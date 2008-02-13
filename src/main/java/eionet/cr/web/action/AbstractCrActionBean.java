@@ -5,8 +5,6 @@ import eionet.cr.web.security.CrUser;
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
 
-import static eionet.cr.web.util.ICrWebConstants.*;
-
 /**
  * Root class for all CR ActionBeans.
  * 
