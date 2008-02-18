@@ -23,7 +23,7 @@ public class SQLUtil {
 	 * @param valueMap
 	 * @throws SQLException 
 	 */
-	public static List<Map<String,SQLValue>> executeQuery(ParameterizedSQL parametrizedSQL, Map<String,SQLValue> valueMap, Connection conn)
+	public static List<Map<String,SQLValue>> executeQuery(ParameterizedSQL parametrizedSQL, Map<String,Object> valueMap, Connection conn)
 																														throws SQLException{		
 		List<Map<String,SQLValue>> result = new ArrayList<Map<String,SQLValue>>();
 		
@@ -68,7 +68,7 @@ public class SQLUtil {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static int executeUpdate(ParameterizedSQL parametrizedSQL, Map<String,SQLValue> valueMap, Connection conn) throws SQLException{
+	public static int executeUpdate(ParameterizedSQL parametrizedSQL, Map<String,Object> valueMap, Connection conn) throws SQLException{
 		
 		PreparedStatement pstmt = null;
 		try{
@@ -91,13 +91,12 @@ public class SQLUtil {
 	 * @return
 	 * @throws SQLException
 	 */
-	private static PreparedStatement prepareStatement(ParameterizedSQL parametrizedSQL, Map<String,SQLValue> valueMap, Connection conn)
+	private static PreparedStatement prepareStatement(ParameterizedSQL parametrizedSQL, Map<String,Object> valueMap, Connection conn)
 																													throws SQLException{
 		String[] sqlParamNames = parametrizedSQL.getParamNames();
 		PreparedStatement pstmt= conn.prepareStatement(parametrizedSQL.getSqlString());
 		for (int i=0; sqlParamNames!=null && i<sqlParamNames.length; i++){
-			SQLValue sqlValue = (SQLValue)valueMap.get(sqlParamNames[i]);
-			pstmt.setObject(i+1, sqlValue.getObject(), sqlValue.getSQLType());
+			pstmt.setObject(i+1, valueMap.get(sqlParamNames[i]));
 		}
 		
 		return pstmt;

@@ -31,17 +31,16 @@ public class MySQLSampleDAO extends MySQLBaseDAO implements SampleDAO{
 	private static final ParameterizedSQL sampleSQL = new ParameterizedSQL(
 			"select * from SAMPLE_TABLE where COL1=? and COL2=?",
 			"col1, col2");
-	/**
-	 * 
-	 * @return
-	 * @throws DAOException 
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.SampleDAO#executeSampleQuery()
 	 */
-	@Override
 	public List<Map<String,SQLValue>> executeSampleQuery() throws DAOException{
 		
-		Map<String,SQLValue> valueMap = new HashMap<String,SQLValue>();
-		valueMap.put("col1", new SQLValue("col1_VALUE", Types.VARCHAR));
-		valueMap.put("col2", new SQLValue("col2_VALUE", Types.INTEGER));
+		Map<String,Object> valueMap = new HashMap<String,Object>();
+		valueMap.put("col1", "some value");
+		valueMap.put("col2", Integer.valueOf("9999"));
 		
 		Connection conn = null;
 		try{
