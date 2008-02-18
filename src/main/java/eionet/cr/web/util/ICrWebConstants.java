@@ -1,9 +1,8 @@
 package eionet.cr.web.util;
 
 /**
- * Interface that holds CR web part related constants.
  * 
- * @author gerasvad
+ * @author heinljab
  *
  */
 public interface ICrWebConstants {
