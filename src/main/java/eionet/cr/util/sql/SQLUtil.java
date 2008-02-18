@@ -23,19 +23,14 @@ public class SQLUtil {
 	 * @param valueMap
 	 * @throws SQLException 
 	 */
-	public static List<Map<String,SQLValue>> executeQuery(ParameterizedSQL parametrizedSQL, Map<String,SQLValue> valueMap, Connection conn) throws SQLException{
-		
+	public static List<Map<String,SQLValue>> executeQuery(ParameterizedSQL parametrizedSQL, Map<String,SQLValue> valueMap, Connection conn)
+																														throws SQLException{		
 		List<Map<String,SQLValue>> result = new ArrayList<Map<String,SQLValue>>();
+		
 		ResultSet rs = null;
 		PreparedStatement pstmt = null;
 		try{
-			String[] sqlParamNames = parametrizedSQL.getParamNames();
-			pstmt= conn.prepareStatement(parametrizedSQL.getSqlString());
-			for (int i=0; sqlParamNames!=null && i<sqlParamNames.length; i++){
-				SQLValue sqlValue = (SQLValue)valueMap.get(sqlParamNames[i]);
-				pstmt.setObject(i+1, sqlValue.getObject(), sqlValue.getSQLType());
-			}
-			
+			pstmt = prepareStatement(parametrizedSQL, valueMap, conn);
 			rs = pstmt.executeQuery();
 			if (rs!=null){
 				ResultSetMetaData rsMetadata = rs.getMetaData();
@@ -63,5 +58,48 @@ public class SQLUtil {
 		}
 		
 		return result.size()==0 ? null : result;
+	}
+
+	/**
+	 * 
+	 * @param parametrizedSQL
+	 * @param valueMap
+	 * @param conn
+	 * @return
+	 * @throws SQLException
+	 */
+	public static int executeUpdate(ParameterizedSQL parametrizedSQL, Map<String,SQLValue> valueMap, Connection conn) throws SQLException{
+		
+		PreparedStatement pstmt = null;
+		try{
+			pstmt = prepareStatement(parametrizedSQL, valueMap, conn);
+			return pstmt.executeUpdate();
+		}
+		finally{
+			try{
+				if (pstmt!=null) pstmt.close();
+			}
+			catch (SQLException e){}
+		}
+	}
+	
+	/**
+	 * 
+	 * @param parametrizedSQL
+	 * @param valueMap
+	 * @param conn
+	 * @return
+	 * @throws SQLException
+	 */
+	private static PreparedStatement prepareStatement(ParameterizedSQL parametrizedSQL, Map<String,SQLValue> valueMap, Connection conn)
+																													throws SQLException{
+		String[] sqlParamNames = parametrizedSQL.getParamNames();
+		PreparedStatement pstmt= conn.prepareStatement(parametrizedSQL.getSqlString());
+		for (int i=0; sqlParamNames!=null && i<sqlParamNames.length; i++){
+			SQLValue sqlValue = (SQLValue)valueMap.get(sqlParamNames[i]);
+			pstmt.setObject(i+1, sqlValue.getObject(), sqlValue.getSQLType());
+		}
+		
+		return pstmt;
 	}
 }
