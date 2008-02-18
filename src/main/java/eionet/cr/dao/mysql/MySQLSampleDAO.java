@@ -1,5 +1,6 @@
 package eionet.cr.dao.mysql;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
@@ -42,11 +43,19 @@ public class MySQLSampleDAO extends MySQLBaseDAO implements SampleDAO{
 		valueMap.put("col1", new SQLValue("col1_VALUE", Types.VARCHAR));
 		valueMap.put("col2", new SQLValue("col2_VALUE", Types.INTEGER));
 		
+		Connection conn = null;
 		try{
-			return SQLUtil.executeQuery(sampleSQL, valueMap, getConnection());
+			conn = getConnection();
+			return SQLUtil.executeQuery(sampleSQL, valueMap, conn);
 		}
 		catch (SQLException e){
 			throw new DAOException(e.getMessage(), e);
+		}
+		finally{
+			try{
+				if (conn!=null) conn.close();
+			}
+			catch (SQLException e){}
 		}
 	}
 }
