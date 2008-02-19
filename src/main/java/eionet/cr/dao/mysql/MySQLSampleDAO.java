@@ -28,9 +28,7 @@ public class MySQLSampleDAO extends MySQLBaseDAO implements SampleDAO{
 	}
 
 	/** */
-	private static final ParameterizedSQL sampleSQL = new ParameterizedSQL(
-			"select * from SAMPLE_TABLE where COL1=? and COL2=?",
-			"col1, col2");
+	private static final String sampleSQL = "select * from SAMPLE_TABLE where COL1=? and COL2=?";
 
 	/*
 	 * (non-Javadoc)
@@ -38,14 +36,14 @@ public class MySQLSampleDAO extends MySQLBaseDAO implements SampleDAO{
 	 */
 	public List<Map<String,SQLValue>> executeSampleQuery() throws DAOException{
 		
-		Map<String,Object> valueMap = new HashMap<String,Object>();
-		valueMap.put("col1", "some value");
-		valueMap.put("col2", Integer.valueOf("9999"));
+		List<Object> values = new ArrayList<Object>();
+		values.add("some value");
+		values.add(Integer.valueOf("9999"));
 		
 		Connection conn = null;
 		try{
 			conn = getConnection();
-			return SQLUtil.executeQuery(sampleSQL, valueMap, conn);
+			return SQLUtil.executeQuery(sampleSQL, values, conn);
 		}
 		catch (SQLException e){
 			throw new DAOException(e.getMessage(), e);

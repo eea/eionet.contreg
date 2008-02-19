@@ -1,12 +1,10 @@
 package eionet.cr.dao.mysql;
 
 import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.sql.SQLException;
 
-import eionet.cr.util.sql.ParameterizedSQL;
-import eionet.cr.util.sql.SQLUtil;
-import eionet.cr.util.sql.SQLValue;
+import eionet.cr.dao.DAOException;
+import eionet.cr.util.sql.MySQLUtil;
 
 /**
  * 
@@ -22,4 +20,24 @@ public abstract class MySQLBaseDAO {
 	protected Connection getConnection(){
 		return MySQLDAOFactory.getConnection();
 	}
+	
+	/**
+	 * 
+	 * @return
+	 * @throws DAOException
+	 */
+	protected Integer getLastInsertID() throws DAOException{
+		Connection conn = getConnection();
+		try{
+			return MySQLUtil.getLastInsertID(conn);
+		}
+		catch (SQLException e){
+			throw new DAOException(e.getMessage(), e);
+		}
+		finally{
+			try{
+				if (conn!=null) conn.close();
+			}
+			catch (SQLException e){}
+		}	}
 }

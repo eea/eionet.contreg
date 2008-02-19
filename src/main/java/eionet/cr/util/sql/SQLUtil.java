@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
@@ -19,33 +20,38 @@ public class SQLUtil {
 
 	/**
 	 * 
-	 * @param parametrizedSQL
+	 * @param parameterizedSQL
 	 * @param valueMap
 	 * @throws SQLException 
 	 */
-	public static List<Map<String,SQLValue>> executeQuery(ParameterizedSQL parametrizedSQL, Map<String,Object> valueMap, Connection conn)
-																														throws SQLException{		
-		List<Map<String,SQLValue>> result = new ArrayList<Map<String,SQLValue>>();
+	public static List<Map<String,SQLValue>> executeQuery(String parameterizedSQL, List<Object> values, Connection conn) throws SQLException{
 		
+		SQLValueReader sqlValueReader = new SQLValueReader();
+		executeQuery(parameterizedSQL, values, sqlValueReader, conn);
+		return sqlValueReader.getResultList();
+	}
+	
+	/**
+	 * 
+	 * @param parameterizedSQL
+	 * @param values
+	 * @param rsReader
+	 * @param conn
+	 * @throws SQLException
+	 */
+	public static void executeQuery(String parameterizedSQL, List<Object> values, ResultSetBaseReader rsReader, Connection conn)
+																											throws SQLException{
 		ResultSet rs = null;
 		PreparedStatement pstmt = null;
 		try{
-			pstmt = prepareStatement(parametrizedSQL, valueMap, conn);
+			pstmt = prepareStatement(parameterizedSQL, values, conn);
 			rs = pstmt.executeQuery();
 			if (rs!=null){
-				ResultSetMetaData rsMetadata = rs.getMetaData();
-				int colCount = rsMetadata.getColumnCount();
-				if (colCount>0){
-					while (rs.next()){
-						Map<String,SQLValue> rowMap = new HashMap<String,SQLValue>();
-						for (int i=1; i<=colCount; i++){
-							String colName = rsMetadata.getColumnName(i);
-							int colSQLType = rsMetadata.getColumnType(i);
-							rowMap.put(colName, new SQLValue(rs.getObject(i), colSQLType));
-						}
-						if (rowMap.size()>0)
-							result.add(rowMap);
-					}
+				ResultSetMetaData rsMd = rs.getMetaData();
+				if (rsMd!=null && rsMd.getColumnCount()>0){
+					rsReader.setResultSetMetaData(rsMd);
+					while (rs.next())
+						rsReader.readRow(rs);
 				}
 			}
 		}
@@ -56,23 +62,69 @@ public class SQLUtil {
 			}
 			catch (SQLException e){}
 		}
-		
-		return result.size()==0 ? null : result;
+
 	}
 
 	/**
 	 * 
-	 * @param parametrizedSQL
+	 * @param sql
+	 * @param conn
+	 * @return
+	 * @throws SQLException
+	 */
+	public static List<Map<String,SQLValue>> executeQuery(String sql, Connection conn) throws SQLException{
+		
+		SQLValueReader sqlValueReader = new SQLValueReader();
+		executeQuery(sql, sqlValueReader, conn);
+		return sqlValueReader.getResultList();
+	}
+
+	/**
+	 * 
+	 * @param sql
+	 * @param rsReader
+	 * @param conn
+	 * @throws SQLException
+	 */
+	public static void executeQuery(String sql, ResultSetBaseReader rsReader, Connection conn) throws SQLException{
+		
+		ResultSet rs = null;
+		Statement stmt = null;
+		try{
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(sql);
+			if (rs!=null){
+				ResultSetMetaData rsMd = rs.getMetaData();
+				if (rsMd!=null && rsMd.getColumnCount()>0){
+					rsReader.setResultSetMetaData(rsMd);
+					while (rs.next())
+						rsReader.readRow(rs);
+				}
+			}
+		}
+		finally{
+			try{
+				if (rs!=null) rs.close();
+				if (stmt!=null) stmt.close();
+			}
+			catch (SQLException e){}
+		}
+
+	}
+	
+	/**
+	 * 
+	 * @param parameterizedSQL
 	 * @param valueMap
 	 * @param conn
 	 * @return
 	 * @throws SQLException
 	 */
-	public static int executeUpdate(ParameterizedSQL parametrizedSQL, Map<String,Object> valueMap, Connection conn) throws SQLException{
+	public static int executeUpdate(String parameterizedSQL, List<Object> values, Connection conn) throws SQLException{
 		
 		PreparedStatement pstmt = null;
 		try{
-			pstmt = prepareStatement(parametrizedSQL, valueMap, conn);
+			pstmt = prepareStatement(parameterizedSQL, values, conn);
 			return pstmt.executeUpdate();
 		}
 		finally{
@@ -85,20 +137,18 @@ public class SQLUtil {
 	
 	/**
 	 * 
-	 * @param parametrizedSQL
+	 * @param parameterizedSQL
 	 * @param valueMap
 	 * @param conn
 	 * @return
 	 * @throws SQLException
 	 */
-	private static PreparedStatement prepareStatement(ParameterizedSQL parametrizedSQL, Map<String,Object> valueMap, Connection conn)
-																													throws SQLException{
-		String[] sqlParamNames = parametrizedSQL.getParamNames();
-		PreparedStatement pstmt= conn.prepareStatement(parametrizedSQL.getSqlString());
-		for (int i=0; sqlParamNames!=null && i<sqlParamNames.length; i++){
-			pstmt.setObject(i+1, valueMap.get(sqlParamNames[i]));
-		}
+	private static PreparedStatement prepareStatement(String parameterizedSQL, List<Object> values, Connection conn) throws SQLException{
 		
+		PreparedStatement pstmt= conn.prepareStatement(parameterizedSQL);
+		for (int i=0; values!=null && i<values.size(); i++){
+			pstmt.setObject(i+1, values.get(i));
+		}
 		return pstmt;
 	}
 }
