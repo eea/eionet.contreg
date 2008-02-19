@@ -1,113 +1,67 @@
 package eionet.cr.config;
 
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
+import java.io.IOException;
+import java.util.Properties;
 
+import org.apache.log4j.Logger;
 
 /**
  * 
- * @author altnyris
+ * @author heinljab
  *
  */
 public class GeneralConfig {
-
-	private ResourceBundle props;
-	  
-	private final String PROP_FILE = "cr";
 	
-	/**
-	* DB connection URL for DB connection
-	*/
+	/** */
+	private static final String PROPERTIES_FILE_NAME = "osi.properties";
+
+	/** */
 	public static final String DB_URL = "db.url";
-
-
-	/**
-	* DB driver
-	*/
 	public static final String DB_DRV = "db.drv";
-
-    /**
-	* DB user id for the extractor
-	*/
 	public static final String DB_USER_ID = "db.usr";
-
-	/**
-	* User PWD  for DB connection
-	*/
 	public static final String DB_USER_PWD = "db.pwd";
+
+	/** */
+	private static Logger logger = Logger.getLogger(GeneralConfig.class);
+
+	/** */
+	private static Properties properties = null;
 	
+	/** */
+	private static void init(){
+		properties = new Properties();
+		try{
+			properties.load(GeneralConfig.class.getClassLoader().getResourceAsStream("osi.properties"));
+		}
+		catch (IOException e){
+			logger.fatal("Failed to load properties from " + PROPERTIES_FILE_NAME, e);
+		}
+	}
+
 	/**
-	* DataSource name
-	*/
-	public static final String JDBC_NAME = "jdbc.name";
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public static synchronized String getProperty(String key){
+		
+		if (properties==null)
+			init();
+		
+		return properties.getProperty(key);
+	}
 
-	/** Creates new GeneralConfig */
-	  public GeneralConfig() throws Exception {
-	     try {
-	        props = ResourceBundle.getBundle(PROP_FILE);
-	     } catch (MissingResourceException mre) {
-	       throw new Exception("Properties file " + PROP_FILE + ".properties not found");
-	     }
-
-	  }
-	  
-	  /**
-	  *
-	  */
-	   public String getStringProperty(String propName) throws Exception {
-	     try {
-	        return props.getString(propName);
-	     } catch (MissingResourceException mre) {
-	        throw new Exception("Property value for key " + propName + " not found");
-	     }
-	   }
-
-	 /**
-	  *
-	  */
-	   public boolean getBooleanProperty(String propName) throws Exception {
-	     try {
-	        String s = props.getString(propName);
-	        return Boolean.valueOf(s).booleanValue();
-	     } catch (MissingResourceException mre) {
-	        throw new Exception("Property value for key " + propName + " not found");
-	     }
-	   }
-
-	 /**
-	  *
-	  */
-	   public int getIntProperty(String propName) throws Exception {
-	     try {
-	       String s = props.getString(propName);
-	       return Integer.parseInt(s);
-	     } catch (MissingResourceException mre) {
-	        throw new Exception("Property value for key " + propName + " not found");
-	     } catch (NumberFormatException nfe) {
-	        throw new Exception("Invalid value for integer property " + propName);
-	     }
-	   }
-
-	   /**
-	   *
-	   */
-	    public String[] getStringArrayProperty(String propName, String separator) throws Exception {
-	      try {
-	     	 String[] str= null;
-	     	 String s = props.getString(propName);
-
-	     	 if (separator == null || separator.length()==0){
-	     		 str = new String[1];
-	     		 str[0] = s;
-	     	 }
-	     	 else{
-	     		 char c = separator.charAt(0);
-	     		 String sep = Character.isLetterOrDigit(c) ? Character.toString(c) : "\\" + c;
-	         	 str =s.split(sep);
-	     	 }
-	         return str;
-	      } catch (MissingResourceException mre) {
-	         throw new Exception("Property value for key " + propName + " not found");
-	      }
-	    }
+	/**
+	 * 
+	 * @param key
+	 * @param defaultValue
+	 * @return
+	 */
+	public static synchronized String getProperty(String key, String defaultValue){
+		
+		if (properties==null)
+			init();
+		
+		return properties.getProperty(key, defaultValue);
+	}
 }
