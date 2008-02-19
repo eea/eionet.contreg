@@ -17,13 +17,13 @@ public class DAOUsageSample {
 	 */
 	public static void sampleUsage(){
 		
-		try {
-			SampleDAO sampleDAO = DAOFactory.getDAOFactory().getSampleDAO();
-			List<Map<String,SQLValue>> list = sampleDAO.executeSampleQuery();
-			System.out.println(list);
+		/*try {
+			//ISourceDao sampleDAO = DAOFactory.getDAOFactory().getSourceDAO();
+			//List<Map<String,SQLValue>> list = sampleDAO.executeQuery();
+			//System.out.println(list);
 			
 		} catch (DAOException e) {
 			e.printStackTrace();
-		}
+		}*/
 	}
 }

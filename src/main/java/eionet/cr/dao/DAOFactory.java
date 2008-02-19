@@ -11,7 +11,7 @@ public abstract class DAOFactory {
 	 * 
 	 * @return
 	 */
-	public abstract SampleDAO getSampleDAO();
+	public abstract HarvestSourceDAO getHarvestSourceDAO();
 	
 	/**
 	 * 

@@ -1,16 +1,15 @@
 package eionet.cr.dao.mysql;
 
-import java.sql.Connection;
-
 import eionet.cr.dao.DAOFactory;
-import eionet.cr.dao.SampleDAO;
+import eionet.cr.dao.HarvestSourceDAO;
 
 /**
  * 
- * @author heinljab
+ * @author heinljab, altnyris
  *
  */
 public class MySQLDAOFactory extends DAOFactory {
+	
 
 	/**
 	 * 
@@ -18,17 +17,12 @@ public class MySQLDAOFactory extends DAOFactory {
 	public MySQLDAOFactory(){
 	}
 	
-	/**
-	 * 
-	 * @return
-	 */
-	public static Connection getConnection(){
-		// TODO - this must return a real java.sql.Connection object
-		return null;
-	}
+	private HarvestSourceDAO harvestSourceDAO = new MySQLHarvestSourceDAO();
 	
+
+	 
 	@Override
-	public SampleDAO getSampleDAO() {
-		return new MySQLSampleDAO();
+	public HarvestSourceDAO getHarvestSourceDAO() {
+		return new MySQLHarvestSourceDAO();
 	}
 }
