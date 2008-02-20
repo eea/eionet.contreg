@@ -5,7 +5,7 @@ package eionet.cr.harvest.util;
  * @author heinljab
  *
  */
-public class ResourceProperty {
+public class RDFResourceProperty {
 
 	/** */
 	private String id = null;
@@ -20,7 +20,7 @@ public class ResourceProperty {
 	 * @param id
 	 * @param value
 	 */
-	public ResourceProperty(String id, String value, boolean isAnonymous, boolean isLiteral){
+	public RDFResourceProperty(String id, String value, boolean isAnonymous, boolean isLiteral){
 		this.id = id;
 		this.value = value;
 		this.isLiteral = isLiteral;

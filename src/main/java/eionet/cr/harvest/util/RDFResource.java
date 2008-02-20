@@ -8,17 +8,17 @@ import java.util.List;
  * @author heinljab
  *
  */
-public class Resource {
+public class RDFResource {
 
 	/** */
 	private String id = null;
-	private List<ResourceProperty> properties = null;
+	private List<RDFResourceProperty> properties = null;
 
 	/**
 	 * 
 	 * @param id
 	 */
-	public Resource(String id){
+	public RDFResource(String id){
 		this.id = id;
 	}
 
@@ -33,16 +33,16 @@ public class Resource {
 	 * 
 	 * @param property
 	 */
-	public void addProperty(ResourceProperty property){
+	public void addProperty(RDFResourceProperty property){
 		if (properties!=null)
-			properties = new ArrayList<ResourceProperty>();
+			properties = new ArrayList<RDFResourceProperty>();
 		properties.add(property);
 	}
 
 	/**
 	 * @return the properties
 	 */
-	public List<ResourceProperty> getProperties() {
+	public List<RDFResourceProperty> getProperties() {
 		return properties;
 	}
 }
