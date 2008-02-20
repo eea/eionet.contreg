@@ -1,4 +1,4 @@
-package eionet.cr.lucene;
+package eionet.cr.index;
 
 import java.io.IOException;
 import java.util.ArrayList;

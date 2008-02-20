@@ -13,13 +13,17 @@ import org.apache.log4j.Logger;
 public class GeneralConfig {
 	
 	/** */
-	private static final String PROPERTIES_FILE_NAME = "osi.properties";
+	private static final String PROPERTIES_FILE_NAME = "cr.properties";
 
 	/** */
 	public static final String DB_URL = "db.url";
 	public static final String DB_DRV = "db.drv";
 	public static final String DB_USER_ID = "db.usr";
 	public static final String DB_USER_PWD = "db.pwd";
+	
+	/** */
+	public static final String LUCENE_INDEX_LOCATION = "lucene.index.location";
+	public static final String HARVESTER_FILES_LOCATION = "harvester.files.location";
 
 	/** */
 	private static Logger logger = Logger.getLogger(GeneralConfig.class);
@@ -31,7 +35,7 @@ public class GeneralConfig {
 	private static void init(){
 		properties = new Properties();
 		try{
-			properties.load(GeneralConfig.class.getClassLoader().getResourceAsStream("osi.properties"));
+			properties.load(GeneralConfig.class.getClassLoader().getResourceAsStream(PROPERTIES_FILE_NAME));
 		}
 		catch (IOException e){
 			logger.fatal("Failed to load properties from " + PROPERTIES_FILE_NAME, e);

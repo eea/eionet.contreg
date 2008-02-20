@@ -15,7 +15,7 @@ import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 
-import eionet.cr.lucene.Searcher;
+import eionet.cr.index.Searcher;
 
 /**
  * 

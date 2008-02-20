@@ -26,7 +26,7 @@ import com.hp.hpl.jena.rdf.arp.ALiteral;
 import com.hp.hpl.jena.rdf.arp.AResource;
 import com.hp.hpl.jena.rdf.arp.StatementHandler;
 
-import eionet.cr.lucene.Searcher;
+import eionet.cr.index.Searcher;
 import eionet.cr.util.Util;
 
 /**
