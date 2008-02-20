@@ -14,11 +14,6 @@ import org.apache.log4j.Logger;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 
-/**
- * 
- * @author heinljab
- *
- */
 public class ConnectionUtil {
 	
 	/** */
@@ -42,7 +37,6 @@ public class ConnectionUtil {
 	 * 
 	 * @return
 	 * @throws SQLException 
-	 * @throws NamingException 
 	 */
 	public static synchronized Connection getJNDIConnection() throws SQLException{
 		
