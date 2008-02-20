@@ -110,5 +110,15 @@
 			<artifactId>standard</artifactId>
 			<version>1.1.2</version>
 		</dependency>
+		<dependency>
+			<groupId>lucene</groupId>
+			<artifactId>lucene-core</artifactId>
+			<version>2.2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>ARP</groupId>
+			<artifactId>ARP2</artifactId>
+			<version>alpha-1</version>
+		</dependency>
 	</dependencies>
 </project>
