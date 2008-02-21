@@ -58,7 +58,7 @@ public abstract class AbstractCrActionBean implements ActionBean {
 	/**
 	 * Method handles {@link CrException}
 	 * 
-	 * @param exception exception to handle.
+	 * @param exception exception to handle. 
 	 */
 	void handleCrException(CrException exception) {
 		logger.error(exception.getMessage(), exception);
