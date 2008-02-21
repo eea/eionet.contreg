@@ -1,16 +1,12 @@
 <%@page contentType="text/html;charset=UTF-8" import="java.util.*,java.io.*,eionet.cr.dao.DAOFactory"%>
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld" %>
 
- <%@ taglib uri="http://java.sun.com/jsp/jstl/sql" prefix="sql" %>
-
-<stripes:layout-render name="/pages/common/template.jsp" pageTitle="Kalkulaator">
+<stripes:layout-render name="/pages/common/template.jsp" pageTitle="Add Harvesting Source">
+	<stripes:layout-component name="errors"/>
+	<stripes:layout-component name="messages"/>
 	<stripes:layout-component name="contents">
 		<h1>Add source</h1>
-		<style type="text/css">
-		    input.error { background-color: yellow; }
-		</style>
 	    <stripes:form action="/source.action" focus="">
-	    	<stripes:errors/>
 	        <table>
 	            <tr>
 	                <td>Identifier:</td>

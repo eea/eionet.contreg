@@ -84,6 +84,35 @@
             	</stripes:layout-component>
 
 				<div id="workarea">
+					<stripes:layout-component name="errors">
+						<style type="text/css">
+						    input.error { background-color: yellow; }
+						</style>
+						<stripes:errors/>
+					</stripes:layout-component>
+					<stripes:layout-component name="messages">
+					<c:choose>
+						<c:when test="${actionBean.context.severity == 1}">
+							<div class="system-msg">
+								<stripes:messages/>
+							</div>
+						</c:when>
+						<c:when test="${actionBean.context.severity == 1}">
+							<div class="caution-msg">
+								<strong>Warning ...</strong>		
+								<stripes:messages/>
+							</div>
+						</c:when>
+						<c:when test="${actionBean.context.severity == 2}">
+							<div class="warning-msg">
+								<strong>Errors ...</strong>		
+								<stripes:messages/>
+							</div>
+						</c:when>
+						<c:otherwise>
+						</c:otherwise>
+					</c:choose>
+					</stripes:layout-component>
 					<stripes:layout-component name="contents"/>
 				</div>
 				<div id="pagefoot">

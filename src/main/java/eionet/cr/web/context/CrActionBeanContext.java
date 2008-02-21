@@ -16,10 +16,12 @@ import static eionet.cr.web.util.ICrWebConstants.*;
 /**
  * Extension of stripes ActionBeanContext.
  * 
- * @author gerasvad, altnyris
+ * @author altnyris
  *
  */
 public class CrActionBeanContext extends ActionBeanContext {
+	
+	private int severity;
 	
 	/**
 	 * Wrapper method for {@link ServletRequest#getParameter(String)}.
@@ -81,5 +83,13 @@ public class CrActionBeanContext extends ActionBeanContext {
 	 */
 	public void attachEionetLoginCookie(boolean isLoggedIn) {
 		EionetCASFilter.attachEionetLoginCookie(getResponse(), isLoggedIn);
+	}
+
+	public int getSeverity() {
+		return severity;
+	}
+
+	public void setSeverity(int severity) {
+		this.severity = severity;
 	}
 }

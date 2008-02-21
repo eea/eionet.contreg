@@ -24,6 +24,10 @@ public class GeneralConfig {
 	/** */
 	public static final String LUCENE_INDEX_LOCATION = "lucene.index.location";
 	public static final String HARVESTER_FILES_LOCATION = "harvester.files.location";
+	
+	public static final int SEVERITY_INFO = 0;
+	public static final int SEVERITY_CAUTION = 1;
+	public static final int SEVERITY_WARNING = 2;
 
 	/** */
 	private static Logger logger = Logger.getLogger(GeneralConfig.class);

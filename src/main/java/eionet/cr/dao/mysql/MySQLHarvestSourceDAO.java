@@ -44,22 +44,21 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
     }
     
     /** */
-	private static final String addSourceSQL = "insert into HARVEST_SOURCE (IDENTIFIER,PULL_URL,TYPE,EMAILS,DATE_CREATED,CREATOR) VALUES (?,?,?,?,?,?)";
+	private static final String addSourceSQL = "insert into HARVEST_SOURCE (IDENTIFIER,PULL_URL,TYPE,EMAILS,DATE_CREATED,CREATOR) VALUES (?,?,?,?,NOW(),?)";
 	
 	/*
      * (non-Javadoc)
      * 
      * @see eionet.cr.dao.ISourceDao#getSources()
      */
-    public void addSource(HarvestSourceDTO source) throws DAOException {
+    public void addSource(HarvestSourceDTO source, String user) throws DAOException {
     	    	
     	List<Object> values = new ArrayList<Object>();
 		values.add(source.getIdentifier());
 		values.add(source.getPullUrl());
 		values.add(source.getType());
 		values.add(source.getEmails());
-		values.add("NOW()");
-		values.add("altnyris");
+		values.add(user);
 		
 		try{
 			SQLUtil.executeUpdate(addSourceSQL, values, getConnection());

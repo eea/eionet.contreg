@@ -30,6 +30,10 @@
 			<param-name>ActionBeanContext.Class</param-name>
 			<param-value>eionet.cr.web.context.CrActionBeanContext</param-value>
 		</init-param>
+		<init-param>
+			<param-name>ExceptionHandler.Class</param-name>
+			<param-value>eionet.cr.util.CrExceptionHandler</param-value>
+		</init-param>
 	</filter>
 	
 	<filter-mapping>
