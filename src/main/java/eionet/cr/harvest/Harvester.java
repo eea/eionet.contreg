@@ -41,9 +41,7 @@ public class Harvester {
 	/** */
 	private static Logger logger = Logger.getLogger(Harvester.class);
 	
-	/** */
-	private IndexWriter allIndexWriter = null;
-	private RDFSourceHandler handler = null;
+	private RDFHandler handler = null;
 	private HttpServletRequest servletRequest = null;
 	private ServletContext servletContext = null; 
 	
@@ -55,35 +53,6 @@ public class Harvester {
 
 	/**
 	 * 
-	 * @throws CorruptIndexException
-	 * @throws LockObtainFailedException
-	 * @throws IOException
-	 */
-	private void initIndexing() throws CorruptIndexException, LockObtainFailedException, IOException{
-		
-		if (allIndexWriter==null){
-			Analyzer analyzer = new StandardAnalyzer();
-			String indexLocation = GeneralConfig.getProperty(GeneralConfig.LUCENE_INDEX_LOCATION);
-			allIndexWriter = new IndexWriter(indexLocation, analyzer);
-		}
-	}
-	
-	/**
-	 * @throws IOException 
-	 * @throws CorruptIndexException 
-	 * 
-	 *
-	 */
-	private void closeIndexing() throws CorruptIndexException, IOException{
-		
-		if (allIndexWriter!=null){
-			allIndexWriter.optimize();
-			allIndexWriter.close();
-		}
-	}
-
-	/**
-	 * 
 	 * @param url
 	 * @param useCache
 	 * @throws CorruptIndexException
@@ -91,9 +60,15 @@ public class Harvester {
 	 * @throws MalformedURLException
 	 * @throws IOException
 	 * @throws SAXException
+	 * @throws HarvestException 
 	 */
-	public void harvest(String url, boolean useCache) throws CorruptIndexException, LockObtainFailedException, MalformedURLException, IOException, SAXException{
-		harvest(new URL(url), useCache);
+	public void harvest(String url, boolean useCache) throws HarvestException{
+		try{
+			harvest(new URL(url), useCache);
+		}
+		catch (MalformedURLException e){
+			throw new HarvestException(e.toString(), e);
+		}
 	}
 
 	/**
@@ -104,8 +79,9 @@ public class Harvester {
 	 * @throws LockObtainFailedException
 	 * @throws IOException
 	 * @throws SAXException
+	 * @throws HarvestException 
 	 */
-	public void harvest(URL url, boolean useCache) throws CorruptIndexException, LockObtainFailedException, IOException, SAXException{
+	public void harvest(URL url, boolean useCache) throws HarvestException{
 		
 		File file = new File(GeneralConfig.getProperty(GeneralConfig.HARVESTER_FILES_LOCATION), toFileName(url) + ".xml");
 		if (!useCache){
@@ -119,7 +95,7 @@ public class Harvester {
 				return;
 			}
 			else
-				throw new IOException("No cached file found for " + url.toString());
+				throw new HarvestException("No cached file found for " + url.toString());
 		}
 		
 		harvest(file, url);
@@ -129,9 +105,10 @@ public class Harvester {
 	 * 
 	 * @param url
 	 * @param file
+	 * @throws HarvestException 
 	 * @throws IOException 
 	 */
-	private void download(URL url, File file) throws IOException{
+	private void download(URL url, File file) throws HarvestException{
 
 		InputStream istream = null;
 		FileOutputStream fos = null;
@@ -147,6 +124,9 @@ public class Harvester {
 	
 	        while ((i = istream.read(bytes, 0, bytes.length)) != -1)
 	        	fos.write(bytes, 0, i);
+		}
+		catch (IOException e){
+			throw new HarvestException(e.toString(), e);
 		}
 		finally{
 			try{
@@ -164,37 +144,36 @@ public class Harvester {
 	 * @throws LockObtainFailedException
 	 * @throws IOException
 	 * @throws SAXException 
+	 * @throws HarvestException 
 	 */
-	private void harvest(File file, URL sourceURL) throws CorruptIndexException, LockObtainFailedException, IOException, SAXException{
+	private void harvest(File file, URL sourceURL) throws HarvestException{
 		
 		InputStreamReader reader = null;
-		
+		DefaultHarvestListener harvestListener = new DefaultHarvestListener();
 		try{
-			initIndexing();
-	        reader = new InputStreamReader(new FileInputStream(file));
-
-			// set up the RDFSourceHandler
-			handler = new RDFSourceHandler(allIndexWriter, sourceURL);
-			handler.setServletContext(servletContext);
-			
-			// set up ARP and let it run
+	        reader = new InputStreamReader(new FileInputStream(file));	        
+			handler = new RDFHandler(sourceURL, harvestListener);
 			ARP arp = new ARP();
 	        arp.setStatementHandler(handler);
 	        arp.setErrorHandler(new SAXErrorHandler());
 	        arp.load(reader);
+	        if (harvestListener.hasFatalError())
+	        	throw harvestListener.getFatalException();
+		}
+		catch (Exception e){
+			if (e instanceof HarvestException)
+				throw (HarvestException)e;
+			else
+				throw new HarvestException(e.toString(), e);
 		}
 		finally{
-			// try to close index
-			try{
-				closeIndexing();
-			}
-			catch (Throwable t){}
-			
-			// try to close file input stream
 			try{
 				reader.close();
+				harvestListener.harvestFinished();
 			}
-			catch (Throwable t){}
+			catch (IOException e){
+				logger.error("Failed when trying to close the file's InputStreamReader: " + e.toString(), e);
+			}
 		}
 	}
 	
@@ -219,7 +198,7 @@ public class Harvester {
 		// do the harvest
 		harvester.harvest(url, useCache);
 		
-		RDFSourceHandler handler = harvester.getHandler();
+		RDFHandler handler = harvester.getHandler();
 		if (handler!=null)
 			Messages.addMessage(req, "messages", handler.getCountDocumentsIndexed() + " documents harvested.");
 	}
@@ -228,7 +207,7 @@ public class Harvester {
 	 * 
 	 * @return
 	 */
-	public RDFSourceHandler getHandler() {
+	public RDFHandler getHandler() {
 		return handler;
 	}
 

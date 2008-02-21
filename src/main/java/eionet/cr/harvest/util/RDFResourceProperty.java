@@ -1,5 +1,7 @@
 package eionet.cr.harvest.util;
 
+import eionet.cr.util.Util;
+
 /**
  * 
  * @author heinljab
@@ -15,16 +17,25 @@ public class RDFResourceProperty {
 	private boolean isLiteral = false;
 	private boolean isAnonymous = false;
 	
+	/** */
+	private boolean isValueURL = false;
+	
 	/**
 	 * 
 	 * @param id
 	 * @param value
+	 * @throws NullPointerException if the given id or value is null
 	 */
-	public RDFResourceProperty(String id, String value, boolean isAnonymous, boolean isLiteral){
+	public RDFResourceProperty(String id, String value, boolean isLiteral, boolean isAnonymous){
+		
+		if (id==null || value==null)
+			throw new NullPointerException();
+		
 		this.id = id;
 		this.value = value;
 		this.isLiteral = isLiteral;
 		this.isAnonymous = isAnonymous;
+		this.isValueURL = Util.isURL(value);
 	}
 
 	/**
@@ -53,5 +64,12 @@ public class RDFResourceProperty {
 	 */
 	public boolean isAnonymous() {
 		return isAnonymous;
+	}
+
+	/**
+	 * @return the isValueURL
+	 */
+	public boolean isValueURL() {
+		return isValueURL;
 	}
 }

@@ -22,7 +22,6 @@ public abstract class Indexer {
 
 	/**
 	 * 
-	 * @throws IndexException
 	 */
-	public abstract void close() throws IndexException;
+	public abstract void close();
 }

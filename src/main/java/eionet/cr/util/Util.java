@@ -56,7 +56,7 @@ public class Util {
 	 * @param s
 	 * @return
 	 */
-	public static boolean isUrl(String s){
+	public static boolean isURL(String s){
 		try{
 			URL url = new URL(s);
 			return true;
