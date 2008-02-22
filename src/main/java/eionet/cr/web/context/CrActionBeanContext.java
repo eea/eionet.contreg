@@ -8,10 +8,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import eionet.cr.web.security.EionetCASFilter;
-import eionet.cr.web.security.CrUser;
+import eionet.cr.web.security.CRUser;
 import net.sourceforge.stripes.action.ActionBeanContext;
 
-import static eionet.cr.web.util.ICrWebConstants.*;
+import static eionet.cr.web.util.ICRWebConstants.*;
 
 /**
  * Extension of stripes ActionBeanContext.
@@ -19,7 +19,7 @@ import static eionet.cr.web.util.ICrWebConstants.*;
  * @author altnyris
  *
  */
-public class CrActionBeanContext extends ActionBeanContext {
+public class CRActionBeanContext extends ActionBeanContext {
 	
 	private int severity;
 	
@@ -46,12 +46,12 @@ public class CrActionBeanContext extends ActionBeanContext {
 	}
 	
 	/**
-	 * Method returns {@link CrUser} from session.
+	 * Method returns {@link CRUser} from session.
 	 * 
-	 * @return {@link CrUser} from session or null if user is not logged in.
+	 * @return {@link CRUser} from session or null if user is not logged in.
 	 */
-	public CrUser getCrUser() {
-		return (CrUser) getRequest().getSession(true).getAttribute(USER_SESSION_ATTR);
+	public CRUser getCrUser() {
+		return (CRUser) getRequest().getSession(true).getAttribute(USER_SESSION_ATTR);
 	}
 	
 	/**

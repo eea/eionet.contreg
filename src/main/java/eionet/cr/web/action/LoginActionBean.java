@@ -9,7 +9,7 @@ import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 
-import static eionet.cr.web.util.ICrWebConstants.*;
+import static eionet.cr.web.util.ICRWebConstants.*;
 
 /**
  * Action bean that deals with user login/logout.
@@ -20,7 +20,7 @@ import static eionet.cr.web.util.ICrWebConstants.*;
  *
  */
 @UrlBinding(LOGIN_ACTION)
-public class LoginActionBean extends AbstractCrActionBean {
+public class LoginActionBean extends AbstractCRActionBean {
 	
 	/**
 	 * Action method deals with user logging in.

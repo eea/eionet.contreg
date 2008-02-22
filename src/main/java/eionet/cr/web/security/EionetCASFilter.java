@@ -18,7 +18,7 @@ import javax.servlet.http.HttpSession;
 
 import edu.yale.its.tp.cas.client.filter.CASFilter;
 
-import static eionet.cr.web.util.ICrWebConstants.*;
+import static eionet.cr.web.util.ICRWebConstants.*;
 
 public class EionetCASFilter extends CASFilter {
 
@@ -62,7 +62,7 @@ public class EionetCASFilter extends CASFilter {
 			if (session != null) {
 				String userName = (String) session
 						.getAttribute(CAS_FILTER_USER);
-				httpRequest.getSession(true).setAttribute(USER_SESSION_ATTR, new CrUser(userName));
+				httpRequest.getSession(true).setAttribute(USER_SESSION_ATTR, new CRUser(userName));
 				String requestURI = httpRequest.getRequestURI();
 				HttpServletResponse httpResponse = (HttpServletResponse) response;
 				if (requestURI.indexOf(EIONET_COOKIE_LOGIN_PATH) > -1) {

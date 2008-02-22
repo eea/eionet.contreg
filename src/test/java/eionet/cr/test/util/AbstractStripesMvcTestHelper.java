@@ -3,7 +3,7 @@ package eionet.cr.test.util;
 import java.util.HashMap;
 import java.util.Map;
 
-import eionet.cr.web.action.AbstractCrActionBean;
+import eionet.cr.web.action.AbstractCRActionBean;
 
 import net.sourceforge.stripes.controller.DispatcherServlet;
 import net.sourceforge.stripes.controller.StripesFilter;
@@ -15,7 +15,7 @@ import net.sourceforge.stripes.mock.MockServletContext;
  * @author gerasvad, altnyris
  *
  */
-public abstract class AbstractStripesMvcTestHelper extends AbstractCrActionBean {
+public abstract class AbstractStripesMvcTestHelper extends AbstractCRActionBean {
 	private static MockServletContext mockServletContext;
 	
 	protected MockServletContext getMockServletContext() {

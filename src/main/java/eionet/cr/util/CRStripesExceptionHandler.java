@@ -16,9 +16,9 @@ import net.sourceforge.stripes.exception.ExceptionHandler;
  * @author altnyris
  *
  */
-public class CrExceptionHandler implements ExceptionHandler {
+public class CRStripesExceptionHandler implements ExceptionHandler {
 	
-	private static Log logger = LogFactory.getLog(CrExceptionHandler.class);
+	private static Log logger = LogFactory.getLog(CRStripesExceptionHandler.class);
     /** Doesn't have to do anything... */
     public void init(Configuration configuration) throws Exception { }
 

@@ -28,11 +28,11 @@
 		</init-param>
 		<init-param>
 			<param-name>ActionBeanContext.Class</param-name>
-			<param-value>eionet.cr.web.context.CrActionBeanContext</param-value>
+			<param-value>eionet.cr.web.context.CRActionBeanContext</param-value>
 		</init-param>
 		<init-param>
 			<param-name>ExceptionHandler.Class</param-name>
-			<param-value>eionet.cr.util.CrExceptionHandler</param-value>
+			<param-value>eionet.cr.util.CRStripesExceptionHandler</param-value>
 		</init-param>
 	</filter>
 	

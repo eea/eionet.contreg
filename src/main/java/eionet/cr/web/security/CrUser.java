@@ -6,16 +6,16 @@ package eionet.cr.web.security;
  * @author altnyris
  *
  */
-public class CrUser {
+public class CRUser {
 	
 	private String userName;
 	
 	/** Default constructor. */
-	public CrUser() {
+	public CRUser() {
 		
 	}
 	
-	public CrUser(String userName) {
+	public CRUser(String userName) {
 		this.userName = userName;
 	}
 	

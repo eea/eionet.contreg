@@ -13,7 +13,7 @@ import net.sourceforge.stripes.action.UrlBinding;
  * @author altnyris
  */
 @UrlBinding("/source.action")
-public class HarvestSourceActionBean extends AbstractCrActionBean {
+public class HarvestSourceActionBean extends AbstractCRActionBean {
 	private HarvestSourceDTO harvestSource; 
 	
 	

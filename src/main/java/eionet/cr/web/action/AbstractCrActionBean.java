@@ -4,8 +4,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import eionet.cr.util.CRException;
-import eionet.cr.web.context.CrActionBeanContext;
-import eionet.cr.web.security.CrUser;
+import eionet.cr.web.context.CRActionBeanContext;
+import eionet.cr.web.security.CRUser;
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.validation.SimpleError;
@@ -16,33 +16,33 @@ import net.sourceforge.stripes.validation.SimpleError;
  * @author altnyris
  *
  */
-public abstract class AbstractCrActionBean implements ActionBean {
+public abstract class AbstractCRActionBean implements ActionBean {
 	
-	private static Log logger = LogFactory.getLog(AbstractCrActionBean.class);
+	private static Log logger = LogFactory.getLog(AbstractCRActionBean.class);
 	
-	private CrActionBeanContext context;
+	private CRActionBeanContext context;
 	
 	/**
 	 * @return action bean context.
 	 */
 	@Override
-	public CrActionBeanContext getContext() {
+	public CRActionBeanContext getContext() {
 		return this.context;
 	}
 
 	/**
-	 * Method sets {@link CrActionBeanContext}.
+	 * Method sets {@link CRActionBeanContext}.
 	 */
 	@Override
 	public void setContext(ActionBeanContext context) {
-		this.context = (CrActionBeanContext) context; 
+		this.context = (CRActionBeanContext) context; 
 	}
 	
 	/**
 	 * @return logged in user name or default value for not logged in users.
 	 */
 	public final String getUserName() {
-		CrUser crUser = getContext().getCrUser();
+		CRUser crUser = getContext().getCrUser();
 		return crUser.getUserName();
 	}
 	
