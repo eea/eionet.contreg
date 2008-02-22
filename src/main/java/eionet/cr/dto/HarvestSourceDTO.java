@@ -4,20 +4,37 @@
 package eionet.cr.dto;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @author altnyris
  *
  */
 public class HarvestSourceDTO implements Serializable {
+	private Integer sourceId;
 	private String identifier;
 	private String pullUrl;
 	private String type;
 	private String emails;
 	private String weekday;
-	private int hour;
-	private int period;
+	private Integer hour;
+	private Integer period;
+	private Date dateCreated;
+	private String creator;
+	private Integer statements;
 	
+	/**
+	 * 
+	 */
+	public HarvestSourceDTO(){
+	}
+	
+	public Integer getSourceId() {
+		return sourceId;
+	}
+	public void setSourceId(Integer sourceId) {
+		this.sourceId = sourceId;
+	}
 	public String getIdentifier() {
 		return identifier;
 	}
@@ -48,16 +65,34 @@ public class HarvestSourceDTO implements Serializable {
 	public void setWeekday(String weekday) {
 		this.weekday = weekday;
 	}
-	public int getHour() {
+	public Integer getHour() {
 		return hour;
 	}
-	public void setHour(int hour) {
+	public void setHour(Integer hour) {
 		this.hour = hour;
 	}
-	public int getPeriod() {
+	public Integer getPeriod() {
 		return period;
 	}
-	public void setPeriod(int period) {
+	public void setPeriod(Integer period) {
 		this.period = period;
+	}
+	public Date getDateCreated() {
+		return dateCreated;
+	}
+	public void setDateCreated(Date dateCreated) {
+		this.dateCreated = dateCreated;
+	}
+	public String getCreator() {
+		return creator;
+	}
+	public void setCreator(String creator) {
+		this.creator = creator;
+	}
+	public Integer getStatements() {
+		return statements;
+	}
+	public void setStatements(Integer statements) {
+		this.statements = statements;
 	}
 }

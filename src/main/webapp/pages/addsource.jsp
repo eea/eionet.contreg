@@ -1,5 +1,6 @@
 <%@page contentType="text/html;charset=UTF-8" import="java.util.*,java.io.*,eionet.cr.dao.DAOFactory"%>
-<%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld" %>
+
+<%@ include file="/pages/common/taglibs.jsp"%>	
 
 <stripes:layout-render name="/pages/common/template.jsp" pageTitle="Add Harvesting Source">
 	<stripes:layout-component name="errors"/>

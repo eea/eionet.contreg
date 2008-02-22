@@ -1,7 +1,7 @@
-<%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld" %>
+<%@ include file="/pages/common/taglibs.jsp"%>	
+
 <stripes:layout-definition>
 	<%@ page contentType="text/html;charset=UTF-8" language="java"%>
-	<%@ include file="/pages/common/taglibs.jsp"%>	
 	
 	<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 	<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
