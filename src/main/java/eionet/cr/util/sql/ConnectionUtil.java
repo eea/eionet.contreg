@@ -38,18 +38,16 @@ public class ConnectionUtil {
 	 * @return
 	 * @throws SQLException 
 	 */
-	public static synchronized Connection getJNDIConnection() throws SQLException{
+	public static synchronized Connection getJNDIConnection() throws DataSourceException{
 		
-		if (dataSource==null){
-			try{
+		try{
+			if (dataSource==null)
 				initDataSource();
-			}
-			catch (NamingException e){
-				throw new SQLException("Failed to get connection through JNDI: " + e.toString(), e);
-			}
+			return dataSource.getConnection();
 		}
-		
-		return dataSource.getConnection();
+		catch (Exception e){
+			throw new DataSourceException("Failed to get connection through JNDI: " + e.toString(), e);
+		}
 	}
 	
 	/**

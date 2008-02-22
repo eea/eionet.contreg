@@ -3,7 +3,7 @@ package eionet.cr.web.action;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import eionet.cr.util.CrException;
+import eionet.cr.util.CRException;
 import eionet.cr.web.context.CrActionBeanContext;
 import eionet.cr.web.security.CrUser;
 import net.sourceforge.stripes.action.ActionBean;
@@ -60,7 +60,7 @@ public abstract class AbstractCrActionBean implements ActionBean {
 	 * 
 	 * @param exception exception to handle. 
 	 */
-	void handleCrException(CrException exception) {
+	void handleCrException(CRException exception) {
 		logger.error(exception.getMessage(), exception);
 		getContext().getMessages().add(new SimpleError(exception.getMessage()));
 	}

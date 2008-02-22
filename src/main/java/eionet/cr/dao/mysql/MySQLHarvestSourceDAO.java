@@ -1,5 +1,6 @@
 package eionet.cr.dao.mysql;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.Map;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.HarvestSourceDTO;
+import eionet.cr.util.sql.ConnectionUtil;
 import eionet.cr.util.sql.ParameterizedSQL;
 import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SQLValue;
@@ -60,11 +62,16 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 		values.add(source.getEmails());
 		values.add(user);
 		
+		Connection conn = null;
 		try{
-			SQLUtil.executeUpdate(addSourceSQL, values, getConnection());
+			conn = getConnection();
+			SQLUtil.executeUpdate(addSourceSQL, values, conn);
 		}
-		catch (SQLException e){
+		catch (Exception e){
 			throw new DAOException(e.getMessage(), e);
+		}
+		finally{
+			ConnectionUtil.closeConnection(conn);
 		}
     }
 }

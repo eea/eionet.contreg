@@ -1,5 +1,7 @@
 package eionet.cr.util;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
@@ -64,5 +66,17 @@ public class Util {
 		catch (MalformedURLException e){
 			return false;
 		}
+	}
+	
+	/**
+	 * 
+	 * @param t
+	 * @return
+	 */
+	public static String getStackTrace(Throwable t){
+		
+		ByteArrayOutputStream bytesOut = new ByteArrayOutputStream();
+		t.printStackTrace(new PrintStream(bytesOut));
+		return bytesOut.toString();
 	}
 }
