@@ -18,17 +18,30 @@ import net.sourceforge.stripes.exception.ExceptionHandler;
  */
 public class CRStripesExceptionHandler implements ExceptionHandler {
 	
+	/** */
 	private static Log logger = LogFactory.getLog(CRStripesExceptionHandler.class);
-    /** Doesn't have to do anything... */
-    public void init(Configuration configuration) throws Exception { }
 
-    /** Do something a bit more complicated that just going to a view. */
+	/*
+	 * (non-Javadoc)
+	 * @see net.sourceforge.stripes.config.ConfigurableComponent#init(net.sourceforge.stripes.config.Configuration)
+	 */
+    public void init(Configuration configuration) throws Exception {
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see net.sourceforge.stripes.exception.ExceptionHandler#handle(java.lang.Throwable, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     */
     public void handle(Throwable throwable,
                        HttpServletRequest request,
                        HttpServletResponse response) throws ServletException, IOException {
     	
-    	logger.error(throwable.getMessage(), throwable);
-    	request.setAttribute("exception", throwable);
+    	Throwable t = (throwable instanceof ServletException) ? ((ServletException)throwable).getRootCause() : throwable;
+    	if (t==null)
+    		t = throwable;
+
+    	logger.error(t.getMessage(), t);
+    	request.setAttribute("exception", t);
     	request.getRequestDispatcher("/pages/error.jsp").forward(request, response);
     	
     }

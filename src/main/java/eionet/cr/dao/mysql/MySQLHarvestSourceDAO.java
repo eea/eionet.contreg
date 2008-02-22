@@ -22,6 +22,9 @@ import eionet.cr.util.sql.SQLValue;
  */
 public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSourceDAO {
 	
+	/**
+	 * 
+	 */
 	public MySQLHarvestSourceDAO() {
 	}
 	
@@ -37,11 +40,16 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
     	List<Object> values = new ArrayList<Object>();
 		values.add(Integer.valueOf("1"));
 		
+		Connection conn = null;
 		try{
-			return SQLUtil.executeQuery(getSourcesSQL, values, getConnection());
+			conn = getConnection();
+			return SQLUtil.executeQuery(getSourcesSQL, values, conn);
 		}
-		catch (SQLException e){
+		catch (Exception e){
 			throw new DAOException(e.getMessage(), e);
+		}
+		finally{
+			closeConnection(conn);
 		}
     }
     

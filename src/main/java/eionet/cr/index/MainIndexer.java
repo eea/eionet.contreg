@@ -3,7 +3,8 @@ package eionet.cr.index;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -26,7 +27,7 @@ import eionet.cr.harvest.util.RDFResourceProperty;
 public class MainIndexer extends Indexer{
 	
 	/** */
-	private static Logger logger = Logger.getLogger(MainIndexer.class);
+	private static Log logger = LogFactory.getLog(MainIndexer.class);
 	
 	/** */
 	private IndexWriter indexWriter = null;

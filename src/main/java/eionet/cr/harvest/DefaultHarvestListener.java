@@ -1,6 +1,7 @@
 package eionet.cr.harvest;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -19,7 +20,7 @@ import eionet.cr.index.MainIndexer;
 public class DefaultHarvestListener implements HarvestListener, ErrorHandler {
 	
 	/** */
-	private static Logger logger = Logger.getLogger(DefaultHarvestListener.class);
+	private static Log logger = LogFactory.getLog(DefaultHarvestListener.class);
 	
 	/** */
 	private Indexer indexer = new MainIndexer();

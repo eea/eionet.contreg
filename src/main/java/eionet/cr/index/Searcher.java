@@ -9,7 +9,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.analysis.WhitespaceAnalyzer;
@@ -35,7 +36,7 @@ import eionet.cr.util.Messages;
 public class Searcher {
 	
 	/** */
-	private static Logger logger = Logger.getLogger(Searcher.class);
+	private static Log logger = LogFactory.getLog(Searcher.class);
 	
 	/** */
 	private String indexLocation = null;

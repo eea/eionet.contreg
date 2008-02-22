@@ -3,7 +3,8 @@ package eionet.cr.config;
 import java.io.IOException;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * 
@@ -30,7 +31,7 @@ public class GeneralConfig {
 	public static final int SEVERITY_WARNING = 2;
 
 	/** */
-	private static Logger logger = Logger.getLogger(GeneralConfig.class);
+	private static Log logger = LogFactory.getLog(GeneralConfig.class);
 
 	/** */
 	private static Properties properties = null;

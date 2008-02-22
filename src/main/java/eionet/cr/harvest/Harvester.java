@@ -14,7 +14,8 @@ import java.net.URL;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -39,7 +40,7 @@ import eionet.cr.util.Util;
 public class Harvester {
 
 	/** */
-	private static Logger logger = Logger.getLogger(Harvester.class);
+	private static Log logger = LogFactory.getLog(Harvester.class);
 	
 	private RDFHandler handler = null;
 	private HttpServletRequest servletRequest = null;

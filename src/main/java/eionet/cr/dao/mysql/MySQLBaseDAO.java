@@ -23,14 +23,8 @@ public abstract class MySQLBaseDAO {
 	 * 
 	 * @return
 	 */
-	protected Connection getConnection() throws DAOException{
-		try{
-			return ConnectionUtil.getJNDIConnection();
-		}
-		catch (DataSourceException e){
-			throw new DAOException(e.toString(), e);
-		}
-
+	protected Connection getConnection() throws DataSourceException{
+		return ConnectionUtil.getJNDIConnection();
 	}
 	
 	/**
@@ -47,18 +41,16 @@ public abstract class MySQLBaseDAO {
 	 * @throws DAOException
 	 */
 	protected Integer getLastInsertID() throws DAOException{
-		Connection conn = getConnection();
+		Connection conn = null;
 		try{
+			conn = getConnection();
 			return MySQLUtil.getLastInsertID(conn);
 		}
-		catch (SQLException e){
+		catch (Exception e){
 			throw new DAOException(e.getMessage(), e);
 		}
 		finally{
-			try{
-				if (conn!=null) conn.close();
-			}
-			catch (SQLException e){}
+			closeConnection(conn);
 		}	
 	}
 }

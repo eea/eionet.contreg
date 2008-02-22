@@ -5,13 +5,14 @@ import java.util.List;
 
 import javax.servlet.ServletContext;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 
 public class EncodingSchemes extends Hashtable<String,String[]>{
 	
 	/** */
-	private static Logger logger = Logger.getLogger(EncodingSchemes.class);
+	private static Log logger = LogFactory.getLog(EncodingSchemes.class);
 	
 	/** */
 	private static EncodingSchemes instance = null;

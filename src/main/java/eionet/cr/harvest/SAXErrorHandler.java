@@ -1,6 +1,7 @@
 package eionet.cr.harvest;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
@@ -12,7 +13,7 @@ import org.xml.sax.SAXParseException;
 public class SAXErrorHandler implements org.xml.sax.ErrorHandler{
 	
 	/** */
-	private static Logger logger = Logger.getLogger(SAXErrorHandler.class);
+	private static Log logger = LogFactory.getLog(SAXErrorHandler.class);
 
 	/*
 	 *  (non-Javadoc)

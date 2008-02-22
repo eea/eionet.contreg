@@ -38,14 +38,11 @@ public class MySQLHarvestMessageDAO extends MySQLBaseDAO implements HarvestMessa
 			List<HarvestMessageDTO>  list = rsReader.getResultList();
 			return list!=null && list.size()>0 ? list.get(0) : null;
 		}
-		catch (SQLException e){
+		catch (Exception e){
 			throw new DAOException(e.getMessage(), e);
 		}
 		finally{
-			try{
-				if (conn!=null) conn.close();
-			}
-			catch (SQLException e){}
+			closeConnection(conn);
 		}
 	}
 
@@ -71,14 +68,11 @@ public class MySQLHarvestMessageDAO extends MySQLBaseDAO implements HarvestMessa
 			conn = getConnection();
 			SQLUtil.executeUpdate(q_insertHarvestMessage, values, conn);
 		}
-		catch (SQLException e){
+		catch (Exception e){
 			throw new DAOException(e.getMessage(), e);
 		}
 		finally{
-			try{
-				if (conn!=null) conn.close();
-			}
-			catch (SQLException e){}
+			closeConnection(conn);
 		}
 	}
 

@@ -11,7 +11,8 @@ import java.util.List;
 
 import javax.servlet.ServletContext;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -41,7 +42,7 @@ import eionet.cr.util.Util;
 public class RDFHandler implements StatementHandler{
 
 	/** */
-	private static Logger logger = Logger.getLogger(RDFHandler.class);
+	private static Log logger = LogFactory.getLog(RDFHandler.class);
 	
 	private String currentDocumentID;
 	private ArrayList currentDocumentAttributes;

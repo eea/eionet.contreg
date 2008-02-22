@@ -9,7 +9,8 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
@@ -17,7 +18,7 @@ import eionet.cr.dao.DAOException;
 public class ConnectionUtil {
 	
 	/** */
-	private static Logger logger = Logger.getLogger(ConnectionUtil.class);
+	private static Log logger = LogFactory.getLog(ConnectionUtil.class);
 
 	/** */
 	private static DataSource dataSource = null;
