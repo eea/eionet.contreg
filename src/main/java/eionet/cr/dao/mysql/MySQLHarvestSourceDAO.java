@@ -47,7 +47,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 			List<HarvestSourceDTO>  list = rsReader.getResultList();
 			return list;
 		}
-		catch (SQLException e){
+		catch (Exception e){
 			throw new DAOException(e.getMessage(), e);
 		}
 		finally{
