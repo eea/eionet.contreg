@@ -10,7 +10,10 @@ import java.util.Map;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HarvestSourceDAO;
+import eionet.cr.dto.HarvestMessageDTO;
 import eionet.cr.dto.HarvestSourceDTO;
+import eionet.cr.dto.readers.HarvestMessageDTOReader;
+import eionet.cr.dto.readers.HarvestSourceDTOReader;
 import eionet.cr.util.sql.ConnectionUtil;
 import eionet.cr.util.sql.ParameterizedSQL;
 import eionet.cr.util.sql.SQLUtil;
@@ -22,34 +25,36 @@ import eionet.cr.util.sql.SQLValue;
  */
 public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSourceDAO {
 	
-	/**
-	 * 
-	 */
 	public MySQLHarvestSourceDAO() {
 	}
 	
 	/** */
-	private static final String getSourcesSQL = "select * from HARVEST_SOURCE where HARVEST_SOURCE_ID=?";
+	private static final String getSourcesSQL = "select * from HARVEST_SOURCE";
 	
 	/*
      * (non-Javadoc)
      * 
-     * @see eionet.cr.dao.ISourceDao#getSources()
+     * @see eionet.cr.dao.ISourceDao#getHarvestSources()
      */
-    public List<Map<String,SQLValue>> getSources() throws DAOException {
+    public List<HarvestSourceDTO> getHarvestSources() throws DAOException {
     	List<Object> values = new ArrayList<Object>();
-		values.add(Integer.valueOf("1"));
-		
+				
 		Connection conn = null;
+		HarvestSourceDTOReader rsReader = new HarvestSourceDTOReader();
 		try{
 			conn = getConnection();
-			return SQLUtil.executeQuery(getSourcesSQL, values, conn);
+			SQLUtil.executeQuery(getSourcesSQL, values, rsReader, conn);
+			List<HarvestSourceDTO>  list = rsReader.getResultList();
+			return list;
 		}
-		catch (Exception e){
+		catch (SQLException e){
 			throw new DAOException(e.getMessage(), e);
 		}
 		finally{
-			closeConnection(conn);
+			try{
+				if (conn!=null) conn.close();
+			}
+			catch (SQLException e){}
 		}
     }
     
