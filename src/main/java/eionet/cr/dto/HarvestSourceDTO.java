@@ -6,6 +6,9 @@ package eionet.cr.dto;
 import java.io.Serializable;
 import java.util.Date;
 
+import eionet.cr.dao.DAOException;
+import eionet.cr.dao.DAOFactory;
+
 /**
  * @author altnyris
  *
@@ -28,6 +31,11 @@ public class HarvestSourceDTO implements Serializable {
 	 */
 	public HarvestSourceDTO(){
 	}
+	
+	/** Gets the harvest source with the corresponding ID, or null if it does not exist. */
+    public HarvestSourceDTO getHarvestSource(int id) throws DAOException {
+        return DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(id);
+    }
 	
 	public Integer getSourceId() {
 		return sourceId;

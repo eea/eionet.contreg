@@ -21,18 +21,29 @@
 		        		<th scope="col">Date Created</th>
 		        		<th scope="col">Creator</th>
 		        		<th scope="col">Statements</th>
+		        		<th scope="col"></th>
+		        		<th scope="col"></th>
+		        		<th scope="col"></th>
 		        	</tr>
 	        	</thead>
 	        	<tbody>
-	        		<c:forEach items="${harvestSourceList.harvestSources}" var="harvestSource" varStatus="loop">
+	        		<c:forEach items="${harvestSourceList.harvestSources}" var="source" varStatus="loop">
 		        		<tr>
-		        			<td>${harvestSource.identifier}</td>
-		        			<td>${harvestSource.pullUrl}</td>
-		        			<td>${harvestSource.type}</td>
-		        			<td>${harvestSource.emails}</td>
-		        			<td>${harvestSource.dateCreated}</td>
-		        			<td>${harvestSource.creator}</td>
-		        			<td>${harvestSource.statements}</td>
+		        			<td>${source.identifier}</td>
+		        			<td>${source.pullUrl}</td>
+		        			<td>${source.type}</td>
+		        			<td>${source.emails}</td>
+		        			<td>${source.dateCreated}</td>
+		        			<td>${source.creator}</td>
+		        			<td>${source.statements}</td>
+		        			<td><img src="${pageContext.request.contextPath}/images/view.gif" title="View"/></td>
+		        			<td>
+		        				<stripes:link href="/source.action" event="preEdit">
+	                                <img src="${pageContext.request.contextPath}/images/edit.gif" title="Edit"/>
+	                                <stripes:param name="harvestSource.sourceId" value="${source.sourceId}"/>
+	                            </stripes:link>
+		        			</td>
+		        			<td><img src="${pageContext.request.contextPath}/images/delete.gif" title="Delete"/></td>
 		        		</tr>
 	        		</c:forEach>
 	        	</tbody>

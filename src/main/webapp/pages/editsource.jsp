@@ -2,12 +2,13 @@
 
 <%@ include file="/pages/common/taglibs.jsp"%>	
 
-<stripes:layout-render name="/pages/common/template.jsp" pageTitle="Add Harvesting Source">
+<stripes:layout-render name="/pages/common/template.jsp" pageTitle="Edit Harvesting Source">
 	<stripes:layout-component name="errors"/>
 	<stripes:layout-component name="messages"/>
 	<stripes:layout-component name="contents">
-		<h1>Add source</h1>
+		<h1>Edit source</h1>
 	    <stripes:form action="/source.action" focus="">
+	    	<stripes:hidden name="harvestSource.sourceId"/>
 	        <table>
 	            <tr>
 	                <td>Identifier:</td>
@@ -29,6 +30,27 @@
 	            <tr>
 	                <td>E-mails:</td>
 	                <td><stripes:text name="harvestSource.emails"/></td>
+	            </tr>
+	            <tr>
+	                <td>Date created:</td>
+	                <td>
+	                	${actionBean.harvestSource.dateCreated}
+	                	<stripes:hidden name="harvestSource.dateCreated"/>
+	                </td>
+	            </tr>
+	            <tr>
+	                <td>Creator:</td>
+	                <td>
+	                	${actionBean.harvestSource.creator}
+	                	<stripes:hidden name="harvestSource.creator"/>
+	                </td>
+	            </tr>
+	            <tr>
+	                <td>Statements harvested:</td>
+	                <td>
+	                	${actionBean.harvestSource.statements}
+	                	<stripes:hidden name="harvestSource.statements"/>
+	                </td>
 	            </tr>
 	            <tr>
 	                <td>Schedule:</td>
@@ -58,7 +80,9 @@
 	            </tr>
 	            <tr>
 	                <td colspan="2">
-	                    <stripes:submit name="add" value="Add"/>       
+	                    <stripes:submit name="edit" value="Save"/>       
+	                    <stripes:submit name="exec" value="Schedule for immediate execution"/>
+	                    <stripes:submit name="push" value="Push from local file"/>
 	                </td>
 	            </tr>
 	        </table>

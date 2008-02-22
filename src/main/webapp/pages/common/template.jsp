@@ -97,13 +97,13 @@
 								<stripes:messages/>
 							</div>
 						</c:when>
-						<c:when test="${actionBean.context.severity == 1}">
+						<c:when test="${actionBean.context.severity == 2}">
 							<div class="caution-msg">
 								<strong>Warning ...</strong>		
 								<stripes:messages/>
 							</div>
 						</c:when>
-						<c:when test="${actionBean.context.severity == 2}">
+						<c:when test="${actionBean.context.severity == 3}">
 							<div class="warning-msg">
 								<strong>Errors ...</strong>		
 								<stripes:messages/>
