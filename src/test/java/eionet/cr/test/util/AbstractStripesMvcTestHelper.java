@@ -33,7 +33,7 @@ public abstract class AbstractStripesMvcTestHelper extends AbstractCRActionBean 
 		Map<String,String> filterParams = new HashMap<String,String>();
 		filterParams.put("ActionResolver.UrlFilters", "target/classes, target/test-classes");
 		filterParams.put("ActionResolver.PackageFilters", "eionet.cr.web.action.*");
-		filterParams.put("ActionBeanContext.Class", "eionet.cr.web.context.CrActionBeanContext");
+		filterParams.put("ActionBeanContext.Class", "eionet.cr.web.context.CRActionBeanContext");
 		mockServletContext.addFilter(StripesFilter.class, "StripesFilter", filterParams);
 
 		// Add the Stripes Dispatcher
