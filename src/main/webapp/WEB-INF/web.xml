@@ -5,6 +5,11 @@
          http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
          version="2.4">
 
+	<!--  ServletContextListener  -->
+	<listener>
+		<listener-class>eionet.cr.web.ServletContextListenerImpl</listener-class>
+	</listener>
+	
 	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 	<!--              Configuration of the Stripes Filter.                   -->
 	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -61,7 +66,7 @@
 		</init-param>
 		<init-param>
 			<param-name>edu.yale.its.tp.cas.client.filter.serverName</param-name>
-			<param-value>192.168.10.65:8080</param-value>
+			<param-value>192.168.10.57:8080</param-value>
 		</init-param>
 		<init-param>
 			<param-name>edu.yale.its.tp.cas.client.filter.wrapRequest</param-name>
