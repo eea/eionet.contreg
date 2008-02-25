@@ -37,19 +37,6 @@ public class EncodingSchemes extends Hashtable<String,String[]>{
 	/**
 	 * 
 	 * @param id
-	 * @param labels
-	 */
-	public void updateS(String id, String[] labels){
-		
-		if (id==null || id.trim().length()==0 || labels==null || labels.length==0)
-			return;
-		
-		put(id, labels);
-	}
-	
-	/**
-	 * 
-	 * @param id
 	 * @param servletContext
 	 * @return
 	 */
@@ -77,20 +64,27 @@ public class EncodingSchemes extends Hashtable<String,String[]>{
 	 */
 	public static void load(){
 		
+		logger.debug("Loading encoding schemes");
+		
 		List hits = null;
 		try{
 			Searcher searcher = new Searcher();
-			hits = searcher.search("IS_ENCODING_SCHEME:true");
+			hits = searcher.search("IS_ENCODING_SCHEME:" + Boolean.TRUE.toString());
 		}
 		catch (Exception e){
-			logger.error("Failed to search encoding schemes: " + e.toString(), e);
+			logger.error("Failed to load encoding schemes: " + e.toString(), e);
 		}
-		
+
+		int countLoaded = 0;
 		for (int i=0; hits!=null && i<hits.size(); i++){
 			Hashtable hash = (Hashtable)hits.get(i);
 			String[] ids = (String[])hash.get("ID");
-			if (ids!=null && ids.length>0)
+			if (ids!=null && ids.length>0){
 				getInstance().update(ids[0], (String[])hash.get("http://www.w3.org/2000/01/rdf-schema#label"));
+				countLoaded++;
+			}
 		}
+		
+		logger.debug(countLoaded + " encoding schemes loaded");
 	}
 }

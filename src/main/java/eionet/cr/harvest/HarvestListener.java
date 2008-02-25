@@ -28,5 +28,5 @@ public interface HarvestListener {
 	/**
 	 * 
 	 */
-	public boolean hasFatalError();
+	public boolean hasFatalException();
 }

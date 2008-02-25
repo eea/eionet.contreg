@@ -50,7 +50,7 @@ public class MainIndexer extends Indexer{
 			initIndexWriter();
 		
 		Document document = new Document();
-		document.add(new Field("ID", resource.getId(), Field.Store.YES, Field.Index.TOKENIZED));
+		document.add(new Field("ID", resource.getId(), Field.Store.YES, Field.Index.UN_TOKENIZED));
 
 		boolean hasRdfType = false;
 		boolean hasRdfsLabel = false;
@@ -108,6 +108,8 @@ public class MainIndexer extends Indexer{
 	 */
 	public void close(){
 		
+		logger.debug("Closing index writer");
+		
 		try{
 			if (indexWriter!=null){
 				indexWriter.optimize();
@@ -126,6 +128,8 @@ public class MainIndexer extends Indexer{
 	 * 
 	 */
 	private void initIndexWriter() throws IndexException{
+		
+		logger.debug("Initializing index writer");
 		
 		try{
 			Analyzer analyzer = new StandardAnalyzer();

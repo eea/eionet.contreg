@@ -37,10 +37,10 @@ import eionet.cr.util.Util;
  * @author Jaanus Heinlaid, e-mail: <a href="mailto:jaanus.heinlaid@tietoenator.com">jaanus.heinlaid@tietoenator.com</a>
  *
  */
-public class Harvester {
+public class HarvesterOld {
 
 	/** */
-	private static Log logger = LogFactory.getLog(Harvester.class);
+	private static Log logger = LogFactory.getLog(HarvesterOld.class);
 	
 	private RDFHandler handler = null;
 	private HttpServletRequest servletRequest = null;
@@ -49,7 +49,7 @@ public class Harvester {
 	/**
 	 *
 	 */
-	public Harvester(){
+	public HarvesterOld(){
 	}
 
 	/**
@@ -99,7 +99,7 @@ public class Harvester {
 				throw new HarvestException("No cached file found for " + url.toString());
 		}
 		
-		harvest(file, url);
+		harvest(file, url.toString());
 	}
 	
 	/**
@@ -147,18 +147,18 @@ public class Harvester {
 	 * @throws SAXException 
 	 * @throws HarvestException 
 	 */
-	private void harvest(File file, URL sourceURL) throws HarvestException{
+	private void harvest(File file, String sourceUrlString) throws HarvestException{
 		
 		InputStreamReader reader = null;
-		DefaultHarvestListener harvestListener = new DefaultHarvestListener();
+		DefaultHarvestListener harvestListener = new DefaultHarvestListener(null, null, null);
 		try{
 	        reader = new InputStreamReader(new FileInputStream(file));	        
-			handler = new RDFHandler(sourceURL, harvestListener);
+			handler = new RDFHandler(sourceUrlString, harvestListener);
 			ARP arp = new ARP();
 	        arp.setStatementHandler(handler);
 	        arp.setErrorHandler(new SAXErrorHandler());
 	        arp.load(reader);
-	        if (harvestListener.hasFatalError())
+	        if (harvestListener.hasFatalException())
 	        	throw harvestListener.getFatalException();
 		}
 		catch (Exception e){
@@ -192,7 +192,7 @@ public class Harvester {
 		boolean useCache = req.getParameter("action").toLowerCase().endsWith("from cache");
 		
 		// set up the harvester
-		Harvester harvester = new Harvester();
+		HarvesterOld harvester = new HarvesterOld();
 		harvester.setServletRequest(req);
 		harvester.setServletContext(servletContext);
 		

@@ -2,22 +2,23 @@ package eionet.cr.harvest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.harvest.util.RDFResource;
 import eionet.cr.index.EncodingSchemes;
 import eionet.cr.index.IndexException;
 import eionet.cr.index.Indexer;
 import eionet.cr.index.MainIndexer;
+import eionet.cr.web.security.CRUser;
 
 /**
  * 
  * @author heinljab
  *
  */
-public class DefaultHarvestListener implements HarvestListener, ErrorHandler {
+public class DefaultHarvestListener implements HarvestListener, org.xml.sax.ErrorHandler {
 	
 	/** */
 	private static Log logger = LogFactory.getLog(DefaultHarvestListener.class);
@@ -25,6 +26,29 @@ public class DefaultHarvestListener implements HarvestListener, ErrorHandler {
 	/** */
 	private Indexer indexer = new MainIndexer();
 	private HarvestException fatalException = null;
+	
+	/** */
+	private HarvestSourceDTO harvestSourceDTO = null;
+	private String harvestType = null;
+	private CRUser crUser = null;
+	private int countResourcesCalled = 0;
+	private int countResourcesIndexed = 0;
+
+	/**
+	 * 
+	 * @param harvestSourceDTO
+	 * @param harvestType
+	 * @param crUser
+	 */
+	public DefaultHarvestListener(HarvestSourceDTO harvestSourceDTO, String harvestType, CRUser crUser){
+		
+		if (harvestSourceDTO==null || harvestType==null)
+			throw new NullPointerException();
+		
+		this.harvestSourceDTO = harvestSourceDTO;
+		this.harvestType = harvestType;
+		this.crUser = crUser;
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -32,11 +56,16 @@ public class DefaultHarvestListener implements HarvestListener, ErrorHandler {
 	 */
 	public void resourceHarvested(RDFResource resource){
 		
+		if (resource==null)
+			return;
+		
+		countResourcesCalled++;
 		try{
-			indexer.indexRDFResource(resource);
+			indexer.indexRDFResource(resource);			
+			countResourcesIndexed++;
 		}
 		catch (IndexException e){
-			logger.error(e.toString(), e);
+			setFatalException(new HarvestException(e.toString(), e));
 		}
 	}
 
@@ -45,8 +74,8 @@ public class DefaultHarvestListener implements HarvestListener, ErrorHandler {
 	 * @see eionet.cr.harvest.HarvestListener#harvestStarted()
 	 */
 	public void harvestStarted() {
-		// TODO Auto-generated method stub
-
+		
+		logger.debug("Harvest started for URL: " + harvestSourceDTO.getPullUrl());
 	}
 
 	/*
@@ -56,13 +85,15 @@ public class DefaultHarvestListener implements HarvestListener, ErrorHandler {
 	public void harvestFinished(){
 		
 		indexer.close();
+		
+		logger.debug("Harvest finished for URL: " + harvestSourceDTO.getPullUrl());
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see eionet.cr.harvest.HarvestListener#hasFatalError()
+	 * @see eionet.cr.harvest.HarvestListener#hasFatalException()
 	 */
-	public boolean hasFatalError() {
+	public boolean hasFatalException() {
 		return fatalException!=null;
 	}
 
@@ -86,9 +117,7 @@ public class DefaultHarvestListener implements HarvestListener, ErrorHandler {
 	 * @see org.xml.sax.ErrorHandler#fatalError(org.xml.sax.SAXParseException)
 	 */
 	public void fatalError(SAXParseException e) throws SAXException {
-		
-		if (this.fatalException==null)
-			this.fatalException = new HarvestException("SAX fatal error encountered: " + e.toString(), e);
+		this.setFatalException(new HarvestException("SAX fatal error encountered: " + e.toString(), e));
 	}
 
 	/*
@@ -97,5 +126,47 @@ public class DefaultHarvestListener implements HarvestListener, ErrorHandler {
 	 */
 	public void warning(SAXParseException e) throws SAXException {
 		logger.warn("SAX warning encountered: " + e.toString(), e);
+	}
+
+	/**
+	 * @return the harvestSourceDTO
+	 */
+	public HarvestSourceDTO getHarvestSourceDTO() {
+		return harvestSourceDTO;
+	}
+
+	/**
+	 * @return the harvestType
+	 */
+	public String getHarvestType() {
+		return harvestType;
+	}
+
+	/**
+	 * @return the crUser
+	 */
+	public CRUser getCrUser() {
+		return crUser;
+	}
+
+	/**
+	 * @param fatalException the fatalException to set
+	 */
+	protected void setFatalException(HarvestException fatalException) {
+		this.fatalException = fatalException;
+	}
+
+	/**
+	 * @return the countResourcesCalled
+	 */
+	public int getCountResourcesCalled() {
+		return countResourcesCalled;
+	}
+
+	/**
+	 * @return the countResourcesIndexed
+	 */
+	public int getCountResourcesIndexed() {
+		return countResourcesIndexed;
 	}
 }

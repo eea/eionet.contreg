@@ -51,7 +51,7 @@ public class RDFHandler implements StatementHandler{
 	/** */
 	private String currentAnonymousID = "";
 	private String currentGeneratedID = "";
-	private URL sourceURL = null;
+	private String sourceUrlString = null;
 	
 	/** */
 	private RDFResource currentResource = null;
@@ -60,8 +60,8 @@ public class RDFHandler implements StatementHandler{
 	/**
 	 * 
 	 */
-	public RDFHandler(URL sourceURL, HarvestListener harvestListener){
-		this.sourceURL = sourceURL;
+	public RDFHandler(String sourceUrlString, HarvestListener harvestListener){
+		this.sourceUrlString = sourceUrlString;
 		this.harvestListener = harvestListener;
 	}
 	
@@ -70,6 +70,9 @@ public class RDFHandler implements StatementHandler{
 	 * @see com.hp.hpl.jena.rdf.arp.StatementHandler#statement(com.hp.hpl.jena.rdf.arp.AResource, com.hp.hpl.jena.rdf.arp.AResource, com.hp.hpl.jena.rdf.arp.AResource)
 	 */
 	public void statement(AResource subject, AResource predicate, AResource object) {
+		
+		if (harvestListener!=null && harvestListener.hasFatalException())
+			return;
 		
 		if (subject==null || predicate==null || object==null)
 			return;
@@ -83,6 +86,9 @@ public class RDFHandler implements StatementHandler{
 	 */
 	public void statement(AResource subject, AResource predicate, ALiteral object) {
 
+		if (harvestListener!=null && harvestListener.hasFatalException())
+			return;
+
 		if (subject==null || predicate==null || object==null)
 			return;
 		
@@ -95,7 +101,7 @@ public class RDFHandler implements StatementHandler{
 	 * @param predicate
 	 * @param object
 	 */
-	public void statement(AResource subject, AResource predicate, WrappedARPObject object){
+	protected void statement(AResource subject, AResource predicate, WrappedARPObject object){
 		
 		String subjectID = getResourceID(subject);
 		String predicateID = getResourceID(predicate);
@@ -107,6 +113,8 @@ public class RDFHandler implements StatementHandler{
 				harvestListener.resourceHarvested(currentResource);
 			currentResource = new RDFResource(subjectID);
 		}
+		else if (currentResource==null)
+			currentResource = new RDFResource(subjectID);
 		
 		RDFResourceProperty property = new RDFResourceProperty(predicateID, object.getStringValue(), object.isLiteral(), object.isAnonymous());
 		currentResource.addProperty(property);
@@ -144,7 +152,7 @@ public class RDFHandler implements StatementHandler{
     	try{
     		StringBuffer bufHead = new StringBuffer("http://cr.eionet.europa.eu/anonymous/");
     		StringBuffer bufTail = new StringBuffer(String.valueOf(System.currentTimeMillis()));
-    		bufTail.append(sourceURL==null ? "" : sourceURL.toString()).append(anonID);
+    		bufTail.append(sourceUrlString==null ? "" : sourceUrlString).append(anonID);
     		return bufHead.append(Util.md5digest(bufTail.toString())).toString();
     	}
     	catch (GeneralSecurityException e){

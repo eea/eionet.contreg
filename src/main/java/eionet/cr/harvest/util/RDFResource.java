@@ -43,8 +43,9 @@ public class RDFResource {
 		if (property==null)
 			throw new NullPointerException();
 		
-		if (properties!=null)
+		if (properties==null)
 			properties = new ArrayList<RDFResourceProperty>();
+		
 		properties.add(property);
 	}
 

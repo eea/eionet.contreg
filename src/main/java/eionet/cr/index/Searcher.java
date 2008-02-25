@@ -67,6 +67,8 @@ public class Searcher {
 	 */
 	public List search(String query) throws ParseException, IOException{
 
+		logger.debug("Performing search query: " + query);
+		
 		IndexSearcher indexSearcher = null;
 		try{
 			indexSearcher = new IndexSearcher(indexLocation);
