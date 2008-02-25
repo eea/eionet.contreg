@@ -32,7 +32,7 @@ public class HarvestSourceActionBean extends AbstractCRActionBean {
 			DAOFactory.getDAOFactory().getHarvestSourceDAO().addSource(getHarvestSource(), getUserName());
 		else
 			handleCrException("You are not logged in!", GeneralConfig.SEVERITY_WARNING);
-        return new ForwardResolution("/pages/addsource.jsp");
+        return new ForwardResolution("/pages/sources.jsp");
     }
 	
 	/** Loads a bug on to the form ready for editing. */
@@ -51,6 +51,14 @@ public class HarvestSourceActionBean extends AbstractCRActionBean {
 			handleCrException("You are not logged in!", GeneralConfig.SEVERITY_WARNING);
 		}
         return new ForwardResolution("/pages/editsource.jsp");
+    }
+    
+    /** Loads a bug on to the form ready for viewing. */
+    @DontValidate
+    public Resolution preView() throws DAOException {
+    	HarvestSourceDTO harvestSource = new HarvestSourceDTO();
+        this.harvestSource = harvestSource.getHarvestSource( this.harvestSource.getSourceId() );
+        return new RedirectResolution("/pages/viewsource.jsp").flash(this);
     }
 
 }

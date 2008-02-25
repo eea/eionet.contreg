@@ -6,7 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import eionet.cr.dao.DAOException;
+import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
+import eionet.cr.dto.HarvestScheduleDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.readers.HarvestSourceDTOReader;
 import eionet.cr.util.sql.ConnectionUtil;
@@ -23,7 +25,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 	
 	/** */
 	private static final String getSourcesSQL = "select * from HARVEST_SOURCE";
-	
+		
 	/*
      * (non-Javadoc)
      * 
@@ -64,12 +66,22 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
     	values.add(new Integer(harvestSourceID));
 				
 		Connection conn = null;
+		HarvestSourceDTO source = null;
 		HarvestSourceDTOReader rsReader = new HarvestSourceDTOReader();
 		try{
 			conn = getConnection();
 			SQLUtil.executeQuery(getSourcesByIdSQL, values, rsReader, conn);
 			List<HarvestSourceDTO>  list = rsReader.getResultList();
-			return list!=null && list.size()>0 ? list.get(0) : null;
+			if(list!=null && list.size()>0){
+				source = list.get(0);
+				
+				HarvestScheduleDTO schedule = DAOFactory.getDAOFactory().getHarvestScheduleDAO().getHarvestScheduleBySourceId(harvestSourceID);
+				if(schedule!=null){
+					source.setHarvestSchedule(schedule);
+				}
+				return source;
+			}
+			return null;
 		}
 		catch (Exception e){
 			throw new DAOException(e.getMessage(), e);
@@ -84,7 +96,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
     
     /** */
 	private static final String addSourceSQL = "insert into HARVEST_SOURCE (IDENTIFIER,PULL_URL,TYPE,EMAILS,DATE_CREATED,CREATOR) VALUES (?,?,?,?,NOW(),?)";
-	
+		
 	/*
      * (non-Javadoc)
      * 
@@ -103,6 +115,12 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 		try{
 			conn = getConnection();
 			SQLUtil.executeUpdate(addSourceSQL, values, conn);
+			
+			if(source.getHarvestSchedule() != null){
+				Integer source_id = getLastInsertID(conn);
+				source.getHarvestSchedule().setHarvestSourceId(source_id);
+				DAOFactory.getDAOFactory().getHarvestScheduleDAO().addSchedule(source.getHarvestSchedule());
+			}
 		}
 		catch (Exception e){
 			throw new DAOException(e.getMessage(), e);
@@ -133,6 +151,10 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 		try{
 			conn = getConnection();
 			SQLUtil.executeUpdate(editSourceSQL, values, conn);
+			
+			if(source.getHarvestSchedule() != null){
+				DAOFactory.getDAOFactory().getHarvestScheduleDAO().editSchedule(source.getHarvestSchedule());
+			}
 		}
 		catch (Exception e){
 			throw new DAOException(e.getMessage(), e);

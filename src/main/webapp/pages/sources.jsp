@@ -36,7 +36,12 @@
 		        			<td>${source.dateCreated}</td>
 		        			<td>${source.creator}</td>
 		        			<td>${source.statements}</td>
-		        			<td><img src="${pageContext.request.contextPath}/images/view.gif" title="View"/></td>
+		        			<td>
+		        				<stripes:link href="/source.action" event="preView">
+	                                <img src="${pageContext.request.contextPath}/images/view.gif" title="View"/>
+	                                <stripes:param name="harvestSource.sourceId" value="${source.sourceId}"/>
+	                            </stripes:link>
+		        			</td>
 		        			<td>
 		        				<stripes:link href="/source.action" event="preEdit">
 	                                <img src="${pageContext.request.contextPath}/images/edit.gif" title="Edit"/>

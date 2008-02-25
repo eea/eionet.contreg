@@ -19,12 +19,10 @@ public class HarvestSourceDTO implements Serializable {
 	private String pullUrl;
 	private String type;
 	private String emails;
-	private String weekday;
-	private Integer hour;
-	private Integer period;
 	private Date dateCreated;
 	private String creator;
 	private Integer statements;
+	private HarvestScheduleDTO harvestSchedule;
 	
 	/**
 	 * 
@@ -67,24 +65,6 @@ public class HarvestSourceDTO implements Serializable {
 	public void setEmails(String emails) {
 		this.emails = emails;
 	}
-	public String getWeekday() {
-		return weekday;
-	}
-	public void setWeekday(String weekday) {
-		this.weekday = weekday;
-	}
-	public Integer getHour() {
-		return hour;
-	}
-	public void setHour(Integer hour) {
-		this.hour = hour;
-	}
-	public Integer getPeriod() {
-		return period;
-	}
-	public void setPeriod(Integer period) {
-		this.period = period;
-	}
 	public Date getDateCreated() {
 		return dateCreated;
 	}
@@ -102,5 +82,11 @@ public class HarvestSourceDTO implements Serializable {
 	}
 	public void setStatements(Integer statements) {
 		this.statements = statements;
+	}
+	public HarvestScheduleDTO getHarvestSchedule() {
+		return harvestSchedule;
+	}
+	public void setHarvestSchedule(HarvestScheduleDTO harvestSchedule) {
+		this.harvestSchedule = harvestSchedule;
 	}
 }

@@ -15,6 +15,12 @@ public abstract class DAOFactory {
 	
 	/**
 	 * 
+	 * @return
+	 */
+	public abstract HarvestScheduleDAO getHarvestScheduleDAO();
+	
+	/**
+	 * 
 	 * @param whichFactory
 	 * @return
 	 */

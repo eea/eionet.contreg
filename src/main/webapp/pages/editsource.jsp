@@ -55,20 +55,21 @@
 	            <tr>
 	                <td>Schedule:</td>
 	                <td>
+	                	<stripes:hidden name="harvestSource.harvestSchedule.harvestSourceId"/>
 	                	weekday
-	                	<stripes:select name="harvestSource.weekday">
+	                	<stripes:select name="harvestSource.harvestSchedule.weekday">
 	                		<stripes:option value="monday" label="Monday"/>
 	                		<stripes:option value="sunday" label="Sunday"/>
 	                	</stripes:select>
 	                	hour
-	                	<stripes:select name="harvestSource.hour">
+	                	<stripes:select name="harvestSource.harvestSchedule.hour">
 	                		<% for(int i=0; i<24; i++){ 
 		                		String day = new Integer(i).toString();%>
 	                		<stripes:option value="<%=day%>" label="<%=day%>"/>
 	                		<% } %>
 	                	</stripes:select>
 	                	period
-	                	<stripes:select name="harvestSource.period">
+	                	<stripes:select name="harvestSource.harvestSchedule.period">
 	                		<stripes:option value="1" label="1 week"/>
 	                		<stripes:option value="2" label="2 weeks"/>
 	                		<stripes:option value="3" label="3 weeks"/>
@@ -81,8 +82,6 @@
 	            <tr>
 	                <td colspan="2">
 	                    <stripes:submit name="edit" value="Save"/>       
-	                    <stripes:submit name="exec" value="Schedule for immediate execution"/>
-	                    <stripes:submit name="push" value="Push from local file"/>
 	                </td>
 	            </tr>
 	        </table>
