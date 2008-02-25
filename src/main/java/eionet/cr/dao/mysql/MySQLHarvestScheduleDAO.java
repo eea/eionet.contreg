@@ -109,5 +109,31 @@ public class MySQLHarvestScheduleDAO extends MySQLBaseDAO implements HarvestSche
 			ConnectionUtil.closeConnection(conn);
 		}
     }
+    
+    /** */
+	private static final String deleteScheduleSQL = "delete from HARVEST_SCHEDULE where HARVEST_SOURCE_ID=?";
+	
+	/*
+     * (non-Javadoc)
+     * 
+     * @see eionet.cr.dao.HarvestScheduleDao#deleteSchedule()
+     */
+    public void deleteSchedule(Integer sourceId) throws DAOException {
+    	    	
+    	List<Object> values = new ArrayList<Object>();
+		values.add(sourceId);
+		
+		Connection conn = null;
+		try{
+			conn = getConnection();
+			SQLUtil.executeUpdate(deleteScheduleSQL, values, conn);
+		}
+		catch (Exception e){
+			throw new DAOException(e.getMessage(), e);
+		}
+		finally{
+			ConnectionUtil.closeConnection(conn);
+		}
+    }
 }
 

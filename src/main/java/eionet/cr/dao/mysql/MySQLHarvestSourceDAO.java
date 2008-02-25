@@ -29,7 +29,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 	/*
      * (non-Javadoc)
      * 
-     * @see eionet.cr.dao.ISourceDao#getHarvestSources()
+     * @see eionet.cr.dao.HarvestSourceDao#getHarvestSources()
      */
     public List<HarvestSourceDTO> getHarvestSources() throws DAOException {
     	List<Object> values = new ArrayList<Object>();
@@ -59,7 +59,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 	/*
      * (non-Javadoc)
      * 
-     * @see eionet.cr.dao.ISourceDao#getHarvestSourceById()
+     * @see eionet.cr.dao.HarvestSourceDao#getHarvestSourceById()
      */
     public HarvestSourceDTO getHarvestSourceById(int harvestSourceID) throws DAOException {
     	List<Object> values = new ArrayList<Object>();
@@ -100,7 +100,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 	/*
      * (non-Javadoc)
      * 
-     * @see eionet.cr.dao.ISourceDao#addSource()
+     * @see eionet.cr.dao.HarvestSourceDao#addSource()
      */
     public void addSource(HarvestSourceDTO source, String user) throws DAOException {
     	    	
@@ -136,7 +136,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 	/*
      * (non-Javadoc)
      * 
-     * @see eionet.cr.dao.ISourceDao#editSource()
+     * @see eionet.cr.dao.HarvestSourceDao#editSource()
      */
     public void editSource(HarvestSourceDTO source) throws DAOException {
     	    	
@@ -155,6 +155,34 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 			if(source.getHarvestSchedule() != null){
 				DAOFactory.getDAOFactory().getHarvestScheduleDAO().editSchedule(source.getHarvestSchedule());
 			}
+		}
+		catch (Exception e){
+			throw new DAOException(e.getMessage(), e);
+		}
+		finally{
+			ConnectionUtil.closeConnection(conn);
+		}
+    }
+    
+    /** */
+	private static final String deleteSourceSQL = "delete from HARVEST_SOURCE where HARVEST_SOURCE_ID=?";
+	
+	/*
+     * (non-Javadoc)
+     * 
+     * @see eionet.cr.dao.HarvestSourceDao#deleteSource()
+     */
+    public void deleteSource(HarvestSourceDTO source) throws DAOException {
+    	    	
+    	List<Object> values = new ArrayList<Object>();
+		values.add(source.getSourceId());
+		
+		Connection conn = null;
+		try{
+			conn = getConnection();
+			SQLUtil.executeUpdate(deleteSourceSQL, values, conn);
+			
+			DAOFactory.getDAOFactory().getHarvestScheduleDAO().deleteSchedule(source.getSourceId());
 		}
 		catch (Exception e){
 			throw new DAOException(e.getMessage(), e);

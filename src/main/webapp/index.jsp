@@ -1,1 +1,1 @@
-<%response.sendRedirect((!request.getContextPath().equals("") ? request.getContextPath() + "/" : "") +"pages/calculator.jsp"); %>
+<%response.sendRedirect((!request.getContextPath().equals("") ? request.getContextPath() + "/" : "") +"pages/sources.jsp"); %>

@@ -23,7 +23,13 @@ public interface HarvestScheduleDAO {
     
     /**
      * @throws DAOException
-     * @param HarvestScheduleDTO source
+     * @param HarvestScheduleDTO schedule
      */
     public void editSchedule(HarvestScheduleDTO schedule) throws DAOException;
+    
+    /**
+     * @throws DAOException
+     * @param Integer sourceId
+     */
+    public void deleteSchedule(Integer sourceId) throws DAOException;
 }

@@ -48,7 +48,12 @@
 	                                <stripes:param name="harvestSource.sourceId" value="${source.sourceId}"/>
 	                            </stripes:link>
 		        			</td>
-		        			<td><img src="${pageContext.request.contextPath}/images/delete.gif" title="Delete"/></td>
+		        			<td>
+		        				<stripes:link href="/source.action" event="delete" onclick="return confirm('Are you sure you want to delete this harvesting source');">
+	                                <img src="${pageContext.request.contextPath}/images/delete.gif" title="Delete"/>
+	                                <stripes:param name="harvestSource.sourceId" value="${source.sourceId}"/>
+	                            </stripes:link>
+		        			</td>
 		        		</tr>
 	        		</c:forEach>
 	        	</tbody>

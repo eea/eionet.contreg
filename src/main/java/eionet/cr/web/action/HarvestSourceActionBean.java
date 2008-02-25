@@ -60,5 +60,15 @@ public class HarvestSourceActionBean extends AbstractCRActionBean {
         this.harvestSource = harvestSource.getHarvestSource( this.harvestSource.getSourceId() );
         return new RedirectResolution("/pages/viewsource.jsp").flash(this);
     }
+    
+    public Resolution delete() throws DAOException {
+		if(isUserLoggedIn()){
+			DAOFactory.getDAOFactory().getHarvestSourceDAO().deleteSource(getHarvestSource());
+			showMessage("Harvesting source deleted!");
+		} else {
+			handleCrException("You are not logged in!", GeneralConfig.SEVERITY_WARNING);
+		}
+        return new ForwardResolution("/pages/sources.jsp");
+    }
 
 }

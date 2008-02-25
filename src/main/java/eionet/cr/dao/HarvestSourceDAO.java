@@ -32,4 +32,10 @@ public interface HarvestSourceDAO {
      * @param HarvestSourceDTO source
      */
     public void editSource(HarvestSourceDTO source) throws DAOException;
+    
+    /**
+     * @throws DAOException
+     * @param HarvestSourceDTO source
+     */
+    public void deleteSource(HarvestSourceDTO source) throws DAOException;
 }
