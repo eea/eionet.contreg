@@ -14,7 +14,7 @@ import org.apache.commons.logging.LogFactory;
 public class GeneralConfig {
 	
 	/** */
-	private static final String PROPERTIES_FILE_NAME = "cr.properties";
+	public static final String PROPERTIES_FILE_NAME = "cr.properties";
 
 	/** */
 	public static final String DB_URL = "db.url";
@@ -26,6 +26,14 @@ public class GeneralConfig {
 	public static final String LUCENE_INDEX_LOCATION = "lucene.index.location";
 	public static final String HARVESTER_FILES_LOCATION = "harvester.files.location";
 	
+	/** */
+	public static final String PREDICATE_RDF_TYPE = "rdf.identifiers.predicates.rdf-type";
+	public static final String PREDICATE_RDFS_LABEL = "rdf.identifiers.predicates.rdfs-label";
+	public static final String PREDICATE_CR_ID = "rdf.identifiers.predicates.cr-id";
+	public static final String PREDICATE_IS_ENCODING_SCHEME = "rdf.identifiers.predicates.is-enc";
+	public static final String ANONYMOUS_AUTOGEN_PREFIX = "rdf.identifiers.anonymous.autogen-prefix";
+	
+	/** */
 	public static final int SEVERITY_INFO = 1;
 	public static final int SEVERITY_CAUTION = 2;
 	public static final int SEVERITY_WARNING = 3;
@@ -72,5 +80,20 @@ public class GeneralConfig {
 			init();
 		
 		return properties.getProperty(key, defaultValue);
+	}
+	
+	/**
+	 * 
+	 * @param key
+	 * @return
+	 * @throws ConfigException 
+	 */
+	public static synchronized String getRequiredProperty(String key){
+		
+		String value = getProperty(key);
+		if (value==null || value.trim().length()==0)
+			throw new ConfigException("Missing required property: " + key);
+		else
+			return value;
 	}
 }
