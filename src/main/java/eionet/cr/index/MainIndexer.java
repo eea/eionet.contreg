@@ -52,8 +52,6 @@ public class MainIndexer extends Indexer{
 		Document document = new Document();
 		document.add(new Field("ID", resource.getId(), Field.Store.YES, Field.Index.UN_TOKENIZED));
 
-		boolean hasRdfType = false;
-		boolean hasRdfsLabel = false;
 		StringBuffer contentBuf = new StringBuffer(); // for collecting all literal values
 		
 		List<RDFResourceProperty> resourceProperties = resource.getProperties();
@@ -72,20 +70,15 @@ public class MainIndexer extends Indexer{
 				for (int j=0; decodedLabels!=null && j<decodedLabels.length; j++)
 					document.add(new Field(resourceProperty.getId(), decodedLabels[j], Field.Store.YES, Field.Index.TOKENIZED));
 			}
-
-			// remember if this was an rdf-type or rdfs-label
-			if (resourceProperty.getId().equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"))
-				hasRdfType = true;
-			if (resourceProperty.getId().equals("http://www.w3.org/2000/01/rdf-schema#label"))
-				hasRdfsLabel = true;
 		}
 		
 		// create the so called "content" field, add it to the document
 		if (contentBuf.toString().trim().length()>0)
 			document.add(new Field("content", contentBuf.toString(), Field.Store.NO, Field.Index.TOKENIZED));
 		
-		// if the resource has rdf-type or rdfs-label, it's an encoding scheme, so set the corresponding field
-		if (hasRdfType && hasRdfsLabel)
+		// if the resource is an encoding scheme, set the corresponding field
+		boolean isEncScheme = resource.isEncodingScheme();
+		if (isEncScheme)
 			document.add(new Field("IS_ENCODING_SCHEME", Boolean.TRUE.toString(), Field.Store.YES, Field.Index.TOKENIZED));
 		
 		// finally, update the document in index
@@ -98,7 +91,7 @@ public class MainIndexer extends Indexer{
 		countDocumentsIndexed++;
 		
 		// if this document is an encoding scheme, add it into EncodingSchemes
-		if (hasRdfType && hasRdfsLabel)
+		if (isEncScheme)
 			EncodingSchemes.update(resource.getId(), document.getValues("http://www.w3.org/2000/01/rdf-schema#label"));
 	}
 

@@ -1,6 +1,7 @@
 package eionet.cr.harvest.util;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import eionet.cr.index.IndexException;
@@ -15,6 +16,7 @@ public class RDFResource {
 	/** */
 	private String id = null;
 	private List<RDFResourceProperty> properties = null;
+	private HashSet<String> distinctPropertyIds = null;
 
 	/**
 	 * @param id
@@ -47,6 +49,7 @@ public class RDFResource {
 			properties = new ArrayList<RDFResourceProperty>();
 		
 		properties.add(property);
+		addDistinctPropertyId(property.getId());
 	}
 
 	/**
@@ -54,5 +57,27 @@ public class RDFResource {
 	 */
 	public List<RDFResourceProperty> getProperties() {
 		return properties;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isEncodingScheme(){
+		
+		return distinctPropertyIds!=null &&
+			distinctPropertyIds.contains("http://www.w3.org/1999/02/22-rdf-syntax-ns#type") &&
+			distinctPropertyIds.contains("http://www.w3.org/2000/01/rdf-schema#label");
+	}
+	
+	/**
+	 * 
+	 * @param id
+	 */
+	private void addDistinctPropertyId(String id){
+		
+		if (distinctPropertyIds==null)
+			distinctPropertyIds = new HashSet<String>();
+		distinctPropertyIds.add(id);
 	}
 }
