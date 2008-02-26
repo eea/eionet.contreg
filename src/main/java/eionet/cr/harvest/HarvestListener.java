@@ -29,4 +29,14 @@ public interface HarvestListener {
 	 * 
 	 */
 	public boolean hasFatalException();
+	
+	/**
+	 * 
+	 */
+	public void foundLitObjStatement();
+	
+	/**
+	 * 
+	 */
+	public void foundResObjStatement();
 }

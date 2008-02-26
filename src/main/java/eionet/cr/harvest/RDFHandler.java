@@ -71,12 +71,15 @@ public class RDFHandler implements StatementHandler{
 	 */
 	public void statement(AResource subject, AResource predicate, AResource object) {
 		
-		if (harvestListener!=null && harvestListener.hasFatalException())
-			return;
-		
 		if (subject==null || predicate==null || object==null)
 			return;
-		
+
+		if (harvestListener!=null){
+			if (harvestListener.hasFatalException())
+				return;
+			harvestListener.foundResObjStatement();
+		}
+
 		statement(subject, predicate, new WrappedARPObject(object, getResourceID(object)));
 	}
 
@@ -86,12 +89,15 @@ public class RDFHandler implements StatementHandler{
 	 */
 	public void statement(AResource subject, AResource predicate, ALiteral object) {
 
-		if (harvestListener!=null && harvestListener.hasFatalException())
-			return;
-
 		if (subject==null || predicate==null || object==null)
 			return;
-		
+
+		if (harvestListener!=null){
+			if (harvestListener.hasFatalException())
+				return;
+			harvestListener.foundLitObjStatement();
+		}
+
 		statement(subject, predicate, new WrappedARPObject(object));
 	}
 	

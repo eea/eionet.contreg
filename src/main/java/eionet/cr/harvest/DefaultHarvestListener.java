@@ -31,8 +31,12 @@ public class DefaultHarvestListener implements HarvestListener, org.xml.sax.Erro
 	private HarvestSourceDTO harvestSourceDTO = null;
 	private String harvestType = null;
 	private CRUser crUser = null;
-	private int countResourcesCalled = 0;
-	private int countResourcesIndexed = 0;
+	
+	/** */
+	private int countTotalResources = 0;
+	private int countEncodingSchemes = 0;
+	private int countLitObjStatements = 0;
+	private int countResObjStatements = 0;
 
 	/**
 	 * 
@@ -59,10 +63,11 @@ public class DefaultHarvestListener implements HarvestListener, org.xml.sax.Erro
 		if (resource==null)
 			return;
 		
-		countResourcesCalled++;
 		try{
 			indexer.indexRDFResource(resource);			
-			countResourcesIndexed++;
+			countTotalResources++;
+			if (resource.isEncodingScheme())
+				countEncodingSchemes++;
 		}
 		catch (IndexException e){
 			setFatalException(new HarvestException(e.toString(), e));
@@ -157,16 +162,54 @@ public class DefaultHarvestListener implements HarvestListener, org.xml.sax.Erro
 	}
 
 	/**
-	 * @return the countResourcesCalled
+	 * @return the countTotalResources
 	 */
-	public int getCountResourcesCalled() {
-		return countResourcesCalled;
+	public int getCountTotalResources() {
+		return countTotalResources;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.harvest.HarvestListener#foundLitObjStatement()
+	 */
+	public void foundLitObjStatement() {
+		countLitObjStatements++;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.harvest.HarvestListener#foundResObjStatement()
+	 */
+	public void foundResObjStatement() {
+		countResObjStatements++;
 	}
 
 	/**
-	 * @return the countResourcesIndexed
+	 * @return the countEncodingSchemes
 	 */
-	public int getCountResourcesIndexed() {
-		return countResourcesIndexed;
+	public int getCountEncodingSchemes() {
+		return countEncodingSchemes;
+	}
+
+	/**
+	 * @return the countLitObjStatements
+	 */
+	public int getCountLitObjStatements() {
+		return countLitObjStatements;
+	}
+
+	/**
+	 * @return the countResObjStatements
+	 */
+	public int getCountResObjStatements() {
+		return countResObjStatements;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public int getCountTotalStatements(){
+		return countLitObjStatements + countResObjStatements;
 	}
 }

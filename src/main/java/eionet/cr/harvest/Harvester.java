@@ -19,6 +19,7 @@ import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dto.HarvestSourceDTO;
+import eionet.cr.index.EncodingSchemes;
 import eionet.cr.web.security.CRUser;
 
 public class Harvester {
@@ -163,7 +164,8 @@ public class Harvester {
 	public static void main(String[] args){
 
 		HarvestSourceDTO harvestSourceDTO = new HarvestSourceDTO();
-		harvestSourceDTO.setPullUrl("http://cdr.eionet.europa.eu/envelopes.rdf");
+		//harvestSourceDTO.setPullUrl("http://cdr.eionet.europa.eu/envelopes.rdf");
+		harvestSourceDTO.setPullUrl("http://purl.org/dc/elements/1.1/");		
 		
 		DefaultHarvestListener harvestListener = new DefaultHarvestListener(harvestSourceDTO, "pull", null);
 		try{
@@ -171,11 +173,17 @@ public class Harvester {
 		}
 		catch (Throwable t){			
 			t.printStackTrace();
+		}
+		finally{
 			System.out.println();
 			System.out.println("=================================================");
 		}
 		
-		System.out.println("ResourcesCalled = " + harvestListener.getCountResourcesCalled());
-		System.out.println("ResourcesIndexed = " + harvestListener.getCountResourcesIndexed());
+		System.out.println("getCountTotalStatements = " + harvestListener.getCountTotalStatements());
+		System.out.println("getCountLitObjStatements = " + harvestListener.getCountLitObjStatements());
+		System.out.println("getCountResObjStatements = " + harvestListener.getCountResObjStatements());
+		System.out.println("getCountTotalResources = " + harvestListener.getCountTotalResources());
+		System.out.println("getCountEncodingSchemes = " + harvestListener.getCountEncodingSchemes());
+		System.out.println("EncodingSchemes.getCount() = " + EncodingSchemes.getCount());
 	}
 }

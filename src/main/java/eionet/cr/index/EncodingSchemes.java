@@ -87,4 +87,12 @@ public class EncodingSchemes extends Hashtable<String,String[]>{
 		
 		logger.debug(countLoaded + " encoding schemes loaded");
 	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public static int getCount(){
+		return getInstance().size();
+	}
 }
