@@ -1,9 +1,7 @@
 <div id="leftcolumn" class="localnav">
 	<ul>
-		<li><a href="/cr/pages/calculator.jsp" title="Calculator">Calculator </a></li>
-	    <li><a href="#" title="Simple search">Simple search </a></li>
-	    <li><a href="#" title="Advanced search">Advanced search </a></li>
-	    <li><a href="#" title="Dataflow search">Dataflow search </a></li>
-	    <li><a href="#" title="New uploads">New uploads </a></li>
+	    <li><a href="/cr/pages/sources.jsp" title="Harvestin sources">Harvesting sources </a></li>
+	    <li><a href="/cr/pages/addsource.jsp" title="Add new harvesting source">Add new source </a></li>
+	    <li><a href="/cr/pages/query.jsp" title="Query">Query </a></li>
     </ul>
 </div>
