@@ -68,8 +68,7 @@ public class EncodingSchemes extends Hashtable<String,String[]>{
 		
 		List hits = null;
 		try{
-			Searcher searcher = new Searcher();
-			hits = searcher.search("IS_ENCODING_SCHEME:" + Boolean.TRUE.toString());
+			hits = Searcher.search("IS_ENCODING_SCHEME:" + Boolean.TRUE.toString());
 		}
 		catch (Exception e){
 			logger.error("Failed to load encoding schemes: " + e.toString(), e);

@@ -127,4 +127,15 @@ public class HarvestSourceActionBean extends AbstractCRActionBean {
 		
     	return new ForwardResolution("/pages/viewsource.jsp");
     }
+    
+    /**
+     * 
+     * @return
+     * @throws DAOException 
+     */
+    public Resolution scheduleImmediateHarvest() throws DAOException{
+    	harvestSource = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(harvestSource.getSourceId());
+    	showMessage("Not implemented yet");
+    	return new ForwardResolution("/pages/viewsource.jsp");
+    }
 }
