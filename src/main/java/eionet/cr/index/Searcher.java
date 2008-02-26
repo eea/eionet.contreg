@@ -54,8 +54,10 @@ public class Searcher {
 	 * @throws CorruptIndexException 
 	 */
 	private static IndexSearcher getIndexSearcher() throws CorruptIndexException, IOException{
-		if (indexSearcher==null)
+		if (indexSearcher==null){
+			logger.debug("Initializing index searcher");
 			indexSearcher = new IndexSearcher(GeneralConfig.getProperty(GeneralConfig.LUCENE_INDEX_LOCATION));
+		}
 		return indexSearcher;
 	}
 	
@@ -64,6 +66,7 @@ public class Searcher {
 	 */
 	public static synchronized void close(){
 		if (indexSearcher!=null){
+			logger.debug("Closing index searcher");
 			try{
 				indexSearcher.close();
 			}
@@ -96,20 +99,10 @@ public class Searcher {
 
 		logger.debug("Performing search query: " + query);
 		
-		try{
-			QueryParser parser = new QueryParser(DEFAULT_FIELD, analyzer);
-			Query queryObj = parser.parse(query);
-			Hits hits = getIndexSearcher().search(queryObj);
-			return processHits(hits);
-		}
-		finally{
-			try{
-				if (indexSearcher!=null) indexSearcher.close();
-			}
-			catch (IOException e){
-				logger.error("Failed to close IndexSearcher", e);
-			}
-		}
+		QueryParser parser = new QueryParser(DEFAULT_FIELD, analyzer);
+		Query queryObj = parser.parse(query);
+		Hits hits = getIndexSearcher().search(queryObj);
+		return processHits(hits);
 	}
 	
 	/**
