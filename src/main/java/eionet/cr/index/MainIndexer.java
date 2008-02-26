@@ -74,7 +74,7 @@ public class MainIndexer extends Indexer{
 		
 		// create the so called "content" field, add it to the document
 		if (contentBuf.toString().trim().length()>0)
-			document.add(new Field("content", contentBuf.toString(), Field.Store.NO, Field.Index.TOKENIZED));
+			document.add(new Field(Indexer.ALL_CONTENT_FIELD, contentBuf.toString(), Field.Store.NO, Field.Index.TOKENIZED));
 		
 		// if the resource is an encoding scheme, set the corresponding field
 		boolean isEncScheme = resource.isEncodingScheme();

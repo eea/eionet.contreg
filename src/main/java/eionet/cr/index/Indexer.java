@@ -12,6 +12,9 @@ import eionet.cr.harvest.util.RDFResource;
  *
  */
 public abstract class Indexer {
+	
+	/** */
+	public static final String ALL_CONTENT_FIELD = "content";
 
 	/**
 	 * 
