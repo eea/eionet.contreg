@@ -20,16 +20,16 @@ public class ServletContextListenerImpl implements ServletContextListener{
 	 * (non-Javadoc)
 	 * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
 	 */
-	public void contextDestroyed(ServletContextEvent arg0) {
-		// TODO Auto-generated method stub
+	public void contextDestroyed(ServletContextEvent event) {
 		
+		Searcher.close();
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
 	 */
-	public void contextInitialized(ServletContextEvent arg0) {
+	public void contextInitialized(ServletContextEvent event) {
 		
 		EncodingSchemes.load();
 	}
