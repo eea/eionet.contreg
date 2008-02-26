@@ -38,14 +38,10 @@ public abstract class MySQLBaseDAO {
 	/**
 	 * 
 	 * @return
+	 * @throws SQLException 
 	 * @throws DAOException
 	 */
-	protected Integer getLastInsertID(Connection conn) throws DAOException{
-		try{
-			return MySQLUtil.getLastInsertID(conn);
-		}
-		catch (Exception e){
-			throw new DAOException(e.getMessage(), e);
-		}
+	protected Integer getLastInsertID(Connection conn) throws SQLException{
+		return MySQLUtil.getLastInsertID(conn);
 	}
 }

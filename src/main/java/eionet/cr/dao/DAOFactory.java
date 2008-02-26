@@ -8,16 +8,20 @@ public abstract class DAOFactory {
 	public static final int MYSQL = 1;
 	
 	/**
-	 * 
 	 * @return
 	 */
 	public abstract HarvestSourceDAO getHarvestSourceDAO();
 	
 	/**
-	 * 
 	 * @return
 	 */
 	public abstract HarvestScheduleDAO getHarvestScheduleDAO();
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public abstract HarvestDAO getHarvestDAO();
 	
 	/**
 	 * 

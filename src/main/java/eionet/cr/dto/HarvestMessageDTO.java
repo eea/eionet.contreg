@@ -8,7 +8,7 @@ package eionet.cr.dto;
 public class HarvestMessageDTO implements java.io.Serializable{
 
 	/** */
-	Integer harvestID = null;
+	Integer harvestId = null;
 	String type = null;
 	String message = null;
 	String stackTrace = null;
@@ -22,14 +22,14 @@ public class HarvestMessageDTO implements java.io.Serializable{
 	/**
 	 * @return the harvestID
 	 */
-	public Integer getHarvestID() {
-		return harvestID;
+	public Integer getHarvestId() {
+		return harvestId;
 	}
 	/**
 	 * @param harvestID the harvestID to set
 	 */
-	public void setHarvestID(Integer harvestID) {
-		this.harvestID = harvestID;
+	public void setHarvestId(Integer harvestID) {
+		this.harvestId = harvestID;
 	}
 	/**
 	 * @return the type

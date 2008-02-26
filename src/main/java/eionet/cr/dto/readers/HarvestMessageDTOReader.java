@@ -29,7 +29,7 @@ public class HarvestMessageDTOReader extends ResultSetBaseReader {
 	public void readRow(ResultSet rs) throws SQLException {
 
 		HarvestMessageDTO harvestMessageDTO = new HarvestMessageDTO();
-		harvestMessageDTO.setHarvestID(new Integer(rs.getInt("HARVEST_ID")));
+		harvestMessageDTO.setHarvestId(new Integer(rs.getInt("HARVEST_ID")));
 		harvestMessageDTO.setType(rs.getString("TYPE"));
 		harvestMessageDTO.setMessage(rs.getString("MESSAGE"));
 		harvestMessageDTO.setStackTrace(rs.getString("STACK_TRACE"));

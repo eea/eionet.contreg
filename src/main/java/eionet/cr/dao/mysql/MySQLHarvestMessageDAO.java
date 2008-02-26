@@ -57,7 +57,7 @@ public class MySQLHarvestMessageDAO extends MySQLBaseDAO implements HarvestMessa
 			return;
 		
 		List<Object> values = new ArrayList<Object>();
-		values.add(harvestMessageDTO.getHarvestID());
+		values.add(harvestMessageDTO.getHarvestId());
 		values.add(harvestMessageDTO.getType());
 		values.add(harvestMessageDTO.getMessage());
 		values.add(harvestMessageDTO.getStackTrace());

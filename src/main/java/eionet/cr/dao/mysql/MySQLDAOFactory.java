@@ -1,6 +1,7 @@
 package eionet.cr.dao.mysql;
 
 import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dao.HarvestScheduleDAO;
 import eionet.cr.dao.HarvestSourceDAO;
 
@@ -17,19 +18,27 @@ public class MySQLDAOFactory extends DAOFactory {
 	 */
 	public MySQLDAOFactory(){
 	}
-	
-	private HarvestSourceDAO harvestSourceDAO = new MySQLHarvestSourceDAO();
-	private HarvestScheduleDAO harvestScheduleDAO = new MySQLHarvestScheduleDAO();
-	
 
-	 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.DAOFactory#getHarvestSourceDAO()
+	 */
 	public HarvestSourceDAO getHarvestSourceDAO() {
 		return new MySQLHarvestSourceDAO();
 	}
-	
-	@Override
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.DAOFactory#getHarvestScheduleDAO()
+	 */
 	public HarvestScheduleDAO getHarvestScheduleDAO() {
 		return new MySQLHarvestScheduleDAO();
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.DAOFactory#getHarvestDAO()
+	 */
+	public HarvestDAO getHarvestDAO() {
+		return new MySQLHarvestDAO();	}
 }
