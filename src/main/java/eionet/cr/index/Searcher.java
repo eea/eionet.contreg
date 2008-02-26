@@ -36,45 +36,70 @@ import eionet.cr.util.Messages;
 public class Searcher {
 	
 	/** */
+	public static final String DEFAULT_FIELD = Indexer.ALL_CONTENT_FIELD;
+	
+	/** */
 	private static Log logger = LogFactory.getLog(Searcher.class);
 	
 	/** */
-	private String indexLocation = null;
-	private Analyzer analyzer = null;
+	private static Analyzer defaultAnalyzer = new StandardAnalyzer();
+
+	/** */
+	private static IndexSearcher indexSearcher = null;
 	
 	/**
-	 *
+	 * 
+	 * @return
+	 * @throws IOException 
+	 * @throws CorruptIndexException 
 	 */
-	public Searcher(){
-		this(GeneralConfig.getProperty(GeneralConfig.LUCENE_INDEX_LOCATION));
+	private static IndexSearcher getIndexSearcher() throws CorruptIndexException, IOException{
+		if (indexSearcher==null)
+			indexSearcher = new IndexSearcher(GeneralConfig.getProperty(GeneralConfig.LUCENE_INDEX_LOCATION));
+		return indexSearcher;
 	}
-
+	
 	/**
 	 * 
-	 * @param indexLocation
 	 */
-	public Searcher(String indexLocation){
-		this.indexLocation= indexLocation;
-		this.analyzer = new StandardAnalyzer();
+	public static synchronized void close(){
+		if (indexSearcher!=null){
+			try{
+				indexSearcher.close();
+			}
+			catch (IOException e){
+				logger.error("Failed to close index searcher: " + e.toString(), e);
+			}
+		}
 	}
-
+	
 	/**
 	 * 
 	 * @param query
 	 * @return
+	 * @throws ParseException
+	 * @throws IOException
+	 */
+	public static synchronized List<Hashtable<String,String[]>> search(String query) throws ParseException, IOException{
+		return search(query, defaultAnalyzer);
+	}
+	
+	/**
+	 * 
+	 * @param query
+	 * @param analyzer
+	 * @return
 	 * @throws ParseException 
 	 * @throws IOException 
 	 */
-	public List search(String query) throws ParseException, IOException{
+	public static synchronized List<Hashtable<String,String[]>> search(String query, Analyzer analyzer) throws ParseException, IOException{
 
 		logger.debug("Performing search query: " + query);
 		
-		IndexSearcher indexSearcher = null;
 		try{
-			indexSearcher = new IndexSearcher(indexLocation);
-			QueryParser parser = new QueryParser("content", analyzer);
+			QueryParser parser = new QueryParser(DEFAULT_FIELD, analyzer);
 			Query queryObj = parser.parse(query);
-			Hits hits = indexSearcher.search(queryObj);
+			Hits hits = getIndexSearcher().search(queryObj);
 			return processHits(hits);
 		}
 		finally{
@@ -89,49 +114,18 @@ public class Searcher {
 	
 	/**
 	 * 
-	 * @param req
-	 * @return
-	 * @throws Exception 
-	 */
-	public static void search(HttpServletRequest req) throws Exception{
-		
-		String query = req.getParameter("query");
-		if (query==null || query.trim().length()==0)
-			throw new Exception("Missing or empty query");
-		String analyzerClass = req.getParameter("analyzerClass");
-		
-		
-		Searcher searcher = new Searcher();
-		if (analyzerClass!=null && analyzerClass.trim().length()>0)
-			searcher.setAnalyzer((Analyzer)Class.forName(analyzerClass).newInstance());
-		
-		List hits = searcher.search(query);
-		Messages.addMessage(req, "messages", "Number of hits: " + (hits==null ? "0" : hits.size()));
-		if (hits!=null)
-			req.setAttribute("hits", hits);
-	}
-	
-	/**
-	 * @param analyzer The analyzer to set.
-	 */
-	public void setAnalyzer(Analyzer analyzer) {
-		this.analyzer = analyzer;
-	}
-	
-	/**
-	 * 
 	 * @param hits
 	 * @return
 	 * @throws IOException 
 	 * @throws CorruptIndexException 
 	 */
-	public static List processHits(Hits hits) throws CorruptIndexException, IOException{
+	public static List<Hashtable<String,String[]>> processHits(Hits hits) throws CorruptIndexException, IOException{
 		
-		List list = new ArrayList();
+		List<Hashtable<String,String[]>> list = new ArrayList<Hashtable<String,String[]>>();
 		for (int i=0; hits!=null && i<hits.length(); i++){
 			
 			Document doc = hits.doc(i);
-			Hashtable hash = new Hashtable();
+			Hashtable<String,String[]> hash = new Hashtable<String,String[]>();
 			List allFields = doc.getFields();
 			
 			for (int j=0; allFields!=null && j<allFields.size(); j++){
