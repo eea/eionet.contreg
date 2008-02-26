@@ -20,7 +20,7 @@ public class EncodingSchemes extends Hashtable<String,String[]>{
 	/**
 	 *
 	 */
-	public EncodingSchemes(){
+	private EncodingSchemes(){
 		super();
 	}
 	
