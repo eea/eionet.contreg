@@ -22,6 +22,8 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.Hits;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 import com.hp.hpl.jena.rdf.arp.ALiteral;
 import com.hp.hpl.jena.rdf.arp.AResource;
@@ -44,6 +46,7 @@ public class RDFHandler implements StatementHandler{
 	/** */
 	private static Log logger = LogFactory.getLog(RDFHandler.class);
 	
+	/** */
 	private String currentDocumentID;
 	private ArrayList currentDocumentAttributes;
 	private int countDocumentsIndexed = 0;
@@ -56,6 +59,9 @@ public class RDFHandler implements StatementHandler{
 	/** */
 	private RDFResource currentResource = null;
 	private HarvestListener harvestListener = null;
+	
+	/** */
+	private boolean stopWorking = false;
 	
 	/**
 	 * 
@@ -71,14 +77,8 @@ public class RDFHandler implements StatementHandler{
 	 */
 	public void statement(AResource subject, AResource predicate, AResource object) {
 		
-		if (subject==null || predicate==null || object==null)
+		if (stopWorking || subject==null || predicate==null || object==null)
 			return;
-
-		if (harvestListener!=null){
-			if (harvestListener.hasFatalException())
-				return;
-			harvestListener.foundResObjStatement();
-		}
 
 		statement(subject, predicate, new WrappedARPObject(object, getResourceID(object)));
 	}
@@ -89,14 +89,8 @@ public class RDFHandler implements StatementHandler{
 	 */
 	public void statement(AResource subject, AResource predicate, ALiteral object) {
 
-		if (subject==null || predicate==null || object==null)
+		if (stopWorking || subject==null || predicate==null || object==null)
 			return;
-
-		if (harvestListener!=null){
-			if (harvestListener.hasFatalException())
-				return;
-			harvestListener.foundLitObjStatement();
-		}
 
 		statement(subject, predicate, new WrappedARPObject(object));
 	}
@@ -106,6 +100,7 @@ public class RDFHandler implements StatementHandler{
 	 * @param subject
 	 * @param predicate
 	 * @param object
+	 * @throws HarvestException 
 	 */
 	protected void statement(AResource subject, AResource predicate, WrappedARPObject object){
 		
@@ -115,8 +110,14 @@ public class RDFHandler implements StatementHandler{
 			return;
 		
 		if (currentResource!=null && !currentResource.getId().equals(subjectID)){
-			if (harvestListener!=null)
-				harvestListener.resourceHarvested(currentResource);
+			if (harvestListener!=null){
+				try{
+					harvestListener.resourceHarvested(currentResource);
+				}
+				catch (HarvestException e){
+					stopWorking = true;
+				}
+			}
 			currentResource = new RDFResource(subjectID);
 		}
 		else if (currentResource==null)
@@ -165,12 +166,4 @@ public class RDFHandler implements StatementHandler{
     		throw new RuntimeException(e.toString(), e);
     	}
     }
-
-	/**
-	 * 
-	 * @return
-	 */
-	public int getCountDocumentsIndexed() {
-		return countDocumentsIndexed;
-	}
 }

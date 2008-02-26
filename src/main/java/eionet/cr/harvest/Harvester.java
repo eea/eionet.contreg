@@ -61,10 +61,10 @@ public class Harvester {
 		boolean exceptionCatched = false;
 		InputStreamReader reader = null;
 		try{
-	        reader = new InputStreamReader(new FileInputStream(file));	        
-	        RDFHandler handler = new RDFHandler(harvestListener.getHarvestSourceDTO().getPullUrl(), (HarvestListener)harvestListener);
+			RDFHandler rdfHandler = new RDFHandler(harvestListener.getHarvestSourceDTO().getPullUrl(), (HarvestListener)harvestListener);
+	        reader = new InputStreamReader(new FileInputStream(file));	        	        
 			ARP arp = new ARP();
-	        arp.setStatementHandler(handler);
+	        arp.setStatementHandler(rdfHandler);
 	        arp.setErrorHandler(new SAXErrorHandler());
 	        arp.load(reader);
 		}
@@ -83,7 +83,7 @@ public class Harvester {
 				logger.error("Failure when trying to close the file's InputStreamReader: " + e.toString(), e);
 			}
 			finally{
-		        if (!exceptionCatched && harvestListener.hasFatalException())
+		        if (!exceptionCatched && harvestListener.getFatalException()!=null)
 		        	throw harvestListener.getFatalException();
 			}
 		}
@@ -180,8 +180,8 @@ public class Harvester {
 		}
 		
 		System.out.println("getCountTotalStatements = " + harvestListener.getCountTotalStatements());
-		System.out.println("getCountLitObjStatements = " + harvestListener.getCountLitObjStatements());
-		System.out.println("getCountResObjStatements = " + harvestListener.getCountResObjStatements());
+		System.out.println("getCountLitObjStatements = " + harvestListener.getCountLiteralStatements());
+		System.out.println("getCountResObjStatements = " + (harvestListener.getCountTotalStatements() - harvestListener.getCountLiteralStatements()));
 		System.out.println("getCountTotalResources = " + harvestListener.getCountTotalResources());
 		System.out.println("getCountEncodingSchemes = " + harvestListener.getCountEncodingSchemes());
 		System.out.println("EncodingSchemes.getCount() = " + EncodingSchemes.getCount());

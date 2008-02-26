@@ -119,8 +119,8 @@ public class HarvestSourceActionBean extends AbstractCRActionBean {
 		Harvester.pull(harvestListener);
 		
 		showMessage("Statements in total: " + harvestListener.getCountTotalStatements());
-		showMessage("Statements with literal objects: " + harvestListener.getCountLitObjStatements());
-		showMessage("Statements with resource objects: " + harvestListener.getCountResObjStatements());
+		showMessage("Statements with literal objects: " + harvestListener.getCountLiteralStatements());
+		showMessage("Statements with resource objects: " + (harvestListener.getCountTotalStatements() - harvestListener.getCountLiteralStatements()));
 		showMessage("Resources in total: " + harvestListener.getCountTotalResources());
 		showMessage("Resources as encoding schemes: " + harvestListener.getCountEncodingSchemes());
 		

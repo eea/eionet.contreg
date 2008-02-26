@@ -17,6 +17,7 @@ public class RDFResource {
 	private String id = null;
 	private List<RDFResourceProperty> properties = null;
 	private HashSet<String> distinctPropertyIds = null;
+	private int countLiteralProperties = 0;
 
 	/**
 	 * @param id
@@ -50,6 +51,8 @@ public class RDFResource {
 		
 		properties.add(property);
 		addDistinctPropertyId(property.getId());
+		if (property.isLiteral())
+			countLiteralProperties++;
 	}
 
 	/**
@@ -79,5 +82,20 @@ public class RDFResource {
 		if (distinctPropertyIds==null)
 			distinctPropertyIds = new HashSet<String>();
 		distinctPropertyIds.add(id);
+	}
+
+	/**
+	 * @return the countLitProperties
+	 */
+	public int getCountLiteralProperties() {
+		return countLiteralProperties;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public int getCountTotalProperties(){
+		return properties==null ? 0 : properties.size();
 	}
 }

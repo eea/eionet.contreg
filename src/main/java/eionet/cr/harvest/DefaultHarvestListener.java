@@ -5,6 +5,8 @@ import org.apache.commons.logging.LogFactory;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import eionet.cr.dao.DAOException;
+import eionet.cr.dao.DAOFactory;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.harvest.util.RDFResource;
 import eionet.cr.index.EncodingSchemes;
@@ -18,7 +20,7 @@ import eionet.cr.web.security.CRUser;
  * @author heinljab
  *
  */
-public class DefaultHarvestListener implements HarvestListener, org.xml.sax.ErrorHandler {
+public class DefaultHarvestListener implements HarvestListener, org.xml.sax.ErrorHandler{
 	
 	/** */
 	private static Log logger = LogFactory.getLog(DefaultHarvestListener.class);
@@ -35,8 +37,11 @@ public class DefaultHarvestListener implements HarvestListener, org.xml.sax.Erro
 	/** */
 	private int countTotalResources = 0;
 	private int countEncodingSchemes = 0;
-	private int countLitObjStatements = 0;
-	private int countResObjStatements = 0;
+	private int countTotalStatements = 0;
+	private int countLiteralStatements = 0;
+	
+	/** */
+	private Integer harvestId = null; 
 
 	/**
 	 * 
@@ -58,79 +63,54 @@ public class DefaultHarvestListener implements HarvestListener, org.xml.sax.Erro
 	 * (non-Javadoc)
 	 * @see eionet.cr.harvest.HarvestListener#resourceHarvested(eionet.cr.harvest.util.RDFResource)
 	 */
-	public void resourceHarvested(RDFResource resource){
+	public void resourceHarvested(RDFResource resource) throws HarvestException{
 		
 		if (resource==null)
 			return;
 		
+		countTotalStatements = countTotalStatements + resource.getCountTotalProperties();
+		countLiteralStatements = countLiteralStatements + resource.getCountLiteralProperties();
+		
 		try{
-			indexer.indexRDFResource(resource);			
-			countTotalResources++;
-			if (resource.isEncodingScheme())
-				countEncodingSchemes++;
+			indexer.indexRDFResource(resource);
 		}
 		catch (IndexException e){
-			setFatalException(new HarvestException(e.toString(), e));
+			fatalException = new HarvestException(e.toString(), e);
+			throw fatalException;
 		}
+		
+		countTotalResources++;
+		if (resource.isEncodingScheme())
+			countEncodingSchemes++;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.harvest.HarvestListener#harvestStarted()
 	 */
-	public void harvestStarted() {
+	public void harvestStarted() throws HarvestException {
 		
 		logger.debug("Harvest started for URL: " + harvestSourceDTO.getPullUrl());
+		
+//		try {
+//			harvestId = new Integer(DAOFactory.getDAOFactory().getHarvestDAO().insertStartedHarvest(
+//					harvestSourceDTO.getSourceId(), harvestType, crUser==null ? null : crUser.getUserName(), "started"));
+//		}
+//		catch (DAOException e) {
+//			e.printStackTrace();
+//		}
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.harvest.HarvestListener#harvestFinished()
 	 */
-	public void harvestFinished(){
+	public void harvestFinished() throws HarvestException{
+
 		
 		indexer.close();
 		
 		logger.debug("Harvest finished for URL: " + harvestSourceDTO.getPullUrl());
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.harvest.HarvestListener#hasFatalException()
-	 */
-	public boolean hasFatalException() {
-		return fatalException!=null;
-	}
-
-	/**
-	 * @return the fatalException
-	 */
-	public HarvestException getFatalException() {
-		return fatalException;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.xml.sax.ErrorHandler#error(org.xml.sax.SAXParseException)
-	 */
-	public void error(SAXParseException e) throws SAXException {
-		logger.error("SAX error encountered: " + e.toString(), e);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.xml.sax.ErrorHandler#fatalError(org.xml.sax.SAXParseException)
-	 */
-	public void fatalError(SAXParseException e) throws SAXException {
-		this.setFatalException(new HarvestException("SAX fatal error encountered: " + e.toString(), e));
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.xml.sax.ErrorHandler#warning(org.xml.sax.SAXParseException)
-	 */
-	public void warning(SAXParseException e) throws SAXException {
-		logger.warn("SAX warning encountered: " + e.toString(), e);
 	}
 
 	/**
@@ -168,22 +148,6 @@ public class DefaultHarvestListener implements HarvestListener, org.xml.sax.Erro
 		return countTotalResources;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.harvest.HarvestListener#foundLitObjStatement()
-	 */
-	public void foundLitObjStatement() {
-		countLitObjStatements++;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.harvest.HarvestListener#foundResObjStatement()
-	 */
-	public void foundResObjStatement() {
-		countResObjStatements++;
-	}
-
 	/**
 	 * @return the countEncodingSchemes
 	 */
@@ -194,22 +158,46 @@ public class DefaultHarvestListener implements HarvestListener, org.xml.sax.Erro
 	/**
 	 * @return the countLitObjStatements
 	 */
-	public int getCountLitObjStatements() {
-		return countLitObjStatements;
+	public int getCountLiteralStatements() {
+		return countLiteralStatements;
 	}
 
-	/**
-	 * @return the countResObjStatements
-	 */
-	public int getCountResObjStatements() {
-		return countResObjStatements;
-	}
-	
 	/**
 	 * 
 	 * @return
 	 */
 	public int getCountTotalStatements(){
-		return countLitObjStatements + countResObjStatements;
+		return countTotalStatements;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.xml.sax.ErrorHandler#error(org.xml.sax.SAXParseException)
+	 */
+	public void error(SAXParseException e) throws SAXException {
+		logger.error("SAX error encountered: " + e.toString(), e);	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.xml.sax.ErrorHandler#fatalError(org.xml.sax.SAXParseException)
+	 */
+	public void fatalError(SAXParseException e) throws SAXException {
+		fatalException = new HarvestException("SAX fatal error encountered: " + e.toString(), e);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.xml.sax.ErrorHandler#warning(org.xml.sax.SAXParseException)
+	 */
+	public void warning(SAXParseException e) throws SAXException {
+		logger.warn("SAX warning encountered: " + e.toString(), e);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.harvest.HarvestListener#getFatalException()
+	 */
+	public HarvestException getFatalException() {
+		return fatalException;
 	}
 }

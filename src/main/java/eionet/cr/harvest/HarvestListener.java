@@ -12,31 +12,24 @@ public interface HarvestListener {
 	/**
 	 * 
 	 * @param resource
+	 * @throws HarvestException
 	 */
-	public void resourceHarvested(RDFResource resource);
+	public void resourceHarvested(RDFResource resource) throws HarvestException;
+	
+	/**
+	 * @throws HarvestException
+	 * 
+	 */
+	public void harvestStarted() throws HarvestException;
+	
+	/**
+	 * @throws HarvestException
+	 * 
+	 */
+	public void harvestFinished() throws HarvestException;
 	
 	/**
 	 * 
 	 */
-	public void harvestStarted();
-	
-	/**
-	 * 
-	 */
-	public void harvestFinished();
-	
-	/**
-	 * 
-	 */
-	public boolean hasFatalException();
-	
-	/**
-	 * 
-	 */
-	public void foundLitObjStatement();
-	
-	/**
-	 * 
-	 */
-	public void foundResObjStatement();
+	public HarvestException getFatalException();
 }
