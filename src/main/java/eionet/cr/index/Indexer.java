@@ -24,7 +24,9 @@ public abstract class Indexer {
 	public abstract void indexRDFResource(RDFResource resource) throws IndexException;
 
 	/**
+	 * @throws IOException 
+	 * @throws CorruptIndexException 
 	 * 
 	 */
-	public abstract void close();
+	public abstract void close() throws CorruptIndexException, IOException;
 }

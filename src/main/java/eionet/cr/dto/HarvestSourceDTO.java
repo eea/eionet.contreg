@@ -16,7 +16,7 @@ import eionet.cr.dao.DAOFactory;
 public class HarvestSourceDTO implements Serializable {
 	private Integer sourceId;
 	private String identifier;
-	private String pullUrl;
+	private String url;
 	private String type;
 	private String emails;
 	private Date dateCreated;
@@ -42,11 +42,11 @@ public class HarvestSourceDTO implements Serializable {
 	public void setIdentifier(String identifier) {
 		this.identifier = identifier;
 	}
-	public String getPullUrl() {
-		return pullUrl;
+	public String getUrl() {
+		return url;
 	}
-	public void setPullUrl(String pullUrl) {
-		this.pullUrl = pullUrl;
+	public void setUrl(String pullUrl) {
+		this.url = pullUrl;
 	}
 	public String getType() {
 		return type;

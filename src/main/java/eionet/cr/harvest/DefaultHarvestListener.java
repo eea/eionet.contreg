@@ -90,15 +90,15 @@ public class DefaultHarvestListener implements HarvestListener, org.xml.sax.Erro
 	 */
 	public void harvestStarted() throws HarvestException {
 		
-		logger.debug("Harvest started for URL: " + harvestSourceDTO.getPullUrl());
+		logger.debug("Harvest started for URL: " + harvestSourceDTO.getUrl());
 		
-//		try {
-//			harvestId = new Integer(DAOFactory.getDAOFactory().getHarvestDAO().insertStartedHarvest(
-//					harvestSourceDTO.getSourceId(), harvestType, crUser==null ? null : crUser.getUserName(), "started"));
-//		}
-//		catch (DAOException e) {
-//			e.printStackTrace();
-//		}
+		try {
+			harvestId = new Integer(DAOFactory.getDAOFactory().getHarvestDAO().insertStartedHarvest(
+					harvestSourceDTO.getSourceId(), harvestType, crUser==null ? null : crUser.getUserName(), "started"));
+		}
+		catch (DAOException e) {
+			throw new HarvestException("Failure when inserting new harvest: " + e.toString(), e);
+		}
 	}
 
 	/*
@@ -107,10 +107,23 @@ public class DefaultHarvestListener implements HarvestListener, org.xml.sax.Erro
 	 */
 	public void harvestFinished() throws HarvestException{
 
-		
-		indexer.close();
-		
-		logger.debug("Harvest finished for URL: " + harvestSourceDTO.getPullUrl());
+		try{
+			indexer.close();
+		}
+		catch (Exception e){
+			logger.error("Failure when closing indexer: " + e.toString(), e);
+		}
+
+		try {
+			DAOFactory.getDAOFactory().getHarvestDAO().updateFinishedHarvest(
+					harvestId.intValue(), countTotalStatements, countLiteralStatements, countTotalResources, countEncodingSchemes, "000");
+		}
+		catch (DAOException e) {
+			throw new HarvestException("Failure when updating finished harvest: " + e.toString(), e);
+		}
+		finally{
+			logger.debug("Harvest finished for URL: " + harvestSourceDTO.getUrl());
+		}
 	}
 
 	/**

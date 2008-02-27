@@ -16,7 +16,7 @@
 	            </tr>
 	            <tr>
 	                <td>Pull URL:</td>
-	                <td><stripes:text name="harvestSource.pullUrl"/></td>
+	                <td><stripes:text name="harvestSource.url"/></td>
 	            </tr>
 	            <tr>
 	                <td>Type:</td>

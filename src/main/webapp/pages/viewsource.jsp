@@ -16,7 +16,7 @@
 	            </tr>
 	            <tr>
 	                <td>Pull URL:</td>
-	                <td>${actionBean.harvestSource.pullUrl}</td>
+	                <td>${actionBean.harvestSource.url}</td>
 	            </tr>
 	            <tr>
 	                <td>Type:</td>

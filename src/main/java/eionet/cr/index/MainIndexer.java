@@ -99,18 +99,13 @@ public class MainIndexer extends Indexer{
 	 * (non-Javadoc)
 	 * @see eionet.cr.index.Indexer#close()
 	 */
-	public void close(){
+	public void close() throws CorruptIndexException, IOException{
 		
 		logger.debug("Closing index writer");
 		
-		try{
-			if (indexWriter!=null){
-				indexWriter.optimize();
-				indexWriter.close();
-			}
-		}
-		catch (Exception e){
-			logger.error(e.toString(), e);
+		if (indexWriter!=null){
+			indexWriter.optimize();
+			indexWriter.close();
 		}
 	}
 

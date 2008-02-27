@@ -30,7 +30,7 @@
 	        		<c:forEach items="${harvestSourceList.harvestSources}" var="source" varStatus="loop">
 		        		<tr>
 		        			<td>${source.identifier}</td>
-		        			<td>${source.pullUrl}</td>
+		        			<td>${source.url}</td>
 		        			<td>${source.type}</td>
 		        			<td>${source.emails}</td>
 		        			<td>${source.dateCreated}</td>

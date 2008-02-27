@@ -34,18 +34,32 @@ public class Harvester {
 	 * 
 	 * @param harvestSourceDTO
 	 * @throws HarvestException 
+	 * @throws HarvestException 
 	 */
 	public static void pull(DefaultHarvestListener harvestListener) throws HarvestException{
-		
-		harvestListener.harvestStarted();
-		
-		File toFile = fullFilePathForSourceUrl(harvestListener.getHarvestSourceDTO().getPullUrl());
-		if (toFile.exists())
-			toFile.delete();
-		download(harvestListener.getHarvestSourceDTO().getPullUrl(), toFile);
-		harvest(harvestListener, toFile);
-		
-		harvestListener.harvestFinished();
+
+		boolean excpetionCatched = false;
+		try{
+			harvestListener.harvestStarted();
+			
+			File toFile = fullFilePathForSourceUrl(harvestListener.getHarvestSourceDTO().getUrl());
+			if (toFile.exists())
+				toFile.delete();
+			download(harvestListener.getHarvestSourceDTO().getUrl(), toFile);
+			harvest(harvestListener, toFile);
+		}
+		catch (HarvestException e){
+			excpetionCatched = true;
+		}
+		finally{
+			try{
+				harvestListener.harvestFinished();
+			}
+			catch (HarvestException e){
+				if (!excpetionCatched)
+					throw e;
+			}
+		}
 	}
 	
 	/**
@@ -61,11 +75,11 @@ public class Harvester {
 		boolean exceptionCatched = false;
 		InputStreamReader reader = null;
 		try{
-			RDFHandler rdfHandler = new RDFHandler(harvestListener.getHarvestSourceDTO().getPullUrl(), (HarvestListener)harvestListener);
+			RDFHandler rdfHandler = new RDFHandler(harvestListener.getHarvestSourceDTO().getUrl(), (HarvestListener)harvestListener);
 	        reader = new InputStreamReader(new FileInputStream(file));	        	        
 			ARP arp = new ARP();
 	        arp.setStatementHandler(rdfHandler);
-	        arp.setErrorHandler(new SAXErrorHandler());
+	        arp.setErrorHandler(harvestListener);
 	        arp.load(reader);
 		}
 		catch (Exception e){
@@ -165,7 +179,7 @@ public class Harvester {
 
 		HarvestSourceDTO harvestSourceDTO = new HarvestSourceDTO();
 		//harvestSourceDTO.setPullUrl("http://cdr.eionet.europa.eu/envelopes.rdf");
-		harvestSourceDTO.setPullUrl("http://purl.org/dc/elements/1.1/");		
+		harvestSourceDTO.setUrl("http://purl.org/dc/elements/1.1/");		
 		
 		DefaultHarvestListener harvestListener = new DefaultHarvestListener(harvestSourceDTO, "pull", null);
 		try{

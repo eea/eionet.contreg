@@ -95,7 +95,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
     }
     
     /** */
-	private static final String addSourceSQL = "insert into HARVEST_SOURCE (IDENTIFIER,PULL_URL,TYPE,EMAILS,DATE_CREATED,CREATOR) VALUES (?,?,?,?,NOW(),?)";
+	private static final String addSourceSQL = "insert into HARVEST_SOURCE (IDENTIFIER,URL,TYPE,EMAILS,DATE_CREATED,CREATOR) VALUES (?,?,?,?,NOW(),?)";
 		
 	/*
      * (non-Javadoc)
@@ -106,7 +106,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
     	    	
     	List<Object> values = new ArrayList<Object>();
 		values.add(source.getIdentifier());
-		values.add(source.getPullUrl());
+		values.add(source.getUrl());
 		values.add(source.getType());
 		values.add(source.getEmails());
 		values.add(user);
@@ -131,7 +131,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
     }
     
     /** */
-	private static final String editSourceSQL = "update HARVEST_SOURCE set IDENTIFIER=?,PULL_URL=?,TYPE=?,EMAILS=? where HARVEST_SOURCE_ID=?";
+	private static final String editSourceSQL = "update HARVEST_SOURCE set IDENTIFIER=?,URL=?,TYPE=?,EMAILS=? where HARVEST_SOURCE_ID=?";
 	
 	/*
      * (non-Javadoc)
@@ -142,7 +142,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
     	    	
     	List<Object> values = new ArrayList<Object>();
 		values.add(source.getIdentifier());
-		values.add(source.getPullUrl());
+		values.add(source.getUrl());
 		values.add(source.getType());
 		values.add(source.getEmails());
 		values.add(source.getSourceId());
