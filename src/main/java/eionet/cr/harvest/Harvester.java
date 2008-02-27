@@ -178,7 +178,6 @@ public class Harvester {
 	public static void main(String[] args){
 
 		HarvestSourceDTO harvestSourceDTO = new HarvestSourceDTO();
-		//harvestSourceDTO.setPullUrl("http://cdr.eionet.europa.eu/envelopes.rdf");
 		harvestSourceDTO.setUrl("http://purl.org/dc/elements/1.1/");		
 		
 		DefaultHarvestListener harvestListener = new DefaultHarvestListener(harvestSourceDTO, "pull", null);

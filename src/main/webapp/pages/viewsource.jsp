@@ -11,11 +11,11 @@
 	    	<stripes:hidden name="harvestSource.sourceId"/>
 	        <table>
 	            <tr>
-	                <td>Identifier:</td>
-	                <td>${actionBean.harvestSource.identifier}</td>
+	                <td>Name:</td>
+	                <td>${actionBean.harvestSource.name}</td>
 	            </tr>
 	            <tr>
-	                <td>Pull URL:</td>
+	                <td>URL:</td>
 	                <td>${actionBean.harvestSource.url}</td>
 	            </tr>
 	            <tr>

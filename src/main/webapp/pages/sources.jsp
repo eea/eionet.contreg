@@ -14,8 +14,8 @@
 	        <table class="datatable">
 	        	<thead>
 		        	<tr>
-		        		<th scope="col">Identifier</th>
-		        		<th scope="col">Pull URL</th>
+		        		<th scope="col">Name</th>
+		        		<th scope="col">URL</th>
 		        		<th scope="col">Type</th>
 		        		<th scope="col">E-mails</th>
 		        		<th scope="col">Date Created</th>
@@ -29,7 +29,7 @@
 	        	<tbody>
 	        		<c:forEach items="${harvestSourceList.harvestSources}" var="source" varStatus="loop">
 		        		<tr>
-		        			<td>${source.identifier}</td>
+		        			<td>${source.name}</td>
 		        			<td>${source.url}</td>
 		        			<td>${source.type}</td>
 		        			<td>${source.emails}</td>

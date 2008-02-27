@@ -95,7 +95,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
     }
     
     /** */
-	private static final String addSourceSQL = "insert into HARVEST_SOURCE (IDENTIFIER,URL,TYPE,EMAILS,DATE_CREATED,CREATOR) VALUES (?,?,?,?,NOW(),?)";
+	private static final String addSourceSQL = "insert into HARVEST_SOURCE (NAME,URL,TYPE,EMAILS,DATE_CREATED,CREATOR) VALUES (?,?,?,?,NOW(),?)";
 		
 	/*
      * (non-Javadoc)
@@ -105,7 +105,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
     public void addSource(HarvestSourceDTO source, String user) throws DAOException {
     	    	
     	List<Object> values = new ArrayList<Object>();
-		values.add(source.getIdentifier());
+		values.add(source.getName());
 		values.add(source.getUrl());
 		values.add(source.getType());
 		values.add(source.getEmails());
@@ -131,7 +131,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
     }
     
     /** */
-	private static final String editSourceSQL = "update HARVEST_SOURCE set IDENTIFIER=?,URL=?,TYPE=?,EMAILS=? where HARVEST_SOURCE_ID=?";
+	private static final String editSourceSQL = "update HARVEST_SOURCE set NAME=?,URL=?,TYPE=?,EMAILS=? where HARVEST_SOURCE_ID=?";
 	
 	/*
      * (non-Javadoc)
@@ -141,7 +141,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
     public void editSource(HarvestSourceDTO source) throws DAOException {
     	    	
     	List<Object> values = new ArrayList<Object>();
-		values.add(source.getIdentifier());
+		values.add(source.getName());
 		values.add(source.getUrl());
 		values.add(source.getType());
 		values.add(source.getEmails());

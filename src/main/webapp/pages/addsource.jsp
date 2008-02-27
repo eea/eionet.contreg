@@ -10,11 +10,11 @@
 	    <stripes:form action="/source.action" focus="">
 	        <table>
 	            <tr>
-	                <td>Identifier:</td>
-	                <td><stripes:text name="harvestSource.identifier"/></td>
+	                <td>Name:</td>
+	                <td><stripes:text name="harvestSource.name"/></td>
 	            </tr>
 	            <tr>
-	                <td>Pull URL:</td>
+	                <td>URL:</td>
 	                <td><stripes:text name="harvestSource.url"/></td>
 	            </tr>
 	            <tr>

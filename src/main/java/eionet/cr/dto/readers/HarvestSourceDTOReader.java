@@ -26,7 +26,7 @@ public class HarvestSourceDTOReader extends ResultSetBaseReader {
 
 		HarvestSourceDTO harvestSourceDTO = new HarvestSourceDTO();
 		harvestSourceDTO.setSourceId(new Integer(rs.getInt("HARVEST_SOURCE_ID")));
-		harvestSourceDTO.setIdentifier(rs.getString("IDENTIFIER"));
+		harvestSourceDTO.setName(rs.getString("NAME"));
 		harvestSourceDTO.setUrl(rs.getString("URL"));
 		harvestSourceDTO.setType(rs.getString("TYPE"));
 		harvestSourceDTO.setEmails(rs.getString("EMAILS"));
