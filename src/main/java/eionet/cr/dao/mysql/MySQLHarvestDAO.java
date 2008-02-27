@@ -84,7 +84,7 @@ public class MySQLHarvestDAO extends MySQLBaseDAO implements HarvestDAO {
 	}
 	
 	/** */
-	private static final String getHarvestBySourceIdSQL = "select *, FINISHED IS NULL AS isnull from HARVEST where HARVEST_SOURCE_ID=? ORDER BY isnull DESC, finished DESC";
+	private static final String getHarvestBySourceIdSQL = "select *, FINISHED IS NULL AS isnull from HARVEST where HARVEST_SOURCE_ID=? ORDER BY isnull DESC, finished DESC LIMIT 10";
 		
 	/*
      * (non-Javadoc)
