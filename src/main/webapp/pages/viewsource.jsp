@@ -78,15 +78,21 @@
 		        	</tr>
 	        	</thead>
 	        	<tbody>
-	        		<c:forEach items="${actionBean.harvests}" var="harvest" varStatus="loop">
+	        		<c:forEach items="${actionBean.harvests}" var="harv" varStatus="loop">
 	        			<tr>
-	        				<td>${harvest.harvestType}</td>
-	        				<td>${harvest.user}</td>
-	        				<td>${harvest.datetimeStarted}</td>
-	        				<td>${harvest.datetimeFinished}</td>	        				
-	        				<td>${harvest.totalResources}</td>
-	        				<td>${harvest.encodingSchemes}</td>
-	        				<td>${harvest.totalStatements}</td>
+	        				<td>
+	        					<stripes:link href="/source.action" event="preViewHarvest">
+	                                ${harv.harvestType}
+	                                <stripes:param name="harvest.harvestId" value="${harv.harvestId}"/>
+	                                <stripes:param name="harvest.harvestSourceId" value="${harv.harvestSourceId}"/>
+	                            </stripes:link>
+	        				</td>
+	        				<td>${harv.user}</td>
+	        				<td><fmt:formatDate value="${harv.datetimeStarted}" pattern="dd MMM yyyy HH:mm"/></td>
+	        				<td><fmt:formatDate value="${harv.datetimeFinished}" pattern="dd MMM yyyy HH:mm"/></td>		        				
+	        				<td>${harv.totalResources}</td>
+	        				<td>${harv.encodingSchemes}</td>
+	        				<td>${harv.totalStatements}</td>
 	        			</tr>
 	        		</c:forEach>
 	        	</tbody>

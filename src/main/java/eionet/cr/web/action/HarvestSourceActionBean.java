@@ -26,7 +26,8 @@ public class HarvestSourceActionBean extends AbstractCRActionBean {
 	
 	/** */
 	private HarvestSourceDTO harvestSource;
-	private List<HarvestDTO> harvests; 
+	private List<HarvestDTO> harvests;
+	private HarvestDTO harvest;
 	
 	/**
 	 * 
@@ -51,6 +52,14 @@ public class HarvestSourceActionBean extends AbstractCRActionBean {
 
 	public void setHarvests(List<HarvestDTO> harvests) {
 		this.harvests = harvests;
+	}
+
+	public HarvestDTO getHarvest() {
+		return harvest;
+	}
+
+	public void setHarvest(HarvestDTO harvest) {
+		this.harvest = harvest;
 	}
 
 	/**
@@ -103,6 +112,18 @@ public class HarvestSourceActionBean extends AbstractCRActionBean {
     	harvestSource = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(harvestSource.getSourceId());
     	harvests = DAOFactory.getDAOFactory().getHarvestDAO().getHarvestsBySourceId(harvestSource.getSourceId());
     	return new RedirectResolution("/pages/viewsource.jsp").flash(this);
+    }
+    
+    /**
+     * 
+     * @return
+     * @throws DAOException
+     */
+    @DontValidate
+    public Resolution preViewHarvest() throws DAOException {
+    	harvest = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestById(harvest.getHarvestId());
+    	harvestSource = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(harvest.getHarvestSourceId());
+    	return new RedirectResolution("/pages/harvest.jsp").flash(this);
     }
     
     /**

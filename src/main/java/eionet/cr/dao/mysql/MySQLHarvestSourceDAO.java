@@ -8,8 +8,10 @@ import java.util.List;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
+import eionet.cr.dto.HarvestDTO;
 import eionet.cr.dto.HarvestScheduleDTO;
 import eionet.cr.dto.HarvestSourceDTO;
+import eionet.cr.dto.readers.HarvestDTOReader;
 import eionet.cr.dto.readers.HarvestSourceDTOReader;
 import eionet.cr.util.sql.ConnectionUtil;
 import eionet.cr.util.sql.SQLUtil;
@@ -61,9 +63,9 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
      * 
      * @see eionet.cr.dao.HarvestSourceDao#getHarvestSourceById()
      */
-    public HarvestSourceDTO getHarvestSourceById(int harvestSourceID) throws DAOException {
+    public HarvestSourceDTO getHarvestSourceById(Integer harvestSourceID) throws DAOException {
     	List<Object> values = new ArrayList<Object>();
-    	values.add(new Integer(harvestSourceID));
+    	values.add(harvestSourceID);
 				
 		Connection conn = null;
 		HarvestSourceDTO source = null;
@@ -189,6 +191,37 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 		}
 		finally{
 			ConnectionUtil.closeConnection(conn);
+		}
+    }
+    
+    /** */
+	private static final String getHarvestByIdSQL = "select * from HARVEST where HARVEST_ID=?";
+	
+	/*
+     * (non-Javadoc)
+     * 
+     * @see eionet.cr.dao.HarvestSourceDao#getHarvestById()
+     */
+    public HarvestDTO getHarvestById(Integer harvestID) throws DAOException {
+    	List<Object> values = new ArrayList<Object>();
+    	values.add(harvestID);
+				
+		Connection conn = null;
+		HarvestDTOReader rsReader = new HarvestDTOReader();
+		try{
+			conn = getConnection();
+			SQLUtil.executeQuery(getHarvestByIdSQL, values, rsReader, conn);
+			List<HarvestDTO>  list = rsReader.getResultList();
+			return list!=null && list.size()>0 ? list.get(0) : null;
+		}
+		catch (Exception e){
+			throw new DAOException(e.getMessage(), e);
+		}
+		finally{
+			try{
+				if (conn!=null) conn.close();
+			}
+			catch (SQLException e){}
 		}
     }
 }
