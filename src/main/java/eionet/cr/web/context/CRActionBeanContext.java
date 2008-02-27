@@ -50,7 +50,7 @@ public class CRActionBeanContext extends ActionBeanContext {
 	 * 
 	 * @return {@link CRUser} from session or null if user is not logged in.
 	 */
-	public CRUser getCrUser() {
+	public CRUser getCRUser() {
 		return (CRUser) getRequest().getSession(true).getAttribute(USER_SESSION_ATTR);
 	}
 	

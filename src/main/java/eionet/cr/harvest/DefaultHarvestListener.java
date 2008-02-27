@@ -116,7 +116,7 @@ public class DefaultHarvestListener implements HarvestListener, org.xml.sax.Erro
 
 		try {
 			DAOFactory.getDAOFactory().getHarvestDAO().updateFinishedHarvest(
-					harvestId.intValue(), countTotalStatements, countLiteralStatements, countTotalResources, countEncodingSchemes, "000");
+					harvestId.intValue(), countTotalStatements, countLiteralStatements, countTotalResources, countEncodingSchemes, "");
 		}
 		catch (DAOException e) {
 			throw new HarvestException("Failure when updating finished harvest: " + e.toString(), e);

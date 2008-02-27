@@ -128,16 +128,20 @@ public class HarvestSourceActionBean extends AbstractCRActionBean {
      */
     public Resolution harvestNow() throws HarvestException, DAOException{
     	
-    	harvestSource = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(harvestSource.getSourceId());
-		DefaultHarvestListener harvestListener = new DefaultHarvestListener(harvestSource, "pull", null);
-		Harvester.pull(harvestListener);
-		
-		showMessage("Statements in total: " + harvestListener.getCountTotalStatements());
-		showMessage("Statements with literal objects: " + harvestListener.getCountLiteralStatements());
-		showMessage("Statements with resource objects: " + (harvestListener.getCountTotalStatements() - harvestListener.getCountLiteralStatements()));
-		showMessage("Resources in total: " + harvestListener.getCountTotalResources());
-		showMessage("Resources as encoding schemes: " + harvestListener.getCountEncodingSchemes());
-		
+    	if(isUserLoggedIn()){
+	    	harvestSource = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(harvestSource.getSourceId());
+			DefaultHarvestListener harvestListener = new DefaultHarvestListener(harvestSource, "pull", getCRUser());
+			Harvester.pull(harvestListener);
+			
+			showMessage("Statements in total: " + harvestListener.getCountTotalStatements());
+			showMessage("Statements with literal objects: " + harvestListener.getCountLiteralStatements());
+			showMessage("Statements with resource objects: " + (harvestListener.getCountTotalStatements() - harvestListener.getCountLiteralStatements()));
+			showMessage("Resources in total: " + harvestListener.getCountTotalResources());
+			showMessage("Resources as encoding schemes: " + harvestListener.getCountEncodingSchemes());
+    	}
+    	else{
+    		handleCrException("You are not logged in!", GeneralConfig.SEVERITY_WARNING);
+    	}
 		
     	return new ForwardResolution("/pages/viewsource.jsp");
     }
