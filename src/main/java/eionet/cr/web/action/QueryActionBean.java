@@ -2,6 +2,8 @@ package eionet.cr.web.action;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
@@ -43,7 +45,16 @@ public class QueryActionBean extends AbstractCRActionBean {
 	@DefaultHandler
     public Resolution search() throws Exception {
 		//this.hits = Searcher.search(query);
-		getContext().getRequest().setAttribute("hits", Searcher.search(query));
+		HttpServletRequest request = getContext().getRequest();
+		String analyzer = request.getParameter("analyzer");
+		
+		if (analyzer==null || analyzer.trim().length()==0)
+			hits = Searcher.search(query);
+		else
+			hits = Searcher.search(query, analyzer);
+		
+		request.setAttribute("hits", hits);
+		request.setAttribute("analyzer", analyzer);
         return new ForwardResolution("/pages/query.jsp");
     }
 

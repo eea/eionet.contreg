@@ -2,8 +2,11 @@ package eionet.cr.index;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -12,6 +15,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.KeywordAnalyzer;
 import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.analysis.WhitespaceAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -42,10 +46,13 @@ public class Searcher {
 	private static Log logger = LogFactory.getLog(Searcher.class);
 	
 	/** */
-	private static Analyzer defaultAnalyzer = new StandardAnalyzer();
+	private static String defaultAnalyzer = StandardAnalyzer.class.getName();
 
 	/** */
 	private static IndexSearcher indexSearcher = null;
+	
+	/** */
+	private static LinkedHashMap<String,Analyzer> availableAnalyzers = null;
 	
 	/**
 	 * 
@@ -90,16 +97,16 @@ public class Searcher {
 	/**
 	 * 
 	 * @param query
-	 * @param analyzer
+	 * @param analyzerName
 	 * @return
 	 * @throws ParseException 
 	 * @throws IOException 
 	 */
-	public static synchronized List<Hashtable<String,String[]>> search(String query, Analyzer analyzer) throws ParseException, IOException{
+	public static synchronized List<Hashtable<String,String[]>> search(String query, String analyzerName) throws ParseException, IOException{
 
 		logger.debug("Performing search query: " + query);
 		
-		QueryParser parser = new QueryParser(DEFAULT_FIELD, analyzer);
+		QueryParser parser = new QueryParser(DEFAULT_FIELD, getAvailableAnalyzer(analyzerName));
 		Query queryObj = parser.parse(query);
 		Hits hits = getIndexSearcher().search(queryObj);
 		return processHits(hits);
@@ -133,5 +140,49 @@ public class Searcher {
 		}
 		
 		return list;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public static String[] listAvailableAnalyzers(){
+		
+		if (availableAnalyzers==null)
+			initAvailableAnalyzers();
+		
+		if (availableAnalyzers==null || availableAnalyzers.size()==0)
+			return null;
+		
+		String[] result = new String[availableAnalyzers.size()];
+		Iterator<String> iter = availableAnalyzers.keySet().iterator();
+		for (int i=0; iter.hasNext(); i++)
+			result[i] = iter.next();
+		
+		return result;
+	}
+
+	/**
+	 * 
+	 */
+	private static synchronized void initAvailableAnalyzers(){
+		availableAnalyzers = new LinkedHashMap<String,Analyzer>();
+		availableAnalyzers.put(StandardAnalyzer.class.getName(), new StandardAnalyzer());
+		availableAnalyzers.put(KeywordAnalyzer.class.getName(), new KeywordAnalyzer());
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	private static Analyzer getAvailableAnalyzer(String name){
+		
+		if (availableAnalyzers==null)
+			initAvailableAnalyzers();
+		
+		if (availableAnalyzers==null || availableAnalyzers.size()==0)
+			return null;
+		else
+			return availableAnalyzers.get(name);
 	}
 }

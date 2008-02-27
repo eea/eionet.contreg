@@ -1,5 +1,7 @@
 <%@page contentType="text/html;charset=UTF-8" import="java.util.*,java.io.*,eionet.cr.util.Util"%>
 
+<%@page import="eionet.cr.index.Searcher"%>
+
 <%!
 static final String[] fieldsOrder = {
 	"ID",
@@ -32,6 +34,23 @@ static final String[] analyzers = {
 			<label for="query">Enter your Lucene query here:</label>
 			<br/>
 			<stripes:textarea name="query" cols="100"/>
+			<%
+			String[] analyzers = Searcher.listAvailableAnalyzers();
+			if (analyzers!=null && analyzers.length>0){
+				%>
+				<select name="analyzer">
+					<%
+					String requestedAnalyzer = (String)request.getAttribute("analyzer");
+					for (int i=0; i<analyzers.length; i++){
+						String selected = requestedAnalyzer!=null && requestedAnalyzer.equals(analyzers[i]) ? "selected=\"selected\"" : "";
+						%>
+						<option value="<%=analyzers[i]%>" <%=selected%>><%=analyzers[i]%></option><%
+					}
+					%>
+				</select>
+				<%
+			}
+			%>
 			<br/>
 			<br/>
 			<stripes:submit name="search" value="Query"/>
