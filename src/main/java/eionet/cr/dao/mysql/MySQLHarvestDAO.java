@@ -1,13 +1,14 @@
 package eionet.cr.dao.mysql;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import eionet.cr.dao.DAOException;
-import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dto.HarvestDTO;
+import eionet.cr.dto.readers.HarvestDTOReader;
 import eionet.cr.util.sql.ConnectionUtil;
 import eionet.cr.util.sql.SQLUtil;
 
@@ -81,4 +82,35 @@ public class MySQLHarvestDAO extends MySQLBaseDAO implements HarvestDAO {
 			ConnectionUtil.closeConnection(conn);
 		}
 	}
+	
+	/** */
+	private static final String getHarvestBySourceIdSQL = "select *, FINISHED IS NULL AS isnull from HARVEST where HARVEST_SOURCE_ID=? ORDER BY isnull DESC, finished DESC";
+		
+	/*
+     * (non-Javadoc)
+     * 
+     * @see eionet.cr.dao.HarvestDAO#getHarvestsBySourceId()
+     */
+    public List<HarvestDTO> getHarvestsBySourceId(Integer harvestSourceId) throws DAOException {
+    	List<Object> values = new ArrayList<Object>();
+    	values.add(harvestSourceId);
+				
+		Connection conn = null;
+		HarvestDTOReader rsReader = new HarvestDTOReader();
+		try{
+			conn = getConnection();
+			SQLUtil.executeQuery(getHarvestBySourceIdSQL, values, rsReader, conn);
+			List<HarvestDTO>  list = rsReader.getResultList();
+			return list;
+		}
+		catch (Exception e){
+			throw new DAOException(e.getMessage(), e);
+		}
+		finally{
+			try{
+				if (conn!=null) conn.close();
+			}
+			catch (SQLException e){}
+		}
+    }
 }

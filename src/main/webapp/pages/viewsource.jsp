@@ -65,6 +65,36 @@
 	                </td>
 	            </tr>
 	        </table>
+	        <br/>
+	        Last 10 harvests:
+	        <table class="datatable">
+	        	<thead>
+		        	<tr>
+		        		<th scope="col">Nr</th>
+		        		<th scope="col">Status</th>
+		        		<th scope="col">Type</th>
+		        		<th scope="col">User</th>
+		        		<th scope="col">Started</th>
+		        		<th scope="col">Finished</th>
+		        		<th scope="col">Total statements</th>
+		        		<th scope="col">Messages</th>
+		        	</tr>
+	        	</thead>
+	        	<tbody>
+	        		<c:forEach items="${actionBean.harvests}" var="harvest" varStatus="loop">
+	        			<tr>
+	        				<td>${loop.index + 1}</td>
+	        				<td>${harvest.status}</td>
+	        				<td>${harvest.harvestType}</td>
+	        				<td>${harvest.user}</td>
+	        				<td>${harvest.datetimeStarted}</td>
+	        				<td>${harvest.datetimeFinished}</td>
+	        				<td>${harvest.totalStatements}</td>
+	        				<td>${harvest.messages}</td>
+	        			</tr>
+	        		</c:forEach>
+	        	</tbody>
+	        </table>
 	    </stripes:form>
 
 	</stripes:layout-component>

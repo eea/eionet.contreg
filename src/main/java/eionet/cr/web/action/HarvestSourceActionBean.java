@@ -1,8 +1,11 @@
 package eionet.cr.web.action;
 
+import java.util.List;
+
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
+import eionet.cr.dto.HarvestDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.harvest.DefaultHarvestListener;
 import eionet.cr.harvest.HarvestException;
@@ -22,7 +25,8 @@ import net.sourceforge.stripes.action.UrlBinding;
 public class HarvestSourceActionBean extends AbstractCRActionBean {
 	
 	/** */
-	private HarvestSourceDTO harvestSource; 
+	private HarvestSourceDTO harvestSource;
+	private List<HarvestDTO> harvests; 
 	
 	/**
 	 * 
@@ -40,6 +44,15 @@ public class HarvestSourceActionBean extends AbstractCRActionBean {
 		this.harvestSource = harvestSource;
 	}
 	
+
+	public List<HarvestDTO> getHarvests() {
+		return harvests;
+	}
+
+	public void setHarvests(List<HarvestDTO> harvests) {
+		this.harvests = harvests;
+	}
+
 	/**
 	 * 
 	 * @return
@@ -88,6 +101,7 @@ public class HarvestSourceActionBean extends AbstractCRActionBean {
     @DontValidate
     public Resolution preView() throws DAOException {
     	harvestSource = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(harvestSource.getSourceId());
+    	harvests = DAOFactory.getDAOFactory().getHarvestDAO().getHarvestsBySourceId(harvestSource.getSourceId());
     	return new RedirectResolution("/pages/viewsource.jsp").flash(this);
     }
     
