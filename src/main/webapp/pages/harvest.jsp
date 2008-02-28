@@ -35,11 +35,11 @@
 	            </tr>
 	            <tr>
 	                <td>Started:</td>
-	                <td><fmt:formatDate value="${actionBean.harvest.datetimeStarted}" pattern="dd MMM yyyy HH:mm"/></td>
+	                <td><fmt:formatDate value="${actionBean.harvest.datetimeStarted}" pattern="dd MMM yy HH:mm:ss"/></td>
 	            </tr>
 	            <tr>
 	                <td>Finished:</td>
-	                <td><fmt:formatDate value="${actionBean.harvest.datetimeFinished}" pattern="dd MMM yyyy HH:mm"/></td>
+	                <td><fmt:formatDate value="${actionBean.harvest.datetimeFinished}" pattern="dd MMM yy HH:mm:ss"/></td>
 	            </tr>
 	            <tr>
 	                <td>Statements in total:</td>

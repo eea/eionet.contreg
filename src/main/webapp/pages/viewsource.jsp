@@ -88,8 +88,8 @@
 	                            </stripes:link>
 	        				</td>
 	        				<td>${harv.user}</td>
-	        				<td><fmt:formatDate value="${harv.datetimeStarted}" pattern="dd MMM yyyy HH:mm"/></td>
-	        				<td><fmt:formatDate value="${harv.datetimeFinished}" pattern="dd MMM yyyy HH:mm"/></td>		        				
+	        				<td><fmt:formatDate value="${harv.datetimeStarted}" pattern="dd MMM yy HH:mm:ss"/></td>
+	        				<td><fmt:formatDate value="${harv.datetimeFinished}" pattern="dd MMM yy HH:mm:ss"/></td>		        				
 	        				<td>${harv.totalResources}</td>
 	        				<td>${harv.encodingSchemes}</td>
 	        				<td>${harv.totalStatements}</td>
