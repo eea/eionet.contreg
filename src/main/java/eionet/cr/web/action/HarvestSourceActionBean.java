@@ -2,6 +2,8 @@ package eionet.cr.web.action;
 
 import java.util.List;
 
+import sun.security.action.GetBooleanAction;
+
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
@@ -72,7 +74,7 @@ public class HarvestSourceActionBean extends AbstractCRActionBean {
 		if(isUserLoggedIn())
 			DAOFactory.getDAOFactory().getHarvestSourceDAO().addSource(getHarvestSource(), getUserName());
 		else
-			handleCrException("You are not logged in!", GeneralConfig.SEVERITY_WARNING);
+			handleCrException(getBundle().getString("not.logged.in"), GeneralConfig.SEVERITY_WARNING);
         return new ForwardResolution("/pages/sources.jsp");
     }
 	
@@ -95,9 +97,9 @@ public class HarvestSourceActionBean extends AbstractCRActionBean {
     public Resolution edit() throws DAOException {
 		if(isUserLoggedIn()){
 			DAOFactory.getDAOFactory().getHarvestSourceDAO().editSource(getHarvestSource());
-			showMessage("Successfully updated!");
+			showMessage(getBundle().getString("update.success"));
 		} else {
-			handleCrException("You are not logged in!", GeneralConfig.SEVERITY_WARNING);
+			handleCrException(getBundle().getString("not.logged.in"), GeneralConfig.SEVERITY_WARNING);
 		}
         return new ForwardResolution("/pages/editsource.jsp");
     }
@@ -134,9 +136,9 @@ public class HarvestSourceActionBean extends AbstractCRActionBean {
     public Resolution delete() throws DAOException {
 		if(isUserLoggedIn()){
 			DAOFactory.getDAOFactory().getHarvestSourceDAO().deleteSource(getHarvestSource());
-			showMessage("Harvesting source deleted!");
+			showMessage(getBundle().getString("harvet.source.deleted"));
 		} else {
-			handleCrException("You are not logged in!", GeneralConfig.SEVERITY_WARNING);
+			handleCrException(getBundle().getString("not.logged.in"), GeneralConfig.SEVERITY_WARNING);
 		}
         return new ForwardResolution("/pages/sources.jsp");
     }
@@ -161,7 +163,7 @@ public class HarvestSourceActionBean extends AbstractCRActionBean {
 			showMessage("Resources as encoding schemes: " + harvestListener.getCountEncodingSchemes());
     	}
     	else{
-    		handleCrException("You are not logged in!", GeneralConfig.SEVERITY_WARNING);
+    		handleCrException(getBundle().getString("not.logged.in"), GeneralConfig.SEVERITY_WARNING);
     	}
 		
     	return new ForwardResolution("/pages/viewsource.jsp");
