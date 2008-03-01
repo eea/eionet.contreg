@@ -88,7 +88,7 @@ public class SQLValue {
 			return ((BigDecimal)value).intValue();
 		case Types.VARCHAR:
 		case Types.CHAR:
-		case Types.LONGNVARCHAR:
+		//case Types.LONGNVARCHAR:
 			try {
 				return Integer.parseInt((String)value);
 			} catch (NumberFormatException nfe) {
@@ -123,7 +123,7 @@ public class SQLValue {
 			return new Long(((BigDecimal)value).longValue());
 		case Types.VARCHAR:
 		case Types.CHAR:
-		case Types.LONGNVARCHAR:
+		//case Types.LONGNVARCHAR:
 			try {
 				return new Long((String) value);
 			} catch (NumberFormatException nfe) {
@@ -148,7 +148,7 @@ public class SQLValue {
 			return ((BigDecimal) value).longValue();
 		case Types.VARCHAR:
 		case Types.CHAR:
-		case Types.LONGNVARCHAR:
+		//case Types.LONGNVARCHAR:
 			try {
 				return Long.parseLong((String) value);
 			} catch (NumberFormatException nfe) {
@@ -183,7 +183,7 @@ public class SQLValue {
 			return ((Integer)value).doubleValue();
 		case Types.VARCHAR:
 		case Types.CHAR:
-		case Types.LONGNVARCHAR:
+		//case Types.LONGNVARCHAR:
 			try {
 				return Double.parseDouble((String)value);
 			} catch (NumberFormatException nfe) {
@@ -206,7 +206,7 @@ public class SQLValue {
 			return (byte[]) value;
 		case Types.VARCHAR:
 		case Types.CHAR:
-		case Types.LONGNVARCHAR:
+		//case Types.LONGNVARCHAR:
 			try {
 				return ((String) value).getBytes("UTF-8");
 			} catch (UnsupportedEncodingException ue)	{

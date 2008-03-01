@@ -6,8 +6,10 @@ import java.security.GeneralSecurityException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletContext;
 
@@ -34,6 +36,7 @@ import eionet.cr.harvest.util.RDFResourceProperty;
 import eionet.cr.harvest.util.WrappedARPObject;
 import eionet.cr.index.EncodingSchemes;
 import eionet.cr.index.Searcher;
+import eionet.cr.util.Identifiers;
 import eionet.cr.util.Util;
 
 /**
@@ -41,7 +44,7 @@ import eionet.cr.util.Util;
  * @author Jaanus Heinlaid, e-mail: <a href="mailto:jaanus.heinlaid@tietoenator.com">jaanus.heinlaid@tietoenator.com</a>
  *
  */
-public class RDFHandler implements StatementHandler{
+public class RDFHandler implements StatementHandler, org.xml.sax.ErrorHandler{
 
 	/** */
 	private static Log logger = LogFactory.getLog(RDFHandler.class);
@@ -56,12 +59,13 @@ public class RDFHandler implements StatementHandler{
 	private String currentGeneratedID = "";
 	private String sourceUrlString = null;
 	
-	/** */
-	private RDFResource currentResource = null;
 	private HarvestListener harvestListener = null;
 	
 	/** */
-	private boolean stopWorking = false;
+	private SAXParseException fatalError = null;
+	
+	/** */
+	private Map<String,RDFResource> rdfResources = new HashMap<String,RDFResource>();
 	
 	/**
 	 * 
@@ -77,7 +81,7 @@ public class RDFHandler implements StatementHandler{
 	 */
 	public void statement(AResource subject, AResource predicate, AResource object) {
 		
-		if (stopWorking || subject==null || predicate==null || object==null)
+		if (isFatalError() || subject==null || predicate==null || object==null)
 			return;
 
 		statement(subject, predicate, new WrappedARPObject(object, getResourceID(object)));
@@ -89,7 +93,7 @@ public class RDFHandler implements StatementHandler{
 	 */
 	public void statement(AResource subject, AResource predicate, ALiteral object) {
 
-		if (stopWorking || subject==null || predicate==null || object==null)
+		if (isFatalError() || subject==null || predicate==null || object==null)
 			return;
 
 		statement(subject, predicate, new WrappedARPObject(object));
@@ -104,27 +108,16 @@ public class RDFHandler implements StatementHandler{
 	 */
 	protected void statement(AResource subject, AResource predicate, WrappedARPObject object){
 		
-		String subjectID = getResourceID(subject);
-		String predicateID = getResourceID(predicate);
-		if (subjectID==null || predicateID==null)
+		String subjectId = getResourceID(subject);
+		String predicateId = getResourceID(predicate);
+		if (subjectId==null || predicateId==null)
 			return;
-		
-		if (currentResource!=null && !currentResource.getId().equals(subjectID)){
-			if (harvestListener!=null){
-				try{
-					harvestListener.resourceHarvested(currentResource);
-				}
-				catch (HarvestException e){
-					stopWorking = true;
-				}
-			}
-			currentResource = new RDFResource(subjectID);
-		}
-		else if (currentResource==null)
-			currentResource = new RDFResource(subjectID);
-		
-		RDFResourceProperty property = new RDFResourceProperty(predicateID, object.getStringValue(), object.isLiteral(), object.isAnonymous());
-		currentResource.addProperty(property);
+
+		RDFResource resource = rdfResources.get(subjectId);
+		if (resource==null)
+			resource = new RDFResource(subjectId, sourceUrlString);
+		resource.addProperty(new RDFResourceProperty(predicateId, object.getStringValue(), object.isLiteral(), object.isAnonymous()));
+		rdfResources.put(subjectId, resource);
 	}
 
 	/**
@@ -156,14 +149,55 @@ public class RDFHandler implements StatementHandler{
 	 * @return
 	 */
     private String generateID(String anonID) {
-    	try{
-    		StringBuffer bufHead = new StringBuffer("http://cr.eionet.europa.eu/anonymous/");
-    		StringBuffer bufTail = new StringBuffer(String.valueOf(System.currentTimeMillis()));
-    		bufTail.append(sourceUrlString==null ? "" : sourceUrlString).append(anonID);
-    		return bufHead.append(Util.md5digest(bufTail.toString())).toString();
-    	}
-    	catch (GeneralSecurityException e){
-    		throw new RuntimeException(e.toString(), e);
-    	}
+		StringBuffer bufHead = new StringBuffer(Identifiers.ANON_ID_PREFIX);
+		StringBuffer bufTail = new StringBuffer(String.valueOf(System.currentTimeMillis()));
+		bufTail.append(sourceUrlString==null ? "" : sourceUrlString).append(anonID);
+		return bufHead.append(Util.md5digest(bufTail.toString())).toString();
     }
+
+    /*
+     * (non-Javadoc)
+     * @see org.xml.sax.ErrorHandler#error(org.xml.sax.SAXParseException)
+     */
+	public void error(SAXParseException e) throws SAXException {
+		logger.error("SAX error encountered: " + e.toString(), e);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.xml.sax.ErrorHandler#fatalError(org.xml.sax.SAXParseException)
+	 */
+	public void fatalError(SAXParseException e) throws SAXException {
+		fatalError = e;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.xml.sax.ErrorHandler#warning(org.xml.sax.SAXParseException)
+	 */
+	public void warning(SAXParseException e) throws SAXException {
+		logger.warn("SAX warning encountered: " + e.toString(), e);
+	}
+
+	/**
+	 * @return the fatalError
+	 */
+	public SAXParseException getFatalError() {
+		return fatalError;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isFatalError(){
+		return fatalError!=null;
+	}
+
+	/**
+	 * @return the rdfResources
+	 */
+	public Map<String, RDFResource> getRdfResources() {
+		return rdfResources;
+	}
 }

@@ -47,10 +47,7 @@
 	            </tr>
 	            <tr>
 	                <td>Statements harvested:</td>
-	                <td>
-	                	${actionBean.harvestSource.statements}
-	                	<stripes:hidden name="harvestSource.statements"/>
-	                </td>
+	                <td>&nbsp;</td>
 	            </tr>
 	            <tr>
 	                <td>Schedule:</td>

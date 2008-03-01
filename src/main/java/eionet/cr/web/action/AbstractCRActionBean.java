@@ -26,19 +26,19 @@ public abstract class AbstractCRActionBean implements ActionBean {
 	private static Log logger = LogFactory.getLog(AbstractCRActionBean.class);
 	
 	private CRActionBeanContext context;
-	
-	/**
-	 * @return action bean context.
+
+	/*
+	 * (non-Javadoc)
+	 * @see net.sourceforge.stripes.action.ActionBean#getContext()
 	 */
-	@Override
 	public CRActionBeanContext getContext() {
 		return this.context;
 	}
 
-	/**
-	 * Method sets {@link CRActionBeanContext}.
+	/*
+	 * (non-Javadoc)
+	 * @see net.sourceforge.stripes.action.ActionBean#setContext(net.sourceforge.stripes.action.ActionBeanContext)
 	 */
-	@Override
 	public void setContext(ActionBeanContext context) {
 		this.context = (CRActionBeanContext) context; 
 	}

@@ -27,13 +27,6 @@ public class GeneralConfig {
 	public static final String HARVESTER_FILES_LOCATION = "harvester.files.location";
 	
 	/** */
-	public static final String PREDICATE_RDF_TYPE = "rdf.identifiers.predicates.rdf-type";
-	public static final String PREDICATE_RDFS_LABEL = "rdf.identifiers.predicates.rdfs-label";
-	public static final String PREDICATE_CR_ID = "rdf.identifiers.predicates.cr-id";
-	public static final String PREDICATE_IS_ENCODING_SCHEME = "rdf.identifiers.predicates.is-enc";
-	public static final String ANONYMOUS_AUTOGEN_PREFIX = "rdf.identifiers.anonymous.autogen-prefix";
-	
-	/** */
 	public static final int SEVERITY_INFO = 1;
 	public static final int SEVERITY_CAUTION = 2;
 	public static final int SEVERITY_WARNING = 3;

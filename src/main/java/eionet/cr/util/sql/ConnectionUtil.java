@@ -54,9 +54,10 @@ public class ConnectionUtil {
 	/**
 	 * 
 	 * @return
+	 * @throws SQLException 
 	 * @throws SQLException
 	 */
-	public static Connection getSimpleConnection() throws SQLException{
+	public static Connection getSimpleConnection() throws DataSourceException, SQLException{
 		
 		String drv = GeneralConfig.getProperty(GeneralConfig.DB_DRV);
 		if (drv==null || drv.trim().length()==0)
@@ -79,10 +80,10 @@ public class ConnectionUtil {
 			return DriverManager.getConnection(url, usr, pwd);
 		}
 		catch (ClassNotFoundException e){
-			throw new SQLException("Failed to get connection, driver class not found: " + drv, e);
+			throw new DataSourceException("Failed to get connection, driver class not found: " + drv, e);
 		}
 	}
-
+	
 	/**
 	 * 
 	 * @param conn

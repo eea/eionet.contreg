@@ -1,6 +1,7 @@
 package eionet.cr.harvest;
 
 import eionet.cr.harvest.util.RDFResource;
+import eionet.cr.harvest.util.RDFResourceProperty;
 
 /**
  * 
@@ -9,13 +10,6 @@ import eionet.cr.harvest.util.RDFResource;
  */
 public interface HarvestListener {
 
-	/**
-	 * 
-	 * @param resource
-	 * @throws HarvestException
-	 */
-	public void resourceHarvested(RDFResource resource) throws HarvestException;
-	
 	/**
 	 * @throws HarvestException
 	 * 
@@ -30,6 +24,7 @@ public interface HarvestListener {
 	
 	/**
 	 * 
+	 * @throws HarvestException
 	 */
-	public HarvestException getFatalException();
+	public void harvestCancelled() throws HarvestException;	
 }

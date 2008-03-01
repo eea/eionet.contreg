@@ -7,6 +7,7 @@
 	<stripes:layout-component name="messages"/>
 	<stripes:layout-component name="contents">
 		<h1>View source</h1>
+		<br/>
 	    <stripes:form action="/source.action" focus="">
 	    	<stripes:hidden name="harvestSource.sourceId"/>
 	        <table>
@@ -48,24 +49,24 @@
 	                <td>Schedule:</td>
 	                <td>
 	                	weekday: 
-	                	${actionBean.harvestSource.harvestSchedule.weekday}<br/> 
+	                	${actionBean.harvestSource.harvestSchedule.weekday}&nbsp;&nbsp;&nbsp; 
 	                	hour: 
-	                	${actionBean.harvestSource.harvestSchedule.hour} <br/>
+	                	${actionBean.harvestSource.harvestSchedule.hour}&nbsp;&nbsp;&nbsp;
 	                	period (weeks): 
 	                	${actionBean.harvestSource.harvestSchedule.period}
 	                </td>
 	            </tr>
 	            <tr>
-	                <td colspan="2">
+	                <td colspan="2" style="padding-top:10px">
 	                	<stripes:submit name="harvestNow" value="Harvest now"/>
 	                    <stripes:submit name="scheduleImmediateHarvest" value="Schedule for immediate harvest"/>
 	                    <!--stripes:submit name="push" value="Push from local file"/-->
 	                </td>
 	            </tr>
 	        </table>
-	        <br/>
-	        Last 10 harvests:
-	        <table class="datatable">
+	        <br/><br/>
+	        <strong>Last 10 harvests:</strong>
+	        <table class="datatable">	        	
 	        	<thead>
 		        	<tr>
 		        		<th scope="col">Type</th>
@@ -75,24 +76,26 @@
 		        		<th scope="col">Resources</th>
 		        		<th scope="col">Encoding schemes</th>
 		        		<th scope="col">Statements</th>
+		        		<th scope="col"></th>
 		        	</tr>
 	        	</thead>
 	        	<tbody>
 	        		<c:forEach items="${actionBean.harvests}" var="harv" varStatus="loop">
 	        			<tr>
-	        				<td>
-	        					<stripes:link href="/source.action" event="preViewHarvest">
-	                                ${harv.harvestType}
-	                                <stripes:param name="harvest.harvestId" value="${harv.harvestId}"/>
-	                                <stripes:param name="harvest.harvestSourceId" value="${harv.harvestSourceId}"/>
-	                            </stripes:link>
-	        				</td>
+	        				<td>${harv.harvestType}</td>
 	        				<td>${harv.user}</td>
-	        				<td><fmt:formatDate value="${harv.datetimeStarted}" pattern="dd MMM yy HH:mm:ss"/></td>
-	        				<td><fmt:formatDate value="${harv.datetimeFinished}" pattern="dd MMM yy HH:mm:ss"/></td>		        				
+	        				<td><fmt:formatDate value="${harv.datetimeStarted}" pattern="dd-MM-yy HH:mm:ss"/></td>
+	        				<td><fmt:formatDate value="${harv.datetimeFinished}" pattern="dd-MM-yy HH:mm:ss"/></td>		        				
 	        				<td>${harv.totalResources}</td>
 	        				<td>${harv.encodingSchemes}</td>
 	        				<td>${harv.totalStatements}</td>
+							<td>
+		        				<stripes:link href="/source.action" event="preViewHarvest">
+	                                <img src="${pageContext.request.contextPath}/images/view.gif" title="View"/>
+	                                <stripes:param name="harvest.harvestId" value="${harv.harvestId}"/>
+	                                <stripes:param name="harvest.harvestSourceId" value="${harv.harvestSourceId}"/>
+	                            </stripes:link>
+		        			</td>	        				
 	        			</tr>
 	        		</c:forEach>
 	        	</tbody>

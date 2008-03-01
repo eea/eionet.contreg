@@ -9,6 +9,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -24,9 +25,8 @@ public class Util {
 	 * 
 	 * @param s
 	 * @return
-	 * @throws GeneralSecurityException 
 	 */
-	public static String md5digest(String s) throws GeneralSecurityException{
+	public static String md5digest(String s){
 		return Util.digest(s, "md5");
 	}
 	
@@ -35,14 +35,19 @@ public class Util {
 	 * @param src
 	 * @param algorithm
 	 * @return
-	 * @throws GeneralSecurityException
 	 */
-	public static String digest(String src, String algorithm) throws GeneralSecurityException {
+	public static String digest(String src, String algorithm){
         
         byte[] srcBytes = src.getBytes();
         byte[] dstBytes = new byte[16];
         
-        MessageDigest md = MessageDigest.getInstance(algorithm);
+        MessageDigest md;
+        try{
+        	md = MessageDigest.getInstance(algorithm);
+        }
+        catch (GeneralSecurityException e){
+        	throw new CRRuntimeException(e.toString(), e);
+        }
         md.update(srcBytes);
         dstBytes = md.digest();
         md.reset();
@@ -127,4 +132,24 @@ public class Util {
         for(; frames.hasMoreTokens(); list.add(frames.nextToken()));
         return (String[])list.toArray(new String[list.size()]);
     }
+	
+	/**
+	 * 
+	 * @param array
+	 * @param separator
+	 * @return
+	 */
+	public static String arrayToString(Object[] array, String separator){
+		
+		if (array==null)
+			return null;
+		
+		StringBuffer buf = new StringBuffer();
+		for (int i=0; i<array.length; i++){
+			if (i>0)
+				buf.append(separator);
+			buf.append(array[i].toString());
+		}
+		return buf.toString();
+	}
 }

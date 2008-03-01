@@ -23,13 +23,16 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Fieldable;
 import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TermQuery;
 
 import eionet.cr.config.GeneralConfig;
+import eionet.cr.util.Identifiers;
 import eionet.cr.util.Messages;
 
 /**
@@ -62,8 +65,9 @@ public class Searcher {
 	 */
 	private static IndexSearcher getIndexSearcher() throws CorruptIndexException, IOException{
 		if (indexSearcher==null){
-			logger.debug("Initializing index searcher");
-			indexSearcher = new IndexSearcher(GeneralConfig.getProperty(GeneralConfig.LUCENE_INDEX_LOCATION));
+			String indexLocation = GeneralConfig.getRequiredProperty(GeneralConfig.LUCENE_INDEX_LOCATION);
+			logger.debug("Initializing searcher on index: " + indexLocation);
+			indexSearcher = new IndexSearcher(indexLocation);
 		}
 		return indexSearcher;
 	}
@@ -104,11 +108,12 @@ public class Searcher {
 	 */
 	public static synchronized List<Hashtable<String,String[]>> search(String query, String analyzerName) throws ParseException, IOException{
 
-		logger.debug("Performing search query: " + query);
-		
 		QueryParser parser = new QueryParser(DEFAULT_FIELD, getAvailableAnalyzer(analyzerName));
 		Query queryObj = parser.parse(query);
-		Hits hits = getIndexSearcher().search(queryObj);
+		
+		logger.debug("Performing search query: " + query);
+		
+		Hits hits = getIndexSearcher().search(queryObj);		
 		return processHits(hits);
 	}
 	

@@ -14,11 +14,10 @@ public class HarvestDTO implements java.io.Serializable{
 	private String status;
 	private java.util.Date datetimeStarted;
 	private java.util.Date datetimeFinished;
-	private Integer totalStatements;
-	private Integer litObjStatements;
-	private Integer resObjStatements;
 	private Integer totalResources;
 	private Integer encodingSchemes;
+	private Integer totalStatements;
+	private Integer litObjStatements;
 	private String messages;
 
 	/**
@@ -151,20 +150,6 @@ public class HarvestDTO implements java.io.Serializable{
 	 */
 	public void setLitObjStatements(Integer litObjStatements) {
 		this.litObjStatements = litObjStatements;
-	}
-
-	/**
-	 * @return the resObjStatements
-	 */
-	public Integer getResObjStatements() {
-		return resObjStatements;
-	}
-
-	/**
-	 * @param resObjStatements the resObjStatements to set
-	 */
-	public void setResObjStatements(Integer resObjStatements) {
-		this.resObjStatements = resObjStatements;
 	}
 
 	/**

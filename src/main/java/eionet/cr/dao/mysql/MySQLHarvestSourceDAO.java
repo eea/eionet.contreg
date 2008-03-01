@@ -26,7 +26,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 	}
 	
 	/** */
-	private static final String getSourcesSQL = "select * from HARVEST_SOURCE";
+	private static final String getSourcesSQL = "select * from HARVEST_SOURCE order by TYPE desc, URL";
 		
 	/*
      * (non-Javadoc)

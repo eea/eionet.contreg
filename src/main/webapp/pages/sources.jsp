@@ -14,13 +14,8 @@
 	        <table class="datatable">
 	        	<thead>
 		        	<tr>
-		        		<th scope="col">Name</th>
 		        		<th scope="col">URL</th>
 		        		<th scope="col">Type</th>
-		        		<th scope="col">E-mails</th>
-		        		<th scope="col">Date Created</th>
-		        		<th scope="col">Creator</th>
-		        		<th scope="col">Statements</th>
 		        		<th scope="col"></th>
 		        		<th scope="col"></th>
 		        		<th scope="col"></th>
@@ -29,13 +24,8 @@
 	        	<tbody>
 	        		<c:forEach items="${harvestSourceList.harvestSources}" var="source" varStatus="loop">
 		        		<tr>
-		        			<td>${source.name}</td>
 		        			<td>${source.url}</td>
 		        			<td>${source.type}</td>
-		        			<td>${source.emails}</td>
-		        			<td>${source.dateCreated}</td>
-		        			<td>${source.creator}</td>
-		        			<td>${source.statements}</td>
 		        			<td>
 		        				<stripes:link href="/source.action" event="preView">
 	                                <img src="${pageContext.request.contextPath}/images/view.png" title="View"/>

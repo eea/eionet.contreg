@@ -55,6 +55,8 @@ public class QueryActionBean extends AbstractCRActionBean {
 		
 		request.setAttribute("hits", hits);
 		request.setAttribute("analyzer", analyzer);
+		
+		showMessage(String.valueOf(hits==null ? 0 : hits.size()) + " hits found");
         return new ForwardResolution("/pages/query.jsp");
     }
 

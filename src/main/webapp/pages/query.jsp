@@ -1,10 +1,12 @@
 <%@page contentType="text/html;charset=UTF-8" import="java.util.*,java.io.*,eionet.cr.util.Util"%>
 
 <%@page import="eionet.cr.index.Searcher"%>
+<%@page import="eionet.cr.index.EncodingSchemes"%>
+<%@page import="eionet.cr.util.Identifiers"%>
 
 <%!
 static final String[] fieldsOrder = {
-	"ID",
+	Identifiers.DOC_ID,
 	"http://purl.org/dc/elements/1.1/title",
 	"http://purl.org/dc/elements/1.1/coverage",
 	"http://purl.org/dc/elements/1.1/date",
@@ -33,7 +35,9 @@ static final String[] analyzers = {
 		<stripes:form action="/query.action" focus="query">
 			<label for="query">Enter your Lucene query here:</label>
 			<br/>
+			<br/>
 			<stripes:textarea name="query" cols="100"/>
+			<br/>
 			<%
 			String[] analyzers = Searcher.listAvailableAnalyzers();
 			if (analyzers!=null && analyzers.length>0){
@@ -77,7 +81,7 @@ static final String[] analyzers = {
 								String fieldName = fieldsOrder[j];
 								String[] fieldValues = (String[])hash.get(fieldName);
 								for (int k=0; fieldValues!=null && k<fieldValues.length; k++){
-									String fieldNameDisplay = k>0 ? "" : fieldName;
+									String fieldNameDisplay = k>0 ? "" : EncodingSchemes.getLabel(fieldName, true);
 									%>
 									<tr>
 										<td style="background-color:#CCFFFF"><%=fieldNameDisplay%></td>
@@ -103,7 +107,7 @@ static final String[] analyzers = {
 								if (!displayed.contains(fieldName)){
 									String[] fieldValues = (String[])hash.get(fieldName);
 									for (int k=0; fieldValues!=null && k<fieldValues.length; k++){
-										String fieldNameDisplay = k>0 ? "" : fieldName;
+										String fieldNameDisplay = k>0 ? "" : EncodingSchemes.getLabel(fieldName, true);
 										%>
 										<tr>
 											<td style="background-color:#CCFFFF"><%=fieldNameDisplay%></td>

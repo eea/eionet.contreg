@@ -7,6 +7,7 @@ import sun.security.action.GetBooleanAction;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dto.HarvestDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.harvest.DefaultHarvestListener;
@@ -152,15 +153,19 @@ public class HarvestSourceActionBean extends AbstractCRActionBean {
     public Resolution harvestNow() throws HarvestException, DAOException{
     	
     	if(isUserLoggedIn()){
+    		
 	    	harvestSource = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(harvestSource.getSourceId());
-			DefaultHarvestListener harvestListener = new DefaultHarvestListener(harvestSource, "pull", getCRUser());
+	    	HarvestDAO harvestDAO = DAOFactory.getDAOFactory().getHarvestDAO();
+	    	
+			DefaultHarvestListener harvestListener = new DefaultHarvestListener(harvestSource, "pull", getCRUser(), harvestDAO);
 			Harvester.pull(harvestListener);
 			
-			showMessage("Statements in total: " + harvestListener.getCountTotalStatements());
-			showMessage("Statements with literal objects: " + harvestListener.getCountLiteralStatements());
-			showMessage("Statements with resource objects: " + (harvestListener.getCountTotalStatements() - harvestListener.getCountLiteralStatements()));
+			harvests = harvestDAO.getHarvestsBySourceId(harvestSource.getSourceId());
+
 			showMessage("Resources in total: " + harvestListener.getCountTotalResources());
 			showMessage("Resources as encoding schemes: " + harvestListener.getCountEncodingSchemes());
+			showMessage("Statements in total: " + harvestListener.getCountTotalStatements());
+			showMessage("Statements with literal objects: " + harvestListener.getCountLiteralStatements());
     	}
     	else{
     		handleCrException(getBundle().getString("not.logged.in"), GeneralConfig.SEVERITY_WARNING);

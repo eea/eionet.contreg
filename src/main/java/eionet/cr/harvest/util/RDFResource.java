@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import eionet.cr.index.IndexException;
+import eionet.cr.util.Identifiers;
 
 /**
  * 
@@ -15,6 +16,9 @@ public class RDFResource {
 
 	/** */
 	private String id = null;
+	private String sourceId = null;
+	
+	/** */
 	private List<RDFResourceProperty> properties = null;
 	private HashSet<String> distinctPropertyIds = null;
 	private int countLiteralProperties = 0;
@@ -23,10 +27,11 @@ public class RDFResource {
 	 * @param id
 	 * @throws NullPointerException if the given id is null
 	 */
-	public RDFResource(String id){
-		if (id==null)
+	public RDFResource(String id, String sourceId){
+		if (id==null || sourceId==null)
 			throw new NullPointerException();
 		this.id = id;
+		this.sourceId = sourceId;
 	}
 
 	/**
@@ -69,8 +74,8 @@ public class RDFResource {
 	public boolean isEncodingScheme(){
 		
 		return distinctPropertyIds!=null &&
-			distinctPropertyIds.contains("http://www.w3.org/1999/02/22-rdf-syntax-ns#type") &&
-			distinctPropertyIds.contains("http://www.w3.org/2000/01/rdf-schema#label");
+			distinctPropertyIds.contains(Identifiers.RDFS_LABEL);
+		//FIXME distinctPropertyIds.contains(Identifiers.RDF_TYPE) &&
 	}
 	
 	/**
@@ -97,5 +102,12 @@ public class RDFResource {
 	 */
 	public int getCountTotalProperties(){
 		return properties==null ? 0 : properties.size();
+	}
+
+	/**
+	 * @return the sourceId
+	 */
+	public String getSourceId() {
+		return sourceId;
 	}
 }

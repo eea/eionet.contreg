@@ -1,11 +1,13 @@
 package eionet.cr.config;
 
+import eionet.cr.util.CRRuntimeException;
+
 /**
  * 
  * @author heinljab
  *
  */
-public class ConfigException extends RuntimeException{
+public class ConfigException extends CRRuntimeException{
 
 	/**
 	 * 

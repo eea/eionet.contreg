@@ -12,6 +12,7 @@ import java.net.URL;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.lucene.index.Term;
 
 import com.hp.hpl.jena.rdf.arp.ARP;
 
@@ -20,6 +21,7 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.index.EncodingSchemes;
+import eionet.cr.util.Identifiers;
 import eionet.cr.web.security.CRUser;
 
 public class Harvester {
@@ -38,7 +40,7 @@ public class Harvester {
 	 */
 	public static void pull(DefaultHarvestListener harvestListener) throws HarvestException{
 
-		boolean excpetionCatched = false;
+		boolean throwableCatched = false;
 		try{
 			harvestListener.harvestStarted();
 			
@@ -48,16 +50,28 @@ public class Harvester {
 			download(harvestListener.getHarvestSourceDTO().getUrl(), toFile);
 			harvest(harvestListener, toFile);
 		}
-		catch (HarvestException e){
-			excpetionCatched = true;
+		catch (Throwable t){
+			throwableCatched = true;
+			if (t instanceof HarvestException)
+				throw (HarvestException)t;
+			else
+				throw new HarvestException(t.toString(), t);
 		}
 		finally{
 			try{
-				harvestListener.harvestFinished();
+				if (throwableCatched)
+					harvestListener.harvestCancelled();
+				else
+					harvestListener.harvestFinished();
+				
 			}
-			catch (HarvestException e){
-				if (!excpetionCatched)
-					throw e;
+			catch (Throwable t){
+				if (!throwableCatched){
+					if (t instanceof HarvestException)
+						throw (HarvestException)t;
+					else
+						throw new HarvestException(t.toString(), t);
+				}
 			}
 		}
 	}
@@ -72,18 +86,21 @@ public class Harvester {
 		
 		logger.debug("Parsing local file: " + file.getAbsolutePath());
 		
-		boolean exceptionCatched = false;
 		InputStreamReader reader = null;
-		try{
-			RDFHandler rdfHandler = new RDFHandler(harvestListener.getHarvestSourceDTO().getUrl(), (HarvestListener)harvestListener);
+		RDFHandler rdfHandler = new RDFHandler(harvestListener.getHarvestSourceDTO().getUrl(), (HarvestListener)harvestListener);
+		try{			
 	        reader = new InputStreamReader(new FileInputStream(file));	        	        
 			ARP arp = new ARP();
 	        arp.setStatementHandler(rdfHandler);
-	        arp.setErrorHandler(harvestListener);
+	        arp.setErrorHandler(rdfHandler);
 	        arp.load(reader);
+	        
+	        if (rdfHandler.isFatalError())
+	        	throw rdfHandler.getFatalError();
+	        else
+	        	harvestListener.indexResources(rdfHandler.getRdfResources());
 		}
 		catch (Exception e){
-			exceptionCatched = true;
 			HarvestException hrve = new HarvestException(e.toString(), e);
 			harvestListener.setFatalException(hrve);
 			throw hrve;
@@ -97,8 +114,8 @@ public class Harvester {
 				logger.error("Failure when trying to close the file's InputStreamReader: " + e.toString(), e);
 			}
 			finally{
-		        if (!exceptionCatched && harvestListener.getFatalException()!=null)
-		        	throw harvestListener.getFatalException();
+				logger.debug(harvestListener.getCountTotalResources() + " resources indexed, among them " +
+						harvestListener.getCountEncodingSchemes() + " encoding schemes");
 			}
 		}
 	}
@@ -178,10 +195,11 @@ public class Harvester {
 	public static void main(String[] args){
 
 		HarvestSourceDTO harvestSourceDTO = new HarvestSourceDTO();
-		harvestSourceDTO.setUrl("http://purl.org/dc/elements/1.1/");		
+		harvestSourceDTO.setUrl("http://rod.eionet.europa.eu/obligations");
+		harvestSourceDTO.setSourceId(new Integer(23));
 		
-		DefaultHarvestListener harvestListener = new DefaultHarvestListener(harvestSourceDTO, "pull", null);
-		try{
+		DefaultHarvestListener harvestListener = new DefaultHarvestListener(harvestSourceDTO, "pull", new CRUser("heinlja"), null);
+		try{			
 			Harvester.pull(harvestListener);
 		}
 		catch (Throwable t){			

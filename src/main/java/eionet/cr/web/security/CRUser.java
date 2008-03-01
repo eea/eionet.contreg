@@ -8,13 +8,19 @@ package eionet.cr.web.security;
  */
 public class CRUser {
 	
+	/** */
 	private String userName;
-	
-	/** Default constructor. */
+
+	/**
+	 * 
+	 */
 	public CRUser() {
-		
 	}
 	
+	/**
+	 * 
+	 * @param userName
+	 */
 	public CRUser(String userName) {
 		this.userName = userName;
 	}
@@ -32,5 +38,4 @@ public class CRUser {
 	public void setUserName(String username) {
 		this.userName = username;
 	}
-
 }
