@@ -91,7 +91,7 @@
 	        				<td>${harv.totalStatements}</td>
 							<td>
 		        				<stripes:link href="/source.action" event="preViewHarvest">
-	                                <img src="${pageContext.request.contextPath}/images/view.gif" title="View"/>
+	                                <img src="${pageContext.request.contextPath}/images/view2.gif" title="View"/>
 	                                <stripes:param name="harvest.harvestId" value="${harv.harvestId}"/>
 	                                <stripes:param name="harvest.harvestSourceId" value="${harv.harvestSourceId}"/>
 	                            </stripes:link>
