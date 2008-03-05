@@ -1,5 +1,7 @@
 package eionet.cr.dao;
 
+import java.util.List;
+
 import eionet.cr.dto.HarvestMessageDTO;
 
 /**
@@ -14,7 +16,7 @@ public interface HarvestMessageDAO {
 	 * @return
 	 * @throws DAOException
 	 */
-	public HarvestMessageDTO findHarvestMessageByHarvestID(int harvestID) throws DAOException;
+	public List<HarvestMessageDTO> findHarvestMessagesByHarvestID(int harvestID) throws DAOException;
 	
 	/**
 	 * 

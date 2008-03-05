@@ -9,6 +9,7 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dto.HarvestDTO;
+import eionet.cr.dto.HarvestMessageDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.harvest.DefaultHarvestListener;
 import eionet.cr.harvest.HarvestException;
@@ -30,6 +31,7 @@ public class HarvestSourceActionBean extends AbstractCRActionBean {
 	/** */
 	private HarvestSourceDTO harvestSource;
 	private List<HarvestDTO> harvests;
+	private List<HarvestMessageDTO> harvestMessages;
 	private HarvestDTO harvest;
 	
 	/**
@@ -55,6 +57,14 @@ public class HarvestSourceActionBean extends AbstractCRActionBean {
 
 	public void setHarvests(List<HarvestDTO> harvests) {
 		this.harvests = harvests;
+	}
+
+	public List<HarvestMessageDTO> getHarvestMessages() {
+		return harvestMessages;
+	}
+
+	public void setHarvestMessages(List<HarvestMessageDTO> harvestMessages) {
+		this.harvestMessages = harvestMessages;
 	}
 
 	public HarvestDTO getHarvest() {
@@ -126,6 +136,7 @@ public class HarvestSourceActionBean extends AbstractCRActionBean {
     public Resolution preViewHarvest() throws DAOException {
     	harvest = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestById(harvest.getHarvestId());
     	harvestSource = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(harvest.getHarvestSourceId());
+    	harvestMessages = DAOFactory.getDAOFactory().getHarvestMessageDAO().findHarvestMessagesByHarvestID(harvest.getHarvestId());
     	return new RedirectResolution("/pages/harvest.jsp").flash(this);
     }
     

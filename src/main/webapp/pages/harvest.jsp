@@ -51,12 +51,32 @@
 	            </tr>
 	            <tr>
 	                <td>Statements with resource objects:</td>
-	                <td>${actionBean.harvest.resObjStatements}</td>
+	                <td>${actionBean.harvest.totalResources}</td>
 	            </tr>
 	            <tr>
 	                <td>Encoding schemes:</td>
 	                <td>${actionBean.harvest.encodingSchemes}</td>
 	            </tr>
+	        </table>
+	        <br/><br/>
+	        <strong>Messages:</strong>
+	        <table class="datatable">	        	
+	        	<thead>
+		        	<tr>
+		        		<th scope="col">Type</th>
+		        		<th scope="col">Message</th>
+		        		<th scope="col">StackTrace</th>
+		        	</tr>
+	        	</thead>
+	        	<tbody>
+	        		<c:forEach items="${actionBean.harvestMessages}" var="msg" varStatus="loop">
+	        			<tr>
+	        				<td>${msg.type}</td>
+	        				<td>${msg.message}</td>
+	        				<td>${msg.stackTrace}</td>
+	        			</tr>
+	        		</c:forEach>
+	        	</tbody>
 	        </table>
 	    </stripes:form>
 

@@ -22,9 +22,9 @@ public class MySQLHarvestMessageDAO extends MySQLBaseDAO implements HarvestMessa
 	
 	/*
 	 * (non-Javadoc)
-	 * @see eionet.cr.dao.HarvestMessageDAO#findHarvestMessageByHarvestID(java.lang.String)
+	 * @see eionet.cr.dao.HarvestMessageDAO#findHarvestMessagesByHarvestID(java.lang.String)
 	 */
-	public HarvestMessageDTO findHarvestMessageByHarvestID(int harvestID) throws DAOException {
+	public List<HarvestMessageDTO> findHarvestMessagesByHarvestID(int harvestID) throws DAOException {
 		
 		List<Object> values = new ArrayList<Object>();
 		values.add(new Integer(harvestID));
@@ -35,7 +35,7 @@ public class MySQLHarvestMessageDAO extends MySQLBaseDAO implements HarvestMessa
 			conn = getConnection();
 			SQLUtil.executeQuery(q_HarvestMessageByHarvestID, values, rsReader, conn);
 			List<HarvestMessageDTO>  list = rsReader.getResultList();
-			return list!=null && list.size()>0 ? list.get(0) : null;
+			return list;
 		}
 		catch (Exception e){
 			throw new DAOException(e.getMessage(), e);

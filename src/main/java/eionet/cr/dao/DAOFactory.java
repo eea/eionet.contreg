@@ -25,6 +25,12 @@ public abstract class DAOFactory {
 	
 	/**
 	 * 
+	 * @return
+	 */
+	public abstract HarvestMessageDAO getHarvestMessageDAO();
+	
+	/**
+	 * 
 	 * @param whichFactory
 	 * @return
 	 */
