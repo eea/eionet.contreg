@@ -81,7 +81,7 @@ public class HarvestSourceActionBean extends AbstractCRActionBean {
 	 * @throws DAOException
 	 */
 	@DefaultHandler
-    public Resolution add() throws DAOException {
+    public Resolution addHarvestSource() throws DAOException {
 		if(isUserLoggedIn())
 			DAOFactory.getDAOFactory().getHarvestSourceDAO().addSource(getHarvestSource(), getUserName());
 		else
@@ -95,7 +95,7 @@ public class HarvestSourceActionBean extends AbstractCRActionBean {
 	 * @throws DAOException
 	 */
     @DontValidate
-    public Resolution preEdit() throws DAOException {
+    public Resolution preEditHarvestSource() throws DAOException {
     	harvestSource = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(harvestSource.getSourceId());
         return new RedirectResolution("/pages/editsource.jsp").flash(this);
     }
@@ -105,7 +105,7 @@ public class HarvestSourceActionBean extends AbstractCRActionBean {
      * @return
      * @throws DAOException
      */
-    public Resolution edit() throws DAOException {
+    public Resolution editHarvestSource() throws DAOException {
 		if(isUserLoggedIn()){
 			DAOFactory.getDAOFactory().getHarvestSourceDAO().editSource(getHarvestSource());
 			showMessage(getBundle().getString("update.success"));
@@ -121,7 +121,7 @@ public class HarvestSourceActionBean extends AbstractCRActionBean {
      * @throws DAOException
      */
     @DontValidate
-    public Resolution preView() throws DAOException {
+    public Resolution preViewHarvestSource() throws DAOException {
     	harvestSource = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(harvestSource.getSourceId());
     	harvests = DAOFactory.getDAOFactory().getHarvestDAO().getHarvestsBySourceId(harvestSource.getSourceId());
     	return new RedirectResolution("/pages/viewsource.jsp").flash(this);
@@ -145,7 +145,7 @@ public class HarvestSourceActionBean extends AbstractCRActionBean {
      * @return
      * @throws DAOException
      */
-    public Resolution delete() throws DAOException {
+    public Resolution deleteHarvestSource() throws DAOException {
 		if(isUserLoggedIn()){
 			DAOFactory.getDAOFactory().getHarvestSourceDAO().deleteSource(getHarvestSource());
 			showMessage(getBundle().getString("harvet.source.deleted"));

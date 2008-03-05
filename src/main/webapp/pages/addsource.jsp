@@ -58,7 +58,7 @@
 	            </tr>
 	            <tr>
 	                <td colspan="2">
-	                    <stripes:submit name="add" value="Add"/>       
+	                    <stripes:submit name="addHarvestSource" value="Add"/>       
 	                </td>
 	            </tr>
 	        </table>

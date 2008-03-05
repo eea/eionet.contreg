@@ -78,7 +78,7 @@
 	            </tr>
 	            <tr>
 	                <td colspan="2">
-	                    <stripes:submit name="edit" value="Save"/>       
+	                    <stripes:submit name="editHarvestSource" value="Save"/>       
 	                </td>
 	            </tr>
 	        </table>

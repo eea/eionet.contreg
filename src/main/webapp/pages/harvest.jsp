@@ -13,7 +13,7 @@
 	        	<tr>
 	                <td>Harvest source:</td>
 	                <td>
-	                	<stripes:link href="/source.action" event="preView">
+	                	<stripes:link href="/source.action" event="preViewHarvestSource">
                             ${actionBean.harvestSource.name}
                             <stripes:param name="harvestSource.sourceId" value="${actionBean.harvest.harvestSourceId}"/>
                         </stripes:link>

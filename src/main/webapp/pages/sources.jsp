@@ -27,19 +27,19 @@
 		        			<td>${source.url}</td>
 		        			<td>${source.type}</td>
 		        			<td>
-		        				<stripes:link href="/source.action" event="preView">
+		        				<stripes:link href="/source.action" event="preViewHarvestSource">
 	                                <img src="${pageContext.request.contextPath}/images/view2.gif" title="View"/>
 	                                <stripes:param name="harvestSource.sourceId" value="${source.sourceId}"/>
 	                            </stripes:link>
 		        			</td>
 		        			<td>
-		        				<stripes:link href="/source.action" event="preEdit">
+		        				<stripes:link href="/source.action" event="preEditHarvestSource">
 	                                <img src="${pageContext.request.contextPath}/images/edit.gif" title="Edit"/>
 	                                <stripes:param name="harvestSource.sourceId" value="${source.sourceId}"/>
 	                            </stripes:link>
 		        			</td>
 		        			<td>
-		        				<stripes:link href="/source.action" event="delete" onclick="return confirm('Are you sure you want to delete this harvesting source');">
+		        				<stripes:link href="/source.action" event="deleteHarvestSource" onclick="return confirm('Are you sure you want to delete this harvesting source');">
 	                                <img src="${pageContext.request.contextPath}/images/delete.gif" title="Delete"/>
 	                                <stripes:param name="harvestSource.sourceId" value="${source.sourceId}"/>
 	                            </stripes:link>
