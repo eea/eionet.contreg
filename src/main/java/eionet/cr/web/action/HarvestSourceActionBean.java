@@ -2,8 +2,6 @@ package eionet.cr.web.action;
 
 import java.util.List;
 
-import sun.security.action.GetBooleanAction;
-
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
@@ -14,7 +12,6 @@ import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.harvest.DefaultHarvestListener;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.Harvester;
-import eionet.cr.index.EncodingSchemes;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.DontValidate;
 import net.sourceforge.stripes.action.ForwardResolution;
