@@ -23,8 +23,8 @@ public abstract class MySQLBaseDAO {
 	 * 
 	 * @return
 	 */
-	protected Connection getConnection() throws DataSourceException{
-		return ConnectionUtil.getJNDIConnection();
+	protected Connection getConnection() throws DataSourceException, SQLException{
+		return ConnectionUtil.getConnection();
 	}
 	
 	/**

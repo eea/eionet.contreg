@@ -27,7 +27,7 @@ public interface HarvestSourceDAO {
      * @throws DAOException
      * @param HarvestSourceDTO source
      */
-    public void addSource(HarvestSourceDTO source, String user) throws DAOException;
+    public Integer addSource(HarvestSourceDTO source, String user) throws DAOException;
     
     /**
      * @throws DAOException

@@ -104,7 +104,9 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
      * 
      * @see eionet.cr.dao.HarvestSourceDao#addSource()
      */
-    public void addSource(HarvestSourceDTO source, String user) throws DAOException {
+    public Integer addSource(HarvestSourceDTO source, String user) throws DAOException {
+    	
+    	Integer harvestSourceID = null;
     	    	
     	List<Object> values = new ArrayList<Object>();
 		values.add(source.getName());
@@ -117,12 +119,15 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 		try{
 			conn = getConnection();
 			SQLUtil.executeUpdate(addSourceSQL, values, conn);
+			harvestSourceID = getLastInsertID(conn);
 			
 			if(source.getHarvestSchedule() != null){
 				Integer source_id = getLastInsertID(conn);
 				source.getHarvestSchedule().setHarvestSourceId(source_id);
 				DAOFactory.getDAOFactory().getHarvestScheduleDAO().addSchedule(source.getHarvestSchedule());
 			}
+			
+			return harvestSourceID;
 		}
 		catch (Exception e){
 			throw new DAOException(e.getMessage(), e);

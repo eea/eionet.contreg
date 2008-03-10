@@ -22,6 +22,7 @@ public class ConnectionUtil {
 
 	/** */
 	private static DataSource dataSource = null;
+	private static boolean testConnection = false;
 	
 	/**
 	 * 
@@ -33,13 +34,25 @@ public class ConnectionUtil {
 		Context context = (Context) initContext.lookup("java:comp/env");
 		dataSource = (javax.sql.DataSource)context.lookup("jdbc/cr");
 	}
+	
+	/**
+	 * 
+	 * @return
+	 * @throws SQLException 
+	 */
+	public static Connection getConnection() throws DataSourceException, SQLException {
+		if(isTestConnection())
+			return getSimpleConnection();
+		else
+			return getJNDIConnection();
+	}
 
 	/**
 	 * 
 	 * @return
 	 * @throws SQLException 
 	 */
-	public static synchronized Connection getJNDIConnection() throws DataSourceException{
+	private static synchronized Connection getJNDIConnection() throws DataSourceException{
 		
 		try{
 			if (dataSource==null)
@@ -57,7 +70,7 @@ public class ConnectionUtil {
 	 * @throws SQLException 
 	 * @throws SQLException
 	 */
-	public static Connection getSimpleConnection() throws DataSourceException, SQLException{
+	private static Connection getSimpleConnection() throws DataSourceException, SQLException{
 		
 		String drv = GeneralConfig.getProperty(GeneralConfig.DB_DRV);
 		if (drv==null || drv.trim().length()==0)
@@ -97,4 +110,13 @@ public class ConnectionUtil {
 			logger.error("Failed to close connection", e);
 		}
 	}
+
+	public static boolean isTestConnection() {
+		return testConnection;
+	}
+
+	public static void setTestConnection(boolean testConnection) {
+		ConnectionUtil.testConnection = testConnection;
+	}
+
 }
