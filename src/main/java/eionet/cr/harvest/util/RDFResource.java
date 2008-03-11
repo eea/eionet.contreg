@@ -22,6 +22,9 @@ public class RDFResource {
 	private List<RDFResourceProperty> properties = null;
 	private HashSet<String> distinctPropertyIds = null;
 	private int countLiteralProperties = 0;
+	
+	/** */
+	private String firstSeenTimestamp = null;
 
 	/**
 	 * @param id
@@ -109,5 +112,21 @@ public class RDFResource {
 	 */
 	public String getSourceId() {
 		return sourceId;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public String getFirstSeenTimestamp() {
+		return firstSeenTimestamp;
+	}
+
+	/**
+	 * 
+	 * @param firstSeenTime
+	 */
+	public void setFirstSeenTimestamp(String firstSeenTime) {
+		this.firstSeenTimestamp = firstSeenTime;
 	}
 }

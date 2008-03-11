@@ -64,27 +64,9 @@ public class Searcher {
 	 * @throws CorruptIndexException 
 	 */
 	private static IndexSearcher getIndexSearcher() throws CorruptIndexException, IOException{
-		if (indexSearcher==null){
-			String indexLocation = GeneralConfig.getRequiredProperty(GeneralConfig.LUCENE_INDEX_LOCATION);
-			logger.debug("Initializing searcher on index: " + indexLocation);
-			indexSearcher = new IndexSearcher(indexLocation);
-		}
-		return indexSearcher;
-	}
-	
-	/**
-	 * 
-	 */
-	public static synchronized void close(){
-		if (indexSearcher!=null){
-			logger.debug("Closing index searcher");
-			try{
-				indexSearcher.close();
-			}
-			catch (IOException e){
-				logger.error("Failed to close index searcher: " + e.toString(), e);
-			}
-		}
+		String indexLocation = GeneralConfig.getRequiredProperty(GeneralConfig.LUCENE_INDEX_LOCATION);
+		logger.debug("Initializing searcher on index: " + indexLocation);
+		return new IndexSearcher(indexLocation);
 	}
 	
 	/**
@@ -103,18 +85,31 @@ public class Searcher {
 	 * @param query
 	 * @param analyzerName
 	 * @return
+	 * @throws IOException 
+	 * @throws CorruptIndexException 
 	 * @throws ParseException 
 	 * @throws IOException 
+	 * @throws ParseException 
 	 */
-	public static synchronized List<Hashtable<String,String[]>> search(String query, String analyzerName) throws ParseException, IOException{
+	public static synchronized List<Hashtable<String,String[]>> search(String query, String analyzerName) throws CorruptIndexException, IOException, ParseException{
 
 		QueryParser parser = new QueryParser(DEFAULT_FIELD, getAvailableAnalyzer(analyzerName));
 		Query queryObj = parser.parse(query);
 		
 		logger.debug("Performing search query: " + query);
 		
-		Hits hits = getIndexSearcher().search(queryObj);		
-		return processHits(hits);
+		IndexSearcher indexSearcher = null;
+		try{
+			indexSearcher = getIndexSearcher();
+			Hits hits = indexSearcher.search(queryObj);
+			return processHits(hits);
+		}
+		finally{
+			try{
+				indexSearcher.close();
+			}
+			catch (IOException e){}
+		}
 	}
 	
 	/**

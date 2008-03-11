@@ -2,6 +2,7 @@ package eionet.cr.index;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -11,7 +12,10 @@ import org.apache.lucene.analysis.KeywordAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.FieldSelector;
+import org.apache.lucene.document.MapFieldSelector;
 import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.store.FSDirectory;
@@ -19,6 +23,7 @@ import org.apache.lucene.store.LockObtainFailedException;
 
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.harvest.DefaultHarvestListener;
+import eionet.cr.harvest.Harvester;
 import eionet.cr.harvest.util.RDFResource;
 import eionet.cr.harvest.util.RDFResourceProperty;
 import eionet.cr.util.Identifiers;
@@ -43,6 +48,9 @@ public class MainIndexer extends Indexer{
 	
 	/** */
 	private int countDocumentsIndexed = 0;
+	
+	/** */
+	private String firstSeenTimestamp = null;
 	
 	/*
 	 * (non-Javadoc)
@@ -103,6 +111,10 @@ public class MainIndexer extends Indexer{
 		if (isEncScheme)
 			document.add(new Field(Identifiers.IS_ENCODING_SCHEME, Boolean.TRUE.toString(), Field.Store.YES, Field.Index.TOKENIZED));
 		
+		// set the time the document was first seen
+		document.add(new Field(Identifiers.FIRST_SEEN_TIMESTAMP,
+				resource.getFirstSeenTimestamp()==null ? this.getFirstSeenTimestamp() : resource.getFirstSeenTimestamp(), Field.Store.YES, Field.Index.UN_TOKENIZED));
+		
 		// finally, update the document in index
 		try {
 			indexWriter.updateDocument(new Term(Identifiers.DOC_ID, resource.getId()), document);
@@ -146,6 +158,7 @@ public class MainIndexer extends Indexer{
 		logger.debug("Closing index writer");
 		
 		if (indexWriter!=null){
+			indexWriter.flush();
 			indexWriter.optimize();
 			indexWriter.close();
 		}
@@ -161,6 +174,70 @@ public class MainIndexer extends Indexer{
 		
 		if (indexWriter!=null){
 			indexWriter.abort();
+		}
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	private String getFirstSeenTimestamp(){
+		
+		if (this.firstSeenTimestamp==null)
+			this.firstSeenTimestamp = String.valueOf((int)(System.currentTimeMillis() / (long)1000));
+		return this.firstSeenTimestamp;
+	}
+
+	/**
+	 * 
+	 * @param args
+	 */
+	public static void main(String[] args){
+		
+		//MainIndexer mainIndexer = new MainIndexer();
+		IndexReader indexReader = null;
+		HashMap hash = new HashMap();
+		String s = "http://www.testime.ee/doc";
+		for (int i=0; i<3000; i++){
+			hash.put(s + String.valueOf(i), "");
+		}
+		
+		try {
+			long startTime = System.currentTimeMillis();
+			
+			indexReader = IndexReader.open(GeneralConfig.getProperty(GeneralConfig.LUCENE_INDEX_LOCATION));
+			//mainIndexer.initIndexWriter();
+			int numDocs = indexReader.numDocs();
+			System.out.println("numDocs = " + numDocs);
+			//int count = mainIndexer.indexWriter.docCount();
+			String[] fields = {Identifiers.DOC_ID, "enriko"};
+			FieldSelector fieldSelector = new MapFieldSelector(fields);
+			
+			int countFound = 0;
+			for (int i=0; i<50; i++){
+				//System.out.println(indexReader.document(i, fieldSelector).toString());
+				System.out.println(indexReader.document(i, fieldSelector).get("enriko"));
+//				String value = indexReader.document(i, fieldSelector).get(Identifiers.DOC_ID); 
+//				if (value!=null){
+//					countFound++;
+//					hash.containsKey(value);
+//				}
+				//System.out.println(value);
+			}
+			
+			System.out.println("countFound = " + countFound + ", time = " + (System.currentTimeMillis()-startTime));
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
+		finally{
+			try{
+				//mainIndexer.close();
+				if (indexReader!=null)
+					indexReader.close();
+			}
+			catch (Throwable e){
+			}
 		}
 	}
 }

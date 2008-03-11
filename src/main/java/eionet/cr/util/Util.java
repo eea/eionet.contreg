@@ -10,6 +10,7 @@ import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -151,5 +152,20 @@ public class Util {
 			buf.append(array[i].toString());
 		}
 		return buf.toString();
+	}
+	
+	/**
+	 * 
+	 * @param date
+	 * @param pattern
+	 * @return
+	 */
+    public static String dateToString(java.util.Date date, String pattern){
+
+    	if (date==null)
+    		return null;
+    	
+    	SimpleDateFormat formatter = pattern==null ? new SimpleDateFormat() : new SimpleDateFormat(pattern);
+    	return formatter.format(date);
 	}
 }

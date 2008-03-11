@@ -21,8 +21,6 @@ public class ServletContextListenerImpl implements ServletContextListener{
 	 * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
 	 */
 	public void contextDestroyed(ServletContextEvent event) {
-		
-		Searcher.close();
 	}
 
 	/*

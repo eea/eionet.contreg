@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -20,6 +21,7 @@ import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dto.HarvestSourceDTO;
+import eionet.cr.harvest.util.RDFResource;
 import eionet.cr.index.EncodingSchemes;
 import eionet.cr.util.Identifiers;
 import eionet.cr.web.security.CRUser;
@@ -28,6 +30,7 @@ public class Harvester {
 	
 	/** */
 	private static final String HARVEST_FILE_NAME_EXTENSION = ".xml";
+	public static final String FIRST_SEEN_DATETIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
 	
 	/** */
 	private static Log logger = LogFactory.getLog(Harvester.class);
@@ -97,8 +100,11 @@ public class Harvester {
 	        
 	        if (rdfHandler.isFatalError())
 	        	throw rdfHandler.getFatalError();
-	        else
-	        	harvestListener.indexResources(rdfHandler.getRdfResources());
+	        else{
+	        	Map<String, RDFResource> resources = rdfHandler.getRdfResources();
+	        	harvestListener.updateFirstTimes(resources);
+	        	harvestListener.indexResources(resources);
+	        }
 		}
 		catch (Exception e){
 			HarvestException hrve = new HarvestException(e.toString(), e);

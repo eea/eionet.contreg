@@ -2,9 +2,14 @@ package eionet.cr.harvest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.document.FieldSelector;
+import org.apache.lucene.document.MapFieldSelector;
+import org.apache.lucene.index.IndexReader;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestDAO;
@@ -14,6 +19,7 @@ import eionet.cr.index.EncodingSchemes;
 import eionet.cr.index.IndexException;
 import eionet.cr.index.Indexer;
 import eionet.cr.index.MainIndexer;
+import eionet.cr.util.Identifiers;
 import eionet.cr.web.security.CRUser;
 
 import java.util.ArrayList;
@@ -225,5 +231,46 @@ public class DefaultHarvestListener implements HarvestListener{
 	 */
 	public int getCountTotalStatements(){
 		return countTotalStatements;
+	}
+	
+	/**
+	 * 
+	 * @param resources
+	 * @throws HarvestException 
+	 */
+	public void updateFirstTimes(Map<String,RDFResource> resources) throws HarvestException{
+		
+		logger.debug("Updating first-seen-datetimes of given resources");
+		
+		if (resources==null || resources.size()==0)
+			return;
+		
+		IndexReader indexReader = null;
+		try{
+			indexReader = IndexReader.open(GeneralConfig.getProperty(GeneralConfig.LUCENE_INDEX_LOCATION));
+			String[] fields = {Identifiers.DOC_ID, Identifiers.FIRST_SEEN_TIMESTAMP};
+			FieldSelector fieldSelector = new MapFieldSelector(fields);
+			int numDocs = indexReader.numDocs();
+			int countUpdated = 0;
+			for (int i=0; i<numDocs; i++){
+				Document document = indexReader.document(i, fieldSelector);
+				if (document!=null){
+					String docID = document.get(Identifiers.DOC_ID);
+					String firstTime = document.get(Identifiers.FIRST_SEEN_TIMESTAMP);
+					if (docID!=null && firstTime!=null){
+						RDFResource resource = resources.get(docID);
+						if (resource!=null){
+							resource.setFirstSeenTimestamp(firstTime);
+							countUpdated++;
+						}
+					}
+				}
+			}
+			
+			logger.debug("First-seen-datetimes updated for " + countUpdated + " resources, a total of " + numDocs + " documents was found by index reader");;
+		}
+		catch (Throwable t){
+			throw new HarvestException("Failure when updating first times: " + t.toString(), t);
+		}
 	}
 }

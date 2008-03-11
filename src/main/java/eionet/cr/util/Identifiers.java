@@ -15,4 +15,5 @@ public interface Identifiers {
 	public static final String ANON_ID_PREFIX = "http://cr.eionet.europa.eu/anonymous/";
 	public static final String IS_ENCODING_SCHEME = "IS_ENCODING_SCHEME";
 	public static final String ALL_LITERAL_CONTENT = "CONTENT";
+	public static final String FIRST_SEEN_TIMESTAMP = "urn:contreg:first-seen-timestamp";
 }
