@@ -2,6 +2,8 @@ package eionet.cr.dao;
 
 import static org.junit.Assert.*;
 
+import java.util.List;
+
 import org.junit.Test;
 
 import eionet.cr.dao.DAOFactory;
@@ -9,6 +11,12 @@ import eionet.cr.dto.HarvestScheduleDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.util.sql.ConnectionUtil;
 
+/**
+ * JUnit test tests HarvestSourceDAO functionality.
+ * 
+ * @author altnyris
+ *
+ */
 public class TestHarvestSourceDAO {
 	private static HarvestSourceDTO harvestSource;
 	
@@ -29,8 +37,17 @@ public class TestHarvestSourceDAO {
 		
 		ConnectionUtil.setTestConnection(true);
 		Integer harvestSourceID = DAOFactory.getDAOFactory().getHarvestSourceDAO().addSource(harvestSource, "bobsmith");
-		assertTrue(harvestSourceID != null);
+		assertNotNull(harvestSourceID);
 		harvestSource.setSourceId(harvestSourceID);
+	}
+	
+	@Test
+	public void testGetHarvestSources() throws Exception {
+		
+		ConnectionUtil.setTestConnection(true);
+		List<HarvestSourceDTO> sources = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSources();
+		assertEquals(43, sources.size());
+		
 	}
 	
 	@Test

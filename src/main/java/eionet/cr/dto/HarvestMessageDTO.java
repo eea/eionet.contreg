@@ -12,6 +12,7 @@ public class HarvestMessageDTO implements java.io.Serializable{
 	String type = null;
 	String message = null;
 	String stackTrace = null;
+	Integer harvestMessageId = null;
 
 	/**
 	 * 
@@ -66,5 +67,13 @@ public class HarvestMessageDTO implements java.io.Serializable{
 	 */
 	public void setStackTrace(String stackTrace) {
 		this.stackTrace = stackTrace;
+	}
+
+	public Integer getHarvestMessageId() {
+		return harvestMessageId;
+	}
+
+	public void setHarvestMessageId(Integer harvestMessageId) {
+		this.harvestMessageId = harvestMessageId;
 	}
 }

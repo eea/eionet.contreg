@@ -33,6 +33,7 @@ public class HarvestMessageDTOReader extends ResultSetBaseReader {
 		harvestMessageDTO.setType(rs.getString("TYPE"));
 		harvestMessageDTO.setMessage(rs.getString("MESSAGE"));
 		harvestMessageDTO.setStackTrace(rs.getString("STACK_TRACE"));
+		harvestMessageDTO.setHarvestMessageId(new Integer(rs.getInt("HARVEST_MESSAGE_ID")));
 		resultList.add(harvestMessageDTO);
 	}
 
