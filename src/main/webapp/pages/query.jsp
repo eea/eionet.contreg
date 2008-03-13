@@ -70,7 +70,7 @@ static final String[] analyzers = {
 						%>
 						<tr><td colspan="2"><strong><%=i+1%></strong></td></tr>
 						<%
-						Hashtable hash = (Hashtable)hits.get(i);
+						Map hash = (Map)hits.get(i);
 						if (hash.size()==0){
 							%>
 							<tr><td colspan="2">Some document with no stored fields in it...</td></tr><%
@@ -101,9 +101,9 @@ static final String[] analyzers = {
 								displayed.add(fieldName);
 							}
 							
-							Enumeration keys = hash.keys();
-							while (keys!=null && keys.hasMoreElements()){
-								String fieldName =  (String)keys.nextElement();
+							Iterator keys = hash.keySet().iterator();
+							while (keys!=null && keys.hasNext()){
+								String fieldName =  (String)keys.next();
 								if (!displayed.contains(fieldName)){
 									String[] fieldValues = (String[])hash.get(fieldName);
 									for (int k=0; fieldValues!=null && k<fieldValues.length; k++){

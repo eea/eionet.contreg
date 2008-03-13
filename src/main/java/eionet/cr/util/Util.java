@@ -10,6 +10,7 @@ import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
@@ -157,15 +158,122 @@ public class Util {
 	/**
 	 * 
 	 * @param date
-	 * @param pattern
+	 * @param datePattern
 	 * @return
 	 */
-    public static String dateToString(java.util.Date date, String pattern){
+    public static String dateToString(java.util.Date date, String datePattern){
 
     	if (date==null)
     		return null;
     	
-    	SimpleDateFormat formatter = pattern==null ? new SimpleDateFormat() : new SimpleDateFormat(pattern);
+    	SimpleDateFormat formatter = datePattern==null ? new SimpleDateFormat() : new SimpleDateFormat(datePattern);
     	return formatter.format(date);
 	}
+
+    /**
+     * 
+     * @param str
+     * @param datePattern
+     * @return
+     */
+    public static java.util.Date stringToDate(String str, String datePattern){
+
+    	if (str==null || str.trim().length()==0)
+    		return null;
+    	
+    	SimpleDateFormat formatter = new SimpleDateFormat(datePattern);
+    	try {
+			return formatter.parse(str);
+		}
+    	catch (ParseException e){
+    		throw new CRRuntimeException("Failed to convert the given string to java.util.Date: " + e.toString(), e);
+		}
+	}
+
+    /**
+     * 
+     * @return
+     */
+    public static long currentTimeSeconds(){
+    	return (long)(System.currentTimeMillis() / (long)1000);
+    }
+
+    /**
+     * 
+     * @param milliSeconds
+     * @return
+     */
+    public static long getSeconds(long milliSeconds){
+    	return (long)(milliSeconds/(long)1000);
+    }
+    
+    /**
+     * 
+     * @param str
+     * @return
+     */
+    public static String escapeForLuceneQuery(String str){
+		
+        StringBuffer buf = new StringBuffer();
+        for(int i=0; i<str.length(); i++){
+        	
+        	char c = str.charAt(i);
+            switch(c){
+            
+	            case 43: // '+'
+	            	buf.append("\\+");
+	                break;
+	            case 45: // '-'
+	                buf.append("\\-");
+	                break;
+	            case 33: // '!'
+	                buf.append("\\!");
+	                break;
+	            case 40: // '('
+	                buf.append("\\(");
+	                break;
+	            case 41: // ')'
+	                buf.append("\\)");
+	                break;
+	            case 123: // '{'
+	                buf.append("\\{");
+	                break;
+	            case 125: // '}'
+	                buf.append("\\}");
+	                break;
+	            case 91: // '['
+	                buf.append("\\[");
+	                break;
+	            case 93: // ']'
+	                buf.append("\\]");
+	                break;
+	            case 94: // '^'
+	                buf.append("\\^");
+	                break;
+	            case 34: // '"'
+	                buf.append("\\\"");
+	                break;
+	            case 126: // '~'
+	                buf.append("\\~");
+	                break;
+	            case 42: // '*'
+	                buf.append("\\*");
+	                break;
+	            case 63: // '?'
+	                buf.append("\\?");
+	                break;
+	            case 58: // ':'
+	                buf.append("\\:");
+	                break;
+	            case 92: // '\'
+	                buf.append("\\\\");
+	                break;
+	            default:
+	            	buf.append(c);
+	                break;
+            }
+        }
+
+        return buf.toString();
+    }
 }

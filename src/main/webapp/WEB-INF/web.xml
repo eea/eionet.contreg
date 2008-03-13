@@ -93,6 +93,19 @@
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 	
+	<servlet>
+        <servlet-name>XmlRpcServlet</servlet-name>
+        <servlet-class>eionet.cr.api.xmlrpc.CRXmlRpcServlet</servlet-class>
+        <init-param>
+          <param-name>enabledForExtensions</param-name>
+          <param-value>true</param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>XmlRpcServlet</servlet-name>
+        <url-pattern>/xmlrpc</url-pattern>
+    </servlet-mapping>
+	
 	<servlet-mapping>
 		<servlet-name>StripesDispatcher</servlet-name>
 		<url-pattern>/dispatcher</url-pattern>

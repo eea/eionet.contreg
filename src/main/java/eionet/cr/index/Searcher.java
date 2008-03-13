@@ -8,6 +8,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -76,7 +77,7 @@ public class Searcher {
 	 * @throws ParseException
 	 * @throws IOException
 	 */
-	public static synchronized List<Hashtable<String,String[]>> search(String query) throws ParseException, IOException{
+	public static synchronized List<Map<String,String[]>> search(String query) throws ParseException, IOException{
 		return search(query, defaultAnalyzer);
 	}
 	
@@ -91,7 +92,7 @@ public class Searcher {
 	 * @throws IOException 
 	 * @throws ParseException 
 	 */
-	public static synchronized List<Hashtable<String,String[]>> search(String query, String analyzerName) throws CorruptIndexException, IOException, ParseException{
+	public static synchronized List<Map<String,String[]>> search(String query, String analyzerName) throws CorruptIndexException, IOException, ParseException{
 
 		QueryParser parser = new QueryParser(DEFAULT_FIELD, getAvailableAnalyzer(analyzerName));
 		Query queryObj = parser.parse(query);
@@ -106,7 +107,8 @@ public class Searcher {
 		}
 		finally{
 			try{
-				indexSearcher.close();
+				if (indexSearcher!=null)
+					indexSearcher.close();
 			}
 			catch (IOException e){}
 		}
@@ -119,13 +121,13 @@ public class Searcher {
 	 * @throws IOException 
 	 * @throws CorruptIndexException 
 	 */
-	public static List<Hashtable<String,String[]>> processHits(Hits hits) throws CorruptIndexException, IOException{
+	public static List<Map<String,String[]>> processHits(Hits hits) throws CorruptIndexException, IOException{
 		
-		List<Hashtable<String,String[]>> list = new ArrayList<Hashtable<String,String[]>>();
+		List<Map<String,String[]>> list = new ArrayList<Map<String,String[]>>();
 		for (int i=0; hits!=null && i<hits.length(); i++){
 			
 			Document doc = hits.doc(i);
-			Hashtable<String,String[]> hash = new Hashtable<String,String[]>();
+			Map<String,String[]> map = new Hashtable<String,String[]>();
 			List allFields = doc.getFields();
 			
 			for (int j=0; allFields!=null && j<allFields.size(); j++){
@@ -133,10 +135,10 @@ public class Searcher {
 				String fieldName = field.name();
 				String[] fieldValues = doc.getValues(fieldName);
 				if (fieldValues!=null && fieldValues.length>0)
-					hash.put(field.name(), fieldValues);
+					map.put(field.name(), fieldValues);
 			}
 			
-			list.add(hash);
+			list.add(map);
 		}
 		
 		return list;

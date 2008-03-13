@@ -2,6 +2,7 @@ package eionet.cr.index;
 
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletContext;
 
@@ -92,7 +93,7 @@ public class EncodingSchemes extends Hashtable<String,String[]>{
 		
 		logger.debug("Loading encoding schemes");
 		
-		List hits = null;
+		List<Map<String,String[]>> hits = null;
 		try{
 			hits = Searcher.search(Identifiers.IS_ENCODING_SCHEME + ":" + Boolean.TRUE.toString());
 		}
@@ -102,10 +103,10 @@ public class EncodingSchemes extends Hashtable<String,String[]>{
 
 		int countLoaded = 0;
 		for (int i=0; hits!=null && i<hits.size(); i++){
-			Hashtable hash = (Hashtable)hits.get(i);
-			String[] ids = (String[])hash.get(Identifiers.DOC_ID);
+			Map<String,String[]> map = hits.get(i);
+			String[] ids = map.get(Identifiers.DOC_ID);
 			if (ids!=null && ids.length>0){
-				getInstance().update(ids[0], (String[])hash.get("http://www.w3.org/2000/01/rdf-schema#label"));
+				getInstance().update(ids[0], map.get("http://www.w3.org/2000/01/rdf-schema#label"));
 				countLoaded++;
 			}
 		}
