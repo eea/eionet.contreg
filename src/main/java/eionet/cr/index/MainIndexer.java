@@ -72,6 +72,9 @@ public class MainIndexer extends Indexer{
 			}
 		}
 		
+		if (countDocumentsIndexed==0)
+			logger.debug("Indexing resources, source URL = " + resource.getSourceId());
+		
 		Document document = new Document();		
 		document.add(new Field(Identifiers.DOC_ID, resource.getId(), Field.Store.YES, Field.Index.UN_TOKENIZED));
 		document.add(new Field(Identifiers.SOURCE_ID, resource.getSourceId(), Field.Store.YES, Field.Index.UN_TOKENIZED));

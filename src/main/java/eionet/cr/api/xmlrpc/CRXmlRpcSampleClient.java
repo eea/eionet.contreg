@@ -16,7 +16,7 @@ import eionet.cr.util.Util;
  * @author heinljab
  *
  */
-public class CRXmlRpcClient {
+public class CRXmlRpcSampleClient {
 
 	/**
 	 * 

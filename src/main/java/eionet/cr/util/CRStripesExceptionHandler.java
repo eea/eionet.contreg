@@ -43,7 +43,6 @@ public class CRStripesExceptionHandler implements ExceptionHandler {
     	logger.error(newThrowable.getMessage(), newThrowable);
     	request.setAttribute("exception", newThrowable);
     	request.getRequestDispatcher("/pages/error.jsp").forward(request, response);
-    	
     }
 
     /**

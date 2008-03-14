@@ -10,8 +10,11 @@ import eionet.cr.dto.HarvestDTO;
 import eionet.cr.dto.HarvestMessageDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.harvest.DefaultHarvestListener;
+import eionet.cr.harvest.Harvest;
+import eionet.cr.harvest.HarvestDAOWriter;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.Harvester;
+import eionet.cr.harvest.PullHarvest;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.DontValidate;
 import net.sourceforge.stripes.action.ForwardResolution;
@@ -162,18 +165,25 @@ public class HarvestSourceActionBean extends AbstractCRActionBean {
     	
     	if(isUserLoggedIn()){
     		
-	    	harvestSource = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(harvestSource.getSourceId());
-	    	HarvestDAO harvestDAO = DAOFactory.getDAOFactory().getHarvestDAO();
-	    	
-			DefaultHarvestListener harvestListener = new DefaultHarvestListener(harvestSource, "pull", getCRUser(), harvestDAO);
-			Harvester.pull(harvestListener);
-			
-			harvests = harvestDAO.getHarvestsBySourceId(harvestSource.getSourceId());
+    		// TODO - remove these comments after the new code is stable enough
+//	    	harvestSource = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(harvestSource.getSourceId());
+//	    	HarvestDAO harvestDAO = DAOFactory.getDAOFactory().getHarvestDAO();
+//	    	
+//			DefaultHarvestListener harvestListener = new DefaultHarvestListener(harvestSource, "pull", getCRUser(), harvestDAO);
+//			Harvester.pull(harvestListener);
 
-			showMessage("Resources in total: " + harvestListener.getCountTotalResources());
-			showMessage("Resources as encoding schemes: " + harvestListener.getCountEncodingSchemes());
-			showMessage("Statements in total: " + harvestListener.getCountTotalStatements());
-			showMessage("Statements with literal objects: " + harvestListener.getCountLiteralStatements());
+    		harvestSource = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(harvestSource.getSourceId());
+    		Harvest harvest = new PullHarvest(harvestSource.getUrl(),
+    				new HarvestDAOWriter(harvestSource.getSourceId().intValue(), Harvest.TYPE_PULL, getCRUser()==null ? null : getCRUser().getUserName()),
+    				null);
+    		harvest.execute();
+    		
+			harvests = DAOFactory.getDAOFactory().getHarvestDAO().getHarvestsBySourceId(harvestSource.getSourceId());
+
+			showMessage("Resources in total: " + harvest.getCountTotalResources());
+			showMessage("Resources as encoding schemes: " + harvest.getCountEncodingSchemes());
+			showMessage("Statements in total: " + harvest.getCountTotalStatements());
+			showMessage("Statements with literal objects: " + harvest.getCountLiteralStatements());
     	}
     	else{
     		handleCrException(getBundle().getString("not.logged.in"), GeneralConfig.SEVERITY_WARNING);

@@ -44,10 +44,10 @@ import eionet.cr.util.Util;
  * @author Jaanus Heinlaid, e-mail: <a href="mailto:jaanus.heinlaid@tietoenator.com">jaanus.heinlaid@tietoenator.com</a>
  *
  */
-public class RDFHandler implements StatementHandler, org.xml.sax.ErrorHandler{
+public class CopyOfRDFHandler implements StatementHandler, org.xml.sax.ErrorHandler{
 
 	/** */
-	private static Log logger = LogFactory.getLog(RDFHandler.class);
+	private static Log logger = LogFactory.getLog(CopyOfRDFHandler.class);
 	
 	/** */
 	private String currentDocumentID;
@@ -64,11 +64,19 @@ public class RDFHandler implements StatementHandler, org.xml.sax.ErrorHandler{
 	
 	/** */
 	private Map<String,RDFResource> rdfResources = new HashMap<String,RDFResource>();
-	
+
+	/** */
+	private List<SAXParseException> errors = new ArrayList<SAXParseException>();
+	private List<SAXParseException> warnings = new ArrayList<SAXParseException>();
+
 	/**
 	 * 
 	 */
-	public RDFHandler(String sourceUrlString, HarvestListener harvestListener){
+	public CopyOfRDFHandler(String sourceUrlString){
+		
+		if (sourceUrlString==null)
+			throw new NullPointerException();
+		
 		this.sourceUrlString = sourceUrlString;
 	}
 	
@@ -157,6 +165,7 @@ public class RDFHandler implements StatementHandler, org.xml.sax.ErrorHandler{
      * @see org.xml.sax.ErrorHandler#error(org.xml.sax.SAXParseException)
      */
 	public void error(SAXParseException e) throws SAXException {
+		errors.add(e);
 		logger.error("SAX error encountered: " + e.toString(), e);
 	}
 
@@ -173,6 +182,7 @@ public class RDFHandler implements StatementHandler, org.xml.sax.ErrorHandler{
 	 * @see org.xml.sax.ErrorHandler#warning(org.xml.sax.SAXParseException)
 	 */
 	public void warning(SAXParseException e) throws SAXException {
+		warnings.add(e);
 		logger.warn("SAX warning encountered: " + e.toString(), e);
 	}
 
@@ -196,5 +206,27 @@ public class RDFHandler implements StatementHandler, org.xml.sax.ErrorHandler{
 	 */
 	public Map<String, RDFResource> getRdfResources() {
 		return rdfResources;
+	}
+
+	/**
+	 * @return the errors
+	 */
+	public List<SAXParseException> getErrors() {
+		return errors;
+	}
+
+	/**
+	 * @return the warnings
+	 */
+	public List<SAXParseException> getWarnings() {
+		return warnings;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public int getCountResources(){
+		return rdfResources.size();
 	}
 }
