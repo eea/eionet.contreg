@@ -9,11 +9,9 @@ import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dto.HarvestDTO;
 import eionet.cr.dto.HarvestMessageDTO;
 import eionet.cr.dto.HarvestSourceDTO;
-import eionet.cr.harvest.DefaultHarvestListener;
 import eionet.cr.harvest.Harvest;
 import eionet.cr.harvest.HarvestDAOWriter;
 import eionet.cr.harvest.HarvestException;
-import eionet.cr.harvest.Harvester;
 import eionet.cr.harvest.PullHarvest;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.DontValidate;
@@ -165,13 +163,6 @@ public class HarvestSourceActionBean extends AbstractCRActionBean {
     	
     	if(isUserLoggedIn()){
     		
-    		// TODO - remove these comments after the new code is stable enough
-//	    	harvestSource = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(harvestSource.getSourceId());
-//	    	HarvestDAO harvestDAO = DAOFactory.getDAOFactory().getHarvestDAO();
-//	    	
-//			DefaultHarvestListener harvestListener = new DefaultHarvestListener(harvestSource, "pull", getCRUser(), harvestDAO);
-//			Harvester.pull(harvestListener);
-
     		harvestSource = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(harvestSource.getSourceId());
     		Harvest harvest = new PullHarvest(harvestSource.getUrl(),
     				new HarvestDAOWriter(harvestSource.getSourceId().intValue(), Harvest.TYPE_PULL, getCRUser()==null ? null : getCRUser().getUserName()),

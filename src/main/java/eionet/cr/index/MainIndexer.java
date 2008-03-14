@@ -22,8 +22,6 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.LockObtainFailedException;
 
 import eionet.cr.config.GeneralConfig;
-import eionet.cr.harvest.DefaultHarvestListener;
-import eionet.cr.harvest.Harvester;
 import eionet.cr.harvest.util.RDFResource;
 import eionet.cr.harvest.util.RDFResourceProperty;
 import eionet.cr.util.Identifiers;
