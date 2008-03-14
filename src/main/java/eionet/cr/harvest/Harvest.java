@@ -130,7 +130,7 @@ public abstract class Harvest {
 		logger.debug("Parsing local file: " + file.getAbsolutePath());
 		
 		InputStreamReader reader = null;
-		CopyOfRDFHandler rdfHandler = new CopyOfRDFHandler(sourceUrlString);
+		RDFHandler rdfHandler = new RDFHandler(sourceUrlString);
 		try{			
 	        reader = new InputStreamReader(new FileInputStream(file));	        	        
 			ARP arp = new ARP();

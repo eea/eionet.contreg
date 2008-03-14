@@ -44,10 +44,10 @@ import eionet.cr.util.Util;
  * @author Jaanus Heinlaid, e-mail: <a href="mailto:jaanus.heinlaid@tietoenator.com">jaanus.heinlaid@tietoenator.com</a>
  *
  */
-public class CopyOfRDFHandler implements StatementHandler, org.xml.sax.ErrorHandler{
+public class RDFHandler implements StatementHandler, org.xml.sax.ErrorHandler{
 
 	/** */
-	private static Log logger = LogFactory.getLog(CopyOfRDFHandler.class);
+	private static Log logger = LogFactory.getLog(RDFHandler.class);
 	
 	/** */
 	private String currentDocumentID;
@@ -72,7 +72,7 @@ public class CopyOfRDFHandler implements StatementHandler, org.xml.sax.ErrorHand
 	/**
 	 * 
 	 */
-	public CopyOfRDFHandler(String sourceUrlString){
+	public RDFHandler(String sourceUrlString){
 		
 		if (sourceUrlString==null)
 			throw new NullPointerException();
