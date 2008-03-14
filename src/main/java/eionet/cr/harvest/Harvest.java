@@ -92,9 +92,12 @@ public abstract class Harvest {
 			doExecute();
 			noProblems = true;
 		}
-		catch (HarvestException e){
-			fatalError = e;
-			throw e;
+		catch (Throwable t){
+			fatalError = t;
+			if (t instanceof HarvestException)
+				throw (HarvestException)t;
+			else
+				throw new HarvestException(t.toString(), t);
 		}
 		finally{
 			try{

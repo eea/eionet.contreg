@@ -5,6 +5,7 @@ import org.apache.commons.logging.LogFactory;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
+import eionet.cr.harvest.util.HarvestMessagesMask;
 
 /**
  * 
@@ -55,7 +56,7 @@ public class HarvestDAOWriter {
 				harvest.getCountLiteralStatements(),
 				harvest.getCountTotalResources(),
 				harvest.getCountEncodingSchemes(),
-				null); // TODO put a real value herer
+				HarvestMessagesMask.toString(harvest.getFatalError()!=null, harvest.getErrors().size()>0, harvest.getWarnings().size()>0));
 }
 
 	/**
