@@ -27,7 +27,6 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.harvest.util.RDFResource;
 import eionet.cr.index.IndexException;
 import eionet.cr.index.Indexer;
-import eionet.cr.index.MainIndexer;
 import eionet.cr.util.Identifiers;
 
 /**
@@ -50,7 +49,7 @@ public abstract class Harvest {
 	protected String sourceUrlString = null;
 	
 	/** */
-	protected Indexer indexer = new MainIndexer();
+	protected Indexer indexer = new Indexer();
 
 	/** */
 	private int countTotalResources = 0;
