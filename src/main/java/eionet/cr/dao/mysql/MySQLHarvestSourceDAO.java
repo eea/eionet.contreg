@@ -198,35 +198,31 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 			ConnectionUtil.closeConnection(conn);
 		}
     }
-    
+
     /** */
-	private static final String getHarvestByIdSQL = "select * from HARVEST where HARVEST_ID=?";
-	
-	/*
+    private static final String updateHarvestFinishedSQL = "update HARVEST_SOURCE set STATEMENTS=?, RESOURCES=? where HARVEST_SOURCE_ID=?";
+
+    /*
      * (non-Javadoc)
-     * 
-     * @see eionet.cr.dao.HarvestSourceDao#getHarvestById()
+     * @see eionet.cr.dao.HarvestSourceDAO#updateHarvestFinished(int, Integer, Integer)
      */
-    public HarvestDTO getHarvestById(Integer harvestID) throws DAOException {
-    	List<Object> values = new ArrayList<Object>();
-    	values.add(harvestID);
-				
+	public void updateHarvestFinished(int sourceId, Integer numStatements, Integer numResources) throws DAOException {
+		
+		List<Object> values = new ArrayList<Object>();
+		values.add(numStatements);
+		values.add(numResources);
+		values.add(new Integer(sourceId));
+		
 		Connection conn = null;
-		HarvestDTOReader rsReader = new HarvestDTOReader();
 		try{
 			conn = getConnection();
-			SQLUtil.executeQuery(getHarvestByIdSQL, values, rsReader, conn);
-			List<HarvestDTO>  list = rsReader.getResultList();
-			return list!=null && list.size()>0 ? list.get(0) : null;
+			SQLUtil.executeUpdate(updateHarvestFinishedSQL, values, conn);
 		}
 		catch (Exception e){
 			throw new DAOException(e.getMessage(), e);
 		}
 		finally{
-			try{
-				if (conn!=null) conn.close();
-			}
-			catch (SQLException e){}
+			ConnectionUtil.closeConnection(conn);
 		}
-    }
+	}
 }

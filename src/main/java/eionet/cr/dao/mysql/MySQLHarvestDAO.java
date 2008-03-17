@@ -51,17 +51,18 @@ public class MySQLHarvestDAO extends MySQLBaseDAO implements HarvestDAO {
 
 	/** */
 	private static final String updateFinishedHarvestSQL =
-		"update HARVEST set FINISHED=now(), TOT_STATEMENTS=?, LIT_STATEMENTS=?, RES_STATEMENTS=?, TOT_RESOURCES=?, ENC_SCHEMES=?, MESSAGES=? " +
+		"update HARVEST set STATUS=?, FINISHED=now(), TOT_STATEMENTS=?, LIT_STATEMENTS=?, RES_STATEMENTS=?, TOT_RESOURCES=?, ENC_SCHEMES=?, MESSAGES=? " +
 		"where HARVEST_ID=?";
 	
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.dao.HarvestDAO#updateFinishedHarvest(int, int, int, int, int, java.lang.String)
 	 */
-	public void updateFinishedHarvest(int harvestId, int totStatements, int litStatements,
+	public void updateFinishedHarvest(int harvestId, String status, int totStatements, int litStatements,
 			int totResources, int encSchemes, String messages) throws DAOException {
 		
 		List<Object> values = new ArrayList<Object>();
+		values.add(status);
 		values.add(new Integer(totStatements));
 		values.add(new Integer(litStatements));
 		values.add(new Integer(totStatements-litStatements));
@@ -114,4 +115,35 @@ public class MySQLHarvestDAO extends MySQLBaseDAO implements HarvestDAO {
 			catch (SQLException e){}
 		}
     }
+
+    /** */
+	private static final String getHarvestByIdSQL = "select * from HARVEST where HARVEST_ID=?";
+
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.dao.HarvestDAO#getHarvestById(java.lang.Integer)
+     */
+	public HarvestDTO getHarvestById(Integer harvestId) throws DAOException {
+		
+		List<Object> values = new ArrayList<Object>();
+    	values.add(harvestId);
+				
+		Connection conn = null;
+		HarvestDTOReader rsReader = new HarvestDTOReader();
+		try{
+			conn = getConnection();
+			SQLUtil.executeQuery(getHarvestByIdSQL, values, rsReader, conn);
+			List<HarvestDTO>  list = rsReader.getResultList();
+			return list!=null && list.size()>0 ? list.get(0) : null;
+		}
+		catch (Exception e){
+			throw new DAOException(e.getMessage(), e);
+		}
+		finally{
+			try{
+				if (conn!=null) conn.close();
+			}
+			catch (SQLException e){}
+		}
+	}
 }

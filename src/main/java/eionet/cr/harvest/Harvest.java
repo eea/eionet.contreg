@@ -18,6 +18,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.FieldSelector;
 import org.apache.lucene.document.MapFieldSelector;
+import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
 
 import com.hp.hpl.jena.rdf.arp.ARP;
@@ -27,6 +28,7 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.harvest.util.RDFResource;
 import eionet.cr.index.IndexException;
 import eionet.cr.index.Indexer;
+import eionet.cr.index.Searcher;
 import eionet.cr.util.Identifiers;
 
 /**
@@ -39,8 +41,14 @@ public abstract class Harvest {
 	/** */
 	private static final String HARVEST_FILE_NAME_EXTENSION = ".xml";
 	public static final String STATUS_STARTED = "started";
+	public static final String STATUS_FINISHED = "finished";
 	public static final String TYPE_PULL = "pull";
 	public static final String TYPE_PUSH = "push";
+	
+	/** */
+	public static final String FATAL = "ftl";
+	public static final String ERROR = "err";
+	public static final String WARNING = "wrn";
 	
 	/** */
 	private static Log logger = LogFactory.getLog(Harvest.class);
@@ -313,6 +321,7 @@ public abstract class Harvest {
 	 */
 	protected void doHarvestFinishedActions(){
 		
+		// send notification of messages that occured during the harvest
 		try{
 			if (notificationSender!=null)
 				notificationSender.notifyMessages(this);
@@ -322,22 +331,44 @@ public abstract class Harvest {
 			logger.error("Harvest notification sender threw an error: " + e.toString(), e);
 		}
 		
+		ArrayList<Throwable> finishedActionsErrors  = new ArrayList<Throwable>();
+		
+		// get the number of harvested resources now in the given source
+		Integer numDocsInSource = null;
+		try {
+			numDocsInSource = new Integer(Searcher.getNumDocsBySourceUrl(sourceUrlString));
+		}
+		catch (IOException e){
+			numDocsInSource = null;
+			errors.add(e);
+			finishedActionsErrors.add(e);
+			logger.error("Error when getting the count of documents in the given source: " + e.toString(), e);
+		}
+		
+		// call harvest finished functions of the DAO
 		try{
 			if (daoWriter!=null){
-				daoWriter.writeFinished(this);
+				daoWriter.writeFinished(this, numDocsInSource);
 				daoWriter.writeMessages(this);
 			}
 		}
 		catch (DAOException e){
 			errors.add(e);
+			finishedActionsErrors.add(e);
 			logger.error("Harvest DAO writer threw an exception: " + e.toString(), e);
-			try{
-				if (notificationSender!=null)
-					notificationSender.notifyMessage("The following error occured after harevst finished: " + e.toString(), e, this);
+		}
+
+		// send notification of errors happened when executing harvest actions 
+		try{
+			if (notificationSender!=null && finishedActionsErrors.size()>0){
+				for (int i=0; i<finishedActionsErrors.size(); i++){
+					Throwable t = finishedActionsErrors.get(i);
+					notificationSender.notifyMessage("The following error occured after harvest finished: " + t.toString(), t, this);
+				}
 			}
-			catch (HarvestException ee){
-				logger.error("Harvest notification sender threw an error: " + ee.toString(), ee);
-			}
+		}
+		catch (HarvestException ee){
+			logger.error("Harvest notification sender threw an error: " + ee.toString(), ee);
 		}
 		
 		logger.debug("Harvest finished, source URL = " + sourceUrlString);

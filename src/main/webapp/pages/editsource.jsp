@@ -46,8 +46,10 @@
 	                </td>
 	            </tr>
 	            <tr>
-	                <td>Statements harvested:</td>
-	                <td>&nbsp;</td>
+	                <td>Number of resources:</td>
+	                <td>
+	                	${actionBean.harvestSource.resources}
+	                </td>
 	            </tr>
 	            <tr>
 	                <td>Schedule:</td>

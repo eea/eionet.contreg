@@ -33,6 +33,7 @@ public class HarvestSourceDTOReader extends ResultSetBaseReader {
 		harvestSourceDTO.setDateCreated(rs.getDate("DATE_CREATED"));
 		harvestSourceDTO.setCreator(rs.getString("CREATOR"));
 		harvestSourceDTO.setStatements(new Integer(rs.getInt("STATEMENTS")));
+		harvestSourceDTO.setResources(new Integer(rs.getInt("RESOURCES")));
 		resultList.add(harvestSourceDTO);
 	}
 

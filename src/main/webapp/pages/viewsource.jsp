@@ -42,8 +42,10 @@
 	                </td>
 	            </tr>
 	            <tr>
-	                <td>Statements harvested:</td>
-	                <td>&nbsp;</td>
+	                <td>Number of resources:</td>
+	                <td>
+	                	${actionBean.harvestSource.resources}
+	                </td>
 	            </tr>
 	            <tr>
 	                <td>Schedule:</td>
@@ -90,10 +92,9 @@
 	        				<td>${harv.encodingSchemes}</td>
 	        				<td>${harv.totalStatements}</td>
 							<td>
-		        				<stripes:link href="/source.action" event="preViewHarvest">
+		        				<stripes:link href="/harvest.action">
 	                                <img src="${pageContext.request.contextPath}/images/view2.gif" title="View"/>
-	                                <stripes:param name="harvest.harvestId" value="${harv.harvestId}"/>
-	                                <stripes:param name="harvest.harvestSourceId" value="${harv.harvestSourceId}"/>
+	                                <stripes:param name="harvestDTO.harvestId" value="${harv.harvestId}"/>
 	                            </stripes:link>
 		        			</td>	        				
 	        			</tr>

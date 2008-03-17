@@ -47,7 +47,6 @@ public class TestHarvestSourceDAO {
 		ConnectionUtil.setTestConnection(true);
 		List<HarvestSourceDTO> sources = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSources();
 		assertEquals(43, sources.size());
-		
 	}
 	
 	@Test

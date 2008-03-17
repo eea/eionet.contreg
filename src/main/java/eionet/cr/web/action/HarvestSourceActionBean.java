@@ -29,8 +29,6 @@ public class HarvestSourceActionBean extends AbstractCRActionBean {
 	/** */
 	private HarvestSourceDTO harvestSource;
 	private List<HarvestDTO> harvests;
-	private List<HarvestMessageDTO> harvestMessages;
-	private HarvestDTO harvest;
 	
 	/**
 	 * 
@@ -47,7 +45,6 @@ public class HarvestSourceActionBean extends AbstractCRActionBean {
 	public void setHarvestSource(HarvestSourceDTO harvestSource) {
 		this.harvestSource = harvestSource;
 	}
-	
 
 	public List<HarvestDTO> getHarvests() {
 		return harvests;
@@ -55,22 +52,6 @@ public class HarvestSourceActionBean extends AbstractCRActionBean {
 
 	public void setHarvests(List<HarvestDTO> harvests) {
 		this.harvests = harvests;
-	}
-
-	public List<HarvestMessageDTO> getHarvestMessages() {
-		return harvestMessages;
-	}
-
-	public void setHarvestMessages(List<HarvestMessageDTO> harvestMessages) {
-		this.harvestMessages = harvestMessages;
-	}
-
-	public HarvestDTO getHarvest() {
-		return harvest;
-	}
-
-	public void setHarvest(HarvestDTO harvest) {
-		this.harvest = harvest;
 	}
 
 	/**
@@ -123,19 +104,6 @@ public class HarvestSourceActionBean extends AbstractCRActionBean {
     	harvestSource = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(harvestSource.getSourceId());
     	harvests = DAOFactory.getDAOFactory().getHarvestDAO().getHarvestsBySourceId(harvestSource.getSourceId());
     	return new RedirectResolution("/pages/viewsource.jsp").flash(this);
-    }
-    
-    /**
-     * 
-     * @return
-     * @throws DAOException
-     */
-    @DontValidate
-    public Resolution preViewHarvest() throws DAOException {
-    	harvest = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestById(harvest.getHarvestId());
-    	harvestSource = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(harvest.getHarvestSourceId());
-    	harvestMessages = DAOFactory.getDAOFactory().getHarvestMessageDAO().findHarvestMessagesByHarvestID(harvest.getHarvestId());
-    	return new RedirectResolution("/pages/harvest.jsp").flash(this);
     }
     
     /**

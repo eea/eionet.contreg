@@ -22,6 +22,7 @@ public class HarvestSourceDTO implements Serializable {
 	private Date dateCreated;
 	private String creator;
 	private Integer statements;
+	private Integer resources;
 	private HarvestScheduleDTO harvestSchedule;
 	
 	/**
@@ -83,5 +84,19 @@ public class HarvestSourceDTO implements Serializable {
 	}
 	public void setHarvestSchedule(HarvestScheduleDTO harvestSchedule) {
 		this.harvestSchedule = harvestSchedule;
+	}
+
+	/**
+	 * @return the resources
+	 */
+	public Integer getResources() {
+		return resources;
+	}
+
+	/**
+	 * @param resources the resources to set
+	 */
+	public void setResources(Integer resources) {
+		this.resources = resources;
 	}
 }

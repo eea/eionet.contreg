@@ -77,7 +77,7 @@ public class Searcher {
 	 * @throws ParseException
 	 * @throws IOException
 	 */
-	public static synchronized List<Map<String,String[]>> search(String query) throws ParseException, IOException{
+	public static List<Map<String,String[]>> search(String query) throws ParseException, IOException{
 		return search(query, defaultAnalyzer);
 	}
 	
@@ -92,7 +92,7 @@ public class Searcher {
 	 * @throws IOException 
 	 * @throws ParseException 
 	 */
-	public static synchronized List<Map<String,String[]>> search(String query, String analyzerName) throws CorruptIndexException, IOException, ParseException{
+	public static List<Map<String,String[]>> search(String query, String analyzerName) throws CorruptIndexException, IOException, ParseException{
 
 		QueryParser parser = new QueryParser(DEFAULT_FIELD, getAvailableAnalyzer(analyzerName));
 		Query queryObj = parser.parse(query);
@@ -104,6 +104,32 @@ public class Searcher {
 			indexSearcher = getIndexSearcher();
 			Hits hits = indexSearcher.search(queryObj);
 			return processHits(hits);
+		}
+		finally{
+			try{
+				if (indexSearcher!=null)
+					indexSearcher.close();
+			}
+			catch (IOException e){}
+		}
+	}
+	
+	/**
+	 * 
+	 * @param sourceUrl
+	 * @return
+	 * @throws CorruptIndexException
+	 * @throws IOException
+	 */
+	public static int getNumDocsBySourceUrl(String sourceUrl) throws CorruptIndexException, IOException{
+		
+		if (sourceUrl==null || sourceUrl.length()==0)
+			return 0;
+
+		IndexSearcher indexSearcher = null;
+		try{
+			indexSearcher = getIndexSearcher();
+			return indexSearcher.docFreq(new Term(Identifiers.SOURCE_ID, sourceUrl));
 		}
 		finally{
 			try{

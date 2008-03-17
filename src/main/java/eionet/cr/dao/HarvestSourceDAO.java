@@ -40,11 +40,13 @@ public interface HarvestSourceDAO {
      * @param HarvestSourceDTO source
      */
     public void deleteSource(HarvestSourceDTO source) throws DAOException;
-    
+
     /**
-     * @return harvest
+     * 
+     * @param sourceId
+     * @param numStatements
+     * @param numResources
      * @throws DAOException
-     * @param Integer harvestID
      */
-    public HarvestDTO getHarvestById(Integer harvestSourceID) throws DAOException;
+    public void updateHarvestFinished(int sourceId, Integer numStatements, Integer numResources) throws DAOException;
 }

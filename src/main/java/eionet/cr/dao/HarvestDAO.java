@@ -22,7 +22,7 @@ public interface HarvestDAO {
 	 * @param harvestDTO
 	 * @throws DAOException
 	 */
-	public void updateFinishedHarvest(int harvestId, int totStatements,
+	public void updateFinishedHarvest(int harvestId, String status, int totStatements,
 			int litStatements, int totResources, int encSchemes, String messages) throws DAOException;
 	
 	/**
@@ -30,4 +30,12 @@ public interface HarvestDAO {
 	 * @param harvestSourceId
 	 */
 	public List<HarvestDTO> getHarvestsBySourceId(Integer harvestSourceId) throws DAOException;
+
+	/**
+	 * 
+	 * @param harvestId
+	 * @return
+	 * @throws DAOException
+	 */
+    public HarvestDTO getHarvestById(Integer harvestId) throws DAOException;
 }

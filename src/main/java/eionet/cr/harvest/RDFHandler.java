@@ -78,6 +78,12 @@ public class RDFHandler implements StatementHandler, org.xml.sax.ErrorHandler{
 			throw new NullPointerException();
 		
 		this.sourceUrlString = sourceUrlString;
+		
+//		errors.add(new SAXParseException("testError1", null));
+//		errors.add(new SAXParseException("testError2", null));
+//		warnings.add(new SAXParseException("testWarning1", null));
+//		warnings.add(new SAXParseException("testWarning2", null));
+//		fatalError = new SAXParseException("testFatal", null);
 	}
 	
 	/*

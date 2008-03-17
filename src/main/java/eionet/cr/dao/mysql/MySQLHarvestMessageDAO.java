@@ -2,6 +2,7 @@ package eionet.cr.dao.mysql;
 
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import eionet.cr.dao.DAOException;
@@ -134,6 +135,4 @@ public class MySQLHarvestMessageDAO extends MySQLBaseDAO implements HarvestMessa
 			ConnectionUtil.closeConnection(conn);
 		}
     }
-
-
 }
