@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -56,7 +57,7 @@ public class PullHarvest extends Harvest{
 		FileOutputStream fos = null;
 		try{
 			URL url = new URL(urlString);
-			HttpURLConnection httpConn = (HttpURLConnection)url.openConnection();
+			URLConnection httpConn = url.openConnection();
 			httpConn.setRequestProperty("Accept", "application/rdf+xml");
 			
 			istream = httpConn.getInputStream();
