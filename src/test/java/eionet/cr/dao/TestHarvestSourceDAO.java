@@ -35,7 +35,7 @@ public class TestHarvestSourceDAO {
 		schedule.setWeekday("Monday");
 		harvestSource.setHarvestSchedule(schedule);
 		
-		ConnectionUtil.setTestConnection(true);
+		ConnectionUtil.setReturnSimpleConnection(true);
 		Integer harvestSourceID = DAOFactory.getDAOFactory().getHarvestSourceDAO().addSource(harvestSource, "bobsmith");
 		assertNotNull(harvestSourceID);
 		harvestSource.setSourceId(harvestSourceID);
@@ -44,7 +44,7 @@ public class TestHarvestSourceDAO {
 	@Test
 	public void testGetHarvestSources() throws Exception {
 		
-		ConnectionUtil.setTestConnection(true);
+		ConnectionUtil.setReturnSimpleConnection(true);
 		List<HarvestSourceDTO> sources = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSources();
 		assertEquals(43, sources.size());
 	}
@@ -52,7 +52,7 @@ public class TestHarvestSourceDAO {
 	@Test
 	public void testGetHarvestSourceById() throws Exception {
 		
-		ConnectionUtil.setTestConnection(true);
+		ConnectionUtil.setReturnSimpleConnection(true);
 		HarvestSourceDTO source = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(harvestSource.getSourceId());
 		assertEquals("obligations", source.getName());
 		assertEquals("http://rod.eionet.europa.eu/testObligations", source.getUrl());
@@ -81,7 +81,7 @@ public class TestHarvestSourceDAO {
 		schedule.setWeekday("Sunday");
 		harvestSource.setHarvestSchedule(schedule);
 		
-		ConnectionUtil.setTestConnection(true);
+		ConnectionUtil.setReturnSimpleConnection(true);
 		DAOFactory.getDAOFactory().getHarvestSourceDAO().editSource(harvestSource);
 		
 		HarvestSourceDTO source = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(harvestSource.getSourceId());
@@ -95,7 +95,7 @@ public class TestHarvestSourceDAO {
 	@Test
 	public void testDeleteSource() throws Exception {
 
-		ConnectionUtil.setTestConnection(true);
+		ConnectionUtil.setReturnSimpleConnection(true);
 		DAOFactory.getDAOFactory().getHarvestSourceDAO().deleteSource(harvestSource);
 		
 		HarvestSourceDTO source = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(harvestSource.getSourceId());

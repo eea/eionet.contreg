@@ -25,14 +25,14 @@ public class TestHarvestScheduleDAO {
 		harvestSchedule.setWeekday("Monday");
 		harvestSchedule.setHarvestSourceId(55);
 		
-		ConnectionUtil.setTestConnection(true);
+		ConnectionUtil.setReturnSimpleConnection(true);
 		DAOFactory.getDAOFactory().getHarvestScheduleDAO().addSchedule(harvestSchedule);
 	}
 	
 	@Test
 	public void testGetHarvestScheduleBySourceId() throws Exception {
 		
-		ConnectionUtil.setTestConnection(true);
+		ConnectionUtil.setReturnSimpleConnection(true);
 		HarvestScheduleDTO schedule = DAOFactory.getDAOFactory().getHarvestScheduleDAO().getHarvestScheduleBySourceId(harvestSchedule.getHarvestSourceId());
 		assertEquals(12, schedule.getHour());
 		assertEquals(2, schedule.getPeriod());
@@ -48,7 +48,7 @@ public class TestHarvestScheduleDAO {
 		harvestSchedule.setPeriod(4);
 		harvestSchedule.setWeekday("Sunday");
 				
-		ConnectionUtil.setTestConnection(true);
+		ConnectionUtil.setReturnSimpleConnection(true);
 		DAOFactory.getDAOFactory().getHarvestScheduleDAO().editSchedule(harvestSchedule);
 		
 		HarvestScheduleDTO schedule = DAOFactory.getDAOFactory().getHarvestScheduleDAO().getHarvestScheduleBySourceId(harvestSchedule.getHarvestSourceId());
@@ -61,7 +61,7 @@ public class TestHarvestScheduleDAO {
 	@Test
 	public void testDeleteSchedule() throws Exception {
 
-		ConnectionUtil.setTestConnection(true);
+		ConnectionUtil.setReturnSimpleConnection(true);
 		DAOFactory.getDAOFactory().getHarvestScheduleDAO().deleteSchedule(harvestSchedule.getHarvestSourceId());
 		
 		HarvestScheduleDTO schedule = DAOFactory.getDAOFactory().getHarvestScheduleDAO().getHarvestScheduleBySourceId(harvestSchedule.getHarvestSourceId());

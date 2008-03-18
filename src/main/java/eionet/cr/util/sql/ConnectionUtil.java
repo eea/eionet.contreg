@@ -22,7 +22,7 @@ public class ConnectionUtil {
 
 	/** */
 	private static DataSource dataSource = null;
-	private static boolean testConnection = false;
+	private static boolean returnSimpleConnection = false;
 	
 	/**
 	 * 
@@ -41,7 +41,7 @@ public class ConnectionUtil {
 	 * @throws SQLException 
 	 */
 	public static Connection getConnection() throws DataSourceException, SQLException {
-		if(isTestConnection())
+		if(ConnectionUtil.returnSimpleConnection)
 			return getSimpleConnection();
 		else
 			return getJNDIConnection();
@@ -111,12 +111,20 @@ public class ConnectionUtil {
 		}
 	}
 
-	public static boolean isTestConnection() {
-		return testConnection;
+	/**
+	 * 
+	 * @return
+	 */
+	public static boolean isReturnSimpleConnection() {
+		return returnSimpleConnection;
 	}
 
-	public static void setTestConnection(boolean testConnection) {
-		ConnectionUtil.testConnection = testConnection;
+	/**
+	 * 
+	 * @param testConnection
+	 */
+	public static void setReturnSimpleConnection(boolean b) {
+		ConnectionUtil.returnSimpleConnection = b;
 	}
 
 }

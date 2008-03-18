@@ -27,7 +27,7 @@ public class TestHarvestMessageDAO {
 		harvestMessage.setStackTrace("teststack");
 		harvestMessage.setType("01");
 		
-		ConnectionUtil.setTestConnection(true);
+		ConnectionUtil.setReturnSimpleConnection(true);
 		Integer messageID = DAOFactory.getDAOFactory().getHarvestMessageDAO().insertHarvestMessage(harvestMessage);
 		assertNotNull(messageID);
 		harvestMessage.setHarvestMessageId(messageID);
@@ -36,7 +36,7 @@ public class TestHarvestMessageDAO {
 	@Test
 	public void testFindHarvestMessagesByHarvestID() throws Exception {
 		
-		ConnectionUtil.setTestConnection(true);
+		ConnectionUtil.setReturnSimpleConnection(true);
 		List<HarvestMessageDTO> messages = DAOFactory.getDAOFactory().getHarvestMessageDAO().findHarvestMessagesByHarvestID(harvestMessage.getHarvestId());
 		assertEquals(1, messages.size());
 		
@@ -45,7 +45,7 @@ public class TestHarvestMessageDAO {
 	@Test
 	public void testFindHarvestMessageByMessageID() throws Exception {
 		
-		ConnectionUtil.setTestConnection(true);
+		ConnectionUtil.setReturnSimpleConnection(true);
 		HarvestMessageDTO message = DAOFactory.getDAOFactory().getHarvestMessageDAO().findHarvestMessageByMessageID(harvestMessage.getHarvestMessageId());
 		assertEquals(55, message.getHarvestId());
 		assertEquals("test", message.getMessage());
@@ -58,7 +58,7 @@ public class TestHarvestMessageDAO {
 	@Test
 	public void testDeleteMessage() throws Exception {
 
-		ConnectionUtil.setTestConnection(true);
+		ConnectionUtil.setReturnSimpleConnection(true);
 		DAOFactory.getDAOFactory().getHarvestMessageDAO().deleteMessage(harvestMessage.getHarvestMessageId());
 		
 		HarvestMessageDTO message = DAOFactory.getDAOFactory().getHarvestMessageDAO().findHarvestMessageByMessageID(harvestMessage.getHarvestMessageId());
