@@ -42,7 +42,6 @@ public class HarvestDTOReader extends ResultSetBaseReader {
 		harvestDTO.setTotalStatements(new Integer(rs.getInt("TOT_STATEMENTS")));
 		harvestDTO.setLitObjStatements(new Integer(rs.getInt("LIT_STATEMENTS")));
 		
-		harvestDTO.setMessages(rs.getString("MESSAGES"));
 		resultList.add(harvestDTO);
 	}
 

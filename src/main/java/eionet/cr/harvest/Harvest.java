@@ -224,27 +224,34 @@ public abstract class Harvest {
 		
 		IndexReader indexReader = null;
 		try{
-			indexReader = IndexReader.open(GeneralConfig.getProperty(GeneralConfig.LUCENE_INDEX_LOCATION));
-			String[] fields = {Identifiers.DOC_ID, Identifiers.FIRST_SEEN_TIMESTAMP};
-			FieldSelector fieldSelector = new MapFieldSelector(fields);
-			int numDocs = indexReader.numDocs();
-			int countUpdated = 0;
-			for (int i=0; i<numDocs; i++){
-				Document document = indexReader.document(i, fieldSelector);
-				if (document!=null){
-					String docID = document.get(Identifiers.DOC_ID);
-					String firstTime = document.get(Identifiers.FIRST_SEEN_TIMESTAMP);
-					if (docID!=null && firstTime!=null){
-						RDFResource resource = resources.get(docID);
-						if (resource!=null){
-							resource.setFirstSeenTimestamp(firstTime);
-							countUpdated++;
+			String indexLocation = GeneralConfig.getProperty(GeneralConfig.LUCENE_INDEX_LOCATION);
+			if (IndexReader.indexExists(indexLocation)){
+				indexReader = IndexReader.open(indexLocation);
+				String[] fields = {Identifiers.DOC_ID, Identifiers.FIRST_SEEN_TIMESTAMP};
+				FieldSelector fieldSelector = new MapFieldSelector(fields);
+				int numDocs = indexReader.numDocs();
+				int countUpdated = 0;
+				for (int i=0; i<numDocs; i++){
+					Document document = indexReader.document(i, fieldSelector);
+					if (document!=null){
+						String docID = document.get(Identifiers.DOC_ID);
+						String firstTime = document.get(Identifiers.FIRST_SEEN_TIMESTAMP);
+						if (docID!=null && firstTime!=null){
+							RDFResource resource = resources.get(docID);
+							if (resource!=null){
+								resource.setFirstSeenTimestamp(firstTime);
+								countUpdated++;
+							}
 						}
 					}
 				}
+				
+				logger.debug("First-seen-times updated for " + countUpdated + " resources, a total of " + numDocs + " documents was found by index reader");
+			}
+			else{
+				logger.debug("No first-seen-times updated, because index does not yet exist");
 			}
 			
-			logger.debug("First-seen-times updated for " + countUpdated + " resources, a total of " + numDocs + " documents was found by index reader");;
 		}
 		catch (Throwable t){
 			throw new HarvestException("Failure when updating first times: " + t.toString(), t);

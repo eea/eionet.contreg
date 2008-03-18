@@ -27,7 +27,7 @@ public class CRXmlRpcSampleClient {
 		try{
 			// set up the XmlRpcClient
 			XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
-		    config.setServerURL(new URL("http://127.0.0.1:8080/cr/xmlrpc"));
+		    config.setServerURL(new URL("http://80.235.29.171:8080/cr/xmlrpc"));
 		    config.setEnabledForExtensions(true);
 		    XmlRpcClient client = new XmlRpcClient();
 		    client.setConfig(config);

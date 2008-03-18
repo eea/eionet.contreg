@@ -35,21 +35,21 @@ public class HarvestMessagesMask {
 	/**
 	 * @return the fatals
 	 */
-	private boolean hasFatals() {
+	public boolean hasFatals() {
 		return fatals;
 	}
 
 	/**
 	 * @return the errors
 	 */
-	private boolean hasErrors() {
+	public boolean hasErrors() {
 		return errors;
 	}
 
 	/**
 	 * @return the warngs
 	 */
-	private boolean hasWarngs() {
+	public boolean hasWarngs() {
 		return warngs;
 	}
 
@@ -83,16 +83,26 @@ public class HarvestMessagesMask {
 	 */
 	public static HarvestMessagesMask fromString(String str){
 		
-		boolean validString = true;
-		if (str==null || str.length()!=STR_LENGTH)
-			validString = false;
-		else if (!Character.isDigit(str.charAt(0)) || !Character.isDigit(str.charAt(1)) || !Character.isDigit(str.charAt(2)))
-			validString = false;
-		
-		if (!validString)
+		if (!isValid(str))
 			throw new CRRuntimeException("Invalid input string for " + HarvestMessagesMask.class.getSimpleName() + ": " + str==null ? null : str);
 		
 		return new HarvestMessagesMask(str.charAt(POS_FATALS)!='0', str.charAt(POS_ERRORS)!='0', str.charAt(POS_WARNGS)!='0');
+	}
+	
+	/**
+	 * 
+	 * @param str
+	 * @return
+	 */
+	public static boolean isValid(String str){
+		
+		boolean result = true;
+		if (str==null || str.length()!=STR_LENGTH)
+			result = false;
+		else if (!Character.isDigit(str.charAt(0)) || !Character.isDigit(str.charAt(1)) || !Character.isDigit(str.charAt(2)))
+			result = false;
+		
+		return result;
 	}
 	
 	/**

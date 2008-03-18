@@ -61,7 +61,7 @@
         <br/><br/>
         <c:choose>
         	<c:when test="${(empty actionBean.fatals) && (empty actionBean.errors) && (empty actionBean.warnings)}">
-        		<strong>No messages recorded for this harvest!</strong>
+        		<strong>No error messages or warnings found for this harvest.</strong>
 			</c:when>
 			<c:otherwise>
 				<c:if test="${!(empty actionBean.fatals)}">

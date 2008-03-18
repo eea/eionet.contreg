@@ -62,8 +62,8 @@ public class HarvestDAOWriter {
 				harvest.getCountTotalStatements(),
 				harvest.getCountLiteralStatements(),
 				harvest.getCountTotalResources(),
-				harvest.getCountEncodingSchemes(),
-				HarvestMessagesMask.toString(harvest.getFatalError()!=null, harvest.getErrors().size()>0, harvest.getWarnings().size()>0));
+				harvest.getCountEncodingSchemes());
+				//HarvestMessagesMask.toString(harvest.getFatalError()!=null, harvest.getErrors().size()>0, harvest.getWarnings().size()>0));
 		
 		DAOFactory.getDAOFactory().getHarvestSourceDAO().updateHarvestFinished(sourceId, null, numResourcesInSource);
 	}

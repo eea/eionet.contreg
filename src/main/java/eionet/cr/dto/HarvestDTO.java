@@ -1,11 +1,13 @@
 package eionet.cr.dto;
 
+import eionet.cr.harvest.util.HarvestMessagesMask;
+
 /**
  * 
  * @author heinljab
  *
  */
-public class HarvestDTO implements java.io.Serializable{
+public class HarvestDTO extends HarvestBaseDTO implements java.io.Serializable{
 	
 	private Integer harvestId;
 	private Integer harvestSourceId;
@@ -18,7 +20,6 @@ public class HarvestDTO implements java.io.Serializable{
 	private Integer encodingSchemes;
 	private Integer totalStatements;
 	private Integer litObjStatements;
-	private String messages;
 
 	/**
 	 * 
@@ -179,19 +180,4 @@ public class HarvestDTO implements java.io.Serializable{
 	public void setEncodingSchemes(Integer encodingSchemes) {
 		this.encodingSchemes = encodingSchemes;
 	}
-
-	/**
-	 * @return the messages
-	 */
-	public String getMessages() {
-		return messages;
-	}
-
-	/**
-	 * @param messages the messages to set
-	 */
-	public void setMessages(String messages) {
-		this.messages = messages;
-	}
-
 }
