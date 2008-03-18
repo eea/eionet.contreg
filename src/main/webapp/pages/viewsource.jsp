@@ -2,6 +2,9 @@
 
 <%@ include file="/pages/common/taglibs.jsp"%>	
 
+<%@ page import="eionet.cr.dto.HarvestBaseDTO" %>
+<%@ page import="eionet.cr.harvest.Harvest" %>
+
 <stripes:layout-render name="/pages/common/template.jsp" pageTitle="View Harvesting Source">
 	<stripes:layout-component name="errors"/>
 	<stripes:layout-component name="messages"/>
@@ -93,6 +96,12 @@
 	        				<td>${harv.totalStatements}</td>
 							<td>
 		        				<stripes:link href="/harvest.action">
+									<c:if test="${(!(empty harv.hasFatals) && harv.hasFatals) || (!(empty harv.hasErrors) && harv.hasErrors)}">
+										<img src="${pageContext.request.contextPath}/images/error.gif" title="Errors"/>
+									</c:if>
+									<c:if test="${!(empty harv.hasWarnings) && harv.hasWarnings}">
+										<img src="${pageContext.request.contextPath}/images/warning.gif" title="Warnings"/>
+									</c:if>
 	                                <img src="${pageContext.request.contextPath}/images/view2.gif" title="View"/>
 	                                <stripes:param name="harvestDTO.harvestId" value="${harv.harvestId}"/>
 	                            </stripes:link>

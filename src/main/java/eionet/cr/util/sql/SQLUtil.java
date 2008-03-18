@@ -143,7 +143,7 @@ public class SQLUtil {
 	 * @return
 	 * @throws SQLException
 	 */
-	private static PreparedStatement prepareStatement(String parameterizedSQL, List<Object> values, Connection conn) throws SQLException{
+	public static PreparedStatement prepareStatement(String parameterizedSQL, List<Object> values, Connection conn) throws SQLException{
 		
 		PreparedStatement pstmt= conn.prepareStatement(parameterizedSQL);
 		for (int i=0; values!=null && i<values.size(); i++){

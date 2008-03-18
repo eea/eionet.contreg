@@ -1,14 +1,18 @@
 package eionet.cr.dao.mysql;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HarvestDAO;
+import eionet.cr.dto.HarvestBaseDTO;
 import eionet.cr.dto.HarvestDTO;
 import eionet.cr.dto.readers.HarvestDTOReader;
+import eionet.cr.harvest.Harvest;
 import eionet.cr.util.sql.ConnectionUtil;
 import eionet.cr.util.sql.SQLUtil;
 
@@ -84,9 +88,8 @@ public class MySQLHarvestDAO extends MySQLBaseDAO implements HarvestDAO {
 	}
 	
 	/** */
-	private static final String getHarvestsBySourceIdSQL =
-		"select * from HARVEST where HARVEST_SOURCE_ID=? order by STARTED desc";
-
+	private static final String getHarvestsBySourceIdSQL = "select * from HARVEST where HARVEST_SOURCE_ID=? order by STARTED desc limit 10";
+	private static final String getMessageTypesByHarvestIdSQL = "select distinct TYPE from HARVEST_MESSAGE where HARVEST_ID=?";
 	/*
      * (non-Javadoc)
      * 
@@ -97,11 +100,28 @@ public class MySQLHarvestDAO extends MySQLBaseDAO implements HarvestDAO {
     	values.add(harvestSourceId);
 				
 		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
 		HarvestDTOReader rsReader = new HarvestDTOReader();
 		try{
 			conn = getConnection();
 			SQLUtil.executeQuery(getHarvestsBySourceIdSQL, values, rsReader, conn);
 			List<HarvestDTO>  list = rsReader.getResultList();
+
+			// get message types for found harvests
+			if (list!=null && list.size()>0){
+				stmt = conn.prepareStatement(getMessageTypesByHarvestIdSQL);
+				for (int i=0; i<list.size(); i++){
+					HarvestDTO harvestDTO = list.get(i);
+					stmt.setInt(1, harvestDTO.getHarvestId().intValue());
+					rs = stmt.executeQuery();
+					while (rs.next()){
+						HarvestBaseDTO.addMessageType(harvestDTO, rs.getString(1));
+					}
+					rs.close();
+				}
+			}
+			
 			return list;
 		}
 		catch (Exception e){
@@ -109,6 +129,8 @@ public class MySQLHarvestDAO extends MySQLBaseDAO implements HarvestDAO {
 		}
 		finally{
 			try{
+				if (rs!=null) rs.close();
+				if (stmt!=null) stmt.close();
 				if (conn!=null) conn.close();
 			}
 			catch (SQLException e){}
