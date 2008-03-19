@@ -165,5 +165,10 @@
 			<artifactId>ws-commons-util</artifactId>
 			<version>1.0.2</version>
 		</dependency>
+		<dependency>
+			<groupId>org.dbunit</groupId>
+			<artifactId>dbunit</artifactId>
+			<version>2.2</version>
+		</dependency>
 	</dependencies>
 </project>

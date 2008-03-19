@@ -15,6 +15,7 @@ public class GeneralConfig {
 	
 	/** */
 	public static final String PROPERTIES_FILE_NAME = "cr.properties";
+	public static final String SEED_FILE_NAME = "seed-cr.xml";
 
 	/** */
 	public static final String DB_URL = "db.url";

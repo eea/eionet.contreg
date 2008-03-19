@@ -1,13 +1,16 @@
 package eionet.cr.dao;
 
-import static org.junit.Assert.*;
-
 import java.util.List;
 
+import org.dbunit.DBTestCase;
+import org.dbunit.dataset.IDataSet;
+import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.junit.Test;
 
+import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dto.HarvestMessageDTO;
+import eionet.cr.test.util.DbHelper;
 import eionet.cr.util.sql.ConnectionUtil;
 
 /**
@@ -16,12 +19,28 @@ import eionet.cr.util.sql.ConnectionUtil;
  * @author altnyris
  *
  */
-public class TestHarvestMessageDAO {
-	private static HarvestMessageDTO harvestMessage;
+public class TestHarvestMessageDAO extends DBTestCase {
+	
+	/**
+	 * Provide a connection to the database.
+	 */
+	public TestHarvestMessageDAO(String name)
+	{
+		super( name );
+		DbHelper.setUpConnectionProperties();
+	}
+	/**
+	 * Load the data which will be inserted for the test
+	 */
+	protected IDataSet getDataSet() throws Exception {
+		IDataSet loadedDataSet = new FlatXmlDataSet(
+				getClass().getClassLoader().getResourceAsStream(GeneralConfig.SEED_FILE_NAME));
+		return loadedDataSet;
+	}
 	
 	@Test
 	public void testInsertHarvestMessage() throws Exception {
-		harvestMessage = new HarvestMessageDTO();
+		HarvestMessageDTO harvestMessage = new HarvestMessageDTO();
 		harvestMessage.setHarvestId(55);
 		harvestMessage.setMessage("test");
 		harvestMessage.setStackTrace("teststack");
@@ -30,15 +49,14 @@ public class TestHarvestMessageDAO {
 		ConnectionUtil.setReturnSimpleConnection(true);
 		Integer messageID = DAOFactory.getDAOFactory().getHarvestMessageDAO().insertHarvestMessage(harvestMessage);
 		assertNotNull(messageID);
-		harvestMessage.setHarvestMessageId(messageID);
 	}
 	
 	@Test
 	public void testFindHarvestMessagesByHarvestID() throws Exception {
 		
 		ConnectionUtil.setReturnSimpleConnection(true);
-		List<HarvestMessageDTO> messages = DAOFactory.getDAOFactory().getHarvestMessageDAO().findHarvestMessagesByHarvestID(harvestMessage.getHarvestId());
-		assertEquals(1, messages.size());
+		List<HarvestMessageDTO> messages = DAOFactory.getDAOFactory().getHarvestMessageDAO().findHarvestMessagesByHarvestID(121);
+		assertEquals(2, messages.size());
 		
 	}
 	
@@ -46,22 +64,20 @@ public class TestHarvestMessageDAO {
 	public void testFindHarvestMessageByMessageID() throws Exception {
 		
 		ConnectionUtil.setReturnSimpleConnection(true);
-		HarvestMessageDTO message = DAOFactory.getDAOFactory().getHarvestMessageDAO().findHarvestMessageByMessageID(harvestMessage.getHarvestMessageId());
-		assertEquals(55, message.getHarvestId());
-		assertEquals("test", message.getMessage());
-		assertEquals("teststack", message.getStackTrace());
-		assertEquals("01", message.getType());
-		
-		harvestMessage = message;
+		HarvestMessageDTO message = DAOFactory.getDAOFactory().getHarvestMessageDAO().findHarvestMessageByMessageID(4);
+		assertEquals(new Integer(121), message.getHarvestId());
+		assertEquals("ERROR", message.getMessage());
+		assertEquals("Stack Trace: whatever", message.getStackTrace());
+		assertEquals("err", message.getType());
 	}
 		
 	@Test
 	public void testDeleteMessage() throws Exception {
 
 		ConnectionUtil.setReturnSimpleConnection(true);
-		DAOFactory.getDAOFactory().getHarvestMessageDAO().deleteMessage(harvestMessage.getHarvestMessageId());
+		DAOFactory.getDAOFactory().getHarvestMessageDAO().deleteMessage(5);
 		
-		HarvestMessageDTO message = DAOFactory.getDAOFactory().getHarvestMessageDAO().findHarvestMessageByMessageID(harvestMessage.getHarvestMessageId());
+		HarvestMessageDTO message = DAOFactory.getDAOFactory().getHarvestMessageDAO().findHarvestMessageByMessageID(5);
 		assertNull(message);
 	}
 

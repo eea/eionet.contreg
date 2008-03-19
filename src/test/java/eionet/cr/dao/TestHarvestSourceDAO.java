@@ -1,14 +1,17 @@
 package eionet.cr.dao;
 
-import static org.junit.Assert.*;
-
 import java.util.List;
 
+import org.dbunit.DBTestCase;
+import org.dbunit.dataset.IDataSet;
+import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.junit.Test;
 
+import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dto.HarvestScheduleDTO;
 import eionet.cr.dto.HarvestSourceDTO;
+import eionet.cr.test.util.DbHelper;
 import eionet.cr.util.sql.ConnectionUtil;
 
 /**
@@ -17,11 +20,28 @@ import eionet.cr.util.sql.ConnectionUtil;
  * @author altnyris
  *
  */
-public class TestHarvestSourceDAO {
-	private static HarvestSourceDTO harvestSource;
+public class TestHarvestSourceDAO extends DBTestCase {
+	
+	/**
+	 * Provide a connection to the database.
+	 */
+	public TestHarvestSourceDAO(String name)
+	{
+		super( name );
+		DbHelper.setUpConnectionProperties();
+	}
+	/**
+	 * Load the data which will be inserted for the test
+	 */
+	protected IDataSet getDataSet() throws Exception {
+		IDataSet loadedDataSet = new FlatXmlDataSet(
+				getClass().getClassLoader().getResourceAsStream(GeneralConfig.SEED_FILE_NAME));
+		return loadedDataSet;
+	}
 	
 	@Test
 	public void testAddSource() throws Exception {
+		HarvestSourceDTO harvestSource = new HarvestSourceDTO();
 		harvestSource = new HarvestSourceDTO();
 		harvestSource.setName("obligations");
 		harvestSource.setUrl("http://rod.eionet.europa.eu/testObligations");
@@ -38,7 +58,6 @@ public class TestHarvestSourceDAO {
 		ConnectionUtil.setReturnSimpleConnection(true);
 		Integer harvestSourceID = DAOFactory.getDAOFactory().getHarvestSourceDAO().addSource(harvestSource, "bobsmith");
 		assertNotNull(harvestSourceID);
-		harvestSource.setSourceId(harvestSourceID);
 	}
 	
 	@Test
@@ -46,32 +65,32 @@ public class TestHarvestSourceDAO {
 		
 		ConnectionUtil.setReturnSimpleConnection(true);
 		List<HarvestSourceDTO> sources = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSources();
-		assertEquals(43, sources.size());
+		assertEquals(42, sources.size());
 	}
 	
 	@Test
 	public void testGetHarvestSourceById() throws Exception {
 		
 		ConnectionUtil.setReturnSimpleConnection(true);
-		HarvestSourceDTO source = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(harvestSource.getSourceId());
-		assertEquals("obligations", source.getName());
-		assertEquals("http://rod.eionet.europa.eu/testObligations", source.getUrl());
+		HarvestSourceDTO source = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(45);
+		assertEquals("test1", source.getName());
+		assertEquals("http://localhost:8080/cr/pages/test.xml", source.getUrl());
 		assertEquals("bobsmith", source.getCreator());
 		assertEquals("bob@europe.eu", source.getEmails());
 		assertEquals("data", source.getType());
 		
-		assertEquals(12, source.getHarvestSchedule().getHour());
-		assertEquals(2, source.getHarvestSchedule().getPeriod());
-		assertEquals("Monday", source.getHarvestSchedule().getWeekday());
+		assertEquals(new Integer(0), source.getHarvestSchedule().getHour());
+		assertEquals(new Integer(1), source.getHarvestSchedule().getPeriod());
+		assertEquals("monday", source.getHarvestSchedule().getWeekday());
 		
-		harvestSource = source;
 	}
 	
 	@Test
 	public void testEditSource() throws Exception {
-
-		harvestSource.setName("obligations2");
-		harvestSource.setUrl("http://rod.eionet.europa.eu/testObligations2");
+		HarvestSourceDTO harvestSource = new HarvestSourceDTO();
+		harvestSource.setSourceId(45);
+		harvestSource.setName("test2");
+		harvestSource.setUrl("http://localhost:8080/cr/pages/test2.xml");
 		harvestSource.setEmails("bob2@europe.eu");
 		harvestSource.setType("schema");
 		
@@ -84,9 +103,9 @@ public class TestHarvestSourceDAO {
 		ConnectionUtil.setReturnSimpleConnection(true);
 		DAOFactory.getDAOFactory().getHarvestSourceDAO().editSource(harvestSource);
 		
-		HarvestSourceDTO source = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(harvestSource.getSourceId());
-		assertEquals("obligations2", source.getName());
-		assertEquals("http://rod.eionet.europa.eu/testObligations2", source.getUrl());
+		HarvestSourceDTO source = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(45);
+		assertEquals("test2", source.getName());
+		assertEquals("http://localhost:8080/cr/pages/test2.xml", source.getUrl());
 		assertEquals("bob2@europe.eu", source.getEmails());
 		assertEquals("schema", source.getType());
 		
@@ -94,11 +113,13 @@ public class TestHarvestSourceDAO {
 	
 	@Test
 	public void testDeleteSource() throws Exception {
+		HarvestSourceDTO harvestSource = new HarvestSourceDTO();
+		harvestSource.setSourceId(45);
 
 		ConnectionUtil.setReturnSimpleConnection(true);
 		DAOFactory.getDAOFactory().getHarvestSourceDAO().deleteSource(harvestSource);
 		
-		HarvestSourceDTO source = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(harvestSource.getSourceId());
+		HarvestSourceDTO source = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(45);
 		assertNull(source);
 	}
 

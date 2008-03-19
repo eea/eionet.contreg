@@ -65,8 +65,7 @@ public abstract class AbstractCRActionBean implements ActionBean {
 	 * @return
 	 */
 	protected CRUser getCRUser(){
-		//return getContext().getCRUser();
-		return new CRUser("jaanus");
+		return getContext().getCRUser();
 	}
 	
 	/**
