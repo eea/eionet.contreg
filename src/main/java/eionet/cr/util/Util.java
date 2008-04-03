@@ -276,4 +276,40 @@ public class Util {
 
         return buf.toString();
     }
+    
+    /**
+     * 
+     * @param s
+     * @return
+     */
+    public static boolean isNullOrEmpty(String s){
+    	return s==null || s.length()==0;
+    }
+    
+    /**
+     * 
+     * @param s
+     * @return
+     */
+    public static boolean hasWhiteSpace(String s){
+    	
+    	if (s==null || s.length()!=s.trim().length())
+    		return true;
+    	else{
+	    	StringTokenizer st = new StringTokenizer(s);
+	    	int count = 0;
+	    	for (; st.hasMoreTokens() && count<2; count++)
+	    		st.nextToken();
+	    	return count>1;
+    	}
+    }
+    
+    /**
+     * 
+     * @param args
+     */
+    public static void main(String[] args){
+    	
+    	System.out.println(hasWhiteSpace("a d f"));
+    }
 }

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -17,6 +18,11 @@ import eionet.cr.util.CRException;
 import eionet.cr.util.Identifiers;
 import eionet.cr.util.Util;
 
+/**
+ * 
+ * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
+ *
+ */
 public class SearcherXmlRpcImpl{
 	
 	/** */
@@ -55,8 +61,44 @@ public class SearcherXmlRpcImpl{
 			return result.size()>300 ? result.subList(0, 300) : result;
 	}
 	
-	public int test(){
-		return 8;
+	/**
+	 * 
+	 * @param criteria
+	 * @return
+	 * @throws CRException 
+	 */
+	public List simpleAndSearch(Map<String,String> criteria) throws CRException{
+		
+		List result = null;
+		if (criteria!=null && !criteria.isEmpty()){
+			StringBuffer qryBuf = new StringBuffer();
+			for (Iterator<String> iter = criteria.keySet().iterator(); iter.hasNext();){
+				String key = iter.next();
+				if (key!=null && key.length()>0){
+					String value = criteria.get(key);
+					if (value!=null && value.length()>0){
+						if (Util.hasWhiteSpace(value))
+							value = "\"" + value + "\"";
+						if (qryBuf.length()>0)
+							qryBuf.append(" AND ");
+						qryBuf.append(Util.escapeForLuceneQuery(key)).append(":").append(Util.escapeForLuceneQuery(value));
+						
+						try{
+							result = eionet.cr.index.Searcher.search(qryBuf.toString());
+						}
+						catch (Exception e){
+							logger.error(e.toString(), e);
+							throw new CRException(e.toString(), e);
+						}
+					}
+				}
+			}
+		}
+		
+		if (result==null)
+			return new ArrayList<java.util.Map<String,String[]>>();
+		else
+			return result.size()>300 ? result.subList(0, 300) : result;
 	}
 	
 	/**
