@@ -32,7 +32,8 @@ public class ConnectionUtil {
 	private static void initDataSource() throws NamingException{
 		Context initContext = new InitialContext();
 		Context context = (Context) initContext.lookup("java:comp/env");
-		dataSource = (javax.sql.DataSource)context.lookup("jdbc/cr");
+		DataSource ds = (javax.sql.DataSource)context.lookup(GeneralConfig.getRequiredProperty(GeneralConfig.DATASOURCE_NAME));;
+		dataSource = ds;
 	}
 	
 	/**

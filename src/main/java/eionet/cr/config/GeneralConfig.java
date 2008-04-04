@@ -14,6 +14,7 @@ import org.apache.commons.logging.LogFactory;
 public class GeneralConfig {
 	
 	/** */
+	public static final String BUNDLE_NAME = "cr";
 	public static final String PROPERTIES_FILE_NAME = "cr.properties";
 	public static final String SEED_FILE_NAME = "seed-cr.xml";
 
@@ -26,6 +27,9 @@ public class GeneralConfig {
 	/** */
 	public static final String LUCENE_INDEX_LOCATION = "lucene.index.location";
 	public static final String HARVESTER_FILES_LOCATION = "harvester.files.location";
+	
+	/** */
+	public static final String DATASOURCE_NAME = "datasource.name";
 	
 	/** */
 	public static final int SEVERITY_INFO = 1;
@@ -80,13 +84,13 @@ public class GeneralConfig {
 	 * 
 	 * @param key
 	 * @return
-	 * @throws ConfigException 
+	 * @throws CRConfigException 
 	 */
 	public static synchronized String getRequiredProperty(String key){
 		
 		String value = getProperty(key);
 		if (value==null || value.trim().length()==0)
-			throw new ConfigException("Missing required property: " + key);
+			throw new CRConfigException("Missing required property: " + key);
 		else
 			return value;
 	}

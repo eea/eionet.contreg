@@ -7,12 +7,12 @@ import eionet.cr.util.CRRuntimeException;
  * @author heinljab
  *
  */
-public class ConfigException extends CRRuntimeException{
+public class CRConfigException extends CRRuntimeException{
 
 	/**
 	 * 
 	 */
-	public ConfigException(){
+	public CRConfigException(){
 		super();
 	}
 	
@@ -20,7 +20,7 @@ public class ConfigException extends CRRuntimeException{
 	 * 
 	 * @param message
 	 */
-	public ConfigException(String message){
+	public CRConfigException(String message){
 		super(message);
 	}
 
@@ -29,7 +29,7 @@ public class ConfigException extends CRRuntimeException{
 	 * @param message
 	 * @param cause
 	 */
-	public ConfigException(String message, Throwable cause){
+	public CRConfigException(String message, Throwable cause){
 		super(message, cause);
 	}
 }

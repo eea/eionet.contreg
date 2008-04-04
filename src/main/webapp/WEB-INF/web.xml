@@ -56,26 +56,6 @@
 	<filter>
 		<filter-name>CAS Filter</filter-name>
 		<filter-class>eionet.cr.web.security.EionetCASFilter</filter-class>
-		<init-param>
-			<param-name>edu.yale.its.tp.cas.client.filter.loginUrl</param-name>
-			<param-value>https://sso.eionet.europa.eu/login</param-value>
-		</init-param>
-		<init-param>
-			<param-name>edu.yale.its.tp.cas.client.filter.validateUrl</param-name>
-			<param-value>https://sso.eionet.europa.eu/serviceValidate</param-value>
-		</init-param>
-		<init-param>
-			<param-name>edu.yale.its.tp.cas.client.filter.serverName</param-name>
-			<param-value>192.168.10.57:8080</param-value>
-		</init-param>
-		<init-param>
-			<param-name>edu.yale.its.tp.cas.client.filter.wrapRequest</param-name>
-			<param-value>true</param-value>
-		</init-param>
-		<init-param>
-			<param-name>eionetLoginCookieDomain</param-name>
-			<param-value>eionet.europa.eu</param-value>
-		</init-param>	    
 	</filter>
 
 	<filter-mapping>
@@ -121,9 +101,17 @@
 		<url-pattern>*.action</url-pattern>
 	</servlet-mapping>
 	
+
 	<resource-ref>
-		<description>DB Connection</description>
-		<res-ref-name>jdbc/cr</res-ref-name>
+		<description>DB connection at development server</description>
+		<res-ref-name>jdbc/crDevDB</res-ref-name>
+		<res-type>javax.sql.DataSource</res-type>
+		<res-auth>Container</res-auth>
+	</resource-ref>
+
+	<resource-ref>
+		<description>DB connection at development server</description>
+		<res-ref-name>jdbc/crLocalDB</res-ref-name>
 		<res-type>javax.sql.DataSource</res-type>
 		<res-auth>Container</res-auth>
 	</resource-ref>

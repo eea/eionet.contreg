@@ -17,34 +17,58 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import edu.yale.its.tp.cas.client.filter.CASFilter;
+import eionet.cr.config.GeneralConfig;
+import eionet.cr.web.util.CrCasFilterConfig;
 
 import static eionet.cr.web.util.ICRWebConstants.*;
 
+/**
+ * 
+ * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
+ *
+ */
 public class EionetCASFilter extends CASFilter {
 
+	/** */
 	public static final String EIONET_LOGIN_COOKIE_NAME = "eionetCasLogin";
+	private static final String EIONET_COOKIE_LOGIN_PATH = "eionetCookieLogin";
 
+	/** */
+	private static String CAS_LOGIN_URL = null;
+
+	/** */
+	private static String SERVER_NAME = null;
+
+	/** */
+	private static String EIONET_LOGIN_COOKIE_DOMAIN = null;
+
+	/**
+	 * 
+	 * @return
+	 */
 	public static String getEionetLoginCookieName() {
 		return EIONET_LOGIN_COOKIE_NAME;
 	}
 
-	private static final String EIONET_COOKIE_LOGIN_PATH = "eionetCookieLogin";
-
-	private static String CAS_LOGIN_URL = null;
-
-	private static String SERVER_NAME = null;
-
-	private static String EIONET_LOGIN_COOKIE_DOMAIN = null;
-
+	/*
+	 * (non-Javadoc)
+	 * @see edu.yale.its.tp.cas.client.filter.CASFilter#init(javax.servlet.FilterConfig)
+	 */
 	public void init(FilterConfig config) throws ServletException {
-		CAS_LOGIN_URL = config.getInitParameter(LOGIN_INIT_PARAM);
-		SERVER_NAME = config.getInitParameter(SERVERNAME_INIT_PARAM);
-		EIONET_LOGIN_COOKIE_DOMAIN = config
-				.getInitParameter("eionetLoginCookieDomain");
-		super.init(config);
-
+		
+		CrCasFilterConfig filterConfig = CrCasFilterConfig.getInstance(config);
+		
+		CAS_LOGIN_URL = filterConfig.getInitParameter(LOGIN_INIT_PARAM);
+		SERVER_NAME = filterConfig.getInitParameter(SERVERNAME_INIT_PARAM);
+		EIONET_LOGIN_COOKIE_DOMAIN = filterConfig.getInitParameter("eionetLoginCookieDomain");
+		
+		super.init(filterConfig);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see edu.yale.its.tp.cas.client.filter.CASFilter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse, javax.servlet.FilterChain)
+	 */
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain fc) throws ServletException, IOException {
 
@@ -84,6 +108,11 @@ public class EionetCASFilter extends CASFilter {
 		}
 	}
 
+	/**
+	 * 
+	 * @param response
+	 * @param isLoggedIn
+	 */
 	public static void attachEionetLoginCookie(HttpServletResponse response,
 			boolean isLoggedIn) {
 		Cookie eionetCookie = new Cookie(EIONET_LOGIN_COOKIE_NAME,
@@ -95,6 +124,11 @@ public class EionetCASFilter extends CASFilter {
 		response.addCookie(eionetCookie);
 	}
 
+	/**
+	 * 
+	 * @param request
+	 * @return
+	 */
 	public static String getCASLoginURL(HttpServletRequest request) {
 		request.getSession(true).setAttribute(
 				"afterLogin",
@@ -105,6 +139,12 @@ public class EionetCASFilter extends CASFilter {
 				+ SERVER_NAME + request.getContextPath() + "/login";
 	}
 
+	/**
+	 * 
+	 * @param req
+	 * @param forSubscription
+	 * @return
+	 */
 	public static String getCASLoginURL(HttpServletRequest req,
 			boolean forSubscription) {
 		StringBuffer sb = new StringBuffer(CAS_LOGIN_URL);
@@ -122,12 +162,22 @@ public class EionetCASFilter extends CASFilter {
 		return sb.toString();
 	}
 
+	/**
+	 * 
+	 * @param request
+	 * @return
+	 */
 	public static String getCASLogoutURL(HttpServletRequest request) {
 		return CAS_LOGIN_URL.replaceFirst("/login", "/logout") + "?url="
 				+ request.getScheme() + "://" + SERVER_NAME
 				+ request.getContextPath();
 	}
 
+	/**
+	 * 
+	 * @param request
+	 * @return
+	 */
 	public static String getEionetCookieCASLoginURL(HttpServletRequest request) {
 
 		String contextPath = request.getContextPath();
@@ -167,11 +217,22 @@ public class EionetCASFilter extends CASFilter {
 
 	}
 
+	/**
+	 * 
+	 * @param request
+	 * @return
+	 */
 	public static boolean isCasLoggedUser(HttpServletRequest request) {
 		return (request.getSession() != null && request.getSession()
 				.getAttribute(CAS_FILTER_USER) != null);
 	}
 
+	/**
+	 * 
+	 * @param request
+	 * @param response
+	 * @throws IOException
+	 */
 	private void redirectAfterEionetCookieLogin(HttpServletRequest request,
 			HttpServletResponse response) throws IOException {
 		String requestUri = request.getRequestURI()
@@ -187,6 +248,11 @@ public class EionetCASFilter extends CASFilter {
 		response.sendRedirect(realURI);
 	}
 
+	/**
+	 * 
+	 * @param aRegexFragment
+	 * @return
+	 */
 	public static String forRegex(String aRegexFragment) {
 		final StringBuffer result = new StringBuffer();
 
@@ -239,6 +305,11 @@ public class EionetCASFilter extends CASFilter {
 
 }
 
+/**
+ * 
+ * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
+ *
+ */
 class CASFilterChain implements FilterChain {
 
 	private boolean doNext = false;
