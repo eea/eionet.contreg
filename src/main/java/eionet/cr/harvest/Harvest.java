@@ -146,7 +146,7 @@ public abstract class Harvest {
 			ARP arp = new ARP();
 	        arp.setStatementHandler(rdfHandler);
 	        arp.setErrorHandler(rdfHandler);
-	        arp.load(reader);
+	        arp.load(reader, sourceUrlString);
 	        
 	        logger.debug(rdfHandler.getCountResources() + "collected from local file: " + file.getAbsolutePath());
 	        
@@ -255,6 +255,15 @@ public abstract class Harvest {
 		}
 		catch (Throwable t){
 			throw new HarvestException("Failure when updating first times: " + t.toString(), t);
+		}
+		finally{
+			try{
+				if (indexReader!=null)
+					indexReader.close();
+			}
+			catch (Exception e){
+				logger.error("Failed to close index reader: " + e.toString(), e);
+			}
 		}
 	}
 

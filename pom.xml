@@ -170,5 +170,10 @@
 			<artifactId>dbunit</artifactId>
 			<version>2.2</version>
 		</dependency>
+		<dependency>
+			<groupId>eionet</groupId>
+			<artifactId>qawcommons</artifactId>
+			<version>1.0</version>
+		</dependency>
 	</dependencies>
 </project>

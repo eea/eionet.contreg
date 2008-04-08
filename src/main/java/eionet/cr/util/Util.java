@@ -6,12 +6,15 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -80,7 +83,22 @@ public class Util {
 			return false;
 		}
 	}
-	
+
+	/**
+	 * 
+	 * @param s
+	 * @return
+	 */
+	public static boolean isURI(String s){
+		try{
+			URI uri = new URI(s);
+			return true;
+		}
+		catch (URISyntaxException e){
+			return false;
+		}
+	}
+
 	/**
 	 * 
 	 * @param t
@@ -306,10 +324,104 @@ public class Util {
     
     /**
      * 
+     * @param scheme
+     */
+    public static boolean isCommonURIScheme(String scheme){
+    	
+    	if (scheme==null || scheme.length()!=scheme.trim().length() || scheme.length()==0)
+    		return false;
+    	else if (scheme.equals("dns"))
+    		return true;
+    	else if (scheme.equals("file"))
+    		return true;
+    	else if (scheme.equals("ftp"))
+    		return true;
+    	else if (scheme.equals("sftp"))
+    		return true;
+    	else if (scheme.equals("tftp"))
+    		return true;
+    	else if (scheme.equals("go"))
+    		return true;
+    	else if (scheme.equals("gopher"))
+    		return true;
+    	else if (scheme.equals("http"))
+    		return true;
+    	else if (scheme.equals("https"))
+    		return true;
+    	else if (scheme.equals("ldap"))
+    		return true;
+    	else if (scheme.equals("mailto"))
+    		return true;
+    	else if (scheme.equals("news"))
+    		return true;
+    	else if (scheme.equals("shttp"))
+    		return true;
+    	else if (scheme.equals("skype"))
+    		return true;
+    	else if (scheme.equals("snmp"))
+    		return true;
+    	else if (scheme.equals("telnet"))
+    		return true;
+    	else if (scheme.equals("urn"))
+    		return true;
+    	else if (scheme.equals("news"))
+    		return true;
+    	else
+    		return false;
+    }
+    
+    /**
+     * 
+     * @param array
+     * @return
+     */
+    public static Object getFirst(Object[] array){
+    	return array!=null && array.length>0 ? array[0] : null;
+    }
+
+    /**
+     * 
+     * @param array
+     * @return
+     */
+    public static String getFirst(String[] array){
+    	return array!=null && array.length>0 ? array[0] : null;
+    }
+
+    /**
+     * 
+     * @param array
+     * @return
+     */
+    public static String[] pruneUrls(String[] array){
+    	
+    	if (array==null || array.length==0)
+    		return array;
+    	
+    	ArrayList<String> list = new ArrayList<String>();
+    	for (int i=0; i<array.length; i++){
+    		if (!Util.isURL(array[i]))
+    			list.add(array[i]);
+    	}
+    	
+    	if (list.isEmpty())
+    		return array;
+    	else{
+	    	String[] result = new String[list.size()];
+	    	for (int i=0; i<list.size(); i++){
+	    		result[i] = list.get(i);
+	    	}
+	    	return result;
+    	}
+    }
+    
+    /**
+     * 
      * @param args
      */
     public static void main(String[] args){
-    	
-    	System.out.println(hasWhiteSpace("a d f"));
+
+    	String s = "http://www.neti.ee";
+    	System.out.println(escapeForLuceneQuery(s));
     }
 }

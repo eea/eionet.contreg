@@ -72,4 +72,14 @@ public class RDFResourceProperty {
 	public boolean isValueURL() {
 		return isValueURL;
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	public String toString(){
+		
+		StringBuffer buf = new StringBuffer(id);
+		return buf.append("=").append(value).toString();
+	}
 }

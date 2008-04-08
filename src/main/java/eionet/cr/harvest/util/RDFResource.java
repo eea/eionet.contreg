@@ -129,4 +129,16 @@ public class RDFResource {
 	public void setFirstSeenTimestamp(String firstSeenTime) {
 		this.firstSeenTimestamp = firstSeenTime;
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	public String toString(){
+		
+		StringBuffer buf = new StringBuffer(id==null ? "null" : id);
+		if (properties!=null && !properties.isEmpty())
+			buf.append(", ").append(properties.toString());
+		return buf.toString();
+	}
 }

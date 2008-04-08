@@ -13,6 +13,7 @@ import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 
 import eionet.cr.util.Util;
+import eionet.qawcommons.DataflowResultDto;
 
 /**
  * 
@@ -66,6 +67,41 @@ public class CRXmlRpcSampleClient {
 	    else
 	    	System.out.println("result array null or empty");
 
+	}
+	
+	/**
+	 * 
+	 * @throws MalformedURLException
+	 * @throws XmlRpcException
+	 */
+	public static void sample_dataflowSearch() throws MalformedURLException, XmlRpcException{
+		
+		// set up the XmlRpcClient
+		XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
+	    config.setServerURL(new URL("http://80.235.29.171:8080/cr/xmlrpc"));
+		//config.setServerURL(new URL("http://localhost:8080/cr/xmlrpc"));
+	    config.setEnabledForExtensions(true);
+	    XmlRpcClient client = new XmlRpcClient();
+	    client.setConfig(config);
+	    
+	    // execute the call
+	    Map criteria = new HashMap();
+//	    criteria.put("http://rod.eionet.eu.int/schema.rdf#locality", "http://rod.eionet.eu.int/spatial/28"); // Norway
+//	    criteria.put("http://rod.eionet.eu.int/schema.rdf#obligation", "http://rod.eionet.eu.int/obligations/452");
+//	    criteria.put("http://purl.org/dc/elements/1.1/coverage", "2006");
+	    
+	    Object[] params = new Object[]{criteria};
+	    Object[] result = (Object[])client.execute("Searcher.dataflowSearch", params);
+	    
+	    // loop through the results, do type casting to see if any ClassCastExceptions are thrown
+	    if (result!=null && result.length>0){
+	    	
+	    	Object o = result[0];
+	    	DataflowResultDto dto = (DataflowResultDto)o;
+	    	System.out.println(o);
+	    }
+	    else
+	    	System.out.println("result array null or empty");
 	}
 
 	/**
@@ -128,7 +164,8 @@ public class CRXmlRpcSampleClient {
 		
 		try{
 			//sample_getResourcesSinceTimestamp();
-			sample_simpleAndSearch();
+			//sample_simpleAndSearch();
+			sample_dataflowSearch();
 		}
 		catch (Throwable t){
 			t.printStackTrace();

@@ -17,6 +17,7 @@ import eionet.cr.index.EncodingSchemes;
 import eionet.cr.util.CRException;
 import eionet.cr.util.Identifiers;
 import eionet.cr.util.Util;
+import eionet.qawcommons.DataflowResultDto;
 
 /**
  * 
@@ -59,6 +60,48 @@ public class SearcherXmlRpcImpl{
 			return new ArrayList<java.util.Map<String,String[]>>();
 		else
 			return result.size()>300 ? result.subList(0, 300) : result;
+	}
+	
+	/**
+	 * 
+	 * @param criteria
+	 * @return
+	 * @throws CRException
+	 */
+	public List dataflowSearch(Map<String,String> criteria) throws CRException{
+		
+		if (criteria==null)
+			criteria = new HashMap<String,String>();
+		
+		if (!criteria.containsKey(Identifiers.RDF_TYPE))
+			criteria.put(Identifiers.RDF_TYPE, Identifiers.ROD_DELIVERY);
+		
+		List<DataflowResultDto> result = new ArrayList<DataflowResultDto>();
+		
+		try{
+			List list = simpleAndSearch(criteria);
+			if (list!=null && !list.isEmpty()){
+				for (int i=0; i<list.size(); i++){
+					Map<String,String[]> map = (Map<String,String[]>)list.get(i);
+					
+					DataflowResultDto dto = new DataflowResultDto();
+					dto.setTitle(Util.getFirst(map.get(Identifiers.DC_TITLE)));
+					dto.setDataflow(Util.pruneUrls(map.get(Identifiers.ROD_OBLIGATION)));
+					dto.setLocality(Util.pruneUrls(map.get(Identifiers.ROD_LOCALITY)));
+					dto.setType(Util.pruneUrls(map.get(Identifiers.RDF_TYPE)));
+					dto.setResource(Util.getFirst(map.get(Identifiers.DOC_ID)));
+					dto.setDate(Util.getFirst(map.get(Identifiers.DC_DATE)));
+					
+					result.add(dto);
+				}
+			}
+		}
+		catch (Throwable t){
+			t.printStackTrace();
+			throw new CRException(t.toString(), t);
+		}
+		
+		return result;
 	}
 	
 	/**
