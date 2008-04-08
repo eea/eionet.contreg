@@ -37,6 +37,7 @@ import org.apache.lucene.search.TermQuery;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.util.Identifiers;
 import eionet.cr.util.Messages;
+import eionet.cr.util.SimpleSearchExpression;
 import eionet.cr.util.Util;
 
 /**
@@ -80,8 +81,24 @@ public class Searcher {
 	 * @throws ParseException
 	 * @throws IOException
 	 */
-	public static List<Map<String,String[]>> search(String query) throws ParseException, IOException{
-		return search(query, defaultAnalyzer);
+	public static List<Map<String,String[]>> simpleSearch(String searchExpression) throws ParseException, IOException{
+		
+		if (searchExpression==null || searchExpression.trim().length()==0)
+			return new ArrayList<Map<String,String[]>>();
+		
+		SimpleSearchExpression expressionObject = new SimpleSearchExpression(searchExpression);
+		return luceneQuery(expressionObject.toLuceneQueryString(), expressionObject.getAnalyzerName());
+	}
+	
+	/**
+	 * 
+	 * @param query
+	 * @return
+	 * @throws ParseException
+	 * @throws IOException
+	 */
+	public static List<Map<String,String[]>> luceneQuery(String query) throws ParseException, IOException{
+		return luceneQuery(query, defaultAnalyzer);
 	}
 	
 	/**
@@ -95,12 +112,13 @@ public class Searcher {
 	 * @throws IOException 
 	 * @throws ParseException 
 	 */
-	public static List<Map<String,String[]>> search(String query, String analyzerName) throws CorruptIndexException, IOException, ParseException{
+	public static List<Map<String,String[]>> luceneQuery(String query, String analyzerName) throws CorruptIndexException, IOException, ParseException{
 
-		boolean isURLSearch = Searcher.isURLSearchQuery(query);
+		if (query==null || query.trim().length()==0)
+			return new ArrayList<Map<String,String[]>>();
 		
-		QueryParser parser = new QueryParser(DEFAULT_FIELD, isURLSearch ? new KeywordAnalyzer() : getAvailableAnalyzer(analyzerName));
-		Query queryObj = parser.parse(isURLSearch ? Searcher.processQueryForURLSearch(query) : query);
+		QueryParser parser = new QueryParser(DEFAULT_FIELD, getAvailableAnalyzer(analyzerName));
+		Query queryObj = parser.parse(query);
 		
 		logger.debug("Performing search query: " + query);
 		
@@ -208,7 +226,7 @@ public class Searcher {
 	 * 
 	 * @return
 	 */
-	private static Analyzer getAvailableAnalyzer(String name){
+	public static Analyzer getAvailableAnalyzer(String name){
 		
 		if (availableAnalyzers==null)
 			initAvailableAnalyzers();
@@ -217,37 +235,5 @@ public class Searcher {
 			return null;
 		else
 			return availableAnalyzers.get(name);
-	}
-	
-	/**
-	 * 
-	 * @param query
-	 * @return
-	 */
-	private static String processQueryForURLSearch(String query){
-		
-		StringBuffer buf = new StringBuffer(Identifiers.DOC_ID);
-		buf.append(":").append(Util.escapeForLuceneQuery(query.trim()));
-		return buf.toString();
-	}
-	
-	/**
-	 * 
-	 * @param query
-	 * @return
-	 */
-	private static boolean isURLSearchQuery(String query){
-		
-		boolean result = false;
-		if (query!=null && query.trim().length()>0){
-			try {
-				URI uri = new URI(query.trim());
-				result = Util.isCommonURIScheme(uri.getScheme());
-			}
-			catch (URISyntaxException e){
-			}
-		}
-		
-		return result;
 	}
 }

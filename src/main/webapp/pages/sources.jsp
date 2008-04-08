@@ -3,10 +3,17 @@
 <%@ include file="/pages/common/taglibs.jsp"%>	
 
 <stripes:layout-render name="/pages/common/template.jsp" pageTitle="Harvesting Sources">
+
 	<stripes:layout-component name="errors"/>
 	<stripes:layout-component name="messages"/>
 	<stripes:layout-component name="contents">
 	
+	<div id="operations">
+		<ul>
+			<li><a href="addsource.jsp">Add new source</a></li>
+		</ul>
+	</div>
+	      			
 	<jsp:useBean id="harvestSourceList" scope="page"
                      class="eionet.cr.web.action.HarvestSourceListActionBean"/>
         

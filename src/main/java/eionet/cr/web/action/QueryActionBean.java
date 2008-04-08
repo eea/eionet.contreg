@@ -16,23 +16,40 @@ import eionet.cr.index.Searcher;
  * @author altnyris
  *
  */
-@UrlBinding("/query.action")
+@UrlBinding("/luceneQuery.action")
 public class QueryActionBean extends AbstractCRActionBean {
+	
+	/** */
 	private String query;
+	
+	/** */
 	private List hits;
 
+	/**
+	 * 
+	 * @return
+	 */
 	public String getQuery() {
 		return query;
 	}
 
+	/**
+	 * @param query
+	 */
 	public void setQuery(String query) {
 		this.query = query;
 	}
 	
+	/**
+	 * @return
+	 */
 	public List getHits() {
 		return hits;
 	}
 
+	/**
+	 * @param hits
+	 */
 	public void setHits(List hits) {
 		this.hits = hits;
 	}
@@ -42,6 +59,10 @@ public class QueryActionBean extends AbstractCRActionBean {
 	 * @return
 	 * @throws DAOException
 	 */
+	/**
+	 * @return
+	 * @throws Exception
+	 */
 	@DefaultHandler
     public Resolution search() throws Exception {
 		//this.hits = Searcher.search(query);
@@ -49,9 +70,9 @@ public class QueryActionBean extends AbstractCRActionBean {
 		String analyzer = request.getParameter("analyzer");
 		
 		if (analyzer==null || analyzer.trim().length()==0)
-			hits = Searcher.search(query);
+			hits = Searcher.luceneQuery(query);
 		else
-			hits = Searcher.search(query, analyzer);
+			hits = Searcher.luceneQuery(query, analyzer);
 		
 		request.setAttribute("hits", hits);
 		request.setAttribute("analyzer", analyzer);
