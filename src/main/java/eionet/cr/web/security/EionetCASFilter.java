@@ -16,6 +16,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.yale.its.tp.cas.client.filter.CASFilter;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.web.util.CrCasFilterConfig;
@@ -28,18 +31,14 @@ import static eionet.cr.web.util.ICRWebConstants.*;
  *
  */
 public class EionetCASFilter extends CASFilter {
-
+	
 	/** */
 	public static final String EIONET_LOGIN_COOKIE_NAME = "eionetCasLogin";
 	private static final String EIONET_COOKIE_LOGIN_PATH = "eionetCookieLogin";
 
 	/** */
 	private static String CAS_LOGIN_URL = null;
-
-	/** */
 	private static String SERVER_NAME = null;
-
-	/** */
 	private static String EIONET_LOGIN_COOKIE_DOMAIN = null;
 
 	/**
@@ -75,9 +74,11 @@ public class EionetCASFilter extends CASFilter {
 		if (request.getParameter("action") != null
 				&& !request.getParameter("action").equalsIgnoreCase(
 						"list_services")) {
+			
 			fc.doFilter(request, response);
 			return;
 		}
+		
 		CASFilterChain chain = new CASFilterChain();
 		super.doFilter(request, response, chain);
 		if (chain.isDoNext()) {
@@ -92,14 +93,17 @@ public class EionetCASFilter extends CASFilter {
 				if (requestURI.indexOf(EIONET_COOKIE_LOGIN_PATH) > -1) {
 					redirectAfterEionetCookieLogin(httpRequest, httpResponse);
 					return;
-				} else if (requestURI.endsWith("/login")) {
+				}
+				else if (requestURI.endsWith("/login")){
+					
 					attachEionetLoginCookie(httpResponse, true);
-					if (session.getAttribute("afterLogin") != null)
-						httpResponse.sendRedirect(session.getAttribute(
-								"afterLogin").toString());
-					else
-						request.getRequestDispatcher("/").forward(request,
-								response);
+					
+					// TODO - what should really happen here is that user must be redricetd to the page he logged in from
+					
+//					if (session.getAttribute("afterLogin") != null)
+//						httpResponse.sendRedirect(session.getAttribute("afterLogin").toString());
+//					else
+						request.getRequestDispatcher("/").forward(request, response);
 					return;
 				}
 			}
