@@ -10,6 +10,8 @@ import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.index.Searcher;
+import eionet.cr.util.DefaultColumnList;
+import eionet.cr.util.Util;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
@@ -25,7 +27,12 @@ public class SimpleSearchActionBean extends AbstractCRActionBean {
 	
 	/** */
 	private String searchExpression;
-	private List<Map<String,String[]>> hits;
+	private List<Map<String,String>> hits;
+	
+	@DefaultHandler
+	public Resolution init(){
+		return new ForwardResolution("/pages/simpleSearch.jsp");
+	}
 
 	/**
 	 * 
@@ -37,8 +44,12 @@ public class SimpleSearchActionBean extends AbstractCRActionBean {
 	@DefaultHandler
     public Resolution doSimpleSearch() throws ParseException, IOException{
 		
-		hits = Searcher.simpleSearch(searchExpression);
-		getContext().getRequest().setAttribute("hits", hits);
+		List<Map<String,String[]>> hits = Searcher.simpleSearch(searchExpression);
+		this.hits = Util.listForDisplay(hits);
+		
+		getContext().getRequest().setAttribute("hits", this.hits);
+		getContext().getRequest().setAttribute("collist", new DefaultColumnList());		
+		
 		showMessage(String.valueOf(hits==null ? 0 : hits.size()) + " hits found");
 		
 		return new ForwardResolution("/pages/simpleSearch.jsp");
@@ -61,14 +72,14 @@ public class SimpleSearchActionBean extends AbstractCRActionBean {
 	/**
 	 * @return the hits
 	 */
-	public List<Map<String, String[]>> getHits() {
+	public List<Map<String, String>> getHits() {
 		return hits;
 	}
 
 	/**
 	 * @param hits the hits to set
 	 */
-	public void setHits(List<Map<String, String[]>> hits) {
+	public void setHits(List<Map<String, String>> hits) {
 		this.hits = hits;
 	}
 

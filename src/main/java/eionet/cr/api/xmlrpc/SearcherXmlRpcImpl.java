@@ -56,10 +56,7 @@ public class SearcherXmlRpcImpl{
 			}
 		}
 
-		if (result==null)
-			return new ArrayList<java.util.Map<String,String[]>>();
-		else
-			return result.size()>300 ? result.subList(0, 300) : result;
+		return result==null ? new ArrayList<java.util.Map<String,String[]>>() : result;
 	}
 	
 	/**
@@ -138,10 +135,7 @@ public class SearcherXmlRpcImpl{
 			}
 		}
 		
-		if (result==null)
-			return new ArrayList<java.util.Map<String,String[]>>();
-		else
-			return result.size()>300 ? result.subList(0, 300) : result;
+		return result==null ? new ArrayList<java.util.Map<String,String[]>>() : result;
 	}
 	
 	/**

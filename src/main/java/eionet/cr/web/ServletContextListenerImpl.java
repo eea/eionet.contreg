@@ -8,6 +8,7 @@ import javax.servlet.ServletContextListener;
 
 import eionet.cr.index.EncodingSchemes;
 import eionet.cr.index.Searcher;
+import eionet.cr.index.walk.AllDocsWalker;
 
 /**
  * 
@@ -29,6 +30,6 @@ public class ServletContextListenerImpl implements ServletContextListener{
 	 */
 	public void contextInitialized(ServletContextEvent event) {
 		
-		EncodingSchemes.load();
+		AllDocsWalker.startupWalk();
 	}
 }

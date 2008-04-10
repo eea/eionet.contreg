@@ -15,8 +15,12 @@ import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 /**
@@ -417,11 +421,20 @@ public class Util {
     
     /**
      * 
-     * @param args
+     * @param list
+     * @return
      */
-    public static void main(String[] args){
-
-    	String s = "http://www.neti.ee";
-    	System.out.println(escapeForLuceneQuery(s));
+    public static List<Map<String,String>> listForDisplay(List<Map<String,String[]>> list){
+    	
+    	if (list==null)
+    		return null;
+    	
+    	List<Map<String,String>> resultList = new ArrayList<Map<String,String>>();
+    	for (int i=0; i<list.size(); i++){
+    		Map<String,String[]> map = list.get(i);
+    		if (!map.isEmpty())
+    			resultList.add(new SearchResultRowDisplayMap(map));
+    	}
+    	return resultList;
     }
 }

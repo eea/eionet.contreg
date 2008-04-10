@@ -18,7 +18,7 @@
                      class="eionet.cr.web.action.HarvestSourceListActionBean"/>
         
         <h1>Harvesting sources</h1>             
-        <display:table name="${harvestSourceList.harvestSources}" class="datatable" pagesize="15" id="sources">
+        <display:table name="${harvestSourceList.harvestSources}" class="datatable" pagesize="15" id="sources" sort="list">
 		    <display:column property="url" title="URL"/>
 		    <display:column property="type" sortable="true" headerClass="sortable"/>
 		    <display:column>
