@@ -47,7 +47,7 @@ public class SearcherXmlRpcImpl{
 				StringBuffer qryBuf = new StringBuffer(Util.escapeForLuceneQuery(Identifiers.FIRST_SEEN_TIMESTAMP));
 				qryBuf.append(":[").append(givenTimeSeconds).append(" TO ").append(curTimeSeconds).append("]");
 				try{
-					result = eionet.cr.index.Searcher.luceneQuery(qryBuf.toString());
+					result = eionet.cr.search.Searcher.luceneQuery(qryBuf.toString());
 				}
 				catch (Exception e){
 					logger.error(e.toString(), e);
@@ -124,7 +124,7 @@ public class SearcherXmlRpcImpl{
 						qryBuf.append(Util.escapeForLuceneQuery(key)).append(":").append(Util.escapeForLuceneQuery(value));
 						
 						try{
-							result = eionet.cr.index.Searcher.luceneQuery(qryBuf.toString());
+							result = eionet.cr.search.Searcher.luceneQuery(qryBuf.toString());
 						}
 						catch (Exception e){
 							logger.error(e.toString(), e);

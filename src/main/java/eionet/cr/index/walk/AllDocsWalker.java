@@ -75,7 +75,7 @@ public class AllDocsWalker {
 				logger.debug("Walked through " + numDocs + " documents");
 			}
 			else{
-				logger.debug("Walker found that index does not yet exist at " + indexLocation);
+				logger.info("Walker found that index does not yet exist at " + indexLocation);
 			}
 			
 		}

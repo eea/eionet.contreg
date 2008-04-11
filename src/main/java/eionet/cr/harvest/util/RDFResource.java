@@ -83,6 +83,14 @@ public class RDFResource {
 	
 	/**
 	 * 
+	 * @return
+	 */
+	public boolean isSubPropertyOf(){
+		return distinctPropertyIds!=null && distinctPropertyIds.contains(Identifiers.RDFS_SUB_PROPERTY_OF);
+	}
+	
+	/**
+	 * 
 	 * @param id
 	 */
 	private void addDistinctPropertyId(String id){

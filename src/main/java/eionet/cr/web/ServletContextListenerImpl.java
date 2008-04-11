@@ -7,8 +7,8 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import eionet.cr.index.EncodingSchemes;
-import eionet.cr.index.Searcher;
 import eionet.cr.index.walk.AllDocsWalker;
+import eionet.cr.search.Searcher;
 
 /**
  * 

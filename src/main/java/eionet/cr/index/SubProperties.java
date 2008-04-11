@@ -44,7 +44,7 @@ public class SubProperties extends Hashtable<String,List<String>>{
 	 * @param of
 	 * @param subPropery
 	 */
-	public static synchronized void add(String of, String subProperty){
+	public static synchronized void addSubProperty(String of, String subProperty){
 		
 		if (of!=null && subProperty!=null){
 			List<String> subProperties = getInstance().get(of);
@@ -57,22 +57,27 @@ public class SubProperties extends Hashtable<String,List<String>>{
 	
 	/**
 	 * 
+	 * @param of
+	 * @param subProperty
+	 */
+	public static synchronized void addSubProperty(String[] of, String subProperty){
+		if (of!=null && of.length>0 && subProperty!=null){
+			for (int i=0; i<of.length; i++)
+				addSubProperty(of[i], subProperty);
+		}
+	}
+	
+	/**
+	 * 
 	 * @param id
 	 * @return
 	 */
-	public static String[] getSubPropertiesOf(String id){
+	public static List<String> getSubPropertiesOf(String id){
 		
-		String[] result = null;
-		if (id!=null){
-			List<String> subProperties = getInstance().get(id);
-			if (subProperties!=null && subProperties.size()>0){
-				result = new String[subProperties.size()];
-				for (int i=0; i<subProperties.size(); i++)
-					result[i] = subProperties.get(i);
-			}
-		}
-			
-		return result;
+		if (id!=null)
+			return getInstance().get(id);
+		else
+			return null;
 	}
 	
 	/**

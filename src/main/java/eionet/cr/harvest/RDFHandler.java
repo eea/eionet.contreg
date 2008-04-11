@@ -35,7 +35,7 @@ import eionet.cr.harvest.util.RDFResource;
 import eionet.cr.harvest.util.RDFResourceProperty;
 import eionet.cr.harvest.util.WrappedARPObject;
 import eionet.cr.index.EncodingSchemes;
-import eionet.cr.index.Searcher;
+import eionet.cr.search.Searcher;
 import eionet.cr.util.Identifiers;
 import eionet.cr.util.Util;
 

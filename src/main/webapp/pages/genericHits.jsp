@@ -3,7 +3,7 @@
 <%@page import="java.util.*" %>
 <%@page import="java.io.*" %>
 <%@page import="eionet.cr.util.Util" %>
-<%@page import="eionet.cr.index.Searcher" %>
+<%@page import="eionet.cr.search.Searcher" %>
 <%@page import="eionet.cr.index.EncodingSchemes" %>
 <%@page import="eionet.cr.util.Identifiers" %>
 

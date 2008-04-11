@@ -15,6 +15,7 @@ import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -22,6 +23,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+
+import javax.servlet.jsp.PageContext;
 
 /**
  * 
@@ -436,5 +439,31 @@ public class Util {
     			resultList.add(new SearchResultRowDisplayMap(map));
     	}
     	return resultList;
+    }
+    
+    /**
+     * 
+     * @param pageContext
+     * @param objectClass
+     * @return
+     */
+    public static Object findInAnyScope(PageContext pageContext, Class objectClass){
+    	
+    	if (pageContext==null || objectClass==null)
+    		return null;
+ 
+    	int[] scopes = {PageContext.APPLICATION_SCOPE, PageContext.PAGE_SCOPE, PageContext.REQUEST_SCOPE, PageContext.SESSION_SCOPE};
+		for (int i=0; i<scopes.length; i++){
+			Enumeration attrs = pageContext.getAttributeNamesInScope(scopes[i]);
+			while (attrs!=null && attrs.hasMoreElements()){
+				String name = (String)attrs.nextElement();
+				Object o = pageContext.getAttribute(name, scopes[i]);
+				if (o!=null && objectClass.isInstance(o)){
+					return o;
+				}
+			}
+		}
+		
+		return null;
     }
 }

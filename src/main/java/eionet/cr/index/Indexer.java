@@ -81,7 +81,8 @@ public class Indexer {
 			if (fieldValue.length()>0){
 				
 				String fieldName = property.getId();
-				document.add(new Field(fieldName, fieldValue, Field.Store.YES, Field.Index.TOKENIZED));
+				document.add(new Field(fieldName, fieldValue,
+						Field.Store.YES, property.isLiteral() ? Field.Index.TOKENIZED : Field.Index.UN_TOKENIZED));
 				
 				if (property.isLiteral())
 					contentBuf.append(fieldValue).append(" ");
@@ -122,6 +123,10 @@ public class Indexer {
 		// if this document is an encoding scheme, add it into EncodingSchemes
 		if (isEncScheme)
 			EncodingSchemes.update(resource.getId(), document.getValues(Identifiers.RDFS_LABEL));
+		
+		// if this document represents a resource that is a sub-property of another one, add it to SubProperties
+		if (resource.isSubPropertyOf())
+			SubProperties.addSubProperty(document.getValues(Identifiers.RDFS_SUB_PROPERTY_OF), resource.getId());
 	}
 
 	/**

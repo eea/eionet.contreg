@@ -26,8 +26,7 @@
 				<display:column property="${col.property}" title="${col.title}" sortable="${col.sortable}"/>
 			</c:forEach>
 		</display:table>
-
-
+		
 	    <%	    
 	    //<c:import url="/pages/genericHits.jsp"/>
 	    %>

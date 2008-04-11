@@ -1,4 +1,4 @@
-package eionet.cr.index;
+package eionet.cr.search;
 
 import java.io.IOException;
 import java.net.URI;
@@ -12,6 +12,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -25,9 +27,13 @@ import org.apache.lucene.analysis.WhitespaceAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.FieldSelector;
 import org.apache.lucene.document.Fieldable;
+import org.apache.lucene.document.MapFieldSelector;
 import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.index.TermEnum;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Hits;
@@ -36,11 +42,14 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 
 import eionet.cr.config.GeneralConfig;
-import eionet.cr.index.util.RodInstrumentDTO;
-import eionet.cr.index.util.RodObligationDTO;
+import eionet.cr.index.EncodingSchemes;
+import eionet.cr.index.Indexer;
+import eionet.cr.index.SubProperties;
 import eionet.cr.index.walk.AllDocsWalker;
 import eionet.cr.index.walk.EncodingSchemesLoader;
 import eionet.cr.index.walk.SubPropertiesLoader;
+import eionet.cr.search.util.RodInstrumentDTO;
+import eionet.cr.search.util.RodObligationDTO;
 import eionet.cr.util.Identifiers;
 import eionet.cr.util.Messages;
 import eionet.cr.util.SimpleSearchExpression;
@@ -298,7 +307,68 @@ public class Searcher {
 			return resultList;
 		}
 	}
-	
+
+	/**
+	 * 
+	 * @param fieldName
+	 * @return
+	 * @throws IOException 
+	 * @throws CorruptIndexException 
+	 */
+	public static Set<String> getLiteralFieldValues(String fieldName) throws CorruptIndexException, IOException{
+		
+		Set<String> resultSet = new HashSet<String>();
+		if (fieldName==null || fieldName.length()==0)
+			return resultSet;
+		
+		String indexLocation = GeneralConfig.getProperty(GeneralConfig.LUCENE_INDEX_LOCATION);
+		IndexReader indexReader = null;
+		try{			
+			if (IndexReader.indexExists(indexLocation)){
+				indexReader = IndexReader.open(indexLocation);
+				
+				List<String> subProperties = SubProperties.getSubPropertiesOf(fieldName);
+				if (subProperties==null)
+					subProperties = new ArrayList<String>();
+				subProperties.add(0, fieldName);
+				
+				String[] fields = subProperties.toArray(new String[0]);
+				FieldSelector fieldSelector = new MapFieldSelector(fields);
+				
+				int numDocs = indexReader.numDocs();
+				for (int docIndex=0; docIndex<numDocs; docIndex++){
+					Document document = indexReader.document(docIndex, fieldSelector);
+					if (document!=null){
+						for (int fldIndex=0; fldIndex<fields.length; fldIndex++){
+							String[] values = document.getValues(fields[fldIndex]);
+							if (values!=null && values.length>0){
+								for (int j=0; j<values.length; j++){
+									if (!Util.isURL(values[j]))
+										resultSet.add(values[j]);
+								}
+							}
+						}
+					}
+				}
+				
+			}
+			else{
+				logger.info("Index does not exist at " + indexLocation);
+			}
+			
+		}
+		finally{
+			try{
+				if (indexReader!=null) indexReader.close();
+			}
+			catch (Exception e){
+				logger.error("Failed to close index reader: " + e.toString(), e);
+			}
+		}
+		
+		return new TreeSet(resultSet);
+	}
+
 	/**
 	 * 
 	 * @param args
@@ -308,10 +378,11 @@ public class Searcher {
 		try {
 			AllDocsWalker.startupWalk();
 			
-//			List<RodInstrumentDTO> instruments = Searcher.getDataflowsGroupedByInstruments();
-//			for (int i=0; instruments!=null && i<instruments.size(); i++){
-//				System.out.println(instruments.get(i).toString());
-//			}
+			Set<String> resultSet = Searcher.getLiteralFieldValues("http://www.w3.org/2000/01/rdf-schema#label");
+			for (Iterator i=resultSet.iterator(); i.hasNext(); ){
+				System.out.println(i.next());
+			}
+			
 			System.out.println();
 		}
 		catch (Throwable t) {

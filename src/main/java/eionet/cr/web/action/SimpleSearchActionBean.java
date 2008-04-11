@@ -9,7 +9,7 @@ import org.apache.lucene.queryParser.ParseException;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
-import eionet.cr.index.Searcher;
+import eionet.cr.search.Searcher;
 import eionet.cr.util.DefaultColumnList;
 import eionet.cr.util.Util;
 import net.sourceforge.stripes.action.DefaultHandler;
@@ -41,7 +41,6 @@ public class SimpleSearchActionBean extends AbstractCRActionBean {
 	 * @throws ParseException 
 	 * @throws DAOException
 	 */
-	@DefaultHandler
     public Resolution doSimpleSearch() throws ParseException, IOException{
 		
 		List<Map<String,String[]>> hits = Searcher.simpleSearch(searchExpression);
@@ -82,5 +81,4 @@ public class SimpleSearchActionBean extends AbstractCRActionBean {
 	public void setHits(List<Map<String, String>> hits) {
 		this.hits = hits;
 	}
-
 }

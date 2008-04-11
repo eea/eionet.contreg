@@ -28,7 +28,7 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.harvest.util.RDFResource;
 import eionet.cr.index.IndexException;
 import eionet.cr.index.Indexer;
-import eionet.cr.index.Searcher;
+import eionet.cr.search.Searcher;
 import eionet.cr.util.Identifiers;
 
 /**

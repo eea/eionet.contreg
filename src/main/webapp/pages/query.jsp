@@ -1,6 +1,6 @@
 <%@page contentType="text/html;charset=UTF-8"%>
 
-<%@page import="eionet.cr.index.Searcher"%>
+<%@page import="eionet.cr.search.Searcher"%>
 
 <%@ include file="/pages/common/taglibs.jsp"%>	
 

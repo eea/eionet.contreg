@@ -30,9 +30,7 @@ public class SubPropertiesLoader implements AllDocsWalkerListener {
 		String docID = document.get(Identifiers.DOC_ID);
 		String[] subPropertyOf = document.getValues(Identifiers.RDFS_SUB_PROPERTY_OF);
 		if (docID!=null && subPropertyOf!=null && subPropertyOf.length>0){
-			for (int i=0; i<subPropertyOf.length; i++){
-				SubProperties.add(subPropertyOf[i], docID);
-			}
+			SubProperties.addSubProperty(subPropertyOf, docID);
 			countLoaded++;
 		}
 	}
