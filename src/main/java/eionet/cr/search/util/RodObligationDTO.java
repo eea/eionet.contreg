@@ -40,7 +40,15 @@ public class RodObligationDTO implements Comparable{
 	public int compareTo(Object o) {
 		return this.label.compareTo(((RodObligationDTO)o).getLabel());
 	}
-	
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	public boolean equals(Object o){
+		return compareTo(o)==0;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Object#toString()

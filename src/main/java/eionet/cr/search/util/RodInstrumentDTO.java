@@ -68,7 +68,15 @@ public class RodInstrumentDTO implements Comparable{
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
 	public int compareTo(Object o) {
-		return this.label.compareTo(((RodInstrumentDTO)o).getLabel());
+		return label.compareTo(((RodInstrumentDTO)o).getLabel());
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	public boolean equals(Object o){
+		return compareTo(o)==0;
 	}
 
 	/*
