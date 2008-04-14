@@ -36,6 +36,8 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermEnum;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
@@ -110,18 +112,18 @@ public class Searcher {
 	
 	/**
 	 * 
-	 * @param query
+	 * @param queryStr
 	 * @return
 	 * @throws ParseException
 	 * @throws IOException
 	 */
-	public static List<Map<String,String[]>> luceneQuery(String query) throws ParseException, IOException{
-		return luceneQuery(query, defaultAnalyzer);
+	public static List<Map<String,String[]>> luceneQuery(String queryStr) throws ParseException, IOException{
+		return luceneQuery(queryStr, defaultAnalyzer);
 	}
 	
 	/**
 	 * 
-	 * @param query
+	 * @param queryStr
 	 * @param analyzerName
 	 * @return
 	 * @throws IOException 
@@ -130,21 +132,42 @@ public class Searcher {
 	 * @throws IOException 
 	 * @throws ParseException 
 	 */
-	public static List<Map<String,String[]>> luceneQuery(String query, String analyzerName) throws CorruptIndexException, IOException, ParseException{
+	public static List<Map<String,String[]>> luceneQuery(String queryStr, String analyzerName) throws CorruptIndexException, IOException, ParseException{
 
-		if (query==null || query.trim().length()==0)
+		if (queryStr==null || queryStr.trim().length()==0)
 			return new ArrayList<Map<String,String[]>>();
 		
 		QueryParser parser = new QueryParser(DEFAULT_FIELD, getAvailableAnalyzer(analyzerName));
-		Query queryObj = parser.parse(query);
+		Query queryObj = parser.parse(queryStr);
 		
-		logger.debug("Performing search query: " + query);
+		logger.debug("Performing search query: " + queryStr);
 		
-		List<Map<String,String[]>> list = new ArrayList<Map<String,String[]>>();
 		IndexSearcher indexSearcher = null;
 		try{
 			indexSearcher = getIndexSearcher();
 			Hits hits = indexSearcher.search(queryObj);
+			return processHits(hits);
+		}
+		finally{
+			try{
+				if (indexSearcher!=null)
+					indexSearcher.close();
+			}
+			catch (IOException e){}
+		}
+	}
+	
+	/**
+	 * 
+	 * @param hits
+	 * @return
+	 * @throws IOException 
+	 * @throws CorruptIndexException 
+	 */
+	private static List<Map<String,String[]>> processHits(Hits hits) throws CorruptIndexException, IOException{
+		
+		List<Map<String,String[]>> resultList = new ArrayList<Map<String,String[]>>();
+		if (hits!=null && hits.length()>0){
 			for (int i=0; hits!=null && i<hits.length() && i<Searcher.MAX_RESULT_SET_SIZE; i++){
 				
 				Document doc = hits.doc(i);
@@ -159,18 +182,11 @@ public class Searcher {
 						map.put(field.name(), fieldValues);
 				}
 				
-				list.add(map);
+				resultList.add(map);
 			}
+		}
 			
-			return list;
-		}
-		finally{
-			try{
-				if (indexSearcher!=null)
-					indexSearcher.close();
-			}
-			catch (IOException e){}
-		}
+		return resultList;
 	}
 	
 	/**
@@ -245,18 +261,69 @@ public class Searcher {
 	
 	/**
 	 * 
+	 * @param dataflow
+	 * @param locality
+	 * @param year
 	 * @return
-	 * @throws IOException 
-	 * @throws CorruptIndexException 
-	 * @throws ParseException 
+	 * @throws SearchException 
 	 */
-	public static List<RodInstrumentDTO> getDataflowsGroupedByInstruments() throws CorruptIndexException, IOException, ParseException{
+	public static List<Map<String,String[]>> dataflowSearch(String dataflow, String locality, String year) throws SearchException{
+		
+		List<Query> queries = new ArrayList<Query>();
+		queries.add(new TermQuery(new Term(Identifiers.RDF_TYPE, Identifiers.ROD_DELIVERY_CLASS)));
+		
+		if (!Util.isNullOrEmpty(dataflow))
+			queries.add(new TermQuery(new Term(Identifiers.ROD_OBLIGATION_PROPERTY, dataflow)));
+		
+		IndexSearcher indexSearcher = null;
+		try{
+			if (!Util.isNullOrEmpty(locality)){
+				QueryParser parser = new QueryParser(DEFAULT_FIELD, getAvailableAnalyzer(defaultAnalyzer));
+				StringBuffer qryBuf = new StringBuffer(Util.escapeForLuceneQuery(Identifiers.ROD_LOCALITY_PROPERTY));
+				qryBuf.append(":\"").append(Util.escapeForLuceneQuery(locality)).append("\"");
+				queries.add(parser.parse(qryBuf.toString()));
+			}
+			if (!Util.isNullOrEmpty(year)){
+				QueryParser parser = new QueryParser(DEFAULT_FIELD, getAvailableAnalyzer(defaultAnalyzer));
+				StringBuffer qryBuf = new StringBuffer(Util.escapeForLuceneQuery(Identifiers.DC_COVERAGE));
+				qryBuf.append(":\"").append(Util.escapeForLuceneQuery(year)).append("\"");
+				queries.add(parser.parse(qryBuf.toString()));
+			}
+
+			Query query;
+			if (queries.size()==1)
+				query = queries.get(0);
+			else{
+				query = new BooleanQuery();
+				for (int i=0; i<queries.size(); i++)
+					((BooleanQuery)query).add(queries.get(i), BooleanClause.Occur.MUST);
+			}
+
+			indexSearcher = getIndexSearcher();
+			Hits hits = indexSearcher.search(query);
+			return processHits(hits);
+		}
+		catch (Exception e){
+			throw new SearchException(e.toString(), e);
+		}
+		finally{
+			try{
+				if (indexSearcher!=null)
+					indexSearcher.close();
+			}
+			catch (IOException e){}
+		}
+	}
+
+	/**
+	 * 
+	 * @return
+	 * @throws SearchException
+	 */
+	public static List<RodInstrumentDTO> getDataflowsGroupedByInstruments() throws SearchException{
 
 		StringBuffer qryBuf = new StringBuffer(Util.escapeForLuceneQuery(Identifiers.RDF_TYPE));
-		qryBuf.append(":\"").append(Util.escapeForLuceneQuery(Identifiers.ROD_OBLIGATION)).append("\"");
-		
-		QueryParser parser = new QueryParser(DEFAULT_FIELD, getAvailableAnalyzer(defaultAnalyzer));
-		Query queryObj = parser.parse(qryBuf.toString());
+		qryBuf.append(":\"").append(Util.escapeForLuceneQuery(Identifiers.ROD_OBLIGATION_CLASS)).append("\"");
 		
 		logger.debug("Performing search query: " + qryBuf.toString());
 		
@@ -264,11 +331,15 @@ public class Searcher {
 		IndexSearcher indexSearcher = null;
 		try{
 			indexSearcher = getIndexSearcher();
+			
+			QueryParser parser = new QueryParser(DEFAULT_FIELD, new KeywordAnalyzer());
+			Query queryObj = parser.parse(qryBuf.toString());
+
 			Hits hits = indexSearcher.search(queryObj);
 			for (int i=0; hits!=null && i<hits.length(); i++){
 				
 				Document doc = hits.doc(i);
-				String instrumentId = doc.get(Identifiers.ROD_INSTRUMENT);
+				String instrumentId = doc.get(Identifiers.ROD_INSTRUMENT_PROPERTY);
 				if (instrumentId!=null && instrumentId.length()>0){
 					String instrumentLabel = EncodingSchemes.getLabel(instrumentId);
 					if (instrumentLabel!=null && instrumentLabel.length()>0){
@@ -291,6 +362,9 @@ public class Searcher {
 				}
 			}
 		}
+		catch (Exception e){
+			throw new SearchException(e.toString(), e);
+		}
 		finally{
 			try{
 				if (indexSearcher!=null)
@@ -312,10 +386,9 @@ public class Searcher {
 	 * 
 	 * @param fieldName
 	 * @return
-	 * @throws IOException 
-	 * @throws CorruptIndexException 
+	 * @throws SearchException
 	 */
-	public static Set<String> getLiteralFieldValues(String fieldName) throws CorruptIndexException, IOException{
+	public static Set<String> getLiteralFieldValues(String fieldName) throws SearchException{
 		
 		Set<String> resultSet = new HashSet<String>();
 		if (fieldName==null || fieldName.length()==0)
@@ -357,6 +430,9 @@ public class Searcher {
 			}
 			
 		}
+		catch (Exception e){
+			throw new SearchException(e.toString(), e);
+		}
 		finally{
 			try{
 				if (indexReader!=null) indexReader.close();
@@ -376,12 +452,21 @@ public class Searcher {
 	public static void main(String[] args){
 		
 		try {
-			AllDocsWalker.startupWalk();
-			
-			Set<String> resultSet = Searcher.getLiteralFieldValues("http://www.w3.org/2000/01/rdf-schema#label");
-			for (Iterator i=resultSet.iterator(); i.hasNext(); ){
-				System.out.println(i.next());
+			List<Map<String,String[]>> list = Searcher.dataflowSearch("http://rod.eionet.eu.int/obligations/32", "Albania", "2005");
+			System.out.println(list==null ? "list==null" : "list.size()=" + list.size());
+			for (int i=0; list!=null && i<list.size(); i++){
+				System.out.println(list.get(i));
 			}
+//			AllDocsWalker.startupWalk();
+			
+//			List<RodInstrumentDTO> list = Searcher.getDataflowsGroupedByInstruments();
+//			for (int i=0; list!=null && i<list.size(); i++){
+//				System.out.println(list.get(i));
+//			}
+//			Set<String> resultSet = Searcher.getLiteralFieldValues("http://www.w3.org/2000/01/rdf-schema#label");
+//			for (Iterator i=resultSet.iterator(); i.hasNext(); ){
+//				System.out.println(i.next());
+//			}
 			
 			System.out.println();
 		}

@@ -20,10 +20,18 @@ public interface Identifiers {
 	
 	public static final String DC_TITLE = "http://purl.org/dc/elements/1.1/title";
 	public static final String DC_DATE = "http://purl.org/dc/elements/1.1/date";
-	public static final String ROD_OBLIGATION = "http://rod.eionet.eu.int/schema.rdf#obligation";
-	public static final String ROD_INSTRUMENT = "http://rod.eionet.eu.int/schema.rdf#instrument";
-	public static final String ROD_LOCALITY = "http://rod.eionet.eu.int/schema.rdf#locality";
-	public static final String ROD_DELIVERY = "http://rod.eionet.eu.int/schema.rdf#Delivery";
+	public static final String DC_COVERAGE = "http://purl.org/dc/elements/1.1/coverage";
+	
+	public static final String ROD_OBLIGATION_CLASS = "http://rod.eionet.eu.int/schema.rdf#Obligation";
+	public static final String ROD_OBLIGATION_PROPERTY = "http://rod.eionet.eu.int/schema.rdf#obligation";
+	
+	public static final String ROD_INSTRUMENT_CLASS = "http://rod.eionet.eu.int/schema.rdf#Instrument";
+	public static final String ROD_INSTRUMENT_PROPERTY = "http://rod.eionet.eu.int/schema.rdf#instrument";
+	
+	public static final String ROD_LOCALITY_CLASS = "http://rod.eionet.eu.int/schema.rdf#Locality";
+	public static final String ROD_LOCALITY_PROPERTY = "http://rod.eionet.eu.int/schema.rdf#locality";
+	
+	public static final String ROD_DELIVERY_CLASS = "http://rod.eionet.eu.int/schema.rdf#Delivery";
 	
 	public static final String RDFS_SUB_PROPERTY_OF = "http://www.w3.org/2000/01/rdf-schema#subPropertyOf";
 	

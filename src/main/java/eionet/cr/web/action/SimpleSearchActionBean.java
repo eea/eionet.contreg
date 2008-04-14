@@ -3,6 +3,8 @@ package eionet.cr.web.action;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.queryParser.ParseException;
 import eionet.cr.dao.DAOException;
 import eionet.cr.search.Searcher;
@@ -19,12 +21,18 @@ import net.sourceforge.stripes.action.UrlBinding;
  *
  */
 @UrlBinding("/simpleSearch.action")
-public class SimpleSearchActionBean extends AbstractCRActionBean {
+public class SimpleSearchActionBean extends AbstractSearchActionBean {
+	
+	/** */
+	private static Log logger = LogFactory.getLog(SimpleSearchActionBean.class);
 	
 	/** */
 	private String searchExpression;
-	private List<Map<String,String>> hits;
 	
+	/**
+	 * 
+	 * @return
+	 */
 	@DefaultHandler
 	public Resolution init(){
 		return new ForwardResolution("/pages/simpleSearch.jsp");
@@ -37,16 +45,10 @@ public class SimpleSearchActionBean extends AbstractCRActionBean {
 	 * @throws ParseException 
 	 * @throws DAOException
 	 */
-    public Resolution doSimpleSearch() throws ParseException, IOException{
+    public Resolution search() throws ParseException, IOException{
 		
-		List<Map<String,String[]>> hits = Searcher.simpleSearch(searchExpression);
-		this.hits = Util.listForDisplay(hits);
-		
-		getContext().getRequest().setAttribute("hits", this.hits);
-		getContext().getRequest().setAttribute("collist", new DefaultColumnList());		
-		
-		showMessage(String.valueOf(hits==null ? 0 : hits.size()) + " hits found");
-		
+		resultList = Util.listForDisplay(Searcher.simpleSearch(searchExpression));
+		//showMessage(String.valueOf(resultList==null ? 0 : resultList.size()) + " hits found");
 		return new ForwardResolution("/pages/simpleSearch.jsp");
     }
 
@@ -62,19 +64,5 @@ public class SimpleSearchActionBean extends AbstractCRActionBean {
 	 */
 	public void setSearchExpression(String searchExpression) {
 		this.searchExpression = searchExpression;
-	}
-
-	/**
-	 * @return the hits
-	 */
-	public List<Map<String, String>> getHits() {
-		return hits;
-	}
-
-	/**
-	 * @param hits the hits to set
-	 */
-	public void setHits(List<Map<String, String>> hits) {
-		this.hits = hits;
 	}
 }

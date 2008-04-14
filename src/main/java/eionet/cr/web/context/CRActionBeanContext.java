@@ -42,7 +42,7 @@ public class CRActionBeanContext extends ActionBeanContext {
 	 * @param value session attribute value.
 	 */
 	public void setSessionAttribute(String name, Object value) {
-		getRequest().getSession(true).setAttribute(name, value);
+		getRequest().getSession().setAttribute(name, value);
 	}
 	
 	/**
@@ -51,7 +51,7 @@ public class CRActionBeanContext extends ActionBeanContext {
 	 * @return {@link CRUser} from session or null if user is not logged in.
 	 */
 	public CRUser getCRUser() {
-		return (CRUser) getRequest().getSession(true).getAttribute(USER_SESSION_ATTR);
+		return (CRUser) getRequest().getSession().getAttribute(USER_SESSION_ATTR);
 	}
 	
 	/**
@@ -90,7 +90,7 @@ public class CRActionBeanContext extends ActionBeanContext {
 	 * @return last action event URL.
 	 */
 	public String getLastActionEventUrl() {
-		return (String) getRequest().getSession(true).getAttribute(LAST_ACTION_URL_SESSION_ATTR);
+		return (String) getRequest().getSession().getAttribute(LAST_ACTION_URL_SESSION_ATTR);
 	}
 
 	public int getSeverity() {

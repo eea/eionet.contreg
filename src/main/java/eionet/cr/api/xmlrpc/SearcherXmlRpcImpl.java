@@ -71,7 +71,7 @@ public class SearcherXmlRpcImpl{
 			criteria = new HashMap<String,String>();
 		
 		if (!criteria.containsKey(Identifiers.RDF_TYPE))
-			criteria.put(Identifiers.RDF_TYPE, Identifiers.ROD_DELIVERY);
+			criteria.put(Identifiers.RDF_TYPE, Identifiers.ROD_DELIVERY_CLASS);
 		
 		List<DataflowResultDto> result = new ArrayList<DataflowResultDto>();
 		
@@ -83,8 +83,8 @@ public class SearcherXmlRpcImpl{
 					
 					DataflowResultDto dto = new DataflowResultDto();
 					dto.setTitle(Util.getFirst(map.get(Identifiers.DC_TITLE)));
-					dto.setDataflow(Util.pruneUrls(map.get(Identifiers.ROD_OBLIGATION)));
-					dto.setLocality(Util.pruneUrls(map.get(Identifiers.ROD_LOCALITY)));
+					dto.setDataflow(Util.pruneUrls(map.get(Identifiers.ROD_OBLIGATION_PROPERTY)));
+					dto.setLocality(Util.pruneUrls(map.get(Identifiers.ROD_LOCALITY_PROPERTY)));
 					dto.setType(Util.pruneUrls(map.get(Identifiers.RDF_TYPE)));
 					dto.setResource(Util.getFirst(map.get(Identifiers.DOC_ID)));
 					dto.setDate(Util.getFirst(map.get(Identifiers.DC_DATE)));

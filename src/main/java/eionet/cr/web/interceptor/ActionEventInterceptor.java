@@ -32,7 +32,6 @@ public class ActionEventInterceptor implements Interceptor {
 	/* (non-Javadoc)
      * @see net.sourceforge.stripes.controller.Interceptor#intercept(net.sourceforge.stripes.controller.ExecutionContext)
      */
-	@Override
 	@SuppressWarnings("unchecked")
 	public Resolution intercept(ExecutionContext context) throws Exception {
 		Resolution resolution = null;
@@ -54,7 +53,7 @@ public class ActionEventInterceptor implements Interceptor {
 				//this will handle pretty url integration
 				actionEventURL = postProcess(actionEventURL);
 				
-			request.getSession(true).setAttribute(LAST_ACTION_URL_SESSION_ATTR, actionEventURL);
+			request.getSession().setAttribute(LAST_ACTION_URL_SESSION_ATTR, actionEventURL);
 		}
 
 		resolution = context.proceed();

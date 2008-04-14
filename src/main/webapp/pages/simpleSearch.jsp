@@ -4,9 +4,6 @@
 
 <stripes:layout-render name="/pages/common/template.jsp" pageTitle="Simple search">
 
-	<stripes:layout-component name="errors"/>
-	<stripes:layout-component name="messages"/>
-	
 	<stripes:layout-component name="contents">
 	
         <h1>Simple search</h1>
@@ -17,19 +14,17 @@
 			
 	    	<stripes:label for="expressionField">Expression:</stripes:label>
 	    	<stripes:text name="searchExpression" id="expressionField" size="30"/>
-	    	<stripes:submit name="doSimpleSearch" value="Search" id="searchButton"/>
+	    	<stripes:submit name="search" value="Search" id="searchButton"/>
 	    	
 	    </stripes:form>
 	    
-	    <display:table name="${hits}" class="sortable" pagesize="20" sort="list" requestURI="/simpleSearch.action">
-			<c:forEach var="col" items="${collist}">
+	    <stripes:useActionBean beanclass="eionet.cr.web.action.SimpleSearchActionBean" id="simpleSearchActionBean"/>
+                     
+	    <display:table name="${simpleSearchActionBean.resultList}" class="sortable" pagesize="20" sort="list" requestURI="/simpleSearch.action">
+			<c:forEach var="col" items="${simpleSearchActionBean.columns}">
 				<display:column property="${col.property}" title="${col.title}" sortable="${col.sortable}"/>
 			</c:forEach>
 		</display:table>
 		
-	    <%	    
-	    //<c:import url="/pages/genericHits.jsp"/>
-	    %>
-                     
 	</stripes:layout-component>
 </stripes:layout-render>

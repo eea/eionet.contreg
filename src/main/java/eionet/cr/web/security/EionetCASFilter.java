@@ -80,7 +80,7 @@ public class EionetCASFilter extends CASFilter {
 			if (session != null) {
 				String userName = (String) session
 						.getAttribute(CAS_FILTER_USER);
-				httpRequest.getSession(true).setAttribute(USER_SESSION_ATTR, new CRUser(userName));
+				httpRequest.getSession().setAttribute(USER_SESSION_ATTR, new CRUser(userName));
 				String requestURI = httpRequest.getRequestURI();
 				HttpServletResponse httpResponse = (HttpServletResponse) response;
 				if (requestURI.indexOf(EIONET_COOKIE_LOGIN_PATH) > -1) {
@@ -126,7 +126,7 @@ public class EionetCASFilter extends CASFilter {
 	 * @return
 	 */
 	public static String getCASLoginURL(HttpServletRequest request) {
-		/*request.getSession(true).setAttribute(
+		/*request.getSession().setAttribute(
 				"afterLogin",
 				request.getRequestURL().toString()
 						+ (request.getQueryString() != null ? ("?" + request

@@ -1,4 +1,4 @@
-package eionet.cr.index;
+package eionet.cr.search;
 
 import eionet.cr.util.CRException;
 
@@ -7,12 +7,12 @@ import eionet.cr.util.CRException;
  * @author heinljab
  *
  */
-public class IndexException extends CRException{
+public class SearchException extends CRException{
 
 	/**
 	 * 
 	 */
-	public IndexException(){
+	public SearchException(){
 		super();
 	}
 	
@@ -20,7 +20,7 @@ public class IndexException extends CRException{
 	 * 
 	 * @param message
 	 */
-	public IndexException(String message){
+	public SearchException(String message){
 		super(message);
 	}
 
@@ -29,7 +29,7 @@ public class IndexException extends CRException{
 	 * @param message
 	 * @param cause
 	 */
-	public IndexException(String message, Throwable cause){
+	public SearchException(String message, Throwable cause){
 		super(message, cause);
 	}
 
