@@ -74,7 +74,7 @@ public class HarvestSourceActionBean extends AbstractCRActionBean {
     @DontValidate
     public Resolution preEditHarvestSource() throws DAOException {
     	harvestSource = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(harvestSource.getSourceId());
-        return new RedirectResolution("/pages/editsource.jsp").flash(this);
+        return new ForwardResolution("/pages/editsource.jsp");
     }
     
     /**
@@ -101,7 +101,7 @@ public class HarvestSourceActionBean extends AbstractCRActionBean {
     public Resolution preViewHarvestSource() throws DAOException {
     	harvestSource = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(harvestSource.getSourceId());
     	harvests = DAOFactory.getDAOFactory().getHarvestDAO().getHarvestsBySourceId(harvestSource.getSourceId());
-    	return new RedirectResolution("/pages/viewsource.jsp").flash(this);
+    	return new ForwardResolution("/pages/viewsource.jsp");
     }
     
     /**

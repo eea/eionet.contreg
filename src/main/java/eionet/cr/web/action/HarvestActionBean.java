@@ -43,7 +43,7 @@ public class HarvestActionBean extends AbstractCRActionBean {
 		harvestDTO = DAOFactory.getDAOFactory().getHarvestDAO().getHarvestById(harvestDTO.getHarvestId());
 		harvestSourceDTO = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(harvestDTO.getHarvestSourceId());
 		loadMessages();
-		return new RedirectResolution("/pages/harvest.jsp").flash(this);
+		return new ForwardResolution("/pages/harvest.jsp");
 	}
 	
 	/**

@@ -1,0 +1,13 @@
+th.sorted a,th.sortable a {
+	background-position: right;
+	background-attachment:fixed;
+	background-repeat: no-repeat;
+}
+
+th.order1 a {
+	background-image: url(../images/sortdown.gif);
+}
+
+th.order2 a {
+	background-image: url(../images/sortup.gif);
+}

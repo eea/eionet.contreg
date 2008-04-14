@@ -22,7 +22,7 @@
                      
 	    <display:table name="${simpleSearchActionBean.resultList}" class="sortable" pagesize="20" sort="list" requestURI="/simpleSearch.action">
 			<c:forEach var="col" items="${simpleSearchActionBean.columns}">
-				<display:column property="${col.property}" title="${col.title}" sortable="${col.sortable}"/>
+				<display:column property="${col.property}" title="${col.title}" sortable="${col.sortable}" headerClass="sortable"/>
 			</c:forEach>
 		</display:table>
 		
