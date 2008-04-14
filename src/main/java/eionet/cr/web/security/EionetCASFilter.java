@@ -5,7 +5,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
-
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
@@ -15,14 +14,8 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import edu.yale.its.tp.cas.client.filter.CASFilter;
-import eionet.cr.config.GeneralConfig;
 import eionet.cr.web.util.CrCasFilterConfig;
-
 import static eionet.cr.web.util.ICRWebConstants.*;
 
 /**
@@ -95,15 +88,14 @@ public class EionetCASFilter extends CASFilter {
 					return;
 				}
 				else if (requestURI.endsWith("/login")){
-					
 					attachEionetLoginCookie(httpResponse, true);
-					
 					// TODO - what should really happen here is that user must be redricetd to the page he logged in from
-					
-//					if (session.getAttribute("afterLogin") != null)
-//						httpResponse.sendRedirect(session.getAttribute("afterLogin").toString());
-//					else
-						request.getRequestDispatcher("/").forward(request, response);
+					/*if (session.getAttribute("afterLogin") != null)
+						httpResponse.sendRedirect(session.getAttribute("afterLogin").toString());
+					else
+						request.getRequestDispatcher("/").forward(request, response);*/
+					String redirectUrl =  httpRequest.getContextPath() + LOGIN_ACTION + "?" + AFTER_LOGIN_EVENT;
+					httpResponse.sendRedirect(redirectUrl);
 					return;
 				}
 			}
@@ -134,11 +126,11 @@ public class EionetCASFilter extends CASFilter {
 	 * @return
 	 */
 	public static String getCASLoginURL(HttpServletRequest request) {
-		request.getSession(true).setAttribute(
+		/*request.getSession(true).setAttribute(
 				"afterLogin",
 				request.getRequestURL().toString()
 						+ (request.getQueryString() != null ? ("?" + request
-								.getQueryString()) : ""));
+								.getQueryString()) : ""));*/
 		return CAS_LOGIN_URL + "?service=" + request.getScheme() + "://"
 				+ SERVER_NAME + request.getContextPath() + "/login";
 	}

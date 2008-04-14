@@ -3,6 +3,7 @@
  */
 package eionet.cr.web.action;
 
+import eionet.cr.web.interceptor.annotation.DontSaveLastActionEvent;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.HandlesEvent;
 import net.sourceforge.stripes.action.RedirectResolution;
@@ -29,8 +30,26 @@ public class LoginActionBean extends AbstractCRActionBean {
 	 */
 	@DefaultHandler
 	@HandlesEvent(LOGIN_EVENT)
+	@DontSaveLastActionEvent
 	public Resolution login() {
+		System.out.println("************ LAST URL: " + getContext().getLastActionEventUrl());
 		return new RedirectResolution(getContext().getCASLoginURL(), false);
+	}
+	
+	/**
+	 * Method redirects to last event occurred before logging in.
+	 * 
+	 * @return redirect resolution to last event occurred before logging in.
+	 */
+	@HandlesEvent(AFTER_LOGIN_EVENT)
+	@DontSaveLastActionEvent
+	public Resolution afterLogin() {
+		String lastActionEventUrl = getContext().getLastActionEventUrl();
+		lastActionEventUrl = lastActionEventUrl == null ? MAIN_PAGE_ACTION : lastActionEventUrl;
+		//getContext().getCRUser().setLocalId(this.userService.addUserIfrequired(getUserName()));
+		return new RedirectResolution(
+				lastActionEventUrl,
+				!lastActionEventUrl.toLowerCase().startsWith("http://"));
 	}
 	
 	/**

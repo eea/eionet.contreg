@@ -3,12 +3,8 @@ package eionet.cr.web.action;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.lucene.queryParser.ParseException;
-
-import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
-import eionet.cr.dao.DAOFactory;
 import eionet.cr.search.Searcher;
 import eionet.cr.util.DefaultColumnList;
 import eionet.cr.util.Util;

@@ -36,6 +36,12 @@
 			<param-value>eionet.cr.web.context.CRActionBeanContext</param-value>
 		</init-param>
 		<init-param>
+			<param-name>Interceptor.Classes</param-name>
+			<param-value>
+				eionet.cr.web.interceptor.ActionEventInterceptor
+			</param-value>
+		</init-param>
+		<init-param>
 			<param-name>ExceptionHandler.Class</param-name>
 			<param-value>eionet.cr.util.CRStripesExceptionHandler</param-value>
 		</init-param>

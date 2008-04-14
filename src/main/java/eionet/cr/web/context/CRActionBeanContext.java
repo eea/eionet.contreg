@@ -84,6 +84,14 @@ public class CRActionBeanContext extends ActionBeanContext {
 	public void attachEionetLoginCookie(boolean isLoggedIn) {
 		EionetCASFilter.attachEionetLoginCookie(getResponse(), isLoggedIn);
 	}
+	
+	/**
+	 * 
+	 * @return last action event URL.
+	 */
+	public String getLastActionEventUrl() {
+		return (String) getRequest().getSession(true).getAttribute(LAST_ACTION_URL_SESSION_ATTR);
+	}
 
 	public int getSeverity() {
 		return severity;
