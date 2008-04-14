@@ -1,10 +1,14 @@
-package eionet.cr.util;
+package eionet.cr.search.util;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.KeywordAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
+
+import eionet.cr.util.Identifiers;
+import eionet.cr.util.Util;
 
 /**
  * 
@@ -49,11 +53,11 @@ public class SimpleSearchExpression{
 	/**
 	 * @return the analyzerName
 	 */
-	public String getAnalyzerName() {
+	public Analyzer getAnalyzer() {
 		if (isUrlSearch())
-			return KeywordAnalyzer.class.getName();
+			return new KeywordAnalyzer();
 		else
-			return StandardAnalyzer.class.getName();
+			return new StandardAnalyzer();
 	}
 	
 	/**

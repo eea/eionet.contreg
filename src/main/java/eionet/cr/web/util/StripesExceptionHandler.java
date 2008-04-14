@@ -1,4 +1,4 @@
-package eionet.cr.util;
+package eionet.cr.web.util;
 
 import java.io.IOException;
 
@@ -16,10 +16,10 @@ import net.sourceforge.stripes.exception.ExceptionHandler;
  * @author altnyris
  *
  */
-public class CRStripesExceptionHandler implements ExceptionHandler {
+public class StripesExceptionHandler implements ExceptionHandler {
 	
 	/** */
-	private static Log logger = LogFactory.getLog(CRStripesExceptionHandler.class);
+	private static Log logger = LogFactory.getLog(StripesExceptionHandler.class);
 
 	/*
 	 * (non-Javadoc)

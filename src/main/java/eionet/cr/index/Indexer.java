@@ -140,9 +140,8 @@ public class Indexer {
 		logger.debug("Initializing index writer");
 		
 		try{
-			Analyzer analyzer = new StandardAnalyzer();
 			String indexLocation = GeneralConfig.getProperty(GeneralConfig.LUCENE_INDEX_LOCATION);
-			indexWriter = new IndexWriter(FSDirectory.getDirectory(indexLocation), NO_AUTO_COMMIT, analyzer);
+			indexWriter = new IndexWriter(FSDirectory.getDirectory(indexLocation), NO_AUTO_COMMIT, getAnalyzer());
 		}
 		catch (Exception e){
 			throw new IndexException(e.toString(), e);
@@ -186,5 +185,13 @@ public class Indexer {
 		if (this.firstSeenTimestamp==null)
 			this.firstSeenTimestamp = String.valueOf((int)(System.currentTimeMillis() / (long)1000));
 		return this.firstSeenTimestamp;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public static Analyzer getAnalyzer(){
+		return new StandardAnalyzer();
 	}
 }

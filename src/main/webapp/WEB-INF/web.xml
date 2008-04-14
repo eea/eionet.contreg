@@ -43,7 +43,7 @@
 		</init-param>
 		<init-param>
 			<param-name>ExceptionHandler.Class</param-name>
-			<param-value>eionet.cr.util.CRStripesExceptionHandler</param-value>
+			<param-value>eionet.cr.web.util.StripesExceptionHandler</param-value>
 		</init-param>
 	</filter>
 	

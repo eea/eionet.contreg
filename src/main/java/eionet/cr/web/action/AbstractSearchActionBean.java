@@ -3,7 +3,7 @@ package eionet.cr.web.action;
 import java.util.List;
 import java.util.Map;
 
-import eionet.cr.util.DefaultColumnList;
+import eionet.cr.search.util.DefaultColumnList;
 
 /**
  * 

@@ -1,8 +1,11 @@
-package eionet.cr.util;
+package eionet.cr.search.util;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import eionet.cr.util.Identifiers;
+import eionet.cr.util.Util;
 
 /**
  * 
