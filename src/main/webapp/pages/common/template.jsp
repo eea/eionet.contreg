@@ -15,7 +15,6 @@
 			<link rel="stylesheet" type="text/css" href="http://www.eionet.europa.eu/styles/eionet2007/print.css" media="print" />
 			<link rel="stylesheet" type="text/css" href="http://www.eionet.europa.eu/styles/eionet2007/handheld.css" media="handheld" />		
 			<link rel="stylesheet" type="text/css" href="http://www.eionet.europa.eu/styles/eionet2007/screen.css" media="screen" title="Eionet 2007 style" />
-			<link rel="stylesheet" type="text/css" href="<c:url value="/css/contreg.css"/>" media="screen" title="Local style" />
 			<link rel="stylesheet" type="text/css" href="<c:url value="/css/eionet2007.css"/>" media="screen" title="Eionet 2007 style"/>
 			<link rel="shortcut icon" href="<c:url value="/favicon.ico"/>" type="image/x-icon" />
 			
@@ -24,7 +23,7 @@
 			<script type="text/javascript" src="<c:url value="/scripts/mark_special_links.js"/>"></script>
 		</head>
 		<body>
-			<div id="container" style="max-width: none;">
+			<div id="container">
 				<div id="toolribbon">
 					<div id="lefttools">
 						<a id="eealink" href="http://www.eea.europa.eu/">EEA</a>

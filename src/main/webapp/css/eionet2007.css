@@ -12,6 +12,19 @@ td.select_issue {
 	font-size: 0.8em;
 }
 
+th.sorted a,th.sortable a {
+	background-repeat: no-repeat;
+	background-position: right;
+}
+
+th.order1 a {
+	background-image: url(../images/sortdown.gif);
+}
+
+th.order2 a {
+	background-image: url(../images/sortup.gif);
+}
+
 td.issues {
 	border-left: #008080 1px solid; 
 	border-right: #C0C0C0 1px solid; 
