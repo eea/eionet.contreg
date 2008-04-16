@@ -3,7 +3,8 @@ package eionet.cr.web.action;
 import java.util.List;
 import java.util.Map;
 
-import eionet.cr.search.util.DefaultColumnList;
+import eionet.cr.web.util.display.DefaultColumnList;
+import eionet.cr.web.util.display.SearchResultRowDisplayMap;
 
 /**
  * 
@@ -16,7 +17,7 @@ public abstract class AbstractSearchActionBean extends AbstractCRActionBean{
 	protected List columns = null;
 	
 	/** */
-	protected List<Map<String,String>> resultList;
+	protected List<SearchResultRowDisplayMap> resultList;
 
 	/**
 	 * @return the columns
@@ -37,7 +38,7 @@ public abstract class AbstractSearchActionBean extends AbstractCRActionBean{
 	/**
 	 * @return the resultList
 	 */
-	public List<Map<String, String>> getResultList() {
+	public List<SearchResultRowDisplayMap> getResultList() {
 		return resultList;
 	}
 }

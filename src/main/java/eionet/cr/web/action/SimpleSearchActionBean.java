@@ -8,8 +8,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.queryParser.ParseException;
 import eionet.cr.dao.DAOException;
 import eionet.cr.search.Searcher;
-import eionet.cr.search.util.DefaultColumnList;
-import eionet.cr.search.util.SearchUtil;
+import eionet.cr.web.util.display.DefaultColumnList;
+import eionet.cr.web.util.display.DisplayUtil;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
@@ -47,7 +47,7 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean {
 	 */
     public Resolution search() throws ParseException, IOException{
 		
-		resultList = SearchUtil.listForDisplay(Searcher.simpleSearch(searchExpression));
+		resultList = DisplayUtil.listForDisplay(Searcher.simpleSearch(searchExpression));
 		//showMessage(String.valueOf(resultList==null ? 0 : resultList.size()) + " hits found");
 		return new ForwardResolution("/pages/simpleSearch.jsp");
     }

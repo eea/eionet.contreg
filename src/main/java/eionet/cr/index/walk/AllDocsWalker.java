@@ -10,8 +10,8 @@ import org.apache.lucene.document.FieldSelector;
 import org.apache.lucene.document.MapFieldSelector;
 import org.apache.lucene.index.IndexReader;
 
+import eionet.cr.common.Identifiers;
 import eionet.cr.config.GeneralConfig;
-import eionet.cr.util.Identifiers;
 
 /**
  * 

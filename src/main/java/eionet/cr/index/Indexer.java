@@ -15,10 +15,10 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.LockObtainFailedException;
 
+import eionet.cr.common.Identifiers;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.harvest.util.RDFResource;
 import eionet.cr.harvest.util.RDFResourceProperty;
-import eionet.cr.util.Identifiers;
 
 /**
  * 

@@ -1,4 +1,4 @@
-package eionet.cr.search.util;
+package eionet.cr.web.util.display;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -25,6 +25,8 @@ import java.util.StringTokenizer;
 
 import javax.servlet.jsp.PageContext;
 
+import eionet.cr.common.CRRuntimeException;
+
 
 /**
  * 
@@ -446,5 +448,13 @@ public class Util {
 		}
 		
 		return null;
+    }
+    
+    /**
+     * 
+     * @param args
+     */
+    public static void main(String[] args){
+    	System.out.println(Util.isURL("urn:contreg:first-seen-timestamp"));
     }
 }

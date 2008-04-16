@@ -4,9 +4,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.document.Document;
 
+import eionet.cr.common.Identifiers;
 import eionet.cr.index.EncodingSchemes;
 import eionet.cr.index.SubProperties;
-import eionet.cr.util.Identifiers;
 
 /**
  * 

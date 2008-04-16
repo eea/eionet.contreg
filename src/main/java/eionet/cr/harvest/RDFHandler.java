@@ -31,12 +31,12 @@ import com.hp.hpl.jena.rdf.arp.ALiteral;
 import com.hp.hpl.jena.rdf.arp.AResource;
 import com.hp.hpl.jena.rdf.arp.StatementHandler;
 
+import eionet.cr.common.Identifiers;
 import eionet.cr.harvest.util.RDFResource;
 import eionet.cr.harvest.util.RDFResourceProperty;
 import eionet.cr.harvest.util.WrappedARPObject;
 import eionet.cr.index.EncodingSchemes;
 import eionet.cr.search.Searcher;
-import eionet.cr.util.Identifiers;
 import eionet.cr.util.Util;
 
 /**

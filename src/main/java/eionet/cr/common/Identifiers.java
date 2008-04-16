@@ -1,4 +1,4 @@
-package eionet.cr.util;
+package eionet.cr.common;
 
 /**
  * 
@@ -14,7 +14,6 @@ public interface Identifiers {
 	public static final String RDFS_LABEL = "http://www.w3.org/2000/01/rdf-schema#label";
 	public static final String ANON_ID_PREFIX = "http://cr.eionet.europa.eu/anonymous/";
 	public static final String IS_ENCODING_SCHEME = "IS_ENCODING_SCHEME";
-	public static final String HAS_LABEL = "HAS_LABEL";
 	public static final String ALL_LITERAL_CONTENT = "CONTENT";
 	public static final String FIRST_SEEN_TIMESTAMP = "urn:contreg:first-seen-timestamp";	
 	
@@ -34,6 +33,4 @@ public interface Identifiers {
 	public static final String ROD_DELIVERY_CLASS = "http://rod.eionet.eu.int/schema.rdf#Delivery";
 	
 	public static final String RDFS_SUB_PROPERTY_OF = "http://www.w3.org/2000/01/rdf-schema#subPropertyOf";
-	
-	public static final String DISPLAY_LABEL = "urn:contreg:display-label";
 }

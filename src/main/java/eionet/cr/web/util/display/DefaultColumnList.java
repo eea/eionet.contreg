@@ -1,10 +1,10 @@
-package eionet.cr.search.util;
+package eionet.cr.web.util.display;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import eionet.cr.util.Identifiers;
+import eionet.cr.common.Identifiers;
 import eionet.cr.util.Util;
 
 /**
@@ -22,23 +22,25 @@ public class DefaultColumnList extends ArrayList{
 		super();
 		
 		Map type = new HashMap();
-		type.put("property", Util.md5digest(Identifiers.RDF_TYPE));
+		type.put("property", Identifiers.RDF_TYPE);
+		type.put("propertyMd5", Util.md5digest(Identifiers.RDF_TYPE));
 		type.put("title", "Type");
 		type.put("sortable", Boolean.TRUE);
 		
 		Map label = new HashMap();
-		label.put("property", Util.md5digest(Identifiers.DISPLAY_LABEL));
+		label.put("property", SearchResultRowDisplayMap.FALLBACKED_LABEL);
+		label.put("propertyMd5", SearchResultRowDisplayMap.FALLBACKED_LABEL);
 		label.put("title", "Label");
 		label.put("sortable", Boolean.TRUE);
 
 		Map date = new HashMap();
-		date.put("property", Util.md5digest(Identifiers.DC_DATE));
+		date.put("property", Identifiers.DC_DATE);
+		date.put("propertyMd5", Util.md5digest(Identifiers.DC_DATE));
 		date.put("title", "Date");
 		date.put("sortable", Boolean.TRUE);
 		
 		add(type);
 		add(label);
 		add(date);
-
 	}
 }

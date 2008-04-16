@@ -12,8 +12,8 @@ import org.apache.lucene.document.Fieldable;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.search.Hits;
 
+import eionet.cr.common.CRRuntimeException;
 import eionet.cr.search.Searcher;
-import eionet.cr.util.CRRuntimeException;
 
 /**
  * 
@@ -21,25 +21,6 @@ import eionet.cr.util.CRRuntimeException;
  *
  */
 public class SearchUtil {
-
-	/**
-	 * 
-	 * @param list
-	 * @return
-	 */
-	public static List<Map<String,String>> listForDisplay(List<Map<String,String[]>> list){
-		
-		if (list==null)
-			return null;
-		
-		List<Map<String,String>> resultList = new ArrayList<Map<String,String>>();
-		for (int i=0; i<list.size(); i++){
-			Map<String,String[]> map = list.get(i);
-			if (!map.isEmpty())
-				resultList.add(new SearchResultRowDisplayMap(map));
-		}
-		return resultList;
-	}
 
 	/**
 	 * 

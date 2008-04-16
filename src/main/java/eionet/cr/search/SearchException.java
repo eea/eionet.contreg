@@ -1,6 +1,6 @@
 package eionet.cr.search;
 
-import eionet.cr.util.CRException;
+import eionet.cr.common.CRException;
 
 /**
  * 

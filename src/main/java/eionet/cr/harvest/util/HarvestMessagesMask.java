@@ -1,6 +1,6 @@
 package eionet.cr.harvest.util;
 
-import eionet.cr.util.CRRuntimeException;
+import eionet.cr.common.CRRuntimeException;
 
 /**
  * 

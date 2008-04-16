@@ -1,6 +1,6 @@
 package eionet.cr.config;
 
-import eionet.cr.util.CRRuntimeException;
+import eionet.cr.common.CRRuntimeException;
 
 /**
  * 

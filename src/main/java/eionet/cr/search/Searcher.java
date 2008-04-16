@@ -41,6 +41,8 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 
+import eionet.cr.common.Identifiers;
+import eionet.cr.common.Resource;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.index.EncodingSchemes;
 import eionet.cr.index.Indexer;
@@ -48,12 +50,11 @@ import eionet.cr.index.SubProperties;
 import eionet.cr.index.walk.AllDocsWalker;
 import eionet.cr.index.walk.EncodingSchemesLoader;
 import eionet.cr.index.walk.SubPropertiesLoader;
-import eionet.cr.search.util.RodInstrumentDTO;
-import eionet.cr.search.util.RodObligationDTO;
 import eionet.cr.search.util.SearchUtil;
 import eionet.cr.search.util.SimpleSearchExpression;
-import eionet.cr.util.Identifiers;
 import eionet.cr.util.Util;
+import eionet.cr.web.util.display.RodInstrumentDTO;
+import eionet.cr.web.util.display.RodObligationDTO;
 
 /**
  * 
@@ -422,17 +423,57 @@ public class Searcher {
 	
 	/**
 	 * 
+	 * @param uri
+	 * @return
+	 * @throws SearchException 
+	 */
+	public static Resource getResourceByUri(String uri) throws SearchException{
+		
+		if (uri==null || uri.trim().length()==0)
+			return null;
+		
+		IndexSearcher indexSearcher = null;
+		try{
+			indexSearcher = getIndexSearcher();
+			Hits hits = indexSearcher.search(new TermQuery(new Term(Identifiers.DOC_ID, uri)));
+			if (hits==null || hits.length()==0)
+				return null;
+			else
+				return new Resource(hits.doc(0));
+		}
+		catch (Exception e){
+			throw new SearchException(e.toString(), e);
+		}
+		finally{
+			try{
+				if (indexSearcher!=null)
+					indexSearcher.close();
+			}
+			catch (IOException e){}
+		}
+	}
+	
+	/**
+	 * 
 	 * @param args
 	 */
 	public static void main(String[] args){
 		
 		try {
-			List<Map<String,String[]>> list = Searcher.dataflowSearch("http://rod.eionet.eu.int/obligations/32", "Albania", "2005");
-			System.out.println(list==null ? "list==null" : "list.size()=" + list.size());
-			for (int i=0; list!=null && i<list.size(); i++){
-				System.out.println(list.get(i));
-			}
-//			AllDocsWalker.startupWalk();
+//			List<Map<String,String[]>> list = Searcher.dataflowSearch("http://rod.eionet.eu.int/obligations/32", "Albania", "2005");
+//			System.out.println(list==null ? "list==null" : "list.size()=" + list.size());
+//			for (int i=0; list!=null && i<list.size(); i++){
+//				System.out.println(list.get(i));
+//			}
+			
+			AllDocsWalker.startupWalk();
+			//Resource resource = Searcher.getResourceByUri("http://cdr.eionet.europa.eu/es/eea/ewn1/envrudyww");
+			Resource resource = Searcher.getResourceByUri("http://cdr.eionet.europa.eu/ro/eu/ghgmm/envr4yo9w");			
+			System.out.println(resource);
+			System.out.println("==================================");
+			List list = resource.getPropertiesForFactsheet();
+			for (int i=0; list!=null && i<list.size(); i++)
+				System.out.println(list.get(i).toString());
 			
 //			List<RodInstrumentDTO> list = Searcher.getDataflowsGroupedByInstruments();
 //			for (int i=0; list!=null && i<list.size(); i++){

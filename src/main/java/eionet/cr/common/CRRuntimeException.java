@@ -1,4 +1,4 @@
-package eionet.cr.util;
+package eionet.cr.common;
 
 /**
  * 

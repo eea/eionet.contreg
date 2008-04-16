@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import eionet.cr.common.Identifiers;
 import eionet.cr.index.IndexException;
-import eionet.cr.util.Identifiers;
 
 /**
  * 

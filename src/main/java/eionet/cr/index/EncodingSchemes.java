@@ -17,10 +17,10 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermEnum;
 
+import eionet.cr.common.Identifiers;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.util.RDFResource;
-import eionet.cr.util.Identifiers;
 import eionet.cr.util.Util;
 
 /**

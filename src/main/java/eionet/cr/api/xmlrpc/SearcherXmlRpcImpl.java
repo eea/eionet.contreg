@@ -13,9 +13,9 @@ import java.util.Vector;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import eionet.cr.common.CRException;
+import eionet.cr.common.Identifiers;
 import eionet.cr.index.EncodingSchemes;
-import eionet.cr.util.CRException;
-import eionet.cr.util.Identifiers;
 import eionet.cr.util.Util;
 import eionet.qawcommons.DataflowResultDto;
 

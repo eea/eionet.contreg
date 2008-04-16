@@ -7,7 +7,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.KeywordAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 
-import eionet.cr.util.Identifiers;
+import eionet.cr.common.Identifiers;
 import eionet.cr.util.Util;
 
 /**

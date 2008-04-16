@@ -23,13 +23,13 @@ import org.apache.lucene.index.IndexReader;
 
 import com.hp.hpl.jena.rdf.arp.ARP;
 
+import eionet.cr.common.Identifiers;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.harvest.util.RDFResource;
 import eionet.cr.index.IndexException;
 import eionet.cr.index.Indexer;
 import eionet.cr.search.Searcher;
-import eionet.cr.util.Identifiers;
 
 /**
  * 

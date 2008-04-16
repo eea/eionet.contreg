@@ -5,8 +5,8 @@ import java.util.ResourceBundle;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import eionet.cr.common.CRException;
 import eionet.cr.config.GeneralConfig;
-import eionet.cr.util.CRException;
 import eionet.cr.web.context.CRActionBeanContext;
 import eionet.cr.web.security.CRUser;
 import net.sourceforge.stripes.action.ActionBean;

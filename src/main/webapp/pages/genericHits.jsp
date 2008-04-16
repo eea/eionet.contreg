@@ -5,10 +5,9 @@
 <%@page import="eionet.cr.util.Util" %>
 <%@page import="eionet.cr.search.Searcher" %>
 <%@page import="eionet.cr.index.EncodingSchemes" %>
-<%@page import="eionet.cr.util.Identifiers" %>
+<%@page import="eionet.cr.common.Identifiers" %>
 
-<%!
-static final String[] fieldsOrder = {
+<%!static final String[] fieldsOrder = {
 	Identifiers.DOC_ID,
 	"http://purl.org/dc/elements/1.1/title",
 	"http://purl.org/dc/elements/1.1/coverage",
@@ -21,8 +20,7 @@ static final String[] analyzers = {
 	"org.apache.lucene.analysis.WhitespaceAnalyzer",
 	"org.apache.lucene.analysis.SimpleAnalyzer",
 	"org.apache.lucene.analysis.StopAnalyzer"
-};
-%>
+};%>
 
 <%@ include file="/pages/common/taglibs.jsp"%>	
 
