@@ -19,6 +19,7 @@ import eionet.cr.common.Identifiers;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.harvest.util.RDFResource;
 import eionet.cr.harvest.util.RDFResourceProperty;
+import eionet.cr.util.FirstSeenTimestamp;
 
 /**
  * 
@@ -109,7 +110,7 @@ public class Indexer {
 		
 		// set the time the document was first seen
 		document.add(new Field(Identifiers.FIRST_SEEN_TIMESTAMP,
-				resource.getFirstSeenTimestamp()==null ? this.getFirstSeenTimestamp() : resource.getFirstSeenTimestamp(), Field.Store.YES, Field.Index.UN_TOKENIZED));
+				resource.getFirstSeenTimestamp()==null ? getFirstSeenTimestamp() : resource.getFirstSeenTimestamp(), Field.Store.YES, Field.Index.UN_TOKENIZED));
 		
 		// finally, update the document in index
 		try {
@@ -182,9 +183,11 @@ public class Indexer {
 	 */
 	private String getFirstSeenTimestamp(){
 		
-		if (this.firstSeenTimestamp==null)
-			this.firstSeenTimestamp = String.valueOf((int)(System.currentTimeMillis() / (long)1000));
-		return this.firstSeenTimestamp;
+		if (firstSeenTimestamp==null){
+			FirstSeenTimestamp timestamp = new FirstSeenTimestamp();
+			firstSeenTimestamp = timestamp.toString();
+		}
+		return firstSeenTimestamp;
 	}
 	
 	/**

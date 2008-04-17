@@ -14,7 +14,7 @@
 	    
 	    <stripes:form action="/dataflowSearch.action" method="get">
 			
-	    	<label for="dataflow" style="font-weight:bold;margin-bottom:3px">Dataflow:</label>
+	    	<label for="dataflowSelect" style="font-weight:bold;margin-bottom:3px">Dataflow:</label>
 	    	<stripes:select name="dataflow" id="dataflowSelect" size="14" style="width:100%">
 	    		<c:forEach var="instr" items="${dataflowSearchActionBean.instrumentsObligations}">
 	    			<optgroup label="${instr.label}">
@@ -27,13 +27,13 @@
 			<br/>
 			<br/>
 			
-			<label for="locality" style="font-weight:bold">Locality:</label>
+			<label for="localitySelect" style="font-weight:bold">Locality:</label>
 	    	<stripes:select name="locality" id="localitySelect">
 	    		<stripes:option value="" label="-- All --"/>
 	    		<c:forEach var="loclty" items="${dataflowSearchActionBean.localities}">
 	    			<stripes:option value="${loclty}" label="${loclty}"/>
 	    		</c:forEach>
-	    	</stripes:select>&nbsp;&nbsp;&nbsp;<label for="year" style="font-weight:bold">Delivery year:</label>
+	    	</stripes:select>&nbsp;&nbsp;&nbsp;<label for="yearSelect" style="font-weight:bold">Delivery year:</label>
 	    	<stripes:select name="year" id="yearSelect">
 	    		<stripes:option value="" label="-- All --"/>
 	    		<c:forEach var="y" items="${dataflowSearchActionBean.years}">

@@ -42,6 +42,17 @@ public class SearchUtil {
 		
 		return (Analyzer)result;
 	}
+	
+	/**
+	 * 
+	 * @param hits
+	 * @return
+	 * @throws CorruptIndexException
+	 * @throws IOException
+	 */
+	public static List<Map<String,String[]>> processHits(Hits hits) throws CorruptIndexException, IOException{
+		return processHits(hits, Searcher.MAX_RESULT_SET_SIZE);
+	}
 
 	/**
 	 * 
@@ -50,11 +61,11 @@ public class SearchUtil {
 	 * @throws IOException 
 	 * @throws CorruptIndexException 
 	 */
-	public static List<Map<String,String[]>> processHits(Hits hits) throws CorruptIndexException, IOException{
+	public static List<Map<String,String[]>> processHits(Hits hits, int maxResults) throws CorruptIndexException, IOException{
 		
 		List<Map<String,String[]>> resultList = new ArrayList<Map<String,String[]>>();
 		if (hits!=null && hits.length()>0){
-			for (int i=0; hits!=null && i<hits.length() && i<Searcher.MAX_RESULT_SET_SIZE; i++){
+			for (int i=0; hits!=null && i<hits.length() && i<maxResults; i++){
 				
 				Document doc = hits.doc(i);
 				Map<String,String[]> map = new Hashtable<String,String[]>();

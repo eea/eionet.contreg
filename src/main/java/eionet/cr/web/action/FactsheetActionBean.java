@@ -9,7 +9,8 @@ import net.sourceforge.stripes.action.UrlBinding;
 import eionet.cr.common.Resource;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.Searcher;
-import eionet.cr.web.util.display.ResourcePropertyDTO;
+import eionet.cr.web.util.FactsheetUtil;
+import eionet.cr.web.util.ResourcePropertyDTO;
 
 /**
  * 
@@ -21,6 +22,7 @@ public class FactsheetActionBean extends AbstractCRActionBean{
 
 	/** */
 	private String uri;
+	private String url;
 	private Resource resource;
 	private List<ResourcePropertyDTO> resourceProperties;
 
@@ -32,8 +34,10 @@ public class FactsheetActionBean extends AbstractCRActionBean{
 	@DefaultHandler
 	public Resolution view() throws SearchException{
 		resource = Searcher.getResourceByUri(uri);
-		if (resource!=null)
-			resourceProperties = resource.getPropertiesForFactsheet();
+		if (resource!=null){
+			resourceProperties = FactsheetUtil.getPropertiesForFactsheet(resource);
+			url = resource.getUrl();
+		}
 		return new ForwardResolution("/pages/factsheet.jsp");
 	}
 
@@ -63,5 +67,12 @@ public class FactsheetActionBean extends AbstractCRActionBean{
 	 */
 	public Resource getResource() {
 		return resource;
+	}
+
+	/**
+	 * @return the url
+	 */
+	public String getUrl() {
+		return url;
 	}
 }

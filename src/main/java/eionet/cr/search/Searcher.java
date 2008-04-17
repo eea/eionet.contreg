@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,6 +40,7 @@ import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.TermQuery;
 
 import eionet.cr.common.Identifiers;
@@ -52,9 +54,10 @@ import eionet.cr.index.walk.EncodingSchemesLoader;
 import eionet.cr.index.walk.SubPropertiesLoader;
 import eionet.cr.search.util.SearchUtil;
 import eionet.cr.search.util.SimpleSearchExpression;
+import eionet.cr.util.FirstSeenTimestamp;
 import eionet.cr.util.Util;
-import eionet.cr.web.util.display.RodInstrumentDTO;
-import eionet.cr.web.util.display.RodObligationDTO;
+import eionet.cr.web.util.RodInstrumentDTO;
+import eionet.cr.web.util.RodObligationDTO;
 
 /**
  * 
@@ -64,6 +67,7 @@ import eionet.cr.web.util.display.RodObligationDTO;
 public class Searcher {
 	
 	/** */
+	public static final int MAX_RESULTS_FOR_RECENT_SEARCH = 1000;
 	public static final int MAX_RESULT_SET_SIZE = 300;
 	public static final String DEFAULT_FIELD = Indexer.ALL_CONTENT_FIELD;
 	
@@ -455,36 +459,56 @@ public class Searcher {
 	
 	/**
 	 * 
+	 * @param rdfType
+	 * @return
+	 * @throws SearchException 
+	 */
+	public static List<Map<String,String[]>> getRecentByRdfType(String rdfType) throws SearchException{
+		
+		if (rdfType==null || rdfType.trim().length()==0)
+			return new ArrayList<Map<String,String[]>>();
+		
+		IndexSearcher indexSearcher = null;
+		try{
+			indexSearcher = getIndexSearcher();
+			Sort sort = new Sort(Identifiers.FIRST_SEEN_TIMESTAMP, true);
+			Hits hits = indexSearcher.search(new TermQuery(new Term(Identifiers.RDF_TYPE, rdfType)), sort);
+			if (hits==null || hits.length()==0)
+				hits = indexSearcher.search(new TermQuery(new Term(Identifiers.RDF_TYPE, rdfType)));
+			
+			return SearchUtil.processHits(hits, MAX_RESULTS_FOR_RECENT_SEARCH);
+		}
+		catch (Exception e){
+			throw new SearchException(e.toString(), e);
+		}
+		finally{
+			try{
+				if (indexSearcher!=null)
+					indexSearcher.close();
+			}
+			catch (IOException e){}
+		}
+	}
+	
+	/**
+	 * 
 	 * @param args
 	 */
 	public static void main(String[] args){
 		
-		try {
-//			List<Map<String,String[]>> list = Searcher.dataflowSearch("http://rod.eionet.eu.int/obligations/32", "Albania", "2005");
-//			System.out.println(list==null ? "list==null" : "list.size()=" + list.size());
-//			for (int i=0; list!=null && i<list.size(); i++){
-//				System.out.println(list.get(i));
-//			}
-			
-			AllDocsWalker.startupWalk();
-			//Resource resource = Searcher.getResourceByUri("http://cdr.eionet.europa.eu/es/eea/ewn1/envrudyww");
-			Resource resource = Searcher.getResourceByUri("http://cdr.eionet.europa.eu/ro/eu/ghgmm/envr4yo9w");			
-			System.out.println(resource);
-			System.out.println("==================================");
-			List list = resource.getPropertiesForFactsheet();
-			for (int i=0; list!=null && i<list.size(); i++)
-				System.out.println(list.get(i).toString());
-			
-//			List<RodInstrumentDTO> list = Searcher.getDataflowsGroupedByInstruments();
-//			for (int i=0; list!=null && i<list.size(); i++){
-//				System.out.println(list.get(i));
-//			}
-//			Set<String> resultSet = Searcher.getLiteralFieldValues("http://www.w3.org/2000/01/rdf-schema#label");
-//			for (Iterator i=resultSet.iterator(); i.hasNext(); ){
-//				System.out.println(i.next());
-//			}
-			
-			System.out.println();
+		try {			
+			List<Map<String,String[]>> results = Searcher.getRecentByRdfType("http://www.eionet.eu.int/gemet/2004/06/gemet-schema.rdf#Group");
+			//List<Map<String,String[]>> results = Searcher.getRecentByRdfType(Identifiers.RSS_ITEM);
+			System.out.println(results==null ? "results==null" : "results size = " + results.size());
+			for (int i=0; i<results.size(); i++){
+				Map<String,String[]> map = results.get(i);
+				String[] ss = map.get(Identifiers.FIRST_SEEN_TIMESTAMP);
+				String s = ss==null || ss.length==0 ? "null" : FirstSeenTimestamp.toDateString(ss[0], "yyyy.MM.dd HH:mm:ss");
+				System.out.println("TIMESTAMP=" + s + ", DOC_ID=" + Arrays.deepToString(map.get(Identifiers.DOC_ID)));
+
+//				System.out.println("TIMESTAMP=" + Arrays.deepToString(map.get(Identifiers.FIRST_SEEN_TIMESTAMP)) +
+//						", DOC_ID=" + Arrays.deepToString(map.get(Identifiers.DOC_ID)));
+			}
 		}
 		catch (Throwable t) {
 			t.printStackTrace();

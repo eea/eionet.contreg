@@ -20,6 +20,10 @@ public interface Identifiers {
 	public static final String DC_TITLE = "http://purl.org/dc/elements/1.1/title";
 	public static final String DC_DATE = "http://purl.org/dc/elements/1.1/date";
 	public static final String DC_COVERAGE = "http://purl.org/dc/elements/1.1/coverage";
+	public static final String DC_IDENTIFIER = "http://purl.org/dc/elements/1.1/identifier";
+	public static final String DC_SOURCE = "http://purl.org/dc/elements/1.1/source";
+	
+	public static final String RSS_ITEM = "http://purl.org/rss/1.0/item";
 	
 	public static final String ROD_OBLIGATION_CLASS = "http://rod.eionet.eu.int/schema.rdf#Obligation";
 	public static final String ROD_OBLIGATION_PROPERTY = "http://rod.eionet.eu.int/schema.rdf#obligation";

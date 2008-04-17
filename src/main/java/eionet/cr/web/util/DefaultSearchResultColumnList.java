@@ -1,4 +1,4 @@
-package eionet.cr.web.util.display;
+package eionet.cr.web.util;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,12 +12,12 @@ import eionet.cr.util.Util;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class DefaultColumnList extends ArrayList{
+public class DefaultSearchResultColumnList extends ArrayList{
 
 	/**
 	 * 
 	 */
-	public DefaultColumnList(){
+	public DefaultSearchResultColumnList(){
 		
 		super();
 		

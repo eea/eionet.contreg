@@ -1,4 +1,4 @@
-package eionet.cr.web.util.display;
+package eionet.cr.web.util;
 
 /**
  * 

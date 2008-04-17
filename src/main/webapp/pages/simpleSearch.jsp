@@ -12,8 +12,8 @@
 	    
 	    <stripes:form action="/simpleSearch.action" method="get" focus="searchExpression" style="padding-bottom:20px">
 			
-	    	<stripes:label for="expressionField">Expression:</stripes:label>
-	    	<stripes:text name="searchExpression" id="expressionField" size="30"/>
+	    	<stripes:label for="expressionText">Expression:</stripes:label>
+	    	<stripes:text name="searchExpression" id="expressionText" size="30"/>
 	    	<stripes:submit name="search" value="Search" id="searchButton"/>
 	    	
 	    </stripes:form>

@@ -1,8 +1,9 @@
-package eionet.cr.web.util.display;
+package eionet.cr.web.util;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 
 /**
  * 
@@ -29,5 +30,4 @@ public class DisplayUtil {
 		}
 		return resultList;
 	}
-
 }
