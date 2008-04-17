@@ -1,6 +1,8 @@
 package eionet.cr.web.action;
 
 import java.util.Hashtable;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -23,7 +25,7 @@ public class RecentAdditionsActionBean extends AbstractSearchActionBean {
 	private static Log logger = LogFactory.getLog(RecentAdditionsActionBean.class);
 	
 	/** */
-	public Hashtable<String, String> typeTitles;
+	public Map<String, String> typeTitles;
 	public String type;
 	
 	/**
@@ -32,7 +34,7 @@ public class RecentAdditionsActionBean extends AbstractSearchActionBean {
 	 */
 	@DefaultHandler
 	public Resolution init(){
-		typeTitles = new Hashtable();
+		typeTitles = new LinkedHashMap<String, String>();
 		typeTitles.put(Identifiers.ROD_DELIVERY_CLASS, "Deliveries");
 		typeTitles.put(Identifiers.ROD_OBLIGATION_CLASS, "Obligations");
 		typeTitles.put(Identifiers.REPORTS_FULL_REPORT, "Full reports");
@@ -41,11 +43,11 @@ public class RecentAdditionsActionBean extends AbstractSearchActionBean {
 		return new ForwardResolution("/pages/recent.jsp");
 	}
 
-	public Hashtable<String, String> getTypeTitles() {
+	public Map<String, String> getTypeTitles() {
 		return typeTitles;
 	}
 
-	public void setTypeTitles(Hashtable<String, String> typeTitles) {
+	public void setTypeTitles(Map<String, String> typeTitles) {
 		this.typeTitles = typeTitles;
 	}
 
