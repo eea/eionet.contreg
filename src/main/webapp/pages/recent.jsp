@@ -12,12 +12,22 @@
 		If less than 20 are displayed, it means the addition time is known only for the resources displayed.<br/>
 		If none are displayed, it means addition time is known for none.</p>
 		
-		<stripes:useActionBean beanclass="eionet.cr.web.action.RecentAdditionsActionBean" id="recentAdditionsActionBean"/>
-	    
 	    <div id="tabbedmenu">
 		    <ul>
-		    	<c:forEach items="${recentAdditionsActionBean.typeTitles}" var="title" varStatus="loop">
-					<li><a href="recent.jsp?type=<c:out value='${title.key}'/>"><c:out value="${title.value}"/></a></li>
+		    	<c:forEach items="${actionBean.typeTitles}" var="title" varStatus="loop">
+					<c:choose>
+				  		<c:when test="${actionBean.type == title.key}" > 
+							<li id="currenttab"><span>${title.value}</span></li>
+						</c:when>
+						<c:otherwise> 	
+							<li>
+								<stripes:link href="/recentAdditions.action">
+									${title.value}
+					                <stripes:param name="type" value="${title.key}"/>
+					            </stripes:link>
+				            </li>
+						</c:otherwise>
+					</c:choose>
 				</c:forEach>
 		    </ul>
 		</div>

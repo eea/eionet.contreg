@@ -4,6 +4,8 @@ import java.util.Hashtable;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import eionet.cr.common.Identifiers;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
@@ -22,11 +24,7 @@ public class RecentAdditionsActionBean extends AbstractSearchActionBean {
 	
 	/** */
 	public Hashtable<String, String> typeTitles;
-	
-	String typeDelivery = "http://rod.eionet.eu.int/schema.rdf#Delivery";
-	String typeObligation = "http://rod.eionet.eu.int/schema.rdf#Obligation";
-	String typeFullReport = "http://reports.eea.eu.int/reports_rdf?nr=10000#Full%20Report";
-	String typeNewsReport = "http://purl.org/rss/1.0/item";
+	public String type;
 	
 	/**
 	 * 
@@ -35,10 +33,10 @@ public class RecentAdditionsActionBean extends AbstractSearchActionBean {
 	@DefaultHandler
 	public Resolution init(){
 		typeTitles = new Hashtable();
-		typeTitles.put(typeDelivery, "Deliveries");
-		typeTitles.put(typeObligation, "Obligations");
-		typeTitles.put(typeFullReport, "Full reports");
-		typeTitles.put(typeNewsReport, "News releases");
+		typeTitles.put(Identifiers.ROD_DELIVERY_CLASS, "Deliveries");
+		typeTitles.put(Identifiers.ROD_OBLIGATION_CLASS, "Obligations");
+		typeTitles.put(Identifiers.REPORTS_FULL_REPORT, "Full reports");
+		typeTitles.put(Identifiers.NEWS_REPORT, "News releases");
 		
 		return new ForwardResolution("/pages/recent.jsp");
 	}
@@ -49,6 +47,14 @@ public class RecentAdditionsActionBean extends AbstractSearchActionBean {
 
 	public void setTypeTitles(Hashtable<String, String> typeTitles) {
 		this.typeTitles = typeTitles;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
 	}
 
 }

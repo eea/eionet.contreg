@@ -33,4 +33,8 @@ public interface Identifiers {
 	public static final String ROD_DELIVERY_CLASS = "http://rod.eionet.eu.int/schema.rdf#Delivery";
 	
 	public static final String RDFS_SUB_PROPERTY_OF = "http://www.w3.org/2000/01/rdf-schema#subPropertyOf";
+	
+	public static final String REPORTS_FULL_REPORT = "http://reports.eea.eu.int/reports_rdf?nr=10000#Full%20Report";
+	
+	public static final String NEWS_REPORT = "http://purl.org/rss/1.0/item";
 }
