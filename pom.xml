@@ -175,5 +175,10 @@
 			<artifactId>qawcommons</artifactId>
 			<version>1.0</version>
 		</dependency>
+		<dependency>
+			<groupId>uit-security</groupId>
+			<artifactId>uit-security</artifactId>
+			<version>1.0</version>
+		</dependency>
 	</dependencies>
 </project>
