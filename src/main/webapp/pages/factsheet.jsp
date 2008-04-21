@@ -23,13 +23,15 @@
 			    		<tbody>
 					    	<c:forEach var="resourceProperty" items="${actionBean.resourceProperties}">
 					    		<tr>
-					    			<th scope="row" class="scope-row metalabel" xml:lang="en">
-					    				<c:out value="${resourceProperty.label}"/>
+					    			<th scope="row" class="scope-row metalabel" title="resourceProperty.label">
+					    				${fn:escapeXml(crfn:cutAtFirstLongToken(resourceProperty.label,50))}
 					    			</th>
 					    			<td>
 					    				<ul class="menu">
 						    				<c:forEach var="resourcePropertyValue" items="${resourceProperty.values}">
-						    					<li><c:out value="${resourcePropertyValue.label}"/></li>
+						    					<li title="${resourcePropertyValue.label}">
+						    						${fn:escapeXml(crfn:cutAtFirstLongToken(resourcePropertyValue.label,50))}
+						    					</li>
 						    				</c:forEach>
 					    				</ul>
 					    			</td>

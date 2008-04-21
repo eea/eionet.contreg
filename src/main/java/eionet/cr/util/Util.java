@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 
 import java.lang.reflect.InvocationTargetException;
@@ -12,6 +13,8 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
@@ -33,6 +36,7 @@ import java.util.StringTokenizer;
 import javax.servlet.jsp.PageContext;
 
 import eionet.cr.common.CRRuntimeException;
+import eionet.cr.common.Identifiers;
 
 
 /**
@@ -321,7 +325,7 @@ public class Util {
     }
     
     /**
-     * 
+     * Returns true if the given string has any whitespace in it, including the leading and trailing whitespace.
      * @param s
      * @return
      */
@@ -457,6 +461,34 @@ public class Util {
 		return null;
     }
     
+    /**
+     * Convenience method for URL-encoding the given string.
+     * @param s
+     * @return
+     */
+    public static String urlEncode(String s){
+    	try {
+			return URLEncoder.encode(s, "UTF-8");
+		}
+		catch (UnsupportedEncodingException e) {
+			throw new CRRuntimeException(e.toString(), e);
+		}
+    }
+
+    /**
+     * Convenience method for URL-decoding the given string.
+     * @param s
+     * @return
+     */
+    public static String urlDecode(String s){
+    	try {
+			return URLDecoder.decode(s, "UTF-8");
+		}
+		catch (UnsupportedEncodingException e) {
+			throw new CRRuntimeException(e.toString(), e);
+		}
+    }
+
     /**
      * 
      * @param args

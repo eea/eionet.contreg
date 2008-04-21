@@ -22,8 +22,9 @@ public interface Identifiers {
 	public static final String DC_COVERAGE = "http://purl.org/dc/elements/1.1/coverage";
 	public static final String DC_IDENTIFIER = "http://purl.org/dc/elements/1.1/identifier";
 	public static final String DC_SOURCE = "http://purl.org/dc/elements/1.1/source";
+	public static final String DC_SUBJECT = "http://purl.org/dc/elements/1.1/subject";
 	
-	public static final String RSS_ITEM = "http://purl.org/rss/1.0/item";
+	public static final String RSS_ITEM_CLASS = "http://purl.org/rss/1.0/Item";
 	
 	public static final String ROD_OBLIGATION_CLASS = "http://rod.eionet.eu.int/schema.rdf#Obligation";
 	public static final String ROD_OBLIGATION_PROPERTY = "http://rod.eionet.eu.int/schema.rdf#obligation";
@@ -34,11 +35,12 @@ public interface Identifiers {
 	public static final String ROD_LOCALITY_CLASS = "http://rod.eionet.eu.int/schema.rdf#Locality";
 	public static final String ROD_LOCALITY_PROPERTY = "http://rod.eionet.eu.int/schema.rdf#locality";
 	
+	public static final String ROD_ISSUE_CLASS = "http://rod.eionet.eu.int/schema.rdf#Issue";
+	public static final String ROD_ISSUE_PROPERTY = "http://rod.eionet.eu.int/schema.rdf#issue";
+	
 	public static final String ROD_DELIVERY_CLASS = "http://rod.eionet.eu.int/schema.rdf#Delivery";
 	
 	public static final String RDFS_SUB_PROPERTY_OF = "http://www.w3.org/2000/01/rdf-schema#subPropertyOf";
 	
-	public static final String REPORTS_FULL_REPORT = "http://reports.eea.eu.int/reports_rdf?nr=10000#Full%20Report";
-	
-	public static final String NEWS_REPORT = "http://purl.org/rss/1.0/item";
+	public static final String FULL_REPORT_CLASS = "http://reports.eea.europa.eu/reports_rdf#FullReport";
 }

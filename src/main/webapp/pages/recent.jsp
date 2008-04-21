@@ -2,28 +2,28 @@
 
 <%@ include file="/pages/common/taglibs.jsp"%>	
 
-<stripes:layout-render name="/pages/common/template.jsp" pageTitle="Recent additions">
+<stripes:layout-render name="/pages/common/template.jsp" pageTitle="Recent uploads">
 
 	<stripes:layout-component name="contents">
 	
-        <h1>Recent additions</h1>
+        <h1>Recent uploads</h1>
         
-        <p>This page displayes the 20 most recently added recources of the type denoted by the selected tab.<br/>
-		If less than 20 are displayed, it means the addition time is known only for the resources displayed.<br/>
+        <p>This page displays the <c:out value="${actionBean.maxResults}"/> most recently added recources of the type denoted by the selected tab.<br/>
+		If less than <c:out value="${actionBean.maxResults}"/> are displayed, it means the addition time is known only for the resources displayed.<br/>
 		If none are displayed, it means addition time is known for none.</p>
 		
 	    <div id="tabbedmenu">
 		    <ul>
-		    	<c:forEach items="${actionBean.typeTitles}" var="title" varStatus="loop">
+		    	<c:forEach items="${actionBean.types}" var="loopType">
 					<c:choose>
-				  		<c:when test="${actionBean.type == title.key}" > 
-							<li id="currenttab"><span>${title.value}</span></li>
+				  		<c:when test="${actionBean.type==loopType.uri}" > 
+							<li id="currenttab"><span>${loopType.title}</span></li>
 						</c:when>
-						<c:otherwise> 	
+						<c:otherwise>
 							<li>
-								<stripes:link href="/recentAdditions.action">
-									${title.value}
-					                <stripes:param name="type" value="${title.key}"/>
+								<stripes:link href="/recentUploads.action">
+									${loopType.title}
+					                <stripes:param name="type" value="${loopType.uri}"/>
 					            </stripes:link>
 				            </li>
 						</c:otherwise>
@@ -31,6 +31,8 @@
 				</c:forEach>
 		    </ul>
 		</div>
-		
+		<br style="clear:left" />
+		<stripes:layout-render name="/pages/common/resourcesResultList.jsp" tableClass="datatable" pageSize="0"/>
+				
 	</stripes:layout-component>
 </stripes:layout-render>

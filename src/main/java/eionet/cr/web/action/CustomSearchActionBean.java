@@ -1,12 +1,15 @@
 package eionet.cr.web.action;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import eionet.cr.common.Identifiers;
+import eionet.cr.web.util.CustomSearchFilter;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
@@ -22,7 +25,7 @@ import net.sourceforge.stripes.action.UrlBinding;
 public class CustomSearchActionBean extends AbstractSearchActionBean{
 	
 	/** */
-	private List<Map<String,String>> availableFilters;
+	private List<CustomSearchFilter> availableFilters;
 	private List<String> selectedFilters = new ArrayList<String>();
 	
 	/** */
@@ -51,26 +54,32 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 	/**
 	 * @return the availableFilters
 	 */
-	public List<Map<String,String>> getAvailableFilters() {
+	public List<CustomSearchFilter> getAvailableFilters() {
 		
 		if (availableFilters==null){
 			
-			availableFilters = new ArrayList<Map<String,String>>();
+			availableFilters = new ArrayList<CustomSearchFilter>();
 			
-			Map<String,String> map = new HashMap<String,String>();
-			map.put("uri", Identifiers.RDF_TYPE);
-			map.put("title", "Type");
-			availableFilters.add(map);
-			
-			map = new HashMap<String,String>();
-			map.put("uri", Identifiers.RDFS_LABEL);
-			map.put("title", "Label");
-			availableFilters.add(map);
-			
-			map = new HashMap<String,String>();
-			map.put("uri", Identifiers.DC_COVERAGE);
-			map.put("title", "Coverage");
-			availableFilters.add(map);
+			CustomSearchFilter filter = new CustomSearchFilter();
+			filter.setUri(Identifiers.RDF_TYPE);
+			filter.setTitle("Type");
+			filter.setDescription("");
+			filter.setProvideValues(true);
+			availableFilters.add(filter);
+
+			filter = new CustomSearchFilter();
+			filter.setUri(Identifiers.RDFS_LABEL);
+			filter.setTitle("Label");
+			filter.setDescription("");
+			filter.setProvideValues(false);
+			availableFilters.add(filter);
+
+			filter = new CustomSearchFilter();
+			filter.setUri(Identifiers.DC_COVERAGE);
+			filter.setTitle("Coverage");
+			filter.setDescription("");
+			filter.setProvideValues(true);
+			availableFilters.add(filter);
 		}
 		
 		return availableFilters;
@@ -80,17 +89,17 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 	 * 
 	 * @return
 	 */
-	public List<Map<String,String>> getUnselectedFilters() {
+	public List<CustomSearchFilter> getUnselectedFilters() {
 		
-		List<Map<String,String>> available = getAvailableFilters();
+		List<CustomSearchFilter> available = getAvailableFilters();
 		if (available==null || available.isEmpty())
 			return null;
 		else if (selectedFilters==null || selectedFilters.isEmpty())
 			return available;
 		else{
-			List<Map<String,String>> result = new ArrayList<Map<String,String>>();
+			List<CustomSearchFilter> result = new ArrayList<CustomSearchFilter>();
 			for (int i=0; i<available.size(); i++){
-				if (!selectedFilters.contains(available.get(i).get("uri")))
+				if (!selectedFilters.contains(available.get(i).getUri()))
 					result.add(available.get(i));
 			}
 			return result;

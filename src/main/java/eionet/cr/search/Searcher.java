@@ -67,7 +67,6 @@ import eionet.cr.web.util.RodObligationDTO;
 public class Searcher {
 	
 	/** */
-	public static final int MAX_RESULTS_FOR_RECENT_SEARCH = 1000;
 	public static final int MAX_RESULT_SET_SIZE = 300;
 	public static final String DEFAULT_FIELD = Indexer.ALL_CONTENT_FIELD;
 	
@@ -463,7 +462,7 @@ public class Searcher {
 	 * @return
 	 * @throws SearchException 
 	 */
-	public static List<Map<String,String[]>> getRecentByRdfType(String rdfType) throws SearchException{
+	public static List<Map<String,String[]>> getRecentByRdfType(String rdfType, int maxResults) throws SearchException{
 		
 		if (rdfType==null || rdfType.trim().length()==0)
 			return new ArrayList<Map<String,String[]>>();
@@ -476,7 +475,7 @@ public class Searcher {
 			if (hits==null || hits.length()==0)
 				hits = indexSearcher.search(new TermQuery(new Term(Identifiers.RDF_TYPE, rdfType)));
 			
-			return SearchUtil.processHits(hits, MAX_RESULTS_FOR_RECENT_SEARCH);
+			return SearchUtil.processHits(hits, maxResults);
 		}
 		catch (Exception e){
 			throw new SearchException(e.toString(), e);
@@ -497,7 +496,7 @@ public class Searcher {
 	public static void main(String[] args){
 		
 		try {			
-			List<Map<String,String[]>> results = Searcher.getRecentByRdfType("http://www.eionet.eu.int/gemet/2004/06/gemet-schema.rdf#Group");
+			List<Map<String,String[]>> results = Searcher.getRecentByRdfType("http://www.eionet.eu.int/gemet/2004/06/gemet-schema.rdf#Group", 20);
 			//List<Map<String,String[]>> results = Searcher.getRecentByRdfType(Identifiers.RSS_ITEM);
 			System.out.println(results==null ? "results==null" : "results size = " + results.size());
 			for (int i=0; i<results.size(); i++){

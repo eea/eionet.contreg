@@ -32,7 +32,6 @@ public class LoginActionBean extends AbstractCRActionBean {
 	@HandlesEvent(LOGIN_EVENT)
 	@DontSaveLastActionEvent
 	public Resolution login() {
-		System.out.println("************ LAST URL: " + getContext().getLastActionEventUrl());
 		return new RedirectResolution(getContext().getCASLoginURL(), false);
 	}
 	

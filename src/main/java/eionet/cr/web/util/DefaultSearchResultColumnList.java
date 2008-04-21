@@ -12,7 +12,7 @@ import eionet.cr.util.Util;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class DefaultSearchResultColumnList extends ArrayList{
+public class DefaultSearchResultColumnList extends ArrayList<SearchResultColumn>{
 
 	/**
 	 * 
@@ -21,26 +21,25 @@ public class DefaultSearchResultColumnList extends ArrayList{
 		
 		super();
 		
-		Map type = new HashMap();
-		type.put("property", Identifiers.RDF_TYPE);
-		type.put("propertyMd5", Util.md5digest(Identifiers.RDF_TYPE));
-		type.put("title", "Type");
-		type.put("sortable", Boolean.TRUE);
+		SearchResultColumn col = new SearchResultColumn();
+		col.setPropertyUri(Identifiers.RDF_TYPE);
+		col.setPropertyKey(Util.md5digest(Identifiers.RDF_TYPE));
+		col.setTitle("Type");
+		col.setSortable(true);
+		add(col);
 		
-		Map label = new HashMap();
-		label.put("property", SearchResultRowDisplayMap.FALLBACKED_LABEL);
-		label.put("propertyMd5", SearchResultRowDisplayMap.FALLBACKED_LABEL);
-		label.put("title", "Label");
-		label.put("sortable", Boolean.TRUE);
+		col = new SearchResultColumn();
+		col.setPropertyUri(SearchResultRowDisplayMap.FALLBACKED_LABEL);
+		col.setPropertyKey(SearchResultRowDisplayMap.FALLBACKED_LABEL);
+		col.setTitle("Label");
+		col.setSortable(true);
+		add(col);
 
-		Map date = new HashMap();
-		date.put("property", Identifiers.DC_DATE);
-		date.put("propertyMd5", Util.md5digest(Identifiers.DC_DATE));
-		date.put("title", "Date");
-		date.put("sortable", Boolean.TRUE);
-		
-		add(type);
-		add(label);
-		add(date);
+		col = new SearchResultColumn();
+		col.setPropertyUri(Identifiers.DC_DATE);
+		col.setPropertyKey(Util.md5digest(Identifiers.DC_DATE));
+		col.setTitle("Date");
+		col.setSortable(true);
+		add(col);
 	}
 }

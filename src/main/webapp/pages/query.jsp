@@ -9,8 +9,6 @@
 	
 	<stripes:layout-component name="contents">
 	
-		<stripes:useActionBean beanclass="eionet.cr.web.action.QueryActionBean" id="queryActionBean"/>
-			
 		<h1>Perform Lucene query</h1>
 		
 		<stripes:form action="/luceneQuery.action" focus="query" style="padding-bottom:20px">
@@ -18,11 +16,11 @@
 			<label for="query">Enter your Lucene query here:</label>
 			<br/>
 			<br/>
-			<stripes:textarea name="query" cols="100"/>
+			<stripes:textarea name="query" cols="80"/>
 			<br/>
 			
-			<stripes:select name="analyzer" id="analyzerSelect" value="${queryActionBean.analyzer}">
-	    		<c:forEach var="anl" items="${queryActionBean.analyzers}">
+			<stripes:select name="analyzer" id="analyzerSelect" value="${actionBean.analyzer}">
+	    		<c:forEach var="anl" items="${actionBean.analyzers}">
 	    			<stripes:option value="${anl}" label="${anl}"/>
 	    		</c:forEach>
 	    	</stripes:select>
@@ -32,7 +30,7 @@
 			<stripes:submit name="search" value="Query"/>
 		</stripes:form>
 		
-		<c:import url="/pages/genericHits.jsp"/>
+		<c:import url="/pages/queryHits.jsp"/>
 		
 	</stripes:layout-component>
 </stripes:layout-render>

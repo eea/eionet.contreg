@@ -16,15 +16,11 @@
 	    	<stripes:text name="searchExpression" id="expressionText" size="30"/>
 	    	<stripes:submit name="search" value="Search" id="searchButton"/>
 	    	
+	    	<c:if test="${not empty param.search}">
+	    		<stripes:layout-render name="/pages/common/resourcesResultList.jsp" tableClass="sortable"/>
+	    	</c:if>
+	    	
 	    </stripes:form>
-	    
-	    <stripes:useActionBean beanclass="eionet.cr.web.action.SimpleSearchActionBean" id="simpleSearchActionBean"/>
-                     
-	    <display:table name="${simpleSearchActionBean.resultList}" class="sortable" pagesize="20" sort="list" requestURI="/simpleSearch.action">
-			<c:forEach var="col" items="${simpleSearchActionBean.columns}">
-				<display:column property="${col.property}" title="${col.title}" sortable="${col.sortable}" headerClass="sortable"/>
-			</c:forEach>
-		</display:table>
 		
 	</stripes:layout-component>
 </stripes:layout-render>

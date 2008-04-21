@@ -12,6 +12,7 @@ import eionet.cr.web.security.CRUser;
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.action.SimpleMessage;
+import net.sourceforge.stripes.controller.AnnotatedClassActionResolver;
 import net.sourceforge.stripes.controller.StripesFilter;
 import net.sourceforge.stripes.validation.SimpleError;
 
@@ -23,10 +24,12 @@ import net.sourceforge.stripes.validation.SimpleError;
  */
 public abstract class AbstractCRActionBean implements ActionBean {
 	
+	/** */
 	private static Log logger = LogFactory.getLog(AbstractCRActionBean.class);
 	
+	/** */
 	private CRActionBeanContext context;
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see net.sourceforge.stripes.action.ActionBean#getContext()
@@ -96,10 +99,22 @@ public abstract class AbstractCRActionBean implements ActionBean {
 		getContext().setSeverity(GeneralConfig.SEVERITY_INFO);
 		getContext().getMessages().add(new SimpleMessage(msg));
 	}
-	
+
+	/**
+	 * 
+	 * @return
+	 */
     public ResourceBundle getBundle() {
     	ResourceBundle bundle = ResourceBundle.getBundle("/StripesResources");
         return bundle;
     }
-
+    
+    /**
+     * 
+     * @return
+     */
+    public String getUrlBinding(){
+    	AnnotatedClassActionResolver resolver = new AnnotatedClassActionResolver();
+    	return resolver.getUrlBinding(this.getClass());
+    }
 }
