@@ -3,10 +3,13 @@
 <%@ include file="/pages/common/taglibs.jsp"%>	
 
 <stripes:layout-render name="/pages/common/template.jsp" pageTitle="Edit Harvesting Source">
+
 	<stripes:layout-component name="errors"/>
 	<stripes:layout-component name="messages"/>
 	<stripes:layout-component name="contents">
+	
 		<h1>Edit source</h1>
+		
 	    <stripes:form action="/source.action" focus="">
 	    	<stripes:hidden name="harvestSource.sourceId"/>
 	        <table>
@@ -80,7 +83,7 @@
 	            </tr>
 	            <tr>
 	                <td colspan="2">
-	                    <stripes:submit name="editHarvestSource" value="Save"/>       
+	                    <stripes:submit name="edit" value="Save"/>       
 	                </td>
 	            </tr>
 	        </table>

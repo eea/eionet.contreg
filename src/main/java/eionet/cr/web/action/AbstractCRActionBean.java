@@ -117,4 +117,20 @@ public abstract class AbstractCRActionBean implements ActionBean {
     	AnnotatedClassActionResolver resolver = new AnnotatedClassActionResolver();
     	return resolver.getUrlBinding(this.getClass());
     }
+    
+    /**
+     * 
+     * @return
+     */
+    public boolean isPostRequest(){
+    	return getContext().getRequest().getMethod().equalsIgnoreCase("POST");
+    }
+
+    /**
+     * 
+     * @return
+     */
+    public boolean isGetRequest(){
+    	return getContext().getRequest().getMethod().equalsIgnoreCase("GET");
+    }
 }

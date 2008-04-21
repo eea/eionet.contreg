@@ -25,11 +25,9 @@ import net.sourceforge.stripes.action.UrlBinding;
 public class CustomSearchActionBean extends AbstractSearchActionBean{
 	
 	/** */
-	private List<CustomSearchFilter> availableFilters;
-	private List<String> selectedFilters = new ArrayList<String>();
-	
-	/** */
-	private String filter;
+	private static List<CustomSearchFilter> availableFilters;
+	private List<String> selected;
+	private String filterKey;
 	
 	/**
 	 * 
@@ -39,6 +37,15 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 	public Resolution init(){
 		return new ForwardResolution("/pages/customSearch.jsp");
 	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public Resolution search(){
+		showMessage("Not yet implemented!");
+		return new ForwardResolution("/pages/customSearch.jsp");
+	}
 
 	/**
 	 * 
@@ -46,9 +53,25 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 	 */
 	public Resolution addFilter(){
 		
-		if (filter!=null && filter.length()>0)
-			selectedFilters.add(filter);
+		if (filterKey!=null && filterKey.length()>0){
+			if (selected==null)
+				selected = new ArrayList<String>();
+			selected.add(filterKey);
+		}
 		return new ForwardResolution("/pages/customSearch.jsp");
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public Resolution removeFilter(){
+		
+		if (filterKey!=null && filterKey.length()>0){
+			if (selected!=null)
+				selected.remove(filterKey);
+		}
+		return new ForwardResolution("/pages/customSearch.jsp");		
 	}
 	
 	/**
@@ -65,6 +88,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 			filter.setTitle("Type");
 			filter.setDescription("");
 			filter.setProvideValues(true);
+			filter.setKey(String.valueOf(availableFilters.size()+1));
 			availableFilters.add(filter);
 
 			filter = new CustomSearchFilter();
@@ -72,6 +96,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 			filter.setTitle("Label");
 			filter.setDescription("");
 			filter.setProvideValues(false);
+			filter.setKey(String.valueOf(availableFilters.size()+1));
 			availableFilters.add(filter);
 
 			filter = new CustomSearchFilter();
@@ -79,6 +104,15 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 			filter.setTitle("Coverage");
 			filter.setDescription("");
 			filter.setProvideValues(true);
+			filter.setKey(String.valueOf(availableFilters.size()+1));
+			availableFilters.add(filter);
+
+			filter = new CustomSearchFilter();
+			filter.setUri(Identifiers.DC_SUBJECT);
+			filter.setTitle("Subject");
+			filter.setDescription("");
+			filter.setProvideValues(true);
+			filter.setKey(String.valueOf(availableFilters.size()+1));
 			availableFilters.add(filter);
 		}
 		
@@ -94,12 +128,12 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 		List<CustomSearchFilter> available = getAvailableFilters();
 		if (available==null || available.isEmpty())
 			return null;
-		else if (selectedFilters==null || selectedFilters.isEmpty())
+		else if (selected==null || selected.isEmpty())
 			return available;
 		else{
 			List<CustomSearchFilter> result = new ArrayList<CustomSearchFilter>();
 			for (int i=0; i<available.size(); i++){
-				if (!selectedFilters.contains(available.get(i).getUri()))
+				if (!selected.contains(available.get(i).getKey()))
 					result.add(available.get(i));
 			}
 			return result;
@@ -107,23 +141,48 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 	}
 
 	/**
-	 * @return the selectedFilters
+	 * 
+	 * @return
 	 */
-	public List<String> getSelectedFilters() {
-		return selectedFilters;
+	public List<CustomSearchFilter> getSelectedFilters() {
+		
+		List<CustomSearchFilter> result = new ArrayList<CustomSearchFilter>();
+		if (selected!=null && selected.size()>0){
+			List<CustomSearchFilter> available = getAvailableFilters();
+			for (int i=0; available!=null && i<available.size(); i++){
+				if (selected.contains(available.get(i).getKey()))
+					result.add(available.get(i));
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * @return the selected
+	 */
+	public List<String> getSelected() {
+		return selected;
 	}
 
 	/**
 	 * @return the selectedFilter
 	 */
-	public String getFilter() {
-		return filter;
+	public String getFilterKey() {
+		return filterKey;
 	}
 
 	/**
 	 * @param selectedFilter the selectedFilter to set
 	 */
-	public void setFilter(String selectedFilter) {
-		this.filter = selectedFilter;
+	public void setFilterKey(String selectedFilter) {
+		this.filterKey = selectedFilter;
+	}
+
+	/**
+	 * @param selected the selected to set
+	 */
+	public void setSelected(List<String> selected) {
+		this.selected = selected;
 	}
 }

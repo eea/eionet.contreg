@@ -65,7 +65,6 @@
 	                <td colspan="2" style="padding-top:10px">
 	                	<stripes:submit name="harvestNow" value="Harvest now"/>
 	                    <stripes:submit name="scheduleImmediateHarvest" value="Schedule for immediate harvest"/>
-	                    <!--stripes:submit name="push" value="Push from local file"/-->
 	                </td>
 	            </tr>
 	        </table>

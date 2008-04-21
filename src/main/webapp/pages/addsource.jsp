@@ -7,7 +7,7 @@
 	<stripes:layout-component name="messages"/>
 	<stripes:layout-component name="contents">
 		<h1>Add source</h1>
-	    <stripes:form action="/source.action" focus="">
+	    <stripes:form action="/source.action" method="post">
 	        <table>
 	            <tr>
 	                <td>Name:</td>
@@ -58,7 +58,7 @@
 	            </tr>
 	            <tr>
 	                <td colspan="2">
-	                    <stripes:submit name="addHarvestSource" value="Add"/>       
+	                    <stripes:submit name="add" value="Add"/>       
 	                </td>
 	            </tr>
 	        </table>

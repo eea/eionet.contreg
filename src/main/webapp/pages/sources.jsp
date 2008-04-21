@@ -10,7 +10,9 @@
 	
 	<div id="operations">
 		<ul>
-			<li><a href="pages/addsource.jsp">Add new source</a></li>
+			<li>
+				<stripes:link href="/source.action" event="add">Add new source</stripes:link>
+			</li>
 		</ul>
 	</div>
 	      			
@@ -21,19 +23,19 @@
 		<display:column property="url" title="URL" sortable="true"/>
 		<display:column property="type" title="Type" sortable="true"/>
 		<display:column>
-			<stripes:link href="/source.action" event="preViewHarvestSource">
+			<stripes:link href="/source.action" event="view">
 				<img src="${pageContext.request.contextPath}/images/view2.gif" title="View"/>
 				<stripes:param name="harvestSource.sourceId" value="${harvestSource.sourceId}"/>
 			</stripes:link>
 		</display:column>
 		<display:column>
-			<stripes:link href="/source.action" event="preEditHarvestSource">
+			<stripes:link href="/source.action" event="edit">
 				<img src="${pageContext.request.contextPath}/images/edit.gif" title="Edit"/>
 				<stripes:param name="harvestSource.sourceId" value="${harvestSource.sourceId}"/>
 			</stripes:link>
 		</display:column>
 		<display:column>
-			<stripes:link href="/source.action" event="deleteHarvestSource" onclick="return confirm('Are you sure you want to delete this harvesting source');">
+			<stripes:link href="/source.action" event="delete" onclick="return confirm('Are you sure you want to delete this harvesting source');">
 				<img src="${pageContext.request.contextPath}/images/delete.gif" title="Delete"/>
 				<stripes:param name="harvestSource.sourceId" value="${harvestSource.sourceId}"/>
 			</stripes:link>

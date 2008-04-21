@@ -44,79 +44,83 @@ public class HarvestSourceActionBean extends AbstractCRActionBean {
 		this.harvestSource = harvestSource;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public List<HarvestDTO> getHarvests() {
 		return harvests;
 	}
 
-	public void setHarvests(List<HarvestDTO> harvests) {
-		this.harvests = harvests;
-	}
+    /**
+     * 
+     * @return
+     * @throws DAOException
+     */
+    @DefaultHandler
+    public Resolution view() throws DAOException {
+    	harvestSource = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(harvestSource.getSourceId());
+    	harvests = DAOFactory.getDAOFactory().getHarvestDAO().getHarvestsBySourceId(harvestSource.getSourceId());
+    	return new ForwardResolution("/pages/viewsource.jsp");
+    }
 
 	/**
 	 * 
 	 * @return
 	 * @throws DAOException
 	 */
-	@DefaultHandler
-    public Resolution addHarvestSource() throws DAOException {
-		if(isUserLoggedIn())
-			DAOFactory.getDAOFactory().getHarvestSourceDAO().addSource(getHarvestSource(), getUserName());
+    public Resolution add() throws DAOException {
+		
+		Resolution resolution = new ForwardResolution("/pages/addsource.jsp");
+		if(isUserLoggedIn()){
+			if (isPostRequest()){
+				DAOFactory.getDAOFactory().getHarvestSourceDAO().addSource(getHarvestSource(), getUserName());
+				resolution = new ForwardResolution(HarvestSourcesActionBean.class);
+			}
+		}
 		else
 			handleCrException(getBundle().getString("not.logged.in"), GeneralConfig.SEVERITY_WARNING);
-        return new ForwardResolution(HarvestSourcesActionBean.class);
+		
+		return resolution;
     }
 	
-	/**
-	 * 
-	 * @return
-	 * @throws DAOException
-	 */
-    @DontValidate
-    public Resolution preEditHarvestSource() throws DAOException {
-    	harvestSource = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(harvestSource.getSourceId());
-        return new ForwardResolution("/pages/editsource.jsp");
-    }
-    
     /**
      * 
      * @return
      * @throws DAOException
      */
-    public Resolution editHarvestSource() throws DAOException {
+    public Resolution edit() throws DAOException {
+    	
+    	Resolution resolution = new ForwardResolution("/pages/editsource.jsp");
 		if(isUserLoggedIn()){
-			DAOFactory.getDAOFactory().getHarvestSourceDAO().editSource(getHarvestSource());
-			showMessage(getBundle().getString("update.success"));
-		} else {
-			handleCrException(getBundle().getString("not.logged.in"), GeneralConfig.SEVERITY_WARNING);
+			if (isPostRequest()){
+				DAOFactory.getDAOFactory().getHarvestSourceDAO().editSource(getHarvestSource());
+				showMessage(getBundle().getString("update.success"));
+			}
+			else
+				harvestSource = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(harvestSource.getSourceId());
 		}
-        return new ForwardResolution("/pages/editsource.jsp");
+		else
+			handleCrException(getBundle().getString("not.logged.in"), GeneralConfig.SEVERITY_WARNING);
+		
+        return resolution;
     }
+    
     
     /**
      * 
      * @return
      * @throws DAOException
      */
-    @DontValidate
-    public Resolution preViewHarvestSource() throws DAOException {
-    	harvestSource = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(harvestSource.getSourceId());
-    	harvests = DAOFactory.getDAOFactory().getHarvestDAO().getHarvestsBySourceId(harvestSource.getSourceId());
-    	return new ForwardResolution("/pages/viewsource.jsp");
-    }
-    
-    /**
-     * 
-     * @return
-     * @throws DAOException
-     */
-    public Resolution deleteHarvestSource() throws DAOException {
+    public Resolution delete() throws DAOException {
 		if(isUserLoggedIn()){
 			DAOFactory.getDAOFactory().getHarvestSourceDAO().deleteSource(getHarvestSource());
 			showMessage(getBundle().getString("harvet.source.deleted"));
-		} else {
-			handleCrException(getBundle().getString("not.logged.in"), GeneralConfig.SEVERITY_WARNING);
 		}
-        return new ForwardResolution("/pages/sources.jsp");
+		else
+			handleCrException(getBundle().getString("not.logged.in"), GeneralConfig.SEVERITY_WARNING);
+		
+        return new ForwardResolution(HarvestSourcesActionBean.class);
     }
     
     /**
