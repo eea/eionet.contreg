@@ -45,6 +45,10 @@
 			<param-name>ExceptionHandler.Class</param-name>
 			<param-value>eionet.cr.web.util.StripesExceptionHandler</param-value>
 		</init-param>
+		<init-param>
+        	<param-name>LocalePicker.Class</param-name>
+        	<param-value>eionet.cr.web.util.LocalePicker</param-value>
+        </init-param>		
 	</filter>
 	
 	<filter-mapping>

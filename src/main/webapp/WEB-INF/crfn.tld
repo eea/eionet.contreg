@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd"
+	version="2.0">
+
+	<description>CR local JSTL functions library.</description>
+	<display-name>CR JSTL static functions.</display-name>
+	<tlib-version>1.0</tlib-version>
+	<short-name>crfn</short-name>
+	<uri>http://cr.eionet.europa.eu/jstl/functions</uri>
+
+	<function>
+		<description>Cuts the given string at the first word whose length exceeds that of the given integer.</description>
+		<name>cutAtFirstLongToken</name>
+		<function-class>eionet.cr.web.util.JstlFunctions</function-class>
+		<function-signature>java.lang.String cutAtFirstLongToken(java.lang.String, int)</function-signature>
+		<example>
+			${cutAtFirstLongToken(someString, 50)}
+		</example>
+	</function>
+	
+</taglib>

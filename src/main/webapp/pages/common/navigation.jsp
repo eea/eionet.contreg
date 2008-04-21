@@ -8,9 +8,8 @@
 		<li><a href="/cr/recentUploads.action" title="Recent uploads">Recent uploads </a></li>
 	    <%
   		if (crUser != null && crUser.hasPermission("/", "u")){ %>
-	  		<li><a href="/cr/pages/sources.jsp" title="Manage harvester">Harvester </a></li>
-	    	<li><a href="/cr/luceneQuery.action" title="Lucene query">Lucene query </a></li>
-	    <%
+	  		<li><a href="/cr/sources.action" title="Manage harvester">Harvester </a></li>
+	    	<li><a href="/cr/luceneQuery.action" title="Lucene query">Lucene query </a></li><%
 	    }
 		%>		
     </ul>

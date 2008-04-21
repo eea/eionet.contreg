@@ -63,7 +63,7 @@ public class HarvestSourceActionBean extends AbstractCRActionBean {
 			DAOFactory.getDAOFactory().getHarvestSourceDAO().addSource(getHarvestSource(), getUserName());
 		else
 			handleCrException(getBundle().getString("not.logged.in"), GeneralConfig.SEVERITY_WARNING);
-        return new ForwardResolution("/pages/sources.jsp");
+        return new ForwardResolution(HarvestSourcesActionBean.class);
     }
 	
 	/**
