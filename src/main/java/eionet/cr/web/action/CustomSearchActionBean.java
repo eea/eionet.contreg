@@ -1,12 +1,9 @@
 package eionet.cr.web.action;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import eionet.cr.common.Identifiers;
 import eionet.cr.web.util.CustomSearchFilter;
@@ -28,6 +25,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 	private static List<CustomSearchFilter> availableFilters;
 	private List<String> selected;
 	private String filterKey;
+	private String listKey;
 	
 	/**
 	 * 
@@ -44,6 +42,24 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 	 */
 	public Resolution search(){
 		showMessage("Not yet implemented!");
+		return new ForwardResolution("/pages/customSearch.jsp");
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public Resolution list(){
+		Map reqParams = getContext().getRequest().getParameterMap();
+		Iterator iterator = reqParams.entrySet().iterator();
+		while(iterator.hasNext()){
+			Map.Entry me = (Map.Entry)iterator.next();
+			String name = (String) me.getKey();
+			Object value = me.getValue();
+	        if(name.startsWith("val_")){
+	        	
+	        }
+		}
 		return new ForwardResolution("/pages/customSearch.jsp");
 	}
 
@@ -184,5 +200,13 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 	 */
 	public void setSelected(List<String> selected) {
 		this.selected = selected;
+	}
+
+	public String getListKey() {
+		return listKey;
+	}
+
+	public void setListKey(String listKey) {
+		this.listKey = listKey;
 	}
 }

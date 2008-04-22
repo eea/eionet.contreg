@@ -6,6 +6,28 @@
 
 	<stripes:layout-component name="contents">
 	
+		<script lang="JavaScript">
+			<!--
+						
+			function textSet(idEdit, text, sel)
+			{
+				document.getElementById(idEdit).value = text;
+				document.getElementById(sel).value = '';
+				document.getElementById(idEdit).focus();
+				
+			}
+			
+			function submitGetList(selectedKey)
+			{
+				document.forms["customSearchForm"].elements["listKey"].value = selectedKey;
+				document.forms["customSearchForm"].submit();
+				
+			}
+			
+			//-->
+		</script>
+
+	
         <h1>Custom search</h1>        
         <p>
         	sdhgf sdhgf sajkgfashkdf askjgf askf skdhf asjdhgf asjkdgfsajdhgf<br/>
@@ -13,7 +35,7 @@
         </p>
         
     	<div id="filterSelectionArea" style="margin-top:20px">
-    		<stripes:form action="/customSearch.action" method="get">
+    		<stripes:form action="/customSearch.action" method="get" id="customSearchForm">
     		
     			<stripes:select name="filterKey" id="filterSelect">
     				<stripes:option value="" label=""/>
@@ -36,9 +58,28 @@
 									</stripes:link>
 	    						</td>
 	    						<td style="text-align:right">${selectedFilter.title}:</td>
-	    						<td><input type="text" size="10"/></td>
+	    						<td>
+	    							<input type="text" id="val_${selectedFilter.key}" name="val_${selectedFilter.key}" size="10">
+	    						</td>
+	    						<td>
+	    							<c:choose>
+			                        	<c:when test="${actionBean.getListKey == selectedFilter.key}">    
+			                        		<select id="sel_${selectedFilter.key}" onchange="JavaScript:textSet('val_${selectedFilter.key}',this.value,'sel_${selectedFilter.key}');">
+												<option value=""></option>
+			                        			<option value="ARGENTINA">ARGENTINA</option>
+										        <option value="VIETNAM">VIETNAM</option>
+										        <option value="XXX">XXX</option>
+											</select>
+								    	</c:when>
+				                        <c:otherwise>
+		    								<img src="${pageContext.request.contextPath}/images/select.gif" title="Show list" alt="Show list" onclick="javascript:submitGetList(${selectedFilter.key});"/>
+				                        </c:otherwise>
+				                    </c:choose>
+	    						</td>
 	    					</tr>
 	    				</c:forEach>
+	    				<input type="hidden" name="listKey" value=""/>
+	    				<input type="hidden" name="list" value=""/>
 	    			</table>
 	    			<stripes:submit name="search" value="Search"/>
 	    		</c:if>
