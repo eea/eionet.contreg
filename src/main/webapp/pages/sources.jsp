@@ -24,19 +24,19 @@
 		<display:column property="type" title="Type" sortable="true"/>
 		<display:column>
 			<stripes:link href="/source.action" event="view">
-				<img src="${pageContext.request.contextPath}/images/view2.gif" title="View"/>
+				<img src="${pageContext.request.contextPath}/images/view2.gif" title="View" alt="View"/>
 				<stripes:param name="harvestSource.sourceId" value="${harvestSource.sourceId}"/>
 			</stripes:link>
 		</display:column>
 		<display:column>
 			<stripes:link href="/source.action" event="edit">
-				<img src="${pageContext.request.contextPath}/images/edit.gif" title="Edit"/>
+				<img src="${pageContext.request.contextPath}/images/edit.gif" title="Edit" alt="Edit"/>
 				<stripes:param name="harvestSource.sourceId" value="${harvestSource.sourceId}"/>
 			</stripes:link>
 		</display:column>
 		<display:column>
 			<stripes:link href="/source.action" event="delete" onclick="return confirm('Are you sure you want to delete this harvesting source');">
-				<img src="${pageContext.request.contextPath}/images/delete.gif" title="Delete"/>
+				<img src="${pageContext.request.contextPath}/images/delete.gif" title="Delete" alt="Delete"/>
 				<stripes:param name="harvestSource.sourceId" value="${harvestSource.sourceId}"/>
 			</stripes:link>
 		</display:column>

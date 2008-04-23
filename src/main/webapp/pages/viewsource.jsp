@@ -16,49 +16,49 @@
 	        <table>
 	            <tr>
 	                <td>Name:</td>
-	                <td>${actionBean.harvestSource.name}</td>
+	                <td>${fn:escapeXml(actionBean.harvestSource.name)}</td>
 	            </tr>
 	            <tr>
 	                <td>URL:</td>
-	                <td>${actionBean.harvestSource.url}</td>
+	                <td>${fn:escapeXml(actionBean.harvestSource.url)}</td>
 	            </tr>
 	            <tr>
 	                <td>Type:</td>
 	                <td>
-	                	${actionBean.harvestSource.type}
+	                	${fn:escapeXml(actionBean.harvestSource.type)}
 	                </td>
 	            </tr>
 	            <tr>
 	                <td>E-mails:</td>
-	                <td>${actionBean.harvestSource.emails}</td>
+	                <td>${fn:escapeXml(actionBean.harvestSource.emails)}</td>
 	            </tr>
 	            <tr>
 	                <td>Date created:</td>
 	                <td>
-	                	${actionBean.harvestSource.dateCreated}
+	                	${fn:escapeXml(actionBean.harvestSource.dateCreated)}
 	                </td>
 	            </tr>
 	            <tr>
 	                <td>Creator:</td>
 	                <td>
-	                	${actionBean.harvestSource.creator}
+	                	${fn:escapeXml(actionBean.harvestSource.creator)}
 	                </td>
 	            </tr>
 	            <tr>
 	                <td>Number of resources:</td>
 	                <td>
-	                	${actionBean.harvestSource.resources}
+	                	${fn:escapeXml(actionBean.harvestSource.resources)}
 	                </td>
 	            </tr>
 	            <tr>
 	                <td>Schedule:</td>
 	                <td>
 	                	weekday: 
-	                	${actionBean.harvestSource.harvestSchedule.weekday}&nbsp;&nbsp;&nbsp; 
+	                	${fn:escapeXml(actionBean.harvestSource.harvestSchedule.weekday)}&nbsp;&nbsp;&nbsp; 
 	                	hour: 
-	                	${actionBean.harvestSource.harvestSchedule.hour}&nbsp;&nbsp;&nbsp;
+	                	${fn:escapeXml(actionBean.harvestSource.harvestSchedule.hour)}&nbsp;&nbsp;&nbsp;
 	                	period (weeks): 
-	                	${actionBean.harvestSource.harvestSchedule.period}
+	                	${fn:escapeXml(actionBean.harvestSource.harvestSchedule.period)}
 	                </td>
 	            </tr>
 	            <tr>
@@ -86,22 +86,22 @@
 	        	<tbody>
 	        		<c:forEach items="${actionBean.harvests}" var="harv" varStatus="loop">
 	        			<tr>
-	        				<td>${harv.harvestType}</td>
-	        				<td>${harv.user}</td>
+	        				<td>${fn:escapeXml(harv.harvestType)}</td>
+	        				<td>${fn:escapeXml(harv.user)}</td>
 	        				<td><fmt:formatDate value="${harv.datetimeStarted}" pattern="dd-MM-yy HH:mm:ss"/></td>
 	        				<td><fmt:formatDate value="${harv.datetimeFinished}" pattern="dd-MM-yy HH:mm:ss"/></td>		        				
-	        				<td>${harv.totalResources}</td>
-	        				<td>${harv.encodingSchemes}</td>
-	        				<td>${harv.totalStatements}</td>
+	        				<td>${fn:escapeXml(harv.totalResources)}</td>
+	        				<td>${fn:escapeXml(harv.encodingSchemes)}</td>
+	        				<td>${fn:escapeXml(harv.totalStatements)}</td>
 							<td>
 		        				<stripes:link href="/harvest.action">
 									<c:if test="${(!(empty harv.hasFatals) && harv.hasFatals) || (!(empty harv.hasErrors) && harv.hasErrors)}">
-										<img src="${pageContext.request.contextPath}/images/error.gif" title="Errors"/>
+										<img src="${pageContext.request.contextPath}/images/error.gif" title="Errors" alt="Errors"/>
 									</c:if>
 									<c:if test="${!(empty harv.hasWarnings) && harv.hasWarnings}">
-										<img src="${pageContext.request.contextPath}/images/warning.gif" title="Warnings"/>
+										<img src="${pageContext.request.contextPath}/images/warning.gif" title="Warnings" alt="Warnings"/>
 									</c:if>
-	                                <img src="${pageContext.request.contextPath}/images/view2.gif" title="View"/>
+	                                <img src="${pageContext.request.contextPath}/images/view2.gif" title="View" alt="View"/>
 	                                <stripes:param name="harvestDTO.harvestId" value="${harv.harvestId}"/>
 	                            </stripes:link>
 		        			</td>	        				

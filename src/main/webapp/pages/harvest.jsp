@@ -14,23 +14,23 @@
                 <td>Harvest source:</td>
                 <td>
                 	<stripes:link href="/source.action" event="preViewHarvestSource">
-                        ${actionBean.harvestSourceDTO.url}
+                        ${fn:escapeXml(actionBean.harvestSourceDTO.url)}
                         <stripes:param name="harvestSource.sourceId" value="${actionBean.harvestSourceDTO.sourceId}"/>
                     </stripes:link>
                 </td>
             </tr>
             <tr>
                 <td>Type:</td>
-                <td>${actionBean.harvestDTO.harvestType}</td>
+                <td>${fn:escapeXml(actionBean.harvestDTO.harvestType)}</td>
             </tr>
             <tr>
                 <td>User:</td>
-                <td>${actionBean.harvestDTO.user}</td>
+                <td>${fn:escapeXml(actionBean.harvestDTO.user)}</td>
             </tr>
             <tr>
                 <td>Status:</td>
                 <td>
-                	${actionBean.harvestDTO.status}
+                	${fn:escapeXml(actionBean.harvestDTO.status)}
                 </td>
             </tr>
             <tr>
@@ -43,19 +43,19 @@
             </tr>
             <tr>
                 <td>Statements in total:</td>
-                <td>${actionBean.harvestDTO.totalStatements}</td>
+                <td>${fn:escapeXml(actionBean.harvestDTO.totalStatements)}</td>
             </tr>
             <tr>
                 <td>Statements with literal objects:</td>
-                <td>${actionBean.harvestDTO.litObjStatements}</td>
+                <td>${fn:escapeXml(actionBean.harvestDTO.litObjStatements)}</td>
             </tr>
             <tr>
                 <td>Statements with resource objects:</td>
-                <td>${actionBean.harvestDTO.totalResources}</td>
+                <td>${fn:escapeXml(actionBean.harvestDTO.totalResources)}</td>
             </tr>
             <tr>
                 <td>Encoding schemes:</td>
-                <td>${actionBean.harvestDTO.encodingSchemes}</td>
+                <td>${fn:escapeXml(actionBean.harvestDTO.encodingSchemes)}</td>
             </tr>
         </table>
         <br/><br/>
@@ -76,8 +76,8 @@
 			        	<tbody>
 			        		<c:forEach items="${actionBean.fatals}" var="msg" varStatus="loop">
 			        			<tr>
-			        				<td>${msg.message}</td>
-			        				<td>${msg.stackTrace}</td>
+			        				<td>${fn:escapeXml(msg.message)}</td>
+			        				<td>${fn:escapeXml(msg.stackTrace)}</td>
 			        			</tr>
 			        		</c:forEach>
 			        	</tbody>
@@ -95,8 +95,8 @@
 			        	<tbody>
 			        		<c:forEach items="${actionBean.errors}" var="msg" varStatus="loop">
 			        			<tr>
-			        				<td>${msg.message}</td>
-			        				<td>${msg.stackTrace}</td>
+			        				<td>${fn:escapeXml(msg.message)}</td>
+			        				<td>${fn:escapeXml(msg.stackTrace)}</td>
 			        			</tr>
 			        		</c:forEach>
 			        	</tbody>
@@ -114,8 +114,8 @@
 			        	<tbody>
 			        		<c:forEach items="${actionBean.warnings}" var="msg" varStatus="loop">
 			        			<tr>
-			        				<td>${msg.message}</td>
-			        				<td>${msg.stackTrace}</td>
+			        				<td>${fn:escapeXml(msg.message)}</td>
+			        				<td>${fn:escapeXml(msg.stackTrace)}</td>
 			        			</tr>
 			        		</c:forEach>
 			        	</tbody>

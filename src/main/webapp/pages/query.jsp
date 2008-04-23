@@ -16,7 +16,7 @@
 			<label for="query">Enter your Lucene query here:</label>
 			<br/>
 			<br/>
-			<stripes:textarea name="query" cols="80"/>
+			<stripes:textarea name="query" id="query" cols="80" rows="4"/>
 			<br/>
 			
 			<stripes:select name="analyzer" id="analyzerSelect" value="${actionBean.analyzer}">

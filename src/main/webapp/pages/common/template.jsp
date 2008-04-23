@@ -73,7 +73,7 @@
 						</c:when>
 						<c:otherwise>
 							<div class="breadcrumbitem"><a href='index.jsp'>Content Registry</a></div>
- 							<div class="breadcrumbitemlast">${pageTitle}</div>
+ 							<div class="breadcrumbitemlast">${fn:escapeXml(pageTitle)}</div>
 						</c:otherwise>
 					</c:choose>
 					<div class="breadcrumbtail"></div>
@@ -86,9 +86,6 @@
 				<div id="workarea">
 				
 					<stripes:layout-component name="errors">
-						<style type="text/css">
-						    input.error { background-color: yellow; }
-						</style>
 						<stripes:errors/>
 					</stripes:layout-component>
 					
