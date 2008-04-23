@@ -6,92 +6,91 @@
 
 	<stripes:layout-component name="contents">
 	
-		<script lang="JavaScript">
-			<!--
-						
-			function textSet(idEdit, text, sel)
-			{
-				document.getElementById(idEdit).value = text;
-				document.getElementById(sel).value = '';
-				document.getElementById(idEdit).focus();
-				
-			}
-			
-			function submitGetList(selectedKey)
-			{
-				document.forms["customSearchForm"].elements["listKey"].value = selectedKey;
-				document.forms["customSearchForm"].submit();
-				
-			}
-			
-			//-->
-		</script>
-
-	
-        <h1>Custom search</h1>        
+        <h1>Custom search</h1>
         <p>
-        	sdhgf sdhgf sajkgfashkdf askjgf askf skdhf asjdhgf asjkdgfsajdhgf<br/>
+        	aaaaaaaaaaaasdhgf sdhgf sajkgfashkdf askjgf askf skdhf asjdhgf asjkdgfsajdhgf<br/>
         	sdhgf sdhgf sajkgfashkdf askjgf askf skdhf asjdhgf asjkdgfsajdhgf
         </p>
         
-    	<div id="filterSelectionArea" style="margin-top:20px">
-    		<stripes:form action="/customSearch.action" method="get" id="customSearchForm">
-    		
-    			<stripes:select name="filterKey" id="filterSelect">
-    				<stripes:option value="" label=""/>
-    				<c:if test="${actionBean.unselectedFilters!=null && fn:length(actionBean.unselectedFilters)>0}">
-	    				<c:forEach var="unselectedFilter" items="${actionBean.unselectedFilters}">
-	    					<stripes:option value="${unselectedFilter.key}" label="${unselectedFilter.title}" title="${unselectedFilter.uri}"/>
-	    				</c:forEach>
-	    			</c:if>
-    			</stripes:select>&nbsp;
-    			<stripes:submit name="addFilter" value="Add filter"/>
-    			
-    			<c:if test="${actionBean.selectedFilters!=null && fn:length(actionBean.selectedFilters)>0}">
-	    			<table style="margin-top:20px;margin-bottom:20px">
-	    				<c:forEach var="selectedFilter" items="${actionBean.selectedFilters}">
-	    					<tr>
-	    						<td style="padding-right:12px">
-		    						<stripes:link href="/customSearch.action" event="removeFilter">
-										<img src="${pageContext.request.contextPath}/images/delete.gif" title="Remove filter" alt="Remove filter"/>
-										<stripes:param name="filterKey" value="${selectedFilter.key}"/>
-									</stripes:link>
-	    						</td>
-	    						<td style="text-align:right">${selectedFilter.title}:</td>
-	    						<td>
-	    							<input type="text" id="val_${selectedFilter.key}" name="val_${selectedFilter.key}" size="10">
-	    						</td>
-	    						<td>
-	    							<c:choose>
-			                        	<c:when test="${actionBean.getListKey == selectedFilter.key}">    
-			                        		<select id="sel_${selectedFilter.key}" onchange="JavaScript:textSet('val_${selectedFilter.key}',this.value,'sel_${selectedFilter.key}');">
-												<option value=""></option>
-			                        			<option value="ARGENTINA">ARGENTINA</option>
-										        <option value="VIETNAM">VIETNAM</option>
-										        <option value="XXX">XXX</option>
-											</select>
-								    	</c:when>
-				                        <c:otherwise>
-		    								<img src="${pageContext.request.contextPath}/images/select.gif" title="Show list" alt="Show list" onclick="javascript:submitGetList(${selectedFilter.key});"/>
-				                        </c:otherwise>
-				                    </c:choose>
-	    						</td>
-	    					</tr>
-	    				</c:forEach>
-	    				<input type="hidden" name="listKey" value=""/>
-	    				<input type="hidden" name="list" value=""/>
-	    			</table>
-	    			<stripes:submit name="search" value="Search"/>
-	    		</c:if>
-	    		
-	    		<c:if test="${actionBean.selected!=null && fn:length(actionBean.selected)>0}">
-	    			<c:forEach var="selected" items="${actionBean.selected}">
-	    				<input type="hidden" name="selected" value="${selected}"/>
-	    			</c:forEach>
-	    		</c:if>
-	    		
-    		</stripes:form>
-	    </div>				    
+        <p>
+        	${actionBean.selectedFilters}
+        </p>
+        
+
+		<c:choose>        
+        	<c:when test="${actionBean.availableFilters!=null && fn:length(actionBean.availableFilters)>0}">
+        
+		    	<div id="filterSelectionArea" style="margin-top:20px">
+		    	
+		    		<stripes:form action="/customSearch.action" method="get" id="customSearchForm">
+		    		
+		    			<stripes:select name="addedFilter" id="filterSelect">
+		    				<stripes:option value="" label=""/>
+		    				<c:forEach var="availableFilter" items="${actionBean.availableFilters}">
+		    					<c:if test="${actionBean.selectedFilters[availableFilter.key]==null}">
+		    						<stripes:option value="${availableFilter.key}" label="${availableFilter.value.title}" title="${availableFilter.value.uri}"/>
+		    					</c:if>
+		    				</c:forEach>
+		    			</stripes:select>&nbsp;
+		    			<stripes:submit name="addFilter" value="Add filter"/>
+		    			
+		    			<c:if test="${actionBean.selectedFilters!=null && fn:length(actionBean.selectedFilters)>0}">
+			    			<table style="margin-top:20px;margin-bottom:20px">
+			    				<c:forEach var="availableFilter" items="${actionBean.availableFilters}">
+			    					<c:if test="${actionBean.selectedFilters[availableFilter.key]!=null}">
+				    					<tr>
+				    						<td style="padding-right:12px">
+					    						<stripes:link href="/customSearch.action" event="removeFilter">
+													<img src="${pageContext.request.contextPath}/images/delete.gif" title="Remove filter" alt="Remove filter"/>
+													<stripes:param name="removedFilter" value="${availableFilter.key}"/>
+													<c:forEach var="selectedFilter" items="${actionBean.selectedFilters}">
+														<stripes:param name="value_${selectedFilter.key}" value="${selectedFilter.value}"/>
+													</c:forEach>													
+												</stripes:link>
+				    						</td>
+				    						<td style="text-align:right">${availableFilter.value.title}:</td>
+				    						<td>
+				    							<c:if test="${param.showPicklist==null || actionBean.picklistFilter!=availableFilter.key || (param.showPicklist!=null && actionBean.picklistFilter==availableFilter.key && (actionBean.picklist==null || fn:length(actionBean.picklist)==0))}">
+				    								<input type="text" name="value_${availableFilter.key}" value="${fn:escapeXml(actionBean.selectedFilters[availableFilter.key])}" size="30"/>
+				    							</c:if>
+				    							<c:if test="${param.showPicklist!=null && actionBean.picklistFilter==availableFilter.key && actionBean.picklist!=null && fn:length(actionBean.picklist)>0}">
+													<stripes:select name="value_${availableFilter.key}" style="max-width:400px">
+					                        			<stripes:option value="" label=""/>
+					                        			<c:if test="${actionBean.picklist!=null}">
+						                        			<c:forEach var="picklistItem" items="${actionBean.picklist}">
+						                        				<stripes:option value='"${picklistItem}"' label="${picklistItem}"/>
+						                        			</c:forEach>
+						                        		</c:if>
+													</stripes:select>
+				    							</c:if>
+				    							<c:if test="${param.showPicklist==null || actionBean.picklistFilter!=availableFilter.key}">
+				    								<stripes:link href="/customSearch.action" event="showPicklist" style="position:absolute">
+														<img src="${pageContext.request.contextPath}/images/select.gif" title="Get existing values" alt="Get existing values"/>
+														<stripes:param name="picklistFilter" value="${availableFilter.key}"/>
+														<c:forEach var="selectedFilter" items="${actionBean.selectedFilters}">
+															<stripes:param name="value_${selectedFilter.key}" value="${selectedFilter.value}"/>
+														</c:forEach>
+													</stripes:link>
+				    							</c:if>
+				    							<c:if test="${param.showPicklist!=null && actionBean.picklistFilter==availableFilter.key && (actionBean.picklist==null || fn:length(actionBean.picklist)==0)}">
+				    								No picklist found!
+				    							</c:if>
+				    						</td>
+				    					</tr>
+				    				</c:if>
+			    				</c:forEach>
+			    			</table>
+			    			<stripes:submit name="search" value="Search"/>
+		    			</c:if>
+	    				
+		    		</stripes:form>
+			    </div>
+			    
+			</c:when>
+			<c:otherwise>
+				No available filters found!
+			</c:otherwise>
+		</c:choose>
 				
 	</stripes:layout-component>
 </stripes:layout-render>

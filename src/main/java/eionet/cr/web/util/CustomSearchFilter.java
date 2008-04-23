@@ -12,8 +12,6 @@ public class CustomSearchFilter {
 	private String title;
 	private String description;
 	private boolean provideValues;
-	private String key;
-	private String value;
 	
 	/**
 	 * @return the uri
@@ -62,23 +60,5 @@ public class CustomSearchFilter {
 	 */
 	public void setProvideValues(boolean provideValues) {
 		this.provideValues = provideValues;
-	}
-	/**
-	 * @return the key
-	 */
-	public String getKey() {
-		return key;
-	}
-	/**
-	 * @param key the key to set
-	 */
-	public void setKey(String key) {
-		this.key = key;
-	}
-	public String getValue() {
-		return value;
-	}
-	public void setValue(String value) {
-		this.value = value;
 	}
 }

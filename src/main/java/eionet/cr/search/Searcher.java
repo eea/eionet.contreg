@@ -73,15 +73,6 @@ public class Searcher {
 	/** */
 	private static Log logger = LogFactory.getLog(Searcher.class);
 	
-	/** */
-	//private static Analyzer defaultAnalyzer = new StandardAnalyzer.class.getName();
-
-	/** */
-	private static IndexSearcher indexSearcher = null;
-	
-	/** */
-//	private static LinkedHashMap<String,Analyzer> availableAnalyzers = null;
-	
 	/**
 	 * 
 	 * @return
@@ -421,7 +412,7 @@ public class Searcher {
 			}
 		}
 		
-		return new TreeSet(resultSet);
+		return new TreeSet(resultSet); // TreeSet sorts the results into ascending order
 	}
 	
 	/**
@@ -491,22 +482,94 @@ public class Searcher {
 	
 	/**
 	 * 
+	 * @param criteria
+	 * @return
+	 * @throws SearchException 
+	 */
+	public static List<Map<String,String[]>> customSearch(Map<String,String> criteria) throws SearchException{
+		
+		List<Map<String,String[]>> result = new ArrayList<Map<String,String[]>>();
+		
+		if (criteria==null || criteria.isEmpty())
+			return result;
+		
+		IndexSearcher indexSearcher = null;
+		List<Query> queries = new ArrayList<Query>();
+		QueryParser queryParser = new QueryParser(DEFAULT_FIELD, Indexer.getAnalyzer());
+		try{
+			for (Iterator<String> i = criteria.keySet().iterator(); i.hasNext();){
+				String key = i.next();
+				String value = criteria.get(key);
+				if (!Util.isNullOrEmpty(key) && !Util.isNullOrEmpty(value)){
+					
+					key = key.trim();
+					value = value.trim();
+					
+					StringBuffer buf = new StringBuffer(Util.escapeForLuceneQuery(key));
+					buf.append(":");
+					if (value.startsWith("\"") && value.endsWith("\"") && value.length()>2)
+						buf.append("\"").append(Util.escapeForLuceneQuery(value.substring(1, value.length()-1))).append("\"");
+					else
+						buf.append(Util.escapeForLuceneQuery(value));
+					
+					queries.add(queryParser.parse(buf.toString()));
+				}
+			}
+			
+			if (!queries.isEmpty()){
+				
+				BooleanQuery booleanQuery = new BooleanQuery();
+				for (int i=0; i<queries.size(); i++){
+					booleanQuery.add(queries.get(i), BooleanClause.Occur.MUST);
+				}
+				
+				indexSearcher = getIndexSearcher();
+				Hits hits = indexSearcher.search(booleanQuery);
+				return SearchUtil.processHits(hits);
+			}
+		}
+		catch (Exception e){
+			throw new SearchException(e.toString(), e);
+		}
+		finally{
+			try{
+				if (indexSearcher!=null)
+					indexSearcher.close();
+			}
+			catch (IOException e){}
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * 
 	 * @param args
 	 */
 	public static void main(String[] args){
 		
 		try {			
-			List<Map<String,String[]>> results = Searcher.getRecentByRdfType("http://www.eionet.eu.int/gemet/2004/06/gemet-schema.rdf#Group", 20);
-			//List<Map<String,String[]>> results = Searcher.getRecentByRdfType(Identifiers.RSS_ITEM);
+			//List<Map<String,String[]>> results = Searcher.getRecentByRdfType("http://www.eionet.eu.int/gemet/2004/06/gemet-schema.rdf#Group", 20);
+			
+			HashMap<String,String> criteria = new HashMap<String,String>();
+			criteria.put(Identifiers.RDFS_LABEL, "submission");
+			criteria.put(Identifiers.ROD_INSTRUMENT_PROPERTY, "\"ospar convention\"");
+			
+			List<Map<String,String[]>> results = Searcher.customSearch(criteria);
+			
+			System.out.println();
 			System.out.println(results==null ? "results==null" : "results size = " + results.size());
-			for (int i=0; i<results.size(); i++){
-				Map<String,String[]> map = results.get(i);
-				String[] ss = map.get(Identifiers.FIRST_SEEN_TIMESTAMP);
-				String s = ss==null || ss.length==0 ? "null" : FirstSeenTimestamp.toDateString(ss[0], "yyyy.MM.dd HH:mm:ss");
-				System.out.println("TIMESTAMP=" + s + ", DOC_ID=" + Arrays.deepToString(map.get(Identifiers.DOC_ID)));
-
-//				System.out.println("TIMESTAMP=" + Arrays.deepToString(map.get(Identifiers.FIRST_SEEN_TIMESTAMP)) +
-//						", DOC_ID=" + Arrays.deepToString(map.get(Identifiers.DOC_ID)));
+			System.out.println();
+			for (int j=0; j<results.size(); j++){
+				Map<String,String[]> map = results.get(j);
+				for (Iterator<String> i=map.keySet().iterator(); i.hasNext();){
+					String key = i.next();
+					String value = Arrays.deepToString(map.get(key));
+					System.out.println(key + " = " + value);
+				}
+				System.out.println();
+				System.out.println("====================================================");
+				System.out.println();
 			}
 		}
 		catch (Throwable t) {
