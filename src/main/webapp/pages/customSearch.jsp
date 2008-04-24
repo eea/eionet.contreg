@@ -65,7 +65,7 @@
 				    							</c:if>
 				    							<c:if test="${param.showPicklist==null || actionBean.picklistFilter!=availableFilter.key}">
 				    								<stripes:link href="/customSearch.action" event="showPicklist" style="position:absolute">
-														<img src="${pageContext.request.contextPath}/images/select.gif" title="Get existing values" alt="Get existing values"/>
+														<img style="padding-top: 1px;" src="${pageContext.request.contextPath}/images/list.gif" title="Get existing values" alt="Get existing values"/>
 														<stripes:param name="picklistFilter" value="${availableFilter.key}"/>
 														<c:forEach var="selectedFilter" items="${actionBean.selectedFilters}">
 															<stripes:param name="value_${selectedFilter.key}" value="${selectedFilter.value}"/>
