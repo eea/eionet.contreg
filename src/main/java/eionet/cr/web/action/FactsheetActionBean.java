@@ -6,11 +6,11 @@ import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
-import eionet.cr.common.Resource;
+import eionet.cr.common.ResourceMap;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.Searcher;
-import eionet.cr.web.util.FactsheetUtil;
-import eionet.cr.web.util.ResourcePropertyDTO;
+import eionet.cr.web.util.factsheet.FactsheetUtil;
+import eionet.cr.web.util.factsheet.ResourcePropertyDTO;
 
 /**
  * 
@@ -23,7 +23,7 @@ public class FactsheetActionBean extends AbstractCRActionBean{
 	/** */
 	private String uri;
 	private String url;
-	private Resource resource;
+	private ResourceMap resource;
 	private List<ResourcePropertyDTO> resourceProperties;
 
 	/**
@@ -65,7 +65,7 @@ public class FactsheetActionBean extends AbstractCRActionBean{
 	/**
 	 * @return the resource
 	 */
-	public Resource getResource() {
+	public ResourceMap getResource() {
 		return resource;
 	}
 

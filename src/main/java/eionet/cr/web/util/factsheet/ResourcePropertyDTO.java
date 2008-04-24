@@ -1,4 +1,4 @@
-package eionet.cr.web.util;
+package eionet.cr.web.util.factsheet;
 
 import java.util.ArrayList;
 import java.util.HashMap;

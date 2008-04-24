@@ -1,6 +1,8 @@
 package eionet.cr.index;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -17,7 +19,7 @@ import eionet.cr.config.GeneralConfig;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class SubProperties extends Hashtable<String,List<String>>{
+public class SubProperties extends HashMap<String,HashSet<String>>{
 	
 	/** */
 	private static SubProperties instance = null;
@@ -33,7 +35,7 @@ public class SubProperties extends Hashtable<String,List<String>>{
 	 * 
 	 * @return
 	 */
-	private static SubProperties getInstance(){
+	public static SubProperties getInstance(){
 		if (instance==null)
 			instance = new SubProperties();
 		return instance;
@@ -47,11 +49,13 @@ public class SubProperties extends Hashtable<String,List<String>>{
 	public static synchronized void addSubProperty(String of, String subProperty){
 		
 		if (of!=null && subProperty!=null){
-			List<String> subProperties = getInstance().get(of);
-			if (subProperties==null)
-				subProperties = new ArrayList<String>();
-			subProperties.add(subProperty);
-			getInstance().put(of, subProperties);
+			if (!of.equals(subProperty)){
+				HashSet<String> subProperties = getInstance().get(of);
+				if (subProperties==null)
+					subProperties = new HashSet<String>();
+				subProperties.add(subProperty);
+				getInstance().put(of, subProperties);
+			}
 		}
 	}
 	
@@ -75,7 +79,7 @@ public class SubProperties extends Hashtable<String,List<String>>{
 	public static List<String> getSubPropertiesOf(String id){
 		
 		if (id!=null)
-			return getInstance().get(id);
+			return new ArrayList(getInstance().get(id));
 		else
 			return null;
 	}
@@ -89,7 +93,7 @@ public class SubProperties extends Hashtable<String,List<String>>{
 	public static boolean isSubPropertyOf(String of, String what){
 		
 		if (of!=null && what!=null){
-			List<String> subProperties = getInstance().get(of);
+			HashSet<String> subProperties = getInstance().get(of);
 			return subProperties!=null && subProperties.contains(what);
 		}
 		else

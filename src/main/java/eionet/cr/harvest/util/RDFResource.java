@@ -20,7 +20,7 @@ public class RDFResource {
 	
 	/** */
 	private List<RDFResourceProperty> properties = null;
-	private HashSet<String> distinctPropertyIds = null;
+	private HashSet<String> distinctProperties = null;
 	private int countLiteralProperties = 0;
 	
 	/** */
@@ -56,6 +56,13 @@ public class RDFResource {
 		
 		if (properties==null)
 			properties = new ArrayList<RDFResourceProperty>();
+		else{
+			for (int i=0; i<properties.size(); i++){
+				RDFResourceProperty p = properties.get(i);
+				if (p.getId().equals(property.getId()) && p.getValue().equals(property.getValue()))
+					return;
+			}
+		}
 		
 		properties.add(property);
 		addDistinctPropertyId(property.getId());
@@ -76,9 +83,9 @@ public class RDFResource {
 	 */
 	public boolean isEncodingScheme(){
 		
-		return distinctPropertyIds!=null &&
-			distinctPropertyIds.contains(Identifiers.RDFS_LABEL);
-		//FIXME distinctPropertyIds.contains(Identifiers.RDF_TYPE) &&
+		return distinctProperties!=null &&
+			distinctProperties.contains(Identifiers.RDFS_LABEL);
+		//FIXME distinctProperties.contains(Identifiers.RDF_TYPE) &&
 	}
 	
 	/**
@@ -86,7 +93,7 @@ public class RDFResource {
 	 * @return
 	 */
 	public boolean isSubPropertyOf(){
-		return distinctPropertyIds!=null && distinctPropertyIds.contains(Identifiers.RDFS_SUB_PROPERTY_OF);
+		return distinctProperties!=null && distinctProperties.contains(Identifiers.RDFS_SUB_PROPERTY_OF);
 	}
 	
 	/**
@@ -95,9 +102,9 @@ public class RDFResource {
 	 */
 	private void addDistinctPropertyId(String id){
 		
-		if (distinctPropertyIds==null)
-			distinctPropertyIds = new HashSet<String>();
-		distinctPropertyIds.add(id);
+		if (distinctProperties==null)
+			distinctProperties = new HashSet<String>();
+		distinctProperties.add(id);
 	}
 
 	/**

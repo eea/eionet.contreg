@@ -11,28 +11,25 @@
         	aaaaaaaaaaaasdhgf sdhgf sajkgfashkdf askjgf askf skdhf asjdhgf asjkdgfsajdhgf<br/>
         	sdhgf sdhgf sajkgfashkdf askjgf askf skdhf asjdhgf asjkdgfsajdhgf
         </p>
-        
-        <p>
-        	${actionBean.selectedFilters}
-        </p>
-        
 
 		<c:choose>        
         	<c:when test="${actionBean.availableFilters!=null && fn:length(actionBean.availableFilters)>0}">
         
 		    	<div id="filterSelectionArea" style="margin-top:20px">
 		    	
-		    		<stripes:form action="/customSearch.action" method="get" id="customSearchForm">
+		    		<stripes:form name="customSearchForm" action="/customSearch.action" method="get" id="customSearchForm">
 		    		
-		    			<stripes:select name="addedFilter" id="filterSelect">
-		    				<stripes:option value="" label=""/>
-		    				<c:forEach var="availableFilter" items="${actionBean.availableFilters}">
-		    					<c:if test="${actionBean.selectedFilters[availableFilter.key]==null}">
-		    						<stripes:option value="${availableFilter.key}" label="${availableFilter.value.title}" title="${availableFilter.value.uri}"/>
-		    					</c:if>
-		    				</c:forEach>
-		    			</stripes:select>&nbsp;
-		    			<stripes:submit name="addFilter" value="Add filter"/>
+		    			<c:if test="${fn:length(actionBean.selectedFilters)<fn:length(actionBean.availableFilters)}">
+			    			<stripes:select name="addedFilter" id="filterSelect">
+			    				<stripes:option value="" label=""/>
+			    				<c:forEach var="availableFilter" items="${actionBean.availableFilters}">
+			    					<c:if test="${actionBean.selectedFilters[availableFilter.key]==null}">
+			    						<stripes:option value="${availableFilter.key}" label="${availableFilter.value.title}" title="${availableFilter.value.uri}"/>
+			    					</c:if>
+			    				</c:forEach>
+			    			</stripes:select>&nbsp;
+			    			<stripes:submit name="addFilter" value="Add filter"/>
+			    		</c:if>
 		    			
 		    			<c:if test="${actionBean.selectedFilters!=null && fn:length(actionBean.selectedFilters)>0}">
 			    			<table style="margin-top:20px;margin-bottom:20px">
@@ -40,41 +37,31 @@
 			    					<c:if test="${actionBean.selectedFilters[availableFilter.key]!=null}">
 				    					<tr>
 				    						<td style="padding-right:12px">
-					    						<stripes:link href="/customSearch.action" event="removeFilter">
-													<img src="${pageContext.request.contextPath}/images/delete.gif" title="Remove filter" alt="Remove filter"/>
-													<stripes:param name="removedFilter" value="${availableFilter.key}"/>
-													<c:forEach var="selectedFilter" items="${actionBean.selectedFilters}">
-														<stripes:param name="value_${selectedFilter.key}" value="${selectedFilter.value}"/>
-													</c:forEach>													
-												</stripes:link>
+				    							<input type="image" name="removeFilter_${availableFilter.key}" src="${pageContext.request.contextPath}/images/delete_small.gif" title="Remove filter" alt="Remove filter"/>
 				    						</td>
 				    						<td style="text-align:right">${availableFilter.value.title}:</td>
 				    						<td>
-				    							<c:if test="${param.showPicklist==null || actionBean.picklistFilter!=availableFilter.key || (param.showPicklist!=null && actionBean.picklistFilter==availableFilter.key && (actionBean.picklist==null || fn:length(actionBean.picklist)==0))}">
+				    							<c:if test="${!actionBean.showPicklist || actionBean.picklistFilter!=availableFilter.key || actionBean.picklist==null || fn:length(actionBean.picklist)==0}">
 				    								<input type="text" name="value_${availableFilter.key}" value="${fn:escapeXml(actionBean.selectedFilters[availableFilter.key])}" size="30"/>
 				    							</c:if>
-				    							<c:if test="${param.showPicklist!=null && actionBean.picklistFilter==availableFilter.key && actionBean.picklist!=null && fn:length(actionBean.picklist)>0}">
-													<stripes:select name="value_${availableFilter.key}" style="max-width:400px">
-					                        			<stripes:option value="" label=""/>
-					                        			<c:if test="${actionBean.picklist!=null}">
-						                        			<c:forEach var="picklistItem" items="${actionBean.picklist}">
-						                        				<stripes:option value='"${picklistItem}"' label="${picklistItem}"/>
-						                        			</c:forEach>
-						                        		</c:if>
-													</stripes:select>
-				    							</c:if>
-				    							<c:if test="${param.showPicklist==null || actionBean.picklistFilter!=availableFilter.key}">
-				    								<stripes:link href="/customSearch.action" event="showPicklist" style="position:absolute">
-														<img style="padding-top: 1px;" src="${pageContext.request.contextPath}/images/list.gif" title="Get existing values" alt="Get existing values"/>
-														<stripes:param name="picklistFilter" value="${availableFilter.key}"/>
-														<c:forEach var="selectedFilter" items="${actionBean.selectedFilters}">
-															<stripes:param name="value_${selectedFilter.key}" value="${selectedFilter.value}"/>
-														</c:forEach>
-													</stripes:link>
-				    							</c:if>
-				    							<c:if test="${param.showPicklist!=null && actionBean.picklistFilter==availableFilter.key && (actionBean.picklist==null || fn:length(actionBean.picklist)==0)}">
-				    								No picklist found!
-				    							</c:if>
+				    							<c:if test="${availableFilter.value.provideValues}">
+					    							<c:if test="${actionBean.showPicklist && actionBean.picklistFilter==availableFilter.key && actionBean.picklist!=null && fn:length(actionBean.picklist)>0}">
+														<select name="value_${availableFilter.key}" style="max-width:400px">
+						                        			<option value="" selected="selected">- select a value -</option>
+						                        			<c:if test="${actionBean.picklist!=null}">
+							                        			<c:forEach var="picklistItem" items="${actionBean.picklist}">
+							                        				<option value='"${picklistItem}"' title="${picklistItem}" style="max-width:400px">${picklistItem}</option>
+							                        			</c:forEach>
+							                        		</c:if>
+														</select>
+					    							</c:if>
+					    							<c:if test="${!actionBean.showPicklist || actionBean.picklistFilter!=availableFilter.key}">
+					    								<input type="image" name="showPicklist_${availableFilter.key}" src="${pageContext.request.contextPath}/images/list.gif" title="Get existing values" alt="Get existing values" style="position:absolute"/>
+					    							</c:if>
+					    							<c:if test="${actionBean.showPicklist && actionBean.picklistFilter==availableFilter.key && (actionBean.picklist==null || fn:length(actionBean.picklist)==0)}">
+					    								No picklist found!
+					    							</c:if>
+					    						</c:if>
 				    						</td>
 				    					</tr>
 				    				</c:if>
@@ -82,6 +69,10 @@
 			    			</table>
 			    			<stripes:submit name="search" value="Search"/>
 		    			</c:if>
+		    			
+		    			<c:if test="${not empty param.search}">
+				    		<stripes:layout-render name="/pages/common/resourcesResultList.jsp" tableClass="sortable"/>
+				    	</c:if>
 	    				
 		    		</stripes:form>
 			    </div>

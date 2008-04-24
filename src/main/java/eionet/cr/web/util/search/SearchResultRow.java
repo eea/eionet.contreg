@@ -1,6 +1,9 @@
-package eionet.cr.web.util;
+package eionet.cr.web.util.search;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +17,7 @@ import eionet.cr.util.Util;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class SearchResultRowDisplayMap extends HashMap<String,String>{
+public class SearchResultRow extends HashMap<String,String>{
 	
 	/** */
 	public static final String RESOURCE_URI = "resourceUri";
@@ -24,7 +27,7 @@ public class SearchResultRowDisplayMap extends HashMap<String,String>{
 	 * 
 	 * @param underlyingMap
 	 */
-	public SearchResultRowDisplayMap(Map<String,String[]> underlyingMap){
+	public SearchResultRow(Map<String,String[]> underlyingMap){
 		
 		super();
 		
@@ -32,11 +35,9 @@ public class SearchResultRowDisplayMap extends HashMap<String,String>{
 			return;
 		
 		for (Iterator<String> iter = underlyingMap.keySet().iterator(); iter.hasNext();){
-			
 			String key = iter.next();
-			String[] values = underlyingMap.get(key);
-			String resultValue = Util.arrayToString(Util.pruneUrls(values), ", ");
-			put(key, resultValue);
+			String value = toValuesString(underlyingMap.get(key));
+			put(key, value);
 			Md5Map.addValue(key);
 		}
 	}
@@ -63,4 +64,45 @@ public class SearchResultRowDisplayMap extends HashMap<String,String>{
 		else
 			return super.get(keyString);
 	}
+	
+	/**
+	 * 
+	 * @param rawValues
+	 * @return
+	 */
+	private String toValuesString(String[] rawValues){
+		
+		if (rawValues==null || rawValues.length==0)
+			return null;
+		
+		StringBuffer buf = new StringBuffer();
+		HashSet<String> set = new HashSet<String>(Arrays.asList(Util.pruneUrls(rawValues)));
+		for (Iterator<String> i=set.iterator(); i.hasNext();){
+			if (buf.length()>0)
+				buf.append(", ");
+			buf.append(i.next());
+		}
+		
+		return buf.toString();
+	}
+
+	/**
+	 * 
+	 * @param list
+	 * @return
+	 */
+	public static List<SearchResultRow> convert(List<Map<String,String[]>> list){
+		
+		if (list==null)
+			return null;
+		
+		List<SearchResultRow> resultList = new ArrayList<SearchResultRow>();
+		for (int i=0; i<list.size(); i++){
+			Map<String,String[]> map = list.get(i);
+			if (!map.isEmpty())
+				resultList.add(new SearchResultRow(map));
+		}
+		return resultList;
+	}
+	
 }

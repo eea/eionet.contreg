@@ -7,6 +7,7 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import eionet.cr.index.EncodingSchemes;
+import eionet.cr.index.SubProperties;
 import eionet.cr.index.walk.AllDocsWalker;
 import eionet.cr.search.Searcher;
 
@@ -31,5 +32,7 @@ public class ServletContextListenerImpl implements ServletContextListener{
 	public void contextInitialized(ServletContextEvent event) {
 		
 		AllDocsWalker.startupWalk();
+		SubProperties subProps = SubProperties.getInstance();
+		System.out.println("");
 	}
 }

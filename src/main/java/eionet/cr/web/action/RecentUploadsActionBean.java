@@ -18,9 +18,8 @@ import eionet.cr.common.Identifiers;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.Searcher;
 import eionet.cr.util.Util;
-import eionet.cr.web.util.DisplayUtil;
-import eionet.cr.web.util.SearchResultColumn;
-import eionet.cr.web.util.SearchResultRowDisplayMap;
+import eionet.cr.web.util.search.SearchResultColumn;
+import eionet.cr.web.util.search.SearchResultRow;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
@@ -65,7 +64,7 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean {
 		if (type!=null && type.length()>0){
 			String decodedType = Util.urlDecode(type);
 			this.columns = getColumnsForType(decodedType);
-			this.resultList = DisplayUtil.listForDisplay(Searcher.getRecentByRdfType(decodedType, MAX_RESULTS));
+			this.resultList = SearchResultRow.convert(Searcher.getRecentByRdfType(decodedType, MAX_RESULTS));
 		}
 			
 		return new ForwardResolution("/pages/recent.jsp");
@@ -148,8 +147,8 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean {
 			// columns for deliveries
 			List<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
 			SearchResultColumn col = new SearchResultColumn();
-			col.setPropertyUri(SearchResultRowDisplayMap.FALLBACKED_LABEL);
-			col.setPropertyKey(SearchResultRowDisplayMap.FALLBACKED_LABEL);
+			col.setPropertyUri(SearchResultRow.FALLBACKED_LABEL);
+			col.setPropertyKey(SearchResultRow.FALLBACKED_LABEL);
 			col.setTitle("Label");
 			col.setSortable(false);
 			list.add(col);
@@ -180,8 +179,8 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean {
 			// columns for obligations
 			list = new ArrayList<SearchResultColumn>();
 			col = new SearchResultColumn();
-			col.setPropertyUri(SearchResultRowDisplayMap.FALLBACKED_LABEL);
-			col.setPropertyKey(SearchResultRowDisplayMap.FALLBACKED_LABEL);
+			col.setPropertyUri(SearchResultRow.FALLBACKED_LABEL);
+			col.setPropertyKey(SearchResultRow.FALLBACKED_LABEL);
 			col.setTitle("Label");
 			col.setSortable(false);
 			list.add(col);
@@ -205,8 +204,8 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean {
 			// columns for full reports
 			list = new ArrayList<SearchResultColumn>();
 			col = new SearchResultColumn();
-			col.setPropertyUri(SearchResultRowDisplayMap.FALLBACKED_LABEL);
-			col.setPropertyKey(SearchResultRowDisplayMap.FALLBACKED_LABEL);
+			col.setPropertyUri(SearchResultRow.FALLBACKED_LABEL);
+			col.setPropertyKey(SearchResultRow.FALLBACKED_LABEL);
 			col.setTitle("Label");
 			col.setSortable(false);
 			list.add(col);
@@ -237,8 +236,8 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean {
 			// columns for news releases
 			list = new ArrayList<SearchResultColumn>();
 			col = new SearchResultColumn();
-			col.setPropertyUri(SearchResultRowDisplayMap.FALLBACKED_LABEL);
-			col.setPropertyKey(SearchResultRowDisplayMap.FALLBACKED_LABEL);
+			col.setPropertyUri(SearchResultRow.FALLBACKED_LABEL);
+			col.setPropertyKey(SearchResultRow.FALLBACKED_LABEL);
 			col.setTitle("Label");
 			col.setSortable(false);
 			list.add(col);

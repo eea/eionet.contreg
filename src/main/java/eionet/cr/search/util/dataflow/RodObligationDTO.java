@@ -1,4 +1,4 @@
-package eionet.cr.web.util;
+package eionet.cr.search.util.dataflow;
 
 /**
  * 

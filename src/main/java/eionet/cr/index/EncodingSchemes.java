@@ -1,6 +1,7 @@
 package eionet.cr.index;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -28,7 +29,7 @@ import eionet.cr.util.Util;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class EncodingSchemes extends Hashtable<String,String[]>{
+public class EncodingSchemes extends HashMap<String,String[]>{
 	
 	/** */
 	private static Log logger = LogFactory.getLog(EncodingSchemes.class);

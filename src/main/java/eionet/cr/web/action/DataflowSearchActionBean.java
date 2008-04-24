@@ -13,8 +13,8 @@ import eionet.cr.common.CRRuntimeException;
 import eionet.cr.common.Identifiers;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.Searcher;
-import eionet.cr.web.util.DisplayUtil;
-import eionet.cr.web.util.RodInstrumentDTO;
+import eionet.cr.search.util.dataflow.RodInstrumentDTO;
+import eionet.cr.web.util.search.SearchResultRow;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
@@ -59,9 +59,8 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean{
 	 */
 	public Resolution search() throws SearchException{
 		
-		resultList = DisplayUtil.listForDisplay(Searcher.dataflowSearch(dataflow, locality, year));
+		resultList = SearchResultRow.convert(Searcher.dataflowSearch(dataflow, locality, year));
 		return new ForwardResolution("/pages/dataflowSearchResults.jsp");
-		//return new ForwardResolution("/pages/testSearchResults.jsp");
 	}
 
 	/**

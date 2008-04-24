@@ -44,7 +44,7 @@ import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.TermQuery;
 
 import eionet.cr.common.Identifiers;
-import eionet.cr.common.Resource;
+import eionet.cr.common.ResourceMap;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.index.EncodingSchemes;
 import eionet.cr.index.Indexer;
@@ -54,10 +54,10 @@ import eionet.cr.index.walk.EncodingSchemesLoader;
 import eionet.cr.index.walk.SubPropertiesLoader;
 import eionet.cr.search.util.SearchUtil;
 import eionet.cr.search.util.SimpleSearchExpression;
+import eionet.cr.search.util.dataflow.RodInstrumentDTO;
+import eionet.cr.search.util.dataflow.RodObligationDTO;
 import eionet.cr.util.FirstSeenTimestamp;
 import eionet.cr.util.Util;
-import eionet.cr.web.util.RodInstrumentDTO;
-import eionet.cr.web.util.RodObligationDTO;
 
 /**
  * 
@@ -373,7 +373,7 @@ public class Searcher {
 				List<String> subProperties = SubProperties.getSubPropertiesOf(fieldName);
 				if (subProperties==null)
 					subProperties = new ArrayList<String>();
-				subProperties.add(0, fieldName);
+				subProperties.add(0,fieldName);
 				
 				String[] fields = subProperties.toArray(new String[0]);
 				FieldSelector fieldSelector = new MapFieldSelector(fields);
@@ -421,7 +421,7 @@ public class Searcher {
 	 * @return
 	 * @throws SearchException 
 	 */
-	public static Resource getResourceByUri(String uri) throws SearchException{
+	public static ResourceMap getResourceByUri(String uri) throws SearchException{
 		
 		if (uri==null || uri.trim().length()==0)
 			return null;
@@ -433,7 +433,7 @@ public class Searcher {
 			if (hits==null || hits.length()==0)
 				return null;
 			else
-				return new Resource(hits.doc(0));
+				return new ResourceMap(hits.doc(0));
 		}
 		catch (Exception e){
 			throw new SearchException(e.toString(), e);
@@ -501,16 +501,27 @@ public class Searcher {
 				String key = i.next();
 				String value = criteria.get(key);
 				if (!Util.isNullOrEmpty(key) && !Util.isNullOrEmpty(value)){
-					
 					key = key.trim();
 					value = value.trim();
 					
-					StringBuffer buf = new StringBuffer(Util.escapeForLuceneQuery(key));
-					buf.append(":");
-					if (value.startsWith("\"") && value.endsWith("\"") && value.length()>2)
-						buf.append("\"").append(Util.escapeForLuceneQuery(value.substring(1, value.length()-1))).append("\"");
-					else
-						buf.append(Util.escapeForLuceneQuery(value));
+					List<String> subProperties = SubProperties.getSubPropertiesOf(key);
+					if (subProperties==null)
+						subProperties = new ArrayList<String>();
+					subProperties.add(0,key);
+					
+					StringBuffer buf = new StringBuffer();
+					for (int j=0; j<subProperties.size(); j++){
+						
+						if (j>0)
+							buf.append(" OR ");
+						
+						buf.append(Util.escapeForLuceneQuery(subProperties.get(j)));
+						buf.append(":");
+						if (value.startsWith("\"") && value.endsWith("\"") && value.length()>2)
+							buf.append("\"").append(Util.escapeForLuceneQuery(value.substring(1, value.length()-1))).append("\"");
+						else
+							buf.append(Util.escapeForLuceneQuery(value));
+					}
 					
 					queries.add(queryParser.parse(buf.toString()));
 				}

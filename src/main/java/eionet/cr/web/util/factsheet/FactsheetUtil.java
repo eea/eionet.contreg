@@ -1,4 +1,4 @@
-package eionet.cr.web.util;
+package eionet.cr.web.util.factsheet;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -7,7 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import eionet.cr.common.Identifiers;
-import eionet.cr.common.Resource;
+import eionet.cr.common.ResourceMap;
 import eionet.cr.index.EncodingSchemes;
 import eionet.cr.util.Util;
 
@@ -25,7 +25,7 @@ public class FactsheetUtil {
 	 * 
 	 * @return
 	 */
-	public static List<ResourcePropertyDTO> getPropertiesForFactsheet(Resource resource){
+	public static List<ResourcePropertyDTO> getPropertiesForFactsheet(ResourceMap resource){
 	
 		if (resource==null)
 			return null;
@@ -98,11 +98,10 @@ public class FactsheetUtil {
 		if (propertyValues==null || propertyValues.size()==0)
 			return propertyValues;
 		
-		HashSet<String> hashSet = new HashSet(propertyValues);
-		String[] distinct = hashSet.toArray(new String[hashSet.size()]);
-		for (int i=0; i<distinct.length; i++){
-			if (Util.isURL(distinct[i])){
-				String label = EncodingSchemes.getLabel(distinct[i]);
+		HashSet<String> hashSet = new HashSet<String>(propertyValues);
+		for (int i=0; i<propertyValues.size(); i++){
+			if (Util.isURL(propertyValues.get(i))){
+				String label = EncodingSchemes.getLabel(propertyValues.get(i));
 				if (label!=null && hashSet.contains(label))
 					hashSet.remove(label);
 			}

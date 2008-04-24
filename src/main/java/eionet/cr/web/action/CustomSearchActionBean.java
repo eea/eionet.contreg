@@ -1,7 +1,9 @@
 package eionet.cr.web.action;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -10,7 +12,11 @@ import java.util.Map;
 import javax.servlet.http.HttpSession;
 
 import eionet.cr.common.Identifiers;
-import eionet.cr.web.util.CustomSearchFilter;
+import eionet.cr.search.SearchException;
+import eionet.cr.search.Searcher;
+import eionet.cr.util.Util;
+import eionet.cr.web.util.search.CustomSearchFilter;
+import eionet.cr.web.util.search.SearchResultRow;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
@@ -27,33 +33,52 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 	
 	/** */
 	private static final String SELECTED_FILTERS_SESSION_ATTR_NAME = CustomSearchActionBean.class + ".selectedFilters";
-	private static final String ASSOCIATED_JSP = "/pages/customSearch.jsp";
+	
+	/** */
 	private static final String SELECTED_VALUE_PREFIX = "value_";
+	private static final String SHOW_PICKLIST_VALUE_PREFIX = "showPicklist_";
+	private static final String REMOVE_FILTER_VALUE_PREFIX = "removeFilter_";
+	
+	/** */
+	private static final String ASSOCIATED_JSP = "/pages/customSearch.jsp";
 	
 	/** */
 	private static Map<String,CustomSearchFilter> availableFilters;
 	private String addedFilter;
-	private String removedFilter;
 	private String picklistFilter;
-	private List<String> picklist;
+	private String removedFilter;
+	private Collection<String> picklist;
 	
 	/**
 	 * 
 	 * @return
 	 */
 	@DefaultHandler
-	public Resolution init(){
-		getContext().getRequest().getSession().removeAttribute(SELECTED_FILTERS_SESSION_ATTR_NAME);
+	public Resolution unspecifiedEvent(){
+		
+		if (isShowPicklist())
+			populateSelectedFilters();
+		else if (isRemoveFilter()){
+			populateSelectedFilters();
+			getSelectedFilters().remove(getRemovedFilter());
+		}
+		else
+			getContext().getRequest().getSession().removeAttribute(SELECTED_FILTERS_SESSION_ATTR_NAME);
+		
 		return new ForwardResolution(ASSOCIATED_JSP);
 	}
 	
 	/**
 	 * 
 	 * @return
+	 * @throws SearchException 
 	 */
-	public Resolution search(){
-		populateSelectedValues();
-		showMessage("Not yet implemented!");
+	public Resolution search() throws SearchException{
+		
+		populateSelectedFilters();
+		
+		resultList = SearchResultRow.convert(Searcher.customSearch(buildSearchCriteria()));
+		
 		return new ForwardResolution(ASSOCIATED_JSP);
 	}
 	
@@ -63,16 +88,10 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 	 */
 	public Resolution addFilter(){
 		
+		populateSelectedFilters();
+		
 		if (addedFilter!=null)
 			getSelectedFilters().put(addedFilter, "");
-		
-//		if (addedFilter!=null && addedFilter.length()>0){
-//			if (selected==null)
-//				selected = new ArrayList<String>();
-//			selected.add(addedFilter);
-//		}
-		
-		populateSelectedValues();
 		
 		return new ForwardResolution(ASSOCIATED_JSP);
 	}
@@ -80,22 +99,38 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 	/**
 	 * 
 	 * @return
+	 * @throws SearchException 
 	 */
-	public Resolution removeFilter(){
+	public Collection<String> getPicklist() throws SearchException{
+
+		if (!isShowPicklist())
+			return null;
+		else if (!getAvailableFilters().containsKey(getPicklistFilter()))
+			return null;
 		
-		if (removedFilter!=null)
-			getSelectedFilters().remove(removedFilter);
+		if (picklist==null){
+			picklist = Searcher.getLiteralFieldValues(getAvailableFilters().get(getPicklistFilter()).getUri());
+			if (picklist==null)
+				picklist = new ArrayList<String>();
+		}
 		
-//		if (addedFilter!=null && addedFilter.length()>0){
-//			if (selected!=null)
-//				selected.remove(addedFilter);
-//		}
-		
-		populateSelectedValues();
-		
-		return new ForwardResolution(ASSOCIATED_JSP);
+		return picklist;
 	}
 	
+	/**
+	 * @return the selectedFilter
+	 */
+	public String getAddedFilter() {
+		return addedFilter;
+	}
+
+	/**
+	 * @param selectedFilter the selectedFilter to set
+	 */
+	public void setAddedFilter(String selectedFilter) {
+		this.addedFilter = selectedFilter;
+	}
+
 	/**
 	 * 
 	 * @return
@@ -112,7 +147,26 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 		
 		return selectedFilters;
 	}
-	
+
+	/**
+	 * 
+	 */
+	private void populateSelectedFilters(){
+		
+		Map<String,String> selected = getSelectedFilters();
+		if (!selected.isEmpty()){
+			Enumeration paramNames = this.getContext().getRequest().getParameterNames();
+			while (paramNames!=null && paramNames.hasMoreElements()){
+				String paramName = (String)paramNames.nextElement();
+				if (paramName.startsWith(SELECTED_VALUE_PREFIX)){
+					String key = paramName.substring(SELECTED_VALUE_PREFIX.length());
+					if (key.length()>0 && selected.containsKey(key))
+						selected.put(key, getContext().getRequest().getParameter(paramName));
+				}
+			}
+		}		
+	}
+
 	/**
 	 * @return the availableFilters
 	 */
@@ -157,94 +211,87 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 		
 		return availableFilters;
 	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public Resolution showPicklist(){
 
-		populateSelectedValues();
-		
-		picklist = new ArrayList<String>();
-		picklist.add("Sir Matt Busby, Sir Matt Busby, Sir Matt Busby");
-		picklist.add("Wilf McGuinness, Wilf McGuinness, Wilf McGuinness");
-		picklist.add("Sir Matt Busby, Sir Matt Busby, Sir Matt Busby");
-		picklist.add("Frank O'Farrell, Frank O'Farrell, Frank O'Farrell");
-		picklist.add("Tommy Docherty, Tommy Docherty, Tommy Docherty");
-		picklist.add("Dave Sexton. Dave Sexton, Dave Sexton");
-		picklist.add("Ron Atkinson, Ron Atkinson, Ron Atkinson");
-		picklist.add("Sir Alex Ferguson, Sir Alex Ferguson, Sir Alex Ferguson");
-		
-		return new ForwardResolution(ASSOCIATED_JSP);
-	}
-	
 	/**
-	 * 
-	 * @return
+	 * @return the picklistFilter
 	 */
-	public List<String> getPicklist(){
-		return picklist;
-	}
-	
-	/**
-	 * 
-	 */
-	private void populateSelectedValues(){
+	public String getPicklistFilter() {
 		
-		Map<String,String> selected = getSelectedFilters();
-		if (!selected.isEmpty()){
+		if (picklistFilter==null){
+			picklistFilter = "";
 			Enumeration paramNames = this.getContext().getRequest().getParameterNames();
 			while (paramNames!=null && paramNames.hasMoreElements()){
 				String paramName = (String)paramNames.nextElement();
-				if (paramName.startsWith(SELECTED_VALUE_PREFIX)){
-					String key = paramName.substring(SELECTED_VALUE_PREFIX.length());
-					if (key.length()>0 && selected.containsKey(key))
-						selected.put(key, getContext().getRequest().getParameter(paramName));
+				if (paramName.startsWith(SHOW_PICKLIST_VALUE_PREFIX)){
+					int i = paramName.indexOf('.')<0 ? paramName.length() : paramName.indexOf('.');
+					String key = paramName.substring(SHOW_PICKLIST_VALUE_PREFIX.length(), i);
+					if (key.length()>0 && getSelectedFilters().containsKey(key)){
+						picklistFilter = key;
+						break;
+					}
 				}
 			}
-		}		
-	}
 
-	/**
-	 * @return the selectedFilter
-	 */
-	public String getAddedFilter() {
-		return addedFilter;
-	}
-
-	/**
-	 * @param selectedFilter the selectedFilter to set
-	 */
-	public void setAddedFilter(String selectedFilter) {
-		this.addedFilter = selectedFilter;
+		}
+		return picklistFilter;
 	}
 
 	/**
 	 * @return the removedFilter
 	 */
 	public String getRemovedFilter() {
+		
+		if (removedFilter==null){
+			removedFilter = "";
+			Enumeration paramNames = this.getContext().getRequest().getParameterNames();
+			while (paramNames!=null && paramNames.hasMoreElements()){
+				String paramName = (String)paramNames.nextElement();
+				if (paramName.startsWith(REMOVE_FILTER_VALUE_PREFIX)){
+					int i = paramName.indexOf('.')<0 ? paramName.length() : paramName.indexOf('.');
+					String key = paramName.substring(REMOVE_FILTER_VALUE_PREFIX.length(), i);
+					if (key.length()>0 && getSelectedFilters().containsKey(key)){
+						removedFilter = key;
+						break;
+					}
+				}
+			}
+
+		}
 		return removedFilter;
 	}
 
 	/**
-	 * @param removedFilter the removedFilter to set
+	 * 
+	 * @return
 	 */
-	public void setRemovedFilter(String removedFilter) {
-		this.removedFilter = removedFilter;
+	public boolean isShowPicklist(){
+		return !Util.isNullOrEmpty(getPicklistFilter());
 	}
 
 	/**
-	 * @return the picklistFilter
+	 * 
+	 * @return
 	 */
-	public String getPicklistFilter() {
-		return picklistFilter;
+	public boolean isRemoveFilter(){
+		return !Util.isNullOrEmpty(getRemovedFilter());
 	}
-
+	
 	/**
-	 * @param picklistFilter the picklistFilter to set
+	 * 
+	 * @return
 	 */
-	public void setPicklistFilter(String picklistFilter) {
-		this.picklistFilter = picklistFilter;
+	private Map<String,String> buildSearchCriteria(){
+		
+		Map<String,String> result = new HashMap<String,String>();
+		
+		Map<String,String> selected = getSelectedFilters();
+		for (Iterator<String> keys=selected.keySet().iterator(); keys.hasNext();){
+			String key = keys.next();
+			CustomSearchFilter filter = getAvailableFilters().get(key);
+			if (filter!=null)
+				result.put(filter.getUri(), selected.get(key));
+		}
+		
+		return result;
 	}
 }
