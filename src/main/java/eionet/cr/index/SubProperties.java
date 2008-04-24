@@ -78,8 +78,10 @@ public class SubProperties extends HashMap<String,HashSet<String>>{
 	 */
 	public static List<String> getSubPropertiesOf(String id){
 		
-		if (id!=null)
-			return new ArrayList(getInstance().get(id));
+		if (id!=null){
+			HashSet hashSet = getInstance().get(id);
+			return hashSet==null ? null : new ArrayList(hashSet);
+		}
 		else
 			return null;
 	}

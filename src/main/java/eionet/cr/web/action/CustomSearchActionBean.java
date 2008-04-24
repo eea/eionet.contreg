@@ -287,9 +287,12 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 		Map<String,String> selected = getSelectedFilters();
 		for (Iterator<String> keys=selected.keySet().iterator(); keys.hasNext();){
 			String key = keys.next();
-			CustomSearchFilter filter = getAvailableFilters().get(key);
-			if (filter!=null)
-				result.put(filter.getUri(), selected.get(key));
+			String value = selected.get(key);
+			if (value!=null && value.trim().length()>0){
+				CustomSearchFilter filter = getAvailableFilters().get(key);
+				if (filter!=null)
+					result.put(filter.getUri(), value.trim());
+			}
 		}
 		
 		return result;

@@ -8,8 +8,9 @@
 	
         <h1>Custom search</h1>
         <p>
-        	aaaaaaaaaaaasdhgf sdhgf sajkgfashkdf askjgf askf skdhf asjdhgf asjkdgfsajdhgf<br/>
-        	sdhgf sdhgf sajkgfashkdf askjgf askf skdhf asjdhgf asjkdgfsajdhgf
+        	Add a search filter and give it a value. For some filters the system provides a list of existing values.
+        	Text inputs of such filters have a special icon to the right of them which opens the list. You can remove
+        	added filters by using the removal icons that are displayed to the left of them.
         </p>
 
 		<c:choose>        
