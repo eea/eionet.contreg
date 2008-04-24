@@ -50,13 +50,13 @@
 						                        			<option value="" selected="selected">- select a value -</option>
 						                        			<c:if test="${actionBean.picklist!=null}">
 							                        			<c:forEach var="picklistItem" items="${actionBean.picklist}">
-							                        				<option value='"${picklistItem}"' title="${picklistItem}" style="max-width:400px">${picklistItem}</option>
+							                        				<option value="${fn:escapeXml(crfn:addQuotesIfWhitespaceInside(picklistItem))}" title="${fn:escapeXml(picklistItem)}" style="max-width:400px">${picklistItem}</option>
 							                        			</c:forEach>
 							                        		</c:if>
 														</select>
 					    							</c:if>
 					    							<c:if test="${!actionBean.showPicklist || actionBean.picklistFilter!=availableFilter.key}">
-					    								<input type="image" name="showPicklist_${availableFilter.key}" src="${pageContext.request.contextPath}/images/list.gif" title="Get existing values" alt="Get existing values" style="position:absolute"/>
+					    								<input type="image" name="showPicklist_${availableFilter.key}" src="${pageContext.request.contextPath}/images/list.gif" title="Get existing values" alt="Get existing values" style="position:absolute;padding-top:1px"/>
 					    							</c:if>
 					    							<c:if test="${actionBean.showPicklist && actionBean.picklistFilter==availableFilter.key && (actionBean.picklist==null || fn:length(actionBean.picklist)==0)}">
 					    								No picklist found!

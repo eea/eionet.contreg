@@ -20,5 +20,18 @@
 			${cutAtFirstLongToken(someString, 50)}
 		</example>
 	</function>
+
+	<function>
+		<description>
+			Checks if the given string (after being trimmed first) contains any whitespace. If yes, returns
+		 	the given string surrounded by quotes. Otherwise returns the given string.
+	 	</description>
+		<name>addQuotesIfWhitespaceInside</name>
+		<function-class>eionet.cr.web.util.JstlFunctions</function-class>
+		<function-signature>java.lang.String addQuotesIfWhitespaceInside(java.lang.String)</function-signature>
+		<example>
+			${addQuotesIfWhitespaceInside(someString)}
+		</example>
+	</function>
 	
 </taglib>

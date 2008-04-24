@@ -2,6 +2,8 @@ package eionet.cr.web.util;
 
 import java.util.StringTokenizer;
 
+import eionet.cr.util.Util;
+
 /**
  * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
@@ -41,5 +43,24 @@ public class JstlFunctions {
 		}
 		else
 			return str;
+	}
+	
+	/**
+	 * Checks if the given string (after being trimmed first) contains any whitespace. If yes, returns
+	 * the given string surrounded by quotes. Otherwise returns the given string.
+	 * If the given string is <code>null</code>, returns null.
+	 * 
+	 * @param str
+	 * @return
+	 */
+	public static java.lang.String addQuotesIfWhitespaceInside(java.lang.String str){
+		
+		if (str==null || str.trim().length()==0)
+			return str;
+		
+		if (!Util.hasWhiteSpace(str.trim()))
+			return str;
+		else
+			return "\"" + str + "\"";
 	}
 }
