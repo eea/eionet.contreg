@@ -9,10 +9,8 @@ import java.io.Writer;
 
 import java.lang.reflect.InvocationTargetException;
 
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 
@@ -89,36 +87,6 @@ public class Util {
         return buf.toString();
     }
 	
-	/**
-	 * 
-	 * @param s
-	 * @return
-	 */
-	public static boolean isURL(String s){
-		try{
-			URL url = new URL(s);
-			return true;
-		}
-		catch (MalformedURLException e){
-			return false;
-		}
-	}
-
-	/**
-	 * 
-	 * @param s
-	 * @return
-	 */
-	public static boolean isURI(String s){
-		try{
-			URI uri = new URI(s);
-			return true;
-		}
-		catch (URISyntaxException e){
-			return false;
-		}
-	}
-
 	/**
 	 * 
 	 * @param t
@@ -344,54 +312,6 @@ public class Util {
     
     /**
      * 
-     * @param scheme
-     */
-    public static boolean isCommonURIScheme(String scheme){
-    	
-    	if (scheme==null || scheme.length()!=scheme.trim().length() || scheme.length()==0)
-    		return false;
-    	else if (scheme.equals("dns"))
-    		return true;
-    	else if (scheme.equals("file"))
-    		return true;
-    	else if (scheme.equals("ftp"))
-    		return true;
-    	else if (scheme.equals("sftp"))
-    		return true;
-    	else if (scheme.equals("tftp"))
-    		return true;
-    	else if (scheme.equals("go"))
-    		return true;
-    	else if (scheme.equals("gopher"))
-    		return true;
-    	else if (scheme.equals("http"))
-    		return true;
-    	else if (scheme.equals("https"))
-    		return true;
-    	else if (scheme.equals("ldap"))
-    		return true;
-    	else if (scheme.equals("mailto"))
-    		return true;
-    	else if (scheme.equals("news"))
-    		return true;
-    	else if (scheme.equals("shttp"))
-    		return true;
-    	else if (scheme.equals("skype"))
-    		return true;
-    	else if (scheme.equals("snmp"))
-    		return true;
-    	else if (scheme.equals("telnet"))
-    		return true;
-    	else if (scheme.equals("urn"))
-    		return true;
-    	else if (scheme.equals("news"))
-    		return true;
-    	else
-    		return false;
-    }
-    
-    /**
-     * 
      * @param array
      * @return
      */
@@ -420,7 +340,7 @@ public class Util {
     	
     	ArrayList<String> list = new ArrayList<String>();
     	for (int i=0; i<array.length; i++){
-    		if (!Util.isURL(array[i]))
+    		if (!URLUtil.isURL(array[i]))
     			list.add(array[i]);
     	}
     	
@@ -494,5 +414,12 @@ public class Util {
      * @param args
      */
     public static void main(String[] args){
+    	try{
+			URI uri = new URI("jaanus:");
+			System.out.println(uri.isAbsolute());
+		}
+		catch (URISyntaxException e){
+			e.printStackTrace();
+		}
     }
 }

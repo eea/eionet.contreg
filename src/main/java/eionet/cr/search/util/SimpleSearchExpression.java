@@ -8,6 +8,8 @@ import org.apache.lucene.analysis.KeywordAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 
 import eionet.cr.common.Identifiers;
+import eionet.cr.util.URIUtil;
+import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
 
 /**
@@ -36,7 +38,7 @@ public class SimpleSearchExpression{
 	 */
 	public String toLuceneQueryString(){
 		
-		if (isUrlSearch())
+		if (isUriSearch())
 			return processQueryForURLSearch(expression);
 		else	
 			return expression;
@@ -54,7 +56,7 @@ public class SimpleSearchExpression{
 	 * @return the analyzerName
 	 */
 	public Analyzer getAnalyzer() {
-		if (isUrlSearch())
+		if (isUriSearch())
 			return new KeywordAnalyzer();
 		else
 			return new StandardAnalyzer();
@@ -64,22 +66,9 @@ public class SimpleSearchExpression{
 	 * 
 	 * @return
 	 */
-	public boolean isUrlSearch(){
-		
-		if (isUrlSearch==null){
-			
-			isUrlSearch = new Boolean(false);
-			if (expression.trim().length()>0){
-				try {
-					URI uri = new URI(expression.trim());
-					isUrlSearch = new Boolean(Util.isCommonURIScheme(uri.getScheme()));
-				}
-				catch (URISyntaxException e){
-				}
-			}
-		}
-		
-		return isUrlSearch.booleanValue();
+	public boolean isUriSearch(){
+
+		return URIUtil.isURI(expression.trim());
 	}
 	
 	/**

@@ -77,7 +77,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 		
 		populateSelectedFilters();
 		
-		resultList = SearchResultRow.convert(Searcher.customSearch(buildSearchCriteria()));
+		resultList = SearchResultRow.convert(Searcher.customSearch(buildSearchCriteria(), true));
 		
 		return new ForwardResolution(ASSOCIATED_JSP);
 	}

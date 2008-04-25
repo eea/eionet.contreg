@@ -20,6 +20,7 @@ import eionet.cr.config.GeneralConfig;
 import eionet.cr.harvest.util.RDFResource;
 import eionet.cr.harvest.util.RDFResourceProperty;
 import eionet.cr.util.FirstSeenTimestamp;
+import eionet.cr.util.URIUtil;
 
 /**
  * 
@@ -69,8 +70,8 @@ public class Indexer {
 			logger.debug("Indexing resources, source URL = " + resource.getSourceId());
 		
 		Document document = new Document();		
-		document.add(new Field(Identifiers.DOC_ID, resource.getId(), Field.Store.YES, Field.Index.UN_TOKENIZED));
-		document.add(new Field(Identifiers.SOURCE_ID, resource.getSourceId(), Field.Store.YES, Field.Index.UN_TOKENIZED));
+		document.add(constructField(Identifiers.DOC_ID, resource.getId()));
+		document.add(constructField(Identifiers.SOURCE_ID, resource.getSourceId()));
 
 		StringBuffer contentBuf = new StringBuffer(); // for collecting all literal values
 		
@@ -82,18 +83,16 @@ public class Indexer {
 			if (fieldValue.length()>0){
 				
 				String fieldName = property.getId();
-				document.add(new Field(fieldName, fieldValue,
-						Field.Store.YES, property.isLiteral() ? Field.Index.TOKENIZED : Field.Index.UN_TOKENIZED));
+				document.add(constructField(fieldName, fieldValue));
 				
 				if (property.isLiteral())
 					contentBuf.append(fieldValue).append(" ");
 				
 				// if this is a non-literal attribute, find decoded labels for it, and add them to the document
 				if (!property.isLiteral() && property.isValueURL()){
-					
 					String[] decodedLabels = EncodingSchemes.getLabels(property.getValue());
 					for (int j=0; decodedLabels!=null && j<decodedLabels.length; j++)
-						document.add(new Field(fieldName, decodedLabels[j], Field.Store.YES, Field.Index.TOKENIZED));
+						document.add(constructField(fieldName, decodedLabels[j]));
 				}
 			}
 		}
@@ -101,16 +100,16 @@ public class Indexer {
 		// create the field that contains all literal content, add it to the document
 		String trimmedContentBuf = contentBuf.toString().trim();
 		if (trimmedContentBuf.length()>0)
-			document.add(new Field(Indexer.ALL_CONTENT_FIELD, trimmedContentBuf, Field.Store.NO, Field.Index.TOKENIZED));
+			document.add(constructField(Indexer.ALL_CONTENT_FIELD, trimmedContentBuf));
 		
 		// if the resource is an encoding scheme, set the corresponding field
 		boolean isEncScheme = resource.isEncodingScheme();
 		if (isEncScheme)
-			document.add(new Field(Identifiers.IS_ENCODING_SCHEME, Boolean.TRUE.toString(), Field.Store.YES, Field.Index.TOKENIZED));
+			document.add(constructField(Identifiers.IS_ENCODING_SCHEME, Boolean.TRUE.toString()));
 		
 		// set the time the document was first seen
-		document.add(new Field(Identifiers.FIRST_SEEN_TIMESTAMP,
-				resource.getFirstSeenTimestamp()==null ? getFirstSeenTimestamp() : resource.getFirstSeenTimestamp(), Field.Store.YES, Field.Index.UN_TOKENIZED));
+		document.add(constructField(Identifiers.FIRST_SEEN_TIMESTAMP,
+				resource.getFirstSeenTimestamp()==null ? getFirstSeenTimestamp() : resource.getFirstSeenTimestamp()));
 		
 		// finally, update the document in index
 		try {
@@ -196,5 +195,53 @@ public class Indexer {
 	 */
 	public static Analyzer getAnalyzer(){
 		return new StandardAnalyzer();
+	}
+	
+	/**
+	 * 
+	 * @param fieldName
+	 * @return
+	 */
+	public static boolean isAnalyzedField(String fieldName){
+		
+		if (fieldName.equals(Identifiers.DOC_ID))
+			return false;
+		else if (fieldName.equals(Identifiers.SOURCE_ID))
+			return false;
+		else if (fieldName.equals(Identifiers.FIRST_SEEN_TIMESTAMP))
+			return false;
+		else
+			return true;
+	}
+
+	/**
+	 * 
+	 * @param value
+	 * @return
+	 */
+	public static boolean isAnalyzedValue(String value){
+		return URIUtil.isURI(value)==false;
+	}
+	
+	/**
+	 * 
+	 * @param fieldName
+	 * @return
+	 */
+	public static boolean isStoredField(String fieldName){
+		return !fieldName.equals(ALL_CONTENT_FIELD);
+	}
+
+	/**
+	 * 
+	 * @param fieldName
+	 * @return
+	 */
+	public static Field constructField(String fieldName, String fieldValue){
+		
+		return new Field(fieldName,
+			fieldValue,
+			isStoredField(fieldName) ? Field.Store.YES : Field.Store.NO,
+			!isAnalyzedField(fieldName) || !isAnalyzedValue(fieldValue) ? Field.Index.UN_TOKENIZED : Field.Index.TOKENIZED);
 	}
 }

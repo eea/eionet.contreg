@@ -78,17 +78,17 @@ public class CRXmlRpcSampleClient {
 		
 		// set up the XmlRpcClient
 		XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
-	    config.setServerURL(new URL("http://80.235.29.171:8080/cr/xmlrpc"));
-		//config.setServerURL(new URL("http://localhost:8080/cr/xmlrpc"));
+	    //config.setServerURL(new URL("http://80.235.29.171:8080/cr/xmlrpc"));
+		config.setServerURL(new URL("http://localhost:8080/cr/xmlrpc"));
 	    config.setEnabledForExtensions(true);
 	    XmlRpcClient client = new XmlRpcClient();
 	    client.setConfig(config);
 	    
 	    // execute the call
 	    Map criteria = new HashMap();
-//	    criteria.put("http://rod.eionet.eu.int/schema.rdf#locality", "http://rod.eionet.eu.int/spatial/28"); // Norway
-//	    criteria.put("http://rod.eionet.eu.int/schema.rdf#obligation", "http://rod.eionet.eu.int/obligations/452");
-//	    criteria.put("http://purl.org/dc/elements/1.1/coverage", "2006");
+	    criteria.put("http://rod.eionet.eu.int/schema.rdf#locality", "http://rod.eionet.eu.int/spatial/28"); // Norway
+	    criteria.put("http://rod.eionet.eu.int/schema.rdf#obligation", "http://rod.eionet.eu.int/obligations/452");
+	    criteria.put("http://purl.org/dc/elements/1.1/coverage", "2006");
 	    
 	    Object[] params = new Object[]{criteria};
 	    Object[] result = (Object[])client.execute("Searcher.dataflowSearch", params);

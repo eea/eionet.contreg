@@ -107,7 +107,7 @@ public class CrCasFilterConfig implements FilterConfig {
 	 * Enum of CR web context related keys.
 	 * 
 	 */
-	enum CRInitParameterKey {
+	public enum CRInitParameterKey {
 		
 		/** Specifies CAS server login URL. */
 		CAS_LOGIN_URL(CASFilter.LOGIN_INIT_PARAM),

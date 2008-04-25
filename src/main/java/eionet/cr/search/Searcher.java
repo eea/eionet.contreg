@@ -57,6 +57,7 @@ import eionet.cr.search.util.SimpleSearchExpression;
 import eionet.cr.search.util.dataflow.RodInstrumentDTO;
 import eionet.cr.search.util.dataflow.RodObligationDTO;
 import eionet.cr.util.FirstSeenTimestamp;
+import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
 
 /**
@@ -386,7 +387,7 @@ public class Searcher {
 							String[] values = document.getValues(fields[fldIndex]);
 							if (values!=null && values.length>0){
 								for (int j=0; j<values.length; j++){
-									if (!Util.isURL(values[j]))
+									if (!URLUtil.isURL(values[j]))
 										resultSet.add(values[j]);
 								}
 							}
@@ -486,7 +487,7 @@ public class Searcher {
 	 * @return
 	 * @throws SearchException 
 	 */
-	public static List<Map<String,String[]>> customSearch(Map<String,String> criteria) throws SearchException{
+	public static List<Map<String,String[]>> customSearch(Map<String,String> criteria, boolean useSubProperties) throws SearchException{
 		
 		List<Map<String,String[]>> result = new ArrayList<Map<String,String[]>>();
 		
@@ -497,33 +498,62 @@ public class Searcher {
 		List<Query> queries = new ArrayList<Query>();
 		QueryParser queryParser = new QueryParser(DEFAULT_FIELD, Indexer.getAnalyzer());
 		try{
-			for (Iterator<String> i = criteria.keySet().iterator(); i.hasNext();){
-				String key = i.next();
-				String value = criteria.get(key);
-				if (!Util.isNullOrEmpty(key) && !Util.isNullOrEmpty(value)){
-					key = key.trim();
-					value = value.trim();
+			for (Iterator<String> propertyIter = criteria.keySet().iterator(); propertyIter.hasNext();){
+				String property = propertyIter.next();
+				String propertyValue = criteria.get(property);
+				if (!Util.isNullOrEmpty(property) && !Util.isNullOrEmpty(propertyValue)){
 					
-					List<String> subProperties = SubProperties.getSubPropertiesOf(key);
+					property = property.trim();
+					propertyValue = propertyValue.trim();
+					String propertyValueUnquoted =
+						propertyValue.startsWith("\"") && propertyValue.endsWith("\"") && propertyValue.length()>2 ?
+								propertyValue.substring(1, propertyValue.length()-1) : propertyValue;
+					
+					List<String> subProperties = useSubProperties ? SubProperties.getSubPropertiesOf(property) : null;
 					if (subProperties==null)
 						subProperties = new ArrayList<String>();
-					subProperties.add(0,key);
+					subProperties.add(0,property);
 					
-					StringBuffer buf = new StringBuffer();
+					BooleanQuery booleanQuery = new BooleanQuery();
 					for (int j=0; j<subProperties.size(); j++){
+
+						Query query = null;
+						String subProperty = subProperties.get(j);
+						if (!Indexer.isAnalyzedField(subProperty) || !Indexer.isAnalyzedValue(propertyValueUnquoted)){
+							query = new TermQuery(new Term(subProperty, propertyValueUnquoted));
+						}
+						else{
+							StringBuffer buf = new StringBuffer(Util.escapeForLuceneQuery(subProperty));
+							buf.append(":");
+							if (propertyValueUnquoted.equals(propertyValue))
+								buf.append(Util.escapeForLuceneQuery(propertyValue));
+							else
+								buf.append("\"").append(Util.escapeForLuceneQuery(propertyValueUnquoted)).append("\"");
+							
+							query = queryParser.parse(buf.toString());
+						}
 						
-						if (j>0)
-							buf.append(" OR ");
-						
-						buf.append(Util.escapeForLuceneQuery(subProperties.get(j)));
-						buf.append(":");
-						if (value.startsWith("\"") && value.endsWith("\"") && value.length()>2)
-							buf.append("\"").append(Util.escapeForLuceneQuery(value.substring(1, value.length()-1))).append("\"");
-						else
-							buf.append(Util.escapeForLuceneQuery(value));
+						booleanQuery.add(query, BooleanClause.Occur.SHOULD);
 					}
 					
-					queries.add(queryParser.parse(buf.toString()));
+					queries.add(booleanQuery);
+					
+					
+//					StringBuffer buf = new StringBuffer();
+//					for (int j=0; j<subProperties.size(); j++){
+//						
+//						if (j>0)
+//							buf.append(" OR ");
+//						
+//						buf.append(Util.escapeForLuceneQuery(subProperties.get(j)));
+//						buf.append(":");
+//						if (propertyValue.startsWith("\"") && propertyValue.endsWith("\"") && propertyValue.length()>2)
+//							buf.append("\"").append(Util.escapeForLuceneQuery(propertyValue.substring(1, propertyValue.length()-1))).append("\"");
+//						else
+//							buf.append(Util.escapeForLuceneQuery(propertyValue));
+//					}
+//					
+//					queries.add(queryParser.parse(buf.toString()));
 				}
 			}
 			
@@ -553,35 +583,75 @@ public class Searcher {
 		return result;
 	}
 	
+	public static void testThis() throws SearchException{
+		
+		System.out.println("start");
+		
+		String indexLocation = GeneralConfig.getProperty(GeneralConfig.LUCENE_INDEX_LOCATION);
+		IndexReader indexReader = null;
+		try{			
+			if (IndexReader.indexExists(indexLocation)){
+				indexReader = IndexReader.open(indexLocation);
+				
+				TermEnum terms = indexReader.terms(new Term("http://purl.org/dc/elements/1.1/title", ""));
+				do{
+					Term currentTerm = terms.term();
+					if (currentTerm!=null && currentTerm.field().equals("http://purl.org/dc/elements/1.1/title")){
+						String text = currentTerm.text();
+						//if (text.toLowerCase().indexOf("russian")>=0)
+							System.out.println(text);
+					}
+				}
+				while (terms.next()==true);
+			}
+			else{
+				logger.info("Index does not exist at " + indexLocation);
+			}
+			
+		}
+		catch (Exception e){
+			throw new SearchException(e.toString(), e);
+		}
+		finally{
+			try{
+				if (indexReader!=null) indexReader.close();
+			}
+			catch (Exception e){
+				logger.error("Failed to close index reader: " + e.toString(), e);
+			}
+		}
+	}
+	
 	/**
 	 * 
 	 * @param args
 	 */
 	public static void main(String[] args){
 		
-		try {			
+		try {
+			Searcher.testThis();
 			//List<Map<String,String[]>> results = Searcher.getRecentByRdfType("http://www.eionet.eu.int/gemet/2004/06/gemet-schema.rdf#Group", 20);
 			
-			HashMap<String,String> criteria = new HashMap<String,String>();
-			criteria.put(Identifiers.RDFS_LABEL, "submission");
-			criteria.put(Identifiers.ROD_INSTRUMENT_PROPERTY, "\"ospar convention\"");
-			
-			List<Map<String,String[]>> results = Searcher.customSearch(criteria);
-			
-			System.out.println();
-			System.out.println(results==null ? "results==null" : "results size = " + results.size());
-			System.out.println();
-			for (int j=0; j<results.size(); j++){
-				Map<String,String[]> map = results.get(j);
-				for (Iterator<String> i=map.keySet().iterator(); i.hasNext();){
-					String key = i.next();
-					String value = Arrays.deepToString(map.get(key));
-					System.out.println(key + " = " + value);
-				}
-				System.out.println();
-				System.out.println("====================================================");
-				System.out.println();
-			}
+//			HashMap<String,String> criteria = new HashMap<String,String>();
+//			criteria.put(Identifiers.RDFS_LABEL, "submission");
+//			criteria.put(Identifiers.ROD_INSTRUMENT_PROPERTY, "\"ospar convention\"");
+//			
+//			List<Map<String,String[]>> results = Searcher.customSearch(criteria);
+//			
+//			System.out.println();
+//			System.out.println(results==null ? "results==null" : "results size = " + results.size());
+//			System.out.println();
+//			for (int j=0; j<results.size(); j++){
+//				Map<String,String[]> map = results.get(j);
+//				for (Iterator<String> i=map.keySet().iterator(); i.hasNext();){
+//					String key = i.next();
+//					String value = Arrays.deepToString(map.get(key));
+//					System.out.println(key + " = " + value);
+//				}
+//				System.out.println();
+//				System.out.println("====================================================");
+//				System.out.println();
+//			}
 		}
 		catch (Throwable t) {
 			t.printStackTrace();

@@ -9,7 +9,7 @@ import java.util.List;
 import eionet.cr.common.Identifiers;
 import eionet.cr.common.ResourceMap;
 import eionet.cr.index.EncodingSchemes;
-import eionet.cr.util.Util;
+import eionet.cr.util.URLUtil;
 
 /**
  * 
@@ -53,7 +53,7 @@ public class FactsheetUtil {
 					
 					String value = values.get(i);
 					ResourcePropertyValueDTO valueDTO = new ResourcePropertyValueDTO();
-					if (Util.isURL(value)){
+					if (URLUtil.isURL(value)){
 						valueDTO.setUrl(value);
 						valueDTO.setLabel(EncodingSchemes.getLabel(value, true));
 					}
@@ -100,7 +100,7 @@ public class FactsheetUtil {
 		
 		HashSet<String> hashSet = new HashSet<String>(propertyValues);
 		for (int i=0; i<propertyValues.size(); i++){
-			if (Util.isURL(propertyValues.get(i))){
+			if (URLUtil.isURL(propertyValues.get(i))){
 				String label = EncodingSchemes.getLabel(propertyValues.get(i));
 				if (label!=null && hashSet.contains(label))
 					hashSet.remove(label);

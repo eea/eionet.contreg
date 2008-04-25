@@ -1,6 +1,6 @@
 package eionet.cr.harvest.util;
 
-import eionet.cr.util.Util;
+import eionet.cr.util.URLUtil;
 
 /**
  * 
@@ -35,7 +35,7 @@ public class RDFResourceProperty {
 		this.value = value;
 		this.isLiteral = isLiteral;
 		this.isAnonymous = isAnonymous;
-		this.isValueURL = Util.isURL(value);
+		this.isValueURL = URLUtil.isURL(value);
 	}
 
 	/**

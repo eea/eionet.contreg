@@ -25,7 +25,7 @@ public class CRUser {
 	/**
 	 * 
 	 */
-	public CRUser() {
+	public CRUser() {		
 	}
 	
 	/**

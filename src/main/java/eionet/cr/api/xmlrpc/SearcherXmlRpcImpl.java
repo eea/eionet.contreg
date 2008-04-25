@@ -16,6 +16,7 @@ import org.apache.commons.logging.LogFactory;
 import eionet.cr.common.CRException;
 import eionet.cr.common.Identifiers;
 import eionet.cr.index.EncodingSchemes;
+import eionet.cr.search.Searcher;
 import eionet.cr.util.Util;
 import eionet.qawcommons.DataflowResultDto;
 
@@ -74,11 +75,11 @@ public class SearcherXmlRpcImpl{
 			criteria.put(Identifiers.RDF_TYPE, Identifiers.ROD_DELIVERY_CLASS);
 		
 		List<DataflowResultDto> result = new ArrayList<DataflowResultDto>();
-		
 		try{
-			List list = simpleAndSearch(criteria);
-			if (list!=null && !list.isEmpty()){
+			List<Map<String,String[]>> list = Searcher.customSearch(criteria, false);
+			if (list!=null){
 				for (int i=0; i<list.size(); i++){
+					
 					Map<String,String[]> map = (Map<String,String[]>)list.get(i);
 					
 					DataflowResultDto dto = new DataflowResultDto();
