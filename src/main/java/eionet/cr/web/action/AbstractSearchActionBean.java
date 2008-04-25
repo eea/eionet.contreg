@@ -17,50 +17,12 @@ import eionet.cr.web.util.search.SearchResultRow;
 public abstract class AbstractSearchActionBean extends AbstractCRActionBean{
 
 	/** */
-	protected List<SearchResultColumn> columns = null;
-	
-	/** */
 	protected List<SearchResultRow> resultList;
 
 	/**
 	 * @return the columns
 	 */
-	public List<SearchResultColumn> getColumns() {
-		if (columns==null)
-			columns = getDefaultColumns();
-		return columns;
-	}
-	
-	/**
-	 * 
-	 */
-	protected List<SearchResultColumn> getDefaultColumns(){
-		
-		ArrayList<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
-		
-		SearchResultColumn col = new SearchResultColumn();
-		col.setPropertyUri(Identifiers.RDF_TYPE);
-		col.setPropertyKey(Util.md5digest(Identifiers.RDF_TYPE));
-		col.setTitle("Type");
-		col.setSortable(true);
-		list.add(col);
-		
-		col = new SearchResultColumn();
-		col.setPropertyUri(SearchResultRow.FALLBACKED_LABEL);
-		col.setPropertyKey(SearchResultRow.FALLBACKED_LABEL);
-		col.setTitle("Label");
-		col.setSortable(true);
-		list.add(col);
-
-		col = new SearchResultColumn();
-		col.setPropertyUri(Identifiers.DC_DATE);
-		col.setPropertyKey(Util.md5digest(Identifiers.DC_DATE));
-		col.setTitle("Date");
-		col.setSortable(true);
-		list.add(col);
-		
-		return list;
-	}
+	public abstract List<SearchResultColumn> getColumns();
 
 	/**
 	 * @return the resultList
@@ -74,5 +36,37 @@ public abstract class AbstractSearchActionBean extends AbstractCRActionBean{
 	 */
 	public void setResultList(List<SearchResultRow> resultList) {
 		this.resultList = resultList;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	protected List<SearchResultColumn> getDefaultColumns(){
+		
+		ArrayList<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
+		
+		SearchResultColumn col = new SearchResultColumn();
+		col.setPropertyUri(Identifiers.RDF_TYPE);
+		col.setPropertyKey(Util.md5digest(Identifiers.RDF_TYPE));
+		col.setTitle("Type");
+		col.setSortable(true);
+		list.add(col);
+		
+		col = new SearchResultColumn();
+		col.setPropertyUri(SearchResultRow.RESOURCE_LABEL);
+		col.setPropertyKey(SearchResultRow.RESOURCE_LABEL);
+		col.setTitle("Label");
+		col.setSortable(true);
+		list.add(col);
+
+		col = new SearchResultColumn();
+		col.setPropertyUri(Identifiers.DC_DATE);
+		col.setPropertyKey(Util.md5digest(Identifiers.DC_DATE));
+		col.setTitle("Date");
+		col.setSortable(true);
+		list.add(col);
+		
+		return list;
 	}
 }

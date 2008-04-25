@@ -21,7 +21,7 @@ public class SearchResultRow extends HashMap<String,String>{
 	
 	/** */
 	public static final String RESOURCE_URI = "resourceUri";
-	public static final String FALLBACKED_LABEL = "fallbackedLabel";
+	public static final String RESOURCE_LABEL = "label";
 
 	/**
 	 * 
@@ -56,7 +56,7 @@ public class SearchResultRow extends HashMap<String,String>{
 			return super.get(Md5Map.getValue(keyString));
 		else if (keyString.equals(RESOURCE_URI))
 			return super.get(Identifiers.DOC_ID);
-		else if (keyString.equals(FALLBACKED_LABEL)){
+		else if (keyString.equals(RESOURCE_LABEL)){
 			String s = super.get(Identifiers.DC_TITLE);
 			s = s==null ? super.get(Identifiers.RDFS_LABEL) : s;
 			return s==null ? "" : s;

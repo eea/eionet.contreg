@@ -16,6 +16,7 @@ import eionet.cr.search.SearchException;
 import eionet.cr.search.Searcher;
 import eionet.cr.util.Util;
 import eionet.cr.web.util.search.CustomSearchFilter;
+import eionet.cr.web.util.search.SearchResultColumn;
 import eionet.cr.web.util.search.SearchResultRow;
 
 import net.sourceforge.stripes.action.DefaultHandler;
@@ -296,5 +297,13 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 		}
 		
 		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
+	 */
+	public List<SearchResultColumn> getColumns(){
+		return getDefaultColumns();
 	}
 }

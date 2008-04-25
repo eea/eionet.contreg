@@ -14,6 +14,8 @@ import eionet.cr.common.Identifiers;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.Searcher;
 import eionet.cr.search.util.dataflow.RodInstrumentDTO;
+import eionet.cr.util.Util;
+import eionet.cr.web.util.search.SearchResultColumn;
 import eionet.cr.web.util.search.SearchResultRow;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
@@ -133,5 +135,44 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean{
 	 */
 	public void setYear(String year) {
 		this.year = year;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
+	 */
+	public List<SearchResultColumn> getColumns(){
+		
+		ArrayList<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
+		
+		SearchResultColumn col = new SearchResultColumn();
+		col.setPropertyUri(SearchResultRow.RESOURCE_LABEL);
+		col.setPropertyKey(SearchResultRow.RESOURCE_LABEL);
+		col.setTitle("Label");
+		col.setSortable(true);
+		list.add(col);
+		
+		col = new SearchResultColumn();
+		col.setPropertyUri(Identifiers.ROD_OBLIGATION_PROPERTY);
+		col.setPropertyKey(Util.md5digest(Identifiers.ROD_OBLIGATION_PROPERTY));
+		col.setTitle("Dataflow");
+		col.setSortable(true);
+		list.add(col);
+
+		col = new SearchResultColumn();
+		col.setPropertyUri(Identifiers.ROD_LOCALITY_PROPERTY);
+		col.setPropertyKey(Util.md5digest(Identifiers.ROD_LOCALITY_PROPERTY));
+		col.setTitle("Locality");
+		col.setSortable(true);
+		list.add(col);
+
+		col = new SearchResultColumn();
+		col.setPropertyUri(Identifiers.DC_DATE);
+		col.setPropertyKey(Util.md5digest(Identifiers.DC_DATE));
+		col.setTitle("Date");
+		col.setSortable(true);
+		list.add(col);
+
+		return list;
 	}
 }

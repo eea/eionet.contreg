@@ -1,13 +1,18 @@
 package eionet.cr.web.action;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.queryParser.ParseException;
+
+import eionet.cr.common.Identifiers;
 import eionet.cr.dao.DAOException;
 import eionet.cr.search.Searcher;
+import eionet.cr.util.Util;
+import eionet.cr.web.util.search.SearchResultColumn;
 import eionet.cr.web.util.search.SearchResultRow;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
@@ -63,5 +68,13 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean {
 	 */
 	public void setSearchExpression(String searchExpression) {
 		this.searchExpression = searchExpression;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
+	 */
+	public List<SearchResultColumn> getColumns(){
+		return getDefaultColumns();
 	}
 }
