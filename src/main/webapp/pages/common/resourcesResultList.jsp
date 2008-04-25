@@ -5,7 +5,7 @@
 	<div style="margin-top:20px">
 		<c:choose>
 			<c:when test="${actionBean.resultList!=null && fn:length(actionBean.resultList)>0}">
-				<display:table name="${actionBean.resultList}" class="${tableClass}" pagesize="${(pageSize==null || empty pageSize) ? 20 : pageSize}" requestURI="${actionBean.urlBinding}" id="resultListItem" htmlId="resourcesResultList" sort="list">
+				<display:table name="${actionBean.resultList}" class="${tableClass}" pagesize="${(pageSize==null || empty pageSize) ? 20 : pageSize}" requestURI="${actionBean.urlBinding}?reload=true" id="resultListItem" htmlId="resourcesResultList" sort="list">
 					<display:setProperty name="paging.banner.items_name" value="resources"/>
 					<c:forEach var="col" items="${actionBean.columns}">
 						<display:column property="${col.propertyKey}" title="${col.title}" sortable="${col.sortable}"/>

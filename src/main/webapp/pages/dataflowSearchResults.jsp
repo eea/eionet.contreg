@@ -8,9 +8,12 @@
 	
         <h1>Search results</h1>
         
-        <p>
-        	sdflk asdflk waerwe rwer asädlfk sdlfk sdklf sdk aaraerwer wer werwer wer wer
-        </p>
+        <c:if test="${param.reload==null}">
+	        <p>
+	        	CR returns no more than 300 most relevant search results ordered descendingly by relevance.
+	        	If you can't find what you're looking for, please narrow your search.
+	        </p>
+	    </c:if>
 	    
 	    <stripes:form action="/dataflowSearch.action" method="get" style="padding-bottom:20px">	
 			<stripes:layout-render name="/pages/common/resourcesResultList.jsp" tableClass="sortable"/>
