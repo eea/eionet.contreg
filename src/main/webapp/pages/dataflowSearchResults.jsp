@@ -9,8 +9,7 @@
         <h1>Search results</h1>
         
         <p>
-	        Maybe some text here Maybe some text here Maybe some text here Maybe some text here
-	        maybe some text here Maybe some text here Maybe some text here Maybe some text here
+        	sdflk asdflk waerwe rwer asädlfk sdlfk sdklf sdk aaraerwer wer werwer wer wer
         </p>
 	    
 	    <stripes:form action="/dataflowSearch.action" method="get" style="padding-bottom:20px">	

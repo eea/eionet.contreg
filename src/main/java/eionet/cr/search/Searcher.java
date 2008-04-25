@@ -90,16 +90,22 @@ public class Searcher {
 	 * 
 	 * @param query
 	 * @return
+	 * @throws SearchException 
 	 * @throws ParseException
 	 * @throws IOException
 	 */
-	public static List<Map<String,String[]>> simpleSearch(String searchExpression) throws ParseException, IOException{
+	public static List<Map<String,String[]>> simpleSearch(String searchExpression) throws SearchException{
 		
 		if (searchExpression==null || searchExpression.trim().length()==0)
 			return new ArrayList<Map<String,String[]>>();
 		
 		SimpleSearchExpression expressionObject = new SimpleSearchExpression(searchExpression);
-		return luceneQuery(expressionObject.toLuceneQueryString(), expressionObject.getAnalyzer());
+		try {
+			return luceneQuery(expressionObject.toLuceneQueryString(), expressionObject.getAnalyzer());
+		}
+		catch (Exception e){
+			throw new SearchException(e.toString(), e);
+		}
 	}
 	
 	/**

@@ -4,7 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import net.sourceforge.stripes.action.Resolution;
+
 import eionet.cr.common.Identifiers;
+import eionet.cr.search.SearchException;
+import eionet.cr.search.Searcher;
 import eionet.cr.util.Util;
 import eionet.cr.web.util.search.SearchResultColumn;
 import eionet.cr.web.util.search.SearchResultRow;
@@ -18,6 +22,13 @@ public abstract class AbstractSearchActionBean extends AbstractCRActionBean{
 
 	/** */
 	protected List<SearchResultRow> resultList;
+	
+	/**
+	 * 
+	 * @return
+	 * @throws SearchException
+	 */
+	public abstract Resolution search() throws SearchException;
 
 	/**
 	 * @return the columns
@@ -36,6 +47,14 @@ public abstract class AbstractSearchActionBean extends AbstractCRActionBean{
 	 */
 	public void setResultList(List<SearchResultRow> resultList) {
 		this.resultList = resultList;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public int getMaxResultSetSize(){
+		return Searcher.MAX_RESULT_SET_SIZE;
 	}
 
 	/**

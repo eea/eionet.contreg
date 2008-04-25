@@ -10,6 +10,7 @@ import org.apache.lucene.queryParser.ParseException;
 
 import eionet.cr.common.Identifiers;
 import eionet.cr.dao.DAOException;
+import eionet.cr.search.SearchException;
 import eionet.cr.search.Searcher;
 import eionet.cr.util.Util;
 import eionet.cr.web.util.search.SearchResultColumn;
@@ -49,10 +50,9 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean {
 	 * @throws ParseException 
 	 * @throws DAOException
 	 */
-    public Resolution search() throws ParseException, IOException{
+    public Resolution search() throws SearchException{
 		
 		resultList = SearchResultRow.convert(Searcher.simpleSearch(searchExpression));
-		//showMessage(String.valueOf(resultList==null ? 0 : resultList.size()) + " hits found");
 		return new ForwardResolution("/pages/simpleSearch.jsp");
     }
 

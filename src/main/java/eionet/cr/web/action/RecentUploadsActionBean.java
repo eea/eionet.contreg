@@ -59,7 +59,7 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean {
 	 * @throws SearchException 
 	 */
 	@DefaultHandler
-	public Resolution view() throws SearchException{
+	public Resolution search() throws SearchException{
 		
 		if (type!=null && type.length()>0){
 			String decodedType = Util.urlDecode(type);
