@@ -9,6 +9,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.queryParser.ParseException;
 
 import eionet.cr.common.Identifiers;
+import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.Searcher;
@@ -19,6 +20,9 @@ import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
+import net.sourceforge.stripes.validation.SimpleError;
+import net.sourceforge.stripes.validation.ValidationErrors;
+import net.sourceforge.stripes.validation.ValidationMethod;
 
 /**
  * 
@@ -54,6 +58,13 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean {
 		
 		resultList = SearchResultRow.convert(Searcher.simpleSearch(searchExpression));
 		return new ForwardResolution("/pages/simpleSearch.jsp");
+    }
+    
+    @ValidationMethod(on="search")
+    public void avoidDivideByZero(ValidationErrors errors) {
+        if (this.searchExpression == null || this.searchExpression.equals("")) {
+            handleCrException(getBundle().getString("search.field.empty"), GeneralConfig.SEVERITY_CAUTION);
+        }
     }
 
 	/**
