@@ -38,7 +38,7 @@ public class HarvestMessageDTOReader extends ResultSetBaseReader {
 	}
 
 	/**
-	 * @return the resultList
+	 * @return the resultListAAA
 	 */
 	public List<HarvestMessageDTO> getResultList() {
 		return resultList;

@@ -15,11 +15,11 @@ import org.apache.commons.logging.LogFactory;
 
 import eionet.cr.common.CRRuntimeException;
 import eionet.cr.common.Identifiers;
+import eionet.cr.common.ResourceDTO;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.Searcher;
 import eionet.cr.util.Util;
 import eionet.cr.web.util.search.SearchResultColumn;
-import eionet.cr.web.util.search.SearchResultRow;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
@@ -31,7 +31,7 @@ import net.sourceforge.stripes.action.UrlBinding;
  *
  */
 @UrlBinding("/recentUploads.action")
-public class RecentUploadsActionBean extends AbstractSearchActionBean {
+public class RecentUploadsActionBean extends SearchResourcesActionBean {
 	
 	/** */
 	public static final int MAX_RESULTS = 20;
@@ -63,7 +63,7 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean {
 		
 		if (type!=null && type.length()>0){
 			String decodedType = Util.urlDecode(type);
-			this.resultList = SearchResultRow.convert(Searcher.getRecentByRdfType(decodedType, MAX_RESULTS));
+			this.resultList = Searcher.getRecentByRdfType(decodedType, MAX_RESULTS);
 		}
 			
 		return new ForwardResolution("/pages/recent.jsp");
@@ -146,29 +146,25 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean {
 			// columns for deliveries
 			List<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
 			SearchResultColumn col = new SearchResultColumn();
-			col.setPropertyUri(SearchResultRow.RESOURCE_LABEL);
-			col.setPropertyKey(SearchResultRow.RESOURCE_LABEL);
+			col.setProperty(ResourceDTO.SpecialKeys.RESOURCE_LABEL);
 			col.setTitle("Label");
 			col.setSortable(false);
 			list.add(col);
 
 			col = new SearchResultColumn();
-			col.setPropertyUri(Identifiers.ROD_OBLIGATION_PROPERTY);
-			col.setPropertyKey(Util.md5digest(Identifiers.ROD_OBLIGATION_PROPERTY));
+			col.setProperty(Identifiers.ROD_OBLIGATION_PROPERTY);
 			col.setTitle("Obligation");
 			col.setSortable(false);
 			list.add(col);
 
 			col = new SearchResultColumn();
-			col.setPropertyUri(Identifiers.ROD_LOCALITY_PROPERTY);
-			col.setPropertyKey(Util.md5digest(Identifiers.ROD_LOCALITY_PROPERTY));
+			col.setProperty(Identifiers.ROD_LOCALITY_PROPERTY);
 			col.setTitle("Locality");
 			col.setSortable(false);
 			list.add(col);
 
 			col = new SearchResultColumn();
-			col.setPropertyUri(Identifiers.DC_DATE);
-			col.setPropertyKey(Util.md5digest(Identifiers.DC_DATE));
+			col.setProperty(Identifiers.DC_DATE);
 			col.setTitle("Date");
 			col.setSortable(false);
 			list.add(col);
@@ -178,22 +174,19 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean {
 			// columns for obligations
 			list = new ArrayList<SearchResultColumn>();
 			col = new SearchResultColumn();
-			col.setPropertyUri(SearchResultRow.RESOURCE_LABEL);
-			col.setPropertyKey(SearchResultRow.RESOURCE_LABEL);
+			col.setProperty(ResourceDTO.SpecialKeys.RESOURCE_LABEL);
 			col.setTitle("Label");
 			col.setSortable(false);
 			list.add(col);
 
 			col = new SearchResultColumn();
-			col.setPropertyUri(Identifiers.ROD_ISSUE_PROPERTY);
-			col.setPropertyKey(Util.md5digest(Identifiers.ROD_ISSUE_PROPERTY));
+			col.setProperty(Identifiers.ROD_ISSUE_PROPERTY);
 			col.setTitle("Issue");
 			col.setSortable(false);
 			list.add(col);
 
 			col = new SearchResultColumn();
-			col.setPropertyUri(Identifiers.ROD_INSTRUMENT_PROPERTY);
-			col.setPropertyKey(Util.md5digest(Identifiers.ROD_INSTRUMENT_PROPERTY));
+			col.setProperty(Identifiers.ROD_INSTRUMENT_PROPERTY);
 			col.setTitle("Instrument");
 			col.setSortable(false);
 			list.add(col);
@@ -203,29 +196,25 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean {
 			// columns for full reports
 			list = new ArrayList<SearchResultColumn>();
 			col = new SearchResultColumn();
-			col.setPropertyUri(SearchResultRow.RESOURCE_LABEL);
-			col.setPropertyKey(SearchResultRow.RESOURCE_LABEL);
+			col.setProperty(ResourceDTO.SpecialKeys.RESOURCE_LABEL);
 			col.setTitle("Label");
 			col.setSortable(false);
 			list.add(col);
 
 			col = new SearchResultColumn();
-			col.setPropertyUri(Identifiers.DC_SUBJECT);
-			col.setPropertyKey(Util.md5digest(Identifiers.DC_SUBJECT));
+			col.setProperty(Identifiers.DC_SUBJECT);
 			col.setTitle("Subject");
 			col.setSortable(false);
 			list.add(col);
 
 			col = new SearchResultColumn();
-			col.setPropertyUri(Identifiers.DC_COVERAGE);
-			col.setPropertyKey(Util.md5digest(Identifiers.DC_COVERAGE));
+			col.setProperty(Identifiers.DC_COVERAGE);
 			col.setTitle("Coverage");
 			col.setSortable(false);
 			list.add(col);
 			
 			col = new SearchResultColumn();
-			col.setPropertyUri(Identifiers.DC_DATE);
-			col.setPropertyKey(Util.md5digest(Identifiers.DC_DATE));
+			col.setProperty(Identifiers.DC_DATE);
 			col.setTitle("Date");
 			col.setSortable(false);
 			list.add(col);
@@ -235,29 +224,25 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean {
 			// columns for news releases
 			list = new ArrayList<SearchResultColumn>();
 			col = new SearchResultColumn();
-			col.setPropertyUri(SearchResultRow.RESOURCE_LABEL);
-			col.setPropertyKey(SearchResultRow.RESOURCE_LABEL);
+			col.setProperty(ResourceDTO.SpecialKeys.RESOURCE_LABEL);
 			col.setTitle("Label");
 			col.setSortable(false);
 			list.add(col);
 
 			col = new SearchResultColumn();
-			col.setPropertyUri(Identifiers.DC_SUBJECT);
-			col.setPropertyKey(Util.md5digest(Identifiers.DC_SUBJECT));
+			col.setProperty(Identifiers.DC_SUBJECT);
 			col.setTitle("Subject");
 			col.setSortable(false);
 			list.add(col);
 
 			col = new SearchResultColumn();
-			col.setPropertyUri(Identifiers.DC_COVERAGE);
-			col.setPropertyKey(Util.md5digest(Identifiers.DC_COVERAGE));
+			col.setProperty(Identifiers.DC_COVERAGE);
 			col.setTitle("Coverage");
 			col.setSortable(false);
 			list.add(col);
 			
 			col = new SearchResultColumn();
-			col.setPropertyUri(Identifiers.DC_DATE);
-			col.setPropertyKey(Util.md5digest(Identifiers.DC_DATE));
+			col.setProperty(Identifiers.DC_DATE);
 			col.setTitle("Date");
 			col.setSortable(false);
 			list.add(col);
@@ -272,7 +257,7 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean {
 
 	/*
 	 * (non-Javadoc)
-	 * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
+	 * @see eionet.cr.web.action.SearchResourcesActionBean#getColumns()
 	 */
 	public List<SearchResultColumn> getColumns(){
 		

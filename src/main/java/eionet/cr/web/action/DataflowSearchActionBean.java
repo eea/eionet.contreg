@@ -13,12 +13,12 @@ import org.apache.lucene.queryParser.ParseException;
 
 import eionet.cr.common.CRRuntimeException;
 import eionet.cr.common.Identifiers;
+import eionet.cr.common.ResourceDTO;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.Searcher;
 import eionet.cr.search.util.dataflow.RodInstrumentDTO;
 import eionet.cr.util.Util;
 import eionet.cr.web.util.search.SearchResultColumn;
-import eionet.cr.web.util.search.SearchResultRow;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
@@ -30,7 +30,7 @@ import net.sourceforge.stripes.action.UrlBinding;
  *
  */
 @UrlBinding("/dataflowSearch.action")
-public class DataflowSearchActionBean extends AbstractSearchActionBean{
+public class DataflowSearchActionBean extends SearchResourcesActionBean{
 	
 	private static final String DATAFLOWS_SESSION_ATTR_NAME = DataflowSearchActionBean.class + ".dataflows";
 	private static final String LOCALITIES_SESSION_ATTR_NAME = DataflowSearchActionBean.class + ".localities";
@@ -62,9 +62,12 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean{
 	 * 
 	 */
 	private void loadOptions() throws SearchException{
+		
 		HttpSession session = this.getContext().getRequest().getSession();
-		session.setAttribute(DATAFLOWS_SESSION_ATTR_NAME, Searcher.getDataflowsGroupedByInstruments());
-		session.setAttribute(LOCALITIES_SESSION_ATTR_NAME, Searcher.getLiteralFieldValues(Identifiers.ROD_LOCALITY_PROPERTY));
+		if (session.getAttribute(DATAFLOWS_SESSION_ATTR_NAME)==null)
+			session.setAttribute(DATAFLOWS_SESSION_ATTR_NAME, Searcher.getDataflowsGroupedByInstruments());
+		if (session.getAttribute(LOCALITIES_SESSION_ATTR_NAME)==null)
+			session.setAttribute(LOCALITIES_SESSION_ATTR_NAME, Searcher.getLiteralFieldValues(Identifiers.ROD_LOCALITY_PROPERTY));
 	}
 	
 	/**
@@ -73,7 +76,8 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean{
 	 * @throws SearchException 
 	 */
 	public Resolution search() throws SearchException{
-		resultList = SearchResultRow.convert(Searcher.dataflowSearch(dataflow, locality, year));
+		loadOptions();
+		resultList = Searcher.dataflowSearch(dataflow, locality, year);
 		return new ForwardResolution("/pages/dataflowSearch.jsp");
 	}
 
@@ -151,36 +155,32 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean{
 
 	/*
 	 * (non-Javadoc)
-	 * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
+	 * @see eionet.cr.web.action.SearchResourcesActionBean#getColumns()
 	 */
 	public List<SearchResultColumn> getColumns(){
 		
 		ArrayList<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
 		
 		SearchResultColumn col = new SearchResultColumn();
-		col.setPropertyUri(SearchResultRow.RESOURCE_LABEL);
-		col.setPropertyKey(SearchResultRow.RESOURCE_LABEL);
+		col.setProperty(ResourceDTO.SpecialKeys.RESOURCE_LABEL);
 		col.setTitle("Label");
 		col.setSortable(true);
 		list.add(col);
 		
 		col = new SearchResultColumn();
-		col.setPropertyUri(Identifiers.ROD_OBLIGATION_PROPERTY);
-		col.setPropertyKey(Util.md5digest(Identifiers.ROD_OBLIGATION_PROPERTY));
+		col.setProperty(Identifiers.ROD_OBLIGATION_PROPERTY);
 		col.setTitle("Dataflow");
 		col.setSortable(true);
 		list.add(col);
 
 		col = new SearchResultColumn();
-		col.setPropertyUri(Identifiers.ROD_LOCALITY_PROPERTY);
-		col.setPropertyKey(Util.md5digest(Identifiers.ROD_LOCALITY_PROPERTY));
+		col.setProperty(Identifiers.ROD_LOCALITY_PROPERTY);
 		col.setTitle("Locality");
 		col.setSortable(true);
 		list.add(col);
 
 		col = new SearchResultColumn();
-		col.setPropertyUri(Identifiers.DC_DATE);
-		col.setPropertyKey(Util.md5digest(Identifiers.DC_DATE));
+		col.setProperty(Identifiers.DC_DATE);
 		col.setTitle("Date");
 		col.setSortable(true);
 		list.add(col);

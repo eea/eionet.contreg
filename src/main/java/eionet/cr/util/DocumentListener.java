@@ -1,4 +1,4 @@
-package eionet.cr.index.walk;
+package eionet.cr.util;
 
 import org.apache.lucene.document.Document;
 
@@ -7,7 +7,7 @@ import org.apache.lucene.document.Document;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public interface AllDocsWalkerListener {
+public interface DocumentListener {
 
 	/**
 	 * 

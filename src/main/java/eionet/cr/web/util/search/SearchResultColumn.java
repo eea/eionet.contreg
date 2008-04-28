@@ -1,5 +1,8 @@
 package eionet.cr.web.util.search;
 
+import eionet.cr.common.Md5Map;
+import eionet.cr.util.Util;
+
 /**
  * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
@@ -8,7 +11,7 @@ package eionet.cr.web.util.search;
 public class SearchResultColumn {
 
 	/** */
-	private String propertyUri;
+	private String property;
 	private String propertyKey;
 	private String title;
 	private boolean sortable;
@@ -16,26 +19,25 @@ public class SearchResultColumn {
 	/**
 	 * @return the property
 	 */
-	public String getPropertyUri() {
-		return propertyUri;
+	public String getProperty() {
+		return property;
 	}
 	/**
 	 * @param property the property to set
 	 */
-	public void setPropertyUri(String property) {
-		this.propertyUri = property;
+	public void setProperty(String property) {
+		this.property = property;
 	}
 	/**
-	 * @return the propertyMd5
+	 * @return the propertyKey
 	 */
 	public String getPropertyKey() {
+		if (propertyKey==null){
+			if (property!=null){
+				propertyKey = Md5Map.addValue(property);
+			}
+		}
 		return propertyKey;
-	}
-	/**
-	 * @param propertyMd5 the propertyMd5 to set
-	 */
-	public void setPropertyKey(String propertyMd5) {
-		this.propertyKey = propertyMd5;
 	}
 	/**
 	 * @return the title

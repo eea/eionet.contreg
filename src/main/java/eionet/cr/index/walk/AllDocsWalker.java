@@ -12,6 +12,7 @@ import org.apache.lucene.index.IndexReader;
 
 import eionet.cr.common.Identifiers;
 import eionet.cr.config.GeneralConfig;
+import eionet.cr.util.DocumentListener;
 
 /**
  * 
@@ -21,7 +22,7 @@ import eionet.cr.config.GeneralConfig;
 public class AllDocsWalker {
 
 	/** */
-	private List<AllDocsWalkerListener> listeners = new ArrayList<AllDocsWalkerListener>();
+	private List<DocumentListener> listeners = new ArrayList<DocumentListener>();
 	
 	/** */
 	private static Log logger = LogFactory.getLog(AllDocsWalker.class);
@@ -36,7 +37,7 @@ public class AllDocsWalker {
 	 * 
 	 * @param listener
 	 */
-	public void addListener(AllDocsWalkerListener listener){
+	public void addListener(DocumentListener listener){
 		
 		if (listener==null)
 			return;

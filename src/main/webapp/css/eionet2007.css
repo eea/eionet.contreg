@@ -1,5 +1,3 @@
-@media screen { /* To prevent PocketPC from loading the stylesheet */
-
 th.sorted a,th.sortable a {
 	background-repeat: no-repeat;
 	background-position: right;
@@ -11,4 +9,11 @@ th.order1 a {
 
 th.order2 a {
 	background-image: url(../images/sortup.gif);
+}
+
+.searchExprSample {
+	font-family: Monaco, "Courier New", Courier, monospace;
+	padding-left: 2px;
+	padding-right: 2px;
+	background-color: #D9EDF2;
 }

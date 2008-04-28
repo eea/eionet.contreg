@@ -1,6 +1,7 @@
 package eionet.cr.util;
 
 import java.net.URLEncoder;
+import java.util.List;
 
 /**
  * Helper class that contains static helper methods for string manupulation.
@@ -61,4 +62,16 @@ public class StringUtils {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param list
+	 * @return
+	 */
+	public static String[] toArray(List<String> list){
+		
+		if (list==null || list.isEmpty())
+			return null;
+		else
+			return list.toArray(new String[list.size()]);
+	}
 }

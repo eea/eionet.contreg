@@ -15,7 +15,6 @@ import eionet.cr.search.SearchException;
 import eionet.cr.search.Searcher;
 import eionet.cr.util.Util;
 import eionet.cr.web.util.search.SearchResultColumn;
-import eionet.cr.web.util.search.SearchResultRow;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
@@ -30,7 +29,7 @@ import net.sourceforge.stripes.validation.ValidationMethod;
  *
  */
 @UrlBinding("/simpleSearch.action")
-public class SimpleSearchActionBean extends AbstractSearchActionBean {
+public class SimpleSearchActionBean extends SearchResourcesActionBean {
 	
 	/** */
 	private static Log logger = LogFactory.getLog(SimpleSearchActionBean.class);
@@ -56,7 +55,7 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean {
 	 */
     public Resolution search() throws SearchException{
 		
-		resultList = SearchResultRow.convert(Searcher.simpleSearch(searchExpression));
+		resultList = Searcher.simpleSearch(searchExpression);
 		return new ForwardResolution("/pages/simpleSearch.jsp");
     }
     
@@ -83,7 +82,7 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean {
 	
 	/*
 	 * (non-Javadoc)
-	 * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
+	 * @see eionet.cr.web.action.SearchResourcesActionBean#getColumns()
 	 */
 	public List<SearchResultColumn> getColumns(){
 		return getDefaultColumns();

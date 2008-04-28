@@ -12,12 +12,12 @@ import java.util.Map;
 import javax.servlet.http.HttpSession;
 
 import eionet.cr.common.Identifiers;
+import eionet.cr.common.ResourceDTO;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.Searcher;
 import eionet.cr.util.Util;
 import eionet.cr.web.util.search.CustomSearchFilter;
 import eionet.cr.web.util.search.SearchResultColumn;
-import eionet.cr.web.util.search.SearchResultRow;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
@@ -30,7 +30,7 @@ import net.sourceforge.stripes.action.UrlBinding;
  *
  */
 @UrlBinding("/customSearch.action")
-public class CustomSearchActionBean extends AbstractSearchActionBean{
+public class CustomSearchActionBean extends SearchResourcesActionBean{
 	
 	/** */
 	private static final String SELECTED_FILTERS_SESSION_ATTR_NAME = CustomSearchActionBean.class + ".selectedFilters";
@@ -83,17 +83,17 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 		populateSelectedFilters();
 		
 		getContext().getRequest().getSession().setAttribute(RESULT_LIST_SESSION_ATTR_NAME,
-				SearchResultRow.convert(Searcher.customSearch(buildSearchCriteria(), true))); 
+				Searcher.customSearch(buildSearchCriteria(), true)); 
 		
 		return new ForwardResolution(ASSOCIATED_JSP);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see eionet.cr.web.action.AbstractSearchActionBean#getResultList()
+	 * @see eionet.cr.web.action.SearchResourcesActionBean#getResultList()
 	 */
-	public List<SearchResultRow> getResultList() {
-		return (List<SearchResultRow>)getContext().getRequest().getSession().getAttribute(RESULT_LIST_SESSION_ATTR_NAME);
+	public List<ResourceDTO> getResultList() {
+		return (List<ResourceDTO>)getContext().getRequest().getSession().getAttribute(RESULT_LIST_SESSION_ATTR_NAME);
 	}
 	
 	/**
@@ -384,7 +384,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 
 	/*
 	 * (non-Javadoc)
-	 * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
+	 * @see eionet.cr.web.action.SearchResourcesActionBean#getColumns()
 	 */
 	public List<SearchResultColumn> getColumns(){
 		return getDefaultColumns();

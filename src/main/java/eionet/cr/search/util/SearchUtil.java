@@ -13,7 +13,6 @@ import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.search.Hits;
 
 import eionet.cr.common.CRRuntimeException;
-import eionet.cr.search.Searcher;
 
 /**
  * 
@@ -42,7 +41,7 @@ public class SearchUtil {
 		
 		return (Analyzer)result;
 	}
-	
+
 	/**
 	 * 
 	 * @param hits
@@ -50,18 +49,19 @@ public class SearchUtil {
 	 * @throws CorruptIndexException
 	 * @throws IOException
 	 */
-	public static List<Map<String,String[]>> processHits(Hits hits) throws CorruptIndexException, IOException{
-		return processHits(hits, Searcher.MAX_RESULT_SET_SIZE);
+	public static List<Map<String,String[]>> collectMaps(Hits hits) throws CorruptIndexException, IOException{
+		return collectMaps(hits, HitsCollector.MAX_HITS);
 	}
 
 	/**
 	 * 
 	 * @param hits
+	 * @param maxResults
 	 * @return
-	 * @throws IOException 
-	 * @throws CorruptIndexException 
+	 * @throws CorruptIndexException
+	 * @throws IOException
 	 */
-	public static List<Map<String,String[]>> processHits(Hits hits, int maxResults) throws CorruptIndexException, IOException{
+	public static List<Map<String,String[]>> collectMaps(Hits hits, int maxResults) throws CorruptIndexException, IOException{
 		
 		List<Map<String,String[]>> resultList = new ArrayList<Map<String,String[]>>();
 		if (hits!=null && hits.length()>0){

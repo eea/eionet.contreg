@@ -52,6 +52,7 @@ import eionet.cr.index.SubProperties;
 import eionet.cr.index.walk.AllDocsWalker;
 import eionet.cr.index.walk.EncodingSchemesLoader;
 import eionet.cr.index.walk.SubPropertiesLoader;
+import eionet.cr.search.util.HitsCollector;
 import eionet.cr.search.util.SearchUtil;
 import eionet.cr.search.util.SimpleSearchExpression;
 import eionet.cr.search.util.dataflow.RodInstrumentDTO;
@@ -67,8 +68,6 @@ import eionet.cr.util.Util;
  */
 public class Searcher {
 	
-	/** */
-	public static final int MAX_RESULT_SET_SIZE = 300;
 	public static final String DEFAULT_FIELD = Indexer.ALL_CONTENT_FIELD;
 	
 	/** */
@@ -94,18 +93,29 @@ public class Searcher {
 	 * @throws ParseException
 	 * @throws IOException
 	 */
-	public static List<Map<String,String[]>> simpleSearch(String searchExpression) throws SearchException{
+	public static List<ResourceDTO> simpleSearch(String searchExpression) throws SearchException{
 		
 		if (searchExpression==null || searchExpression.trim().length()==0)
-			return new ArrayList<Map<String,String[]>>();
+			return null;
 		
+		IndexSearcher indexSearcher = null;
 		SimpleSearchExpression expressionObject = new SimpleSearchExpression(searchExpression);
-		try {
-			return luceneQuery(expressionObject.toLuceneQueryString(), expressionObject.getAnalyzer());
+		QueryParser parser = new QueryParser(DEFAULT_FIELD, expressionObject.getAnalyzer());
+		try{
+			indexSearcher = getIndexSearcher();
+			return HitsCollector.collectResourceDTOs(indexSearcher.search(parser.parse(expressionObject.toLuceneQueryString())));
 		}
 		catch (Exception e){
 			throw new SearchException(e.toString(), e);
 		}
+		finally{
+			try{
+				if (indexSearcher!=null)
+					indexSearcher.close();
+			}
+			catch (IOException e){}
+		}
+
 	}
 	
 	/**
@@ -155,7 +165,7 @@ public class Searcher {
 		try{
 			indexSearcher = getIndexSearcher();
 			Hits hits = indexSearcher.search(queryObj);
-			return SearchUtil.processHits(hits);
+			return SearchUtil.collectMaps(hits);
 		}
 		finally{
 			try{
@@ -244,7 +254,7 @@ public class Searcher {
 	 * @return
 	 * @throws SearchException 
 	 */
-	public static List<Map<String,String[]>> dataflowSearch(String dataflow, String locality, String year) throws SearchException{
+	public static List<ResourceDTO> dataflowSearch(String dataflow, String locality, String year) throws SearchException{
 		
 		List<Query> queries = new ArrayList<Query>();
 		queries.add(new TermQuery(new Term(Identifiers.RDF_TYPE, Identifiers.ROD_DELIVERY_CLASS)));
@@ -277,8 +287,7 @@ public class Searcher {
 			}
 
 			indexSearcher = getIndexSearcher();
-			Hits hits = indexSearcher.search(query);
-			return SearchUtil.processHits(hits);
+			return HitsCollector.collectResourceDTOs(indexSearcher.search(query));
 		}
 		catch (Exception e){
 			throw new SearchException(e.toString(), e);
@@ -460,10 +469,10 @@ public class Searcher {
 	 * @return
 	 * @throws SearchException 
 	 */
-	public static List<Map<String,String[]>> getRecentByRdfType(String rdfType, int maxResults) throws SearchException{
+	public static List<ResourceDTO> getRecentByRdfType(String rdfType, int maxResults) throws SearchException{
 		
 		if (rdfType==null || rdfType.trim().length()==0)
-			return new ArrayList<Map<String,String[]>>();
+			return null;
 		
 		IndexSearcher indexSearcher = null;
 		try{
@@ -473,7 +482,7 @@ public class Searcher {
 			if (hits==null || hits.length()==0)
 				hits = indexSearcher.search(new TermQuery(new Term(Identifiers.RDF_TYPE, rdfType)));
 			
-			return SearchUtil.processHits(hits, maxResults);
+			return HitsCollector.collectResourceDTOs(hits, maxResults);
 		}
 		catch (Exception e){
 			throw new SearchException(e.toString(), e);
@@ -493,12 +502,10 @@ public class Searcher {
 	 * @return
 	 * @throws SearchException 
 	 */
-	public static List<Map<String,String[]>> customSearch(Map<String,String> criteria, boolean useSubProperties) throws SearchException{
-		
-		List<Map<String,String[]>> result = new ArrayList<Map<String,String[]>>();
+	public static List<ResourceDTO> customSearch(Map<String,String> criteria, boolean useSubProperties) throws SearchException{
 		
 		if (criteria==null || criteria.isEmpty())
-			return result;
+			return null;
 		
 		IndexSearcher indexSearcher = null;
 		List<Query> queries = new ArrayList<Query>();
@@ -543,23 +550,6 @@ public class Searcher {
 					}
 					
 					queries.add(booleanQuery);
-					
-					
-//					StringBuffer buf = new StringBuffer();
-//					for (int j=0; j<subProperties.size(); j++){
-//						
-//						if (j>0)
-//							buf.append(" OR ");
-//						
-//						buf.append(Util.escapeForLuceneQuery(subProperties.get(j)));
-//						buf.append(":");
-//						if (propertyValue.startsWith("\"") && propertyValue.endsWith("\"") && propertyValue.length()>2)
-//							buf.append("\"").append(Util.escapeForLuceneQuery(propertyValue.substring(1, propertyValue.length()-1))).append("\"");
-//						else
-//							buf.append(Util.escapeForLuceneQuery(propertyValue));
-//					}
-//					
-//					queries.add(queryParser.parse(buf.toString()));
 				}
 			}
 			
@@ -571,9 +561,10 @@ public class Searcher {
 				}
 				
 				indexSearcher = getIndexSearcher();
-				Hits hits = indexSearcher.search(booleanQuery);
-				return SearchUtil.processHits(hits);
+				return HitsCollector.collectResourceDTOs(indexSearcher.search(booleanQuery));
 			}
+			else
+				return null;
 		}
 		catch (Exception e){
 			throw new SearchException(e.toString(), e);
@@ -585,8 +576,6 @@ public class Searcher {
 			}
 			catch (IOException e){}
 		}
-		
-		return result;
 	}
 	
 	public static void testThis() throws SearchException{

@@ -15,8 +15,10 @@ import org.apache.commons.logging.LogFactory;
 
 import eionet.cr.common.CRException;
 import eionet.cr.common.Identifiers;
+import eionet.cr.common.ResourceDTO;
 import eionet.cr.index.EncodingSchemes;
 import eionet.cr.search.Searcher;
+import eionet.cr.util.StringUtils;
 import eionet.cr.util.Util;
 import eionet.qawcommons.DataflowResultDto;
 
@@ -76,21 +78,24 @@ public class SearcherXmlRpcImpl{
 		
 		List<DataflowResultDto> result = new ArrayList<DataflowResultDto>();
 		try{
-			List<Map<String,String[]>> list = Searcher.customSearch(criteria, false);
+			List<ResourceDTO> list = Searcher.customSearch(criteria, false);
 			if (list!=null){
 				for (int i=0; i<list.size(); i++){
 					
-					Map<String,String[]> map = (Map<String,String[]>)list.get(i);
+					ResourceDTO resourceDTO = list.get(i);
 					
-					DataflowResultDto dto = new DataflowResultDto();
-					dto.setTitle(Util.getFirst(map.get(Identifiers.DC_TITLE)));
-					dto.setDataflow(Util.pruneUrls(map.get(Identifiers.ROD_OBLIGATION_PROPERTY)));
-					dto.setLocality(Util.pruneUrls(map.get(Identifiers.ROD_LOCALITY_PROPERTY)));
-					dto.setType(Util.pruneUrls(map.get(Identifiers.RDF_TYPE)));
-					dto.setResource(Util.getFirst(map.get(Identifiers.DOC_ID)));
-					dto.setDate(Util.getFirst(map.get(Identifiers.DC_DATE)));
+					DataflowResultDto resultDTO = new DataflowResultDto();
+					resultDTO.setTitle(resourceDTO.getLabel());
+					resultDTO.setDataflow(
+							StringUtils.toArray(resourceDTO.getDistinctLiteralValues(Identifiers.ROD_OBLIGATION_PROPERTY)));
+					resultDTO.setLocality(
+							StringUtils.toArray(resourceDTO.getDistinctLiteralValues(Identifiers.ROD_LOCALITY_PROPERTY)));
+					resultDTO.setType(
+							StringUtils.toArray(resourceDTO.getDistinctLiteralValues(Identifiers.RDF_TYPE)));
+					resultDTO.setResource(resourceDTO.getUri());
+					resultDTO.setDate(resourceDTO.getValue(Identifiers.DC_DATE));
 					
-					result.add(dto);
+					result.add(resultDTO);
 				}
 			}
 		}

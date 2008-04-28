@@ -7,21 +7,21 @@ import java.util.Map;
 import net.sourceforge.stripes.action.Resolution;
 
 import eionet.cr.common.Identifiers;
+import eionet.cr.common.ResourceDTO;
 import eionet.cr.search.SearchException;
-import eionet.cr.search.Searcher;
+import eionet.cr.search.util.HitsCollector;
 import eionet.cr.util.Util;
 import eionet.cr.web.util.search.SearchResultColumn;
-import eionet.cr.web.util.search.SearchResultRow;
 
 /**
  * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public abstract class AbstractSearchActionBean extends AbstractCRActionBean{
+public abstract class SearchResourcesActionBean extends AbstractCRActionBean{
 
 	/** */
-	protected List<SearchResultRow> resultList;
+	protected List<ResourceDTO> resultList;
 	
 	/**
 	 * 
@@ -38,23 +38,23 @@ public abstract class AbstractSearchActionBean extends AbstractCRActionBean{
 	/**
 	 * @return the resultList
 	 */
-	public List<SearchResultRow> getResultList() {
+	public List<ResourceDTO> getResultList() {
 		return resultList;
 	}
 
 	/**
 	 * @param resultList the resultList to set
 	 */
-	public void setResultList(List<SearchResultRow> resultList) {
+	public void setResultList(List<ResourceDTO> resultList) {
 		this.resultList = resultList;
 	}
-	
+
 	/**
 	 * 
 	 * @return
 	 */
 	public int getMaxResultSetSize(){
-		return Searcher.MAX_RESULT_SET_SIZE;
+		return HitsCollector.MAX_HITS;
 	}
 
 	/**
@@ -66,22 +66,19 @@ public abstract class AbstractSearchActionBean extends AbstractCRActionBean{
 		ArrayList<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
 		
 		SearchResultColumn col = new SearchResultColumn();
-		col.setPropertyUri(Identifiers.RDF_TYPE);
-		col.setPropertyKey(Util.md5digest(Identifiers.RDF_TYPE));
+		col.setProperty(Identifiers.RDF_TYPE);
 		col.setTitle("Type");
 		col.setSortable(true);
 		list.add(col);
 		
 		col = new SearchResultColumn();
-		col.setPropertyUri(SearchResultRow.RESOURCE_LABEL);
-		col.setPropertyKey(SearchResultRow.RESOURCE_LABEL);
+		col.setProperty(ResourceDTO.SpecialKeys.RESOURCE_LABEL);
 		col.setTitle("Label");
 		col.setSortable(true);
 		list.add(col);
 
 		col = new SearchResultColumn();
-		col.setPropertyUri(Identifiers.DC_DATE);
-		col.setPropertyKey(Util.md5digest(Identifiers.DC_DATE));
+		col.setProperty(Identifiers.DC_DATE);
 		col.setTitle("Date");
 		col.setSortable(true);
 		list.add(col);

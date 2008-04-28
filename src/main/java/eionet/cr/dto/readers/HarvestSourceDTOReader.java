@@ -38,7 +38,7 @@ public class HarvestSourceDTOReader extends ResultSetBaseReader {
 	}
 
 	/**
-	 * @return the resultList
+	 * @return the resultListAAA
 	 */
 	public List<HarvestSourceDTO> getResultList() {
 		return resultList;

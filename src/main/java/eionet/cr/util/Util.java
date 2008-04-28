@@ -422,4 +422,24 @@ public class Util {
 			e.printStackTrace();
 		}
     }
+
+    /**
+     * 
+     * @param objects
+     * @return
+     */
+	public static java.lang.String toCsvString(java.util.List objects){
+		
+		if (objects==null || objects.isEmpty())
+			return "";
+		
+		StringBuffer buf = new StringBuffer();
+		for (int i=0; i<objects.size(); i++){
+			if (i>0)
+				buf.append(", ");
+			buf.append(objects.get(i).toString());
+		}
+		
+		return buf.toString();
+	}
 }

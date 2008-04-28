@@ -14,7 +14,6 @@ public class Md5Map extends HashMap<String,String>{
 	
 	/** */
 	private static Md5Map instance = null;
-	private static HashSet values = new HashSet();
 
 	/**
 	 * 
@@ -35,15 +34,16 @@ public class Md5Map extends HashMap<String,String>{
 	
 	/**
 	 * 
-	 * @param key - the key, NOT in MD5 format
 	 * @param value
 	 */
-	public static synchronized void addValue(String value){
+	public static synchronized String addValue(String value){
 		
-		if (value==null || values.contains(value))
-			return;
-		getInstance().put(Util.md5digest(value), value);
-		values.add(value);
+		if (value==null)
+			return null;
+		
+		String digest = Util.md5digest(value);
+		getInstance().put(digest, value);
+		return digest;
 	}
 	
 	/**
@@ -54,8 +54,9 @@ public class Md5Map extends HashMap<String,String>{
 	public static String getValue(String md5key){
 		if (md5key==null)
 			return null;
-		else
+		else{
 			return getInstance().get(md5key);
+		}
 	}
 	
 	/**

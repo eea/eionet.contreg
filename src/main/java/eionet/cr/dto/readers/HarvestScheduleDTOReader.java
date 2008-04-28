@@ -33,7 +33,7 @@ public class HarvestScheduleDTOReader extends ResultSetBaseReader {
 	}
 
 	/**
-	 * @return the resultList
+	 * @return the resultListAAA
 	 */
 	public List<HarvestScheduleDTO> getResultList() {
 		return resultList;

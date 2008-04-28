@@ -28,21 +28,16 @@ public class ResourceDTO extends HashMap<String,List<String>>{
 		
 		public static final String RESOURCE_URI = "resourceUri";
 		public static final String RESOURCE_URL = "resourceUrl";
-		public static final String FALLBACKED_LABEL = "fallbackedLabel";
+		public static final String RESOURCE_LABEL = "resourceLabel";
 	}
 	
-	/**
-	 * 
-	 */
-	public ResourceDTO(){
-		super();
-	}
-
 	/**
 	 * 
 	 * @param luceneDocument
 	 */
 	public ResourceDTO(Document luceneDocument){
+		
+		super();
 		
 		if (luceneDocument==null)
 			return;
@@ -76,11 +71,13 @@ public class ResourceDTO extends HashMap<String,List<String>>{
 		if (keyObject!=null){
 			
 			String key = keyObject.toString();
+			if (Md5Map.hasKey(key))
+				key = Md5Map.getValue(key);
 			
 			if (key.equals(SpecialKeys.RESOURCE_URI)){
 				result = super.get(Identifiers.DOC_ID);
 			}
-			else if (key.equals(SpecialKeys.FALLBACKED_LABEL)){
+			else if (key.equals(SpecialKeys.RESOURCE_LABEL)){
 				result = super.get(Identifiers.DC_TITLE);
 				if (deepEmpty(result))
 					result = super.get(Identifiers.RDFS_LABEL);
@@ -93,8 +90,6 @@ public class ResourceDTO extends HashMap<String,List<String>>{
 						result = null;
 				}
 			}
-			else if (Md5Map.hasKey(key))
-				result = super.get(Md5Map.getValue(key));
 			else
 				result = super.get(key);
 		}
@@ -133,10 +128,44 @@ public class ResourceDTO extends HashMap<String,List<String>>{
 	 * 
 	 * @return
 	 */
-	public String getFallbackedLabel(){
-		return getValue(SpecialKeys.FALLBACKED_LABEL);
+	public String getLabel(){
+		return getValue(SpecialKeys.RESOURCE_LABEL);
 	}
 	
+	/**
+	 * 
+	 * @param key
+	 * @return
+	 */
+	public List<String> getDistinctLiteralValues(String key){
+		return asDistinctLiteralValues(get(key));
+	}
+	
+	/**
+	 * 
+	 * @param list
+	 * @return
+	 */
+	public static List<String> asDistinctLiteralValues(List list){
+		
+		if (list==null || list.isEmpty())
+			return list;
+		
+		// first we pick out only literals (using HashSet ensures we get only distinct ones)
+		HashSet set = new HashSet();
+		for (int i=0; i<list.size(); i++){
+			String s = list.get(i).toString();
+			if (!URLUtil.isURL(s))
+				set.add(s);
+		}
+		
+		// if no distinct literals were found at all, return the list as it was given
+		if (set.isEmpty())
+			return list;
+		
+		return new ArrayList<String>(set);
+	}
+
 	/**
 	 * 
 	 * @param list

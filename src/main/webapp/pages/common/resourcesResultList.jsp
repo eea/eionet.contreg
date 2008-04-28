@@ -8,7 +8,7 @@
 				<display:table name="${actionBean.resultList}" class="${tableClass}" pagesize="${(pageSize==null || empty pageSize) ? 20 : pageSize}" requestURI="${actionBean.urlBinding}?reload=true" id="resultListItem" htmlId="resourcesResultList" sort="list">
 					<display:setProperty name="paging.banner.items_name" value="resources"/>
 					<c:forEach var="col" items="${actionBean.columns}">
-						<display:column property="${col.propertyKey}" title="${col.title}" sortable="${col.sortable}"/>
+						<display:column property="${col.propertyKey}" title="${col.title}" sortable="${col.sortable}" decorator="eionet.cr.web.util.search.ResourceDTOColumnDecorator"/>
 					</c:forEach>
 					<display:column>
 						<stripes:link href="/factsheet.action">
