@@ -8,7 +8,12 @@
 	
         <h1>Simple search</h1>
         
-        <p>Here we should have some sort of text explaining how to formulate your search expression...</p>
+        <p>
+        	This page enables you to find content by case-insensitive text in any metadata element. For example:<br/>
+        	to search for content that contains words "air" <strong>or</strong> "soil", enter <span class="searchExprSample">air soil</span>.
+        	To search for content that contains words "air" <strong>and</strong> "soil", enter <span class="searchExprSample">air AND soil</span>.
+        	Entering <span class="searchExprSample">"air pollution"</span> will search for the exact phrase "air pollution".
+        </p>
 	    
 	    <stripes:form action="/simpleSearch.action" method="get" focus="searchExpression" style="padding-bottom:20px">
 			

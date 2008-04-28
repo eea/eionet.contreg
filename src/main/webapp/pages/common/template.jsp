@@ -72,7 +72,7 @@
                     		<div class="breadcrumbitemlast">Content Registry</div>
 						</c:when>
 						<c:otherwise>
-							<div class="breadcrumbitem"><a href='index.jsp'>Content Registry</a></div>
+							<div class="breadcrumbitem"><a href="${pageContext.request.contextPath}/pages/index.jsp">Content Registry</a></div>
  							<div class="breadcrumbitemlast">${fn:escapeXml(pageTitle)}</div>
 						</c:otherwise>
 					</c:choose>

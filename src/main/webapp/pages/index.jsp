@@ -13,19 +13,15 @@
 	    content of services in Eionet, based on their metadata.
 	    Not all of the Eionet services are included, only those
 	    that have been specified by the administrators of
-	    this site. CR uses the <a href="dcmes.jsp" onclick="pop(this.href);return false;">DublinCore Metadata Element Set</a>
-	    to describe the content, but it also keeps track of Eionet specific metadata elements.
+	    this site. CR uses the <a href="http://dublincore.org/documents/dces/" onclick="pop(this.href);return false;">DublinCore's metadata elements</a>
+	    to describe the content, but also keeps track of Eionet-specific metadata.
 	    </p>
 	    <h2>Simple search</h2>
 	    <p>
-	    To quickly find content by text in any metadata element, you can start
-	    right here by using the text input below. You can choose between free
-	    text search, exact search and substring search. For free text search,
-	    the words have to be at least 3 letters in length. Note that substring
-	    search is usually the slowest of the three.
+	    To quickly find content by text in any metadata element, you can start right here by using the text input below.
 	    </p>
 	    
-	    <stripes:form action="/simpleSearch.action" method="get" focus="searchExpression" style="padding-bottom:20px">
+	    <stripes:form name="searchForm" action="/simpleSearch.action" method="get" focus="searchExpression" style="padding-bottom:20px">
 			
 	    	<stripes:label for="expressionText">Expression:</stripes:label>
 	    	<stripes:text name="searchExpression" id="expressionText" size="30"/>
@@ -33,39 +29,31 @@
 	    	
 	    </stripes:form>
 	    
-	    <h2>Further searches and login</h2>
+	    <h2>Further searches and administrative functions</h2>
 		<p>
 	    On the left of the screen you can choose between different search cases:
 	    </p>
 	    <ul>
-	        <li>
-	            <a href="/cr/dataflowSearch.action">Dataflow search</a>
+	    	<li>
+	            <a href="/cr/simpleSearch.action">Simple search</a><br/>
+	            is the same quick-find search that is also displayed above.
 	        </li>
 	        <li>
-	            <a href="/cr/customSearch.action">Custom search</a>
+	            <a href="/cr/dataflowSearch.action">Dataflow search</a><br/>
+	            is meant for dataflow managers to observe specific dataflows in the dimensions of country and year.
 	        </li>
 	        <li>
-	            <a href="/cr/simpleSearch.action">Simple search</a>
+	            <a href="/cr/customSearch.action">Custom search</a><br/>
+	            enables you to choose the criteria you want to search by and offers picklists of existing values too.
 	        </li>
-	        <li>
-	            <a href="/cr/recentUploads.action">Recent uploads</a>
+			<li>
+	            <a href="/cr/recentUploads.action">Recent uploads</a><br/>
+	            displays the latest content that CR has discovered, classified by certain content types.
 	        </li>
 	    </ul>
 	    <p>
-	    There's more help on each search case when you go
-	    there. Generally, <a href="/cr/dataflowSearch.action">Dataflow
-	    search</a> is meant for dataflow managers to observe
-	    specific dataflows in the dimensions of country and year.
-	    <a href="/cr/customSearch.action">Custom search</a> is for
-	    those more familiar with the DublinCore Metadata Elements,
-	    while <a href="/cr/simpleSearch.action">Simple search</a>
-	    represents the same quick-find search displayed above.
-	    <br/> Administrators can use additional functions that
-	    will appear on the left of the screen after logging in
-	    by clicking the Login button on the left.  Those functions will enable to
-	    administrate the Harvester which is the process running
-	    in the background, harvesting the metadata from specified
-	    Eionet services.
+	    Administrators can use additional functions that will appear on the left of the screen after logging in. These will enable to administrate the <em>Harvester</em> which is the process that
+	    runs in the background and harvests the metadata from specified Eionet services.
 	    </p>
 	
 	    <h2>Support</h2>
