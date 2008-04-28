@@ -40,6 +40,10 @@ public class SubPropertiesLoader implements AllDocsWalkerListener {
 	 * @see eionet.cr.index.walk.AllDocsWalkerListener#done()
 	 */
 	public void done() {
+		
 		logger.debug(countLoaded + " sub-properties loaded for " + SubProperties.getCount() + " resources");
+		
+		// we "artifically" force DublinCore's Title to be a sub-property of RDF Schema's Label, because we simply want to :) 
+		SubProperties.addSubProperty(Identifiers.RDFS_LABEL, Identifiers.DC_TITLE);
 	}
 }

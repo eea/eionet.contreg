@@ -27,7 +27,7 @@ public class SubProperties extends HashMap<String,HashSet<String>>{
 	/**
 	 * 
 	 */
-	private SubProperties(){
+	public SubProperties(){
 		super();
 	}
 	

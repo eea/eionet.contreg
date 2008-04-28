@@ -34,6 +34,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 	
 	/** */
 	private static final String SELECTED_FILTERS_SESSION_ATTR_NAME = CustomSearchActionBean.class + ".selectedFilters";
+	private static final String RESULT_LIST_SESSION_ATTR_NAME = CustomSearchActionBean.class + ".resultList";
 	
 	/** */
 	private static final String SELECTED_VALUE_PREFIX = "value_";
@@ -63,8 +64,11 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 			populateSelectedFilters();
 			getSelectedFilters().remove(getRemovedFilter());
 		}
-		else
-			getContext().getRequest().getSession().removeAttribute(SELECTED_FILTERS_SESSION_ATTR_NAME);
+		else{
+			HttpSession session = getContext().getRequest().getSession();
+			session.removeAttribute(RESULT_LIST_SESSION_ATTR_NAME);
+			session.removeAttribute(SELECTED_FILTERS_SESSION_ATTR_NAME);
+		}
 		
 		return new ForwardResolution(ASSOCIATED_JSP);
 	}
@@ -78,9 +82,18 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 		
 		populateSelectedFilters();
 		
-		resultList = SearchResultRow.convert(Searcher.customSearch(buildSearchCriteria(), true));
+		getContext().getRequest().getSession().setAttribute(RESULT_LIST_SESSION_ATTR_NAME,
+				SearchResultRow.convert(Searcher.customSearch(buildSearchCriteria(), true))); 
 		
 		return new ForwardResolution(ASSOCIATED_JSP);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.web.action.AbstractSearchActionBean#getResultList()
+	 */
+	public List<SearchResultRow> getResultList() {
+		return (List<SearchResultRow>)getContext().getRequest().getSession().getAttribute(RESULT_LIST_SESSION_ATTR_NAME);
 	}
 	
 	/**
@@ -192,6 +205,13 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 			list.add(filter);
 
 			filter = new CustomSearchFilter();
+			filter.setUri(Identifiers.DC_SUBJECT);
+			filter.setTitle("Subject");
+			filter.setDescription("");
+			filter.setProvideValues(true);
+			list.add(filter);
+
+			filter = new CustomSearchFilter();
 			filter.setUri(Identifiers.DC_COVERAGE);
 			filter.setTitle("Coverage");
 			filter.setDescription("");
@@ -199,12 +219,75 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 			list.add(filter);
 
 			filter = new CustomSearchFilter();
-			filter.setUri(Identifiers.DC_SUBJECT);
-			filter.setTitle("Subject");
+			filter.setUri(Identifiers.ROD_OBLIGATION_PROPERTY);
+			filter.setTitle("Dataflow");
 			filter.setDescription("");
 			filter.setProvideValues(true);
 			list.add(filter);
-			
+
+			filter = new CustomSearchFilter();
+			filter.setUri(Identifiers.ROD_LOCALITY_PROPERTY);
+			filter.setTitle("Locality");
+			filter.setDescription("");
+			filter.setProvideValues(true);
+			list.add(filter);
+
+			filter = new CustomSearchFilter();
+			filter.setUri(Identifiers.ROD_ISSUE_PROPERTY);
+			filter.setTitle("Issue");
+			filter.setDescription("");
+			filter.setProvideValues(true);
+			list.add(filter);
+
+			filter = new CustomSearchFilter();
+			filter.setUri(Identifiers.ROD_INSTRUMENT_PROPERTY);
+			filter.setTitle("Instrument");
+			filter.setDescription("");
+			filter.setProvideValues(true);
+			list.add(filter);
+
+			filter = new CustomSearchFilter();
+			filter.setUri(Identifiers.DC_CREATOR);
+			filter.setTitle("Creator");
+			filter.setDescription("");
+			filter.setProvideValues(true);
+			list.add(filter);
+
+			filter = new CustomSearchFilter();
+			filter.setUri(Identifiers.DC_DESCRIPTION);
+			filter.setTitle("Description");
+			filter.setDescription("Abstract description of content");
+			filter.setProvideValues(false);
+			list.add(filter);
+
+			filter = new CustomSearchFilter();
+			filter.setUri(Identifiers.DC_PUBLISHER);
+			filter.setTitle("Publisher");
+			filter.setDescription("");
+			filter.setProvideValues(true);
+			list.add(filter);
+
+			filter = new CustomSearchFilter();
+			filter.setUri(Identifiers.DC_CONTRIBUTOR);
+			filter.setTitle("Contributor");
+			filter.setDescription("");
+			filter.setProvideValues(true);
+			list.add(filter);
+
+			filter = new CustomSearchFilter();
+			filter.setUri(Identifiers.DC_RELATION);
+			filter.setTitle("Relation");
+			filter.setDescription("Url to a related resource");
+			filter.setProvideValues(false);
+			list.add(filter);
+
+			filter = new CustomSearchFilter();
+			filter.setUri(Identifiers.DC_LANGUAGE);
+			filter.setTitle("Language");
+			filter.setDescription("");
+			filter.setProvideValues(true);
+			list.add(filter);
+
 			availableFilters = new LinkedHashMap<String,CustomSearchFilter>();
 			for (int i=0; i<list.size(); i++)
 				availableFilters.put(String.valueOf(i+1), list.get(i));

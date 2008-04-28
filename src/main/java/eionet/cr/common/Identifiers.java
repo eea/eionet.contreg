@@ -23,6 +23,12 @@ public interface Identifiers {
 	public static final String DC_IDENTIFIER = "http://purl.org/dc/elements/1.1/identifier";
 	public static final String DC_SOURCE = "http://purl.org/dc/elements/1.1/source";
 	public static final String DC_SUBJECT = "http://purl.org/dc/elements/1.1/subject";
+	public static final String DC_CREATOR = "http://purl.org/dc/elements/1.1/creator";
+	public static final String DC_DESCRIPTION = "http://purl.org/dc/elements/1.1/description";
+	public static final String DC_PUBLISHER = "http://purl.org/dc/elements/1.1/publisher";
+	public static final String DC_CONTRIBUTOR = "http://purl.org/dc/elements/1.1/contributor";
+	public static final String DC_RELATION = "http://purl.org/dc/elements/1.1/relation";
+	public static final String DC_LANGUAGE = "http://purl.org/dc/elements/1.1/language";
 	
 	public static final String RSS_ITEM_CLASS = "http://purl.org/rss/1.0/Item";
 	

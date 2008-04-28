@@ -61,7 +61,7 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean {
     }
     
     @ValidationMethod(on="search")
-    public void avoidDivideByZero(ValidationErrors errors) {
+    public void validateSearch(ValidationErrors errors) {
         if (this.searchExpression == null || this.searchExpression.equals("")) {
             handleCrException(getBundle().getString("search.field.empty"), GeneralConfig.SEVERITY_CAUTION);
         }

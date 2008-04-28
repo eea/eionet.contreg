@@ -18,7 +18,7 @@
         
 		    	<div id="filterSelectionArea" style="margin-top:20px">
 		    	
-		    		<stripes:form name="customSearchForm" action="/customSearch.action" method="get" id="customSearchForm">
+		    		<stripes:form name="customSearchForm" action="/customSearch.action" method="get" id="customSearchForm" acceptcharset="UTF-8">
 		    		
 		    			<c:if test="${fn:length(actionBean.selectedFilters)<fn:length(actionBean.availableFilters)}">
 			    			<stripes:select name="addedFilter" id="filterSelect">
@@ -71,7 +71,7 @@
 			    			<stripes:submit name="search" value="Search"/>
 		    			</c:if>
 		    			
-		    			<c:if test="${not empty param.search}">
+		    			<c:if test="${(actionBean.resultList!=null && fn:length(actionBean.resultList)>0) || not empty param.search}">
 				    		<stripes:layout-render name="/pages/common/resourcesResultList.jsp" tableClass="sortable"/>
 				    	</c:if>
 	    				

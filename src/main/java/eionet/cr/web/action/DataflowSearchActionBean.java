@@ -6,6 +6,8 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Set;
 
+import javax.servlet.http.HttpSession;
+
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.queryParser.ParseException;
 
@@ -30,6 +32,9 @@ import net.sourceforge.stripes.action.UrlBinding;
 @UrlBinding("/dataflowSearch.action")
 public class DataflowSearchActionBean extends AbstractSearchActionBean{
 	
+	private static final String DATAFLOWS_SESSION_ATTR_NAME = DataflowSearchActionBean.class + ".dataflows";
+	private static final String LOCALITIES_SESSION_ATTR_NAME = DataflowSearchActionBean.class + ".localities";
+	
 	/** */
 	private List<RodInstrumentDTO> instrumentsObligations;
 	private Set<String> localities;
@@ -48,10 +53,18 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean{
 	 */
 	@DefaultHandler
 	public Resolution init() throws SearchException{
-		
-		instrumentsObligations = Searcher.getDataflowsGroupedByInstruments();
-		localities = Searcher.getLiteralFieldValues(Identifiers.ROD_LOCALITY_PROPERTY);
+		loadOptions();
 		return new ForwardResolution("/pages/dataflowSearch.jsp");
+	}
+
+	/**
+	 * @throws SearchException 
+	 * 
+	 */
+	private void loadOptions() throws SearchException{
+		HttpSession session = this.getContext().getRequest().getSession();
+		session.setAttribute(DATAFLOWS_SESSION_ATTR_NAME, Searcher.getDataflowsGroupedByInstruments());
+		session.setAttribute(LOCALITIES_SESSION_ATTR_NAME, Searcher.getLiteralFieldValues(Identifiers.ROD_LOCALITY_PROPERTY));
 	}
 	
 	/**
@@ -60,23 +73,22 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean{
 	 * @throws SearchException 
 	 */
 	public Resolution search() throws SearchException{
-		
 		resultList = SearchResultRow.convert(Searcher.dataflowSearch(dataflow, locality, year));
-		return new ForwardResolution("/pages/dataflowSearchResults.jsp");
+		return new ForwardResolution("/pages/dataflowSearch.jsp");
 	}
 
 	/**
 	 * @return the instrumentsObligations
 	 */
 	public List<RodInstrumentDTO> getInstrumentsObligations() {
-		return instrumentsObligations;
+		return (List<RodInstrumentDTO>) getContext().getRequest().getSession().getAttribute(DATAFLOWS_SESSION_ATTR_NAME);
 	}
 
 	/**
 	 * @return the countries
 	 */
 	public Set<String> getLocalities() {
-		return localities;
+		return (Set<String>) getContext().getRequest().getSession().getAttribute(LOCALITIES_SESSION_ATTR_NAME);
 	}
 
 	/**
