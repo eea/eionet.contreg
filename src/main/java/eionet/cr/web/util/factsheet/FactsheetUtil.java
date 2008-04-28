@@ -7,7 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import eionet.cr.common.Identifiers;
-import eionet.cr.common.ResourceMap;
+import eionet.cr.common.ResourceDTO;
 import eionet.cr.index.EncodingSchemes;
 import eionet.cr.util.URLUtil;
 
@@ -25,7 +25,7 @@ public class FactsheetUtil {
 	 * 
 	 * @return
 	 */
-	public static List<ResourcePropertyDTO> getPropertiesForFactsheet(ResourceMap resource){
+	public static List<ResourcePropertyDTO> getPropertiesForFactsheet(ResourceDTO resource){
 	
 		if (resource==null)
 			return null;

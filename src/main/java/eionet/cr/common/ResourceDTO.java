@@ -20,7 +20,7 @@ import eionet.cr.web.util.factsheet.ResourcePropertyValueDTO;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class ResourceMap extends HashMap<String,List<String>>{
+public class ResourceDTO extends HashMap<String,List<String>>{
 	
 	/**
 	 */
@@ -34,7 +34,7 @@ public class ResourceMap extends HashMap<String,List<String>>{
 	/**
 	 * 
 	 */
-	public ResourceMap(){
+	public ResourceDTO(){
 		super();
 	}
 
@@ -42,7 +42,7 @@ public class ResourceMap extends HashMap<String,List<String>>{
 	 * 
 	 * @param luceneDocument
 	 */
-	public ResourceMap(Document luceneDocument){
+	public ResourceDTO(Document luceneDocument){
 		
 		if (luceneDocument==null)
 			return;

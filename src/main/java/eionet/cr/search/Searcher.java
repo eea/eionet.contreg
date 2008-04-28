@@ -44,7 +44,7 @@ import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.TermQuery;
 
 import eionet.cr.common.Identifiers;
-import eionet.cr.common.ResourceMap;
+import eionet.cr.common.ResourceDTO;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.index.EncodingSchemes;
 import eionet.cr.index.Indexer;
@@ -428,7 +428,7 @@ public class Searcher {
 	 * @return
 	 * @throws SearchException 
 	 */
-	public static ResourceMap getResourceByUri(String uri) throws SearchException{
+	public static ResourceDTO getResourceByUri(String uri) throws SearchException{
 		
 		if (uri==null || uri.trim().length()==0)
 			return null;
@@ -440,7 +440,7 @@ public class Searcher {
 			if (hits==null || hits.length()==0)
 				return null;
 			else
-				return new ResourceMap(hits.doc(0));
+				return new ResourceDTO(hits.doc(0));
 		}
 		catch (Exception e){
 			throw new SearchException(e.toString(), e);
