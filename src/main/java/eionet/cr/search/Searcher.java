@@ -54,10 +54,10 @@ import eionet.cr.index.walk.EncodingSchemesLoader;
 import eionet.cr.index.walk.SubPropertiesLoader;
 import eionet.cr.search.util.HitsCollector;
 import eionet.cr.search.util.SearchUtil;
-import eionet.cr.search.util.SimpleSearchExpression;
 import eionet.cr.search.util.dataflow.RodInstrumentDTO;
 import eionet.cr.search.util.dataflow.RodObligationDTO;
 import eionet.cr.util.FirstSeenTimestamp;
+import eionet.cr.util.URIUtil;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
 
@@ -93,17 +93,25 @@ public class Searcher {
 	 * @throws ParseException
 	 * @throws IOException
 	 */
-	public static List<ResourceDTO> simpleSearch(String searchExpression) throws SearchException{
+	public static List<ResourceDTO> simpleSearch(String expression) throws SearchException{
 		
-		if (searchExpression==null || searchExpression.trim().length()==0)
+		if (expression==null || expression.trim().length()==0)
 			return null;
+		else
+			expression = expression.trim();
 		
+		Query query = null;
 		IndexSearcher indexSearcher = null;
-		SimpleSearchExpression expressionObject = new SimpleSearchExpression(searchExpression);
-		QueryParser parser = new QueryParser(DEFAULT_FIELD, expressionObject.getAnalyzer());
 		try{
+			if (URIUtil.isURI(expression.trim()))
+				query = new TermQuery(new Term(Identifiers.DOC_ID, expression));
+			else{
+				QueryParser parser = new QueryParser(DEFAULT_FIELD, Indexer.getAnalyzer());
+				query = parser.parse(Util.luceneEscape(expression));
+			}
+					
 			indexSearcher = getIndexSearcher();
-			return HitsCollector.collectResourceDTOs(indexSearcher.search(parser.parse(expressionObject.toLuceneQueryString())));
+			return HitsCollector.collectResourceDTOs(indexSearcher.search(query));
 		}
 		catch (Exception e){
 			throw new SearchException(e.toString(), e);
@@ -165,7 +173,7 @@ public class Searcher {
 		try{
 			indexSearcher = getIndexSearcher();
 			Hits hits = indexSearcher.search(queryObj);
-			return SearchUtil.collectMaps(hits);
+			return HitsCollector.collectMaps(hits);
 		}
 		finally{
 			try{
@@ -266,14 +274,14 @@ public class Searcher {
 		try{
 			if (!Util.isNullOrEmpty(locality)){
 				QueryParser parser = new QueryParser(DEFAULT_FIELD, Indexer.getAnalyzer());
-				StringBuffer qryBuf = new StringBuffer(Util.escapeForLuceneQuery(Identifiers.ROD_LOCALITY_PROPERTY));
-				qryBuf.append(":\"").append(Util.escapeForLuceneQuery(locality)).append("\"");
+				StringBuffer qryBuf = new StringBuffer(Util.luceneEscape(Identifiers.ROD_LOCALITY_PROPERTY));
+				qryBuf.append(":\"").append(Util.luceneEscape(locality)).append("\"");
 				queries.add(parser.parse(qryBuf.toString()));
 			}
 			if (!Util.isNullOrEmpty(year)){
 				QueryParser parser = new QueryParser(DEFAULT_FIELD, Indexer.getAnalyzer());
-				StringBuffer qryBuf = new StringBuffer(Util.escapeForLuceneQuery(Identifiers.DC_COVERAGE));
-				qryBuf.append(":\"").append(Util.escapeForLuceneQuery(year)).append("\"");
+				StringBuffer qryBuf = new StringBuffer(Util.luceneEscape(Identifiers.DC_COVERAGE));
+				qryBuf.append(":\"").append(Util.luceneEscape(year)).append("\"");
 				queries.add(parser.parse(qryBuf.toString()));
 			}
 
@@ -308,8 +316,8 @@ public class Searcher {
 	 */
 	public static List<RodInstrumentDTO> getDataflowsGroupedByInstruments() throws SearchException{
 
-		StringBuffer qryBuf = new StringBuffer(Util.escapeForLuceneQuery(Identifiers.RDF_TYPE));
-		qryBuf.append(":\"").append(Util.escapeForLuceneQuery(Identifiers.ROD_OBLIGATION_CLASS)).append("\"");
+		StringBuffer qryBuf = new StringBuffer(Util.luceneEscape(Identifiers.RDF_TYPE));
+		qryBuf.append(":\"").append(Util.luceneEscape(Identifiers.ROD_OBLIGATION_CLASS)).append("\"");
 		
 		logger.debug("Performing search query: " + qryBuf.toString());
 		
@@ -536,12 +544,12 @@ public class Searcher {
 							query = new TermQuery(new Term(subProperty, propertyValueUnquoted));
 						}
 						else{
-							StringBuffer buf = new StringBuffer(Util.escapeForLuceneQuery(subProperty));
+							StringBuffer buf = new StringBuffer(Util.luceneEscape(subProperty));
 							buf.append(":");
 							if (propertyValueUnquoted.equals(propertyValue))
-								buf.append(Util.escapeForLuceneQuery(propertyValue));
+								buf.append(Util.luceneEscape(propertyValue));
 							else
-								buf.append("\"").append(Util.escapeForLuceneQuery(propertyValueUnquoted)).append("\"");
+								buf.append("\"").append(Util.luceneEscape(propertyValueUnquoted)).append("\"");
 							
 							query = queryParser.parse(buf.toString());
 						}

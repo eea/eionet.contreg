@@ -45,17 +45,6 @@ public class SearchUtil {
 	/**
 	 * 
 	 * @param hits
-	 * @return
-	 * @throws CorruptIndexException
-	 * @throws IOException
-	 */
-	public static List<Map<String,String[]>> collectMaps(Hits hits) throws CorruptIndexException, IOException{
-		return collectMaps(hits, HitsCollector.MAX_HITS);
-	}
-
-	/**
-	 * 
-	 * @param hits
 	 * @param maxResults
 	 * @return
 	 * @throws CorruptIndexException

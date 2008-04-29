@@ -47,7 +47,7 @@ public class SearcherXmlRpcImpl{
 				
 				String s = Identifiers.FIRST_SEEN_TIMESTAMP.replaceAll(":", "\\:");
 				
-				StringBuffer qryBuf = new StringBuffer(Util.escapeForLuceneQuery(Identifiers.FIRST_SEEN_TIMESTAMP));
+				StringBuffer qryBuf = new StringBuffer(Util.luceneEscape(Identifiers.FIRST_SEEN_TIMESTAMP));
 				qryBuf.append(":[").append(givenTimeSeconds).append(" TO ").append(curTimeSeconds).append("]");
 				try{
 					result = eionet.cr.search.Searcher.luceneQuery(qryBuf.toString());
@@ -127,7 +127,7 @@ public class SearcherXmlRpcImpl{
 							value = "\"" + value + "\"";
 						if (qryBuf.length()>0)
 							qryBuf.append(" AND ");
-						qryBuf.append(Util.escapeForLuceneQuery(key)).append(":").append(Util.escapeForLuceneQuery(value));
+						qryBuf.append(Util.luceneEscape(key)).append(":").append(Util.luceneEscape(value));
 						
 						try{
 							result = eionet.cr.search.Searcher.luceneQuery(qryBuf.toString());

@@ -218,7 +218,7 @@ public class Util {
      * @param str
      * @return
      */
-    public static String escapeForLuceneQuery(String str){
+    public static String luceneEscape(String str){
 		
         StringBuffer buf = new StringBuffer();
         for(int i=0; i<str.length(); i++){
