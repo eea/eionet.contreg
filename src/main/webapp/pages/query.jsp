@@ -30,7 +30,9 @@
 			<stripes:submit name="search" value="Query"/>
 		</stripes:form>
 		
-		<c:import url="/pages/queryHits.jsp"/>
+		<c:if test="${not empty param.search}">
+			<c:import url="/pages/queryHits.jsp"/>
+		</c:if>
 		
 	</stripes:layout-component>
 </stripes:layout-render>

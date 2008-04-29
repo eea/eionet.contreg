@@ -8,6 +8,7 @@ import com.tee.uit.security.AccessController;
 import com.tee.uit.security.SignOnException;
 
 import eionet.cr.harvest.Harvest;
+import eionet.cr.util.Util;
 
 /**
  * Class represents authenticated user.
@@ -50,14 +51,35 @@ public class CRUser {
 		this.userName = username;
 	}
 	
+	/**
+	 * 
+	 * @param aclPath
+	 * @param prm
+	 * @return
+	 */
 	public boolean hasPermission(String aclPath, String prm){
+		return hasPermission(userName, aclPath, prm);
+	}
+	
+	/**
+	 * 
+	 * @param userName
+	 * @param aclPath
+	 * @param prm
+	 * @return
+	 */
+	public static boolean hasPermission(String userName, String aclPath, String prm){
+
+		if (Util.isNullOrEmpty(userName) || Util.isNullOrEmpty(aclPath) || Util.isNullOrEmpty(prm))
+			return false;
 		
 		try{
 			AccessControlListIF acl = AccessController.getAcl(aclPath);
-			if (acl!=null) return acl.checkPermission(userName, prm);
+			if (acl!=null)
+				return acl.checkPermission(userName, prm);
 		}
 		catch (SignOnException soe){
-			logger.error(soe.toString(),soe);
+			logger.error(soe.toString(), soe);
 		}
 		
 		return false;

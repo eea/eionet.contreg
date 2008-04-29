@@ -2,7 +2,7 @@
 
 <%@page import="java.util.*" %>
 <%@page import="java.io.*" %>
-<%@page import="eionet.cr.util.Util" %>
+<%@page import="eionet.cr.util.URLUtil" %>
 <%@page import="eionet.cr.search.Searcher" %>
 <%@page import="eionet.cr.index.EncodingSchemes" %>
 <%@page import="eionet.cr.common.Identifiers" %>
@@ -14,13 +14,7 @@
 	"http://purl.org/dc/elements/1.1/date",
 	"http://purl.org/dc/elements/1.1/language"
 };
-
-static final String[] analyzers = {
-	"org.apache.lucene.analysis.standard.StandardAnalyzer",
-	"org.apache.lucene.analysis.WhitespaceAnalyzer",
-	"org.apache.lucene.analysis.SimpleAnalyzer",
-	"org.apache.lucene.analysis.StopAnalyzer"
-};%>
+%>
 
 <%@ include file="/pages/common/taglibs.jsp"%>	
 
@@ -51,7 +45,7 @@ static final String[] analyzers = {
 									<tr>
 										<td style="background-color:#CCFFFF"><%=fieldNameDisplay%></td>
 										<%
-										if (Util.isURL(fieldValues[k])){
+										if (URLUtil.isURL(fieldValues[k])){
 											%>
 											<td><a target="_blank" href="<%=fieldValues[k]%>"><%=fieldValues[k]%></a></td><%
 										}
@@ -77,7 +71,7 @@ static final String[] analyzers = {
 										<tr>
 											<td style="background-color:#CCFFFF"><%=fieldNameDisplay%></td>
 											<%
-											if (Util.isURL(fieldValues[k])){
+											if (URLUtil.isURL(fieldValues[k])){
 												%>
 												<td><a target="_blank" href="<%=fieldValues[k]%>"><%=fieldValues[k]%></a></td><%
 											}

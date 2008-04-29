@@ -3,6 +3,7 @@ package eionet.cr.web.util;
 import java.util.StringTokenizer;
 
 import eionet.cr.util.Util;
+import eionet.cr.web.security.CRUser;
 
 /**
  * 
@@ -62,5 +63,16 @@ public class JstlFunctions {
 			return str;
 		else
 			return "\"" + str + "\"";
+	}
+
+	/**
+	 * 
+	 * @param userName
+	 * @param aclName
+	 * @param permission
+	 * @return
+	 */
+	public static boolean hasPermission(java.lang.String userName, java.lang.String aclName, java.lang.String permission){
+		return CRUser.hasPermission(userName, aclName, permission);
 	}
 }

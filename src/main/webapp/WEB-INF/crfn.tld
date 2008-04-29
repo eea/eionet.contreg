@@ -33,5 +33,19 @@
 			${addQuotesIfWhitespaceInside(someString)}
 		</example>
 	</function>
+
+	<function>
+		<description>
+			Checks if the given user has the given permission in the given acl.
+			The 1st input string is the user name, the 2nd is the acl name and the 3rd is the permission identifier.
+			If any of the three is null or zero length, returns false.
+	 	</description>
+		<name>hasPermission</name>
+		<function-class>eionet.cr.web.util.JstlFunctions</function-class>
+		<function-signature>boolean hasPermission(java.lang.String, java.lang.String, java.lang.String)</function-signature>
+		<example>
+			${hasPermission("roug", "/", "u")}
+		</example>
+	</function>
 	
 </taglib>

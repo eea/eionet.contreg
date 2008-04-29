@@ -586,45 +586,6 @@ public class Searcher {
 		}
 	}
 	
-	public static void testThis() throws SearchException{
-		
-		System.out.println("start");
-		
-		String indexLocation = GeneralConfig.getProperty(GeneralConfig.LUCENE_INDEX_LOCATION);
-		IndexReader indexReader = null;
-		try{			
-			if (IndexReader.indexExists(indexLocation)){
-				indexReader = IndexReader.open(indexLocation);
-				
-				TermEnum terms = indexReader.terms(new Term("http://purl.org/dc/elements/1.1/title", ""));
-				do{
-					Term currentTerm = terms.term();
-					if (currentTerm!=null && currentTerm.field().equals("http://purl.org/dc/elements/1.1/title")){
-						String text = currentTerm.text();
-						//if (text.toLowerCase().indexOf("russian")>=0)
-							System.out.println(text);
-					}
-				}
-				while (terms.next()==true);
-			}
-			else{
-				logger.info("Index does not exist at " + indexLocation);
-			}
-			
-		}
-		catch (Exception e){
-			throw new SearchException(e.toString(), e);
-		}
-		finally{
-			try{
-				if (indexReader!=null) indexReader.close();
-			}
-			catch (Exception e){
-				logger.error("Failed to close index reader: " + e.toString(), e);
-			}
-		}
-	}
-	
 	/**
 	 * 
 	 * @param args
@@ -632,29 +593,7 @@ public class Searcher {
 	public static void main(String[] args){
 		
 		try {
-			Searcher.testThis();
-			//List<Map<String,String[]>> results = Searcher.getRecentByRdfType("http://www.eionet.eu.int/gemet/2004/06/gemet-schema.rdf#Group", 20);
-			
-//			HashMap<String,String> criteria = new HashMap<String,String>();
-//			criteria.put(Identifiers.RDFS_LABEL, "submission");
-//			criteria.put(Identifiers.ROD_INSTRUMENT_PROPERTY, "\"ospar convention\"");
-//			
-//			List<Map<String,String[]>> results = Searcher.customSearch(criteria);
-//			
-//			System.out.println();
-//			System.out.println(results==null ? "results==null" : "results size = " + results.size());
-//			System.out.println();
-//			for (int j=0; j<results.size(); j++){
-//				Map<String,String[]> map = results.get(j);
-//				for (Iterator<String> i=map.keySet().iterator(); i.hasNext();){
-//					String key = i.next();
-//					String value = Arrays.deepToString(map.get(key));
-//					System.out.println(key + " = " + value);
-//				}
-//				System.out.println();
-//				System.out.println("====================================================");
-//				System.out.println();
-//			}
+			System.out.println();
 		}
 		catch (Throwable t) {
 			t.printStackTrace();
