@@ -199,7 +199,7 @@ public class CustomSearchActionBean extends SearchResourcesActionBean{
 
 			filter = new CustomSearchFilter();
 			filter.setUri(Identifiers.RDFS_LABEL);
-			filter.setTitle("Label");
+			filter.setTitle("Title");
 			filter.setDescription("");
 			filter.setProvideValues(false);
 			list.add(filter);

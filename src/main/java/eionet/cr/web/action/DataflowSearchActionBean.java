@@ -162,8 +162,8 @@ public class DataflowSearchActionBean extends SearchResourcesActionBean{
 		ArrayList<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
 		
 		SearchResultColumn col = new SearchResultColumn();
-		col.setProperty(ResourceDTO.SpecialKeys.RESOURCE_LABEL);
-		col.setTitle("Label");
+		col.setProperty(ResourceDTO.SpecialKeys.RESOURCE_TITLE);
+		col.setTitle("Title");
 		col.setSortable(true);
 		list.add(col);
 		

@@ -72,8 +72,8 @@ public abstract class SearchResourcesActionBean extends AbstractCRActionBean{
 		list.add(col);
 		
 		col = new SearchResultColumn();
-		col.setProperty(ResourceDTO.SpecialKeys.RESOURCE_LABEL);
-		col.setTitle("Label");
+		col.setProperty(ResourceDTO.SpecialKeys.RESOURCE_TITLE);
+		col.setTitle("Title");
 		col.setSortable(true);
 		list.add(col);
 

@@ -146,8 +146,8 @@ public class RecentUploadsActionBean extends SearchResourcesActionBean {
 			// columns for deliveries
 			List<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
 			SearchResultColumn col = new SearchResultColumn();
-			col.setProperty(ResourceDTO.SpecialKeys.RESOURCE_LABEL);
-			col.setTitle("Label");
+			col.setProperty(ResourceDTO.SpecialKeys.RESOURCE_TITLE);
+			col.setTitle("Title");
 			col.setSortable(false);
 			list.add(col);
 
@@ -174,8 +174,8 @@ public class RecentUploadsActionBean extends SearchResourcesActionBean {
 			// columns for obligations
 			list = new ArrayList<SearchResultColumn>();
 			col = new SearchResultColumn();
-			col.setProperty(ResourceDTO.SpecialKeys.RESOURCE_LABEL);
-			col.setTitle("Label");
+			col.setProperty(ResourceDTO.SpecialKeys.RESOURCE_TITLE);
+			col.setTitle("Title");
 			col.setSortable(false);
 			list.add(col);
 
@@ -196,8 +196,8 @@ public class RecentUploadsActionBean extends SearchResourcesActionBean {
 			// columns for full reports
 			list = new ArrayList<SearchResultColumn>();
 			col = new SearchResultColumn();
-			col.setProperty(ResourceDTO.SpecialKeys.RESOURCE_LABEL);
-			col.setTitle("Label");
+			col.setProperty(ResourceDTO.SpecialKeys.RESOURCE_TITLE);
+			col.setTitle("Title");
 			col.setSortable(false);
 			list.add(col);
 
@@ -224,8 +224,8 @@ public class RecentUploadsActionBean extends SearchResourcesActionBean {
 			// columns for news releases
 			list = new ArrayList<SearchResultColumn>();
 			col = new SearchResultColumn();
-			col.setProperty(ResourceDTO.SpecialKeys.RESOURCE_LABEL);
-			col.setTitle("Label");
+			col.setProperty(ResourceDTO.SpecialKeys.RESOURCE_TITLE);
+			col.setTitle("Title");
 			col.setSortable(false);
 			list.add(col);
 

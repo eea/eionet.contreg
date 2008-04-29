@@ -85,7 +85,7 @@ public class SearcherXmlRpcImpl{
 					ResourceDTO resourceDTO = list.get(i);
 					
 					DataflowResultDto resultDTO = new DataflowResultDto();
-					resultDTO.setTitle(resourceDTO.getLabel());
+					resultDTO.setTitle(resourceDTO.getTitle());
 					resultDTO.setDataflow(
 							StringUtils.toArray(resourceDTO.getDistinctLiteralValues(Identifiers.ROD_OBLIGATION_PROPERTY)));
 					resultDTO.setLocality(

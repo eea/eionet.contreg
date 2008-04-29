@@ -28,7 +28,7 @@ public class ResourceDTO extends HashMap<String,List<String>>{
 		
 		public static final String RESOURCE_URI = "resourceUri";
 		public static final String RESOURCE_URL = "resourceUrl";
-		public static final String RESOURCE_LABEL = "resourceLabel";
+		public static final String RESOURCE_TITLE = "resourceTitle";
 	}
 	
 	/**
@@ -77,7 +77,7 @@ public class ResourceDTO extends HashMap<String,List<String>>{
 			if (key.equals(SpecialKeys.RESOURCE_URI)){
 				result = super.get(Identifiers.DOC_ID);
 			}
-			else if (key.equals(SpecialKeys.RESOURCE_LABEL)){
+			else if (key.equals(SpecialKeys.RESOURCE_TITLE)){
 				result = super.get(Identifiers.DC_TITLE);
 				if (deepEmpty(result))
 					result = super.get(Identifiers.RDFS_LABEL);
@@ -128,8 +128,8 @@ public class ResourceDTO extends HashMap<String,List<String>>{
 	 * 
 	 * @return
 	 */
-	public String getLabel(){
-		return getValue(SpecialKeys.RESOURCE_LABEL);
+	public String getTitle(){
+		return getValue(SpecialKeys.RESOURCE_TITLE);
 	}
 	
 	/**
