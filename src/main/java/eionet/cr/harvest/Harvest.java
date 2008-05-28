@@ -8,10 +8,15 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -20,16 +25,22 @@ import org.apache.lucene.document.FieldSelector;
 import org.apache.lucene.document.MapFieldSelector;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
+import org.xml.sax.SAXException;
 
 import com.hp.hpl.jena.rdf.arp.ARP;
 
 import eionet.cr.common.Identifiers;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
+import eionet.cr.harvest.util.HarvestSourceFile;
 import eionet.cr.harvest.util.RDFResource;
 import eionet.cr.index.IndexException;
 import eionet.cr.index.Indexer;
 import eionet.cr.search.Searcher;
+import eionet.cr.util.URLUtil;
+import eionet.cr.util.Util;
+import eionet.cr.util.xml.ConversionsParser;
+import eionet.cr.util.xml.XmlAnalysis;
 
 /**
  * 
@@ -418,5 +429,117 @@ public abstract class Harvest {
 		return sourceUrlString;
 	}
 	
-	protected java.util.Map<String,String[]>[] kala = null;
+	/**
+	 * 
+	 * @param file
+	 * @throws IOException 
+	 * @throws SAXException 
+	 * @throws ParserConfigurationException 
+	 * @throws HarvestException 
+	 */
+	private void preProcess(File file, String fromUrl) throws ParserConfigurationException, SAXException, IOException, HarvestException{
+
+		if (!Util.isValidXmlFile(file.getAbsolutePath()))
+			return;
+		
+		XmlAnalysis xmlAnalyzer = new XmlAnalysis();
+		xmlAnalyzer.parse(file);
+		
+		// if it's an RDF file, no further processing needed, so return
+		StringBuffer buf = new StringBuffer();
+		buf.append(xmlAnalyzer.getStartTagNamespace()).append(xmlAnalyzer.getStartTag());
+		if (buf.toString().equalsIgnoreCase(Identifiers.RDF_RDF))
+			return;
+		
+		// get schema uri, if it's not found then fall back to dtd 
+		String schemaOrDtd = xmlAnalyzer.getSchemaLocation();
+		if (schemaOrDtd==null || schemaOrDtd.length()==0){
+			schemaOrDtd = xmlAnalyzer.getSystemDtd();
+			if (schemaOrDtd==null || !URLUtil.isURL(schemaOrDtd)){
+				schemaOrDtd = xmlAnalyzer.getPublicDtd();
+			}
+		}
+		
+		if (schemaOrDtd!=null && schemaOrDtd.length()>0){
+			
+			String listConversionsUrl = GeneralConfig.getRequiredProperty(GeneralConfig.XMLCONV_LIST_CONVERSIONS_URL);
+			listConversionsUrl = MessageFormat.format(listConversionsUrl, Util.toArray(URLEncoder.encode(schemaOrDtd)));
+			
+			URL url = new URL(listConversionsUrl);
+			URLConnection httpConn = url.openConnection();
+			
+			InputStream inputStream = null;
+			try{
+				inputStream = httpConn.getInputStream();
+				ConversionsParser conversionsParser = new ConversionsParser();
+				conversionsParser.parse(inputStream);
+				String conversionId = conversionsParser.getRdfConversionId();
+				if (conversionId!=null && conversionId.length()>0){
+					
+					String convertUrl = GeneralConfig.getRequiredProperty(GeneralConfig.XMLCONV_CONVERT_URL);
+					Object[] args = new String[2];
+					args[0] = URLEncoder.encode(conversionId);
+					args[1] = URLEncoder.encode(fromUrl);
+					convertUrl = MessageFormat.format(convertUrl, args);
+					
+					File convertedFile = new File(file.getAbsolutePath() + ".converted");
+					downloadUrlToFile(convertUrl, convertedFile);
+					file.delete();
+					convertedFile.renameTo(file);
+				}
+			}
+			finally{
+				try{
+					if (inputStream!=null) inputStream.close();
+				}
+				catch (IOException e){}
+			}
+		}
+	}
+
+	/**
+	 * 
+	 * @param urlString
+	 * @param toFile
+	 * @throws HarvestException
+	 */
+	protected void downloadUrlToFile(String urlString, File toFile) throws HarvestException{
+		
+		PullHarvest.logger.debug("Downloading from URL: " + urlString);
+	
+		InputStream istream = null;
+		FileOutputStream fos = null;
+		try{
+			URL url = new URL(urlString);
+			URLConnection httpConn = url.openConnection();
+			
+			istream = httpConn.getInputStream();
+			fos = new FileOutputStream(toFile);
+	        
+	        int i = -1;
+	        byte[] bytes = new byte[1024];
+	
+	        while ((i = istream.read(bytes, 0, bytes.length)) != -1)
+	        	fos.write(bytes, 0, i);
+		}
+		catch (IOException e){
+			throw new HarvestException(e.toString(), e);
+		}
+		finally{
+			try{
+				logger.debug("Closing URL input stream: " + urlString);
+		        if (istream!=null) istream.close();
+			}
+			catch (IOException e){
+				logger.error("Failed to close URL input stream: " + e.toString(), e);
+			}
+			try{
+				logger.debug("Closing file output stream: " + toFile.getAbsolutePath());
+				if (fos!=null) fos.close();
+			}
+			catch (IOException e){
+				logger.error("Failed to close file output stream: " + e.toString(), e);
+			}
+		}
+	}
 }

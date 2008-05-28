@@ -30,7 +30,11 @@ public class GeneralConfig {
 	
 	/** */
 	public static final String DATASOURCE_NAME = "datasource.name";
-	
+
+	/** */
+	public static final String XMLCONV_LIST_CONVERSIONS_URL = "xmlconv.listConversions.url";
+	public static final String XMLCONV_CONVERT_URL = "xmlconv.convert.url";
+
 	/** */
 	public static final int SEVERITY_INFO = 1;
 	public static final int SEVERITY_CAUTION = 2;

@@ -1,6 +1,7 @@
 package eionet.cr.util;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -18,6 +19,7 @@ import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
@@ -32,6 +34,11 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 import javax.servlet.jsp.PageContext;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.xml.sax.SAXException;
 
 import eionet.cr.common.CRRuntimeException;
 import eionet.cr.common.Identifiers;
@@ -411,20 +418,6 @@ public class Util {
 
     /**
      * 
-     * @param args
-     */
-    public static void main(String[] args){
-    	try{
-			URI uri = new URI("jaanus:");
-			System.out.println(uri.isAbsolute());
-		}
-		catch (URISyntaxException e){
-			e.printStackTrace();
-		}
-    }
-
-    /**
-     * 
      * @param objects
      * @return
      */
@@ -441,5 +434,47 @@ public class Util {
 		}
 		
 		return buf.toString();
+	}
+
+	/**
+	 * 
+	 * @param fileFullPath
+	 * @return
+	 * @throws IOException
+	 * @throws ParserConfigurationException
+	 */
+	public static boolean isValidXmlFile(String fileFullPath) throws IOException, ParserConfigurationException{
+		
+		try {
+			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+			DocumentBuilder db = dbf.newDocumentBuilder();
+			db.parse(fileFullPath);
+		}
+		catch (SAXException e){
+			return false;
+		}
+		
+		return true;
+	}
+	
+	/**
+	 * 
+	 * @param o
+	 * @return
+	 */
+	public static Object[] toArray(Object o){
+		if (o==null)
+			return null;
+		else{
+			Object[] oo = new Object[1];
+			oo[0] = o;
+			return oo;
+		}
+	}
+	
+	public static void main(String[] args){
+		StringBuffer buf = new StringBuffer(null);
+		buf.append("1").append((String)null);
+		System.out.println(buf.toString());
 	}
 }
