@@ -37,6 +37,7 @@ import eionet.cr.harvest.util.RDFResource;
 import eionet.cr.index.IndexException;
 import eionet.cr.index.Indexer;
 import eionet.cr.search.Searcher;
+import eionet.cr.util.HttpUtil;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
 import eionet.cr.util.xml.ConversionsParser;
@@ -148,18 +149,18 @@ public abstract class Harvest {
 	 */
 	protected void harvestFile(File file) throws HarvestException{
 		
-		logger.debug("Parsing local file: " + file.getAbsolutePath());
-		
 		InputStreamReader reader = null;
-		RDFHandler rdfHandler = new RDFHandler(sourceUrlString);
-		try{			
+		try{
+			file = preProcess(file, sourceUrlString);
+			
+			RDFHandler rdfHandler = new RDFHandler(sourceUrlString);
 	        reader = new InputStreamReader(new FileInputStream(file));	        	        
 			ARP arp = new ARP();
 	        arp.setStatementHandler(rdfHandler);
 	        arp.setErrorHandler(rdfHandler);
 	        arp.load(reader, sourceUrlString);
 	        
-	        logger.debug(rdfHandler.getCountResources() + "collected from local file: " + file.getAbsolutePath());
+	        logger.debug(rdfHandler.getCountResources() + " collected from local file: " + file.getAbsolutePath());
 	        
 	        errors.addAll(rdfHandler.getErrors());
 	        warnings.addAll(rdfHandler.getWarnings());
@@ -435,28 +436,27 @@ public abstract class Harvest {
 	 * @throws IOException 
 	 * @throws SAXException 
 	 * @throws ParserConfigurationException 
-	 * @throws HarvestException 
 	 */
-	private void preProcess(File file, String fromUrl) throws ParserConfigurationException, SAXException, IOException, HarvestException{
+	protected static File preProcess(File file, String fromUrl) throws ParserConfigurationException, SAXException, IOException{
 
 		if (!Util.isValidXmlFile(file.getAbsolutePath()))
-			return;
+			return file;
 		
-		XmlAnalysis xmlAnalyzer = new XmlAnalysis();
-		xmlAnalyzer.parse(file);
+		XmlAnalysis xmlAnalysis = new XmlAnalysis();
+		xmlAnalysis.parse(file);
 		
 		// if it's an RDF file, no further processing needed, so return
 		StringBuffer buf = new StringBuffer();
-		buf.append(xmlAnalyzer.getStartTagNamespace()).append(xmlAnalyzer.getStartTag());
+		buf.append(xmlAnalysis.getStartTagNamespace()).append(xmlAnalysis.getStartTag());
 		if (buf.toString().equalsIgnoreCase(Identifiers.RDF_RDF))
-			return;
+			return file;
 		
 		// get schema uri, if it's not found then fall back to dtd 
-		String schemaOrDtd = xmlAnalyzer.getSchemaLocation();
+		String schemaOrDtd = xmlAnalysis.getSchemaLocation();
 		if (schemaOrDtd==null || schemaOrDtd.length()==0){
-			schemaOrDtd = xmlAnalyzer.getSystemDtd();
+			schemaOrDtd = xmlAnalysis.getSystemDtd();
 			if (schemaOrDtd==null || !URLUtil.isURL(schemaOrDtd)){
-				schemaOrDtd = xmlAnalyzer.getPublicDtd();
+				schemaOrDtd = xmlAnalysis.getPublicDtd();
 			}
 		}
 		
@@ -483,9 +483,8 @@ public abstract class Harvest {
 					convertUrl = MessageFormat.format(convertUrl, args);
 					
 					File convertedFile = new File(file.getAbsolutePath() + ".converted");
-					downloadUrlToFile(convertUrl, convertedFile);
-					file.delete();
-					convertedFile.renameTo(file);
+					HttpUtil.downloadUrlToFile(convertUrl, convertedFile);
+					return convertedFile;
 				}
 			}
 			finally{
@@ -495,6 +494,8 @@ public abstract class Harvest {
 				catch (IOException e){}
 			}
 		}
+		
+		return file;
 	}
 
 	/**
@@ -503,43 +504,4 @@ public abstract class Harvest {
 	 * @param toFile
 	 * @throws HarvestException
 	 */
-	protected void downloadUrlToFile(String urlString, File toFile) throws HarvestException{
-		
-		PullHarvest.logger.debug("Downloading from URL: " + urlString);
-	
-		InputStream istream = null;
-		FileOutputStream fos = null;
-		try{
-			URL url = new URL(urlString);
-			URLConnection httpConn = url.openConnection();
-			
-			istream = httpConn.getInputStream();
-			fos = new FileOutputStream(toFile);
-	        
-	        int i = -1;
-	        byte[] bytes = new byte[1024];
-	
-	        while ((i = istream.read(bytes, 0, bytes.length)) != -1)
-	        	fos.write(bytes, 0, i);
-		}
-		catch (IOException e){
-			throw new HarvestException(e.toString(), e);
-		}
-		finally{
-			try{
-				logger.debug("Closing URL input stream: " + urlString);
-		        if (istream!=null) istream.close();
-			}
-			catch (IOException e){
-				logger.error("Failed to close URL input stream: " + e.toString(), e);
-			}
-			try{
-				logger.debug("Closing file output stream: " + toFile.getAbsolutePath());
-				if (fos!=null) fos.close();
-			}
-			catch (IOException e){
-				logger.error("Failed to close file output stream: " + e.toString(), e);
-			}
-		}
-	}
 }

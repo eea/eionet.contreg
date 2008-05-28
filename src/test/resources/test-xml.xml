@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<habitat xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xml:lang="en" xmlns="" xsi:noNamespaceSchemaLocation="http://biodiversity.eionet.europa.eu/schemas/dir9243eec/habitats.xsd">
+  <member-state countrycode="BE" label="Member state">Belgium</member-state>
+  <habitatcode label="Habitat code">3130</habitatcode>
+  <habitatname label="Habitat name">3130 Oligotrophic to mesotrophic standing waters with vegetation of the Littorelletea uniflorae and/or of the Isoeto-Nanojuncetea</habitatname>
+  <regions label="Biogeographic regions and/or marine regions concerned within the member state">ATL CON</regions>
+  <regional label="2. Biogeographical or marine level">
+    <region desc="Atlantic" label="2.1 Biogeographic region or marine region">ATL</region>
+
+    <published label="2.2 Published sources and/or websites">www.inbo.be/natura2000/</published>
+    <range label="2.3 Range of the habitat type in the biogeographic region or marine region">
+      <surface-area label="2.3.1 Surface area of range in km2">3819</surface-area>
+      <date label="2.3.2 Date of range determination">1994-2006</date>
+      <quality label="2.3.3 Quality of data concerning range">Good</quality>
+      <trend label="2.3.4 Range trend">+</trend>
+
+      <trend-magnitude label="2.3.5 Range trend magnitude in km2 (optional)"/>
+      <trend-period label="2.3.6 Range trend period">1994-2006</trend-period>
+      <reasons label="2.3.7 Reasons for reported trend">DirectHuman</reasons>
+      <reasons-specify label="Other (specify)"/>
+    </range>
+    <coverage label="2.4 Area covered by habitat type in the biogeographic region or marine region">
+      <surface-area label="2.4.1 Surface area of the habitat type (km2)">4.58</surface-area>
+
+      <date label="2.4.2 Date of area estimation">1994-2006</date>
+      <method label="2.4.3 Method used for area estimation">GroundSurvey</method>
+      <quality label="2.4.4 Quality of data on area">Moderate</quality>
+      <trend label="2.4.5 Area trend">=</trend>
+      <trend-magnitude label="2.4.6 Area trend magnitude (km2)"/>
+      <trend-period label="2.4.7 Area trend period">1994-2006</trend-period>
+
+      <reasons label="2.4.8 Reasons for reported trend">ImprovedKnowledge</reasons>
+      <reasons-specify label="Other (specify)"/>
+      <justification label="2.4.9 Justification of % thresholds for trends (optional)"/>
+      <pressures label="2.4.10 Main pressures">190 200 220 290 400 620 701 810 853 890 951 952 953 954 979</pressures>
+      <threats label="2.4.11 Threats">290 701 952 953</threats>
+    </coverage>
+    <complementary label="2.5 Complementary information">
+
+      <favourable-range label="2.5.1 Favourable reference range (km2)" qualifier="Much more than">3819</favourable-range>
+      <favourable-area label="2.5.2 Favourable reference area (km2)" qualifier="More than">4.58</favourable-area>
+      
+      <typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Apium inundatum</speciesname>
+          <speciesauthor label="Species author (year)">(L.) Reichenb. f.</speciesauthor>
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Baldellia ranunculoides</speciesname>
+
+          <speciesauthor label="Species author (year)">(L.) Parl.</speciesauthor>
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Centaurium pulchellum</speciesname>
+          <speciesauthor label="Species author (year)">(Sw.) Druce</speciesauthor>
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Anagallis minima</speciesname>
+          <speciesauthor label="Species author (year)">(L.) E.H.L. Krause</speciesauthor>
+
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Cicendia filiformis</speciesname>
+          <speciesauthor label="Species author (year)">(L.) Delarbre</speciesauthor>
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Cyperus flavescens</speciesname>
+          <speciesauthor label="Species author (year)">L.</speciesauthor>
+      </typical-species><typical-species label="2.5.3 Typical species">
+
+          <speciesname label="Species name">Deschampsia setacea</speciesname>
+          <speciesauthor label="Species author (year)">(Huds.) Hack.</speciesauthor>
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Elatine hexandra</speciesname>
+          <speciesauthor label="Species author (year)">(Lapierre) DC.</speciesauthor>
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Elatine hydropiper</speciesname>
+
+          <speciesauthor label="Species author (year)">L.</speciesauthor>
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Elatine triandra</speciesname>
+          <speciesauthor label="Species author (year)">Schkuhr</speciesauthor>
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Eleocharis acicularis</speciesname>
+          <speciesauthor label="Species author (year)">(L.) Roem. et Schult.</speciesauthor>
+
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Eleocharis ovata</speciesname>
+          <speciesauthor label="Species author (year)">(Roth) Roem. et Schult.</speciesauthor>
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Hypericum elodes</speciesname>
+          <speciesauthor label="Species author (year)">L.</speciesauthor>
+      </typical-species><typical-species label="2.5.3 Typical species">
+
+          <speciesname label="Species name">Juncus capitatus</speciesname>
+          <speciesauthor label="Species author (year)">Weigel</speciesauthor>
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Juncus pygmaeus</speciesname>
+          <speciesauthor label="Species author (year)">L.C.M. Rich.</speciesauthor>
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Juncus tenageia</speciesname>
+
+          <speciesauthor label="Species author (year)">L. f.</speciesauthor>
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Littorella uniflora</speciesname>
+          <speciesauthor label="Species author (year)">(L.) Aschers.</speciesauthor>
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Luronium natans</speciesname>
+          <speciesauthor label="Species author (year)"/>
+
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Nitella gracilis</speciesname>
+          <speciesauthor label="Species author (year)">(Smith) Ag.</speciesauthor>
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Nitella translucens</speciesname>
+          <speciesauthor label="Species author (year)">(Persoon) Ag.</speciesauthor>
+      </typical-species><typical-species label="2.5.3 Typical species">
+
+          <speciesname label="Species name">Pilularia globulifera</speciesname>
+          <speciesauthor label="Species author (year)">L.</speciesauthor>
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Potamogeton gramineus</speciesname>
+          <speciesauthor label="Species author (year)">L.</speciesauthor>
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Potamogeton polygonifolius</speciesname>
+
+          <speciesauthor label="Species author (year)">Pourr.</speciesauthor>
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Radiola linoides</speciesname>
+          <speciesauthor label="Species author (year)">Roth</speciesauthor>
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Ranunculus ololeucos</speciesname>
+          <speciesauthor label="Species author (year)">Lloyd</speciesauthor>
+
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Scirpus fluitans</speciesname>
+          <speciesauthor label="Species author (year)">L.</speciesauthor>
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Scirpus setaceus</speciesname>
+          <speciesauthor label="Species author (year)">L.</speciesauthor>
+      </typical-species><typical-species label="2.5.3 Typical species">
+
+          <speciesname label="Species name">Sparganium natans</speciesname>
+          <speciesauthor label="Species author (year)">L.</speciesauthor>
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Subularia aquatica</speciesname>
+          <speciesauthor label="Species author (year)">L.</speciesauthor>
+      </typical-species><species-assessment label="2.5.4 Typical species assessment">Standing freshwaters are considered to be well developed, when at least 2 typical species occur frequently in the subtype littorella or 3 typical species occur frequently in the subtype Isoeto-Nanojuncetea.</species-assessment>
+
+      <other-information label="2.5.5 Other relevant information (optional)">Although the range and area estimation have a good to moderate quality, trends are estimated by expert judgement. For the Atlantic region, no map for the FRR was made, due to a lack of knowledge.</other-information>
+    </complementary>
+    <conclusion label="Conclusions">
+      <conclusion-range label="(2.3) Range">U2+</conclusion-range>
+      <conclusion-area label="(2.4) Area">U1</conclusion-area>
+      <conclusion-structure label="(2.5) Structure and function, including typical species">U2</conclusion-structure>
+      <conclusion-future label="Future prospects">U2</conclusion-future>
+
+      <conclusion-assessment label="Overall assessment">U2</conclusion-assessment>
+    </conclusion>
+    <conclusion-n2000 label="Conclusions within Natura 2000 sites (optional)">
+      <conclusion-range label="Range">U2+</conclusion-range>
+      <conclusion-area label="Area">U1</conclusion-area>
+      <conclusion-structure label="Structure and function, including typical species">U1</conclusion-structure>
+      <conclusion-future label="Future prospects">U2</conclusion-future>
+
+      <conclusion-assessment label="Overall assessment">U2</conclusion-assessment>
+    </conclusion-n2000>
+  </regional>
+  <regional label="2. Biogeographical or marine level">
+    <region desc="Continental" label="2.1 Biogeographic region or marine region">CON</region>
+    <published label="2.2 Published sources and/or websites">biodiversite.wallonie.be/sites/natura2000</published>
+    <range label="2.3 Range of the habitat type in the biogeographic region or marine region">
+
+      <surface-area label="2.3.1 Surface area of range in km2">736</surface-area>
+      <date label="2.3.2 Date of range determination">1994-2006</date>
+      <quality label="2.3.3 Quality of data concerning range">Poor</quality>
+      <trend label="2.3.4 Range trend">=</trend>
+      <trend-magnitude label="2.3.5 Range trend magnitude in km2 (optional)"/>
+      <trend-period label="2.3.6 Range trend period">1994-2006</trend-period>
+
+      <reasons label="2.3.7 Reasons for reported trend">NotApplicable</reasons>
+      <reasons-specify label="Other (specify)"/>
+    </range>
+    <coverage label="2.4 Area covered by habitat type in the biogeographic region or marine region">
+      <surface-area label="2.4.1 Surface area of the habitat type (km2)">0.2</surface-area>
+      <date label="2.4.2 Date of area estimation">1994-2006</date>
+      <method label="2.4.3 Method used for area estimation">ExpertOpinion</method>
+
+      <quality label="2.4.4 Quality of data on area">Poor</quality>
+      <trend label="2.4.5 Area trend">-</trend>
+      <trend-magnitude label="2.4.6 Area trend magnitude (km2)"/>
+      <trend-period label="2.4.7 Area trend period">1994-2006</trend-period>
+      <reasons label="2.4.8 Reasons for reported trend">DirectHuman</reasons>
+      <reasons-specify label="Other (specify)"/>
+      <justification label="2.4.9 Justification of % thresholds for trends (optional)"/>
+
+      <pressures label="2.4.10 Main pressures">190 220 701 702 853 951 952 953</pressures>
+      <threats label="2.4.11 Threats">190 220 701 702 853 951 952 953</threats>
+    </coverage>
+    <complementary label="2.5 Complementary information">
+      <favourable-range label="2.5.1 Favourable reference range (km2)" qualifier="More than">806</favourable-range>
+      <favourable-area label="2.5.2 Favourable reference area (km2)" qualifier="Much more than">0.2</favourable-area>
+      <typical-species label="2.5.3 Typical species">
+
+          <speciesname label="Species name">Alisma gramineum</speciesname>
+          <speciesauthor label="Species author (year)">Leg.</speciesauthor>
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Apium inundatum</speciesname>
+          <speciesauthor label="Species author (year)">(L.) Reichenb. f.</speciesauthor>
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Baldellia ranunculoides</speciesname>
+
+          <speciesauthor label="Species author (year)">(L.) Parl.</speciesauthor>
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Callitriche palustris</speciesname>
+          <speciesauthor label="Species author (year)">L.</speciesauthor>
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Centaurium pulchellum</speciesname>
+          <speciesauthor label="Species author (year)">(Sw.) Druce</speciesauthor>
+
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Anagallis minima</speciesname>
+          <speciesauthor label="Species author (year)">(L.) E.H.L. Krause</speciesauthor>
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Cicendia filiformis</speciesname>
+          <speciesauthor label="Species author (year)">(L.) Delarbre</speciesauthor>
+      </typical-species><typical-species label="2.5.3 Typical species">
+
+          <speciesname label="Species name">Crassula tillaea</speciesname>
+          <speciesauthor label="Species author (year)">Lester-Garland</speciesauthor>
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Elatine hexandra</speciesname>
+          <speciesauthor label="Species author (year)">(Lapierre) DC.</speciesauthor>
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Elatine hydropiper</speciesname>
+
+          <speciesauthor label="Species author (year)">L.</speciesauthor>
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Elatine triandra</speciesname>
+          <speciesauthor label="Species author (year)">Schkuhr</speciesauthor>
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Eleocharis acicularis</speciesname>
+          <speciesauthor label="Species author (year)">(L.) Roem. et Schult.</speciesauthor>
+
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Eleocharis ovata</speciesname>
+          <speciesauthor label="Species author (year)">(Roth) Roem. et Schult.</speciesauthor>
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Hypericum elodes</speciesname>
+          <speciesauthor label="Species author (year)">L.</speciesauthor>
+      </typical-species><typical-species label="2.5.3 Typical species">
+
+          <speciesname label="Species name">Juncus capitatus</speciesname>
+          <speciesauthor label="Species author (year)">Weigel</speciesauthor>
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Juncus pygmaeus</speciesname>
+          <speciesauthor label="Species author (year)">L.C.M. Rich.</speciesauthor>
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Juncus tenageia</speciesname>
+
+          <speciesauthor label="Species author (year)">L. f.</speciesauthor>
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Limosella aquatica</speciesname>
+          <speciesauthor label="Species author (year)">L.</speciesauthor>
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Littorella uniflora</speciesname>
+          <speciesauthor label="Species author (year)">(L.) Aschers.</speciesauthor>
+
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Luronium natans</speciesname>
+          <speciesauthor label="Species author (year)"/>
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Lythrum hyssopifolia</speciesname>
+          <speciesauthor label="Species author (year)">L.</speciesauthor>
+      </typical-species><typical-species label="2.5.3 Typical species">
+
+          <speciesname label="Species name">Pilularia globulifera</speciesname>
+          <speciesauthor label="Species author (year)">L.</speciesauthor>
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Potamogeton gramineus</speciesname>
+          <speciesauthor label="Species author (year)">L.</speciesauthor>
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Potamogeton polygonifolius</speciesname>
+
+          <speciesauthor label="Species author (year)">Pourr.</speciesauthor>
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Radiola linoides</speciesname>
+          <speciesauthor label="Species author (year)">Roth</speciesauthor>
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Scirpus fluitans</speciesname>
+          <speciesauthor label="Species author (year)">L.</speciesauthor>
+
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Scirpus setaceus</speciesname>
+          <speciesauthor label="Species author (year)">L.</speciesauthor>
+      </typical-species><typical-species label="2.5.3 Typical species">
+          <speciesname label="Species name">Sparganium natans</speciesname>
+          <speciesauthor label="Species author (year)">L.</speciesauthor>
+      </typical-species><species-assessment label="2.5.4 Typical species assessment">Standing freshwaters with at least two typical species are considered as typical habitat.</species-assessment>
+
+      <other-information label="2.5.5 Other relevant information (optional)"/>
+    </complementary>
+    <conclusion label="Conclusions">
+      <conclusion-range label="(2.3) Range">U1</conclusion-range>
+      <conclusion-area label="(2.4) Area">U2</conclusion-area>
+      <conclusion-structure label="(2.5) Structure and function, including typical species">U2</conclusion-structure>
+      <conclusion-future label="Future prospects">U2</conclusion-future>
+
+      <conclusion-assessment label="Overall assessment">U2</conclusion-assessment>
+    </conclusion>
+    <conclusion-n2000 label="Conclusions within Natura 2000 sites (optional)">
+      <conclusion-range label="Range"/>
+      <conclusion-area label="Area"/>
+      <conclusion-structure label="Structure and function, including typical species"/>
+      <conclusion-future label="Future prospects"/>
+      <conclusion-assessment label="Overall assessment"/>
+
+    </conclusion-n2000>
+  </regional>
+</habitat>

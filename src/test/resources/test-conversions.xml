@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<response code="200">
+<conversion>
+<content_type_out>text/html;charset=UTF-8</content_type_out>
+<xml_schema>http://biodiversity.eionet.europa.eu/schemas/dir9243eec/habitats.xsd</xml_schema>
+<xsl>art17-habitats.xsl</xsl>
+<result_type>HTML</result_type>
+<description>Html view of habitat type factsheet</description>
+<convert_id>23</convert_id>
+</conversion>
+<conversion>
+
+<content_type_out>application/rdf+xml;charset=UTF-8</content_type_out>
+<xml_schema>http://biodiversity.eionet.europa.eu/schemas/dir9243eec/habitats.xsd</xml_schema>
+<xsl>art17-habitat-rdf.xsl</xsl>
+<result_type>RDF</result_type>
+<description>Show as RDF</description>
+<convert_id>89</convert_id>
+</conversion>
+</response>

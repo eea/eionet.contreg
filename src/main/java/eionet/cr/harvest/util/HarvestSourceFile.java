@@ -129,9 +129,9 @@ public class HarvestSourceFile extends File {
 				InputStream inputStream = null;
 				try{
 					inputStream = httpConn.getInputStream();
-					ConversionsParser conversionsParser = new ConversionsParser();
-					conversionsParser.parse(inputStream);
-					this.rdfConversionId = conversionsParser.getRdfConversionId();
+					ConversionsParser conversionsParserTest = new ConversionsParser();
+					conversionsParserTest.parse(inputStream);
+					this.rdfConversionId = conversionsParserTest.getRdfConversionId();
 				}
 				finally{
 					try{

@@ -1,5 +1,7 @@
 package eionet.cr.util.xml;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -22,6 +24,28 @@ public class ConversionsParser {
 	
 	/** */
 	private String rdfConversionId = null;
+	
+	/**
+	 * 
+	 * @param file
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
+	 * @throws IOException
+	 */
+	public void parse(File file) throws ParserConfigurationException, SAXException, IOException{
+		
+		FileInputStream inputStream = null;
+		try{
+			inputStream = new FileInputStream(file);
+			parse(inputStream);
+		}
+		finally{
+			try{
+				if (inputStream!=null) inputStream.close();
+			}
+			catch (IOException e){}
+		}
+	}
 
 	/**
 	 * 
