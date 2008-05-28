@@ -80,6 +80,7 @@ public class Indexer {
 			
 			RDFResourceProperty property = properties.get(i);
 			String fieldValue = property.getValue().trim();
+			
 			if (fieldValue.length()>0){
 				
 				String fieldName = property.getId();

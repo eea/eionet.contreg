@@ -149,16 +149,17 @@ public abstract class Harvest {
 	 */
 	protected void harvestFile(File file) throws HarvestException{
 		
-		InputStreamReader reader = null;
+		FileInputStream fileInputStream = null;
+		
 		try{
 			file = preProcess(file, sourceUrlString);
 			
 			RDFHandler rdfHandler = new RDFHandler(sourceUrlString);
-	        reader = new InputStreamReader(new FileInputStream(file));	        	        
+	        fileInputStream = new FileInputStream(file);	        	        
 			ARP arp = new ARP();
 	        arp.setStatementHandler(rdfHandler);
 	        arp.setErrorHandler(rdfHandler);
-	        arp.load(reader, sourceUrlString);
+	        arp.load(fileInputStream, sourceUrlString);
 	        
 	        logger.debug(rdfHandler.getCountResources() + " collected from local file: " + file.getAbsolutePath());
 	        
@@ -178,8 +179,8 @@ public abstract class Harvest {
 		finally{
 			try{
 				logger.debug("Closing file reader: " + file.getAbsolutePath());
-				if (reader!=null)
-					reader.close();
+				if (fileInputStream!=null)
+					fileInputStream.close();
 			}
 			catch (IOException e){
 				errors.add(e);
