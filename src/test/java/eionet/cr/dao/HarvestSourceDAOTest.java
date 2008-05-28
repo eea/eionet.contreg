@@ -20,12 +20,12 @@ import eionet.cr.util.sql.ConnectionUtil;
  * @author altnyris
  *
  */
-public class TestHarvestSourceDAO extends DBTestCase {
+public class HarvestSourceDAOTest extends DBTestCase {
 	
 	/**
 	 * Provide a connection to the database.
 	 */
-	public TestHarvestSourceDAO(String name)
+	public HarvestSourceDAOTest(String name)
 	{
 		super( name );
 		DbHelper.setUpConnectionProperties();

@@ -17,12 +17,12 @@ import eionet.cr.util.sql.ConnectionUtil;
  * @author altnyris
  *
  */
-public class TestHarvestScheduleDAO extends DBTestCase {
+public class HarvestScheduleDAOTest extends DBTestCase {
 	
 	/**
 	 * Provide a connection to the database.
 	 */
-	public TestHarvestScheduleDAO(String name)
+	public HarvestScheduleDAOTest(String name)
 	{
 		super( name );
 		DbHelper.setUpConnectionProperties();

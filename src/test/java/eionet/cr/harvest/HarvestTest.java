@@ -13,7 +13,7 @@ import org.junit.Test;
  * @author heinljab
  *
  */
-public class TestHarvest extends TestCase{
+public class HarvestTest extends TestCase{
 
 	@Test
 	public void testHarvestFile(){

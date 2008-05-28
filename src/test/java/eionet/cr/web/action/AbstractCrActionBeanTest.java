@@ -17,7 +17,7 @@ import eionet.cr.web.security.CRUser;
  * @author gerasvad, altnyris
  *
  */
-public class TestAbstractCrActionBeanTest extends AbstractStripesMvcTestHelper {
+public class AbstractCrActionBeanTest extends AbstractStripesMvcTestHelper {
 	
 	/**
 	 * Tests method {@link AbstractCrActionBean#getUserName()} when user is logged in.
