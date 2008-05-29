@@ -1,0 +1,1 @@
+alter table HARVEST_SOURCE add column COUNT_UNAVAIL int(10) unsigned not null default 0;
