@@ -15,12 +15,13 @@ import org.apache.commons.logging.LogFactory;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class HttpUtil {
+public class FileUtil {
 	
 	/** */
-	private static Log logger = LogFactory.getLog(HttpUtil.class);
+	private static Log logger = LogFactory.getLog(FileUtil.class);
 
 	/**
+	 * Downloads the contents of the given URL into the given file and closes the file.
 	 * 
 	 * @param urlString
 	 * @param toFile
@@ -28,28 +29,43 @@ public class HttpUtil {
 	 */
 	public static void downloadUrlToFile(String urlString, File toFile) throws IOException{
 		
-		InputStream istream = null;
-		FileOutputStream fos = null;
+		InputStream inputStream = null;
 		try{
 			URL url = new URL(urlString);
 			URLConnection httpConn = url.openConnection();
-			
-			istream = httpConn.getInputStream();
-			fos = new FileOutputStream(toFile);
-	        
-	        int i = -1;
-	        byte[] bytes = new byte[1024];
-	
-	        while ((i = istream.read(bytes, 0, bytes.length)) != -1)
-	        	fos.write(bytes, 0, i);
+			inputStream = httpConn.getInputStream();
+			FileUtil.streamToFile(inputStream, toFile);
 		}
 		finally{
 			try{
-		        if (istream!=null) istream.close();
+		        if (inputStream!=null) inputStream.close();
 			}
 			catch (IOException e){
 				logger.error("Failed to close URLConnection's input stream: " + e.toString(), e);
 			}
+		}
+	}
+
+	/**
+	 * Writes the content of the given InputStream into the given file and closes the file.
+	 * The caller is responsible for closing the InputStream!
+	 * 
+	 * @param inputStream
+	 * @param toFile
+	 * @throws IOException
+	 */
+	public static void streamToFile(InputStream inputStream, File toFile) throws IOException{
+		
+		FileOutputStream fos = null;
+		try{
+			int i = -1;
+			byte[] bytes = new byte[1024];
+			fos = new FileOutputStream(toFile);
+	        while ((i = inputStream.read(bytes, 0, bytes.length)) != -1){
+	        	fos.write(bytes, 0, i);
+	        }
+		}
+		finally{
 			try{
 				if (fos!=null) fos.close();
 			}
@@ -58,5 +74,4 @@ public class HttpUtil {
 			}
 		}
 	}
-
 }

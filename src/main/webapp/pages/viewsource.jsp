@@ -61,6 +61,11 @@
 	                	${fn:escapeXml(actionBean.harvestSource.harvestSchedule.period)}
 	                </td>
 	            </tr>
+           		<c:if test="${actionBean.harvestSource.unavailable}">
+           			<tr>
+           				<td colspan="2" class="warning-msg" style="color:#E6E6E6">The source has been unavailable for too many times!</td>
+           			</tr>
+           		</c:if>	            		
 	            <tr>
 	                <td colspan="2" style="padding-top:10px">
 	                	<stripes:submit name="harvestNow" value="Harvest now"/>
@@ -95,13 +100,13 @@
 	        				<td>${fn:escapeXml(harv.totalStatements)}</td>
 							<td>
 		        				<stripes:link href="/harvest.action">
+		        					<img src="${pageContext.request.contextPath}/images/view2.gif" title="View" alt="View"/>
 									<c:if test="${(!(empty harv.hasFatals) && harv.hasFatals) || (!(empty harv.hasErrors) && harv.hasErrors)}">
-										<img src="${pageContext.request.contextPath}/images/error.gif" title="Errors" alt="Errors"/>
+										<img src="${pageContext.request.contextPath}/images/error.png" title="Errors" alt="Errors"/>
 									</c:if>
 									<c:if test="${!(empty harv.hasWarnings) && harv.hasWarnings}">
-										<img src="${pageContext.request.contextPath}/images/warning.gif" title="Warnings" alt="Warnings"/>
-									</c:if>
-	                                <img src="${pageContext.request.contextPath}/images/view2.gif" title="View" alt="View"/>
+										<img src="${pageContext.request.contextPath}/images/warning.png" title="Warnings" alt="Warnings"/>
+									</c:if>	                                
 	                                <stripes:param name="harvestDTO.harvestId" value="${harv.harvestId}"/>
 	                            </stripes:link>
 		        			</td>	        				

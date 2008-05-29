@@ -13,6 +13,7 @@ import eionet.cr.dto.HarvestScheduleDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.readers.HarvestDTOReader;
 import eionet.cr.dto.readers.HarvestSourceDTOReader;
+import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.sql.ConnectionUtil;
 import eionet.cr.util.sql.SQLUtil;
 
@@ -201,22 +202,25 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 
     /** */
     private static final String updateHarvestFinishedSQL = "update HARVEST_SOURCE set STATEMENTS=?, RESOURCES=? where HARVEST_SOURCE_ID=?";
+    private static final String updateHarvestFinishedSQL_avail = "update HARVEST_SOURCE set STATEMENTS=?, RESOURCES=?, COUNT_UNAVAIL=if(?,0,(COUNT_UNAVAIL+1)) where HARVEST_SOURCE_ID=?";
 
     /*
      * (non-Javadoc)
      * @see eionet.cr.dao.HarvestSourceDAO#updateHarvestFinished(int, Integer, Integer)
      */
-	public void updateHarvestFinished(int sourceId, Integer numStatements, Integer numResources) throws DAOException {
+	public void updateHarvestFinished(int sourceId, Integer numStatements, Integer numResources, Boolean sourceAvailable) throws DAOException {
 		
 		List<Object> values = new ArrayList<Object>();
 		values.add(numStatements);
 		values.add(numResources);
-		values.add(new Integer(sourceId));
+		if (sourceAvailable!=null)
+			values.add(sourceAvailable.booleanValue()==true ? new Integer(1) : new Integer(0));
+		values.add(new Integer(sourceId));		
 		
 		Connection conn = null;
 		try{
 			conn = getConnection();
-			SQLUtil.executeUpdate(updateHarvestFinishedSQL, values, conn);
+			SQLUtil.executeUpdate(sourceAvailable!=null ? updateHarvestFinishedSQL_avail : updateHarvestFinishedSQL, values, conn);
 		}
 		catch (Exception e){
 			throw new DAOException(e.getMessage(), e);

@@ -18,7 +18,7 @@
 	      			
 	<h1>Harvesting sources</h1>
 	             
-	<display:table name="${actionBean.harvestSources}" class="sortable" pagesize="0" sort="list" id="harvestSource" htmlId="harvestSources" requestURI="${actionBean.urlBinding}">
+	<display:table name="${actionBean.harvestSources}" class="sortable" pagesize="0" sort="list" id="harvestSource" htmlId="harvestSources" requestURI="${actionBean.urlBinding}" decorator="eionet.cr.web.util.HarvestSourcesTableDecorator">
 	
 		<display:column property="url" title="URL" sortable="true"/>
 		<display:column property="type" title="Type" sortable="true"/>
@@ -36,7 +36,7 @@
 		</display:column>
 		<display:column>
 			<stripes:link href="/source.action" event="delete" onclick="return confirm('Are you sure you want to delete this harvesting source');">
-				<img src="${pageContext.request.contextPath}/images/delete.gif" title="Delete" alt="Delete"/>
+				<img src="${pageContext.request.contextPath}/images/delete_small.gif" title="Delete" alt="Delete"/>
 				<stripes:param name="harvestSource.sourceId" value="${harvestSource.sourceId}"/>
 			</stripes:link>
 		</display:column>

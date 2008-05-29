@@ -1,13 +1,17 @@
 package eionet.cr.harvest;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import eionet.cr.util.HttpUtil;
+import eionet.cr.util.FileUtil;
 import eionet.cr.util.Util;
 
 /**
@@ -19,6 +23,9 @@ public class PullHarvest extends Harvest{
 	
 	/** */
 	private static Log logger = LogFactory.getLog(PullHarvest.class);
+	
+	/** */
+	private Boolean sourceAvailable = null;
 
 	/**
 	 * 
@@ -39,14 +46,36 @@ public class PullHarvest extends Harvest{
 			toFile.delete();
 		
 		logger.debug("Downloading from URL: " + sourceUrlString);
+		
+		InputStream inputStream = null;
 		try{
-			HttpUtil.downloadUrlToFile(sourceUrlString, toFile);
+			sourceAvailable = new Boolean(false);
+			URL url = new URL(sourceUrlString);
+			URLConnection httpConn = url.openConnection();
+			httpConn.setRequestProperty("Accept", "application/rdf+xml, text/xml, */*");
+			inputStream = httpConn.getInputStream();
+			sourceAvailable = new Boolean(true);
+			
+			FileUtil.streamToFile(inputStream, toFile);
 		}
 		catch (IOException e){
 			throw new HarvestException(e.toString(), e);
 		}
+		finally{
+			try{
+				if (inputStream!=null) inputStream.close();
+			}
+			catch (IOException e){}
+		}
 		
 		logger.debug("Parsing local file: " + toFile.getAbsolutePath());
 		harvestFile(toFile);
+	}
+
+	/**
+	 * @return the sourceAvailable
+	 */
+	public Boolean getSourceAvailable() {
+		return sourceAvailable;
 	}
 }

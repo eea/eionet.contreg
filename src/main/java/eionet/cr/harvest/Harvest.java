@@ -37,7 +37,7 @@ import eionet.cr.harvest.util.RDFResource;
 import eionet.cr.index.IndexException;
 import eionet.cr.index.Indexer;
 import eionet.cr.search.Searcher;
-import eionet.cr.util.HttpUtil;
+import eionet.cr.util.FileUtil;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
 import eionet.cr.util.xml.ConversionsParser;
@@ -90,7 +90,7 @@ public abstract class Harvest {
 	 * 
 	 * @param sourceUrlString
 	 */
-	public Harvest(String sourceUrlString, HarvestDAOWriter daoWriter, HarvestNotificationSender notificationSender){
+	protected Harvest(String sourceUrlString, HarvestDAOWriter daoWriter, HarvestNotificationSender notificationSender){
 		
 		if (sourceUrlString==null)
 			throw new NullPointerException();
@@ -375,16 +375,23 @@ public abstract class Harvest {
 		}
 		
 		// call harvest finished functions of the DAO
-		try{
-			if (daoWriter!=null){
+		if (daoWriter!=null){
+			try{
 				daoWriter.writeFinished(this, numDocsInSource);
+			}
+			catch (DAOException e){
+				errors.add(e);
+				finishedActionsErrors.add(e);
+				logger.error("Harvest DAO writer threw an exception: " + e.toString(), e);
+			}
+			try{
 				daoWriter.writeMessages(this);
 			}
-		}
-		catch (DAOException e){
-			errors.add(e);
-			finishedActionsErrors.add(e);
-			logger.error("Harvest DAO writer threw an exception: " + e.toString(), e);
+			catch (DAOException e){
+				errors.add(e);
+				finishedActionsErrors.add(e);
+				logger.error("Harvest DAO writer threw an exception: " + e.toString(), e);
+			}
 		}
 
 		// send notification of errors happened when executing harvest actions 
@@ -484,7 +491,7 @@ public abstract class Harvest {
 					convertUrl = MessageFormat.format(convertUrl, args);
 					
 					File convertedFile = new File(file.getAbsolutePath() + ".converted");
-					HttpUtil.downloadUrlToFile(convertUrl, convertedFile);
+					FileUtil.downloadUrlToFile(convertUrl, convertedFile);
 					return convertedFile;
 				}
 			}

@@ -46,7 +46,8 @@ public interface HarvestSourceDAO {
      * @param sourceId
      * @param numStatements
      * @param numResources
+     * @param sourceAvailable 
      * @throws DAOException
      */
-    public void updateHarvestFinished(int sourceId, Integer numStatements, Integer numResources) throws DAOException;
+    public void updateHarvestFinished(int sourceId, Integer numStatements, Integer numResources, Boolean sourceAvailable) throws DAOException;
 }
