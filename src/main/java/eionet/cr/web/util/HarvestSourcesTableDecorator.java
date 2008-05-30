@@ -20,7 +20,7 @@ public class HarvestSourcesTableDecorator extends TableDecorator{
 		HarvestSourceDTO harvestSource = (HarvestSourceDTO) getCurrentRowObject();
 		StringBuffer buf = new StringBuffer();
 		if (harvestSource.isUnavailable())
-			buf.append("<img src=\"images/error.png\"/>");
+			buf.append("<img src=\"images/error.png\" alt=\"Errors\" title\"Source unavailable\"/>");
 		buf.append(harvestSource.getUrl());
 		return buf.toString();
 	}

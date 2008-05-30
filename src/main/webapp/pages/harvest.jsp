@@ -121,7 +121,6 @@
 			        	</tbody>
 			        </table>
 				</c:if>
-				
 			</c:otherwise>
         </c:choose>
 

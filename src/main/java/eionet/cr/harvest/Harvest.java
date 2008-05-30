@@ -150,9 +150,10 @@ public abstract class Harvest {
 	protected void harvestFile(File file) throws HarvestException{
 		
 		FileInputStream fileInputStream = null;
-		
 		try{
 			file = preProcess(file, sourceUrlString);
+			if (file==null)
+				return;
 			
 			RDFHandler rdfHandler = new RDFHandler(sourceUrlString);
 	        fileInputStream = new FileInputStream(file);	        	        
@@ -178,13 +179,11 @@ public abstract class Harvest {
 		}
 		finally{
 			try{
-				logger.debug("Closing file reader: " + file.getAbsolutePath());
-				if (fileInputStream!=null)
-					fileInputStream.close();
+				if (fileInputStream!=null) fileInputStream.close();
 			}
 			catch (IOException e){
 				errors.add(e);
-				logger.error(e.toString(), e);
+				logger.error("Failed to close file input stream: " + e.toString(), e);
 			}
 		}
 	}
@@ -445,19 +444,13 @@ public abstract class Harvest {
 	 * @throws SAXException 
 	 * @throws ParserConfigurationException 
 	 */
-	protected static File preProcess(File file, String fromUrl) throws ParserConfigurationException, SAXException, IOException{
+	protected File preProcess(File file, String fromUrl) throws ParserConfigurationException, SAXException, IOException{
 
 		if (!Util.isValidXmlFile(file.getAbsolutePath()))
-			return file;
+			return null;
 		
 		XmlAnalysis xmlAnalysis = new XmlAnalysis();
 		xmlAnalysis.parse(file);
-		
-		// if it's an RDF file, no further processing needed, so return
-		StringBuffer buf = new StringBuffer();
-		buf.append(xmlAnalysis.getStartTagNamespace()).append(xmlAnalysis.getStartTag());
-		if (buf.toString().equalsIgnoreCase(Identifiers.RDF_RDF))
-			return file;
 		
 		// get schema uri, if it's not found then fall back to dtd 
 		String schemaOrDtd = xmlAnalysis.getSchemaLocation();

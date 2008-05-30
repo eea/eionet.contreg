@@ -1,6 +1,7 @@
 package eionet.cr.util;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
@@ -435,7 +436,18 @@ public class Util {
 		
 		return buf.toString();
 	}
-
+	
+	/**
+	 * 
+	 * @param file
+	 * @return
+	 * @throws IOException
+	 * @throws ParserConfigurationException
+	 */
+	public static boolean isValidXmlFile(File file) throws IOException, ParserConfigurationException{
+		return isValidXmlFile(file.getAbsolutePath());
+	}
+	
 	/**
 	 * 
 	 * @param fileFullPath
@@ -470,11 +482,5 @@ public class Util {
 			oo[0] = o;
 			return oo;
 		}
-	}
-	
-	public static void main(String[] args){
-		StringBuffer buf = new StringBuffer(null);
-		buf.append("1").append((String)null);
-		System.out.println(buf.toString());
 	}
 }
