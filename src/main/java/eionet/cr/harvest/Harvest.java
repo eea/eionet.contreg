@@ -461,6 +461,7 @@ public abstract class Harvest {
 			}
 		}
 		
+		// if this file has a conversion to RDF, run it and return the reference to the resulting file
 		if (schemaOrDtd!=null && schemaOrDtd.length()>0){
 			
 			String listConversionsUrl = GeneralConfig.getRequiredProperty(GeneralConfig.XMLCONV_LIST_CONVERSIONS_URL);

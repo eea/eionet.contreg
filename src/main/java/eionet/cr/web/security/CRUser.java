@@ -73,15 +73,20 @@ public class CRUser {
 		if (Util.isNullOrEmpty(userName) || Util.isNullOrEmpty(aclPath) || Util.isNullOrEmpty(prm))
 			return false;
 		
+		boolean result = false;
 		try{
 			AccessControlListIF acl = AccessController.getAcl(aclPath);
-			if (acl!=null)
-				return acl.checkPermission(userName, prm);
+			if (acl!=null){
+				result = acl.checkPermission(userName, prm);
+				logger.debug("User " + userName + " " + (result ? "has" : "does not have") + " permission " + prm + " in acl \"" + aclPath + "\"");
+			}
+			else
+				logger.warn("acl \"" + aclPath + "\" not found!");
 		}
 		catch (SignOnException soe){
 			logger.error(soe.toString(), soe);
 		}
 		
-		return false;
+		return result;
 	}
 }
