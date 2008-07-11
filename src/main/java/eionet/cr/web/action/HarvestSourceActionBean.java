@@ -135,7 +135,7 @@ public class HarvestSourceActionBean extends AbstractCRActionBean {
     		
     		// do the harvest
     		harvestSource = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(harvestSource.getSourceId());
-    		Harvest harvest = new PullHarvest(harvestSource.getUrl());
+    		Harvest harvest = new PullHarvest(harvestSource.getUrl(), null); // TODO - use proper lastHarvestTimestamp instead of null
     		harvest.setDaoWriter(new HarvestDAOWriter(
     				harvestSource.getSourceId().intValue(), Harvest.TYPE_PULL, getCRUser()==null ? null : getCRUser().getUserName()));
     		harvest.execute();

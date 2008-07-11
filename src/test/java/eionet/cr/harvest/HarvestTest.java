@@ -22,7 +22,7 @@ public class HarvestTest extends TestCase{
 				
 		try {
 			URL o = getClass().getClassLoader().getResource("test-rdf.xml");
-			Harvest harvest = new PullHarvest(o.toString());
+			Harvest harvest = new PullHarvest(o.toString(), null);
 			harvest.execute();
 			assertEquals((int)10, harvest.getCountTotalResources());
 			assertEquals((int)10, harvest.getCountEncodingSchemes());
@@ -40,7 +40,7 @@ public class HarvestTest extends TestCase{
 	public void testHarvestNonExistingURL(){
 		
 		try {
-			Harvest harvest = new PullHarvest("http://www.jaanusheinlaid.tw");
+			Harvest harvest = new PullHarvest("http://www.jaanusheinlaid.tw", null);
 			harvest.execute();
 			fail("Was expecting " + HarvestException.class.getName() + " with a cause of " + java.net.UnknownHostException.class.getName());
 		}

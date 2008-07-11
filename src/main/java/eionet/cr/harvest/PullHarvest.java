@@ -26,13 +26,15 @@ public class PullHarvest extends Harvest{
 	
 	/** */
 	private Boolean sourceAvailable = null;
+	private Long lastHarvestTimestamp = null;
 
 	/**
 	 * 
 	 * @param sourceUrlString
 	 */
-	public PullHarvest(String sourceUrlString) {
+	public PullHarvest(String sourceUrlString, Long lastHarvestTimestamp) {
 		super(sourceUrlString);
+		this.lastHarvestTimestamp = lastHarvestTimestamp;
 	}
 	
 	/**
@@ -52,6 +54,8 @@ public class PullHarvest extends Harvest{
 			sourceAvailable = new Boolean(false);
 			URL url = new URL(sourceUrlString);
 			URLConnection httpConn = url.openConnection();
+			if (lastHarvestTimestamp!=null && lastHarvestTimestamp.longValue()>0)
+				httpConn.setIfModifiedSince(lastHarvestTimestamp.longValue());
 			httpConn.setRequestProperty("Accept", "application/rdf+xml, text/xml, */*");
 			inputStream = httpConn.getInputStream();
 			sourceAvailable = new Boolean(true);
