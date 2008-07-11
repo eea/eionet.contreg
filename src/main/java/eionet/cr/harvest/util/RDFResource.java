@@ -2,6 +2,7 @@ package eionet.cr.harvest.util;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 
 import eionet.cr.common.Identifiers;
@@ -76,7 +77,31 @@ public class RDFResource {
 	public List<RDFResourceProperty> getProperties() {
 		return properties;
 	}
-	
+
+	/**
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public String getPropertyValue(String propertyId) {
+		
+		if (propertyId==null)
+			return null;
+		
+		if (properties==null || properties.isEmpty())
+			return null;
+		
+		String result = null;
+		Iterator<RDFResourceProperty> i = properties.iterator();
+		while ((result==null || result.length()==0) && i.hasNext()){
+			RDFResourceProperty property = i.next();
+			if (property.getId().equals(propertyId))
+				result = property.getValue();
+		}
+		
+		return result;
+	}
+
 	/**
 	 * 
 	 * @return

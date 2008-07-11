@@ -50,4 +50,6 @@ public interface Identifiers {
 	public static final String RDFS_SUB_PROPERTY_OF = "http://www.w3.org/2000/01/rdf-schema#subPropertyOf";
 	
 	public static final String FULL_REPORT_CLASS = "http://reports.eea.europa.eu/reports_rdf#FullReport";
+	
+	public static final String DCTYPE_DATASET_CLASS = "http://purl.org/dc/dcmitype/Dataset";
 }

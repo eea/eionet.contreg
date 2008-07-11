@@ -15,6 +15,14 @@ public interface HarvestSourceDAO {
      * @throws DAOException
      */
     public List<HarvestSourceDTO> getHarvestSources() throws DAOException;
+
+    /**
+     * 
+     * @param type
+     * @return
+     * @throws DAOException
+     */
+    public List<HarvestSourceDTO> getHarvestSourcesByType(String type) throws DAOException;
     
     /**
      * @return harvesting sources
@@ -28,7 +36,13 @@ public interface HarvestSourceDAO {
      * @param HarvestSourceDTO source
      */
     public Integer addSource(HarvestSourceDTO source, String user) throws DAOException;
-    
+
+    /**
+     * @throws DAOException
+     * @param HarvestSourceDTO source
+     */
+    public Integer addSourceIgnoreDuplicate(HarvestSourceDTO source, String user) throws DAOException;
+
     /**
      * @throws DAOException
      * @param HarvestSourceDTO source

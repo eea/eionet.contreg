@@ -5,11 +5,15 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import eionet.cr.common.Identifiers;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dto.HarvestMessageDTO;
+import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.harvest.util.HarvestMessagesMask;
+import eionet.cr.harvest.util.RDFResource;
 import eionet.cr.util.Util;
+import eionet.cr.web.security.CRUser;
 
 
 /**
@@ -118,5 +122,28 @@ public class HarvestDAOWriter {
 		for (int i=0; i<throwables.size(); i++){
 			writeThrowable(throwables.get(i), type);
 		}
+	}
+	
+	/**
+	 * 
+	 * @param resource
+	 * @param dedicatedTypeName
+	 * @throws DAOException 
+	 */
+	protected void storeDedicatedHarvestSource(RDFResource resource, String dedicatedTypeName) throws DAOException{
+		
+		String name = resource.getPropertyValue(Identifiers.DC_TITLE);
+		if (name==null || name.length()==0)
+			name = resource.getPropertyValue(Identifiers.RDFS_LABEL);
+		if (name==null)
+			name = resource.getId();
+		
+		HarvestSourceDTO dto = new HarvestSourceDTO();
+		dto.setUrl(resource.getId());
+		dto.setName(name);
+		dto.setType(dedicatedTypeName);
+		// TODO - set e-mails too!!!
+		
+		DAOFactory.getDAOFactory().getHarvestSourceDAO().addSourceIgnoreDuplicate(dto, CRUser.application.getUserName());
 	}
 }

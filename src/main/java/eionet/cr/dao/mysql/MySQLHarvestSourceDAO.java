@@ -23,6 +23,9 @@ import eionet.cr.util.sql.SQLUtil;
  */
 public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSourceDAO {
 	
+	/**
+	 * 
+	 */
 	public MySQLHarvestSourceDAO() {
 	}
 	
@@ -55,6 +58,35 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 			catch (SQLException e){}
 		}
     }
+
+    /** */
+    private static final String getSourcesByTypeSQL = "select * from HARVEST_SOURCE where TYPE=? order by TYPE desc, URL";
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSourcesByType()
+     */
+    public List<HarvestSourceDTO> getHarvestSourcesByType(String type) throws DAOException {
+    	
+    	List<Object> values = new ArrayList<Object>();
+    	values.add(type);
+				
+		Connection conn = null;
+		HarvestSourceDTOReader rsReader = new HarvestSourceDTOReader();
+		try{
+			conn = getConnection();
+			SQLUtil.executeQuery(getSourcesByTypeSQL, values, rsReader, conn);
+			return rsReader.getResultList();
+		}
+		catch (Exception e){
+			throw new DAOException(e.getMessage(), e);
+		}
+		finally{
+			try{
+				if (conn!=null) conn.close();
+			}
+			catch (SQLException e){}
+		}
+	}
     
     /** */
 	private static final String getSourcesByIdSQL = "select * from HARVEST_SOURCE where HARVEST_SOURCE_ID=?";
@@ -99,16 +131,37 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
     
     /** */
 	private static final String addSourceSQL = "insert into HARVEST_SOURCE (NAME,URL,TYPE,EMAILS,DATE_CREATED,CREATOR) VALUES (?,?,?,?,NOW(),?)";
-		
+	private static final String addSourceIgnoreSQL = "insert ignore into HARVEST_SOURCE (NAME,URL,TYPE,EMAILS,DATE_CREATED,CREATOR) VALUES (?,?,?,?,NOW(),?)";
+
 	/*
      * (non-Javadoc)
      * 
      * @see eionet.cr.dao.HarvestSourceDao#addSource()
      */
     public Integer addSource(HarvestSourceDTO source, String user) throws DAOException {
+    	return this.addSource(addSourceSQL, source, user);
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.dao.HarvestSourceDAO#addSourceIgnoreDuplicate(eionet.cr.dto.HarvestSourceDTO, java.lang.String)
+     */
+	public Integer addSourceIgnoreDuplicate(HarvestSourceDTO source, String user) throws DAOException {
+		return this.addSource(addSourceIgnoreSQL, source, user);
+	}
+
+	/**
+	 * 
+	 * @param sql
+	 * @param source
+	 * @param user
+	 * @return
+	 * @throws DAOException 
+	 */
+	private Integer addSource(String sql, HarvestSourceDTO source, String user) throws DAOException{
+		
+		Integer harvestSourceID = null;
     	
-    	Integer harvestSourceID = null;
-    	    	
     	List<Object> values = new ArrayList<Object>();
 		values.add(source.getName());
 		values.add(source.getUrl());
@@ -119,12 +172,12 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 		Connection conn = null;
 		try{
 			conn = getConnection();
-			SQLUtil.executeUpdate(addSourceSQL, values, conn);
+			SQLUtil.executeUpdate(sql, values, conn);
 			harvestSourceID = getLastInsertID(conn);
 			
-			if(source.getHarvestSchedule() != null){
-				Integer source_id = getLastInsertID(conn);
-				source.getHarvestSchedule().setHarvestSourceId(source_id);
+			// if this was an "insert ignore" statement and there was a duplicate entry indeed, getLastInsertID() returns 0 
+			if(harvestSourceID!=null && harvestSourceID.intValue()>0 && source.getHarvestSchedule() != null){
+				source.getHarvestSchedule().setHarvestSourceId(harvestSourceID);
 				DAOFactory.getDAOFactory().getHarvestScheduleDAO().addSchedule(source.getHarvestSchedule());
 			}
 			
@@ -136,8 +189,8 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 		finally{
 			ConnectionUtil.closeConnection(conn);
 		}
-    }
-    
+	}
+
     /** */
 	private static final String editSourceSQL = "update HARVEST_SOURCE set NAME=?,URL=?,TYPE=?,EMAILS=? where HARVEST_SOURCE_ID=?";
 	
@@ -229,4 +282,5 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 			ConnectionUtil.closeConnection(conn);
 		}
 	}
+
 }

@@ -10,6 +10,8 @@ import java.util.List;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 
+import eionet.cr.harvest.util.RDFResource;
+import eionet.cr.harvest.util.RDFResourceProperty;
 import eionet.cr.index.EncodingSchemes;
 import eionet.cr.util.URLUtil;
 import eionet.cr.web.util.factsheet.ResourcePropertyDTO;
@@ -60,7 +62,7 @@ public class ResourceDTO extends HashMap<String,List<String>>{
 			}
 		}
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see java.util.HashMap#get(java.lang.Object)

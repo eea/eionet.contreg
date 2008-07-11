@@ -32,8 +32,10 @@ import com.hp.hpl.jena.rdf.arp.ARP;
 import eionet.cr.common.Identifiers;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
+import eionet.cr.harvest.util.DedicatedHarvestSourceTypes;
 import eionet.cr.harvest.util.HarvestSourceFile;
 import eionet.cr.harvest.util.RDFResource;
+import eionet.cr.harvest.util.RDFResourceProperty;
 import eionet.cr.index.IndexException;
 import eionet.cr.index.Indexer;
 import eionet.cr.search.Searcher;
@@ -170,6 +172,10 @@ public abstract class Harvest {
 	        if (rdfHandler.isFatalError())
 	        	throw rdfHandler.getFatalError();
 	        else{
+	        	try{
+	        		storeDedicatedHarvestSources(rdfHandler.getRdfResources());
+	        	}
+	        	catch (Exception e){}
 	        	updateFirstTimes(rdfHandler.getRdfResources());
 	        	indexResources(rdfHandler.getRdfResources());
 	        }
@@ -499,11 +505,25 @@ public abstract class Harvest {
 		
 		return file;
 	}
-
+	
 	/**
+	 * @throws DAOException 
 	 * 
-	 * @param urlString
-	 * @param toFile
-	 * @throws HarvestException
 	 */
+	private void storeDedicatedHarvestSources(Map<String,RDFResource> resources) throws DAOException{
+		
+		if (daoWriter==null || resources==null || resources.size()==0)
+			return;
+		
+		Iterator<RDFResource> iter = resources.values().iterator();
+		while (iter.hasNext()){
+			RDFResource resource = iter.next();
+			String type = resource.getPropertyValue(Identifiers.RDF_TYPE);
+			if (type!=null){
+				String dedicatedTypeName = DedicatedHarvestSourceTypes.getInstance().get(type);
+				if (dedicatedTypeName!=null)
+					daoWriter.storeDedicatedHarvestSource(resource, dedicatedTypeName);
+			}
+		}
+	}
 }

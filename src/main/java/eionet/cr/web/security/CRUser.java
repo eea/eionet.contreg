@@ -18,7 +18,11 @@ import eionet.cr.util.Util;
  */
 public class CRUser {
 	
+	/** */
 	private static Log logger = LogFactory.getLog(CRUser.class);
+	
+	/** */
+	public static final CRUser application = new CRUser("application");
 	
 	/** */
 	private String userName;
