@@ -92,14 +92,12 @@ public abstract class Harvest {
 	 * 
 	 * @param sourceUrlString
 	 */
-	protected Harvest(String sourceUrlString, HarvestDAOWriter daoWriter, HarvestNotificationSender notificationSender){
+	protected Harvest(String sourceUrlString){
 		
 		if (sourceUrlString==null)
 			throw new NullPointerException();
 		
 		this.sourceUrlString = sourceUrlString;
-		this.daoWriter = daoWriter;
-		this.notificationSender = notificationSender;
 	}
 
 	/**
@@ -525,5 +523,19 @@ public abstract class Harvest {
 					daoWriter.storeDedicatedHarvestSource(resource, dedicatedTypeName);
 			}
 		}
+	}
+
+	/**
+	 * @param daoWriter the daoWriter to set
+	 */
+	public void setDaoWriter(HarvestDAOWriter daoWriter) {
+		this.daoWriter = daoWriter;
+	}
+
+	/**
+	 * @param notificationSender the notificationSender to set
+	 */
+	public void setNotificationSender(HarvestNotificationSender notificationSender) {
+		this.notificationSender = notificationSender;
 	}
 }

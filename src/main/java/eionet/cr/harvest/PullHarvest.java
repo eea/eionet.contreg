@@ -31,8 +31,8 @@ public class PullHarvest extends Harvest{
 	 * 
 	 * @param sourceUrlString
 	 */
-	public PullHarvest(String sourceUrlString, HarvestDAOWriter harvestDAOWriter, HarvestNotificationSender notificationSender) {
-		super(sourceUrlString, harvestDAOWriter, notificationSender);
+	public PullHarvest(String sourceUrlString) {
+		super(sourceUrlString);
 	}
 	
 	/**

@@ -133,14 +133,17 @@ public class HarvestSourceActionBean extends AbstractCRActionBean {
     	
     	if(isUserLoggedIn()){
     		
+    		// do the harvest
     		harvestSource = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(harvestSource.getSourceId());
-    		Harvest harvest = new PullHarvest(harvestSource.getUrl(),
-    				new HarvestDAOWriter(harvestSource.getSourceId().intValue(), Harvest.TYPE_PULL, getCRUser()==null ? null : getCRUser().getUserName()),
-    				null);
+    		Harvest harvest = new PullHarvest(harvestSource.getUrl());
+    		harvest.setDaoWriter(new HarvestDAOWriter(
+    				harvestSource.getSourceId().intValue(), Harvest.TYPE_PULL, getCRUser()==null ? null : getCRUser().getUserName()));
     		harvest.execute();
     		
+    		// retrieve list of harvests (for display) 
 			harvests = DAOFactory.getDAOFactory().getHarvestDAO().getHarvestsBySourceId(harvestSource.getSourceId());
 
+			// set messages to show to user
 			showMessage("Resources in total: " + harvest.getCountTotalResources());
 			showMessage("Resources as encoding schemes: " + harvest.getCountEncodingSchemes());
 			showMessage("Statements in total: " + harvest.getCountTotalStatements());
