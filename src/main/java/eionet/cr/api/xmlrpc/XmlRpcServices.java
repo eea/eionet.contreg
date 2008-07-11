@@ -27,11 +27,11 @@ import eionet.qawcommons.DataflowResultDto;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class SearcherXmlRpcImpl{
+public class XmlRpcServices{
 
 	
 	/** */
-	private static Log logger = LogFactory.getLog(SearcherXmlRpcImpl.class);
+	private static Log logger = LogFactory.getLog(XmlRpcServices.class);
 
 	/*
 	 * (non-Javadoc)
@@ -151,7 +151,7 @@ public class SearcherXmlRpcImpl{
 	 */
 	public static void main(String[] args){
 		
-		SearcherXmlRpcImpl searcher = new SearcherXmlRpcImpl();
+		XmlRpcServices searcher = new XmlRpcServices();
 		
 		java.text.SimpleDateFormat formatter = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		try {
