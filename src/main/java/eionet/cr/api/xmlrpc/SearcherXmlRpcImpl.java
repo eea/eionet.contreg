@@ -28,6 +28,7 @@ import eionet.qawcommons.DataflowResultDto;
  *
  */
 public class SearcherXmlRpcImpl{
+
 	
 	/** */
 	private static Log logger = LogFactory.getLog(SearcherXmlRpcImpl.class);
