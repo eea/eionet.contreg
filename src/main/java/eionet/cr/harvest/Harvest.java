@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
@@ -141,28 +142,55 @@ public abstract class Harvest {
 	 * @throws HarvestException
 	 */
 	protected abstract void doExecute() throws HarvestException;
-	
+
 	/**
+	 * Harvest the given file.
 	 * 
 	 * @param file
 	 * @throws HarvestException
 	 */
-	protected void harvestFile(File file) throws HarvestException{
+	protected void harvest(File file) throws HarvestException{
 		
-		FileInputStream fileInputStream = null;
+		InputStreamReader reader = null;
 		try{
 			file = preProcess(file, sourceUrlString);
 			if (file==null)
 				return;
 			
-			RDFHandler rdfHandler = new RDFHandler(sourceUrlString);
-	        fileInputStream = new FileInputStream(file);	        	        
+	        reader = new InputStreamReader(new FileInputStream(file));
+	        harvest(reader);
+		}
+		catch (Exception e){
+			throw new HarvestException(e.toString(), e);
+		}
+		finally{
+			try{
+				if (reader!=null) reader.close();
+			}
+			catch (IOException e){
+				errors.add(e);
+				logger.error("Failed to close file input stream reader: " + e.toString(), e);
+			}
+		}
+	}
+
+	/**
+	 * Harvest the given reader.
+	 * The caller is responsible for closing the reader.
+	 * 
+	 * @param reader
+	 * @throws HarvestException
+	 */
+	protected void harvest(Reader reader) throws HarvestException{
+		
+		try{
 			ARP arp = new ARP();
+			RDFHandler rdfHandler = new RDFHandler(sourceUrlString);
 	        arp.setStatementHandler(rdfHandler);
 	        arp.setErrorHandler(rdfHandler);
-	        arp.load(fileInputStream, sourceUrlString);
+	        arp.load(reader, sourceUrlString);
 	        
-	        logger.debug(rdfHandler.getCountResources() + " collected from local file: " + file.getAbsolutePath());
+	        logger.debug(rdfHandler.getCountResources() + " resources collected from : " + sourceUrlString);
 	        
 	        errors.addAll(rdfHandler.getErrors());
 	        warnings.addAll(rdfHandler.getWarnings());
@@ -180,15 +208,6 @@ public abstract class Harvest {
 		}
 		catch (Exception e){
 			throw new HarvestException(e.toString(), e);
-		}
-		finally{
-			try{
-				if (fileInputStream!=null) fileInputStream.close();
-			}
-			catch (IOException e){
-				errors.add(e);
-				logger.error("Failed to close file input stream: " + e.toString(), e);
-			}
 		}
 	}
 
@@ -353,7 +372,7 @@ public abstract class Harvest {
 	 */
 	protected void doHarvestFinishedActions(){
 		
-		// send notification of messages that occured during the harvest
+		// send notification of messages that occurred during the harvest
 		try{
 			if (notificationSender!=null)
 				notificationSender.notifyMessages(this);

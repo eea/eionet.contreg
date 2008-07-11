@@ -73,7 +73,7 @@ public class PullHarvest extends Harvest{
 		}
 		
 		logger.debug("Parsing local file: " + toFile.getAbsolutePath());
-		harvestFile(toFile);
+		harvest(toFile);
 	}
 
 	/**

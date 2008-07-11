@@ -16,6 +16,8 @@ import org.apache.commons.logging.LogFactory;
 import eionet.cr.common.CRException;
 import eionet.cr.common.Identifiers;
 import eionet.cr.common.ResourceDTO;
+import eionet.cr.harvest.HarvestException;
+import eionet.cr.harvest.PushHarvest;
 import eionet.cr.index.EncodingSchemes;
 import eionet.cr.search.Searcher;
 import eionet.cr.util.StringUtils;
@@ -27,7 +29,7 @@ import eionet.qawcommons.DataflowResultDto;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class XmlRpcServices{
+public class XmlRpcServices implements Services{
 
 	
 	/** */
@@ -35,7 +37,7 @@ public class XmlRpcServices{
 
 	/*
 	 * (non-Javadoc)
-	 * @see eionet.cr.api.Searcher#getResourcesSinceTimestamp(java.util.Date)
+	 * @see eionet.cr.api.xmlrpc.Services#getResourcesSinceTimestamp(java.util.Date)
 	 */
 	public List getResourcesSinceTimestamp(Date timestamp) throws CRException {
 		
@@ -62,12 +64,10 @@ public class XmlRpcServices{
 
 		return result==null ? new ArrayList<java.util.Map<String,String[]>>() : result;
 	}
-	
-	/**
-	 * 
-	 * @param criteria
-	 * @return
-	 * @throws CRException
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.api.xmlrpc.Services#dataflowSearch(java.util.Map)
 	 */
 	public List dataflowSearch(Map<String,String> criteria) throws CRException{
 		
@@ -107,12 +107,10 @@ public class XmlRpcServices{
 		
 		return result;
 	}
-	
-	/**
-	 * 
-	 * @param criteria
-	 * @return
-	 * @throws CRException 
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.api.xmlrpc.Services#simpleAndSearch(java.util.Map)
 	 */
 	public List simpleAndSearch(Map<String,String> criteria) throws CRException{
 		
@@ -144,7 +142,32 @@ public class XmlRpcServices{
 		
 		return result==null ? new ArrayList<java.util.Map<String,String[]>>() : result;
 	}
-	
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.api.xmlrpc.Services#pushContent(java.lang.String)
+	 */
+	public Integer pushContent(String content, String sourceUri) throws CRException {
+		
+		int result = 0;
+		if (content!=null && content.trim().length()>0){
+			if (sourceUri==null || sourceUri.trim().length()==0)
+				throw new CRException("Missing sourceUri");
+			else{
+				PushHarvest pushHarvest = new PushHarvest(content, sourceUri);
+				try {
+					pushHarvest.execute();
+					result = pushHarvest.getCountTotalResources();
+				}
+				catch (HarvestException e) {
+					throw new CRException(e.toString(), e);
+				}
+			}
+		}
+		
+		return new Integer(result);
+	}
+
 	/**
 	 * 
 	 * @param args
