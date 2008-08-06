@@ -14,6 +14,7 @@ public class DedicatedHarvestSourceTypes extends Hashtable<String,String>{
 
 	/** */
 	public static final String deliveredFile = "delivered file";
+	public static final String qawSource = "qaw source";
 	
 	/** */
 	private static DedicatedHarvestSourceTypes instance = null;
@@ -35,6 +36,8 @@ public class DedicatedHarvestSourceTypes extends Hashtable<String,String>{
 		
 		this.put(Identifiers.ROD_DELIVERY_CLASS, deliveredFile);
 		this.put(Identifiers.DCTYPE_DATASET_CLASS, deliveredFile);
+		this.put(Identifiers.QAW_RESOURCE_CLASS, qawSource);
+		this.put(Identifiers.QA_REPORT_CLASS, qawSource);
 	}
 
 	/**

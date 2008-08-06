@@ -52,4 +52,7 @@ public interface Identifiers {
 	public static final String FULL_REPORT_CLASS = "http://reports.eea.europa.eu/reports_rdf#FullReport";
 	
 	public static final String DCTYPE_DATASET_CLASS = "http://purl.org/dc/dcmitype/Dataset";
+	
+	public static final String QAW_RESOURCE_CLASS = "http://qaw.eionet.europa.eu/schema.rdf#QawResource";
+	public static final String QA_REPORT_CLASS = "http://qaw.eionet.europa.eu/schema.rdf#QaReport";
 }

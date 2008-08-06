@@ -32,6 +32,14 @@ public interface HarvestSourceDAO {
     public HarvestSourceDTO getHarvestSourceById(Integer harvestSourceID) throws DAOException;
     
     /**
+     * 
+     * @param url
+     * @return
+     * @throws DAOException
+     */
+    public HarvestSourceDTO getHarvestSourceByUrl(String url) throws DAOException;
+    
+    /**
      * @throws DAOException
      * @param HarvestSourceDTO source
      */

@@ -16,12 +16,17 @@ import org.apache.commons.logging.LogFactory;
 import eionet.cr.common.CRException;
 import eionet.cr.common.Identifiers;
 import eionet.cr.common.ResourceDTO;
+import eionet.cr.dao.DAOFactory;
+import eionet.cr.dto.HarvestSourceDTO;
+import eionet.cr.harvest.Harvest;
+import eionet.cr.harvest.HarvestDAOWriter;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.PushHarvest;
 import eionet.cr.index.EncodingSchemes;
 import eionet.cr.search.Searcher;
 import eionet.cr.util.StringUtils;
 import eionet.cr.util.Util;
+import eionet.cr.web.security.CRUser;
 import eionet.qawcommons.DataflowResultDto;
 
 /**
@@ -152,14 +157,25 @@ public class XmlRpcServices implements Services{
 		int result = 0;
 		if (content!=null && content.trim().length()>0){
 			if (sourceUri==null || sourceUri.trim().length()==0)
-				throw new CRException("Missing sourceUri");
+				throw new CRException( "Missing source uri");
 			else{
 				PushHarvest pushHarvest = new PushHarvest(content, sourceUri);
+				HarvestSourceDTO sourceDTO = new HarvestSourceDTO();
+				sourceDTO.setUrl(sourceUri);
+				sourceDTO.setName(sourceUri);
+				sourceDTO.setType("data");
 				try {
+					Integer sourceId = DAOFactory.getDAOFactory().getHarvestSourceDAO().addSourceIgnoreDuplicate(
+							sourceDTO, CRUser.application.getUserName());
+					if (sourceId!=null && sourceId.intValue()>0){
+						pushHarvest.setDaoWriter(
+								new HarvestDAOWriter(sourceId.intValue(), Harvest.TYPE_PUSH, CRUser.application.getUserName()));
+					}
+					
 					pushHarvest.execute();
 					result = pushHarvest.getCountTotalResources();
 				}
-				catch (HarvestException e) {
+				catch (Exception e) {
 					throw new CRException(e.toString(), e);
 				}
 			}

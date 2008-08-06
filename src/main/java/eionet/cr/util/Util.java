@@ -25,6 +25,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -227,65 +228,80 @@ public class Util {
      * @return
      */
     public static String luceneEscape(String str){
+    	return luceneEscape(str, null);
+    }
+    
+    /**
+     * 
+     * @param str
+     * @return
+     */
+    public static String luceneEscape(String str, char[] exceptions){
 		
+    	boolean exceptionsGiven = exceptions!=null && exceptions.length>0;
+    		
         StringBuffer buf = new StringBuffer();
         for(int i=0; i<str.length(); i++){
         	
         	char c = str.charAt(i);
-            switch(c){
-            
-	            case 43: // '+'
-	            	buf.append("\\+");
-	                break;
-	            case 45: // '-'
-	                buf.append("\\-");
-	                break;
-	            case 33: // '!'
-	                buf.append("\\!");
-	                break;
-	            case 40: // '('
-	                buf.append("\\(");
-	                break;
-	            case 41: // ')'
-	                buf.append("\\)");
-	                break;
-	            case 123: // '{'
-	                buf.append("\\{");
-	                break;
-	            case 125: // '}'
-	                buf.append("\\}");
-	                break;
-	            case 91: // '['
-	                buf.append("\\[");
-	                break;
-	            case 93: // ']'
-	                buf.append("\\]");
-	                break;
-	            case 94: // '^'
-	                buf.append("\\^");
-	                break;
-	            case 34: // '"'
-	                buf.append("\\\"");
-	                break;
-	            case 126: // '~'
-	                buf.append("\\~");
-	                break;
-	            case 42: // '*'
-	                buf.append("\\*");
-	                break;
-	            case 63: // '?'
-	                buf.append("\\?");
-	                break;
-	            case 58: // ':'
-	                buf.append("\\:");
-	                break;
-	            case 92: // '\'
-	                buf.append("\\\\");
-	                break;
-	            default:
-	            	buf.append(c);
-	                break;
-            }
+        	if (exceptionsGiven && Arrays.binarySearch(exceptions, c)>=0)
+        		buf.append(c);
+        	else{
+	            switch(c){
+	            
+		            case 43: // '+'
+		            	buf.append("\\+");
+		                break;
+		            case 45: // '-'
+		                buf.append("\\-");
+		                break;
+		            case 33: // '!'
+		                buf.append("\\!");
+		                break;
+		            case 40: // '('
+		                buf.append("\\(");
+		                break;
+		            case 41: // ')'
+		                buf.append("\\)");
+		                break;
+		            case 123: // '{'
+		                buf.append("\\{");
+		                break;
+		            case 125: // '}'
+		                buf.append("\\}");
+		                break;
+		            case 91: // '['
+		                buf.append("\\[");
+		                break;
+		            case 93: // ']'
+		                buf.append("\\]");
+		                break;
+		            case 94: // '^'
+		                buf.append("\\^");
+		                break;
+		            case 34: // '"'
+		                buf.append("\\\"");
+		                break;
+		            case 126: // '~'
+		                buf.append("\\~");
+		                break;
+		            case 42: // '*'
+		                buf.append("\\*");
+		                break;
+		            case 63: // '?'
+		                buf.append("\\?");
+		                break;
+		            case 58: // ':'
+		                buf.append("\\:");
+		                break;
+		            case 92: // '\'
+		                buf.append("\\\\");
+		                break;
+		            default:
+		            	buf.append(c);
+		                break;
+	            }
+        	}
         }
 
         return buf.toString();

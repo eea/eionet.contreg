@@ -203,6 +203,9 @@ public abstract class Harvest {
 	        	}
 	        	catch (Exception e){}
 	        	updateFirstTimes(rdfHandler.getRdfResources());
+	        	
+	        	if (this instanceof PushHarvest)
+	        		indexer.setIncremental(true);
 	        	indexResources(rdfHandler.getRdfResources());
 	        }
 		}
@@ -538,8 +541,15 @@ public abstract class Harvest {
 			String type = resource.getPropertyValue(Identifiers.RDF_TYPE);
 			if (type!=null){
 				String dedicatedTypeName = DedicatedHarvestSourceTypes.getInstance().get(type);
-				if (dedicatedTypeName!=null)
-					daoWriter.storeDedicatedHarvestSource(resource, dedicatedTypeName);
+				if (dedicatedTypeName!=null){
+					if (type.equals(Identifiers.QA_REPORT_CLASS) || type.equals(Identifiers.QAW_RESOURCE_CLASS)){
+						String source = resource.getPropertyValue(Identifiers.DC_SOURCE);
+						if (URLUtil.isURL(source))
+							daoWriter.storeDedicatedHarvestSource(source, resource, dedicatedTypeName);
+					}
+					else
+						daoWriter.storeDedicatedHarvestSource(resource.getId(), resource, dedicatedTypeName);
+				}
 			}
 		}
 	}

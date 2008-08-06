@@ -22,7 +22,7 @@ public class WrappedARPObject {
 	public WrappedARPObject(ALiteral literalObject){
 		this.wrappedObject = literalObject;
 		this.wrappedObjectType = ALiteral.class.getName();
-		this.stringValue = literalObject.toString();
+		this.stringValue = literalObject.toString().trim();
 	}
 
 	/**

@@ -128,10 +128,50 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 			catch (SQLException e){}
 		}
     }
-    
+
+    /** */
+	private static final String getSourcesByUrlSQL = "select * from HARVEST_SOURCE where URL=?";
+
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSourceByUrl(java.lang.String)
+     */
+	public HarvestSourceDTO getHarvestSourceByUrl(String url) throws DAOException {
+		
+    	List<Object> values = new ArrayList<Object>();
+    	values.add(url);
+				
+		Connection conn = null;
+		HarvestSourceDTO source = null;
+		HarvestSourceDTOReader rsReader = new HarvestSourceDTOReader();
+		try{
+			conn = getConnection();
+			SQLUtil.executeQuery(getSourcesByUrlSQL, values, rsReader, conn);
+			List<HarvestSourceDTO>  list = rsReader.getResultList();
+			if(list!=null && list.size()>0){
+				source = list.get(0);
+				HarvestScheduleDTO schedule = DAOFactory.getDAOFactory().getHarvestScheduleDAO().getHarvestScheduleBySourceId(source.getSourceId());
+				if(schedule!=null){
+					source.setHarvestSchedule(schedule);
+				}
+				return source;
+			}
+			return null;
+		}
+		catch (Exception e){
+			throw new DAOException(e.getMessage(), e);
+		}
+		finally{
+			try{
+				if (conn!=null) conn.close();
+			}
+			catch (SQLException e){}
+		}
+	}
+
     /** */
 	private static final String addSourceSQL = "insert into HARVEST_SOURCE (NAME,URL,TYPE,EMAILS,DATE_CREATED,CREATOR) VALUES (?,?,?,?,NOW(),?)";
-	private static final String addSourceIgnoreSQL = "insert ignore into HARVEST_SOURCE (NAME,URL,TYPE,EMAILS,DATE_CREATED,CREATOR) VALUES (?,?,?,?,NOW(),?)";
+	private static final String addSourceIgnoreSQL = "insert into HARVEST_SOURCE (NAME,URL,TYPE,EMAILS,DATE_CREATED,CREATOR) VALUES (?,?,?,?,NOW(),?) on duplicate key update HARVEST_SOURCE_ID=LAST_INSERT_ID(HARVEST_SOURCE_ID)";
 
 	/*
      * (non-Javadoc)
@@ -139,7 +179,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
      * @see eionet.cr.dao.HarvestSourceDao#addSource()
      */
     public Integer addSource(HarvestSourceDTO source, String user) throws DAOException {
-    	return this.addSource(addSourceSQL, source, user);
+    	return addSource(addSourceSQL, source, user);
     }
 
     /*
@@ -147,7 +187,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
      * @see eionet.cr.dao.HarvestSourceDAO#addSourceIgnoreDuplicate(eionet.cr.dto.HarvestSourceDTO, java.lang.String)
      */
 	public Integer addSourceIgnoreDuplicate(HarvestSourceDTO source, String user) throws DAOException {
-		return this.addSource(addSourceIgnoreSQL, source, user);
+		return addSource(addSourceIgnoreSQL, source, user);
 	}
 
 	/**
@@ -176,7 +216,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 			harvestSourceID = getLastInsertID(conn);
 			
 			// if this was an "insert ignore" statement and there was a duplicate entry indeed, getLastInsertID() returns 0 
-			if(harvestSourceID!=null && harvestSourceID.intValue()>0 && source.getHarvestSchedule() != null){
+			if(!sql.equals(addSourceIgnoreSQL) && source.getHarvestSchedule() != null){
 				source.getHarvestSchedule().setHarvestSourceId(harvestSourceID);
 				DAOFactory.getDAOFactory().getHarvestScheduleDAO().addSchedule(source.getHarvestSchedule());
 			}
@@ -282,5 +322,4 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 			ConnectionUtil.closeConnection(conn);
 		}
 	}
-
 }

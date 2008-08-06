@@ -126,20 +126,21 @@ public class HarvestDAOWriter {
 	
 	/**
 	 * 
-	 * @param resource
+	 * @param url
+	 * @param name
 	 * @param dedicatedTypeName
-	 * @throws DAOException 
+	 * @throws DAOException
 	 */
-	protected void storeDedicatedHarvestSource(RDFResource resource, String dedicatedTypeName) throws DAOException{
-		
+	protected void storeDedicatedHarvestSource(String url, RDFResource resource, String dedicatedTypeName) throws DAOException{
+
 		String name = resource.getPropertyValue(Identifiers.DC_TITLE);
 		if (name==null || name.length()==0)
 			name = resource.getPropertyValue(Identifiers.RDFS_LABEL);
 		if (name==null)
 			name = resource.getId();
-		
+
 		HarvestSourceDTO dto = new HarvestSourceDTO();
-		dto.setUrl(resource.getId());
+		dto.setUrl(url);
 		dto.setName(name);
 		dto.setType(dedicatedTypeName);
 		

@@ -46,6 +46,9 @@ public class Indexer {
 	/** */
 	private String firstSeenTimestamp = null;
 	
+	/** */
+	private boolean incremental = false;
+	
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.index.Indexer#indexRDFResource(eionet.cr.harvest.util.RDFResource)
@@ -57,12 +60,14 @@ public class Indexer {
 		
 		if (indexWriter==null){
 			initIndexWriter();
-			try{
-				logger.debug("Clearing index for source: " + resource.getSourceId());
-				indexWriter.deleteDocuments(new Term(Identifiers.SOURCE_ID, resource.getSourceId()));
-			}
-			catch (Exception e){
-				throw new IndexException(e.toString(), e);
+			if (!incremental){
+				try{
+					logger.debug("Clearing index for source: " + resource.getSourceId());
+					indexWriter.deleteDocuments(new Term(Identifiers.SOURCE_ID, resource.getSourceId()));
+				}
+				catch (Exception e){
+					throw new IndexException(e.toString(), e);
+				}
 			}
 		}
 		
@@ -92,8 +97,11 @@ public class Indexer {
 				// if this is a non-literal attribute, find decoded labels for it, and add them to the document
 				if (!property.isLiteral() && property.isValueURL()){
 					String[] decodedLabels = EncodingSchemes.getLabels(property.getValue());
-					for (int j=0; decodedLabels!=null && j<decodedLabels.length; j++)
+					for (int j=0; decodedLabels!=null && j<decodedLabels.length; j++){
 						document.add(constructField(fieldName, decodedLabels[j]));
+						// add the decoded to the all-literal-content field
+						contentBuf.append(decodedLabels[j]).append(" ");
+					}
 				}
 			}
 		}
@@ -244,5 +252,12 @@ public class Indexer {
 			fieldValue,
 			isStoredField(fieldName) ? Field.Store.YES : Field.Store.NO,
 			!isAnalyzedField(fieldName) || !isAnalyzedValue(fieldValue) ? Field.Index.UN_TOKENIZED : Field.Index.TOKENIZED);
+	}
+
+	/**
+	 * @param incremental the incremental to set
+	 */
+	public void setIncremental(boolean incremental) {
+		this.incremental = incremental;
 	}
 }

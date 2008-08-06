@@ -80,6 +80,11 @@ public class HarvestSourcesActionBean extends AbstractCRActionBean {
 			typeMap.put("title", "Delivered files");
 			typeMap.put("type", DedicatedHarvestSourceTypes.deliveredFile);
 			sourceTypes.add(typeMap);
+			
+			typeMap = new HashMap<String,String>();
+			typeMap.put("title", "QAW sources");
+			typeMap.put("type", DedicatedHarvestSourceTypes.qawSource);
+			sourceTypes.add(typeMap);
 		}
 		
 		return sourceTypes;

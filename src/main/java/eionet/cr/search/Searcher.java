@@ -107,7 +107,8 @@ public class Searcher {
 				query = new TermQuery(new Term(Identifiers.DOC_ID, expression));
 			else{
 				QueryParser parser = new QueryParser(DEFAULT_FIELD, Indexer.getAnalyzer());
-				query = parser.parse(Util.luceneEscape(expression));
+				char[] escapeExceptions = {'"'};
+				query = parser.parse(Util.luceneEscape(expression, escapeExceptions));
 			}
 					
 			indexSearcher = getIndexSearcher();
