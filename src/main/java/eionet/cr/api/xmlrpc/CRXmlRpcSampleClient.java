@@ -38,7 +38,7 @@ public class CRXmlRpcSampleClient {
 	    
 	    // execute the call
 	    Object[] params = new Object[]{Util.stringToDate("2007-01-01 10:30:00", "yyyy-MM-dd HH:mm:ss")};
-	    Object[] result = (Object[])client.execute("Services.getResourcesSinceTimestamp", params);
+	    Object[] result = (Object[])client.execute("ContRegService.getResourcesSinceTimestamp", params);
 	    
 	    // loop through the results, do type casting to see if any ClassCastExceptions are thrown
 	    if (result!=null && result.length>0){
