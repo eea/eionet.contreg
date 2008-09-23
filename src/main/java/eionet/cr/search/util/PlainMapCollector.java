@@ -15,16 +15,23 @@ import eionet.cr.util.DocumentListener;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class PlainMapCollector implements DocumentListener {
+public class PlainMapCollector extends HitsCollector {
 	
 	/** */
 	private List<Map<String,String[]>> resultList;
 
+	/**
+	 * @return the resultList
+	 */
+	public List<Map<String, String[]>> getResultList() {
+		return resultList;
+	}
+
 	/*
 	 * (non-Javadoc)
-	 * @see eionet.cr.util.DocumentListener#handleDocument(org.apache.lucene.document.Document)
+	 * @see eionet.cr.search.util.HitsCollector#collectDocument(org.apache.lucene.document.Document)
 	 */
-	public void handleDocument(Document document) {
+	public void collectDocument(Document document) {
 		
 		if (document==null)
 			return;
@@ -44,19 +51,5 @@ public class PlainMapCollector implements DocumentListener {
 			resultList = new ArrayList<Map<String,String[]>>();
 		
 		resultList.add(map);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.util.DocumentListener#done()
-	 */
-	public void done() {
-	}
-
-	/**
-	 * @return the resultListAAA
-	 */
-	public List<Map<String, String[]>> getResultList() {
-		return resultList;
 	}
 }

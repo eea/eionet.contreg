@@ -19,7 +19,32 @@ import eionet.cr.util.DocumentListener;
 public abstract class HitsCollector {
 	
 	/** */
-	public static final int MAX_HITS = 300;
+	public static final int DEFAULT_MAX_HITS = 300;
+	
+	/** */
+	private int maxHits = DEFAULT_MAX_HITS;
+	
+	/**
+	 * 
+	 * @param document
+	 */
+	public abstract void collectDocument(Document document);
+	
+	/**
+	 * 
+	 * @param hits
+	 * @throws IOException 
+	 * @throws CorruptIndexException 
+	 */
+	public void collectHits(Hits hits) throws CorruptIndexException, IOException{
+		
+		if (hits==null || hits.length()==0)
+			return;
+		
+		for (int i=0; i<hits.length() && i<maxHits; i++){
+			collectDocument(hits.doc(i));
+		}
+	}
 
 	/**
 	 * 
@@ -29,7 +54,7 @@ public abstract class HitsCollector {
 	 * @throws IOException
 	 */
 	public static List<ResourceDTO> collectResourceDTOs(Hits hits) throws CorruptIndexException, IOException{
-		return collectResourceDTOs(hits, MAX_HITS);
+		return collectResourceDTOs(hits, DEFAULT_MAX_HITS);
 	}
 	
 	/**
@@ -54,7 +79,7 @@ public abstract class HitsCollector {
 	 * @throws IOException
 	 */
 	public static List<Map<String,String[]>> collectMaps(Hits hits) throws CorruptIndexException, IOException{
-		return collectMaps(hits, MAX_HITS);
+		return collectMaps(hits, DEFAULT_MAX_HITS);
 	}
 	
 	/**
@@ -75,19 +100,31 @@ public abstract class HitsCollector {
 	 * 
 	 * @param hits
 	 * @param maxHits
-	 * @param docListener
+	 * @param collector
 	 * @throws IOException 
 	 * @throws CorruptIndexException 
 	 */
-	protected static void collectHits(Hits hits, int maxHits, DocumentListener docListener) throws CorruptIndexException, IOException{
+	protected static void collectHits(Hits hits, int maxHits, HitsCollector collector) throws CorruptIndexException, IOException{
 		
-		if (hits==null || hits.length()==0 || docListener==null)
+		if (hits==null || hits.length()==0 || collector==null)
 			return;
 		
 		for (int i=0; i<hits.length() && i<maxHits; i++){
-			docListener.handleDocument(hits.doc(i));
+			collector.collectDocument(hits.doc(i));
 		}
-		
-		docListener.done();
+	}
+
+	/**
+	 * @return the maxHits
+	 */
+	public int getMaxHits() {
+		return maxHits;
+	}
+
+	/**
+	 * @param maxHits the maxHits to set
+	 */
+	public void setMaxHits(int maxHits) {
+		this.maxHits = maxHits;
 	}
 }

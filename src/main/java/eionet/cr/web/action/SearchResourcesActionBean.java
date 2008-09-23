@@ -54,7 +54,7 @@ public abstract class SearchResourcesActionBean extends AbstractCRActionBean{
 	 * @return
 	 */
 	public int getMaxResultSetSize(){
-		return HitsCollector.MAX_HITS;
+		return HitsCollector.DEFAULT_MAX_HITS;
 	}
 
 	/**

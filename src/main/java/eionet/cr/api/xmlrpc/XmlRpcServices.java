@@ -24,6 +24,9 @@ import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.PushHarvest;
 import eionet.cr.index.EncodingSchemes;
 import eionet.cr.search.Searcher;
+import eionet.cr.search.util.EntriesCollector;
+import eionet.cr.search.util.HitsCollector;
+import eionet.cr.search.util.ResourceDTOCollector;
 import eionet.cr.util.StringUtils;
 import eionet.cr.util.Util;
 import eionet.cr.web.security.CRUser;
@@ -84,7 +87,11 @@ public class XmlRpcServices implements Services{
 		
 		List<DataflowResultDto> result = new ArrayList<DataflowResultDto>();
 		try{
-			List<ResourceDTO> list = Searcher.customSearch(criteria, false);
+			
+			ResourceDTOCollector collector = new ResourceDTOCollector();
+			Searcher.customSearch(criteria, false, collector);
+			List<ResourceDTO> list = collector.getResultList();
+			
 			if (list!=null){
 				for (int i=0; i<list.size(); i++){
 					
@@ -182,6 +189,36 @@ public class XmlRpcServices implements Services{
 		}
 		
 		return new Integer(result);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.api.xmlrpc.Services#getEntries(java.util.Hashtable)
+	 * 
+	 * This method implements what getEntries did in the old Content Registry.
+	 * It is called by ROD, though it can be used by any other application as well.
+	 * 
+	 * The purpose is to return all metadata of all resources that match the given
+	 * criteria. The criteria is given as a <code>java.util.Hashtable</code>, where keys represent metadata
+	 * attribute names and values represent their values. Data type of both keys and
+	 * values is <code>java.lang.String</code>.
+	 * 
+	 * The method returns a <code>java.util.Vector</code> of type <code>java.util.Hashtable</code>. Every such hashtable represents one
+	 * resource that contains exactly 1 key that is a String that represents the resource's URI. The value is
+	 * another <code>java.lang.Hashtable</code> where the data type of keys is <code>java.lang.String</code> and the data type of values
+	 * is <code>java.util.Vector</code>. They keys represent URIs of the resource's attributes and the value-vectors represent values
+	 * of attributes. These values are of type <code>java.lang.String</code>.
+	 * 
+	 */
+	public Vector getEntries(Hashtable attributes) throws CRException {
+
+		EntriesCollector collector = new EntriesCollector();
+		Searcher.customSearch((Map<String,String>)attributes, true, collector);
+		Vector result = collector.getResultVector();
+		if (result==null)
+			result = new Vector();
+		
+		return result;
 	}
 
 	/**

@@ -229,7 +229,7 @@ public class Indexer {
 	 * @return
 	 */
 	public static boolean isAnalyzedValue(String value){
-		return URIUtil.isURI(value)==false;
+		return URIUtil.isSchemedURI(value)==false;
 	}
 	
 	/**

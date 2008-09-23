@@ -309,11 +309,11 @@ public class Util {
     
     /**
      * 
-     * @param s
+     * @param str
      * @return
      */
-    public static boolean isNullOrEmpty(String s){
-    	return s==null || s.length()==0;
+    public static boolean isNullOrEmpty(String str){
+    	return str == null || str.length() == 0 || str.trim().length() == 0;
     }
     
     /**

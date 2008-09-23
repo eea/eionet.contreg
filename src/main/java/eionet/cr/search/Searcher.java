@@ -103,7 +103,7 @@ public class Searcher {
 		Query query = null;
 		IndexSearcher indexSearcher = null;
 		try{
-			if (URIUtil.isURI(expression.trim()))
+			if (URIUtil.isSchemedURI(expression.trim()))
 				query = new TermQuery(new Term(Identifiers.DOC_ID, expression));
 			else{
 				QueryParser parser = new QueryParser(DEFAULT_FIELD, Indexer.getAnalyzer());
@@ -511,10 +511,10 @@ public class Searcher {
 	 * @return
 	 * @throws SearchException 
 	 */
-	public static List<ResourceDTO> customSearch(Map<String,String> criteria, boolean useSubProperties) throws SearchException{
+	public static void customSearch(Map<String,String> criteria, boolean useSubProperties, HitsCollector collector) throws SearchException{
 		
 		if (criteria==null || criteria.isEmpty())
-			return null;
+			return;
 		
 		IndexSearcher indexSearcher = null;
 		List<Query> queries = new ArrayList<Query>();
@@ -570,10 +570,10 @@ public class Searcher {
 				}
 				
 				indexSearcher = getIndexSearcher();
-				return HitsCollector.collectResourceDTOs(indexSearcher.search(booleanQuery));
+				collector.collectHits(indexSearcher.search(booleanQuery));
 			}
 			else
-				return null;
+				return;
 		}
 		catch (Exception e){
 			throw new SearchException(e.toString(), e);

@@ -18,6 +18,7 @@ import net.sourceforge.stripes.controller.Interceptor;
 import net.sourceforge.stripes.controller.Intercepts;
 import net.sourceforge.stripes.controller.LifecycleStage;
 import eionet.cr.util.StringUtils;
+import eionet.cr.util.Util;
 import eionet.cr.web.interceptor.annotation.DontSaveLastActionEvent;
 
 /**
@@ -132,8 +133,7 @@ public class ActionEventInterceptor implements Interceptor {
 			} else {
 				for (String parameterValue : parameterValues) {
 					sb.append(parameter + "=" + 
-							(StringUtils.isEmptyOrNull(parameterValue) ? "" : parameterValue) + 
-							"&");
+							(Util.isNullOrEmpty(parameterValue) ? "" : parameterValue) +  "&");
 				}
 			}
 		}

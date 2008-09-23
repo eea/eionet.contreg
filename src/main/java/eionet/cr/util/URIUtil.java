@@ -26,9 +26,9 @@ public class URIUtil {
 	 * @param str
 	 * @return
 	 */
-	public static boolean isURI(String str){
+	public static boolean isSchemedURI(String str){
 		
-		if (StringUtils.isEmptyOrNull(str))
+		if (Util.isNullOrEmpty(str))
 			return false;
 		
 		try {

@@ -8,16 +8,23 @@ import org.apache.lucene.document.Document;
 import eionet.cr.common.ResourceDTO;
 import eionet.cr.util.DocumentListener;
 
-public class ResourceDTOCollector implements DocumentListener{
+public class ResourceDTOCollector extends HitsCollector{
 
 	/** */
 	private List<ResourceDTO> resultList;
 
+	/**
+	 * @return the resultList
+	 */
+	public List<ResourceDTO> getResultList() {
+		return resultList;
+	}
+
 	/*
 	 * (non-Javadoc)
-	 * @see eionet.cr.util.DocumentListener#handleDocument(org.apache.lucene.document.Document)
+	 * @see eionet.cr.search.util.HitsCollector#collectDocument(org.apache.lucene.document.Document)
 	 */
-	public void handleDocument(Document document){
+	public void collectDocument(Document document){
 		
 		if (document==null)
 			return;
@@ -26,19 +33,5 @@ public class ResourceDTOCollector implements DocumentListener{
 			resultList = new ArrayList<ResourceDTO>();
 		
 		resultList.add(new ResourceDTO(document));
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.util.DocumentListener#done()
-	 */
-	public void done() {
-	}
-
-	/**
-	 * @return the resultListAAA
-	 */
-	public List<ResourceDTO> getResultList() {
-		return resultList;
 	}
 }

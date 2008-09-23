@@ -1,8 +1,10 @@
 package eionet.cr.api.xmlrpc;
 
 import java.util.Date;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 import eionet.cr.common.CRException;
 
@@ -41,4 +43,11 @@ public interface Services {
 	 * @throws CRException
 	 */
 	public abstract Integer pushContent(String content, String sourceUri) throws CRException;
+	/**
+	 * 
+	 * @param attributes
+	 * @return
+	 * @throws CRException
+	 */
+	public abstract Vector getEntries(Hashtable attributes) throws CRException;
 }
