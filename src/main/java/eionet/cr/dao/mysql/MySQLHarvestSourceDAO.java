@@ -9,7 +9,6 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.HarvestDTO;
-import eionet.cr.dto.HarvestScheduleDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.readers.HarvestDTOReader;
 import eionet.cr.dto.readers.HarvestSourceDTOReader;
@@ -107,16 +106,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 			conn = getConnection();
 			SQLUtil.executeQuery(getSourcesByIdSQL, values, rsReader, conn);
 			List<HarvestSourceDTO>  list = rsReader.getResultList();
-			if(list!=null && list.size()>0){
-				source = list.get(0);
-				
-				HarvestScheduleDTO schedule = DAOFactory.getDAOFactory().getHarvestScheduleDAO().getHarvestScheduleBySourceId(harvestSourceID);
-				if(schedule!=null){
-					source.setHarvestSchedule(schedule);
-				}
-				return source;
-			}
-			return null;
+			return (list!=null && !list.isEmpty()) ? list.get(0) : null;
 		}
 		catch (Exception e){
 			throw new DAOException(e.getMessage(), e);
@@ -148,15 +138,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 			conn = getConnection();
 			SQLUtil.executeQuery(getSourcesByUrlSQL, values, rsReader, conn);
 			List<HarvestSourceDTO>  list = rsReader.getResultList();
-			if(list!=null && list.size()>0){
-				source = list.get(0);
-				HarvestScheduleDTO schedule = DAOFactory.getDAOFactory().getHarvestScheduleDAO().getHarvestScheduleBySourceId(source.getSourceId());
-				if(schedule!=null){
-					source.setHarvestSchedule(schedule);
-				}
-				return source;
-			}
-			return null;
+			return (list!=null && !list.isEmpty()) ? list.get(0) : null;
 		}
 		catch (Exception e){
 			throw new DAOException(e.getMessage(), e);
@@ -214,13 +196,6 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 			conn = getConnection();
 			SQLUtil.executeUpdate(sql, values, conn);
 			harvestSourceID = getLastInsertID(conn);
-			
-			// if this was an "insert ignore" statement and there was a duplicate entry indeed, getLastInsertID() returns 0 
-			if(!sql.equals(addSourceIgnoreSQL) && source.getHarvestSchedule() != null){
-				source.getHarvestSchedule().setHarvestSourceId(harvestSourceID);
-				DAOFactory.getDAOFactory().getHarvestScheduleDAO().addSchedule(source.getHarvestSchedule());
-			}
-			
 			return harvestSourceID;
 		}
 		catch (Exception e){
@@ -252,10 +227,6 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 		try{
 			conn = getConnection();
 			SQLUtil.executeUpdate(editSourceSQL, values, conn);
-			
-			if(source.getHarvestSchedule() != null){
-				DAOFactory.getDAOFactory().getHarvestScheduleDAO().editSchedule(source.getHarvestSchedule());
-			}
 		}
 		catch (Exception e){
 			throw new DAOException(e.getMessage(), e);
@@ -282,8 +253,6 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 		try{
 			conn = getConnection();
 			SQLUtil.executeUpdate(deleteSourceSQL, values, conn);
-			
-			DAOFactory.getDAOFactory().getHarvestScheduleDAO().deleteSchedule(source.getSourceId());
 		}
 		catch (Exception e){
 			throw new DAOException(e.getMessage(), e);

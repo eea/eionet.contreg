@@ -35,6 +35,8 @@ public class HarvestSourceDTOReader extends ResultSetBaseReader {
 		harvestSourceDTO.setStatements(new Integer(rs.getInt("STATEMENTS")));
 		harvestSourceDTO.setResources(new Integer(rs.getInt("RESOURCES")));
 		harvestSourceDTO.setCountUnavail(new Integer(rs.getInt("COUNT_UNAVAIL")));
+		harvestSourceDTO.setScheduleCron(rs.getString("SCHEDULE_CRON"));
+		
 		resultList.add(harvestSourceDTO);
 	}
 

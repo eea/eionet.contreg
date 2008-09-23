@@ -9,7 +9,6 @@ import org.junit.Test;
 
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOFactory;
-import eionet.cr.dto.HarvestScheduleDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.test.util.DbHelper;
 import eionet.cr.util.sql.ConnectionUtil;
@@ -49,12 +48,6 @@ public class HarvestSourceDAOTest extends DBTestCase {
 		harvestSource.setEmails("bob@europe.eu");
 		harvestSource.setType("data");
 		
-		HarvestScheduleDTO schedule = new HarvestScheduleDTO();
-		schedule.setHour(12);
-		schedule.setPeriod(2);
-		schedule.setWeekday("Monday");
-		harvestSource.setHarvestSchedule(schedule);
-		
 		ConnectionUtil.setReturnSimpleConnection(true);
 		Integer harvestSourceID = DAOFactory.getDAOFactory().getHarvestSourceDAO().addSource(harvestSource, "bobsmith");
 		assertNotNull(harvestSourceID);
@@ -78,11 +71,6 @@ public class HarvestSourceDAOTest extends DBTestCase {
 		assertEquals("bobsmith", source.getCreator());
 		assertEquals("bob@europe.eu", source.getEmails());
 		assertEquals("data", source.getType());
-		
-		assertEquals(new Integer(0), source.getHarvestSchedule().getHour());
-		assertEquals(new Integer(1), source.getHarvestSchedule().getPeriod());
-		assertEquals("monday", source.getHarvestSchedule().getWeekday());
-		
 	}
 	
 	@Test
@@ -93,12 +81,6 @@ public class HarvestSourceDAOTest extends DBTestCase {
 		harvestSource.setUrl("http://localhost:8080/cr/pages/test2.xml");
 		harvestSource.setEmails("bob2@europe.eu");
 		harvestSource.setType("schema");
-		
-		HarvestScheduleDTO schedule = new HarvestScheduleDTO();
-		schedule.setHour(14);
-		schedule.setPeriod(4);
-		schedule.setWeekday("Sunday");
-		harvestSource.setHarvestSchedule(schedule);
 		
 		ConnectionUtil.setReturnSimpleConnection(true);
 		DAOFactory.getDAOFactory().getHarvestSourceDAO().editSource(harvestSource);

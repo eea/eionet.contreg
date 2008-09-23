@@ -3,7 +3,6 @@ package eionet.cr.dao.mysql;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dao.HarvestMessageDAO;
-import eionet.cr.dao.HarvestScheduleDAO;
 import eionet.cr.dao.HarvestSourceDAO;
 
 /**
@@ -26,14 +25,6 @@ public class MySQLDAOFactory extends DAOFactory {
 	 */
 	public HarvestSourceDAO getHarvestSourceDAO() {
 		return new MySQLHarvestSourceDAO();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.dao.DAOFactory#getHarvestScheduleDAO()
-	 */
-	public HarvestScheduleDAO getHarvestScheduleDAO() {
-		return new MySQLHarvestScheduleDAO();
 	}
 
 	/*

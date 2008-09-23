@@ -51,15 +51,8 @@
 	                </td>
 	            </tr>
 	            <tr>
-	                <td>Schedule:</td>
-	                <td>
-	                	weekday: 
-	                	${fn:escapeXml(actionBean.harvestSource.harvestSchedule.weekday)}&nbsp;&nbsp;&nbsp; 
-	                	hour: 
-	                	${fn:escapeXml(actionBean.harvestSource.harvestSchedule.hour)}&nbsp;&nbsp;&nbsp;
-	                	period (weeks): 
-	                	${fn:escapeXml(actionBean.harvestSource.harvestSchedule.period)}
-	                </td>
+	                <td>Schedule cron expression:</td>
+	                <td>${fn:escapeXml(actionBean.harvestSource.scheduleCron)}</td>
 	            </tr>
            		<c:if test="${actionBean.harvestSource.unavailable}">
            			<tr>

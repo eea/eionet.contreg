@@ -144,7 +144,7 @@ public class HarvestDAOWriter {
 		dto.setName(name);
 		dto.setType(dedicatedTypeName);
 		
-		// TODO - set e-mails + a proper schedule
+		// TODO - set e-mails + a proper schedule!!!
 		
 		DAOFactory.getDAOFactory().getHarvestSourceDAO().addSourceIgnoreDuplicate(dto, CRUser.application.getUserName());
 	}

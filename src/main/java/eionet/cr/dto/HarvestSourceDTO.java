@@ -29,7 +29,7 @@ public class HarvestSourceDTO implements Serializable {
 	private Integer statements;
 	private Integer resources;
 	private Integer countUnavail;
-	private HarvestScheduleDTO harvestSchedule;
+	private String scheduleCron;
 	
 	/**
 	 * 
@@ -178,25 +178,25 @@ public class HarvestSourceDTO implements Serializable {
 	}
 
 	/**
-	 * @return the harvestSchedule
-	 */
-	public HarvestScheduleDTO getHarvestSchedule() {
-		return harvestSchedule;
-	}
-
-	/**
-	 * @param harvestSchedule the harvestSchedule to set
-	 */
-	public void setHarvestSchedule(HarvestScheduleDTO harvestSchedule) {
-		this.harvestSchedule = harvestSchedule;
-	}
-	
-	/**
 	 * 
 	 * @return
 	 */
 	public boolean isUnavailable(){
 		
 		return countUnavail!=null && countUnavail.intValue()>=COUNT_UNAVAIL_THRESHOLD;
+	}
+
+	/**
+	 * @return the scheduleCron
+	 */
+	public String getScheduleCron() {
+		return scheduleCron;
+	}
+
+	/**
+	 * @param scheduleCron the scheduleCron to set
+	 */
+	public void setScheduleCron(String scheduleCron) {
+		this.scheduleCron = scheduleCron;
 	}
 }

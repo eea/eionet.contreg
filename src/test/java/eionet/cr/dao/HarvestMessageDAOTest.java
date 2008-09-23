@@ -14,7 +14,7 @@ import eionet.cr.test.util.DbHelper;
 import eionet.cr.util.sql.ConnectionUtil;
 
 /**
- * JUnit test tests HarvestScheduleDAO functionality.
+ * JUnit test tests HarvestMessageDAO functionality.
  * 
  * @author altnyris
  *

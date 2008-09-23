@@ -13,11 +13,6 @@ public abstract class DAOFactory {
 	public abstract HarvestSourceDAO getHarvestSourceDAO();
 	
 	/**
-	 * @return
-	 */
-	public abstract HarvestScheduleDAO getHarvestScheduleDAO();
-	
-	/**
 	 * 
 	 * @return
 	 */
