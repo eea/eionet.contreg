@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
@@ -15,6 +16,7 @@ import eionet.cr.dto.readers.HarvestSourceDTOReader;
 import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.sql.ConnectionUtil;
 import eionet.cr.util.sql.SQLUtil;
+import eionet.cr.util.sql.SQLValue;
 
 /**
  * @author altnyris
@@ -289,6 +291,76 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 		}
 		finally{
 			ConnectionUtil.closeConnection(conn);
+		}
+	}
+	
+	/** */
+	private static final String getDistinctSchedulesSQL = "select distinct SCHEDULE_CRON from HARVEST_SOURCE";
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HarvestSourceDAO#getDistinctSchedules()
+	 */
+	public List<String> getDistinctSchedules() throws DAOException {
+		
+		List<String> result = new ArrayList<String>();
+		
+		Connection conn = null;
+		HarvestSourceDTOReader rsReader = new HarvestSourceDTOReader();
+		try{
+			conn = getConnection();
+			List<Map<String,SQLValue>> list = SQLUtil.executeQuery(getDistinctSchedulesSQL, conn);
+			if (list!=null){
+				for (int i=0; i<list.size(); i++){
+					Map<String,SQLValue> map = list.get(i);
+					if (map!=null && !map.isEmpty()){
+						SQLValue value = map.get("SCHEDULE_CRON");
+						if (value!=null)
+							result.add(value.getString());
+					}
+				}
+			}
+		}
+		catch (Exception e){
+			throw new DAOException(e.getMessage(), e);
+		}
+		finally{
+			try{
+				if (conn!=null) conn.close();
+			}
+			catch (SQLException e){}
+		}
+		
+		return result;
+	}
+
+	/** */
+	private static final String getSourcesByScheduleSQL = "select * from HARVEST_SOURCE where SCHEDULE_CRON=? order by HARVEST_SOURCE_ID asc";
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSourcesBySchedule(java.lang.String)
+	 */
+	public List<HarvestSourceDTO> getHarvestSourcesBySchedule(String schedule) throws DAOException {
+
+    	List<Object> values = new ArrayList<Object>();
+    	values.add(schedule);
+				
+		Connection conn = null;
+		HarvestSourceDTOReader rsReader = new HarvestSourceDTOReader();
+		try{
+			conn = getConnection();
+			SQLUtil.executeQuery(getSourcesByScheduleSQL, values, rsReader, conn);
+			return rsReader.getResultList();
+		}
+		catch (Exception e){
+			throw new DAOException(e.getMessage(), e);
+		}
+		finally{
+			try{
+				if (conn!=null) conn.close();
+			}
+			catch (SQLException e){}
 		}
 	}
 }

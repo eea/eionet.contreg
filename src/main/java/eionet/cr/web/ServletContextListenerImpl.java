@@ -32,7 +32,5 @@ public class ServletContextListenerImpl implements ServletContextListener{
 	public void contextInitialized(ServletContextEvent event) {
 		
 		AllDocsWalker.startupWalk();
-		SubProperties subProps = SubProperties.getInstance();
-		System.out.println("");
 	}
 }
