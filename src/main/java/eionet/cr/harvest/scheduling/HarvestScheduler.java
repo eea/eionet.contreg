@@ -3,6 +3,8 @@ package eionet.cr.harvest.scheduling;
 import java.text.ParseException;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.quartz.CronTrigger;
 import org.quartz.Job;
 import org.quartz.JobDetail;
@@ -17,6 +19,7 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.harvest.HarvestException;
+import eionet.cr.util.sql.ConnectionUtil;
 
 /**
  * 
@@ -26,7 +29,10 @@ import eionet.cr.harvest.HarvestException;
 public class HarvestScheduler implements Job{
 	
 	/** */
-	private static final String CRON_ATTR = "cron";
+	private static Log logger = LogFactory.getLog(HarvestScheduler.class);
+	
+	/** */
+	protected static final String CRON_ATTR = "cron";
 
 	/** */
 	private static Scheduler scheduler = null;
@@ -73,10 +79,9 @@ public class HarvestScheduler implements Job{
 	private static synchronized void schedule(String cronExpression) throws HarvestException{
 		
 		try{
-			JobDetail jobDetails = new JobDetail();
-			jobDetails.setJobClass(HarvestScheduler.class);
+			JobDetail jobDetails = new JobDetail("HarvestScheduler", "CR Schedulers", HarvestScheduler.class);
 			jobDetails.getJobDataMap().put(CRON_ATTR, cronExpression);
-			CronTrigger trigger = new CronTrigger();
+			CronTrigger trigger = new CronTrigger("HarvestScheduler", "CR Schedulers");
 			trigger.setCronExpression(cronExpression);
 	
 			if (scheduler==null)
@@ -84,7 +89,7 @@ public class HarvestScheduler implements Job{
 			scheduler.scheduleJob(jobDetails, trigger);
 		}
 		catch (ParseException e){
-			throw new HarvestException("Error parsing cronExpression(" + cronExpression + "): " + e.toString(), e);
+			logger.error("Error parsing cron expression (" + cronExpression + "): " + e.toString(), e);
 		}
 		catch (SchedulerException e){
 			throw new HarvestException(e.toString(), e);

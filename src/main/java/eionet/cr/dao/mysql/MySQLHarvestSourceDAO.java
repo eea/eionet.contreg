@@ -13,6 +13,7 @@ import eionet.cr.dto.HarvestDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.readers.HarvestDTOReader;
 import eionet.cr.dto.readers.HarvestSourceDTOReader;
+import eionet.cr.util.Util;
 import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.sql.ConnectionUtil;
 import eionet.cr.util.sql.SQLUtil;
@@ -314,9 +315,12 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 				for (int i=0; i<list.size(); i++){
 					Map<String,SQLValue> map = list.get(i);
 					if (map!=null && !map.isEmpty()){
-						SQLValue value = map.get("SCHEDULE_CRON");
-						if (value!=null)
-							result.add(value.getString());
+						SQLValue sqlValue = map.get("SCHEDULE_CRON");
+						if (sqlValue!=null){
+							String strValue = sqlValue.getString();
+							if (!Util.isNullOrEmpty(strValue))
+								result.add(strValue);
+						}
 					}
 				}
 			}
