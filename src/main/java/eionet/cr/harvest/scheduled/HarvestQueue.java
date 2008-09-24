@@ -1,4 +1,4 @@
-package eionet.cr.harvest.scheduling;
+package eionet.cr.harvest.scheduled;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
