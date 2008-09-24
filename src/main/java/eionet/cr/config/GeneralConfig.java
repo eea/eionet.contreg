@@ -27,6 +27,7 @@ public class GeneralConfig {
 	/** */
 	public static final String LUCENE_INDEX_LOCATION = "lucene.index.location";
 	public static final String HARVESTER_FILES_LOCATION = "harvester.files.location";
+	public static final String HARVESTER_JOB_CRON_EXPRESSION = "harvester.job.quartzCronExpression";
 	
 	/** */
 	public static final String DATASOURCE_NAME = "datasource.name";
@@ -50,7 +51,6 @@ public class GeneralConfig {
 	private static void init(){
 		properties = new Properties();
 		try{
-			String s = GeneralConfig.class.getClassLoader().getResource(PROPERTIES_FILE_NAME).toString();
 			properties.load(GeneralConfig.class.getClassLoader().getResourceAsStream(PROPERTIES_FILE_NAME));
 		}
 		catch (IOException e){

@@ -11,11 +11,11 @@ import org.quartz.JobListener;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class HarvestQueueingJobListener implements JobListener{
-
-	/** */
-	private static Log logger = LogFactory.getLog(HarvestQueueingJobListener.class);
+public class HarvestingJobListener implements JobListener{
 	
+	/** */
+	private static Log logger = LogFactory.getLog(HarvestingJobListener.class);
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.quartz.JobListener#getName()
@@ -29,8 +29,7 @@ public class HarvestQueueingJobListener implements JobListener{
 	 * @see org.quartz.JobListener#jobExecutionVetoed(org.quartz.JobExecutionContext)
 	 */
 	public void jobExecutionVetoed(JobExecutionContext context) {
-		logger.error("Job execution was vetoed for cron expression [" +
-				context.getJobDetail().getJobDataMap().getString(HarvestQueueingJob.CRON_ATTR) + "]");
+		logger.error("Execution vetoed for job " + context.getJobDetail().getName());
 	}
 
 	/*
@@ -38,8 +37,7 @@ public class HarvestQueueingJobListener implements JobListener{
 	 * @see org.quartz.JobListener#jobToBeExecuted(org.quartz.JobExecutionContext)
 	 */
 	public void jobToBeExecuted(JobExecutionContext context) {
-		logger.info("Going to execute job for cron expression [" +
-				context.getJobDetail().getJobDataMap().getString(HarvestQueueingJob.CRON_ATTR) + "]");
+		logger.error("Going to execute job " + context.getJobDetail().getName());
 	}
 
 	/*
@@ -49,15 +47,10 @@ public class HarvestQueueingJobListener implements JobListener{
 	public void jobWasExecuted(JobExecutionContext context, JobExecutionException exception) {
 		
 		if (exception!=null){
-			logger.error("There was a job execution exception for cron expression [" +
-					context.getJobDetail().getJobDataMap().getString(HarvestQueueingJob.CRON_ATTR) + "]: " + exception.toString(), exception);
+			logger.error("Exception thrown when executing job " + context.getJobDetail().getName() + ": " + exception.toString(), exception);
 			return;
 		}
 		
-		logger.info("Job was executed for cron expression [" +
-				context.getJobDetail().getJobDataMap().getString(HarvestQueueingJob.CRON_ATTR) + "]");
-		
-		logger.info("Current *normal* priority harvest queue:\n" + HarvestQueue.getNormal().toString());
-		logger.info("Current *urgent* priority harvest queue:\n" + HarvestQueue.getUrgent().toString());
+		logger.error("Executed job " + context.getJobDetail().getName());
 	}
 }

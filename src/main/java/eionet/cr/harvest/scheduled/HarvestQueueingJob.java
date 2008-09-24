@@ -71,7 +71,7 @@ public class HarvestQueueingJob implements Job, ServletContextListener{
 	 */
 	public static void scheduleCronExpression(String cronExpression) throws SchedulerException{
 		
-		JobDetail jobDetails = new JobDetail(HarvestQueueingJob.class.getName(), JobScheduler.class.getName(), HarvestQueueingJob.class);
+		JobDetail jobDetails = new JobDetail(HarvestQueueingJob.class.getSimpleName() + " for cron expression [" + cronExpression + "]", JobScheduler.class.getName(), HarvestQueueingJob.class);
 		jobDetails.getJobDataMap().put(CRON_ATTR, cronExpression);
 		
 		addListener(jobDetails);
