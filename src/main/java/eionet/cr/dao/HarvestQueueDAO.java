@@ -13,6 +13,19 @@ public interface HarvestQueueDAO {
 
 	/**
 	 * 
+	 * @throws DAOException
+	 */
+	public abstract void addPullHarvest(HarvestQueueItemDTO queueItem) throws DAOException;
+	
+	/**
+	 * 
+	 * @param queueItem
+	 * @throws DAOException
+	 */
+	public abstract void addPushHarvest(HarvestQueueItemDTO queueItem) throws DAOException;
+	
+	/**
+	 * 
 	 * @return
 	 * @throws DAOException 
 	 */
@@ -23,5 +36,18 @@ public interface HarvestQueueDAO {
 	 * @return
 	 */
 	public abstract List<HarvestQueueItemDTO> getUrgentHarvestQueue() throws DAOException;
-
+	
+	/**
+	 * 
+	 * @return
+	 * @throws DAOException
+	 */
+	public abstract HarvestQueueItemDTO pollNormal() throws DAOException;
+	
+	/**
+	 * 
+	 * @return
+	 * @throws DAOException
+	 */
+	public abstract HarvestQueueItemDTO pollUrgent() throws DAOException;
 }

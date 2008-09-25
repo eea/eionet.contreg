@@ -23,7 +23,13 @@ public abstract class DAOFactory {
 	 * @return
 	 */
 	public abstract HarvestMessageDAO getHarvestMessageDAO();
-	
+
+	/**
+	 * 
+	 * @return
+	 */
+	public abstract HarvestQueueDAO getHarvestQueueDAO();
+
 	/**
 	 * 
 	 * @param whichFactory

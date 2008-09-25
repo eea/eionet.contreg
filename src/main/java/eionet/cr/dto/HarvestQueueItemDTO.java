@@ -10,10 +10,6 @@ import java.io.Serializable;
 public class HarvestQueueItemDTO implements Serializable{
 	
 	/** */
-	public static final String PRIORITY_NORMAL = "normal";
-	public static final String PRIORITY_URGENT = "urgent";
-	
-	/** */
 	private String url;
 	private String priority;
 	private java.util.Date timeAdded;

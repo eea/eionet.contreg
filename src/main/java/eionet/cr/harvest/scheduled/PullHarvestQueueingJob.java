@@ -19,6 +19,7 @@ import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
 import org.quartz.impl.StdSchedulerFactory;
 
+import eionet.cr.common.CRException;
 import eionet.cr.common.JobScheduler;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
@@ -31,16 +32,16 @@ import eionet.cr.util.sql.ConnectionUtil;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class HarvestQueueingJob implements Job, ServletContextListener{
+public class PullHarvestQueueingJob implements Job, ServletContextListener{
 	
 	/** */
-	private static Log logger = LogFactory.getLog(HarvestQueueingJob.class);
+	private static Log logger = LogFactory.getLog(PullHarvestQueueingJob.class);
 	
 	/** */
 	protected static final String CRON_ATTR = "cron";
 	
 	/** */
-	private static HarvestQueueingJobListener listener;
+	private static PullHarvestQueueingJobListener listener;
 
 	/*
 	 * (non-Javadoc)
@@ -55,11 +56,11 @@ public class HarvestQueueingJob implements Job, ServletContextListener{
 			if (harvestSources!=null && !harvestSources.isEmpty()){
 				for (int i=0; i<harvestSources.size(); i++){
 					String sourceUrl = harvestSources.get(i).getUrl();
-					HarvestQueue.getNormal().add(sourceUrl);
+					HarvestQueue.addPullHarvest(sourceUrl, HarvestQueue.PRIORITY_NORMAL);
 				}
 			}
 		}
-		catch (DAOException e){
+		catch (CRException e){
 			throw new JobExecutionException(e.toString(), e);
 		}
 	}
@@ -71,7 +72,7 @@ public class HarvestQueueingJob implements Job, ServletContextListener{
 	 */
 	public static void scheduleCronExpression(String cronExpression) throws SchedulerException{
 		
-		JobDetail jobDetails = new JobDetail(HarvestQueueingJob.class.getSimpleName() + " for cron expression [" + cronExpression + "]", JobScheduler.class.getName(), HarvestQueueingJob.class);
+		JobDetail jobDetails = new JobDetail(PullHarvestQueueingJob.class.getSimpleName() + " for cron expression [" + cronExpression + "]", JobScheduler.class.getName(), PullHarvestQueueingJob.class);
 		jobDetails.getJobDataMap().put(CRON_ATTR, cronExpression);
 		
 		addListener(jobDetails);
@@ -86,7 +87,7 @@ public class HarvestQueueingJob implements Job, ServletContextListener{
 	private synchronized static void addListener(JobDetail jobDetails) throws SchedulerException{
 		
 		if (listener==null){
-			listener = new HarvestQueueingJobListener();
+			listener = new PullHarvestQueueingJobListener();
 			JobScheduler.registerJobListener(listener);
 		}
 		jobDetails.addJobListener(listener.getName());
@@ -129,7 +130,7 @@ public class HarvestQueueingJob implements Job, ServletContextListener{
 	 */
 	public static void main(String[] args){
 		ConnectionUtil.setReturnSimpleConnection(true);
-		HarvestQueueingJob job = new HarvestQueueingJob();
+		PullHarvestQueueingJob job = new PullHarvestQueueingJob();
 		job.contextInitialized(null);
 	}
 }

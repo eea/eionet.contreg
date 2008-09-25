@@ -18,6 +18,7 @@ import eionet.cr.common.CRException;
 import eionet.cr.common.JobScheduler;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOFactory;
+import eionet.cr.dto.HarvestQueueItemDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.harvest.Harvest;
 import eionet.cr.harvest.HarvestDAOWriter;
@@ -47,20 +48,20 @@ public class HarvestingJob implements Job, ServletContextListener{
 	public void execute(JobExecutionContext jobExecContext) throws JobExecutionException {
 
 		try{
-			String urlToHarvest = HarvestQueue.getUrgent().poll();
-			if (urlToHarvest==null)
-				urlToHarvest = HarvestQueue.getNormal().poll();
-			if (urlToHarvest==null || !URLUtil.isURL(urlToHarvest))
+			HarvestQueueItemDTO queueItem = HarvestQueue.poll(HarvestQueue.PRIORITY_URGENT);
+			if (queueItem==null || queueItem.getUrl()==null || queueItem.getUrl().length()==0)
+				queueItem = HarvestQueue.poll(HarvestQueue.PRIORITY_NORMAL);
+			if (queueItem==null || queueItem.getUrl()==null || queueItem.getUrl().length()==0)
 				return;
 			
-			logger.info("Going to harvest url: " + urlToHarvest);
+			logger.info("Going to harvest url: " + queueItem.getUrl());
 		
-			HarvestSourceDTO harvestSource = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceByUrl(urlToHarvest);
+			HarvestSourceDTO harvestSource = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceByUrl(queueItem.getUrl());
 			Harvest harvest = new PullHarvest(harvestSource.getUrl(), null); // TODO - use proper lastHarvestTimestamp instead of null
 			harvest.setDaoWriter(new HarvestDAOWriter(
 					harvestSource.getSourceId().intValue(), Harvest.TYPE_PULL, CRUser.application.getUserName()));
 			
-			setUrlHarvestingNow(urlToHarvest);
+			setUrlHarvestingNow(queueItem.getUrl());
 			
 			harvest.execute();
 		}
@@ -107,7 +108,7 @@ public class HarvestingJob implements Job, ServletContextListener{
 		
 		ConnectionUtil.setReturnSimpleConnection(true);
 
-		HarvestQueueingJob queueingJob = new HarvestQueueingJob();
+		PullHarvestQueueingJob queueingJob = new PullHarvestQueueingJob();
 		queueingJob.contextInitialized(null);
 
 		HarvestingJob harvestingJob = new HarvestingJob();

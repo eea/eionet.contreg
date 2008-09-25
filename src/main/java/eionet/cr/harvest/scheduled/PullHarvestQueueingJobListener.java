@@ -11,10 +11,10 @@ import org.quartz.JobListener;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class HarvestQueueingJobListener implements JobListener{
+public class PullHarvestQueueingJobListener implements JobListener{
 
 	/** */
-	private static Log logger = LogFactory.getLog(HarvestQueueingJobListener.class);
+	private static Log logger = LogFactory.getLog(PullHarvestQueueingJobListener.class);
 	
 	/*
 	 * (non-Javadoc)
@@ -30,7 +30,7 @@ public class HarvestQueueingJobListener implements JobListener{
 	 */
 	public void jobExecutionVetoed(JobExecutionContext context) {
 		logger.info("Job execution was vetoed for cron expression [" +
-				context.getJobDetail().getJobDataMap().getString(HarvestQueueingJob.CRON_ATTR) + "]");
+				context.getJobDetail().getJobDataMap().getString(PullHarvestQueueingJob.CRON_ATTR) + "]");
 	}
 
 	/*
@@ -39,7 +39,7 @@ public class HarvestQueueingJobListener implements JobListener{
 	 */
 	public void jobToBeExecuted(JobExecutionContext context) {
 		logger.info("Going to execute job for cron expression [" +
-				context.getJobDetail().getJobDataMap().getString(HarvestQueueingJob.CRON_ATTR) + "]");
+				context.getJobDetail().getJobDataMap().getString(PullHarvestQueueingJob.CRON_ATTR) + "]");
 	}
 
 	/*
@@ -50,14 +50,11 @@ public class HarvestQueueingJobListener implements JobListener{
 		
 		if (exception!=null){
 			logger.error("There was a job execution exception for cron expression [" +
-					context.getJobDetail().getJobDataMap().getString(HarvestQueueingJob.CRON_ATTR) + "]: " + exception.toString(), exception);
+					context.getJobDetail().getJobDataMap().getString(PullHarvestQueueingJob.CRON_ATTR) + "]: " + exception.toString(), exception);
 			return;
 		}
 		
 		logger.info("Job was executed for cron expression [" +
-				context.getJobDetail().getJobDataMap().getString(HarvestQueueingJob.CRON_ATTR) + "]");
-		
-		logger.info("Current *normal* priority harvest queue:\n" + HarvestQueue.getNormal().toString());
-		logger.info("Current *urgent* priority harvest queue:\n" + HarvestQueue.getUrgent().toString());
+				context.getJobDetail().getJobDataMap().getString(PullHarvestQueueingJob.CRON_ATTR) + "]");
 	}
 }

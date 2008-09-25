@@ -2,56 +2,79 @@ package eionet.cr.harvest.scheduled;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import eionet.cr.dao.DAOException;
+import eionet.cr.dao.DAOFactory;
+import eionet.cr.dto.HarvestQueueItemDTO;
+import eionet.cr.harvest.HarvestException;
+
 /**
  * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class HarvestQueue extends ConcurrentLinkedQueue<String>{
+public class HarvestQueue{
 
 	/** */
-	private static HarvestQueue urgentQueue;
-	private static HarvestQueue normalQueue;
+	public static final String PRIORITY_NORMAL = "normal";
+	public static final String PRIORITY_URGENT = "urgent";
 	
 	/**
 	 * 
+	 * @param priority
+	 * @throws HarvestException 
 	 */
-	private HarvestQueue(){
-		super();
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public static synchronized HarvestQueue getUrgent(){
-		if (urgentQueue==null)
-			urgentQueue = new HarvestQueue();
-		return urgentQueue;
+	public static synchronized void addPullHarvest(String url, String priority) throws HarvestException{
+		
+		HarvestQueueItemDTO dto = new HarvestQueueItemDTO();
+		dto.setUrl(url);
+		dto.setPriority(priority);
+		
+		try {
+			DAOFactory.getDAOFactory().getHarvestQueueDAO().addPullHarvest(dto);
+		}
+		catch (DAOException e) {
+			throw new HarvestException(e.toString(), e);
+		}
 	}
 
 	/**
 	 * 
-	 * @return
+	 * @param pushContent
+	 * @param url
+	 * @param priority
+	 * @throws HarvestException 
 	 */
-	public static synchronized HarvestQueue getNormal(){
-		if (normalQueue==null)
-			normalQueue = new HarvestQueue();
-		return normalQueue;
+	public static synchronized void addPushHarvest(String pushContent, String url, String priority) throws HarvestException{
+		
+		HarvestQueueItemDTO dto = new HarvestQueueItemDTO();
+		dto.setUrl(url);
+		dto.setPriority(priority);
+		dto.setPushedContent(pushContent);
+		
+		try {
+			DAOFactory.getDAOFactory().getHarvestQueueDAO().addPushHarvest(dto);
+		}
+		catch (DAOException e) {
+			throw new HarvestException(e.toString(), e);
+		}
 	}
 	
 	/**
 	 * 
-	 * @param args
+	 * @param priority
+	 * @return
+	 * @throws HarvestException 
 	 */
-	public static void main(String[] args){
+	public static synchronized HarvestQueueItemDTO poll(String priority) throws HarvestException{
 		
-		HarvestQueue.getNormal().add("kala");
-		HarvestQueue.getNormal().add("mees");
-		System.out.println(HarvestQueue.getNormal().size());
-		System.out.println(HarvestQueue.getNormal().poll());
-		System.out.println(HarvestQueue.getNormal().poll());
-		System.out.println(HarvestQueue.getNormal().poll());
-		System.out.println(HarvestQueue.getNormal().size());
+		try {
+			if (priority.equals(HarvestQueue.PRIORITY_NORMAL))
+				return DAOFactory.getDAOFactory().getHarvestQueueDAO().pollNormal();
+			else
+				return DAOFactory.getDAOFactory().getHarvestQueueDAO().pollUrgent();
+		}
+		catch (DAOException e) {
+			throw new HarvestException(e.toString(), e);
+		}
 	}
 }
