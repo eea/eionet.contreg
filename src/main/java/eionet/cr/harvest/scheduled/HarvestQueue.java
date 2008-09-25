@@ -39,4 +39,19 @@ public class HarvestQueue extends ConcurrentLinkedQueue<String>{
 			normalQueue = new HarvestQueue();
 		return normalQueue;
 	}
+	
+	/**
+	 * 
+	 * @param args
+	 */
+	public static void main(String[] args){
+		
+		HarvestQueue.getNormal().add("kala");
+		HarvestQueue.getNormal().add("mees");
+		System.out.println(HarvestQueue.getNormal().size());
+		System.out.println(HarvestQueue.getNormal().poll());
+		System.out.println(HarvestQueue.getNormal().poll());
+		System.out.println(HarvestQueue.getNormal().poll());
+		System.out.println(HarvestQueue.getNormal().size());
+	}
 }

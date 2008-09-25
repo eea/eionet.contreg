@@ -29,7 +29,7 @@ public class HarvestQueueingJobListener implements JobListener{
 	 * @see org.quartz.JobListener#jobExecutionVetoed(org.quartz.JobExecutionContext)
 	 */
 	public void jobExecutionVetoed(JobExecutionContext context) {
-		logger.error("Job execution was vetoed for cron expression [" +
+		logger.info("Job execution was vetoed for cron expression [" +
 				context.getJobDetail().getJobDataMap().getString(HarvestQueueingJob.CRON_ATTR) + "]");
 	}
 

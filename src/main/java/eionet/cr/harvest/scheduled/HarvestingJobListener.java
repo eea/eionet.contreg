@@ -29,7 +29,7 @@ public class HarvestingJobListener implements JobListener{
 	 * @see org.quartz.JobListener#jobExecutionVetoed(org.quartz.JobExecutionContext)
 	 */
 	public void jobExecutionVetoed(JobExecutionContext context) {
-		logger.error("Execution vetoed for job " + context.getJobDetail().getName());
+		logger.info("Execution vetoed for job " + context.getJobDetail().getName());
 	}
 
 	/*
@@ -37,7 +37,7 @@ public class HarvestingJobListener implements JobListener{
 	 * @see org.quartz.JobListener#jobToBeExecuted(org.quartz.JobExecutionContext)
 	 */
 	public void jobToBeExecuted(JobExecutionContext context) {
-		logger.error("Going to execute job " + context.getJobDetail().getName());
+		logger.info("Going to execute job " + context.getJobDetail().getName());
 	}
 
 	/*
@@ -51,6 +51,6 @@ public class HarvestingJobListener implements JobListener{
 			return;
 		}
 		
-		logger.error("Executed job " + context.getJobDetail().getName());
+		logger.info("Executed job " + context.getJobDetail().getName());
 	}
 }

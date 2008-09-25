@@ -1,11 +1,13 @@
 package eionet.cr.dao;
 
+import eionet.cr.common.CRException;
+
 /**
  * 
  * @author heinljab
  *
  */
-public class DAOException extends Exception {
+public class DAOException extends CRException {
 
 	/**
 	 * 

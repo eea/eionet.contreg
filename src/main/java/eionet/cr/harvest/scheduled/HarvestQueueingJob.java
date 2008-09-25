@@ -49,7 +49,7 @@ public class HarvestQueueingJob implements Job, ServletContextListener{
 	public void execute(JobExecutionContext jobExecContext) throws JobExecutionException {
 		
 		String cronExpression = jobExecContext.getJobDetail().getJobDataMap().getString(CRON_ATTR);
-
+		
 		try{
 			List<HarvestSourceDTO> harvestSources = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourcesBySchedule(cronExpression);
 			if (harvestSources!=null && !harvestSources.isEmpty()){

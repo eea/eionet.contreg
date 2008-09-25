@@ -14,11 +14,18 @@ import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
 import org.quartz.impl.StdSchedulerFactory;
 
+import eionet.cr.common.CRException;
 import eionet.cr.common.JobScheduler;
 import eionet.cr.config.GeneralConfig;
+import eionet.cr.dao.DAOFactory;
+import eionet.cr.dto.HarvestSourceDTO;
+import eionet.cr.harvest.Harvest;
+import eionet.cr.harvest.HarvestDAOWriter;
 import eionet.cr.harvest.HarvestException;
+import eionet.cr.harvest.PullHarvest;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.sql.ConnectionUtil;
+import eionet.cr.web.security.CRUser;
 
 /**
  * 
@@ -29,21 +36,40 @@ public class HarvestingJob implements Job, ServletContextListener{
 	
 	/** */
 	private static Log logger = LogFactory.getLog(HarvestingJob.class);
+	
+	/** */
+	private static String urlHarvestingNow = null;
 
 	/*
 	 * (non-Javadoc)
 	 * @see org.quartz.Job#execute(org.quartz.JobExecutionContext)
 	 */
 	public void execute(JobExecutionContext jobExecContext) throws JobExecutionException {
+
+		try{
+			String urlToHarvest = HarvestQueue.getUrgent().poll();
+			if (urlToHarvest==null)
+				urlToHarvest = HarvestQueue.getNormal().poll();
+			if (urlToHarvest==null || !URLUtil.isURL(urlToHarvest))
+				return;
+			
+			logger.info("Going to harvest url: " + urlToHarvest);
 		
-		if (true){
-			throw new JobExecutionException("just testing");
+			HarvestSourceDTO harvestSource = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceByUrl(urlToHarvest);
+			Harvest harvest = new PullHarvest(harvestSource.getUrl(), null); // TODO - use proper lastHarvestTimestamp instead of null
+			harvest.setDaoWriter(new HarvestDAOWriter(
+					harvestSource.getSourceId().intValue(), Harvest.TYPE_PULL, CRUser.application.getUserName()));
+			
+			setUrlHarvestingNow(urlToHarvest);
+			
+			harvest.execute();
 		}
-		String urlToHarvest = HarvestQueue.getUrgent().remove();
-		if (urlToHarvest==null)
-			urlToHarvest = HarvestQueue.getNormal().remove();
-		if (urlToHarvest==null || !URLUtil.isURL(urlToHarvest))
-			return;
+		catch (Throwable t){
+			throw new JobExecutionException(t.toString(), t);
+		}
+		finally{
+			setUrlHarvestingNow(null);
+		}
 	}
 
 	/*
@@ -78,8 +104,27 @@ public class HarvestingJob implements Job, ServletContextListener{
 	 * @param args
 	 */
 	public static void main(String[] args){
+		
 		ConnectionUtil.setReturnSimpleConnection(true);
-		HarvestingJob job = new HarvestingJob();
-		job.contextInitialized(null);
+
+		HarvestQueueingJob queueingJob = new HarvestQueueingJob();
+		queueingJob.contextInitialized(null);
+
+		HarvestingJob harvestingJob = new HarvestingJob();
+		harvestingJob.contextInitialized(null);
+	}
+
+	/**
+	 * @return the urlHarvestingNow
+	 */
+	public static synchronized String getUrlHarvestingNow() {
+		return urlHarvestingNow;
+	}
+
+	/**
+	 * @param urlHarvestingNow the urlHarvestingNow to set
+	 */
+	public static synchronized void setUrlHarvestingNow(String urlHarvestingNow) {
+		HarvestingJob.urlHarvestingNow = urlHarvestingNow;
 	}
 }

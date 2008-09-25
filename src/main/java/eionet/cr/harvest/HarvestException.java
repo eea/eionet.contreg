@@ -1,11 +1,13 @@
 package eionet.cr.harvest;
 
+import eionet.cr.common.CRException;
+
 /**
  * 
  * @author heinljab
  *
  */
-public class HarvestException extends Exception{
+public class HarvestException extends CRException{
 
 	/**
 	 * 
