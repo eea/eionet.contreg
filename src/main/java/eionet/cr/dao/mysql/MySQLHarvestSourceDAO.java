@@ -155,8 +155,8 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 	}
 
     /** */
-	private static final String addSourceSQL = "insert into HARVEST_SOURCE (NAME,URL,TYPE,EMAILS,DATE_CREATED,CREATOR) VALUES (?,?,?,?,NOW(),?)";
-	private static final String addSourceIgnoreSQL = "insert into HARVEST_SOURCE (NAME,URL,TYPE,EMAILS,DATE_CREATED,CREATOR) VALUES (?,?,?,?,NOW(),?) on duplicate key update HARVEST_SOURCE_ID=LAST_INSERT_ID(HARVEST_SOURCE_ID)";
+	private static final String addSourceSQL = "insert into HARVEST_SOURCE (NAME,URL,TYPE,EMAILS,DATE_CREATED,CREATOR,SCHEDULE_CRON) VALUES (?,?,?,?,NOW(),?,?)";
+	private static final String addSourceIgnoreSQL = "insert into HARVEST_SOURCE (NAME,URL,TYPE,EMAILS,DATE_CREATED,CREATOR,SCHEDULE_CRON) VALUES (?,?,?,?,NOW(),?,?) on duplicate key update HARVEST_SOURCE_ID=LAST_INSERT_ID(HARVEST_SOURCE_ID)";
 
 	/*
      * (non-Javadoc)
@@ -193,6 +193,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 		values.add(source.getType());
 		values.add(source.getEmails());
 		values.add(user);
+		values.add(source.getScheduleCron());
 		
 		Connection conn = null;
 		try{
@@ -210,7 +211,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 	}
 
     /** */
-	private static final String editSourceSQL = "update HARVEST_SOURCE set NAME=?,URL=?,TYPE=?,EMAILS=? where HARVEST_SOURCE_ID=?";
+	private static final String editSourceSQL = "update HARVEST_SOURCE set NAME=?,URL=?,TYPE=?,EMAILS=?,SCHEDULE_CRON=? where HARVEST_SOURCE_ID=?";
 	
 	/*
      * (non-Javadoc)
@@ -224,6 +225,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 		values.add(source.getUrl());
 		values.add(source.getType());
 		values.add(source.getEmails());
+		values.add(source.getScheduleCron());
 		values.add(source.getSourceId());
 		
 		Connection conn = null;
