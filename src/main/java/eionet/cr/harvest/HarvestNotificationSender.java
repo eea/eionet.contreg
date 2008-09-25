@@ -6,6 +6,8 @@ package eionet.cr.harvest;
  *
  */
 public class HarvestNotificationSender {
+	
+	// TODO - make real use of this class, i.e. start sending e-mail notifications
 
 	/**
 	 * 

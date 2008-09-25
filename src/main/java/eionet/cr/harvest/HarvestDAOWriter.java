@@ -6,6 +6,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import eionet.cr.common.Identifiers;
+import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dto.HarvestMessageDTO;
@@ -143,8 +144,8 @@ public class HarvestDAOWriter {
 		dto.setUrl(url);
 		dto.setName(name);
 		dto.setType(dedicatedTypeName);
-		
-		// TODO - set e-mails + a proper schedule!!!
+		dto.setScheduleCron(GeneralConfig.getProperty(
+				GeneralConfig.HARVESTER_DEDICATED_SOURCES_CRON_EXPRESSION, HarvestSourceDTO.DEDICATED_HARVEST_SOURCE_DEFAULT_CRON));
 		
 		DAOFactory.getDAOFactory().getHarvestSourceDAO().addSourceIgnoreDuplicate(dto, CRUser.application.getUserName());
 	}

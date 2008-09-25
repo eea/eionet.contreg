@@ -88,12 +88,9 @@ public class EionetCASFilter extends CASFilter {
 					return;
 				}
 				else if (requestURI.endsWith("/login")){
+					
 					attachEionetLoginCookie(httpResponse, true);
-					// TODO - what should really happen here is that user must be redricetd to the page he logged in from
-					/*if (session.getAttribute("afterLogin") != null)
-						httpResponse.sendRedirect(session.getAttribute("afterLogin").toString());
-					else
-						request.getRequestDispatcher("/").forward(request, response);*/
+					
 					String redirectUrl =  httpRequest.getContextPath() + LOGIN_ACTION + "?" + AFTER_LOGIN_EVENT;
 					httpResponse.sendRedirect(redirectUrl);
 					return;

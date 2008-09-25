@@ -17,6 +17,7 @@ public class HarvestSourceDTO implements Serializable {
 	
 	/** */
 	public static final int COUNT_UNAVAIL_THRESHOLD = 5;
+	public static final String DEDICATED_HARVEST_SOURCE_DEFAULT_CRON = "0 0 2 ? * 6L"; // 02:00am on the last Friday of every month
 	
 	/** */
 	private Integer sourceId;
