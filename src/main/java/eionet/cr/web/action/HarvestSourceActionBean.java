@@ -2,6 +2,8 @@ package eionet.cr.web.action;
 
 import java.util.List;
 
+import org.quartz.SchedulerException;
+
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
@@ -11,6 +13,7 @@ import eionet.cr.harvest.Harvest;
 import eionet.cr.harvest.HarvestDAOWriter;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.PullHarvest;
+import eionet.cr.harvest.scheduled.CronHarvestQueueingJob;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
 import net.sourceforge.stripes.action.DefaultHandler;
@@ -76,13 +79,15 @@ public class HarvestSourceActionBean extends AbstractCRActionBean {
 	 * 
 	 * @return
 	 * @throws DAOException
+	 * @throws SchedulerException 
 	 */
-    public Resolution add() throws DAOException {
+    public Resolution add() throws DAOException, SchedulerException {
 		
 		Resolution resolution = new ForwardResolution("/pages/addsource.jsp");
 		if(isUserLoggedIn()){
 			if (isPostRequest()){
 				DAOFactory.getDAOFactory().getHarvestSourceDAO().addSource(getHarvestSource(), getUserName());
+				CronHarvestQueueingJob.scheduleCronHarvest(getHarvestSource().getScheduleCron());
 				resolution = new ForwardResolution(HarvestSourcesActionBean.class);
 			}
 		}
@@ -96,13 +101,15 @@ public class HarvestSourceActionBean extends AbstractCRActionBean {
      * 
      * @return
      * @throws DAOException
+     * @throws SchedulerException 
      */
-    public Resolution edit() throws DAOException {
+    public Resolution edit() throws DAOException, SchedulerException {
     	
     	Resolution resolution = new ForwardResolution("/pages/editsource.jsp");
 		if(isUserLoggedIn()){
 			if (isPostRequest()){
 				DAOFactory.getDAOFactory().getHarvestSourceDAO().editSource(getHarvestSource());
+				CronHarvestQueueingJob.scheduleCronHarvest(getHarvestSource().getScheduleCron());
 				showMessage(getBundle().getString("update.success"));
 			}
 			else
