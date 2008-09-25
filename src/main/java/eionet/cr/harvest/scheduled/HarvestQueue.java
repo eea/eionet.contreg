@@ -6,6 +6,7 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dto.HarvestQueueItemDTO;
 import eionet.cr.harvest.HarvestException;
+import eionet.cr.util.sql.ConnectionUtil;
 
 /**
  * 
@@ -77,4 +78,30 @@ public class HarvestQueue{
 			throw new HarvestException(e.toString(), e);
 		}
 	}
+	
+//	public static void main(String[] args){
+//		
+//		try{
+//			ConnectionUtil.setReturnSimpleConnection(true);
+//			
+//			HarvestQueue.addPullHarvest("http://pull1.org", HarvestQueue.PRIORITY_NORMAL);
+//			Thread.sleep(1000);
+//			HarvestQueue.addPullHarvest("http://pull1.org", HarvestQueue.PRIORITY_URGENT);
+//			Thread.sleep(1000);
+//			HarvestQueue.addPushHarvest("push content 1", "http://push1.org", HarvestQueue.PRIORITY_NORMAL);
+//			Thread.sleep(1000);
+//			HarvestQueue.addPushHarvest("push content 1", "http://push1.org", HarvestQueue.PRIORITY_URGENT);
+//			Thread.sleep(1000);
+//			
+//			HarvestQueueItemDTO dto = HarvestQueue.poll(HarvestQueue.PRIORITY_NORMAL);
+//			if (dto!=null)
+//				System.out.println(dto.getUrl());
+//			dto = HarvestQueue.poll(HarvestQueue.PRIORITY_URGENT);
+//			if (dto!=null)
+//				System.out.println(dto.getUrl());
+//		}
+//		catch (Throwable t){
+//			t.printStackTrace();
+//		}
+//	}
 }

@@ -27,7 +27,7 @@ public class HarvestQueueItemDTOReader extends ResultSetBaseReader{
 		HarvestQueueItemDTO dto = new HarvestQueueItemDTO();
 		dto.setUrl(rs.getString("URL"));
 		dto.setPriority(rs.getString("PRIORITY"));
-		dto.setTimeAdded(rs.getDate("TIMESTAMP"));
+		dto.setTimeAdded(rs.getTimestamp("TIMESTAMP"));
 		dto.setPushedContent(rs.getString("PUSHED_CONTENT"));
 		
 		resultList.add(dto);
