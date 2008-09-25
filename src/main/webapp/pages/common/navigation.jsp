@@ -9,7 +9,7 @@
 		<li><a href="/cr/customSearch.action" title="Custom search">Custom search </a></li>
 		<li><a href="/cr/recentUploads.action" title="Recent uploads">Recent uploads </a></li>
 		<c:if test='${sessionScope.crUser!=null && crfn:hasPermission(sessionScope.crUser.userName, "/", "u")}'>
-			<li><a href="/cr/sources.action" title="Manage harvester">Harvester </a></li>
+			<li><a href="/cr/sources.action" title="Manage harvest sources">Harvest sources </a></li>
 	    	<li><a href="/cr/luceneQuery.action" title="Lucene query">Lucene query </a></li>		
 		</c:if>		
     </ul>

@@ -2,6 +2,9 @@ package eionet.cr.common;
 
 import java.text.ParseException;
 
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.quartz.CronTrigger;
@@ -20,7 +23,7 @@ import eionet.cr.harvest.scheduled.CronHarvestQueueingJob;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class JobScheduler {
+public class JobScheduler implements ServletContextListener{
 	
 	/** */
 	private static Log logger = LogFactory.getLog(JobScheduler.class);
@@ -75,5 +78,27 @@ public class JobScheduler {
 			init();
 		
 		quartzScheduler.addJobListener(jobListener);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
+	 */
+	public void contextDestroyed(ServletContextEvent servletContextEvent) {
+		
+		if (quartzScheduler!=null){
+			try{
+				quartzScheduler.shutdown(false);
+			}
+			catch (SchedulerException e){
+			}
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
+	 */
+	public void contextInitialized(ServletContextEvent servletContextEvent) {
 	}
 }

@@ -14,6 +14,7 @@ import eionet.cr.harvest.HarvestDAOWriter;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.PullHarvest;
 import eionet.cr.harvest.scheduled.CronHarvestQueueingJob;
+import eionet.cr.harvest.scheduled.HarvestQueue;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
 import net.sourceforge.stripes.action.DefaultHandler;
@@ -175,10 +176,15 @@ public class HarvestSourceActionBean extends AbstractCRActionBean {
      * 
      * @return
      * @throws DAOException 
+     * @throws HarvestException 
      */
-    public Resolution scheduleImmediateHarvest() throws DAOException{
+    public Resolution scheduleUrgentHarvest() throws DAOException, HarvestException{
+
+    	// we need to re-fect this.harvestSource, because the post request has nulled it
     	harvestSource = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(harvestSource.getSourceId());
-    	showMessage("Not implemented yet");
+    	
+    	HarvestQueue.addPullHarvest(getHarvestSource().getUrl(), HarvestQueue.PRIORITY_URGENT);
+    	showMessage("Successfully scheduled for urgent harvest!");
     	return new ForwardResolution("/pages/viewsource.jsp");
     }
 

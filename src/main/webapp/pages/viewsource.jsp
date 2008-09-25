@@ -61,8 +61,10 @@
            		</c:if>	            		
 	            <tr>
 	                <td colspan="2" style="padding-top:10px">
-	                	<stripes:submit name="harvestNow" value="Harvest now"/>
-	                    <stripes:submit name="scheduleImmediateHarvest" value="Schedule for immediate harvest"/>
+						<c:if test="${!actionBean.productionMode}">
+	                		<stripes:submit name="harvestNow" value="Harvest now"/>
+	                	</c:if>
+	                    <stripes:submit name="scheduleUrgentHarvest" value="Schedule urgent harvest"/>
 	                </td>
 	            </tr>
 	        </table>

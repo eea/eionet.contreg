@@ -168,4 +168,12 @@ public abstract class AbstractCRActionBean implements ActionBean {
 	public void addMessage(String message) {
 		addMessage(new SimpleMessage(message));
 	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isProductionMode(){
+		return Boolean.parseBoolean(GeneralConfig.getProperty(GeneralConfig.ENVIRONMENT_PRODUCTION, "true"));
+	}
 }
