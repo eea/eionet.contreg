@@ -24,7 +24,9 @@ import eionet.cr.harvest.Harvest;
 import eionet.cr.harvest.HarvestDAOWriter;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.PullHarvest;
+import eionet.cr.harvest.PushHarvest;
 import eionet.cr.util.URLUtil;
+import eionet.cr.util.Util;
 import eionet.cr.util.sql.ConnectionUtil;
 import eionet.cr.web.security.CRUser;
 
@@ -54,15 +56,33 @@ public class HarvestingJob implements Job, ServletContextListener{
 			if (queueItem==null || queueItem.getUrl()==null || queueItem.getUrl().length()==0)
 				return;
 			
-			logger.info("Going to harvest url: " + queueItem.getUrl());
+			Harvest harvest = null;
+			String pushedContent = queueItem.getPushedContent();
+			if (Util.isNullOrEmpty(pushedContent)){
+				
+				logger.info("Going to harvest url: " + queueItem.getUrl());
+				
+				HarvestSourceDTO harvestSource = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceByUrl(queueItem.getUrl());
+				harvest = new PullHarvest(harvestSource.getUrl(), null); // TODO - use proper lastHarvestTimestamp instead of null
+				harvest.setDaoWriter(new HarvestDAOWriter(
+						harvestSource.getSourceId().intValue(), Harvest.TYPE_PULL, CRUser.application.getUserName()));
+			}
+			else{
+				logger.info("Going to push content from url: " + queueItem.getUrl());
+				
+				HarvestSourceDTO sourceDTO = new HarvestSourceDTO();
+				sourceDTO.setUrl(queueItem.getUrl());
+				sourceDTO.setName(queueItem.getUrl());
+				sourceDTO.setType("data");
+				Integer sourceId = DAOFactory.getDAOFactory().getHarvestSourceDAO().addSourceIgnoreDuplicate(sourceDTO, CRUser.application.getUserName());
+				
+				harvest = new PushHarvest(pushedContent, queueItem.getUrl());
+				if (sourceId!=null && sourceId.intValue()>0){
+					harvest.setDaoWriter(new HarvestDAOWriter(sourceId.intValue(), Harvest.TYPE_PUSH, CRUser.application.getUserName()));
+				}
+			}
 		
-			HarvestSourceDTO harvestSource = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceByUrl(queueItem.getUrl());
-			Harvest harvest = new PullHarvest(harvestSource.getUrl(), null); // TODO - use proper lastHarvestTimestamp instead of null
-			harvest.setDaoWriter(new HarvestDAOWriter(
-					harvestSource.getSourceId().intValue(), Harvest.TYPE_PULL, CRUser.application.getUserName()));
-			
 			setUrlHarvestingNow(queueItem.getUrl());
-			
 			harvest.execute();
 		}
 		catch (Throwable t){

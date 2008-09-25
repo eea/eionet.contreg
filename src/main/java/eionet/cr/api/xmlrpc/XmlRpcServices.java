@@ -22,6 +22,7 @@ import eionet.cr.harvest.Harvest;
 import eionet.cr.harvest.HarvestDAOWriter;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.PushHarvest;
+import eionet.cr.harvest.scheduled.HarvestQueue;
 import eionet.cr.index.EncodingSchemes;
 import eionet.cr.search.Searcher;
 import eionet.cr.search.util.EntriesCollector;
@@ -159,36 +160,16 @@ public class XmlRpcServices implements Services{
 	 * (non-Javadoc)
 	 * @see eionet.cr.api.xmlrpc.Services#pushContent(java.lang.String)
 	 */
-	public Integer pushContent(String content, String sourceUri) throws CRException {
+	public String pushContent(String content, String sourceUri) throws CRException {
 		
-		int result = 0;
 		if (content!=null && content.trim().length()>0){
 			if (sourceUri==null || sourceUri.trim().length()==0)
 				throw new CRException( "Missing source uri");
-			else{
-				PushHarvest pushHarvest = new PushHarvest(content, sourceUri);
-				HarvestSourceDTO sourceDTO = new HarvestSourceDTO();
-				sourceDTO.setUrl(sourceUri);
-				sourceDTO.setName(sourceUri);
-				sourceDTO.setType("data");
-				try {
-					Integer sourceId = DAOFactory.getDAOFactory().getHarvestSourceDAO().addSourceIgnoreDuplicate(
-							sourceDTO, CRUser.application.getUserName());
-					if (sourceId!=null && sourceId.intValue()>0){
-						pushHarvest.setDaoWriter(
-								new HarvestDAOWriter(sourceId.intValue(), Harvest.TYPE_PUSH, CRUser.application.getUserName()));
-					}
-					
-					pushHarvest.execute();
-					result = pushHarvest.getCountTotalResources();
-				}
-				catch (Exception e) {
-					throw new CRException(e.toString(), e);
-				}
-			}
+			else
+				HarvestQueue.addPushHarvest(content, sourceUri, HarvestQueue.PRIORITY_NORMAL);
 		}
 		
-		return new Integer(result);
+		return OK_RETURN_STRING;
 	}
 
 	/*

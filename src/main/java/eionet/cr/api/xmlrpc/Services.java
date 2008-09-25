@@ -42,7 +42,7 @@ public interface Services {
 	 * @return
 	 * @throws CRException
 	 */
-	public abstract Integer pushContent(String content, String sourceUri) throws CRException;
+	public abstract String pushContent(String content, String sourceUri) throws CRException;
 	/**
 	 * 
 	 * @param attributes
