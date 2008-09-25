@@ -41,7 +41,7 @@ public class HarvestingJob implements Job, ServletContextListener{
 	private static Log logger = LogFactory.getLog(HarvestingJob.class);
 	
 	/** */
-	private static String urlHarvestingNow = null;
+	private static HarvestQueueItemDTO currentlyHarvestedItem = null;
 
 	/*
 	 * (non-Javadoc)
@@ -82,14 +82,14 @@ public class HarvestingJob implements Job, ServletContextListener{
 				}
 			}
 		
-			setUrlHarvestingNow(queueItem.getUrl());
+			setCurrentlyHarvestedItem(queueItem);
 			harvest.execute();
 		}
 		catch (Throwable t){
 			throw new JobExecutionException(t.toString(), t);
 		}
 		finally{
-			setUrlHarvestingNow(null);
+			setCurrentlyHarvestedItem(null);
 		}
 	}
 
@@ -136,16 +136,18 @@ public class HarvestingJob implements Job, ServletContextListener{
 	}
 
 	/**
-	 * @return the urlHarvestingNow
+	 * 
+	 * @return
 	 */
-	public static synchronized String getUrlHarvestingNow() {
-		return urlHarvestingNow;
+	public static synchronized HarvestQueueItemDTO getCurrentlyHarvestedItem() {
+		return currentlyHarvestedItem;
 	}
 
 	/**
-	 * @param urlHarvestingNow the urlHarvestingNow to set
+	 * 
+	 * @param item
 	 */
-	public static synchronized void setUrlHarvestingNow(String urlHarvestingNow) {
-		HarvestingJob.urlHarvestingNow = urlHarvestingNow;
+	public static synchronized void setCurrentlyHarvestedItem(HarvestQueueItemDTO item) {
+		currentlyHarvestedItem = item;
 	}
 }

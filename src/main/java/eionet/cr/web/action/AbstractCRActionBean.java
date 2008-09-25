@@ -7,6 +7,8 @@ import org.apache.commons.logging.LogFactory;
 
 import eionet.cr.common.CRException;
 import eionet.cr.config.GeneralConfig;
+import eionet.cr.dto.HarvestQueueItemDTO;
+import eionet.cr.harvest.scheduled.HarvestingJob;
 import eionet.cr.web.context.CRActionBeanContext;
 import eionet.cr.web.security.CRUser;
 import net.sourceforge.stripes.action.ActionBean;
@@ -175,5 +177,13 @@ public abstract class AbstractCRActionBean implements ActionBean {
 	 */
 	public boolean isProductionMode(){
 		return Boolean.parseBoolean(GeneralConfig.getProperty(GeneralConfig.ENVIRONMENT_PRODUCTION, "true"));
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public HarvestQueueItemDTO getCurrentlyHarvestedQueueItem(){
+		return HarvestingJob.getCurrentlyHarvestedItem();
 	}
 }
