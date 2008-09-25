@@ -1,7 +1,9 @@
 package eionet.cr.harvest.scheduled;
 
 import java.text.ParseException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -25,6 +27,7 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.harvest.HarvestException;
+import eionet.cr.util.Util;
 import eionet.cr.util.sql.ConnectionUtil;
 
 /**
@@ -42,6 +45,9 @@ public class CronHarvestQueueingJob implements Job, ServletContextListener{
 	
 	/** */
 	private static CronHarvestQueueingJobListener listener;
+	
+	/** */
+	private static Set<String> scheduledCrons = null;
 
 	/*
 	 * (non-Javadoc)
@@ -72,11 +78,17 @@ public class CronHarvestQueueingJob implements Job, ServletContextListener{
 	 */
 	public static void scheduleCronHarvest(String cronExpression) throws SchedulerException{
 		
+		if (!Util.isValidQuartzCronExpression(cronExpression))
+			return;
+		else if (getScheduledCrons().contains(cronExpression))
+			return;
+		
 		JobDetail jobDetails = new JobDetail(CronHarvestQueueingJob.class.getSimpleName() + " for cron expression [" + cronExpression + "]", JobScheduler.class.getName(), CronHarvestQueueingJob.class);
 		jobDetails.getJobDataMap().put(CRON_ATTR, cronExpression);
 		
 		addListener(jobDetails);
 		JobScheduler.scheduleCronJob(cronExpression, jobDetails);
+		getScheduledCrons().add(cronExpression);
 	}
 
 	/**
@@ -122,6 +134,16 @@ public class CronHarvestQueueingJob implements Job, ServletContextListener{
 	 * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
 	 */
 	public void contextDestroyed(ServletContextEvent servletContextEvent) {
+	}
+	
+	/**
+	 * 
+	 */
+	private static synchronized Set<String> getScheduledCrons(){
+		
+		if (scheduledCrons==null)
+			scheduledCrons = new HashSet<String>();
+		return scheduledCrons;
 	}
 	
 	/**
