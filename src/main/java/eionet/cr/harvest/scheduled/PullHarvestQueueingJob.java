@@ -70,7 +70,7 @@ public class PullHarvestQueueingJob implements Job, ServletContextListener{
 	 * @param cronExpression
 	 * @throws SchedulerException 
 	 */
-	public static void scheduleCronExpression(String cronExpression) throws SchedulerException{
+	public static void scheduleCronHarvest(String cronExpression) throws SchedulerException{
 		
 		JobDetail jobDetails = new JobDetail(PullHarvestQueueingJob.class.getSimpleName() + " for cron expression [" + cronExpression + "]", JobScheduler.class.getName(), PullHarvestQueueingJob.class);
 		jobDetails.getJobDataMap().put(CRON_ATTR, cronExpression);
@@ -105,7 +105,7 @@ public class PullHarvestQueueingJob implements Job, ServletContextListener{
 			if (schedules!=null && !schedules.isEmpty()){
 				for (int i=0; i<schedules.size(); i++){
 					cronExpression = schedules.get(i);
-					scheduleCronExpression(cronExpression);
+					scheduleCronHarvest(cronExpression);
 				}
 			}
 		}

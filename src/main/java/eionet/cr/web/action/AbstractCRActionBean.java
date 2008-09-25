@@ -11,10 +11,12 @@ import eionet.cr.web.context.CRActionBeanContext;
 import eionet.cr.web.security.CRUser;
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
+import net.sourceforge.stripes.action.Message;
 import net.sourceforge.stripes.action.SimpleMessage;
 import net.sourceforge.stripes.controller.AnnotatedClassActionResolver;
 import net.sourceforge.stripes.controller.StripesFilter;
 import net.sourceforge.stripes.validation.SimpleError;
+import net.sourceforge.stripes.validation.ValidationError;
 
 /**
  * Root class for all CR ActionBeans.
@@ -133,4 +135,37 @@ public abstract class AbstractCRActionBean implements ActionBean {
     public boolean isGetRequest(){
     	return getContext().getRequest().getMethod().equalsIgnoreCase("GET");
     }
+
+    /**
+     * 
+     * @param field
+     * @param error
+     */
+	public void addFieldError(String field, ValidationError error) {
+		context.getValidationErrors().add(field, error);
+	}
+
+	/**
+	 * 
+	 * @param error
+	 */
+	public void addGlobalError(ValidationError error) {
+		context.getValidationErrors().addGlobalError(error);
+	}
+
+	/**
+	 * 
+	 * @param message
+	 */
+	public void addMessage(Message message) {
+		context.getMessages().add(message);
+	}
+
+	/**
+	 * 
+	 * @param message
+	 */
+	public void addMessage(String message) {
+		addMessage(new SimpleMessage(message));
+	}
 }

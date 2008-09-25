@@ -17,3 +17,7 @@ th.order2 a {
 	padding-right: 2px;
 	background-color: #D9EDF2;
 }
+
+div.errorHeader {
+	color: #FF0000;
+}

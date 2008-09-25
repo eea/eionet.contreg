@@ -11,18 +11,26 @@ import eionet.cr.harvest.Harvest;
 import eionet.cr.harvest.HarvestDAOWriter;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.PullHarvest;
+import eionet.cr.util.URLUtil;
+import eionet.cr.util.Util;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.DontValidate;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
+import net.sourceforge.stripes.validation.SimpleError;
+import net.sourceforge.stripes.validation.ValidationMethod;
 
 /**
  * @author altnyris
  */
 @UrlBinding("/source.action")
 public class HarvestSourceActionBean extends AbstractCRActionBean {
+	
+	/** */
+	private static final String ADD_EVENT = "add";
+	private static final String EDIT_EVENT = "edit";
 	
 	/** */
 	private HarvestSourceDTO harvestSource;
@@ -165,5 +173,19 @@ public class HarvestSourceActionBean extends AbstractCRActionBean {
     	harvestSource = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(harvestSource.getSourceId());
     	showMessage("Not implemented yet");
     	return new ForwardResolution("/pages/viewsource.jsp");
+    }
+
+    @ValidationMethod(on={ADD_EVENT,EDIT_EVENT})
+    public void validateAddEdit(){
+    	
+    	if (isPostRequest()){
+	    	if (harvestSource.getUrl()==null || harvestSource.getUrl().trim().length()==0 || !URLUtil.isURL(harvestSource.getUrl()))
+	    		addGlobalError(new SimpleError("Invalid URL"));
+	    	
+	    	if (!Util.isNullOrEmpty(harvestSource.getScheduleCron()) && !Util.isValidQuartzCronExpression(harvestSource.getScheduleCron())){
+	    		addGlobalError(new SimpleError("Invalid Quartz cron expression"));
+	    	}
+
+    	}
     }
 }

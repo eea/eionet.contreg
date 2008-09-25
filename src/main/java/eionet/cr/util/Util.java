@@ -40,6 +40,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.quartz.CronExpression;
 import org.xml.sax.SAXException;
 
 import eionet.cr.common.CRRuntimeException;
@@ -498,5 +499,17 @@ public class Util {
 			oo[0] = o;
 			return oo;
 		}
+	}
+	
+	/**
+	 * 
+	 * @param expression
+	 */
+	public static boolean isValidQuartzCronExpression(String expression){
+		
+		if (Util.isNullOrEmpty(expression))
+			return false;
+		else
+			return CronExpression.isValidExpression(expression);
 	}
 }
