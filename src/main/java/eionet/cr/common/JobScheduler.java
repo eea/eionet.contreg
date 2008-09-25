@@ -13,7 +13,7 @@ import org.quartz.SchedulerFactory;
 import org.quartz.impl.StdSchedulerFactory;
 
 import eionet.cr.harvest.HarvestException;
-import eionet.cr.harvest.scheduled.PullHarvestQueueingJob;
+import eionet.cr.harvest.scheduled.CronHarvestQueueingJob;
 
 /**
  * 

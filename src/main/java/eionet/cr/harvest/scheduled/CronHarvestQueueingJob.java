@@ -32,16 +32,16 @@ import eionet.cr.util.sql.ConnectionUtil;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class PullHarvestQueueingJob implements Job, ServletContextListener{
+public class CronHarvestQueueingJob implements Job, ServletContextListener{
 	
 	/** */
-	private static Log logger = LogFactory.getLog(PullHarvestQueueingJob.class);
+	private static Log logger = LogFactory.getLog(CronHarvestQueueingJob.class);
 	
 	/** */
 	protected static final String CRON_ATTR = "cron";
 	
 	/** */
-	private static PullHarvestQueueingJobListener listener;
+	private static CronHarvestQueueingJobListener listener;
 
 	/*
 	 * (non-Javadoc)
@@ -72,7 +72,7 @@ public class PullHarvestQueueingJob implements Job, ServletContextListener{
 	 */
 	public static void scheduleCronHarvest(String cronExpression) throws SchedulerException{
 		
-		JobDetail jobDetails = new JobDetail(PullHarvestQueueingJob.class.getSimpleName() + " for cron expression [" + cronExpression + "]", JobScheduler.class.getName(), PullHarvestQueueingJob.class);
+		JobDetail jobDetails = new JobDetail(CronHarvestQueueingJob.class.getSimpleName() + " for cron expression [" + cronExpression + "]", JobScheduler.class.getName(), CronHarvestQueueingJob.class);
 		jobDetails.getJobDataMap().put(CRON_ATTR, cronExpression);
 		
 		addListener(jobDetails);
@@ -87,7 +87,7 @@ public class PullHarvestQueueingJob implements Job, ServletContextListener{
 	private synchronized static void addListener(JobDetail jobDetails) throws SchedulerException{
 		
 		if (listener==null){
-			listener = new PullHarvestQueueingJobListener();
+			listener = new CronHarvestQueueingJobListener();
 			JobScheduler.registerJobListener(listener);
 		}
 		jobDetails.addJobListener(listener.getName());
@@ -130,7 +130,7 @@ public class PullHarvestQueueingJob implements Job, ServletContextListener{
 	 */
 	public static void main(String[] args){
 		ConnectionUtil.setReturnSimpleConnection(true);
-		PullHarvestQueueingJob job = new PullHarvestQueueingJob();
+		CronHarvestQueueingJob job = new CronHarvestQueueingJob();
 		job.contextInitialized(null);
 	}
 }

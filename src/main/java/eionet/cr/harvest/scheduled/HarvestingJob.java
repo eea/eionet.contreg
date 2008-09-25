@@ -128,7 +128,7 @@ public class HarvestingJob implements Job, ServletContextListener{
 		
 		ConnectionUtil.setReturnSimpleConnection(true);
 
-		PullHarvestQueueingJob queueingJob = new PullHarvestQueueingJob();
+		CronHarvestQueueingJob queueingJob = new CronHarvestQueueingJob();
 		queueingJob.contextInitialized(null);
 
 		HarvestingJob harvestingJob = new HarvestingJob();
