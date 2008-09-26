@@ -184,6 +184,11 @@ public abstract class AbstractCRActionBean implements ActionBean {
 	 * @return
 	 */
 	public HarvestQueueItemDTO getCurrentlyHarvestedQueueItem(){
+		
+//		HarvestQueueItemDTO dto = new HarvestQueueItemDTO();
+//		dto.setUrl("http://rod.eionet.eu.int/schema.rdf");
+//		dto.setPushedContent("test");
+//		return dto;
 		return HarvestingJob.getCurrentlyHarvestedItem();
 	}
 }

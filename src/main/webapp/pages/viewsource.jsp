@@ -9,6 +9,11 @@
 	<stripes:layout-component name="errors"/>
 	<stripes:layout-component name="messages"/>
 	<stripes:layout-component name="contents">
+	
+		<c:if test="${not empty actionBean.currentlyHarvestedQueueItem && (actionBean.currentlyHarvestedQueueItem.url==actionBean.harvestSource.url)}">
+			<div class="important-msg" style="margin-bottom:10px">This source is being harvested right now!</div>
+		</c:if>
+		
 		<h1>View source</h1>
 		<br/>
 	    <stripes:form action="/source.action" focus="">
@@ -58,7 +63,8 @@
            			<tr>
            				<td colspan="2" class="warning-msg" style="color:#E6E6E6">The source has been unavailable for too many times!</td>
            			</tr>
-           		</c:if>	            		
+           		</c:if>
+           		
 	            <tr>
 	                <td colspan="2" style="padding-top:10px">
 						<c:if test="${!actionBean.productionMode}">

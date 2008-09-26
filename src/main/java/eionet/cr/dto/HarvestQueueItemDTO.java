@@ -76,4 +76,12 @@ public class HarvestQueueItemDTO implements Serializable{
 	public void setPushedContent(String pushedContent) {
 		this.pushedContent = pushedContent;
 	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isPushHarvest(){
+		return pushedContent!=null && pushedContent.length()>0;
+	}
 }
