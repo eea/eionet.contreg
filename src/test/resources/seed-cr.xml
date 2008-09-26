@@ -559,48 +559,6 @@ Caused by: org.xml.sax.SAXParseException: testFatal
 	at org.apache.tomcat.util.threads.ThreadPool$ControlRunnable.run(ThreadPool.java:684)
 	at java.lang.Thread.run(Thread.java:595)
 " HARVEST_MESSAGE_ID="15"/>
-  <harvest_schedule HARVEST_SOURCE_ID="4" WEEKDAY="monday" HOUR="0" PERIOD_WEEKS="1"/>
-  <harvest_schedule HARVEST_SOURCE_ID="5" WEEKDAY="monday" HOUR="0" PERIOD_WEEKS="1"/>
-  <harvest_schedule HARVEST_SOURCE_ID="6" WEEKDAY="monday" HOUR="0" PERIOD_WEEKS="1"/>
-  <harvest_schedule HARVEST_SOURCE_ID="7" WEEKDAY="monday" HOUR="0" PERIOD_WEEKS="1"/>
-  <harvest_schedule HARVEST_SOURCE_ID="8" WEEKDAY="monday" HOUR="1" PERIOD_WEEKS="1"/>
-  <harvest_schedule HARVEST_SOURCE_ID="9" WEEKDAY="monday" HOUR="0" PERIOD_WEEKS="1"/>
-  <harvest_schedule HARVEST_SOURCE_ID="10" WEEKDAY="monday" HOUR="0" PERIOD_WEEKS="1"/>
-  <harvest_schedule HARVEST_SOURCE_ID="11" WEEKDAY="monday" HOUR="0" PERIOD_WEEKS="1"/>
-  <harvest_schedule HARVEST_SOURCE_ID="12" WEEKDAY="monday" HOUR="0" PERIOD_WEEKS="1"/>
-  <harvest_schedule HARVEST_SOURCE_ID="13" WEEKDAY="monday" HOUR="0" PERIOD_WEEKS="1"/>
-  <harvest_schedule HARVEST_SOURCE_ID="14" WEEKDAY="monday" HOUR="0" PERIOD_WEEKS="1"/>
-  <harvest_schedule HARVEST_SOURCE_ID="15" WEEKDAY="monday" HOUR="0" PERIOD_WEEKS="1"/>
-  <harvest_schedule HARVEST_SOURCE_ID="16" WEEKDAY="monday" HOUR="0" PERIOD_WEEKS="1"/>
-  <harvest_schedule HARVEST_SOURCE_ID="17" WEEKDAY="monday" HOUR="0" PERIOD_WEEKS="1"/>
-  <harvest_schedule HARVEST_SOURCE_ID="18" WEEKDAY="monday" HOUR="0" PERIOD_WEEKS="1"/>
-  <harvest_schedule HARVEST_SOURCE_ID="19" WEEKDAY="monday" HOUR="0" PERIOD_WEEKS="1"/>
-  <harvest_schedule HARVEST_SOURCE_ID="20" WEEKDAY="monday" HOUR="0" PERIOD_WEEKS="1"/>
-  <harvest_schedule HARVEST_SOURCE_ID="21" WEEKDAY="monday" HOUR="0" PERIOD_WEEKS="1"/>
-  <harvest_schedule HARVEST_SOURCE_ID="22" WEEKDAY="monday" HOUR="0" PERIOD_WEEKS="1"/>
-  <harvest_schedule HARVEST_SOURCE_ID="23" WEEKDAY="monday" HOUR="0" PERIOD_WEEKS="1"/>
-  <harvest_schedule HARVEST_SOURCE_ID="24" WEEKDAY="monday" HOUR="0" PERIOD_WEEKS="1"/>
-  <harvest_schedule HARVEST_SOURCE_ID="25" WEEKDAY="monday" HOUR="0" PERIOD_WEEKS="1"/>
-  <harvest_schedule HARVEST_SOURCE_ID="26" WEEKDAY="monday" HOUR="0" PERIOD_WEEKS="1"/>
-  <harvest_schedule HARVEST_SOURCE_ID="27" WEEKDAY="monday" HOUR="0" PERIOD_WEEKS="1"/>
-  <harvest_schedule HARVEST_SOURCE_ID="28" WEEKDAY="monday" HOUR="0" PERIOD_WEEKS="1"/>
-  <harvest_schedule HARVEST_SOURCE_ID="29" WEEKDAY="monday" HOUR="0" PERIOD_WEEKS="1"/>
-  <harvest_schedule HARVEST_SOURCE_ID="30" WEEKDAY="monday" HOUR="0" PERIOD_WEEKS="1"/>
-  <harvest_schedule HARVEST_SOURCE_ID="31" WEEKDAY="monday" HOUR="0" PERIOD_WEEKS="1"/>
-  <harvest_schedule HARVEST_SOURCE_ID="32" WEEKDAY="monday" HOUR="0" PERIOD_WEEKS="1"/>
-  <harvest_schedule HARVEST_SOURCE_ID="33" WEEKDAY="monday" HOUR="0" PERIOD_WEEKS="1"/>
-  <harvest_schedule HARVEST_SOURCE_ID="34" WEEKDAY="monday" HOUR="0" PERIOD_WEEKS="1"/>
-  <harvest_schedule HARVEST_SOURCE_ID="35" WEEKDAY="monday" HOUR="0" PERIOD_WEEKS="1"/>
-  <harvest_schedule HARVEST_SOURCE_ID="36" WEEKDAY="monday" HOUR="0" PERIOD_WEEKS="1"/>
-  <harvest_schedule HARVEST_SOURCE_ID="37" WEEKDAY="monday" HOUR="0" PERIOD_WEEKS="1"/>
-  <harvest_schedule HARVEST_SOURCE_ID="38" WEEKDAY="monday" HOUR="0" PERIOD_WEEKS="1"/>
-  <harvest_schedule HARVEST_SOURCE_ID="39" WEEKDAY="monday" HOUR="0" PERIOD_WEEKS="1"/>
-  <harvest_schedule HARVEST_SOURCE_ID="40" WEEKDAY="monday" HOUR="0" PERIOD_WEEKS="1"/>
-  <harvest_schedule HARVEST_SOURCE_ID="41" WEEKDAY="monday" HOUR="0" PERIOD_WEEKS="1"/>
-  <harvest_schedule HARVEST_SOURCE_ID="42" WEEKDAY="monday" HOUR="0" PERIOD_WEEKS="1"/>
-  <harvest_schedule HARVEST_SOURCE_ID="43" WEEKDAY="monday" HOUR="0" PERIOD_WEEKS="1"/>
-  <harvest_schedule HARVEST_SOURCE_ID="44" WEEKDAY="monday" HOUR="0" PERIOD_WEEKS="1"/>
-  <harvest_schedule HARVEST_SOURCE_ID="45" WEEKDAY="monday" HOUR="0" PERIOD_WEEKS="1"/>
   <harvest_source HARVEST_SOURCE_ID="4" NAME="CDR&apos;s envelopes" URL="http://cdr.eionet.europa.eu/envelopes.rdf" TYPE="data" EMAILS="jaanus.heinlaid@tietoenator.com" DATE_CREATED="2008-02-28 10:21:00.0" CREATOR="heinlja"/>
   <harvest_source HARVEST_SOURCE_ID="5" NAME="CDR&apos; old envelopes" URL="http://cdr.eionet.europa.eu/envelopes-old.rdf" TYPE="data" EMAILS="jaanus.heinlaid@tietoenator.com" DATE_CREATED="2008-02-28 10:25:29.0" CREATOR="heinlja"/>
   <harvest_source HARVEST_SOURCE_ID="6" NAME="CDR&apos;s referrals" URL="http://cdr.eionet.europa.eu/referrals.rdf" TYPE="data" EMAILS="jaanus.heinlaid@tietoenator.com" DATE_CREATED="2008-02-28 10:26:07.0" CREATOR="heinlja"/>

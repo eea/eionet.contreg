@@ -55,6 +55,7 @@ public class GeneralConfig {
 	private static void init(){
 		properties = new Properties();
 		try{
+			String s = GeneralConfig.class.getClassLoader().getResource(PROPERTIES_FILE_NAME).toString();
 			properties.load(GeneralConfig.class.getClassLoader().getResourceAsStream(PROPERTIES_FILE_NAME));
 		}
 		catch (IOException e){
