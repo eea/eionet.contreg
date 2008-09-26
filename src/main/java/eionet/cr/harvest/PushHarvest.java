@@ -32,7 +32,7 @@ public class PushHarvest extends Harvest{
 	protected void doExecute() throws HarvestException {
 		
 		if (content==null || content.trim().length()==0)
-			throw new HarvestException("content must not be null or empty!");
+			throw new HarvestException("No content supplied for push-harvesting from url [" + sourceUrlString + "]");
 		
 		Reader stringReader = null;
 		try{

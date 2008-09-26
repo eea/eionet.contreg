@@ -118,7 +118,7 @@ public abstract class Harvest {
 			if (t instanceof HarvestException)
 				throw (HarvestException)t;
 			else
-				throw new HarvestException(t.toString(), t);
+				throw new HarvestException("Exception when harvesting [" + sourceUrlString + "]: " + t.toString(), t);
 		}
 		finally{
 			try{
@@ -161,7 +161,7 @@ public abstract class Harvest {
 	        harvest(reader);
 		}
 		catch (Exception e){
-			throw new HarvestException(e.toString(), e);
+			throw new HarvestException("Exception when harvesting [" + sourceUrlString + "]: " + e.toString(), e);
 		}
 		finally{
 			try{
@@ -210,7 +210,7 @@ public abstract class Harvest {
 	        }
 		}
 		catch (Exception e){
-			throw new HarvestException(e.toString(), e);
+			throw new HarvestException("Exception when harvesting [" + sourceUrlString + "]: " + e.toString(), e);
 		}
 	}
 
@@ -236,7 +236,7 @@ public abstract class Harvest {
 				indexer.indexRDFResource(resource);
 			}
 			catch (IndexException e) {
-				throw new HarvestException(e.toString(), e);
+				throw new HarvestException("Indexing exception when harvesting [" + sourceUrlString + "]: " + e.toString(), e);
 			}
 			
 			countTotalResources++;
@@ -292,7 +292,7 @@ public abstract class Harvest {
 			
 		}
 		catch (Throwable t){
-			throw new HarvestException("Failure when updating first times: " + t.toString(), t);
+			throw new HarvestException("Exception when updating first times for [" + sourceUrlString + "]: " + t.toString(), t);
 		}
 		finally{
 			try{

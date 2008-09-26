@@ -63,7 +63,7 @@ public class PullHarvest extends Harvest{
 			FileUtil.streamToFile(inputStream, toFile);
 		}
 		catch (IOException e){
-			throw new HarvestException(e.toString(), e);
+			throw new HarvestException("IOException when harvesting [" + sourceUrlString + "]: " + e.toString(), e);
 		}
 		finally{
 			try{
