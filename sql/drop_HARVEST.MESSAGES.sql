@@ -1,1 +1,0 @@
-alter table HARVEST drop column MESSAGES;
