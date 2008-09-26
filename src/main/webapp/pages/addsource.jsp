@@ -32,7 +32,7 @@
 	            </tr>
 	            <tr>
 	                <td>Schedule cron expression:</td>
-	                <td><stripes:text name="harvestSource.scheduleCron"/></td>
+	                <td><stripes:text name="harvestSource.scheduleCron" class="cronExpression"/></td>
 	            </tr>
 	            <tr>
 	                <td colspan="2">

@@ -57,7 +57,7 @@
 	            </tr>
 	            <tr>
 	                <td>Schedule cron expression:</td>
-	                <td>${fn:escapeXml(actionBean.harvestSource.scheduleCron)}</td>
+	                <td class="cronExpression">${fn:escapeXml(actionBean.harvestSource.scheduleCron)}</td>
 	            </tr>
            		<c:if test="${actionBean.harvestSource.unavailable}">
            			<tr>
