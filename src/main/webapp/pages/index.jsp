@@ -35,19 +35,19 @@
 	    </p>
 	    <ul>
 	    	<li>
-	            <a href="/cr/simpleSearch.action">Simple search</a><br/>
+	            <a href="simpleSearch.action">Simple search</a><br/>
 	            is the same quick-find search that is also displayed above.
 	        </li>
 	        <li>
-	            <a href="/cr/dataflowSearch.action">Dataflow search</a><br/>
+	            <a href="dataflowSearch.action">Dataflow search</a><br/>
 	            is meant for dataflow managers to observe specific dataflows in the dimensions of country and year.
 	        </li>
 	        <li>
-	            <a href="/cr/customSearch.action">Custom search</a><br/>
+	            <a href="customSearch.action">Custom search</a><br/>
 	            enables you to choose the criteria you want to search by and offers picklists of existing values too.
 	        </li>
 			<li>
-	            <a href="/cr/recentUploads.action">Recent uploads</a><br/>
+	            <a href="recentUploads.action">Recent uploads</a><br/>
 	            displays the latest content that CR has discovered, classified by certain content types.
 	        </li>
 	    </ul>
