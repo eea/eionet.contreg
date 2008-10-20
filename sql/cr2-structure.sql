@@ -17,8 +17,8 @@
 -- Table structure for table `harvest`
 --
 
-DROP TABLE IF EXISTS `harvest`;
-CREATE TABLE `harvest` (
+DROP TABLE IF EXISTS `HARVEST`;
+CREATE TABLE `HARVEST` (
   `HARVEST_ID` int(10) unsigned NOT NULL auto_increment,
   `HARVEST_SOURCE_ID` int(10) unsigned NOT NULL default '0',
   `TYPE` varchar(20) NOT NULL default '',
@@ -39,8 +39,8 @@ CREATE TABLE `harvest` (
 -- Table structure for table `harvest_message`
 --
 
-DROP TABLE IF EXISTS `harvest_message`;
-CREATE TABLE `harvest_message` (
+DROP TABLE IF EXISTS `HARVEST_MESSAGE`;
+CREATE TABLE `HARVEST_MESSAGE` (
   `HARVEST_ID` int(10) unsigned NOT NULL default '0',
   `TYPE` varchar(3) NOT NULL default '',
   `MESSAGE` varchar(255) NOT NULL default '',
@@ -53,8 +53,8 @@ CREATE TABLE `harvest_message` (
 -- Table structure for table `harvest_queue`
 --
 
-DROP TABLE IF EXISTS `harvest_queue`;
-CREATE TABLE `harvest_queue` (
+DROP TABLE IF EXISTS `HARVEST_QUEUE`;
+CREATE TABLE `HARVEST_QUEUE` (
   `URL` varchar(255) NOT NULL default '',
   `PRIORITY` enum('normal','urgent') NOT NULL default 'normal',
   `TIMESTAMP` timestamp NOT NULL default CURRENT_TIMESTAMP,
@@ -65,8 +65,8 @@ CREATE TABLE `harvest_queue` (
 -- Table structure for table `harvest_source`
 --
 
-DROP TABLE IF EXISTS `harvest_source`;
-CREATE TABLE `harvest_source` (
+DROP TABLE IF EXISTS `HARVEST_SOURCE`;
+CREATE TABLE `HARVEST_SOURCE` (
   `HARVEST_SOURCE_ID` int(10) unsigned NOT NULL auto_increment,
   `NAME` varchar(255) NOT NULL default '',
   `URL` varchar(255) default NULL,
