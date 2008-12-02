@@ -3,7 +3,7 @@ package eionet.cr.common;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import eionet.cr.util.Util;
+import eionet.cr.util.Hashes;
 
 /**
  * 
@@ -41,7 +41,7 @@ public class Md5Map extends HashMap<String,String>{
 		if (value==null)
 			return null;
 		
-		String digest = Util.md5digest(value);
+		String digest = Hashes.md5(value);
 		getInstance().put(digest, value);
 		return digest;
 	}

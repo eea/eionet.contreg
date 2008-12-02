@@ -16,8 +16,6 @@ import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 
-import java.security.GeneralSecurityException;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import java.text.MessageFormat;
@@ -54,49 +52,6 @@ import eionet.cr.common.Identifiers;
  */
 public class Util {
 
-	/**
-	 * 
-	 * @param s
-	 * @return
-	 */
-	public static String md5digest(String s){
-		return Util.digest(s, "md5");
-	}
-	
-	/**
-	 * 
-	 * @param src
-	 * @param algorithm
-	 * @return
-	 */
-	public static String digest(String src, String algorithm){
-        
-        byte[] srcBytes = src.getBytes();
-        byte[] dstBytes = new byte[16];
-        
-        MessageDigest md;
-        try{
-        	md = MessageDigest.getInstance(algorithm);
-        }
-        catch (GeneralSecurityException e){
-        	throw new CRRuntimeException(e.toString(), e);
-        }
-        md.update(srcBytes);
-        dstBytes = md.digest();
-        md.reset();
-        
-        StringBuffer buf = new StringBuffer();
-        for (int i=0; i<dstBytes.length; i++){
-            Byte byteWrapper = new Byte(dstBytes[i]);
-            int k = byteWrapper.intValue();
-            String s = Integer.toHexString(byteWrapper.intValue());
-            if (s.length() == 1) s = "0" + s;
-            buf.append(s.substring(s.length() - 2));
-        }
-        
-        return buf.toString();
-    }
-	
 	/**
 	 * 
 	 * @param t

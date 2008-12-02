@@ -37,7 +37,7 @@ import eionet.cr.harvest.util.RDFResourceProperty;
 import eionet.cr.harvest.util.WrappedARPObject;
 import eionet.cr.index.EncodingSchemes;
 import eionet.cr.search.Searcher;
-import eionet.cr.util.Util;
+import eionet.cr.util.Hashes;
 
 /**
  * 
@@ -163,7 +163,7 @@ public class RDFHandler implements StatementHandler, org.xml.sax.ErrorHandler{
 		StringBuffer bufHead = new StringBuffer(Identifiers.ANON_ID_PREFIX);
 		StringBuffer bufTail = new StringBuffer(String.valueOf(System.currentTimeMillis()));
 		bufTail.append(sourceUrlString==null ? "" : sourceUrlString).append(anonID);
-		return bufHead.append(Util.md5digest(bufTail.toString())).toString();
+		return bufHead.append(Hashes.md5(bufTail.toString())).toString();
     }
 
     /*
