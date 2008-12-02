@@ -11,7 +11,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
-import eionet.cr.common.Identifiers;
+import eionet.cr.common.Predicates;
 import eionet.cr.common.ResourceDTO;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.Searcher;
@@ -194,98 +194,98 @@ public class CustomSearchActionBean extends SearchResourcesActionBean{
 			ArrayList<CustomSearchFilter> list = new ArrayList<CustomSearchFilter>();
 			
 			CustomSearchFilter filter = new CustomSearchFilter();
-			filter.setUri(Identifiers.RDF_TYPE);
+			filter.setUri(Predicates.RDF_TYPE);
 			filter.setTitle("Type");
 			filter.setDescription("");
 			filter.setProvideValues(true);
 			list.add(filter);
 
 			filter = new CustomSearchFilter();
-			filter.setUri(Identifiers.RDFS_LABEL);
+			filter.setUri(Predicates.RDFS_LABEL);
 			filter.setTitle("Title");
 			filter.setDescription("");
 			filter.setProvideValues(false);
 			list.add(filter);
 
 			filter = new CustomSearchFilter();
-			filter.setUri(Identifiers.DC_SUBJECT);
+			filter.setUri(Predicates.DC_SUBJECT);
 			filter.setTitle("Subject");
 			filter.setDescription("");
 			filter.setProvideValues(true);
 			list.add(filter);
 
 			filter = new CustomSearchFilter();
-			filter.setUri(Identifiers.DC_COVERAGE);
+			filter.setUri(Predicates.DC_COVERAGE);
 			filter.setTitle("Coverage");
 			filter.setDescription("");
 			filter.setProvideValues(true);
 			list.add(filter);
 
 			filter = new CustomSearchFilter();
-			filter.setUri(Identifiers.ROD_OBLIGATION_PROPERTY);
+			filter.setUri(Predicates.ROD_OBLIGATION_PROPERTY);
 			filter.setTitle("Dataflow");
 			filter.setDescription("");
 			filter.setProvideValues(true);
 			list.add(filter);
 
 			filter = new CustomSearchFilter();
-			filter.setUri(Identifiers.ROD_LOCALITY_PROPERTY);
+			filter.setUri(Predicates.ROD_LOCALITY_PROPERTY);
 			filter.setTitle("Locality");
 			filter.setDescription("");
 			filter.setProvideValues(true);
 			list.add(filter);
 
 			filter = new CustomSearchFilter();
-			filter.setUri(Identifiers.ROD_ISSUE_PROPERTY);
+			filter.setUri(Predicates.ROD_ISSUE_PROPERTY);
 			filter.setTitle("Issue");
 			filter.setDescription("");
 			filter.setProvideValues(true);
 			list.add(filter);
 
 			filter = new CustomSearchFilter();
-			filter.setUri(Identifiers.ROD_INSTRUMENT_PROPERTY);
+			filter.setUri(Predicates.ROD_INSTRUMENT_PROPERTY);
 			filter.setTitle("Instrument");
 			filter.setDescription("");
 			filter.setProvideValues(true);
 			list.add(filter);
 
 			filter = new CustomSearchFilter();
-			filter.setUri(Identifiers.DC_CREATOR);
+			filter.setUri(Predicates.DC_CREATOR);
 			filter.setTitle("Creator");
 			filter.setDescription("");
 			filter.setProvideValues(true);
 			list.add(filter);
 
 			filter = new CustomSearchFilter();
-			filter.setUri(Identifiers.DC_DESCRIPTION);
+			filter.setUri(Predicates.DC_DESCRIPTION);
 			filter.setTitle("Description");
 			filter.setDescription("Abstract description of content");
 			filter.setProvideValues(false);
 			list.add(filter);
 
 			filter = new CustomSearchFilter();
-			filter.setUri(Identifiers.DC_PUBLISHER);
+			filter.setUri(Predicates.DC_PUBLISHER);
 			filter.setTitle("Publisher");
 			filter.setDescription("");
 			filter.setProvideValues(true);
 			list.add(filter);
 
 			filter = new CustomSearchFilter();
-			filter.setUri(Identifiers.DC_CONTRIBUTOR);
+			filter.setUri(Predicates.DC_CONTRIBUTOR);
 			filter.setTitle("Contributor");
 			filter.setDescription("");
 			filter.setProvideValues(true);
 			list.add(filter);
 
 			filter = new CustomSearchFilter();
-			filter.setUri(Identifiers.DC_RELATION);
+			filter.setUri(Predicates.DC_RELATION);
 			filter.setTitle("Relation");
 			filter.setDescription("Url to a related resource");
 			filter.setProvideValues(false);
 			list.add(filter);
 
 			filter = new CustomSearchFilter();
-			filter.setUri(Identifiers.DC_LANGUAGE);
+			filter.setUri(Predicates.DC_LANGUAGE);
 			filter.setTitle("Language");
 			filter.setDescription("");
 			filter.setProvideValues(true);

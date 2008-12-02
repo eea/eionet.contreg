@@ -15,7 +15,7 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.LockObtainFailedException;
 
-import eionet.cr.common.Identifiers;
+import eionet.cr.common.Predicates;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.harvest.util.RDFResource;
 import eionet.cr.harvest.util.RDFResourceProperty;
@@ -32,7 +32,7 @@ public class Indexer {
 	/** */
 	private static final boolean AUTO_COMMIT = true;
 	private static final boolean NO_AUTO_COMMIT = false;
-	public static final String ALL_CONTENT_FIELD = Identifiers.ALL_LITERAL_CONTENT;
+	public static final String ALL_CONTENT_FIELD = Predicates.ALL_LITERAL_CONTENT;
 	
 	/** */
 	private static Log logger = LogFactory.getLog(Indexer.class);
@@ -63,7 +63,7 @@ public class Indexer {
 			if (!incremental){
 				try{
 					logger.debug("Clearing index for source: " + resource.getSourceId());
-					indexWriter.deleteDocuments(new Term(Identifiers.SOURCE_ID, resource.getSourceId()));
+					indexWriter.deleteDocuments(new Term(Predicates.SOURCE_ID, resource.getSourceId()));
 				}
 				catch (Exception e){
 					throw new IndexException(e.toString(), e);
@@ -75,8 +75,8 @@ public class Indexer {
 			logger.debug("Indexing resources, source URL = " + resource.getSourceId());
 		
 		Document document = new Document();		
-		document.add(constructField(Identifiers.DOC_ID, resource.getId()));
-		document.add(constructField(Identifiers.SOURCE_ID, resource.getSourceId()));
+		document.add(constructField(Predicates.DOC_ID, resource.getId()));
+		document.add(constructField(Predicates.SOURCE_ID, resource.getSourceId()));
 
 		StringBuffer contentBuf = new StringBuffer(); // for collecting all literal values
 		
@@ -114,15 +114,15 @@ public class Indexer {
 		// if the resource is an encoding scheme, set the corresponding field
 		boolean isEncScheme = resource.isEncodingScheme();
 		if (isEncScheme)
-			document.add(constructField(Identifiers.IS_ENCODING_SCHEME, Boolean.TRUE.toString()));
+			document.add(constructField(Predicates.IS_ENCODING_SCHEME, Boolean.TRUE.toString()));
 		
 		// set the time the document was first seen
-		document.add(constructField(Identifiers.FIRST_SEEN_TIMESTAMP,
+		document.add(constructField(Predicates.FIRST_SEEN_TIMESTAMP,
 				resource.getFirstSeenTimestamp()==null ? getFirstSeenTimestamp() : resource.getFirstSeenTimestamp()));
 		
 		// finally, update the document in index
 		try {
-			indexWriter.updateDocument(new Term(Identifiers.DOC_ID, resource.getId()), document);
+			indexWriter.updateDocument(new Term(Predicates.DOC_ID, resource.getId()), document);
 		}
 		catch (Exception e) {
 			throw new IndexException(e.toString(), e);
@@ -131,11 +131,11 @@ public class Indexer {
 		
 		// if this document is an encoding scheme, add it into EncodingSchemes
 		if (isEncScheme)
-			EncodingSchemes.update(resource.getId(), document.getValues(Identifiers.RDFS_LABEL));
+			EncodingSchemes.update(resource.getId(), document.getValues(Predicates.RDFS_LABEL));
 		
 		// if this document represents a resource that is a sub-property of another one, add it to SubProperties
 		if (resource.isSubPropertyOf())
-			SubProperties.addSubProperty(document.getValues(Identifiers.RDFS_SUB_PROPERTY_OF), resource.getId());
+			SubProperties.addSubProperty(document.getValues(Predicates.RDFS_SUB_PROPERTY_OF), resource.getId());
 	}
 
 	/**
@@ -213,11 +213,11 @@ public class Indexer {
 	 */
 	public static boolean isAnalyzedField(String fieldName){
 		
-		if (fieldName.equals(Identifiers.DOC_ID))
+		if (fieldName.equals(Predicates.DOC_ID))
 			return false;
-		else if (fieldName.equals(Identifiers.SOURCE_ID))
+		else if (fieldName.equals(Predicates.SOURCE_ID))
 			return false;
-		else if (fieldName.equals(Identifiers.FIRST_SEEN_TIMESTAMP))
+		else if (fieldName.equals(Predicates.FIRST_SEEN_TIMESTAMP))
 			return false;
 		else
 			return true;

@@ -4,7 +4,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.document.Document;
 
-import eionet.cr.common.Identifiers;
+import eionet.cr.common.Predicates;
 import eionet.cr.index.EncodingSchemes;
 import eionet.cr.index.SubProperties;
 import eionet.cr.util.DocumentListener;
@@ -28,8 +28,8 @@ public class SubPropertiesLoader implements DocumentListener {
 	 */
 	public void handleDocument(Document document) {
 		
-		String docID = document.get(Identifiers.DOC_ID);
-		String[] subPropertyOf = document.getValues(Identifiers.RDFS_SUB_PROPERTY_OF);
+		String docID = document.get(Predicates.DOC_ID);
+		String[] subPropertyOf = document.getValues(Predicates.RDFS_SUB_PROPERTY_OF);
 		if (docID!=null && subPropertyOf!=null && subPropertyOf.length>0){
 			SubProperties.addSubProperty(subPropertyOf, docID);
 			countLoaded++;
@@ -45,6 +45,6 @@ public class SubPropertiesLoader implements DocumentListener {
 		logger.debug(countLoaded + " sub-properties loaded for " + SubProperties.getCount() + " resources");
 		
 		// we "artifically" force DublinCore's Title to be a sub-property of RDF Schema's Label, because we simply want to :) 
-		SubProperties.addSubProperty(Identifiers.RDFS_LABEL, Identifiers.DC_TITLE);
+		SubProperties.addSubProperty(Predicates.RDFS_LABEL, Predicates.DC_TITLE);
 	}
 }

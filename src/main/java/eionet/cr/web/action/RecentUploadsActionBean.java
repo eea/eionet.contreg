@@ -14,8 +14,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import eionet.cr.common.CRRuntimeException;
-import eionet.cr.common.Identifiers;
+import eionet.cr.common.Predicates;
 import eionet.cr.common.ResourceDTO;
+import eionet.cr.common.Subjects;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.Searcher;
 import eionet.cr.util.Util;
@@ -50,7 +51,7 @@ public class RecentUploadsActionBean extends SearchResourcesActionBean {
 	 * 
 	 */
 	public RecentUploadsActionBean(){
-		this.type = Util.urlEncode(Identifiers.ROD_DELIVERY_CLASS); // default type
+		this.type = Util.urlEncode(Subjects.ROD_DELIVERY_CLASS); // default type
 	}
 	
 	/**
@@ -97,22 +98,22 @@ public class RecentUploadsActionBean extends SearchResourcesActionBean {
 			
 			Map<String,String> typeMap = new HashMap<String,String>();
 			typeMap.put("title", "Deliveries");
-			typeMap.put("uri", Util.urlEncode(Identifiers.ROD_DELIVERY_CLASS));
+			typeMap.put("uri", Util.urlEncode(Subjects.ROD_DELIVERY_CLASS));
 			RecentUploadsActionBean.types.add(typeMap);
 			
 			typeMap = new HashMap<String,String>();
 			typeMap.put("title", "Obligations");
-			typeMap.put("uri", Util.urlEncode(Identifiers.ROD_OBLIGATION_CLASS));
+			typeMap.put("uri", Util.urlEncode(Subjects.ROD_OBLIGATION_CLASS));
 			RecentUploadsActionBean.types.add(typeMap);
 			
 			typeMap = new HashMap<String,String>();
 			typeMap.put("title", "Full reports");
-			typeMap.put("uri", Util.urlEncode(Identifiers.FULL_REPORT_CLASS));
+			typeMap.put("uri", Util.urlEncode(Subjects.FULL_REPORT_CLASS));
 			RecentUploadsActionBean.types.add(typeMap);
 
 			typeMap = new HashMap<String,String>();
 			typeMap.put("title", "News releases");
-			typeMap.put("uri", Util.urlEncode(Identifiers.RSS_ITEM_CLASS.toLowerCase()));
+			typeMap.put("uri", Util.urlEncode(Subjects.RSS_ITEM_CLASS.toLowerCase()));
 				// we do toLowerCase(), because http://reports.eea.europa.eu/whatsnew.rdf wrongfully uses
 				// http://purl.org/rss/1.0/item, instead of http://purl.org/rss/1.0/Item
 			RecentUploadsActionBean.types.add(typeMap);
@@ -152,24 +153,24 @@ public class RecentUploadsActionBean extends SearchResourcesActionBean {
 			list.add(col);
 
 			col = new SearchResultColumn();
-			col.setProperty(Identifiers.ROD_OBLIGATION_PROPERTY);
+			col.setProperty(Predicates.ROD_OBLIGATION_PROPERTY);
 			col.setTitle("Obligation");
 			col.setSortable(false);
 			list.add(col);
 
 			col = new SearchResultColumn();
-			col.setProperty(Identifiers.ROD_LOCALITY_PROPERTY);
+			col.setProperty(Predicates.ROD_LOCALITY_PROPERTY);
 			col.setTitle("Locality");
 			col.setSortable(false);
 			list.add(col);
 
 			col = new SearchResultColumn();
-			col.setProperty(Identifiers.DC_DATE);
+			col.setProperty(Predicates.DC_DATE);
 			col.setTitle("Date");
 			col.setSortable(false);
 			list.add(col);
 			
-			RecentUploadsActionBean.typesColumns.put(Identifiers.ROD_DELIVERY_CLASS, list);
+			RecentUploadsActionBean.typesColumns.put(Subjects.ROD_DELIVERY_CLASS, list);
 
 			// columns for obligations
 			list = new ArrayList<SearchResultColumn>();
@@ -180,18 +181,18 @@ public class RecentUploadsActionBean extends SearchResourcesActionBean {
 			list.add(col);
 
 			col = new SearchResultColumn();
-			col.setProperty(Identifiers.ROD_ISSUE_PROPERTY);
+			col.setProperty(Predicates.ROD_ISSUE_PROPERTY);
 			col.setTitle("Issue");
 			col.setSortable(false);
 			list.add(col);
 
 			col = new SearchResultColumn();
-			col.setProperty(Identifiers.ROD_INSTRUMENT_PROPERTY);
+			col.setProperty(Predicates.ROD_INSTRUMENT_PROPERTY);
 			col.setTitle("Instrument");
 			col.setSortable(false);
 			list.add(col);
 			
-			RecentUploadsActionBean.typesColumns.put(Identifiers.ROD_OBLIGATION_CLASS, list);
+			RecentUploadsActionBean.typesColumns.put(Subjects.ROD_OBLIGATION_CLASS, list);
 
 			// columns for full reports
 			list = new ArrayList<SearchResultColumn>();
@@ -202,24 +203,24 @@ public class RecentUploadsActionBean extends SearchResourcesActionBean {
 			list.add(col);
 
 			col = new SearchResultColumn();
-			col.setProperty(Identifiers.DC_SUBJECT);
+			col.setProperty(Predicates.DC_SUBJECT);
 			col.setTitle("Subject");
 			col.setSortable(false);
 			list.add(col);
 
 			col = new SearchResultColumn();
-			col.setProperty(Identifiers.DC_COVERAGE);
+			col.setProperty(Predicates.DC_COVERAGE);
 			col.setTitle("Coverage");
 			col.setSortable(false);
 			list.add(col);
 			
 			col = new SearchResultColumn();
-			col.setProperty(Identifiers.DC_DATE);
+			col.setProperty(Predicates.DC_DATE);
 			col.setTitle("Date");
 			col.setSortable(false);
 			list.add(col);
 
-			RecentUploadsActionBean.typesColumns.put(Identifiers.FULL_REPORT_CLASS, list);
+			RecentUploadsActionBean.typesColumns.put(Subjects.FULL_REPORT_CLASS, list);
 
 			// columns for news releases
 			list = new ArrayList<SearchResultColumn>();
@@ -230,24 +231,24 @@ public class RecentUploadsActionBean extends SearchResourcesActionBean {
 			list.add(col);
 
 			col = new SearchResultColumn();
-			col.setProperty(Identifiers.DC_SUBJECT);
+			col.setProperty(Predicates.DC_SUBJECT);
 			col.setTitle("Subject");
 			col.setSortable(false);
 			list.add(col);
 
 			col = new SearchResultColumn();
-			col.setProperty(Identifiers.DC_COVERAGE);
+			col.setProperty(Predicates.DC_COVERAGE);
 			col.setTitle("Coverage");
 			col.setSortable(false);
 			list.add(col);
 			
 			col = new SearchResultColumn();
-			col.setProperty(Identifiers.DC_DATE);
+			col.setProperty(Predicates.DC_DATE);
 			col.setTitle("Date");
 			col.setSortable(false);
 			list.add(col);
 
-			RecentUploadsActionBean.typesColumns.put(Identifiers.RSS_ITEM_CLASS.toLowerCase(), list);
+			RecentUploadsActionBean.typesColumns.put(Subjects.RSS_ITEM_CLASS.toLowerCase(), list);
 			// we do toLowerCase(), because http://reports.eea.europa.eu/whatsnew.rdf wrongfully uses
 			// http://purl.org/rss/1.0/item, instead of http://purl.org/rss/1.0/Item
 		}

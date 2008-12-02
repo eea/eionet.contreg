@@ -14,8 +14,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import eionet.cr.common.CRException;
-import eionet.cr.common.Identifiers;
+import eionet.cr.common.Predicates;
 import eionet.cr.common.ResourceDTO;
+import eionet.cr.common.Subjects;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.harvest.Harvest;
@@ -57,9 +58,9 @@ public class XmlRpcServices implements Services{
 			long givenTimeSeconds = Util.getSeconds(timestamp.getTime());
 			if (givenTimeSeconds < curTimeSeconds){
 				
-				String s = Identifiers.FIRST_SEEN_TIMESTAMP.replaceAll(":", "\\:");
+				String s = Predicates.FIRST_SEEN_TIMESTAMP.replaceAll(":", "\\:");
 				
-				StringBuffer qryBuf = new StringBuffer(Util.luceneEscape(Identifiers.FIRST_SEEN_TIMESTAMP));
+				StringBuffer qryBuf = new StringBuffer(Util.luceneEscape(Predicates.FIRST_SEEN_TIMESTAMP));
 				qryBuf.append(":[").append(givenTimeSeconds).append(" TO ").append(curTimeSeconds).append("]");
 				try{
 					result = eionet.cr.search.Searcher.luceneQuery(qryBuf.toString());
@@ -83,8 +84,8 @@ public class XmlRpcServices implements Services{
 		if (criteria==null)
 			criteria = new HashMap<String,String>();
 		
-		if (!criteria.containsKey(Identifiers.RDF_TYPE))
-			criteria.put(Identifiers.RDF_TYPE, Identifiers.ROD_DELIVERY_CLASS);
+		if (!criteria.containsKey(Predicates.RDF_TYPE))
+			criteria.put(Predicates.RDF_TYPE, Subjects.ROD_DELIVERY_CLASS);
 		
 		List<DataflowResultDto> result = new ArrayList<DataflowResultDto>();
 		try{
@@ -101,13 +102,13 @@ public class XmlRpcServices implements Services{
 					DataflowResultDto resultDTO = new DataflowResultDto();
 					resultDTO.setTitle(resourceDTO.getTitle());
 					resultDTO.setDataflow(
-							StringUtils.toArray(resourceDTO.getDistinctLiteralValues(Identifiers.ROD_OBLIGATION_PROPERTY)));
+							StringUtils.toArray(resourceDTO.getDistinctLiteralValues(Predicates.ROD_OBLIGATION_PROPERTY)));
 					resultDTO.setLocality(
-							StringUtils.toArray(resourceDTO.getDistinctLiteralValues(Identifiers.ROD_LOCALITY_PROPERTY)));
+							StringUtils.toArray(resourceDTO.getDistinctLiteralValues(Predicates.ROD_LOCALITY_PROPERTY)));
 					resultDTO.setType(
-							StringUtils.toArray(resourceDTO.getDistinctLiteralValues(Identifiers.RDF_TYPE)));
+							StringUtils.toArray(resourceDTO.getDistinctLiteralValues(Predicates.RDF_TYPE)));
 					resultDTO.setResource(resourceDTO.getUri());
-					resultDTO.setDate(resourceDTO.getValue(Identifiers.DC_DATE));
+					resultDTO.setDate(resourceDTO.getValue(Predicates.DC_DATE));
 					
 					result.add(resultDTO);
 				}

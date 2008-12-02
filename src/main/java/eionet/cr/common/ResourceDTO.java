@@ -77,17 +77,17 @@ public class ResourceDTO extends HashMap<String,List<String>>{
 				key = Md5Map.getValue(key);
 			
 			if (key.equals(SpecialKeys.RESOURCE_URI)){
-				result = super.get(Identifiers.DOC_ID);
+				result = super.get(Predicates.DOC_ID);
 			}
 			else if (key.equals(SpecialKeys.RESOURCE_TITLE)){
-				result = super.get(Identifiers.DC_TITLE);
+				result = super.get(Predicates.DC_TITLE);
 				if (deepEmpty(result))
-					result = super.get(Identifiers.RDFS_LABEL);
+					result = super.get(Predicates.RDFS_LABEL);
 			}
 			else if (key.equals(SpecialKeys.RESOURCE_URL)){
-				result = super.get(Identifiers.DOC_ID);
+				result = super.get(Predicates.DOC_ID);
 				if (result==null || result.isEmpty() || !URLUtil.isURL(result.get(0))){
-					result = super.get(Identifiers.DC_IDENTIFIER);
+					result = super.get(Predicates.DC_IDENTIFIER);
 					if (result!=null && !result.isEmpty() && !URLUtil.isURL(result.get(0)))
 						result = null;
 				}
@@ -115,7 +115,7 @@ public class ResourceDTO extends HashMap<String,List<String>>{
 	 * @return
 	 */
 	public String getUri(){
-		return getValue(Identifiers.DOC_ID);
+		return getValue(Predicates.DOC_ID);
 	}
 	
 	/**

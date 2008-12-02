@@ -30,7 +30,8 @@ import org.xml.sax.SAXException;
 
 import com.hp.hpl.jena.rdf.arp.ARP;
 
-import eionet.cr.common.Identifiers;
+import eionet.cr.common.Predicates;
+import eionet.cr.common.Subjects;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.harvest.util.DedicatedHarvestSourceTypes;
@@ -265,15 +266,15 @@ public abstract class Harvest {
 			String indexLocation = GeneralConfig.getProperty(GeneralConfig.LUCENE_INDEX_LOCATION);
 			if (IndexReader.indexExists(indexLocation)){
 				indexReader = IndexReader.open(indexLocation);
-				String[] fields = {Identifiers.DOC_ID, Identifiers.FIRST_SEEN_TIMESTAMP};
+				String[] fields = {Predicates.DOC_ID, Predicates.FIRST_SEEN_TIMESTAMP};
 				FieldSelector fieldSelector = new MapFieldSelector(fields);
 				int numDocs = indexReader.numDocs();
 				int countUpdated = 0;
 				for (int i=0; i<numDocs; i++){
 					Document document = indexReader.document(i, fieldSelector);
 					if (document!=null){
-						String docID = document.get(Identifiers.DOC_ID);
-						String firstTime = document.get(Identifiers.FIRST_SEEN_TIMESTAMP);
+						String docID = document.get(Predicates.DOC_ID);
+						String firstTime = document.get(Predicates.FIRST_SEEN_TIMESTAMP);
 						if (docID!=null && firstTime!=null){
 							RDFResource resource = resources.get(docID);
 							if (resource!=null){
@@ -538,12 +539,12 @@ public abstract class Harvest {
 		Iterator<RDFResource> iter = resources.values().iterator();
 		while (iter.hasNext()){
 			RDFResource resource = iter.next();
-			String type = resource.getPropertyValue(Identifiers.RDF_TYPE);
+			String type = resource.getPropertyValue(Predicates.RDF_TYPE);
 			if (type!=null){
 				String dedicatedTypeName = DedicatedHarvestSourceTypes.getInstance().get(type);
 				if (dedicatedTypeName!=null){
-					if (type.equals(Identifiers.QA_REPORT_CLASS) || type.equals(Identifiers.QAW_RESOURCE_CLASS)){
-						String source = resource.getPropertyValue(Identifiers.DC_SOURCE);
+					if (type.equals(Subjects.QA_REPORT_CLASS) || type.equals(Subjects.QAW_RESOURCE_CLASS)){
+						String source = resource.getPropertyValue(Predicates.DC_SOURCE);
 						if (URLUtil.isURL(source))
 							daoWriter.storeDedicatedHarvestSource(source, resource, dedicatedTypeName);
 					}

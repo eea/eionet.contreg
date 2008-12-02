@@ -5,7 +5,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import eionet.cr.common.Identifiers;
+import eionet.cr.common.Predicates;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
@@ -134,9 +134,9 @@ public class HarvestDAOWriter {
 	 */
 	protected void storeDedicatedHarvestSource(String url, RDFResource resource, String dedicatedTypeName) throws DAOException{
 
-		String name = resource.getPropertyValue(Identifiers.DC_TITLE);
+		String name = resource.getPropertyValue(Predicates.DC_TITLE);
 		if (name==null || name.length()==0)
-			name = resource.getPropertyValue(Identifiers.RDFS_LABEL);
+			name = resource.getPropertyValue(Predicates.RDFS_LABEL);
 		if (name==null)
 			name = resource.getId();
 

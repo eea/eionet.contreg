@@ -10,7 +10,7 @@ import java.util.Vector;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Fieldable;
 
-import eionet.cr.common.Identifiers;
+import eionet.cr.common.Predicates;
 import eionet.cr.index.EncodingSchemes;
 import eionet.cr.util.DocumentListener;
 
@@ -61,7 +61,7 @@ public class EntriesCollector extends HitsCollector{
 				}
 				fieldsHashtable.put(fieldName, new Vector<String>(valueSet));
 				
-				if (fieldName.equals(Identifiers.DOC_ID))
+				if (fieldName.equals(Predicates.DOC_ID))
 					docId = fieldValues[0];
 			}
 		}

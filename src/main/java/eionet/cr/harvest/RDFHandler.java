@@ -31,7 +31,7 @@ import com.hp.hpl.jena.rdf.arp.ALiteral;
 import com.hp.hpl.jena.rdf.arp.AResource;
 import com.hp.hpl.jena.rdf.arp.StatementHandler;
 
-import eionet.cr.common.Identifiers;
+import eionet.cr.common.Subjects;
 import eionet.cr.harvest.util.RDFResource;
 import eionet.cr.harvest.util.RDFResourceProperty;
 import eionet.cr.harvest.util.WrappedARPObject;
@@ -160,7 +160,7 @@ public class RDFHandler implements StatementHandler, org.xml.sax.ErrorHandler{
 	 * @return
 	 */
     private String generateID(String anonID) {
-		StringBuffer bufHead = new StringBuffer(Identifiers.ANON_ID_PREFIX);
+		StringBuffer bufHead = new StringBuffer(Subjects.ANON_ID_PREFIX);
 		StringBuffer bufTail = new StringBuffer(String.valueOf(System.currentTimeMillis()));
 		bufTail.append(sourceUrlString==null ? "" : sourceUrlString).append(anonID);
 		return bufHead.append(Hashes.md5(bufTail.toString())).toString();

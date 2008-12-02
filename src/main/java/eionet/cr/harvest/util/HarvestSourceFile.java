@@ -12,7 +12,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
-import eionet.cr.common.Identifiers;
+import eionet.cr.common.Subjects;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
@@ -90,7 +90,7 @@ public class HarvestSourceFile extends File {
 		if (analysis!=null){
 			StringBuffer buf = new StringBuffer();
 			buf.append(analysis.getStartTagNamespace()).append(analysis.getStartTag());
-			return buf.toString().equalsIgnoreCase(Identifiers.RDF_RDF);
+			return buf.toString().equalsIgnoreCase(Subjects.RDF_RDF);
 		}
 		else
 			return false;

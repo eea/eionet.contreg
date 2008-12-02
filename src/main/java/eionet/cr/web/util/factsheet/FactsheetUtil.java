@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-import eionet.cr.common.Identifiers;
+import eionet.cr.common.Predicates;
 import eionet.cr.common.ResourceDTO;
 import eionet.cr.index.EncodingSchemes;
 import eionet.cr.util.URLUtil;
@@ -119,10 +119,10 @@ public class FactsheetUtil {
 		
 		if (skipFromFactsheet==null){			
 			skipFromFactsheet = new HashSet();
-			skipFromFactsheet.add(Identifiers.DOC_ID);
-			skipFromFactsheet.add(Identifiers.FIRST_SEEN_TIMESTAMP);
-			skipFromFactsheet.add(Identifiers.SOURCE_ID);
-			skipFromFactsheet.add(Identifiers.IS_ENCODING_SCHEME);
+			skipFromFactsheet.add(Predicates.DOC_ID);
+			skipFromFactsheet.add(Predicates.FIRST_SEEN_TIMESTAMP);
+			skipFromFactsheet.add(Predicates.SOURCE_ID);
+			skipFromFactsheet.add(Predicates.IS_ENCODING_SCHEME);
 		}
 		
 		return skipFromFactsheet.contains(propertyUri);

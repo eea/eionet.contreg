@@ -6,7 +6,7 @@ import java.util.Map;
 
 import net.sourceforge.stripes.action.Resolution;
 
-import eionet.cr.common.Identifiers;
+import eionet.cr.common.Predicates;
 import eionet.cr.common.ResourceDTO;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.util.HitsCollector;
@@ -66,7 +66,7 @@ public abstract class SearchResourcesActionBean extends AbstractCRActionBean{
 		ArrayList<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
 		
 		SearchResultColumn col = new SearchResultColumn();
-		col.setProperty(Identifiers.RDF_TYPE);
+		col.setProperty(Predicates.RDF_TYPE);
 		col.setTitle("Type");
 		col.setSortable(true);
 		list.add(col);
@@ -78,7 +78,7 @@ public abstract class SearchResourcesActionBean extends AbstractCRActionBean{
 		list.add(col);
 
 		col = new SearchResultColumn();
-		col.setProperty(Identifiers.DC_DATE);
+		col.setProperty(Predicates.DC_DATE);
 		col.setTitle("Date");
 		col.setSortable(true);
 		list.add(col);

@@ -43,8 +43,9 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.TermQuery;
 
-import eionet.cr.common.Identifiers;
+import eionet.cr.common.Predicates;
 import eionet.cr.common.ResourceDTO;
+import eionet.cr.common.Subjects;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.index.EncodingSchemes;
 import eionet.cr.index.Indexer;
@@ -104,7 +105,7 @@ public class Searcher {
 		IndexSearcher indexSearcher = null;
 		try{
 			if (URIUtil.isSchemedURI(expression.trim()))
-				query = new TermQuery(new Term(Identifiers.DOC_ID, expression));
+				query = new TermQuery(new Term(Predicates.DOC_ID, expression));
 			else{
 				QueryParser parser = new QueryParser(DEFAULT_FIELD, Indexer.getAnalyzer());
 				char[] escapeExceptions = {'"'};
@@ -200,7 +201,7 @@ public class Searcher {
 		IndexSearcher indexSearcher = null;
 		try{
 			indexSearcher = getIndexSearcher();
-			return indexSearcher.docFreq(new Term(Identifiers.SOURCE_ID, sourceUrl));
+			return indexSearcher.docFreq(new Term(Predicates.SOURCE_ID, sourceUrl));
 		}
 		finally{
 			try{
@@ -266,22 +267,22 @@ public class Searcher {
 	public static List<ResourceDTO> dataflowSearch(String dataflow, String locality, String year) throws SearchException{
 		
 		List<Query> queries = new ArrayList<Query>();
-		queries.add(new TermQuery(new Term(Identifiers.RDF_TYPE, Identifiers.ROD_DELIVERY_CLASS)));
+		queries.add(new TermQuery(new Term(Predicates.RDF_TYPE, Subjects.ROD_DELIVERY_CLASS)));
 		
 		if (!Util.isNullOrEmpty(dataflow))
-			queries.add(new TermQuery(new Term(Identifiers.ROD_OBLIGATION_PROPERTY, dataflow)));
+			queries.add(new TermQuery(new Term(Predicates.ROD_OBLIGATION_PROPERTY, dataflow)));
 		
 		IndexSearcher indexSearcher = null;
 		try{
 			if (!Util.isNullOrEmpty(locality)){
 				QueryParser parser = new QueryParser(DEFAULT_FIELD, Indexer.getAnalyzer());
-				StringBuffer qryBuf = new StringBuffer(Util.luceneEscape(Identifiers.ROD_LOCALITY_PROPERTY));
+				StringBuffer qryBuf = new StringBuffer(Util.luceneEscape(Predicates.ROD_LOCALITY_PROPERTY));
 				qryBuf.append(":\"").append(Util.luceneEscape(locality)).append("\"");
 				queries.add(parser.parse(qryBuf.toString()));
 			}
 			if (!Util.isNullOrEmpty(year)){
 				QueryParser parser = new QueryParser(DEFAULT_FIELD, Indexer.getAnalyzer());
-				StringBuffer qryBuf = new StringBuffer(Util.luceneEscape(Identifiers.DC_COVERAGE));
+				StringBuffer qryBuf = new StringBuffer(Util.luceneEscape(Predicates.DC_COVERAGE));
 				qryBuf.append(":\"").append(Util.luceneEscape(year)).append("\"");
 				queries.add(parser.parse(qryBuf.toString()));
 			}
@@ -317,8 +318,8 @@ public class Searcher {
 	 */
 	public static List<RodInstrumentDTO> getDataflowsGroupedByInstruments() throws SearchException{
 
-		StringBuffer qryBuf = new StringBuffer(Util.luceneEscape(Identifiers.RDF_TYPE));
-		qryBuf.append(":\"").append(Util.luceneEscape(Identifiers.ROD_OBLIGATION_CLASS)).append("\"");
+		StringBuffer qryBuf = new StringBuffer(Util.luceneEscape(Predicates.RDF_TYPE));
+		qryBuf.append(":\"").append(Util.luceneEscape(Subjects.ROD_OBLIGATION_CLASS)).append("\"");
 		
 		logger.debug("Performing search query: " + qryBuf.toString());
 		
@@ -334,16 +335,16 @@ public class Searcher {
 			for (int i=0; hits!=null && i<hits.length(); i++){
 				
 				Document doc = hits.doc(i);
-				String instrumentId = doc.get(Identifiers.ROD_INSTRUMENT_PROPERTY);
+				String instrumentId = doc.get(Predicates.ROD_INSTRUMENT_PROPERTY);
 				if (instrumentId!=null && instrumentId.length()>0){
 					String instrumentLabel = EncodingSchemes.getLabel(instrumentId);
 					if (instrumentLabel!=null && instrumentLabel.length()>0){
-						String obligationLabel = doc.get(Identifiers.RDFS_LABEL);
+						String obligationLabel = doc.get(Predicates.RDFS_LABEL);
 						if (obligationLabel==null || obligationLabel.length()==0)
-							obligationLabel = doc.get(Identifiers.DC_TITLE);
+							obligationLabel = doc.get(Predicates.DC_TITLE);
 						
 						if (obligationLabel!=null && obligationLabel.length()>0){
-							String obligationId = doc.get(Identifiers.DOC_ID);
+							String obligationId = doc.get(Predicates.DOC_ID);
 							if (obligationId!=null && obligationId.length()>0){
 								
 								RodInstrumentDTO instrumentDTO = instrumentsMap.get(instrumentId);
@@ -454,7 +455,7 @@ public class Searcher {
 		IndexSearcher indexSearcher = null;
 		try{
 			indexSearcher = getIndexSearcher();
-			Hits hits = indexSearcher.search(new TermQuery(new Term(Identifiers.DOC_ID, uri)));
+			Hits hits = indexSearcher.search(new TermQuery(new Term(Predicates.DOC_ID, uri)));
 			if (hits==null || hits.length()==0)
 				return null;
 			else
@@ -486,10 +487,10 @@ public class Searcher {
 		IndexSearcher indexSearcher = null;
 		try{
 			indexSearcher = getIndexSearcher();
-			Sort sort = new Sort(Identifiers.FIRST_SEEN_TIMESTAMP, true);
-			Hits hits = indexSearcher.search(new TermQuery(new Term(Identifiers.RDF_TYPE, rdfType)), sort);
+			Sort sort = new Sort(Predicates.FIRST_SEEN_TIMESTAMP, true);
+			Hits hits = indexSearcher.search(new TermQuery(new Term(Predicates.RDF_TYPE, rdfType)), sort);
 			if (hits==null || hits.length()==0)
-				hits = indexSearcher.search(new TermQuery(new Term(Identifiers.RDF_TYPE, rdfType)));
+				hits = indexSearcher.search(new TermQuery(new Term(Predicates.RDF_TYPE, rdfType)));
 			
 			return HitsCollector.collectResourceDTOs(hits, maxResults);
 		}

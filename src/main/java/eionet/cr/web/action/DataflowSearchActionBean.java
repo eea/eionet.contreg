@@ -12,7 +12,7 @@ import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.queryParser.ParseException;
 
 import eionet.cr.common.CRRuntimeException;
-import eionet.cr.common.Identifiers;
+import eionet.cr.common.Predicates;
 import eionet.cr.common.ResourceDTO;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.Searcher;
@@ -67,7 +67,7 @@ public class DataflowSearchActionBean extends SearchResourcesActionBean{
 		if (session.getAttribute(DATAFLOWS_SESSION_ATTR_NAME)==null)
 			session.setAttribute(DATAFLOWS_SESSION_ATTR_NAME, Searcher.getDataflowsGroupedByInstruments());
 		if (session.getAttribute(LOCALITIES_SESSION_ATTR_NAME)==null)
-			session.setAttribute(LOCALITIES_SESSION_ATTR_NAME, Searcher.getLiteralFieldValues(Identifiers.ROD_LOCALITY_PROPERTY));
+			session.setAttribute(LOCALITIES_SESSION_ATTR_NAME, Searcher.getLiteralFieldValues(Predicates.ROD_LOCALITY_PROPERTY));
 	}
 	
 	/**
@@ -168,19 +168,19 @@ public class DataflowSearchActionBean extends SearchResourcesActionBean{
 		list.add(col);
 		
 		col = new SearchResultColumn();
-		col.setProperty(Identifiers.ROD_OBLIGATION_PROPERTY);
+		col.setProperty(Predicates.ROD_OBLIGATION_PROPERTY);
 		col.setTitle("Dataflow");
 		col.setSortable(true);
 		list.add(col);
 
 		col = new SearchResultColumn();
-		col.setProperty(Identifiers.ROD_LOCALITY_PROPERTY);
+		col.setProperty(Predicates.ROD_LOCALITY_PROPERTY);
 		col.setTitle("Locality");
 		col.setSortable(true);
 		list.add(col);
 
 		col = new SearchResultColumn();
-		col.setProperty(Identifiers.DC_DATE);
+		col.setProperty(Predicates.DC_DATE);
 		col.setTitle("Date");
 		col.setSortable(true);
 		list.add(col);

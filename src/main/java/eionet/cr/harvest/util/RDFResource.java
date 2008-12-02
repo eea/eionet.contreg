@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-import eionet.cr.common.Identifiers;
+import eionet.cr.common.Predicates;
 import eionet.cr.index.IndexException;
 
 /**
@@ -109,7 +109,7 @@ public class RDFResource {
 	public boolean isEncodingScheme(){
 		
 		return distinctProperties!=null &&
-			distinctProperties.contains(Identifiers.RDFS_LABEL);
+			distinctProperties.contains(Predicates.RDFS_LABEL);
 		//FIXME distinctProperties.contains(Identifiers.RDF_TYPE) &&
 	}
 	
@@ -118,7 +118,7 @@ public class RDFResource {
 	 * @return
 	 */
 	public boolean isSubPropertyOf(){
-		return distinctProperties!=null && distinctProperties.contains(Identifiers.RDFS_SUB_PROPERTY_OF);
+		return distinctProperties!=null && distinctProperties.contains(Predicates.RDFS_SUB_PROPERTY_OF);
 	}
 	
 	/**
