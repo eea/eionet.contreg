@@ -11,6 +11,10 @@ import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
+import net.sourceforge.stripes.action.DefaultHandler;
+import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.action.UrlBinding;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.ResourceDTO;
 import eionet.cr.search.SearchException;
@@ -19,11 +23,6 @@ import eionet.cr.search.util.ResourceDTOCollector;
 import eionet.cr.util.Util;
 import eionet.cr.web.util.search.CustomSearchFilter;
 import eionet.cr.web.util.search.SearchResultColumn;
-
-import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.action.UrlBinding;
 
 /**
  * 

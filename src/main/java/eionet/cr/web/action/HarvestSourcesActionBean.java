@@ -5,16 +5,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import eionet.cr.common.Identifiers;
-import eionet.cr.dao.DAOException;
-import eionet.cr.dao.DAOFactory;
-import eionet.cr.dto.HarvestSourceDTO;
-import eionet.cr.harvest.util.DedicatedHarvestSourceTypes;
-import eionet.cr.util.Util;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
+import eionet.cr.dao.DAOException;
+import eionet.cr.dao.DAOFactory;
+import eionet.cr.dto.HarvestSourceDTO;
+import eionet.cr.harvest.util.DedicatedHarvestSourceTypes;
 
 /**
  * @author altnyris

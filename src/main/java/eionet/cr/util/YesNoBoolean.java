@@ -11,40 +11,27 @@ public class YesNoBoolean {
 	public static final String YES = "Y";
 	public static final String NO = "N";
 
-	/** */
-	private String value;
-
-	/**
-	 * 
-	 * @param booleanValue
-	 */
-	public YesNoBoolean(boolean booleanValue){
-		value = booleanValue ? YesNoBoolean.YES : YesNoBoolean.NO;
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public String getValue(){
-		return value;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	public String toString(){
-		return getValue();
-	}
-	
 	/**
 	 * 
 	 * @param b
 	 * @return
 	 */
-	public static String parse(boolean b){
-		YesNoBoolean yn = new YesNoBoolean(b);
-		return yn.getValue();
+	public static String format(boolean b){
+		return b==true ? YES : NO;
+	}
+	
+	/**
+	 * 
+	 * @param s
+	 * @return
+	 */
+	public static boolean parse(String s){
+		
+		if (s.equals(YES))
+			return true;
+		else if (s.equals(NO))
+			return false;
+		else
+			throw new IllegalArgumentException(s);
 	}
 }

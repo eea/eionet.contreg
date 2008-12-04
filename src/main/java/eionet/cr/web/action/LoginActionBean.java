@@ -3,14 +3,18 @@
  */
 package eionet.cr.web.action;
 
-import eionet.cr.web.interceptor.annotation.DontSaveLastActionEvent;
+import static eionet.cr.web.util.ICRWebConstants.AFTER_LOGIN_EVENT;
+import static eionet.cr.web.util.ICRWebConstants.LOGIN_ACTION;
+import static eionet.cr.web.util.ICRWebConstants.LOGIN_EVENT;
+import static eionet.cr.web.util.ICRWebConstants.LOGOUT_EVENT;
+import static eionet.cr.web.util.ICRWebConstants.MAIN_PAGE_ACTION;
+import static eionet.cr.web.util.ICRWebConstants.USER_SESSION_ATTR;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.HandlesEvent;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
-
-import static eionet.cr.web.util.ICRWebConstants.*;
+import eionet.cr.web.interceptor.annotation.DontSaveLastActionEvent;
 
 /**
  * Action bean that deals with user login/logout.

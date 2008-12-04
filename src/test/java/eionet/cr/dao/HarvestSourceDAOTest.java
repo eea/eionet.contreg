@@ -8,7 +8,6 @@ import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.junit.Test;
 
 import eionet.cr.config.GeneralConfig;
-import eionet.cr.dao.DAOFactory;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.test.util.DbHelper;
 import eionet.cr.util.sql.ConnectionUtil;

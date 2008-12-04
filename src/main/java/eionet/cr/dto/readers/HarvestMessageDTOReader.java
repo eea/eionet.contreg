@@ -1,16 +1,12 @@
 package eionet.cr.dto.readers;
 
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import eionet.cr.dto.HarvestMessageDTO;
 import eionet.cr.util.sql.ResultSetBaseReader;
-import eionet.cr.util.sql.SQLValue;
 
 /**
  * 

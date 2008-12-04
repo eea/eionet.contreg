@@ -3,11 +3,10 @@ package eionet.cr.test.util;
 import java.util.HashMap;
 import java.util.Map;
 
-import eionet.cr.web.action.AbstractCRActionBean;
-
 import net.sourceforge.stripes.controller.DispatcherServlet;
 import net.sourceforge.stripes.controller.StripesFilter;
 import net.sourceforge.stripes.mock.MockServletContext;
+import eionet.cr.web.action.AbstractCRActionBean;
 
 /**
  * Helper class for testing Stripes action beans.

@@ -1,7 +1,6 @@
 package eionet.cr.common;
 
 import java.util.HashMap;
-import java.util.HashSet;
 
 import eionet.cr.util.Hashes;
 

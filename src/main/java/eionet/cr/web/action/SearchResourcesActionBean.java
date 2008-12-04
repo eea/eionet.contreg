@@ -2,15 +2,12 @@ package eionet.cr.web.action;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import net.sourceforge.stripes.action.Resolution;
-
 import eionet.cr.common.Predicates;
 import eionet.cr.common.ResourceDTO;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.util.HitsCollector;
-import eionet.cr.util.Util;
 import eionet.cr.web.util.search.SearchResultColumn;
 
 /**

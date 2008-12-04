@@ -3,15 +3,16 @@
  */
 package eionet.cr.web.context;
 
+import static eionet.cr.web.util.ICRWebConstants.LAST_ACTION_URL_SESSION_ATTR;
+import static eionet.cr.web.util.ICRWebConstants.USER_SESSION_ATTR;
+
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import eionet.cr.web.security.EionetCASFilter;
-import eionet.cr.web.security.CRUser;
 import net.sourceforge.stripes.action.ActionBeanContext;
-
-import static eionet.cr.web.util.ICRWebConstants.*;
+import eionet.cr.web.security.CRUser;
+import eionet.cr.web.security.EionetCASFilter;
 
 /**
  * Extension of stripes ActionBeanContext.

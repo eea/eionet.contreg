@@ -7,7 +7,6 @@ import com.tee.uit.security.AccessControlListIF;
 import com.tee.uit.security.AccessController;
 import com.tee.uit.security.SignOnException;
 
-import eionet.cr.harvest.Harvest;
 import eionet.cr.util.Util;
 
 /**

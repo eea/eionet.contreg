@@ -2,7 +2,6 @@ package eionet.cr.dao;
 
 import java.util.List;
 
-import eionet.cr.dto.HarvestDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 
 /**

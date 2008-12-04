@@ -17,21 +17,12 @@ import eionet.cr.common.CRException;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.ResourceDTO;
 import eionet.cr.common.Subjects;
-import eionet.cr.dao.DAOFactory;
-import eionet.cr.dto.HarvestSourceDTO;
-import eionet.cr.harvest.Harvest;
-import eionet.cr.harvest.HarvestDAOWriter;
-import eionet.cr.harvest.HarvestException;
-import eionet.cr.harvest.PushHarvest;
 import eionet.cr.harvest.scheduled.HarvestQueue;
-import eionet.cr.index.EncodingSchemes;
 import eionet.cr.search.Searcher;
 import eionet.cr.search.util.EntriesCollector;
-import eionet.cr.search.util.HitsCollector;
 import eionet.cr.search.util.ResourceDTOCollector;
 import eionet.cr.util.StringUtils;
 import eionet.cr.util.Util;
-import eionet.cr.web.security.CRUser;
 import eionet.qawcommons.DataflowResultDto;
 
 /**

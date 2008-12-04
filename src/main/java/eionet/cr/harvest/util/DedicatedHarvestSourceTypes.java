@@ -1,6 +1,5 @@
 package eionet.cr.harvest.util;
 
-import java.util.ArrayList;
 import java.util.Hashtable;
 
 import eionet.cr.common.Subjects;

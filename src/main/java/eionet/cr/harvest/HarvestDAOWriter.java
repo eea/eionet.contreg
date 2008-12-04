@@ -11,7 +11,6 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dto.HarvestMessageDTO;
 import eionet.cr.dto.HarvestSourceDTO;
-import eionet.cr.harvest.util.HarvestMessagesMask;
 import eionet.cr.harvest.util.RDFResource;
 import eionet.cr.util.Util;
 import eionet.cr.web.security.CRUser;

@@ -2,6 +2,13 @@ package eionet.cr.web.action;
 
 import java.util.List;
 
+import net.sourceforge.stripes.action.DefaultHandler;
+import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.action.UrlBinding;
+import net.sourceforge.stripes.validation.SimpleError;
+import net.sourceforge.stripes.validation.ValidationMethod;
+
 import org.quartz.SchedulerException;
 
 import eionet.cr.config.GeneralConfig;
@@ -17,14 +24,6 @@ import eionet.cr.harvest.scheduled.CronHarvestQueueingJob;
 import eionet.cr.harvest.scheduled.HarvestQueue;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
-import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.DontValidate;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.RedirectResolution;
-import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.action.UrlBinding;
-import net.sourceforge.stripes.validation.SimpleError;
-import net.sourceforge.stripes.validation.ValidationMethod;
 
 /**
  * @author altnyris

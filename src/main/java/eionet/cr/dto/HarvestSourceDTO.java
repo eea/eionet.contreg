@@ -6,9 +6,6 @@ package eionet.cr.dto;
 import java.io.Serializable;
 import java.util.Date;
 
-import eionet.cr.dao.DAOException;
-import eionet.cr.dao.DAOFactory;
-
 /**
  * @author altnyris
  *

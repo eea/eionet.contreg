@@ -5,7 +5,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.document.Document;
 
 import eionet.cr.common.Predicates;
-import eionet.cr.index.EncodingSchemes;
 import eionet.cr.index.SubProperties;
 import eionet.cr.util.DocumentListener;
 

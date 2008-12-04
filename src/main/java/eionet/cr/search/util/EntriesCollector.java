@@ -1,10 +1,8 @@
 package eionet.cr.search.util;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
 import java.util.Vector;
 
 import org.apache.lucene.document.Document;
@@ -12,7 +10,6 @@ import org.apache.lucene.document.Fieldable;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.index.EncodingSchemes;
-import eionet.cr.util.DocumentListener;
 
 /**
  * 

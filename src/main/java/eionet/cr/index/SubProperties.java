@@ -3,16 +3,7 @@ package eionet.cr.index;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.List;
-
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.FieldSelector;
-import org.apache.lucene.document.MapFieldSelector;
-import org.apache.lucene.index.IndexReader;
-
-import eionet.cr.common.Identifiers;
-import eionet.cr.config.GeneralConfig;
 
 /**
  * 

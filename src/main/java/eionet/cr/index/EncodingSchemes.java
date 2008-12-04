@@ -1,28 +1,9 @@
 package eionet.cr.index;
 
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.ServletContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.FieldSelector;
-import org.apache.lucene.document.MapFieldSelector;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.index.TermEnum;
-
-import eionet.cr.common.Identifiers;
-import eionet.cr.config.GeneralConfig;
-import eionet.cr.harvest.HarvestException;
-import eionet.cr.harvest.util.RDFResource;
-import eionet.cr.util.Util;
 
 /**
  * 

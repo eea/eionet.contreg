@@ -17,7 +17,6 @@ import net.sourceforge.stripes.controller.ExecutionContext;
 import net.sourceforge.stripes.controller.Interceptor;
 import net.sourceforge.stripes.controller.Intercepts;
 import net.sourceforge.stripes.controller.LifecycleStage;
-import eionet.cr.util.StringUtils;
 import eionet.cr.util.Util;
 import eionet.cr.web.interceptor.annotation.DontSaveLastActionEvent;
 

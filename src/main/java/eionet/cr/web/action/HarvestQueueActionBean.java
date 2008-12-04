@@ -17,7 +17,6 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dto.HarvestQueueItemDTO;
 import eionet.cr.harvest.scheduled.HarvestQueue;
-import eionet.cr.search.SearchException;
 import eionet.cr.util.Util;
 
 /**

@@ -15,9 +15,6 @@ import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
 import org.quartz.impl.StdSchedulerFactory;
 
-import eionet.cr.harvest.HarvestException;
-import eionet.cr.harvest.scheduled.CronHarvestQueueingJob;
-
 /**
  * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>

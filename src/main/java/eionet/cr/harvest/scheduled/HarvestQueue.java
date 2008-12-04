@@ -1,12 +1,9 @@
 package eionet.cr.harvest.scheduled;
 
-import java.util.concurrent.ConcurrentLinkedQueue;
-
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dto.HarvestQueueItemDTO;
 import eionet.cr.harvest.HarvestException;
-import eionet.cr.util.sql.ConnectionUtil;
 
 /**
  * 

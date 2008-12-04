@@ -1,10 +1,15 @@
 package eionet.cr.web.security;
 
+import static eionet.cr.web.util.ICRWebConstants.AFTER_LOGIN_EVENT;
+import static eionet.cr.web.util.ICRWebConstants.LOGIN_ACTION;
+import static eionet.cr.web.util.ICRWebConstants.USER_SESSION_ATTR;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
+
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
@@ -14,9 +19,9 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
 import edu.yale.its.tp.cas.client.filter.CASFilter;
 import eionet.cr.web.util.CrCasFilterConfig;
-import static eionet.cr.web.util.ICRWebConstants.*;
 
 /**
  * 

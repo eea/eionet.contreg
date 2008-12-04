@@ -23,8 +23,8 @@
 
 package eionet.cr.util.xml;
 
-import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.SAXException;
+import org.xml.sax.ext.LexicalHandler;
 
 /**
  * 

@@ -1,6 +1,5 @@
 package eionet.cr.util.sql;
 
-import java.util.StringTokenizer;
 
 /**
  * 

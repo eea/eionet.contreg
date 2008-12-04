@@ -7,9 +7,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Map;
-import java.util.HashMap;
 
 /**
  * 
@@ -150,5 +148,44 @@ public class SQLUtil {
 			pstmt.setObject(i+1, values.get(i));
 		}
 		return pstmt;
+	}
+	
+	/**
+	 * 
+	 * @param conn
+	 */
+	public static void close(Connection conn){
+		if (conn!=null){
+			try{
+				conn.close();
+			}
+			catch (SQLException e){}
+		}
+	}
+
+	/**
+	 * 
+	 * @param stmt
+	 */
+	public static void close(Statement stmt){
+		if (stmt!=null){
+			try{
+				stmt.close();
+			}
+			catch (SQLException e){}
+		}
+	}
+	
+	/**
+	 * 
+	 * @param rs
+	 */
+	public static void close(ResultSet rs){
+		if (rs!=null){
+			try{
+				rs.close();
+			}
+			catch (SQLException e){}
+		}
 	}
 }

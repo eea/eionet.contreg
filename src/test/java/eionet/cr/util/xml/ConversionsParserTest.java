@@ -1,11 +1,6 @@
 package eionet.cr.util.xml;
 
 import java.io.File;
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.xml.sax.SAXException;
 
 import junit.framework.TestCase;
 

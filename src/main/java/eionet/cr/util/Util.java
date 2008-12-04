@@ -1,36 +1,19 @@
 package eionet.cr.util;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
-import java.io.Writer;
-
-import java.lang.reflect.InvocationTargetException;
-
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-
-import java.security.NoSuchAlgorithmException;
-
-import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.StringTokenizer;
 
 import javax.servlet.jsp.PageContext;
@@ -42,7 +25,6 @@ import org.quartz.CronExpression;
 import org.xml.sax.SAXException;
 
 import eionet.cr.common.CRRuntimeException;
-import eionet.cr.common.Identifiers;
 
 
 /**

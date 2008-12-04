@@ -8,8 +8,6 @@ import java.util.Map;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Fieldable;
 
-import eionet.cr.util.DocumentListener;
-
 /**
  * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>

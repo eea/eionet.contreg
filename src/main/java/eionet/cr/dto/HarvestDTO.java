@@ -1,6 +1,5 @@
 package eionet.cr.dto;
 
-import eionet.cr.harvest.util.HarvestMessagesMask;
 
 /**
  * 

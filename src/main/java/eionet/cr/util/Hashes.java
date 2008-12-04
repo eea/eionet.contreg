@@ -2,7 +2,6 @@ package eionet.cr.util;
 
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
-import java.util.ArrayList;
 
 import eionet.cr.common.CRRuntimeException;
 
@@ -27,17 +26,34 @@ public class Hashes {
 	 * @param s
 	 * @return
 	 */
+	public static long spoHash(String s, long seed){
+		return Hashes.fnv64(s, seed);
+	}
+
+	/**
+	 * 
+	 * @param s
+	 * @return
+	 */
 	public static long fnv64(String s){
+		return Hashes.fnv64(s, 0xcbf29ce484222325L);
+	}
+
+	/**
+	 * 
+	 * @param s
+	 * @return
+	 */
+	public static long fnv64(String s, long seed){
 		
-		long hash = 0xcbf29ce484222325L;
 		if (s!=null && s.length()>0){
 		    for (int i=0; i<s.length(); i++){
-		    	hash ^= (long)s.charAt(i);
-		    	hash += (hash << 1) + (hash << 4) + (hash << 5) + (hash << 7) + (hash << 8) + (hash << 40);
+		    	seed ^= (long)s.charAt(i);
+		    	seed += (seed << 1) + (seed << 4) + (seed << 5) + (seed << 7) + (seed << 8) + (seed << 40);
 		    }
 		}
 		
-		return hash;
+		return seed;
 	}
 
 	/**

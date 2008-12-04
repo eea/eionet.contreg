@@ -2,6 +2,14 @@ package eionet.cr.web.action;
 
 import java.util.ResourceBundle;
 
+import net.sourceforge.stripes.action.ActionBean;
+import net.sourceforge.stripes.action.ActionBeanContext;
+import net.sourceforge.stripes.action.Message;
+import net.sourceforge.stripes.action.SimpleMessage;
+import net.sourceforge.stripes.controller.AnnotatedClassActionResolver;
+import net.sourceforge.stripes.validation.SimpleError;
+import net.sourceforge.stripes.validation.ValidationError;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -11,14 +19,6 @@ import eionet.cr.dto.HarvestQueueItemDTO;
 import eionet.cr.harvest.scheduled.HarvestingJob;
 import eionet.cr.web.context.CRActionBeanContext;
 import eionet.cr.web.security.CRUser;
-import net.sourceforge.stripes.action.ActionBean;
-import net.sourceforge.stripes.action.ActionBeanContext;
-import net.sourceforge.stripes.action.Message;
-import net.sourceforge.stripes.action.SimpleMessage;
-import net.sourceforge.stripes.controller.AnnotatedClassActionResolver;
-import net.sourceforge.stripes.controller.StripesFilter;
-import net.sourceforge.stripes.validation.SimpleError;
-import net.sourceforge.stripes.validation.ValidationError;
 
 /**
  * Root class for all CR ActionBeans.

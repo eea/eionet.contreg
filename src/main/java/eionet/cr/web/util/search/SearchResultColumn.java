@@ -1,7 +1,6 @@
 package eionet.cr.web.util.search;
 
 import eionet.cr.common.Md5Map;
-import eionet.cr.util.Util;
 
 /**
  * 

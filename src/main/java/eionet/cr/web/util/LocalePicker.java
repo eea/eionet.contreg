@@ -1,7 +1,9 @@
 package eionet.cr.web.util;
 
 import java.util.Locale;
+
 import javax.servlet.http.HttpServletRequest;
+
 import net.sourceforge.stripes.localization.DefaultLocalePicker;
 
 /**

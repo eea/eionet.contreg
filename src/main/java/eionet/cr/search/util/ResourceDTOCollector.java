@@ -6,7 +6,6 @@ import java.util.List;
 import org.apache.lucene.document.Document;
 
 import eionet.cr.common.ResourceDTO;
-import eionet.cr.util.DocumentListener;
 
 public class ResourceDTOCollector extends HitsCollector{
 

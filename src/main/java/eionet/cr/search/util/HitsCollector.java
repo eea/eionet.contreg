@@ -9,7 +9,6 @@ import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.search.Hits;
 
 import eionet.cr.common.ResourceDTO;
-import eionet.cr.util.DocumentListener;
 
 /**
  * 
