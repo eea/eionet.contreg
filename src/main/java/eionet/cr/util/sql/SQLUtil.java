@@ -135,6 +135,25 @@ public class SQLUtil {
 	
 	/**
 	 * 
+	 * @param sql
+	 * @param conn
+	 * @return
+	 * @throws SQLException
+	 */
+	public static int executeUpdate(String sql, Connection conn) throws SQLException{
+		
+		Statement stmt = null;
+		try{
+			stmt = conn.createStatement();
+			return stmt.executeUpdate(sql);
+		}
+		finally{
+			SQLUtil.close(stmt);
+		}
+	}
+	
+	/**
+	 * 
 	 * @param parameterizedSQL
 	 * @param valueMap
 	 * @param conn

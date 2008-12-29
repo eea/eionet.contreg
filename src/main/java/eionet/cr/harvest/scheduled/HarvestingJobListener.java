@@ -37,7 +37,7 @@ public class HarvestingJobListener implements JobListener{
 	 * @see org.quartz.JobListener#jobToBeExecuted(org.quartz.JobExecutionContext)
 	 */
 	public void jobToBeExecuted(JobExecutionContext context) {
-		logger.info("Going to execute job " + context.getJobDetail().getName());
+//		logger.debug("Going to execute job " + context.getJobDetail().getName());
 	}
 
 	/*
@@ -51,6 +51,6 @@ public class HarvestingJobListener implements JobListener{
 			return;
 		}
 		
-		logger.info("Executed job " + context.getJobDetail().getName());
+//		logger.debug("Executed job " + context.getJobDetail().getName());
 	}
 }

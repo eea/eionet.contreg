@@ -81,7 +81,8 @@ public class CRUser {
 			AccessControlListIF acl = AccessController.getAcl(aclPath);
 			if (acl!=null){
 				result = acl.checkPermission(userName, prm);
-				logger.debug("User " + userName + " " + (result ? "has" : "does not have") + " permission " + prm + " in acl \"" + aclPath + "\"");
+				if (result==false)
+					logger.debug("User " + userName + " does not have permission " + prm + " in acl \"" + aclPath + "\"");
 			}
 			else
 				logger.warn("acl \"" + aclPath + "\" not found!");

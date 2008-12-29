@@ -38,8 +38,8 @@ public class CronHarvestQueueingJobListener implements JobListener{
 	 * @see org.quartz.JobListener#jobToBeExecuted(org.quartz.JobExecutionContext)
 	 */
 	public void jobToBeExecuted(JobExecutionContext context) {
-		logger.info("Going to execute CronHarvestQueueingJob for cron expression [" +
-				context.getJobDetail().getJobDataMap().getString(CronHarvestQueueingJob.CRON_ATTR) + "]");
+//		logger.debug("Going to execute CronHarvestQueueingJob for cron expression [" +
+//				context.getJobDetail().getJobDataMap().getString(CronHarvestQueueingJob.CRON_ATTR) + "]");
 	}
 
 	/*
@@ -54,7 +54,7 @@ public class CronHarvestQueueingJobListener implements JobListener{
 			return;
 		}
 		
-		logger.info("CronHarvestQueueingJob was executed for cron expression [" +
-				context.getJobDetail().getJobDataMap().getString(CronHarvestQueueingJob.CRON_ATTR) + "]");
+//		logger.debug("CronHarvestQueueingJob was executed for cron expression [" +
+//				context.getJobDetail().getJobDataMap().getString(CronHarvestQueueingJob.CRON_ATTR) + "]");
 	}
 }

@@ -49,7 +49,7 @@ public class HarvestDAOWriter {
 	 */
 	protected void writeStarted(Harvest harvest) throws DAOException{
 		
-		logger.debug(getClass().getSimpleName() + ", recording harvest started, source URL = " + harvest.getSourceUrlString());
+		logger.debug(getClass().getSimpleName() + ", recording harvest starting details, source URL = " + harvest.getSourceUrlString());
 		harvestId = DAOFactory.getDAOFactory().getHarvestDAO().insertStartedHarvest(sourceId, harvestType, userName, Harvest.STATUS_STARTED);
 	}
 
@@ -61,7 +61,7 @@ public class HarvestDAOWriter {
 	 */
 	protected void writeFinished(Harvest harvest, Integer numResourcesInSource) throws DAOException{
 		
-		logger.debug(getClass().getSimpleName() + ", recording harvest finished, source URL = " + harvest.getSourceUrlString());
+		logger.debug(getClass().getSimpleName() + ", recording harvest finish details, source URL = " + harvest.getSourceUrlString());
 		DAOFactory.getDAOFactory().getHarvestDAO().updateFinishedHarvest(harvestId, Harvest.STATUS_FINISHED,
 				harvest.getCountTotalStatements(),
 				harvest.getCountLiteralStatements(),

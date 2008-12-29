@@ -27,6 +27,7 @@ import org.xml.sax.SAXException;
 
 import com.hp.hpl.jena.rdf.arp.ARP;
 
+import eionet.cr.common.CRRuntimeException;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.config.GeneralConfig;
@@ -179,34 +180,38 @@ public abstract class Harvest {
 	 */
 	protected void harvest(Reader reader) throws HarvestException{
 		
+		NewRDFHandler rdfHandler = new NewRDFHandler(sourceUrlString, System.currentTimeMillis());
 		try{
 			ARP arp = new ARP();
-			RDFHandler rdfHandler = new RDFHandler(sourceUrlString);
 	        arp.setStatementHandler(rdfHandler);
 	        arp.setErrorHandler(rdfHandler);
 	        arp.load(reader, sourceUrlString);
+	        rdfHandler.commit();
 	        
-	        logger.debug(rdfHandler.getCountResources() + " resources collected from : " + sourceUrlString);
+	        logger.debug(rdfHandler.getStoredTriplesCount() + " triples stored for : " + sourceUrlString);
 	        
-	        errors.addAll(rdfHandler.getErrors());
-	        warnings.addAll(rdfHandler.getWarnings());
+	        errors.addAll(rdfHandler.getSaxErrors());
+	        warnings.addAll(rdfHandler.getSaxWarnings());
 	        
-	        if (rdfHandler.isFatalError())
-	        	throw rdfHandler.getFatalError();
-	        else{
-	        	try{
-	        		storeDedicatedHarvestSources(rdfHandler.getRdfResources());
-	        	}
-	        	catch (Exception e){}
-	        	updateFirstTimes(rdfHandler.getRdfResources());
-	        	
-	        	if (this instanceof PushHarvest)
-	        		indexer.setIncremental(true);
-	        	indexResources(rdfHandler.getRdfResources());
-	        }
+        	// TODO - store dedicated harevst sources
+        	
+        	// TODO - handle incremental (i.e. pushed via API) harvest
+//	        	if (this instanceof PushHarvest)
+//	        		indexer.setIncremental(true);
 		}
 		catch (Exception e){
-			throw new HarvestException("Exception when harvesting [" + sourceUrlString + "]: " + e.toString(), e);
+			try{
+				rdfHandler.rollback();
+			}
+			catch (Exception ee){}
+			Throwable t = (e instanceof CRRuntimeException) && e.getCause()!=null ? e.getCause() : e;
+			throw new HarvestException("Exception when harvesting [" + sourceUrlString + "]: " + t.toString(), t);
+		}
+		finally{
+			try{
+				rdfHandler.close();
+			}
+			catch (Exception e){}
 		}
 	}
 

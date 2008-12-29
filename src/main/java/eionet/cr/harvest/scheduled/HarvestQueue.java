@@ -1,5 +1,8 @@
 package eionet.cr.harvest.scheduled;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dto.HarvestQueueItemDTO;
@@ -11,6 +14,9 @@ import eionet.cr.harvest.HarvestException;
  *
  */
 public class HarvestQueue{
+	
+	/** */
+	private static Log logger = LogFactory.getLog(HarvestQueue.class);
 
 	/** */
 	public static final String PRIORITY_NORMAL = "normal";
@@ -29,6 +35,7 @@ public class HarvestQueue{
 		
 		try {
 			DAOFactory.getDAOFactory().getHarvestQueueDAO().addPullHarvest(dto);
+			logger.debug("Pull harvest added to the " + priority + " queue, url = " + url);
 		}
 		catch (DAOException e) {
 			throw new HarvestException(e.toString(), e);
@@ -51,6 +58,7 @@ public class HarvestQueue{
 		
 		try {
 			DAOFactory.getDAOFactory().getHarvestQueueDAO().addPushHarvest(dto);
+			logger.debug("Push harvest added to the " + priority + " queue, url = " + url);
 		}
 		catch (DAOException e) {
 			throw new HarvestException(e.toString(), e);
