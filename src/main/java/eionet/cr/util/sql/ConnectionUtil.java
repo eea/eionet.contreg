@@ -12,9 +12,15 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import eionet.cr.common.CRRuntimeException;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 
+/**
+ * 
+ * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
+ *
+ */
 public class ConnectionUtil {
 	
 	/** */
@@ -26,14 +32,18 @@ public class ConnectionUtil {
 	
 	/**
 	 * 
-	 * @throws NamingException 
-	 * @throws DAOException
 	 */
-	private static void initDataSource() throws NamingException{
-		Context initContext = new InitialContext();
-		Context context = (Context) initContext.lookup("java:comp/env");
-		DataSource ds = (javax.sql.DataSource)context.lookup(GeneralConfig.getRequiredProperty(GeneralConfig.DATASOURCE_NAME));;
-		dataSource = ds;
+	private static void initDataSource(){
+		
+		String dataSourceName = GeneralConfig.getRequiredProperty(GeneralConfig.DATASOURCE_NAME);
+		try{
+			Context initContext = new InitialContext();
+			Context context = (Context) initContext.lookup("java:comp/env");
+			ConnectionUtil.dataSource = (javax.sql.DataSource)context.lookup(dataSourceName);
+		}
+		catch (NamingException e){
+			throw new CRRuntimeException("Failed to init JDBC resource " + dataSourceName, e);
+		}
 	}
 	
 	/**
@@ -41,7 +51,7 @@ public class ConnectionUtil {
 	 * @return
 	 * @throws SQLException 
 	 */
-	public static Connection getConnection() throws DataSourceException, SQLException {
+	public static Connection getConnection() throws SQLException {
 		if(ConnectionUtil.returnSimpleConnection)
 			return getSimpleConnection();
 		else
@@ -53,16 +63,11 @@ public class ConnectionUtil {
 	 * @return
 	 * @throws SQLException 
 	 */
-	private static synchronized Connection getJNDIConnection() throws DataSourceException{
+	private static synchronized Connection getJNDIConnection() throws SQLException{
 		
-		try{
-			if (dataSource==null)
-				initDataSource();
-			return dataSource.getConnection();
-		}
-		catch (Exception e){
-			throw new DataSourceException("Failed to get connection through JNDI: " + e.toString(), e);
-		}
+		if (dataSource==null)
+			initDataSource();
+		return dataSource.getConnection();
 	}
 	
 	/**
@@ -71,7 +76,7 @@ public class ConnectionUtil {
 	 * @throws SQLException 
 	 * @throws SQLException
 	 */
-	private static Connection getSimpleConnection() throws DataSourceException, SQLException{
+	private static Connection getSimpleConnection() throws SQLException{
 		
 		String drv = GeneralConfig.getProperty(GeneralConfig.DB_DRV);
 		if (drv==null || drv.trim().length()==0)
@@ -94,7 +99,7 @@ public class ConnectionUtil {
 			return DriverManager.getConnection(url, usr, pwd);
 		}
 		catch (ClassNotFoundException e){
-			throw new DataSourceException("Failed to get connection, driver class not found: " + drv, e);
+			throw new CRRuntimeException("Failed to get connection, driver class not found: " + drv, e);
 		}
 	}
 	

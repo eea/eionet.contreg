@@ -23,7 +23,6 @@ import eionet.cr.util.Hashes;
 import eionet.cr.util.UnicodeUtils;
 import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.sql.ConnectionUtil;
-import eionet.cr.util.sql.DataSourceException;
 import eionet.cr.util.sql.SQLUtil;
 
 /**
@@ -147,7 +146,7 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 	 * @throws SQLException 
 	 */
 	private int storeTriple(long subjectHash, boolean anonSubject, long predicateHash,
-							String object, String objectLang, boolean litObject, boolean anonObject) throws SQLException, DataSourceException{
+							String object, String objectLang, boolean litObject, boolean anonObject) throws SQLException{
 		
 		if (preparedStatementForTriples==null){
 			prepareStatementForTriples();
@@ -174,7 +173,7 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 	 * @throws DataSourceException 
 	 * @throws SQLException 
 	 */
-	private int storeResource(String uri, long uriHash) throws SQLException, DataSourceException{
+	private int storeResource(String uri, long uriHash) throws SQLException{
 
 		if (preparedStatementForResources==null){
 			prepareStatementForResources();
@@ -221,7 +220,7 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 	 * @throws SQLException
 	 * @throws DataSourceException
 	 */
-	private void prepareStatementForTriples() throws SQLException, DataSourceException{
+	private void prepareStatementForTriples() throws SQLException{
 		
 		// make sure SPO_TEMP is empty, let exception be thrown if this does not succeed
 		// (because we do only one harvest at a time, so possible leftovers from previous harvest must be deleted)
@@ -239,7 +238,7 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 	 * @throws DataSourceException 
 	 * @throws SQLException 
 	 */
-	private void prepareStatementForResources() throws SQLException, DataSourceException{
+	private void prepareStatementForResources() throws SQLException{
 
 		// make sure RESOURCE_TEMP is empty, let exception be thrown if this does not succeed
 		// (because we do only one harvest at a time, so possible leftovers from previous harvest must be deleted)
@@ -253,7 +252,7 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 	 * @throws SQLException 
 	 * @throws DataSourceException 
 	 */
-	private Connection getConnection() throws DataSourceException, SQLException {
+	private Connection getConnection() throws SQLException {
 		
 		if (connection==null){
 			connection = ConnectionUtil.getConnection();
@@ -276,7 +275,7 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 	 * @throws SQLException 
 	 * 
 	 */
-	protected void commit() throws SQLException, DataSourceException{
+	protected void commit() throws SQLException{
 		
 		logger.debug("Committing triples and resources of " + sourceUrl);
 
@@ -294,7 +293,7 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 	 * @throws SQLException 
 	 * 
 	 */
-	private int commitTriples() throws SQLException, DataSourceException{
+	private int commitTriples() throws SQLException{
 		
 		StringBuffer buf = new StringBuffer();
 		buf.append("insert high_priority into SPO (").
@@ -311,7 +310,7 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 	 * @throws SQLException
 	 * @throws DataSourceException
 	 */
-	private int commitResources() throws SQLException, DataSourceException{
+	private int commitResources() throws SQLException{
 		
 		StringBuffer buf = new StringBuffer();
 		buf.append("insert high_priority ignore into RESOURCE (URI, URI_HASH, FIRSTSEEN_SOURCE, FIRSTSEEN_TIME) ").
@@ -325,7 +324,7 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 	 * @throws SQLException 
 	 * 
 	 */
-	private void cleanup() throws SQLException, DataSourceException{
+	private void cleanup() throws SQLException{
 		
 		logger.debug("Cleaning up the temporary tables and previous harvest of " + sourceUrl);
 		
@@ -348,7 +347,7 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 	 * @throws SQLException 
 	 * 
 	 */
-	protected void rollback() throws SQLException, DataSourceException{
+	protected void rollback() throws SQLException{
 		cleanup();
 	}
 

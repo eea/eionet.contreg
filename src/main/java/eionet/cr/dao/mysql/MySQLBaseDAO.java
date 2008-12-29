@@ -9,7 +9,6 @@ import javax.sql.DataSource;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.util.sql.ConnectionUtil;
-import eionet.cr.util.sql.DataSourceException;
 import eionet.cr.util.sql.MySQLUtil;
 
 /**
@@ -23,7 +22,7 @@ public abstract class MySQLBaseDAO {
 	 * 
 	 * @return
 	 */
-	protected Connection getConnection() throws DataSourceException, SQLException{
+	protected Connection getConnection() throws SQLException{
 		return ConnectionUtil.getConnection();
 	}
 	
