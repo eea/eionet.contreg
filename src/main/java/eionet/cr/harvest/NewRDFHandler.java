@@ -109,7 +109,7 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 	private void statement(AResource subject, AResource predicate,
 							String object, String objectLang, boolean litObject, boolean anonObject){
 
-		if (!predicate.isAnonymous()){
+		if (!predicate.isAnonymous()){ // we ignore statements with anonymous predicates
 			
 			try{
 				parseForUsedNamespaces(predicate);
@@ -128,7 +128,7 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 				}
 			}
 			catch (Exception e){
-				throw new CRRuntimeException(e.toString(), e);
+				throw new LoadException(e.toString(), e);
 			}
 		}
 	}
@@ -366,7 +366,7 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 	 * @see org.xml.sax.ErrorHandler#fatalError(org.xml.sax.SAXParseException)
 	 */
 	public void fatalError(SAXParseException e) throws SAXException {
-		throw new CRRuntimeException(e.toString(), e);
+		throw new LoadException(e.toString(), e);
 	}
 
 	/*

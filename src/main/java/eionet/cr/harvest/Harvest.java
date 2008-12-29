@@ -186,14 +186,14 @@ public abstract class Harvest {
 	        arp.setStatementHandler(rdfHandler);
 	        arp.setErrorHandler(rdfHandler);
 	        arp.load(reader, sourceUrlString);
-	        rdfHandler.commit();
-	        
-	        logger.debug(rdfHandler.getStoredTriplesCount() + " triples stored for : " + sourceUrlString);
 	        
 	        errors.addAll(rdfHandler.getSaxErrors());
 	        warnings.addAll(rdfHandler.getSaxWarnings());
+
+	        rdfHandler.commit();
+	        logger.debug(rdfHandler.getStoredTriplesCount() + " triples stored for : " + sourceUrlString);
 	        
-        	// TODO - store dedicated harevst sources
+        	// TODO - store dedicated harvest sources
         	
         	// TODO - handle incremental (i.e. pushed via API) harvest
 //	        	if (this instanceof PushHarvest)
@@ -204,7 +204,8 @@ public abstract class Harvest {
 				rdfHandler.rollback();
 			}
 			catch (Exception ee){}
-			Throwable t = (e instanceof CRRuntimeException) && e.getCause()!=null ? e.getCause() : e;
+			
+			Throwable t = (e instanceof LoadException) && e.getCause()!=null ? e.getCause() : e;
 			throw new HarvestException("Exception when harvesting [" + sourceUrlString + "]: " + t.toString(), t);
 		}
 		finally{
