@@ -180,7 +180,8 @@ public abstract class Harvest {
 	 */
 	protected void harvest(Reader reader) throws HarvestException{
 		
-		NewRDFHandler rdfHandler = new NewRDFHandler(sourceUrlString, System.currentTimeMillis());
+		long genTime = System.currentTimeMillis();
+		NewRDFHandler rdfHandler = new NewRDFHandler(sourceUrlString, genTime);
 		try{
 			ARP arp = new ARP();
 	        arp.setStatementHandler(rdfHandler);
@@ -194,16 +195,16 @@ public abstract class Harvest {
 	        logger.debug(rdfHandler.getStoredTriplesCount() + " triples stored for : " + sourceUrlString);
 	        
         	// TODO - store dedicated harvest sources
-        	
-        	// TODO - handle incremental (i.e. pushed via API) harvest
-//	        	if (this instanceof PushHarvest)
-//	        		indexer.setIncremental(true);
+        	// TODO - handle incremental harvest --- if (this instanceof PushHarvest) indexer.setIncremental(true); ---
 		}
 		catch (Exception e){
 			try{
 				rdfHandler.rollback();
 			}
-			catch (Exception ee){}
+			catch (Exception ee){
+				logger.fatal("Harvest rollback failed, source=[" + sourceUrlString + "], timestamp=[" + genTime + "}", ee);
+				// TODO - handle rollback failure somehow (e.g. send e-mail notification, store failure into database)
+			}
 			
 			Throwable t = (e instanceof LoadException) && e.getCause()!=null ? e.getCause() : e;
 			throw new HarvestException("Exception when harvesting [" + sourceUrlString + "]: " + t.toString(), t);
