@@ -102,8 +102,6 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 	 * @param objectLang
 	 * @param litObject
 	 * @param anonObject
-	 * @throws DataSourceException 
-	 * @throws SQLException 
 	 */
 	private void statement(AResource subject, AResource predicate,
 							String object, String objectLang, boolean litObject, boolean anonObject){
@@ -142,7 +140,6 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 	 * @param objectLang
 	 * @param litObject
 	 * @param anonObject
-	 * @throws DataSourceException 
 	 * @throws SQLException 
 	 */
 	private int storeTriple(long subjectHash, boolean anonSubject, long predicateHash,
@@ -170,7 +167,6 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 	 * @param uri
 	 * @param uriHash
 	 * @param type
-	 * @throws DataSourceException 
 	 * @throws SQLException 
 	 */
 	private int storeResource(String uri, long uriHash) throws SQLException{
@@ -218,7 +214,6 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 	/**
 	 * 
 	 * @throws SQLException
-	 * @throws DataSourceException
 	 */
 	private void prepareStatementForTriples() throws SQLException{
 		
@@ -257,7 +252,6 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 	
 	/**
 	 * 
-	 * @throws DataSourceException 
 	 * @throws SQLException 
 	 */
 	private void prepareStatementForResources() throws SQLException{
@@ -272,7 +266,6 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 	/**
 	 * @return the connection
 	 * @throws SQLException 
-	 * @throws DataSourceException 
 	 */
 	private Connection getConnection() throws SQLException {
 		
@@ -293,7 +286,6 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 	}
 
 	/**
-	 * @throws DataSourceException 
 	 * @throws SQLException 
 	 * 
 	 */
@@ -305,11 +297,10 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 			storedTriplesCount = storedTriplesCount + i;
 		}
 		
-		cleanup();
+		clearTemporaries();
 	}
 	
 	/**
-	 * @throws DataSourceException 
 	 * @throws SQLException 
 	 * 
 	 */
@@ -343,7 +334,6 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 	 * 
 	 * @return
 	 * @throws SQLException
-	 * @throws DataSourceException
 	 */
 	private int commitResources() throws SQLException{
 		
@@ -357,11 +347,10 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 	}
 
 	/**
-	 * @throws DataSourceException 
 	 * @throws SQLException 
 	 * 
 	 */
-	private void cleanup() throws SQLException{
+	private void clearTemporaries() throws SQLException{
 		
 		logger.debug("Cleaning the temporary tables after harvesting " + sourceUrl);
 		
@@ -376,12 +365,23 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 	}
 
 	/**
-	 * @throws DataSourceException 
 	 * @throws SQLException 
 	 * 
 	 */
 	protected void rollback() throws SQLException{
-		cleanup();
+
+		// delete rows of current harvest from SPO
+		StringBuffer buf = new StringBuffer("delete from SPO where SOURCE=");
+		buf.append(sourceUrlHash).append(" and GEN_TIME=").append(genTime);
+		SQLUtil.executeUpdate(buf.toString(), getConnection());
+
+		// delete rows of current harvest from RESOURCE_TEMP
+		buf = new StringBuffer("delete from RESOURCE_TEMP where FIRSTSEEN_SOURCE=");
+		buf.append(sourceUrlHash).append(" and FIRSTSEEN_TIME=").append(genTime);
+		SQLUtil.executeUpdate(buf.toString(), getConnection());
+
+		// delete all rows from SPO_TEMP and RESOURCE_TEMP
+		clearTemporaries();
 	}
 
     /*
