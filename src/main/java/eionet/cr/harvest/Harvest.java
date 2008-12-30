@@ -211,7 +211,7 @@ public abstract class Harvest {
 		}
 		finally{
 			try{
-				rdfHandler.close();
+				rdfHandler.closeResources();
 			}
 			catch (Exception e){}
 		}

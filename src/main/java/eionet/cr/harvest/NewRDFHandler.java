@@ -263,7 +263,7 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 	/**
 	 * 
 	 */
-	protected void close(){
+	protected void closeResources(){
 		
 		SQLUtil.close(preparedStatementForTriples);
 		SQLUtil.close(preparedStatementForResources);
