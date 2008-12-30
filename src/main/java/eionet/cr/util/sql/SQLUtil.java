@@ -15,6 +15,28 @@ import java.util.Map;
  *
  */
 public class SQLUtil {
+	
+	/**
+	 * 
+	 * @param sql
+	 * @param conn
+	 * @return
+	 * @throws SQLException
+	 */
+	public static Object executeSingleReturnValueQuery(String sql, Connection conn) throws SQLException{
+		
+		ResultSet rs = null;
+		Statement stmt = null;
+		try{
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(sql);
+			return (rs!=null && rs.next()) ? rs.getObject(1) : null;
+		}
+		finally{
+			SQLUtil.close(rs);
+			SQLUtil.close(stmt);
+		}
+	}
 
 	/**
 	 * 
@@ -107,7 +129,6 @@ public class SQLUtil {
 			}
 			catch (SQLException e){}
 		}
-
 	}
 	
 	/**

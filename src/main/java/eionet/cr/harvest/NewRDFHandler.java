@@ -222,9 +222,7 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 	 */
 	private void prepareStatementForTriples() throws SQLException{
 		
-		// make sure SPO_TEMP is empty, let exception be thrown if this does not succeed
-		// (because we do only one harvest at a time, so possible leftovers from previous harvest must be deleted)
-		SQLUtil.executeUpdate("delete from SPO_TEMP", getConnection());
+		clearPastLeftovers();
 		
 		StringBuffer buf = new StringBuffer();
         buf.append("insert into SPO_TEMP (SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ").
@@ -233,6 +231,30 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
         preparedStatementForTriples = getConnection().prepareStatement(buf.toString());
 	}
 
+	/**
+	 * Does "delete from SPO_TEMP" and then deletes all SPO records where SOURCE equals this source
+	 * and GEN_TIME is less than the latest GEN_TIME for this source (i.e. clears possible corrupted SPO leftovers
+	 * for this source).
+	 * @throws SQLException 
+	 */
+	private void clearPastLeftovers() throws SQLException{
+		
+		logger.debug("Clearing past leftovers of " + sourceUrl);
+
+		// make sure SPO_TEMP is empty, let exception be thrown if this does not succeed
+		// (because we do only one harvest at a time, so possible leftovers from previous harvest must be deleted)
+		SQLUtil.executeUpdate("delete from SPO_TEMP", getConnection());
+		
+		// delete all SPO records where SOURCE equals this source and GEN_TIME is less than the latest GEN_TIME for this source
+		// select distinct GEN_TIME from SPO where SOURCE=md5('http://cdr.eionet.europa.eu/envelopes.rdf')
+		Object latestGenTime = SQLUtil.executeSingleReturnValueQuery("select max(GEN_TIME) from SPO where SOURCE=" + sourceUrlHash, getConnection());
+		if (latestGenTime!=null){
+			StringBuffer buf = new StringBuffer("delete from SPO where SOURCE=");
+			buf.append(sourceUrlHash).append(" and GEN_TIME<").append(latestGenTime.toString());
+			SQLUtil.executeUpdate(buf.toString(), getConnection());
+		}
+	}
+	
 	/**
 	 * 
 	 * @throws DataSourceException 
@@ -277,8 +299,6 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 	 */
 	protected void commit() throws SQLException{
 		
-		logger.debug("Committing triples and resources of " + sourceUrl);
-
 		int i = commitTriples();
 		if (i>0){
 			commitResources();
@@ -294,6 +314,10 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 	 * 
 	 */
 	private int commitTriples() throws SQLException{
+
+		/* copy triples from SPO_TEMP into SPO */
+
+		logger.debug("Copying triples from SPO_TEMP into SPO, sourceUrl: " + sourceUrl);
 		
 		StringBuffer buf = new StringBuffer();
 		buf.append("insert high_priority into SPO (").
@@ -301,7 +325,18 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 		append(") select distinct SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG, ").
 		append(sourceUrlHash).append(", ").append(genTime).append(" from SPO_TEMP");
 		
-		return SQLUtil.executeUpdate(buf.toString(), getConnection());
+		int committedTriplesCount = SQLUtil.executeUpdate(buf.toString(), getConnection());
+		
+		/* delete SPO records from previous harvests of this source */
+		
+		logger.debug("Deleting SPO rows of previous harvests of " + sourceUrl);
+		
+		buf = new StringBuffer("delete from SPO where SOURCE=");
+		buf.append(sourceUrlHash).append(" and GEN_TIME<").append(genTime);
+		
+		SQLUtil.executeUpdate(buf.toString(), getConnection());
+		
+		return committedTriplesCount;
 	}
 
 	/**
@@ -311,6 +346,8 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 	 * @throws DataSourceException
 	 */
 	private int commitResources() throws SQLException{
+		
+		logger.debug("Copying resources from RESOURCE_TEMP into RESOURCE, sourceUrl: " + sourceUrl);
 		
 		StringBuffer buf = new StringBuffer();
 		buf.append("insert high_priority ignore into RESOURCE (URI, URI_HASH, FIRSTSEEN_SOURCE, FIRSTSEEN_TIME) ").
@@ -326,12 +363,8 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 	 */
 	private void cleanup() throws SQLException{
 		
-		logger.debug("Cleaning up the temporary tables and previous harvest of " + sourceUrl);
+		logger.debug("Cleaning the temporary tables after harvesting " + sourceUrl);
 		
-		StringBuffer buf = new StringBuffer("delete from SPO where SOURCE=");
-		buf.append(sourceUrlHash).append(" and GEN_TIME<").append(genTime);
-		
-		SQLUtil.executeUpdate(buf.toString(), getConnection());		
 		try{
 			SQLUtil.executeUpdate("delete from SPO_TEMP", getConnection());
 		}
