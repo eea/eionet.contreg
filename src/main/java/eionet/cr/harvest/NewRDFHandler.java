@@ -146,7 +146,7 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 							String object, String objectLang, boolean litObject, boolean anonObject) throws SQLException{
 		
 		if (preparedStatementForTriples==null){
-			prepareStatementForTriples();
+			prepareForTriples();
 			logger.debug("Storing first triple for " + sourceUrl);
 		}
 		
@@ -172,7 +172,7 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 	private int storeResource(String uri, long uriHash) throws SQLException{
 
 		if (preparedStatementForResources==null){
-			prepareStatementForResources();
+			prepareForResources();
 			logger.debug("Storing first resource for " + sourceUrl);
 		}
 		
@@ -212,54 +212,39 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 	}
 
 	/**
+	 * Does "delete from SPO_TEMP" and then prepares this.preparedStatementForTriples.
 	 * 
 	 * @throws SQLException
 	 */
-	private void prepareStatementForTriples() throws SQLException{
+	private void prepareForTriples() throws SQLException{
 		
-		clearPastLeftovers();
+		logger.debug("Clearing SPO_TEMP");
 		
-		StringBuffer buf = new StringBuffer();
-        buf.append("insert into SPO_TEMP (SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ").
-        append("ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-        
-        preparedStatementForTriples = getConnection().prepareStatement(buf.toString());
-	}
-
-	/**
-	 * Does "delete from SPO_TEMP" and then deletes all SPO records where SOURCE equals this source
-	 * and GEN_TIME is less than the latest GEN_TIME for this source (i.e. clears possible corrupted SPO leftovers
-	 * for this source).
-	 * @throws SQLException 
-	 */
-	private void clearPastLeftovers() throws SQLException{
-		
-		logger.debug("Clearing past leftovers of " + sourceUrl);
-
 		// make sure SPO_TEMP is empty, let exception be thrown if this does not succeed
 		// (because we do only one harvest at a time, so possible leftovers from previous harvest must be deleted)
 		SQLUtil.executeUpdate("delete from SPO_TEMP", getConnection());
 		
-		// delete all SPO records where SOURCE equals this source and GEN_TIME is less than the latest GEN_TIME for this source
-		// select distinct GEN_TIME from SPO where SOURCE=md5('http://cdr.eionet.europa.eu/envelopes.rdf')
-		Object latestGenTime = SQLUtil.executeSingleReturnValueQuery("select max(GEN_TIME) from SPO where SOURCE=" + sourceUrlHash, getConnection());
-		if (latestGenTime!=null){
-			StringBuffer buf = new StringBuffer("delete from SPO where SOURCE=");
-			buf.append(sourceUrlHash).append(" and GEN_TIME<").append(latestGenTime.toString());
-			SQLUtil.executeUpdate(buf.toString(), getConnection());
-		}
+		// prepare this.preparedStatementForTriples
+		StringBuffer buf = new StringBuffer();
+        buf.append("insert into SPO_TEMP (SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ").
+        append("ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        preparedStatementForTriples = getConnection().prepareStatement(buf.toString());
 	}
-	
+
 	/**
+	 * First does "delete from RESOURCE_TEMP" and then prepares this.preparedStatementForResources.
 	 * 
 	 * @throws SQLException 
 	 */
-	private void prepareStatementForResources() throws SQLException{
+	private void prepareForResources() throws SQLException{
 
+		logger.debug("Clearing RESOURCE_TEMP");
+		
 		// make sure RESOURCE_TEMP is empty, let exception be thrown if this does not succeed
 		// (because we do only one harvest at a time, so possible leftovers from previous harvest must be deleted)
 		SQLUtil.executeUpdate("delete from RESOURCE_TEMP", getConnection());
 
+		// prepare this.preparedStatementForResources
         preparedStatementForResources = getConnection().prepareStatement("insert ignore into RESOURCE_TEMP (URI, URI_HASH) VALUES (?, ?)");
 	}
 
