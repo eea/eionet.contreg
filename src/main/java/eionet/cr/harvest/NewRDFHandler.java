@@ -3,7 +3,6 @@ package eionet.cr.harvest;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -18,8 +17,9 @@ import com.hp.hpl.jena.rdf.arp.ALiteral;
 import com.hp.hpl.jena.rdf.arp.AResource;
 import com.hp.hpl.jena.rdf.arp.StatementHandler;
 
-import eionet.cr.common.CRRuntimeException;
+import eionet.cr.common.LabelPredicates;
 import eionet.cr.util.Hashes;
+import eionet.cr.util.StringUtils;
 import eionet.cr.util.UnicodeUtils;
 import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.sql.ConnectionUtil;
@@ -282,6 +282,7 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 			storedTriplesCount = storedTriplesCount + i;
 		}
 		
+		resolveLabels();
 		clearTemporaries();
 	}
 	
@@ -329,6 +330,49 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 		append("select URI, URI_HASH, ").append(sourceUrlHash).append(", ").append(genTime).append(" from RESOURCE_TEMP");
 		
 		return SQLUtil.executeUpdate(buf.toString(), getConnection());
+	}
+	
+	/**
+	 * @throws SQLException 
+	 * 
+	 */
+	private void resolveLabels() throws SQLException{
+		
+		/* Find and insert labels for freshly harvested non-literal objects. */
+		
+		StringBuffer buf = new StringBuffer();
+		buf.append("insert ignore into SPO ").
+		append("(SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_DERIV_SOURCE, OBJ_LANG, SOURCE, GEN_TIME) ").
+		append("select distinct SPO_FRESH.SUBJECT, SPO_FRESH.PREDICATE, SPO_LABEL.OBJECT, SPO_LABEL.OBJECT_HASH, SPO_FRESH.ANON_SUBJ, ").
+		append("'N' as ANON_OBJ, 'Y' as LIT_OBJ, SPO_LABEL.SOURCE as OBJ_DERIV_SOURCE, SPO_LABEL.OBJ_LANG, SPO_FRESH.SOURCE, SPO_FRESH.GEN_TIME ").
+		append("from SPO as SPO_FRESH, SPO as SPO_LABEL ").
+		append("where SPO_FRESH.SOURCE=").append(sourceUrlHash).
+		append(" and SPO_FRESH.GEN_TIME=").append(genTime).
+		append(" and SPO_FRESH.ANON_OBJ='N' and SPO_FRESH.LIT_OBJ='N' and SPO_FRESH.OBJECT_HASH=SPO_LABEL.SUBJECT and ").
+		append("SPO_LABEL.LIT_OBJ='Y' and SPO_LABEL.ANON_OBJ='N' and ").
+		append("SPO_LABEL.PREDICATE in (").
+		append(LabelPredicates.getCommaSeparatedHashes()).
+		append(")");
+		
+		SQLUtil.executeUpdate(buf.toString(), getConnection());
+		
+		/* Insert freshly harvested labels for all non-literal objects in SPO across all sources. */
+		
+		buf = new StringBuffer();
+		buf.append("insert ignore into SPO (SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ, LIT_OBJ, ").
+		append("OBJ_DERIV_SOURCE, OBJ_LANG, SOURCE, GEN_TIME) ").
+		append("select distinct SPO_ALL.SUBJECT, SPO_ALL.PREDICATE, SPO_FRESH.OBJECT, SPO_FRESH.OBJECT_HASH, SPO_ALL.ANON_SUBJ, ").
+		append("'N' as ANON_OBJ, 'Y' as LIT_OBJ, SPO_FRESH.SOURCE as OBJ_DERIV_SOURCE, SPO_FRESH.OBJ_LANG, 	SPO_ALL.SOURCE, SPO_ALL.GEN_TIME ").
+		append("from SPO as SPO_ALL, SPO as SPO_FRESH ").
+		append("where SPO_ALL.LIT_OBJ='N' and SPO_ALL.OBJECT_HASH=SPO_FRESH.SUBJECT and ").
+		append("SPO_FRESH.SOURCE=").append(sourceUrlHash).
+		append(" and SPO_FRESH.GEN_TIME=").append(genTime).
+		append(" and SPO_FRESH.LIT_OBJ='Y' and SPO_FRESH.ANON_OBJ='N' and ").
+		append("SPO_FRESH.PREDICATE in (").
+		append(LabelPredicates.getCommaSeparatedHashes()).
+		append(")");
+		
+		SQLUtil.executeUpdate(buf.toString(), getConnection());
 	}
 
 	/**

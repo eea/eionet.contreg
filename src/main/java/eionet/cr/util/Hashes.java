@@ -35,7 +35,7 @@ public class Hashes {
 	 * @param s
 	 * @return
 	 */
-	public static long fnv64(String s){
+	private static long fnv64(String s){
 		return Hashes.fnv64(s, 0xcbf29ce484222325L);
 	}
 
@@ -44,7 +44,7 @@ public class Hashes {
 	 * @param s
 	 * @return
 	 */
-	public static long fnv64(String s, long seed){
+	private static long fnv64(String s, long seed){
 		
 		if (s!=null && s.length()>0){
 		    for (int i=0; i<s.length(); i++){

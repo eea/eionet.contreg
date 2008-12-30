@@ -1,51 +1,62 @@
 package eionet.cr.common;
 
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.ArrayList;
+
+import eionet.cr.util.Hashes;
 
 /**
- * This is a singleton implemented by a single-element enum type (as suggested by Joshua Bloch in his Effective Java 2nd Edition).
  * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  */
-public enum LabelPredicates{
-
-	/** The singleton instance. */
-	INSTANCE;
+public class LabelPredicates{
 	
-	/** The list of label predicates in the correct order of failover. */
-	List<String> predicates;
+	/** */
+	private static final LabelPredicates instance = new LabelPredicates();
+
+	/** */
+	private LinkedHashSet<String> predicates;
+	
+	/** */
+	private String[] predicateHashes;
+	
+	/** */
+	private String commaSeparatedHashes;
 	
 	/**
 	 * 
 	 */
-	LabelPredicates(){
-		predicates = new ArrayList<String>();
+	private LabelPredicates(){
+		
+		load();
+		predicateHashes = new String[predicates.size()];
+		StringBuffer buf = new StringBuffer();
+		int i = 0;
+		for (Iterator<String> iter=predicates.iterator(); iter.hasNext(); i++){
+			predicateHashes[i] = String.valueOf(Hashes.spoHash(iter.next()));
+			if (i>0)
+				buf.append(",");
+			buf.append(predicateHashes[i]);
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	private void load(){
+		
+		// TODO - real loading must be done from some configuration
+		predicates = new LinkedHashSet<String>();
 		predicates.add(Predicates.RDFS_LABEL);
 		predicates.add(Predicates.SKOS_PREF_LABEL);
 	}
 	
 	/**
 	 * 
-	 * @param s
 	 * @return
 	 */
-	public boolean contains(String s){
-		return this.predicates.contains(s);
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public String formatForSQLInOperator(){
-		
-		StringBuilder buf = new StringBuilder();
-		for (int i=0; i<predicates.size(); i++){
-			if (i>0)
-				buf.append(",");
-			buf.append("'").append(predicates.get(i)).append("'");
-		}
-		return buf.toString();
+	public static String getCommaSeparatedHashes(){
+		return LabelPredicates.instance.commaSeparatedHashes;
 	}
 }
