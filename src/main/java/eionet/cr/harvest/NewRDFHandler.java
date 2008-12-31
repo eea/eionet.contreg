@@ -115,7 +115,7 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 		if (!predicate.isAnonymous()){ // we ignore statements with anonymous predicates
 			
 			try{
-				parseForUsedNamespaces(predicate);
+				parseForUsedNamespaces(predicate); // FIXME - extract used namespaces before this handler is called (for better performance)
 				
 				long subjectHash = spoHash(subject.isAnonymous() ? subject.getAnonymousID() : subject.getURI(), subject.isAnonymous());
 				long predicateHash = spoHash(predicate.getURI(), false);
@@ -153,7 +153,7 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 		
 		if (preparedStatementForTriples==null){
 			prepareForTriples();
-			logger.debug("Storing first triple for " + sourceUrl);
+			logger.debug("Started storing triples from " + sourceUrl);
 		}
 		
 		preparedStatementForTriples.setLong  ( 1, subjectHash);
@@ -179,7 +179,7 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 
 		if (preparedStatementForResources==null){
 			prepareForResources();
-			logger.debug("Storing first resource for " + sourceUrl);
+			logger.debug("Started storing resources from " + sourceUrl);
 		}
 		
 		preparedStatementForResources.setString(1, uri);
@@ -224,8 +224,6 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 	 */
 	private void prepareForTriples() throws SQLException{
 		
-		logger.debug("Clearing SPO_TEMP");
-		
 		// make sure SPO_TEMP is empty, let exception be thrown if this does not succeed
 		// (because we do only one harvest at a time, so possible leftovers from previous harvest must be deleted)
 		SQLUtil.executeUpdate("delete from SPO_TEMP", getConnection());
@@ -244,8 +242,6 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 	 */
 	private void prepareForResources() throws SQLException{
 
-		logger.debug("Clearing RESOURCE_TEMP");
-		
 		// make sure RESOURCE_TEMP is empty, let exception be thrown if this does not succeed
 		// (because we do only one harvest at a time, so possible leftovers from previous harvest must be deleted)
 		SQLUtil.executeUpdate("delete from RESOURCE_TEMP", getConnection());
@@ -289,6 +285,7 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 		}
 		
 		clearTemporaries();
+		
 		resolveLabels();
 		extractNewHarvestSources();
 	}
@@ -310,6 +307,8 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 		append(sourceUrlHash).append(", ").append(genTime).append(" from SPO_TEMP");
 		
 		int committedTriplesCount = SQLUtil.executeUpdate(buf.toString(), getConnection());
+		
+		logger.debug(committedTriplesCount + " triples inserted into SPO from " + sourceUrl);
 		
 		/* delete SPO records from previous harvests of this source */
 		
@@ -336,7 +335,10 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 		buf.append("insert high_priority ignore into RESOURCE (URI, URI_HASH, FIRSTSEEN_SOURCE, FIRSTSEEN_TIME) ").
 		append("select URI, URI_HASH, ").append(sourceUrlHash).append(", ").append(genTime).append(" from RESOURCE_TEMP");
 		
-		return SQLUtil.executeUpdate(buf.toString(), getConnection());
+		int i = SQLUtil.executeUpdate(buf.toString(), getConnection());
+		logger.debug(i + " resources inserted into RESOURCE from " + sourceUrl);
+		
+		return i;
 	}
 	
 	/**
@@ -345,10 +347,12 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 	 */
 	private void resolveLabels() throws SQLException{
 		
+		logger.debug("Deriving labels for and from " + sourceUrl);
+		
 		/* Find and insert labels for freshly harvested non-literal objects. */
 		
-		StringBuffer buf = new StringBuffer();
-		buf.append("insert ignore into SPO ").
+		StringBuffer buf = new StringBuffer().
+		append("insert ignore into SPO ").
 		append("(SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_DERIV_SOURCE, OBJ_LANG, SOURCE, GEN_TIME) ").
 		append("select distinct SPO_FRESH.SUBJECT, SPO_FRESH.PREDICATE, SPO_LABEL.OBJECT, SPO_LABEL.OBJECT_HASH, SPO_FRESH.ANON_SUBJ, ").
 		append("'N' as ANON_OBJ, 'Y' as LIT_OBJ, SPO_LABEL.SOURCE as OBJ_DERIV_SOURCE, SPO_LABEL.OBJ_LANG, SPO_FRESH.SOURCE, SPO_FRESH.GEN_TIME ").
@@ -361,12 +365,12 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 		append(LabelPredicates.getCommaSeparatedHashes()).
 		append(")");
 		
-		SQLUtil.executeUpdate(buf.toString(), getConnection());
-		
+		int i = SQLUtil.executeUpdate(buf.toString(), getConnection());
+
 		/* Insert freshly harvested labels for all non-literal objects in SPO across all sources. */
 		
-		buf = new StringBuffer();
-		buf.append("insert ignore into SPO (SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ, LIT_OBJ, ").
+		buf = new StringBuffer().
+		append("insert ignore into SPO (SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ, LIT_OBJ, ").
 		append("OBJ_DERIV_SOURCE, OBJ_LANG, SOURCE, GEN_TIME) ").
 		append("select distinct SPO_ALL.SUBJECT, SPO_ALL.PREDICATE, SPO_FRESH.OBJECT, SPO_FRESH.OBJECT_HASH, SPO_ALL.ANON_SUBJ, ").
 		append("'N' as ANON_OBJ, 'Y' as LIT_OBJ, SPO_FRESH.SOURCE as OBJ_DERIV_SOURCE, SPO_FRESH.OBJ_LANG, 	SPO_ALL.SOURCE, SPO_ALL.GEN_TIME ").
@@ -379,7 +383,9 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 		append(LabelPredicates.getCommaSeparatedHashes()).
 		append(")");
 		
-		SQLUtil.executeUpdate(buf.toString(), getConnection());
+		int j = SQLUtil.executeUpdate(buf.toString(), getConnection());
+		
+		logger.debug(i + " labels derived FOR and " + j + " labels derived FROM " + sourceUrl);
 	}
 	
 	/**
@@ -388,6 +394,8 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 	 */
 	private void extractNewHarvestSources() throws SQLException{
 
+		logger.debug("Extracting new harvest sources from SPO rows harvested from " + sourceUrl);
+		
 		/* handle qaw sources */
 		
 		String cronExpr = GeneralConfig.getProperty(GeneralConfig.HARVESTER_DEDICATED_SOURCES_CRON_EXPRESSION,
@@ -404,7 +412,7 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 		append(Hashes.spoHash(Predicates.RDF_TYPE)).append(" and ANON_OBJ='N' and LIT_OBJ='N' and OBJECT_HASH in (").
 		append(Hashes.spoHash(Subjects.QA_REPORT_CLASS)).append(", ").append(Hashes.spoHash(Subjects.QAW_RESOURCE_CLASS)).append("))");
 		
-		SQLUtil.executeUpdate(buf.toString(), getConnection());
+		int i = SQLUtil.executeUpdate(buf.toString(), getConnection());
 
 		/* handle delivered files */
 		
@@ -413,11 +421,13 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 		append("select URI, URI, '").append(DedicatedHarvestSourceTypes.deliveredFile).
 		append("', now(), '").append(CRUser.application.getUserName()).
 		append("', '").append(cronExpr).
-		append("' from RESOURCE where SUBJECT in (select distinct SUBJECT from SPO where PREDICATE=").
+		append("' from RESOURCE where URI_HASH in (select distinct SUBJECT from SPO where PREDICATE=").
 		append(Hashes.spoHash(Predicates.RDF_TYPE)).append(" and ANON_OBJ='N' and LIT_OBJ='N' and OBJECT_HASH in (").
 		append(Hashes.spoHash(Subjects.ROD_DELIVERY_CLASS)).append(", ").append(Hashes.spoHash(Subjects.DCTYPE_DATASET_CLASS)).append("))");
 		
-		SQLUtil.executeUpdate(buf.toString(), getConnection());
+		i = i + SQLUtil.executeUpdate(buf.toString(), getConnection());
+		
+		logger.debug(i + " new harvest sources extracted and inserted from " + sourceUrl);
 	}
 
 	/**
@@ -426,7 +436,7 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 	 */
 	private void clearTemporaries() throws SQLException{
 		
-		logger.debug("Cleaning the temporary tables after harvesting " + sourceUrl);
+		logger.debug("Cleaning SPO_TEMP and RESOURCE_TEMP after harvesting " + sourceUrl);
 		
 		try{
 			SQLUtil.executeUpdate("delete from SPO_TEMP", getConnection());
@@ -449,8 +459,8 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 		buf.append(sourceUrlHash).append(" and GEN_TIME=").append(genTime);
 		SQLUtil.executeUpdate(buf.toString(), getConnection());
 
-		// delete rows of current harvest from RESOURCE_TEMP
-		buf = new StringBuffer("delete from RESOURCE_TEMP where FIRSTSEEN_SOURCE=");
+		// delete rows of current harvest from RESOURCE
+		buf = new StringBuffer("delete from RESOURCE where FIRSTSEEN_SOURCE=");
 		buf.append(sourceUrlHash).append(" and FIRSTSEEN_TIME=").append(genTime);
 		SQLUtil.executeUpdate(buf.toString(), getConnection());
 

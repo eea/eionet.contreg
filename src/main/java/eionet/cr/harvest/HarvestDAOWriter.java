@@ -49,7 +49,6 @@ public class HarvestDAOWriter {
 	 */
 	protected void writeStarted(Harvest harvest) throws DAOException{
 		
-		logger.debug(getClass().getSimpleName() + ", recording harvest starting details, source URL = " + harvest.getSourceUrlString());
 		harvestId = DAOFactory.getDAOFactory().getHarvestDAO().insertStartedHarvest(sourceId, harvestType, userName, Harvest.STATUS_STARTED);
 	}
 

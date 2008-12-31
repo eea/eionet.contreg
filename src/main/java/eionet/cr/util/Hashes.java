@@ -98,4 +98,8 @@ public class Hashes {
 	    
 	    return buf.toString();
 	}
+	
+	public static void main(String[] args){
+		System.out.println(spoHash("http://rod.eionet.eu.int/schema.rdf#obligation"));
+	}
 }

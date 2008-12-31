@@ -30,15 +30,19 @@ public class LabelPredicates{
 	private LabelPredicates(){
 		
 		load();
-		predicateHashes = new String[predicates.size()];
-		StringBuffer buf = new StringBuffer();
+		
 		int i = 0;
+		StringBuffer buf = new StringBuffer();
+		
+		predicateHashes = new String[predicates.size()];
 		for (Iterator<String> iter=predicates.iterator(); iter.hasNext(); i++){
 			predicateHashes[i] = String.valueOf(Hashes.spoHash(iter.next()));
 			if (i>0)
 				buf.append(",");
 			buf.append(predicateHashes[i]);
 		}
+		
+		commaSeparatedHashes = buf.toString();
 	}
 	
 	/**

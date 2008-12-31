@@ -362,7 +362,12 @@ public abstract class Harvest {
 	 */
 	protected void doHarvestStartedActions() throws HarvestException{
 		
-		logger.debug("Harvested started, source URL = " + sourceUrlString);
+		if (this instanceof PullHarvest)
+			logger.debug("Pull harvest started for " + sourceUrlString);
+		else if (this instanceof PushHarvest)
+			logger.debug("Push harvest started for " + sourceUrlString);
+		else
+			logger.debug("Harvest started for " + sourceUrlString);
 		
 		try{
 			if (daoWriter!=null)

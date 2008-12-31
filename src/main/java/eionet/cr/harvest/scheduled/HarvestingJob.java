@@ -54,16 +54,12 @@ public class HarvestingJob implements Job, ServletContextListener{
 			String pushedContent = queueItem.getPushedContent();
 			if (Util.isNullOrEmpty(pushedContent)){
 				
-				logger.debug("Going to harvest url: " + queueItem.getUrl());
-				
 				HarvestSourceDTO harvestSource = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceByUrl(queueItem.getUrl());
 				harvest = new PullHarvest(harvestSource.getUrl(), null); // TODO - use proper lastHarvestTimestamp instead of null
 				harvest.setDaoWriter(new HarvestDAOWriter(
 						harvestSource.getSourceId().intValue(), Harvest.TYPE_PULL, CRUser.application.getUserName()));
 			}
 			else{
-				logger.debug("Going to push content from url: " + queueItem.getUrl());
-				
 				HarvestSourceDTO sourceDTO = new HarvestSourceDTO();
 				sourceDTO.setUrl(queueItem.getUrl());
 				sourceDTO.setName(queueItem.getUrl());
