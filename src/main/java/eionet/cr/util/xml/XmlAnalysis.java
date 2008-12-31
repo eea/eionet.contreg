@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.StringTokenizer;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -162,10 +163,11 @@ public class XmlAnalysis {
 	private class Handler extends DefaultHandler{
 		
 		/** */
-		private String startTag=null;
-		private String startTagNamespace=null;
-		private String schemaLocation=null;
-		private String schemaNamespace=null;
+		private String startTag = null;
+		private String startTagNamespace = null;
+		private String schemaLocation = null;
+		private String schemaNamespace = null;
+		private HashMap<String,String> usedNamespaces = new HashMap<String,String>();
 
 		/*
 		 * (non-Javadoc)
@@ -195,6 +197,11 @@ public class XmlAnalysis {
 						else
 							this.schemaNamespace = attrValue;
 					}
+				}
+				
+				String attrQName = attrs.getLocalName(i);
+				if (attrQName.startsWith("xmlns:")){
+					usedNamespaces.put(attrName, attrs.getValue(i));
 				}
 			}
 			
