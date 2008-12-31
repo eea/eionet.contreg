@@ -18,12 +18,18 @@ import com.hp.hpl.jena.rdf.arp.AResource;
 import com.hp.hpl.jena.rdf.arp.StatementHandler;
 
 import eionet.cr.common.LabelPredicates;
+import eionet.cr.common.Predicates;
+import eionet.cr.common.Subjects;
+import eionet.cr.config.GeneralConfig;
+import eionet.cr.dto.HarvestSourceDTO;
+import eionet.cr.harvest.util.DedicatedHarvestSourceTypes;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.StringUtils;
 import eionet.cr.util.UnicodeUtils;
 import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.sql.ConnectionUtil;
 import eionet.cr.util.sql.SQLUtil;
+import eionet.cr.web.security.CRUser;
 
 /**
  * 
@@ -282,8 +288,9 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 			storedTriplesCount = storedTriplesCount + i;
 		}
 		
-		resolveLabels();
 		clearTemporaries();
+		resolveLabels();
+		extractNewHarvestSources();
 	}
 	
 	/**
@@ -371,6 +378,44 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 		append("SPO_FRESH.PREDICATE in (").
 		append(LabelPredicates.getCommaSeparatedHashes()).
 		append(")");
+		
+		SQLUtil.executeUpdate(buf.toString(), getConnection());
+	}
+	
+	/**
+	 * @throws SQLException 
+	 * 
+	 */
+	private void extractNewHarvestSources() throws SQLException{
+
+		/* handle qaw sources */
+		
+		String cronExpr = GeneralConfig.getProperty(GeneralConfig.HARVESTER_DEDICATED_SOURCES_CRON_EXPRESSION,
+				HarvestSourceDTO.DEDICATED_HARVEST_SOURCE_DEFAULT_CRON);
+		
+		StringBuffer buf = new StringBuffer().
+		append("insert ignore into HARVEST_SOURCE (NAME, URL, TYPE, DATE_CREATED, CREATOR, SCHEDULE_CRON) ").
+		append("select OBJECT, OBJECT, '").append(DedicatedHarvestSourceTypes.qawSource).
+		append("', now(), '").append(CRUser.application.getUserName()).
+		append("', '").append(cronExpr).
+		append("' from SPO where ANON_OBJ='N' and LIT_OBJ='N' and PREDICATE=").
+		append(Hashes.spoHash(Predicates.DC_SOURCE)).
+		append(" and SUBJECT in (select distinct SUBJECT from SPO where PREDICATE=").
+		append(Hashes.spoHash(Predicates.RDF_TYPE)).append(" and ANON_OBJ='N' and LIT_OBJ='N' and OBJECT_HASH in (").
+		append(Hashes.spoHash(Subjects.QA_REPORT_CLASS)).append(", ").append(Hashes.spoHash(Subjects.QAW_RESOURCE_CLASS)).append("))");
+		
+		SQLUtil.executeUpdate(buf.toString(), getConnection());
+
+		/* handle delivered files */
+		
+		buf = new StringBuffer().
+		append("insert ignore into HARVEST_SOURCE (NAME, URL, TYPE, DATE_CREATED, CREATOR, SCHEDULE_CRON) ").
+		append("select URI, URI, '").append(DedicatedHarvestSourceTypes.deliveredFile).
+		append("', now(), '").append(CRUser.application.getUserName()).
+		append("', '").append(cronExpr).
+		append("' from RESOURCE where SUBJECT in (select distinct SUBJECT from SPO where PREDICATE=").
+		append(Hashes.spoHash(Predicates.RDF_TYPE)).append(" and ANON_OBJ='N' and LIT_OBJ='N' and OBJECT_HASH in (").
+		append(Hashes.spoHash(Subjects.ROD_DELIVERY_CLASS)).append(", ").append(Hashes.spoHash(Subjects.DCTYPE_DATASET_CLASS)).append("))");
 		
 		SQLUtil.executeUpdate(buf.toString(), getConnection());
 	}
