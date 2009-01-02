@@ -163,7 +163,7 @@ public abstract class Harvest {
 		
 		long genTime = System.currentTimeMillis();
 		
-		NewRDFHandler rdfHandler = new NewRDFHandler(sourceUrlString, genTime);
+		RDFHandler rdfHandler = new RDFHandler(sourceUrlString, genTime);
 		if (this instanceof PushHarvest)
 			rdfHandler.setClearPreviousContent(true);
 		
