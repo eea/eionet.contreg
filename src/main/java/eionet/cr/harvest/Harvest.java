@@ -33,8 +33,8 @@ import eionet.cr.common.Subjects;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.harvest.util.DedicatedHarvestSourceTypes;
+import eionet.cr.harvest.util.HarvestLog;
 import eionet.cr.harvest.util.RDFResource;
-import eionet.cr.index.IndexException;
 import eionet.cr.index.Indexer;
 import eionet.cr.search.Searcher;
 import eionet.cr.util.FileUtil;
@@ -63,14 +63,9 @@ public abstract class Harvest {
 	public static final String WARNING = "wrn";
 	
 	/** */
-	private static Log logger = LogFactory.getLog(Harvest.class);
-	
-	/** */
 	protected String sourceUrlString = null;
+	protected Log logger = null;
 	
-	/** */
-	protected Indexer indexer = new Indexer();
-
 	/** */
 	private int countTotalResources = 0;
 	private int countEncodingSchemes = 0;
@@ -96,6 +91,7 @@ public abstract class Harvest {
 			throw new NullPointerException();
 		
 		this.sourceUrlString = sourceUrlString;
+		this.logger = new HarvestLog(sourceUrlString, LogFactory.getLog(this.getClass()));
 	}
 
 	/**
@@ -104,11 +100,9 @@ public abstract class Harvest {
 	 */
 	public void execute() throws HarvestException{
 
-		boolean noProblems = false;
 		try{
 			doHarvestStartedActions();
 			doExecute();
-			noProblems = true;
 		}
 		catch (Throwable t){
 			fatalError = t;
@@ -118,19 +112,7 @@ public abstract class Harvest {
 				throw new HarvestException("Exception when harvesting [" + sourceUrlString + "]: " + t.toString(), t);
 		}
 		finally{
-			try{
-				if (noProblems)
-					indexer.close();
-				else
-					indexer.abort();
-			}
-			catch (IOException e){
-				errors.add(e);
-				logger.error(e.toString(), e);
-			}
-			finally{
-				doHarvestFinishedActions();
-			}
+			doHarvestFinishedActions();
 		}
 	}
 	
@@ -181,7 +163,11 @@ public abstract class Harvest {
 	protected void harvest(Reader reader) throws HarvestException{
 		
 		long genTime = System.currentTimeMillis();
+		
 		NewRDFHandler rdfHandler = new NewRDFHandler(sourceUrlString, genTime);
+		if (this instanceof PushHarvest)
+			rdfHandler.setClearPreviousContent(true);
+		
 		try{
 			ARP arp = new ARP();
 	        arp.setStatementHandler(rdfHandler);
@@ -192,18 +178,16 @@ public abstract class Harvest {
 	        warnings.addAll(rdfHandler.getSaxWarnings());
 
 	        rdfHandler.commit();
-	        logger.debug(rdfHandler.getStoredTriplesCount() + " triples stored for : " + sourceUrlString);
-	        
-        	// TODO - store dedicated harvest sources
-        	// TODO - handle incremental harvest --- if (this instanceof PushHarvest) indexer.setIncremental(true); ---
+	        logger.debug(rdfHandler.getStoredTriplesCount() + " triples stored");
 		}
 		catch (Exception e){
 			try{
 				rdfHandler.rollback();
 			}
 			catch (Exception ee){
-				logger.fatal("Harvest rollback failed, source=[" + sourceUrlString + "], timestamp=[" + genTime + "}", ee);
-				// TODO - handle rollback failure somehow (e.g. send e-mail notification, store failure into database)
+				logger.fatal("Harvest rollback failed", ee);
+				// TODO - handle rollback failure somehow
+				// (e.g. send e-mail notification, store failure into database and retry rollback at later harvests)
 			}
 			
 			Throwable t = (e instanceof LoadException) && e.getCause()!=null ? e.getCause() : e;
@@ -214,97 +198,6 @@ public abstract class Harvest {
 				rdfHandler.closeResources();
 			}
 			catch (Exception e){}
-		}
-	}
-
-	/**
-	 * 
-	 * @param resources
-	 * @throws HarvestException 
-	 */
-	private void indexResources(Map<String,RDFResource> resources) throws HarvestException{
-		
-		if (resources==null || resources.size()==0)
-			return;
-		
-		Iterator<RDFResource> iter = resources.values().iterator();
-		while (iter.hasNext()){
-			
-			RDFResource resource = iter.next();
-			
-			countTotalStatements = countTotalStatements + resource.getCountTotalProperties();
-			countLiteralStatements  = countLiteralStatements + resource.getCountLiteralProperties();
-			
-			try {
-				indexer.indexRDFResource(resource);
-			}
-			catch (IndexException e) {
-				throw new HarvestException("Indexing exception when harvesting [" + sourceUrlString + "]: " + e.toString(), e);
-			}
-			
-			countTotalResources++;
-			if (resource.isEncodingScheme())
-				countEncodingSchemes++;
-		}
-		
-		logger.debug(countTotalResources + " resources indexed, among them " +
-				countEncodingSchemes + " encoding schemes, sourceURL = " + sourceUrlString);
-	}
-
-	/**
-	 * 
-	 * @param resources
-	 * @throws HarvestException
-	 */
-	private void updateFirstTimes(Map<String,RDFResource> resources) throws HarvestException{
-		
-		logger.debug("Updating the first-seen-times of the given resources");
-		
-		if (resources==null || resources.size()==0)
-			return;
-		
-		IndexReader indexReader = null;
-		try{
-			String indexLocation = GeneralConfig.getProperty(GeneralConfig.LUCENE_INDEX_LOCATION);
-			if (IndexReader.indexExists(indexLocation)){
-				indexReader = IndexReader.open(indexLocation);
-				String[] fields = {Predicates.DOC_ID, Predicates.FIRST_SEEN_TIMESTAMP};
-				FieldSelector fieldSelector = new MapFieldSelector(fields);
-				int numDocs = indexReader.numDocs();
-				int countUpdated = 0;
-				for (int i=0; i<numDocs; i++){
-					Document document = indexReader.document(i, fieldSelector);
-					if (document!=null){
-						String docID = document.get(Predicates.DOC_ID);
-						String firstTime = document.get(Predicates.FIRST_SEEN_TIMESTAMP);
-						if (docID!=null && firstTime!=null){
-							RDFResource resource = resources.get(docID);
-							if (resource!=null){
-								resource.setFirstSeenTimestamp(firstTime);
-								countUpdated++;
-							}
-						}
-					}
-				}
-				
-				logger.debug("First-seen-times updated for " + countUpdated + " resources, a total of " + numDocs + " documents was found by index reader");
-			}
-			else{
-				logger.debug("No first-seen-times updated, because index does not yet exist");
-			}
-			
-		}
-		catch (Throwable t){
-			throw new HarvestException("Exception when updating first times for [" + sourceUrlString + "]: " + t.toString(), t);
-		}
-		finally{
-			try{
-				if (indexReader!=null)
-					indexReader.close();
-			}
-			catch (Exception e){
-				logger.error("Failed to close index reader: " + e.toString(), e);
-			}
 		}
 	}
 
@@ -363,11 +256,11 @@ public abstract class Harvest {
 	protected void doHarvestStartedActions() throws HarvestException{
 		
 		if (this instanceof PullHarvest)
-			logger.debug("Pull harvest started for " + sourceUrlString);
+			logger.debug("Pull harvest started");
 		else if (this instanceof PushHarvest)
-			logger.debug("Push harvest started for " + sourceUrlString);
+			logger.debug("Push harvest started");
 		else
-			logger.debug("Harvest started for " + sourceUrlString);
+			logger.debug("Harvest started");
 		
 		try{
 			if (daoWriter!=null)
@@ -440,7 +333,7 @@ public abstract class Harvest {
 			logger.error("Harvest notification sender threw an error: " + ee.toString(), ee);
 		}
 		
-		logger.debug("Harvest finished, source URL = " + sourceUrlString);
+		logger.debug("Harvest finished");
 	}
 	
 	/**

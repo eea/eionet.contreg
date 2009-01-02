@@ -109,7 +109,6 @@ public class RDFResource {
 		
 		return distinctProperties!=null &&
 			distinctProperties.contains(Predicates.RDFS_LABEL);
-		//FIXME distinctProperties.contains(Identifiers.RDF_TYPE) &&
 	}
 	
 	/**

@@ -19,9 +19,6 @@ import eionet.cr.util.FileUtil;
 public class PullHarvest extends Harvest{
 	
 	/** */
-	private static Log logger = LogFactory.getLog(PullHarvest.class);
-	
-	/** */
 	private Boolean sourceAvailable = null;
 	private Long lastHarvestTimestamp = null;
 
@@ -44,7 +41,7 @@ public class PullHarvest extends Harvest{
 		if (toFile.exists())
 			toFile.delete();
 		
-		logger.debug("Downloading from URL: " + sourceUrlString);
+		logger.debug("Downloading");
 		
 		InputStream inputStream = null;
 		try{

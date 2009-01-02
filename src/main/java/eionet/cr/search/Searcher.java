@@ -66,7 +66,6 @@ public class Searcher {
 	 */
 	private static IndexSearcher getIndexSearcher() throws CorruptIndexException, IOException{
 		String indexLocation = GeneralConfig.getRequiredProperty(GeneralConfig.LUCENE_INDEX_LOCATION);
-		logger.debug("Initializing searcher on index: " + indexLocation);
 		return new IndexSearcher(indexLocation);
 	}
 	

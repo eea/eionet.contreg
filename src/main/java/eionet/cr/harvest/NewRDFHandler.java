@@ -23,6 +23,7 @@ import eionet.cr.common.Subjects;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.harvest.util.DedicatedHarvestSourceTypes;
+import eionet.cr.harvest.util.HarvestLog;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.StringUtils;
 import eionet.cr.util.UnicodeUtils;
@@ -39,9 +40,6 @@ import eionet.cr.web.security.CRUser;
 public class NewRDFHandler implements StatementHandler, ErrorHandler{
 
 	/** */
-	private static Log logger = LogFactory.getLog(NewRDFHandler.class);
-	
-	/** */
 	private List<SAXParseException> saxErrors = new ArrayList<SAXParseException>();
 	private List<SAXParseException> saxWarnings = new ArrayList<SAXParseException>();
 	
@@ -55,6 +53,7 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 	private String sourceUrl;
 	private long sourceUrlHash;
 	private long genTime;
+	private Log logger;
 	
 	/** */
 	private PreparedStatement preparedStatementForTriples;
@@ -65,6 +64,9 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 
 	/** */
 	private int storedTriplesCount = 0;
+
+	/** */
+	private boolean clearPreviousContent = false;
 
 	/**
 	 * 
@@ -77,6 +79,7 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 		this.sourceUrl = sourceUrl;
 		this.sourceUrlHash = Hashes.spoHash(sourceUrl);
 		this.genTime = genTime;
+		this.logger = new HarvestLog(sourceUrl, genTime, LogFactory.getLog(this.getClass()));
 		
 		// set the hash-seed for anonymous ids
 		anonIdSeed = Hashes.spoHash(sourceUrl + String.valueOf(genTime));
@@ -115,7 +118,7 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 		if (!predicate.isAnonymous()){ // we ignore statements with anonymous predicates
 			
 			try{
-				parseForUsedNamespaces(predicate); // FIXME - extract used namespaces before this handler is called (for better performance)
+				parseForUsedNamespaces(predicate);
 				
 				long subjectHash = spoHash(subject.isAnonymous() ? subject.getAnonymousID() : subject.getURI(), subject.isAnonymous());
 				long predicateHash = spoHash(predicate.getURI(), false);
@@ -153,7 +156,7 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 		
 		if (preparedStatementForTriples==null){
 			prepareForTriples();
-			logger.debug("Started storing triples from " + sourceUrl);
+			logger.debug("Started storing triples");
 		}
 		
 		preparedStatementForTriples.setLong  ( 1, subjectHash);
@@ -179,7 +182,7 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 
 		if (preparedStatementForResources==null){
 			prepareForResources();
-			logger.debug("Started storing resources from " + sourceUrl);
+			logger.debug("Started storing resources");
 		}
 		
 		preparedStatementForResources.setString(1, uri);
@@ -298,7 +301,7 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 
 		/* copy triples from SPO_TEMP into SPO */
 
-		logger.debug("Copying triples from SPO_TEMP into SPO, sourceUrl: " + sourceUrl);
+		logger.debug("Copying triples from SPO_TEMP into SPO");
 		
 		StringBuffer buf = new StringBuffer();
 		buf.append("insert high_priority into SPO (").
@@ -308,16 +311,19 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 		
 		int committedTriplesCount = SQLUtil.executeUpdate(buf.toString(), getConnection());
 		
-		logger.debug(committedTriplesCount + " triples inserted into SPO from " + sourceUrl);
-		
-		/* delete SPO records from previous harvests of this source */
-		
-		logger.debug("Deleting SPO rows of previous harvests of " + sourceUrl);
-		
-		buf = new StringBuffer("delete from SPO where SOURCE=");
-		buf.append(sourceUrlHash).append(" and GEN_TIME<").append(genTime);
-		
-		SQLUtil.executeUpdate(buf.toString(), getConnection());
+		logger.debug(committedTriplesCount + " triples inserted into SPO");
+
+		if (clearPreviousContent){
+			
+			/* delete SPO records from previous harvests of this source */
+	
+			logger.debug("Deleting SPO rows of previous harvests");
+			
+			buf = new StringBuffer("delete from SPO where SOURCE=");
+			buf.append(sourceUrlHash).append(" and GEN_TIME<").append(genTime);
+			
+			SQLUtil.executeUpdate(buf.toString(), getConnection());
+		}
 		
 		return committedTriplesCount;
 	}
@@ -329,14 +335,14 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 	 */
 	private int commitResources() throws SQLException{
 		
-		logger.debug("Copying resources from RESOURCE_TEMP into RESOURCE, sourceUrl: " + sourceUrl);
+		logger.debug("Copying resources from RESOURCE_TEMP into RESOURCE");
 		
 		StringBuffer buf = new StringBuffer();
 		buf.append("insert high_priority ignore into RESOURCE (URI, URI_HASH, FIRSTSEEN_SOURCE, FIRSTSEEN_TIME) ").
 		append("select URI, URI_HASH, ").append(sourceUrlHash).append(", ").append(genTime).append(" from RESOURCE_TEMP");
 		
 		int i = SQLUtil.executeUpdate(buf.toString(), getConnection());
-		logger.debug(i + " resources inserted into RESOURCE from " + sourceUrl);
+		logger.debug(i + " resources inserted into RESOURCE");
 		
 		return i;
 	}
@@ -347,7 +353,7 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 	 */
 	private void resolveLabels() throws SQLException{
 		
-		logger.debug("Deriving labels for and from " + sourceUrl);
+		logger.debug("Deriving labels");
 		
 		/* Find and insert labels for freshly harvested non-literal objects. */
 		
@@ -385,7 +391,7 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 		
 		int j = SQLUtil.executeUpdate(buf.toString(), getConnection());
 		
-		logger.debug(i + " labels derived FOR and " + j + " labels derived FROM " + sourceUrl);
+		logger.debug(i + " labels derived FOR and " + j + " labels derived FROM the current harvest");
 	}
 	
 	/**
@@ -394,7 +400,7 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 	 */
 	private void extractNewHarvestSources() throws SQLException{
 
-		logger.debug("Extracting new harvest sources from SPO rows harvested from " + sourceUrl);
+		logger.debug("Extracting new harvest sources");
 		
 		/* handle qaw sources */
 		
@@ -427,7 +433,7 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 		
 		i = i + SQLUtil.executeUpdate(buf.toString(), getConnection());
 		
-		logger.debug(i + " new harvest sources extracted and inserted from " + sourceUrl);
+		logger.debug(i + " new harvest sources extracted and inserted");
 	}
 
 	/**
@@ -436,7 +442,7 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 	 */
 	private void clearTemporaries() throws SQLException{
 		
-		logger.debug("Cleaning SPO_TEMP and RESOURCE_TEMP after harvesting " + sourceUrl);
+		logger.debug("Cleaning SPO_TEMP and RESOURCE_TEMP");
 		
 		try{
 			SQLUtil.executeUpdate("delete from SPO_TEMP", getConnection());
@@ -454,6 +460,8 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 	 */
 	protected void rollback() throws SQLException{
 
+		logger.debug("Doing rollback for current harvest");
+		
 		// delete rows of current harvest from SPO
 		StringBuffer buf = new StringBuffer("delete from SPO where SOURCE=");
 		buf.append(sourceUrlHash).append(" and GEN_TIME=").append(genTime);
@@ -513,5 +521,12 @@ public class NewRDFHandler implements StatementHandler, ErrorHandler{
 	 */
 	public int getStoredTriplesCount() {
 		return storedTriplesCount;
+	}
+
+	/**
+	 * @param clearPreviousContent the clearPreviousContent to set
+	 */
+	public void setClearPreviousContent(boolean clearPreviousContent) {
+		this.clearPreviousContent = clearPreviousContent;
 	}
 }

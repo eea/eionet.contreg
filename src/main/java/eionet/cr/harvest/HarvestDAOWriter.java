@@ -23,8 +23,6 @@ import eionet.cr.web.security.CRUser;
  */
 public class HarvestDAOWriter {
 	
-	private static Log logger = LogFactory.getLog(HarvestDAOWriter.class);
-	
 	/** */
 	private int sourceId;
 	private String harvestType;
@@ -60,7 +58,6 @@ public class HarvestDAOWriter {
 	 */
 	protected void writeFinished(Harvest harvest, Integer numResourcesInSource) throws DAOException{
 		
-		logger.debug(getClass().getSimpleName() + ", recording harvest finish details, source URL = " + harvest.getSourceUrlString());
 		DAOFactory.getDAOFactory().getHarvestDAO().updateFinishedHarvest(harvestId, Harvest.STATUS_FINISHED,
 				harvest.getCountTotalStatements(),
 				harvest.getCountLiteralStatements(),
@@ -77,8 +74,6 @@ public class HarvestDAOWriter {
 	 * @throws DAOException
 	 */
 	protected void writeMessages(Harvest harvest) throws DAOException{
-		
-		logger.debug(getClass().getSimpleName() + ", recording harvest messages, source URL = " + harvest.getSourceUrlString());
 		
 		// save the fatal exception
 		writeThrowable(harvest.getFatalError(), Harvest.FATAL);
