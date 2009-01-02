@@ -6,9 +6,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
+import eionet.cr.common.EncodingSchemes;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.ResourceDTO;
-import eionet.cr.index.EncodingSchemes;
 import eionet.cr.util.URLUtil;
 
 /**

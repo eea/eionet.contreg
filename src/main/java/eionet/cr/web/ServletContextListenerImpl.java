@@ -3,8 +3,6 @@ package eionet.cr.web;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import eionet.cr.index.walk.AllDocsWalker;
-
 /**
  * 
  * @author heinljab
@@ -24,7 +22,5 @@ public class ServletContextListenerImpl implements ServletContextListener{
 	 * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
 	 */
 	public void contextInitialized(ServletContextEvent event) {
-		
-		AllDocsWalker.startupWalk();
 	}
 }

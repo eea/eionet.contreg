@@ -15,6 +15,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.KeywordAnalyzer;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.FieldSelector;
 import org.apache.lucene.document.MapFieldSelector;
@@ -31,13 +32,12 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.TermQuery;
 
+import eionet.cr.common.EncodingSchemes;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.ResourceDTO;
+import eionet.cr.common.SubProperties;
 import eionet.cr.common.Subjects;
 import eionet.cr.config.GeneralConfig;
-import eionet.cr.index.EncodingSchemes;
-import eionet.cr.index.Indexer;
-import eionet.cr.index.SubProperties;
 import eionet.cr.search.util.HitsCollector;
 import eionet.cr.search.util.SearchUtil;
 import eionet.cr.search.util.dataflow.RodInstrumentDTO;
@@ -53,7 +53,7 @@ import eionet.cr.util.Util;
  */
 public class Searcher {
 	
-	public static final String DEFAULT_FIELD = Indexer.ALL_CONTENT_FIELD;
+	public static final String DEFAULT_FIELD = Searcher.ALL_CONTENT_FIELD;
 	
 	/** */
 	private static Log logger = LogFactory.getLog(Searcher.class);
@@ -90,7 +90,7 @@ public class Searcher {
 			if (URIUtil.isSchemedURI(expression.trim()))
 				query = new TermQuery(new Term(Predicates.DOC_ID, expression));
 			else{
-				QueryParser parser = new QueryParser(DEFAULT_FIELD, Indexer.getAnalyzer());
+				QueryParser parser = new QueryParser(DEFAULT_FIELD, Searcher.getAnalyzer());
 				char[] escapeExceptions = {'"'};
 				query = parser.parse(Util.luceneEscape(expression, escapeExceptions));
 			}
@@ -119,7 +119,7 @@ public class Searcher {
 	 * @throws IOException
 	 */
 	public static List<Map<String,String[]>> luceneQuery(String queryStr) throws ParseException, IOException{
-		return luceneQuery(queryStr, Indexer.getAnalyzer());
+		return luceneQuery(queryStr, Searcher.getAnalyzer());
 	}
 	
 	/**
@@ -258,13 +258,13 @@ public class Searcher {
 		IndexSearcher indexSearcher = null;
 		try{
 			if (!Util.isNullOrEmpty(locality)){
-				QueryParser parser = new QueryParser(DEFAULT_FIELD, Indexer.getAnalyzer());
+				QueryParser parser = new QueryParser(DEFAULT_FIELD, Searcher.getAnalyzer());
 				StringBuffer qryBuf = new StringBuffer(Util.luceneEscape(Predicates.ROD_LOCALITY_PROPERTY));
 				qryBuf.append(":\"").append(Util.luceneEscape(locality)).append("\"");
 				queries.add(parser.parse(qryBuf.toString()));
 			}
 			if (!Util.isNullOrEmpty(year)){
-				QueryParser parser = new QueryParser(DEFAULT_FIELD, Indexer.getAnalyzer());
+				QueryParser parser = new QueryParser(DEFAULT_FIELD, Searcher.getAnalyzer());
 				StringBuffer qryBuf = new StringBuffer(Util.luceneEscape(Predicates.DC_COVERAGE));
 				qryBuf.append(":\"").append(Util.luceneEscape(year)).append("\"");
 				queries.add(parser.parse(qryBuf.toString()));
@@ -502,7 +502,7 @@ public class Searcher {
 		
 		IndexSearcher indexSearcher = null;
 		List<Query> queries = new ArrayList<Query>();
-		QueryParser queryParser = new QueryParser(DEFAULT_FIELD, Indexer.getAnalyzer());
+		QueryParser queryParser = new QueryParser(DEFAULT_FIELD, Searcher.getAnalyzer());
 		try{
 			for (Iterator<String> propertyIter = criteria.keySet().iterator(); propertyIter.hasNext();){
 				String property = propertyIter.next();
@@ -525,7 +525,7 @@ public class Searcher {
 
 						Query query = null;
 						String subProperty = subProperties.get(j);
-						if (!Indexer.isAnalyzedField(subProperty) || !Indexer.isAnalyzedValue(propertyValueUnquoted)){
+						if (!Searcher.isAnalyzedField(subProperty) || !Searcher.isAnalyzedValue(propertyValueUnquoted)){
 							query = new TermQuery(new Term(subProperty, propertyValueUnquoted));
 						}
 						else{
@@ -583,5 +583,42 @@ public class Searcher {
 		catch (Throwable t) {
 			t.printStackTrace();
 		}
+	}
+
+	/** */
+	public static final String ALL_CONTENT_FIELD = Predicates.ALL_LITERAL_CONTENT;
+
+	/**
+	 * 
+	 * @return
+	 */
+	public static Analyzer getAnalyzer(){
+		return new StandardAnalyzer();
+	}
+
+	/**
+	 * 
+	 * @param fieldName
+	 * @return
+	 */
+	public static boolean isAnalyzedField(String fieldName){
+		
+		if (fieldName.equals(Predicates.DOC_ID))
+			return false;
+		else if (fieldName.equals(Predicates.SOURCE_ID))
+			return false;
+		else if (fieldName.equals(Predicates.FIRST_SEEN_TIMESTAMP))
+			return false;
+		else
+			return true;
+	}
+
+	/**
+	 * 
+	 * @param value
+	 * @return
+	 */
+	public static boolean isAnalyzedValue(String value){
+		return URIUtil.isSchemedURI(value)==false;
 	}
 }

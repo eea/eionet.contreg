@@ -8,8 +8,8 @@ import java.util.Vector;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Fieldable;
 
+import eionet.cr.common.EncodingSchemes;
 import eionet.cr.common.Predicates;
-import eionet.cr.index.EncodingSchemes;
 
 /**
  * 

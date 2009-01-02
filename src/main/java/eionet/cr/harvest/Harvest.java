@@ -35,7 +35,6 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.harvest.util.DedicatedHarvestSourceTypes;
 import eionet.cr.harvest.util.HarvestLog;
 import eionet.cr.harvest.util.RDFResource;
-import eionet.cr.index.Indexer;
 import eionet.cr.search.Searcher;
 import eionet.cr.util.FileUtil;
 import eionet.cr.util.URLUtil;
