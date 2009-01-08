@@ -36,7 +36,7 @@ public class CRActionBeanContext extends ActionBeanContext {
 	}
 	
 	/**
-	 * Wrapper method for {@link HttpSession#setAttribute(String, Object)}.
+	 * Wrapper method for {@link HttpSession#setAttribute(String, RDFObject)}.
 	 * <p>
 	 * The wrapper allows to avoid direct usage of {@link HttpSession}.
 	 * @param name session attribute name.

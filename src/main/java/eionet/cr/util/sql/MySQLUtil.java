@@ -115,4 +115,28 @@ public class MySQLUtil {
 			catch (SQLException e){}
 		}
 	}
+
+	/**
+	 * 
+	 * @param conn
+	 * @return
+	 * @throws SQLException
+	 */
+	public static Integer getTotalRowCount(Connection conn) throws SQLException{
+		
+		ResultSet rs = null;
+		Statement stmt = null;
+		try{
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery("select found_rows()");
+			return (rs!=null && rs.next()) ? new Integer(rs.getInt(1)) : null;
+		}
+		finally{
+			try{
+				if (rs!=null) rs.close();
+				if (stmt!=null) stmt.close();
+			}
+			catch (SQLException e){}
+		}
+	}
 }
