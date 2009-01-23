@@ -65,7 +65,7 @@ public abstract class HitsCollector {
 	 * @throws IOException
 	 */
 	public static List<SubjectDTO> collectResourceDTOs(Hits hits, int maxHits) throws CorruptIndexException, IOException{
-		ResourceDTOCollector collector = new ResourceDTOCollector();
+		SubjectDTOCollector collector = new SubjectDTOCollector();
 		collectHits(hits, maxHits, collector);
 		return collector.getResultList();
 	}

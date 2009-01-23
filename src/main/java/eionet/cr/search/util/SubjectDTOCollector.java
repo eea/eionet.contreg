@@ -7,7 +7,7 @@ import org.apache.lucene.document.Document;
 
 import eionet.cr.dto.SubjectDTO;
 
-public class ResourceDTOCollector extends HitsCollector{
+public class SubjectDTOCollector extends HitsCollector{
 
 	/** */
 	private List<SubjectDTO> resultList;

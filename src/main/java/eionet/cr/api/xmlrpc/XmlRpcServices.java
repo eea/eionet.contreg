@@ -20,7 +20,7 @@ import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.scheduled.HarvestQueue;
 import eionet.cr.search.Searcher;
 import eionet.cr.search.util.EntriesCollector;
-import eionet.cr.search.util.ResourceDTOCollector;
+import eionet.cr.search.util.SubjectDTOCollector;
 import eionet.cr.util.StringUtils;
 import eionet.cr.util.Util;
 import eionet.qawcommons.DataflowResultDto;
@@ -81,7 +81,7 @@ public class XmlRpcServices implements Services{
 		List<DataflowResultDto> result = new ArrayList<DataflowResultDto>();
 		try{
 			
-			ResourceDTOCollector collector = new ResourceDTOCollector();
+			SubjectDTOCollector collector = new SubjectDTOCollector();
 			Searcher.customSearch(criteria, false, collector);
 			List<SubjectDTO> list = collector.getResultList();
 			

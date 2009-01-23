@@ -19,7 +19,7 @@ import eionet.cr.common.Predicates;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.Searcher;
-import eionet.cr.search.util.ResourceDTOCollector;
+import eionet.cr.search.util.SubjectDTOCollector;
 import eionet.cr.util.Util;
 import eionet.cr.web.util.search.CustomSearchFilter;
 import eionet.cr.web.util.search.SearchResultColumn;
@@ -82,7 +82,7 @@ public class CustomSearchActionBean extends SearchResourcesActionBean{
 		
 		populateSelectedFilters();
 		
-		ResourceDTOCollector collector = new ResourceDTOCollector();
+		SubjectDTOCollector collector = new SubjectDTOCollector();
 		Searcher.customSearch(buildSearchCriteria(), true, collector);
 		
 		getContext().getRequest().getSession().setAttribute(RESULT_LIST_SESSION_ATTR_NAME, collector.getResultList()); 
