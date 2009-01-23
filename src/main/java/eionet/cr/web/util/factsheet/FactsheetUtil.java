@@ -8,7 +8,7 @@ import java.util.List;
 
 import eionet.cr.common.EncodingSchemes;
 import eionet.cr.common.Predicates;
-import eionet.cr.common.ResourceDTO;
+import eionet.cr.dto.ResourceDTO;
 import eionet.cr.util.URLUtil;
 
 /**

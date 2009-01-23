@@ -14,8 +14,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import eionet.cr.common.Predicates;
-import eionet.cr.common.ResourceDTO;
 import eionet.cr.common.Subjects;
+import eionet.cr.dto.ResourceDTO;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.Searcher;
 import eionet.cr.util.Util;

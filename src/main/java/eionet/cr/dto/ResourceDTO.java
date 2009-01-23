@@ -1,4 +1,4 @@
-package eionet.cr.common;
+package eionet.cr.dto;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,6 +8,8 @@ import java.util.List;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 
+import eionet.cr.common.Md5Map;
+import eionet.cr.common.Predicates;
 import eionet.cr.util.URLUtil;
 
 /**

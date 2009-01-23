@@ -9,7 +9,7 @@ import org.displaytag.decorator.DisplaytagColumnDecorator;
 import org.displaytag.exception.DecoratorException;
 import org.displaytag.properties.MediaTypeEnum;
 
-import eionet.cr.common.ResourceDTO;
+import eionet.cr.dto.ResourceDTO;
 import eionet.cr.util.Util;
 import eionet.cr.web.util.JstlFunctions;
 

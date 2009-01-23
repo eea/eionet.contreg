@@ -5,7 +5,7 @@ import java.util.List;
 
 import net.sourceforge.stripes.action.Resolution;
 import eionet.cr.common.Predicates;
-import eionet.cr.common.ResourceDTO;
+import eionet.cr.dto.ResourceDTO;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.util.HitsCollector;
 import eionet.cr.web.util.search.SearchResultColumn;

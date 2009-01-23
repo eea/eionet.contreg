@@ -34,10 +34,10 @@ import org.apache.lucene.search.TermQuery;
 
 import eionet.cr.common.EncodingSchemes;
 import eionet.cr.common.Predicates;
-import eionet.cr.common.ResourceDTO;
 import eionet.cr.common.SubProperties;
 import eionet.cr.common.Subjects;
 import eionet.cr.config.GeneralConfig;
+import eionet.cr.dto.ResourceDTO;
 import eionet.cr.search.util.HitsCollector;
 import eionet.cr.search.util.SearchUtil;
 import eionet.cr.search.util.dataflow.RodInstrumentDTO;

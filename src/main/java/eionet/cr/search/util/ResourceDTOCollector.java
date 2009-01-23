@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.apache.lucene.document.Document;
 
-import eionet.cr.common.ResourceDTO;
+import eionet.cr.dto.ResourceDTO;
 
 public class ResourceDTOCollector extends HitsCollector{
 
