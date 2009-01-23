@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import eionet.cr.dto.RDFSubject;
+import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.util.SearchExpression;
 import eionet.cr.util.sql.ConnectionUtil;
 import eionet.cr.util.sql.SQLUtil;
@@ -81,13 +81,13 @@ public class SimpleSearch extends RDFSubjectSearch{
 		try{
 			simpleSearch.setSearchString("soil");
 			simpleSearch.execute();
-			Collection<RDFSubject> coll = simpleSearch.getResultList();
+			Collection<SubjectDTO> coll = simpleSearch.getResultList();
 			
 			if (coll!=null){
 				System.out.println("coll.size() = " + coll.size());
 				
-				for (Iterator<RDFSubject> i=coll.iterator(); i.hasNext(); ){
-					RDFSubject subject = i.next();
+				for (Iterator<SubjectDTO> i=coll.iterator(); i.hasNext(); ){
+					SubjectDTO subject = i.next();
 					System.out.println(subject);
 				}
 			}

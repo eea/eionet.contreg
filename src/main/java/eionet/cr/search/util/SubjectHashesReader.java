@@ -4,7 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedHashMap;
 
-import eionet.cr.dto.RDFSubject;
+import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.sql.ResultSetBaseReader;
 
 /**
@@ -15,7 +15,7 @@ import eionet.cr.util.sql.ResultSetBaseReader;
 public class SubjectHashesReader extends ResultSetBaseReader{
 	
 	/** */
-	private LinkedHashMap<String,RDFSubject> resultMap = new LinkedHashMap<String,RDFSubject>();
+	private LinkedHashMap<String,SubjectDTO> resultMap = new LinkedHashMap<String,SubjectDTO>();
 	private StringBuffer subjectHashesCommaSeparated = new StringBuffer();
 	
 	/*
@@ -35,7 +35,7 @@ public class SubjectHashesReader extends ResultSetBaseReader{
 	/**
 	 * @return the resultMap
 	 */
-	public LinkedHashMap<String,RDFSubject> getResultMap(){
+	public LinkedHashMap<String,SubjectDTO> getResultMap(){
 		return resultMap;
 	}
 

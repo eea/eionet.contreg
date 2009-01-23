@@ -5,7 +5,7 @@ package eionet.cr.dto;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class RDFPredicate {
+public class PredicateDTO {
 
 	/** */
 	private String value;
@@ -14,7 +14,7 @@ public class RDFPredicate {
 	 * 
 	 * @param value
 	 */
-	public RDFPredicate(String value){
+	public PredicateDTO(String value){
 		this.value = value;
 	}
 	
@@ -42,11 +42,11 @@ public class RDFPredicate {
 		if (this==other)
 			return true;
 		
-		if (!(other instanceof RDFPredicate))
+		if (!(other instanceof PredicateDTO))
 			return false;
 		
 		
-		String otherValue = ((RDFPredicate)other).getValue();
+		String otherValue = ((PredicateDTO)other).getValue();
 		return getValue()==null ? otherValue==null : getValue().equals(otherValue);
 	}
 

@@ -9,9 +9,9 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 
-import eionet.cr.dto.RDFObject;
-import eionet.cr.dto.RDFPredicate;
-import eionet.cr.dto.RDFSubject;
+import eionet.cr.dto.ObjectDTO;
+import eionet.cr.dto.PredicateDTO;
+import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.sql.ResultSetBaseReader;
 
@@ -23,18 +23,18 @@ import eionet.cr.util.sql.ResultSetBaseReader;
 public class SubjectsDataReader extends ResultSetBaseReader{
 
 	/** */
-	private LinkedHashMap<String,RDFSubject> subjectsMap;
+	private LinkedHashMap<String,SubjectDTO> subjectsMap;
 	
 	/** */
-	private RDFSubject currentSubject = null;
+	private SubjectDTO currentSubject = null;
 	private String currentPredicate = null;
-	private Collection<RDFObject> currentObjects = null;
+	private Collection<ObjectDTO> currentObjects = null;
 	
 	/**
 	 * 
 	 * @param subjectsMap
 	 */
-	public SubjectsDataReader(LinkedHashMap<String,RDFSubject> subjectsMap){
+	public SubjectsDataReader(LinkedHashMap<String,SubjectDTO> subjectsMap){
 		this.subjectsMap = subjectsMap;
 	}
 	
@@ -48,7 +48,7 @@ public class SubjectsDataReader extends ResultSetBaseReader{
 		boolean newSubject = currentSubject==null || !currentSubject.getUri().equals(subjectUri);
 		if (newSubject){
 			String subjectHash = rs.getString("SUBJECT");
-			currentSubject = new RDFSubject(subjectUri, YesNoBoolean.parse(rs.getString("ANON_SUBJ")));
+			currentSubject = new SubjectDTO(subjectUri, YesNoBoolean.parse(rs.getString("ANON_SUBJ")));
 			subjectsMap.put(subjectHash, currentSubject);
 		}
 
@@ -56,11 +56,11 @@ public class SubjectsDataReader extends ResultSetBaseReader{
 		boolean newPredicate = newSubject || currentPredicate==null || !currentPredicate.equals(predicateUri);
 		if (newPredicate){
 			currentPredicate = predicateUri;
-			currentObjects = new ArrayList<RDFObject>();
-			currentSubject.put(new RDFPredicate(predicateUri), currentObjects);
+			currentObjects = new ArrayList<ObjectDTO>();
+			currentSubject.put(new PredicateDTO(predicateUri), currentObjects);
 		}
 		
-		RDFObject object = new RDFObject(rs.getString("OBJECT"),
+		ObjectDTO object = new ObjectDTO(rs.getString("OBJECT"),
 											rs.getString("OBJ_LANG"),
 											YesNoBoolean.parse(rs.getString("LIT_OBJ")),
 											YesNoBoolean.parse(rs.getString("ANON_OBJ")));

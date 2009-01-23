@@ -5,7 +5,7 @@ package eionet.cr.dto;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class RDFObject {
+public class ObjectDTO {
 
 	/** */
 	private String value;
@@ -21,7 +21,7 @@ public class RDFObject {
 	 * @param literal
 	 * @param anonymous
 	 */
-	public RDFObject(String value, String language, boolean literal, boolean anonymous){
+	public ObjectDTO(String value, String language, boolean literal, boolean anonymous){
 		
 		this.value = value;
 		this.language = language;
@@ -71,11 +71,11 @@ public class RDFObject {
 		if (this==other)
 			return true;
 		
-		if (!(other instanceof RDFObject))
+		if (!(other instanceof ObjectDTO))
 			return false;
 		
 		
-		String otherValue = ((RDFObject)other).getValue();
+		String otherValue = ((ObjectDTO)other).getValue();
 		return getValue()==null ? otherValue==null : getValue().equals(otherValue);
 	}
 

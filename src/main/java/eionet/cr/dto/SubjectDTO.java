@@ -9,7 +9,7 @@ import java.util.List;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class RDFSubject extends HashMap<RDFPredicate,Collection<RDFObject>>{
+public class SubjectDTO extends HashMap<PredicateDTO,Collection<ObjectDTO>>{
 	
 	/** */
 	private String uri;
@@ -20,7 +20,7 @@ public class RDFSubject extends HashMap<RDFPredicate,Collection<RDFObject>>{
 	 * @param uri
 	 * @param anonymous
 	 */
-	public RDFSubject(String uri, boolean anonymous){
+	public SubjectDTO(String uri, boolean anonymous){
 		super();
 		this.uri = uri;
 		this.anonymous = anonymous;
@@ -31,8 +31,8 @@ public class RDFSubject extends HashMap<RDFPredicate,Collection<RDFObject>>{
 	 * @param s
 	 * @return
 	 */
-	public Collection<RDFObject> get(String s){
-		return super.get(new RDFPredicate(s));
+	public Collection<ObjectDTO> get(String s){
+		return super.get(new PredicateDTO(s));
 	}
 
 	/**
@@ -60,11 +60,11 @@ public class RDFSubject extends HashMap<RDFPredicate,Collection<RDFObject>>{
 		if (this==other)
 			return true;
 		
-		if (!(other instanceof RDFSubject))
+		if (!(other instanceof SubjectDTO))
 			return false;
 		
 		
-		String otherUri = ((RDFSubject)other).getUri();
+		String otherUri = ((SubjectDTO)other).getUri();
 		return getUri()==null ? otherUri==null : getUri().equals(otherUri);
 	}
 

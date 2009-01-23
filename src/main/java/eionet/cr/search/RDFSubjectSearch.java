@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import eionet.cr.dto.RDFSubject;
+import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.util.SortOrder;
 import eionet.cr.search.util.SubjectHashesReader;
 import eionet.cr.search.util.SubjectsDataReader;
@@ -31,7 +31,7 @@ public abstract class RDFSubjectSearch {
 	protected String sortPredicate = null;	
 	
 	/** */
-	protected Collection<RDFSubject> resultList = new ArrayList<RDFSubject>();
+	protected Collection<SubjectDTO> resultList = new ArrayList<SubjectDTO>();
 	protected int totalRowCount = 0;
 	
 	/**
@@ -55,7 +55,7 @@ public abstract class RDFSubjectSearch {
 				if (subjectHashesReader.getResultCount()>0){
 					
 					Integer totalRowCount = MySQLUtil.getTotalRowCount(conn); // TODO - maybe do it without directly pointing to MySQL
-					LinkedHashMap<String, RDFSubject> subjectsMap = subjectHashesReader.getResultMap();
+					LinkedHashMap<String, SubjectDTO> subjectsMap = subjectHashesReader.getResultMap();
 					
 					SubjectsDataReader subjectsDataReader = new SubjectsDataReader(subjectsMap);
 					SQLUtil.executeQuery(
@@ -100,7 +100,7 @@ public abstract class RDFSubjectSearch {
 	/**
 	 * @return the resultList
 	 */
-	public Collection<RDFSubject> getResultList() {
+	public Collection<SubjectDTO> getResultList() {
 		return resultList;
 	}
 
