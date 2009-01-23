@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedHashMap;
 
+import eionet.cr.dto.RDFSubject;
 import eionet.cr.util.sql.ResultSetBaseReader;
 
 /**

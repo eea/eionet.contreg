@@ -1,4 +1,4 @@
-package eionet.cr.search.util;
+package eionet.cr.dto;
 
 /**
  * 

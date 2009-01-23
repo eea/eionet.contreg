@@ -1,4 +1,4 @@
-package eionet.cr.search.util;
+package eionet.cr.dto;
 
 import java.util.Collection;
 import java.util.HashMap;

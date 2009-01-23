@@ -9,6 +9,9 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 
+import eionet.cr.dto.RDFObject;
+import eionet.cr.dto.RDFPredicate;
+import eionet.cr.dto.RDFSubject;
 import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.sql.ResultSetBaseReader;
 

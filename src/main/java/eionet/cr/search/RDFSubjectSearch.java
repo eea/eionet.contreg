@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import eionet.cr.search.util.RDFSubject;
+import eionet.cr.dto.RDFSubject;
 import eionet.cr.search.util.SortOrder;
 import eionet.cr.search.util.SubjectHashesReader;
 import eionet.cr.search.util.SubjectsDataReader;

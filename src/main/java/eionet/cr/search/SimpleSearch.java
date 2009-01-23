@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import eionet.cr.search.util.RDFSubject;
+import eionet.cr.dto.RDFSubject;
 import eionet.cr.search.util.SearchExpression;
 import eionet.cr.util.sql.ConnectionUtil;
 import eionet.cr.util.sql.SQLUtil;
