@@ -208,7 +208,7 @@ public class CustomSearchActionBean extends SearchResourcesActionBean{
 
 			filter = new CustomSearchFilter();
 			filter.setUri(Predicates.DC_SUBJECT);
-			filter.setTitle("SubjectDTO");
+			filter.setTitle("SubjectDTOTemp");
 			filter.setDescription("");
 			filter.setProvideValues(true);
 			list.add(filter);

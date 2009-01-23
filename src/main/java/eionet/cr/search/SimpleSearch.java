@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import eionet.cr.dto.SubjectDTO;
+import eionet.cr.dto.SubjectDTOTemp;
 import eionet.cr.search.util.SearchExpression;
 import eionet.cr.util.sql.ConnectionUtil;
 import eionet.cr.util.sql.SQLUtil;
@@ -81,13 +81,13 @@ public class SimpleSearch extends SubjectSearch{
 		try{
 			simpleSearch.setSearchString("soil");
 			simpleSearch.execute();
-			Collection<SubjectDTO> coll = simpleSearch.getResultList();
+			Collection<SubjectDTOTemp> coll = simpleSearch.getResultList();
 			
 			if (coll!=null){
 				System.out.println("coll.size() = " + coll.size());
 				
-				for (Iterator<SubjectDTO> i=coll.iterator(); i.hasNext(); ){
-					SubjectDTO subject = i.next();
+				for (Iterator<SubjectDTOTemp> i=coll.iterator(); i.hasNext(); ){
+					SubjectDTOTemp subject = i.next();
 					System.out.println(subject);
 				}
 			}

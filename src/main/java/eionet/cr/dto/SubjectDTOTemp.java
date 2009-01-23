@@ -15,7 +15,7 @@ import eionet.cr.util.URLUtil;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class SubjectDTO extends HashMap<PredicateDTO,Collection<ObjectDTO>>{
+public class SubjectDTOTemp extends HashMap<PredicateDTO,Collection<ObjectDTO>>{
 	
 	/**
 	 */
@@ -36,7 +36,7 @@ public class SubjectDTO extends HashMap<PredicateDTO,Collection<ObjectDTO>>{
 	 * @param uri
 	 * @param anonymous
 	 */
-	public SubjectDTO(String uri, boolean anonymous){
+	public SubjectDTOTemp(String uri, boolean anonymous){
 		super();
 		this.uri = uri;
 		this.anonymous = anonymous;
@@ -76,11 +76,11 @@ public class SubjectDTO extends HashMap<PredicateDTO,Collection<ObjectDTO>>{
 		if (this==other)
 			return true;
 		
-		if (!(other instanceof SubjectDTO))
+		if (!(other instanceof SubjectDTOTemp))
 			return false;
 		
 		
-		String otherUri = ((SubjectDTO)other).getUri();
+		String otherUri = ((SubjectDTOTemp)other).getUri();
 		return getUri()==null ? otherUri==null : getUri().equals(otherUri);
 	}
 

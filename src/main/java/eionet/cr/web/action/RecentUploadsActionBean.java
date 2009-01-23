@@ -199,7 +199,7 @@ public class RecentUploadsActionBean extends SearchResourcesActionBean {
 
 			col = new SearchResultColumn();
 			col.setProperty(Predicates.DC_SUBJECT);
-			col.setTitle("SubjectDTO");
+			col.setTitle("SubjectDTOTemp");
 			col.setSortable(false);
 			list.add(col);
 
@@ -227,7 +227,7 @@ public class RecentUploadsActionBean extends SearchResourcesActionBean {
 
 			col = new SearchResultColumn();
 			col.setProperty(Predicates.DC_SUBJECT);
-			col.setTitle("SubjectDTO");
+			col.setTitle("SubjectDTOTemp");
 			col.setSortable(false);
 			list.add(col);
 
