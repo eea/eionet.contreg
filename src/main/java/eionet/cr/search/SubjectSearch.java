@@ -23,7 +23,7 @@ import eionet.cr.util.sql.SQLUtil;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public abstract class RDFSubjectSearch {
+public abstract class SubjectSearch {
 	
 	/** */
 	protected int pageNumber = 0;

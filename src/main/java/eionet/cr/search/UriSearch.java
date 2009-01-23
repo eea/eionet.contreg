@@ -9,14 +9,14 @@ import eionet.cr.search.util.SearchExpression;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class UriSearch extends RDFSubjectSearch{
+public class UriSearch extends SubjectSearch{
 	
 	/** */
 	private SearchExpression uri;
 
 	/*
 	 * (non-Javadoc)
-	 * @see eionet.cr.search.RDFSubjectSearch#getSubjectSelectSQL(java.util.List)
+	 * @see eionet.cr.search.SubjectSearch#getSubjectSelectSQL(java.util.List)
 	 */
 	protected String getSubjectSelectSQL(List<Object> inParameters) {
 		

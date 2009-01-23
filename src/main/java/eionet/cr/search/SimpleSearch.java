@@ -14,14 +14,14 @@ import eionet.cr.util.sql.SQLUtil;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class SimpleSearch extends RDFSubjectSearch{
+public class SimpleSearch extends SubjectSearch{
 
 	/** */
 	private SearchExpression searchExpression;
 
 	/*
 	 * (non-Javadoc)
-	 * @see eionet.cr.search.RDFSubjectSearch#getSQL(java.util.List)
+	 * @see eionet.cr.search.SubjectSearch#getSQL(java.util.List)
 	 */
 	protected String getSubjectSelectSQL(List<Object> inParameters){
 		
