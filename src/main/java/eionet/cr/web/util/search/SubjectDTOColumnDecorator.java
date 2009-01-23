@@ -18,7 +18,7 @@ import eionet.cr.web.util.JstlFunctions;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class ResourceDTOColumnDecorator implements DisplaytagColumnDecorator{
+public class SubjectDTOColumnDecorator implements DisplaytagColumnDecorator{
 
 	/*
 	 * (non-Javadoc)

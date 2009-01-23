@@ -34,7 +34,6 @@ import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.harvest.util.DedicatedHarvestSourceTypes;
 import eionet.cr.harvest.util.HarvestLog;
-import eionet.cr.harvest.util.RDFResource;
 import eionet.cr.search.Searcher;
 import eionet.cr.util.FileUtil;
 import eionet.cr.util.URLUtil;
@@ -426,34 +425,6 @@ public abstract class Harvest {
 		return file;
 	}
 	
-	/**
-	 * @throws DAOException 
-	 * 
-	 */
-	private void storeDedicatedHarvestSources(Map<String,RDFResource> resources) throws DAOException{
-		
-		if (daoWriter==null || resources==null || resources.size()==0)
-			return;
-		
-		Iterator<RDFResource> iter = resources.values().iterator();
-		while (iter.hasNext()){
-			RDFResource resource = iter.next();
-			String type = resource.getPropertyValue(Predicates.RDF_TYPE);
-			if (type!=null){
-				String dedicatedTypeName = DedicatedHarvestSourceTypes.getInstance().get(type);
-				if (dedicatedTypeName!=null){
-					if (type.equals(Subjects.QA_REPORT_CLASS) || type.equals(Subjects.QAW_RESOURCE_CLASS)){
-						String source = resource.getPropertyValue(Predicates.DC_SOURCE);
-						if (URLUtil.isURL(source))
-							daoWriter.storeDedicatedHarvestSource(source, resource, dedicatedTypeName);
-					}
-					else
-						daoWriter.storeDedicatedHarvestSource(resource.getId(), resource, dedicatedTypeName);
-				}
-			}
-		}
-	}
-
 	/**
 	 * @param daoWriter the daoWriter to set
 	 */

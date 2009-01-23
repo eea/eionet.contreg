@@ -11,7 +11,6 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dto.HarvestMessageDTO;
 import eionet.cr.dto.HarvestSourceDTO;
-import eionet.cr.harvest.util.RDFResource;
 import eionet.cr.util.Util;
 import eionet.cr.web.security.CRUser;
 
@@ -116,30 +115,5 @@ public class HarvestDAOWriter {
 		for (int i=0; i<throwables.size(); i++){
 			writeThrowable(throwables.get(i), type);
 		}
-	}
-	
-	/**
-	 * 
-	 * @param url
-	 * @param name
-	 * @param dedicatedTypeName
-	 * @throws DAOException
-	 */
-	protected void storeDedicatedHarvestSource(String url, RDFResource resource, String dedicatedTypeName) throws DAOException{
-
-		String name = resource.getPropertyValue(Predicates.DC_TITLE);
-		if (name==null || name.length()==0)
-			name = resource.getPropertyValue(Predicates.RDFS_LABEL);
-		if (name==null)
-			name = resource.getId();
-
-		HarvestSourceDTO dto = new HarvestSourceDTO();
-		dto.setUrl(url);
-		dto.setName(name);
-		dto.setType(dedicatedTypeName);
-		dto.setScheduleCron(GeneralConfig.getProperty(
-				GeneralConfig.HARVESTER_DEDICATED_SOURCES_CRON_EXPRESSION, HarvestSourceDTO.DEDICATED_HARVEST_SOURCE_DEFAULT_CRON));
-		
-		DAOFactory.getDAOFactory().getHarvestSourceDAO().addSourceIgnoreDuplicate(dto, CRUser.application.getUserName());
 	}
 }
