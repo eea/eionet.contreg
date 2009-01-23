@@ -40,21 +40,27 @@ public abstract class RDFSubjectSearch {
 	 */
 	public void execute() throws SQLException{
 		
-		List<Object> paramValues = new ArrayList<Object>();
-		String subjectSelectSQL = getSubjectSelectSQL(paramValues);
+		List<Object> inParameters = new ArrayList<Object>();
+		
+		String subjectSelectSQL = getSubjectSelectSQL(inParameters);
 		if (subjectSelectSQL!=null && subjectSelectSQL.length()>0){
 			
 			Connection conn = null;
 			try{
+				conn = getConnection();
+				
 				SubjectHashesReader subjectHashesReader = new SubjectHashesReader();
-				SQLUtil.executeQuery(subjectSelectSQL, paramValues, subjectHashesReader, conn);
+				SQLUtil.executeQuery(subjectSelectSQL, inParameters, subjectHashesReader, conn);
+				
 				if (subjectHashesReader.getResultCount()>0){
-					Integer totalRowCount = MySQLUtil.getTotalRowCount(conn); // TODO - maybe do it without directly pointing to MySQL
 					
-					LinkedHashMap<String, RDFSubject> subjectsMap = subjectHashesReader.getSubjectsMap();
+					Integer totalRowCount = MySQLUtil.getTotalRowCount(conn); // TODO - maybe do it without directly pointing to MySQL
+					LinkedHashMap<String, RDFSubject> subjectsMap = subjectHashesReader.getResultMap();
+					
 					SubjectsDataReader subjectsDataReader = new SubjectsDataReader(subjectsMap);
 					SQLUtil.executeQuery(
 							getSubjectDataSelectSQL(subjectHashesReader.getSubjectHashesCommaSeparated()), subjectsDataReader, conn);
+					
 					this.resultList = subjectsMap.values();
 				}
 			}
@@ -66,10 +72,10 @@ public abstract class RDFSubjectSearch {
 
 	/**
 	 * 
-	 * @param paramValues
+	 * @param inParameters
 	 * @return
 	 */
-	protected abstract String getSubjectSelectSQL(List<Object> paramValues);
+	protected abstract String getSubjectSelectSQL(List<Object> inParameters);
 	
 	/**
 	 * 

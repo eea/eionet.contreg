@@ -67,7 +67,10 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 
 	/** */
 	private boolean clearPreviousContent = false;
-
+	
+	/** */
+	private boolean parsingStarted = false;
+	
 	/**
 	 * 
 	 */
@@ -115,28 +118,50 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	private void statement(AResource subject, AResource predicate,
 							String object, String objectLang, boolean litObject, boolean anonObject){
 
-		if (!predicate.isAnonymous()){ // we ignore statements with anonymous predicates
-			
-			try{
-				parseForUsedNamespaces(predicate);
-				
-				long subjectHash = spoHash(subject.isAnonymous() ? subject.getAnonymousID() : subject.getURI(), subject.isAnonymous());
-				long predicateHash = spoHash(predicate.getURI(), false);
-				if (litObject)
-					object = UnicodeUtils.replaceEntityReferences(object);
-				
-				int i = storeTriple(subjectHash, subject.isAnonymous(), predicateHash, object, objectLang, litObject, anonObject);
-				if (i>0){
-					storeResource(predicate.getURI(), predicateHash);
-					if (!subject.isAnonymous()){
-						storeResource(subject.getURI(), subjectHash);
-					}
-				}
+		try{
+			if (parsingStarted==false){
+				onParsingStarted();
+				parsingStarted = true;
 			}
-			catch (Exception e){
-				throw new LoadException(e.toString(), e);
+			
+			// we ignore statements with anonymous predicates
+			if (predicate.isAnonymous())
+				return;
+
+			// we ignore literal objects with length=0
+			if (litObject && object.length()==0)
+				return;
+
+			parseForUsedNamespaces(predicate);
+			
+			long subjectHash = spoHash(subject.isAnonymous() ? subject.getAnonymousID() : subject.getURI(), subject.isAnonymous());
+			long predicateHash = spoHash(predicate.getURI(), false);
+			if (litObject)
+				object = UnicodeUtils.replaceEntityReferences(object);
+			
+			int i = storeTriple(subjectHash, subject.isAnonymous(), predicateHash, object, objectLang, litObject, anonObject);
+			storeResource(predicate.getURI(), predicateHash);
+			if (!subject.isAnonymous()){
+				storeResource(subject.getURI(), subjectHash);
 			}
 		}
+		catch (Exception e){
+			throw new LoadException(e.toString(), e);
+		}
+	}
+	
+	/**
+	 * @throws SQLException 
+	 * 
+	 */
+	private void onParsingStarted() throws SQLException{
+		
+		// make sure SPO_TEMP and RESOURCE_TEMP are empty, because we do only one harvest at a time
+		// and so any possible leftovers from previous harvest must be deleted)
+		clearTemporaries();
+		
+		// store the hash of the source itself
+		storeResource(sourceUrl, sourceUrlHash);
 	}
 
 	/**
@@ -155,7 +180,7 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 							String object, String objectLang, boolean litObject, boolean anonObject) throws SQLException{
 		
 		if (preparedStatementForTriples==null){
-			prepareForTriples();
+			prepareStatementForTriples();
 			logger.debug("Started storing triples");
 		}
 		
@@ -181,7 +206,7 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	private int storeResource(String uri, long uriHash) throws SQLException{
 
 		if (preparedStatementForResources==null){
-			prepareForResources();
+			prepareStatementForResources();
 			logger.debug("Started storing resources");
 		}
 		
@@ -221,17 +246,11 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	}
 
 	/**
-	 * Does "delete from SPO_TEMP" and then prepares this.preparedStatementForTriples.
 	 * 
 	 * @throws SQLException
 	 */
-	private void prepareForTriples() throws SQLException{
+	private void prepareStatementForTriples() throws SQLException{
 		
-		// make sure SPO_TEMP is empty, let exception be thrown if this does not succeed
-		// (because we do only one harvest at a time, so possible leftovers from previous harvest must be deleted)
-		SQLUtil.executeUpdate("delete from SPO_TEMP", getConnection());
-		
-		// prepare this.preparedStatementForTriples
 		StringBuffer buf = new StringBuffer();
         buf.append("insert into SPO_TEMP (SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ").
         append("ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
@@ -239,17 +258,11 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	}
 
 	/**
-	 * First does "delete from RESOURCE_TEMP" and then prepares this.preparedStatementForResources.
 	 * 
 	 * @throws SQLException 
 	 */
-	private void prepareForResources() throws SQLException{
+	private void prepareStatementForResources() throws SQLException{
 
-		// make sure RESOURCE_TEMP is empty, let exception be thrown if this does not succeed
-		// (because we do only one harvest at a time, so possible leftovers from previous harvest must be deleted)
-		SQLUtil.executeUpdate("delete from RESOURCE_TEMP", getConnection());
-
-		// prepare this.preparedStatementForResources
         preparedStatementForResources = getConnection().prepareStatement("insert ignore into RESOURCE_TEMP (URI, URI_HASH) VALUES (?, ?)");
 	}
 
@@ -281,11 +294,8 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	 */
 	protected void commit() throws SQLException{
 		
-		int i = commitTriples();
-		if (i>0){
-			commitResources();
-			storedTriplesCount = storedTriplesCount + i;
-		}
+		commitTriples();
+		commitResources();
 		
 		clearTemporaries();
 		
@@ -297,7 +307,7 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	 * @throws SQLException 
 	 * 
 	 */
-	private int commitTriples() throws SQLException{
+	private void commitTriples() throws SQLException{
 
 		/* copy triples from SPO_TEMP into SPO */
 
@@ -309,9 +319,8 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 		append(") select distinct SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG, ").
 		append(sourceUrlHash).append(", ").append(genTime).append(" from SPO_TEMP");
 		
-		int committedTriplesCount = SQLUtil.executeUpdate(buf.toString(), getConnection());
-		
-		logger.debug(committedTriplesCount + " triples inserted into SPO");
+		storedTriplesCount = SQLUtil.executeUpdate(buf.toString(), getConnection());
+		logger.debug(storedTriplesCount + " triples inserted into SPO");
 
 		if (clearPreviousContent){
 			
@@ -324,8 +333,6 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 			
 			SQLUtil.executeUpdate(buf.toString(), getConnection());
 		}
-		
-		return committedTriplesCount;
 	}
 
 	/**
@@ -333,7 +340,7 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	 * @return
 	 * @throws SQLException
 	 */
-	private int commitResources() throws SQLException{
+	private void commitResources() throws SQLException{
 		
 		logger.debug("Copying resources from RESOURCE_TEMP into RESOURCE");
 		
@@ -343,8 +350,6 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 		
 		int i = SQLUtil.executeUpdate(buf.toString(), getConnection());
 		logger.debug(i + " resources inserted into RESOURCE");
-		
-		return i;
 	}
 	
 	/**

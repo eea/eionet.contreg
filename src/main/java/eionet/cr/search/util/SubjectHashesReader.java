@@ -14,7 +14,7 @@ import eionet.cr.util.sql.ResultSetBaseReader;
 public class SubjectHashesReader extends ResultSetBaseReader{
 	
 	/** */
-	private LinkedHashMap<String,RDFSubject> subjectsMap = new LinkedHashMap<String,RDFSubject>();
+	private LinkedHashMap<String,RDFSubject> resultMap = new LinkedHashMap<String,RDFSubject>();
 	private StringBuffer subjectHashesCommaSeparated = new StringBuffer();
 	
 	/*
@@ -28,14 +28,14 @@ public class SubjectHashesReader extends ResultSetBaseReader{
 			subjectHashesCommaSeparated.append(",");
 		}
 		subjectHashesCommaSeparated.append(subjectHash);
-		subjectsMap.put(subjectHash, null);
+		resultMap.put(subjectHash, null);
 	}
 
 	/**
-	 * @return the subjectsMap
+	 * @return the resultMap
 	 */
-	public LinkedHashMap<String,RDFSubject> getSubjectsMap(){
-		return subjectsMap;
+	public LinkedHashMap<String,RDFSubject> getResultMap(){
+		return resultMap;
 	}
 
 	/**
@@ -50,6 +50,6 @@ public class SubjectHashesReader extends ResultSetBaseReader{
 	 * @return
 	 */
 	public int getResultCount(){
-		return subjectsMap.size();
+		return resultMap.size();
 	}
 }

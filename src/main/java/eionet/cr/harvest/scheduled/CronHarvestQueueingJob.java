@@ -14,6 +14,7 @@ import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.SchedulerException;
+import org.quartz.StatefulJob;
 
 import eionet.cr.common.CRException;
 import eionet.cr.common.JobScheduler;
@@ -28,7 +29,7 @@ import eionet.cr.util.sql.ConnectionUtil;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class CronHarvestQueueingJob implements Job, ServletContextListener{
+public class CronHarvestQueueingJob implements  StatefulJob, ServletContextListener{
 	
 	/** */
 	private static Log logger = LogFactory.getLog(CronHarvestQueueingJob.class);

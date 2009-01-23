@@ -53,14 +53,6 @@ public class RDFSubject extends HashMap<RDFPredicate,Collection<RDFObject>>{
 
 	/*
 	 * (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	public String toString(){
-		return getUri();
-	}
-
-	/*
-	 * (non-Javadoc)
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	public boolean equals(Object other){
