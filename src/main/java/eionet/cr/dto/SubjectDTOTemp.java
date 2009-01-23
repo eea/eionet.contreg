@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
-import eionet.cr.dto.ResourceDTO.SpecialKeys;
+import eionet.cr.dto.SubjectDTO.SpecialKeys;
 import eionet.cr.util.URLUtil;
 
 /**

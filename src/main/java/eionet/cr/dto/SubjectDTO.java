@@ -17,7 +17,7 @@ import eionet.cr.util.URLUtil;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class ResourceDTO extends HashMap<String,List<String>>{
+public class SubjectDTO extends HashMap<String,List<String>>{
 	
 	/**
 	 */
@@ -32,7 +32,7 @@ public class ResourceDTO extends HashMap<String,List<String>>{
 	 * 
 	 * @param luceneDocument
 	 */
-	public ResourceDTO(Document luceneDocument){
+	public SubjectDTO(Document luceneDocument){
 		
 		super();
 		

@@ -5,17 +5,17 @@ import java.util.List;
 
 import org.apache.lucene.document.Document;
 
-import eionet.cr.dto.ResourceDTO;
+import eionet.cr.dto.SubjectDTO;
 
 public class ResourceDTOCollector extends HitsCollector{
 
 	/** */
-	private List<ResourceDTO> resultList;
+	private List<SubjectDTO> resultList;
 
 	/**
 	 * @return the resultList
 	 */
-	public List<ResourceDTO> getResultList() {
+	public List<SubjectDTO> getResultList() {
 		return resultList;
 	}
 
@@ -29,8 +29,8 @@ public class ResourceDTOCollector extends HitsCollector{
 			return;
 		
 		if (resultList==null)
-			resultList = new ArrayList<ResourceDTO>();
+			resultList = new ArrayList<SubjectDTO>();
 		
-		resultList.add(new ResourceDTO(document));
+		resultList.add(new SubjectDTO(document));
 	}
 }

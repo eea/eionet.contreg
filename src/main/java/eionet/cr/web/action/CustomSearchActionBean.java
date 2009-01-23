@@ -16,7 +16,7 @@ import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import eionet.cr.common.Predicates;
-import eionet.cr.dto.ResourceDTO;
+import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.Searcher;
 import eionet.cr.search.util.ResourceDTOCollector;
@@ -94,8 +94,8 @@ public class CustomSearchActionBean extends SearchResourcesActionBean{
 	 * (non-Javadoc)
 	 * @see eionet.cr.web.action.SearchResourcesActionBean#getResultList()
 	 */
-	public List<ResourceDTO> getResultList() {
-		return (List<ResourceDTO>)getContext().getRequest().getSession().getAttribute(RESULT_LIST_SESSION_ATTR_NAME);
+	public List<SubjectDTO> getResultList() {
+		return (List<SubjectDTO>)getContext().getRequest().getSession().getAttribute(RESULT_LIST_SESSION_ATTR_NAME);
 	}
 	
 	/**

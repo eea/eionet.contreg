@@ -15,7 +15,7 @@ import org.apache.commons.logging.LogFactory;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
-import eionet.cr.dto.ResourceDTO;
+import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.Searcher;
 import eionet.cr.util.Util;
@@ -142,7 +142,7 @@ public class RecentUploadsActionBean extends SearchResourcesActionBean {
 			// columns for deliveries
 			List<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
 			SearchResultColumn col = new SearchResultColumn();
-			col.setProperty(ResourceDTO.SpecialKeys.RESOURCE_TITLE);
+			col.setProperty(SubjectDTO.SpecialKeys.RESOURCE_TITLE);
 			col.setTitle("Title");
 			col.setSortable(false);
 			list.add(col);
@@ -170,7 +170,7 @@ public class RecentUploadsActionBean extends SearchResourcesActionBean {
 			// columns for obligations
 			list = new ArrayList<SearchResultColumn>();
 			col = new SearchResultColumn();
-			col.setProperty(ResourceDTO.SpecialKeys.RESOURCE_TITLE);
+			col.setProperty(SubjectDTO.SpecialKeys.RESOURCE_TITLE);
 			col.setTitle("Title");
 			col.setSortable(false);
 			list.add(col);
@@ -192,7 +192,7 @@ public class RecentUploadsActionBean extends SearchResourcesActionBean {
 			// columns for full reports
 			list = new ArrayList<SearchResultColumn>();
 			col = new SearchResultColumn();
-			col.setProperty(ResourceDTO.SpecialKeys.RESOURCE_TITLE);
+			col.setProperty(SubjectDTO.SpecialKeys.RESOURCE_TITLE);
 			col.setTitle("Title");
 			col.setSortable(false);
 			list.add(col);
@@ -220,7 +220,7 @@ public class RecentUploadsActionBean extends SearchResourcesActionBean {
 			// columns for news releases
 			list = new ArrayList<SearchResultColumn>();
 			col = new SearchResultColumn();
-			col.setProperty(ResourceDTO.SpecialKeys.RESOURCE_TITLE);
+			col.setProperty(SubjectDTO.SpecialKeys.RESOURCE_TITLE);
 			col.setTitle("Title");
 			col.setSortable(false);
 			list.add(col);

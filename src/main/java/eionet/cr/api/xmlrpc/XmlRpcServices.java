@@ -16,7 +16,7 @@ import org.apache.commons.logging.LogFactory;
 import eionet.cr.common.CRException;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
-import eionet.cr.dto.ResourceDTO;
+import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.scheduled.HarvestQueue;
 import eionet.cr.search.Searcher;
 import eionet.cr.search.util.EntriesCollector;
@@ -83,23 +83,23 @@ public class XmlRpcServices implements Services{
 			
 			ResourceDTOCollector collector = new ResourceDTOCollector();
 			Searcher.customSearch(criteria, false, collector);
-			List<ResourceDTO> list = collector.getResultList();
+			List<SubjectDTO> list = collector.getResultList();
 			
 			if (list!=null){
 				for (int i=0; i<list.size(); i++){
 					
-					ResourceDTO resourceDTO = list.get(i);
+					SubjectDTO subjectDTO = list.get(i);
 					
 					DataflowResultDto resultDTO = new DataflowResultDto();
-					resultDTO.setTitle(resourceDTO.getTitle());
+					resultDTO.setTitle(subjectDTO.getTitle());
 					resultDTO.setDataflow(
-							StringUtils.toArray(resourceDTO.getDistinctLiteralValues(Predicates.ROD_OBLIGATION_PROPERTY)));
+							StringUtils.toArray(subjectDTO.getDistinctLiteralValues(Predicates.ROD_OBLIGATION_PROPERTY)));
 					resultDTO.setLocality(
-							StringUtils.toArray(resourceDTO.getDistinctLiteralValues(Predicates.ROD_LOCALITY_PROPERTY)));
+							StringUtils.toArray(subjectDTO.getDistinctLiteralValues(Predicates.ROD_LOCALITY_PROPERTY)));
 					resultDTO.setType(
-							StringUtils.toArray(resourceDTO.getDistinctLiteralValues(Predicates.RDF_TYPE)));
-					resultDTO.setResource(resourceDTO.getUri());
-					resultDTO.setDate(resourceDTO.getValue(Predicates.DC_DATE));
+							StringUtils.toArray(subjectDTO.getDistinctLiteralValues(Predicates.RDF_TYPE)));
+					resultDTO.setResource(subjectDTO.getUri());
+					resultDTO.setDate(subjectDTO.getValue(Predicates.DC_DATE));
 					
 					result.add(resultDTO);
 				}

@@ -5,7 +5,7 @@ import java.util.List;
 
 import net.sourceforge.stripes.action.Resolution;
 import eionet.cr.common.Predicates;
-import eionet.cr.dto.ResourceDTO;
+import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.util.HitsCollector;
 import eionet.cr.web.util.search.SearchResultColumn;
@@ -18,7 +18,7 @@ import eionet.cr.web.util.search.SearchResultColumn;
 public abstract class SearchResourcesActionBean extends AbstractCRActionBean{
 
 	/** */
-	protected List<ResourceDTO> resultList;
+	protected List<SubjectDTO> resultList;
 	
 	/**
 	 * 
@@ -35,14 +35,14 @@ public abstract class SearchResourcesActionBean extends AbstractCRActionBean{
 	/**
 	 * @return the resultList
 	 */
-	public List<ResourceDTO> getResultList() {
+	public List<SubjectDTO> getResultList() {
 		return resultList;
 	}
 
 	/**
 	 * @param resultList the resultList to set
 	 */
-	public void setResultList(List<ResourceDTO> resultList) {
+	public void setResultList(List<SubjectDTO> resultList) {
 		this.resultList = resultList;
 	}
 
@@ -69,7 +69,7 @@ public abstract class SearchResourcesActionBean extends AbstractCRActionBean{
 		list.add(col);
 		
 		col = new SearchResultColumn();
-		col.setProperty(ResourceDTO.SpecialKeys.RESOURCE_TITLE);
+		col.setProperty(SubjectDTO.SpecialKeys.RESOURCE_TITLE);
 		col.setTitle("Title");
 		col.setSortable(true);
 		list.add(col);

@@ -8,7 +8,7 @@ import java.util.List;
 
 import eionet.cr.common.EncodingSchemes;
 import eionet.cr.common.Predicates;
-import eionet.cr.dto.ResourceDTO;
+import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.URLUtil;
 
 /**
@@ -25,7 +25,7 @@ public class FactsheetUtil {
 	 * 
 	 * @return
 	 */
-	public static List<ResourcePropertyDTO> getPropertiesForFactsheet(ResourceDTO resource){
+	public static List<ResourcePropertyDTO> getPropertiesForFactsheet(SubjectDTO resource){
 	
 		if (resource==null)
 			return null;

@@ -37,7 +37,7 @@ import eionet.cr.common.Predicates;
 import eionet.cr.common.SubProperties;
 import eionet.cr.common.Subjects;
 import eionet.cr.config.GeneralConfig;
-import eionet.cr.dto.ResourceDTO;
+import eionet.cr.dto.SubjectDTO;
 import eionet.cr.dto.RodInstrumentDTO;
 import eionet.cr.dto.RodObligationDTO;
 import eionet.cr.search.util.HitsCollector;
@@ -77,7 +77,7 @@ public class Searcher {
 	 * @throws ParseException
 	 * @throws IOException
 	 */
-	public static List<ResourceDTO> simpleSearch(String expression) throws SearchException{
+	public static List<SubjectDTO> simpleSearch(String expression) throws SearchException{
 		
 		if (expression==null || expression.trim().length()==0)
 			return null;
@@ -247,7 +247,7 @@ public class Searcher {
 	 * @return
 	 * @throws SearchException 
 	 */
-	public static List<ResourceDTO> dataflowSearch(String dataflow, String locality, String year) throws SearchException{
+	public static List<SubjectDTO> dataflowSearch(String dataflow, String locality, String year) throws SearchException{
 		
 		List<Query> queries = new ArrayList<Query>();
 		queries.add(new TermQuery(new Term(Predicates.RDF_TYPE, Subjects.ROD_DELIVERY_CLASS)));
@@ -430,7 +430,7 @@ public class Searcher {
 	 * @return
 	 * @throws SearchException 
 	 */
-	public static ResourceDTO getResourceByUri(String uri) throws SearchException{
+	public static SubjectDTO getResourceByUri(String uri) throws SearchException{
 		
 		if (uri==null || uri.trim().length()==0)
 			return null;
@@ -442,7 +442,7 @@ public class Searcher {
 			if (hits==null || hits.length()==0)
 				return null;
 			else
-				return new ResourceDTO(hits.doc(0));
+				return new SubjectDTO(hits.doc(0));
 		}
 		catch (Exception e){
 			throw new SearchException(e.toString(), e);
@@ -462,7 +462,7 @@ public class Searcher {
 	 * @return
 	 * @throws SearchException 
 	 */
-	public static List<ResourceDTO> getRecentByRdfType(String rdfType, int maxResults) throws SearchException{
+	public static List<SubjectDTO> getRecentByRdfType(String rdfType, int maxResults) throws SearchException{
 		
 		if (rdfType==null || rdfType.trim().length()==0)
 			return null;

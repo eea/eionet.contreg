@@ -12,7 +12,7 @@ import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import eionet.cr.common.Predicates;
-import eionet.cr.dto.ResourceDTO;
+import eionet.cr.dto.SubjectDTO;
 import eionet.cr.dto.RodInstrumentDTO;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.Searcher;
@@ -156,7 +156,7 @@ public class DataflowSearchActionBean extends SearchResourcesActionBean{
 		ArrayList<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
 		
 		SearchResultColumn col = new SearchResultColumn();
-		col.setProperty(ResourceDTO.SpecialKeys.RESOURCE_TITLE);
+		col.setProperty(SubjectDTO.SpecialKeys.RESOURCE_TITLE);
 		col.setTitle("Title");
 		col.setSortable(true);
 		list.add(col);

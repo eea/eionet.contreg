@@ -9,7 +9,7 @@ import org.displaytag.decorator.DisplaytagColumnDecorator;
 import org.displaytag.exception.DecoratorException;
 import org.displaytag.properties.MediaTypeEnum;
 
-import eionet.cr.dto.ResourceDTO;
+import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Util;
 import eionet.cr.web.util.JstlFunctions;
 
@@ -29,7 +29,7 @@ public class ResourceDTOColumnDecorator implements DisplaytagColumnDecorator{
 		if (columnValue==null || !(columnValue instanceof java.util.List))
 			return "";
 		else{
-			List<String> list = ResourceDTO.asDistinctLiteralValues((java.util.List)columnValue);
+			List<String> list = SubjectDTO.asDistinctLiteralValues((java.util.List)columnValue);
 			String s = Util.toCsvString(list);
 			return JstlFunctions.cutAtFirstLongToken(s, 50);
 		}

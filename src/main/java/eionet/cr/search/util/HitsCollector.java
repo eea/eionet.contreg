@@ -8,7 +8,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.search.Hits;
 
-import eionet.cr.dto.ResourceDTO;
+import eionet.cr.dto.SubjectDTO;
 
 /**
  * 
@@ -52,7 +52,7 @@ public abstract class HitsCollector {
 	 * @throws CorruptIndexException
 	 * @throws IOException
 	 */
-	public static List<ResourceDTO> collectResourceDTOs(Hits hits) throws CorruptIndexException, IOException{
+	public static List<SubjectDTO> collectResourceDTOs(Hits hits) throws CorruptIndexException, IOException{
 		return collectResourceDTOs(hits, DEFAULT_MAX_HITS);
 	}
 	
@@ -64,7 +64,7 @@ public abstract class HitsCollector {
 	 * @throws CorruptIndexException
 	 * @throws IOException
 	 */
-	public static List<ResourceDTO> collectResourceDTOs(Hits hits, int maxHits) throws CorruptIndexException, IOException{
+	public static List<SubjectDTO> collectResourceDTOs(Hits hits, int maxHits) throws CorruptIndexException, IOException{
 		ResourceDTOCollector collector = new ResourceDTOCollector();
 		collectHits(hits, maxHits, collector);
 		return collector.getResultList();
