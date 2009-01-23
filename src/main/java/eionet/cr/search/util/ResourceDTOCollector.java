@@ -31,6 +31,6 @@ public class ResourceDTOCollector extends HitsCollector{
 		if (resultList==null)
 			resultList = new ArrayList<SubjectDTO>();
 		
-		resultList.add(new SubjectDTO(document));
+		resultList.add(new SubjectDTO("", false)); // resultList.add(new SubjectDTO(document));
 	}
 }

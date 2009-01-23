@@ -442,7 +442,7 @@ public class Searcher {
 			if (hits==null || hits.length()==0)
 				return null;
 			else
-				return new SubjectDTO(hits.doc(0));
+				return new SubjectDTO("", false); //return new SubjectDTO(hits.doc(0));
 		}
 		catch (Exception e){
 			throw new SearchException(e.toString(), e);

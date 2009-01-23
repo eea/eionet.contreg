@@ -11,7 +11,7 @@ import java.util.List;
 
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.PredicateDTO;
-import eionet.cr.dto.SubjectDTOTemp;
+import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.sql.ResultSetBaseReader;
 
@@ -23,10 +23,10 @@ import eionet.cr.util.sql.ResultSetBaseReader;
 public class SubjectsDataReader extends ResultSetBaseReader{
 
 	/** */
-	private LinkedHashMap<String,SubjectDTOTemp> subjectsMap;
+	private LinkedHashMap<String,SubjectDTO> subjectsMap;
 	
 	/** */
-	private SubjectDTOTemp currentSubject = null;
+	private SubjectDTO currentSubject = null;
 	private String currentPredicate = null;
 	private Collection<ObjectDTO> currentObjects = null;
 	
@@ -34,7 +34,7 @@ public class SubjectsDataReader extends ResultSetBaseReader{
 	 * 
 	 * @param subjectsMap
 	 */
-	public SubjectsDataReader(LinkedHashMap<String,SubjectDTOTemp> subjectsMap){
+	public SubjectsDataReader(LinkedHashMap<String,SubjectDTO> subjectsMap){
 		this.subjectsMap = subjectsMap;
 	}
 	
@@ -48,7 +48,7 @@ public class SubjectsDataReader extends ResultSetBaseReader{
 		boolean newSubject = currentSubject==null || !currentSubject.getUri().equals(subjectUri);
 		if (newSubject){
 			String subjectHash = rs.getString("SUBJECT");
-			currentSubject = new SubjectDTOTemp(subjectUri, YesNoBoolean.parse(rs.getString("ANON_SUBJ")));
+			currentSubject = new SubjectDTO(subjectUri, YesNoBoolean.parse(rs.getString("ANON_SUBJ")));
 			subjectsMap.put(subjectHash, currentSubject);
 		}
 

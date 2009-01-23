@@ -1,6 +1,7 @@
 package eionet.cr.web.util.factsheet;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -8,6 +9,8 @@ import java.util.List;
 
 import eionet.cr.common.EncodingSchemes;
 import eionet.cr.common.Predicates;
+import eionet.cr.dto.ObjectDTO;
+import eionet.cr.dto.PredicateDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.URLUtil;
 
@@ -25,30 +28,30 @@ public class FactsheetUtil {
 	 * 
 	 * @return
 	 */
-	public static List<ResourcePropertyDTO> getPropertiesForFactsheet(SubjectDTO resource){
+	public static List<ResourcePropertyDTO> getPropertiesForFactsheet(SubjectDTO subject){
 	
-		if (resource==null)
+		if (subject==null)
 			return null;
 		
 		List<ResourcePropertyDTO> result = new ArrayList<ResourcePropertyDTO>();
-		if (resource.isEmpty())
+		if (subject.isEmpty())
 			return result;
 		
 		List<ResourcePropertyDTO> propertiesWithLabels = new ArrayList<ResourcePropertyDTO>();
 		List<ResourcePropertyDTO> propertiesWithoutLabels = new ArrayList<ResourcePropertyDTO>();
 		
-		Iterator<String> keysIterator = resource.keySet().iterator();
-		while (keysIterator.hasNext()){
-			String propertyUri = keysIterator.next();
-			if (!skipFromFactsheet(propertyUri)){
+		Iterator<PredicateDTO> predicatesIterator = subject.keySet().iterator();
+		while (predicatesIterator.hasNext()){
+			String predicateUri = predicatesIterator.next().toString();
+			if (!skipFromFactsheet(predicateUri)){
 				
-				String propertyLabel = EncodingSchemes.getLabel(propertyUri);
+				String propertyLabel = EncodingSchemes.getLabel(predicateUri);
 				
 				ResourcePropertyDTO propDTO = new ResourcePropertyDTO();
-				propDTO.setUri(propertyUri);
-				propDTO.setLabel(propertyLabel != null ? propertyLabel : propertyUri);
+				propDTO.setUri(predicateUri);
+				propDTO.setLabel(propertyLabel != null ? propertyLabel : predicateUri);
 
-				List<String> values = getDistinct(resource.get(propertyUri));
+				List<String> values = getDistinct(subject.get(predicateUri));
 				for (int i=0; values!=null && i<values.size(); i++){
 					
 					String value = values.get(i);
@@ -90,18 +93,26 @@ public class FactsheetUtil {
 
 	/**
 	 * 
-	 * @param propertyValues
+	 * @param objects
 	 * @return
 	 */
-	private static List<String> getDistinct(List<String> propertyValues){
+	private static List<String> getDistinct(Collection<ObjectDTO> objectsCollection){
 		
-		if (propertyValues==null || propertyValues.size()==0)
-			return propertyValues;
+		if (objectsCollection==null)
+			return null;
+
+		ArrayList<String> objects = new ArrayList<String>();
+		for (Iterator<ObjectDTO> i = objectsCollection.iterator(); i.hasNext();){
+			objects.add(i.next().toString());
+		}
 		
-		HashSet<String> hashSet = new HashSet<String>(propertyValues);
-		for (int i=0; i<propertyValues.size(); i++){
-			if (URLUtil.isURL(propertyValues.get(i))){
-				String label = EncodingSchemes.getLabel(propertyValues.get(i));
+		if (objects.size()==0)
+			return objects;
+		
+		HashSet<String> hashSet = new HashSet<String>(objects);
+		for (int i=0; i<objects.size(); i++){
+			if (URLUtil.isURL(objects.get(i))){
+				String label = EncodingSchemes.getLabel(objects.get(i));
 				if (label!=null && hashSet.contains(label))
 					hashSet.remove(label);
 			}

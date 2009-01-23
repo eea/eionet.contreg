@@ -1,15 +1,12 @@
 package eionet.cr.dto;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
-
-import eionet.cr.common.Md5Map;
-import eionet.cr.common.Predicates;
 import eionet.cr.util.URLUtil;
 
 /**
@@ -17,7 +14,7 @@ import eionet.cr.util.URLUtil;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class SubjectDTO extends HashMap<String,List<String>>{
+public class SubjectDTO extends HashMap<PredicateDTO,Collection<ObjectDTO>>{
 	
 	/**
 	 */
@@ -27,82 +24,30 @@ public class SubjectDTO extends HashMap<String,List<String>>{
 		public static final String RESOURCE_URL = "resourceUrl";
 		public static final String RESOURCE_TITLE = "resourceTitle";
 	}
+
+	
+	/** */
+	private String uri;
+	private boolean anonymous;
 	
 	/**
 	 * 
-	 * @param luceneDocument
+	 * @param uri
+	 * @param anonymous
 	 */
-	public SubjectDTO(Document luceneDocument){
-		
+	public SubjectDTO(String uri, boolean anonymous){
 		super();
-		
-		if (luceneDocument==null)
-			return;
-		
-		List fields = luceneDocument.getFields();
-		if (fields!=null && !fields.isEmpty()){
-			for (int i=0; i<fields.size(); i++){
-				Field field = (Field)fields.get(i);
-				if (field!=null){
-					String fieldName = new String(field.name());
-					List<String> values = super.get(fieldName);
-					if (values==null){
-						values = new ArrayList<String>();
-						values.add(field.stringValue());
-						super.put(fieldName, values);
-					}
-					else if (!values.contains(field.stringValue()))
-						values.add(field.stringValue());
-				}
-			}
-		}
+		this.uri = uri;
+		this.anonymous = anonymous;
 	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see java.util.HashMap#get(java.lang.Object)
-	 */
-	public List<String> get(Object keyObject){
-		
-		List<String> result = null;
-		if (keyObject!=null){
-			
-			String key = keyObject.toString();
-			if (Md5Map.hasKey(key))
-				key = Md5Map.getValue(key);
-			
-			if (key.equals(SpecialKeys.RESOURCE_URI)){
-				result = super.get(Predicates.DOC_ID);
-			}
-			else if (key.equals(SpecialKeys.RESOURCE_TITLE)){
-				result = super.get(Predicates.DC_TITLE);
-				if (deepEmpty(result))
-					result = super.get(Predicates.RDFS_LABEL);
-			}
-			else if (key.equals(SpecialKeys.RESOURCE_URL)){
-				result = super.get(Predicates.DOC_ID);
-				if (result==null || result.isEmpty() || !URLUtil.isURL(result.get(0))){
-					result = super.get(Predicates.DC_IDENTIFIER);
-					if (result!=null && !result.isEmpty() && !URLUtil.isURL(result.get(0)))
-						result = null;
-				}
-			}
-			else
-				result = super.get(key);
-		}
-		
-		return result;
-	}
-	
+
 	/**
 	 * 
-	 * @param key
+	 * @param s
 	 * @return
 	 */
-	public String getValue(String key){
-		
-		List<String> values = get(key);
-		return values!=null && values.size()>0 ? values.get(0) : null;
+	public Collection<ObjectDTO> get(String s){
+		return super.get(new PredicateDTO(s));
 	}
 
 	/**
@@ -110,34 +55,57 @@ public class SubjectDTO extends HashMap<String,List<String>>{
 	 * @return
 	 */
 	public String getUri(){
-		return getValue(Predicates.DOC_ID);
+		return uri;
 	}
-	
+
 	/**
 	 * 
 	 * @return
 	 */
-	public String getUrl(){
-		return getValue(SpecialKeys.RESOURCE_URL);
+	public boolean isAnonymous(){
+		return anonymous;
 	}
-	
-	/**
-	 * 
-	 * @return
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
-	public String getTitle(){
-		return getValue(SpecialKeys.RESOURCE_TITLE);
+	public boolean equals(Object other){
+		
+		if (this==other)
+			return true;
+		
+		if (!(other instanceof SubjectDTO))
+			return false;
+		
+		
+		String otherUri = ((SubjectDTO)other).getUri();
+		return getUri()==null ? otherUri==null : getUri().equals(otherUri);
 	}
-	
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	public int hashCode(){
+
+		return getUri()==null ? 0 : getUri().hashCode();
+	}
+
 	/**
 	 * 
 	 * @param key
 	 * @return
 	 */
 	public List<String> getDistinctLiteralValues(String key){
-		return asDistinctLiteralValues(get(key));
+		
+		Collection<ObjectDTO> coll = get(key);
+		if (coll==null)
+			return null;
+		else
+			return asDistinctLiteralValues(new ArrayList<ObjectDTO>(coll));
 	}
-	
+
 	/**
 	 * 
 	 * @param list
@@ -165,20 +133,28 @@ public class SubjectDTO extends HashMap<String,List<String>>{
 
 	/**
 	 * 
-	 * @param list
 	 * @return
 	 */
-	private static boolean deepEmpty(List<String> list){
+	public String getUrl(){
+		return getValue(SpecialKeys.RESOURCE_URL);
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public String getTitle(){
+		return getValue(SpecialKeys.RESOURCE_TITLE);
+	}
+
+	/**
+	 * 
+	 * @param key
+	 * @return
+	 */
+	public String getValue(String key){
 		
-		if (list==null || list.isEmpty())
-			return true;
-		
-		for (int i=0; i<list.size(); i++){
-			String s = list.get(i);
-			if (s!=null && s.trim().length()>0)
-				return false;
-		}
-		
-		return true;
+		Collection<ObjectDTO> values = get(key);
+		return values!=null && values.size()>0 ? values.iterator().next().toString() : null;
 	}
 }
