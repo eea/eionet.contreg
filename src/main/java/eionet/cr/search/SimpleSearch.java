@@ -6,6 +6,7 @@ import java.util.List;
 
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.util.SearchExpression;
+import eionet.cr.util.Hashes;
 import eionet.cr.util.sql.ConnectionUtil;
 import eionet.cr.util.sql.SQLUtil;
 
@@ -18,6 +19,22 @@ public class SimpleSearch extends SubjectSearch{
 
 	/** */
 	private SearchExpression searchExpression;
+	
+	/**
+	 * 
+	 * @param searchExpression
+	 */
+	public SimpleSearch(SearchExpression searchExpression){
+		this.searchExpression = searchExpression;
+	}
+
+	/**
+	 * 
+	 * @param str
+	 */
+	public SimpleSearch(String searchExpression){
+		this(new SearchExpression(searchExpression));
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -31,7 +48,7 @@ public class SimpleSearch extends SubjectSearch{
 		StringBuffer sqlBuf = new StringBuffer("select sql_calc_found_rows distinct SPO.SUBJECT from SPO ");
 		if (sortPredicate!=null){
 			sqlBuf.append("left join SPO as ORDERING on (SPO.SUBJECT=ORDERING.SUBJECT and ORDERING.PREDICATE=?) ");
-			inParameters.add(Integer.valueOf(sortPredicate));
+			inParameters.add(Long.valueOf(Hashes.spoHash(sortPredicate)));
 		}
 		
 		if (searchExpression.isExactPhrase())
@@ -58,7 +75,7 @@ public class SimpleSearch extends SubjectSearch{
 	/**
 	 * @param searchExpression the searchExpression to set
 	 */
-	public void setSearchString(SearchExpression searchExpression) {
+	public void setSearchExpression(SearchExpression searchExpression) {
 		this.searchExpression = searchExpression;
 	}
 
@@ -66,7 +83,7 @@ public class SimpleSearch extends SubjectSearch{
 	 * 
 	 * @param string
 	 */
-	public void setSearchString(String string) {
+	public void setSearchExpression(String string) {
 		this.searchExpression = new SearchExpression(string);
 	}
 
@@ -77,9 +94,8 @@ public class SimpleSearch extends SubjectSearch{
 	public static void main(String[] args){
 		
 		ConnectionUtil.setReturnSimpleConnection(true);
-		SimpleSearch simpleSearch = new SimpleSearch();
+		SimpleSearch simpleSearch = new SimpleSearch("soil");
 		try{
-			simpleSearch.setSearchString("soil");
 			simpleSearch.execute();
 			Collection<SubjectDTO> coll = simpleSearch.getResultList();
 			

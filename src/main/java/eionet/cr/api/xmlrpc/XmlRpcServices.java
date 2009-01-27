@@ -2,6 +2,7 @@ package eionet.cr.api.xmlrpc;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -16,12 +17,12 @@ import org.apache.commons.logging.LogFactory;
 import eionet.cr.common.CRException;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
+import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.scheduled.HarvestQueue;
 import eionet.cr.search.Searcher;
 import eionet.cr.search.util.EntriesCollector;
 import eionet.cr.search.util.SubjectDTOCollector;
-import eionet.cr.util.StringUtils;
 import eionet.cr.util.Util;
 import eionet.qawcommons.DataflowResultDto;
 
@@ -92,14 +93,11 @@ public class XmlRpcServices implements Services{
 					
 					DataflowResultDto resultDTO = new DataflowResultDto();
 					resultDTO.setTitle(subjectDTO.getTitle());
-					resultDTO.setDataflow(
-							StringUtils.toArray(subjectDTO.getDistinctLiteralValues(Predicates.ROD_OBLIGATION_PROPERTY)));
-					resultDTO.setLocality(
-							StringUtils.toArray(subjectDTO.getDistinctLiteralValues(Predicates.ROD_LOCALITY_PROPERTY)));
-					resultDTO.setType(
-							StringUtils.toArray(subjectDTO.getDistinctLiteralValues(Predicates.RDF_TYPE)));
+					resultDTO.setDataflow(subjectDTO.getDistinctLiteralObjects(Predicates.ROD_OBLIGATION_PROPERTY));
+					resultDTO.setLocality(subjectDTO.getDistinctLiteralObjects(Predicates.ROD_LOCALITY_PROPERTY));
+					resultDTO.setType(subjectDTO.getDistinctLiteralObjects(Predicates.RDF_TYPE));
 					resultDTO.setResource(subjectDTO.getUri());
-					resultDTO.setDate(subjectDTO.getValue(Predicates.DC_DATE));
+					resultDTO.setDate(subjectDTO.getObject(Predicates.DC_DATE).getValue());
 					
 					result.add(resultDTO);
 				}

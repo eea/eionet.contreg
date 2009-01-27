@@ -27,7 +27,7 @@ import eionet.cr.web.util.search.SearchResultColumn;
  *
  */
 @UrlBinding("/recentUploads.action")
-public class RecentUploadsActionBean extends SearchResourcesActionBean {
+public class RecentUploadsActionBean extends SubjectSearchActionBean {
 	
 	/** */
 	public static final int MAX_RESULTS = 20;
@@ -142,7 +142,7 @@ public class RecentUploadsActionBean extends SearchResourcesActionBean {
 			// columns for deliveries
 			List<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
 			SearchResultColumn col = new SearchResultColumn();
-			col.setProperty(SubjectDTO.SpecialKeys.RESOURCE_TITLE);
+			col.setProperty(Predicates.RDFS_LABEL);
 			col.setTitle("Title");
 			col.setSortable(false);
 			list.add(col);
@@ -170,7 +170,7 @@ public class RecentUploadsActionBean extends SearchResourcesActionBean {
 			// columns for obligations
 			list = new ArrayList<SearchResultColumn>();
 			col = new SearchResultColumn();
-			col.setProperty(SubjectDTO.SpecialKeys.RESOURCE_TITLE);
+			col.setProperty(Predicates.RDFS_LABEL);
 			col.setTitle("Title");
 			col.setSortable(false);
 			list.add(col);
@@ -192,7 +192,7 @@ public class RecentUploadsActionBean extends SearchResourcesActionBean {
 			// columns for full reports
 			list = new ArrayList<SearchResultColumn>();
 			col = new SearchResultColumn();
-			col.setProperty(SubjectDTO.SpecialKeys.RESOURCE_TITLE);
+			col.setProperty(Predicates.RDFS_LABEL);
 			col.setTitle("Title");
 			col.setSortable(false);
 			list.add(col);
@@ -220,7 +220,7 @@ public class RecentUploadsActionBean extends SearchResourcesActionBean {
 			// columns for news releases
 			list = new ArrayList<SearchResultColumn>();
 			col = new SearchResultColumn();
-			col.setProperty(SubjectDTO.SpecialKeys.RESOURCE_TITLE);
+			col.setProperty(Predicates.RDFS_LABEL);
 			col.setTitle("Title");
 			col.setSortable(false);
 			list.add(col);
@@ -253,7 +253,7 @@ public class RecentUploadsActionBean extends SearchResourcesActionBean {
 
 	/*
 	 * (non-Javadoc)
-	 * @see eionet.cr.web.action.SearchResourcesActionBean#getColumns()
+	 * @see eionet.cr.web.action.SubjectSearchActionBean#getColumns()
 	 */
 	public List<SearchResultColumn> getColumns(){
 		

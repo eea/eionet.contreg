@@ -1,6 +1,9 @@
 package eionet.cr.web.util.search;
 
 
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import javax.servlet.jsp.PageContext;
@@ -9,6 +12,7 @@ import org.displaytag.decorator.DisplaytagColumnDecorator;
 import org.displaytag.exception.DecoratorException;
 import org.displaytag.properties.MediaTypeEnum;
 
+import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Util;
 import eionet.cr.web.util.JstlFunctions;
@@ -26,12 +30,52 @@ public class SubjectDTOColumnDecorator implements DisplaytagColumnDecorator{
 	 */
 	public Object decorate(Object columnValue, PageContext pageContext, MediaTypeEnum media) throws DecoratorException {
 		
-		if (columnValue==null || !(columnValue instanceof java.util.List))
+		if (columnValue==null)
 			return "";
-		else{
-			List<String> list = SubjectDTO.asDistinctLiteralValues((java.util.List)columnValue);
-			String s = Util.toCsvString(list);
-			return JstlFunctions.cutAtFirstLongToken(s, 50);
+		else if (!(columnValue instanceof Collection))
+			return columnValue.toString();
+		else
+			return JstlFunctions.cutAtFirstLongToken(format((Collection)columnValue), 50);
+	}
+
+	/**
+	 * 
+	 * @param coll
+	 * @return
+	 */
+	public static String format(Collection coll){
+		
+		LinkedHashSet hashSet = new LinkedHashSet(coll);
+		StringBuffer bufLiterals = new StringBuffer();
+		StringBuffer bufNonLiterals = new StringBuffer();
+		
+		for (Iterator iter = hashSet.iterator(); iter.hasNext();){			
+			Object o = iter.next();
+			if (o instanceof ObjectDTO){
+				ObjectDTO objectDTO = (ObjectDTO)o;
+				if (objectDTO.isLiteral())
+					append(bufLiterals, objectDTO.toString());
+				else
+					append(bufNonLiterals, objectDTO.toString());
+			}
+			else
+				append(bufLiterals, o.toString());
+		}
+		
+		return bufLiterals.length()>0 ? bufLiterals.toString() : bufNonLiterals.toString();
+	}
+	
+	/**
+	 * 
+	 * @param buf
+	 * @param s
+	 */
+	private static void append(StringBuffer buf, String s){
+		if (s.trim().length()>0){
+			if (buf.length()>0){
+				buf.append(", ");
+			}
+			buf.append(s);
 		}
 	}
 }

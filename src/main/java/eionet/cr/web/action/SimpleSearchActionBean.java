@@ -18,6 +18,9 @@ import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.Searcher;
+import eionet.cr.search.SimpleSearch;
+import eionet.cr.search.UriSearch;
+import eionet.cr.search.util.SearchExpression;
 import eionet.cr.web.util.search.SearchResultColumn;
 
 /**
@@ -26,7 +29,7 @@ import eionet.cr.web.util.search.SearchResultColumn;
  *
  */
 @UrlBinding("/simpleSearch.action")
-public class SimpleSearchActionBean extends SearchResourcesActionBean {
+public class SimpleSearchActionBean extends SubjectSearchActionBean {
 	
 	/** */
 	private static Log logger = LogFactory.getLog(SimpleSearchActionBean.class);
@@ -52,7 +55,31 @@ public class SimpleSearchActionBean extends SearchResourcesActionBean {
 	 */
     public Resolution search() throws SearchException{
 		
-		resultList = Searcher.simpleSearch(searchExpression);
+    	SearchExpression searchExpression = new SearchExpression(this.searchExpression);
+    	if (!searchExpression.isEmpty()){
+	    	if (searchExpression.isUri()){
+	    		
+	    		UriSearch uriSearch = new UriSearch(searchExpression);
+	    		uriSearch.setPageNumber(getPageN());
+	    		uriSearch.setSorting(getSortP(), getSortO());
+	    		
+	    		uriSearch.execute();
+	    		resultList = uriSearch.getResultList();
+	    		totalMatchCount = uriSearch.getTotalMatchCount();
+	    	}
+	    	
+	    	if (resultList==null || resultList.size()==0){
+	    		
+	    		SimpleSearch simpleSearch = new SimpleSearch(searchExpression);
+	    		simpleSearch.setPageNumber(getPageN());
+	    		simpleSearch.setSorting(getSortP(), getSortO());
+	    		
+	    		simpleSearch.execute();
+	    		resultList = simpleSearch.getResultList();
+	    		totalMatchCount = simpleSearch.getTotalMatchCount();
+	    	}
+    	}
+    	
 		return new ForwardResolution("/pages/simpleSearch.jsp");
     }
     
@@ -79,7 +106,7 @@ public class SimpleSearchActionBean extends SearchResourcesActionBean {
 	
 	/*
 	 * (non-Javadoc)
-	 * @see eionet.cr.web.action.SearchResourcesActionBean#getColumns()
+	 * @see eionet.cr.web.action.SubjectSearchActionBean#getColumns()
 	 */
 	public List<SearchResultColumn> getColumns(){
 		return getDefaultColumns();

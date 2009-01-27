@@ -3,6 +3,7 @@ package eionet.cr.search;
 import java.util.List;
 
 import eionet.cr.search.util.SearchExpression;
+import eionet.cr.util.Hashes;
 
 /**
  * 
@@ -13,6 +14,22 @@ public class UriSearch extends SubjectSearch{
 	
 	/** */
 	private SearchExpression uri;
+	
+	/**
+	 * 
+	 * @param uri
+	 */
+	public UriSearch(SearchExpression uri){
+		this.uri = uri;
+	}
+
+	/**
+	 * 
+	 * @param uri
+	 */
+	public UriSearch(String uri){
+		this(new SearchExpression(uri));
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -23,7 +40,7 @@ public class UriSearch extends SubjectSearch{
 		if (uri==null || uri.isEmpty())
 			return null;
 		
-		inParameters.add(uri.toString());
+		inParameters.add(Hashes.spoHash(uri.toString()));
 		return "select sql_calc_found_rows distinct SUBJECT from SPO where SUBJECT=?";
 	}
 

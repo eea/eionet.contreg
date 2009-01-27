@@ -47,5 +47,33 @@
 			${hasPermission("roug", "/", "u")}
 		</example>
 	</function>
-	
+
+	<function>
+		<description>
+			Gets the collection of objects matching to the given predicate in the given subject.
+			Formats the given collection to comma-separated string and returns it.
+			Only distinct objects and only literal ones are selected (unless there is not a single literal
+			in which case the non-literals are returned.
+	 	</description>
+		<name>formatPredicateObjects</name>
+		<function-class>eionet.cr.web.util.JstlFunctions</function-class>
+		<function-signature>java.lang.String formatPredicateObjects(eionet.cr.dto.SubjectDTO, java.lang.String)</function-signature>
+		<example>
+			${formatPredicateObjects(someSubjectDTO, someString)}
+		</example>
+	</function>
+
+	<function>
+		<description>
+			Returns a string that constructed by concatenating the given request's getRequestURI() + "?" +
+			the given request's getQueryString(), and replacing the sort predicate with the given one.
+			The present sort order is replaced by the opposite.
+		</description>
+		<name>sortURL</name>
+		<function-class>eionet.cr.web.util.JstlFunctions</function-class>
+		<function-signature>java.lang.String sortURL(eionet.cr.web.action.AbstractCRActionBean, javax.servlet.http.HttpServletRequest, java.lang.String)</function-signature>
+		<example>
+			${sortURL(someHttpServletRequest, someString)}
+		</example>
+	</function>	
 </taglib>

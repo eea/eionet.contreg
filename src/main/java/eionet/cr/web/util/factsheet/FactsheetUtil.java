@@ -34,15 +34,16 @@ public class FactsheetUtil {
 			return null;
 		
 		List<ResourcePropertyDTO> result = new ArrayList<ResourcePropertyDTO>();
-		if (subject.isEmpty())
+		if (subject.getPredicateCount()==0)
 			return result;
 		
 		List<ResourcePropertyDTO> propertiesWithLabels = new ArrayList<ResourcePropertyDTO>();
 		List<ResourcePropertyDTO> propertiesWithoutLabels = new ArrayList<ResourcePropertyDTO>();
 		
-		Iterator<PredicateDTO> predicatesIterator = subject.keySet().iterator();
+		Iterator<String> predicatesIterator = subject.getPredicates().keySet().iterator();
 		while (predicatesIterator.hasNext()){
-			String predicateUri = predicatesIterator.next().toString();
+			
+			String predicateUri = predicatesIterator.next();
 			if (!skipFromFactsheet(predicateUri)){
 				
 				String propertyLabel = EncodingSchemes.getLabel(predicateUri);
@@ -51,7 +52,7 @@ public class FactsheetUtil {
 				propDTO.setUri(predicateUri);
 				propDTO.setLabel(propertyLabel != null ? propertyLabel : predicateUri);
 
-				List<String> values = getDistinct(subject.get(predicateUri));
+				List<String> values = getDistinct(subject.getObjects(predicateUri));
 				for (int i=0; values!=null && i<values.size(); i++){
 					
 					String value = values.get(i);

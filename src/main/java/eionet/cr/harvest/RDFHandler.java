@@ -25,7 +25,6 @@ import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.harvest.util.DedicatedHarvestSourceTypes;
 import eionet.cr.harvest.util.HarvestLog;
 import eionet.cr.util.Hashes;
-import eionet.cr.util.StringUtils;
 import eionet.cr.util.UnicodeUtils;
 import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.sql.ConnectionUtil;

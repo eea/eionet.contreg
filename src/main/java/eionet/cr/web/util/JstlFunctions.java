@@ -1,8 +1,19 @@
 package eionet.cr.web.util;
 
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.StringTokenizer;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang.StringUtils;
+
+import eionet.cr.dto.ObjectDTO;
+import eionet.cr.dto.SubjectDTO;
+import eionet.cr.search.util.SortOrder;
 import eionet.cr.util.Util;
+import eionet.cr.web.action.AbstractCRActionBean;
 import eionet.cr.web.security.CRUser;
 
 /**
@@ -74,5 +85,98 @@ public class JstlFunctions {
 	 */
 	public static boolean hasPermission(java.lang.String userName, java.lang.String aclName, java.lang.String permission){
 		return CRUser.hasPermission(userName, aclName, permission);
+	}
+
+	/**
+	 * Gets the collection of objects matching to the given predicate in the given subject.
+	 * Formats the given collection to comma-separated string and returns it.
+	 * Only distinct objects and only literal ones are selected (unless there is not a single literal
+	 * in which case the non-literals are returned.
+	 * 
+	 * @param subjectDTO
+	 * @param predicateUri
+	 * @return
+	 */
+	public static String formatPredicateObjects(SubjectDTO subjectDTO, String predicateUri){
+		
+		if (subjectDTO==null || subjectDTO.getPredicateCount()==0 || predicateUri==null)
+			return "";
+		
+		Collection<ObjectDTO> objects = subjectDTO.getObjects(predicateUri);
+		if (objects==null || objects.isEmpty())
+			return "";
+		
+		LinkedHashSet<ObjectDTO> distinctObjects = new LinkedHashSet<ObjectDTO>(objects);		
+		StringBuffer bufLiterals = new StringBuffer();
+		StringBuffer bufNonLiterals = new StringBuffer();
+		
+		for (Iterator<ObjectDTO> iter = distinctObjects.iterator(); iter.hasNext();){			
+			ObjectDTO objectDTO = iter.next();
+			if (objectDTO.isLiteral())
+				append(bufLiterals, objectDTO.toString());
+			else
+				append(bufNonLiterals, objectDTO.toString());
+		}
+		
+		return bufLiterals.length()>0 ? bufLiterals.toString() : bufNonLiterals.toString();
+	}
+	
+	/**
+	 * 
+	 * @param buf
+	 * @param s
+	 */
+	private static void append(StringBuffer buf, String s){
+		if (s.trim().length()>0){
+			if (buf.length()>0){
+				buf.append(", ");
+			}
+			buf.append(s);
+		}
+	}
+	
+	/**
+	 * Returns a string that constructed by concatenating the given request's getRequestURI() + "?" +
+	 * the given request's getQueryString(), and replacing the sort predicate with the given one.
+	 * The present sort order is replaced by the opposite.
+	 * 
+	 * @param request
+	 * @param sortP
+	 * @param sortO
+	 * @return
+	 */
+	public static String sortURL(AbstractCRActionBean actionBean, HttpServletRequest request, String sortPredicate){
+		
+		StringBuffer buf = new StringBuffer(actionBean.getUrlBinding());
+		buf.append("?").append(request.getQueryString());
+		
+		String curValue = request.getParameter("sortP");
+		if (curValue!=null){
+			buf = new StringBuffer(
+					StringUtils.replace(buf.toString(), "sortP=" + Util.urlEncode(curValue), "sortP=" + Util.urlEncode(sortPredicate)));
+		}
+		else
+			buf.append("&sortP=").append(Util.urlEncode(sortPredicate)); 
+
+		curValue = request.getParameter("sortO");
+		if (curValue!=null)
+			buf = new StringBuffer(StringUtils.replace(buf.toString(), "sortO=" + curValue, "sortO=" + oppositeSortOrder(curValue)));
+		else
+			buf.append("&sortO=").append(oppositeSortOrder(curValue)); 
+
+		String result = buf.toString();
+		return result.startsWith("/") ? result.substring(1) : result;
+	}
+
+	/**
+	 * 
+	 * @param order
+	 * @return
+	 */
+	private static String oppositeSortOrder(String order){
+		if (StringUtils.isBlank(order))
+			return SortOrder.ASCENDING.toString();
+		else
+			return SortOrder.parse(order).toOpposite().toString();
 	}
 }

@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 
 import eionet.cr.dto.ObjectDTO;
@@ -57,7 +56,7 @@ public class SubjectsDataReader extends ResultSetBaseReader{
 		if (newPredicate){
 			currentPredicate = predicateUri;
 			currentObjects = new ArrayList<ObjectDTO>();
-			currentSubject.put(new PredicateDTO(predicateUri), currentObjects);
+			currentSubject.getPredicates().put(predicateUri, currentObjects);
 		}
 		
 		ObjectDTO object = new ObjectDTO(rs.getString("OBJECT"),

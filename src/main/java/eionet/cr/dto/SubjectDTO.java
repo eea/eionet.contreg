@@ -5,8 +5,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 
+import eionet.cr.common.Md5Map;
+import eionet.cr.common.Predicates;
 import eionet.cr.util.URLUtil;
 
 /**
@@ -14,21 +19,12 @@ import eionet.cr.util.URLUtil;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class SubjectDTO extends HashMap<PredicateDTO,Collection<ObjectDTO>>{
-	
-	/**
-	 */
-	public static interface SpecialKeys{
-		
-		public static final String RESOURCE_URI = "resourceUri";
-		public static final String RESOURCE_URL = "resourceUrl";
-		public static final String RESOURCE_TITLE = "resourceTitle";
-	}
-
+public class SubjectDTO{
 	
 	/** */
 	private String uri;
 	private boolean anonymous;
+	private Map<String,Collection<ObjectDTO>> predicates;
 	
 	/**
 	 * 
@@ -36,18 +32,45 @@ public class SubjectDTO extends HashMap<PredicateDTO,Collection<ObjectDTO>>{
 	 * @param anonymous
 	 */
 	public SubjectDTO(String uri, boolean anonymous){
-		super();
+		
 		this.uri = uri;
 		this.anonymous = anonymous;
+		predicates = new HashMap<String,Collection<ObjectDTO>>();
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public Map<String,Collection<ObjectDTO>> getPredicates(){
+		return predicates;
+	}
+	
+	/**
+	 * 
+	 * @param predicateUri
+	 * @return
+	 */
+	public Collection<ObjectDTO> getObjects(String predicateUri){
+		return predicates.get(predicateUri);
 	}
 
 	/**
 	 * 
-	 * @param s
+	 * @param predicate
 	 * @return
 	 */
-	public Collection<ObjectDTO> get(String s){
-		return super.get(new PredicateDTO(s));
+	public ObjectDTO getObject(String predicateUri){
+		Collection<ObjectDTO> objects = getObjects(predicateUri);
+		return objects==null || objects.isEmpty() ? null : objects.iterator().next();
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public int getPredicateCount(){
+		return predicates.size();
 	}
 
 	/**
@@ -97,38 +120,22 @@ public class SubjectDTO extends HashMap<PredicateDTO,Collection<ObjectDTO>>{
 	 * @param key
 	 * @return
 	 */
-	public List<String> getDistinctLiteralValues(String key){
+	public String[] getDistinctLiteralObjects(String predicateUri){
 		
-		Collection<ObjectDTO> coll = get(key);
-		if (coll==null)
-			return null;
-		else
-			return asDistinctLiteralValues(new ArrayList<ObjectDTO>(coll));
-	}
-
-	/**
-	 * 
-	 * @param list
-	 * @return
-	 */
-	public static List<String> asDistinctLiteralValues(List list){
+		ArrayList<String> result = new ArrayList<String>();		
 		
-		if (list==null || list.isEmpty())
-			return list;
+		Collection<ObjectDTO> objects = getObjects(predicateUri);
+		if (objects!=null && !objects.isEmpty()){
 		
-		// first we pick out only literals (using HashSet ensures we get only distinct ones)
-		HashSet set = new HashSet();
-		for (int i=0; i<list.size(); i++){
-			String s = list.get(i).toString();
-			if (!URLUtil.isURL(s))
-				set.add(s);
+			LinkedHashSet<ObjectDTO> distinctObjects = new LinkedHashSet<ObjectDTO>(objects);
+			for (Iterator<ObjectDTO> iter = distinctObjects.iterator(); iter.hasNext();){			
+				ObjectDTO objectDTO = iter.next();
+				if (objectDTO.isLiteral())
+					result.add(objectDTO.toString());
+			}
 		}
 		
-		// if no distinct literals were found at all, return the list as it was given
-		if (set.isEmpty())
-			return list;
-		
-		return new ArrayList<String>(set);
+		return result.toArray(new String[result.size()]);
 	}
 
 	/**
@@ -136,7 +143,13 @@ public class SubjectDTO extends HashMap<PredicateDTO,Collection<ObjectDTO>>{
 	 * @return
 	 */
 	public String getUrl(){
-		return getValue(SpecialKeys.RESOURCE_URL);
+		
+		if (uri!=null && URLUtil.isURL(uri))
+			return uri;
+		else{
+			ObjectDTO o = getObject(Predicates.DC_IDENTIFIER);
+			return o==null || !URLUtil.isURL(o.getValue()) ? null : o.getValue();
+		}
 	}
 	
 	/**
@@ -144,17 +157,7 @@ public class SubjectDTO extends HashMap<PredicateDTO,Collection<ObjectDTO>>{
 	 * @return
 	 */
 	public String getTitle(){
-		return getValue(SpecialKeys.RESOURCE_TITLE);
-	}
-
-	/**
-	 * 
-	 * @param key
-	 * @return
-	 */
-	public String getValue(String key){
-		
-		Collection<ObjectDTO> values = get(key);
-		return values!=null && values.size()>0 ? values.iterator().next().toString() : null;
+		ObjectDTO o = getObject(Predicates.RDFS_LABEL);
+		return o==null ? null : o.getValue();
 	}
 }

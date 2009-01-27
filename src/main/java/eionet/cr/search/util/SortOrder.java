@@ -35,13 +35,24 @@ public enum SortOrder {
 	public String toSQL(){
 		return s;
 	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public SortOrder toOpposite(){
+		if (this.equals(ASCENDING))
+			return DESCENDING;
+		else
+			return ASCENDING;
+	}
 
 	/**
 	 * 
 	 * @param s
 	 * @return
 	 */
-	public static SortOrder fromString(String s){
+	public static SortOrder parse(String s){
 		
 		if (s==null)
 			return null;

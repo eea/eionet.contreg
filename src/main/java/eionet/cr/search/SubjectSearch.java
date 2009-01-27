@@ -10,6 +10,9 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.util.SortOrder;
 import eionet.cr.search.util.SubjectHashesReader;
@@ -26,19 +29,22 @@ import eionet.cr.util.sql.SQLUtil;
 public abstract class SubjectSearch {
 	
 	/** */
+	private static Log logger = LogFactory.getLog(SubjectSearch.class);
+	
+	/** */
 	protected int pageNumber = 0;
 	protected SortOrder sortOrder = SortOrder.ASCENDING;
 	protected String sortPredicate = null;	
 	
 	/** */
 	protected Collection<SubjectDTO> resultList = new ArrayList<SubjectDTO>();
-	protected int totalRowCount = 0;
+	protected int totalMatchCount = 0;
 	
 	/**
 	 * @throws SQLException 
 	 * 
 	 */
-	public void execute() throws SQLException{
+	public void execute() throws SearchException{
 		
 		List<Object> inParameters = new ArrayList<Object>();
 		
@@ -50,19 +56,34 @@ public abstract class SubjectSearch {
 				conn = getConnection();
 				
 				SubjectHashesReader subjectHashesReader = new SubjectHashesReader();
+				
+				logger.debug("Executing subject select query");
+				long time = System.currentTimeMillis();
+				
 				SQLUtil.executeQuery(subjectSelectSQL, inParameters, subjectHashesReader, conn);
+				
+				logger.debug("subject select query took " + (System.currentTimeMillis()-time) + " ms");
 				
 				if (subjectHashesReader.getResultCount()>0){
 					
-					Integer totalRowCount = MySQLUtil.getTotalRowCount(conn); // TODO - maybe do it without directly pointing to MySQL
+					totalMatchCount = MySQLUtil.getTotalRowCount(conn); // TODO - maybe do it without directly pointing to MySQL
 					LinkedHashMap<String, SubjectDTO> subjectsMap = subjectHashesReader.getResultMap();
 					
 					SubjectsDataReader subjectsDataReader = new SubjectsDataReader(subjectsMap);
+					
+					logger.debug("Executing subject data select query");
+					time = System.currentTimeMillis();
+
 					SQLUtil.executeQuery(
 							getSubjectDataSelectSQL(subjectHashesReader.getSubjectHashesCommaSeparated()), subjectsDataReader, conn);
+				
+					logger.debug("subject data select query took " + (System.currentTimeMillis()-time) + " ms");
 					
 					this.resultList = subjectsMap.values();
 				}
+			}
+			catch (SQLException e){
+				throw new SearchException(e.toString(), e);
 			}
 			finally{
 				SQLUtil.close(conn);
@@ -79,18 +100,18 @@ public abstract class SubjectSearch {
 	
 	/**
 	 * 
-	 * @param sortPredicate
-	 * @param sortOrder
+	 * @param sortP
+	 * @param sortO
 	 */
-	public void setSorting(String sortPredicate, SortOrder sortOrder) {
+	public void setSorting(String sortPredicate, String sortOrder) {
 		
 		this.sortPredicate= sortPredicate;
-		this.sortOrder = sortOrder;
+		this.sortOrder = SortOrder.parse(sortOrder);
 	}
 
 	/**
 	 * 
-	 * @param pageNumber
+	 * @param pageN
 	 */
 	public void setPageNumber(int pageNumber) {
 		
@@ -105,10 +126,10 @@ public abstract class SubjectSearch {
 	}
 
 	/**
-	 * @return the totalRowCount
+	 * @return the totalMatchCount
 	 */
-	public int getTotalRowCount() {
-		return totalRowCount;
+	public int getTotalMatchCount() {
+		return totalMatchCount;
 	}
 	
 	/**
@@ -116,7 +137,7 @@ public abstract class SubjectSearch {
 	 * @return
 	 */
 	protected int getPageLength(){
-		return 20; // FIXME - should not be hard-coded
+		return 15; // FIXME - should not be hard-coded
 	}
 	
 	/**
@@ -142,5 +163,13 @@ public abstract class SubjectSearch {
 		append("SUBJECT=SUBJ_RESOURCE.URI_HASH and PREDICATE=PRED_RESOURCE.URI_HASH order by SUBJECT, PREDICATE, OBJECT");
 		
 		return buf.toString();
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public int resultSize(){
+		return resultList==null ? 0 : resultList.size();
 	}
 }
