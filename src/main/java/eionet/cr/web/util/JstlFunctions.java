@@ -1,19 +1,23 @@
 package eionet.cr.web.util;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 
+import eionet.cr.config.GeneralConfig;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.util.SortOrder;
 import eionet.cr.util.Util;
 import eionet.cr.web.action.AbstractCRActionBean;
+import eionet.cr.web.action.SubjectSearchActionBean;
 import eionet.cr.web.security.CRUser;
 
 /**
@@ -136,8 +140,8 @@ public class JstlFunctions {
 	}
 	
 	/**
-	 * Returns a string that constructed by concatenating the given request's getRequestURI() + "?" +
-	 * the given request's getQueryString(), and replacing the sort predicate with the given one.
+	 * Returns a string that is constructed by concatenating the given bean request's getRequestURI() + "?" +
+	 * the given bean request's getQueryString(), and replacing the sort predicate with the given one.
 	 * The present sort order is replaced by the opposite.
 	 * 
 	 * @param request
@@ -145,8 +149,9 @@ public class JstlFunctions {
 	 * @param sortO
 	 * @return
 	 */
-	public static String sortURL(AbstractCRActionBean actionBean, HttpServletRequest request, String sortPredicate){
+	public static String sortUrl(AbstractCRActionBean actionBean, String sortPredicate){
 		
+		HttpServletRequest request = actionBean.getContext().getRequest();
 		StringBuffer buf = new StringBuffer(actionBean.getUrlBinding());
 		buf.append("?").append(request.getQueryString());
 		
@@ -167,7 +172,7 @@ public class JstlFunctions {
 		String result = buf.toString();
 		return result.startsWith("/") ? result.substring(1) : result;
 	}
-
+	
 	/**
 	 * 
 	 * @param order

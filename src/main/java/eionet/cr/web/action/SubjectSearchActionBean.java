@@ -15,6 +15,7 @@ import eionet.cr.search.SearchException;
 import eionet.cr.search.util.HitsCollector;
 import eionet.cr.search.util.SortOrder;
 import eionet.cr.util.Util;
+import eionet.cr.util.pagination.Pagination;
 import eionet.cr.web.util.search.SearchResultColumn;
 
 /**
@@ -28,7 +29,7 @@ public abstract class SubjectSearchActionBean extends AbstractCRActionBean{
 	protected Collection<SubjectDTO> resultList;
 	
 	/** */
-	protected int pageN = 0;
+	protected int pageN = 1;
 	protected String sortO = SortOrder.ASCENDING.toString();
 	protected String sortP = null;	
 	protected int totalMatchCount = 0;
@@ -108,7 +109,7 @@ public abstract class SubjectSearchActionBean extends AbstractCRActionBean{
 	 * @param pageN the pageN to set
 	 */
 	public void setPageN(int pageNumber) {
-		this.pageN = pageNumber;
+		this.pageN = pageNumber<1 ? 1 : pageNumber;
 	}
 
 	/**
@@ -144,5 +145,17 @@ public abstract class SubjectSearchActionBean extends AbstractCRActionBean{
 	 */
 	public int getTotalMatchCount() {
 		return totalMatchCount;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public Pagination getPagination(){
+		
+		StringBuffer buf = new StringBuffer(getUrlBinding());
+		buf.append("?").append(getContext().getRequest().getQueryString());
+
+		return Pagination.getPagination(getTotalMatchCount(), getPageN(), buf.toString());
 	}
 }

@@ -12,7 +12,7 @@
 							<th scope="col">
 								<c:choose>
 									<c:when test="${col.sortable}">							
-										<a title="${col.title}" href="${crfn:sortURL(actionBean,pageContext.request,col.property)}">
+										<a title="${col.title}" href="${crfn:sortUrl(actionBean,pageContext.request,col.property)}">
 											${col.title}
 										</a>
 									</c:when>

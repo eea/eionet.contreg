@@ -65,15 +65,15 @@
 
 	<function>
 		<description>
-			Returns a string that constructed by concatenating the given request's getRequestURI() + "?" +
-			the given request's getQueryString(), and replacing the sort predicate with the given one.
-			The present sort order is replaced by the opposite.
+			Returns a string that is constructed by concatenating the given bean request's getRequestURI() + "?" +
+	 		the given bean request's getQueryString(), and replacing the sort predicate with the given one.
+	 		The present sort order is replaced by the opposite.
 		</description>
-		<name>sortURL</name>
+		<name>sortUrl</name>
 		<function-class>eionet.cr.web.util.JstlFunctions</function-class>
-		<function-signature>java.lang.String sortURL(eionet.cr.web.action.AbstractCRActionBean, javax.servlet.http.HttpServletRequest, java.lang.String)</function-signature>
+		<function-signature>java.lang.String sortUrl(eionet.cr.web.action.AbstractCRActionBean, javax.servlet.http.HttpServletRequest, java.lang.String)</function-signature>
 		<example>
-			${sortURL(someHttpServletRequest, someString)}
+			${sortUrl(someHttpServletRequest, someString)}
 		</example>
 	</function>	
 </taglib>

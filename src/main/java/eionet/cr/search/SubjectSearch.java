@@ -135,14 +135,6 @@ public abstract class SubjectSearch {
 	/**
 	 * 
 	 * @return
-	 */
-	protected int getPageLength(){
-		return 15; // FIXME - should not be hard-coded
-	}
-	
-	/**
-	 * 
-	 * @return
 	 * @throws SQLException 
 	 */
 	protected Connection getConnection() throws SQLException{

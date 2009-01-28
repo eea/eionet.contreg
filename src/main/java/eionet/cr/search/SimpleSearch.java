@@ -4,9 +4,11 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import eionet.cr.config.GeneralConfig;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.util.SearchExpression;
 import eionet.cr.util.Hashes;
+import eionet.cr.util.pagination.Pagination;
 import eionet.cr.util.sql.ConnectionUtil;
 import eionet.cr.util.sql.SQLUtil;
 
@@ -59,14 +61,15 @@ public class SimpleSearch extends SubjectSearch{
 		
 		if (sortPredicate!=null)
 			sqlBuf.append(" order by ORDERING.OBJECT ").append(sortOrder==null ? "" : sortOrder.toSQL());
-			
-		if (getPageLength()>0){
+
+		int pageLength = Pagination.pageLength();
+		if (pageLength>0){
 			sqlBuf.append(" limit ");
 			if (pageNumber>0){
 				sqlBuf.append("?,");
-				inParameters.add(new Integer((pageNumber-1)*getPageLength()));
+				inParameters.add(new Integer((pageNumber-1)*pageLength));
 			}
-			sqlBuf.append(getPageLength());
+			sqlBuf.append(pageLength);
 		}
 		
 		return sqlBuf.toString();
