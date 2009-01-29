@@ -12,8 +12,6 @@ import eionet.cr.search.SearchException;
 import eionet.cr.search.Searcher;
 import eionet.cr.search.UriSearch;
 import eionet.cr.search.util.SearchExpression;
-import eionet.cr.web.util.factsheet.FactsheetUtil;
-import eionet.cr.web.util.factsheet.ResourcePropertyDTO;
 
 /**
  * 
@@ -21,7 +19,7 @@ import eionet.cr.web.util.factsheet.ResourcePropertyDTO;
  *
  */
 @UrlBinding("/factsheet.action")
-public class FactsheetActionBean extends AbstractCRActionBean{
+public class FactsheetActionBean extends AbstractActionBean{
 
 	/** */
 	private String uri;

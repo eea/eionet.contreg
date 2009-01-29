@@ -25,7 +25,7 @@ import eionet.cr.util.Util;
  *
  */
 @UrlBinding("/harvestQueue.action")
-public class HarvestQueueActionBean extends AbstractCRActionBean{
+public class HarvestQueueActionBean extends AbstractActionBean{
 	
 	/** */
 	private static Log logger = LogFactory.getLog(HarvestQueueActionBean.class);

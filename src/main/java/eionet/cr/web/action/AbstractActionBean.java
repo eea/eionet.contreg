@@ -26,10 +26,10 @@ import eionet.cr.web.security.CRUser;
  * @author altnyris
  *
  */
-public abstract class AbstractCRActionBean implements ActionBean {
+public abstract class AbstractActionBean implements ActionBean {
 	
 	/** */
-	private static Log logger = LogFactory.getLog(AbstractCRActionBean.class);
+	private static Log logger = LogFactory.getLog(AbstractActionBean.class);
 	
 	/** */
 	private CRActionBeanContext context;

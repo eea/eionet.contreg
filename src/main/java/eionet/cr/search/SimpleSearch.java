@@ -17,7 +17,7 @@ import eionet.cr.util.sql.SQLUtil;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class SimpleSearch extends SubjectSearch{
+public class SimpleSearch extends AbstractSubjectSearch{
 
 	/** */
 	private SearchExpression searchExpression;
@@ -40,7 +40,7 @@ public class SimpleSearch extends SubjectSearch{
 
 	/*
 	 * (non-Javadoc)
-	 * @see eionet.cr.search.SubjectSearch#getSQL(java.util.List)
+	 * @see eionet.cr.search.AbstractSubjectSearch#getSQL(java.util.List)
 	 */
 	protected String getSubjectSelectSQL(List<Object> inParameters){
 		

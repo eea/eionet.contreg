@@ -3,8 +3,8 @@
  */
 package eionet.cr.web.context;
 
-import static eionet.cr.web.util.ICRWebConstants.LAST_ACTION_URL_SESSION_ATTR;
-import static eionet.cr.web.util.ICRWebConstants.USER_SESSION_ATTR;
+import static eionet.cr.web.util.WebConstants.LAST_ACTION_URL_SESSION_ATTR;
+import static eionet.cr.web.util.WebConstants.USER_SESSION_ATTR;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;

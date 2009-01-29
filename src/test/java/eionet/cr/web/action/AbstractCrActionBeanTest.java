@@ -1,6 +1,6 @@
 package eionet.cr.web.action;
 
-import static eionet.cr.web.util.ICRWebConstants.USER_SESSION_ATTR;
+import static eionet.cr.web.util.WebConstants.USER_SESSION_ATTR;
 import static org.junit.Assert.assertEquals;
 import net.sourceforge.stripes.mock.MockRoundtrip;
 import net.sourceforge.stripes.mock.MockServletContext;

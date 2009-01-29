@@ -1,6 +1,6 @@
 package eionet.cr.web.interceptor;
 
-import static eionet.cr.web.util.ICRWebConstants.LAST_ACTION_URL_SESSION_ATTR;
+import static eionet.cr.web.util.WebConstants.LAST_ACTION_URL_SESSION_ATTR;
 
 import java.lang.reflect.Method;
 import java.util.Enumeration;

@@ -3,12 +3,12 @@
  */
 package eionet.cr.web.action;
 
-import static eionet.cr.web.util.ICRWebConstants.AFTER_LOGIN_EVENT;
-import static eionet.cr.web.util.ICRWebConstants.LOGIN_ACTION;
-import static eionet.cr.web.util.ICRWebConstants.LOGIN_EVENT;
-import static eionet.cr.web.util.ICRWebConstants.LOGOUT_EVENT;
-import static eionet.cr.web.util.ICRWebConstants.MAIN_PAGE_ACTION;
-import static eionet.cr.web.util.ICRWebConstants.USER_SESSION_ATTR;
+import static eionet.cr.web.util.WebConstants.AFTER_LOGIN_EVENT;
+import static eionet.cr.web.util.WebConstants.LOGIN_ACTION;
+import static eionet.cr.web.util.WebConstants.LOGIN_EVENT;
+import static eionet.cr.web.util.WebConstants.LOGOUT_EVENT;
+import static eionet.cr.web.util.WebConstants.MAIN_PAGE_ACTION;
+import static eionet.cr.web.util.WebConstants.USER_SESSION_ATTR;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.HandlesEvent;
 import net.sourceforge.stripes.action.RedirectResolution;
@@ -25,7 +25,7 @@ import eionet.cr.web.interceptor.annotation.DontSaveLastActionEvent;
  *
  */
 @UrlBinding(LOGIN_ACTION)
-public class LoginActionBean extends AbstractCRActionBean {
+public class LoginActionBean extends AbstractActionBean {
 	
 	/**
 	 * Action method deals with user logging in.

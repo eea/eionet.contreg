@@ -6,7 +6,7 @@ import java.util.Map;
 import net.sourceforge.stripes.controller.DispatcherServlet;
 import net.sourceforge.stripes.controller.StripesFilter;
 import net.sourceforge.stripes.mock.MockServletContext;
-import eionet.cr.web.action.AbstractCRActionBean;
+import eionet.cr.web.action.AbstractActionBean;
 
 /**
  * Helper class for testing Stripes action beans.
@@ -14,7 +14,7 @@ import eionet.cr.web.action.AbstractCRActionBean;
  * @author gerasvad, altnyris
  *
  */
-public abstract class AbstractStripesMvcTestHelper extends AbstractCRActionBean {
+public abstract class AbstractStripesMvcTestHelper extends AbstractActionBean {
 	private static MockServletContext mockServletContext;
 	
 	protected MockServletContext getMockServletContext() {

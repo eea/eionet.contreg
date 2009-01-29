@@ -16,8 +16,8 @@ import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.util.SortOrder;
 import eionet.cr.util.Util;
-import eionet.cr.web.action.AbstractCRActionBean;
-import eionet.cr.web.action.SubjectSearchActionBean;
+import eionet.cr.web.action.AbstractActionBean;
+import eionet.cr.web.action.AbstractSubjectSearchActionBean;
 import eionet.cr.web.security.CRUser;
 
 /**
@@ -149,7 +149,7 @@ public class JstlFunctions {
 	 * @param sortO
 	 * @return
 	 */
-	public static String sortUrl(AbstractCRActionBean actionBean, String sortPredicate){
+	public static String sortUrl(AbstractActionBean actionBean, String sortPredicate){
 		
 		HttpServletRequest request = actionBean.getContext().getRequest();
 		StringBuffer buf = new StringBuffer(actionBean.getUrlBinding());

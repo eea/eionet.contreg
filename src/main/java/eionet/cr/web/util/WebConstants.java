@@ -5,7 +5,7 @@ package eionet.cr.web.util;
  * @author heinljab
  *
  */
-public interface ICRWebConstants {
+public interface WebConstants {
 	
 	/** CR user session attribute name. */
 	public static final String USER_SESSION_ATTR = "crUser";

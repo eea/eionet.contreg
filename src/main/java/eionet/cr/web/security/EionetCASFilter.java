@@ -1,8 +1,8 @@
 package eionet.cr.web.security;
 
-import static eionet.cr.web.util.ICRWebConstants.AFTER_LOGIN_EVENT;
-import static eionet.cr.web.util.ICRWebConstants.LOGIN_ACTION;
-import static eionet.cr.web.util.ICRWebConstants.USER_SESSION_ATTR;
+import static eionet.cr.web.util.WebConstants.AFTER_LOGIN_EVENT;
+import static eionet.cr.web.util.WebConstants.LOGIN_ACTION;
+import static eionet.cr.web.util.WebConstants.USER_SESSION_ATTR;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;

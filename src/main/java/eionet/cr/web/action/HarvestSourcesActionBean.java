@@ -19,7 +19,7 @@ import eionet.cr.harvest.util.DedicatedHarvestSourceTypes;
  *
  */
 @UrlBinding("/sources.action")
-public class HarvestSourcesActionBean extends AbstractCRActionBean {
+public class HarvestSourcesActionBean extends AbstractActionBean {
 	
 	/** */
 	private List<HarvestSourceDTO> harvestSources;

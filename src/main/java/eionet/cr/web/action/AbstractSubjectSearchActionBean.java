@@ -23,7 +23,7 @@ import eionet.cr.web.util.search.SearchResultColumn;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public abstract class SubjectSearchActionBean extends AbstractCRActionBean{
+public abstract class AbstractSubjectSearchActionBean extends AbstractActionBean{
 
 	/** */
 	protected Collection<SubjectDTO> resultList;

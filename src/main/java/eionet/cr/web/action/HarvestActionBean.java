@@ -20,7 +20,7 @@ import eionet.cr.harvest.Harvest;
  *
  */
 @UrlBinding("/harvest.action")
-public class HarvestActionBean extends AbstractCRActionBean {
+public class HarvestActionBean extends AbstractActionBean {
 	
 	/** */
 	private HarvestDTO harvestDTO;

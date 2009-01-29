@@ -26,10 +26,10 @@ import eionet.cr.util.sql.SQLUtil;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public abstract class SubjectSearch {
+public abstract class AbstractSubjectSearch {
 	
 	/** */
-	private static Log logger = LogFactory.getLog(SubjectSearch.class);
+	private static Log logger = LogFactory.getLog(AbstractSubjectSearch.class);
 	
 	/** */
 	protected int pageNumber = 0;

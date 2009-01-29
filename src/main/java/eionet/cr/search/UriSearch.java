@@ -10,7 +10,7 @@ import eionet.cr.util.Hashes;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class UriSearch extends SubjectSearch{
+public class UriSearch extends AbstractSubjectSearch{
 	
 	/** */
 	private SearchExpression uri;
@@ -33,7 +33,7 @@ public class UriSearch extends SubjectSearch{
 
 	/*
 	 * (non-Javadoc)
-	 * @see eionet.cr.search.SubjectSearch#getSubjectSelectSQL(java.util.List)
+	 * @see eionet.cr.search.AbstractSubjectSearch#getSubjectSelectSQL(java.util.List)
 	 */
 	protected String getSubjectSelectSQL(List<Object> inParameters) {
 		

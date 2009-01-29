@@ -1,4 +1,4 @@
-<%@ page import="eionet.cr.web.security.CRUser,eionet.cr.web.util.ICRWebConstants" %>
+<%@ page import="eionet.cr.web.security.CRUser" %>
 
 <%@ include file="/pages/common/taglibs.jsp"%>	
 
@@ -11,7 +11,6 @@
 		<c:if test='${sessionScope.crUser!=null && crfn:hasPermission(sessionScope.crUser.userName, "/", "u")}'>
 			<li><a href="sources.action" title="Manage harvest sources">Harvest sources </a></li>
 			<li><a href="harvestQueue.action" title="Monitor harvest queue">Harvest queue </a></li>
-	    	<li><a href="luceneQuery.action" title="Lucene query">Lucene query </a></li>		
 		</c:if>		
     </ul>
 </div>

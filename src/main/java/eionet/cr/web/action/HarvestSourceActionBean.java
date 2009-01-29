@@ -29,7 +29,7 @@ import eionet.cr.util.Util;
  * @author altnyris
  */
 @UrlBinding("/source.action")
-public class HarvestSourceActionBean extends AbstractCRActionBean {
+public class HarvestSourceActionBean extends AbstractActionBean {
 	
 	/** */
 	private static final String ADD_EVENT = "add";

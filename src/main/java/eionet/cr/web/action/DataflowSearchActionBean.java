@@ -24,7 +24,7 @@ import eionet.cr.web.util.search.SearchResultColumn;
  *
  */
 @UrlBinding("/dataflowSearch.action")
-public class DataflowSearchActionBean extends SubjectSearchActionBean{
+public class DataflowSearchActionBean extends AbstractSubjectSearchActionBean{
 	
 	private static final String DATAFLOWS_SESSION_ATTR_NAME = DataflowSearchActionBean.class + ".dataflows";
 	private static final String LOCALITIES_SESSION_ATTR_NAME = DataflowSearchActionBean.class + ".localities";
@@ -149,7 +149,7 @@ public class DataflowSearchActionBean extends SubjectSearchActionBean{
 
 	/*
 	 * (non-Javadoc)
-	 * @see eionet.cr.web.action.SubjectSearchActionBean#getColumns()
+	 * @see eionet.cr.web.action.AbstractSubjectSearchActionBean#getColumns()
 	 */
 	public List<SearchResultColumn> getColumns(){
 		
