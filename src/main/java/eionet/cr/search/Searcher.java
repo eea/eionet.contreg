@@ -52,7 +52,9 @@ import eionet.cr.util.Util;
  *
  */
 public class Searcher {
-	
+
+	/** */
+	public static final String ALL_CONTENT_FIELD = Predicates.ALL_LITERAL_CONTENT;
 	public static final String DEFAULT_FIELD = Searcher.ALL_CONTENT_FIELD;
 	
 	/** */
@@ -65,8 +67,9 @@ public class Searcher {
 	 * @throws CorruptIndexException 
 	 */
 	private static IndexSearcher getIndexSearcher() throws CorruptIndexException, IOException{
-		String indexLocation = GeneralConfig.getRequiredProperty(GeneralConfig.LUCENE_INDEX_LOCATION);
-		return new IndexSearcher(indexLocation);
+		return null;
+//		String indexLocation = GeneralConfig.getRequiredProperty(GeneralConfig.LUCENE_INDEX_LOCATION);
+//		return new IndexSearcher(indexLocation);
 	}
 	
 	/**
@@ -78,6 +81,9 @@ public class Searcher {
 	 * @throws IOException
 	 */
 	public static List<SubjectDTO> simpleSearch(String expression) throws SearchException{
+
+		if (true)
+			return new ArrayList<SubjectDTO>();
 		
 		if (expression==null || expression.trim().length()==0)
 			return null;
@@ -146,6 +152,9 @@ public class Searcher {
 	 */
 	public static List<Map<String,String[]>> luceneQuery(String queryStr, Analyzer analyzer) throws CorruptIndexException, IOException, ParseException{
 
+		if (true)
+			return new ArrayList<Map<String,String[]>>();
+
 		if (queryStr==null || queryStr.trim().length()==0)
 			return new ArrayList<Map<String,String[]>>();
 		
@@ -178,6 +187,9 @@ public class Searcher {
 	 */
 	public static int getNumDocsBySourceUrl(String sourceUrl) throws CorruptIndexException, IOException{
 		
+		if (true)
+			return 0;
+		
 		if (sourceUrl==null || sourceUrl.length()==0)
 			return 0;
 
@@ -197,50 +209,6 @@ public class Searcher {
 	
 	/**
 	 * 
-	 * @return
-	 */
-//	public static String[] listAvailableAnalyzers(){
-//		
-//		if (availableAnalyzers==null)
-//			initAvailableAnalyzers();
-//		
-//		if (availableAnalyzers==null || availableAnalyzers.size()==0)
-//			return null;
-//		
-//		String[] result = new String[availableAnalyzers.size()];
-//		Iterator<String> iter = availableAnalyzers.keySet().iterator();
-//		for (int i=0; iter.hasNext(); i++)
-//			result[i] = iter.next();
-//		
-//		return result;
-//	}
-//
-//	/**
-//	 * 
-//	 */
-//	private static synchronized void initAvailableAnalyzers(){
-//		availableAnalyzers = new LinkedHashMap<String,Analyzer>();
-//		availableAnalyzers.put(StandardAnalyzer.class.getName(), new StandardAnalyzer());
-//		availableAnalyzers.put(KeywordAnalyzer.class.getName(), new KeywordAnalyzer());
-//	}
-	
-//	/**
-//	 * 
-//	 * @return
-//	 */
-//	public static Analyzer getAvailableAnalyzer(String name){
-//		
-//		if (availableAnalyzers==null)
-//			initAvailableAnalyzers();
-//		
-//		if (availableAnalyzers==null || availableAnalyzers.size()==0)
-//			return null;
-//		else
-//			return availableAnalyzers.get(name);
-//	}
-	
-	/**
-	 * 
 	 * @param dataflow
 	 * @param locality
 	 * @param year
@@ -248,6 +216,9 @@ public class Searcher {
 	 * @throws SearchException 
 	 */
 	public static List<SubjectDTO> dataflowSearch(String dataflow, String locality, String year) throws SearchException{
+		
+		if (true)
+			return new ArrayList<SubjectDTO>();
 		
 		List<Query> queries = new ArrayList<Query>();
 		queries.add(new TermQuery(new Term(Predicates.RDF_TYPE, Subjects.ROD_DELIVERY_CLASS)));
@@ -301,6 +272,9 @@ public class Searcher {
 	 */
 	public static List<RodInstrumentDTO> getDataflowsGroupedByInstruments() throws SearchException{
 
+		if (true)
+			return new ArrayList<RodInstrumentDTO>();
+		
 		StringBuffer qryBuf = new StringBuffer(Util.luceneEscape(Predicates.RDF_TYPE));
 		qryBuf.append(":\"").append(Util.luceneEscape(Subjects.ROD_OBLIGATION_CLASS)).append("\"");
 		
@@ -369,6 +343,9 @@ public class Searcher {
 	 */
 	public static Set<String> getLiteralFieldValues(String fieldName) throws SearchException{
 		
+		if (true)
+			return new HashSet<String>();
+		
 		Set<String> resultSet = new HashSet<String>();
 		if (fieldName==null || fieldName.length()==0)
 			return resultSet;
@@ -432,6 +409,9 @@ public class Searcher {
 	 */
 	public static SubjectDTO getResourceByUri(String uri) throws SearchException{
 		
+		if (true)
+			return null;
+		
 		if (uri==null || uri.trim().length()==0)
 			return null;
 		
@@ -463,6 +443,9 @@ public class Searcher {
 	 * @throws SearchException 
 	 */
 	public static List<SubjectDTO> getRecentByRdfType(String rdfType, int maxResults) throws SearchException{
+		
+		if (true)
+			return new ArrayList<SubjectDTO>();
 		
 		if (rdfType==null || rdfType.trim().length()==0)
 			return null;
@@ -496,6 +479,9 @@ public class Searcher {
 	 * @throws SearchException 
 	 */
 	public static void customSearch(Map<String,String> criteria, boolean useSubProperties, HitsCollector collector) throws SearchException{
+		
+		if (true)
+			return;
 		
 		if (criteria==null || criteria.isEmpty())
 			return;
@@ -570,23 +556,7 @@ public class Searcher {
 			catch (IOException e){}
 		}
 	}
-	
-	/**
-	 * 
-	 * @param args
-	 */
-	public static void main(String[] args){
-		
-		try {
-			System.out.println();
-		}
-		catch (Throwable t) {
-			t.printStackTrace();
-		}
-	}
 
-	/** */
-	public static final String ALL_CONTENT_FIELD = Predicates.ALL_LITERAL_CONTENT;
 
 	/**
 	 * 
