@@ -65,10 +65,8 @@ public abstract class Harvest {
 	protected Log logger = null;
 	
 	/** */
-	private int countTotalResources = 0;
-	private int countEncodingSchemes = 0;
-	private int countTotalStatements = 0;
-	private int countLiteralStatements = 0;
+	private int distinctSubjectsCount = 0;
+	private int storedTriplesCount = 0;
 	
 	/** */
 	private HarvestDAOWriter daoWriter = null;
@@ -176,6 +174,10 @@ public abstract class Harvest {
 	        warnings.addAll(rdfHandler.getSaxWarnings());
 
 	        rdfHandler.commit();
+	        
+	        storedTriplesCount = rdfHandler.getStoredTriplesCount();
+	        distinctSubjectsCount = rdfHandler.getDistinctSubjectsCount();
+	        
 	        logger.debug(rdfHandler.getStoredTriplesCount() + " triples stored");
 		}
 		catch (Exception e){
@@ -221,33 +223,19 @@ public abstract class Harvest {
 	}
 	
 	/**
-	 * @return the countTotalResources
+	 * @return the distinctSubjectsCount
 	 */
-	public int getCountTotalResources() {
-		return countTotalResources;
+	public int getDistinctSubjectsCount() {
+		return distinctSubjectsCount;
 	}
 
 	/**
-	 * @return the countEncodingSchemes
+	 * @return the storedTriplesCount
 	 */
-	public int getCountEncodingSchemes() {
-		return countEncodingSchemes;
+	public int getStoredTriplesCount() {
+		return storedTriplesCount;
 	}
 
-	/**
-	 * @return the countTotalStatements
-	 */
-	public int getCountTotalStatements() {
-		return countTotalStatements;
-	}
-
-	/**
-	 * @return the countLiteralStatements
-	 */
-	public int getCountLiteralStatements() {
-		return countLiteralStatements;
-	}
-	
 	/**
 	 * @throws HarvestException 
 	 */

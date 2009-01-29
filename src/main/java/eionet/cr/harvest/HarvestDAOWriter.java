@@ -58,10 +58,10 @@ public class HarvestDAOWriter {
 	protected void writeFinished(Harvest harvest, Integer numResourcesInSource) throws DAOException{
 		
 		DAOFactory.getDAOFactory().getHarvestDAO().updateFinishedHarvest(harvestId, Harvest.STATUS_FINISHED,
-				harvest.getCountTotalStatements(),
-				harvest.getCountLiteralStatements(),
-				harvest.getCountTotalResources(),
-				harvest.getCountEncodingSchemes());
+				harvest.getStoredTriplesCount(),
+				harvest.getDistinctSubjectsCount(),
+				0,
+				0);
 		
 		Boolean sourceAvailable = (harvest instanceof PullHarvest) ? ((PullHarvest)harvest).getSourceAvailable() : null;
 		DAOFactory.getDAOFactory().getHarvestSourceDAO().updateHarvestFinished(sourceId, null, numResourcesInSource, sourceAvailable);

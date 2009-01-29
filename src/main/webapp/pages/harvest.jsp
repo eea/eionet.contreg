@@ -42,20 +42,12 @@
                 <td><fmt:formatDate value="${actionBean.harvestDTO.datetimeFinished}" pattern="dd MMM yy HH:mm:ss"/></td>
             </tr>
             <tr>
-                <td>Statements in total:</td>
+                <td>Triples:</td>
                 <td>${fn:escapeXml(actionBean.harvestDTO.totalStatements)}</td>
             </tr>
             <tr>
-                <td>Statements with literal objects:</td>
-                <td>${fn:escapeXml(actionBean.harvestDTO.litObjStatements)}</td>
-            </tr>
-            <tr>
-                <td>Statements with resource objects:</td>
+                <td>Subjects:</td>
                 <td>${fn:escapeXml(actionBean.harvestDTO.totalResources)}</td>
-            </tr>
-            <tr>
-                <td>Encoding schemes:</td>
-                <td>${fn:escapeXml(actionBean.harvestDTO.encodingSchemes)}</td>
             </tr>
         </table>
         <br/><br/>

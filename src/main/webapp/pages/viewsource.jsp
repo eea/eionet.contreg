@@ -52,7 +52,7 @@
 	            <tr>
 	                <td>Number of resources:</td>
 	                <td>
-	                	${fn:escapeXml(actionBean.harvestSource.resources)}
+	                	to be implemented
 	                </td>
 	            </tr>
 	            <tr>
@@ -83,9 +83,8 @@
 		        		<th scope="col">User</th>
 		        		<th scope="col">Started</th>
 		        		<th scope="col">Finished</th>
-		        		<th scope="col">Resources</th>
-		        		<th scope="col">Encoding schemes</th>
-		        		<th scope="col">Statements</th>
+		        		<th scope="col">Triples</th>
+		        		<th scope="col">Subjects</th>
 		        		<th scope="col"></th>
 		        	</tr>
 	        	</thead>
@@ -96,9 +95,8 @@
 	        				<td>${fn:escapeXml(harv.user)}</td>
 	        				<td><fmt:formatDate value="${harv.datetimeStarted}" pattern="dd-MM-yy HH:mm:ss"/></td>
 	        				<td><fmt:formatDate value="${harv.datetimeFinished}" pattern="dd-MM-yy HH:mm:ss"/></td>		        				
-	        				<td>${fn:escapeXml(harv.totalResources)}</td>
-	        				<td>${fn:escapeXml(harv.encodingSchemes)}</td>
 	        				<td>${fn:escapeXml(harv.totalStatements)}</td>
+	        				<td>${fn:escapeXml(harv.totalResources)}</td>
 							<td>
 		        				<stripes:link href="/harvest.action">
 		        					<img src="${pageContext.request.contextPath}/images/view2.gif" title="View" alt="View"/>

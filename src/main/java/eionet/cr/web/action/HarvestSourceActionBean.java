@@ -159,10 +159,8 @@ public class HarvestSourceActionBean extends AbstractActionBean {
 			harvests = DAOFactory.getDAOFactory().getHarvestDAO().getHarvestsBySourceId(harvestSource.getSourceId());
 
 			// set messages to show to user
-			showMessage("Resources in total: " + harvest.getCountTotalResources());
-			showMessage("Resources as encoding schemes: " + harvest.getCountEncodingSchemes());
-			showMessage("Statements in total: " + harvest.getCountTotalStatements());
-			showMessage("Statements with literal objects: " + harvest.getCountLiteralStatements());
+			showMessage("Stored triples: " + harvest.getStoredTriplesCount());
+			showMessage("Distinct subjects: " + harvest.getDistinctSubjectsCount());
     	}
     	else{
     		handleCrException(getBundle().getString("not.logged.in"), GeneralConfig.SEVERITY_WARNING);
@@ -179,10 +177,15 @@ public class HarvestSourceActionBean extends AbstractActionBean {
      */
     public Resolution scheduleUrgentHarvest() throws DAOException, HarvestException{
 
-    	// we need to re-fect this.harvestSource, because the post request has nulled it
+    	// we need to re-fetch this.harvestSource, because the requested post has nulled it
     	harvestSource = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(harvestSource.getSourceId());
     	
+    	// schedule the harvest
     	HarvestQueue.addPullHarvest(getHarvestSource().getUrl(), HarvestQueue.PRIORITY_URGENT);
+    	
+		// retrieve list of harvests (for display) 
+		harvests = DAOFactory.getDAOFactory().getHarvestDAO().getHarvestsBySourceId(harvestSource.getSourceId());
+
     	showMessage("Successfully scheduled for urgent harvest!");
     	return new ForwardResolution("/pages/viewsource.jsp");
     }

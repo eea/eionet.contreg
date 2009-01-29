@@ -63,7 +63,12 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 
 	/** */
 	private int storedTriplesCount = 0;
-
+	private int distinctSubjectsCount = 0;
+	
+	/** */
+	private Long currentSubjectHash;
+	private HashSet distinctSubjects = new HashSet();
+	
 	/** */
 	private boolean clearPreviousContent = false;
 	
@@ -192,7 +197,13 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 		preparedStatementForTriples.setString( 7, YesNoBoolean.format(litObject));
 		preparedStatementForTriples.setString( 8, objectLang==null ? "" : objectLang);
 		
-		return preparedStatementForTriples.executeUpdate();
+		int i = preparedStatementForTriples.executeUpdate();
+		if (currentSubjectHash==null || currentSubjectHash.longValue()!=subjectHash){
+			currentSubjectHash = subjectHash;
+			distinctSubjects.add(Long.valueOf(subjectHash));
+		}
+		
+		return i;
 	}
 
 	/**
@@ -319,6 +330,8 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 		append(sourceUrlHash).append(", ").append(genTime).append(" from SPO_TEMP");
 		
 		storedTriplesCount = SQLUtil.executeUpdate(buf.toString(), getConnection());
+		distinctSubjectsCount = distinctSubjects.size();
+		
 		logger.debug(storedTriplesCount + " triples inserted into SPO");
 
 		if (clearPreviousContent){
@@ -532,5 +545,12 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	 */
 	public void setClearPreviousContent(boolean clearPreviousContent) {
 		this.clearPreviousContent = clearPreviousContent;
+	}
+
+	/**
+	 * @return the distinctSubjectsCount
+	 */
+	public int getDistinctSubjectsCount() {
+		return distinctSubjectsCount;
 	}
 }

@@ -20,10 +20,8 @@ public class HarvestTest extends TestCase{
 			URL o = getClass().getClassLoader().getResource("test-rdf.xml");
 			Harvest harvest = new PullHarvest(o.toString(), null);
 			harvest.execute();
-			assertEquals((int)10, harvest.getCountTotalResources());
-			assertEquals((int)10, harvest.getCountEncodingSchemes());
-			assertEquals((int)44, harvest.getCountTotalStatements());
-			assertEquals((int)20, harvest.getCountLiteralStatements());
+			assertEquals((int)10, harvest.getDistinctSubjectsCount());
+			assertEquals((int)44, harvest.getStoredTriplesCount());
 			
 		}
 		catch (Throwable e) {
