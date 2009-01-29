@@ -142,25 +142,25 @@ public class RecentUploadsActionBean extends SubjectSearchActionBean {
 			// columns for deliveries
 			List<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
 			SearchResultColumn col = new SearchResultColumn();
-			col.setProperty(Predicates.RDFS_LABEL);
+			col.setPredicateUri(Predicates.RDFS_LABEL);
 			col.setTitle("Title");
 			col.setSortable(false);
 			list.add(col);
 
 			col = new SearchResultColumn();
-			col.setProperty(Predicates.ROD_OBLIGATION_PROPERTY);
+			col.setPredicateUri(Predicates.ROD_OBLIGATION_PROPERTY);
 			col.setTitle("Obligation");
 			col.setSortable(false);
 			list.add(col);
 
 			col = new SearchResultColumn();
-			col.setProperty(Predicates.ROD_LOCALITY_PROPERTY);
+			col.setPredicateUri(Predicates.ROD_LOCALITY_PROPERTY);
 			col.setTitle("Locality");
 			col.setSortable(false);
 			list.add(col);
 
 			col = new SearchResultColumn();
-			col.setProperty(Predicates.DC_DATE);
+			col.setPredicateUri(Predicates.DC_DATE);
 			col.setTitle("Date");
 			col.setSortable(false);
 			list.add(col);
@@ -170,19 +170,19 @@ public class RecentUploadsActionBean extends SubjectSearchActionBean {
 			// columns for obligations
 			list = new ArrayList<SearchResultColumn>();
 			col = new SearchResultColumn();
-			col.setProperty(Predicates.RDFS_LABEL);
+			col.setPredicateUri(Predicates.RDFS_LABEL);
 			col.setTitle("Title");
 			col.setSortable(false);
 			list.add(col);
 
 			col = new SearchResultColumn();
-			col.setProperty(Predicates.ROD_ISSUE_PROPERTY);
+			col.setPredicateUri(Predicates.ROD_ISSUE_PROPERTY);
 			col.setTitle("Issue");
 			col.setSortable(false);
 			list.add(col);
 
 			col = new SearchResultColumn();
-			col.setProperty(Predicates.ROD_INSTRUMENT_PROPERTY);
+			col.setPredicateUri(Predicates.ROD_INSTRUMENT_PROPERTY);
 			col.setTitle("Instrument");
 			col.setSortable(false);
 			list.add(col);
@@ -192,25 +192,25 @@ public class RecentUploadsActionBean extends SubjectSearchActionBean {
 			// columns for full reports
 			list = new ArrayList<SearchResultColumn>();
 			col = new SearchResultColumn();
-			col.setProperty(Predicates.RDFS_LABEL);
+			col.setPredicateUri(Predicates.RDFS_LABEL);
 			col.setTitle("Title");
 			col.setSortable(false);
 			list.add(col);
 
 			col = new SearchResultColumn();
-			col.setProperty(Predicates.DC_SUBJECT);
+			col.setPredicateUri(Predicates.DC_SUBJECT);
 			col.setTitle("SubjectDTOTemp");
 			col.setSortable(false);
 			list.add(col);
 
 			col = new SearchResultColumn();
-			col.setProperty(Predicates.DC_COVERAGE);
+			col.setPredicateUri(Predicates.DC_COVERAGE);
 			col.setTitle("Coverage");
 			col.setSortable(false);
 			list.add(col);
 			
 			col = new SearchResultColumn();
-			col.setProperty(Predicates.DC_DATE);
+			col.setPredicateUri(Predicates.DC_DATE);
 			col.setTitle("Date");
 			col.setSortable(false);
 			list.add(col);
@@ -220,25 +220,25 @@ public class RecentUploadsActionBean extends SubjectSearchActionBean {
 			// columns for news releases
 			list = new ArrayList<SearchResultColumn>();
 			col = new SearchResultColumn();
-			col.setProperty(Predicates.RDFS_LABEL);
+			col.setPredicateUri(Predicates.RDFS_LABEL);
 			col.setTitle("Title");
 			col.setSortable(false);
 			list.add(col);
 
 			col = new SearchResultColumn();
-			col.setProperty(Predicates.DC_SUBJECT);
+			col.setPredicateUri(Predicates.DC_SUBJECT);
 			col.setTitle("SubjectDTOTemp");
 			col.setSortable(false);
 			list.add(col);
 
 			col = new SearchResultColumn();
-			col.setProperty(Predicates.DC_COVERAGE);
+			col.setPredicateUri(Predicates.DC_COVERAGE);
 			col.setTitle("Coverage");
 			col.setSortable(false);
 			list.add(col);
 			
 			col = new SearchResultColumn();
-			col.setProperty(Predicates.DC_DATE);
+			col.setPredicateUri(Predicates.DC_DATE);
 			col.setTitle("Date");
 			col.setSortable(false);
 			list.add(col);

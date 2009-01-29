@@ -32,7 +32,7 @@
 		    </ul>
 		</div>
 		<br style="clear:left" />
-		<stripes:layout-render name="/pages/common/resourcesResultList.jsp" tableClass="datatable" pageSize="0"/>
+		<stripes:layout-render name="/pages/common/subjectsResultList.jsp" tableClass="datatable" pageSize="0"/>
 				
 	</stripes:layout-component>
 </stripes:layout-render>

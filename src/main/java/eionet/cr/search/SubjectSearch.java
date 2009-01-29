@@ -57,7 +57,7 @@ public abstract class SubjectSearch {
 				
 				SubjectHashesReader subjectHashesReader = new SubjectHashesReader();
 				
-				logger.debug("Executing subject select query");
+				logger.debug("Executing subject select query: " + subjectSelectSQL);
 				long time = System.currentTimeMillis();
 				
 				SQLUtil.executeQuery(subjectSelectSQL, inParameters, subjectHashesReader, conn);
@@ -126,7 +126,7 @@ public abstract class SubjectSearch {
 	}
 
 	/**
-	 * @return the totalMatchCount
+	 * @return the matchCount
 	 */
 	public int getTotalMatchCount() {
 		return totalMatchCount;

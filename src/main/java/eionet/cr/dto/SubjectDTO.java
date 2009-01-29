@@ -10,7 +10,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
-import eionet.cr.common.Md5Map;
 import eionet.cr.common.Predicates;
 import eionet.cr.util.URLUtil;
 

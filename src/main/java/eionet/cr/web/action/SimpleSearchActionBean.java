@@ -65,7 +65,7 @@ public class SimpleSearchActionBean extends SubjectSearchActionBean {
 	    		
 	    		uriSearch.execute();
 	    		resultList = uriSearch.getResultList();
-	    		totalMatchCount = uriSearch.getTotalMatchCount();
+	    		matchCount = uriSearch.getTotalMatchCount();
 	    	}
 	    	
 	    	if (resultList==null || resultList.size()==0){
@@ -76,7 +76,7 @@ public class SimpleSearchActionBean extends SubjectSearchActionBean {
 	    		
 	    		simpleSearch.execute();
 	    		resultList = simpleSearch.getResultList();
-	    		totalMatchCount = simpleSearch.getTotalMatchCount();
+	    		matchCount = simpleSearch.getTotalMatchCount();
 	    	}
     	}
     	

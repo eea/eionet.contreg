@@ -32,7 +32,10 @@ public abstract class SubjectSearchActionBean extends AbstractCRActionBean{
 	protected int pageN = 1;
 	protected String sortO = SortOrder.ASCENDING.toString();
 	protected String sortP = null;	
-	protected int totalMatchCount = 0;
+	protected int matchCount = 0;
+	
+	/** */
+	private Pagination pagination;
 	
 	/**
 	 * 
@@ -78,19 +81,19 @@ public abstract class SubjectSearchActionBean extends AbstractCRActionBean{
 		ArrayList<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
 		
 		SearchResultColumn col = new SearchResultColumn();
-		col.setProperty(Predicates.RDF_TYPE);
+		col.setPredicateUri(Predicates.RDF_TYPE);
 		col.setTitle("Type");
 		col.setSortable(true);
 		list.add(col);
 		
 		col = new SearchResultColumn();
-		col.setProperty(Predicates.RDFS_LABEL);
+		col.setPredicateUri(Predicates.RDFS_LABEL);
 		col.setTitle("Title");
 		col.setSortable(true);
 		list.add(col);
 
 		col = new SearchResultColumn();
-		col.setProperty(Predicates.DC_DATE);
+		col.setPredicateUri(Predicates.DC_DATE);
 		col.setTitle("Date");
 		col.setSortable(true);
 		list.add(col);
@@ -141,10 +144,10 @@ public abstract class SubjectSearchActionBean extends AbstractCRActionBean{
 	}
 
 	/**
-	 * @return the totalMatchCount
+	 * @return the matchCount
 	 */
-	public int getTotalMatchCount() {
-		return totalMatchCount;
+	public int getMatchCount() {
+		return matchCount;
 	}
 	
 	/**
@@ -153,9 +156,13 @@ public abstract class SubjectSearchActionBean extends AbstractCRActionBean{
 	 */
 	public Pagination getPagination(){
 		
-		StringBuffer buf = new StringBuffer(getUrlBinding());
-		buf.append("?").append(getContext().getRequest().getQueryString());
-
-		return Pagination.getPagination(getTotalMatchCount(), getPageN(), buf.toString());
+		if (pagination==null){
+			StringBuffer buf = new StringBuffer(getUrlBinding());
+			buf.append("?").append(getContext().getRequest().getQueryString());
+	
+			pagination = Pagination.getPagination(getMatchCount(), getPageN(), buf.charAt(0)=='/' ? buf.substring(1) : buf.toString());
+		}
+		
+		return pagination;
 	}
 }

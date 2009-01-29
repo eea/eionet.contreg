@@ -1,5 +1,6 @@
 package eionet.cr.web.action;
 
+import java.util.Collection;
 import java.util.List;
 
 import net.sourceforge.stripes.action.DefaultHandler;
@@ -9,6 +10,8 @@ import net.sourceforge.stripes.action.UrlBinding;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.Searcher;
+import eionet.cr.search.UriSearch;
+import eionet.cr.search.util.SearchExpression;
 import eionet.cr.web.util.factsheet.FactsheetUtil;
 import eionet.cr.web.util.factsheet.ResourcePropertyDTO;
 
@@ -22,9 +25,7 @@ public class FactsheetActionBean extends AbstractCRActionBean{
 
 	/** */
 	private String uri;
-	private String url;
-	private SubjectDTO resource;
-	private List<ResourcePropertyDTO> resourceProperties;
+	private SubjectDTO subject;
 
 	/**
 	 * 
@@ -33,11 +34,13 @@ public class FactsheetActionBean extends AbstractCRActionBean{
 	 */
 	@DefaultHandler
 	public Resolution view() throws SearchException{
-		resource = Searcher.getResourceByUri(uri);
-		if (resource!=null){
-			resourceProperties = FactsheetUtil.getPropertiesForFactsheet(resource);
-			url = resource.getUrl();
-		}
+		
+		UriSearch uriSearch = new UriSearch(new SearchExpression(uri));
+		uriSearch.execute();
+		Collection<SubjectDTO> coll = uriSearch.getResultList();
+		if (coll!=null && !coll.isEmpty())
+			subject = coll.iterator().next();
+
 		return new ForwardResolution("/pages/factsheet.jsp");
 	}
 
@@ -56,23 +59,9 @@ public class FactsheetActionBean extends AbstractCRActionBean{
 	}
 
 	/**
-	 * @return the resourceProperties
-	 */
-	public List<ResourcePropertyDTO> getResourceProperties() {
-		return resourceProperties;
-	}
-
-	/**
 	 * @return the resource
 	 */
-	public SubjectDTO getResource() {
-		return resource;
-	}
-
-	/**
-	 * @return the url
-	 */
-	public String getUrl() {
-		return url;
+	public SubjectDTO getSubject() {
+		return subject;
 	}
 }

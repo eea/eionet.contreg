@@ -6,36 +6,34 @@
 
 	<stripes:layout-component name="contents">
 	
-        <h1>Resource properties</h1>
+        <h1>Resource factsheet</h1>
         
 	    <c:choose>
-		    <c:when test="${actionBean.resource!=null}">
+		    <c:when test="${actionBean.subject!=null}">
+		    	<c:set var="subjectUrl" value="${actionBean.subject.url}"/>
 		    	<div style="margin-top:20px">
 		    		<c:choose>
-		    			<c:when test="${actionBean.url!=null}">
-		    				<p>Click <a href="${actionBean.url}">here</a> to go to the resource's original location.</p>
+		    			<c:when test="${subjectUrl!=null}">
+		    				<p>Click <a href="${subjectUrl}">here</a> to go to the resource's original location.</p>
 		    			</c:when>
 		    			<c:otherwise>
 		    				<p>Link to the resource's original location was not found.</p>
 		    			</c:otherwise>
 		    		</c:choose>
-			    	<table class="datatable" width="100%" cellspacing="0" summary="The table displays the resource's metadata elements in label, value columns">
+			    	<table class="datatable" width="100%" cellspacing="0" summary="">
 			    		<tbody>
-					    	<c:forEach var="resourceProperty" items="${actionBean.resourceProperties}">
-					    		<tr>
-					    			<th scope="row" class="scope-row metalabel" title="resourceProperty.label">
-					    				${fn:escapeXml(crfn:cutAtFirstLongToken(resourceProperty.label,50))}
-					    			</th>
-					    			<td>
-					    				<ul class="menu">
-						    				<c:forEach var="resourcePropertyValue" items="${resourceProperty.values}">
-						    					<li title="${resourcePropertyValue.label}">
-						    						${fn:escapeXml(crfn:cutAtFirstLongToken(resourcePropertyValue.label,50))}
-						    					</li>
-						    				</c:forEach>
-					    				</ul>
-					    			</td>
-					    		</tr>
+					    	<c:forEach var="predicate" items="${actionBean.subject.predicates}">
+					    		<c:forEach items="${predicate.value}" var="object" varStatus="objectsStatus">
+						    		<tr>
+						    			<th>
+						    				<c:choose>
+						    					<c:when test="${objectsStatus.count==1}">${predicate.key}</c:when>
+						    					<c:otherwise>&nbsp;</c:otherwise>
+						    				</c:choose>
+						    			</th>
+						    			<td>${object.value}</td>
+						    		</tr>
+						    	</c:forEach>
 					    	</c:forEach>
 					    </tbody>
 			    	</table>

@@ -72,7 +72,7 @@
 		    			</c:if>
 		    			
 		    			<c:if test="${(actionBean.resultList!=null && fn:length(actionBean.resultList)>0) || not empty param.search}">
-				    		<stripes:layout-render name="/pages/common/resourcesResultList.jsp" tableClass="sortable"/>
+				    		<stripes:layout-render name="/pages/common/subjectsResultList.jsp" tableClass="sortable"/>
 				    	</c:if>
 	    				
 		    		</stripes:form>

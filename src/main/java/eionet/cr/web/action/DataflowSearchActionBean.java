@@ -156,25 +156,25 @@ public class DataflowSearchActionBean extends SubjectSearchActionBean{
 		ArrayList<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
 		
 		SearchResultColumn col = new SearchResultColumn();
-		col.setProperty(Predicates.RDFS_LABEL);
+		col.setPredicateUri(Predicates.RDFS_LABEL);
 		col.setTitle("Title");
 		col.setSortable(true);
 		list.add(col);
 		
 		col = new SearchResultColumn();
-		col.setProperty(Predicates.ROD_OBLIGATION_PROPERTY);
+		col.setPredicateUri(Predicates.ROD_OBLIGATION_PROPERTY);
 		col.setTitle("Dataflow");
 		col.setSortable(true);
 		list.add(col);
 
 		col = new SearchResultColumn();
-		col.setProperty(Predicates.ROD_LOCALITY_PROPERTY);
+		col.setPredicateUri(Predicates.ROD_LOCALITY_PROPERTY);
 		col.setTitle("Locality");
 		col.setSortable(true);
 		list.add(col);
 
 		col = new SearchResultColumn();
-		col.setProperty(Predicates.DC_DATE);
+		col.setPredicateUri(Predicates.DC_DATE);
 		col.setTitle("Date");
 		col.setSortable(true);
 		list.add(col);

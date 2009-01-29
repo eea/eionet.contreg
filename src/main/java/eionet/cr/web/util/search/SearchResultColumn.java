@@ -1,7 +1,5 @@
 package eionet.cr.web.util.search;
 
-import eionet.cr.common.Md5Map;
-
 /**
  * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
@@ -10,34 +8,23 @@ import eionet.cr.common.Md5Map;
 public class SearchResultColumn {
 
 	/** */
-	private String property;
-	private String propertyKey;
+	private String predicateUri;
 	private String title;
-	private boolean sortable;
+	private boolean isSortable;
 	
 	/**
-	 * @return the property
+	 * @return the predicateUri
 	 */
-	public String getProperty() {
-		return property;
+	public String getPredicateUri() {
+		return predicateUri;
 	}
 	/**
-	 * @param property the property to set
+	 * @param predicateUri the predicateUri to set
 	 */
-	public void setProperty(String property) {
-		this.property = property;
+	public void setPredicateUri(String property) {
+		this.predicateUri = property;
 	}
-	/**
-	 * @return the propertyKey
-	 */
-	public String getPropertyKey() {
-		if (propertyKey==null){
-			if (property!=null){
-				propertyKey = Md5Map.addValue(property);
-			}
-		}
-		return propertyKey;
-	}
+	
 	/**
 	 * @return the title
 	 */
@@ -51,15 +38,15 @@ public class SearchResultColumn {
 		this.title = title;
 	}
 	/**
-	 * @return the sortable
+	 * @return the isSortable
 	 */
 	public boolean isSortable() {
-		return sortable;
+		return isSortable;
 	}
 	/**
-	 * @param sortable the sortable to set
+	 * @param isSortable the isSortable to set
 	 */
-	public void setSortable(boolean sortable) {
-		this.sortable = sortable;
+	public void setSortable(boolean isSortable) {
+		this.isSortable = isSortable;
 	}
 }

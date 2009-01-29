@@ -16,7 +16,7 @@
 	    </c:if>
 	    
 	    <stripes:form action="/dataflowSearch.action" method="get" style="padding-bottom:20px">	
-			<stripes:layout-render name="/pages/common/resourcesResultList.jsp" tableClass="sortable"/>
+			<stripes:layout-render name="/pages/common/subjectsResultList.jsp" tableClass="sortable"/>
 		</stripes:form>
 				
 	</stripes:layout-component>

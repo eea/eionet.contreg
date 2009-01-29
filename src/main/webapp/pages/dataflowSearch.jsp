@@ -45,7 +45,7 @@
 		</div>			  
 		
 		<c:if test="${not empty param.search}">
-    		<stripes:layout-render name="/pages/common/resourcesResultList.jsp" tableClass="sortable"/>
+    		<stripes:layout-render name="/pages/common/subjectsResultList.jsp" tableClass="sortable"/>
     	</c:if>
 				    	
 	</stripes:layout-component>
