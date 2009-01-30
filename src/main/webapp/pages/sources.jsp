@@ -12,6 +12,12 @@
 		<ul>
 			<li>
 				<stripes:link href="/source.action" event="add">Add new source</stripes:link>
+				<c:if test="${actionBean.type!=null && actionBean.type=='data'}">
+					<stripes:link href="/sources.action" event="harvest" title="Schedule urgent harvest of all data sources">Harvest all data</stripes:link>
+				</c:if>
+				<c:if test="${actionBean.type!=null && actionBean.type=='schema'}">
+					<stripes:link href="/sources.action" event="harvest" title="Schedule urgent harvest of all schemas sources">Harvest all schemas</stripes:link>
+				</c:if>
 			</li>
 		</ul>
 	</div>
@@ -49,18 +55,14 @@
 					<img src="${pageContext.request.contextPath}/images/view2.gif" title="View" alt="View"/>
 					<stripes:param name="harvestSource.sourceId" value="${harvestSource.sourceId}"/>
 				</stripes:link>
-			</display:column>
-			<display:column>
-				<stripes:link href="/source.action" event="edit">
-					<img src="${pageContext.request.contextPath}/images/edit.gif" title="Edit" alt="Edit"/>
-					<stripes:param name="harvestSource.sourceId" value="${harvestSource.sourceId}"/>
+				&nbsp;<stripes:link href="/sources.action" event="harvest">
+					<img src="${pageContext.request.contextPath}/images/refresh.png" title="Schedule urgent harvest" alt="Schedule urgent harvest"/>
+					<stripes:param name="harvestUrl" value="${harvestSource.url}"/>
 				</stripes:link>
-			</display:column>
-			<display:column>
-				<stripes:link href="/source.action" event="delete" onclick="return confirm('Are you sure you want to delete this harvesting source');">
+				&nbsp;<stripes:link href="/source.action" event="delete" onclick="return confirm('Are you sure you want to delete this harvesting source?. This does not yet delete all content harvested from this source. It has not been implemented yet.');">
 					<img src="${pageContext.request.contextPath}/images/delete_small.gif" title="Delete" alt="Delete"/>
 					<stripes:param name="harvestSource.sourceId" value="${harvestSource.sourceId}"/>
-				</stripes:link>
+				</stripes:link>				
 			</display:column>
 			
 		</display:table>

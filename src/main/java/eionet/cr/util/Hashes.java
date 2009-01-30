@@ -100,6 +100,6 @@ public class Hashes {
 	}
 	
 	public static void main(String[] args){
-		System.out.println(spoHash("http://rod.eionet.eu.int/schema.rdf#obligation"));
+		System.out.println(spoHash("urn:uuid:41904690-E552-40B4-98E8-AD05D008422F"));
 	}
 }

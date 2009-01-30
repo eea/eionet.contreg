@@ -57,6 +57,9 @@ public class DataflowSearchActionBean extends AbstractSubjectSearchActionBean{
 	 */
 	private void loadOptions() throws SearchException{
 		
+		if (true)
+			return;
+		
 		HttpSession session = this.getContext().getRequest().getSession();
 		if (session.getAttribute(DATAFLOWS_SESSION_ATTR_NAME)==null)
 			session.setAttribute(DATAFLOWS_SESSION_ATTR_NAME, Searcher.getDataflowsGroupedByInstruments());

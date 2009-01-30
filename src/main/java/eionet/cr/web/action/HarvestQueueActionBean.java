@@ -43,7 +43,7 @@ public class HarvestQueueActionBean extends AbstractActionBean{
 	 * 
 	 */
 	public HarvestQueueActionBean(){
-		setPriority(HarvestQueue.PRIORITY_NORMAL);
+		setPriority(HarvestQueue.PRIORITY_URGENT);
 	}
 	
 	/**
@@ -97,13 +97,13 @@ public class HarvestQueueActionBean extends AbstractActionBean{
 			priorities = new ArrayList<Map<String,String>>();
 			
 			Map<String,String> priorityMap = new HashMap<String,String>();
-			priorityMap.put("title", "Normal queue");
-			priorityMap.put("priority", HarvestQueue.PRIORITY_NORMAL);
-			priorities.add(priorityMap);
-			
-			priorityMap = new HashMap<String,String>();
 			priorityMap.put("title", "Urgent queue");
 			priorityMap.put("priority", HarvestQueue.PRIORITY_URGENT);
+			priorities.add(priorityMap);
+
+			priorityMap = new HashMap<String,String>();
+			priorityMap.put("title", "Normal queue");
+			priorityMap.put("priority", HarvestQueue.PRIORITY_NORMAL);
 			priorities.add(priorityMap);
 		}
 		

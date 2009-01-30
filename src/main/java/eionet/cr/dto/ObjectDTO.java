@@ -12,6 +12,7 @@ public class ObjectDTO {
 	private String language;
 	private boolean literal;
 	private boolean anonymous;
+	private String source;
 	private String derivSource;
 	
 	/**
@@ -100,5 +101,32 @@ public class ObjectDTO {
 	 */
 	public void setDerivSource(String derivSource) {
 		this.derivSource = derivSource;
+	}
+
+	/**
+	 * @return the source
+	 */
+	public String getSource() {
+		return source;
+	}
+
+	/**
+	 * @param source the source to set
+	 */
+	public void setSource(String source) {
+		this.source = source;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public String getSourceSmart() {
+		if (derivSource!=null && derivSource.trim().length()>0)
+			return derivSource;
+		else if (source!=null && source.trim().length()>0)
+			return source;
+		else
+			return null;
 	}
 }

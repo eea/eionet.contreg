@@ -149,10 +149,14 @@ public abstract class AbstractSubjectSearch {
 		
 		StringBuffer buf = new StringBuffer().
 		append("select SUBJECT, SUBJ_RESOURCE.URI as SUBJECT_URI, PRED_RESOURCE.URI as PREDICATE_URI, ").
-		append("OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_DERIV_SOURCE, OBJ_LANG ").
-		append("from SPO, RESOURCE as SUBJ_RESOURCE, RESOURCE as PRED_RESOURCE ").
-		append("where SUBJECT in (").append(subjectHashes).append(") and ").
-		append("SUBJECT=SUBJ_RESOURCE.URI_HASH and PREDICATE=PRED_RESOURCE.URI_HASH order by SUBJECT, PREDICATE, OBJECT");
+		append("OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG, ").
+		append("SRC_RESOURCE.URI as SOURCE_URI, DSRC_RESOURCE.URI as DERIV_SOURCE_URI from SPO ").
+		append("left join RESOURCE as SUBJ_RESOURCE on (SUBJECT=SUBJ_RESOURCE.URI_HASH) ").
+		append("left join RESOURCE as PRED_RESOURCE on (PREDICATE=PRED_RESOURCE.URI_HASH) ").
+		append("left join RESOURCE as SRC_RESOURCE on (SOURCE=SRC_RESOURCE.URI_HASH) ").
+		append("left join RESOURCE as DSRC_RESOURCE on (OBJ_DERIV_SOURCE=DSRC_RESOURCE.URI_HASH) ").
+		append("where SUBJECT in (").append(subjectHashes).append(") ").
+		append("order by SUBJECT, PREDICATE, OBJECT");
 		
 		return buf.toString();
 	}

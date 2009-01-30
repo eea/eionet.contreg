@@ -119,6 +119,9 @@ public class CustomSearchActionBean extends AbstractSubjectSearchActionBean{
 	 */
 	public Collection<String> getPicklist() throws SearchException{
 
+		if (true)
+			return new ArrayList<String>();
+			
 		if (!isShowPicklist())
 			return null;
 		else if (!getAvailableFilters().containsKey(getPicklistFilter()))

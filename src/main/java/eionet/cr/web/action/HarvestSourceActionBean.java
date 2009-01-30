@@ -4,6 +4,7 @@ import java.util.List;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.validation.SimpleError;
@@ -70,8 +71,21 @@ public class HarvestSourceActionBean extends AbstractActionBean {
      */
     @DefaultHandler
     public Resolution view() throws DAOException {
-    	harvestSource = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(harvestSource.getSourceId());
-    	harvests = DAOFactory.getDAOFactory().getHarvestDAO().getHarvestsBySourceId(harvestSource.getSourceId());
+    	
+    	if (harvestSource!=null){
+    		Integer sourceId = harvestSource.getSourceId();
+    		String url = harvestSource.getUrl();
+    		if (sourceId!=null){
+    			harvestSource = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(sourceId);
+    		}
+    		else if (url!=null && url.trim().length()>0){
+    			harvestSource = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceByUrl(url);
+    		}
+    		if (harvestSource!=null){
+    			harvests = DAOFactory.getDAOFactory().getHarvestDAO().getHarvestsBySourceId(harvestSource.getSourceId());
+    		}
+    	}
+    
     	return new ForwardResolution("/pages/viewsource.jsp");
     }
 
@@ -188,6 +202,17 @@ public class HarvestSourceActionBean extends AbstractActionBean {
 
     	showMessage("Successfully scheduled for urgent harvest!");
     	return new ForwardResolution("/pages/viewsource.jsp");
+    }
+    
+    /**
+     * 
+     * @return
+     */
+    public Resolution goToEdit(){
+    	if (harvestSource!=null)
+    		return new RedirectResolution(getUrlBinding() + "?edit=&harvestSource.sourceId=" + harvestSource.getSourceId());
+    	else
+    		return new ForwardResolution("/pages/viewsource.jsp");
     }
 
     @ValidationMethod(on={ADD_EVENT,EDIT_EVENT})
