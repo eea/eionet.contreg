@@ -14,11 +14,11 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `spo`
+-- Table structure for table `SPO`
 --
 
-DROP TABLE IF EXISTS `spo`;
-CREATE TABLE `spo` (
+DROP TABLE IF EXISTS `SPO`;
+CREATE TABLE `SPO` (
   `SUBJECT` bigint(20) NOT NULL default '0',
   `PREDICATE` bigint(20) NOT NULL default '0',
   `OBJECT` text NOT NULL,
@@ -40,11 +40,11 @@ CREATE TABLE `spo` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --
--- Table structure for table `spo_temp`
+-- Table structure for table `SPO_TEMP`
 --
 
-DROP TABLE IF EXISTS `spo_temp`;
-CREATE TABLE `spo_temp` (
+DROP TABLE IF EXISTS `SPO_TEMP`;
+CREATE TABLE `SPO_TEMP` (
   `SUBJECT` bigint(20) NOT NULL default '0',
   `PREDICATE` bigint(20) NOT NULL default '0',
   `OBJECT` text NOT NULL,
@@ -56,11 +56,11 @@ CREATE TABLE `spo_temp` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --
--- Table structure for table `resource`
+-- Table structure for table `RESOURCE`
 --
 
-DROP TABLE IF EXISTS `resource`;
-CREATE TABLE `resource` (
+DROP TABLE IF EXISTS `RESOURCE`;
+CREATE TABLE `RESOURCE` (
   `URI` text NOT NULL,
   `URI_HASH` bigint(20) NOT NULL default '0',
   `FIRSTSEEN_SOURCE` bigint(20) NOT NULL default '0',
@@ -71,11 +71,11 @@ CREATE TABLE `resource` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --
--- Table structure for table `resource_temp`
+-- Table structure for table `RESOURCE_TEMP`
 --
 
-DROP TABLE IF EXISTS `resource_temp`;
-CREATE TABLE `resource_temp` (
+DROP TABLE IF EXISTS `RESOURCE_TEMP`;
+CREATE TABLE `RESOURCE_TEMP` (
   `URI` text NOT NULL,
   `URI_HASH` bigint(20) NOT NULL default '0',
   PRIMARY KEY  (`URI_HASH`)
