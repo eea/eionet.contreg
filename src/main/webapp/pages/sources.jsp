@@ -13,10 +13,16 @@
 			<li>
 				<stripes:link href="/source.action" event="add">Add new source</stripes:link>
 				<c:if test="${actionBean.type!=null && actionBean.type=='data'}">
-					<stripes:link href="/sources.action" event="harvest" title="Schedule urgent harvest of all data sources">Harvest all data</stripes:link>
+					<stripes:link href="/sources.action" event="harvest" title="Schedule urgent harvest of all data sources">
+						Harvest all data
+						<stripes:param name="type" value="${actionBean.type}"/>
+					</stripes:link>
 				</c:if>
 				<c:if test="${actionBean.type!=null && actionBean.type=='schema'}">
-					<stripes:link href="/sources.action" event="harvest" title="Schedule urgent harvest of all schemas sources">Harvest all schemas</stripes:link>
+					<stripes:link href="/sources.action" event="harvest" title="Schedule urgent harvest of all schemas sources">
+						Harvest all schemas
+						<stripes:param name="type" value="${actionBean.type}"/>
+					</stripes:link>					
 				</c:if>
 			</li>
 		</ul>
