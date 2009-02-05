@@ -26,6 +26,7 @@
 	    	<stripes:label for="expressionText">Expression:</stripes:label>
 	    	<stripes:text name="searchExpression" id="expressionText" size="30"/>
 	    	<stripes:submit name="search" value="Search" id="searchButton"/>
+				<stripes:text name="dummy" style="visibility:hidden;display:none" disabled="disabled" size="1"/>
 	    	
 	    </stripes:form>
 	    
