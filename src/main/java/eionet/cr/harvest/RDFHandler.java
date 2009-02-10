@@ -70,7 +70,7 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	private HashSet distinctSubjects = new HashSet();
 	
 	/** */
-	private boolean clearPreviousContent = false;
+	private boolean clearPreviousContent = true;
 	
 	/** */
 	private boolean parsingStarted = false;

@@ -162,7 +162,7 @@ public abstract class Harvest {
 		
 		RDFHandler rdfHandler = new RDFHandler(sourceUrlString, genTime);
 		if (this instanceof PushHarvest)
-			rdfHandler.setClearPreviousContent(true);
+			rdfHandler.setClearPreviousContent(false);
 		
 		try{
 			ARP arp = new ARP();
