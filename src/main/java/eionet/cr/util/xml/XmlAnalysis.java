@@ -73,28 +73,31 @@ public class XmlAnalysis {
 	 */
 	public void parse(InputStream inputStream) throws ParserConfigurationException, SAXException, IOException {
 		
+		// set up the parser and reader
 		SAXParserFactory parserFactory = SAXParserFactory.newInstance();
 		SAXParser parser = parserFactory.newSAXParser();
 		XMLReader reader = parser.getXMLReader();
 
+		// turn off validation against schema or dtd (we only need the document to be well-formed XML)
 		parserFactory.setValidating(false);
 		reader.setFeature("http://xml.org/sax/features/validation", false); 
 		reader.setFeature("http://apache.org/xml/features/validation/schema", false);
 		reader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
 		reader.setFeature("http://xml.org/sax/features/namespaces", true);
-
+		
 		// turn on dtd handling
 		doctypeReader = new SAXDoctypeReader();
 		try {
 			parser.setProperty("http://xml.org/sax/properties/lexical-handler", doctypeReader);
 		}
 		catch (SAXNotRecognizedException e) {
-			logger.warn("Installed XML parser does not provide lexical events...", e);
+			logger.warn("Installed XML parser does not provide lexical events", e);
 		}
 		catch (SAXNotSupportedException e) {
 			logger.warn("Cannot turn on comment processing here", e);
 		}       
 
+		// set the handler and do the parsing
 		handler = new Handler();
 		reader.setContentHandler(handler);
 		try{

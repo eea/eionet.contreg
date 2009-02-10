@@ -359,9 +359,6 @@ public abstract class Harvest {
 	 */
 	protected File preProcess(File file, String fromUrl) throws ParserConfigurationException, SAXException, IOException{
 
-		if (!Util.isValidXmlFile(file.getAbsolutePath()))
-			return null;
-		
 		XmlAnalysis xmlAnalysis = new XmlAnalysis();
 		xmlAnalysis.parse(file);
 		

@@ -395,38 +395,6 @@ public class Util {
 	
 	/**
 	 * 
-	 * @param file
-	 * @return
-	 * @throws IOException
-	 * @throws ParserConfigurationException
-	 */
-	public static boolean isValidXmlFile(File file) throws IOException, ParserConfigurationException{
-		return isValidXmlFile(file.getAbsolutePath());
-	}
-	
-	/**
-	 * 
-	 * @param fileFullPath
-	 * @return
-	 * @throws IOException
-	 * @throws ParserConfigurationException
-	 */
-	public static boolean isValidXmlFile(String fileFullPath) throws IOException, ParserConfigurationException{
-		
-		try {
-			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-			DocumentBuilder db = dbf.newDocumentBuilder();
-			db.parse(fileFullPath);
-		}
-		catch (SAXException e){
-			return false;
-		}
-		
-		return true;
-	}
-	
-	/**
-	 * 
 	 * @param o
 	 * @return
 	 */
