@@ -68,7 +68,7 @@ CREATE TABLE `HARVEST_QUEUE` (
 DROP TABLE IF EXISTS `HARVEST_SOURCE`;
 CREATE TABLE `HARVEST_SOURCE` (
   `HARVEST_SOURCE_ID` int(10) unsigned NOT NULL auto_increment,
-  `NAME` varchar(255) NOT NULL default '',
+  `NAME` varchar(255) default NULL,
   `URL` varchar(255) default NULL,
   `TYPE` varchar(30) NOT NULL default '',
   `EMAILS` varchar(255) default NULL,

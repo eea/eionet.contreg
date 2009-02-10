@@ -15,11 +15,11 @@
 	        <table>
 	            <tr>
 	                <td>Name:</td>
-	                <td><stripes:text name="harvestSource.name"/></td>
+	                <td><stripes:text name="harvestSource.name" size="100"/></td>
 	            </tr>
 	            <tr>
 	                <td>URL:</td>
-	                <td><stripes:text name="harvestSource.url"/></td>
+	                <td><stripes:text name="harvestSource.url" size="100"/></td>
 	            </tr>
 	            <tr>
 	                <td>Type:</td>
@@ -32,7 +32,7 @@
 	            </tr>
 	            <tr>
 	                <td>E-mails:</td>
-	                <td><stripes:text name="harvestSource.emails"/></td>
+	                <td><stripes:text name="harvestSource.emails" size="100"/></td>
 	            </tr>
 	            <tr>
 	                <td>Date created:</td>
@@ -56,7 +56,7 @@
 	            </tr>
 	            <tr>
 	                <td>Schedule cron expression:</td>
-	                <td><stripes:text name="harvestSource.scheduleCron" class="cronExpression"/></td>
+	                <td><stripes:text name="harvestSource.scheduleCron" class="cronExpression" size="40"/></td>
 	            </tr>
 	            <tr>
 	                <td colspan="2">
