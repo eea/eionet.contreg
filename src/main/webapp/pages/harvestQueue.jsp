@@ -17,7 +17,7 @@
         Harvests from the urgent queue are executed before harvests in the normal queue.</p>
         
         <c:if test="${not empty actionBean.currentlyHarvestedQueueItem}">
-			<div class="important-msg" style="margin-bottom:10px">
+			<div class="advise-msg" style="margin-bottom:10px">
 				<c:choose>
 					<c:when test="${actionBean.currentlyHarvestedQueueItem.pushHarvest}">Currently push-harvesting:&nbsp;</c:when>
 					<c:otherwise>Currently pull-harvesting:&nbsp;</c:otherwise>
