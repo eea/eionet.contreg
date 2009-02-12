@@ -7,6 +7,7 @@ import java.util.Map;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import eionet.cr.dao.DAOException;
@@ -15,6 +16,7 @@ import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.scheduled.HarvestQueue;
 import eionet.cr.harvest.util.DedicatedHarvestSourceTypes;
+import eionet.cr.util.QueryString;
 
 /**
  * @author altnyris
@@ -131,7 +133,7 @@ public class HarvestSourcesActionBean extends AbstractActionBean {
 			}
 		}
 		
-		return new ForwardResolution("/pages/sources.jsp");
+		return new RedirectResolution(getClass());
 	}
 
 	/**
