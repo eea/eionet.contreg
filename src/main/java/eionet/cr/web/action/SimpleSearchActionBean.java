@@ -17,7 +17,6 @@ import org.apache.lucene.queryParser.ParseException;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.search.SearchException;
-import eionet.cr.search.Searcher;
 import eionet.cr.search.SimpleSearch;
 import eionet.cr.search.UriSearch;
 import eionet.cr.search.util.SearchExpression;

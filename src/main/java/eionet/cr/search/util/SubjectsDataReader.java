@@ -4,12 +4,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 
 import eionet.cr.dto.ObjectDTO;
-import eionet.cr.dto.PredicateDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.sql.ResultSetBaseReader;

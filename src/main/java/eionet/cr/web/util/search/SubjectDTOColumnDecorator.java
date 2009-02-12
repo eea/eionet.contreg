@@ -4,7 +4,6 @@ package eionet.cr.web.util.search;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.List;
 
 import javax.servlet.jsp.PageContext;
 
@@ -13,8 +12,6 @@ import org.displaytag.exception.DecoratorException;
 import org.displaytag.properties.MediaTypeEnum;
 
 import eionet.cr.dto.ObjectDTO;
-import eionet.cr.dto.SubjectDTO;
-import eionet.cr.util.Util;
 import eionet.cr.web.util.JstlFunctions;
 
 /**

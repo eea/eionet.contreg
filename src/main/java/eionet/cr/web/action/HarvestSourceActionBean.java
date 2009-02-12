@@ -144,12 +144,12 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     public Resolution delete() throws DAOException {
 		if(isUserLoggedIn()){
 			DAOFactory.getDAOFactory().getHarvestSourceDAO().deleteSource(getHarvestSource());
-			showMessage(getBundle().getString("harvet.source.deleted"));
+			addSessionMessage("Harvest source deleted");
 		}
 		else
 			handleCrException(getBundle().getString("not.logged.in"), GeneralConfig.SEVERITY_WARNING);
 		
-        return new ForwardResolution(HarvestSourcesActionBean.class);
+        return new RedirectResolution(HarvestSourcesActionBean.class);
     }
     
     /**

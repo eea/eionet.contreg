@@ -14,7 +14,6 @@ import org.apache.commons.logging.LogFactory;
 
 import eionet.cr.common.CRRuntimeException;
 import eionet.cr.config.GeneralConfig;
-import eionet.cr.dao.DAOException;
 
 /**
  * 

@@ -1,14 +1,10 @@
 package eionet.cr.harvest.scheduled;
 
-import java.sql.SQLException;
-import java.util.List;
-
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.quartz.Job;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -17,11 +13,9 @@ import org.quartz.StatefulJob;
 
 import eionet.cr.common.JobScheduler;
 import eionet.cr.config.GeneralConfig;
-import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dto.HarvestQueueItemDTO;
 import eionet.cr.dto.HarvestSourceDTO;
-import eionet.cr.dto.UnfinishedHarvestDTO;
 import eionet.cr.harvest.Harvest;
 import eionet.cr.harvest.HarvestDAOWriter;
 import eionet.cr.harvest.PullHarvest;

@@ -7,14 +7,10 @@ import java.util.List;
 import java.util.Map;
 
 import eionet.cr.dao.DAOException;
-import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
-import eionet.cr.dto.HarvestDTO;
 import eionet.cr.dto.HarvestSourceDTO;
-import eionet.cr.dto.readers.HarvestDTOReader;
 import eionet.cr.dto.readers.HarvestSourceDTOReader;
 import eionet.cr.util.Util;
-import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.sql.ConnectionUtil;
 import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SQLValue;

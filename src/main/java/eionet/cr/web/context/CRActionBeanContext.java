@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import net.sourceforge.stripes.action.ActionBeanContext;
+import eionet.cr.dto.ObjectDTO;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.security.EionetCASFilter;
 

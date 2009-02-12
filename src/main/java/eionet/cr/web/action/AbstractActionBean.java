@@ -1,6 +1,10 @@
 package eionet.cr.web.action;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
+
+import javax.servlet.http.HttpSession;
 
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
@@ -27,6 +31,9 @@ import eionet.cr.web.security.CRUser;
  *
  */
 public abstract class AbstractActionBean implements ActionBean {
+	
+	/** */
+	private static final String SESSION_MESSAGES = AbstractActionBean.class.getName() + ".sessionMessages";
 	
 	/** */
 	private static Log logger = LogFactory.getLog(AbstractActionBean.class);
@@ -102,6 +109,51 @@ public abstract class AbstractActionBean implements ActionBean {
 	void showMessage(String msg) {
 		getContext().setSeverity(GeneralConfig.SEVERITY_INFO);
 		getContext().getMessages().add(new SimpleMessage(msg));
+	}
+
+	/**
+	 * 
+	 * @param msg
+	 */
+	void showMessage(Message msg) {
+		getContext().setSeverity(GeneralConfig.SEVERITY_INFO);
+		getContext().getMessages().add(msg);
+	}
+
+	/**
+	 * 
+	 * @param message
+	 */
+	void addSessionMessage(String message){
+		
+		HttpSession session = getContext().getRequest().getSession();
+		if (session!=null){
+			List<Message> messages = (List<Message>)session.getAttribute(SESSION_MESSAGES);
+			if (messages==null){
+				messages = new ArrayList<Message>();
+				session.setAttribute(SESSION_MESSAGES, messages);
+			}
+			messages.add(new SimpleMessage(message));
+		}
+	}
+
+	/**
+	 * 
+	 */
+	void showSessionMessages(boolean removeAfterShow){
+		
+		HttpSession session = getContext().getRequest().getSession();
+		if (session!=null){
+			List<Message> messages = (List<Message>)session.getAttribute(SESSION_MESSAGES);
+			if (messages!=null && !messages.isEmpty()){
+				for (int i=0; i<messages.size(); i++){
+					showMessage(messages.get(i));
+				}
+			}
+			
+			if (removeAfterShow)
+				session.removeAttribute(SESSION_MESSAGES);
+		}
 	}
 
 	/**

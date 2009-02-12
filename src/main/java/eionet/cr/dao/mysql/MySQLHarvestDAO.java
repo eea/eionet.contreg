@@ -12,7 +12,6 @@ import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dto.HarvestBaseDTO;
 import eionet.cr.dto.HarvestDTO;
 import eionet.cr.dto.readers.HarvestDTOReader;
-import eionet.cr.harvest.Harvest;
 import eionet.cr.util.sql.ConnectionUtil;
 import eionet.cr.util.sql.SQLUtil;
 

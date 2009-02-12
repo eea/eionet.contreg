@@ -16,7 +16,6 @@ import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.scheduled.HarvestQueue;
 import eionet.cr.harvest.util.DedicatedHarvestSourceTypes;
-import eionet.cr.util.QueryString;
 
 /**
  * @author altnyris
@@ -51,6 +50,9 @@ public class HarvestSourcesActionBean extends AbstractActionBean {
 	public Resolution view() throws DAOException{
 		if (type!=null && type.length()>0)
 			harvestSources = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourcesByType(type);
+		
+		showSessionMessages(true);
+		
 		return new ForwardResolution("/pages/sources.jsp");
 	}
 
@@ -122,14 +124,14 @@ public class HarvestSourcesActionBean extends AbstractActionBean {
 			
 			if (harvestUrl!=null && harvestUrl.trim().length()>0){
 				HarvestQueue.addPullHarvest(harvestUrl.trim(), HarvestQueue.PRIORITY_URGENT);
-				showMessage("The source has been scheduled for urgent harvest!");
+				addSessionMessage("The source has been scheduled for urgent harvest!");
 			}
 			else if (type.equals("data") || type.equals("schema") && harvestSources!=null && !harvestSources.isEmpty()){
 				
 				for (int i=0; i<harvestSources.size(); i++){
 					HarvestQueue.addPullHarvest(harvestSources.get(i).getUrl(), HarvestQueue.PRIORITY_URGENT);
 				}
-				showMessage("Successfully scheduled harvest of all " + type + " sources");
+				addSessionMessage("Successfully scheduled harvest of all " + type + " sources");
 			}
 		}
 		

@@ -24,7 +24,6 @@ import eionet.cr.common.LabelPredicates;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.config.GeneralConfig;
-import eionet.cr.dao.DAOFactory;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.UnfinishedHarvestDTO;
 import eionet.cr.harvest.util.DedicatedHarvestSourceTypes;

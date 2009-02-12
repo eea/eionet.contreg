@@ -2,7 +2,6 @@ package eionet.cr.common;
 
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.List;
 
 import eionet.cr.util.Hashes;
 

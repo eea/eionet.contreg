@@ -1,23 +1,19 @@
 package eionet.cr.web.util;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 
-import eionet.cr.config.GeneralConfig;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.util.SortOrder;
 import eionet.cr.util.Util;
 import eionet.cr.web.action.AbstractActionBean;
-import eionet.cr.web.action.AbstractSubjectSearchActionBean;
 import eionet.cr.web.security.CRUser;
 
 /**

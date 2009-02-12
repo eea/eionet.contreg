@@ -1,7 +1,6 @@
 package eionet.cr.web.action;
 
 import java.util.Collection;
-import java.util.List;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
@@ -9,7 +8,6 @@ import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
-import eionet.cr.search.Searcher;
 import eionet.cr.search.UriSearch;
 import eionet.cr.search.util.SearchExpression;
 

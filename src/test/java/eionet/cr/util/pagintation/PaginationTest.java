@@ -1,7 +1,7 @@
 package eionet.cr.util.pagintation;
 
-import eionet.cr.util.pagination.Pagination;
 import junit.framework.TestCase;
+import eionet.cr.util.pagination.Pagination;
 
 /**
  * 

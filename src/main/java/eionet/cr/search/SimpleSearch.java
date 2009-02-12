@@ -4,13 +4,11 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import eionet.cr.config.GeneralConfig;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.util.SearchExpression;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.pagination.Pagination;
 import eionet.cr.util.sql.ConnectionUtil;
-import eionet.cr.util.sql.SQLUtil;
 
 /**
  * 

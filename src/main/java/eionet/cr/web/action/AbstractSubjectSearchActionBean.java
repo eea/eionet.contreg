@@ -4,17 +4,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.lang.StringUtils;
-
 import net.sourceforge.stripes.action.Resolution;
 import eionet.cr.common.Predicates;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.util.HitsCollector;
 import eionet.cr.search.util.SortOrder;
-import eionet.cr.util.Util;
 import eionet.cr.util.pagination.Pagination;
 import eionet.cr.web.util.search.SearchResultColumn;
 

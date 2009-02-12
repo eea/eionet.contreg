@@ -1,7 +1,5 @@
 package eionet.cr.util;
 
-import java.io.File;
-
 import junit.framework.TestCase;
 
 /**

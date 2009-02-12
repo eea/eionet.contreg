@@ -2,17 +2,10 @@ package eionet.cr.harvest;
 
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import eionet.cr.common.Predicates;
-import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dto.HarvestMessageDTO;
-import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.util.Util;
-import eionet.cr.web.security.CRUser;
 
 
 /**

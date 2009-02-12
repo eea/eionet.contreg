@@ -4,7 +4,6 @@ import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 
 import eionet.cr.common.CRRuntimeException;
-import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 
 /**
