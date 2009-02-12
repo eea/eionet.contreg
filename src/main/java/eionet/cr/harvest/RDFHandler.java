@@ -2,9 +2,12 @@ package eionet.cr.harvest;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -21,7 +24,9 @@ import eionet.cr.common.LabelPredicates;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.config.GeneralConfig;
+import eionet.cr.dao.DAOFactory;
 import eionet.cr.dto.HarvestSourceDTO;
+import eionet.cr.dto.UnfinishedHarvestDTO;
 import eionet.cr.harvest.util.DedicatedHarvestSourceTypes;
 import eionet.cr.harvest.util.HarvestLog;
 import eionet.cr.util.Hashes;
@@ -37,7 +42,7 @@ import eionet.cr.web.security.CRUser;
  *
  */
 public class RDFHandler implements StatementHandler, ErrorHandler{
-
+	
 	/** */
 	private List<SAXParseException> saxErrors = new ArrayList<SAXParseException>();
 	private List<SAXParseException> saxWarnings = new ArrayList<SAXParseException>();
@@ -74,7 +79,7 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	
 	/** */
 	private boolean parsingStarted = false;
-	
+
 	/**
 	 * 
 	 */
@@ -91,7 +96,7 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 		// set the hash-seed for anonymous ids
 		anonIdSeed = Hashes.spoHash(sourceUrl + String.valueOf(genTime));
 	}
-	
+
 	/*
 	 *  (non-Javadoc)
 	 * @see com.hp.hpl.jena.rdf.arp.StatementHandler#statement(com.hp.hpl.jena.rdf.arp.AResource, com.hp.hpl.jena.rdf.arp.AResource, com.hp.hpl.jena.rdf.arp.AResource)
@@ -164,10 +169,46 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 		// and so any possible leftovers from previous harvest must be deleted)
 		clearTemporaries();
 		
+		// create unfinished harvest flag for the current harvest
+		raiseUnfinishedHarvestFlag();
+		
 		// store the hash of the source itself
 		storeResource(sourceUrl, sourceUrlHash);
 	}
+	
+	/**
+	 * @throws SQLException 
+	 * 
+	 */
+	private void raiseUnfinishedHarvestFlag() throws SQLException{
+		
+		StringBuffer buf = new StringBuffer();
+		buf.append("insert into UNFINISHED_HARVEST (SOURCE, GEN_TIME) values (").
+		append(sourceUrlHash).append(", ").append(genTime).append(")");
+		
+		SQLUtil.executeUpdate(buf.toString(), getConnection());
+	}
+	
+	/**
+	 * 
+	 * @throws SQLException
+	 */
+	private void deleteUnfinishedHarvestFlag() throws SQLException{
+		RDFHandler.deleteUnfinishedHarvestFlag(this.sourceUrlHash, this.genTime, this.getConnection());
+	}
 
+	/**
+	 * 
+	 * @throws SQLException
+	 */
+	private static void deleteUnfinishedHarvestFlag(long sourceUrlHash, long genTime, Connection conn) throws SQLException{
+		
+		StringBuffer buf = new StringBuffer();
+		buf.append("delete from UNFINISHED_HARVEST where SOURCE=").append(sourceUrlHash).append(" and GEN_TIME=").append(genTime);
+		
+		SQLUtil.executeUpdate(buf.toString(), conn);
+	}
+	
 	/**
 	 * 
 	 * @param subject
@@ -307,10 +348,15 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 		commitTriples();
 		commitResources();
 		
-		clearTemporaries();
-		
 		resolveLabels();
 		extractNewHarvestSources();
+		
+		try{
+			clearTemporaries();
+		}
+		catch (Exception e){}
+		
+		deleteUnfinishedHarvestFlag();
 	}
 	
 	/**
@@ -376,9 +422,11 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 		
 		StringBuffer buf = new StringBuffer().
 		append("insert ignore into SPO ").
-		append("(SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_DERIV_SOURCE, OBJ_LANG, SOURCE, GEN_TIME) ").
+		append("(SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG, ").
+		append("OBJ_DERIV_SOURCE, OBJ_DERIV_SOURCE_GEN_TIME, SOURCE, GEN_TIME) ").
 		append("select distinct SPO_FRESH.SUBJECT, SPO_FRESH.PREDICATE, SPO_LABEL.OBJECT, SPO_LABEL.OBJECT_HASH, SPO_FRESH.ANON_SUBJ, ").
-		append("'N' as ANON_OBJ, 'Y' as LIT_OBJ, SPO_LABEL.SOURCE as OBJ_DERIV_SOURCE, SPO_LABEL.OBJ_LANG, SPO_FRESH.SOURCE, SPO_FRESH.GEN_TIME ").
+		append("'N' as ANON_OBJ, 'Y' as LIT_OBJ, SPO_LABEL.OBJ_LANG, ").
+		append("SPO_LABEL.SOURCE as OBJ_DERIV_SOURCE, SPO_LABEL.GEN_TIME as OBJ_DERIV_SOURCE_GEN_TIME, SPO_FRESH.SOURCE, SPO_FRESH.GEN_TIME ").
 		append("from SPO as SPO_FRESH, SPO as SPO_LABEL ").
 		append("where SPO_FRESH.SOURCE=").append(sourceUrlHash).
 		append(" and SPO_FRESH.GEN_TIME=").append(genTime).
@@ -393,10 +441,11 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 		/* Insert freshly harvested labels for all non-literal objects in SPO across all sources. */
 		
 		buf = new StringBuffer().
-		append("insert ignore into SPO (SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ, LIT_OBJ, ").
-		append("OBJ_DERIV_SOURCE, OBJ_LANG, SOURCE, GEN_TIME) ").
+		append("insert ignore into SPO (SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG, ").
+		append("OBJ_DERIV_SOURCE, OBJ_DERIV_SOURCE_GEN_TIME, SOURCE, GEN_TIME) ").
 		append("select distinct SPO_ALL.SUBJECT, SPO_ALL.PREDICATE, SPO_FRESH.OBJECT, SPO_FRESH.OBJECT_HASH, SPO_ALL.ANON_SUBJ, ").
-		append("'N' as ANON_OBJ, 'Y' as LIT_OBJ, SPO_FRESH.SOURCE as OBJ_DERIV_SOURCE, SPO_FRESH.OBJ_LANG, 	SPO_ALL.SOURCE, SPO_ALL.GEN_TIME ").
+		append("'N' as ANON_OBJ, 'Y' as LIT_OBJ, SPO_FRESH.OBJ_LANG, ").
+		append("SPO_FRESH.SOURCE as OBJ_DERIV_SOURCE, SPO_FRESH.GEN_TIME as OBJ_DERIV_SOURCE_GEN_TIME, SPO_ALL.SOURCE, SPO_ALL.GEN_TIME ").
 		append("from SPO as SPO_ALL, SPO as SPO_FRESH ").
 		append("where SPO_ALL.LIT_OBJ='N' and SPO_ALL.OBJECT_HASH=SPO_FRESH.SUBJECT and ").
 		append("SPO_FRESH.SOURCE=").append(sourceUrlHash).
@@ -425,72 +474,133 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 				HarvestSourceDTO.DEDICATED_HARVEST_SOURCE_DEFAULT_CRON);
 		
 		StringBuffer buf = new StringBuffer().
-		append("insert ignore into HARVEST_SOURCE (NAME, URL, TYPE, DATE_CREATED, CREATOR, SCHEDULE_CRON) ").
-		append("select OBJECT, OBJECT, '").append(DedicatedHarvestSourceTypes.qawSource).
+		append("insert ignore into HARVEST_SOURCE (NAME, URL, TYPE, DATE_CREATED, CREATOR, SCHEDULE_CRON, SOURCE, GEN_TIME) ").
+		append("select SPO_TEMP_SOURCE.OBJECT, SPO_TEMP_SOURCE.OBJECT, '").append(DedicatedHarvestSourceTypes.qawSource).
 		append("', now(), '").append(CRUser.application.getUserName()).
-		append("', '").append(cronExpr).
-		append("' from SPO where ANON_OBJ='N' and LIT_OBJ='N' and PREDICATE=").
-		append(Hashes.spoHash(Predicates.DC_SOURCE)).
-		append(" and SUBJECT in (select distinct SUBJECT from SPO where PREDICATE=").
-		append(Hashes.spoHash(Predicates.RDF_TYPE)).append(" and ANON_OBJ='N' and LIT_OBJ='N' and OBJECT_HASH in (").
-		append(Hashes.spoHash(Subjects.QA_REPORT_CLASS)).append(", ").append(Hashes.spoHash(Subjects.QAW_RESOURCE_CLASS)).append("))");
+		append("', '").append(cronExpr).append("', ").append(sourceUrlHash).append(", ").append(genTime).
+		append(" from SPO_TEMP as SPO_TEMP_SOURCE, SPO_TEMP where SPO_TEMP_SOURCE.ANON_OBJ='N' and SPO_TEMP_SOURCE.LIT_OBJ='N' and ").
+		append("SPO_TEMP_SOURCE.PREDICATE=").append(Hashes.spoHash(Predicates.DC_SOURCE)).
+		append(" and SPO_TEMP_SOURCE.SUBJECT=SPO_TEMP.SUBJECT and SPO_TEMP.PREDICATE=").append(Hashes.spoHash(Predicates.RDF_TYPE)).
+		append(" and SPO_TEMP.ANON_OBJ='N' and SPO_TEMP.LIT_OBJ='N' and SPO_TEMP.OBJECT_HASH in (").
+		append(Hashes.spoHash(Subjects.QA_REPORT_CLASS)).append(", ").append(Hashes.spoHash(Subjects.QAW_RESOURCE_CLASS)).append(")");
 		
 		int i = SQLUtil.executeUpdate(buf.toString(), getConnection());
 
 		/* handle delivered files */
 		
 		buf = new StringBuffer().
-		append("insert ignore into HARVEST_SOURCE (NAME, URL, TYPE, DATE_CREATED, CREATOR, SCHEDULE_CRON) ").
+		append("insert ignore into HARVEST_SOURCE (NAME, URL, TYPE, DATE_CREATED, CREATOR, SCHEDULE_CRON, SOURCE, GEN_TIME) ").
 		append("select URI, URI, '").append(DedicatedHarvestSourceTypes.deliveredFile).
 		append("', now(), '").append(CRUser.application.getUserName()).
-		append("', '").append(cronExpr).
-		append("' from RESOURCE where URI_HASH in (select distinct SUBJECT from SPO where PREDICATE=").
-		append(Hashes.spoHash(Predicates.RDF_TYPE)).append(" and ANON_OBJ='N' and LIT_OBJ='N' and OBJECT_HASH in (").
-		append(Hashes.spoHash(Subjects.ROD_DELIVERY_CLASS)).append(", ").append(Hashes.spoHash(Subjects.DCTYPE_DATASET_CLASS)).append("))");
+		append("', '").append(cronExpr).append("', ").append(sourceUrlHash).append(", ").append(genTime).
+		append(" from RESOURCE_TEMP, SPO_TEMP where RESOURCE_TEMP.URI_HASH=SPO_TEMP.SUBJECT and ").
+		append("SPO_TEMP.PREDICATE=").append(Hashes.spoHash(Predicates.RDF_TYPE)).
+		append(" and SPO_TEMP.ANON_OBJ='N' and SPO_TEMP.LIT_OBJ='N' and SPO_TEMP.OBJECT_HASH in (").
+		append(Hashes.spoHash(Subjects.ROD_DELIVERY_CLASS)).append(", ").append(Hashes.spoHash(Subjects.DCTYPE_DATASET_CLASS)).append(")");
 		
 		i = i + SQLUtil.executeUpdate(buf.toString(), getConnection());
 		
 		logger.debug(i + " new harvest sources extracted and inserted");
 	}
-
+	
 	/**
-	 * @throws SQLException 
 	 * 
+	 * @throws SQLException
 	 */
 	private void clearTemporaries() throws SQLException{
 		
 		logger.debug("Cleaning SPO_TEMP and RESOURCE_TEMP");
-		
-		try{
-			SQLUtil.executeUpdate("delete from SPO_TEMP", getConnection());
-		}
-		catch (Exception e){}
-		try{
-			SQLUtil.executeUpdate("delete from RESOURCE_TEMP", getConnection());
-		}
-		catch (Exception e){}
+		RDFHandler.clearTemporaries(getConnection());
 	}
 
 	/**
 	 * @throws SQLException 
+	 * @throws SQLException 
 	 * 
+	 */
+	private static void clearTemporaries(Connection conn) throws SQLException{
+		
+		SQLUtil.executeUpdate("delete from SPO_TEMP", conn);
+		SQLUtil.executeUpdate("delete from RESOURCE_TEMP", conn);
+	}
+	
+	/**
+	 * 
+	 * @throws SQLException
+	 */
+	public static void rollbackUnfinishedHarvests() throws SQLException{
+
+		ResultSet rs = null;
+		Statement stmt = null;
+		Connection conn = null;
+		ArrayList<UnfinishedHarvestDTO> list = new ArrayList<UnfinishedHarvestDTO>();
+		try{
+			conn = ConnectionUtil.getConnection();
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery("select * from UNFINISHED_HARVEST");
+			while (rs!=null && rs.next()){
+				list.add(UnfinishedHarvestDTO.create(rs.getLong("SOURCE"), rs.getLong("GEN_TIME")));
+			}
+
+			if (!list.isEmpty()){
+				
+				LogFactory.getLog(RDFHandler.class).debug("Deleting leftovers from unfinished harvests");
+				
+				for (Iterator<UnfinishedHarvestDTO> i = list.iterator(); i.hasNext();){
+					UnfinishedHarvestDTO unfinishedHarvestDTO = i.next();
+					RDFHandler.rollback(unfinishedHarvestDTO.getSource(), unfinishedHarvestDTO.getGenTime(), conn);
+				}
+			}
+		}
+		finally{
+			SQLUtil.close(rs);
+			SQLUtil.close(stmt);
+			SQLUtil.close(conn);
+		}
+	}
+	
+	/**
+	 * 
+	 * @throws SQLException
 	 */
 	protected void rollback() throws SQLException{
 
-		logger.debug("Doing rollback for current harvest");
-		
+		logger.debug("Doing harvest rollback");
+		RDFHandler.rollback(this.sourceUrlHash, this.genTime, this.getConnection());
+	}
+
+	/**
+	 * 
+	 * @param rollbackScope
+	 * @throws SQLException
+	 */
+	private static void rollback(long sourceUrlHash, long genTime, Connection conn) throws SQLException{
+
 		// delete rows of current harvest from SPO
-		StringBuffer buf = new StringBuffer("delete from SPO where SOURCE=");
-		buf.append(sourceUrlHash).append(" and GEN_TIME=").append(genTime);
-		SQLUtil.executeUpdate(buf.toString(), getConnection());
+		StringBuffer buf = new StringBuffer("delete from SPO where (SOURCE=");
+		buf.append(sourceUrlHash).append(" and GEN_TIME=").append(genTime).
+		append(") or (OBJ_DERIV_SOURCE=").append(sourceUrlHash).
+		append(" and OBJ_DERIV_SOURCE_GEN_TIME=").append(genTime).append(")");
+		
+		SQLUtil.executeUpdate(buf.toString(), conn);
 
 		// delete rows of current harvest from RESOURCE
 		buf = new StringBuffer("delete from RESOURCE where FIRSTSEEN_SOURCE=");
 		buf.append(sourceUrlHash).append(" and FIRSTSEEN_TIME=").append(genTime);
-		SQLUtil.executeUpdate(buf.toString(), getConnection());
+		SQLUtil.executeUpdate(buf.toString(), conn);
+		
+		// delete new extracted harvest sources
+		buf = new StringBuffer("delete from HARVEST_SOURCE where SOURCE=").append(sourceUrlHash).
+		append(" and GEN_TIME=").append(genTime);
+		
+		// 
+		RDFHandler.deleteUnfinishedHarvestFlag(sourceUrlHash, genTime, conn);
 
 		// delete all rows from SPO_TEMP and RESOURCE_TEMP
-		clearTemporaries();
+		try{
+			RDFHandler.clearTemporaries(conn);
+		}
+		catch (Exception e){}
 	}
 
     /*

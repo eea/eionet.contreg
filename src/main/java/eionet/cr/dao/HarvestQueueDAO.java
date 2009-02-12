@@ -50,4 +50,25 @@ public interface HarvestQueueDAO {
 	 * @throws DAOException
 	 */
 	public abstract HarvestQueueItemDTO pollUrgent() throws DAOException;
+
+	/**
+	 * 
+	 * @return
+	 * @throws DAOException
+	 */
+	public abstract HarvestQueueItemDTO peekNormal() throws DAOException;
+	
+	/**
+	 * 
+	 * @return
+	 * @throws DAOException
+	 */
+	public abstract HarvestQueueItemDTO peekUrgent() throws DAOException;
+
+	/**
+	 * 
+	 * @return
+	 * @throws DAOException
+	 */
+	public abstract void deleteQueueItem(HarvestQueueItemDTO harvestQueueItemDTO) throws DAOException;
 }

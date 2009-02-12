@@ -1,5 +1,8 @@
 package eionet.cr.harvest.scheduled;
 
+import java.sql.SQLException;
+import java.util.List;
+
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -14,13 +17,16 @@ import org.quartz.StatefulJob;
 
 import eionet.cr.common.JobScheduler;
 import eionet.cr.config.GeneralConfig;
+import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dto.HarvestQueueItemDTO;
 import eionet.cr.dto.HarvestSourceDTO;
+import eionet.cr.dto.UnfinishedHarvestDTO;
 import eionet.cr.harvest.Harvest;
 import eionet.cr.harvest.HarvestDAOWriter;
 import eionet.cr.harvest.PullHarvest;
 import eionet.cr.harvest.PushHarvest;
+import eionet.cr.harvest.RDFHandler;
 import eionet.cr.util.Util;
 import eionet.cr.util.sql.ConnectionUtil;
 import eionet.cr.web.security.CRUser;
@@ -45,6 +51,8 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 	public void execute(JobExecutionContext jobExecContext) throws JobExecutionException {
 
 		try{
+			RDFHandler.rollbackUnfinishedHarvests();
+			
 			HarvestQueueItemDTO queueItem = HarvestQueue.poll(HarvestQueue.PRIORITY_URGENT);
 			if (queueItem==null || queueItem.getUrl()==null || queueItem.getUrl().length()==0)
 				queueItem = HarvestQueue.poll(HarvestQueue.PRIORITY_NORMAL);

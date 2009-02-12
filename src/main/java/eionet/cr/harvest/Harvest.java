@@ -181,6 +181,9 @@ public abstract class Harvest {
 	        logger.debug(rdfHandler.getStoredTriplesCount() + " triples stored");
 		}
 		catch (Exception e){
+			
+			try{logger.error("Harvest error: " + e.toString());}catch (Exception ee){}
+			
 			try{
 				rdfHandler.rollback();
 			}

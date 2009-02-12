@@ -4,6 +4,8 @@ import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 
 import eionet.cr.common.CRRuntimeException;
+import eionet.cr.common.Predicates;
+import eionet.cr.common.Subjects;
 
 /**
  * 
@@ -100,6 +102,6 @@ public class Hashes {
 	}
 	
 	public static void main(String[] args){
-		System.out.println(spoHash("urn:uuid:41904690-E552-40B4-98E8-AD05D008422F"));
+		System.out.println(spoHash(Subjects.QAW_RESOURCE_CLASS));
 	}
 }

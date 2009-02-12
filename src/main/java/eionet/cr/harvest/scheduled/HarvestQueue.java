@@ -83,30 +83,38 @@ public class HarvestQueue{
 			throw new HarvestException(e.toString(), e);
 		}
 	}
+
+	/**
+	 * 
+	 * @param priority
+	 * @return
+	 * @throws HarvestException 
+	 */
+	public static synchronized HarvestQueueItemDTO peek(String priority) throws HarvestException{
+		
+		try {
+			if (priority.equals(HarvestQueue.PRIORITY_NORMAL))
+				return DAOFactory.getDAOFactory().getHarvestQueueDAO().peekNormal();
+			else
+				return DAOFactory.getDAOFactory().getHarvestQueueDAO().peekUrgent();
+		}
+		catch (DAOException e) {
+			throw new HarvestException(e.toString(), e);
+		}
+	}
 	
-//	public static void main(String[] args){
-//		
-//		try{
-//			ConnectionUtil.setReturnSimpleConnection(true);
-//			
-//			HarvestQueue.addPullHarvest("http://pull1.org", HarvestQueue.PRIORITY_NORMAL);
-//			Thread.sleep(1000);
-//			HarvestQueue.addPullHarvest("http://pull1.org", HarvestQueue.PRIORITY_URGENT);
-//			Thread.sleep(1000);
-//			HarvestQueue.addPushHarvest("push content 1", "http://push1.org", HarvestQueue.PRIORITY_NORMAL);
-//			Thread.sleep(1000);
-//			HarvestQueue.addPushHarvest("push content 1", "http://push1.org", HarvestQueue.PRIORITY_URGENT);
-//			Thread.sleep(1000);
-//			
-//			HarvestQueueItemDTO dto = HarvestQueue.poll(HarvestQueue.PRIORITY_NORMAL);
-//			if (dto!=null)
-//				System.out.println(dto.getUrl());
-//			dto = HarvestQueue.poll(HarvestQueue.PRIORITY_URGENT);
-//			if (dto!=null)
-//				System.out.println(dto.getUrl());
-//		}
-//		catch (Throwable t){
-//			t.printStackTrace();
-//		}
-//	}
+	/**
+	 * 
+	 * @param harvestQueueItemDTO
+	 * @throws HarvestException
+	 */
+	public static synchronized void deleteQueueItem(HarvestQueueItemDTO harvestQueueItemDTO) throws HarvestException{
+		
+		try {
+			DAOFactory.getDAOFactory().getHarvestQueueDAO().deleteQueueItem(harvestQueueItemDTO);
+		}
+		catch (DAOException e) {
+			throw new HarvestException(e.toString(), e);
+		}
+	}
 }

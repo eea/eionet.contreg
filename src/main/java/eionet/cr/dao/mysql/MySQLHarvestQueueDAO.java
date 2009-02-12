@@ -128,39 +128,26 @@ public class MySQLHarvestQueueDAO extends MySQLBaseDAO implements HarvestQueueDA
 		}
 	}
 
-	/** */
-	private static final String pollByPrioritySQL = "select * from HARVEST_QUEUE where PRIORITY = ? order by TIMESTAMP asc limit 1";
-	
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.dao.HarvestQueueDAO#pollNormal()
 	 */
 	public HarvestQueueItemDTO pollNormal() throws DAOException {
 		
-		List<Object> values = new ArrayList<Object>();
-    	values.add(HarvestQueue.PRIORITY_NORMAL);
-				
 		Connection conn = null;
-		HarvestQueueItemDTOReader rsReader = new HarvestQueueItemDTOReader();
 		try{
 			conn = getConnection();
-			SQLUtil.executeQuery(pollByPrioritySQL, values, rsReader, conn);
-			List<HarvestQueueItemDTO> list = rsReader.getResultList();
-			
-			HarvestQueueItemDTO queueItem = (list!=null && !list.isEmpty()) ? list.get(0) : null;
+			HarvestQueueItemDTO queueItem = peekNormal(conn);
 			if (queueItem!=null)
 				deleteQueueItem(queueItem, conn);
 			
 			return queueItem;
 		}
-		catch (Exception e){
+		catch (SQLException e){
 			throw new DAOException(e.getMessage(), e);
 		}
 		finally{
-			try{
-				if (conn!=null) conn.close();
-			}
-			catch (SQLException e){}
+			SQLUtil.close(conn);
 		}
 	}
 
@@ -170,30 +157,116 @@ public class MySQLHarvestQueueDAO extends MySQLBaseDAO implements HarvestQueueDA
 	 */
 	public HarvestQueueItemDTO pollUrgent() throws DAOException {
 		
-		List<Object> values = new ArrayList<Object>();
-    	values.add(HarvestQueue.PRIORITY_URGENT);
-				
 		Connection conn = null;
-		HarvestQueueItemDTOReader rsReader = new HarvestQueueItemDTOReader();
 		try{
 			conn = getConnection();
-			SQLUtil.executeQuery(pollByPrioritySQL, values, rsReader, conn);
-			List<HarvestQueueItemDTO> list = rsReader.getResultList();
-			
-			HarvestQueueItemDTO queueItem = (list!=null && !list.isEmpty()) ? list.get(0) : null;
+			HarvestQueueItemDTO queueItem = peekUrgent(conn);
 			if (queueItem!=null)
 				deleteQueueItem(queueItem, conn);
 			
 			return queueItem;
 		}
-		catch (Exception e){
+		catch (SQLException e){
 			throw new DAOException(e.getMessage(), e);
 		}
 		finally{
-			try{
-				if (conn!=null) conn.close();
-			}
-			catch (SQLException e){}
+			SQLUtil.close(conn);
+		}
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HarvestQueueDAO#peekNormal()
+	 */
+	public HarvestQueueItemDTO peekNormal() throws DAOException {
+		
+		Connection conn = null;
+		try{
+			conn = getConnection();
+			return peekNormal(conn);
+		}
+		catch (SQLException e){
+			throw new DAOException(e.toString(), e);
+		}
+		finally{
+			SQLUtil.close(conn);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HarvestQueueDAO#peekUrgent()
+	 */
+	public HarvestQueueItemDTO peekUrgent() throws DAOException {
+		
+		Connection conn = null;
+		try{
+			conn = getConnection();
+			return peekUrgent(conn);
+		}
+		catch (SQLException e){
+			throw new DAOException(e.toString(), e);
+		}
+		finally{
+			SQLUtil.close(conn);
+		}
+	}
+
+	/** */
+	private static final String peekByPrioritySQL = "select * from HARVEST_QUEUE where PRIORITY = ? order by TIMESTAMP asc limit 1";
+
+	/**
+	 * 
+	 * @param conn
+	 * @return
+	 * @throws SQLException
+	 */
+	private static HarvestQueueItemDTO peekNormal(Connection conn) throws SQLException{
+		
+		List<Object> values = new ArrayList<Object>();
+    	values.add(HarvestQueue.PRIORITY_NORMAL);
+				
+		HarvestQueueItemDTOReader rsReader = new HarvestQueueItemDTOReader();
+		SQLUtil.executeQuery(peekByPrioritySQL, values, rsReader, conn);
+		List<HarvestQueueItemDTO> list = rsReader.getResultList();
+		
+		return (list!=null && !list.isEmpty()) ? list.get(0) : null;
+	}
+
+	/**
+	 * 
+	 * @param conn
+	 * @return
+	 * @throws SQLException
+	 */
+	private static HarvestQueueItemDTO peekUrgent(Connection conn) throws SQLException{
+		
+		List<Object> values = new ArrayList<Object>();
+    	values.add(HarvestQueue.PRIORITY_URGENT);
+				
+		HarvestQueueItemDTOReader rsReader = new HarvestQueueItemDTOReader();
+		SQLUtil.executeQuery(peekByPrioritySQL, values, rsReader, conn);
+		List<HarvestQueueItemDTO> list = rsReader.getResultList();
+		
+		return (list!=null && !list.isEmpty()) ? list.get(0) : null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HarvestQueueDAO#deleteQueueItem(eionet.cr.dto.HarvestQueueItemDTO)
+	 */
+	public void deleteQueueItem(HarvestQueueItemDTO harvestQueueItemDTO) throws DAOException {
+		
+		Connection conn = null;
+		try{
+			conn = getConnection();
+			deleteQueueItem(harvestQueueItemDTO, conn);
+		}
+		catch (SQLException e){
+			throw new DAOException(e.toString(), e);
+		}
+		finally{
+			SQLUtil.close(conn);
 		}
 	}
 
@@ -205,7 +278,7 @@ public class MySQLHarvestQueueDAO extends MySQLBaseDAO implements HarvestQueueDA
 	 * @param queueItem
 	 * @throws SQLException 
 	 */
-	private void deleteQueueItem(HarvestQueueItemDTO queueItem, Connection conn) throws SQLException{
+	private static void deleteQueueItem(HarvestQueueItemDTO queueItem, Connection conn) throws SQLException{
 		
 		List<Object> values = new ArrayList<Object>();
 		values.add(queueItem.getUrl());
