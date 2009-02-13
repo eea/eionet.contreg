@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 
+import eionet.cr.harvest.util.ReaderBasedARPSource;
+
 /**
  * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
@@ -35,7 +37,7 @@ public class PushHarvest extends Harvest{
 		Reader stringReader = null;
 		try{
 			stringReader = new StringReader(content);
-			harvest(stringReader);
+			harvest(new ReaderBasedARPSource(stringReader));
 		}
 		finally{
 			if (stringReader!=null){

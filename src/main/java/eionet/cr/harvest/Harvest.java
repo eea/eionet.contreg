@@ -23,7 +23,9 @@ import com.hp.hpl.jena.rdf.arp.ARP;
 
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
+import eionet.cr.harvest.util.ARPSource;
 import eionet.cr.harvest.util.HarvestLog;
+import eionet.cr.harvest.util.InputStreamBasedARPSource;
 import eionet.cr.search.Searcher;
 import eionet.cr.util.FileUtil;
 import eionet.cr.util.URLUtil;
@@ -116,29 +118,29 @@ public abstract class Harvest {
 	 */
 	protected void harvest(File file) throws HarvestException{
 		
-		InputStreamReader reader = null;
+		InputStream inputStream = null;
 		try{
 			file = preProcess(file, sourceUrlString);
 			if (file==null)
 				return;
 			
-	        reader = new InputStreamReader(new FileInputStream(file));
-	        harvest(reader);
+	        inputStream = new FileInputStream(file);
+	        harvest(new InputStreamBasedARPSource(inputStream));
 		}
 		catch (Exception e){
 			throw new HarvestException("Exception when harvesting [" + sourceUrlString + "]: " + e.toString(), e);
 		}
 		finally{
 			try{
-				if (reader!=null) reader.close();
+				if (inputStream!=null) inputStream.close();
 			}
 			catch (IOException e){
 				errors.add(e);
-				logger.error("Failed to close file input stream reader: " + e.toString(), e);
+				logger.error("Failed to close file input stream: " + e.toString(), e);
 			}
 		}
 	}
-
+	
 	/**
 	 * Harvest the given reader.
 	 * The caller is responsible for closing the reader.
@@ -146,7 +148,7 @@ public abstract class Harvest {
 	 * @param reader
 	 * @throws HarvestException
 	 */
-	protected void harvest(Reader reader) throws HarvestException{
+	protected void harvest(ARPSource arpLoader) throws HarvestException{
 		
 		long genTime = System.currentTimeMillis();
 		
@@ -158,7 +160,7 @@ public abstract class Harvest {
 			ARP arp = new ARP();
 	        arp.setStatementHandler(rdfHandler);
 	        arp.setErrorHandler(rdfHandler);
-	        arp.load(reader, sourceUrlString);
+	        arpLoader.load(arp, sourceUrlString);
 	        
 	        errors.addAll(rdfHandler.getSaxErrors());
 	        warnings.addAll(rdfHandler.getSaxWarnings());
