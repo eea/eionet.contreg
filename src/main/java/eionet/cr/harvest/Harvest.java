@@ -140,15 +140,15 @@ public abstract class Harvest {
 			}
 		}
 	}
-	
+
 	/**
-	 * Harvest the given reader.
-	 * The caller is responsible for closing the reader.
+	 * Harvest the given ARPSource.
+	 * The caller is responsible for closing the resources that the given ARPSource uses.
 	 * 
-	 * @param reader
+	 * @param arpSource
 	 * @throws HarvestException
 	 */
-	protected void harvest(ARPSource arpLoader) throws HarvestException{
+	protected void harvest(ARPSource arpSource) throws HarvestException{
 		
 		long genTime = System.currentTimeMillis();
 		
@@ -160,7 +160,7 @@ public abstract class Harvest {
 			ARP arp = new ARP();
 	        arp.setStatementHandler(rdfHandler);
 	        arp.setErrorHandler(rdfHandler);
-	        arpLoader.load(arp, sourceUrlString);
+	        arpSource.load(arp, sourceUrlString);
 	        
 	        errors.addAll(rdfHandler.getSaxErrors());
 	        warnings.addAll(rdfHandler.getSaxWarnings());
