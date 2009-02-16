@@ -123,3 +123,27 @@ function addEvent(obj, evType, fn){
 addEvent(window,'load',startList);
 addEvent(window,'load',fullscreenModeLoad);
 
+/**
+ *
+ */
+function toggleSelectAll(formname) {
+
+  formobj = document.getElementById(formname);
+  checkboxes = formobj.getElementsByTagName('input');
+  var isAllSelected = readCookie('isAllSelected');
+  if (isAllSelected==null || isAllSelected=='0') {
+	for (i = 0; i < checkboxes.length; i++) {
+	  if (checkboxes[i].type == 'checkbox')
+		checkboxes[i].checked = true ;
+	}
+	createCookie('isAllSelected', '1');
+	formobj.selectAll.value = "Deselect all";
+  }
+  else {
+	for (i = 0; i < checkboxes.length; i++)
+	  if (checkboxes[i].type == 'checkbox')
+		checkboxes[i].checked = false ;
+	createCookie('isAllSelected', '0');
+	formobj.selectAll.value = "Select all";
+  }
+}

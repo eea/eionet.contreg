@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
+
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.HarvestSourceDTO;
@@ -236,24 +238,25 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 			ConnectionUtil.closeConnection(conn);
 		}
     }
-    
-    /** */
-	private static final String deleteSourceSQL = "delete from HARVEST_SOURCE where HARVEST_SOURCE_ID=?";
-	
-	/*
+
+    /*
      * (non-Javadoc)
-     * 
-     * @see eionet.cr.dao.HarvestSourceDao#deleteSource()
+     * @see eionet.cr.dao.HarvestSourceDAO#deleteSourcesByUrl(java.util.List)
      */
-    public void deleteSource(HarvestSourceDTO source) throws DAOException {
-    	    	
+    public void deleteSourcesByUrl(List<String> urls) throws DAOException {
+    	
     	List<Object> values = new ArrayList<Object>();
-		values.add(source.getSourceId());
+    	StringBuffer buf = new StringBuffer("delete from HARVEST_SOURCE where URL in (");
+    	for (int i=0; i<urls.size(); i++){
+    		buf.append(i>0 ? "," : "").append("?");
+    		values.add(urls.get(i));
+    	}
+    	buf.append(")");
 		
 		Connection conn = null;
 		try{
 			conn = getConnection();
-			SQLUtil.executeUpdate(deleteSourceSQL, values, conn);
+			SQLUtil.executeUpdate(buf.toString(), values, conn);
 		}
 		catch (Exception e){
 			throw new DAOException(e.getMessage(), e);

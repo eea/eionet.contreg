@@ -1,5 +1,10 @@
 package eionet.cr.harvest.scheduled;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -29,13 +34,31 @@ public class HarvestQueue{
 	 */
 	public static synchronized void addPullHarvest(String url, String priority) throws HarvestException{
 		
-		HarvestQueueItemDTO dto = new HarvestQueueItemDTO();
-		dto.setUrl(url);
-		dto.setPriority(priority);
+		addPullHarvests(Collections.singletonList(url), priority);
+	}
+	
+	/**
+	 * 
+	 * @param urls
+	 * @param priority
+	 * @throws HarvestException
+	 */
+	public static synchronized void addPullHarvests(List<String> urls, String priority) throws HarvestException{
 		
 		try {
-			DAOFactory.getDAOFactory().getHarvestQueueDAO().addPullHarvest(dto);
-			logger.debug("Pull harvest added to the " + priority + " queue, url = " + url);
+			List<HarvestQueueItemDTO> dtos = new ArrayList<HarvestQueueItemDTO>();
+			for (Iterator<String> i=urls.iterator(); i.hasNext();){
+				HarvestQueueItemDTO dto = new HarvestQueueItemDTO();
+				dto.setUrl(i.next());
+				dto.setPriority(priority);
+				dtos.add(dto);
+			}
+			
+			DAOFactory.getDAOFactory().getHarvestQueueDAO().addPullHarvests(dtos);
+			
+			for (Iterator<String> i=urls.iterator(); i.hasNext();){
+				logger.debug("Pull harvest added to the " + priority + " queue, url = " + i.next());
+			}
 		}
 		catch (DAOException e) {
 			throw new HarvestException(e.toString(), e);

@@ -1,5 +1,6 @@
 package eionet.cr.dao;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.dbunit.DBTestCase;
@@ -98,7 +99,7 @@ public class HarvestSourceDAOTest extends DBTestCase {
 		harvestSource.setSourceId(45);
 
 		ConnectionUtil.setReturnSimpleConnection(true);
-		DAOFactory.getDAOFactory().getHarvestSourceDAO().deleteSource(harvestSource);
+		DAOFactory.getDAOFactory().getHarvestSourceDAO().deleteSourcesByUrl(Collections.singletonList("http://localhost:8080/cr/pages/test2.xml"));
 		
 		HarvestSourceDTO source = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(45);
 		assertNull(source);

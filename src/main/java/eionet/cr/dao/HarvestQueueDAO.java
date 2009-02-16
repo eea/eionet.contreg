@@ -15,7 +15,7 @@ public interface HarvestQueueDAO {
 	 * 
 	 * @throws DAOException
 	 */
-	public abstract void addPullHarvest(HarvestQueueItemDTO queueItem) throws DAOException;
+	public abstract void addPullHarvests(List<HarvestQueueItemDTO> queueItems) throws DAOException;
 	
 	/**
 	 * 

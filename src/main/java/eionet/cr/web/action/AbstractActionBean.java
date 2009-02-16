@@ -122,42 +122,6 @@ public abstract class AbstractActionBean implements ActionBean {
 
 	/**
 	 * 
-	 * @param message
-	 */
-	void addSessionMessage(String message){
-		
-		HttpSession session = getContext().getRequest().getSession();
-		if (session!=null){
-			List<Message> messages = (List<Message>)session.getAttribute(SESSION_MESSAGES);
-			if (messages==null){
-				messages = new ArrayList<Message>();
-				session.setAttribute(SESSION_MESSAGES, messages);
-			}
-			messages.add(new SimpleMessage(message));
-		}
-	}
-
-	/**
-	 * 
-	 */
-	void showSessionMessages(boolean removeAfterShow){
-		
-		HttpSession session = getContext().getRequest().getSession();
-		if (session!=null){
-			List<Message> messages = (List<Message>)session.getAttribute(SESSION_MESSAGES);
-			if (messages!=null && !messages.isEmpty()){
-				for (int i=0; i<messages.size(); i++){
-					showMessage(messages.get(i));
-				}
-			}
-			
-			if (removeAfterShow)
-				session.removeAttribute(SESSION_MESSAGES);
-		}
-	}
-
-	/**
-	 * 
 	 * @return
 	 */
     public ResourceBundle getBundle() {

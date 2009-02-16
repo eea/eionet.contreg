@@ -55,12 +55,13 @@ public interface HarvestSourceDAO {
      * @param HarvestSourceDTO source
      */
     public void editSource(HarvestSourceDTO source) throws DAOException;
-    
+
     /**
+     * 
+     * @param urls
      * @throws DAOException
-     * @param HarvestSourceDTO source
      */
-    public void deleteSource(HarvestSourceDTO source) throws DAOException;
+    public void deleteSourcesByUrl(List<String> urls) throws DAOException;
 
     /**
      * 

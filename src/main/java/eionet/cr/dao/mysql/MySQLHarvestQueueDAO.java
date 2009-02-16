@@ -20,24 +20,26 @@ import eionet.cr.util.sql.SQLUtil;
  */
 public class MySQLHarvestQueueDAO extends MySQLBaseDAO implements HarvestQueueDAO{
 
-	/** */
-	private static final String addPullHarvestSQL = "insert into HARVEST_QUEUE (URL,PRIORITY,TIMESTAMP) VALUES (?,?,NOW())";
-	private static final String addPushHarvestSQL = "insert into HARVEST_QUEUE (URL,PRIORITY,TIMESTAMP,PUSHED_CONTENT) VALUES (?,?,NOW(),?)";
-	
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.dao.HarvestQueueDAO#addQueueItem(eionet.cr.dto.HarvestQueueItemDTO)
 	 */
-	public void addPullHarvest(HarvestQueueItemDTO queueItem) throws DAOException {
+	public void addPullHarvests(List<HarvestQueueItemDTO> queueItems) throws DAOException {
 		
+		String valueStr = "(?,?,NOW())";
 		List<Object> values = new ArrayList<Object>();
-		values.add(queueItem.getUrl());
-		values.add(queueItem.getPriority());
+		StringBuffer buf = new StringBuffer("insert into HARVEST_QUEUE (URL,PRIORITY,TIMESTAMP) VALUES ");
+		for (int i=0; i<queueItems.size(); i++){
+			HarvestQueueItemDTO dto = queueItems.get(i);
+			buf.append(i>0 ? "," : "").append(valueStr);
+			values.add(dto.getUrl());
+			values.add(dto.getPriority());
+		}
 		
 		Connection conn = null;
 		try{
 			conn = getConnection();
-			SQLUtil.executeUpdate(addPullHarvestSQL, values, conn);
+			SQLUtil.executeUpdate(buf.toString(), values, conn);
 		}
 		catch (Exception e){
 			throw new DAOException(e.getMessage(), e);
@@ -46,6 +48,9 @@ public class MySQLHarvestQueueDAO extends MySQLBaseDAO implements HarvestQueueDA
 			ConnectionUtil.closeConnection(conn);
 		}
 	}
+
+	/** */
+	private static final String addPushHarvestSQL = "insert into HARVEST_QUEUE (URL,PRIORITY,TIMESTAMP,PUSHED_CONTENT) VALUES (?,?,NOW(),?)";
 
 	/*
 	 * (non-Javadoc)
