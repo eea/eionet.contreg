@@ -42,11 +42,13 @@ public class Page {
 	public String getHref() {
 		return href;
 	}
+	
 	/**
-	 * @param href the href to set
+	 * 
+	 * @param href
 	 */
-	public void setHref(String url) {
-		this.href = url;
+	public void setHref(String href) {
+		this.href = href;
 	}
 	
 	/**

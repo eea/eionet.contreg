@@ -10,6 +10,7 @@ import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.util.HitsCollector;
 import eionet.cr.search.util.SortOrder;
+import eionet.cr.util.QueryString;
 import eionet.cr.util.pagination.Pagination;
 import eionet.cr.web.util.search.SearchResultColumn;
 
@@ -152,10 +153,11 @@ public abstract class AbstractSubjectSearchActionBean extends AbstractActionBean
 	public Pagination getPagination(){
 		
 		if (pagination==null){
-			StringBuffer buf = new StringBuffer(getUrlBinding());
-			buf.append("?").append(getContext().getRequest().getQueryString());
-	
-			pagination = Pagination.getPagination(getMatchCount(), getPageN(), buf.charAt(0)=='/' ? buf.substring(1) : buf.toString());
+			String urlBinding = getUrlBinding();
+			if (urlBinding.startsWith("/")){
+				urlBinding = urlBinding.substring(1);
+			}
+			pagination = Pagination.getPagination(getMatchCount(), getPageN(), urlBinding, QueryString.getInstance(getContext().getRequest()));
 		}
 		
 		return pagination;

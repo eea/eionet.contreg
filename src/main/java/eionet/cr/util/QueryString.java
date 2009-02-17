@@ -17,6 +17,13 @@ public class QueryString extends HashMap<String,Set<String>>{
 	
 	/**
 	 * 
+	 */
+	private QueryString(){
+		super();
+	}
+	
+	/**
+	 * 
 	 * @param request
 	 */
 	private QueryString(ServletRequest request){
@@ -77,7 +84,16 @@ public class QueryString extends HashMap<String,Set<String>>{
 		remove(parName);
 		return this;
 	}
-	
+
+	/**
+	 * 
+	 * @param parName
+	 */
+	public QueryString setParameterValue(String parName, String parValue){
+		remove(parName);
+		return addParameterValue(parName, parValue);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see java.util.AbstractMap#toString()
@@ -103,5 +119,13 @@ public class QueryString extends HashMap<String,Set<String>>{
 	 */
 	public static QueryString getInstance(ServletRequest request){
 		return new QueryString(request);
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public static QueryString getInstance(){
+		return new QueryString();
 	}
 }
