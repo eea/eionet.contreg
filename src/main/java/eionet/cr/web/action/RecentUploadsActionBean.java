@@ -26,7 +26,7 @@ import eionet.cr.web.util.search.SearchResultColumn;
  *
  */
 @UrlBinding("/recentUploads.action")
-public class RecentUploadsActionBean extends AbstractSubjectSearchActionBean {
+public class RecentUploadsActionBean extends AbstractSearchActionBean {
 	
 	/** */
 	public static final int MAX_RESULTS = 20;
@@ -252,7 +252,7 @@ public class RecentUploadsActionBean extends AbstractSubjectSearchActionBean {
 
 	/*
 	 * (non-Javadoc)
-	 * @see eionet.cr.web.action.AbstractSubjectSearchActionBean#getColumns()
+	 * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
 	 */
 	public List<SearchResultColumn> getColumns(){
 		

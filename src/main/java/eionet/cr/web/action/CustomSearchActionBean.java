@@ -30,7 +30,7 @@ import eionet.cr.web.util.search.SearchResultColumn;
  *
  */
 @UrlBinding("/customSearch.action")
-public class CustomSearchActionBean extends AbstractSubjectSearchActionBean{
+public class CustomSearchActionBean extends AbstractSearchActionBean{
 	
 	/** */
 	private static final String SELECTED_FILTERS_SESSION_ATTR_NAME = CustomSearchActionBean.class + ".selectedFilters";
@@ -92,7 +92,7 @@ public class CustomSearchActionBean extends AbstractSubjectSearchActionBean{
 
 	/*
 	 * (non-Javadoc)
-	 * @see eionet.cr.web.action.AbstractSubjectSearchActionBean#getResultList()
+	 * @see eionet.cr.web.action.AbstractSearchActionBean#getResultList()
 	 */
 	public List<SubjectDTO> getResultList() {
 		return (List<SubjectDTO>)getContext().getRequest().getSession().getAttribute(RESULT_LIST_SESSION_ATTR_NAME);
@@ -389,7 +389,7 @@ public class CustomSearchActionBean extends AbstractSubjectSearchActionBean{
 
 	/*
 	 * (non-Javadoc)
-	 * @see eionet.cr.web.action.AbstractSubjectSearchActionBean#getColumns()
+	 * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
 	 */
 	public List<SearchResultColumn> getColumns(){
 		return getDefaultColumns();

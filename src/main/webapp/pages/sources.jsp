@@ -8,23 +8,12 @@
 	<stripes:layout-component name="messages"/>
 	
 	<stripes:layout-component name="contents">
-		<stripes:form id="generalForm" action="${actionBean.urlBinding}">	
+		<stripes:form id="generalForm" action="${actionBean.urlBinding}">
+			
 			<div id="operations">
 				<ul>
 					<li>
 						<stripes:link href="/source.action" event="add">Add new source</stripes:link>
-						<c:if test="${actionBean.type!=null && actionBean.type=='data'}">
-							<stripes:link href="${actionBean.urlBinding}" event="harvest" title="Schedule urgent harvest of all data sources">
-								Harvest all data
-								<stripes:param name="type" value="${actionBean.type}"/>
-							</stripes:link>
-						</c:if>
-						<c:if test="${actionBean.type!=null && actionBean.type=='schema'}">
-							<stripes:link href="${actionBean.urlBinding}" event="harvest" title="Schedule urgent harvest of all schemas sources">
-								Harvest all schemas
-								<stripes:param name="type" value="${actionBean.type}"/>
-							</stripes:link>					
-						</c:if>
 					</li>
 				</ul>
 			</div>
@@ -52,7 +41,10 @@
 			</div>
 			<br style="clear:left" />
 			<div style="margin-top:20px;margin-bottom:5px">	
-				<display:table name="${actionBean.harvestSources}" class="sortable" pagesize="15" sort="list" id="harvestSource" htmlId="harvestSources" requestURI="${actionBean.urlBinding}" decorator="eionet.cr.web.util.HarvestSourcesTableDecorator" style="width:100%">
+				<display:table name="${actionBean.harvestSources}" class="sortable" pagesize="15"
+								sort="list" id="harvestSource" htmlId="harvestSources" requestURI="${actionBean.pagingUrl}"
+								decorator="eionet.cr.web.util.HarvestSourcesTableDecorator" style="width:100%"
+								excludedParams="harvest delete sourceUrl">
 					<display:setProperty name="paging.banner.items_name" value="sources"/>
 					<display:column>
 						<input type="checkbox" name="sourceUrl" value="${harvestSource.url}"/>

@@ -28,7 +28,7 @@ import eionet.cr.web.util.search.SearchResultColumn;
  *
  */
 @UrlBinding("/simpleSearch.action")
-public class SimpleSearchActionBean extends AbstractSubjectSearchActionBean {
+public class SimpleSearchActionBean extends AbstractSearchActionBean {
 	
 	/** */
 	private static Log logger = LogFactory.getLog(SimpleSearchActionBean.class);
@@ -105,7 +105,7 @@ public class SimpleSearchActionBean extends AbstractSubjectSearchActionBean {
 	
 	/*
 	 * (non-Javadoc)
-	 * @see eionet.cr.web.action.AbstractSubjectSearchActionBean#getColumns()
+	 * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
 	 */
 	public List<SearchResultColumn> getColumns(){
 		return getDefaultColumns();

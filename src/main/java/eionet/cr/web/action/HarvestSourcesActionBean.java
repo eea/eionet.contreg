@@ -2,8 +2,11 @@ package eionet.cr.web.action;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
@@ -17,6 +20,7 @@ import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.scheduled.HarvestQueue;
 import eionet.cr.harvest.util.DedicatedHarvestSourceTypes;
+import eionet.cr.util.QueryString;
 
 /**
  * @author altnyris
@@ -73,7 +77,7 @@ public class HarvestSourcesActionBean extends AbstractActionBean {
 		else
 			handleCrException(getBundle().getString("not.logged.in"), GeneralConfig.SEVERITY_WARNING);
 
-		return new RedirectResolution(getClass(), "view");
+		return view();
 	}
 	
 	/**
@@ -95,7 +99,7 @@ public class HarvestSourcesActionBean extends AbstractActionBean {
 		else
 			handleCrException(getBundle().getString("not.logged.in"), GeneralConfig.SEVERITY_WARNING);
 		
-		return new RedirectResolution(getClass(), "view");
+		return view();
 	}
 
 	/**
@@ -158,5 +162,20 @@ public class HarvestSourcesActionBean extends AbstractActionBean {
 	 */
 	public void setSourceUrl(List<String> sourceUrl) {
 		this.sourceUrl = sourceUrl;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public String getPagingUrl(){
+		
+		String urlBinding = getUrlBinding();
+		if (urlBinding.startsWith("/")){
+			urlBinding = urlBinding.substring(1);
+		}
+		
+		StringBuffer buf = new StringBuffer(urlBinding);
+		return buf.append("?view=").toString();
 	}
 }
