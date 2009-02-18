@@ -50,11 +50,12 @@
 						<input type="checkbox" name="sourceUrl" value="${harvestSource.url}"/>
 					</display:column>
 					<display:column property="url" title="URL" sortable="true"/>
+					<display:column property="lastHarvestDatetime" title="Last harvest" sortable="true"/>
 				</display:table>				
 			</div>
 			<div>
 				<stripes:submit name="delete" value="Delete" title="Delete selecetd sources"/>
-				<stripes:submit name="harvest" value="Harvest" title="Harvest selecetd sources"/>
+				<stripes:submit name="harvest" value="Schedule urgent harvest" title="Schedule urgent harvest of selecetd sources"/>
 				<input type="button" name="selectAll" value="Select all" onclick="toggleSelectAll'generalForm');return false"/>
 			</div>
 		</stripes:form>                  

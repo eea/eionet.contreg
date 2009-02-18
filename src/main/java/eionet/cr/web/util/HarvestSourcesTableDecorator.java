@@ -1,5 +1,7 @@
 package eionet.cr.web.util;
 
+import java.text.SimpleDateFormat;
+
 import org.displaytag.decorator.TableDecorator;
 
 import eionet.cr.dto.HarvestSourceDTO;
@@ -11,6 +13,9 @@ import eionet.cr.harvest.scheduled.HarvestingJob;
  *
  */
 public class HarvestSourcesTableDecorator extends TableDecorator{
+	
+	/** */
+	private SimpleDateFormat lastHarvestDatetimeFormat = new SimpleDateFormat("dd-MM-yy HH:mm:ss");
 
 	/**
 	 * 
@@ -18,14 +23,26 @@ public class HarvestSourcesTableDecorator extends TableDecorator{
 	 */
 	public String getUrl(){
 		
-		HarvestSourceDTO harvestSource = (HarvestSourceDTO) getCurrentRowObject();
 		StringBuffer buf = new StringBuffer();
-		if (harvestSource.isUnavailable())
-			buf.append("<img src=\"images/error.png\" alt=\"Errors\" title\"Source unavailable\"/>");
-		String currentlyHarvestedUrl = HarvestingJob.getCurrentlyHarvestedItem()==null ? "" : HarvestingJob.getCurrentlyHarvestedItem().getUrl();
-		if (currentlyHarvestedUrl.equals(harvestSource.getUrl()))
-			buf.append("<img src=\"images/animated-loader.gif\" alt=\"Harvesting\" title\"Currently being harvested\"/>");
-		buf.append(harvestSource.getUrl());
+		String url = ((HarvestSourceDTO) getCurrentRowObject()).getUrl();
+		if (url!=null){
+			buf.append("<a class=\"link-plain\" href=\"source.action?view=&harvestSource.url=").
+			append(url).append("\">").append(url).append("</a>");
+		}
+		
 		return buf.toString();
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public String getLastHarvestDatetime(){
+		
+		HarvestSourceDTO harvestSource = (HarvestSourceDTO) getCurrentRowObject();
+		if (harvestSource.getLastHarvestDatetime()!=null)
+			return lastHarvestDatetimeFormat.format(harvestSource.getLastHarvestDatetime());
+		else
+			return "&nbsp;";
 	}
 }

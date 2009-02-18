@@ -75,6 +75,13 @@ public interface HarvestSourceDAO {
     
     /**
      * 
+     * @param sourceId
+     * @throws DAOException
+     */
+    public void updateHarvestStarted(int sourceId) throws DAOException;
+    
+    /**
+     * 
      * @return
      * @throws DAOException
      */
@@ -87,4 +94,11 @@ public interface HarvestSourceDAO {
      * @throws DAOException
      */
     public List<HarvestSourceDTO> getHarvestSourcesBySchedule(String schedule) throws DAOException;
+    
+    /**
+     * 
+     * @return
+     * @throws DAOException
+     */
+    public List<HarvestSourceDTO> getHarvestSourcesUnavailable() throws DAOException;
 }

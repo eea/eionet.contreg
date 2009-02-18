@@ -72,10 +72,6 @@
 			                <td colspan="2" style="padding-top:10px">
 			                	<stripes:submit name="goToEdit" value="Edit" title="Edit this harvest source"/>
 			                    <stripes:submit name="scheduleUrgentHarvest" value="Schedule urgent harvest"/>
-			                    <c:if test="${!actionBean.productionMode}">
-			                		<stripes:submit name="harvestNow" value="Harvest now"/>
-			                	</c:if>
-			                    
 			                </td>
 			            </tr>
 			        </table>

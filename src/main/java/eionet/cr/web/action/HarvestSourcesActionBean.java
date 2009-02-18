@@ -30,6 +30,9 @@ import eionet.cr.util.QueryString;
 public class HarvestSourcesActionBean extends AbstractActionBean {
 	
 	/** */
+	private static final String UNAVAILABLE_TYPE = "unavail";
+	
+	/** */
 	private List<HarvestSourceDTO> harvestSources;
 	
 	/** */
@@ -55,7 +58,10 @@ public class HarvestSourcesActionBean extends AbstractActionBean {
 	public Resolution view() throws DAOException{
 		
 		if (type!=null && type.length()>0){
-			harvestSources = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourcesByType(type);
+			if (type.equals(UNAVAILABLE_TYPE))
+				harvestSources = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourcesUnavailable();
+			else
+				harvestSources = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourcesByType(type);
 		}
 		
 		return new ForwardResolution("/pages/sources.jsp");
@@ -137,6 +143,11 @@ public class HarvestSourcesActionBean extends AbstractActionBean {
 			typeMap = new HashMap<String,String>();
 			typeMap.put("title", "QAW sources");
 			typeMap.put("type", DedicatedHarvestSourceTypes.qawSource);
+			sourceTypes.add(typeMap);
+
+			typeMap = new HashMap<String,String>();
+			typeMap.put("title", "Unavailable");
+			typeMap.put("type", UNAVAILABLE_TYPE);
 			sourceTypes.add(typeMap);
 		}
 		

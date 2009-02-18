@@ -368,4 +368,53 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 			catch (SQLException e){}
 		}
 	}
+
+	/** */
+	private static final String updateHarvestStartedSQL = "update HARVEST_SOURCE set LAST_HARVEST=NOW() where HARVEST_SOURCE_ID=?";
+	
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HarvestSourceDAO#updateHarvestStarted(int)
+	 */
+	public void updateHarvestStarted(int sourceId) throws DAOException {
+
+		List<Object> values = new ArrayList<Object>();
+		values.add(new Integer(sourceId));		
+		
+		Connection conn = null;
+		try{
+			conn = getConnection();
+			SQLUtil.executeUpdate(updateHarvestStartedSQL, values, conn);
+		}
+		catch (Exception e){
+			throw new DAOException(e.getMessage(), e);
+		}
+		finally{
+			ConnectionUtil.closeConnection(conn);
+		}
+	}
+
+	/** */
+	private static final String getHarvestSourcesUnavailableSQL =
+		"select * from HARVEST_SOURCE where COUNT_UNAVAIL > " + HarvestSourceDTO.COUNT_UNAVAIL_THRESHOLD;
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSourcesUnavailable()
+	 */
+	public List<HarvestSourceDTO> getHarvestSourcesUnavailable() throws DAOException {
+		
+		Connection conn = null;
+		HarvestSourceDTOReader rsReader = new HarvestSourceDTOReader();
+		try{
+			conn = getConnection();
+			SQLUtil.executeQuery(getHarvestSourcesUnavailableSQL, new ArrayList<Object>(), rsReader, conn);
+			return rsReader.getResultList();
+		}
+		catch (Exception e){
+			throw new DAOException(e.getMessage(), e);
+		}
+		finally{
+			ConnectionUtil.closeConnection(conn);
+		}
+	}
 }

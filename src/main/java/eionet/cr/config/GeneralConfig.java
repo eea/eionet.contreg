@@ -38,9 +38,6 @@ public class GeneralConfig {
 	public static final String XMLCONV_CONVERT_URL = "xmlconv.convert.url";
 	
 	/** */
-	public static final String ENVIRONMENT_PRODUCTION = "environment.production";
-
-	/** */
 	public static final int SEVERITY_INFO = 1;
 	public static final int SEVERITY_CAUTION = 2;
 	public static final int SEVERITY_WARNING = 3;

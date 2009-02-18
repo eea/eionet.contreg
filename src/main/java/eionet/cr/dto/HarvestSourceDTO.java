@@ -27,6 +27,7 @@ public class HarvestSourceDTO implements Serializable {
 	private Integer statements;
 	private Integer resources;
 	private Integer countUnavail;
+	private java.util.Date lastHarvestDatetime;
 	private String scheduleCron;
 	
 	/**
@@ -196,5 +197,19 @@ public class HarvestSourceDTO implements Serializable {
 	 */
 	public void setScheduleCron(String scheduleCron) {
 		this.scheduleCron = scheduleCron;
+	}
+
+	/**
+	 * @return the lastHarvestDatetime
+	 */
+	public java.util.Date getLastHarvestDatetime() {
+		return lastHarvestDatetime;
+	}
+
+	/**
+	 * @param lastHarvestDatetime the lastHarvestDatetime to set
+	 */
+	public void setLastHarvestDatetime(java.util.Date lastHarvestDatetime) {
+		this.lastHarvestDatetime = lastHarvestDatetime;
 	}
 }

@@ -191,20 +191,8 @@ public abstract class AbstractActionBean implements ActionBean {
 	 * 
 	 * @return
 	 */
-	public boolean isProductionMode(){
-		return Boolean.parseBoolean(GeneralConfig.getProperty(GeneralConfig.ENVIRONMENT_PRODUCTION, "true"));
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
 	public HarvestQueueItemDTO getCurrentlyHarvestedQueueItem(){
 		
-//		HarvestQueueItemDTO dto = new HarvestQueueItemDTO();
-//		dto.setUrl("http://rod.eionet.eu.int/schema.rdf");
-//		dto.setPushedContent("test");
-//		return dto;
 		return HarvestingJob.getCurrentlyHarvestedItem();
 	}
 }

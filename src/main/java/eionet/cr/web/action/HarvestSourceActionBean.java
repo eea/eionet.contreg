@@ -138,37 +138,6 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     /**
      * 
      * @return
-     * @throws HarvestException 
-     * @throws DAOException 
-     */
-    public Resolution harvestNow() throws HarvestException, DAOException{
-    	
-    	if(isUserLoggedIn()){
-    		
-    		// do the harvest
-    		harvestSource = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(harvestSource.getSourceId());
-    		Harvest harvest = new PullHarvest(harvestSource.getUrl(), null); // TODO - use proper lastHarvestTimestamp instead of null
-    		harvest.setDaoWriter(new HarvestDAOWriter(
-    				harvestSource.getSourceId().intValue(), Harvest.TYPE_PULL, getCRUser()==null ? null : getCRUser().getUserName()));
-    		harvest.execute();
-    		
-    		// retrieve list of harvests (for display) 
-			harvests = DAOFactory.getDAOFactory().getHarvestDAO().getHarvestsBySourceId(harvestSource.getSourceId());
-
-			// set messages to show to user
-			showMessage("Stored triples: " + harvest.getStoredTriplesCount());
-			showMessage("Distinct subjects: " + harvest.getDistinctSubjectsCount());
-    	}
-    	else{
-    		handleCrException(getBundle().getString("not.logged.in"), GeneralConfig.SEVERITY_WARNING);
-    	}
-		
-    	return new ForwardResolution("/pages/viewsource.jsp");
-    }
-    
-    /**
-     * 
-     * @return
      * @throws DAOException 
      * @throws HarvestException 
      */

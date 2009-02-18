@@ -40,6 +40,7 @@ public class HarvestDAOWriter {
 	protected void writeStarted(Harvest harvest) throws DAOException{
 		
 		harvestId = DAOFactory.getDAOFactory().getHarvestDAO().insertStartedHarvest(sourceId, harvestType, userName, Harvest.STATUS_STARTED);
+		DAOFactory.getDAOFactory().getHarvestSourceDAO().updateHarvestStarted(sourceId);
 	}
 
 	/**
