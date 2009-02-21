@@ -17,8 +17,10 @@ import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import eionet.cr.common.Predicates;
 import eionet.cr.dto.SubjectDTO;
+import eionet.cr.search.CustomSearch;
+import eionet.cr.search.PicklistSearch;
 import eionet.cr.search.SearchException;
-import eionet.cr.search.Searcher;
+import eionet.cr.search.LuceneBasedSearcher;
 import eionet.cr.search.util.SubjectDTOCollector;
 import eionet.cr.util.Util;
 import eionet.cr.web.util.search.CustomSearchFilter;
@@ -82,10 +84,15 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 		
 		populateSelectedFilters();
 		
-		SubjectDTOCollector collector = new SubjectDTOCollector();
-		Searcher.customSearch(buildSearchCriteria(), true, collector);
+		CustomSearch customSearch = new CustomSearch(buildSearchCriteria());
+		customSearch.setPageNumber(getPageN());
+		customSearch.setSorting(getSortP(), getSortO());
+		customSearch.execute();
+		matchCount = customSearch.getTotalMatchCount();
 		
-		getContext().getRequest().getSession().setAttribute(RESULT_LIST_SESSION_ATTR_NAME, collector.getResultList()); 
+		// we put the search result list into session and override getResultList() to retrieve the list from session
+		// (look for the override in this class)
+		getContext().getRequest().getSession().setAttribute(RESULT_LIST_SESSION_ATTR_NAME, customSearch.getResultList());
 		
 		return new ForwardResolution(ASSOCIATED_JSP);
 	}
@@ -94,8 +101,8 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 	 * (non-Javadoc)
 	 * @see eionet.cr.web.action.AbstractSearchActionBean#getResultList()
 	 */
-	public List<SubjectDTO> getResultList() {
-		return (List<SubjectDTO>)getContext().getRequest().getSession().getAttribute(RESULT_LIST_SESSION_ATTR_NAME);
+	public Collection<SubjectDTO> getResultList(){
+		return (Collection<SubjectDTO>)getContext().getRequest().getSession().getAttribute(RESULT_LIST_SESSION_ATTR_NAME);
 	}
 	
 	/**
@@ -119,18 +126,18 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 	 */
 	public Collection<String> getPicklist() throws SearchException{
 
-		if (true)
-			return new ArrayList<String>();
-			
 		if (!isShowPicklist())
 			return null;
 		else if (!getAvailableFilters().containsKey(getPicklistFilter()))
 			return null;
 		
 		if (picklist==null){
-			picklist = Searcher.getLiteralFieldValues(getAvailableFilters().get(getPicklistFilter()).getUri());
-			if (picklist==null)
+			PicklistSearch picklistSearch = new PicklistSearch(getAvailableFilters().get(getPicklistFilter()).getUri());
+			picklistSearch.execute();
+			picklist = picklistSearch.getResultCollection();
+			if (picklist==null){
 				picklist = new ArrayList<String>();
+			}
 		}
 		
 		return picklist;
@@ -211,7 +218,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 
 			filter = new CustomSearchFilter();
 			filter.setUri(Predicates.DC_SUBJECT);
-			filter.setTitle("SubjectDTOTemp");
+			filter.setTitle("Subject");
 			filter.setDescription("");
 			filter.setProvideValues(true);
 			list.add(filter);
@@ -371,7 +378,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 	 */
 	private Map<String,String> buildSearchCriteria(){
 		
-		Map<String,String> result = new HashMap<String,String>();
+		Map<String,String> result = new LinkedHashMap<String,String>();
 		
 		Map<String,String> selected = getSelectedFilters();
 		for (Iterator<String> keys=selected.keySet().iterator(); keys.hasNext();){

@@ -35,7 +35,7 @@ public class UriSearch extends AbstractSubjectSearch{
 	 * (non-Javadoc)
 	 * @see eionet.cr.search.AbstractSubjectSearch#getSubjectSelectSQL(java.util.List)
 	 */
-	protected String getSubjectSelectSQL(List<Object> inParameters) {
+	protected String getSubjectSelectSQL(List inParameters) {
 		
 		if (uri==null || uri.isEmpty())
 			return null;

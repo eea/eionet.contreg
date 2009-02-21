@@ -26,7 +26,7 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.harvest.util.ARPSource;
 import eionet.cr.harvest.util.HarvestLog;
 import eionet.cr.harvest.util.InputStreamBasedARPSource;
-import eionet.cr.search.Searcher;
+import eionet.cr.search.LuceneBasedSearcher;
 import eionet.cr.util.FileUtil;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
@@ -272,7 +272,7 @@ public abstract class Harvest {
 		// get the number of harvested resources now in the given source
 		Integer numDocsInSource = null;
 		try {
-			numDocsInSource = new Integer(Searcher.getNumDocsBySourceUrl(sourceUrlString));
+			numDocsInSource = new Integer(LuceneBasedSearcher.getNumDocsBySourceUrl(sourceUrlString));
 		}
 		catch (IOException e){
 			numDocsInSource = null;

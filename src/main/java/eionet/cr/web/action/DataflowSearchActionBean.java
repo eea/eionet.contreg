@@ -14,7 +14,7 @@ import net.sourceforge.stripes.action.UrlBinding;
 import eionet.cr.common.Predicates;
 import eionet.cr.dto.RodInstrumentDTO;
 import eionet.cr.search.SearchException;
-import eionet.cr.search.Searcher;
+import eionet.cr.search.LuceneBasedSearcher;
 import eionet.cr.web.util.search.SearchResultColumn;
 
 /**
@@ -61,9 +61,9 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean{
 		
 		HttpSession session = this.getContext().getRequest().getSession();
 		if (session.getAttribute(DATAFLOWS_SESSION_ATTR_NAME)==null)
-			session.setAttribute(DATAFLOWS_SESSION_ATTR_NAME, Searcher.getDataflowsGroupedByInstruments());
+			session.setAttribute(DATAFLOWS_SESSION_ATTR_NAME, LuceneBasedSearcher.getDataflowsGroupedByInstruments());
 		if (session.getAttribute(LOCALITIES_SESSION_ATTR_NAME)==null)
-			session.setAttribute(LOCALITIES_SESSION_ATTR_NAME, Searcher.getLiteralFieldValues(Predicates.ROD_LOCALITY_PROPERTY));
+			session.setAttribute(LOCALITIES_SESSION_ATTR_NAME, LuceneBasedSearcher.getLiteralFieldValues(Predicates.ROD_LOCALITY_PROPERTY));
 	}
 	
 	/**
@@ -73,7 +73,7 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean{
 	 */
 	public Resolution search() throws SearchException{
 		loadOptions();
-		resultList = Searcher.dataflowSearch(dataflow, locality, year);
+		resultList = LuceneBasedSearcher.dataflowSearch(dataflow, locality, year);
 		return new ForwardResolution("/pages/dataflowSearch.jsp");
 	}
 

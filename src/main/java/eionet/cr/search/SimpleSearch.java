@@ -40,7 +40,7 @@ public class SimpleSearch extends AbstractSubjectSearch{
 	 * (non-Javadoc)
 	 * @see eionet.cr.search.AbstractSubjectSearch#getSQL(java.util.List)
 	 */
-	protected String getSubjectSelectSQL(List<Object> inParameters){
+	protected String getSubjectSelectSQL(List inParameters){
 		
 		if (searchExpression==null || searchExpression.isEmpty())
 			return null;
@@ -58,7 +58,7 @@ public class SimpleSearch extends AbstractSubjectSearch{
 		inParameters.add(searchExpression.toString());
 		
 		if (sortPredicate!=null)
-			sqlBuf.append(" order by ORDERING.OBJECT ").append(sortOrder==null ? "" : sortOrder.toSQL());
+			sqlBuf.append(" order by ORDERING.OBJECT ").append(sortOrder==null ? sortOrder.ASCENDING.toSQL() : sortOrder.toSQL());
 
 		int pageLength = Pagination.pageLength();
 		if (pageLength>0){

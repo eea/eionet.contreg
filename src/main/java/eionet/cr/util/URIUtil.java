@@ -57,6 +57,7 @@ public class URIUtil {
 		schemes.add("aaa");
 		schemes.add("aaas");
 		schemes.add("acap");
+		schemes.add("afs");
 		schemes.add("cap");
 		schemes.add("cid");
 		schemes.add("crid");
@@ -64,6 +65,7 @@ public class URIUtil {
 		schemes.add("dav");
 		schemes.add("dict");
 		schemes.add("dns");
+		schemes.add("dtn");
 		schemes.add("fax");
 		schemes.add("file");
 		schemes.add("ftp");
@@ -72,6 +74,7 @@ public class URIUtil {
 		schemes.add("h323");
 		schemes.add("http");
 		schemes.add("https");
+		schemes.add("iax");
 		schemes.add("icap");
 		schemes.add("im");
 		schemes.add("imap");
@@ -79,10 +82,11 @@ public class URIUtil {
 		schemes.add("ipp");
 		schemes.add("iris");
 		schemes.add("iris.beep");
+		schemes.add("iris.lwz");
 		schemes.add("iris.xpc");
 		schemes.add("iris.xpcs");
-		schemes.add("iris.lwz");
 		schemes.add("ldap");
+		schemes.add("mailserver");
 		schemes.add("mailto");
 		schemes.add("mid");
 		schemes.add("modem");
@@ -94,8 +98,10 @@ public class URIUtil {
 		schemes.add("nfs");
 		schemes.add("nntp");
 		schemes.add("opaquelocktoken");
+		schemes.add("pack");
 		schemes.add("pop");
 		schemes.add("pres");
+		schemes.add("prospero");
 		schemes.add("rtsp");
 		schemes.add("service");
 		schemes.add("shttp");
@@ -104,27 +110,21 @@ public class URIUtil {
 		schemes.add("snmp");
 		schemes.add("soap.beep");
 		schemes.add("soap.beeps");
+		schemes.add("z39.50r");
+		schemes.add("z39.50s");
 		schemes.add("tag");
 		schemes.add("tel");
 		schemes.add("telnet");
 		schemes.add("tftp");
 		schemes.add("thismessage");
 		schemes.add("tip");
+		schemes.add("tn3270");
 		schemes.add("tv");
 		schemes.add("urn");
+		schemes.add("wais");
 		schemes.add("vemmi");
 		schemes.add("xmlrpc.beep");
 		schemes.add("xmlrpc.beeps");
 		schemes.add("xmpp");
-		schemes.add("z39.50r");
-		schemes.add("z39.50s");
-		schemes.add("afs");
-		schemes.add("dtn");
-		schemes.add("iax");
-		schemes.add("mailserver");
-		schemes.add("pack");
-		schemes.add("tn3270");
-		schemes.add("prospero");
-		schemes.add("wais");
 	}
 }

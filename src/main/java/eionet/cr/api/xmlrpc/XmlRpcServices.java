@@ -18,7 +18,7 @@ import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.scheduled.HarvestQueue;
-import eionet.cr.search.Searcher;
+import eionet.cr.search.LuceneBasedSearcher;
 import eionet.cr.search.util.EntriesCollector;
 import eionet.cr.search.util.SubjectDTOCollector;
 import eionet.cr.util.Util;
@@ -53,7 +53,7 @@ public class XmlRpcServices implements Services{
 				StringBuffer qryBuf = new StringBuffer(Util.luceneEscape(Predicates.FIRST_SEEN_TIMESTAMP));
 				qryBuf.append(":[").append(givenTimeSeconds).append(" TO ").append(curTimeSeconds).append("]");
 				try{
-					result = eionet.cr.search.Searcher.luceneQuery(qryBuf.toString());
+					result = eionet.cr.search.LuceneBasedSearcher.luceneQuery(qryBuf.toString());
 				}
 				catch (Exception e){
 					logger.error(e.toString(), e);
@@ -81,7 +81,7 @@ public class XmlRpcServices implements Services{
 		try{
 			
 			SubjectDTOCollector collector = new SubjectDTOCollector();
-			Searcher.customSearch(criteria, false, collector);
+			LuceneBasedSearcher.customSearch(criteria, false, collector);
 			List<SubjectDTO> list = collector.getResultList();
 			
 			if (list!=null){
@@ -130,7 +130,7 @@ public class XmlRpcServices implements Services{
 						qryBuf.append(Util.luceneEscape(key)).append(":").append(Util.luceneEscape(value));
 						
 						try{
-							result = eionet.cr.search.Searcher.luceneQuery(qryBuf.toString());
+							result = eionet.cr.search.LuceneBasedSearcher.luceneQuery(qryBuf.toString());
 						}
 						catch (Exception e){
 							logger.error(e.toString(), e);
@@ -182,7 +182,7 @@ public class XmlRpcServices implements Services{
 	public Vector getEntries(Hashtable attributes) throws CRException {
 
 		EntriesCollector collector = new EntriesCollector();
-		Searcher.customSearch((Map<String,String>)attributes, true, collector);
+		LuceneBasedSearcher.customSearch((Map<String,String>)attributes, true, collector);
 		Vector result = collector.getResultVector();
 		if (result==null)
 			result = new Vector();

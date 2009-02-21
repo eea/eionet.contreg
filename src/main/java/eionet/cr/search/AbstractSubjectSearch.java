@@ -93,7 +93,7 @@ public abstract class AbstractSubjectSearch {
 	 * @param inParameters
 	 * @return
 	 */
-	protected abstract String getSubjectSelectSQL(List<Object> inParameters);
+	protected abstract String getSubjectSelectSQL(List inParameters);
 	
 	/**
 	 * 

@@ -51,14 +51,14 @@ import eionet.cr.util.Util;
  * @author Jaanus Heinlaid, e-mail: <a href="mailto:jaanus.heinlaid@tietoenator.com">jaanus.heinlaid@tietoenator.com</a>
  *
  */
-public class Searcher {
+public class LuceneBasedSearcher {
 
 	/** */
 	public static final String ALL_CONTENT_FIELD = Predicates.ALL_LITERAL_CONTENT;
-	public static final String DEFAULT_FIELD = Searcher.ALL_CONTENT_FIELD;
+	public static final String DEFAULT_FIELD = LuceneBasedSearcher.ALL_CONTENT_FIELD;
 	
 	/** */
-	private static Log logger = LogFactory.getLog(Searcher.class);
+	private static Log logger = LogFactory.getLog(LuceneBasedSearcher.class);
 	
 	/**
 	 * 
@@ -96,7 +96,7 @@ public class Searcher {
 			if (URIUtil.isSchemedURI(expression.trim()))
 				query = new TermQuery(new Term(Predicates.DOC_ID, expression));
 			else{
-				QueryParser parser = new QueryParser(DEFAULT_FIELD, Searcher.getAnalyzer());
+				QueryParser parser = new QueryParser(DEFAULT_FIELD, LuceneBasedSearcher.getAnalyzer());
 				char[] escapeExceptions = {'"'};
 				query = parser.parse(Util.luceneEscape(expression, escapeExceptions));
 			}
@@ -125,7 +125,7 @@ public class Searcher {
 	 * @throws IOException
 	 */
 	public static List<Map<String,String[]>> luceneQuery(String queryStr) throws ParseException, IOException{
-		return luceneQuery(queryStr, Searcher.getAnalyzer());
+		return luceneQuery(queryStr, LuceneBasedSearcher.getAnalyzer());
 	}
 	
 	/**
@@ -229,13 +229,13 @@ public class Searcher {
 		IndexSearcher indexSearcher = null;
 		try{
 			if (!Util.isNullOrEmpty(locality)){
-				QueryParser parser = new QueryParser(DEFAULT_FIELD, Searcher.getAnalyzer());
+				QueryParser parser = new QueryParser(DEFAULT_FIELD, LuceneBasedSearcher.getAnalyzer());
 				StringBuffer qryBuf = new StringBuffer(Util.luceneEscape(Predicates.ROD_LOCALITY_PROPERTY));
 				qryBuf.append(":\"").append(Util.luceneEscape(locality)).append("\"");
 				queries.add(parser.parse(qryBuf.toString()));
 			}
 			if (!Util.isNullOrEmpty(year)){
-				QueryParser parser = new QueryParser(DEFAULT_FIELD, Searcher.getAnalyzer());
+				QueryParser parser = new QueryParser(DEFAULT_FIELD, LuceneBasedSearcher.getAnalyzer());
 				StringBuffer qryBuf = new StringBuffer(Util.luceneEscape(Predicates.DC_COVERAGE));
 				qryBuf.append(":\"").append(Util.luceneEscape(year)).append("\"");
 				queries.add(parser.parse(qryBuf.toString()));
@@ -488,7 +488,7 @@ public class Searcher {
 		
 		IndexSearcher indexSearcher = null;
 		List<Query> queries = new ArrayList<Query>();
-		QueryParser queryParser = new QueryParser(DEFAULT_FIELD, Searcher.getAnalyzer());
+		QueryParser queryParser = new QueryParser(DEFAULT_FIELD, LuceneBasedSearcher.getAnalyzer());
 		try{
 			for (Iterator<String> propertyIter = criteria.keySet().iterator(); propertyIter.hasNext();){
 				String property = propertyIter.next();
@@ -511,7 +511,7 @@ public class Searcher {
 
 						Query query = null;
 						String subProperty = subProperties.get(j);
-						if (!Searcher.isAnalyzedField(subProperty) || !Searcher.isAnalyzedValue(propertyValueUnquoted)){
+						if (!LuceneBasedSearcher.isAnalyzedField(subProperty) || !LuceneBasedSearcher.isAnalyzedValue(propertyValueUnquoted)){
 							query = new TermQuery(new Term(subProperty, propertyValueUnquoted));
 						}
 						else{

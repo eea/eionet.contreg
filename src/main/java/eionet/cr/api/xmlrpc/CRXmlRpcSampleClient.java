@@ -89,7 +89,7 @@ public class CRXmlRpcSampleClient {
 	    criteria.put("http://purl.org/dc/elements/1.1/coverage", "2006");
 	    
 	    Object[] params = new Object[]{criteria};
-	    Object[] result = (Object[])client.execute("Searcher.dataflowSearch", params);
+	    Object[] result = (Object[])client.execute("LuceneBasedSearcher.dataflowSearch", params);
 	    
 	    // loop through the results, do type casting to see if any ClassCastExceptions are thrown
 	    if (result!=null && result.length>0){
@@ -123,7 +123,7 @@ public class CRXmlRpcSampleClient {
 	    criteria.put("http://purl.org/dc/elements/1.1/coverage", "2006");
 	    
 	    Object[] params = new Object[]{criteria};
-	    Object[] result = (Object[])client.execute("Searcher.simpleAndSearch", params);
+	    Object[] result = (Object[])client.execute("LuceneBasedSearcher.simpleAndSearch", params);
 	    
 	    // loop through the results, do type casting to see if any ClassCastExceptions are thrown
 	    if (result!=null && result.length>0){

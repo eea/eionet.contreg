@@ -44,7 +44,7 @@ public class SQLUtil {
 	 * @param valueMap
 	 * @throws SQLException 
 	 */
-	public static List<Map<String,SQLValue>> executeQuery(String parameterizedSQL, List<Object> values, Connection conn) throws SQLException{
+	public static List<Map<String,SQLValue>> executeQuery(String parameterizedSQL, List<?> values, Connection conn) throws SQLException{
 		
 		SQLValueReader sqlValueReader = new SQLValueReader();
 		executeQuery(parameterizedSQL, values, sqlValueReader, conn);
@@ -59,7 +59,7 @@ public class SQLUtil {
 	 * @param conn
 	 * @throws SQLException
 	 */
-	public static void executeQuery(String parameterizedSQL, List<Object> values, ResultSetBaseReader rsReader, Connection conn)
+	public static void executeQuery(String parameterizedSQL, List<?> values, ResultSetBaseReader rsReader, Connection conn)
 																											throws SQLException{
 		ResultSet rs = null;
 		PreparedStatement pstmt = null;
@@ -139,7 +139,7 @@ public class SQLUtil {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static int executeUpdate(String parameterizedSQL, List<Object> values, Connection conn) throws SQLException{
+	public static int executeUpdate(String parameterizedSQL, List<?> values, Connection conn) throws SQLException{
 		
 		PreparedStatement pstmt = null;
 		try{
@@ -181,7 +181,7 @@ public class SQLUtil {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static PreparedStatement prepareStatement(String parameterizedSQL, List<Object> values, Connection conn) throws SQLException{
+	public static PreparedStatement prepareStatement(String parameterizedSQL, List<?> values, Connection conn) throws SQLException{
 		
 		PreparedStatement pstmt= conn.prepareStatement(parameterizedSQL);
 		for (int i=0; values!=null && i<values.size(); i++){

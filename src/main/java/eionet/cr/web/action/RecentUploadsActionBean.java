@@ -16,7 +16,7 @@ import org.apache.commons.logging.LogFactory;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.search.SearchException;
-import eionet.cr.search.Searcher;
+import eionet.cr.search.LuceneBasedSearcher;
 import eionet.cr.util.Util;
 import eionet.cr.web.util.search.SearchResultColumn;
 
@@ -58,7 +58,7 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean {
 		
 		if (type!=null && type.length()>0){
 			String decodedType = Util.urlDecode(type);
-			this.resultList = Searcher.getRecentByRdfType(decodedType, MAX_RESULTS);
+			this.resultList = LuceneBasedSearcher.getRecentByRdfType(decodedType, MAX_RESULTS);
 		}
 			
 		return new ForwardResolution("/pages/recent.jsp");
