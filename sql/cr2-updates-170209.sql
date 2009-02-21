@@ -1,0 +1,2 @@
+alter table HARVEST_SOURCE add column LAST_HARVEST timestamp null default null after COUNT_UNAVAIL;
+update HARVEST_SOURCE set LAST_HARVEST=(select max(STARTED) from HARVEST where HARVEST.HARVEST_SOURCE_ID=HARVEST_SOURCE.HARVEST_SOURCE_ID);
