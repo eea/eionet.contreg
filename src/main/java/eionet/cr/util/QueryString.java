@@ -94,18 +94,18 @@ public class QueryString extends HashMap<String,Set<String>>{
 		return addParameterValue(parName, parValue);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.util.AbstractMap#toString()
+	/**
+	 * 
+	 * @return
 	 */
-	public String toString(){
+	public String toURLFormat(){
 		
 		StringBuffer buf = new StringBuffer();
 		for (Iterator<String> keys = keySet().iterator(); keys.hasNext();){
 			String parName = keys.next();
 			Set<String> parValueSet = get(parName);
 			for (Iterator<String> parValues = parValueSet.iterator(); parValues.hasNext();){
-				buf.append(buf.length()>0 ? "&" : "").append(parName).append("=").append(parValues.next());
+				buf.append(buf.length()>0 ? "&" : "").append(parName).append("=").append(Util.urlEncode(parValues.next()));
 			}
 		}
 		
@@ -117,7 +117,7 @@ public class QueryString extends HashMap<String,Set<String>>{
 	 * @param request
 	 * @return
 	 */
-	public static QueryString getInstance(ServletRequest request){
+	public static QueryString createQueryString(ServletRequest request){
 		return new QueryString(request);
 	}
 
@@ -125,7 +125,7 @@ public class QueryString extends HashMap<String,Set<String>>{
 	 * 
 	 * @return
 	 */
-	public static QueryString getInstance(){
+	public static QueryString createQueryString(){
 		return new QueryString();
 	}
 }

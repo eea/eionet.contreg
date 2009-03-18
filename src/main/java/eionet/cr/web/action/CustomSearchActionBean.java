@@ -23,6 +23,7 @@ import eionet.cr.search.SearchException;
 import eionet.cr.search.LuceneBasedSearcher;
 import eionet.cr.search.util.SubjectDTOCollector;
 import eionet.cr.util.Util;
+import eionet.cr.util.pagination.Pagination;
 import eionet.cr.web.util.search.CustomSearchFilter;
 import eionet.cr.web.util.search.SearchResultColumn;
 
@@ -35,8 +36,10 @@ import eionet.cr.web.util.search.SearchResultColumn;
 public class CustomSearchActionBean extends AbstractSearchActionBean{
 	
 	/** */
-	private static final String SELECTED_FILTERS_SESSION_ATTR_NAME = CustomSearchActionBean.class + ".selectedFilters";
-	private static final String RESULT_LIST_SESSION_ATTR_NAME = CustomSearchActionBean.class + ".resultList";
+	private static final String SELECTED_FILTERS_SESSION_ATTR_NAME = CustomSearchActionBean.class.getName() + ".selectedFilters";
+	private static final String RESULT_LIST_SESSION_ATTR_NAME = CustomSearchActionBean.class.getName() + ".resultList";
+	private static final String MATCH_COUNT_SESSION_ATTR_NAME = CustomSearchActionBean.class.getName() + ".matchCount";
+	private static final String PAGINATION_SESSION_ATTR_NAME = CustomSearchActionBean.class.getName() + ".pagination";
 	
 	/** */
 	private static final String SELECTED_VALUE_PREFIX = "value_";
@@ -64,15 +67,27 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 			populateSelectedFilters();
 		else if (isRemoveFilter()){
 			populateSelectedFilters();
-			getSelectedFilters().remove(getRemovedFilter());
+			
+			Map selectedFilters = getSelectedFilters(false);
+			if (selectedFilters!=null){
+				selectedFilters.remove(getRemovedFilter());
+			}
 		}
-		else{
-			HttpSession session = getContext().getRequest().getSession();
-			session.removeAttribute(RESULT_LIST_SESSION_ATTR_NAME);
-			session.removeAttribute(SELECTED_FILTERS_SESSION_ATTR_NAME);
-		}
+		else
+			clearSessionAttributes();
 		
 		return new ForwardResolution(ASSOCIATED_JSP);
+	}
+
+	/**
+	 * 
+	 */
+	private void clearSessionAttributes(){
+		HttpSession session = getContext().getRequest().getSession();
+		session.removeAttribute(RESULT_LIST_SESSION_ATTR_NAME);
+		session.removeAttribute(MATCH_COUNT_SESSION_ATTR_NAME);
+		session.removeAttribute(PAGINATION_SESSION_ATTR_NAME);
+		session.removeAttribute(SELECTED_FILTERS_SESSION_ATTR_NAME);
 	}
 	
 	/**
@@ -88,11 +103,15 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 		customSearch.setPageNumber(getPageN());
 		customSearch.setSorting(getSortP(), getSortO());
 		customSearch.execute();
-		matchCount = customSearch.getTotalMatchCount();
 		
 		// we put the search result list into session and override getResultList() to retrieve the list from session
 		// (look for the override in this class)
-		getContext().getRequest().getSession().setAttribute(RESULT_LIST_SESSION_ATTR_NAME, customSearch.getResultList());
+		HttpSession session = getContext().getRequest().getSession();
+		session.setAttribute(RESULT_LIST_SESSION_ATTR_NAME, customSearch.getResultList());
+		
+		// we do the same for matchCount and pagination as well
+		session.setAttribute(MATCH_COUNT_SESSION_ATTR_NAME, new Integer(customSearch.getTotalMatchCount()));
+		session.setAttribute(PAGINATION_SESSION_ATTR_NAME, super.getPagination());
 		
 		return new ForwardResolution(ASSOCIATED_JSP);
 	}
@@ -104,6 +123,24 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 	public Collection<SubjectDTO> getResultList(){
 		return (Collection<SubjectDTO>)getContext().getRequest().getSession().getAttribute(RESULT_LIST_SESSION_ATTR_NAME);
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.web.action.AbstractSearchActionBean#getPagination()
+	 */
+	public Pagination getPagination(){
+		return (Pagination)getContext().getRequest().getSession().getAttribute(PAGINATION_SESSION_ATTR_NAME);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.web.action.AbstractSearchActionBean#getMatchCount()
+	 */
+	public int getMatchCount(){
+		Integer i = (Integer)getContext().getRequest().getSession().getAttribute(MATCH_COUNT_SESSION_ATTR_NAME);
+		return i==null ? super.getMatchCount() : i.intValue();
+	}
+	
 	
 	/**
 	 * 
@@ -163,10 +200,20 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 	 */
 	public Map<String,String> getSelectedFilters(){
 		
+		return getSelectedFilters(true);
+	}
+	
+	/**
+	 * 
+	 * @param create
+	 * @return
+	 */
+	private Map<String,String> getSelectedFilters(boolean create){
+		
 		HttpSession session = getContext().getRequest().getSession();
 		Map<String,String> selectedFilters =
 			(Map<String,String>)session.getAttribute(SELECTED_FILTERS_SESSION_ATTR_NAME);
-		if (selectedFilters==null){
+		if (selectedFilters==null && create==true){
 			selectedFilters = new LinkedHashMap<String,String>();
 			session.setAttribute(SELECTED_FILTERS_SESSION_ATTR_NAME, selectedFilters);
 		}

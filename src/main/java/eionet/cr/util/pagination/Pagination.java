@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.util.QueryString;
+import eionet.cr.util.Util;
 
 /**
  * 
@@ -43,7 +44,7 @@ public class Pagination {
 		this.numOfPages = numOfPages;
 		this.curPageNum = curPageNum;
 		this.urlPath = urlPath;
-		this.queryString = queryString==null ? QueryString.getInstance() :  queryString;
+		this.queryString = queryString==null ? QueryString.createQueryString() :  queryString;
 		
 		constructPages();
 	}
@@ -99,7 +100,7 @@ public class Pagination {
 	private String getPageHref(int pageNum){
 		
 		StringBuffer buf = new StringBuffer(urlPath);
-		return buf.append("?").append(queryString.setParameterValue(PAGE_NUM_PARAM, String.valueOf(pageNum))).toString();
+		return buf.append("?").append(queryString.setParameterValue(PAGE_NUM_PARAM, String.valueOf(pageNum)).toURLFormat()).toString();
 	}
 	
 	/**

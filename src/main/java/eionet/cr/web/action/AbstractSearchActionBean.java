@@ -157,7 +157,7 @@ public abstract class AbstractSearchActionBean extends AbstractActionBean{
 			if (urlBinding.startsWith("/")){
 				urlBinding = urlBinding.substring(1);
 			}
-			pagination = Pagination.getPagination(getMatchCount(), getPageN(), urlBinding, QueryString.getInstance(getContext().getRequest()));
+			pagination = Pagination.getPagination(getMatchCount(), getPageN(), urlBinding, QueryString.createQueryString(getContext().getRequest()));
 		}
 		
 		return pagination;

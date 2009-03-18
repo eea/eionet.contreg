@@ -51,7 +51,7 @@
 						                        			<option value="" selected="selected">- select a value -</option>
 						                        			<c:if test="${actionBean.picklist!=null}">
 							                        			<c:forEach var="picklistItem" items="${actionBean.picklist}">
-							                        				<option value="${fn:escapeXml(crfn:addQuotesIfWhitespaceInside(picklistItem))}" title="${fn:escapeXml(picklistItem)}" style="max-width:400px">${picklistItem}</option>
+							                        				<option value="${fn:escapeXml(crfn:addQuotesIfWhitespaceInside(picklistItem))}" title="${fn:escapeXml(picklistItem)}" style="max-width:400px">${fn:escapeXml(picklistItem)}</option>
 							                        			</c:forEach>
 							                        		</c:if>
 														</select>
@@ -74,7 +74,7 @@
 		    			<c:if test="${(actionBean.resultList!=null && fn:length(actionBean.resultList)>0) || not empty param.search}">
 				    		<stripes:layout-render name="/pages/common/subjectsResultList.jsp" tableClass="sortable"/>
 				    	</c:if>
-	    				
+				    	
 		    		</stripes:form>
 			    </div>
 			    
