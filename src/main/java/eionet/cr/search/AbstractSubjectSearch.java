@@ -37,6 +37,9 @@ public abstract class AbstractSubjectSearch {
 	protected Collection<SubjectDTO> resultList = new ArrayList<SubjectDTO>();
 	protected int totalMatchCount = 0;
 	
+	/** */
+	protected boolean noLimit = false;
+	
 	/**
 	 * @throws SQLException 
 	 * 
@@ -164,5 +167,19 @@ public abstract class AbstractSubjectSearch {
 	 */
 	public int resultSize(){
 		return resultList==null ? 0 : resultList.size();
+	}
+
+	/**
+	 * @return the noLimit
+	 */
+	public boolean isNoLimit() {
+		return noLimit;
+	}
+
+	/**
+	 * @param noLimit the noLimit to set
+	 */
+	public void setNoLimit(boolean noLimit) {
+		this.noLimit = noLimit;
 	}
 }

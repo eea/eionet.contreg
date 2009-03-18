@@ -54,14 +54,16 @@ public class CustomSearch extends AbstractSubjectSearch{
 		if (sortPredicate!=null)
 			sqlBuf.append(" order by ORDERING.OBJECT ").append(sortOrder==null ? sortOrder.ASCENDING.toSQL() : sortOrder.toSQL());
 
-		int pageLength = Pagination.pageLength();
-		if (pageLength>0){
-			sqlBuf.append(" limit ");
-			if (pageNumber>0){
-				sqlBuf.append("?,");
-				inParameters.add(new Integer((pageNumber-1)*pageLength));
+		if (noLimit==false){
+			int pageLength = Pagination.pageLength();
+			if (pageLength>0){
+				sqlBuf.append(" limit ");
+				if (pageNumber>0){
+					sqlBuf.append("?,");
+					inParameters.add(new Integer((pageNumber-1)*pageLength));
+				}
+				sqlBuf.append(pageLength);
 			}
-			sqlBuf.append(pageLength);
 		}
 
 		return sqlBuf.toString();
@@ -128,5 +130,20 @@ public class CustomSearch extends AbstractSubjectSearch{
 			return predicateValue.substring(1, predicateValue.length()-1).trim();
 		else
 			return predicateValue;
+	}
+	
+	/**
+	 * 
+	 * @param predicate
+	 * @param value
+	 * @return
+	 */
+	public static Map<String,String> singletonCriteria(String predicate, String value){
+		
+		Map<String,String> result = new HashMap<String,String>();
+		if (!StringUtils.isBlank(predicate) && !StringUtils.isBlank(value)){
+			result.put(predicate, value);
+		}
+		return result;
 	}
 }

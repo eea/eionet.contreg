@@ -6,6 +6,9 @@ package eionet.cr.dto;
  *
  */
 public class ObjectDTO {
+	
+	/** */
+	public enum Type{LITERAL, RESOURCE;}
 
 	/** */
 	private String value;

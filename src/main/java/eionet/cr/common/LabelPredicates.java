@@ -53,6 +53,7 @@ public class LabelPredicates{
 		predicates = new LinkedHashSet<String>();
 		predicates.add(Predicates.RDFS_LABEL);
 		predicates.add(Predicates.SKOS_PREF_LABEL);
+		predicates.add(Predicates.DC_TITLE);
 	}
 	
 	/**

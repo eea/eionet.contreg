@@ -48,7 +48,39 @@ public class SubjectDTO{
 	 * @return
 	 */
 	public Collection<ObjectDTO> getObjects(String predicateUri){
-		return predicates.get(predicateUri);
+		
+		Collection<ObjectDTO> result = predicates.get(predicateUri);
+		if (result==null || result.isEmpty()){
+			if (predicateUri!=null){
+				if (predicateUri.equals(Predicates.RDFS_LABEL)) // FIXME right now a workaround if no label available
+					result = predicates.get(Predicates.DC_TITLE);
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * 
+	 * @param predicateUri
+	 * @param objectType
+	 * @return
+	 */
+	public Collection<ObjectDTO> getObjects(String predicateUri, ObjectDTO.Type objectType){
+		
+		ArrayList<ObjectDTO> result = new ArrayList<ObjectDTO>();
+		
+		Collection<ObjectDTO> coll = getObjects(predicateUri);
+		if (coll!=null && !coll.isEmpty()){
+			for (Iterator<ObjectDTO> iter=coll.iterator(); iter.hasNext();){
+				ObjectDTO objectDTO = iter.next();
+				if (objectType.equals(ObjectDTO.Type.LITERAL) && objectDTO.isLiteral())
+					result.add(objectDTO);
+				else if (objectType.equals(ObjectDTO.Type.RESOURCE) && !objectDTO.isLiteral())
+					result.add(objectDTO);;
+			}
+		}
+		
+		return result;
 	}
 
 	/**
@@ -59,6 +91,37 @@ public class SubjectDTO{
 	public ObjectDTO getObject(String predicateUri){
 		Collection<ObjectDTO> objects = getObjects(predicateUri);
 		return objects==null || objects.isEmpty() ? null : objects.iterator().next();
+	}
+
+	/**
+	 * 
+	 * @param predicateUri
+	 * @param objectType
+	 * @return
+	 */
+	public ObjectDTO getObject(String predicateUri, ObjectDTO.Type objectType){
+		Collection<ObjectDTO> objects = getObjects(predicateUri, objectType);
+		return objects==null || objects.isEmpty() ? null : objects.iterator().next();
+	}
+
+	/**
+	 * 
+	 * @param predicateUri
+	 * @return
+	 */
+	public String getObjectValue(String predicateUri){
+		ObjectDTO objectDTO = getObject(predicateUri);
+		return objectDTO==null ? null : objectDTO.getValue();
+	}
+
+	/**
+	 * 
+	 * @param predicateUri
+	 * @return
+	 */
+	public String getObjectValue(String predicateUri, ObjectDTO.Type objectType){
+		ObjectDTO objectDTO = getObject(predicateUri, objectType);
+		return objectDTO==null ? null : objectDTO.getValue();
 	}
 
 	/**
@@ -113,29 +176,6 @@ public class SubjectDTO{
 
 	/**
 	 * 
-	 * @param key
-	 * @return
-	 */
-	public String[] getDistinctLiteralObjects(String predicateUri){
-		
-		ArrayList<String> result = new ArrayList<String>();		
-		
-		Collection<ObjectDTO> objects = getObjects(predicateUri);
-		if (objects!=null && !objects.isEmpty()){
-		
-			LinkedHashSet<ObjectDTO> distinctObjects = new LinkedHashSet<ObjectDTO>(objects);
-			for (Iterator<ObjectDTO> iter = distinctObjects.iterator(); iter.hasNext();){			
-				ObjectDTO objectDTO = iter.next();
-				if (objectDTO.isLiteral())
-					result.add(objectDTO.toString());
-			}
-		}
-		
-		return result.toArray(new String[result.size()]);
-	}
-
-	/**
-	 * 
 	 * @return
 	 */
 	public String getUrl(){
@@ -153,7 +193,6 @@ public class SubjectDTO{
 	 * @return
 	 */
 	public String getTitle(){
-		ObjectDTO o = getObject(Predicates.RDFS_LABEL);
-		return o==null ? null : o.getValue();
+		return getObjectValue(Predicates.RDFS_LABEL);
 	}
 }

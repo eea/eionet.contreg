@@ -30,7 +30,7 @@
 		    	<stripes:select name="locality" id="localitySelect" style="max-width:200px">
 		    		<stripes:option value="" label="-- All --"/>
 		    		<c:forEach var="loclty" items="${dataflowSearchActionBean.localities}">
-		    			<stripes:option value="${loclty}" label="${loclty}"/>
+		    			<stripes:option value="${crfn:addQuotesIfWhitespaceInside(loclty)}" label="${loclty}"/>
 		    		</c:forEach>
 		    	</stripes:select>
 		    	<label for="yearSelect" style="font-weight:bold;display:inline;margin-left:20px">Delivery year:</label>

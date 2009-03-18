@@ -60,14 +60,16 @@ public class SimpleSearch extends AbstractSubjectSearch{
 		if (sortPredicate!=null)
 			sqlBuf.append(" order by ORDERING.OBJECT ").append(sortOrder==null ? sortOrder.ASCENDING.toSQL() : sortOrder.toSQL());
 
-		int pageLength = Pagination.pageLength();
-		if (pageLength>0){
-			sqlBuf.append(" limit ");
-			if (pageNumber>0){
-				sqlBuf.append("?,");
-				inParameters.add(new Integer((pageNumber-1)*pageLength));
+		if (noLimit==false){
+			int pageLength = Pagination.pageLength();
+			if (pageLength>0){
+				sqlBuf.append(" limit ");
+				if (pageNumber>0){
+					sqlBuf.append("?,");
+					inParameters.add(new Integer((pageNumber-1)*pageLength));
+				}
+				sqlBuf.append(pageLength);
 			}
-			sqlBuf.append(pageLength);
 		}
 		
 		return sqlBuf.toString();

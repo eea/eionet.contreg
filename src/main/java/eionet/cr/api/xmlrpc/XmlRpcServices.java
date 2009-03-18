@@ -2,10 +2,13 @@ package eionet.cr.api.xmlrpc;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -16,12 +19,14 @@ import org.apache.commons.logging.LogFactory;
 import eionet.cr.common.CRException;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
+import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.scheduled.HarvestQueue;
 import eionet.cr.search.LuceneBasedSearcher;
 import eionet.cr.search.util.EntriesCollector;
 import eionet.cr.search.util.SubjectDTOCollector;
 import eionet.cr.util.Util;
+import eionet.cr.web.util.JstlFunctions;
 import eionet.qawcommons.DataflowResultDto;
 
 /**
@@ -88,14 +93,15 @@ public class XmlRpcServices implements Services{
 				for (int i=0; i<list.size(); i++){
 					
 					SubjectDTO subjectDTO = list.get(i);
-					
 					DataflowResultDto resultDTO = new DataflowResultDto();
-					resultDTO.setTitle(subjectDTO.getTitle());
-					resultDTO.setDataflow(subjectDTO.getDistinctLiteralObjects(Predicates.ROD_OBLIGATION_PROPERTY));
-					resultDTO.setLocality(subjectDTO.getDistinctLiteralObjects(Predicates.ROD_LOCALITY_PROPERTY));
-					resultDTO.setType(subjectDTO.getDistinctLiteralObjects(Predicates.RDF_TYPE));
+					
 					resultDTO.setResource(subjectDTO.getUri());
-					resultDTO.setDate(subjectDTO.getObject(Predicates.DC_DATE).getValue());
+					resultDTO.setTitle(subjectDTO.getTitle());
+					
+					resultDTO.setDate(subjectDTO.getObjectValue(Predicates.DC_DATE));
+					resultDTO.setDataflow(getDistinctLiteralObjects(subjectDTO, Predicates.ROD_OBLIGATION_PROPERTY));
+					resultDTO.setLocality(getDistinctLiteralObjects(subjectDTO, Predicates.ROD_LOCALITY_PROPERTY));
+					resultDTO.setType(getDistinctLiteralObjects(subjectDTO, Predicates.RDF_TYPE));
 					
 					result.add(resultDTO);
 				}
@@ -188,6 +194,26 @@ public class XmlRpcServices implements Services{
 			result = new Vector();
 		
 		return result;
+	}
+
+	/**
+	 * 
+	 * @param subjectDTO
+	 * @param predicateUri
+	 * @return
+	 */
+	private static String[] getDistinctLiteralObjects(SubjectDTO subjectDTO, String predicateUri){
+		
+		HashSet<String> result = new HashSet<String>();
+		
+		Collection<ObjectDTO> objects = subjectDTO.getObjects(predicateUri, ObjectDTO.Type.LITERAL);
+		if (objects!=null && !objects.isEmpty()){
+			for (Iterator<ObjectDTO> iter = objects.iterator(); iter.hasNext();){
+				result.add(iter.next().getValue());
+			}
+		}
+		
+		return result.toArray(new String[result.size()]);
 	}
 
 	/**

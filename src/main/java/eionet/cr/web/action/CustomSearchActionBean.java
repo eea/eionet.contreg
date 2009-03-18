@@ -172,9 +172,6 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 			PicklistSearch picklistSearch = new PicklistSearch(getAvailableFilters().get(getPicklistFilter()).getUri());
 			picklistSearch.execute();
 			picklist = picklistSearch.getResultCollection();
-			if (picklist==null){
-				picklist = new ArrayList<String>();
-			}
 		}
 		
 		return picklist;
@@ -425,7 +422,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 	 */
 	private Map<String,String> buildSearchCriteria(){
 		
-		Map<String,String> result = new LinkedHashMap<String,String>();
+		Map<String,String> result = new HashMap<String,String>();
 		
 		Map<String,String> selected = getSelectedFilters();
 		for (Iterator<String> keys=selected.keySet().iterator(); keys.hasNext();){

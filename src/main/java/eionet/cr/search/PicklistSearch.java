@@ -23,7 +23,7 @@ import eionet.cr.util.sql.SQLValue;
 public class PicklistSearch {
 
 	/** */
-	private Collection<String> resultCollection;
+	private Collection<String> resultCollection = new ArrayList<String>();
 	
 	/** */
 	private String predicateUri;
@@ -34,7 +34,6 @@ public class PicklistSearch {
 	 */
 	public PicklistSearch(String predicateUri){
 		this.predicateUri = predicateUri;
-		resultCollection = new ArrayList<String>();
 	}
 	
 	/** */
@@ -56,7 +55,7 @@ public class PicklistSearch {
 				for (int i=0; i<resultList.size(); i++){
 					SQLValue sqlValue = resultList.get(i).get("OBJECT");
 					if (sqlValue!=null){
-						this.resultCollection.add(sqlValue.getString());
+						resultCollection.add(sqlValue.getString());
 					}
 				}
 			}
