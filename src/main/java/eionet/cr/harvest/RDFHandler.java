@@ -347,6 +347,9 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 		commitTriples();
 		commitResources();
 		
+		deriveParentProperties();
+		deriveParentClasses();
+		
 		resolveLabels();
 		extractNewHarvestSources();
 		
@@ -459,6 +462,102 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 		logger.debug(i + " labels derived FOR and " + j + " labels derived FROM the current harvest");
 	}
 	
+	/**
+	 * 
+	 * @throws SQLException
+	 */
+	private void deriveParentProperties() throws SQLException{
+		
+		logger.debug("Deriving parent-properties");
+		
+		/* Derive parent-properties FOR freshly harvested source. */
+		
+		StringBuffer buf = new StringBuffer().
+		append("insert ignore into SPO ").
+		append("(SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG, ").
+		append("OBJ_DERIV_SOURCE, OBJ_DERIV_SOURCE_GEN_TIME, SOURCE, GEN_TIME) ").
+		append("select distinct SPO_FRESH.SUBJECT, SUBPROP.OBJECT_HASH as PARENT_PREDICATE, ").
+		append("SPO_FRESH.OBJECT, SPO_FRESH.OBJECT_HASH, SPO_FRESH.ANON_SUBJ, SPO_FRESH.ANON_OBJ, ").
+		append("SPO_FRESH.LIT_OBJ, SPO_FRESH.OBJ_LANG, ").
+		append("SUBPROP.SOURCE as DERIV_SOURCE, SUBPROP.GEN_TIME as DERIV_SOURCE_GEN_TIME, SPO_FRESH.SOURCE, SPO_FRESH.GEN_TIME ").
+		append("from SPO as SPO_FRESH, SPO as SUBPROP ").
+		append("where SPO_FRESH.SOURCE=").append(sourceUrlHash).
+		append(" and SPO_FRESH.GEN_TIME=").append(genTime).
+		append(" and SPO_FRESH.PREDICATE=SUBPROP.SUBJECT").
+		append(" and SUBPROP.PREDICATE=").append(Hashes.spoHash(Predicates.RDFS_SUBPROPERTY_OF)). 
+		append(" and SUBPROP.LIT_OBJ='N' and SUBPROP.ANON_OBJ='N'");
+		
+		int i = SQLUtil.executeUpdate(buf.toString(), getConnection());
+
+		/* Derive parent-properties FROM freshly harvested source. */
+		
+		buf = new StringBuffer().
+		append("insert ignore into SPO (SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG, ").
+		append("OBJ_DERIV_SOURCE, OBJ_DERIV_SOURCE_GEN_TIME, SOURCE, GEN_TIME) ").		
+		append("select distinct SPO.SUBJECT, SPO_FRESH.OBJECT_HASH as PARENT_PRED, SPO.OBJECT, SPO.OBJECT_HASH, ").
+		append("SPO.ANON_SUBJ, SPO.ANON_OBJ, SPO.LIT_OBJ, SPO.OBJ_LANG, ").
+		append("SPO_FRESH.SOURCE as DERIV_SOURCE, SPO_FRESH.GEN_TIME as DERIV_SOURCE_GEN_TIME, SPO.SOURCE, SPO.GEN_TIME ").
+		append("from SPO, SPO as SPO_FRESH").
+		append(" where SPO_FRESH.SOURCE=").append(sourceUrlHash).
+		append(" and SPO_FRESH.GEN_TIME=").append(genTime).
+		append(" and SPO_FRESH.PREDICATE=").append(Hashes.spoHash(Predicates.RDFS_SUBPROPERTY_OF)). 
+		append(" and SPO_FRESH.LIT_OBJ='N' and SPO_FRESH.ANON_OBJ='N' and SPO_FRESH.SUBJECT=SPO.PREDICATE");
+		
+		int j = SQLUtil.executeUpdate(buf.toString(), getConnection());
+		
+		logger.debug(i + " parent-properties derived FOR and " + j + " parent-properties derived FROM the current harvest");
+	}
+
+	/**
+	 * 
+	 * @throws SQLException
+	 */
+	private void deriveParentClasses() throws SQLException{
+		
+		logger.debug("Deriving parent-classes");
+		
+		/* Derive parent-classes FOR freshly harvested source. */
+		
+		StringBuffer buf = new StringBuffer().
+		append("insert ignore into SPO ").
+		append("(SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG, ").
+		append("OBJ_DERIV_SOURCE, OBJ_DERIV_SOURCE_GEN_TIME, SOURCE, GEN_TIME) ").
+		append("select distinct SPO_FRESH.SUBJECT, SPO_FRESH.PREDICATE, SUBCLASS.OBJECT, ").
+		append("SUBCLASS.OBJECT_HASH, SPO_FRESH.ANON_SUBJ, 'N' as ANON_OBJ, 'N' as LIT_OBJ, SUBCLASS.OBJ_LANG, ").
+		append("SUBCLASS.SOURCE as DERIV_SOURCE, SUBCLASS.GEN_TIME as DERIV_SOURCE_GEN_TIME, ").
+		append("SPO_FRESH.SOURCE, SPO_FRESH.GEN_TIME ").
+		append("from SPO as SPO_FRESH, SPO as SUBCLASS").
+		append(" where SPO_FRESH.SOURCE=").append(sourceUrlHash).
+		append(" and SPO_FRESH.GEN_TIME=").append(genTime).
+		append(" and SPO_FRESH.PREDICATE=").append(Hashes.spoHash(Predicates.RDF_TYPE)).
+		append(" and SPO_FRESH.OBJECT_HASH=SUBCLASS.SUBJECT").
+		append(" and SUBCLASS.PREDICATE=").append(Hashes.spoHash(Predicates.RDFS_SUBCLASS_OF)). 
+		append(" and SUBCLASS.LIT_OBJ='N' and SUBCLASS.ANON_OBJ='N'");
+			
+		int i = SQLUtil.executeUpdate(buf.toString(), getConnection());
+
+		/* Derive parent-classes FROM freshly harvested source. */
+		
+		buf = new StringBuffer().
+		append("insert ignore into SPO (SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG, ").
+		append("OBJ_DERIV_SOURCE, OBJ_DERIV_SOURCE_GEN_TIME, SOURCE, GEN_TIME) ").
+		append("select distinct SPO.SUBJECT, SPO.PREDICATE, SPO_FRESH.OBJECT, SPO_FRESH.OBJECT_HASH, ").
+		append("SPO.ANON_SUBJ, 'N' as ANON_OBJ, 'N' as LIT_OBJ, SPO_FRESH.OBJ_LANG, ").
+		append("SPO_FRESH.SOURCE as DERIV_SOURCE, SPO_FRESH.GEN_TIME as DERIV_SOURCE_GEN_TIME, ").
+		append("SPO.SOURCE, SPO.GEN_TIME ").
+		append("from SPO, SPO as SPO_FRESH").
+		append(" where SPO.PREDICATE=").append(Hashes.spoHash(Predicates.RDF_TYPE)).
+		append(" and SPO.OBJECT_HASH=SPO_FRESH.SUBJECT").
+		append(" and SPO_FRESH.SOURCE=").append(sourceUrlHash).
+		append(" and SPO_FRESH.GEN_TIME=").append(genTime).
+		append(" and SPO_FRESH.PREDICATE=").append(Hashes.spoHash(Predicates.RDFS_SUBCLASS_OF)). 
+		append(" and SPO_FRESH.LIT_OBJ='N' and SPO_FRESH.ANON_OBJ='N'");
+		
+		int j = SQLUtil.executeUpdate(buf.toString(), getConnection());
+		
+		logger.debug(i + " parent-classes derived FOR and " + j + " parent-classes derived FROM the current harvest");
+	}
+
 	/**
 	 * @throws SQLException 
 	 * 
