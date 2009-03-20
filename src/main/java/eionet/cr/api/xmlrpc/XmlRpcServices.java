@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -26,7 +25,6 @@ import eionet.cr.search.LuceneBasedSearcher;
 import eionet.cr.search.util.EntriesCollector;
 import eionet.cr.search.util.SubjectDTOCollector;
 import eionet.cr.util.Util;
-import eionet.cr.web.util.JstlFunctions;
 import eionet.qawcommons.DataflowResultDto;
 
 /**

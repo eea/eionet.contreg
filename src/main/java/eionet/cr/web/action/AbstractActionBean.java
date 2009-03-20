@@ -1,10 +1,6 @@
 package eionet.cr.web.action;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.ResourceBundle;
-
-import javax.servlet.http.HttpSession;
 
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;

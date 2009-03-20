@@ -18,7 +18,6 @@ import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.search.RecentUploadsSearch;
 import eionet.cr.search.SearchException;
-import eionet.cr.search.LuceneBasedSearcher;
 import eionet.cr.util.Util;
 import eionet.cr.web.util.search.SearchResultColumn;
 

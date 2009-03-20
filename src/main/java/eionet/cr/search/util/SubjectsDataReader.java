@@ -25,6 +25,7 @@ public class SubjectsDataReader extends ResultSetBaseReader{
 	private SubjectDTO currentSubject = null;
 	private String currentPredicate = null;
 	private Collection<ObjectDTO> currentObjects = null;
+	private StringBuffer predicateHashesCommaSeparated = new StringBuffer();
 	
 	/**
 	 * 
@@ -47,7 +48,7 @@ public class SubjectsDataReader extends ResultSetBaseReader{
 			currentSubject = new SubjectDTO(subjectUri, YesNoBoolean.parse(rs.getString("ANON_SUBJ")));
 			subjectsMap.put(subjectHash, currentSubject);
 		}
-
+		
 		String predicateUri = rs.getString("PREDICATE_URI");
 		boolean newPredicate = newSubject || currentPredicate==null || !currentPredicate.equals(predicateUri);
 		if (newPredicate){
@@ -55,6 +56,8 @@ public class SubjectsDataReader extends ResultSetBaseReader{
 			currentObjects = new ArrayList<ObjectDTO>();
 			currentSubject.getPredicates().put(predicateUri, currentObjects);
 		}
+		
+		addPredicateHash(rs.getString("PREDICATE_HASH"));
 		
 		ObjectDTO object = new ObjectDTO(rs.getString("OBJECT"),
 											rs.getString("OBJ_LANG"),
@@ -64,5 +67,24 @@ public class SubjectsDataReader extends ResultSetBaseReader{
 		object.setDerivSource(rs.getString("DERIV_SOURCE_URI"));
 		
 		currentObjects.add(object);
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	private void addPredicateHash(String predicateHash){
+		
+		if (predicateHashesCommaSeparated.length()>0){
+			predicateHashesCommaSeparated.append(",");
+		}
+		predicateHashesCommaSeparated.append(predicateHash);
+	}
+
+	/**
+	 * @return the predicateHashesCommaSeparated
+	 */
+	private StringBuffer getPredicateHashesCommaSeparated() {
+		return predicateHashesCommaSeparated;
 	}
 }

@@ -5,7 +5,6 @@ import java.text.SimpleDateFormat;
 import org.displaytag.decorator.TableDecorator;
 
 import eionet.cr.dto.HarvestSourceDTO;
-import eionet.cr.harvest.scheduled.HarvestingJob;
 
 /**
  * 

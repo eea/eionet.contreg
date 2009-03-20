@@ -2,15 +2,11 @@ package eionet.cr.web.action;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import eionet.cr.config.GeneralConfig;
@@ -20,7 +16,6 @@ import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.scheduled.HarvestQueue;
 import eionet.cr.harvest.util.DedicatedHarvestSourceTypes;
-import eionet.cr.util.QueryString;
 
 /**
  * @author altnyris

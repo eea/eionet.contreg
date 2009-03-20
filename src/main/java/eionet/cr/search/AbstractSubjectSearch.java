@@ -148,7 +148,7 @@ public abstract class AbstractSubjectSearch {
 	protected String getSubjectDataSelectSQL(String subjectHashes){
 		
 		StringBuffer buf = new StringBuffer().
-		append("select distinct SUBJECT, SUBJ_RESOURCE.URI as SUBJECT_URI, PRED_RESOURCE.URI as PREDICATE_URI, ").
+		append("select distinct SUBJECT, SUBJ_RESOURCE.URI as SUBJECT_URI, PRED_RESOURCE.URI as PREDICATE_URI, PREDICATE as PREDICATE_HASH ").
 		append("OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG, ").
 		append("SRC_RESOURCE.URI as SOURCE_URI, DSRC_RESOURCE.URI as DERIV_SOURCE_URI from SPO ").
 		append("left join RESOURCE as SUBJ_RESOURCE on (SUBJECT=SUBJ_RESOURCE.URI_HASH) ").

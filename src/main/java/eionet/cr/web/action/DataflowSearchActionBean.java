@@ -12,12 +12,13 @@ import java.util.Set;
 
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringUtils;
-
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
+
+import org.apache.commons.lang.StringUtils;
+
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.dto.ObjectDTO;
@@ -27,7 +28,6 @@ import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.CustomSearch;
 import eionet.cr.search.PicklistSearch;
 import eionet.cr.search.SearchException;
-import eionet.cr.search.LuceneBasedSearcher;
 import eionet.cr.web.util.search.SearchResultColumn;
 
 /**

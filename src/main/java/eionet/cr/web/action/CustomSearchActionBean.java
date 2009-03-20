@@ -20,8 +20,6 @@ import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.CustomSearch;
 import eionet.cr.search.PicklistSearch;
 import eionet.cr.search.SearchException;
-import eionet.cr.search.LuceneBasedSearcher;
-import eionet.cr.search.util.SubjectDTOCollector;
 import eionet.cr.util.Util;
 import eionet.cr.util.pagination.Pagination;
 import eionet.cr.web.util.search.CustomSearchFilter;

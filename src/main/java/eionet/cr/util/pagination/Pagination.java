@@ -3,10 +3,7 @@ package eionet.cr.util.pagination;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
-
 import eionet.cr.util.QueryString;
-import eionet.cr.util.Util;
 
 /**
  * 
