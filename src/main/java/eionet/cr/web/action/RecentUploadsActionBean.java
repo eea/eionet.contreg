@@ -10,11 +10,13 @@ import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
+import eionet.cr.search.RecentUploadsSearch;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.LuceneBasedSearcher;
 import eionet.cr.util.Util;
@@ -56,9 +58,11 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean {
 	@DefaultHandler
 	public Resolution search() throws SearchException{
 		
-		if (type!=null && type.length()>0){
-			String decodedType = Util.urlDecode(type);
-			this.resultList = LuceneBasedSearcher.getRecentByRdfType(decodedType, MAX_RESULTS);
+		if (!StringUtils.isBlank(type)){
+			//String decodedType = Util.urlDecode(type);
+			RecentUploadsSearch recentUploadsSearch = new RecentUploadsSearch(type, MAX_RESULTS);
+			recentUploadsSearch.execute();
+			this.resultList = recentUploadsSearch.getResultList();
 		}
 			
 		return new ForwardResolution("/pages/recent.jsp");
@@ -90,27 +94,50 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean {
 			
 			RecentUploadsActionBean.types = new ArrayList<Map<String,String>>();
 			
+//			Map<String,String> typeMap = new HashMap<String,String>();
+//			typeMap.put("title", "Deliveries");
+//			typeMap.put("uri", Util.urlEncode(Subjects.ROD_DELIVERY_CLASS));
+//			RecentUploadsActionBean.types.add(typeMap);
+//			
+//			typeMap = new HashMap<String,String>();
+//			typeMap.put("title", "Obligations");
+//			typeMap.put("uri", Util.urlEncode(Subjects.ROD_OBLIGATION_CLASS));
+//			RecentUploadsActionBean.types.add(typeMap);
+//			
+//			typeMap = new HashMap<String,String>();
+//			typeMap.put("title", "Full reports");
+//			typeMap.put("uri", Util.urlEncode(Subjects.FULL_REPORT_CLASS));
+//			RecentUploadsActionBean.types.add(typeMap);
+//
+//			typeMap = new HashMap<String,String>();
+//			typeMap.put("title", "News releases");
+//			typeMap.put("uri", Util.urlEncode(Subjects.RSS_ITEM_CLASS.toLowerCase()));
+//				// we do toLowerCase(), because http://reports.eea.europa.eu/whatsnew.rdf wrongfully uses
+//				// http://purl.org/rss/1.0/item, instead of http://purl.org/rss/1.0/Item
+//			RecentUploadsActionBean.types.add(typeMap);
+
 			Map<String,String> typeMap = new HashMap<String,String>();
 			typeMap.put("title", "Deliveries");
-			typeMap.put("uri", Util.urlEncode(Subjects.ROD_DELIVERY_CLASS));
+			typeMap.put("uri", Subjects.ROD_DELIVERY_CLASS);
 			RecentUploadsActionBean.types.add(typeMap);
 			
 			typeMap = new HashMap<String,String>();
 			typeMap.put("title", "Obligations");
-			typeMap.put("uri", Util.urlEncode(Subjects.ROD_OBLIGATION_CLASS));
+			typeMap.put("uri", Subjects.ROD_OBLIGATION_CLASS);
 			RecentUploadsActionBean.types.add(typeMap);
 			
 			typeMap = new HashMap<String,String>();
 			typeMap.put("title", "Full reports");
-			typeMap.put("uri", Util.urlEncode(Subjects.FULL_REPORT_CLASS));
+			typeMap.put("uri", Subjects.FULL_REPORT_CLASS);
 			RecentUploadsActionBean.types.add(typeMap);
 
 			typeMap = new HashMap<String,String>();
 			typeMap.put("title", "News releases");
-			typeMap.put("uri", Util.urlEncode(Subjects.RSS_ITEM_CLASS.toLowerCase()));
+			typeMap.put("uri", Subjects.RSS_ITEM_CLASS.toLowerCase());
 				// we do toLowerCase(), because http://reports.eea.europa.eu/whatsnew.rdf wrongfully uses
 				// http://purl.org/rss/1.0/item, instead of http://purl.org/rss/1.0/Item
 			RecentUploadsActionBean.types.add(typeMap);
+
 		}
 		
 		return RecentUploadsActionBean.types;
