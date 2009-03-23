@@ -26,7 +26,7 @@
 						    	<c:forEach var="predicate" items="${actionBean.subject.predicates}">
 						    		<c:forEach items="${predicate.value}" var="object" varStatus="objectsStatus">
 							    		<tr>
-							    			<th scope="row" class="scope-row" title="${predicate.key}">
+							    			<th scope="row" class="scope-row" title="${predicate.key}" style="white-space:nowrap">
 							    				<c:choose>
 							    					<c:when test="${objectsStatus.count==1}">
 							    						${crfn:getPredicateLabel(actionBean.predicateLabels, predicate.key)}
