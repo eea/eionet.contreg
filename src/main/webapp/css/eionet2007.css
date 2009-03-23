@@ -21,3 +21,22 @@ th.order2 a {
 div.errorHeader {
 	color: #FF0000;
 }
+
+span.langcode {
+	display: block;
+	color: #455b6b;
+	text-decoration: none;
+	font-size: 70%;
+	background-color: transparent;
+	background-image: url(http://www.eionet.europa.eu/styles/eionet2007/button_right.gif);
+	background-repeat: no-repeat;
+	background-attachment: scroll;
+	background-position: 0% 0%;
+	padding-top: 5px;
+	padding-right: 0px;
+	padding-bottom: 0px;
+	padding-left: 10px;
+	border-bottom-width: medium;
+	border-bottom-style: none;
+	border-bottom-color: -moz-use-text-color;
+}

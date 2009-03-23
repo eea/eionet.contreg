@@ -19,6 +19,7 @@
 				    	<table class="datatable" width="100%" cellspacing="0" summary="">
 				    		<thead>
 								<th scope="col" class="scope-col">Property</th>
+								<th scope="col" class="scope-col">&nbsp;</th>
 								<th scope="col" class="scope-col">Value</th> 
 								<th scope="col" class="scope-col">Source</th>
 							</thead>
@@ -34,6 +35,14 @@
 							    					<c:otherwise>&nbsp;</c:otherwise>
 							    				</c:choose>
 							    			</th>
+							    			<td>
+							    				<c:choose>
+							    					<c:when test="${not empty object.language}">
+							    						<span class="langcode">${object.language}</span>
+							    					</c:when>
+							    					<c:otherwise>&nbsp;</c:otherwise>
+							    				</c:choose>
+							    			</td>
 							    			<td>${object.value}</td>
 							    			<td>
 							    				<c:choose>
