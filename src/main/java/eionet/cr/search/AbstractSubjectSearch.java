@@ -56,6 +56,7 @@ public abstract class AbstractSubjectSearch {
 			
 			Connection conn = null;
 			try{
+				conn = getConnection();
 				SubjectHashesReader subjectHashesReader = new SubjectHashesReader();
 				
 				logger.debug("Executing subject select query: " + subjectSelectSQL);
