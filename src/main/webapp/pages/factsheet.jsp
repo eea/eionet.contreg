@@ -23,15 +23,15 @@
 		    		<c:if test="${actionBean.subject.predicates!=null && fn:length(actionBean.subject.predicates)>0}">
 				    	<table class="datatable" width="100%" cellspacing="0" summary="">
 				    		<thead>
-				    			<td style="text-align:center">Property</td>
-				    			<td style="text-align:center">Value</td>
-				    			<td style="text-align:center">Source</td>
+				    			<th scope="col" class="scope-col">Property</th>
+				    			<th scope="col" class="scope-col">Value</th>
+				    			<th scope="col" class="scope-col">Source</th>
 				    		</thead>
 				    		<tbody>
 						    	<c:forEach var="predicate" items="${actionBean.subject.predicates}">
 						    		<c:forEach items="${predicate.value}" var="object" varStatus="objectsStatus">
 							    		<tr>
-							    			<th>
+							    			<th scope="row" class="scope-row">
 							    				<c:choose>
 							    					<c:when test="${objectsStatus.count==1}">
 							    						${crfn:getPredicateLabel(actionBean.predicateLabels, predicate.key)}
