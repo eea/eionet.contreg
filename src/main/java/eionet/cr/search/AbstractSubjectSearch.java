@@ -6,14 +6,17 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.util.SortOrder;
 import eionet.cr.search.util.SubjectHashesReader;
-import eionet.cr.search.util.SubjectsDataReader;
+import eionet.cr.search.util.SubjectDataReader;
 import eionet.cr.util.sql.ConnectionUtil;
 import eionet.cr.util.sql.MySQLUtil;
 import eionet.cr.util.sql.SQLUtil;
@@ -53,8 +56,6 @@ public abstract class AbstractSubjectSearch {
 			
 			Connection conn = null;
 			try{
-				conn = getConnection();
-				
 				SubjectHashesReader subjectHashesReader = new SubjectHashesReader();
 				
 				logger.debug("Executing subject select query: " + subjectSelectSQL);
@@ -69,17 +70,18 @@ public abstract class AbstractSubjectSearch {
 					totalMatchCount = MySQLUtil.getTotalRowCount(conn); // TODO - maybe do it without directly pointing to MySQL
 					LinkedHashMap<String, SubjectDTO> subjectsMap = subjectHashesReader.getResultMap();
 					
-					SubjectsDataReader subjectsDataReader = new SubjectsDataReader(subjectsMap);
+					SubjectDataReader subjectDataReader = new SubjectDataReader(subjectsMap);
 					
 					logger.debug("Executing subject data select query");
 					time = System.currentTimeMillis();
 
 					SQLUtil.executeQuery(
-							getSubjectDataSelectSQL(subjectHashesReader.getSubjectHashesCommaSeparated()), subjectsDataReader, conn);
+							getSubjectDataSelectSQL(subjectHashesReader.getSubjectHashesCommaSeparated()), subjectDataReader, conn);
 				
 					logger.debug("subject data select query took " + (System.currentTimeMillis()-time) + " ms");
 					
-					this.resultList = subjectsMap.values();
+					collectPredicateLabels(conn, subjectDataReader);
+					resultList = subjectsMap.values();
 				}
 			}
 			catch (SQLException e){
@@ -89,6 +91,15 @@ public abstract class AbstractSubjectSearch {
 				SQLUtil.close(conn);
 			}
 		}
+	}
+
+	/**
+	 * 
+	 * @param conn
+	 * @param subjectDataReader
+	 * @throws SQLException 
+	 */
+	protected void collectPredicateLabels(Connection conn, SubjectDataReader subjectDataReader) throws SQLException {
 	}
 
 	/**

@@ -1,8 +1,17 @@
 package eionet.cr.search;
 
+import java.sql.Connection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
+
+import eionet.cr.dto.ObjectDTO;
 import eionet.cr.search.util.SearchExpression;
+import eionet.cr.search.util.SubjectDataReader;
 import eionet.cr.util.Hashes;
 
 /**
@@ -57,5 +66,4 @@ public class UriSearch extends AbstractSubjectSearch{
 	public void setUri(SearchExpression uri) {
 		this.uri = uri;
 	}
-
 }

@@ -4,7 +4,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.Set;
 
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
@@ -16,7 +18,7 @@ import eionet.cr.util.sql.ResultSetBaseReader;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class SubjectsDataReader extends ResultSetBaseReader{
+public class SubjectDataReader extends ResultSetBaseReader{
 
 	/** */
 	private LinkedHashMap<String,SubjectDTO> subjectsMap;
@@ -31,7 +33,7 @@ public class SubjectsDataReader extends ResultSetBaseReader{
 	 * 
 	 * @param subjectsMap
 	 */
-	public SubjectsDataReader(LinkedHashMap<String,SubjectDTO> subjectsMap){
+	public SubjectDataReader(LinkedHashMap<String,SubjectDTO> subjectsMap){
 		this.subjectsMap = subjectsMap;
 	}
 	
@@ -82,9 +84,9 @@ public class SubjectsDataReader extends ResultSetBaseReader{
 	}
 
 	/**
-	 * @return the predicateHashesCommaSeparated
+	 * 
 	 */
-	private StringBuffer getPredicateHashesCommaSeparated() {
-		return predicateHashesCommaSeparated;
+	public String getPredicateHashesCommaSeparated() {
+		return predicateHashesCommaSeparated.toString();
 	}
 }
