@@ -26,7 +26,7 @@
 						    	<c:forEach var="predicate" items="${actionBean.subject.predicates}">
 						    		<c:forEach items="${predicate.value}" var="object" varStatus="objectsStatus">
 							    		<tr>
-							    			<th scope="row" class="scope-row">
+							    			<th scope="row" class="scope-row" title="${predicate.key}">
 							    				<c:choose>
 							    					<c:when test="${objectsStatus.count==1}">
 							    						${crfn:getPredicateLabel(actionBean.predicateLabels, predicate.key)}
@@ -55,7 +55,7 @@
 			    </div>				    
 		    </c:when>
 		    <c:otherwise>
-				No such resource found! 
+				Nothing is known about this resource! 
 			</c:otherwise>
 		</c:choose>
 				
