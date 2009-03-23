@@ -75,5 +75,21 @@
 		<example>
 			${sortUrl(someHttpServletRequest, someString)}
 		</example>
-	</function>	
+	</function>
+	
+	<function>
+		<description>
+			Finds the label for the given predicate in the given predicate-label map.
+	 		If there is no match, then looks for the last occurrence of '#' or '/' or ':' in the predicate.
+	 		If such an occurrence is found, returns everything after that occurrence.
+	 		Otherwise returns the predicate as it was given.
+		</description>
+		<name>getPredicateLabel</name>
+		<function-class>eionet.cr.web.util.JstlFunctions</function-class>
+		<function-signature>java.lang.String getPredicateLabel(java.util.Map, java.lang.String)</function-signature>
+		<example>
+			${getPredicateLabel(predicateLabelsMap, label)}
+		</example>
+	</function>
+	
 </taglib>

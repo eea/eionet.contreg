@@ -34,14 +34,7 @@
 							    			<th>
 							    				<c:choose>
 							    					<c:when test="${objectsStatus.count==1}">
-							    						<c:choose>
-								    						<c:when test="${not empty actionBean.predicateLabels[predicate.key]}">
-								    							${actionBean.predicateLabels[predicate.key]}
-								    						</c:when>
-								    						<c:otherwise>
-								    							${predicate.key}
-								    						</c:otherwise>
-								    					</c:choose>
+							    						${crfn:getPredicateLabel(actionBean.predicateLabels, predicate.key)}
 							    					</c:when>
 							    					<c:otherwise>&nbsp;</c:otherwise>
 							    				</c:choose>

@@ -3,6 +3,7 @@ package eionet.cr.web.util;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletRequest;
@@ -11,6 +12,7 @@ import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
+import eionet.cr.search.util.PredicateLabels;
 import eionet.cr.search.util.SortOrder;
 import eionet.cr.util.Util;
 import eionet.cr.web.action.AbstractActionBean;
@@ -179,5 +181,29 @@ public class JstlFunctions {
 			return SortOrder.ASCENDING.toString();
 		else
 			return SortOrder.parse(order).toOpposite().toString();
+	}
+	
+	/**
+	 * Finds the label for the given predicate in the given predicate-label map.
+	 * If there is no match, then looks for the last occurrence of '#' or '/' or ':' in the predicate.
+	 * If such an occurrence is found, returns everything after that occurrence.
+	 * Otherwise returns the predicate as it was given.
+	 * 
+	 * @param predicateLabels
+	 * @param predicate
+	 * @return
+	 */
+	public static String getPredicateLabel(Map predicateLabels, String predicate){
+
+		Object o = predicateLabels.get(predicate);
+		String label = o==null ? null : o.toString();
+		if (StringUtils.isBlank(label)){
+			int last = Math.max(Math.max(predicate.lastIndexOf('#'), predicate.lastIndexOf('/')), predicate.lastIndexOf(':'));
+			if (last>=0){
+				label = predicate.substring(last+1);
+			}
+		}
+		
+		return StringUtils.isBlank(label) ? predicate : label;
 	}
 }
