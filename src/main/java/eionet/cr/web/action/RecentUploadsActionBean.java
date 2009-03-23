@@ -46,7 +46,7 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean {
 	 * 
 	 */
 	public RecentUploadsActionBean(){
-		this.type = Util.urlEncode(Subjects.ROD_DELIVERY_CLASS); // default type
+		this.type = Subjects.ROD_DELIVERY_CLASS; // default type
 	}
 	
 	/**

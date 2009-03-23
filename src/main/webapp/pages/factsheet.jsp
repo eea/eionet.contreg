@@ -12,21 +12,16 @@
 		    <c:when test="${actionBean.subject!=null}">
 		    	<c:set var="subjectUrl" value="${actionBean.subject.url}"/>
 		    	<div style="margin-top:20px">
-		    		<c:choose>
-		    			<c:when test="${subjectUrl!=null}">
-		    				<p>Click <a href="${subjectUrl}">here</a> to go to the resource's original location.</p>
-		    			</c:when>
-		    			<c:otherwise>
-		    				<p>Link to the resource's original location was not found.</p>
-		    			</c:otherwise>
-		    		</c:choose>
+	    			<c:if test="${subjectUrl!=null}">
+	    				<p>Resource URL: <a href="${subjectUrl}">${subjectUrl}</a></p>
+	    			</c:if>
 		    		<c:if test="${actionBean.subject.predicates!=null && fn:length(actionBean.subject.predicates)>0}">
 				    	<table class="datatable" width="100%" cellspacing="0" summary="">
 				    		<thead>
-				    			<th scope="col" class="scope-col">Property</th>
-				    			<th scope="col" class="scope-col">Value</th>
-				    			<th scope="col" class="scope-col">Source</th>
-				    		</thead>
+								<th scope="col" class="scope-col">Property</th>
+								<th scope="col" class="scope-col">Value</th> 
+								<th scope="col" class="scope-col">Source</th>
+							</thead>
 				    		<tbody>
 						    	<c:forEach var="predicate" items="${actionBean.subject.predicates}">
 						    		<c:forEach items="${predicate.value}" var="object" varStatus="objectsStatus">
@@ -43,9 +38,9 @@
 							    			<td>
 							    				<c:choose>
 							    					<c:when test="${object.sourceSmart!=null}">
-										    			<stripes:link href="/source.action" event="view">
-										    				<img src="${pageContext.request.contextPath}/images/harvest_source.png" title="Harvest source" alt="Harvest source"/>
-										    				<stripes:param name="harvestSource.url" value="${object.sourceSmart}"/>
+										    			<stripes:link href="/factsheet.action">
+										    				<img src="${pageContext.request.contextPath}/images/harvest_source.png" title="${object.sourceSmart}" alt="${object.sourceSmart}"/>
+										    				<stripes:param name="uri" value="${object.sourceSmart}"/>
 														</stripes:link>
 													</c:when>
 													<c:otherwise>&nbsp;</c:otherwise>

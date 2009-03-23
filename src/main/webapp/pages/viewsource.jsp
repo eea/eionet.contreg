@@ -28,7 +28,7 @@
 			            </tr>
 			            <tr>
 			                <td>URL:</td>
-			                <td><a href="${fn:escapeXml(actionBean.harvestSource.url)}">${fn:escapeXml(actionBean.harvestSource.url)}</td>
+			                <td><a href="${fn:escapeXml(actionBean.harvestSource.url)}">${fn:escapeXml(actionBean.harvestSource.url)}</a></td>
 			            </tr>
 			            <tr>
 			                <td>Type:</td>
