@@ -3,6 +3,7 @@ package eionet.cr.web.action;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,7 @@ import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.FactsheetSearch;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.UriSearch;
+import eionet.cr.search.util.PredicateLabels;
 import eionet.cr.search.util.SearchExpression;
 
 /**
@@ -50,7 +52,7 @@ public class FactsheetActionBean extends AbstractActionBean{
 		if (coll!=null && !coll.isEmpty())
 			subject = coll.iterator().next();
 
-		predicateLabels = factsheetSearch.getPredicateLabels().getByLanguagePreferences(createLanguagePreferences(), "en");
+		predicateLabels = factsheetSearch.getPredicateLabels().getByLanguagePreferences(createPreferredLanguages(), "en");
 		
 		return new ForwardResolution("/pages/factsheet.jsp");
 	}
@@ -80,28 +82,15 @@ public class FactsheetActionBean extends AbstractActionBean{
 	 * 
 	 * @return
 	 */
-	private List<String> createLanguagePreferences(){
+	private Set<String> createPreferredLanguages(){
 		
-		List<String> result = new ArrayList<String>();
+		Set<String> result = new HashSet<String>();
 		
 		String languagePreferences = getContext().getRequest().getHeader("Accept-Language");
 		if (!StringUtils.isBlank(languagePreferences)){
 			String[] languages = StringUtils.split(languagePreferences, ',');
-			for (int m=0; m<languages.length; m++){
-				
-				String lang = languages[m];
-	            
-	            int i = lang.indexOf(";");
-	            if (i != -1)
-	            	lang = lang.substring(0, i);
-	            
-	            int j = lang.indexOf("-");
-	            if (j == -1)
-	            	j = lang.indexOf("_");
-	            if (j != -1)
-	            	lang = lang.substring(0, j);
-	            
-	            result.add(lang.toLowerCase());
+			for (int i=0; i<languages.length; i++){
+				result.add(PredicateLabels.parseHTTPAcceptedLanguage(languages[i]));
 			}
 		}
 			

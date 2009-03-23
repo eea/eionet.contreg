@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 
@@ -27,10 +28,11 @@ public class PredicateLabels extends HashMap<String,HashMap<String,HashSet<Strin
 			put(predicate, labels);
 		}
 		
-		HashSet<String> labelsOfLang = labels.get(language);
+		String parsedLanguage = parseHTTPAcceptedLanguage(language);
+		HashSet<String> labelsOfLang = labels.get(parsedLanguage);
 		if (labelsOfLang==null){
 			labelsOfLang = new HashSet<String>();
-			labels.put(language, labelsOfLang);
+			labels.put(parsedLanguage, labelsOfLang);
 		}
 		
 		labelsOfLang.add(label);
@@ -38,13 +40,13 @@ public class PredicateLabels extends HashMap<String,HashMap<String,HashSet<Strin
 	
 	/**
 	 * 
-	 * @param languagePreferences
+	 * @param preferredLanguages
 	 * @return
 	 */
-	public Map<String,String> getByLanguagePreferences(List<String> languagePreferences, String defaultLanguage){
+	public Map<String,String> getByLanguagePreferences(Set<String> preferredLanguages, String defaultLanguage){
 		
 		Map<String,String> result = new HashMap<String,String>();
-		if (languagePreferences!=null && !languagePreferences.isEmpty()){
+		if (preferredLanguages!=null && !preferredLanguages.isEmpty()){
 			if (!isEmpty()){
 				
 				for (Iterator<String> predicates=keySet().iterator(); predicates.hasNext();){
@@ -53,8 +55,8 @@ public class PredicateLabels extends HashMap<String,HashMap<String,HashSet<Strin
 					HashMap<String,HashSet<String>> labels = get(predicate);
 					
 					HashSet<String> labelsOfLang = null;
-					for (int i=0; labelsOfLang==null && i<languagePreferences.size(); i++){
-						labelsOfLang = labels.get(languagePreferences.get(i));
+					for (Iterator<String> prefLanguages=preferredLanguages.iterator(); labelsOfLang==null && prefLanguages.hasNext();){
+						labelsOfLang = labels.get(prefLanguages.next());
 					}
 					if (labelsOfLang==null)
 						labelsOfLang = labels.get(defaultLanguage);
@@ -68,5 +70,32 @@ public class PredicateLabels extends HashMap<String,HashMap<String,HashSet<Strin
 		}
 		
 		return result;
+	}
+	
+	/**
+	 * 
+	 * @param language
+	 */
+	public static String parseHTTPAcceptedLanguage(String httpAcceptedLanguage){
+		
+		String result = new String(httpAcceptedLanguage);
+		
+		/* ignore quality value which is separated by ';' */
+		
+        int j = result.indexOf(";");
+        if (j != -1)
+        	result = result.substring(0, j);
+
+        /* ignore language refinement (e.g. en-US, en_UK) which is separated either by '-' or '_' */
+        
+        j = result.indexOf("-");
+        if (j<0){
+        	j = result.indexOf("_");
+        }
+        if (j>=0){
+        	result = result.substring(0, j);
+        }
+        
+		return result.toLowerCase();
 	}
 }
