@@ -1,75 +1,125 @@
-<%@page contentType="text/html;charset=UTF-8"%>
+<%@page contentType="text/html;charset=UTF-8" import="java.util.*,java.io.*,eionet.cr.dao.DAOFactory"%>
 
-<%@ include file="/pages/common/taglibs.jsp"%>
+<%@ include file="/pages/common/taglibs.jsp"%>	
 
-<stripes:layout-render name="/pages/common/template.jsp" pageTitle="Resource properties">
+<%@ page import="eionet.cr.dto.HarvestBaseDTO" %>
+<%@ page import="eionet.cr.harvest.Harvest" %>
 
+<stripes:layout-render name="/pages/common/template.jsp" pageTitle="View Harvesting Source">
+	<stripes:layout-component name="errors"/>
+	<stripes:layout-component name="messages"/>
 	<stripes:layout-component name="contents">
-	
-        <h1>Resource factsheet</h1>
-        
-	    <c:choose>
-		    <c:when test="${actionBean.subject!=null}">
-		    	<c:set var="subjectUrl" value="${actionBean.subject.url}"/>
-		    	<div style="margin-top:20px">
-		    		<c:choose>
-		    			<c:when test="${subjectUrl!=null}">
-		    				<p>Click <a href="${subjectUrl}">here</a> to go to the resource's original location.</p>
-		    			</c:when>
-		    			<c:otherwise>
-		    				<p>Link to the resource's original location was not found.</p>
-		    			</c:otherwise>
-		    		</c:choose>
-		    		<c:if test="${actionBean.subject.predicates!=null && fn:length(actionBean.subject.predicates)>0}">
-				    	<table class="datatable" width="100%" cellspacing="0" summary="">
-				    		<thead>
-				    			<td style="text-align:center">Property</td>
-				    			<td style="text-align:center">Value</td>
-				    			<td style="text-align:center">Source</td>
-				    		</thead>
-				    		<tbody>
-						    	<c:forEach var="predicate" items="${actionBean.subject.predicates}">
-						    		<c:forEach items="${predicate.value}" var="object" varStatus="objectsStatus">
-							    		<tr>
-							    			<th>
-							    				<c:choose>
-							    					<c:when test="${objectsStatus.count==1}">
-							    						<c:choose>
-								    						<c:when test="${not empty actionBean.predicateLabels[predicate.key]}">
-								    							${actionBean.predicateLabels[predicate.key]}
-								    						</c:when>
-								    						<c:otherwise>
-								    							${predicate.key}
-								    						</c:otherwise>
-								    					</c:choose>
-							    					</c:when>
-							    					<c:otherwise>&nbsp;</c:otherwise>
-							    				</c:choose>
-							    			</th>
-							    			<td>${object.value}</td>
-							    			<td>
-							    				<c:choose>
-							    					<c:when test="${object.sourceSmart!=null}">
-										    			<stripes:link href="/source.action" event="view">
-										    				<img src="${pageContext.request.contextPath}/images/harvest_source.png" title="Harvest source" alt="Harvest source"/>
-										    				<stripes:param name="harvestSource.url" value="${object.sourceSmart}"/>
-														</stripes:link>
-													</c:when>
-													<c:otherwise>&nbsp;</c:otherwise>
-												</c:choose>
-											</td>
-							    		</tr>
-							    	</c:forEach>
-						    	</c:forEach>
-						    </tbody>
-				    	</table>
-				    </c:if>
-			    </div>				    
-		    </c:when>
-		    <c:otherwise>
-				No such resource found! 
-			</c:otherwise>
-		</c:choose>
+
+		<c:choose>
+			<c:when test="${actionBean.harvestSource!=null}">
+			
+				<c:if test="${not empty actionBean.currentlyHarvestedQueueItem && (actionBean.currentlyHarvestedQueueItem.url==actionBean.harvestSource.url)}">
+					<div class="important-msg" style="margin-bottom:10px">This source is being harvested right now!</div>
+				</c:if>
 				
+				<h1>View source</h1>
+				<br/>
+			    <stripes:form action="/source.action" focus="">
+			    	<stripes:hidden name="harvestSource.sourceId"/>
+			        <table>
+			            <tr>
+			                <td>Name:</td>
+			                <td>${fn:escapeXml(actionBean.harvestSource.name)}</td>
+			            </tr>
+			            <tr>
+			                <td>URL:</td>
+			                <td><a href="${fn:escapeXml(actionBean.harvestSource.url)}">${fn:escapeXml(actionBean.harvestSource.url)}</td>
+			            </tr>
+			            <tr>
+			                <td>Type:</td>
+			                <td>
+			                	${fn:escapeXml(actionBean.harvestSource.type)}
+			                </td>
+			            </tr>
+			            <tr>
+			                <td>E-mails:</td>
+			                <td>${fn:escapeXml(actionBean.harvestSource.emails)}</td>
+			            </tr>
+			            <tr>
+			                <td>Date created:</td>
+			                <td>
+			                	${fn:escapeXml(actionBean.harvestSource.dateCreated)}
+			                </td>
+			            </tr>
+			            <tr>
+			                <td>Creator:</td>
+			                <td>
+			                	${fn:escapeXml(actionBean.harvestSource.creator)}
+			                </td>
+			            </tr>
+			            <tr>
+			                <td>Number of resources:</td>
+			                <td>
+			                	to be implemented
+			                </td>
+			            </tr>
+			            <tr>
+			                <td>Schedule cron expression:</td>
+			                <td class="cronExpression">${fn:escapeXml(actionBean.harvestSource.scheduleCron)}</td>
+			            </tr>
+		           		<c:if test="${actionBean.harvestSource.unavailable}">
+		           			<tr>
+		           				<td colspan="2" class="warning-msg" style="color:#E6E6E6">The source has been unavailable for too many times!</td>
+		           			</tr>
+		           		</c:if>
+		           		
+			            <tr>
+			                <td colspan="2" style="padding-top:10px">
+			                	<stripes:submit name="goToEdit" value="Edit" title="Edit this harvest source"/>
+			                    <stripes:submit name="scheduleUrgentHarvest" value="Schedule urgent harvest"/>
+			                </td>
+			            </tr>
+			        </table>
+			        <br/><br/>
+			        <strong>Last 10 harvests:</strong>
+			        <table class="datatable">	        	
+			        	<thead>
+				        	<tr>
+				        		<th scope="col">Type</th>
+				        		<th scope="col">User</th>
+				        		<th scope="col">Started</th>
+				        		<th scope="col">Finished</th>
+				        		<th scope="col">Triples</th>
+				        		<th scope="col">Subjects</th>
+				        		<th scope="col"></th>
+				        	</tr>
+			        	</thead>
+			        	<tbody>
+			        		<c:forEach items="${actionBean.harvests}" var="harv" varStatus="loop">
+			        			<tr>
+			        				<td>${fn:escapeXml(harv.harvestType)}</td>
+			        				<td>${fn:escapeXml(harv.user)}</td>
+			        				<td><fmt:formatDate value="${harv.datetimeStarted}" pattern="dd-MM-yy HH:mm:ss"/></td>
+			        				<td><fmt:formatDate value="${harv.datetimeFinished}" pattern="dd-MM-yy HH:mm:ss"/></td>		        				
+			        				<td>${fn:escapeXml(harv.totalStatements)}</td>
+			        				<td>${fn:escapeXml(harv.totalResources)}</td>
+									<td>
+				        				<stripes:link href="/harvest.action">
+				        					<img src="${pageContext.request.contextPath}/images/view2.gif" title="View" alt="View"/>
+											<c:if test="${(!(empty harv.hasFatals) && harv.hasFatals) || (!(empty harv.hasErrors) && harv.hasErrors)}">
+												<img src="${pageContext.request.contextPath}/images/error.png" title="Errors" alt="Errors"/>
+											</c:if>
+											<c:if test="${!(empty harv.hasWarnings) && harv.hasWarnings}">
+												<img src="${pageContext.request.contextPath}/images/warning.png" title="Warnings" alt="Warnings"/>
+											</c:if>	                                
+			                                <stripes:param name="harvestDTO.harvestId" value="${harv.harvestId}"/>
+			                            </stripes:link>
+				        			</td>	        				
+			        			</tr>
+			        		</c:forEach>
+			        	</tbody>
+			        </table>
+			    </stripes:form>
+			</c:when>
+			<c:otherwise>
+				No such harvest source found!
+			</c:otherwise>			
+		</c:choose>			  
+		    
 	</stripes:layout-component>
 </stripes:layout-render>
