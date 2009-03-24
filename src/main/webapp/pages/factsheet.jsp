@@ -13,7 +13,7 @@
 		    	<c:set var="subjectUrl" value="${actionBean.subject.url}"/>
 		    	<div style="margin-top:20px">
 	    			<c:if test="${subjectUrl!=null}">
-	    				<p>Resource URL: <a href="${subjectUrl}">${subjectUrl}</a></p>
+	    				<p>Resource URL: <a href="${fn:escapeXml(subjectUrl)}"><c:out value="${subjectUrl}"/></a></p>
 	    			</c:if>
 		    		<c:if test="${actionBean.subject.predicates!=null && fn:length(actionBean.subject.predicates)>0}">
 				    	<table class="datatable" width="100%" cellspacing="0" summary="">
@@ -35,7 +35,7 @@
 									    			<th scope="row" class="scope-row" title="${predicate.key}" style="white-space:nowrap">
 									    				<c:choose>
 									    					<c:when test="${not predicateLabelDisplayed}">
-									    						${crfn:getPredicateLabel(actionBean.predicateLabels, predicate.key)}
+									    						<c:out value="${crfn:getPredicateLabel(actionBean.predicateLabels, predicate.key)}"/>
 									    						<c:set var="predicateLabelDisplayed" value="${true}"/>
 									    					</c:when>
 									    					<c:otherwise>&nbsp;</c:otherwise>
@@ -44,17 +44,19 @@
 									    			<td>
 									    				<c:choose>
 									    					<c:when test="${not empty object.language}">
-									    						<span class="langcode">${object.language}</span>
+									    						<span class="langcode"><c:out value="${object.language}"/></span>
 									    					</c:when>
 									    					<c:otherwise>&nbsp;</c:otherwise>
 									    				</c:choose>
 									    			</td>
-									    			<td>${object.value}</td>
+									    			<td>
+									    				<c:out value="${object.value}"/>
+									    			</td>
 									    			<td>
 									    				<c:choose>
 									    					<c:when test="${object.sourceSmart!=null}">
 												    			<stripes:link href="/factsheet.action">
-												    				<img src="${pageContext.request.contextPath}/images/harvest_source.png" title="${object.sourceSmart}" alt="${object.sourceSmart}"/>
+												    				<img src="${pageContext.request.contextPath}/images/harvest_source.png" title="${fn:escapeXml(object.sourceSmart)}" alt="${fn:escapeXml(object.sourceSmart)}"/>
 												    				<stripes:param name="uri" value="${object.sourceSmart}"/>
 																</stripes:link>
 															</c:when>
