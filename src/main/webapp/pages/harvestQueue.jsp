@@ -21,7 +21,7 @@
 				<c:choose>
 					<c:when test="${actionBean.currentlyHarvestedQueueItem.pushHarvest}">Currently push-harvesting:&nbsp;</c:when>
 					<c:otherwise>Currently pull-harvesting:&nbsp;</c:otherwise>
-				</c:choose><a href="javascript:doNothing()" title="${actionBean.currentlyHarvestedQueueItem.url}">${fn:escapeXml(crfn:cutAtFirstLongToken(actionBean.currentlyHarvestedQueueItem.url,55))}</a>
+				</c:choose><a href="javascript:doNothing()" title="${actionBean.currentlyHarvestedQueueItem.url}"><c:out value="${crfn:cutAtFirstLongToken(actionBean.currentlyHarvestedQueueItem.url,55)}"/></a>
 			</div>
 		</c:if>
 		
@@ -30,12 +30,12 @@
 		    	<c:forEach items="${actionBean.priorities}" var="loopPriority">
 					<c:choose>
 				  		<c:when test="${actionBean.priority==loopPriority.priority}" > 
-							<li id="currenttab"><span>${fn:escapeXml(loopPriority.title)}</span></li>
+							<li id="currenttab"><span><c:out value="${loopPriority.title}"/></span></li>
 						</c:when>
 						<c:otherwise>
 							<li>
 								<stripes:link href="/harvestQueue.action">
-									${fn:escapeXml(loopPriority.title)}
+									<c:out value="${loopPriority.title}"/>
 					                <stripes:param name="priority" value="${loopPriority.priority}"/>
 					            </stripes:link>
 				            </li>

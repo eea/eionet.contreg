@@ -14,23 +14,23 @@
                 <td>Harvest source:</td>
                 <td>
                 	<stripes:link href="/source.action" event="preViewHarvestSource">
-                        ${fn:escapeXml(actionBean.harvestSourceDTO.url)}
+                        <c:out value="${actionBean.harvestSourceDTO.url}"/>
                         <stripes:param name="harvestSource.sourceId" value="${actionBean.harvestSourceDTO.sourceId}"/>
                     </stripes:link>
                 </td>
             </tr>
             <tr>
                 <td>Type:</td>
-                <td>${fn:escapeXml(actionBean.harvestDTO.harvestType)}</td>
+                <td><c:out value="${actionBean.harvestDTO.harvestType}"/></td>
             </tr>
             <tr>
                 <td>User:</td>
-                <td>${fn:escapeXml(actionBean.harvestDTO.user)}</td>
+                <td><c:out value="${actionBean.harvestDTO.user}"/></td>
             </tr>
             <tr>
                 <td>Status:</td>
                 <td>
-                	${fn:escapeXml(actionBean.harvestDTO.status)}
+                	<c:out value="${actionBean.harvestDTO.status}"/>
                 </td>
             </tr>
             <tr>
@@ -43,11 +43,11 @@
             </tr>
             <tr>
                 <td>Triples:</td>
-                <td>${fn:escapeXml(actionBean.harvestDTO.totalStatements)}</td>
+                <td><c:out value="${actionBean.harvestDTO.totalStatements}"/></td>
             </tr>
             <tr>
                 <td>Subjects:</td>
-                <td>${fn:escapeXml(actionBean.harvestDTO.totalResources)}</td>
+                <td><c:out value="${actionBean.harvestDTO.totalResources}"/></td>
             </tr>
         </table>
         <br/><br/>
@@ -68,8 +68,8 @@
 			        	<tbody>
 			        		<c:forEach items="${actionBean.fatals}" var="msg" varStatus="loop">
 			        			<tr>
-			        				<td>${fn:escapeXml(msg.message)}</td>
-			        				<td>${fn:escapeXml(msg.stackTrace)}</td>
+			        				<td><c:out value="${msg.message}"/></td>
+			        				<td><c:out value="${msg.stackTrace}"/></td>
 			        			</tr>
 			        		</c:forEach>
 			        	</tbody>
@@ -87,8 +87,8 @@
 			        	<tbody>
 			        		<c:forEach items="${actionBean.errors}" var="msg" varStatus="loop">
 			        			<tr>
-			        				<td>${fn:escapeXml(msg.message)}</td>
-			        				<td>${fn:escapeXml(msg.stackTrace)}</td>
+			        				<td><c:out value="${msg.message}"/></td>
+			        				<td><c:out value="${msg.stackTrace}"/></td>
 			        			</tr>
 			        		</c:forEach>
 			        	</tbody>
@@ -106,8 +106,8 @@
 			        	<tbody>
 			        		<c:forEach items="${actionBean.warnings}" var="msg" varStatus="loop">
 			        			<tr>
-			        				<td>${fn:escapeXml(msg.message)}</td>
-			        				<td>${fn:escapeXml(msg.stackTrace)}</td>
+			        				<td><c:out value="${msg.message}"/></td>
+			        				<td><c:out value="${msg.stackTrace}"/></td>
 			        			</tr>
 			        		</c:forEach>
 			        	</tbody>

@@ -73,7 +73,7 @@
 						</c:when>
 						<c:otherwise>
 							<div class="breadcrumbitem"><a href="${pageContext.request.contextPath}">Content Registry</a></div>
- 							<div class="breadcrumbitemlast">${fn:escapeXml(pageTitle)}</div>
+ 							<div class="breadcrumbitemlast"><c:out value="${pageTitle}"/></div>
 						</c:otherwise>
 					</c:choose>
 					<div class="breadcrumbtail"></div>

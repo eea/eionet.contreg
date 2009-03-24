@@ -25,12 +25,12 @@
 			    	<c:forEach items="${actionBean.sourceTypes}" var="loopItem">
 						<c:choose>
 					  		<c:when test="${actionBean.type==loopItem.type}" > 
-								<li id="currenttab"><span>${fn:escapeXml(loopItem.title)}</span></li>
+								<li id="currenttab"><span><c:out value="${loopItem.title}"/></span></li>
 							</c:when>
 							<c:otherwise>
 								<li>
 									<stripes:link href="${actionBean.urlBinding}">
-										${fn:escapeXml(loopItem.title)}
+										<c:out value="${loopItem.title}"/>
 						                <stripes:param name="type" value="${loopItem.type}"/>
 						            </stripes:link>
 					            </li>

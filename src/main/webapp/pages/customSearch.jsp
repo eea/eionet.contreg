@@ -51,7 +51,7 @@
 						                        			<option value="" selected="selected">- select a value -</option>
 						                        			<c:if test="${actionBean.picklist!=null}">
 							                        			<c:forEach var="picklistItem" items="${actionBean.picklist}">
-							                        				<option value="${fn:escapeXml(crfn:addQuotesIfWhitespaceInside(picklistItem))}" title="${fn:escapeXml(picklistItem)}" style="max-width:400px">${fn:escapeXml(picklistItem)}</option>
+							                        				<option value="${fn:escapeXml(crfn:addQuotesIfWhitespaceInside(picklistItem))}" title="${fn:escapeXml(picklistItem)}" style="max-width:400px"><c:out value="${picklistItem}"/></option>
 							                        			</c:forEach>
 							                        		</c:if>
 														</select>

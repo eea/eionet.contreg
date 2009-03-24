@@ -24,32 +24,32 @@
 			        <table>
 			            <tr>
 			                <td>Name:</td>
-			                <td>${fn:escapeXml(actionBean.harvestSource.name)}</td>
+			                <td><c:out value="${actionBean.harvestSource.name}"/></td>
 			            </tr>
 			            <tr>
 			                <td>URL:</td>
-			                <td><a href="${fn:escapeXml(actionBean.harvestSource.url)}">${fn:escapeXml(actionBean.harvestSource.url)}</a></td>
+			                <td><a href="${fn:escapeXml(actionBean.harvestSource.url)}"><c:out value="${actionBean.harvestSource.url}"/></a></td>
 			            </tr>
 			            <tr>
 			                <td>Type:</td>
 			                <td>
-			                	${fn:escapeXml(actionBean.harvestSource.type)}
+			                	<c:out value="${actionBean.harvestSource.type}"/>
 			                </td>
 			            </tr>
 			            <tr>
 			                <td>E-mails:</td>
-			                <td>${fn:escapeXml(actionBean.harvestSource.emails)}</td>
+			                <td><c:out value="${actionBean.harvestSource.emails}"/></td>
 			            </tr>
 			            <tr>
 			                <td>Date created:</td>
 			                <td>
-			                	${fn:escapeXml(actionBean.harvestSource.dateCreated)}
+			                	<c:out value="${actionBean.harvestSource.dateCreated}"/>
 			                </td>
 			            </tr>
 			            <tr>
 			                <td>Creator:</td>
 			                <td>
-			                	${fn:escapeXml(actionBean.harvestSource.creator)}
+			                	<c:out value="${actionBean.harvestSource.creator}"/>
 			                </td>
 			            </tr>
 			            <tr>
@@ -60,7 +60,7 @@
 			            </tr>
 			            <tr>
 			                <td>Schedule cron expression:</td>
-			                <td class="cronExpression">${fn:escapeXml(actionBean.harvestSource.scheduleCron)}</td>
+			                <td class="cronExpression"><c:out value="${actionBean.harvestSource.scheduleCron}"/></td>
 			            </tr>
 		           		<c:if test="${actionBean.harvestSource.unavailable}">
 		           			<tr>
@@ -92,12 +92,12 @@
 			        	<tbody>
 			        		<c:forEach items="${actionBean.harvests}" var="harv" varStatus="loop">
 			        			<tr>
-			        				<td>${fn:escapeXml(harv.harvestType)}</td>
-			        				<td>${fn:escapeXml(harv.user)}</td>
+			        				<td><c:out value="${harv.harvestType}"/></td>
+			        				<td><c:out value="${harv.user}"/></td>
 			        				<td><fmt:formatDate value="${harv.datetimeStarted}" pattern="dd-MM-yy HH:mm:ss"/></td>
 			        				<td><fmt:formatDate value="${harv.datetimeFinished}" pattern="dd-MM-yy HH:mm:ss"/></td>		        				
-			        				<td>${fn:escapeXml(harv.totalStatements)}</td>
-			        				<td>${fn:escapeXml(harv.totalResources)}</td>
+			        				<td><c:out value="${harv.totalStatements}"/></td>
+			        				<td><c:out value="${harv.totalResources}"/></td>
 									<td>
 				        				<stripes:link href="/harvest.action">
 				        					<img src="${pageContext.request.contextPath}/images/view2.gif" title="View" alt="View"/>

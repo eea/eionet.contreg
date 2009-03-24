@@ -17,12 +17,12 @@
 		    	<c:forEach items="${actionBean.types}" var="loopType">
 					<c:choose>
 				  		<c:when test="${actionBean.type==loopType.uri}" > 
-							<li id="currenttab"><span>${fn:escapeXml(loopType.title)}</span></li>
+							<li id="currenttab"><span><c:out value="${loopType.title}"/></span></li>
 						</c:when>
 						<c:otherwise>
 							<li>
 								<stripes:link href="/recentUploads.action">
-									${fn:escapeXml(loopType.title)}
+									<c:out value="${loopType.title}"/>
 					                <stripes:param name="type" value="${loopType.uri}"/>
 					            </stripes:link>
 				            </li>

@@ -37,21 +37,21 @@
 	            <tr>
 	                <td>Date created:</td>
 	                <td>
-	                	${fn:escapeXml(actionBean.harvestSource.dateCreated)}
+	                	<c:out value="${actionBean.harvestSource.dateCreated}"/>
 	                	<stripes:hidden name="harvestSource.dateCreated"/>
 	                </td>
 	            </tr>
 	            <tr>
 	                <td>Creator:</td>
 	                <td>
-	                	${fn:escapeXml(actionBean.harvestSource.creator)}
+	                	<c:out value="${actionBean.harvestSource.creator}"/>
 	                	<stripes:hidden name="harvestSource.creator"/>
 	                </td>
 	            </tr>
 	            <tr>
 	                <td>Number of resources:</td>
 	                <td>
-	                	${fn:escapeXml(actionBean.harvestSource.resources)}
+	                	<c:out value="${actionBean.harvestSource.resources}"/>
 	                </td>
 	            </tr>
 	            <tr>
