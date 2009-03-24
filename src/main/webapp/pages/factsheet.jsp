@@ -30,37 +30,39 @@
 						    		
 						    		<c:forEach items="${predicate.value}" var="object" varStatus="objectsStatus">
 						    			<c:if test="${not crfn:subjectHasPredicateObject(actionBean.subject, actionBean.subProperties[predicate.key], object.value)}">
-								    		<tr>
-								    			<th scope="row" class="scope-row" title="${predicate.key}" style="white-space:nowrap">
-								    				<c:choose>
-								    					<c:when test="${not predicateLabelDisplayed}">
-								    						${crfn:getPredicateLabel(actionBean.predicateLabels, predicate.key)}
-								    						<c:set var="predicateLabelDisplayed" value="${true}"/>
-								    					</c:when>
-								    					<c:otherwise>&nbsp;</c:otherwise>
-								    				</c:choose>
-								    			</th>
-								    			<td>
-								    				<c:choose>
-								    					<c:when test="${not empty object.language}">
-								    						<span class="langcode">${object.language}</span>
-								    					</c:when>
-								    					<c:otherwise>&nbsp;</c:otherwise>
-								    				</c:choose>
-								    			</td>
-								    			<td>${object.value}</td>
-								    			<td>
-								    				<c:choose>
-								    					<c:when test="${object.sourceSmart!=null}">
-											    			<stripes:link href="/factsheet.action">
-											    				<img src="${pageContext.request.contextPath}/images/harvest_source.png" title="${object.sourceSmart}" alt="${object.sourceSmart}"/>
-											    				<stripes:param name="uri" value="${object.sourceSmart}"/>
-															</stripes:link>
-														</c:when>
-														<c:otherwise>&nbsp;</c:otherwise>
-													</c:choose>
-												</td>
-								    		</tr>
+						    				<c:if test="${not crfn:isSourceToAny(object.valueHash, predicate.value)}">
+									    		<tr>
+									    			<th scope="row" class="scope-row" title="${predicate.key}" style="white-space:nowrap">
+									    				<c:choose>
+									    					<c:when test="${not predicateLabelDisplayed}">
+									    						${crfn:getPredicateLabel(actionBean.predicateLabels, predicate.key)}
+									    						<c:set var="predicateLabelDisplayed" value="${true}"/>
+									    					</c:when>
+									    					<c:otherwise>&nbsp;</c:otherwise>
+									    				</c:choose>
+									    			</th>
+									    			<td>
+									    				<c:choose>
+									    					<c:when test="${not empty object.language}">
+									    						<span class="langcode">${object.language}</span>
+									    					</c:when>
+									    					<c:otherwise>&nbsp;</c:otherwise>
+									    				</c:choose>
+									    			</td>
+									    			<td>${object.value}</td>
+									    			<td>
+									    				<c:choose>
+									    					<c:when test="${object.sourceSmart!=null}">
+												    			<stripes:link href="/factsheet.action">
+												    				<img src="${pageContext.request.contextPath}/images/harvest_source.png" title="${object.sourceSmart}" alt="${object.sourceSmart}"/>
+												    				<stripes:param name="uri" value="${object.sourceSmart}"/>
+																</stripes:link>
+															</c:when>
+															<c:otherwise>&nbsp;</c:otherwise>
+														</c:choose>
+													</td>
+									    		</tr>
+									    	</c:if>
 								    	</c:if>
 							    	</c:forEach>
 						    	</c:forEach>

@@ -103,4 +103,15 @@
 		</example>
 	</function>
 	
+	<function>
+		<description>
+		</description>
+		<name>isSourceToAny</name>
+		<function-class>eionet.cr.web.util.JstlFunctions</function-class>
+		<function-signature>java.lang.String isSourceToAny(java.lang.String, java.util.Collection)</function-signature>
+		<example>
+			${isSourceToAny(objectHash, collectionOfObjects)}
+		</example>
+	</function>
+	
 </taglib>
