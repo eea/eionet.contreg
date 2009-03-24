@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletRequest;
@@ -205,5 +206,29 @@ public class JstlFunctions {
 		}
 		
 		return StringUtils.isBlank(label) ? predicate : label;
+	}
+	
+	/**
+	 * 
+	 * @param subjectDTO
+	 * @param predicates
+	 * @param object
+	 * @return
+	 */
+	public static boolean subjectHasPredicateObject(SubjectDTO subjectDTO, Set predicates, String object){
+		
+		boolean result = false;
+		
+		if (predicates==null)
+			return result;
+		
+		for (Iterator i=predicates.iterator(); i.hasNext();){
+			if (subjectDTO.hasPredicateObject(i.next().toString(), object)){
+				result = true;
+				break;
+			}
+		}
+			
+		return result;
 	}
 }

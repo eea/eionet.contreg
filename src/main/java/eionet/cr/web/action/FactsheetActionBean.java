@@ -21,6 +21,7 @@ import eionet.cr.search.FactsheetSearch;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.UriSearch;
 import eionet.cr.search.util.PredicateLabels;
+import eionet.cr.search.util.SubProperties;
 import eionet.cr.search.util.SearchExpression;
 
 /**
@@ -37,6 +38,7 @@ public class FactsheetActionBean extends AbstractActionBean{
 	
 	/** */
 	private Map<String,String> predicateLabels;
+	private SubProperties subProperties;
 
 	/**
 	 * 
@@ -53,6 +55,7 @@ public class FactsheetActionBean extends AbstractActionBean{
 			subject = coll.iterator().next();
 
 		predicateLabels = factsheetSearch.getPredicateLabels().getByLanguagePreferences(createPreferredLanguages(), "en");
+		subProperties = factsheetSearch.getSubProperties();
 		
 		return new ForwardResolution("/pages/factsheet.jsp");
 	}
@@ -102,5 +105,12 @@ public class FactsheetActionBean extends AbstractActionBean{
 	 */
 	public Map<String, String> getPredicateLabels() {
 		return predicateLabels;
+	}
+
+	/**
+	 * @return the subProperties
+	 */
+	public SubProperties getSubProperties() {
+		return subProperties;
 	}
 }

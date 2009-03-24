@@ -82,6 +82,8 @@ public abstract class AbstractSubjectSearch {
 					logger.debug("subject data select query took " + (System.currentTimeMillis()-time) + " ms");
 					
 					collectPredicateLabels(conn, subjectDataReader);
+					collectSubProperties(conn, subjectDataReader);
+					
 					resultList = subjectsMap.values();
 				}
 			}
@@ -109,7 +111,7 @@ public abstract class AbstractSubjectSearch {
 	 * @param subjectDataReader
 	 * @throws SQLException
 	 */
-	protected void collectPredicateParents(Connection conn, SubjectDataReader subjectDataReader) throws SQLException {
+	protected void collectSubProperties(Connection conn, SubjectDataReader subjectDataReader) throws SQLException {
 	}
 
 	/**

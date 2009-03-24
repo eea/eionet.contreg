@@ -91,5 +91,16 @@
 			${getPredicateLabel(predicateLabelsMap, label)}
 		</example>
 	</function>
+
+	<function>
+		<description>
+		</description>
+		<name>subjectHasPredicateObject</name>
+		<function-class>eionet.cr.web.util.JstlFunctions</function-class>
+		<function-signature>java.lang.String subjectHasPredicateObject(eionet.cr.dto.SubjectDTO, java.util.Set, java.lang.String)</function-signature>
+		<example>
+			${subjectHasPredicateObject(subjectDTO, predicateSet, objectValue)}
+		</example>
+	</function>
 	
 </taglib>

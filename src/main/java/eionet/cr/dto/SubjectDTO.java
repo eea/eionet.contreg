@@ -195,4 +195,25 @@ public class SubjectDTO{
 	public String getTitle(){
 		return getObjectValue(Predicates.RDFS_LABEL);
 	}
+	
+	/**
+	 * 
+	 * @param predicateUri
+	 * @param objectValue
+	 * @return
+	 */
+	public boolean hasPredicateObject(String predicateUri, String objectValue){
+		
+		boolean result = false;
+		Collection<ObjectDTO> objects = getObjects(predicateUri);
+		if (objects!=null && !objects.isEmpty()){
+			for (Iterator<ObjectDTO> i=objects.iterator(); i.hasNext();){
+				if (objectValue.equals(i.next().getValue())){
+					result = true;
+					break;
+				}
+			}
+		}
+		return result;
+	}
 }

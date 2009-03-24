@@ -13,6 +13,8 @@ import eionet.cr.common.Predicates;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.search.util.PredicateLabels;
 import eionet.cr.search.util.PredicateLabelsReader;
+import eionet.cr.search.util.SubProperties;
+import eionet.cr.search.util.SubPropertiesReader;
 import eionet.cr.search.util.SubjectDataReader;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.sql.SQLUtil;
@@ -26,6 +28,7 @@ public class FactsheetSearch extends UriSearch {
 
 	/** */
 	private PredicateLabels predicateLabels = new PredicateLabels();
+	private SubProperties subProperties = new SubProperties();
 	
 	/**
 	 * 
@@ -37,6 +40,7 @@ public class FactsheetSearch extends UriSearch {
 
 	/**
 	 * 
+	 * @return
 	 */
 	public PredicateLabels getPredicateLabels(){
 		return predicateLabels;
@@ -65,18 +69,25 @@ public class FactsheetSearch extends UriSearch {
 	 * (non-Javadoc)
 	 * @see eionet.cr.search.AbstractSubjectSearch#collectPredicateParents(java.sql.Connection, eionet.cr.search.util.SubjectDataReader)
 	 */
-	protected void collectPredicateParents(Connection conn, SubjectDataReader subjectDataReader) throws SQLException {
+	protected void collectSubProperties(Connection conn, SubjectDataReader subjectDataReader) throws SQLException {
 		
 		if (StringUtils.isBlank(subjectDataReader.getPredicateHashesCommaSeparated()))
 			return;
 		
-		StringBuffer sqlBuf = new StringBuffer("select distinct RESOURCE.URI as SUBJECT_URI, SPO.OBJECT as PARENT").
+		StringBuffer sqlBuf = new StringBuffer("select distinct SPO.OBJECT as PREDICATE, RESOURCE.URI as SUB_PROPERTY").
 		append(" from SPO, RESOURCE").
-		append(" where SPO.SUBJECT in (").append(subjectDataReader.getPredicateHashesCommaSeparated()).append(")").
-		append(" and SPO.PREDICATE=8744745537220110927").
-		append(" and SPO.LIT_OBJ='Y'").
+		append(" where SPO.OBJECT_HASH in (").append(subjectDataReader.getPredicateHashesCommaSeparated()).append(")").
+		append(" and SPO.PREDICATE=").append(Hashes.spoHash(Predicates.RDFS_SUBPROPERTY_OF)).
+		append(" and SPO.LIT_OBJ='N' and SPO.ANON_OBJ='N'").
 		append(" and SPO.SUBJECT=RESOURCE.URI_HASH");
 		
-		SQLUtil.executeQuery(sqlBuf.toString(), new PredicateLabelsReader(predicateLabels), conn);
+		SQLUtil.executeQuery(sqlBuf.toString(), new SubPropertiesReader(subProperties), conn);
+	}
+
+	/**
+	 * @return the subProperties
+	 */
+	public SubProperties getSubProperties() {
+		return subProperties;
 	}
 }
