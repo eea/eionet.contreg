@@ -105,6 +105,15 @@ public abstract class AbstractSubjectSearch {
 
 	/**
 	 * 
+	 * @param conn
+	 * @param subjectDataReader
+	 * @throws SQLException
+	 */
+	protected void collectPredicateParents(Connection conn, SubjectDataReader subjectDataReader) throws SQLException {
+	}
+
+	/**
+	 * 
 	 * @param inParameters
 	 * @return
 	 */
