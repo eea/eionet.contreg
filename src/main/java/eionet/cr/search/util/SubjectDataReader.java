@@ -67,6 +67,7 @@ public class SubjectDataReader extends ResultSetBaseReader{
 											YesNoBoolean.parse(rs.getString("ANON_OBJ")));
 		object.setSource(rs.getString("SOURCE_URI"));
 		object.setDerivSource(rs.getString("DERIV_SOURCE_URI"));
+		object.setSourceObject(rs.getString("OBJ_SOURCE_OBJECT"));
 		
 		currentObjects.add(object);
 	}

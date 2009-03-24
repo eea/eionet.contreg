@@ -1,5 +1,7 @@
 package eionet.cr.dto;
 
+import eionet.cr.util.Hashes;
+
 /**
  * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
@@ -17,6 +19,7 @@ public class ObjectDTO {
 	private boolean anonymous;
 	private String source;
 	private String derivSource;
+	private String sourceObject;
 	
 	/**
 	 * 
@@ -88,8 +91,15 @@ public class ObjectDTO {
 	 * @see java.lang.Object#hashCode()
 	 */
 	public int hashCode(){
-
 		return getValue()==null ? 0 : getValue().hashCode();
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public String getValueHash(){
+		return getValue()==null ? null : String.valueOf(Hashes.spoHash(getValue()));
 	}
 
 	/**
@@ -131,5 +141,19 @@ public class ObjectDTO {
 			return source;
 		else
 			return null;
+	}
+
+	/**
+	 * @return the sourceObject
+	 */
+	public String getSourceObject() {
+		return sourceObject;
+	}
+
+	/**
+	 * @param sourceObject the sourceObject to set
+	 */
+	public void setSourceObject(String derivObject) {
+		this.sourceObject = derivObject;
 	}
 }

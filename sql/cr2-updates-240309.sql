@@ -1,0 +1,1 @@
+alter table SPO change column OBJ_DERIV_OBJECT OBJ_SOURCE_OBJECT bigint(20) not null default 0 after OBJ_DERIV_SOURCE_GEN_TIME;
