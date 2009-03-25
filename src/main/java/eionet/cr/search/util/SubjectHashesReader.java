@@ -24,7 +24,7 @@ public class SubjectHashesReader extends ResultSetBaseReader{
 	 */
 	public void readRow(ResultSet rs) throws SQLException{
 		
-		String subjectHash = rs.getString(1);
+		String subjectHash = rs.getString("SUBJECT_HASH");
 		if (subjectHashesCommaSeparated.length()>0){
 			subjectHashesCommaSeparated.append(",");
 		}
