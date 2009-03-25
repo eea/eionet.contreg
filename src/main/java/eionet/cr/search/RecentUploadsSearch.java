@@ -36,7 +36,7 @@ public class RecentUploadsSearch extends AbstractSubjectSearch {
 		if (StringUtils.isBlank(subjectType))
 			return null;
 		
-		StringBuffer sqlBuf = new StringBuffer("select sql_calc_found_rows distinct SPO.SUBJECT from SPO, RESOURCE").
+		StringBuffer sqlBuf = new StringBuffer("select sql_calc_found_rows distinct SPO.SUBJECT as SUBJECT_HASH from SPO, RESOURCE").
 		append(" where SPO.PREDICATE=").append(Hashes.spoHash(Predicates.RDF_TYPE)).
 		append(" and SPO.OBJECT_HASH=?").
 		append(" and SPO.SUBJECT=RESOURCE.URI_HASH").

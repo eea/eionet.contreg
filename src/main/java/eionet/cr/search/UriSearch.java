@@ -50,7 +50,7 @@ public class UriSearch extends AbstractSubjectSearch{
 			return null;
 		
 		inParameters.add(Hashes.spoHash(uri.toString()));
-		return "select sql_calc_found_rows distinct SUBJECT from SPO where SUBJECT=?";
+		return "select sql_calc_found_rows distinct SUBJECT as SUBJECT_HASH from SPO where SUBJECT=?";
 	}
 
 	/**

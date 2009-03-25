@@ -2,6 +2,7 @@ package eionet.cr.dto;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -20,6 +21,7 @@ public class SubjectDTO{
 	private String uri;
 	private boolean anonymous;
 	private Map<String,Collection<ObjectDTO>> predicates;
+	private Date firstSeenTime;
 	
 	/**
 	 * 
@@ -215,5 +217,19 @@ public class SubjectDTO{
 			}
 		}
 		return result;
+	}
+
+	/**
+	 * @return the firstSeenTime
+	 */
+	public Date getFirstSeenTime() {
+		return firstSeenTime;
+	}
+
+	/**
+	 * @param firstSeenTime the firstSeenTime to set
+	 */
+	public void setFirstSeenTime(Date firstSeenTime) {
+		this.firstSeenTime = firstSeenTime;
 	}
 }

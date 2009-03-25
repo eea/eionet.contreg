@@ -44,7 +44,7 @@ public class CustomSearch extends AbstractSubjectSearch{
 		
 		createFromAndWhereStatements(inParameters);
 		
-		StringBuffer sqlBuf = new StringBuffer("select sql_calc_found_rows distinct SPO1.SUBJECT from ").
+		StringBuffer sqlBuf = new StringBuffer("select sql_calc_found_rows distinct SPO1.SUBJECT as SUBJECT_HASH from ").
 		append(fromStatement).append(" where ").append(whereStatement);
 		
 		if (sortPredicate!=null)

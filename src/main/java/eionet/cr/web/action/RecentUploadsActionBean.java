@@ -164,7 +164,8 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean {
 			
 			RecentUploadsActionBean.typesColumns = new HashMap<String,List<SearchResultColumn>>();
 			
-			// columns for deliveries
+			/* columns for deliveries */
+			
 			List<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
 			SearchResultColumn col = new SearchResultColumn();
 			col.setPredicateUri(Predicates.RDFS_LABEL);
@@ -184,15 +185,10 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean {
 			col.setSortable(false);
 			list.add(col);
 
-			col = new SearchResultColumn();
-			col.setPredicateUri(Predicates.DC_DATE);
-			col.setTitle("Date");
-			col.setSortable(false);
-			list.add(col);
-			
 			RecentUploadsActionBean.typesColumns.put(Subjects.ROD_DELIVERY_CLASS, list);
 
-			// columns for obligations
+			/* columns for obligations */
+			
 			list = new ArrayList<SearchResultColumn>();
 			col = new SearchResultColumn();
 			col.setPredicateUri(Predicates.RDFS_LABEL);
@@ -214,7 +210,8 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean {
 			
 			RecentUploadsActionBean.typesColumns.put(Subjects.ROD_OBLIGATION_CLASS, list);
 
-			// columns for full reports
+			/* columns for full reports */
+			
 			list = new ArrayList<SearchResultColumn>();
 			col = new SearchResultColumn();
 			col.setPredicateUri(Predicates.RDFS_LABEL);
@@ -234,15 +231,10 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean {
 			col.setSortable(false);
 			list.add(col);
 			
-			col = new SearchResultColumn();
-			col.setPredicateUri(Predicates.DC_DATE);
-			col.setTitle("Date");
-			col.setSortable(false);
-			list.add(col);
-
 			RecentUploadsActionBean.typesColumns.put(Subjects.FULL_REPORT_CLASS, list);
 
-			// columns for news releases
+			/* columns for news releases */
+			
 			list = new ArrayList<SearchResultColumn>();
 			col = new SearchResultColumn();
 			col.setPredicateUri(Predicates.RDFS_LABEL);
@@ -262,12 +254,6 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean {
 			col.setSortable(false);
 			list.add(col);
 			
-			col = new SearchResultColumn();
-			col.setPredicateUri(Predicates.DC_DATE);
-			col.setTitle("Date");
-			col.setSortable(false);
-			list.add(col);
-
 			RecentUploadsActionBean.typesColumns.put(Subjects.RSS_ITEM_CLASS.toLowerCase(), list);
 			// we do toLowerCase(), because http://reports.eea.europa.eu/whatsnew.rdf wrongfully uses
 			// http://purl.org/rss/1.0/item, instead of http://purl.org/rss/1.0/Item
