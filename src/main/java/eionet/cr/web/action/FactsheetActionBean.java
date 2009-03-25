@@ -39,7 +39,7 @@ public class FactsheetActionBean extends AbstractActionBean{
 	/** */
 	private Map<String,String> predicateLabels;
 	private SubProperties subProperties;
-
+	
 	/**
 	 * 
 	 * @return

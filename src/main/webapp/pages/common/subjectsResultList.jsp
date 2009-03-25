@@ -76,7 +76,14 @@
 									</c:otherwise>
 								</c:choose>>
 								<c:forEach items="${actionBean.columns}" var="col">
-									<td>${crfn:formatPredicateObjects(resultListItem, col.predicateUri)}</td>
+									<c:choose>
+										<c:when test="${fn:endsWith(col.class.name, 'PropertyBasedColumn')}">
+											<td><c:out value="${crfn:formatObject(resultListItem[col.property], col.formatter)}"/></td>
+										</c:when>
+										<c:otherwise>									
+											<td><c:out value="${crfn:formatPredicateObjects(resultListItem, col.predicateUri)}"/></td>
+										</c:otherwise>
+									</c:choose>
 								</c:forEach>
 								<td>
 									<stripes:link href="/factsheet.action">

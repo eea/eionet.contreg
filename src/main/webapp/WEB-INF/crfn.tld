@@ -113,5 +113,16 @@
 			${isSourceToAny(objectHash, collectionOfObjects)}
 		</example>
 	</function>
+
+	<function>
+		<description>
+		</description>
+		<name>formatObject</name>
+		<function-class>eionet.cr.web.util.JstlFunctions</function-class>
+		<function-signature>java.lang.String formatObject(java.lang.Object, eionet.cr.web.util.Formatter)</function-signature>
+		<example>
+			${formatObject(object, formatter)}
+		</example>
+	</function>
 	
 </taglib>

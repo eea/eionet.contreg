@@ -253,4 +253,15 @@ public class JstlFunctions {
 		
 		return result;
 	}
+	
+	/**
+	 * 
+	 * @param object
+	 * @param formatter
+	 * @return
+	 */
+	public static String formatObject(Object object, Formatter formatter){
+		
+		return formatter==null ? object.toString() : formatter.format(object);
+	}
 }

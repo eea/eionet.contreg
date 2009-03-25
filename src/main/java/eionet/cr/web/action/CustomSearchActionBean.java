@@ -23,6 +23,7 @@ import eionet.cr.search.SearchException;
 import eionet.cr.util.Util;
 import eionet.cr.util.pagination.Pagination;
 import eionet.cr.web.util.search.CustomSearchFilter;
+import eionet.cr.web.util.search.PredicateBasedColumn;
 import eionet.cr.web.util.search.SearchResultColumn;
 
 /**

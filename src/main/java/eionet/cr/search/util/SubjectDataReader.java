@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
 
 import eionet.cr.dto.ObjectDTO;
@@ -21,7 +22,7 @@ import eionet.cr.util.sql.ResultSetBaseReader;
 public class SubjectDataReader extends ResultSetBaseReader{
 
 	/** */
-	private LinkedHashMap<String,SubjectDTO> subjectsMap;
+	private Map<String,SubjectDTO> subjectsMap;
 	
 	/** */
 	private SubjectDTO currentSubject = null;
@@ -33,7 +34,7 @@ public class SubjectDataReader extends ResultSetBaseReader{
 	 * 
 	 * @param subjectsMap
 	 */
-	public SubjectDataReader(LinkedHashMap<String,SubjectDTO> subjectsMap){
+	public SubjectDataReader(Map<String,SubjectDTO> subjectsMap){
 		this.subjectsMap = subjectsMap;
 	}
 	
@@ -48,7 +49,7 @@ public class SubjectDataReader extends ResultSetBaseReader{
 		if (newSubject){
 			String subjectHash = rs.getString("SUBJECT");
 			currentSubject = new SubjectDTO(subjectUri, YesNoBoolean.parse(rs.getString("ANON_SUBJ")));
-			subjectsMap.put(subjectHash, currentSubject);
+			addNewSubject(subjectHash, currentSubject);
 		}
 		
 		String predicateUri = rs.getString("PREDICATE_URI");
@@ -74,9 +75,18 @@ public class SubjectDataReader extends ResultSetBaseReader{
 	
 	/**
 	 * 
+	 * @param subjectHash
+	 * @param subjectDTO
+	 */
+	protected void addNewSubject(String subjectHash, SubjectDTO subjectDTO){
+		subjectsMap.put(subjectHash, currentSubject);
+	}
+	
+	/**
+	 * 
 	 * @return
 	 */
-	private void addPredicateHash(String predicateHash){
+	protected void addPredicateHash(String predicateHash){
 		
 		if (predicateHashesCommaSeparated.length()>0){
 			predicateHashesCommaSeparated.append(",");

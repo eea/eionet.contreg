@@ -51,14 +51,6 @@ public class SubjectDTO{
 	public Collection<ObjectDTO> getObjects(String predicateUri){
 		
 		return predicates.get(predicateUri);
-//		Collection<ObjectDTO> result = predicates.get(predicateUri);
-//		if (result==null || result.isEmpty()){
-//			if (predicateUri!=null){
-//				if (predicateUri.equals(Predicates.RDFS_LABEL)) // FIXME right now a workaround if no label available
-//					result = predicates.get(Predicates.DC_TITLE);
-//			}
-//		}
-//		return result;
 	}
 
 	/**

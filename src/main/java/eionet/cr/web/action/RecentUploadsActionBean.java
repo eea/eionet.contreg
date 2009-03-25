@@ -19,6 +19,9 @@ import eionet.cr.common.Subjects;
 import eionet.cr.search.RecentUploadsSearch;
 import eionet.cr.search.SearchException;
 import eionet.cr.util.Util;
+import eionet.cr.web.util.UploadDateFormatter;
+import eionet.cr.web.util.search.PredicateBasedColumn;
+import eionet.cr.web.util.search.PropertyBasedColumn;
 import eionet.cr.web.util.search.SearchResultColumn;
 
 /**
@@ -41,6 +44,8 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean {
 
 	/** */
 	private String type;
+	
+	private static PropertyBasedColumn uploadDateColumn = createUploadDateColumn();
 	
 	/**
 	 * 
@@ -167,101 +172,125 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean {
 			/* columns for deliveries */
 			
 			List<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
-			SearchResultColumn col = new SearchResultColumn();
+			PredicateBasedColumn col = new PredicateBasedColumn();
 			col.setPredicateUri(Predicates.RDFS_LABEL);
 			col.setTitle("Title");
 			col.setSortable(false);
 			list.add(col);
 
-			col = new SearchResultColumn();
+			col = new PredicateBasedColumn();
 			col.setPredicateUri(Predicates.ROD_OBLIGATION_PROPERTY);
 			col.setTitle("Obligation");
 			col.setSortable(false);
 			list.add(col);
 
-			col = new SearchResultColumn();
+			col = new PredicateBasedColumn();
 			col.setPredicateUri(Predicates.ROD_LOCALITY_PROPERTY);
 			col.setTitle("Locality");
 			col.setSortable(false);
 			list.add(col);
-
-			RecentUploadsActionBean.typesColumns.put(Subjects.ROD_DELIVERY_CLASS, list);
+			
+			addColumnsForType(Subjects.ROD_DELIVERY_CLASS, list);
 
 			/* columns for obligations */
 			
 			list = new ArrayList<SearchResultColumn>();
-			col = new SearchResultColumn();
+			col = new PredicateBasedColumn();
 			col.setPredicateUri(Predicates.RDFS_LABEL);
 			col.setTitle("Title");
 			col.setSortable(false);
 			list.add(col);
 
-			col = new SearchResultColumn();
+			col = new PredicateBasedColumn();
 			col.setPredicateUri(Predicates.ROD_ISSUE_PROPERTY);
 			col.setTitle("Issue");
 			col.setSortable(false);
 			list.add(col);
 
-			col = new SearchResultColumn();
+			col = new PredicateBasedColumn();
 			col.setPredicateUri(Predicates.ROD_INSTRUMENT_PROPERTY);
 			col.setTitle("Instrument");
 			col.setSortable(false);
 			list.add(col);
 			
-			RecentUploadsActionBean.typesColumns.put(Subjects.ROD_OBLIGATION_CLASS, list);
+			addColumnsForType(Subjects.ROD_OBLIGATION_CLASS, list);
 
 			/* columns for full reports */
 			
 			list = new ArrayList<SearchResultColumn>();
-			col = new SearchResultColumn();
+			col = new PredicateBasedColumn();
 			col.setPredicateUri(Predicates.RDFS_LABEL);
 			col.setTitle("Title");
 			col.setSortable(false);
 			list.add(col);
 
-			col = new SearchResultColumn();
+			col = new PredicateBasedColumn();
 			col.setPredicateUri(Predicates.DC_SUBJECT);
 			col.setTitle("SubjectDTOTemp");
 			col.setSortable(false);
 			list.add(col);
 
-			col = new SearchResultColumn();
+			col = new PredicateBasedColumn();
 			col.setPredicateUri(Predicates.DC_COVERAGE);
 			col.setTitle("Coverage");
 			col.setSortable(false);
 			list.add(col);
 			
-			RecentUploadsActionBean.typesColumns.put(Subjects.FULL_REPORT_CLASS, list);
+			addColumnsForType(Subjects.FULL_REPORT_CLASS, list);
 
 			/* columns for news releases */
 			
 			list = new ArrayList<SearchResultColumn>();
-			col = new SearchResultColumn();
+			col = new PredicateBasedColumn();
 			col.setPredicateUri(Predicates.RDFS_LABEL);
 			col.setTitle("Title");
 			col.setSortable(false);
 			list.add(col);
 
-			col = new SearchResultColumn();
+			col = new PredicateBasedColumn();
 			col.setPredicateUri(Predicates.DC_SUBJECT);
 			col.setTitle("SubjectDTOTemp");
 			col.setSortable(false);
 			list.add(col);
 
-			col = new SearchResultColumn();
+			col = new PredicateBasedColumn();
 			col.setPredicateUri(Predicates.DC_COVERAGE);
 			col.setTitle("Coverage");
 			col.setSortable(false);
 			list.add(col);
-			
-			RecentUploadsActionBean.typesColumns.put(Subjects.RSS_ITEM_CLASS.toLowerCase(), list);
+
 			// we do toLowerCase(), because http://reports.eea.europa.eu/whatsnew.rdf wrongfully uses
 			// http://purl.org/rss/1.0/item, instead of http://purl.org/rss/1.0/Item
+			addColumnsForType(Subjects.RSS_ITEM_CLASS.toLowerCase(), list);
 		}
 		
 		return RecentUploadsActionBean.typesColumns.get(type);
 	}
+	
+	/**
+	 * 
+	 * @param type
+	 * @param columns
+	 */
+	private static void addColumnsForType(String type, List<SearchResultColumn> columns){
+		columns.add(uploadDateColumn);
+		RecentUploadsActionBean.typesColumns.put(type, columns);
+	}
 
+	/**
+	 * 
+	 * @return
+	 */
+	private static PropertyBasedColumn createUploadDateColumn(){
+		
+		PropertyBasedColumn result = new PropertyBasedColumn();
+		result.setProperty("firstSeenTime");
+		result.setTitle("Uploaded");
+		result.setSortable(false);
+		result.setFormatter(new UploadDateFormatter());
+		
+		return result;
+	}
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()

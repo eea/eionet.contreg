@@ -9,9 +9,9 @@
         <h1>Resource factsheet</h1>
         
 	    <c:choose>
-		    <c:when test="${actionBean.subject!=null}">
+		    <c:when test="${actionBean.subject!=null}">		    
 		    	<c:set var="subjectUrl" value="${actionBean.subject.url}"/>
-		    	<div style="margin-top:20px">
+		    	<div style="margin-top:20px">	    	
 	    			<c:if test="${subjectUrl!=null}">
 	    				<p>Resource URL: <a href="${fn:escapeXml(subjectUrl)}"><c:out value="${subjectUrl}"/></a></p>
 	    			</c:if>

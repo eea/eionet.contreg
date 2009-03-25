@@ -57,7 +57,7 @@ public abstract class AbstractSubjectSearch {
 			Connection conn = null;
 			try{
 				conn = getConnection();
-				SubjectHashesReader subjectHashesReader = new SubjectHashesReader();
+				SubjectHashesReader subjectHashesReader = createSubjectHashesReader();
 				
 				logger.debug("Executing subject select query: " + subjectSelectSQL);
 				long time = System.currentTimeMillis();
@@ -71,7 +71,7 @@ public abstract class AbstractSubjectSearch {
 					totalMatchCount = MySQLUtil.getTotalRowCount(conn); // TODO - maybe do it without directly pointing to MySQL
 					LinkedHashMap<String, SubjectDTO> subjectsMap = subjectHashesReader.getResultMap();
 					
-					SubjectDataReader subjectDataReader = new SubjectDataReader(subjectsMap);
+					SubjectDataReader subjectDataReader = createSubjectDataReader(subjectsMap);
 					
 					logger.debug("Executing subject data select query");
 					time = System.currentTimeMillis();
@@ -204,5 +204,22 @@ public abstract class AbstractSubjectSearch {
 	 */
 	public void setNoLimit(boolean noLimit) {
 		this.noLimit = noLimit;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	protected SubjectHashesReader createSubjectHashesReader(){
+		return new SubjectHashesReader();
+	}
+
+	/**
+	 * 
+	 * @param subjectsMap
+	 * @return
+	 */
+	protected SubjectDataReader createSubjectDataReader(Map<String, SubjectDTO> subjectsMap){
+		return new SubjectDataReader(subjectsMap);
 	}
 }
