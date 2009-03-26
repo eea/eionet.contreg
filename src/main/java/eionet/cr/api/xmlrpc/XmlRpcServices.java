@@ -21,8 +21,9 @@ import eionet.cr.common.Subjects;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.scheduled.HarvestQueue;
+import eionet.cr.search.DiscoveredSinceTimeSearch;
 import eionet.cr.search.LuceneBasedSearcher;
-import eionet.cr.search.util.EntriesCollector;
+import eionet.cr.search.util.HitsCollector;
 import eionet.cr.search.util.SubjectDTOCollector;
 import eionet.cr.util.Util;
 import eionet.qawcommons.DataflowResultDto;
@@ -34,6 +35,8 @@ import eionet.qawcommons.DataflowResultDto;
  */
 public class XmlRpcServices implements Services{
 
+	/** */
+	private static final int MAX_RESULTS = 300;
 	
 	/** */
 	private static Log logger = LogFactory.getLog(XmlRpcServices.class);
@@ -44,28 +47,34 @@ public class XmlRpcServices implements Services{
 	 */
 	public List getResourcesSinceTimestamp(Date timestamp) throws CRException {
 		
-		List result = null;
+		List<Map<String,String[]>> result = new ArrayList<Map<String,String[]>>();		
 		if (timestamp!=null){
+			
 			// given timestamp must be less than current time (in seconds)
 			long curTimeSeconds = Util.currentTimeSeconds();
 			long givenTimeSeconds = Util.getSeconds(timestamp.getTime());
 			if (givenTimeSeconds < curTimeSeconds){
 				
-				String s = Predicates.FIRST_SEEN_TIMESTAMP.replaceAll(":", "\\:");
-				
-				StringBuffer qryBuf = new StringBuffer(Util.luceneEscape(Predicates.FIRST_SEEN_TIMESTAMP));
-				qryBuf.append(":[").append(givenTimeSeconds).append(" TO ").append(curTimeSeconds).append("]");
-				try{
-					result = eionet.cr.search.LuceneBasedSearcher.luceneQuery(qryBuf.toString());
+				DiscoveredSinceTimeSearch search = new DiscoveredSinceTimeSearch(timestamp, MAX_RESULTS);
+				search.execute();
+				Collection<SubjectDTO> subjects = search.getResultList();
+				for (Iterator<SubjectDTO> subjectsIter=subjects.iterator(); subjectsIter.hasNext();){
+					
+					SubjectDTO subjectDTO = subjectsIter.next();
+					HashMap<String,String[]> map = new HashMap<String,String[]>();
+					for (Iterator<String> predicatesIter=subjectDTO.getPredicates().keySet().iterator(); predicatesIter.hasNext();){
+						
+						String predicate = predicatesIter.next();
+						map.put(predicate, toStringArray(subjectDTO.getObjects(predicate)));
+					}
+					
+					if (!map.isEmpty())
+						result.add(map);
 				}
-				catch (Exception e){
-					logger.error(e.toString(), e);
-					throw new CRException(e.toString(), e);
-				}				
 			}
 		}
 
-		return result==null ? new ArrayList<java.util.Map<String,String[]>>() : result;
+		return result;
 	}
 
 	/*
@@ -115,41 +124,6 @@ public class XmlRpcServices implements Services{
 
 	/*
 	 * (non-Javadoc)
-	 * @see eionet.cr.api.xmlrpc.Services#simpleAndSearch(java.util.Map)
-	 */
-	public List simpleAndSearch(Map<String,String> criteria) throws CRException{
-		
-		List result = null;
-		if (criteria!=null && !criteria.isEmpty()){
-			StringBuffer qryBuf = new StringBuffer();
-			for (Iterator<String> iter = criteria.keySet().iterator(); iter.hasNext();){
-				String key = iter.next();
-				if (key!=null && key.length()>0){
-					String value = criteria.get(key);
-					if (value!=null && value.length()>0){
-						if (Util.hasWhiteSpace(value))
-							value = "\"" + value + "\"";
-						if (qryBuf.length()>0)
-							qryBuf.append(" AND ");
-						qryBuf.append(Util.luceneEscape(key)).append(":").append(Util.luceneEscape(value));
-						
-						try{
-							result = eionet.cr.search.LuceneBasedSearcher.luceneQuery(qryBuf.toString());
-						}
-						catch (Exception e){
-							logger.error(e.toString(), e);
-							throw new CRException(e.toString(), e);
-						}
-					}
-				}
-			}
-		}
-		
-		return result==null ? new ArrayList<java.util.Map<String,String[]>>() : result;
-	}
-
-	/*
-	 * (non-Javadoc)
 	 * @see eionet.cr.api.xmlrpc.Services#pushContent(java.lang.String)
 	 */
 	public String pushContent(String content, String sourceUri) throws CRException {
@@ -185,13 +159,8 @@ public class XmlRpcServices implements Services{
 	 */
 	public Vector getEntries(Hashtable attributes) throws CRException {
 
-		EntriesCollector collector = new EntriesCollector();
-		LuceneBasedSearcher.customSearch((Map<String,String>)attributes, true, collector);
-		Vector result = collector.getResultVector();
-		if (result==null)
-			result = new Vector();
-		
-		return result;
+		//LuceneBasedSearcher.customSearch((Map<String,String>)attributes, true, collector);
+		return new Vector();
 	}
 
 	/**
@@ -212,6 +181,25 @@ public class XmlRpcServices implements Services{
 		}
 		
 		return result.toArray(new String[result.size()]);
+	}
+	
+	/**
+	 * 
+	 * @param objects
+	 * @return
+	 */
+	private static String[] toStringArray(Collection<ObjectDTO> objects){
+		
+		if (objects==null)
+			return new String[0];
+		
+		int i = 0;
+		String[] result = new String[objects.size()];
+		for (Iterator<ObjectDTO> iter=objects.iterator(); iter.hasNext();i++){
+			result[i] = iter.next().getValue();
+		}
+		
+		return result;
 	}
 
 	/**

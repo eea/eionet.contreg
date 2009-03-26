@@ -30,12 +30,6 @@ public interface Services {
 	 */
 	public abstract List dataflowSearch(Map<String,String> criteria) throws CRException;
 	/**
-	 * @param criteria
-	 * @return
-	 * @throws CRException
-	 */
-	public abstract List simpleAndSearch(Map<String,String> criteria) throws CRException;
-	/**
 	 * 
 	 * @param content
 	 * @param sourceUri

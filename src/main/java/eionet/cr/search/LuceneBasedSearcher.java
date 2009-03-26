@@ -94,7 +94,7 @@ public class LuceneBasedSearcher {
 		IndexSearcher indexSearcher = null;
 		try{
 			if (URIUtil.isSchemedURI(expression.trim()))
-				query = new TermQuery(new Term(Predicates.DOC_ID, expression));
+				query = new TermQuery(new Term(LuceneBasedSearcher.DOC_ID, expression));
 			else{
 				QueryParser parser = new QueryParser(DEFAULT_FIELD, LuceneBasedSearcher.getAnalyzer());
 				char[] escapeExceptions = {'"'};
@@ -301,7 +301,7 @@ public class LuceneBasedSearcher {
 							obligationLabel = doc.get(Predicates.DC_TITLE);
 						
 						if (obligationLabel!=null && obligationLabel.length()>0){
-							String obligationId = doc.get(Predicates.DOC_ID);
+							String obligationId = doc.get(LuceneBasedSearcher.DOC_ID);
 							if (obligationId!=null && obligationId.length()>0){
 								
 								RodInstrumentDTO instrumentDTO = instrumentsMap.get(instrumentId);
@@ -418,7 +418,7 @@ public class LuceneBasedSearcher {
 		IndexSearcher indexSearcher = null;
 		try{
 			indexSearcher = getIndexSearcher();
-			Hits hits = indexSearcher.search(new TermQuery(new Term(Predicates.DOC_ID, uri)));
+			Hits hits = indexSearcher.search(new TermQuery(new Term(LuceneBasedSearcher.DOC_ID, uri)));
 			if (hits==null || hits.length()==0)
 				return null;
 			else
@@ -573,7 +573,7 @@ public class LuceneBasedSearcher {
 	 */
 	public static boolean isAnalyzedField(String fieldName){
 		
-		if (fieldName.equals(Predicates.DOC_ID))
+		if (fieldName.equals(LuceneBasedSearcher.DOC_ID))
 			return false;
 		else if (fieldName.equals(Predicates.SOURCE_ID))
 			return false;
@@ -591,4 +591,7 @@ public class LuceneBasedSearcher {
 	public static boolean isAnalyzedValue(String value){
 		return URIUtil.isSchemedURI(value)==false;
 	}
+
+	/** */
+	public static final String DOC_ID = "DOC_ID";
 }
