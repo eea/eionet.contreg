@@ -25,16 +25,14 @@ public class RecentUploadsSearch extends AbstractSubjectSearch {
 	
 	/** */
 	private String subjectType;
-	private int maxResults;
 	private Map<String,Date> firstSeenTimes = new HashMap<String,Date>();
 	
 	/**
 	 * 
 	 * @param subjectType
 	 */
-	public RecentUploadsSearch(String subjectType, int maxResults){
+	public RecentUploadsSearch(String subjectType){
 		this.subjectType = subjectType;
-		this.maxResults = maxResults;
 	}
 
 	/*
@@ -51,10 +49,18 @@ public class RecentUploadsSearch extends AbstractSubjectSearch {
 		append(" where SPO.PREDICATE=").append(Hashes.spoHash(Predicates.RDF_TYPE)).
 		append(" and SPO.OBJECT_HASH=?").
 		append(" and SPO.SUBJECT=RESOURCE.URI_HASH").
-		append(" order by RESOURCE.FIRSTSEEN_TIME desc").
-		append(" limit ").append(maxResults);
+		append(" order by RESOURCE.FIRSTSEEN_TIME desc");
 		
 		inParameters.add(Long.valueOf(Hashes.spoHash(subjectType)));
+		
+		if (pageLength>0){
+			sqlBuf.append(" limit ");
+			if (pageNumber>0){
+				sqlBuf.append("?,");
+				inParameters.add(new Integer((pageNumber-1)*pageLength));
+			}
+			sqlBuf.append(pageLength);
+		}
 		
 		return sqlBuf.toString();
 	}

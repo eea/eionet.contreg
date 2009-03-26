@@ -64,7 +64,8 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean {
 		
 		if (!StringUtils.isBlank(type)){
 			//String decodedType = Util.urlDecode(type);
-			RecentUploadsSearch recentUploadsSearch = new RecentUploadsSearch(type, MAX_RESULTS);
+			RecentUploadsSearch recentUploadsSearch = new RecentUploadsSearch(type);
+			recentUploadsSearch.setPageLength(MAX_RESULTS);
 			recentUploadsSearch.execute();
 			this.resultList = recentUploadsSearch.getResultList();
 		}

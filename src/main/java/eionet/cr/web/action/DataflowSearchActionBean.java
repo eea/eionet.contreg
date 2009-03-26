@@ -85,7 +85,7 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean{
 			return;
 		
 		CustomSearch customSearch = new CustomSearch(CustomSearch.singletonCriteria(Predicates.RDF_TYPE, Subjects.ROD_OBLIGATION_CLASS));
-		customSearch.setNoLimit(true);
+		customSearch.setNoLimit();
 		customSearch.execute();
 		
 		session.setAttribute(DATAFLOWS_SESSION_ATTR_NAME, createDataflowsGroupByInstruments(customSearch.getResultList()));

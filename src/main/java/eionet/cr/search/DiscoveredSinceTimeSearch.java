@@ -11,15 +11,13 @@ public class DiscoveredSinceTimeSearch extends AbstractSubjectSearch {
 	
 	/** */
 	private Date time;
-	private int maxResults;
 	
 	/**
 	 * 
 	 * @param time
 	 */
-	public DiscoveredSinceTimeSearch(Date time, int maxResults){
+	public DiscoveredSinceTimeSearch(Date time){
 		this.time = time;
-		this.maxResults= maxResults;
 	}
 
 	/*
@@ -35,10 +33,18 @@ public class DiscoveredSinceTimeSearch extends AbstractSubjectSearch {
 		append("select sql_calc_found_rows distinct SPO.SUBJECT as SUBJECT_HASH from SPO, RESOURCE").
 		append(" where SPO.SUBJECT=RESOURCE.URI_HASH ").
 		append(" and RESOURCE.FIRSTSEEN_TIME>?").
-		append(" order by RESOURCE.FIRSTSEEN_TIME desc").
-		append(" limit ").append(maxResults);
+		append(" order by RESOURCE.FIRSTSEEN_TIME desc");
 		
 		inParameters.add(Long.valueOf(time.getTime()));
+		
+		if (pageLength>0){
+			sqlBuf.append(" limit ");
+			if (pageNumber>0){
+				sqlBuf.append("?,");
+				inParameters.add(new Integer((pageNumber-1)*pageLength));
+			}
+			sqlBuf.append(pageLength);
+		}
 		
 		return sqlBuf.toString();
 	}

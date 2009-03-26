@@ -17,6 +17,7 @@ import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.util.SortOrder;
 import eionet.cr.search.util.SubjectHashesReader;
 import eionet.cr.search.util.SubjectDataReader;
+import eionet.cr.util.pagination.Pagination;
 import eionet.cr.util.sql.ConnectionUtil;
 import eionet.cr.util.sql.MySQLUtil;
 import eionet.cr.util.sql.SQLUtil;
@@ -33,15 +34,15 @@ public abstract class AbstractSubjectSearch {
 	
 	/** */
 	protected int pageNumber = 0;
+	protected int pageLength = Pagination.pageLength();
+	
+	/** */
 	protected SortOrder sortOrder = SortOrder.ASCENDING;
 	protected String sortPredicate = null;	
 	
 	/** */
 	protected Collection<SubjectDTO> resultList = new ArrayList<SubjectDTO>();
 	protected int totalMatchCount = 0;
-	
-	/** */
-	protected boolean noLimit = false;
 	
 	/**
 	 * @throws SQLException 
@@ -193,17 +194,10 @@ public abstract class AbstractSubjectSearch {
 	}
 
 	/**
-	 * @return the noLimit
-	 */
-	public boolean isNoLimit() {
-		return noLimit;
-	}
-
-	/**
 	 * @param noLimit the noLimit to set
 	 */
-	public void setNoLimit(boolean noLimit) {
-		this.noLimit = noLimit;
+	public final void setNoLimit() {
+		pageLength = 0;
 	}
 	
 	/**
@@ -221,5 +215,19 @@ public abstract class AbstractSubjectSearch {
 	 */
 	protected SubjectDataReader createSubjectDataReader(Map<String, SubjectDTO> subjectsMap){
 		return new SubjectDataReader(subjectsMap);
+	}
+
+	/**
+	 * @return the pageLength
+	 */
+	public int getPageLength() {
+		return pageLength;
+	}
+
+	/**
+	 * @param pageLength the pageLength to set
+	 */
+	public void setPageLength(int pageLength) {
+		this.pageLength = pageLength;
 	}
 }

@@ -56,7 +56,8 @@ public class XmlRpcServices implements Services{
 			long givenTimeSeconds = Util.getSeconds(timestamp.getTime());
 			if (givenTimeSeconds < curTimeSeconds){
 				
-				DiscoveredSinceTimeSearch search = new DiscoveredSinceTimeSearch(timestamp, MAX_RESULTS);
+				DiscoveredSinceTimeSearch search = new DiscoveredSinceTimeSearch(timestamp);
+				search.setPageLength(MAX_RESULTS);
 				search.execute();
 				Collection<SubjectDTO> subjects = search.getResultList();
 				for (Iterator<SubjectDTO> subjectsIter=subjects.iterator(); subjectsIter.hasNext();){
