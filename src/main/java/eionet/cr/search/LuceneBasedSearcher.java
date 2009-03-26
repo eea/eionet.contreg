@@ -54,7 +54,7 @@ import eionet.cr.util.Util;
 public class LuceneBasedSearcher {
 
 	/** */
-	public static final String ALL_CONTENT_FIELD = Predicates.ALL_LITERAL_CONTENT;
+	public static final String ALL_CONTENT_FIELD = "CONTENT";
 	public static final String DEFAULT_FIELD = LuceneBasedSearcher.ALL_CONTENT_FIELD;
 	
 	/** */
