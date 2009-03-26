@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -68,8 +69,17 @@ public class XmlRpcServices implements Services{
 						map.put(predicate, toStringArray(subjectDTO.getObjects(predicate)));
 					}
 					
-					if (!map.isEmpty())
-						result.add(map);
+					// if map not empty and the subject has a URL (i.e. getUrl() is not blank)
+					// then add the map to result
+					if (!map.isEmpty()){
+						String url = subjectDTO.getUrl();
+						if (!StringUtils.isBlank(url)){
+							String[] arr = new String[1];
+							arr[0] = url;
+							map.put(Predicates.URL, arr); // QAW needs this special reserved predicate
+							result.add(map);
+						}
+					}
 				}
 			}
 		}

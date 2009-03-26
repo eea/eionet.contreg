@@ -19,7 +19,6 @@ public interface Predicates {
 	public static final String RDFS_LABEL = "http://www.w3.org/2000/01/rdf-schema#label";
 	public static final String SKOS_PREF_LABEL = "http://www.w3.org/2004/02/skos/core#prefLabel";
 		
-	public static final String FIRST_SEEN_TIMESTAMP = "urn:contreg:first-seen-timestamp";
 	public static final String ROD_OBLIGATION_PROPERTY = "http://rod.eionet.eu.int/schema.rdf#obligation";
 	public static final String ROD_INSTRUMENT_PROPERTY = "http://rod.eionet.eu.int/schema.rdf#instrument";
 	public static final String ROD_LOCALITY_PROPERTY = "http://rod.eionet.eu.int/schema.rdf#locality";
@@ -27,4 +26,6 @@ public interface Predicates {
 	public static final String RDFS_SUBPROPERTY_OF = "http://www.w3.org/2000/01/rdf-schema#subPropertyOf";
 	public static final String RDFS_SUBCLASS_OF = "http://www.w3.org/2000/01/rdf-schema#subClassOf";
 
+	public static final String FIRST_SEEN_TIMESTAMP = "urn:eionet:contreg:first-seen-timestamp";
+	public static final String URL = "urn:eionet:contreg:url";
 }
