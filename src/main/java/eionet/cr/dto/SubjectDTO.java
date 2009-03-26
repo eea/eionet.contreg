@@ -184,14 +184,6 @@ public class SubjectDTO{
 	
 	/**
 	 * 
-	 * @return
-	 */
-	public String getTitle(){
-		return getObjectValue(Predicates.RDFS_LABEL);
-	}
-	
-	/**
-	 * 
 	 * @param predicateUri
 	 * @param objectValue
 	 * @return

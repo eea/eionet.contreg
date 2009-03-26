@@ -22,6 +22,7 @@ import eionet.cr.common.Subjects;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.scheduled.HarvestQueue;
+import eionet.cr.search.CustomSearch;
 import eionet.cr.search.DiscoveredSinceTimeSearch;
 import eionet.cr.search.LuceneBasedSearcher;
 import eionet.cr.search.util.HitsCollector;
@@ -103,18 +104,19 @@ public class XmlRpcServices implements Services{
 		List<DataflowResultDto> result = new ArrayList<DataflowResultDto>();
 		try{
 			
-			SubjectDTOCollector collector = new SubjectDTOCollector();
-			LuceneBasedSearcher.customSearch(criteria, false, collector);
-			List<SubjectDTO> list = collector.getResultList();
+			CustomSearch search = new CustomSearch(criteria);
+			search.setPageLength(MAX_RESULTS);
+			search.execute();
 			
-			if (list!=null){
-				for (int i=0; i<list.size(); i++){
+			Collection<SubjectDTO> subjects = search.getResultList();
+			if (subjects!=null){
+				for (Iterator<SubjectDTO> iter=subjects.iterator(); iter.hasNext();){
 					
-					SubjectDTO subjectDTO = list.get(i);
+					SubjectDTO subjectDTO = iter.next();
 					DataflowResultDto resultDTO = new DataflowResultDto();
 					
 					resultDTO.setResource(subjectDTO.getUri());
-					resultDTO.setTitle(subjectDTO.getTitle());
+					resultDTO.setTitle(subjectDTO.getObjectValue(Predicates.RDFS_LABEL));
 					
 					resultDTO.setDate(subjectDTO.getObjectValue(Predicates.DC_DATE));
 					resultDTO.setDataflow(getDistinctLiteralObjects(subjectDTO, Predicates.ROD_OBLIGATION_PROPERTY));
