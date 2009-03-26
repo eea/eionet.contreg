@@ -76,7 +76,7 @@ public class XmlRpcServices implements Services{
 						if (!StringUtils.isBlank(url)){
 							String[] arr = new String[1];
 							arr[0] = url;
-							map.put(Predicates.URL, arr); // QAW needs this special reserved predicate
+							map.put(Predicates.CR_URL, arr); // QAW needs this special reserved predicate
 							result.add(map);
 						}
 					}

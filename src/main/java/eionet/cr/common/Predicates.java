@@ -14,7 +14,6 @@ public interface Predicates {
 	public static final String DC_CONTRIBUTOR = "http://purl.org/dc/elements/1.1/contributor";
 	public static final String DC_RELATION = "http://purl.org/dc/elements/1.1/relation";
 	public static final String DC_LANGUAGE = "http://purl.org/dc/elements/1.1/language";
-	public static final String SOURCE_ID = "SOURCE_ID";
 	public static final String RDF_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
 	public static final String RDFS_LABEL = "http://www.w3.org/2000/01/rdf-schema#label";
 	public static final String SKOS_PREF_LABEL = "http://www.w3.org/2004/02/skos/core#prefLabel";
@@ -26,6 +25,6 @@ public interface Predicates {
 	public static final String RDFS_SUBPROPERTY_OF = "http://www.w3.org/2000/01/rdf-schema#subPropertyOf";
 	public static final String RDFS_SUBCLASS_OF = "http://www.w3.org/2000/01/rdf-schema#subClassOf";
 
-	public static final String FIRST_SEEN_TIMESTAMP = "urn:eionet:contreg:first-seen-timestamp";
-	public static final String URL = "urn:eionet:contreg:url";
+	public static final String CR_FIRSTSEEN_TIME = "urn:eionet:contreg:firstseen-time";
+	public static final String CR_URL = "urn:eionet:contreg:url";
 }

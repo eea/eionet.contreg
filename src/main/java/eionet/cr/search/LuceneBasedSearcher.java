@@ -196,7 +196,7 @@ public class LuceneBasedSearcher {
 		IndexSearcher indexSearcher = null;
 		try{
 			indexSearcher = getIndexSearcher();
-			return indexSearcher.docFreq(new Term(Predicates.SOURCE_ID, sourceUrl));
+			return indexSearcher.docFreq(new Term(LuceneBasedSearcher.SOURCE_ID, sourceUrl));
 		}
 		finally{
 			try{
@@ -453,7 +453,7 @@ public class LuceneBasedSearcher {
 		IndexSearcher indexSearcher = null;
 		try{
 			indexSearcher = getIndexSearcher();
-			Sort sort = new Sort(Predicates.FIRST_SEEN_TIMESTAMP, true);
+			Sort sort = new Sort(Predicates.CR_FIRSTSEEN_TIME, true);
 			Hits hits = indexSearcher.search(new TermQuery(new Term(Predicates.RDF_TYPE, rdfType)), sort);
 			if (hits==null || hits.length()==0)
 				hits = indexSearcher.search(new TermQuery(new Term(Predicates.RDF_TYPE, rdfType)));
@@ -575,9 +575,9 @@ public class LuceneBasedSearcher {
 		
 		if (fieldName.equals(LuceneBasedSearcher.DOC_ID))
 			return false;
-		else if (fieldName.equals(Predicates.SOURCE_ID))
+		else if (fieldName.equals(LuceneBasedSearcher.SOURCE_ID))
 			return false;
-		else if (fieldName.equals(Predicates.FIRST_SEEN_TIMESTAMP))
+		else if (fieldName.equals(Predicates.CR_FIRSTSEEN_TIME))
 			return false;
 		else
 			return true;
@@ -594,4 +594,5 @@ public class LuceneBasedSearcher {
 
 	/** */
 	public static final String DOC_ID = "DOC_ID";
+	public static final String SOURCE_ID = "SOURCE_ID";
 }
