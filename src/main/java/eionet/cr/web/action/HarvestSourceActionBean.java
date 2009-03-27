@@ -1,5 +1,8 @@
 package eionet.cr.web.action;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import net.sourceforge.stripes.action.DefaultHandler;
@@ -17,9 +20,14 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dto.HarvestDTO;
 import eionet.cr.dto.HarvestSourceDTO;
+import eionet.cr.dto.ObjectDTO;
+import eionet.cr.dto.RawTripleDTO;
+import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.scheduled.CronHarvestQueueingJob;
 import eionet.cr.harvest.scheduled.HarvestQueue;
+import eionet.cr.search.SearchException;
+import eionet.cr.search.SourceContentsSearch;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
 
@@ -36,6 +44,12 @@ public class HarvestSourceActionBean extends AbstractActionBean {
 	/** */
 	private HarvestSourceDTO harvestSource;
 	private List<HarvestDTO> harvests;
+	
+	/** */
+	private List<RawTripleDTO> sampleTriples;
+	
+	/** */
+	private int noOfResources = 0; // number of distinct resources harvested from this source right now 
 	
 	/**
 	 * 
@@ -65,9 +79,10 @@ public class HarvestSourceActionBean extends AbstractActionBean {
      * 
      * @return
      * @throws DAOException
+     * @throws SearchException 
      */
     @DefaultHandler
-    public Resolution view() throws DAOException {
+    public Resolution view() throws DAOException, SearchException {
     	
     	if (harvestSource!=null){
     		Integer sourceId = harvestSource.getSourceId();
@@ -78,12 +93,50 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     		else if (url!=null && url.trim().length()>0){
     			harvestSource = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceByUrl(url);
     		}
+    		
     		if (harvestSource!=null){
+    			
+    			// populate history of harvests
     			harvests = DAOFactory.getDAOFactory().getHarvestDAO().getHarvestsBySourceId(harvestSource.getSourceId());
+    			
+    			// populate sample triples
+    			populateSampleTriples();
     		}
     	}
     
     	return new ForwardResolution("/pages/viewsource.jsp");
+    }
+    
+    /**
+     * @throws SearchException 
+     * 
+     */
+    private void populateSampleTriples() throws SearchException{
+    	
+    	SourceContentsSearch search = new SourceContentsSearch(harvestSource.getUrl());
+    	search.execute();
+    	noOfResources = search.getTotalMatchCount();
+    	
+    	sampleTriples = new ArrayList<RawTripleDTO>();
+    	Collection<SubjectDTO> subjects = search.getResultList();
+    	if (subjects!=null && !subjects.isEmpty()){
+    		
+    		for (Iterator<SubjectDTO> subjectsIter=subjects.iterator(); subjectsIter.hasNext() && sampleTriples.size()<10;){
+    			
+    			SubjectDTO subjectDTO = subjectsIter.next();
+    			for (Iterator<String> predicatesIter=subjectDTO.getPredicates().keySet().iterator(); predicatesIter.hasNext() && sampleTriples.size()<10;){
+    				
+    				String predicate = predicatesIter.next();
+    				
+    				RawTripleDTO tripleDTO = new RawTripleDTO();
+    				tripleDTO.setSubject(subjectDTO.getUri());
+    				tripleDTO.setPredicate(predicate);
+    				tripleDTO.setObject(subjectDTO.getObjectValue(predicate));
+    				
+    				sampleTriples.add(tripleDTO);
+    			}
+    		}
+    	}
     }
 
 	/**
@@ -177,4 +230,18 @@ public class HarvestSourceActionBean extends AbstractActionBean {
 
     	}
     }
+
+	/**
+	 * @return the sampleTriples
+	 */
+	public List<RawTripleDTO> getSampleTriples() {
+		return sampleTriples;
+	}
+
+	/**
+	 * @return the noOfResources
+	 */
+	public int getNoOfResources() {
+		return noOfResources;
+	}
 }
