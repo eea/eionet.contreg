@@ -343,7 +343,7 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	 * 
 	 */
 	protected void commit() throws SQLException{
-		
+
 		commitTriples();
 		commitResources();
 		
@@ -351,6 +351,7 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 		deriveParentClasses();
 		
 		deriveLabels();
+
 		extractNewHarvestSources();
 		
 		try{
@@ -578,10 +579,10 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 		append("select SPO_TEMP_SOURCE.OBJECT, SPO_TEMP_SOURCE.OBJECT, '").append(DedicatedHarvestSourceTypes.qawSource).
 		append("', now(), '").append(CRUser.application.getUserName()).
 		append("', '").append(cronExpr).append("', ").append(sourceUrlHash).append(", ").append(genTime).
-		append(" from SPO_TEMP as SPO_TEMP_SOURCE, SPO_TEMP where SPO_TEMP_SOURCE.ANON_OBJ='N' and SPO_TEMP_SOURCE.LIT_OBJ='N' and ").
+		append(" from SPO_TEMP as SPO_TEMP_SOURCE, SPO_TEMP where SPO_TEMP_SOURCE.ANON_OBJ='N' and ").
 		append("SPO_TEMP_SOURCE.PREDICATE=").append(Hashes.spoHash(Predicates.DC_SOURCE)).
 		append(" and SPO_TEMP_SOURCE.SUBJECT=SPO_TEMP.SUBJECT and SPO_TEMP.PREDICATE=").append(Hashes.spoHash(Predicates.RDF_TYPE)).
-		append(" and SPO_TEMP.ANON_OBJ='N' and SPO_TEMP.LIT_OBJ='N' and SPO_TEMP.OBJECT_HASH in (").
+		append(" and SPO_TEMP.ANON_OBJ='N' and SPO_TEMP.OBJECT_HASH in (").
 		append(Hashes.spoHash(Subjects.QA_REPORT_CLASS)).append(", ").append(Hashes.spoHash(Subjects.QAW_RESOURCE_CLASS)).append(")");
 		
 		int i = SQLUtil.executeUpdate(buf.toString(), getConnection());
@@ -595,7 +596,7 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 		append("', '").append(cronExpr).append("', ").append(sourceUrlHash).append(", ").append(genTime).
 		append(" from RESOURCE_TEMP, SPO_TEMP where RESOURCE_TEMP.URI_HASH=SPO_TEMP.SUBJECT and ").
 		append("SPO_TEMP.PREDICATE=").append(Hashes.spoHash(Predicates.RDF_TYPE)).
-		append(" and SPO_TEMP.ANON_OBJ='N' and SPO_TEMP.LIT_OBJ='N' and SPO_TEMP.OBJECT_HASH in (").
+		append(" and SPO_TEMP.ANON_OBJ='N' and SPO_TEMP.OBJECT_HASH in (").
 		append(Hashes.spoHash(Subjects.ROD_DELIVERY_CLASS)).append(", ").append(Hashes.spoHash(Subjects.DCTYPE_DATASET_CLASS)).append(")");
 		
 		i = i + SQLUtil.executeUpdate(buf.toString(), getConnection());
