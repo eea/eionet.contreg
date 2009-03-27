@@ -103,58 +103,6 @@ public class CRXmlRpcSampleClient {
 	}
 
 	/**
-	 * @throws MalformedURLException 
-	 * @throws XmlRpcException 
-	 * 
-	 */
-	public static void sample_simpleAndSearch() throws MalformedURLException, XmlRpcException{
-		
-		// set up the XmlRpcClient
-		XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
-	    config.setServerURL(new URL("http://80.235.29.171:8080/cr/xmlrpc"));
-	    config.setEnabledForExtensions(true);
-	    XmlRpcClient client = new XmlRpcClient();
-	    client.setConfig(config);
-	    
-	    // execute the call
-	    Map criteria = new HashMap();
-	    criteria.put("http://rod.eionet.eu.int/schema.rdf#locality", "http://rod.eionet.eu.int/spatial/28"); // Norway
-	    criteria.put("http://rod.eionet.eu.int/schema.rdf#obligation", "http://rod.eionet.eu.int/obligations/452");
-	    criteria.put("http://purl.org/dc/elements/1.1/coverage", "2006");
-	    
-	    Object[] params = new Object[]{criteria};
-	    Object[] result = (Object[])client.execute("LuceneBasedSearcher.simpleAndSearch", params);
-	    
-	    // loop through the results, do type casting to see if any ClassCastExceptions are thrown
-	    if (result!=null && result.length>0){
-	    	
-		    for (int i=0; i<result.length; i++){
-		    	Map<String,Object[]> map = (Map<String,Object[]>)result[i];
-		    	if (map!=null && !map.isEmpty()){
-			    	Iterator<String> keys = map.keySet().iterator();
-			    	while (keys.hasNext()){
-			    		String key = keys.next();
-			    		Object[] values = map.get(key);
-			    		StringBuffer buf = new StringBuffer(values==null ? "null array" : "");
-			    		for (int j=0; values!=null && j<values.length; j++){
-			    			if (j>0)
-			    				buf.append(", ");
-			    			buf.append(values[j].toString());
-			    		}
-			    		System.out.println(key + " = " + buf.toString());
-			    	}
-		    	}
-		    	else
-		    		System.out.println("map null or empty");
-		    	System.out.println("====================================================================================");
-		    }
-	    }
-	    else
-	    	System.out.println("result array null or empty");
-
-	}
-
-	/**
 	 * 
 	 * @param args
 	 */

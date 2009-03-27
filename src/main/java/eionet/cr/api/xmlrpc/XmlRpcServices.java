@@ -57,32 +57,42 @@ public class XmlRpcServices implements Services{
 			long givenTimeSeconds = Util.getSeconds(timestamp.getTime());
 			if (givenTimeSeconds < curTimeSeconds){
 				
-				DiscoveredSinceTimeSearch search = new DiscoveredSinceTimeSearch(timestamp);
-				search.setPageLength(MAX_RESULTS);
-				search.execute();
-				Collection<SubjectDTO> subjects = search.getResultList();
-				for (Iterator<SubjectDTO> subjectsIter=subjects.iterator(); subjectsIter.hasNext();){
-					
-					SubjectDTO subjectDTO = subjectsIter.next();
-					HashMap<String,String[]> map = new HashMap<String,String[]>();
-					for (Iterator<String> predicatesIter=subjectDTO.getPredicates().keySet().iterator(); predicatesIter.hasNext();){
+				try{
+					DiscoveredSinceTimeSearch search = new DiscoveredSinceTimeSearch(timestamp);
+					search.setPageLength(MAX_RESULTS);
+					search.execute();
+					Collection<SubjectDTO> subjects = search.getResultList();
+					for (Iterator<SubjectDTO> subjectsIter=subjects.iterator(); subjectsIter.hasNext();){
 						
-						String predicate = predicatesIter.next();
-						map.put(predicate, toStringArray(subjectDTO.getObjects(predicate)));
-					}
-					
-					// if map not empty and the subject has a URL (i.e. getUrl() is not blank)
-					// then add the map to result
-					if (!map.isEmpty()){
-						String url = subjectDTO.getUrl();
-						if (!StringUtils.isBlank(url)){
-							String[] arr = new String[1];
-							arr[0] = url;
-							map.put(Predicates.CR_URL, arr); // QAW needs this special reserved predicate
-							result.add(map);
+						SubjectDTO subjectDTO = subjectsIter.next();
+						HashMap<String,String[]> map = new HashMap<String,String[]>();
+						for (Iterator<String> predicatesIter=subjectDTO.getPredicates().keySet().iterator(); predicatesIter.hasNext();){
+							
+							String predicate = predicatesIter.next();
+							map.put(predicate, toStringArray(subjectDTO.getObjects(predicate)));
+						}
+						
+						// if map not empty and the subject has a URL (i.e. getUrl() is not blank)
+						// then add the map to result
+						if (!map.isEmpty()){
+							String url = subjectDTO.getUrl();
+							if (!StringUtils.isBlank(url)){
+								String[] arr = new String[1];
+								arr[0] = url;
+								map.put(Predicates.CR_URL, arr); // QAW needs this special reserved predicate
+								result.add(map);
+							}
 						}
 					}
 				}
+				catch (Throwable t){
+					t.printStackTrace();
+					if (t instanceof CRException)
+						throw (CRException)t;
+					else
+						throw new CRException(t.toString(), t);
+				}
+
 			}
 		}
 
@@ -108,6 +118,7 @@ public class XmlRpcServices implements Services{
 			search.setPageLength(MAX_RESULTS);
 			search.execute();
 			
+			String[] strArray = {};
 			Collection<SubjectDTO> subjects = search.getResultList();
 			if (subjects!=null){
 				for (Iterator<SubjectDTO> iter=subjects.iterator(); iter.hasNext();){
@@ -119,9 +130,9 @@ public class XmlRpcServices implements Services{
 					resultDTO.setTitle(subjectDTO.getObjectValue(Predicates.RDFS_LABEL));
 					
 					resultDTO.setDate(subjectDTO.getObjectValue(Predicates.DC_DATE));
-					resultDTO.setDataflow(getDistinctLiteralObjects(subjectDTO, Predicates.ROD_OBLIGATION_PROPERTY));
-					resultDTO.setLocality(getDistinctLiteralObjects(subjectDTO, Predicates.ROD_LOCALITY_PROPERTY));
-					resultDTO.setType(getDistinctLiteralObjects(subjectDTO, Predicates.RDF_TYPE));
+					resultDTO.setDataflow(getLiteralValues(subjectDTO, Predicates.ROD_OBLIGATION_PROPERTY).toArray(strArray));
+					resultDTO.setLocality(getLiteralValues(subjectDTO, Predicates.ROD_LOCALITY_PROPERTY).toArray(strArray));
+					resultDTO.setType(getLiteralValues(subjectDTO, Predicates.RDF_TYPE).toArray(strArray));
 					
 					result.add(resultDTO);
 				}
@@ -129,7 +140,10 @@ public class XmlRpcServices implements Services{
 		}
 		catch (Throwable t){
 			t.printStackTrace();
-			throw new CRException(t.toString(), t);
+			if (t instanceof CRException)
+				throw (CRException)t;
+			else
+				throw new CRException(t.toString(), t);
 		}
 		
 		return result;
@@ -143,7 +157,7 @@ public class XmlRpcServices implements Services{
 		
 		if (content!=null && content.trim().length()>0){
 			if (sourceUri==null || sourceUri.trim().length()==0)
-				throw new CRException( "Missing source uri");
+				throw new CRException("Missing source uri");
 			else
 				HarvestQueue.addPushHarvest(content, sourceUri, HarvestQueue.PRIORITY_NORMAL);
 		}
@@ -170,10 +184,43 @@ public class XmlRpcServices implements Services{
 	 * of attributes. These values are of type <code>java.lang.String</code>.
 	 * 
 	 */
-	public Vector getEntries(Hashtable attributes) throws CRException {
+	public Vector getEntries(Hashtable criteria) throws CRException {
 
-		//LuceneBasedSearcher.customSearch((Map<String,String>)attributes, true, collector);
-		return new Vector();
+		Vector result = new Vector();
+		try{
+			CustomSearch search = new CustomSearch((Map<String,String>)criteria);
+			search.setPageLength(MAX_RESULTS);
+			search.execute();
+			
+			Collection<SubjectDTO> subjects = search.getResultList();
+			if (subjects!=null){
+				for (Iterator<SubjectDTO> iter=subjects.iterator(); iter.hasNext();){
+					
+					SubjectDTO subjectDTO = iter.next();
+					Hashtable<String,Vector<String>> predicatesTable = new Hashtable<String,Vector<String>>();
+					for (Iterator<String> predicatesIter=subjectDTO.getPredicates().keySet().iterator(); predicatesIter.hasNext();){
+						
+						String predicate = predicatesIter.next();
+						predicatesTable.put(predicate, new Vector<String>(getLiteralValues(subjectDTO, predicate)));
+					}
+
+					if (!predicatesTable.isEmpty()){
+						Hashtable<String,Hashtable> subjectTable = new Hashtable<String,Hashtable>();
+						subjectTable.put(subjectDTO.getUri(), predicatesTable);
+						result.add(subjectTable);
+					}
+				}
+			}
+		}
+		catch (Throwable t){
+			t.printStackTrace();
+			if (t instanceof CRException)
+				throw (CRException)t;
+			else
+				throw new CRException(t.toString(), t);
+		}
+		
+		return result;
 	}
 
 	/**
@@ -182,7 +229,7 @@ public class XmlRpcServices implements Services{
 	 * @param predicateUri
 	 * @return
 	 */
-	private static String[] getDistinctLiteralObjects(SubjectDTO subjectDTO, String predicateUri){
+	private static Collection<String> getLiteralValues(SubjectDTO subjectDTO, String predicateUri){
 		
 		HashSet<String> result = new HashSet<String>();
 		
@@ -193,7 +240,7 @@ public class XmlRpcServices implements Services{
 			}
 		}
 		
-		return result.toArray(new String[result.size()]);
+		return result;
 	}
 	
 	/**
@@ -213,25 +260,5 @@ public class XmlRpcServices implements Services{
 		}
 		
 		return result;
-	}
-
-	/**
-	 * 
-	 * @param args
-	 */
-	public static void main(String[] args){
-		
-		XmlRpcServices searcher = new XmlRpcServices();
-		
-		java.text.SimpleDateFormat formatter = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		try {
-			System.out.println(searcher.getResourcesSinceTimestamp(formatter.parse("2007-01-01 10:30:00")));
-		}
-		catch (CRException e) {
-			e.printStackTrace();
-		}
-		catch (ParseException e) {
-			e.printStackTrace();
-		}
 	}
 }

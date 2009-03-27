@@ -39,9 +39,9 @@ public interface Services {
 	public abstract String pushContent(String content, String sourceUri) throws CRException;
 	/**
 	 * 
-	 * @param attributes
+	 * @param criteria
 	 * @return
 	 * @throws CRException
 	 */
-	public abstract Vector getEntries(Hashtable attributes) throws CRException;
+	public abstract Vector getEntries(Hashtable criteria) throws CRException;
 }
