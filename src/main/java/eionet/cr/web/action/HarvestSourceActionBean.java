@@ -24,7 +24,6 @@ import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.RawTripleDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.HarvestException;
-import eionet.cr.harvest.scheduled.CronHarvestQueueingJob;
 import eionet.cr.harvest.scheduled.HarvestQueue;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.SourceContentsSearch;
@@ -151,7 +150,6 @@ public class HarvestSourceActionBean extends AbstractActionBean {
 		if(isUserLoggedIn()){
 			if (isPostRequest()){
 				DAOFactory.getDAOFactory().getHarvestSourceDAO().addSource(getHarvestSource(), getUserName());
-				CronHarvestQueueingJob.scheduleCronHarvest(getHarvestSource().getScheduleCron());
 				resolution = new ForwardResolution(HarvestSourcesActionBean.class);
 			}
 		}
@@ -173,7 +171,6 @@ public class HarvestSourceActionBean extends AbstractActionBean {
 		if(isUserLoggedIn()){
 			if (isPostRequest()){
 				DAOFactory.getDAOFactory().getHarvestSourceDAO().editSource(getHarvestSource());
-				CronHarvestQueueingJob.scheduleCronHarvest(getHarvestSource().getScheduleCron());
 				showMessage(getBundle().getString("update.success"));
 			}
 			else

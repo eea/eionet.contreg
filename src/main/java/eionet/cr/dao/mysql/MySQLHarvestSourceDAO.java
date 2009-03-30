@@ -151,8 +151,8 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 	}
 
     /** */
-	private static final String addSourceSQL = "insert into HARVEST_SOURCE (NAME,URL,TYPE,EMAILS,DATE_CREATED,CREATOR,SCHEDULE_CRON) VALUES (?,?,?,?,NOW(),?,?)";
-	private static final String addSourceIgnoreSQL = "insert into HARVEST_SOURCE (NAME,URL,TYPE,EMAILS,DATE_CREATED,CREATOR,SCHEDULE_CRON) VALUES (?,?,?,?,NOW(),?,?) on duplicate key update HARVEST_SOURCE_ID=LAST_INSERT_ID(HARVEST_SOURCE_ID)";
+	private static final String addSourceSQL = "insert into HARVEST_SOURCE (NAME,URL,TYPE,EMAILS,DATE_CREATED,CREATOR,INTERVAL_MINUTES) VALUES (?,?,?,?,NOW(),?,?)";
+	private static final String addSourceIgnoreSQL = "insert into HARVEST_SOURCE (NAME,URL,TYPE,EMAILS,DATE_CREATED,CREATOR,INTERVAL_MINUTES) VALUES (?,?,?,?,NOW(),?,?) on duplicate key update HARVEST_SOURCE_ID=LAST_INSERT_ID(HARVEST_SOURCE_ID)";
 
 	/*
      * (non-Javadoc)
@@ -207,7 +207,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 	}
 
     /** */
-	private static final String editSourceSQL = "update HARVEST_SOURCE set NAME=?,URL=?,TYPE=?,EMAILS=?,SCHEDULE_CRON=? where HARVEST_SOURCE_ID=?";
+	private static final String editSourceSQL = "update HARVEST_SOURCE set NAME=?,URL=?,TYPE=?,EMAILS=?,INTERVAL_MINUTES=? where HARVEST_SOURCE_ID=?";
 	
 	/*
      * (non-Javadoc)
@@ -291,79 +291,6 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 		}
 		finally{
 			ConnectionUtil.closeConnection(conn);
-		}
-	}
-	
-	/** */
-	private static final String getDistinctSchedulesSQL = "select distinct SCHEDULE_CRON from HARVEST_SOURCE";
-
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.dao.HarvestSourceDAO#getDistinctSchedules()
-	 */
-	public List<String> getDistinctSchedules() throws DAOException {
-		
-		List<String> result = new ArrayList<String>();
-		
-		Connection conn = null;
-		HarvestSourceDTOReader rsReader = new HarvestSourceDTOReader();
-		try{
-			conn = getConnection();
-			List<Map<String,SQLValue>> list = SQLUtil.executeQuery(getDistinctSchedulesSQL, conn);
-			if (list!=null){
-				for (int i=0; i<list.size(); i++){
-					Map<String,SQLValue> map = list.get(i);
-					if (map!=null && !map.isEmpty()){
-						SQLValue sqlValue = map.get("SCHEDULE_CRON");
-						if (sqlValue!=null){
-							String strValue = sqlValue.getString();
-							if (!Util.isNullOrEmpty(strValue))
-								result.add(strValue);
-						}
-					}
-				}
-			}
-		}
-		catch (Exception e){
-			throw new DAOException(e.getMessage(), e);
-		}
-		finally{
-			try{
-				if (conn!=null) conn.close();
-			}
-			catch (SQLException e){}
-		}
-		
-		return result;
-	}
-
-	/** */
-	private static final String getSourcesByScheduleSQL = "select * from HARVEST_SOURCE where SCHEDULE_CRON=? order by HARVEST_SOURCE_ID asc";
-
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSourcesBySchedule(java.lang.String)
-	 */
-	public List<HarvestSourceDTO> getHarvestSourcesBySchedule(String schedule) throws DAOException {
-
-    	List<Object> values = new ArrayList<Object>();
-    	values.add(schedule);
-				
-		Connection conn = null;
-		HarvestSourceDTOReader rsReader = new HarvestSourceDTOReader();
-		try{
-			conn = getConnection();
-			SQLUtil.executeQuery(getSourcesByScheduleSQL, values, rsReader, conn);
-			return rsReader.getResultList();
-		}
-		catch (Exception e){
-			throw new DAOException(e.getMessage(), e);
-		}
-		finally{
-			try{
-				if (conn!=null) conn.close();
-			}
-			catch (SQLException e){}
 		}
 	}
 

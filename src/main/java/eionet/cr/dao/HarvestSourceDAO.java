@@ -85,20 +85,5 @@ public interface HarvestSourceDAO {
      * @return
      * @throws DAOException
      */
-    public List<String> getDistinctSchedules() throws DAOException;
-
-    /**
-     * 
-     * @param schedule
-     * @return
-     * @throws DAOException
-     */
-    public List<HarvestSourceDTO> getHarvestSourcesBySchedule(String schedule) throws DAOException;
-    
-    /**
-     * 
-     * @return
-     * @throws DAOException
-     */
     public List<HarvestSourceDTO> getHarvestSourcesUnavailable() throws DAOException;
 }

@@ -115,21 +115,6 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 	
 	/**
 	 * 
-	 * @param args
-	 */
-	public static void main(String[] args){
-		
-		ConnectionUtil.setReturnSimpleConnection(true);
-
-		CronHarvestQueueingJob queueingJob = new CronHarvestQueueingJob();
-		queueingJob.contextInitialized(null);
-
-		HarvestingJob harvestingJob = new HarvestingJob();
-		harvestingJob.contextInitialized(null);
-	}
-
-	/**
-	 * 
 	 * @return
 	 */
 	public static synchronized HarvestQueueItemDTO getCurrentlyHarvestedItem() {
