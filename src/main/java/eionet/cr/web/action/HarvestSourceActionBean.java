@@ -28,7 +28,7 @@ import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.RawTripleDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.HarvestException;
-import eionet.cr.harvest.scheduled.HarvestQueue;
+import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.SourceContentsSearch;
 import eionet.cr.util.URLUtil;
@@ -202,7 +202,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     	harvestSource = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(harvestSource.getSourceId());
     	
     	// schedule the harvest
-    	HarvestQueue.addPullHarvest(getHarvestSource().getUrl(), HarvestQueue.PRIORITY_URGENT);
+    	UrgentHarvestQueue.addPullHarvest(getHarvestSource().getUrl());
     	
 		// retrieve list of harvests (for display) 
 		harvests = DAOFactory.getDAOFactory().getHarvestDAO().getHarvestsBySourceId(harvestSource.getSourceId());

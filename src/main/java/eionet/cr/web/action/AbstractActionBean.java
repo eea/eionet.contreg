@@ -15,7 +15,7 @@ import org.apache.commons.logging.LogFactory;
 
 import eionet.cr.common.CRException;
 import eionet.cr.config.GeneralConfig;
-import eionet.cr.dto.HarvestQueueItemDTO;
+import eionet.cr.dto.UrgentHarvestQueueItemDTO;
 import eionet.cr.harvest.scheduled.HarvestingJob;
 import eionet.cr.web.context.CRActionBeanContext;
 import eionet.cr.web.security.CRUser;
@@ -187,7 +187,7 @@ public abstract class AbstractActionBean implements ActionBean {
 	 * 
 	 * @return
 	 */
-	public HarvestQueueItemDTO getCurrentlyHarvestedQueueItem(){
+	public UrgentHarvestQueueItemDTO getCurrentlyHarvestedQueueItem(){
 		
 		return HarvestingJob.getCurrentlyHarvestedItem();
 	}

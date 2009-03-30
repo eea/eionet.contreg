@@ -3,7 +3,7 @@ package eionet.cr.dao.mysql;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dao.HarvestMessageDAO;
-import eionet.cr.dao.HarvestQueueDAO;
+import eionet.cr.dao.UrgentHarvestQueueDAO;
 import eionet.cr.dao.HarvestSourceDAO;
 
 /**
@@ -47,7 +47,7 @@ public class MySQLDAOFactory extends DAOFactory {
 	 * (non-Javadoc)
 	 * @see eionet.cr.dao.DAOFactory#getHarvestQueueDAO()
 	 */
-	public HarvestQueueDAO getHarvestQueueDAO() {
-		return new MySQLHarvestQueueDAO();
+	public UrgentHarvestQueueDAO getHarvestQueueDAO() {
+		return new MySQLUrgentHarvestQueueDAO();
 	}
 }

@@ -7,18 +7,17 @@ import java.io.Serializable;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class HarvestQueueItemDTO implements Serializable{
+public class UrgentHarvestQueueItemDTO implements Serializable{
 	
 	/** */
 	private String url;
-	private String priority;
 	private java.util.Date timeAdded;
 	private String pushedContent;
 
 	/**
 	 * 
 	 */
-	public HarvestQueueItemDTO(){
+	public UrgentHarvestQueueItemDTO(){
 	}
 
 	/**
@@ -33,20 +32,6 @@ public class HarvestQueueItemDTO implements Serializable{
 	 */
 	public void setUrl(String url) {
 		this.url = url;
-	}
-
-	/**
-	 * @return the priority
-	 */
-	public String getPriority() {
-		return priority;
-	}
-
-	/**
-	 * @param priority the priority to set
-	 */
-	public void setPriority(String priority) {
-		this.priority = priority;
 	}
 
 	/**

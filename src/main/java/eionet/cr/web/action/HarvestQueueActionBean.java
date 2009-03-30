@@ -15,8 +15,8 @@ import org.apache.commons.logging.LogFactory;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
-import eionet.cr.dto.HarvestQueueItemDTO;
-import eionet.cr.harvest.scheduled.HarvestQueue;
+import eionet.cr.dto.UrgentHarvestQueueItemDTO;
+import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.util.Util;
 
 /**
@@ -28,6 +28,10 @@ import eionet.cr.util.Util;
 public class HarvestQueueActionBean extends AbstractActionBean{
 	
 	/** */
+	private static final String PRIORITY_NORMAL = "normal";
+	private static final String PRIORITY_URGENT = "urgent";
+
+	/** */
 	private static Log logger = LogFactory.getLog(HarvestQueueActionBean.class);
 	
 	/** */
@@ -37,13 +41,13 @@ public class HarvestQueueActionBean extends AbstractActionBean{
 	private String priority;
 	
 	/** */
-	private List<HarvestQueueItemDTO> list;
+	private List<UrgentHarvestQueueItemDTO> list;
 	
 	/**
 	 * 
 	 */
 	public HarvestQueueActionBean(){
-		setPriority(HarvestQueue.PRIORITY_URGENT);
+		setPriority(PRIORITY_URGENT);
 	}
 	
 	/**
@@ -55,8 +59,8 @@ public class HarvestQueueActionBean extends AbstractActionBean{
 	public Resolution view() throws DAOException{
 		
 		if (!Util.isNullOrEmpty(getPriority())){
-			if (getPriority().equals(HarvestQueue.PRIORITY_NORMAL))
-				list = DAOFactory.getDAOFactory().getHarvestQueueDAO().getNormalHarvestQueue();
+			if (getPriority().equals(PRIORITY_NORMAL))
+				list = null; // FIXME
 			else
 				list = DAOFactory.getDAOFactory().getHarvestQueueDAO().getUrgentHarvestQueue();
 		}
@@ -82,7 +86,7 @@ public class HarvestQueueActionBean extends AbstractActionBean{
 	/**
 	 * @return the list
 	 */
-	public List<HarvestQueueItemDTO> getList() {
+	public List<UrgentHarvestQueueItemDTO> getList() {
 		return list;
 	}
 	
@@ -98,12 +102,12 @@ public class HarvestQueueActionBean extends AbstractActionBean{
 			
 			Map<String,String> priorityMap = new HashMap<String,String>();
 			priorityMap.put("title", "Urgent queue");
-			priorityMap.put("priority", HarvestQueue.PRIORITY_URGENT);
+			priorityMap.put("priority", PRIORITY_URGENT);
 			priorities.add(priorityMap);
 
 			priorityMap = new HashMap<String,String>();
 			priorityMap.put("title", "Normal queue");
-			priorityMap.put("priority", HarvestQueue.PRIORITY_NORMAL);
+			priorityMap.put("priority", PRIORITY_NORMAL);
 			priorities.add(priorityMap);
 		}
 		

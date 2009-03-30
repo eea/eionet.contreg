@@ -21,7 +21,7 @@ import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.harvest.scheduled.HarvestQueue;
+import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.search.CustomSearch;
 import eionet.cr.search.DiscoveredSinceTimeSearch;
 import eionet.cr.search.LuceneBasedSearcher;
@@ -159,7 +159,7 @@ public class XmlRpcServices implements Services{
 			if (sourceUri==null || sourceUri.trim().length()==0)
 				throw new CRException("Missing source uri");
 			else
-				HarvestQueue.addPushHarvest(content, sourceUri, HarvestQueue.PRIORITY_NORMAL);
+				UrgentHarvestQueue.addPushHarvest(content, sourceUri);
 		}
 		
 		return OK_RETURN_STRING;

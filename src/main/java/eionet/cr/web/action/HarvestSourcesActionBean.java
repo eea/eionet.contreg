@@ -14,7 +14,7 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.harvest.HarvestException;
-import eionet.cr.harvest.scheduled.HarvestQueue;
+import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.harvest.util.DedicatedHarvestSourceTypes;
 
 /**
@@ -90,7 +90,7 @@ public class HarvestSourcesActionBean extends AbstractActionBean {
 		
 		if(isUserLoggedIn()){
 			if (sourceUrl!=null && !sourceUrl.isEmpty()){
-				HarvestQueue.addPullHarvests(sourceUrl, HarvestQueue.PRIORITY_URGENT);
+				UrgentHarvestQueue.addPullHarvests(sourceUrl);
 				if (sourceUrl.size()==1)
 					showMessage("The source has been scheduled for urgent harvest!");
 				else

@@ -5,7 +5,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import eionet.cr.dto.HarvestQueueItemDTO;
+import eionet.cr.dto.UrgentHarvestQueueItemDTO;
 import eionet.cr.util.sql.ResultSetBaseReader;
 
 /**
@@ -16,7 +16,7 @@ import eionet.cr.util.sql.ResultSetBaseReader;
 public class HarvestQueueItemDTOReader extends ResultSetBaseReader{
 
 	/** */
-	List<HarvestQueueItemDTO> resultList = new ArrayList<HarvestQueueItemDTO>();
+	List<UrgentHarvestQueueItemDTO> resultList = new ArrayList<UrgentHarvestQueueItemDTO>();
 
 	/*
 	 * (non-Javadoc)
@@ -24,9 +24,8 @@ public class HarvestQueueItemDTOReader extends ResultSetBaseReader{
 	 */
 	public void readRow(ResultSet rs) throws SQLException {
 		
-		HarvestQueueItemDTO dto = new HarvestQueueItemDTO();
+		UrgentHarvestQueueItemDTO dto = new UrgentHarvestQueueItemDTO();
 		dto.setUrl(rs.getString("URL"));
-		dto.setPriority(rs.getString("PRIORITY"));
 		dto.setTimeAdded(rs.getTimestamp("TIMESTAMP"));
 		dto.setPushedContent(rs.getString("PUSHED_CONTENT"));
 		
@@ -36,7 +35,7 @@ public class HarvestQueueItemDTOReader extends ResultSetBaseReader{
 	/**
 	 * @return the resultList
 	 */
-	public List<HarvestQueueItemDTO> getResultList() {
+	public List<UrgentHarvestQueueItemDTO> getResultList() {
 		return resultList;
 	}
 }

@@ -14,7 +14,7 @@ import org.quartz.StatefulJob;
 import eionet.cr.common.JobScheduler;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOFactory;
-import eionet.cr.dto.HarvestQueueItemDTO;
+import eionet.cr.dto.UrgentHarvestQueueItemDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.harvest.Harvest;
 import eionet.cr.harvest.HarvestDAOWriter;
@@ -36,7 +36,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 	private static Log logger = LogFactory.getLog(HarvestingJob.class);
 	
 	/** */
-	private static HarvestQueueItemDTO currentlyHarvestedItem = null;
+	private static UrgentHarvestQueueItemDTO currentlyHarvestedItem = null;
 
 	/*
 	 * (non-Javadoc)
@@ -47,11 +47,11 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 		try{
 			RDFHandler.rollbackUnfinishedHarvests();
 			
-			HarvestQueueItemDTO queueItem = HarvestQueue.poll(HarvestQueue.PRIORITY_URGENT);
-			if (queueItem==null || queueItem.getUrl()==null || queueItem.getUrl().length()==0)
-				queueItem = HarvestQueue.poll(HarvestQueue.PRIORITY_NORMAL);
-			if (queueItem==null || queueItem.getUrl()==null || queueItem.getUrl().length()==0)
-				return;
+			UrgentHarvestQueueItemDTO queueItem = UrgentHarvestQueue.poll();
+//			if (queueItem==null || queueItem.getUrl()==null || queueItem.getUrl().length()==0)
+//				queueItem = UrgentHarvestQueue.poll(UrgentHarvestQueue.PRIORITY_NORMAL);
+//			if (queueItem==null || queueItem.getUrl()==null || queueItem.getUrl().length()==0)
+//				return;
 			
 			Harvest harvest = null;
 			String pushedContent = queueItem.getPushedContent();
@@ -117,7 +117,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 	 * 
 	 * @return
 	 */
-	public static synchronized HarvestQueueItemDTO getCurrentlyHarvestedItem() {
+	public static synchronized UrgentHarvestQueueItemDTO getCurrentlyHarvestedItem() {
 		return currentlyHarvestedItem;
 	}
 
@@ -125,7 +125,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 	 * 
 	 * @param item
 	 */
-	public static synchronized void setCurrentlyHarvestedItem(HarvestQueueItemDTO item) {
+	public static synchronized void setCurrentlyHarvestedItem(UrgentHarvestQueueItemDTO item) {
 		currentlyHarvestedItem = item;
 	}
 }
