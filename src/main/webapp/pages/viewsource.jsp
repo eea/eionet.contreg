@@ -59,8 +59,10 @@
 			                </td>
 			            </tr>
 			            <tr>
-			                <td>Schedule cron expression:</td>
-			                <td class="cronExpression"><c:out value="${actionBean.harvestSource.scheduleCron}"/></td>
+			                <td>Harvest interval:</td>
+			                <td>
+			                	<c:out value="${actionBean.harvestSource.intervalMinutes}"/> minutes
+			                </td>
 			            </tr>
 		           		<c:if test="${actionBean.harvestSource.unavailable}">
 		           			<tr>

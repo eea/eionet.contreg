@@ -189,7 +189,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 		values.add(source.getType());
 		values.add(source.getEmails());
 		values.add(user);
-		values.add(source.getScheduleCron());
+		values.add(source.getIntervalMinutes());
 		
 		Connection conn = null;
 		try{
@@ -221,7 +221,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 		values.add(source.getUrl());
 		values.add(source.getType());
 		values.add(source.getEmails());
-		values.add(source.getScheduleCron());
+		values.add(source.getIntervalMinutes());
 		values.add(source.getSourceId());
 		
 		Connection conn = null;

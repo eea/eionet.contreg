@@ -14,7 +14,7 @@ public class HarvestSourceDTO implements Serializable {
 	
 	/** */
 	public static final int COUNT_UNAVAIL_THRESHOLD = 5;
-	public static final String DEDICATED_HARVEST_SOURCE_DEFAULT_CRON = "0 0 2 ? * 6L"; // 02:00am on the last Friday of every month
+	public static final int DEFAULT_REFERRALS_INTERVAL = 60480;
 	
 	/** */
 	private Integer sourceId;
@@ -28,7 +28,7 @@ public class HarvestSourceDTO implements Serializable {
 	private Integer resources;
 	private Integer countUnavail;
 	private java.util.Date lastHarvestDatetime;
-	private String scheduleCron;
+	private Integer intervalMinutes;
 	
 	/**
 	 * 
@@ -186,17 +186,15 @@ public class HarvestSourceDTO implements Serializable {
 	}
 
 	/**
-	 * @return the scheduleCron
 	 */
-	public String getScheduleCron() {
-		return scheduleCron;
+	public Integer getIntervalMinutes() {
+		return intervalMinutes;
 	}
 
 	/**
-	 * @param scheduleCron the scheduleCron to set
 	 */
-	public void setScheduleCron(String scheduleCron) {
-		this.scheduleCron = scheduleCron;
+	public void setIntervalMinutes(Integer intervalMinutes) {
+		this.intervalMinutes = intervalMinutes;
 	}
 
 	/**

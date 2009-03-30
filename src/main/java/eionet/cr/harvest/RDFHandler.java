@@ -571,14 +571,14 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 		
 		/* handle qaw sources */
 		
-		String cronExpr = GeneralConfig.getProperty(GeneralConfig.HARVESTER_DEDICATED_SOURCES_CRON_EXPRESSION,
-				HarvestSourceDTO.DEDICATED_HARVEST_SOURCE_DEFAULT_CRON);
+		Integer interval = Integer.valueOf(GeneralConfig.getProperty(GeneralConfig.HARVESTER_REFERRALS_INTERVAL,
+				String.valueOf(HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL)));
 		
 		StringBuffer buf = new StringBuffer().
-		append("insert ignore into HARVEST_SOURCE (NAME, URL, TYPE, DATE_CREATED, CREATOR, SCHEDULE_CRON, SOURCE, GEN_TIME) ").
+		append("insert ignore into HARVEST_SOURCE (NAME, URL, TYPE, DATE_CREATED, CREATOR, INTERVAL_MINUTES, SOURCE, GEN_TIME) ").
 		append("select SPO_TEMP_SOURCE.OBJECT, SPO_TEMP_SOURCE.OBJECT, '").append(DedicatedHarvestSourceTypes.qawSource).
 		append("', now(), '").append(CRUser.application.getUserName()).
-		append("', '").append(cronExpr).append("', ").append(sourceUrlHash).append(", ").append(genTime).
+		append("', '").append(interval).append("', ").append(sourceUrlHash).append(", ").append(genTime).
 		append(" from SPO_TEMP as SPO_TEMP_SOURCE, SPO_TEMP where SPO_TEMP_SOURCE.ANON_OBJ='N' and ").
 		append("SPO_TEMP_SOURCE.PREDICATE=").append(Hashes.spoHash(Predicates.DC_SOURCE)).
 		append(" and SPO_TEMP_SOURCE.SUBJECT=SPO_TEMP.SUBJECT and SPO_TEMP.PREDICATE=").append(Hashes.spoHash(Predicates.RDF_TYPE)).
@@ -590,10 +590,10 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 		/* handle delivered files */
 		
 		buf = new StringBuffer().
-		append("insert ignore into HARVEST_SOURCE (NAME, URL, TYPE, DATE_CREATED, CREATOR, SCHEDULE_CRON, SOURCE, GEN_TIME) ").
+		append("insert ignore into HARVEST_SOURCE (NAME, URL, TYPE, DATE_CREATED, CREATOR, INTERVAL_MINUTES, SOURCE, GEN_TIME) ").
 		append("select URI, URI, '").append(DedicatedHarvestSourceTypes.deliveredFile).
 		append("', now(), '").append(CRUser.application.getUserName()).
-		append("', '").append(cronExpr).append("', ").append(sourceUrlHash).append(", ").append(genTime).
+		append("', '").append(interval).append("', ").append(sourceUrlHash).append(", ").append(genTime).
 		append(" from RESOURCE_TEMP, SPO_TEMP where RESOURCE_TEMP.URI_HASH=SPO_TEMP.SUBJECT and ").
 		append("SPO_TEMP.PREDICATE=").append(Hashes.spoHash(Predicates.RDF_TYPE)).
 		append(" and SPO_TEMP.ANON_OBJ='N' and SPO_TEMP.OBJECT_HASH in (").

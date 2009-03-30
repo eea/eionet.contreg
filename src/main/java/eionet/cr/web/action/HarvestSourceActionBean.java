@@ -3,7 +3,10 @@ package eionet.cr.web.action;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
@@ -13,6 +16,7 @@ import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.validation.SimpleError;
 import net.sourceforge.stripes.validation.ValidationMethod;
 
+import org.apache.commons.lang.StringUtils;
 import org.quartz.SchedulerException;
 
 import eionet.cr.config.GeneralConfig;
@@ -48,7 +52,11 @@ public class HarvestSourceActionBean extends AbstractActionBean {
 	private List<RawTripleDTO> sampleTriples;
 	
 	/** */
-	private int noOfResources = 0; // number of distinct resources harvested from this source right now 
+	private int noOfResources = 0; // number of distinct resources harvested from this source right now
+	
+	/** */
+	private int intervalMultiplier;
+	private static LinkedHashMap<Integer,String> intervalMultipliers;
 	
 	/**
 	 * 
@@ -221,10 +229,12 @@ public class HarvestSourceActionBean extends AbstractActionBean {
 	    	if (harvestSource.getUrl()==null || harvestSource.getUrl().trim().length()==0 || !URLUtil.isURL(harvestSource.getUrl()))
 	    		addGlobalError(new SimpleError("Invalid URL"));
 	    	
-	    	if (!Util.isNullOrEmpty(harvestSource.getScheduleCron()) && !Util.isValidQuartzCronExpression(harvestSource.getScheduleCron())){
-	    		addGlobalError(new SimpleError("Invalid Quartz cron expression"));
+	    	if (harvestSource.getIntervalMinutes()<0 || intervalMultiplier<0){
+	    		addGlobalError(new SimpleError("Harvest interval must be >=0"));
 	    	}
-
+	    	else{
+	    		harvestSource.setIntervalMinutes(new Integer(harvestSource.getIntervalMinutes() * intervalMultiplier));
+	    	}
     	}
     }
 
@@ -240,5 +250,37 @@ public class HarvestSourceActionBean extends AbstractActionBean {
 	 */
 	public int getNoOfResources() {
 		return noOfResources;
+	}
+
+	/**
+	 * @param intervalMultiplier the intervalMultiplier to set
+	 */
+	public void setIntervalMultiplier(int intervalMultiplier) {
+		this.intervalMultiplier = intervalMultiplier;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public Map<Integer,String> getIntervalMultipliers(){
+		
+		if (intervalMultipliers==null){
+			intervalMultipliers = new LinkedHashMap<Integer,String>();
+			intervalMultipliers.put(new Integer(1), "minutes");
+			intervalMultipliers.put(new Integer(60), "hours");
+			intervalMultipliers.put(new Integer(1440), "days");
+			intervalMultipliers.put(new Integer(10080), "weeks");
+		}
+		
+		return intervalMultipliers;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public int getSelectedIntervalMultiplier(){
+		return getIntervalMultipliers().keySet().iterator().next().intValue();
 	}
 }

@@ -35,28 +35,15 @@
 	                <td><stripes:text name="harvestSource.emails" size="100"/></td>
 	            </tr>
 	            <tr>
-	                <td>Date created:</td>
+	                <td>Harvest interval:</td>
 	                <td>
-	                	<c:out value="${actionBean.harvestSource.dateCreated}"/>
-	                	<stripes:hidden name="harvestSource.dateCreated"/>
+	                	<stripes:text name="harvestSource.intervalMinutes" size="10"/>
+	                	<stripes:select name="intervalMultiplier" value="${actionBean.selectedIntervalMultiplier}">
+	                		<c:forEach items="${actionBean.intervalMultipliers}" var="intervalMultiplier"> 
+		                		<stripes:option value="${intervalMultiplier.key}" label="${intervalMultiplier.value}"/>
+		                	</c:forEach>
+	                	</stripes:select>
 	                </td>
-	            </tr>
-	            <tr>
-	                <td>Creator:</td>
-	                <td>
-	                	<c:out value="${actionBean.harvestSource.creator}"/>
-	                	<stripes:hidden name="harvestSource.creator"/>
-	                </td>
-	            </tr>
-	            <tr>
-	                <td>Number of resources:</td>
-	                <td>
-	                	<c:out value="${actionBean.harvestSource.resources}"/>
-	                </td>
-	            </tr>
-	            <tr>
-	                <td>Schedule cron expression:</td>
-	                <td><stripes:text name="harvestSource.scheduleCron" class="cronExpression" size="40"/></td>
 	            </tr>
 	            <tr>
 	                <td colspan="2">

@@ -28,7 +28,7 @@ public class GeneralConfig {
 	public static final String LUCENE_INDEX_LOCATION = "lucene.index.location";
 	public static final String HARVESTER_FILES_LOCATION = "harvester.files.location";
 	public static final String HARVESTER_JOB_CRON_EXPRESSION = "harvester.job.cronExpression";
-	public static final String HARVESTER_DEDICATED_SOURCES_CRON_EXPRESSION = "harvester.dedicatedSources.cronExpression";
+	public static final String HARVESTER_REFERRALS_INTERVAL = "harvester.referrals.intervalMinutes";
 	
 	/** */
 	public static final String DATASOURCE_NAME = "datasource.name";
