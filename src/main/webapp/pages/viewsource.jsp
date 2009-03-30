@@ -64,6 +64,12 @@
 			                	<c:out value="${actionBean.harvestSource.intervalMinutes}"/> minutes
 			                </td>
 			            </tr>
+			            <tr>
+			                <td>Last harvest:</td>
+			                <td>
+			                	<c:out value="${actionBean.harvestSource.lastHarvestDatetime}"/>
+			                </td>
+			            </tr>
 		           		<c:if test="${actionBean.harvestSource.unavailable}">
 		           			<tr>
 		           				<td colspan="2" class="warning-msg" style="color:#E6E6E6">The source has been unavailable for too many times!</td>
