@@ -34,3 +34,13 @@ span.langcode {
 	padding: 2px;
 	border: 1px solid #0c506f;
 }
+
+/* source.action */
+#sampletriples {
+	width:100%;
+	font-size:80%;
+}
+#sampletriples .derived {
+	font-style: italic;
+}
+}

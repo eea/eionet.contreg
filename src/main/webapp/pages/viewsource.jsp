@@ -85,21 +85,21 @@
 			        </table>
 			        <br/>
 			        <c:if test="${not empty actionBean.sampleTriples}">			        	
-				        <table class="datatable" style="width:100%">
+				        <table id="sampletriples" class="datatable">
 				        	<caption style="text-align:left;color:black">Sample triples:</caption>
 				        	<thead>
 					        	<tr>
-					        		<th scope="col" style="width:35%">Subject</th>
-					        		<th scope="col" style="width:35%">Predicate</th>
-					        		<th scope="col" style="width:30%">Object</th>
+					        		<th scope="col" style="width:30%">Subject</th>
+					        		<th scope="col" style="width:30%">Predicate</th>
+					        		<th scope="col" style="width:40%">Object</th>
 					        	</tr>
 				        	</thead>
 				        	<tbody>
 				        		<c:forEach items="${actionBean.sampleTriples}" var="sampleTriple" varStatus="loop">
 				        			<tr>
-				        				<td title="${sampleTriple.subject}" style="font-size:80%"><c:out value="${crfn:cutAtFirstLongToken(sampleTriple.subject, 100)}"/></td>
-				        				<td title="${sampleTriple.predicate}" style="font-size:80%"><c:out value="${crfn:cutAtFirstLongToken(sampleTriple.predicate, 100)}"/></td>
-				        				<td title="${sampleTriple.object}" style="font-size:80%"><c:out value="${crfn:cutAtFirstLongToken(sampleTriple.object, 100)}"/></td>
+				        				<td><c:out value="${crfn:cutAtFirstLongToken(sampleTriple.subject, 100)}"/></td>
+				        				<td><c:out value="${crfn:cutAtFirstLongToken(sampleTriple.predicate, 100)}"/></td>
+				        				<td><c:out value="${crfn:cutAtFirstLongToken(sampleTriple.object, 100)}"/></td>
 				        			</tr>
 				        		</c:forEach>
 				        	</tbody>
