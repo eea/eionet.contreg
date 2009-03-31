@@ -23,20 +23,14 @@ div.errorHeader {
 }
 
 span.langcode {
-	display: block;
+	display:block;
+	min-width: 1.5em;
+	text-align:center;
 	color: #455b6b;
 	text-decoration: none;
+	text-transform: uppercase;
 	font-size: 70%;
 	background-color: transparent;
-	background-image: url(http://www.eionet.europa.eu/styles/eionet2007/button_right.gif);
-	background-repeat: no-repeat;
-	background-attachment: scroll;
-	background-position: 0% 0%;
-	padding-top: 5px;
-	padding-right: 0px;
-	padding-bottom: 0px;
-	padding-left: 10px;
-	border-bottom-width: medium;
-	border-bottom-style: none;
-	border-bottom-color: -moz-use-text-color;
+	padding: 2px;
+	border: 1px solid #0c506f;
 }
