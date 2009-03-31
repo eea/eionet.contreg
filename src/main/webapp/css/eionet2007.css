@@ -43,4 +43,7 @@ span.langcode {
 #sampletriples .derived {
 	font-style: italic;
 }
+#sampletriples caption {
+	text-align:left;
+	color:black
 }

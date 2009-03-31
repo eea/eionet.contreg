@@ -86,12 +86,15 @@
 			        <br/>
 			        <c:if test="${not empty actionBean.sampleTriples}">			        	
 				        <table id="sampletriples" class="datatable">
-				        	<caption style="text-align:left;color:black">Sample triples:</caption>
+				        	<caption>Sample triples:</caption>
+									<col style="width:30%"/>
+									<col style="width:30%"/>
+									<col style="width:40%"/>
 				        	<thead>
 					        	<tr>
-					        		<th scope="col" style="width:30%">Subject</th>
-					        		<th scope="col" style="width:30%">Predicate</th>
-					        		<th scope="col" style="width:40%">Object</th>
+					        		<th scope="col">Subject</th>
+					        		<th scope="col">Predicate</th>
+					        		<th scope="col">Object</th>
 					        	</tr>
 				        	</thead>
 				        	<tbody>
