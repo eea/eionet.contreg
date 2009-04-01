@@ -13,6 +13,7 @@ import org.quartz.JobListener;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
+import org.quartz.SimpleTrigger;
 import org.quartz.impl.StdSchedulerFactory;
 
 /**
@@ -39,26 +40,42 @@ public class JobScheduler implements ServletContextListener{
 		quartzScheduler = schedFact.getScheduler();
 		quartzScheduler.start();
 	}
-	
+
 	/**
 	 * 
 	 * @param cronExpression
+	 * @param jobDetails
 	 * @throws SchedulerException 
+	 * @throws ParseException 
 	 */
-	public static synchronized void scheduleCronJob(String cronExpression, JobDetail jobDetails) throws SchedulerException{
+	public static synchronized void scheduleCronJob(String cronExpression, JobDetail jobDetails) throws SchedulerException, ParseException{
 		
-		try{
-			CronTrigger trigger = new CronTrigger(jobDetails.getName(), jobDetails.getGroup());
-			trigger.setCronExpression(cronExpression);
-	
-			if (quartzScheduler==null)
-				init();
-			
-			quartzScheduler.scheduleJob(jobDetails, trigger);
-		}
-		catch (ParseException e){
-			logger.error("Error parsing cron expression (" + cronExpression + "): " + e.toString(), e);
-		}
+		CronTrigger trigger = new CronTrigger(jobDetails.getName(), jobDetails.getGroup());
+		trigger.setCronExpression(cronExpression);
+
+		if (quartzScheduler==null)
+			init();
+		
+		quartzScheduler.scheduleJob(jobDetails, trigger);
+	}
+
+	/**
+	 * 
+	 * @param repeatInterval
+	 * @param jobDetails
+	 * @throws SchedulerException
+	 * @throws ParseException
+	 */
+	public static synchronized void scheduleIntervalJob(long repeatInterval, JobDetail jobDetails) throws SchedulerException, ParseException{
+		
+		SimpleTrigger trigger = new SimpleTrigger(jobDetails.getName(), jobDetails.getGroup());
+		trigger.setRepeatInterval(repeatInterval);
+		trigger.setRepeatCount(SimpleTrigger.REPEAT_INDEFINITELY);
+
+		if (quartzScheduler==null)
+			init();
+		
+		quartzScheduler.scheduleJob(jobDetails, trigger);
 	}
 
 	/**

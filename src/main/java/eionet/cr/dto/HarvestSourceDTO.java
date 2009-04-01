@@ -22,12 +22,12 @@ public class HarvestSourceDTO implements Serializable {
 	private String url;
 	private String type;
 	private String emails;
-	private Date dateCreated;
+	private Date timeCreated;
 	private String creator;
 	private Integer statements;
 	private Integer resources;
 	private Integer countUnavail;
-	private java.util.Date lastHarvestDatetime;
+	private Date lastHarvest;
 	private Integer intervalMinutes;
 	
 	/**
@@ -107,17 +107,17 @@ public class HarvestSourceDTO implements Serializable {
 	}
 
 	/**
-	 * @return the dateCreated
+	 * @return the timeCreated
 	 */
-	public Date getDateCreated() {
-		return dateCreated;
+	public Date getTimeCreated() {
+		return timeCreated;
 	}
 
 	/**
-	 * @param dateCreated the dateCreated to set
+	 * @param timeCreated the timeCreated to set
 	 */
-	public void setDateCreated(Date dateCreated) {
-		this.dateCreated = dateCreated;
+	public void setTimeCreated(Date timeCreated) {
+		this.timeCreated = timeCreated;
 	}
 
 	/**
@@ -198,16 +198,16 @@ public class HarvestSourceDTO implements Serializable {
 	}
 
 	/**
-	 * @return the lastHarvestDatetime
+	 * @return the lastHarvest
 	 */
-	public java.util.Date getLastHarvestDatetime() {
-		return lastHarvestDatetime;
+	public Date getLastHarvest() {
+		return lastHarvest;
 	}
 
 	/**
-	 * @param lastHarvestDatetime the lastHarvestDatetime to set
+	 * @param lastHarvest the lastHarvest to set
 	 */
-	public void setLastHarvestDatetime(java.util.Date lastHarvestDatetime) {
-		this.lastHarvestDatetime = lastHarvestDatetime;
+	public void setLastHarvest(Date lastHarvest) {
+		this.lastHarvest = lastHarvest;
 	}
 }

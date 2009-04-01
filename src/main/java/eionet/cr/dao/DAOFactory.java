@@ -28,7 +28,7 @@ public abstract class DAOFactory {
 	 * 
 	 * @return
 	 */
-	public abstract UrgentHarvestQueueDAO getHarvestQueueDAO();
+	public abstract UrgentHarvestQueueDAO getUrgentHarvestQueueDAO();
 
 	/**
 	 * 

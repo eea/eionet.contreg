@@ -1,6 +1,7 @@
 package eionet.cr.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import eionet.cr.dto.HarvestSourceDTO;
 
@@ -86,4 +87,12 @@ public interface HarvestSourceDAO {
      * @throws DAOException
      */
     public List<HarvestSourceDTO> getHarvestSourcesUnavailable() throws DAOException;
+
+    /**
+     * 
+     * @param numOfSegments
+     * @return
+     * @throws DAOException
+     */
+    public List<HarvestSourceDTO> getNextScheduledSources(int numOfSegments) throws DAOException;
 }

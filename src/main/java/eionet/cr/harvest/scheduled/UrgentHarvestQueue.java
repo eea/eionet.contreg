@@ -49,7 +49,7 @@ public class UrgentHarvestQueue{
 				dtos.add(dto);
 			}
 			
-			DAOFactory.getDAOFactory().getHarvestQueueDAO().addPullHarvests(dtos);
+			DAOFactory.getDAOFactory().getUrgentHarvestQueueDAO().addPullHarvests(dtos);
 			
 			for (Iterator<String> i=urls.iterator(); i.hasNext();){
 				logger.debug("Pull harvest added to the urgent queue, url = " + i.next());
@@ -74,24 +74,8 @@ public class UrgentHarvestQueue{
 		dto.setPushedContent(pushContent);
 		
 		try {
-			DAOFactory.getDAOFactory().getHarvestQueueDAO().addPushHarvest(dto);
+			DAOFactory.getDAOFactory().getUrgentHarvestQueueDAO().addPushHarvest(dto);
 			logger.debug("Push harvest added to the urgent queue, url = " + url);
-		}
-		catch (DAOException e) {
-			throw new HarvestException(e.toString(), e);
-		}
-	}
-	
-	/**
-	 * 
-	 * @param priority
-	 * @return
-	 * @throws HarvestException 
-	 */
-	public static synchronized UrgentHarvestQueueItemDTO poll() throws HarvestException{
-		
-		try {
-			return DAOFactory.getDAOFactory().getHarvestQueueDAO().poll();
 		}
 		catch (DAOException e) {
 			throw new HarvestException(e.toString(), e);
@@ -100,32 +84,11 @@ public class UrgentHarvestQueue{
 
 	/**
 	 * 
-	 * @param priority
 	 * @return
-	 * @throws HarvestException 
+	 * @throws DAOException 
 	 */
-	public static synchronized UrgentHarvestQueueItemDTO peek() throws HarvestException{
+	public static synchronized UrgentHarvestQueueItemDTO poll() throws DAOException{
 		
-		try {
-			return DAOFactory.getDAOFactory().getHarvestQueueDAO().peek();
-		}
-		catch (DAOException e) {
-			throw new HarvestException(e.toString(), e);
-		}
-	}
-	
-	/**
-	 * 
-	 * @param urgentHarvestQueueItemDTO
-	 * @throws HarvestException
-	 */
-	public static synchronized void deleteQueueItem(UrgentHarvestQueueItemDTO urgentHarvestQueueItemDTO) throws HarvestException{
-		
-		try {
-			DAOFactory.getDAOFactory().getHarvestQueueDAO().deleteQueueItem(urgentHarvestQueueItemDTO);
-		}
-		catch (DAOException e) {
-			throw new HarvestException(e.toString(), e);
-		}
+		return DAOFactory.getDAOFactory().getUrgentHarvestQueueDAO().poll();
 	}
 }

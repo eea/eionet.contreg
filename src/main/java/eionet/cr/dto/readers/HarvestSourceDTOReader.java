@@ -30,12 +30,12 @@ public class HarvestSourceDTOReader extends ResultSetBaseReader {
 		harvestSourceDTO.setUrl(rs.getString("URL"));
 		harvestSourceDTO.setType(rs.getString("TYPE"));
 		harvestSourceDTO.setEmails(rs.getString("EMAILS"));
-		harvestSourceDTO.setDateCreated(rs.getDate("DATE_CREATED"));
+		harvestSourceDTO.setTimeCreated(rs.getDate("TIME_CREATED"));
 		harvestSourceDTO.setCreator(rs.getString("CREATOR"));
 		harvestSourceDTO.setStatements(new Integer(rs.getInt("STATEMENTS")));
 		harvestSourceDTO.setResources(new Integer(rs.getInt("RESOURCES")));
 		harvestSourceDTO.setCountUnavail(new Integer(rs.getInt("COUNT_UNAVAIL")));
-		harvestSourceDTO.setLastHarvestDatetime(rs.getTimestamp("LAST_HARVEST"));
+		harvestSourceDTO.setLastHarvest(rs.getTimestamp("LAST_HARVEST"));
 		harvestSourceDTO.setIntervalMinutes(rs.getInt("INTERVAL_MINUTES"));
 		
 		resultList.add(harvestSourceDTO);

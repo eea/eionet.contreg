@@ -82,9 +82,6 @@
 	<listener>
 		<listener-class>eionet.cr.web.ServletContextListenerImpl</listener-class>
 	</listener>
-<!-- <listener>
-		<listener-class>eionet.cr.harvest.scheduled.CronHarvestQueueingJob</listener-class>
-	</listener> -->
 	<listener>
 		<listener-class>eionet.cr.harvest.scheduled.HarvestingJob</listener-class>
 	</listener>

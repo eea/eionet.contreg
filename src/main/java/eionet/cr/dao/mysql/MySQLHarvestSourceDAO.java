@@ -3,6 +3,7 @@ package eionet.cr.dao.mysql;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -151,8 +152,8 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 	}
 
     /** */
-	private static final String addSourceSQL = "insert into HARVEST_SOURCE (NAME,URL,TYPE,EMAILS,DATE_CREATED,CREATOR,INTERVAL_MINUTES) VALUES (?,?,?,?,NOW(),?,?)";
-	private static final String addSourceIgnoreSQL = "insert into HARVEST_SOURCE (NAME,URL,TYPE,EMAILS,DATE_CREATED,CREATOR,INTERVAL_MINUTES) VALUES (?,?,?,?,NOW(),?,?) on duplicate key update HARVEST_SOURCE_ID=LAST_INSERT_ID(HARVEST_SOURCE_ID)";
+	private static final String addSourceSQL = "insert into HARVEST_SOURCE (NAME,URL,TYPE,EMAILS,TIME_CREATED,CREATOR,INTERVAL_MINUTES) VALUES (?,?,?,?,NOW(),?,?)";
+	private static final String addSourceIgnoreSQL = "insert into HARVEST_SOURCE (NAME,URL,TYPE,EMAILS,TIME_CREATED,CREATOR,INTERVAL_MINUTES) VALUES (?,?,?,?,NOW(),?,?) on duplicate key update HARVEST_SOURCE_ID=LAST_INSERT_ID(HARVEST_SOURCE_ID)";
 
 	/*
      * (non-Javadoc)
@@ -333,6 +334,41 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 		try{
 			conn = getConnection();
 			SQLUtil.executeQuery(getHarvestSourcesUnavailableSQL, new ArrayList<Object>(), rsReader, conn);
+			return rsReader.getResultList();
+		}
+		catch (Exception e){
+			throw new DAOException(e.getMessage(), e);
+		}
+		finally{
+			ConnectionUtil.closeConnection(conn);
+		}
+	}
+
+	private static final String getNextScheduledSourcesSQL =
+		
+		"select * from HARVEST_SOURCE where INTERVAL_MINUTES>0"
+		+ " and timestampdiff(MINUTE,ifnull(LAST_HARVEST,timestampadd(MINUTE,-1*INTERVAL_MINUTES,TIME_CREATED)),NOW()) >= INTERVAL_MINUTES"
+		+ " order by timestampdiff(MINUTE,ifnull(LAST_HARVEST,timestampadd(MINUTE,-1*INTERVAL_MINUTES,TIME_CREATED)),NOW())/INTERVAL_MINUTES desc"
+		+ " limit ?";
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HarvestSourceDAO#getNextScheduledSources(int)
+	 */
+	public List<HarvestSourceDTO> getNextScheduledSources(int numOfSegments) throws DAOException {
+		
+		Connection conn = null;
+		HarvestSourceDTOReader rsReader = new HarvestSourceDTOReader();
+		try{
+			conn = getConnection();
+			
+			Object o = SQLUtil.executeSingleReturnValueQuery("select count(*) from HARVEST_SOURCE", conn);
+			int numOfSources = o==null ? 0 : Integer.parseInt(o.toString());
+			int limit = Math.round((float)numOfSources/(float)numOfSegments);
+
+			List<Object> values = new ArrayList<Object>();
+	    	values.add(new Integer(limit));
+			SQLUtil.executeQuery(getNextScheduledSourcesSQL, values, rsReader, conn);
 			return rsReader.getResultList();
 		}
 		catch (Exception e){

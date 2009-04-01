@@ -1,8 +1,16 @@
 package eionet.cr.harvest.scheduled;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.quartz.JobDetail;
@@ -13,11 +21,14 @@ import org.quartz.StatefulJob;
 
 import eionet.cr.common.JobScheduler;
 import eionet.cr.config.GeneralConfig;
+import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.UrgentHarvestQueueItemDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.harvest.Harvest;
 import eionet.cr.harvest.HarvestDAOWriter;
+import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.PullHarvest;
 import eionet.cr.harvest.PushHarvest;
 import eionet.cr.harvest.RDFHandler;
@@ -36,53 +47,144 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 	private static Log logger = LogFactory.getLog(HarvestingJob.class);
 	
 	/** */
-	private static UrgentHarvestQueueItemDTO currentlyHarvestedItem = null;
-
+	private static Harvest currentHarvest = null;
+	private static List<HarvestSourceDTO> batchHarvestingQueue; 
+	
+	/** */
+	private List<HourSpan> batchHarvestingHours;
+	private Integer intervalSeconds;
+	private Integer dailyActiveMinutes;
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.quartz.Job#execute(org.quartz.JobExecutionContext)
 	 */
 	public void execute(JobExecutionContext jobExecContext) throws JobExecutionException {
-
+		
 		try{
 			RDFHandler.rollbackUnfinishedHarvests();
-			
-			UrgentHarvestQueueItemDTO queueItem = UrgentHarvestQueue.poll();
-//			if (queueItem==null || queueItem.getUrl()==null || queueItem.getUrl().length()==0)
-//				queueItem = UrgentHarvestQueue.poll(UrgentHarvestQueue.PRIORITY_NORMAL);
-//			if (queueItem==null || queueItem.getUrl()==null || queueItem.getUrl().length()==0)
-//				return;
-			
-			Harvest harvest = null;
-			String pushedContent = queueItem.getPushedContent();
-			if (Util.isNullOrEmpty(pushedContent)){
-				
-				HarvestSourceDTO harvestSource = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceByUrl(queueItem.getUrl());
-				harvest = new PullHarvest(harvestSource.getUrl(), null); // TODO - use proper lastHarvestTimestamp instead of null
-				harvest.setDaoWriter(new HarvestDAOWriter(
-						harvestSource.getSourceId().intValue(), Harvest.TYPE_PULL, CRUser.application.getUserName()));
-			}
-			else{
-				HarvestSourceDTO sourceDTO = new HarvestSourceDTO();
-				sourceDTO.setUrl(queueItem.getUrl());
-				sourceDTO.setName(queueItem.getUrl());
-				sourceDTO.setType("data");
-				Integer sourceId = DAOFactory.getDAOFactory().getHarvestSourceDAO().addSourceIgnoreDuplicate(sourceDTO, CRUser.application.getUserName());
-				
-				harvest = new PushHarvest(pushedContent, queueItem.getUrl());
-				if (sourceId!=null && sourceId.intValue()>0){
-					harvest.setDaoWriter(new HarvestDAOWriter(sourceId.intValue(), Harvest.TYPE_PUSH, CRUser.application.getUserName()));
+			harvestUrgentQueue();
+
+			if (!isBatchHarvestingEnabled() || !isBatchHarvestingHour())
+				return;
+
+			initBatchHarvestingQueue();
+			if (!batchHarvestingQueue.isEmpty()){
+				for (Iterator<HarvestSourceDTO> iter=batchHarvestingQueue.iterator(); iter.hasNext(); harvestUrgentQueue()){
+					pullHarvest(iter.next());
 				}
 			}
-		
-			setCurrentlyHarvestedItem(queueItem);
-			harvest.execute();
 		}
-		catch (Throwable t){
-			throw new JobExecutionException(t.toString(), t);
+		catch (Exception e){
+			throw new JobExecutionException(e.toString(), e);
 		}
 		finally{
-			setCurrentlyHarvestedItem(null);
+			setCurrentHarvest(null);
+		}
+	}
+
+	/**
+	 * 
+	 * @return
+	 * @throws DAOException 
+	 */
+	private void initBatchHarvestingQueue() throws DAOException{
+		
+		if (isBatchHarvestingEnabled()){
+			int numOfSegments = Math.round((float)getDailyActiveMinutes() / (float)getIntervalSeconds().intValue());
+			HarvestingJob.batchHarvestingQueue = DAOFactory.getDAOFactory().getHarvestSourceDAO().getNextScheduledSources(numOfSegments);
+		}
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public static List<HarvestSourceDTO> getBatchHarvestingQueue(){
+		return HarvestingJob.batchHarvestingQueue;
+	}
+
+	/**
+	 * 
+	 */
+	private void harvestUrgentQueue(){
+		
+		try{
+			UrgentHarvestQueueItemDTO queueItem = null;
+			for (queueItem = UrgentHarvestQueue.poll(); queueItem!=null; queueItem = UrgentHarvestQueue.poll()){
+				
+				String url = queueItem.getUrl();
+				if (!StringUtils.isBlank(url)){
+					
+					if (queueItem.isPushHarvest())
+						pushHarvest(url, queueItem.getPushedContent());
+					else
+						pullHarvest(DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceByUrl(url));
+				}
+			}
+		}
+		catch (DAOException e){
+			logger.error(e.toString(), e);
+		}
+	}
+
+	/**
+	 * 
+	 * @param url
+	 * @param pushedContent
+	 */
+	private void pushHarvest(String url, String pushedContent){
+		
+		HarvestSourceDTO sourceDTO = new HarvestSourceDTO();
+		sourceDTO.setUrl(url);
+		sourceDTO.setName(url);
+		sourceDTO.setType("data");
+		
+		try{
+			Integer sourceId = DAOFactory.getDAOFactory().getHarvestSourceDAO().addSourceIgnoreDuplicate(
+																sourceDTO, CRUser.application.getUserName());
+			Harvest harvest = new PushHarvest(pushedContent, url);
+			if (sourceId!=null && sourceId.intValue()>0){
+				harvest.setDaoWriter(new HarvestDAOWriter(sourceId.intValue(), Harvest.TYPE_PUSH, CRUser.application.getUserName()));
+			}
+			executeHarvest(harvest);
+		}
+		catch (DAOException e){
+			logger.error(e.toString(), e);
+		}
+	}
+
+	/**
+	 * 
+	 * @param harvestSource
+	 */
+	private void pullHarvest(HarvestSourceDTO harvestSource){
+		
+		if (harvestSource!=null){
+			Harvest harvest = new PullHarvest(harvestSource.getUrl(), harvestSource.getLastHarvest());
+			harvest.setDaoWriter(new HarvestDAOWriter(
+					harvestSource.getSourceId().intValue(), Harvest.TYPE_PULL, CRUser.application.getUserName()));
+			executeHarvest(harvest);
+		}
+	}
+	
+	/**
+	 * 
+	 * @param harvest
+	 */
+	private void executeHarvest(Harvest harvest){
+		
+		if (harvest!=null){
+			setCurrentHarvest(harvest);
+			try {
+				harvest.execute();
+			}
+			catch (HarvestException e){
+				// exception already logged
+			}
+			finally{
+				setCurrentHarvest(null);
+			}
 		}
 	}
 
@@ -93,16 +195,19 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 	public void contextInitialized(ServletContextEvent servletContextEvent) {
 		
 		try{
-			JobDetail jobDetails = new JobDetail(HarvestingJob.class.getSimpleName(), JobScheduler.class.getName(), HarvestingJob.class);
+			JobDetail jobDetails = new JobDetail(getClass().getSimpleName(), JobScheduler.class.getName(), HarvestingJob.class);
 			
 			HarvestingJobListener listener = new HarvestingJobListener();
 			jobDetails.addJobListener(listener.getName());
 			JobScheduler.registerJobListener(listener);
 			
-			JobScheduler.scheduleCronJob(GeneralConfig.getRequiredProperty(GeneralConfig.HARVESTER_JOB_CRON_EXPRESSION), jobDetails);
+			JobScheduler.scheduleIntervalJob((long)getIntervalSeconds().intValue()*(long)1000, jobDetails);
+			
+			logger.debug(getClass().getSimpleName() + " scheduled with interval seconds " + getIntervalSeconds()
+					+ ", batch harvesting hours = " + getBatchHarvestingHours());
 		}
-		catch (SchedulerException e){
-			logger.fatal("Error when scheduling " + HarvestingJob.class.getSimpleName() + ": " + e.toString(), e);
+		catch (Exception e){
+			logger.fatal("Error when scheduling " + getClass().getSimpleName() + " with interval seconds " + getIntervalSeconds(), e);
 		}
 	}
 
@@ -117,15 +222,166 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 	 * 
 	 * @return
 	 */
-	public static synchronized UrgentHarvestQueueItemDTO getCurrentlyHarvestedItem() {
-		return currentlyHarvestedItem;
+	public static synchronized Harvest getCurrentHarvest() {
+		return currentHarvest;
 	}
 
 	/**
 	 * 
 	 * @param item
 	 */
-	public static synchronized void setCurrentlyHarvestedItem(UrgentHarvestQueueItemDTO item) {
-		currentlyHarvestedItem = item;
+	public static synchronized void setCurrentHarvest(Harvest harvest) {
+		currentHarvest = harvest;
+	}
+	
+	/**
+	 * @return the activeHours
+	 */
+	public List<HourSpan> getBatchHarvestingHours() {
+		
+		if (batchHarvestingHours==null){
+			
+			batchHarvestingHours = new ArrayList<HourSpan>();
+			String hoursString = GeneralConfig.getProperty(GeneralConfig.HARVESTER_BATCH_HARVESTING_HOURS);
+			if (!StringUtils.isBlank(hoursString)){
+				
+				String[] spans = hoursString.trim().split(",");
+				for (int i=0; i<spans.length; i++){
+					
+					String span = spans[i].trim();
+					if (span.length()>0){
+						
+						String[] spanBoundaries = span.split("-");
+						
+						int from = Integer.parseInt(spanBoundaries[0].trim());
+						int to = Integer.parseInt(spanBoundaries[1].trim());
+						
+						from = Math.max(0, Math.min(23, from));
+						to = Math.max(0, Math.min(23, to));
+						if (to<from)
+							to = from;
+						
+						batchHarvestingHours.add(new HourSpan(from, to));
+					}
+				}
+			}
+		}
+		
+		return batchHarvestingHours;
+	}
+
+	/**
+	 * @return the intervalSeconds
+	 */
+	public Integer getIntervalSeconds() {
+		if (intervalSeconds==null){
+			intervalSeconds = Integer.parseInt(GeneralConfig.getRequiredProperty(GeneralConfig.HARVESTER_JOB_INTERVAL_SECONDS).trim());
+			intervalSeconds = Math.min(3600, intervalSeconds.intValue());
+			intervalSeconds = Math.max(5, intervalSeconds.intValue());
+		}
+		return intervalSeconds;
+	}
+
+	/**
+	 * @return the dailyActiveMinutes
+	 */
+	public Integer getDailyActiveMinutes() {
+
+		if (this.dailyActiveMinutes==null){
+
+			/* determine the amount of total active minutes in a day */
+
+			int dailyActiveMinutes = 0;
+			List<HourSpan> activeHours = getBatchHarvestingHours();
+			for (Iterator<HourSpan> iter=activeHours.iterator(); iter.hasNext();){
+				dailyActiveMinutes += ((iter.next().length())+1)*(int)60;
+			}
+
+			this.dailyActiveMinutes = dailyActiveMinutes>1440 ? new Integer(1440) : new Integer(dailyActiveMinutes);
+		}
+		
+		return this.dailyActiveMinutes;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	private boolean isBatchHarvestingHour(){
+		
+		boolean result = false;
+		
+		int currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+		List<HourSpan> activeHours = getBatchHarvestingHours();
+		for (Iterator<HourSpan> iter=activeHours.iterator(); iter.hasNext();){
+			if (iter.next().includes(currentHour)){
+				result = true;
+				break;
+			}
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	private boolean isBatchHarvestingEnabled(){
+		return getDailyActiveMinutes().intValue()>0;
+	}
+	
+	/**
+	 * 
+	 */
+	class HourSpan{
+		
+		/** */
+		private int from;
+		private int to;
+
+		/**
+		 * 
+		 * @param from
+		 * @param to
+		 */
+		HourSpan(int from, int to){
+			this.from = from;
+			this.to = to;
+		}
+		/**
+		 * @return the from
+		 */
+		public int getFrom() {
+			return from;
+		}
+		/**
+		 * @return the to
+		 */
+		public int getTo() {
+			return to;
+		}
+		/**
+		 * 
+		 * @return
+		 */
+		public int length(){
+			return to-from; // we assume the creator has made sure that to>=from
+		}
+		/**
+		 * 
+		 * @param hour
+		 * @return
+		 */
+		public boolean includes(int hour){
+			return hour>=from && hour<=to;
+		}
+		/*
+		 * (non-Javadoc)
+		 * @see java.lang.Object#toString()
+		 */
+		public String toString(){
+			return new StringBuffer().append(from).append("-").append(to).toString();
+		}
 	}
 }

@@ -67,6 +67,6 @@ public class UrgentHarvestQueueItemDTO implements Serializable{
 	 * @return
 	 */
 	public boolean isPushHarvest(){
-		return pushedContent!=null && pushedContent.length()>0;
+		return pushedContent!=null;
 	}
 }

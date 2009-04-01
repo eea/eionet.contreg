@@ -28,7 +28,7 @@ public class MySQLUrgentHarvestQueueDAO extends MySQLBaseDAO implements UrgentHa
 		
 		String valueStr = "(?,NOW())";
 		List<Object> values = new ArrayList<Object>();
-		StringBuffer buf = new StringBuffer("insert ignore into HARVEST_QUEUE (URL,TIMESTAMP) VALUES ");
+		StringBuffer buf = new StringBuffer("insert ignore into URGENT_HARVEST_QUEUE (URL,TIMESTAMP) VALUES ");
 		for (int i=0; i<queueItems.size(); i++){
 			UrgentHarvestQueueItemDTO dto = queueItems.get(i);
 			buf.append(i>0 ? "," : "").append(valueStr);
@@ -49,8 +49,7 @@ public class MySQLUrgentHarvestQueueDAO extends MySQLBaseDAO implements UrgentHa
 	}
 
 	/** */
-	private static final String addPushHarvestSQL = "insert ignore into HARVEST_QUEUE (URL,TIMESTAMP,PUSHED_CONTENT) VALUES (?,NOW(),?)";
-
+	private static final String addPushHarvestSQL = "insert ignore into URGENT_HARVEST_QUEUE (URL,TIMESTAMP,PUSHED_CONTENT) VALUES (?,NOW(),?)";
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.dao.HarvestQueueDAO#addPushHarvest(eionet.cr.dto.HarvestQueueItemDTO)
@@ -75,8 +74,7 @@ public class MySQLUrgentHarvestQueueDAO extends MySQLBaseDAO implements UrgentHa
 	}
 
 	/** */
-	private static final String getUrgentHarvestQueueSQL = "select * from HARVEST_QUEUE order by TIMESTAMP asc";
-
+	private static final String getUrgentHarvestQueueSQL = "select * from URGENT_HARVEST_QUEUE order by TIMESTAMP asc";
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.dao.HarvestQueueDAO#getUrgentHarvestQueue()
@@ -126,28 +124,8 @@ public class MySQLUrgentHarvestQueueDAO extends MySQLBaseDAO implements UrgentHa
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.dao.UrgentHarvestQueueDAO#peek()
-	 */
-	public UrgentHarvestQueueItemDTO peek() throws DAOException {
-		
-		Connection conn = null;
-		try{
-			conn = getConnection();
-			return peek(conn);
-		}
-		catch (SQLException e){
-			throw new DAOException(e.toString(), e);
-		}
-		finally{
-			SQLUtil.close(conn);
-		}
-	}
-
 	/** */
-	private static final String peekSQL = "select * from HARVEST_QUEUE order by TIMESTAMP asc limit 1";
-
+	private static final String peekSQL = "select * from URGENT_HARVEST_QUEUE order by TIMESTAMP asc limit 1";
 	/**
 	 * 
 	 * @param conn
@@ -165,28 +143,8 @@ public class MySQLUrgentHarvestQueueDAO extends MySQLBaseDAO implements UrgentHa
 		return (list!=null && !list.isEmpty()) ? list.get(0) : null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.dao.HarvestQueueDAO#deleteQueueItem(eionet.cr.dto.HarvestQueueItemDTO)
-	 */
-	public void deleteQueueItem(UrgentHarvestQueueItemDTO urgentHarvestQueueItemDTO) throws DAOException {
-		
-		Connection conn = null;
-		try{
-			conn = getConnection();
-			deleteQueueItem(urgentHarvestQueueItemDTO, conn);
-		}
-		catch (SQLException e){
-			throw new DAOException(e.toString(), e);
-		}
-		finally{
-			SQLUtil.close(conn);
-		}
-	}
-
 	/** */
-	private static final String deleteQueueItemSQL = "delete from HARVEST_QUEUE where URL=? and TIMESTAMP=?";
-
+	private static final String deleteQueueItemSQL = "delete from URGENT_HARVEST_QUEUE where URL=? and TIMESTAMP=?";
 	/**
 	 * 
 	 * @param queueItem

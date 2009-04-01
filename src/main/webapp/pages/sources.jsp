@@ -50,7 +50,7 @@
 						<input type="checkbox" name="sourceUrl" value="${harvestSource.url}"/>
 					</display:column>
 					<display:column property="url" title="URL" sortable="true"/>
-					<display:column property="lastHarvestDatetime" title="Last harvest" sortable="true"/>
+					<display:column property="lastHarvest" title="Last harvest" sortable="true"/>
 				</display:table>				
 			</div>
 			<div>

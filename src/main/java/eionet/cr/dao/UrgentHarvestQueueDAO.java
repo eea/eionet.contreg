@@ -36,18 +36,4 @@ public interface UrgentHarvestQueueDAO {
 	 * @throws DAOException
 	 */
 	public abstract UrgentHarvestQueueItemDTO poll() throws DAOException;
-
-	/**
-	 * 
-	 * @return
-	 * @throws DAOException
-	 */
-	public abstract UrgentHarvestQueueItemDTO peek() throws DAOException;
-	
-	/**
-	 * 
-	 * @return
-	 * @throws DAOException
-	 */
-	public abstract void deleteQueueItem(UrgentHarvestQueueItemDTO urgentHarvestQueueItemDTO) throws DAOException;
 }

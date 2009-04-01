@@ -15,7 +15,10 @@ import org.apache.commons.logging.LogFactory;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
+import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.UrgentHarvestQueueItemDTO;
+import eionet.cr.harvest.Harvest;
+import eionet.cr.harvest.scheduled.HarvestingJob;
 import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.util.Util;
 
@@ -28,26 +31,27 @@ import eionet.cr.util.Util;
 public class HarvestQueueActionBean extends AbstractActionBean{
 	
 	/** */
-	private static final String PRIORITY_NORMAL = "normal";
-	private static final String PRIORITY_URGENT = "urgent";
+	private static final String TYPE_BATCH = "batch";
+	private static final String TYPE_URGENT = "urgent";
 
 	/** */
 	private static Log logger = LogFactory.getLog(HarvestQueueActionBean.class);
 	
 	/** */
-	private static List<Map<String, String>> priorities;
+	private static List<Map<String, String>> queueTypes;
 	
 	/** */
-	private String priority;
+	private String queueType;
 	
 	/** */
-	private List<UrgentHarvestQueueItemDTO> list;
+	private List<UrgentHarvestQueueItemDTO> urgentQueue;
+	private List<HarvestSourceDTO> batchQueue;
 	
 	/**
 	 * 
 	 */
 	public HarvestQueueActionBean(){
-		setPriority(PRIORITY_URGENT);
+		setQueueType(TYPE_URGENT);
 	}
 	
 	/**
@@ -58,11 +62,11 @@ public class HarvestQueueActionBean extends AbstractActionBean{
 	@DefaultHandler
 	public Resolution view() throws DAOException{
 		
-		if (!Util.isNullOrEmpty(getPriority())){
-			if (getPriority().equals(PRIORITY_NORMAL))
-				list = null; // FIXME
-			else
-				list = DAOFactory.getDAOFactory().getHarvestQueueDAO().getUrgentHarvestQueue();
+		if (getQueueType().equals(TYPE_BATCH)){
+			batchQueue = HarvestingJob.getBatchHarvestingQueue();
+		}
+		else{
+			urgentQueue = DAOFactory.getDAOFactory().getUrgentHarvestQueueDAO().getUrgentHarvestQueue();
 		}
 		
 		return new ForwardResolution("/pages/harvestQueue.jsp");
@@ -70,47 +74,74 @@ public class HarvestQueueActionBean extends AbstractActionBean{
 
 
 	/**
-	 * @return the priority
+	 * @return the queueType
 	 */
-	public String getPriority() {
-		return priority;
+	public String getQueueType() {
+		
+		if (queueType==null){
+			queueType = TYPE_URGENT;
+		}
+		return queueType;
 	}
 
 	/**
-	 * @param priority the priority to set
+	 * @param queueType the queueType to set
 	 */
-	public void setPriority(String priority) {
-		this.priority = priority;
+	public void setQueueType(String queueType) {
+		this.queueType = queueType;
 	}
 
 	/**
 	 * @return the list
 	 */
-	public List<UrgentHarvestQueueItemDTO> getList() {
-		return list;
+	public List<UrgentHarvestQueueItemDTO> getUrgentQueue() {
+		return urgentQueue;
+	}
+
+	/**
+	 * @return the batchQueue
+	 */
+	public List<HarvestSourceDTO> getBatchQueue() {
+		return batchQueue;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public List<Map<String, String>> getQueueTypes(){
+		
+		if (queueTypes==null){
+			
+			queueTypes = new ArrayList<Map<String,String>>();
+			
+			Map<String,String> queueType = new HashMap<String,String>();
+			queueType.put("title", "Urgent queue");
+			queueType.put("queueType", TYPE_URGENT);
+			queueTypes.add(queueType);
+
+			queueType = new HashMap<String,String>();
+			queueType.put("title", "Batch queue");
+			queueType.put("queueType", TYPE_BATCH);
+			queueTypes.add(queueType);
+		}
+		
+		return queueTypes;
 	}
 	
 	/**
 	 * 
 	 * @return
 	 */
-	public List<Map<String, String>> getPriorities(){
-		
-		if (priorities==null){
-			
-			priorities = new ArrayList<Map<String,String>>();
-			
-			Map<String,String> priorityMap = new HashMap<String,String>();
-			priorityMap.put("title", "Urgent queue");
-			priorityMap.put("priority", PRIORITY_URGENT);
-			priorities.add(priorityMap);
+	public boolean isTypeUrgent(){
+		return getQueueType().equals(TYPE_URGENT);
+	}
 
-			priorityMap = new HashMap<String,String>();
-			priorityMap.put("title", "Normal queue");
-			priorityMap.put("priority", PRIORITY_NORMAL);
-			priorities.add(priorityMap);
-		}
-		
-		return priorities;
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isTypeBatch(){
+		return getQueueType().equals(TYPE_BATCH);
 	}
 }

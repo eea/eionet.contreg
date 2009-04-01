@@ -90,12 +90,15 @@ public abstract class Harvest {
 			doHarvestStartedActions();
 			doExecute();
 		}
-		catch (Throwable t){
-			fatalError = t;
-			if (t instanceof HarvestException)
-				throw (HarvestException)t;
+		catch (Exception e){
+			
+			fatalError = e;
+			try{ logger.error("Exception when harvesting [" + sourceUrlString + "]: " + e.toString(), e); }catch (Exception ee){}
+			
+			if (e instanceof HarvestException)
+				throw (HarvestException)e;
 			else
-				throw new HarvestException("Exception when harvesting [" + sourceUrlString + "]: " + t.toString(), t);
+				throw new HarvestException(e.toString(), e);
 		}
 		finally{
 			doHarvestFinishedActions();
@@ -118,15 +121,17 @@ public abstract class Harvest {
 		
 		InputStream inputStream = null;
 		try{
-			file = preProcess(file, sourceUrlString);
-			if (file==null)
-				return;
-			
-	        inputStream = new FileInputStream(file);
+			try{
+				file = preProcess(file, sourceUrlString);
+				if (file==null)
+					return;
+				
+		        inputStream = new FileInputStream(file);
+			}
+			catch (Exception e){
+				throw new HarvestException(e.toString(), e);
+			}
 	        harvest(new InputStreamBasedARPSource(inputStream));
-		}
-		catch (Exception e){
-			throw new HarvestException("Exception when harvesting [" + sourceUrlString + "]: " + e.toString(), e);
 		}
 		finally{
 			try{
@@ -184,7 +189,7 @@ public abstract class Harvest {
 			}
 			
 			Throwable t = (e instanceof LoadException) && e.getCause()!=null ? e.getCause() : e;
-			throw new HarvestException("Exception when harvesting [" + sourceUrlString + "]: " + t.toString(), t);
+			throw new HarvestException(t.toString(), t);
 		}
 		finally{
 			try{

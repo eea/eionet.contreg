@@ -14,7 +14,7 @@ import eionet.cr.dto.HarvestSourceDTO;
 public class HarvestSourcesTableDecorator extends TableDecorator{
 	
 	/** */
-	private SimpleDateFormat lastHarvestDatetimeFormat = new SimpleDateFormat("dd-MM-yy HH:mm:ss");
+	private SimpleDateFormat lastHarvestFormat = new SimpleDateFormat("dd-MM-yy HH:mm:ss");
 
 	/**
 	 * 
@@ -36,11 +36,11 @@ public class HarvestSourcesTableDecorator extends TableDecorator{
 	 * 
 	 * @return
 	 */
-	public String getLastHarvestDatetime(){
+	public String getLastHarvest(){
 		
 		HarvestSourceDTO harvestSource = (HarvestSourceDTO) getCurrentRowObject();
-		if (harvestSource.getLastHarvestDatetime()!=null)
-			return lastHarvestDatetimeFormat.format(harvestSource.getLastHarvestDatetime());
+		if (harvestSource.getLastHarvest()!=null)
+			return lastHarvestFormat.format(harvestSource.getLastHarvest());
 		else
 			return "&nbsp;";
 	}

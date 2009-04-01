@@ -13,7 +13,7 @@
 		<c:choose>
 			<c:when test="${actionBean.harvestSource!=null}">
 			
-				<c:if test="${not empty actionBean.currentlyHarvestedQueueItem && (actionBean.currentlyHarvestedQueueItem.url==actionBean.harvestSource.url)}">
+				<c:if test="${not empty actionBean.currentHarvest && (actionBean.currentHarvest.sourceUrlString==actionBean.harvestSource.url)}">
 					<div class="important-msg" style="margin-bottom:10px">This source is being harvested right now!</div>
 				</c:if>
 				
@@ -43,7 +43,7 @@
 			            <tr>
 			                <td>Date created:</td>
 			                <td>
-			                	<c:out value="${actionBean.harvestSource.dateCreated}"/>
+			                	<c:out value="${actionBean.harvestSource.timeCreated}"/>
 			                </td>
 			            </tr>
 			            <tr>
@@ -67,7 +67,7 @@
 			            <tr>
 			                <td>Last harvest:</td>
 			                <td>
-			                	<c:out value="${actionBean.harvestSource.lastHarvestDatetime}"/>
+			                	<c:out value="${actionBean.harvestSource.lastHarvest}"/>
 			                </td>
 			            </tr>
 		           		<c:if test="${actionBean.harvestSource.unavailable}">

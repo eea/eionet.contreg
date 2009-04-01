@@ -411,4 +411,13 @@ public class Util {
 		else
 			return CronExpression.isValidExpression(expression);
 	}
+	
+	/**
+	 * 
+	 * @param args
+	 */
+	public static void main(String[] args){
+		System.out.println(30/60);
+		//System.out.println(isValidQuartzCronExpression("0/3600 0 9-10 * * ?"));
+	}
 }

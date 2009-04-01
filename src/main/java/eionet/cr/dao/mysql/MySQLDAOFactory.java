@@ -47,7 +47,7 @@ public class MySQLDAOFactory extends DAOFactory {
 	 * (non-Javadoc)
 	 * @see eionet.cr.dao.DAOFactory#getHarvestQueueDAO()
 	 */
-	public UrgentHarvestQueueDAO getHarvestQueueDAO() {
+	public UrgentHarvestQueueDAO getUrgentHarvestQueueDAO() {
 		return new MySQLUrgentHarvestQueueDAO();
 	}
 }

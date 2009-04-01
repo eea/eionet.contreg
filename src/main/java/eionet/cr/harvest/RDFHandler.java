@@ -575,7 +575,7 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 				String.valueOf(HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL)));
 		
 		StringBuffer buf = new StringBuffer().
-		append("insert ignore into HARVEST_SOURCE (NAME, URL, TYPE, DATE_CREATED, CREATOR, INTERVAL_MINUTES, SOURCE, GEN_TIME) ").
+		append("insert ignore into HARVEST_SOURCE (NAME, URL, TYPE, TIME_CREATED, CREATOR, INTERVAL_MINUTES, SOURCE, GEN_TIME) ").
 		append("select SPO_TEMP_SOURCE.OBJECT, SPO_TEMP_SOURCE.OBJECT, '").append(DedicatedHarvestSourceTypes.qawSource).
 		append("', now(), '").append(CRUser.application.getUserName()).
 		append("', '").append(interval).append("', ").append(sourceUrlHash).append(", ").append(genTime).
@@ -590,7 +590,7 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 		/* handle delivered files */
 		
 		buf = new StringBuffer().
-		append("insert ignore into HARVEST_SOURCE (NAME, URL, TYPE, DATE_CREATED, CREATOR, INTERVAL_MINUTES, SOURCE, GEN_TIME) ").
+		append("insert ignore into HARVEST_SOURCE (NAME, URL, TYPE, TIME_CREATED, CREATOR, INTERVAL_MINUTES, SOURCE, GEN_TIME) ").
 		append("select URI, URI, '").append(DedicatedHarvestSourceTypes.deliveredFile).
 		append("', now(), '").append(CRUser.application.getUserName()).
 		append("', '").append(interval).append("', ").append(sourceUrlHash).append(", ").append(genTime).
