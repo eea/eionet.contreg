@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:owl="http://www.w3.org/2002/07/owl#"
+         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+
+	<rdf:Description rdf:about="">
+		<rdfs:label>Tabular relations schema</rdfs:label>
+                <!-- Any benefit in declaring this an OWL schema? -->
+	</rdf:Description>
+
+	<rdfs:Class rdf:ID="Index">
+		<rdfs:label>Index</rdfs:label>
+		<rdfs:comment>An index on a relational database table</rdfs:comment>
+	</rdfs:Class>
+
+	<rdf:Property rdf:ID="has_index">
+		<rdfs:label>Index</rdfs:label>
+                <rdfs:domain rdf:resource="http://www.w3.org/2000/01/rdf-schema#Class"/>
+                <rdfs:range rdf:resource="#Index"/>
+	</rdf:Property>
+
+	<rdf:Property rdf:ID="has_key">
+		<rdfs:label>Key</rdfs:label>
+                <rdfs:domain rdf:resource="#Index"/>
+	</rdf:Property>
+
+	<rdf:Property rdf:ID="references">
+		<rdfs:label>References</rdfs:label>
+                <rdfs:range rdf:resource="#Index"/>
+                <rdfs:domain rdf:resource="#Index"/>
+	</rdf:Property>
+
+	<rdf:Property rdf:ID="key_type_is">
+		<rdfs:label>Key type</rdfs:label>
+                <rdfs:domain rdf:resource="#Index"/>
+                <rdfs:comment>Specifies whether key is 'Unique' or 'Multiple'</rdfs:comment>
+	</rdf:Property>
+
+</rdf:RDF>
