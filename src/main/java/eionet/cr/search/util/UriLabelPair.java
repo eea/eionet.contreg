@@ -74,4 +74,12 @@ public class UriLabelPair implements Comparable{
 	public void setLabel(String label) {
 		this.label = label;
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	public String toString(){
+		return new StringBuffer().append(uri).append(" [").append(label).append("]").toString();
+	}
 }
