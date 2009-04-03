@@ -37,8 +37,6 @@ import eionet.cr.common.Predicates;
 import eionet.cr.common.SubProperties;
 import eionet.cr.common.Subjects;
 import eionet.cr.config.GeneralConfig;
-import eionet.cr.dto.RodInstrumentDTO;
-import eionet.cr.dto.RodObligationDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.util.HitsCollector;
 import eionet.cr.search.util.SearchUtil;
@@ -262,76 +260,6 @@ public class LuceneBasedSearcher {
 					indexSearcher.close();
 			}
 			catch (IOException e){}
-		}
-	}
-
-	/**
-	 * 
-	 * @return
-	 * @throws SearchException
-	 */
-	public static List<RodInstrumentDTO> getDataflowsGroupedByInstruments() throws SearchException{
-
-		if (true)
-			return new ArrayList<RodInstrumentDTO>();
-		
-		StringBuffer qryBuf = new StringBuffer(Util.luceneEscape(Predicates.RDF_TYPE));
-		qryBuf.append(":\"").append(Util.luceneEscape(Subjects.ROD_OBLIGATION_CLASS)).append("\"");
-		
-		logger.debug("Performing search query: " + qryBuf.toString());
-		
-		Map<String,RodInstrumentDTO> instrumentsMap = new HashMap<String,RodInstrumentDTO>();
-		IndexSearcher indexSearcher = null;
-		try{
-			indexSearcher = getIndexSearcher();
-			
-			QueryParser parser = new QueryParser(DEFAULT_FIELD, new KeywordAnalyzer());
-			Query queryObj = parser.parse(qryBuf.toString());
-
-			Hits hits = indexSearcher.search(queryObj);
-			for (int i=0; hits!=null && i<hits.length(); i++){
-				
-				Document doc = hits.doc(i);
-				String instrumentId = doc.get(Predicates.ROD_INSTRUMENT_PROPERTY);
-				if (instrumentId!=null && instrumentId.length()>0){
-					String instrumentLabel = EncodingSchemes.getLabel(instrumentId);
-					if (instrumentLabel!=null && instrumentLabel.length()>0){
-						String obligationLabel = doc.get(Predicates.RDFS_LABEL);
-						if (obligationLabel==null || obligationLabel.length()==0)
-							obligationLabel = doc.get(Predicates.DC_TITLE);
-						
-						if (obligationLabel!=null && obligationLabel.length()>0){
-							String obligationId = doc.get(LuceneBasedSearcher.DOC_ID);
-							if (obligationId!=null && obligationId.length()>0){
-								
-								RodInstrumentDTO instrumentDTO = instrumentsMap.get(instrumentId);
-								if (instrumentDTO==null)
-									instrumentDTO = new RodInstrumentDTO(instrumentId, instrumentLabel);
-								instrumentDTO.addObligation(new RodObligationDTO(obligationId, obligationLabel));
-								instrumentsMap.put(instrumentId, instrumentDTO);
-							}
-						}
-					}
-				}
-			}
-		}
-		catch (Exception e){
-			throw new SearchException(e.toString(), e);
-		}
-		finally{
-			try{
-				if (indexSearcher!=null)
-					indexSearcher.close();
-			}
-			catch (IOException e){}
-		}
-		
-		if (instrumentsMap.isEmpty())
-			return null;
-		else{
-			List<RodInstrumentDTO> resultList = new ArrayList(instrumentsMap.values());
-			Collections.sort(resultList);
-			return resultList;
 		}
 	}
 

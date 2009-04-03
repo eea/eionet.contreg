@@ -47,7 +47,7 @@ public class SubjectDataReader extends ResultSetBaseReader{
 		String subjectUri = rs.getString("SUBJECT_URI");
 		boolean newSubject = currentSubject==null || !currentSubject.getUri().equals(subjectUri);
 		if (newSubject){
-			String subjectHash = rs.getString("SUBJECT");
+			String subjectHash = rs.getString("SUBJECT_HASH");
 			currentSubject = new SubjectDTO(subjectUri, YesNoBoolean.parse(rs.getString("ANON_SUBJ")));
 			addNewSubject(subjectHash, currentSubject);
 		}

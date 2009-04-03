@@ -4,6 +4,7 @@ import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 
 import eionet.cr.common.CRRuntimeException;
+import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 
 /**
@@ -101,6 +102,10 @@ public class Hashes {
 	}
 	
 	public static void main(String[] args){
-		System.out.println(spoHash(Subjects.QAW_RESOURCE_CLASS));
+		System.out.println(spoHash(Subjects.ROD_OBLIGATION_CLASS));
+		System.out.println(spoHash(Predicates.RDF_TYPE));
+		System.out.println(spoHash(Predicates.DC_TITLE));
+		System.out.println(spoHash(Predicates.ROD_INSTRUMENT_PROPERTY));
+		System.out.println(spoHash(Predicates.DCTERMS_ALTERNATIVE));
 	}
 }

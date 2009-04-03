@@ -18,16 +18,18 @@ import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.dto.ObjectDTO;
-import eionet.cr.dto.RodInstrumentDTO;
-import eionet.cr.dto.RodObligationDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.CustomSearch;
+import eionet.cr.search.DataflowPicklistSearch;
 import eionet.cr.search.PicklistSearch;
 import eionet.cr.search.SearchException;
+import eionet.cr.search.util.UriLabelPair;
 import eionet.cr.web.util.search.PredicateBasedColumn;
 import eionet.cr.web.util.search.SearchResultColumn;
 
@@ -39,12 +41,14 @@ import eionet.cr.web.util.search.SearchResultColumn;
 @UrlBinding("/dataflowSearch.action")
 public class DataflowSearchActionBean extends AbstractSearchActionBean{
 	
-	private static final String DATAFLOWS_SESSION_ATTR_NAME = DataflowSearchActionBean.class + ".dataflows";
-	private static final String LOCALITIES_SESSION_ATTR_NAME = DataflowSearchActionBean.class + ".localities";
+	/** */
+	private static Log logger = LogFactory.getLog(DataflowSearchActionBean.class);
 	
 	/** */
-	private List<RodInstrumentDTO> instrumentsObligations;
-	private Set<String> localities;
+	private static final String DATAFLOWS_SESSION_ATTR_NAME = DataflowSearchActionBean.class + ".dataflows";
+	private static final String LOCALITIES_SESSION_ATTR_NAME = DataflowSearchActionBean.class + ".localities";
+
+	/** */
 	private List<String> years;
 	
 	/** */
@@ -83,12 +87,18 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean{
 		
 		if (session.getAttribute(DATAFLOWS_SESSION_ATTR_NAME)!=null)
 			return;
+
+		long start = System.currentTimeMillis();
 		
-		CustomSearch customSearch = new CustomSearch(CustomSearch.singletonCriteria(Predicates.RDF_TYPE, Subjects.ROD_OBLIGATION_CLASS));
-		customSearch.setNoLimit();
-		customSearch.execute();
+		DataflowPicklistSearch search = new DataflowPicklistSearch();
+		search.execute();
 		
-		session.setAttribute(DATAFLOWS_SESSION_ATTR_NAME, createDataflowsGroupByInstruments(customSearch.getResultList()));
+		logger.debug("Dataflow search executed with " + (System.currentTimeMillis()-start) + " ms");
+		start = System.currentTimeMillis();
+		
+		session.setAttribute(DATAFLOWS_SESSION_ATTR_NAME, search.getResultMap());
+		
+		logger.debug("Dataflow search results sorted with " + (System.currentTimeMillis() - start) + " ms");
 	}
 
 	/**
@@ -109,48 +119,6 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean{
 
 	/**
 	 * 
-	 * @param dataflowSubjects
-	 * @return
-	 */
-	private List<RodInstrumentDTO> createDataflowsGroupByInstruments(Collection<SubjectDTO> dataflowSubjects) {
-		
-		List<RodInstrumentDTO> result = new ArrayList<RodInstrumentDTO>();
-		if (dataflowSubjects==null || dataflowSubjects.isEmpty())
-			return result;
-		
-		Map<String,RodInstrumentDTO> instrumentsMap = new HashMap<String,RodInstrumentDTO>();
-		for (Iterator<SubjectDTO> iter=dataflowSubjects.iterator(); iter.hasNext();){
-			
-			SubjectDTO subjectDTO = iter.next();
-			String instrumentLabel = subjectDTO.getObjectValue(Predicates.ROD_INSTRUMENT_PROPERTY, ObjectDTO.Type.LITERAL);
-			if (!StringUtils.isBlank(instrumentLabel)){
-				
-				String obligationLabel = subjectDTO.getObjectValue(Predicates.RDFS_LABEL, ObjectDTO.Type.LITERAL);
-				if (StringUtils.isBlank(obligationLabel))
-					obligationLabel = subjectDTO.getObjectValue(Predicates.DC_TITLE, ObjectDTO.Type.LITERAL);
-				
-				if (!StringUtils.isBlank(obligationLabel) && !StringUtils.isBlank(subjectDTO.getUri())){
-					
-					RodInstrumentDTO instrumentDTO = instrumentsMap.get(instrumentLabel);
-					if (instrumentDTO==null){
-						instrumentDTO = new RodInstrumentDTO("", instrumentLabel);
-						instrumentsMap.put(instrumentLabel, instrumentDTO);
-					}
-					instrumentDTO.addObligation(new RodObligationDTO(subjectDTO.getUri(), obligationLabel));
-				}
-			}
-		}
-		
-		if (!instrumentsMap.isEmpty()){
-			result.addAll(instrumentsMap.values());
-			Collections.sort(result);
-		}
-		
-		return result;
-	}
-
-	/**
-	 * 
 	 * @return
 	 * @throws SearchException 
 	 */
@@ -164,6 +132,8 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean{
 		customSearch.execute();
 		
 		resultList = customSearch.getResultList();
+		matchCount = customSearch.getTotalMatchCount();
+		
 		return new ForwardResolution("/pages/dataflowSearch.jsp");
 	}
 
@@ -191,8 +161,8 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean{
 	/**
 	 * @return the instrumentsObligations
 	 */
-	public List<RodInstrumentDTO> getInstrumentsObligations() {
-		return (List<RodInstrumentDTO>) getContext().getRequest().getSession().getAttribute(DATAFLOWS_SESSION_ATTR_NAME);
+	public HashMap<String,ArrayList<UriLabelPair>> getInstrumentsObligations() {
+		return (HashMap<String,ArrayList<UriLabelPair>>)getContext().getRequest().getSession().getAttribute(DATAFLOWS_SESSION_ATTR_NAME);
 	}
 
 	/**
