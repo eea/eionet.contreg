@@ -18,7 +18,11 @@ import eionet.cr.util.URLUtil;
 public class SubjectDTO{
 	
 	/** */
+	public static final String URI_ANONYMOUS = "anonymous";
+	
+	/** */
 	private String uri;
+	private String uriHash;
 	private boolean anonymous;
 	private Map<String,Collection<ObjectDTO>> predicates;
 	private Date firstSeenTime;
@@ -30,7 +34,7 @@ public class SubjectDTO{
 	 */
 	public SubjectDTO(String uri, boolean anonymous){
 		
-		this.uri = uri;
+		this.uri = anonymous==false ? uri : URI_ANONYMOUS;
 		this.anonymous = anonymous;
 		predicates = new HashMap<String,Collection<ObjectDTO>>();
 	}
@@ -215,5 +219,19 @@ public class SubjectDTO{
 	 */
 	public void setFirstSeenTime(Date firstSeenTime) {
 		this.firstSeenTime = firstSeenTime;
+	}
+
+	/**
+	 * @return the uriHash
+	 */
+	public String getUriHash() {
+		return uriHash;
+	}
+
+	/**
+	 * @param uriHash the uriHash to set
+	 */
+	public void setUriHash(String uriHash) {
+		this.uriHash = uriHash;
 	}
 }

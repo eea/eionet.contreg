@@ -59,7 +59,7 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean {
     	if (!searchExpression.isEmpty()){
 	    	if (searchExpression.isUri()){
 	    		
-	    		UriSearch uriSearch = new UriSearch(searchExpression);
+	    		UriSearch uriSearch = new UriSearch(searchExpression.toString());
 	    		uriSearch.setPageNumber(getPageN());
 	    		uriSearch.setSorting(getSortP(), getSortO());
 	    		

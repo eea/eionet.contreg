@@ -64,8 +64,8 @@ public class UriLabelPair implements Comparable{
 	/**
 	 * @param uri the uri to set
 	 */
-	public void setUri(String value) {
-		this.uri = value;
+	public void setUri(String uri) {
+		this.uri = uri;
 	}
 
 	/**

@@ -183,7 +183,7 @@ public abstract class AbstractSubjectSearch {
 			append("left join RESOURCE as SRC_RESOURCE on (SOURCE=SRC_RESOURCE.URI_HASH) ").
 			append("left join RESOURCE as DSRC_RESOURCE on (OBJ_DERIV_SOURCE=DSRC_RESOURCE.URI_HASH) ").
 		append("where ").
-			append("SUBJECT in (").append(subjectHashes).append(") ").
+			append("SUBJECT in (").append(subjectHashes).append(") ").  
 		append("order by ").
 			append("SUBJECT, PREDICATE, OBJECT");
 		

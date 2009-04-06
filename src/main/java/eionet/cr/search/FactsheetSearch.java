@@ -40,6 +40,14 @@ public class FactsheetSearch extends UriSearch {
 
 	/**
 	 * 
+	 * @param uriHash
+	 */
+	public FactsheetSearch(Long uriHash) {
+		super(uriHash);
+	}
+
+	/**
+	 * 
 	 * @return
 	 */
 	public PredicateLabels getPredicateLabels(){

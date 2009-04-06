@@ -44,11 +44,11 @@ public class SubjectDataReader extends ResultSetBaseReader{
 	 */
 	public void readRow(ResultSet rs) throws SQLException {
 		
-		String subjectUri = rs.getString("SUBJECT_URI");
-		boolean newSubject = currentSubject==null || !currentSubject.getUri().equals(subjectUri);
+		String subjectHash = rs.getString("SUBJECT_HASH");
+		boolean newSubject = currentSubject==null || !subjectHash.equals(currentSubject.getUriHash());
 		if (newSubject){
-			String subjectHash = rs.getString("SUBJECT_HASH");
-			currentSubject = new SubjectDTO(subjectUri, YesNoBoolean.parse(rs.getString("ANON_SUBJ")));
+			currentSubject = new SubjectDTO(rs.getString("SUBJECT_URI"), YesNoBoolean.parse(rs.getString("ANON_SUBJ")));
+			currentSubject.setUriHash(subjectHash);
 			addNewSubject(subjectHash, currentSubject);
 		}
 		

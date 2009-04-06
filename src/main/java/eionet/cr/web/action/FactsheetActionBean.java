@@ -34,6 +34,7 @@ public class FactsheetActionBean extends AbstractActionBean{
 
 	/** */
 	private String uri;
+	private Long uriHash;
 	private SubjectDTO subject;
 	
 	/** */
@@ -48,7 +49,7 @@ public class FactsheetActionBean extends AbstractActionBean{
 	@DefaultHandler
 	public Resolution view() throws SearchException{
 		
-		FactsheetSearch factsheetSearch = new FactsheetSearch(uri);
+		FactsheetSearch factsheetSearch = uriHash==null ? new FactsheetSearch(uri) : new FactsheetSearch(uriHash);
 		factsheetSearch.execute();
 		Collection<SubjectDTO> coll = factsheetSearch.getResultList();
 		if (coll!=null && !coll.isEmpty())
@@ -112,5 +113,19 @@ public class FactsheetActionBean extends AbstractActionBean{
 	 */
 	public SubProperties getSubProperties() {
 		return subProperties;
+	}
+
+	/**
+	 * @return the uriHash
+	 */
+	public Long getUriHash() {
+		return uriHash;
+	}
+
+	/**
+	 * @param uriHash the uriHash to set
+	 */
+	public void setUriHash(Long uriHash) {
+		this.uriHash = uriHash;
 	}
 }

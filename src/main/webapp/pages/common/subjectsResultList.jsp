@@ -88,7 +88,14 @@
 								<td>
 									<stripes:link href="/factsheet.action">
 										<img src="${pageContext.request.contextPath}/images/view2.gif" title="View factsheet" alt="View factsheet"/>
-										<stripes:param name="uri" value="${resultListItem.uri}" />
+										<c:choose>
+											<c:when test="${resultListItem.anonymous}">
+												<stripes:param name="uriHash" value="${resultListItem.uriHash}" />
+											</c:when>
+											<c:otherwise>
+												<stripes:param name="uri" value="${resultListItem.uri}" />
+											</c:otherwise>
+										</c:choose>
 									</stripes:link>									
 								</td>
 							</tr>

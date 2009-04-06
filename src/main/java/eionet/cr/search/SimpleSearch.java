@@ -52,9 +52,9 @@ public class SimpleSearch extends AbstractSubjectSearch{
 		}
 		
 		if (searchExpression.isExactPhrase())
-			sqlBuf.append(" where SPO.ANON_SUBJ='N' and SPO.OBJECT like ?");
+			sqlBuf.append(" where SPO.OBJECT like ?");
 		else
-			sqlBuf.append(" where SPO.ANON_SUBJ='N' and match(SPO.OBJECT) against (?)");
+			sqlBuf.append(" where match(SPO.OBJECT) against (?)");
 		inParameters.add(searchExpression.toString());
 		
 		if (sortPredicate!=null)

@@ -93,12 +93,10 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean{
 		DataflowPicklistSearch search = new DataflowPicklistSearch();
 		search.execute();
 		
-		logger.debug("Dataflow search executed with " + (System.currentTimeMillis()-start) + " ms");
+		logger.debug("Dataflow search executed and result map collected with " + (System.currentTimeMillis()-start) + " ms");
 		start = System.currentTimeMillis();
 		
 		session.setAttribute(DATAFLOWS_SESSION_ATTR_NAME, search.getResultMap());
-		
-		logger.debug("Dataflow search results sorted with " + (System.currentTimeMillis() - start) + " ms");
 	}
 
 	/**

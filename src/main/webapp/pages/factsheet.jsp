@@ -11,10 +11,15 @@
 	    <c:choose>
 		    <c:when test="${actionBean.subject!=null}">		    
 		    	<c:set var="subjectUrl" value="${actionBean.subject.url}"/>
-		    	<div style="margin-top:20px">	    	
-	    			<c:if test="${subjectUrl!=null}">
-	    				<p>Resource URL: <a href="${fn:escapeXml(subjectUrl)}"><c:out value="${subjectUrl}"/></a></p>
-	    			</c:if>
+		    	<div style="margin-top:20px">
+		    		<c:choose>
+		    			<c:when test="${subjectUrl!=null}">
+		    				<p>Resource URL: <a href="${fn:escapeXml(subjectUrl)}"><c:out value="${subjectUrl}"/></a></p>
+		    			</c:when>
+		    			<c:otherwise>
+		    				<p class="tip-msg">This is an anonymous resource!</p>
+		    			</c:otherwise>
+		    		</c:choose>
 		    		<c:if test="${actionBean.subject.predicates!=null && fn:length(actionBean.subject.predicates)>0}">
 				    	<table class="datatable" width="100%" cellspacing="0" summary="">
 				    		<thead>
@@ -74,7 +79,9 @@
 			    </div>				    
 		    </c:when>
 		    <c:otherwise>
-				Nothing is known about this resource! 
+		    	<div style="margin-top:20px">
+					<p class="note-msg">Nothing is known about this resource!</p>
+				</div>
 			</c:otherwise>
 		</c:choose>
 				

@@ -22,22 +22,26 @@ import eionet.cr.util.Hashes;
 public class UriSearch extends AbstractSubjectSearch{
 	
 	/** */
-	private SearchExpression uri;
+	private String uri;
+	private Long uriHash;
 	
 	/**
 	 * 
 	 * @param uri
 	 */
-	public UriSearch(SearchExpression uri){
+	public UriSearch(String uri){
 		this.uri = uri;
+		if (uri!=null){
+			uriHash = new Long(Hashes.spoHash(uri));
+		}
 	}
 
 	/**
 	 * 
-	 * @param uri
+	 * @param uriHash
 	 */
-	public UriSearch(String uri){
-		this(new SearchExpression(uri));
+	public UriSearch(Long uriHash){
+		this.uriHash = uriHash;
 	}
 
 	/*
@@ -46,24 +50,10 @@ public class UriSearch extends AbstractSubjectSearch{
 	 */
 	protected String getSubjectSelectSQL(List inParameters) {
 		
-		if (uri==null || uri.isEmpty())
+		if (uriHash==null)
 			return null;
 		
-		inParameters.add(Hashes.spoHash(uri.toString()));
+		inParameters.add(uriHash);
 		return "select sql_calc_found_rows distinct SUBJECT as SUBJECT_HASH from SPO where SUBJECT=?";
-	}
-
-	/**
-	 * @return the uri
-	 */
-	public SearchExpression getUri() {
-		return uri;
-	}
-
-	/**
-	 * @param uri the uri to set
-	 */
-	public void setUri(SearchExpression uri) {
-		this.uri = uri;
 	}
 }
