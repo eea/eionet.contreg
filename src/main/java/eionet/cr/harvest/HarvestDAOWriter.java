@@ -1,5 +1,6 @@
 package eionet.cr.harvest;
 
+import java.util.Iterator;
 import java.util.List;
 
 import eionet.cr.dao.DAOException;
@@ -74,6 +75,20 @@ public class HarvestDAOWriter {
 		// save errors and warnings
 		writeThrowables(harvest.getErrors(), Harvest.ERROR);
 		writeThrowables(harvest.getWarnings(), Harvest.WARNING);
+		
+		// save infos
+		List<String> infos = harvest.getInfos();
+		if (infos!=null && !infos.isEmpty()){
+			for (Iterator<String> i=infos.iterator(); i.hasNext();){
+				
+				HarvestMessageDTO harvestMessageDTO = new HarvestMessageDTO();
+				harvestMessageDTO.setHarvestId(new Integer(harvestId));
+				harvestMessageDTO.setType(Harvest.INFO);
+				harvestMessageDTO.setMessage(i.next());
+				harvestMessageDTO.setStackTrace("");
+				DAOFactory.getDAOFactory().getHarvestMessageDAO().insertHarvestMessage(harvestMessageDTO);
+			}
+		}
 	}
 	
 	/**

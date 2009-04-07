@@ -30,6 +30,7 @@ public class HarvestActionBean extends AbstractActionBean {
 	private List<HarvestMessageDTO> fatals;
 	private List<HarvestMessageDTO> errors;
 	private List<HarvestMessageDTO> warnings;
+	private List<HarvestMessageDTO> infos;
 	
 	/**
 	 * 
@@ -37,7 +38,7 @@ public class HarvestActionBean extends AbstractActionBean {
 	 * @throws DAOException 
 	 */
 	@DontValidate
-    public Resolution unspecified() throws DAOException{
+	public Resolution unspecified() throws DAOException{
 		
 		harvestDTO = DAOFactory.getDAOFactory().getHarvestDAO().getHarvestById(harvestDTO.getHarvestId());
 		harvestSourceDTO = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(harvestDTO.getHarvestSourceId());
@@ -56,6 +57,7 @@ public class HarvestActionBean extends AbstractActionBean {
 			loadMessages(Harvest.FATAL, messageDTOs, fatals = new ArrayList<HarvestMessageDTO>());
 			loadMessages(Harvest.ERROR, messageDTOs, errors = new ArrayList<HarvestMessageDTO>());
 			loadMessages(Harvest.WARNING, messageDTOs, warnings = new ArrayList<HarvestMessageDTO>());
+			loadMessages(Harvest.INFO, messageDTOs, infos = new ArrayList<HarvestMessageDTO>());
 		}
 	}
 
@@ -114,5 +116,12 @@ public class HarvestActionBean extends AbstractActionBean {
 	 */
 	public List<HarvestMessageDTO> getWarnings() {
 		return warnings;
+	}
+
+	/**
+	 * @return the infos
+	 */
+	public List<HarvestMessageDTO> getInfos() {
+		return infos;
 	}
 }

@@ -727,7 +727,6 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	 */
 	public void warning(SAXParseException e) throws SAXException {
 		saxWarnings.add(e);
-		logger.warn("SAX warning encountered: " + e.toString(), e);
 	}
 
 	/**

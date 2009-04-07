@@ -3,6 +3,7 @@ package eionet.cr.harvest;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Date;
@@ -44,15 +45,26 @@ public class PullHarvest extends Harvest{
 		InputStream inputStream = null;
 		try{
 			sourceAvailable = new Boolean(false);
+			
 			URL url = new URL(sourceUrlString);
-			URLConnection httpConn = url.openConnection();
-// FIXME - use IfModifiedSince, but keep in mind that if the source has not been modified
-// indeed then you get a 304 response instead of any content and you need to handle this situation
-//			if (lastHarvest!=null)
-//				httpConn.setIfModifiedSince(lastHarvest.getTime());
-			httpConn.setRequestProperty("Accept", "application/rdf+xml, text/xml, */*");
-			inputStream = httpConn.getInputStream();
+			URLConnection urlConnection = url.openConnection();
+			
+			urlConnection.setRequestProperty("Accept", "application/rdf+xml, text/xml, */*");
+			if (lastHarvest!=null){
+				urlConnection.setIfModifiedSince(lastHarvest.getTime());
+			}
+			
+			inputStream = urlConnection.getInputStream();
 			sourceAvailable = new Boolean(true);
+			
+			if (urlConnection instanceof HttpURLConnection){
+				if (((HttpURLConnection)urlConnection).getResponseCode()==HttpURLConnection.HTTP_NOT_MODIFIED){
+					String msg = "Source not modified since " + lastHarvest.toString();
+					logger.debug(msg);
+					infos.add(msg);
+					return;
+				}
+			}
 			
 			FileUtil.streamToFile(inputStream, toFile);
 		}

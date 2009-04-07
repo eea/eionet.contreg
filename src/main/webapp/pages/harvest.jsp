@@ -52,8 +52,8 @@
         </table>
         <br/><br/>
         <c:choose>
-        	<c:when test="${(empty actionBean.fatals) && (empty actionBean.errors) && (empty actionBean.warnings)}">
-        		<strong>No error messages or warnings found for this harvest.</strong>
+        	<c:when test="${(empty actionBean.fatals) && (empty actionBean.errors) && (empty actionBean.warnings) && (empty actionBean.infos)}">
+        		<strong>No messages found for this harvest.</strong>
 			</c:when>
 			<c:otherwise>
 				<c:if test="${!(empty actionBean.fatals)}">
@@ -113,6 +113,16 @@
 			        	</tbody>
 			        </table>
 				</c:if>
+				<c:if test="${!(empty actionBean.infos)}">
+					<strong>Info messages:</strong>
+					<ul>
+		        		<c:forEach items="${actionBean.infos}" var="info" varStatus="loop">
+		        			<li>
+		        				<c:out value="${info.message}"/></td>
+		        			</li>
+		        		</c:forEach>
+					</ul>
+				</c:if>				
 			</c:otherwise>
         </c:choose>
 

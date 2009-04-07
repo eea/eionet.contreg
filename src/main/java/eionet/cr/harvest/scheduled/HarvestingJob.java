@@ -68,8 +68,8 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 			if (!isBatchHarvestingEnabled() || !isBatchHarvestingHour())
 				return;
 
-			initBatchHarvestingQueue();
-			if (!batchHarvestingQueue.isEmpty()){
+			updateBatchHarvestingQueue();
+			if (batchHarvestingQueue!=null && !batchHarvestingQueue.isEmpty()){
 				for (Iterator<HarvestSourceDTO> iter=batchHarvestingQueue.iterator(); iter.hasNext(); harvestUrgentQueue()){
 					pullHarvest(iter.next());
 				}
@@ -80,6 +80,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 		}
 		finally{
 			setCurrentHarvest(null);
+			resetBatchHarvestingQueue();
 		}
 	}
 
@@ -88,12 +89,22 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 	 * @return
 	 * @throws DAOException 
 	 */
-	private void initBatchHarvestingQueue() throws DAOException{
+	private void updateBatchHarvestingQueue() throws DAOException{
 		
 		if (isBatchHarvestingEnabled()){
-			int numOfSegments = Math.round((float)getDailyActiveMinutes() / (float)getIntervalSeconds().intValue());
-			HarvestingJob.batchHarvestingQueue = DAOFactory.getDAOFactory().getHarvestSourceDAO().getNextScheduledSources(numOfSegments);
+			
+			int numOfSegments = Math.round((float)getDailyActiveMinutes() / getIntervalMinutes());
+			batchHarvestingQueue = DAOFactory.getDAOFactory().getHarvestSourceDAO().getNextScheduledSources(numOfSegments);
+			
+			logger.debug(batchHarvestingQueue.size() + " sources added to batch harvesting queue (numOfSegments=" + numOfSegments + ")");
 		}
+	}
+	
+	/**
+	 * 
+	 */
+	private void resetBatchHarvestingQueue(){
+		batchHarvestingQueue = null;
 	}
 	
 	/**
@@ -280,6 +291,15 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 			intervalSeconds = Math.max(5, intervalSeconds.intValue());
 		}
 		return intervalSeconds;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public float getIntervalMinutes(){
+		
+		return (float)getIntervalSeconds().intValue()/(float)60;
 	}
 
 	/**

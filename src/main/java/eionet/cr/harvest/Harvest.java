@@ -49,6 +49,7 @@ public abstract class Harvest {
 	public static final String FATAL = "ftl";
 	public static final String ERROR = "err";
 	public static final String WARNING = "wrn";
+	public static final String INFO = "inf";
 	
 	/** */
 	protected String sourceUrlString = null;
@@ -66,6 +67,7 @@ public abstract class Harvest {
 	protected Throwable fatalError = null;
 	protected List<Throwable> errors = new ArrayList<Throwable>();
 	protected List<Throwable> warnings = new ArrayList<Throwable>();
+	protected List<String> infos = new ArrayList<String>();
 	
 	/**
 	 * 
@@ -420,5 +422,12 @@ public abstract class Harvest {
 	 */
 	public void setNotificationSender(HarvestNotificationSender notificationSender) {
 		this.notificationSender = notificationSender;
+	}
+
+	/**
+	 * @return the infos
+	 */
+	public List<String> getInfos() {
+		return infos;
 	}
 }
