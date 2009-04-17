@@ -28,9 +28,9 @@ public class GeneralConfig {
 	public static final String LUCENE_INDEX_LOCATION = "lucene.index.location";
 	
 	/** */
-	public static final String HARVESTER_FILES_LOCATION = "harvester.files.location";
-	public static final String HARVESTER_BATCH_HARVESTING_HOURS = "harvester.job.batchHarvestingHours";
-	public static final String HARVESTER_JOB_INTERVAL_SECONDS = "harvester.job.intervalSeconds";
+	public static final String HARVESTER_FILES_LOCATION = "harvester.tempFileDir";
+	public static final String HARVESTER_BATCH_HARVESTING_HOURS = "harvester.batchHarvestingHours";
+	public static final String HARVESTER_JOB_INTERVAL_SECONDS = "harvester.batchHarvestingIntervalSeconds";
 	public static final String HARVESTER_REFERRALS_INTERVAL = "harvester.referrals.intervalMinutes";
 	
 	/** */
