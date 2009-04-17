@@ -93,7 +93,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 		
 		if (isBatchHarvestingEnabled()){
 			
-			int numOfSegments = Math.round((float)getDailyActiveMinutes() / getIntervalMinutes());
+			int numOfSegments = getNumberOfSegments();
 			batchHarvestingQueue = DAOFactory.getDAOFactory().getHarvestSourceDAO().getNextScheduledSources(numOfSegments);
 			
 			logger.debug(batchHarvestingQueue.size() + " sources added to batch harvesting queue (numOfSegments=" + numOfSegments + ")");
@@ -321,6 +321,14 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 		}
 		
 		return this.dailyActiveMinutes;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	private int getNumberOfSegments(){
+		return Math.round((float)getDailyActiveMinutes() / getIntervalMinutes());
 	}
 
 	/**
