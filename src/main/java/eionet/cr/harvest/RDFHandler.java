@@ -259,7 +259,7 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 			prepareStatementForResources();
 			logger.debug("Started storing resources");
 		}
-		
+
 		preparedStatementForResources.setString(1, uri);
 		preparedStatementForResources.setLong(2, uriHash);
 		
@@ -372,12 +372,19 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 
 		logger.debug("Copying triples from SPO_TEMP into SPO");
 		
+		// FIXME
+		// In the below insert statement we use 'ignore', but it shouldn't be necessary because the select
+		// statement is done with 'distinct'. However, it turns out there can be a situation where one
+		// and the same triple is reported in two different languages. For example a subject's dc:title is the same
+		// both in language='fr' and language='en'. Such a case is present in seris.rdf.
+		// So maybe we should consider having OBJ_LANG as part of the unique index in SPO.
+		
 		StringBuffer buf = new StringBuffer();
-		buf.append("insert high_priority into SPO (").
+		buf.append("insert ignore high_priority into SPO (").
 		append("SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG, SOURCE, GEN_TIME").
 		append(") select distinct SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG, ").
 		append(sourceUrlHash).append(", ").append(genTime).append(" from SPO_TEMP");
-		
+
 		storedTriplesCount = SQLUtil.executeUpdate(buf.toString(), getConnection());
 		distinctSubjectsCount = distinctSubjects.size();
 		
