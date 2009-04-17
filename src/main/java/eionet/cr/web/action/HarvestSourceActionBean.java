@@ -226,15 +226,20 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     public void validateAddEdit(){
     	
     	if (isPostRequest()){
+    		
 	    	if (harvestSource.getUrl()==null || harvestSource.getUrl().trim().length()==0 || !URLUtil.isURL(harvestSource.getUrl()))
 	    		addGlobalError(new SimpleError("Invalid URL"));
 	    	
-	    	if (harvestSource.getIntervalMinutes()<0 || intervalMultiplier<0){
-	    		addGlobalError(new SimpleError("Harvest interval must be >=0"));
+	    	if (harvestSource.getIntervalMinutes()!=null){
+		    	if (harvestSource.getIntervalMinutes().intValue()<0 || intervalMultiplier<0){
+		    		addGlobalError(new SimpleError("Harvest interval must be >=0"));
+		    	}
+		    	else{
+		    		harvestSource.setIntervalMinutes(new Integer(harvestSource.getIntervalMinutes().intValue() * intervalMultiplier));
+		    	}
 	    	}
-	    	else{
-	    		harvestSource.setIntervalMinutes(new Integer(harvestSource.getIntervalMinutes() * intervalMultiplier));
-	    	}
+	    	else
+	    		harvestSource.setIntervalMinutes(new Integer(0));
     	}
     }
 
