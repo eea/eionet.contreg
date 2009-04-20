@@ -149,7 +149,7 @@
 			    </stripes:form>
 			</c:when>
 			<c:otherwise>
-				No such harvest source found!
+				<div class="error-msg">No such harvest source found!</div>
 			</c:otherwise>			
 		</c:choose>			  
 		    
