@@ -380,7 +380,7 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 		// So maybe we should consider having OBJ_LANG as part of the unique index in SPO.
 		
 		StringBuffer buf = new StringBuffer();
-		buf.append("insert ignore high_priority into SPO (").
+		buf.append("insert high_priority ignore into SPO (").
 		append("SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG, SOURCE, GEN_TIME").
 		append(") select distinct SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG, ").
 		append(sourceUrlHash).append(", ").append(genTime).append(" from SPO_TEMP");
