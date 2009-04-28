@@ -25,9 +25,6 @@ public class GeneralConfig {
 	public static final String DB_USER_PWD = "db.pwd";
 	
 	/** */
-	public static final String LUCENE_INDEX_LOCATION = "lucene.index.location";
-	
-	/** */
 	public static final String HARVESTER_FILES_LOCATION = "harvester.tempFileDir";
 	public static final String HARVESTER_BATCH_HARVESTING_HOURS = "harvester.batchHarvestingHours";
 	public static final String HARVESTER_JOB_INTERVAL_SECONDS = "harvester.batchHarvestingIntervalSeconds";

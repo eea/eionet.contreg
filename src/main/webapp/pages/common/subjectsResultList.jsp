@@ -61,8 +61,9 @@
 										${col.title}
 									</c:otherwise>
 								</c:choose>
-							</th>
+							</th>							
 						</c:forEach>
+						<th scope="col">&nbsp;</th>
 					</thead>
 					<tbody>
 						<c:forEach items="${actionBean.resultList}" var="resultListItem" varStatus="rowStatus">

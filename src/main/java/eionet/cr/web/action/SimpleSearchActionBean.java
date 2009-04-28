@@ -12,7 +12,6 @@ import net.sourceforge.stripes.validation.ValidationMethod;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.lucene.queryParser.ParseException;
 
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;

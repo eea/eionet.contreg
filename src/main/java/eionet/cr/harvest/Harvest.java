@@ -24,7 +24,6 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.harvest.util.ARPSource;
 import eionet.cr.harvest.util.HarvestLog;
 import eionet.cr.harvest.util.InputStreamBasedARPSource;
-import eionet.cr.search.LuceneBasedSearcher;
 import eionet.cr.util.FileUtil;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
@@ -274,22 +273,10 @@ public abstract class Harvest {
 		
 		ArrayList<Throwable> finishedActionsErrors  = new ArrayList<Throwable>();
 		
-		// get the number of harvested resources now in the given source
-		Integer numDocsInSource = null;
-		try {
-			numDocsInSource = new Integer(LuceneBasedSearcher.getNumDocsBySourceUrl(sourceUrlString));
-		}
-		catch (IOException e){
-			numDocsInSource = null;
-			errors.add(e);
-			finishedActionsErrors.add(e);
-			logger.error("Error when getting the count of documents in the given source: " + e.toString(), e);
-		}
-		
 		// call harvest finished functions of the DAO
 		if (daoWriter!=null){
 			try{
-				daoWriter.writeFinished(this, numDocsInSource);
+				daoWriter.writeFinished(this, 0); // FIXME - supply a meaningful value instead of hard-coded 0, or drop the feature
 			}
 			catch (DAOException e){
 				errors.add(e);

@@ -24,9 +24,6 @@ import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.search.CustomSearch;
 import eionet.cr.search.DiscoveredSinceTimeSearch;
-import eionet.cr.search.LuceneBasedSearcher;
-import eionet.cr.search.util.HitsCollector;
-import eionet.cr.search.util.SubjectDTOCollector;
 import eionet.cr.util.Util;
 import eionet.qawcommons.DataflowResultDto;
 

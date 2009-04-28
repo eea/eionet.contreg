@@ -8,7 +8,6 @@ import net.sourceforge.stripes.action.Resolution;
 import eionet.cr.common.Predicates;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
-import eionet.cr.search.util.HitsCollector;
 import eionet.cr.search.util.SortOrder;
 import eionet.cr.util.QueryString;
 import eionet.cr.util.pagination.Pagination;
@@ -66,7 +65,7 @@ public abstract class AbstractSearchActionBean extends AbstractActionBean{
 	 * @return
 	 */
 	public int getMaxResultSetSize(){
-		return HitsCollector.DEFAULT_MAX_HITS;
+		return Pagination.pageLength();
 	}
 
 	/**
