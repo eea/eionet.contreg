@@ -288,4 +288,44 @@ public class HarvestSourceActionBean extends AbstractActionBean {
 	public int getSelectedIntervalMultiplier(){
 		return getIntervalMultipliers().keySet().iterator().next().intValue();
 	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public String getIntervalMinutesDisplay(){
+		
+		String result = "";
+		if (this.harvestSource!=null && this.harvestSource.getIntervalMinutes()!=null){
+			result = HarvestSourceActionBean.getMinutesDisplay(this.harvestSource.getIntervalMinutes().intValue());
+		}
+		
+		return result;
+	}
+
+	/**
+	 * 
+	 * @param minutes
+	 * @return
+	 */
+	private static String getMinutesDisplay(int minutes){
+		
+		int days = minutes / 1440;
+		minutes = minutes - (days * 1440);
+		int hours = minutes / 60;
+		minutes = minutes - (hours * 60);
+
+		StringBuffer buf = new StringBuffer();
+		if (days>0){
+			buf.append(days).append(days==1 ? " day" : " days");
+		}
+		if (hours>0){
+			buf.append(buf.length()>0 ? ", " : "").append(hours).append(hours==1 ? " hour" : " hours");
+		}
+		if (minutes>0){
+			buf.append(buf.length()>0 ? ", " : "").append(minutes).append(minutes==1 ? " minute" : " minutes");
+		}
+		
+		return buf.toString();
+	}
 }

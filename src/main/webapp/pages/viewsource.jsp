@@ -61,7 +61,7 @@
 			            <tr>
 			                <td>Harvest interval:</td>
 			                <td>
-			                	<c:out value="${actionBean.harvestSource.intervalMinutes}"/> minutes
+			                	<c:out value="${actionBean.intervalMinutesDisplay}"/>
 			                </td>
 			            </tr>
 			            <tr>
