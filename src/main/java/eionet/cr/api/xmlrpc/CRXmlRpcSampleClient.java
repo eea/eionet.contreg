@@ -89,9 +89,9 @@ public class CRXmlRpcSampleClient {
 	    criteria.put("http://purl.org/dc/elements/1.1/coverage", "2006");
 	    
 	    Object[] params = new Object[]{criteria};
-	    Object[] result = (Object[])client.execute("LuceneBasedSearcher.dataflowSearch", params);
+	    Object[] result = (Object[])client.execute("ContRegService.dataflowSearch", params);
 	    
-	    // loop through the results, do type casting to see if any ClassCastExceptions are thrown
+	    // get the first object in the result set
 	    if (result!=null && result.length>0){
 	    	
 	    	Object o = result[0];
