@@ -116,9 +116,7 @@ public class CrCasFilterConfig implements FilterConfig {
 		/** Specifies application server name/URL. */
 		CAS_SERVER_NAME(CASFilter.SERVERNAME_INIT_PARAM),
 		/** Specifies flag wrap request. */
-		CAS_WRAP_REQUEST(CASFilter.WRAP_REQUESTS_INIT_PARAM),
-		/** Specifies eionet cookie domain. */
-		CAS_COOKIE_DOMAIN("eionetLoginCookieDomain");
+		CAS_WRAP_REQUEST(CASFilter.WRAP_REQUESTS_INIT_PARAM);
 		
 		private String parameterKey;
 		

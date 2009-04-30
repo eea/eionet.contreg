@@ -75,19 +75,6 @@ public class CRActionBeanContext extends ActionBeanContext {
 	}
 	
 	/**
-	 * Wrapper method for
-	 * {@link EionetCASFilter#attachEionetLoginCookie(javax.servlet.http.HttpServletResponse, boolean)}.
-	 * 
-	 * @param isLoggedIn
-	 *            if value is true the cookie is added with some value that in
-	 *            CAS context means logged in user otherwise cookie is added
-	 *            that means not logged in user.
-	 */
-	public void attachEionetLoginCookie(boolean isLoggedIn) {
-		EionetCASFilter.attachEionetLoginCookie(getResponse(), isLoggedIn);
-	}
-	
-	/**
 	 * 
 	 * @return last action event URL.
 	 */

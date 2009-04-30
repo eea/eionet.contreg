@@ -63,7 +63,6 @@ public class LoginActionBean extends AbstractActionBean {
 	@HandlesEvent(LOGOUT_EVENT)
 	public Resolution logout() {
 		getContext().setSessionAttribute(USER_SESSION_ATTR, null);
-		getContext().attachEionetLoginCookie(false);
 		return new RedirectResolution(getContext().getCASLogoutURL(), false);
 	}
 }
