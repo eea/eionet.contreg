@@ -29,6 +29,7 @@ import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.harvest.Harvest;
 import eionet.cr.harvest.HarvestDAOWriter;
 import eionet.cr.harvest.HarvestException;
+import eionet.cr.harvest.HarvestNotificationSender;
 import eionet.cr.harvest.PullHarvest;
 import eionet.cr.harvest.PushHarvest;
 import eionet.cr.harvest.RDFHandler;
@@ -188,6 +189,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 		if (harvest!=null){
 			setCurrentHarvest(harvest);
 			try {
+				harvest.setNotificationSender(new HarvestNotificationSender());
 				harvest.execute();
 			}
 			catch (HarvestException e){

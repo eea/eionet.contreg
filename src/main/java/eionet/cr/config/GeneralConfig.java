@@ -38,6 +38,9 @@ public class GeneralConfig {
 	public static final String XMLCONV_CONVERT_URL = "xmlconv.convert.url";
 	
 	/** */
+	public static final String MAIL_SYSADMINS = "mail.sysAdmins";
+	
+	/** */
 	public static final int SEVERITY_INFO = 1;
 	public static final int SEVERITY_CAUTION = 2;
 	public static final int SEVERITY_WARNING = 3;
@@ -100,5 +103,17 @@ public class GeneralConfig {
 			throw new CRConfigException("Missing required property: " + key);
 		else
 			return value;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public static synchronized Properties getProperties(){
+
+		if (properties==null)
+			init();
+		
+		return properties;
 	}
 }

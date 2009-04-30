@@ -293,13 +293,10 @@ public abstract class Harvest {
 			}
 		}
 
-		// send notification of errors happened when executing harvest actions 
+		// send notification of errors happened when executing harvest finished actions 
 		try{
 			if (notificationSender!=null && finishedActionsErrors.size()>0){
-				for (int i=0; i<finishedActionsErrors.size(); i++){
-					Throwable t = finishedActionsErrors.get(i);
-					notificationSender.notifyMessage("The following error occured after harvest finished: " + t.toString(), t, this);
-				}
+				notificationSender.notifyMessagesAfterHarvest(finishedActionsErrors, this);
 			}
 		}
 		catch (HarvestException ee){
