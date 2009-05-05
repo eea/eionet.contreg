@@ -156,4 +156,12 @@ public class ObjectDTO {
 	public void setSourceObject(String derivObject) {
 		this.sourceObject = derivObject;
 	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public long getSourceObjectLong(){
+		return this.sourceObject==null ? 0 : Long.parseLong(this.sourceObject);
+	}
 }
