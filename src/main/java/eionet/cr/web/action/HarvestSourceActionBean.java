@@ -138,7 +138,12 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     				RawTripleDTO tripleDTO = new RawTripleDTO();
     				tripleDTO.setSubject(subjectDTO.getUri());
     				tripleDTO.setPredicate(predicate);
-    				tripleDTO.setObject(subjectDTO.getObjectValue(predicate));
+    				
+    				ObjectDTO object = subjectDTO.getObject(predicate);
+    				if (object!=null){
+    					tripleDTO.setObject(object.getValue());
+    					tripleDTO.setObjectDerivSource(object.getDerivSource());
+    				}
     				
     				sampleTriples.add(tripleDTO);
     			}

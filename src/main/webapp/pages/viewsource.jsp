@@ -99,7 +99,7 @@
 				        	</thead>
 				        	<tbody>
 				        		<c:forEach items="${actionBean.sampleTriples}" var="sampleTriple" varStatus="loop">
-				        			<tr>
+				        			<tr <c:if test="${not empty sampleTriple.objectDerivSource}">class="derived"</c:if>>
 				        				<td><c:out value="${crfn:cutAtFirstLongToken(sampleTriple.subject, 100)}"/></td>
 				        				<td><c:out value="${crfn:cutAtFirstLongToken(sampleTriple.predicate, 100)}"/></td>
 				        				<td><c:out value="${crfn:cutAtFirstLongToken(sampleTriple.object, 100)}"/></td>

@@ -11,6 +11,13 @@ public class RawTripleDTO {
 	private String subject;
 	private String predicate;
 	private String object;
+	private String objectDerivSource;
+
+	/**
+	 * 
+	 */
+	public RawTripleDTO(){
+	}
 	
 	/**
 	 * @return the subject
@@ -47,5 +54,19 @@ public class RawTripleDTO {
 	 */
 	public void setObject(String object) {
 		this.object = object;
+	}
+
+	/**
+	 * @return the objectDerivSource
+	 */
+	public String getObjectDerivSource() {
+		return objectDerivSource;
+	}
+
+	/**
+	 * @param objectDerivSource the objectDerivSource to set
+	 */
+	public void setObjectDerivSource(String objectDerivSource) {
+		this.objectDerivSource = objectDerivSource;
 	}
 }
