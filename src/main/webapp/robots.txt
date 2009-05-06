@@ -1,0 +1,4 @@
+# CR is a search engine
+# Don't index it
+User-agent: *
+Disallow: /
