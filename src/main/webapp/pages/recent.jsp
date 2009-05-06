@@ -8,7 +8,7 @@
 	
         <h1>Recent uploads</h1>
         
-        <p>This page displays the <c:out value="${actionBean.maxResults}"/> most recently added recources of the type denoted by the selected tab.<br/>
+        <p>This page displays the <c:out value="${actionBean.maxResults}"/> most recently added resources of the type denoted by the selected tab.<br/>
 		If less than <c:out value="${actionBean.maxResults}"/> are displayed, it means the addition time is known only for the resources displayed.<br/>
 		If none are displayed, it means addition time is known for none.</p>
 		
