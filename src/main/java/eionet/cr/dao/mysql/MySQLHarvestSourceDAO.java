@@ -11,6 +11,7 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.readers.HarvestSourceDTOReader;
+import eionet.cr.util.Hashes;
 import eionet.cr.util.Util;
 import eionet.cr.util.sql.ConnectionUtil;
 import eionet.cr.util.sql.SQLUtil;
@@ -244,18 +245,29 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
      */
     public void deleteSourcesByUrl(List<String> urls) throws DAOException {
     	
-    	List<Object> values = new ArrayList<Object>();
-    	StringBuffer buf = new StringBuffer("delete from HARVEST_SOURCE where URL in (");
+    	List<Object> valuesHarvestSource = new ArrayList<Object>();
+    	List<Object> valuesSPO = new ArrayList<Object>();
+    	
+    	StringBuffer bufHarvestSource = new StringBuffer("delete from HARVEST_SOURCE where URL in (");
+    	StringBuffer bufSPO = new StringBuffer("delete from SPO where SOURCE in (");
+    	
     	for (int i=0; i<urls.size(); i++){
-    		buf.append(i>0 ? "," : "").append("?");
-    		values.add(urls.get(i));
+    		
+    		bufHarvestSource.append(i>0 ? "," : "").append("?");
+    		bufSPO.append(i>0 ? "," : "").append("?");
+    		
+    		valuesHarvestSource.add(urls.get(i));
+    		valuesSPO.add(Hashes.spoHash(urls.get(i)));
+    		System.out.println("--------- deleting, urlHash = " + valuesSPO.get(i));
     	}
-    	buf.append(")");
+    	bufHarvestSource.append(")");
+    	bufSPO.append(")");
 		
 		Connection conn = null;
 		try{
 			conn = getConnection();
-			SQLUtil.executeUpdate(buf.toString(), values, conn);
+			SQLUtil.executeUpdate(bufHarvestSource.toString(), valuesHarvestSource, conn);
+			SQLUtil.executeUpdate(bufSPO.toString(), valuesSPO, conn);
 		}
 		catch (Exception e){
 			throw new DAOException(e.getMessage(), e);
