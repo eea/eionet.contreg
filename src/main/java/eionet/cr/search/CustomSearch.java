@@ -1,6 +1,7 @@
 package eionet.cr.search;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,9 @@ public class CustomSearch extends AbstractSubjectSearch{
 	
 	/** */
 	private Map<String,String> criteria;
+	
+	/** */
+	private HashSet<String> literalsEnabledPredicates;
 	
 	/** */
 	private StringBuffer fromStatement = new StringBuffer();
@@ -88,7 +92,7 @@ public class CustomSearch extends AbstractSubjectSearch{
 			whereStatement.append(spoCurr).append(".PREDICATE=? and ");
 			inParameters.add(Long.valueOf(Hashes.spoHash(predicateUri)));
 			
-			if (requiresExactMatch(predicateValue)){
+			if (requiresExactMatch(predicateUri, predicateValue)){
 				whereStatement.append(spoCurr).append(".OBJECT_HASH=?");
 				inParameters.add(Long.valueOf(Hashes.spoHash(normalize(predicateValue))));
 			}
@@ -109,8 +113,8 @@ public class CustomSearch extends AbstractSubjectSearch{
 	 * @param predicateValue
 	 * @return
 	 */
-	private boolean requiresExactMatch(String predicateValue){
-		return (predicateValue.startsWith("\"") && predicateValue.endsWith("\"")) || URIUtil.isSchemedURI(predicateValue);
+	private boolean requiresExactMatch(String predicateUri, String predicateValue){
+		return (predicateValue.startsWith("\"") && predicateValue.endsWith("\"")) || URIUtil.isSchemedURI(predicateValue) || !isLiteralsEnabled(predicateUri);
 	}
 
 	/**
@@ -138,5 +142,22 @@ public class CustomSearch extends AbstractSubjectSearch{
 			result.put(predicate, value);
 		}
 		return result;
+	}
+
+	/**
+	 * @param literalsEnabledPredicates the literalsEnabledPredicates to set
+	 */
+	public void setLiteralsEnabledPredicates(
+			HashSet<String> literalsEnabledPredicates) {
+		this.literalsEnabledPredicates = literalsEnabledPredicates;
+	}
+	
+	/**
+	 * 
+	 * @param predicateUri
+	 * @return
+	 */
+	private boolean isLiteralsEnabled(String predicateUri){
+		return literalsEnabledPredicates!=null && literalsEnabledPredicates.contains(predicateUri);
 	}
 }

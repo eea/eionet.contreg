@@ -19,6 +19,9 @@ public interface Predicates {
 	
 	public static final String RDF_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
 	public static final String RDFS_LABEL = "http://www.w3.org/2000/01/rdf-schema#label";
+	public static final String RDFS_DOMAIN = "http://www.w3.org/2000/01/rdf-schema#domain";
+	public static final String RDFS_RANGE = "http://www.w3.org/2000/01/rdf-schema#range";
+	
 	public static final String SKOS_PREF_LABEL = "http://www.w3.org/2004/02/skos/core#prefLabel";
 		
 	public static final String ROD_OBLIGATION_PROPERTY = "http://rod.eionet.eu.int/schema.rdf#obligation";

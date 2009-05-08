@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -18,6 +19,7 @@ import net.sourceforge.stripes.action.UrlBinding;
 import eionet.cr.common.Predicates;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.CustomSearch;
+import eionet.cr.search.LiteralsEnabledSearch;
 import eionet.cr.search.PicklistSearch;
 import eionet.cr.search.SearchException;
 import eionet.cr.util.Util;
@@ -39,6 +41,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 	private static final String RESULT_LIST_SESSION_ATTR_NAME = CustomSearchActionBean.class.getName() + ".resultList";
 	private static final String MATCH_COUNT_SESSION_ATTR_NAME = CustomSearchActionBean.class.getName() + ".matchCount";
 	private static final String PAGINATION_SESSION_ATTR_NAME = CustomSearchActionBean.class.getName() + ".pagination";
+	private static final String LITERAL_SEARCH_ENABLED_FILTERS = CustomSearchActionBean.class.getName() + ".literalSearchEnabledFilters";
 	
 	/** */
 	private static final String SELECTED_VALUE_PREFIX = "value_";
@@ -87,6 +90,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 		session.removeAttribute(MATCH_COUNT_SESSION_ATTR_NAME);
 		session.removeAttribute(PAGINATION_SESSION_ATTR_NAME);
 		session.removeAttribute(SELECTED_FILTERS_SESSION_ATTR_NAME);
+		session.removeAttribute(LITERAL_SEARCH_ENABLED_FILTERS);
 	}
 	
 	/**
@@ -101,6 +105,8 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 		CustomSearch customSearch = new CustomSearch(buildSearchCriteria());
 		customSearch.setPageNumber(getPageN());
 		customSearch.setSorting(getSortP(), getSortO());
+		customSearch.setLiteralsEnabledPredicates(getLiteralEnabledFilters());
+		
 		customSearch.execute();
 		
 		// we put the search result list into session and override getResultList() to retrieve the list from session
@@ -144,13 +150,24 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 	/**
 	 * 
 	 * @return
+	 * @throws SearchException 
 	 */
-	public Resolution addFilter(){
+	public Resolution addFilter() throws SearchException{
 		
 		populateSelectedFilters();
 		
-		if (addedFilter!=null)
+		if (addedFilter!=null){
+			
 			getSelectedFilters().put(addedFilter, "");
+			
+			String predicateUri = getAvailableFilters().get(addedFilter).getUri();
+			
+			boolean literalsEnabled = LiteralsEnabledSearch.search(predicateUri);
+			if (literalsEnabled)
+				getLiteralEnabledFilters().add(predicateUri);
+			else
+				getLiteralEnabledFilters().remove(predicateUri);
+		}
 		
 		return new ForwardResolution(ASSOCIATED_JSP);
 	}
@@ -215,6 +232,22 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 		}
 		
 		return selectedFilters;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	private HashSet<String> getLiteralEnabledFilters(){
+		
+		HttpSession session = getContext().getRequest().getSession();
+		HashSet<String> set = (HashSet<String>)session.getAttribute(LITERAL_SEARCH_ENABLED_FILTERS);
+		if (set==null){
+			set = new HashSet<String>();
+			session.setAttribute(LITERAL_SEARCH_ENABLED_FILTERS, set);
+		}
+		
+		return set;
 	}
 
 	/**
