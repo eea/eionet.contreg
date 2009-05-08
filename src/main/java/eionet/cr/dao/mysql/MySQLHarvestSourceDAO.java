@@ -250,27 +250,31 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
     	
     	StringBuffer bufHarvestSource1 = new StringBuffer("delete from HARVEST_SOURCE where URL in (");
     	StringBuffer bufHarvestSource2 = new StringBuffer("delete from HARVEST_SOURCE where SOURCE in (");
-    	StringBuffer bufSPO = new StringBuffer("delete from SPO where SOURCE in (");
+    	StringBuffer bufSPO1 = new StringBuffer("delete from SPO where SOURCE in (");
+    	StringBuffer bufSPO2 = new StringBuffer("delete from SPO where OBJ_DERIV_SOURCE in (");
     	
     	for (int i=0; i<urls.size(); i++){
     		
     		bufHarvestSource1.append(i>0 ? "," : "").append("?");
     		bufHarvestSource2.append(i>0 ? "," : "").append("?");
-    		bufSPO.append(i>0 ? "," : "").append("?");
+    		bufSPO1.append(i>0 ? "," : "").append("?");
+    		bufSPO2.append(i>0 ? "," : "").append("?");
     		
     		urlValues.add(urls.get(i));
     		urlHashValues.add(Hashes.spoHash(urls.get(i)));
     	}
     	bufHarvestSource1.append(")");
     	bufHarvestSource2.append(")");
-    	bufSPO.append(")");
+    	bufSPO1.append(")");
+    	bufSPO2.append(")");
 		
 		Connection conn = null;
 		try{
 			conn = getConnection();
 			SQLUtil.executeUpdate(bufHarvestSource1.toString(), urlValues, conn);
 			SQLUtil.executeUpdate(bufHarvestSource2.toString(), urlHashValues, conn);
-			SQLUtil.executeUpdate(bufSPO.toString(), urlHashValues, conn);
+			SQLUtil.executeUpdate(bufSPO1.toString(), urlHashValues, conn);
+			SQLUtil.executeUpdate(bufSPO2.toString(), urlHashValues, conn);
 		}
 		catch (Exception e){
 			throw new DAOException(e.getMessage(), e);
