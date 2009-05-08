@@ -3,6 +3,10 @@ package eionet.cr.api.xmlrpc;
 import java.io.IOException;
 import java.net.URL;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.server.XmlRpcHandlerMapping;
 import org.apache.xmlrpc.webserver.XmlRpcServlet;
@@ -30,5 +34,15 @@ public class CRXmlRpcServlet extends XmlRpcServlet{
 		catch (IOException e) {
 			throw new XmlRpcException("Failed to load resource " + url + ": " + e.getMessage(), e);
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.apache.xmlrpc.webserver.XmlRpcServlet#doPost(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+	 */
+	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+		
+		response.setCharacterEncoding("UTF-8");
+		super.doPost(request, response);
 	}
 }
