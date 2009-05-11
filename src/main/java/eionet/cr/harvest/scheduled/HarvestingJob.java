@@ -72,7 +72,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 			updateBatchHarvestingQueue();
 			if (batchHarvestingQueue!=null && !batchHarvestingQueue.isEmpty()){
 				for (Iterator<HarvestSourceDTO> iter=batchHarvestingQueue.iterator(); iter.hasNext(); harvestUrgentQueue()){
-					pullHarvest(iter.next());
+					pullHarvest(iter.next(), false);
 				}
 			}
 		}
@@ -131,7 +131,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 					if (queueItem.isPushHarvest())
 						pushHarvest(url, queueItem.getPushedContent());
 					else
-						pullHarvest(DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceByUrl(url));
+						pullHarvest(DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceByUrl(url), true);
 				}
 			}
 		}
@@ -170,10 +170,10 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 	 * 
 	 * @param harvestSource
 	 */
-	private void pullHarvest(HarvestSourceDTO harvestSource){
+	private void pullHarvest(HarvestSourceDTO harvestSource, boolean urgent){
 		
 		if (harvestSource!=null){
-			Harvest harvest = new PullHarvest(harvestSource.getUrl(), harvestSource.getLastHarvest());
+			Harvest harvest = new PullHarvest(harvestSource.getUrl(), urgent ? null : harvestSource.getLastHarvest());
 			harvest.setDaoWriter(new HarvestDAOWriter(
 					harvestSource.getSourceId().intValue(), Harvest.TYPE_PULL, CRUser.application.getUserName()));
 			executeHarvest(harvest);
