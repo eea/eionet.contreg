@@ -19,19 +19,22 @@ public class HarvestDAOWriter {
 	/** */
 	private int sourceId;
 	private String harvestType;
-	private String userName;
+	private int numOfResources;
+	private String userName;	
 	
 	/** */
 	private int harvestId;
 
 	/**
+	 * @param numOfResources TODO
 	 * 
 	 */
-	public HarvestDAOWriter(int sourceId, String harvestType, String userName){
+	public HarvestDAOWriter(int sourceId, String harvestType, int numOfResources, String userName){
 		
 		this.sourceId = sourceId;
 		this.harvestType = harvestType;
-		this.userName = userName;
+		this.numOfResources = numOfResources;
+		this.userName = userName;		
 	}
 
 	/**
@@ -50,7 +53,7 @@ public class HarvestDAOWriter {
 	 * @param numResourcesInSource
 	 * @throws DAOException
 	 */
-	protected void writeFinished(Harvest harvest, Integer numResourcesInSource) throws DAOException{
+	protected void writeFinished(Harvest harvest) throws DAOException{
 		
 		DAOFactory.getDAOFactory().getHarvestDAO().updateFinishedHarvest(harvestId, Harvest.STATUS_FINISHED,
 				harvest.getStoredTriplesCount(),
@@ -58,8 +61,14 @@ public class HarvestDAOWriter {
 				0,
 				0);
 		
-		Boolean sourceAvailable = (harvest instanceof PullHarvest) ? ((PullHarvest)harvest).getSourceAvailable() : null;
-		DAOFactory.getDAOFactory().getHarvestSourceDAO().updateHarvestFinished(sourceId, null, numResourcesInSource, sourceAvailable);
+		if (harvest instanceof PullHarvest){
+			DAOFactory.getDAOFactory().getHarvestSourceDAO().updateHarvestFinished(
+					sourceId, null, harvest.getDistinctSubjectsCount(), ((PullHarvest)harvest).getSourceAvailable());
+		}
+		else{
+			DAOFactory.getDAOFactory().getHarvestSourceDAO().updateHarvestFinished(
+					sourceId, null, numOfResources + harvest.getDistinctSubjectsCount(), null);
+		}
 	}
 
 	/**

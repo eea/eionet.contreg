@@ -147,17 +147,27 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 	 */
 	private void pushHarvest(String url, String pushedContent){
 		
-		HarvestSourceDTO sourceDTO = new HarvestSourceDTO();
-		sourceDTO.setUrl(url);
-		sourceDTO.setName(url);
-		sourceDTO.setType("data");
-		
 		try{
-			Integer sourceId = DAOFactory.getDAOFactory().getHarvestSourceDAO().addSourceIgnoreDuplicate(
-																sourceDTO, CRUser.application.getUserName());
+			Integer sourceId = null;
+			int numOfResources = 0;
+			
+			HarvestSourceDAO harvestSourceDAO = DAOFactory.getDAOFactory().getHarvestSourceDAO();
+			HarvestSourceDTO harvestSource = harvestSourceDAO.getHarvestSourceByUrl(url);
+			if (harvestSource==null){
+				harvestSource = new HarvestSourceDTO();
+				harvestSource.setUrl(url);
+				harvestSource.setName(url);
+				harvestSource.setType("data");
+				sourceId = harvestSourceDAO.addSource(harvestSource, CRUser.application.getUserName());
+			}
+			else{
+				sourceId = harvestSource.getSourceId();
+				numOfResources = harvestSource.getResources()==null ? 0 : harvestSource.getResources().intValue();
+			}
+			
 			Harvest harvest = new PushHarvest(pushedContent, url);
 			if (sourceId!=null && sourceId.intValue()>0){
-				harvest.setDaoWriter(new HarvestDAOWriter(sourceId.intValue(), Harvest.TYPE_PUSH, CRUser.application.getUserName()));
+				harvest.setDaoWriter(new HarvestDAOWriter(sourceId.intValue(), Harvest.TYPE_PUSH, numOfResources, CRUser.application.getUserName()));
 			}
 			executeHarvest(harvest);
 		}
@@ -173,9 +183,12 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 	private void pullHarvest(HarvestSourceDTO harvestSource, boolean urgent){
 		
 		if (harvestSource!=null){
+			
+			int numOfResources = harvestSource.getResources()==null ? 0 : harvestSource.getResources().intValue();
+			
 			Harvest harvest = new PullHarvest(harvestSource.getUrl(), urgent ? null : harvestSource.getLastHarvest());
 			harvest.setDaoWriter(new HarvestDAOWriter(
-					harvestSource.getSourceId().intValue(), Harvest.TYPE_PULL, CRUser.application.getUserName()));
+					harvestSource.getSourceId().intValue(), Harvest.TYPE_PULL, numOfResources, CRUser.application.getUserName()));
 			executeHarvest(harvest);
 		}
 	}

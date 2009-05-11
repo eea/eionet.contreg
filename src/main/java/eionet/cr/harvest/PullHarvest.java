@@ -41,7 +41,7 @@ public class PullHarvest extends Harvest{
 		
 		File toFile = fullFilePathForSourceUrl(sourceUrlString);;
 		if (toFile.exists()){
-			doDownload = !Boolean.parseBoolean(GeneralConfig.getProperty(GeneralConfig.HARVESTER_DEBUG_USE_DOWNLOADED_FILES, "true"));
+			doDownload = !Boolean.parseBoolean(GeneralConfig.getProperty(GeneralConfig.HARVESTER_DEBUG_USE_DOWNLOADED_FILES, "false"));
 			if (doDownload){
 				toFile.delete();
 			}

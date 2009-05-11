@@ -43,14 +43,16 @@ import eionet.cr.web.security.CRUser;
 public class RDFHandler implements StatementHandler, ErrorHandler{
 	
 	/** */
-	private List<SAXParseException> saxErrors = new ArrayList<SAXParseException>();
-	private List<SAXParseException> saxWarnings = new ArrayList<SAXParseException>();
-	
+	private SAXParseException saxError = null;
+	private SAXParseException saxWarning = null;
+	private boolean saxErrorSet = false;
+	private boolean saxWarningSet = false;
+
 	/** */
 	private long anonIdSeed;
 	
 	/** */
-	private HashSet<String> usedNamespaces = new HashSet();
+//	private HashSet<String> usedNamespaces = new HashSet();
 	
 	/** */
 	private String sourceUrl;
@@ -68,10 +70,6 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	/** */
 	private int storedTriplesCount = 0;
 	private int distinctSubjectsCount = 0;
-	
-	/** */
-	private Long currentSubjectHash;
-	private HashSet distinctSubjects = new HashSet();
 	
 	/** */
 	private boolean clearPreviousContent = true;
@@ -140,7 +138,7 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 			if (litObject && object.length()==0)
 				return;
 
-			parseForUsedNamespaces(predicate);
+//			parseForUsedNamespaces(predicate);
 			
 			long subjectHash = spoHash(subject.isAnonymous() ? subject.getAnonymousID() : subject.getURI(), subject.isAnonymous());
 			long predicateHash = spoHash(predicate.getURI(), false);
@@ -237,13 +235,7 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 		preparedStatementForTriples.setString( 7, YesNoBoolean.format(litObject));
 		preparedStatementForTriples.setString( 8, objectLang==null ? "" : objectLang);
 		
-		int i = preparedStatementForTriples.executeUpdate();
-		if (currentSubjectHash==null || currentSubjectHash.longValue()!=subjectHash){
-			currentSubjectHash = subjectHash;
-			distinctSubjects.add(Long.valueOf(subjectHash));
-		}
-		
-		return i;
+		return preparedStatementForTriples.executeUpdate();
 	}
 
 	/**
@@ -276,24 +268,24 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 		return isAnonymous ? Hashes.spoHash(s, anonIdSeed) : Hashes.spoHash(s);
 	}
 
-	/**
-	 * 
-	 * @param predicate
-	 */
-	private void parseForUsedNamespaces(AResource predicate){
-		
-		if (!predicate.isAnonymous()){
-			String predicateUri = predicate.getURI();
-			int i = predicateUri.lastIndexOf("#");
-            if (i<0)
-            	i = predicateUri.lastIndexOf("/");
-            if (i>0){
-                if (predicateUri.charAt(i)=='/')
-                	i++;
-                usedNamespaces.add(predicateUri.substring(0, i));
-            }
-		}
-	}
+//	/**
+//	 * 
+//	 * @param predicate
+//	 */
+//	private void parseForUsedNamespaces(AResource predicate){
+//		
+//		if (!predicate.isAnonymous()){
+//			String predicateUri = predicate.getURI();
+//			int i = predicateUri.lastIndexOf("#");
+//            if (i<0)
+//            	i = predicateUri.lastIndexOf("/");
+//            if (i>0){
+//                if (predicateUri.charAt(i)=='/')
+//                	i++;
+//                usedNamespaces.add(predicateUri.substring(0, i));
+//            }
+//		}
+//	}
 
 	/**
 	 * 
@@ -372,23 +364,20 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 
 		logger.debug("Copying triples from SPO_TEMP into SPO");
 		
-		// FIXME
-		// In the below insert statement we use 'ignore', but it shouldn't be necessary because the select
-		// statement is done with 'distinct'. However, it turns out there can be a situation where one
-		// and the same triple is reported in two different languages. For example a subject's dc:title is the same
-		// both in language='fr' and language='en'. Such a case is present in seris.rdf.
-		// So maybe we should consider having OBJ_LANG as part of the unique index in SPO.
-		
 		StringBuffer buf = new StringBuffer();
-		buf.append("insert high_priority ignore into SPO (").
+		buf.append("insert high_priority into SPO (").
 		append("SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG, SOURCE, GEN_TIME").
 		append(") select distinct SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG, ").
 		append(sourceUrlHash).append(", ").append(genTime).append(" from SPO_TEMP");
 
 		storedTriplesCount = SQLUtil.executeUpdate(buf.toString(), getConnection());
-		distinctSubjectsCount = distinctSubjects.size();
-		
 		logger.debug(storedTriplesCount + " triples inserted into SPO");
+		
+		Object o = SQLUtil.executeSingleReturnValueQuery("select count(distinct SUBJECT) from SPO_TEMP", getConnection());
+		if (o!=null){
+			distinctSubjectsCount = Integer.parseInt(o.toString());
+		}
+		logger.debug(distinctSubjectsCount + " distinct subjects inserted into SPO");
 
 		if (clearPreviousContent){
 			
@@ -716,8 +705,25 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
      * @see org.xml.sax.ErrorHandler#error(org.xml.sax.SAXParseException)
      */
 	public void error(SAXParseException e) throws SAXException {
-		saxErrors.add(e);
-		logger.error("SAX error encountered: " + e.toString(), e);
+
+		if (!saxErrorSet){
+			saxError = e;
+			saxErrorSet = true;
+		}
+		
+		logger.warn("SAX error encountered: " + e.toString(), e);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.xml.sax.ErrorHandler#warning(org.xml.sax.SAXParseException)
+	 */
+	public void warning(SAXParseException e) throws SAXException {
+		
+		if (!saxWarningSet){
+			saxWarning = e;
+			saxWarningSet = true;
+		}
 	}
 
 	/*
@@ -728,26 +734,18 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 		throw new LoadException(e.toString(), e);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.xml.sax.ErrorHandler#warning(org.xml.sax.SAXParseException)
+	/**
+	 * @return the saxError
 	 */
-	public void warning(SAXParseException e) throws SAXException {
-		saxWarnings.add(e);
+	public SAXParseException getSaxError() {
+		return saxError;
 	}
 
 	/**
-	 * @return the saxErrors
+	 * @return the saxWarning
 	 */
-	public List<SAXParseException> getSaxErrors() {
-		return saxErrors;
-	}
-
-	/**
-	 * @return the saxWarnings
-	 */
-	public List<SAXParseException> getSaxWarnings() {
-		return saxWarnings;
+	public SAXParseException getSaxWarning() {
+		return saxWarning;
 	}
 
 	/**

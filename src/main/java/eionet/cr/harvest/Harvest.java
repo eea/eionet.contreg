@@ -166,8 +166,10 @@ public abstract class Harvest {
 	        arp.setErrorHandler(rdfHandler);
 	        arpSource.load(arp, sourceUrlString);
 	        
-	        errors.addAll(rdfHandler.getSaxErrors());
-	        warnings.addAll(rdfHandler.getSaxWarnings());
+	        if (rdfHandler.getSaxError()!=null)
+	        	errors.add(rdfHandler.getSaxError());
+	        if (rdfHandler.getSaxWarning()!=null)
+	        	warnings.add(rdfHandler.getSaxWarning());
 
 	        rdfHandler.commit();
 	        
@@ -276,7 +278,7 @@ public abstract class Harvest {
 		// call harvest finished functions of the DAO
 		if (daoWriter!=null){
 			try{
-				daoWriter.writeFinished(this, 0); // FIXME - supply a meaningful value instead of hard-coded 0, or drop the feature
+				daoWriter.writeFinished(this);
 			}
 			catch (DAOException e){
 				errors.add(e);
