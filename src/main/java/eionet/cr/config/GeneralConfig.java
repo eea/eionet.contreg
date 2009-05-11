@@ -41,6 +41,9 @@ public class GeneralConfig {
 	public static final String MAIL_SYSADMINS = "mail.sysAdmins";
 	
 	/** */
+	public static final String HARVESTER_DEBUG_USE_DOWNLOADED_FILES = "harvest.debug.useDownloadedFiles";
+	
+	/** */
 	public static final int SEVERITY_INFO = 1;
 	public static final int SEVERITY_CAUTION = 2;
 	public static final int SEVERITY_WARNING = 3;
