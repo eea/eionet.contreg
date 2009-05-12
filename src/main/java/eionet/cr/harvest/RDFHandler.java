@@ -59,13 +59,13 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	private long sourceUrlHash;
 	private long genTime;
 	private Log logger;
-	
+
+	/** */
+	private Connection connection;
+
 	/** */
 	private PreparedStatement preparedStatementForTriples;
 	private PreparedStatement preparedStatementForResources;
-	
-	/** */
-	private Connection connection;
 
 	/** */
 	private int storedTriplesCount = 0;
@@ -76,11 +76,19 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	
 	/** */
 	private boolean parsingStarted = false;
-
+	
+	/** */
+	private int tripleCounter = 0;
+	private static final int TRIPLE_PROGRESS_INTERVAL = 50000;
+	
+	/** */
+	private static final String EMPTY_STRING = "";
+	
 	/**
+	 * @throws SQLException 
 	 * 
 	 */
-	public RDFHandler(String sourceUrl, long genTime){
+	public RDFHandler(String sourceUrl, long genTime) throws SQLException{
 		
 		if (sourceUrl==null || sourceUrl.length()==0 || genTime<=0)
 			throw new IllegalArgumentException();
@@ -92,6 +100,13 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 		
 		// set the hash-seed for anonymous ids
 		anonIdSeed = Hashes.spoHash(sourceUrl + String.valueOf(genTime));
+		
+		// init connection
+		connection = ConnectionUtil.getSimpleConnection();
+		
+		// prepare statements
+		prepareStatementForTriples();
+		prepareStatementForResources();
 	}
 
 	/*
@@ -100,7 +115,7 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	 */
 	public void statement(AResource subject, AResource predicate, AResource object){
 		
-		statement(subject, predicate, object.isAnonymous() ? object.getAnonymousID() : object.getURI(), "", false, object.isAnonymous());
+		statement(subject, predicate, object.isAnonymous() ? object.getAnonymousID() : object.getURI(), EMPTY_STRING, false, object.isAnonymous());
 	}
 
 	/*
@@ -124,6 +139,11 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	private void statement(AResource subject, AResource predicate,
 							String object, String objectLang, boolean litObject, boolean anonObject){
 
+		tripleCounter++;
+		if (tripleCounter % TRIPLE_PROGRESS_INTERVAL == 0){
+			logger.debug("Currently at triple #" + String.valueOf(tripleCounter));
+		}
+
 		try{
 			if (parsingStarted==false){
 				onParsingStarted();
@@ -140,14 +160,15 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 
 //			parseForUsedNamespaces(predicate);
 			
-			long subjectHash = spoHash(subject.isAnonymous() ? subject.getAnonymousID() : subject.getURI(), subject.isAnonymous());
-			long predicateHash = spoHash(predicate.getURI(), false);
+			boolean anonSubject = subject.isAnonymous();			
+			long subjectHash = anonSubject ? Hashes.spoHash(subject.getAnonymousID(), anonIdSeed) : Hashes.spoHash(subject.getURI());
+			long predicateHash = Hashes.spoHash(predicate.getURI());
 			if (litObject)
 				object = UnicodeUtils.replaceEntityReferences(object);
 			
-			int i = storeTriple(subjectHash, subject.isAnonymous(), predicateHash, object, objectLang, litObject, anonObject);
+			storeTriple(subjectHash, anonSubject, predicateHash, object, objectLang, litObject, anonObject);
 			storeResource(predicate.getURI(), predicateHash);
-			if (!subject.isAnonymous()){
+			if (!anonSubject){
 				storeResource(subject.getURI(), subjectHash);
 			}
 		}
@@ -171,6 +192,9 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 		
 		// store the hash of the source itself
 		storeResource(sourceUrl, sourceUrlHash);
+		
+		// let the debugger know that we have got our first triple
+		logger.debug("Handling first triple");
 	}
 	
 	/**
@@ -218,56 +242,35 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	 * @param anonObject
 	 * @throws SQLException 
 	 */
-	private int storeTriple(long subjectHash, boolean anonSubject, long predicateHash,
+	private void storeTriple(long subjectHash, boolean anonSubject, long predicateHash,
 							String object, String objectLang, boolean litObject, boolean anonObject) throws SQLException{
-		
-		if (preparedStatementForTriples==null){
-			prepareStatementForTriples();
-			logger.debug("Started storing triples");
-		}
 		
 		preparedStatementForTriples.setLong  ( 1, subjectHash);
 		preparedStatementForTriples.setLong  ( 2, predicateHash);
 		preparedStatementForTriples.setString( 3, object);
-		preparedStatementForTriples.setLong  ( 4, spoHash(object, anonObject));
+		preparedStatementForTriples.setLong  ( 4, anonObject ? Hashes.spoHash(object, anonIdSeed) : Hashes.spoHash(object));
 		preparedStatementForTriples.setString( 5, YesNoBoolean.format(anonSubject));
 		preparedStatementForTriples.setString( 6, YesNoBoolean.format(anonObject));
 		preparedStatementForTriples.setString( 7, YesNoBoolean.format(litObject));
 		preparedStatementForTriples.setString( 8, objectLang==null ? "" : objectLang);
 		
-		return preparedStatementForTriples.executeUpdate();
+		preparedStatementForTriples.executeUpdate();
 	}
 
 	/**
 	 * 
 	 * @param uri
 	 * @param uriHash
-	 * @param type
 	 * @throws SQLException 
 	 */
-	private int storeResource(String uri, long uriHash) throws SQLException{
-
-		if (preparedStatementForResources==null){
-			prepareStatementForResources();
-			logger.debug("Started storing resources");
-		}
+	private void storeResource(String uri, long uriHash) throws SQLException{
 
 		preparedStatementForResources.setString(1, uri);
 		preparedStatementForResources.setLong(2, uriHash);
 		
-		return preparedStatementForResources.executeUpdate();
+		preparedStatementForResources.executeUpdate();
 	}
 	
-	/**
-	 * 
-	 * @param s
-	 * @param isAnonymous
-	 * @return
-	 */
-	private long spoHash(String s, boolean isAnonymous){
-		return isAnonymous ? Hashes.spoHash(s, anonIdSeed) : Hashes.spoHash(s);
-	}
-
 //	/**
 //	 * 
 //	 * @param predicate
@@ -314,9 +317,6 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	 */
 	private Connection getConnection() throws SQLException {
 		
-		if (connection==null){
-			connection = ConnectionUtil.getConnection();
-		}
 		return connection;
 	}
 	
@@ -707,11 +707,10 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	public void error(SAXParseException e) throws SAXException {
 
 		if (!saxErrorSet){
-			saxError = e;
+			logger.warn("SAX error encountered: " + e.toString(), e);
+			saxError = new SAXParseException(e.getMessage(), e.getPublicId(), e.getSystemId(), e.getLineNumber(), e.getColumnNumber());
 			saxErrorSet = true;
 		}
-		
-		logger.warn("SAX error encountered: " + e.toString(), e);
 	}
 
 	/*
@@ -721,7 +720,7 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	public void warning(SAXParseException e) throws SAXException {
 		
 		if (!saxWarningSet){
-			saxWarning = e;
+			saxWarning = new SAXParseException(e.getMessage(), e.getPublicId(), e.getSystemId(), e.getLineNumber(), e.getColumnNumber());
 			saxWarningSet = true;
 		}
 	}

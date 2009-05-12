@@ -27,11 +27,9 @@ public class UnicodeUtils {
 	 */
 	public static String replaceEntityReferences(String str){
 		
-		if (str==null)
-			return null;
-
-		StringBuffer buf = new StringBuffer();
-		for (int i=0; i<str.length(); i++){
+		int strLen = str.length();
+		StringBuilder budiler = new StringBuilder();
+		for (int i=0; i<strLen; i++){
     
 			char c = str.charAt(i);
     
@@ -63,10 +61,10 @@ public class UnicodeUtils {
 				}
 			}
     
-			buf.append(c);
+			budiler.append(c);
 		}
 
-		return buf.toString();
+		return budiler.toString();
 	}
 
 	/**

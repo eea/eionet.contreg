@@ -81,6 +81,7 @@ public class PullHarvest extends Harvest{
 			}
 			else{
 				sourceAvailable = Boolean.TRUE;
+				logger.debug("Harvesting the already downloaded file");
 			}
 		}
 		catch (IOException e){

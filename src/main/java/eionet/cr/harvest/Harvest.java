@@ -156,11 +156,13 @@ public abstract class Harvest {
 		
 		long genTime = System.currentTimeMillis();
 		
-		RDFHandler rdfHandler = new RDFHandler(sourceUrlString, genTime);
-		if (this instanceof PushHarvest)
-			rdfHandler.setClearPreviousContent(false);
-		
+		RDFHandler rdfHandler = null;
 		try{
+			
+			rdfHandler = new RDFHandler(sourceUrlString, genTime);
+			if (this instanceof PushHarvest)
+				rdfHandler.setClearPreviousContent(false);
+
 			ARP arp = new ARP();
 	        arp.setStatementHandler(rdfHandler);
 	        arp.setErrorHandler(rdfHandler);
@@ -182,23 +184,27 @@ public abstract class Harvest {
 			
 			try{logger.error("Harvest error: " + e.toString());}catch (Exception ee){}
 			
-			try{
-				rdfHandler.rollback();
-			}
-			catch (Exception ee){
-				logger.fatal("Harvest rollback failed", ee);
-				// TODO - handle rollback failure somehow
-				// (e.g. send e-mail notification, store failure into database and retry rollback at later harvests)
+			if (rdfHandler!=null){
+				try{
+					rdfHandler.rollback();
+				}
+				catch (Exception ee){
+					logger.fatal("Harvest rollback failed", ee);
+					// TODO - handle rollback failure somehow
+					// (e.g. send e-mail notification, store failure into database and retry rollback at later harvests)
+				}
 			}
 			
 			Throwable t = (e instanceof LoadException) && e.getCause()!=null ? e.getCause() : e;
 			throw new HarvestException(t.toString(), t);
 		}
 		finally{
-			try{
-				rdfHandler.closeResources();
+			if (rdfHandler!=null){
+				try{
+					rdfHandler.closeResources();
+				}
+				catch (Exception e){}
 			}
-			catch (Exception e){}
 		}
 	}
 

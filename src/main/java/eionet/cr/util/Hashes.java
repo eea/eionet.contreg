@@ -14,6 +14,8 @@ import eionet.cr.common.Subjects;
  */
 public class Hashes {
 	
+	private static final long SEED = 0xcbf29ce484222325L;
+	
 	/**
 	 * 
 	 * @param s
@@ -38,7 +40,7 @@ public class Hashes {
 	 * @return
 	 */
 	private static long fnv64(String s){
-		return Hashes.fnv64(s, 0xcbf29ce484222325L);
+		return Hashes.fnv64(s, SEED);
 	}
 
 	/**
@@ -48,12 +50,11 @@ public class Hashes {
 	 */
 	private static long fnv64(String s, long seed){
 		
-		if (s!=null && s.length()>0){
-		    for (int i=0; i<s.length(); i++){
-		    	seed ^= (long)s.charAt(i);
-		    	seed += (seed << 1) + (seed << 4) + (seed << 5) + (seed << 7) + (seed << 8) + (seed << 40);
-		    }
-		}
+		int sLen = s.length();
+	    for (int i=0; i<sLen; i++){
+	    	seed ^= (long)s.charAt(i);
+	    	seed += (seed << 1) + (seed << 4) + (seed << 5) + (seed << 7) + (seed << 8) + (seed << 40);
+	    }
 		
 		return seed;
 	}
@@ -101,11 +102,12 @@ public class Hashes {
 	    return buf.toString();
 	}
 	
+	/**
+	 * 
+	 * @param args
+	 */
 	public static void main(String[] args){
-		System.out.println(spoHash(Subjects.ROD_OBLIGATION_CLASS));
-		System.out.println(spoHash(Predicates.RDF_TYPE));
-		System.out.println(spoHash(Predicates.DC_TITLE));
-		System.out.println(spoHash(Predicates.ROD_INSTRUMENT_PROPERTY));
-		System.out.println(spoHash(Predicates.DCTERMS_ALTERNATIVE));
+		
+		System.out.println(spoHash("http://www.gutenberg.org/feeds/catalog.rdf"));
 	}
 }
