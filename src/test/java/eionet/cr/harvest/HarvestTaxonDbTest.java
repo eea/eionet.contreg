@@ -63,10 +63,10 @@ public class HarvestTaxonDbTest extends DatabaseTestCase {
         }
 
 	@Test
-	public void testTaxonDownRdf() {
+	public void testTaxonUnderRdf() {
 				
 		try {
-			URL o = getClass().getClassLoader().getResource("taxon-rdf.xml");
+			URL o = getClass().getClassLoader().getResource("taxon-under-rdf.xml");
 			Harvest harvest = new PullHarvest(o.toString(), null);
 			harvest.execute();
 			assertEquals((int)2, harvest.getDistinctSubjectsCount());
@@ -81,10 +81,10 @@ public class HarvestTaxonDbTest extends DatabaseTestCase {
         }
 
 	@Test
-	public void testTaxonUpRdf() {
+	public void testTaxonOverRdf() {
 				
 		try {
-			URL o = getClass().getClassLoader().getResource("taxon-up-rdf.xml");
+			URL o = getClass().getClassLoader().getResource("taxon-over-rdf.xml");
 			Harvest harvest = new PullHarvest(o.toString(), null);
 			harvest.execute();
 			assertEquals((int)2, harvest.getDistinctSubjectsCount());

@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE rdf:RDF [
+    <!ENTITY rdfns 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'>
+    <!ENTITY rdfsns 'http://www.w3.org/2000/01/rdf-schema#'>
+    <!ENTITY dctermsns 'http://purl.org/dc/terms/'>
+    <!ENTITY dctypens 'http://purl.org/dc/dcmitype/'>
+    <!ENTITY dwcattributesns 'http://rs.tdwg.org/dwc/terms/attributes/'>
+<!--
+    <!ENTITY skosns 'http://www.w3.org/2004/02/skos/core#'>
+    <!ENTITY vsns 'http://www.w3.org/2003/06/sw-vocab-status/ns#'>
+-->
+]>
+
+<rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/"
+         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xml:base="http://rs.tdwg.org/dwc/terms/">
+
+  <rdf:Description rdf:about="Taxon">
+    <rdfs:label xml:lang="en-US">Taxon</rdfs:label>
+    <rdfs:comment xml:lang="en-US">The category of information pertaining to taxonomic names or concepts.</rdfs:comment>
+    <rdfs:isDefinedBy rdf:resource="http://rs.tdwg.org/dwc/terms/"/>
+    <dcterms:issued>2008-11-19</dcterms:issued>
+    <dcterms:modified>2008-11-19</dcterms:modified>
+    <rdf:type rdf:resource="http://www.w3.org/2000/01/rdf-schema#Class"/>
+    <dcterms:hasVersion rdf:resource="http://rs.tdwg.org/dwc/terms/#Taxon-2008-11-19"/>
+    <rdfs:replaces rdf:resource="http://rs.tdwg.org/dwc/terms/Taxon-2008-11-19"/>
+  </rdf:Description>
+
+  <rdf:Description rdf:about="kingdom">
+    <rdfs:label xml:lang="en-US">kingdom</rdfs:label>
+    <rdfs:comment xml:lang="en-US">The name of the kingdom in which the scientificName is classified.</rdfs:comment>
+    <dcterms:description xml:lang="en-US">Example: "Animalia"</dcterms:description>
+    <rdfs:isDefinedBy rdf:resource="http://rs.tdwg.org/dwc/terms/"/>
+    <dcterms:issued>2008-11-19</dcterms:issued>
+    <dcterms:modified>2009-04-24</dcterms:modified>
+    <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
+    <dcterms:hasVersion rdf:resource="http://rs.tdwg.org/dwc/terms/#kingdom-2009-04-24"/>
+    <rdfs:domain rdf:resource="http://rs.tdwg.org/dwc/terms/Taxon"/>
+    <rdfs:replaces rdf:resource="http://rs.tdwg.org/dwc/terms/kingdom-2009-04-24"/>
+  </rdf:Description>
+
+</rdf:RDF>
