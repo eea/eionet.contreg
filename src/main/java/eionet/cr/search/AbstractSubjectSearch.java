@@ -17,6 +17,7 @@ import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.util.SortOrder;
 import eionet.cr.search.util.SubjectHashesReader;
 import eionet.cr.search.util.SubjectDataReader;
+import eionet.cr.util.Util;
 import eionet.cr.util.pagination.Pagination;
 import eionet.cr.util.sql.ConnectionUtil;
 import eionet.cr.util.sql.MySQLUtil;
@@ -57,33 +58,39 @@ public abstract class AbstractSubjectSearch {
 			
 			Connection conn = null;
 			try{
+				/* create connection and SubjectHashesReader */
+				
 				conn = getConnection();
 				SubjectHashesReader subjectHashesReader = createSubjectHashesReader();
 				
+				/* execute subject finder query */
+				
 				logger.debug("Executing subject select query: " + subjectSelectSQL);
 				long time = System.currentTimeMillis();
-				
 				SQLUtil.executeQuery(subjectSelectSQL, inParameters, subjectHashesReader, conn);
-				
 				logger.debug("subject select query took " + (System.currentTimeMillis()-time) + " ms");
 				
-				if (subjectHashesReader.getResultCount()>0){
+				/* if any subjects found, proceed to getting their metadata */
+				
+				LinkedHashMap<String, SubjectDTO> subjectsMap = subjectHashesReader.getPageMap(pageNumber, pageLength);
+				if (subjectsMap.size()>0){
 					
-					totalMatchCount = MySQLUtil.getTotalRowCount(conn); // TODO - maybe do it without directly pointing to MySQL
-					LinkedHashMap<String, SubjectDTO> subjectsMap = subjectHashesReader.getResultMap();
-					
+					totalMatchCount = subjectHashesReader.getTotalResultCount();
 					SubjectDataReader subjectDataReader = createSubjectDataReader(subjectsMap);
+				
+					/* execute subject metadata query */
 					
 					logger.debug("Executing subject data select query");
 					time = System.currentTimeMillis();
-
-					SQLUtil.executeQuery(
-							getSubjectDataSelectSQL(subjectHashesReader.getSubjectHashesCommaSeparated()), subjectDataReader, conn);
-				
+					SQLUtil.executeQuery(getSubjectDataSelectSQL(Util.toCSV(subjectsMap.keySet())), subjectDataReader, conn);
 					logger.debug("subject data select query took " + (System.currentTimeMillis()-time) + " ms");
+					
+					/* collect labels and sub-properties */
 					
 					collectPredicateLabels(conn, subjectDataReader);
 					collectSubProperties(conn, subjectDataReader);
+					
+					/* assign result list */
 					
 					resultList = subjectsMap.values();
 				}

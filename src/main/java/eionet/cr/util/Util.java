@@ -9,7 +9,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -280,26 +282,6 @@ public class Util {
 		}
     }
 
-    /**
-     * 
-     * @param objects
-     * @return
-     */
-	public static java.lang.String toCsvString(java.util.List objects){
-		
-		if (objects==null || objects.isEmpty())
-			return "";
-		
-		StringBuffer buf = new StringBuffer();
-		for (int i=0; i<objects.size(); i++){
-			if (i>0)
-				buf.append(", ");
-			buf.append(objects.get(i).toString());
-		}
-		
-		return buf.toString();
-	}
-	
 	/**
 	 * 
 	 * @param o
@@ -325,6 +307,26 @@ public class Util {
 			return false;
 		else
 			return CronExpression.isValidExpression(expression);
+	}
+	
+	/**
+	 * 
+	 * @param coll
+	 * @return
+	 */
+	public static String toCSV(Collection coll){
+		
+		StringBuffer buf = new StringBuffer();
+		if (coll!=null){
+			for (Iterator it = coll.iterator(); it.hasNext();){
+				
+				if (buf.length()>0){
+					buf.append(",");
+				}
+				buf.append(it.next());
+			}
+		}
+		return buf.toString();
 	}
 	
 	/**

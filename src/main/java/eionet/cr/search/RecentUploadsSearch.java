@@ -45,7 +45,7 @@ public class RecentUploadsSearch extends AbstractSubjectSearch {
 			return null;
 		
 		StringBuffer sqlBuf = new StringBuffer().
-		append("select sql_calc_found_rows distinct SPO.SUBJECT as SUBJECT_HASH, RESOURCE.FIRSTSEEN_TIME as FIRSTSEEN_TIME from SPO, RESOURCE").
+		append("select SPO.SUBJECT as SUBJECT_HASH, RESOURCE.FIRSTSEEN_TIME as FIRSTSEEN_TIME from SPO, RESOURCE").
 		append(" where SPO.PREDICATE=").append(Hashes.spoHash(Predicates.RDF_TYPE)).
 		append(" and SPO.OBJECT_HASH=?").
 		append(" and SPO.SUBJECT=RESOURCE.URI_HASH").
@@ -53,14 +53,14 @@ public class RecentUploadsSearch extends AbstractSubjectSearch {
 		
 		inParameters.add(Long.valueOf(Hashes.spoHash(subjectType)));
 		
-		if (pageLength>0){
-			sqlBuf.append(" limit ");
-			if (pageNumber>0){
-				sqlBuf.append("?,");
-				inParameters.add(new Integer((pageNumber-1)*pageLength));
-			}
-			sqlBuf.append(pageLength);
-		}
+//		if (pageLength>0){
+//			sqlBuf.append(" limit ");
+//			if (pageNumber>0){
+//				sqlBuf.append("?,");
+//				inParameters.add(new Integer((pageNumber-1)*pageLength));
+//			}
+//			sqlBuf.append(pageLength);
+//		}
 		
 		return sqlBuf.toString();
 	}

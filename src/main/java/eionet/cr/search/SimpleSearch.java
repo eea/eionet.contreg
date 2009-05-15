@@ -45,7 +45,7 @@ public class SimpleSearch extends AbstractSubjectSearch{
 		if (searchExpression==null || searchExpression.isEmpty())
 			return null;
 		
-		StringBuffer sqlBuf = new StringBuffer("select sql_calc_found_rows distinct SPO.SUBJECT as SUBJECT_HASH from SPO ");
+		StringBuffer sqlBuf = new StringBuffer("select SPO.SUBJECT as SUBJECT_HASH from SPO ");
 		if (sortPredicate!=null){
 			sqlBuf.append("left join SPO as ORDERING on (SPO.SUBJECT=ORDERING.SUBJECT and ORDERING.PREDICATE=?) ");
 			inParameters.add(Long.valueOf(Hashes.spoHash(sortPredicate)));
@@ -60,14 +60,14 @@ public class SimpleSearch extends AbstractSubjectSearch{
 		if (sortPredicate!=null)
 			sqlBuf.append(" order by ORDERING.OBJECT ").append(sortOrder==null ? sortOrder.ASCENDING.toSQL() : sortOrder.toSQL());
 
-		if (pageLength>0){
-			sqlBuf.append(" limit ");
-			if (pageNumber>0){
-				sqlBuf.append("?,");
-				inParameters.add(new Integer((pageNumber-1)*pageLength));
-			}
-			sqlBuf.append(pageLength);
-		}
+//		if (pageLength>0){
+//			sqlBuf.append(" limit ");
+//			if (pageNumber>0){
+//				sqlBuf.append("?,");
+//				inParameters.add(new Integer((pageNumber-1)*pageLength));
+//			}
+//			sqlBuf.append(pageLength);
+//		}
 		
 		return sqlBuf.toString();
 	}

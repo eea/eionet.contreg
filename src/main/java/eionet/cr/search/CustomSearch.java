@@ -48,20 +48,20 @@ public class CustomSearch extends AbstractSubjectSearch{
 		
 		createFromAndWhereStatements(inParameters);
 		
-		StringBuffer sqlBuf = new StringBuffer("select sql_calc_found_rows SPO1.SUBJECT as SUBJECT_HASH from ").
+		StringBuffer sqlBuf = new StringBuffer("select SPO1.SUBJECT as SUBJECT_HASH from ").
 		append(fromStatement).append(" where ").append(whereStatement);
 		
 		if (sortPredicate!=null)
 			sqlBuf.append(" order by ORDERING.OBJECT ").append(sortOrder==null ? sortOrder.ASCENDING.toSQL() : sortOrder.toSQL());
 
-		if (pageLength>0){
-			sqlBuf.append(" limit ");
-			if (pageNumber>0){
-				sqlBuf.append("?,");
-				inParameters.add(new Integer((pageNumber-1)*pageLength));
-			}
-			sqlBuf.append(pageLength);
-		}
+//		if (pageLength>0){
+//			sqlBuf.append(" limit ");
+//			if (pageNumber>0){
+//				sqlBuf.append("?,");
+//				inParameters.add(new Integer((pageNumber-1)*pageLength));
+//			}
+//			sqlBuf.append(pageLength);
+//		}
 
 		return sqlBuf.toString();
 	}

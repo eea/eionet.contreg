@@ -16,6 +16,8 @@ public class RecentUploadsHashesReader extends SubjectHashesReader {
 	 */
 	public RecentUploadsHashesReader(Map<String,Date> firstSeenTimes){
 		
+		super();
+		
 		if (firstSeenTimes==null)
 			throw new IllegalArgumentException();
 		this.firstSeenTimes = firstSeenTimes;
