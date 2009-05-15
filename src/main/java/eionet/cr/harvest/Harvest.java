@@ -167,6 +167,7 @@ public abstract class Harvest {
 	        arp.setStatementHandler(rdfHandler);
 	        arp.setErrorHandler(rdfHandler);
 	        arpSource.load(arp, sourceUrlString);
+	        rdfHandler.endOfFile();
 	        
 	        if (rdfHandler.getSaxError()!=null)
 	        	errors.add(rdfHandler.getSaxError());
@@ -177,8 +178,6 @@ public abstract class Harvest {
 	        
 	        storedTriplesCount = rdfHandler.getStoredTriplesCount();
 	        distinctSubjectsCount = rdfHandler.getDistinctSubjectsCount();
-	        
-	        logger.debug(rdfHandler.getStoredTriplesCount() + " triples stored");
 		}
 		catch (Exception e){
 			

@@ -62,7 +62,7 @@ public class ConnectionUtil {
 	 * @return
 	 * @throws SQLException 
 	 */
-	public static synchronized Connection getJNDIConnection() throws SQLException{
+	protected static synchronized Connection getJNDIConnection() throws SQLException{
 		
 		if (dataSource==null)
 			initDataSource();
@@ -75,7 +75,7 @@ public class ConnectionUtil {
 	 * @throws SQLException 
 	 * @throws SQLException
 	 */
-	public static Connection getSimpleConnection() throws SQLException{
+	protected static Connection getSimpleConnection() throws SQLException{
 		
 		String drv = GeneralConfig.getProperty(GeneralConfig.DB_DRV);
 		if (drv==null || drv.trim().length()==0)
