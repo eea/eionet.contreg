@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE rdf:RDF [
+	<!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+	<!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#">
+	<!ENTITY dc "http://purl.org/dc/elements/1.1/">
+	<!ENTITY dct "http://purl.org/dc/terms/">
+]>
+<rdf:RDF xml:base="http://www.w3.org/2004/02/skos/core"
+xmlns:rdf="&rdf;" xmlns:rdfs="&rdfs;" xmlns:dc="&dc;" xmlns:dct="&dct;">
+	
+	<rdfs:Class rdf:ID="Concept">
+		<rdfs:label>Concept</rdfs:label>
+		<rdfs:comment>A concept is any unit of thought that can be defined or described.</rdfs:comment>
+		<rdfs:isDefinedBy rdf:resource="http://www.w3.org/2004/02/skos/core"/>
+		<dct:issued>2004-03-26</dct:issued>
+	</rdfs:Class>
+
+	<rdf:Property rdf:ID="semanticRelation">
+		<rdfs:label>semantic relation</rdfs:label>
+		<rdfs:domain rdf:resource="#Concept"/>
+		<rdfs:range rdf:resource="#Concept"/>
+		<rdfs:comment>This is the super-property of all properties used to make statements about how concepts within the same conceptual scheme relate to each other.</rdfs:comment>
+		<rdfs:isDefinedBy rdf:resource="http://www.w3.org/2004/02/skos/core"/>
+		<dct:issued>2004-03-26</dct:issued>
+	</rdf:Property>
+	
+</rdf:RDF>
