@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+         xmlns:dc="http://purl.org/dc/elements/1.1/"
+         xmlns:dcterms="http://purl.org/dc/terms/"
+         xmlns:pgterms="http://www.gutenberg.org/rdfterms/"
+         xml:base="http://www.gutenberg.org/feeds/catalog.rdf">
+
+<pgterms:etext rdf:ID="etext28546">
+  <dc:subject>
+    <rdf:Bag>
+      <rdf:li><dcterms:LCSH><rdf:value>Great Britain -- History -- Stuarts, 1603-1714</rdf:value></dcterms:LCSH></rdf:li>
+      <rdf:li><dcterms:LCSH><rdf:value>England -- Civilization -- 17th century</rdf:value></dcterms:LCSH></rdf:li>
+    </rdf:Bag>
+  </dc:subject>
+</pgterms:etext>
+
+</rdf:RDF>
+

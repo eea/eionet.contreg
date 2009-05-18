@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:dc="http://purl.org/dc/elements/1.1/"
+         xmlns:dcterms="http://purl.org/dc/terms/"
+         xml:base="http://www.gutenberg.org/feeds/catalog.rdf">
+
+<rdf:Description rdf:ID="etext28546">
+  <dc:date><dcterms:W3CDTF><rdf:value>2009-04-09</rdf:value></dcterms:W3CDTF></dc:date>
+</rdf:Description>
+
+</rdf:RDF>
+

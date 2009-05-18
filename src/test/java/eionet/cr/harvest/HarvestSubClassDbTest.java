@@ -21,7 +21,7 @@ import eionet.cr.util.sql.ConnectionUtil;
  * @author roug
  * 
  */
-public class HarvestTaxonDbTest extends DatabaseTestCase {
+public class HarvestSubClassDbTest extends DatabaseTestCase {
 
 	protected IDatabaseConnection getConnection() throws Exception {
 		ConnectionUtil.setReturnSimpleConnection(true);
@@ -40,64 +40,60 @@ public class HarvestTaxonDbTest extends DatabaseTestCase {
 
 		// Fetch database data after executing your code
 		QueryDataSet queryDataSet = new QueryDataSet(getConnection());
-		queryDataSet
-				.addTable(
-						"SPO",
-						"SELECT SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG, OBJ_DERIV_SOURCE, OBJ_DERIV_SOURCE_GEN_TIME, OBJ_SOURCE_OBJECT FROM SPO ORDER BY SUBJECT, PREDICATE, OBJECT");
+		queryDataSet.addTable("SPO",
+						"SELECT SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ, "
+								+ "LIT_OBJ, OBJ_LANG, OBJ_SOURCE_OBJECT FROM SPO"
+								+ " ORDER BY SUBJECT, PREDICATE, OBJECT");
 		ITable actSPOTable = queryDataSet.getTable("SPO");
 
-		queryDataSet
-				.addTable(
-						"RESOURCE",
-						"SELECT URI,URI_HASH FROM RESOURCE WHERE URI NOT LIKE 'file:%' ORDER BY URI, URI_HASH");
+		queryDataSet.addTable("RESOURCE", "SELECT URI,URI_HASH FROM RESOURCE "
+				+ "WHERE URI NOT LIKE 'file:%' ORDER BY URI, URI_HASH");
 		ITable actResTable = queryDataSet.getTable("RESOURCE");
-		if (dumpIt) {
+
+		if ( dumpIt) {
 			FlatXmlDataSet.write(queryDataSet, new FileOutputStream(testData));
 		} else {
+		// Load expected data from an XML dataset
+		IDataSet expectedDataSet = new FlatXmlDataSet(
+				getFileAsStream(testData));
+		ITable expSpoTable = expectedDataSet.getTable("SPO");
+		ITable expResTable = expectedDataSet.getTable("RESOURCE");
 
-			// Load expected data from an XML dataset
-			IDataSet expectedDataSet = new FlatXmlDataSet(
-					getFileAsStream(testData));
-			ITable expSpoTable = expectedDataSet.getTable("SPO");
-			ITable expResTable = expectedDataSet.getTable("RESOURCE");
+		// Assert actual SPO table matches expected table
+		Assertion.assertEquals(actSPOTable, expSpoTable);
 
-			// Assert actual SPO table matches expected table
-			Assertion.assertEquals(actSPOTable, expSpoTable);
-
-			// Assert actual Resource table matches expected table
-			Assertion.assertEquals(actResTable, expResTable);
+		// Assert actual Resource table matches expected table
+		Assertion.assertEquals(actResTable, expResTable);
 		}
 	}
 
+
 	@Test
-	public void testTaxonUnderRdf() {
+	public void testSubClassOfRdf() {
 
 		try {
-			URL o = getClass().getClassLoader().getResource(
-					"taxon-under-rdf.xml");
+			URL o = getClass().getClassLoader().getResource("subclass-rdf.xml");
 			Harvest harvest = new PullHarvest(o.toString(), null);
 			harvest.execute();
-			assertEquals((int) 2, harvest.getDistinctSubjectsCount());
-			assertEquals((int) 18, harvest.getStoredTriplesCount());
-			compareDatasets("taxon-db.xml", false);
+			compareDatasets("subclass-db.xml", false);
 		} catch (Throwable e) {
 			e.printStackTrace();
 			fail("Was not expecting this exception: " + e.toString());
 		}
 
 	}
-
+	
 	@Test
-	public void testTaxonOverRdf() {
+	public void testSplitSubClassOfRdf() {
 
 		try {
-			URL o = getClass().getClassLoader().getResource(
-					"taxon-over-rdf.xml");
+			URL o = getClass().getClassLoader().getResource("subclass-s1-rdf.xml");
 			Harvest harvest = new PullHarvest(o.toString(), null);
 			harvest.execute();
-			assertEquals((int) 2, harvest.getDistinctSubjectsCount());
-			assertEquals((int) 18, harvest.getStoredTriplesCount());
-			compareDatasets("taxon-db.xml", false);
+			o = getClass().getClassLoader().getResource("subclass-s2-rdf.xml");
+			harvest = new PullHarvest(o.toString(), null);
+			harvest.execute();
+			compareDatasets("subclass-db.xml", false);
 		} catch (Throwable e) {
 			e.printStackTrace();
 			fail("Was not expecting this exception: " + e.toString());
