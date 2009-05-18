@@ -106,8 +106,13 @@ public class Hashes {
 	 * 
 	 * @param args
 	 */
-	public static void main(String[] args){
-		
-		System.out.println(spoHash("http://www.gutenberg.org/feeds/catalog.rdf"));
+	public static void main(String[] args) {
+		if (args.length != 0) {
+			for (String s:args) {
+				System.out.println(s + " = " + Hashes.spoHash(s));
+			}
+		} else {
+			System.out.println(spoHash("http://www.gutenberg.org/feeds/catalog.rdf"));
+		}
 	}
 }
