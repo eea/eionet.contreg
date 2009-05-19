@@ -50,4 +50,12 @@ public class JavaURLTest extends TestCase {
 
 	}
 
+	/**
+	 * This method explains the problem with local-file URLs obtained with getClass().getClassLoader().getResource(). 
+	 */
+	public void testURLWithResource(){
+		
+		URL url = getClass().getClassLoader().getResource("taxon-under-rdf.xml");
+		assertEquals("file:///C:/projects/eeasvn/cr2/target/test-classes/taxon-under-rdf.xml", url.toString());
+	}
 }
