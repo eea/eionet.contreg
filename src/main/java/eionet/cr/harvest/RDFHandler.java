@@ -88,6 +88,9 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	private Long currentPredicateHash = null;
 	private HashSet<Long> distinctResources = new HashSet<Long>();
 	
+	/** */
+	private boolean deriveExtraTriples = true;
+	
 	/**
 	 * @throws SQLException 
 	 * 
@@ -378,10 +381,11 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 		commitTriples();
 		commitResources();
 		
-		deriveParentProperties();
-		deriveParentClasses();
-		
-		deriveLabels();
+		if (deriveExtraTriples){
+			deriveParentProperties();
+			deriveParentClasses();
+			deriveLabels();
+		}
 
 		extractNewHarvestSources();
 		
@@ -815,5 +819,12 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	 */
 	public int getTripleCounter() {
 		return tripleCounter;
+	}
+
+	/**
+	 * @param deriveExtraTriples the deriveExtraTriples to set
+	 */
+	public void setDeriveExtraTriples(boolean deriveExtraTriples) {
+		this.deriveExtraTriples = deriveExtraTriples;
 	}
 }

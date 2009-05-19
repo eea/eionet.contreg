@@ -68,6 +68,9 @@ public abstract class Harvest {
 	protected List<Throwable> warnings = new ArrayList<Throwable>();
 	protected List<String> infos = new ArrayList<String>();
 	
+	/** */
+	private boolean deriveExtraTriples = true;
+	
 	/**
 	 * 
 	 * @param sourceUrlString
@@ -160,6 +163,7 @@ public abstract class Harvest {
 		try{
 			
 			rdfHandler = new RDFHandler(sourceUrlString, genTime);
+			rdfHandler.setDeriveExtraTriples(deriveExtraTriples);
 			if (this instanceof PushHarvest)
 				rdfHandler.setClearPreviousContent(false);
 
@@ -420,5 +424,12 @@ public abstract class Harvest {
 	 */
 	public List<String> getInfos() {
 		return infos;
+	}
+
+	/**
+	 * @param deriveExtraTriples the deriveExtraTriples to set
+	 */
+	public void setDeriveExtraTriples(boolean deriveExtraTriples) {
+		this.deriveExtraTriples = deriveExtraTriples;
 	}
 }

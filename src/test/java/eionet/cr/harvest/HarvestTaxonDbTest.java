@@ -2,6 +2,7 @@ package eionet.cr.harvest;
 
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
 
 import org.dbunit.Assertion;
@@ -23,19 +24,35 @@ import eionet.cr.util.sql.ConnectionUtil;
  */
 public class HarvestTaxonDbTest extends DatabaseTestCase {
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.dbunit.DatabaseTestCase#getConnection()
+	 */
 	protected IDatabaseConnection getConnection() throws Exception {
 		ConnectionUtil.setReturnSimpleConnection(true);
 		return new DatabaseConnection(ConnectionUtil.getConnection());
 	}
 
+	/**
+	 * 
+	 * @param filename
+	 * @return
+	 */
 	private InputStream getFileAsStream(String filename) {
 		return this.getClass().getClassLoader().getResourceAsStream(filename);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.dbunit.DatabaseTestCase#getDataSet()
+	 */
 	protected IDataSet getDataSet() throws Exception {
 		return new FlatXmlDataSet(getFileAsStream("emptydb.xml"));
 	}
 
+	/*
+	 * 
+	 */
 	private void compareDatasets(String testData, boolean dumpIt) throws Exception {
 
 		// Fetch database data after executing your code
@@ -62,10 +79,10 @@ public class HarvestTaxonDbTest extends DatabaseTestCase {
 			ITable expResTable = expectedDataSet.getTable("RESOURCE");
 
 			// Assert actual SPO table matches expected table
-			Assertion.assertEquals(actSPOTable, expSpoTable);
+			Assertion.assertEquals(expSpoTable, actSPOTable);
 
 			// Assert actual Resource table matches expected table
-			Assertion.assertEquals(actResTable, expResTable);
+			Assertion.assertEquals(expResTable, actResTable);
 		}
 	}
 
@@ -73,10 +90,9 @@ public class HarvestTaxonDbTest extends DatabaseTestCase {
 	public void testTaxonUnderRdf() {
 
 		try {
-			URL o = getClass().getClassLoader().getResource(
-					"taxon-under-rdf.xml");
-//			URL o = new URL("http://svn.eionet.europa.eu/repositories/Reportnet/cr2/trunk/src/test/resources/taxon-under-rdf.xml");
-			Harvest harvest = new PullHarvest(o.toString(), null);
+			URL o = getClass().getClassLoader().getResource("taxon-under-rdf.xml");
+			Harvest harvest = new PullHarvest("file://" + o.getPath(), null);
+			harvest.setDeriveExtraTriples(false);
 			harvest.execute();
 			assertEquals((int) 2, harvest.getDistinctSubjectsCount());
 			assertEquals((int) 18, harvest.getStoredTriplesCount());
@@ -92,10 +108,9 @@ public class HarvestTaxonDbTest extends DatabaseTestCase {
 	public void testTaxonOverRdf() {
 
 		try {
-			URL o = getClass().getClassLoader().getResource(
-					"taxon-over-rdf.xml");
-//			URL o = new URL("http://svn.eionet.europa.eu/repositories/Reportnet/cr2/trunk/src/test/resources/taxon-over-rdf.xml");
-			Harvest harvest = new PullHarvest(o.toString(), null);
+			URL o = getClass().getClassLoader().getResource("taxon-over-rdf.xml");
+			Harvest harvest = new PullHarvest("file://" + o.getPath(), null);
+			harvest.setDeriveExtraTriples(false);
 			harvest.execute();
 			assertEquals((int) 2, harvest.getDistinctSubjectsCount());
 			assertEquals((int) 18, harvest.getStoredTriplesCount());
@@ -104,7 +119,6 @@ public class HarvestTaxonDbTest extends DatabaseTestCase {
 			e.printStackTrace();
 			fail("Was not expecting this exception: " + e.toString());
 		}
-
 	}
 
 }
