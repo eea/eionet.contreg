@@ -55,7 +55,8 @@ public class JavaURLTest extends TestCase {
 	 */
 	public void testURLWithResource(){
 		
+		String prefix = "file:///";
 		URL url = getClass().getClassLoader().getResource("taxon-under-rdf.xml");
-		assertEquals("file:///C:/projects/eeasvn/cr2/target/test-classes/taxon-under-rdf.xml", url.toString());
+		assertTrue("Was expecting the url to strat with \"" + prefix + "\"", url.toString().startsWith(prefix));
 	}
 }
