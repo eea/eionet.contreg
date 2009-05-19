@@ -75,6 +75,7 @@ public class HarvestTaxonDbTest extends DatabaseTestCase {
 		try {
 			URL o = getClass().getClassLoader().getResource(
 					"taxon-under-rdf.xml");
+//			URL o = new URL("http://svn.eionet.europa.eu/repositories/Reportnet/cr2/trunk/src/test/resources/taxon-under-rdf.xml");
 			Harvest harvest = new PullHarvest(o.toString(), null);
 			harvest.execute();
 			assertEquals((int) 2, harvest.getDistinctSubjectsCount());
@@ -93,6 +94,7 @@ public class HarvestTaxonDbTest extends DatabaseTestCase {
 		try {
 			URL o = getClass().getClassLoader().getResource(
 					"taxon-over-rdf.xml");
+//			URL o = new URL("http://svn.eionet.europa.eu/repositories/Reportnet/cr2/trunk/src/test/resources/taxon-over-rdf.xml");
 			Harvest harvest = new PullHarvest(o.toString(), null);
 			harvest.execute();
 			assertEquals((int) 2, harvest.getDistinctSubjectsCount());

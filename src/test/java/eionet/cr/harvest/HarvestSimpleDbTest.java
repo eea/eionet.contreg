@@ -72,7 +72,8 @@ public class HarvestSimpleDbTest extends DatabaseTestCase {
 	public void testSimpleRdf() {
 
 		try {
-			URL o = getClass().getClassLoader().getResource("simple-rdf.xml");
+//			URL o = getClass().getClassLoader().getResource("simple-rdf.xml");
+			URL o = new URL("http://svn.eionet.europa.eu/repositories/Reportnet/cr2/trunk/src/test/resources/simple-rdf.xml");
 			Harvest harvest = new PullHarvest(o.toString(), null);
 			harvest.execute();
 			compareDatasets("simple-db.xml", false);
@@ -87,7 +88,8 @@ public class HarvestSimpleDbTest extends DatabaseTestCase {
 	public void testEncodingRdf() {
 
 		try {
-			URL o = getClass().getClassLoader().getResource("encoding-scheme-rdf.xml");
+//			URL o = getClass().getClassLoader().getResource("encoding-scheme-rdf.xml");
+			URL o = new URL("http://svn.eionet.europa.eu/repositories/Reportnet/cr2/trunk/src/test/resources/encoding-scheme-rdf.xml");
 			Harvest harvest = new PullHarvest(o.toString(), null);
 			harvest.execute();
 			compareDatasets("encoding-scheme-db.xml", false);
