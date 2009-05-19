@@ -136,8 +136,18 @@ public abstract class AbstractSubjectSearch {
 	 */
 	public void setSorting(String sortPredicate, String sortOrder) {
 		
+		setSorting(sortPredicate, SortOrder.parse(sortOrder));
+	}
+
+	/**
+	 * 
+	 * @param sortPredicate
+	 * @param sortOrder
+	 */
+	public void setSorting(String sortPredicate, SortOrder sortOrder) {
+		
 		this.sortPredicate= sortPredicate;
-		this.sortOrder = SortOrder.parse(sortOrder);
+		this.sortOrder = sortOrder;
 	}
 
 	/**

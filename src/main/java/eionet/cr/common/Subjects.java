@@ -19,4 +19,5 @@ public interface Subjects {
 	public static final String ANON_ID_PREFIX = "http://cr.eionet.europa.eu/anonymous/";
 
 	public static final String RDFS_LITERAL = "http://www.w3.org/2000/01/rdf-schema#Literal";
+	public static final String RDFS_CLASS = "http://www.w3.org/2000/01/rdf-schema#Class";
 }

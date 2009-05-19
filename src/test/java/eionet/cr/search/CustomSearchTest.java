@@ -27,7 +27,7 @@ public class CustomSearchTest extends TestCase{
 		
 		CustomSearch customSearch = new CustomSearch(criteria);
 		customSearch.setPageNumber(12);
-		customSearch.setSorting("sortPredicate", null);
+		customSearch.setSorting("sortPredicate", (String)null);
 
 		List inParameters = new ArrayList();
 		String subjectSelectSQL = customSearch.getSubjectSelectSQL(inParameters);

@@ -210,4 +210,12 @@ public class HarvestSourceDTO implements Serializable {
 	public void setLastHarvest(Date lastHarvest) {
 		this.lastHarvest = lastHarvest;
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	public String toString(){
+		return new StringBuffer().append("Harvest source ").append(url).toString();
+	}
 }
