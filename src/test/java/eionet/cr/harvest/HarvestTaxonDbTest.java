@@ -90,8 +90,8 @@ public class HarvestTaxonDbTest extends DatabaseTestCase {
 	public void testTaxonUnderRdf() {
 
 		try {
-			URL o = getClass().getClassLoader().getResource("taxon-under-rdf.xml");
-			Harvest harvest = new PullHarvest("file://" + o.getPath(), null);
+			URL o = new URL("http://svn.eionet.europa.eu/repositories/Reportnet/cr2/trunk/src/test/resources/taxon-under-rdf.xml");
+			Harvest harvest = new PullHarvest(o.toString(), null);
 			harvest.setDeriveExtraTriples(false);
 			harvest.execute();
 			assertEquals((int) 2, harvest.getDistinctSubjectsCount());
@@ -108,8 +108,8 @@ public class HarvestTaxonDbTest extends DatabaseTestCase {
 	public void testTaxonOverRdf() {
 
 		try {
-			URL o = getClass().getClassLoader().getResource("taxon-over-rdf.xml");
-			Harvest harvest = new PullHarvest("file://" + o.getPath(), null);
+			URL o = new URL("http://svn.eionet.europa.eu/repositories/Reportnet/cr2/trunk/src/test/resources/taxon-over-rdf.xml");
+			Harvest harvest = new PullHarvest(o.toString(), null);
 			harvest.setDeriveExtraTriples(false);
 			harvest.execute();
 			assertEquals((int) 2, harvest.getDistinctSubjectsCount());
