@@ -7,6 +7,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpSession;
+
 import org.apache.commons.lang.StringUtils;
 
 import net.sourceforge.stripes.action.DefaultHandler;
@@ -36,7 +38,9 @@ public class TypeSearchActionBean extends AbstractSearchActionBean{
 	private static final String FORM_PAGE = "/pages/typeSearch.jsp";
 	
 	/** */
-	private static final String TYPE_SEARCH_PICKLIST = TypeSearchActionBean.class.getName() + ".picklist";
+	private static final String PICKLIST = TypeSearchActionBean.class.getName() + ".picklist";
+	private static final String PROPERTIES = TypeSearchActionBean.class.getName() + ".properties";
+	private static final String PREV_TYPE = TypeSearchActionBean.class.getName() + ".prevType";
 	
 	/** */
 	private String type;
@@ -78,7 +82,10 @@ public class TypeSearchActionBean extends AbstractSearchActionBean{
 	 */
 	private void clearSession(){
 		
-		getContext().getRequest().getSession().removeAttribute(TYPE_SEARCH_PICKLIST);
+		HttpSession session = getContext().getRequest().getSession();
+		session.removeAttribute(PICKLIST);
+		session.removeAttribute(PROPERTIES);
+		session.removeAttribute(PREV_TYPE);
 	}
 	
 	/**
@@ -87,7 +94,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean{
 	 */
 	public List<UriLabelPair> getPicklist() throws SearchException{
 		
-		List<UriLabelPair> picklist = (List<UriLabelPair>)getContext().getRequest().getSession().getAttribute(TYPE_SEARCH_PICKLIST);
+		List<UriLabelPair> picklist = (List<UriLabelPair>)getContext().getRequest().getSession().getAttribute(PICKLIST);
 		if (picklist==null || picklist.isEmpty()){
 			
 			Map<String,String> criteria = new HashMap<String,String>();
@@ -113,26 +120,105 @@ public class TypeSearchActionBean extends AbstractSearchActionBean{
 			}
 			
 			if (picklist!=null && !picklist.isEmpty()){
-				getContext().getRequest().getSession().setAttribute(TYPE_SEARCH_PICKLIST, picklist);
+				getContext().getRequest().getSession().setAttribute(PICKLIST, picklist);
 			}
 		}
 		
 		return picklist;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 * @throws SearchException 
+	 */
+	private List<UriLabelPair> getProperties() throws SearchException{
+		
+		// take out the previous type, replace it with the new one
+		HttpSession session = getContext().getRequest().getSession();
+		String previousType = (String)session.getAttribute(PREV_TYPE);
+		session.setAttribute(PREV_TYPE, type);
+		if (previousType==null)
+			previousType = "";
+		
+		// if submitted type is blank anyway, there's nothing to do here
+		if (StringUtils.isBlank(type))
+			return null;
+		
+		// find properties only if none in the session or type differs from previous
+		
+		List<UriLabelPair> properties = (List<UriLabelPair>)session.getAttribute(PROPERTIES);
+		if (properties==null || properties.isEmpty() || !previousType.equals(type)){						
+			
+			Map<String,String> criteria = new HashMap<String,String>();
+			criteria.put(Predicates.RDF_TYPE, Subjects.RDF_PROPERTY);
+			criteria.put(Predicates.RDFS_DOMAIN, type);
+			
+			CustomSearch customSearch = new CustomSearch(criteria);
+			customSearch.setPageLength(0); // no limits to the result set size, because there cannot be too many properties for a type
+			customSearch.execute();
+			
+			Collection<SubjectDTO> subjects = customSearch.getResultList();
+			if (subjects!=null){
+				
+				properties = new ArrayList<UriLabelPair>();
+				for (Iterator<SubjectDTO> it=subjects.iterator(); it.hasNext();){
+					
+					SubjectDTO subject = it.next();
+					if (!subject.isAnonymous()){
+						
+						String uri = subject.getUri();
+						if (!uri.equals(Predicates.RDFS_LABEL)){ // we skip label, because we include by default later
+							
+							String label = subject.getObjectValue(Predicates.RDFS_LABEL);
+							if (!StringUtils.isBlank(label)){
+								properties.add(UriLabelPair.create(uri, label));
+							}
+						}
+					}
+				}
+			}
+			
+			if (properties!=null && !properties.isEmpty()){
+				getContext().getRequest().getSession().setAttribute(PROPERTIES, properties);
+			}
+		}
+		
+		return properties;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
 	 */
-	public List<SearchResultColumn> getColumns() {
+	public List<SearchResultColumn> getColumns() throws SearchException {
 		
 		ArrayList<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
-		
+
+		// let's always include rdfs:label in the columns
 		PredicateBasedColumn col = new PredicateBasedColumn();
 		col.setPredicateUri(Predicates.RDFS_LABEL);
 		col.setTitle("Title");
 		col.setSortable(true);
 		list.add(col);
+		
+		// query the rest of the columns
+		
+		List<UriLabelPair> properties = getProperties();
+		if (properties!=null && !properties.isEmpty()){
+			
+			int i=0;
+			for (Iterator<UriLabelPair> it=properties.iterator(); i<5 && it.hasNext();i++){ // only interested in first 4 columns
+				
+				UriLabelPair property = it.next();
+				
+				col = new PredicateBasedColumn();
+				col.setPredicateUri(property.getUri());
+				col.setTitle(property.getLabel());
+				col.setSortable(true);
+				list.add(col);
+			}
+		}
 
 		return list;
 	}

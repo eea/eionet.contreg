@@ -42,8 +42,9 @@ public abstract class AbstractSearchActionBean extends AbstractActionBean{
 
 	/**
 	 * @return the columns
+	 * @throws SearchException 
 	 */
-	public abstract List<SearchResultColumn> getColumns();
+	public abstract List<SearchResultColumn> getColumns() throws SearchException;
 
 	/**
 	 * 
