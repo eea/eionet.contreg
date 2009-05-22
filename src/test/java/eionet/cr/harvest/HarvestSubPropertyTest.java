@@ -16,7 +16,7 @@ import org.junit.Test;
 
 import eionet.cr.util.sql.ConnectionUtil;
 
-public class HarvestSubProperty extends DatabaseTestCase {
+public class HarvestSubPropertyTest extends DatabaseTestCase {
 	protected IDatabaseConnection getConnection() throws Exception {
 		ConnectionUtil.setReturnSimpleConnection(true);
 		return new DatabaseConnection(ConnectionUtil.getConnection());
