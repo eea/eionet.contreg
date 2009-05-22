@@ -2,7 +2,6 @@ package eionet.cr.harvest;
 
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.net.URI;
 import java.net.URL;
 
 import org.dbunit.Assertion;

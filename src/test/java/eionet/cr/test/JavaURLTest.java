@@ -50,13 +50,5 @@ public class JavaURLTest extends TestCase {
 
 	}
 
-	/**
-	 * This method explains the problem with local-file URLs obtained with getClass().getClassLoader().getResource(). 
-	 */
-	public void testURLWithResource(){
-		
-		String prefix = "file:///";
-		URL url = getClass().getClassLoader().getResource("taxon-under-rdf.xml");
-		assertTrue("Was expecting the url to strat with \"" + prefix + "\"", url.toString().startsWith(prefix));
-	}
+
 }
