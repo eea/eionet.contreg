@@ -57,6 +57,9 @@ public class TypeSearchActionBean extends AbstractSearchActionBean{
 			criteria.put(Predicates.RDF_TYPE, type);
 			
 			CustomSearch customSearch = new CustomSearch(criteria);
+			customSearch.setPageNumber(getPageN());
+			customSearch.setSorting(getSortP(), getSortO());
+
 			customSearch.execute();
 			
 			resultList = customSearch.getResultList();
@@ -208,7 +211,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean{
 		if (properties!=null && !properties.isEmpty()){
 			
 			int i=0;
-			for (Iterator<UriLabelPair> it=properties.iterator(); i<5 && it.hasNext();i++){ // only interested in first 4 columns
+			for (Iterator<UriLabelPair> it=properties.iterator(); i<4 && it.hasNext();i++){ // only interested in first 4 columns
 				
 				UriLabelPair property = it.next();
 				
