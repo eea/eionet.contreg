@@ -91,5 +91,21 @@ public class HarvestSubProperty extends DatabaseTestCase {
 
 	}
 
+	@Test
+	public void testTripleSubProperty() {
+
+		try {
+			URL o = new URL("http://svn.eionet.europa.eu/repositories/Reportnet/cr2/trunk/src/test/resources/subproperty2-rdf.xml");
+//			URL o = getClass().getClassLoader().getResource("subproperty2-rdf.xml");
+			Harvest harvest = new PullHarvest(o.toString(), null);
+			harvest.execute();
+			compareDatasets("subproperty2-db.xml", false);
+		} catch (Throwable e) {
+			e.printStackTrace();
+			fail("Was not expecting this exception: " + e.toString());
+		}
+
+	}
+
 
 }
