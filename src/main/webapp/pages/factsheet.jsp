@@ -84,9 +84,9 @@
 			    </div>				    
 		    </c:when>
 		    <c:otherwise>
-		    	<div style="margin-top:20px">
-					<p class="note-msg">Nothing is known about this resource!</p>
-				</div>
+		    	<div style="margin-top:20px" class="note-msg"><strong>Unknown resource</strong>
+				<p>Nothing is known about ${actionBean.uri}</p>
+			</div>
 			</c:otherwise>
 		</c:choose>
 				
