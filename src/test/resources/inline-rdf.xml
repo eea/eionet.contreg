@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+     The purpose of this test file is to verify that the parser understands
+     named inline nodes correctly. This file must produce 6 triples and there
+     shall be no difference between Estonia and Denmark.
+-->
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+         xmlns:eurostat="http://www4.wiwiss.fu-berlin.de/eurostat/resource/eurostat/">
+
+  <eurostat:countries rdf:about="http://www4.wiwiss.fu-berlin.de/eurostat/resource/countries/Eesti">
+    <eurostat:name>Eesti</eurostat:name>
+  </eurostat:countries>
+
+  <rdf:Description rdf:about="http://www4.wiwiss.fu-berlin.de/eurostat/all/countries">
+     <rdfs:seeAlso rdf:resource="http://www4.wiwiss.fu-berlin.de/eurostat/resource/countries/Eesti"/>
+     <rdfs:seeAlso>
+       <eurostat:countries rdf:about="http://www4.wiwiss.fu-berlin.de/eurostat/resource/countries/Danmark">
+         <eurostat:name>Danmark</eurostat:name>
+       </eurostat:countries>
+     </rdfs:seeAlso>
+  </rdf:Description>
+
+</rdf:RDF>
