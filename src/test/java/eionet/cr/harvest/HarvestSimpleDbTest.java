@@ -100,4 +100,20 @@ public class HarvestSimpleDbTest extends DatabaseTestCase {
 
 	}
 
+	@Test
+	public void testInlineRdf() {
+
+		try {
+//			URL o = getClass().getClassLoader().getResource("inline-rdf.xml");
+			URL o = new URL("http://svn.eionet.europa.eu/repositories/Reportnet/cr2/trunk/src/test/resources/inline-rdf.xml");
+			Harvest harvest = new PullHarvest(o.toString(), null);
+			harvest.execute();
+			compareDatasets("inline-db.xml", false);
+		} catch (Throwable e) {
+			e.printStackTrace();
+			fail("Was not expecting this exception: " + e.toString());
+		}
+
+	}
+
 }
