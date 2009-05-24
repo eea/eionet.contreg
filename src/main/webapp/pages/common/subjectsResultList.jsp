@@ -106,7 +106,7 @@
 				
 			</c:when>
 			<c:otherwise>
-				<p>No matches found!</p>
+				<div class="system-msg">No matches found</div>
 			</c:otherwise>
 		</c:choose>
 	</div>

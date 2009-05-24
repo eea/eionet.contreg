@@ -6,25 +6,22 @@
 
 	<stripes:layout-component name="contents">
 
-       <h1>Simple search</h1>
-       <p>
-       	This page enables you to find content by case-insensitive text in any metadata element. For example:<br/>
-       	to search for content that contains words "air" or "soil" or both, enter <span class="searchExprSample">air soil</span>.
-       	Entering <span class="searchExprSample">"air pollution"</span><br/> will search for the exact phrase "air pollution".
-       </p>
+	<h1>Simple search</h1>
+	<p>
+	This page enables you to find content by case-insensitive text in any metadata element. For example:
+	to search for content that contains words "air" or "soil" or both, enter <span class="searchExprSample">air soil</span>.
+	Entering <span class="searchExprSample">"air pollution"</span> will search for the exact phrase "air pollution".
+	<em>Words shorter than four letters are ignored!</em>
+	</p>
 
-	    <stripes:form action="/simpleSearch.action" method="get" focus="searchExpression" style="padding-bottom:20px">
-
-				<stripes:label for="expressionText">Expression:</stripes:label>
-				<stripes:text name="searchExpression" id="expressionText" size="30"/>
-				<stripes:submit name="search" value="Search" id="searchButton"/>
-				<stripes:text name="dummy" style="visibility:hidden;display:none" disabled="disabled" size="1"/>
-
-				<c:if test="${not empty param.search}">
-					<stripes:layout-render name="/pages/common/subjectsResultList.jsp" tableClass="sortable"/>
-				</c:if>
-
-			</stripes:form>
-
+	<stripes:form action="/simpleSearch.action" method="get" focus="searchExpression" style="padding-bottom:20px">
+		<stripes:label for="expressionText">Expression:</stripes:label>
+		<stripes:text name="searchExpression" id="expressionText" size="30"/>
+		<stripes:submit name="search" value="Search" id="searchButton"/>
+		<stripes:text name="dummy" style="visibility:hidden;display:none" disabled="disabled" size="1"/>
+	</stripes:form>
+	<c:if test="${not empty param.search}">
+		<stripes:layout-render name="/pages/common/subjectsResultList.jsp" tableClass="sortable"/>
+	</c:if>
 	</stripes:layout-component>
 </stripes:layout-render>
