@@ -26,7 +26,16 @@ public class SubjectDTO{
 	private boolean anonymous;
 	private Map<String,Collection<ObjectDTO>> predicates;
 	private Date firstSeenTime;
-	
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 * This toString is used in the Unit-tests.
+	 */
+	@Override
+	public String toString() {
+		return "SubjectDTO[uri=" + uri + ",predicates=" + predicates.toString() + "]";
+	}
 	/**
 	 * 
 	 * @param uri

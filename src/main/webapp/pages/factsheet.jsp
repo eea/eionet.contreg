@@ -17,7 +17,7 @@
 		    				<p>Resource URL: <a href="${fn:escapeXml(subjectUrl)}"><c:out value="${subjectUrl}"/></a></p>
 		    			</c:when>
 		    			<c:otherwise>
-		    				<p class="tip-msg">This is an anonymous resource!</p>
+		    				<div class="advice-msg">This is an anonymous resource!</div>
 		    			</c:otherwise>
 		    		</c:choose>
 		    		<c:if test="${actionBean.subject.predicates!=null && fn:length(actionBean.subject.predicates)>0}">
