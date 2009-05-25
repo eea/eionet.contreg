@@ -51,10 +51,10 @@ public class SimpleSearch extends AbstractSubjectSearch{
 			inParameters.add(Long.valueOf(Hashes.spoHash(sortPredicate)));
 		}
 		
-		if (searchExpression.isExactPhrase())
-			sqlBuf.append(" where SPO.OBJECT like ?");
-		else
-			sqlBuf.append(" where match(SPO.OBJECT) against (?)");
+//		if (searchExpression.isExactPhrase())
+//			sqlBuf.append(" where SPO.OBJECT like ?");
+//		else
+			sqlBuf.append(" where match(SPO.OBJECT) against (? in boolean mode)");
 		inParameters.add(searchExpression.toString());
 		
 		if (sortPredicate!=null)

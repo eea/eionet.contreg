@@ -21,10 +21,10 @@ public class SearchExpression {
 	public SearchExpression(String s){
 		
 		expression = s==null ? "" : s.trim();
-		exactPhrase = expression.startsWith("\"") && expression.endsWith("\"");
-		if (exactPhrase){
-			expression = expression.substring(1, expression.length()-1);
-		}
+//		exactPhrase = expression.startsWith("\"") && expression.endsWith("\"");
+//		if (exactPhrase){
+//			expression = expression.substring(1, expression.length()-1);
+//		}
 		
 		isUri = URIUtil.isSchemedURI(expression);
 	}
@@ -41,9 +41,9 @@ public class SearchExpression {
 	 * 
 	 * @return
 	 */
-	public boolean isExactPhrase(){
-		return exactPhrase; 
-	}
+//	public boolean isExactPhrase(){
+//		return exactPhrase; 
+//	}
 	
 	/*
 	 * (non-Javadoc)
