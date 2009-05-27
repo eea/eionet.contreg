@@ -53,15 +53,6 @@ public class RecentUploadsSearch extends AbstractSubjectSearch {
 		
 		inParameters.add(Long.valueOf(Hashes.spoHash(subjectType)));
 		
-//		if (pageLength>0){
-//			sqlBuf.append(" limit ");
-//			if (pageNumber>0){
-//				sqlBuf.append("?,");
-//				inParameters.add(new Integer((pageNumber-1)*pageLength));
-//			}
-//			sqlBuf.append(pageLength);
-//		}
-		
 		return sqlBuf.toString();
 	}
 

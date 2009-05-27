@@ -51,23 +51,11 @@ public class SimpleSearch extends AbstractSubjectSearch{
 			inParameters.add(Long.valueOf(Hashes.spoHash(sortPredicate)));
 		}
 		
-//		if (searchExpression.isExactPhrase())
-//			sqlBuf.append(" where SPO.OBJECT like ?");
-//		else
-			sqlBuf.append(" where match(SPO.OBJECT) against (? in boolean mode)");
+		sqlBuf.append(" where match(SPO.OBJECT) against (? in boolean mode)");
 		inParameters.add(searchExpression.toString());
 		
 		if (sortPredicate!=null)
 			sqlBuf.append(" order by ORDERING.OBJECT ").append(sortOrder==null ? sortOrder.ASCENDING.toSQL() : sortOrder.toSQL());
-
-//		if (pageLength>0){
-//			sqlBuf.append(" limit ");
-//			if (pageNumber>0){
-//				sqlBuf.append("?,");
-//				inParameters.add(new Integer((pageNumber-1)*pageLength));
-//			}
-//			sqlBuf.append(pageLength);
-//		}
 		
 		return sqlBuf.toString();
 	}
