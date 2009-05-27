@@ -63,7 +63,7 @@
 									    			</td>
 									    			<td>
 									    				<c:out value="${object.value}"/>
-									    				<c:if test="${object.sourceObjectLong>0}">
+									    				<c:if test="${object.sourceObjectLong!=0}">
 									    					&nbsp;<stripes:link class="infolink" href="/factsheet.action">Info
 																<stripes:param name="uriHash" value="${object.sourceObject}"/>
 															</stripes:link>	
