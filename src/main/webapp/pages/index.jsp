@@ -9,10 +9,10 @@
 	<div style="background-color:#f0f0f0; padding:0.5em; margin: 0.3em; border:1px dotted black;">
 		<c:choose>
                 <c:when test='${sessionScope.crUser!=null}'>
-		<a href="#" title="To be developed">Register a URL!</a>
+		<a href="#" title="To be developed" style="font-weight:bold">Suggest a URL!</a>
 		</c:when>
 		<c:otherwise>
-		<stripes:link title="Login" href="/login.action" event="login">Login and register a URL!</stripes:link>
+		<stripes:link title="Login" href="/login.action" event="login" style="font-weight:bold">Login to suggest a URL!</stripes:link>
 		</c:otherwise>
 		</c:choose>
 		Help other researchers find the good datasets. Bookmark them on this site.
@@ -22,9 +22,9 @@
 		In 2002 Jim Flanagan was the first using tag clouds as a display
 		form. Flickr, <span style="font-size:1.2em">Technorati</span> and Blogs have tightened the trend in the design
 		business and today leading enterprises like Spiegel.de, O2-online and
-		others use this tool. Will tag clouds become a <span style="font-size:0.8em">trend</span> , like a lot of
+		others use this tool. Will <span style="font-size:1.4em">tag</span> clouds become a <span style="font-size:0.8em">trend</span> , like a lot of
 		before, which came and disappeared again when we recognized that we benefit
-		less than we thought from them ? A tag <span style="font-size:1.2em">cloud</span> is a mean of visualisation
+		less than we thought from them ? A tag <span style="font-size:1.4em">cloud</span> is a means of visualisation
 		of information within a specified area.
 	</div>
 	<div style="background-color:#f0f0f0; padding:0.5em; margin: 0.3em; border:1px dotted black;">
@@ -32,8 +32,8 @@
 		<ul class="menu">
 		<li>2009 submission under Article 3(2)</li>
 		<li>Monthly Ozone April 2009 report</li>
-		<li>2009 submission under Article 3(2)</li>
-		<li>2009 submission under Article 3(2)</li>
+		<li>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus vel.</li>
+		<li>Nunc quis venenatis lacus. Vivamus pretium, nunc nec volutpat eleifend.</li>
 		<li>2009 submission under Article 3(2)</li>
 		<li>2009 submission under Article 3(2)</li>
 		<li>2009 submission under Article 3(2)</li>
