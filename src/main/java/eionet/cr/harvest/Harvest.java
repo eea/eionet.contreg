@@ -45,10 +45,10 @@ public abstract class Harvest {
 	public static final String TYPE_PUSH = "push";
 	
 	/** */
-	public static final String FATAL = "ftl";
-	public static final String ERROR = "err";
-	public static final String WARNING = "wrn";
-	public static final String INFO = "inf";
+//	public static final String FATAL = "ftl";
+//	public static final String ERROR = "err";
+//	public static final String WARNING = "wrn";
+//	public static final String INFO = "inf";
 	
 	/** */
 	protected String sourceUrlString = null;

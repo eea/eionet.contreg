@@ -6,6 +6,7 @@ import java.util.List;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dto.HarvestMessageDTO;
+import eionet.cr.harvest.util.HarvestMessageType;
 import eionet.cr.util.Util;
 
 
@@ -79,11 +80,11 @@ public class HarvestDAOWriter {
 	protected void writeMessages(Harvest harvest) throws DAOException{
 		
 		// save the fatal exception
-		writeThrowable(harvest.getFatalError(), Harvest.FATAL);
+		writeThrowable(harvest.getFatalError(), HarvestMessageType.FATAL.toString());
 		
 		// save errors and warnings
-		writeThrowables(harvest.getErrors(), Harvest.ERROR);
-		writeThrowables(harvest.getWarnings(), Harvest.WARNING);
+		writeThrowables(harvest.getErrors(), HarvestMessageType.ERROR.toString());
+		writeThrowables(harvest.getWarnings(), HarvestMessageType.WARNING.toString());
 		
 		// save infos
 		List<String> infos = harvest.getInfos();
@@ -92,7 +93,7 @@ public class HarvestDAOWriter {
 				
 				HarvestMessageDTO harvestMessageDTO = new HarvestMessageDTO();
 				harvestMessageDTO.setHarvestId(new Integer(harvestId));
-				harvestMessageDTO.setType(Harvest.INFO);
+				harvestMessageDTO.setType(HarvestMessageType.INFO.toString());
 				harvestMessageDTO.setMessage(i.next());
 				harvestMessageDTO.setStackTrace("");
 				DAOFactory.getDAOFactory().getHarvestMessageDAO().insertHarvestMessage(harvestMessageDTO);

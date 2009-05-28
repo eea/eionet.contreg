@@ -10,6 +10,9 @@ import eionet.cr.util.pagination.Pagination;
 public class DiscoveredSinceTimeSearch extends AbstractSubjectSearch {
 	
 	/** */
+	private static final int DEFAULT_LIMIT = 300;
+	
+	/** */
 	private Date time;
 	
 	/**
@@ -30,7 +33,7 @@ public class DiscoveredSinceTimeSearch extends AbstractSubjectSearch {
 			return null;
 		
 		StringBuffer sqlBuf = new StringBuffer().
-		append("select sql_calc_found_rows distinct SPO.SUBJECT as SUBJECT_HASH from SPO, RESOURCE").
+		append("select SPO.SUBJECT as SUBJECT_HASH from SPO, RESOURCE").
 		append(" where SPO.SUBJECT=RESOURCE.URI_HASH ").
 		append(" and RESOURCE.FIRSTSEEN_TIME>?").
 		append(" order by RESOURCE.FIRSTSEEN_TIME desc");
@@ -45,6 +48,8 @@ public class DiscoveredSinceTimeSearch extends AbstractSubjectSearch {
 			}
 			sqlBuf.append(pageLength);
 		}
+		else
+			sqlBuf.append(" limit ").append(DEFAULT_LIMIT);
 		
 		return sqlBuf.toString();
 	}

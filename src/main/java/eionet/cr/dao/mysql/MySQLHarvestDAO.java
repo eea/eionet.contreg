@@ -12,6 +12,8 @@ import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dto.HarvestBaseDTO;
 import eionet.cr.dto.HarvestDTO;
 import eionet.cr.dto.readers.HarvestDTOReader;
+import eionet.cr.dto.readers.HarvestWithMessageTypesReader;
+import eionet.cr.harvest.util.HarvestMessageType;
 import eionet.cr.util.sql.ConnectionUtil;
 import eionet.cr.util.sql.SQLUtil;
 
@@ -87,49 +89,35 @@ public class MySQLHarvestDAO extends MySQLBaseDAO implements HarvestDAO {
 	}
 	
 	/** */
-	private static final String getHarvestsBySourceIdSQL = "select * from HARVEST where HARVEST_SOURCE_ID=? order by STARTED desc limit 10";
-	private static final String getMessageTypesByHarvestIdSQL = "select distinct TYPE from HARVEST_MESSAGE where HARVEST_ID=?";
+	private static final String getHarvestsBySourceIdSQL = 
+		"select distinct HARVEST.*, HARVEST_MESSAGE.TYPE from HARVEST left join HARVEST_MESSAGE on HARVEST.HARVEST_ID=HARVEST_MESSAGE.HARVEST_ID "
+		+ "where HARVEST.HARVEST_SOURCE_ID=? order by HARVEST.STARTED desc limit ?";
+	
 	/*
      * (non-Javadoc)
      * 
      * @see eionet.cr.dao.HarvestDAO#getHarvestsBySourceId()
      */
     public List<HarvestDTO> getHarvestsBySourceId(Integer harvestSourceId) throws DAOException {
+    	
+    	int maxDistinctHarvests = 10;
+    	
     	List<Object> values = new ArrayList<Object>();
     	values.add(harvestSourceId);
+    	values.add(HarvestMessageType.values().length * maxDistinctHarvests);
 				
 		Connection conn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		HarvestDTOReader rsReader = new HarvestDTOReader();
+		HarvestWithMessageTypesReader rsReader = new HarvestWithMessageTypesReader(maxDistinctHarvests);
 		try{
 			conn = getConnection();
 			SQLUtil.executeQuery(getHarvestsBySourceIdSQL, values, rsReader, conn);
-			List<HarvestDTO>  list = rsReader.getResultList();
-
-			// get message types for found harvests
-			if (list!=null && list.size()>0){
-				stmt = conn.prepareStatement(getMessageTypesByHarvestIdSQL);
-				for (int i=0; i<list.size(); i++){
-					HarvestDTO harvestDTO = list.get(i);
-					stmt.setInt(1, harvestDTO.getHarvestId().intValue());
-					rs = stmt.executeQuery();
-					while (rs.next()){
-						HarvestBaseDTO.addMessageType(harvestDTO, rs.getString(1));
-					}
-					rs.close();
-				}
-			}
-			
-			return list;
+			return rsReader.getResultList();
 		}
 		catch (Exception e){
 			throw new DAOException(e.getMessage(), e);
 		}
 		finally{
 			try{
-				if (rs!=null) rs.close();
-				if (stmt!=null) stmt.close();
 				if (conn!=null) conn.close();
 			}
 			catch (SQLException e){}

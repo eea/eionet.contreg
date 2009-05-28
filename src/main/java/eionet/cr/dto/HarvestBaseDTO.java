@@ -1,6 +1,7 @@
 package eionet.cr.dto;
 
 import eionet.cr.harvest.Harvest;
+import eionet.cr.harvest.util.HarvestMessageType;
 
 /**
  * 
@@ -58,11 +59,11 @@ public class HarvestBaseDTO {
 	public static final void addMessageType(HarvestBaseDTO dto, String messageType){
 		
 		if (dto!=null && messageType!=null){
-			if (messageType.equals(Harvest.FATAL))
+			if (messageType.equals(HarvestMessageType.FATAL.toString()))
 				dto.setHasFatals(Boolean.TRUE);
-			else if (messageType.equals(Harvest.ERROR))
+			else if (messageType.equals(HarvestMessageType.ERROR.toString()))
 				dto.setHasErrors(Boolean.TRUE);
-			else if (messageType.equals(Harvest.WARNING))
+			else if (messageType.equals(HarvestMessageType.WARNING.toString()))
 				dto.setHasWarnings(Boolean.TRUE);
 		}
 	}

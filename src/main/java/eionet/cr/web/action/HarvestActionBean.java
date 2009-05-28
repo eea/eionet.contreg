@@ -13,6 +13,7 @@ import eionet.cr.dto.HarvestDTO;
 import eionet.cr.dto.HarvestMessageDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.harvest.Harvest;
+import eionet.cr.harvest.util.HarvestMessageType;
 
 /**
  * 
@@ -54,10 +55,10 @@ public class HarvestActionBean extends AbstractActionBean {
 		
 		List<HarvestMessageDTO> messageDTOs = DAOFactory.getDAOFactory().getHarvestMessageDAO().findHarvestMessagesByHarvestID(harvestDTO.getHarvestId());
 		if (messageDTOs!=null){
-			loadMessages(Harvest.FATAL, messageDTOs, fatals = new ArrayList<HarvestMessageDTO>());
-			loadMessages(Harvest.ERROR, messageDTOs, errors = new ArrayList<HarvestMessageDTO>());
-			loadMessages(Harvest.WARNING, messageDTOs, warnings = new ArrayList<HarvestMessageDTO>());
-			loadMessages(Harvest.INFO, messageDTOs, infos = new ArrayList<HarvestMessageDTO>());
+			loadMessages(HarvestMessageType.FATAL.toString(), messageDTOs, fatals = new ArrayList<HarvestMessageDTO>());
+			loadMessages(HarvestMessageType.ERROR.toString(), messageDTOs, errors = new ArrayList<HarvestMessageDTO>());
+			loadMessages(HarvestMessageType.WARNING.toString(), messageDTOs, warnings = new ArrayList<HarvestMessageDTO>());
+			loadMessages(HarvestMessageType.INFO.toString(), messageDTOs, infos = new ArrayList<HarvestMessageDTO>());
 		}
 	}
 
