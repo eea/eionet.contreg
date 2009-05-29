@@ -87,6 +87,20 @@
 						    	</c:forEach>
 						    </tbody>
 				    	</table>
+				    	
+				    	<p>
+							<stripes:link href="/references.action" event="search">What is referring to this resource?
+								<c:choose>
+					    			<c:when test="${subjectUrl!=null}">
+					    				<stripes:param name="to" value="${subjectUrl}"/>
+					    			</c:when>
+					    			<c:otherwise>
+					    				<stripes:param name="to" value="${actionBean.subject.uriHash}"/>
+					    			</c:otherwise>
+					    		</c:choose>
+							</stripes:link>
+						</p>
+							
 				    </c:if>
 			    </div>				    
 		    </c:when>

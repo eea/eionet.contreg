@@ -13,6 +13,7 @@ public class SearchExpression {
 	private String expression;
 	private boolean exactPhrase = false;
 	private boolean isUri = false;
+	private boolean isHash = false;
 	
 	/**
 	 * 
@@ -21,12 +22,13 @@ public class SearchExpression {
 	public SearchExpression(String s){
 		
 		expression = s==null ? "" : s.trim();
-//		exactPhrase = expression.startsWith("\"") && expression.endsWith("\"");
-//		if (exactPhrase){
-//			expression = expression.substring(1, expression.length()-1);
-//		}
-		
 		isUri = URIUtil.isSchemedURI(expression);
+		
+		try{
+			Long.parseLong(expression);
+			isHash = true;
+		}
+		catch (NumberFormatException nfe){}
 	}
 	
 	/**
@@ -37,14 +39,6 @@ public class SearchExpression {
 		return expression==null || expression.length()==0;
 	}
 
-	/**
-	 * 
-	 * @return
-	 */
-//	public boolean isExactPhrase(){
-//		return exactPhrase; 
-//	}
-	
 	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Object#toString()
@@ -58,5 +52,12 @@ public class SearchExpression {
 	 */
 	public boolean isUri() {
 		return isUri;
+	}
+
+	/**
+	 * @return the isHash
+	 */
+	public boolean isHash() {
+		return isHash;
 	}
 }

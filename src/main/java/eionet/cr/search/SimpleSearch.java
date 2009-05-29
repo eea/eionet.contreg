@@ -51,9 +51,16 @@ public class SimpleSearch extends AbstractSubjectSearch{
 			inParameters.add(Long.valueOf(Hashes.spoHash(sortPredicate)));
 		}
 		
-		if (searchExpression.isUri()){
+		if (searchExpression.isUri() || searchExpression.isHash()){
+			
 			sqlBuf.append(" where SPO.OBJECT_HASH=?");
-			inParameters.add(Hashes.spoHash(searchExpression.toString()));
+			if (searchExpression.isHash()){
+				inParameters.add(searchExpression.toString());
+			}
+			else{
+				inParameters.add(Hashes.spoHash(searchExpression.toString()));
+			}
+				
 		}
 		else{
 			sqlBuf.append(" where match(SPO.OBJECT) against (? in boolean mode)");

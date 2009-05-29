@@ -56,6 +56,7 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean {
 		
     	SearchExpression searchExpression = new SearchExpression(this.searchExpression);
     	if (!searchExpression.isEmpty()){
+    		
 	    	if (searchExpression.isUri()){
 	    		
 	    		UriSearch uriSearch = new UriSearch(searchExpression.toString());
