@@ -7,41 +7,41 @@
 			<c:when test="${actionBean.resultList!=null && fn:length(actionBean.resultList)>0}">
 				<c:if test="${actionBean.matchCount>0}">
 					<c:set var="pagination" value="${actionBean.pagination}"/>
-					<span>
+					<span class="matchescount">
 						${actionBean.matchCount} matches found
-						<c:if test="${pagination!=null}">						
+						<c:if test="${pagination!=null}">
 							<c:choose>
 								<c:when test="${pagination.rowsFrom==pagination.rowsTo}">, displaying last one</c:when>
 								<c:otherwise>, displaying ${pagination.rowsFrom} to ${pagination.rowsTo}</c:otherwise>
-							</c:choose>			
+							</c:choose>
 						</c:if>
 					</span>
 					<c:if test="${pagination!=null}">
-						<span>
+						<span class="pagination">
 							<c:choose>
 								<c:when test="${pagination.curPageNum==1}">
-									[First/Prev]
+									<span class="firstpage">First</span>, <span class="prevpage">Prev</span>,
 								</c:when>
 								<c:otherwise>
-									[<a href="${pagination.first.href}">First</a>/<a href="${pagination.prev.href}">Prev</a>]
+									<a href="${pagination.first.href}" class="firstpage">First</a>, <a href="${pagination.prev.href}" class="prevpage">Prev</a>,
 								</c:otherwise>
 							</c:choose>
 							<c:forEach items="${pagination.group}" var="numberedPage" varStatus="paginationGroupStatus">
 								<c:choose>
 									<c:when test="${numberedPage.selected}">
-										<c:if test="${paginationGroupStatus.count>1}">, </c:if><strong>${numberedPage.number}</strong>
+										<c:if test="${paginationGroupStatus.count>1}">, </c:if><span class="selectedpage">${numberedPage.number}</span>
 									</c:when>
 									<c:otherwise>
-										<c:if test="${paginationGroupStatus.count>1}">, </c:if><a href="${numberedPage.href}">${numberedPage.number}</a>
+										<c:if test="${paginationGroupStatus.count>1}">, </c:if><a href="${numberedPage.href}" class="numberedpage">${numberedPage.number}</a>
 									</c:otherwise>
-								</c:choose>			
+								</c:choose>
 							</c:forEach>
 							<c:choose>
 								<c:when test="${pagination.curPageNum==pagination.numOfPages}">
-									[Next/Last]
+									<span class="nextpage">Next</span>, <span class="lastpage">Last</span>
 								</c:when>
 								<c:otherwise>
-									[<a href="${pagination.next.href}">Next</a>/<a href="${pagination.last.href}">Last</a>]
+									<a href="${pagination.next.href}" class="nextpage">Next</a>, <a href="${pagination.last.href}" class="lastpage">Last</a>
 								</c:otherwise>
 							</c:choose>
 						</span>
@@ -52,7 +52,7 @@
 						<c:forEach items="${actionBean.columns}" var="col">
 							<th scope="col">
 								<c:choose>
-									<c:when test="${col.sortable}">							
+									<c:when test="${col.sortable}">
 										<a title="${col.title}" href="${crfn:sortUrl(actionBean,col.predicateUri)}">
 											${col.title}
 										</a>
@@ -61,7 +61,7 @@
 										${col.title}
 									</c:otherwise>
 								</c:choose>
-							</th>							
+							</th>
 						</c:forEach>
 						<th scope="col">&nbsp;</th>
 					</thead>
@@ -81,7 +81,7 @@
 										<c:when test="${fn:endsWith(col.class.name, 'PropertyBasedColumn')}">
 											<td><c:out value="${crfn:formatObject(resultListItem[col.property], col.formatter)}"/></td>
 										</c:when>
-										<c:otherwise>									
+										<c:otherwise>
 											<td><c:out value="${crfn:formatPredicateObjects(resultListItem, col.predicateUri)}"/></td>
 										</c:otherwise>
 									</c:choose>
@@ -97,18 +97,18 @@
 												<stripes:param name="uri" value="${resultListItem.uri}" />
 											</c:otherwise>
 										</c:choose>
-									</stripes:link>									
+									</stripes:link>
 								</td>
 							</tr>
 						</c:forEach>
 					</tbody>
 				</table>
-				
+
 			</c:when>
 			<c:otherwise>
 				<div class="system-msg">No matches found</div>
 			</c:otherwise>
 		</c:choose>
 	</div>
-	
+
 </stripes:layout-definition>

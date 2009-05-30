@@ -47,3 +47,24 @@ span.langcode {
 	text-align:left;
 	color:black
 }
+/* Paging */
+.pagination {
+	margin: 0.2em 0;
+}
+.selectedpage, .numberedpage, .nextpage, .prevpage, .firstpage, .lastpage {
+	font-weight: bold;
+	border: 1px solid black;
+	padding: 0.1em 0.2em;
+	margin: 0 0.1em;
+}
+
+.selectedpage {
+	background-color: #61d3f7;
+}
+
+a.numberedpage, a.nextpage, a.prevpage, a.firstpage, a.lastpage {
+	text-decoration: none;
+}
+a.numberedpage:hover, a.nextpage:hover, a.prevpage:hover, a.firstpage:hover, a.lastpage:hover {
+	background-color:#71e3f7;
+}
