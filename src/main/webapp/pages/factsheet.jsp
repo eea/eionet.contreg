@@ -11,10 +11,14 @@
 	    <c:choose>
 		    <c:when test="${actionBean.subject!=null}">		    
 		    	<c:set var="subjectUrl" value="${actionBean.subject.url}"/>
+		    	<c:set var="subjectUri" value="${actionBean.subject.uri}"/>
 		    	<div style="margin-top:20px">
 		    		<c:choose>
 		    			<c:when test="${subjectUrl!=null}">
 		    				<p>Resource URL: <a href="${fn:escapeXml(subjectUrl)}"><c:out value="${subjectUrl}"/></a></p>
+		    			</c:when>
+		    			<c:when test="${subjectUri!=null}">
+		    				<div class="advice-msg" title="${fn:escapeXml(subjectUri)}">This is an unresolvable resource!</div>
 		    			</c:when>
 		    			<c:otherwise>
 		    				<div class="advice-msg">This is an anonymous resource!</div>
@@ -22,6 +26,10 @@
 		    		</c:choose>
 		    		<c:if test="${actionBean.subject.predicates!=null && fn:length(actionBean.subject.predicates)>0}">
 				    	<table class="datatable" width="100%" cellspacing="0" summary="">
+						<col style="width:25%;"/>
+						<col style="max-width:3em;"/>
+						<col/>
+						<col style="width:4em;"/>
 				    		<thead>
 								<th scope="col" class="scope-col">Property</th>
 								<th scope="col" class="scope-col">&nbsp;</th>
