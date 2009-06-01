@@ -34,8 +34,11 @@ import eionet.qawcommons.DataflowResultDto;
  */
 public class XmlRpcServices implements Services{
 
-	/** */
-	private static final int MAX_RESULTS = 300;
+	/**
+	 * A leftover constant from times when CR returned a maximum of 300 hits.
+	 * No simply set to 1000000;
+	 */
+	private static final int MAX_RESULTS = 1000000;
 	
 	/** */
 	private static Log logger = LogFactory.getLog(XmlRpcServices.class);

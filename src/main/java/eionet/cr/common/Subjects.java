@@ -22,4 +22,6 @@ public interface Subjects {
 	public static final String RDFS_CLASS = "http://www.w3.org/2000/01/rdf-schema#Class";
 	
 	public static final String RDF_PROPERTY = "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property";
+	
+	public static final String CR_FILE = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#File";
 }
