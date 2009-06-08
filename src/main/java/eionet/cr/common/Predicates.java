@@ -33,4 +33,7 @@ public interface Predicates {
 
 	public static final String CR_FIRSTSEEN_TIME = "urn:eionet:contreg:firstseen-time";
 	public static final String CR_URL = "urn:eionet:contreg:url";
+	
+	public static final String WGS_LAT = "http://www.w3.org/2003/01/geo/wgs84_pos#lat";
+	public static final String WGS_LONG = "http://www.w3.org/2003/01/geo/wgs84_pos#long";
 }

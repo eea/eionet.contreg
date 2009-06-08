@@ -24,4 +24,6 @@ public interface Subjects {
 	public static final String RDF_PROPERTY = "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property";
 	
 	public static final String CR_FILE = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#File";
+	
+	public static final String WGS_SPATIAL_THING = "http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing";
 }
