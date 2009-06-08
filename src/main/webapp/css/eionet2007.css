@@ -65,6 +65,17 @@ span.langcode {
 a.numberedpage, a.nextpage, a.prevpage, a.firstpage, a.lastpage {
 	text-decoration: none;
 }
+
 a.numberedpage:hover, a.nextpage:hover, a.prevpage:hover, a.firstpage:hover, a.lastpage:hover {
 	background-color:#71e3f7;
+}
+
+/* typeSearch.action */
+#typesearch {
+	padding-bottom:20px;
+	width: 100%;
+}
+
+#typesearch select {
+	width: 90%;
 }
