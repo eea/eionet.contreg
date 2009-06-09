@@ -351,10 +351,28 @@ public class Util {
 	
 	/**
 	 * 
+	 * @param s
+	 * @return
+	 */
+	public static Double toDouble(String s){
+		
+		if (s==null || s.trim().length()==0)
+			return null;
+		else{
+			try{
+				return Double.valueOf(s);
+			}
+			catch (NumberFormatException nfe){
+				return null;
+			}
+		}
+	}
+	
+	/**
+	 * 
 	 * @param args
 	 */
 	public static void main(String[] args){
-		System.out.println(30/60);
-		//System.out.println(isValidQuartzCronExpression("0/3600 0 9-10 * * ?"));
+		System.out.println(toDouble("-0,1"));
 	}
 }

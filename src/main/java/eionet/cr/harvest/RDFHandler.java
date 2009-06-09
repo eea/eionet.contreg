@@ -50,6 +50,7 @@ import eionet.cr.harvest.util.DedicatedHarvestSourceTypes;
 import eionet.cr.harvest.util.HarvestLog;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.UnicodeUtils;
+import eionet.cr.util.Util;
 import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.sql.ConnectionUtil;
 import eionet.cr.util.sql.SQLUtil;
@@ -295,10 +296,11 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 		preparedStatementForTriples.setLong  ( 2, predicateHash);
 		preparedStatementForTriples.setString( 3, object);
 		preparedStatementForTriples.setLong  ( 4, anonObject ? Hashes.spoHash(object, anonIdSeed) : Hashes.spoHash(object));
-		preparedStatementForTriples.setString( 5, YesNoBoolean.format(anonSubject));
-		preparedStatementForTriples.setString( 6, YesNoBoolean.format(anonObject));
-		preparedStatementForTriples.setString( 7, YesNoBoolean.format(litObject));
-		preparedStatementForTriples.setString( 8, objectLang==null ? "" : objectLang);
+		preparedStatementForTriples.setObject( 5, Util.toDouble(object));
+		preparedStatementForTriples.setString( 6, YesNoBoolean.format(anonSubject));
+		preparedStatementForTriples.setString( 7, YesNoBoolean.format(anonObject));
+		preparedStatementForTriples.setString( 8, YesNoBoolean.format(litObject));
+		preparedStatementForTriples.setString( 9, objectLang==null ? "" : objectLang);
 		
 		preparedStatementForTriples.addBatch();
 	}
@@ -359,8 +361,8 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	private void prepareStatementForTriples() throws SQLException{
 		
 		StringBuffer buf = new StringBuffer();
-        buf.append("insert into SPO_TEMP (SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ").
-        append("ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        buf.append("insert into SPO_TEMP (SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, OBJECT_DOUBLE, ").
+        append("ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
         preparedStatementForTriples = getConnection().prepareStatement(buf.toString());
 	}
 
@@ -429,22 +431,25 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 		
 		StringBuffer buf = new StringBuffer();
 		buf.append("insert ignore into SPO (").
-		append("SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG, SOURCE, GEN_TIME").
-		append(") select SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG, ").
+		append("SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, OBJECT_DOUBLE, ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG, SOURCE, GEN_TIME").
+		append(") select SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, OBJECT_DOUBLE, ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG, ").
 		append(sourceUrlHash).append(", ").append(genTime).append(" from SPO_TEMP");
 
 		storedTriplesCount = SQLUtil.executeUpdate(buf.toString(), getConnection());
 		logger.debug(storedTriplesCount + " triples inserted into SPO, " + distinctSubjectsCount + " distinct subjects identified");
 		
-		/* clear previous content if required (it is not, for example, required when doing a push-harevst) */
+		/* clear previous content if required (it is not, for example, required when doing a push-harvest) */
 		
 		if (clearPreviousContent){
 			
 			logger.debug("Deleting SPO rows of previous harvests");
 			
 			buf = new StringBuffer("delete from SPO where SOURCE=");
-			buf.append(sourceUrlHash).append(" and GEN_TIME<").append(genTime);
+			buf.append(sourceUrlHash).append(" and GEN_TIME<").append(genTime);			
+			SQLUtil.executeUpdate(buf.toString(), getConnection());
 			
+			buf = new StringBuffer("delete from SPO where OBJ_DERIV_SOURCE=");
+			buf.append(sourceUrlHash).append(" and OBJ_DERIV_SOURCE_GEN_TIME<").append(genTime);			
 			SQLUtil.executeUpdate(buf.toString(), getConnection());
 		}
 	}
