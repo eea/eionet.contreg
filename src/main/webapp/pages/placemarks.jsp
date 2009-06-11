@@ -25,10 +25,6 @@
 				<href>root://icons/palette-4.png</href>
 			</Icon>
  		</IconStyle>
- 		<LabelStyle>
- 			<scale>0.7</scale>
- 			<color>00ffffff</color>
- 		</LabelStyle>
 	</Style>
 	
 	<c:if test="${not empty actionBean.resultList}">
@@ -49,7 +45,7 @@
 				<c:set var="subjectType" value="${crfn:formatPredicateObjects(subject, rdfType)}"/>
 				<c:set var="factsheetUrl" value="${actionBean.contextUrl}/factsheet.action?uri=${subject.uri}"/>
 			
-				<Placemark>	
+				<Placemark id="${subject.uriHash}">	
 					<c:choose>
 						<c:when test="${not empty subjectLabel}">
 							<name><c:out value="${subjectLabel}"/></name>
