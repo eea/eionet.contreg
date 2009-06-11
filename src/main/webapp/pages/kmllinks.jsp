@@ -10,8 +10,8 @@
 
 	<name>CR spatial objects</name>
     <description><![CDATA[Shows layers of spatial objects found in CR]]></description>
-    <visibility>1</visibility>
-    <open>1</open>
+    <open>0</open>
+    <visibility>0</visibility>    
     <LookAt>
       <longitude>15.0</longitude>
       <latitude>51.0</latitude>
@@ -28,6 +28,8 @@
 				<NetworkLink>
 					<name><c:out value="${currentSource}"/></name>					
 					<description><![CDATA[Spatial objects found from ${currentSource}]]></description>
+					<open>0</open>
+    				<visibility>0</visibility>
 					<Url>
 						<href>${actionBean.contextUrl}${actionBean.urlBinding}?source=${currentSource}</href>
         				<viewRefreshMode>onStop</viewRefreshMode>

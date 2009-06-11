@@ -69,6 +69,7 @@
 						</div>
 						]]>
 					</description>
+					<open>0</open>
 					<Point>
 						<coordinates>${subjectLongitude},${subjectLatitude}</coordinates>
 					</Point>

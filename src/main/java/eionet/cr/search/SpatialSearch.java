@@ -60,35 +60,35 @@ public class SpatialSearch extends AbstractSubjectSearch{
 		if (box==null || box.isUndefined())
 			return null;
 		
-		StringBuffer buf = new StringBuffer("select SPO_SPAT.SUBJECT as SUBJECT_HASH from SPO as SPO_SPAT");
+		StringBuffer sqlBuf = new StringBuffer("select distinct SPO_SPAT.SUBJECT as SUBJECT_HASH from SPO as SPO_SPAT");
 		if (sortPredicate!=null){
-			buf.append(" left join SPO as ORDERING on (SPO_SPAT.SUBJECT=ORDERING.SUBJECT and ORDERING.PREDICATE=?) ");
+			sqlBuf.append(" left join SPO as ORDERING on (SPO_SPAT.SUBJECT=ORDERING.SUBJECT and ORDERING.PREDICATE=?) ");
 			inParameters.add(Long.valueOf(Hashes.spoHash(sortPredicate)));
 		}
 
 		if (box.hasLatitude()){
-			buf.append(", SPO as SPO_LAT");
+			sqlBuf.append(", SPO as SPO_LAT");
 		}
 		if (box.hasLongitude()){
-			buf.append(", SPO as SPO_LONG");
+			sqlBuf.append(", SPO as SPO_LONG");
 		}
 		
-		buf.append(" where SPO_SPAT.PREDICATE=").append(Hashes.spoHash(Predicates.RDF_TYPE)).
+		sqlBuf.append(" where SPO_SPAT.PREDICATE=").append(Hashes.spoHash(Predicates.RDF_TYPE)).
 		append(" and SPO_SPAT.OBJECT_HASH=").append(Hashes.spoHash(Subjects.WGS_SPATIAL_THING));
 		
 		if (!StringUtils.isBlank(source)){
-			buf.append(" and SPO_SPAT.SOURCE=?");
+			sqlBuf.append(" and SPO_SPAT.SOURCE=?");
 			inParameters.add(Long.valueOf(Hashes.spoHash(source)));
 		}
 		
 		if (box.hasLatitude()){
-			buf.append(" and SPO_SPAT.SUBJECT=SPO_LAT.SUBJECT and SPO_LAT.PREDICATE=").append(Hashes.spoHash(Predicates.WGS_LAT));
+			sqlBuf.append(" and SPO_SPAT.SUBJECT=SPO_LAT.SUBJECT and SPO_LAT.PREDICATE=").append(Hashes.spoHash(Predicates.WGS_LAT));
 			if (box.getLatitudeSouth()!=null){
-				buf.append(" and SPO_LAT.OBJECT_DOUBLE>=?");
+				sqlBuf.append(" and SPO_LAT.OBJECT_DOUBLE>=?");
 				inParameters.add(box.getLatitudeSouth());
 			}
 			if (box.getLatitudeNorth()!=null){
-				buf.append(" and SPO_LAT.OBJECT_DOUBLE<=?");
+				sqlBuf.append(" and SPO_LAT.OBJECT_DOUBLE<=?");
 				inParameters.add(box.getLatitudeNorth());
 			}
 		}
@@ -96,25 +96,34 @@ public class SpatialSearch extends AbstractSubjectSearch{
 		if (box.hasLongitude()){
 			
 			if (box.hasLatitude())
-				buf.append(" and SPO_LAT.SUBJECT=SPO_LONG.SUBJECT");
+				sqlBuf.append(" and SPO_LAT.SUBJECT=SPO_LONG.SUBJECT");
 			else
-				buf.append(" and SPO_SPAT.SUBJECT=SPO_LONG.SUBJECT"); 
+				sqlBuf.append(" and SPO_SPAT.SUBJECT=SPO_LONG.SUBJECT"); 
 						
-			buf.append(" and SPO_LONG.PREDICATE=").append(Hashes.spoHash(Predicates.WGS_LONG));
+			sqlBuf.append(" and SPO_LONG.PREDICATE=").append(Hashes.spoHash(Predicates.WGS_LONG));
 			
 			if (box.getLongitudeWest()!=null){
-				buf.append(" and SPO_LONG.OBJECT_DOUBLE>=?");
+				sqlBuf.append(" and SPO_LONG.OBJECT_DOUBLE>=?");
 				inParameters.add(box.getLongitudeWest());
 			}
 			if (box.getLongitudeEast()!=null){
-				buf.append(" and SPO_LONG.OBJECT_DOUBLE<=?");
+				sqlBuf.append(" and SPO_LONG.OBJECT_DOUBLE<=?");
 				inParameters.add(box.getLongitudeEast());
 			}
 		}
 		
 		if (sortPredicate!=null)
-			buf.append(" order by ORDERING.OBJECT ").append(sortOrder==null ? sortOrder.ASCENDING.toSQL() : sortOrder.toSQL());
+			sqlBuf.append(" order by ORDERING.OBJECT ").append(sortOrder==null ? sortOrder.ASCENDING.toSQL() : sortOrder.toSQL());
 		
-		return buf.toString();
+		if (pageLength>0){
+			sqlBuf.append(" limit ");
+			if (pageNumber>0){
+				sqlBuf.append("?,");
+				inParameters.add(new Integer((pageNumber-1)*pageLength));
+			}
+			sqlBuf.append(pageLength);
+		}
+		
+		return sqlBuf.toString();
 	}
 }

@@ -22,6 +22,7 @@ package eionet.cr.web.action;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -41,6 +42,7 @@ import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.validation.ValidationMethod;
 import eionet.cr.common.Predicates;
+import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.CustomSearch;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.SpatialSearch;
@@ -102,7 +104,7 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean {
 	 */
 	private Resolution doKml() throws SearchException{
 		
-		logger.debug("kml requested, BBXO = " + BBOX);
+		logger.debug("kml requested, BBOX = " + BBOX);
 		
 		String[] ltudes = BBOX.split(",");
 		if (ltudes!=null && ltudes.length==4){
@@ -113,8 +115,10 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean {
 			latN = Util.toDouble(ltudes[3].trim());
 			
 			SpatialSearch spatialSearch = new SpatialSearch(createBBOX(), source);
-			spatialSearch.setNoLimit();
+			spatialSearch.setPageLength(25);
+			spatialSearch.setPageNumber(1);
 			spatialSearch.execute();
+			
 			resultList = spatialSearch.getResultList();
 		}
 		
@@ -129,6 +133,76 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean {
 		return new ForwardResolution("/pages/placemarks.jsp");
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
+	private Collection<SubjectDTO> filterPlacemarks(Collection<SubjectDTO> placemarks){
+		
+		if (placemarks==null || placemarks.isEmpty())
+			return placemarks;
+		
+		double delta = (longE - longW) / 100;
+		delta = delta * delta;
+		
+		Collection<SubjectDTO> result = new ArrayList<SubjectDTO>();
+		for (SubjectDTO subject:placemarks){
+			
+			String latit = subject.getObjectValue(Predicates.WGS_LAT);
+			String longit = subject.getObjectValue(Predicates.WGS_LONG);
+			if (!StringUtils.isBlank(latit) && !StringUtils.isBlank(longit)){
+				if (!isTooClose(Double.parseDouble(latit.trim()), Double.parseDouble(longit.trim()), delta, result)){
+					result.add(subject);
+				}
+			}
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * 
+	 * @param latit
+	 * @param longit
+	 * @param delta
+	 * @return
+	 */
+	private static boolean isTooClose(double latit, double longit, double delta, Collection<SubjectDTO> coll){
+		
+	    for (SubjectDTO subject:coll){
+	    	
+	    	double subjLat = getLatitude(subject);
+	    	double subjLong = getLongitude(subject);
+	    	
+			double diff_lat = (subjLat - latit) * (subjLat - latit) ;
+			double diff_long = (subjLong - longit) * (subjLong - longit) ;
+	        double diff = diff_lat + diff_long;
+	        if (diff < delta){
+	        	return true;
+	        }
+		}
+	    
+		return false;
+	}
+
+	/**
+	 * 
+	 * @param subject
+	 * @return
+	 */
+	private static double getLatitude(SubjectDTO subject){
+		return Double.parseDouble(subject.getObjectValue(Predicates.WGS_LAT).trim());
+	}
+
+	/**
+	 * 
+	 * @param subject
+	 * @return
+	 */
+	private static double getLongitude(SubjectDTO subject){
+		return Double.parseDouble(subject.getObjectValue(Predicates.WGS_LONG).trim());
+	}
+
 	/**
 	 * 
 	 * @return
