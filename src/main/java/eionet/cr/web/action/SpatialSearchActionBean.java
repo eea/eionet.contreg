@@ -20,11 +20,19 @@
  */
 package eionet.cr.web.action;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import net.sourceforge.stripes.action.Before;
 import net.sourceforge.stripes.action.DefaultHandler;
@@ -36,8 +44,10 @@ import eionet.cr.common.Predicates;
 import eionet.cr.search.CustomSearch;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.SpatialSearch;
-import eionet.cr.search.util.CoordinateBox;
+import eionet.cr.search.SpatialSourcesSearch;
+import eionet.cr.search.util.BBOX;
 import eionet.cr.search.util.UriLabelPair;
+import eionet.cr.util.Util;
 import eionet.cr.web.util.search.PredicateBasedColumn;
 import eionet.cr.web.util.search.SearchResultColumn;
 
@@ -50,14 +60,106 @@ import eionet.cr.web.util.search.SearchResultColumn;
 public class SpatialSearchActionBean extends AbstractSearchActionBean {
 
 	/** */
-	private CoordinateBox box;
+	private static Log logger = LogFactory.getLog(SpatialSearchActionBean.class);
 	
 	/** */
-	private Double lat1,lat2,long1,long2;
+	public static final String NO_KMLLINKS = "no_kmllinks";
 	
+	/** */
+	private String BBOX;
+	
+	/** */
+	private String source;
+	
+	/** */
+	private Double latS,latN,longW,longE;
+	
+	private List<String> sources;
+	
+	/** */
+	private String contextUrl;
+	
+	/**
+	 * 
+	 * @return
+	 * @throws SearchException
+	 */
 	@DefaultHandler
-	public Resolution init(){
-		return new ForwardResolution("/pages/spatialSearch.jsp");
+	public Resolution onEventUnspecified() throws SearchException{
+		
+		if (BBOX!=null)
+			return doKml();
+		else
+			return new ForwardResolution("/pages/spatialSearch.jsp");
+	}
+	
+	/**
+	 * 
+	 * @param bbox
+	 * @param source
+	 * @return
+	 * @throws SearchException 
+	 */
+	private Resolution doKml() throws SearchException{
+		
+		logger.debug("kml requested, BBXO = " + BBOX);
+		
+		String[] ltudes = BBOX.split(",");
+		if (ltudes!=null && ltudes.length==4){
+			
+			longW = Util.toDouble(ltudes[0].trim());
+			latS = Util.toDouble(ltudes[1].trim());
+			longE = Util.toDouble(ltudes[2].trim());
+			latN = Util.toDouble(ltudes[3].trim());
+			
+			SpatialSearch spatialSearch = new SpatialSearch(createBBOX(), source);
+			spatialSearch.setNoLimit();
+			spatialSearch.execute();
+			resultList = spatialSearch.getResultList();
+		}
+		
+		try {
+			getContext().getRequest().setCharacterEncoding("UTF-8");
+		}
+		catch (UnsupportedEncodingException e){
+			throw new RuntimeException(e.toString(), e);
+		}
+		getContext().getResponse().setHeader("Content-Disposition", "attachment; filename=placemarks.kml");
+		
+		return new ForwardResolution("/pages/placemarks.jsp");
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public Resolution googleEarthIntro(){
+		
+		return new ForwardResolution("/pages/googleEarthIntro.jsp");
+	}
+	
+	/**
+	 * 
+	 * @return
+	 * @throws SearchException
+	 */
+	public Resolution kmlLinks() throws SearchException {
+		
+		sources = SpatialSourcesSearch.execute();
+		if (sources.isEmpty()){
+			showMessage("No spatial objects currently found!");
+			return new ForwardResolution("/pages/googleEarthIntro.jsp");
+		}
+		else{
+			try {
+				getContext().getRequest().setCharacterEncoding("UTF-8");
+			}
+			catch (UnsupportedEncodingException e){
+				throw new RuntimeException(e.toString(), e);
+			}
+			getContext().getResponse().setHeader("Content-Disposition", "attachment; filename=kmllinks.kml");
+			return new ForwardResolution("/pages/kmllinks.jsp");
+		}
 	}
 
 	/*
@@ -66,9 +168,10 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean {
 	 */
 	public Resolution search() throws SearchException {
 		
-		if (getBox()!=null && !getBox().isUndefined()){
+		BBOX bbox = createBBOX();
+		if (!bbox.isUndefined()){
 			
-			SpatialSearch spatialSearch = new SpatialSearch(getBox());
+			SpatialSearch spatialSearch = new SpatialSearch(bbox, source);
 			spatialSearch.setPageNumber(getPageN());
 			spatialSearch.setSorting(getSortP(), getSortO());
 
@@ -120,72 +223,122 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean {
 	 * 
 	 * @return
 	 */
-	private CoordinateBox getBox(){
+	private BBOX createBBOX(){
 		
-		if (box==null){
-			box = new CoordinateBox();
-			box.setLowerLatitude(lat1);
-			box.setUpperLatitude(lat2);
-			box.setLowerLongitude(long1);
-			box.setUpperLongitude(long2);
+		BBOX bbox = new BBOX();
+		bbox.setLatitudeSouth(latS);
+		bbox.setLatitudeNorth(latN);
+		bbox.setLongitudeWest(longW);
+		bbox.setLongitudeEast(longE);
+		
+		return bbox;
+	}
+	
+	/**
+	 * @return the latS
+	 */
+	public Double getLatS() {
+		return latS;
+	}
+
+	/**
+	 * @param latS the latS to set
+	 */
+	public void setLatS(Double lat1) {
+		this.latS = lat1;
+	}
+
+	/**
+	 * @return the latN
+	 */
+	public Double getLatN() {
+		return latN;
+	}
+
+	/**
+	 * @param latN the latN to set
+	 */
+	public void setLatN(Double lat2) {
+		this.latN = lat2;
+	}
+
+	/**
+	 * @return the longW
+	 */
+	public Double getLongW() {
+		return longW;
+	}
+
+	/**
+	 * @param longW the longW to set
+	 */
+	public void setLongW(Double long1) {
+		this.longW = long1;
+	}
+
+	/**
+	 * @return the longE
+	 */
+	public Double getLongE() {
+		return longE;
+	}
+
+	/**
+	 * @param longE the longE to set
+	 */
+	public void setLongE(Double long2) {
+		this.longE = long2;
+	}
+
+	/**
+	 * @param bbox the bBOX to set
+	 */
+	public void setBBOX(String bbox) {
+		BBOX = bbox;
+	}
+
+	/**
+	 * @return the source
+	 */
+	public String getSource() {
+		return source;
+	}
+
+	/**
+	 * @param source the source to set
+	 */
+	public void setSource(String source) {
+		this.source = source;
+	}
+
+	/**
+	 * @return the contextUrl
+	 */
+	public String getContextUrl() {
+		
+		if (contextUrl==null){
+			HttpServletRequest request = getContext().getRequest();
+			
+			StringBuffer buf = new StringBuffer(request.getScheme()).append("://").append(request.getServerName());
+			int port = request.getServerPort();
+			if (port>0 && !(port==80 && request.getScheme().equalsIgnoreCase("http"))){
+				buf.append(":").append(port);
+			}
+			String contextPath = request.getContextPath();
+			if (contextPath!=null){
+				buf.append(contextPath.trim());
+			}
+			
+			contextUrl = buf.toString();
 		}
 		
-		return box;
+		return contextUrl;
 	}
 
 	/**
-	 * @return the lat1
+	 * @return the sources
 	 */
-	public Double getLat1() {
-		return lat1;
-	}
-
-	/**
-	 * @param lat1 the lat1 to set
-	 */
-	public void setLat1(Double lat1) {
-		this.lat1 = lat1;
-	}
-
-	/**
-	 * @return the lat2
-	 */
-	public Double getLat2() {
-		return lat2;
-	}
-
-	/**
-	 * @param lat2 the lat2 to set
-	 */
-	public void setLat2(Double lat2) {
-		this.lat2 = lat2;
-	}
-
-	/**
-	 * @return the long1
-	 */
-	public Double getLong1() {
-		return long1;
-	}
-
-	/**
-	 * @param long1 the long1 to set
-	 */
-	public void setLong1(Double long1) {
-		this.long1 = long1;
-	}
-
-	/**
-	 * @return the long2
-	 */
-	public Double getLong2() {
-		return long2;
-	}
-
-	/**
-	 * @param long2 the long2 to set
-	 */
-	public void setLong2(Double long2) {
-		this.long2 = long2;
+	public List<String> getSources() {
+		return sources;
 	}
 }

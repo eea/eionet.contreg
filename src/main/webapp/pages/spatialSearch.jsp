@@ -7,16 +7,17 @@
 
 		<h1>Spatial search</h1>
 		<p>
-		Search for all spatial objects having the coordinates you specify below. 
+		Search for all spatial objects having the coordinates you specify below.<br/>
+		Coordinates can be any positive or negative number. For example -60.257, 0.15, 17.
 		</p>
 	
 		<stripes:form action="/spatialSearch.action" method="get" style="padding-bottom:20px">
 
-			<stripes:label for="txtLat1">Latitude:&nbsp;&nbsp;&nbsp;</stripes:label>
-			<stripes:text name="lat1" id="txtLat1" size="10"/> - <stripes:text name="lat2" id="txtLat2" size="10"/>
+			<stripes:label for="txtLatS">Latitude (south,north):</stripes:label>
+			<stripes:text name="latS" id="txtLatS" size="10"/> - <stripes:text name="latN" id="txtLatN" size="10"/>
 			<br/><br/>
-			<stripes:label for="txtLong1">Longitude:</stripes:label>
-			<stripes:text name="long1" id="txtLong1" size="10"/> - <stripes:text name="long2" id="txtLong2" size="10"/>			
+			<stripes:label for="txtLongW">Longitude (west,east):</stripes:label>
+			<stripes:text name="longW" id="txtLongW" size="10"/> - <stripes:text name="longE" id="txtLongE" size="10"/>			
 			<br/><br/>
 			<stripes:submit name="search" value="Search" id="searchButton"/>
 			

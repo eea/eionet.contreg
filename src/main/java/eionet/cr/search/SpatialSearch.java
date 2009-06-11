@@ -22,9 +22,11 @@ package eionet.cr.search;
 
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
+
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
-import eionet.cr.search.util.CoordinateBox;
+import eionet.cr.search.util.BBOX;
 import eionet.cr.util.Hashes;
 
 /**
@@ -35,14 +37,18 @@ import eionet.cr.util.Hashes;
 public class SpatialSearch extends AbstractSubjectSearch{
 	
 	/** */
-	private CoordinateBox box;
+	private BBOX box;
+	
+	/** */
+	private String source;
 	
 	/**
 	 * 
 	 * @param box
 	 */
-	public SpatialSearch(CoordinateBox box){
+	public SpatialSearch(BBOX box, String source){
 		this.box = box;
+		this.source = source;
 	}
 	
 	/*
@@ -70,15 +76,20 @@ public class SpatialSearch extends AbstractSubjectSearch{
 		buf.append(" where SPO_SPAT.PREDICATE=").append(Hashes.spoHash(Predicates.RDF_TYPE)).
 		append(" and SPO_SPAT.OBJECT_HASH=").append(Hashes.spoHash(Subjects.WGS_SPATIAL_THING));
 		
+		if (!StringUtils.isBlank(source)){
+			buf.append(" and SPO_SPAT.SOURCE=?");
+			inParameters.add(Long.valueOf(Hashes.spoHash(source)));
+		}
+		
 		if (box.hasLatitude()){
 			buf.append(" and SPO_SPAT.SUBJECT=SPO_LAT.SUBJECT and SPO_LAT.PREDICATE=").append(Hashes.spoHash(Predicates.WGS_LAT));
-			if (box.getLowerLatitude()!=null){
+			if (box.getLatitudeSouth()!=null){
 				buf.append(" and SPO_LAT.OBJECT_DOUBLE>=?");
-				inParameters.add(box.getLowerLatitude());
+				inParameters.add(box.getLatitudeSouth());
 			}
-			if (box.getUpperLatitude()!=null){
+			if (box.getLatitudeNorth()!=null){
 				buf.append(" and SPO_LAT.OBJECT_DOUBLE<=?");
-				inParameters.add(box.getUpperLatitude());
+				inParameters.add(box.getLatitudeNorth());
 			}
 		}
 		
@@ -91,13 +102,13 @@ public class SpatialSearch extends AbstractSubjectSearch{
 						
 			buf.append(" and SPO_LONG.PREDICATE=").append(Hashes.spoHash(Predicates.WGS_LONG));
 			
-			if (box.getLowerLongitude()!=null){
+			if (box.getLongitudeWest()!=null){
 				buf.append(" and SPO_LONG.OBJECT_DOUBLE>=?");
-				inParameters.add(box.getLowerLongitude());
+				inParameters.add(box.getLongitudeWest());
 			}
-			if (box.getUpperLongitude()!=null){
+			if (box.getLongitudeEast()!=null){
 				buf.append(" and SPO_LONG.OBJECT_DOUBLE<=?");
-				inParameters.add(box.getUpperLongitude());
+				inParameters.add(box.getLongitudeEast());
 			}
 		}
 		
