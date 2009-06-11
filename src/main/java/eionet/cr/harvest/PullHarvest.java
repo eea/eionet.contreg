@@ -26,6 +26,8 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLEncoder;
+import java.text.MessageFormat;
 import java.util.Date;
 
 import eionet.cr.config.GeneralConfig;
@@ -37,6 +39,9 @@ import eionet.cr.util.FileUtil;
  *
  */
 public class PullHarvest extends Harvest{
+	
+	/** */
+	private static String userAgent;
 	
 	/** */
 	private Boolean sourceAvailable = null;
@@ -80,6 +85,7 @@ public class PullHarvest extends Harvest{
 				URLConnection urlConnection = url.openConnection();
 				
 				urlConnection.setRequestProperty("Accept", "application/rdf+xml, text/xml, */*");
+				urlConnection.setRequestProperty("User-Agent", getUserAgent());
 				if (lastHarvest!=null){
 					urlConnection.setIfModifiedSince(lastHarvest.getTime());
 				}
@@ -124,5 +130,22 @@ public class PullHarvest extends Harvest{
 	 */
 	public Boolean getSourceAvailable() {
 		return sourceAvailable;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	private static final String getUserAgent(){
+		
+		if (PullHarvest.userAgent==null){
+			
+			String ua = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_USERAGENT);
+			Object[] args = new String[1];
+			args[0] = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_VERSION);
+			PullHarvest.userAgent = MessageFormat.format(ua, args);
+		}
+		
+		return PullHarvest.userAgent;
 	}
 }
