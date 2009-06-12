@@ -35,6 +35,7 @@ import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.util.PredicateLabels;
 import eionet.cr.search.util.SortOrder;
+import eionet.cr.util.Hashes;
 import eionet.cr.util.Util;
 import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.security.CRUser;
@@ -284,4 +285,17 @@ public class JstlFunctions {
 		
 		return formatter==null ? object.toString() : formatter.format(object);
 	}
+
+	/**
+	 * Returns a color for the given source by supplying the source's hash to the
+	 * <code>Colors.colorByModulus(long)</code>.
+	 * 
+	 * @param source
+	 * @return
+	 */
+	public static String colorForSource(String source){
+		
+		return Colors.toKML(Colors.colorByModulus(Hashes.spoHash(source==null ? "" : source)), false);
+	}
+
 }

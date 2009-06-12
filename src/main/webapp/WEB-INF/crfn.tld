@@ -124,5 +124,17 @@
 			${formatObject(object, formatter)}
 		</example>
 	</function>
+
+	<function>
+		<description>
+			Returns a HEX color code for the given source string.
+		</description>
+		<name>colorForSource</name>
+		<function-class>eionet.cr.web.util.JstlFunctions</function-class>
+		<function-signature>java.lang.String colorForSource(java.lang.String)</function-signature>
+		<example>
+			${colorForSource(source)}
+		</example>
+	</function>
 	
 </taglib>

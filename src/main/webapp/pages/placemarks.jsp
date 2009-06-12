@@ -18,13 +18,23 @@
 	<description>Spatial things that CR has from ${actionBean.source}</description>	
 		</c:otherwise>
 	</c:choose>
+	
+	<c:set var="colorForSource" value="${crfn:colorForSource(actionBean.source)}"/>
+	
 	<Style id="placemarksStyle1">
 		<IconStyle>
+			<color>${colorForSource}</color>
+			<colorMode>normal</colorMode>
  			<scale>1.0</scale>
  			<Icon>
 				<href>root://icons/palette-4.png</href>
 			</Icon>
  		</IconStyle>
+		<LabelStyle>
+			<color>${colorForSource}</color>
+			<colorMode>normal</colorMode>
+ 			<scale>1.0</scale>
+		</LabelStyle>
 	</Style>
 	
 	<c:if test="${not empty actionBean.resultList}">
