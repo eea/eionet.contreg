@@ -137,4 +137,16 @@
 		</example>
 	</function>
 	
+	<function>
+		<description>
+			Encodes the given string for inclusion into a URL.
+		</description>
+		<name>urlEncode</name>
+		<function-class>eionet.cr.web.util.JstlFunctions</function-class>
+		<function-signature>java.lang.String urlEncode(java.lang.String)</function-signature>
+		<example>
+			${urlEncode(str)}
+		</example>
+	</function>
+	
 </taglib>

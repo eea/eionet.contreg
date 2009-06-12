@@ -31,7 +31,7 @@
 					<open>0</open>
     				<visibility>0</visibility>
 					<Url>
-						<href>${actionBean.contextUrl}${actionBean.urlBinding}?source=${currentSource}</href>
+						<href>${actionBean.contextUrl}${actionBean.urlBinding}?source=${crfn:urlEncode(currentSource)}</href>
         				<viewRefreshMode>onStop</viewRefreshMode>
         				<viewRefreshTime>3</viewRefreshTime>					
 					</Url>

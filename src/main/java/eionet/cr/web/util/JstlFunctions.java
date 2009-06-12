@@ -20,6 +20,8 @@
  */
 package eionet.cr.web.util;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -297,5 +299,14 @@ public class JstlFunctions {
 		
 		return Colors.toKML(Colors.colorByModulus(Hashes.spoHash(source==null ? "" : source)), false);
 	}
-
+	
+	/**
+	 * 
+	 * @param s
+	 * @return
+	 */
+	public static String urlEncode(String s){
+		
+		return Util.urlEncode(s);
+	}
 }

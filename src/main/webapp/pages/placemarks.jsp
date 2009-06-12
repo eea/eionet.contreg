@@ -53,7 +53,7 @@
 			
 				<c:set var="subjectLabel" value="${crfn:formatPredicateObjects(subject, rdfsLabel)}"/>
 				<c:set var="subjectType" value="${crfn:formatPredicateObjects(subject, rdfType)}"/>
-				<c:set var="factsheetUrl" value="${actionBean.contextUrl}/factsheet.action?uri=${subject.uri}"/>
+				<c:set var="factsheetUrl" value="${actionBean.contextUrl}/factsheet.action?uri=${crfn:urlEncode(subject.uri)}"/>
 			
 				<Placemark id="${subject.uriHash}">	
 					<c:choose>
