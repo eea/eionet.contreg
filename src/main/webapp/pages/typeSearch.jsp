@@ -23,6 +23,9 @@
     				</c:forEach>
 				</stripes:select>&nbsp;
 				<stripes:submit name="search" value="Search"/>
+				<c:if test='${sessionScope.crUser!=null && crfn:hasPermission(sessionScope.crUser.userName, "/", "u")}'>
+					&nbsp;<stripes:submit name="introspect" value="Introspect"/>
+				</c:if>		
 
 				<c:if test="${not empty param.search}">
 					<stripes:layout-render name="/pages/common/subjectsResultList.jsp" tableClass="sortable"/>

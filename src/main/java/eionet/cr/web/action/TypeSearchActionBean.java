@@ -33,6 +33,7 @@ import org.apache.commons.lang.StringUtils;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import eionet.cr.common.Predicates;
@@ -87,6 +88,20 @@ public class TypeSearchActionBean extends AbstractSearchActionBean{
 		}
 		
 		return new ForwardResolution(FORM_PAGE);
+	}
+
+	/**
+	 * 
+	 * @return
+	 * @throws SearchException
+	 */
+	public Resolution introspect() throws SearchException {
+		
+		if (!StringUtils.isBlank(type)){			
+			return new RedirectResolution(FactsheetActionBean.class).addParameter("uri", type);
+		}
+		else
+			return new ForwardResolution(FORM_PAGE);
 	}
 	
 	/**
