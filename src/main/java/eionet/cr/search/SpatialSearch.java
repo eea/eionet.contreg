@@ -67,9 +67,12 @@ public class SpatialSearch extends AbstractSubjectSearch{
 		
 		StringBuffer sqlBuf = new StringBuffer(googleEarthMode ? "select distinct" : " select").
 		append(" SPO_POINT.SUBJECT as SUBJECT_HASH from SPO as SPO_POINT");
-		if (sortPredicate!=null){
-			sqlBuf.append(" left join SPO as ORDERING on (SPO_POINT.SUBJECT=ORDERING.SUBJECT and ORDERING.PREDICATE=?) ");
-			inParameters.add(Long.valueOf(Hashes.spoHash(sortPredicate)));
+		
+		if (!googleEarthMode){
+			if (sortPredicate!=null){
+				sqlBuf.append(" left join SPO as ORDERING on (SPO_POINT.SUBJECT=ORDERING.SUBJECT and ORDERING.PREDICATE=?) ");
+				inParameters.add(Long.valueOf(Hashes.spoHash(sortPredicate)));
+			}
 		}
 
 		if (box.hasLatitude()){
@@ -119,8 +122,12 @@ public class SpatialSearch extends AbstractSubjectSearch{
 		}
 		
 		if (!googleEarthMode){
-			if (sortPredicate!=null)
+			if (sortPredicate!=null){
 				sqlBuf.append(" order by ORDERING.OBJECT ").append(sortOrder==null ? sortOrder.ASCENDING.toSQL() : sortOrder.toSQL());
+			}
+		}
+		else{
+			sqlBuf.append(" order by SPO_POINT.SUBJECT");
 		}
 		
 		if (googleEarthMode){
