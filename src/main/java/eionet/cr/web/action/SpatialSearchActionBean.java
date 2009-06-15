@@ -117,6 +117,7 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean {
 			SpatialSearch spatialSearch = new SpatialSearch(createBBOX(), source);
 			spatialSearch.setPageLength(25);
 			spatialSearch.setPageNumber(1);
+			spatialSearch.setGoogleEarthMode(true);
 			spatialSearch.execute();
 			
 			resultList = spatialSearch.getResultList();

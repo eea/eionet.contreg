@@ -20,6 +20,7 @@
  */
 package eionet.cr.search;
 
+import java.sql.Connection;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -27,6 +28,7 @@ import org.apache.commons.lang.StringUtils;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.search.util.BBOX;
+import eionet.cr.search.util.SubjectHashesReader;
 import eionet.cr.util.Hashes;
 
 /**
@@ -41,6 +43,9 @@ public class SpatialSearch extends AbstractSubjectSearch{
 	
 	/** */
 	private String source;
+	
+	/** */
+	private boolean googleEarthMode = false;
 	
 	/**
 	 * 
@@ -60,9 +65,10 @@ public class SpatialSearch extends AbstractSubjectSearch{
 		if (box==null || box.isUndefined())
 			return null;
 		
-		StringBuffer sqlBuf = new StringBuffer("select distinct SPO_SPAT.SUBJECT as SUBJECT_HASH from SPO as SPO_SPAT");
+		StringBuffer sqlBuf = new StringBuffer(googleEarthMode ? "select distinct" : " select").
+		append(" SPO_POINT.SUBJECT as SUBJECT_HASH from SPO as SPO_POINT");
 		if (sortPredicate!=null){
-			sqlBuf.append(" left join SPO as ORDERING on (SPO_SPAT.SUBJECT=ORDERING.SUBJECT and ORDERING.PREDICATE=?) ");
+			sqlBuf.append(" left join SPO as ORDERING on (SPO_POINT.SUBJECT=ORDERING.SUBJECT and ORDERING.PREDICATE=?) ");
 			inParameters.add(Long.valueOf(Hashes.spoHash(sortPredicate)));
 		}
 
@@ -73,16 +79,16 @@ public class SpatialSearch extends AbstractSubjectSearch{
 			sqlBuf.append(", SPO as SPO_LONG");
 		}
 		
-		sqlBuf.append(" where SPO_SPAT.PREDICATE=").append(Hashes.spoHash(Predicates.RDF_TYPE)).
-		append(" and SPO_SPAT.OBJECT_HASH=").append(Hashes.spoHash(Subjects.WGS_SPATIAL_THING));
+		sqlBuf.append(" where SPO_POINT.PREDICATE=").append(Hashes.spoHash(Predicates.RDF_TYPE)).
+		append(" and SPO_POINT.OBJECT_HASH=").append(Hashes.spoHash(Subjects.WGS_POINT));
 		
 		if (!StringUtils.isBlank(source)){
-			sqlBuf.append(" and SPO_SPAT.SOURCE=?");
+			sqlBuf.append(" and SPO_POINT.SOURCE=?");
 			inParameters.add(Long.valueOf(Hashes.spoHash(source)));
 		}
 		
 		if (box.hasLatitude()){
-			sqlBuf.append(" and SPO_SPAT.SUBJECT=SPO_LAT.SUBJECT and SPO_LAT.PREDICATE=").append(Hashes.spoHash(Predicates.WGS_LAT));
+			sqlBuf.append(" and SPO_POINT.SUBJECT=SPO_LAT.SUBJECT and SPO_LAT.PREDICATE=").append(Hashes.spoHash(Predicates.WGS_LAT));
 			if (box.getLatitudeSouth()!=null){
 				sqlBuf.append(" and SPO_LAT.OBJECT_DOUBLE>=?");
 				inParameters.add(box.getLatitudeSouth());
@@ -98,7 +104,7 @@ public class SpatialSearch extends AbstractSubjectSearch{
 			if (box.hasLatitude())
 				sqlBuf.append(" and SPO_LAT.SUBJECT=SPO_LONG.SUBJECT");
 			else
-				sqlBuf.append(" and SPO_SPAT.SUBJECT=SPO_LONG.SUBJECT"); 
+				sqlBuf.append(" and SPO_POINT.SUBJECT=SPO_LONG.SUBJECT"); 
 						
 			sqlBuf.append(" and SPO_LONG.PREDICATE=").append(Hashes.spoHash(Predicates.WGS_LONG));
 			
@@ -112,18 +118,29 @@ public class SpatialSearch extends AbstractSubjectSearch{
 			}
 		}
 		
-		if (sortPredicate!=null)
-			sqlBuf.append(" order by ORDERING.OBJECT ").append(sortOrder==null ? sortOrder.ASCENDING.toSQL() : sortOrder.toSQL());
+		if (!googleEarthMode){
+			if (sortPredicate!=null)
+				sqlBuf.append(" order by ORDERING.OBJECT ").append(sortOrder==null ? sortOrder.ASCENDING.toSQL() : sortOrder.toSQL());
+		}
 		
-		if (pageLength>0){
-			sqlBuf.append(" limit ");
-			if (pageNumber>0){
-				sqlBuf.append("?,");
-				inParameters.add(new Integer((pageNumber-1)*pageLength));
+		if (googleEarthMode){
+			if (pageLength>0){
+				sqlBuf.append(" limit ");
+				if (pageNumber>0){
+					sqlBuf.append("?,");
+					inParameters.add(new Integer((pageNumber-1)*pageLength));
+				}
+				sqlBuf.append(pageLength);
 			}
-			sqlBuf.append(pageLength);
 		}
 		
 		return sqlBuf.toString();
+	}
+
+	/**
+	 * @param googleEarthMode the googleEarthMode to set
+	 */
+	public void setGoogleEarthMode(boolean googleEarthMode) {
+		this.googleEarthMode = googleEarthMode;
 	}
 }

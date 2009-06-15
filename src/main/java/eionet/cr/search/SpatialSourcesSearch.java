@@ -44,7 +44,7 @@ public class SpatialSourcesSearch {
 	/** */
 	private static final String sql =
 		new StringBuffer("select distinct URI from SPO,RESOURCE where PREDICATE=").
-		append(Hashes.spoHash(Predicates.RDF_TYPE)).append(" and OBJECT_HASH=").append(Hashes.spoHash(Subjects.WGS_SPATIAL_THING)).
+		append(Hashes.spoHash(Predicates.RDF_TYPE)).append(" and OBJECT_HASH=").append(Hashes.spoHash(Subjects.WGS_POINT)).
 		append(" and SOURCE=RESOURCE.URI_HASH").toString();
 	
 	/**
