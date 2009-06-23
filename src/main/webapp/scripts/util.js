@@ -260,3 +260,26 @@ function openCirca(url){
 	function redirect(url){
 		document.location=url;
 	}
+
+/**
+ *
+ */
+function toggleSelectAll(formname) {
+  formobj = document.getElementById(formname);
+  checkboxes = formobj.getElementsByTagName('input');
+  var isAllSelected = (formobj.selectAll.value == "Select all")?false:true;
+
+  if (isAllSelected == null || isAllSelected == false) {
+	for (i = 0; i < checkboxes.length; i++) {
+	  if (checkboxes[i].type == 'checkbox')
+		checkboxes[i].checked = true ;
+	}
+	formobj.selectAll.value = "Deselect all";
+  }
+  else {
+	for (i = 0; i < checkboxes.length; i++)
+	  if (checkboxes[i].type == 'checkbox')
+		checkboxes[i].checked = false ;
+	formobj.selectAll.value = "Select all";
+  }
+}
