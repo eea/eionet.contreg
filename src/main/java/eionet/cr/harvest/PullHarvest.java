@@ -66,7 +66,7 @@ public class PullHarvest extends Harvest{
 		
 		File toFile = fullFilePathForSourceUrl(sourceUrlString);;
 		if (toFile.exists()){
-			doDownload = !Boolean.parseBoolean(GeneralConfig.getProperty(GeneralConfig.HARVESTER_DEBUG_USE_DOWNLOADED_FILES, "false"));
+			doDownload = !Boolean.parseBoolean(GeneralConfig.getProperty(GeneralConfig.HARVESTER_USE_DOWNLOADED_FILES, "false"));
 			if (doDownload){
 				toFile.delete();
 			}
@@ -102,7 +102,7 @@ public class PullHarvest extends Harvest{
 					}
 				}
 			
-				// harvest the downloaded file
+				// save the stream to file
 				FileUtil.streamToFile(inputStream, toFile);
 			}
 			else{
@@ -122,7 +122,22 @@ public class PullHarvest extends Harvest{
 		}
 		
 		logger.debug("Parsing local file: " + toFile.getAbsolutePath());
-		harvest(toFile);
+		
+		/* harvest the downloaded file */
+		
+		try{
+			harvest(toFile);
+		}
+		finally{
+		
+			// delete the downloaded file, unless the configuration doesn't require to do so
+			try{
+				if (GeneralConfig.getProperty(GeneralConfig.HARVESTER_DELETE_DOWNLOADED_FILES, "true").equals("true")){
+					toFile.delete();
+				}
+			}
+			catch (Exception e){}
+		}
 	}
 
 	/**
