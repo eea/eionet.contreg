@@ -171,4 +171,8 @@ public class CustomSearch extends AbstractSubjectSearch{
 	private boolean isLiteralsEnabled(String predicateUri){
 		return literalsEnabledPredicates!=null && literalsEnabledPredicates.contains(predicateUri);
 	}
+
+	protected String orderingJoinTable(){
+		return "SPO1";
+	}
 }

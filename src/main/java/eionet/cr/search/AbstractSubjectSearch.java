@@ -29,14 +29,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import eionet.cr.config.GeneralConfig;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.util.SortOrder;
 import eionet.cr.search.util.SubjectHashesReader;
 import eionet.cr.search.util.SubjectDataReader;
+import eionet.cr.search.util.SubjectSelectMode;
+import eionet.cr.util.Hashes;
 import eionet.cr.util.Util;
 import eionet.cr.util.pagination.Pagination;
 import eionet.cr.util.sql.ConnectionUtil;
@@ -73,8 +77,10 @@ public abstract class AbstractSubjectSearch {
 		
 		List<Object> inParameters = new ArrayList<Object>();
 		
-		String subjectSelectSQL = getSubjectSelectSQL(inParameters);
-		if (subjectSelectSQL!=null && subjectSelectSQL.length()>0){
+		/* create the SQL query that selects the hashes of matching subjects */
+		
+		String subjectSelectQuery = getSubjectSelectSQL(inParameters);//createCompleteSubjectSelectQuery(inParameters);
+		if (subjectSelectQuery!=null && subjectSelectQuery.length()>0){
 			
 			Connection conn = null;
 			try{
@@ -83,26 +89,41 @@ public abstract class AbstractSubjectSearch {
 				conn = getConnection();
 				SubjectHashesReader subjectHashesReader = createSubjectHashesReader();
 				
-				/* execute subject finder query */
+				/* execute the above-created query */
 				
-				logger.debug("Executing subject select query: " + subjectSelectSQL);
+				logger.debug("Executing subject select query: " + subjectSelectQuery);
 				long time = System.currentTimeMillis();
-				SQLUtil.executeQuery(subjectSelectSQL, inParameters, subjectHashesReader, conn);
+				SQLUtil.executeQuery(subjectSelectQuery, inParameters, subjectHashesReader, conn);
 				logger.debug("subject select query took " + (System.currentTimeMillis()-time) + " ms");
 				
-				/* if any subjects found, proceed to getting their metadata */
+				/* get the result-map */
 				
-				LinkedHashMap<String, SubjectDTO> subjectsMap = subjectHashesReader.getPageMap(pageNumber, pageLength);
+				LinkedHashMap<String, SubjectDTO> subjectsMap =
+//					!getSubjectSelectMode().equals(SubjectSelectMode.SERVER) ? subjectHashesReader.getResultMap() :
+							subjectHashesReader.getResultMap(pageNumber, pageLength);
+
+				// if any matching subjects found, proceed to getting their metadata */
 				if (subjectsMap.size()>0){
+
+					/* set the count of total matches, depending on the mode */
 					
-					totalMatchCount = subjectHashesReader.getTotalResultCount();
+					totalMatchCount = subjectHashesReader.getResultSetSize();
+					
+//					switch(getSubjectSelectMode()) {
+//					case DB_1STEP:
+//						totalMatchCount = MySQLUtil.getTotalRowCount(conn);break;
+//					case DB_2STEP:
+//						totalMatchCount = Integer.parseInt(SQLUtil.executeSingleReturnValueQuery(addSQLCountFunction(subjectSelectQuery), conn).toString());break;
+//					case SERVER:
+//						totalMatchCount = subjectHashesReader.getResultSetSize();break;
+//					}
+
+					/* execute the SQL query that gets the metadata of the found subjects, collect the query results */
+
 					SubjectDataReader subjectDataReader = createSubjectDataReader(subjectsMap);
-				
-					/* execute subject metadata query */
-					
 					logger.debug("Executing subject data select query");
 					time = System.currentTimeMillis();
-					SQLUtil.executeQuery(getSubjectDataSelectSQL(Util.toCSV(subjectsMap.keySet())), subjectDataReader, conn);
+					SQLUtil.executeQuery(createSubjectMetadataSelectQuery(Util.toCSV(subjectsMap.keySet())), subjectDataReader, conn);
 					logger.debug("subject data select query took " + (System.currentTimeMillis()-time) + " ms");
 					
 					/* collect labels and sub-properties */
@@ -123,7 +144,7 @@ public abstract class AbstractSubjectSearch {
 			}
 		}
 	}
-
+	
 	/**
 	 * 
 	 * @param conn
@@ -206,7 +227,7 @@ public abstract class AbstractSubjectSearch {
 	 * 
 	 * @return
 	 */
-	protected String getSubjectDataSelectSQL(String subjectHashes){
+	protected String createSubjectMetadataSelectQuery(String subjectHashes){
 		
 		StringBuffer buf = new StringBuffer().
 		append("select distinct ").
@@ -271,5 +292,87 @@ public abstract class AbstractSubjectSearch {
 	 */
 	public void setPageLength(int pageLength) {
 		this.pageLength = pageLength;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	protected static SubjectSelectMode getSubjectSelectMode(){
+		
+		return SubjectSelectMode.valueOf(
+				GeneralConfig.getProperty(GeneralConfig.SUBEJCT_SELECT_MODE, SubjectSelectMode.DB_1STEP.toString()).toUpperCase());
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	private static String addSQLCountFunction(String selectQuery){
+		
+		String s = StringUtils.replace(selectQuery, " distinct ", " count(distinct ", 1);
+		return StringUtils.replace(s, " from ", ") from ", 1);
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	private String createCompleteSubjectSelectQuery(List inParameters){
+		
+		/* add the "sql_calc_found_rows" and/or "distinct" keywords if the mode requires so */
+		
+		String sql = getSubjectSelectSQL(inParameters);
+		switch(getSubjectSelectMode()) {
+	    	case DB_1STEP: sql = StringUtils.replace(sql, "select ", "select sql_calc_found_rows distinct ", 1);break;
+	    	case DB_2STEP: sql = StringUtils.replace(sql, "select ", "select distinct ", 1);break;
+		}
+		
+		/* if sorting required, add sorting join */
+		
+		if (sortPredicate!=null){
+			
+			int countQMarks = StringUtils.countMatches(sql.substring(0, sql.indexOf(" from ")), "?");
+			
+			StringBuffer buf = new StringBuffer().
+			append(" left join SPO as ORDERING on (").append(orderingJoinTable()).
+			append(".SUBJECT=ORDERING.SUBJECT and ORDERING.PREDICATE=?) where ");
+			
+			sql = StringUtils.replace(sql, " where ", buf.toString(), 1);
+			
+			// add an IN parameter for sorting predicate, add it into the correct position in the list of IN parameters
+			inParameters.add(countQMarks, Long.valueOf(Hashes.spoHash(sortPredicate)));
+		}
+		
+		/* add the ORDER BY part */
+		
+		StringBuffer sqlBuf = new StringBuffer(sql);
+		if (sortPredicate!=null){
+			sqlBuf.append(" order by ORDERING.OBJECT ").append(sortOrder==null ? sortOrder.ASCENDING.toSQL() : sortOrder.toSQL());
+		}
+		
+		/* build the LIMIT part */
+		
+		if (!getSubjectSelectMode().equals(SubjectSelectMode.SERVER)){
+			
+			if (pageLength>0){
+				sqlBuf.append(" limit ");
+				if (pageNumber>0){
+					sqlBuf.append("?,");
+					inParameters.add(new Integer((pageNumber-1)*pageLength));
+				}
+				sqlBuf.append(pageLength);
+			}
+		}
+		
+		return sqlBuf.toString();
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	protected String orderingJoinTable(){
+		return "SPO";
 	}
 }

@@ -48,11 +48,27 @@ public class SubjectHashesReader extends ResultSetBaseReader{
 		
 		resultSet.add(rs.getString("SUBJECT_HASH"));
 	}
+	
+	/**
+	 * 
+	 * @param pageNumber
+	 * @param pageLength
+	 * @return
+	 */
+	public LinkedHashMap<String,SubjectDTO> getResultMap(){
+		
+		LinkedHashMap<String, SubjectDTO> result = new LinkedHashMap<String, SubjectDTO>();
+		for (Iterator<String> it=resultSet.iterator(); it.hasNext();){
+			result.put(it.next(), (SubjectDTO)null);					
+		}
+		
+		return result;
+	}
 
 	/**
 	 * @return the resultMap
 	 */
-	public LinkedHashMap<String,SubjectDTO> getPageMap(int pageNumber, int pageLength){
+	public LinkedHashMap<String,SubjectDTO> getResultMap(int pageNumber, int pageLength){
 		
 		LinkedHashMap<String,SubjectDTO> pageMap = new LinkedHashMap<String,SubjectDTO>();
 		if (resultSet.size()>0){
@@ -95,7 +111,7 @@ public class SubjectHashesReader extends ResultSetBaseReader{
 	 * 
 	 * @return
 	 */
-	public int getTotalResultCount(){
+	public int getResultSetSize(){
 		return resultSet.size();
 	}
 }
