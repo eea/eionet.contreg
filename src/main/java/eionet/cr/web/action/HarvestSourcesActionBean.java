@@ -29,13 +29,13 @@ import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
+import eionet.cr.common.HarvestSourceType;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
-import eionet.cr.harvest.util.DedicatedHarvestSourceTypes;
 
 /**
  * @author altnyris
@@ -151,15 +151,10 @@ public class HarvestSourcesActionBean extends AbstractActionBean {
 			sourceTypes.add(typeMap);
 			
 			typeMap = new HashMap<String,String>();
-			typeMap.put("title", "Delivered files");
-			typeMap.put("type", DedicatedHarvestSourceTypes.deliveredFile);
+			typeMap.put("title", "Tracked files");
+			typeMap.put("type", HarvestSourceType.tracked_file.toString());
 			sourceTypes.add(typeMap);
 			
-			typeMap = new HashMap<String,String>();
-			typeMap.put("title", "QAW sources");
-			typeMap.put("type", DedicatedHarvestSourceTypes.qawSource);
-			sourceTypes.add(typeMap);
-
 			typeMap = new HashMap<String,String>();
 			typeMap.put("title", "Unavailable");
 			typeMap.put("type", UNAVAILABLE_TYPE);

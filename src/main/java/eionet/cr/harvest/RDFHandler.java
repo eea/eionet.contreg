@@ -40,13 +40,13 @@ import com.hp.hpl.jena.rdf.arp.ALiteral;
 import com.hp.hpl.jena.rdf.arp.AResource;
 import com.hp.hpl.jena.rdf.arp.StatementHandler;
 
+import eionet.cr.common.HarvestSourceType;
 import eionet.cr.common.LabelPredicates;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.UnfinishedHarvestDTO;
-import eionet.cr.harvest.util.DedicatedHarvestSourceTypes;
 import eionet.cr.harvest.util.HarvestLog;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.UnicodeUtils;
@@ -627,41 +627,24 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	 */
 	private void extractNewHarvestSources() throws SQLException{
 
-		logger.debug("Extracting new harvest sources");
+		logger.debug("Extracting tracked files");
 		
-		/* handle qaw sources */
-		
+		// harvest interval for tracked files		
 		Integer interval = Integer.valueOf(GeneralConfig.getProperty(GeneralConfig.HARVESTER_REFERRALS_INTERVAL,
 				String.valueOf(HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL)));
-		
-		StringBuffer buf = new StringBuffer().
-		append("insert ignore into HARVEST_SOURCE (NAME, URL, TYPE, TIME_CREATED, CREATOR, INTERVAL_MINUTES, SOURCE, GEN_TIME) ").
-		append("select SPO_TEMP_SOURCE.OBJECT, SPO_TEMP_SOURCE.OBJECT, '").append(DedicatedHarvestSourceTypes.qawSource).
-		append("', now(), '").append(CRUser.application.getUserName()).
-		append("', '").append(interval).append("', ").append(sourceUrlHash).append(", ").append(genTime).
-		append(" from SPO_TEMP as SPO_TEMP_SOURCE, SPO_TEMP where SPO_TEMP_SOURCE.ANON_OBJ='N' and ").
-		append("SPO_TEMP_SOURCE.PREDICATE=").append(Hashes.spoHash(Predicates.DC_SOURCE)).
-		append(" and SPO_TEMP_SOURCE.SUBJECT=SPO_TEMP.SUBJECT and SPO_TEMP.PREDICATE=").append(Hashes.spoHash(Predicates.RDF_TYPE)).
-		append(" and SPO_TEMP.ANON_OBJ='N' and SPO_TEMP.OBJECT_HASH in (").
-		append(Hashes.spoHash(Subjects.QA_REPORT_CLASS)).append(", ").append(Hashes.spoHash(Subjects.QAW_RESOURCE_CLASS)).append(")");
-		
-		int i = SQLUtil.executeUpdate(buf.toString(), getConnection());
 
-		/* handle delivered files */
-		
-		buf = new StringBuffer().
-		append("insert ignore into HARVEST_SOURCE (NAME, URL, TYPE, TIME_CREATED, CREATOR, INTERVAL_MINUTES, SOURCE, GEN_TIME) ").
-		append("select URI, URI, '").append(DedicatedHarvestSourceTypes.deliveredFile).
+		StringBuffer buf = new StringBuffer().
+		append("insert ignore into HARVEST_SOURCE (NAME, URL, TYPE, TIME_CREATED, CREATOR, INTERVAL_MINUTES, SOURCE, GEN_TIME) ").		
+		append("select URI, URI, '").append(HarvestSourceType.tracked_file).
 		append("', now(), '").append(CRUser.application.getUserName()).
 		append("', '").append(interval).append("', ").append(sourceUrlHash).append(", ").append(genTime).
-		append(" from RESOURCE_TEMP, SPO_TEMP where RESOURCE_TEMP.URI_HASH=SPO_TEMP.SUBJECT and ").
-		append("SPO_TEMP.PREDICATE=").append(Hashes.spoHash(Predicates.RDF_TYPE)).
-		append(" and SPO_TEMP.ANON_OBJ='N' and SPO_TEMP.OBJECT_HASH in (").
-		append(Hashes.spoHash(Subjects.ROD_DELIVERY_CLASS)).append(", ").append(Hashes.spoHash(Subjects.DCTYPE_DATASET_CLASS)).append(")");
+		append(" from SPO,RESOURCE where SPO.SOURCE=").append(sourceUrlHash).append(" and SPO.GEN_TIME=").append(genTime).
+		append(" and SPO.PREDICATE=").append(Hashes.spoHash(Predicates.RDF_TYPE)).
+		append(" and SPO.ANON_OBJ='N' and SPO.OBJECT_HASH=").append(Hashes.spoHash(Subjects.CR_FILE)).
+		append(" and SPO.SUBJECT=RESOURCE.URI_HASH");
 		
-		i = i + SQLUtil.executeUpdate(buf.toString(), getConnection());
-		
-		logger.debug(i + " new harvest sources extracted and inserted");
+		int i = SQLUtil.executeUpdate(buf.toString(), getConnection());		
+		logger.debug(i + " tracked files extracted and inserted as NEW harvest sources");
 	}
 	
 	/**
