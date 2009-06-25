@@ -141,14 +141,17 @@ public abstract class Harvest {
 	 * @param file
 	 * @throws HarvestException
 	 */
-	protected void harvest(File file, String responseContentType) throws HarvestException{
+	protected void harvest(File file, String contentType) throws HarvestException{
 		
 		InputStream inputStream = null;
 		try{
-			try{
-				file = preProcess(file, sourceUrlString, responseContentType);
-				if (file==null)
-					return;
+			try{				
+				if (contentType==null || !contentType.startsWith("application/rdf+xml")){
+										
+					file = preProcess(file, sourceUrlString);
+					if (file==null)
+						return;
+				}
 				
 		        inputStream = new FileInputStream(file);
 			}
@@ -373,9 +376,10 @@ public abstract class Harvest {
 	 * @throws SAXException 
 	 * @throws ParserConfigurationException 
 	 */
-	protected File preProcess(File file, String fromUrl, String responseContentType)
-                                                                throws ParserConfigurationException, SAXException, IOException{
+	protected File preProcess(File file, String fromUrl) throws ParserConfigurationException, SAXException, IOException{
 
+		logger.debug("Content type unknown or not RDF, trying to find conversion to RDF");
+		
 		XmlAnalysis xmlAnalysis = new XmlAnalysis();
 		xmlAnalysis.parse(file);
 		
@@ -414,6 +418,8 @@ public abstract class Harvest {
 				String conversionId = conversionsParser.getRdfConversionId();
 				if (conversionId!=null && conversionId.length()>0){
 					
+					logger.debug("Found RDF conversion, going to run it");
+					
 					/* prepare conversion URL */
 					
 					String convertUrl = GeneralConfig.getRequiredProperty(GeneralConfig.XMLCONV_CONVERT_URL);
@@ -429,16 +435,8 @@ public abstract class Harvest {
 					return convertedFile;
 				}
 				else{
-					if (responseContentType!=null){
-						responseContentType = responseContentType.trim();
-						if (!responseContentType.startsWith("text/xml")
-								&& !responseContentType.startsWith("application/xml")
-								&& !responseContentType.startsWith("application/rdf+xml")){
-							
-							logger.debug("Skipping, because no conversions found and cannot parse this media type: " + responseContentType);
-							return null;
-						}
-					}
+					logger.debug("No RDF conversion found, no parsing will be done");
+					return null;
 				}
 			}
 			finally{

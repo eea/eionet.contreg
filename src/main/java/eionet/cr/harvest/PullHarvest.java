@@ -72,7 +72,7 @@ public class PullHarvest extends Harvest{
 			}
 		}
 		
-		String responseContentType = null;
+		String contentType = null;
 		InputStream inputStream = null;
 		try{
 			
@@ -83,7 +83,7 @@ public class PullHarvest extends Harvest{
 				sourceAvailable = Boolean.FALSE;
 				
 				URL url = new URL(sourceUrlString);
-				URLConnection urlConnection = url.openConnection();
+				URLConnection urlConnection = url.openConnection();				
 				
 				urlConnection.setRequestProperty("Accept", "application/rdf+xml, text/xml, */*");
 				urlConnection.setRequestProperty("User-Agent", getUserAgent());
@@ -92,21 +92,33 @@ public class PullHarvest extends Harvest{
 				}
 				
 				inputStream = urlConnection.getInputStream();
-				sourceAvailable = Boolean.TRUE;
 				
-				if (urlConnection instanceof HttpURLConnection){
-					if (((HttpURLConnection)urlConnection).getResponseCode()==HttpURLConnection.HTTP_NOT_MODIFIED){
-						String msg = "Source not modified since " + lastHarvest.toString();
-						logger.debug(msg);
-						infos.add(msg);
-						return;
+				// having reached this point, we assume the URL is not broken, ie the source is available
+				// (if it's not then we shouldn't reach this point, but instead we should be in the catch exception block)
+				sourceAvailable = Boolean.TRUE; 
+				
+				contentType = urlConnection.getContentType();
+				if (contentType==null
+						|| contentType.startsWith("text/xml")
+						|| contentType.startsWith("application/xml")
+						|| contentType.startsWith("application/rdf+xml")){
+
+					if (urlConnection instanceof HttpURLConnection){
+						if (((HttpURLConnection)urlConnection).getResponseCode()==HttpURLConnection.HTTP_NOT_MODIFIED){
+							String msg = "Source not modified since " + lastHarvest.toString();
+							logger.debug(msg);
+							infos.add(msg);
+							return;
+						}
 					}
+
+					// save the stream to file
+					FileUtil.streamToFile(inputStream, toFile);
 				}
-				
-				responseContentType = urlConnection.getContentType();
-			
-				// save the stream to file
-				FileUtil.streamToFile(inputStream, toFile);
+				else{
+					logger.debug("Skipping because of unsupported content type: " + contentType);
+					return;
+				}
 			}
 			else{
 				sourceAvailable = Boolean.TRUE;
@@ -129,7 +141,7 @@ public class PullHarvest extends Harvest{
 		/* harvest the downloaded file */
 		
 		try{
-			harvest(toFile, responseContentType);
+			harvest(toFile, contentType);
 		}
 		finally{
 		
