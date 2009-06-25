@@ -355,6 +355,13 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 			list.add(filter);
 
 			filter = new CustomSearchFilter();
+			filter.setUri(Predicates.CR_SCHEMA);
+			filter.setTitle("XML Schema");
+			filter.setDescription("");
+			filter.setProvideValues(true);
+			list.add(filter);
+
+			filter = new CustomSearchFilter();
 			filter.setUri(Predicates.DC_CREATOR);
 			filter.setTitle("Creator");
 			filter.setDescription("");
