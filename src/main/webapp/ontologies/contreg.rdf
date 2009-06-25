@@ -25,34 +25,38 @@
 		<rdfs:subClassOf rdf:resource="#File"/>
 	</rdfs:Class>
 
-	<rdf:Property rdf:ID="hasFeedback">
+	<owl:ObjectProperty rdf:ID="hasFeedback">
 		<rdfs:label>Has feedback</rdfs:label>
+                <owl:inverseOf rdf:resource="#feedbackFor"/>
                 <rdfs:range rdf:resource="#Feedback"/>
                 <rdfs:domain rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Resource"/>
-	</rdf:Property>
+	</owl:ObjectProperty>
 
-	<rdf:Property rdf:ID="feedbackFor">
+	<owl:ObjectProperty rdf:ID="feedbackFor">
 		<rdfs:label>Feedback for</rdfs:label>
+                <owl:inverseOf rdf:resource="#hasFeedback"/>
 		<rdfs:domain rdf:resource="#Feedback"/>
                 <rdfs:range rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Resource"/>
-	</rdf:Property>
+	</owl:ObjectProperty>
 
 	<rdfs:Class rdf:ID="FeedbackAttachment">
-		<rdfs:label>Feedback</rdfs:label>
+		<rdfs:label>Feedback attachment</rdfs:label>
 		<rdfs:subClassOf rdf:resource="#File"/>
 	</rdfs:Class>
 
-	<rdf:Property rdf:ID="hasAttachment">
-		<rdfs:label>Has feedback</rdfs:label>
+	<owl:ObjectProperty rdf:ID="hasAttachment">
+		<rdfs:label>Has attachment</rdfs:label>
+                <owl:inverseOf rdf:resource="#attachmentOf"/>
                 <rdfs:range rdf:resource="#FeedbackAttachment"/>
                 <rdfs:domain rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Resource"/>
-	</rdf:Property>
+	</owl:ObjectProperty>
 
-	<rdf:Property rdf:ID="attachmentOf">
-		<rdfs:label>Feedback for</rdfs:label>
+	<owl:ObjectProperty rdf:ID="attachmentOf">
+		<rdfs:label>Attachment of</rdfs:label>
+                <owl:inverseOf rdf:resource="#hasAttachment"/>
 		<rdfs:domain rdf:resource="#FeedbackAttachment"/>
                 <rdfs:range rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Resource"/>
-	</rdf:Property>
+	</owl:ObjectProperty>
 
 	<rdf:Property rdf:ID="xmlSchema">
 		<rdfs:label>XML Schema/DTD</rdfs:label>
@@ -117,16 +121,6 @@
 		<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
 <!--		<rdfs:domain rdf:resource="#File"/> -->
 	</rdf:Property>
-
-<!-- See ROD's schema -->
-<!--
-	<rdf:Property rdf:ID="file">
-		<rdfs:label>File in delivery</rdfs:label>
-		<rdfs:comment>Reference from Delivery envelope to file.</rdfs:comment>
-		<rdfs:subPropertyOf rdf:resource="http://purl.org/dc/terms/hasPart"/>
-		<rdfs:domain rdf:resource="#Delivery"/>
-	</rdf:Property>
--->
 
 	<!-- CR displays the rdfs:label in many situations. By declaring dc:title as a sub-property
 	     of rdfs:label, we have something to display when the author of the meta-data only uses Dublin Core -->
