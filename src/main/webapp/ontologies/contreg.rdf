@@ -27,7 +27,7 @@
 
 	<rdf:Property rdf:ID="hasFeedback">
 		<rdfs:label>Has feedback</rdfs:label>
-                <rdfs:range rdf:resouce="#Feedback"/>
+                <rdfs:range rdf:resource="#Feedback"/>
                 <rdfs:domain rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Resource"/>
 	</rdf:Property>
 
@@ -44,7 +44,7 @@
 
 	<rdf:Property rdf:ID="hasAttachment">
 		<rdfs:label>Has feedback</rdfs:label>
-                <rdfs:range rdf:resouce="#FeedbackAttachment"/>
+                <rdfs:range rdf:resource="#FeedbackAttachment"/>
                 <rdfs:domain rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Resource"/>
 	</rdf:Property>
 
