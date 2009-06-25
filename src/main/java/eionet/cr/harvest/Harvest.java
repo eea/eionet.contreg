@@ -141,12 +141,12 @@ public abstract class Harvest {
 	 * @param file
 	 * @throws HarvestException
 	 */
-	protected void harvest(File file) throws HarvestException{
+	protected void harvest(File file, String responseContentType) throws HarvestException{
 		
 		InputStream inputStream = null;
 		try{
 			try{
-				file = preProcess(file, sourceUrlString);
+				file = preProcess(file, sourceUrlString, responseContentType);
 				if (file==null)
 					return;
 				
@@ -155,6 +155,7 @@ public abstract class Harvest {
 			catch (Exception e){
 				throw new HarvestException(e.toString(), e);
 			}
+			
 	        harvest(new InputStreamBasedARPSource(inputStream));
 		}
 		finally{
@@ -372,7 +373,8 @@ public abstract class Harvest {
 	 * @throws SAXException 
 	 * @throws ParserConfigurationException 
 	 */
-	protected File preProcess(File file, String fromUrl) throws ParserConfigurationException, SAXException, IOException{
+	protected File preProcess(File file, String fromUrl, String responseContentType)
+                                                                throws ParserConfigurationException, SAXException, IOException{
 
 		XmlAnalysis xmlAnalysis = new XmlAnalysis();
 		xmlAnalysis.parse(file);
@@ -388,20 +390,31 @@ public abstract class Harvest {
 		
 		// if this file has a conversion to RDF, run it and return the reference to the resulting file
 		if (schemaOrDtd!=null && schemaOrDtd.length()>0){
+		
+			/* get the URL of the conversion service method that returns the list of available conversions */
 			
 			String listConversionsUrl = GeneralConfig.getRequiredProperty(GeneralConfig.XMLCONV_LIST_CONVERSIONS_URL);
 			listConversionsUrl = MessageFormat.format(listConversionsUrl, Util.toArray(URLEncoder.encode(schemaOrDtd)));
+
+			/* open connection to the list-conversions URL */
 			
 			URL url = new URL(listConversionsUrl);
 			URLConnection httpConn = url.openConnection();
 			
+			/* parse the returned input stream with eionet.cr.util.xml.ConversionsParser */
+			
 			InputStream inputStream = null;
 			try{
-				inputStream = httpConn.getInputStream();
+				inputStream = httpConn.getInputStream();				
 				ConversionsParser conversionsParser = new ConversionsParser();
 				conversionsParser.parse(inputStream);
+				
+				/* see if ConversionsParser found any conversions available */
+				
 				String conversionId = conversionsParser.getRdfConversionId();
 				if (conversionId!=null && conversionId.length()>0){
+					
+					/* prepare conversion URL */
 					
 					String convertUrl = GeneralConfig.getRequiredProperty(GeneralConfig.XMLCONV_CONVERT_URL);
 					Object[] args = new String[2];
@@ -409,9 +422,23 @@ public abstract class Harvest {
 					args[1] = URLEncoder.encode(fromUrl);
 					convertUrl = MessageFormat.format(convertUrl, args);
 					
+					/* run conversion and save the response to file */
+					
 					File convertedFile = new File(file.getAbsolutePath() + ".converted");
 					FileUtil.downloadUrlToFile(convertUrl, convertedFile);
 					return convertedFile;
+				}
+				else{
+					if (responseContentType!=null){
+						responseContentType = responseContentType.trim();
+						if (!responseContentType.startsWith("text/xml")
+								&& !responseContentType.startsWith("application/xml")
+								&& !responseContentType.startsWith("application/rdf+xml")){
+							
+							logger.debug("Skipping, because no conversions found and cannot parse this media type: " + responseContentType);
+							return null;
+						}
+					}
 				}
 			}
 			finally{

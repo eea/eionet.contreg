@@ -72,6 +72,7 @@ public class PullHarvest extends Harvest{
 			}
 		}
 		
+		String responseContentType = null;
 		InputStream inputStream = null;
 		try{
 			
@@ -101,6 +102,8 @@ public class PullHarvest extends Harvest{
 						return;
 					}
 				}
+				
+				responseContentType = urlConnection.getContentType();
 			
 				// save the stream to file
 				FileUtil.streamToFile(inputStream, toFile);
@@ -126,7 +129,7 @@ public class PullHarvest extends Harvest{
 		/* harvest the downloaded file */
 		
 		try{
-			harvest(toFile);
+			harvest(toFile, responseContentType);
 		}
 		finally{
 		
