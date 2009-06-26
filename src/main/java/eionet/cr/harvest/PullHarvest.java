@@ -209,7 +209,7 @@ public class PullHarvest extends Harvest{
 		if (contentType!=null && contentType.startsWith("application/rdf+xml"))
 			return file;
 		
-		logger.debug("Trying to find RDF conversion, because content type is " + contentType);
+		logger.debug("Response content type was " + contentType + ", trying to extract schema or DTD");
 		
 		XmlAnalysis xmlAnalysis = new XmlAnalysis();
 		xmlAnalysis.parse(file);
@@ -249,7 +249,7 @@ public class PullHarvest extends Harvest{
 				String conversionId = conversionsParser.getRdfConversionId();
 				if (conversionId!=null && conversionId.length()>0){
 					
-					logger.debug("Found RDF conversion, going to run it");
+					logger.debug("Extracted schema or DTD has an RDF conversion, going to run it");
 					
 					/* prepare conversion URL */
 					
@@ -271,7 +271,7 @@ public class PullHarvest extends Harvest{
 					return convertedFile;
 				}
 				else{
-					logger.debug("No RDF conversion found for the declared schema/dtd, no parsing will be done");
+					logger.debug("Extracted schema or DTD has no RDF conversion, no parsing will be done");
 					return null;
 				}
 			}
