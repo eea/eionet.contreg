@@ -41,6 +41,8 @@ import com.hp.hpl.jena.rdf.arp.ARP;
 
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
+import eionet.cr.dao.HarvestDAO;
+import eionet.cr.dto.HarvestDTO;
 import eionet.cr.harvest.util.ARPSource;
 import eionet.cr.harvest.util.HarvestLog;
 import eionet.cr.harvest.util.InputStreamBasedARPSource;
@@ -90,6 +92,9 @@ public abstract class Harvest {
 	
 	/** */
 	private boolean deriveExtraTriples = true;
+	
+	/** */
+	protected HarvestDTO previousHarvest = null;
 	
 	/**
 	 * 
@@ -145,14 +150,12 @@ public abstract class Harvest {
 		
 		InputStream inputStream = null;
 		try{
-			try{				
-				if (contentType==null || !contentType.startsWith("application/rdf+xml")){
-										
-					file = preProcess(file, sourceUrlString);
-					if (file==null)
-						return;
-				}
+			try{
+				file = preProcess(file, sourceUrlString, contentType);
+				if (file==null)
+					return;
 				
+				logger.debug("Parsing local file: " + file.getAbsolutePath());
 		        inputStream = new FileInputStream(file);
 			}
 			catch (Exception e){
@@ -296,7 +299,8 @@ public abstract class Harvest {
 	 */
 	protected void doHarvestFinishedActions(){
 		
-		// send notification of messages that occurred during the harvest
+		/* send notification of messages that occurred during the harvest */
+		
 		try{
 			if (notificationSender!=null)
 				notificationSender.notifyMessages(this);
@@ -306,16 +310,18 @@ public abstract class Harvest {
 			logger.error("Harvest notification sender threw an error: " + e.toString(), e);
 		}
 		
-		ArrayList<Throwable> finishedActionsErrors  = new ArrayList<Throwable>();
+		// let's be so ambitious and try to remember even the errors that will happen during the finishing actions
+		ArrayList<Throwable> finishingErrors  = new ArrayList<Throwable>();
 		
-		// call harvest finished functions of the DAO
+		/* call harvest-finished functions of the DAO */
+		
 		if (daoWriter!=null){
 			try{
 				daoWriter.writeFinished(this);
 			}
 			catch (DAOException e){
 				errors.add(e);
-				finishedActionsErrors.add(e);
+				finishingErrors.add(e);
 				logger.error("Harvest DAO writer threw an exception: " + e.toString(), e);
 			}
 			try{
@@ -323,15 +329,16 @@ public abstract class Harvest {
 			}
 			catch (DAOException e){
 				errors.add(e);
-				finishedActionsErrors.add(e);
+				finishingErrors.add(e);
 				logger.error("Harvest DAO writer threw an exception: " + e.toString(), e);
 			}
 		}
 
-		// send notification of errors happened when executing harvest finished actions 
+		/* send notification of finishing errors */
+		
 		try{
-			if (notificationSender!=null && finishedActionsErrors.size()>0){
-				notificationSender.notifyMessagesAfterHarvest(finishedActionsErrors, this);
+			if (notificationSender!=null && finishingErrors.size()>0){
+				notificationSender.notifyMessagesAfterHarvest(finishingErrors, this);
 			}
 		}
 		catch (HarvestException ee){
@@ -376,9 +383,12 @@ public abstract class Harvest {
 	 * @throws SAXException 
 	 * @throws ParserConfigurationException 
 	 */
-	protected File preProcess(File file, String fromUrl) throws ParserConfigurationException, SAXException, IOException{
+	protected File preProcess(File file, String fromUrl, String contentType) throws ParserConfigurationException, SAXException, IOException{
 
-		logger.debug("Content type unknown or not RDF, trying to find conversion to RDF");
+		if (contentType!=null && contentType.startsWith("application/rdf+xml"))
+			return file;
+		
+		logger.debug("Content type not RDF, trying to extract schema or DTD");
 		
 		XmlAnalysis xmlAnalysis = new XmlAnalysis();
 		xmlAnalysis.parse(file);
@@ -394,6 +404,8 @@ public abstract class Harvest {
 		
 		// if this file has a conversion to RDF, run it and return the reference to the resulting file
 		if (schemaOrDtd!=null && schemaOrDtd.length()>0){
+			
+			logger.debug("Found schema or DTD, going to ask for RDF conversion");
 		
 			/* get the URL of the conversion service method that returns the list of available conversions */
 			
@@ -432,11 +444,11 @@ public abstract class Harvest {
 					
 					File convertedFile = new File(file.getAbsolutePath() + ".converted");
 					FileUtil.downloadUrlToFile(convertUrl, convertedFile);
+					
 					return convertedFile;
 				}
 				else{
-					logger.debug("No RDF conversion found, no parsing will be done");
-					return null;
+					logger.debug("No RDF conversion found for the given schema/dtd, no parsing will be done");
 				}
 			}
 			finally{
@@ -445,6 +457,9 @@ public abstract class Harvest {
 				}
 				catch (IOException e){}
 			}
+		}
+		else{
+			logger.debug("No schema or DTD found, going to parse as RDF");
 		}
 		
 		return file;
@@ -476,5 +491,26 @@ public abstract class Harvest {
 	 */
 	public void setDeriveExtraTriples(boolean deriveExtraTriples) {
 		this.deriveExtraTriples = deriveExtraTriples;
+	}
+
+	/**
+	 * @param previousHarvest the previousHarvest to set
+	 */
+	public void setPreviousHarvest(HarvestDTO previousHarvest) {
+		this.previousHarvest = previousHarvest;
+	}
+
+	/**
+	 * @param distinctSubjectsCount the distinctSubjectsCount to set
+	 */
+	protected void setDistinctSubjectsCount(int distinctSubjectsCount) {
+		this.distinctSubjectsCount = distinctSubjectsCount;
+	}
+
+	/**
+	 * @param storedTriplesCount the storedTriplesCount to set
+	 */
+	protected void setStoredTriplesCount(int storedTriplesCount) {
+		this.storedTriplesCount = storedTriplesCount;
 	}
 }

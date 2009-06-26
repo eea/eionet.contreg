@@ -98,13 +98,24 @@ public class PullHarvest extends Harvest{
 				sourceAvailable = Boolean.TRUE; 
 				
 				contentType = urlConnection.getContentType();
-				if (contentType==null
-						|| contentType.startsWith("text/xml")
-						|| contentType.startsWith("application/xml")
-						|| contentType.startsWith("application/rdf+xml")){
+				logger.debug("Content type in response header = " + contentType);
+				if (contentType!=null
+						&& !contentType.startsWith("text/xml")
+						&& !contentType.startsWith("application/xml")
+						&& !contentType.startsWith("application/rdf+xml")){
 
+					logger.debug("Skipping because of unsupported content type: " + contentType);
+					return;
+				}
+				else{
 					if (urlConnection instanceof HttpURLConnection){
 						if (((HttpURLConnection)urlConnection).getResponseCode()==HttpURLConnection.HTTP_NOT_MODIFIED){
+							
+							if (previousHarvest!=null){
+								setStoredTriplesCount(previousHarvest.getTotalStatements());
+								setDistinctSubjectsCount(previousHarvest.getTotalResources());
+							}
+							
 							String msg = "Source not modified since " + lastHarvest.toString();
 							logger.debug(msg);
 							infos.add(msg);
@@ -113,11 +124,7 @@ public class PullHarvest extends Harvest{
 					}
 
 					// save the stream to file
-					FileUtil.streamToFile(inputStream, toFile);
-				}
-				else{
-					logger.debug("Skipping because of unsupported content type: " + contentType);
-					return;
+					FileUtil.streamToFile(inputStream, toFile);					
 				}
 			}
 			else{
@@ -135,8 +142,6 @@ public class PullHarvest extends Harvest{
 			}
 			catch (IOException e){}
 		}
-		
-		logger.debug("Parsing local file: " + toFile.getAbsolutePath());
 		
 		/* harvest the downloaded file */
 		

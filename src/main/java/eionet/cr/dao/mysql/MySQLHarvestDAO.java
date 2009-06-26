@@ -174,4 +174,34 @@ public class MySQLHarvestDAO extends MySQLBaseDAO implements HarvestDAO {
 			catch (SQLException e){}
 		}
 	}
+
+	/** */
+	private static final String getLastHarvestSQL = "select * from HARVEST where HARVEST_SOURCE_ID=? order by HARVEST.STARTED desc limit 1";
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HarvestDAO#getLastHarvest(java.lang.Integer)
+	 */
+	public HarvestDTO getLastHarvest(Integer harvestSourceId) throws DAOException {
+		
+		List<Object> values = new ArrayList<Object>();
+    	values.add(harvestSourceId);
+				
+		Connection conn = null;
+		HarvestDTOReader rsReader = new HarvestDTOReader();
+		try{
+			conn = getConnection();
+			SQLUtil.executeQuery(getLastHarvestSQL, values, rsReader, conn);
+			List<HarvestDTO> list = rsReader.getResultList();
+			return list!=null && !list.isEmpty() ? list.get(0) : null;
+		}
+		catch (Exception e){
+			throw new DAOException(e.getMessage(), e);
+		}
+		finally{
+			try{
+				if (conn!=null) conn.close();
+			}
+			catch (SQLException e){}
+		}
+	}
 }

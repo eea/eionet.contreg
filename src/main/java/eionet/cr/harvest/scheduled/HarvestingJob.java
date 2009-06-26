@@ -199,16 +199,20 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 	/**
 	 * 
 	 * @param harvestSource
+	 * @throws DAOException 
 	 */
-	private void pullHarvest(HarvestSourceDTO harvestSource, boolean urgent){
+	private void pullHarvest(HarvestSourceDTO harvestSource, boolean urgent) throws DAOException{
 		
 		if (harvestSource!=null){
 			
 			int numOfResources = harvestSource.getResources()==null ? 0 : harvestSource.getResources().intValue();
 			
 			Harvest harvest = new PullHarvest(harvestSource.getUrl(), urgent ? null : harvestSource.getLastHarvest());
+			
+			harvest.setPreviousHarvest(DAOFactory.getDAOFactory().getHarvestDAO().getLastHarvest(harvestSource.getSourceId().intValue()));
 			harvest.setDaoWriter(new HarvestDAOWriter(
 					harvestSource.getSourceId().intValue(), Harvest.TYPE_PULL, numOfResources, CRUser.application.getUserName()));
+			
 			executeHarvest(harvest);
 		}
 	}

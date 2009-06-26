@@ -58,4 +58,12 @@ public interface HarvestDAO {
 	 * @throws DAOException
 	 */
     public HarvestDTO getHarvestById(Integer harvestId) throws DAOException;
+    
+    /**
+     * 
+     * @param harvestSourceId
+     * @return
+     * @throws DAOException
+     */
+    public HarvestDTO getLastHarvest(Integer harvestSourceId) throws DAOException;
 }
