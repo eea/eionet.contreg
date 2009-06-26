@@ -22,6 +22,7 @@ package eionet.cr.harvest;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -74,11 +75,11 @@ public class PullHarvest extends Harvest{
 
 		boolean doDownload = true;
 		
-		File toFile = fullFilePathForSourceUrl(sourceUrlString);;
-		if (toFile.exists()){
+		File file = fullFilePathForSourceUrl(sourceUrlString);;
+		if (file.exists()){
 			doDownload = !Boolean.parseBoolean(GeneralConfig.getProperty(GeneralConfig.HARVESTER_USE_DOWNLOADED_FILES, "false"));
 			if (doDownload){
-				toFile.delete();
+				file.delete();
 			}
 		}
 		
@@ -107,8 +108,7 @@ public class PullHarvest extends Harvest{
 				// (if it's not then we shouldn't reach this point, but instead we should be in the catch exception block)
 				sourceAvailable = Boolean.TRUE; 
 				
-				contentType = urlConnection.getContentType();
-				logger.debug("Content type in response header = " + contentType);
+				contentType = urlConnection.getContentType();				
 				if (contentType!=null
 						&& !contentType.startsWith("text/xml")
 						&& !contentType.startsWith("application/xml")
@@ -134,7 +134,7 @@ public class PullHarvest extends Harvest{
 					}
 
 					// save the stream to file
-					FileUtil.streamToFile(inputStream, toFile);					
+					FileUtil.streamToFile(inputStream, file);					
 				}
 			}
 			else{
@@ -155,53 +155,45 @@ public class PullHarvest extends Harvest{
 		
 		/* harvest the downloaded file */
 		
-		try{
-			harvest(toFile, contentType);
-		}
-		finally{
-		
-			// delete the downloaded file, unless the configuration doesn't require to do so
-			try{
-				if (GeneralConfig.getProperty(GeneralConfig.HARVESTER_DELETE_DOWNLOADED_FILES, "true").equals("true")){
-					toFile.delete();
-				}
-			}
-			catch (Exception e){}
-		}
+		harvest(file, contentType);
 	}
 
 	/**
 	 * Harvest the given file.
 	 * 
 	 * @param file
-	 * @throws HarvestException
+	 * @throws HarvestException 
 	 */
 	private void harvest(File file, String contentType) throws HarvestException{
 		
 		InputStream inputStream = null;
 		try{
+			
+			/* pre-process the file and if it's still valid then open input stream */
+			
 			try{
-				file = preProcess(file, sourceUrlString, contentType);
-				if (file==null)
+				if ((file=preProcess(file, contentType))==null)
 					return;
-				
-				logger.debug("Parsing local file: " + file.getAbsolutePath());
-		        inputStream = new FileInputStream(file);
+				else
+					inputStream = new FileInputStream(file);
 			}
 			catch (Exception e){
 				throw new HarvestException(e.toString(), e);
 			}
+
+			/* create ARPSource based on the file's input stream and harvest it */
 			
-	        harvest(new InputStreamBasedARPSource(inputStream));
+			harvest(new InputStreamBasedARPSource(inputStream));
 		}
 		finally{
-			try{
-				if (inputStream!=null) inputStream.close();
+			
+			// close input stream
+			if (inputStream!=null){
+				try{ inputStream.close(); } catch (Exception e){ logger.error(e.toString(), e);}
 			}
-			catch (IOException e){
-				errors.add(e);
-				logger.error("Failed to close file input stream: " + e.toString(), e);
-			}
+			
+			// delete the file
+			deleteDownloadedFile(file);
 		}
 	}
 
@@ -212,12 +204,12 @@ public class PullHarvest extends Harvest{
 	 * @throws SAXException 
 	 * @throws ParserConfigurationException 
 	 */
-	private File preProcess(File file, String fromUrl, String contentType) throws ParserConfigurationException, SAXException, IOException{
+	private File preProcess(File file, String contentType) throws ParserConfigurationException, SAXException, IOException{
 
 		if (contentType!=null && contentType.startsWith("application/rdf+xml"))
 			return file;
 		
-		logger.debug("Content type not RDF, trying to extract schema or DTD");
+		logger.debug("Trying to find RDF conversion, because content type is " + contentType);
 		
 		XmlAnalysis xmlAnalysis = new XmlAnalysis();
 		xmlAnalysis.parse(file);
@@ -234,8 +226,6 @@ public class PullHarvest extends Harvest{
 		// if this file has a conversion to RDF, run it and return the reference to the resulting file
 		if (schemaOrDtd!=null && schemaOrDtd.length()>0){
 			
-			logger.debug("Found schema or DTD, going to ask for RDF conversion");
-		
 			/* get the URL of the conversion service method that returns the list of available conversions */
 			
 			String listConversionsUrl = GeneralConfig.getRequiredProperty(GeneralConfig.XMLCONV_LIST_CONVERSIONS_URL);
@@ -266,7 +256,7 @@ public class PullHarvest extends Harvest{
 					String convertUrl = GeneralConfig.getRequiredProperty(GeneralConfig.XMLCONV_CONVERT_URL);
 					Object[] args = new String[2];
 					args[0] = URLEncoder.encode(conversionId);
-					args[1] = URLEncoder.encode(fromUrl);
+					args[1] = URLEncoder.encode(sourceUrlString);
 					convertUrl = MessageFormat.format(convertUrl, args);
 					
 					/* run conversion and save the response to file */
@@ -274,10 +264,15 @@ public class PullHarvest extends Harvest{
 					File convertedFile = new File(file.getAbsolutePath() + ".converted");
 					FileUtil.downloadUrlToFile(convertUrl, convertedFile);
 					
+					// delete the original file
+					deleteDownloadedFile(file);
+					
+					// return converted file
 					return convertedFile;
 				}
 				else{
-					logger.debug("No RDF conversion found for the given schema/dtd, no parsing will be done");
+					logger.debug("No RDF conversion found for the declared schema/dtd, no parsing will be done");
+					return null;
 				}
 			}
 			finally{
@@ -288,10 +283,27 @@ public class PullHarvest extends Harvest{
 			}
 		}
 		else{
-			logger.debug("No schema or DTD found, going to parse as RDF");
+			logger.debug("No schema or DTD declared, going to parse as RDF");
 		}
 		
 		return file;
+	}
+
+	/**
+	 * 
+	 * @param file
+	 */
+	private void deleteDownloadedFile(File file){
+		
+		try{
+			// delete unless the configuration requires otherwise
+			if (GeneralConfig.getProperty(GeneralConfig.HARVESTER_DELETE_DOWNLOADED_FILES, "true").equals("true")){
+				file.delete();
+			}
+		}
+		catch (RuntimeException e){
+			logger.error(e.toString(), e);
+		}
 	}
 
 	/**
