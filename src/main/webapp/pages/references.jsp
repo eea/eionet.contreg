@@ -12,17 +12,17 @@
 		<c:if test="${not empty actionBean.searchExpression}">
 			<c:choose>
 				<c:when test="${actionBean.searchExpression.uri}">
-					<stripes:link href="/factsheet.action">${actionBean.to}
-						<stripes:param name="uri" value="${actionBean.to}"/>			
+					<stripes:link href="/factsheet.action">${actionBean.object}
+						<stripes:param name="uri" value="${actionBean.object}"/>			
 					</stripes:link>
 				</c:when>
 				<c:when test="${actionBean.searchExpression.hash}">
-					hash code&nbsp;<stripes:link href="/factsheet.action">${actionBean.to}
-						<stripes:param name="uriHash" value="${actionBean.to}"/>
+					hash code&nbsp;<stripes:link href="/factsheet.action">${actionBean.object}
+						<stripes:param name="uriHash" value="${actionBean.object}"/>
 					</stripes:link>
 				</c:when>
 				<c:otherwise>
-					<em><c:out value="${actionBean.to}"/></em>
+					<em><c:out value="${actionBean.object}"/></em>
 				</c:otherwise>
 			</c:choose>
 		</c:if>

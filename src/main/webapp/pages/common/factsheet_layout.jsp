@@ -94,10 +94,10 @@
 							<stripes:link href="/references.action" event="search">What is referring to this resource?
 								<c:choose>
 					    			<c:when test="${subjectUrl!=null}">
-					    				<stripes:param name="to" value="${subjectUrl}"/>
+					    				<stripes:param name="object" value="${subjectUrl}"/>
 					    			</c:when>
 					    			<c:otherwise>
-					    				<stripes:param name="to" value="${actionBean.subject.uriHash}"/>
+					    				<stripes:param name="object" value="${actionBean.subject.uriHash}"/>
 					    			</c:otherwise>
 					    		</c:choose>
 							</stripes:link>
