@@ -141,41 +141,6 @@ public abstract class Harvest {
 	protected abstract void doExecute() throws HarvestException;
 
 	/**
-	 * Harvest the given file.
-	 * 
-	 * @param file
-	 * @throws HarvestException
-	 */
-	protected void harvest(File file, String contentType) throws HarvestException{
-		
-		InputStream inputStream = null;
-		try{
-			try{
-				file = preProcess(file, sourceUrlString, contentType);
-				if (file==null)
-					return;
-				
-				logger.debug("Parsing local file: " + file.getAbsolutePath());
-		        inputStream = new FileInputStream(file);
-			}
-			catch (Exception e){
-				throw new HarvestException(e.toString(), e);
-			}
-			
-	        harvest(new InputStreamBasedARPSource(inputStream));
-		}
-		finally{
-			try{
-				if (inputStream!=null) inputStream.close();
-			}
-			catch (IOException e){
-				errors.add(e);
-				logger.error("Failed to close file input stream: " + e.toString(), e);
-			}
-		}
-	}
-
-	/**
 	 * Harvest the given ARPSource.
 	 * The caller is responsible for closing the resources that the given ARPSource uses.
 	 * 
@@ -374,95 +339,6 @@ public abstract class Harvest {
 	 */
 	public String getSourceUrlString() {
 		return sourceUrlString;
-	}
-	
-	/**
-	 * 
-	 * @param file
-	 * @throws IOException 
-	 * @throws SAXException 
-	 * @throws ParserConfigurationException 
-	 */
-	protected File preProcess(File file, String fromUrl, String contentType) throws ParserConfigurationException, SAXException, IOException{
-
-		if (contentType!=null && contentType.startsWith("application/rdf+xml"))
-			return file;
-		
-		logger.debug("Content type not RDF, trying to extract schema or DTD");
-		
-		XmlAnalysis xmlAnalysis = new XmlAnalysis();
-		xmlAnalysis.parse(file);
-		
-		// get schema uri, if it's not found then fall back to dtd 
-		String schemaOrDtd = xmlAnalysis.getSchemaLocation();
-		if (schemaOrDtd==null || schemaOrDtd.length()==0){
-			schemaOrDtd = xmlAnalysis.getSystemDtd();
-			if (schemaOrDtd==null || !URLUtil.isURL(schemaOrDtd)){
-				schemaOrDtd = xmlAnalysis.getPublicDtd();
-			}
-		}
-		
-		// if this file has a conversion to RDF, run it and return the reference to the resulting file
-		if (schemaOrDtd!=null && schemaOrDtd.length()>0){
-			
-			logger.debug("Found schema or DTD, going to ask for RDF conversion");
-		
-			/* get the URL of the conversion service method that returns the list of available conversions */
-			
-			String listConversionsUrl = GeneralConfig.getRequiredProperty(GeneralConfig.XMLCONV_LIST_CONVERSIONS_URL);
-			listConversionsUrl = MessageFormat.format(listConversionsUrl, Util.toArray(URLEncoder.encode(schemaOrDtd)));
-
-			/* open connection to the list-conversions URL */
-			
-			URL url = new URL(listConversionsUrl);
-			URLConnection httpConn = url.openConnection();
-			
-			/* parse the returned input stream with eionet.cr.util.xml.ConversionsParser */
-			
-			InputStream inputStream = null;
-			try{
-				inputStream = httpConn.getInputStream();				
-				ConversionsParser conversionsParser = new ConversionsParser();
-				conversionsParser.parse(inputStream);
-				
-				/* see if ConversionsParser found any conversions available */
-				
-				String conversionId = conversionsParser.getRdfConversionId();
-				if (conversionId!=null && conversionId.length()>0){
-					
-					logger.debug("Found RDF conversion, going to run it");
-					
-					/* prepare conversion URL */
-					
-					String convertUrl = GeneralConfig.getRequiredProperty(GeneralConfig.XMLCONV_CONVERT_URL);
-					Object[] args = new String[2];
-					args[0] = URLEncoder.encode(conversionId);
-					args[1] = URLEncoder.encode(fromUrl);
-					convertUrl = MessageFormat.format(convertUrl, args);
-					
-					/* run conversion and save the response to file */
-					
-					File convertedFile = new File(file.getAbsolutePath() + ".converted");
-					FileUtil.downloadUrlToFile(convertUrl, convertedFile);
-					
-					return convertedFile;
-				}
-				else{
-					logger.debug("No RDF conversion found for the given schema/dtd, no parsing will be done");
-				}
-			}
-			finally{
-				try{
-					if (inputStream!=null) inputStream.close();
-				}
-				catch (IOException e){}
-			}
-		}
-		else{
-			logger.debug("No schema or DTD found, going to parse as RDF");
-		}
-		
-		return file;
 	}
 	
 	/**
