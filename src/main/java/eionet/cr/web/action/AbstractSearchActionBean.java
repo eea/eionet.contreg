@@ -31,7 +31,7 @@ import eionet.cr.search.SearchException;
 import eionet.cr.search.util.SortOrder;
 import eionet.cr.util.QueryString;
 import eionet.cr.util.pagination.Pagination;
-import eionet.cr.web.util.search.PredicateBasedColumn;
+import eionet.cr.web.util.search.SubjectPredicateColumn;
 import eionet.cr.web.util.search.SearchResultColumn;
 
 /**
@@ -97,19 +97,19 @@ public abstract class AbstractSearchActionBean extends AbstractActionBean{
 		
 		ArrayList<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
 		
-		PredicateBasedColumn col = new PredicateBasedColumn();
+		SubjectPredicateColumn col = new SubjectPredicateColumn();
 		col.setPredicateUri(Predicates.RDF_TYPE);
 		col.setTitle("Type");
 		col.setSortable(true);
 		list.add(col);
 		
-		col = new PredicateBasedColumn();
+		col = new SubjectPredicateColumn();
 		col.setPredicateUri(Predicates.RDFS_LABEL);
 		col.setTitle("Title");
 		col.setSortable(true);
 		list.add(col);
 
-		col = new PredicateBasedColumn();
+		col = new SubjectPredicateColumn();
 		col.setPredicateUri(Predicates.DC_DATE);
 		col.setTitle("Date");
 		col.setSortable(true);

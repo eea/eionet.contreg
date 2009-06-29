@@ -103,25 +103,6 @@ public class FactsheetActionBean extends AbstractActionBean{
 	}
 	
 	/**
-	 * 
-	 * @return
-	 */
-	private Set<String> createPreferredLanguages(){
-		
-		Set<String> result = new HashSet<String>();
-		
-		String languagePreferences = getContext().getRequest().getHeader("Accept-Language");
-		if (!StringUtils.isBlank(languagePreferences)){
-			String[] languages = StringUtils.split(languagePreferences, ',');
-			for (int i=0; i<languages.length; i++){
-				result.add(PredicateLabels.parseHTTPAcceptedLanguage(languages[i]));
-			}
-		}
-			
-		return result;
-	}
-
-	/**
 	 * @return the predicateLabels
 	 */
 	public Map<String, String> getPredicateLabels() {

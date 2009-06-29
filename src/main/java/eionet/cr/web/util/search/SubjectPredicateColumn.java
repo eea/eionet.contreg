@@ -25,7 +25,7 @@ package eionet.cr.web.util.search;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class PredicateBasedColumn extends SearchResultColumn{
+public class SubjectPredicateColumn extends SearchResultColumn{
 
 	/** */
 	private String predicateUri;

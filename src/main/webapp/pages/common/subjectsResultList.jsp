@@ -78,9 +78,12 @@
 								</c:choose>>
 								<c:forEach items="${actionBean.columns}" var="col">
 									<c:choose>
-										<c:when test="${fn:endsWith(col.class.name, 'PropertyBasedColumn')}">
+										<c:when test="${fn:endsWith(col.class.name, 'SubjectPropertyColumn')}">
 											<td><c:out value="${crfn:formatObject(resultListItem[col.property], col.formatter)}"/></td>
 										</c:when>
+										<c:when test="${fn:endsWith(col.class.name, 'SearchResultColumn')}">
+											<td><c:out value="${crfn:formatObject(resultListItem, col.formatter)}"/></td>
+										</c:when>										
 										<c:otherwise>
 											<td><c:out value="${crfn:formatPredicateObjects(resultListItem, col.predicateUri)}"/></td>
 										</c:otherwise>

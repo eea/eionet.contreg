@@ -44,7 +44,7 @@ import eionet.cr.search.PicklistSearch;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.util.SortOrder;
 import eionet.cr.search.util.UriLabelPair;
-import eionet.cr.web.util.search.PredicateBasedColumn;
+import eionet.cr.web.util.search.SubjectPredicateColumn;
 import eionet.cr.web.util.search.SearchResultColumn;
 
 /**
@@ -234,7 +234,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean{
 		ArrayList<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
 
 		// let's always include rdfs:label in the columns
-		PredicateBasedColumn col = new PredicateBasedColumn();
+		SubjectPredicateColumn col = new SubjectPredicateColumn();
 		col.setPredicateUri(Predicates.RDFS_LABEL);
 		col.setTitle("Title");
 		col.setSortable(true);
@@ -250,7 +250,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean{
 				
 				UriLabelPair property = it.next();
 				
-				col = new PredicateBasedColumn();
+				col = new SubjectPredicateColumn();
 				col.setPredicateUri(property.getUri());
 				col.setTitle(property.getLabel());
 				col.setSortable(true);

@@ -20,16 +20,25 @@
  */
 package eionet.cr.web.util.search;
 
+import eionet.cr.web.util.Formatter;
+
 /**
  * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public abstract class SearchResultColumn {
+public class SearchResultColumn {
 
 	/** */
 	private String title;
 	private boolean isSortable;
+	private Formatter formatter;
+	
+	/**
+	 * 
+	 */
+	public SearchResultColumn(){
+	}
 	
 	/**
 	 * @return the title
@@ -54,6 +63,18 @@ public abstract class SearchResultColumn {
 	 */
 	public void setSortable(boolean isSortable) {
 		this.isSortable = isSortable;
+	}
+	/**
+	 * @return the formatter
+	 */
+	public Formatter getFormatter() {
+		return formatter;
+	}
+	/**
+	 * @param formatter the formatter to set
+	 */
+	public void setFormatter(Formatter formatter) {
+		this.formatter = formatter;
 	}
 
 }

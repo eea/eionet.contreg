@@ -104,8 +104,8 @@ public class PullHarvest extends Harvest{
 				
 				inputStream = urlConnection.getInputStream();
 				
-				// having reached this point, we assume the URL is not broken, ie the source is available
-				// (if it's not then we shouldn't reach this point, but instead we should be in the catch exception block)
+				// having reached this point, we assume the URL is not broken, i.e. the source is available
+				// (if it's not then we shouldn't reach this point (instead we should be in the catch exception block)
 				sourceAvailable = Boolean.TRUE; 
 				
 				contentType = urlConnection.getContentType();				

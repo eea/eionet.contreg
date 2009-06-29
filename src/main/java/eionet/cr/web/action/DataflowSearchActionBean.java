@@ -50,7 +50,7 @@ import eionet.cr.search.DataflowPicklistSearch;
 import eionet.cr.search.PicklistSearch;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.util.UriLabelPair;
-import eionet.cr.web.util.search.PredicateBasedColumn;
+import eionet.cr.web.util.search.SubjectPredicateColumn;
 import eionet.cr.web.util.search.SearchResultColumn;
 
 /**
@@ -256,25 +256,25 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean{
 		
 		ArrayList<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
 		
-		PredicateBasedColumn col = new PredicateBasedColumn();
+		SubjectPredicateColumn col = new SubjectPredicateColumn();
 		col.setPredicateUri(Predicates.RDFS_LABEL);
 		col.setTitle("Title");
 		col.setSortable(true);
 		list.add(col);
 		
-		col = new PredicateBasedColumn();
+		col = new SubjectPredicateColumn();
 		col.setPredicateUri(Predicates.ROD_OBLIGATION_PROPERTY);
 		col.setTitle("Dataflow");
 		col.setSortable(true);
 		list.add(col);
 
-		col = new PredicateBasedColumn();
+		col = new SubjectPredicateColumn();
 		col.setPredicateUri(Predicates.ROD_LOCALITY_PROPERTY);
 		col.setTitle("Locality");
 		col.setSortable(true);
 		list.add(col);
 
-		col = new PredicateBasedColumn();
+		col = new SubjectPredicateColumn();
 		col.setPredicateUri(Predicates.DC_DATE);
 		col.setTitle("Date");
 		col.setSortable(true);

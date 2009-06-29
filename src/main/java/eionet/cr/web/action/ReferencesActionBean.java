@@ -39,15 +39,18 @@ import net.sourceforge.stripes.validation.ValidationMethod;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.config.GeneralConfig;
+import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.CustomSearch;
-import eionet.cr.search.ReferringPredicatesSearch;
+import eionet.cr.search.ReferencesSearch;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.SimpleSearch;
 import eionet.cr.search.util.SearchExpression;
 import eionet.cr.search.util.UriLabelPair;
+import eionet.cr.util.Hashes;
 import eionet.cr.util.URIUtil;
-import eionet.cr.web.util.search.PredicateBasedColumn;
+import eionet.cr.web.util.ReferringPredicatesFormatter;
+import eionet.cr.web.util.search.SubjectPredicateColumn;
 import eionet.cr.web.util.search.SearchResultColumn;
 
 /**
@@ -66,6 +69,12 @@ public class ReferencesActionBean extends AbstractSearchActionBean{
 	private String object;
 	private SearchExpression searchExpression;
 	
+	/** */
+	private HashMap<String,List<String>> referringPredicates;
+	
+	/** */
+	private Map<String,String> predicateLabels;
+	
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.web.action.AbstractSearchActionBean#search()
@@ -73,72 +82,19 @@ public class ReferencesActionBean extends AbstractSearchActionBean{
 	public Resolution search() throws SearchException {
 
 		searchExpression = new SearchExpression(object);
-		SimpleSearch simpleSearch = new SimpleSearch(searchExpression); // validation assures that object!=null
-		simpleSearch.setPageNumber(getPageN());
-		simpleSearch.setSorting(getSortP(), getSortO());
+		ReferencesSearch refSearch = new ReferencesSearch(searchExpression); // validation assures that object!=null
+		refSearch.setPageNumber(getPageN());
+		refSearch.setSorting(getSortP(), getSortO());
 		
-		simpleSearch.execute();
-		resultList = simpleSearch.getResultList();
-		matchCount = simpleSearch.getTotalMatchCount();
+		refSearch.execute();
+		resultList = refSearch.getResultList();
+		matchCount = refSearch.getTotalMatchCount();
+		
+		predicateLabels = refSearch.getPredicateLabels().getByLanguagePreferences(createPreferredLanguages(), "en");
 		
 		return new ForwardResolution("/pages/references.jsp");
 	}
 	
-	/**
-	 * 
-	 * @return
-	 * @throws SearchException
-	 */
-	private List<UriLabelPair> getReferringPredicates() throws SearchException{
-		
-		/* remove the previous object, replace it with the new one */
-		
-		HttpSession session = getContext().getRequest().getSession();
-		String previousObject = (String)session.getAttribute(PREV_OBJECT);
-		session.setAttribute(PREV_OBJECT, object);
-		if (previousObject==null)
-			previousObject = "";
-		
-		/* if submitted object is blank anyway, there's nothing to do here */
-		
-		if (StringUtils.isBlank(object))
-			return null;
-		
-		/* find referring predicates only if none in the session or object differs from previous one */
-		
-		List<UriLabelPair> predicates = (List<UriLabelPair>)session.getAttribute(REFERRING_PREDICATES);
-		if (predicates==null || predicates.isEmpty() || !previousObject.equals(object)){						
-			
-			ReferringPredicatesSearch search = new ReferringPredicatesSearch(object);
-			search.setPageLength(0); // no limits to the result set size, we want all the referring predicates
-			search.execute();
-			
-			Collection<SubjectDTO> list = search.getResultList();
-			if (list!=null){
-				
-				predicates = new ArrayList<UriLabelPair>();
-				for (Iterator<SubjectDTO> it=list.iterator(); it.hasNext();){
-					
-					SubjectDTO predicate = it.next();
-					if (!predicate.isAnonymous()){
-						
-						String uri = predicate.getUri();
-						String label = predicate.getObjectValue(Predicates.RDFS_LABEL);
-						if (!StringUtils.isBlank(label)){
-							predicates.add(UriLabelPair.create(uri, label));
-						}
-					}
-				}
-			}
-			
-			if (predicates!=null && !predicates.isEmpty()){
-				getContext().getRequest().getSession().setAttribute(REFERRING_PREDICATES, predicates);
-			}
-		}
-		
-		return predicates;
-	}
-
 	/**
 	 * 
 	 * @param errors
@@ -161,39 +117,24 @@ public class ReferencesActionBean extends AbstractSearchActionBean{
 
 		/* let's always include rdf:type and rdfs:label in the columns */
 
-		PredicateBasedColumn col = new PredicateBasedColumn();
-		col.setPredicateUri(Predicates.RDF_TYPE);
-		col.setTitle("Type");
-		col.setSortable(true);
-		list.add(col);
+		SubjectPredicateColumn predCol = new SubjectPredicateColumn();
+		predCol.setPredicateUri(Predicates.RDF_TYPE);
+		predCol.setTitle("Type");
+		predCol.setSortable(true);
+		list.add(predCol);
 
-		col = new PredicateBasedColumn();
-		col.setPredicateUri(Predicates.RDFS_LABEL);
-		col.setTitle("Title");
-		col.setSortable(true);
-		list.add(col);
+		predCol = new SubjectPredicateColumn();
+		predCol.setPredicateUri(Predicates.RDFS_LABEL);
+		predCol.setTitle("Title");
+		predCol.setSortable(true);
+		list.add(predCol);
 		
-		// query the rest of the columns
+		SearchResultColumn col = new SearchResultColumn();
+		col.setTitle("Relationship");
+		col.setSortable(false);
+		col.setFormatter(new ReferringPredicatesFormatter(this));
+		list.add(col);		
 		
-		List<UriLabelPair> referringPredicates = getReferringPredicates();
-		if (referringPredicates!=null && !referringPredicates.isEmpty()){
-			
-			int i=0;
-			for (Iterator<UriLabelPair> it=referringPredicates.iterator(); i<4 && it.hasNext();i++){ // only interested in first 4
-				
-				UriLabelPair predicate = it.next();
-				
-				String uri = predicate.getUri();
-				if (uri!=null && !uri.equals(Predicates.RDF_TYPE) && !uri.equals(Predicates.RDFS_LABEL)){
-					col = new PredicateBasedColumn();
-					col.setPredicateUri(predicate.getUri());
-					col.setTitle(predicate.getLabel());
-					col.setSortable(true);
-					list.add(col);
-				}
-			}
-		}
-
 		return list;
 	}
 
@@ -218,5 +159,12 @@ public class ReferencesActionBean extends AbstractSearchActionBean{
 	 */
 	public String getObject() {
 		return object;
+	}
+
+	/**
+	 * @return the predicateLabels
+	 */
+	public Map<String, String> getPredicateLabels() {
+		return predicateLabels;
 	}
 }

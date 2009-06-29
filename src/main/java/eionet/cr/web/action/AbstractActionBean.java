@@ -20,7 +20,9 @@
  */
 package eionet.cr.web.action;
 
+import java.util.HashSet;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
@@ -30,6 +32,7 @@ import net.sourceforge.stripes.controller.AnnotatedClassActionResolver;
 import net.sourceforge.stripes.validation.SimpleError;
 import net.sourceforge.stripes.validation.ValidationError;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -38,6 +41,7 @@ import eionet.cr.config.GeneralConfig;
 import eionet.cr.dto.UrgentHarvestQueueItemDTO;
 import eionet.cr.harvest.Harvest;
 import eionet.cr.harvest.scheduled.HarvestingJob;
+import eionet.cr.search.util.PredicateLabels;
 import eionet.cr.web.context.CRActionBeanContext;
 import eionet.cr.web.security.CRUser;
 
@@ -213,5 +217,24 @@ public abstract class AbstractActionBean implements ActionBean {
 	 */
 	public Harvest getCurrentHarvest(){
 		return currentHarvest;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	protected Set<String> createPreferredLanguages(){
+		
+		Set<String> result = new HashSet<String>();
+		
+		String languagePreferences = getContext().getRequest().getHeader("Accept-Language");
+		if (!StringUtils.isBlank(languagePreferences)){
+			String[] languages = StringUtils.split(languagePreferences, ',');
+			for (int i=0; i<languages.length; i++){
+				result.add(PredicateLabels.parseHTTPAcceptedLanguage(languages[i]));
+			}
+		}
+			
+		return result;
 	}
 }

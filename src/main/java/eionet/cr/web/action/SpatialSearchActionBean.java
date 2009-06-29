@@ -50,7 +50,7 @@ import eionet.cr.search.SpatialSourcesSearch;
 import eionet.cr.search.util.BBOX;
 import eionet.cr.search.util.UriLabelPair;
 import eionet.cr.util.Util;
-import eionet.cr.web.util.search.PredicateBasedColumn;
+import eionet.cr.web.util.search.SubjectPredicateColumn;
 import eionet.cr.web.util.search.SearchResultColumn;
 
 /**
@@ -267,25 +267,25 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean {
 		
 		ArrayList<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
 
-		PredicateBasedColumn col = new PredicateBasedColumn();
+		SubjectPredicateColumn col = new SubjectPredicateColumn();
 		col.setPredicateUri(Predicates.RDF_TYPE);
 		col.setTitle("Type");
 		col.setSortable(true);
 		list.add(col);
 
-		col = new PredicateBasedColumn();
+		col = new SubjectPredicateColumn();
 		col.setPredicateUri(Predicates.RDFS_LABEL);
 		col.setTitle("Title");
 		col.setSortable(true);
 		list.add(col);
 		
-		col = new PredicateBasedColumn();
+		col = new SubjectPredicateColumn();
 		col.setPredicateUri(Predicates.WGS_LAT);
 		col.setTitle("Latitude");
 		col.setSortable(true);
 		list.add(col);
 
-		col = new PredicateBasedColumn();
+		col = new SubjectPredicateColumn();
 		col.setPredicateUri(Predicates.WGS_LONG);
 		col.setTitle("Longitude");
 		col.setSortable(true);

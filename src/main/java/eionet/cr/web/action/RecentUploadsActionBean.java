@@ -40,8 +40,8 @@ import eionet.cr.search.RecentUploadsSearch;
 import eionet.cr.search.SearchException;
 import eionet.cr.util.Util;
 import eionet.cr.web.util.UploadDateFormatter;
-import eionet.cr.web.util.search.PredicateBasedColumn;
-import eionet.cr.web.util.search.PropertyBasedColumn;
+import eionet.cr.web.util.search.SubjectPredicateColumn;
+import eionet.cr.web.util.search.SubjectPropertyColumn;
 import eionet.cr.web.util.search.SearchResultColumn;
 
 /**
@@ -65,7 +65,7 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean {
 	/** */
 	private String type;
 	
-	private static PropertyBasedColumn uploadDateColumn = createUploadDateColumn();
+	private static SubjectPropertyColumn uploadDateColumn = createUploadDateColumn();
 	
 	/**
 	 * 
@@ -193,19 +193,19 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean {
 			/* columns for deliveries */
 			
 			List<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
-			PredicateBasedColumn col = new PredicateBasedColumn();
+			SubjectPredicateColumn col = new SubjectPredicateColumn();
 			col.setPredicateUri(Predicates.RDFS_LABEL);
 			col.setTitle("Title");
 			col.setSortable(false);
 			list.add(col);
 
-			col = new PredicateBasedColumn();
+			col = new SubjectPredicateColumn();
 			col.setPredicateUri(Predicates.ROD_OBLIGATION_PROPERTY);
 			col.setTitle("Obligation");
 			col.setSortable(false);
 			list.add(col);
 
-			col = new PredicateBasedColumn();
+			col = new SubjectPredicateColumn();
 			col.setPredicateUri(Predicates.ROD_LOCALITY_PROPERTY);
 			col.setTitle("Locality");
 			col.setSortable(false);
@@ -216,19 +216,19 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean {
 			/* columns for obligations */
 			
 			list = new ArrayList<SearchResultColumn>();
-			col = new PredicateBasedColumn();
+			col = new SubjectPredicateColumn();
 			col.setPredicateUri(Predicates.RDFS_LABEL);
 			col.setTitle("Title");
 			col.setSortable(false);
 			list.add(col);
 
-			col = new PredicateBasedColumn();
+			col = new SubjectPredicateColumn();
 			col.setPredicateUri(Predicates.ROD_ISSUE_PROPERTY);
 			col.setTitle("Issue");
 			col.setSortable(false);
 			list.add(col);
 
-			col = new PredicateBasedColumn();
+			col = new SubjectPredicateColumn();
 			col.setPredicateUri(Predicates.ROD_INSTRUMENT_PROPERTY);
 			col.setTitle("Instrument");
 			col.setSortable(false);
@@ -239,19 +239,19 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean {
 			/* columns for full reports */
 			
 			list = new ArrayList<SearchResultColumn>();
-			col = new PredicateBasedColumn();
+			col = new SubjectPredicateColumn();
 			col.setPredicateUri(Predicates.RDFS_LABEL);
 			col.setTitle("Title");
 			col.setSortable(false);
 			list.add(col);
 
-			col = new PredicateBasedColumn();
+			col = new SubjectPredicateColumn();
 			col.setPredicateUri(Predicates.DC_SUBJECT);
 			col.setTitle("SubjectDTOTemp");
 			col.setSortable(false);
 			list.add(col);
 
-			col = new PredicateBasedColumn();
+			col = new SubjectPredicateColumn();
 			col.setPredicateUri(Predicates.DC_COVERAGE);
 			col.setTitle("Coverage");
 			col.setSortable(false);
@@ -262,19 +262,19 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean {
 			/* columns for news releases */
 			
 			list = new ArrayList<SearchResultColumn>();
-			col = new PredicateBasedColumn();
+			col = new SubjectPredicateColumn();
 			col.setPredicateUri(Predicates.RDFS_LABEL);
 			col.setTitle("Title");
 			col.setSortable(false);
 			list.add(col);
 
-			col = new PredicateBasedColumn();
+			col = new SubjectPredicateColumn();
 			col.setPredicateUri(Predicates.DC_SUBJECT);
 			col.setTitle("SubjectDTOTemp");
 			col.setSortable(false);
 			list.add(col);
 
-			col = new PredicateBasedColumn();
+			col = new SubjectPredicateColumn();
 			col.setPredicateUri(Predicates.DC_COVERAGE);
 			col.setTitle("Coverage");
 			col.setSortable(false);
@@ -302,9 +302,9 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean {
 	 * 
 	 * @return
 	 */
-	private static PropertyBasedColumn createUploadDateColumn(){
+	private static SubjectPropertyColumn createUploadDateColumn(){
 		
-		PropertyBasedColumn result = new PropertyBasedColumn();
+		SubjectPropertyColumn result = new SubjectPropertyColumn();
 		result.setProperty("firstSeenTime");
 		result.setTitle("Uploaded");
 		result.setSortable(false);
