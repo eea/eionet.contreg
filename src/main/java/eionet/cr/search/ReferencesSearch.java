@@ -22,6 +22,7 @@ package eionet.cr.search;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -32,25 +33,71 @@ import eionet.cr.search.util.SearchExpression;
 import eionet.cr.search.util.SubjectDataReader;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.sql.SQLUtil;
+import eionet.cr.web.util.columns.ReferringPredicatesColumn;
 
 /**
  * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class ReferencesSearch extends SimpleSearch{
+public class ReferencesSearch extends AbstractSubjectSearch{
 
 	/** */
 	private PredicateLabels predicateLabels = new PredicateLabels();
+	
+	/** */
+	private SearchExpression searchExpression;
 	
 	/**
 	 * 
 	 * @param searchExpression
 	 */
 	public ReferencesSearch(SearchExpression searchExpression) {
-		super(searchExpression);
+		this.searchExpression = searchExpression;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.search.AbstractSubjectSearch#getSQL(java.util.List)
+	 */
+	protected String getSubjectSelectSQL(List inParameters){
+		
+		if (searchExpression==null || searchExpression.isEmpty())
+			return null;
+		
+		StringBuffer sqlBuf = new StringBuffer("select SPO.SUBJECT as SUBJECT_HASH from SPO ");
+		if (sortPredicate!=null){
+			if (sortPredicate.equals(ReferringPredicatesColumn.class.getSimpleName())){
+				sqlBuf.append("left join SPO as ORDERING on (SPO.PREDICATE=ORDERING.SUBJECT and ORDERING.PREDICATE=").
+				append(Hashes.spoHash(Predicates.RDFS_LABEL)).append(") ");
+			}
+			else{
+				sqlBuf.append("left join SPO as ORDERING on (SPO.SUBJECT=ORDERING.SUBJECT and ORDERING.PREDICATE=?) ");
+				inParameters.add(Long.valueOf(Hashes.spoHash(sortPredicate)));
+			}
+		}
+		
+		if (searchExpression.isUri() || searchExpression.isHash()){
+			
+			sqlBuf.append(" where SPO.OBJECT_HASH=?");
+			if (searchExpression.isHash()){
+				inParameters.add(searchExpression.toString());
+			}
+			else{
+				inParameters.add(Hashes.spoHash(searchExpression.toString()));
+			}
+				
+		}
+		else{
+			sqlBuf.append(" where match(SPO.OBJECT) against (? in boolean mode)");
+			inParameters.add(searchExpression.toString());
+		}		
+		
+		if (sortPredicate!=null)
+			sqlBuf.append(" order by ORDERING.OBJECT ").append(sortOrder==null ? sortOrder.ASCENDING.toSQL() : sortOrder.toSQL());
+		
+		return sqlBuf.toString();
+	}
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.search.AbstractSubjectSearch#collectPredicateLabels(java.sql.Connection, eionet.cr.search.util.SubjectDataReader)
