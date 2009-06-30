@@ -70,7 +70,7 @@ function scanforlinksinarea(contentarea) {
             // ADD CSS CLASSES FOR SPECIAL PROTOCOLS
             // check if the link href is a relative link, or an absolute link to
             // the current host.
-            if (linkval.toLowerCase().indexOf('://')>0 && (linkval.toLowerCase().indexOf(window.location.host)>0 || linkval.toLowerCase().indexOf('eionet.eu.int')>0 || linkval.toLowerCase().indexOf('eionet.europa.eu')>0)){
+            if (linkval.toLowerCase().indexOf('://')>0 && linkval.toLowerCase().indexOf(window.location.host)>0 ){
                 // absolute link internal to our host
             } else if (linkval.indexOf('http:') != 0) {
                 // not a http-link. Possibly an internal relative link, but also
