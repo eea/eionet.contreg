@@ -79,7 +79,7 @@ public class ReferencesSearch extends AbstractSubjectSearch{
 		
 		if (searchExpression.isUri() || searchExpression.isHash()){
 			
-			sqlBuf.append(" where SPO.OBJECT_HASH=?");
+			sqlBuf.append(" where SPO.LIT_OBJ='N' and SPO.OBJECT_HASH=?");
 			if (searchExpression.isHash()){
 				inParameters.add(searchExpression.toString());
 			}
