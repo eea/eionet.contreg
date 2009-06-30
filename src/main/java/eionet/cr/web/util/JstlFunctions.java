@@ -41,6 +41,7 @@ import eionet.cr.util.Hashes;
 import eionet.cr.util.Util;
 import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.security.CRUser;
+import eionet.cr.web.util.columns.SearchResultColumn;
 
 /**
  * 
@@ -114,54 +115,6 @@ public class JstlFunctions {
 	}
 
 	/**
-	 * Gets the collection of objects matching to the given predicate in the given subject.
-	 * Formats the given collection to comma-separated string and returns it.
-	 * Only distinct objects and only literal ones are selected (unless there is not a single literal
-	 * in which case the non-literals are returned.
-	 * 
-	 * @param subjectDTO
-	 * @param predicateUri
-	 * @return
-	 */
-	public static String formatPredicateObjects(SubjectDTO subjectDTO, String predicateUri){
-		
-		if (subjectDTO==null || subjectDTO.getPredicateCount()==0 || predicateUri==null)
-			return "";
-		
-		Collection<ObjectDTO> objects = subjectDTO.getObjects(predicateUri);
-		if (objects==null || objects.isEmpty())
-			return "";
-		
-		LinkedHashSet<ObjectDTO> distinctObjects = new LinkedHashSet<ObjectDTO>(objects);		
-		StringBuffer bufLiterals = new StringBuffer();
-		StringBuffer bufNonLiterals = new StringBuffer();
-		
-		for (Iterator<ObjectDTO> iter = distinctObjects.iterator(); iter.hasNext();){			
-			ObjectDTO objectDTO = iter.next();
-			if (objectDTO.isLiteral())
-				append(bufLiterals, objectDTO.toString());
-			else
-				append(bufNonLiterals, objectDTO.toString());
-		}
-		
-		return bufLiterals.length()>0 ? bufLiterals.toString() : bufNonLiterals.toString();
-	}
-	
-	/**
-	 * 
-	 * @param buf
-	 * @param s
-	 */
-	private static void append(StringBuffer buf, String s){
-		if (s.trim().length()>0){
-			if (buf.length()>0){
-				buf.append(", ");
-			}
-			buf.append(s);
-		}
-	}
-	
-	/**
 	 * Returns a string that is constructed by concatenating the given bean request's getRequestURI() + "?" +
 	 * the given bean request's getQueryString(), and replacing the sort predicate with the given one.
 	 * The present sort order is replaced by the opposite.
@@ -171,40 +124,32 @@ public class JstlFunctions {
 	 * @param sortO
 	 * @return
 	 */
-	public static String sortUrl(AbstractActionBean actionBean, String sortPredicate){
+	public static String sortUrl(AbstractActionBean actionBean, SearchResultColumn column){
 		
 		HttpServletRequest request = actionBean.getContext().getRequest();
 		StringBuffer buf = new StringBuffer(actionBean.getUrlBinding());
 		buf.append("?").append(request.getQueryString());
 		
+		String sortParamValue = column.getSortParamValue();
+		if (sortParamValue==null)
+			sortParamValue = "";
+		
 		String curValue = request.getParameter("sortP");
 		if (curValue!=null){
 			buf = new StringBuffer(
-					StringUtils.replace(buf.toString(), "sortP=" + Util.urlEncode(curValue), "sortP=" + Util.urlEncode(sortPredicate)));
+					StringUtils.replace(buf.toString(), "sortP=" + Util.urlEncode(curValue), "sortP=" + Util.urlEncode(sortParamValue)));
 		}
 		else
-			buf.append("&sortP=").append(Util.urlEncode(sortPredicate)); 
+			buf.append("&sortP=").append(Util.urlEncode(sortParamValue)); 
 
 		curValue = request.getParameter("sortO");
 		if (curValue!=null)
-			buf = new StringBuffer(StringUtils.replace(buf.toString(), "sortO=" + curValue, "sortO=" + oppositeSortOrder(curValue)));
+			buf = new StringBuffer(StringUtils.replace(buf.toString(), "sortO=" + curValue, "sortO=" + SortOrder.oppositeSortOrder(curValue)));
 		else
-			buf.append("&sortO=").append(oppositeSortOrder(curValue)); 
+			buf.append("&sortO=").append(SortOrder.oppositeSortOrder(curValue)); 
 
 		String result = buf.toString();
 		return result.startsWith("/") ? result.substring(1) : result;
-	}
-	
-	/**
-	 * 
-	 * @param order
-	 * @return
-	 */
-	private static String oppositeSortOrder(String order){
-		if (StringUtils.isBlank(order))
-			return SortOrder.ASCENDING.toString();
-		else
-			return SortOrder.parse(order).toOpposite().toString();
 	}
 	
 	/**
@@ -278,17 +223,6 @@ public class JstlFunctions {
 	}
 	
 	/**
-	 * 
-	 * @param object
-	 * @param formatter
-	 * @return
-	 */
-	public static String formatObject(Object object, Formatter formatter){
-		
-		return formatter==null ? object.toString() : formatter.format(object);
-	}
-
-	/**
 	 * Returns a color for the given source by supplying the source's hash to the
 	 * <code>Colors.colorByModulus(long)</code>.
 	 * 
@@ -308,5 +242,15 @@ public class JstlFunctions {
 	public static String urlEncode(String s){
 		
 		return Util.urlEncode(s);
+	}
+	
+	/**
+	 * 
+	 * @param column
+	 * @param subjectDTO
+	 * @return
+	 */
+	public static String format(SearchResultColumn column, SubjectDTO subjectDTO){
+		return column.format(subjectDTO);
 	}
 }

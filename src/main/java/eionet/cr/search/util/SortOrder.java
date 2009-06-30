@@ -20,6 +20,8 @@
  */
 package eionet.cr.search.util;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
@@ -65,6 +67,18 @@ public enum SortOrder {
 			return DESCENDING;
 		else
 			return ASCENDING;
+	}
+
+	/**
+	 * 
+	 * @param order
+	 * @return
+	 */
+	public static String oppositeSortOrder(String order){
+		if (StringUtils.isBlank(order))
+			return ASCENDING.toString();
+		else
+			return parse(order).toOpposite().toString();
 	}
 
 	/**

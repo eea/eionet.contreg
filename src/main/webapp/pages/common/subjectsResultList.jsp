@@ -52,8 +52,8 @@
 						<c:forEach items="${actionBean.columns}" var="col">
 							<th scope="col">
 								<c:choose>
-									<c:when test="${col.sortable}">
-										<a title="${col.title}" href="${crfn:sortUrl(actionBean,col.predicateUri)}">
+									<c:when test="${col.sortable && not empty col.sortParamValue}">
+										<a title="${col.title}" href="${crfn:sortUrl(actionBean,col)}">
 											${col.title}
 										</a>
 									</c:when>
@@ -77,17 +77,7 @@
 									</c:otherwise>
 								</c:choose>>
 								<c:forEach items="${actionBean.columns}" var="col">
-									<c:choose>
-										<c:when test="${fn:endsWith(col.class.name, 'SubjectPropertyColumn')}">
-											<td><c:out value="${crfn:formatObject(resultListItem[col.property], col.formatter)}"/></td>
-										</c:when>
-										<c:when test="${fn:endsWith(col.class.name, 'SearchResultColumn')}">
-											<td><c:out value="${crfn:formatObject(resultListItem, col.formatter)}"/></td>
-										</c:when>										
-										<c:otherwise>
-											<td><c:out value="${crfn:formatPredicateObjects(resultListItem, col.predicateUri)}"/></td>
-										</c:otherwise>
-									</c:choose>
+									<td><c:out value="${crfn:format(col, resultListItem)}"/></td>
 								</c:forEach>
 								<td>
 									<stripes:link href="/factsheet.action">

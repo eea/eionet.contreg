@@ -40,9 +40,9 @@ import eionet.cr.search.RecentUploadsSearch;
 import eionet.cr.search.SearchException;
 import eionet.cr.util.Util;
 import eionet.cr.web.util.UploadDateFormatter;
-import eionet.cr.web.util.search.SubjectPredicateColumn;
-import eionet.cr.web.util.search.SubjectPropertyColumn;
-import eionet.cr.web.util.search.SearchResultColumn;
+import eionet.cr.web.util.columns.SearchResultColumn;
+import eionet.cr.web.util.columns.SubjectPredicateColumn;
+import eionet.cr.web.util.columns.SubjectUploadedColumn;
 
 /**
  * 
@@ -65,7 +65,7 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean {
 	/** */
 	private String type;
 	
-	private static SubjectPropertyColumn uploadDateColumn = createUploadDateColumn();
+	private static SubjectUploadedColumn uploadDateColumn = createUploadDateColumn();
 	
 	/**
 	 * 
@@ -302,13 +302,11 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean {
 	 * 
 	 * @return
 	 */
-	private static SubjectPropertyColumn createUploadDateColumn(){
+	private static SubjectUploadedColumn createUploadDateColumn(){
 		
-		SubjectPropertyColumn result = new SubjectPropertyColumn();
-		result.setProperty("firstSeenTime");
+		SubjectUploadedColumn result = new SubjectUploadedColumn();
 		result.setTitle("Uploaded");
 		result.setSortable(false);
-		result.setFormatter(new UploadDateFormatter());
 		
 		return result;
 	}

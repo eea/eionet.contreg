@@ -50,8 +50,8 @@ import eionet.cr.search.SpatialSourcesSearch;
 import eionet.cr.search.util.BBOX;
 import eionet.cr.search.util.UriLabelPair;
 import eionet.cr.util.Util;
-import eionet.cr.web.util.search.SubjectPredicateColumn;
-import eionet.cr.web.util.search.SearchResultColumn;
+import eionet.cr.web.util.columns.SearchResultColumn;
+import eionet.cr.web.util.columns.SubjectPredicateColumn;
 
 /**
  * 

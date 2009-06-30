@@ -31,8 +31,8 @@ import eionet.cr.search.SearchException;
 import eionet.cr.search.util.SortOrder;
 import eionet.cr.util.QueryString;
 import eionet.cr.util.pagination.Pagination;
-import eionet.cr.web.util.search.SubjectPredicateColumn;
-import eionet.cr.web.util.search.SearchResultColumn;
+import eionet.cr.web.util.columns.SearchResultColumn;
+import eionet.cr.web.util.columns.SubjectPredicateColumn;
 
 /**
  * 

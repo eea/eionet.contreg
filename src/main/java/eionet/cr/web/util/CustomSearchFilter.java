@@ -18,7 +18,7 @@
  * Contributor(s):
  * Jaanus Heinlaid, Tieto Eesti
  */
-package eionet.cr.web.util.search;
+package eionet.cr.web.util;
 
 /**
  * 

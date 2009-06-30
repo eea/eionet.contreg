@@ -50,30 +50,15 @@
 
 	<function>
 		<description>
-			Gets the collection of objects matching to the given predicate in the given subject.
-			Formats the given collection to comma-separated string and returns it.
-			Only distinct objects and only literal ones are selected (unless there is not a single literal
-			in which case the non-literals are returned.
-	 	</description>
-		<name>formatPredicateObjects</name>
-		<function-class>eionet.cr.web.util.JstlFunctions</function-class>
-		<function-signature>java.lang.String formatPredicateObjects(eionet.cr.dto.SubjectDTO, java.lang.String)</function-signature>
-		<example>
-			${formatPredicateObjects(someSubjectDTO, someString)}
-		</example>
-	</function>
-
-	<function>
-		<description>
 			Returns a string that is constructed by concatenating the given bean request's getRequestURI() + "?" +
 	 		the given bean request's getQueryString(), and replacing the sort predicate with the given one.
 	 		The present sort order is replaced by the opposite.
 		</description>
 		<name>sortUrl</name>
 		<function-class>eionet.cr.web.util.JstlFunctions</function-class>
-		<function-signature>java.lang.String sortUrl(eionet.cr.web.action.AbstractActionBean, java.lang.String)</function-signature>
+		<function-signature>java.lang.String sortUrl(eionet.cr.web.action.AbstractActionBean, eionet.cr.web.util.columns.SearchResultColumn)</function-signature>
 		<example>
-			${sortUrl(someHttpServletRequest, someString)}
+			${sortUrl(actionBean, column)}
 		</example>
 	</function>
 	
@@ -116,17 +101,6 @@
 
 	<function>
 		<description>
-		</description>
-		<name>formatObject</name>
-		<function-class>eionet.cr.web.util.JstlFunctions</function-class>
-		<function-signature>java.lang.String formatObject(java.lang.Object, eionet.cr.web.util.Formatter)</function-signature>
-		<example>
-			${formatObject(object, formatter)}
-		</example>
-	</function>
-
-	<function>
-		<description>
 			Returns a HEX color code for the given source string.
 		</description>
 		<name>colorForSource</name>
@@ -146,6 +120,17 @@
 		<function-signature>java.lang.String urlEncode(java.lang.String)</function-signature>
 		<example>
 			${urlEncode(str)}
+		</example>
+	</function>
+
+	<function>
+		<description>
+		</description>
+		<name>format</name>
+		<function-class>eionet.cr.web.util.JstlFunctions</function-class>
+		<function-signature>java.lang.String format(eionet.cr.web.util.columns.SearchResultColumn, eionet.cr.dto.SubjectDTO)</function-signature>
+		<example>
+			${format(column, subject)}
 		</example>
 	</function>
 	

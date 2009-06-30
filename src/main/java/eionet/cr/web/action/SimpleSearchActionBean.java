@@ -39,8 +39,8 @@ import eionet.cr.search.SearchException;
 import eionet.cr.search.SimpleSearch;
 import eionet.cr.search.UriSearch;
 import eionet.cr.search.util.SearchExpression;
-import eionet.cr.web.util.search.SubjectPredicateColumn;
-import eionet.cr.web.util.search.SearchResultColumn;
+import eionet.cr.web.util.columns.SearchResultColumn;
+import eionet.cr.web.util.columns.SubjectPredicateColumn;
 
 /**
  * 

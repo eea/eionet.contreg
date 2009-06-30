@@ -18,7 +18,7 @@
  * Contributor(s):
  * Jaanus Heinlaid, Tieto Eesti
  */
-package eionet.cr.web.util.search;
+package eionet.cr.web.util.columns;
 
 import eionet.cr.web.util.Formatter;
 
@@ -27,28 +27,47 @@ import eionet.cr.web.util.Formatter;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class SubjectPropertyColumn extends SearchResultColumn{
+public abstract class SearchResultColumn {
 
 	/** */
-	private String property;
+	private String title;
+	private boolean isSortable;
 
 	/**
 	 * 
+	 * @param object
+	 * @return
 	 */
-	public SubjectPropertyColumn(){
-	}
+	public abstract String format(Object object);
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public abstract String getSortParamValue();
 
 	/**
-	 * @return the property
+	 * @return the title
 	 */
-	public String getProperty() {
-		return property;
+	public String getTitle() {
+		return title;
 	}
-
 	/**
-	 * @param property the property to set
+	 * @param title the title to set
 	 */
-	public void setProperty(String property) {
-		this.property = property;
+	public void setTitle(String title) {
+		this.title = title;
+	}
+	/**
+	 * @return the isSortable
+	 */
+	public boolean isSortable() {
+		return isSortable;
+	}
+	/**
+	 * @param isSortable the isSortable to set
+	 */
+	public void setSortable(boolean isSortable) {
+		this.isSortable = isSortable;
 	}
 }

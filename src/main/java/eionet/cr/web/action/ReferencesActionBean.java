@@ -50,8 +50,9 @@ import eionet.cr.search.util.UriLabelPair;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.URIUtil;
 import eionet.cr.web.util.ReferringPredicatesFormatter;
-import eionet.cr.web.util.search.SubjectPredicateColumn;
-import eionet.cr.web.util.search.SearchResultColumn;
+import eionet.cr.web.util.columns.ReferringPredicatesColumn;
+import eionet.cr.web.util.columns.SearchResultColumn;
+import eionet.cr.web.util.columns.SubjectPredicateColumn;
 
 /**
  * 
@@ -129,10 +130,9 @@ public class ReferencesActionBean extends AbstractSearchActionBean{
 		predCol.setSortable(true);
 		list.add(predCol);
 		
-		SearchResultColumn col = new SearchResultColumn();
+		SearchResultColumn col = new ReferringPredicatesColumn();
 		col.setTitle("Relationship");
 		col.setSortable(false);
-		col.setFormatter(new ReferringPredicatesFormatter(this));
 		list.add(col);		
 		
 		return list;
