@@ -166,6 +166,9 @@ public class PullHarvest extends Harvest{
 	 */
 	private void harvest(File file, String contentType) throws HarvestException{
 		
+		// remember the file's absolute path, so we can later detect if a new file was created during the pre-processing
+		String originalPath = file.getAbsolutePath();
+		
 		InputStream inputStream = null;
 		try{
 			
@@ -192,8 +195,13 @@ public class PullHarvest extends Harvest{
 				try{ inputStream.close(); } catch (Exception e){ logger.error(e.toString(), e);}
 			}
 			
-			// delete the file
+			// delete the file we harvested
 			deleteDownloadedFile(file);
+			
+			// delete the original file if a new one was created during the pre-processing
+			if (!originalPath.equals(file.getAbsolutePath())){
+				deleteDownloadedFile(file);
+			}
 		}
 	}
 
@@ -294,6 +302,9 @@ public class PullHarvest extends Harvest{
 	 * @param file
 	 */
 	private void deleteDownloadedFile(File file){
+		
+		if (file==null || !file.exists())
+			return;
 		
 		try{
 			// delete unless the configuration requires otherwise
