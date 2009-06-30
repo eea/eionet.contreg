@@ -64,24 +64,28 @@
 									    				</c:choose>
 									    			</td>
 									    			<td>
-									    				<c:out value="${object.value}"/>
-									    				<c:if test="${object.sourceObjectLong!=0}">
-									    					&nbsp;<stripes:link class="infolink" href="/factsheet.action">Info
-																<stripes:param name="uriHash" value="${object.sourceObject}"/>
+									    				<c:choose>
+														<c:when test="${object.sourceObjectLong==0}">
+															<c:out value="${object.value}"/>
+														</c:when>
+														<c:otherwise>
+															<stripes:link class="infolink" href="/factsheet.action"><c:out value="${object.value}"/>
+																	<stripes:param name="uriHash" value="${object.sourceObject}"/>
 															</stripes:link>	
-									    				</c:if>
+														</c:otherwise>
+													</c:choose>
 									    			</td>
-									    			<td>
+									    			<td class="center">
 									    				<c:choose>
 									    					<c:when test="${object.sourceSmart!=null}">
 												    			<stripes:link href="/factsheet.action">
 												    				<img src="${pageContext.request.contextPath}/images/harvest_source.png" title="${fn:escapeXml(object.sourceSmart)}" alt="${fn:escapeXml(object.sourceSmart)}"/>
 												    				<stripes:param name="uri" value="${object.sourceSmart}"/>
-																</stripes:link>
-															</c:when>
-															<c:otherwise>&nbsp;</c:otherwise>
-														</c:choose>
-													</td>
+															</stripes:link>
+														</c:when>
+														<c:otherwise>&nbsp;</c:otherwise>
+													</c:choose>
+												</td>
 									    		</tr>
 									    	</c:if>
 								    	</c:if>
