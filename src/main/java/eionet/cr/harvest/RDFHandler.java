@@ -48,6 +48,7 @@ import eionet.cr.config.GeneralConfig;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.UnfinishedHarvestDTO;
 import eionet.cr.harvest.util.HarvestLog;
+import eionet.cr.harvest.util.arp.ATriple;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.UnicodeUtils;
 import eionet.cr.util.Util;
@@ -136,7 +137,7 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 		prepareStatementForTriples();
 		prepareStatementForResources();
 	}
-
+	
 	/*
 	 *  (non-Javadoc)
 	 * @see com.hp.hpl.jena.rdf.arp.StatementHandler#statement(com.hp.hpl.jena.rdf.arp.AResource, com.hp.hpl.jena.rdf.arp.AResource, com.hp.hpl.jena.rdf.arp.AResource)
@@ -154,7 +155,16 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 		
 		statement(subject, predicate, object.toString(), object.getLang(), true, false);
 	}
-
+	
+	/**
+	 * 
+	 * @param triple
+	 */
+	public void triple(ATriple triple){
+		statement(triple.getSubject(), triple.getPredicate(),
+				triple.getObject(), triple.getObjectLang(), triple.isLitObject(), triple.isAnonObject());
+	}
+	
 	/**
 	 * 
 	 * @param subject

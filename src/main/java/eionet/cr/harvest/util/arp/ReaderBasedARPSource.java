@@ -18,10 +18,10 @@
  * Contributor(s):
  * Jaanus Heinlaid, Tieto Eesti
  */
-package eionet.cr.harvest.util;
+package eionet.cr.harvest.util.arp;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.Reader;
 
 import org.xml.sax.SAXException;
 
@@ -32,17 +32,17 @@ import com.hp.hpl.jena.rdf.arp.ARP;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class InputStreamBasedARPSource implements ARPSource{
+public class ReaderBasedARPSource implements ARPSource{
 	
 	/** */
-	private InputStream inputStream;
+	private Reader reader;
 	
 	/**
 	 * 
-	 * @param inputStream
+	 * @param reader
 	 */
-	public InputStreamBasedARPSource(InputStream inputStream){
-		this.inputStream = inputStream;
+	public ReaderBasedARPSource(Reader reader){
+		this.reader = reader;
 	}
 
 	/*
@@ -50,7 +50,6 @@ public class InputStreamBasedARPSource implements ARPSource{
 	 * @see eionet.cr.harvest.util.ARPSource#load(com.hp.hpl.jena.rdf.arp.ARP, java.lang.String)
 	 */
 	public void load(ARP arp, String sourceUrlString) throws SAXException, IOException {
-		arp.load(inputStream, sourceUrlString);
+		arp.load(reader, sourceUrlString);
 	}
-
 }

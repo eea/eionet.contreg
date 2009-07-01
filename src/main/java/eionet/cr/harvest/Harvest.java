@@ -43,9 +43,10 @@ import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dto.HarvestDTO;
-import eionet.cr.harvest.util.ARPSource;
 import eionet.cr.harvest.util.HarvestLog;
-import eionet.cr.harvest.util.InputStreamBasedARPSource;
+import eionet.cr.harvest.util.arp.ARPSource;
+import eionet.cr.harvest.util.arp.ATriple;
+import eionet.cr.harvest.util.arp.InputStreamBasedARPSource;
 import eionet.cr.util.FileUtil;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
@@ -147,7 +148,7 @@ public abstract class Harvest {
 	 * @param arpSource
 	 * @throws HarvestException
 	 */
-	protected void harvest(ARPSource arpSource) throws HarvestException{
+	protected void harvest(ARPSource arpSource, List<ATriple> triplesAboutSource) throws HarvestException{
 		
 		long genTime = System.currentTimeMillis();
 		
@@ -159,10 +160,19 @@ public abstract class Harvest {
 			if (this instanceof PushHarvest)
 				rdfHandler.setClearPreviousContent(false);
 
-			ARP arp = new ARP();
-	        arp.setStatementHandler(rdfHandler);
-	        arp.setErrorHandler(rdfHandler);
-	        arpSource.load(arp, sourceUrlString);
+			if (arpSource!=null){
+				ARP arp = new ARP();
+		        arp.setStatementHandler(rdfHandler);
+		        arp.setErrorHandler(rdfHandler);
+		        arpSource.load(arp, sourceUrlString);
+			}
+			
+			if (triplesAboutSource!=null && !triplesAboutSource.isEmpty()){
+				for (ATriple triple:triplesAboutSource){
+					rdfHandler.triple(triple);
+				}
+			}
+			
 	        rdfHandler.endOfFile();
 	        
 	        if (rdfHandler.getSaxError()!=null)

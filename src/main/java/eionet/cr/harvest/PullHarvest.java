@@ -31,13 +31,16 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.Date;
+import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
 import eionet.cr.config.GeneralConfig;
-import eionet.cr.harvest.util.InputStreamBasedARPSource;
+import eionet.cr.harvest.util.arp.ARPSource;
+import eionet.cr.harvest.util.arp.ATriple;
+import eionet.cr.harvest.util.arp.InputStreamBasedARPSource;
 import eionet.cr.util.FileUtil;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
@@ -73,55 +76,60 @@ public class PullHarvest extends Harvest{
 	 */
 	protected void doExecute() throws HarvestException{
 
-		boolean doDownload = true;
-		
-		File file = fullFilePathForSourceUrl(sourceUrlString);;
-		if (file.exists()){
-			doDownload = !Boolean.parseBoolean(GeneralConfig.getProperty(GeneralConfig.HARVESTER_USE_DOWNLOADED_FILES, "false"));
-			if (doDownload){
-				file.delete();
-			}
-		}
+		File file = fullFilePathForSourceUrl(sourceUrlString);
 		
 		String contentType = null;
 		InputStream inputStream = null;
 		try{
-			
-			if (doDownload){
+			// reuse the file if it exists and the configuration allows to do it (e.g. for debugging purposes) */			
+			if (file.exists() && Boolean.parseBoolean(GeneralConfig.getProperty(GeneralConfig.HARVESTER_USE_DOWNLOADED_FILES, "false"))){
 				
-				logger.debug("Downloading");
+				sourceAvailable = Boolean.TRUE;
+				logger.debug("Harvesting the already downloaded file");
+			}
+			else{
+				// delete the old file, should it exist
+				if (file.exists()){
+					file.delete();
+				}
 				
-				sourceAvailable = Boolean.FALSE;
-				
+				// prepare URL connection
 				URL url = new URL(sourceUrlString);
 				URLConnection urlConnection = url.openConnection();				
-				
 				urlConnection.setRequestProperty("Accept", "application/rdf+xml, text/xml, */*");
 				urlConnection.setRequestProperty("User-Agent", getUserAgent());
 				if (lastHarvest!=null){
 					urlConnection.setIfModifiedSince(lastHarvest.getTime());
 				}
-				
-				inputStream = urlConnection.getInputStream();
-				
-				// having reached this point, we assume the URL is not broken, i.e. the source is available
-				// (if it's not then we shouldn't reach this point (instead we should be in the catch exception block)
-				sourceAvailable = Boolean.TRUE; 
-				
-				contentType = urlConnection.getContentType();				
-				if (contentType!=null
-						&& !contentType.startsWith("text/xml")
-						&& !contentType.startsWith("application/xml")
-						&& !contentType.startsWith("application/rdf+xml")){
 
-					logger.debug("Skipping because of unsupported content type: " + contentType);
-					return;
+				// open connection stream				
+				logger.debug("Downloading");
+				try{
+					sourceAvailable = Boolean.FALSE;
+					inputStream = urlConnection.getInputStream();
+					sourceAvailable = Boolean.TRUE;
 				}
-				else{
-					if (urlConnection instanceof HttpURLConnection){
-						if (((HttpURLConnection)urlConnection).getResponseCode()==HttpURLConnection.HTTP_NOT_MODIFIED){
-							
+				catch (IOException e){}
+				
+				// if source available (i.e. link not broken) then continue
+				if (sourceAvailable.booleanValue()==true){
+					
+					// skip if unsupported content type
+					contentType = urlConnection.getContentType();
+					if (contentType!=null
+							&& !contentType.startsWith("text/xml")
+							&& !contentType.startsWith("application/xml")
+							&& !contentType.startsWith("application/rdf+xml")){
+	
+						logger.debug("Skipping because of unsupported content type: " + contentType);
+					}
+					else{
+						// content type OK, but skip if not modified since last harvest
+						if (urlConnection instanceof HttpURLConnection
+							&& ((HttpURLConnection)urlConnection).getResponseCode()==HttpURLConnection.HTTP_NOT_MODIFIED){
+								
 							if (previousHarvest!=null){
+								// copy the number of triples and distinct subjects from previous harvest
 								setStoredTriplesCount(previousHarvest.getTotalStatements());
 								setDistinctSubjectsCount(previousHarvest.getTotalResources());
 							}
@@ -129,33 +137,25 @@ public class PullHarvest extends Harvest{
 							String msg = "Source not modified since " + lastHarvest.toString();
 							logger.debug(msg);
 							infos.add(msg);
-							return;
+						}
+						else{						
+							// content type OK, source modified since last harvest, so save the stream to file
+							FileUtil.streamToFile(inputStream, file);
 						}
 					}
-
-					// save the stream to file
-					FileUtil.streamToFile(inputStream, file);					
 				}
-			}
-			else{
-				sourceAvailable = Boolean.TRUE;
-				logger.debug("Harvesting the already downloaded file");
 			}
 		}
 		catch (IOException e){
 			throw new HarvestException(e.toString(), e);
 		}
 		finally{
-			try{
-				if (inputStream!=null)
-					inputStream.close();
-			}
-			catch (IOException e){}
+			// close input stream
+			try{ if (inputStream!=null) inputStream.close(); } catch (IOException e){}
 		}
 		
-		/* harvest the downloaded file */
-		
-		harvest(file, contentType);
+		// harvest the file
+		harvest(file, contentType, null);
 	}
 
 	/**
@@ -164,7 +164,12 @@ public class PullHarvest extends Harvest{
 	 * @param file
 	 * @throws HarvestException 
 	 */
-	private void harvest(File file, String contentType) throws HarvestException{
+	private void harvest(File file, String contentType, List<ATriple> triplesAboutSource) throws HarvestException{
+		
+		if (!file.exists()){
+			harvest(null, triplesAboutSource);
+			return;
+		}
 		
 		// remember the file's absolute path, so we can later detect if a new file was created during the pre-processing
 		String originalPath = file.getAbsolutePath();
@@ -172,21 +177,20 @@ public class PullHarvest extends Harvest{
 		InputStream inputStream = null;
 		try{
 			
-			/* pre-process the file and if it's still valid then open input stream */
+			ARPSource arpSource = null;
 			
+			/* pre-process the file and if it's still valid then open input stream */
 			try{
-				if ((file=preProcess(file, contentType))==null)
-					return;
-				else
+				if ((file=preProcess(file, contentType))!=null){
 					inputStream = new FileInputStream(file);
+					arpSource = new InputStreamBasedARPSource(inputStream);
+				}
 			}
 			catch (Exception e){
 				throw new HarvestException(e.toString(), e);
 			}
 
-			/* create ARPSource based on the file's input stream and harvest it */
-			
-			harvest(new InputStreamBasedARPSource(inputStream));
+			harvest(arpSource, triplesAboutSource);
 		}
 		finally{
 			
