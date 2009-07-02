@@ -51,7 +51,7 @@ public interface Predicates {
 	public static final String ROD_LOCALITY_PROPERTY = "http://rod.eionet.eu.int/schema.rdf#locality";
 	public static final String ROD_ISSUE_PROPERTY = "http://rod.eionet.eu.int/schema.rdf#issue";
 	public static final String ROD_HAS_FILE = "http://rod.eionet.europa.eu/schema.rdf#hasFile";
-	public static final String ROD_HAS_FEEDBACK = "http://rod.eionet.europa.eu/schema.rdf#hasFeedback";
+	public static final String ROD_HAS_FEEDBACK = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#hasFeedback";
 
 	public static final String CR_FIRSTSEEN_TIME = "urn:eionet:contreg:firstseen-time";
 	public static final String CR_URL = "urn:eionet:contreg:url";
