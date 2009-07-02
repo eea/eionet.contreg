@@ -54,7 +54,12 @@ public interface Predicates {
 	public static final String CR_FIRSTSEEN_TIME = "urn:eionet:contreg:firstseen-time";
 	public static final String CR_URL = "urn:eionet:contreg:url";
 	public static final String CR_SCHEMA = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#xmlSchema";
-	
+	public static final String CR_LAST_MODIFIED = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#contentLastModified";
+	public static final String CR_BYTE_SIZE = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#byteSize";
+	public static final String CR_MEDIA_TYPE = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#mediaType";
+	public static final String CR_CHARSET = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#characterSet";
+	public static final String CR_LAST_REFRESHED = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#lastRefreshed";
+
 	public static final String WGS_LAT = "http://www.w3.org/2003/01/geo/wgs84_pos#lat";
 	public static final String WGS_LONG = "http://www.w3.org/2003/01/geo/wgs84_pos#long";
 }

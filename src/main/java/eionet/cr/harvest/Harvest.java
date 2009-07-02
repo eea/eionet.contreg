@@ -29,6 +29,7 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -43,6 +44,8 @@ import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dto.HarvestDTO;
+import eionet.cr.dto.ObjectDTO;
+import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.util.HarvestLog;
 import eionet.cr.harvest.util.arp.ARPSource;
 import eionet.cr.harvest.util.arp.ATriple;
@@ -68,12 +71,6 @@ public abstract class Harvest {
 	public static final String TYPE_PUSH = "push";
 	
 	/** */
-//	public static final String FATAL = "ftl";
-//	public static final String ERROR = "err";
-//	public static final String WARNING = "wrn";
-//	public static final String INFO = "inf";
-	
-	/** */
 	protected String sourceUrlString = null;
 	protected Log logger = null;
 	
@@ -96,6 +93,9 @@ public abstract class Harvest {
 	
 	/** */
 	protected HarvestDTO previousHarvest = null;
+
+	/** */
+	protected SubjectDTO sourceMetadata;
 	
 	/**
 	 * 
@@ -108,6 +108,7 @@ public abstract class Harvest {
 		
 		this.sourceUrlString = sourceUrlString;
 		this.logger = new HarvestLog(sourceUrlString, LogFactory.getLog(this.getClass()));
+		this.sourceMetadata = new SubjectDTO(sourceUrlString, false);
 	}
 
 	/**
@@ -148,7 +149,7 @@ public abstract class Harvest {
 	 * @param arpSource
 	 * @throws HarvestException
 	 */
-	protected void harvest(ARPSource arpSource, List<ATriple> triplesAboutSource) throws HarvestException{
+	protected void harvest(ARPSource arpSource) throws HarvestException{
 		
 		long genTime = System.currentTimeMillis();
 		
@@ -166,13 +167,11 @@ public abstract class Harvest {
 		        arp.setErrorHandler(rdfHandler);
 		        arpSource.load(arp, sourceUrlString);
 			}
-			
-			if (triplesAboutSource!=null && !triplesAboutSource.isEmpty()){
-				for (ATriple triple:triplesAboutSource){
-					rdfHandler.triple(triple);
-				}
+			else if (sourceMetadata.getPredicateCount()>0){
+				logger.debug("No content to harvest, but storing triples *about* the source");
 			}
-			
+
+			rdfHandler.addSourceMetadata(sourceMetadata);
 	        rdfHandler.endOfFile();
 	        
 	        if (rdfHandler.getSaxError()!=null)

@@ -57,6 +57,15 @@ public class ObjectDTO {
 	}
 	
 	/**
+	 * 
+	 * @param value
+	 * @param literal
+	 */
+	public ObjectDTO(String value, boolean literal){
+		this(value, null, literal, false);
+	}
+	
+	/**
 	 * @return the value
 	 */
 	public String getValue() {

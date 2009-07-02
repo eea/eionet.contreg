@@ -57,7 +57,7 @@ public class PushHarvest extends Harvest{
 		Reader stringReader = null;
 		try{
 			stringReader = new StringReader(content);
-			harvest(new ReaderBasedARPSource(stringReader), null);
+			harvest(new ReaderBasedARPSource(stringReader));
 		}
 		finally{
 			if (stringReader!=null){

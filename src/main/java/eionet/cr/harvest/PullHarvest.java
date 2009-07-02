@@ -37,7 +37,9 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
+import eionet.cr.common.Predicates;
 import eionet.cr.config.GeneralConfig;
+import eionet.cr.dto.ObjectDTO;
 import eionet.cr.harvest.util.arp.ARPSource;
 import eionet.cr.harvest.util.arp.ATriple;
 import eionet.cr.harvest.util.arp.InputStreamBasedARPSource;
@@ -107,21 +109,30 @@ public class PullHarvest extends Harvest{
 				try{
 					sourceAvailable = Boolean.FALSE;
 					inputStream = urlConnection.getInputStream();
-					sourceAvailable = Boolean.TRUE;
+					sourceAvailable = Boolean.TRUE;					
 				}
-				catch (IOException e){}
+				catch (IOException e){
+					logger.warn(e.toString(), e);
+				}
 				
-				// if source available (i.e. link not broken) then continue
-				if (sourceAvailable.booleanValue()==true){
+				// if source not available (i.e. link broken) then just set the last-refreshed metadata
+				if (sourceAvailable.booleanValue()==false){
+					setLastRefreshed(urlConnection);
+				}
+				// source is avaialable, so continue to extract it's contents and metadata
+				else{
 					
+					// extract various metadata about this harvest source from url connection object
+					setSourceMetadata(urlConnection);
+
 					// skip if unsupported content type
-					contentType = urlConnection.getContentType();
+					contentType = sourceMetadata.getObjectValue(Predicates.CR_MEDIA_TYPE);
 					if (contentType!=null
 							&& !contentType.startsWith("text/xml")
 							&& !contentType.startsWith("application/xml")
 							&& !contentType.startsWith("application/rdf+xml")){
 	
-						logger.debug("Skipping because of unsupported content type: " + contentType);
+						logger.debug("Unsupported content type: " + contentType);
 					}
 					else{
 						// content type OK, but skip if not modified since last harvest
@@ -140,7 +151,12 @@ public class PullHarvest extends Harvest{
 						}
 						else{						
 							// content type OK, source modified since last harvest, so save the stream to file
-							FileUtil.streamToFile(inputStream, file);
+							int totalBytes = FileUtil.streamToFile(inputStream, file);
+							
+							// if content-length for source metadata was previously not found, then set it to file size
+							if (sourceMetadata.getObject(Predicates.CR_BYTE_SIZE)==null){
+								sourceMetadata.addObject(Predicates.CR_BYTE_SIZE, new ObjectDTO(String.valueOf(totalBytes), true));
+							}
 						}
 					}
 				}
@@ -154,8 +170,8 @@ public class PullHarvest extends Harvest{
 			try{ if (inputStream!=null) inputStream.close(); } catch (IOException e){}
 		}
 		
-		// harvest the file
-		harvest(file, contentType, null);
+		// perform the harvest
+		harvest(file, contentType);
 	}
 
 	/**
@@ -164,12 +180,7 @@ public class PullHarvest extends Harvest{
 	 * @param file
 	 * @throws HarvestException 
 	 */
-	private void harvest(File file, String contentType, List<ATriple> triplesAboutSource) throws HarvestException{
-		
-		if (!file.exists()){
-			harvest(null, triplesAboutSource);
-			return;
-		}
+	private void harvest(File file, String contentType) throws HarvestException{
 		
 		// remember the file's absolute path, so we can later detect if a new file was created during the pre-processing
 		String originalPath = file.getAbsolutePath();
@@ -179,18 +190,21 @@ public class PullHarvest extends Harvest{
 			
 			ARPSource arpSource = null;
 			
-			/* pre-process the file and if it's still valid then open input stream */
-			try{
-				if ((file=preProcess(file, contentType))!=null){
-					inputStream = new FileInputStream(file);
-					arpSource = new InputStreamBasedARPSource(inputStream);
+			/* pre-process the file; if it's still valid then open input stream and create ARP source object */
+			/* (the file may not exist, if content type was unsupported or other reasons (see caller)*/
+			if (file.exists()){
+				try{
+					if ((file=preProcess(file, contentType))!=null){
+						inputStream = new FileInputStream(file);
+						arpSource = new InputStreamBasedARPSource(inputStream);
+					}
+				}
+				catch (Exception e){
+					throw new HarvestException(e.toString(), e);
 				}
 			}
-			catch (Exception e){
-				throw new HarvestException(e.toString(), e);
-			}
 
-			harvest(arpSource, triplesAboutSource);
+			harvest(arpSource);
 		}
 		finally{
 			
@@ -299,6 +313,56 @@ public class PullHarvest extends Harvest{
 		}
 		
 		return file;
+	}
+
+	/**
+	 * 
+	 * @param urlConnection
+	 */
+	private void setLastRefreshed(URLConnection urlConnection){
+		
+		String lastRefreshed = Util.dateToString(new Date(System.currentTimeMillis()), "yyyy-MM-dd'T'HH:mm:ss");
+		sourceMetadata.addObject(Predicates.CR_LAST_REFRESHED, new ObjectDTO(String.valueOf(lastRefreshed), true));
+	}
+	
+	/**
+	 * 
+	 * @param urlConnetion
+	 */
+	private void setSourceMetadata(URLConnection urlConnection){
+		
+		setLastRefreshed(urlConnection);
+
+		long lastModified = urlConnection.getLastModified();
+		if (lastModified>0){
+			String s = Util.dateToString(new Date(lastModified), "yyyy-MM-dd'T'HH:mm:ss");
+			sourceMetadata.addObject(Predicates.CR_LAST_MODIFIED, new ObjectDTO(s, true));
+		}
+		
+		int contentLength = urlConnection.getContentLength();
+		if (contentLength>=0){
+			sourceMetadata.addObject(Predicates.CR_BYTE_SIZE, new ObjectDTO(String.valueOf(contentLength), true));
+		}
+		
+		String contentType = urlConnection.getContentType();
+		if (contentType!=null && contentType.length()>0){
+			String charset = null;
+			int i = contentType.indexOf(";");
+			if (i>0){
+				int j = contentType.indexOf("charset=", i);
+				if (j>i){
+					int k = contentType.indexOf(";", j);
+					k = k<0 ? contentType.length() : k;
+					charset = contentType.substring(j + "charset=".length(), k).trim(); 
+				}
+				contentType = contentType.substring(0, i).trim();
+			}
+			
+			sourceMetadata.addObject(Predicates.CR_MEDIA_TYPE, new ObjectDTO(String.valueOf(contentType), true));
+			if (charset!=null && charset.length()>0){
+				sourceMetadata.addObject(Predicates.CR_CHARSET, new ObjectDTO(String.valueOf(charset), true));
+			}
+		}
 	}
 
 	/**

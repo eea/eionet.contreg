@@ -26,6 +26,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -46,8 +47,11 @@ import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dto.HarvestSourceDTO;
+import eionet.cr.dto.ObjectDTO;
+import eionet.cr.dto.SubjectDTO;
 import eionet.cr.dto.UnfinishedHarvestDTO;
 import eionet.cr.harvest.util.HarvestLog;
+import eionet.cr.harvest.util.arp.AResourceImpl;
 import eionet.cr.harvest.util.arp.ATriple;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.UnicodeUtils;
@@ -160,9 +164,25 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	 * 
 	 * @param triple
 	 */
-	public void triple(ATriple triple){
-		statement(triple.getSubject(), triple.getPredicate(),
-				triple.getObject(), triple.getObjectLang(), triple.isLitObject(), triple.isAnonObject());
+	public void addSourceMetadata(SubjectDTO subjectDTO){
+		
+		if (subjectDTO!=null && subjectDTO.getPredicateCount()>0){
+			
+			AResource subject = new AResourceImpl(subjectDTO.getUri());
+			for (String predicateUri:subjectDTO.getPredicates().keySet()){
+				
+				Collection<ObjectDTO> objects = subjectDTO.getObjects(predicateUri);
+				if (objects!=null && !objects.isEmpty()){
+					
+					AResource predicate = new AResourceImpl(predicateUri);
+					for (ObjectDTO object:objects){
+						
+						statement(subject, predicate, object.toString(), object.getLanguage(), object.isLiteral(), object.isAnonymous());
+					}
+				}
+			}
+		}
+
 	}
 	
 	/**

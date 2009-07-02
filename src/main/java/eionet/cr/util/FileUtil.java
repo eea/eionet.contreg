@@ -74,16 +74,20 @@ public class FileUtil {
 	 * @param toFile
 	 * @throws IOException
 	 */
-	public static void streamToFile(InputStream inputStream, File toFile) throws IOException{
+	public static int streamToFile(InputStream inputStream, File toFile) throws IOException{
 		
 		FileOutputStream fos = null;
 		try{
 			int i = -1;
+			int totalBytes = 0;
 			byte[] bytes = new byte[1024];
 			fos = new FileOutputStream(toFile);
 	        while ((i = inputStream.read(bytes, 0, bytes.length)) != -1){
 	        	fos.write(bytes, 0, i);
+	        	totalBytes = totalBytes + i;
 	        }
+	        
+	        return totalBytes;
 		}
 		finally{
 			try{

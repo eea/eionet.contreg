@@ -70,6 +70,33 @@ public class SubjectDTO{
 	
 	/**
 	 * 
+	 * @param predicateUri
+	 * @param object
+	 */
+	public void addObject(String predicateUri, ObjectDTO object){
+		
+		Collection<ObjectDTO> objects = predicates.get(predicateUri);
+		if (objects==null){
+			objects = new ArrayList<ObjectDTO>();
+			predicates.put(predicateUri, objects);
+		}
+		objects.add(object);
+	}
+	
+	/**
+	 * 
+	 * @param predicateUri
+	 * @param object
+	 */
+	public void setObject(String predicateUri, ObjectDTO object){
+		
+		Collection<ObjectDTO> objects = new ArrayList<ObjectDTO>();
+		objects.add(object);
+		predicates.put(predicateUri, objects);
+	}
+	
+	/**
+	 * 
 	 * @return
 	 */
 	public Map<String,Collection<ObjectDTO>> getPredicates(){
