@@ -63,7 +63,6 @@
 								</c:choose>
 							</th>
 						</c:forEach>
-						<th scope="col">&nbsp;</th>
 					</thead>
 					<tbody>
 						<c:forEach items="${actionBean.resultList}" var="resultListItem" varStatus="rowStatus">
@@ -77,21 +76,13 @@
 									</c:otherwise>
 								</c:choose>>
 								<c:forEach items="${actionBean.columns}" var="col">
-									<td><c:out value="${crfn:format(col, resultListItem)}"/></td>
-								</c:forEach>
-								<td>
-									<stripes:link href="/factsheet.action">
-										<img src="${pageContext.request.contextPath}/images/view2.gif" title="View factsheet" alt="View factsheet"/>
+									<td>
 										<c:choose>
-											<c:when test="${resultListItem.anonymous}">
-												<stripes:param name="uriHash" value="${resultListItem.uriHash}" />
-											</c:when>
-											<c:otherwise>
-												<stripes:param name="uri" value="${resultListItem.uri}" />
-											</c:otherwise>
+											<c:when test="${col.escapeXml}"><c:out value="${crfn:format(col, resultListItem)}"/></c:when>
+											<c:otherwise>${crfn:format(col, resultListItem)}</c:otherwise>
 										</c:choose>
-									</stripes:link>
-								</td>
+									</td>
+								</c:forEach>
 							</tr>
 						</c:forEach>
 					</tbody>

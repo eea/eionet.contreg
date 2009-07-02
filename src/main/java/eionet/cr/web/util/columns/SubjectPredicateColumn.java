@@ -24,8 +24,15 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 
+import net.sourceforge.stripes.action.UrlBinding;
+
+import eionet.cr.common.Predicates;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
+import eionet.cr.util.URIUtil;
+import eionet.cr.util.URLUtil;
+import eionet.cr.util.Util;
+import eionet.cr.web.action.FactsheetActionBean;
 
 /**
  * 
@@ -68,31 +75,79 @@ public class SubjectPredicateColumn extends SearchResultColumn{
 			if (subjectDTO.getPredicateCount()>0){
 				
 				Collection<ObjectDTO> objects = subjectDTO.getObjects(predicateUri);
-				if (objects==null || objects.isEmpty())
-					return "";
+				if (objects!=null && !objects.isEmpty()){
 				
-				LinkedHashSet<ObjectDTO> distinctObjects = new LinkedHashSet<ObjectDTO>(objects);		
-				StringBuffer bufLiterals = new StringBuffer();
-				StringBuffer bufNonLiterals = new StringBuffer();
+					LinkedHashSet<ObjectDTO> distinctObjects = new LinkedHashSet<ObjectDTO>(objects);		
+					StringBuffer bufLiterals = new StringBuffer();
+					StringBuffer bufNonLiterals = new StringBuffer();
+
+					for (Iterator<ObjectDTO> iter = distinctObjects.iterator(); iter.hasNext();){
+
+						ObjectDTO objectDTO = iter.next();
+						String objectString = objectDTO.toString().trim();
+						if (objectString.length()>0){
+
+							if (objectDTO.isLiteral())
+								bufLiterals.append(bufLiterals.length()>0 ? ", " : "").append(objectString);
+							else
+								bufNonLiterals.append(bufNonLiterals.length()>0 ? ", " : "").append(objectString);
+						}
+					}
+
+					result = bufLiterals.length()>0 ? bufLiterals.toString() : bufNonLiterals.toString();
+				}
+			}
+
+			// rdfs:label gets special treatment
+			if (predicateUri.equals(Predicates.RDFS_LABEL)){
 				
-				for (Iterator<ObjectDTO> iter = distinctObjects.iterator(); iter.hasNext();){
-					
-					ObjectDTO objectDTO = iter.next();
-					String objectString = objectDTO.toString().trim();
-					if (objectString.length()>0){
-						
-						if (objectDTO.isLiteral())
-							bufLiterals.append(bufLiterals.length()>0 ? ", " : "").append(objectString);
-						else
-							bufNonLiterals.append(bufNonLiterals.length()>0 ? ", " : "").append(objectString);
+				// if the result is blank, then guess the value from subject
+				if (result.trim().length()==0){
+
+					if (subjectDTO.isAnonymous()){
+						result = "Anonymous object";
+					}
+					else{
+						String subjectUri = subjectDTO.getUri();
+						if (URIUtil.isSchemedURI(subjectUri) && !URLUtil.isURL(subjectUri)){
+							result = subjectUri;
+						}
+						else{
+							int i = Math.max(Math.max(subjectUri.lastIndexOf('#'), subjectUri.lastIndexOf('/')), subjectUri.lastIndexOf(':'));
+							if (i>=0){
+								result = subjectUri.substring(i+1);
+							}
+							else{
+								result = subjectUri;
+							}
+						}
 					}
 				}
 				
-				result = bufLiterals.length()>0 ? bufLiterals.toString() : bufNonLiterals.toString();
+				// no we are sure we have a label to display, so let's generate the factsheet link based on that
+				String factsheetUrlBinding = FactsheetActionBean.class.getAnnotation(UrlBinding.class).value();
+				int i = factsheetUrlBinding.lastIndexOf("/");
+				StringBuffer href = new StringBuffer(i>=0 ? factsheetUrlBinding.substring(i+1) : factsheetUrlBinding).append("?");
+				if (subjectDTO.isAnonymous()){
+					href.append("uriHash=").append(Util.urlEncode(subjectDTO.getUriHash()));
+				}
+				else{
+					href.append("uri=").append(Util.urlEncode(subjectDTO.getUri()));
+				}				
+				result = new StringBuffer("<a href=\"").append(href).append("\">").append(result).append("</a>").toString();
 			}
 		}
 		
 		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.web.util.columns.SearchResultColumn#isEscapeXml()
+	 */
+	public boolean isEscapeXml(){
+		
+		return predicateUri.equals(Predicates.RDFS_LABEL) ? false : super.isEscapeXml();
 	}
 	
 	/*

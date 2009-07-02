@@ -44,6 +44,14 @@ public abstract class SearchResultColumn {
 	 * 
 	 * @return
 	 */
+	public boolean isEscapeXml(){
+		return true;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
 	public abstract String getSortParamValue();
 
 	/**
