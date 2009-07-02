@@ -252,6 +252,8 @@ public class PullHarvest extends Harvest{
 		// if this file has a conversion to RDF, run it and return the reference to the resulting file
 		if (schemaOrDtd!=null && schemaOrDtd.length()>0){
 			
+			sourceMetadata.addObject(Predicates.CR_SCHEMA, new ObjectDTO(schemaOrDtd, false));
+			
 			/* get the URL of the conversion service method that returns the list of available conversions */
 			
 			String listConversionsUrl = GeneralConfig.getRequiredProperty(GeneralConfig.XMLCONV_LIST_CONVERSIONS_URL);
