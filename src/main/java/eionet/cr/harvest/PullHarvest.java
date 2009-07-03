@@ -115,11 +115,16 @@ public class PullHarvest extends Harvest{
 					logger.warn(e.toString(), e);
 				}
 				
+				if (urlConnection instanceof HttpURLConnection){
+					int responseCode = ((HttpURLConnection)urlConnection).getResponseCode();
+					System.out.println(responseCode);
+				}
+				
 				// if source not available (i.e. link broken) then just set the last-refreshed metadata
 				if (sourceAvailable.booleanValue()==false){
 					setLastRefreshed(urlConnection);
 				}
-				// source is avaialable, so continue to extract it's contents and metadata
+				// source is available, so continue to extract it's contents and metadata
 				else{
 					
 					// extract various metadata about this harvest source from url connection object

@@ -23,14 +23,17 @@ package eionet.cr.dao.mysql;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import eionet.cr.dao.DAOException;
+import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.readers.HarvestSourceDTOReader;
+import eionet.cr.dto.readers.SingleIntColumnReader;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Util;
 import eionet.cr.util.sql.ConnectionUtil;
@@ -264,37 +267,45 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
      * @see eionet.cr.dao.HarvestSourceDAO#deleteSourcesByUrl(java.util.List)
      */
     public void deleteSourcesByUrl(List<String> urls) throws DAOException {
+
+    	/* prepare question marks and url hashes */
     	
-    	List<Object> urlValues = new ArrayList<Object>();
-    	List<Object> urlHashValues = new ArrayList<Object>();
-    	
-    	StringBuffer bufHarvestSource1 = new StringBuffer("delete from HARVEST_SOURCE where URL in (");
-    	StringBuffer bufHarvestSource2 = new StringBuffer("delete from HARVEST_SOURCE where SOURCE in (");
-    	StringBuffer bufSPO1 = new StringBuffer("delete from SPO where SOURCE in (");
-    	StringBuffer bufSPO2 = new StringBuffer("delete from SPO where OBJ_DERIV_SOURCE in (");
-    	
-    	for (int i=0; i<urls.size(); i++){
-    		
-    		bufHarvestSource1.append(i>0 ? "," : "").append("?");
-    		bufHarvestSource2.append(i>0 ? "," : "").append("?");
-    		bufSPO1.append(i>0 ? "," : "").append("?");
-    		bufSPO2.append(i>0 ? "," : "").append("?");
-    		
-    		urlValues.add(urls.get(i));
-    		urlHashValues.add(Hashes.spoHash(urls.get(i)));
+    	String questionMark = "?";
+    	List<Long> urlHashes = new ArrayList<Long>();
+    	List<String> questionMarks = new ArrayList<String>();
+    	for (String url:urls){
+    		urlHashes.add(Hashes.spoHash(url));
+    		questionMarks.add(questionMark);
     	}
-    	bufHarvestSource1.append(")");
-    	bufHarvestSource2.append(")");
-    	bufSPO1.append(")");
-    	bufSPO2.append(")");
-		
+    	String inClause = " in (" + Util.toCSV(questionMarks) + ")";
+    	
+    	/* execute deletion queries */
+    	
 		Connection conn = null;
 		try{
 			conn = getConnection();
-			SQLUtil.executeUpdate(bufHarvestSource1.toString(), urlValues, conn);
-			SQLUtil.executeUpdate(bufHarvestSource2.toString(), urlHashValues, conn);
-			SQLUtil.executeUpdate(bufSPO1.toString(), urlHashValues, conn);
-			SQLUtil.executeUpdate(bufSPO2.toString(), urlHashValues, conn);
+			
+			/* get harvest source ids, delete harvests and harvest messages by them */
+			
+			SingleIntColumnReader reader = new SingleIntColumnReader();
+			SQLUtil.executeQuery("select HARVEST_SOURCE_ID from HARVEST_SOURCE where URL" + inClause, urls, reader, conn);
+			String harvestSourceIdsCSV = Util.toCSV(reader.getResultList());
+			
+			reader = new SingleIntColumnReader();
+			SQLUtil.executeQuery("select HARVEST_ID from HARVEST where HARVEST_SOURCE_ID in (" + harvestSourceIdsCSV + ")", reader, conn);
+			String harvestIdsCSV = Util.toCSV(reader.getResultList());
+			
+			SQLUtil.executeUpdate("delete from HARVEST_MESSAGE where HARVEST_ID in (" + harvestIdsCSV + ")", conn);
+			SQLUtil.executeUpdate("delete from HARVEST where HARVEST_SOURCE_ID in (" + harvestSourceIdsCSV + ")", conn);
+			
+			/* delete various stuff by harvest source urls or url hashes */
+			
+			SQLUtil.executeUpdate("delete from HARVEST_SOURCE where URL" + inClause, urls, conn);
+			SQLUtil.executeUpdate("delete from HARVEST_SOURCE where SOURCE" + inClause, urlHashes, conn);
+			SQLUtil.executeUpdate("delete from SPO where SOURCE" + inClause, urlHashes, conn);
+			SQLUtil.executeUpdate("delete from SPO where OBJ_DERIV_SOURCE" + inClause, urlHashes, conn);
+			SQLUtil.executeUpdate("delete from UNFINISHED_HARVEST where SOURCE" + inClause, urlHashes, conn);
+			SQLUtil.executeUpdate("delete from URGENT_HARVEST_QUEUE where URL" + inClause, urls, conn);
 		}
 		catch (Exception e){
 			throw new DAOException(e.getMessage(), e);
