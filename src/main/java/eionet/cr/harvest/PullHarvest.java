@@ -29,7 +29,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.net.UnknownHostException;
 import java.text.MessageFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -39,6 +41,8 @@ import org.xml.sax.SAXException;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.config.GeneralConfig;
+import eionet.cr.dao.DAOException;
+import eionet.cr.dao.DAOFactory;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.harvest.util.arp.ARPSource;
 import eionet.cr.harvest.util.arp.ATriple;
@@ -106,20 +110,40 @@ public class PullHarvest extends Harvest{
 
 				// open connection stream				
 				logger.debug("Downloading");
+				IOException connectException = null;
 				try{
 					sourceAvailable = Boolean.FALSE;
 					inputStream = urlConnection.getInputStream();
 					sourceAvailable = Boolean.TRUE;					
 				}
 				catch (IOException e){
+					connectException = e;
 					logger.warn(e.toString(), e);
 				}
 				
-				if (urlConnection instanceof HttpURLConnection){
-					int responseCode = ((HttpURLConnection)urlConnection).getResponseCode();
-					System.out.println(responseCode);
+				// if we see that the source for surely doesn't exist, we delete it and return right away
+				String sourceNotExistMessage = null; 
+				if (connectException!=null && connectException instanceof UnknownHostException){
+					sourceNotExistMessage = "IP address of the host could not be determined";
 				}
-				
+				else if (urlConnection instanceof HttpURLConnection){
+					int responseCode = ((HttpURLConnection)urlConnection).getResponseCode();
+					if ((responseCode>=400 && responseCode<=499) || responseCode==501 || responseCode==505){
+						sourceNotExistMessage = "Got HTTP response code " + responseCode;
+					}
+				}
+				if (sourceNotExistMessage!=null){
+					logger.debug(sourceNotExistMessage + ", going to delete the source");
+					try {
+						daoWriter = null; // we won't finishing actions to be done
+						DAOFactory.getDAOFactory().getHarvestSourceDAO().deleteSourcesByUrl(Collections.singletonList(sourceUrlString));
+					}
+					catch (DAOException e){
+						logger.warn("Failure when deleting the source", e);
+					}
+					return;
+				}
+						
 				// if source not available (i.e. link broken) then just set the last-refreshed metadata
 				if (sourceAvailable.booleanValue()==false){
 					setLastRefreshed(urlConnection);

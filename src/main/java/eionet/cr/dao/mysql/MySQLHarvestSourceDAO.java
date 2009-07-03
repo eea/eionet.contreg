@@ -294,8 +294,9 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 			reader = new SingleIntColumnReader();
 			SQLUtil.executeQuery("select HARVEST_ID from HARVEST where HARVEST_SOURCE_ID in (" + harvestSourceIdsCSV + ")", reader, conn);
 			String harvestIdsCSV = Util.toCSV(reader.getResultList());
-			
-			SQLUtil.executeUpdate("delete from HARVEST_MESSAGE where HARVEST_ID in (" + harvestIdsCSV + ")", conn);
+			if (harvestIdsCSV.trim().length()>0){
+				SQLUtil.executeUpdate("delete from HARVEST_MESSAGE where HARVEST_ID in (" + harvestIdsCSV + ")", conn);
+			}
 			SQLUtil.executeUpdate("delete from HARVEST where HARVEST_SOURCE_ID in (" + harvestSourceIdsCSV + ")", conn);
 			
 			/* delete various stuff by harvest source urls or url hashes */

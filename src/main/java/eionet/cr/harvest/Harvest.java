@@ -79,7 +79,7 @@ public abstract class Harvest {
 	private int storedTriplesCount = 0;
 	
 	/** */
-	private HarvestDAOWriter daoWriter = null;
+	protected HarvestDAOWriter daoWriter = null;
 	private HarvestNotificationSender notificationSender = null;
 	
 	/** */
