@@ -44,7 +44,7 @@
 				<display:table name="${actionBean.harvestSources}" class="sortable" pagesize="15"
 								sort="list" id="harvestSource" htmlId="harvestSources" requestURI="${actionBean.pagingUrl}"
 								decorator="eionet.cr.web.util.HarvestSourcesTableDecorator" style="width:100%"
-								excludedParams="harvest delete sourceUrl">
+								excludedParams="harvest delete sourceUrl view">
 					<display:setProperty name="paging.banner.items_name" value="sources"/>
 					<display:column>
 						<input type="checkbox" name="sourceUrl" value="${harvestSource.url}"/>
