@@ -46,10 +46,10 @@ public interface Predicates {
 	
 	public static final String SKOS_PREF_LABEL = "http://www.w3.org/2004/02/skos/core#prefLabel";
 		
-	public static final String ROD_OBLIGATION_PROPERTY = "http://rod.eionet.eu.int/schema.rdf#obligation";
-	public static final String ROD_INSTRUMENT_PROPERTY = "http://rod.eionet.eu.int/schema.rdf#instrument";
-	public static final String ROD_LOCALITY_PROPERTY = "http://rod.eionet.eu.int/schema.rdf#locality";
-	public static final String ROD_ISSUE_PROPERTY = "http://rod.eionet.eu.int/schema.rdf#issue";
+	public static final String ROD_OBLIGATION_PROPERTY = "http://rod.eionet.europa.eu/schema.rdf#obligation";
+	public static final String ROD_INSTRUMENT_PROPERTY = "http://rod.eionet.europa.eu/schema.rdf#instrument";
+	public static final String ROD_LOCALITY_PROPERTY = "http://rod.eionet.europa.eu/schema.rdf#locality";
+	public static final String ROD_ISSUE_PROPERTY = "http://rod.eionet.europa.eu/schema.rdf#issue";
 	public static final String ROD_HAS_FILE = "http://rod.eionet.europa.eu/schema.rdf#hasFile";
 	public static final String ROD_HAS_FEEDBACK = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#hasFeedback";
 

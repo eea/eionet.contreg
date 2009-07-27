@@ -138,9 +138,6 @@
 	<rdf:Description rdf:about="http://qaw.eionet.europa.eu/schema.rdf#QaReport">
 		<rdfs:subClassOf rdf:resource="#File"/>
 	</rdf:Description>
-	<rdf:Description rdf:about="http://rod.eionet.eu.int/schema.rdf#Delivery">
-		<rdfs:subClassOf rdf:resource="#File"/>
-	</rdf:Description>
 	<rdf:Description rdf:about="http://rod.eionet.europa.eu/schema.rdf#Delivery">
 		<rdfs:subClassOf rdf:resource="#File"/>
 	</rdf:Description>

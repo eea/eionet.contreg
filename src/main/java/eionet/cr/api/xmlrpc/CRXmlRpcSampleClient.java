@@ -104,8 +104,8 @@ public class CRXmlRpcSampleClient {
 	    
 	    // execute the call
 	    Map criteria = new HashMap();
-	    criteria.put("http://rod.eionet.eu.int/schema.rdf#locality", "http://rod.eionet.eu.int/spatial/28"); // Norway
-	    criteria.put("http://rod.eionet.eu.int/schema.rdf#obligation", "http://rod.eionet.eu.int/obligations/452");
+	    criteria.put("http://rod.eionet.europa.eu/schema.rdf#locality", "http://rod.eionet.europa.eu/spatial/28"); // Norway
+	    criteria.put("http://rod.eionet.europa.eu/schema.rdf#obligation", "http://rod.eionet.europa.eu/obligations/452");
 	    criteria.put("http://purl.org/dc/elements/1.1/coverage", "2006");
 	    
 	    Object[] params = new Object[]{criteria};

@@ -23,11 +23,11 @@ package eionet.cr.common;
 public interface Subjects {
 
 	public static final String RSS_ITEM_CLASS = "http://purl.org/rss/1.0/Item";
-	public static final String ROD_OBLIGATION_CLASS = "http://rod.eionet.eu.int/schema.rdf#Obligation";
-	public static final String ROD_INSTRUMENT_CLASS = "http://rod.eionet.eu.int/schema.rdf#Instrument";
-	public static final String ROD_LOCALITY_CLASS = "http://rod.eionet.eu.int/schema.rdf#Locality";
-	public static final String ROD_ISSUE_CLASS = "http://rod.eionet.eu.int/schema.rdf#Issue";
-	public static final String ROD_DELIVERY_CLASS = "http://rod.eionet.eu.int/schema.rdf#Delivery";
+	public static final String ROD_OBLIGATION_CLASS = "http://rod.eionet.europa.eu/schema.rdf#Obligation";
+	public static final String ROD_INSTRUMENT_CLASS = "http://rod.eionet.europa.eu/schema.rdf#Instrument";
+	public static final String ROD_LOCALITY_CLASS = "http://rod.eionet.europa.eu/schema.rdf#Locality";
+	public static final String ROD_ISSUE_CLASS = "http://rod.eionet.europa.eu/schema.rdf#Issue";
+	public static final String ROD_DELIVERY_CLASS = "http://rod.eionet.europa.eu/schema.rdf#Delivery";
 	
 	public static final String FULL_REPORT_CLASS = "http://reports.eea.europa.eu/reports_rdf#FullReport";
 	public static final String DCTYPE_DATASET_CLASS = "http://purl.org/dc/dcmitype/Dataset";
