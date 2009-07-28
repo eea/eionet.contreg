@@ -64,11 +64,7 @@
           </dt>
 <dd>
             By default (when neither <code class="literal">+</code> nor
-            <code class="literal">-</code> is specified) the word is optional, but
-            the rows that contain it are rated higher. This mimics the
-            behavior of <a href="fulltext-search.html#function_match"><code class="literal">MATCH() ...
-            AGAINST()</code></a> without the <code class="literal">IN BOOLEAN
-            MODE</code> modifier.
+            <code class="literal">-</code> is specified) the word is optional
           </p>
 
 <dt>
