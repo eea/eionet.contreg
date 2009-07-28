@@ -57,7 +57,7 @@
 
 	<stripes:form name="searchForm" action="/simpleSearch.action" method="get" focus="searchExpression" style="padding-bottom:20px">
 	    	<stripes:label for="expressionText">Expression:</stripes:label>
-	    	<stripes:text name="searchExpression" id="expressionText" size="30"/>
+	    	<stripes:text name="searchExpression" id="expressionText" size="40"/>
 	    	<stripes:submit name="search" value="Search" id="searchButton"/>
 		<stripes:text name="dummy" style="visibility:hidden;display:none" disabled="disabled" size="1"/>
 	</stripes:form>
