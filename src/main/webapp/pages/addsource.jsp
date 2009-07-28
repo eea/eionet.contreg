@@ -33,8 +33,8 @@
 	            <tr>
 	                <td>Harvest interval:</td>
 	                <td>
-	                	<stripes:text name="harvestSource.intervalMinutes" size="10"/>
-	                	<stripes:select name="intervalMultiplier" value="${actionBean.selectedIntervalMultiplier}">
+	                	<stripes:text name="harvestSource.intervalMinutes" size="10" value="6"/>
+	                	<stripes:select name="intervalMultiplier" value="10080">
 	                		<c:forEach items="${actionBean.intervalMultipliers}" var="intervalMultiplier"> 
 		                		<stripes:option value="${intervalMultiplier.key}" label="${intervalMultiplier.value}"/>
 		                	</c:forEach>
