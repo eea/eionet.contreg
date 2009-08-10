@@ -49,6 +49,7 @@
 				</c:if>
 				<table id="resourcesResultList" class="${tableClass}">
 					<thead>
+						<tr>
 						<c:forEach items="${actionBean.columns}" var="col">
 							<th scope="col">
 								<c:choose>
@@ -63,6 +64,7 @@
 								</c:choose>
 							</th>
 						</c:forEach>
+						</tr>
 					</thead>
 					<tbody>
 						<c:forEach items="${actionBean.resultList}" var="resultListItem" varStatus="rowStatus">
