@@ -31,6 +31,7 @@ import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.dto.ObjectDTO;
@@ -128,8 +129,9 @@ public class JstlFunctions {
 		
 		HttpServletRequest request = actionBean.getContext().getRequest();
 		StringBuffer buf = new StringBuffer(actionBean.getUrlBinding());
-		buf.append("?").append(request.getQueryString());
-		
+		buf.append("?").append(
+				StringEscapeUtils.escapeHtml(
+						request.getQueryString()));
 		String sortParamValue = column.getSortParamValue();
 		if (sortParamValue==null)
 			sortParamValue = "";
@@ -140,13 +142,13 @@ public class JstlFunctions {
 					StringUtils.replace(buf.toString(), "sortP=" + Util.urlEncode(curValue), "sortP=" + Util.urlEncode(sortParamValue)));
 		}
 		else
-			buf.append("&sortP=").append(Util.urlEncode(sortParamValue)); 
+			buf.append("&amp;sortP=").append(Util.urlEncode(sortParamValue)); 
 
 		curValue = request.getParameter("sortO");
 		if (curValue!=null)
 			buf = new StringBuffer(StringUtils.replace(buf.toString(), "sortO=" + curValue, "sortO=" + SortOrder.oppositeSortOrder(curValue)));
 		else
-			buf.append("&sortO=").append(SortOrder.oppositeSortOrder(curValue)); 
+			buf.append("&amp;sortO=").append(SortOrder.oppositeSortOrder(curValue)); 
 
 		String result = buf.toString();
 		return result.startsWith("/") ? result.substring(1) : result;

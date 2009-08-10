@@ -125,7 +125,7 @@ public class QueryString extends HashMap<String,Set<String>>{
 			String parName = keys.next();
 			Set<String> parValueSet = get(parName);
 			for (Iterator<String> parValues = parValueSet.iterator(); parValues.hasNext();){
-				buf.append(buf.length()>0 ? "&" : "").append(parName).append("=").append(Util.urlEncode(parValues.next()));
+				buf.append(buf.length()>0 ? "&amp;" : "").append(parName).append("=").append(Util.urlEncode(parValues.next()));
 			}
 		}
 		
