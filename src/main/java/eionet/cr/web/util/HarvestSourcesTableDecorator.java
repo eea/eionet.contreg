@@ -36,7 +36,7 @@ import eionet.cr.util.Util;
 public class HarvestSourcesTableDecorator extends TableDecorator{
 	
 	/** */
-	private SimpleDateFormat lastHarvestFormat = new SimpleDateFormat("dd-MM-yy HH:mm:ss");
+	private SimpleDateFormat lastHarvestFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 	/**
 	 * 
