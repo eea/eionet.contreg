@@ -43,6 +43,7 @@ public class PushHarvest extends Harvest{
 	public PushHarvest(String content, String sourceUri) {
 		super(sourceUri);
 		this.content = content;
+		this.clearPreviousContent = false;
 	}
 
 	/*

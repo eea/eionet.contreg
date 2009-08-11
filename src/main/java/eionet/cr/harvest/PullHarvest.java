@@ -64,7 +64,7 @@ public class PullHarvest extends Harvest{
 	private static String userAgent;
 	
 	/** */
-	private Boolean sourceAvailable = null;
+	private Boolean sourceAvailable = null;	
 	private Date lastHarvest = null;
 
 	/**
@@ -167,7 +167,9 @@ public class PullHarvest extends Harvest{
 						// content type OK, but skip if not modified since last harvest
 						if (urlConnection instanceof HttpURLConnection
 							&& ((HttpURLConnection)urlConnection).getResponseCode()==HttpURLConnection.HTTP_NOT_MODIFIED){
-								
+							
+							clearPreviousContent = false;
+							
 							if (previousHarvest!=null){
 								// copy the number of triples and distinct subjects from previous harvest
 								setStoredTriplesCount(previousHarvest.getTotalStatements());

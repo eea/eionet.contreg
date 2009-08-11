@@ -97,6 +97,9 @@ public abstract class Harvest {
 	/** */
 	protected SubjectDTO sourceMetadata;
 	
+	/** */
+	protected boolean clearPreviousContent = true;
+	
 	/**
 	 * 
 	 * @param sourceUrlString
@@ -158,8 +161,7 @@ public abstract class Harvest {
 			
 			rdfHandler = new RDFHandler(sourceUrlString, genTime);
 			rdfHandler.setDeriveExtraTriples(deriveExtraTriples);
-			if (this instanceof PushHarvest)
-				rdfHandler.setClearPreviousContent(false);
+			rdfHandler.setClearPreviousContent(clearPreviousContent);
 
 			if (arpSource!=null){
 				ARP arp = new ARP();
