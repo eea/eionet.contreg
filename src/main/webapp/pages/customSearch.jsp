@@ -18,10 +18,10 @@
         
 		    	<div id="filterSelectionArea" style="margin-top:20px">
 		    	
-		    		<stripes:form name="customSearchForm" action="/customSearch.action" method="get" id="customSearchForm" acceptcharset="UTF-8">
-		    		
+		    		<stripes:form name="filterAdd" action="/customSearch.action" method="get" id="filterAdd" acceptcharset="UTF-8">
+		    			<stripes:hidden name="addFilter"/>
 		    			<c:if test="${fn:length(actionBean.selectedFilters)<fn:length(actionBean.availableFilters)}">
-			    			<stripes:select name="addedFilter" id="filterSelect">
+			    			<stripes:select name="addedFilter" id="filterSelect" onchange="this.form.submit();" >
 			    				<stripes:option value="" label=""/>
 			    				<c:forEach var="availableFilter" items="${actionBean.availableFilters}">
 			    					<c:if test="${actionBean.selectedFilters[availableFilter.key]==null}">
@@ -29,9 +29,13 @@
 			    					</c:if>
 			    				</c:forEach>
 			    			</stripes:select>&nbsp;
-			    			<stripes:submit name="addFilter" value="Add filter"/>
+		    		 		<noscript>
+		    				<stripes:submit name="addFilter" value="Add filter"/>
+			    			 </noscript>
 			    		</c:if>
-		    			
+		    		</stripes:form>
+		    		
+		    		<stripes:form name="customSearchForm" action="/customSearch.action" method="get" id="customSearchForm" acceptcharset="UTF-8">
 		    			<c:if test="${actionBean.selectedFilters!=null && fn:length(actionBean.selectedFilters)>0}">
 			    			<table style="margin-top:20px;margin-bottom:20px">
 			    				<c:forEach var="availableFilter" items="${actionBean.availableFilters}">
