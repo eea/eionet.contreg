@@ -34,6 +34,7 @@ public class ObjectDTO {
 
 	/** */
 	private String value;
+	private String hash;
 	private String language;
 	private boolean literal;
 	private boolean anonymous;
@@ -127,8 +128,14 @@ public class ObjectDTO {
 	 * 
 	 * @return
 	 */
-	public String getValueHash(){
-		return getValue()==null ? null : String.valueOf(Hashes.spoHash(getValue()));
+	public String getHash(){
+		
+		if (hash==null){
+			if (getValue()!=null){
+				hash = String.valueOf(Hashes.spoHash(getValue()));
+			}
+		}
+		return hash;
 	}
 
 	/**
@@ -192,5 +199,13 @@ public class ObjectDTO {
 	 */
 	public long getSourceObjectLong(){
 		return this.sourceObject==null ? 0 : Long.parseLong(this.sourceObject);
+	}
+
+	/**
+	 * 
+	 * @param hash
+	 */
+	public void setHash(String hash) {
+		this.hash = hash;
 	}
 }

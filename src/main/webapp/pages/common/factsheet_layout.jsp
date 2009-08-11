@@ -37,7 +37,7 @@
 						    		
 						    		<c:forEach items="${predicate.value}" var="object" varStatus="objectsStatus">
 						    			<c:if test="${not crfn:subjectHasPredicateObject(actionBean.subject, actionBean.subProperties[predicate.key], object.value)}">
-						    				<c:if test="${not crfn:isSourceToAny(object.valueHash, predicate.value)}">
+						    				<c:if test="${not crfn:isSourceToAny(object.hash, predicate.value)}">
 									    		<tr>
 									    			<th scope="row" class="scope-row" title="${predicate.key}" style="white-space:nowrap">
 									    				<c:choose>

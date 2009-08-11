@@ -81,7 +81,7 @@ public class ReferringPredicatesColumn extends SearchResultColumn{
 						
 						for (ObjectDTO objectDTO:objects){
 							
-							if (objectDTO.getSourceObjectLong()==0 && objectDTO.getValueHash().equals(referringToHash)){
+							if (objectDTO.getSourceObjectLong()==0 && objectDTO.getHash().equals(referringToHash)){
 								
 								String predicateLabel = JstlFunctions.getPredicateLabel(actionBean.getPredicateLabels(), predicate);
 								labels.add(predicateLabel);
