@@ -38,7 +38,8 @@ public interface Predicates {
 	public static final String DCTERMS_ALTERNATIVE = "http://purl.org/dc/terms/alternative";
 	
 	public static final String RDF_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
-	public static final String RDFS_LABEL = "http://www.w3.org/2000/01/rdf-schema#label";
+	public static final String RDF_VALUE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#value";
+	public static final String RDFS_LABEL = "http://www.w3.org/2000/01/rdf-schema#label";	
 	public static final String RDFS_DOMAIN = "http://www.w3.org/2000/01/rdf-schema#domain";
 	public static final String RDFS_RANGE = "http://www.w3.org/2000/01/rdf-schema#range";
 	public static final String RDFS_SUBPROPERTY_OF = "http://www.w3.org/2000/01/rdf-schema#subPropertyOf";

@@ -27,6 +27,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -116,6 +117,9 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	
 	/** */
 	private boolean deriveExtraTriples = true;
+	
+	/** */
+	private HashMap<String,ArrayList<ValueLanguagePair>> rdfValues = new HashMap<String,ArrayList<ValueLanguagePair>>();
 	
 	/**
 	 * @throws SQLException 
@@ -212,14 +216,37 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 			// we ignore literal objects with length=0
 			if (litObject && object.length()==0)
 				return;
-
-			boolean anonSubject = subject.isAnonymous();			
-			long subjectHash = anonSubject ? Hashes.spoHash(subject.getAnonymousID(), anonIdSeed) : Hashes.spoHash(subject.getURI());
+			
+			// set up subject and predicate hashes, replace entity references in the object
+			boolean anonSubject = subject.isAnonymous();
+			long subjectHash = getSubjectHash(subject, anonSubject);
 			long predicateHash = Hashes.spoHash(predicate.getURI());
 			if (litObject)
 				object = UnicodeUtils.replaceEntityReferences(object);
-			
+
+			// we remember rdfValues			
+			if (anonSubject && predicate.getURI().equals(Predicates.RDF_VALUE)){
+				ArrayList<ValueLanguagePair> subjectRdfValues = rdfValues.get(subject.getAnonymousID());
+				if (subjectRdfValues==null){
+					subjectRdfValues = new ArrayList<ValueLanguagePair>();
+					rdfValues.put(subject.getAnonymousID(), subjectRdfValues);
+				}
+				subjectRdfValues.add(new ValueLanguagePair(object, objectLang));
+			}
+
+			// add the triple to the SQL insert batch
 			addTriple(subjectHash, anonSubject, predicateHash, object, objectLang, litObject, anonObject);
+			
+			// if the object represents an anonymous subject, lookup the rdf:value(s) of the latter and insert it as derived
+			if (anonObject && !litObject){
+				ArrayList<ValueLanguagePair> objectRdfValues = rdfValues.get(object);
+				if (objectRdfValues!=null){
+					for (ValueLanguagePair pair:objectRdfValues){
+						addTriple(subjectHash, anonSubject, predicateHash, pair.getValue(), pair.getLanguage(),
+								true, false, getObjectHash(object, anonObject));
+					}
+				}
+			}
 
 			// if predicate different from previous one
 			if (currentPredicateHash==null || predicateHash!=currentPredicateHash.longValue()){
@@ -320,19 +347,59 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	 * @throws SQLException
 	 */
 	private void addTriple(long subjectHash, boolean anonSubject, long predicateHash,
-							String object, String objectLang, boolean litObject, boolean anonObject) throws SQLException{
+			String object, String objectLang, boolean litObject, boolean anonObject) throws SQLException{
+		
+		addTriple(subjectHash, anonSubject, predicateHash, object, objectLang, litObject, anonObject, 0);
+	}
+
+	/**
+	 * 
+	 * @param subjectHash
+	 * @param anonSubject
+	 * @param predicateHash
+	 * @param object
+	 * @param objectLang
+	 * @param litObject
+	 * @param anonObject
+	 * @param objSourceObject
+	 * @throws SQLException
+	 */
+	private void addTriple(long subjectHash, boolean anonSubject, long predicateHash,
+			String object, String objectLang, boolean litObject, boolean anonObject, long objSourceObject) throws SQLException{
 		
 		preparedStatementForTriples.setLong  ( 1, subjectHash);
 		preparedStatementForTriples.setLong  ( 2, predicateHash);
 		preparedStatementForTriples.setString( 3, object);
-		preparedStatementForTriples.setLong  ( 4, anonObject ? Hashes.spoHash(object, anonIdSeed) : Hashes.spoHash(object));
+		preparedStatementForTriples.setLong  ( 4, getObjectHash(object, anonObject));
 		preparedStatementForTriples.setObject( 5, Util.toDouble(object));
 		preparedStatementForTriples.setString( 6, YesNoBoolean.format(anonSubject));
 		preparedStatementForTriples.setString( 7, YesNoBoolean.format(anonObject));
 		preparedStatementForTriples.setString( 8, YesNoBoolean.format(litObject));
-		preparedStatementForTriples.setString( 9, objectLang==null ? "" : objectLang);
+		preparedStatementForTriples.setString( 9, objectLang==null ? "" : objectLang);		
+		preparedStatementForTriples.setLong  (10, objSourceObject==0 ? 0 : sourceUrlHash);
+		preparedStatementForTriples.setLong  (11, objSourceObject==0 ? 0 : genTime);
+		preparedStatementForTriples.setLong  (12, objSourceObject);
 		
 		preparedStatementForTriples.addBatch();
+	}
+	
+	/**
+	 * 
+	 * @param object
+	 * @param anonObject
+	 * @return
+	 */
+	private long getObjectHash(String object, boolean anonObject){		
+		return anonObject ? Hashes.spoHash(object, anonIdSeed) : Hashes.spoHash(object);
+	}
+
+	/**
+	 * 
+	 * @param subject
+	 * @return
+	 */
+	private long getSubjectHash(AResource subject, boolean anonSubject){
+		return anonSubject ? Hashes.spoHash(subject.getAnonymousID(), anonIdSeed) : Hashes.spoHash(subject.getURI());
 	}
 
 	/**
@@ -392,7 +459,8 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 		
 		StringBuffer buf = new StringBuffer();
         buf.append("insert into SPO_TEMP (SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, OBJECT_DOUBLE, ").
-        append("ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        append("ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG, OBJ_DERIV_SOURCE, OBJ_DERIV_SOURCE_GEN_TIME, OBJ_SOURCE_OBJECT) ").
+        append("VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         preparedStatementForTriples = getConnection().prepareStatement(buf.toString());
 	}
 
@@ -461,8 +529,10 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 		
 		StringBuffer buf = new StringBuffer();
 		buf.append("insert ignore into SPO (").
-		append("SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, OBJECT_DOUBLE, ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG, SOURCE, GEN_TIME").
+		append("SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, OBJECT_DOUBLE, ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG, ").
+		append("OBJ_DERIV_SOURCE, OBJ_DERIV_SOURCE_GEN_TIME, OBJ_SOURCE_OBJECT, SOURCE, GEN_TIME").
 		append(") select SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, OBJECT_DOUBLE, ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG, ").
+		append("OBJ_DERIV_SOURCE, OBJ_DERIV_SOURCE_GEN_TIME, OBJ_SOURCE_OBJECT, ").
 		append(sourceUrlHash).append(", ").append(genTime).append(" from SPO_TEMP");
 
 		storedTriplesCount = SQLUtil.executeUpdate(buf.toString(), getConnection());
@@ -554,7 +624,7 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 		
 		logger.debug(i + " labels derived FOR and " + j + " labels derived FROM the current harvest");
 	}
-	
+
 	/**
 	 * 
 	 * @throws SQLException
@@ -866,5 +936,40 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	 */
 	public void setDeriveExtraTriples(boolean deriveExtraTriples) {
 		this.deriveExtraTriples = deriveExtraTriples;
+	}
+	
+	/**
+	 * 
+	 * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
+	 *
+	 */
+	private class ValueLanguagePair{
+		
+		/** */
+		private String value;
+		private String language;
+		
+		/**
+		 * 
+		 * @param value
+		 * @param language
+		 */
+		private ValueLanguagePair(String value, String language){
+			this.value = value;
+			this.language = language;
+		}
+		
+		/**
+		 * @return the value
+		 */
+		private String getValue() {
+			return value;
+		}
+		/**
+		 * @return the language
+		 */
+		private String getLanguage() {
+			return language;
+		}
 	}
 }
