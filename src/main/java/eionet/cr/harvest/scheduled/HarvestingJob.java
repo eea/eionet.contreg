@@ -20,12 +20,12 @@
  */
 package eionet.cr.harvest.scheduled;
 
+import static eionet.cr.dao.mysql.MySQLDAOFactory.get;
+
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -36,16 +36,16 @@ import org.apache.commons.logging.LogFactory;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import org.quartz.SchedulerException;
 import org.quartz.StatefulJob;
 
 import eionet.cr.common.JobScheduler;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
-import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dao.HarvestSourceDAO;
-import eionet.cr.dto.UrgentHarvestQueueItemDTO;
+import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.HarvestSourceDTO;
+import eionet.cr.dto.UrgentHarvestQueueItemDTO;
 import eionet.cr.harvest.Harvest;
 import eionet.cr.harvest.HarvestDAOWriter;
 import eionet.cr.harvest.HarvestException;
@@ -53,10 +53,7 @@ import eionet.cr.harvest.HarvestNotificationSender;
 import eionet.cr.harvest.PullHarvest;
 import eionet.cr.harvest.PushHarvest;
 import eionet.cr.harvest.RDFHandler;
-import eionet.cr.util.Util;
-import eionet.cr.util.sql.ConnectionUtil;
 import eionet.cr.web.security.CRUser;
-
 /**
  * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
@@ -115,7 +112,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 		if (isBatchHarvestingEnabled()){
 			
 			int numOfSegments = getNumberOfSegments();
-			batchHarvestingQueue = DAOFactory.getDAOFactory().getHarvestSourceDAO().getNextScheduledSources(numOfSegments);
+			batchHarvestingQueue = MySQLDAOFactory.get().getDao(HarvestSourceDAO.class).getNextScheduledSources(numOfSegments);
 			
 			logger.debug(batchHarvestingQueue.size() + " sources added to batch harvesting queue (numOfSegments=" + numOfSegments + ")");
 		}
@@ -151,7 +148,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 					if (queueItem.isPushHarvest())
 						pushHarvest(url, queueItem.getPushedContent());
 					else
-						pullHarvest(DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceByUrl(url), true);
+						pullHarvest(get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(url), true);
 				}
 			}
 		}
@@ -171,13 +168,12 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 			Integer sourceId = null;
 			int numOfResources = 0;
 			
-			HarvestSourceDAO harvestSourceDAO = DAOFactory.getDAOFactory().getHarvestSourceDAO();
+			HarvestSourceDAO harvestSourceDAO = get().getDao(HarvestSourceDAO.class);
 			HarvestSourceDTO harvestSource = harvestSourceDAO.getHarvestSourceByUrl(url);
 			if (harvestSource==null){
 				harvestSource = new HarvestSourceDTO();
 				harvestSource.setUrl(url);
-				harvestSource.setName(url);
-				harvestSource.setType("data");
+				harvestSource.setTrackedFile(false);
 				sourceId = harvestSourceDAO.addSource(harvestSource, CRUser.application.getUserName());
 			}
 			else{
@@ -209,7 +205,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 			
 			Harvest harvest = new PullHarvest(harvestSource.getUrl(), urgent ? null : harvestSource.getLastHarvest());
 			
-			harvest.setPreviousHarvest(DAOFactory.getDAOFactory().getHarvestDAO().getLastHarvest(harvestSource.getSourceId().intValue()));
+			harvest.setPreviousHarvest(get().getDao(HarvestDAO.class).getLastHarvest(harvestSource.getSourceId().intValue()));
 			harvest.setDaoWriter(new HarvestDAOWriter(
 					harvestSource.getSourceId().intValue(), Harvest.TYPE_PULL, numOfResources, CRUser.application.getUserName()));
 			

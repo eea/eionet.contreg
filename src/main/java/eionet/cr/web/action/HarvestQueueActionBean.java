@@ -34,13 +34,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import eionet.cr.dao.DAOException;
-import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.UrgentHarvestQueueDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.UrgentHarvestQueueItemDTO;
-import eionet.cr.harvest.Harvest;
 import eionet.cr.harvest.scheduled.HarvestingJob;
-import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
-import eionet.cr.util.Util;
 
 /**
  * 
@@ -86,7 +83,7 @@ public class HarvestQueueActionBean extends AbstractActionBean{
 			batchQueue = HarvestingJob.getBatchHarvestingQueue();
 		}
 		else{
-			urgentQueue = DAOFactory.getDAOFactory().getUrgentHarvestQueueDAO().getUrgentHarvestQueue();
+			urgentQueue = factory.getDao(UrgentHarvestQueueDAO.class).getUrgentHarvestQueue();
 		}
 		
 		return new ForwardResolution("/pages/harvestQueue.jsp");

@@ -1,9 +1,6 @@
-<%@page contentType="text/html;charset=UTF-8" import="java.util.*,java.io.*,eionet.cr.dao.DAOFactory"%>
+<%@page contentType="text/html;charset=UTF-8"%>
 
 <%@ include file="/pages/common/taglibs.jsp"%>	
-
-<%@ page import="eionet.cr.dto.HarvestBaseDTO" %>
-<%@ page import="eionet.cr.harvest.Harvest" %>
 
 <stripes:layout-render name="/pages/common/template.jsp" pageTitle="View Harvesting Source">
 	<stripes:layout-component name="errors"/>
@@ -23,18 +20,8 @@
 			    	<stripes:hidden name="harvestSource.sourceId"/>
 			        <table>
 			            <tr>
-			                <td>Name:</td>
-			                <td><c:out value="${actionBean.harvestSource.name}"/></td>
-			            </tr>
-			            <tr>
 			                <td>URL:</td>
 			                <td><a href="${fn:escapeXml(actionBean.harvestSource.url)}"><c:out value="${actionBean.harvestSource.url}"/></a></td>
-			            </tr>
-			            <tr>
-			                <td>Type:</td>
-			                <td>
-			                	<c:out value="${actionBean.harvestSource.type}"/>
-			                </td>
 			            </tr>
 			            <tr>
 			                <td>E-mails:</td>
@@ -44,12 +31,6 @@
 			                <td>Date created:</td>
 			                <td>
 			                	<c:out value="${actionBean.harvestSource.timeCreated}"/>
-			                </td>
-			            </tr>
-			            <tr>
-			                <td>Creator:</td>
-			                <td>
-			                	<c:out value="${actionBean.harvestSource.creator}"/>
 			                </td>
 			            </tr>
 			            <tr>

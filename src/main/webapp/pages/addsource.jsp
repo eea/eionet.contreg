@@ -1,4 +1,4 @@
-<%@page contentType="text/html;charset=UTF-8" import="java.util.*,java.io.*,eionet.cr.dao.DAOFactory"%>
+<%@page contentType="text/html;charset=UTF-8"%>
 
 <%@ include file="/pages/common/taglibs.jsp"%>	
 
@@ -10,21 +10,8 @@
 	    <stripes:form action="/source.action" method="post">
 	        <table>
 	            <tr>
-	                <td>Name:</td>
-	                <td><stripes:text name="harvestSource.name" size="100"/></td>
-	            </tr>
-	            <tr>
 	                <td>URL:</td>
 	                <td><stripes:text name="harvestSource.url" size="100"/></td>
-	            </tr>
-	            <tr>
-	                <td>Type:</td>
-	                <td>
-	                	<stripes:select name="harvestSource.type">
-	                		<stripes:option value="data" label="Data"/>
-	                		<stripes:option value="schema" label="Schema"/>
-	                	</stripes:select>
-	                </td>
 	            </tr>
 	            <tr>
 	                <td>E-mails:</td>

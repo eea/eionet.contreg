@@ -25,14 +25,14 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import eionet.cr.util.sql.ResultSetBaseReader;
+import eionet.cr.util.sql.ResultSetListReader;
 
 /**
  * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class SingleIntColumnReader extends ResultSetBaseReader{
+public class SingleIntColumnReader extends ResultSetListReader<Integer>{
 	
 	/** */
 	private List<Integer> resultList = new ArrayList<Integer>();

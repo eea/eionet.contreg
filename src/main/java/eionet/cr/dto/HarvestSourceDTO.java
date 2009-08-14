@@ -32,18 +32,20 @@ import java.util.Date;
  */
 public class HarvestSourceDTO implements Serializable {
 	
+	/**
+	 * serial.
+	 */
+	private static final long serialVersionUID = 1L;
 	/** */
 	public static final int COUNT_UNAVAIL_THRESHOLD = 5;
 	public static final int DEFAULT_REFERRALS_INTERVAL = 60480;
 	
 	/** */
 	private Integer sourceId;
-	private String name;
 	private String url;
-	private String type;
 	private String emails;
+	private boolean trackedFile;
 	private Date timeCreated;
-	private String creator;
 	private Integer statements;
 	private Integer resources;
 	private Integer countUnavail;
@@ -71,20 +73,6 @@ public class HarvestSourceDTO implements Serializable {
 	}
 
 	/**
-	 * @return the name
-	 */
-	public String getName() {
-		return name;
-	}
-
-	/**
-	 * @param name the name to set
-	 */
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	/**
 	 * @return the url
 	 */
 	public String getUrl() {
@@ -96,20 +84,6 @@ public class HarvestSourceDTO implements Serializable {
 	 */
 	public void setUrl(String url) {
 		this.url = url;
-	}
-
-	/**
-	 * @return the type
-	 */
-	public String getType() {
-		return type;
-	}
-
-	/**
-	 * @param type the type to set
-	 */
-	public void setType(String type) {
-		this.type = type;
 	}
 
 	/**
@@ -138,20 +112,6 @@ public class HarvestSourceDTO implements Serializable {
 	 */
 	public void setTimeCreated(Date timeCreated) {
 		this.timeCreated = timeCreated;
-	}
-
-	/**
-	 * @return the creator
-	 */
-	public String getCreator() {
-		return creator;
-	}
-
-	/**
-	 * @param creator the creator to set
-	 */
-	public void setCreator(String creator) {
-		this.creator = creator;
 	}
 
 	/**
@@ -231,6 +191,20 @@ public class HarvestSourceDTO implements Serializable {
 		this.lastHarvest = lastHarvest;
 	}
 	
+	/**
+	 * @return the trackedFile
+	 */
+	public boolean isTrackedFile() {
+		return trackedFile;
+	}
+
+	/**
+	 * @param trackedFile the trackedFile to set
+	 */
+	public void setTrackedFile(boolean trackedFile) {
+		this.trackedFile = trackedFile;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Object#toString()
@@ -238,4 +212,6 @@ public class HarvestSourceDTO implements Serializable {
 	public String toString(){
 		return new StringBuffer().append("Harvest source ").append(url).toString();
 	}
+
+	
 }

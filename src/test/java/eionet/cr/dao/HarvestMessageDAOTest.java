@@ -20,6 +20,8 @@
  */
 package eionet.cr.dao;
 
+import static eionet.cr.dao.mysql.MySQLDAOFactory.get;
+
 import java.util.List;
 
 import org.dbunit.DBTestCase;
@@ -28,6 +30,7 @@ import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.junit.Test;
 
 import eionet.cr.config.GeneralConfig;
+import eionet.cr.dao.mysql.MySQLHarvestMessageDAO;
 import eionet.cr.dto.HarvestMessageDTO;
 import eionet.cr.test.util.DbHelper;
 import eionet.cr.util.sql.ConnectionUtil;
@@ -66,7 +69,7 @@ public class HarvestMessageDAOTest extends DBTestCase {
 		harvestMessage.setType("01");
 		
 		ConnectionUtil.setReturnSimpleConnection(true);
-		Integer messageID = DAOFactory.getDAOFactory().getHarvestMessageDAO().insertHarvestMessage(harvestMessage);
+		Integer messageID = get().getDao(HarvestMessageDAO.class).insertHarvestMessage(harvestMessage);
 		assertNotNull(messageID);
 	}
 	
@@ -74,7 +77,7 @@ public class HarvestMessageDAOTest extends DBTestCase {
 	public void testFindHarvestMessagesByHarvestID() throws Exception {
 		
 		ConnectionUtil.setReturnSimpleConnection(true);
-		List<HarvestMessageDTO> messages = DAOFactory.getDAOFactory().getHarvestMessageDAO().findHarvestMessagesByHarvestID(121);
+		List<HarvestMessageDTO> messages = get().getDao(HarvestMessageDAO.class).findHarvestMessagesByHarvestID(121);
 		assertEquals(2, messages.size());
 		
 	}
@@ -83,7 +86,7 @@ public class HarvestMessageDAOTest extends DBTestCase {
 	public void testFindHarvestMessageByMessageID() throws Exception {
 		
 		ConnectionUtil.setReturnSimpleConnection(true);
-		HarvestMessageDTO message = DAOFactory.getDAOFactory().getHarvestMessageDAO().findHarvestMessageByMessageID(4);
+		HarvestMessageDTO message = get().getDao(HarvestMessageDAO.class).findHarvestMessageByMessageID(4);
 		assertEquals(new Integer(121), message.getHarvestId());
 		assertEquals("ERROR", message.getMessage());
 		assertEquals("Stack Trace: whatever", message.getStackTrace());
@@ -94,9 +97,9 @@ public class HarvestMessageDAOTest extends DBTestCase {
 	public void testDeleteMessage() throws Exception {
 
 		ConnectionUtil.setReturnSimpleConnection(true);
-		DAOFactory.getDAOFactory().getHarvestMessageDAO().deleteMessage(5);
+		get().getDao(HarvestMessageDAO.class).deleteMessage(5);
 		
-		HarvestMessageDTO message = DAOFactory.getDAOFactory().getHarvestMessageDAO().findHarvestMessageByMessageID(5);
+		HarvestMessageDTO message = get().getDao(HarvestMessageDAO.class).findHarvestMessageByMessageID(5);
 		assertNull(message);
 	}
 

@@ -23,19 +23,18 @@ package eionet.cr.dto.readers;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashSet;
 import java.util.List;
 
+import eionet.cr.dto.HarvestBaseDTO;
 import eionet.cr.dto.HarvestDTO;
-import eionet.cr.util.sql.ResultSetBaseReader;
+import eionet.cr.util.sql.ResultSetListReader;
 
 /**
  * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class HarvestWithMessageTypesReader extends ResultSetBaseReader{
+public class HarvestWithMessageTypesReader extends ResultSetListReader<HarvestDTO> {
 	
 	/** */
 	private List<HarvestDTO> resultList = new ArrayList<HarvestDTO>();
@@ -87,7 +86,7 @@ public class HarvestWithMessageTypesReader extends ResultSetBaseReader{
 			curHarvest.setLitObjStatements(new Integer(rs.getInt("HARVEST.LIT_STATEMENTS")));
 		}
 		
-		curHarvest.addMessageType(curHarvest, rs.getString("HARVEST_MESSAGE.TYPE"));
+		HarvestBaseDTO.addMessageType(curHarvest, rs.getString("HARVEST_MESSAGE.TYPE"));
 	}
 
 	/**

@@ -29,7 +29,7 @@ import eionet.cr.dto.HarvestMessageDTO;
  * @author heinljab
  *
  */
-public interface HarvestMessageDAO {
+public interface HarvestMessageDAO extends IDao {
 
 	/**
 	 * 

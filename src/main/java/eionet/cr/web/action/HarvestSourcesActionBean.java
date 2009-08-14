@@ -29,10 +29,13 @@ import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
-import eionet.cr.common.HarvestSourceType;
+
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
+
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
-import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
@@ -46,6 +49,8 @@ public class HarvestSourcesActionBean extends AbstractActionBean {
 	
 	/** */
 	private static final String UNAVAILABLE_TYPE = "unavail";
+
+	private static final String TRACKED_FILES = "tracked_file";
 	
 	/** */
 	private List<HarvestSourceDTO> harvestSources;
@@ -53,6 +58,13 @@ public class HarvestSourcesActionBean extends AbstractActionBean {
 	/** */
 	public static List<Map<String,String>> sourceTypes;
 	
+	
+	/**
+	 * the string to be searched 
+	 */
+	private String searchString;
+	
+
 	/** */
 	private String type;
 
@@ -70,18 +82,21 @@ public class HarvestSourcesActionBean extends AbstractActionBean {
 	 * @throws DAOException 
 	 */
 	@DefaultHandler
-	public Resolution view() throws DAOException{
-		
-		if (type!=null && type.length()>0){
-			if (type.equals(UNAVAILABLE_TYPE))
-				harvestSources = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourcesUnavailable();
-			else
-				harvestSources = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourcesByType(type);
+	public Resolution view() throws DAOException {
+		String filterString = null; 
+		if(!StringUtils.isEmpty(this.searchString)) {
+			filterString = "%" + StringEscapeUtils.escapeSql(this.searchString) + "%";
 		}
-		
+		if(type == null) {
+			harvestSources = factory.getDao(HarvestSourceDAO.class).getHarvestSources(filterString);
+		} else if (TRACKED_FILES.equals(type)) {
+				harvestSources = factory.getDao(HarvestSourceDAO.class).getHarvestTrackedFiles(filterString);
+		} else if (UNAVAILABLE_TYPE.equals(type)) {
+				harvestSources = factory.getDao(HarvestSourceDAO.class).getHarvestSourcesUnavailable(filterString);
+		}
 		return new ForwardResolution("/pages/sources.jsp");
 	}
-
+	
 	/**
 	 * 
 	 * @return
@@ -91,7 +106,7 @@ public class HarvestSourcesActionBean extends AbstractActionBean {
 		
 		if(isUserLoggedIn()){
 			if (sourceUrl!=null && !sourceUrl.isEmpty()){
-				DAOFactory.getDAOFactory().getHarvestSourceDAO().deleteSourcesByUrl(sourceUrl);
+				factory.getDao(HarvestSourceDAO.class).deleteSourcesByUrl(sourceUrl);
 				showMessage("Harvest source(s) deleted!");
 			}
 		}
@@ -141,18 +156,13 @@ public class HarvestSourcesActionBean extends AbstractActionBean {
 			sourceTypes = new ArrayList<Map<String,String>>();
 			
 			Map<String,String> typeMap = new HashMap<String,String>();
-			typeMap.put("title", "Data");
-			typeMap.put("type", "data");
+			typeMap.put("title", "Sources");
 			sourceTypes.add(typeMap);
 			
-			typeMap = new HashMap<String,String>();
-			typeMap.put("title", "Schemas");
-			typeMap.put("type", "schema");
-			sourceTypes.add(typeMap);
 			
 			typeMap = new HashMap<String,String>();
 			typeMap.put("title", "Tracked files");
-			typeMap.put("type", HarvestSourceType.tracked_file.toString());
+			typeMap.put("type", TRACKED_FILES);
 			sourceTypes.add(typeMap);
 			
 			typeMap = new HashMap<String,String>();
@@ -199,4 +209,19 @@ public class HarvestSourcesActionBean extends AbstractActionBean {
 		StringBuffer buf = new StringBuffer(urlBinding);
 		return buf.append("?view=").toString();
 	}
+
+	/**
+	 * @param searchString the searchString to set
+	 */
+	public void setSearchString(String searchString) {
+		this.searchString = searchString;
+	}
+
+	/**
+	 * @return the searchString
+	 */
+	public String getSearchString() {
+		return searchString;
+	}
+
 }

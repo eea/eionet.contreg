@@ -22,7 +22,6 @@ package eionet.cr.harvest;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -33,7 +32,6 @@ import java.net.UnknownHostException;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -42,10 +40,10 @@ import org.xml.sax.SAXException;
 import eionet.cr.common.Predicates;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
-import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.HarvestSourceDAO;
+import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.harvest.util.arp.ARPSource;
-import eionet.cr.harvest.util.arp.ATriple;
 import eionet.cr.harvest.util.arp.InputStreamBasedARPSource;
 import eionet.cr.util.FileUtil;
 import eionet.cr.util.URLUtil;
@@ -136,7 +134,7 @@ public class PullHarvest extends Harvest{
 					logger.debug(sourceNotExistMessage + ", going to delete the source");
 					try {
 						daoWriter = null; // we won't finishing actions to be done
-						DAOFactory.getDAOFactory().getHarvestSourceDAO().deleteSourcesByUrl(Collections.singletonList(sourceUrlString));
+						MySQLDAOFactory.get().getDao(HarvestSourceDAO.class).deleteSourcesByUrl(Collections.singletonList(sourceUrlString));
 					}
 					catch (DAOException e){
 						logger.warn("Failure when deleting the source", e);

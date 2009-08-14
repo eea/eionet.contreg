@@ -32,7 +32,7 @@ import java.util.Map;
  * @author heinljab
  *
  */
-public class SQLValueReader extends ResultSetBaseReader{
+public class SQLValueReader extends ResultSetListReader<Map<String,SQLValue>>{
 	
 	/** */
 	private List<Map<String,SQLValue>> result = new ArrayList<Map<String,SQLValue>>();

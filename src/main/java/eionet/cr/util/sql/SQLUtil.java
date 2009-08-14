@@ -57,19 +57,6 @@ public class SQLUtil {
 			SQLUtil.close(stmt);
 		}
 	}
-
-	/**
-	 * 
-	 * @param parameterizedSQL
-	 * @param valueMap
-	 * @throws SQLException 
-	 */
-	public static List<Map<String,SQLValue>> executeQuery(String parameterizedSQL, List<?> values, Connection conn) throws SQLException{
-		
-		SQLValueReader sqlValueReader = new SQLValueReader();
-		executeQuery(parameterizedSQL, values, sqlValueReader, conn);
-		return sqlValueReader.getResultList();
-	}
 	
 	/**
 	 * 

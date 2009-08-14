@@ -30,7 +30,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -42,7 +41,6 @@ import com.hp.hpl.jena.rdf.arp.ALiteral;
 import com.hp.hpl.jena.rdf.arp.AResource;
 import com.hp.hpl.jena.rdf.arp.StatementHandler;
 
-import eionet.cr.common.HarvestSourceType;
 import eionet.cr.common.LabelPredicates;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
@@ -53,14 +51,12 @@ import eionet.cr.dto.SubjectDTO;
 import eionet.cr.dto.UnfinishedHarvestDTO;
 import eionet.cr.harvest.util.HarvestLog;
 import eionet.cr.harvest.util.arp.AResourceImpl;
-import eionet.cr.harvest.util.arp.ATriple;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.UnicodeUtils;
 import eionet.cr.util.Util;
 import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.sql.ConnectionUtil;
 import eionet.cr.util.sql.SQLUtil;
-import eionet.cr.web.security.CRUser;
 
 /**
  * 
@@ -730,14 +726,14 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 		logger.debug("Extracting tracked files");
 		
 		// harvest interval for tracked files		
-		Integer interval = Integer.valueOf(GeneralConfig.getProperty(GeneralConfig.HARVESTER_REFERRALS_INTERVAL,
-				String.valueOf(HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL)));
+		Integer interval = Integer.valueOf(
+				GeneralConfig.getProperty(
+						GeneralConfig.HARVESTER_REFERRALS_INTERVAL,
+						String.valueOf(HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL)));
 
 		StringBuffer buf = new StringBuffer().
-		append("insert ignore into HARVEST_SOURCE (NAME, URL, TYPE, TIME_CREATED, CREATOR, INTERVAL_MINUTES, SOURCE, GEN_TIME) ").		
-		append("select URI, URI, '").append(HarvestSourceType.tracked_file).
-		append("', now(), '").append(CRUser.application.getUserName()).
-		append("', '").append(interval).append("', ").append(sourceUrlHash).append(", ").append(genTime).
+		append("insert ignore into HARVEST_SOURCE (URL, TRACKED_FILE, TIME_CREATED, INTERVAL_MINUTES, SOURCE, GEN_TIME) ").		
+		append("select URI, 'Y', now(),").append(interval).append(",").append(sourceUrlHash).append(", ").append(genTime).
 		append(" from SPO,RESOURCE where SPO.SOURCE=").append(sourceUrlHash).append(" and SPO.GEN_TIME=").append(genTime).
 		append(" and SPO.PREDICATE=").append(Hashes.spoHash(Predicates.RDF_TYPE)).
 		append(" and SPO.ANON_OBJ='N' and SPO.OBJECT_HASH=").append(Hashes.spoHash(Subjects.CR_FILE)).

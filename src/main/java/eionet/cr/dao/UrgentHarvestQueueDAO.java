@@ -29,7 +29,7 @@ import eionet.cr.dto.UrgentHarvestQueueItemDTO;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public interface UrgentHarvestQueueDAO {
+public interface UrgentHarvestQueueDAO extends IDao {
 
 	/**
 	 * 

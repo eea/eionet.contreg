@@ -1,4 +1,4 @@
-<%@page contentType="text/html;charset=UTF-8" import="java.util.*,java.io.*"%>
+<%@page contentType="text/html;charset=UTF-8"%>
 
 <%@ include file="/pages/common/taglibs.jsp"%>	
 
@@ -17,9 +17,21 @@
 					</li>
 				</ul>
 			</div>
-			      			
+						      			
 			<h1>Harvesting sources</h1>
 			<p></p>
+			<div id="searchForm" style="padding-bottom: 5px">
+				<stripes:label for="filterString" class="question">Filter expression</stripes:label>
+				<stripes:text name="searchString" id="filterString"/>
+				<stripes:hidden name="type" value="${actionBean.type }"/>
+				<stripes:submit name="view" value="Filter" />
+				<c:if test="${!empty actionBean.searchString }"> 
+					<stripes:link href="${actionBean.urlBinding}?view">
+						<stripes:link-param name="type" value="${actionBean.type }"/>
+						<img src="${pageContext.request.contextPath}/images/delete_small.gif" title="Remove filter" alt="Remove filter"/>
+					</stripes:link>
+				</c:if>
+			</div>
 			<div id="tabbedmenu">
 			    <ul>
 			    	<c:forEach items="${actionBean.sourceTypes}" var="loopItem">
@@ -32,6 +44,7 @@
 									<stripes:link href="${actionBean.urlBinding}">
 										<c:out value="${loopItem.title}"/>
 						                <stripes:param name="type" value="${loopItem.type}"/>
+						                <stripes:param name="searchString" value="${actionBean.searchString }"/>
 						            </stripes:link>
 					            </li>
 							</c:otherwise>

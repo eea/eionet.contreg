@@ -26,14 +26,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import eionet.cr.dto.HarvestDTO;
-import eionet.cr.util.sql.ResultSetBaseReader;
+import eionet.cr.util.sql.ResultSetListReader;
 
 /**
  * 
  * @author altnyris
  *
  */
-public class HarvestDTOReader extends ResultSetBaseReader {
+public class HarvestDTOReader extends ResultSetListReader<HarvestDTO> {
 
 	/** */
 	List<HarvestDTO> resultList = new ArrayList<HarvestDTO>();

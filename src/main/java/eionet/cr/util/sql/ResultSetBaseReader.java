@@ -29,7 +29,7 @@ import java.sql.SQLException;
  * @author heinljab
  *
  */
-public abstract class ResultSetBaseReader{
+public abstract class ResultSetBaseReader {
 	
 	/** */
 	protected ResultSetMetaData rsMd = null;
@@ -48,4 +48,5 @@ public abstract class ResultSetBaseReader{
 	 * @throws SQLException 
 	 */
 	public abstract void readRow(ResultSet rs) throws SQLException;
+	
 }

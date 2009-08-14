@@ -1,4 +1,4 @@
-<%@page contentType="text/html;charset=UTF-8" import="java.util.*,java.io.*,eionet.cr.dao.DAOFactory"%>
+<%@page contentType="text/html;charset=UTF-8"%>
 
 <%@ include file="/pages/common/taglibs.jsp"%>	
 

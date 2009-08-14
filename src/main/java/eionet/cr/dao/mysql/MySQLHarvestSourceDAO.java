@@ -21,15 +21,13 @@
 package eionet.cr.dao.mysql;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.dao.DAOException;
-import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.readers.HarvestSourceDTOReader;
@@ -38,7 +36,6 @@ import eionet.cr.util.Hashes;
 import eionet.cr.util.Util;
 import eionet.cr.util.sql.ConnectionUtil;
 import eionet.cr.util.sql.SQLUtil;
-import eionet.cr.util.sql.SQLValue;
 
 /**
  * @author altnyris
@@ -46,68 +43,55 @@ import eionet.cr.util.sql.SQLValue;
  */
 public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSourceDAO {
 	
-	/**
-	 * 
-	 */
-	public MySQLHarvestSourceDAO() {
+	MySQLHarvestSourceDAO() {
+		//reducing visibility
 	}
 	
 	/** */
-	private static final String getSourcesSQL = "select * from HARVEST_SOURCE order by TYPE desc, URL";
+	private static final String getSourcesSQL = "SELECT * FROM HARVEST_SOURCE WHERE TRACKED_FILE = 'N' AND COUNT_UNAVAIL = 0 ORDER BY URL";
+	private static final String searchSourcesSQL = "SELECT * FROM HARVEST_SOURCE WHERE TRACKED_FILE = 'N' AND COUNT_UNAVAIL = 0 AND URL like (?) ORDER BY URL";
 		
 	/*
      * (non-Javadoc)
      * 
      * @see eionet.cr.dao.HarvestSourceDao#getHarvestSources()
      */
-    public List<HarvestSourceDTO> getHarvestSources() throws DAOException {
-    	List<Object> values = new ArrayList<Object>();
-				
-		Connection conn = null;
-		HarvestSourceDTOReader rsReader = new HarvestSourceDTOReader();
-		try{
-			conn = getConnection();
-			SQLUtil.executeQuery(getSourcesSQL, values, rsReader, conn);
-			List<HarvestSourceDTO>  list = rsReader.getResultList();
-			return list;
-		}
-		catch (Exception e){
-			throw new DAOException(e.getMessage(), e);
-		}
-		finally{
-			try{
-				if (conn!=null) conn.close();
-			}
-			catch (SQLException e){}
-		}
+    public List<HarvestSourceDTO> getHarvestSources(String searchString) throws DAOException {
+    	if (StringUtils.isEmpty(searchString)) {
+    		return executeQuery(getSourcesSQL, new ArrayList<Object>(), new HarvestSourceDTOReader());
+    	} else {
+    		return executeQuery(searchSourcesSQL, Collections.singletonList(searchString), new HarvestSourceDTOReader());
+    	}
     }
+    
+    private static final String getHarvestTrackedFiles = "SELECT * FROM HARVEST_SOURCE WHERE TRACKED_FILE = 'Y' ORDER BY URL";
+    private static final String searchHarvestTrackedFiles = "SELECT * FROM HARVEST_SOURCE WHERE TRACKED_FILE = 'Y' and URL like(?) ORDER BY URL";
+	/** 
+	 * @see eionet.cr.dao.HarvestSourceDAO#getHarvestTrackedFiles()
+	 * {@inheritDoc}
+	 */
+	public List<HarvestSourceDTO> getHarvestTrackedFiles(String searchString) throws DAOException {
+		if (StringUtils.isEmpty(searchString)) {
+			return executeQuery(getHarvestTrackedFiles, new ArrayList<Object>(), new HarvestSourceDTOReader());
+		} else {
+			return executeQuery(searchHarvestTrackedFiles, Collections.singletonList(searchString), new HarvestSourceDTOReader());
+		}
+	}
 
-    /** */
-    private static final String getSourcesByTypeSQL = "select * from HARVEST_SOURCE where TYPE=? order by TYPE desc, URL";
-    /*
-     * (non-Javadoc)
-     * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSourcesByType()
-     */
-    public List<HarvestSourceDTO> getHarvestSourcesByType(String type) throws DAOException {
-    	
-    	List<Object> values = new ArrayList<Object>();
-    	values.add(type);
-				
-		Connection conn = null;
-		HarvestSourceDTOReader rsReader = new HarvestSourceDTOReader();
-		try{
-			conn = getConnection();
-			SQLUtil.executeQuery(getSourcesByTypeSQL, values, rsReader, conn);
-			return rsReader.getResultList();
-		}
-		catch (Exception e){
-			throw new DAOException(e.getMessage(), e);
-		}
-		finally{
-			try{
-				if (conn!=null) conn.close();
-			}
-			catch (SQLException e){}
+	/** */
+	private static final String getHarvestSourcesUnavailableSQL =
+		"select * from HARVEST_SOURCE where COUNT_UNAVAIL > " + HarvestSourceDTO.COUNT_UNAVAIL_THRESHOLD;
+	private static final String searchHarvestSourcesUnavailableSQL =
+		"select * from HARVEST_SOURCE where URL like (?) AND COUNT_UNAVAIL > " + HarvestSourceDTO.COUNT_UNAVAIL_THRESHOLD;
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSourcesUnavailable()
+	 */
+	public List<HarvestSourceDTO> getHarvestSourcesUnavailable(String searchString) throws DAOException {
+		if (StringUtils.isEmpty(searchString)) {
+			return executeQuery(getHarvestSourcesUnavailableSQL, new ArrayList<Object>(), new HarvestSourceDTOReader());
+		} else {
+			return executeQuery(searchHarvestSourcesUnavailableSQL, Collections.singletonList(searchString), new HarvestSourceDTOReader());
 		}
 	}
     
@@ -122,25 +106,8 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
     public HarvestSourceDTO getHarvestSourceById(Integer harvestSourceID) throws DAOException {
     	List<Object> values = new ArrayList<Object>();
     	values.add(harvestSourceID);
-				
-		Connection conn = null;
-		HarvestSourceDTO source = null;
-		HarvestSourceDTOReader rsReader = new HarvestSourceDTOReader();
-		try{
-			conn = getConnection();
-			SQLUtil.executeQuery(getSourcesByIdSQL, values, rsReader, conn);
-			List<HarvestSourceDTO>  list = rsReader.getResultList();
-			return (list!=null && !list.isEmpty()) ? list.get(0) : null;
-		}
-		catch (Exception e){
-			throw new DAOException(e.getMessage(), e);
-		}
-		finally{
-			try{
-				if (conn!=null) conn.close();
-			}
-			catch (SQLException e){}
-		}
+    	List<HarvestSourceDTO> list =  executeQuery(getSourcesByIdSQL, values, new HarvestSourceDTOReader());
+    	return (list!=null && !list.isEmpty()) ? list.get(0) : null;
     }
 
     /** */
@@ -151,33 +118,15 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
      * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSourceByUrl(java.lang.String)
      */
 	public HarvestSourceDTO getHarvestSourceByUrl(String url) throws DAOException {
-		
-    	List<Object> values = new ArrayList<Object>();
-    	values.add(url);
-				
-		Connection conn = null;
-		HarvestSourceDTO source = null;
-		HarvestSourceDTOReader rsReader = new HarvestSourceDTOReader();
-		try{
-			conn = getConnection();
-			SQLUtil.executeQuery(getSourcesByUrlSQL, values, rsReader, conn);
-			List<HarvestSourceDTO>  list = rsReader.getResultList();
-			return (list!=null && !list.isEmpty()) ? list.get(0) : null;
-		}
-		catch (Exception e){
-			throw new DAOException(e.getMessage(), e);
-		}
-		finally{
-			try{
-				if (conn!=null) conn.close();
-			}
-			catch (SQLException e){}
-		}
+		List<Object> values = new ArrayList<Object>();
+		values.add(url);
+		List<HarvestSourceDTO> list = executeQuery(getSourcesByUrlSQL, values, new HarvestSourceDTOReader());
+		return (list!=null && !list.isEmpty()) ? list.get(0) : null;
 	}
 
     /** */
-	private static final String addSourceSQL = "insert into HARVEST_SOURCE (NAME,URL,TYPE,EMAILS,TIME_CREATED,CREATOR,INTERVAL_MINUTES) VALUES (?,?,?,?,NOW(),?,?)";
-	private static final String addSourceIgnoreSQL = "insert into HARVEST_SOURCE (NAME,URL,TYPE,EMAILS,TIME_CREATED,CREATOR,INTERVAL_MINUTES) VALUES (?,?,?,?,NOW(),?,?) on duplicate key update HARVEST_SOURCE_ID=LAST_INSERT_ID(HARVEST_SOURCE_ID)";
+	private static final String addSourceSQL = "insert into HARVEST_SOURCE (URL,EMAILS,TIME_CREATED,INTERVAL_MINUTES) VALUES (?,?,NOW(),?)";
+	private static final String addSourceIgnoreSQL = "insert into HARVEST_SOURCE (URL,EMAILS,TIME_CREATED,INTERVAL_MINUTES) VALUES (?,?,NOW(),?) on duplicate key update HARVEST_SOURCE_ID=LAST_INSERT_ID(HARVEST_SOURCE_ID)";
 
 	/*
      * (non-Javadoc)
@@ -209,11 +158,8 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 		Integer harvestSourceID = null;
     	
     	List<Object> values = new ArrayList<Object>();
-		values.add(source.getName());
 		values.add(source.getUrl());
-		values.add(source.getType());
 		values.add(source.getEmails());
-		values.add(user);
 		values.add(source.getIntervalMinutes());
 		
 		Connection conn = null;
@@ -232,7 +178,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 	}
 
     /** */
-	private static final String editSourceSQL = "update HARVEST_SOURCE set NAME=?,URL=?,TYPE=?,EMAILS=?,INTERVAL_MINUTES=? where HARVEST_SOURCE_ID=?";
+	private static final String editSourceSQL = "update HARVEST_SOURCE set URL=?, EMAILS=?,INTERVAL_MINUTES=? where HARVEST_SOURCE_ID=?";
 	
 	/*
      * (non-Javadoc)
@@ -242,9 +188,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
     public void editSource(HarvestSourceDTO source) throws DAOException {
     	    	
     	List<Object> values = new ArrayList<Object>();
-		values.add(source.getName());
 		values.add(source.getUrl());
-		values.add(source.getType());
 		values.add(source.getEmails());
 		values.add(source.getIntervalMinutes());
 		values.add(source.getSourceId());
@@ -371,29 +315,6 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 		}
 	}
 
-	/** */
-	private static final String getHarvestSourcesUnavailableSQL =
-		"select * from HARVEST_SOURCE where COUNT_UNAVAIL > " + HarvestSourceDTO.COUNT_UNAVAIL_THRESHOLD;
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSourcesUnavailable()
-	 */
-	public List<HarvestSourceDTO> getHarvestSourcesUnavailable() throws DAOException {
-		
-		Connection conn = null;
-		HarvestSourceDTOReader rsReader = new HarvestSourceDTOReader();
-		try{
-			conn = getConnection();
-			SQLUtil.executeQuery(getHarvestSourcesUnavailableSQL, new ArrayList<Object>(), rsReader, conn);
-			return rsReader.getResultList();
-		}
-		catch (Exception e){
-			throw new DAOException(e.getMessage(), e);
-		}
-		finally{
-			ConnectionUtil.closeConnection(conn);
-		}
-	}
 
 	private static final String getNextScheduledSourcesSQL =
 		
@@ -429,4 +350,5 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 			ConnectionUtil.closeConnection(conn);
 		}
 	}
+
 }

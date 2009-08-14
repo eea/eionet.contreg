@@ -21,7 +21,6 @@
 package eionet.cr.dao;
 
 import java.util.List;
-import java.util.Map;
 
 import eionet.cr.dto.HarvestSourceDTO;
 
@@ -29,21 +28,26 @@ import eionet.cr.dto.HarvestSourceDTO;
  * @author altnyris
  *
  */
-public interface HarvestSourceDAO {
+public interface HarvestSourceDAO extends IDao{
 	/**
-     * @return list of harvesting sources
+	 * 
+     * @return list of harvesting sources (excluding unavailable sources and tracked files)
      * @throws DAOException
      */
-    public List<HarvestSourceDTO> getHarvestSources() throws DAOException;
-
-    /**
-     * 
-     * @param type
-     * @return
-     * @throws DAOException
-     */
-    public List<HarvestSourceDTO> getHarvestSourcesByType(String type) throws DAOException;
+    List<HarvestSourceDTO> getHarvestSources(String searchString) throws DAOException;
     
+    /**
+     * @return list of harvest tracked files
+     * @throws DAOException
+     */
+    List<HarvestSourceDTO> getHarvestTrackedFiles(String searchString) throws DAOException;
+    
+    /**
+     * @return list of unavailable harvest sources
+     * @throws DAOException
+     */
+    List<HarvestSourceDTO> getHarvestSourcesUnavailable(String searchString) throws DAOException;
+
     /**
      * @return harvesting sources
      * @throws DAOException
@@ -101,13 +105,6 @@ public interface HarvestSourceDAO {
      */
     public void updateHarvestStarted(int sourceId) throws DAOException;
     
-    /**
-     * 
-     * @return
-     * @throws DAOException
-     */
-    public List<HarvestSourceDTO> getHarvestSourcesUnavailable() throws DAOException;
-
     /**
      * 
      * @param numOfSegments

@@ -22,7 +22,7 @@
 		    			<stripes:hidden name="addFilter"/>
 		    			<c:if test="${fn:length(actionBean.selectedFilters)<fn:length(actionBean.availableFilters)}">
 			    			<stripes:select name="addedFilter" id="filterSelect" onchange="this.form.submit();" >
-			    				<stripes:option value="" label=""/>
+			    				<stripes:option value="" label="Add filter"/>
 			    				<c:forEach var="availableFilter" items="${actionBean.availableFilters}">
 			    					<c:if test="${actionBean.selectedFilters[availableFilter.key]==null}">
 			    						<stripes:option value="${availableFilter.key}" label="${availableFilter.value.title}" title="${availableFilter.value.uri}"/>

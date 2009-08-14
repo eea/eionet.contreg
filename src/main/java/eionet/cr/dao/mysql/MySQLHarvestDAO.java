@@ -21,15 +21,11 @@
 package eionet.cr.dao.mysql;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HarvestDAO;
-import eionet.cr.dto.HarvestBaseDTO;
 import eionet.cr.dto.HarvestDTO;
 import eionet.cr.dto.readers.HarvestDTOReader;
 import eionet.cr.dto.readers.HarvestWithMessageTypesReader;
@@ -43,6 +39,10 @@ import eionet.cr.util.sql.SQLUtil;
  *
  */
 public class MySQLHarvestDAO extends MySQLBaseDAO implements HarvestDAO {
+	
+	MySQLHarvestDAO(){
+		//reducing visibility
+	}
 
 	/** */
 	private static final String insertStartedHarvestSQL = 
@@ -125,23 +125,7 @@ public class MySQLHarvestDAO extends MySQLBaseDAO implements HarvestDAO {
     	List<Object> values = new ArrayList<Object>();
     	values.add(harvestSourceId);
     	values.add(HarvestMessageType.values().length * maxDistinctHarvests);
-				
-		Connection conn = null;
-		HarvestWithMessageTypesReader rsReader = new HarvestWithMessageTypesReader(maxDistinctHarvests);
-		try{
-			conn = getConnection();
-			SQLUtil.executeQuery(getHarvestsBySourceIdSQL, values, rsReader, conn);
-			return rsReader.getResultList();
-		}
-		catch (Exception e){
-			throw new DAOException(e.getMessage(), e);
-		}
-		finally{
-			try{
-				if (conn!=null) conn.close();
-			}
-			catch (SQLException e){}
-		}
+		return executeQuery(getHarvestsBySourceIdSQL, values, new HarvestWithMessageTypesReader(maxDistinctHarvests));		
     }
 
     /** */
@@ -152,27 +136,10 @@ public class MySQLHarvestDAO extends MySQLBaseDAO implements HarvestDAO {
      * @see eionet.cr.dao.HarvestDAO#getHarvestById(java.lang.Integer)
      */
 	public HarvestDTO getHarvestById(Integer harvestId) throws DAOException {
-		
 		List<Object> values = new ArrayList<Object>();
     	values.add(harvestId);
-				
-		Connection conn = null;
-		HarvestDTOReader rsReader = new HarvestDTOReader();
-		try{
-			conn = getConnection();
-			SQLUtil.executeQuery(getHarvestByIdSQL, values, rsReader, conn);
-			List<HarvestDTO>  list = rsReader.getResultList();
-			return list!=null && list.size()>0 ? list.get(0) : null;
-		}
-		catch (Exception e){
-			throw new DAOException(e.getMessage(), e);
-		}
-		finally{
-			try{
-				if (conn!=null) conn.close();
-			}
-			catch (SQLException e){}
-		}
+		List<HarvestDTO> list = executeQuery(getHarvestByIdSQL, values, new HarvestDTOReader());
+		return list!=null && list.size()>0 ? list.get(0) : null;
 	}
 
 	/** */
@@ -182,26 +149,9 @@ public class MySQLHarvestDAO extends MySQLBaseDAO implements HarvestDAO {
 	 * @see eionet.cr.dao.HarvestDAO#getLastHarvest(java.lang.Integer)
 	 */
 	public HarvestDTO getLastHarvest(Integer harvestSourceId) throws DAOException {
-		
 		List<Object> values = new ArrayList<Object>();
     	values.add(harvestSourceId);
-				
-		Connection conn = null;
-		HarvestDTOReader rsReader = new HarvestDTOReader();
-		try{
-			conn = getConnection();
-			SQLUtil.executeQuery(getLastHarvestSQL, values, rsReader, conn);
-			List<HarvestDTO> list = rsReader.getResultList();
-			return list!=null && !list.isEmpty() ? list.get(0) : null;
-		}
-		catch (Exception e){
-			throw new DAOException(e.getMessage(), e);
-		}
-		finally{
-			try{
-				if (conn!=null) conn.close();
-			}
-			catch (SQLException e){}
-		}
+		List<HarvestDTO> list = executeQuery(getLastHarvestSQL, values, new HarvestDTOReader());		
+		return list!=null && !list.isEmpty() ? list.get(0) : null;
 	}
 }

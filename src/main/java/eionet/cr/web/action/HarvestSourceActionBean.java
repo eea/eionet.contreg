@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 
 import net.sourceforge.stripes.action.DefaultHandler;
@@ -36,12 +35,12 @@ import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.validation.SimpleError;
 import net.sourceforge.stripes.validation.ValidationMethod;
 
-import org.apache.commons.lang.StringUtils;
 import org.quartz.SchedulerException;
 
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
-import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.HarvestDAO;
+import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.HarvestDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
@@ -52,7 +51,6 @@ import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.SourceContentsSearch;
 import eionet.cr.util.URLUtil;
-import eionet.cr.util.Util;
 
 /**
  * @author altnyris
@@ -114,17 +112,18 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     	if (harvestSource!=null){
     		Integer sourceId = harvestSource.getSourceId();
     		String url = harvestSource.getUrl();
+    		
     		if (sourceId!=null){
-    			harvestSource = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(sourceId);
+    			harvestSource = factory.getDao(HarvestSourceDAO.class).getHarvestSourceById(sourceId);
     		}
     		else if (url!=null && url.trim().length()>0){
-    			harvestSource = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceByUrl(url);
+    			harvestSource = factory.getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(url);
     		}
     		
     		if (harvestSource!=null){
     			
     			// populate history of harvests
-    			harvests = DAOFactory.getDAOFactory().getHarvestDAO().getHarvestsBySourceId(harvestSource.getSourceId());
+    			harvests = factory.getDao(HarvestDAO.class).getHarvestsBySourceId(harvestSource.getSourceId());
     			
     			// populate sample triples
     			populateSampleTriples();
@@ -182,7 +181,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
 		Resolution resolution = new ForwardResolution("/pages/addsource.jsp");
 		if(isUserLoggedIn()){
 			if (isPostRequest()){
-				DAOFactory.getDAOFactory().getHarvestSourceDAO().addSource(getHarvestSource(), getUserName());
+				factory.getDao(HarvestSourceDAO.class).addSource(getHarvestSource(), getUserName());
 				resolution = new ForwardResolution(HarvestSourcesActionBean.class);
 			}
 		}
@@ -203,11 +202,11 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     	Resolution resolution = new ForwardResolution("/pages/editsource.jsp");
 		if(isUserLoggedIn()){
 			if (isPostRequest()){
-				DAOFactory.getDAOFactory().getHarvestSourceDAO().editSource(getHarvestSource());
+				factory.getDao(HarvestSourceDAO.class).editSource(getHarvestSource());
 				showMessage(getBundle().getString("update.success"));
 			}
 			else
-				harvestSource = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(harvestSource.getSourceId());
+				harvestSource = factory.getDao(HarvestSourceDAO.class).getHarvestSourceById(harvestSource.getSourceId());
 		}
 		else
 			handleCrException(getBundle().getString("not.logged.in"), GeneralConfig.SEVERITY_WARNING);
@@ -224,13 +223,13 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     public Resolution scheduleUrgentHarvest() throws DAOException, HarvestException{
 
     	// we need to re-fetch this.harvestSource, because the requested post has nulled it
-    	harvestSource = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(harvestSource.getSourceId());
+    	harvestSource = factory.getDao(HarvestSourceDAO.class).getHarvestSourceById(harvestSource.getSourceId());
     	
     	// schedule the harvest
     	UrgentHarvestQueue.addPullHarvest(getHarvestSource().getUrl());
     	
 		// retrieve list of harvests (for display) 
-		harvests = DAOFactory.getDAOFactory().getHarvestDAO().getHarvestsBySourceId(harvestSource.getSourceId());
+		harvests = factory.getDao(HarvestDAO.class).getHarvestsBySourceId(harvestSource.getSourceId());
 
     	showMessage("Successfully scheduled for urgent harvest!");
     	return new ForwardResolution("/pages/viewsource.jsp");

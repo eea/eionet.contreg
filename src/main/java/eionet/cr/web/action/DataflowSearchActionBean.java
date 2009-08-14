@@ -23,12 +23,9 @@ package eionet.cr.web.action;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.http.HttpSession;
 
@@ -43,11 +40,9 @@ import org.apache.commons.logging.LogFactory;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
-import eionet.cr.dto.ObjectDTO;
-import eionet.cr.dto.SubjectDTO;
+import eionet.cr.dao.SearchHelperDao;
 import eionet.cr.search.CustomSearch;
 import eionet.cr.search.DataflowPicklistSearch;
-import eionet.cr.search.PicklistSearch;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.util.UriLabelPair;
 import eionet.cr.web.util.columns.SearchResultColumn;
@@ -129,10 +124,9 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean{
 		if (session.getAttribute(LOCALITIES_SESSION_ATTR_NAME)!=null)
 			return;
 			
-		PicklistSearch picklistSearch = new PicklistSearch(Predicates.ROD_LOCALITY_PROPERTY);
-		picklistSearch.execute();
-		
-		session.setAttribute(LOCALITIES_SESSION_ATTR_NAME, picklistSearch.getResultCollection());
+		session.setAttribute(
+				LOCALITIES_SESSION_ATTR_NAME,
+				factory.getDao(SearchHelperDao.class).getPicklistForPredicate(Predicates.ROD_LOCALITY_PROPERTY));
 	}
 
 	/**

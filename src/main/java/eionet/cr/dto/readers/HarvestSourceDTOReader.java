@@ -26,14 +26,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import eionet.cr.dto.HarvestSourceDTO;
-import eionet.cr.util.sql.ResultSetBaseReader;
+import eionet.cr.util.sql.ResultSetListReader;
 
 /**
  * 
  * @author altnyris
  *
  */
-public class HarvestSourceDTOReader extends ResultSetBaseReader {
+public class HarvestSourceDTOReader extends ResultSetListReader<HarvestSourceDTO> {
 
 	/** */
 	List<HarvestSourceDTO> resultList = new ArrayList<HarvestSourceDTO>();
@@ -46,12 +46,9 @@ public class HarvestSourceDTOReader extends ResultSetBaseReader {
 
 		HarvestSourceDTO harvestSourceDTO = new HarvestSourceDTO();
 		harvestSourceDTO.setSourceId(new Integer(rs.getInt("HARVEST_SOURCE_ID")));
-		harvestSourceDTO.setName(rs.getString("NAME"));
 		harvestSourceDTO.setUrl(rs.getString("URL"));
-		harvestSourceDTO.setType(rs.getString("TYPE"));
 		harvestSourceDTO.setEmails(rs.getString("EMAILS"));
 		harvestSourceDTO.setTimeCreated(rs.getDate("TIME_CREATED"));
-		harvestSourceDTO.setCreator(rs.getString("CREATOR"));
 		harvestSourceDTO.setStatements(new Integer(rs.getInt("STATEMENTS")));
 		harvestSourceDTO.setResources(new Integer(rs.getInt("RESOURCES")));
 		harvestSourceDTO.setCountUnavail(new Integer(rs.getInt("COUNT_UNAVAIL")));

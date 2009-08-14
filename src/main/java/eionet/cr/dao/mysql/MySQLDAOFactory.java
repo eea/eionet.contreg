@@ -20,54 +20,58 @@
  */
 package eionet.cr.dao.mysql;
 
-import eionet.cr.dao.DAOFactory;
+import java.util.HashMap;
+import java.util.Map;
+
 import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dao.HarvestMessageDAO;
-import eionet.cr.dao.UrgentHarvestQueueDAO;
 import eionet.cr.dao.HarvestSourceDAO;
+import eionet.cr.dao.IDao;
+import eionet.cr.dao.SearchHelperDao;
+import eionet.cr.dao.UrgentHarvestQueueDAO;
+
+
 
 /**
  * 
  * @author heinljab, altnyris
  *
  */
-public class MySQLDAOFactory extends DAOFactory {
+public final class MySQLDAOFactory {
 	
 
-	/**
-	 * 
-	 */
-	public MySQLDAOFactory(){
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.dao.DAOFactory#getHarvestSourceDAO()
-	 */
-	public HarvestSourceDAO getHarvestSourceDAO() {
-		return new MySQLHarvestSourceDAO();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.dao.DAOFactory#getHarvestDAO()
-	 */
-	public HarvestDAO getHarvestDAO() {
-		return new MySQLHarvestDAO();	}
+	private static MySQLDAOFactory instance;
+	private Map<Class<? extends IDao>, Class<? extends MySQLBaseDAO>> registeredDaos;
 	
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.dao.DAOFactory#getHarvestMessageDAO()
-	 */
-	public HarvestMessageDAO getHarvestMessageDAO() {
-		return new MySQLHarvestMessageDAO();
+	private void init() {
+		registeredDaos = new HashMap<Class<? extends IDao>, Class<? extends MySQLBaseDAO>>();
+		registeredDaos.put(HarvestDAO.class, MySQLHarvestDAO.class);
+		registeredDaos.put(HarvestMessageDAO.class, MySQLHarvestMessageDAO.class);
+		registeredDaos.put(HarvestSourceDAO.class, MySQLHarvestSourceDAO.class);
+		registeredDaos.put(SearchHelperDao.class, MySQLSearchHelperDao.class);
+		registeredDaos.put(UrgentHarvestQueueDAO.class, MySQLUrgentHarvestQueueDAO.class);
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.dao.DAOFactory#getHarvestQueueDAO()
-	 */
-	public UrgentHarvestQueueDAO getUrgentHarvestQueueDAO() {
-		return new MySQLUrgentHarvestQueueDAO();
+	
+	private MySQLDAOFactory() {
+		init();
+	}
+	
+	public static MySQLDAOFactory get() {
+		if(instance == null) {
+			instance = new MySQLDAOFactory();
+		}
+		
+		return instance;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <T extends IDao> T getDao(Class<T> implementedInterface) {
+		//due to synchronization problems we have to create DAOs for each method invocation.
+		try {
+			Class implClass = registeredDaos.get(implementedInterface);
+			return (T) implClass.newInstance();
+		} catch (Exception fatal) {
+			throw new RuntimeException(fatal);
+		}
 	}
 }

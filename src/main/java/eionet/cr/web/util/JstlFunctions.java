@@ -20,11 +20,8 @@
  */
 package eionet.cr.web.util;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -36,7 +33,6 @@ import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.search.util.PredicateLabels;
 import eionet.cr.search.util.SortOrder;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Util;

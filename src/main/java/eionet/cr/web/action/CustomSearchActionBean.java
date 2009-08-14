@@ -37,16 +37,14 @@ import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import eionet.cr.common.Predicates;
+import eionet.cr.dao.SearchHelperDao;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.CustomSearch;
-import eionet.cr.search.LiteralsEnabledSearch;
-import eionet.cr.search.PicklistSearch;
 import eionet.cr.search.SearchException;
 import eionet.cr.util.Util;
 import eionet.cr.util.pagination.Pagination;
 import eionet.cr.web.util.CustomSearchFilter;
 import eionet.cr.web.util.columns.SearchResultColumn;
-import eionet.cr.web.util.columns.SubjectPredicateColumn;
 
 /**
  * 
@@ -84,7 +82,6 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 	 */
 	@DefaultHandler
 	public Resolution unspecifiedEvent(){
-		
 		if (isShowPicklist())
 			populateSelectedFilters();
 		else if (isRemoveFilter()){
@@ -182,7 +179,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 			
 			String predicateUri = getAvailableFilters().get(addedFilter).getUri();
 			
-			boolean literalsEnabled = LiteralsEnabledSearch.search(predicateUri);
+			boolean literalsEnabled = factory.getDao(SearchHelperDao.class).isAllowLiteralSearch(predicateUri);
 			if (literalsEnabled)
 				getLiteralEnabledFilters().add(predicateUri);
 			else
@@ -204,10 +201,9 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 		else if (!getAvailableFilters().containsKey(getPicklistFilter()))
 			return null;
 		
-		if (picklist==null){
-			PicklistSearch picklistSearch = new PicklistSearch(getAvailableFilters().get(getPicklistFilter()).getUri());
-			picklistSearch.execute();
-			picklist = picklistSearch.getResultCollection();
+		if (picklist == null){
+			picklist = factory.getDao(SearchHelperDao.class).getPicklistForPredicate(
+					getAvailableFilters().get(getPicklistFilter()).getUri());
 		}
 		
 		return picklist;

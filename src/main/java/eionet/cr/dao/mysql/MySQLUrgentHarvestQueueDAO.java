@@ -29,7 +29,6 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.UrgentHarvestQueueDAO;
 import eionet.cr.dto.UrgentHarvestQueueItemDTO;
 import eionet.cr.dto.readers.HarvestQueueItemDTOReader;
-import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.util.sql.ConnectionUtil;
 import eionet.cr.util.sql.SQLUtil;
 
@@ -39,6 +38,11 @@ import eionet.cr.util.sql.SQLUtil;
  *
  */
 public class MySQLUrgentHarvestQueueDAO extends MySQLBaseDAO implements UrgentHarvestQueueDAO{
+	
+	
+	MySQLUrgentHarvestQueueDAO() {
+		//reducing visibility
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -100,25 +104,7 @@ public class MySQLUrgentHarvestQueueDAO extends MySQLBaseDAO implements UrgentHa
 	 * @see eionet.cr.dao.HarvestQueueDAO#getUrgentHarvestQueue()
 	 */
 	public List<UrgentHarvestQueueItemDTO> getUrgentHarvestQueue() throws DAOException{
-		
-		List<Object> values = new ArrayList<Object>();
-				
-		Connection conn = null;
-		HarvestQueueItemDTOReader rsReader = new HarvestQueueItemDTOReader();
-		try{
-			conn = getConnection();
-			SQLUtil.executeQuery(getUrgentHarvestQueueSQL, values, rsReader, conn);
-			return rsReader.getResultList();
-		}
-		catch (Exception e){
-			throw new DAOException(e.getMessage(), e);
-		}
-		finally{
-			try{
-				if (conn!=null) conn.close();
-			}
-			catch (SQLException e){}
-		}
+		return executeQuery(getUrgentHarvestQueueSQL, new ArrayList<Object>(), new HarvestQueueItemDTOReader());
 	}
 
 	/*

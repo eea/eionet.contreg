@@ -28,11 +28,13 @@ import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import eionet.cr.dao.DAOException;
-import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.HarvestDAO;
+import eionet.cr.dao.HarvestMessageDAO;
+import eionet.cr.dao.HarvestSourceDAO;
+import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.HarvestDTO;
 import eionet.cr.dto.HarvestMessageDTO;
 import eionet.cr.dto.HarvestSourceDTO;
-import eionet.cr.harvest.Harvest;
 import eionet.cr.harvest.util.HarvestMessageType;
 
 /**
@@ -60,9 +62,9 @@ public class HarvestActionBean extends AbstractActionBean {
 	 */
 	@DontValidate
 	public Resolution unspecified() throws DAOException{
-		
-		harvestDTO = DAOFactory.getDAOFactory().getHarvestDAO().getHarvestById(harvestDTO.getHarvestId());
-		harvestSourceDTO = DAOFactory.getDAOFactory().getHarvestSourceDAO().getHarvestSourceById(harvestDTO.getHarvestSourceId());
+		MySQLDAOFactory factory = MySQLDAOFactory.get();
+		harvestDTO = factory.getDao(HarvestDAO.class).getHarvestById(harvestDTO.getHarvestId());
+		harvestSourceDTO = factory.getDao(HarvestSourceDAO.class).getHarvestSourceById(harvestDTO.getHarvestSourceId());
 		loadMessages();
 		return new ForwardResolution("/pages/harvest.jsp");
 	}
@@ -73,7 +75,10 @@ public class HarvestActionBean extends AbstractActionBean {
 	 */
 	private void loadMessages() throws DAOException{
 		
-		List<HarvestMessageDTO> messageDTOs = DAOFactory.getDAOFactory().getHarvestMessageDAO().findHarvestMessagesByHarvestID(harvestDTO.getHarvestId());
+		List<HarvestMessageDTO> messageDTOs = MySQLDAOFactory
+				.get()
+				.getDao(HarvestMessageDAO.class)
+				.findHarvestMessagesByHarvestID(harvestDTO.getHarvestId());
 		if (messageDTOs!=null){
 			loadMessages(HarvestMessageType.FATAL.toString(), messageDTOs, fatals = new ArrayList<HarvestMessageDTO>());
 			loadMessages(HarvestMessageType.ERROR.toString(), messageDTOs, errors = new ArrayList<HarvestMessageDTO>());

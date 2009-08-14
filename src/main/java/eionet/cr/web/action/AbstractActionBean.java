@@ -38,7 +38,7 @@ import org.apache.commons.logging.LogFactory;
 
 import eionet.cr.common.CRException;
 import eionet.cr.config.GeneralConfig;
-import eionet.cr.dto.UrgentHarvestQueueItemDTO;
+import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.harvest.Harvest;
 import eionet.cr.harvest.scheduled.HarvestingJob;
 import eionet.cr.search.util.PredicateLabels;
@@ -64,6 +64,8 @@ public abstract class AbstractActionBean implements ActionBean {
 	
 	/** */
 	private Harvest currentHarvest = HarvestingJob.getCurrentHarvest();
+	
+	protected MySQLDAOFactory factory = MySQLDAOFactory.get();
 	
 	/*
 	 * (non-Javadoc)

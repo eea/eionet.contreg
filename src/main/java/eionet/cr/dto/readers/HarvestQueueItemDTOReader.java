@@ -26,14 +26,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import eionet.cr.dto.UrgentHarvestQueueItemDTO;
-import eionet.cr.util.sql.ResultSetBaseReader;
+import eionet.cr.util.sql.ResultSetListReader;
 
 /**
  * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class HarvestQueueItemDTOReader extends ResultSetBaseReader{
+public class HarvestQueueItemDTOReader extends ResultSetListReader<UrgentHarvestQueueItemDTO>{
 
 	/** */
 	List<UrgentHarvestQueueItemDTO> resultList = new ArrayList<UrgentHarvestQueueItemDTO>();

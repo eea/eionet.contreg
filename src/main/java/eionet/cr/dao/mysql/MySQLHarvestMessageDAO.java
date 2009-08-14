@@ -37,6 +37,11 @@ import eionet.cr.util.sql.SQLUtil;
  *
  */
 public class MySQLHarvestMessageDAO extends MySQLBaseDAO implements HarvestMessageDAO {
+	
+	
+	MySQLHarvestMessageDAO() {
+		//reducing visibility
+	}
 
 	/** */
 	private static final String q_HarvestMessageByHarvestID = "select * from HARVEST_MESSAGE where HARVEST_ID=?";
@@ -46,24 +51,9 @@ public class MySQLHarvestMessageDAO extends MySQLBaseDAO implements HarvestMessa
 	 * @see eionet.cr.dao.HarvestMessageDAO#findHarvestMessagesByHarvestID(java.lang.String)
 	 */
 	public List<HarvestMessageDTO> findHarvestMessagesByHarvestID(int harvestID) throws DAOException {
-		
 		List<Object> values = new ArrayList<Object>();
 		values.add(new Integer(harvestID));
-				
-		Connection conn = null;
-		HarvestMessageDTOReader rsReader = new HarvestMessageDTOReader();
-		try{
-			conn = getConnection();
-			SQLUtil.executeQuery(q_HarvestMessageByHarvestID, values, rsReader, conn);
-			List<HarvestMessageDTO>  list = rsReader.getResultList();
-			return list;
-		}
-		catch (Exception e){
-			throw new DAOException(e.getMessage(), e);
-		}
-		finally{
-			closeConnection(conn);
-		}
+		return executeQuery(q_HarvestMessageByHarvestID, values, new HarvestMessageDTOReader());
 	}
 	
 	/** */
@@ -74,24 +64,10 @@ public class MySQLHarvestMessageDAO extends MySQLBaseDAO implements HarvestMessa
 	 * @see eionet.cr.dao.HarvestMessageDAO#findHarvestMessageByMessageID(java.lang.String)
 	 */
 	public HarvestMessageDTO findHarvestMessageByMessageID(int messageID) throws DAOException {
-		
 		List<Object> values = new ArrayList<Object>();
 		values.add(new Integer(messageID));
-				
-		Connection conn = null;
-		HarvestMessageDTOReader rsReader = new HarvestMessageDTOReader();
-		try{
-			conn = getConnection();
-			SQLUtil.executeQuery(q_HarvestMessageByMessageID, values, rsReader, conn);
-			List<HarvestMessageDTO>  list = rsReader.getResultList();
-			return list!=null && list.size()>0 ? list.get(0) : null;
-		}
-		catch (Exception e){
-			throw new DAOException(e.getMessage(), e);
-		}
-		finally{
-			closeConnection(conn);
-		}
+		List<HarvestMessageDTO> list = executeQuery(q_HarvestMessageByMessageID, values, new HarvestMessageDTOReader());		
+		return list!=null && list.size()>0 ? list.get(0) : null;
 	}
 
 	private static final String q_insertHarvestMessage =
