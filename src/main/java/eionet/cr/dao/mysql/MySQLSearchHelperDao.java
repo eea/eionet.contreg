@@ -28,9 +28,12 @@ import eionet.cr.util.sql.SQLValueReader;
  */
 public class MySQLSearchHelperDao extends MySQLBaseDAO implements SearchHelperDao {
 	
-
+	/** */
 	private static final String sqlQuery = "select distinct OBJECT from SPO where PREDICATE=? and LIT_OBJ='Y' and ANON_OBJ='N' order by OBJECT asc";
 	
+	/**
+	 * 
+	 */
 	MySQLSearchHelperDao() {
 		//reducing visibility
 	}
@@ -72,6 +75,7 @@ public class MySQLSearchHelperDao extends MySQLBaseDAO implements SearchHelperDa
 	 * {@inheritDoc}
 	 */
 	public boolean isAllowLiteralSearch(String predicateUri) throws SearchException{
+		
 		//sanity checks
 		if (StringUtils.isBlank(predicateUri)) {
 			return false;
@@ -81,10 +85,12 @@ public class MySQLSearchHelperDao extends MySQLBaseDAO implements SearchHelperDa
 			ArrayList<Object> values = new ArrayList<Object>();
 			values.add(Long.valueOf(Hashes.spoHash(predicateUri)));
 			values.add(Long.valueOf((Hashes.spoHash(Predicates.RDFS_RANGE))));
+			
 			List<Map<String,SQLValue>> resultList = executeQuery(allowLiteralSearchQuery, values, new SQLValueReader());
 			if (resultList == null || resultList.isEmpty()) {
 				return true; // if not rdfs:domain specified at all, then lets allow literal search
 			}
+			
 			for (Map<String, SQLValue> result : resultList){
 				SQLValue sqlValue = result.get("OBJECT");
 				if (sqlValue!=null){
@@ -96,9 +102,9 @@ public class MySQLSearchHelperDao extends MySQLBaseDAO implements SearchHelperDa
 			}
 			
 			return false;
-		} catch(DAOException exception) {
+		}
+		catch(DAOException exception) {
 			throw new SearchException();
 		}
-	}
-	
+	}	
 }
