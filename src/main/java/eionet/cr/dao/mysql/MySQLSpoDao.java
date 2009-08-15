@@ -117,7 +117,7 @@ public class MySQLSpoDao extends MySQLBaseDAO implements SpoHelperDao {
 	}
 
 	/** */
-	private static final String tripleInsertSQL = "insert into SPO (SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, OBJECT_DOUBLE," +
+	private static final String tripleInsertSQL = "insert high_priority into SPO (SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, OBJECT_DOUBLE," +
 			" ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG, OBJ_DERIV_SOURCE, OBJ_DERIV_SOURCE_GEN_TIME, OBJ_SOURCE_OBJECT, SOURCE," +
 			" GEN_TIME) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	
@@ -137,7 +137,7 @@ public class MySQLSpoDao extends MySQLBaseDAO implements SpoHelperDao {
 			pstmt = conn.prepareStatement(tripleInsertSQL);
 
 			boolean doExecuteBatch = false;
-			long subjectHash = Long.parseLong(subjectDTO.getUriHash());
+			long subjectHash = subjectDTO.getUriHash();
 			for (String predicateUri:subjectDTO.getPredicateUris()){
 				
 				Collection<ObjectDTO> objects = subjectDTO.getObjects(predicateUri);
@@ -180,5 +180,23 @@ public class MySQLSpoDao extends MySQLBaseDAO implements SpoHelperDao {
 			SQLUtil.close(pstmt);
 			SQLUtil.close(conn);
 		}
+	}
+
+	/** */
+	public static final String insertResourceSQL = "insert high_priority into RESOURCE" +
+			" (URI, URI_HASH, FIRSTSEEN_SOURCE, FIRSTSEEN_TIME) values (?, ?, ?, ?)";
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.SpoHelperDao#register(eionet.cr.dto.SubjectDTO)
+	 */
+	public void register(SubjectDTO subjectDTO) throws DAOException {
+		
+		ArrayList values = new ArrayList();
+		values.add(subjectDTO.getUri());
+		values.add(subjectDTO.getUriHash());
+		
+		values.add(Long.valueOf((Hashes.spoHash(Predicates.RDFS_RANGE))));
+		
+//		SQLUtil.executeUpdate(insertResourceSQL, values, conn);
 	}	
 }

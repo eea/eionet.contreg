@@ -39,4 +39,11 @@ public interface SpoHelperDao extends IDao {
 	 * @throws DAOException 
 	 */
 	public abstract void addTriples(SubjectDTO subjectDTO) throws DAOException;
+	
+	/**
+	 * 
+	 * @param subjectDTO
+	 * @throws DAOException
+	 */
+	public abstract void register(SubjectDTO subjectDTO) throws DAOException;
 }

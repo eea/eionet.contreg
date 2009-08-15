@@ -129,7 +129,7 @@ public class SubjectPredicateColumn extends SearchResultColumn{
 				int i = factsheetUrlBinding.lastIndexOf("/");
 				StringBuffer href = new StringBuffer(i>=0 ? factsheetUrlBinding.substring(i+1) : factsheetUrlBinding).append("?");
 				if (subjectDTO.isAnonymous()){
-					href.append("uriHash=").append(Util.urlEncode(subjectDTO.getUriHash()));
+					href.append("uriHash=").append(subjectDTO.getUriHash());
 				}
 				else{
 					href.append("uri=").append(Util.urlEncode(subjectDTO.getUri()));

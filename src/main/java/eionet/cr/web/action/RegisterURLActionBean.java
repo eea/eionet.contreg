@@ -62,9 +62,6 @@ public class RegisterURLActionBean extends AbstractActionBean{
 	 */
 	public Resolution save() throws DAOException{
 		
-		System.out.println("url = " + url);
-		System.out.println("bookmark = " + String.valueOf(bookmark));
-		
 		SubjectDTO subjectDTO = new SubjectDTO(url, false);
 		subjectDTO.addObject(Predicates.RDF_TYPE, new ObjectDTO(Subjects.CR_FILE, false));
 		

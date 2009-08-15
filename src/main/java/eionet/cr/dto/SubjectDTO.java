@@ -44,20 +44,11 @@ public class SubjectDTO{
 	
 	/** */
 	private String uri;
-	private String uriHash;
+	private long uriHash;
 	private boolean anonymous;
 	private Map<String,Collection<ObjectDTO>> predicates;
 	private Date firstSeenTime;
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 * This toString is used in the Unit-tests.
-	 */
-	@Override
-	public String toString() {
-		return "SubjectDTO[uri=" + uri + ",predicates=" + predicates.toString() + "]";
-	}
 	/**
 	 * 
 	 * @param uri
@@ -67,7 +58,18 @@ public class SubjectDTO{
 		
 		this.uri = anonymous==false ? uri : URI_ANONYMOUS;
 		this.anonymous = anonymous;
+		this.uriHash = Hashes.spoHash(uri);
 		predicates = new HashMap<String,Collection<ObjectDTO>>();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 * This toString is used in the Unit-tests.
+	 */
+	@Override
+	public String toString() {
+		return "SubjectDTO[uri=" + uri + ",predicates=" + predicates.toString() + "]";
 	}
 	
 	/**
@@ -290,18 +292,14 @@ public class SubjectDTO{
 	/**
 	 * @return the uriHash
 	 */
-	public String getUriHash() {
-		
-		if (uriHash==null){
-			uriHash = String.valueOf(Hashes.spoHash(uri));
-		}
+	public long getUriHash() {		
 		return uriHash;
 	}
 
 	/**
 	 * @param uriHash the uriHash to set
 	 */
-	public void setUriHash(String uriHash) {
+	public void setUriHash(long uriHash) {
 		this.uriHash = uriHash;
 	}
 }

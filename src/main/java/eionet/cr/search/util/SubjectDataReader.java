@@ -64,12 +64,12 @@ public class SubjectDataReader extends ResultSetBaseReader{
 	 */
 	public void readRow(ResultSet rs) throws SQLException {
 		
-		String subjectHash = rs.getString("SUBJECT_HASH");
-		boolean newSubject = currentSubject==null || !subjectHash.equals(currentSubject.getUriHash());
+		long subjectHash = rs.getLong("SUBJECT_HASH");
+		boolean newSubject = currentSubject==null || subjectHash!=currentSubject.getUriHash();
 		if (newSubject){
 			currentSubject = new SubjectDTO(rs.getString("SUBJECT_URI"), YesNoBoolean.parse(rs.getString("ANON_SUBJ")));
 			currentSubject.setUriHash(subjectHash);
-			addNewSubject(subjectHash, currentSubject);
+			addNewSubject(String.valueOf(subjectHash), currentSubject);
 		}
 		
 		String predicateUri = rs.getString("PREDICATE_URI");
