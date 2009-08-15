@@ -93,7 +93,7 @@
 		</description>
 		<name>isSourceToAny</name>
 		<function-class>eionet.cr.web.util.JstlFunctions</function-class>
-		<function-signature>java.lang.String isSourceToAny(java.lang.String, java.util.Collection)</function-signature>
+		<function-signature>java.lang.String isSourceToAny(long, java.util.Collection)</function-signature>
 		<example>
 			${isSourceToAny(objectHash, collectionOfObjects)}
 		</example>

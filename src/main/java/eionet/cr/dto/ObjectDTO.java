@@ -34,13 +34,17 @@ public class ObjectDTO {
 
 	/** */
 	private String value;
-	private String hash;
-	private String language;
-	private boolean literal;
+	private long hash;
+	
 	private boolean anonymous;
-	private String source;
-	private String derivSource;
-	private String sourceObject;
+	private boolean literal;
+	private String language;
+	
+	private String derivSourceUri;
+	private long derivSourceGenTime;
+	private long sourceObjectHash;
+	
+	private String sourceUri;
 	
 	/**
 	 * 
@@ -55,6 +59,7 @@ public class ObjectDTO {
 		this.language = language;
 		this.literal = literal;
 		this.anonymous = anonymous;
+		this.hash = Hashes.spoHash(value);
 	}
 	
 	/**
@@ -128,42 +133,36 @@ public class ObjectDTO {
 	 * 
 	 * @return
 	 */
-	public String getHash(){
-		
-		if (hash==null){
-			if (getValue()!=null){
-				hash = String.valueOf(Hashes.spoHash(getValue()));
-			}
-		}
+	public long getHash(){
 		return hash;
 	}
 
 	/**
-	 * @return the derivSource
+	 * @return the derivSourceUri
 	 */
-	public String getDerivSource() {
-		return derivSource;
+	public String getDerivSourceUri() {
+		return derivSourceUri;
+	}
+	
+	/**
+	 * @param derivSourceUri the derivSourceUri to set
+	 */
+	public void setDerivSourceUri(String derivSource) {
+		this.derivSourceUri = derivSource;
 	}
 
 	/**
-	 * @param derivSource the derivSource to set
+	 * @return the sourceUri
 	 */
-	public void setDerivSource(String derivSource) {
-		this.derivSource = derivSource;
+	public String getSourceUri() {
+		return sourceUri;
 	}
 
 	/**
-	 * @return the source
+	 * @param sourceUri the sourceUri to set
 	 */
-	public String getSource() {
-		return source;
-	}
-
-	/**
-	 * @param source the source to set
-	 */
-	public void setSource(String source) {
-		this.source = source;
+	public void setSourceUri(String source) {
+		this.sourceUri = source;
 	}
 
 	/**
@@ -171,41 +170,47 @@ public class ObjectDTO {
 	 * @return
 	 */
 	public String getSourceSmart() {
-		if (derivSource!=null && derivSource.trim().length()>0)
-			return derivSource;
-		else if (source!=null && source.trim().length()>0)
-			return source;
+		if (derivSourceUri!=null && derivSourceUri.trim().length()>0)
+			return derivSourceUri;
+		else if (sourceUri!=null && sourceUri.trim().length()>0)
+			return sourceUri;
 		else
 			return null;
 	}
 
 	/**
-	 * @return the sourceObject
+	 * @return the sourceObjectHash
 	 */
-	public String getSourceObject() {
-		return sourceObject;
+	public long getSourceObjectHash() {
+		return sourceObjectHash;
 	}
 
 	/**
-	 * @param sourceObject the sourceObject to set
+	 * @param sourceObjectHash the sourceObjectHash to set
 	 */
-	public void setSourceObject(String derivObject) {
-		this.sourceObject = derivObject;
+	public void setSourceObjectHash(long sourceObjectHash) {
+		this.sourceObjectHash = sourceObjectHash;
 	}
 	
 	/**
 	 * 
-	 * @return
+	 * @param hash
 	 */
-	public long getSourceObjectLong(){
-		return this.sourceObject==null ? 0 : Long.parseLong(this.sourceObject);
+	public void setHash(long hash) {
+		this.hash = hash;
 	}
 
 	/**
-	 * 
-	 * @param hash
+	 * @return the derivSourceGenTime
 	 */
-	public void setHash(String hash) {
-		this.hash = hash;
+	public long getDerivSourceGenTime() {
+		return derivSourceGenTime;
+	}
+
+	/**
+	 * @param derivSourceGenTime the derivSourceGenTime to set
+	 */
+	public void setDerivSourceGenTime(long derivSourceGenTime) {
+		this.derivSourceGenTime = derivSourceGenTime;
 	}
 }

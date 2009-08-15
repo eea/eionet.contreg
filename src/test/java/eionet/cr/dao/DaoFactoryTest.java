@@ -28,7 +28,7 @@ import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dao.mysql.MySQLHarvestDAO;
 import eionet.cr.dao.mysql.MySQLHarvestMessageDAO;
 import eionet.cr.dao.mysql.MySQLHarvestSourceDAO;
-import eionet.cr.dao.mysql.MySQLSearchHelperDao;
+import eionet.cr.dao.mysql.MySQLSpoDao;
 import eionet.cr.dao.mysql.MySQLUrgentHarvestQueueDAO;
 
 /**
@@ -45,7 +45,7 @@ public class DaoFactoryTest extends TestCase {
 		assertTrue(factory.getDao(HarvestDAO.class) instanceof MySQLHarvestDAO);
 		assertTrue(factory.getDao(HarvestMessageDAO.class) instanceof MySQLHarvestMessageDAO);
 		assertTrue(factory.getDao(HarvestSourceDAO.class) instanceof MySQLHarvestSourceDAO);
-		assertTrue(factory.getDao(SearchHelperDao.class) instanceof MySQLSearchHelperDao);
+		assertTrue(factory.getDao(SpoHelperDao.class) instanceof MySQLSpoDao);
 		assertTrue(factory.getDao(UrgentHarvestQueueDAO.class) instanceof MySQLUrgentHarvestQueueDAO);
 	}
 }

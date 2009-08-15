@@ -37,7 +37,7 @@ import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import eionet.cr.common.Predicates;
-import eionet.cr.dao.SearchHelperDao;
+import eionet.cr.dao.SpoHelperDao;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.CustomSearch;
 import eionet.cr.search.SearchException;
@@ -179,7 +179,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 			
 			String predicateUri = getAvailableFilters().get(addedFilter).getUri();
 			
-			boolean literalsEnabled = factory.getDao(SearchHelperDao.class).isAllowLiteralSearch(predicateUri);
+			boolean literalsEnabled = factory.getDao(SpoHelperDao.class).isAllowLiteralSearch(predicateUri);
 			if (literalsEnabled)
 				getLiteralEnabledFilters().add(predicateUri);
 			else
@@ -202,7 +202,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean{
 			return null;
 		
 		if (picklist == null){
-			picklist = factory.getDao(SearchHelperDao.class).getPicklistForPredicate(
+			picklist = factory.getDao(SpoHelperDao.class).getPicklistForPredicate(
 					getAvailableFilters().get(getPicklistFilter()).getUri());
 		}
 		

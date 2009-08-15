@@ -26,8 +26,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import eionet.cr.common.Predicates;
+import eionet.cr.util.Hashes;
 import eionet.cr.util.URLUtil;
 
 /**
@@ -102,7 +104,15 @@ public class SubjectDTO{
 	public Map<String,Collection<ObjectDTO>> getPredicates(){
 		return predicates;
 	}
-	
+
+	/**
+	 * 
+	 * @return
+	 */
+	public Set<String> getPredicateUris(){
+		return predicates.keySet();
+	}
+
 	/**
 	 * 
 	 * @param predicateUri
@@ -281,6 +291,10 @@ public class SubjectDTO{
 	 * @return the uriHash
 	 */
 	public String getUriHash() {
+		
+		if (uriHash==null){
+			uriHash = String.valueOf(Hashes.spoHash(uri));
+		}
 		return uriHash;
 	}
 

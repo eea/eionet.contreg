@@ -65,12 +65,12 @@
 									    			</td>
 									    			<td>
 									    				<c:choose>
-														<c:when test="${object.sourceObjectLong==0}">
+														<c:when test="${object.sourceObjectHash==0}">
 															<c:out value="${object.value}"/>
 														</c:when>
 														<c:otherwise>
 															<stripes:link class="infolink" href="/factsheet.action"><c:out value="${object.value}"/>
-																	<stripes:param name="uriHash" value="${object.sourceObject}"/>
+																	<stripes:param name="uriHash" value="${object.sourceObjectHash}"/>
 															</stripes:link>	
 														</c:otherwise>
 													</c:choose>

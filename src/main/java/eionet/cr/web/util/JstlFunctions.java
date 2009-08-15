@@ -204,16 +204,14 @@ public class JstlFunctions {
 	 * @param findObjectHash
 	 * @return
 	 */
-	public static boolean isSourceToAny(String objectHash, Collection objects){
+	public static boolean isSourceToAny(long objectHash, Collection objects){
 		
 		boolean result = false;
-		if (objectHash!=null){
-			for (Iterator i=objects.iterator(); i.hasNext();){
-				ObjectDTO objectDTO = (ObjectDTO)i.next();
-				if (objectHash.equals(objectDTO.getSourceObject())){
-					result = true;
-					break;
-				}
+		for (Iterator i=objects.iterator(); i.hasNext();){
+			ObjectDTO objectDTO = (ObjectDTO)i.next();
+			if (objectHash == objectDTO.getSourceObjectHash()){
+				result = true;
+				break;
 			}
 		}
 		

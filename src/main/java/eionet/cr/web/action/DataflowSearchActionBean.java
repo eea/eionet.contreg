@@ -40,7 +40,7 @@ import org.apache.commons.logging.LogFactory;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
-import eionet.cr.dao.SearchHelperDao;
+import eionet.cr.dao.SpoHelperDao;
 import eionet.cr.search.CustomSearch;
 import eionet.cr.search.DataflowPicklistSearch;
 import eionet.cr.search.SearchException;
@@ -126,7 +126,7 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean{
 			
 		session.setAttribute(
 				LOCALITIES_SESSION_ATTR_NAME,
-				factory.getDao(SearchHelperDao.class).getPicklistForPredicate(Predicates.ROD_LOCALITY_PROPERTY));
+				factory.getDao(SpoHelperDao.class).getPicklistForPredicate(Predicates.ROD_LOCALITY_PROPERTY));
 	}
 
 	/**

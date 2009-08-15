@@ -41,7 +41,7 @@ public class ReferringPredicatesColumn extends SearchResultColumn{
 
 	/** */
 	private ReferencesActionBean actionBean;
-	private String referringToHash;
+	private long referringToHash;
 
 	/**
 	 * 
@@ -53,8 +53,13 @@ public class ReferringPredicatesColumn extends SearchResultColumn{
 
 		SearchExpression searchExpression = actionBean.getSearchExpression();
 		if (searchExpression!=null){
-			referringToHash = searchExpression.isHash() ?
-					searchExpression.toString() : String.valueOf(Hashes.spoHash(searchExpression.toString()));
+			
+			try{
+				referringToHash = Long.parseLong(searchExpression.toString());
+			}
+			catch (NumberFormatException nfe){
+				referringToHash = Hashes.spoHash(searchExpression.toString());
+			}
 		}
 	}
 	
@@ -81,7 +86,7 @@ public class ReferringPredicatesColumn extends SearchResultColumn{
 						
 						for (ObjectDTO objectDTO:objects){
 							
-							if (objectDTO.getSourceObjectLong()==0 && objectDTO.getHash().equals(referringToHash)){
+							if (objectDTO.getSourceObjectHash()==0 && objectDTO.getHash()==referringToHash){
 								
 								String predicateLabel = JstlFunctions.getPredicateLabel(actionBean.getPredicateLabels(), predicate);
 								labels.add(predicateLabel);
