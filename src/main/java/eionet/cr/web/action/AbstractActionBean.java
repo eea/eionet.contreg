@@ -87,8 +87,7 @@ public abstract class AbstractActionBean implements ActionBean {
 	 * @return logged in user name or default value for not logged in users.
 	 */
 	public final String getUserName() {
-		CRUser crUser = getContext().getCRUser();
-		return crUser.getUserName();
+		return getCRUser().getUserName();
 	}
 	
 	/**

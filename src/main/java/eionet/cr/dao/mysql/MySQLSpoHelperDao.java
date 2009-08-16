@@ -29,12 +29,12 @@ import eionet.cr.util.sql.SQLValueReader;
 
 
 /**
- *	Mysql implementation of {@link MySQLSpoDao}.
+ *	Mysql implementation of {@link MySQLSpoHelperDao}.
  * 
  * @author Aleksandr Ivanov
  * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
-public class MySQLSpoDao extends MySQLBaseDAO implements SpoHelperDao {
+public class MySQLSpoHelperDao extends MySQLBaseDAO implements SpoHelperDao {
 	
 	/** */
 	private static final String sqlQuery = "select distinct OBJECT from SPO where PREDICATE=? and LIT_OBJ='Y' and ANON_OBJ='N' order by OBJECT asc";
@@ -42,7 +42,7 @@ public class MySQLSpoDao extends MySQLBaseDAO implements SpoHelperDao {
 	/**
 	 * 
 	 */
-	MySQLSpoDao() {
+	MySQLSpoHelperDao() {
 		//reducing visibility
 	}
 
@@ -120,7 +120,6 @@ public class MySQLSpoDao extends MySQLBaseDAO implements SpoHelperDao {
 	private static final String tripleInsertSQL = "insert high_priority into SPO (SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, OBJECT_DOUBLE," +
 			" ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG, OBJ_DERIV_SOURCE, OBJ_DERIV_SOURCE_GEN_TIME, OBJ_SOURCE_OBJECT, SOURCE," +
 			" GEN_TIME) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-	
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.dao.SpoHelperDao#addTriples(eionet.cr.dto.SubjectDTO)
@@ -130,6 +129,8 @@ public class MySQLSpoDao extends MySQLBaseDAO implements SpoHelperDao {
 		if (subjectDTO==null || subjectDTO.getPredicateCount()==0)
 			return;
 		
+		long firstSeenTime = System.currentTimeMillis();
+			
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try{
@@ -170,6 +171,8 @@ public class MySQLSpoDao extends MySQLBaseDAO implements SpoHelperDao {
 			}
 			
 			if (doExecuteBatch==true){
+				
+				// insert triples
 				pstmt.executeBatch();
 			}
 		}
@@ -183,20 +186,36 @@ public class MySQLSpoDao extends MySQLBaseDAO implements SpoHelperDao {
 	}
 
 	/** */
-	public static final String insertResourceSQL = "insert high_priority into RESOURCE" +
+	public static final String insertResourceSQL = "insert high_priority ignore into RESOURCE" +
 			" (URI, URI_HASH, FIRSTSEEN_SOURCE, FIRSTSEEN_TIME) values (?, ?, ?, ?)";
 	/*
 	 * (non-Javadoc)
-	 * @see eionet.cr.dao.SpoHelperDao#register(eionet.cr.dto.SubjectDTO)
+	 * @see eionet.cr.dao.SpoHelperDao#addResource(java.lang.String, java.lang.String)
 	 */
-	public void register(SubjectDTO subjectDTO) throws DAOException {
+	public void addResource(String uri, String firstSeenSourceUri) throws DAOException {
 		
 		ArrayList values = new ArrayList();
-		values.add(subjectDTO.getUri());
-		values.add(subjectDTO.getUriHash());
+		values.add(uri);
+		values.add(Long.valueOf(Hashes.spoHash(uri)));
+		if (StringUtils.isBlank(firstSeenSourceUri)){
+			values.add(Long.valueOf(0));
+			values.add(Long.valueOf(0));
+		}
+		else{
+			values.add(Long.valueOf(Hashes.spoHash(firstSeenSourceUri)));
+			values.add(Long.valueOf(System.currentTimeMillis()));
+		}
 		
-		values.add(Long.valueOf((Hashes.spoHash(Predicates.RDFS_RANGE))));
-		
-//		SQLUtil.executeUpdate(insertResourceSQL, values, conn);
-	}	
+		Connection conn = null;
+		try{
+			conn = getConnection();
+			SQLUtil.executeUpdate(insertResourceSQL, values, conn);
+		}
+		catch (SQLException e){
+			throw new DAOException(e.toString(), e);
+		}
+		finally{
+			SQLUtil.close(conn);
+		}
+	}
 }

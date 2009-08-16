@@ -170,6 +170,7 @@ public class ObjectDTO {
 	 * @return
 	 */
 	public String getSourceSmart() {
+		
 		if (derivSourceUri!=null && derivSourceUri.trim().length()>0)
 			return derivSourceUri;
 		else if (sourceUri!=null && sourceUri.trim().length()>0)

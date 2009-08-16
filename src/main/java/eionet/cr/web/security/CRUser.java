@@ -20,6 +20,7 @@
  */
 package eionet.cr.web.security;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -112,5 +113,80 @@ public class CRUser {
 		}
 		
 		return result;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public String homeUri(){
+		return CRUser.homeUri(userName);
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public String registrationsUri(){
+		return CRUser.registrationsUri(userName);
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public String bookmarksUri(){
+		return CRUser.bookmarksUri(userName);
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public String historyUri(){
+		return CRUser.historyUri(userName);
+	}
+
+	/**
+	 * 
+	 * @param userName
+	 * @return
+	 */
+	public static String homeUri(String userName){
+		
+		if (StringUtils.isBlank(userName))
+			throw new IllegalArgumentException("userName must not be blank");
+		else
+			return "http://cr.eionet.europa.eu/home/" + userName;
+	}
+
+	/**
+	 * 
+	 * @param userName
+	 * @return
+	 */
+	public static String bookmarksUri(String userName){
+		
+		return CRUser.homeUri(userName) + "/bookmarks";
+	}
+
+	/**
+	 * 
+	 * @param userName
+	 * @return
+	 */
+	public static String registrationsUri(String userName){
+		
+		return CRUser.homeUri(userName) + "/registrations";
+	}
+
+	/**
+	 * 
+	 * @param userName
+	 * @return
+	 */
+	public static String historyUri(String userName){
+		
+		return CRUser.homeUri(userName) + "/history";
 	}
 }

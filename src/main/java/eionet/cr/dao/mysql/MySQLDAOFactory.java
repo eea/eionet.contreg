@@ -48,7 +48,7 @@ public final class MySQLDAOFactory {
 		registeredDaos.put(HarvestDAO.class, MySQLHarvestDAO.class);
 		registeredDaos.put(HarvestMessageDAO.class, MySQLHarvestMessageDAO.class);
 		registeredDaos.put(HarvestSourceDAO.class, MySQLHarvestSourceDAO.class);
-		registeredDaos.put(SpoHelperDao.class, MySQLSpoDao.class);
+		registeredDaos.put(SpoHelperDao.class, MySQLSpoHelperDao.class);
 		registeredDaos.put(UrgentHarvestQueueDAO.class, MySQLUrgentHarvestQueueDAO.class);
 	}
 	

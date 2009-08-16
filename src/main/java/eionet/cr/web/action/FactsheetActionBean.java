@@ -33,8 +33,15 @@ import org.apache.commons.lang.StringUtils;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
+import net.sourceforge.stripes.validation.SimpleError;
+import net.sourceforge.stripes.validation.ValidationMethod;
+import eionet.cr.common.Predicates;
+import eionet.cr.common.Subjects;
+import eionet.cr.dao.DAOException;
+import eionet.cr.dao.SpoHelperDao;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.FactsheetSearch;
@@ -43,6 +50,8 @@ import eionet.cr.search.UriSearch;
 import eionet.cr.search.util.PredicateLabels;
 import eionet.cr.search.util.SubProperties;
 import eionet.cr.search.util.SearchExpression;
+import eionet.cr.search.util.UriLabelPair;
+import eionet.cr.util.URLUtil;
 
 /**
  * 
@@ -60,6 +69,14 @@ public class FactsheetActionBean extends AbstractActionBean{
 	/** */
 	private Map<String,String> predicateLabels;
 	private SubProperties subProperties;
+	
+	/** */
+	private Collection<UriLabelPair> propertiesToSelect;
+
+	/** */
+	private boolean anonymous;
+	private String propertyUri;
+	private String propertyValue;
 	
 	/**
 	 * 
@@ -80,7 +97,41 @@ public class FactsheetActionBean extends AbstractActionBean{
 		
 		return new ForwardResolution("/pages/factsheet.jsp");
 	}
-
+	
+	/**
+	 * 
+	 * @return
+	 * @throws SearchException
+	 */
+	public Resolution edit() throws SearchException{
+		
+		propertiesToSelect = new ArrayList<UriLabelPair>();
+		propertiesToSelect.add(UriLabelPair.create(Predicates.DC_TITLE, "Title"));
+		propertiesToSelect.add(UriLabelPair.create(Predicates.DC_DATE, "Publish date"));
+		propertiesToSelect.add(UriLabelPair.create(Predicates.DC_DESCRIPTION, "Description"));
+		
+		return view();
+	}
+	
+	/**
+	 * 
+	 * @return
+	 * @throws DAOException
+	 */
+	public Resolution save() throws DAOException{
+		
+		SubjectDTO subjectDTO = new SubjectDTO(uri, anonymous);
+		
+		ObjectDTO objectDTO = new ObjectDTO(propertyValue, true);		
+		objectDTO.setSourceUri(getCRUser().registrationsUri());		
+		subjectDTO.addObject(propertyUri, objectDTO);
+		
+		SpoHelperDao spoHelperDao = factory.getDao(SpoHelperDao.class);			 
+		spoHelperDao.addTriples(subjectDTO);
+		
+		return new RedirectResolution(this.getClass(), "edit").addParameter("uri", uri);
+	}
+	
 	/**
 	 * @return the resourceUri
 	 */
@@ -128,5 +179,61 @@ public class FactsheetActionBean extends AbstractActionBean{
 	 */
 	public void setUriHash(Long uriHash) {
 		this.uriHash = uriHash;
+	}
+
+	/**
+	 * @return the propertiesToSelect
+	 */
+	public Collection<UriLabelPair> getPropertiesToSelect() {
+		return propertiesToSelect;
+	}
+
+	/**
+	 * @param anonymous the anonymous to set
+	 */
+	public void setAnonymous(boolean anonymous) {
+		this.anonymous = anonymous;
+	}
+
+	/**
+	 * @param subject the subject to set
+	 */
+	public void setSubject(SubjectDTO subject) {
+		this.subject = subject;
+	}
+
+	/**
+	 * @param predicateLabels the predicateLabels to set
+	 */
+	public void setPredicateLabels(Map<String, String> predicateLabels) {
+		this.predicateLabels = predicateLabels;
+	}
+
+	/**
+	 * @param subProperties the subProperties to set
+	 */
+	public void setSubProperties(SubProperties subProperties) {
+		this.subProperties = subProperties;
+	}
+
+	/**
+	 * @param propertiesToSelect the propertiesToSelect to set
+	 */
+	public void setPropertiesToSelect(Collection<UriLabelPair> propertiesToSelect) {
+		this.propertiesToSelect = propertiesToSelect;
+	}
+
+	/**
+	 * @param propertyUri the propertyUri to set
+	 */
+	public void setPropertyUri(String propertyUri) {
+		this.propertyUri = propertyUri;
+	}
+
+	/**
+	 * @param propertyValue the propertyValue to set
+	 */
+	public void setPropertyValue(String propertyValue) {
+		this.propertyValue = propertyValue;
 	}
 }

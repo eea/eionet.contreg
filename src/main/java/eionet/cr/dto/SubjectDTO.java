@@ -302,4 +302,24 @@ public class SubjectDTO{
 	public void setUriHash(long uriHash) {
 		this.uriHash = uriHash;
 	}
+	
+	/**
+	 * 
+	 * @param predicateUri
+	 * @param objectValue
+	 * @param sourceHash
+	 * @return
+	 */
+	public boolean existsPredicateObjectSource(String predicateUri, String objectValue, String sourceUri){
+		
+		for (ObjectDTO objectDTO:getObjects(predicateUri)){
+			if (objectDTO.getValue().equals(objectValue)){
+				if (objectDTO.getSourceUri().equals(sourceUri)){
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
 }

@@ -42,8 +42,9 @@ public interface SpoHelperDao extends IDao {
 	
 	/**
 	 * 
-	 * @param subjectDTO
+	 * @param uri
+	 * @param firstSeenSourceUri
 	 * @throws DAOException
 	 */
-	public abstract void register(SubjectDTO subjectDTO) throws DAOException;
+	public abstract void addResource(String uri, String firstSeenSourceUri) throws DAOException;
 }
