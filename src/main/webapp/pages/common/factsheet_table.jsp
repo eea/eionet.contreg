@@ -77,7 +77,13 @@
 	    	</c:forEach>
 	    </tbody>
    	</table>
-   	
+   	<c:if test='${sessionScope.crUser!=null && crfn:hasPermission(sessionScope.crUser.userName, "/", "u")}'>
+		<p>
+			<stripes:link href="${actionBean.urlBinding}" event="harvest">
+			<stripes:link-param name="uri" value="${actionBean.uri}"/>
+			Schedule urgent harvest</stripes:link>
+		</p>
+	</c:if>	
    	<p>
 		<stripes:link href="/references.action" event="search">What is referring to this resource?
 			<c:choose>

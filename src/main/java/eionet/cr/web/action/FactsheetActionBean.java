@@ -22,36 +22,28 @@ package eionet.cr.web.action;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
-import org.apache.commons.lang.StringUtils;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
-import net.sourceforge.stripes.validation.SimpleError;
-import net.sourceforge.stripes.validation.ValidationMethod;
+
+import org.apache.commons.lang.StringUtils;
+
 import eionet.cr.common.Predicates;
-import eionet.cr.common.Subjects;
+import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.SpoHelperDao;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
+import eionet.cr.harvest.HarvestException;
+import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.search.FactsheetSearch;
 import eionet.cr.search.SearchException;
-import eionet.cr.search.UriSearch;
-import eionet.cr.search.util.PredicateLabels;
 import eionet.cr.search.util.SubProperties;
-import eionet.cr.search.util.SearchExpression;
 import eionet.cr.search.util.UriLabelPair;
-import eionet.cr.util.URLUtil;
 
 /**
  * 
@@ -91,13 +83,32 @@ public class FactsheetActionBean extends AbstractActionBean{
 		Collection<SubjectDTO> coll = factsheetSearch.getResultList();
 		if (coll!=null && !coll.isEmpty())
 			subject = coll.iterator().next();
-
 		predicateLabels = factsheetSearch.getPredicateLabels().getByLanguagePreferences(createPreferredLanguages(), "en");
 		subProperties = factsheetSearch.getSubProperties();
 		
 		return new ForwardResolution("/pages/factsheet.jsp");
 	}
 	
+	/**
+	 * schedules a harvest for resource.
+	 * 
+	 * @return view resolution
+	 * @throws HarvestException
+	 * @throws SearchException
+	 */
+	public Resolution harvest() throws HarvestException, SearchException {
+		if(isUserLoggedIn()){
+			if (uri!=null && !uri.isEmpty()){
+				UrgentHarvestQueue.addPullHarvest(StringUtils.substringBefore(uri, "#"));
+				showMessage("The source has been scheduled for urgent harvest!");
+			}
+		}
+		else {
+			handleCrException(getBundle().getString("not.logged.in"), GeneralConfig.SEVERITY_WARNING);
+		}
+		return view();
+	}
+
 	/**
 	 * 
 	 * @return
