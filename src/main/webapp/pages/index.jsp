@@ -8,12 +8,12 @@
 <div style="float:right; background-color:white; width: 20em; padding-left: 1em;">
 	<div style="background-color:#f0f0f0; padding:0.5em; margin: 0.3em; border:1px dotted black;">
 		<c:choose>
-                <c:when test='${sessionScope.crUser!=null}'>
-		<a href="#" title="To be developed" style="font-weight:bold">Suggest a URL!</a>
-		</c:when>
-		<c:otherwise>
-		<stripes:link title="Login" href="/login.action" event="login" style="font-weight:bold">Login to suggest a URL!</stripes:link>
-		</c:otherwise>
+			<c:when test='${sessionScope.crUser!=null}'>
+				<stripes:link href="/registerUrl.action" style="font-weight:bold">Suggest a URL!</stripes:link>
+			</c:when>
+			<c:otherwise>
+				<stripes:link title="Login" href="/login.action" event="login" style="font-weight:bold">Login to suggest a URL!</stripes:link>
+			</c:otherwise>
 		</c:choose>
 		Help other researchers find the good datasets. Bookmark them on this site.
 	</div>
