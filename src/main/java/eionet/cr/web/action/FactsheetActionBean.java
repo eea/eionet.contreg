@@ -98,7 +98,7 @@ public class FactsheetActionBean extends AbstractActionBean{
 	 */
 	public Resolution harvest() throws HarvestException, SearchException {
 		if(isUserLoggedIn()){
-			if (uri!=null && !uri.isEmpty()){
+			if (!StringUtils.isBlank(uri)){
 				UrgentHarvestQueue.addPullHarvest(StringUtils.substringBefore(uri, "#"));
 				showMessage("The source has been scheduled for urgent harvest!");
 			}
