@@ -26,11 +26,8 @@ import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
-import eionet.cr.common.Predicates;
-import eionet.cr.common.Subjects;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HelperDao;
-import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
 
 /**
@@ -59,10 +56,6 @@ public class FrontpageActionBean extends AbstractActionBean {
 	 */
 	public List<Pair<String, String>> getRecentFiles() {
 		return recentFiles;
-	}
-	
-	public static void main(String[] args) {
-		System.out.println(Hashes.spoHash(Predicates.RDF_TYPE));
 	}
 
 }
