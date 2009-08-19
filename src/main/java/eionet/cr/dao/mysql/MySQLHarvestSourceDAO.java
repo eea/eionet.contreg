@@ -31,11 +31,11 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.readers.HarvestSourceDTOReader;
-import eionet.cr.dto.readers.SingleIntColumnReader;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Util;
 import eionet.cr.util.sql.ConnectionUtil;
 import eionet.cr.util.sql.SQLUtil;
+import eionet.cr.util.sql.SingleObjectReader;
 
 /**
  * @author altnyris
@@ -231,11 +231,11 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 			
 			/* get harvest source ids, delete harvests and harvest messages by them */
 			
-			SingleIntColumnReader reader = new SingleIntColumnReader();
+			SingleObjectReader<Integer> reader = new SingleObjectReader<Integer>();
 			SQLUtil.executeQuery("select HARVEST_SOURCE_ID from HARVEST_SOURCE where URL" + inClause, urls, reader, conn);
 			String harvestSourceIdsCSV = Util.toCSV(reader.getResultList());
 			
-			reader = new SingleIntColumnReader();
+			reader = new SingleObjectReader<Integer>();
 			SQLUtil.executeQuery("select HARVEST_ID from HARVEST where HARVEST_SOURCE_ID in (" + harvestSourceIdsCSV + ")", reader, conn);
 			String harvestIdsCSV = Util.toCSV(reader.getResultList());
 			if (harvestIdsCSV.trim().length()>0){

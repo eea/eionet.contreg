@@ -57,7 +57,7 @@ public abstract class AbstractActionBean implements ActionBean {
 	private static final String SESSION_MESSAGES = AbstractActionBean.class.getName() + ".sessionMessages";
 	
 	/** */
-	private static Log logger = LogFactory.getLog(AbstractActionBean.class);
+	protected static Log logger = LogFactory.getLog(AbstractActionBean.class);
 	
 	/** */
 	private CRActionBeanContext context;

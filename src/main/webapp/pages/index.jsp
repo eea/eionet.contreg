@@ -29,17 +29,29 @@
 	</div>
 	<div style="background-color:#f0f0f0; padding:0.5em; margin: 0.3em; border:1px dotted black;">
 		<div style="font-size:1.2em;font-weight:bold">Recently discovered files:</div>
-		<ul class="menu">
-		<li>2009 submission under Article 3(2)</li>
-		<li>Monthly Ozone April 2009 report</li>
-		<li>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus vel.</li>
-		<li>Nunc quis venenatis lacus. Vivamus pretium, nunc nec volutpat eleifend.</li>
-		<li>2009 submission under Article 3(2)</li>
-		<li>2009 submission under Article 3(2)</li>
-		<li>2009 submission under Article 3(2)</li>
-		<li>2009 submission under Article 3(2)</li>
-		<li>...</li>
-		</ul>
+		<c:choose>
+			<c:when test="${actionBean.recentFiles eq null}">
+				<p class="system-msg">No recently discovered files found</p>
+			</c:when>
+			<c:otherwise>
+				<ul class="menu">
+				<c:forEach items="${actionBean.recentFiles}" var="recentFile">
+						<li>
+							<a href="factsheet.action?uriHash=${recentFile.id }" title="${recentFile.value }">
+							<c:choose>
+								<c:when test="${fn:length(recentFile.value) gt 38}">
+									${fn:substring(recentFile.value,0,35)}...
+								</c:when>
+								<c:otherwise>
+									${recentFile.value}
+								</c:otherwise>
+							</c:choose>
+							</a>
+						</li>
+				</c:forEach>
+				</ul>
+			</c:otherwise>
+		</c:choose>
 	</div>
 </div>
         <h1>What is Content Registry?</h1>

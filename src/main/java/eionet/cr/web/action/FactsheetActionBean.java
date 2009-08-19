@@ -35,7 +35,7 @@ import org.apache.commons.lang.StringUtils;
 import eionet.cr.common.Predicates;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
-import eionet.cr.dao.SpoHelperDao;
+import eionet.cr.dao.HelperDao;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.HarvestException;
@@ -137,7 +137,7 @@ public class FactsheetActionBean extends AbstractActionBean{
 		objectDTO.setSourceUri(getCRUser().registrationsUri());		
 		subjectDTO.addObject(propertyUri, objectDTO);
 		
-		SpoHelperDao spoHelperDao = factory.getDao(SpoHelperDao.class);			 
+		HelperDao spoHelperDao = factory.getDao(HelperDao.class);			 
 		spoHelperDao.addTriples(subjectDTO);
 		
 		return new RedirectResolution(this.getClass(), "edit").addParameter("uri", uri);

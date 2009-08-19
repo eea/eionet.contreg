@@ -23,32 +23,26 @@ package eionet.cr.web.action;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletRequest;
+
+import net.sourceforge.stripes.action.DefaultHandler;
+import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.action.UrlBinding;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import net.sourceforge.stripes.action.Before;
-import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.action.UrlBinding;
-import net.sourceforge.stripes.validation.ValidationMethod;
 import eionet.cr.common.Predicates;
+import eionet.cr.dao.DAOException;
+import eionet.cr.dao.HelperDao;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.search.CustomSearch;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.SpatialSearch;
-import eionet.cr.search.SpatialSourcesSearch;
 import eionet.cr.search.util.BBOX;
-import eionet.cr.search.util.UriLabelPair;
 import eionet.cr.util.Util;
 import eionet.cr.web.util.columns.SearchResultColumn;
 import eionet.cr.web.util.columns.SubjectPredicateColumn;
@@ -219,8 +213,11 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean {
 	 * @throws SearchException
 	 */
 	public Resolution kmlLinks() throws SearchException {
-		
-		sources = SpatialSourcesSearch.execute();
+		try {
+			sources = factory.getDao(HelperDao.class).performSpatialSourcesSearch();
+		} catch (DAOException ignored){
+			logger.error("spatial search failed", ignored);
+		}
 		if (sources.isEmpty()){
 			showMessage("No spatial objects currently found!");
 			return new ForwardResolution("/pages/googleEarthIntro.jsp");

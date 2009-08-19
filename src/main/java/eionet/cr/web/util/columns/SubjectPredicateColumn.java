@@ -44,6 +44,20 @@ public class SubjectPredicateColumn extends SearchResultColumn{
 	/** */
 	private String predicateUri;
 	
+	public SubjectPredicateColumn() {
+		//blank
+	}
+	
+	/**
+	 * @param title
+	 * @param isSortable
+	 * @param predicateUri
+	 */
+	public SubjectPredicateColumn(String title, boolean isSortable, String predicateUri) {
+		super(title, isSortable);
+		this.predicateUri = predicateUri;
+	}
+	
 	/**
 	 * @return the predicateUri
 	 */

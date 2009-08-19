@@ -20,7 +20,6 @@
  */
 package eionet.cr.web.util.columns;
 
-import eionet.cr.web.util.Formatter;
 
 /**
  * 
@@ -32,6 +31,19 @@ public abstract class SearchResultColumn {
 	/** */
 	private String title;
 	private boolean isSortable;
+	
+	public SearchResultColumn() {
+		//blank constructor
+	}
+
+	/**
+	 * @param title
+	 * @param isSortable
+	 */
+	public SearchResultColumn(String title, boolean isSortable) {
+		this.title = title;
+		this.isSortable = isSortable;
+	}
 
 	/**
 	 * 

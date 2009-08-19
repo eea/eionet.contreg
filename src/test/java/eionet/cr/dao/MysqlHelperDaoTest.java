@@ -20,32 +20,28 @@
  */
 package eionet.cr.dao;
 
-import junit.framework.TestCase;
+import java.util.List;
 
 import org.junit.Test;
 
 import eionet.cr.dao.mysql.MySQLDAOFactory;
-import eionet.cr.dao.mysql.MySQLHarvestDAO;
-import eionet.cr.dao.mysql.MySQLHarvestMessageDAO;
-import eionet.cr.dao.mysql.MySQLHarvestSourceDAO;
-import eionet.cr.dao.mysql.MySQLHelperDao;
-import eionet.cr.dao.mysql.MySQLUrgentHarvestQueueDAO;
+import eionet.cr.util.Pair;
+
+import junit.framework.Assert;
+import junit.framework.TestCase;
 
 /**
- * Tests the factory getDao methods.
- * 
  * @author Aleksandr Ivanov
  * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
-public class DaoFactoryTest extends TestCase {
-
+public class MysqlHelperDaoTest extends TestCase {
+	
 	@Test
-	public void testFactory() {
-		MySQLDAOFactory factory = MySQLDAOFactory.get();
-		assertTrue(factory.getDao(HarvestDAO.class) instanceof MySQLHarvestDAO);
-		assertTrue(factory.getDao(HarvestMessageDAO.class) instanceof MySQLHarvestMessageDAO);
-		assertTrue(factory.getDao(HarvestSourceDAO.class) instanceof MySQLHarvestSourceDAO);
-		assertTrue(factory.getDao(HelperDao.class) instanceof MySQLHelperDao);
-		assertTrue(factory.getDao(UrgentHarvestQueueDAO.class) instanceof MySQLUrgentHarvestQueueDAO);
+	public void testGetRecentFiles() throws DAOException {
+		HelperDao dao = MySQLDAOFactory.get().getDao(HelperDao.class);
+		List<Pair<String, String>> result = dao.getRecentlyDiscoveredFiles(10);
+		Assert.assertNotNull(result);
+		Assert.assertEquals(10, result.size());
 	}
+
 }

@@ -24,6 +24,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import eionet.cr.dao.DAOException;
 import eionet.cr.util.sql.ConnectionUtil;
 import eionet.cr.util.sql.MySQLUtil;
@@ -36,6 +38,8 @@ import eionet.cr.util.sql.SQLUtil;
  *
  */
 public abstract class MySQLBaseDAO {
+	
+	protected Logger logger = Logger.getLogger(MySQLBaseDAO.class);
 	
 	/**
 	 * 

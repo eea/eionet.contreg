@@ -4,71 +4,104 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.dao.DAOException;
-import eionet.cr.dao.SpoHelperDao;
+import eionet.cr.dao.HelperDao;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
 import eionet.cr.util.Hashes;
+import eionet.cr.util.Pair;
 import eionet.cr.util.Util;
 import eionet.cr.util.YesNoBoolean;
+import eionet.cr.util.sql.PairReader;
 import eionet.cr.util.sql.SQLUtil;
-import eionet.cr.util.sql.SQLValue;
-import eionet.cr.util.sql.SQLValueReader;
+import eionet.cr.util.sql.SingleObjectReader;
 
 
 /**
- *	Mysql implementation of {@link MySQLSpoHelperDao}.
+ *	Mysql implementation of {@link HelperDao}.
  * 
  * @author Aleksandr Ivanov
  * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
-public class MySQLSpoHelperDao extends MySQLBaseDAO implements SpoHelperDao {
-	
-	/** */
-	private static final String sqlQuery = "select distinct OBJECT from SPO where PREDICATE=? and LIT_OBJ='Y' and ANON_OBJ='N' order by OBJECT asc";
+public class MySQLHelperDao extends MySQLBaseDAO implements HelperDao {
 	
 	/**
 	 * 
 	 */
-	MySQLSpoHelperDao() {
+	MySQLHelperDao() {
 		//reducing visibility
 	}
 
 	/** 
-	 * @see eionet.cr.dao.SpoHelperDao#getPicklistForPredicate(java.lang.String)
+	 * @see eionet.cr.dao.HelperDao#performSpatialSourcesSearch()
+	 * {@inheritDoc}
+	 */
+	public List<String> performSpatialSourcesSearch() throws DAOException {
+		String sql = "select distinct URI from SPO,RESOURCE where " +
+				"PREDICATE= ? and OBJECT_HASH= ? and SOURCE=RESOURCE.URI_HASH";
+		List<Long> params = new LinkedList<Long>();
+		params.add(Hashes.spoHash(Predicates.RDF_TYPE));
+		params.add(Hashes.spoHash(Subjects.WGS_POINT));
+		return executeQuery(sql, null, new SingleObjectReader<String>());
+	}
+	
+	/** 
+	 * @see eionet.cr.dao.HelperDao#getRecentlyDiscoveredFiles()
+	 * {@inheritDoc}
+	 */
+	public List<Pair<String, String>> getRecentlyDiscoveredFiles(int limit) throws DAOException {
+		//workaround as mysql doesn't allow limit in subqueries
+		//first let's select needed uri_hash
+		String sql = "SELECT DISTINCT RESOURCE.URI_HASH FROM RESOURCE INNER JOIN SPO ON RESOURCE.URI_HASH = SPO.SUBJECT" +
+				" WHERE SPO.PREDICATE= ? AND OBJECT_HASH= ? ORDER BY FIRSTSEEN_TIME DESC LIMIT ?;";
+		List<Long> params = new LinkedList<Long>();
+		params.add(Hashes.spoHash(Predicates.RDF_TYPE));
+		params.add( Hashes.spoHash(Subjects.CR_FILE));
+		params.add(new Long(limit));
+		
+		List<Long> result = executeQuery(sql, params, new SingleObjectReader<Long>());
+		logger.debug(result);
+		//now let's fetch labels
+		sql = "SELECT DISTINCT SPO.SUBJECT as id, SPO.OBJECT as value FROM RESOURCE INNER JOIN SPO ON RESOURCE.URI_HASH = SPO.SUBJECT" +
+				" WHERE SPO.PREDICATE= ? AND SPO.SUBJECT IN (" + Util.toCSV(result) + 
+				") ORDER BY FIRSTSEEN_TIME DESC LIMIT ?;";
+		logger.debug(sql);
+		params.clear();
+		params.add(Hashes.spoHash(Predicates.RDFS_LABEL));
+		params.add(new Long(limit));
+		List<Pair<String, String>> resultList = executeQuery(sql, params, new PairReader<String, String>());
+		logger.debug(resultList);
+		
+		return resultList;
+	}
+
+	/** */
+	private static final String sqlQuery = "select distinct OBJECT from SPO where PREDICATE=? and LIT_OBJ='Y' and ANON_OBJ='N' order by OBJECT asc";
+
+	/** 
+	 * @see eionet.cr.dao.HelperDao#getPicklistForPredicate(java.lang.String)
 	 * {@inheritDoc}
 	 */
 	public Collection<String> getPicklistForPredicate(String predicateUri) throws SearchException {
 		if (StringUtils.isBlank(predicateUri)) {
 			return Collections.emptyList();
 		}
-		try{
-			Collection<String> result = new LinkedList<String>();
-			List<Map<String,SQLValue>> resultList = executeQuery(
+		try {
+			List<String> resultList = executeQuery(
 					sqlQuery,
 					Collections.singletonList((Object)Hashes.spoHash(predicateUri)),
-					new SQLValueReader()); 
-			if (resultList!=null && !resultList.isEmpty()){
-				for (int i=0; i<resultList.size(); i++){
-					SQLValue sqlValue = resultList.get(i).get("OBJECT");
-					if (sqlValue!=null){
-						result.add(sqlValue.getString());
-					}
-				}
-			}
-			return result;
+					new SingleObjectReader<String>());
+			return resultList;
 		}
 		catch (DAOException e){
 			throw new SearchException(e.toString(), e);
@@ -79,7 +112,7 @@ public class MySQLSpoHelperDao extends MySQLBaseDAO implements SpoHelperDao {
 	private static final String allowLiteralSearchQuery = "select distinct OBJECT from SPO where SUBJECT=? and PREDICATE=? and LIT_OBJ='N' and ANON_OBJ='N'";
 	
 	/** 
-	 * @see eionet.cr.dao.SpoHelperDao#isAllowLiteralSearch(java.lang.String)
+	 * @see eionet.cr.dao.HelperDao#isAllowLiteralSearch(java.lang.String)
 	 * {@inheritDoc}
 	 */
 	public boolean isAllowLiteralSearch(String predicateUri) throws SearchException{
@@ -94,18 +127,14 @@ public class MySQLSpoHelperDao extends MySQLBaseDAO implements SpoHelperDao {
 			values.add(Long.valueOf(Hashes.spoHash(predicateUri)));
 			values.add(Long.valueOf((Hashes.spoHash(Predicates.RDFS_RANGE))));
 			
-			List<Map<String,SQLValue>> resultList = executeQuery(allowLiteralSearchQuery, values, new SQLValueReader());
+			List<String> resultList = executeQuery(allowLiteralSearchQuery, values, new SingleObjectReader<String>());
 			if (resultList == null || resultList.isEmpty()) {
 				return true; // if not rdfs:domain specified at all, then lets allow literal search
 			}
 			
-			for (Map<String, SQLValue> result : resultList){
-				SQLValue sqlValue = result.get("OBJECT");
-				if (sqlValue!=null){
-					String strValue = sqlValue.getString();
-					if (strValue!=null && strValue.equals(Subjects.RDFS_LITERAL)){
-						return true; // rdfs:Literal is present in the specified rdfs:domain
-					}
+			for (String result : resultList){
+				if (Subjects.RDFS_LITERAL.equals(result)){
+					return true; // rdfs:Literal is present in the specified rdfs:domain
 				}
 			}
 			
@@ -218,4 +247,5 @@ public class MySQLSpoHelperDao extends MySQLBaseDAO implements SpoHelperDao {
 			SQLUtil.close(conn);
 		}
 	}
+
 }

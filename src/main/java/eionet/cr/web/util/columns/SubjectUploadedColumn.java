@@ -35,6 +35,19 @@ public class SubjectUploadedColumn extends SearchResultColumn{
 	/** */
 	private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yy HH:mm:ss");
 	
+	public SubjectUploadedColumn() {
+		//blank constructor
+	}
+
+	/**
+	 * @param title
+	 * @param isSortable
+	 */
+	public SubjectUploadedColumn(String title, boolean isSortable) {
+		super(title, isSortable);
+	}
+
+	
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.web.util.search.SearchResultColumn#format(java.lang.Object)

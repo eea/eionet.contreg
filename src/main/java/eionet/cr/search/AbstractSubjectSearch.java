@@ -27,24 +27,19 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import eionet.cr.config.GeneralConfig;
-import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.util.SortOrder;
-import eionet.cr.search.util.SubjectHashesReader;
 import eionet.cr.search.util.SubjectDataReader;
+import eionet.cr.search.util.SubjectHashesReader;
 import eionet.cr.search.util.SubjectSelectMode;
-import eionet.cr.util.Hashes;
 import eionet.cr.util.Util;
 import eionet.cr.util.pagination.Pagination;
 import eionet.cr.util.sql.ConnectionUtil;
-import eionet.cr.util.sql.MySQLUtil;
 import eionet.cr.util.sql.SQLUtil;
 
 /**
@@ -79,7 +74,7 @@ public abstract class AbstractSubjectSearch {
 		
 		/* create the SQL query that selects the hashes of matching subjects */
 		
-		String subjectSelectQuery = getSubjectSelectSQL(inParameters);//createCompleteSubjectSelectQuery(inParameters);
+		String subjectSelectQuery = getSubjectSelectSQL(inParameters);
 		if (subjectSelectQuery!=null && subjectSelectQuery.length()>0){
 			
 			Connection conn = null;
@@ -109,15 +104,6 @@ public abstract class AbstractSubjectSearch {
 					
 					totalMatchCount = subjectHashesReader.getResultSetSize();
 					
-//					switch(getSubjectSelectMode()) {
-//					case DB_1STEP:
-//						totalMatchCount = MySQLUtil.getTotalRowCount(conn);break;
-//					case DB_2STEP:
-//						totalMatchCount = Integer.parseInt(SQLUtil.executeSingleReturnValueQuery(addSQLCountFunction(subjectSelectQuery), conn).toString());break;
-//					case SERVER:
-//						totalMatchCount = subjectHashesReader.getResultSetSize();break;
-//					}
-
 					/* execute the SQL query that gets the metadata of the found subjects, collect the query results */
 
 					SubjectDataReader subjectDataReader = createSubjectDataReader(subjectsMap);
@@ -304,70 +290,6 @@ public abstract class AbstractSubjectSearch {
 				GeneralConfig.getProperty(GeneralConfig.SUBEJCT_SELECT_MODE, SubjectSelectMode.DB_1STEP.toString()).toUpperCase());
 	}
 
-	/**
-	 * 
-	 * @return
-	 */
-	private static String addSQLCountFunction(String selectQuery){
-		
-		String s = StringUtils.replace(selectQuery, " distinct ", " count(distinct ", 1);
-		return StringUtils.replace(s, " from ", ") from ", 1);
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	private String createCompleteSubjectSelectQuery(List inParameters){
-		
-		/* add the "sql_calc_found_rows" and/or "distinct" keywords if the mode requires so */
-		
-		String sql = getSubjectSelectSQL(inParameters);
-		switch(getSubjectSelectMode()) {
-	    	case DB_1STEP: sql = StringUtils.replace(sql, "select ", "select sql_calc_found_rows distinct ", 1);break;
-	    	case DB_2STEP: sql = StringUtils.replace(sql, "select ", "select distinct ", 1);break;
-		}
-		
-		/* if sorting required, add sorting join */
-		
-		if (sortPredicate!=null){
-			
-			int countQMarks = StringUtils.countMatches(sql.substring(0, sql.indexOf(" from ")), "?");
-			
-			StringBuffer buf = new StringBuffer().
-			append(" left join SPO as ORDERING on (").append(orderingJoinTable()).
-			append(".SUBJECT=ORDERING.SUBJECT and ORDERING.PREDICATE=?) where ");
-			
-			sql = StringUtils.replace(sql, " where ", buf.toString(), 1);
-			
-			// add an IN parameter for sorting predicate, add it into the correct position in the list of IN parameters
-			inParameters.add(countQMarks, Long.valueOf(Hashes.spoHash(sortPredicate)));
-		}
-		
-		/* add the ORDER BY part */
-		
-		StringBuffer sqlBuf = new StringBuffer(sql);
-		if (sortPredicate!=null){
-			sqlBuf.append(" order by ORDERING.OBJECT ").append(sortOrder==null ? sortOrder.ASCENDING.toSQL() : sortOrder.toSQL());
-		}
-		
-		/* build the LIMIT part */
-		
-		if (!getSubjectSelectMode().equals(SubjectSelectMode.SERVER)){
-			
-			if (pageLength>0){
-				sqlBuf.append(" limit ");
-				if (pageNumber>0){
-					sqlBuf.append("?,");
-					inParameters.add(new Integer((pageNumber-1)*pageLength));
-				}
-				sqlBuf.append(pageLength);
-			}
-		}
-		
-		return sqlBuf.toString();
-	}
-	
 	/**
 	 * 
 	 * @return

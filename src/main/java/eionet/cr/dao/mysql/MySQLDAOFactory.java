@@ -27,7 +27,7 @@ import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dao.HarvestMessageDAO;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.IDao;
-import eionet.cr.dao.SpoHelperDao;
+import eionet.cr.dao.HelperDao;
 import eionet.cr.dao.UrgentHarvestQueueDAO;
 
 
@@ -48,7 +48,7 @@ public final class MySQLDAOFactory {
 		registeredDaos.put(HarvestDAO.class, MySQLHarvestDAO.class);
 		registeredDaos.put(HarvestMessageDAO.class, MySQLHarvestMessageDAO.class);
 		registeredDaos.put(HarvestSourceDAO.class, MySQLHarvestSourceDAO.class);
-		registeredDaos.put(SpoHelperDao.class, MySQLSpoHelperDao.class);
+		registeredDaos.put(HelperDao.class, MySQLHelperDao.class);
 		registeredDaos.put(UrgentHarvestQueueDAO.class, MySQLUrgentHarvestQueueDAO.class);
 	}
 	
