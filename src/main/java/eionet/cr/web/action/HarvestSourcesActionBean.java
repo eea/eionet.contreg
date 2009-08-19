@@ -73,7 +73,6 @@ public class HarvestSourcesActionBean extends AbstractActionBean {
 
 	/** */
 	public HarvestSourcesActionBean(){
-		this.type = "data";
 	}
 	
 	/**
@@ -87,7 +86,7 @@ public class HarvestSourcesActionBean extends AbstractActionBean {
 		if(!StringUtils.isEmpty(this.searchString)) {
 			filterString = "%" + StringEscapeUtils.escapeSql(this.searchString) + "%";
 		}
-		if(type == null) {
+		if(StringUtils.isBlank(type)) {
 			harvestSources = factory.getDao(HarvestSourceDAO.class).getHarvestSources(filterString);
 		} else if (TRACKED_FILES.equals(type)) {
 				harvestSources = factory.getDao(HarvestSourceDAO.class).getHarvestTrackedFiles(filterString);
