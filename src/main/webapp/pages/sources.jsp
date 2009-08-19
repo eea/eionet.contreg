@@ -55,7 +55,7 @@
 			<br style="clear:left" />
 			<div style="margin-top:20px;margin-bottom:5px">	
 				<display:table name="${actionBean.harvestSources}" class="sortable" pagesize="15"
-								sort="list" id="harvestSource" htmlId="harvestSources" requestURI="${actionBean.pagingUrl}"
+								sort="page" id="harvestSource" htmlId="harvestSources" requestURI="${actionBean.pagingUrl}"
 								decorator="eionet.cr.web.util.HarvestSourcesTableDecorator" style="width:100%"
 								excludedParams="harvest delete sourceUrl view">
 					<display:setProperty name="paging.banner.items_name" value="sources"/>
