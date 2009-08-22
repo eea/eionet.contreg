@@ -25,6 +25,10 @@
        OBJECT="Eesti"
        OBJECT_HASH="7022791704201925883" ANON_SUBJ="N" ANON_OBJ="N" LIT_OBJ="Y" OBJ_LANG="" OBJ_DERIV_SOURCE="0" OBJ_SOURCE_OBJECT="0"/>
 
+  <RESOURCE URI="http://cr.eionet.europa.eu/ontologies/contreg.rdf#byteSize" URI_HASH="8639511163630871821"/>
+  <RESOURCE URI="http://cr.eionet.europa.eu/ontologies/contreg.rdf#contentLastModified" URI_HASH="3296918264710147612"/>
+  <RESOURCE URI="http://cr.eionet.europa.eu/ontologies/contreg.rdf#lastRefreshed" URI_HASH="-2213704056277764256"/>
+  <RESOURCE URI="http://cr.eionet.europa.eu/ontologies/contreg.rdf#mediaType" URI_HASH="333311624525447614"/>
   <RESOURCE URI="http://svn.eionet.europa.eu/repositories/Reportnet/cr2/trunk/src/test/resources/inline-rdf.xml" URI_HASH="-7018864882084838862"/>
   <RESOURCE URI="http://www.w3.org/1999/02/22-rdf-syntax-ns#type" URI_HASH="-5251507576730213845"/>
   <RESOURCE URI="http://www.w3.org/2000/01/rdf-schema#seeAlso" URI_HASH="-1439821251260322103"/>

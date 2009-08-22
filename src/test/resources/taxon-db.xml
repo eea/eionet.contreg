@@ -5,9 +5,10 @@
      The original file can be retrieved as version 7158.
 -->
 <dataset>
-  <!-- Excluded from test data as it changes with the user
-  <RESOURCE URI="file:/home/roug/workspace/cr2/target/test-classes/taxon-rdf.xml" URI_HASH="4747674420698131110"/>
-  -->
+  <RESOURCE URI="http://cr.eionet.europa.eu/ontologies/contreg.rdf#byteSize" URI_HASH="8639511163630871821"/>
+  <RESOURCE URI="http://cr.eionet.europa.eu/ontologies/contreg.rdf#contentLastModified" URI_HASH="3296918264710147612"/>
+  <RESOURCE URI="http://cr.eionet.europa.eu/ontologies/contreg.rdf#lastRefreshed" URI_HASH="-2213704056277764256"/>
+  <RESOURCE URI="http://cr.eionet.europa.eu/ontologies/contreg.rdf#mediaType" URI_HASH="333311624525447614"/>
   <RESOURCE URI="http://purl.org/dc/terms/description" URI_HASH="-7864036825501654521"/>
   <RESOURCE URI="http://purl.org/dc/terms/hasVersion" URI_HASH="1383918283326755379"/>
   <RESOURCE URI="http://purl.org/dc/terms/issued" URI_HASH="133517385080018634"/>

@@ -66,10 +66,11 @@ public class HarvestSubPropertyTest extends DatabaseTestCase {
 
 		// Fetch database data after executing your code
 		QueryDataSet queryDataSet = new QueryDataSet(getConnection());
-		queryDataSet
-				.addTable(
-						"SPO",
-						"SELECT SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_DERIV_SOURCE, OBJ_SOURCE_OBJECT FROM SPO ORDER BY SUBJECT, PREDICATE, OBJECT");
+		queryDataSet.addTable("SPO",
+                     "SELECT DISTINCT SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ,"
+                     + " LIT_OBJ, OBJ_DERIV_SOURCE, OBJ_SOURCE_OBJECT FROM SPO"
+                     + " WHERE PREDICATE NOT IN ( 8639511163630871821, 3296918264710147612, -2213704056277764256, 333311624525447614 )"
+                     + " ORDER BY SUBJECT, PREDICATE, OBJECT");
 		ITable actSPOTable = queryDataSet.getTable("SPO");
 
 		queryDataSet
@@ -103,7 +104,8 @@ public class HarvestSubPropertyTest extends DatabaseTestCase {
 //			URL o = getClass().getClassLoader().getResource("subproperty-rdf.xml");
 			Harvest harvest = new PullHarvest(o.toString(), null);
 			harvest.execute();
-			compareDatasets("subproperty-db.xml", false);
+                        // Change to true if you want to dump the result into an XML file
+			compareDatasets("subproperty-db.xml", true);
 		} catch (Throwable e) {
 			e.printStackTrace();
 			fail("Was not expecting this exception: " + e.toString());

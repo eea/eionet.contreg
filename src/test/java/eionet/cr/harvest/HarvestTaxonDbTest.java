@@ -76,16 +76,15 @@ public class HarvestTaxonDbTest extends DatabaseTestCase {
 
 		// Fetch database data after executing your code
 		QueryDataSet queryDataSet = new QueryDataSet(getConnection());
-		queryDataSet
-				.addTable(
-						"SPO",
-						"SELECT SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG, OBJ_DERIV_SOURCE, OBJ_DERIV_SOURCE_GEN_TIME, OBJ_SOURCE_OBJECT FROM SPO ORDER BY SUBJECT, PREDICATE, OBJECT");
+		queryDataSet.addTable("SPO",
+                    "SELECT DISTINCT SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ,"
+                    + " LIT_OBJ, OBJ_LANG, OBJ_DERIV_SOURCE, OBJ_DERIV_SOURCE_GEN_TIME, OBJ_SOURCE_OBJECT FROM SPO"
+                    + " WHERE PREDICATE NOT IN ( 8639511163630871821, 3296918264710147612, -2213704056277764256, 333311624525447614 )"
+                    + " ORDER BY SUBJECT, PREDICATE, OBJECT");
 		ITable actSPOTable = queryDataSet.getTable("SPO");
 
-		queryDataSet
-				.addTable(
-						"RESOURCE",
-						"SELECT URI,URI_HASH FROM RESOURCE WHERE URI NOT LIKE 'file:%' ORDER BY URI, URI_HASH");
+		queryDataSet.addTable("RESOURCE",
+                    "SELECT URI,URI_HASH FROM RESOURCE WHERE URI NOT LIKE 'http://svn.eionet%' ORDER BY URI, URI_HASH");
 		ITable actResTable = queryDataSet.getTable("RESOURCE");
 		if (dumpIt) {
 			FlatXmlDataSet.write(queryDataSet, new FileOutputStream(testData));
@@ -113,9 +112,9 @@ public class HarvestTaxonDbTest extends DatabaseTestCase {
 			Harvest harvest = new PullHarvest(o.toString(), null);
 			harvest.setDeriveExtraTriples(false);
 			harvest.execute();
-			assertEquals((int) 2, harvest.getDistinctSubjectsCount());
-			assertEquals((int) 18, harvest.getStoredTriplesCount());
-			compareDatasets("taxon-db.xml", false);
+			assertEquals((int) 3, harvest.getDistinctSubjectsCount());
+			assertEquals((int) 22, harvest.getStoredTriplesCount());
+			compareDatasets("taxon-db.xml", true);
 		} catch (Throwable e) {
 			e.printStackTrace();
 			fail("Was not expecting this exception: " + e.toString());
@@ -131,8 +130,8 @@ public class HarvestTaxonDbTest extends DatabaseTestCase {
 			Harvest harvest = new PullHarvest(o.toString(), null);
 			harvest.setDeriveExtraTriples(false);
 			harvest.execute();
-			assertEquals((int) 2, harvest.getDistinctSubjectsCount());
-			assertEquals((int) 18, harvest.getStoredTriplesCount());
+			assertEquals((int) 3, harvest.getDistinctSubjectsCount());
+			assertEquals((int) 22, harvest.getStoredTriplesCount());
 			compareDatasets("taxon-db.xml", false);
 		} catch (Throwable e) {
 			e.printStackTrace();

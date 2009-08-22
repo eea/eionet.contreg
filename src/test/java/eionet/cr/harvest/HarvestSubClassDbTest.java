@@ -61,9 +61,11 @@ public class HarvestSubClassDbTest extends DatabaseTestCase {
 		// Fetch database data after executing your code
 		QueryDataSet queryDataSet = new QueryDataSet(getConnection());
 		queryDataSet.addTable("SPO",
-						"SELECT SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ, "
-								+ "LIT_OBJ, OBJ_LANG, OBJ_SOURCE_OBJECT FROM SPO"
-								+ " ORDER BY SUBJECT, PREDICATE, OBJECT");
+                    "SELECT DISTINCT SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ,"
+                    + " LIT_OBJ, OBJ_LANG, OBJ_SOURCE_OBJECT FROM SPO"
+                    + " WHERE PREDICATE NOT IN ( 8639511163630871821, 3296918264710147612, -2213704056277764256, 333311624525447614 )"
+
+                    + " ORDER BY SUBJECT, PREDICATE, OBJECT");
 		ITable actSPOTable = queryDataSet.getTable("SPO");
 
 		queryDataSet.addTable("RESOURCE", "SELECT URI,URI_HASH FROM RESOURCE "

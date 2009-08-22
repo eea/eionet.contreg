@@ -52,11 +52,15 @@
   <RESOURCE URI_HASH="-5251507576730213845" URI="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"/>
   <RESOURCE URI_HASH="-4138434751919531696" URI="http://somewhere.net/resource"/>
   <RESOURCE URI_HASH="-2785858390031356069" URI="http://www.w3.org/2000/01/rdf-schema#domain"/>
+  <RESOURCE URI_HASH="-2213704056277764256" URI="http://cr.eionet.europa.eu/ontologies/contreg.rdf#lastRefreshed"/>
   <RESOURCE URI_HASH="-1516405989053904450" URI="http://purl.org/dc/elements/1.1/title"/>
   <RESOURCE URI_HASH="-658719500550795056" URI="http://svn.eionet.europa.eu/repositories/Reportnet/cr2/trunk/src/test/resources/subproperty2-rdf.xml"/>
+  <RESOURCE URI_HASH="333311624525447614" URI="http://cr.eionet.europa.eu/ontologies/contreg.rdf#mediaType"/>
+  <RESOURCE URI_HASH="3296918264710147612" URI="http://cr.eionet.europa.eu/ontologies/contreg.rdf#contentLastModified"/>
   <RESOURCE URI_HASH="4171861332787161232" URI="http://www.w3.org/2000/01/rdf-schema#comment"/>
   <RESOURCE URI_HASH="5208071116833832492" URI="http://www.w3.org/2000/01/rdf-schema#range"/>
   <RESOURCE URI_HASH="7882251955035655459" URI="http://www.w3.org/2000/01/rdf-schema#subPropertyOf"/>
+  <RESOURCE URI_HASH="8639511163630871821" URI="http://cr.eionet.europa.eu/ontologies/contreg.rdf#byteSize"/>
   <RESOURCE URI_HASH="8744745537220110927" URI="http://www.w3.org/2000/01/rdf-schema#label"/>
   <RESOURCE URI_HASH="8846362705449003666" URI="http://purl.org/rss/1.0/title"/>
 </dataset>

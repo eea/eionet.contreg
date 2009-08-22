@@ -61,9 +61,10 @@ public class HarvestSimpleDbTest extends DatabaseTestCase {
 		// Fetch database data after executing your code
 		QueryDataSet queryDataSet = new QueryDataSet(getConnection());
 		queryDataSet.addTable("SPO",
-						"SELECT SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ, "
-								+ "LIT_OBJ, OBJ_LANG, OBJ_DERIV_SOURCE, OBJ_SOURCE_OBJECT FROM SPO"
-								+ " ORDER BY SUBJECT, PREDICATE, OBJECT, OBJ_DERIV_SOURCE");
+			"SELECT DISTINCT SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ, "
+			+ "LIT_OBJ, OBJ_LANG, OBJ_DERIV_SOURCE, OBJ_SOURCE_OBJECT FROM SPO "
+                        + "WHERE PREDICATE NOT IN ( 8639511163630871821, 3296918264710147612, -2213704056277764256, 333311624525447614 )"
+			+ " ORDER BY SUBJECT, PREDICATE, OBJECT, OBJ_DERIV_SOURCE");
 		ITable actSPOTable = queryDataSet.getTable("SPO");
 
 		queryDataSet.addTable("RESOURCE", "SELECT URI,URI_HASH FROM RESOURCE "
@@ -112,7 +113,23 @@ public class HarvestSimpleDbTest extends DatabaseTestCase {
 			URL o = new URL("http://svn.eionet.europa.eu/repositories/Reportnet/cr2/trunk/src/test/resources/encoding-scheme-rdf.xml");
 			Harvest harvest = new PullHarvest(o.toString(), null);
 			harvest.execute();
-			compareDatasets("encoding-scheme-db.xml", false);
+                        // Fetch database data after executing your code
+                        QueryDataSet queryDataSet = new QueryDataSet(getConnection());
+                        queryDataSet.addTable("SPO",
+                                "SELECT SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ,"
+                                + " LIT_OBJ, OBJ_LANG, OBJ_DERIV_SOURCE FROM SPO"
+                                + " WHERE SUBJECT=-1142222056026225699 AND PREDICATE=6813166255579199724 AND OBJECT='2009-04-09'"
+                                + " ORDER BY SUBJECT, PREDICATE, OBJECT, OBJ_DERIV_SOURCE");
+                        ITable actSPOTable = queryDataSet.getTable("SPO");
+
+//			FlatXmlDataSet.write(queryDataSet, new FileOutputStream("encoding-scheme-db.xml"));
+                        // Load expected data from an XML dataset
+                        IDataSet expectedDataSet = new FlatXmlDataSet(
+                                        getFileAsStream("encoding-scheme-db.xml"));
+                        ITable expSpoTable = expectedDataSet.getTable("SPO");
+
+                        // Assert actual SPO table matches expected table
+                        Assertion.assertEquals(actSPOTable, expSpoTable);
 		} catch (Throwable e) {
 			e.printStackTrace();
 			fail("Was not expecting this exception: " + e.toString());

@@ -14,6 +14,10 @@
   <SPO SUBJECT="5550937339998314774" PREDICATE="5208071116833832492" OBJECT="http://www.w3.org/2004/02/skos/core#Concept" OBJECT_HASH="-6601083188331798490" ANON_SUBJ="N" ANON_OBJ="N" LIT_OBJ="N" OBJ_LANG="" OBJ_DERIV_SOURCE="0" OBJ_SOURCE_OBJECT="0"/>
   <SPO SUBJECT="5550937339998314774" PREDICATE="7143970754346561049" OBJECT="http://www.w3.org/2004/02/skos/core" OBJECT_HASH="2403328652459648169" ANON_SUBJ="N" ANON_OBJ="N" LIT_OBJ="N" OBJ_LANG="" OBJ_DERIV_SOURCE="0" OBJ_SOURCE_OBJECT="0"/>
   <SPO SUBJECT="5550937339998314774" PREDICATE="8744745537220110927" OBJECT="semantic relation" OBJECT_HASH="8468401963857515067" ANON_SUBJ="N" ANON_OBJ="N" LIT_OBJ="Y" OBJ_LANG="" OBJ_DERIV_SOURCE="0" OBJ_SOURCE_OBJECT="0"/>
+  <RESOURCE URI="http://cr.eionet.europa.eu/ontologies/contreg.rdf#byteSize" URI_HASH="8639511163630871821"/>
+  <RESOURCE URI="http://cr.eionet.europa.eu/ontologies/contreg.rdf#contentLastModified" URI_HASH="3296918264710147612"/>
+  <RESOURCE URI="http://cr.eionet.europa.eu/ontologies/contreg.rdf#lastRefreshed" URI_HASH="-2213704056277764256"/>
+  <RESOURCE URI="http://cr.eionet.europa.eu/ontologies/contreg.rdf#mediaType" URI_HASH="333311624525447614"/>
   <RESOURCE URI="http://purl.org/dc/terms/issued" URI_HASH="133517385080018634"/>
   <RESOURCE URI="http://svn.eionet.europa.eu/repositories/Reportnet/cr2/trunk/src/test/resources/simple-rdf.xml" URI_HASH="-1193841814207334039"/>
   <RESOURCE URI="http://www.w3.org/1999/02/22-rdf-syntax-ns#type" URI_HASH="-5251507576730213845"/>
