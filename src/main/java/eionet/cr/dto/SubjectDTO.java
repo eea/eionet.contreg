@@ -57,8 +57,10 @@ public class SubjectDTO{
 	public SubjectDTO(String uri, boolean anonymous){
 		
 		this.uri = anonymous==false ? uri : URI_ANONYMOUS;
+		if (uri!=null){
+			uriHash = Hashes.spoHash(uri);
+		}
 		this.anonymous = anonymous;
-		this.uriHash = Hashes.spoHash(uri);
 		predicates = new HashMap<String,Collection<ObjectDTO>>();
 	}
 
