@@ -246,8 +246,10 @@ public class PullHarvest extends Harvest{
 			deleteDownloadedFile(file);
 			
 			// delete the original file if a new one was created during the pre-processing
-			if (!originalPath.equals(file.getAbsolutePath())){
-				deleteDownloadedFile(file);
+			if (originalPath!=null && file!=null){
+				if (!originalPath.equals(file.getAbsolutePath())){
+					deleteDownloadedFile(file);
+				}
 			}
 		}
 	}
