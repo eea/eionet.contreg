@@ -242,15 +242,10 @@ public class PullHarvest extends Harvest{
 				try{ inputStream.close(); } catch (Exception e){ logger.error(e.toString(), e);}
 			}
 			
-			// delete the file we harvested
+			// delete the file we harvested and the original one (in case a new file was created during the pre-processing)
+			// the method is safe against situation where file or original file is actually null or doesn't exist
 			deleteDownloadedFile(file);
-			
-			// delete the original file if a new one was created during the pre-processing
-			if (originalPath!=null && file!=null){
-				if (!originalPath.equals(file.getAbsolutePath())){
-					deleteDownloadedFile(file);
-				}
-			}
+			deleteDownloadedFile(originalPath);
 		}
 	}
 
@@ -396,6 +391,14 @@ public class PullHarvest extends Harvest{
 				sourceMetadata.addObject(Predicates.CR_CHARSET, new ObjectDTO(String.valueOf(charset), true));
 			}
 		}
+	}
+	
+	/**
+	 * 
+	 * @param path
+	 */
+	private void deleteDownloadedFile(String path){
+		deleteDownloadedFile(new File(path));
 	}
 
 	/**
