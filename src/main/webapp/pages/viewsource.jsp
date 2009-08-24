@@ -21,7 +21,7 @@
 			        <table>
 			            <tr>
 			                <td>URL:</td>
-			                <td><a href="${fn:escapeXml(actionBean.harvestSource.url)}"><c:out value="${actionBean.harvestSource.url}"/></a></td>
+			                <td><a class="link-external" href="${fn:escapeXml(actionBean.harvestSource.url)}"><c:out value="${actionBean.harvestSource.url}"/></a></td>
 			            </tr>
 			            <tr>
 			                <td>E-mails:</td>

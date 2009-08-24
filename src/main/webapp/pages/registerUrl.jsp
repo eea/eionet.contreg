@@ -11,7 +11,7 @@
 		This page enables you to register an URL and provide it with metadata.<br/>
 		The purpose is to use CR as a way for users to help other users to find interesting resources on the Internet.<br/>
 		The first person that discovers the resource, registers it with CR in similar way like it's done on
-		<a href="http://en.wikipedia.org/wiki/Social_bookmarking">social bookmarking</a> websites.	
+		<a class="link-external" href="http://en.wikipedia.org/wiki/Social_bookmarking">social bookmarking</a> websites.	
 	</p>
 	
 	<stripes:form action="/registerUrl.action" method="post" focus="url">

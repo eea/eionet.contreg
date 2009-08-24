@@ -20,7 +20,6 @@
 			
 			<script type="text/javascript" src="<c:url value="/scripts/util.js"/>"></script>
 			<script type="text/javascript" src="<c:url value="/scripts/pageops.js"/>"></script>
-			<script type="text/javascript" src="<c:url value="/scripts/mark_special_links.js"/>"></script>
 		</head>
 		<body>
 			<div id="container">

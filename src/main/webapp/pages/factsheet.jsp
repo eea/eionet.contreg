@@ -23,7 +23,7 @@
 		    	
 		    		<c:choose>
 		    			<c:when test="${subjectUrl!=null}">
-		    				<p>Resource URL: <a href="${fn:escapeXml(subjectUrl)}"><c:out value="${subjectUrl}"/></a></p>
+		    				<p>Resource URL: <a class="link-external" href="${fn:escapeXml(subjectUrl)}"><c:out value="${subjectUrl}"/></a></p>
 		    			</c:when>
 		    			<c:when test="${subjectUri!=null}">
 		    				<div class="advice-msg" title="${fn:escapeXml(subjectUri)}">This is an unresolvable resource!</div>
