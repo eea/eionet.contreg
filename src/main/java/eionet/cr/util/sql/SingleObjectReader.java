@@ -31,7 +31,7 @@ import java.util.List;
  */
 public class SingleObjectReader<T> extends ResultSetListReader<T> {
 	
-	private List<T> resultList;
+	private List<T> resultList = new LinkedList<T>();
 
 	/** 
 	 * @see eionet.cr.util.sql.ResultSetListReader#getResultList()
@@ -49,9 +49,6 @@ public class SingleObjectReader<T> extends ResultSetListReader<T> {
 	@Override
 	@SuppressWarnings("unchecked")
 	public void readRow(ResultSet rs) throws SQLException {
-		if (resultList == null) {
-			resultList = new LinkedList<T>();
-		}
 		resultList.add((T) rs.getObject(1));
 	}
 

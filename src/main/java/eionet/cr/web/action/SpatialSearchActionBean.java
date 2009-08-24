@@ -213,11 +213,14 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean {
 	 * @throws SearchException
 	 */
 	public Resolution kmlLinks() throws SearchException {
+		
 		try {
 			sources = factory.getDao(HelperDao.class).performSpatialSourcesSearch();
-		} catch (DAOException ignored){
-			logger.error("spatial search failed", ignored);
 		}
+		catch (DAOException e){
+			throw new SearchException(e.toString(), e);
+		}
+		
 		if (sources.isEmpty()){
 			showMessage("No spatial objects currently found!");
 			return new ForwardResolution("/pages/googleEarthIntro.jsp");

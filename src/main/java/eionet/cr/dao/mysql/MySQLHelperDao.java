@@ -52,7 +52,7 @@ public class MySQLHelperDao extends MySQLBaseDAO implements HelperDao {
 		List<Long> params = new LinkedList<Long>();
 		params.add(Hashes.spoHash(Predicates.RDF_TYPE));
 		params.add(Hashes.spoHash(Subjects.WGS_POINT));
-		return executeQuery(sql, null, new SingleObjectReader<String>());
+		return executeQuery(sql, params, new SingleObjectReader<String>());
 	}
 	
 	/** 
