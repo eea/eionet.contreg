@@ -74,9 +74,9 @@ public class HarvestSourceDAOTest extends DBTestCase {
 	
 	@Test
 	public void testGetHarvestSources() throws Exception {
-		
+		//TODO most likely a broken test
 		ConnectionUtil.setReturnSimpleConnection(true);
-		List<HarvestSourceDTO> sources = get().getDao(HarvestSourceDAO.class).getHarvestSources("");
+		List<HarvestSourceDTO> sources = get().getDao(HarvestSourceDAO.class).getHarvestSources("", null, null);
 		assertEquals(42, sources.size());
 	}
 	

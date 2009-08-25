@@ -59,7 +59,7 @@ import eionet.cr.web.util.columns.SubjectPredicateColumn;
  *
  */
 @UrlBinding("/references.action")
-public class ReferencesActionBean extends AbstractSearchActionBean{
+public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
 	
 	/** */
 	private static final String REFERRING_PREDICATES = ReferencesActionBean.class.getName() + ".referringPredicates";

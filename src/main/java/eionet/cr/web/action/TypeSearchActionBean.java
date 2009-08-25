@@ -53,7 +53,7 @@ import eionet.cr.web.util.columns.SubjectPredicateColumn;
  *
  */
 @UrlBinding("/typeSearch.action")
-public class TypeSearchActionBean extends AbstractSearchActionBean{
+public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO>{
 	
 	/** */
 	private static final String FORM_PAGE = "/pages/typeSearch.jsp";

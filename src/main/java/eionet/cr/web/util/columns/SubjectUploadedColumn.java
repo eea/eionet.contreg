@@ -20,7 +20,6 @@
 * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.web.util.columns;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import eionet.cr.dto.SubjectDTO;
@@ -33,7 +32,7 @@ import eionet.cr.dto.SubjectDTO;
 public class SubjectUploadedColumn extends SearchResultColumn{
 
 	/** */
-	private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yy HH:mm:ss");
+	
 	
 	public SubjectUploadedColumn() {
 		//blank constructor
@@ -60,7 +59,7 @@ public class SubjectUploadedColumn extends SearchResultColumn{
 			SubjectDTO subjectDTO = (SubjectDTO)object;
 			Date date = ((SubjectDTO)object).getFirstSeenTime();
 			if (date!=null){
-				result = simpleDateFormat.format(date);
+				result = SIMPLE_DATE_FORMAT.format(date);
 			}
 		}
 		

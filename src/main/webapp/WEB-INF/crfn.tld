@@ -128,9 +128,9 @@
 		</description>
 		<name>format</name>
 		<function-class>eionet.cr.web.util.JstlFunctions</function-class>
-		<function-signature>java.lang.String format(eionet.cr.web.util.columns.SearchResultColumn, eionet.cr.dto.SubjectDTO)</function-signature>
+		<function-signature>java.lang.String format(eionet.cr.web.util.columns.SearchResultColumn, java.lang.Object)</function-signature>
 		<example>
-			${format(column, subject)}
+			${format(column, object)}
 		</example>
 	</function>
 	

@@ -35,6 +35,7 @@ import org.apache.commons.logging.LogFactory;
 
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
+import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.SimpleSearch;
 import eionet.cr.search.UriSearch;
@@ -48,7 +49,7 @@ import eionet.cr.web.util.columns.SubjectPredicateColumn;
  *
  */
 @UrlBinding("/simpleSearch.action")
-public class SimpleSearchActionBean extends AbstractSearchActionBean {
+public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 	
 	/** */
 	private static Log logger = LogFactory.getLog(SimpleSearchActionBean.class);

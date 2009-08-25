@@ -52,7 +52,7 @@ import eionet.cr.web.util.columns.SearchResultColumn;
  *
  */
 @UrlBinding("/customSearch.action")
-public class CustomSearchActionBean extends AbstractSearchActionBean{
+public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>{
 	
 	/** */
 	private static final String SELECTED_FILTERS_SESSION_ATTR_NAME = CustomSearchActionBean.class.getName() + ".selectedFilters";

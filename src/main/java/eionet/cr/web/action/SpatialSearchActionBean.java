@@ -53,7 +53,7 @@ import eionet.cr.web.util.columns.SubjectPredicateColumn;
  *
  */
 @UrlBinding("/spatialSearch.action")
-public class SpatialSearchActionBean extends AbstractSearchActionBean {
+public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 
 	/** */
 	private static Log logger = LogFactory.getLog(SpatialSearchActionBean.class);

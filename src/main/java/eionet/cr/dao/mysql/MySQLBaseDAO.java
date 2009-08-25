@@ -27,6 +27,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import eionet.cr.dao.DAOException;
+import eionet.cr.util.Pair;
 import eionet.cr.util.sql.ConnectionUtil;
 import eionet.cr.util.sql.MySQLUtil;
 import eionet.cr.util.sql.ResultSetListReader;
@@ -91,5 +92,27 @@ public abstract class MySQLBaseDAO {
 		finally{
 			ConnectionUtil.closeConnection(conn);
 		}
+	}
+	
+	protected <T> Pair<List<T>, Integer> executeQueryWithRowCount(String sql, List<?> params, ResultSetListReader<T> reader) throws DAOException {
+		Connection conn = null;
+		try {
+			conn = getConnection();
+			SQLUtil.executeQuery(sql, params, reader, conn);
+			List<T> list = reader.getResultList();
+			int rows = MySQLUtil.getTotalRowCount(conn);
+			return new Pair<List<T>, Integer> (list, rows);
+		} catch (Exception fatal) {
+			throw new DAOException(fatal.getMessage(), fatal);
+		} finally {
+			ConnectionUtil.closeConnection(conn);
+		}
+	}
+	
+	protected <T> T executeQueryUniqueResult(String sql, List<?> params, ResultSetListReader<T> reader) throws DAOException {
+		List<T> result = executeQuery(sql, params, reader);
+		return result == null || result.isEmpty()
+				? null
+				: result.get(0);
 	}
 }

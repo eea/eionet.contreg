@@ -22,7 +22,7 @@ package eionet.cr.dao.mysql;
 
 import java.sql.Connection;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -32,7 +32,10 @@ import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.readers.HarvestSourceDTOReader;
 import eionet.cr.util.Hashes;
+import eionet.cr.util.Pair;
+import eionet.cr.util.SortingRequest;
 import eionet.cr.util.Util;
+import eionet.cr.util.pagination.PaginationRequest;
 import eionet.cr.util.sql.ConnectionUtil;
 import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
@@ -48,52 +51,86 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 	}
 	
 	/** */
-	private static final String getSourcesSQL = "SELECT * FROM HARVEST_SOURCE WHERE TRACKED_FILE = 'N' AND COUNT_UNAVAIL = 0 ORDER BY URL";
-	private static final String searchSourcesSQL = "SELECT * FROM HARVEST_SOURCE WHERE TRACKED_FILE = 'N' AND COUNT_UNAVAIL = 0 AND URL like (?) ORDER BY URL";
+	private static final String getSourcesSQL = "SELECT SQL_CALC_FOUND_ROWS * FROM HARVEST_SOURCE WHERE TRACKED_FILE = 'N' AND COUNT_UNAVAIL = 0 ";
+	private static final String searchSourcesSQL = "SELECT SQL_CALC_FOUND_ROWS * FROM HARVEST_SOURCE WHERE TRACKED_FILE = 'N' AND COUNT_UNAVAIL = 0 AND URL like (?) ";
+	private static final String getHarvestTrackedFiles = "SELECT SQL_CALC_FOUND_ROWS * FROM HARVEST_SOURCE WHERE TRACKED_FILE = 'Y' ";
+	private static final String searchHarvestTrackedFiles = "SELECT SQL_CALC_FOUND_ROWS * FROM HARVEST_SOURCE WHERE TRACKED_FILE = 'Y' and URL like(?) ";
+	private static final String getHarvestSourcesUnavailableSQL =
+		"SELECT SQL_CALC_FOUND_ROWS * FROM HARVEST_SOURCE WHERE COUNT_UNAVAIL > " + HarvestSourceDTO.COUNT_UNAVAIL_THRESHOLD;
+	private static final String searchHarvestSourcesUnavailableSQL =
+		"SELECT SQL_CALC_FOUND_ROWS * FROM HARVEST_SOURCE WHERE URL LIKE (?) AND COUNT_UNAVAIL > " + HarvestSourceDTO.COUNT_UNAVAIL_THRESHOLD;
 		
 	/*
      * (non-Javadoc)
      * 
      * @see eionet.cr.dao.HarvestSourceDao#getHarvestSources()
      */
-    public List<HarvestSourceDTO> getHarvestSources(String searchString) throws DAOException {
-    	if (StringUtils.isEmpty(searchString)) {
-    		return executeQuery(getSourcesSQL, new ArrayList<Object>(), new HarvestSourceDTOReader());
-    	} else {
-    		return executeQuery(searchSourcesSQL, Collections.singletonList(searchString), new HarvestSourceDTOReader());
+    public List<HarvestSourceDTO> getHarvestSources(String searchString, PaginationRequest pageRequest, SortingRequest sortingRequest)
+    		throws DAOException {
+    	if (pageRequest == null) {
+    		throw new IllegalArgumentException("Page request cannot be null");
     	}
+    	
+    	return getSources(
+    			StringUtils.isBlank(searchString)
+    					? getSourcesSQL
+    					: searchSourcesSQL,
+				searchString,
+				pageRequest,
+				sortingRequest);	
     }
     
-    private static final String getHarvestTrackedFiles = "SELECT * FROM HARVEST_SOURCE WHERE TRACKED_FILE = 'Y' ORDER BY URL";
-    private static final String searchHarvestTrackedFiles = "SELECT * FROM HARVEST_SOURCE WHERE TRACKED_FILE = 'Y' and URL like(?) ORDER BY URL";
-	/** 
-	 * @see eionet.cr.dao.HarvestSourceDAO#getHarvestTrackedFiles()
-	 * {@inheritDoc}
-	 */
-	public List<HarvestSourceDTO> getHarvestTrackedFiles(String searchString) throws DAOException {
-		if (StringUtils.isEmpty(searchString)) {
-			return executeQuery(getHarvestTrackedFiles, new ArrayList<Object>(), new HarvestSourceDTOReader());
-		} else {
-			return executeQuery(searchHarvestTrackedFiles, Collections.singletonList(searchString), new HarvestSourceDTOReader());
-		}
-	}
-
-	/** */
-	private static final String getHarvestSourcesUnavailableSQL =
-		"select * from HARVEST_SOURCE where COUNT_UNAVAIL > " + HarvestSourceDTO.COUNT_UNAVAIL_THRESHOLD;
-	private static final String searchHarvestSourcesUnavailableSQL =
-		"select * from HARVEST_SOURCE where URL like (?) AND COUNT_UNAVAIL > " + HarvestSourceDTO.COUNT_UNAVAIL_THRESHOLD;
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSourcesUnavailable()
-	 */
-	public List<HarvestSourceDTO> getHarvestSourcesUnavailable(String searchString) throws DAOException {
-		if (StringUtils.isEmpty(searchString)) {
-			return executeQuery(getHarvestSourcesUnavailableSQL, new ArrayList<Object>(), new HarvestSourceDTOReader());
-		} else {
-			return executeQuery(searchHarvestSourcesUnavailableSQL, Collections.singletonList(searchString), new HarvestSourceDTOReader());
-		}
-	}
+    /** 
+     * @see eionet.cr.dao.HarvestSourceDAO#getHarvestTrackedFiles()
+     * {@inheritDoc}
+     */
+    public List<HarvestSourceDTO> getHarvestTrackedFiles(String searchString, PaginationRequest pageRequest, SortingRequest sortingRequest)
+    		throws DAOException {
+    	return getSources(
+    			StringUtils.isBlank(searchString)
+		    			? getHarvestTrackedFiles
+						: searchHarvestTrackedFiles,
+				searchString,
+				pageRequest,
+				sortingRequest);	
+    }
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSourcesUnavailable()
+     */
+    public List<HarvestSourceDTO> getHarvestSourcesUnavailable(String searchString, PaginationRequest pageRequest, SortingRequest sortingRequest)
+    		throws DAOException {
+    	return getSources(
+    			StringUtils.isBlank(searchString)
+						? getHarvestSourcesUnavailableSQL
+						: searchHarvestSourcesUnavailableSQL,
+				searchString,
+				pageRequest,
+				sortingRequest);	
+    	
+    }
+    
+    private List<HarvestSourceDTO> getSources(String sql, String searchString, PaginationRequest pageRequest, SortingRequest sortingRequest)
+    		throws DAOException {
+    	List<Object> searchParams = new LinkedList<Object>();
+    	if (!StringUtils.isBlank(searchString)) {
+    		searchParams.add(searchString);
+    	}
+    	if (sortingRequest != null) {
+    		sql += " ORDER BY " + sortingRequest.getSortingColumnName() + " " + sortingRequest.getSortingColumnOrder();
+    	} else {
+    		//in case no sorting request is present, use default one.
+    		sql += " ORDER BY URL "; 
+    	}
+    	List<Object> limitParams =  pageRequest.getLimitParams();
+    	if (limitParams != null) {
+    		sql += " LIMIT ?, ? ";
+    		searchParams.addAll(limitParams);
+    	}
+    	Pair<List<HarvestSourceDTO>, Integer> result = executeQueryWithRowCount(sql, searchParams, new HarvestSourceDTOReader());
+    	pageRequest.setMatchCount(result.getValue());
+    	return result.getId();
+    }
     
     /** */
 	private static final String getSourcesByIdSQL = "select * from HARVEST_SOURCE where HARVEST_SOURCE_ID=?";
@@ -328,27 +365,18 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 	 * @see eionet.cr.dao.HarvestSourceDAO#getNextScheduledSources(int)
 	 */
 	public List<HarvestSourceDTO> getNextScheduledSources(int numOfSegments) throws DAOException {
-		
-		Connection conn = null;
-		HarvestSourceDTOReader rsReader = new HarvestSourceDTOReader();
-		try{
-			conn = getConnection();
-			
-			Object o = SQLUtil.executeSingleReturnValueQuery("select count(*) from HARVEST_SOURCE", conn);
-			int numOfSources = o==null ? 0 : Integer.parseInt(o.toString());
-			int limit = Math.round((float)numOfSources/(float)numOfSegments);
 
-			List<Object> values = new ArrayList<Object>();
-	    	values.add(new Integer(limit));
-			SQLUtil.executeQuery(getNextScheduledSourcesSQL, values, rsReader, conn);
-			return rsReader.getResultList();
-		}
-		catch (Exception e){
-			throw new DAOException(e.getMessage(), e);
-		}
-		finally{
-			ConnectionUtil.closeConnection(conn);
-		}
+		Integer numberOfSources = executeQueryUniqueResult(
+				"select count(*)	from HARVEST_SOURCE",
+				null,
+				new SingleObjectReader<Integer>());
+		numberOfSources = numberOfSources == null ? 0 : numberOfSources;
+		int limit = Math.round((float)numberOfSources/(float)numOfSegments);
+
+		List<Object> values = new ArrayList<Object>();
+    	values.add(new Integer(limit));
+    	
+		return executeQuery(getNextScheduledSourcesSQL, values, new HarvestSourceDTOReader());
 	}
 
 }

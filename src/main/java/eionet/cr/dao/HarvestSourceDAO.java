@@ -23,6 +23,8 @@ package eionet.cr.dao;
 import java.util.List;
 
 import eionet.cr.dto.HarvestSourceDTO;
+import eionet.cr.util.SortingRequest;
+import eionet.cr.util.pagination.PaginationRequest;
 
 /**
  * @author altnyris
@@ -31,22 +33,25 @@ import eionet.cr.dto.HarvestSourceDTO;
 public interface HarvestSourceDAO extends IDao{
 	/**
 	 * 
-     * @return list of harvesting sources (excluding unavailable sources and tracked files)
+     * @param sortingRequest 
+	 * @return list of harvesting sources (excluding unavailable sources and tracked files)
      * @throws DAOException
      */
-    List<HarvestSourceDTO> getHarvestSources(String searchString) throws DAOException;
+    List<HarvestSourceDTO> getHarvestSources(String searchString, PaginationRequest pageRequest, SortingRequest sortingRequest) throws DAOException;
     
     /**
+     * @param sortingRequest 
      * @return list of harvest tracked files
      * @throws DAOException
      */
-    List<HarvestSourceDTO> getHarvestTrackedFiles(String searchString) throws DAOException;
+    List<HarvestSourceDTO> getHarvestTrackedFiles(String searchString, PaginationRequest pageRequest, SortingRequest sortingRequest) throws DAOException;
     
     /**
+     * @param sortingRequest 
      * @return list of unavailable harvest sources
      * @throws DAOException
      */
-    List<HarvestSourceDTO> getHarvestSourcesUnavailable(String searchString) throws DAOException;
+    List<HarvestSourceDTO> getHarvestSourcesUnavailable(String searchString, PaginationRequest pageRequest, SortingRequest sortingRequest) throws DAOException;
 
     /**
      * @return harvesting sources

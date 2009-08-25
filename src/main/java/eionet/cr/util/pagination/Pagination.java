@@ -35,6 +35,8 @@ public class Pagination {
 	/** */
 	public static final String PAGE_NUM_PARAM = "pageN";
 
+	public static final int DEFAULT_ITEMS_PER_PAGE = 15;
+
 	/** */
 	private int matchCount;
 	private int numOfPages;
@@ -78,11 +80,27 @@ public class Pagination {
 		int numOfPages = matchCount / pageLength();
 		if (matchCount % pageLength() != 0)
 			numOfPages = numOfPages + 1;
+		
+		if (urlPath.startsWith("/")) {
+			urlPath = urlPath.substring(1);
+		}
 
 		if (numOfPages>1)
 			return new Pagination(matchCount, numOfPages, Math.min(numOfPages, Math.max(1, curPageNum)), urlPath, queryString);
 		else
 			return null;
+	}
+	
+	/**
+	 * Gets pagination based on {@link PaginationRequest}.
+	 * 
+	 * @param request pagination request
+	 * @param urlPath url path
+	 * @param queryString query string
+	 * @return
+	 */
+	public static Pagination getPagination(PaginationRequest request, String urlPath, QueryString queryString) {
+		return getPagination(request.getMatchCount(), request.getPageNumber(), urlPath, queryString);
 	}
 	
 	/**

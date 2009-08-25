@@ -38,6 +38,7 @@ import org.apache.commons.logging.LogFactory;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
+import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.RecentUploadsSearch;
 import eionet.cr.search.SearchException;
 import eionet.cr.util.Util;
@@ -51,7 +52,7 @@ import eionet.cr.web.util.columns.SubjectUploadedColumn;
  *
  */
 @UrlBinding("/recentUploads.action")
-public class RecentUploadsActionBean extends AbstractSearchActionBean {
+public class RecentUploadsActionBean extends AbstractSearchActionBean<SubjectDTO> {
 	
 	/** */
 	public static final int MAX_RESULTS = 20;

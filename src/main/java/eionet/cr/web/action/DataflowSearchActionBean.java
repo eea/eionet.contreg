@@ -41,6 +41,7 @@ import org.apache.commons.logging.LogFactory;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.dao.HelperDao;
+import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.CustomSearch;
 import eionet.cr.search.DataflowPicklistSearch;
 import eionet.cr.search.SearchException;
@@ -54,7 +55,7 @@ import eionet.cr.web.util.columns.SubjectPredicateColumn;
  *
  */
 @UrlBinding("/dataflowSearch.action")
-public class DataflowSearchActionBean extends AbstractSearchActionBean{
+public class DataflowSearchActionBean extends AbstractSearchActionBean<SubjectDTO>{
 	
 	/** */
 	private static Log logger = LogFactory.getLog(DataflowSearchActionBean.class);

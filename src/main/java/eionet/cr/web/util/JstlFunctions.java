@@ -246,7 +246,8 @@ public class JstlFunctions {
 	 * @param subjectDTO
 	 * @return
 	 */
-	public static String format(SearchResultColumn column, SubjectDTO subjectDTO){
-		return column.format(subjectDTO);
+	public static String format(SearchResultColumn column, Object object){
+		return column.format(object);
 	}
+
 }

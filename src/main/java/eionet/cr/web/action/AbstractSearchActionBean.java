@@ -26,7 +26,6 @@ import java.util.List;
 
 import net.sourceforge.stripes.action.Resolution;
 import eionet.cr.common.Predicates;
-import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.util.SortOrder;
 import eionet.cr.util.QueryString;
@@ -39,10 +38,10 @@ import eionet.cr.web.util.columns.SubjectPredicateColumn;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public abstract class AbstractSearchActionBean extends AbstractActionBean{
+public abstract class AbstractSearchActionBean<T> extends AbstractActionBean{
 
 	/** */
-	protected Collection<SubjectDTO> resultList;
+	protected Collection<T> resultList;
 	
 	/** */
 	protected int pageN = 1;
@@ -70,14 +69,14 @@ public abstract class AbstractSearchActionBean extends AbstractActionBean{
 	 * 
 	 * @return
 	 */
-	public Collection<SubjectDTO> getResultList() {
+	public Collection<T> getResultList() {
 		return resultList;
 	}
 
 	/**
 	 * @param resultList the resultList to set
 	 */
-	public void setResultList(List<SubjectDTO> resultList) {
+	public void setResultList(List<T> resultList) {
 		this.resultList = resultList;
 	}
 
@@ -174,13 +173,17 @@ public abstract class AbstractSearchActionBean extends AbstractActionBean{
 	public Pagination getPagination(){
 		
 		if (pagination==null){
-			String urlBinding = getUrlBinding();
-			if (urlBinding.startsWith("/")){
-				urlBinding = urlBinding.substring(1);
-			}
-			pagination = Pagination.getPagination(getMatchCount(), getPageN(), urlBinding, QueryString.createQueryString(getContext().getRequest()));
+			pagination = Pagination.getPagination(
+					getMatchCount(),
+					getPageN(),
+					getUrlBinding(),
+					QueryString.createQueryString(getContext().getRequest()));
 		}
 		
 		return pagination;
+	}
+	
+	public void setPagination(Pagination pagination) {
+		this.pagination = pagination;
 	}
 }

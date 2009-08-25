@@ -20,6 +20,8 @@
  */
 package eionet.cr.web.util.columns;
 
+import java.text.SimpleDateFormat;
+
 
 /**
  * 
@@ -27,10 +29,14 @@ package eionet.cr.web.util.columns;
  *
  */
 public abstract class SearchResultColumn {
+	
+	protected static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("dd.MM.yy HH:mm:ss");
 
 	/** */
 	private String title;
 	private boolean isSortable;
+
+	private boolean escapeXml;
 	
 	public SearchResultColumn() {
 		//blank constructor
@@ -57,7 +63,11 @@ public abstract class SearchResultColumn {
 	 * @return
 	 */
 	public boolean isEscapeXml(){
-		return true;
+		return escapeXml;
+	}
+	
+	public void setEscapeXml(boolean escapeXml) {
+		this.escapeXml = escapeXml;
 	}
 	
 	/**

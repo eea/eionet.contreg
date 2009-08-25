@@ -8,7 +8,7 @@
 	<stripes:layout-component name="messages"/>
 	
 	<stripes:layout-component name="contents">
-		<stripes:form id="generalForm" action="${actionBean.urlBinding}">
+		<stripes:form id="generalForm" action="${actionBean.urlBinding}" method="get">
 			
 			<div id="operations">
 				<ul>
@@ -36,14 +36,14 @@
 			    <ul>
 			    	<c:forEach items="${actionBean.sourceTypes}" var="loopItem">
 						<c:choose>
-					  		<c:when test="${actionBean.type==loopItem.type}" > 
-								<li id="currenttab"><span><c:out value="${loopItem.title}"/></span></li>
+					  		<c:when test="${actionBean.type==loopItem.id}" > 
+								<li id="currenttab"><span><c:out value="${loopItem.value}"/></span></li>
 							</c:when>
 							<c:otherwise>
 								<li>
 									<stripes:link href="${actionBean.urlBinding}">
-										<c:out value="${loopItem.title}"/>
-						                <stripes:param name="type" value="${loopItem.type}"/>
+										<c:out value="${loopItem.value}"/>
+						                <stripes:param name="type" value="${loopItem.id}"/>
 						                <stripes:param name="searchString" value="${actionBean.searchString }"/>
 						            </stripes:link>
 					            </li>
@@ -54,17 +54,7 @@
 			</div>
 			<br style="clear:left" />
 			<div style="margin-top:20px;margin-bottom:5px">	
-				<display:table name="${actionBean.harvestSources}" class="sortable" pagesize="15"
-								sort="page" id="harvestSource" htmlId="harvestSources" requestURI="${actionBean.pagingUrl}"
-								decorator="eionet.cr.web.util.HarvestSourcesTableDecorator" style="width:100%"
-								excludedParams="harvest delete sourceUrl view">
-					<display:setProperty name="paging.banner.items_name" value="sources"/>
-					<display:column>
-						<input type="checkbox" name="sourceUrl" value="${harvestSource.url}"/>
-					</display:column>
-					<display:column property="url" title="URL" sortable="true"/>
-					<display:column property="lastHarvest" title="Last harvest" sortable="true"/>
-				</display:table>				
+				<stripes:layout-render name="/pages/common/subjectsResultList.jsp" tableClass="sortable"/>
 			</div>
 			<div>
 				<stripes:submit name="delete" value="Delete" title="Delete selecetd sources"/>

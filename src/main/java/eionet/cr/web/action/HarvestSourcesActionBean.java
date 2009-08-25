@@ -20,10 +20,8 @@
  */
 package eionet.cr.web.action;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
@@ -39,24 +37,56 @@ import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
+import eionet.cr.search.SearchException;
+import eionet.cr.util.Pair;
+import eionet.cr.util.QueryString;
+import eionet.cr.util.SortingRequest;
+import eionet.cr.util.pagination.Pagination;
+import eionet.cr.util.pagination.PaginationRequest;
+import eionet.cr.web.util.columns.GenericColumn;
+import eionet.cr.web.util.columns.HarvestSourcesColumn;
+import eionet.cr.web.util.columns.SearchResultColumn;
 
 /**
  * @author altnyris
  *
  */
 @UrlBinding("/sources.action")
-public class HarvestSourcesActionBean extends AbstractActionBean {
+public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSourceDTO> {
 	
 	/** */
 	private static final String UNAVAILABLE_TYPE = "unavail";
-
 	private static final String TRACKED_FILES = "tracked_file";
 	
 	/** */
-	private List<HarvestSourceDTO> harvestSources;
+	public static final List<Pair<String, String>> sourceTypes;
+	private static final List<SearchResultColumn> columnList;
 	
-	/** */
-	public static List<Map<String,String>> sourceTypes;
+	static {
+		sourceTypes = new LinkedList<Pair<String,String>>();
+		sourceTypes.add(new Pair<String, String>(null, "Sources"));
+		sourceTypes.add(new Pair<String, String>(TRACKED_FILES, "Tracked files"));
+		sourceTypes.add(new Pair<String, String>(UNAVAILABLE_TYPE, "Unavaliable"));
+		
+		columnList = new LinkedList<SearchResultColumn>();
+		GenericColumn checkbox = new GenericColumn();
+		checkbox.setTitle("");
+		checkbox.setSortable(false);
+		checkbox.setEscapeXml(false);
+		columnList.add(checkbox);
+		
+		HarvestSourcesColumn urlColumn = new HarvestSourcesColumn(false);
+		urlColumn.setSortable(true);
+		urlColumn.setTitle("URL");
+		urlColumn.setEscapeXml(false);
+		columnList.add(urlColumn);
+
+		HarvestSourcesColumn dateColumn= new HarvestSourcesColumn(true);
+		dateColumn.setSortable(true);
+		dateColumn.setTitle("Last harvest");
+		columnList.add(dateColumn);
+		
+	}
 	
 	
 	/**
@@ -71,30 +101,43 @@ public class HarvestSourcesActionBean extends AbstractActionBean {
 	/** */
 	private List<String> sourceUrl;
 
+
 	/** */
 	public HarvestSourcesActionBean(){
 	}
 	
-	/**
-	 * 
-	 * @return
-	 * @throws DAOException 
+	/** 
+	 * @see eionet.cr.web.action.AbstractSearchActionBean#search()
+	 * {@inheritDoc}
 	 */
 	@DefaultHandler
-	public Resolution view() throws DAOException {
-		String filterString = null; 
-		if(!StringUtils.isEmpty(this.searchString)) {
-			filterString = "%" + StringEscapeUtils.escapeSql(this.searchString) + "%";
+	public Resolution search() {
+		try {
+			String filterString = null; 
+			if(!StringUtils.isEmpty(this.searchString)) {
+				filterString = "%" + StringEscapeUtils.escapeSql(this.searchString) + "%";
+			}
+			PaginationRequest pageRequest = new PaginationRequest(getPageN(), Pagination.DEFAULT_ITEMS_PER_PAGE);
+			SortingRequest sortingRequest = new SortingRequest(sortP, sortO);
+			if(StringUtils.isBlank(type)) {
+				setResultList(factory.getDao(HarvestSourceDAO.class).getHarvestSources(filterString, pageRequest, sortingRequest));
+				matchCount = pageRequest.getMatchCount();
+			} else if (TRACKED_FILES.equals(type)) {
+					setResultList(factory.getDao(HarvestSourceDAO.class).getHarvestTrackedFiles(filterString, pageRequest, sortingRequest));
+			} else if (UNAVAILABLE_TYPE.equals(type)) {
+					setResultList(factory.getDao(HarvestSourceDAO.class).getHarvestSourcesUnavailable(filterString, pageRequest, sortingRequest));
+			}
+			setPagination(Pagination.getPagination(
+					pageRequest,
+					getUrlBinding(),
+					QueryString.createQueryString(getContext().getRequest())));
+			
+			return new ForwardResolution("/pages/sources.jsp");
+		} catch (DAOException exception) {
+			throw new RuntimeException("error in search", exception);
 		}
-		if(StringUtils.isBlank(type)) {
-			harvestSources = factory.getDao(HarvestSourceDAO.class).getHarvestSources(filterString);
-		} else if (TRACKED_FILES.equals(type)) {
-				harvestSources = factory.getDao(HarvestSourceDAO.class).getHarvestTrackedFiles(filterString);
-		} else if (UNAVAILABLE_TYPE.equals(type)) {
-				harvestSources = factory.getDao(HarvestSourceDAO.class).getHarvestSourcesUnavailable(filterString);
-		}
-		return new ForwardResolution("/pages/sources.jsp");
 	}
+
 	
 	/**
 	 * 
@@ -111,8 +154,7 @@ public class HarvestSourcesActionBean extends AbstractActionBean {
 		}
 		else
 			handleCrException(getBundle().getString("not.logged.in"), GeneralConfig.SEVERITY_WARNING);
-
-		return view();
+		return search();
 	}
 	
 	/**
@@ -134,42 +176,14 @@ public class HarvestSourcesActionBean extends AbstractActionBean {
 		else
 			handleCrException(getBundle().getString("not.logged.in"), GeneralConfig.SEVERITY_WARNING);
 		
-		return view();
+		return search();
 	}
 
-	/**
-	 * @return the harvestSources
-	 */
-	public List<HarvestSourceDTO> getHarvestSources() {
-		return harvestSources;
-	}
-	
 	/**
 	 * 
 	 * @return
 	 */
-	public List<Map<String, String>> getSourceTypes(){
-		
-		if (sourceTypes==null){
-			
-			sourceTypes = new ArrayList<Map<String,String>>();
-			
-			Map<String,String> typeMap = new HashMap<String,String>();
-			typeMap.put("title", "Sources");
-			sourceTypes.add(typeMap);
-			
-			
-			typeMap = new HashMap<String,String>();
-			typeMap.put("title", "Tracked files");
-			typeMap.put("type", TRACKED_FILES);
-			sourceTypes.add(typeMap);
-			
-			typeMap = new HashMap<String,String>();
-			typeMap.put("title", "Unavailable");
-			typeMap.put("type", UNAVAILABLE_TYPE);
-			sourceTypes.add(typeMap);
-		}
-		
+	public List<Pair<String, String>> getSourceTypes(){
 		return sourceTypes;
 	}
 
@@ -221,6 +235,15 @@ public class HarvestSourcesActionBean extends AbstractActionBean {
 	 */
 	public String getSearchString() {
 		return searchString;
+	}
+
+	/** 
+	 * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
+	 * {@inheritDoc}
+	 */
+	@Override
+	public List<SearchResultColumn> getColumns() throws SearchException {
+		return columnList;
 	}
 
 }
