@@ -53,14 +53,15 @@ public class HarvestTest extends TestCase{
 	@Test
 	public void testHarvestNonExistingURL(){
 		
+		PullHarvest harvest = new PullHarvest("http://www.jaanusheinlaid.tw", null);
 		try {
-			Harvest harvest = new PullHarvest("http://www.jaanusheinlaid.tw", null);
 			harvest.execute();
-			fail("Was expecting " + HarvestException.class.getName() + " with a cause of " + java.net.UnknownHostException.class.getName());
 		}
-		catch (Throwable e){
-			if (e.getCause()==null || !(e.getCause() instanceof java.net.UnknownHostException))
-				fail("Was expecting " + HarvestException.class.getName() + " with a cause of " + java.net.UnknownHostException.class.getName());
+		catch (HarvestException e) {
+			e.printStackTrace();
+			fail("Was not expecting this exception: " + e.toString());
 		}
+		assertNotNull(harvest.getSourceAvailable());
+		assertFalse(harvest.getSourceAvailable().booleanValue());
 	}
 }

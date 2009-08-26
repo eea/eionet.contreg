@@ -33,6 +33,7 @@ import org.junit.Test;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.test.util.DbHelper;
+import eionet.cr.util.pagination.PaginationRequest;
 import eionet.cr.util.sql.ConnectionUtil;
 
 /**
@@ -62,10 +63,12 @@ public class HarvestSourceDAOTest extends DBTestCase {
 	
 	@Test
 	public void testAddSource() throws Exception {
+		
 		HarvestSourceDTO harvestSource = new HarvestSourceDTO();
 		harvestSource = new HarvestSourceDTO();
 		harvestSource.setUrl("http://rod.eionet.europa.eu/testObligations");
 		harvestSource.setEmails("bob@europe.eu");
+		harvestSource.setIntervalMinutes(new Integer(0));
 		
 		ConnectionUtil.setReturnSimpleConnection(true);
 		Integer harvestSourceID = get().getDao(HarvestSourceDAO.class).addSource(harvestSource, "bobsmith");
@@ -74,9 +77,9 @@ public class HarvestSourceDAOTest extends DBTestCase {
 	
 	@Test
 	public void testGetHarvestSources() throws Exception {
-		//TODO most likely a broken test
+		
 		ConnectionUtil.setReturnSimpleConnection(true);
-		List<HarvestSourceDTO> sources = get().getDao(HarvestSourceDAO.class).getHarvestSources("", null, null);
+		List<HarvestSourceDTO> sources = get().getDao(HarvestSourceDAO.class).getHarvestSources("", new PaginationRequest(1,100), null);
 		assertEquals(42, sources.size());
 	}
 	
@@ -92,16 +95,18 @@ public class HarvestSourceDAOTest extends DBTestCase {
 	
 	@Test
 	public void testEditSource() throws Exception {
+		
 		HarvestSourceDTO harvestSource = new HarvestSourceDTO();
 		harvestSource.setSourceId(45);
-		harvestSource.setUrl("http://localhost:8080/cr/pages/test2.xml");
+		harvestSource.setUrl("http://localhost:8080/cr/pages/test.xml");
 		harvestSource.setEmails("bob2@europe.eu");
+		harvestSource.setIntervalMinutes(new Integer(0));
 		
 		ConnectionUtil.setReturnSimpleConnection(true);
 		get().getDao(HarvestSourceDAO.class).editSource(harvestSource);
 		
 		HarvestSourceDTO source = get().getDao(HarvestSourceDAO.class).getHarvestSourceById(45);
-		assertEquals("http://localhost:8080/cr/pages/test2.xml", source.getUrl());
+		assertEquals("http://localhost:8080/cr/pages/test.xml", source.getUrl());
 		assertEquals("bob2@europe.eu", source.getEmails());
 		assertEquals(false, source.isTrackedFile());
 		
@@ -113,7 +118,7 @@ public class HarvestSourceDAOTest extends DBTestCase {
 		harvestSource.setSourceId(45);
 
 		ConnectionUtil.setReturnSimpleConnection(true);
-		get().getDao(HarvestSourceDAO.class).deleteSourcesByUrl(Collections.singletonList("http://localhost:8080/cr/pages/test2.xml"));
+		get().getDao(HarvestSourceDAO.class).deleteSourcesByUrl(Collections.singletonList("http://localhost:8080/cr/pages/test.xml"));
 		
 		HarvestSourceDTO source = get().getDao(HarvestSourceDAO.class).getHarvestSourceById(45);
 		assertNull(source);

@@ -65,10 +65,11 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
      * 
      * @see eionet.cr.dao.HarvestSourceDao#getHarvestSources()
      */
-    public List<HarvestSourceDTO> getHarvestSources(String searchString, PaginationRequest pageRequest, SortingRequest sortingRequest)
+    public List<HarvestSourceDTO> getHarvestSources(String searchString, PaginationRequest paginRequest, SortingRequest sortingRequest)
     		throws DAOException {
-    	if (pageRequest == null) {
-    		throw new IllegalArgumentException("Page request cannot be null");
+    	
+    	if (paginRequest == null) {
+    		throw new IllegalArgumentException("Pagination request cannot be null");
     	}
     	
     	return getSources(
@@ -76,7 +77,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
     					? getSourcesSQL
     					: searchSourcesSQL,
 				searchString,
-				pageRequest,
+				paginRequest,
 				sortingRequest);	
     }
     
@@ -272,13 +273,17 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 			SQLUtil.executeQuery("select HARVEST_SOURCE_ID from HARVEST_SOURCE where URL" + inClause, urls, reader, conn);
 			String harvestSourceIdsCSV = Util.toCSV(reader.getResultList());
 			
-			reader = new SingleObjectReader<Integer>();
-			SQLUtil.executeQuery("select HARVEST_ID from HARVEST where HARVEST_SOURCE_ID in (" + harvestSourceIdsCSV + ")", reader, conn);
-			String harvestIdsCSV = Util.toCSV(reader.getResultList());
-			if (harvestIdsCSV.trim().length()>0){
-				SQLUtil.executeUpdate("delete from HARVEST_MESSAGE where HARVEST_ID in (" + harvestIdsCSV + ")", conn);
+			if (!StringUtils.isBlank(harvestSourceIdsCSV)){
+				
+				reader = new SingleObjectReader<Integer>();
+				SQLUtil.executeQuery("select HARVEST_ID from HARVEST where HARVEST_SOURCE_ID in (" + harvestSourceIdsCSV + ")", reader, conn);
+
+				String harvestIdsCSV = Util.toCSV(reader.getResultList());
+				if (harvestIdsCSV.trim().length()>0){
+					SQLUtil.executeUpdate("delete from HARVEST_MESSAGE where HARVEST_ID in (" + harvestIdsCSV + ")", conn);
+				}
+				SQLUtil.executeUpdate("delete from HARVEST where HARVEST_SOURCE_ID in (" + harvestSourceIdsCSV + ")", conn);
 			}
-			SQLUtil.executeUpdate("delete from HARVEST where HARVEST_SOURCE_ID in (" + harvestSourceIdsCSV + ")", conn);
 			
 			/* delete various stuff by harvest source urls or url hashes */
 			

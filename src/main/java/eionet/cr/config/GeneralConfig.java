@@ -69,7 +69,7 @@ public class GeneralConfig {
 	public static final String APPLICATION_USERAGENT = "application.userAgent";
 	
 	/** */
-	public static final String SUBEJCT_SELECT_MODE = "subjectSelectMode";
+	public static final String SUBJECT_SELECT_MODE = "subjectSelectMode";
 	
 	/** */
 	public static final int SEVERITY_INFO = 1;

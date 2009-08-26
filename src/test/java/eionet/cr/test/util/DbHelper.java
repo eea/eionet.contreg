@@ -24,17 +24,28 @@ import org.dbunit.PropertiesBasedJdbcDatabaseTester;
 
 import eionet.cr.config.GeneralConfig;
 
+/**
+ * 
+ */
 public class DbHelper {
-	public static void setUpConnectionProperties() {
+
+	/**
+	 * 
+	 */
+	public static void setUpConnectionProperties(){
+		
+		String drv = GeneralConfig.getProperty(GeneralConfig.DB_DRV);
 		System.setProperty(
-				PropertiesBasedJdbcDatabaseTester.DBUNIT_DRIVER_CLASS,
-				GeneralConfig.getProperty(GeneralConfig.DB_DRV));
+				PropertiesBasedJdbcDatabaseTester.DBUNIT_DRIVER_CLASS, drv);
+		
+		String url = GeneralConfig.getProperty(GeneralConfig.DB_URL);
 		System.setProperty(
-				PropertiesBasedJdbcDatabaseTester.DBUNIT_CONNECTION_URL,
-				GeneralConfig.getProperty(GeneralConfig.DB_URL));
-		System.setProperty(PropertiesBasedJdbcDatabaseTester.DBUNIT_USERNAME,
-				GeneralConfig.getProperty(GeneralConfig.DB_USER_ID));
-		System.setProperty(PropertiesBasedJdbcDatabaseTester.DBUNIT_PASSWORD,
-				GeneralConfig.getProperty(GeneralConfig.DB_USER_PWD));
+				PropertiesBasedJdbcDatabaseTester.DBUNIT_CONNECTION_URL, url);
+		
+		String usr = GeneralConfig.getProperty(GeneralConfig.DB_USER_ID);
+		System.setProperty(PropertiesBasedJdbcDatabaseTester.DBUNIT_USERNAME, usr);
+		
+		String pwd = GeneralConfig.getProperty(GeneralConfig.DB_USER_PWD);
+		System.setProperty(PropertiesBasedJdbcDatabaseTester.DBUNIT_PASSWORD, pwd);
 	}
 }

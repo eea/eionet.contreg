@@ -20,6 +20,8 @@
  */
 package eionet.cr.util;
 
+import org.junit.Test;
+
 import junit.framework.TestCase;
 
 /**
@@ -29,4 +31,9 @@ import junit.framework.TestCase;
  */
 public class UtilTest extends TestCase{
 
+	// TODO some tests to be added, a method-less TestCase causes an error in JUnit
+	
+	@Test
+	public void testNothing() throws Exception {
+	}
 }

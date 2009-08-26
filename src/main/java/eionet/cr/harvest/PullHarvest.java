@@ -116,7 +116,7 @@ public class PullHarvest extends Harvest{
 				}
 				catch (IOException e){
 					connectException = e;
-					logger.warn(e.toString(), e);
+					logger.warn(e.toString());
 				}
 				
 				// if we see that the source for surely doesn't exist, we delete it and return right away

@@ -29,6 +29,8 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
+import eionet.cr.util.Hashes;
+
 /**
  * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
@@ -51,16 +53,28 @@ public class CustomSearchTest extends TestCase{
 
 		List inParameters = new ArrayList();
 		String subjectSelectSQL = customSearch.getSubjectSelectSQL(inParameters);
-		assertEquals("select sql_calc_found_rows distinct SPO1.OBJECT from SPO as SPO1 left join SPO as ORDERING on "
-				+ "(SPO1.SUBJECT=ORDERING.SUBJECT and ORDERING.PREDICATE=?), SPO as SPO2, SPO as SPO3, SPO as SPO4 "
-				+ "where SPO1.PREDICATE=? and match (SPO1.OBJECT) against (?) and SPO1.SUBJECT=SPO2.SUBJECT and "
-				+ "SPO2.PREDICATE=? and match (SPO2.OBJECT) against (?) and SPO2.SUBJECT=SPO3.SUBJECT and SPO3.PREDICATE=? "
-				+ "and SPO3.OBJECT_HASH=? and SPO3.SUBJECT=SPO4.SUBJECT and SPO4.PREDICATE=? and SPO4.OBJECT_HASH=? "
-				+ "order by ORDERING.OBJECT asc limit ?,15",
-				subjectSelectSQL);
 		
-		assertEquals("[-6298139117913057870, -7425789506134211845, 2001, 919940972634798377, EEA Roug, -7619963771306832881, "
-				+ "4067911937186105398, -5849801858992246572, -2808135257893655278, 165]",
-				inParameters.toString());
+		String s = "select SPO1.SUBJECT as SUBJECT_HASH from SPO as SPO1 left join SPO as ORDERING on " +
+				"(SPO1.SUBJECT=ORDERING.SUBJECT and ORDERING.PREDICATE=?), SPO as SPO2, SPO as SPO3, SPO as SPO4 " +
+				"where SPO1.PREDICATE=? and SPO1.OBJECT_HASH=? and SPO1.SUBJECT=SPO2.SUBJECT and " +
+				"SPO2.PREDICATE=? and SPO2.OBJECT_HASH=? and SPO2.SUBJECT=SPO3.SUBJECT and SPO3.PREDICATE=? " +
+				"and SPO3.OBJECT_HASH=? and SPO3.SUBJECT=SPO4.SUBJECT and SPO4.PREDICATE=? and SPO4.OBJECT_HASH=? " +
+				"order by ORDERING.OBJECT asc";
+		
+		assertEquals(s, subjectSelectSQL);
+		
+		ArrayList inParamsExpected = new ArrayList();
+		inParamsExpected.add(Long.valueOf(Hashes.spoHash("sortPredicate")));
+		inParamsExpected.add(Long.valueOf(Hashes.spoHash("coverage")));
+		inParamsExpected.add(Long.valueOf(Hashes.spoHash("2001")));
+		inParamsExpected.add(Long.valueOf(Hashes.spoHash("description")));
+		inParamsExpected.add(Long.valueOf(Hashes.spoHash("EEA Roug")));
+		inParamsExpected.add(Long.valueOf(Hashes.spoHash("subject")));
+		// removed quotes from "Marine water", since CustomSearch removes them when normalizing predicate value
+		inParamsExpected.add(Long.valueOf(Hashes.spoHash("Marine water")));
+		inParamsExpected.add(Long.valueOf(Hashes.spoHash("locality")));
+		inParamsExpected.add(Long.valueOf(Hashes.spoHash("http://www.localities.com/14")));
+
+		assertEquals(inParamsExpected.toString(), inParameters.toString());
 	}
 }

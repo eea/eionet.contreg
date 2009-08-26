@@ -287,7 +287,7 @@ public abstract class AbstractSubjectSearch {
 	protected static SubjectSelectMode getSubjectSelectMode(){
 		
 		return SubjectSelectMode.valueOf(
-				GeneralConfig.getProperty(GeneralConfig.SUBEJCT_SELECT_MODE, SubjectSelectMode.DB_1STEP.toString()).toUpperCase());
+				GeneralConfig.getProperty(GeneralConfig.SUBJECT_SELECT_MODE, SubjectSelectMode.DB_1STEP.toString()).toUpperCase());
 	}
 
 	/**
