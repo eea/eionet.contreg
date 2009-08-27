@@ -75,8 +75,6 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO>{
 	 */
 	@DefaultHandler
 	public Resolution defaultHandler() throws SearchException {
-		//entry point to the type search.
-		clearSession();
 		//get all available types and cache them;
 		availableTypes = getTypesFromCacheOrGenerate();
 		
@@ -257,15 +255,6 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO>{
 			getSession().setAttribute(AVAILABLE_TYPES_CACHE, result);
 			return result;
 		}
-	}
-
-	/**
-	 * 
-	 */
-	private void clearSession(){
-		getSession().removeAttribute(AVAILABLE_TYPES_CACHE);
-		getSession().removeAttribute(AVAILABLE_COLUMNS_CACHE);
-		getSession().removeAttribute(SELECTED_COLUMNS_CACHE);
 	}
 
 	/**
