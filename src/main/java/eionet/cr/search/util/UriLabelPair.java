@@ -64,7 +64,10 @@ public class UriLabelPair implements Comparable{
 	 */
 	public int compareTo(Object o) {
 		
-		UriLabelPair otherOption = (UriLabelPair)o; // this can be done even if o==null and it will throw ClassCastException if (o istanceof OptionDTO)==false
+		// the following assignment can be done even if o==null and it will
+		// throw ClassCastException if (o instanceof UriLabelPair)==false
+		UriLabelPair otherOption = (UriLabelPair)o;
+		
 		if (otherOption==null)
 			return 1;
 		else if (label==null)

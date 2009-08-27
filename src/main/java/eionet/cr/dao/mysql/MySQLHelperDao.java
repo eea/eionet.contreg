@@ -2,10 +2,13 @@ package eionet.cr.dao.mysql;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -248,4 +251,111 @@ public class MySQLHelperDao extends MySQLBaseDAO implements HelperDao {
 		}
 	}
 
+	/** */
+	private static final String getDCPropertiesSQL = "select distinct SUBJECT from SPO" +
+			" where SOURCE=" + Hashes.spoHash(Subjects.DUBLIN_CORE_SOURCE_URL) +
+			" and PREDICATE=" + Hashes.spoHash(Predicates.RDF_TYPE) +
+			" and OBJECT_HASH=" + Hashes.spoHash(Subjects.RDF_PROPERTY);
+	
+	/**
+	 * 
+	 * @param subjectTypes
+	 * @return
+	 * @throws DAOException
+	 */
+	public HashMap<String,String> getAddibleProperties(Collection<String> subjectTypes) throws DAOException {
+		
+		HashMap<String,String> result = new HashMap<String,String>();
+		
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		try{
+			/* get the DublinCore properties */
+			
+			conn = getConnection();
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(getDCPropertiesSQL);			
+			List<String> dcPropertiesHashes = new ArrayList<String>();
+			while (rs.next()){
+				dcPropertiesHashes.add(rs.getString(1));
+			}
+			SQLUtil.close(rs);
+
+			if (!dcPropertiesHashes.isEmpty()){
+				result.putAll(getSubjectLabels(dcPropertiesHashes, conn));
+			}
+			
+			/* get the properties for given subject types */
+			
+			if (subjectTypes!=null && !subjectTypes.isEmpty()){
+				
+				StringBuilder buf = new StringBuilder("select distinct SUBJECT from SPO where PREDICATE=").
+				append(Hashes.spoHash(Predicates.RDFS_DOMAIN)).append(" and OBJECT_HASH in (").
+				append(Util.toCSV(subjectTypes)).append(")");
+				
+				rs = stmt.executeQuery(buf.toString());			
+				List<String> otherPropertiesHashes = new ArrayList<String>();
+				while (rs.next()){
+					otherPropertiesHashes.add(rs.getString(1));
+				}
+				
+				if (!otherPropertiesHashes.isEmpty()){
+					result.putAll(getSubjectLabels(otherPropertiesHashes, conn));
+				}
+			}
+		}
+		catch (SQLException e){
+			throw new DAOException(e.toString(), e);
+		}
+		finally{
+			SQLUtil.close(rs);
+			SQLUtil.close(stmt);
+			SQLUtil.close(conn);
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * 
+	 * @param subjectHashes
+	 * @return
+	 * @throws SQLException 
+	 */
+	public HashMap<String,String> getSubjectLabels(Collection<String> subjectHashes, Connection conn) throws SQLException{
+		
+		HashMap<String,String> result = new HashMap<String,String>();
+		boolean closeConnection = false;
+		
+		Statement stmt = null;
+		ResultSet rs = null;
+		try{
+			if (conn==null){
+				conn = getConnection();
+				closeConnection = true;
+			}
+			stmt = conn.createStatement();
+			
+			StringBuilder buf =
+				new StringBuilder("select distinct RESOURCE.URI as SUBJECT_URI, OBJECT as SUBJECT_LABEL").
+				append(" from SPO inner join RESOURCE on SPO.SUBJECT=RESOURCE.URI_HASH where SUBJECT in (").
+				append(Util.toCSV(subjectHashes)).append(") and PREDICATE=").
+				append(Hashes.spoHash(Predicates.RDFS_LABEL)).append(" and LIT_OBJ='Y'");
+			
+			rs = stmt.executeQuery(buf.toString());
+			while (rs.next()){
+				result.put(rs.getString("SUBJECT_URI"), rs.getString("SUBJECT_LABEL"));
+			}
+		}
+		finally{
+			SQLUtil.close(rs);
+			SQLUtil.close(stmt);
+			if (closeConnection){
+				SQLUtil.close(conn);
+			}
+		}
+		
+		return result;
+	}
 }

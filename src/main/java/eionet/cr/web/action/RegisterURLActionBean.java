@@ -90,7 +90,7 @@ public class RegisterURLActionBean extends AbstractActionBean{
 		Collection<SubjectDTO> coll = uriSearch.getResultList();
 		SubjectDTO subjectDTO = coll!=null && !coll.isEmpty() ? coll.iterator().next() : null;
 		
-		// if subject did not exist or it isn't registered in user's registration yet, then add the necessary triples
+		// if subject did not exist or it isn't registered in user's registrations yet, then add the necessary triples
 		if (subjectDTO==null || !subjectDTO.existsPredicateObjectSource(
 				Predicates.RDF_TYPE, Subjects.CR_FILE, getCRUser().registrationsUri())){
 			

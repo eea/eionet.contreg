@@ -40,7 +40,7 @@
 		    						<td><stripes:label for="propertySelect">Property:</stripes:label></td>
 		    						<td>
 		    							<stripes:select name="propertyUri" id="propertySelect">
-						    				<c:forEach var="prop" items="${actionBean.propertiesToSelect}">
+						    				<c:forEach var="prop" items="${actionBean.addibleProperties}">
 						    					<stripes:option value="${prop.uri}" label="${prop.label} (${prop.uri})"/>
 								    		</c:forEach>
 						    			</stripes:select>

@@ -3,6 +3,7 @@
 package eionet.cr.dao;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 
 import eionet.cr.dto.SubjectDTO;
@@ -63,4 +64,12 @@ public interface HelperDao extends IDao {
 	 * @throws DAOException
 	 */
 	void addResource(String uri, String firstSeenSourceUri) throws DAOException;
+	
+	/**
+	 * 
+	 * @param subjectTypes
+	 * @return
+	 * @throws DAOException
+	 */
+	HashMap<String,String> getAddibleProperties(Collection<String> subjectTypes) throws DAOException;
 }

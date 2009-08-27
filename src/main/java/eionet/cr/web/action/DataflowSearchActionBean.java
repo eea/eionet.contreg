@@ -270,7 +270,7 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean<SubjectDT
 		list.add(col);
 
 		col = new SubjectPredicateColumn();
-		col.setPredicateUri(Predicates.ROD_HAS_FEEDBACK);
+		col.setPredicateUri(Predicates.CR_HAS_FEEDBACK);
 		col.setTitle("Feedback");
 		col.setSortable(true);
 		list.add(col);

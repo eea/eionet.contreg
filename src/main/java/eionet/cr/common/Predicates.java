@@ -52,7 +52,7 @@ public interface Predicates {
 	public static final String ROD_LOCALITY_PROPERTY = "http://rod.eionet.europa.eu/schema.rdf#locality";
 	public static final String ROD_ISSUE_PROPERTY = "http://rod.eionet.europa.eu/schema.rdf#issue";
 	public static final String ROD_HAS_FILE = "http://rod.eionet.europa.eu/schema.rdf#hasFile";
-	public static final String ROD_HAS_FEEDBACK = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#hasFeedback";
+	public static final String ROD_PRODUCT_OF = "http://rod.eionet.europa.eu/schema.rdf#productOf";
 
 	public static final String CR_FIRSTSEEN_TIME = "urn:eionet:contreg:firstseen-time";
 	public static final String CR_URL = "urn:eionet:contreg:url";
@@ -64,7 +64,11 @@ public interface Predicates {
 	public static final String CR_LAST_REFRESHED = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#lastRefreshed";
 	public static final String CR_BOOKMARK = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#userBookmark";
 	public static final String CR_SAVETIME = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#userSaveTime";
-
+	public static final String CR_TAG = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#tag";
+	public static final String CR_COMMENT = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#comment";
+	public static final String CR_HAS_SOURCE = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#hasSource";
+	public static final String CR_HAS_FEEDBACK = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#hasFeedback";
+	
 	public static final String WGS_LAT = "http://www.w3.org/2003/01/geo/wgs84_pos#lat";
 	public static final String WGS_LONG = "http://www.w3.org/2003/01/geo/wgs84_pos#long";
 }

@@ -22,7 +22,13 @@ package eionet.cr.web.action;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+
+import javax.servlet.http.HttpSession;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
@@ -52,6 +58,9 @@ import eionet.cr.search.util.UriLabelPair;
  */
 @UrlBinding("/factsheet.action")
 public class FactsheetActionBean extends AbstractActionBean{
+	
+	/** */
+	private static final String ADDIBLE_PROPERTIES_SESSION_ATTR = FactsheetActionBean.class.getName() + ".addibleProperties";
 
 	/** */
 	private String uri;
@@ -62,9 +71,6 @@ public class FactsheetActionBean extends AbstractActionBean{
 	private Map<String,String> predicateLabels;
 	private SubProperties subProperties;
 	
-	/** */
-	private Collection<UriLabelPair> propertiesToSelect;
-
 	/** */
 	private boolean anonymous;
 	private String propertyUri;
@@ -115,11 +121,6 @@ public class FactsheetActionBean extends AbstractActionBean{
 	 * @throws SearchException
 	 */
 	public Resolution edit() throws SearchException{
-		
-		propertiesToSelect = new ArrayList<UriLabelPair>();
-		propertiesToSelect.add(UriLabelPair.create(Predicates.DC_TITLE, "Title"));
-		propertiesToSelect.add(UriLabelPair.create(Predicates.DC_DATE, "Publish date"));
-		propertiesToSelect.add(UriLabelPair.create(Predicates.DC_DESCRIPTION, "Description"));
 		
 		return view();
 	}
@@ -193,10 +194,66 @@ public class FactsheetActionBean extends AbstractActionBean{
 	}
 
 	/**
-	 * @return the propertiesToSelect
+	 * @return the addibleProperties
+	 * @throws DAOException 
 	 */
-	public Collection<UriLabelPair> getPropertiesToSelect() {
-		return propertiesToSelect;
+	public Collection<UriLabelPair> getAddibleProperties() throws DAOException {
+
+		/* get the addible properties from session */
+		
+		HttpSession session = getContext().getRequest().getSession();
+		ArrayList<UriLabelPair> result = (ArrayList<UriLabelPair>)session.getAttribute(ADDIBLE_PROPERTIES_SESSION_ATTR);
+		
+		// if not in session, create them and add to session
+		if (result==null || result.isEmpty()){
+		
+			/* get addible properties from database */
+			
+			HelperDao helperDao = factory.getDao(HelperDao.class);
+			HashMap<String,String> props = helperDao.getAddibleProperties(getSubjectTypesHashes());
+			
+			// add some hard-coded properties, HashMap assures there won't be duplicates
+			props.put(Predicates.RDF_TYPE, "Type");
+			props.put(Predicates.CR_TAG, "Tag");
+			props.put(Predicates.CR_COMMENT, "Comment");
+			props.put(Predicates.CR_HAS_SOURCE, "hasSource");
+			props.put(Predicates.ROD_PRODUCT_OF, "productOf");
+			
+			/* create the result object from the found and hard-coded properties, sort it */
+			
+			result = new ArrayList<UriLabelPair>();
+			if (props!=null && !props.isEmpty()){
+				
+				for (String uri:props.keySet()){
+					result.add(UriLabelPair.create(uri, props.get(uri)));
+				}
+				Collections.sort(result);
+			}
+			
+			// put into session
+			session.setAttribute(ADDIBLE_PROPERTIES_SESSION_ATTR, result);
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	private Collection<String> getSubjectTypesHashes(){
+		
+		HashSet<String> result = new HashSet<String>();
+		Collection<ObjectDTO> typeObjects = subject.getObjects(Predicates.RDF_TYPE, ObjectDTO.Type.RESOURCE);
+		if (typeObjects!=null && !typeObjects.isEmpty()){
+			
+			for (ObjectDTO object:typeObjects){
+				
+				result.add(String.valueOf(object.getHash()));
+			}
+		}
+		
+		return result;
 	}
 
 	/**
@@ -225,13 +282,6 @@ public class FactsheetActionBean extends AbstractActionBean{
 	 */
 	public void setSubProperties(SubProperties subProperties) {
 		this.subProperties = subProperties;
-	}
-
-	/**
-	 * @param propertiesToSelect the propertiesToSelect to set
-	 */
-	public void setPropertiesToSelect(Collection<UriLabelPair> propertiesToSelect) {
-		this.propertiesToSelect = propertiesToSelect;
 	}
 
 	/**
