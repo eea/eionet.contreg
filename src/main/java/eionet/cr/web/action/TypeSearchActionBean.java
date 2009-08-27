@@ -20,17 +20,16 @@
  */
 package eionet.cr.web.action;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpSession;
-
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.HandlesEvent;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
@@ -43,7 +42,7 @@ import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.CustomSearch;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.util.SortOrder;
-import eionet.cr.search.util.UriLabelPair;
+import eionet.cr.util.Pair;
 import eionet.cr.web.util.columns.SearchResultColumn;
 import eionet.cr.web.util.columns.SubjectPredicateColumn;
 
@@ -58,22 +57,62 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO>{
 	/** */
 	private static final String FORM_PAGE = "/pages/typeSearch.jsp";
 	
-	/** */
-	private static final String PICKLIST = TypeSearchActionBean.class.getName() + ".picklist";
-	private static final String PROPERTIES = TypeSearchActionBean.class.getName() + ".properties";
-	private static final String PREV_TYPE = TypeSearchActionBean.class.getName() + ".prevType";
+	private static final String AVAILABLE_TYPES_CACHE = TypeSearchActionBean.class.getName() + ".picklist";
+	private static final String SELECTED_COLUMNS_CACHE = TypeSearchActionBean.class.getName() + ".storedSelectedColumns";
+	private static final String AVAILABLE_COLUMNS_CACHE = TypeSearchActionBean.class.getName() + ".availableColumnsCache";
 	
 	/** */
 	private String type;
+	
+	private List<String> selectedColumns;
+	private List<SearchResultColumn> columns;
+	private List<Pair<String,String>> availableColumns;
+	private List<Pair<String,String>> availableTypes;
+	
+	/**
+	 * 
+	 * @return
+	 */
+	@DefaultHandler
+	public Resolution defaultHandler() throws SearchException {
+		//entry point to the type search.
+		clearSession();
+		//get all available types and cache them;
+		availableTypes = getTypesFromCacheOrGenerate();
+		
+		return new ForwardResolution(FORM_PAGE);
+	}
+	
+	@HandlesEvent("setSearchColumns")
+	public Resolution setSearchColumns() throws SearchException {
+		Map<String,List<String>> cache = (Map<String, List<String>>) getSession().getAttribute(SELECTED_COLUMNS_CACHE);
+		if (cache == null) {
+			cache = new HashMap<String, List<String>>();
+		} 
+		cache.put(type, selectedColumns);
+		getSession().setAttribute(SELECTED_COLUMNS_CACHE, cache);
+		return search();
+	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.web.action.AbstractSearchActionBean#search()
 	 */
 	public Resolution search() throws SearchException {
-		
+
+		availableTypes = getTypesFromCacheOrGenerate();
 		if (!StringUtils.isBlank(type)){
-			
+			//get available columns for search
+			availableColumns = getAvailableColumns(type);
+			//check if user has selected any columns.
+			// if none - try the cache.
+			if (selectedColumns == null) {
+				selectedColumns = getSelectedColumns(type);
+			}
+			//decide what columns to show to the user
+			columns = getColumns(availableColumns, selectedColumns);
+					
+			//perform the search
 			Map<String,String> criteria = new HashMap<String,String>();
 			criteria.put(Predicates.RDF_TYPE, type);
 			
@@ -86,7 +125,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO>{
 			resultList = customSearch.getResultList();
     		matchCount = customSearch.getTotalMatchCount();
 		}
-		
+
 		return new ForwardResolution(FORM_PAGE);
 	}
 
@@ -105,89 +144,61 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO>{
 	}
 	
 	/**
-	 * 
+	 * @param availableColumns2
+	 * @param selectedColumns2
 	 * @return
 	 */
-	@DefaultHandler
-	public Resolution unspecified(){
-		
-		clearSession();
-		return new ForwardResolution(FORM_PAGE);
-	}
-	
-	/**
-	 * 
-	 */
-	private void clearSession(){
-		
-		HttpSession session = getContext().getRequest().getSession();
-		session.removeAttribute(PICKLIST);
-		session.removeAttribute(PROPERTIES);
-		session.removeAttribute(PREV_TYPE);
-	}
-	
-	/**
-	 * @throws SearchException 
-	 * 
-	 */
-	public List<UriLabelPair> getPicklist() throws SearchException{
-		
-		List<UriLabelPair> picklist = (List<UriLabelPair>)getContext().getRequest().getSession().getAttribute(PICKLIST);
-		if (picklist==null || picklist.isEmpty()){
-			
-			Map<String,String> criteria = new HashMap<String,String>();
-			criteria.put(Predicates.RDF_TYPE, Subjects.RDFS_CLASS);
-			
-			CustomSearch customSearch = new CustomSearch(criteria);
-			customSearch.setSorting(Predicates.RDFS_LABEL, SortOrder.ASCENDING);
-			customSearch.setPageLength(0); // we want no limits on result set size
-			customSearch.execute();
-			Collection<SubjectDTO> subjects = customSearch.getResultList();
-			if (subjects!=null){
-				
-				picklist = new ArrayList<UriLabelPair>();
-				for (Iterator<SubjectDTO> it=subjects.iterator(); it.hasNext();){
-					SubjectDTO subject = it.next();
-					if (!subject.isAnonymous()){
-						String label = subject.getObjectValue(Predicates.RDFS_LABEL);
-						if (!StringUtils.isBlank(label)){
-							picklist.add(UriLabelPair.create(subject.getUri(), label));
-						}
+	private List<SearchResultColumn> getColumns(List<Pair<String, String>> availableColumns, List<String> selectedColumns) {
+		List<SearchResultColumn> columns = new LinkedList<SearchResultColumn>();
+		// let's always include rdfs:label in the columns
+		columns.add(new SubjectPredicateColumn("Title", true, Predicates.RDFS_LABEL));
+
+		if (selectedColumns == null || selectedColumns.isEmpty()) {
+			//if nothing is selected - select first 4
+			int counter = 0;
+			for(Pair<String,String> pair : availableColumns) {
+				columns.add(new SubjectPredicateColumn(pair.getValue(), true, pair.getId()));
+				if (++counter == 4) {
+					break;
+				}
+			}
+		} else {
+			//add every selected column to the output
+			for(String string : selectedColumns) {
+				for (Pair<String,String> pair : availableColumns) {
+					if (pair.getId().equals(string)) {
+						columns.add(new SubjectPredicateColumn(pair.getValue(), true, string));
 					}
 				}
 			}
-			
-			if (picklist!=null && !picklist.isEmpty()){
-				getContext().getRequest().getSession().setAttribute(PICKLIST, picklist);
-			}
 		}
 		
-		return picklist;
+		return columns;
 	}
-	
+
 	/**
-	 * 
+	 * @param type2
 	 * @return
-	 * @throws SearchException 
 	 */
-	private List<UriLabelPair> getProperties() throws SearchException{
-		
-		// take out the previous type, replace it with the new one
-		HttpSession session = getContext().getRequest().getSession();
-		String previousType = (String)session.getAttribute(PREV_TYPE);
-		session.setAttribute(PREV_TYPE, type);
-		if (previousType==null)
-			previousType = "";
-		
-		// if submitted type is blank anyway, there's nothing to do here
-		if (StringUtils.isBlank(type))
-			return null;
-		
-		// find properties only if none in the session or type differs from previous
-		
-		List<UriLabelPair> properties = (List<UriLabelPair>)session.getAttribute(PROPERTIES);
-		if (properties==null || properties.isEmpty() || !previousType.equals(type)){						
-			
+	private List<String> getSelectedColumns(String type) {
+		Map<String,List<String>> cache = (Map<String, List<String>>) getSession().getAttribute(SELECTED_COLUMNS_CACHE);
+		return cache != null && cache.containsKey(type)
+				? cache.get(type)
+				: new LinkedList<String>();
+	}
+
+	/**
+	 * @param type
+	 * @return
+	 */
+	private List<Pair<String, String>> getAvailableColumns(String type) throws SearchException {
+		Map<String, List<Pair<String,String>>> cache = 
+				(Map<String, List<Pair<String, String>>>) getSession().getAttribute(AVAILABLE_COLUMNS_CACHE);
+		if (cache == null) {
+			cache = new HashMap<String, List<Pair<String,String>>>();
+		}
+		if (!cache.containsKey(type)) {
+			List<Pair<String,String>> result = new LinkedList<Pair<String,String>>();
 			Map<String,String> criteria = new HashMap<String,String>();
 			criteria.put(Predicates.RDF_TYPE, Subjects.RDF_PROPERTY);
 			criteria.put(Predicates.RDFS_DOMAIN, type);
@@ -198,31 +209,75 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO>{
 			
 			Collection<SubjectDTO> subjects = customSearch.getResultList();
 			if (subjects!=null){
-				
-				properties = new ArrayList<UriLabelPair>();
+				for(SubjectDTO subject : subjects) {
+					if (!subject.isAnonymous()){
+						String uri = subject.getUri();
+						String label = subject.getObjectValue(Predicates.RDFS_LABEL);
+						result.add(new Pair<String, String>(uri, label));
+					}
+				}
+			}
+			cache.put(type, result);
+			getSession().setAttribute(AVAILABLE_COLUMNS_CACHE, cache);
+			return result;
+		} else {
+			return cache.get(type);
+		}
+	}
+	
+	/**
+	 * @return
+	 */
+	private List<Pair<String, String>> getTypesFromCacheOrGenerate() throws SearchException {
+		//check if it was already cached
+		if (getSession().getAttribute(AVAILABLE_TYPES_CACHE) != null) {
+			return (List<Pair<String, String>>) getSession().getAttribute(AVAILABLE_TYPES_CACHE);
+		} else {
+			List<Pair<String,String>> result = new LinkedList<Pair<String,String>>();
+			Map<String,String> criteria = new HashMap<String,String>();
+			criteria.put(Predicates.RDF_TYPE, Subjects.RDFS_CLASS);
+			
+			CustomSearch customSearch = new CustomSearch(criteria);
+			customSearch.setSorting(Predicates.RDFS_LABEL, SortOrder.ASCENDING);
+			customSearch.setPageLength(0); // we want no limits on result set size
+			customSearch.execute();
+			Collection<SubjectDTO> subjects = customSearch.getResultList();
+			if (subjects!=null){
 				for (Iterator<SubjectDTO> it=subjects.iterator(); it.hasNext();){
-					
 					SubjectDTO subject = it.next();
 					if (!subject.isAnonymous()){
-						
-						String uri = subject.getUri();
-						if (!uri.equals(Predicates.RDFS_LABEL)){ // we skip label, because we include by default later
-							
-							String label = subject.getObjectValue(Predicates.RDFS_LABEL);
-							if (!StringUtils.isBlank(label)){
-								properties.add(UriLabelPair.create(uri, label));
-							}
+						String label = subject.getObjectValue(Predicates.RDFS_LABEL);
+						if (!StringUtils.isBlank(label)){
+							result.add(new Pair<String,String>(subject.getUri(), label));
 						}
 					}
 				}
 			}
-			
-			if (properties!=null && !properties.isEmpty()){
-				getContext().getRequest().getSession().setAttribute(PROPERTIES, properties);
-			}
+			//cache it 
+			getSession().setAttribute(AVAILABLE_TYPES_CACHE, result);
+			return result;
 		}
-		
-		return properties;
+	}
+
+	/**
+	 * 
+	 */
+	private void clearSession(){
+		getSession().removeAttribute(AVAILABLE_TYPES_CACHE);
+		getSession().removeAttribute(AVAILABLE_COLUMNS_CACHE);
+		getSession().removeAttribute(SELECTED_COLUMNS_CACHE);
+	}
+
+	/**
+	 * @throws SearchException 
+	 * 
+	 */
+	public List<Pair<String,String>> getAvailableTypes() throws SearchException{
+		return availableTypes;
+	}
+	
+	public List<Pair<String,String>> getAvailableColumns() throws SearchException {
+		return availableColumns;
 	}
 
 	/*
@@ -230,35 +285,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO>{
 	 * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
 	 */
 	public List<SearchResultColumn> getColumns() throws SearchException {
-		
-		ArrayList<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
-
-		// let's always include rdfs:label in the columns
-		SubjectPredicateColumn col = new SubjectPredicateColumn();
-		col.setPredicateUri(Predicates.RDFS_LABEL);
-		col.setTitle("Title");
-		col.setSortable(true);
-		list.add(col);
-		
-		// query the rest of the columns
-		
-		List<UriLabelPair> properties = getProperties();
-		if (properties!=null && !properties.isEmpty()){
-			
-			int i=0;
-			for (Iterator<UriLabelPair> it=properties.iterator(); i<4 && it.hasNext();i++){ // only interested in first 4 columns
-				
-				UriLabelPair property = it.next();
-				
-				col = new SubjectPredicateColumn();
-				col.setPredicateUri(property.getUri());
-				col.setTitle(property.getLabel());
-				col.setSortable(true);
-				list.add(col);
-			}
-		}
-
-		return list;
+		return columns;
 	}
 
 	/**
@@ -273,5 +300,19 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO>{
 	 */
 	public void setType(String type) {
 		this.type = type;
+	}
+
+	/**
+	 * @return the options
+	 */
+	public List<String> getSelectedColumns() {
+		return selectedColumns;
+	}
+
+	/**
+	 * @param options the options to set
+	 */
+	public void setSelectedColumns(List<String> options) {
+		this.selectedColumns = options;
 	}
 }

@@ -24,6 +24,8 @@ import java.util.HashSet;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import javax.servlet.http.HttpSession;
+
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.action.Message;
@@ -237,5 +239,12 @@ public abstract class AbstractActionBean implements ActionBean {
 		}
 			
 		return result;
+	}
+	
+	/**
+	 * @return session associated with current request
+	 */
+	protected HttpSession getSession() {
+		return context.getRequest().getSession();
 	}
 }

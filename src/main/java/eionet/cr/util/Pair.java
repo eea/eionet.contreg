@@ -22,6 +22,9 @@ package eionet.cr.util;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
 /**
  * @author Aleksandr Ivanov
  * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
@@ -70,5 +73,25 @@ public class Pair<T,T1> implements Serializable {
 	public void setValue(T1 value) {
 		this.value = value;
 	}
+
+	/** 
+	 * @see java.lang.Object#hashCode()
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		return HashCodeBuilder.reflectionHashCode(this);
+	}
+
+	/** 
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		return EqualsBuilder.reflectionEquals(this, obj);
+	}
+	
+	
 
 }

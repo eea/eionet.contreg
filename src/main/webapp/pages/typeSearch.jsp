@@ -16,17 +16,36 @@
 
 	    <stripes:form action="/typeSearch.action" method="get" id="typesearch">
 
-				<stripes:select name="type">
-					<c:forEach var="picklistItem" items="${actionBean.picklist}">
-    					<stripes:option value="${picklistItem.uri}" label="${picklistItem.label} (${picklistItem.uri})"/>
+				<stripes:select name="type" onchange="hideElement('searchColumns')">
+					<c:forEach var="picklistItem" items="${actionBean.availableTypes}">
+    					<stripes:option value="${picklistItem.id}" label="${picklistItem.value} (${picklistItem.id})"/>
     				</c:forEach>
 				</stripes:select>&nbsp;
 				<stripes:submit name="search" value="Search"/>
+		</stripes:form>
+		<stripes:form action="/typeSearch.action" id="typesearch">
+		<stripes:hidden name="type" value="${actionBean.type }"/>				
+				<c:if test="${!empty actionBean.availableColumns}">
+					<div id="searchColumns">
+						<label for="searchColumnsSelect"> Choose which columns to display in a search result</label> <br/>
+						<stripes:select 
+								name="selectedColumns" 
+								multiple="multiple" 
+								size="5" 
+								style="max-width:300px; margin-top:5px" 
+								id="searchColumnsSelect" value="${actionBean.selectedColumns}" >
+							<c:forEach items="${actionBean.availableColumns}" var="typeColumn">
+								<stripes:option value="${typeColumn.id}" label="${typeColumn.value }"/>
+							</c:forEach>
+						</stripes:select>
+						<stripes:submit name="setSearchColumns" value="Set search columns" id="searchColumnsButton"/>
+					</div>
+				</c:if>
 				<c:if test='${sessionScope.crUser!=null && crfn:hasPermission(sessionScope.crUser.userName, "/", "u")}'>
 					&nbsp;<stripes:submit name="introspect" value="Introspect"/>
 				</c:if>		
 
-				<c:if test="${not empty param.search}">
+				<c:if test="${not empty param.search or not empty param.setSearchColumns}">
 					<stripes:layout-render name="/pages/common/subjectsResultList.jsp" tableClass="sortable"/>
 				</c:if>
 

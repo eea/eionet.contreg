@@ -283,3 +283,12 @@ function toggleSelectAll(formname) {
 	formobj.selectAll.value = "Select all";
   }
 }
+
+function disableElement(elementId) {
+	this.document.getElementById(elementId).disabled = true;
+}
+
+function hideElement(elementId) {
+	this.document.getElementById(elementId).style.display = 'none';
+}
+
