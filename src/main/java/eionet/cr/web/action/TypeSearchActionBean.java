@@ -148,14 +148,17 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO>{
 	 */
 	private List<SearchResultColumn> getColumns(List<Pair<String, String>> availableColumns, List<String> selectedColumns) {
 		List<SearchResultColumn> columns = new LinkedList<SearchResultColumn>();
+		//setSelectedColumns uses POST to submit a form, we have to add needed parameters to the 
+		//column headers in order to be able to sort right.
+		String actionParameter = "search=Search&amp;type=" + eionet.cr.util.Util.urlEncode(type);
 		// let's always include rdfs:label in the columns
-		columns.add(new SubjectPredicateColumn("Title", true, Predicates.RDFS_LABEL));
+		columns.add(new SubjectPredicateColumn("Title", true, Predicates.RDFS_LABEL, actionParameter));
 
 		if (selectedColumns == null || selectedColumns.isEmpty()) {
 			//if nothing is selected - select first 4
 			int counter = 0;
 			for(Pair<String,String> pair : availableColumns) {
-				columns.add(new SubjectPredicateColumn(pair.getValue(), true, pair.getId()));
+				columns.add(new SubjectPredicateColumn(pair.getValue(), true, pair.getId(), actionParameter));
 				if (++counter == 4) {
 					break;
 				}
@@ -165,7 +168,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO>{
 			for(String string : selectedColumns) {
 				for (Pair<String,String> pair : availableColumns) {
 					if (pair.getId().equals(string)) {
-						columns.add(new SubjectPredicateColumn(pair.getValue(), true, string));
+						columns.add(new SubjectPredicateColumn(pair.getValue(), true, string, actionParameter));
 					}
 				}
 			}
@@ -197,6 +200,9 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO>{
 		}
 		if (!cache.containsKey(type)) {
 			List<Pair<String,String>> result = new LinkedList<Pair<String,String>>();
+			//hardcode RDF_TYPE as one of the available values
+			result.add(new Pair<String, String>(Predicates.RDF_TYPE, "RDF type"));
+			
 			Map<String,String> criteria = new HashMap<String,String>();
 			criteria.put(Predicates.RDF_TYPE, Subjects.RDF_PROPERTY);
 			criteria.put(Predicates.RDFS_DOMAIN, type);

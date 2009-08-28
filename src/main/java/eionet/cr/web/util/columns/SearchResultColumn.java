@@ -37,6 +37,7 @@ public abstract class SearchResultColumn {
 	private boolean isSortable;
 
 	private boolean escapeXml;
+	private String actionRequestParameter;
 	
 	public SearchResultColumn() {
 		//blank constructor
@@ -57,6 +58,8 @@ public abstract class SearchResultColumn {
 	 * @return
 	 */
 	public abstract String format(Object object);
+	
+	
 	
 	/**
 	 * 
@@ -99,5 +102,19 @@ public abstract class SearchResultColumn {
 	 */
 	public void setSortable(boolean isSortable) {
 		this.isSortable = isSortable;
+	}
+
+	/**
+	 * @return the actionRequestParameter
+	 */
+	public String getActionRequestParameter() {
+		return actionRequestParameter;
+	}
+
+	/**
+	 * @param actionRequestParameter the actionRequestParameter to set
+	 */
+	public void setActionRequestParameter(String actionRequestParameter) {
+		this.actionRequestParameter = actionRequestParameter;
 	}
 }

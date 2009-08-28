@@ -125,9 +125,14 @@ public class JstlFunctions {
 		
 		HttpServletRequest request = actionBean.getContext().getRequest();
 		StringBuffer buf = new StringBuffer(actionBean.getUrlBinding());
-		buf.append("?").append(
-				StringEscapeUtils.escapeHtml(
-						request.getQueryString()));
+		buf.append("?");
+		if (StringUtils.isBlank(column.getActionRequestParameter())) {
+			buf.append(
+					StringEscapeUtils.escapeHtml(
+							request.getQueryString()));
+		} else {
+			buf.append(column.getActionRequestParameter());
+		}
 		String sortParamValue = column.getSortParamValue();
 		if (sortParamValue==null)
 			sortParamValue = "";
