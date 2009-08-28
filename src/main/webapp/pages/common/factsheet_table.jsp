@@ -3,6 +3,23 @@
 <stripes:layout-definition>
 
 <c:if test="${actionBean.subject.predicates!=null && fn:length(actionBean.subject.predicates)>0}">
+	<div id="tabbedmenu">
+	    <ul>
+		<li id="currenttab"><span>Resource properties</span></li>
+		<li>
+			<stripes:link href="/references.action" event="search">References to this resource
+			<c:choose>
+    			<c:when test="${subjectUrl!=null}">
+    				<stripes:param name="object" value="${subjectUrl}"/>
+    			</c:when>
+    			<c:otherwise>
+    				<stripes:param name="object" value="${actionBean.subject.uriHash}"/>
+    			</c:otherwise>
+    		</c:choose>
+			</stripes:link>
+        </li>
+	    </ul>
+	</div>
    	<table class="datatable" width="100%" cellspacing="0" summary="">
 	<col style="width:25%;"/>
 	<col style="max-width:3em;"/>
@@ -89,19 +106,6 @@
 			Schedule urgent harvest</stripes:link>
 		</p>
 	</c:if>	
-   	<p>
-		<stripes:link href="/references.action" event="search">What is referring to this resource?
-			<c:choose>
-    			<c:when test="${subjectUrl!=null}">
-    				<stripes:param name="object" value="${subjectUrl}"/>
-    			</c:when>
-    			<c:otherwise>
-    				<stripes:param name="object" value="${actionBean.subject.uriHash}"/>
-    			</c:otherwise>
-    		</c:choose>
-		</stripes:link>
-	</p>
-		
 
 </c:if>
 </stripes:layout-definition>
