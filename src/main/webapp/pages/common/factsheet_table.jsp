@@ -49,15 +49,20 @@
 				    			</td>
 				    			<td>
 				    				<c:choose>
-									<c:when test="${object.sourceObjectHash==0}">
-										<c:out value="${object.value}"/>
-									</c:when>
-									<c:otherwise>
-										<stripes:link class="infolink" href="/factsheet.action"><c:out value="${object.value}"/>
-												<stripes:param name="uriHash" value="${object.sourceObjectHash}"/>
-										</stripes:link>	
-									</c:otherwise>
-								</c:choose>
+					    				<c:when test="${object.sourceObjectHash==0 && object.anonymous && !object.literal}">
+											<stripes:link class="infolink" href="/factsheet.action">Anonymous resource
+												<stripes:param name="uriHash" value="${object.hash}"/>
+											</stripes:link>	
+										</c:when>
+										<c:when test="${object.sourceObjectHash==0}">
+											<c:out value="${object.value}"/>
+										</c:when>
+										<c:otherwise>
+											<stripes:link class="infolink" href="/factsheet.action"><c:out value="${object.value}"/>
+													<stripes:param name="uriHash" value="${object.sourceObjectHash}"/>
+											</stripes:link>	
+										</c:otherwise>
+									</c:choose>
 				    			</td>
 				    			<td class="center">
 				    				<c:choose>
