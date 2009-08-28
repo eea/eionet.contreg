@@ -3,29 +3,19 @@
 <stripes:layout-definition>
 
 <c:if test="${actionBean.subject.predicates!=null && fn:length(actionBean.subject.predicates)>0}">
-	<div id="tabbedmenu">
-	    <ul>
-		<li id="currenttab"><span>Resource properties</span></li>
-		<li>
-			<stripes:link href="/references.action" event="search">References to this resource
-			<c:choose>
-    			<c:when test="${subjectUrl!=null}">
-    				<stripes:param name="object" value="${subjectUrl}"/>
-    			</c:when>
-    			<c:otherwise>
-    				<stripes:param name="object" value="${actionBean.subject.uriHash}"/>
-    			</c:otherwise>
-    		</c:choose>
-			</stripes:link>
-        </li>
-	    </ul>
-	</div>
+	
    	<table class="datatable" width="100%" cellspacing="0" summary="">
+   	<c:if test="${displayCheckboxes}">
+   		<col/>
+   	</c:if>
 	<col style="width:25%;"/>
 	<col style="max-width:3em;"/>
 	<col/>
 	<col style="width:4em;"/>
    		<thead>
+   			<c:if test="${displayCheckboxes}">
+   				<th scope="col" class="scope-col">&nbsp;</th>
+   			</c:if>
 			<th scope="col" class="scope-col">Property</th>
 			<th scope="col" class="scope-col">&nbsp;</th>
 			<th scope="col" class="scope-col">Value</th> 
@@ -40,6 +30,11 @@
 	    			<c:if test="${not crfn:subjectHasPredicateObject(actionBean.subject, actionBean.subProperties[predicate.key], object.value)}">
 	    				<c:if test="${not crfn:isSourceToAny(object.hash, predicate.value)}">
 				    		<tr>
+								<c:if test="${displayCheckboxes}">
+									<th>
+										<input type="checkbox" name="rowId" value="${object.id}"/>
+									</th>
+								</c:if>
 				    			<th scope="row" class="scope-row" title="${predicate.key}" style="white-space:nowrap">
 				    				<c:choose>
 				    					<c:when test="${not predicateLabelDisplayed}">
@@ -52,7 +47,6 @@
 													</stripes:link>	
 												</c:if>
 				    					</c:when>
-
 				    					<c:otherwise>&nbsp;</c:otherwise>
 				    				</c:choose>
 				    			</th>
@@ -99,6 +93,7 @@
 	    	</c:forEach>
 	    </tbody>
    	</table>
+   	
    	<c:if test='${sessionScope.crUser!=null && crfn:hasPermission(sessionScope.crUser.userName, "/", "u")}'>
 		<p>
 			<stripes:link href="${actionBean.urlBinding}" event="harvest">
@@ -106,6 +101,7 @@
 			Schedule urgent harvest</stripes:link>
 		</p>
 	</c:if>	
+   	<p>
 
 </c:if>
 </stripes:layout-definition>

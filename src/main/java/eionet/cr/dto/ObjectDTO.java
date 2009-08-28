@@ -21,6 +21,7 @@
 package eionet.cr.dto;
 
 import eionet.cr.util.Hashes;
+import eionet.cr.web.util.FactsheetObjectId;
 
 /**
  * 
@@ -41,10 +42,13 @@ public class ObjectDTO {
 	private String language;
 	
 	private String derivSourceUri;
+	private long derivSourceHash;
 	private long derivSourceGenTime;
+	
 	private long sourceObjectHash;
 	
 	private String sourceUri;
+	private long sourceHash;
 	
 	/**
 	 * 
@@ -68,7 +72,35 @@ public class ObjectDTO {
 	 * @param literal
 	 */
 	public ObjectDTO(String value, boolean literal){
-		this(value, null, literal, false);
+		this(value, null, literal, false);	
+	}
+	
+	/**
+	 * 
+	 * @param hash
+	 * @param sourceHash
+	 * @param derivSourceHash
+	 * @param sourceObjectHash
+	 */
+	private ObjectDTO(long hash, long sourceHash, long derivSourceHash, long sourceObjectHash){
+		
+		this.hash = hash;
+		this.sourceHash = sourceHash;
+		this.derivSourceHash = derivSourceHash;
+		this.sourceObjectHash = sourceObjectHash;
+	}
+	
+	/**
+	 * 
+	 * @param hash
+	 * @param sourceHash
+	 * @param derivSourceHash
+	 * @param sourceObjectHash
+	 * @return
+	 */
+	public static ObjectDTO create(long hash, long sourceHash, long derivSourceHash, long sourceObjectHash){
+		
+		return new ObjectDTO(hash, sourceHash, derivSourceHash, sourceObjectHash);
 	}
 	
 	/**
@@ -214,4 +246,42 @@ public class ObjectDTO {
 	public void setDerivSourceGenTime(long derivSourceGenTime) {
 		this.derivSourceGenTime = derivSourceGenTime;
 	}
+
+	/**
+	 * @return the derivSourceHash
+	 */
+	public long getDerivSourceHash() {
+		return derivSourceHash;
+	}
+
+	/**
+	 * @param derivSourceHash the derivSourceHash to set
+	 */
+	public void setDerivSourceHash(long derivSourceHash) {
+		this.derivSourceHash = derivSourceHash;
+	}
+
+	/**
+	 * @return the sourceHash
+	 */
+	public long getSourceHash() {
+		return sourceHash;
+	}
+
+	/**
+	 * @param sourceHash the sourceHash to set
+	 */
+	public void setSourceHash(long sourceHash) {
+		this.sourceHash = sourceHash;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public String getId(){
+
+		return FactsheetObjectId.format(this);
+	}
+
 }

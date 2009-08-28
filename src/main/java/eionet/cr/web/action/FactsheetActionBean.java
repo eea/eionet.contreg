@@ -76,6 +76,9 @@ public class FactsheetActionBean extends AbstractActionBean{
 	private String propertyUri;
 	private String propertyValue;
 	
+	/** */
+	private List<String> rowId;
+	
 	/**
 	 * 
 	 * @return
@@ -140,6 +143,24 @@ public class FactsheetActionBean extends AbstractActionBean{
 		
 		HelperDao spoHelperDao = factory.getDao(HelperDao.class);			 
 		spoHelperDao.addTriples(subjectDTO);
+		
+		return new RedirectResolution(this.getClass(), "edit").addParameter("uri", uri);
+	}
+	
+	/**
+	 * 
+	 * @return
+	 * @throws DAOException
+	 */
+	public Resolution delete() throws DAOException{
+		
+		if (rowId!=null && !rowId.isEmpty()){
+			
+			System.out.println("The following rows were selected for deletion by user:");
+			for (String s:rowId){
+				System.out.println(s);
+			}
+		}
 		
 		return new RedirectResolution(this.getClass(), "edit").addParameter("uri", uri);
 	}
@@ -296,5 +317,12 @@ public class FactsheetActionBean extends AbstractActionBean{
 	 */
 	public void setPropertyValue(String propertyValue) {
 		this.propertyValue = propertyValue;
+	}
+
+	/**
+	 * @param rowId the rowId to set
+	 */
+	public void setRowId(List<String> rowId) {
+		this.rowId = rowId;
 	}
 }
