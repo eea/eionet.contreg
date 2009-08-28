@@ -20,19 +20,23 @@
 		    
 		    	<c:set var="subjectUrl" value="${actionBean.subject.url}"/>
 		    	<c:set var="subjectUri" value="${actionBean.subject.uri}"/>
-		    	
+		    	<c:set var="allowEdit" value="false"/>
 		    	<c:if test='${sessionScope.crUser!=null && crfn:hasPermission(sessionScope.crUser.userName, "/", "u")}'>
 			    	<c:if test="${!subject.anonymous}">
-				    	<div id="operations">
-							<ul>
-								<li>
-									<stripes:link href="/factsheet.action" event="${actionBean.context.eventName=='edit' ? 'view' : 'edit'}">${actionBean.context.eventName=='edit' ? 'View' : 'Edit'} mode
-										<stripes:param name="uri" value="${subjectUri}"/>
-									</stripes:link>
-								</li>
-							</ul>
-						</div>
-					</c:if>
+    					<c:set var="allowEdit" value="true"/>
+    				</c:if>
+    			</c:if>
+    			
+		    	<c:if test="${allowEdit}">
+			    	<div id="operations">
+						<ul>
+							<li>
+								<stripes:link href="/factsheet.action" event="${actionBean.context.eventName=='edit' ? 'view' : 'edit'}">${actionBean.context.eventName=='edit' ? 'View' : 'Edit'} mode
+									<stripes:param name="uri" value="${subjectUri}"/>
+								</stripes:link>
+							</li>
+						</ul>
+					</div>
 				</c:if>
 		
 		    	<div style="margin-top:20px">
@@ -49,39 +53,36 @@
 		    			</c:otherwise>
 		    		</c:choose>
 		    		
-			    	<c:if test="${actionBean.context.eventName=='edit'}">
-				    	<c:if test='${sessionScope.crUser!=null && crfn:hasPermission(sessionScope.crUser.userName, "/", "u")}'>
-					    	<c:if test="${!subject.anonymous}">
-				    			<stripes:form action="/factsheet.action" method="post">
-				    				<table>
-				    					<tr>
-				    						<td><stripes:label for="propertySelect">Property:</stripes:label></td>
-				    						<td>
-				    							<stripes:select name="propertyUri" id="propertySelect">
-								    				<c:forEach var="prop" items="${actionBean.addibleProperties}">
-								    					<stripes:option value="${prop.uri}" label="${prop.label} (${prop.uri})"/>
-										    		</c:forEach>
-								    			</stripes:select>
-				    						</td>
-				    					</tr>
-				    					<tr>
-							    			<td><stripes:label for="propertyText">Value:</stripes:label></td>
-							    			<td><stripes:textarea name="propertyValue" id="propertyText" cols="100" rows="2"/></td>
-							    		</tr>
-							    		<tr>
-							    			<td>&nbsp;</td>
-						    				<td>
-						    					<stripes:submit name="save" value="Save" id="saveButton"/>
-						    					<stripes:hidden name="uri" value="${subjectUri}"/>
-												<stripes:hidden name="anonymous" value="${actionBean.subject.anonymous}"/>
-						    				</td>
-						    		</table>
-					    		</stripes:form>
-			    			</c:if>
-			    		</c:if>
+			    	<c:if test="${actionBean.context.eventName=='edit' && allowEdit}">
+		    			<stripes:form action="/factsheet.action" method="post">
+		    				<table>
+		    					<tr>
+		    						<td><stripes:label for="propertySelect">Property:</stripes:label></td>
+		    						<td>
+		    							<stripes:select name="propertyUri" id="propertySelect">
+						    				<c:forEach var="prop" items="${actionBean.addibleProperties}">
+						    					<stripes:option value="${prop.uri}" label="${prop.label} (${prop.uri})"/>
+								    		</c:forEach>
+						    			</stripes:select>
+		    						</td>
+		    					</tr>
+		    					<tr>
+					    			<td><stripes:label for="propertyText">Value:</stripes:label></td>
+					    			<td><stripes:textarea name="propertyValue" id="propertyText" cols="100" rows="2"/></td>
+					    		</tr>
+					    		<tr>
+					    			<td>&nbsp;</td>
+				    				<td>
+				    					<stripes:submit name="save" value="Save" id="saveButton"/>
+				    					<stripes:hidden name="uri" value="${subjectUri}"/>
+										<stripes:hidden name="anonymous" value="${actionBean.subject.anonymous}"/>
+				    				</td>
+				    		</table>
+			    		</stripes:form>
 			    	</c:if>
 		    		
-					<stripes:layout-render name="/pages/common/factsheet_table.jsp" subjectUrl="${subjectUrl}" subjectUri="${subjectUri}"/>
+					<stripes:layout-render name="/pages/common/factsheet_table.jsp"
+								subjectUrl="${subjectUrl}" subjectUri="${subjectUri}" allowEdit="${allowEdit}"/>
 					
 				</div>				    
 		    </c:when>

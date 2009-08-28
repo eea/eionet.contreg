@@ -119,7 +119,7 @@ public class CRUser {
 	 * 
 	 * @return
 	 */
-	public String homeUri(){
+	public String getHomeUri(){
 		return CRUser.homeUri(userName);
 	}
 
@@ -127,7 +127,7 @@ public class CRUser {
 	 * 
 	 * @return
 	 */
-	public String registrationsUri(){
+	public String getRegistrationsUri(){
 		return CRUser.registrationsUri(userName);
 	}
 
@@ -135,7 +135,7 @@ public class CRUser {
 	 * 
 	 * @return
 	 */
-	public String bookmarksUri(){
+	public String getBookmarksUri(){
 		return CRUser.bookmarksUri(userName);
 	}
 
@@ -143,7 +143,7 @@ public class CRUser {
 	 * 
 	 * @return
 	 */
-	public String historyUri(){
+	public String getHistoryUri(){
 		return CRUser.historyUri(userName);
 	}
 

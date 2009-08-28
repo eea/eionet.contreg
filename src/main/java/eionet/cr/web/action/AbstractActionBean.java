@@ -89,7 +89,7 @@ public abstract class AbstractActionBean implements ActionBean {
 	 * @return logged in user name or default value for not logged in users.
 	 */
 	public final String getUserName() {
-		return getCRUser().getUserName();
+		return getUser().getUserName();
 	}
 	
 	/**
@@ -98,14 +98,14 @@ public abstract class AbstractActionBean implements ActionBean {
 	 * @return true if user is logged in.
 	 */
 	public final boolean isUserLoggedIn() {
-		return getCRUser()!=null;
+		return getUser()!=null;
 	}
 	
 	/**
 	 * 
 	 * @return
 	 */
-	protected CRUser getCRUser(){
+	protected CRUser getUser(){
 		return getContext().getCRUser();
 	}
 	

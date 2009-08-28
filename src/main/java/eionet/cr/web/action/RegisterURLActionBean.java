@@ -92,25 +92,25 @@ public class RegisterURLActionBean extends AbstractActionBean{
 		
 		// if subject did not exist or it isn't registered in user's registrations yet, then add the necessary triples
 		if (subjectDTO==null || !subjectDTO.existsPredicateObjectSource(
-				Predicates.RDF_TYPE, Subjects.CR_FILE, getCRUser().registrationsUri())){
+				Predicates.RDF_TYPE, Subjects.CR_FILE, getUser().getRegistrationsUri())){
 			
 			boolean subjectFirstSeen = subjectDTO==null;
 			
 			/* add the rdf:type=cr:File triple into user's registrations */
 			subjectDTO = new SubjectDTO(url, subjectDTO==null ? false : subjectDTO.isAnonymous());
 			ObjectDTO objectDTO = new ObjectDTO(Subjects.CR_FILE, false);
-			objectDTO.setSourceUri(getCRUser().registrationsUri());
+			objectDTO.setSourceUri(getUser().getRegistrationsUri());
 			subjectDTO.addObject(Predicates.RDF_TYPE, objectDTO);
 			
 			HelperDao spoHelperDao = factory.getDao(HelperDao.class);			 
 			spoHelperDao.addTriples(subjectDTO);
 			
 			// let the user registrations' URI be stored in RESOURCE
-			spoHelperDao.addResource(getCRUser().registrationsUri(), null);
+			spoHelperDao.addResource(getUser().getRegistrationsUri(), null);
 			
 			// if this is the first time this subject is seen, store it in RESOURCE
 			if (subjectFirstSeen){
-				spoHelperDao.addResource(url, getCRUser().registrationsUri());
+				spoHelperDao.addResource(url, getUser().getRegistrationsUri());
 			}
 			
 			/* add the URL into user's history, and also into user's bookmarks if requested */
@@ -118,12 +118,12 @@ public class RegisterURLActionBean extends AbstractActionBean{
 			String userHomeUrlHash = CRUser.homeUri(getUserName()) + "/" + Hashes.spoHash(url);			
 			subjectDTO = new SubjectDTO(userHomeUrlHash, false);
 			objectDTO = new ObjectDTO(Util.dateToString(new Date(), "yyyy-MM-dd'T'HH:mm:ss"), true);
-			objectDTO.setSourceUri(getCRUser().historyUri());
+			objectDTO.setSourceUri(getUser().getHistoryUri());
 			subjectDTO.addObject(Predicates.CR_SAVETIME, objectDTO);
 			
 			if (bookmark){
 				objectDTO = new ObjectDTO(url, false);
-				objectDTO.setSourceUri(getCRUser().bookmarksUri());
+				objectDTO.setSourceUri(getUser().getBookmarksUri());
 				subjectDTO.addObject(Predicates.CR_BOOKMARK, objectDTO);
 			}
 			

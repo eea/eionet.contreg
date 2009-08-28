@@ -135,7 +135,7 @@ public class FactsheetActionBean extends AbstractActionBean{
 		SubjectDTO subjectDTO = new SubjectDTO(uri, anonymous);
 		
 		ObjectDTO objectDTO = new ObjectDTO(propertyValue, true);		
-		objectDTO.setSourceUri(getCRUser().registrationsUri());		
+		objectDTO.setSourceUri(getUser().getRegistrationsUri());		
 		subjectDTO.addObject(propertyUri, objectDTO);
 		
 		HelperDao spoHelperDao = factory.getDao(HelperDao.class);			 
