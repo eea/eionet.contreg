@@ -79,3 +79,175 @@ a.numberedpage:hover, a.nextpage:hover, a.prevpage:hover, a.firstpage:hover, a.l
 #typesearch select {
 	width: 90%;
 }
+
+/* Dropdown operations */
+
+#dropdown-operations, #dropdown-operations ul {
+
+	padding: 0;
+
+	margin: 0;
+
+	list-style: none;
+
+	list-style-image: none;
+
+	float: right;
+
+	width: 144px;
+
+	font-family: verdana, helvetica, sans-serif;
+
+}
+
+
+
+#dropdown-operations li {
+
+	float: left;
+
+	position: relative;
+
+	background: transparent url('../images/operations_back.gif') no-repeat;
+
+	width: 144px;
+
+	font-weight: bold;
+
+	border-right: 1px dotted #ffffff;
+
+	color: #fff;
+
+	list-style: none;
+
+	list-style-image: none;
+
+	z-index: 11; /* Bug in IE6, IE7 */
+
+}
+
+
+
+#dropdown-operations li:hover {
+
+	background-image: url(../images/operations_back2.gif);
+
+}
+
+
+
+
+
+#dropdown-operations li ul li:hover {
+
+	background-image: none;
+
+}
+
+
+
+#dropdown-operations a:link, #dropdown-operations a:visited {
+
+	display: block;
+
+	text-decoration: none;
+
+	padding: 0em 0.5em;
+
+	color: #fff;
+
+	font-size: 12px;
+
+}
+
+
+
+#dropdown-operations ul {
+
+	display: none;
+
+	position: absolute;
+
+	top: 1.5em;
+
+	left: 0;
+
+	background-color: #A5CED1;
+
+	list-style: none;
+
+	list-style-image: none;
+
+}
+
+
+
+#dropdown-operations li > ul { /* For Opera and Firefox */
+
+	top: auto;
+
+	left: auto;
+
+}
+
+
+
+#dropdown-operations ul li {
+
+	float: none;
+
+	font-weight: normal;
+
+	border-right: 0 none transparent;
+
+	border-bottom: 1px dotted #000;
+
+	background-color: #A5CED1;
+
+	text-transform: none;
+
+	background-image: none;
+
+	margin: 0;
+
+	padding: 0.1em 0;
+
+	color: #fff;
+
+	
+
+}
+
+
+
+#dropdown-operations li ul li a:link, #dropdown-operations li ul li a:visited {
+
+	background: transparent url('../images/operations_drop_bullet.gif') 5px center no-repeat;
+
+	padding: 0.1em 0 0.1em 15px;
+
+	font-size: 12px;
+
+	color: #000;
+
+}
+
+#dropdown-operations li ul li a:hover {
+
+	background-color: #C8EDF0;
+
+}
+
+
+
+#dropdown-operations li:hover ul, #dropdown-operations li.over ul {
+
+	display: block;
+
+}
+
+#dropdown-operations li:hover ul li, #dropdown-operations li.over ul li{
+
+	width: 144px;
+
+}

@@ -76,29 +76,29 @@ public class SubjectDTO{
 	
 	/**
 	 * 
-	 * @param predicateUri
+	 * @param predicate
 	 * @param object
 	 */
-	public void addObject(String predicateUri, ObjectDTO object){
+	public void addObject(String predicate, ObjectDTO object){
 		
-		Collection<ObjectDTO> objects = predicates.get(predicateUri);
+		Collection<ObjectDTO> objects = predicates.get(predicate);
 		if (objects==null){
 			objects = new ArrayList<ObjectDTO>();
-			predicates.put(predicateUri, objects);
+			predicates.put(predicate, objects);
 		}
 		objects.add(object);
 	}
 	
 	/**
 	 * 
-	 * @param predicateUri
+	 * @param predicate
 	 * @param object
 	 */
-	public void setObject(String predicateUri, ObjectDTO object){
+	public void setObject(String predicate, ObjectDTO object){
 		
 		Collection<ObjectDTO> objects = new ArrayList<ObjectDTO>();
 		objects.add(object);
-		predicates.put(predicateUri, objects);
+		predicates.put(predicate, objects);
 	}
 	
 	/**
@@ -119,25 +119,25 @@ public class SubjectDTO{
 
 	/**
 	 * 
-	 * @param predicateUri
+	 * @param predicate
 	 * @return
 	 */
-	public Collection<ObjectDTO> getObjects(String predicateUri){
+	public Collection<ObjectDTO> getObjects(String predicate){
 		
-		return predicates.get(predicateUri);
+		return predicates.get(predicate);
 	}
 
 	/**
 	 * 
-	 * @param predicateUri
+	 * @param predicate
 	 * @param objectType
 	 * @return
 	 */
-	public Collection<ObjectDTO> getObjects(String predicateUri, ObjectDTO.Type objectType){
+	public Collection<ObjectDTO> getObjects(String predicate, ObjectDTO.Type objectType){
 		
 		ArrayList<ObjectDTO> result = new ArrayList<ObjectDTO>();
 		
-		Collection<ObjectDTO> coll = getObjects(predicateUri);
+		Collection<ObjectDTO> coll = getObjects(predicate);
 		if (coll!=null && !coll.isEmpty()){
 			for (Iterator<ObjectDTO> iter=coll.iterator(); iter.hasNext();){
 				ObjectDTO objectDTO = iter.next();
@@ -156,39 +156,39 @@ public class SubjectDTO{
 	 * @param predicate
 	 * @return
 	 */
-	public ObjectDTO getObject(String predicateUri){
-		Collection<ObjectDTO> objects = getObjects(predicateUri);
+	public ObjectDTO getObject(String predicate){
+		Collection<ObjectDTO> objects = getObjects(predicate);
 		return objects==null || objects.isEmpty() ? null : objects.iterator().next();
 	}
 
 	/**
 	 * 
-	 * @param predicateUri
+	 * @param predicate
 	 * @param objectType
 	 * @return
 	 */
-	public ObjectDTO getObject(String predicateUri, ObjectDTO.Type objectType){
-		Collection<ObjectDTO> objects = getObjects(predicateUri, objectType);
+	public ObjectDTO getObject(String predicate, ObjectDTO.Type objectType){
+		Collection<ObjectDTO> objects = getObjects(predicate, objectType);
 		return objects==null || objects.isEmpty() ? null : objects.iterator().next();
 	}
 
 	/**
 	 * 
-	 * @param predicateUri
+	 * @param predicate
 	 * @return
 	 */
-	public String getObjectValue(String predicateUri){
-		ObjectDTO objectDTO = getObject(predicateUri);
+	public String getObjectValue(String predicate){
+		ObjectDTO objectDTO = getObject(predicate);
 		return objectDTO==null ? null : objectDTO.getValue();
 	}
 
 	/**
 	 * 
-	 * @param predicateUri
+	 * @param predicate
 	 * @return
 	 */
-	public String getObjectValue(String predicateUri, ObjectDTO.Type objectType){
-		ObjectDTO objectDTO = getObject(predicateUri, objectType);
+	public String getObjectValue(String predicate, ObjectDTO.Type objectType){
+		ObjectDTO objectDTO = getObject(predicate, objectType);
 		return objectDTO==null ? null : objectDTO.getValue();
 	}
 
@@ -258,14 +258,14 @@ public class SubjectDTO{
 	
 	/**
 	 * 
-	 * @param predicateUri
+	 * @param predicate
 	 * @param objectValue
 	 * @return
 	 */
-	public boolean hasPredicateObject(String predicateUri, String objectValue){
+	public boolean hasPredicateObject(String predicate, String objectValue){
 		
 		boolean result = false;
-		Collection<ObjectDTO> objects = getObjects(predicateUri);
+		Collection<ObjectDTO> objects = getObjects(predicate);
 		if (objects!=null && !objects.isEmpty()){
 			for (Iterator<ObjectDTO> i=objects.iterator(); i.hasNext();){
 				if (objectValue.equals(i.next().getValue())){
@@ -307,14 +307,14 @@ public class SubjectDTO{
 	
 	/**
 	 * 
-	 * @param predicateUri
+	 * @param predicate
 	 * @param objectValue
 	 * @param sourceHash
 	 * @return
 	 */
-	public boolean existsPredicateObjectSource(String predicateUri, String objectValue, String sourceUri){
+	public boolean existsPredicateObjectSource(String predicate, String objectValue, String sourceUri){
 		
-		for (ObjectDTO objectDTO:getObjects(predicateUri)){
+		for (ObjectDTO objectDTO:getObjects(predicate)){
 			if (objectDTO.getValue().equals(objectValue)){
 				if (objectDTO.getSourceUri().equals(sourceUri)){
 					return true;

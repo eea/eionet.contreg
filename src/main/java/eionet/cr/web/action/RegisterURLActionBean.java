@@ -106,7 +106,7 @@ public class RegisterURLActionBean extends AbstractActionBean{
 			spoHelperDao.addTriples(subjectDTO);
 			
 			// let the user registrations' URI be stored in RESOURCE
-			spoHelperDao.addResource(getUser().getRegistrationsUri(), null);
+			spoHelperDao.addResource(getUser().getRegistrationsUri(), getUser().getRegistrationsUri());
 			
 			// if this is the first time this subject is seen, store it in RESOURCE
 			if (subjectFirstSeen){

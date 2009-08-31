@@ -32,21 +32,31 @@
 		    	<c:set var="subjectUri" value="${actionBean.subject.uri}"/>
 		    	<c:set var="allowEdit" value="false"/>
 		    	<c:if test='${sessionScope.crUser!=null && crfn:hasPermission(sessionScope.crUser.userName, "/", "u")}'>
+		    		<c:set var="displayOperations" value="true"/>
 			    	<c:if test="${!subject.anonymous}">
     					<c:set var="allowEdit" value="true"/>
     				</c:if>
     			</c:if>
     			
-		    	<c:if test="${allowEdit}">
-			    	<div id="operations">
-						<ul>
-							<li>
-								<stripes:link href="/factsheet.action" event="${actionBean.context.eventName=='edit' ? 'view' : 'edit'}">${actionBean.context.eventName=='edit' ? 'View' : 'Edit'} mode
-									<stripes:param name="uri" value="${subjectUri}"/>
-								</stripes:link>
-							</li>
-						</ul>
-					</div>
+		    	<c:if test="${displayOperations}">
+		    		<ul id="dropdown-operations">
+						<li><a href="#">Operations</a>
+							<ul>
+								<c:if test="${allowEdit}">
+									<li>
+										<stripes:link class="link-plain" href="/factsheet.action" event="${actionBean.context.eventName=='edit' ? 'view' : 'edit'}">${actionBean.context.eventName=='edit' ? 'View' : 'Edit'}
+											<stripes:param name="uri" value="${subjectUri}"/>
+										</stripes:link>
+									</li>
+								</c:if>
+								<li>
+									<stripes:link href="${actionBean.urlBinding}" event="harvest">Schedule harvest
+											<stripes:link-param name="uri" value="${actionBean.uri}"/>
+									</stripes:link>
+								</li>
+							</ul>
+						</li>
+					</ul>
 				</c:if>
 		
 		    	<div style="margin-top:20px">

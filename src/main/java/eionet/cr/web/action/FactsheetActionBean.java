@@ -35,6 +35,8 @@ import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
+import net.sourceforge.stripes.validation.SimpleError;
+import net.sourceforge.stripes.validation.ValidationMethod;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -50,6 +52,7 @@ import eionet.cr.search.FactsheetSearch;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.util.SubProperties;
 import eionet.cr.search.util.UriLabelPair;
+import eionet.cr.web.util.FactsheetObjectId;
 
 /**
  * 
@@ -106,15 +109,12 @@ public class FactsheetActionBean extends AbstractActionBean{
 	 * @throws SearchException
 	 */
 	public Resolution harvest() throws HarvestException, SearchException {
-		if(isUserLoggedIn()){
-			if (!StringUtils.isBlank(uri)){
-				UrgentHarvestQueue.addPullHarvest(StringUtils.substringBefore(uri, "#"));
-				showMessage("The source has been scheduled for urgent harvest!");
-			}
+		
+		if (!StringUtils.isBlank(uri)){
+			UrgentHarvestQueue.addPullHarvest(StringUtils.substringBefore(uri, "#"));
+			showMessage("The source has been scheduled for urgent harvest!");
 		}
-		else {
-			handleCrException(getBundle().getString("not.logged.in"), GeneralConfig.SEVERITY_WARNING);
-		}
+
 		return view();
 	}
 
@@ -143,6 +143,8 @@ public class FactsheetActionBean extends AbstractActionBean{
 		
 		HelperDao spoHelperDao = factory.getDao(HelperDao.class);			 
 		spoHelperDao.addTriples(subjectDTO);
+		spoHelperDao.addResource(propertyUri, getUser().getRegistrationsUri());
+		spoHelperDao.addResource(getUser().getRegistrationsUri(), getUser().getRegistrationsUri());
 		
 		return new RedirectResolution(this.getClass(), "edit").addParameter("uri", uri);
 	}
@@ -156,15 +158,44 @@ public class FactsheetActionBean extends AbstractActionBean{
 		
 		if (rowId!=null && !rowId.isEmpty()){
 			
-			System.out.println("The following rows were selected for deletion by user:");
+			SubjectDTO subjectDTO = new SubjectDTO(uri, anonymous);
+
+			boolean execute = false;
 			for (String s:rowId){
-				System.out.println(s);
+				
+				int i = s.indexOf("_");
+				if (i<=0 || i==(s.length()-1)){
+					throw new IllegalArgumentException("Illegal rowId: " + s);
+				}
+				
+				ObjectDTO object = FactsheetObjectId.parse(s.substring(i+1));
+				subjectDTO.addObject(s.substring(0,i), object);
+				if (execute==false){
+					execute = true;
+				}
+			}
+			
+			if (execute==true){
+				
+				HelperDao spoHelperDao = factory.getDao(HelperDao.class);			 
+				spoHelperDao.deleteTriples(subjectDTO);
 			}
 		}
 		
 		return new RedirectResolution(this.getClass(), "edit").addParameter("uri", uri);
 	}
 	
+	@ValidationMethod(on={"save","delete","edit","harvest"})
+	public void validateUserKnown(){
+		
+		if (getUser()==null){
+			handleCrException("Operation not allowed for anonymous users", GeneralConfig.SEVERITY_WARNING);
+		}
+		else if (getContext().getEventName().equals("save") && StringUtils.isBlank(propertyValue)){
+			addGlobalError(new SimpleError("Property value must not be blank"));
+		}
+	}
+
 	/**
 	 * @return the resourceUri
 	 */

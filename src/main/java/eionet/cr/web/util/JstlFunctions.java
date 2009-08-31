@@ -254,5 +254,13 @@ public class JstlFunctions {
 	public static String format(SearchResultColumn column, Object object){
 		return column.format(object);
 	}
-
+	
+	/**
+	 * 
+	 * @param s
+	 * @return
+	 */
+	public static long spoHash(String s){
+		return Hashes.spoHash(s);
+	}
 }

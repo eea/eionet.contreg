@@ -31,9 +31,14 @@
 	    				<c:if test="${not crfn:isSourceToAny(object.hash, predicate.value)}">
 				    		<tr>
 								<c:if test="${displayCheckboxes}">
-									<th>
-										<input type="checkbox" name="rowId" value="${object.id}"/>
-									</th>
+									<c:choose>
+										<c:when test="${sessionScope.crUser.registrationsUri==object.sourceSmart}">
+											<th>
+												<input type="checkbox" name="rowId" value="${crfn:spoHash(predicate.key)}_${object.id}"/>
+											</th>
+										</c:when>
+										<c:otherwise><th>&nbsp;</th></c:otherwise>
+									</c:choose>
 								</c:if>
 				    			<th scope="row" class="scope-row" title="${predicate.key}" style="white-space:nowrap">
 				    				<c:choose>
@@ -94,14 +99,5 @@
 	    </tbody>
    	</table>
    	
-   	<c:if test='${sessionScope.crUser!=null && crfn:hasPermission(sessionScope.crUser.userName, "/", "u")}'>
-		<p>
-			<stripes:link href="${actionBean.urlBinding}" event="harvest">
-			<stripes:link-param name="uri" value="${actionBean.uri}"/>
-			Schedule urgent harvest</stripes:link>
-		</p>
-	</c:if>	
-   	<p>
-
 </c:if>
 </stripes:layout-definition>

@@ -72,4 +72,11 @@ public interface HelperDao extends IDao {
 	 * @throws DAOException
 	 */
 	HashMap<String,String> getAddibleProperties(Collection<String> subjectTypes) throws DAOException;
+	
+	/**
+	 * 
+	 * @param subject
+	 * @throws DAOException
+	 */
+	void deleteTriples(SubjectDTO subject) throws DAOException;
 }

@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -213,6 +214,64 @@ public class MySQLHelperDao extends MySQLBaseDAO implements HelperDao {
 		}
 		finally{
 			SQLUtil.close(pstmt);
+			SQLUtil.close(conn);
+		}
+	}
+
+	/** */
+	private static final String deleteTriplesSQL = "delete from SPO where SUBJECT=? and PREDICATE=?" +
+			" and OBJECT_HASH=? and SOURCE=? and OBJ_DERIV_SOURCE=? and OBJ_SOURCE_OBJECT=?";
+	
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDao#deleteTriples(eionet.cr.dto.SubjectDTO)
+	 */
+	public void deleteTriples(SubjectDTO subject) throws DAOException{
+		
+		if (subject==null || subject.getPredicateCount()==0){
+			return;
+		}
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		boolean executeBatch = false;
+		try{
+			conn = getConnection();
+			pstmt = conn.prepareStatement(deleteTriplesSQL);
+			Map<String,Collection<ObjectDTO>> predicates = subject.getPredicates();
+			for (String predicate:predicates.keySet()){
+				
+				Collection<ObjectDTO> objects = subject.getObjects(predicate);
+				if (objects!=null && !objects.isEmpty()){
+					
+					for (ObjectDTO object:objects){
+						
+						pstmt.setLong(1, subject.getUriHash());
+						pstmt.setLong(2, Long.parseLong(predicate));
+						pstmt.setLong(3, object.getHash());
+						pstmt.setLong(4, object.getSourceHash());
+						pstmt.setLong(5, object.getDerivSourceHash());
+						pstmt.setLong(6, object.getSourceObjectHash());
+						pstmt.addBatch();
+						
+						if (executeBatch==false){
+							executeBatch = true;
+						}
+					}
+				}
+			}
+			
+			if (executeBatch==true){
+				pstmt.executeBatch();
+			}
+		}
+		catch (NumberFormatException e){
+			throw new IllegalArgumentException("Expected the predicates to be in hash format");
+		}
+		catch (SQLException e){
+			throw new DAOException(e.toString(), e);
+		}
+		finally{
 			SQLUtil.close(conn);
 		}
 	}

@@ -133,5 +133,16 @@
 			${format(column, object)}
 		</example>
 	</function>
+
+	<function>
+		<description>
+		</description>
+		<name>spoHash</name>
+		<function-class>eionet.cr.web.util.JstlFunctions</function-class>
+		<function-signature>long spoHash(java.lang.String)</function-signature>
+		<example>
+			${spoHash(someString)}
+		</example>
+	</function>
 	
 </taglib>
