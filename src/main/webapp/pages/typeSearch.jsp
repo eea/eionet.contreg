@@ -27,7 +27,7 @@
 		<stripes:hidden name="type" value="${actionBean.type }"/>				
 				<c:if test="${!empty actionBean.availableColumns}">
 					<div id="searchColumns">
-						<label for="searchColumnsSelect"> Choose which columns to display in a search result</label> <br/>
+						<label for="searchColumnsSelect"> Choose which columns to display in a search result (maximum ${actionBean.maxDisplayedColumns })</label> <br/>
 						<stripes:select 
 								name="selectedColumns" 
 								multiple="multiple" 

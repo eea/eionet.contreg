@@ -43,6 +43,7 @@ import eionet.cr.search.CustomSearch;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.util.SortOrder;
 import eionet.cr.util.Pair;
+import eionet.cr.util.Util;
 import eionet.cr.web.util.columns.SearchResultColumn;
 import eionet.cr.web.util.columns.SubjectPredicateColumn;
 
@@ -60,12 +61,12 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO>{
 	private static final String AVAILABLE_TYPES_CACHE = TypeSearchActionBean.class.getName() + ".picklist";
 	private static final String SELECTED_COLUMNS_CACHE = TypeSearchActionBean.class.getName() + ".storedSelectedColumns";
 	private static final String AVAILABLE_COLUMNS_CACHE = TypeSearchActionBean.class.getName() + ".availableColumnsCache";
+	private static final int MAX_DISPLAYED_COLUMNS = 4;
 	
 	/** */
 	private String type;
 	
 	private List<String> selectedColumns;
-	private List<SearchResultColumn> columns;
 	private List<Pair<String,String>> availableColumns;
 	private List<Pair<String,String>> availableTypes;
 	
@@ -83,13 +84,26 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO>{
 	
 	@HandlesEvent("setSearchColumns")
 	public Resolution setSearchColumns() throws SearchException {
-		Map<String,List<String>> cache = (Map<String, List<String>>) getSession().getAttribute(SELECTED_COLUMNS_CACHE);
-		if (cache == null) {
-			cache = new HashMap<String, List<String>>();
-		} 
-		cache.put(type, selectedColumns);
-		getSession().setAttribute(SELECTED_COLUMNS_CACHE, cache);
-		return search();
+		if (selectedColumns != null) {
+			Map<String,List<String>> cache = (Map<String, List<String>>) getSession().getAttribute(SELECTED_COLUMNS_CACHE);
+			if (cache == null) {
+				cache = new HashMap<String, List<String>>();
+			}
+			//cannot use sublist here, as it's not Serializable
+			// and we're storing it in the Session.
+			List<String> temp = new LinkedList<String>();
+			int i = 0;
+			for (String selectedColumn : selectedColumns) {
+				temp.add(selectedColumn);
+				if (++i == MAX_DISPLAYED_COLUMNS) {
+					break;
+				}
+			}
+			selectedColumns = temp;
+			cache.put(type, selectedColumns);
+			getSession().setAttribute(SELECTED_COLUMNS_CACHE, cache);
+		}
+		return new RedirectResolution(getUrlBinding() + "?search=Search&type=" + Util.urlEncode(type));
 	}
 
 	/*
@@ -97,19 +111,26 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO>{
 	 * @see eionet.cr.web.action.AbstractSearchActionBean#search()
 	 */
 	public Resolution search() throws SearchException {
-
 		availableTypes = getTypesFromCacheOrGenerate();
 		if (!StringUtils.isBlank(type)){
 			//get available columns for search
 			availableColumns = getAvailableColumns(type);
-			//check if user has selected any columns.
-			// if none - try the cache.
-			if (selectedColumns == null) {
-				selectedColumns = getSelectedColumns(type);
-			}
-			//decide what columns to show to the user
-			columns = getColumns(availableColumns, selectedColumns);
+			//check if user has previously selected some columns.
+			Map<String,List<String>> cache = (Map<String, List<String>>) getSession().getAttribute(SELECTED_COLUMNS_CACHE);
+			if (cache != null && cache.containsKey(type) ) {
+				selectedColumns = cache.get(type);
+			} else {
+				selectedColumns = new LinkedList<String>();
+				int i = 0;
+				for (Pair<String,String> pair : availableColumns){
+					if(i++ == MAX_DISPLAYED_COLUMNS || Predicates.RDF_TYPE.equals(pair.getId())) {
+						break;
+					}
+					selectedColumns.add(pair.getId());
 					
+				}
+			}
+								
 			//perform the search
 			Map<String,String> criteria = new HashMap<String,String>();
 			criteria.put(Predicates.RDF_TYPE, type);
@@ -142,53 +163,6 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO>{
 	}
 	
 	/**
-	 * @param availableColumns2
-	 * @param selectedColumns2
-	 * @return
-	 */
-	private List<SearchResultColumn> getColumns(List<Pair<String, String>> availableColumns, List<String> selectedColumns) {
-		List<SearchResultColumn> columns = new LinkedList<SearchResultColumn>();
-		//setSelectedColumns uses POST to submit a form, we have to add needed parameters to the 
-		//column headers in order to be able to sort right.
-		String actionParameter = "search=Search&amp;type=" + eionet.cr.util.Util.urlEncode(type);
-		// let's always include rdfs:label in the columns
-		columns.add(new SubjectPredicateColumn("Title", true, Predicates.RDFS_LABEL, actionParameter));
-
-		if (selectedColumns == null || selectedColumns.isEmpty()) {
-			//if nothing is selected - select first 4
-			int counter = 0;
-			for(Pair<String,String> pair : availableColumns) {
-				columns.add(new SubjectPredicateColumn(pair.getValue(), true, pair.getId(), actionParameter));
-				if (++counter == 4) {
-					break;
-				}
-			}
-		} else {
-			//add every selected column to the output
-			for(String string : selectedColumns) {
-				for (Pair<String,String> pair : availableColumns) {
-					if (pair.getId().equals(string)) {
-						columns.add(new SubjectPredicateColumn(pair.getValue(), true, string, actionParameter));
-					}
-				}
-			}
-		}
-		
-		return columns;
-	}
-
-	/**
-	 * @param type2
-	 * @return
-	 */
-	private List<String> getSelectedColumns(String type) {
-		Map<String,List<String>> cache = (Map<String, List<String>>) getSession().getAttribute(SELECTED_COLUMNS_CACHE);
-		return cache != null && cache.containsKey(type)
-				? cache.get(type)
-				: new LinkedList<String>();
-	}
-
-	/**
 	 * @param type
 	 * @return
 	 */
@@ -200,8 +174,6 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO>{
 		}
 		if (!cache.containsKey(type)) {
 			List<Pair<String,String>> result = new LinkedList<Pair<String,String>>();
-			//hardcode RDF_TYPE as one of the available values
-			result.add(new Pair<String, String>(Predicates.RDF_TYPE, "RDF type"));
 			
 			Map<String,String> criteria = new HashMap<String,String>();
 			criteria.put(Predicates.RDF_TYPE, Subjects.RDF_PROPERTY);
@@ -221,6 +193,9 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO>{
 					}
 				}
 			}
+			//hardcode RDF_TYPE as one of the available values
+			result.add(new Pair<String, String>(Predicates.RDF_TYPE, "type"));
+			
 			cache.put(type, result);
 			getSession().setAttribute(AVAILABLE_COLUMNS_CACHE, cache);
 			return result;
@@ -280,6 +255,21 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO>{
 	 * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
 	 */
 	public List<SearchResultColumn> getColumns() throws SearchException {
+		List<SearchResultColumn> columns = new LinkedList<SearchResultColumn>();
+		//setSelectedColumns uses POST to submit a form, we have to add needed parameters to the 
+		//column headers in order to be able to sort right.
+		String actionParameter = "search=Search&amp;type=" + eionet.cr.util.Util.urlEncode(type);
+		// let's always include rdfs:label in the columns
+		columns.add(new SubjectPredicateColumn("Title", true, Predicates.RDFS_LABEL, actionParameter));
+		//add every selected column to the output
+		for(String string : selectedColumns) {
+			for (Pair<String,String> pair : availableColumns) {
+				if (pair.getId().equals(string)) {
+					columns.add(new SubjectPredicateColumn(pair.getValue(), true, string, actionParameter));
+				}
+			}
+		}
+		
 		return columns;
 	}
 
@@ -309,5 +299,12 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO>{
 	 */
 	public void setSelectedColumns(List<String> options) {
 		this.selectedColumns = options;
+	}
+
+	/**
+	 * @return the maxDisplayedColumns
+	 */
+	public int getMaxDisplayedColumns() {
+		return MAX_DISPLAYED_COLUMNS;
 	}
 }
