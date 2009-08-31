@@ -10,7 +10,7 @@
 		    <ul>
 			<li id="currenttab"><span>Resource properties</span></li>
 			<li>
-				<stripes:link href="/references.action" event="search">References to this resource
+				<stripes:link href="/references.action" event="search">Resource references
 				<c:choose>
 	    			<c:when test="${subjectUrl!=null}">
 	    				<stripes:param name="object" value="${subjectUrl}"/>
