@@ -113,7 +113,7 @@ public abstract class AbstractSearchActionBean<T> extends AbstractActionBean{
 		col.setTitle("Date");
 		col.setSortable(true);
 		list.add(col);
-		
+
 		return list;
 	}
 

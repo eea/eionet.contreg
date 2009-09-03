@@ -100,6 +100,9 @@ public abstract class Harvest {
 	/** */
 	protected boolean clearPreviousContent = true;
 	
+	/** */
+	protected long sourceLastModified;
+	
 	/**
 	 * 
 	 * @param sourceUrlString
@@ -162,6 +165,7 @@ public abstract class Harvest {
 			rdfHandler = new RDFHandler(sourceUrlString, genTime);
 			rdfHandler.setDeriveExtraTriples(deriveExtraTriples);
 			rdfHandler.setClearPreviousContent(clearPreviousContent);
+			rdfHandler.setSourceLastModified(sourceLastModified);
 
 			if (arpSource!=null){
 				ARP arp = new ARP();

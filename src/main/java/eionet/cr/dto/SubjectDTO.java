@@ -48,6 +48,10 @@ public class SubjectDTO{
 	private boolean anonymous;
 	private Map<String,Collection<ObjectDTO>> predicates;
 	private Date firstSeenTime;
+	private Date lastModifiedTime;
+	
+	/** */
+	private long hitSource;
 
 	/**
 	 * 
@@ -323,5 +327,33 @@ public class SubjectDTO{
 		}
 		
 		return false;
+	}
+
+	/**
+	 * @return the hitSource
+	 */
+	public long getHitSource() {
+		return hitSource;
+	}
+
+	/**
+	 * @param hitSource the hitSource to set
+	 */
+	public void setHitSource(long hitSource) {
+		this.hitSource = hitSource;
+	}
+
+	/**
+	 * @return the lastModifiedTime
+	 */
+	public Date getLastModifiedTime() {
+		return lastModifiedTime;
+	}
+
+	/**
+	 * @param lastModifiedTime the lastModifiedTime to set
+	 */
+	public void setLastModifiedTime(Date lastModifiedTime) {
+		this.lastModifiedTime = lastModifiedTime;
 	}
 }

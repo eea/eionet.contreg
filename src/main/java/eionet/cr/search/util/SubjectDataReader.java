@@ -24,6 +24,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -69,6 +70,7 @@ public class SubjectDataReader extends ResultSetBaseReader{
 		if (newSubject){
 			currentSubject = new SubjectDTO(rs.getString("SUBJECT_URI"), YesNoBoolean.parse(rs.getString("ANON_SUBJ")));
 			currentSubject.setUriHash(subjectHash);
+			currentSubject.setLastModifiedTime(new Date(rs.getLong("SUBJECT_MODIFIED")));
 			addNewSubject(String.valueOf(subjectHash), currentSubject);
 		}
 		

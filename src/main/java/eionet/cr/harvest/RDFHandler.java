@@ -79,6 +79,7 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	private long sourceUrlHash;
 	private long genTime;
 	private Log logger;
+	private long sourceLastModified;
 
 	/** */
 	private Connection connection;
@@ -560,11 +561,12 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 		logger.debug("Copying resources from RESOURCE_TEMP into RESOURCE");
 		
 		StringBuffer buf = new StringBuffer();
-		buf.append("insert ignore into RESOURCE (URI, URI_HASH, FIRSTSEEN_SOURCE, FIRSTSEEN_TIME) ").
-		append("select URI, URI_HASH, ").append(sourceUrlHash).append(", ").append(genTime).append(" from RESOURCE_TEMP");
+		buf.append("insert into RESOURCE (URI, URI_HASH, FIRSTSEEN_SOURCE, FIRSTSEEN_TIME, LASTMODIFIED_TIME) ").
+		append("select URI, URI_HASH, ").append(sourceUrlHash).append(", ").append(genTime).append(", ").append(sourceLastModified).
+		append(" from RESOURCE_TEMP on duplicate key update RESOURCE.LASTMODIFIED_TIME=").append(sourceLastModified);
 		
-		int i = SQLUtil.executeUpdate(buf.toString(), getConnection());
-		logger.debug(i + " distinctResources inserted into RESOURCE");
+		SQLUtil.executeUpdate(buf.toString(), getConnection());
+		logger.debug("Resources inserted into RESOURCE");
 	}
 	
 	/**
@@ -967,5 +969,12 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 		private String getLanguage() {
 			return language;
 		}
+	}
+
+	/**
+	 * @param sourceLastModified the sourceLastModified to set
+	 */
+	public void setSourceLastModified(long sourceLastModified) {
+		this.sourceLastModified = sourceLastModified;
 	}
 }

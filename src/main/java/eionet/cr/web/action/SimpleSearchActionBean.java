@@ -21,6 +21,9 @@
 package eionet.cr.web.action;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import net.sourceforge.stripes.action.DefaultHandler;
@@ -33,14 +36,17 @@ import net.sourceforge.stripes.validation.ValidationMethod;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import eionet.cr.common.Predicates;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
+import eionet.cr.dao.HelperDao;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.SimpleSearch;
 import eionet.cr.search.UriSearch;
 import eionet.cr.search.util.SearchExpression;
 import eionet.cr.web.util.columns.SearchResultColumn;
+import eionet.cr.web.util.columns.SubjectLastModifiedColumn;
 import eionet.cr.web.util.columns.SubjectPredicateColumn;
 
 /**
@@ -69,6 +75,7 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 	/**
 	 * 
 	 * @return
+	 * @throws DAOException 
 	 * @throws IOException 
 	 * @throws ParseException 
 	 * @throws DAOException
@@ -130,6 +137,26 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 	 * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
 	 */
 	public List<SearchResultColumn> getColumns(){
-		return getDefaultColumns();
+		
+		ArrayList<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
+		
+		SubjectPredicateColumn col = new SubjectPredicateColumn();
+		col.setPredicateUri(Predicates.RDF_TYPE);
+		col.setTitle("Type");
+		col.setSortable(true);
+		list.add(col);
+		
+		col = new SubjectPredicateColumn();
+		col.setPredicateUri(Predicates.RDFS_LABEL);
+		col.setTitle("Title");
+		col.setSortable(true);
+		list.add(col);
+
+		SubjectLastModifiedColumn col2 = new SubjectLastModifiedColumn();
+		col2.setTitle("Date");
+		col2.setSortable(true);
+		list.add(col2);
+
+		return list;
 	}
 }

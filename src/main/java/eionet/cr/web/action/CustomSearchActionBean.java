@@ -45,6 +45,8 @@ import eionet.cr.util.Util;
 import eionet.cr.util.pagination.Pagination;
 import eionet.cr.web.util.CustomSearchFilter;
 import eionet.cr.web.util.columns.SearchResultColumn;
+import eionet.cr.web.util.columns.SubjectLastModifiedColumn;
+import eionet.cr.web.util.columns.SubjectPredicateColumn;
 
 /**
  * 
@@ -498,6 +500,26 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 	 * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
 	 */
 	public List<SearchResultColumn> getColumns(){
-		return getDefaultColumns();
+		
+		ArrayList<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
+		
+		SubjectPredicateColumn col = new SubjectPredicateColumn();
+		col.setPredicateUri(Predicates.RDF_TYPE);
+		col.setTitle("Type");
+		col.setSortable(true);
+		list.add(col);
+		
+		col = new SubjectPredicateColumn();
+		col.setPredicateUri(Predicates.RDFS_LABEL);
+		col.setTitle("Title");
+		col.setSortable(true);
+		list.add(col);
+
+		SubjectLastModifiedColumn col2 = new SubjectLastModifiedColumn();
+		col2.setTitle("Date");
+		col2.setSortable(true);
+		list.add(col2);
+
+		return list;
 	}
 }

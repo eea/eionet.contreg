@@ -24,6 +24,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 
+import org.apache.commons.lang.StringUtils;
+
 import net.sourceforge.stripes.action.UrlBinding;
 
 import eionet.cr.common.Predicates;
@@ -109,10 +111,22 @@ public class SubjectPredicateColumn extends SearchResultColumn{
 					StringBuffer bufLiterals = new StringBuffer();
 					StringBuffer bufNonLiterals = new StringBuffer();
 
+					String resultFromHitSource = null;
 					for (Iterator<ObjectDTO> iter = distinctObjects.iterator(); iter.hasNext();){
 
 						ObjectDTO objectDTO = iter.next();
-						String objectString = objectDTO.toString().trim();
+						String objectString = objectDTO.getValue().trim();
+						
+						// if the source of the object matches the search-hit source of the subject then
+						// remember the object value and break
+						if (subjectDTO.getHitSource()>0 && objectDTO.getSourceHash()==subjectDTO.getHitSource()
+								&& !StringUtils.isBlank(objectString)
+								&& objectDTO.isLiteral()){
+
+							resultFromHitSource = objectString;
+							break;
+						}
+						
 						if (objectString.length()>0){
 
 							if (objectDTO.isLiteral())
@@ -122,7 +136,13 @@ public class SubjectPredicateColumn extends SearchResultColumn{
 						}
 					}
 
-					result = bufLiterals.length()>0 ? bufLiterals.toString() : bufNonLiterals.toString();
+					// if there was a value found that came from search-hit source then prefer that one as the result
+					if (!StringUtils.isBlank(resultFromHitSource)){
+						result = resultFromHitSource;
+					}
+					else{
+						result = bufLiterals.length()>0 ? bufLiterals.toString() : bufNonLiterals.toString();
+					}
 				}
 			}
 

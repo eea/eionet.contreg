@@ -31,6 +31,7 @@ import org.apache.commons.lang.StringUtils;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.URIUtil;
 import eionet.cr.util.pagination.Pagination;
+import eionet.cr.web.util.columns.SubjectLastModifiedColumn;
 
 /**
  * 
@@ -71,8 +72,14 @@ public class CustomSearch extends AbstractSubjectSearch{
 		StringBuffer sqlBuf = new StringBuffer("select SPO1.SUBJECT as SUBJECT_HASH from ").
 		append(fromStatement).append(" where ").append(whereStatement);
 		
-		if (sortPredicate!=null)
-			sqlBuf.append(" order by ORDERING.OBJECT ").append(sortOrder==null ? sortOrder.ASCENDING.toSQL() : sortOrder.toSQL());
+		if (sortPredicate!=null){
+			if (sortPredicate.equals(SubjectLastModifiedColumn.class.getSimpleName())){
+				sqlBuf.append(" order by RESOURCE.LASTMODIFIED_TIME ").append(sortOrder==null ? sortOrder.ASCENDING.toSQL() : sortOrder.toSQL());
+			}
+			else{
+				sqlBuf.append(" order by ORDERING.OBJECT ").append(sortOrder==null ? sortOrder.ASCENDING.toSQL() : sortOrder.toSQL());
+			}
+		}
 
 		return sqlBuf.toString();
 	}
@@ -90,8 +97,14 @@ public class CustomSearch extends AbstractSubjectSearch{
 			fromStatement.append(fromStatement.length()==0 ? "" : ", ").append("SPO as ").append(spoCurr);
 			
 			if (i==1 && sortPredicate!=null){
-				fromStatement.append(" left join SPO as ORDERING on (SPO1.SUBJECT=ORDERING.SUBJECT and ORDERING.PREDICATE=?)");
-				inParameters.add(Long.valueOf(Hashes.spoHash(sortPredicate)));
+				
+				if (sortPredicate.equals(SubjectLastModifiedColumn.class.getSimpleName())){
+					fromStatement.append(" left join RESOURCE on (SPO1.SUBJECT=RESOURCE.URI_HASH) ");
+				}
+				else{
+					fromStatement.append(" left join SPO as ORDERING on (SPO1.SUBJECT=ORDERING.SUBJECT and ORDERING.PREDICATE=?)");
+					inParameters.add(Long.valueOf(Hashes.spoHash(sortPredicate)));
+				}
 			}
 			
 			if (whereStatement.length()>0)

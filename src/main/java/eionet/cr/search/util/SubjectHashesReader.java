@@ -22,9 +22,12 @@ package eionet.cr.search.util;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.pagination.Pagination;
@@ -46,7 +49,8 @@ public class SubjectHashesReader extends ResultSetBaseReader{
 	 */
 	public void readRow(ResultSet rs) throws SQLException{
 		
-		resultSet.add(rs.getString("SUBJECT_HASH"));
+		String subjectHash = rs.getString("SUBJECT_HASH");
+		resultSet.add(subjectHash);
 	}
 	
 	/**

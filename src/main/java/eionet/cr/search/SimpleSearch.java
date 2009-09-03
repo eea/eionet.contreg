@@ -20,15 +20,22 @@
  */
 package eionet.cr.search;
 
-import java.util.Collection;
-import java.util.Iterator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
+import eionet.cr.common.Predicates;
+import eionet.cr.dao.HelperDao;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.util.SearchExpression;
+import eionet.cr.search.util.SimpleSearchDataReader;
+import eionet.cr.search.util.SimpleSearchHashesReader;
+import eionet.cr.search.util.SubjectDataReader;
+import eionet.cr.search.util.SubjectHashesReader;
 import eionet.cr.util.Hashes;
-import eionet.cr.util.pagination.Pagination;
-import eionet.cr.util.sql.ConnectionUtil;
+import eionet.cr.web.util.columns.ReferringPredicatesColumn;
+import eionet.cr.web.util.columns.SubjectLastModifiedColumn;
 
 /**
  * 
@@ -39,6 +46,9 @@ public class SimpleSearch extends AbstractSubjectSearch{
 
 	/** */
 	private SearchExpression searchExpression;
+	
+	/** */
+	private Map<String,Long> hitSources = new HashMap<String,Long>();
 	
 	/**
 	 * 
@@ -58,17 +68,23 @@ public class SimpleSearch extends AbstractSubjectSearch{
 
 	/*
 	 * (non-Javadoc)
-	 * @see eionet.cr.search.AbstractSubjectSearch#getSQL(java.util.List)
+	 * @see eionet.cr.search.AbstractSubjectSearch#getSubjectSelectSQL(java.util.List)
 	 */
 	protected String getSubjectSelectSQL(List inParameters){
 		
 		if (searchExpression==null || searchExpression.isEmpty())
 			return null;
 		
-		StringBuffer sqlBuf = new StringBuffer("select SPO.SUBJECT as SUBJECT_HASH from SPO ");
+		StringBuffer sqlBuf = new StringBuffer("select SPO.SUBJECT as SUBJECT_HASH, SPO.SOURCE as HIT_SOURCE from SPO ");
 		if (sortPredicate!=null){
-			sqlBuf.append("left join SPO as ORDERING on (SPO.SUBJECT=ORDERING.SUBJECT and ORDERING.PREDICATE=?) ");
-			inParameters.add(Long.valueOf(Hashes.spoHash(sortPredicate)));
+			
+			if (sortPredicate.equals(SubjectLastModifiedColumn.class.getSimpleName())){
+				sqlBuf.append("left join RESOURCE on (SPO.SUBJECT=RESOURCE.URI_HASH) ");
+			}
+			else{
+				sqlBuf.append("left join SPO as ORDERING on (SPO.SUBJECT=ORDERING.SUBJECT and ORDERING.PREDICATE=?) ");
+				inParameters.add(Long.valueOf(Hashes.spoHash(sortPredicate)));
+			}
 		}
 		
 		if (searchExpression.isUri() || searchExpression.isHash()){
@@ -87,8 +103,14 @@ public class SimpleSearch extends AbstractSubjectSearch{
 			inParameters.add(searchExpression.toString());
 		}		
 		
-		if (sortPredicate!=null)
-			sqlBuf.append(" order by ORDERING.OBJECT ").append(sortOrder==null ? sortOrder.ASCENDING.toSQL() : sortOrder.toSQL());
+		if (sortPredicate!=null){
+			if (sortPredicate.equals(SubjectLastModifiedColumn.class.getSimpleName())){
+				sqlBuf.append(" order by RESOURCE.LASTMODIFIED_TIME ").append(sortOrder==null ? sortOrder.ASCENDING.toSQL() : sortOrder.toSQL());
+			}
+			else{
+				sqlBuf.append(" order by ORDERING.OBJECT ").append(sortOrder==null ? sortOrder.ASCENDING.toSQL() : sortOrder.toSQL());
+			}
+		}
 		
 		return sqlBuf.toString();
 	}
@@ -107,32 +129,20 @@ public class SimpleSearch extends AbstractSubjectSearch{
 	public void setSearchExpression(String string) {
 		this.searchExpression = new SearchExpression(string);
 	}
-
-	/**
-	 * 
-	 * @param args
+	
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.search.AbstractSubjectSearch#createSubjectHashesReader()
 	 */
-	public static void main(String[] args){
-		
-		ConnectionUtil.setReturnSimpleConnection(true);
-		SimpleSearch simpleSearch = new SimpleSearch("soil");
-		try{
-			simpleSearch.execute();
-			Collection<SubjectDTO> coll = simpleSearch.getResultList();
-			
-			if (coll!=null){
-				System.out.println("coll.size() = " + coll.size());
-				
-				for (Iterator<SubjectDTO> i=coll.iterator(); i.hasNext(); ){
-					SubjectDTO subject = i.next();
-					System.out.println(subject);
-				}
-			}
-			else
-				System.out.println("coll is null");
-		}
-		catch (Exception e){
-			e.printStackTrace();
-		}		
+	protected SubjectHashesReader createSubjectHashesReader(){
+		return new SimpleSearchHashesReader(hitSources);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.search.AbstractSubjectSearch#createSubjectDataReader(java.util.Map)
+	 */
+	protected SubjectDataReader createSubjectDataReader(Map<String, SubjectDTO> subjectsMap){
+		return new SimpleSearchDataReader(subjectsMap, hitSources);
 	}
 }

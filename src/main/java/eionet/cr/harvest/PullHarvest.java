@@ -144,7 +144,7 @@ public class PullHarvest extends Harvest{
 						
 				// if source not available (i.e. link broken) then just set the last-refreshed metadata
 				if (sourceAvailable.booleanValue()==false){
-					setLastRefreshed(urlConnection);
+					setLastRefreshed(urlConnection, System.currentTimeMillis());
 				}
 				// source is available, so continue to extract it's contents and metadata
 				else{
@@ -347,9 +347,9 @@ public class PullHarvest extends Harvest{
 	 * 
 	 * @param urlConnection
 	 */
-	private void setLastRefreshed(URLConnection urlConnection){
+	private void setLastRefreshed(URLConnection urlConnection, long lastRefreshedTime){
 		
-		String lastRefreshed = Util.dateToString(new Date(System.currentTimeMillis()), "yyyy-MM-dd'T'HH:mm:ss");
+		String lastRefreshed = Util.dateToString(new Date(lastRefreshedTime), "yyyy-MM-dd'T'HH:mm:ss");
 		sourceMetadata.addObject(Predicates.CR_LAST_REFRESHED, new ObjectDTO(String.valueOf(lastRefreshed), true));
 	}
 	
@@ -359,13 +359,19 @@ public class PullHarvest extends Harvest{
 	 */
 	private void setSourceMetadata(URLConnection urlConnection){
 		
-		setLastRefreshed(urlConnection);
+		// set last-refreshed predicate
+		long lastRefreshed = System.currentTimeMillis();
+		setLastRefreshed(urlConnection, lastRefreshed);
 
-		long lastModified = urlConnection.getLastModified();
-		if (lastModified>0){
-			String s = Util.dateToString(new Date(lastModified), "yyyy-MM-dd'T'HH:mm:ss");
-			sourceMetadata.addObject(Predicates.CR_LAST_MODIFIED, new ObjectDTO(s, true));
+		// detect the last-modified-date from HTTP response, if it's not >0, then take the value of last-refreshed 
+		sourceLastModified = urlConnection.getLastModified();
+		if (sourceLastModified<=0){
+			sourceLastModified = lastRefreshed;
 		}
+
+		// set the last-modified predicate
+		String s = Util.dateToString(new Date(sourceLastModified), "yyyy-MM-dd'T'HH:mm:ss");
+		sourceMetadata.addObject(Predicates.CR_LAST_MODIFIED, new ObjectDTO(s, true));
 		
 		int contentLength = urlConnection.getContentLength();
 		if (contentLength>=0){

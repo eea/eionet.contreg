@@ -58,6 +58,7 @@ public class PushHarvest extends Harvest{
 		Reader stringReader = null;
 		try{
 			stringReader = new StringReader(content);
+			sourceLastModified = System.currentTimeMillis();
 			harvest(new ReaderBasedARPSource(stringReader));
 		}
 		finally{
