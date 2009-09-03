@@ -121,12 +121,12 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
 			SortingRequest sortingRequest = new SortingRequest(sortP, sortO);
 			if(StringUtils.isBlank(type)) {
 				setResultList(factory.getDao(HarvestSourceDAO.class).getHarvestSources(filterString, pageRequest, sortingRequest));
-				matchCount = pageRequest.getMatchCount();
 			} else if (TRACKED_FILES.equals(type)) {
 					setResultList(factory.getDao(HarvestSourceDAO.class).getHarvestTrackedFiles(filterString, pageRequest, sortingRequest));
 			} else if (UNAVAILABLE_TYPE.equals(type)) {
 					setResultList(factory.getDao(HarvestSourceDAO.class).getHarvestSourcesUnavailable(filterString, pageRequest, sortingRequest));
 			}
+			matchCount = pageRequest.getMatchCount();
 			setPagination(Pagination.getPagination(
 					pageRequest,
 					getUrlBinding(),
