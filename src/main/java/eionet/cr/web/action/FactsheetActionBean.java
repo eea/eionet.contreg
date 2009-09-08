@@ -50,6 +50,7 @@ import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.search.FactsheetSearch;
 import eionet.cr.search.SearchException;
+import eionet.cr.search.util.SearchExpression;
 import eionet.cr.search.util.SubProperties;
 import eionet.cr.search.util.UriLabelPair;
 import eionet.cr.web.util.FactsheetObjectId;
@@ -67,7 +68,7 @@ public class FactsheetActionBean extends AbstractActionBean{
 
 	/** */
 	private String uri;
-	private Long uriHash;
+	private long uriHash;
 	private SubjectDTO subject;
 	
 	/** */
@@ -82,6 +83,9 @@ public class FactsheetActionBean extends AbstractActionBean{
 	/** */
 	private List<String> rowId;
 	
+	/** */
+	private boolean noCriteria;
+	
 	/**
 	 * 
 	 * @return
@@ -90,13 +94,21 @@ public class FactsheetActionBean extends AbstractActionBean{
 	@DefaultHandler
 	public Resolution view() throws SearchException{
 		
-		FactsheetSearch factsheetSearch = uriHash==null ? new FactsheetSearch(uri) : new FactsheetSearch(uriHash);
-		factsheetSearch.execute();
-		Collection<SubjectDTO> coll = factsheetSearch.getResultList();
-		if (coll!=null && !coll.isEmpty())
-			subject = coll.iterator().next();
-		predicateLabels = factsheetSearch.getPredicateLabels().getByLanguagePreferences(createPreferredLanguages(), "en");
-		subProperties = factsheetSearch.getSubProperties();
+		if (StringUtils.isBlank(uri) && uriHash==0){
+			noCriteria = true;
+			handleCrException("Resource identifier not specified!", GeneralConfig.SEVERITY_CAUTION);
+		}
+		else{
+			FactsheetSearch factsheetSearch = uriHash==0 ? new FactsheetSearch(uri) : new FactsheetSearch(uriHash);
+			factsheetSearch.execute();
+			Collection<SubjectDTO> coll = factsheetSearch.getResultList();
+			if (coll!=null && !coll.isEmpty()){
+				subject = coll.iterator().next();
+			}
+			
+			predicateLabels = factsheetSearch.getPredicateLabels().getByLanguagePreferences(createPreferredLanguages(), "en");
+			subProperties = factsheetSearch.getSubProperties();
+		}
 		
 		return new ForwardResolution("/pages/factsheet.jsp");
 	}
@@ -232,20 +244,6 @@ public class FactsheetActionBean extends AbstractActionBean{
 	}
 
 	/**
-	 * @return the uriHash
-	 */
-	public Long getUriHash() {
-		return uriHash;
-	}
-
-	/**
-	 * @param uriHash the uriHash to set
-	 */
-	public void setUriHash(Long uriHash) {
-		this.uriHash = uriHash;
-	}
-
-	/**
 	 * @return the addibleProperties
 	 * @throws DAOException 
 	 */
@@ -355,5 +353,26 @@ public class FactsheetActionBean extends AbstractActionBean{
 	 */
 	public void setRowId(List<String> rowId) {
 		this.rowId = rowId;
+	}
+
+	/**
+	 * @return the noCriteria
+	 */
+	public boolean isNoCriteria() {
+		return noCriteria;
+	}
+
+	/**
+	 * @return the uriHash
+	 */
+	public long getUriHash() {
+		return uriHash;
+	}
+
+	/**
+	 * @param uriHash the uriHash to set
+	 */
+	public void setUriHash(long uriHash) {
+		this.uriHash = uriHash;
 	}
 }

@@ -111,6 +111,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO>{
 	 * @see eionet.cr.web.action.AbstractSearchActionBean#search()
 	 */
 	public Resolution search() throws SearchException {
+		
 		availableTypes = getTypesFromCacheOrGenerate();
 		if (!StringUtils.isBlank(type)){
 			//get available columns for search

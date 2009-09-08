@@ -31,6 +31,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 
+import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
@@ -81,31 +82,33 @@ public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
 	 */
 	public Resolution search() throws SearchException {
 
-		searchExpression = new SearchExpression(object);
-		ReferencesSearch refSearch = new ReferencesSearch(searchExpression); // validation assures that object!=null
-		refSearch.setPageNumber(getPageN());
-		refSearch.setSorting(getSortP(), getSortO());
-		
-		refSearch.execute();
-		resultList = refSearch.getResultList();
-		matchCount = refSearch.getTotalMatchCount();
-		
-		predicateLabels = refSearch.getPredicateLabels().getByLanguagePreferences(createPreferredLanguages(), "en");
+		if (!StringUtils.isBlank(object)){
+			
+			searchExpression = new SearchExpression(object);
+			if (searchExpression.isUri() || searchExpression.isHash()){
+				
+				ReferencesSearch refSearch = new ReferencesSearch(searchExpression); // validation assures that object!=null
+				refSearch.setPageNumber(getPageN());
+				refSearch.setSorting(getSortP(), getSortO());
+				
+				refSearch.execute();
+				resultList = refSearch.getResultList();
+				matchCount = refSearch.getTotalMatchCount();
+				
+				predicateLabels = refSearch.getPredicateLabels().getByLanguagePreferences(createPreferredLanguages(), "en");
+			}
+			else{
+				searchExpression = null;
+				handleCrException("The provided resource identifier is neither a URI nor a hash!", GeneralConfig.SEVERITY_CAUTION);
+			}
+		}
+		else{
+			object = null;
+			handleCrException("Resource identifier not specified!", GeneralConfig.SEVERITY_CAUTION);
+		}
 		
 		return new ForwardResolution("/pages/references.jsp");
 	}
-	
-	/**
-	 * 
-	 * @param errors
-	 */
-    @ValidationMethod(on="search")
-    public void validateSearch(ValidationErrors errors) {
-    	
-        if (StringUtils.isBlank(object)) {
-            handleCrException("No search criteria specified!", GeneralConfig.SEVERITY_CAUTION);
-        }
-    }
 
 	/*
 	 * (non-Javadoc)

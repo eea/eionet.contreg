@@ -62,8 +62,8 @@ public class FactsheetSearch extends UriSearch {
 	 * 
 	 * @param uriHash
 	 */
-	public FactsheetSearch(Long uriHash) {
-		super(uriHash);
+	public FactsheetSearch(long uriHash) {
+		super(Long.valueOf(uriHash));
 	}
 
 	/**

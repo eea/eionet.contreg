@@ -65,18 +65,27 @@
 				    			</td>
 				    			<td>
 				    				<c:choose>
-					    				<c:when test="${object.sourceObjectHash==0 && object.anonymous && !object.literal}">
-											<stripes:link class="infolink" href="/factsheet.action">Anonymous resource
-												<stripes:param name="uriHash" value="${object.hash}"/>
-											</stripes:link>	
-										</c:when>
-										<c:when test="${object.sourceObjectHash==0}">
-											<c:out value="${object.value}"/>
-										</c:when>
+				    					<c:when test="${!object.literal}">		    								
+	    									<c:choose>
+	    										<c:when test="${!object.anonymous}">
+	    											<stripes:link class="infolink" href="/factsheet.action"><c:out value="${object.value}"/>
+	    												<stripes:param name="uri" value="${object.value}"/>
+	    											</stripes:link>
+	    										</c:when>
+	    										<c:otherwise>
+	    											<stripes:link class="infolink" href="/factsheet.action">Anonymous resource
+	    												<stripes:param name="uriHash" value="${object.hash}"/>
+	    											</stripes:link>
+	    										</c:otherwise>
+	    									</c:choose>						
+				    					</c:when>
+				    					<c:when test="${object.literal && object.sourceObjectHash!=0}">
+				    						<stripes:link class="infolink" href="/factsheet.action"><c:out value="${object.value}"/>
+   												<stripes:param name="uriHash" value="${object.sourceObjectHash}"/>
+	    									</stripes:link>
+				    					</c:when>
 										<c:otherwise>
-											<stripes:link class="infolink" href="/factsheet.action"><c:out value="${object.value}"/>
-													<stripes:param name="uriHash" value="${object.sourceObjectHash}"/>
-											</stripes:link>	
+											<c:out value="${object.value}"/>
 										</c:otherwise>
 									</c:choose>
 				    			</td>
