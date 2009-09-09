@@ -44,16 +44,25 @@ public class ReferencesSearch extends AbstractSubjectSearch{
 
 	/** */
 	private PredicateLabels predicateLabels = new PredicateLabels();
-	
+
 	/** */
-	private SearchExpression searchExpression;
+	private String uri;
+	private long hash;
 	
 	/**
 	 * 
-	 * @param searchExpression
+	 * @param uri
 	 */
-	public ReferencesSearch(SearchExpression searchExpression) {
-		this.searchExpression = searchExpression;
+	public ReferencesSearch(String uri){
+		this.uri = uri;
+	}
+	
+	/**
+	 * 
+	 * @param hash
+	 */
+	public ReferencesSearch(long hash){
+		this.hash = hash;		
 	}
 
 	/*
@@ -62,8 +71,9 @@ public class ReferencesSearch extends AbstractSubjectSearch{
 	 */
 	protected String getSubjectSelectSQL(List inParameters){
 		
-		if (searchExpression==null || searchExpression.isEmpty())
+		if (StringUtils.isBlank(uri) && hash==0){
 			return null;
+		}
 		
 		StringBuffer sqlBuf = new StringBuffer("select SPO.SUBJECT as SUBJECT_HASH from SPO ");
 		if (sortPredicate!=null){
@@ -77,27 +87,20 @@ public class ReferencesSearch extends AbstractSubjectSearch{
 			}
 		}
 		
-		if (searchExpression.isUri() || searchExpression.isHash()){
-			
-			sqlBuf.append(" where SPO.LIT_OBJ='N' and SPO.OBJECT_HASH=?");
-			if (searchExpression.isHash()){
-				inParameters.add(searchExpression.toString());
-			}
-			else{
-				inParameters.add(Hashes.spoHash(searchExpression.toString()));
-			}
-				
+		sqlBuf.append(" where SPO.LIT_OBJ='N' and SPO.OBJECT_HASH=?");
+		if (hash!=0){
+			inParameters.add(Long.valueOf(hash));
 		}
 		else{
-			sqlBuf.append(" where match(SPO.OBJECT) against (? in boolean mode)");
-			inParameters.add(searchExpression.toString());
-		}		
+			inParameters.add(Long.valueOf(Hashes.spoHash(uri)));
+		}
 		
 		if (sortPredicate!=null)
 			sqlBuf.append(" order by ORDERING.OBJECT ").append(sortOrder==null ? sortOrder.ASCENDING.toSQL() : sortOrder.toSQL());
 		
 		return sqlBuf.toString();
 	}
+		
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.search.AbstractSubjectSearch#collectPredicateLabels(java.sql.Connection, eionet.cr.search.util.SubjectDataReader)

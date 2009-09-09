@@ -7,20 +7,20 @@
 	<stripes:layout-component name="contents">
 
 		<c:choose>
-			<c:when test="${not empty actionBean.searchExpression}">
+			<c:when test="${!actionBean.noCriteria}">
 				
 				<div id="tabbedmenu">
 				    <ul>
 						<li>
 							<c:choose>
-								<c:when test="${actionBean.searchExpression.uri}">
+								<c:when test="${not empty actionBean.uri}">
 									<stripes:link href="/factsheet.action">Resource properties
-										<stripes:param name="uri" value="${actionBean.object}"/>			
+										<stripes:param name="uri" value="${actionBean.uri}"/>			
 									</stripes:link>
 								</c:when>
 								<c:otherwise>
 									<stripes:link href="/factsheet.action">Resource properties
-										<stripes:param name="uriHash" value="${actionBean.object}"/>
+										<stripes:param name="uriHash" value="${actionBean.anonHash}"/>
 									</stripes:link>
 								</c:otherwise>
 							</c:choose>
@@ -36,14 +36,19 @@
 						<br/><br/>
 						Below is the list of references to
 						<c:choose>
-							<c:when test="${actionBean.searchExpression.uri}">
-								<stripes:link href="/factsheet.action">${actionBean.object}
-									<stripes:param name="uri" value="${actionBean.object}"/>			
+							<c:when test="${actionBean.anonHash!=0}">
+								<stripes:link href="/factsheet.action">this anonymous resource
+									<stripes:param name="uriHash" value="${actionBean.anonHash}"/>
+								</stripes:link>
+							</c:when>
+							<c:when test="${actionBean.uriResolvable}">
+								<stripes:link href="/factsheet.action">${actionBean.uri}
+									<stripes:param name="uri" value="${actionBean.uri}"/>			
 								</stripes:link>
 							</c:when>
 							<c:otherwise>
-								resource with hash code&nbsp;<stripes:link href="/factsheet.action">${actionBean.object}
-									<stripes:param name="uriHash" value="${actionBean.object}"/>
+								<stripes:link href="/factsheet.action">this unresolvable resource
+									<stripes:param name="uri" value="${actionBean.uri}"/>			
 								</stripes:link>
 							</c:otherwise>
 						</c:choose>

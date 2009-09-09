@@ -50,6 +50,7 @@ import eionet.cr.search.util.SearchExpression;
 import eionet.cr.search.util.UriLabelPair;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.URIUtil;
+import eionet.cr.util.URLUtil;
 import eionet.cr.web.util.columns.ReferringPredicatesColumn;
 import eionet.cr.web.util.columns.SearchResultColumn;
 import eionet.cr.web.util.columns.SubjectPredicateColumn;
@@ -67,9 +68,11 @@ public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
 	private static final String PREV_OBJECT = ReferencesActionBean.class.getName() + ".previousObject";
 
 	/** */
-	private String object;
-	private SearchExpression searchExpression;
-	
+	private String uri;
+	private long anonHash;
+	private SubjectDTO subject;
+	private boolean noCriteria;
+
 	/** */
 	private HashMap<String,List<String>> referringPredicates;
 	
@@ -81,30 +84,22 @@ public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
 	 * @see eionet.cr.web.action.AbstractSearchActionBean#search()
 	 */
 	public Resolution search() throws SearchException {
-
-		if (!StringUtils.isBlank(object)){
+		
+		if (StringUtils.isBlank(uri) && anonHash==0){
 			
-			searchExpression = new SearchExpression(object);
-			if (searchExpression.isUri() || searchExpression.isHash()){
-				
-				ReferencesSearch refSearch = new ReferencesSearch(searchExpression); // validation assures that object!=null
-				refSearch.setPageNumber(getPageN());
-				refSearch.setSorting(getSortP(), getSortO());
-				
-				refSearch.execute();
-				resultList = refSearch.getResultList();
-				matchCount = refSearch.getTotalMatchCount();
-				
-				predicateLabels = refSearch.getPredicateLabels().getByLanguagePreferences(createPreferredLanguages(), "en");
-			}
-			else{
-				searchExpression = null;
-				handleCrException("The provided resource identifier is neither a URI nor a hash!", GeneralConfig.SEVERITY_CAUTION);
-			}
+			noCriteria = true;
+			handleCrException("Resource identifier not specified!", GeneralConfig.SEVERITY_CAUTION);
 		}
 		else{
-			object = null;
-			handleCrException("Resource identifier not specified!", GeneralConfig.SEVERITY_CAUTION);
+			ReferencesSearch refSearch = anonHash==0 ? new ReferencesSearch(uri) : new ReferencesSearch(anonHash);
+			refSearch.setPageNumber(getPageN());
+			refSearch.setSorting(getSortP(), getSortO());
+			
+			refSearch.execute();
+			resultList = refSearch.getResultList();
+			matchCount = refSearch.getTotalMatchCount();
+			
+			predicateLabels = refSearch.getPredicateLabels().getByLanguagePreferences(createPreferredLanguages(), "en");
 		}
 		
 		return new ForwardResolution("/pages/references.jsp");
@@ -141,32 +136,60 @@ public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
 	}
 
 	/**
-	 * 
-	 * @param object
-	 */
-	public void setObject(String object) {
-		this.object = object;
-	}
-
-	/**
-	 * @return the searchExpression
-	 */
-	public SearchExpression getSearchExpression() {
-		return searchExpression;
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public String getObject() {
-		return object;
-	}
-
-	/**
 	 * @return the predicateLabels
 	 */
 	public Map<String, String> getPredicateLabels() {
 		return predicateLabels;
+	}
+
+	/**
+	 * @return the uri
+	 */
+	public String getUri() {
+		return uri;
+	}
+
+	/**
+	 * @param uri the uri to set
+	 */
+	public void setUri(String uri) {
+		this.uri = uri;
+	}
+
+	/**
+	 * @return the anonHash
+	 */
+	public long getAnonHash() {
+		return anonHash;
+	}
+
+	/**
+	 * @param anonHash the anonHash to set
+	 */
+	public void setAnonHash(long hash) {
+		this.anonHash = hash;
+	}
+
+	/**
+	 * @return the subject
+	 */
+	public SubjectDTO getSubject() {
+		return subject;
+	}
+
+	/**
+	 * @return the noCriteria
+	 */
+	public boolean isNoCriteria() {
+		return noCriteria;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isUriResolvable(){
+		
+		return uri==null ? false : URLUtil.isURL(uri);
 	}
 }

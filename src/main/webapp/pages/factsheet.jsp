@@ -14,19 +14,19 @@
 					<li id="currenttab"><span>Resource properties</span></li>
 					<li>
 						<c:choose>
+							<c:when test="${not empty actionBean.subject && not empty actionBean.subject.uri}">
+								<stripes:link href="/references.action" event="search">Resource references
+									<stripes:param name="uri" value="${actionBean.subject.uri}"/>
+								</stripes:link>
+							</c:when>						
 							<c:when test="${not empty actionBean.uri}">
 								<stripes:link href="/references.action" event="search">Resource references
-									<stripes:param name="object" value="${actionBean.uri}"/>
-								</stripes:link>
-							</c:when>
-							<c:when test="${actionBean.uriHash!=0}">
-								<stripes:link href="/references.action" event="search">Resource references
-									<stripes:param name="object" value="${actionBean.uriHash}"/>
+									<stripes:param name="uri" value="${actionBean.uri}"/>
 								</stripes:link>
 							</c:when>
 							<c:otherwise>
 								<stripes:link href="/references.action" event="search">Resource references
-									<stripes:param name="object" value=""/>
+									<stripes:param name="anonHash" value="${actionBean.uriHash}"/>
 								</stripes:link>
 							</c:otherwise>
 						</c:choose>
@@ -73,14 +73,14 @@
 				    	<div style="margin-top:20px">
 				    	
 				    		<c:choose>
+				    			<c:when test="${actionBean.subject.anonymous}">
+				    				<div class="advice-msg">This is an anonymous resource!</div>
+				    			</c:when>
 				    			<c:when test="${subjectUrl!=null}">
 				    				<div><p>Resource URL: <a class="link-external" href="${fn:escapeXml(subjectUrl)}"><c:out value="${subjectUrl}"/></a></p></div>
 				    			</c:when>
-				    			<c:when test="${subjectUri!=null}">
-				    				<div class="advice-msg" title="${fn:escapeXml(subjectUri)}">This is an unresolvable resource!</div>
-				    			</c:when>
 				    			<c:otherwise>
-				    				<div class="advice-msg">This is an anonymous resource!</div>
+				    				<div class="advice-msg" title="${fn:escapeXml(subjectUri)}">This is an unresolvable resource!</div>
 				    			</c:otherwise>
 				    		</c:choose>
 				    		
@@ -126,7 +126,7 @@
 				    				<strong>Nothing is known about ${actionBean.uri}</strong>
 				    			</c:when>
 				    			<c:when test="${actionBean.uriHash!=0}">
-				    				<strong>Nothing is known about resource with hash code ${actionBean.uriHash}</strong>
+				    				<strong>Nothing is known about this anonymous resource!</strong>
 				    			</c:when>
 				    			<c:otherwise>
 				    				<strong>Resource identifier not specified!</strong>

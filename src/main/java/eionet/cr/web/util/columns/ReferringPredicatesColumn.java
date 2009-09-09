@@ -24,6 +24,8 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
+
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.util.SearchExpression;
@@ -50,16 +52,10 @@ public class ReferringPredicatesColumn extends SearchResultColumn{
 	public ReferringPredicatesColumn(ReferencesActionBean actionBean){
 
 		this.actionBean = actionBean;
-
-		SearchExpression searchExpression = actionBean.getSearchExpression();
-		if (searchExpression!=null){
-			
-			try{
-				referringToHash = Long.parseLong(searchExpression.toString());
-			}
-			catch (NumberFormatException nfe){
-				referringToHash = Hashes.spoHash(searchExpression.toString());
-			}
+		
+		referringToHash = actionBean.getAnonHash();
+		if (referringToHash==0 && !StringUtils.isBlank(actionBean.getUri())){
+			referringToHash = Hashes.spoHash(actionBean.getUri());
 		}
 	}
 	
