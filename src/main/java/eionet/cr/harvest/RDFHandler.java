@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.UUID;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -66,14 +67,14 @@ import eionet.cr.util.sql.SQLUtil;
 public class RDFHandler implements StatementHandler, ErrorHandler{
 	
 	/** */
+	private static final String URN_UUID_PREFIX = "urn:uuid:";
+	
+	/** */
 	private SAXParseException saxError = null;
 	private SAXParseException saxWarning = null;
 	private boolean saxErrorSet = false;
 	private boolean saxWarningSet = false;
 
-	/** */
-	private long anonIdSeed;
-	
 	/** */
 	private String sourceUrl;
 	private long sourceUrlHash;
@@ -118,6 +119,9 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	/** */
 	private HashMap<String,ArrayList<ValueLanguagePair>> rdfValues = new HashMap<String,ArrayList<ValueLanguagePair>>();
 	
+	/** */
+	private String uuidNamePrefix;
+	
 	/**
 	 * @throws SQLException 
 	 * 
@@ -132,8 +136,8 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 		this.genTime = genTime;
 		this.logger = new HarvestLog(sourceUrl, genTime, LogFactory.getLog(this.getClass()));
 		
-		// set the hash-seed for anonymous ids
-		anonIdSeed = Hashes.spoHash(sourceUrl + String.valueOf(genTime));
+		this.uuidNamePrefix = new StringBuilder().
+			append(this.sourceUrlHash).append(":").append(this.genTime).append(":").toString(); 
 		
 		// init connection
 		connection = ConnectionUtil.getConnection();
@@ -201,25 +205,37 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 		tripleCounter++;
 		
 		try{
+			// if this is the first statement, perform certain "startup" actions
 			if (parsingStarted==false){
 				onParsingStarted();
 				parsingStarted = true;
 			}
 			
-			// we ignore statements with anonymous predicates
-			if (predicate.isAnonymous())
+			// ignore statements with anonymous predicates
+			if (predicate.isAnonymous()){
 				return;
+			}
 
-			// we ignore literal objects with length=0
-			if (litObject && object.length()==0)
+			// ignore literal objects with length==0
+			if (litObject && object.length()==0){
 				return;
+			}
 			
-			// set up subject and predicate hashes, replace entity references in the object
+			// set up subject URI, and subject and predicate hashes
 			boolean anonSubject = subject.isAnonymous();
-			long subjectHash = getSubjectHash(subject, anonSubject);
+			String subjectUri = anonSubject ? generateUUID(subject.getAnonymousID()) : subject.getURI();
+			long subjectHash = Hashes.spoHash(subjectUri);
 			long predicateHash = Hashes.spoHash(predicate.getURI());
-			if (litObject)
+			
+			// replace entity references in the object if it's a literal
+			if (litObject){
 				object = UnicodeUtils.replaceEntityReferences(object);
+			}
+			
+			// replace object with its UUID, if it's an anonymous resource
+			if (anonObject && !litObject){
+				object = generateUUID(object);
+			}
 
 			// we remember rdfValues			
 			if (anonSubject && predicate.getURI().equals(Predicates.RDF_VALUE)){
@@ -240,7 +256,7 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 				if (objectRdfValues!=null){
 					for (ValueLanguagePair pair:objectRdfValues){
 						addTriple(subjectHash, anonSubject, predicateHash, pair.getValue(), pair.getLanguage(),
-								true, false, getObjectHash(object, anonObject));
+								true, false, Hashes.spoHash(object));
 					}
 				}
 			}
@@ -254,22 +270,17 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 				}
 			}
 			
-			if (!anonSubject){
-				
-				// if subject different from previous one
-				if (currentSubjectHash==null || subjectHash!=currentSubjectHash.longValue()){
-					currentSubjectHash = new Long(subjectHash);
-					if (!distinctResources.contains(subjectHash)){
-						addResource(subject.getURI(), subjectHash);
-						distinctResources.add(subjectHash);
-						distinctSubjectsCount++;
-					}
+			// if subject different from previous one, add it into RESOURCES
+			if (currentSubjectHash==null || subjectHash!=currentSubjectHash.longValue()){
+				currentSubjectHash = new Long(subjectHash);
+				if (!distinctResources.contains(subjectHash)){
+					addResource(subjectUri, subjectHash);
+					distinctResources.add(subjectHash);
+					distinctSubjectsCount++;
 				}
 			}
-			else if (distinctAnonSubjects.add(subjectHash)){
-				distinctSubjectsCount++;
-			}
 			
+			// if at BULK_INSERT_SIZE, execute the batch
 			if (tripleCounter % BULK_INSERT_SIZE == 0){
 				executeBatch();
 			}
@@ -367,7 +378,7 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 		preparedStatementForTriples.setLong  ( 1, subjectHash);
 		preparedStatementForTriples.setLong  ( 2, predicateHash);
 		preparedStatementForTriples.setString( 3, object);
-		preparedStatementForTriples.setLong  ( 4, getObjectHash(object, anonObject));
+		preparedStatementForTriples.setLong  ( 4, Hashes.spoHash(object));
 		preparedStatementForTriples.setObject( 5, Util.toDouble(object));
 		preparedStatementForTriples.setString( 6, YesNoBoolean.format(anonSubject));
 		preparedStatementForTriples.setString( 7, YesNoBoolean.format(anonObject));
@@ -381,24 +392,17 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	}
 	
 	/**
+	 * Generates a name-based (i.e. version-3) UUID from the given name, that is unique across all harvests.
 	 * 
-	 * @param object
-	 * @param anonObject
+	 * @param name
 	 * @return
 	 */
-	private long getObjectHash(String object, boolean anonObject){		
-		return anonObject ? Hashes.spoHash(object, anonIdSeed) : Hashes.spoHash(object);
+	private String generateUUID(String name){
+		
+		String uuid = UUID.nameUUIDFromBytes(new StringBuilder(uuidNamePrefix).append(name).toString().getBytes()).toString();
+		return new StringBuilder(URN_UUID_PREFIX).append(uuid).toString();
 	}
-
-	/**
-	 * 
-	 * @param subject
-	 * @return
-	 */
-	private long getSubjectHash(AResource subject, boolean anonSubject){
-		return anonSubject ? Hashes.spoHash(subject.getAnonymousID(), anonIdSeed) : Hashes.spoHash(subject.getURI());
-	}
-
+	
 	/**
 	 * 
 	 * @param uri
