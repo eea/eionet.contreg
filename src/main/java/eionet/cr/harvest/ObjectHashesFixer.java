@@ -49,8 +49,8 @@ public class ObjectHashesFixer extends Thread{
 	private static final String prop_noOfBatchesToRun = ObjectHashesFixer.class.getSimpleName() + ".noOfBatchesToRun";
 	
 	/** */
-	private static int BATCH_SIZE = 10;
-	private static int NOOF_BATCHES_TO_RUN = 2;
+	private static int BATCH_SIZE = 1000;
+	private static int NOOF_BATCHES_TO_RUN = 1;
 
 	/**
 	 * 
