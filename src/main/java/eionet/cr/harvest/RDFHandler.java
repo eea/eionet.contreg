@@ -136,8 +136,7 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 		this.genTime = genTime;
 		this.logger = new HarvestLog(sourceUrl, genTime, LogFactory.getLog(this.getClass()));
 		
-		this.uuidNamePrefix = new StringBuilder().
-			append(this.sourceUrlHash).append(":").append(this.genTime).append(":").toString(); 
+		this.uuidNamePrefix = createUuidNamePrefix(String.valueOf(this.sourceUrlHash), String.valueOf(this.genTime)); 
 		
 		// init connection
 		connection = ConnectionUtil.getConnection();
@@ -399,10 +398,33 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	 */
 	private String generateUUID(String name){
 		
+		String uuid = UUID.nameUUIDFromBytes(new StringBuilder(this.uuidNamePrefix).append(name).toString().getBytes()).toString();
+		return new StringBuilder(URN_UUID_PREFIX).append(uuid).toString();
+	}
+
+	/**
+	 * 
+	 * @param uuidNamePrefix
+	 * @param name
+	 * @return
+	 */
+	public static String generateUUID(String uuidNamePrefix, String name){
+		
 		String uuid = UUID.nameUUIDFromBytes(new StringBuilder(uuidNamePrefix).append(name).toString().getBytes()).toString();
 		return new StringBuilder(URN_UUID_PREFIX).append(uuid).toString();
 	}
 	
+	/**
+	 * 
+	 * @param sourceHash
+	 * @param genTime
+	 * @return
+	 */
+	public static String createUuidNamePrefix(String sourceHash, String genTime){
+		
+		return new StringBuilder(sourceHash).append(":").append(genTime).append(":").toString();
+	}
+
 	/**
 	 * 
 	 * @param uri
