@@ -157,12 +157,10 @@ public abstract class Harvest {
 	 */
 	protected void harvest(ARPSource arpSource) throws HarvestException{
 		
-		long genTime = System.currentTimeMillis();
-		
 		RDFHandler rdfHandler = null;
 		try{
 			
-			rdfHandler = new RDFHandler(sourceUrlString, genTime);
+			rdfHandler = createRDFHandler();
 			rdfHandler.setDeriveExtraTriples(deriveExtraTriples);
 			rdfHandler.setClearPreviousContent(clearPreviousContent);
 			rdfHandler.setSourceLastModified(sourceLastModified);
@@ -217,6 +215,13 @@ public abstract class Harvest {
 			}
 		}
 	}
+	
+	/**
+	 * 
+	 */
+	protected RDFHandler createRDFHandler(){
+		return new RDFHandler(sourceUrlString, System.currentTimeMillis());
+	}
 
 	/**
 	 * 
@@ -257,13 +262,6 @@ public abstract class Harvest {
 	 * @throws HarvestException 
 	 */
 	protected void doHarvestStartedActions() throws HarvestException{
-		
-		if (this instanceof PullHarvest)
-			logger.debug("Pull harvest started");
-		else if (this instanceof PushHarvest)
-			logger.debug("Push harvest started");
-		else
-			logger.debug("Harvest started");
 		
 		try{
 			if (daoWriter!=null)

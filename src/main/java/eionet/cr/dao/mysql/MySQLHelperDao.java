@@ -64,6 +64,7 @@ public class MySQLHelperDao extends MySQLBaseDAO implements HelperDao {
 	 * {@inheritDoc}
 	 */
 	public List<Pair<String, String>> getRecentlyDiscoveredFiles(int limit) throws DAOException {
+		
 		//workaround as mysql doesn't allow limit in subqueries
 		//first let's select needed uri_hash
 		String sql = "SELECT DISTINCT RESOURCE.URI_HASH FROM RESOURCE INNER JOIN SPO ON RESOURCE.URI_HASH = SPO.SUBJECT" +
@@ -75,18 +76,26 @@ public class MySQLHelperDao extends MySQLBaseDAO implements HelperDao {
 		
 		List<Long> result = executeQuery(sql, params, new SingleObjectReader<Long>());
 		logger.debug(result);
-		//now let's fetch labels
-		sql = "SELECT DISTINCT SPO.SUBJECT as id, SPO.OBJECT as value FROM RESOURCE INNER JOIN SPO ON RESOURCE.URI_HASH = SPO.SUBJECT" +
-				" WHERE SPO.PREDICATE= ? AND SPO.SUBJECT IN (" + Util.toCSV(result) + 
-				") ORDER BY FIRSTSEEN_TIME DESC LIMIT ?;";
-		logger.debug(sql);
-		params.clear();
-		params.add(Hashes.spoHash(Predicates.RDFS_LABEL));
-		params.add(new Long(limit));
-		List<Pair<String, String>> resultList = executeQuery(sql, params, new PairReader<String, String>());
-		logger.debug(resultList);
+
+		if (result!=null && !result.isEmpty()){
+			
+			//now let's fetch labels
+			sql = "SELECT DISTINCT SPO.SUBJECT as id, SPO.OBJECT as value FROM RESOURCE INNER JOIN SPO ON RESOURCE.URI_HASH = SPO.SUBJECT" +
+					" WHERE SPO.PREDICATE= ? AND SPO.SUBJECT IN (" + Util.toCSV(result) + 
+					") ORDER BY FIRSTSEEN_TIME DESC LIMIT ?;";
+			
+			logger.debug(sql);
+			params.clear();
+			params.add(Hashes.spoHash(Predicates.RDFS_LABEL));
+			params.add(new Long(limit));
+			List<Pair<String, String>> resultList = executeQuery(sql, params, new PairReader<String, String>());
+			logger.debug(resultList);
+			return resultList;
+		}
+		else{
+			return new ArrayList<Pair<String, String>>();
+		}
 		
-		return resultList;
 	}
 
 	/** */

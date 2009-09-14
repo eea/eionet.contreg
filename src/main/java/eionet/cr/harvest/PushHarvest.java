@@ -67,4 +67,14 @@ public class PushHarvest extends Harvest{
 			}
 		}
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.harvest.Harvest#doHarvestStartedActions()
+	 */
+	protected void doHarvestStartedActions() throws HarvestException{
+		
+		logger.debug("Push harvest started");
+		super.doHarvestStartedActions();
+	}
 }

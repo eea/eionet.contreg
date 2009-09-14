@@ -60,11 +60,13 @@
 												</stripes:link>
 											</li>
 										</c:if>
-										<li>
-											<stripes:link href="${actionBean.urlBinding}" event="harvest">Schedule harvest
-													<stripes:link-param name="uri" value="${actionBean.uri}"/>
-											</stripes:link>
-										</li>
+										<c:if test="${subjectUrl!=null}">
+											<li>
+												<stripes:link href="${actionBean.urlBinding}" event="harvest">Harvest
+														<stripes:link-param name="uri" value="${actionBean.uri}"/>
+												</stripes:link>
+											</li>
+										</c:if>
 									</ul>
 								</li>
 							</ul>

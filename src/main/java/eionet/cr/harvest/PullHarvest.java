@@ -450,4 +450,14 @@ public class PullHarvest extends Harvest{
 		
 		return PullHarvest.userAgent;
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.harvest.Harvest#doHarvestStartedActions()
+	 */
+	protected void doHarvestStartedActions() throws HarvestException{
+		
+		logger.debug("Pull harvest started");
+		super.doHarvestStartedActions();
+	}
 }

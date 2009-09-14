@@ -108,6 +108,7 @@
 								</div>
 							</c:when>
 							<c:otherwise>
+								<stripes:messages/>
 							</c:otherwise>
 						</c:choose>
 					</stripes:layout-component>

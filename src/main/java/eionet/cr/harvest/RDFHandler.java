@@ -32,6 +32,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.UUID;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xml.sax.ErrorHandler;
@@ -122,28 +123,34 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	/** */
 	private String uuidNamePrefix;
 	
+	/** */
+	private String instantHarvestUser;
+	
+	/** */
+	private String spoTempTableName = "SPO_TEMP";
+	private String resourceTempTableName = "RESOURCE_TEMP";
+	
 	/**
-	 * @throws SQLException 
 	 * 
+	 * @param sourceUrl
+	 * @param genTime
 	 */
-	public RDFHandler(String sourceUrl, long genTime) throws SQLException{
+	public RDFHandler(String sourceUrl, long genTime){
+
+		/* argument validations */
 		
-		if (sourceUrl==null || sourceUrl.length()==0 || genTime<=0)
-			throw new IllegalArgumentException();
+		if (StringUtils.isBlank(sourceUrl))
+			throw new IllegalArgumentException("Source URL must not be null or blank!");
+		else if (genTime<=0)
+			throw new IllegalArgumentException("Gen-time must be > 0");
+		
+		/* field assignments */
 		
 		this.sourceUrl = sourceUrl;
 		this.sourceUrlHash = Hashes.spoHash(sourceUrl);
 		this.genTime = genTime;
 		this.logger = new HarvestLog(sourceUrl, genTime, LogFactory.getLog(this.getClass()));
-		
-		this.uuidNamePrefix = createUuidNamePrefix(String.valueOf(this.sourceUrlHash), String.valueOf(this.genTime)); 
-		
-		// init connection
-		connection = ConnectionUtil.getConnection();
-		
-		// prepare statements
-		prepareStatementForTriples();
-		prepareStatementForResources();
+		this.uuidNamePrefix = createUuidNamePrefix(String.valueOf(this.sourceUrlHash), String.valueOf(this.genTime));
 	}
 	
 	/*
@@ -295,18 +302,62 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	 */
 	private void onParsingStarted() throws SQLException{
 		
-		// make sure SPO_TEMP and RESOURCE_TEMP are empty, because we do only one harvest at a time
-		// and so any possible leftovers from previous harvest must be deleted)
-		clearTemporaries();
+		// init the db connection
+		connection = ConnectionUtil.getConnection();
+
+		// make sure SPO_TEMP and RESOURCE_TEMP are empty, because we do only one scheduled harvest at a time
+		// and so any possible leftovers from previous scheduled harvest must be deleted)
+		if (!isInstantHarvest()){
+			clearTemporaries();
+		}
 		
 		// create unfinished harvest flag for the current harvest
 		raiseUnfinishedHarvestFlag();
 		
+		// if instant harvest, then create temporary SPO_TEMP and RESOURCE_TEMP tables
+		if (isInstantHarvest()){
+			String tempTableSuffix = "_" + instantHarvestUser + "_" + Hashes.md5(sourceUrl + genTime);
+			spoTempTableName = spoTempTableName + tempTableSuffix;
+			resourceTempTableName = resourceTempTableName + tempTableSuffix;
+			createTemporaryTempTables();
+		}
+		
+		// prepare statements
+		prepareStatementForTriples();
+		prepareStatementForResources();
+
 		// store the hash of the source itself
 		addResource(sourceUrl, sourceUrlHash);
 		
 		// let the debugger know that we have got our first triple
 		logger.debug("Got first triple");
+	}
+	
+	/**
+	 * @throws SQLException 
+	 * 
+	 */
+	private void createTemporaryTempTables() throws SQLException{
+		
+		String sql1 = "create temporary table " + spoTempTableName + " like SPO_TEMP";
+		String sql2 = "create temporary table " + resourceTempTableName + " like RESOURCE_TEMP";
+		Statement stmt = null;
+		try{
+			stmt = getConnection().createStatement();
+			stmt.executeUpdate(sql1);
+			stmt.executeUpdate(sql2);
+		}
+		finally{
+			SQLUtil.close(stmt);
+		}
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	private boolean isInstantHarvest(){
+		return instantHarvestUser!=null;
 	}
 	
 	/**
@@ -480,11 +531,11 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	 */
 	private void prepareStatementForTriples() throws SQLException{
 		
-		StringBuffer buf = new StringBuffer();
-        buf.append("insert into SPO_TEMP (SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, OBJECT_DOUBLE, ").
-        append("ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG, OBJ_DERIV_SOURCE, OBJ_DERIV_SOURCE_GEN_TIME, OBJ_SOURCE_OBJECT) ").
-        append("VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        preparedStatementForTriples = getConnection().prepareStatement(buf.toString());
+		String s = "insert into " + spoTempTableName + 
+				" (SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, OBJECT_DOUBLE," +
+				" ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG, OBJ_DERIV_SOURCE, OBJ_DERIV_SOURCE_GEN_TIME, OBJ_SOURCE_OBJECT)" +
+				" VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        preparedStatementForTriples = getConnection().prepareStatement(s);
 	}
 
 	/**
@@ -493,7 +544,8 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	 */
 	private void prepareStatementForResources() throws SQLException{
 
-        preparedStatementForResources = getConnection().prepareStatement("insert ignore into RESOURCE_TEMP (URI, URI_HASH) VALUES (?, ?)");
+        preparedStatementForResources = getConnection().prepareStatement(
+        		"insert ignore into " + resourceTempTableName + " (URI, URI_HASH) VALUES (?, ?)");
 	}
 
 	/**
@@ -548,7 +600,7 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 
 		/* copy triples from SPO_TEMP into SPO */
 
-		logger.debug("Copying triples from SPO_TEMP into SPO");
+		logger.debug("Copying triples from " + spoTempTableName + " into SPO");
 		
 		StringBuffer buf = new StringBuffer();
 		buf.append("insert ignore into SPO (").
@@ -556,7 +608,7 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 		append("OBJ_DERIV_SOURCE, OBJ_DERIV_SOURCE_GEN_TIME, OBJ_SOURCE_OBJECT, SOURCE, GEN_TIME").
 		append(") select SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, OBJECT_DOUBLE, ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG, ").
 		append("OBJ_DERIV_SOURCE, OBJ_DERIV_SOURCE_GEN_TIME, OBJ_SOURCE_OBJECT, ").
-		append(sourceUrlHash).append(", ").append(genTime).append(" from SPO_TEMP");
+		append(sourceUrlHash).append(", ").append(genTime).append(" from ").append(spoTempTableName);
 
 		storedTriplesCount = SQLUtil.executeUpdate(buf.toString(), getConnection());
 		logger.debug(storedTriplesCount + " triples inserted into SPO, " + distinctSubjectsCount + " distinct subjects identified");
@@ -777,8 +829,8 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	 */
 	private void clearTemporaries() throws SQLException{
 		
-		logger.debug("Cleaning SPO_TEMP and RESOURCE_TEMP");
-		RDFHandler.clearTemporaries(getConnection());
+		logger.debug("Cleaning " + spoTempTableName + " and " + resourceTempTableName);
+		RDFHandler.clearTemporaries(getConnection(), spoTempTableName, resourceTempTableName);
 	}
 
 	/**
@@ -787,11 +839,22 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	 * 
 	 */
 	private static void clearTemporaries(Connection conn) throws SQLException{
-		
-		SQLUtil.executeUpdate("delete from SPO_TEMP", conn);
-		SQLUtil.executeUpdate("delete from RESOURCE_TEMP", conn);
+		clearTemporaries(conn, "SPO_TEMP", "RESOURCE_TEMP");
 	}
-	
+
+	/**
+	 * 
+	 * @param conn
+	 * @param spoTemp
+	 * @param resourceTemp
+	 * @throws SQLException
+	 */
+	private static void clearTemporaries(Connection conn, String spoTemp, String resourceTemp) throws SQLException{
+		
+		SQLUtil.executeUpdate("delete from " + spoTemp, conn);
+		SQLUtil.executeUpdate("delete from " + resourceTemp, conn);
+	}
+
 	/**
 	 * 
 	 * @throws SQLException
@@ -814,9 +877,12 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 				
 				LogFactory.getLog(RDFHandler.class).debug("Deleting leftovers from unfinished harvests");
 				
-				for (Iterator<UnfinishedHarvestDTO> i = list.iterator(); i.hasNext();){
-					UnfinishedHarvestDTO unfinishedHarvestDTO = i.next();
-					RDFHandler.rollback(unfinishedHarvestDTO.getSource(), unfinishedHarvestDTO.getGenTime(), conn);
+				for (UnfinishedHarvestDTO unfinishedHarvestDTO:list){
+					
+					// if the source is not actually being currently harvested, only then roll it back
+					if (!CurrentHarvests.contains(unfinishedHarvestDTO.getSource())){
+						RDFHandler.rollback(unfinishedHarvestDTO.getSource(), unfinishedHarvestDTO.getGenTime(), conn);
+					}
 				}
 			}
 		}
@@ -844,7 +910,7 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	 */
 	private static void rollback(long sourceUrlHash, long genTime, Connection conn) throws SQLException{
 
-		// delete rows of current harvest from SPO
+		// delete rows of given harvest from SPO
 		StringBuffer buf = new StringBuffer("delete from SPO where (SOURCE=");
 		buf.append(sourceUrlHash).append(" and GEN_TIME=").append(genTime).
 		append(") or (OBJ_DERIV_SOURCE=").append(sourceUrlHash).
@@ -1002,5 +1068,12 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	 */
 	public void setSourceLastModified(long sourceLastModified) {
 		this.sourceLastModified = sourceLastModified;
+	}
+
+	/**
+	 * @param instantHarvestUser the instantHarvestUser to set
+	 */
+	public void setInstantHarvestUser(String instantHarvestUser) {
+		this.instantHarvestUser = instantHarvestUser;
 	}
 }

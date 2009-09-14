@@ -46,10 +46,12 @@ import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.UrgentHarvestQueueItemDTO;
+import eionet.cr.harvest.CurrentHarvests;
 import eionet.cr.harvest.Harvest;
 import eionet.cr.harvest.HarvestDAOWriter;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.HarvestNotificationSender;
+import eionet.cr.harvest.InstantHarvester;
 import eionet.cr.harvest.PullHarvest;
 import eionet.cr.harvest.PushHarvest;
 import eionet.cr.harvest.RDFHandler;
@@ -65,7 +67,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 	private static Log logger = LogFactory.getLog(HarvestingJob.class);
 	
 	/** */
-	private static Harvest currentHarvest = null;
+//	private static Harvest currentHarvest = null;
 	private static List<HarvestSourceDTO> batchHarvestingQueue; 
 	
 	/** */
@@ -97,7 +99,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 			throw new JobExecutionException(e.toString(), e);
 		}
 		finally{
-			setCurrentHarvest(null);
+			CurrentHarvests.setQueuedHarvest(null);
 			resetBatchHarvestingQueue();
 		}
 	}
@@ -164,6 +166,13 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 	 */
 	private void pushHarvest(String url, String pushedContent){
 		
+		// if the source is currently being harvested by InstantHarvester then return
+		//if (url!=null && url.equals(InstantHarvester.getCurrentHarvestSourceUrl())){
+		if (url!=null && CurrentHarvests.contains(url)){
+			logger.debug("The source is currently being instantly-harvested, so skipping it");
+			return;
+		}
+		
 		try{
 			Integer sourceId = null;
 			int numOfResources = 0;
@@ -201,6 +210,13 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 		
 		if (harvestSource!=null){
 			
+			// if the source is currently being harvested by InstantHarvester then return
+			//if (harvestSource.getUrl().equals(InstantHarvester.getCurrentHarvestSourceUrl())){
+			if (CurrentHarvests.contains(harvestSource.getUrl())){
+				logger.debug("The source is currently being instantly-harvested, so skipping it");
+				return;
+			}
+			
 			int numOfResources = harvestSource.getResources()==null ? 0 : harvestSource.getResources().intValue();
 			
 			Harvest harvest = new PullHarvest(harvestSource.getUrl(), urgent ? null : harvestSource.getLastHarvest());
@@ -220,7 +236,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 	private void executeHarvest(Harvest harvest){
 		
 		if (harvest!=null){
-			setCurrentHarvest(harvest);
+			CurrentHarvests.setQueuedHarvest(harvest);
 			try {
 				harvest.setNotificationSender(new HarvestNotificationSender());
 				harvest.execute();
@@ -229,7 +245,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 				// exception already logged
 			}
 			finally{
-				setCurrentHarvest(null);
+				CurrentHarvests.setQueuedHarvest(null);
 			}
 		}
 	}
@@ -264,21 +280,29 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 	public void contextDestroyed(ServletContextEvent servletContextEvent) {
 	}
 	
-	/**
-	 * 
-	 * @return
-	 */
-	public static synchronized Harvest getCurrentHarvest() {
-		return currentHarvest;
-	}
-
-	/**
-	 * 
-	 * @param item
-	 */
-	public static synchronized void setCurrentHarvest(Harvest harvest) {
-		currentHarvest = harvest;
-	}
+//	/**
+//	 * 
+//	 * @return
+//	 */
+//	public static synchronized Harvest getCurrentHarvest() {
+//		return currentHarvest;
+//	}
+//
+//	/**
+//	 * 
+//	 * @return
+//	 */
+//	public static synchronized String getCurrentHarvestUrl() {
+//		return currentHarvest==null ? null : currentHarvest.getSourceUrlString();
+//	}
+//
+//	/**
+//	 * 
+//	 * @param item
+//	 */
+//	public static synchronized void setCurrentHarvest(Harvest harvest) {
+//		currentHarvest = harvest;
+//	}
 	
 	/**
 	 * @return the activeHours
