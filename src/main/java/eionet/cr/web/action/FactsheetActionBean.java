@@ -125,29 +125,26 @@ public class FactsheetActionBean extends AbstractActionBean{
 	 */
 	public Resolution harvest() throws HarvestException, SearchException {
 		
-//		if(isUserLoggedIn()){
-//			if (!StringUtils.isBlank(uri) && URLUtil.isURL(uri)){
-//
-//				InstantHarvester.Resolution resolution =
-//					InstantHarvester.harvest(StringUtils.substringBefore(uri, "#"), getUserName());
-//				if (resolution.equals(InstantHarvester.Resolution.ALREADY_HARVESTING))
-//					System.out.println("The source is currently being harvested by another user or background harvester!");
-//				else if (resolution.equals(InstantHarvester.Resolution.UNCOMPLETE))
-//					System.out.println("The harvest hasn't finished yet, but continues in the background!");
-//				else if (resolution.equals(InstantHarvester.Resolution.COMPLETE))
-//					System.out.println("The harvest has been completed!");
-//
-////				UrgentHarvestQueue.addPullHarvest(StringUtils.substringBefore(uri, "#"));
-////				showMessage("The source has been scheduled for urgent harvest!");
-//			}
-//		}
-//		else{
-//			handleCrException(getBundle().getString("not.logged.in"), GeneralConfig.SEVERITY_WARNING);
-//		}
+		if(isUserLoggedIn()){
+			if (!StringUtils.isBlank(uri) && URLUtil.isURL(uri)){
 
-		getContext().setSeverity(GeneralConfig.SEVERITY_INFO);
-		getContext().getMessages().add(new SimpleMessage("KALA"));
-		
+				InstantHarvester.Resolution resolution =
+					InstantHarvester.harvest(StringUtils.substringBefore(uri, "#"), getUserName());
+				if (resolution.equals(InstantHarvester.Resolution.ALREADY_HARVESTING))
+					System.out.println("The source is currently being harvested by another user or background harvester!");
+				else if (resolution.equals(InstantHarvester.Resolution.UNCOMPLETE))
+					System.out.println("The harvest hasn't finished yet, but continues in the background!");
+				else if (resolution.equals(InstantHarvester.Resolution.COMPLETE))
+					System.out.println("The harvest has been completed!");
+
+//				UrgentHarvestQueue.addPullHarvest(StringUtils.substringBefore(uri, "#"));
+//				showMessage("The source has been scheduled for urgent harvest!");
+			}
+		}
+		else{
+			handleCrException(getBundle().getString("not.logged.in"), GeneralConfig.SEVERITY_WARNING);
+		}
+
 		return new RedirectResolution(this.getClass(), "view").addParameter("uri", uri);
 	}
 
