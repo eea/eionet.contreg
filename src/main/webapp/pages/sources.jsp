@@ -4,9 +4,6 @@
 
 <stripes:layout-render name="/pages/common/template.jsp" pageTitle="Harvesting Sources">
 
-	<stripes:layout-component name="errors"/>
-	<stripes:layout-component name="messages"/>
-	
 	<stripes:layout-component name="contents">
 		<stripes:form id="generalForm" action="${actionBean.urlBinding}" method="get">
 			

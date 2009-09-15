@@ -88,7 +88,7 @@ public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
 		if (StringUtils.isBlank(uri) && anonHash==0){
 			
 			noCriteria = true;
-			handleCrException("Resource identifier not specified!", GeneralConfig.SEVERITY_CAUTION);
+			addCautionMessage("Resource identifier not specified!");
 		}
 		else{
 			ReferencesSearch refSearch = anonHash==0 ? new ReferencesSearch(uri) : new ReferencesSearch(anonHash);

@@ -114,7 +114,7 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
     @ValidationMethod(on="search")
     public void validateSearch(ValidationErrors errors) {
         if (this.searchExpression == null || this.searchExpression.equals("")) {
-            handleCrException(getBundle().getString("search.field.empty"), GeneralConfig.SEVERITY_CAUTION);
+            addCautionMessage(getBundle().getString("search.field.empty"));
         }
     }
 

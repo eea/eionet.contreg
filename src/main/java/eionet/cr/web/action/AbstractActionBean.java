@@ -20,7 +20,9 @@
  */
 package eionet.cr.web.action;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
 
@@ -58,6 +60,11 @@ public abstract class AbstractActionBean implements ActionBean {
 	
 	/** */
 	private static final String SESSION_MESSAGES = AbstractActionBean.class.getName() + ".sessionMessages";
+	
+	/** */
+	private static final String SYSTEM_MESSAGES = "systemMessages";
+	private static final String CAUTION_MESSAGES = "cautionMessages";
+	private static final String WARNING_MESSAGES = "warningMessages";
 	
 	/** */
 	protected static Log logger = LogFactory.getLog(AbstractActionBean.class);
@@ -111,41 +118,27 @@ public abstract class AbstractActionBean implements ActionBean {
 	}
 	
 	/**
-	 * Method handles {@link CrException}
 	 * 
-	 * @param exception exception to handle. 
+	 * @param message
 	 */
-	void handleCrException(CRException exception) {
-		logger.error(exception.getMessage(), exception);
-		getContext().getMessages().add(new SimpleError(exception.getMessage()));
-	}
-	
-	/**
-	 * 
-	 * @param String exception to handle.
-	 */
-	void handleCrException(String exception, int severity) {
-		logger.error(exception);
-		getContext().setSeverity(severity);
-		getContext().getMessages().add(new SimpleError(exception));
-	}
-	
-	/**
-	 * 
-	 * @param String message
-	 */
-	void showMessage(String msg) {
-		getContext().setSeverity(GeneralConfig.SEVERITY_INFO);
-		getContext().getMessages().add(new SimpleMessage(msg));
+	protected void addSystemMessage(String message){
+		getContext().getMessages(SYSTEM_MESSAGES).add(new SimpleMessage(message));
 	}
 
 	/**
 	 * 
-	 * @param msg
+	 * @param message
 	 */
-	void showMessage(Message msg) {
-		getContext().setSeverity(GeneralConfig.SEVERITY_INFO);
-		getContext().getMessages().add(msg);
+	protected void addCautionMessage(String message){
+		getContext().getMessages(CAUTION_MESSAGES).add(new SimpleMessage(message));
+	}
+
+	/**
+	 * 
+	 * @param message
+	 */
+	protected void addWarningMessage(String message){
+		getContext().getMessages(WARNING_MESSAGES).add(new SimpleMessage(message));
 	}
 
 	/**
@@ -187,7 +180,7 @@ public abstract class AbstractActionBean implements ActionBean {
      * @param field
      * @param error
      */
-	public void addFieldError(String field, ValidationError error) {
+	public void addFieldValidationError(String field, ValidationError error) {
 		context.getValidationErrors().add(field, error);
 	}
 
@@ -195,7 +188,7 @@ public abstract class AbstractActionBean implements ActionBean {
 	 * 
 	 * @param error
 	 */
-	public void addGlobalError(ValidationError error) {
+	public void addGlobalValidationError(ValidationError error) {
 		context.getValidationErrors().addGlobalError(error);
 	}
 

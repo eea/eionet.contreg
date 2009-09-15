@@ -136,7 +136,8 @@ public class RegisterURLActionBean extends AbstractActionBean{
 			harvestSource.setIntervalMinutes(
 					Integer.valueOf(
 							GeneralConfig.getProperty(GeneralConfig.HARVESTER_REFERRALS_INTERVAL,
-									String.valueOf(HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL))));			
+									String.valueOf(HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL))));
+			harvestSource.setTrackedFile(true);
 			factory.getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(harvestSource, getUserName());
 			
 			// schedule urgent harvest
@@ -154,7 +155,7 @@ public class RegisterURLActionBean extends AbstractActionBean{
 	public void validateSave(){
 		
 		if (StringUtils.isBlank(url) || !URLUtil.isURL(url)){
-			addGlobalError(new SimpleError("Not a valid URL!"));
+			addGlobalValidationError(new SimpleError("Not a valid URL!"));
 		}
 	}
 

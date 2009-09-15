@@ -22,6 +22,11 @@ package eionet.cr.harvest;
 
 import java.util.Date;
 
+import eionet.cr.common.Predicates;
+import eionet.cr.common.Subjects;
+import eionet.cr.dto.ObjectDTO;
+import eionet.cr.web.security.CRUser;
+
 public class InstantHarvest extends PullHarvest{
 
 	/** */
@@ -33,8 +38,13 @@ public class InstantHarvest extends PullHarvest{
 	 * @param lastHarvest
 	 */
 	public InstantHarvest(String sourceUrlString, Date lastHarvest, String userName){
+		
 		super(sourceUrlString, lastHarvest);
 		this.userName = userName;
+		
+		ObjectDTO objectDTO = new ObjectDTO(Subjects.CR_FILE, false);
+		objectDTO.setSourceUri(CRUser.registrationsUri(userName));
+		sourceMetadata.addObject(Predicates.RDF_TYPE, objectDTO);
 	}
 
 	/*

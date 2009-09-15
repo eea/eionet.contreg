@@ -222,7 +222,7 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
 		}
 		
 		if (sources.isEmpty()){
-			showMessage("No spatial objects currently found!");
+			addSystemMessage("No spatial objects currently found!");
 			return new ForwardResolution("/pages/googleEarthIntro.jsp");
 		}
 		else{

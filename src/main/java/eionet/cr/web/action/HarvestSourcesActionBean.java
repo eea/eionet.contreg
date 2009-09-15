@@ -149,11 +149,11 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
 		if(isUserLoggedIn()){
 			if (sourceUrl!=null && !sourceUrl.isEmpty()){
 				factory.getDao(HarvestSourceDAO.class).deleteSourcesByUrl(sourceUrl);
-				showMessage("Harvest source(s) deleted!");
+				addSystemMessage("Harvest source(s) deleted!");
 			}
 		}
 		else
-			handleCrException(getBundle().getString("not.logged.in"), GeneralConfig.SEVERITY_WARNING);
+			addWarningMessage(getBundle().getString("not.logged.in"));
 		return search();
 	}
 	
@@ -168,13 +168,13 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
 			if (sourceUrl!=null && !sourceUrl.isEmpty()){
 				UrgentHarvestQueue.addPullHarvests(sourceUrl);
 				if (sourceUrl.size()==1)
-					showMessage("The source has been scheduled for urgent harvest!");
+					addSystemMessage("The source has been scheduled for urgent harvest!");
 				else
-					showMessage("The sources have been scheduled for urgent harvest!");
+					addSystemMessage("The sources have been scheduled for urgent harvest!");
 			}
 		}
 		else
-			handleCrException(getBundle().getString("not.logged.in"), GeneralConfig.SEVERITY_WARNING);
+			addWarningMessage(getBundle().getString("not.logged.in"));
 		
 		return search();
 	}

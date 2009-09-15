@@ -4,8 +4,6 @@
 
 <stripes:layout-render name="/pages/common/template.jsp" pageTitle="Edit Harvesting Source">
 
-	<stripes:layout-component name="errors"/>
-	<stripes:layout-component name="messages"/>
 	<stripes:layout-component name="contents">
 	
 		<h1>Edit source</h1>

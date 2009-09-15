@@ -186,7 +186,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
 			}
 		}
 		else
-			handleCrException(getBundle().getString("not.logged.in"), GeneralConfig.SEVERITY_WARNING);
+			addWarningMessage(getBundle().getString("not.logged.in"));
 		
 		return resolution;
     }
@@ -203,13 +203,13 @@ public class HarvestSourceActionBean extends AbstractActionBean {
 		if(isUserLoggedIn()){
 			if (isPostRequest()){
 				factory.getDao(HarvestSourceDAO.class).editSource(getHarvestSource());
-				showMessage(getBundle().getString("update.success"));
+				addSystemMessage(getBundle().getString("update.success"));
 			}
 			else
 				harvestSource = factory.getDao(HarvestSourceDAO.class).getHarvestSourceById(harvestSource.getSourceId());
 		}
 		else
-			handleCrException(getBundle().getString("not.logged.in"), GeneralConfig.SEVERITY_WARNING);
+			addWarningMessage(getBundle().getString("not.logged.in"));
 		
         return resolution;
     }
@@ -231,7 +231,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
 		// retrieve list of harvests (for display) 
 		harvests = factory.getDao(HarvestDAO.class).getHarvestsBySourceId(harvestSource.getSourceId());
 
-    	showMessage("Successfully scheduled for urgent harvest!");
+		addSystemMessage("Successfully scheduled for urgent harvest!");
     	return new ForwardResolution("/pages/viewsource.jsp");
     }
     
@@ -252,11 +252,11 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     	if (isPostRequest()){
     		
 	    	if (harvestSource.getUrl()==null || harvestSource.getUrl().trim().length()==0 || !URLUtil.isURL(harvestSource.getUrl()))
-	    		addGlobalError(new SimpleError("Invalid URL"));
+	    		addGlobalValidationError(new SimpleError("Invalid URL"));
 	    	
 	    	if (harvestSource.getIntervalMinutes()!=null){
 		    	if (harvestSource.getIntervalMinutes().intValue()<0 || intervalMultiplier<0){
-		    		addGlobalError(new SimpleError("Harvest interval must be >=0"));
+		    		addGlobalValidationError(new SimpleError("Harvest interval must be >=0"));
 		    	}
 		    	else{
 		    		harvestSource.setIntervalMinutes(new Integer(harvestSource.getIntervalMinutes().intValue() * intervalMultiplier));

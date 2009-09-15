@@ -78,7 +78,7 @@ public interface HarvestSourceDAO extends IDao{
      * @throws DAOException
      * @param HarvestSourceDTO source
      */
-    public Integer addSourceIgnoreDuplicate(HarvestSourceDTO source, String user) throws DAOException;
+    public void addSourceIgnoreDuplicate(HarvestSourceDTO source, String user) throws DAOException;
 
     /**
      * @throws DAOException

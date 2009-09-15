@@ -35,6 +35,7 @@ import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.Util;
+import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.pagination.PaginationRequest;
 import eionet.cr.util.sql.ConnectionUtil;
 import eionet.cr.util.sql.SQLUtil;
@@ -163,8 +164,8 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 	}
 
     /** */
-	private static final String addSourceSQL = "insert into HARVEST_SOURCE (URL,EMAILS,TIME_CREATED,INTERVAL_MINUTES) VALUES (?,?,NOW(),?)";
-	private static final String addSourceIgnoreSQL = "insert into HARVEST_SOURCE (URL,EMAILS,TIME_CREATED,INTERVAL_MINUTES) VALUES (?,?,NOW(),?) on duplicate key update HARVEST_SOURCE_ID=LAST_INSERT_ID(HARVEST_SOURCE_ID)";
+	private static final String addSourceSQL = "insert into HARVEST_SOURCE (URL,EMAILS,TIME_CREATED,INTERVAL_MINUTES,TRACKED_FILE) VALUES (?,?,NOW(),?,?)";
+	private static final String addSourceIgnoreSQL = "insert ignore into HARVEST_SOURCE (URL,EMAILS,TIME_CREATED,INTERVAL_MINUTES,TRACKED_FILE) VALUES (?,?,NOW(),?,?)";
 
 	/*
      * (non-Javadoc)
@@ -179,8 +180,8 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
      * (non-Javadoc)
      * @see eionet.cr.dao.HarvestSourceDAO#addSourceIgnoreDuplicate(eionet.cr.dto.HarvestSourceDTO, java.lang.String)
      */
-	public Integer addSourceIgnoreDuplicate(HarvestSourceDTO source, String user) throws DAOException {
-		return addSource(addSourceIgnoreSQL, source, user);
+	public void addSourceIgnoreDuplicate(HarvestSourceDTO source, String user) throws DAOException {
+		addSource(addSourceIgnoreSQL, source, user);
 	}
 
 	/**
@@ -199,6 +200,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 		values.add(source.getUrl());
 		values.add(source.getEmails());
 		values.add(source.getIntervalMinutes());
+		values.add(YesNoBoolean.format(source.isTrackedFile()));
 		
 		Connection conn = null;
 		try{

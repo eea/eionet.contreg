@@ -3,8 +3,7 @@
 <%@ include file="/pages/common/taglibs.jsp"%>	
 
 <stripes:layout-render name="/pages/common/template.jsp" pageTitle="Add Harvesting Source">
-	<stripes:layout-component name="errors"/>
-	<stripes:layout-component name="messages"/>
+
 	<stripes:layout-component name="contents">
 		<h1>Add source</h1>
 	    <stripes:form action="/source.action" method="post">

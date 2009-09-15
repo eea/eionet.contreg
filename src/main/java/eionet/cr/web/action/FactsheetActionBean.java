@@ -44,7 +44,10 @@ import org.apache.commons.lang.StringUtils;
 import eionet.cr.common.Predicates;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
+import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDao;
+import eionet.cr.dao.mysql.MySQLHarvestSourceDAO;
+import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.HarvestException;
@@ -99,7 +102,7 @@ public class FactsheetActionBean extends AbstractActionBean{
 		
 		if (StringUtils.isBlank(uri) && uriHash==0){
 			noCriteria = true;
-			handleCrException("Resource identifier not specified!", GeneralConfig.SEVERITY_CAUTION);
+			addCautionMessage("Resource identifier not specified!");
 		}
 		else{
 			FactsheetSearch factsheetSearch = uriHash==0 ? new FactsheetSearch(uri) : new FactsheetSearch(uriHash);
@@ -121,30 +124,47 @@ public class FactsheetActionBean extends AbstractActionBean{
 	 * 
 	 * @return view resolution
 	 * @throws HarvestException
-	 * @throws SearchException
+	 * @throws DAOException 
 	 */
-	public Resolution harvest() throws HarvestException, SearchException {
+	public Resolution harvest() throws HarvestException, DAOException{
 		
 		if(isUserLoggedIn()){
 			if (!StringUtils.isBlank(uri) && URLUtil.isURL(uri)){
 
+				/* add this url into HARVEST_SOURCE table */
+				
+				HarvestSourceDAO dao = factory.getDao(HarvestSourceDAO.class);
+				HarvestSourceDTO dto = new HarvestSourceDTO();
+				dto.setUrl(uri);
+				dto.setEmails("");
+				dto.setIntervalMinutes(Integer.valueOf(GeneralConfig.getProperty(
+						GeneralConfig.HARVESTER_REFERRALS_INTERVAL,
+								String.valueOf(HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL))));
+				dto.setTrackedFile(true);
+				dao.addSourceIgnoreDuplicate(dto, getUserName());
+				
+				/* issue an instant harvest of this url */
+				
 				InstantHarvester.Resolution resolution =
 					InstantHarvester.harvest(StringUtils.substringBefore(uri, "#"), getUserName());
+				
+				/* give feedback to the user */
+				
 				if (resolution.equals(InstantHarvester.Resolution.ALREADY_HARVESTING))
-					System.out.println("The source is currently being harvested by another user or background harvester!");
+					addSystemMessage("The source is currently being harvested by another user or background harvester!");
 				else if (resolution.equals(InstantHarvester.Resolution.UNCOMPLETE))
-					System.out.println("The harvest hasn't finished yet, but continues in the background!");
+					addSystemMessage("The harvest hasn't finished yet, but continues in the background!");
 				else if (resolution.equals(InstantHarvester.Resolution.COMPLETE))
-					System.out.println("The harvest has been completed!");
+					addSystemMessage("The harvest has been completed!");
 
 //				UrgentHarvestQueue.addPullHarvest(StringUtils.substringBefore(uri, "#"));
 //				showMessage("The source has been scheduled for urgent harvest!");
 			}
 		}
 		else{
-			handleCrException(getBundle().getString("not.logged.in"), GeneralConfig.SEVERITY_WARNING);
+			addWarningMessage(getBundle().getString("not.logged.in"));
 		}
-
+		
 		return new RedirectResolution(this.getClass(), "view").addParameter("uri", uri);
 	}
 
@@ -219,10 +239,10 @@ public class FactsheetActionBean extends AbstractActionBean{
 	public void validateUserKnown(){
 		
 		if (getUser()==null){
-			handleCrException("Operation not allowed for anonymous users", GeneralConfig.SEVERITY_WARNING);
+			addWarningMessage("Operation not allowed for anonymous users");
 		}
 		else if (getContext().getEventName().equals("save") && StringUtils.isBlank(propertyValue)){
-			addGlobalError(new SimpleError("Property value must not be blank"));
+			addGlobalValidationError(new SimpleError("Property value must not be blank"));
 		}
 	}
 

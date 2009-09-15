@@ -84,33 +84,28 @@
 
 				<div id="workarea">
 				
-					<stripes:layout-component name="errors">
-						<stripes:errors/>
-					</stripes:layout-component>
+					<!--  validation errors -->
+					<stripes:errors/>
 					
+					<!--  messages -->
 					<stripes:layout-component name="messages">
-						<c:choose>
-							<c:when test="${actionBean.context.severity == 1}">
-								<div class="system-msg">
-									<stripes:messages/>
-								</div>
-							</c:when>
-							<c:when test="${actionBean.context.severity == 2}">
-								<div class="caution-msg">
-									<strong>Warning ...</strong>		
-									<stripes:messages/>
-								</div>
-							</c:when>
-							<c:when test="${actionBean.context.severity == 3}">
-								<div class="warning-msg">
-									<strong>Errors ...</strong>		
-									<stripes:messages/>
-								</div>
-							</c:when>
-							<c:otherwise>
-								<stripes:messages/>
-							</c:otherwise>
-						</c:choose>
+						<c:if test="${not empty systemMessages}">
+							<div class="system-msg">
+								<stripes:messages key="systemMessages"/>
+							</div>
+						</c:if>
+						<c:if test="${not empty cautionMessages}">
+							<div class="caution-msg">
+								<strong>Caution ...</strong>
+								<stripes:messages key="cautionMessages"/>
+							</div>
+						</c:if>
+						<c:if test="${not empty warningMessages}">
+							<div class="warning-msg">
+								<strong>Warning ...</strong>
+								<stripes:messages key="warningMessages"/>
+							</div>
+						</c:if>
 					</stripes:layout-component>
 					
 					<stripes:layout-component name="contents"/>
