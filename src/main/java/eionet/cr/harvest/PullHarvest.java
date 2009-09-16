@@ -133,7 +133,7 @@ public class PullHarvest extends Harvest{
 				if (sourceNotExistMessage!=null){
 					logger.debug(sourceNotExistMessage + ", going to delete the source");
 					try {
-						daoWriter = null; // we won't finishing actions to be done
+						daoWriter = null; // we dont't want finishing actions to be done
 						MySQLDAOFactory.get().getDao(HarvestSourceDAO.class).deleteSourcesByUrl(Collections.singletonList(sourceUrlString));
 					}
 					catch (DAOException e){

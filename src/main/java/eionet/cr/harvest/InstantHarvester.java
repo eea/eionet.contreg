@@ -39,7 +39,7 @@ import eionet.cr.harvest.scheduled.HarvestingJob;
 public class InstantHarvester extends Thread{
 	
 	/** */
-	public enum Resolution{ALREADY_HARVESTING, UNCOMPLETE, COMPLETE;}
+	public enum Resolution{ALREADY_HARVESTING, UNCOMPLETE, COMPLETE, NO_STRUCTURED_DATA, SOURCE_UNAVAILABLE;}
 	
 //	/** */
 //	private static String currentHarvestSourceUrl;
@@ -59,6 +59,10 @@ public class InstantHarvester extends Thread{
 	/** */
 	private HarvestException harvestException = null;
 	
+	/** */
+	private boolean rdfContentFound = false;
+	private boolean sourceAvailable = false;
+	
 	/**
 	 * 
 	 * @param sourceUrl
@@ -75,9 +79,10 @@ public class InstantHarvester extends Thread{
 	 */
 	public void run(){
 		
+		InstantHarvest instantHarvest = null;
 		try{
 			HarvestSourceDTO sourceDTO = MySQLDAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(sourceUrl);
-			InstantHarvest instantHarvest = new InstantHarvest(sourceUrl, sourceDTO.getLastHarvest(), userName);
+			instantHarvest = new InstantHarvest(sourceUrl, sourceDTO.getLastHarvest(), userName);
 			instantHarvest.execute();
 		}
 		catch (DAOException e){
@@ -87,8 +92,12 @@ public class InstantHarvester extends Thread{
 			harvestException = e;
 		}
 		finally{
-//			InstantHarvester.setCurrentHarvestSourceUrl(null);
+			if (instantHarvest!=null){
+				rdfContentFound = instantHarvest.isRdfContentFound();
+				sourceAvailable = instantHarvest.getSourceAvailable()!=null && instantHarvest.getSourceAvailable().booleanValue();
+			}
 			CurrentHarvests.removeInstantHarvest(sourceUrl);
+//			InstantHarvester.setCurrentHarvestSourceUrl(null);
 		}
 	}
 	
@@ -166,7 +175,15 @@ public class InstantHarvester extends Thread{
 				throw instantHarvester.getHarvestException();
 			}
 			else{
-				return instantHarvester.isAlive() ? Resolution.UNCOMPLETE : Resolution.COMPLETE;
+				if (instantHarvester.isAlive()){
+					return Resolution.UNCOMPLETE;
+				}
+				else{
+					if (!instantHarvester.isSourceAvailable())
+						return Resolution.SOURCE_UNAVAILABLE;
+					else
+						return instantHarvester.isRdfContentFound() ? Resolution.COMPLETE : Resolution.NO_STRUCTURED_DATA;
+				}
 			}
 		}
 		finally{
@@ -184,5 +201,19 @@ public class InstantHarvester extends Thread{
 	 */
 	public HarvestException getHarvestException() {
 		return harvestException;
+	}
+
+	/**
+	 * @return the rdfContentFound
+	 */
+	public boolean isRdfContentFound() {
+		return rdfContentFound;
+	}
+
+	/**
+	 * @return the sourceAvailable
+	 */
+	public boolean isSourceAvailable() {
+		return sourceAvailable;
 	}
 }

@@ -122,19 +122,38 @@
 						</div>				    
 				    </c:when>
 				    <c:otherwise>
-						<div style="margin-top:20px" class="note-msg">
-				    		<c:choose>
-				    			<c:when test="${not empty actionBean.uri}">
-				    				<strong>Nothing is known about ${actionBean.uri}</strong>
-				    			</c:when>
-				    			<c:when test="${actionBean.uriHash!=0}">
-				    				<strong>Nothing is known about this anonymous resource!</strong>
-				    			</c:when>
-				    			<c:otherwise>
-				    				<strong>Resource identifier not specified!</strong>
-				    			</c:otherwise>
-				    		</c:choose>		    		
-				    	</div>
+				    	<c:choose>
+			    			<c:when test="${not empty actionBean.uri}">
+			    				<div style="margin-top:20px" class="note-msg">
+			    					<strong>Nothing is known about ${actionBean.uri}</strong>
+			    				</div>
+			    				<c:if test='${sessionScope.crUser!=null && crfn:hasPermission(sessionScope.crUser.userName, "/", "u")}'>
+				    				<c:if test="${not empty actionBean.url}">
+					    				<ul id="dropdown-operations">
+											<li><a href="#">Operations</a>
+												<ul>
+													<li>
+														<stripes:link href="${actionBean.urlBinding}" event="harvest">Harvest
+																<stripes:link-param name="uri" value="${actionBean.uri}"/>
+														</stripes:link>
+													</li>
+												</ul>
+											</li>
+										</ul>
+									</c:if>
+								</c:if>
+			    			</c:when>
+			    			<c:when test="${actionBean.uriHash!=0}">
+			    				<div style="margin-top:20px" class="note-msg">
+			    					<strong>Nothing is known about this anonymous resource!</strong>
+			    				</div>
+			    			</c:when>
+			    			<c:otherwise>
+			    				<div style="margin-top:20px" class="note-msg">
+			    					<strong>Resource identifier not specified!</strong>
+			    				</div>
+			    			</c:otherwise>
+			    		</c:choose>
 					</c:otherwise>
 				</c:choose>
 			</c:when>

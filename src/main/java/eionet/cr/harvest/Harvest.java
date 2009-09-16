@@ -103,6 +103,9 @@ public abstract class Harvest {
 	/** */
 	protected long sourceLastModified;
 	
+	/** */
+	protected boolean rdfContentFound = false;
+	
 	/**
 	 * 
 	 * @param sourceUrlString
@@ -184,7 +187,8 @@ public abstract class Harvest {
 	        	warnings.add(rdfHandler.getSaxWarning());
 
 	        rdfHandler.commit();
-	        
+
+	        rdfContentFound = rdfHandler.isRdfContentFound();
 	        storedTriplesCount = rdfHandler.getStoredTriplesCount();
 	        distinctSubjectsCount = rdfHandler.getDistinctSubjectsCount();
 		}
@@ -401,5 +405,12 @@ public abstract class Harvest {
 	 */
 	protected void setStoredTriplesCount(int storedTriplesCount) {
 		this.storedTriplesCount = storedTriplesCount;
+	}
+
+	/**
+	 * @return the rdfContentFound
+	 */
+	public boolean isRdfContentFound() {
+		return rdfContentFound;
 	}
 }

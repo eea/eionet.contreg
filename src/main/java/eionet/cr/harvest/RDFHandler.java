@@ -130,6 +130,9 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	private String spoTempTableName = "SPO_TEMP";
 	private String resourceTempTableName = "RESOURCE_TEMP";
 	
+	/** */
+	private boolean rdfContentFound = false;
+	
 	/**
 	 * 
 	 * @param sourceUrl
@@ -159,6 +162,10 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	 */
 	public void statement(AResource subject, AResource predicate, AResource object){
 		
+		if (rdfContentFound==false){
+			rdfContentFound = true;
+		}
+		
 		statement(subject, predicate, object.isAnonymous() ? object.getAnonymousID() : object.getURI(), EMPTY_STRING, false, object.isAnonymous());
 	}
 
@@ -167,6 +174,10 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	 * @see com.hp.hpl.jena.rdf.arp.StatementHandler#statement(com.hp.hpl.jena.rdf.arp.AResource, com.hp.hpl.jena.rdf.arp.AResource, com.hp.hpl.jena.rdf.arp.ALiteral)
 	 */
 	public void statement(AResource subject, AResource predicate, ALiteral object){
+		
+		if (rdfContentFound==false){
+			rdfContentFound = true;
+		}
 		
 		statement(subject, predicate, object.toString(), object.getLang(), true, false);
 	}
@@ -302,9 +313,6 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	 */
 	private void onParsingStarted() throws SQLException{
 		
-		// init the db connection
-		connection = ConnectionUtil.getConnection();
-
 		// make sure SPO_TEMP and RESOURCE_TEMP are empty, because we do only one scheduled harvest at a time
 		// and so any possible leftovers from previous scheduled harvest must be deleted)
 		if (!isInstantHarvest()){
@@ -554,6 +562,9 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	 */
 	private Connection getConnection() throws SQLException {
 		
+		if (connection==null){
+			connection = ConnectionUtil.getConnection();
+		}
 		return connection;
 	}
 	
@@ -636,12 +647,12 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	 */
 	private void commitResources() throws SQLException{
 		
-		logger.debug("Copying resources from RESOURCE_TEMP into RESOURCE");
+		logger.debug("Copying resources from " + resourceTempTableName + " into RESOURCE");
 		
 		StringBuffer buf = new StringBuffer();
 		buf.append("insert into RESOURCE (URI, URI_HASH, FIRSTSEEN_SOURCE, FIRSTSEEN_TIME, LASTMODIFIED_TIME) ").
 		append("select URI, URI_HASH, ").append(sourceUrlHash).append(", ").append(genTime).append(", ").append(sourceLastModified).
-		append(" from RESOURCE_TEMP on duplicate key update RESOURCE.LASTMODIFIED_TIME=").append(sourceLastModified);
+		append(" from ").append(resourceTempTableName).append(" on duplicate key update RESOURCE.LASTMODIFIED_TIME=").append(sourceLastModified);
 		
 		SQLUtil.executeUpdate(buf.toString(), getConnection());
 		logger.debug("Resources inserted into RESOURCE");
@@ -1075,5 +1086,12 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	 */
 	public void setInstantHarvestUser(String instantHarvestUser) {
 		this.instantHarvestUser = instantHarvestUser;
+	}
+
+	/**
+	 * @return the rdfContentFound
+	 */
+	public boolean isRdfContentFound() {
+		return rdfContentFound;
 	}
 }

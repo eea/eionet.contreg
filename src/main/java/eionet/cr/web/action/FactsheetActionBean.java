@@ -156,6 +156,12 @@ public class FactsheetActionBean extends AbstractActionBean{
 					addSystemMessage("The harvest hasn't finished yet, but continues in the background!");
 				else if (resolution.equals(InstantHarvester.Resolution.COMPLETE))
 					addSystemMessage("The harvest has been completed!");
+				else if (resolution.equals(InstantHarvester.Resolution.SOURCE_UNAVAILABLE))
+					addSystemMessage("The resource was not available!");
+				else if (resolution.equals(InstantHarvester.Resolution.NO_STRUCTURED_DATA))
+					addSystemMessage("The resource contained no structured data!");
+				else
+					addSystemMessage("No feedback given from harvest!");
 
 //				UrgentHarvestQueue.addPullHarvest(StringUtils.substringBefore(uri, "#"));
 //				showMessage("The source has been scheduled for urgent harvest!");
@@ -412,5 +418,13 @@ public class FactsheetActionBean extends AbstractActionBean{
 	 */
 	public void setUriHash(long uriHash) {
 		this.uriHash = uriHash;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public String getUrl(){
+		return uri!=null && URLUtil.isURL(uri) ? uri : null;
 	}
 }
