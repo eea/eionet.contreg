@@ -18,39 +18,46 @@
  * Contributor(s):
  * Aleksandr Ivanov, Tieto Eesti
  */
-package eionet.cr.web.action;
+package eionet.cr.util;
 
+import java.util.LinkedList;
 import java.util.List;
 
-import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.action.UrlBinding;
-import eionet.cr.util.Pair;
+import junit.framework.TestCase;
+
+import org.junit.Test;
+
 import eionet.cr.web.util.RecentDiscoveredFilesCache;
 
 /**
- * ActionBean class responsible for preparing data for index.jsp rendering.
- * 
  * @author Aleksandr Ivanov
  * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
-@UrlBinding("/index.jsp")
-public class FrontpageActionBean extends AbstractActionBean {
+public class RecentDiscoveredFilesCacheTest extends TestCase {
 	
-	private List<Pair<String,String>> recentFiles;
-	
-	@DefaultHandler
-	public Resolution frontpage() {
-		recentFiles = RecentDiscoveredFilesCache.getInstance().getRecentDiscoveredFiles(10);
-		return new ForwardResolution("/pages/index.jsp");
+	@Test
+	public void testCache(){
+		RecentDiscoveredFilesCache cache = RecentDiscoveredFilesCache.getInstance();
+		assertEquals(0, cache.getRecentDiscoveredFiles(100).size());
+		for(int i = 0; i < 100; i++){
+			cache.updateCache(getTestData(11));
+			assertEquals(10, cache.getRecentDiscoveredFiles(10).size());
+		}
+		
+		assertEquals(3, cache.getRecentDiscoveredFiles(3).size());
+		assertEquals("8", cache.getRecentDiscoveredFiles(3).get(0).getId());
+		
 	}
 
 	/**
-	 * @return the recentFiles
+	 * @return
 	 */
-	public List<Pair<String, String>> getRecentFiles() {
-		return recentFiles;
+	private List<Pair<String, String>> getTestData(int size) {
+		List<Pair<String,String>> result = new LinkedList<Pair<String,String>>();
+		for(int i=0; i< size; i++) {
+			result.add(new Pair<String, String>(i + "", "value"));
+		}
+		return result;
 	}
 
 }

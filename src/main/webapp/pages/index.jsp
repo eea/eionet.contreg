@@ -30,7 +30,7 @@
 	<div style="background-color:#f0f0f0; padding:0.5em; margin: 0.3em; border:1px dotted black;">
 		<div style="font-size:1.2em;font-weight:bold">Recently discovered files:</div>
 		<c:choose>
-			<c:when test="${actionBean.recentFiles eq null}">
+			<c:when test="${empty actionBean.recentFiles}">
 				<p class="system-msg">No recently discovered files found</p>
 			</c:when>
 			<c:otherwise>
