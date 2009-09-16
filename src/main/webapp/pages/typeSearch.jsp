@@ -5,7 +5,7 @@
 <stripes:layout-render name="/pages/common/template.jsp" pageTitle="Type search">
 
 	<stripes:layout-component name="contents">
-
+		<div style="max-width: 750px;">
        <h1>Type search</h1>
        <p>
        	This page enables to find content by type. Below is the list of types known to CR.
@@ -13,43 +13,79 @@
        	The search will return the list of all resources having the type you selected.
        	To view a resource's factsheet, click the relevant action icon next to it.   
        </p>
-
-	    <stripes:form action="/typeSearch.action" method="get" id="typesearch">
-
-				<stripes:select name="type" onchange="hideElement('searchColumns')">
-					<c:forEach var="picklistItem" items="${actionBean.availableTypes}">
-    					<stripes:option value="${picklistItem.id}" label="${picklistItem.value} (${picklistItem.id})"/>
-    				</c:forEach>
-				</stripes:select>&nbsp;
-				<stripes:submit name="search" value="Search"/>
-		</stripes:form>
-		<stripes:form action="/typeSearch.action" id="typesearch">
-		<stripes:hidden name="type" value="${actionBean.type }"/>				
-				<c:if test="${!empty actionBean.availableColumns}">
-					<div id="searchColumns">
-						<label for="searchColumnsSelect"> Choose which columns to display in a search result (maximum ${actionBean.maxDisplayedColumns })</label> <br/>
-						<stripes:select 
-								name="selectedColumns" 
-								multiple="multiple" 
-								size="5" 
-								style="max-width:300px; margin-top:5px" 
-								id="searchColumnsSelect" value="${actionBean.selectedColumns}" >
-							<c:forEach items="${actionBean.availableColumns}" var="typeColumn">
-								<stripes:option value="${typeColumn.id}" label="${typeColumn.value }"/>
-							</c:forEach>
-						</stripes:select>
-						<stripes:submit name="setSearchColumns" value="Set search columns" id="searchColumnsButton"/>
-					</div>
+		<stripes:form action="/typeSearch.action" method="get">
+			<stripes:select name="type">
+				<c:forEach items="${actionBean.availableTypes }" var="type">
+					<stripes:option value="${type.id}">${type.value} (${type.id})</stripes:option>
+				</c:forEach>
+			</stripes:select>
+			<stripes:submit name="search" value="Search" /> 
+			<c:if test='${sessionScope.crUser!=null && crfn:hasPermission(sessionScope.crUser.userName, "/", "u")}'>
+				&nbsp;<stripes:submit name="introspect" value="Introspect"/>
+			</c:if>		
+		</stripes:form><br/>
+			<c:if test="${not empty actionBean.type}">
+			<div style="margin-bottom:10px; float:right;  min-width:400px; width:50%;">
+				<fieldset>
+				<legend>Select filters</legend>
+				<c:if test="${not empty actionBean.availableFilters}">
+				<stripes:form action="/typeSearch.action" method="post">
+					<stripes:hidden name="addFilter" value="addFilter"/>
+					<stripes:hidden name="type" value="${actionBean.type }"/>
+					<stripes:select name="newFilter" onchange="this.form.submit();">
+						<stripes:option value="">Select filter to add </stripes:option>
+						<c:forEach items="${actionBean.availableFilters}" var="column">
+							<stripes:option value="${column.key}">${column.value}</stripes:option>					
+						</c:forEach>
+					</stripes:select>
+					<noscript>
+						<stripes:submit name="addFilter" value="Add filter"/>
+					</noscript>
+				</stripes:form>
+				<br/>
 				</c:if>
-				<c:if test='${sessionScope.crUser!=null && crfn:hasPermission(sessionScope.crUser.userName, "/", "u")}'>
-					&nbsp;<stripes:submit name="introspect" value="Introspect"/>
-				</c:if>		
-
-				<c:if test="${not empty param.search or not empty param.setSearchColumns}">
-					<stripes:layout-render name="/pages/common/subjectsResultList.jsp" tableClass="sortable"/>
-				</c:if>
-
-			</stripes:form>
-
+					<c:if test="${not empty actionBean.displayFilters}">
+						<stripes:form action="/typeSearch.action" method="post">
+						<stripes:hidden name="type" value="${actionBean.type }"/>
+						<table>
+							<tbody>
+								<c:forEach items="${actionBean.displayFilters}" var="filter">
+									<tr>
+										<td>${filter.key}</td>
+										<td><stripes:text name="selectedFilters[${filter.value.id}]" size="40" value="${filter.value.value}"/></td>
+										<td>
+											<stripes:submit name="removeFilter_${filter.value.id}" value="-"/>
+										</td>
+									</tr>
+								</c:forEach>
+							</tbody>
+						</table>
+						<stripes:submit name="applyFilters" value="Apply filters"/>
+						</stripes:form>
+						<br/>
+					</c:if>	
+				</fieldset>		
+			</div>
+			</c:if>
+		<c:if test="${not empty actionBean.type and not empty actionBean.availableColumns}">
+			<div style="max-width: 350px;">
+				<fieldset>
+				<legend>Select columns to be displayed (max 4)</legend>
+				<stripes:form action="/typeSearch.action" method="post">
+					<stripes:hidden name="type" value="${actionBean.type }"/>
+					<stripes:select name="selectedColumns" multiple="multiple" size="5" style="min-width:250px; width:250px;">
+						<c:forEach items="${actionBean.availableColumns }" var="column">
+							<stripes:option value="${column.key}">${column.value}</stripes:option>					
+						</c:forEach>
+					</stripes:select>			
+					<stripes:submit name="setSearchColumns" value="Set"/>
+				</stripes:form>
+				</fieldset>		
+			</div>
+		</c:if>
+		<c:if test="${! empty actionBean.type}">
+			<stripes:layout-render name="/pages/common/subjectsResultList.jsp" tableClass="sortable" />
+		</c:if>
+		</div>
 	</stripes:layout-component>
 </stripes:layout-render>

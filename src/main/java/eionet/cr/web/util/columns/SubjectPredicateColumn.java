@@ -179,7 +179,7 @@ public class SubjectPredicateColumn extends SearchResultColumn{
 				if (subjectDTO.isAnonymous()){
 					href.append("uriHash=").append(subjectDTO.getUriHash());
 				}
-				else{
+				else if (!StringUtils.isBlank(subjectDTO.getUri())){
 					href.append("uri=").append(Util.urlEncode(subjectDTO.getUri()));
 				}				
 				result = new StringBuffer("<a href=\"").append(href).append("\">").append(result).append("</a>").toString();

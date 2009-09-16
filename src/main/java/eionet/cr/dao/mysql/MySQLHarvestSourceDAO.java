@@ -118,7 +118,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
     	if (!StringUtils.isBlank(searchString)) {
     		searchParams.add(searchString);
     	}
-    	if (sortingRequest != null) {
+    	if (sortingRequest != null && sortingRequest.getSortingColumnName() != null) {
     		sql += " ORDER BY " + sortingRequest.getSortingColumnName() + " " + sortingRequest.getSortingColumnOrder();
     	} else {
     		//in case no sorting request is present, use default one.

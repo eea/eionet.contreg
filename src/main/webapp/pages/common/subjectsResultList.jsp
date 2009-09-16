@@ -2,7 +2,7 @@
 
 <stripes:layout-definition>
 
-	<div style="margin-top:20px">
+	<div style="margin-top:20px; clear:both;">
 		<c:choose>
 			<c:when test="${actionBean.resultList!=null && fn:length(actionBean.resultList)>0}">
 				<c:if test="${actionBean.matchCount>0}">
