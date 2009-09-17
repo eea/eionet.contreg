@@ -81,6 +81,9 @@
   	<listener>
 		<listener-class>eionet.cr.harvest.scheduled.HarvestingJob</listener-class>
 	</listener>
+  	<listener>
+		<listener-class>eionet.cr.web.util.RecentResourcesCacheUpdater</listener-class>
+	</listener>
 
 	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 	<!--              servlets                  -->

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,7 @@ import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
+import eionet.cr.util.URIUtil;
 import eionet.cr.util.Util;
 import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.sql.PairReader;
@@ -65,37 +67,72 @@ public class MySQLHelperDao extends MySQLBaseDAO implements HelperDao {
 	 */
 	public List<Pair<String, String>> getRecentlyDiscoveredFiles(int limit) throws DAOException {
 		
-		//workaround as mysql doesn't allow limit in subqueries
-		//first let's select needed uri_hash
-		String sql = "SELECT DISTINCT RESOURCE.URI_HASH FROM RESOURCE INNER JOIN SPO ON RESOURCE.URI_HASH = SPO.SUBJECT" +
+		/* Get the hashes and URIs of recent subjects of type=cr:file
+		 * (we need URIs, because we might need to derive labels from them).
+		 */
+		
+		String sql = "SELECT DISTINCT RESOURCE.URI_HASH, RESOURCE.URI FROM RESOURCE INNER JOIN SPO ON RESOURCE.URI_HASH = SPO.SUBJECT" +
 				" WHERE SPO.PREDICATE= ? AND OBJECT_HASH= ? ORDER BY FIRSTSEEN_TIME DESC LIMIT ?;";
 		List<Long> params = new LinkedList<Long>();
 		params.add(Hashes.spoHash(Predicates.RDF_TYPE));
 		params.add( Hashes.spoHash(Subjects.CR_FILE));
 		params.add(new Long(limit));
 		
-		List<Long> result = executeQuery(sql, params, new SingleObjectReader<Long>());
-		logger.debug(result);
+		Map<String,String> labelMap = new LinkedHashMap<String,String>();
+		Map<String,String> uriMap = new LinkedHashMap<String,String>();
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		try{
+			conn = getConnection();
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setLong(1, Hashes.spoHash(Predicates.RDF_TYPE));
+			pstmt.setLong(2, Hashes.spoHash(Subjects.CR_FILE));
+			pstmt.setLong(3, limit);
+			rs = pstmt.executeQuery();
+			while (rs.next()){
+				uriMap.put(rs.getString(1), rs.getString(2));
+				labelMap.put(rs.getString(1), "");
+			}
 
-		if (result!=null && !result.isEmpty()){
+			/* if any subjects were found, let's find their labels */
 			
-			//now let's fetch labels
-			sql = "SELECT DISTINCT SPO.SUBJECT as id, SPO.OBJECT as value FROM RESOURCE INNER JOIN SPO ON RESOURCE.URI_HASH = SPO.SUBJECT" +
-					" WHERE SPO.PREDICATE= ? AND SPO.SUBJECT IN (" + Util.toCSV(result) + 
-					") ORDER BY FIRSTSEEN_TIME DESC LIMIT ?;";
-			
-			logger.debug(sql);
-			params.clear();
-			params.add(Hashes.spoHash(Predicates.RDFS_LABEL));
-			params.add(new Long(limit));
-			List<Pair<String, String>> resultList = executeQuery(sql, params, new PairReader<String, String>());
-			logger.debug(resultList);
-			return resultList;
+			if (!labelMap.isEmpty()){
+				
+				sql = "SELECT DISTINCT SPO.SUBJECT as id, SPO.OBJECT as value FROM SPO WHERE SPO.PREDICATE=? " +
+						"AND SPO.SUBJECT IN (" + Util.toCSV(labelMap.keySet()) + ")";				
+				pstmt = conn.prepareStatement(sql);
+				pstmt.setLong(1, Hashes.spoHash(Predicates.RDFS_LABEL));
+				rs = pstmt.executeQuery();
+				while (rs.next()){
+					labelMap.put(rs.getString(1), rs.getString(2));
+				}
+			}
 		}
-		else{
-			return new ArrayList<Pair<String, String>>();
+		catch (SQLException e){
+			throw new DAOException(e.toString(), e);
+		}
+		finally{
+			SQLUtil.close(rs);
+			SQLUtil.close(pstmt);
+			SQLUtil.close(conn);
 		}
 		
+		/* Loop through labels and if a label was not found for a particular subject,
+		 * then derive the label from the subject's URI.
+		 */
+		ArrayList<Pair<String, String>> result = new ArrayList<Pair<String, String>>();
+		for (String uriHash:labelMap.keySet()){
+			if (StringUtils.isBlank(labelMap.get(uriHash))){
+				result.add(new Pair(uriHash, URIUtil.deriveLabel(uriMap.get(uriHash))));
+			}
+			else{
+				result.add(new Pair(uriHash, labelMap.get(uriHash)));
+			}
+		}
+		
+		return result;
 	}
 
 	/** */

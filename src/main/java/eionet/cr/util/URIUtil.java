@@ -65,6 +65,30 @@ public class URIUtil {
 			return false;
 		}
 	}
+	
+	/**
+	 * 
+	 * @param uri
+	 * @return
+	 */
+	public static String deriveLabel(String uri){
+		
+		if (uri==null){
+			return "";
+		}		
+		else if (URIUtil.isSchemedURI(uri) && !URLUtil.isURL(uri)){
+			return uri;
+		}
+		else{
+			int i = Math.max(Math.max(uri.lastIndexOf('#'), uri.lastIndexOf('/')), uri.lastIndexOf(':'));
+			if (i>=0){
+				return uri.substring(i+1);
+			}
+			else{
+				return uri;
+			}
+		}
+	}
 
 	/**
 	 * 

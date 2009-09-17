@@ -24,9 +24,9 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 
-import org.apache.commons.lang.StringUtils;
-
 import net.sourceforge.stripes.action.UrlBinding;
+
+import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.dto.ObjectDTO;
@@ -156,19 +156,7 @@ public class SubjectPredicateColumn extends SearchResultColumn{
 						result = "Anonymous object";
 					}
 					else{
-						String subjectUri = subjectDTO.getUri();
-						if (URIUtil.isSchemedURI(subjectUri) && !URLUtil.isURL(subjectUri)){
-							result = subjectUri;
-						}
-						else{
-							int i = Math.max(Math.max(subjectUri.lastIndexOf('#'), subjectUri.lastIndexOf('/')), subjectUri.lastIndexOf(':'));
-							if (i>=0){
-								result = subjectUri.substring(i+1);
-							}
-							else{
-								result = subjectUri;
-							}
-						}
+						result = URIUtil.deriveLabel(subjectDTO.getUri());
 					}
 				}
 				

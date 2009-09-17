@@ -27,7 +27,7 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
-import eionet.cr.web.util.RecentDiscoveredFilesCache;
+import eionet.cr.web.util.RecentResourcesCache;
 
 /**
  * @author Aleksandr Ivanov
@@ -37,7 +37,7 @@ public class RecentDiscoveredFilesCacheTest extends TestCase {
 	
 	@Test
 	public void testCache(){
-		RecentDiscoveredFilesCache cache = RecentDiscoveredFilesCache.getInstance();
+		RecentResourcesCache cache = RecentResourcesCache.getInstance();
 		assertEquals(0, cache.getRecentDiscoveredFiles(100).size());
 		for(int i = 0; i < 100; i++){
 			cache.updateCache(getTestData(11));
