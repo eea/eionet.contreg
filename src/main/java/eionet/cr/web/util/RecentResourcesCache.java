@@ -93,7 +93,7 @@ public final class RecentResourcesCache{
 		if (update!=null){
 			recentFiles.addAll(update);
 			if(recentFiles.size() > CACHE_LIMIT) {
-				recentFiles.subList(0, recentFiles.size() - 10).clear();
+				recentFiles.subList(0, recentFiles.size() - CACHE_LIMIT).clear();
 			}
 		}
 	}
