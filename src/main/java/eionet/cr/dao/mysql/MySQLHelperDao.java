@@ -136,7 +136,7 @@ public class MySQLHelperDao extends MySQLBaseDAO implements HelperDao {
 	}
 
 	/** */
-	private static final String sqlQuery = "select distinct OBJECT from SPO where PREDICATE=? and LIT_OBJ='Y' and ANON_OBJ='N' order by OBJECT asc";
+	private static final String sqlQuery = "select distinct OBJECT from SPO where PREDICATE=? and LIT_OBJ='Y' order by OBJECT asc";
 
 	/** 
 	 * @see eionet.cr.dao.HelperDao#getPicklistForPredicate(java.lang.String)
