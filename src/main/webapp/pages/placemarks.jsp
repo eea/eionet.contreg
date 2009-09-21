@@ -46,13 +46,13 @@
 		
 		<c:forEach items="${actionBean.resultList}" var="subject" varStatus="resultListStatus">
 		
-			<c:set var="subjectLatitude" value="${crfn:formatPredicateObjects(subject, wgsLatitude)}"/>
-			<c:set var="subjectLongitude" value="${crfn:formatPredicateObjects(subject, wgsLongitude)}"/>
+			<c:set var="subjectLatitude" value="${crfn:getObjectLiteral(subject, wgsLatitude)}"/>
+			<c:set var="subjectLongitude" value="${crfn:getObjectLiteral(subject, wgsLongitude)}"/>
 			
 			<c:if test="${not empty subjectLatitude && not empty subjectLongitude}">
 			
-				<c:set var="subjectLabel" value="${crfn:formatPredicateObjects(subject, rdfsLabel)}"/>
-				<c:set var="subjectType" value="${crfn:formatPredicateObjects(subject, rdfType)}"/>
+				<c:set var="subjectLabel" value="${subject.label}"/>
+				<c:set var="subjectType" value="${crfn:getObjectLiteral(subject, rdfType)}"/>
 				<c:set var="factsheetUrl" value="${actionBean.contextUrl}/factsheet.action?uri=${crfn:urlEncode(subject.uri)}"/>
 			
 				<Placemark id="${subject.uriHash}">	

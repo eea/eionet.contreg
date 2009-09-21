@@ -145,4 +145,16 @@
 		</example>
 	</function>
 	
+	<function>
+		<description>
+		</description>
+		<name>getObjectLiteral</name>
+		<function-class>eionet.cr.web.util.JstlFunctions</function-class>
+		<function-signature>java.lang.String getObjectLiteral(eionet.cr.dto.SubjectDTO, java.lang.String)</function-signature>
+		<example>
+			${getObjectLiteral(subjectDTO, predicateUri)}
+		</example>
+	</function>
+
+	
 </taglib>

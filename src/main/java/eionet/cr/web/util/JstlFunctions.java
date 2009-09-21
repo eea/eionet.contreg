@@ -263,4 +263,19 @@ public class JstlFunctions {
 	public static long spoHash(String s){
 		return Hashes.spoHash(s);
 	}
+	
+	/**
+	 * 
+	 * @param subject
+	 * @param predicate
+	 * @return
+	 */
+	public static String getObjectLiteral(SubjectDTO subject, String predicate){
+		
+		if (subject==null)
+			return "";
+		
+		ObjectDTO object = subject.getObject(predicate, ObjectDTO.Type.LITERAL);
+		return object==null ? "" : object.getValue();
+	}
 }

@@ -30,6 +30,7 @@ import java.util.Set;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.util.Hashes;
+import eionet.cr.util.URIUtil;
 import eionet.cr.util.URLUtil;
 
 /**
@@ -355,5 +356,21 @@ public class SubjectDTO{
 	 */
 	public void setLastModifiedTime(Date lastModifiedTime) {
 		this.lastModifiedTime = lastModifiedTime;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public String getLabel(){
+		
+		ObjectDTO object = getObject(Predicates.RDFS_LABEL, ObjectDTO.Type.LITERAL);
+		String label = object.getValue();
+		if (label!=null && label.trim().length()>0)
+			return label;
+		else if (isAnonymous())
+			return "Anonymous resource";
+		else
+			return URIUtil.deriveLabel(getUri());
 	}
 }
