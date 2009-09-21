@@ -259,7 +259,7 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 				ArrayList<ValueLanguagePair> subjectRdfValues = rdfValues.get(subject.getAnonymousID());
 				if (subjectRdfValues==null){
 					subjectRdfValues = new ArrayList<ValueLanguagePair>();
-					rdfValues.put(subject.getAnonymousID(), subjectRdfValues);
+					rdfValues.put(subjectUri, subjectRdfValues);
 				}
 				subjectRdfValues.add(new ValueLanguagePair(object, objectLang));
 			}

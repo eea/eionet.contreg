@@ -129,7 +129,7 @@ public class HarvestSimpleDbTest extends DatabaseTestCase {
                         ITable expSpoTable = expectedDataSet.getTable("SPO");
 
                         // Assert actual SPO table matches expected table
-                        Assertion.assertEquals(actSPOTable, expSpoTable);
+                        Assertion.assertEquals(expSpoTable, actSPOTable);
 		} catch (Throwable e) {
 			e.printStackTrace();
 			fail("Was not expecting this exception: " + e.toString());
