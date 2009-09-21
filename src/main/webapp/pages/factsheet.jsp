@@ -125,7 +125,14 @@
 				    	<c:choose>
 			    			<c:when test="${not empty actionBean.uri}">
 			    				<div style="margin-top:20px" class="note-msg">
-			    					<strong>Nothing is known about ${actionBean.uri}</strong>
+			    					<c:choose>
+			    						<c:when test="${not empty actionBean.url}">
+			    							<strong>Nothing is known about <a href="${actionBean.url}">${actionBean.url}</a></strong>
+			    						</c:when>
+			    						<c:otherwise>
+			    							<strong>Nothing is known about ${actionBean.uri}</strong>
+			    						</c:otherwise>
+			    					</c:choose>			    					
 			    				</div>
 			    				<c:if test='${sessionScope.crUser!=null && crfn:hasPermission(sessionScope.crUser.userName, "/", "u")}'>
 				    				<c:if test="${not empty actionBean.url}">
