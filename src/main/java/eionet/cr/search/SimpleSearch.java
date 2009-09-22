@@ -21,12 +21,9 @@
 package eionet.cr.search;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import eionet.cr.common.Predicates;
-import eionet.cr.dao.HelperDao;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.util.SearchExpression;
 import eionet.cr.search.util.SimpleSearchDataReader;
@@ -34,14 +31,15 @@ import eionet.cr.search.util.SimpleSearchHashesReader;
 import eionet.cr.search.util.SubjectDataReader;
 import eionet.cr.search.util.SubjectHashesReader;
 import eionet.cr.util.Hashes;
-import eionet.cr.web.util.columns.ReferringPredicatesColumn;
 import eionet.cr.web.util.columns.SubjectLastModifiedColumn;
 
 /**
  * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
+ *	@deprecated - use {@link HelperDao#} performSimpleSearch method instead.
  */
+@Deprecated
 public class SimpleSearch extends AbstractSubjectSearch{
 
 	/** */

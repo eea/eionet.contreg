@@ -21,9 +21,8 @@
 package eionet.cr.web.action;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 import net.sourceforge.stripes.action.DefaultHandler;
@@ -37,14 +36,16 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import eionet.cr.common.Predicates;
-import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HelperDao;
+import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
-import eionet.cr.search.SimpleSearch;
 import eionet.cr.search.UriSearch;
 import eionet.cr.search.util.SearchExpression;
+import eionet.cr.search.util.SortOrder;
+import eionet.cr.util.Pair;
+import eionet.cr.util.SortingRequest;
 import eionet.cr.web.util.columns.SearchResultColumn;
 import eionet.cr.web.util.columns.SubjectLastModifiedColumn;
 import eionet.cr.web.util.columns.SubjectPredicateColumn;
@@ -56,9 +57,6 @@ import eionet.cr.web.util.columns.SubjectPredicateColumn;
  */
 @UrlBinding("/simpleSearch.action")
 public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
-	
-	/** */
-	private static Log logger = LogFactory.getLog(SimpleSearchActionBean.class);
 	
 	/** */
 	private String searchExpression;
@@ -82,31 +80,37 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 	 */
     public Resolution search() throws SearchException{
 		
-    	SearchExpression searchExpression = new SearchExpression(this.searchExpression);
-    	if (!searchExpression.isEmpty()){
-    		
-	    	if (searchExpression.isUri()){
-	    		
-	    		UriSearch uriSearch = new UriSearch(searchExpression.toString());
-	    		uriSearch.setPageNumber(getPageN());
-	    		uriSearch.setSorting(getSortP(), getSortO());
-	    		
-	    		uriSearch.execute();
-	    		resultList = uriSearch.getResultList();
-	    		matchCount = uriSearch.getTotalMatchCount();
-	    	}
-	    	
-	    	if (resultList==null || resultList.size()==0){
-	    		
-	    		SimpleSearch simpleSearch = new SimpleSearch(searchExpression);
-	    		simpleSearch.setPageNumber(getPageN());
-	    		simpleSearch.setSorting(getSortP(), getSortO());
-	    		
-	    		simpleSearch.execute();
-	    		resultList = simpleSearch.getResultList();
-	    		matchCount = simpleSearch.getTotalMatchCount();
-	    	}
-    	}
+		try {
+			SearchExpression searchExpression = new SearchExpression(this.searchExpression);
+			if (!searchExpression.isEmpty()) {
+
+				if (searchExpression.isUri()) {
+
+					UriSearch uriSearch = new UriSearch(searchExpression.toString());
+					uriSearch.setPageNumber(getPageN());
+					uriSearch.setSorting(getSortP(), getSortO());
+
+					uriSearch.execute();
+					resultList = uriSearch.getResultList();
+					matchCount = uriSearch.getTotalMatchCount();
+				}
+
+				if (resultList == null || resultList.size() == 0) {
+					HelperDao helperDao = MySQLDAOFactory.get().getDao(
+							HelperDao.class);
+					Pair<Integer, List<SubjectDTO>> result = helperDao
+							.performSimpleSearch(
+									searchExpression,
+									getPageN(),
+									new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
+
+					resultList = result.getValue();
+					matchCount = result.getId();
+				}
+			}
+		} catch (Exception fatal) {
+			throw new SearchException("exception in simple search", fatal);
+		}
     	
 		return new ForwardResolution("/pages/simpleSearch.jsp");
     }

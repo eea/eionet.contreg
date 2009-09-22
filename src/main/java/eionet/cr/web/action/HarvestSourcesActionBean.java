@@ -31,13 +31,13 @@ import net.sourceforge.stripes.action.UrlBinding;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 
-import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.search.SearchException;
+import eionet.cr.search.util.SortOrder;
 import eionet.cr.util.Pair;
 import eionet.cr.util.QueryString;
 import eionet.cr.util.SortingRequest;
@@ -118,7 +118,7 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
 				filterString = "%" + StringEscapeUtils.escapeSql(this.searchString) + "%";
 			}
 			PaginationRequest pageRequest = new PaginationRequest(getPageN(), Pagination.DEFAULT_ITEMS_PER_PAGE);
-			SortingRequest sortingRequest = new SortingRequest(sortP, sortO);
+			SortingRequest sortingRequest = new SortingRequest(sortP, SortOrder.parse(sortO));
 			if(StringUtils.isBlank(type)) {
 				setResultList(factory.getDao(HarvestSourceDAO.class).getHarvestSources(filterString, pageRequest, sortingRequest));
 			} else if (TRACKED_FILES.equals(type)) {

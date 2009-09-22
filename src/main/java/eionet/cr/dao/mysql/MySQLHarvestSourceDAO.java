@@ -119,7 +119,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
     		searchParams.add(searchString);
     	}
     	if (sortingRequest != null && sortingRequest.getSortingColumnName() != null) {
-    		sql += " ORDER BY " + sortingRequest.getSortingColumnName() + " " + sortingRequest.getSortingColumnOrder();
+    		sql += " ORDER BY " + sortingRequest.getSortingColumnName() + " " + sortingRequest.getSortOrder().toSQL();
     	} else {
     		//in case no sorting request is present, use default one.
     		sql += " ORDER BY URL "; 

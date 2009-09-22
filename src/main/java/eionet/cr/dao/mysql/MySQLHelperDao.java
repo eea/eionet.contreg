@@ -23,14 +23,18 @@ import eionet.cr.dao.HelperDao;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
+import eionet.cr.search.util.SearchExpression;
+import eionet.cr.search.util.SortOrder;
+import eionet.cr.search.util.SubjectDataReader;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
+import eionet.cr.util.SortingRequest;
 import eionet.cr.util.URIUtil;
 import eionet.cr.util.Util;
 import eionet.cr.util.YesNoBoolean;
-import eionet.cr.util.sql.PairReader;
 import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
+import eionet.cr.web.util.columns.SubjectLastModifiedColumn;
 
 
 /**
@@ -59,6 +63,82 @@ public class MySQLHelperDao extends MySQLBaseDAO implements HelperDao {
 		params.add(Hashes.spoHash(Predicates.RDF_TYPE));
 		params.add(Hashes.spoHash(Subjects.WGS_POINT));
 		return executeQuery(sql, params, new SingleObjectReader<String>());
+	}
+	
+	/** 
+	 * @see eionet.cr.dao.HelperDao#performSimpleSearch(eionet.cr.search.util.SearchExpression, int, eionet.cr.util.SortingRequest)
+	 * {@inheritDoc}
+	 */
+	public Pair<Integer, List<SubjectDTO>> performSimpleSearch(
+				SearchExpression expression,
+				int pageNumber,
+				SortingRequest sortingRequest) throws DAOException, SQLException {
+		long time = System.currentTimeMillis();
+		List<Object> searchParams = new LinkedList<Object>();
+		StringBuffer selectQuery = new StringBuffer();
+		selectQuery.append("select sql_calc_found_rows distinct SPO.SUBJECT as SUBJECT_HASH, SPO.SOURCE as HIT_SOURCE from SPO ");
+		if (sortingRequest  != null && sortingRequest.getSortingColumnName() != null) {
+			if (sortingRequest.getSortingColumnName().equals(SubjectLastModifiedColumn.class.getSimpleName())){
+				selectQuery.append("left join RESOURCE on (SPO.SUBJECT=RESOURCE.URI_HASH) ");
+			}
+			else{
+				selectQuery.append("left join SPO as ORDERING on (SPO.SUBJECT=ORDERING.SUBJECT and ORDERING.PREDICATE=?) ");
+				searchParams.add(Long.valueOf(Hashes.spoHash(sortingRequest.getSortingColumnName())));
+			}
+		}
+		if (expression.isUri() || expression.isHash()){
+			selectQuery.append(" where SPO.OBJECT_HASH=?");
+			searchParams.add(
+					expression.isHash() 
+							? expression.toString()
+							: Hashes.spoHash(expression.toString()));
+				
+		} else{
+			selectQuery.append(" where match(SPO.OBJECT) against (? in boolean mode)");
+			searchParams.add(expression.toString());
+		}		
+		
+		if (sortingRequest !=null && sortingRequest.getSortingColumnName() != null){
+			if (sortingRequest.getSortingColumnName().equals(SubjectLastModifiedColumn.class.getSimpleName())){
+				selectQuery.append(" order by RESOURCE.LASTMODIFIED_TIME ").append(
+						sortingRequest.getSortOrder() == null 
+								? SortOrder.ASCENDING.toSQL() 
+								: sortingRequest.getSortOrder().toSQL());
+			} else{
+				selectQuery.append(" order by ORDERING.OBJECT ").append(
+						sortingRequest.getSortOrder() == null 
+								? SortOrder.ASCENDING.toSQL() 
+								: sortingRequest.getSortOrder().toSQL());
+			}
+		}
+		selectQuery.append(" LIMIT ").append(pageNumber * 15).append(',').append(15);
+		Pair<List<Long>,Integer> result = executeQueryWithRowCount(selectQuery.toString(), searchParams, new SingleObjectReader<Long>());
+		Map<String, SubjectDTO> temp = new LinkedHashMap<String, SubjectDTO>();
+		if (result != null && !result.getId().isEmpty()) {
+			for (Long subjectHash : result.getId()) {
+				temp.put(subjectHash + "", null);
+			}
+			StringBuffer buf = new StringBuffer().
+			append("select distinct ").
+				append("SUBJECT as SUBJECT_HASH, SUBJ_RESOURCE.URI as SUBJECT_URI, SUBJ_RESOURCE.LASTMODIFIED_TIME as SUBJECT_MODIFIED, ").
+				append("PREDICATE as PREDICATE_HASH, PRED_RESOURCE.URI as PREDICATE_URI, ").
+				append("OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG, OBJ_SOURCE_OBJECT, OBJ_DERIV_SOURCE, SOURCE, ").
+				append("SRC_RESOURCE.URI as SOURCE_URI, DSRC_RESOURCE.URI as DERIV_SOURCE_URI ").
+			append("from SPO ").
+				append("left join RESOURCE as SUBJ_RESOURCE on (SUBJECT=SUBJ_RESOURCE.URI_HASH) ").
+				append("left join RESOURCE as PRED_RESOURCE on (PREDICATE=PRED_RESOURCE.URI_HASH) ").
+				append("left join RESOURCE as SRC_RESOURCE on (SOURCE=SRC_RESOURCE.URI_HASH) ").
+				append("left join RESOURCE as DSRC_RESOURCE on (OBJ_DERIV_SOURCE=DSRC_RESOURCE.URI_HASH) ").
+			append("where ").
+				append("SUBJECT in (").append(Util.toCSV(temp.keySet())).append(") ").  
+			append("order by ").
+				append("SUBJECT, PREDICATE, OBJECT");
+			SubjectDataReader reader = new SubjectDataReader(temp);
+			SQLUtil.executeQuery(buf.toString(), reader, getConnection());
+		}
+		logger.debug("subject data select query took " + (System.currentTimeMillis()-time) + " ms");
+		
+		return new Pair<Integer, List<SubjectDTO>>(result.getValue(), new LinkedList<SubjectDTO>(temp.values()));
 	}
 	
 	/** 

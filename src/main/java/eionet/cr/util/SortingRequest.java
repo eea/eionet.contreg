@@ -20,6 +20,8 @@
  */
 package eionet.cr.util;
 
+import eionet.cr.search.util.SortOrder;
+
 /**
  * Encapsulates data about table sorting.
  * 
@@ -29,15 +31,15 @@ package eionet.cr.util;
 public class SortingRequest {
 	
 	private String sortingColumnName;
-	private String sortingColumnOrder;
+	private SortOrder sortOrder; 
 	
 	/**
 	 * @param sortingColumnName
 	 * @param sortingColumnOrder
 	 */
-	public SortingRequest(String sortingColumnName, String sortingColumnOrder) {
+	public SortingRequest(String sortingColumnName, SortOrder sortingColumnOrder) {
 		this.sortingColumnName = sortingColumnName;
-		this.sortingColumnOrder = sortingColumnOrder;
+		this.sortOrder = sortingColumnOrder;
 	}
 	/**
 	 * @return the sortingColumnName
@@ -52,19 +54,16 @@ public class SortingRequest {
 		this.sortingColumnName = sortingColumnName;
 	}
 	/**
-	 * @return the sortingColumnOrder
+	 * @return the sortOrder
 	 */
-	public String getSortingColumnOrder() {
-		return sortingColumnOrder;
+	public SortOrder getSortOrder() {
+		return sortOrder;
 	}
 	/**
-	 * @param sortingColumnOrder the sortingColumnOrder to set
+	 * @param sortOrder the sortOrder to set
 	 */
-	public void setSortingColumnOrder(String sortingColumnOrder) {
-		this.sortingColumnOrder = sortingColumnOrder;
+	public void setSortOrder(SortOrder sortOrder) {
+		this.sortOrder = sortOrder;
 	}
-	
-	
-	
 
 }

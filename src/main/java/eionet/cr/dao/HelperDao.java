@@ -8,7 +8,9 @@ import java.util.List;
 
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
+import eionet.cr.search.util.SearchExpression;
 import eionet.cr.util.Pair;
+import eionet.cr.util.SortingRequest;
 
 /**
  * Helper dao to use in different searches.
@@ -26,6 +28,20 @@ public interface HelperDao extends IDao {
 	 * @throws DAOException
 	 */
 	List<String> performSpatialSourcesSearch() throws DAOException;
+	
+	/**
+	 * Newly rewritten simple search.
+	 * 
+	 * @param expression - search expression to find.
+	 * @param pageNumber - page number to get
+	 * @param sortingRequest - sorting request to set
+	 * @return
+	 * @throws Exception
+	 */
+	Pair<Integer, List<SubjectDTO>> performSimpleSearch(
+				SearchExpression expression,
+				int pageNumber,
+				SortingRequest sortingRequest) throws Exception;
 	
 	/**
 	 * fetches recently discovered files.
