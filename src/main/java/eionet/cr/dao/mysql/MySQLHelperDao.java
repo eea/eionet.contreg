@@ -24,6 +24,7 @@ import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.util.SearchExpression;
+import eionet.cr.search.util.SimpleSearchDataReader;
 import eionet.cr.search.util.SortOrder;
 import eionet.cr.search.util.SubjectDataReader;
 import eionet.cr.util.Hashes;
@@ -32,6 +33,7 @@ import eionet.cr.util.SortingRequest;
 import eionet.cr.util.URIUtil;
 import eionet.cr.util.Util;
 import eionet.cr.util.YesNoBoolean;
+import eionet.cr.util.sql.PairReader;
 import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
 import eionet.cr.web.util.columns.SubjectLastModifiedColumn;
@@ -76,7 +78,7 @@ public class MySQLHelperDao extends MySQLBaseDAO implements HelperDao {
 		long time = System.currentTimeMillis();
 		List<Object> searchParams = new LinkedList<Object>();
 		StringBuffer selectQuery = new StringBuffer();
-		selectQuery.append("select sql_calc_found_rows distinct SPO.SUBJECT as SUBJECT_HASH, SPO.SOURCE as HIT_SOURCE from SPO ");
+		selectQuery.append("select sql_calc_found_rows SPO.SUBJECT as id, IF(SPO.OBJ_DERIV_SOURCE <> 0, SPO.OBJ_DERIV_SOURCE, SPO.SOURCE) as value from SPO ");
 		if (sortingRequest  != null && sortingRequest.getSortingColumnName() != null) {
 			if (sortingRequest.getSortingColumnName().equals(SubjectLastModifiedColumn.class.getSimpleName())){
 				selectQuery.append("left join RESOURCE on (SPO.SUBJECT=RESOURCE.URI_HASH) ");
@@ -97,6 +99,7 @@ public class MySQLHelperDao extends MySQLBaseDAO implements HelperDao {
 			selectQuery.append(" where match(SPO.OBJECT) against (? in boolean mode)");
 			searchParams.add(expression.toString());
 		}		
+		selectQuery.append(" GROUP BY SPO.SUBJECT "); 
 		
 		if (sortingRequest !=null && sortingRequest.getSortingColumnName() != null){
 			if (sortingRequest.getSortingColumnName().equals(SubjectLastModifiedColumn.class.getSimpleName())){
@@ -111,12 +114,16 @@ public class MySQLHelperDao extends MySQLBaseDAO implements HelperDao {
 								: sortingRequest.getSortOrder().toSQL());
 			}
 		}
-		selectQuery.append(" LIMIT ").append(pageNumber * 15).append(',').append(15);
-		Pair<List<Long>,Integer> result = executeQueryWithRowCount(selectQuery.toString(), searchParams, new SingleObjectReader<Long>());
+		
+		selectQuery.append(" LIMIT ").append( (pageNumber -1) * 15).append(',').append(15);
+		Pair<List<Pair<Long,Long>>,Integer> result = executeQueryWithRowCount(selectQuery.toString(), searchParams, new PairReader<Long,Long>());
 		Map<String, SubjectDTO> temp = new LinkedHashMap<String, SubjectDTO>();
 		if (result != null && !result.getId().isEmpty()) {
-			for (Long subjectHash : result.getId()) {
-				temp.put(subjectHash + "", null);
+
+			Map<String, Long> hitSources = new HashMap<String, Long>();
+			for (Pair<Long,Long> subjectHash : result.getId()) {
+				temp.put(subjectHash.getId() + "", null);
+				hitSources.put(subjectHash.getId() + "", subjectHash.getValue());
 			}
 			StringBuffer buf = new StringBuffer().
 			append("select distinct ").
@@ -133,11 +140,11 @@ public class MySQLHelperDao extends MySQLBaseDAO implements HelperDao {
 				append("SUBJECT in (").append(Util.toCSV(temp.keySet())).append(") ").  
 			append("order by ").
 				append("SUBJECT, PREDICATE, OBJECT");
-			SubjectDataReader reader = new SubjectDataReader(temp);
+			SubjectDataReader reader = new SimpleSearchDataReader(temp, hitSources);
 			SQLUtil.executeQuery(buf.toString(), reader, getConnection());
 		}
 		logger.debug("subject data select query took " + (System.currentTimeMillis()-time) + " ms");
-		
+			                                         
 		return new Pair<Integer, List<SubjectDTO>>(result.getValue(), new LinkedList<SubjectDTO>(temp.values()));
 	}
 	
