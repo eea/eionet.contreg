@@ -119,7 +119,7 @@ public class SubjectPredicateColumn extends SearchResultColumn{
 						
 						// if the source of the object matches the search-hit source of the subject then
 						// remember the object value and break
-						if (subjectDTO.getHitSource()>0 && objectDTO.getSourceHash()==subjectDTO.getHitSource()
+						if (subjectDTO.getHitSource()>0 && objectDTO.getSourceHashSmart()==subjectDTO.getHitSource()
 								&& !StringUtils.isBlank(objectString)
 								&& objectDTO.isLiteral()){
 

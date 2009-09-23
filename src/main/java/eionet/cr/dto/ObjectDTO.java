@@ -269,6 +269,14 @@ public class ObjectDTO {
 	}
 
 	/**
+	 * 
+	 * @return
+	 */
+	public long getSourceHashSmart() {
+		return derivSourceHash!=0 ? derivSourceHash : sourceHash;
+	}
+
+	/**
 	 * @param sourceHash the sourceHash to set
 	 */
 	public void setSourceHash(long sourceHash) {
