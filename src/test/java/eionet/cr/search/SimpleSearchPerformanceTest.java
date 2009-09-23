@@ -47,8 +47,15 @@ public class SimpleSearchPerformanceTest extends TestCase{
 	@Test
 	public void testPerformance() throws Exception {
 		ConnectionUtil.setReturnSimpleConnection(true);
-		long time = System.currentTimeMillis();
+		//just to initiate the connection launch simplesearch.
 		SimpleSearch simpleSearch = new SimpleSearch(getSearchExpression());
+		simpleSearch.setPageNumber(getPageNumber());
+		simpleSearch.setSorting(getSortPredicate(), SortOrder.DESCENDING);
+		simpleSearch.execute();
+		
+		//time to measure things
+		long time = System.currentTimeMillis();
+		simpleSearch = new SimpleSearch(getSearchExpression());
 		simpleSearch.setPageNumber(getPageNumber());
 		simpleSearch.setSorting(getSortPredicate(), SortOrder.DESCENDING);
 		simpleSearch.execute();
@@ -61,6 +68,8 @@ public class SimpleSearchPerformanceTest extends TestCase{
 				getPageNumber(),
 				new SortingRequest(getSortPredicate(), SortOrder.DESCENDING));
 		long newSearchCompleteTime = System.currentTimeMillis() - time;
+		System.out.println("Simple search : " + simpleSearchCompleteTime);
+		System.out.println("HelperDao search: " + newSearchCompleteTime);
 		assertTrue(simpleSearchCompleteTime > newSearchCompleteTime);
 	}
 
