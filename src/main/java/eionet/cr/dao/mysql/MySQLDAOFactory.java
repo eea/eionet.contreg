@@ -26,8 +26,9 @@ import java.util.Map;
 import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dao.HarvestMessageDAO;
 import eionet.cr.dao.HarvestSourceDAO;
-import eionet.cr.dao.IDao;
 import eionet.cr.dao.HelperDao;
+import eionet.cr.dao.IDao;
+import eionet.cr.dao.ISearchDao;
 import eionet.cr.dao.UrgentHarvestQueueDAO;
 
 
@@ -49,6 +50,7 @@ public final class MySQLDAOFactory {
 		registeredDaos.put(HarvestMessageDAO.class, MySQLHarvestMessageDAO.class);
 		registeredDaos.put(HarvestSourceDAO.class, MySQLHarvestSourceDAO.class);
 		registeredDaos.put(HelperDao.class, MySQLHelperDao.class);
+		registeredDaos.put(ISearchDao.class, MySQLSearchDAO.class);
 		registeredDaos.put(UrgentHarvestQueueDAO.class, MySQLUrgentHarvestQueueDAO.class);
 	}
 	

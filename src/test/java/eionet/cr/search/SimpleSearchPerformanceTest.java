@@ -26,7 +26,7 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
-import eionet.cr.dao.HelperDao;
+import eionet.cr.dao.ISearchDao;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.util.SearchExpression;
@@ -62,8 +62,7 @@ public class SimpleSearchPerformanceTest extends TestCase{
 		long simpleSearchCompleteTime = System.currentTimeMillis() - time;
 		
 		time = System.currentTimeMillis();
-		HelperDao helperDao = MySQLDAOFactory.get().getDao(HelperDao.class);
-		Pair<Integer, List<SubjectDTO>> result = helperDao.performSimpleSearch(
+		Pair<Integer, List<SubjectDTO>> result = MySQLDAOFactory.get().getDao(ISearchDao.class).performSimpleSearch(
 				getSearchExpression(),
 				getPageNumber(),
 				new SortingRequest(getSortPredicate(), SortOrder.DESCENDING));

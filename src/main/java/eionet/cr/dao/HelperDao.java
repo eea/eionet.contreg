@@ -5,6 +5,8 @@ package eionet.cr.dao;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
@@ -22,28 +24,6 @@ public interface HelperDao extends IDao {
 
 	
 	/**
-	 * performs spatial sources search.
-	 * 
-	 * @return
-	 * @throws DAOException
-	 */
-	List<String> performSpatialSourcesSearch() throws DAOException;
-	
-	/**
-	 * Newly rewritten simple search.
-	 * 
-	 * @param expression - search expression to find.
-	 * @param pageNumber - page number to get
-	 * @param sortingRequest - sorting request to set
-	 * @return
-	 * @throws Exception
-	 */
-	Pair<Integer, List<SubjectDTO>> performSimpleSearch(
-				SearchExpression expression,
-				int pageNumber,
-				SortingRequest sortingRequest) throws Exception;
-	
-	/**
 	 * fetches recently discovered files.
 	 * @param limit how many files to fetch
 	 * @return
@@ -57,14 +37,6 @@ public interface HelperDao extends IDao {
 	 * @throws SearchException
 	 */
 	Collection<String> getPicklistForPredicate(String predicateUri) throws SearchException;
-
-	/**
-	 * 
-	 * @param predicateUri
-	 * @return
-	 * @throws SearchException 
-	 */
-	boolean isAllowLiteralSearch(String predicateUri) throws SearchException;
 
 	/**
 	 * 

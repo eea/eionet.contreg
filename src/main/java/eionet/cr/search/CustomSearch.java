@@ -30,7 +30,6 @@ import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.util.Hashes;
 import eionet.cr.util.URIUtil;
-import eionet.cr.util.pagination.Pagination;
 import eionet.cr.web.util.columns.SubjectLastModifiedColumn;
 
 /**

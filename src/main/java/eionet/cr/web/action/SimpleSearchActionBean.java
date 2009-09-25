@@ -38,6 +38,7 @@ import org.apache.commons.logging.LogFactory;
 import eionet.cr.common.Predicates;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HelperDao;
+import eionet.cr.dao.ISearchDao;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
@@ -96,13 +97,12 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 				}
 
 				if (resultList == null || resultList.size() == 0) {
-					HelperDao helperDao = MySQLDAOFactory.get().getDao(
-							HelperDao.class);
-					Pair<Integer, List<SubjectDTO>> result = helperDao
-							.performSimpleSearch(
-									searchExpression,
-									getPageN(),
-									new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
+					Pair<Integer, List<SubjectDTO>> result = 
+							MySQLDAOFactory.get().getDao(ISearchDao.class)
+									.performSimpleSearch(
+											searchExpression,
+											getPageN(),
+											new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
 
 					resultList = result.getValue();
 					matchCount = result.getId();

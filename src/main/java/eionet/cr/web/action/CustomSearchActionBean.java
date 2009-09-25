@@ -38,6 +38,7 @@ import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import eionet.cr.common.Predicates;
 import eionet.cr.dao.HelperDao;
+import eionet.cr.dao.ISearchDao;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.CustomSearch;
 import eionet.cr.search.SearchException;
@@ -120,13 +121,14 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 	public Resolution search() throws SearchException{
 		
 		populateSelectedFilters();
-		
+		long startTime = System.currentTimeMillis();
 		CustomSearch customSearch = new CustomSearch(buildSearchCriteria());
 		customSearch.setPageNumber(getPageN());
 		customSearch.setSorting(getSortP(), getSortO());
 		customSearch.setLiteralsEnabledPredicates(getLiteralEnabledFilters());
 		
 		customSearch.execute();
+		logger.debug("it took " + (System.currentTimeMillis() - startTime) + " ms to execute custom search");
 		
 		// we put the search result list into session and override getResultList() to retrieve the list from session
 		// (look for the override in this class)
@@ -181,7 +183,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 			
 			String predicateUri = getAvailableFilters().get(addedFilter).getUri();
 			
-			boolean literalsEnabled = factory.getDao(HelperDao.class).isAllowLiteralSearch(predicateUri);
+			boolean literalsEnabled = factory.getDao(ISearchDao.class).isAllowLiteralSearch(predicateUri);
 			if (literalsEnabled)
 				getLiteralEnabledFilters().add(predicateUri);
 			else
