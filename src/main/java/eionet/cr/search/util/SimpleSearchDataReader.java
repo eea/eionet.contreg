@@ -20,11 +20,8 @@
 * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.search.util;
 
-import java.util.Date;
-import java.util.HashSet;
 import java.util.Map;
 
-import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 
 public class SimpleSearchDataReader extends SubjectDataReader {

@@ -27,25 +27,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpSession;
-
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
-import eionet.cr.dao.HelperDao;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.CustomSearch;
-import eionet.cr.search.DataflowPicklistSearch;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.util.UriLabelPair;
+import eionet.cr.web.util.DataflowSearchPicklistCache;
 import eionet.cr.web.util.columns.SearchResultColumn;
 import eionet.cr.web.util.columns.SubjectPredicateColumn;
 
@@ -57,13 +52,6 @@ import eionet.cr.web.util.columns.SubjectPredicateColumn;
 @UrlBinding("/dataflowSearch.action")
 public class DataflowSearchActionBean extends AbstractSearchActionBean<SubjectDTO>{
 	
-	/** */
-	private static Log logger = LogFactory.getLog(DataflowSearchActionBean.class);
-	
-	/** */
-	private static final String DATAFLOWS_SESSION_ATTR_NAME = DataflowSearchActionBean.class + ".dataflows";
-	private static final String LOCALITIES_SESSION_ATTR_NAME = DataflowSearchActionBean.class + ".localities";
-
 	/** */
 	private List<String> years;
 	
@@ -80,54 +68,7 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean<SubjectDT
 	 */
 	@DefaultHandler
 	public Resolution init() throws SearchException{
-		loadOptions();
 		return new ForwardResolution("/pages/dataflowSearch.jsp");
-	}
-
-	/**
-	 * @throws SearchException 
-	 * 
-	 */
-	private void loadOptions() throws SearchException{
-		
-		HttpSession session = getContext().getRequest().getSession();
-		loadDataflows(session);
-		loadLocalities(session);
-	}
-	
-	/**
-	 * 
-	 * @throws SearchException
-	 */
-	private void loadDataflows(HttpSession session) throws SearchException{
-		
-		if (session.getAttribute(DATAFLOWS_SESSION_ATTR_NAME)!=null)
-			return;
-
-		long start = System.currentTimeMillis();
-		
-		DataflowPicklistSearch search = new DataflowPicklistSearch();
-		search.execute();
-		
-		logger.debug("Dataflow search executed and result map collected with " + (System.currentTimeMillis()-start) + " ms");
-		start = System.currentTimeMillis();
-		
-		session.setAttribute(DATAFLOWS_SESSION_ATTR_NAME, search.getResultMap());
-	}
-
-	/**
-	 * 
-	 * @param session
-	 * @throws SearchException
-	 */
-	private void loadLocalities(HttpSession session) throws SearchException{
-		
-		if (session.getAttribute(LOCALITIES_SESSION_ATTR_NAME)!=null)
-			return;
-			
-		session.setAttribute(
-				LOCALITIES_SESSION_ATTR_NAME,
-				factory.getDao(HelperDao.class).getPicklistForPredicate(Predicates.ROD_LOCALITY_PROPERTY));
 	}
 
 	/**
@@ -136,8 +77,6 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean<SubjectDT
 	 * @throws SearchException 
 	 */
 	public Resolution search() throws SearchException{
-		
-		loadOptions();
 		
 		CustomSearch customSearch = new CustomSearch(buildSearchCriteria());
 		customSearch.setPageNumber(getPageN());
@@ -174,15 +113,15 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean<SubjectDT
 	/**
 	 * @return the instrumentsObligations
 	 */
-	public HashMap<String,ArrayList<UriLabelPair>> getInstrumentsObligations() {
-		return (HashMap<String,ArrayList<UriLabelPair>>)getContext().getRequest().getSession().getAttribute(DATAFLOWS_SESSION_ATTR_NAME);
+	public Map<String,List<UriLabelPair>> getInstrumentsObligations() {
+		return DataflowSearchPicklistCache.getInstance().getDataflowPicklist();
 	}
 
 	/**
 	 * @return the countries
 	 */
 	public Collection<String> getLocalities() {
-		return (Collection<String>) getContext().getRequest().getSession().getAttribute(LOCALITIES_SESSION_ATTR_NAME);
+		return DataflowSearchPicklistCache.getInstance().getDataflowLocalities();
 	}
 
 	/**

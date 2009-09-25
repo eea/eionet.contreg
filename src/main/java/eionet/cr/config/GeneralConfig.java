@@ -71,6 +71,11 @@ public class GeneralConfig {
 	/** */
 	public static final String SUBJECT_SELECT_MODE = "subjectSelectMode";
 	
+	/**
+	 * Constant to get dataflow picklist cache update interval (in milliseconds). 
+	 */
+	public static final String DATAFLOW_PICKLIST_CACHE_UPDATE_INTERVAL = "dataflowPicklistCacheUpdateInterval";
+	
 	/** */
 	public static final int SEVERITY_INFO = 1;
 	public static final int SEVERITY_CAUTION = 2;
