@@ -31,6 +31,7 @@ import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.util.SearchExpression;
 import eionet.cr.search.util.SortOrder;
+import eionet.cr.util.PageRequest;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.sql.ConnectionUtil;
@@ -62,10 +63,11 @@ public class SimpleSearchPerformanceTest extends TestCase{
 		long simpleSearchCompleteTime = System.currentTimeMillis() - time;
 		
 		time = System.currentTimeMillis();
-		Pair<Integer, List<SubjectDTO>> result = MySQLDAOFactory.get().getDao(ISearchDao.class).performSimpleSearch(
-				getSearchExpression(),
-				getPageNumber(),
-				new SortingRequest(getSortPredicate(), SortOrder.DESCENDING));
+		Pair<Integer, List<SubjectDTO>> result = MySQLDAOFactory.get().getDao(ISearchDao.class)
+				.performSimpleSearch(
+						getSearchExpression(),
+						new PageRequest(getPageNumber()),
+						new SortingRequest(getSortPredicate(), SortOrder.DESCENDING));
 		long newSearchCompleteTime = System.currentTimeMillis() - time;
 		System.out.println("Simple search : " + simpleSearchCompleteTime);
 		System.out.println("HelperDao search: " + newSearchCompleteTime);

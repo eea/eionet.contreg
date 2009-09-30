@@ -27,10 +27,13 @@ import java.util.Set;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.util.SearchExpression;
+import eionet.cr.util.PageRequest;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
 
 /**
+ * Interface to define search related dao methods.
+ * 
  * @author Aleksandr Ivanov
  * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
@@ -47,22 +50,32 @@ public interface ISearchDao extends IDao{
 	/**
 	 * Newly rewritten simple search.
 	 * 
-	 * @param expression - search expression to find.
-	 * @param pageNumber - page number to get
+	 * @param expression - search expression to find
+	 * @param pageRequest - page request
 	 * @param sortingRequest - sorting request to set
 	 * @return
 	 * @throws Exception
 	 */
 	Pair<Integer, List<SubjectDTO>> performSimpleSearch(
 				SearchExpression expression,
-				int pageNumber,
+				PageRequest pageRequest,
 				SortingRequest sortingRequest) throws Exception;
 	
+	/**
+	 * Newly rewritten custom search.
+	 * 
+	 * @param criteria - custom search criteria.
+	 * @param literalPredicates - set of literal predicates
+	 * @param pageRequest - page request
+	 * @param sortingRequest - sorting request
+	 * @return
+	 * @throws DAOException
+	 */
 	Pair<Integer, List<SubjectDTO>> performCustomSearch(
 			Map<String,String> criteria,
 			Set<String> literalPredicates,
-			int pageNumber,
-			SortingRequest sortingRequest) throws SearchException;
+			PageRequest pageRequest,
+			SortingRequest sortingRequest) throws DAOException;
 	/**
 	 * 
 	 * @param predicateUri

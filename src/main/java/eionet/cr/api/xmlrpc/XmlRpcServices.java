@@ -20,7 +20,6 @@
  */
 package eionet.cr.api.xmlrpc;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -39,11 +38,14 @@ import org.apache.commons.logging.LogFactory;
 import eionet.cr.common.CRException;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
+import eionet.cr.dao.ISearchDao;
+import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
-import eionet.cr.search.CustomSearch;
 import eionet.cr.search.DiscoveredSinceTimeSearch;
+import eionet.cr.util.PageRequest;
+import eionet.cr.util.Pair;
 import eionet.cr.util.Util;
 import eionet.qawcommons.DataflowResultDto;
 
@@ -130,13 +132,16 @@ public class XmlRpcServices implements Services{
 		
 		List<DataflowResultDto> result = new ArrayList<DataflowResultDto>();
 		try{
-			
-			CustomSearch search = new CustomSearch(criteria);
-			search.setPageLength(MAX_RESULTS);
-			search.execute();
+			Pair<Integer, List<SubjectDTO>> search = MySQLDAOFactory
+					.get().getDao(ISearchDao.class)
+					.performCustomSearch(
+							criteria,
+							null,
+							new PageRequest(1, MAX_RESULTS),
+							null);
 			
 			String[] strArray = {};
-			Collection<SubjectDTO> subjects = search.getResultList();
+			Collection<SubjectDTO> subjects = search.getValue();
 			if (subjects!=null){
 				for (Iterator<SubjectDTO> iter=subjects.iterator(); iter.hasNext();){
 					
@@ -205,11 +210,14 @@ public class XmlRpcServices implements Services{
 
 		Vector result = new Vector();
 		try{
-			CustomSearch search = new CustomSearch((Map<String,String>)criteria);
-			search.setPageLength(MAX_RESULTS);
-			search.execute();
-			
-			Collection<SubjectDTO> subjects = search.getResultList();
+			Pair<Integer,List<SubjectDTO>> search = MySQLDAOFactory.get()
+					.getDao(ISearchDao.class)
+					.performCustomSearch(
+							criteria,
+							null,
+							new PageRequest(1,MAX_RESULTS),
+							null);
+			Collection<SubjectDTO> subjects = search.getValue();
 			if (subjects!=null){
 				for (Iterator<SubjectDTO> iter=subjects.iterator(); iter.hasNext();){
 					

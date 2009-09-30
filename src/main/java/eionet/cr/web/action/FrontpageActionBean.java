@@ -27,7 +27,7 @@ import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import eionet.cr.util.Pair;
-import eionet.cr.web.util.RecentResourcesCache;
+import eionet.cr.web.util.ApplicationCache;
 
 /**
  * ActionBean class responsible for preparing data for index.jsp rendering.
@@ -42,7 +42,7 @@ public class FrontpageActionBean extends AbstractActionBean {
 	
 	@DefaultHandler
 	public Resolution frontpage() {
-		recentFiles = RecentResourcesCache.getInstance().getRecentDiscoveredFiles(10);
+		recentFiles = ApplicationCache.getRecentDiscoveredFiles(10);
 		return new ForwardResolution("/pages/index.jsp");
 	}
 

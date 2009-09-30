@@ -18,36 +18,26 @@
 * 
 * Contributor(s):
 * Jaanus Heinlaid, Tieto Eesti*/
-package eionet.cr.web.util;
-
-import java.text.ParseException;
-
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
+package eionet.cr.web.util.job;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import org.quartz.SchedulerException;
 import org.quartz.StatefulJob;
 
-import eionet.cr.common.JobScheduler;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HelperDao;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
+import eionet.cr.web.util.ApplicationCache;
 
 /**
  * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class RecentResourcesCacheUpdater implements StatefulJob, ServletContextListener{
+public class RecentResourcesCacheUpdater implements StatefulJob {
 
-	/** */
-	private static final int UPDATE_INTERVAL_MINUTES = 5;
-	
 	/** */
 	private static Log logger = LogFactory.getLog(RecentResourcesCacheUpdater.class);
 			
@@ -59,37 +49,11 @@ public class RecentResourcesCacheUpdater implements StatefulJob, ServletContextL
 		
 		try {
 			HelperDao dao = MySQLDAOFactory.get().getDao(HelperDao.class);
-			RecentResourcesCache.getInstance().updateCache(dao.getRecentlyDiscoveredFiles(10));
+			ApplicationCache.updateRecentResourceCache(dao.getRecentlyDiscoveredFiles(10));
 			logger.debug("Recently discovered resources cache updated!");
 		}
 		catch (DAOException e) {
 			logger.error("Error when updating recently discovered files cache: ", e);
 		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
-	 */
-	public void contextInitialized(ServletContextEvent servletContextEvent) {
-		
-		JobDetail jobDetails = new JobDetail(getClass().getSimpleName(), JobScheduler.class.getName(), RecentResourcesCacheUpdater.class);
-		try{
-			JobScheduler.scheduleIntervalJob(UPDATE_INTERVAL_MINUTES * 60 * 1000, jobDetails);
-			logger.debug(getClass().getSimpleName() + " scheduled");
-		}
-		catch (ParseException e){
-			logger.fatal("Error when scheduling " + getClass().getSimpleName(), e);
-		}
-		catch (SchedulerException e){
-			logger.fatal("Error when scheduling " + getClass().getSimpleName(), e);
-		}
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
-	 */
-	public void contextDestroyed(ServletContextEvent servletContextEvent) {
 	}
 }

@@ -37,13 +37,19 @@ import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import eionet.cr.common.Predicates;
+import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HelperDao;
 import eionet.cr.dao.ISearchDao;
+import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.search.CustomSearch;
 import eionet.cr.search.SearchException;
+import eionet.cr.search.util.SortOrder;
+import eionet.cr.util.PageRequest;
+import eionet.cr.util.Pair;
+import eionet.cr.util.SortingRequest;
 import eionet.cr.util.Util;
 import eionet.cr.util.pagination.Pagination;
+import eionet.cr.web.util.ApplicationCache;
 import eionet.cr.web.util.CustomSearchFilter;
 import eionet.cr.web.util.columns.SearchResultColumn;
 import eionet.cr.web.util.columns.SubjectLastModifiedColumn;
@@ -122,21 +128,28 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 		
 		populateSelectedFilters();
 		long startTime = System.currentTimeMillis();
-		CustomSearch customSearch = new CustomSearch(buildSearchCriteria());
-		customSearch.setPageNumber(getPageN());
-		customSearch.setSorting(getSortP(), getSortO());
-		customSearch.setLiteralsEnabledPredicates(getLiteralEnabledFilters());
-		
-		customSearch.execute();
+		Pair<Integer, List<SubjectDTO>> result;
+		try {
+			result = MySQLDAOFactory.get().getDao(ISearchDao.class)
+					.performCustomSearch(
+							buildSearchCriteria(),
+							getLiteralEnabledFilters(),
+							new PageRequest(getPageN()),
+							new SortingRequest(
+									getSortP(),
+									SortOrder.parse(getSortO())));
+		} catch (DAOException e) {
+			throw new SearchException("Exception in custom search", e);
+		}
 		logger.debug("it took " + (System.currentTimeMillis() - startTime) + " ms to execute custom search");
 		
 		// we put the search result list into session and override getResultList() to retrieve the list from session
 		// (look for the override in this class)
 		HttpSession session = getContext().getRequest().getSession();
-		session.setAttribute(RESULT_LIST_SESSION_ATTR_NAME, customSearch.getResultList());
+		session.setAttribute(RESULT_LIST_SESSION_ATTR_NAME, result.getValue());
 		
 		// we do the same for matchCount and pagination as well
-		session.setAttribute(MATCH_COUNT_SESSION_ATTR_NAME, new Integer(customSearch.getTotalMatchCount()));
+		session.setAttribute(MATCH_COUNT_SESSION_ATTR_NAME, result.getId());
 		session.setAttribute(PAGINATION_SESSION_ATTR_NAME, super.getPagination());
 		
 		return new ForwardResolution(ASSOCIATED_JSP);
@@ -199,16 +212,28 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 	 * @throws SearchException 
 	 */
 	public Collection<String> getPicklist() throws SearchException{
-
-		if (!isShowPicklist())
+		String picklistFilter = getPicklistFilter();
+		if (!isShowPicklist()) {
 			return null;
-		else if (!getAvailableFilters().containsKey(getPicklistFilter()))
+		} else if (!getAvailableFilters().containsKey(picklistFilter)) {
 			return null;
-		
+		}
+		String uri = getAvailableFilters().get(picklistFilter).getUri();
+		if(Predicates.RDF_TYPE.equals(uri)) {
+			picklist = ApplicationCache.getTypeURIs();
+		} else if (Predicates.ROD_LOCALITY_PROPERTY.equals(uri)) {
+			picklist = ApplicationCache.getLocalities();
+		} else if (Predicates.ROD_OBLIGATION_PROPERTY.equals(uri)) {
+			picklist = ApplicationCache.getDataflows();
+		} else if (Predicates.ROD_INSTRUMENT_PROPERTY.equals(uri)) {
+			picklist = ApplicationCache.getInstruments();
+		}
+	
 		if (picklist == null){
 			picklist = factory.getDao(HelperDao.class).getPicklistForPredicate(
-					getAvailableFilters().get(getPicklistFilter()).getUri());
+					getAvailableFilters().get(picklistFilter).getUri());
 		}
+		
 		
 		return picklist;
 	}

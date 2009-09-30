@@ -25,19 +25,21 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.YesNoBoolean;
-import eionet.cr.util.sql.ResultSetBaseReader;
+import eionet.cr.util.sql.ResultSetListReader;
 
 /**
  * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class SubjectDataReader extends ResultSetBaseReader{
+public class SubjectDataReader extends ResultSetListReader<SubjectDTO>{
 
 	/** */
 	private Map<String,SubjectDTO> subjectsMap;
@@ -121,5 +123,14 @@ public class SubjectDataReader extends ResultSetBaseReader{
 	 */
 	public String getPredicateHashesCommaSeparated() {
 		return predicateHashesCommaSeparated.toString();
+	}
+
+	/** 
+	 * @see eionet.cr.util.sql.ResultSetListReader#getResultList()
+	 * {@inheritDoc}
+	 */
+	@Override
+	public List<SubjectDTO> getResultList() {
+		return new LinkedList<SubjectDTO>( subjectsMap.values());
 	}
 }

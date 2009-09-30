@@ -20,44 +20,60 @@
  */
 package eionet.cr.util;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import junit.framework.TestCase;
-
-import org.junit.Test;
-
-import eionet.cr.web.util.ApplicationCache;
-
 /**
  * @author Aleksandr Ivanov
  * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
-public class RecentDiscoveredFilesCacheTest extends TestCase {
+public class PageRequest {
 	
-	@Test
-	public void testCache(){
-		new ApplicationCache().contextInitialized(null);
-		
-		for(int i = 0; i < 100; i++){
-			ApplicationCache.updateRecentResourceCache(getTestData(11));
-			assertEquals(10, ApplicationCache.getRecentDiscoveredFiles(10).size());
-		}
-		
-		assertEquals(3, ApplicationCache.getRecentDiscoveredFiles(3).size());
-		assertEquals("8", ApplicationCache.getRecentDiscoveredFiles(3).get(0).getId());
-		
+	public static int DEFAULT_ITEMS_PER_PAGE = 15;
+
+	private int pageNumber,itemsPerPage;
+	
+	/**
+	 * @param pageNumber
+	 */
+	public PageRequest(int pageNumber) {
+		this.pageNumber = pageNumber;
+		itemsPerPage = DEFAULT_ITEMS_PER_PAGE;
+	}
+	
+	/**
+	 * @param pageNumber
+	 * @param itemsPerPage
+	 */
+	public PageRequest(int pageNumber, int itemsPerPage) {
+		this.pageNumber = pageNumber;
+		this.itemsPerPage = itemsPerPage;
 	}
 
 	/**
-	 * @return
+	 * @return the pageNumber
 	 */
-	private List<Pair<String, String>> getTestData(int size) {
-		List<Pair<String,String>> result = new LinkedList<Pair<String,String>>();
-		for(int i=0; i< size; i++) {
-			result.add(new Pair<String, String>(i + "", "value"));
-		}
-		return result;
+	public int getPageNumber() {
+		return pageNumber;
 	}
 
+	/**
+	 * @param pageNumber the pageNumber to set
+	 */
+	public void setPageNumber(int pageNumber) {
+		this.pageNumber = pageNumber;
+	}
+
+	/**
+	 * @return the itemsPerPage
+	 */
+	public int getItemsPerPage() {
+		return itemsPerPage;
+	}
+
+	/**
+	 * @param itemsPerPage the itemsPerPage to set
+	 */
+	public void setItemsPerPage(int itemsPerPage) {
+		this.itemsPerPage = itemsPerPage;
+	}
+	
+	
 }

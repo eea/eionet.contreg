@@ -36,11 +36,17 @@ import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
+import eionet.cr.dao.DAOException;
+import eionet.cr.dao.ISearchDao;
+import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.search.CustomSearch;
 import eionet.cr.search.SearchException;
+import eionet.cr.search.util.SortOrder;
 import eionet.cr.search.util.UriLabelPair;
-import eionet.cr.web.util.DataflowSearchPicklistCache;
+import eionet.cr.util.PageRequest;
+import eionet.cr.util.Pair;
+import eionet.cr.util.SortingRequest;
+import eionet.cr.web.util.ApplicationCache;
 import eionet.cr.web.util.columns.SearchResultColumn;
 import eionet.cr.web.util.columns.SubjectPredicateColumn;
 
@@ -77,14 +83,21 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean<SubjectDT
 	 * @throws SearchException 
 	 */
 	public Resolution search() throws SearchException{
-		
-		CustomSearch customSearch = new CustomSearch(buildSearchCriteria());
-		customSearch.setPageNumber(getPageN());
-		customSearch.setSorting(getSortP(), getSortO());
-		customSearch.execute();
-		
-		resultList = customSearch.getResultList();
-		matchCount = customSearch.getTotalMatchCount();
+		Pair<Integer, List<SubjectDTO>> customSearch;
+		try {
+			customSearch = MySQLDAOFactory
+					.get()
+					.getDao(ISearchDao.class)
+					.performCustomSearch(
+							buildSearchCriteria(),
+							null,
+							new PageRequest(getPageN()),
+							new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
+		} catch (DAOException e) {
+			throw new SearchException("Exception in dataflow search", e);
+		}
+		resultList = customSearch.getValue();
+		matchCount = customSearch.getId();
 		
 		return new ForwardResolution("/pages/dataflowSearch.jsp");
 	}
@@ -114,14 +127,14 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean<SubjectDT
 	 * @return the instrumentsObligations
 	 */
 	public Map<String,List<UriLabelPair>> getInstrumentsObligations() {
-		return DataflowSearchPicklistCache.getInstance().getDataflowPicklist();
+		return ApplicationCache.getDataflowPicklist();
 	}
 
 	/**
 	 * @return the countries
 	 */
 	public Collection<String> getLocalities() {
-		return DataflowSearchPicklistCache.getInstance().getDataflowLocalities();
+		return ApplicationCache.getLocalities();
 	}
 
 	/**

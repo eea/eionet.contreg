@@ -20,6 +20,7 @@
  */
 package eionet.cr.dto;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -38,8 +39,13 @@ import eionet.cr.util.URLUtil;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class SubjectDTO{
+public class SubjectDTO implements Serializable{
 	
+	/**
+	 * serial.
+	 */
+	private static final long serialVersionUID = 1L;
+
 	/** */
 	public static final String URI_ANONYMOUS = "anonymous";
 	

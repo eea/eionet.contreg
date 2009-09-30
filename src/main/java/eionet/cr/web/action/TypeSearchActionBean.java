@@ -23,7 +23,6 @@ package eionet.cr.web.action;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -40,12 +39,17 @@ import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
+import eionet.cr.dao.DAOException;
+import eionet.cr.dao.ISearchDao;
+import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.search.CustomSearch;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.util.SortOrder;
+import eionet.cr.util.PageRequest;
 import eionet.cr.util.Pair;
+import eionet.cr.util.SortingRequest;
 import eionet.cr.util.Util;
+import eionet.cr.web.util.ApplicationCache;
 import eionet.cr.web.util.columns.SearchResultColumn;
 import eionet.cr.web.util.columns.SubjectPredicateColumn;
 
@@ -176,10 +180,10 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 	 */
 	@Override
 	public Resolution search() throws SearchException {
-		restoreStateFromSession();
-		LastAction lastAction = getLastAction();
-		if (resultList == null || !(lastAction != null && lastAction.equals(LastAction.ADD_FILTER))) {
-			if (!StringUtils.isBlank(type)) {
+		if (!StringUtils.isBlank(type)) {
+			restoreStateFromSession();
+			LastAction lastAction = getLastAction();
+			if (resultList == null || !(lastAction != null && lastAction.equals(LastAction.ADD_FILTER))) {
 				Map<String,String> criteria = new HashMap<String,String>();
 				criteria.put(Predicates.RDF_TYPE, type);
 				if (selectedFilters != null && !selectedFilters.isEmpty()) {
@@ -190,12 +194,20 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 					}
 				}
 				
-				CustomSearch customSearch = new CustomSearch(criteria);
-				customSearch.setPageNumber(getPageN());
-				customSearch.setSorting(getSortP(), getSortO());
-				customSearch.execute();
-				resultList = customSearch.getResultList();
-	    		matchCount = customSearch.getTotalMatchCount();
+				Pair<Integer, List<SubjectDTO>> customSearch;
+				try {
+					customSearch = MySQLDAOFactory.get().getDao(ISearchDao.class)
+							.performCustomSearch(
+									criteria,
+									null,
+									new PageRequest(getPageN()),
+									new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
+				} catch (DAOException e) {
+					throw new SearchException("Exception in type search action bean", e);
+				}
+				
+				resultList = customSearch.getValue();
+	    		matchCount = customSearch.getId();
 			}
 			//cache result list.
 			getSession().setAttribute(RESULT_LIST_CACHED, resultList);
@@ -315,34 +327,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 	}
 	
 	public List<Pair<String, String>> getAvailableTypes() throws SearchException {
-		//check if it was already cached
-		if (getSession().getAttribute(AVAILABLE_TYPES_CACHE) != null) {
-			return (List<Pair<String, String>>) getSession().getAttribute(AVAILABLE_TYPES_CACHE);
-		} else {
-			List<Pair<String,String>> result = new LinkedList<Pair<String,String>>();
-			Map<String,String> criteria = new HashMap<String,String>();
-			criteria.put(Predicates.RDF_TYPE, Subjects.RDFS_CLASS);
-			
-			CustomSearch customSearch = new CustomSearch(criteria);
-			customSearch.setSorting(Predicates.RDFS_LABEL, SortOrder.ASCENDING);
-			customSearch.setPageLength(0); // we want no limits on result set size
-			customSearch.execute();
-			Collection<SubjectDTO> subjects = customSearch.getResultList();
-			if (subjects!=null){
-				for (Iterator<SubjectDTO> it=subjects.iterator(); it.hasNext();){
-					SubjectDTO subject = it.next();
-					if (!subject.isAnonymous()){
-						String label = subject.getObjectValue(Predicates.RDFS_LABEL);
-						if (!StringUtils.isBlank(label)){
-							result.add(new Pair<String,String>(subject.getUri(), label));
-						}
-					}
-				}
-			}
-			//cache it 
-			getSession().setAttribute(AVAILABLE_TYPES_CACHE, result);
-			return result;
-		}
+		return ApplicationCache.getTypes();
 	}
 
 	/**
@@ -390,13 +375,16 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 			criteria.put(Predicates.RDF_TYPE, Subjects.RDF_PROPERTY);
 			criteria.put(Predicates.RDFS_DOMAIN, type);
 			
-			CustomSearch customSearch = new CustomSearch(criteria);
-			customSearch.setPageLength(0); // no limits to the result set size, because there cannot be too many properties for a type
-			customSearch.execute();
+			Pair<Integer, List<SubjectDTO>> customSearch;
+			try {
+				customSearch = MySQLDAOFactory.get().getDao(ISearchDao.class)
+						.performCustomSearch(criteria, null, new PageRequest(1,0), null);
+			} catch (DAOException e) {
+				throw new SearchException("Exception in type search action bean", e);
+			}
 			
-			Collection<SubjectDTO> subjects = customSearch.getResultList();
-			if (subjects!=null){
-				for(SubjectDTO subject : subjects) {
+			if (customSearch.getValue() != null){
+				for(SubjectDTO subject : customSearch.getValue()) {
 					if (!subject.isAnonymous()){
 						String uri = subject.getUri();
 						String label = subject.getObjectValue(Predicates.RDFS_LABEL);

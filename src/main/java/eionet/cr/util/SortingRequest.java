@@ -31,7 +31,7 @@ import eionet.cr.search.util.SortOrder;
 public class SortingRequest {
 	
 	private String sortingColumnName;
-	private SortOrder sortOrder; 
+	private SortOrder sortOrder = SortOrder.ASCENDING; 
 	
 	/**
 	 * @param sortingColumnName

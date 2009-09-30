@@ -36,11 +36,18 @@ import org.quartz.SchedulerFactory;
 import org.quartz.SimpleTrigger;
 import org.quartz.impl.StdSchedulerFactory;
 
+import eionet.cr.config.GeneralConfig;
+import eionet.cr.util.Pair;
+import eionet.cr.web.util.job.DataflowSearchPicklistCacheUpdater;
+import eionet.cr.web.util.job.RecentResourcesCacheUpdater;
+import eionet.cr.web.util.job.TypeCacheUpdater;
+
 /**
  * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
+@SuppressWarnings("unchecked")
 public class JobScheduler implements ServletContextListener{
 	
 	/** */
@@ -48,6 +55,32 @@ public class JobScheduler implements ServletContextListener{
 
 	/** */
 	private static Scheduler quartzScheduler = null;
+	
+	private static final Pair<String, JobDetail>[] details;
+	
+	static {
+		
+		details = new Pair[]{
+				new Pair(
+						GeneralConfig.DATAFLOW_PICKLIST_CACHE_UPDATE_INTERVAL,
+						new JobDetail(
+								DataflowSearchPicklistCacheUpdater.class.getSimpleName(),
+								JobScheduler.class.getName(),
+								DataflowSearchPicklistCacheUpdater.class)),
+				new Pair(
+						GeneralConfig.RECENT_DISCOVERED_FILES_CACHE_UPDATE_INTERVAL,
+						new JobDetail(
+								RecentResourcesCacheUpdater.class.getSimpleName(),
+								JobScheduler.class.getName(),
+								RecentResourcesCacheUpdater.class)),
+				new Pair(
+						GeneralConfig.TYPE_CACHE_UPDATE_INTERVAL,
+						new JobDetail(
+								TypeCacheUpdater.class.getSimpleName(),
+								JobScheduler.class.getName(),
+								TypeCacheUpdater.class))	
+		};
+	}
 	
 	/**
 	 * 
@@ -129,10 +162,24 @@ public class JobScheduler implements ServletContextListener{
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
+	/** 
 	 * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
+	 * {@inheritDoc}
 	 */
-	public void contextInitialized(ServletContextEvent servletContextEvent) {
+	public void contextInitialized(ServletContextEvent sce) {
+		for (Pair<String,JobDetail> job : details) {
+			try{
+				scheduleIntervalJob(
+						Long.parseLong(GeneralConfig.getRequiredProperty(job.getId())),
+						job.getValue());
+				logger.debug(job.getValue().getName() + " scheduled");
+			}
+			catch (ParseException e){
+				logger.fatal("Error when scheduling " + job.getValue().getName(), e);
+			}
+			catch (SchedulerException e){
+				logger.fatal("Error when scheduling " + job.getValue().getName(), e);
+			}
+		}
 	}
 }

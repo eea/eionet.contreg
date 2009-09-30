@@ -73,19 +73,13 @@
 	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 	<listener>
-		<listener-class>eionet.cr.common.JobScheduler</listener-class>
+		<listener-class>eionet.cr.web.util.ApplicationCache</listener-class>
 	</listener>
 	<listener>
-		<listener-class>eionet.cr.web.ServletContextListenerImpl</listener-class>
+		<listener-class>eionet.cr.common.JobScheduler</listener-class>
 	</listener>
   	<listener>
 		<listener-class>eionet.cr.harvest.scheduled.HarvestingJob</listener-class>
-	</listener>
-  	<listener>
-		<listener-class>eionet.cr.web.util.RecentResourcesCacheUpdater</listener-class>
-	</listener>
-	<listener>
-		<listener-class>eionet.cr.web.util.DataflowSearchPicklistCacheUpdater</listener-class>
 	</listener>
 
 	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
