@@ -86,7 +86,7 @@ public interface ISearchDao extends IDao{
 	 * @return
 	 * @throws DAOException
 	 */
-	Pair<Integer, List<RawTripleDTO>> getSampleTriplets(String url, int limit) throws DAOException;
+	Pair<Integer, List<RawTripleDTO>> getSampleTriples(String url, int limit) throws DAOException;
 	
 	/**
 	 * 

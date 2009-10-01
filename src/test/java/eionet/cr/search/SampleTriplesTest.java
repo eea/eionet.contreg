@@ -45,7 +45,7 @@ public class SampleTriplesTest extends TestCase {
 	@Test
 	public void testGetSampleTriples() throws Exception {
 		ConnectionUtil.setReturnSimpleConnection(true);
-		Pair<Integer, List<RawTripleDTO>> result = MySQLDAOFactory.get().getDao(ISearchDao.class).getSampleTriplets(url, 10);
+		Pair<Integer, List<RawTripleDTO>> result = MySQLDAOFactory.get().getDao(ISearchDao.class).getSampleTriples(url, 10);
 		assertEquals(10, result.getValue().size());
 	}
 }

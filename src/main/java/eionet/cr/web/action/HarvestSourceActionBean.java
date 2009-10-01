@@ -136,7 +136,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     private void populateSampleTriples() throws SearchException{
     	Pair<Integer, List<RawTripleDTO>> temp;
 		try {
-			temp = MySQLDAOFactory.get().getDao(ISearchDao.class).getSampleTriplets(harvestSource.getUrl(), 10);
+			temp = MySQLDAOFactory.get().getDao(ISearchDao.class).getSampleTriples(harvestSource.getUrl(), 10);
 		} catch (DAOException e) {
 			throw new SearchException("exception while getting sample triplets ", e);
 		}

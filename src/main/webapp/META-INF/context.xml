@@ -23,10 +23,10 @@
 				maxActive="100"
 				maxIdle="30"
 				maxWait="10000"
-				username="cruser"
-				password="xxx"
+				username="cr2"
+				password="cr2"
 				driverClassName="com.mysql.jdbc.Driver" 
-				url="jdbc:mysql://localhost:3306/cr2?autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;characterSetResults=UTF-8&amp;zeroDateTimeBehavior=convertToNull&amp;jdbcCompliantTruncation=false">
+				url="jdbc:mysql://localhost:3306/eea?autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;characterSetResults=UTF-8&amp;zeroDateTimeBehavior=convertToNull&amp;jdbcCompliantTruncation=false">
 	</Resource>
 
 </Context>

@@ -294,10 +294,10 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements ISearchDao {
 	}
 
 	/** 
-	 * @see eionet.cr.dao.ISearchDao#getSampleTriplets(java.lang.String, int)
+	 * @see eionet.cr.dao.ISearchDao#getSampleTriples(java.lang.String, int)
 	 * {@inheritDoc}
 	 */
-	public Pair<Integer, List<RawTripleDTO>> getSampleTriplets(String url, int limit)
+	public Pair<Integer, List<RawTripleDTO>> getSampleTriples(String url, int limit)
 			throws DAOException {
 		StringBuffer buf = new StringBuffer().
 		append("select distinct sql_calc_found_rows ").
