@@ -80,7 +80,16 @@
 				        	<tbody>
 				        		<c:forEach items="${actionBean.sampleTriples}" var="sampleTriple" varStatus="loop">
 				        			<tr <c:if test="${not empty sampleTriple.objectDerivSource}">class="derived"</c:if>>
-				        				<td><c:out value="${crfn:cutAtFirstLongToken(sampleTriple.subject, 100)}"/></td>
+				        				<td>
+				        					<c:choose>
+				        						<c:when test="${sampleTriple.subject!=null}">
+				        							<c:out value="${crfn:cutAtFirstLongToken(sampleTriple.subject, 100)}"/>
+				        						</c:when>
+				        						<c:otherwise>
+				        							Anonymous resource
+				        						</c:otherwise>
+				        					</c:choose>
+				        				</td>
 				        				<td><c:out value="${crfn:cutAtFirstLongToken(sampleTriple.predicate, 100)}"/></td>
 				        				<td><c:out value="${crfn:cutAtFirstLongToken(sampleTriple.object, 100)}"/></td>
 				        			</tr>
