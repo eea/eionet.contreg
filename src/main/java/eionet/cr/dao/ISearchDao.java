@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import eionet.cr.dto.RawTripleDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.util.SearchExpression;
@@ -76,6 +77,17 @@ public interface ISearchDao extends IDao{
 			Set<String> literalPredicates,
 			PageRequest pageRequest,
 			SortingRequest sortingRequest) throws DAOException;
+	
+	/**
+	 * fetch sample triplets for given source.
+	 * 
+	 * @param url - source url
+	 * @param limit - how many to fetch
+	 * @return
+	 * @throws DAOException
+	 */
+	Pair<Integer, List<RawTripleDTO>> getSampleTriplets(String url, int limit) throws DAOException;
+	
 	/**
 	 * 
 	 * @param predicateUri

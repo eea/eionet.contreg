@@ -20,6 +20,7 @@
  */
 package eionet.cr.dao.mysql;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,6 +38,7 @@ import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.ISearchDao;
+import eionet.cr.dto.RawTripleDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.util.SearchExpression;
@@ -49,10 +51,8 @@ import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.URIUtil;
 import eionet.cr.util.Util;
-import eionet.cr.util.sql.ConnectionUtil;
-import eionet.cr.util.sql.MySQLUtil;
 import eionet.cr.util.sql.PairReader;
-import eionet.cr.util.sql.SQLUtil;
+import eionet.cr.util.sql.ResultSetListReader;
 import eionet.cr.util.sql.SingleObjectReader;
 import eionet.cr.web.util.columns.SubjectLastModifiedColumn;
 
@@ -146,23 +146,8 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements ISearchDao {
 				temp.put(subjectHash.getId() + "", null);
 				hitSources.put(subjectHash.getId() + "", subjectHash.getValue());
 			}
-		StringBuffer buf = new StringBuffer().
-			append("select distinct ").
-				append("SUBJECT as SUBJECT_HASH, SUBJ_RESOURCE.URI as SUBJECT_URI, SUBJ_RESOURCE.LASTMODIFIED_TIME as SUBJECT_MODIFIED, ").
-				append("PREDICATE as PREDICATE_HASH, PRED_RESOURCE.URI as PREDICATE_URI, ").
-				append("OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG, OBJ_SOURCE_OBJECT, OBJ_DERIV_SOURCE, SOURCE, ").
-				append("SRC_RESOURCE.URI as SOURCE_URI, DSRC_RESOURCE.URI as DERIV_SOURCE_URI ").
-			append("from SPO ").
-				append("left join RESOURCE as SUBJ_RESOURCE on (SUBJECT=SUBJ_RESOURCE.URI_HASH) ").
-				append("left join RESOURCE as PRED_RESOURCE on (PREDICATE=PRED_RESOURCE.URI_HASH) ").
-				append("left join RESOURCE as SRC_RESOURCE on (SOURCE=SRC_RESOURCE.URI_HASH) ").
-				append("left join RESOURCE as DSRC_RESOURCE on (OBJ_DERIV_SOURCE=DSRC_RESOURCE.URI_HASH) ").
-			append("where ").
-				append("SUBJECT in (").append(Util.toCSV(temp.keySet())).append(") ").  
-			append("order by ").
-				append("SUBJECT, PREDICATE, OBJECT");
 			SubjectDataReader reader = new SimpleSearchDataReader(temp, hitSources);
-			SQLUtil.executeQuery(buf.toString(), reader, getConnection());
+			executeQuery(getDataInitQuery(temp.keySet()), null, reader);
 		}
 		logger.debug("subject data select query took " + (System.currentTimeMillis()-time) + " ms");
 			                                         
@@ -306,6 +291,53 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements ISearchDao {
 		catch(DAOException exception) {
 			throw new SearchException();
 		}
+	}
+
+	/** 
+	 * @see eionet.cr.dao.ISearchDao#getSampleTriplets(java.lang.String, int)
+	 * {@inheritDoc}
+	 */
+	public Pair<Integer, List<RawTripleDTO>> getSampleTriplets(String url, int limit)
+			throws DAOException {
+		StringBuffer buf = new StringBuffer().
+		append("select distinct sql_calc_found_rows ").
+			append("SUBJ_RESOURCE.URI as SUBJECT_URI, ").
+			append("PRED_RESOURCE.URI as PREDICATE_URI, ").
+			append("OBJECT, ").
+			append("DSRC_RESOURCE.URI as DERIV_SOURCE_URI ").
+		append("from SPO ").
+			append("left join RESOURCE as SUBJ_RESOURCE on (SUBJECT=SUBJ_RESOURCE.URI_HASH) ").
+			append("left join RESOURCE as PRED_RESOURCE on (PREDICATE=PRED_RESOURCE.URI_HASH) ").
+			append("left join RESOURCE as SRC_RESOURCE on (SOURCE=SRC_RESOURCE.URI_HASH) ").
+			append("left join RESOURCE as DSRC_RESOURCE on (OBJ_DERIV_SOURCE=DSRC_RESOURCE.URI_HASH) ").
+		append("where ").
+			append("SPO.SOURCE = ? LIMIT 0, ?");   
+		List<Object> params = new LinkedList<Object>();
+		params.add(Hashes.spoHash(url));
+		params.add(limit);
+		
+		Pair<List<RawTripleDTO>, Integer> result = executeQueryWithRowCount(buf.toString(), params, new ResultSetListReader<RawTripleDTO>() {
+
+			private List<RawTripleDTO> resultList = new LinkedList<RawTripleDTO>();
+			
+			@Override
+			public List<RawTripleDTO> getResultList() {
+				return resultList;
+			}
+
+			@Override
+			public void readRow(ResultSet rs) throws SQLException {
+				resultList.add(
+						new RawTripleDTO(
+								rs.getString("SUBJECT_URI"),
+								rs.getString("PREDICATE_URI"),
+								rs.getString("OBJECT"),
+								rs.getString("DERIV_SOURCE_URI")));
+			}
+		});
+		
+		
+		return new Pair<Integer, List<RawTripleDTO>>(result.getValue(), result.getId());
 	}
 
 }

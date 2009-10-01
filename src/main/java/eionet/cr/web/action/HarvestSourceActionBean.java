@@ -20,9 +20,6 @@
  */
 package eionet.cr.web.action;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,19 +34,18 @@ import net.sourceforge.stripes.validation.ValidationMethod;
 
 import org.quartz.SchedulerException;
 
-import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dao.HarvestSourceDAO;
+import eionet.cr.dao.ISearchDao;
+import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.HarvestDTO;
 import eionet.cr.dto.HarvestSourceDTO;
-import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.RawTripleDTO;
-import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.search.SearchException;
-import eionet.cr.search.SourceContentsSearch;
+import eionet.cr.util.Pair;
 import eionet.cr.util.URLUtil;
 
 /**
@@ -138,36 +134,14 @@ public class HarvestSourceActionBean extends AbstractActionBean {
      * 
      */
     private void populateSampleTriples() throws SearchException{
-    	
-    	SourceContentsSearch search = new SourceContentsSearch(harvestSource.getUrl());
-    	search.execute();
-    	noOfResources = search.getTotalMatchCount();
-    	
-    	sampleTriples = new ArrayList<RawTripleDTO>();
-    	Collection<SubjectDTO> subjects = search.getResultList();
-    	if (subjects!=null && !subjects.isEmpty()){
-    		
-    		for (Iterator<SubjectDTO> subjectsIter=subjects.iterator(); subjectsIter.hasNext() && sampleTriples.size()<10;){
-    			
-    			SubjectDTO subjectDTO = subjectsIter.next();
-    			for (Iterator<String> predicatesIter=subjectDTO.getPredicates().keySet().iterator(); predicatesIter.hasNext() && sampleTriples.size()<10;){
-    				
-    				String predicate = predicatesIter.next();
-    				
-    				RawTripleDTO tripleDTO = new RawTripleDTO();
-    				tripleDTO.setSubject(subjectDTO.getUri());
-    				tripleDTO.setPredicate(predicate);
-    				
-    				ObjectDTO object = subjectDTO.getObject(predicate);
-    				if (object!=null){
-    					tripleDTO.setObject(object.getValue());
-    					tripleDTO.setObjectDerivSource(object.getDerivSourceUri());
-    				}
-    				
-    				sampleTriples.add(tripleDTO);
-    			}
-    		}
-    	}
+    	Pair<Integer, List<RawTripleDTO>> temp;
+		try {
+			temp = MySQLDAOFactory.get().getDao(ISearchDao.class).getSampleTriplets(harvestSource.getUrl(), 10);
+		} catch (DAOException e) {
+			throw new SearchException("exception while getting sample triplets ", e);
+		}
+    	noOfResources = temp.getId();
+    	sampleTriples = temp.getValue();
     }
 
 	/**
