@@ -57,6 +57,7 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 	
 	/** */
 	private String searchExpression;
+	private boolean isUri;
 	
 	/**
 	 * 
@@ -82,7 +83,7 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 			if (!searchExpression.isEmpty()) {
 
 				if (searchExpression.isUri()) {
-
+					this.isUri = true;
 					UriSearch uriSearch = new UriSearch(searchExpression.toString());
 					uriSearch.setPageNumber(getPageN());
 					uriSearch.setSorting(getSortP(), getSortO());
@@ -158,5 +159,19 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 		list.add(col2);
 
 		return list;
+	}
+
+	/**
+	 * @return the isUri
+	 */
+	public boolean isUri() {
+		return isUri;
+	}
+
+	/**
+	 * @param isUri the isUri to set
+	 */
+	public void setUri(boolean isUri) {
+		this.isUri = isUri;
 	}
 }

@@ -22,6 +22,11 @@
 	</stripes:form>
 	<c:choose>
 		<c:when test="${not empty param.search}">
+			<c:if test="${empty actionBean.resultList and actionBean.uri and (not empty sessionScope.crUser)}">
+				<stripes:link href="/registerUrl.action"> Register this URL
+					<stripes:link-param name="url" value="${actionBean.searchExpression}" />
+				</stripes:link>
+			</c:if>			
 			<stripes:layout-render name="/pages/common/subjectsResultList.jsp" tableClass="sortable"/>
 		</c:when>
 		<c:otherwise>
