@@ -148,8 +148,8 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
 		
 		if(isUserLoggedIn()){
 			if (sourceUrl!=null && !sourceUrl.isEmpty()){
-				factory.getDao(HarvestSourceDAO.class).deleteSourcesByUrl(sourceUrl);
-				addSystemMessage("Harvest source(s) deleted!");
+				factory.getDao(HarvestSourceDAO.class).queueSourcesForDeletion(sourceUrl);
+				addSystemMessage("Harvest source(s) sheduled for removal!");
 			}
 		}
 		else

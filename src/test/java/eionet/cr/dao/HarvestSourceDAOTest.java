@@ -118,7 +118,7 @@ public class HarvestSourceDAOTest extends DBTestCase {
 		harvestSource.setSourceId(45);
 
 		ConnectionUtil.setReturnSimpleConnection(true);
-		get().getDao(HarvestSourceDAO.class).deleteSourcesByUrl(Collections.singletonList("http://localhost:8080/cr/pages/test.xml"));
+		get().getDao(HarvestSourceDAO.class).deleteSourceByUrl("http://localhost:8080/cr/pages/test.xml");
 		
 		HarvestSourceDTO source = get().getDao(HarvestSourceDAO.class).getHarvestSourceById(45);
 		assertNull(source);

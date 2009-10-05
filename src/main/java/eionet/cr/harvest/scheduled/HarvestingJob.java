@@ -51,7 +51,6 @@ import eionet.cr.harvest.Harvest;
 import eionet.cr.harvest.HarvestDAOWriter;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.HarvestNotificationSender;
-import eionet.cr.harvest.InstantHarvester;
 import eionet.cr.harvest.PullHarvest;
 import eionet.cr.harvest.PushHarvest;
 import eionet.cr.harvest.RDFHandler;
@@ -83,6 +82,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 		
 		try{
 			RDFHandler.rollbackUnfinishedHarvests();
+			deleteSheduledSources();
 			harvestUrgentQueue();
 
 			if (!isBatchHarvestingEnabled() || !isBatchHarvestingHour())
@@ -101,6 +101,21 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 		finally{
 			CurrentHarvests.setQueuedHarvest(null);
 			resetBatchHarvestingQueue();
+		}
+	}
+
+	/**
+	 * deletes all sources, which are queued for deletion.
+	 */
+	private void deleteSheduledSources() throws DAOException {
+		HarvestSourceDAO sourceDao = MySQLDAOFactory.get().getDao(HarvestSourceDAO.class); 
+		List<String> doomed = sourceDao.getScheduledForDeletion();
+		if (doomed != null && !doomed.isEmpty()) {
+			for (String url : doomed) {
+				if (!CurrentHarvests.contains(url)) {
+					sourceDao.deleteSourceByUrl(url);
+				}
+			}
 		}
 	}
 

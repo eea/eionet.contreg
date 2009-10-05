@@ -22,6 +22,7 @@ package eionet.cr.util.sql;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import javax.naming.Context;
@@ -150,6 +151,20 @@ public class ConnectionUtil {
 	 */
 	public static void setReturnSimpleConnection(boolean b) {
 		ConnectionUtil.returnSimpleConnection = b;
+	}
+
+	/**
+	 * @param statement
+	 */
+	public static void clostStatement(PreparedStatement statement) {
+		try {
+			if (statement != null) {
+				statement.close();
+			}
+		} catch (Exception ignored) {
+			logger.error("exception was raised while attempting to close the prepared statement", ignored);
+		}
+		
 	}
 
 }

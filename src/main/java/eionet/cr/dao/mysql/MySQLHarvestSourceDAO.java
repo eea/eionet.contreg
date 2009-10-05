@@ -246,41 +246,67 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 		}
     }
 
-    /*
-     * (non-Javadoc)
-     * @see eionet.cr.dao.HarvestSourceDAO#deleteSourcesByUrl(java.util.List)
+    /** 
+     * @see eionet.cr.dao.HarvestSourceDAO#queueSourcesForDeletion(java.util.List)
+     * {@inheritDoc}
      */
-    public void deleteSourcesByUrl(List<String> urls) throws DAOException {
-
-    	/* prepare question marks and url hashes */
-    	
-    	String questionMark = "?";
-    	List<Long> urlHashes = new ArrayList<Long>();
-    	List<String> questionMarks = new ArrayList<String>();
-    	for (String url:urls){
-    		urlHashes.add(Hashes.spoHash(url));
-    		questionMarks.add(questionMark);
+    public void queueSourcesForDeletion(List<String> urls) throws DAOException {
+    	if (urls == null || urls.isEmpty()) {
+    		return;
     	}
-    	String inClause = " in (" + Util.toCSV(questionMarks) + ")";
-    	
+    	StringBuffer sql = new StringBuffer("INSERT IGNORE INTO REMOVE_SOURCE_QUEUE (URL) VALUES ");
+    	List<Object> params = new LinkedList<Object>();
+    	int i = 0;
+    	for (String url : urls) {
+    		sql.append("(?)");
+    		if (++i < urls.size()) {
+    			sql.append(',');
+    		}
+    		params.add(url);
+    	}
+    	executeInsert(sql.toString(), params);
+    }
+
+	/** 
+	 * @see eionet.cr.dao.HarvestSourceDAO#getScheduledForDeletion()
+	 * {@inheritDoc}
+	 */
+	public List<String> getScheduledForDeletion() throws DAOException {
+		return executeQuery("select URL from REMOVE_SOURCE_QUEUE", null, new SingleObjectReader<String>());
+	}
+    
+    /** 
+     * @see eionet.cr.dao.HarvestSourceDAO#deleteSourceByUrl(java.lang.String)
+     * {@inheritDoc}
+     */
+    public void deleteSourceByUrl(String url) throws DAOException {
+
     	/* execute deletion queries */
+    	//we'll need those wrappers later.
+    	List<Object> urlHashesList = new LinkedList<Object>();
+    	urlHashesList.add(Hashes.spoHash(url));
+    	List<Object> urlList = new LinkedList<Object>();
+    	urlList.add(url);
     	
 		Connection conn = null;
 		try{
 			conn = getConnection();
 			
 			/* get harvest source ids, delete harvests and harvest messages by them */
-			
-			SingleObjectReader<Integer> reader = new SingleObjectReader<Integer>();
-			SQLUtil.executeQuery("select HARVEST_SOURCE_ID from HARVEST_SOURCE where URL" + inClause, urls, reader, conn);
-			String harvestSourceIdsCSV = Util.toCSV(reader.getResultList());
+			List<Long> sourceIds = executeQuery(
+					"select HARVEST_SOURCE_ID from HARVEST_SOURCE where URL = ?",
+					urlHashesList,
+					new SingleObjectReader<Long>());
+			String harvestSourceIdsCSV = Util.toCSV(sourceIds);
 			
 			if (!StringUtils.isBlank(harvestSourceIdsCSV)){
 				
-				reader = new SingleObjectReader<Integer>();
-				SQLUtil.executeQuery("select HARVEST_ID from HARVEST where HARVEST_SOURCE_ID in (" + harvestSourceIdsCSV + ")", reader, conn);
+				List<Long> harvestIds = executeQuery(
+						"select HARVEST_ID from HARVEST where HARVEST_SOURCE_ID in (" + harvestSourceIdsCSV + ")",
+						null,
+						new SingleObjectReader<Long>());
 
-				String harvestIdsCSV = Util.toCSV(reader.getResultList());
+				String harvestIdsCSV = Util.toCSV(harvestIds);
 				if (harvestIdsCSV.trim().length()>0){
 					SQLUtil.executeUpdate("delete from HARVEST_MESSAGE where HARVEST_ID in (" + harvestIdsCSV + ")", conn);
 				}
@@ -288,13 +314,13 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 			}
 			
 			/* delete various stuff by harvest source urls or url hashes */
-			
-			SQLUtil.executeUpdate("delete from HARVEST_SOURCE where URL" + inClause, urls, conn);
-			SQLUtil.executeUpdate("delete from HARVEST_SOURCE where SOURCE" + inClause, urlHashes, conn);
-			SQLUtil.executeUpdate("delete from SPO where SOURCE" + inClause, urlHashes, conn);
-			SQLUtil.executeUpdate("delete from SPO where OBJ_DERIV_SOURCE" + inClause, urlHashes, conn);
-			SQLUtil.executeUpdate("delete from UNFINISHED_HARVEST where SOURCE" + inClause, urlHashes, conn);
-			SQLUtil.executeUpdate("delete from URGENT_HARVEST_QUEUE where URL" + inClause, urls, conn);
+			SQLUtil.executeUpdate("delete from HARVEST_SOURCE where URL = ?" , urlList, conn);
+			SQLUtil.executeUpdate("delete from HARVEST_SOURCE where SOURCE = ?" , urlHashesList, conn);
+			SQLUtil.executeUpdate("delete from SPO where SOURCE = ?", urlHashesList, conn);
+			SQLUtil.executeUpdate("delete from SPO where OBJ_DERIV_SOURCE = ?" , urlHashesList, conn);
+			SQLUtil.executeUpdate("delete from UNFINISHED_HARVEST where SOURCE = ?", urlHashesList, conn);
+			SQLUtil.executeUpdate("delete from URGENT_HARVEST_QUEUE where URL = ?" , urlList, conn);
+			SQLUtil.executeUpdate("delete from REMOVE_SOURCE_QUEUE where URL = ?", urlList, conn);
 		}
 		catch (Exception e){
 			throw new DAOException(e.getMessage(), e);

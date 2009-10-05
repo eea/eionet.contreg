@@ -87,11 +87,26 @@ public interface HarvestSourceDAO extends IDao{
     public void editSource(HarvestSourceDTO source) throws DAOException;
 
     /**
+     * adds references to sources into queue for removal.
      * 
-     * @param urls
+     * @param urls - urls to add
      * @throws DAOException
      */
-    public void deleteSourcesByUrl(List<String> urls) throws DAOException;
+    public void queueSourcesForDeletion(List<String> urls) throws DAOException;
+    
+    /**
+     * fetches all scheduled source URLs, which are scheduled for removal.
+     * 
+     * @return
+     */
+    List<String> getScheduledForDeletion() throws DAOException;
+    /**
+     * Deletes selected source from the DB.
+     * 
+     * @param url - source url
+     * @throws DAOException
+     */
+    public void deleteSourceByUrl(String url) throws DAOException;
 
     /**
      * 
@@ -117,4 +132,5 @@ public interface HarvestSourceDAO extends IDao{
      * @throws DAOException
      */
     public List<HarvestSourceDTO> getNextScheduledSources(int numOfSegments) throws DAOException;
+
 }
