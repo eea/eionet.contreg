@@ -5,9 +5,9 @@ alter table HARVEST_SOURCE add column URL_HASH bigint(20) not null default 0 aft
  
 -- Create temp table to store id / hash pairs
 create table TEMP_UPDATE_051009 (ID bigint, HASH bigint) engine = MyISAM;
---create index on hash column
+-- create index on hash column
 create index hash_index on TEMP_UPDATE_051009 (ID); 
---lock the involved tables
+-- lock the involved tables
 lock tables HARVEST_SOURCE WRITE, RESOURCE WRITE, TEMP_UPDATE_051009 WRITE;
 -- populate TEMP_UPDATE_051009 table with hash
 insert into TEMP_UPDATE_051009 (ID, HASH) select HARVEST_SOURCE_ID, URI_HASH from HARVEST_SOURCE inner join RESOURCE on HARVEST_SOURCE.URL = RESOURCE.URI;
@@ -19,8 +19,8 @@ update HARVEST_SOURCE  set URL_HASH = (select HASH from TEMP_UPDATE_051009 where
 drop table TEMP_UPDATE_051009;
 unlock tables;
 
---add unique key constraint to URL_HASH
-alter table HARVEST_SOURCE modify column HASH_URL bigint(20) not null unique;
+-- add unique key constraint to URL_HASH
+alter table HARVEST_SOURCE modify column URL_HASH bigint(20) not null unique;
 
 -- change URL
 alter table HARVEST_SOURCE drop key URL;
