@@ -14,7 +14,7 @@
 					<li id="currenttab"><span>Resource properties</span></li>
 					<li>
 						<c:choose>
-							<c:when test="${not empty actionBean.subject && not empty actionBean.subject.uri}">
+							<c:when test="${not empty actionBean.subject && not empty actionBean.subject.uri && !actionBean.subject.anonymous}">
 								<stripes:link href="/references.action" event="search">Resource references
 									<stripes:param name="uri" value="${actionBean.subject.uri}"/>
 								</stripes:link>
