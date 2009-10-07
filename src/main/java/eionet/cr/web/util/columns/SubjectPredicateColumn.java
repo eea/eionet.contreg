@@ -26,6 +26,7 @@ import java.util.LinkedHashSet;
 
 import net.sourceforge.stripes.action.UrlBinding;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.common.Predicates;
@@ -145,7 +146,7 @@ public class SubjectPredicateColumn extends SearchResultColumn{
 					}
 				}
 			}
-
+			
 			// rdfs:label gets special treatment
 			if (predicateUri.equals(Predicates.RDFS_LABEL)){
 				
@@ -157,8 +158,12 @@ public class SubjectPredicateColumn extends SearchResultColumn{
 					}
 					else{
 						result = URIUtil.deriveLabel(subjectDTO.getUri());
+						if (result.trim().length()==0){
+							result = "No label";
+						}
 					}
 				}
+				result = StringEscapeUtils.escapeXml(result);
 				
 				// no we are sure we have a label to display, so let's generate the factsheet link based on that
 				String factsheetUrlBinding = FactsheetActionBean.class.getAnnotation(UrlBinding.class).value();
@@ -174,7 +179,7 @@ public class SubjectPredicateColumn extends SearchResultColumn{
 			}
 		}
 		
-		return result;
+		return result.trim().length()>0 ? result : "No label";
 	}
 
 	/*
@@ -183,7 +188,7 @@ public class SubjectPredicateColumn extends SearchResultColumn{
 	 */
 	public boolean isEscapeXml(){
 		
-		return predicateUri.equals(Predicates.RDFS_LABEL) ? false : super.isEscapeXml();
+		return predicateUri.equals(Predicates.RDFS_LABEL) ? false : true;
 	}
 	
 	/*

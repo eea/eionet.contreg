@@ -308,6 +308,7 @@ public class FactsheetActionBean extends AbstractActionBean{
 			
 			// add some hard-coded properties, HashMap assures there won't be duplicates
 			props.put(Predicates.RDF_TYPE, "Type");
+			props.put(Predicates.RDFS_LABEL, "Label");
 			props.put(Predicates.CR_TAG, "Tag");
 			props.put(Predicates.CR_COMMENT, "Comment");
 			props.put(Predicates.CR_HAS_SOURCE, "hasSource");
