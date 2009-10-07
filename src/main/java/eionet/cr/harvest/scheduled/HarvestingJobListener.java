@@ -33,6 +33,8 @@ import org.quartz.JobListener;
  */
 public class HarvestingJobListener implements JobListener{
 	
+	public static final String NAME = HarvestingJobListener.class.getClass().getSimpleName();
+	
 	/** */
 	private static Log logger = LogFactory.getLog(HarvestingJobListener.class);
 
@@ -41,7 +43,7 @@ public class HarvestingJobListener implements JobListener{
 	 * @see org.quartz.JobListener#getName()
 	 */
 	public String getName() {
-		return this.getClass().getSimpleName();
+		return NAME;
 	}
 	
 	/*

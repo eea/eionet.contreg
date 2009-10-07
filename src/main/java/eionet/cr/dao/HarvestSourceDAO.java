@@ -133,4 +133,18 @@ public interface HarvestSourceDAO extends IDao{
      */
     public List<HarvestSourceDTO> getNextScheduledSources(int numOfSegments) throws DAOException;
 
+	/**
+	 * deletes orphans from SPO table.
+	 * Orphan is a record inside SPO, which has an non-existent source in HARVEST_SOURCE.
+	 * @throws DAOException 
+	 * 
+	 */
+	void deleteOrphanSources() throws DAOException;
+
+	/**
+	 * @param neededToRemain
+	 * @throws DAOException 
+	 */
+	void deleteHarvestHistory(int neededToRemain) throws DAOException;
+
 }

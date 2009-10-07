@@ -168,8 +168,8 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 	}
 
     /** */
-	private static final String addSourceSQL = "insert into HARVEST_SOURCE (URL,EMAILS,TIME_CREATED,INTERVAL_MINUTES,TRACKED_FILE) VALUES (?,?,NOW(),?,?)";
-	private static final String addSourceIgnoreSQL = "insert ignore into HARVEST_SOURCE (URL,EMAILS,TIME_CREATED,INTERVAL_MINUTES,TRACKED_FILE) VALUES (?,?,NOW(),?,?)";
+	private static final String addSourceSQL = "insert into HARVEST_SOURCE (URL,URL_HASH,EMAILS,TIME_CREATED,INTERVAL_MINUTES,TRACKED_FILE) VALUES (?,?,?,NOW(),?,?)";
+	private static final String addSourceIgnoreSQL = "insert ignore into HARVEST_SOURCE (URL,URL_HASH,EMAILS,TIME_CREATED,INTERVAL_MINUTES,TRACKED_FILE) VALUES (?,?,?,NOW(),?,?)";
 
 	/*
      * (non-Javadoc)
@@ -202,6 +202,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
     	
     	List<Object> values = new ArrayList<Object>();
 		values.add(source.getUrl());
+		values.add(Hashes.spoHash(source.getUrl()));
 		values.add(source.getEmails());
 		values.add(source.getIntervalMinutes());
 		values.add(YesNoBoolean.format(source.isTrackedFile()));
@@ -268,7 +269,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
     		}
     		params.add(url);
     	}
-    	executeInsert(sql.toString(), params);
+    	execute(sql.toString(), params);
     }
 
 	/** 
@@ -414,6 +415,31 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
     	values.add(new Integer(limit));
     	
 		return executeQuery(getNextScheduledSourcesSQL, values, new HarvestSourceDTOReader());
+	}
+
+	/** 
+	 * @throws DAOException 
+	 * @see eionet.cr.dao.HarvestSourceDAO#deleteOrphanSources()
+	 * {@inheritDoc}
+	 */
+	public void deleteOrphanSources() throws DAOException {
+		String sql = "delete from SPO where source not in (select url_hash from harvest_source);";
+		execute(sql, null);
+	}
+
+	/** 
+	 * @throws DAOException 
+	 * @see eionet.cr.dao.HarvestSourceDAO#deleteHarvestHistory(int)
+	 * {@inheritDoc}
+	 */
+	public void deleteHarvestHistory(int neededToRemain) throws DAOException {
+		//fetch the last auto_incremented id;
+		Long id = executeQueryUniqueResult("select max(HARVEST_ID) from HARVEST", null, new SingleObjectReader<Long>());
+		//delete everything, except last needed_to_remain records
+		List<Object> params = new LinkedList<Object>();
+		params.add(id - neededToRemain);
+		execute("delete from HARVEST where HARVEST_ID <= ?", params);
+		execute("delete from HARVEST_MESSAGE where HARVEST_ID not in (select HARVEST_ID from HARVEST)", null);
 	}
 
 }

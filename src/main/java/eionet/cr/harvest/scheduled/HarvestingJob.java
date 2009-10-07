@@ -62,6 +62,8 @@ import eionet.cr.web.security.CRUser;
  */
 public class HarvestingJob implements StatefulJob, ServletContextListener{
 	
+	public static final String NAME = HarvestingJob.class.getClass().getSimpleName();
+	
 	/** */
 	private static Log logger = LogFactory.getLog(HarvestingJob.class);
 	
@@ -272,7 +274,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 	public void contextInitialized(ServletContextEvent servletContextEvent) {
 		
 		try{
-			JobDetail jobDetails = new JobDetail(getClass().getSimpleName(), JobScheduler.class.getName(), HarvestingJob.class);
+			JobDetail jobDetails = new JobDetail(HarvestingJob.NAME, JobScheduler.class.getName(), HarvestingJob.class);
 			
 			HarvestingJobListener listener = new HarvestingJobListener();
 			jobDetails.addJobListener(listener.getName());

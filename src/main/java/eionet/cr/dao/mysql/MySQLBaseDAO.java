@@ -27,8 +27,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import com.mysql.jdbc.Statement;
-
 import eionet.cr.dao.DAOException;
 import eionet.cr.util.Pair;
 import eionet.cr.util.sql.ConnectionUtil;
@@ -98,19 +96,23 @@ public abstract class MySQLBaseDAO {
 	}
 	
 	/**
-	 * executes insert with given sql and parameters.
+	 * executes insert or update with given sql and parameters.
 	 * 
 	 * @param sql - sql string to execute
 	 * @param params - sql params
 	 * @throws DAOException
 	 */
-	protected void executeInsert(String sql, List<?> params) throws DAOException {
+	protected void execute(String sql, List<?> params) throws DAOException {
 		Connection conn = null;
 		PreparedStatement statement = null;
 		try {
 			conn = getConnection();
-			statement  = SQLUtil.prepareStatement(sql, params, conn);
-			statement.execute();
+			if (params != null && !params.isEmpty()) {
+				statement  = SQLUtil.prepareStatement(sql, params, conn);
+				statement.execute();
+			} else {
+				SQLUtil.executeUpdate(sql, conn);
+			}
 		} catch (Exception e){
 			throw new DAOException(e.getMessage(), e);
 		} finally{

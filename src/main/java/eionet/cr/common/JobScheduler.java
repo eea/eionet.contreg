@@ -39,6 +39,7 @@ import org.quartz.impl.StdSchedulerFactory;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.util.Pair;
 import eionet.cr.web.util.job.DataflowSearchPicklistCacheUpdater;
+import eionet.cr.web.util.job.GarbageCollectorJob;
 import eionet.cr.web.util.job.RecentResourcesCacheUpdater;
 import eionet.cr.web.util.job.TypeCacheUpdater;
 
@@ -56,11 +57,11 @@ public class JobScheduler implements ServletContextListener{
 	/** */
 	private static Scheduler quartzScheduler = null;
 	
-	private static final Pair<String, JobDetail>[] details;
+	private static final Pair<String, JobDetail>[] intervalJobs;
+	private static final Pair<String, JobDetail>[] cronJobs;
 	
 	static {
-		
-		details = new Pair[]{
+		intervalJobs = new Pair[]{
 				new Pair(
 						GeneralConfig.DATAFLOW_PICKLIST_CACHE_UPDATE_INTERVAL,
 						new JobDetail(
@@ -80,6 +81,16 @@ public class JobScheduler implements ServletContextListener{
 								JobScheduler.class.getName(),
 								TypeCacheUpdater.class))	
 		};
+		
+		cronJobs = new Pair[]{
+				new Pair(
+						GeneralConfig.GARBAGE_COLLECTOR_CRON_JOB,
+						new JobDetail(
+								GarbageCollectorJob.class.getSimpleName(),
+								JobScheduler.class.getName(),
+								GarbageCollectorJob.class))
+		};
+		
 	}
 	
 	/**
@@ -167,17 +178,28 @@ public class JobScheduler implements ServletContextListener{
 	 * {@inheritDoc}
 	 */
 	public void contextInitialized(ServletContextEvent sce) {
-		for (Pair<String,JobDetail> job : details) {
+		for (Pair<String,JobDetail> job : intervalJobs) {
 			try{
 				scheduleIntervalJob(
 						Long.parseLong(GeneralConfig.getRequiredProperty(job.getId())),
 						job.getValue());
 				logger.debug(job.getValue().getName() + " scheduled");
-			}
-			catch (ParseException e){
+			} catch (ParseException e){
+				logger.fatal("Error when scheduling " + job.getValue().getName(), e);
+			} catch (SchedulerException e){
 				logger.fatal("Error when scheduling " + job.getValue().getName(), e);
 			}
-			catch (SchedulerException e){
+		}
+		for(Pair<String,JobDetail> job: cronJobs) {
+			try {
+				scheduleCronJob(
+						GeneralConfig.getRequiredProperty(job.getId()),
+						job.getValue());
+				logger.debug(job.getValue().getName() + " scheduled with cron string: " 
+						+ GeneralConfig.getRequiredProperty(job.getId()));
+			} catch (SchedulerException e) {
+				logger.fatal("Error when scheduling " + job.getValue().getName(), e);
+			} catch (ParseException e){
 				logger.fatal("Error when scheduling " + job.getValue().getName(), e);
 			}
 		}

@@ -24,14 +24,15 @@ import static eionet.cr.dao.mysql.MySQLDAOFactory.get;
 
 import java.util.List;
 
-import org.dbunit.DBTestCase;
+import junit.framework.TestCase;
+
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.junit.Test;
 
 import eionet.cr.config.GeneralConfig;
-import eionet.cr.dao.mysql.MySQLHarvestMessageDAO;
 import eionet.cr.dto.HarvestMessageDTO;
+import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.test.util.DbHelper;
 import eionet.cr.util.sql.ConnectionUtil;
 
@@ -41,7 +42,7 @@ import eionet.cr.util.sql.ConnectionUtil;
  * @author altnyris
  *
  */
-public class HarvestMessageDAOTest extends DBTestCase {
+public class HarvestMessageDAOTest extends TestCase {
 	
 	/**
 	 * Provide a connection to the database.
@@ -101,6 +102,19 @@ public class HarvestMessageDAOTest extends DBTestCase {
 		
 		HarvestMessageDTO message = get().getDao(HarvestMessageDAO.class).findHarvestMessageByMessageID(5);
 		assertNull(message);
+	}
+	
+	@Test
+	public void testInsertSource() throws Exception {
+		ConnectionUtil.setReturnSimpleConnection(true);
+		HarvestSourceDTO dto = new HarvestSourceDTO();
+		dto.setUrl("http://1.ee");
+		dto.setEmails("emails");
+		dto.setIntervalMinutes(1);
+		dto.setTrackedFile(true);
+		Integer id = get().getDao(HarvestSourceDAO.class).addSource(dto, "user");
+		assertNotNull(id);
+		get().getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(dto, "user");
 	}
 
 }
