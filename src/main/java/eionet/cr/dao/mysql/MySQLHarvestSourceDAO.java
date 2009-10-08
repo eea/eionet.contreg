@@ -404,10 +404,10 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 	 */
 	public List<HarvestSourceDTO> getNextScheduledSources(int numOfSegments) throws DAOException {
 
-		Integer numberOfSources = executeQueryUniqueResult(
-				"select count(*)	from HARVEST_SOURCE",
+		Long numberOfSources = executeQueryUniqueResult(
+				"select count(*) from HARVEST_SOURCE",
 				null,
-				new SingleObjectReader<Integer>());
+				new SingleObjectReader<Long>());
 		numberOfSources = numberOfSources == null ? 0 : numberOfSources;
 		int limit = Math.round((float)numberOfSources/(float)numOfSegments);
 

@@ -84,7 +84,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 		
 		try{
 			RDFHandler.rollbackUnfinishedHarvests();
-			deleteSheduledSources();
+			deleteSourcesQueuedForRemoval();
 			harvestUrgentQueue();
 
 			if (!isBatchHarvestingEnabled() || !isBatchHarvestingHour())
@@ -109,7 +109,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 	/**
 	 * deletes all sources, which are queued for deletion.
 	 */
-	private void deleteSheduledSources() throws DAOException {
+	private void deleteSourcesQueuedForRemoval() throws DAOException {
 		HarvestSourceDAO sourceDao = MySQLDAOFactory.get().getDao(HarvestSourceDAO.class); 
 		List<String> doomed = sourceDao.getScheduledForDeletion();
 		if (doomed != null && !doomed.isEmpty()) {
