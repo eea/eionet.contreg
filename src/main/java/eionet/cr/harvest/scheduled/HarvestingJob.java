@@ -54,6 +54,8 @@ import eionet.cr.harvest.HarvestNotificationSender;
 import eionet.cr.harvest.PullHarvest;
 import eionet.cr.harvest.PushHarvest;
 import eionet.cr.harvest.RDFHandler;
+import eionet.cr.util.EMailSender;
+import eionet.cr.util.Util;
 import eionet.cr.web.security.CRUser;
 /**
  * 
@@ -98,6 +100,12 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 			}
 		}
 		catch (Exception e){
+			try{
+				EMailSender.sendToSysAdmin(getClass().getName() + " encountered the following error", Util.getStackTrace(e));
+			}
+			catch (Exception ee){
+				logger.error("Exception when sending error notification to system administrator", ee);
+			}
 			throw new JobExecutionException(e.toString(), e);
 		}
 		finally{
