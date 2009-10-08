@@ -20,6 +20,8 @@
  */
 package eionet.cr.harvest;
 
+import static eionet.cr.dao.mysql.MySQLDAOFactory.get;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -35,13 +37,16 @@ import java.util.Date;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.lang.StringUtils;
 import org.xml.sax.SAXException;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
+import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
+import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.harvest.util.arp.ARPSource;
 import eionet.cr.harvest.util.arp.InputStreamBasedARPSource;
@@ -50,6 +55,7 @@ import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
 import eionet.cr.util.xml.ConversionsParser;
 import eionet.cr.util.xml.XmlAnalysis;
+import eionet.cr.web.security.CRUser;
 
 /**
  * 
@@ -98,7 +104,7 @@ public class PullHarvest extends Harvest{
 				}
 				
 				// prepare URL connection
-				URL url = new URL(sourceUrlString);
+				URL url = new URL(StringUtils.substringBefore(sourceUrlString, "#"));
 				URLConnection urlConnection = url.openConnection();				
 				urlConnection.setRequestProperty("Accept", "application/rdf+xml, text/xml, */*");
 				urlConnection.setRequestProperty("User-Agent", getUserAgent());
@@ -459,5 +465,37 @@ public class PullHarvest extends Harvest{
 		
 		logger.debug("Pull harvest started");
 		super.doHarvestStartedActions();
+	}
+
+	/**
+	 * 
+	 * @param sourceUrl
+	 * @return
+	 * @throws DAOException 
+	 */
+	public static PullHarvest createFullSetup(String sourceUrl, boolean urgent) throws DAOException{
+		
+		return createFullSetup(MySQLDAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(sourceUrl), urgent);
+	}
+	
+	/**
+	 * 
+	 * @param dto
+	 * @param urgent
+	 * @return
+	 * @throws DAOException
+	 */
+	public static PullHarvest createFullSetup(HarvestSourceDTO dto, boolean urgent) throws DAOException{
+		
+		int numOfResources = dto.getResources()==null ? 0 : dto.getResources().intValue();
+		
+		PullHarvest harvest = new PullHarvest(dto.getUrl(), urgent ? null : dto.getLastHarvest());
+		
+		harvest.setPreviousHarvest(get().getDao(HarvestDAO.class).getLastHarvest(dto.getSourceId().intValue()));
+		harvest.setDaoWriter(new HarvestDAOWriter(
+				dto.getSourceId().intValue(), Harvest.TYPE_PULL, numOfResources, CRUser.application.getUserName()));
+		harvest.setNotificationSender(new HarvestNotificationSender());
+		
+		return harvest;
 	}
 }

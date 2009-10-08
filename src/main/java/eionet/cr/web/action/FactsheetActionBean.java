@@ -145,8 +145,7 @@ public class FactsheetActionBean extends AbstractActionBean{
 				
 				/* issue an instant harvest of this url */
 				
-				InstantHarvester.Resolution resolution =
-					InstantHarvester.harvest(StringUtils.substringBefore(uri, "#"), getUserName());
+				InstantHarvester.Resolution resolution = InstantHarvester.harvest(uri, getUserName());
 				
 				/* give feedback to the user */
 				

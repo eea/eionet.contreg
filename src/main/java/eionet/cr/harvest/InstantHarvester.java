@@ -81,15 +81,19 @@ public class InstantHarvester extends Thread{
 		
 		InstantHarvest instantHarvest = null;
 		try{
-			HarvestSourceDTO sourceDTO = MySQLDAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(sourceUrl);
-			instantHarvest = new InstantHarvest(sourceUrl, sourceDTO.getLastHarvest(), userName);
+			instantHarvest = InstantHarvest.createFullSetup(sourceUrl, userName);
 			instantHarvest.execute();
-		}
-		catch (DAOException e){
-			harvestException = new HarvestException(e.toString(), e);
 		}
 		catch (HarvestException e){
 			harvestException = e;
+		}
+		catch (Throwable e){
+			if (e instanceof HarvestException){
+				harvestException = (HarvestException)e;
+			}
+			else{
+				harvestException = new HarvestException(e.toString(), e);
+			}
 		}
 		finally{
 			if (instantHarvest!=null){

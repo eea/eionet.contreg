@@ -211,6 +211,8 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 			if (sourceId!=null && sourceId.intValue()>0){
 				harvest.setDaoWriter(new HarvestDAOWriter(sourceId.intValue(), Harvest.TYPE_PUSH, numOfResources, CRUser.application.getUserName()));
 			}
+			
+			harvest.setNotificationSender(new HarvestNotificationSender());
 			executeHarvest(harvest);
 		}
 		catch (DAOException e){
@@ -234,14 +236,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 				return;
 			}
 			
-			int numOfResources = harvestSource.getResources()==null ? 0 : harvestSource.getResources().intValue();
-			
-			Harvest harvest = new PullHarvest(harvestSource.getUrl(), urgent ? null : harvestSource.getLastHarvest());
-			
-			harvest.setPreviousHarvest(get().getDao(HarvestDAO.class).getLastHarvest(harvestSource.getSourceId().intValue()));
-			harvest.setDaoWriter(new HarvestDAOWriter(
-					harvestSource.getSourceId().intValue(), Harvest.TYPE_PULL, numOfResources, CRUser.application.getUserName()));
-			
+			Harvest harvest = PullHarvest.createFullSetup(harvestSource, urgent);
 			executeHarvest(harvest);
 		}
 	}
@@ -254,8 +249,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 		
 		if (harvest!=null){
 			CurrentHarvests.setQueuedHarvest(harvest);
-			try {
-				harvest.setNotificationSender(new HarvestNotificationSender());
+			try {				
 				harvest.execute();
 			}
 			catch (HarvestException e){

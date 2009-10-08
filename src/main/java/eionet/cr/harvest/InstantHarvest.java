@@ -20,10 +20,17 @@
 * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.harvest;
 
+import static eionet.cr.dao.mysql.MySQLDAOFactory.get;
+
 import java.util.Date;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
+import eionet.cr.dao.DAOException;
+import eionet.cr.dao.HarvestDAO;
+import eionet.cr.dao.HarvestSourceDAO;
+import eionet.cr.dao.mysql.MySQLDAOFactory;
+import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.web.security.CRUser;
 
@@ -65,5 +72,27 @@ public class InstantHarvest extends PullHarvest{
 		
 		logger.debug("Instant harvest started");
 		super.doHarvestStartedActions();
+	}
+	
+	/**
+	 * 
+	 * @param sourceUrl
+	 * @param userName
+	 * @return
+	 * @throws DAOException
+	 */
+	public static InstantHarvest createFullSetup(String sourceUrl, String userName) throws DAOException{
+		
+		HarvestSourceDTO dto = MySQLDAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(sourceUrl);
+		InstantHarvest instantHarvest = new InstantHarvest(sourceUrl, null, userName);
+		
+		int numOfResources = dto.getResources()==null ? 0 : dto.getResources().intValue();
+		
+		instantHarvest.setPreviousHarvest(get().getDao(HarvestDAO.class).getLastHarvest(dto.getSourceId().intValue()));
+		instantHarvest.setDaoWriter(new HarvestDAOWriter(
+				dto.getSourceId().intValue(), Harvest.TYPE_PULL, numOfResources, CRUser.application.getUserName()));
+		instantHarvest.setNotificationSender(new HarvestNotificationSender());
+		
+		return instantHarvest;
 	}
 }
