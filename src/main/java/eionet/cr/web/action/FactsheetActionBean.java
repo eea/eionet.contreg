@@ -34,7 +34,7 @@ import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.action.SimpleMessage;
+import net.sourceforge.stripes.action.StreamingResolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.validation.SimpleError;
 import net.sourceforge.stripes.validation.ValidationMethod;
@@ -46,18 +46,16 @@ import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDao;
-import eionet.cr.dao.mysql.MySQLHarvestSourceDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.InstantHarvester;
-import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.search.FactsheetSearch;
 import eionet.cr.search.SearchException;
-import eionet.cr.search.util.SearchExpression;
 import eionet.cr.search.util.SubProperties;
 import eionet.cr.search.util.UriLabelPair;
+import eionet.cr.util.Pair;
 import eionet.cr.util.URLUtil;
 import eionet.cr.web.util.FactsheetObjectId;
 
@@ -120,14 +118,42 @@ public class FactsheetActionBean extends AbstractActionBean{
 	}
 	
 	/**
+	 * Handle for ajax harvesting.
+	 * 
+	 * @return
+	 */
+	public Resolution harvestAjax() {
+		String message;
+		try {
+			message = scheduleHarvest().getValue();
+		} catch (Exception ignored) {
+			logger.error("error while scheduling ajax harvest", ignored);
+			message = "Error occured, more info can be obtained in application logs";
+		}
+		return new StreamingResolution("text/html", message);
+	}
+
+	/**
 	 * schedules a harvest for resource.
 	 * 
 	 * @return view resolution
 	 * @throws HarvestException
 	 * @throws DAOException 
 	 */
-	public Resolution harvest() throws HarvestException, DAOException{
+	public Resolution harvest() throws HarvestException, DAOException {
+		Pair<Boolean, String> message = scheduleHarvest();
+		if (message.getId()) {
+			addWarningMessage(message.getValue());
+		} else {
+			addSystemMessage(message.getValue());
+		}
 		
+		return new RedirectResolution(this.getClass(), "view").addParameter("uri", uri);
+	}
+	
+	//helper method to eliminate code duplication.
+	private Pair<Boolean, String> scheduleHarvest() throws HarvestException, DAOException  {
+		String message = null;
 		if(isUserLoggedIn()){
 			if (!StringUtils.isBlank(uri) && URLUtil.isURL(uri)){
 
@@ -150,29 +176,25 @@ public class FactsheetActionBean extends AbstractActionBean{
 				/* give feedback to the user */
 				
 				if (resolution.equals(InstantHarvester.Resolution.ALREADY_HARVESTING))
-					addSystemMessage("The source is currently being harvested by another user or background harvester!");
+					message = "The source is currently being harvested by another user or background harvester!";
 				else if (resolution.equals(InstantHarvester.Resolution.UNCOMPLETE))
-					addSystemMessage("The harvest hasn't finished yet, but continues in the background!");
+					message = "The harvest hasn't finished yet, but continues in the background!";
 				else if (resolution.equals(InstantHarvester.Resolution.COMPLETE))
-					addSystemMessage("The harvest has been completed!");
+					message = "The harvest has been completed!";
 				else if (resolution.equals(InstantHarvester.Resolution.SOURCE_UNAVAILABLE))
-					addSystemMessage("The resource was not available!");
+					message = "The resource was not available!";
 				else if (resolution.equals(InstantHarvester.Resolution.NO_STRUCTURED_DATA))
-					addSystemMessage("The resource contained no structured data!");
-				else
-					addSystemMessage("No feedback given from harvest!");
-
-//				UrgentHarvestQueue.addPullHarvest(StringUtils.substringBefore(uri, "#"));
-//				showMessage("The source has been scheduled for urgent harvest!");
+					message = "The resource contained no structured data!";
+				else 
+					message = "No feedback given from harvest!";
 			}
+			return new Pair<Boolean,String> (false, message);
 		}
 		else{
-			addWarningMessage(getBundle().getString("not.logged.in"));
+			return new Pair<Boolean, String> (true, getBundle().getString("not.logged.in"));
 		}
-		
-		return new RedirectResolution(this.getClass(), "view").addParameter("uri", uri);
 	}
-
+	
 	/**
 	 * 
 	 * @return

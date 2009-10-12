@@ -14,17 +14,17 @@
 	<em>Words shorter than four letters are ignored!</em>
 	</p>
 
-	<stripes:form action="/simpleSearch.action" method="get" focus="searchExpression" style="padding-bottom:20px">
+	<crfn:form action="/simpleSearch.action" method="get">
 		<stripes:label for="expressionText" class="question">Expression</stripes:label>
 		<stripes:text name="searchExpression" id="expressionText" size="50"/>
 		<stripes:submit name="search" value="Search" id="searchButton"/>
 		<stripes:text name="dummy" style="visibility:hidden;display:none" disabled="disabled" size="1"/>
-	</stripes:form>
+	</crfn:form>
 	<c:choose>
 		<c:when test="${not empty param.search}">
 			<c:if test="${empty actionBean.resultList and actionBean.uri and (not empty sessionScope.crUser)}">
 				<stripes:link href="/registerUrl.action"> Register this URL
-					<stripes:link-param name="url" value="${actionBean.searchExpression}" />
+					<stripes:param name="url" value="${actionBean.searchExpression}" />
 				</stripes:link>
 			</c:if>			
 			<stripes:layout-render name="/pages/common/subjectsResultList.jsp" tableClass="sortable"/>

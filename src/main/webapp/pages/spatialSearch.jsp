@@ -11,7 +11,7 @@
 		Coordinates can be any positive or negative number. For example -60.257, 0.15, 17.
 		</p>
 	
-		<stripes:form action="/spatialSearch.action" method="get" style="padding-bottom:20px">
+		<crfn:form action="/spatialSearch.action" method="get" style="padding-bottom:20px">
 
 			<stripes:label for="txtLatS">Latitude (south,north):</stripes:label>
 			<stripes:text name="latS" id="txtLatS" size="10"/> - <stripes:text name="latN" id="txtLatN" size="10"/>
@@ -21,7 +21,7 @@
 			<br/><br/>
 			<stripes:submit name="search" value="Search" id="searchButton"/>
 			
-		</stripes:form>
+		</crfn:form>
 		
 		<c:if test="${not empty param.search}">
 			<stripes:layout-render name="/pages/common/subjectsResultList.jsp" tableClass="sortable"/>

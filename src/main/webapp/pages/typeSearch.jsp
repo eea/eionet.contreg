@@ -13,7 +13,7 @@
        	The search will return the list of all resources having the type you selected.
        	To view a resource's factsheet, click the relevant action icon next to it.   
        </p>
-		<stripes:form action="/typeSearch.action" method="get">
+		<crfn:form action="/typeSearch.action" method="get">
 			<stripes:select name="type">
 				<c:forEach items="${actionBean.availableTypes }" var="type">
 					<stripes:option value="${type.id}">${type.value} (${type.id})</stripes:option>
@@ -23,13 +23,13 @@
 			<c:if test='${sessionScope.crUser!=null && crfn:hasPermission(sessionScope.crUser.userName, "/", "u")}'>
 				&nbsp;<stripes:submit name="introspect" value="Introspect"/>
 			</c:if>		
-		</stripes:form><br/>
+		</crfn:form><br/>
 			<c:if test="${not empty actionBean.type}">
 			<div style="margin-bottom:10px; float:right;  min-width:400px; width:50%;">
 				<fieldset>
 				<legend>Select filters</legend>
 				<c:if test="${not empty actionBean.availableFilters}">
-				<stripes:form action="/typeSearch.action" method="post">
+				<crfn:form action="/typeSearch.action" method="post">
 					<stripes:hidden name="addFilter" value="addFilter"/>
 					<stripes:hidden name="type" value="${actionBean.type }"/>
 					<stripes:select name="newFilter" onchange="this.form.submit();">
@@ -41,11 +41,11 @@
 					<noscript>
 						<stripes:submit name="addFilter" value="Add filter"/>
 					</noscript>
-				</stripes:form>
+				</crfn:form>
 				<br/>
 				</c:if>
 					<c:if test="${not empty actionBean.displayFilters}">
-						<stripes:form action="/typeSearch.action" method="post">
+						<crfn:form action="/typeSearch.action" method="post">
 						<stripes:hidden name="type" value="${actionBean.type }"/>
 						<table>
 							<tbody>
@@ -61,7 +61,7 @@
 							</tbody>
 						</table>
 						<stripes:submit name="applyFilters" value="Apply filters"/>
-						</stripes:form>
+						</crfn:form>
 						<br/>
 					</c:if>	
 				</fieldset>		
@@ -71,7 +71,7 @@
 			<div style="max-width: 350px;">
 				<fieldset>
 				<legend>Select columns to be displayed (max 4)</legend>
-				<stripes:form action="/typeSearch.action" method="post">
+				<crfn:form action="/typeSearch.action" method="post">
 					<stripes:hidden name="type" value="${actionBean.type }"/>
 					<stripes:select name="selectedColumns" multiple="multiple" size="5" style="min-width:250px; width:250px;">
 						<c:forEach items="${actionBean.availableColumns }" var="column">
@@ -79,7 +79,7 @@
 						</c:forEach>
 					</stripes:select>			
 					<stripes:submit name="setSearchColumns" value="Set"/>
-				</stripes:form>
+				</crfn:form>
 				</fieldset>		
 			</div>
 		</c:if>

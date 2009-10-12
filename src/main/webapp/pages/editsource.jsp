@@ -8,7 +8,7 @@
 	
 		<h1>Edit source</h1>
 		
-	    <stripes:form action="/source.action" focus="">
+	    <crfn:form action="/source.action" focus="">
 	    	<stripes:hidden name="harvestSource.sourceId"/>
 	        <table>
 	            <tr>
@@ -36,7 +36,7 @@
 	                </td>
 	            </tr>
 	        </table>
-	    </stripes:form>
+	    </crfn:form>
 
 	</stripes:layout-component>
 </stripes:layout-render>

@@ -18,7 +18,7 @@
         
 		    	<div id="filterSelectionArea" style="margin-top:20px">
 		    	
-		    		<stripes:form name="filterAdd" action="/customSearch.action" method="get" id="filterAdd" acceptcharset="UTF-8">
+		    		<crfn:form name="filterAdd" action="/customSearch.action" method="get" id="filterAdd" acceptcharset="UTF-8">
 		    			<stripes:hidden name="addFilter"/>
 		    			<c:if test="${fn:length(actionBean.selectedFilters)<fn:length(actionBean.availableFilters)}">
 			    			<stripes:select name="addedFilter" id="filterSelect" onchange="this.form.submit();" >
@@ -33,9 +33,9 @@
 		    				<stripes:submit name="addFilter" value="Add filter"/>
 			    			 </noscript>
 			    		</c:if>
-		    		</stripes:form>
+		    		</crfn:form>
 		    		
-		    		<stripes:form name="customSearchForm" action="/customSearch.action" method="get" id="customSearchForm" acceptcharset="UTF-8">
+		    		<crfn:form name="customSearchForm" action="/customSearch.action" method="get" id="customSearchForm" acceptcharset="UTF-8">
 		    			<c:if test="${actionBean.selectedFilters!=null && fn:length(actionBean.selectedFilters)>0}">
 			    			<table style="margin-top:20px;margin-bottom:20px">
 			    				<c:forEach var="availableFilter" items="${actionBean.availableFilters}">
@@ -79,7 +79,7 @@
 				    		<stripes:layout-render name="/pages/common/subjectsResultList.jsp" tableClass="sortable"/>
 				    	</c:if>
 				    	
-		    		</stripes:form>
+		    		</crfn:form>
 			    </div>
 			    
 			</c:when>

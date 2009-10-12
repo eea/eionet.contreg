@@ -11,7 +11,7 @@
         <h1>Dataflow search</h1>
         
         <div style="margin-top:15px">
-		    <stripes:form action="/dataflowSearch.action" method="get">
+		    <crfn:form action="/dataflowSearch.action" method="get">
 				
 		    	<label for="dataflowSelect" style="font-weight:bold;margin-bottom:3px">Dataflow:</label>
 		    	<stripes:select name="dataflow" id="dataflowSelect" size="9" style="width:100%">
@@ -41,7 +41,7 @@
 		    		</c:forEach>
 		    	</stripes:select><stripes:submit name="search" value="Search" id="searchButton" style="display:inline;margin-left:60px"/>
 		    	
-		    </stripes:form>
+		    </crfn:form>
 		</div>			  
 		
 		<c:if test="${not empty param.search}">

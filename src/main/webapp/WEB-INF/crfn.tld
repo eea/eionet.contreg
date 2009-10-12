@@ -11,6 +11,107 @@
 	<short-name>crfn</short-name>
 	<uri>http://cr.eionet.europa.eu/jstl/functions</uri>
 
+
+	<tag>
+        <description>
+           A custom Form tag, which extends Stripes form tag. This tag skips creation of _sourcePage and _fp.
+           Those parameters are needed for redirecting user back to the form in case of validation errors.
+           
+        </description>
+        <display-name>form</display-name>
+        <name>form</name>
+        <tag-class>eionet.cr.web.util.FormTag</tag-class>
+        <body-content>JSP</body-content>
+
+        <attribute>
+            <description>
+                The URL to which this form will post. Expected to be a web-app relative path - the
+                tag will prepend the context path to any action that begins with a slash and does
+                not already begin with the context path. Should match a URL to which an ActionBean
+                has been bound.  Required unless 'beanclass' is provided.
+            </description>
+            <name>action</name><required>false</required><rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <description>
+                The fully qualified name of an ActionBean class, or alternatively a Class instance
+                for an ActionBean class.  An alternative to the 'action' attribute, the 'beanclass'
+                attribute will generate an action appropriate for the ActionBean identified. Note
+                that if an "ActionBean" that does not yet exist is identified an exception will
+                be thrown!
+            </description>
+            <name>beanclass</name><required>false</required><rtexprvalue>true</rtexprvalue>
+            <type>java.lang.Object</type>
+        </attribute>
+        <attribute>
+            <description>
+                The name of the form field that should receive focus when the page is loaded. Two
+                special values are recognized, 'first' and the empty string; these values cause
+                the form to set focus on the first element in the form.  If any value is set,
+                and the form has validation errors, the behaviour is altered and the first field
+                with validation errors is focused instead.
+            </description>
+            <name>focus</name><required>false</required><rtexprvalue>true</rtexprvalue>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>A comma separated list of content types that it is acceptable to submit through this form. (HTML Pass-through)</description>
+            <name>accept</name><required>false</required><rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <description>A comma separated list of possible character sets for form data. Will be written to the page as accept-charset. (HTML Pass-through)</description>
+            <name>acceptcharset</name><required>false</required><rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <description>
+                The mime type used to encode the content of this form. This value will be overridden if one or more Stripes
+                file input tags is used within the body of the form.
+            </description>
+            <name>enctype</name><required>false</required><rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <description>The HTTP method used for sending data to the server. Options are GET and POST. Default is GET. (HTML Pass-through)</description>
+            <name>method</name><required>false</required><rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <description>The unique name of the form. (HTML Pass-through)</description>
+            <name>name</name><required>false</required><rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <description>Where the target URL is to be opened. One of _blank, _self, _parent and _top. (HTML Pass-through)</description>
+            <name>target</name><required>false</required><rtexprvalue>true</rtexprvalue>
+        </attribute>
+
+        <attribute>
+            <description>Scripting code run when the form is reset. (HTML Pass-through)</description>
+            <name>onreset</name><required>false</required><rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <description>Scripting code run prior to the form being submitted to the server, (HTML Pass-through)</description>
+            <name>onsubmit</name><required>false</required><rtexprvalue>true</rtexprvalue>
+        </attribute>
+
+        <!-- Start: Standard HTML attributes -->
+        <attribute><description>The CSS class to be applied to the element. (HTML Pass-through)</description><name>class</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+        <attribute><description>Text direction. (HTML Pass-through)</description><name>dir</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+        <attribute><description>A unique identifier for the HTML tag on the pgae. (HTML Pass-through)</description><name>id</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+        <attribute><description>The language code of the element. (HTML Pass-through)</description><name>lang</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+        <attribute><description>Scripting code run on each mouse click. (HTML Pass-through)</description><name>onclick</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+        <attribute><description>Scripting code run on a double-click of the mouse. (HTML Pass-through)</description><name>ondblclick</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+        <attribute><description>Scripting code run when a key is depressed. (HTML Pass-through)</description><name>onkeydown</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+        <attribute><description>Scripting code run when a key is pressed and released. (HTML Pass-through)</description><name>onkeypress</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+        <attribute><description>Scripting code run when a key is released. (HTML Pass-through)</description><name>onkeyup</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+        <attribute><description>Scripting code run when a mouse button is depressed. (HTML Pass-through)</description><name>onmousedown</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+        <attribute><description>Scripting code run when the mouse pointer is moved. (HTML Pass-through)</description><name>onmousemove</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+        <attribute><description>Scripting code run when the mouse pointer moves out of the element. (HTML Pass-through)</description><name>onmouseout</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+        <attribute><description>Scripting code run when the mouse pointer moves over the element. (HTML Pass-through)</description><name>onmouseover</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+        <attribute><description>Scripting code run when a mouse button is released. (HTML Pass-through)</description><name>onmouseup</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+        <attribute><description>Inline CSS style fragment that applies to the element (HTML Pass-through)</description><name>style</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+        <attribute><description>Tool-tip text for the element. (HTML Pass-through)</description><name>title</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+        <!-- End: Standard HTML attributes -->
+        <dynamic-attributes>false</dynamic-attributes>
+    </tag>
+
 	<function>
 		<description>Cuts the given string at the first word whose length exceeds that of the given integer.</description>
 		<name>cutAtFirstLongToken</name>
@@ -155,6 +256,4 @@
 			${getObjectLiteral(subjectDTO, predicateUri)}
 		</example>
 	</function>
-
-	
 </taglib>

@@ -15,7 +15,7 @@
 				
 				<h1>View source</h1>
 				<br/>
-			    <stripes:form action="/source.action" focus="">
+			    <crfn:form action="/source.action" focus="">
 			    	<stripes:hidden name="harvestSource.sourceId"/>
 			        <table>
 			            <tr>
@@ -135,7 +135,7 @@
 			        		</c:forEach>
 			        	</tbody>
 			        </table>
-			    </stripes:form>
+			    </crfn:form>
 			</c:when>
 			<c:otherwise>
 				<div class="error-msg">No such harvest source found!</div>

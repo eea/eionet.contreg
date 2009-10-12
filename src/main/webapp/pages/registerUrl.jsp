@@ -14,7 +14,7 @@
 		<a class="link-external" href="http://en.wikipedia.org/wiki/Social_bookmarking">social bookmarking</a> websites.	
 	</p>
 	
-	<stripes:form action="/registerUrl.action" method="post" focus="url">
+	<crfn:form action="/registerUrl.action" method="post" focus="url">
 	
 		<stripes:label for="urlText">URL to register:</stripes:label>
 		<br/>
@@ -26,7 +26,7 @@
 		<stripes:submit name="save" value="Save" id="saveButton"/>
 		<stripes:text name="dummy" style="visibility:hidden;display:none" disabled="disabled" size="1"/>
 		
-	</stripes:form>
+	</crfn:form>
 		
 	</stripes:layout-component>
 </stripes:layout-render>

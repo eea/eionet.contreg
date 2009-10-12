@@ -22,6 +22,29 @@
  */
 
 
+function showWait(contextRoot, url) {
+	var v = $('#wait_link')[0].href ='#';
+	
+	if($('#wait_div').length > 0){
+		return false;
+	}
+	$("#wait_container").append('<div id="wait_div"' + 
+		'style="padding: 20px; border: 1px solid; background-color: #cccccc; width: 500px;' +
+		'height: 50px; position:absolute; z-index:100000;  left: 300px; top: 300px; ">' +
+		'<img src="' + contextRoot + '/images/wait.gif"/> Feedback will be available soon</div>');
+	$("#wait_div").load(url, 
+			function(){
+				$("#wait_div").oneTime(
+						1000,
+						function(){
+							$(this).hide(
+									"slow",
+									function(){$(this).remove();});
+							});
+				});
+	return false;
+}
+
 //
 // Replaces some text in a string with other text
 //

@@ -16,15 +16,9 @@
 		<display-name>Stripes Filter</display-name>
 		<filter-name>StripesFilter</filter-name>
 		<filter-class>net.sourceforge.stripes.controller.StripesFilter</filter-class>
-
-		<!-- Optional init parameters for the Stripes Filter. -->
 		<init-param>
-			<param-name>ActionResolver.UrlFilters</param-name>
-			<param-value>WEB-INF/classes</param-value>
-		</init-param>
-		<init-param>
-			<param-name>ActionResolver.PackageFilters</param-name>
-			<param-value>eionet.cr.web.action.*</param-value>
+			<param-name>ActionResolver.Packages</param-name>
+			<param-value>eionet.cr.web.action</param-value>
 		</init-param>
 		<init-param>
 			<param-name>ActionBeanContext.Class</param-name>

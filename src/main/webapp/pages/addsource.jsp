@@ -6,7 +6,7 @@
 
 	<stripes:layout-component name="contents">
 		<h1>Add source</h1>
-	    <stripes:form action="/source.action" method="post">
+	    <crfn:form action="/source.action" method="post">
 	        <table>
 	            <tr>
 	                <td>URL:</td>
@@ -33,7 +33,7 @@
 	                </td>
 	            </tr>
 	        </table>
-	    </stripes:form>
+	    </crfn:form>
 
 	</stripes:layout-component>
 </stripes:layout-render>

@@ -5,7 +5,7 @@
 <stripes:layout-render name="/pages/common/template.jsp" pageTitle="Harvesting Sources">
 
 	<stripes:layout-component name="contents">
-		<stripes:form id="generalForm" action="${actionBean.urlBinding}" method="get">
+		<crfn:form id="generalForm" action="${actionBean.urlBinding}" method="get">
 			
 			<div id="operations">
 				<ul>
@@ -24,7 +24,7 @@
 				<stripes:submit name="view" value="Filter" />
 				<c:if test="${!empty actionBean.searchString }"> 
 					<stripes:link href="${actionBean.urlBinding}?view">
-						<stripes:link-param name="type" value="${actionBean.type }"/>
+						<stripes:param name="type" value="${actionBean.type }"/>
 						<img src="${pageContext.request.contextPath}/images/delete_small.gif" title="Remove filter" alt="Remove filter"/>
 					</stripes:link>
 				</c:if>
@@ -58,6 +58,6 @@
 				<stripes:submit name="harvest" value="Schedule urgent harvest" title="Schedule urgent harvest of selecetd sources"/>
 				<input type="button" name="selectAll" value="Select all" onclick="toggleSelectAll('generalForm');return false"/>
 			</div>
-		</stripes:form>                  
+		</crfn:form>                  
 	</stripes:layout-component>
 </stripes:layout-render>

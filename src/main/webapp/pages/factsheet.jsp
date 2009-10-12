@@ -48,8 +48,7 @@
 		    					<c:set var="allowEdit" value="true"/>
 		    				</c:if>
 		    			</c:if>
-		    			
-				    	<c:if test="${displayOperations}">
+	    			 	<c:if test="${displayOperations}">
 				    		<ul id="dropdown-operations">
 								<li><a href="#">Operations</a>
 									<ul>
@@ -62,17 +61,20 @@
 										</c:if>
 										<c:if test="${subjectUrl!=null}">
 											<li>
-												<stripes:link href="${actionBean.urlBinding}" event="harvest">Harvest
-														<stripes:link-param name="uri" value="${actionBean.uri}"/>
-												</stripes:link>
+												<stripes:url value="${actionBean.urlBinding}" event="harvestAjax"  var="url">
+														<stripes:param name="uri" value="${actionBean.uri}"/>
+												</stripes:url>
+												<stripes:url value="${actionBean.urlBinding}" event="harvest"  var="oldUrl">
+														<stripes:param name="uri" value="${actionBean.uri}"/>
+												</stripes:url>
+												<a id="wait_link" href="${oldUrl }" onclick="javascript:showWait('${pageContext.request.contextPath}', '${url }');">Harvest</a>
 											</li>
 										</c:if>
 									</ul>
 								</li>
 							</ul>
 						</c:if>
-				
-				    	<div style="margin-top:20px">
+				    	<div style="margin-top:20px" id="wait_container">
 				    	
 				    		<c:choose>
 				    			<c:when test="${actionBean.subject.anonymous}">
@@ -86,7 +88,7 @@
 				    			</c:otherwise>
 				    		</c:choose>
 				    		
-				    		<stripes:form action="/factsheet.action" method="post">
+				    		<crfn:form action="/factsheet.action" method="post">
 				    		
 						    	<c:if test="${actionBean.context.eventName=='edit' && allowEdit}">
 					    				<table>
@@ -118,7 +120,7 @@
 								<stripes:layout-render name="/pages/common/factsheet_table.jsp"
 											subjectUrl="${subjectUrl}" subjectUri="${subjectUri}" displayCheckboxes="${actionBean.context.eventName=='edit' && allowEdit}"/>
 		
-				    		</stripes:form>
+				    		</crfn:form>
 						</div>				    
 				    </c:when>
 				    <c:otherwise>
@@ -141,7 +143,7 @@
 												<ul>
 													<li>
 														<stripes:link href="${actionBean.urlBinding}" event="harvest">Harvest
-																<stripes:link-param name="uri" value="${actionBean.uri}"/>
+																<stripes:param name="uri" value="${actionBean.uri}"/>
 														</stripes:link>
 													</li>
 												</ul>
