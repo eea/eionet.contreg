@@ -89,7 +89,7 @@ public abstract class Harvest {
 	protected List<String> infos = new ArrayList<String>();
 	
 	/** */
-	private boolean deriveExtraTriples = true;
+	private boolean deriveInferredTriples = true;
 	
 	/** */
 	protected HarvestDTO previousHarvest = null;
@@ -164,7 +164,7 @@ public abstract class Harvest {
 		try{
 			
 			rdfHandler = createRDFHandler();
-			rdfHandler.setDeriveExtraTriples(deriveExtraTriples);
+			rdfHandler.setDeriveInferredTriples(deriveInferredTriples);
 			rdfHandler.setClearPreviousContent(clearPreviousContent);
 			rdfHandler.setSourceLastModified(sourceLastModified);
 
@@ -380,10 +380,10 @@ public abstract class Harvest {
 	}
 
 	/**
-	 * @param deriveExtraTriples the deriveExtraTriples to set
+	 * @param deriveInferredTriples the deriveInferredTriples to set
 	 */
-	public void setDeriveExtraTriples(boolean deriveExtraTriples) {
-		this.deriveExtraTriples = deriveExtraTriples;
+	public void setDeriveInferredTriples(boolean deriveInferredTriples) {
+		this.deriveInferredTriples = deriveInferredTriples;
 	}
 
 	/**

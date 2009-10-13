@@ -115,7 +115,7 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	private HashSet<Long> distinctResources = new HashSet<Long>();
 	
 	/** */
-	private boolean deriveExtraTriples = true;
+	private boolean deriveInferredTriples = true;
 	
 	/** */
 	private HashMap<String,ArrayList<ValueLanguagePair>> rdfValues = new HashMap<String,ArrayList<ValueLanguagePair>>();
@@ -587,7 +587,8 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 		commitTriples();
 		commitResources();
 		
-		if (deriveExtraTriples){
+		if (deriveInferredTriples){
+			
 			deriveParentProperties();
 			deriveParentClasses();
 			deriveLabels();
@@ -1033,10 +1034,10 @@ public class RDFHandler implements StatementHandler, ErrorHandler{
 	}
 
 	/**
-	 * @param deriveExtraTriples the deriveExtraTriples to set
+	 * @param deriveInferredTriples the deriveInferredTriples to set
 	 */
-	public void setDeriveExtraTriples(boolean deriveExtraTriples) {
-		this.deriveExtraTriples = deriveExtraTriples;
+	public void setDeriveInferredTriples(boolean deriveInferredTriples) {
+		this.deriveInferredTriples = deriveInferredTriples;
 	}
 	
 	/**

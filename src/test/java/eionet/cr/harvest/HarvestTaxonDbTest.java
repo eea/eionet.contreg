@@ -110,7 +110,7 @@ public class HarvestTaxonDbTest extends DatabaseTestCase {
 		try {
 			URL o = new URL("http://svn.eionet.europa.eu/repositories/Reportnet/cr2/trunk/src/test/resources/taxon-under-rdf.xml");
 			Harvest harvest = new PullHarvest(o.toString(), null);
-			harvest.setDeriveExtraTriples(false);
+			harvest.setDeriveInferredTriples(false);
 			harvest.execute();
 			assertEquals((int) 3, harvest.getDistinctSubjectsCount());
 			assertEquals((int) 22, harvest.getStoredTriplesCount());
@@ -128,7 +128,7 @@ public class HarvestTaxonDbTest extends DatabaseTestCase {
 		try {
 			URL o = new URL("http://svn.eionet.europa.eu/repositories/Reportnet/cr2/trunk/src/test/resources/taxon-over-rdf.xml");
 			Harvest harvest = new PullHarvest(o.toString(), null);
-			harvest.setDeriveExtraTriples(false);
+			harvest.setDeriveInferredTriples(false);
 			harvest.execute();
 			assertEquals((int) 3, harvest.getDistinctSubjectsCount());
 			assertEquals((int) 22, harvest.getStoredTriplesCount());
