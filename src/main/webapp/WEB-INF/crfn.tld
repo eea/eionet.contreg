@@ -229,9 +229,9 @@
 		</description>
 		<name>format</name>
 		<function-class>eionet.cr.web.util.JstlFunctions</function-class>
-		<function-signature>java.lang.String format(eionet.cr.web.util.columns.SearchResultColumn, java.lang.Object)</function-signature>
+		<function-signature>java.lang.String format(eionet.cr.web.util.columns.SearchResultColumn, java.lang.Object, eionet.cr.web.action.AbstractActionBean)</function-signature>
 		<example>
-			${format(column, object)}
+			${format(column, object, actionBean)}
 		</example>
 	</function>
 
@@ -256,4 +256,16 @@
 			${getObjectLiteral(subjectDTO, predicateUri)}
 		</example>
 	</function>
+
+	<function>
+		<description>
+		</description>
+		<name>isObjectInAcceptedLanguage</name>
+		<function-class>eionet.cr.web.util.JstlFunctions</function-class>
+		<function-signature>boolean isObjectInAcceptedLanguage(eionet.cr.web.action.AbstractActionBean, eionet.cr.dto.ObjectDTO)</function-signature>
+		<example>
+			${isObjectInAcceptedLanguage(actionBean, objectDTO)}
+		</example>
+	</function>
+	
 </taglib>

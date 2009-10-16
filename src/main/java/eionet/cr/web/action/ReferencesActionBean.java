@@ -99,7 +99,7 @@ public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
 			resultList = refSearch.getResultList();
 			matchCount = refSearch.getTotalMatchCount();
 			
-			predicateLabels = refSearch.getPredicateLabels().getByLanguagePreferences(createPreferredLanguages(), "en");
+			predicateLabels = refSearch.getPredicateLabels().getByLanguages(getAcceptedLanguages());
 		}
 		
 		return new ForwardResolution("/pages/references.jsp");

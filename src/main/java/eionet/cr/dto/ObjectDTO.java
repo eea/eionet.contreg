@@ -21,6 +21,7 @@
 package eionet.cr.dto;
 
 import eionet.cr.util.Hashes;
+import eionet.cr.util.Util;
 import eionet.cr.web.util.FactsheetObjectId;
 
 /**
@@ -115,6 +116,7 @@ public class ObjectDTO {
 	public String getLanguage() {
 		return language;
 	}
+
 	/**
 	 * @return the literal
 	 */

@@ -20,7 +20,11 @@
  */
 package eionet.cr.web.util.columns;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
+
+import eionet.cr.web.action.AbstractActionBean;
 
 
 /**
@@ -36,9 +40,16 @@ public abstract class SearchResultColumn {
 	private String title;
 	private boolean isSortable;
 
+	/** */
 	private boolean escapeXml;
 	private String actionRequestParameter;
 	
+	/** */
+	protected AbstractActionBean actionBean;
+	
+	/**
+	 * 
+	 */
 	public SearchResultColumn() {
 		//blank constructor
 	}
@@ -58,8 +69,6 @@ public abstract class SearchResultColumn {
 	 * @return
 	 */
 	public abstract String format(Object object);
-	
-	
 	
 	/**
 	 * 
@@ -116,5 +125,19 @@ public abstract class SearchResultColumn {
 	 */
 	public void setActionRequestParameter(String actionRequestParameter) {
 		this.actionRequestParameter = actionRequestParameter;
+	}
+
+	/**
+	 * @return the actionBean
+	 */
+	public AbstractActionBean getActionBean() {
+		return actionBean;
+	}
+
+	/**
+	 * @param actionBean the actionBean to set
+	 */
+	public void setActionBean(AbstractActionBean actionBean) {
+		this.actionBean = actionBean;
 	}
 }

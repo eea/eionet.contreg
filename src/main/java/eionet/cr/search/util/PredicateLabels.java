@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import eionet.cr.util.Util;
+
 /**
  * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
@@ -48,7 +50,7 @@ public class PredicateLabels extends HashMap<String,HashMap<String,HashSet<Strin
 			put(predicate, labels);
 		}
 		
-		String parsedLanguage = parseHTTPAcceptedLanguage(language);
+		String parsedLanguage = Util.normalizeHTTPAcceptedLanguage(language);
 		HashSet<String> labelsOfLang = labels.get(parsedLanguage);
 		if (labelsOfLang==null){
 			labelsOfLang = new HashSet<String>();
@@ -60,62 +62,32 @@ public class PredicateLabels extends HashMap<String,HashMap<String,HashSet<Strin
 	
 	/**
 	 * 
-	 * @param preferredLanguages
+	 * @param languages
 	 * @return
 	 */
-	public Map<String,String> getByLanguagePreferences(Set<String> preferredLanguages, String defaultLanguage){
+	public Map<String,String> getByLanguages(HashSet<String> languages){
 		
-		Map<String,String> result = new HashMap<String,String>();
-		if (preferredLanguages!=null && !preferredLanguages.isEmpty()){
+		Map<String,String> result = new HashMap<String,String>();		
+		if (languages!=null && !languages.isEmpty()){
+			
 			if (!isEmpty()){
 				
-				for (Iterator<String> predicates=keySet().iterator(); predicates.hasNext();){
+				for (String predicate:keySet()){
 					
-					String predicate = predicates.next();
 					HashMap<String,HashSet<String>> labels = get(predicate);
 					
-					HashSet<String> labelsOfLang = null;
-					for (Iterator<String> prefLanguages=preferredLanguages.iterator(); labelsOfLang==null && prefLanguages.hasNext();){
-						labelsOfLang = labels.get(prefLanguages.next());
+					HashSet<String> labelsInRequestedLanguages = null;
+					for (String language:languages){
+						labelsInRequestedLanguages = labels.get(language);
 					}
-					if (labelsOfLang==null)
-						labelsOfLang = labels.get(defaultLanguage);
-					if (labelsOfLang==null)
-						labelsOfLang = labels.get("");
 					
-					if (labelsOfLang!=null && !labelsOfLang.isEmpty())
-						result.put(predicate, labelsOfLang.iterator().next());
+					if (labelsInRequestedLanguages!=null && !labelsInRequestedLanguages.isEmpty()){
+						result.put(predicate, labelsInRequestedLanguages.iterator().next());
+					}
 				}
 			}
 		}
 		
 		return result;
-	}
-	
-	/**
-	 * 
-	 * @param language
-	 */
-	public static String parseHTTPAcceptedLanguage(String httpAcceptedLanguage){
-		
-		String result = new String(httpAcceptedLanguage);
-		
-		/* ignore quality value which is separated by ';' */
-		
-        int j = result.indexOf(";");
-        if (j != -1)
-        	result = result.substring(0, j);
-
-        /* ignore language refinement (e.g. en-US, en_UK) which is separated either by '-' or '_' */
-        
-        j = result.indexOf("-");
-        if (j<0){
-        	j = result.indexOf("_");
-        }
-        if (j>=0){
-        	result = result.substring(0, j);
-        }
-        
-		return result.toLowerCase();
 	}
 }

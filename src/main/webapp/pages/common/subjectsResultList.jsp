@@ -80,8 +80,12 @@
 								<c:forEach items="${actionBean.columns}" var="col">
 									<td>
 										<c:choose>
-											<c:when test="${col.escapeXml}"><c:out value="${crfn:format(col, resultListItem)}"/></c:when>
-											<c:otherwise>${crfn:format(col, resultListItem)}</c:otherwise>
+											<c:when test="${col.escapeXml}">
+												<c:out value="${crfn:format(col, resultListItem, actionBean)}"/>
+											</c:when>
+											<c:otherwise>
+												${crfn:format(col, resultListItem, actionBean)}
+											</c:otherwise>
 										</c:choose>
 									</td>
 								</c:forEach>

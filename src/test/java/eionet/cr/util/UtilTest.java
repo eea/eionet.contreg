@@ -20,6 +20,8 @@
  */
 package eionet.cr.util;
 
+import java.util.ArrayList;
+
 import org.junit.Test;
 
 import junit.framework.TestCase;
@@ -34,6 +36,28 @@ public class UtilTest extends TestCase{
 	// TODO some tests to be added, a method-less TestCase causes an error in JUnit
 	
 	@Test
-	public void testNothing() throws Exception {
+	public void test_toCSV() throws Exception {
+		
+		try{
+			assertEquals("", Util.toCSV(null));
+		}
+		catch (NullPointerException e){
+			fail("Did not expect " + e.getClass().getSimpleName());
+		}
+		assertEquals("", Util.toCSV(new ArrayList<String>()));
 	}
+
+	@Test
+	public void test_normalizeHTTPAcceptedLanguage() throws Exception {
+		
+		try{			
+			assertEquals(null, Util.normalizeHTTPAcceptedLanguage(null));
+		}
+		catch (NullPointerException e){
+			fail("Did not expect " + e.getClass().getSimpleName());
+		}
+		assertEquals("", Util.normalizeHTTPAcceptedLanguage(""));
+		assertEquals("", Util.normalizeHTTPAcceptedLanguage(" "));
+	}
+
 }

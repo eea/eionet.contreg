@@ -248,13 +248,15 @@ public class JstlFunctions {
 	/**
 	 * 
 	 * @param column
-	 * @param subjectDTO
+	 * @param object
+	 * @param actionBean
 	 * @return
 	 */
-	public static String format(SearchResultColumn column, Object object){
+	public static String format(SearchResultColumn column, Object object, AbstractActionBean actionBean){
+		column.setActionBean(actionBean);
 		return column.format(object);
 	}
-	
+
 	/**
 	 * 
 	 * @param s
@@ -277,5 +279,16 @@ public class JstlFunctions {
 		
 		ObjectDTO object = subject.getObject(predicate, ObjectDTO.Type.LITERAL);
 		return object==null ? "" : object.getValue();
+	}
+	
+	/**
+	 * 
+	 * @param actionBean
+	 * @param object
+	 * @return
+	 */
+	public static boolean isObjectInAcceptedLanguage(AbstractActionBean actionBean, ObjectDTO object){
+		
+		return actionBean.getAcceptedLanguages().contains(Util.normalizeHTTPAcceptedLanguage(object.getLanguage()));
 	}
 }

@@ -375,4 +375,38 @@ public class Util {
 	public static void main(String[] args){
 		System.out.println(toDouble("-0,1"));
 	}
+
+	/**
+	 * 
+	 * @param language
+	 */
+	public static String normalizeHTTPAcceptedLanguage(String httpAcceptedLanguage){
+		
+		if (httpAcceptedLanguage==null){
+			return httpAcceptedLanguage;
+		}
+		else{
+			httpAcceptedLanguage = httpAcceptedLanguage.trim();
+		}
+			
+		String result = new String(httpAcceptedLanguage);
+		
+		/* ignore quality value which is separated by ';' */
+		
+	    int j = result.indexOf(";");
+	    if (j != -1)
+	    	result = result.substring(0, j);
+	
+	    /* ignore language refinement (e.g. en-US, en_UK) which is separated either by '-' or '_' */
+	    
+	    j = result.indexOf("-");
+	    if (j<0){
+	    	j = result.indexOf("_");
+	    }
+	    if (j>=0){
+	    	result = result.substring(0, j);
+	    }
+	    
+		return result.toLowerCase();
+	}
 }

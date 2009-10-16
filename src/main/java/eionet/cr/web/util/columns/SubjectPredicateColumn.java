@@ -21,6 +21,7 @@
 package eionet.cr.web.util.columns;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 
@@ -47,6 +48,12 @@ public class SubjectPredicateColumn extends SearchResultColumn{
 	/** */
 	private String predicateUri;
 	
+	/** */
+	private HashSet<String> languages;
+
+	/**
+	 * 
+	 */
 	public SubjectPredicateColumn() {
 		//blank
 	}
@@ -57,6 +64,7 @@ public class SubjectPredicateColumn extends SearchResultColumn{
 	 * @param predicateUri
 	 */
 	public SubjectPredicateColumn(String title, boolean isSortable, String predicateUri) {
+		
 		super(title, isSortable);
 		this.predicateUri = predicateUri;
 	}
@@ -113,9 +121,8 @@ public class SubjectPredicateColumn extends SearchResultColumn{
 					StringBuffer bufNonLiterals = new StringBuffer();
 
 					String resultFromHitSource = null;
-					for (Iterator<ObjectDTO> iter = distinctObjects.iterator(); iter.hasNext();){
+					for (ObjectDTO objectDTO:distinctObjects){
 
-						ObjectDTO objectDTO = iter.next();
 						String objectString = objectDTO.getValue().trim();
 						
 						// if the source of the object matches the search-hit source of the subject then
@@ -130,10 +137,14 @@ public class SubjectPredicateColumn extends SearchResultColumn{
 						
 						if (objectString.length()>0){
 
-							if (objectDTO.isLiteral())
-								bufLiterals.append(bufLiterals.length()>0 ? ", " : "").append(objectString);
-							else
+							if (objectDTO.isLiteral()){
+								if (getLanguages().isEmpty() || getLanguages().contains(objectDTO.getLanguage())){
+									bufLiterals.append(bufLiterals.length()>0 ? ", " : "").append(objectString);
+								}
+							}
+							else{
 								bufNonLiterals.append(bufNonLiterals.length()>0 ? ", " : "").append(objectString);
+							}
 						}
 					}
 
@@ -197,5 +208,23 @@ public class SubjectPredicateColumn extends SearchResultColumn{
 	 */
 	public String getSortParamValue() {		
 		return predicateUri;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	private HashSet<String> getLanguages(){
+		
+		if (languages==null){
+			if (actionBean!=null){
+				languages = actionBean.getAcceptedLanguages();
+			}
+			if (languages==null){
+				languages = new HashSet<String>();
+			}
+		}
+		
+		return languages;
 	}
 }

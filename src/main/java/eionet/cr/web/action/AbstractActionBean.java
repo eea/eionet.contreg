@@ -46,7 +46,7 @@ import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.harvest.CurrentHarvests;
 import eionet.cr.harvest.Harvest;
 import eionet.cr.harvest.scheduled.HarvestingJob;
-import eionet.cr.search.util.PredicateLabels;
+import eionet.cr.util.Util;
 import eionet.cr.web.context.CRActionBeanContext;
 import eionet.cr.web.security.CRUser;
 
@@ -75,7 +75,11 @@ public abstract class AbstractActionBean implements ActionBean {
 	/** */
 	private Harvest currentHarvest = CurrentHarvests.getQueuedHarvest();//HarvestingJob.getCurrentHarvest();
 	
+	/** */
 	protected MySQLDAOFactory factory = MySQLDAOFactory.get();
+	
+	/** */
+	private HashSet<String> acceptedLanguages;
 	
 	/*
 	 * (non-Javadoc)
@@ -220,19 +224,25 @@ public abstract class AbstractActionBean implements ActionBean {
 	 * 
 	 * @return
 	 */
-	protected Set<String> createPreferredLanguages(){
+	public HashSet<String> getAcceptedLanguages(){
 		
-		Set<String> result = new HashSet<String>();
-		
-		String languagePreferences = getContext().getRequest().getHeader("Accept-Language");
-		if (!StringUtils.isBlank(languagePreferences)){
-			String[] languages = StringUtils.split(languagePreferences, ',');
-			for (int i=0; i<languages.length; i++){
-				result.add(PredicateLabels.parseHTTPAcceptedLanguage(languages[i]));
-			}
-		}
+		if (acceptedLanguages==null){
 			
-		return result;
+			acceptedLanguages = new HashSet<String>();
+
+			String acceptLanguageHeader = getContext().getRequest().getHeader("Accept-Language");
+			if (!StringUtils.isBlank(acceptLanguageHeader)){
+				String[] languages = StringUtils.split(acceptLanguageHeader, ',');
+				for (int i=0; i<languages.length; i++){
+					acceptedLanguages.add(Util.normalizeHTTPAcceptedLanguage(languages[i]));
+				}
+			}
+			
+			acceptedLanguages.add("en");
+			acceptedLanguages.add("");
+		}
+		
+		return acceptedLanguages;
 	}
 	
 	/**

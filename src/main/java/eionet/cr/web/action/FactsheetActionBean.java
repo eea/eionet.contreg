@@ -110,7 +110,7 @@ public class FactsheetActionBean extends AbstractActionBean{
 				subject = coll.iterator().next();
 			}
 			
-			predicateLabels = factsheetSearch.getPredicateLabels().getByLanguagePreferences(createPreferredLanguages(), "en");
+			predicateLabels = factsheetSearch.getPredicateLabels().getByLanguages(getAcceptedLanguages());
 			subProperties = factsheetSearch.getSubProperties();
 		}
 		
