@@ -25,11 +25,29 @@
 			</c:if>		
 		</crfn:form><br/>
 			<c:if test="${not empty actionBean.type}">
+			<div>
+				<fieldset>
+					<legend>Export options</legend>
+					<crfn:form action="/typeSearch.action" method="post" target="new">
+						<stripes:hidden name="type" value="${actionBean.type }"/>
+						<label for="export_resource">Resource identifier</label>
+						<stripes:select id="export_resource" name="uriResourceIdentifier">
+							<stripes:option value="true">Uri</stripes:option>
+							<stripes:option value="false">Label</stripes:option>
+						</stripes:select>
+						<label for="export_format">Export format</label>
+						<stripes:select id="export_format" name="exportFormat">
+							<stripes:option value=".xls">.xls</stripes:option>
+						</stripes:select>
+						<stripes:submit name="export" value="Export" />					
+					</crfn:form>
+				</fieldset>
+			</div>
 			<div style="margin-bottom:10px; float:right;  min-width:400px; width:50%;">
 				<fieldset>
 				<legend>Select filters</legend>
 				<c:if test="${not empty actionBean.availableFilters}">
-				<crfn:form action="/typeSearch.action" method="post">
+				<crfn:form action="/typeSearch.action" method="post"> 
 					<stripes:hidden name="addFilter" value="addFilter"/>
 					<stripes:hidden name="type" value="${actionBean.type }"/>
 					<stripes:select name="newFilter" onchange="this.form.submit();">

@@ -20,6 +20,8 @@
  */
 package eionet.cr.dto;
 
+import java.io.Serializable;
+
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Util;
 import eionet.cr.web.util.FactsheetObjectId;
@@ -29,8 +31,13 @@ import eionet.cr.web.util.FactsheetObjectId;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class ObjectDTO {
+public class ObjectDTO implements Serializable {
 	
+	/**
+	 * serial.
+	 */
+	private static final long serialVersionUID = 1L;
+
 	/** */
 	public enum Type{LITERAL, RESOURCE;}
 

@@ -20,10 +20,7 @@
  */
 package eionet.cr.web.util.columns;
 
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
 
 import net.sourceforge.stripes.action.UrlBinding;
 
@@ -31,10 +28,9 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.common.Predicates;
-import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
+import eionet.cr.util.FormatUtils;
 import eionet.cr.util.URIUtil;
-import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
 import eionet.cr.web.action.FactsheetActionBean;
 
@@ -111,52 +107,7 @@ public class SubjectPredicateColumn extends SearchResultColumn{
 		if (object!=null && object instanceof SubjectDTO && predicateUri!=null){
 			
 			SubjectDTO subjectDTO = (SubjectDTO)object;
-			if (subjectDTO.getPredicateCount()>0){
-				
-				Collection<ObjectDTO> objects = subjectDTO.getObjects(predicateUri);
-				if (objects!=null && !objects.isEmpty()){
-				
-					LinkedHashSet<ObjectDTO> distinctObjects = new LinkedHashSet<ObjectDTO>(objects);		
-					StringBuffer bufLiterals = new StringBuffer();
-					StringBuffer bufNonLiterals = new StringBuffer();
-
-					String resultFromHitSource = null;
-					for (ObjectDTO objectDTO:distinctObjects){
-
-						String objectString = objectDTO.getValue().trim();
-						
-						// if the source of the object matches the search-hit source of the subject then
-						// remember the object value and break
-						if (subjectDTO.getHitSource()>0 && objectDTO.getSourceHashSmart()==subjectDTO.getHitSource()
-								&& !StringUtils.isBlank(objectString)
-								&& objectDTO.isLiteral()){
-
-							resultFromHitSource = objectString;
-							break;
-						}
-						
-						if (objectString.length()>0){
-
-							if (objectDTO.isLiteral()){
-								if (getLanguages().isEmpty() || getLanguages().contains(objectDTO.getLanguage())){
-									bufLiterals.append(bufLiterals.length()>0 ? ", " : "").append(objectString);
-								}
-							}
-							else{
-								bufNonLiterals.append(bufNonLiterals.length()>0 ? ", " : "").append(objectString);
-							}
-						}
-					}
-
-					// if there was a value found that came from search-hit source then prefer that one as the result
-					if (!StringUtils.isBlank(resultFromHitSource)){
-						result = resultFromHitSource;
-					}
-					else{
-						result = bufLiterals.length()>0 ? bufLiterals.toString() : bufNonLiterals.toString();
-					}
-				}
-			}
+			result = FormatUtils.getObjectValuesForPredicate(predicateUri, subjectDTO, getLanguages());
 			
 			// rdfs:label gets special treatment
 			if (predicateUri.equals(Predicates.RDFS_LABEL)){

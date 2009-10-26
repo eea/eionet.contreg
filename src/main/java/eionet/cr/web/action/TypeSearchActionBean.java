@@ -21,6 +21,7 @@
 package eionet.cr.web.action;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -33,6 +34,7 @@ import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.action.StreamingResolution;
 import net.sourceforge.stripes.action.UrlBinding;
 
 import org.apache.commons.lang.StringUtils;
@@ -45,6 +47,8 @@ import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.util.SortOrder;
+import eionet.cr.util.ExportFormat;
+import eionet.cr.util.Exporter;
 import eionet.cr.util.PageRequest;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
@@ -64,7 +68,6 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 		ADD_FILTER, REMOVE_FILTER, APPLY_FILTERS, SET_COLUMNS, SEARCH, SORTING;
 	}
 
-	private static final String AVAILABLE_TYPES_CACHE = TypeSearchActionBean.class.getName() + ".availableTypesCache";
 	private static final String AVAILABLE_COLUMNS_CACHE = TypeSearchActionBean.class.getName() + ".availableColumnsCache";
 	private static final String SELECTED_COLUMNS_CACHE = TypeSearchActionBean.class.getName() + ".selectedColumnsCache";
 	private static final String SELECTED_FILTERS_CACHE = TypeSearchActionBean.class.getName() + ".selectedFiltersCache";
@@ -93,7 +96,9 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 	private Map<String,String> selectedFilters;
 	//selected filters with labels.
 	private Map<String, Pair<String,String>> displayFilters;
-	
+
+	private boolean uriResourceIdentifier;
+	private String exportFormat;
 
 	/**
 	 * @return
@@ -110,6 +115,45 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 			}
 		}
 		return new ForwardResolution(TYPE_SEARCH_PATH);
+	}
+	
+	
+	/**
+	 * exports search result as a file.
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public Resolution export() throws Exception {
+		restoreStateFromSession();
+		Exporter exporter = new Exporter();
+		ExportFormat format = ExportFormat.fromName(exportFormat);
+		exporter.setExportFormat(format);
+		exporter.setLanguages(
+				getAcceptedLanguages() != null
+						? getAcceptedLanguages() 
+						: Collections.EMPTY_SET);
+		List<Pair<String,String>> columnPairs = new LinkedList<Pair<String,String>>();
+		for (String selectedColumn : selectedColumns) {
+			columnPairs.add(
+					new Pair<String,String>(
+							selectedColumn,
+							uriResourceIdentifier
+									? null 
+									: getAvailableColumns().get(selectedColumn)));
+		}
+		exporter.setSelectedColumns(columnPairs);
+		Map<String, String> filters = new HashMap<String, String>();
+		if (selectedFilters != null) {
+			filters.putAll(selectedFilters);
+		}
+		filters.put(Predicates.RDF_TYPE, type);
+		exporter.setSelectedFilters(filters);
+		getContext().getResponse().setHeader("Content-Disposition", "inline;filename=" + format.getFilename());
+		getContext().getResponse().setHeader("Cache-Control", "no-cache, must-revalidate");
+		
+		return new StreamingResolution(format.getContentType(), exporter.export());
 	}
 	
 	/**
@@ -466,6 +510,22 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 	 */
 	public Map<String, Pair<String, String>> getDisplayFilters() {
 		return displayFilters;
+	}
+
+
+	/**
+	 * @return the uriResourceIdentifier
+	 */
+	public boolean isUriResourceIdentifier() {
+		return uriResourceIdentifier;
+	}
+
+
+	/**
+	 * @param uriResourceIdentifier the uriResourceIdentifier to set
+	 */
+	public void setUriResourceIdentifier(boolean uriResourceIdentifier) {
+		this.uriResourceIdentifier = uriResourceIdentifier;
 	}
 
 }
