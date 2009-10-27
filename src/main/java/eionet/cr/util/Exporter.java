@@ -60,6 +60,9 @@ public class Exporter {
 	private Map<String,String> selectedFilters;
 	private Set<String> languages;
 	
+	//if true exports Resource uri, label otherwise.
+	private boolean exportResourceUri;
+	
 	//List of selected columns Pair.id - column URI, Pair.value - optional column label
 	// if label is present - it is used in the output. Otherwise URI is used.
 	// URI should be always present
@@ -100,9 +103,16 @@ public class Exporter {
 			int[] columnWidth = new int[selectedColumns.size()];
 			
 			for(Pair<String,String> columnPair : selectedColumns) {
-				String column = columnPair.getValue() != null
-						? columnPair.getValue()
-						: columnPair.getId();
+				String column; 
+				if (columnNumber == 0) {
+					column = exportResourceUri 
+							? "Uri"
+							: "Label";
+				} else {
+					column = columnPair.getValue() != null
+							? columnPair.getValue()
+							: columnPair.getId();
+				}
 				columnWidth[columnNumber] = column.length();
 				HSSFCell cell = headers.createCell(columnNumber++);
 				cell.setCellValue(helper.createRichTextString(column));
@@ -115,7 +125,13 @@ public class Exporter {
 				HSSFRow row = sheet.createRow(rowNumber++);
 				columnNumber = 0;
 				for(Pair<String,String> columnPair : selectedColumns) {
-					String value = FormatUtils.getObjectValuesForPredicate(columnPair.getId(), subject, languages);
+					String value;
+					//resource uri / label
+					if (columnNumber == 0 && exportResourceUri) {
+						value = subject.getUri();
+					} else {
+						value = FormatUtils.getObjectValuesForPredicate(columnPair.getId(), subject, languages);
+					}
 					columnWidth[columnNumber] = Math.max(columnWidth[columnNumber], value.length());
 					row.createCell(columnNumber++).setCellValue(helper.createRichTextString(
 							!StringUtils.isBlank(value)
@@ -191,5 +207,19 @@ public class Exporter {
 	 */
 	public void setLanguages(Set<String> set) {
 		this.languages = set;
+	}
+
+	/**
+	 * @return the exportResourceUri
+	 */
+	public boolean isExportResourceUri() {
+		return exportResourceUri;
+	}
+
+	/**
+	 * @param exportResourceUri the exportResourceUri to set
+	 */
+	public void setExportResourceUri(boolean exportResourceUri) {
+		this.exportResourceUri = exportResourceUri;
 	}
 }

@@ -130,18 +130,23 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 		Exporter exporter = new Exporter();
 		ExportFormat format = ExportFormat.fromName(exportFormat);
 		exporter.setExportFormat(format);
+		
 		exporter.setLanguages(
 				getAcceptedLanguages() != null
 						? getAcceptedLanguages() 
 						: Collections.EMPTY_SET);
 		List<Pair<String,String>> columnPairs = new LinkedList<Pair<String,String>>();
+		
+		columnPairs.add(
+				new Pair<String, String>(
+						Predicates.RDFS_LABEL,
+						"Title"));
+		exporter.setExportResourceUri(uriResourceIdentifier);
 		for (String selectedColumn : selectedColumns) {
 			columnPairs.add(
 					new Pair<String,String>(
 							selectedColumn,
-							uriResourceIdentifier
-									? null 
-									: getAvailableColumns().get(selectedColumn)));
+							getAvailableColumns().get(selectedColumn)));
 		}
 		exporter.setSelectedColumns(columnPairs);
 		Map<String, String> filters = new HashMap<String, String>();
