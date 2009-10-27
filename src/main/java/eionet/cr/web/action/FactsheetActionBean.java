@@ -102,14 +102,15 @@ public class FactsheetActionBean extends AbstractActionBean{
 			noCriteria = true;
 			addCautionMessage("Resource identifier not specified!");
 		}
-		else{
+		else {
 			FactsheetSearch factsheetSearch = uriHash==0 ? new FactsheetSearch(uri) : new FactsheetSearch(uriHash);
 			factsheetSearch.execute();
 			Collection<SubjectDTO> coll = factsheetSearch.getResultList();
 			if (coll!=null && !coll.isEmpty()){
 				subject = coll.iterator().next();
 			}
-			
+			uri = subject.getUri();
+			uriHash = subject.getUriHash();
 			predicateLabels = factsheetSearch.getPredicateLabels().getByLanguages(getAcceptedLanguages());
 			subProperties = factsheetSearch.getSubProperties();
 		}
