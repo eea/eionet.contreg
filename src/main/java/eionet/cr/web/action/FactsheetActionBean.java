@@ -108,9 +108,11 @@ public class FactsheetActionBean extends AbstractActionBean{
 			Collection<SubjectDTO> coll = factsheetSearch.getResultList();
 			if (coll!=null && !coll.isEmpty()){
 				subject = coll.iterator().next();
+				if (subject != null) {
+					uri = subject.getUri();
+					uriHash = subject.getUriHash();
+				}
 			}
-			uri = subject.getUri();
-			uriHash = subject.getUriHash();
 			predicateLabels = factsheetSearch.getPredicateLabels().getByLanguages(getAcceptedLanguages());
 			subProperties = factsheetSearch.getSubProperties();
 		}
