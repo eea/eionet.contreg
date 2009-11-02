@@ -21,6 +21,32 @@
  * Original Code: Ander Tenno (TietoEnator)
  */
 
+$(document).ready(
+		function(){
+			$("#export_form_noscript").hide();
+			//export clicked
+			$(".export_div").show().click(function(){
+				//if div is in place - just show it
+				if ($("#export_form_div").length > 0) {
+					$("#export_form_div").show();
+					return false;
+				}
+			    // create the export div
+				$("#export_form_container")
+						.append('<div id="export_form_div" ' +
+								'style="padding: 20px; padding-top:0px; border: 1px solid; background-color: #cccccc; width: 500px;' +
+								'height: 190px; position:absolute; z-index:100000;  left: 200px; top: 300px; ">' +
+								'<a href="#" style="float:right; clear:both">close</a><br/>' + $("#export_form_noscript").html() + "</div>");
+			    // attach close link
+			    $("#export_form_div > a").click(function(){ $("#export_form_div").hide();});
+			    // hide the div on submit
+			    $("#export_form_submit").click(function(){
+			    	$("#export_form_div").hide();
+			    });
+				return false;
+			});
+});
+
 
 function showWait(contextRoot, url) {
 	var v = $('#wait_link')[0].href ='#';

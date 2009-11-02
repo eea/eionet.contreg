@@ -3,9 +3,16 @@
 <%@ include file="/pages/common/taglibs.jsp"%>	
 
 <stripes:layout-render name="/pages/common/template.jsp" pageTitle="Type search">
-
+	
 	<stripes:layout-component name="contents">
-		<div style="max-width: 750px;">
+		<c:if test="${not empty actionBean.resultList}">
+			<div id="operations" class="export_div" style="display:none;">
+				<ul>
+					<li><a href="#">Export</a></li>
+				</ul>
+			</div>
+		</c:if>
+		<div style="max-width: 750px;" id="export_form_container">
        <h1>Type search</h1>
        <p>
        	This page enables to find content by type. Below is the list of types known to CR.
@@ -25,22 +32,29 @@
 			</c:if>		
 		</crfn:form><br/>
 			<c:if test="${not empty actionBean.type}">
-			<div>
+			<div id="export_form_noscript">
 				<fieldset>
-					<legend>Export options</legend>
-					<crfn:form action="/typeSearch.action" method="post" target="new">
-						<stripes:hidden name="type" value="${actionBean.type }"/>
-						<label for="export_resource">Resource identifier</label>
-						<stripes:select id="export_resource" name="uriResourceIdentifier">
-							<stripes:option value="true">Uri</stripes:option>
-							<stripes:option value="false">Label</stripes:option>
-						</stripes:select>
-						<label for="export_format">Export format</label>
-						<stripes:select id="export_format" name="exportFormat">
-							<stripes:option value=".xls">.xls</stripes:option>
-						</stripes:select>
-						<stripes:submit name="export" value="Export" />					
-					</crfn:form>
+				<legend>Export options</legend>
+				<crfn:form action="/typeSearch.action" method="post">
+					<stripes:hidden name="type" value="${actionBean.type }"/>
+					<label for="export_resource">Resource identifier</label>
+					<stripes:select id="export_resource" name="uriResourceIdentifier">
+						<stripes:option value="true">Uri</stripes:option>
+						<stripes:option value="false">Label</stripes:option>
+					</stripes:select>
+					&nbsp;
+					<label for="export_format">Export format</label>
+					<stripes:select id="export_format" name="exportFormat">
+						<stripes:option value=".xls">.xls</stripes:option>
+					</stripes:select> <br/>
+					<label for="export_columns">Select columns to be exported</label><br/>
+					<stripes:select name="exportColumns" multiple="multiple" size="5" style="min-width:250px; width:250px;">
+						<c:forEach items="${actionBean.availableColumns }" var="column">
+							<stripes:option value="${column.key}">${column.value}</stripes:option>					
+						</c:forEach>
+					</stripes:select> 
+					<stripes:submit name="export" value="Export" id="export_form_submit" />
+				</crfn:form>
 				</fieldset>
 			</div>
 			<div style="margin-bottom:10px; float:right;  min-width:400px; width:50%;">
@@ -88,7 +102,7 @@
 		<c:if test="${not empty actionBean.type and not empty actionBean.availableColumns}">
 			<div style="max-width: 350px;">
 				<fieldset>
-				<legend>Select columns to be displayed (max 4)</legend>
+				<legend>Select columns to be displayed (max <c:out value="${actionBean.maxDisplayedColumns}"/>)</legend>
 				<crfn:form action="/typeSearch.action" method="post">
 					<stripes:hidden name="type" value="${actionBean.type }"/>
 					<stripes:select name="selectedColumns" multiple="multiple" size="5" style="min-width:250px; width:250px;">
