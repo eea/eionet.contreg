@@ -30,6 +30,8 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
 public class Pair<T,T1> implements Serializable {
+	
+	private static final String[] excludeFromEquals = new String[]{"value"};
 
 	/**
 	 * serial.
@@ -89,7 +91,7 @@ public class Pair<T,T1> implements Serializable {
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		return EqualsBuilder.reflectionEquals(this, obj);
+		return EqualsBuilder.reflectionEquals(this, obj, excludeFromEquals);
 	}
 	
 	

@@ -82,7 +82,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 	private static final String TYPE_SEARCH_PATH = "/pages/typeSearch.jsp";
 
 
-	private static final int MAX_DISPLAYED_COLUMNS = 4;
+	private static final int MAX_DISPLAYED_COLUMNS = 5;
 
 	//type to search
 	private String type;
@@ -99,6 +99,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 
 	private boolean uriResourceIdentifier;
 	private String exportFormat;
+	private List<String> exportColumns;
 
 	/**
 	 * @return
@@ -114,6 +115,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 				return removeFilter();
 			}
 		}
+		setExportColumns(getSelectedColumnsFromCache());
 		return new ForwardResolution(TYPE_SEARCH_PATH);
 	}
 	
@@ -136,12 +138,11 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 						? getAcceptedLanguages() 
 						: Collections.EMPTY_SET);
 		List<Pair<String,String>> columnPairs = new LinkedList<Pair<String,String>>();
-		
-		columnPairs.add(
-				new Pair<String, String>(
-						Predicates.RDFS_LABEL,
-						"Title"));
+
 		exporter.setExportResourceUri(uriResourceIdentifier);
+		selectedColumns = exportColumns == null || exportColumns.isEmpty()
+				? selectedColumns
+				: exportColumns;
 		for (String selectedColumn : selectedColumns) {
 			columnPairs.add(
 					new Pair<String,String>(
@@ -190,6 +191,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 		cache.get(type).put(newFilter, null);
 		getSession().setAttribute(SELECTED_FILTERS_CACHE, cache);
 		getSession().setAttribute(LAST_ACTION, LastAction.ADD_FILTER);
+		setExportColumns(getSelectedColumnsFromCache());
 		return new RedirectResolution(getUrlBinding() + "?search=Search&type=" + Util.urlEncode(type));		
 	}
 	
@@ -204,6 +206,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 			cache.get(type).remove(clearFilter);
 		}
 		getSession().setAttribute(LAST_ACTION, LastAction.REMOVE_FILTER);
+		setExportColumns(getSelectedColumnsFromCache());
 		return new RedirectResolution(getUrlBinding() + "?search=Search&type=" + Util.urlEncode(type));		
 	}
 	
@@ -220,6 +223,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 			}
 		}
 		getSession().setAttribute(LAST_ACTION, LastAction.REMOVE_FILTER);
+		setExportColumns(getSelectedColumnsFromCache());
 		return search();
 	}
 	
@@ -263,6 +267,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 			getSession().setAttribute(LAST_ACTION, LastAction.SEARCH);
 			getSession().setAttribute(MATCH_COUNT, matchCount);
 		}
+		setExportColumns(getSelectedColumnsFromCache());
 		return new ForwardResolution(TYPE_SEARCH_PATH);
 	}
 
@@ -335,6 +340,10 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 			cache = new HashMap<String, List<String>>();
 		}
 		if (selectedColumns != null) {
+			//hardcode title into the selected columns
+			if (!selectedColumns.contains(Predicates.RDFS_LABEL)) {
+				selectedColumns.add(0, Predicates.RDFS_LABEL);
+			}
 			selectedColumns = new LinkedList<String>(
 					selectedColumns.subList(
 							0,
@@ -348,6 +357,13 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 		return new RedirectResolution(getUrlBinding() + "?search=Search&type=" + Util.urlEncode(type));
 	}
 	
+	private List<String> getSelectedColumnsFromCache(){
+		Map<String,List<String>> cache = (Map<String, List<String>>) getSession().getAttribute(SELECTED_COLUMNS_CACHE);
+		return cache == null 
+				? selectedColumns 
+				: cache.get(type);
+	}
+	
 	/** 
 	 * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
 	 * {@inheritDoc}
@@ -358,8 +374,6 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 		//setSelectedColumns uses POST to submit a form, we have to add needed parameters to the 
 		//column headers in order to be able to sort right.
 		String actionParameter = "search=Search&amp;type=" + eionet.cr.util.Util.urlEncode(type);
-		// let's always include rdfs:label in the columns
-		columns.add(new SubjectPredicateColumn("Title", true, Predicates.RDFS_LABEL, actionParameter));
 		//add every selected column to the output
 		if (selectedColumns != null && !selectedColumns.isEmpty()) {
 			for(String string : selectedColumns) {
@@ -431,7 +445,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 			} catch (DAOException e) {
 				throw new SearchException("Exception in type search action bean", e);
 			}
-			
+			result.put(Predicates.RDFS_LABEL, "Title");
 			if (customSearch.getValue() != null){
 				for(SubjectDTO subject : customSearch.getValue()) {
 					if (!subject.isAnonymous()){
@@ -532,5 +546,24 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 	public void setUriResourceIdentifier(boolean uriResourceIdentifier) {
 		this.uriResourceIdentifier = uriResourceIdentifier;
 	}
+	
+	public int getMaxDisplayedColumns() {
+		return MAX_DISPLAYED_COLUMNS;
+	}
 
+
+	/**
+	 * @return the exportColumns
+	 */
+	public List<String> getExportColumns() {
+		return exportColumns;
+	}
+
+
+	/**
+	 * @param exportColumns the exportColumns to set
+	 */
+	public void setExportColumns(List<String> exportColumns) {
+		this.exportColumns = exportColumns;
+	}
 }
