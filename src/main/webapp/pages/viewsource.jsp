@@ -64,41 +64,8 @@
 			            </tr>
 			        </table>
 			        <br/>
-			        <c:if test="${not empty actionBean.sampleTriples}">			        	
-				        <table id="sampletriples" class="datatable">
-				        	<caption>Sample triples:</caption>
-									<col style="width:30%"/>
-									<col style="width:30%"/>
-									<col style="width:40%"/>
-				        	<thead>
-					        	<tr>
-					        		<th scope="col">Subject</th>
-					        		<th scope="col">Predicate</th>
-					        		<th scope="col">Object</th>
-					        	</tr>
-				        	</thead>
-				        	<tbody>
-				        		<c:forEach items="${actionBean.sampleTriples}" var="sampleTriple" varStatus="loop">
-				        			<tr <c:if test="${not empty sampleTriple.objectDerivSource}">class="derived"</c:if>>
-				        				<td>
-				        					<c:choose>
-				        						<c:when test="${sampleTriple.subject!=null}">
-				        							<c:out value="${crfn:cutAtFirstLongToken(sampleTriple.subject, 100)}"/>
-				        						</c:when>
-				        						<c:otherwise>
-				        							Anonymous resource
-				        						</c:otherwise>
-				        					</c:choose>
-				        				</td>
-				        				<td><c:out value="${crfn:cutAtFirstLongToken(sampleTriple.predicate, 100)}"/></td>
-				        				<td><c:out value="${crfn:cutAtFirstLongToken(sampleTriple.object, 100)}"/></td>
-				        			</tr>
-				        		</c:forEach>
-				        	</tbody>
-				        </table>
-				    </c:if>
 			        <table class="datatable">
-			        	<caption style="text-align:left;color:black">Last 10 harvests:</caption>
+			        	<caption>Last 10 harvests:</caption>
 			        	<thead>
 				        	<tr>
 				        		<th scope="col">Type</th>
@@ -135,6 +102,40 @@
 			        		</c:forEach>
 			        	</tbody>
 			        </table>
+
+			        <c:if test="${not empty actionBean.sampleTriples}">			        	
+				        <table id="sampletriples" class="datatable">
+				        	<caption>Sample triples:</caption>
+						<col style="width:30%"/>
+						<col style="width:30%"/>
+						<col style="width:40%"/>
+				        	<thead>
+					        	<tr>
+					        		<th scope="col">Subject</th>
+					        		<th scope="col">Predicate</th>
+					        		<th scope="col">Object</th>
+					        	</tr>
+				        	</thead>
+				        	<tbody>
+				        		<c:forEach items="${actionBean.sampleTriples}" var="sampleTriple" varStatus="loop">
+				        			<tr <c:if test="${not empty sampleTriple.objectDerivSource}">class="derived"</c:if>>
+				        				<td>
+				        					<c:choose>
+				        						<c:when test="${sampleTriple.subject!=null}">
+				        							<c:out value="${crfn:cutAtFirstLongToken(sampleTriple.subject, 100)}"/>
+				        						</c:when>
+				        						<c:otherwise>
+				        							Anonymous resource
+				        						</c:otherwise>
+				        					</c:choose>
+				        				</td>
+				        				<td><c:out value="${crfn:cutAtFirstLongToken(sampleTriple.predicate, 100)}"/></td>
+				        				<td><c:out value="${crfn:cutAtFirstLongToken(sampleTriple.object, 100)}"/></td>
+				        			</tr>
+				        		</c:forEach>
+				        	</tbody>
+				        </table>
+				</c:if>
 			    </crfn:form>
 			</c:when>
 			<c:otherwise>

@@ -18,7 +18,7 @@
 	
 		<stripes:label for="urlText">URL to register:</stripes:label>
 		<br/>
-		<stripes:text name="url" id="urlText" size="140"/>
+		<stripes:text name="url" id="urlText" size="100"/>
 		<br/><br/>
 		<stripes:label for="bookmarkCheckbox">Bookmark this URL on my personal bookmark list</stripes:label>
 		<stripes:checkbox name="bookmark" id="bookmarkCheckbox"/>

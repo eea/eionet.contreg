@@ -9,7 +9,7 @@
    		<col/>
    	</c:if>
 	<col style="width:25%;"/>
-	<col style="max-width:3em;"/>
+	<col style="width:2em; max-width:3em;"/>
 	<col/>
 	<col style="width:4em;"/>
    		<thead>

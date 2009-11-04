@@ -8,10 +8,10 @@
 	
         <h1>Harvest queue</h1>
         
-        <p>This page displays the harvest queue. It is divided into two: <em>urgent queue</em> and <em>batch queue</em>.<br/>
-        The batch queue contains the sources that are being harvested at the current run of the batch harvester. If it is empty,<br/>
-        it means the batch harvester is not running at the moment or there are currently no sources that it needs to harvest.<br/>
-        The urgent queue is created by system administrators who can request an urgent harvest at any time.<br/>
+        <p>This page displays the harvest queue. It is divided into two: <em>urgent queue</em> and <em>batch queue</em>.
+        The batch queue contains the sources that are being harvested at the current run of the batch harvester. If it is empty,
+        it means the batch harvester is not running at the moment or there are currently no sources that it needs to harvest.
+        The urgent queue is created by system administrators who can request an urgent harvest at any time.
         Harvests in the urgent queue have always a higher priority over those in the batch queue.</p>
         
         <c:if test="${not empty actionBean.currentHarvest}">
@@ -67,7 +67,7 @@
 						</display:table>
 					</c:when>
 					<c:otherwise>
-						<p>No items found in this queue!</p>
+						<p>No items found in this queue.</p>
 					</c:otherwise>
 				</c:choose>
 			</c:if>
@@ -85,7 +85,7 @@
 						</display:table>
 					</c:when>
 					<c:otherwise>
-						<p>No items found in this queue!</p>
+						<p>No items found in this queue.</p>
 					</c:otherwise>
 				</c:choose>
 			</c:if>

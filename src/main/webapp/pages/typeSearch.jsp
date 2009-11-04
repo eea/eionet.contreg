@@ -16,7 +16,7 @@
        <h1>Type search</h1>
        <p>
        	This page enables to find content by type. Below is the list of types known to CR.
-       	This does not mean that CR has content for every listed type.<br/>
+       	This does not mean that CR has content for every listed type.
        	The search will return the list of all resources having the type you selected.
        	To view a resource's factsheet, click the relevant action icon next to it.   
        </p>

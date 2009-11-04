@@ -8,18 +8,20 @@
 		<h1>Add source</h1>
 	    <crfn:form action="/source.action" method="post">
 	        <table>
+                    <col style="width:10em"/>
+                    <col style="width:100%"/>
 	            <tr>
-	                <td>URL:</td>
-	                <td><stripes:text name="harvestSource.url" size="100"/></td>
+	                <td><label class="question required" for="harvesturl">URL</label></td>
+	                <td><stripes:text id="harvesturl" name="harvestSource.url" size="80"/></td>
 	            </tr>
 	            <tr>
-	                <td>E-mails:</td>
-	                <td><stripes:text name="harvestSource.emails" size="100"/></td>
+	                <td><label class="question" for="emails">E-mails</label></td>
+	                <td><stripes:text id="emails" name="harvestSource.emails" size="80"/></td>
 	            </tr>
 	            <tr>
-	                <td>Harvest interval:</td>
+	                <td><label class="question" for="interval">Harvest interval</label></td>
 	                <td>
-	                	<stripes:text name="harvestSource.intervalMinutes" size="10" value="6"/>
+	                	<stripes:text id="interval" name="harvestSource.intervalMinutes" size="10" value="6"/>
 	                	<stripes:select name="intervalMultiplier" value="10080">
 	                		<c:forEach items="${actionBean.intervalMultipliers}" var="intervalMultiplier"> 
 		                		<stripes:option value="${intervalMultiplier.key}" label="${intervalMultiplier.value}"/>

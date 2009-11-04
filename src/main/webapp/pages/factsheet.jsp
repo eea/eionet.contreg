@@ -8,7 +8,7 @@
 
 		<c:choose>
 			<c:when test="${!actionBean.noCriteria}">
-			
+
 				<div id="tabbedmenu">
 				    <ul>
 					<li id="currenttab"><span>Resource properties</span></li>
@@ -18,7 +18,7 @@
 								<stripes:link href="/references.action" event="search">Resource references
 									<stripes:param name="uri" value="${actionBean.subject.uri}"/>
 								</stripes:link>
-							</c:when>						
+							</c:when>
 							<c:when test="${not empty actionBean.uri}">
 								<stripes:link href="/references.action" event="search">Resource references
 									<stripes:param name="uri" value="${actionBean.uri}"/>
@@ -34,14 +34,14 @@
 				    </ul>
 				</div>
 				<br style="clear:left" />
-		
+
 		        <c:choose>
 				    <c:when test="${actionBean.subject!=null}">		    
 								    
 				    	<c:set var="subjectUrl" value="${actionBean.subject.url}"/>
 				    	<c:set var="subjectUri" value="${actionBean.subject.uri}"/>
 				    	<c:set var="allowEdit" value="false"/>
-				    	
+				    
 				    	<c:if test='${sessionScope.crUser!=null && crfn:hasPermission(sessionScope.crUser.userName, "/", "u")}'>
 				    		<c:set var="displayOperations" value="true"/>
 					    	<c:if test="${!subject.anonymous}">
@@ -75,7 +75,7 @@
 							</ul>
 						</c:if>
 				    	<div style="margin-top:20px" id="wait_container">
-				    	
+				    
 				    		<c:choose>
 				    			<c:when test="${actionBean.subject.anonymous}">
 				    				<div class="advice-msg">This is an anonymous resource!</div>
@@ -87,9 +87,9 @@
 				    				<div class="advice-msg" title="${fn:escapeXml(subjectUri)}">This is an unresolvable resource!</div>
 				    			</c:otherwise>
 				    		</c:choose>
-				    		
+				    
 				    		<crfn:form action="/factsheet.action" method="post">
-				    		
+				    
 						    	<c:if test="${actionBean.context.eventName=='edit' && allowEdit}">
 					    				<table>
 					    					<tr>
@@ -116,50 +116,54 @@
 							    				</td>
 							    		</table>
 						    	</c:if>
-				    		
+				    
 								<stripes:layout-render name="/pages/common/factsheet_table.jsp"
 											subjectUrl="${subjectUrl}" subjectUri="${subjectUri}" displayCheckboxes="${actionBean.context.eventName=='edit' && allowEdit}"/>
-		
+
 				    		</crfn:form>
 						</div>				    
 				    </c:when>
 				    <c:otherwise>
 				    	<c:choose>
 			    			<c:when test="${not empty actionBean.uri}">
-			    				<div style="margin-top:20px" class="note-msg">
-			    					<c:choose>
-			    						<c:when test="${not empty actionBean.url}">
-			    							<strong>Nothing is known about <a href="${actionBean.url}">${actionBean.url}</a></strong>
-			    						</c:when>
-			    						<c:otherwise>
-			    							<strong>Nothing is known about ${actionBean.uri}</strong>
-			    						</c:otherwise>
-			    					</c:choose>			    					
-			    				</div>
 			    				<c:if test='${sessionScope.crUser!=null && crfn:hasPermission(sessionScope.crUser.userName, "/", "u")}'>
 				    				<c:if test="${not empty actionBean.url}">
 					    				<ul id="dropdown-operations">
-											<li><a href="#">Operations</a>
-												<ul>
-													<li>
-														<stripes:link href="${actionBean.urlBinding}" event="harvest">Harvest
-																<stripes:param name="uri" value="${actionBean.uri}"/>
-														</stripes:link>
-													</li>
-												</ul>
-											</li>
-										</ul>
-									</c:if>
+										<li><a href="#">Operations</a>
+											<ul>
+												<li>
+													<stripes:link href="${actionBean.urlBinding}" event="harvest">Harvest
+															<stripes:param name="uri" value="${actionBean.uri}"/>
+													</stripes:link>
+												</li>
+											</ul>
+										</li>
+									</ul>
 								</c:if>
+							</c:if>
+			    				<div style="margin-top:20px" class="note-msg">
+								<strong>Unknown</strong>
+								<p>Nothing is known about
+			    					<c:choose>
+			    						<c:when test="${not empty actionBean.url}">
+			    							<a class="link-external" href="${actionBean.url}">${actionBean.url}</a>
+			    						</c:when>
+			    						<c:otherwise>
+			    							${actionBean.uri}
+			    						</c:otherwise>
+			    					</c:choose>
+								in Content Registry</p>
+			    				</div>
 			    			</c:when>
 			    			<c:when test="${actionBean.uriHash!=0}">
 			    				<div style="margin-top:20px" class="note-msg">
-			    					<strong>Nothing is known about this anonymous resource!</strong>
+								<strong>Unknown</strong>
+			    					<p>Nothing is known about this anonymous resource in Content Registry</p>
 			    				</div>
 			    			</c:when>
 			    			<c:otherwise>
-			    				<div style="margin-top:20px" class="note-msg">
-			    					<strong>Resource identifier not specified!</strong>
+			    				<div class="error-msg">
+			    					Resource identifier not specified!
 			    				</div>
 			    			</c:otherwise>
 			    		</c:choose>
@@ -170,6 +174,6 @@
 				<div>&nbsp;</div>
 			</c:otherwise>
 		</c:choose>
-	    				
+
 	</stripes:layout-component>
 </stripes:layout-render>

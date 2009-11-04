@@ -19,7 +19,7 @@
 			<p></p>
 			<div id="searchForm" style="padding-bottom: 5px">
 				<stripes:label for="filterString" class="question">Filter expression</stripes:label>
-				<stripes:text name="searchString" id="filterString"/>
+				<stripes:text name="searchString" id="filterString" size="40"/>
 				<stripes:hidden name="type" value="${actionBean.type }"/>
 				<stripes:submit name="view" value="Filter" />
 				<c:if test="${!empty actionBean.searchString }"> 
