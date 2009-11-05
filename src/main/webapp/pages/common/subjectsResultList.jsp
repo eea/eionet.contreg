@@ -5,19 +5,19 @@
 	<div style="margin-top:20px; clear:both;">
 		<c:choose>
 			<c:when test="${actionBean.resultList!=null && fn:length(actionBean.resultList)>0}">
-				<c:if test="${actionBean.matchCount>0}">
-					<c:set var="pagination" value="${actionBean.pagination}"/>
-					<span class="matchescount">
-						${actionBean.matchCount} matches found
+				<div class="pagination">
+					<c:if test="${actionBean.matchCount>0}">
+						<c:set var="pagination" value="${actionBean.pagination}"/>
+						<span class="matchescount">
+							${actionBean.matchCount} matches found
+							<c:if test="${pagination!=null}">
+								<c:choose>
+									<c:when test="${pagination.rowsFrom==pagination.rowsTo}">, displaying last one</c:when>
+									<c:otherwise>, displaying ${pagination.rowsFrom} to ${pagination.rowsTo}</c:otherwise>
+								</c:choose>
+							</c:if>
+						</span>
 						<c:if test="${pagination!=null}">
-							<c:choose>
-								<c:when test="${pagination.rowsFrom==pagination.rowsTo}">, displaying last one</c:when>
-								<c:otherwise>, displaying ${pagination.rowsFrom} to ${pagination.rowsTo}</c:otherwise>
-							</c:choose>
-						</c:if>
-					</span>
-					<c:if test="${pagination!=null}">
-						<span class="pagination">
 							<c:choose>
 								<c:when test="${pagination.curPageNum==1}">
 									<span class="firstpage">First</span>, <span class="prevpage">Prev</span>,
@@ -44,9 +44,9 @@
 									<a href="${pagination.next.href}" class="nextpage">Next</a>, <a href="${pagination.last.href}" class="lastpage">Last</a>
 								</c:otherwise>
 							</c:choose>
-						</span>
+						</c:if>
 					</c:if>
-				</c:if>
+				</div>
 				<table id="resourcesResultList" class="${tableClass}">
 					<thead>
 						<tr>
