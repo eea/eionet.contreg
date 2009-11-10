@@ -54,6 +54,14 @@ public interface HarvestSourceDAO extends IDao{
     List<HarvestSourceDTO> getHarvestSourcesUnavailable(String searchString, PaginationRequest pageRequest, SortingRequest sortingRequest) throws DAOException;
 
     /**
+     * @param filterString
+     * @param pageRequest
+     * @param sortingRequest
+     * @return
+     */
+    List<HarvestSourceDTO> getHarvestSourcesFailed(String filterString,	PaginationRequest pageRequest, SortingRequest sortingRequest) throws DAOException;
+
+    /**
      * @return harvesting sources
      * @throws DAOException
      * @param int harvestSourceID
@@ -114,9 +122,10 @@ public interface HarvestSourceDAO extends IDao{
      * @param numStatements
      * @param numResources
      * @param sourceAvailable 
+     * @param failed 
      * @throws DAOException
      */
-    public void updateHarvestFinished(int sourceId, Integer numStatements, Integer numResources, Boolean sourceAvailable) throws DAOException;
+    public void updateHarvestFinished(int sourceId, Integer numStatements, Integer numResources, Boolean sourceAvailable, boolean failed) throws DAOException;
     
     /**
      * 
@@ -146,5 +155,6 @@ public interface HarvestSourceDAO extends IDao{
 	 * @throws DAOException 
 	 */
 	void deleteHarvestHistory(int neededToRemain) throws DAOException;
+
 
 }

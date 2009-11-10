@@ -57,6 +57,7 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
 	/** */
 	private static final String UNAVAILABLE_TYPE = "unavail";
 	private static final String TRACKED_FILES = "tracked_file";
+	private static final String FAILED_HARVESTS = "failed";
 	
 	/** */
 	public static final List<Pair<String, String>> sourceTypes;
@@ -67,6 +68,7 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
 		sourceTypes.add(new Pair<String, String>(null, "Sources"));
 		sourceTypes.add(new Pair<String, String>(TRACKED_FILES, "Tracked files"));
 		sourceTypes.add(new Pair<String, String>(UNAVAILABLE_TYPE, "Unavaliable"));
+		sourceTypes.add(new Pair<String, String>(FAILED_HARVESTS, "Failed harvests"));
 		
 		columnList = new LinkedList<SearchResultColumn>();
 		GenericColumn checkbox = new GenericColumn();
@@ -125,6 +127,8 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
 					setResultList(factory.getDao(HarvestSourceDAO.class).getHarvestTrackedFiles(filterString, pageRequest, sortingRequest));
 			} else if (UNAVAILABLE_TYPE.equals(type)) {
 					setResultList(factory.getDao(HarvestSourceDAO.class).getHarvestSourcesUnavailable(filterString, pageRequest, sortingRequest));
+			} else if (FAILED_HARVESTS.equals(type)) {
+				setResultList(factory.getDao(HarvestSourceDAO.class).getHarvestSourcesFailed(filterString, pageRequest, sortingRequest));
 			}
 			matchCount = pageRequest.getMatchCount();
 			setPagination(Pagination.getPagination(

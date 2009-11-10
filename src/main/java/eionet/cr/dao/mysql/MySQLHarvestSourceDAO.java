@@ -64,6 +64,10 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 		"SELECT SQL_CALC_FOUND_ROWS * FROM HARVEST_SOURCE WHERE COUNT_UNAVAIL > " + HarvestSourceDTO.COUNT_UNAVAIL_THRESHOLD + " AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)";
 	private static final String searchHarvestSourcesUnavailableSQL =
 		"SELECT SQL_CALC_FOUND_ROWS * FROM HARVEST_SOURCE WHERE URL LIKE (?) AND COUNT_UNAVAIL > " + HarvestSourceDTO.COUNT_UNAVAIL_THRESHOLD + " AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)";
+	private static final String getHarvestSourcesFailedSQL = 
+		"SELECT SQL_CALC_FOUND_ROWS * FROM HARVEST_SOURCE WHERE LAST_HARVEST_FAILED = 'Y' AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)";
+	private static final String searchHarvestSourcesFailedSQL = 
+		"SELECT SQL_CALC_FOUND_ROWS * FROM HARVEST_SOURCE WHERE LAST_HARVEST_FAILED = 'Y' AND URL LIKE(?) AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)";
 		
 	/*
      * (non-Javadoc)
@@ -115,6 +119,21 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 				sortingRequest);	
     	
     }
+    
+    /** 
+	 * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSourcesFailed(java.lang.String, eionet.cr.util.pagination.PaginationRequest, eionet.cr.util.SortingRequest)
+	 * {@inheritDoc}
+	 */
+	public List<HarvestSourceDTO> getHarvestSourcesFailed(String searchString, 
+			PaginationRequest pageRequest, SortingRequest sortingRequest) throws DAOException {
+		return getSources(
+    			StringUtils.isBlank(searchString)
+						? getHarvestSourcesFailedSQL
+						: searchHarvestSourcesFailedSQL,
+				searchString,
+				pageRequest,
+				sortingRequest);
+	}
     
     private List<HarvestSourceDTO> getSources(String sql, String searchString, PaginationRequest pageRequest, SortingRequest sortingRequest)
     		throws DAOException {
@@ -336,20 +355,21 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
     }
 
     /** */
-    private static final String updateHarvestFinishedSQL = "update HARVEST_SOURCE set STATEMENTS=?, RESOURCES=? where HARVEST_SOURCE_ID=?";
-    private static final String updateHarvestFinishedSQL_avail = "update HARVEST_SOURCE set STATEMENTS=?, RESOURCES=?, COUNT_UNAVAIL=if(?,0,(COUNT_UNAVAIL+1)) where HARVEST_SOURCE_ID=?";
+    private static final String updateHarvestFinishedSQL = "update HARVEST_SOURCE set STATEMENTS=?, RESOURCES=?, LAST_HARVEST_FAILED=? where HARVEST_SOURCE_ID=?";
+    private static final String updateHarvestFinishedSQL_avail = "update HARVEST_SOURCE set STATEMENTS=?, RESOURCES=?, COUNT_UNAVAIL=if(?,0,(COUNT_UNAVAIL+1)), LAST_HARVEST_FAILED=?  where HARVEST_SOURCE_ID=?";
 
     /*
      * (non-Javadoc)
      * @see eionet.cr.dao.HarvestSourceDAO#updateHarvestFinished(int, Integer, Integer)
      */
-	public void updateHarvestFinished(int sourceId, Integer numStatements, Integer numResources, Boolean sourceAvailable) throws DAOException {
+	public void updateHarvestFinished(int sourceId, Integer numStatements, Integer numResources, Boolean sourceAvailable, boolean failed) throws DAOException {
 		
 		List<Object> values = new ArrayList<Object>();
 		values.add(numStatements);
 		values.add(numResources);
 		if (sourceAvailable!=null)
 			values.add(sourceAvailable.booleanValue()==true ? new Integer(1) : new Integer(0));
+		values.add(YesNoBoolean.format(failed));
 		values.add(new Integer(sourceId));		
 		
 		Connection conn = null;

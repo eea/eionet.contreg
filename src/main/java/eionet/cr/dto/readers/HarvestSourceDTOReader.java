@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import eionet.cr.dto.HarvestSourceDTO;
+import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.sql.ResultSetListReader;
 
 /**
@@ -54,6 +55,8 @@ public class HarvestSourceDTOReader extends ResultSetListReader<HarvestSourceDTO
 		harvestSourceDTO.setCountUnavail(new Integer(rs.getInt("COUNT_UNAVAIL")));
 		harvestSourceDTO.setLastHarvest(rs.getTimestamp("LAST_HARVEST"));
 		harvestSourceDTO.setIntervalMinutes(rs.getInt("INTERVAL_MINUTES"));
+		harvestSourceDTO.setLastHarvestFailed(YesNoBoolean.parse(rs.getString("LAST_HARVEST_FAILED")));
+		harvestSourceDTO.setTrackedFile(YesNoBoolean.parse(rs.getString("TRACKED_FILE")));
 		
 		resultList.add(harvestSourceDTO);
 	}

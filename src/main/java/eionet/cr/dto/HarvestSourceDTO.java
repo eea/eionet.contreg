@@ -50,6 +50,7 @@ public class HarvestSourceDTO implements Serializable {
 	private Integer resources;
 	private Integer countUnavail;
 	private Date lastHarvest;
+	private boolean lastHarvestFailed;
 	private Integer intervalMinutes;
 	
 	/**
@@ -211,6 +212,20 @@ public class HarvestSourceDTO implements Serializable {
 	 */
 	public String toString(){
 		return new StringBuffer().append("Harvest source ").append(url).toString();
+	}
+
+	/**
+	 * @return the lastHarvestFailed
+	 */
+	public boolean isLastHarvestFailed() {
+		return lastHarvestFailed;
+	}
+
+	/**
+	 * @param lastHarvestFailed the lastHarvestFailed to set
+	 */
+	public void setLastHarvestFailed(boolean lastHarvestFailed) {
+		this.lastHarvestFailed = lastHarvestFailed;
 	}
 
 	

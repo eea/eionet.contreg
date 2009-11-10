@@ -85,14 +85,28 @@ public class HarvestDAOWriter {
 				harvest.getDistinctSubjectsCount(),
 				0,
 				0);
+		//harvest failed IFF it has a fatal error || warnings || errors
+		boolean failed = harvest.getFatalError() != null 
+				|| (harvest.getErrors() != null && !harvest.getErrors().isEmpty())
+				|| (harvest.getWarnings() != null && !harvest.getWarnings().isEmpty());
 		
 		if (harvest instanceof PullHarvest){
-			get().getDao(HarvestSourceDAO.class).updateHarvestFinished(
-					sourceId, null, harvest.getDistinctSubjectsCount(), ((PullHarvest)harvest).getSourceAvailable());
+			get().getDao(HarvestSourceDAO.class)
+					.updateHarvestFinished(
+							sourceId,
+							null,
+							harvest.getDistinctSubjectsCount(),
+							((PullHarvest)harvest).getSourceAvailable(),
+							failed);
 		}
 		else{
-			get().getDao(HarvestSourceDAO.class).updateHarvestFinished(
-					sourceId, null, numOfResources + harvest.getDistinctSubjectsCount(), null);
+			get().getDao(HarvestSourceDAO.class)
+					.updateHarvestFinished(
+							sourceId,
+							null,
+							numOfResources + harvest.getDistinctSubjectsCount(),
+							null,
+							failed);
 		}
 	}
 
