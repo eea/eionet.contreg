@@ -21,40 +21,22 @@
 package eionet.cr.harvest;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLEncoder;
-import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.xml.sax.SAXException;
 
 import com.hp.hpl.jena.rdf.arp.ARP;
 
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
-import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dto.HarvestDTO;
-import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
+import eionet.cr.harvest.persister.PersisterConfig;
 import eionet.cr.harvest.util.HarvestLog;
 import eionet.cr.harvest.util.arp.ARPSource;
-import eionet.cr.harvest.util.arp.ATriple;
-import eionet.cr.harvest.util.arp.InputStreamBasedARPSource;
-import eionet.cr.util.FileUtil;
-import eionet.cr.util.URLUtil;
-import eionet.cr.util.Util;
-import eionet.cr.util.xml.ConversionsParser;
-import eionet.cr.util.xml.XmlAnalysis;
+import eionet.cr.util.Hashes;
 
 /**
  * 
@@ -163,16 +145,23 @@ public abstract class Harvest {
 		RDFHandler rdfHandler = null;
 		try{
 			
-			rdfHandler = createRDFHandler();
-			rdfHandler.setDeriveInferredTriples(deriveInferredTriples);
-			rdfHandler.setClearPreviousContent(clearPreviousContent);
-			rdfHandler.setSourceLastModified(sourceLastModified);
-
+			PersisterConfig config = new PersisterConfig(
+					deriveInferredTriples,
+					clearPreviousContent,
+					sourceLastModified,
+					sourceUrlString,
+					System.currentTimeMillis(),
+					Hashes.spoHash(sourceUrlString),
+					null);
+			rdfHandler = createRDFHandler(config);
+			DefaultErrorHandler errorHandler = new DefaultErrorHandler();
 			if (arpSource!=null){
 				ARP arp = new ARP();
 		        arp.setStatementHandler(rdfHandler);
-		        arp.setErrorHandler(rdfHandler);
+		        arp.setErrorHandler(errorHandler);
+		        long time = System.currentTimeMillis();
 		        arpSource.load(arp, sourceUrlString);
+		        logger.debug("file processing took: " + (System.currentTimeMillis() - time) + " ms");
 			}
 			else if (sourceMetadata.getPredicateCount()>0){
 				logger.debug("No content to harvest, but storing triples *about* the source");
@@ -181,10 +170,10 @@ public abstract class Harvest {
 			rdfHandler.addSourceMetadata(sourceMetadata);
 	        rdfHandler.endOfFile();
 	        
-	        if (rdfHandler.getSaxError()!=null)
-	        	errors.add(rdfHandler.getSaxError());
-	        if (rdfHandler.getSaxWarning()!=null)
-	        	warnings.add(rdfHandler.getSaxWarning());
+	        if (errorHandler.getSaxError()!=null)
+	        	errors.add(errorHandler.getSaxError());
+	        if (errorHandler.getSaxWarning()!=null)
+	        	warnings.add(errorHandler.getSaxWarning());
 
 	        rdfHandler.commit();
 
@@ -223,8 +212,8 @@ public abstract class Harvest {
 	/**
 	 * 
 	 */
-	protected RDFHandler createRDFHandler(){
-		return new RDFHandler(sourceUrlString, System.currentTimeMillis());
+	protected RDFHandler createRDFHandler(PersisterConfig config){
+		return new RDFHandler(config);
 	}
 
 	/**

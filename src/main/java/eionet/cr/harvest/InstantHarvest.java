@@ -32,6 +32,7 @@ import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
+import eionet.cr.harvest.persister.PersisterConfig;
 import eionet.cr.web.security.CRUser;
 
 public class InstantHarvest extends PullHarvest{
@@ -58,9 +59,9 @@ public class InstantHarvest extends PullHarvest{
 	 * (non-Javadoc)
 	 * @see eionet.cr.harvest.Harvest#createRDFHandler()
 	 */
-	protected RDFHandler createRDFHandler(){
-		RDFHandler handler = super.createRDFHandler();
-		handler.setInstantHarvestUser(userName);
+	protected RDFHandler createRDFHandler(PersisterConfig config){
+		config.setInstantHarvestUser(userName);
+		RDFHandler handler = super.createRDFHandler(config);
 		return handler;
 	}
 

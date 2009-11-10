@@ -41,7 +41,6 @@ import org.quartz.StatefulJob;
 import eionet.cr.common.JobScheduler;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
-import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.HarvestSourceDTO;
@@ -53,7 +52,7 @@ import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.HarvestNotificationSender;
 import eionet.cr.harvest.PullHarvest;
 import eionet.cr.harvest.PushHarvest;
-import eionet.cr.harvest.RDFHandler;
+import eionet.cr.harvest.persister.DefaultPersister;
 import eionet.cr.util.EMailSender;
 import eionet.cr.util.Util;
 import eionet.cr.web.security.CRUser;
@@ -85,7 +84,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 	public void execute(JobExecutionContext jobExecContext) throws JobExecutionException {
 		
 		try{
-			RDFHandler.rollbackUnfinishedHarvests();
+			new DefaultPersister().rollbackUnfinishedHarvests();
 			deleteSourcesQueuedForRemoval();
 			harvestUrgentQueue();
 
