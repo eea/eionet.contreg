@@ -21,11 +21,13 @@
 package eionet.cr.web.action;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.HandlesEvent;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
@@ -72,6 +74,16 @@ public class HarvestSourceActionBean extends AbstractActionBean {
 	private int intervalMultiplier;
 	private static LinkedHashMap<Integer,String> intervalMultipliers;
 	
+	private static final List<Pair<String,String>> tabs;
+	private String selectedTab = "view";
+	
+	static {
+		tabs = new LinkedList<Pair<String,String>>();
+		tabs.add(new Pair<String,String>("view", "View"));
+		tabs.add(new Pair<String,String>("sampleTriples", "Sample triples"));
+		tabs.add(new Pair<String,String>("history", "History"));
+	}
+	
 	/**
 	 * 
 	 * @return
@@ -103,30 +115,59 @@ public class HarvestSourceActionBean extends AbstractActionBean {
      * @throws SearchException 
      */
     @DefaultHandler
+    @HandlesEvent("view")
     public Resolution view() throws DAOException, SearchException {
-    	
+    	selectedTab = "view";
+    	prepareDTO();
+    	return new ForwardResolution("/pages/viewsource.jsp");
+    }
+    
+    /**
+     * @return
+     * @throws DAOException
+     * @throws SearchException
+     */
+    @HandlesEvent("history")
+    public Resolution history() throws DAOException, SearchException {
+    	selectedTab = "history";
+    	prepareDTO();
+		if (harvestSource!=null){
+			// populate history of harvests
+			harvests = factory.getDao(HarvestDAO.class).getHarvestsBySourceId(harvestSource.getSourceId());
+		}
+    
+    	return new ForwardResolution("/pages/viewsource.jsp");
+    }
+
+    /**
+     * @return
+     * @throws DAOException
+     * @throws SearchException
+     */
+    @HandlesEvent("sampleTriples")
+    public Resolution sampleTriples() throws DAOException, SearchException {
+    	selectedTab = "sampleTriples";
+    	prepareDTO();
+		if (harvestSource!=null){
+			// populate sample triples
+			populateSampleTriples();
+		}
+    
+    	return new ForwardResolution("/pages/viewsource.jsp");
+    }
+
+    private void prepareDTO() throws DAOException {
     	if (harvestSource!=null){
     		Integer sourceId = harvestSource.getSourceId();
     		String url = harvestSource.getUrl();
-    		
-    		if (sourceId!=null){
-    			harvestSource = factory.getDao(HarvestSourceDAO.class).getHarvestSourceById(sourceId);
-    		}
-    		else if (url!=null && url.trim().length()>0){
-    			harvestSource = factory.getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(url);
-    		}
-    		
-    		if (harvestSource!=null){
-    			
-    			// populate history of harvests
-    			harvests = factory.getDao(HarvestDAO.class).getHarvestsBySourceId(harvestSource.getSourceId());
-    			
-    			// populate sample triples
-    			populateSampleTriples();
-    		}
+		
+			if (sourceId!=null){
+				harvestSource = factory.getDao(HarvestSourceDAO.class).getHarvestSourceById(sourceId);
+			}
+			else if (url!=null && url.trim().length()>0){
+				harvestSource = factory.getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(url);
+			}
     	}
-    
-    	return new ForwardResolution("/pages/viewsource.jsp");
     }
     
     /**
@@ -325,5 +366,26 @@ public class HarvestSourceActionBean extends AbstractActionBean {
 		}
 		
 		return buf.toString();
+	}
+
+	/**
+	 * @return the tabs
+	 */
+	public List<Pair<String, String>> getTabs() {
+		return HarvestSourceActionBean.tabs;
+	}
+
+	/**
+	 * @return the selectedTab
+	 */
+	public String getSelectedTab() {
+		return selectedTab;
+	}
+
+	/**
+	 * @param selectedTab the selectedTab to set
+	 */
+	public void setSelectedTab(String selectedTab) {
+		this.selectedTab = selectedTab;
 	}
 }
