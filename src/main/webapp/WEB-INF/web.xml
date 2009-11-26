@@ -94,6 +94,18 @@
           <param-value>true</param-value>
         </init-param>
     </servlet>
+    
+    <servlet>
+		<servlet-name>AmpServlet</servlet-name>
+		<servlet-class>eionet.cr.api.services.AmpServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	
+	<servlet-mapping>
+        <servlet-name>AmpServlet</servlet-name>
+        <url-pattern>/ampService</url-pattern>
+    </servlet-mapping>
+    
     <servlet-mapping>
         <servlet-name>XmlRpcServlet</servlet-name>
         <url-pattern>/xmlrpc</url-pattern>

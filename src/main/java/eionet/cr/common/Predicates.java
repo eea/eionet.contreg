@@ -71,4 +71,7 @@ public interface Predicates {
 	
 	public static final String WGS_LAT = "http://www.w3.org/2003/01/geo/wgs84_pos#lat";
 	public static final String WGS_LONG = "http://www.w3.org/2003/01/geo/wgs84_pos#long";
+	
+	public static final String AMP_OUTPUT = "http://rdfdata.eionet.europa.eu/amp/ontology/Output";
+	public static final String AMP_ONTOLOGY_CODE = "http://rdfdata.eionet.europa.eu/amp/ontology/code";
 }
