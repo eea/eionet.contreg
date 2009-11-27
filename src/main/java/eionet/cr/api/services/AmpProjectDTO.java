@@ -52,25 +52,35 @@ public class AmpProjectDTO implements Serializable {
 	
 	@Attribute(name = "rdf:about", required = false)
 	private String uri;
-	@Element(required = false)
+	
+	@Element(required = false, name = "dc:identifier")
 	private String identifier;
-	@ElementList(name = "rdf:type", inline = true)
+	
+	@ElementList(inline = true, name = "rdf:type")
 	private List<AmpProjectTypeDTO> type;
+	
 	@Element(required = false, name="code")
 	private String csiCode;
+	
 	@Element(required = false)
 	private String mpsCode;
-	@Element(required = false)
+	
+	@Element(required = false, name = "dc:title")
 	private String title;
-	@Element (required = false)
+	
+	@Element (required = false, name = "rdfs:label")
 	private String label;
-	@Element (required = false)
+	
+	@Element (required = false, name = "dc:description")
 	private String description;
-	@Element (required = false)
+	
+	@Element (required = false, name = "dc:language")
 	private String language;
-	@Element (name = "startingDate", required = false)
+	
+	@Element (required = false, name = "dc:date")
 	private String date;
-	@Element (required = false)
+	
+	@Element (required = false, name = "cr:contentLastModified")
 	private String lastModifiedDate;
 
 	public AmpProjectDTO() {

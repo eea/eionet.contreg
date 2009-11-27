@@ -56,6 +56,8 @@ public class AmpServlet extends HttpServlet {
 	private static final Logger logger = Logger.getLogger(AmpServlet.class);
 	private static final String HEADER = "<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" " +
 			"xmlns=\"http://rdfdata.eionet.europa.eu/amp/ontology/\" " +
+			"xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema\" " + 
+			"xmlns:cr=\"http://cr.eionet.europa.eu/ontologies/contreg.rdf#\" "+ 
 			"xmlns:dc=\"http://purl.org/dc/elements/1.1/\">\n";
 	private static final String FOOTER = "</rdf:RDF>";
 	private static final Persister persister = new Persister(new Format(4));
