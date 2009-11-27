@@ -21,13 +21,18 @@
 package eionet.cr.api.services;
 
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
+import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 
 import eionet.cr.common.Predicates;
+import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.URIUtil;
 
@@ -37,7 +42,7 @@ import eionet.cr.util.URIUtil;
  * @author Aleksandr Ivanov
  * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
-@Root(name="EionetProject")
+@Root(name = "rdf:Description")
 public class AmpProjectDTO implements Serializable {
 	
 	/**
@@ -45,12 +50,12 @@ public class AmpProjectDTO implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	@Attribute(name="rdf:about", required = false)
+	@Attribute(name = "rdf:about", required = false)
 	private String uri;
 	@Element(required = false)
 	private String identifier;
-	@Element(name="type", required = false)
-	private String rdfType;
+	@ElementList(name = "rdf:type", inline = true)
+	private List<AmpProjectTypeDTO> type;
 	@Element(required = false, name="code")
 	private String csiCode;
 	@Element(required = false)
@@ -78,7 +83,14 @@ public class AmpProjectDTO implements Serializable {
 	public AmpProjectDTO(SubjectDTO subject) {
 		uri = subject.getUri();
 		identifier = subject.getObjectValue(Predicates.DC_IDENTIFIER);
-		rdfType = subject.getObjectValue(Predicates.RDF_TYPE);
+		Collection<ObjectDTO> types = subject.getObjects(Predicates.RDF_TYPE, ObjectDTO.Type.RESOURCE);
+		if (types != null && !types.isEmpty()) {
+			type = new LinkedList<AmpProjectTypeDTO>();
+			for(ObjectDTO temp : types) {
+				type.add(new AmpProjectTypeDTO(temp.getValue()));
+			}
+		}
+		
 		csiCode = subject.getObjectValue(Predicates.AMP_ONTOLOGY_CODE);
 		title = subject.getObjectValue(Predicates.DC_TITLE);
 		
@@ -109,18 +121,7 @@ public class AmpProjectDTO implements Serializable {
 	public void setIdentifier(String id) {
 		this.identifier = id;
 	}
-	/**
-	 * @return the rdfType
-	 */
-	public String getRdfType() {
-		return rdfType;
-	}
-	/**
-	 * @param rdfType the rdfType to set
-	 */
-	public void setRdfType(String rdfType) {
-		this.rdfType = rdfType;
-	}
+
 	/**
 	 * @return the code
 	 */

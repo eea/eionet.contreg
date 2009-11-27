@@ -71,6 +71,8 @@ public class AmpServlet extends HttpServlet {
 		ISearchDao searchDao = MySQLDAOFactory.get().getDao(ISearchDao.class);
 		Map<String, String> criteria = new HashMap<String, String>();
 		criteria.put(Predicates.RDF_TYPE, Predicates.AMP_OUTPUT);
+		resp.setContentType("text/xml");
+		resp.getOutputStream().write(HEADER.getBytes());
 		try {
 			Pair<Integer, List<SubjectDTO>> results = searchDao.performCustomSearch(
 					criteria,
@@ -78,7 +80,6 @@ public class AmpServlet extends HttpServlet {
 					new PageRequest(0, 0),
 					null);
 			logger.debug("in total " + results.getValue().size() + " records were found");
-			resp.getOutputStream().write(HEADER.getBytes());
 			if (results.getValue() != null && !results.getValue().isEmpty()) {
 				for (SubjectDTO subject : results.getValue()) {
 					persister.write(
@@ -88,15 +89,14 @@ public class AmpServlet extends HttpServlet {
 					resp.getOutputStream().write("\n".getBytes());
 				}
 			}
-			resp.getOutputStream().write(FOOTER.getBytes());
-			resp.getOutputStream().flush();
-			
 		} catch (Exception fatal) {
 			logger.error("error in AMP servlet", fatal);
 			if (!resp.isCommitted()) {
 				resp.sendError(500);
 			}
 		}
+		resp.getOutputStream().write(FOOTER.getBytes());
+		resp.getOutputStream().flush();
 	}
 
 }
