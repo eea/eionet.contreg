@@ -32,6 +32,7 @@ import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 
 import eionet.cr.common.Predicates;
+import eionet.cr.common.Subjects;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.URIUtil;
@@ -58,10 +59,13 @@ public class AmpProjectDTO implements Serializable {
 	
 	@ElementList(inline = true, name = "rdf:type")
 	private List<AmpProjectTypeDTO> type;
-	
-	@Element(required = false, name="code")
+
+	@ElementList(inline = true, name="amp:eeaproject")
+	private List<AmpEeaprojectDTO> eeaproject;
+
+	@Element(required = false, name="amp:code")
 	private String csiCode;
-	
+
 	@Element(required = false)
 	private String mpsCode;
 	
@@ -70,7 +74,10 @@ public class AmpProjectDTO implements Serializable {
 	
 	@Element (required = false, name = "rdfs:label")
 	private String label;
-	
+
+	@Element (required = false, name = "rdfs:comment")
+	private String rdfsComment;
+
 	@Element (required = false, name = "dc:description")
 	private String description;
 	
@@ -91,32 +98,55 @@ public class AmpProjectDTO implements Serializable {
 	 * @param subject amp:Output subject
 	 */
 	public AmpProjectDTO(SubjectDTO subject) {
+		
+		// URI and dc:identifier
 		uri = subject.getUri();
 		identifier = subject.getObjectValue(Predicates.DC_IDENTIFIER);
+		
+		// rdf:type
+		type = new LinkedList<AmpProjectTypeDTO>();
 		Collection<ObjectDTO> types = subject.getObjects(Predicates.RDF_TYPE, ObjectDTO.Type.RESOURCE);
 		if (types != null && !types.isEmpty()) {
-			type = new LinkedList<AmpProjectTypeDTO>();
-			for(ObjectDTO temp : types) {
-				type.add(new AmpProjectTypeDTO(temp.getValue()));
+			for(ObjectDTO temp : types){
+				String value = temp.getValue();
+				// skip the generic amp:Output type
+				if (value!=null && !value.equals(Subjects.AMP_OUTPUT)){
+					type.add(new AmpProjectTypeDTO(value));
+				}
+			}
+		}
+
+		// amp:eeaproject
+		eeaproject = new LinkedList<AmpEeaprojectDTO>();
+		Collection<ObjectDTO> eeaprojects = subject.getObjects(Predicates.AMP_ONTOLOGY_EEAPROJECT, ObjectDTO.Type.RESOURCE);
+		if (eeaprojects != null && !eeaprojects.isEmpty()) {
+			for(ObjectDTO temp : eeaprojects){
+				eeaproject.add(new AmpEeaprojectDTO(temp.getValue()));
 			}
 		}
 		
+		// amp:code
 		csiCode = subject.getObjectValue(Predicates.AMP_ONTOLOGY_CODE);
-		title = subject.getObjectValue(Predicates.DC_TITLE);
 		
-		//derive label
+		// derive rdfs:label
 		String label = URIUtil.deriveLabel(subject.getObjectValue(Predicates.RDFS_LABEL));
 		this.label = StringUtils.isBlank(label) ? "No label" : label;
 		
+		// rdfs:comment
+		rdfsComment = subject.getObjectValue(Predicates.RDFS_COMMENT);
+			
+		// dc:description and dc:language
 		description = subject.getObjectValue(Predicates.DC_DESCRIPTION);
 		language = subject.getObjectValue(Predicates.DC_LANGUAGE);
 		
-		//derive date
+		// derive dc:date
 		String date = subject.getObjectValue(Predicates.DC_DATE);
 		if (StringUtils.isBlank(date) && subject.getFirstSeenTime() != null) {
 			date = subject.getFirstSeenTime().toString();
 		}
 		this.date = date;
+		
+		// cr:contentLastModified
 		lastModifiedDate = subject.getObjectValue(Predicates.CR_LAST_MODIFIED);
 	}
 	/**
@@ -245,6 +275,20 @@ public class AmpProjectDTO implements Serializable {
 	 */
 	public void setDate(String date) {
 		this.date = date;
+	}
+
+	/**
+	 * @return the rdfsComment
+	 */
+	public String getRdfsComment() {
+		return rdfsComment;
+	}
+
+	/**
+	 * @param rdfsComment the rdfsComment to set
+	 */
+	public void setRdfsComment(String rdfsComment) {
+		this.rdfsComment = rdfsComment;
 	}
 
 }

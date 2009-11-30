@@ -35,6 +35,7 @@ import org.simpleframework.xml.core.Persister;
 import org.simpleframework.xml.stream.Format;
 
 import eionet.cr.common.Predicates;
+import eionet.cr.common.Subjects;
 import eionet.cr.dao.ISearchDao;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.SubjectDTO;
@@ -55,7 +56,7 @@ public class AmpServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(AmpServlet.class);
 	private static final String HEADER = "<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" " +
-			"xmlns=\"http://rdfdata.eionet.europa.eu/amp/ontology/\" " +
+			"xmlns:amp=\"http://rdfdata.eionet.europa.eu/amp/ontology/\" " +
 			"xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema\" " + 
 			"xmlns:cr=\"http://cr.eionet.europa.eu/ontologies/contreg.rdf#\" "+ 
 			"xmlns:dc=\"http://purl.org/dc/elements/1.1/\">\n";
@@ -72,7 +73,7 @@ public class AmpServlet extends HttpServlet {
 		logger.debug("received request for AMP servlet");
 		ISearchDao searchDao = MySQLDAOFactory.get().getDao(ISearchDao.class);
 		Map<String, String> criteria = new HashMap<String, String>();
-		criteria.put(Predicates.RDF_TYPE, Predicates.AMP_OUTPUT);
+		criteria.put(Predicates.RDF_TYPE, Subjects.AMP_OUTPUT);
 		resp.setContentType("text/xml");
 		resp.getOutputStream().write(HEADER.getBytes());
 		try {

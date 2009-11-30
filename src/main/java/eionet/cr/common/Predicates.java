@@ -44,6 +44,7 @@ public interface Predicates {
 	public static final String RDFS_RANGE = "http://www.w3.org/2000/01/rdf-schema#range";
 	public static final String RDFS_SUBPROPERTY_OF = "http://www.w3.org/2000/01/rdf-schema#subPropertyOf";
 	public static final String RDFS_SUBCLASS_OF = "http://www.w3.org/2000/01/rdf-schema#subClassOf";
+	public static final String RDFS_COMMENT = "http://www.w3.org/2000/01/rdf-schema#comment";
 	
 	public static final String SKOS_PREF_LABEL = "http://www.w3.org/2004/02/skos/core#prefLabel";
 		
@@ -72,6 +73,6 @@ public interface Predicates {
 	public static final String WGS_LAT = "http://www.w3.org/2003/01/geo/wgs84_pos#lat";
 	public static final String WGS_LONG = "http://www.w3.org/2003/01/geo/wgs84_pos#long";
 	
-	public static final String AMP_OUTPUT = "http://rdfdata.eionet.europa.eu/amp/ontology/Output";
 	public static final String AMP_ONTOLOGY_CODE = "http://rdfdata.eionet.europa.eu/amp/ontology/code";
+	public static final String AMP_ONTOLOGY_EEAPROJECT = "http://rdfdata.eionet.europa.eu/amp/ontology/eeaproject";
 }
