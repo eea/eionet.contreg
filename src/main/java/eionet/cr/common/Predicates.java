@@ -75,4 +75,6 @@ public interface Predicates {
 	
 	public static final String AMP_ONTOLOGY_CODE = "http://rdfdata.eionet.europa.eu/amp/ontology/code";
 	public static final String AMP_ONTOLOGY_EEAPROJECT = "http://rdfdata.eionet.europa.eu/amp/ontology/eeaproject";
+	public static final String AMP_ONTOLOGY_FORCODE = "http://rdfdata.eionet.europa.eu/amp/ontology/forCode";
+	public static final String AMP_ONTOLOGY_FORYEAR = "http://rdfdata.eionet.europa.eu/amp/ontology/forYear";
 }

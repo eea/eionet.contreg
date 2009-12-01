@@ -90,6 +90,15 @@ public class AmpProjectDTO implements Serializable {
 	@Element (required = false, name = "cr:contentLastModified")
 	private String lastModifiedDate;
 
+	@Element (required = false, name = "amp:forCode")
+	private String forCode;
+	
+	@Element (required = false, name = "amp:forYear")
+	private String forYear;
+
+	/**
+	 * 
+	 */
 	public AmpProjectDTO() {
 		//blank
 	}
@@ -125,8 +134,10 @@ public class AmpProjectDTO implements Serializable {
 			}
 		}
 		
-		// amp:code
+		// amp stuff
 		csiCode = subject.getObjectValue(Predicates.AMP_ONTOLOGY_CODE);
+		forCode = subject.getObjectValue(Predicates.AMP_ONTOLOGY_FORCODE);
+		forYear = subject.getObjectValue(Predicates.AMP_ONTOLOGY_FORYEAR);
 		
 		// derive rdfs:label
 		String label = URIUtil.deriveLabel(subject.getObjectValue(Predicates.RDFS_LABEL));
@@ -289,6 +300,34 @@ public class AmpProjectDTO implements Serializable {
 	 */
 	public void setRdfsComment(String rdfsComment) {
 		this.rdfsComment = rdfsComment;
+	}
+
+	/**
+	 * @return the forCode
+	 */
+	public String getForCode() {
+		return forCode;
+	}
+
+	/**
+	 * @param forCode the forCode to set
+	 */
+	public void setForCode(String forCode) {
+		this.forCode = forCode;
+	}
+
+	/**
+	 * @return the forYear
+	 */
+	public String getForYear() {
+		return forYear;
+	}
+
+	/**
+	 * @param forYear the forYear to set
+	 */
+	public void setForYear(String forYear) {
+		this.forYear = forYear;
 	}
 
 }
