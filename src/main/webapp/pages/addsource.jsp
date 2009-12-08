@@ -30,8 +30,11 @@
 	                </td>
 	            </tr>
 	            <tr>
-	                <td colspan="2">
+	                <td>
 	                    <stripes:submit name="add" value="Add"/>       
+	                </td>
+	                <td>
+	                    <input type="checkbox" name="dontHarvest" id="chkDontHarvest"/><label for="chkDontHarvest">Don't schedule urgent harvest</label>       
 	                </td>
 	            </tr>
 	        </table>

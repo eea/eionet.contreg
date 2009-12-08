@@ -74,9 +74,11 @@ public class HarvestSourceActionBean extends AbstractActionBean {
 	private int intervalMultiplier;
 	private static LinkedHashMap<Integer,String> intervalMultipliers;
 	
+	/** */
 	private static final List<Pair<String,String>> tabs;
 	private String selectedTab = "view";
 	
+	/** */
 	static {
 		tabs = new LinkedList<Pair<String,String>>();
 		tabs.add(new Pair<String,String>("view", "View"));
@@ -190,14 +192,28 @@ public class HarvestSourceActionBean extends AbstractActionBean {
 	 * @return
 	 * @throws DAOException
 	 * @throws SchedulerException 
+	 * @throws HarvestException 
 	 */
-    public Resolution add() throws DAOException, SchedulerException {
+    public Resolution add() throws DAOException, SchedulerException, HarvestException {
 		
 		Resolution resolution = new ForwardResolution("/pages/addsource.jsp");
 		if(isUserLoggedIn()){
 			if (isPostRequest()){
+				
+				// create new harvest source
 				factory.getDao(HarvestSourceDAO.class).addSource(getHarvestSource(), getUserName());
+				
+				// set up the resolution
 				resolution = new ForwardResolution(HarvestSourcesActionBean.class);
+				
+		    	// schedule urgent harvest, unless explicitly requested not to
+				if (getContext().getRequestParameter("dontHarvest")==null){
+			    	UrgentHarvestQueue.addPullHarvest(getHarvestSource().getUrl());
+					addSystemMessage("Harvest source successfully created and scheduled for urgent harvest!");
+				}
+				else{
+					addSystemMessage("Harvest source successfully created!");
+				}
 			}
 		}
 		else
