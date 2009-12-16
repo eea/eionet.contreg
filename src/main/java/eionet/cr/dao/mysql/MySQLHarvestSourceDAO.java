@@ -219,9 +219,14 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 		
 		Integer harvestSourceID = null;
     	
+		String url = source.getUrl();
+		if (url!=null){
+			url = StringUtils.substringBefore(url, "#"); // harvest sources where URL has fragment part, are not allowed
+		}
+		
     	List<Object> values = new ArrayList<Object>();
-		values.add(source.getUrl());
-		values.add(Hashes.spoHash(source.getUrl()));
+		values.add(url);
+		values.add(Hashes.spoHash(url));
 		values.add(source.getEmails());
 		values.add(source.getIntervalMinutes());
 		values.add(YesNoBoolean.format(source.isTrackedFile()));

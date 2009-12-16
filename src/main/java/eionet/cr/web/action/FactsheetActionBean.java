@@ -154,8 +154,15 @@ public class FactsheetActionBean extends AbstractActionBean{
 		return new RedirectResolution(this.getClass(), "view").addParameter("uri", uri);
 	}
 	
-	//helper method to eliminate code duplication.
+	/**
+	 * helper method to eliminate code duplication.
+	 * 
+	 * @return
+	 * @throws HarvestException
+	 * @throws DAOException
+	 */
 	private Pair<Boolean, String> scheduleHarvest() throws HarvestException, DAOException  {
+		
 		String message = null;
 		if(isUserLoggedIn()){
 			if (!StringUtils.isBlank(uri) && URLUtil.isURL(uri)){
@@ -164,7 +171,7 @@ public class FactsheetActionBean extends AbstractActionBean{
 				
 				HarvestSourceDAO dao = factory.getDao(HarvestSourceDAO.class);
 				HarvestSourceDTO dto = new HarvestSourceDTO();
-				dto.setUrl(uri);
+				dto.setUrl(StringUtils.substringBefore(uri, "#"));
 				dto.setEmails("");
 				dto.setIntervalMinutes(Integer.valueOf(GeneralConfig.getProperty(
 						GeneralConfig.HARVESTER_REFERRALS_INTERVAL,
@@ -174,7 +181,7 @@ public class FactsheetActionBean extends AbstractActionBean{
 				
 				/* issue an instant harvest of this url */
 				
-				InstantHarvester.Resolution resolution = InstantHarvester.harvest(uri, getUserName());
+				InstantHarvester.Resolution resolution = InstantHarvester.harvest(dto.getUrl(), getUserName());
 				
 				/* give feedback to the user */
 				

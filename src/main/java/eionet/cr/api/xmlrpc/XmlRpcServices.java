@@ -46,6 +46,7 @@ import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.search.DiscoveredSinceTimeSearch;
 import eionet.cr.util.PageRequest;
 import eionet.cr.util.Pair;
+import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
 import eionet.qawcommons.DataflowResultDto;
 
@@ -175,13 +176,17 @@ public class XmlRpcServices implements Services{
 	 * (non-Javadoc)
 	 * @see eionet.cr.api.xmlrpc.Services#pushContent(java.lang.String)
 	 */
-	public String pushContent(String content, String sourceUri) throws CRException {
+	public String pushContent(String content, String sourceUrl) throws CRException {
 		
 		if (content!=null && content.trim().length()>0){
-			if (sourceUri==null || sourceUri.trim().length()==0)
-				throw new CRException("Missing source uri");
+			if (StringUtils.isBlank(sourceUrl))
+				throw new CRException("Missing source URL!");
+			else if (!URLUtil.isURL(sourceUrl))
+				throw new CRException("Invalid source URL!");
+			else if (sourceUrl.indexOf("#")>=0)
+				throw new CRException("Source URL must not contain a fragment part!");
 			else
-				UrgentHarvestQueue.addPushHarvest(content, sourceUri);
+				UrgentHarvestQueue.addPushHarvest(content, sourceUrl);
 		}
 		
 		return OK_RETURN_STRING;

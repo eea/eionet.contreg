@@ -283,8 +283,12 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     	if (isPostRequest()){
     		
 	    	if (harvestSource.getUrl()==null || harvestSource.getUrl().trim().length()==0 || !URLUtil.isURL(harvestSource.getUrl()))
-	    		addGlobalValidationError(new SimpleError("Invalid URL"));
+	    		addGlobalValidationError(new SimpleError("Invalid URL!"));
 	    	
+	    	if (harvestSource.getUrl()!=null && harvestSource.getUrl().indexOf("#")>=0){
+	    		addGlobalValidationError(new SimpleError("URL with a fragment part not allowed!"));
+	    	}
+
 	    	if (harvestSource.getIntervalMinutes()!=null){
 		    	if (harvestSource.getIntervalMinutes().intValue()<0 || intervalMultiplier<0){
 		    		addGlobalValidationError(new SimpleError("Harvest interval must be >=0"));

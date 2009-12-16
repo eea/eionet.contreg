@@ -132,7 +132,7 @@ public class RegisterURLActionBean extends AbstractActionBean{
 			/* add the URL into HARVEST_SOURCE (the dao is responsible for handling if HARVEST_SOURCE already has such a URL) */
 			
 			HarvestSourceDTO harvestSource = new HarvestSourceDTO();
-			harvestSource.setUrl(url);
+			harvestSource.setUrl(StringUtils.substringBefore(url, "#"));
 			harvestSource.setIntervalMinutes(
 					Integer.valueOf(
 							GeneralConfig.getProperty(GeneralConfig.HARVESTER_REFERRALS_INTERVAL,
@@ -141,7 +141,7 @@ public class RegisterURLActionBean extends AbstractActionBean{
 			factory.getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(harvestSource, getUserName());
 			
 			// schedule urgent harvest
-			UrgentHarvestQueue.addPullHarvest(url);
+			UrgentHarvestQueue.addPullHarvest(harvestSource.getUrl());
 		}
 		
 		// go to factsheet in edit mode

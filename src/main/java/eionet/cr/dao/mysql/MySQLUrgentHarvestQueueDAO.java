@@ -25,6 +25,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
+
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.UrgentHarvestQueueDAO;
 import eionet.cr.dto.UrgentHarvestQueueItemDTO;
@@ -56,7 +58,12 @@ public class MySQLUrgentHarvestQueueDAO extends MySQLBaseDAO implements UrgentHa
 		for (int i=0; i<queueItems.size(); i++){
 			UrgentHarvestQueueItemDTO dto = queueItems.get(i);
 			buf.append(i>0 ? "," : "").append(valueStr);
-			values.add(dto.getUrl());
+			
+			String url = dto.getUrl();
+			if (url!=null){
+				url = StringUtils.substringBefore(url, "#");
+			}
+			values.add(url);
 		}
 		
 		Connection conn = null;
@@ -81,7 +88,12 @@ public class MySQLUrgentHarvestQueueDAO extends MySQLBaseDAO implements UrgentHa
 	public void addPushHarvest(UrgentHarvestQueueItemDTO queueItem) throws DAOException {
 
 		List<Object> values = new ArrayList<Object>();
-		values.add(queueItem.getUrl());
+		
+		String url = queueItem.getUrl();
+		if (url!=null){
+			url = StringUtils.substringBefore(url, "#");
+		}		
+		values.add(url);
 		values.add(queueItem.getPushedContent());
 		
 		Connection conn = null;

@@ -267,5 +267,27 @@
 			${isObjectInAcceptedLanguage(actionBean, objectDTO)}
 		</example>
 	</function>
+
+	<function>
+		<description>
+		</description>
+		<name>rawModeTitle</name>
+		<function-class>eionet.cr.web.util.JstlFunctions</function-class>
+		<function-signature>java.lang.String rawModeTitle(eionet.cr.dto.ObjectDTO, java.util.Collection)</function-signature>
+		<example>
+			${rawModeTitle(particularObject, allObjectsOfThisPredicate)}
+		</example>
+	</function>
+
+	<function>
+		<description>
+		</description>
+		<name>isObjectValueDisplayed</name>
+		<function-class>eionet.cr.web.util.JstlFunctions</function-class>
+		<function-signature>boolean isObjectValueDisplayed(java.lang.String, java.lang.String, javax.servlet.jsp.PageContext)</function-signature>
+		<example>
+			${isObjectValueDisplayed(predicate, objectValue, pageContext)}
+		</example>
+	</function>
 	
 </taglib>

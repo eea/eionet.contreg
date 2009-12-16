@@ -21,12 +21,14 @@
 package eionet.cr.web.util;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.jsp.PageContext;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
@@ -37,6 +39,7 @@ import eionet.cr.search.util.SortOrder;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Util;
 import eionet.cr.web.action.AbstractActionBean;
+import eionet.cr.web.action.FactsheetActionBean;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.columns.SearchResultColumn;
 
@@ -290,5 +293,71 @@ public class JstlFunctions {
 	public static boolean isObjectInAcceptedLanguage(AbstractActionBean actionBean, ObjectDTO object){
 		
 		return actionBean.getAcceptedLanguages().contains(Util.normalizeHTTPAcceptedLanguage(object.getLanguage()));
+	}
+
+	/**
+	 * 
+	 * @param object
+	 * @return
+	 */
+	public static String rawModeTitle(ObjectDTO object, Collection allObjects){
+		
+		StringBuffer buf = new StringBuffer();
+		if (object!=null){
+			
+			buf.append("[Type: ").append(object.isLiteral() ? "Literal" : object.isAnonymous() ? "Anonymous resource" : "Resource");
+			buf.append("]   [Inferred from object: ").append(getMatchingObjectValue(object.getSourceObjectHash(), allObjects));
+			buf.append("]   [Inferred from source: ").append(StringUtils.isBlank(object.getDerivSourceUri()) ? object.getDerivSourceHash() : object.getDerivSourceUri());
+			buf.append("]");
+		}
+		return buf.toString();
+	}
+	
+	/**
+	 * 
+	 * @param hash
+	 * @param objects
+	 * @return
+	 */
+	private static String getMatchingObjectValue(long hash, Collection objects){
+		
+		String result = String.valueOf(hash);
+		if (hash!=0 && objects!=null && !objects.isEmpty()){
+			for (Object o:objects){
+				ObjectDTO object = (ObjectDTO)o;
+				if (object.getHash()==hash){
+					result = object.getValue();
+					break;
+				}
+			}
+		}
+		return result;
+		
+	}
+
+	/**
+	 * 
+	 * @param objectValue
+	 * @param pageContext
+	 * @return
+	 */
+	public static boolean isObjectValueDisplayed(String predicate, String objectValue, PageContext pageContext){
+		
+		boolean result = false;		
+		if (predicate!=null){
+			
+			String previousPredicate = (String)pageContext.getAttribute("prevPredicate");
+			HashSet<String> objectValues = (HashSet<String>)pageContext.getAttribute("displayedObjectValues");
+			if (objectValues==null || previousPredicate==null || !predicate.equals(previousPredicate)){
+				objectValues = new HashSet<String>();
+				pageContext.setAttribute("displayedObjectValues", objectValues);
+			}
+			
+			result = objectValues.contains(objectValue);		
+			pageContext.setAttribute("prevPredicate", predicate);
+			objectValues.add(objectValue);
+		}
+		
+		return result;
 	}
 }

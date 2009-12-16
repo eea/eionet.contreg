@@ -95,7 +95,10 @@ public abstract class Harvest {
 	protected Harvest(String sourceUrlString){
 		
 		if (sourceUrlString==null)
-			throw new NullPointerException();
+			throw new IllegalArgumentException("Harvest source URL cannot be null");
+		else if (sourceUrlString.indexOf("#")>=0){
+			throw new IllegalArgumentException("Harvest source URL must no contain a fragment part");
+		}
 		
 		this.sourceUrlString = sourceUrlString;
 		this.logger = new HarvestLog(sourceUrlString, LogFactory.getLog(this.getClass()));
