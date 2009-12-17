@@ -218,7 +218,7 @@ public class XmlAnalysis {
 							this.schemaLocation = tokens.nextToken();
 						}
 						else
-							this.schemaNamespace = attrValue;
+							this.schemaLocation = attrValue;
 					}
 				}
 				
