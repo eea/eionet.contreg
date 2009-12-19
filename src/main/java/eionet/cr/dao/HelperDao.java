@@ -67,4 +67,12 @@ public interface HelperDao extends IDao {
 	 * @throws DAOException
 	 */
 	void deleteTriples(SubjectDTO subject) throws DAOException;
+
+	/**
+	 * 
+	 * @param subjectUri
+	 * @return
+	 * @throws DAOException
+	 */
+	String getSubjectSchemaUri(String subjectUri) throws DAOException;
 }

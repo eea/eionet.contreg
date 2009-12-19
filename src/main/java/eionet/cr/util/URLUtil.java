@@ -20,8 +20,18 @@
  */
 package eionet.cr.util;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
+import java.text.MessageFormat;
+
+import org.apache.commons.lang.StringUtils;
+
+import eionet.cr.config.GeneralConfig;
+import eionet.cr.harvest.PullHarvest;
 
 /**
  * 
@@ -46,6 +56,60 @@ public class URLUtil {
 		}
 		catch (MalformedURLException e){
 			return false;
+		}
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public static String userAgentHeader(){
+		
+		String ua = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_USERAGENT);
+		Object[] args = new String[1];
+		args[0] = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_VERSION);
+		return MessageFormat.format(ua, args);
+	}
+	
+	/**
+	 * 
+	 * @param timestamp
+	 * @return
+	 */
+	public static Boolean isModifiedSince(String urlString, long timestamp){
+		
+		if (!URLUtil.isURL(urlString))
+			return false;
+		
+		if (timestamp==0)
+			return true;
+		
+		InputStream inputStream = null;
+		try{
+			URL url = new URL(StringUtils.substringBefore(urlString, "#"));
+			URLConnection urlConnection = url.openConnection();
+			urlConnection.setRequestProperty("User-Agent", userAgentHeader());
+			urlConnection.setIfModifiedSince(timestamp);
+			inputStream = urlConnection.getInputStream();
+			
+			int responseCode = ((HttpURLConnection)urlConnection).getResponseCode();
+			if (responseCode==HttpURLConnection.HTTP_NOT_MODIFIED){
+				return Boolean.FALSE;
+			}
+			else if (responseCode==HttpURLConnection.HTTP_OK){
+				return Boolean.TRUE;
+			}
+			else{
+				return null;
+			}
+		}
+		catch (IOException ioe){
+			return null;
+		}
+		finally{
+			if (inputStream!=null){
+				try{ inputStream.close(); } catch (IOException ioe){}
+			}
 		}
 	}
 }

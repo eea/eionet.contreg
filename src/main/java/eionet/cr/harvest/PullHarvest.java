@@ -45,6 +45,7 @@ import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dao.HarvestSourceDAO;
+import eionet.cr.dao.HelperDao;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
@@ -65,11 +66,11 @@ import eionet.cr.web.security.CRUser;
 public class PullHarvest extends Harvest{
 	
 	/** */
-	private static String userAgent;
-	
-	/** */
 	private Boolean sourceAvailable = null;	
 	private Date lastHarvest = null;
+	
+	/** */
+	private ConversionsParser convParser;
 
 	/**
 	 * 
@@ -107,9 +108,20 @@ public class PullHarvest extends Harvest{
 				URL url = new URL(StringUtils.substringBefore(sourceUrlString, "#"));
 				URLConnection urlConnection = url.openConnection();				
 				urlConnection.setRequestProperty("Accept", "application/rdf+xml, text/xml, */*");
-				urlConnection.setRequestProperty("User-Agent", getUserAgent());
+				urlConnection.setRequestProperty("User-Agent", URLUtil.userAgentHeader());
 				if (lastHarvest!=null){
-					urlConnection.setIfModifiedSince(lastHarvest.getTime());
+					
+					Boolean conversionModified = isConversionModifiedSinceLastHarvest();
+					if (conversionModified==null || conversionModified.booleanValue()==false){
+						
+						urlConnection.setIfModifiedSince(lastHarvest.getTime());
+						if (conversionModified!=null){
+							logger.debug("The source's RDF conversion not modified since" + lastHarvest.toString());
+						}
+					}
+					else{
+						logger.debug("The source has an RDF conversion that has been modified since last harvest");
+					}
 				}
 
 				// open connection stream				
@@ -125,7 +137,6 @@ public class PullHarvest extends Harvest{
 					logger.warn(e.toString());
 				}
 				
-				// if we see that the source for surely doesn't exist, we delete it and return right away
 				String sourceNotExistMessage = null; 
 				if (connectException!=null && connectException instanceof UnknownHostException){
 					sourceNotExistMessage = "IP address of the host could not be determined";
@@ -136,6 +147,8 @@ public class PullHarvest extends Harvest{
 						sourceNotExistMessage = "Got HTTP response code " + responseCode;
 					}
 				}
+
+				// if we see that the source for surely doesn't exist, we delete it and return right away
 				if (sourceNotExistMessage!=null){
 					logger.debug(sourceNotExistMessage + ", going to delete the source");
 					try {
@@ -168,7 +181,7 @@ public class PullHarvest extends Harvest{
 						logger.debug("Unsupported content type: " + contentType);
 					}
 					else{
-						// content type OK, but skip if not modified since last harvest
+						// set the field indicating if source has been modified since last harvest
 						if (urlConnection instanceof HttpURLConnection
 							&& ((HttpURLConnection)urlConnection).getResponseCode()==HttpURLConnection.HTTP_NOT_MODIFIED){
 							
@@ -184,10 +197,10 @@ public class PullHarvest extends Harvest{
 							logger.debug(msg);
 							infos.add(msg);
 						}
-						else{						
-							// content type OK, source modified since last harvest, so save the stream to file
+						else{
+							// save the stream to file
 							int totalBytes = FileUtil.streamToFile(inputStream, file);
-							
+
 							// if content-length for source metadata was previously not found, then set it to file size
 							if (sourceMetadata.getObject(Predicates.CR_BYTE_SIZE)==null){
 								sourceMetadata.addObject(Predicates.CR_BYTE_SIZE, new ObjectDTO(String.valueOf(totalBytes), true));
@@ -197,7 +210,7 @@ public class PullHarvest extends Harvest{
 				}
 			}
 		}
-		catch (IOException e){
+		catch (Exception e){
 			throw new HarvestException(e.toString(), e);
 		}
 		finally{
@@ -207,6 +220,39 @@ public class PullHarvest extends Harvest{
 		
 		// perform the harvest
 		harvest(file, contentType);
+	}
+	
+	/**
+	 * 
+	 * @return
+	 * @throws ParserConfigurationException 
+	 * @throws SAXException 
+	 * @throws IOException 
+	 * @throws DAOException 
+	 */
+	private Boolean isConversionModifiedSinceLastHarvest() throws IOException, SAXException, ParserConfigurationException, DAOException{
+		
+		Boolean result = null;
+		
+		String schemaUri = daoFactory.getDao(HelperDao.class).getSubjectSchemaUri(sourceUrlString);
+		if (!StringUtils.isBlank(schemaUri)){
+			
+			// see if schema has RDF conversion
+			convParser = ConversionsParser.parseForSchema(schemaUri);
+			if (!StringUtils.isBlank(convParser.getRdfConversionId())){
+
+				// see if the conversion XSL has changed since last harvest
+				String xsl = convParser.getRdfConversionXslFileName();
+				if (!StringUtils.isBlank(xsl)){
+
+					String xslUrl = GeneralConfig.getRequiredProperty(GeneralConfig.XMLCONV_XSL_URL);
+					xslUrl = MessageFormat.format(xslUrl, Util.toArray(xsl));
+					result = URLUtil.isModifiedSince(xslUrl, lastHarvest.getTime());
+				}
+			}
+		}
+		
+		return result;
 	}
 
 	/**
@@ -230,6 +276,7 @@ public class PullHarvest extends Harvest{
 			if (file.exists()){
 				try{
 					if ((file=preProcess(file, contentType))!=null){
+						
 						inputStream = new FileInputStream(file);
 						arpSource = new InputStreamBasedARPSource(inputStream);
 					}
@@ -264,89 +311,69 @@ public class PullHarvest extends Harvest{
 	 */
 	private File preProcess(File file, String contentType) throws ParserConfigurationException, SAXException, IOException{
 
-		if (contentType!=null && contentType.startsWith("application/rdf+xml"))
+		if (contentType!=null && contentType.startsWith("application/rdf+xml")){
 			return file;
-		
-		logger.debug("Response content type was " + contentType + ", trying to extract schema or DTD");
-		
-		XmlAnalysis xmlAnalysis = new XmlAnalysis();
-		xmlAnalysis.parse(file);
-		
-		// get schema uri, if it's not found then fall back to dtd 
-		String schemaOrDtd = xmlAnalysis.getSchemaLocation();
-		if (schemaOrDtd==null || schemaOrDtd.length()==0){
-			schemaOrDtd = xmlAnalysis.getSystemDtd();
-			if (schemaOrDtd==null || !URLUtil.isURL(schemaOrDtd)){
-				schemaOrDtd = xmlAnalysis.getPublicDtd();
+		}
+
+		String conversionId = convParser==null ? null : convParser.getRdfConversionId();
+		if (StringUtils.isBlank(conversionId)){
+			
+			logger.debug("Response content type was " + contentType + ", trying to extract schema or DTD");
+			
+			XmlAnalysis xmlAnalysis = new XmlAnalysis();
+			xmlAnalysis.parse(file);
+			
+			// get schema uri, if it's not found then fall back to dtd 
+			String schemaOrDtd = xmlAnalysis.getSchemaLocation();
+			if (schemaOrDtd==null || schemaOrDtd.length()==0){
+				schemaOrDtd = xmlAnalysis.getSystemDtd();
+				if (schemaOrDtd==null || !URLUtil.isURL(schemaOrDtd)){
+					schemaOrDtd = xmlAnalysis.getPublicDtd();
+				}
+			}
+			
+			// if this file has a conversion to RDF, run it and return the reference to the resulting file
+			if (schemaOrDtd!=null && schemaOrDtd.length()>0){
+				
+				sourceMetadata.addObject(Predicates.CR_SCHEMA, new ObjectDTO(schemaOrDtd, false));
+				convParser = ConversionsParser.parseForSchema(schemaOrDtd);
+				if (convParser!=null){
+					conversionId = convParser.getRdfConversionId();
+				}
+			}
+			else{
+				logger.debug("No schema or DTD declared, going to parse as RDF");
+				return file;
 			}
 		}
 		
-		// if this file has a conversion to RDF, run it and return the reference to the resulting file
-		if (schemaOrDtd!=null && schemaOrDtd.length()>0){
+		if (!StringUtils.isBlank(conversionId)){
 			
-			sourceMetadata.addObject(Predicates.CR_SCHEMA, new ObjectDTO(schemaOrDtd, false));
+			logger.debug("Going to run RDF conversion");
 			
-			/* get the URL of the conversion service method that returns the list of available conversions */
-			
-			String listConversionsUrl = GeneralConfig.getRequiredProperty(GeneralConfig.XMLCONV_LIST_CONVERSIONS_URL);
-			listConversionsUrl = MessageFormat.format(listConversionsUrl, Util.toArray(URLEncoder.encode(schemaOrDtd)));
+			/* prepare conversion URL */
 
-			/* open connection to the list-conversions URL */
-			
-			URL url = new URL(listConversionsUrl);
-			URLConnection httpConn = url.openConnection();
-			
-			/* parse the returned input stream with eionet.cr.util.xml.ConversionsParser */
-			
-			InputStream inputStream = null;
-			try{
-				inputStream = httpConn.getInputStream();				
-				ConversionsParser conversionsParser = new ConversionsParser();
-				conversionsParser.parse(inputStream);
-				
-				/* see if ConversionsParser found any conversions available */
-				
-				String conversionId = conversionsParser.getRdfConversionId();
-				if (conversionId!=null && conversionId.length()>0){
-					
-					logger.debug("Extracted schema or DTD has an RDF conversion, going to run it");
-					
-					/* prepare conversion URL */
-					
-					String convertUrl = GeneralConfig.getRequiredProperty(GeneralConfig.XMLCONV_CONVERT_URL);
-					Object[] args = new String[2];
-					args[0] = URLEncoder.encode(conversionId);
-					args[1] = URLEncoder.encode(sourceUrlString);
-					convertUrl = MessageFormat.format(convertUrl, args);
-					
-					/* run conversion and save the response to file */
-					
-					File convertedFile = new File(file.getAbsolutePath() + ".converted");
-					FileUtil.downloadUrlToFile(convertUrl, convertedFile);
-					
-					// delete the original file
-					deleteDownloadedFile(file);
-					
-					// return converted file
-					return convertedFile;
-				}
-				else{
-					logger.debug("Extracted schema or DTD has no RDF conversion, no parsing will be done");
-					return null;
-				}
-			}
-			finally{
-				try{
-					if (inputStream!=null) inputStream.close();
-				}
-				catch (IOException e){}
-			}
+			String convertUrl = GeneralConfig.getRequiredProperty(GeneralConfig.XMLCONV_CONVERT_URL);
+			Object[] args = new String[2];
+			args[0] = URLEncoder.encode(conversionId);
+			args[1] = URLEncoder.encode(sourceUrlString);
+			convertUrl = MessageFormat.format(convertUrl, args);
+
+			/* run conversion and save the response to file */
+
+			File convertedFile = new File(file.getAbsolutePath() + ".converted");
+			FileUtil.downloadUrlToFile(convertUrl, convertedFile);
+
+			// delete the original file
+			deleteDownloadedFile(file);
+
+			// return converted file
+			return convertedFile;
 		}
 		else{
-			logger.debug("No schema or DTD declared, going to parse as RDF");
+			logger.debug("No RDF conversion found, no parsing will be done");
+			return null;
 		}
-		
-		return file;
 	}
 
 	/**
@@ -438,23 +465,6 @@ public class PullHarvest extends Harvest{
 	 */
 	public Boolean getSourceAvailable() {
 		return sourceAvailable;
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	private static final String getUserAgent(){
-		
-		if (PullHarvest.userAgent==null){
-			
-			String ua = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_USERAGENT);
-			Object[] args = new String[1];
-			args[0] = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_VERSION);
-			PullHarvest.userAgent = MessageFormat.format(ua, args);
-		}
-		
-		return PullHarvest.userAgent;
 	}
 	
 	/*

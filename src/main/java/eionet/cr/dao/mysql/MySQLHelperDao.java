@@ -413,4 +413,37 @@ public class MySQLHelperDao extends MySQLBaseDAO implements HelperDao {
 		
 		return result;
 	}
+
+	/** */
+	private static final String getSubjectSchemaUriSQL = "select OBJECT from SPO where SUBJECT=? and PREDICATE="
+		+ Hashes.spoHash(Predicates.CR_SCHEMA) + " limit 1";
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDao#getSubjectSchemaUri(java.lang.String)
+	 */
+	public String getSubjectSchemaUri(String subjectUri) throws DAOException {
+		
+		if (StringUtils.isBlank(subjectUri))
+			return null;
+		
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try{
+			conn = getConnection();
+			stmt = conn.prepareStatement(getSubjectSchemaUriSQL);
+			stmt.setLong(1, Hashes.spoHash(subjectUri));
+			rs = stmt.executeQuery();
+			return rs.next() ? rs.getString(1) : null;
+		}
+		catch (SQLException e){
+			throw new DAOException(e.toString(), e);
+		}
+		finally{
+			SQLUtil.close(rs);
+			SQLUtil.close(stmt);
+			SQLUtil.close(conn);
+		}
+	}
 }

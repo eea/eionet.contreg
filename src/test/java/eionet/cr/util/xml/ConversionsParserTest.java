@@ -47,5 +47,8 @@ public class ConversionsParserTest extends TestCase{
 		
 		assertNotNull(conversionsParser.getRdfConversionId());
 		assertEquals(conversionsParser.getRdfConversionId(), "89");
+		
+		assertNotNull(conversionsParser.getRdfConversionXslFileName());
+		assertEquals(conversionsParser.getRdfConversionXslFileName(), "art17-habitat-rdf.xsl");
 	}
 }

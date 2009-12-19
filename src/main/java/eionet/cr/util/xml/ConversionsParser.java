@@ -24,6 +24,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
+import java.text.MessageFormat;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -35,6 +39,9 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 
+import eionet.cr.config.GeneralConfig;
+import eionet.cr.util.Util;
+
 /**
  * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
@@ -44,6 +51,7 @@ public class ConversionsParser {
 	
 	/** */
 	private String rdfConversionId = null;
+	private String rdfConversionXslFileName = null;
 	
 	/**
 	 * 
@@ -119,14 +127,60 @@ public class ConversionsParser {
 						this.rdfConversionId = text.getData();
 					}
 				}
+				
+				nl = conversionElement.getElementsByTagName("xsl");
+				if (nl!=null && nl.getLength()>0){
+					Element element = (Element)nl.item(0);
+					Text text = (Text)element.getFirstChild();
+					if (text!=null){
+						this.rdfConversionXslFileName = text.getData();
+					}
+				}
 			}
 		}
 	}
+	
+	/**
+	 * 
+	 * @param schemaUri
+	 * @return
+	 * @throws IOException 
+	 * @throws ParserConfigurationException 
+	 * @throws SAXException 
+	 */
+	public static ConversionsParser parseForSchema(String schemaUri) throws IOException, SAXException, ParserConfigurationException{
+		
+		String listConversionsUrl = GeneralConfig.getRequiredProperty(GeneralConfig.XMLCONV_LIST_CONVERSIONS_URL);
+		listConversionsUrl = MessageFormat.format(listConversionsUrl, Util.toArray(URLEncoder.encode(schemaUri)));
+
+		URL url = new URL(listConversionsUrl);
+		URLConnection httpConn = url.openConnection();
+		InputStream inputStream = null;
+		try{
+			inputStream = httpConn.getInputStream();				
+			ConversionsParser conversionsParser = new ConversionsParser();
+			conversionsParser.parse(inputStream);
+			return conversionsParser;
+		}
+		finally{
+			if (inputStream!=null){
+				try{inputStream.close();}catch (IOException e){}
+			}
+		}
+	}
+	
 
 	/**
 	 * @return the rdfConversionId
 	 */
 	public String getRdfConversionId() {
 		return rdfConversionId;
+	}
+
+	/**
+	 * @return the rdfConversionXslFileName
+	 */
+	public String getRdfConversionXslFileName() {
+		return rdfConversionXslFileName;
 	}
 }
