@@ -340,4 +340,31 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements ISearchDao {
 		return new Pair<Integer, List<RawTripleDTO>>(result.getValue(), result.getId());
 	}
 
+	/** */
+	private static final String getPredicatesUsedForType_SQL = "select distinct SPOPRED.PREDICATE from SPO as SPOTYPE" +
+			", SPO as SPOPRED where SPOTYPE.PREDICATE=" + Hashes.spoHash(Predicates.RDF_TYPE) + " and SPOTYPE.OBJECT_HASH=?" +
+			" and SPOTYPE.SUBJECT=SPOPRED.SUBJECT";
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.ISearchDao#getPredicatesUsedForType(java.lang.String)
+	 */
+	public List<SubjectDTO> getPredicatesUsedForType(String typeUri) throws DAOException{
+		
+		ArrayList<Object> values = new ArrayList<Object>();
+		values.add(Long.valueOf(Hashes.spoHash(typeUri)));
+		
+		List<Long> predicateUris = executeQuery(getPredicatesUsedForType_SQL, values, new SingleObjectReader<Long>());
+		if (predicateUris==null || predicateUris.isEmpty()){
+			return new ArrayList<SubjectDTO>();
+		}
+		else{
+			Map<String, SubjectDTO> temp = new HashMap<String, SubjectDTO>();
+			for (Long hash : predicateUris) {
+				temp.put(hash + "", null);
+			}
+			
+			return executeQuery(getDataInitQuery(temp.keySet()), null, new SubjectDataReader(temp));
+		}
+	}
 }

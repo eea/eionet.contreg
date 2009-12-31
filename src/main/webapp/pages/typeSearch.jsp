@@ -66,7 +66,7 @@
 					<stripes:hidden name="type" value="${actionBean.type }"/>
 					<stripes:select name="newFilter" onchange="this.form.submit();">
 						<stripes:option value="">Select filter to add </stripes:option>
-						<c:forEach items="${actionBean.availableFilters}" var="column">
+						<c:forEach items="${actionBean.availableFiltersSorted}" var="column">
 							<stripes:option value="${column.key}">${column.value}</stripes:option>					
 						</c:forEach>
 					</stripes:select>
@@ -106,7 +106,7 @@
 				<crfn:form action="/typeSearch.action" method="post">
 					<stripes:hidden name="type" value="${actionBean.type }"/>
 					<stripes:select name="selectedColumns" multiple="multiple" size="5" style="min-width:250px; width:250px;">
-						<c:forEach items="${actionBean.availableColumns }" var="column">
+						<c:forEach items="${actionBean.availableColumnsSorted}" var="column">
 							<stripes:option value="${column.key}">${column.value}</stripes:option>					
 						</c:forEach>
 					</stripes:select>			

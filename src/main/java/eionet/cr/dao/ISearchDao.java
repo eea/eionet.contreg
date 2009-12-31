@@ -95,4 +95,12 @@ public interface ISearchDao extends IDao{
 	 * @throws SearchException 
 	 */
 	boolean isAllowLiteralSearch(String predicateUri) throws SearchException;
+	
+	/**
+	 * 
+	 * @param typeUri
+	 * @return
+	 * @throws DAOException
+	 */
+	List<SubjectDTO> getPredicatesUsedForType(String typeUri) throws DAOException;
 }

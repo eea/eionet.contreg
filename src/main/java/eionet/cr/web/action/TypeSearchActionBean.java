@@ -20,14 +20,17 @@
  */
 package eionet.cr.web.action;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 import java.util.Map.Entry;
 
 import net.sourceforge.stripes.action.DefaultHandler;
@@ -421,33 +424,40 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 	public void setSelectedColumns(List<String> selectedColumns) {
 		this.selectedColumns = selectedColumns;
 	}
-
+	
+	/**
+	 * 
+	 * @return
+	 * @throws SearchException
+	 */
+	public Map<String, String> getAvailableColumnsSorted() throws SearchException {
+		return sortByValueIgnoreCase(getAvailableColumns());
+	}
+	
 	/**
 	 * @return the availableColumns
 	 */
 	public Map<String, String> getAvailableColumns() throws SearchException {
+		
 		Map<String, Map<String,String>> cache = 
 			(Map<String, Map<String, String>>) getSession().getAttribute(AVAILABLE_COLUMNS_CACHE);
 		if (cache == null) {
 			cache = new HashMap<String, Map<String,String>>();
 		}
 		if (!cache.containsKey(type)) {
+			
 			Map<String,String> result = new LinkedHashMap<String,String>();
 			
-			Map<String,String> criteria = new HashMap<String,String>();
-			criteria.put(Predicates.RDF_TYPE, Subjects.RDF_PROPERTY);
-			criteria.put(Predicates.RDFS_DOMAIN, type);
-			
-			Pair<Integer, List<SubjectDTO>> customSearch;
+			List<SubjectDTO> usedPredicates = null;
 			try {
-				customSearch = MySQLDAOFactory.get().getDao(ISearchDao.class)
-						.performCustomSearch(criteria, null, new PageRequest(1,0), null);
+				usedPredicates = MySQLDAOFactory.get().getDao(ISearchDao.class).getPredicatesUsedForType(type);
 			} catch (DAOException e) {
 				throw new SearchException("Exception in type search action bean", e);
 			}
 			result.put(Predicates.RDFS_LABEL, "Title");
-			if (customSearch.getValue() != null){
-				for(SubjectDTO subject : customSearch.getValue()) {
+			if (usedPredicates!=null && !usedPredicates.isEmpty()){
+				
+				for(SubjectDTO subject : usedPredicates) {
 					if (!subject.isAnonymous()){
 						String uri = subject.getUri();
 						String label = subject.getObjectValue(Predicates.RDFS_LABEL);
@@ -480,6 +490,15 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 			}
 		}
 		return result;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public Map<String,String> getAvailableFiltersSorted() throws SearchException {
+		
+		return sortByValueIgnoreCase(getAvailableFilters());
 	}
 
 	/**
@@ -565,5 +584,51 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 	 */
 	public void setExportColumns(List<String> exportColumns) {
 		this.exportColumns = exportColumns;
+	}
+
+	/**
+	 * 
+	 * @param map
+	 * @return
+	 * @throws SearchException
+	 */
+	private Map<String,String> sortByValueIgnoreCase(Map<String,String> map) throws SearchException {
+		
+		LinkedHashMap<String,String> result = new LinkedHashMap<String,String>();
+		if (map!=null && !map.isEmpty()){
+			
+			List<String> keys = new ArrayList<String>(map.keySet());
+			List<String> values = new ArrayList<String>(map.values());
+			
+			List<String> sortedValues = new ArrayList<String>(map.values());
+			Collections.sort(sortedValues, new CaseInsensitiveStringComparator());
+			for (int i=0; i<sortedValues.size(); i++){
+				result.put(keys.get(values.indexOf(sortedValues.get(i))), sortedValues.get(i));
+			}
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * 
+	 * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
+	 *
+	 */
+	private class CaseInsensitiveStringComparator implements Comparator<String>{
+
+		/*
+		 * (non-Javadoc)
+		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+		 */
+		public int compare(String str1, String str2) {
+			
+			if (str1==null && str2==null)
+				return 0;
+			else if (str1==null && str2!=null)
+				return -1;
+			else
+				return ((String)str1).compareToIgnoreCase((String)str2);
+		}
 	}
 }
