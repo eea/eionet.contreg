@@ -55,6 +55,7 @@ import eionet.cr.util.Exporter;
 import eionet.cr.util.PageRequest;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
+import eionet.cr.util.URIUtil;
 import eionet.cr.util.Util;
 import eionet.cr.web.util.ApplicationCache;
 import eionet.cr.web.util.columns.SearchResultColumn;
@@ -458,10 +459,17 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 			if (usedPredicates!=null && !usedPredicates.isEmpty()){
 				
 				for(SubjectDTO subject : usedPredicates) {
-					if (!subject.isAnonymous()){
+					if (subject!=null && !subject.isAnonymous()){
+						
 						String uri = subject.getUri();
 						String label = subject.getObjectValue(Predicates.RDFS_LABEL);
-						result.put(uri, label);
+						if (StringUtils.isBlank(label)){
+							label = URIUtil.deriveLabel(uri);
+						}
+
+						if (!StringUtils.isBlank(label)){
+							result.put(uri, label);
+						}
 					}
 				}
 			}
@@ -627,6 +635,8 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 				return 0;
 			else if (str1==null && str2!=null)
 				return -1;
+			else if (str1!=null && str2==null)
+				return 1;
 			else
 				return ((String)str1).compareToIgnoreCase((String)str2);
 		}

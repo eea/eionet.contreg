@@ -20,11 +20,14 @@
  */
 package eionet.cr.dao.mysql;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -53,6 +56,7 @@ import eionet.cr.util.URIUtil;
 import eionet.cr.util.Util;
 import eionet.cr.util.sql.PairReader;
 import eionet.cr.util.sql.ResultSetListReader;
+import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
 import eionet.cr.web.util.columns.SubjectLastModifiedColumn;
 
@@ -359,12 +363,80 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements ISearchDao {
 			return new ArrayList<SubjectDTO>();
 		}
 		else{
-			Map<String, SubjectDTO> temp = new HashMap<String, SubjectDTO>();
+			// get the SubjectDTO objects of the found predicates
+			Map<String, SubjectDTO> subjectsMap = new HashMap<String, SubjectDTO>();
 			for (Long hash : predicateUris) {
-				temp.put(hash + "", null);
+				subjectsMap.put(hash + "", null);
+			}
+			executeQuery(getDataInitQuery(subjectsMap.keySet()), null, new SubjectDataReader(subjectsMap));
+			
+			// since a used predicate may not appear as a subject in SPO, there might unfound SubjectDTO objects 
+			HashSet<String> unfoundSubjects = new HashSet<String>();
+			for (Entry<String,SubjectDTO> entry : subjectsMap.entrySet()){
+				if (entry.getValue()==null){
+					unfoundSubjects.add(entry.getKey());
+				}
 			}
 			
-			return executeQuery(getDataInitQuery(temp.keySet()), null, new SubjectDataReader(temp));
+			// if there were indeed any unfound SubjectDTO objects, find URIs for those predicates
+			// and create dummy SubjectDTO objects from those URIs
+			if (!unfoundSubjects.isEmpty()){
+				Map<String,String> resourceUris = getResourceUris(unfoundSubjects);
+				for (Entry<String,SubjectDTO> entry : subjectsMap.entrySet()){
+					if (entry.getValue()==null){
+						String uri = resourceUris.get(entry.getKey());
+						if (!StringUtils.isBlank(uri)){
+							unfoundSubjects.remove(entry.getKey());
+							entry.setValue(new SubjectDTO(uri, false));
+						}
+					}
+				}
+			}
+			
+			// clean the subjectsMap of unfound subjects 
+			for (String hash : unfoundSubjects){
+				subjectsMap.remove(hash);
+			}
+			
+			return new LinkedList<SubjectDTO>( subjectsMap.values());
 		}
+	}
+	
+	/**
+	 * 
+	 * @param resourceHashes
+	 * @return
+	 * @throws DAOException 
+	 */
+	private Map<String,String> getResourceUris(HashSet<String> resourceHashes) throws DAOException{
+		
+		StringBuffer buf = new StringBuffer().
+		append("select URI_HASH, URI from RESOURCE where URI_HASH in (").append(Util.toCSV(resourceHashes)).append(")");
+		
+		HashMap<String,String> result = new HashMap<String,String>();
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		try{
+			conn = getConnection();
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(buf.toString());
+			while (rs.next()){
+				String uri = rs.getString("URI");
+				if (!StringUtils.isBlank(uri)){
+					result.put(rs.getString("URI_HASH"), uri);
+				}
+			}
+		}
+		catch (SQLException e){
+			throw new DAOException(e.toString(), e);
+		}
+		finally{
+			SQLUtil.close(rs);
+			SQLUtil.close(stmt);
+			SQLUtil.close(conn);
+		}
+		
+		return result;
 	}
 }
