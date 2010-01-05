@@ -37,6 +37,7 @@ import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.util.SortOrder;
 import eionet.cr.util.Hashes;
+import eionet.cr.util.QueryString;
 import eionet.cr.util.Util;
 import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.action.FactsheetActionBean;
@@ -130,12 +131,18 @@ public class JstlFunctions {
 		StringBuffer buf = new StringBuffer(actionBean.getUrlBinding());
 		buf.append("?");
 		if (StringUtils.isBlank(column.getActionRequestParameter())) {
-			buf.append(
-					StringEscapeUtils.escapeHtml(
-							request.getQueryString()));
-		} else {
+			
+			if (!StringUtils.isBlank(request.getQueryString())){
+				
+				QueryString queryString = QueryString.createQueryString(request);
+				queryString.removeParameters(actionBean.excludeFromSortAndPagingUrls());
+				buf.append(queryString.toURLFormat());
+			}
+		}
+		else {
 			buf.append(column.getActionRequestParameter());
 		}
+		
 		String sortParamValue = column.getSortParamValue();
 		if (sortParamValue==null)
 			sortParamValue = "";

@@ -20,6 +20,8 @@
  */
 package eionet.cr.web.action;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -58,6 +60,9 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
 	private static final String UNAVAILABLE_TYPE = "unavail";
 	private static final String TRACKED_FILES = "tracked_file";
 	private static final String FAILED_HARVESTS = "failed";
+	
+	/** */
+	private static final String[] EXCLUDE_FROM_SORT_AND_PAGING_URLS = {"harvest", "delete", "sourceUrl"};
 	
 	/** */
 	public static final List<Pair<String, String>> sourceTypes;
@@ -119,22 +124,20 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
 			if(!StringUtils.isEmpty(this.searchString)) {
 				filterString = "%" + StringEscapeUtils.escapeSql(this.searchString) + "%";
 			}
-			PaginationRequest pageRequest = new PaginationRequest(getPageN(), Pagination.DEFAULT_ITEMS_PER_PAGE);
+			PaginationRequest paginationRequest = new PaginationRequest(getPageN(), Pagination.DEFAULT_ITEMS_PER_PAGE);
 			SortingRequest sortingRequest = new SortingRequest(sortP, SortOrder.parse(sortO));
 			if(StringUtils.isBlank(type)) {
-				setResultList(factory.getDao(HarvestSourceDAO.class).getHarvestSources(filterString, pageRequest, sortingRequest));
+				setResultList(factory.getDao(HarvestSourceDAO.class).getHarvestSources(filterString, paginationRequest, sortingRequest));
 			} else if (TRACKED_FILES.equals(type)) {
-					setResultList(factory.getDao(HarvestSourceDAO.class).getHarvestTrackedFiles(filterString, pageRequest, sortingRequest));
+					setResultList(factory.getDao(HarvestSourceDAO.class).getHarvestTrackedFiles(filterString, paginationRequest, sortingRequest));
 			} else if (UNAVAILABLE_TYPE.equals(type)) {
-					setResultList(factory.getDao(HarvestSourceDAO.class).getHarvestSourcesUnavailable(filterString, pageRequest, sortingRequest));
+					setResultList(factory.getDao(HarvestSourceDAO.class).getHarvestSourcesUnavailable(filterString, paginationRequest, sortingRequest));
 			} else if (FAILED_HARVESTS.equals(type)) {
-				setResultList(factory.getDao(HarvestSourceDAO.class).getHarvestSourcesFailed(filterString, pageRequest, sortingRequest));
+				setResultList(factory.getDao(HarvestSourceDAO.class).getHarvestSourcesFailed(filterString, paginationRequest, sortingRequest));
 			}
-			matchCount = pageRequest.getMatchCount();
-			setPagination(Pagination.getPagination(
-					pageRequest,
-					getUrlBinding(),
-					QueryString.createQueryString(getContext().getRequest())));
+			
+			matchCount = paginationRequest.getMatchCount();
+			setPagination(Pagination.createPagination(paginationRequest, this));
 			
 			return new ForwardResolution("/pages/sources.jsp");
 		} catch (DAOException exception) {
@@ -249,5 +252,11 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
 	public List<SearchResultColumn> getColumns() throws SearchException {
 		return columnList;
 	}
-
+	
+	/**
+	 * 
+	 */
+	public String[] excludeFromSortAndPagingUrls(){
+		return EXCLUDE_FROM_SORT_AND_PAGING_URLS;
+	}
 }

@@ -35,10 +35,10 @@ public class PaginationTest extends TestCase{
 	 */
 	public void testPagination(){
 		
-		Pagination pagination = Pagination.getPagination(Pagination.pageLength(), 2, "", null);
+		Pagination pagination = Pagination.createPagination(Pagination.pageLength(), 2, "", null);
 		assertNull(pagination);
 		
-		pagination = Pagination.getPagination(Pagination.pageLength()+1, 2, "", null);
+		pagination = Pagination.createPagination(Pagination.pageLength()+1, 2, "", null);
 		
 		assertNotNull(pagination.getPrev());
 		assertEquals(1, pagination.getPrev().getNumber());

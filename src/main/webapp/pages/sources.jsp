@@ -5,8 +5,7 @@
 <stripes:layout-render name="/pages/common/template.jsp" pageTitle="Harvesting Sources">
 
 	<stripes:layout-component name="contents">
-		<crfn:form id="generalForm" action="${actionBean.urlBinding}" method="get">
-			
+		
 			<div id="operations">
 				<ul>
 					<li>
@@ -17,18 +16,20 @@
 						      			
 			<h1>Harvesting sources</h1>
 			<p></p>
-			<div id="searchForm" style="padding-bottom: 5px">
-				<stripes:label for="filterString" class="question">Filter expression</stripes:label>
-				<stripes:text name="searchString" id="filterString" size="40"/>
-				<stripes:hidden name="type" value="${actionBean.type }"/>
-				<stripes:submit name="view" value="Filter" />
-				<c:if test="${!empty actionBean.searchString }"> 
-					<stripes:link href="${actionBean.urlBinding}?view">
-						<stripes:param name="type" value="${actionBean.type }"/>
-						<img src="${pageContext.request.contextPath}/images/delete_small.gif" title="Remove filter" alt="Remove filter"/>
-					</stripes:link>
-				</c:if>
-			</div>
+			<crfn:form id="filterForm" action="${actionBean.urlBinding}" method="get">
+				<div id="searchForm" style="padding-bottom: 5px">
+					<stripes:label for="filterString" class="question">Filter expression</stripes:label>
+					<stripes:text name="searchString" id="filterString" size="40"/>
+					<stripes:hidden name="type" value="${actionBean.type }"/>
+					<stripes:submit name="view" value="Filter" />
+					<c:if test="${!empty actionBean.searchString }"> 
+						<stripes:link href="${actionBean.urlBinding}?view">
+							<stripes:param name="type" value="${actionBean.type }"/>
+							<img src="${pageContext.request.contextPath}/images/delete_small.gif" title="Remove filter" alt="Remove filter"/>
+						</stripes:link>
+					</c:if>
+				</div>
+			</crfn:form>
 			<div id="tabbedmenu">
 			    <ul>
 			    	<c:forEach items="${actionBean.sourceTypes}" var="loopItem">
@@ -50,14 +51,15 @@
 			    </ul>
 			</div>
 			<br style="clear:left" />
-			<div style="margin-top:20px;margin-bottom:5px">	
-				<stripes:layout-render name="/pages/common/subjectsResultList.jsp" tableClass="sortable"/>
-			</div>
-			<div>
-				<stripes:submit name="delete" value="Delete" title="Delete selecetd sources"/>
-				<stripes:submit name="harvest" value="Schedule urgent harvest" title="Schedule urgent harvest of selecetd sources"/>
-				<input type="button" name="selectAll" value="Select all" onclick="toggleSelectAll('generalForm');return false"/>
-			</div>
-		</crfn:form>                  
+			<crfn:form id="resultSetForm" action="${actionBean.urlBinding}" method="post">
+				<div style="margin-top:20px;margin-bottom:5px">	
+					<stripes:layout-render name="/pages/common/subjectsResultList.jsp" tableClass="sortable"/>
+				</div>
+				<div>
+					<stripes:submit name="delete" value="Delete" title="Delete selecetd sources"/>
+					<stripes:submit name="harvest" value="Schedule urgent harvest" title="Schedule urgent harvest of selecetd sources"/>
+					<input type="button" name="selectAll" value="Select all" onclick="toggleSelectAll('generalForm');return false"/>
+				</div>
+			</crfn:form>                  
 	</stripes:layout-component>
 </stripes:layout-render>

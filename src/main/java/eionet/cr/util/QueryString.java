@@ -20,6 +20,7 @@
  */
 package eionet.cr.util;
 
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -45,6 +46,7 @@ public class QueryString extends HashMap<String,Set<String>>{
 	/**
 	 * 
 	 * @param request
+	 * @param excludeParameters
 	 */
 	private QueryString(ServletRequest request){
 		
@@ -102,6 +104,21 @@ public class QueryString extends HashMap<String,Set<String>>{
 	 */
 	public QueryString removeParameter(String parName){
 		remove(parName);
+		return this;
+	}
+
+	/**
+	 * 
+	 * @param parName
+	 */
+	public QueryString removeParameters(String[] parNames){
+		
+		if (parNames!=null){
+			for (int i=0; i<parNames.length; i++){
+				remove(parNames[i]);
+			}
+		}
+		
 		return this;
 	}
 

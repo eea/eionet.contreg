@@ -251,4 +251,12 @@ public abstract class AbstractActionBean implements ActionBean {
 	protected HttpSession getSession() {
 		return context.getRequest().getSession();
 	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public String[] excludeFromSortAndPagingUrls(){
+		return null;
+	}
 }

@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import eionet.cr.util.QueryString;
+import eionet.cr.web.action.AbstractActionBean;
+import eionet.cr.web.action.AbstractSearchActionBean;
 
 /**
  * 
@@ -75,7 +77,7 @@ public class Pagination {
 	 * @param urlPath
 	 * @return
 	 */
-	public static Pagination getPagination(int matchCount, int curPageNum, String urlPath, QueryString queryString){
+	public static Pagination createPagination(int matchCount, int curPageNum, String urlPath, QueryString queryString){
 
 		int numOfPages = matchCount / pageLength();
 		if (matchCount % pageLength() != 0)
@@ -90,19 +92,31 @@ public class Pagination {
 		else
 			return null;
 	}
-	
+
 	/**
 	 * Gets pagination based on {@link PaginationRequest}.
 	 * 
-	 * @param request pagination request
-	 * @param urlPath url path
-	 * @param queryString query string
+	 * @param request
+	 * @param actionBean
 	 * @return
 	 */
-	public static Pagination getPagination(PaginationRequest request, String urlPath, QueryString queryString) {
-		return getPagination(request.getMatchCount(), request.getPageNumber(), urlPath, queryString);
+	public static Pagination createPagination(PaginationRequest request, AbstractActionBean actionBean) {
+		
+		return createPagination(request.getMatchCount(), request.getPageNumber(), actionBean.getUrlBinding(),
+				QueryString.createQueryString(actionBean.getContext().getRequest()).removeParameters(actionBean.excludeFromSortAndPagingUrls()));
 	}
-	
+
+	/**
+	 * 
+	 * @param actionBean
+	 * @return
+	 */
+	public static Pagination createPagination(AbstractSearchActionBean actionBean) {
+		
+		return Pagination.createPagination(actionBean.getMatchCount(), actionBean.getPageN(), actionBean.getUrlBinding(),
+				QueryString.createQueryString(actionBean.getContext().getRequest()).removeParameters(actionBean.excludeFromSortAndPagingUrls()));
+	}
+
 	/**
 	 * 
 	 */

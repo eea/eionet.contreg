@@ -173,11 +173,7 @@ public abstract class AbstractSearchActionBean<T> extends AbstractActionBean{
 	public Pagination getPagination(){
 		
 		if (pagination==null){
-			pagination = Pagination.getPagination(
-					getMatchCount(),
-					getPageN(),
-					getUrlBinding(),
-					QueryString.createQueryString(getContext().getRequest()));
+			pagination = Pagination.createPagination(this);
 		}
 		
 		return pagination;
