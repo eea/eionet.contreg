@@ -252,7 +252,7 @@ public class DefaultPersister implements IHarvestPersister {
 		logger.debug("Copying triples from " + spoTempTableName + " into SPO");
 		
 		StringBuffer buf = new StringBuffer();
-		buf.append("insert ignore into SPO (").
+		buf.append("insert into SPO (").
 		append("SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, OBJECT_DOUBLE, ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG, ").
 		append("OBJ_DERIV_SOURCE, OBJ_DERIV_SOURCE_GEN_TIME, OBJ_SOURCE_OBJECT, SOURCE, GEN_TIME").
 		append(") select SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, OBJECT_DOUBLE, ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG, ").
@@ -401,7 +401,7 @@ public class DefaultPersister implements IHarvestPersister {
 	private void prepareStatementForResources() throws SQLException{
 
         preparedStatementForResources = getConnection().prepareStatement(
-        		"insert ignore into " + resourceTempTableName + " (URI, URI_HASH) VALUES (?, ?)");
+        		"insert into " + resourceTempTableName + " (URI, URI_HASH) VALUES (?, ?)");
 	}
 	
 	private void raiseUnfinishedHarvestFlag() throws SQLException{

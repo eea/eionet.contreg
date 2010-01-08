@@ -54,7 +54,7 @@ public class MySQLUrgentHarvestQueueDAO extends MySQLBaseDAO implements UrgentHa
 		
 		String valueStr = "(?,NOW())";
 		List<Object> values = new ArrayList<Object>();
-		StringBuffer buf = new StringBuffer("insert ignore into URGENT_HARVEST_QUEUE (URL,TIMESTAMP) VALUES ");
+		StringBuffer buf = new StringBuffer("insert into URGENT_HARVEST_QUEUE (URL,TIMESTAMP) VALUES ");
 		for (int i=0; i<queueItems.size(); i++){
 			UrgentHarvestQueueItemDTO dto = queueItems.get(i);
 			buf.append(i>0 ? "," : "").append(valueStr);
@@ -80,7 +80,7 @@ public class MySQLUrgentHarvestQueueDAO extends MySQLBaseDAO implements UrgentHa
 	}
 
 	/** */
-	private static final String addPushHarvestSQL = "insert ignore into URGENT_HARVEST_QUEUE (URL,TIMESTAMP,PUSHED_CONTENT) VALUES (?,NOW(),?)";
+	private static final String addPushHarvestSQL = "insert into URGENT_HARVEST_QUEUE (URL,TIMESTAMP,PUSHED_CONTENT) VALUES (?,NOW(),?)";
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.dao.HarvestQueueDAO#addPushHarvest(eionet.cr.dto.HarvestQueueItemDTO)
