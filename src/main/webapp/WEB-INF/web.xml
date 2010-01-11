@@ -97,7 +97,7 @@
     
     <servlet>
 		<servlet-name>AmpServlet</servlet-name>
-		<servlet-class>eionet.cr.api.services.AmpServlet</servlet-class>
+		<servlet-class>eionet.cr.api.feeds.amp.AmpFeedServlet</servlet-class>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 	
