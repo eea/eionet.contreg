@@ -18,46 +18,32 @@
 * 
 * Contributor(s):
 * Jaanus Heinlaid, Tieto Eesti*/
-package eionet.cr.api.services;
+package eionet.cr.api.feeds;
 
-import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.simpleframework.xml.Attribute;
-import org.simpleframework.xml.Root;
+import eionet.cr.common.Namespaces;
 
 /**
  * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-@Root(name = "amp:eeaproject")
-public class AmpEeaprojectDTO {
+public class NamespaceProvider {
 
 	/** */
-	private static final long serialVersionUID = 1L;
-
-	/** */
-	@Attribute(name = "rdf:resource")
-	private String eeaproject;
+	private static Map<String,String> namespaces;
 	
 	/**
-	 * @param type
+	 * 
 	 */
-	public AmpEeaprojectDTO(String eeaproject) {
-		this.eeaproject = eeaproject;
-	}
-
-	/**
-	 * @return the eeaproject
-	 */
-	public String getEeaproject() {
-		return eeaproject;
-	}
-
-	/**
-	 * @param eeaproject the eeaproject to set
-	 */
-	public void setEeaproject(String eeaproject) {
-		this.eeaproject = eeaproject;
+	static{
+		namespaces = new HashMap<String, String>();
+		namespaces.put("rdf", Namespaces.RDF);
+		namespaces.put("rdfs", Namespaces.RDFS);
+		namespaces.put("owl", Namespaces.OWL);
+		namespaces.put("dc", Namespaces.DC);
+		namespaces.put("cr", Namespaces.CR);
 	}
 }
