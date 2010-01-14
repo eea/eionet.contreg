@@ -146,7 +146,7 @@ public class MySQLHelperDao extends MySQLBaseDAO implements HelperDao {
 	}
 	
 	/** */
-	private static final String tripleInsertSQL = "insert high_priority into SPO (SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, OBJECT_DOUBLE," +
+	private static final String tripleInsertSQL = "insert into SPO (SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, OBJECT_DOUBLE," +
 			" ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG, OBJ_DERIV_SOURCE, OBJ_DERIV_SOURCE_GEN_TIME, OBJ_SOURCE_OBJECT, SOURCE," +
 			" GEN_TIME) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	/*
@@ -273,7 +273,7 @@ public class MySQLHelperDao extends MySQLBaseDAO implements HelperDao {
 	}
 
 	/** */
-	public static final String insertResourceSQL = "insert high_priority ignore into RESOURCE" +
+	public static final String insertResourceSQL = "insert ignore into RESOURCE" +
 			" (URI, URI_HASH, FIRSTSEEN_SOURCE, FIRSTSEEN_TIME) values (?, ?, ?, ?)";
 	/*
 	 * (non-Javadoc)
