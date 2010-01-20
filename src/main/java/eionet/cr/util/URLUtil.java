@@ -26,6 +26,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.UnknownHostException;
 import java.text.MessageFormat;
 
 import org.apache.commons.lang.StringUtils;
@@ -111,5 +112,37 @@ public class URLUtil {
 				try{ inputStream.close(); } catch (IOException ioe){}
 			}
 		}
+	}
+	
+	/**
+	 * 
+	 * @param uri
+	 * @return
+	 */
+	public static boolean isNotExisting(String urlStr){
+		
+		int responseCode = -1;
+		IOException ioe = null;		
+		InputStream inputStream = null;
+		try{
+			URL url = new URL(StringUtils.substringBefore(urlStr, "#"));
+			URLConnection urlConnection = url.openConnection();
+			inputStream = urlConnection.getInputStream();
+			responseCode = ((HttpURLConnection)urlConnection).getResponseCode();
+		}
+		catch (IOException e){
+			ioe = e;
+		}
+		finally{
+			if (inputStream!=null){
+				try{inputStream.close();}catch (IOException e){}
+			}
+		}
+
+		return    ioe instanceof MalformedURLException
+		       || ioe instanceof UnknownHostException
+		       || (responseCode>=400 && responseCode<=499)
+		       || responseCode==501
+		       || responseCode==505;
 	}
 }

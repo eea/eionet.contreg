@@ -198,6 +198,14 @@ public abstract class AbstractActionBean implements ActionBean {
 
 	/**
 	 * 
+	 * @return
+	 */
+	public boolean hasValidationErrors() {
+		return context.getValidationErrors()!=null && !context.getValidationErrors().isEmpty();
+	}
+
+	/**
+	 * 
 	 * @param message
 	 */
 	public void addMessage(Message message) {

@@ -105,6 +105,16 @@
         <servlet-name>AmpServlet</servlet-name>
         <url-pattern>/ampService</url-pattern>
     </servlet-mapping>
+
+    <servlet>
+		<servlet-name>XmlConvServlet</servlet-name>
+		<servlet-class>eionet.cr.api.feeds.xmlconv.XmlConvFeedServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+        <servlet-name>XmlConvServlet</servlet-name>
+        <url-pattern>/xmlConvService</url-pattern>
+    </servlet-mapping>
     
     <servlet-mapping>
         <servlet-name>XmlRpcServlet</servlet-name>

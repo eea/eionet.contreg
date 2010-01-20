@@ -200,19 +200,22 @@ public class HarvestSourceActionBean extends AbstractActionBean {
 		if(isUserLoggedIn()){
 			if (isPostRequest()){
 				
-				// create new harvest source
-				factory.getDao(HarvestSourceDAO.class).addSource(getHarvestSource(), getUserName());
+				if (validateAddEdit()){
 				
-				// set up the resolution
-				resolution = new ForwardResolution(HarvestSourcesActionBean.class);
-				
-		    	// schedule urgent harvest, unless explicitly requested not to
-				if (getContext().getRequestParameter("dontHarvest")==null){
-			    	UrgentHarvestQueue.addPullHarvest(getHarvestSource().getUrl());
-					addSystemMessage("Harvest source successfully created and scheduled for urgent harvest!");
-				}
-				else{
-					addSystemMessage("Harvest source successfully created!");
+					// create new harvest source
+					factory.getDao(HarvestSourceDAO.class).addSource(getHarvestSource(), getUserName());
+
+					// set up the resolution
+					resolution = new ForwardResolution(HarvestSourcesActionBean.class);
+
+					// schedule urgent harvest, unless explicitly requested not to
+					if (getContext().getRequestParameter("dontHarvest")==null){
+						UrgentHarvestQueue.addPullHarvest(getHarvestSource().getUrl());
+						addSystemMessage("Harvest source successfully created and scheduled for urgent harvest!");
+					}
+					else{
+						addSystemMessage("Harvest source successfully created!");
+					}
 				}
 			}
 		}
@@ -233,8 +236,12 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     	Resolution resolution = new ForwardResolution("/pages/editsource.jsp");
 		if(isUserLoggedIn()){
 			if (isPostRequest()){
-				factory.getDao(HarvestSourceDAO.class).editSource(getHarvestSource());
-				addSystemMessage(getBundle().getString("update.success"));
+				
+				if (validateAddEdit()){
+				
+					factory.getDao(HarvestSourceDAO.class).editSource(getHarvestSource());
+					addSystemMessage(getBundle().getString("update.success"));
+				}
 			}
 			else
 				harvestSource = factory.getDao(HarvestSourceDAO.class).getHarvestSourceById(harvestSource.getSourceId());
@@ -277,16 +284,23 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     		return new ForwardResolution("/pages/viewsource.jsp");
     }
 
-    @ValidationMethod(on={ADD_EVENT,EDIT_EVENT})
-    public void validateAddEdit(){
+    /**
+     * 
+     */
+    public boolean validateAddEdit(){
     	
     	if (isPostRequest()){
     		
-	    	if (harvestSource.getUrl()==null || harvestSource.getUrl().trim().length()==0 || !URLUtil.isURL(harvestSource.getUrl()))
+	    	if (harvestSource.getUrl()==null || harvestSource.getUrl().trim().length()==0 || !URLUtil.isURL(harvestSource.getUrl())){
 	    		addGlobalValidationError(new SimpleError("Invalid URL!"));
+	    	}
 	    	
 	    	if (harvestSource.getUrl()!=null && harvestSource.getUrl().indexOf("#")>=0){
 	    		addGlobalValidationError(new SimpleError("URL with a fragment part not allowed!"));
+	    	}
+	    	
+	    	if (harvestSource.getUrl()!=null && URLUtil.isNotExisting(harvestSource.getUrl())){
+	    		addGlobalValidationError(new SimpleError("There is no resource existing behind this URL!"));
 	    	}
 
 	    	if (harvestSource.getIntervalMinutes()!=null){
@@ -300,6 +314,8 @@ public class HarvestSourceActionBean extends AbstractActionBean {
 	    	else
 	    		harvestSource.setIntervalMinutes(new Integer(0));
     	}
+    	
+    	return getContext().getValidationErrors()==null || getContext().getValidationErrors().isEmpty();
     }
 
 	/**
