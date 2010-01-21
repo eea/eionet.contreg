@@ -16,46 +16,16 @@
  * (C) European Environment Agency.  All Rights Reserved.
  *
  * Contributor(s):
- * Jaanus Heinlaid, Tieto Eesti
+ * Aleksandr Ivanov, Tieto Eesti
  */
 package eionet.cr.dao;
 
-import java.util.List;
-
-import eionet.cr.dto.HarvestMessageDTO;
-
 /**
+ * Marker interface to mark dao interfaces.
  * 
- * @author heinljab
- *
+ * @author Aleksandr Ivanov
+ * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
-public interface HarvestMessageDAO extends DAO {
+public interface DAO {
 
-	/**
-	 * 
-	 * @return
-	 * @throws DAOException
-	 */
-	public List<HarvestMessageDTO> findHarvestMessagesByHarvestID(int harvestID) throws DAOException;
-	
-	/**
-	 * 
-	 * @return
-	 * @throws DAOException
-	 */
-	public HarvestMessageDTO findHarvestMessageByMessageID(int messageID) throws DAOException;
-	
-	/**
-	 * 
-	 * @param harvestMessageDTO
-	 * @throws DAOException
-	 */
-	public Integer insertHarvestMessage(HarvestMessageDTO harvestMessageDTO) throws DAOException;
-	
-	/**
-	 * 
-	 * @param messageId
-	 * @throws DAOException
-	 */
-	public void deleteMessage(Integer messageId) throws DAOException;
 }

@@ -40,7 +40,7 @@ import org.apache.commons.lang.StringUtils;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.dao.DAOException;
-import eionet.cr.dao.ISearchDao;
+import eionet.cr.dao.SearchDAO;
 import eionet.cr.dto.RawTripleDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
@@ -62,19 +62,19 @@ import eionet.cr.web.util.columns.SubjectLastModifiedColumn;
 
 /**
  * 
- * Mysql implementation of {@link ISearchDao}.
+ * Mysql implementation of {@link SearchDAO}.
  * 
  * @author Aleksandr Ivanov
  * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
-public class MySQLSearchDAO extends MySQLBaseDAO implements ISearchDao {
+public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 
 	MySQLSearchDAO() {
 		//reduced visibility
 	}
 	
 	/** 
-	 * @see eionet.cr.dao.ISearchDao#performSpatialSourcesSearch()
+	 * @see eionet.cr.dao.SearchDAO#performSpatialSourcesSearch()
 	 * {@inheritDoc}
 	 */
 	public List<String> performSpatialSourcesSearch() throws DAOException {
@@ -87,7 +87,7 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements ISearchDao {
 	}
 	
 	/** 
-	 * @see eionet.cr.dao.ISearchDao#performSimpleSearch(eionet.cr.search.util.SearchExpression, int, eionet.cr.util.SortingRequest)
+	 * @see eionet.cr.dao.SearchDAO#performSimpleSearch(eionet.cr.search.util.SearchExpression, int, eionet.cr.util.SortingRequest)
 	 * {@inheritDoc}
 	 */
 	public Pair<Integer, List<SubjectDTO>> performSimpleSearch(
@@ -178,7 +178,7 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements ISearchDao {
 	}
 
 	/** 
-	 * @see eionet.cr.dao.ISearchDao#performCustomSearch(java.util.Map, java.util.Set, int, eionet.cr.util.SortingRequest)
+	 * @see eionet.cr.dao.SearchDAO#performCustomSearch(java.util.Map, java.util.Set, int, eionet.cr.util.SortingRequest)
 	 * {@inheritDoc}
 	 */
 	public Pair<Integer, List<SubjectDTO>> performCustomSearch(
@@ -264,7 +264,7 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements ISearchDao {
 	}
 
 	/** 
-	 * @see eionet.cr.dao.ISearchDao#isAllowLiteralSearch(java.lang.String)
+	 * @see eionet.cr.dao.SearchDAO#isAllowLiteralSearch(java.lang.String)
 	 * {@inheritDoc}
 	 */
 	public boolean isAllowLiteralSearch(String predicateUri) throws SearchException{
@@ -298,7 +298,7 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements ISearchDao {
 	}
 
 	/** 
-	 * @see eionet.cr.dao.ISearchDao#getSampleTriples(java.lang.String, int)
+	 * @see eionet.cr.dao.SearchDAO#getSampleTriples(java.lang.String, int)
 	 * {@inheritDoc}
 	 */
 	public Pair<Integer, List<RawTripleDTO>> getSampleTriples(String url, int limit)
@@ -351,7 +351,7 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements ISearchDao {
 
 	/*
 	 * (non-Javadoc)
-	 * @see eionet.cr.dao.ISearchDao#getPredicatesUsedForType(java.lang.String)
+	 * @see eionet.cr.dao.SearchDAO#getPredicatesUsedForType(java.lang.String)
 	 */
 	public List<SubjectDTO> getPredicatesUsedForType(String typeUri) throws DAOException{
 		

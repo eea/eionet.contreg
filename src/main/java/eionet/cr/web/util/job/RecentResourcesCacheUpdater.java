@@ -27,7 +27,7 @@ import org.quartz.JobExecutionException;
 import org.quartz.StatefulJob;
 
 import eionet.cr.dao.DAOException;
-import eionet.cr.dao.HelperDao;
+import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.web.util.ApplicationCache;
 
@@ -48,7 +48,7 @@ public class RecentResourcesCacheUpdater implements StatefulJob {
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		
 		try {
-			HelperDao dao = MySQLDAOFactory.get().getDao(HelperDao.class);
+			HelperDAO dao = MySQLDAOFactory.get().getDao(HelperDAO.class);
 			ApplicationCache.updateRecentResourceCache(dao.getRecentlyDiscoveredFiles(10));
 			logger.debug("Recently discovered resources cache updated!");
 		}

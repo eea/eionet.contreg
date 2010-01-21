@@ -20,7 +20,7 @@ import eionet.cr.util.SortingRequest;
  * @author Aleksandr Ivanov
  * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
-public interface HelperDao extends IDao {
+public interface HelperDAO extends DAO {
 
 	
 	/**

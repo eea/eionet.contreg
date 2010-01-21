@@ -26,7 +26,7 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
-import eionet.cr.dao.ISearchDao;
+import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.RawTripleDTO;
 import eionet.cr.util.Pair;
@@ -45,7 +45,7 @@ public class SampleTriplesTest extends TestCase {
 	@Test
 	public void testGetSampleTriples() throws Exception {
 		ConnectionUtil.setReturnSimpleConnection(true);
-		Pair<Integer, List<RawTripleDTO>> result = MySQLDAOFactory.get().getDao(ISearchDao.class).getSampleTriples(url, 10);
+		Pair<Integer, List<RawTripleDTO>> result = MySQLDAOFactory.get().getDao(SearchDAO.class).getSampleTriples(url, 10);
 		assertEquals(10, result.getValue().size());
 	}
 }

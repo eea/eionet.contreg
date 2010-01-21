@@ -38,7 +38,7 @@ import eionet.cr.api.feeds.amp.AmpFeedServlet;
 import eionet.cr.common.Namespaces;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
-import eionet.cr.dao.ISearchDao;
+import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.PageRequest;
@@ -73,7 +73,7 @@ public class XmlConvFeedServlet extends HttpServlet{
 			String xmlSchema = request.getParameter(SCHEMA_PARAM);
 			if (!StringUtils.isBlank(xmlSchema)){
 				
-				ISearchDao searchDao = MySQLDAOFactory.get().getDao(ISearchDao.class);
+				SearchDAO searchDao = MySQLDAOFactory.get().getDao(SearchDAO.class);
 				Map<String, String> criteria = new HashMap<String, String>();
 				criteria.put(Predicates.CR_SCHEMA, xmlSchema);
 

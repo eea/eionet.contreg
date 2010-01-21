@@ -38,7 +38,7 @@ import org.apache.commons.logging.LogFactory;
 import eionet.cr.common.CRException;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
-import eionet.cr.dao.ISearchDao;
+import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
@@ -134,7 +134,7 @@ public class XmlRpcServices implements Services{
 		List<DataflowResultDto> result = new ArrayList<DataflowResultDto>();
 		try{
 			Pair<Integer, List<SubjectDTO>> search = MySQLDAOFactory
-					.get().getDao(ISearchDao.class)
+					.get().getDao(SearchDAO.class)
 					.performCustomSearch(
 							criteria,
 							null,
@@ -216,7 +216,7 @@ public class XmlRpcServices implements Services{
 		Vector result = new Vector();
 		try{
 			Pair<Integer,List<SubjectDTO>> search = MySQLDAOFactory.get()
-					.getDao(ISearchDao.class)
+					.getDao(SearchDAO.class)
 					.performCustomSearch(
 							criteria,
 							null,

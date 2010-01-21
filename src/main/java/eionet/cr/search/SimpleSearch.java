@@ -37,7 +37,7 @@ import eionet.cr.web.util.columns.SubjectLastModifiedColumn;
  * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  * 
- *	@deprecated - use {@link HelperDao#} performSimpleSearch method instead.
+ *	@deprecated - use {@link HelperDAO#} performSimpleSearch method instead.
  */
 @Deprecated
 public class SimpleSearch extends AbstractSubjectSearch{

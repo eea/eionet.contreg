@@ -19,7 +19,7 @@ import org.apache.commons.lang.StringUtils;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.dao.DAOException;
-import eionet.cr.dao.HelperDao;
+import eionet.cr.dao.HelperDAO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
@@ -33,23 +33,23 @@ import eionet.cr.util.sql.SingleObjectReader;
 
 
 /**
- *	Mysql implementation of {@link HelperDao}.
+ *	Mysql implementation of {@link HelperDAO}.
  * 
  * @author Aleksandr Ivanov
  * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
-public class MySQLHelperDao extends MySQLBaseDAO implements HelperDao {
+public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 	
 	/**
 	 * 
 	 */
-	MySQLHelperDao() {
+	MySQLHelperDAO() {
 		//reducing visibility
 	}
 
 	
 	/** 
-	 * @see eionet.cr.dao.HelperDao#getRecentlyDiscoveredFiles()
+	 * @see eionet.cr.dao.HelperDAO#getRecentlyDiscoveredFiles()
 	 * {@inheritDoc}
 	 */
 	public List<Pair<String, String>> getRecentlyDiscoveredFiles(int limit) throws DAOException {
@@ -126,7 +126,7 @@ public class MySQLHelperDao extends MySQLBaseDAO implements HelperDao {
 	private static final String sqlQuery = "select distinct OBJECT from SPO where PREDICATE=? and LIT_OBJ='Y' order by OBJECT asc";
 
 	/** 
-	 * @see eionet.cr.dao.HelperDao#getPicklistForPredicate(java.lang.String)
+	 * @see eionet.cr.dao.HelperDAO#getPicklistForPredicate(java.lang.String)
 	 * {@inheritDoc}
 	 */
 	public Collection<String> getPicklistForPredicate(String predicateUri) throws SearchException {
@@ -220,7 +220,7 @@ public class MySQLHelperDao extends MySQLBaseDAO implements HelperDao {
 	
 	/*
 	 * (non-Javadoc)
-	 * @see eionet.cr.dao.HelperDao#deleteTriples(eionet.cr.dto.SubjectDTO)
+	 * @see eionet.cr.dao.HelperDAO#deleteTriples(eionet.cr.dto.SubjectDTO)
 	 */
 	public void deleteTriples(SubjectDTO subject) throws DAOException{
 		
@@ -420,7 +420,7 @@ public class MySQLHelperDao extends MySQLBaseDAO implements HelperDao {
 
 	/*
 	 * (non-Javadoc)
-	 * @see eionet.cr.dao.HelperDao#getSubjectSchemaUri(java.lang.String)
+	 * @see eionet.cr.dao.HelperDAO#getSubjectSchemaUri(java.lang.String)
 	 */
 	public String getSubjectSchemaUri(String subjectUri) throws DAOException {
 		

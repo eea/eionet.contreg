@@ -39,7 +39,7 @@ import eionet.cr.common.Subjects;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HarvestSourceDAO;
-import eionet.cr.dao.HelperDao;
+import eionet.cr.dao.HelperDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
@@ -102,7 +102,7 @@ public class RegisterURLActionBean extends AbstractActionBean{
 			objectDTO.setSourceUri(getUser().getRegistrationsUri());
 			subjectDTO.addObject(Predicates.RDF_TYPE, objectDTO);
 			
-			HelperDao spoHelperDao = factory.getDao(HelperDao.class);			 
+			HelperDAO spoHelperDao = factory.getDao(HelperDAO.class);			 
 			spoHelperDao.addTriples(subjectDTO);
 			
 			// let the user registrations' URI be stored in RESOURCE

@@ -36,7 +36,7 @@ import org.simpleframework.xml.stream.Format;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
-import eionet.cr.dao.ISearchDao;
+import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.PageRequest;
@@ -72,7 +72,7 @@ public class AmpServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		logger.debug("received request for AMP servlet");
-		ISearchDao searchDao = MySQLDAOFactory.get().getDao(ISearchDao.class);
+		SearchDAO searchDao = MySQLDAOFactory.get().getDao(SearchDAO.class);
 		Map<String, String> criteria = new HashMap<String, String>();
 		criteria.put(Predicates.RDF_TYPE, Subjects.AMP_OUTPUT);
 		resp.setContentType("text/xml");

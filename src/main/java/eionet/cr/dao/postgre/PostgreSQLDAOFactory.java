@@ -18,7 +18,7 @@
  * Contributor(s):
  * Jaanus Heinlaid, Tieto Eesti
  */
-package eionet.cr.dao.mysql;
+package eionet.cr.dao.postgre;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,16 +39,16 @@ import eionet.cr.dao.UrgentHarvestQueueDAO;
  * @author heinljab, altnyris
  *
  */
-public final class MySQLDAOFactory extends DAOFactory{
+public final class PostgreSQLDAOFactory extends DAOFactory{
 	
 	/** */
-	private static MySQLDAOFactory instance;
-	private Map<Class<? extends DAO>, Class<? extends MySQLBaseDAO>> registeredDaos;
+	private static PostgreSQLDAOFactory instance;
+	private Map<Class<? extends DAO>, Class<? extends PostgreSQLBaseDAO>> registeredDaos;
 
 	/**
 	 * 
 	 */
-	private MySQLDAOFactory() {
+	private PostgreSQLDAOFactory() {
 		init();
 	}
 
@@ -56,22 +56,22 @@ public final class MySQLDAOFactory extends DAOFactory{
 	 * 
 	 */
 	private void init() {
-		registeredDaos = new HashMap<Class<? extends DAO>, Class<? extends MySQLBaseDAO>>();
-		registeredDaos.put(HarvestDAO.class, MySQLHarvestDAO.class);
-		registeredDaos.put(HarvestMessageDAO.class, MySQLHarvestMessageDAO.class);
-		registeredDaos.put(HarvestSourceDAO.class, MySQLHarvestSourceDAO.class);
-		registeredDaos.put(HelperDAO.class, MySQLHelperDAO.class);
-		registeredDaos.put(SearchDAO.class, MySQLSearchDAO.class);
-		registeredDaos.put(UrgentHarvestQueueDAO.class, MySQLUrgentHarvestQueueDAO.class);
+		registeredDaos = new HashMap<Class<? extends DAO>, Class<? extends PostgreSQLBaseDAO>>();
+		registeredDaos.put(HarvestDAO.class, PostgreSQLHarvestDAO.class);
+		registeredDaos.put(HarvestMessageDAO.class, PostgreSQLHarvestMessageDAO.class);
+		registeredDaos.put(HarvestSourceDAO.class, PostgreSQLHarvestSourceDAO.class);
+		registeredDaos.put(HelperDAO.class, PostgreSQLHelperDAO.class);
+		registeredDaos.put(SearchDAO.class, PostgreSQLSearchDAO.class);
+		registeredDaos.put(UrgentHarvestQueueDAO.class, PostgreSQLUrgentHarvestQueueDAO.class);
 	}
 
 	/**
 	 * 
 	 * @return
 	 */
-	public static MySQLDAOFactory get() {
+	public static PostgreSQLDAOFactory get() {
 		if(instance == null) {
-			instance = new MySQLDAOFactory();
+			instance = new PostgreSQLDAOFactory();
 		}
 		return instance;
 	}

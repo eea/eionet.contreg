@@ -41,7 +41,7 @@ import org.apache.poi.ss.usermodel.Font;
 import eionet.cr.common.Predicates;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
-import eionet.cr.dao.ISearchDao;
+import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.SubjectDTO;
 
@@ -76,7 +76,7 @@ public class Exporter {
 			criteria.put(StringUtils.trim(entry.getKey()), StringUtils.trim(entry.getValue()));
 		}
 		customSearch = MySQLDAOFactory.get()
-				.getDao(ISearchDao.class)
+				.getDao(SearchDAO.class)
 				.performCustomSearch(
 						criteria,
 						null,

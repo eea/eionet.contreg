@@ -45,7 +45,7 @@ import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dao.HarvestSourceDAO;
-import eionet.cr.dao.HelperDao;
+import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
@@ -234,7 +234,7 @@ public class PullHarvest extends Harvest{
 		
 		Boolean result = null;
 		
-		String schemaUri = daoFactory.getDao(HelperDao.class).getSubjectSchemaUri(sourceUrlString);
+		String schemaUri = daoFactory.getDao(HelperDAO.class).getSubjectSchemaUri(sourceUrlString);
 		if (!StringUtils.isBlank(schemaUri)){
 			
 			// see if schema has RDF conversion

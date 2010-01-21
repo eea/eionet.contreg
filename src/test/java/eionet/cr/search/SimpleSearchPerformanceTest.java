@@ -26,7 +26,7 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
-import eionet.cr.dao.ISearchDao;
+import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.util.SearchExpression;
@@ -38,7 +38,7 @@ import eionet.cr.util.sql.ConnectionUtil;
 
 /**
  * tests the performance of {@link SimpleSearch} against 
- * new {@link eionet.cr.dao.HelperDao#performSimpleSearch(eionet.cr.search.util.SearchExpression, int, eionet.cr.util.SortingRequest)}.
+ * new {@link eionet.cr.dao.HelperDAO#performSimpleSearch(eionet.cr.search.util.SearchExpression, int, eionet.cr.util.SortingRequest)}.
  * 
  * @author Aleksandr Ivanov
  * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
@@ -63,14 +63,14 @@ public class SimpleSearchPerformanceTest extends TestCase{
 		long simpleSearchCompleteTime = System.currentTimeMillis() - time;
 		
 		time = System.currentTimeMillis();
-		Pair<Integer, List<SubjectDTO>> result = MySQLDAOFactory.get().getDao(ISearchDao.class)
+		Pair<Integer, List<SubjectDTO>> result = MySQLDAOFactory.get().getDao(SearchDAO.class)
 				.performSimpleSearch(
 						getSearchExpression(),
 						new PageRequest(getPageNumber()),
 						new SortingRequest(getSortPredicate(), SortOrder.DESCENDING));
 		long newSearchCompleteTime = System.currentTimeMillis() - time;
 		System.out.println("Simple search : " + simpleSearchCompleteTime);
-		System.out.println("HelperDao search: " + newSearchCompleteTime);
+		System.out.println("HelperDAO search: " + newSearchCompleteTime);
 		assertTrue(simpleSearchCompleteTime > newSearchCompleteTime);
 	}
 

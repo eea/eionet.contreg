@@ -39,7 +39,7 @@ import org.quartz.SchedulerException;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dao.HarvestSourceDAO;
-import eionet.cr.dao.ISearchDao;
+import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.HarvestDTO;
 import eionet.cr.dto.HarvestSourceDTO;
@@ -179,7 +179,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     private void populateSampleTriples() throws SearchException{
     	Pair<Integer, List<RawTripleDTO>> temp;
 		try {
-			temp = MySQLDAOFactory.get().getDao(ISearchDao.class).getSampleTriples(harvestSource.getUrl(), 10);
+			temp = MySQLDAOFactory.get().getDao(SearchDAO.class).getSampleTriples(harvestSource.getUrl(), 10);
 		} catch (DAOException e) {
 			throw new SearchException("exception while getting sample triplets ", e);
 		}

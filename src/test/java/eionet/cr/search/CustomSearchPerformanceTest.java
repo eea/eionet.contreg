@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.Set;
 
 import junit.framework.TestCase;
-import eionet.cr.dao.ISearchDao;
+import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.PageRequest;
@@ -62,7 +62,7 @@ public class CustomSearchPerformanceTest extends TestCase {
 		Collection<SubjectDTO> list = search.getResultList();
 		startTime = System.currentTimeMillis();
 		Pair<Integer,List<SubjectDTO>> result = MySQLDAOFactory
-				.get().getDao(ISearchDao.class)
+				.get().getDao(SearchDAO.class)
 						.performCustomSearch(
 								getCriteria(),
 								literalPredicates,

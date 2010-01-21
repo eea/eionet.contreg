@@ -33,7 +33,7 @@ import net.sourceforge.stripes.validation.ValidationErrors;
 import net.sourceforge.stripes.validation.ValidationMethod;
 import eionet.cr.common.Predicates;
 import eionet.cr.dao.DAOException;
-import eionet.cr.dao.ISearchDao;
+import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
@@ -95,7 +95,7 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 
 				if (resultList == null || resultList.size() == 0) {
 					Pair<Integer, List<SubjectDTO>> result = 
-							MySQLDAOFactory.get().getDao(ISearchDao.class)
+							MySQLDAOFactory.get().getDao(SearchDAO.class)
 									.performSimpleSearch(
 											searchExpression,
 											new PageRequest(getPageN()),

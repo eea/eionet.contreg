@@ -41,7 +41,7 @@ public class MysqlHelperDaoTest extends TestCase {
 		
 		// TODO this test needs to be fixed by extending DBTestCase, and loading a dataset that contains 10 recently discovered resources
 		
-//		HelperDao dao = MySQLDAOFactory.get().getDao(HelperDao.class);
+//		HelperDAO dao = PostgreSQLDAOFactory.get().getDao(HelperDAO.class);
 //		List<Pair<String, String>> result = dao.getRecentlyDiscoveredFiles(10);
 //		Assert.assertNotNull(result);
 //		Assert.assertEquals(10, result.size());

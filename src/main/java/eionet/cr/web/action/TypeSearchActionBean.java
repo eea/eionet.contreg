@@ -45,7 +45,7 @@ import org.apache.commons.lang.StringUtils;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.dao.DAOException;
-import eionet.cr.dao.ISearchDao;
+import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
@@ -253,7 +253,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 				
 				Pair<Integer, List<SubjectDTO>> customSearch;
 				try {
-					customSearch = MySQLDAOFactory.get().getDao(ISearchDao.class)
+					customSearch = MySQLDAOFactory.get().getDao(SearchDAO.class)
 							.performCustomSearch(
 									criteria,
 									null,
@@ -451,7 +451,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 			
 			List<SubjectDTO> usedPredicates = null;
 			try {
-				usedPredicates = MySQLDAOFactory.get().getDao(ISearchDao.class).getPredicatesUsedForType(type);
+				usedPredicates = MySQLDAOFactory.get().getDao(SearchDAO.class).getPredicatesUsedForType(type);
 			} catch (DAOException e) {
 				throw new SearchException("Exception in type search action bean", e);
 			}

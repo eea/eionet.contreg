@@ -28,13 +28,13 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 
-import eionet.cr.dao.ISearchDao;
+import eionet.cr.dao.SearchDAO;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.URIUtil;
 import eionet.cr.web.util.columns.SubjectLastModifiedColumn;
 
 /**
- * Use {@link ISearchDao} performCustomSearch  method instead.
+ * Use {@link SearchDAO} performCustomSearch  method instead.
  * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *

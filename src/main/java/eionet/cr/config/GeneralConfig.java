@@ -22,6 +22,7 @@ package eionet.cr.config;
 
 import java.io.IOException;
 import java.util.Properties;
+import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -97,6 +98,12 @@ public class GeneralConfig {
 		try{
 			String s = GeneralConfig.class.getClassLoader().getResource(PROPERTIES_FILE_NAME).toString();
 			properties.load(GeneralConfig.class.getClassLoader().getResourceAsStream(PROPERTIES_FILE_NAME));
+			
+			// trim all the values (i.e. we don't allow preceding or trailing white space in property values)
+			for (Entry<Object,Object> entry : properties.entrySet()){
+				entry.setValue(entry.getValue().toString().trim());
+			}
+			
 		}
 		catch (IOException e){
 			logger.fatal("Failed to load properties from " + PROPERTIES_FILE_NAME, e);

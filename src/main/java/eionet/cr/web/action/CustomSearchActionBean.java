@@ -38,8 +38,8 @@ import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import eionet.cr.common.Predicates;
 import eionet.cr.dao.DAOException;
-import eionet.cr.dao.HelperDao;
-import eionet.cr.dao.ISearchDao;
+import eionet.cr.dao.HelperDAO;
+import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
@@ -130,7 +130,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 		long startTime = System.currentTimeMillis();
 		Pair<Integer, List<SubjectDTO>> result;
 		try {
-			result = MySQLDAOFactory.get().getDao(ISearchDao.class)
+			result = MySQLDAOFactory.get().getDao(SearchDAO.class)
 					.performCustomSearch(
 							buildSearchCriteria(),
 							getLiteralEnabledFilters(),
@@ -196,7 +196,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 			
 			String predicateUri = getAvailableFilters().get(addedFilter).getUri();
 			
-			boolean literalsEnabled = factory.getDao(ISearchDao.class).isAllowLiteralSearch(predicateUri);
+			boolean literalsEnabled = factory.getDao(SearchDAO.class).isAllowLiteralSearch(predicateUri);
 			if (literalsEnabled)
 				getLiteralEnabledFilters().add(predicateUri);
 			else
@@ -230,7 +230,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 		}
 	
 		if (picklist == null){
-			picklist = factory.getDao(HelperDao.class).getPicklistForPredicate(
+			picklist = factory.getDao(HelperDAO.class).getPicklistForPredicate(
 					getAvailableFilters().get(picklistFilter).getUri());
 		}
 		

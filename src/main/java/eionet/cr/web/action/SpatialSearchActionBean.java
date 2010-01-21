@@ -38,8 +38,8 @@ import org.apache.commons.logging.LogFactory;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.dao.DAOException;
-import eionet.cr.dao.HelperDao;
-import eionet.cr.dao.ISearchDao;
+import eionet.cr.dao.HelperDAO;
+import eionet.cr.dao.SearchDAO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.SpatialSearch;
@@ -216,7 +216,7 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
 	public Resolution kmlLinks() throws SearchException {
 		
 		try {
-			sources = factory.getDao(ISearchDao.class).performSpatialSourcesSearch();
+			sources = factory.getDao(SearchDAO.class).performSpatialSourcesSearch();
 		}
 		catch (DAOException e){
 			throw new SearchException(e.toString(), e);
