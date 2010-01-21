@@ -70,4 +70,5 @@ public interface SearchDAO extends DAO{
 			Set<String> literalPredicates,
 			PagingRequest pagingRequest,
 			SortingRequest sortingRequest) throws DAOException;
+
 }

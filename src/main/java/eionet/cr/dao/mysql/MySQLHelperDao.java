@@ -14,6 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringUtils;
@@ -26,6 +27,10 @@ import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.RawTripleDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
+import eionet.cr.search.util.PredicateLabels;
+import eionet.cr.search.util.PredicateLabelsReader;
+import eionet.cr.search.util.SubProperties;
+import eionet.cr.search.util.SubPropertiesReader;
 import eionet.cr.search.util.SubjectDataReader;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
@@ -639,5 +644,70 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 		params.add(Hashes.spoHash(Predicates.RDF_TYPE));
 		params.add(Hashes.spoHash(Subjects.WGS_POINT));
 		return executeQuery(sql, params, new SingleObjectReader<String>());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#getSubject(java.lang.String)
+	 */
+	public SubjectDTO getSubject(Long subjectHash) throws DAOException {
+		
+		if (subjectHash==null){
+			return null;
+		}
+		
+		Map<Long,SubjectDTO> map = new LinkedHashMap<Long, SubjectDTO>();
+		map.put(subjectHash, null);
+		
+		List<SubjectDTO> subjects = executeQuery(getSubjectsDataQuery(map.keySet()),
+				null, new SubjectDataReader(map));
+		
+		return subjects==null || subjects.isEmpty() ? null : subjects.get(0);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#getPredicateLabels(java.util.Set)
+	 */
+	public PredicateLabels getPredicateLabels(Set<Long> subjectHashes) throws DAOException {
+		
+		PredicateLabels predLabels = new PredicateLabels();
+		if (subjectHashes!=null && !subjectHashes.isEmpty()){
+			
+			StringBuffer sqlBuf = new StringBuffer().
+			append("select RESOURCE.URI as PREDICATE_URI, SPO.OBJECT as LABEL, SPO.OBJ_LANG as LANG").
+			append(" from SPO, RESOURCE").
+			append(" where SPO.SUBJECT in (").append(Util.toCSV(subjectHashes)).append(")").
+			append(" and SPO.PREDICATE=").append(Hashes.spoHash(Predicates.RDFS_LABEL)).
+			append(" and SPO.LIT_OBJ='Y'").
+			append(" and SPO.SUBJECT=RESOURCE.URI_HASH");
+			
+			executeQuery(sqlBuf.toString(), new PredicateLabelsReader(predLabels));
+		}
+		
+		return predLabels;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#getSubProperties(java.util.Set)
+	 */
+	public SubProperties getSubProperties(Set<Long> subjectHashes) throws DAOException {
+		
+		SubProperties subProperties = new SubProperties();
+		if (subjectHashes!=null && !subjectHashes.isEmpty()){
+			
+			StringBuffer sqlBuf = new StringBuffer().
+			append("select distinct SPO.OBJECT as PREDICATE, RESOURCE.URI as SUB_PROPERTY").
+			append(" from SPO, RESOURCE").
+			append(" where SPO.OBJECT_HASH in (").append(Util.toCSV(subjectHashes)).append(")").
+			append(" and SPO.PREDICATE=").append(Hashes.spoHash(Predicates.RDFS_SUBPROPERTY_OF)).
+			append(" and SPO.LIT_OBJ='N' and SPO.ANON_OBJ='N'").
+			append(" and SPO.SUBJECT=RESOURCE.URI_HASH");
+
+			executeQuery(sqlBuf.toString(), new SubPropertiesReader(subProperties));
+		}
+		
+		return subProperties;
 	}
 }

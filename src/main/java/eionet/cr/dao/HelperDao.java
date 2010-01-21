@@ -2,6 +2,8 @@
 
 package eionet.cr.dao;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -11,7 +13,10 @@ import java.util.Set;
 import eionet.cr.dto.RawTripleDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
+import eionet.cr.search.util.PredicateLabels;
 import eionet.cr.search.util.SearchExpression;
+import eionet.cr.search.util.SubProperties;
+import eionet.cr.search.util.SubjectDataReader;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
 
@@ -111,4 +116,27 @@ public interface HelperDAO extends DAO {
 	 */
 	List<String> getSpatialSources() throws DAOException;
 
+	/**
+	 * 
+	 * @param subjectHash
+	 * @return
+	 * @throws DAOException
+	 */
+	SubjectDTO getSubject(Long subjectHash) throws DAOException;
+	
+	/**
+	 * 
+	 * @param subjectHashes
+	 * @return
+	 * @throws DAOException
+	 */
+	PredicateLabels getPredicateLabels(Set<Long> subjectHashes) throws DAOException;
+	
+	/**
+	 * 
+	 * @param subjectHashes
+	 * @return
+	 * @throws DAOException
+	 */
+	SubProperties getSubProperties(Set<Long> subjectHashes) throws DAOException;
 }

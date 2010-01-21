@@ -23,12 +23,15 @@ package eionet.cr.dao.postgre;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dto.RawTripleDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
+import eionet.cr.search.util.PredicateLabels;
+import eionet.cr.search.util.SubProperties;
 import eionet.cr.util.Pair;
 
 /**
@@ -102,6 +105,23 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 	}
 
 	public List<String> getSpatialSources() throws DAOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public SubjectDTO getSubject(Long subjectHash) throws DAOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public PredicateLabels getPredicateLabels(Set<Long> subjectHashes)
+			throws DAOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public SubProperties getSubProperties(Set<Long> subjectHashes)
+			throws DAOException {
 		// TODO Auto-generated method stub
 		return null;
 	}

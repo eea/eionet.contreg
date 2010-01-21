@@ -33,6 +33,7 @@ import eionet.cr.util.Pair;
 import eionet.cr.util.Util;
 import eionet.cr.util.sql.ConnectionUtil;
 import eionet.cr.util.sql.MySQLUtil;
+import eionet.cr.util.sql.ResultSetBaseReader;
 import eionet.cr.util.sql.ResultSetListReader;
 import eionet.cr.util.sql.SQLUtil;
 
@@ -96,7 +97,27 @@ public abstract class MySQLBaseDAO {
 			ConnectionUtil.closeConnection(conn);
 		}
 	}
-	
+
+	/**
+	 * 
+	 * @param sql
+	 * @param reader
+	 * @throws DAOException
+	 */
+	protected void executeQuery(String sql, ResultSetBaseReader reader) throws DAOException {
+		Connection conn = null;
+		try {
+			conn = getConnection();
+			SQLUtil.executeQuery(sql, reader, conn);
+		}
+		catch (Exception e){
+			throw new DAOException(e.getMessage(), e);
+		}
+		finally{
+			ConnectionUtil.closeConnection(conn);
+		}
+	}
+
 	/**
 	 * executes insert or update with given sql and parameters.
 	 * 
