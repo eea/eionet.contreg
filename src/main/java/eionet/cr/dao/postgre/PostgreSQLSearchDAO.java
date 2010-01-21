@@ -20,6 +20,7 @@
 * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.dao.postgre;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -75,6 +76,11 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 	}
 
 	public List<String> performSpatialSourcesSearch() throws DAOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public String getSubjectsDataQuery(Collection<Long> subjectHashes) {
 		// TODO Auto-generated method stub
 		return null;
 	}

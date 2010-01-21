@@ -151,32 +151,13 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 				hitSources.put(subjectHash.getLeft(),subjectHash.getRight());
 			}
 			SubjectDataReader reader = new SimpleSearchDataReader(temp, hitSources);
-			executeQuery(getDataInitQuery(temp.keySet()), null, reader);
+			executeQuery(getSubjectsDataQuery(temp.keySet()), null, reader);
 		}
 		logger.debug("subject data select query took " + (System.currentTimeMillis()-time) + " ms");
 			                                         
 		return new Pair<Integer, List<SubjectDTO>>(result.getRight(), new LinkedList<SubjectDTO>(temp.values()));
 	}
 	
-	private String getDataInitQuery(Collection<Long> subjectHashes){
-		StringBuffer buf = new StringBuffer().
-		append("select distinct ").
-			append("SUBJECT as SUBJECT_HASH, SUBJ_RESOURCE.URI as SUBJECT_URI, SUBJ_RESOURCE.LASTMODIFIED_TIME as SUBJECT_MODIFIED, ").
-			append("PREDICATE as PREDICATE_HASH, PRED_RESOURCE.URI as PREDICATE_URI, ").
-			append("OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG, OBJ_SOURCE_OBJECT, OBJ_DERIV_SOURCE, SOURCE, ").
-			append("SRC_RESOURCE.URI as SOURCE_URI, DSRC_RESOURCE.URI as DERIV_SOURCE_URI ").
-		append("from SPO ").
-			append("left join RESOURCE as SUBJ_RESOURCE on (SUBJECT=SUBJ_RESOURCE.URI_HASH) ").
-			append("left join RESOURCE as PRED_RESOURCE on (PREDICATE=PRED_RESOURCE.URI_HASH) ").
-			append("left join RESOURCE as SRC_RESOURCE on (SOURCE=SRC_RESOURCE.URI_HASH) ").
-			append("left join RESOURCE as DSRC_RESOURCE on (OBJ_DERIV_SOURCE=DSRC_RESOURCE.URI_HASH) ").
-		append("where ").
-			append("SUBJECT in (").append(Util.toCSV(subjectHashes)).append(") ").  
-		append("order by ").
-			append("SUBJECT, PREDICATE, OBJECT");
-		return buf.toString();
-	}
-
 	/** 
 	 * @see eionet.cr.dao.SearchDAO#performCustomSearch(java.util.Map, java.util.Set, int, eionet.cr.util.SortingRequest)
 	 * {@inheritDoc}
@@ -259,7 +240,7 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 			temp.put(hash, null);
 		}
 		
-		List<SubjectDTO> subjects = executeQuery(getDataInitQuery(temp.keySet()), null, new SubjectDataReader(temp));
+		List<SubjectDTO> subjects = executeQuery(getSubjectsDataQuery(temp.keySet()), null, new SubjectDataReader(temp));
 		return new Pair<Integer,List<SubjectDTO>>(subjectHashes.getRight(), subjects);
 	}
 
@@ -368,7 +349,7 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 			for (Long hash : predicateUris) {
 				subjectsMap.put(hash, null);
 			}
-			executeQuery(getDataInitQuery(subjectsMap.keySet()), null, new SubjectDataReader(subjectsMap));
+			executeQuery(getSubjectsDataQuery(subjectsMap.keySet()), null, new SubjectDataReader(subjectsMap));
 			
 			// since a used predicate may not appear as a subject in SPO, there might unfound SubjectDTO objects 
 			HashSet<Long> unfoundSubjects = new HashSet<Long>();
@@ -438,5 +419,29 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 		}
 		
 		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.SearchDAO#getSubjectsLoadQuery(java.util.Collection)
+	 */
+	public String getSubjectsDataQuery(Collection<Long> subjectHashes) {
+
+		StringBuffer buf = new StringBuffer().
+		append("select distinct ").
+		append("SUBJECT as SUBJECT_HASH, SUBJ_RESOURCE.URI as SUBJECT_URI, SUBJ_RESOURCE.LASTMODIFIED_TIME as SUBJECT_MODIFIED, ").
+		append("PREDICATE as PREDICATE_HASH, PRED_RESOURCE.URI as PREDICATE_URI, ").
+		append("OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG, OBJ_SOURCE_OBJECT, OBJ_DERIV_SOURCE, SOURCE, ").
+		append("SRC_RESOURCE.URI as SOURCE_URI, DSRC_RESOURCE.URI as DERIV_SOURCE_URI ").
+		append("from SPO ").
+		append("left join RESOURCE as SUBJ_RESOURCE on (SUBJECT=SUBJ_RESOURCE.URI_HASH) ").
+		append("left join RESOURCE as PRED_RESOURCE on (PREDICATE=PRED_RESOURCE.URI_HASH) ").
+		append("left join RESOURCE as SRC_RESOURCE on (SOURCE=SRC_RESOURCE.URI_HASH) ").
+		append("left join RESOURCE as DSRC_RESOURCE on (OBJ_DERIV_SOURCE=DSRC_RESOURCE.URI_HASH) ").
+		append("where ").
+		append("SUBJECT in (").append(Util.toCSV(subjectHashes)).append(") ").  
+		append("order by ").
+		append("SUBJECT, PREDICATE, OBJECT");
+		return buf.toString();
 	}
 }

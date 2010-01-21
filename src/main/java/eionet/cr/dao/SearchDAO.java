@@ -20,6 +20,7 @@
  */
 package eionet.cr.dao;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -103,4 +104,11 @@ public interface SearchDAO extends DAO{
 	 * @throws DAOException
 	 */
 	List<SubjectDTO> getPredicatesUsedForType(String typeUri) throws DAOException;
+	
+	/**
+	 * 
+	 * @param subjectHashes
+	 * @return
+	 */
+	String getSubjectsDataQuery(Collection<Long> subjectHashes);
 }
