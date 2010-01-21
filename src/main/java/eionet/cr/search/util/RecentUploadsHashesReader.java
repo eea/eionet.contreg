@@ -28,13 +28,13 @@ import java.util.Map;
 public class RecentUploadsHashesReader extends SubjectHashesReader {
 
 	/** */
-	private Map<String,Date> firstSeenTimes;
+	private Map<Long,Date> firstSeenTimes;
 
 	/**
 	 * 
 	 * @param firstSeenTimes
 	 */
-	public RecentUploadsHashesReader(Map<String,Date> firstSeenTimes){
+	public RecentUploadsHashesReader(Map<Long,Date> firstSeenTimes){
 		
 		super();
 		
@@ -49,6 +49,6 @@ public class RecentUploadsHashesReader extends SubjectHashesReader {
 	 */
 	public void readRow(ResultSet rs) throws SQLException{
 		super.readRow(rs);
-		firstSeenTimes.put(rs.getString("SUBJECT_HASH"), new Date(rs.getLong("FIRSTSEEN_TIME")));
+		firstSeenTimes.put(Long.valueOf(rs.getLong("SUBJECT_HASH")), new Date(rs.getLong("FIRSTSEEN_TIME")));
 	}
 }

@@ -93,7 +93,7 @@ public abstract class AbstractSubjectSearch {
 				
 				/* get the result-map */
 				
-				LinkedHashMap<String, SubjectDTO> subjectsMap =
+				LinkedHashMap<Long,SubjectDTO> subjectsMap =
 //					!getSubjectSelectMode().equals(SubjectSelectMode.SERVER) ? subjectHashesReader.getResultMap() :
 							subjectHashesReader.getResultMap(pageNumber, pageLength);
 
@@ -262,7 +262,7 @@ public abstract class AbstractSubjectSearch {
 	 * @param subjectsMap
 	 * @return
 	 */
-	protected SubjectDataReader createSubjectDataReader(Map<String, SubjectDTO> subjectsMap){
+	protected SubjectDataReader createSubjectDataReader(Map<Long,SubjectDTO> subjectsMap){
 		return new SubjectDataReader(subjectsMap);
 	}
 

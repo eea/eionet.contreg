@@ -41,7 +41,7 @@ import eionet.cr.util.sql.ResultSetBaseReader;
 public class SubjectHashesReader extends ResultSetBaseReader{
 	
 	/** */
-	private LinkedHashSet<String> resultSet = new LinkedHashSet<String>();
+	private LinkedHashSet<Long> resultSet = new LinkedHashSet<Long>();
 	
 	/*
 	 * (non-Javadoc)
@@ -49,8 +49,8 @@ public class SubjectHashesReader extends ResultSetBaseReader{
 	 */
 	public void readRow(ResultSet rs) throws SQLException{
 		
-		String subjectHash = rs.getString("SUBJECT_HASH");
-		resultSet.add(subjectHash);
+		long subjectHash = rs.getLong("SUBJECT_HASH");
+		resultSet.add(Long.valueOf(subjectHash));
 	}
 	
 	/**
@@ -59,11 +59,11 @@ public class SubjectHashesReader extends ResultSetBaseReader{
 	 * @param pageLength
 	 * @return
 	 */
-	public LinkedHashMap<String,SubjectDTO> getResultMap(){
+	public LinkedHashMap<Long,SubjectDTO> getResultMap(){
 		
-		LinkedHashMap<String, SubjectDTO> result = new LinkedHashMap<String, SubjectDTO>();
-		for (Iterator<String> it=resultSet.iterator(); it.hasNext();){
-			result.put(it.next(), (SubjectDTO)null);					
+		LinkedHashMap<Long,SubjectDTO> result = new LinkedHashMap<Long,SubjectDTO>();
+		for (Iterator<Long> it=resultSet.iterator(); it.hasNext();){
+			result.put(it.next(), (SubjectDTO)null);
 		}
 		
 		return result;
@@ -72,9 +72,9 @@ public class SubjectHashesReader extends ResultSetBaseReader{
 	/**
 	 * @return the resultMap
 	 */
-	public LinkedHashMap<String,SubjectDTO> getResultMap(int pageNumber, int pageLength){
+	public LinkedHashMap<Long,SubjectDTO> getResultMap(int pageNumber, int pageLength){
 		
-		LinkedHashMap<String,SubjectDTO> pageMap = new LinkedHashMap<String,SubjectDTO>();
+		LinkedHashMap<Long,SubjectDTO> pageMap = new LinkedHashMap<Long,SubjectDTO>();
 		if (resultSet.size()>0){
 		
 			/* calculate first and last index of the requested page */
@@ -99,9 +99,9 @@ public class SubjectHashesReader extends ResultSetBaseReader{
 			/* populate page map */
 			
 			int i = 0;
-			for (Iterator<String> it=resultSet.iterator(); it.hasNext() && i<lastIndexExclusive; i++){
+			for (Iterator<Long> it=resultSet.iterator(); it.hasNext() && i<lastIndexExclusive; i++){
 				
-				String subjectHash = it.next();
+				Long subjectHash = it.next();
 				if (i>=firstIndexInclusive){
 					pageMap.put(subjectHash, (SubjectDTO)null);					
 				}

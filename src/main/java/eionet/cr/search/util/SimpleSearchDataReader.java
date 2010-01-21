@@ -27,13 +27,13 @@ import eionet.cr.dto.SubjectDTO;
 public class SimpleSearchDataReader extends SubjectDataReader {
 
 	/** */
-	private Map<String,Long> hitSources;
+	private Map<Long,Long> hitSources;
 	
 	/**
 	 * 
 	 * @param subjectsMap
 	 */
-	public SimpleSearchDataReader(Map<String,SubjectDTO> subjectsMap, Map<String,Long> hitSources){
+	public SimpleSearchDataReader(Map<Long,SubjectDTO> subjectsMap, Map<Long,Long> hitSources){
 		
 		super(subjectsMap);
 		this.hitSources = hitSources;
@@ -43,12 +43,12 @@ public class SimpleSearchDataReader extends SubjectDataReader {
 	 * (non-Javadoc)
 	 * @see eionet.cr.search.util.SubjectDataReader#addNewSubject(java.lang.String, eionet.cr.dto.SubjectDTO)
 	 */
-	protected void addNewSubject(String subjectHash, SubjectDTO subjectDTO){
+	protected void addNewSubject(long subjectHash, SubjectDTO subjectDTO){
 		
-		super.addNewSubject(subjectHash, subjectDTO);
+		super.addNewSubject(Long.valueOf(subjectHash), subjectDTO);
 		
 		if (hitSources!=null){
-			subjectDTO.setHitSource(Long.valueOf(hitSources.get(subjectHash)));
+			subjectDTO.setHitSource(Long.valueOf(hitSources.get(Long.valueOf(subjectHash))));
 		}
 	}
 }

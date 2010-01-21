@@ -42,7 +42,7 @@ import eionet.cr.util.sql.ResultSetListReader;
 public class SubjectDataReader extends ResultSetListReader<SubjectDTO>{
 
 	/** */
-	private Map<String,SubjectDTO> subjectsMap;
+	private Map<Long,SubjectDTO> subjectsMap;
 	
 	/** */
 	private SubjectDTO currentSubject = null;
@@ -54,7 +54,7 @@ public class SubjectDataReader extends ResultSetListReader<SubjectDTO>{
 	 * 
 	 * @param subjectsMap
 	 */
-	public SubjectDataReader(Map<String,SubjectDTO> subjectsMap){
+	public SubjectDataReader(Map<Long,SubjectDTO> subjectsMap){
 		this.subjectsMap = subjectsMap;
 	}
 	
@@ -70,7 +70,7 @@ public class SubjectDataReader extends ResultSetListReader<SubjectDTO>{
 			currentSubject = new SubjectDTO(rs.getString("SUBJECT_URI"), YesNoBoolean.parse(rs.getString("ANON_SUBJ")));
 			currentSubject.setUriHash(subjectHash);
 			currentSubject.setLastModifiedTime(new Date(rs.getLong("SUBJECT_MODIFIED")));
-			addNewSubject(String.valueOf(subjectHash), currentSubject);
+			addNewSubject(subjectHash, currentSubject);
 		}
 		
 		String predicateUri = rs.getString("PREDICATE_URI");
@@ -102,8 +102,8 @@ public class SubjectDataReader extends ResultSetListReader<SubjectDTO>{
 	 * @param subjectHash
 	 * @param subjectDTO
 	 */
-	protected void addNewSubject(String subjectHash, SubjectDTO subjectDTO){
-		subjectsMap.put(subjectHash, currentSubject);
+	protected void addNewSubject(long subjectHash, SubjectDTO subjectDTO){
+		subjectsMap.put(Long.valueOf(subjectHash), currentSubject);
 	}
 	
 	/**

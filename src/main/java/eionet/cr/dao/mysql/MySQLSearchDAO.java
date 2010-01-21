@@ -142,13 +142,13 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 				selectQuery.toString(),
 				searchParams,
 				new PairReader<Long,Long>());
-		Map<String, SubjectDTO> temp = new LinkedHashMap<String, SubjectDTO>();
+		Map<Long,SubjectDTO> temp = new LinkedHashMap<Long,SubjectDTO>();
 		if (result != null && !result.getLeft().isEmpty()) {
 
-			Map<String, Long> hitSources = new HashMap<String, Long>();
+			Map<Long,Long> hitSources = new HashMap<Long,Long>();
 			for (Pair<Long,Long> subjectHash : result.getLeft()) {
-				temp.put(subjectHash.getLeft() + "", null);
-				hitSources.put(subjectHash.getLeft() + "", subjectHash.getRight());
+				temp.put(subjectHash.getLeft(), null);
+				hitSources.put(subjectHash.getLeft(),subjectHash.getRight());
 			}
 			SubjectDataReader reader = new SimpleSearchDataReader(temp, hitSources);
 			executeQuery(getDataInitQuery(temp.keySet()), null, reader);
@@ -158,7 +158,7 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 		return new Pair<Integer, List<SubjectDTO>>(result.getRight(), new LinkedList<SubjectDTO>(temp.values()));
 	}
 	
-	private String getDataInitQuery(Collection<String> subjectHashes) {
+	private String getDataInitQuery(Collection<Long> subjectHashes){
 		StringBuffer buf = new StringBuffer().
 		append("select distinct ").
 			append("SUBJECT as SUBJECT_HASH, SUBJ_RESOURCE.URI as SUBJECT_URI, SUBJ_RESOURCE.LASTMODIFIED_TIME as SUBJECT_MODIFIED, ").
@@ -254,9 +254,9 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 		if(subjectHashes == null || subjectHashes.getRight() == 0) {
 			return new Pair<Integer,List<SubjectDTO>>(0, new LinkedList<SubjectDTO>());
 		}
-		Map<String, SubjectDTO> temp = new LinkedHashMap<String, SubjectDTO>();
+		Map<Long,SubjectDTO> temp = new LinkedHashMap<Long, SubjectDTO>();
 		for (Long hash : subjectHashes.getLeft()) {
-			temp.put(hash + "", null);
+			temp.put(hash, null);
 		}
 		
 		List<SubjectDTO> subjects = executeQuery(getDataInitQuery(temp.keySet()), null, new SubjectDataReader(temp));
@@ -364,15 +364,15 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 		}
 		else{
 			// get the SubjectDTO objects of the found predicates
-			Map<String, SubjectDTO> subjectsMap = new HashMap<String, SubjectDTO>();
+			Map<Long,SubjectDTO> subjectsMap = new HashMap<Long,SubjectDTO>();
 			for (Long hash : predicateUris) {
-				subjectsMap.put(hash + "", null);
+				subjectsMap.put(hash, null);
 			}
 			executeQuery(getDataInitQuery(subjectsMap.keySet()), null, new SubjectDataReader(subjectsMap));
 			
 			// since a used predicate may not appear as a subject in SPO, there might unfound SubjectDTO objects 
-			HashSet<String> unfoundSubjects = new HashSet<String>();
-			for (Entry<String,SubjectDTO> entry : subjectsMap.entrySet()){
+			HashSet<Long> unfoundSubjects = new HashSet<Long>();
+			for (Entry<Long,SubjectDTO> entry : subjectsMap.entrySet()){
 				if (entry.getValue()==null){
 					unfoundSubjects.add(entry.getKey());
 				}
@@ -381,8 +381,8 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 			// if there were indeed any unfound SubjectDTO objects, find URIs for those predicates
 			// and create dummy SubjectDTO objects from those URIs
 			if (!unfoundSubjects.isEmpty()){
-				Map<String,String> resourceUris = getResourceUris(unfoundSubjects);
-				for (Entry<String,SubjectDTO> entry : subjectsMap.entrySet()){
+				Map<Long,String> resourceUris = getResourceUris(unfoundSubjects);
+				for (Entry<Long,SubjectDTO> entry : subjectsMap.entrySet()){
 					if (entry.getValue()==null){
 						String uri = resourceUris.get(entry.getKey());
 						if (!StringUtils.isBlank(uri)){
@@ -394,7 +394,7 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 			}
 			
 			// clean the subjectsMap of unfound subjects 
-			for (String hash : unfoundSubjects){
+			for (Long hash : unfoundSubjects){
 				subjectsMap.remove(hash);
 			}
 			
@@ -408,12 +408,12 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 	 * @return
 	 * @throws DAOException 
 	 */
-	private Map<String,String> getResourceUris(HashSet<String> resourceHashes) throws DAOException{
+	private Map<Long,String> getResourceUris(HashSet<Long> resourceHashes) throws DAOException{
 		
 		StringBuffer buf = new StringBuffer().
 		append("select URI_HASH, URI from RESOURCE where URI_HASH in (").append(Util.toCSV(resourceHashes)).append(")");
 		
-		HashMap<String,String> result = new HashMap<String,String>();
+		HashMap<Long,String> result = new HashMap<Long,String>();
 		Connection conn = null;
 		Statement stmt = null;
 		ResultSet rs = null;
@@ -424,7 +424,7 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 			while (rs.next()){
 				String uri = rs.getString("URI");
 				if (!StringUtils.isBlank(uri)){
-					result.put(rs.getString("URI_HASH"), uri);
+					result.put(Long.valueOf(rs.getLong("URI_HASH")), uri);
 				}
 			}
 		}

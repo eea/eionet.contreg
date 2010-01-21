@@ -45,7 +45,7 @@ public class RecentUploadsSearch extends AbstractSubjectSearch {
 	
 	/** */
 	private String subjectType;
-	private Map<String,Date> firstSeenTimes = new HashMap<String,Date>();
+	private Map<Long,Date> firstSeenTimes = new HashMap<Long,Date>();
 	
 	/**
 	 * 
@@ -88,7 +88,7 @@ public class RecentUploadsSearch extends AbstractSubjectSearch {
 	 * (non-Javadoc)
 	 * @see eionet.cr.search.AbstractSubjectSearch#createSubjectDataReader(java.util.Map)
 	 */
-	protected SubjectDataReader createSubjectDataReader(Map<String, SubjectDTO> subjectsMap){
+	protected SubjectDataReader createSubjectDataReader(Map<Long,SubjectDTO> subjectsMap){
 		return new RecentUploadsDataReader(subjectsMap, firstSeenTimes);
 	}
 }

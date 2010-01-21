@@ -33,13 +33,13 @@ import eionet.cr.dto.SubjectDTO;
 public class RecentUploadsDataReader extends SubjectDataReader {
 
 	/** */
-	private Map<String,Date> firstSeenTimes;
+	private Map<Long,Date> firstSeenTimes;
 	
 	/**
 	 * 
 	 * @param subjectsMap
 	 */
-	public RecentUploadsDataReader(Map<String,SubjectDTO> subjectsMap, Map<String,Date> firstSeenTimes){
+	public RecentUploadsDataReader(Map<Long,SubjectDTO> subjectsMap, Map<Long,Date> firstSeenTimes){
 		
 		super(subjectsMap);
 		
@@ -52,9 +52,9 @@ public class RecentUploadsDataReader extends SubjectDataReader {
 	 * (non-Javadoc)
 	 * @see eionet.cr.search.util.SubjectDataReader#addNewSubject(java.lang.String, eionet.cr.dto.SubjectDTO)
 	 */
-	protected void addNewSubject(String subjectHash, SubjectDTO subjectDTO){
+	protected void addNewSubject(long subjectHash, SubjectDTO subjectDTO){
 		
-		super.addNewSubject(subjectHash, subjectDTO);
-		subjectDTO.setFirstSeenTime(firstSeenTimes.get(subjectHash));
+		super.addNewSubject(Long.valueOf(subjectHash), subjectDTO);
+		subjectDTO.setFirstSeenTime(firstSeenTimes.get(Long.valueOf(subjectHash)));
 	}
 }
