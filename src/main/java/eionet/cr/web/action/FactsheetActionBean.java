@@ -44,6 +44,7 @@ import org.apache.commons.lang.StringUtils;
 import eionet.cr.common.Predicates;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
+import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dto.HarvestSourceDTO;
@@ -51,10 +52,10 @@ import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.InstantHarvester;
-import eionet.cr.search.FactsheetSearch;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.util.SubProperties;
 import eionet.cr.search.util.UriLabelPair;
+import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
 import eionet.cr.util.URLUtil;
 import eionet.cr.web.util.FactsheetObjectId;
@@ -93,28 +94,27 @@ public class FactsheetActionBean extends AbstractActionBean{
 	/**
 	 * 
 	 * @return
-	 * @throws SearchException
+	 * @throws DAOException TODO
 	 */
 	@DefaultHandler
-	public Resolution view() throws SearchException{
+	public Resolution view() throws DAOException{
 		
 		if (StringUtils.isBlank(uri) && uriHash==0){
 			noCriteria = true;
 			addCautionMessage("Resource identifier not specified!");
 		}
 		else {
-			FactsheetSearch factsheetSearch = uriHash==0 ? new FactsheetSearch(uri) : new FactsheetSearch(uriHash);
-			factsheetSearch.execute();
-			Collection<SubjectDTO> coll = factsheetSearch.getResultList();
-			if (coll!=null && !coll.isEmpty()){
-				subject = coll.iterator().next();
-				if (subject != null) {
-					uri = subject.getUri();
-					uriHash = subject.getUriHash();
-				}
+			HelperDAO helperDAO = DAOFactory.get().getDao(HelperDAO.class);
+			Long subjectHash = uriHash==0 ? Hashes.spoHash(uri) : uriHash;
+			subject = helperDAO.getSubject(subjectHash);
+			if (subject!=null) {
+				uri = subject.getUri();
+				uriHash = subject.getUriHash();
 			}
-			predicateLabels = factsheetSearch.getPredicateLabels().getByLanguages(getAcceptedLanguages());
-			subProperties = factsheetSearch.getSubProperties();
+			
+			predicateLabels = helperDAO.getPredicateLabels(
+					Collections.singleton(subjectHash)).getByLanguages(getAcceptedLanguages());
+			subProperties = helperDAO.getSubProperties(Collections.singleton(subjectHash));
 		}
 		
 		return new ForwardResolution("/pages/factsheet.jsp");
@@ -208,9 +208,9 @@ public class FactsheetActionBean extends AbstractActionBean{
 	/**
 	 * 
 	 * @return
-	 * @throws SearchException
+	 * @throws DAOException
 	 */
-	public Resolution edit() throws SearchException{
+	public Resolution edit() throws DAOException{
 		
 		return view();
 	}

@@ -34,14 +34,14 @@
 			    <ul>
 			    	<c:forEach items="${actionBean.sourceTypes}" var="loopItem">
 						<c:choose>
-					  		<c:when test="${actionBean.type==loopItem.id}" > 
-								<li id="currenttab"><span><c:out value="${loopItem.value}"/></span></li>
+					  		<c:when test="${actionBean.type==loopItem.left}" > 
+								<li id="currenttab"><span><c:out value="${loopItem.right}"/></span></li>
 							</c:when>
 							<c:otherwise>
 								<li>
 									<stripes:link href="${actionBean.urlBinding}">
-										<c:out value="${loopItem.value}"/>
-						                <stripes:param name="type" value="${loopItem.id}"/>
+										<c:out value="${loopItem.right}"/>
+						                <stripes:param name="type" value="${loopItem.left}"/>
 						                <stripes:param name="searchString" value="${actionBean.searchString }"/>
 						            </stripes:link>
 					            </li>

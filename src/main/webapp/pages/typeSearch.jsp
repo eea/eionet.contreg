@@ -23,7 +23,7 @@
 		<crfn:form action="/typeSearch.action" method="get">
 			<stripes:select name="type">
 				<c:forEach items="${actionBean.availableTypes }" var="type">
-					<stripes:option value="${type.id}">${type.value} (${type.id})</stripes:option>
+					<stripes:option value="${type.left}">${type.right} (${type.right})</stripes:option>
 				</c:forEach>
 			</stripes:select>
 			<stripes:submit name="search" value="Search" /> 
@@ -84,9 +84,9 @@
 								<c:forEach items="${actionBean.displayFilters}" var="filter">
 									<tr>
 										<td>${filter.key}</td>
-										<td><stripes:text name="selectedFilters[${filter.value.id}]" size="40" value="${filter.value.value}"/></td>
+										<td><stripes:text name="selectedFilters[${filter.value.left}]" size="40" value="${filter.value.right}"/></td>
 										<td>
-											<stripes:submit name="removeFilter_${filter.value.id}" value="-"/>
+											<stripes:submit name="removeFilter_${filter.value.left}" value="-"/>
 										</td>
 									</tr>
 								</c:forEach>

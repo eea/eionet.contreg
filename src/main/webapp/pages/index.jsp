@@ -37,13 +37,13 @@
 				<ul class="menu">
 				<c:forEach items="${actionBean.recentFiles}" var="recentFile">
 						<li>
-							<a href="factsheet.action?uriHash=${recentFile.id }" title="${recentFile.value }">
+							<a href="factsheet.action?uriHash=${recentFile.left }" title="${recentFile.right }">
 							<c:choose>
-								<c:when test="${fn:length(recentFile.value) gt 38}">
-									${fn:substring(recentFile.value,0,35)}...
+								<c:when test="${fn:length(recentFile.right) gt 38}">
+									${fn:substring(recentFile.right,0,35)}...
 								</c:when>
 								<c:otherwise>
-									${recentFile.value}
+									${recentFile.right}
 								</c:otherwise>
 							</c:choose>
 							</a>

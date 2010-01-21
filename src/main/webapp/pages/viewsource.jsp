@@ -16,13 +16,13 @@
 			    <ul>
 			    	<c:forEach items="${actionBean.tabs}" var="loopItem">
 						<c:choose>
-					  		<c:when test="${actionBean.selectedTab == loopItem.id}" > 
-								<li id="currenttab"><span><c:out value="${loopItem.value}"/></span></li>
+					  		<c:when test="${actionBean.selectedTab == loopItem.left}" > 
+								<li id="currenttab"><span><c:out value="${loopItem.right}"/></span></li>
 							</c:when>
 							<c:otherwise>
 								<li>
-									<stripes:link href="${actionBean.urlBinding}" event="${loopItem.id}">
-										<c:out value="${loopItem.value}"/>
+									<stripes:link href="${actionBean.urlBinding}" event="${loopItem.left}">
+										<c:out value="${loopItem.right}"/>
 						                <stripes:param name="harvestSource.url" value="${actionBean.harvestSource.url }"/>
 						            </stripes:link>
 					            </li>
