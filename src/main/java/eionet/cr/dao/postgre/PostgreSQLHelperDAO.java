@@ -26,6 +26,7 @@ import java.util.List;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HelperDAO;
+import eionet.cr.dto.RawTripleDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
 import eionet.cr.util.Pair;
@@ -76,4 +77,32 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#isAllowLiteralSearch(java.lang.String)
+	 */
+	public boolean isAllowLiteralSearch(String predicateUri) throws SearchException {
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#getPredicatesUsedForType(java.lang.String)
+	 */
+	public List<SubjectDTO> getPredicatesUsedForType(String typeUri) throws DAOException {
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#getSampleTriples(java.lang.String, int)
+	 */
+	public Pair<Integer, List<RawTripleDTO>> getSampleTriples(String url, int limit) throws DAOException {
+		return null;
+	}
+
+	public List<String> getSpatialSources() throws DAOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

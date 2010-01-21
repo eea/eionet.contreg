@@ -31,9 +31,10 @@ import eionet.cr.dto.RawTripleDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.util.SearchExpression;
-import eionet.cr.util.PageRequest;
+import eionet.cr.util.PagingRequest;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
+import eionet.cr.util.Util;
 
 /**
  * 
@@ -42,47 +43,28 @@ import eionet.cr.util.SortingRequest;
  */
 public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 
-	public List<SubjectDTO> getPredicatesUsedForType(String typeUri)
-			throws DAOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public Pair<Integer, List<RawTripleDTO>> getSampleTriples(String url,
-			int limit) throws DAOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public boolean isAllowLiteralSearch(String predicateUri)
-			throws SearchException {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	public Pair<Integer, List<SubjectDTO>> performCustomSearch(
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.SearchDAO#filteredSearch(java.util.Map, java.util.Set, eionet.cr.util.PagingRequest, eionet.cr.util.SortingRequest)
+	 */
+	public Pair<Integer, List<SubjectDTO>> filteredSearch(
 			Map<String, String> criteria, Set<String> literalPredicates,
-			PageRequest pageRequest, SortingRequest sortingRequest)
+			PagingRequest pagingRequest, SortingRequest sortingRequest)
 			throws DAOException {
-		// TODO Auto-generated method stub
+		
+		// TODO method to be implemented
 		return null;
 	}
 
-	public Pair<Integer, List<SubjectDTO>> performSimpleSearch(
-			SearchExpression expression, PageRequest pageRequest,
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.SearchDAO#freetextSearch(eionet.cr.search.util.SearchExpression, eionet.cr.util.PagingRequest, eionet.cr.util.SortingRequest)
+	 */
+	public Pair<Integer, List<SubjectDTO>> freetextSearch(
+			SearchExpression expression, PagingRequest pagingRequest,
 			SortingRequest sortingRequest) throws Exception {
-		// TODO Auto-generated method stub
+
+		// TODO method to be implemented
 		return null;
 	}
-
-	public List<String> performSpatialSourcesSearch() throws DAOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public String getSubjectsDataQuery(Collection<Long> subjectHashes) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }

@@ -39,7 +39,7 @@ import eionet.cr.common.Subjects;
 import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.util.PageRequest;
+import eionet.cr.util.PagingRequest;
 import eionet.cr.util.Pair;
 
 /**
@@ -78,10 +78,10 @@ public class AmpServlet extends HttpServlet {
 		resp.setContentType("text/xml");
 		resp.getOutputStream().write(HEADER.getBytes());
 		try {
-			Pair<Integer, List<SubjectDTO>> results = searchDao.performCustomSearch(
+			Pair<Integer, List<SubjectDTO>> results = searchDao.filteredSearch(
 					criteria,
 					null, 
-					new PageRequest(0, 0),
+					new PagingRequest(0, 0),
 					null);
 			logger.debug("in total " + results.getRight().size() + " records were found");
 			if (results.getRight() != null && !results.getRight().isEmpty()) {

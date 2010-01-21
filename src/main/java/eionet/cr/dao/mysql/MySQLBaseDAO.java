@@ -23,12 +23,14 @@ package eionet.cr.dao.mysql;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.util.Pair;
+import eionet.cr.util.Util;
 import eionet.cr.util.sql.ConnectionUtil;
 import eionet.cr.util.sql.MySQLUtil;
 import eionet.cr.util.sql.ResultSetListReader;
@@ -141,5 +143,30 @@ public abstract class MySQLBaseDAO {
 		return result == null || result.isEmpty()
 				? null
 				: result.get(0);
+	}
+
+	/**
+	 * 
+	 * @param subjectHashes
+	 * @return
+	 */
+	protected String getSubjectsDataQuery(Collection<Long> subjectHashes) {
+
+		StringBuffer buf = new StringBuffer().
+		append("select distinct ").
+		append("SUBJECT as SUBJECT_HASH, SUBJ_RESOURCE.URI as SUBJECT_URI, SUBJ_RESOURCE.LASTMODIFIED_TIME as SUBJECT_MODIFIED, ").
+		append("PREDICATE as PREDICATE_HASH, PRED_RESOURCE.URI as PREDICATE_URI, ").
+		append("OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG, OBJ_SOURCE_OBJECT, OBJ_DERIV_SOURCE, SOURCE, ").
+		append("SRC_RESOURCE.URI as SOURCE_URI, DSRC_RESOURCE.URI as DERIV_SOURCE_URI ").
+		append("from SPO ").
+		append("left join RESOURCE as SUBJ_RESOURCE on (SUBJECT=SUBJ_RESOURCE.URI_HASH) ").
+		append("left join RESOURCE as PRED_RESOURCE on (PREDICATE=PRED_RESOURCE.URI_HASH) ").
+		append("left join RESOURCE as SRC_RESOURCE on (SOURCE=SRC_RESOURCE.URI_HASH) ").
+		append("left join RESOURCE as DSRC_RESOURCE on (OBJ_DERIV_SOURCE=DSRC_RESOURCE.URI_HASH) ").
+		append("where ").
+		append("SUBJECT in (").append(Util.toCSV(subjectHashes)).append(") ").  
+		append("order by ").
+		append("SUBJECT, PREDICATE, OBJECT");
+		return buf.toString();
 	}
 }

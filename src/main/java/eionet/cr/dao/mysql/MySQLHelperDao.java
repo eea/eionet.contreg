@@ -9,10 +9,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -21,13 +23,16 @@ import eionet.cr.common.Subjects;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dto.ObjectDTO;
+import eionet.cr.dto.RawTripleDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
+import eionet.cr.search.util.SubjectDataReader;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
 import eionet.cr.util.URIUtil;
 import eionet.cr.util.Util;
 import eionet.cr.util.YesNoBoolean;
+import eionet.cr.util.sql.ResultSetListReader;
 import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
 
@@ -445,5 +450,194 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 			SQLUtil.close(stmt);
 			SQLUtil.close(conn);
 		}
+	}
+
+	/** */
+	private static final String getPredicatesUsedForType_SQL = "select distinct SPOPRED.PREDICATE from SPO as SPOTYPE" +
+			", SPO as SPOPRED where SPOTYPE.PREDICATE=" + Hashes.spoHash(Predicates.RDF_TYPE) + " and SPOTYPE.OBJECT_HASH=?" +
+			" and SPOTYPE.SUBJECT=SPOPRED.SUBJECT";
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#getPredicatesUsedForType(java.lang.String)
+	 */
+	public List<SubjectDTO> getPredicatesUsedForType(String typeUri) throws DAOException{
+		
+		ArrayList<Object> values = new ArrayList<Object>();
+		values.add(Long.valueOf(Hashes.spoHash(typeUri)));
+		
+		List<Long> predicateUris = executeQuery(getPredicatesUsedForType_SQL, values, new SingleObjectReader<Long>());
+		if (predicateUris==null || predicateUris.isEmpty()){
+			return new ArrayList<SubjectDTO>();
+		}
+		else{
+			// get the SubjectDTO objects of the found predicates
+			Map<Long,SubjectDTO> subjectsMap = new HashMap<Long,SubjectDTO>();
+			for (Long hash : predicateUris) {
+				subjectsMap.put(hash, null);
+			}
+			executeQuery(getSubjectsDataQuery(subjectsMap.keySet()), null, new SubjectDataReader(subjectsMap));
+			
+			// since a used predicate may not appear as a subject in SPO, there might unfound SubjectDTO objects 
+			HashSet<Long> unfoundSubjects = new HashSet<Long>();
+			for (Entry<Long,SubjectDTO> entry : subjectsMap.entrySet()){
+				if (entry.getValue()==null){
+					unfoundSubjects.add(entry.getKey());
+				}
+			}
+			
+			// if there were indeed any unfound SubjectDTO objects, find URIs for those predicates
+			// and create dummy SubjectDTO objects from those URIs
+			if (!unfoundSubjects.isEmpty()){
+				Map<Long,String> resourceUris = getResourceUris(unfoundSubjects);
+				for (Entry<Long,SubjectDTO> entry : subjectsMap.entrySet()){
+					if (entry.getValue()==null){
+						String uri = resourceUris.get(entry.getKey());
+						if (!StringUtils.isBlank(uri)){
+							unfoundSubjects.remove(entry.getKey());
+							entry.setValue(new SubjectDTO(uri, false));
+						}
+					}
+				}
+			}
+			
+			// clean the subjectsMap of unfound subjects 
+			for (Long hash : unfoundSubjects){
+				subjectsMap.remove(hash);
+			}
+			
+			return new LinkedList<SubjectDTO>( subjectsMap.values());
+		}
+	}
+
+	/**
+	 * 
+	 * @param resourceHashes
+	 * @return
+	 * @throws DAOException 
+	 */
+	private Map<Long,String> getResourceUris(HashSet<Long> resourceHashes) throws DAOException{
+		
+		StringBuffer buf = new StringBuffer().
+		append("select URI_HASH, URI from RESOURCE where URI_HASH in (").append(Util.toCSV(resourceHashes)).append(")");
+		
+		HashMap<Long,String> result = new HashMap<Long,String>();
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		try{
+			conn = getConnection();
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(buf.toString());
+			while (rs.next()){
+				String uri = rs.getString("URI");
+				if (!StringUtils.isBlank(uri)){
+					result.put(Long.valueOf(rs.getLong("URI_HASH")), uri);
+				}
+			}
+		}
+		catch (SQLException e){
+			throw new DAOException(e.toString(), e);
+		}
+		finally{
+			SQLUtil.close(rs);
+			SQLUtil.close(stmt);
+			SQLUtil.close(conn);
+		}
+		
+		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#getSampleTriples(java.lang.String, int)
+	 */
+	public Pair<Integer, List<RawTripleDTO>> getSampleTriples(String url, int limit)
+			throws DAOException {
+		StringBuffer buf = new StringBuffer().
+		append("select distinct sql_calc_found_rows ").
+			append("SUBJ_RESOURCE.URI as SUBJECT_URI, ").
+			append("PRED_RESOURCE.URI as PREDICATE_URI, ").
+			append("OBJECT, ").
+			append("DSRC_RESOURCE.URI as DERIV_SOURCE_URI ").
+		append("from SPO ").
+			append("left join RESOURCE as SUBJ_RESOURCE on (SUBJECT=SUBJ_RESOURCE.URI_HASH) ").
+			append("left join RESOURCE as PRED_RESOURCE on (PREDICATE=PRED_RESOURCE.URI_HASH) ").
+			append("left join RESOURCE as SRC_RESOURCE on (SOURCE=SRC_RESOURCE.URI_HASH) ").
+			append("left join RESOURCE as DSRC_RESOURCE on (OBJ_DERIV_SOURCE=DSRC_RESOURCE.URI_HASH) ").
+		append("where ").
+			append("SPO.SOURCE = ? LIMIT 0, ?");   
+		List<Object> params = new LinkedList<Object>();
+		params.add(Hashes.spoHash(url));
+		params.add(limit);
+		
+		Pair<List<RawTripleDTO>, Integer> result = executeQueryWithRowCount(buf.toString(), params, new ResultSetListReader<RawTripleDTO>() {
+
+			private List<RawTripleDTO> resultList = new LinkedList<RawTripleDTO>();
+			
+			@Override
+			public List<RawTripleDTO> getResultList() {
+				return resultList;
+			}
+
+			@Override
+			public void readRow(ResultSet rs) throws SQLException {
+				resultList.add(
+						new RawTripleDTO(
+								rs.getString("SUBJECT_URI"),
+								rs.getString("PREDICATE_URI"),
+								rs.getString("OBJECT"),
+								rs.getString("DERIV_SOURCE_URI")));
+			}
+		});
+		
+		
+		return new Pair<Integer, List<RawTripleDTO>>(result.getRight(), result.getLeft());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#isAllowLiteralSearch(java.lang.String)
+	 */
+	public boolean isAllowLiteralSearch(String predicateUri) throws SearchException{
+		//sanity checks
+		if (StringUtils.isBlank(predicateUri)) {
+			return false;
+		}
+		String allowLiteralSearchQuery = "select distinct OBJECT from SPO where SUBJECT=? and PREDICATE=? and LIT_OBJ='N' and ANON_OBJ='N'";
+		
+		try {
+			ArrayList<Object> values = new ArrayList<Object>();
+			values.add(Long.valueOf(Hashes.spoHash(predicateUri)));
+			values.add(Long.valueOf((Hashes.spoHash(Predicates.RDFS_RANGE))));
+			
+			List<String> resultList = executeQuery(allowLiteralSearchQuery, values, new SingleObjectReader<String>());
+			if (resultList == null || resultList.isEmpty()) {
+				return true; // if not rdfs:domain specified at all, then lets allow literal search
+			}
+			
+			for (String result : resultList){
+				if (Subjects.RDFS_LITERAL.equals(result)){
+					return true; // rdfs:Literal is present in the specified rdfs:domain
+				}
+			}
+			
+			return false;
+		}
+		catch(DAOException exception) {
+			throw new SearchException();
+		}
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#getSpatialSources()
+	 */
+	public List<String> getSpatialSources() throws DAOException {
+		String sql = "select distinct URI from SPO,RESOURCE where " +
+		"PREDICATE= ? and OBJECT_HASH= ? and SOURCE=RESOURCE.URI_HASH";
+		List<Long> params = new LinkedList<Long>();
+		params.add(Hashes.spoHash(Predicates.RDF_TYPE));
+		params.add(Hashes.spoHash(Subjects.WGS_POINT));
+		return executeQuery(sql, params, new SingleObjectReader<String>());
 	}
 }

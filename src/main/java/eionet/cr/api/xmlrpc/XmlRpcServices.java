@@ -44,7 +44,7 @@ import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.search.DiscoveredSinceTimeSearch;
-import eionet.cr.util.PageRequest;
+import eionet.cr.util.PagingRequest;
 import eionet.cr.util.Pair;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
@@ -135,10 +135,10 @@ public class XmlRpcServices implements Services{
 		try{
 			Pair<Integer, List<SubjectDTO>> search = MySQLDAOFactory
 					.get().getDao(SearchDAO.class)
-					.performCustomSearch(
+					.filteredSearch(
 							criteria,
 							null,
-							new PageRequest(1, MAX_RESULTS),
+							new PagingRequest(1, MAX_RESULTS),
 							null);
 			
 			String[] strArray = {};
@@ -217,10 +217,10 @@ public class XmlRpcServices implements Services{
 		try{
 			Pair<Integer,List<SubjectDTO>> search = MySQLDAOFactory.get()
 					.getDao(SearchDAO.class)
-					.performCustomSearch(
+					.filteredSearch(
 							criteria,
 							null,
-							new PageRequest(1,MAX_RESULTS),
+							new PagingRequest(1,MAX_RESULTS),
 							null);
 			Collection<SubjectDTO> subjects = search.getRight();
 			if (subjects!=null){

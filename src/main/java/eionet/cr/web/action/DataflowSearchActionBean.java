@@ -43,7 +43,7 @@ import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.util.SortOrder;
 import eionet.cr.search.util.UriLabelPair;
-import eionet.cr.util.PageRequest;
+import eionet.cr.util.PagingRequest;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.web.util.ApplicationCache;
@@ -88,10 +88,10 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean<SubjectDT
 			customSearch = MySQLDAOFactory
 					.get()
 					.getDao(SearchDAO.class)
-					.performCustomSearch(
+					.filteredSearch(
 							buildSearchCriteria(),
 							null,
-							new PageRequest(getPageN()),
+							new PagingRequest(getPageN()),
 							new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
 		} catch (DAOException e) {
 			throw new SearchException("Exception in dataflow search", e);

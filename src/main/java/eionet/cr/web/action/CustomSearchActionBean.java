@@ -44,7 +44,7 @@ import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.util.SortOrder;
-import eionet.cr.util.PageRequest;
+import eionet.cr.util.PagingRequest;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.Util;
@@ -131,10 +131,10 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 		Pair<Integer, List<SubjectDTO>> result;
 		try {
 			result = MySQLDAOFactory.get().getDao(SearchDAO.class)
-					.performCustomSearch(
+					.filteredSearch(
 							buildSearchCriteria(),
 							getLiteralEnabledFilters(),
-							new PageRequest(getPageN()),
+							new PagingRequest(getPageN()),
 							new SortingRequest(
 									getSortP(),
 									SortOrder.parse(getSortO())));
@@ -196,7 +196,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 			
 			String predicateUri = getAvailableFilters().get(addedFilter).getUri();
 			
-			boolean literalsEnabled = factory.getDao(SearchDAO.class).isAllowLiteralSearch(predicateUri);
+			boolean literalsEnabled = factory.getDao(HelperDAO.class).isAllowLiteralSearch(predicateUri);
 			if (literalsEnabled)
 				getLiteralEnabledFilters().add(predicateUri);
 			else

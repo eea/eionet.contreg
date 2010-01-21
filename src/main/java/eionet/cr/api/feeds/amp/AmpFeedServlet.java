@@ -42,7 +42,7 @@ import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.util.PageRequest;
+import eionet.cr.util.PagingRequest;
 import eionet.cr.util.Pair;
 
 /**
@@ -73,10 +73,10 @@ public class AmpFeedServlet extends HttpServlet implements SubjectProcessor{
 			Map<String, String> criteria = new HashMap<String, String>();
 			criteria.put(Predicates.RDF_TYPE, Subjects.AMP_OUTPUT);
 
-			Pair<Integer, List<SubjectDTO>> results = searchDao.performCustomSearch(
+			Pair<Integer, List<SubjectDTO>> results = searchDao.filteredSearch(
 					criteria,
 					null, 
-					new PageRequest(0, 0),
+					new PagingRequest(0, 0),
 					null);
 			
 			int subjectCount = results==null ? 0 : (results.getRight()==null ? 0 : results.getRight().size());  

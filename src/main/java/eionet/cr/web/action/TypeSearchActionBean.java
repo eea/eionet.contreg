@@ -45,6 +45,7 @@ import org.apache.commons.lang.StringUtils;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.dao.DAOException;
+import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.SubjectDTO;
@@ -52,7 +53,7 @@ import eionet.cr.search.SearchException;
 import eionet.cr.search.util.SortOrder;
 import eionet.cr.util.ExportFormat;
 import eionet.cr.util.Exporter;
-import eionet.cr.util.PageRequest;
+import eionet.cr.util.PagingRequest;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.URIUtil;
@@ -254,10 +255,10 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 				Pair<Integer, List<SubjectDTO>> customSearch;
 				try {
 					customSearch = MySQLDAOFactory.get().getDao(SearchDAO.class)
-							.performCustomSearch(
+							.filteredSearch(
 									criteria,
 									null,
-									new PageRequest(getPageN()),
+									new PagingRequest(getPageN()),
 									new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
 				} catch (DAOException e) {
 					throw new SearchException("Exception in type search action bean", e);
@@ -451,7 +452,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 			
 			List<SubjectDTO> usedPredicates = null;
 			try {
-				usedPredicates = MySQLDAOFactory.get().getDao(SearchDAO.class).getPredicatesUsedForType(type);
+				usedPredicates = MySQLDAOFactory.get().getDao(HelperDAO.class).getPredicatesUsedForType(type);
 			} catch (DAOException e) {
 				throw new SearchException("Exception in type search action bean", e);
 			}

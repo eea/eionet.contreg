@@ -29,7 +29,7 @@ import eionet.cr.dto.RawTripleDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.util.SearchExpression;
-import eionet.cr.util.PageRequest;
+import eionet.cr.util.PagingRequest;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
 
@@ -42,25 +42,17 @@ import eionet.cr.util.SortingRequest;
 public interface SearchDAO extends DAO{
 
 	/**
-	 * performs spatial sources search.
-	 * 
-	 * @return
-	 * @throws DAOException
-	 */
-	List<String> performSpatialSourcesSearch() throws DAOException;
-	
-	/**
 	 * Newly rewritten simple search.
 	 * 
 	 * @param expression - search expression to find
-	 * @param pageRequest - page request
+	 * @param pagingRequest - page request
 	 * @param sortingRequest - sorting request to set
 	 * @return
 	 * @throws Exception
 	 */
-	Pair<Integer, List<SubjectDTO>> performSimpleSearch(
+	Pair<Integer, List<SubjectDTO>> freetextSearch(
 				SearchExpression expression,
-				PageRequest pageRequest,
+				PagingRequest pagingRequest,
 				SortingRequest sortingRequest) throws Exception;
 	
 	/**
@@ -68,47 +60,14 @@ public interface SearchDAO extends DAO{
 	 * 
 	 * @param criteria - custom search criteria.
 	 * @param literalPredicates - set of literal predicates
-	 * @param pageRequest - page request
+	 * @param pagingRequest - page request
 	 * @param sortingRequest - sorting request
 	 * @return
 	 * @throws DAOException
 	 */
-	Pair<Integer, List<SubjectDTO>> performCustomSearch(
+	Pair<Integer, List<SubjectDTO>> filteredSearch(
 			Map<String,String> criteria,
 			Set<String> literalPredicates,
-			PageRequest pageRequest,
+			PagingRequest pagingRequest,
 			SortingRequest sortingRequest) throws DAOException;
-	
-	/**
-	 * fetch sample triplets for given source.
-	 * 
-	 * @param url - source url
-	 * @param limit - how many to fetch
-	 * @return
-	 * @throws DAOException
-	 */
-	Pair<Integer, List<RawTripleDTO>> getSampleTriples(String url, int limit) throws DAOException;
-	
-	/**
-	 * 
-	 * @param predicateUri
-	 * @return
-	 * @throws SearchException 
-	 */
-	boolean isAllowLiteralSearch(String predicateUri) throws SearchException;
-	
-	/**
-	 * 
-	 * @param typeUri
-	 * @return
-	 * @throws DAOException
-	 */
-	List<SubjectDTO> getPredicatesUsedForType(String typeUri) throws DAOException;
-	
-	/**
-	 * 
-	 * @param subjectHashes
-	 * @return
-	 */
-	String getSubjectsDataQuery(Collection<Long> subjectHashes);
 }

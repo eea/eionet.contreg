@@ -77,10 +77,10 @@ public class Exporter {
 		}
 		customSearch = MySQLDAOFactory.get()
 				.getDao(SearchDAO.class)
-				.performCustomSearch(
+				.filteredSearch(
 						criteria,
 						null,
-						new PageRequest(
+						new PagingRequest(
 								1, 
 								new Integer(GeneralConfig.getRequiredProperty(EXPORT_ROW_LIMIT))),
 						null);

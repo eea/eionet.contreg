@@ -216,7 +216,7 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
 	public Resolution kmlLinks() throws SearchException {
 		
 		try {
-			sources = factory.getDao(SearchDAO.class).performSpatialSourcesSearch();
+			sources = factory.getDao(HelperDAO.class).getSpatialSources();
 		}
 		catch (DAOException e){
 			throw new SearchException(e.toString(), e);

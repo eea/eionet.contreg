@@ -40,7 +40,7 @@ import eionet.cr.search.SearchException;
 import eionet.cr.search.UriSearch;
 import eionet.cr.search.util.SearchExpression;
 import eionet.cr.search.util.SortOrder;
-import eionet.cr.util.PageRequest;
+import eionet.cr.util.PagingRequest;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.web.util.columns.SearchResultColumn;
@@ -96,9 +96,9 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 				if (resultList == null || resultList.size() == 0) {
 					Pair<Integer, List<SubjectDTO>> result = 
 							MySQLDAOFactory.get().getDao(SearchDAO.class)
-									.performSimpleSearch(
+									.freetextSearch(
 											searchExpression,
-											new PageRequest(getPageN()),
+											new PagingRequest(getPageN()),
 											new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
 
 					resultList = result.getRight();

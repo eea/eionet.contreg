@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import eionet.cr.dto.RawTripleDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.util.SearchExpression;
@@ -75,4 +76,39 @@ public interface HelperDAO extends DAO {
 	 * @throws DAOException
 	 */
 	String getSubjectSchemaUri(String subjectUri) throws DAOException;
+	
+	/**
+	 * fetch sample triplets for given source.
+	 * 
+	 * @param url - source url
+	 * @param limit - how many to fetch
+	 * @return
+	 * @throws DAOException
+	 */
+	Pair<Integer, List<RawTripleDTO>> getSampleTriples(String url, int limit) throws DAOException;
+	
+	/**
+	 * 
+	 * @param predicateUri
+	 * @return
+	 * @throws SearchException 
+	 */
+	boolean isAllowLiteralSearch(String predicateUri) throws SearchException;
+	
+	/**
+	 * 
+	 * @param typeUri
+	 * @return
+	 * @throws DAOException
+	 */
+	List<SubjectDTO> getPredicatesUsedForType(String typeUri) throws DAOException;
+	
+	/**
+	 * Gets sources that have some spatial content.
+	 * 
+	 * @return
+	 * @throws DAOException
+	 */
+	List<String> getSpatialSources() throws DAOException;
+
 }

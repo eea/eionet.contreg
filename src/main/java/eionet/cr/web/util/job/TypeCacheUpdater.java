@@ -38,7 +38,7 @@ import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.util.SortOrder;
-import eionet.cr.util.PageRequest;
+import eionet.cr.util.PagingRequest;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.web.util.ApplicationCache;
@@ -63,10 +63,10 @@ public class TypeCacheUpdater implements StatefulJob {
 
 			Pair<Integer, List<SubjectDTO>> customSearch = MySQLDAOFactory.get()
 					.getDao(SearchDAO.class)
-					.performCustomSearch(
+					.filteredSearch(
 							criteria,
 							null,
-							new PageRequest(1,0),
+							new PagingRequest(1,0),
 							new SortingRequest(Predicates.RDFS_LABEL, SortOrder.ASCENDING));
 			
 			if (customSearch != null && customSearch.getRight() != null){
