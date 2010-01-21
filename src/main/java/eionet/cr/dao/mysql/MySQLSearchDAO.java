@@ -143,19 +143,19 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 				searchParams,
 				new PairReader<Long,Long>());
 		Map<String, SubjectDTO> temp = new LinkedHashMap<String, SubjectDTO>();
-		if (result != null && !result.getId().isEmpty()) {
+		if (result != null && !result.getLeft().isEmpty()) {
 
 			Map<String, Long> hitSources = new HashMap<String, Long>();
-			for (Pair<Long,Long> subjectHash : result.getId()) {
-				temp.put(subjectHash.getId() + "", null);
-				hitSources.put(subjectHash.getId() + "", subjectHash.getValue());
+			for (Pair<Long,Long> subjectHash : result.getLeft()) {
+				temp.put(subjectHash.getLeft() + "", null);
+				hitSources.put(subjectHash.getLeft() + "", subjectHash.getRight());
 			}
 			SubjectDataReader reader = new SimpleSearchDataReader(temp, hitSources);
 			executeQuery(getDataInitQuery(temp.keySet()), null, reader);
 		}
 		logger.debug("subject data select query took " + (System.currentTimeMillis()-time) + " ms");
 			                                         
-		return new Pair<Integer, List<SubjectDTO>>(result.getValue(), new LinkedList<SubjectDTO>(temp.values()));
+		return new Pair<Integer, List<SubjectDTO>>(result.getRight(), new LinkedList<SubjectDTO>(temp.values()));
 	}
 	
 	private String getDataInitQuery(Collection<String> subjectHashes) {
@@ -251,16 +251,16 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 		}
 		logger.debug(sb.toString());
 		Pair<List<Long>,Integer> subjectHashes = executeQueryWithRowCount(sb.toString(), parameters, new SingleObjectReader<Long>());
-		if(subjectHashes == null || subjectHashes.getValue() == 0) {
+		if(subjectHashes == null || subjectHashes.getRight() == 0) {
 			return new Pair<Integer,List<SubjectDTO>>(0, new LinkedList<SubjectDTO>());
 		}
 		Map<String, SubjectDTO> temp = new LinkedHashMap<String, SubjectDTO>();
-		for (Long hash : subjectHashes.getId()) {
+		for (Long hash : subjectHashes.getLeft()) {
 			temp.put(hash + "", null);
 		}
 		
 		List<SubjectDTO> subjects = executeQuery(getDataInitQuery(temp.keySet()), null, new SubjectDataReader(temp));
-		return new Pair<Integer,List<SubjectDTO>>(subjectHashes.getValue(), subjects);
+		return new Pair<Integer,List<SubjectDTO>>(subjectHashes.getRight(), subjects);
 	}
 
 	/** 
@@ -341,7 +341,7 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 		});
 		
 		
-		return new Pair<Integer, List<RawTripleDTO>>(result.getValue(), result.getId());
+		return new Pair<Integer, List<RawTripleDTO>>(result.getRight(), result.getLeft());
 	}
 
 	/** */

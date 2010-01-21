@@ -83,9 +83,9 @@ public class XmlConvFeedServlet extends HttpServlet{
 						new PageRequest(0, 0),
 						null);
 
-				int subjectCount = results==null ? 0 : (results.getValue()==null ? 0 : results.getValue().size());  
+				int subjectCount = results==null ? 0 : (results.getRight()==null ? 0 : results.getRight().size());  
 				logger.debug(methodName + ", " + subjectCount + " subjects found in total");
-				subjects = results.getValue();
+				subjects = results.getRight();
 			}
 
 			SubjectsRDFWriter rdfWriter = new SubjectsRDFWriter(request.getParameter(AmpFeedServlet.INCLUDE_DERIVED_VALUES)!=null);

@@ -117,13 +117,13 @@ public class DefaultPersister implements IHarvestPersister {
 	}
 	
 	public void addTriple(long subjectHash, boolean anonSubject, long predicateHash,
-			String object, String objectLang, boolean litObject, boolean anonObject, long objSourceObject) throws PersisterException {
+			String object, long objectHash, String objectLang, boolean litObject, boolean anonObject, long objSourceObject) throws PersisterException {
 		
 		try {
 			preparedStatementForTriples.setLong  ( 1, subjectHash);
 			preparedStatementForTriples.setLong  ( 2, predicateHash);
 			preparedStatementForTriples.setString( 3, object);
-			preparedStatementForTriples.setLong  ( 4, Hashes.spoHash(object));
+			preparedStatementForTriples.setLong  ( 4, objectHash);
 			preparedStatementForTriples.setObject( 5, Util.toDouble(object));
 			preparedStatementForTriples.setString( 6, YesNoBoolean.format(anonSubject));
 			preparedStatementForTriples.setString( 7, YesNoBoolean.format(anonObject));

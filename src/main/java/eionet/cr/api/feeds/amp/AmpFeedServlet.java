@@ -79,7 +79,7 @@ public class AmpFeedServlet extends HttpServlet implements SubjectProcessor{
 					new PageRequest(0, 0),
 					null);
 			
-			int subjectCount = results==null ? 0 : (results.getValue()==null ? 0 : results.getValue().size());  
+			int subjectCount = results==null ? 0 : (results.getRight()==null ? 0 : results.getRight().size());  
 			logger.debug(methodName + ", " + subjectCount + " subjects found in total");
 		
 			SubjectsRDFWriter rdfWriter = new SubjectsRDFWriter(request.getParameter(INCLUDE_DERIVED_VALUES)!=null);
@@ -90,7 +90,7 @@ public class AmpFeedServlet extends HttpServlet implements SubjectProcessor{
 			rdfWriter.addNamespace(Namespaces.OWL, "owl");
 			rdfWriter.setSubjectProcessor(this);
 			
-			rdfWriter.write(results.getValue(), response.getOutputStream());
+			rdfWriter.write(results.getRight(), response.getOutputStream());
 		}
 		catch (Exception e) {
 			logger.error("Error in " + methodName, e);

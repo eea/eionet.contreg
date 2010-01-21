@@ -129,9 +129,9 @@ public class Exporter {
 		//output rest of the headers
 		int columnNumber= 1;
 		for(Pair<String,String> columnPair : selectedColumns) {
-			String column = columnPair.getValue() != null
-						? columnPair.getValue()
-						: columnPair.getId();
+			String column = columnPair.getRight() != null
+						? columnPair.getRight()
+						: columnPair.getLeft();
 			columnWidth[columnNumber] = column.length();
 			HSSFCell cell = headers.createCell(columnNumber++);
 			setCellValue(cell, column).setCellStyle(headerStyle);
@@ -140,7 +140,7 @@ public class Exporter {
 		
 		//output serarch results
 		int rowNumber = 1;
-		for(SubjectDTO subject : customSearch.getValue()) {
+		for(SubjectDTO subject : customSearch.getRight()) {
 			HSSFRow row = sheet.createRow(rowNumber++);
 			
 			//output uri or label column value
@@ -153,7 +153,7 @@ public class Exporter {
 			//output other columns
 			columnNumber = 1;
 			for(Pair<String,String> columnPair : selectedColumns) {
-				value = FormatUtils.getObjectValuesForPredicate(columnPair.getId(), subject, languages);
+				value = FormatUtils.getObjectValuesForPredicate(columnPair.getLeft(), subject, languages);
 				columnWidth[columnNumber] = Math.max(columnWidth[columnNumber], value.length());
 				setCellValue(row.createCell(columnNumber++), value);
 			}

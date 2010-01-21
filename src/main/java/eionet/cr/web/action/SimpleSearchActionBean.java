@@ -101,8 +101,8 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 											new PageRequest(getPageN()),
 											new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
 
-					resultList = result.getValue();
-					matchCount = result.getId();
+					resultList = result.getRight();
+					matchCount = result.getLeft();
 				}
 			}
 		} catch (Exception fatal) {

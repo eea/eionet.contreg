@@ -183,8 +183,8 @@ public class HarvestSourceActionBean extends AbstractActionBean {
 		} catch (DAOException e) {
 			throw new SearchException("exception while getting sample triplets ", e);
 		}
-    	noOfResources = temp.getId();
-    	sampleTriples = temp.getValue();
+    	noOfResources = temp.getLeft();
+    	sampleTriples = temp.getRight();
     }
 
 	/**

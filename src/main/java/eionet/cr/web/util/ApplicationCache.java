@@ -173,7 +173,7 @@ public class ApplicationCache implements ServletContextListener {
 		List<Pair<String,String>> types = getTypes();
 		List<String> typeUris = new LinkedList<String>();
 		for (Pair<String,String> type: types){
-			typeUris.add(type.getId());
+			typeUris.add(type.getLeft());
 		}
 		return typeUris;
 	}

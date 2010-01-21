@@ -96,8 +96,8 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean<SubjectDT
 		} catch (DAOException e) {
 			throw new SearchException("Exception in dataflow search", e);
 		}
-		resultList = customSearch.getValue();
-		matchCount = customSearch.getId();
+		resultList = customSearch.getRight();
+		matchCount = customSearch.getLeft();
 		
 		return new ForwardResolution("/pages/dataflowSearch.jsp");
 	}

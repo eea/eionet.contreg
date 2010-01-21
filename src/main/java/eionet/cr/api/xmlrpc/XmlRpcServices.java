@@ -142,7 +142,7 @@ public class XmlRpcServices implements Services{
 							null);
 			
 			String[] strArray = {};
-			Collection<SubjectDTO> subjects = search.getValue();
+			Collection<SubjectDTO> subjects = search.getRight();
 			if (subjects!=null){
 				for (Iterator<SubjectDTO> iter=subjects.iterator(); iter.hasNext();){
 					
@@ -222,7 +222,7 @@ public class XmlRpcServices implements Services{
 							null,
 							new PageRequest(1,MAX_RESULTS),
 							null);
-			Collection<SubjectDTO> subjects = search.getValue();
+			Collection<SubjectDTO> subjects = search.getRight();
 			if (subjects!=null){
 				for (Iterator<SubjectDTO> iter=subjects.iterator(); iter.hasNext();){
 					

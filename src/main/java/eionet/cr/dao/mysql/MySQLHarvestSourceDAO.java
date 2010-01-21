@@ -153,8 +153,8 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
     		searchParams.addAll(limitParams);
     	}
     	Pair<List<HarvestSourceDTO>, Integer> result = executeQueryWithRowCount(sql, searchParams, new HarvestSourceDTOReader());
-    	pageRequest.setMatchCount(result.getValue());
-    	return result.getId();
+    	pageRequest.setMatchCount(result.getRight());
+    	return result.getLeft();
     }
     
     /** */

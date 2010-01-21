@@ -86,7 +86,7 @@ public class OptimizedPersister implements IHarvestPersister {
 	 * @see eionet.cr.harvest.persister.IHarvestPersister#addTriple(long, boolean, long, java.lang.String, java.lang.String, boolean, boolean, long)
 	 * {@inheritDoc}
 	 */
-	public void addTriple(long subjectHash, boolean anonSubject, long predicateHash, String object, String objectLang,
+	public void addTriple(long subjectHash, boolean anonSubject, long predicateHash, String object, long objectHash, String objectLang,
 			boolean litObject, boolean anonObject, long objSourceObject) throws PersisterException {
 		StringBuffer sb = new StringBuffer()
 				.append(escapeCSV(subjectHash)).append(',')

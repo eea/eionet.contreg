@@ -69,8 +69,8 @@ public class TypeCacheUpdater implements StatefulJob {
 							new PageRequest(1,0),
 							new SortingRequest(Predicates.RDFS_LABEL, SortOrder.ASCENDING));
 			
-			if (customSearch != null && customSearch.getValue() != null){
-				for(SubjectDTO subject : customSearch.getValue()) {
+			if (customSearch != null && customSearch.getRight() != null){
+				for(SubjectDTO subject : customSearch.getRight()) {
 					if (!subject.isAnonymous()){
 						String label = subject.getObjectValue(Predicates.RDFS_LABEL);
 						if (!StringUtils.isBlank(label)){

@@ -83,9 +83,9 @@ public class AmpServlet extends HttpServlet {
 					null, 
 					new PageRequest(0, 0),
 					null);
-			logger.debug("in total " + results.getValue().size() + " records were found");
-			if (results.getValue() != null && !results.getValue().isEmpty()) {
-				for (SubjectDTO subject : results.getValue()) {
+			logger.debug("in total " + results.getRight().size() + " records were found");
+			if (results.getRight() != null && !results.getRight().isEmpty()) {
+				for (SubjectDTO subject : results.getRight()) {
 					persister.write(
 							new AmpProjectDTO(subject),
 							resp.getOutputStream(),

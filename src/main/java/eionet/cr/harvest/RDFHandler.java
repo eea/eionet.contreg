@@ -73,7 +73,7 @@ public class RDFHandler implements StatementHandler{
 	private static final String EMPTY_STRING = "";
 	
 	/** */
-	private HashSet<Long> distinctResources = new HashSet<Long>();
+	private HashSet<Long> addedResources = new HashSet<Long>();
 	
 	/** */
 	private Map<String, List<Pair<String,String>>> rdfValues = new HashMap<String, List<Pair<String,String>>>();
@@ -200,6 +200,9 @@ public class RDFHandler implements StatementHandler{
 				object = generateUUID(object);
 			}
 
+			// no more modifications of object are expected below this line, so prepare object hash
+			long objectHash = Hashes.spoHash(object);
+			
 			// we remember rdfValues			
 			if (anonSubject && predicate.getURI().equals(Predicates.RDF_VALUE)){
 				List<Pair<String,String>> subjectRdfValues = rdfValues.get(subject.getAnonymousID());
@@ -211,31 +214,37 @@ public class RDFHandler implements StatementHandler{
 			}
 
 			// add the triple to the SQL insert batch
-			addTriple(subjectHash, anonSubject, predicateHash, object, objectLang, litObject, anonObject);
+			addTriple(subjectHash, anonSubject, predicateHash, object, objectHash, objectLang, litObject, anonObject);
 			
-			// if the object represents an anonymous subject, lookup the rdf:value(s) of the latter and insert it as derived
+			// if the object represents an anonymous subject, lookup the rdf:value(s) of the latter and insert it(them) as derived
 			if (anonObject && !litObject){
 				List<Pair<String,String>> objectRdfValues = rdfValues.get(object);
 				if (objectRdfValues!=null){
-					for (Pair<String,String> pair:objectRdfValues){
-						addTriple(subjectHash, anonSubject, predicateHash, pair.getId(), pair.getValue(),
+					for (Pair<String,String> objectLangPair : objectRdfValues){
+						addTriple(subjectHash, anonSubject, predicateHash, objectLangPair.getLeft(), objectHash, objectLangPair.getRight(),
 								true, false, Hashes.spoHash(object));
 					}
 				}
 			}
 
-			// if predicate different from previous one
-			if (!distinctResources.contains(predicateHash)){
+			// if predicate not already added into resources, then do so
+			if (!addedResources.contains(predicateHash)){
 				addResource(predicate.getURI(), predicateHash);
-				distinctResources.add(predicateHash);
+				addedResources.add(predicateHash);
 			}
 			
-			// if subject different from previous one, add it into RESOURCES
-			if (!distinctResources.contains(subjectHash)){
+			// if predicate not already added into resources, then do so
+			if (!addedResources.contains(subjectHash)){
 				addResource(subjectUri, subjectHash);
-				distinctResources.add(subjectHash);
+				addedResources.add(subjectHash);
 			}
-			
+
+			// if object is a resource and it's not already added into resources, then do so
+			if (litObject==false && !addedResources.contains(objectHash)){
+				addResource(object, objectHash);
+				addedResources.add(subjectHash);
+			}
+
 			// if at BULK_INSERT_SIZE, execute the batch
 			if (tripleCounter % BULK_INSERT_SIZE == 0){
 				executeBatch();
@@ -266,9 +275,9 @@ public class RDFHandler implements StatementHandler{
 	 * @throws SQLException
 	 */
 	private void addTriple(long subjectHash, boolean anonSubject, long predicateHash,
-			String object, String objectLang, boolean litObject, boolean anonObject) throws PersisterException {
+			String object, long objectHash, String objectLang, boolean litObject, boolean anonObject) throws PersisterException {
 		
-		addTriple(subjectHash, anonSubject, predicateHash, object, objectLang, litObject, anonObject, 0);
+		addTriple(subjectHash, anonSubject, predicateHash, object, objectHash, objectLang, litObject, anonObject, 0);
 	}
 
 	/**
@@ -284,8 +293,8 @@ public class RDFHandler implements StatementHandler{
 	 * @throws SQLException
 	 */
 	private void addTriple(long subjectHash, boolean anonSubject, long predicateHash,
-			String object, String objectLang, boolean litObject, boolean anonObject, long objSourceObject) throws PersisterException {
-		persister.addTriple(subjectHash, anonSubject, predicateHash, object, objectLang, litObject, anonObject, objSourceObject);
+			String object, long objectHash, String objectLang, boolean litObject, boolean anonObject, long objSourceObject) throws PersisterException {
+		persister.addTriple(subjectHash, anonSubject, predicateHash, object, objectHash, objectLang, litObject, anonObject, objSourceObject);
 	}
 	
 	/**
@@ -404,5 +413,4 @@ public class RDFHandler implements StatementHandler{
 	public void closeResources() throws PersisterException  {
 		persister.closeResources();
 	}
-
 }

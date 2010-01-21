@@ -29,51 +29,52 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  * @author Aleksandr Ivanov
  * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
-public class Pair<T,T1> implements Serializable {
+public class Pair<L,R> implements Serializable {
 	
-	private static final String[] excludeFromEquals = new String[]{"value"};
+	/** */
+	private static final String[] excludeFromEquals = new String[]{"right"};
 
 	/**
 	 * serial.
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	
-	private T id;
-	private T1 value;
+	/** */
+	private L left;
+	private R right;
 
 	/**
-	 * @param id
-	 * @param value
+	 * @param left
+	 * @param right
 	 */
-	public Pair(T id, T1 value) {
-		this.id = id;
-		this.value = value;
+	public Pair(L left, R right) {
+		this.left = left;
+		this.right = right;
 	}
-	
+
 	/**
-	 * @return the id
+	 * @return the left
 	 */
-	public T getId() {
-		return id;
-	}
-	/**
-	 * @param id the id to set
-	 */
-	public void setId(T id) {
-		this.id = id;
+	public L getLeft() {
+		return left;
 	}
 	/**
-	 * @return the value
+	 * @param left the left to set
 	 */
-	public T1 getValue() {
-		return value;
+	public void setLeft(L id) {
+		this.left = id;
 	}
 	/**
-	 * @param value the value to set
+	 * @return the right
 	 */
-	public void setValue(T1 value) {
-		this.value = value;
+	public R getRight() {
+		return right;
+	}
+	/**
+	 * @param right the right to set
+	 */
+	public void setRight(R value) {
+		this.right = value;
 	}
 
 	/** 
@@ -93,7 +94,4 @@ public class Pair<T,T1> implements Serializable {
 	public boolean equals(Object obj) {
 		return EqualsBuilder.reflectionEquals(this, obj, excludeFromEquals);
 	}
-	
-	
-
 }

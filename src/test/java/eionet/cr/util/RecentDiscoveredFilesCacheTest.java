@@ -45,7 +45,7 @@ public class RecentDiscoveredFilesCacheTest extends TestCase {
 		}
 		
 		assertEquals(3, ApplicationCache.getRecentDiscoveredFiles(3).size());
-		assertEquals("8", ApplicationCache.getRecentDiscoveredFiles(3).get(0).getId());
+		assertEquals("8", ApplicationCache.getRecentDiscoveredFiles(3).get(0).getLeft());
 		
 	}
 

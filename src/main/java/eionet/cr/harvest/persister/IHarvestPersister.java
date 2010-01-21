@@ -41,7 +41,7 @@ public interface IHarvestPersister {
 	 * @throws PersisterException
 	 */
 	void addTriple(long subjectHash, boolean anonSubject, long predicateHash,
-			String object, String objectLang, boolean litObject, boolean anonObject, long objSourceObject) throws PersisterException;
+			String object, long objectHash, String objectLang, boolean litObject, boolean anonObject, long objSourceObject) throws PersisterException;
 
 	/**
 	 * Add source.

@@ -181,26 +181,26 @@ public class JobScheduler implements ServletContextListener{
 		for (Pair<String,JobDetail> job : intervalJobs) {
 			try{
 				scheduleIntervalJob(
-						Long.parseLong(GeneralConfig.getRequiredProperty(job.getId())),
-						job.getValue());
-				logger.debug(job.getValue().getName() + " scheduled");
+						Long.parseLong(GeneralConfig.getRequiredProperty(job.getLeft())),
+						job.getRight());
+				logger.debug(job.getRight().getName() + " scheduled");
 			} catch (ParseException e){
-				logger.fatal("Error when scheduling " + job.getValue().getName(), e);
+				logger.fatal("Error when scheduling " + job.getRight().getName(), e);
 			} catch (SchedulerException e){
-				logger.fatal("Error when scheduling " + job.getValue().getName(), e);
+				logger.fatal("Error when scheduling " + job.getRight().getName(), e);
 			}
 		}
 		for(Pair<String,JobDetail> job: cronJobs) {
 			try {
 				scheduleCronJob(
-						GeneralConfig.getRequiredProperty(job.getId()),
-						job.getValue());
-				logger.debug(job.getValue().getName() + " scheduled with cron string: " 
-						+ GeneralConfig.getRequiredProperty(job.getId()));
+						GeneralConfig.getRequiredProperty(job.getLeft()),
+						job.getRight());
+				logger.debug(job.getRight().getName() + " scheduled with cron string: " 
+						+ GeneralConfig.getRequiredProperty(job.getLeft()));
 			} catch (SchedulerException e) {
-				logger.fatal("Error when scheduling " + job.getValue().getName(), e);
+				logger.fatal("Error when scheduling " + job.getRight().getName(), e);
 			} catch (ParseException e){
-				logger.fatal("Error when scheduling " + job.getValue().getName(), e);
+				logger.fatal("Error when scheduling " + job.getRight().getName(), e);
 			}
 		}
 	}

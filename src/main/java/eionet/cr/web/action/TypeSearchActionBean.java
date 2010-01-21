@@ -263,8 +263,8 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 					throw new SearchException("Exception in type search action bean", e);
 				}
 				
-				resultList = customSearch.getValue();
-	    		matchCount = customSearch.getId();
+				resultList = customSearch.getRight();
+	    		matchCount = customSearch.getLeft();
 			}
 			//cache result list.
 			getSession().setAttribute(RESULT_LIST_CACHED, resultList);

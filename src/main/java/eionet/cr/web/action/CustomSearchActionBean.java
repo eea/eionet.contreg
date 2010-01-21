@@ -146,10 +146,10 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 		// we put the search result list into session and override getResultList() to retrieve the list from session
 		// (look for the override in this class)
 		HttpSession session = getContext().getRequest().getSession();
-		session.setAttribute(RESULT_LIST_SESSION_ATTR_NAME, result.getValue());
+		session.setAttribute(RESULT_LIST_SESSION_ATTR_NAME, result.getRight());
 		
 		// we do the same for matchCount and pagination as well
-		session.setAttribute(MATCH_COUNT_SESSION_ATTR_NAME, result.getId());
+		session.setAttribute(MATCH_COUNT_SESSION_ATTR_NAME, result.getLeft());
 		session.setAttribute(PAGINATION_SESSION_ATTR_NAME, super.getPagination());
 		
 		return new ForwardResolution(ASSOCIATED_JSP);
