@@ -38,12 +38,16 @@ import org.apache.commons.logging.LogFactory;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.dao.DAOException;
+import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.SearchDAO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
-import eionet.cr.search.SpatialSearch;
 import eionet.cr.search.util.BBOX;
+import eionet.cr.search.util.SortOrder;
+import eionet.cr.util.PagingRequest;
+import eionet.cr.util.Pair;
+import eionet.cr.util.SortingRequest;
 import eionet.cr.util.Util;
 import eionet.cr.web.util.columns.SearchResultColumn;
 import eionet.cr.web.util.columns.SubjectPredicateColumn;
@@ -109,13 +113,15 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
 			longE = Util.toDouble(ltudes[2].trim());
 			latN = Util.toDouble(ltudes[3].trim());
 			
-			SpatialSearch spatialSearch = new SpatialSearch(createBBOX(), source);
-			spatialSearch.setPageLength(25);
-			spatialSearch.setPageNumber(1);
-			spatialSearch.setGoogleEarthMode(true);
-			spatialSearch.execute();
-			
-			resultList = spatialSearch.getResultList();
+			try {
+				Pair<Integer, List<SubjectDTO>> resultPair =
+					DAOFactory.get().getDao(SearchDAO.class).searchBySpatialBox(
+						createBBOX(), source, true, new PagingRequest(1,25), null);
+				resultList = resultPair.getRight();
+			}
+			catch (DAOException e) {
+				throw new SearchException(e.toString(), e);
+			}
 		}
 		
 		try {
@@ -247,14 +253,20 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
 		BBOX bbox = createBBOX();
 		if (!bbox.isUndefined()){
 			
-			SpatialSearch spatialSearch = new SpatialSearch(bbox, source);
-			spatialSearch.setPageNumber(getPageN());
-			spatialSearch.setSorting(getSortP(), getSortO());
-
-			spatialSearch.execute();
-			
-			resultList = spatialSearch.getResultList();
-    		matchCount = spatialSearch.getTotalMatchCount();
+			try {
+				Pair<Integer, List<SubjectDTO>> resultPair =
+					DAOFactory.get().getDao(SearchDAO.class).searchBySpatialBox(
+						createBBOX(),
+						source,
+						false,
+						new PagingRequest(getPageN()),
+						new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
+				resultList = resultPair.getRight();
+				matchCount = resultPair.getLeft();
+			}
+			catch (DAOException e) {
+				throw new SearchException(e.toString(), e);
+			}
 		}
 		
 		return new ForwardResolution("/pages/spatialSearch.jsp");

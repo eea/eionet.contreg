@@ -44,6 +44,7 @@ import eionet.cr.dao.SearchDAO;
 import eionet.cr.dto.RawTripleDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
+import eionet.cr.search.util.BBOX;
 import eionet.cr.search.util.SearchExpression;
 import eionet.cr.search.util.SimpleSearchDataReader;
 import eionet.cr.search.util.SortOrder;
@@ -301,6 +302,112 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 			}
 			List<SubjectDTO> subjects = executeQuery(
 					getSubjectsDataQuery(temp.keySet()), null, new SubjectDataReader(temp));
+			return new Pair<Integer,List<SubjectDTO>>(pair.getRight(), subjects);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.SearchDAO#searchBySpatialBox(eionet.cr.search.util.BBOX, eionet.cr.util.PagingRequest, eionet.cr.util.SortingRequest)
+	 */
+	public Pair<Integer, List<SubjectDTO>> searchBySpatialBox(BBOX box,
+			String sourceUri, boolean googleEarthMode,
+			PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException {
+		
+		
+		if (box==null || box.isUndefined()){
+			return new Pair<Integer, List<SubjectDTO>>(0,new LinkedList<SubjectDTO>());
+		}
+
+		String sortPredicate = sortingRequest!=null ? sortingRequest.getSortingColumnName() : null;
+		SortOrder sortOrder  = sortingRequest!=null ? sortingRequest.getSortOrder() : null;
+		boolean doSort = !StringUtils.isBlank(sortPredicate);
+
+		StringBuffer sqlBuf = new StringBuffer(googleEarthMode ? "select distinct" : " select").
+		append(" sql_calc_found_rows SPO_POINT.SUBJECT as SUBJECT_HASH from SPO as SPO_POINT");
+		
+		if (googleEarthMode || sortPredicate!=null){
+			sqlBuf.append(" left join SPO as ORDERING on").
+			append(" (SPO_POINT.SUBJECT=ORDERING.SUBJECT and ORDERING.PREDICATE=").
+			append(Hashes.spoHash(googleEarthMode ? Predicates.RDFS_LABEL : sortPredicate)).
+			append(")");
+		}
+
+		if (box.hasLatitude()){
+			sqlBuf.append(", SPO as SPO_LAT");
+		}
+		if (box.hasLongitude()){
+			sqlBuf.append(", SPO as SPO_LONG");
+		}
+		
+		sqlBuf.append(" where SPO_POINT.PREDICATE=").append(Hashes.spoHash(Predicates.RDF_TYPE)).
+		append(" and SPO_POINT.OBJECT_HASH=").append(Hashes.spoHash(Subjects.WGS_POINT));
+		
+		if (!StringUtils.isBlank(sourceUri)){
+			sqlBuf.append(" and SPO_POINT.SOURCE=").append(Hashes.spoHash(sourceUri));
+		}
+		
+		if (box.hasLatitude()){
+			
+			sqlBuf.append(" and SPO_POINT.SUBJECT=SPO_LAT.SUBJECT and SPO_LAT.PREDICATE=").
+			append(Hashes.spoHash(Predicates.WGS_LAT));
+			if (box.getLatitudeSouth()!=null){
+				sqlBuf.append(" and SPO_LAT.OBJECT_DOUBLE>=").append(box.getLatitudeSouth());
+			}
+			if (box.getLatitudeNorth()!=null){
+				sqlBuf.append(" and SPO_LAT.OBJECT_DOUBLE<=").append(box.getLatitudeNorth());
+			}
+		}
+		
+		if (box.hasLongitude()){
+			
+			if (box.hasLatitude()){
+				sqlBuf.append(" and SPO_LAT.SUBJECT=SPO_LONG.SUBJECT");
+			}
+			else{
+				sqlBuf.append(" and SPO_POINT.SUBJECT=SPO_LONG.SUBJECT");
+			}
+			sqlBuf.append(" and SPO_LONG.PREDICATE=").append(Hashes.spoHash(Predicates.WGS_LONG));
+			
+			if (box.getLongitudeWest()!=null){
+				sqlBuf.append(" and SPO_LONG.OBJECT_DOUBLE>=").append(box.getLongitudeWest());
+			}
+			if (box.getLongitudeEast()!=null){
+				sqlBuf.append(" and SPO_LONG.OBJECT_DOUBLE<=").append(box.getLongitudeEast());
+			}
+		}
+		
+		if (!googleEarthMode){
+			if (sortPredicate!=null){
+				sqlBuf.append(" order by ORDERING.OBJECT ").
+				append(sortOrder==null ? sortOrder.ASCENDING.toSQL() : sortOrder.toSQL());
+			}
+		}
+		else{
+			sqlBuf.append(" order by ORDERING.OBJECT_HASH");
+		}
+		
+		if (googleEarthMode && pagingRequest!=null && pagingRequest.getItemsPerPage()>0){
+			
+			sqlBuf.append(" limit ");
+			if (pagingRequest.getPageNumber()>0){
+				sqlBuf.append(pagingRequest.getPageNumber());
+			}
+			sqlBuf.append(",").append(pagingRequest.getItemsPerPage());
+		}
+
+		Pair<List<Long>,Integer> pair = executeQueryWithRowCount(sqlBuf.toString(),
+				new SingleObjectReader<Long>());
+		if (pair==null || pair.getRight()==0){
+			return new Pair<Integer, List<SubjectDTO>>(0, new LinkedList<SubjectDTO>());
+		}
+		else{
+			Map<Long,SubjectDTO> subjectsMap = new LinkedHashMap<Long, SubjectDTO>();
+			for (Long hash : pair.getLeft()) {
+				subjectsMap.put(hash, null);
+			}
+			List<SubjectDTO> subjects = executeQuery(
+					getSubjectsDataQuery(subjectsMap.keySet()), null, new SubjectDataReader(subjectsMap));
 			return new Pair<Integer,List<SubjectDTO>>(pair.getRight(), subjects);
 		}
 	}

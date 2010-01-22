@@ -30,6 +30,7 @@ import eionet.cr.dao.SearchDAO;
 import eionet.cr.dto.RawTripleDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
+import eionet.cr.search.util.BBOX;
 import eionet.cr.search.util.SearchExpression;
 import eionet.cr.util.PagingRequest;
 import eionet.cr.util.Pair;
@@ -70,6 +71,13 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 
 	public Pair<Integer, List<SubjectDTO>> searchReferences(Long subjectHash,
 			PagingRequest pagingRequest, SortingRequest sortingRequest)
+			throws DAOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Pair<Integer, List<SubjectDTO>> searchBySpatialBox(BBOX box,
+			String sourceUri, boolean googleEarthMode, PagingRequest pagingRequest, SortingRequest sortingRequest)
 			throws DAOException {
 		// TODO Auto-generated method stub
 		return null;

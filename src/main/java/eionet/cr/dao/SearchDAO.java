@@ -28,6 +28,7 @@ import java.util.Set;
 import eionet.cr.dto.RawTripleDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
+import eionet.cr.search.util.BBOX;
 import eionet.cr.search.util.SearchExpression;
 import eionet.cr.util.PagingRequest;
 import eionet.cr.util.Pair;
@@ -80,4 +81,18 @@ public interface SearchDAO extends DAO{
 			PagingRequest pagingRequest,
 			SortingRequest sortingRequest) throws DAOException;
 
+	/**
+	 * 
+	 * @param box
+	 * @param sourceUri TODO
+	 * @param googleEarthMode TODO
+	 * @param pagingRequest
+	 * @param sortingRequest
+	 * @return
+	 * @throws DAOException
+	 */
+	Pair<Integer, List<SubjectDTO>> searchBySpatialBox(
+			BBOX box,
+			String sourceUri,
+			boolean googleEarthMode, PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException;
 }
