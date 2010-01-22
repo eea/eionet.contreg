@@ -49,7 +49,7 @@ public class RecentResourcesCacheUpdater implements StatefulJob {
 		
 		try {
 			HelperDAO dao = MySQLDAOFactory.get().getDao(HelperDAO.class);
-			ApplicationCache.updateRecentResourceCache(dao.getRecentlyDiscoveredFiles(10));
+			ApplicationCache.updateRecentResourceCache(dao.getLatestFiles(10));
 			logger.debug("Recently discovered resources cache updated!");
 		}
 		catch (DAOException e) {

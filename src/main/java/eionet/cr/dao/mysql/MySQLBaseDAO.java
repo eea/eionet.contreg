@@ -214,6 +214,9 @@ public abstract class MySQLBaseDAO {
 	 * @return
 	 */
 	protected String getSubjectsDataQuery(Collection<Long> subjectHashes) {
+		
+		if (subjectHashes==null || subjectHashes.isEmpty())
+			throw new IllegalArgumentException("The subject hashes collection must be null or empty!");
 
 		StringBuffer buf = new StringBuffer().
 		append("select distinct ").

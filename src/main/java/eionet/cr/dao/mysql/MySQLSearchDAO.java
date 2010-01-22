@@ -86,7 +86,10 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 		long time = System.currentTimeMillis();
 		List<Object> searchParams = new LinkedList<Object>();
 		StringBuffer selectQuery = new StringBuffer();
-		selectQuery.append("select sql_calc_found_rows SPO.SUBJECT as id, IF(SPO.OBJ_DERIV_SOURCE <> 0, SPO.OBJ_DERIV_SOURCE, SPO.SOURCE) as value from SPO ");
+		selectQuery.append("select sql_calc_found_rows SPO.SUBJECT as ").append(PairReader.LEFTCOL).
+		append(", IF(SPO.OBJ_DERIV_SOURCE <> 0, SPO.OBJ_DERIV_SOURCE, SPO.SOURCE) as ").
+		append(PairReader.RIGHTCOL).append(" from SPO ");
+		
 		if (sortingRequest  != null && sortingRequest.getSortingColumnName() != null) {
 			if (sortingRequest.getSortingColumnName().equals(SubjectLastModifiedColumn.class.getSimpleName())){
 				selectQuery.append("left join RESOURCE on (SPO.SUBJECT=RESOURCE.URI_HASH) ");
@@ -135,9 +138,9 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 		if (result != null && !result.getLeft().isEmpty()) {
 
 			Map<Long,Long> hitSources = new HashMap<Long,Long>();
-			for (Pair<Long,Long> subjectHash : result.getLeft()) {
-				temp.put(subjectHash.getLeft(), null);
-				hitSources.put(subjectHash.getLeft(),subjectHash.getRight());
+			for (Pair<Long,Long> subjectPair : result.getLeft()) {
+				temp.put(subjectPair.getLeft(), null);
+				hitSources.put(subjectPair.getLeft(),subjectPair.getRight());
 			}
 			SubjectDataReader reader = new SimpleSearchDataReader(temp, hitSources);
 			executeQuery(getSubjectsDataQuery(temp.keySet()), null, reader);
@@ -224,6 +227,7 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 		if(subjectHashes == null || subjectHashes.getRight() == 0) {
 			return new Pair<Integer,List<SubjectDTO>>(0, new LinkedList<SubjectDTO>());
 		}
+		
 		Map<Long,SubjectDTO> temp = new LinkedHashMap<Long, SubjectDTO>();
 		for (Long hash : subjectHashes.getLeft()) {
 			temp.put(hash, null);

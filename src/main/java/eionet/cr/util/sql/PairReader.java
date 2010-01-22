@@ -33,6 +33,11 @@ import eionet.cr.util.Pair;
  */
 public class PairReader<T, T1> extends ResultSetListReader<Pair<T, T1>> {
 
+	/** */
+	public static final String LEFTCOL = "LCOL";
+	public static final String RIGHTCOL = "RCOL";
+	
+	/** */
 	private List<Pair<T,T1>> resultList = new LinkedList<Pair<T,T1>>();
 	
 	/** 
@@ -51,7 +56,7 @@ public class PairReader<T, T1> extends ResultSetListReader<Pair<T, T1>> {
 	@Override
 	@SuppressWarnings("unchecked")
 	public void readRow(ResultSet rs) throws SQLException {
-		resultList.add(new Pair<T, T1>((T)rs.getObject("id"), (T1)rs.getObject("value")));
+		resultList.add(new Pair<T, T1>((T)rs.getObject(LEFTCOL), (T1)rs.getObject(RIGHTCOL)));
 	}
 
 }

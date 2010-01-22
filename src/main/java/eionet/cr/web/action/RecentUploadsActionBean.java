@@ -38,8 +38,10 @@ import org.apache.commons.logging.LogFactory;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
+import eionet.cr.dao.DAOException;
+import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.HelperDAO;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.search.RecentUploadsSearch;
 import eionet.cr.search.SearchException;
 import eionet.cr.util.Util;
 import eionet.cr.web.util.columns.SearchResultColumn;
@@ -114,7 +116,7 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean<SubjectDTO
 		/* columns for full reports */
 		list = new ArrayList<SearchResultColumn>();
 		list.add(new SubjectPredicateColumn("Title", false, Predicates.RDFS_LABEL));
-		list.add(new SubjectPredicateColumn("SubjectDTOTemp", false, Predicates.DC_SUBJECT));
+		list.add(new SubjectPredicateColumn("Subject", false, Predicates.DC_SUBJECT));
 		list.add(new SubjectPredicateColumn("Coverage", false, Predicates.DC_COVERAGE));
 		list.add(uploaded);
 		typesColumns.put(Subjects.FULL_REPORT_CLASS, list);
@@ -143,24 +145,19 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean<SubjectDTO
 		
 		if (!StringUtils.isBlank(type)){
 			//String decodedType = Util.urlDecode(type);
-			RecentUploadsSearch recentUploadsSearch = new RecentUploadsSearch(type);
-			recentUploadsSearch.setPageLength(MAX_RESULTS);
-			recentUploadsSearch.execute();
-			this.resultList = recentUploadsSearch.getResultList();
+			
+			try {
+				resultList = DAOFactory.get().getDao(HelperDAO.class).getLatestSubjects(
+						type, MAX_RESULTS);
+			}
+			catch (DAOException e) {
+				throw new SearchException(e.toString(),e);
+			}
 		}
 			
 		return new ForwardResolution("/pages/recent.jsp");
 	}
 	
-	@HandlesEvent("recentFiles")
-	public Resolution recentFiles() throws SearchException {
-		RecentUploadsSearch search = new RecentUploadsSearch("file");
-		search.setPageLength(MAX_RESULTS);
-		search.execute();
-		this.resultList = search.getResultList();
-		return new ForwardResolution("/pages/recentFiles.jsp");
-	}
-
 	/**
 	 * 
 	 * @return

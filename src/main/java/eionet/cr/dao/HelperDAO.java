@@ -35,7 +35,16 @@ public interface HelperDAO extends DAO {
 	 * @return
 	 * @throws DAOException
 	 */
-	List<Pair<String, String>> getRecentlyDiscoveredFiles(int limit) throws DAOException;
+	List<Pair<String, String>> getLatestFiles(int limit) throws DAOException;
+	
+	/**
+	 * 
+	 * @param rdfType TODO
+	 * @param limit
+	 * @return
+	 * @throws DAOException
+	 */
+	List<SubjectDTO> getLatestSubjects(String rdfType, int limit) throws DAOException;
 	
 	/**
 	 * @param predicateUri

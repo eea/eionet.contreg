@@ -8,6 +8,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -37,6 +38,7 @@ import eionet.cr.util.Pair;
 import eionet.cr.util.URIUtil;
 import eionet.cr.util.Util;
 import eionet.cr.util.YesNoBoolean;
+import eionet.cr.util.sql.PairReader;
 import eionet.cr.util.sql.ResultSetListReader;
 import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
@@ -62,7 +64,7 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 	 * @see eionet.cr.dao.HelperDAO#getRecentlyDiscoveredFiles()
 	 * {@inheritDoc}
 	 */
-	public List<Pair<String, String>> getRecentlyDiscoveredFiles(int limit) throws DAOException {
+	public List<Pair<String, String>> getLatestFiles(int limit) throws DAOException {
 		
 		/* Get the hashes and URIs of recent subjects of type=cr:file
 		 * (we need URIs, because we might need to derive labels from them).
@@ -709,5 +711,58 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 		}
 		
 		return subProperties;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#getLatestSubjects(int)
+	 */
+	public List<SubjectDTO> getLatestSubjects(String rdfType, int limit) throws DAOException {
+		
+		// validate arguments
+		if (StringUtils.isBlank(rdfType))
+			throw new IllegalArgumentException("rdfType must not be blank!");
+		if (limit<=0)
+			throw new IllegalArgumentException("limit must be greater than 0!");
+
+		// build SQL query
+		StringBuffer sqlBuf = new StringBuffer().
+		append("select SPO.SUBJECT as ").append(PairReader.LEFTCOL).
+		append(", RESOURCE.FIRSTSEEN_TIME as ").append(PairReader.RIGHTCOL).
+		append(" from SPO, RESOURCE").
+		append(" where SPO.PREDICATE=").append(Hashes.spoHash(Predicates.RDF_TYPE)).
+		append(" and SPO.OBJECT_HASH=").append(Hashes.spoHash(rdfType)).
+		append(" and SPO.SUBJECT=RESOURCE.URI_HASH").
+		append(" order by RESOURCE.FIRSTSEEN_TIME desc").
+		append(" limit ").append(limit);
+		
+		// execute SQL query
+		PairReader<Long,Long> pairReader = new PairReader<Long,Long>();
+		executeQuery(sqlBuf.toString(), pairReader);
+		List<Pair<Long,Long>> resultList = pairReader.getResultList();
+		
+		// if result list null or empty, return
+		if (resultList==null || resultList.isEmpty()){
+			return new LinkedList<SubjectDTO>();
+		}
+		
+		// create helper objects
+		Map<Long,SubjectDTO> subjectsMap = new HashMap<Long, SubjectDTO>();
+		Map<Long,Date> firstSeenTimes = new HashMap<Long, Date>(); 
+		for (Pair<Long,Long> p : resultList){
+			subjectsMap.put(p.getLeft(), null);
+			firstSeenTimes.put(p.getLeft(), new Date(p.getRight()));
+		}
+		
+		// get subjects data
+		List<SubjectDTO> result = executeQuery(getSubjectsDataQuery(subjectsMap.keySet()),
+				null, new SubjectDataReader(subjectsMap));
+		
+		// set firstseen-times of found subjects
+		for (SubjectDTO subject : result){
+			subject.setFirstSeenTime(firstSeenTimes.get(Long.valueOf(subject.getUriHash())));
+		}
+		
+		return result;
 	}
 }

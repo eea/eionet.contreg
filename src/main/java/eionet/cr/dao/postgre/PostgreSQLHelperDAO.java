@@ -69,7 +69,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		return null;
 	}
 
-	public List<Pair<String, String>> getRecentlyDiscoveredFiles(int limit)
+	public List<Pair<String, String>> getLatestFiles(int limit)
 			throws DAOException {
 		// TODO Auto-generated method stub
 		return null;
@@ -122,6 +122,11 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 
 	public SubProperties getSubProperties(Set<Long> subjectHashes)
 			throws DAOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public List<SubjectDTO> getLatestSubjects(String rdfType, int limit) throws DAOException {
 		// TODO Auto-generated method stub
 		return null;
 	}
