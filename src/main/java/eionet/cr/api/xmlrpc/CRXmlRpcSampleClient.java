@@ -49,13 +49,13 @@ public class CRXmlRpcSampleClient {
 		
 		// set up the XmlRpcClient
 		XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
-	    config.setServerURL(new URL("http://80.235.29.171:8080/cr/xmlrpc"));
+	    config.setServerURL(new URL("http://ww010646:8080/cr/xmlrpc"));
 	    config.setEnabledForExtensions(true);
 	    XmlRpcClient client = new XmlRpcClient();
 	    client.setConfig(config);
 	    
 	    // execute the call
-	    Object[] params = new Object[]{Util.stringToDate("2007-01-01 10:30:00", "yyyy-MM-dd HH:mm:ss")};
+	    Object[] params = new Object[]{Util.stringToDate("2010-01-01 00:00:00", "yyyy-MM-dd HH:mm:ss")};
 	    Object[] result = (Object[])client.execute("ContRegService.getResourcesSinceTimestamp", params);
 	    
 	    // loop through the results, do type casting to see if any ClassCastExceptions are thrown
@@ -129,9 +129,9 @@ public class CRXmlRpcSampleClient {
 	public static void main(String[] args){
 		
 		try{
-			//sample_getResourcesSinceTimestamp();
+			sample_getResourcesSinceTimestamp();
 			//sample_simpleAndSearch();
-			sample_dataflowSearch();
+			//sample_dataflowSearch();
 		}
 		catch (Throwable t){
 			t.printStackTrace();

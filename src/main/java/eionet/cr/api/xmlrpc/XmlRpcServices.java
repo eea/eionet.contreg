@@ -38,12 +38,13 @@ import org.apache.commons.logging.LogFactory;
 import eionet.cr.common.CRException;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
+import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
-import eionet.cr.search.DiscoveredSinceTimeSearch;
 import eionet.cr.util.PagingRequest;
 import eionet.cr.util.Pair;
 import eionet.cr.util.URLUtil;
@@ -78,10 +79,10 @@ public class XmlRpcServices implements Services{
 			if (givenTimeSeconds < curTimeSeconds){
 				
 				try{
-					DiscoveredSinceTimeSearch search = new DiscoveredSinceTimeSearch(timestamp);
-					search.setPageLength(MAX_RESULTS);
-					search.execute();
-					Collection<SubjectDTO> subjects = search.getResultList();
+					Collection<SubjectDTO> subjects =
+						DAOFactory.get().getDao(HelperDAO.class).getSubjectsNewerThan(
+							timestamp, MAX_RESULTS);
+					
 					for (Iterator<SubjectDTO> subjectsIter=subjects.iterator(); subjectsIter.hasNext();){
 						
 						SubjectDTO subjectDTO = subjectsIter.next();

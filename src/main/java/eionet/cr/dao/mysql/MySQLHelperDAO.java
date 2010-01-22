@@ -765,4 +765,51 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 		
 		return result;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#getSubjectsNewerThan(java.util.Date, int)
+	 */
+	public List<SubjectDTO> getSubjectsNewerThan(Date timestamp, int limit) throws DAOException {
+		
+		// validate arguments
+		if (timestamp==null || timestamp.after(new Date()))
+			throw new IllegalArgumentException("timestamp must not be null or after current time!");
+		if (limit<=0)
+			throw new IllegalArgumentException("limit must be greater than 0!");
+
+		// build SQL query
+		StringBuffer sqlBuf = new StringBuffer().
+		append("select SPO.SUBJECT as SUBJECT_HASH from SPO, RESOURCE").
+		append(" where SPO.PREDICATE=? and SPO.OBJECT_HASH=? and SPO.SUBJECT=RESOURCE.URI_HASH ").
+		append(" and RESOURCE.FIRSTSEEN_TIME>?").
+		append(" order by RESOURCE.FIRSTSEEN_TIME desc").
+		append(" limit ").append(limit);
+		
+		ArrayList<Object> inParameters = new ArrayList<Object>();
+		inParameters.add(Hashes.spoHash(Predicates.RDF_TYPE));
+		inParameters.add(Hashes.spoHash(Subjects.CR_FILE));
+		inParameters.add(Long.valueOf(timestamp.getTime()));
+		
+		// execute SQL query
+		SingleObjectReader<Long> reader = new SingleObjectReader<Long>();
+		executeQuery(sqlBuf.toString(), inParameters, reader);
+		List<Long> resultList = reader.getResultList();
+		
+		// if result list null or empty, return
+		if (resultList==null || resultList.isEmpty()){
+			return new LinkedList<SubjectDTO>();
+		}
+		
+		// create helper objects
+		Map<Long,SubjectDTO> subjectsMap = new HashMap<Long, SubjectDTO>();
+		for (Long subjectHash : resultList){
+			subjectsMap.put(subjectHash, null);
+		}
+		
+		// get subjects data
+		List<SubjectDTO> result = executeQuery(getSubjectsDataQuery(subjectsMap.keySet()),
+				null, new SubjectDataReader(subjectsMap));
+		return result;
+	}
 }

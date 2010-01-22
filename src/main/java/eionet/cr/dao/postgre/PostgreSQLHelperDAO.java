@@ -21,6 +21,7 @@
 package eionet.cr.dao.postgre;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -127,6 +128,12 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 	}
 
 	public List<SubjectDTO> getLatestSubjects(String rdfType, int limit) throws DAOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public List<SubjectDTO> getSubjectsNewerThan(Date timestamp, int limit)
+			throws DAOException {
 		// TODO Auto-generated method stub
 		return null;
 	}

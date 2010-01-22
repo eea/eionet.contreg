@@ -5,6 +5,7 @@ package eionet.cr.dao;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +46,15 @@ public interface HelperDAO extends DAO {
 	 * @throws DAOException
 	 */
 	List<SubjectDTO> getLatestSubjects(String rdfType, int limit) throws DAOException;
+	
+	/**
+	 * 
+	 * @param timestamp
+	 * @param limit
+	 * @return
+	 * @throws DAOException
+	 */
+	List<SubjectDTO> getSubjectsNewerThan(Date timestamp, int limit) throws DAOException;
 	
 	/**
 	 * @param predicateUri
