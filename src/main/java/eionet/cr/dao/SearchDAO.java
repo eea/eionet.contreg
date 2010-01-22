@@ -70,4 +70,18 @@ public interface SearchDAO extends DAO{
 			Set<String> literalPredicates,
 			PagingRequest pagingRequest,
 			SortingRequest sortingRequest) throws DAOException;
+
+	/**
+	 * 
+	 * @param subjectHash
+	 * @param pagingRequest
+	 * @param sortingRequest
+	 * @return
+	 * @throws DAOException
+	 */
+	Pair<Integer, List<SubjectDTO>> referenceSearch(
+			Long subjectHash,
+			PagingRequest pagingRequest,
+			SortingRequest sortingRequest) throws DAOException;
+
 }

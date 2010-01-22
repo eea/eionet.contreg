@@ -67,4 +67,11 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 		// TODO method to be implemented
 		return null;
 	}
+
+	public Pair<Integer, List<SubjectDTO>> referenceSearch(Long subjectHash,
+			PagingRequest pagingRequest, SortingRequest sortingRequest)
+			throws DAOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

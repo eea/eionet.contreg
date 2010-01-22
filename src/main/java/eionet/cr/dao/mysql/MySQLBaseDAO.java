@@ -143,7 +143,16 @@ public abstract class MySQLBaseDAO {
 			ConnectionUtil.clostStatement(statement);
 		}
 	}
-	
+
+	/**
+	 * 
+	 * @param <T>
+	 * @param sql
+	 * @param params
+	 * @param reader
+	 * @return
+	 * @throws DAOException
+	 */
 	protected <T> Pair<List<T>, Integer> executeQueryWithRowCount(String sql, List<?> params, ResultSetListReader<T> reader) throws DAOException {
 		Connection conn = null;
 		try {
@@ -159,6 +168,39 @@ public abstract class MySQLBaseDAO {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param <T>
+	 * @param sql
+	 * @param reader
+	 * @return
+	 * @throws DAOException
+	 */
+	protected <T> Pair<List<T>, Integer> executeQueryWithRowCount(String sql, ResultSetListReader<T> reader) throws DAOException {
+		
+		Connection conn = null;
+		try {
+			conn = getConnection();
+			SQLUtil.executeQuery(sql, reader, conn);
+			List<T> list = reader.getResultList();
+			int rows = MySQLUtil.getTotalRowCount(conn);
+			return new Pair<List<T>, Integer> (list, rows);
+		} catch (Exception fatal) {
+			throw new DAOException(fatal.getMessage(), fatal);
+		} finally {
+			ConnectionUtil.closeConnection(conn);
+		}
+	}
+	
+	/**
+	 * 
+	 * @param <T>
+	 * @param sql
+	 * @param params
+	 * @param reader
+	 * @return
+	 * @throws DAOException
+	 */
 	protected <T> T executeQueryUniqueResult(String sql, List<?> params, ResultSetListReader<T> reader) throws DAOException {
 		List<T> result = executeQuery(sql, params, reader);
 		return result == null || result.isEmpty()

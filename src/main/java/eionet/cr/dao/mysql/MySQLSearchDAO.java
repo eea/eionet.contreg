@@ -58,6 +58,7 @@ import eionet.cr.util.sql.PairReader;
 import eionet.cr.util.sql.ResultSetListReader;
 import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
+import eionet.cr.web.util.columns.ReferringPredicatesColumn;
 import eionet.cr.web.util.columns.SubjectLastModifiedColumn;
 
 /**
@@ -230,5 +231,73 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 		
 		List<SubjectDTO> subjects = executeQuery(getSubjectsDataQuery(temp.keySet()), null, new SubjectDataReader(temp));
 		return new Pair<Integer,List<SubjectDTO>>(subjectHashes.getRight(), subjects);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.SearchDAO#referenceSearch(java.lang.Long, eionet.cr.util.PagingRequest, eionet.cr.util.SortingRequest)
+	 */
+	public Pair<Integer, List<SubjectDTO>> referenceSearch(Long subjectHash,
+			PagingRequest pagingRequest, SortingRequest sortingRequest)
+			throws DAOException {
+		
+		if (subjectHash==null){
+			return null;
+		}
+
+		String sortPredicate = sortingRequest!=null ? sortingRequest.getSortingColumnName() : null;
+		SortOrder sortOrder  = sortingRequest!=null ? sortingRequest.getSortOrder() : null;
+		boolean doSort = !StringUtils.isBlank(sortPredicate);
+		
+		// build the "select from" part
+		StringBuffer sqlBuf = new StringBuffer().
+		append("select sql_calc_found_rows SPO.SUBJECT as SUBJECT_HASH from SPO");
+		if (doSort){
+			
+			if (sortPredicate.equals(ReferringPredicatesColumn.class.getSimpleName())){
+				sqlBuf.append(" left join SPO as ORDERING on ").
+				append("(SPO.PREDICATE=ORDERING.SUBJECT and ORDERING.PREDICATE=").
+				append(Hashes.spoHash(Predicates.RDFS_LABEL)).append(")");
+			}
+			else{
+				sqlBuf.append(" left join SPO as ORDERING on ").
+				append("(SPO.SUBJECT=ORDERING.SUBJECT and ORDERING.PREDICATE=").
+				append(Hashes.spoHash(sortPredicate)).append(")");
+			}
+		}
+		
+		// build the "where" part
+		sqlBuf.append(" where SPO.LIT_OBJ='N' and SPO.OBJECT_HASH=").append(subjectHash);
+		
+		// build the "order by" part
+		if (doSort){
+			sqlBuf.append(" order by ORDERING.OBJECT ").
+			append(sortOrder==null ? sortOrder.ASCENDING.toSQL() : sortOrder.toSQL());
+		}
+
+		// build the "limit" part
+		if (pagingRequest!=null && pagingRequest.getItemsPerPage()>0){
+			
+			sqlBuf.append(" limit ");
+			if (pagingRequest.getPageNumber()>0){
+				sqlBuf.append(pagingRequest.getPageNumber());
+			}
+			sqlBuf.append(",").append(pagingRequest.getItemsPerPage());
+		}
+		
+		Pair<List<Long>,Integer> pair = executeQueryWithRowCount(sqlBuf.toString(),
+				new SingleObjectReader<Long>());
+		if (pair==null || pair.getRight()==0){
+			return new Pair<Integer, List<SubjectDTO>>(0, new LinkedList<SubjectDTO>());
+		}
+		else{
+			Map<Long,SubjectDTO> temp = new LinkedHashMap<Long, SubjectDTO>();
+			for (Long hash : pair.getLeft()) {
+				temp.put(hash, null);
+			}
+			List<SubjectDTO> subjects = executeQuery(
+					getSubjectsDataQuery(temp.keySet()), null, new SubjectDataReader(temp));
+			return new Pair<Integer,List<SubjectDTO>>(pair.getRight(), subjects);
+		}
 	}
 }

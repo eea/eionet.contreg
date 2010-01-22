@@ -65,5 +65,4 @@ public class SortingRequest {
 	public void setSortOrder(SortOrder sortOrder) {
 		this.sortOrder = sortOrder;
 	}
-
 }

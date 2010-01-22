@@ -23,6 +23,7 @@ package eionet.cr.web.action;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -40,15 +41,24 @@ import net.sourceforge.stripes.validation.ValidationMethod;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.config.GeneralConfig;
+import eionet.cr.dao.DAOException;
+import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.HelperDAO;
+import eionet.cr.dao.SearchDAO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.ReferencesSearch;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.util.SearchExpression;
+import eionet.cr.search.util.SortOrder;
 import eionet.cr.search.util.UriLabelPair;
 import eionet.cr.util.Hashes;
+import eionet.cr.util.PagingRequest;
+import eionet.cr.util.Pair;
+import eionet.cr.util.SortingRequest;
 import eionet.cr.util.URIUtil;
 import eionet.cr.util.URLUtil;
+import eionet.cr.util.Util;
 import eionet.cr.web.util.columns.ReferringPredicatesColumn;
 import eionet.cr.web.util.columns.SearchResultColumn;
 import eionet.cr.web.util.columns.SubjectPredicateColumn;
@@ -89,15 +99,26 @@ public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
 			addCautionMessage("Resource identifier not specified!");
 		}
 		else{
-			ReferencesSearch refSearch = anonHash==0 ? new ReferencesSearch(uri) : new ReferencesSearch(anonHash);
-			refSearch.setPageNumber(getPageN());
-			refSearch.setSorting(getSortP(), getSortO());
-			
-			refSearch.execute();
-			resultList = refSearch.getResultList();
-			matchCount = refSearch.getTotalMatchCount();
-			
-			predicateLabels = refSearch.getPredicateLabels().getByLanguages(getAcceptedLanguages());
+			try{
+				Pair<Integer, List<SubjectDTO>> searchResult =
+					DAOFactory.get().getDao(SearchDAO.class).referenceSearch(
+						anonHash==0 ? Hashes.spoHash(uri) : anonHash,
+								new PagingRequest(getPageN()),
+								new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
+
+				resultList = searchResult.getRight();
+				matchCount = searchResult.getLeft();
+
+				HashSet<Long> subjectHashes = new HashSet<Long>();
+				for (SubjectDTO subject : resultList){
+					subjectHashes.add(subject.getUriHash());
+				}
+				predicateLabels = DAOFactory.get().getDao(HelperDAO.class).getPredicateLabels(
+						subjectHashes).getByLanguages(getAcceptedLanguages());
+			}
+			catch (DAOException e){
+				throw new SearchException(e.toString(), e);
+			}
 		}
 		
 		return new ForwardResolution("/pages/references.jsp");
