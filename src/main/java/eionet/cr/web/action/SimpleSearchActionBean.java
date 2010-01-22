@@ -23,6 +23,7 @@ package eionet.cr.web.action;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import net.sourceforge.stripes.action.DefaultHandler;
@@ -33,13 +34,15 @@ import net.sourceforge.stripes.validation.ValidationErrors;
 import net.sourceforge.stripes.validation.ValidationMethod;
 import eionet.cr.common.Predicates;
 import eionet.cr.dao.DAOException;
+import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
-import eionet.cr.search.UriSearch;
 import eionet.cr.search.util.SearchExpression;
 import eionet.cr.search.util.SortOrder;
+import eionet.cr.util.Hashes;
 import eionet.cr.util.PagingRequest;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
@@ -83,14 +86,14 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 			if (!searchExpression.isEmpty()) {
 
 				if (searchExpression.isUri()) {
+					
 					this.isUri = true;
-					UriSearch uriSearch = new UriSearch(searchExpression.toString());
-					uriSearch.setPageNumber(getPageN());
-					uriSearch.setSorting(getSortP(), getSortO());
-
-					uriSearch.execute();
-					resultList = uriSearch.getResultList();
-					matchCount = uriSearch.getTotalMatchCount();
+					SubjectDTO subject = DAOFactory.get().getDao(HelperDAO.class).getSubject(
+							Hashes.spoHash(searchExpression.toString()));
+					if (subject!=null){
+						resultList = Collections.singleton(subject);
+						matchCount = 1;
+					}
 				}
 
 				if (resultList == null || resultList.size() == 0) {

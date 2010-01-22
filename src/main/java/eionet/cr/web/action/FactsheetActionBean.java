@@ -103,9 +103,10 @@ public class FactsheetActionBean extends AbstractActionBean{
 			noCriteria = true;
 			addCautionMessage("Resource identifier not specified!");
 		}
-		else {
-			HelperDAO helperDAO = DAOFactory.get().getDao(HelperDAO.class);
+		else{
 			Long subjectHash = uriHash==0 ? Hashes.spoHash(uri) : uriHash;
+			HelperDAO helperDAO = DAOFactory.get().getDao(HelperDAO.class);
+			
 			subject = helperDAO.getSubject(subjectHash);
 			if (subject!=null) {
 				uri = subject.getUri();

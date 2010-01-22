@@ -22,6 +22,7 @@ package eionet.cr.search;
 
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Collections;
 
 import org.dbunit.DatabaseTestCase;
 import org.dbunit.database.DatabaseConnection;
@@ -29,6 +30,9 @@ import org.dbunit.database.IDatabaseConnection;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
 
+import eionet.cr.dao.DAOException;
+import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.HelperDAO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.sql.ConnectionUtil;
 
@@ -45,10 +49,10 @@ public class SubjectSearchTest extends DatabaseTestCase {
 		return new FlatXmlDataSet(getFileAsStream("simple-db.xml"));
 	}
 	
-	public void testSubjectDataSelectSQL() throws SearchException {
-		UriSearch us = new UriSearch(5550937339998314774L);
-		us.execute();
-		Collection<SubjectDTO> resultList = us.getResultList();
+	public void testSubjectDataSelectSQL() throws DAOException {
+		
+		SubjectDTO subject = DAOFactory.get().getDao(HelperDAO.class).getSubject(5550937339998314774L);
+		Collection<SubjectDTO> resultList = Collections.singleton(subject);
 		assertEquals("[SubjectDTO[uri=http://www.w3.org/2004/02/skos/core#semanticRelation," +
 				"predicates={" +
 				"http://www.w3.org/2000/01/rdf-schema#domain=[Concept, http://www.w3.org/2004/02/skos/core#Concept], " +

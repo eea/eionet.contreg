@@ -20,10 +20,7 @@
 * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.web.action;
 
-import java.util.Collection;
 import java.util.Date;
-
-import org.apache.commons.lang.StringUtils;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
@@ -31,13 +28,15 @@ import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.validation.SimpleError;
-import net.sourceforge.stripes.validation.Validate;
-import net.sourceforge.stripes.validation.ValidationErrors;
 import net.sourceforge.stripes.validation.ValidationMethod;
+
+import org.apache.commons.lang.StringUtils;
+
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
+import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dto.HarvestSourceDTO;
@@ -46,7 +45,6 @@ import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.search.SearchException;
-import eionet.cr.search.UriSearch;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
@@ -83,14 +81,12 @@ public class RegisterURLActionBean extends AbstractActionBean{
 	 */
 	public Resolution save() throws SearchException, DAOException, HarvestException{
 		
-		/* get the subject from db */
-		
-		UriSearch uriSearch = new UriSearch(url);
-		uriSearch.execute();
-		Collection<SubjectDTO> coll = uriSearch.getResultList();
-		SubjectDTO subjectDTO = coll!=null && !coll.isEmpty() ? coll.iterator().next() : null;
-		
-		// if subject did not exist or it isn't registered in user's registrations yet, then add the necessary triples
+		// get the subject from db		
+		SubjectDTO subjectDTO = DAOFactory.get().getDao(HelperDAO.class).getSubject(
+				Hashes.spoHash(url));
+
+		// if subject did not exist or it isn't registered in user's registrations yet,
+		// then add the necessary triples
 		if (subjectDTO==null || !subjectDTO.existsPredicateObjectSource(
 				Predicates.RDF_TYPE, Subjects.CR_FILE, getUser().getRegistrationsUri())){
 			
