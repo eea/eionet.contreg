@@ -88,7 +88,7 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean<SubjectDT
 			customSearch = MySQLDAOFactory
 					.get()
 					.getDao(SearchDAO.class)
-					.filteredSearch(
+					.searchByFilters(
 							buildSearchCriteria(),
 							null,
 							new PagingRequest(getPageN()),

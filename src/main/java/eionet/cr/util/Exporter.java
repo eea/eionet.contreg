@@ -77,7 +77,7 @@ public class Exporter {
 		}
 		customSearch = MySQLDAOFactory.get()
 				.getDao(SearchDAO.class)
-				.filteredSearch(
+				.searchByFilters(
 						criteria,
 						null,
 						new PagingRequest(

@@ -75,10 +75,10 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 	}
 	
 	/** 
-	 * @see eionet.cr.dao.SearchDAO#freetextSearch(eionet.cr.search.util.SearchExpression, int, eionet.cr.util.SortingRequest)
+	 * @see eionet.cr.dao.SearchDAO#searchByFreeText(eionet.cr.search.util.SearchExpression, int, eionet.cr.util.SortingRequest)
 	 * {@inheritDoc}
 	 */
-	public Pair<Integer, List<SubjectDTO>> freetextSearch(
+	public Pair<Integer, List<SubjectDTO>> searchByFreeText(
 				SearchExpression expression,
 				PagingRequest pagingRequest,
 				SortingRequest sortingRequest) throws DAOException, SQLException {
@@ -148,11 +148,11 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 	}
 	
 	/** 
-	 * @see eionet.cr.dao.SearchDAO#filteredSearch(java.util.Map, java.util.Set, int, eionet.cr.util.SortingRequest)
+	 * @see eionet.cr.dao.SearchDAO#searchByFilters(java.util.Map, java.util.Set, int, eionet.cr.util.SortingRequest)
 	 * {@inheritDoc}
 	 */
-	public Pair<Integer, List<SubjectDTO>> filteredSearch(
-			Map<String, String> criterias,
+	public Pair<Integer, List<SubjectDTO>> searchByFilters(
+			Map<String, String> filters,
 			Set<String> literalPredicates,
 			PagingRequest pagingRequest,
 			SortingRequest sortingRequest)
@@ -176,7 +176,7 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 		
 		//building up where and from clause
 		int index = 1;
-		for(Entry<String,String> criteria : criterias.entrySet()) {
+		for(Entry<String,String> criteria : filters.entrySet()) {
 			String spoCurr = "SPO" + index++;
 			whereClause.append(whereClause.length() > 0 ? " and " : "");
 			whereClause.append(spoCurr).append(".PREDICATE=? and ");
@@ -237,7 +237,7 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 	 * (non-Javadoc)
 	 * @see eionet.cr.dao.SearchDAO#referenceSearch(java.lang.Long, eionet.cr.util.PagingRequest, eionet.cr.util.SortingRequest)
 	 */
-	public Pair<Integer, List<SubjectDTO>> referenceSearch(Long subjectHash,
+	public Pair<Integer, List<SubjectDTO>> searchReferences(Long subjectHash,
 			PagingRequest pagingRequest, SortingRequest sortingRequest)
 			throws DAOException {
 		

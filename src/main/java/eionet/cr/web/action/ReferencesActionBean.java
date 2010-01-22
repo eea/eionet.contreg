@@ -47,7 +47,6 @@ import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.SearchDAO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.search.ReferencesSearch;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.util.SearchExpression;
 import eionet.cr.search.util.SortOrder;
@@ -101,7 +100,7 @@ public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
 		else{
 			try{
 				Pair<Integer, List<SubjectDTO>> searchResult =
-					DAOFactory.get().getDao(SearchDAO.class).referenceSearch(
+					DAOFactory.get().getDao(SearchDAO.class).searchReferences(
 						anonHash==0 ? Hashes.spoHash(uri) : anonHash,
 								new PagingRequest(getPageN()),
 								new SortingRequest(getSortP(), SortOrder.parse(getSortO())));

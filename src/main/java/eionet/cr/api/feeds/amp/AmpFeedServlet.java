@@ -72,7 +72,7 @@ public class AmpFeedServlet extends HttpServlet implements SubjectProcessor{
 			Map<String, String> criteria = new HashMap<String, String>();
 			criteria.put(Predicates.RDF_TYPE, Subjects.AMP_PRODUCT);
 
-			Pair<Integer, List<SubjectDTO>> results = searchDao.filteredSearch(
+			Pair<Integer, List<SubjectDTO>> results = searchDao.searchByFilters(
 					criteria,
 					null, 
 					new PagingRequest(0, 0),

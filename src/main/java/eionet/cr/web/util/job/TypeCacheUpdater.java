@@ -63,7 +63,7 @@ public class TypeCacheUpdater implements StatefulJob {
 
 			Pair<Integer, List<SubjectDTO>> customSearch = MySQLDAOFactory.get()
 					.getDao(SearchDAO.class)
-					.filteredSearch(
+					.searchByFilters(
 							criteria,
 							null,
 							new PagingRequest(1,0),

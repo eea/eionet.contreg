@@ -99,7 +99,7 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 				if (resultList == null || resultList.size() == 0) {
 					Pair<Integer, List<SubjectDTO>> result = 
 							MySQLDAOFactory.get().getDao(SearchDAO.class)
-									.freetextSearch(
+									.searchByFreeText(
 											searchExpression,
 											new PagingRequest(getPageN()),
 											new SortingRequest(getSortP(), SortOrder.parse(getSortO())));

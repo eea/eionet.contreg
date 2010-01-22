@@ -47,8 +47,8 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 	 * (non-Javadoc)
 	 * @see eionet.cr.dao.SearchDAO#filteredSearch(java.util.Map, java.util.Set, eionet.cr.util.PagingRequest, eionet.cr.util.SortingRequest)
 	 */
-	public Pair<Integer, List<SubjectDTO>> filteredSearch(
-			Map<String, String> criteria, Set<String> literalPredicates,
+	public Pair<Integer, List<SubjectDTO>> searchByFilters(
+			Map<String, String> filters, Set<String> literalPredicates,
 			PagingRequest pagingRequest, SortingRequest sortingRequest)
 			throws DAOException {
 		
@@ -60,7 +60,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 	 * (non-Javadoc)
 	 * @see eionet.cr.dao.SearchDAO#freetextSearch(eionet.cr.search.util.SearchExpression, eionet.cr.util.PagingRequest, eionet.cr.util.SortingRequest)
 	 */
-	public Pair<Integer, List<SubjectDTO>> freetextSearch(
+	public Pair<Integer, List<SubjectDTO>> searchByFreeText(
 			SearchExpression expression, PagingRequest pagingRequest,
 			SortingRequest sortingRequest) throws Exception {
 
@@ -68,7 +68,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 		return null;
 	}
 
-	public Pair<Integer, List<SubjectDTO>> referenceSearch(Long subjectHash,
+	public Pair<Integer, List<SubjectDTO>> searchReferences(Long subjectHash,
 			PagingRequest pagingRequest, SortingRequest sortingRequest)
 			throws DAOException {
 		// TODO Auto-generated method stub

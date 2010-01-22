@@ -42,31 +42,27 @@ import eionet.cr.util.SortingRequest;
 public interface SearchDAO extends DAO{
 
 	/**
-	 * Newly rewritten simple search.
-	 * 
 	 * @param expression - search expression to find
 	 * @param pagingRequest - page request
 	 * @param sortingRequest - sorting request to set
 	 * @return
 	 * @throws Exception
 	 */
-	Pair<Integer, List<SubjectDTO>> freetextSearch(
+	Pair<Integer, List<SubjectDTO>> searchByFreeText(
 				SearchExpression expression,
 				PagingRequest pagingRequest,
 				SortingRequest sortingRequest) throws Exception;
 	
 	/**
-	 * Newly rewritten custom search.
-	 * 
-	 * @param criteria - custom search criteria.
+	 * @param filters - search filters.
 	 * @param literalPredicates - set of literal predicates
 	 * @param pagingRequest - page request
 	 * @param sortingRequest - sorting request
 	 * @return
 	 * @throws DAOException
 	 */
-	Pair<Integer, List<SubjectDTO>> filteredSearch(
-			Map<String,String> criteria,
+	Pair<Integer, List<SubjectDTO>> searchByFilters(
+			Map<String,String> filters,
 			Set<String> literalPredicates,
 			PagingRequest pagingRequest,
 			SortingRequest sortingRequest) throws DAOException;
@@ -79,7 +75,7 @@ public interface SearchDAO extends DAO{
 	 * @return
 	 * @throws DAOException
 	 */
-	Pair<Integer, List<SubjectDTO>> referenceSearch(
+	Pair<Integer, List<SubjectDTO>> searchReferences(
 			Long subjectHash,
 			PagingRequest pagingRequest,
 			SortingRequest sortingRequest) throws DAOException;

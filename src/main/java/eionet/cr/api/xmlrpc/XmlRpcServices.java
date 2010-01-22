@@ -135,7 +135,7 @@ public class XmlRpcServices implements Services{
 		try{
 			Pair<Integer, List<SubjectDTO>> search = MySQLDAOFactory
 					.get().getDao(SearchDAO.class)
-					.filteredSearch(
+					.searchByFilters(
 							criteria,
 							null,
 							new PagingRequest(1, MAX_RESULTS),
@@ -217,7 +217,7 @@ public class XmlRpcServices implements Services{
 		try{
 			Pair<Integer,List<SubjectDTO>> search = MySQLDAOFactory.get()
 					.getDao(SearchDAO.class)
-					.filteredSearch(
+					.searchByFilters(
 							criteria,
 							null,
 							new PagingRequest(1,MAX_RESULTS),

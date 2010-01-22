@@ -255,7 +255,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 				Pair<Integer, List<SubjectDTO>> customSearch;
 				try {
 					customSearch = MySQLDAOFactory.get().getDao(SearchDAO.class)
-							.filteredSearch(
+							.searchByFilters(
 									criteria,
 									null,
 									new PagingRequest(getPageN()),

@@ -77,7 +77,7 @@ public class XmlConvFeedServlet extends HttpServlet{
 				Map<String, String> criteria = new HashMap<String, String>();
 				criteria.put(Predicates.CR_SCHEMA, xmlSchema);
 
-				Pair<Integer, List<SubjectDTO>> results = searchDao.filteredSearch(
+				Pair<Integer, List<SubjectDTO>> results = searchDao.searchByFilters(
 						criteria,
 						null, 
 						new PagingRequest(0, 0),
