@@ -28,11 +28,13 @@ import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.RawTripleDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
+import eionet.cr.search.util.DataflowPicklistReader;
 import eionet.cr.search.util.PredicateLabels;
 import eionet.cr.search.util.PredicateLabelsReader;
 import eionet.cr.search.util.SubProperties;
 import eionet.cr.search.util.SubPropertiesReader;
 import eionet.cr.search.util.SubjectDataReader;
+import eionet.cr.search.util.UriLabelPair;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
 import eionet.cr.util.URIUtil;
@@ -811,5 +813,38 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 		List<SubjectDTO> result = executeQuery(getSubjectsDataQuery(subjectsMap.keySet()),
 				null, new SubjectDataReader(subjectsMap));
 		return result;
+	}
+
+	/** */
+	private static final String dataflowPicklistSQL = new StringBuffer().
+		append("select distinct ").
+			append("INSTRUMENT_TITLE.OBJECT as INSTRUMENT_TITLE, ").
+			append("OBLIGATION_TITLE.OBJECT as OBLIGATION_TITLE, ").
+			append("OBLIGATION_URI.URI as OBLIGATION_URI ").
+		append("from ").
+			append("SPO as OBLIGATION_TITLE ").
+			append("left join RESOURCE as OBLIGATION_URI on OBLIGATION_TITLE.SUBJECT=OBLIGATION_URI.URI_HASH ").
+			append("left join SPO as OBLIGATION_INSTR on OBLIGATION_TITLE.SUBJECT=OBLIGATION_INSTR.SUBJECT ").
+			append("left join SPO as INSTRUMENT_TITLE on OBLIGATION_INSTR.OBJECT_HASH=INSTRUMENT_TITLE.SUBJECT ").			
+		append("where ").
+			append("OBLIGATION_TITLE.PREDICATE=").append(Hashes.spoHash(Predicates.DC_TITLE)).
+			append(" and OBLIGATION_TITLE.LIT_OBJ='Y' and OBLIGATION_INSTR.PREDICATE=").
+			append(Hashes.spoHash(Predicates.ROD_INSTRUMENT_PROPERTY)).
+			append(" and OBLIGATION_INSTR.LIT_OBJ='N' and OBLIGATION_INSTR.ANON_OBJ='N'").
+			append(" and INSTRUMENT_TITLE.PREDICATE=").append(Hashes.spoHash(Predicates.DCTERMS_ALTERNATIVE)).
+			append(" and INSTRUMENT_TITLE.LIT_OBJ='Y' ").
+		append("order by ").
+			append("INSTRUMENT_TITLE.OBJECT, OBLIGATION_TITLE.OBJECT ").toString();
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#getDataflowSearchPicklist()
+	 */
+	public HashMap<String, ArrayList<UriLabelPair>> getDataflowSearchPicklist()
+	                                                                    throws DAOException {
+		
+		DataflowPicklistReader reader = new DataflowPicklistReader();
+		executeQuery(dataflowPicklistSQL, reader);
+		return reader.getResultMap();
 	}
 }

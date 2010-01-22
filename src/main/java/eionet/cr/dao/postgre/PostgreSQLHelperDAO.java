@@ -20,6 +20,7 @@
 * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.dao.postgre;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -33,6 +34,7 @@ import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.SearchException;
 import eionet.cr.search.util.PredicateLabels;
 import eionet.cr.search.util.SubProperties;
+import eionet.cr.search.util.UriLabelPair;
 import eionet.cr.util.Pair;
 
 /**
@@ -133,6 +135,12 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 	}
 
 	public List<SubjectDTO> getSubjectsNewerThan(Date timestamp, int limit)
+			throws DAOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public HashMap<String, ArrayList<UriLabelPair>> getDataflowSearchPicklist()
 			throws DAOException {
 		// TODO Auto-generated method stub
 		return null;

@@ -4,6 +4,7 @@ package eionet.cr.dao;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -18,6 +19,7 @@ import eionet.cr.search.util.PredicateLabels;
 import eionet.cr.search.util.SearchExpression;
 import eionet.cr.search.util.SubProperties;
 import eionet.cr.search.util.SubjectDataReader;
+import eionet.cr.search.util.UriLabelPair;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
 
@@ -158,4 +160,11 @@ public interface HelperDAO extends DAO {
 	 * @throws DAOException
 	 */
 	SubProperties getSubProperties(Set<Long> subjectHashes) throws DAOException;
+	
+	/**
+	 * 
+	 * @return
+	 * @throws DAOException
+	 */
+	HashMap<String, ArrayList<UriLabelPair>> getDataflowSearchPicklist() throws DAOException;
 }

@@ -18,7 +18,7 @@
  * Contributor(s):
  * Jaanus Heinlaid, Tieto Eesti
  */
-package eionet.cr.search;
+package eionet.cr.search.util;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 import eionet.cr.common.Predicates;
-import eionet.cr.search.util.UriLabelPair;
+import eionet.cr.search.SearchException;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.sql.ConnectionUtil;
 import eionet.cr.util.sql.ResultSetBaseReader;
@@ -39,7 +39,7 @@ import eionet.cr.util.sql.SQLUtil;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class DataflowPicklistSearch extends ResultSetBaseReader{
+public class DataflowPicklistReader extends ResultSetBaseReader{
 
 	/** */
 	private static final String sql = new StringBuffer().

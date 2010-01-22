@@ -29,9 +29,10 @@ import org.quartz.JobExecutionException;
 import org.quartz.StatefulJob;
 
 import eionet.cr.common.Predicates;
+import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
-import eionet.cr.search.DataflowPicklistSearch;
+import eionet.cr.search.util.DataflowPicklistReader;
 import eionet.cr.web.util.ApplicationCache;
 
 /**
@@ -50,14 +51,14 @@ public class DataflowSearchPicklistCacheUpdater  implements StatefulJob {
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		
 		try {
-			DataflowPicklistSearch search = new DataflowPicklistSearch();
-			search.execute();
 			Collection<String> localities = MySQLDAOFactory
 					.get()
 					.getDao(HelperDAO.class)
 					.getPicklistForPredicate(Predicates.ROD_LOCALITY_PROPERTY);
 			
-			ApplicationCache.updateDataflowPicklistCache(search.getResultMap(), localities);
+			ApplicationCache.updateDataflowPicklistCache(
+					DAOFactory.get().getDao(HelperDAO.class).getDataflowSearchPicklist(),
+					localities);
 			logger.debug("Dataflow picklist cache updated");
 		}
 		catch (Exception e) {
