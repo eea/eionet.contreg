@@ -35,7 +35,7 @@ import org.apache.log4j.Logger;
 
 import eionet.cr.api.feeds.SubjectsRDFWriter;
 import eionet.cr.api.feeds.amp.AmpFeedServlet;
-import eionet.cr.common.Namespaces;
+import eionet.cr.common.Namespace;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.dao.SearchDAO;
@@ -89,12 +89,11 @@ public class XmlConvFeedServlet extends HttpServlet{
 			}
 
 			SubjectsRDFWriter rdfWriter = new SubjectsRDFWriter(request.getParameter(AmpFeedServlet.INCLUDE_DERIVED_VALUES)!=null);
-			rdfWriter.addNamespace(Namespaces.CR, "cr");
-			rdfWriter.addNamespace(Namespaces.DC, "dc");
-			rdfWriter.addNamespace(Namespaces.OWL, "owl");
-			rdfWriter.addNamespace(Namespaces.ROD, "rod");
-			rdfWriter.addNamespace(Namespaces.EPER, "eper");
-			rdfWriter.setSubjectProcessor(null);
+			rdfWriter.addNamespace(Namespace.CR);
+			rdfWriter.addNamespace(Namespace.DC);
+			rdfWriter.addNamespace(Namespace.OWL);
+			rdfWriter.addNamespace(Namespace.ROD);
+			rdfWriter.addNamespace(Namespace.EPER);
 
 			rdfWriter.write(subjects, response.getOutputStream());
 		}

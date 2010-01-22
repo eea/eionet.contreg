@@ -33,8 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 
 import eionet.cr.api.feeds.SubjectsRDFWriter;
-import eionet.cr.api.feeds.amp.old.AmpProjectDTO;
-import eionet.cr.common.Namespaces;
+import eionet.cr.common.Namespace;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.SubjectProcessor;
 import eionet.cr.common.Subjects;
@@ -71,7 +70,7 @@ public class AmpFeedServlet extends HttpServlet implements SubjectProcessor{
 		try {
 			SearchDAO searchDao = MySQLDAOFactory.get().getDao(SearchDAO.class);
 			Map<String, String> criteria = new HashMap<String, String>();
-			criteria.put(Predicates.RDF_TYPE, Subjects.AMP_OUTPUT);
+			criteria.put(Predicates.RDF_TYPE, Subjects.AMP_PRODUCT);
 
 			Pair<Integer, List<SubjectDTO>> results = searchDao.filteredSearch(
 					criteria,
@@ -83,11 +82,12 @@ public class AmpFeedServlet extends HttpServlet implements SubjectProcessor{
 			logger.debug(methodName + ", " + subjectCount + " subjects found in total");
 		
 			SubjectsRDFWriter rdfWriter = new SubjectsRDFWriter(request.getParameter(INCLUDE_DERIVED_VALUES)!=null);
-			rdfWriter.addNamespace(Namespaces.CR, "cr");
-			rdfWriter.addNamespace(Namespaces.DC, "dc");
-			rdfWriter.addNamespace(Namespaces.IMS, "ims");
-			rdfWriter.addNamespace(Namespaces.AMP, "amp");
-			rdfWriter.addNamespace(Namespaces.OWL, "owl");
+			rdfWriter.addNamespace(Namespace.CR);
+			rdfWriter.addNamespace(Namespace.DC);
+			rdfWriter.addNamespace(Namespace.IMS);
+			rdfWriter.addNamespace(Namespace.AMP_OLD);
+			rdfWriter.addNamespace(Namespace.AMP);
+			rdfWriter.addNamespace(Namespace.OWL);
 			rdfWriter.setSubjectProcessor(this);
 			
 			rdfWriter.write(results.getRight(), response.getOutputStream());

@@ -50,5 +50,6 @@ public interface Subjects {
 	public static final String WGS_SPATIAL_THING = "http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing";
 	
 	public static final String DUBLIN_CORE_SOURCE_URL = "http://purl.org/dc/elements/1.1/";
-	public static final String AMP_OUTPUT = "http://rdfdata.eionet.europa.eu/amp/ontology/Output";
+	public static final String AMPOLD_OUTPUT = "http://rdfdata.eionet.europa.eu/amp/ontology/Output";
+	public static final String AMP_PRODUCT = "http://moonefish.eea.europa.eu:81/AMP-schema.rdf#Product";
 }

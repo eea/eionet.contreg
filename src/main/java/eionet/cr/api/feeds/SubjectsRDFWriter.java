@@ -33,7 +33,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.common.CRRuntimeException;
-import eionet.cr.common.Namespaces;
+import eionet.cr.common.Namespace;
 import eionet.cr.common.SubjectProcessor;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
@@ -63,8 +63,8 @@ public class SubjectsRDFWriter {
 	 */
 	public SubjectsRDFWriter(){
 		
-		namespaces.put(Namespaces.RDF, "rdf");
-		namespaces.put(Namespaces.RDFS, "rdfs");
+		addNamespace(Namespace.RDF);
+		addNamespace(Namespace.RDFS);
 	}
 
 	/**
@@ -81,13 +81,9 @@ public class SubjectsRDFWriter {
 	 * @param url
 	 * @param prefix
 	 */
-	public void addNamespace(String url, String prefix){
+	public void addNamespace(Namespace namespace){
 		
-		if (url==null || url.trim().length()==0 || prefix==null || prefix.trim().length()==0){
-			throw new IllegalArgumentException("Url and prefix must not be blank!");
-		}
-		
-		namespaces.put(url, prefix);
+		namespaces.put(namespace.getUri(), namespace.getPrefix());
 	}
 	
 	/**
