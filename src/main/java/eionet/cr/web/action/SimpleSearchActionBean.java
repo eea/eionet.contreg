@@ -20,8 +20,6 @@
  */
 package eionet.cr.web.action;
 
-import java.io.IOException;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -37,9 +35,7 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.SearchDAO;
-import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.search.SearchException;
 import eionet.cr.search.util.SearchExpression;
 import eionet.cr.search.util.SortOrder;
 import eionet.cr.util.Hashes;
@@ -71,46 +67,38 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 		return new ForwardResolution("/pages/simpleSearch.jsp");
 	}
 
-	/**
-	 * 
-	 * @return
-	 * @throws DAOException 
-	 * @throws IOException 
-	 * @throws ParseException 
-	 * @throws DAOException
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.web.action.AbstractSearchActionBean#search()
 	 */
-    public Resolution search() throws SearchException{
+    public Resolution search() throws DAOException{
 		
-		try {
-			SearchExpression searchExpression = new SearchExpression(this.searchExpression);
-			if (!searchExpression.isEmpty()) {
+    	SearchExpression searchExpression = new SearchExpression(this.searchExpression);
+    	if (!searchExpression.isEmpty()) {
 
-				if (searchExpression.isUri()) {
-					
-					this.isUri = true;
-					SubjectDTO subject = DAOFactory.get().getDao(HelperDAO.class).getSubject(
-							Hashes.spoHash(searchExpression.toString()));
-					if (subject!=null){
-						resultList = Collections.singleton(subject);
-						matchCount = 1;
-					}
-				}
+    		if (searchExpression.isUri()) {
 
-				if (resultList == null || resultList.size() == 0) {
-					Pair<Integer, List<SubjectDTO>> result = 
-							MySQLDAOFactory.get().getDao(SearchDAO.class)
-									.searchByFreeText(
-											searchExpression,
-											new PagingRequest(getPageN()),
-											new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
+    			this.isUri = true;
+    			SubjectDTO subject = DAOFactory.get().getDao(HelperDAO.class).getSubject(
+    					Hashes.spoHash(searchExpression.toString()));
+    			if (subject!=null){
+    				resultList = Collections.singleton(subject);
+    				matchCount = 1;
+    			}
+    		}
 
-					resultList = result.getRight();
-					matchCount = result.getLeft();
-				}
-			}
-		} catch (Exception fatal) {
-			throw new SearchException("exception in simple search", fatal);
-		}
+    		if (resultList == null || resultList.size() == 0) {
+    			Pair<Integer, List<SubjectDTO>> result = 
+    				DAOFactory.get().getDao(SearchDAO.class)
+    				.searchByFreeText(
+    						searchExpression,
+    						new PagingRequest(getPageN()),
+    						new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
+
+    			resultList = result.getRight();
+    			matchCount = result.getLeft();
+    		}
+    	}
     	
 		return new ForwardResolution("/pages/simpleSearch.jsp");
     }

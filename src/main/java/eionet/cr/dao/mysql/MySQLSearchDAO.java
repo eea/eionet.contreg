@@ -20,14 +20,7 @@
  */
 package eionet.cr.dao.mysql;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -41,9 +34,7 @@ import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.SearchDAO;
-import eionet.cr.dto.RawTripleDTO;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.search.SearchException;
 import eionet.cr.search.util.BBOX;
 import eionet.cr.search.util.SearchExpression;
 import eionet.cr.search.util.SimpleSearchDataReader;
@@ -54,10 +45,7 @@ import eionet.cr.util.PagingRequest;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.URIUtil;
-import eionet.cr.util.Util;
 import eionet.cr.util.sql.PairReader;
-import eionet.cr.util.sql.ResultSetListReader;
-import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
 import eionet.cr.web.util.columns.ReferringPredicatesColumn;
 import eionet.cr.web.util.columns.SubjectLastModifiedColumn;
@@ -74,15 +62,15 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 	MySQLSearchDAO() {
 		//reduced visibility
 	}
-	
-	/** 
-	 * @see eionet.cr.dao.SearchDAO#searchByFreeText(eionet.cr.search.util.SearchExpression, int, eionet.cr.util.SortingRequest)
-	 * {@inheritDoc}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.SearchDAO#searchByFreeText(eionet.cr.search.util.SearchExpression, eionet.cr.util.PagingRequest, eionet.cr.util.SortingRequest)
 	 */
 	public Pair<Integer, List<SubjectDTO>> searchByFreeText(
 				SearchExpression expression,
 				PagingRequest pagingRequest,
-				SortingRequest sortingRequest) throws DAOException, SQLException {
+				SortingRequest sortingRequest) throws DAOException{
 		
 		long time = System.currentTimeMillis();
 		List<Object> searchParams = new LinkedList<Object>();

@@ -26,7 +26,7 @@ import java.util.List;
 
 import net.sourceforge.stripes.action.Resolution;
 import eionet.cr.common.Predicates;
-import eionet.cr.search.SearchException;
+import eionet.cr.dao.DAOException;
 import eionet.cr.search.util.SortOrder;
 import eionet.cr.util.QueryString;
 import eionet.cr.util.pagination.Pagination;
@@ -55,15 +55,15 @@ public abstract class AbstractSearchActionBean<T> extends AbstractActionBean{
 	/**
 	 * 
 	 * @return
-	 * @throws SearchException
+	 * @throws DAOException TODO
 	 */
-	public abstract Resolution search() throws SearchException;
+	public abstract Resolution search() throws DAOException;
 
 	/**
 	 * @return the columns
-	 * @throws SearchException 
+	 * @throws DAOException 
 	 */
-	public abstract List<SearchResultColumn> getColumns() throws SearchException;
+	public abstract List<SearchResultColumn> getColumns() throws DAOException;
 
 	/**
 	 * 

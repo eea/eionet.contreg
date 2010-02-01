@@ -28,7 +28,6 @@ import java.util.Map;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.HandlesEvent;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 
@@ -42,7 +41,6 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.search.SearchException;
 import eionet.cr.util.Util;
 import eionet.cr.web.util.columns.SearchResultColumn;
 import eionet.cr.web.util.columns.SubjectPredicateColumn;
@@ -134,25 +132,18 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean<SubjectDTO
 	public RecentUploadsActionBean(){
 		this.type = Subjects.ROD_DELIVERY_CLASS; // default type
 	}
-	
-	/**
-	 * 
-	 * @return
-	 * @throws SearchException 
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.web.action.AbstractSearchActionBean#search()
 	 */
 	@DefaultHandler
-	public Resolution search() throws SearchException {
+	public Resolution search() throws DAOException {
 		
 		if (!StringUtils.isBlank(type)){
 			//String decodedType = Util.urlDecode(type);
-			
-			try {
 				resultList = DAOFactory.get().getDao(HelperDAO.class).getLatestSubjects(
 						type, MAX_RESULTS);
-			}
-			catch (DAOException e) {
-				throw new SearchException(e.toString(),e);
-			}
 		}
 			
 		return new ForwardResolution("/pages/recent.jsp");

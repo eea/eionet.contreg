@@ -14,7 +14,6 @@ import java.util.Set;
 
 import eionet.cr.dto.RawTripleDTO;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.search.SearchException;
 import eionet.cr.search.util.PredicateLabels;
 import eionet.cr.search.util.SearchExpression;
 import eionet.cr.search.util.SubProperties;
@@ -61,9 +60,9 @@ public interface HelperDAO extends DAO {
 	/**
 	 * @param predicateUri
 	 * @return
-	 * @throws SearchException
+	 * @throws DAOException 
 	 */
-	Collection<String> getPicklistForPredicate(String predicateUri) throws SearchException;
+	Collection<String> getPicklistForPredicate(String predicateUri) throws DAOException;
 
 	/**
 	 * 
@@ -117,9 +116,9 @@ public interface HelperDAO extends DAO {
 	 * 
 	 * @param predicateUri
 	 * @return
-	 * @throws SearchException 
+	 * @throws DAOException TODO
 	 */
-	boolean isAllowLiteralSearch(String predicateUri) throws SearchException;
+	boolean isAllowLiteralSearch(String predicateUri) throws DAOException;
 	
 	/**
 	 * 

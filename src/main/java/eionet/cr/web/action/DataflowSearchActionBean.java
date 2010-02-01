@@ -40,7 +40,6 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.search.SearchException;
 import eionet.cr.search.util.SortOrder;
 import eionet.cr.search.util.UriLabelPair;
 import eionet.cr.util.PagingRequest;
@@ -65,27 +64,22 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean<SubjectDT
 	private String dataflow;
 	private String locality;
 	private String year;
-	
-	/**
-	 * 
-	 * @return
-	 * @throws SearchException 
-	 * @throws SearchException
-	 */
-	@DefaultHandler
-	public Resolution init() throws SearchException{
-		return new ForwardResolution("/pages/dataflowSearch.jsp");
-	}
 
 	/**
 	 * 
 	 * @return
-	 * @throws SearchException 
 	 */
-	public Resolution search() throws SearchException{
-		Pair<Integer, List<SubjectDTO>> customSearch;
-		try {
-			customSearch = MySQLDAOFactory
+	@DefaultHandler
+	public Resolution init(){
+		return new ForwardResolution("/pages/dataflowSearch.jsp");
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.web.action.AbstractSearchActionBean#search()
+	 */
+	public Resolution search() throws DAOException{
+		Pair<Integer, List<SubjectDTO>> customSearch = MySQLDAOFactory
 					.get()
 					.getDao(SearchDAO.class)
 					.searchByFilters(
@@ -93,9 +87,6 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean<SubjectDT
 							null,
 							new PagingRequest(getPageN()),
 							new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
-		} catch (DAOException e) {
-			throw new SearchException("Exception in dataflow search", e);
-		}
 		resultList = customSearch.getRight();
 		matchCount = customSearch.getLeft();
 		

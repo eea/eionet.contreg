@@ -42,7 +42,6 @@ import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.search.SearchException;
 import eionet.cr.search.util.SortOrder;
 import eionet.cr.util.PagingRequest;
 import eionet.cr.util.Pair;
@@ -118,19 +117,16 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 		session.removeAttribute(SELECTED_FILTERS_SESSION_ATTR_NAME);
 		session.removeAttribute(LITERAL_SEARCH_ENABLED_FILTERS);
 	}
-	
-	/**
-	 * 
-	 * @return
-	 * @throws SearchException 
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.web.action.AbstractSearchActionBean#search()
 	 */
-	public Resolution search() throws SearchException{
+	public Resolution search() throws DAOException{
 		
 		populateSelectedFilters();
 		long startTime = System.currentTimeMillis();
-		Pair<Integer, List<SubjectDTO>> result;
-		try {
-			result = MySQLDAOFactory.get().getDao(SearchDAO.class)
+		Pair<Integer, List<SubjectDTO>> result = MySQLDAOFactory.get().getDao(SearchDAO.class)
 					.searchByFilters(
 							buildSearchCriteria(),
 							getLiteralEnabledFilters(),
@@ -138,9 +134,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 							new SortingRequest(
 									getSortP(),
 									SortOrder.parse(getSortO())));
-		} catch (DAOException e) {
-			throw new SearchException("Exception in custom search", e);
-		}
+
 		logger.debug("it took " + (System.currentTimeMillis() - startTime) + " ms to execute custom search");
 		
 		// we put the search result list into session and override getResultList() to retrieve the list from session
@@ -184,9 +178,9 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 	/**
 	 * 
 	 * @return
-	 * @throws SearchException 
+	 * @throws DAOException 
 	 */
-	public Resolution addFilter() throws SearchException{
+	public Resolution addFilter() throws DAOException{
 		
 		populateSelectedFilters();
 		
@@ -209,9 +203,9 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 	/**
 	 * 
 	 * @return
-	 * @throws SearchException 
+	 * @throws DAOException 
 	 */
-	public Collection<String> getPicklist() throws SearchException{
+	public Collection<String> getPicklist() throws DAOException{
 		String picklistFilter = getPicklistFilter();
 		if (!isShowPicklist()) {
 			return null;

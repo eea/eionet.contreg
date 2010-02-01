@@ -20,22 +20,18 @@
 * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.dao.postgre;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.SearchDAO;
-import eionet.cr.dto.RawTripleDTO;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.search.SearchException;
 import eionet.cr.search.util.BBOX;
 import eionet.cr.search.util.SearchExpression;
 import eionet.cr.util.PagingRequest;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
-import eionet.cr.util.Util;
 
 /**
  * 
@@ -59,11 +55,11 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 
 	/*
 	 * (non-Javadoc)
-	 * @see eionet.cr.dao.SearchDAO#freetextSearch(eionet.cr.search.util.SearchExpression, eionet.cr.util.PagingRequest, eionet.cr.util.SortingRequest)
+	 * @see eionet.cr.dao.SearchDAO#searchByFreeText(eionet.cr.search.util.SearchExpression, eionet.cr.util.PagingRequest, eionet.cr.util.SortingRequest)
 	 */
 	public Pair<Integer, List<SubjectDTO>> searchByFreeText(
 			SearchExpression expression, PagingRequest pagingRequest,
-			SortingRequest sortingRequest) throws Exception {
+			SortingRequest sortingRequest) throws DAOException {
 
 		// TODO method to be implemented
 		return null;

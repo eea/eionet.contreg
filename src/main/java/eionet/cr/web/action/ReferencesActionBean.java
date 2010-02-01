@@ -21,43 +21,29 @@
 package eionet.cr.web.action;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpSession;
-
-import org.apache.commons.lang.StringUtils;
-
-import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
-import net.sourceforge.stripes.validation.ValidationErrors;
-import net.sourceforge.stripes.validation.ValidationMethod;
+
+import org.apache.commons.lang.StringUtils;
+
 import eionet.cr.common.Predicates;
-import eionet.cr.common.Subjects;
-import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.SearchDAO;
-import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.search.SearchException;
-import eionet.cr.search.util.SearchExpression;
 import eionet.cr.search.util.SortOrder;
-import eionet.cr.search.util.UriLabelPair;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.PagingRequest;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
-import eionet.cr.util.URIUtil;
 import eionet.cr.util.URLUtil;
-import eionet.cr.util.Util;
 import eionet.cr.web.util.columns.ReferringPredicatesColumn;
 import eionet.cr.web.util.columns.SearchResultColumn;
 import eionet.cr.web.util.columns.SubjectPredicateColumn;
@@ -90,7 +76,7 @@ public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
 	 * (non-Javadoc)
 	 * @see eionet.cr.web.action.AbstractSearchActionBean#search()
 	 */
-	public Resolution search() throws SearchException {
+	public Resolution search() throws DAOException {
 		
 		if (StringUtils.isBlank(uri) && anonHash==0){
 			
@@ -98,26 +84,21 @@ public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
 			addCautionMessage("Resource identifier not specified!");
 		}
 		else{
-			try{
-				Pair<Integer, List<SubjectDTO>> searchResult =
-					DAOFactory.get().getDao(SearchDAO.class).searchReferences(
+			Pair<Integer, List<SubjectDTO>> searchResult =
+				DAOFactory.get().getDao(SearchDAO.class).searchReferences(
 						anonHash==0 ? Hashes.spoHash(uri) : anonHash,
 								new PagingRequest(getPageN()),
 								new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
 
-				resultList = searchResult.getRight();
-				matchCount = searchResult.getLeft();
+			resultList = searchResult.getRight();
+			matchCount = searchResult.getLeft();
 
-				HashSet<Long> subjectHashes = new HashSet<Long>();
-				for (SubjectDTO subject : resultList){
-					subjectHashes.add(subject.getUriHash());
-				}
-				predicateLabels = DAOFactory.get().getDao(HelperDAO.class).getPredicateLabels(
-						subjectHashes).getByLanguages(getAcceptedLanguages());
+			HashSet<Long> subjectHashes = new HashSet<Long>();
+			for (SubjectDTO subject : resultList){
+				subjectHashes.add(subject.getUriHash());
 			}
-			catch (DAOException e){
-				throw new SearchException(e.toString(), e);
-			}
+			predicateLabels = DAOFactory.get().getDao(HelperDAO.class).getPredicateLabels(
+					subjectHashes).getByLanguages(getAcceptedLanguages());
 		}
 		
 		return new ForwardResolution("/pages/references.jsp");
@@ -127,7 +108,7 @@ public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
 	 * (non-Javadoc)
 	 * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
 	 */
-	public List<SearchResultColumn> getColumns() throws SearchException {
+	public List<SearchResultColumn> getColumns() throws DAOException {
 		
 		ArrayList<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
 

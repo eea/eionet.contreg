@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 import eionet.cr.common.Predicates;
-import eionet.cr.search.SearchException;
+import eionet.cr.dao.DAOException;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.sql.ConnectionUtil;
 import eionet.cr.util.sql.ResultSetBaseReader;
@@ -70,10 +70,10 @@ public class DataflowPicklistReader extends ResultSetBaseReader{
 	private ArrayList<UriLabelPair> currentObligations = null;
 
 	/**
-	 * @throws SearchException 
+	 * @throws DAOException 
 	 * 
 	 */
-	public void execute() throws SearchException{
+	public void execute() throws DAOException{
 		
 		Connection conn = null;
 		try{
@@ -81,7 +81,7 @@ public class DataflowPicklistReader extends ResultSetBaseReader{
 			SQLUtil.executeQuery(sql, this, conn);
 		}
 		catch (SQLException e){
-			throw new SearchException(e.toString(), e);
+			throw new DAOException(e.toString(), e);
 		}
 		finally{
 			ConnectionUtil.closeConnection(conn);

@@ -52,7 +52,6 @@ import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.InstantHarvester;
-import eionet.cr.search.SearchException;
 import eionet.cr.search.util.SubProperties;
 import eionet.cr.search.util.UriLabelPair;
 import eionet.cr.util.Hashes;

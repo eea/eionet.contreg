@@ -20,8 +20,6 @@
  */
 package eionet.cr.web.action;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -38,10 +36,8 @@ import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
-import eionet.cr.search.SearchException;
 import eionet.cr.search.util.SortOrder;
 import eionet.cr.util.Pair;
-import eionet.cr.util.QueryString;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.pagination.Pagination;
 import eionet.cr.util.pagination.PaginationRequest;
@@ -118,7 +114,7 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
 	 * {@inheritDoc}
 	 */
 	@DefaultHandler
-	public Resolution search() {
+	public Resolution search() throws DAOException {
 		try {
 			String filterString = null; 
 			if(!StringUtils.isEmpty(this.searchString)) {
@@ -244,12 +240,11 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
 		return searchString;
 	}
 
-	/** 
+	/*
+	 * (non-Javadoc)
 	 * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
-	 * {@inheritDoc}
 	 */
-	@Override
-	public List<SearchResultColumn> getColumns() throws SearchException {
+	public List<SearchResultColumn> getColumns() throws DAOException {
 		return columnList;
 	}
 	

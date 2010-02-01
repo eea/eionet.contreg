@@ -27,7 +27,6 @@ import eionet.cr.dao.HelperDAO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.RawTripleDTO;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.search.SearchException;
 import eionet.cr.search.util.DataflowPicklistReader;
 import eionet.cr.search.util.PredicateLabels;
 import eionet.cr.search.util.PredicateLabelsReader;
@@ -143,20 +142,17 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 	 * @see eionet.cr.dao.HelperDAO#getPicklistForPredicate(java.lang.String)
 	 * {@inheritDoc}
 	 */
-	public Collection<String> getPicklistForPredicate(String predicateUri) throws SearchException {
+	public Collection<String> getPicklistForPredicate(String predicateUri) throws DAOException {
+		
 		if (StringUtils.isBlank(predicateUri)) {
 			return Collections.emptyList();
 		}
-		try {
-			List<String> resultList = executeQuery(
-					sqlQuery,
-					Collections.singletonList((Object)Hashes.spoHash(predicateUri)),
-					new SingleObjectReader<String>());
-			return resultList;
-		}
-		catch (DAOException e){
-			throw new SearchException(e.toString(), e);
-		}
+		
+		List<String> resultList = executeQuery(
+				sqlQuery,
+				Collections.singletonList((Object)Hashes.spoHash(predicateUri)),
+				new SingleObjectReader<String>());
+		return resultList;
 	}
 	
 	/** */
@@ -607,34 +603,30 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 	 * (non-Javadoc)
 	 * @see eionet.cr.dao.HelperDAO#isAllowLiteralSearch(java.lang.String)
 	 */
-	public boolean isAllowLiteralSearch(String predicateUri) throws SearchException{
+	public boolean isAllowLiteralSearch(String predicateUri) throws DAOException{
+
 		//sanity checks
 		if (StringUtils.isBlank(predicateUri)) {
 			return false;
 		}
 		String allowLiteralSearchQuery = "select distinct OBJECT from SPO where SUBJECT=? and PREDICATE=? and LIT_OBJ='N' and ANON_OBJ='N'";
 		
-		try {
-			ArrayList<Object> values = new ArrayList<Object>();
-			values.add(Long.valueOf(Hashes.spoHash(predicateUri)));
-			values.add(Long.valueOf((Hashes.spoHash(Predicates.RDFS_RANGE))));
-			
-			List<String> resultList = executeQuery(allowLiteralSearchQuery, values, new SingleObjectReader<String>());
-			if (resultList == null || resultList.isEmpty()) {
-				return true; // if not rdfs:domain specified at all, then lets allow literal search
-			}
-			
-			for (String result : resultList){
-				if (Subjects.RDFS_LITERAL.equals(result)){
-					return true; // rdfs:Literal is present in the specified rdfs:domain
-				}
-			}
-			
-			return false;
+		ArrayList<Object> values = new ArrayList<Object>();
+		values.add(Long.valueOf(Hashes.spoHash(predicateUri)));
+		values.add(Long.valueOf((Hashes.spoHash(Predicates.RDFS_RANGE))));
+
+		List<String> resultList = executeQuery(allowLiteralSearchQuery, values, new SingleObjectReader<String>());
+		if (resultList == null || resultList.isEmpty()) {
+			return true; // if not rdfs:domain specified at all, then lets allow literal search
 		}
-		catch(DAOException exception) {
-			throw new SearchException();
+
+		for (String result : resultList){
+			if (Subjects.RDFS_LITERAL.equals(result)){
+				return true; // rdfs:Literal is present in the specified rdfs:domain
+			}
 		}
+
+		return false;
 	}
 	
 	/*

@@ -31,7 +31,6 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dto.RawTripleDTO;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.search.SearchException;
 import eionet.cr.search.util.PredicateLabels;
 import eionet.cr.search.util.SubProperties;
 import eionet.cr.search.util.UriLabelPair;
@@ -66,8 +65,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		return null;
 	}
 
-	public Collection<String> getPicklistForPredicate(String predicateUri)
-			throws SearchException {
+	public Collection<String> getPicklistForPredicate(String predicateUri) throws DAOException {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -87,7 +85,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 	 * (non-Javadoc)
 	 * @see eionet.cr.dao.HelperDAO#isAllowLiteralSearch(java.lang.String)
 	 */
-	public boolean isAllowLiteralSearch(String predicateUri) throws SearchException {
+	public boolean isAllowLiteralSearch(String predicateUri) throws DAOException {
 		return false;
 	}
 

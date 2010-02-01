@@ -30,7 +30,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeSet;
 import java.util.Map.Entry;
 
 import net.sourceforge.stripes.action.DefaultHandler;
@@ -43,13 +42,11 @@ import net.sourceforge.stripes.action.UrlBinding;
 import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.common.Predicates;
-import eionet.cr.common.Subjects;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.search.SearchException;
 import eionet.cr.search.util.SortOrder;
 import eionet.cr.util.ExportFormat;
 import eionet.cr.util.Exporter;
@@ -169,9 +166,8 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 	
 	/**
 	 * @return
-	 * @throws SearchException
 	 */
-	public Resolution introspect() throws SearchException {
+	public Resolution introspect(){
 		
 		if (!StringUtils.isBlank(type)){			
 			return new RedirectResolution(FactsheetActionBean.class).addParameter("uri", type);
@@ -182,9 +178,9 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 	
 	/**
 	 * @return
-	 * @throws SearchException
 	 */
-	public Resolution addFilter() throws SearchException {
+	public Resolution addFilter(){
+		
 		Map<String, Map<String,String>> cache = (Map<String, Map<String, String>>) getSession().getAttribute(SELECTED_FILTERS_CACHE);
 		if (cache == null) {
 			cache = new HashMap<String, Map<String,String>>();
@@ -202,9 +198,9 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 	
 	/**
 	 * @return
-	 * @throws SearchException
 	 */
-	public Resolution removeFilter() throws SearchException {
+	public Resolution removeFilter(){
+		
 		Map<String,Map<String,String>> cache = (Map<String, Map<String, String>>) getSession().getAttribute(SELECTED_FILTERS_CACHE);
 		if(cache != null && cache.containsKey(type) && cache.get(type) != null 
 				&& cache.get(type).containsKey(clearFilter)) {
@@ -217,9 +213,9 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 	
 	/**
 	 * @return
-	 * @throws SearchException
+	 * @throws DAOException
 	 */
-	public Resolution applyFilters() throws SearchException {
+	public Resolution applyFilters() throws DAOException {
 		if(selectedFilters != null && !selectedFilters.isEmpty()) {
 			//save selected filters for future use
 			Map<String,Map<String,String>> cache = (Map<String, Map<String, String>>) getSession().getAttribute(SELECTED_FILTERS_CACHE);
@@ -231,13 +227,13 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 		setExportColumns(getSelectedColumnsFromCache());
 		return search();
 	}
-	
-	/** 
+
+	/*
+	 * (non-Javadoc)
 	 * @see eionet.cr.web.action.AbstractSearchActionBean#search()
-	 * {@inheritDoc}
 	 */
-	@Override
-	public Resolution search() throws SearchException {
+	public Resolution search() throws DAOException {
+		
 		if (!StringUtils.isBlank(type)) {
 			restoreStateFromSession();
 			LastAction lastAction = getLastAction();
@@ -252,18 +248,12 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 					}
 				}
 				
-				Pair<Integer, List<SubjectDTO>> customSearch;
-				try {
-					customSearch = MySQLDAOFactory.get().getDao(SearchDAO.class)
-							.searchByFilters(
+				Pair<Integer, List<SubjectDTO>> customSearch =
+					MySQLDAOFactory.get().getDao(SearchDAO.class).searchByFilters(
 									criteria,
 									null,
 									new PagingRequest(getPageN()),
 									new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
-				} catch (DAOException e) {
-					throw new SearchException("Exception in type search action bean", e);
-				}
-				
 				resultList = customSearch.getRight();
 	    		matchCount = customSearch.getLeft();
 			}
@@ -291,7 +281,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 	/**
 	 * restores actionBean state from session.
 	 */
-	private void restoreStateFromSession() throws SearchException {
+	private void restoreStateFromSession() throws DAOException {
 
 		//restoring the result list
 		resultList = (Collection<SubjectDTO>) getSession().getAttribute(RESULT_LIST_CACHED);
@@ -339,7 +329,12 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 		}
 	}
 
-	public Resolution setSearchColumns() throws SearchException {
+	/**
+	 * 
+	 * @return
+	 */
+	public Resolution setSearchColumns(){
+		
 		Map<String,List<String>> cache = (Map<String, List<String>>) getSession().getAttribute(SELECTED_COLUMNS_CACHE);
 		if (cache == null) {
 			cache = new HashMap<String, List<String>>();
@@ -368,13 +363,13 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 				? selectedColumns 
 				: cache.get(type);
 	}
-	
-	/** 
+
+	/*
+	 * (non-Javadoc)
 	 * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
-	 * {@inheritDoc}
 	 */
-	@Override
-	public List<SearchResultColumn> getColumns() throws SearchException {
+	public List<SearchResultColumn> getColumns() throws DAOException {
+		
 		List<SearchResultColumn> columns = new LinkedList<SearchResultColumn>();
 		//setSelectedColumns uses POST to submit a form, we have to add needed parameters to the 
 		//column headers in order to be able to sort right.
@@ -394,7 +389,11 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 
 	}
 	
-	public List<Pair<String, String>> getAvailableTypes() throws SearchException {
+	/**
+	 * 
+	 * @return
+	 */
+	public List<Pair<String, String>> getAvailableTypes(){
 		return ApplicationCache.getTypes();
 	}
 
@@ -430,16 +429,16 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 	/**
 	 * 
 	 * @return
-	 * @throws SearchException
+	 * @throws DAOException
 	 */
-	public Map<String, String> getAvailableColumnsSorted() throws SearchException {
+	public Map<String, String> getAvailableColumnsSorted() throws DAOException {
 		return sortByValueIgnoreCase(getAvailableColumns());
 	}
 	
 	/**
 	 * @return the availableColumns
 	 */
-	public Map<String, String> getAvailableColumns() throws SearchException {
+	public Map<String, String> getAvailableColumns() throws DAOException {
 		
 		Map<String, Map<String,String>> cache = 
 			(Map<String, Map<String, String>>) getSession().getAttribute(AVAILABLE_COLUMNS_CACHE);
@@ -450,12 +449,9 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 			
 			Map<String,String> result = new LinkedHashMap<String,String>();
 			
-			List<SubjectDTO> usedPredicates = null;
-			try {
-				usedPredicates = MySQLDAOFactory.get().getDao(HelperDAO.class).getPredicatesUsedForType(type);
-			} catch (DAOException e) {
-				throw new SearchException("Exception in type search action bean", e);
-			}
+			List<SubjectDTO> usedPredicates = MySQLDAOFactory.get().getDao(
+					HelperDAO.class).getPredicatesUsedForType(type);
+
 			result.put(Predicates.RDFS_LABEL, "Title");
 			if (usedPredicates!=null && !usedPredicates.isEmpty()){
 				
@@ -487,9 +483,9 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 	
 	/**
 	 * @return available filters.
-	 * @throws SearchException
+	 * @throws DAOException
 	 */
-	public Map<String,String> getAvailableFilters() throws SearchException {
+	public Map<String,String> getAvailableFilters() throws DAOException {
 		Map<String,String> result = new HashMap<String, String>();
 		result.putAll(getAvailableColumns());
 		result.remove(Predicates.RDF_TYPE);
@@ -504,8 +500,9 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 	/**
 	 * 
 	 * @return
+	 * @throws DAOException
 	 */
-	public Map<String,String> getAvailableFiltersSorted() throws SearchException {
+	public Map<String,String> getAvailableFiltersSorted() throws DAOException {
 		
 		return sortByValueIgnoreCase(getAvailableFilters());
 	}
@@ -599,9 +596,8 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 	 * 
 	 * @param map
 	 * @return
-	 * @throws SearchException
 	 */
-	private Map<String,String> sortByValueIgnoreCase(Map<String,String> map) throws SearchException {
+	private Map<String,String> sortByValueIgnoreCase(Map<String,String> map){
 		
 		LinkedHashMap<String,String> result = new LinkedHashMap<String,String>();
 		if (map!=null && !map.isEmpty()){

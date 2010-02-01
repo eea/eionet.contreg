@@ -42,7 +42,6 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.SearchDAO;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.search.SearchException;
 import eionet.cr.search.util.BBOX;
 import eionet.cr.search.util.SortOrder;
 import eionet.cr.util.PagingRequest;
@@ -83,10 +82,10 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
 	/**
 	 * 
 	 * @return
-	 * @throws SearchException
+	 * @throws DAOException
 	 */
 	@DefaultHandler
-	public Resolution onEventUnspecified() throws SearchException{
+	public Resolution onEventUnspecified() throws DAOException{
 		
 		if (BBOX!=null)
 			return doKml();
@@ -99,9 +98,9 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
 	 * @param bbox
 	 * @param source
 	 * @return
-	 * @throws SearchException 
+	 * @throws DAOException 
 	 */
-	private Resolution doKml() throws SearchException{
+	private Resolution doKml() throws DAOException{
 		
 		logger.debug("kml requested, BBOX = " + BBOX);
 		
@@ -113,15 +112,10 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
 			longE = Util.toDouble(ltudes[2].trim());
 			latN = Util.toDouble(ltudes[3].trim());
 			
-			try {
-				Pair<Integer, List<SubjectDTO>> resultPair =
-					DAOFactory.get().getDao(SearchDAO.class).searchBySpatialBox(
+			Pair<Integer, List<SubjectDTO>> resultPair =
+				DAOFactory.get().getDao(SearchDAO.class).searchBySpatialBox(
 						createBBOX(), source, true, new PagingRequest(1,25), null);
-				resultList = resultPair.getRight();
-			}
-			catch (DAOException e) {
-				throw new SearchException(e.toString(), e);
-			}
+			resultList = resultPair.getRight();
 		}
 		
 		try {
@@ -217,17 +211,11 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
 	/**
 	 * 
 	 * @return
-	 * @throws SearchException
+	 * @throws DAOException
 	 */
-	public Resolution kmlLinks() throws SearchException {
+	public Resolution kmlLinks() throws DAOException {
 		
-		try {
-			sources = factory.getDao(HelperDAO.class).getSpatialSources();
-		}
-		catch (DAOException e){
-			throw new SearchException(e.toString(), e);
-		}
-		
+		sources = factory.getDao(HelperDAO.class).getSpatialSources();
 		if (sources.isEmpty()){
 			addSystemMessage("No spatial objects currently found!");
 			return new ForwardResolution("/pages/googleEarthIntro.jsp");
@@ -248,25 +236,20 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
 	 * (non-Javadoc)
 	 * @see eionet.cr.web.action.AbstractSearchActionBean#search()
 	 */
-	public Resolution search() throws SearchException {
+	public Resolution search() throws DAOException {
 		
 		BBOX bbox = createBBOX();
 		if (!bbox.isUndefined()){
 			
-			try {
-				Pair<Integer, List<SubjectDTO>> resultPair =
-					DAOFactory.get().getDao(SearchDAO.class).searchBySpatialBox(
+			Pair<Integer, List<SubjectDTO>> resultPair =
+				DAOFactory.get().getDao(SearchDAO.class).searchBySpatialBox(
 						createBBOX(),
 						source,
 						false,
 						new PagingRequest(getPageN()),
 						new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
-				resultList = resultPair.getRight();
-				matchCount = resultPair.getLeft();
-			}
-			catch (DAOException e) {
-				throw new SearchException(e.toString(), e);
-			}
+			resultList = resultPair.getRight();
+			matchCount = resultPair.getLeft();
 		}
 		
 		return new ForwardResolution("/pages/spatialSearch.jsp");
@@ -276,7 +259,7 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
 	 * (non-Javadoc)
 	 * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
 	 */
-	public List<SearchResultColumn> getColumns() throws SearchException {
+	public List<SearchResultColumn> getColumns() throws DAOException {
 		
 		ArrayList<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
 

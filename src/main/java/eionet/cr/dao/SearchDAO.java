@@ -20,14 +20,11 @@
  */
 package eionet.cr.dao;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import eionet.cr.dto.RawTripleDTO;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.search.SearchException;
 import eionet.cr.search.util.BBOX;
 import eionet.cr.search.util.SearchExpression;
 import eionet.cr.util.PagingRequest;
@@ -47,12 +44,12 @@ public interface SearchDAO extends DAO{
 	 * @param pagingRequest - page request
 	 * @param sortingRequest - sorting request to set
 	 * @return
-	 * @throws Exception
+	 * @throws DAOException
 	 */
 	Pair<Integer, List<SubjectDTO>> searchByFreeText(
 				SearchExpression expression,
 				PagingRequest pagingRequest,
-				SortingRequest sortingRequest) throws Exception;
+				SortingRequest sortingRequest) throws DAOException;
 	
 	/**
 	 * @param filters - search filters.
