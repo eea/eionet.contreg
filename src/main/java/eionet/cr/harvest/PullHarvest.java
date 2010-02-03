@@ -107,7 +107,7 @@ public class PullHarvest extends Harvest{
 				// prepare URL connection
 				URL url = new URL(StringUtils.substringBefore(sourceUrlString, "#"));
 				URLConnection urlConnection = url.openConnection();				
-				urlConnection.setRequestProperty("Accept", "application/rdf+xml, text/xml, */*");
+				urlConnection.setRequestProperty("Accept", "application/rdf+xml, text/xml, */*;q=0.6");
 				urlConnection.setRequestProperty("User-Agent", URLUtil.userAgentHeader());
 				if (lastHarvest!=null){
 					
