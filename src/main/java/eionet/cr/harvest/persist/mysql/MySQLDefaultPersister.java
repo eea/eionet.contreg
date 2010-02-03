@@ -82,6 +82,7 @@ public class MySQLDefaultPersister implements IHarvestPersister {
 		sourceUrl = config.getSourceUrl();
 		genTime = config.getGenTime();
 		sourceUrlHash = config.getSourceUrlHash();
+		instantHarvestUser = config.getInstantHarvestUser();
 	}
 	
 	/**
