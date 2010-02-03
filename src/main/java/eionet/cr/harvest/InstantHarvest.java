@@ -32,7 +32,7 @@ import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
-import eionet.cr.harvest.persister.PersisterConfig;
+import eionet.cr.harvest.persist.PersisterConfig;
 import eionet.cr.web.security.CRUser;
 
 public class InstantHarvest extends PullHarvest{

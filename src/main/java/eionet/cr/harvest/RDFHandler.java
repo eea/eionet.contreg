@@ -40,10 +40,11 @@ import com.hp.hpl.jena.rdf.arp.StatementHandler;
 import eionet.cr.common.Predicates;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.harvest.persister.DefaultPersister;
-import eionet.cr.harvest.persister.IHarvestPersister;
-import eionet.cr.harvest.persister.PersisterConfig;
-import eionet.cr.harvest.persister.PersisterException;
+import eionet.cr.harvest.persist.IHarvestPersister;
+import eionet.cr.harvest.persist.PersisterConfig;
+import eionet.cr.harvest.persist.PersisterException;
+import eionet.cr.harvest.persist.PersisterFactory;
+import eionet.cr.harvest.persist.mysql.MySQLDefaultPersister;
 import eionet.cr.harvest.util.HarvestLog;
 import eionet.cr.harvest.util.arp.AResourceImpl;
 import eionet.cr.util.Hashes;
@@ -100,7 +101,7 @@ public class RDFHandler implements StatementHandler{
 		/* field assignments */
 		this.logger = new HarvestLog(config.getSourceUrl(), config.getGenTime(), LogFactory.getLog(this.getClass()));
 		
-		persister = new DefaultPersister(config);
+		persister = PersisterFactory.getPersister(config);
 	}
 	
 	/** 

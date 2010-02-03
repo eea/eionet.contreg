@@ -34,7 +34,7 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.HarvestDTO;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.harvest.persister.PersisterConfig;
+import eionet.cr.harvest.persist.PersisterConfig;
 import eionet.cr.harvest.util.HarvestLog;
 import eionet.cr.harvest.util.arp.ARPSource;
 import eionet.cr.util.Hashes;
