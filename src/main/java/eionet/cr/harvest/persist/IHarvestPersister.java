@@ -44,7 +44,6 @@ public interface IHarvestPersister {
 			String object, long objectHash, String objectLang, boolean litObject, boolean anonObject, long objSourceObject) throws PersisterException;
 
 	/**
-	 * Add source.
 	 * 
 	 * @param uri
 	 * @param uriHash
@@ -100,15 +99,4 @@ public interface IHarvestPersister {
 	 * @throws PersisterException
 	 */
 	void rollbackUnfinishedHarvests() throws PersisterException;
-	
-	/**
-	 * @return how many triples were inserted 
-	 */
-	int getStoredTripleCount();
-	
-	/**
-	 * @return how many distinc subjects were inserted
-	 */
-	int getDistinctSubjectCount();
-	
 }

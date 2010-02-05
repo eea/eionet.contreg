@@ -283,7 +283,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
     	if (urls == null || urls.isEmpty()) {
     		return;
     	}
-    	StringBuffer sql = new StringBuffer("INSERT IGNORE INTO REMOVE_SOURCE_QUEUE (URL) VALUES ");
+    	StringBuffer sql = new StringBuffer("INSERT INTO REMOVE_SOURCE_QUEUE (URL) VALUES ");
     	List<Object> params = new LinkedList<Object>();
     	int i = 0;
     	for (String url : urls) {

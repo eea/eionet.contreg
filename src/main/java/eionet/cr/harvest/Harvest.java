@@ -21,6 +21,8 @@
 package eionet.cr.harvest;
 
 import java.io.File;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +31,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.rdf.arp.ARP;
 
+import eionet.cr.common.CRRuntimeException;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
@@ -187,6 +190,9 @@ public abstract class Harvest {
 	        rdfContentFound = rdfHandler.isRdfContentFound();
 	        storedTriplesCount = rdfHandler.getStoredTriplesCount();
 	        distinctSubjectsCount = rdfHandler.getDistinctSubjectsCount();
+	        
+	        logger.debug("Harvest committed, " + storedTriplesCount + " triples stored and "
+	        		+ distinctSubjectsCount + " distinct subjects found in the source");
 		}
 		catch (Exception e){
 			

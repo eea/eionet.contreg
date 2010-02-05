@@ -50,7 +50,7 @@ public class HarvestMessageDAOTest extends TestCase {
 	public HarvestMessageDAOTest(String name)
 	{
 		super( name );
-		DbHelper.setUpConnectionProperties();
+		DbHelper.createConnectionPropertiesInSystem();
 	}
 	/**
 	 * Load the data which will be inserted for the test

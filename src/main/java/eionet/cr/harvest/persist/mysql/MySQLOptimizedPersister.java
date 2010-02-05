@@ -66,10 +66,10 @@ public class MySQLOptimizedPersister implements IHarvestPersister {
 	public MySQLOptimizedPersister(PersisterConfig config) {
 		this.config = config;
 	}
-
-	/** 
+	
+	/*
+	 * (non-Javadoc)
 	 * @see eionet.cr.harvest.persist.IHarvestPersister#addResource(java.lang.String, long)
-	 * {@inheritDoc}
 	 */
 	public void addResource(String uri, long uriHash) throws PersisterException {
 		StringBuffer sb = new StringBuffer()
@@ -213,23 +213,4 @@ public class MySQLOptimizedPersister implements IHarvestPersister {
 //		new File(TEMP_FILE_NAME).delete();
 //		new File(SOURCE_TEMP_FILE).delete();
 	}
-
-	/** 
-	 * @see eionet.cr.harvest.persist.IHarvestPersister#getStoredTripleCount()
-	 * {@inheritDoc}
-	 */
-	public int getStoredTripleCount() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	/** 
-	 * @see eionet.cr.harvest.persist.IHarvestPersister#getDistinctSubjectCount()
-	 * {@inheritDoc}
-	 */
-	public int getDistinctSubjectCount() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
 }

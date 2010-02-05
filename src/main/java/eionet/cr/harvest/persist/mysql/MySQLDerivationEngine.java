@@ -23,6 +23,8 @@ package eionet.cr.harvest.persist.mysql;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Logger;
 
 import eionet.cr.common.LabelPredicates;
@@ -31,6 +33,7 @@ import eionet.cr.common.Subjects;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.harvest.persist.IDerivationEngine;
+import eionet.cr.harvest.util.HarvestLog;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.sql.SQLUtil;
 
@@ -42,22 +45,27 @@ import eionet.cr.util.sql.SQLUtil;
  */
 public class MySQLDerivationEngine implements IDerivationEngine{
 	
-	private static final Logger logger = Logger.getLogger(MySQLDerivationEngine.class);
+	/** */
+	private Log logger;
 
+	/** */
 	private long sourceUrlHash;
 	private long genTime;
 	private Connection connection;
 	
-	public MySQLDerivationEngine(long sourceUrlHash, long genTime, Connection connection) {
+	/**
+	 * 
+	 * @param sourceUrlHash
+	 * @param genTime
+	 * @param connection
+	 */
+	public MySQLDerivationEngine(String sourceUrlString, long sourceUrlHash, long genTime, Connection connection) {
+		
 		this.sourceUrlHash = sourceUrlHash;
 		this.genTime = genTime;
 		this.connection = connection;
-	}
-	
-	public void derive() throws SQLException {
-		deriveParentProperties();
-		deriveParentClasses();
-		deriveLabels();
+		
+		logger = new HarvestLog(sourceUrlString, genTime, LogFactory.getLog(this.getClass()));
 	}
 
 	/*

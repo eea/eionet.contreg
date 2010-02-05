@@ -21,17 +21,49 @@
 package eionet.cr.harvest;
 
 import java.net.URL;
+import java.sql.Connection;
 
-import junit.framework.TestCase;
-
+import org.dbunit.DBTestCase;
+import org.dbunit.DatabaseTestCase;
+import org.dbunit.database.DatabaseConnection;
+import org.dbunit.database.IDatabaseConnection;
+import org.dbunit.dataset.IDataSet;
+import org.dbunit.dataset.xml.FlatXmlDataSet;
+import org.dbunit.operation.DatabaseOperation;
 import org.junit.Test;
+
+import eionet.cr.util.sql.ConnectionUtil;
 
 /**
  * 
  * @author heinljab
  *
  */
-public class HarvestTest extends TestCase{
+public class HarvestTest extends DatabaseTestCase{
+	
+	/**
+	 * 
+	 */
+	static{
+		ConnectionUtil.setReturnSimpleConnection(true);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.dbunit.DBTestCase#getConnection()
+	 */
+	protected IDatabaseConnection getConnection() throws Exception {
+		Connection conn = ConnectionUtil.getConnection();
+		return new DatabaseConnection(ConnectionUtil.getConnection());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.dbunit.DatabaseTestCase#getDataSet()
+	 */
+	protected IDataSet getDataSet() throws Exception {
+		return new FlatXmlDataSet(getClass().getClassLoader().getResourceAsStream("emptydb.xml"));
+	}
 
 	@Test
 	public void testHarvestFile(){
@@ -46,22 +78,24 @@ public class HarvestTest extends TestCase{
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
-			fail("Was not expecting this exception: " + e.toString());
+			fail("Was not expecting this exception: " + e.toString());			
 		}
 	}
 	
-	@Test
-	public void testHarvestNonExistingURL(){
-		
-		PullHarvest harvest = new PullHarvest("http://www.jaanusheinlaid.tw", null);
-		try {
-			harvest.execute();
-		}
-		catch (HarvestException e) {
-			e.printStackTrace();
-			fail("Was not expecting this exception: " + e.toString());
-		}
-		assertNotNull(harvest.getSourceAvailable());
-		assertFalse(harvest.getSourceAvailable().booleanValue());
-	}
+//	@Test
+//	public void testHarvestNonExistingURL(){
+//		
+//		ConnectionUtil.setReturnSimpleConnection(true);
+//		
+//		PullHarvest harvest = new PullHarvest("http://www.jaanusheinlaid.tw", null);
+//		try {
+//			harvest.execute();
+//		}
+//		catch (HarvestException e) {
+//			e.printStackTrace();
+//			fail("Was not expecting this exception: " + e.toString());
+//		}
+//		assertNotNull(harvest.getSourceAvailable());
+//		assertFalse(harvest.getSourceAvailable().booleanValue());
+//	}
 }

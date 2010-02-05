@@ -32,7 +32,7 @@ public class DbHelper {
 	/**
 	 * 
 	 */
-	public static void setUpConnectionProperties(){
+	public static void createConnectionPropertiesInSystem(){
 		
 		String drv = GeneralConfig.getProperty(GeneralConfig.DB_DRV);
 		System.setProperty(

@@ -20,21 +20,41 @@
  */
 package eionet.cr.harvest.persist;
 
+import eionet.cr.common.CRException;
+
 /**
  * Thrown by implementations of {@link IHarvestPersister}
  * 
  * @author Aleksandr Ivanov
  * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
-public class PersisterException extends Exception {
+public class PersisterException extends CRException {
 
 	/**
 	 * serial.
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
+	/**
+	 * 
+	 */
+	public PersisterException(){
+	}
+
+	/**
+	 * 
+	 * @param message
+	 */
+	public PersisterException(String message){
+		super(message);
+	}
+
+	/**
+	 * 
+	 * @param message
+	 * @param cause
+	 */
 	public PersisterException(String message, Throwable cause) {
 		super(message, cause);
 	}
-
 }

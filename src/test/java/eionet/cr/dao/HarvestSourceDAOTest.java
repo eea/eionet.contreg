@@ -50,12 +50,17 @@ public class HarvestSourceDAOTest extends DBTestCase {
 	public HarvestSourceDAOTest(String name)
 	{
 		super( name );
-		DbHelper.setUpConnectionProperties();
+		DbHelper.createConnectionPropertiesInSystem();
 	}
-	/**
-	 * Load the data which will be inserted for the test
+	
+	/*
+	 * Load the data which will be inserted for the test.
+	 * 
+	 * (non-Javadoc)
+	 * @see org.dbunit.DatabaseTestCase#getDataSet()
 	 */
 	protected IDataSet getDataSet() throws Exception {
+		
 		IDataSet loadedDataSet = new FlatXmlDataSet(
 				getClass().getClassLoader().getResourceAsStream(GeneralConfig.SEED_FILE_NAME));
 		return loadedDataSet;
