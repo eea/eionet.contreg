@@ -76,6 +76,9 @@ public class PostgreSQLPersister implements IHarvestPersister{
 	private int tripleCounter;
 	private PersisterConfig config;
 
+	/** */
+	private int storedTriplesCount;
+
 	/**
 	 * 
 	 */
@@ -120,6 +123,11 @@ public class PostgreSQLPersister implements IHarvestPersister{
 
 			preparedStatementForTriples.addBatch();
 			tripleCounter++;
+
+			// if at BULK_INSERT_SIZE, execute the batch
+			if (tripleCounter % BULK_INSERT_SIZE == 0){
+				executeBatch();
+			}
 		}
 		catch (SQLException e) {
 			throw new PersisterException(e.getMessage(), e);
@@ -198,18 +206,23 @@ public class PostgreSQLPersister implements IHarvestPersister{
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.harvest.persist.IHarvestPersister#tempCommit()
+	/**
+	 * 
+	 * @throws PersisterException
 	 */
-	public void tempCommit() throws PersisterException {
+	public void executeBatch() throws PersisterException {
 		try {
-			preparedStatementForTriples.executeBatch();
+			int[] counts = preparedStatementForTriples.executeBatch();
 			preparedStatementForTriples.clearParameters();
 			System.gc();
 			preparedStatementForResources.executeBatch();
 			preparedStatementForResources.clearParameters();
 			System.gc();
+			
+			int len = counts.length;
+			for (int i=0; i<len; i++){
+				storedTriplesCount = storedTriplesCount+ counts[i];
+			}
 			
 			if (tripleCounter % TRIPLE_PROGRESS_INTERVAL == 0){
 				logger.debug("Progress: " + String.valueOf(tripleCounter) + " triples processed");
@@ -227,7 +240,7 @@ public class PostgreSQLPersister implements IHarvestPersister{
 		
 		// if there are any un-executed records left in the batch, execute them 
 		if (tripleCounter % BULK_INSERT_SIZE != 0){
-			tempCommit();
+			executeBatch();
 		}
 		
 		logger.debug("End of file, total of " + tripleCounter + " triples found in source");
@@ -426,5 +439,13 @@ public class PostgreSQLPersister implements IHarvestPersister{
 			try{conn.rollback();}catch (SQLException ee){}
 			throw e;
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.harvest.persist.IHarvestPersister#getStoredTriplesCount()
+	 */
+	public int getStoredTriplesCount() {
+		return storedTriplesCount;
 	}
 }

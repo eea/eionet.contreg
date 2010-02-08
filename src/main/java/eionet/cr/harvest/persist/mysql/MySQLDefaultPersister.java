@@ -60,20 +60,22 @@ public class MySQLDefaultPersister implements IHarvestPersister {
 
 	/** */
 	private Log logger;
+	private Connection connection;
+	private PersisterConfig config;
 	
-	//fields initialized through PersisterConfig object
+	/** fields initialized through PersisterConfig object */
 	private long sourceUrlHash;
 	private long genTime;
 	private String instantHarvestUser;
 	private String sourceUrl;
-
-	private Connection connection;
 	
 	/** */
 	private PreparedStatement preparedStatementForTriples;
 	private PreparedStatement preparedStatementForResources;
+	
+	/** */
 	private int tripleCounter;
-	private PersisterConfig config;
+	private int storedTriplesCount;
 	
 	/**
 	 * @param config
@@ -189,7 +191,13 @@ public class MySQLDefaultPersister implements IHarvestPersister {
 			
 			preparedStatementForTriples.addBatch();
 			tripleCounter++;
-		}catch (SQLException e) {
+			
+			// if at BULK_INSERT_SIZE, execute the batch
+			if (tripleCounter % BULK_INSERT_SIZE == 0){
+				executeBatch();
+			}
+		}
+		catch (SQLException e) {
 			throw new PersisterException(e.getMessage(), e);
 		}
 	}
@@ -229,7 +237,7 @@ public class MySQLDefaultPersister implements IHarvestPersister {
 		
 		// if there are any un-executed records left in the batch, execute them 
 		if (tripleCounter % BULK_INSERT_SIZE != 0){
-			tempCommit();
+			executeBatch();
 		}
 		
 		logger.debug("End of file, total of " + tripleCounter + " triples found in source");
@@ -294,7 +302,7 @@ public class MySQLDefaultPersister implements IHarvestPersister {
 		append("OBJ_DERIV_SOURCE, OBJ_DERIV_SOURCE_GEN_TIME, OBJ_SOURCE_OBJECT, ").
 		append(sourceUrlHash).append(", ").append(genTime).append(" from ").append(spoTempTableName);
 
-		SQLUtil.executeUpdate(buf.toString(), getConnection());
+		storedTriplesCount = SQLUtil.executeUpdate(buf.toString(), getConnection());
 		
 		/* clear previous content if required (it is not, for example, required when doing a push-harvest) */
 		
@@ -352,12 +360,13 @@ public class MySQLDefaultPersister implements IHarvestPersister {
 			SQLUtil.close(conn);
 		}
 	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.harvest.persist.IHarvestPersister#tempCommit()
+
+	/**
+	 * 
+	 * @throws PersisterException
 	 */
-	public void tempCommit() throws PersisterException {
+	public void executeBatch() throws PersisterException {
+		
 		try {
 			preparedStatementForTriples.executeBatch();
 			preparedStatementForTriples.clearParameters();
@@ -369,7 +378,8 @@ public class MySQLDefaultPersister implements IHarvestPersister {
 			if (tripleCounter % TRIPLE_PROGRESS_INTERVAL == 0){
 				logger.debug("Progress: " + String.valueOf(tripleCounter) + " triples processed");
 			}
-		} catch(SQLException e) {
+		}
+		catch(SQLException e) {
 			throw new PersisterException(e.getMessage(), e);
 		}
 	}
@@ -504,5 +514,13 @@ public class MySQLDefaultPersister implements IHarvestPersister {
 		
 		SQLUtil.executeUpdate("delete from " + spoTempTableName, connection);
 		SQLUtil.executeUpdate("delete from " + resourceTempTableName, connection);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.harvest.persist.IHarvestPersister#getStoredTriplesCount()
+	 */
+	public int getStoredTriplesCount() {
+		return storedTriplesCount;
 	}
 }

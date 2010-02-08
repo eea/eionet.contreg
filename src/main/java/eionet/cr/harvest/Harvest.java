@@ -169,9 +169,7 @@ public abstract class Harvest {
 				ARP arp = new ARP();
 		        arp.setStatementHandler(rdfHandler);
 		        arp.setErrorHandler(errorHandler);
-		        long time = System.currentTimeMillis();
 		        arpSource.load(arp, sourceUrlString);
-		        logger.debug("file processing took: " + (System.currentTimeMillis() - time) + " ms");
 			}
 			else if (sourceMetadata.getPredicateCount()>0){
 				logger.debug("No content to harvest, but storing triples *about* the source");
@@ -189,10 +187,10 @@ public abstract class Harvest {
 
 	        rdfContentFound = rdfHandler.isRdfContentFound();
 	        storedTriplesCount = rdfHandler.getStoredTriplesCount();
-	        distinctSubjectsCount = rdfHandler.getDistinctSubjectsCount();
+	        distinctSubjectsCount = rdfHandler.getSubjectCount();
 	        
-	        logger.debug("Harvest committed, " + storedTriplesCount + " triples stored and "
-	        		+ distinctSubjectsCount + " distinct subjects found in the source");
+	        logger.debug("Harvest committed. " + storedTriplesCount + " triples stored. "
+	        		+ distinctSubjectsCount + " subjects found in source");
 		}
 		catch (Exception e){
 			

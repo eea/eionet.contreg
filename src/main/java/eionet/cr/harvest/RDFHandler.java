@@ -67,15 +67,11 @@ public class RDFHandler implements StatementHandler{
 	private boolean parsingStarted = false;
 	
 	/** */
-	private int tripleCounter = 0;
-	private static final int BULK_INSERT_SIZE = 50000;
-	
-	/** */
 	private static final String EMPTY_STRING = "";
 	
 	/** */
-	private HashSet<Long> addedSubjects = new HashSet<Long>();
-	private HashSet<Long> addedPredicates = new HashSet<Long>();
+	private Pair<HashSet<Long>,HashSet<Long>> resources =
+		new Pair<HashSet<Long>,HashSet<Long>>(new HashSet<Long>(), new HashSet<Long>());
 	
 	/** */
 	private Map<String, List<Pair<String,String>>> rdfValues = new HashMap<String, List<Pair<String,String>>>();
@@ -87,7 +83,6 @@ public class RDFHandler implements StatementHandler{
 	private IHarvestPersister persister;
 
 	/** */
-	private int storedTriplesCount;
 	private int distinctSubjectsCount;
 
 	
@@ -173,8 +168,6 @@ public class RDFHandler implements StatementHandler{
 	 */
 	private void statement(AResource subject, AResource predicate, String object, String objectLang, boolean litObject, boolean anonObject){
 
-		tripleCounter++;
-		
 		try{
 			// if this is the first statement, perform certain "startup" actions
 			if (parsingStarted==false){
@@ -236,26 +229,18 @@ public class RDFHandler implements StatementHandler{
 			}
 
 			// if subject not already added into resources, then do so
-			if (!resourceAlreadyAdded(subjectHash)){
-				addResource(subjectUri, subjectHash);
-				addedSubjects.add(subjectHash);
+			if (!isResourceAdded(subjectHash)){
+				addResource(subjectUri, subjectHash, true);
 			}
 
 			// if predicate not already added into resources, then do so
-			if (!resourceAlreadyAdded(predicateHash)){
-				addResource(predicate.getURI(), predicateHash);
-				addedSubjects.add(predicateHash);
+			if (!isResourceAdded(predicateHash)){
+				addResource(predicate.getURI(), predicateHash, false);
 			}
 			
 			// if object is a resource and it's not already added into resources, then do so
-			if (litObject==false && !resourceAlreadyAdded(objectHash)){
-				addResource(object, objectHash);
-				addedPredicates.add(subjectHash); // TODO
-			}
-
-			// if at BULK_INSERT_SIZE, execute the batch
-			if (tripleCounter % BULK_INSERT_SIZE == 0){
-				executeBatch();
+			if (litObject==false && !isResourceAdded(objectHash)){
+				addResource(object, objectHash, false);
 			}
 		}
 		catch (Exception e){
@@ -263,16 +248,6 @@ public class RDFHandler implements StatementHandler{
 		}
 	}
 
-	/**
-	 * 
-	 * @param resourceHash
-	 * @return
-	 */
-	private boolean resourceAlreadyAdded(long resourceHash){
-		Long l = Long.valueOf(resourceHash);
-		return addedSubjects.contains(l) || addedPredicates.contains(l);
-	}
-	
 	/**
 	 * @throws SQLException 
 	 * 
@@ -314,7 +289,6 @@ public class RDFHandler implements StatementHandler{
 			String object, long objectHash, String objectLang, boolean litObject, boolean anonObject, long objSourceObject) throws PersisterException {
 		
 		persister.addTriple(subjectHash, anonSubject, predicateHash, object, objectHash, objectLang, litObject, anonObject, objSourceObject);
-		storedTriplesCount++;
 	}
 	
 	/**
@@ -352,18 +326,17 @@ public class RDFHandler implements StatementHandler{
 
 	/**
 	 * @param uri
-	 * @param uriHash
+	 * @param hash
 	 * @throws PersisterException 
 	 */
-	private void addResource(String uri, long uriHash) throws PersisterException {
-		persister.addResource(uri, uriHash);
-	}
-
-	/**
-	 * 
-	 */
-	private void executeBatch() throws PersisterException{
-		persister.tempCommit();
+	private void addResource(String uri, long hash, boolean isSubject) throws PersisterException {
+		
+		persister.addResource(uri, hash);
+		
+		if (isSubject)
+			resources.getLeft().add(Long.valueOf(hash));
+		else
+			resources.getRight().add(Long.valueOf(hash));
 	}
 
 	/**
@@ -394,23 +367,7 @@ public class RDFHandler implements StatementHandler{
 	 * @return return stored triple count.
 	 */
 	public int getStoredTriplesCount() {
-		//return persister.getStoredTripleCount();
-		return storedTriplesCount;
-	}
-
-	/**
-	 * @return distinct subject count.
-	 */
-	public int getDistinctSubjectsCount() {
-		//return persister.getDistinctSubjectCount();
-		return addedSubjects.size();
-	}
-
-	/**
-	 * @return triple counter.
-	 */
-	public int getTripleCounter() {
-		return tripleCounter;
+		return persister.getStoredTriplesCount();
 	}
 
 	/**
@@ -426,5 +383,24 @@ public class RDFHandler implements StatementHandler{
 	 */
 	public void closeResources() throws PersisterException  {
 		persister.closeResources();
+	}
+	
+	/**
+	 * 
+	 * @param hash
+	 * @return
+	 */
+	private boolean isResourceAdded(long hash){
+		
+		return resources.getLeft().contains(Long.valueOf(hash))
+		|| resources.getRight().contains(Long.valueOf(hash));
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public int getSubjectCount(){
+		return resources.getLeft().size();
 	}
 }

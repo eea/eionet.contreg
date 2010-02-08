@@ -201,16 +201,20 @@ public class MySQLOptimizedPersister implements IHarvestPersister {
 		deleteTempFiles();
 	}
 
-	/** 
-	 * @see eionet.cr.harvest.persist.IHarvestPersister#tempCommit()
-	 * {@inheritDoc}
+	/**
+	 * 
 	 */
-	public void tempCommit() throws PersisterException {
-		//not needed
-	}
-	
 	private void deleteTempFiles() {
 //		new File(TEMP_FILE_NAME).delete();
 //		new File(SOURCE_TEMP_FILE).delete();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.harvest.persist.IHarvestPersister#getStoredTriplesCount()
+	 */
+	public int getStoredTriplesCount() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }

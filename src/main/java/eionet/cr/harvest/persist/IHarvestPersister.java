@@ -59,13 +59,6 @@ public interface IHarvestPersister {
 	void rollback() throws PersisterException;
 	
 	/**
-	 * allows to do a temp commit.
-	 * 
-	 * @throws PersisterException
-	 */
-	void tempCommit() throws PersisterException;
-	
-	/**
 	 * commits resources when harvest is finished.
 	 * 
 	 * @throws PersisterException
@@ -99,4 +92,10 @@ public interface IHarvestPersister {
 	 * @throws PersisterException
 	 */
 	void rollbackUnfinishedHarvests() throws PersisterException;
+
+	/**
+	 * 
+	 * @return
+	 */
+	int getStoredTriplesCount();
 }
