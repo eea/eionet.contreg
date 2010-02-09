@@ -23,6 +23,7 @@ package eionet.cr.harvest;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -195,6 +196,10 @@ public abstract class Harvest {
 		catch (Exception e){
 			
 			try{logger.error("Harvest error: " + e.toString());}catch (Exception ee){}
+			
+			if (e instanceof SQLException){
+				logger.error("Next exception: ", ((SQLException)e).getNextException());
+			}
 			
 			if (rdfHandler!=null){
 				try{

@@ -229,9 +229,9 @@ public class PostgreSQLDerivationEngine implements IDerivationEngine{
 
 		StringBuffer buf = new StringBuffer().
 		append("insert into HARVEST_SOURCE").
-		append(" (URL, TRACKED_FILE, TIME_CREATED, INTERVAL_MINUTES, SOURCE, GEN_TIME) ").		
+		append(" (URL, URL_HASH, TRACKED_FILE, TIME_CREATED, INTERVAL_MINUTES, SOURCE, GEN_TIME) ").		
 		append("select (case when position('#' in URI)>1 then substring(URI from 1 for position('#' in URI)-1) else URI END),").
-		append(" cast('Y' as ynboolean), now(),").append(interval).append(",").
+		append(" URI_HASH, cast('Y' as ynboolean), now(),").append(interval).append(",").
 		append(sourceUrlHash).append(", ").append(genTime).
 		append(" from SPO,RESOURCE where SPO.SOURCE=").append(sourceUrlHash).
 		append(" and SPO.GEN_TIME=").append(genTime).append(" and SPO.PREDICATE=").

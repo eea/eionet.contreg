@@ -65,6 +65,22 @@ public class HarvestTest extends DatabaseTestCase{
 		return new FlatXmlDataSet(getClass().getClassLoader().getResourceAsStream("emptydb.xml"));
 	}
 
+//	/*
+//	 * (non-Javadoc)
+//	 * @see org.dbunit.DatabaseTestCase#getSetUpOperation()
+//	 */
+//	protected DatabaseOperation getSetUpOperation() throws Exception{
+//		return DatabaseOperation.REFRESH;
+//	}
+//
+//	/*
+//	 * (non-Javadoc)
+//	 * @see org.dbunit.DatabaseTestCase#getTearDownOperation()
+//	 */
+//	protected DatabaseOperation getTearDownOperation()throws Exception{
+//		return DatabaseOperation.NONE;
+//	}
+
 	@Test
 	public void testHarvestFile(){
 				
@@ -81,21 +97,34 @@ public class HarvestTest extends DatabaseTestCase{
 			fail("Was not expecting this exception: " + e.toString());			
 		}
 	}
-	
+
 //	@Test
-//	public void testHarvestNonExistingURL(){
+//	public void testHarvestURL(){
 //		
-//		ConnectionUtil.setReturnSimpleConnection(true);
-//		
-//		PullHarvest harvest = new PullHarvest("http://www.jaanusheinlaid.tw", null);
 //		try {
+//			Harvest harvest = new PullHarvest("http://dampos.eionet.europa.eu/dams.rdf", null);
 //			harvest.execute();
 //		}
-//		catch (HarvestException e) {
+//		catch (Throwable e) {
 //			e.printStackTrace();
-//			fail("Was not expecting this exception: " + e.toString());
+//			fail("Was not expecting this exception: " + e.toString());			
 //		}
-//		assertNotNull(harvest.getSourceAvailable());
-//		assertFalse(harvest.getSourceAvailable().booleanValue());
 //	}
+
+	@Test
+	public void testHarvestNonExistingURL(){
+		
+		ConnectionUtil.setReturnSimpleConnection(true);
+		
+		PullHarvest harvest = new PullHarvest("http://www.jaanusheinlaid.tw", null);
+		try {
+			harvest.execute();
+		}
+		catch (HarvestException e) {
+			e.printStackTrace();
+			fail("Was not expecting this exception: " + e.toString());
+		}
+		assertNotNull(harvest.getSourceAvailable());
+		assertFalse(harvest.getSourceAvailable().booleanValue());
+	}
 }

@@ -128,7 +128,7 @@ public class FactsheetActionBean extends AbstractActionBean{
 	public Resolution harvestAjax() {
 		String message;
 		try {
-			message = scheduleHarvest().getRight();
+			message = harvestNow().getRight();
 		} catch (Exception ignored) {
 			logger.error("error while scheduling ajax harvest", ignored);
 			message = "Error occured, more info can be obtained in application logs";
@@ -144,7 +144,7 @@ public class FactsheetActionBean extends AbstractActionBean{
 	 * @throws DAOException 
 	 */
 	public Resolution harvest() throws HarvestException, DAOException {
-		Pair<Boolean, String> message = scheduleHarvest();
+		Pair<Boolean, String> message = harvestNow();
 		if (message.getLeft()) {
 			addWarningMessage(message.getRight());
 		} else {
@@ -161,7 +161,7 @@ public class FactsheetActionBean extends AbstractActionBean{
 	 * @throws HarvestException
 	 * @throws DAOException
 	 */
-	private Pair<Boolean, String> scheduleHarvest() throws HarvestException, DAOException  {
+	private Pair<Boolean, String> harvestNow() throws HarvestException, DAOException  {
 		
 		String message = null;
 		if(isUserLoggedIn()){
