@@ -1,0 +1,33 @@
+
+alter table harvest drop constraint harvest_pkey;
+alter table harvest drop constraint harvest_unique;
+
+alter table harvest_message drop constraint harvest_message_pkey;
+drop index harvest_message_harvest_id;
+
+alter table harvest_source drop constraint harvest_source_pkey;
+alter table harvest_source drop constraint harvest_source_unique;
+drop rule skip_duplicate_harvest_source on harvest_source;
+
+alter table remove_source_queue drop constraint remove_source_queue_pkey;
+drop rule skip_duplicate_remove_source on remove_source_queue;
+
+alter table resource drop constraint resource_pkey;
+drop index resource_firstseen_source;
+drop index resource_firstseen_time;
+drop index resource_lastmodified_time;
+drop rule replace_resource on resource;
+
+drop index spo_gen_time;
+drop index spo_obj_source_object;
+drop index spo_object_double;
+drop index spo_object_hash;
+drop index spo_predicate;
+drop index spo_source;
+drop index spo_subject;
+drop index spo_object_idx;
+
+alter table unfinished_harvest drop constraint unfinished_harvest_unique;
+
+
+
