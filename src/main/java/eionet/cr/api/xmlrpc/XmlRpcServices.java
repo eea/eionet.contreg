@@ -292,4 +292,54 @@ public class XmlRpcServices implements Services{
 		
 		return result;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.api.xmlrpc.Services#getXmlFilesBySchema(java.lang.String)
+	 */
+	public Vector getXmlFilesBySchema(String schemaIdentifier) throws CRException {
+
+		Vector result = new Vector();
+		try{
+			List<SubjectDTO> subjects = null;
+			if (!StringUtils.isBlank(schemaIdentifier)){
+				
+				SearchDAO searchDao = MySQLDAOFactory.get().getDao(SearchDAO.class);
+				Map<String, String> criteria = new HashMap<String, String>();
+				criteria.put(Predicates.CR_SCHEMA, schemaIdentifier);
+
+				Pair<Integer, List<SubjectDTO>> results = searchDao.searchByFilters(
+						criteria,
+						null, 
+						new PagingRequest(0, 0),
+						null);
+
+				int subjectCount = results==null ?
+						0 : (results.getRight()==null ? 0 : results.getRight().size());  
+				logger.debug(getClass().getSimpleName() + ".getXmlFilesBySchema("
+						+ schemaIdentifier + "), " + subjectCount + " subjects found in total");
+				subjects = results.getRight();
+				
+				if (subjects!=null){
+					for (SubjectDTO subjectDTO : subjects){
+						
+						String lastModif = subjectDTO.getObjectValue(Predicates.CR_LAST_MODIFIED);
+						Hashtable hashtable = new Hashtable();
+						hashtable.put("uri", subjectDTO.getUri());
+						hashtable.put("lastModified", lastModif==null ? "" : lastModif.trim());
+						result.add(hashtable);
+					}
+				}
+			}
+		}
+		catch (Throwable t){
+			t.printStackTrace();
+			if (t instanceof CRException)
+				throw (CRException)t;
+			else
+				throw new CRException(t.toString(), t);
+		}
+		
+		return result;
+	}
 }

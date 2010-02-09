@@ -64,4 +64,12 @@ public interface Services {
 	 * @throws CRException
 	 */
 	public abstract Vector getEntries(Hashtable criteria) throws CRException;
+	
+	/**
+	 * 
+	 * @param schemaIdentifier
+	 * @return
+	 * @throws CRException
+	 */
+	public Vector getXmlFilesBySchema(String schemaIdentifier) throws CRException;
 }

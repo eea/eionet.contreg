@@ -124,12 +124,41 @@ public class CRXmlRpcSampleClient {
 
 	/**
 	 * 
+	 * @throws XmlRpcException
+	 * @throws MalformedURLException
+	 */
+	public static void sample_getXmlFilesBySchema() throws XmlRpcException, MalformedURLException{
+
+		// set up the XmlRpcClient
+		XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
+		config.setServerURL(new URL("http://ww010646:8080/cr/xmlrpc"));
+		config.setEnabledForExtensions(true);
+		XmlRpcClient client = new XmlRpcClient();
+		client.setConfig(config);
+
+		// execute the call
+		Object[] params = new Object[]{"eper.xsd"};
+		Object[] result = (Object[])client.execute("ContRegService.getXmlFilesBySchema", params);
+
+		// loop through the results, do type casting to see if any ClassCastExceptions are thrown
+		if (result!=null && result.length>0){
+			for (int i=0; i<result.length; i++){
+				System.out.println(result[i].toString());
+			}
+		}
+		else
+			System.out.println("result array null or empty");
+
+	}
+	/**
+	 * 
 	 * @param args
 	 */
 	public static void main(String[] args){
 		
 		try{
-			sample_getResourcesSinceTimestamp();
+			sample_getXmlFilesBySchema();
+//			sample_getResourcesSinceTimestamp();
 			//sample_simpleAndSearch();
 			//sample_dataflowSearch();
 		}
