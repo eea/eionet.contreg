@@ -23,7 +23,7 @@
 		<crfn:form action="/typeSearch.action" method="get">
 			<stripes:select name="type">
 				<c:forEach items="${actionBean.availableTypes }" var="type">
-					<stripes:option value="${type.left}">${type.right} (${type.right})</stripes:option>
+					<stripes:option value="${type.left}">${type.right} (${type.left})</stripes:option>
 				</c:forEach>
 			</stripes:select>
 			<stripes:submit name="search" value="Search" /> 
