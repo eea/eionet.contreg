@@ -78,16 +78,8 @@
 									</c:otherwise>
 								</c:choose>>
 								<c:forEach items="${actionBean.columns}" var="col">
-									<td>
-										<c:choose>
-											<c:when test="${col.escapeXml}">
-												<c:out value="${crfn:format(col, resultListItem, actionBean)}"/>
-											</c:when>
-											<c:otherwise>
-												${crfn:format(col, resultListItem, actionBean)}
-											</c:otherwise>
-										</c:choose>
-									</td>
+									<%-- assume crfn:format() does the XML escaping --%>
+									<td>${crfn:format(col, resultListItem, actionBean)}</td>
 								</c:forEach>
 							</tr>
 						</c:forEach>

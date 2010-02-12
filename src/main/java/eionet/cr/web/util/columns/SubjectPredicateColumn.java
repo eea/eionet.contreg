@@ -108,6 +108,11 @@ public class SubjectPredicateColumn extends SearchResultColumn{
 			
 			SubjectDTO subjectDTO = (SubjectDTO)object;
 			result = FormatUtils.getObjectValuesForPredicate(predicateUri, subjectDTO, getLanguages());
+			if (result==null) result = "";
+			result = StringEscapeUtils.escapeXml(result);
+			
+			// IE is not able to display &apos; correctly. Workaround is to use &#39; instead. 
+			result = StringUtils.replace(result, "&apos;", "&#39;");
 			
 			// rdfs:label gets special treatment
 			if (predicateUri.equals(Predicates.RDFS_LABEL)){
@@ -124,8 +129,7 @@ public class SubjectPredicateColumn extends SearchResultColumn{
 							result = "No label";
 						}
 					}
-				}
-				result = StringEscapeUtils.escapeXml(result);
+				}				
 				
 				// no we are sure we have a label to display, so let's generate the factsheet link based on that
 				String factsheetUrlBinding = FactsheetActionBean.class.getAnnotation(UrlBinding.class).value();
@@ -144,15 +148,6 @@ public class SubjectPredicateColumn extends SearchResultColumn{
 		return result.trim().length()>0 ? result : "No label";
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.web.util.columns.SearchResultColumn#isEscapeXml()
-	 */
-	public boolean isEscapeXml(){
-		
-		return predicateUri.equals(Predicates.RDFS_LABEL) ? false : true;
-	}
-	
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.web.util.search.SearchResultColumn#getSortParamValue()

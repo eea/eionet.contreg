@@ -69,15 +69,11 @@ public abstract class SearchResultColumn {
 	 * @return
 	 */
 	public abstract String format(Object object);
-	
+
 	/**
 	 * 
-	 * @return
+	 * @param escapeXml
 	 */
-	public boolean isEscapeXml(){
-		return escapeXml;
-	}
-	
 	public void setEscapeXml(boolean escapeXml) {
 		this.escapeXml = escapeXml;
 	}
