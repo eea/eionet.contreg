@@ -20,11 +20,16 @@
 * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.dao.postgre;
 
+import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.List;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HarvestMessageDAO;
 import eionet.cr.dto.HarvestMessageDTO;
+import eionet.cr.dto.readers.HarvestMessageDTOReader;
+import eionet.cr.util.sql.ConnectionUtil;
+import eionet.cr.util.sql.SQLUtil;
 
 /**
  * 
@@ -33,27 +38,88 @@ import eionet.cr.dto.HarvestMessageDTO;
  */
 public class PostgreSQLHarvestMessageDAO extends PostgreSQLBaseDAO implements HarvestMessageDAO{
 
-	public void deleteMessage(Integer messageId) throws DAOException {
-		// TODO Auto-generated method stub
+	/** */
+	private static final String q_HarvestMessageByHarvestID = "select * from HARVEST_MESSAGE where HARVEST_ID=?";
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HarvestMessageDAO#findHarvestMessagesByHarvestID(java.lang.String)
+	 */
+	public List<HarvestMessageDTO> findHarvestMessagesByHarvestID(int harvestID) throws DAOException {
+		List<Object> values = new ArrayList<Object>();
+		values.add(new Integer(harvestID));
+		return executeQuery(q_HarvestMessageByHarvestID, values, new HarvestMessageDTOReader());
+	}
+	
+	/** */
+	private static final String q_HarvestMessageByMessageID = "select * from HARVEST_MESSAGE where HARVEST_MESSAGE_ID=?";
+	
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HarvestMessageDAO#findHarvestMessageByMessageID(java.lang.String)
+	 */
+	public HarvestMessageDTO findHarvestMessageByMessageID(int messageID) throws DAOException {
+		List<Object> values = new ArrayList<Object>();
+		values.add(new Integer(messageID));
+		List<HarvestMessageDTO> list = executeQuery(q_HarvestMessageByMessageID, values, new HarvestMessageDTOReader());		
+		return list!=null && list.size()>0 ? list.get(0) : null;
+	}
+
+	/** */
+	private static final String q_insertHarvestMessage =
+		"insert into HARVEST_MESSAGE (HARVEST_ID, TYPE, MESSAGE, STACK_TRACE) values (?, ?, ?, ?)";
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HarvestMessageDAO#insertHarvestMessage(eionet.cr.dto.HarvestMessageDTO)
+	 */
+	public Integer insertHarvestMessage(HarvestMessageDTO harvestMessageDTO) throws DAOException {
 		
+		Integer harvestMessageID = null;
+		
+		if (harvestMessageDTO==null)
+			return null;
+		
+		List<Object> values = new ArrayList<Object>();
+		values.add(harvestMessageDTO.getHarvestId());
+		values.add(harvestMessageDTO.getType());
+		values.add(harvestMessageDTO.getMessage());
+		values.add(harvestMessageDTO.getStackTrace());
+		
+		Connection conn = null;
+		try{
+			conn = getConnection();
+			return SQLUtil.executeUpdateReturnAutoKey(q_insertHarvestMessage, values, conn);
+		}
+		catch (Exception e){
+			throw new DAOException(e.getMessage(), e);
+		}
+		finally{
+			closeConnection(conn);
+		}
 	}
-
-	public HarvestMessageDTO findHarvestMessageByMessageID(int messageID)
-			throws DAOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public List<HarvestMessageDTO> findHarvestMessagesByHarvestID(int harvestID)
-			throws DAOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public Integer insertHarvestMessage(HarvestMessageDTO harvestMessageDTO)
-			throws DAOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+	
+	/** */
+	private static final String deleteHarvestMessageSQL = "delete from HARVEST_MESSAGE where HARVEST_MESSAGE_ID=?";
+	
+	/*
+     * (non-Javadoc)
+     * 
+     * @see eionet.cr.dao.HarvestMessageDao#deleteMessage()
+     */
+    public void deleteMessage(Integer messageId) throws DAOException {
+    	    	
+    	List<Object> values = new ArrayList<Object>();
+		values.add(messageId);
+		
+		Connection conn = null;
+		try{
+			conn = getConnection();
+			SQLUtil.executeUpdate(deleteHarvestMessageSQL, values, conn);
+		}
+		catch (Exception e){
+			throw new DAOException(e.getMessage(), e);
+		}
+		finally{
+			ConnectionUtil.closeConnection(conn);
+		}
+    }
 }
