@@ -289,4 +289,18 @@ public class SQLUtil {
 			catch (SQLException e){}
 		}
 	}
+	
+	/**
+	 * 
+	 * @param conn
+	 */
+	public static void rollback(Connection conn){
+		
+		if (conn!=null){
+			try{
+				conn.rollback();
+			}
+			catch (SQLException e){}
+		}
+	}
 }

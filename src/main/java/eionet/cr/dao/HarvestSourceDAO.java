@@ -60,7 +60,7 @@ public interface HarvestSourceDAO extends DAO{
      * @param sortingRequest
      * @return
      */
-    Pair<Integer, List<HarvestSourceDTO>> getHarvestSourcesFailed(String filterString,	PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException;
+    Pair<Integer, List<HarvestSourceDTO>> getHarvestSourcesFailed(String searchString,	PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException;
 
     /**
      * @return harvesting sources

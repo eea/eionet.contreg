@@ -150,6 +150,32 @@ public abstract class PostgreSQLBaseDAO {
 				? null
 				: result.get(0);
 	}
+
+	/**
+	 * 
+	 * @param sql
+	 * @return
+	 * @throws DAOException 
+	 */
+	protected int getQueryRowCount(String sqlQuery) throws DAOException{
+
+		Connection conn = null;
+		try {
+			conn = getConnection();
+			StringBuffer buf = new StringBuffer("select count(*) from (").
+			append(sqlQuery).append(") as foo");
+			Object o = SQLUtil.executeSingleReturnValueQuery(buf.toString(), conn);
+			return o==null ? 0 : Integer.valueOf(o.toString());
+		}
+		catch (Exception e){
+			throw new DAOException(e.getMessage(), e);
+		}
+		finally{
+			ConnectionUtil.closeConnection(conn);
+		}
+
+	}
+
 	
 	/**
 	 * 
@@ -174,5 +200,5 @@ public abstract class PostgreSQLBaseDAO {
 		append("order by ").
 		append("SUBJECT, PREDICATE, OBJECT");
 		return buf.toString();
-	}
+	}	
 }
