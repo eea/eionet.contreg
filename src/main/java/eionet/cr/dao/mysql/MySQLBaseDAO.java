@@ -153,17 +153,20 @@ public abstract class MySQLBaseDAO {
 	 * @return
 	 * @throws DAOException
 	 */
-	protected <T> Pair<List<T>, Integer> executeQueryWithRowCount(String sql, List<?> params, ResultSetListReader<T> reader) throws DAOException {
+	protected <T> Pair<Integer, List<T>> executeQueryWithRowCount(String sql, List<?> params, ResultSetListReader<T> reader) throws DAOException {
+		
 		Connection conn = null;
 		try {
 			conn = getConnection();
 			SQLUtil.executeQuery(sql, params, reader, conn);
 			List<T> list = reader.getResultList();
-			int rows = MySQLUtil.getTotalRowCount(conn);
-			return new Pair<List<T>, Integer> (list, rows);
-		} catch (Exception fatal) {
+			int rowCount = MySQLUtil.getTotalRowCount(conn);
+			return new Pair<Integer,List<T>> (rowCount,list);
+		}
+		catch (Exception fatal) {
 			throw new DAOException(fatal.getMessage(), fatal);
-		} finally {
+		}
+		finally {
 			ConnectionUtil.closeConnection(conn);
 		}
 	}
@@ -176,15 +179,15 @@ public abstract class MySQLBaseDAO {
 	 * @return
 	 * @throws DAOException
 	 */
-	protected <T> Pair<List<T>, Integer> executeQueryWithRowCount(String sql, ResultSetListReader<T> reader) throws DAOException {
+	protected <T> Pair<Integer, List<T>> executeQueryWithRowCount(String sql, ResultSetListReader<T> reader) throws DAOException {
 		
 		Connection conn = null;
 		try {
 			conn = getConnection();
 			SQLUtil.executeQuery(sql, reader, conn);
 			List<T> list = reader.getResultList();
-			int rows = MySQLUtil.getTotalRowCount(conn);
-			return new Pair<List<T>, Integer> (list, rows);
+			int rowCount = MySQLUtil.getTotalRowCount(conn);
+			return new Pair<Integer,List<T>> (rowCount,list);
 		} catch (Exception fatal) {
 			throw new DAOException(fatal.getMessage(), fatal);
 		} finally {

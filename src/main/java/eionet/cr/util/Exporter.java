@@ -44,6 +44,7 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.SubjectDTO;
+import eionet.cr.util.pagination.PagingRequest;
 
 /**
  * Utility class to handle export procedure.
@@ -80,8 +81,7 @@ public class Exporter {
 				.searchByFilters(
 						criteria,
 						null,
-						new PagingRequest(
-								1, 
+						PagingRequest.create(1, 
 								new Integer(GeneralConfig.getRequiredProperty(EXPORT_ROW_LIMIT))),
 						null);
 		InputStream result = null;

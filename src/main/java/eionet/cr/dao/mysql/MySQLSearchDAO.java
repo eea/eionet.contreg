@@ -41,10 +41,10 @@ import eionet.cr.search.util.SimpleSearchDataReader;
 import eionet.cr.search.util.SortOrder;
 import eionet.cr.search.util.SubjectDataReader;
 import eionet.cr.util.Hashes;
-import eionet.cr.util.PagingRequest;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.URIUtil;
+import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.util.sql.PairReader;
 import eionet.cr.util.sql.SingleObjectReader;
 import eionet.cr.web.util.columns.ReferringPredicatesColumn;
@@ -115,19 +115,22 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 			}
 		}
 		
-		selectQuery.append(" LIMIT ")
-				.append((pagingRequest.getPageNumber() -1) * pagingRequest.getItemsPerPage())
-				.append(',')
-				.append(pagingRequest.getItemsPerPage());
-		Pair<List<Pair<Long,Long>>,Integer> result = executeQueryWithRowCount(
+		if (pagingRequest!=null){
+			
+			selectQuery.append(" LIMIT ")
+			.append(pagingRequest.getOffset()).append(',').append(pagingRequest.getItemsPerPage());
+		}
+		
+		Pair<Integer,List<Pair<Long,Long>>> pair = executeQueryWithRowCount(
 				selectQuery.toString(),
 				searchParams,
 				new PairReader<Long,Long>());
+		
 		Map<Long,SubjectDTO> temp = new LinkedHashMap<Long,SubjectDTO>();
-		if (result != null && !result.getLeft().isEmpty()) {
+		if (pair != null && !pair.getRight().isEmpty()) {
 
 			Map<Long,Long> hitSources = new HashMap<Long,Long>();
-			for (Pair<Long,Long> subjectPair : result.getLeft()) {
+			for (Pair<Long,Long> subjectPair : pair.getRight()) {
 				temp.put(subjectPair.getLeft(), null);
 				hitSources.put(subjectPair.getLeft(),subjectPair.getRight());
 			}
@@ -136,7 +139,8 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 		}
 		logger.debug("subject data select query took " + (System.currentTimeMillis()-time) + " ms");
 			                                         
-		return new Pair<Integer, List<SubjectDTO>>(result.getRight(), new LinkedList<SubjectDTO>(temp.values()));
+		return new Pair<Integer, List<SubjectDTO>>(
+				pair.getLeft(), new LinkedList<SubjectDTO>(temp.values()));
 	}
 	
 	/** 
@@ -150,17 +154,18 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 			SortingRequest sortingRequest)
 			throws DAOException {
 		
-		StringBuffer sb = new StringBuffer();
+		StringBuffer buf = new StringBuffer();
 		List<Object> parameters = new LinkedList<Object>();
-		sb.append("select distinct sql_calc_found_rows SPO1.SUBJECT as SUBJECT_HASH from SPO as SPO1 ");
+		buf.append("select distinct sql_calc_found_rows SPO1.SUBJECT as SUBJECT_HASH from SPO as SPO1 ");
 		
 		//check if sorting has been requested
 		if (sortingRequest != null && sortingRequest.getSortingColumnName() != null) {
+			
 			if (sortingRequest.getSortingColumnName().equals(SubjectLastModifiedColumn.class.getSimpleName())){
-				sb.append(" left join RESOURCE on (SPO1.SUBJECT=RESOURCE.URI_HASH) ");
+				buf.append(" left join RESOURCE on (SPO1.SUBJECT=RESOURCE.URI_HASH) ");
 			}
 			else{
-				sb.append(" left join SPO as ORDERING on (SPO1.SUBJECT=ORDERING.SUBJECT and ORDERING.PREDICATE=?) ");
+				buf.append(" left join SPO as ORDERING on (SPO1.SUBJECT=ORDERING.SUBJECT and ORDERING.PREDICATE=?) ");
 				parameters.add(Long.valueOf(Hashes.spoHash(sortingRequest.getSortingColumnName())));
 			}
 		}
@@ -186,44 +191,44 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 		}
 		//packing it all together into sql select
 		for (int i = 2; i < index; i++) {
-			sb.append(" inner join SPO as SPO")
+			buf.append(" inner join SPO as SPO")
 					.append(i)
 					.append(" on SPO1.SUBJECT = SPO")
 					.append(i)
 					.append(".SUBJECT ");
 		}
 		if (whereClause.length() > 0) {
-			sb.append(" where ");
-			sb.append(whereClause);
+			buf.append(" where ");
+			buf.append(whereClause);
 		}
 		if (sortingRequest != null && sortingRequest.getSortingColumnName() != null){
 			if (sortingRequest.getSortingColumnName().equals(SubjectLastModifiedColumn.class.getSimpleName())){
-				sb.append(" order by RESOURCE.LASTMODIFIED_TIME ").append(sortingRequest.getSortOrder().toSQL());
+				buf.append(" order by RESOURCE.LASTMODIFIED_TIME ").append(sortingRequest.getSortOrder().toSQL());
 			}
 			else{
-				sb.append(" order by ORDERING.OBJECT ").append(sortingRequest.getSortOrder().toSQL());
+				buf.append(" order by ORDERING.OBJECT ").append(sortingRequest.getSortOrder().toSQL());
 			}
 		}
-		//iff pageRequest.itemsPerPage == 0 - we want to deliver all results.
-		if (pagingRequest.getItemsPerPage() > 0) {
-			sb.append(" LIMIT ")
-					.append( (pagingRequest.getPageNumber() -1) * pagingRequest.getItemsPerPage())
-					.append(',')
-					.append(pagingRequest.getItemsPerPage());
+		
+		if (pagingRequest!=null) {
+			
+			buf.append(" LIMIT ").
+			append(pagingRequest.getOffset()).append(',').append(pagingRequest.getItemsPerPage());
 		}
-		logger.debug(sb.toString());
-		Pair<List<Long>,Integer> subjectHashes = executeQueryWithRowCount(sb.toString(), parameters, new SingleObjectReader<Long>());
-		if(subjectHashes == null || subjectHashes.getRight() == 0) {
+		
+		logger.debug(buf.toString());
+		Pair<Integer,List<Long>> pair = executeQueryWithRowCount(buf.toString(), parameters, new SingleObjectReader<Long>());
+		if(pair == null || pair.getLeft()==0) {
 			return new Pair<Integer,List<SubjectDTO>>(0, new LinkedList<SubjectDTO>());
 		}
 		
 		Map<Long,SubjectDTO> temp = new LinkedHashMap<Long, SubjectDTO>();
-		for (Long hash : subjectHashes.getLeft()) {
+		for (Long hash : pair.getRight()) {
 			temp.put(hash, null);
 		}
 		
 		List<SubjectDTO> subjects = executeQuery(getSubjectsDataQuery(temp.keySet()), null, new SubjectDataReader(temp));
-		return new Pair<Integer,List<SubjectDTO>>(subjectHashes.getRight(), subjects);
+		return new Pair<Integer,List<SubjectDTO>>(pair.getLeft(), subjects);
 	}
 
 	/*
@@ -269,28 +274,25 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 		}
 
 		// build the "limit" part
-		if (pagingRequest!=null && pagingRequest.getItemsPerPage()>0){
+		if (pagingRequest!=null){
 			
-			sqlBuf.append(" limit ");
-			if (pagingRequest.getPageNumber()>0){
-				sqlBuf.append(pagingRequest.getPageNumber());
-			}
-			sqlBuf.append(",").append(pagingRequest.getItemsPerPage());
+			sqlBuf.append(" limit ").
+			append(pagingRequest.getOffset()).append(",").append(pagingRequest.getItemsPerPage());
 		}
 		
-		Pair<List<Long>,Integer> pair = executeQueryWithRowCount(sqlBuf.toString(),
+		Pair<Integer,List<Long>> pair = executeQueryWithRowCount(sqlBuf.toString(),
 				new SingleObjectReader<Long>());
-		if (pair==null || pair.getRight()==0){
+		if (pair==null || pair.getLeft()==0){
 			return new Pair<Integer, List<SubjectDTO>>(0, new LinkedList<SubjectDTO>());
 		}
 		else{
 			Map<Long,SubjectDTO> temp = new LinkedHashMap<Long, SubjectDTO>();
-			for (Long hash : pair.getLeft()) {
+			for (Long hash : pair.getRight()) {
 				temp.put(hash, null);
 			}
 			List<SubjectDTO> subjects = executeQuery(
 					getSubjectsDataQuery(temp.keySet()), null, new SubjectDataReader(temp));
-			return new Pair<Integer,List<SubjectDTO>>(pair.getRight(), subjects);
+			return new Pair<Integer,List<SubjectDTO>>(pair.getLeft(), subjects);
 		}
 	}
 
@@ -375,28 +377,25 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 			sqlBuf.append(" order by ORDERING.OBJECT_HASH");
 		}
 		
-		if (googleEarthMode && pagingRequest!=null && pagingRequest.getItemsPerPage()>0){
+		if (googleEarthMode && pagingRequest!=null){
 			
-			sqlBuf.append(" limit ");
-			if (pagingRequest.getPageNumber()>0){
-				sqlBuf.append(pagingRequest.getPageNumber());
-			}
-			sqlBuf.append(",").append(pagingRequest.getItemsPerPage());
+			sqlBuf.append(" limit ").
+			append(pagingRequest.getOffset()).append(",").append(pagingRequest.getItemsPerPage());
 		}
 
-		Pair<List<Long>,Integer> pair = executeQueryWithRowCount(sqlBuf.toString(),
+		Pair<Integer,List<Long>> pair = executeQueryWithRowCount(sqlBuf.toString(),
 				new SingleObjectReader<Long>());
-		if (pair==null || pair.getRight()==0){
+		if (pair==null || pair.getLeft()==0){
 			return new Pair<Integer, List<SubjectDTO>>(0, new LinkedList<SubjectDTO>());
 		}
 		else{
 			Map<Long,SubjectDTO> subjectsMap = new LinkedHashMap<Long, SubjectDTO>();
-			for (Long hash : pair.getLeft()) {
+			for (Long hash : pair.getRight()) {
 				subjectsMap.put(hash, null);
 			}
 			List<SubjectDTO> subjects = executeQuery(
 					getSubjectsDataQuery(subjectsMap.keySet()), null, new SubjectDataReader(subjectsMap));
-			return new Pair<Integer,List<SubjectDTO>>(pair.getRight(), subjects);
+			return new Pair<Integer,List<SubjectDTO>>(pair.getLeft(), subjects);
 		}
 	}
 }

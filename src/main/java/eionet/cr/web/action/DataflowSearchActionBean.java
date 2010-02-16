@@ -42,9 +42,9 @@ import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.util.SortOrder;
 import eionet.cr.search.util.UriLabelPair;
-import eionet.cr.util.PagingRequest;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
+import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.web.util.ApplicationCache;
 import eionet.cr.web.util.columns.SearchResultColumn;
 import eionet.cr.web.util.columns.SubjectPredicateColumn;
@@ -85,7 +85,7 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean<SubjectDT
 					.searchByFilters(
 							buildSearchCriteria(),
 							null,
-							new PagingRequest(getPageN()),
+							PagingRequest.create(getPageN()),
 							new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
 		resultList = customSearch.getRight();
 		matchCount = customSearch.getLeft();

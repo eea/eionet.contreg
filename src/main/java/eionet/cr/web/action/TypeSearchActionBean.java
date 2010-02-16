@@ -50,11 +50,11 @@ import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.util.SortOrder;
 import eionet.cr.util.ExportFormat;
 import eionet.cr.util.Exporter;
-import eionet.cr.util.PagingRequest;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.URIUtil;
 import eionet.cr.util.Util;
+import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.web.util.ApplicationCache;
 import eionet.cr.web.util.columns.SearchResultColumn;
 import eionet.cr.web.util.columns.SubjectPredicateColumn;
@@ -252,7 +252,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 					MySQLDAOFactory.get().getDao(SearchDAO.class).searchByFilters(
 									criteria,
 									null,
-									new PagingRequest(getPageN()),
+									PagingRequest.create(getPageN()),
 									new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
 				resultList = customSearch.getRight();
 	    		matchCount = customSearch.getLeft();

@@ -29,9 +29,9 @@ import eionet.cr.dao.SearchDAO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.util.BBOX;
 import eionet.cr.search.util.SearchExpression;
-import eionet.cr.util.PagingRequest;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
+import eionet.cr.util.pagination.PagingRequest;
 
 /**
  * 

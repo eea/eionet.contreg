@@ -45,10 +45,10 @@ import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
-import eionet.cr.util.PagingRequest;
 import eionet.cr.util.Pair;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
+import eionet.cr.util.pagination.PagingRequest;
 import eionet.qawcommons.DataflowResultDto;
 
 /**
@@ -139,7 +139,7 @@ public class XmlRpcServices implements Services{
 					.searchByFilters(
 							criteria,
 							null,
-							new PagingRequest(1, MAX_RESULTS),
+							PagingRequest.create(1, MAX_RESULTS),
 							null);
 			
 			String[] strArray = {};
@@ -221,7 +221,7 @@ public class XmlRpcServices implements Services{
 					.searchByFilters(
 							criteria,
 							null,
-							new PagingRequest(1,MAX_RESULTS),
+							PagingRequest.create(1,MAX_RESULTS),
 							null);
 			Collection<SubjectDTO> subjects = search.getRight();
 			if (subjects!=null){
@@ -311,7 +311,7 @@ public class XmlRpcServices implements Services{
 				Pair<Integer, List<SubjectDTO>> results = searchDao.searchByFilters(
 						criteria,
 						null, 
-						new PagingRequest(0, 0),
+						null,
 						null);
 
 				int subjectCount = results==null ?

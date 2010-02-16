@@ -38,9 +38,9 @@ import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.util.SortOrder;
-import eionet.cr.util.PagingRequest;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
+import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.web.util.ApplicationCache;
 
 /**
@@ -66,7 +66,7 @@ public class TypeCacheUpdater implements StatefulJob {
 					.searchByFilters(
 							criteria,
 							null,
-							new PagingRequest(1,0),
+							null,
 							new SortingRequest(Predicates.RDFS_LABEL, SortOrder.ASCENDING));
 			
 			if (customSearch != null && customSearch.getRight() != null){

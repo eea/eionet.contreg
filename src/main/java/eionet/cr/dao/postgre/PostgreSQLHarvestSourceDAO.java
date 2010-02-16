@@ -20,13 +20,18 @@
 * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.dao.postgre;
 
+import java.util.LinkedList;
 import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.HarvestSourceDTO;
+import eionet.cr.dto.readers.HarvestSourceDTOReader;
+import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
-import eionet.cr.util.pagination.PaginationRequest;
+import eionet.cr.util.pagination.PagingRequest;
 
 /**
  * 
@@ -34,6 +39,70 @@ import eionet.cr.util.pagination.PaginationRequest;
  *
  */
 public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements HarvestSourceDAO{
+
+	/** */
+	private static final String getSourcesSQL = 
+		"SELECT * FROM HARVEST_SOURCE WHERE TRACKED_FILE = 'N' AND COUNT_UNAVAIL = 0 AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
+	private static final String searchSourcesSQL = 
+		"SELECT * FROM HARVEST_SOURCE WHERE TRACKED_FILE = 'N' AND COUNT_UNAVAIL = 0 AND URL like (?) AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSources(java.lang.String, eionet.cr.util.PagingRequest, eionet.cr.util.SortingRequest)
+	 */
+    public Pair<Integer,List<HarvestSourceDTO>> getHarvestSources(String searchString, PagingRequest pagingRequest, SortingRequest sortingRequest)
+    		throws DAOException {
+    	
+    	if (pagingRequest == null) {
+    		throw new IllegalArgumentException("Pagination request cannot be null");
+    	}
+    	
+    	return getSources(
+    			StringUtils.isBlank(searchString)
+    					? getSourcesSQL
+    					: searchSourcesSQL,
+				searchString,
+				pagingRequest,
+				sortingRequest);	
+    }
+
+    /**
+     * 
+     * @param sql
+     * @param searchString
+     * @param pagingRequest
+     * @param sortingRequest
+     * @return
+     * @throws DAOException
+     */
+    private Pair<Integer,List<HarvestSourceDTO>> getSources(String sql, String searchString,
+    		PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException {
+        	
+    	List<Object> paramValues = new LinkedList<Object>();
+    	if (!StringUtils.isBlank(searchString)) {
+    		paramValues.add(searchString);
+    	}
+    	
+    	if (sortingRequest!=null && sortingRequest.getSortingColumnName()!=null) {
+    		sql += " ORDER BY " +
+    		   sortingRequest.getSortingColumnName() + " " + sortingRequest.getSortOrder().toSQL();
+    	}
+    	else {
+    		//in case no sorting request is present, use default one.
+    		sql += " ORDER BY URL "; 
+    	}
+    	
+//    	List<Object> limitParams =  pagingRequest.getLimitParams();
+//    	if (limitParams != null) {
+//    		sql += " LIMIT ?, ? ";
+//    		paramValues.addAll(limitParams);
+//    	}
+//    	Pair<List<HarvestSourceDTO>, Integer> result = executeQueryWithRowCount(
+//    			sql, paramValues, new HarvestSourceDTOReader());
+//    	pagingRequest.setMatchCount(result.getRight());
+//    	return result.getLeft();
+    	return null;
+    }
 
 	public Integer addSource(HarvestSourceDTO source, String user)
 			throws DAOException {
@@ -79,29 +148,34 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
 		return null;
 	}
 
-	public List<HarvestSourceDTO> getHarvestSources(String searchString,
-			PaginationRequest pageRequest, SortingRequest sortingRequest)
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSourcesFailed(java.lang.String, eionet.cr.util.PagingRequest, eionet.cr.util.SortingRequest)
+	 */
+	public Pair<Integer, List<HarvestSourceDTO>> getHarvestSourcesFailed(String filterString,
+			PagingRequest pagingRequest, SortingRequest sortingRequest)
 			throws DAOException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public List<HarvestSourceDTO> getHarvestSourcesFailed(String filterString,
-			PaginationRequest pageRequest, SortingRequest sortingRequest)
-			throws DAOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public List<HarvestSourceDTO> getHarvestSourcesUnavailable(
-			String searchString, PaginationRequest pageRequest,
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSourcesUnavailable(java.lang.String, eionet.cr.util.PagingRequest, eionet.cr.util.SortingRequest)
+	 */
+	public Pair<Integer, List<HarvestSourceDTO>> getHarvestSourcesUnavailable(
+			String searchString, PagingRequest pagingRequest,
 			SortingRequest sortingRequest) throws DAOException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public List<HarvestSourceDTO> getHarvestTrackedFiles(String searchString,
-			PaginationRequest pageRequest, SortingRequest sortingRequest)
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HarvestSourceDAO#getHarvestTrackedFiles(java.lang.String, eionet.cr.util.PagingRequest, eionet.cr.util.SortingRequest)
+	 */
+	public Pair<Integer, List<HarvestSourceDTO>> getHarvestTrackedFiles(String searchString,
+			PagingRequest pagingRequest, SortingRequest sortingRequest)
 			throws DAOException {
 		// TODO Auto-generated method stub
 		return null;
@@ -134,5 +208,4 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
 		// TODO Auto-generated method stub
 		
 	}
-
 }

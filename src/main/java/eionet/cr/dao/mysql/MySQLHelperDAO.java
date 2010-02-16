@@ -575,7 +575,7 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 		params.add(Hashes.spoHash(url));
 		params.add(limit);
 		
-		Pair<List<RawTripleDTO>, Integer> result = executeQueryWithRowCount(buf.toString(), params, new ResultSetListReader<RawTripleDTO>() {
+		Pair<Integer,List<RawTripleDTO>> result = executeQueryWithRowCount(buf.toString(), params, new ResultSetListReader<RawTripleDTO>() {
 
 			private List<RawTripleDTO> resultList = new LinkedList<RawTripleDTO>();
 			
@@ -596,7 +596,7 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 		});
 		
 		
-		return new Pair<Integer, List<RawTripleDTO>>(result.getRight(), result.getLeft());
+		return new Pair<Integer, List<RawTripleDTO>>(result.getLeft(),result.getRight());
 	}
 
 	/*

@@ -36,7 +36,7 @@ import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.Util;
 import eionet.cr.util.YesNoBoolean;
-import eionet.cr.util.pagination.PaginationRequest;
+import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.util.sql.ConnectionUtil;
 import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
@@ -68,16 +68,15 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 		"SELECT SQL_CALC_FOUND_ROWS * FROM HARVEST_SOURCE WHERE LAST_HARVEST_FAILED = 'Y' AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)";
 	private static final String searchHarvestSourcesFailedSQL = 
 		"SELECT SQL_CALC_FOUND_ROWS * FROM HARVEST_SOURCE WHERE LAST_HARVEST_FAILED = 'Y' AND URL LIKE(?) AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)";
-		
+
 	/*
-     * (non-Javadoc)
-     * 
-     * @see eionet.cr.dao.HarvestSourceDao#getHarvestSources()
-     */
-    public List<HarvestSourceDTO> getHarvestSources(String searchString, PaginationRequest paginRequest, SortingRequest sortingRequest)
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSources(java.lang.String, eionet.cr.util.PagingRequest, eionet.cr.util.SortingRequest)
+	 */
+    public Pair<Integer,List<HarvestSourceDTO>> getHarvestSources(String searchString, PagingRequest pagingRequest, SortingRequest sortingRequest)
     		throws DAOException {
     	
-    	if (paginRequest == null) {
+    	if (pagingRequest == null) {
     		throw new IllegalArgumentException("Pagination request cannot be null");
     	}
     	
@@ -86,56 +85,56 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
     					? getSourcesSQL
     					: searchSourcesSQL,
 				searchString,
-				paginRequest,
+				pagingRequest,
 				sortingRequest);	
     }
-    
-    /** 
-     * @see eionet.cr.dao.HarvestSourceDAO#getHarvestTrackedFiles()
-     * {@inheritDoc}
+
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.dao.HarvestSourceDAO#getHarvestTrackedFiles(java.lang.String, eionet.cr.util.PagingRequest, eionet.cr.util.SortingRequest)
      */
-    public List<HarvestSourceDTO> getHarvestTrackedFiles(String searchString, PaginationRequest pageRequest, SortingRequest sortingRequest)
+    public Pair<Integer, List<HarvestSourceDTO>> getHarvestTrackedFiles(String searchString, PagingRequest pagingRequest, SortingRequest sortingRequest)
     		throws DAOException {
     	return getSources(
     			StringUtils.isBlank(searchString)
 		    			? getHarvestTrackedFiles
 						: searchHarvestTrackedFiles,
 				searchString,
-				pageRequest,
+				pagingRequest,
 				sortingRequest);	
     }
     /*
      * (non-Javadoc)
      * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSourcesUnavailable()
      */
-    public List<HarvestSourceDTO> getHarvestSourcesUnavailable(String searchString, PaginationRequest pageRequest, SortingRequest sortingRequest)
+    public Pair<Integer, List<HarvestSourceDTO>> getHarvestSourcesUnavailable(String searchString, PagingRequest pagingRequest, SortingRequest sortingRequest)
     		throws DAOException {
     	return getSources(
     			StringUtils.isBlank(searchString)
 						? getHarvestSourcesUnavailableSQL
 						: searchHarvestSourcesUnavailableSQL,
 				searchString,
-				pageRequest,
+				pagingRequest,
 				sortingRequest);	
     	
     }
     
-    /** 
-	 * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSourcesFailed(java.lang.String, eionet.cr.util.pagination.PaginationRequest, eionet.cr.util.SortingRequest)
-	 * {@inheritDoc}
-	 */
-	public List<HarvestSourceDTO> getHarvestSourcesFailed(String searchString, 
-			PaginationRequest pageRequest, SortingRequest sortingRequest) throws DAOException {
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSourcesFailed(java.lang.String, eionet.cr.util.PagingRequest, eionet.cr.util.SortingRequest)
+     */
+	public Pair<Integer, List<HarvestSourceDTO>> getHarvestSourcesFailed(String searchString, 
+			PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException {
 		return getSources(
     			StringUtils.isBlank(searchString)
 						? getHarvestSourcesFailedSQL
 						: searchHarvestSourcesFailedSQL,
 				searchString,
-				pageRequest,
+				pagingRequest,
 				sortingRequest);
 	}
     
-    private List<HarvestSourceDTO> getSources(String sql, String searchString, PaginationRequest pageRequest, SortingRequest sortingRequest)
+    private Pair<Integer,List<HarvestSourceDTO>> getSources(String sql, String searchString, PagingRequest pagingRequest, SortingRequest sortingRequest)
     		throws DAOException {
     	List<Object> searchParams = new LinkedList<Object>();
     	if (!StringUtils.isBlank(searchString)) {
@@ -147,14 +146,14 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
     		//in case no sorting request is present, use default one.
     		sql += " ORDER BY URL "; 
     	}
-    	List<Object> limitParams =  pageRequest.getLimitParams();
-    	if (limitParams != null) {
+    	
+    	if (pagingRequest!=null) {
     		sql += " LIMIT ?, ? ";
-    		searchParams.addAll(limitParams);
+    		searchParams.add(pagingRequest.getOffset());
+    		searchParams.add(pagingRequest.getItemsPerPage());
     	}
-    	Pair<List<HarvestSourceDTO>, Integer> result = executeQueryWithRowCount(sql, searchParams, new HarvestSourceDTOReader());
-    	pageRequest.setMatchCount(result.getRight());
-    	return result.getLeft();
+    	
+    	return executeQueryWithRowCount(sql, searchParams, new HarvestSourceDTOReader());
     }
     
     /** */

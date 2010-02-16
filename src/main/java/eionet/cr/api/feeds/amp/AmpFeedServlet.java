@@ -41,8 +41,8 @@ import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.util.PagingRequest;
 import eionet.cr.util.Pair;
+import eionet.cr.util.pagination.PagingRequest;
 
 /**
  * 
@@ -75,7 +75,7 @@ public class AmpFeedServlet extends HttpServlet implements SubjectProcessor{
 			Pair<Integer, List<SubjectDTO>> results = searchDao.searchByFilters(
 					criteria,
 					null, 
-					new PagingRequest(0, 0),
+					null,
 					null);
 			
 			int subjectCount = results==null ? 0 : (results.getRight()==null ? 0 : results.getRight().size());  

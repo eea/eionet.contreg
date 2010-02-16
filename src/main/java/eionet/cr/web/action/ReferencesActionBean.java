@@ -40,10 +40,10 @@ import eionet.cr.dao.SearchDAO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.util.SortOrder;
 import eionet.cr.util.Hashes;
-import eionet.cr.util.PagingRequest;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.URLUtil;
+import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.web.util.columns.ReferringPredicatesColumn;
 import eionet.cr.web.util.columns.SearchResultColumn;
 import eionet.cr.web.util.columns.SubjectPredicateColumn;
@@ -87,7 +87,7 @@ public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
 			Pair<Integer, List<SubjectDTO>> searchResult =
 				DAOFactory.get().getDao(SearchDAO.class).searchReferences(
 						anonHash==0 ? Hashes.spoHash(uri) : anonHash,
-								new PagingRequest(getPageN()),
+								PagingRequest.create(getPageN()),
 								new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
 
 			resultList = searchResult.getRight();

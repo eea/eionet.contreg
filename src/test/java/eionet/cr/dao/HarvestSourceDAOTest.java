@@ -33,7 +33,8 @@ import org.junit.Test;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.test.util.DbHelper;
-import eionet.cr.util.pagination.PaginationRequest;
+import eionet.cr.util.Pair;
+import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.util.sql.ConnectionUtil;
 
 /**
@@ -84,8 +85,10 @@ public class HarvestSourceDAOTest extends DBTestCase {
 	public void testGetHarvestSources() throws Exception {
 		
 		ConnectionUtil.setReturnSimpleConnection(true);
-		List<HarvestSourceDTO> sources = get().getDao(HarvestSourceDAO.class).getHarvestSources("", new PaginationRequest(1,100), null);
-		assertEquals(42, sources.size());
+		Pair<Integer,List<HarvestSourceDTO>> result = get().getDao(HarvestSourceDAO.class).getHarvestSources("", PagingRequest.create(1,100), null);
+		assertNotNull(result);
+		assertNotNull(result.getRight());
+		assertEquals(42, result.getRight().size());
 	}
 	
 	@Test

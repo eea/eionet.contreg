@@ -40,7 +40,7 @@ import eionet.cr.search.util.SortOrder;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.pagination.Pagination;
-import eionet.cr.util.pagination.PaginationRequest;
+import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.web.util.columns.GenericColumn;
 import eionet.cr.web.util.columns.HarvestSourcesColumn;
 import eionet.cr.web.util.columns.SearchResultColumn;
@@ -115,28 +115,51 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
 	 */
 	@DefaultHandler
 	public Resolution search() throws DAOException {
+		
 		try {
 			String filterString = null; 
 			if(!StringUtils.isEmpty(this.searchString)) {
 				filterString = "%" + StringEscapeUtils.escapeSql(this.searchString) + "%";
 			}
-			PaginationRequest paginationRequest = new PaginationRequest(getPageN(), Pagination.DEFAULT_ITEMS_PER_PAGE);
+			
+			PagingRequest pagingRequest = PagingRequest.create(getPageN());
 			SortingRequest sortingRequest = new SortingRequest(sortP, SortOrder.parse(sortO));
+			
+			Pair<Integer,List<HarvestSourceDTO>> pair = null;
 			if(StringUtils.isBlank(type)) {
-				setResultList(factory.getDao(HarvestSourceDAO.class).getHarvestSources(filterString, paginationRequest, sortingRequest));
-			} else if (TRACKED_FILES.equals(type)) {
-					setResultList(factory.getDao(HarvestSourceDAO.class).getHarvestTrackedFiles(filterString, paginationRequest, sortingRequest));
-			} else if (UNAVAILABLE_TYPE.equals(type)) {
-					setResultList(factory.getDao(HarvestSourceDAO.class).getHarvestSourcesUnavailable(filterString, paginationRequest, sortingRequest));
-			} else if (FAILED_HARVESTS.equals(type)) {
-				setResultList(factory.getDao(HarvestSourceDAO.class).getHarvestSourcesFailed(filterString, paginationRequest, sortingRequest));
+				pair = factory.getDao(HarvestSourceDAO.class).getHarvestSources(
+						filterString, pagingRequest, sortingRequest);
+			}
+			else if (TRACKED_FILES.equals(type)) {
+				pair = factory.getDao(HarvestSourceDAO.class).getHarvestTrackedFiles(
+						filterString, pagingRequest, sortingRequest);
+			}
+			else if (UNAVAILABLE_TYPE.equals(type)) {
+				pair = factory.getDao(HarvestSourceDAO.class).getHarvestSourcesUnavailable(
+						filterString, pagingRequest, sortingRequest);
+			}
+			else if (FAILED_HARVESTS.equals(type)) {
+				pair = factory.getDao(HarvestSourceDAO.class).getHarvestSourcesFailed(
+						filterString, pagingRequest, sortingRequest);
 			}
 			
-			matchCount = paginationRequest.getMatchCount();
-			setPagination(Pagination.createPagination(paginationRequest, this));
+			if (pair!=null){
+				resultList = pair.getRight();
+				if (resultList==null){
+					resultList = new LinkedList<HarvestSourceDTO>();
+				}
+				matchCount = pair.getLeft();
+			}
+			else{
+				matchCount = 0;
+			}
+			
+			setPagination(Pagination.createPagination(
+					matchCount, pagingRequest.getPageNumber(), this));
 			
 			return new ForwardResolution("/pages/sources.jsp");
-		} catch (DAOException exception) {
+		}
+		catch (DAOException exception) {
 			throw new RuntimeException("error in search", exception);
 		}
 	}

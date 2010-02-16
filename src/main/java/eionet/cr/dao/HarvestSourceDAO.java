@@ -23,8 +23,9 @@ package eionet.cr.dao;
 import java.util.List;
 
 import eionet.cr.dto.HarvestSourceDTO;
+import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
-import eionet.cr.util.pagination.PaginationRequest;
+import eionet.cr.util.pagination.PagingRequest;
 
 /**
  * @author altnyris
@@ -37,21 +38,21 @@ public interface HarvestSourceDAO extends DAO{
 	 * @return list of harvesting sources (excluding unavailable sources and tracked files)
      * @throws DAOException
      */
-    List<HarvestSourceDTO> getHarvestSources(String searchString, PaginationRequest pageRequest, SortingRequest sortingRequest) throws DAOException;
+    Pair<Integer,List<HarvestSourceDTO>> getHarvestSources(String searchString, PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException;
     
     /**
      * @param sortingRequest 
      * @return list of harvest tracked files
      * @throws DAOException
      */
-    List<HarvestSourceDTO> getHarvestTrackedFiles(String searchString, PaginationRequest pageRequest, SortingRequest sortingRequest) throws DAOException;
+    Pair<Integer, List<HarvestSourceDTO>> getHarvestTrackedFiles(String searchString, PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException;
     
     /**
      * @param sortingRequest 
      * @return list of unavailable harvest sources
      * @throws DAOException
      */
-    List<HarvestSourceDTO> getHarvestSourcesUnavailable(String searchString, PaginationRequest pageRequest, SortingRequest sortingRequest) throws DAOException;
+    Pair<Integer, List<HarvestSourceDTO>> getHarvestSourcesUnavailable(String searchString, PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException;
 
     /**
      * @param filterString
@@ -59,7 +60,7 @@ public interface HarvestSourceDAO extends DAO{
      * @param sortingRequest
      * @return
      */
-    List<HarvestSourceDTO> getHarvestSourcesFailed(String filterString,	PaginationRequest pageRequest, SortingRequest sortingRequest) throws DAOException;
+    Pair<Integer, List<HarvestSourceDTO>> getHarvestSourcesFailed(String filterString,	PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException;
 
     /**
      * @return harvesting sources

@@ -39,9 +39,9 @@ import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.util.SearchExpression;
 import eionet.cr.search.util.SortOrder;
 import eionet.cr.util.Hashes;
-import eionet.cr.util.PagingRequest;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
+import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.web.util.columns.SearchResultColumn;
 import eionet.cr.web.util.columns.SubjectLastModifiedColumn;
 import eionet.cr.web.util.columns.SubjectPredicateColumn;
@@ -92,7 +92,7 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
     				DAOFactory.get().getDao(SearchDAO.class)
     				.searchByFreeText(
     						searchExpression,
-    						new PagingRequest(getPageN()),
+    						PagingRequest.create(getPageN()),
     						new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
 
     			resultList = result.getRight();

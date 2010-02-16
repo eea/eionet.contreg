@@ -37,6 +37,7 @@ public class Pagination {
 	/** */
 	public static final String PAGE_NUM_PARAM = "pageN";
 
+	/** */
 	public static final int DEFAULT_ITEMS_PER_PAGE = 15;
 
 	/** */
@@ -94,16 +95,20 @@ public class Pagination {
 	}
 
 	/**
-	 * Gets pagination based on {@link PaginationRequest}.
+	 * Gets pagination based on {@link PagingRequest}.
 	 * 
-	 * @param request
+	 * @param pagingRequest
 	 * @param actionBean
 	 * @return
 	 */
-	public static Pagination createPagination(PaginationRequest request, AbstractActionBean actionBean) {
+	public static Pagination createPagination(int matchCount, int pageNumber,
+			AbstractActionBean actionBean) {
 		
-		return createPagination(request.getMatchCount(), request.getPageNumber(), actionBean.getUrlBinding(),
-				QueryString.createQueryString(actionBean.getContext().getRequest()).removeParameters(actionBean.excludeFromSortAndPagingUrls()));
+		return createPagination(matchCount,
+				pageNumber,
+				actionBean.getUrlBinding(),
+				QueryString.createQueryString(actionBean.getContext().getRequest()).
+				removeParameters(actionBean.excludeFromSortAndPagingUrls()));
 	}
 
 	/**

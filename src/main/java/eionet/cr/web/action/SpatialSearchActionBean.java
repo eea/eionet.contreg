@@ -44,10 +44,10 @@ import eionet.cr.dao.SearchDAO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.util.BBOX;
 import eionet.cr.search.util.SortOrder;
-import eionet.cr.util.PagingRequest;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.Util;
+import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.web.util.columns.SearchResultColumn;
 import eionet.cr.web.util.columns.SubjectPredicateColumn;
 
@@ -114,7 +114,7 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
 			
 			Pair<Integer, List<SubjectDTO>> resultPair =
 				DAOFactory.get().getDao(SearchDAO.class).searchBySpatialBox(
-						createBBOX(), source, true, new PagingRequest(1,25), null);
+						createBBOX(), source, true, PagingRequest.create(1,25), null);
 			resultList = resultPair.getRight();
 		}
 		
@@ -246,7 +246,7 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
 						createBBOX(),
 						source,
 						false,
-						new PagingRequest(getPageN()),
+						PagingRequest.create(getPageN()),
 						new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
 			resultList = resultPair.getRight();
 			matchCount = resultPair.getLeft();

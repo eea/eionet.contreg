@@ -18,7 +18,10 @@
  * Contributor(s):
  * Aleksandr Ivanov, Tieto Eesti
  */
-package eionet.cr.util;
+package eionet.cr.util.pagination;
+
+import java.util.List;
+
 
 /**
  * @author Aleksandr Ivanov
@@ -26,25 +29,41 @@ package eionet.cr.util;
  */
 public class PagingRequest {
 	
-	public static int DEFAULT_ITEMS_PER_PAGE = 15;
-
-	private int pageNumber,itemsPerPage;
-	
-	/**
-	 * @param pageNumber
-	 */
-	public PagingRequest(int pageNumber) {
-		this.pageNumber = pageNumber;
-		itemsPerPage = DEFAULT_ITEMS_PER_PAGE;
-	}
+	/** */
+	private int pageNumber;
+	private int itemsPerPage;
+	private int offset;
 	
 	/**
 	 * @param pageNumber
 	 * @param itemsPerPage
 	 */
-	public PagingRequest(int pageNumber, int itemsPerPage) {
-		this.pageNumber = pageNumber;
-		this.itemsPerPage = itemsPerPage;
+	private PagingRequest(int pageNumber, int itemsPerPage) {
+		
+		this.pageNumber = Math.max(1, pageNumber);
+		this.itemsPerPage = Math.max(1, itemsPerPage);
+		this.offset = (this.pageNumber-1) * this.itemsPerPage; 
+	}
+	
+	/**
+	 * 
+	 * @param pageNumber
+	 * @return
+	 */
+	public static PagingRequest create(int pageNumber){
+		
+		return create(pageNumber, Pagination.DEFAULT_ITEMS_PER_PAGE);
+	}
+	
+	/**
+	 * 
+	 * @param pageNumber
+	 * @param itemsPerPage
+	 * @return
+	 */
+	public static PagingRequest create(int pageNumber, int itemsPerPage){
+		
+		return itemsPerPage<=0 ? null : new PagingRequest(pageNumber, itemsPerPage);
 	}
 
 	/**
@@ -55,25 +74,26 @@ public class PagingRequest {
 	}
 
 	/**
-	 * @param pageNumber the pageNumber to set
-	 */
-	public void setPageNumber(int pageNumber) {
-		this.pageNumber = pageNumber;
-	}
-
-	/**
 	 * @return the itemsPerPage
 	 */
 	public int getItemsPerPage() {
 		return itemsPerPage;
 	}
-
+	
 	/**
-	 * @param itemsPerPage the itemsPerPage to set
+	 * 
+	 * @return
 	 */
-	public void setItemsPerPage(int itemsPerPage) {
-		this.itemsPerPage = itemsPerPage;
+	public int getOffset(){
+		return offset;
 	}
-	
-	
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	public String toString(){
+		return new StringBuffer().append("pageNumber=").append(pageNumber).
+		append(",itemsPerPage=").append(itemsPerPage).toString();
+	}
 }
