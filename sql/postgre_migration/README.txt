@@ -73,9 +73,11 @@ Re-create the indexes, constraints and rules you dropped in step 5.
 
 [user@host]$ psql -U postgres cr2 < create_indexes_and_rules.pgsql
 
+7)
+Fix the next values of sequences, because they go "broken" if serial IDs are inserted explicitly
+(which is what the data import exactly did):
 
-
-
+[user@host]$ psql -U postgres cr2 < fix_sequences.pgsql
 
 
 
