@@ -60,10 +60,9 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 		//reducing visibility
 	}
 
-	
-	/** 
-	 * @see eionet.cr.dao.HelperDAO#getRecentlyDiscoveredFiles()
-	 * {@inheritDoc}
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#getLatestFiles(int)
 	 */
 	public List<Pair<String, String>> getLatestFiles(int limit) throws DAOException {
 		
@@ -136,8 +135,7 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 	}
 
 	/** */
-	private static final String sqlQuery = "select distinct OBJECT from SPO where PREDICATE=? and LIT_OBJ='Y' order by OBJECT asc";
-
+	private static final String sqlPicklist = "select distinct OBJECT from SPO where PREDICATE=? and LIT_OBJ='Y' order by OBJECT asc";
 	/** 
 	 * @see eionet.cr.dao.HelperDAO#getPicklistForPredicate(java.lang.String)
 	 * {@inheritDoc}
@@ -149,7 +147,7 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 		}
 		
 		List<String> resultList = executeQuery(
-				sqlQuery,
+				sqlPicklist,
 				Collections.singletonList((Object)Hashes.spoHash(predicateUri)),
 				new SingleObjectReader<String>());
 		return resultList;
@@ -321,12 +319,9 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 			" where SOURCE=" + Hashes.spoHash(Subjects.DUBLIN_CORE_SOURCE_URL) +
 			" and PREDICATE=" + Hashes.spoHash(Predicates.RDF_TYPE) +
 			" and OBJECT_HASH=" + Hashes.spoHash(Subjects.RDF_PROPERTY);
-	
-	/**
-	 * 
-	 * @param subjectTypes
-	 * @return
-	 * @throws DAOException
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#getAddibleProperties(java.util.Collection)
 	 */
 	public HashMap<String,String> getAddibleProperties(Collection<String> subjectTypes) throws DAOException {
 		
@@ -381,14 +376,15 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 		
 		return result;
 	}
-	
+
 	/**
 	 * 
 	 * @param subjectHashes
+	 * @param conn
 	 * @return
-	 * @throws SQLException 
+	 * @throws SQLException
 	 */
-	public HashMap<String,String> getSubjectLabels(Collection<String> subjectHashes, Connection conn) throws SQLException{
+	private HashMap<String,String> getSubjectLabels(Collection<String> subjectHashes, Connection conn) throws SQLException{
 		
 		HashMap<String,String> result = new HashMap<String,String>();
 		boolean closeConnection = false;
@@ -425,9 +421,9 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 	}
 
 	/** */
-	private static final String getSubjectSchemaUriSQL = "select OBJECT from SPO where SUBJECT=? and PREDICATE="
+	private static final String getSubjectSchemaUriSQL =
+		"select OBJECT from SPO where SUBJECT=? and PREDICATE="
 		+ Hashes.spoHash(Predicates.CR_SCHEMA) + " limit 1";
-
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.dao.HelperDAO#getSubjectSchemaUri(java.lang.String)
@@ -634,11 +630,14 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 	 * @see eionet.cr.dao.HelperDAO#getSpatialSources()
 	 */
 	public List<String> getSpatialSources() throws DAOException {
+		
 		String sql = "select distinct URI from SPO,RESOURCE where " +
 		"PREDICATE= ? and OBJECT_HASH= ? and SOURCE=RESOURCE.URI_HASH";
+		
 		List<Long> params = new LinkedList<Long>();
 		params.add(Hashes.spoHash(Predicates.RDF_TYPE));
 		params.add(Hashes.spoHash(Subjects.WGS_POINT));
+		
 		return executeQuery(sql, params, new SingleObjectReader<String>());
 	}
 

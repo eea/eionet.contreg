@@ -172,7 +172,9 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
     }
 
     /** */
-	private static final String addSourceSQL = "insert into HARVEST_SOURCE (URL,URL_HASH,EMAILS,TIME_CREATED,INTERVAL_MINUTES,TRACKED_FILE) VALUES (?,?,?,NOW(),?,?)";
+	private static final String addSourceSQL = "insert into HARVEST_SOURCE" +
+			" (URL,URL_HASH,EMAILS,TIME_CREATED,INTERVAL_MINUTES,TRACKED_FILE)" +
+			" VALUES (?,?,?,NOW(),?,cast(? as ynboolean))";
     /*
      * (non-Javadoc)
      * @see eionet.cr.dao.HarvestSourceDAO#addSource(eionet.cr.dto.HarvestSourceDTO, java.lang.String)
@@ -425,11 +427,11 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
 	/** */
     private static final String updateHarvestFinishedSQL =
     	"update HARVEST_SOURCE set STATEMENTS=?, RESOURCES=?," +
-    	" LAST_HARVEST_FAILED=? where HARVEST_SOURCE_ID=?";
+    	" LAST_HARVEST_FAILED=cast(? as ynboolean) where HARVEST_SOURCE_ID=?";
     private static final String updateHarvestFinishedSQL_avail =
     	"update HARVEST_SOURCE set STATEMENTS=?, RESOURCES=?," +
     	" COUNT_UNAVAIL=(case when ?=1 then 0 else (COUNT_UNAVAIL+1) end)," +
-    	" LAST_HARVEST_FAILED=? where HARVEST_SOURCE_ID=?";
+    	" LAST_HARVEST_FAILED=cast(? as ynboolean) where HARVEST_SOURCE_ID=?";
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.dao.HarvestSourceDAO#updateHarvestFinished(int, java.lang.Integer, java.lang.Integer, java.lang.Boolean, boolean)
