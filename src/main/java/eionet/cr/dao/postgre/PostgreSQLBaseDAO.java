@@ -173,7 +173,6 @@ public abstract class PostgreSQLBaseDAO {
 		finally{
 			ConnectionUtil.closeConnection(conn);
 		}
-
 	}
 
 	

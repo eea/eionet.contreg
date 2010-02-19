@@ -31,7 +31,8 @@ import eionet.cr.search.util.SortOrder;
 public class SortingRequest {
 	
 	private String sortingColumnName;
-	private SortOrder sortOrder = SortOrder.ASCENDING; 
+	private SortOrder sortOrder = SortOrder.ASCENDING;
+	private boolean sortByPredicateObjectHash = false;
 	
 	/**
 	 * @param sortingColumnName
@@ -64,5 +65,17 @@ public class SortingRequest {
 	 */
 	public void setSortOrder(SortOrder sortOrder) {
 		this.sortOrder = sortOrder;
+	}
+	/**
+	 * @return the sortByPredicateObjectHash
+	 */
+	public boolean isSortByPredicateObjectHash() {
+		return sortByPredicateObjectHash;
+	}
+	/**
+	 * @param sortByPredicateObjectHash the sortByPredicateObjectHash to set
+	 */
+	public void setSortByPredicateObjectHash(boolean sortByPredicateObjectHash) {
+		this.sortByPredicateObjectHash = sortByPredicateObjectHash;
 	}
 }

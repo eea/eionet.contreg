@@ -112,9 +112,12 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
 			longE = Util.toDouble(ltudes[2].trim());
 			latN = Util.toDouble(ltudes[3].trim());
 			
+			SortingRequest sortingRequest = new SortingRequest(Predicates.RDFS_LABEL,
+					SortOrder.ASCENDING);
+			sortingRequest.setSortByPredicateObjectHash(true);
 			Pair<Integer, List<SubjectDTO>> resultPair =
 				DAOFactory.get().getDao(SearchDAO.class).searchBySpatialBox(
-						createBBOX(), source, true, PagingRequest.create(1,25), null);
+						createBBOX(), source, PagingRequest.create(1,25), sortingRequest, true);
 			resultList = resultPair.getRight();
 		}
 		
@@ -245,9 +248,8 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
 				DAOFactory.get().getDao(SearchDAO.class).searchBySpatialBox(
 						createBBOX(),
 						source,
-						false,
 						PagingRequest.create(getPageN()),
-						new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
+						new SortingRequest(getSortP(), SortOrder.parse(getSortO())), false);
 			resultList = resultPair.getRight();
 			matchCount = resultPair.getLeft();
 		}

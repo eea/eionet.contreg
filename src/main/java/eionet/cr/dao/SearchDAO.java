@@ -81,15 +81,16 @@ public interface SearchDAO extends DAO{
 	/**
 	 * 
 	 * @param box
-	 * @param sourceUri TODO
-	 * @param googleEarthMode TODO
+	 * @param sourceUri
 	 * @param pagingRequest
 	 * @param sortingRequest
+	 * @param sortByObjectHash
 	 * @return
 	 * @throws DAOException
 	 */
 	Pair<Integer, List<SubjectDTO>> searchBySpatialBox(
 			BBOX box,
-			String sourceUri,
-			boolean googleEarthMode, PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException;
+			String sourceUri,			
+			PagingRequest pagingRequest,
+			SortingRequest sortingRequest, boolean sortByObjectHash) throws DAOException;
 }

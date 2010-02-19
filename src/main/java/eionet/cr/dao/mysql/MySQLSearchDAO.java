@@ -298,11 +298,11 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 
 	/*
 	 * (non-Javadoc)
-	 * @see eionet.cr.dao.SearchDAO#searchBySpatialBox(eionet.cr.search.util.BBOX, eionet.cr.util.PagingRequest, eionet.cr.util.SortingRequest)
+	 * @see eionet.cr.dao.SearchDAO#searchBySpatialBox(eionet.cr.search.util.BBOX, java.lang.String, eionet.cr.util.pagination.PagingRequest, eionet.cr.util.SortingRequest, boolean)
 	 */
-	public Pair<Integer, List<SubjectDTO>> searchBySpatialBox(BBOX box,
-			String sourceUri, boolean googleEarthMode,
-			PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException {
+	public Pair<Integer, List<SubjectDTO>> searchBySpatialBox(BBOX box, String sourceUri, 
+			PagingRequest pagingRequest,
+			SortingRequest sortingRequest, boolean sortByObjectHash) throws DAOException {
 		
 		
 		if (box==null || box.isUndefined()){
@@ -313,14 +313,13 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 		SortOrder sortOrder  = sortingRequest!=null ? sortingRequest.getSortOrder() : null;
 		boolean doSort = !StringUtils.isBlank(sortPredicate);
 
-		StringBuffer sqlBuf = new StringBuffer(googleEarthMode ? "select distinct" : " select").
-		append(" sql_calc_found_rows SPO_POINT.SUBJECT as SUBJECT_HASH from SPO as SPO_POINT");
+		StringBuffer sqlBuf = new StringBuffer("select sql_calc_found_rows distinct").
+		append(" SPO_POINT.SUBJECT as SUBJECT_HASH from SPO as SPO_POINT");
 		
-		if (googleEarthMode || sortPredicate!=null){
+		if (sortPredicate!=null){
 			sqlBuf.append(" left join SPO as ORDERING on").
 			append(" (SPO_POINT.SUBJECT=ORDERING.SUBJECT and ORDERING.PREDICATE=").
-			append(Hashes.spoHash(googleEarthMode ? Predicates.RDFS_LABEL : sortPredicate)).
-			append(")");
+			append(Hashes.spoHash(sortPredicate)).append(")");
 		}
 
 		if (box.hasLatitude()){
@@ -367,17 +366,19 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 			}
 		}
 		
-		if (!googleEarthMode){
-			if (sortPredicate!=null){
-				sqlBuf.append(" order by ORDERING.OBJECT ").
-				append(sortOrder==null ? sortOrder.ASCENDING.toSQL() : sortOrder.toSQL());
+		if (sortPredicate!=null){
+			
+			if (sortByObjectHash){
+				sqlBuf.append(" order by ORDERING.OBJECT_HASH");
 			}
-		}
-		else{
-			sqlBuf.append(" order by ORDERING.OBJECT_HASH");
+			else{
+				sqlBuf.append(" order by ORDERING.OBJECT");
+			}
+			sqlBuf.append(" ").
+			append(sortOrder==null ? sortOrder.ASCENDING.toSQL() : sortOrder.toSQL());
 		}
 		
-		if (googleEarthMode && pagingRequest!=null){
+		if (pagingRequest!=null){
 			
 			sqlBuf.append(" limit ").
 			append(pagingRequest.getOffset()).append(",").append(pagingRequest.getItemsPerPage());
