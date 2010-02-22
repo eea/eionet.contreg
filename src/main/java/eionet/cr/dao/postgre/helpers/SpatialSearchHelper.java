@@ -38,14 +38,13 @@ import eionet.cr.util.pagination.PagingRequest;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class SpatialSearchHelper {
+public class SpatialSearchHelper extends AbstractSearchHelper{
 
 	/** */
 	private BBOX box;
 	private String sourceUri;
-	private PagingRequest pagingRequest;
-	private String sortPredicate;
-	private String sortOrder;
+	
+	/** */
 	private boolean sortByObjectHash;
 	
 	/**
@@ -54,62 +53,20 @@ public class SpatialSearchHelper {
 	 * @param pagingRequest
 	 * @param sortingRequest
 	 */
-	private SpatialSearchHelper(BBOX box, String sourceUri,
+	public SpatialSearchHelper(BBOX box, String sourceUri,
 			PagingRequest pagingRequest, SortingRequest sortingRequest, boolean sortByObjectHash){
 		
+		super(pagingRequest, sortingRequest);
 		this.box = box;
 		this.sourceUri= sourceUri;		
-		
-		this.pagingRequest = pagingRequest;
-		if (sortingRequest!=null){
-			this.sortPredicate = sortingRequest.getSortingColumnName();
-			this.sortOrder = sortingRequest.getSortOrder() == null  ? SortOrder.ASCENDING.toSQL() 
-					: sortingRequest.getSortOrder().toSQL();
-			this.sortByObjectHash = sortByObjectHash;
-		}
-	}
-	
-	/**
-	 * 
-	 * @param expression
-	 * @param pagingRequest
-	 * @param sortingRequest
-	 * @return
-	 */
-	public static SpatialSearchHelper create(BBOX box, String sourceUri,
-			PagingRequest pagingRequest,
-			SortingRequest sortingRequest, boolean sortByObjectHash){
-		return new SpatialSearchHelper(box, sourceUri, pagingRequest,
-				sortingRequest, sortByObjectHash);
+		this.sortByObjectHash = sortByObjectHash;
 	}
 
-	/**
-	 * 
-	 * @param inParams
-	 * @return
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.postgre.helpers.AbstractSearchHelper#getUnorderedQuery(java.util.List)
 	 */
-	public String getQuery(List<Object> inParams){
-		
-		String query = StringUtils.isBlank(sortPredicate) ?
-				getUnorderedQuery(inParams) : getOrderedQuery(inParams);
-		
-		if (pagingRequest!=null){
-			return query;
-		}
-		else{
-			return new StringBuffer(query).
-			append(" limit ").append(pagingRequest.getItemsPerPage()).
-			append(" offset ").append(pagingRequest.getOffset()).
-			toString();
-		}
-	}
-	
-	/**
-	 * 
-	 * @param inParams
-	 * @return
-	 */
-	public String getUnorderedQuery(List<Object> inParams){
+	protected String getUnorderedQuery(List<Object> inParams){
 		
 		StringBuffer buf = new StringBuffer().
 		append("select distinct SPO_POINT.SUBJECT as SUBJECT_HASH from SPO as SPO_POINT");
@@ -160,13 +117,12 @@ public class SpatialSearchHelper {
 		
 		return buf.toString();
 	}
-	
-	/**
-	 * 
-	 * @param inParams
-	 * @return
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.postgre.helpers.AbstractSearchHelper#getOrderedQuery(java.util.List)
 	 */
-	public String getOrderedQuery(List<Object> inParams){
+	protected String getOrderedQuery(List<Object> inParams){
 		
 		StringBuffer subSelect = new StringBuffer().
 		append("select distinct on (SUBJECT_HASH) SPO_POINT.SUBJECT as SUBJECT_HASH").
@@ -227,11 +183,10 @@ public class SpatialSearchHelper {
 
 		return buf.toString();
 	}
-	
-	/**
-	 * 
-	 * @param inParams
-	 * @return
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.postgre.helpers.AbstractSearchHelper#getCountQuery(java.util.List)
 	 */
 	public String getCountQuery(List<Object> inParams){
 		

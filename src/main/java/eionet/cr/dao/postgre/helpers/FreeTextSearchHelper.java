@@ -37,13 +37,10 @@ import eionet.cr.web.util.columns.SubjectLastModifiedColumn;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class FreeTextSearchHelper {
+public class FreeTextSearchHelper extends AbstractSearchHelper{
 	
 	/** */
 	private SearchExpression expression;
-	private PagingRequest pagingRequest;
-	private String sortPredicate;
-	private String sortOrder;
 	
 	/**
 	 * 
@@ -51,59 +48,19 @@ public class FreeTextSearchHelper {
 	 * @param pagingRequest
 	 * @param sortingRequest
 	 */
-	private FreeTextSearchHelper(SearchExpression expression,
+	public FreeTextSearchHelper(SearchExpression expression,
 			PagingRequest pagingRequest,
 			SortingRequest sortingRequest){
 		
+		super(pagingRequest, sortingRequest);
 		this.expression = expression;
-		this.pagingRequest = pagingRequest;
-		if (sortingRequest!=null){
-			this.sortPredicate = sortingRequest.getSortingColumnName();
-			this.sortOrder = sortingRequest.getSortOrder() == null  ? SortOrder.ASCENDING.toSQL() 
-					: sortingRequest.getSortOrder().toSQL();
-		}
-	}
-	
-	/**
-	 * 
-	 * @param expression
-	 * @param pagingRequest
-	 * @param sortingRequest
-	 * @return
-	 */
-	public static FreeTextSearchHelper create(SearchExpression expression,
-			PagingRequest pagingRequest,
-			SortingRequest sortingRequest){
-		return new FreeTextSearchHelper(expression, pagingRequest, sortingRequest);
 	}
 
-	/**
-	 * 
-	 * @param inParams
-	 * @return
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.postgre.helpers.AbstractSearchHelper#getUnorderedQuery(java.util.List)
 	 */
-	public String getQuery(List<Object> inParams){
-		
-		String query = StringUtils.isBlank(sortPredicate) ?
-				getUnorderedQuery(inParams) : getOrderedQuery(inParams);
-		
-		if (pagingRequest!=null){
-			return query;
-		}
-		else{
-			return new StringBuffer(query).
-			append(" limit ").append(pagingRequest.getItemsPerPage()).
-			append(" offset ").append(pagingRequest.getOffset()).
-			toString();
-		}
-	}
-
-	/**
-	 * 
-	 * @param inParams
-	 * @return
-	 */
-	private String getUnorderedQuery(List<Object> inParams){
+	protected String getUnorderedQuery(List<Object> inParams){
 		
 		StringBuffer buf = new StringBuffer().
 		append("select distinct SPO.SUBJECT as ").append(PairReader.LEFTCOL).append(", ").
@@ -124,27 +81,25 @@ public class FreeTextSearchHelper {
 		return buf.toString();
 	}
 
-	/**
-	 * 
-	 * @param inParams
-	 * @return
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.postgre.helpers.AbstractSearchHelper#getOrderedQuery(java.util.List)
 	 */
-	private String getOrderedQuery(List<Object> inParams){
+	protected String getOrderedQuery(List<Object> inParams){
 
 		StringBuffer subSelect = new StringBuffer().
 		append("select distinct on (").append(PairReader.LEFTCOL).append(")").
 		append(" SPO.SUBJECT as ").append(PairReader.LEFTCOL).append(", ").
 		append("(CASE WHEN SPO.OBJ_DERIV_SOURCE<>0 THEN SPO.OBJ_DERIV_SOURCE ELSE SPO.SOURCE END)").
-		append(" as ").append(PairReader.RIGHTCOL).append(", ").
-		append(" ORDERING.OBJECT as OBJECT_ORDERED_BY").
-		append(" from SPO");
+		append(" as ").append(PairReader.RIGHTCOL).append(", ");
 		
 		if (sortPredicate.equals(SubjectLastModifiedColumn.class.getSimpleName())){
-			
-			subSelect.append(" left join RESOURCE on (SPO.SUBJECT=RESOURCE.URI_HASH) ");
+			subSelect.append(" RESOURCE.LASTMODIFIED_TIME as OBJECT_ORDERED_BY from SPO").
+			append(" left join RESOURCE on (SPO.SUBJECT=RESOURCE.URI_HASH)");
 		}
 		else{
-			subSelect.append(" left join SPO as ORDERING on").
+			subSelect.append(" ORDERING.OBJECT as OBJECT_ORDERED_BY from SPO").
+			append(" left join SPO as ORDERING on").
 			append(" (SPO.SUBJECT=ORDERING.SUBJECT and ORDERING.PREDICATE=").
 			append(Hashes.spoHash(sortPredicate)).append(")");
 		}
@@ -166,10 +121,9 @@ public class FreeTextSearchHelper {
 		return buf.toString();
 	}
 
-	/**
-	 * 
-	 * @param inParams
-	 * @return
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.postgre.helpers.AbstractSearchHelper#getCountQuery(java.util.List)
 	 */
 	public String getCountQuery(List<Object> inParams){
 
