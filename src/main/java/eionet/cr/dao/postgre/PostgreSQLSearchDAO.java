@@ -185,30 +185,27 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 		if (list==null || list.isEmpty()){
 			return new Pair<Integer, List<SubjectDTO>>(0, new LinkedList<SubjectDTO>());
 		}
-		// result list not empty, do the necessary processing and get total row count
-		else{
-			// create the subjects map that needs to be fed into the subjects data reader
-			Map<Long,SubjectDTO> subjectsMap = new LinkedHashMap<Long, SubjectDTO>();
-			for (Long hash : list){
-				subjectsMap.put(hash, null);
-			}
-			
-			// get the data of all found subjects
-			List<SubjectDTO> subjects = executeQuery(
-					getSubjectsDataQuery(subjectsMap.keySet()), null, new SubjectDataReader(subjectsMap));
-			
-			// if paging required, get the total number of found subjects too
-			int totalRowCount = 0;
-			if (pagingRequest!=null){
-				inParams = new ArrayList<Object>();
-				totalRowCount = executeQueryUniqueResult(
-					helper.getCountQuery(inParams), inParams, new SingleObjectReader<Integer>());
-			}
-
-			// the result Pair contains total number of subjects and the requested sub-list
-			return new Pair<Integer,List<SubjectDTO>>(Integer.valueOf(totalRowCount), subjects);
+		
+		// create the subjects map that needs to be fed into the subjects data reader
+		Map<Long,SubjectDTO> subjectsMap = new LinkedHashMap<Long, SubjectDTO>();
+		for (Long hash : list){
+			subjectsMap.put(hash, null);
 		}
 
+		// get the data of all found subjects
+		List<SubjectDTO> subjects = executeQuery(
+				getSubjectsDataQuery(subjectsMap.keySet()), null, new SubjectDataReader(subjectsMap));
+
+		// if paging required, get the total number of found subjects too
+		int totalRowCount = 0;
+		if (pagingRequest!=null){
+			inParams = new ArrayList<Object>();
+			totalRowCount = executeQueryUniqueResult(
+					helper.getCountQuery(inParams), inParams, new SingleObjectReader<Integer>());
+		}
+
+		// the result Pair contains total number of subjects and the requested sub-list
+		return new Pair<Integer,List<SubjectDTO>>(Integer.valueOf(totalRowCount), subjects);
 	}
 
 	/*
@@ -237,28 +234,26 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 		if (list==null || list.isEmpty()){
 			return new Pair<Integer, List<SubjectDTO>>(0, new LinkedList<SubjectDTO>());
 		}
-		// result list not empty, do the necessary processing and get total row count
-		else{
-			// create the subjects map that needs to be fed into the subjects data reader
-			Map<Long,SubjectDTO> subjectsMap = new LinkedHashMap<Long, SubjectDTO>();
-			for (Long hash : list){
-				subjectsMap.put(hash, null);
-			}
-			
-			// get the data of all found subjects
-			List<SubjectDTO> subjects = executeQuery(getSubjectsDataQuery(
-					subjectsMap.keySet()), null, new SubjectDataReader(subjectsMap));
-			
-			// if paging required, get the total number of found subjects too
-			int totalRowCount = 0;
-			if (pagingRequest!=null){
-				inParams = new ArrayList<Object>();
-				totalRowCount = executeQueryUniqueResult(
-					helper.getCountQuery(inParams), inParams, new SingleObjectReader<Integer>());
-			}
-
-			// the result Pair contains total number of subjects and the requested sub-list
-			return new Pair<Integer,List<SubjectDTO>>(Integer.valueOf(totalRowCount), subjects);
+		
+		// create the subjects map that needs to be fed into the subjects data reader
+		Map<Long,SubjectDTO> subjectsMap = new LinkedHashMap<Long, SubjectDTO>();
+		for (Long hash : list){
+			subjectsMap.put(hash, null);
 		}
+
+		// get the data of all found subjects
+		List<SubjectDTO> subjects = executeQuery(getSubjectsDataQuery(
+				subjectsMap.keySet()), null, new SubjectDataReader(subjectsMap));
+
+		// if paging required, get the total number of found subjects too
+		int totalRowCount = 0;
+		if (pagingRequest!=null){
+			inParams = new ArrayList<Object>();
+			totalRowCount = executeQueryUniqueResult(
+					helper.getCountQuery(inParams), inParams, new SingleObjectReader<Integer>());
+		}
+
+		// the result Pair contains total number of subjects and the requested sub-list
+		return new Pair<Integer,List<SubjectDTO>>(Integer.valueOf(totalRowCount), subjects);
 	}
 }
