@@ -41,7 +41,7 @@ import eionet.cr.util.sql.SQLUtil;
 public class PostgreSQLHarvestDAO extends PostgreSQLBaseDAO implements HarvestDAO{
 
     /** */
-	private static final String getHarvestByIdSQL = "select * from HARVEST where HARVEST_ID=?";
+	private static final String getHarvestByIdSQL = "select *, USERNAME as USER from HARVEST where HARVEST_ID=?";
     /*
      * (non-Javadoc)
      * @see eionet.cr.dao.HarvestDAO#getHarvestById(java.lang.Integer)
@@ -55,8 +55,9 @@ public class PostgreSQLHarvestDAO extends PostgreSQLBaseDAO implements HarvestDA
 
 	/** */
 	private static final String getHarvestsBySourceIdSQL = 
-		"select distinct HARVEST.*, HARVEST_MESSAGE.TYPE from HARVEST left join HARVEST_MESSAGE on HARVEST.HARVEST_ID=HARVEST_MESSAGE.HARVEST_ID "
-		+ "where HARVEST.HARVEST_SOURCE_ID=? order by HARVEST.STARTED desc limit ?";
+		"select distinct HARVEST.*, HARVEST.USERNAME as HARVEST_USER, HARVEST_MESSAGE.TYPE" +
+		" from HARVEST left join HARVEST_MESSAGE on HARVEST.HARVEST_ID=HARVEST_MESSAGE.HARVEST_ID" +
+		" where HARVEST.HARVEST_SOURCE_ID=? order by HARVEST.STARTED desc limit ?";
 	/*
      * (non-Javadoc)
      * 
@@ -73,7 +74,8 @@ public class PostgreSQLHarvestDAO extends PostgreSQLBaseDAO implements HarvestDA
     }
 
 	/** */
-	private static final String getLastHarvestSQL = "select * from HARVEST where HARVEST_SOURCE_ID=? order by HARVEST.STARTED desc limit 1";
+	private static final String getLastHarvestSQL = "select *, USERNAME as USER" +
+			" from HARVEST where HARVEST_SOURCE_ID=? order by HARVEST.STARTED desc limit 1";
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.dao.HarvestDAO#getLastHarvest(java.lang.Integer)

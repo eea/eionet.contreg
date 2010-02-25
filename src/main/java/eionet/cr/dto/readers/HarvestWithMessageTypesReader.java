@@ -74,7 +74,7 @@ public class HarvestWithMessageTypesReader extends ResultSetListReader<HarvestDT
 			curHarvest.setHarvestSourceId(new Integer(rs.getInt("HARVEST.HARVEST_SOURCE_ID")));
 			
 			curHarvest.setHarvestType(rs.getString("HARVEST.TYPE"));
-			curHarvest.setUser(rs.getString("HARVEST.USER"));
+			curHarvest.setUser(rs.getString("HARVEST_USER"));
 			curHarvest.setStatus(rs.getString("HARVEST.STATUS"));
 			
 			curHarvest.setDatetimeStarted(rs.getTimestamp("HARVEST.STARTED"));

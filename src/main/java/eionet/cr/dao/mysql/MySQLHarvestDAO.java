@@ -110,8 +110,9 @@ public class MySQLHarvestDAO extends MySQLBaseDAO implements HarvestDAO {
 	
 	/** */
 	private static final String getHarvestsBySourceIdSQL = 
-		"select distinct HARVEST.*, HARVEST_MESSAGE.TYPE from HARVEST left join HARVEST_MESSAGE on HARVEST.HARVEST_ID=HARVEST_MESSAGE.HARVEST_ID "
-		+ "where HARVEST.HARVEST_SOURCE_ID=? order by HARVEST.STARTED desc limit ?";
+		"select distinct HARVEST.*, HARVEST.USER as HARVEST_USER, HARVEST_MESSAGE.TYPE" +
+		" from HARVEST left join HARVEST_MESSAGE on HARVEST.HARVEST_ID=HARVEST_MESSAGE.HARVEST_ID" +
+		" where HARVEST.HARVEST_SOURCE_ID=? order by HARVEST.STARTED desc limit ?";
 	
 	/*
      * (non-Javadoc)
