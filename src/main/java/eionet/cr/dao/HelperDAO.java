@@ -13,12 +13,12 @@ import java.util.Map;
 import java.util.Set;
 
 import eionet.cr.dao.readers.SubjectDataReader;
+import eionet.cr.dao.util.PredicateLabels;
+import eionet.cr.dao.util.SearchExpression;
+import eionet.cr.dao.util.SubProperties;
+import eionet.cr.dao.util.UriLabelPair;
 import eionet.cr.dto.RawTripleDTO;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.search.util.PredicateLabels;
-import eionet.cr.search.util.SearchExpression;
-import eionet.cr.search.util.SubProperties;
-import eionet.cr.search.util.UriLabelPair;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
 

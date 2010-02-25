@@ -18,66 +18,31 @@
  * Contributor(s):
  * Jaanus Heinlaid, Tieto Eesti
  */
-package eionet.cr.search.util;
+package eionet.cr.dao.util;
 
-import eionet.cr.util.URIUtil;
+import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class SearchExpression {
+public class SubProperties extends HashMap<String,HashSet<String>>{
 
-	/** */
-	private String expression;
-	private boolean exactPhrase = false;
-	private boolean isUri = false;
-	private boolean isHash = false;
-	
 	/**
 	 * 
-	 * @param s
+	 * @param predicateUri
+	 * @param parentUri
 	 */
-	public SearchExpression(String s){
+	public void add(String predicate, String subProperty){
 		
-		expression = s==null ? "" : s.trim();
-		isUri = URIUtil.isSchemedURI(expression);
-		
-		try{
-			Long.parseLong(expression);
-			isHash = true;
+		HashSet<String> subProperties = get(predicate);
+		if (subProperties==null){
+			subProperties = new HashSet<String>();
+			put(predicate, subProperties);
 		}
-		catch (NumberFormatException nfe){}
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public boolean isEmpty(){
-		return expression==null || expression.length()==0;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	public String toString(){
-		return expression;
-	}
-
-	/**
-	 * @return the isUri
-	 */
-	public boolean isUri() {
-		return isUri;
-	}
-
-	/**
-	 * @return the isHash
-	 */
-	public boolean isHash() {
-		return isHash;
+		
+		subProperties.add(subProperty);
 	}
 }

@@ -20,7 +20,6 @@
  */
 package eionet.cr.util;
 
-import eionet.cr.search.util.SortOrder;
 
 /**
  * Encapsulates data about table sorting.

@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
-import eionet.cr.search.util.SortOrder;
+import eionet.cr.util.SortOrder;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.pagination.PagingRequest;
 

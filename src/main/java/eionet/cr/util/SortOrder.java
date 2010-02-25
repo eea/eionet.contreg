@@ -18,7 +18,7 @@
  * Contributor(s):
  * Jaanus Heinlaid, Tieto Eesti
  */
-package eionet.cr.search.util;
+package eionet.cr.util;
 
 import org.apache.commons.lang.StringUtils;
 

@@ -26,9 +26,9 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 
+import eionet.cr.dao.util.SearchExpression;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.search.util.SearchExpression;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Util;
 import eionet.cr.web.action.ReferencesActionBean;

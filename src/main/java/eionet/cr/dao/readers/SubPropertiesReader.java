@@ -23,7 +23,7 @@ package eionet.cr.dao.readers;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import eionet.cr.search.util.SubProperties;
+import eionet.cr.dao.util.SubProperties;
 import eionet.cr.util.sql.ResultSetBaseReader;
 
 /**

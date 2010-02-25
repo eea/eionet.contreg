@@ -18,7 +18,7 @@
  * Contributor(s):
  * Jaanus Heinlaid, Tieto Eesti
  */
-package eionet.cr.search.util;
+package eionet.cr.dao.util;
 
 import java.util.HashMap;
 import java.util.HashSet;

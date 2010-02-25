@@ -26,8 +26,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import eionet.cr.dao.util.PredicateLabels;
 import eionet.cr.dto.ObjectDTO;
-import eionet.cr.search.util.PredicateLabels;
 import eionet.cr.util.sql.ResultSetBaseReader;
 
 /**

@@ -24,9 +24,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import eionet.cr.dao.util.BBOX;
+import eionet.cr.dao.util.SearchExpression;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.search.util.BBOX;
-import eionet.cr.search.util.SearchExpression;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.pagination.PagingRequest;

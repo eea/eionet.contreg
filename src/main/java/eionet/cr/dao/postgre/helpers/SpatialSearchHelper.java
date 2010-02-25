@@ -26,10 +26,10 @@ import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
-import eionet.cr.search.util.BBOX;
-import eionet.cr.search.util.SearchExpression;
-import eionet.cr.search.util.SortOrder;
+import eionet.cr.dao.util.BBOX;
+import eionet.cr.dao.util.SearchExpression;
 import eionet.cr.util.Hashes;
+import eionet.cr.util.SortOrder;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.pagination.PagingRequest;
 

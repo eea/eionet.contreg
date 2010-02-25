@@ -26,8 +26,8 @@ import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
-import eionet.cr.search.util.SortOrder;
 import eionet.cr.util.Hashes;
+import eionet.cr.util.SortOrder;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.web.util.columns.ReferringPredicatesColumn;

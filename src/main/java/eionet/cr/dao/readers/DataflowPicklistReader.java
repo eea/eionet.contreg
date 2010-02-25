@@ -29,7 +29,7 @@ import java.util.LinkedHashMap;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.dao.DAOException;
-import eionet.cr.search.util.UriLabelPair;
+import eionet.cr.dao.util.UriLabelPair;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.sql.ConnectionUtil;
 import eionet.cr.util.sql.ResultSetBaseReader;

@@ -36,7 +36,7 @@ import javax.servlet.ServletContextListener;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
-import eionet.cr.search.util.UriLabelPair;
+import eionet.cr.dao.util.UriLabelPair;
 import eionet.cr.util.Pair;
 
 /**
