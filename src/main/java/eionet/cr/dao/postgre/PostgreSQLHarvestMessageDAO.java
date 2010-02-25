@@ -26,8 +26,8 @@ import java.util.List;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HarvestMessageDAO;
+import eionet.cr.dao.readers.HarvestMessageDTOReader;
 import eionet.cr.dto.HarvestMessageDTO;
-import eionet.cr.dto.readers.HarvestMessageDTOReader;
 import eionet.cr.util.sql.ConnectionUtil;
 import eionet.cr.util.sql.SQLUtil;
 

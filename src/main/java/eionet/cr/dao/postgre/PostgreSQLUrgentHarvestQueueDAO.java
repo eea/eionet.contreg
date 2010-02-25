@@ -29,8 +29,8 @@ import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.UrgentHarvestQueueDAO;
+import eionet.cr.dao.readers.HarvestQueueItemDTOReader;
 import eionet.cr.dto.UrgentHarvestQueueItemDTO;
-import eionet.cr.dto.readers.HarvestQueueItemDTOReader;
 import eionet.cr.util.sql.ConnectionUtil;
 import eionet.cr.util.sql.SQLUtil;
 

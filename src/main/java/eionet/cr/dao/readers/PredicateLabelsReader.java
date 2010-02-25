@@ -18,43 +18,45 @@
  * Contributor(s):
  * Jaanus Heinlaid, Tieto Eesti
  */
-package eionet.cr.search.util;
+package eionet.cr.dao.readers;
 
-import java.util.Date;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
-import eionet.cr.dto.SubjectDTO;
+import eionet.cr.dto.ObjectDTO;
+import eionet.cr.search.util.PredicateLabels;
+import eionet.cr.util.sql.ResultSetBaseReader;
 
 /**
  * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class RecentUploadsDataReader extends SubjectDataReader {
-
+public class PredicateLabelsReader extends ResultSetBaseReader{
+	
 	/** */
-	private Map<Long,Date> firstSeenTimes;
+	private PredicateLabels predicateLabels;
 	
 	/**
 	 * 
-	 * @param subjectsMap
+	 * @param predicateLabels
 	 */
-	public RecentUploadsDataReader(Map<Long,SubjectDTO> subjectsMap, Map<Long,Date> firstSeenTimes){
+	public PredicateLabelsReader(PredicateLabels predicateLabels){
 		
-		super(subjectsMap);
-		
-		if (firstSeenTimes==null)
+		if (predicateLabels==null)
 			throw new IllegalArgumentException();
-		this.firstSeenTimes = firstSeenTimes;
+		
+		this.predicateLabels = predicateLabels;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * @see eionet.cr.search.util.SubjectDataReader#addNewSubject(java.lang.String, eionet.cr.dto.SubjectDTO)
+	 * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
 	 */
-	protected void addNewSubject(long subjectHash, SubjectDTO subjectDTO){
-		
-		super.addNewSubject(Long.valueOf(subjectHash), subjectDTO);
-		subjectDTO.setFirstSeenTime(firstSeenTimes.get(Long.valueOf(subjectHash)));
+	public void readRow(ResultSet rs) throws SQLException {
+		predicateLabels.add(rs.getString("PREDICATE_URI"), rs.getString("LABEL"), rs.getString("LANG"));
 	}
 }

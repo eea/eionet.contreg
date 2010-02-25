@@ -18,45 +18,44 @@
  * Contributor(s):
  * Jaanus Heinlaid, Tieto Eesti
  */
-package eionet.cr.dto.readers;
+package eionet.cr.dao.readers;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import eionet.cr.dto.HarvestMessageDTO;
+import eionet.cr.dto.UrgentHarvestQueueItemDTO;
 import eionet.cr.util.sql.ResultSetListReader;
 
 /**
  * 
- * @author heinljab
+ * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class HarvestMessageDTOReader extends ResultSetListReader<HarvestMessageDTO>{
+public class HarvestQueueItemDTOReader extends ResultSetListReader<UrgentHarvestQueueItemDTO>{
 
 	/** */
-	List<HarvestMessageDTO> resultList = new ArrayList<HarvestMessageDTO>();
+	List<UrgentHarvestQueueItemDTO> resultList = new ArrayList<UrgentHarvestQueueItemDTO>();
 
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
 	 */
 	public void readRow(ResultSet rs) throws SQLException {
-
-		HarvestMessageDTO harvestMessageDTO = new HarvestMessageDTO();
-		harvestMessageDTO.setHarvestId(new Integer(rs.getInt("HARVEST_ID")));
-		harvestMessageDTO.setType(rs.getString("TYPE"));
-		harvestMessageDTO.setMessage(rs.getString("MESSAGE"));
-		harvestMessageDTO.setStackTrace(rs.getString("STACK_TRACE"));
-		harvestMessageDTO.setHarvestMessageId(new Integer(rs.getInt("HARVEST_MESSAGE_ID")));
-		resultList.add(harvestMessageDTO);
+		
+		UrgentHarvestQueueItemDTO dto = new UrgentHarvestQueueItemDTO();
+		dto.setUrl(rs.getString("URL"));
+		dto.setTimeAdded(rs.getTimestamp("TIMESTAMP"));
+		dto.setPushedContent(rs.getString("PUSHED_CONTENT"));
+		
+		resultList.add(dto);
 	}
 
 	/**
-	 * @return the resultListAAA
+	 * @return the resultList
 	 */
-	public List<HarvestMessageDTO> getResultList() {
+	public List<UrgentHarvestQueueItemDTO> getResultList() {
 		return resultList;
 	}
 }

@@ -18,44 +18,56 @@
  * Contributor(s):
  * Jaanus Heinlaid, Tieto Eesti
  */
-package eionet.cr.dto.readers;
+package eionet.cr.dao.readers;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import eionet.cr.dto.UrgentHarvestQueueItemDTO;
+import eionet.cr.dto.HarvestDTO;
 import eionet.cr.util.sql.ResultSetListReader;
 
 /**
  * 
- * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
+ * @author altnyris
  *
  */
-public class HarvestQueueItemDTOReader extends ResultSetListReader<UrgentHarvestQueueItemDTO>{
+public class HarvestDTOReader extends ResultSetListReader<HarvestDTO> {
 
 	/** */
-	List<UrgentHarvestQueueItemDTO> resultList = new ArrayList<UrgentHarvestQueueItemDTO>();
+	List<HarvestDTO> resultList = new ArrayList<HarvestDTO>();
 
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
 	 */
 	public void readRow(ResultSet rs) throws SQLException {
+
+		HarvestDTO harvestDTO = new HarvestDTO();
 		
-		UrgentHarvestQueueItemDTO dto = new UrgentHarvestQueueItemDTO();
-		dto.setUrl(rs.getString("URL"));
-		dto.setTimeAdded(rs.getTimestamp("TIMESTAMP"));
-		dto.setPushedContent(rs.getString("PUSHED_CONTENT"));
+		harvestDTO.setHarvestId(new Integer(rs.getInt("HARVEST_ID")));
+		harvestDTO.setHarvestSourceId(new Integer(rs.getInt("HARVEST_SOURCE_ID")));
 		
-		resultList.add(dto);
+		harvestDTO.setHarvestType(rs.getString("TYPE"));
+		harvestDTO.setUser(rs.getString("USER"));
+		harvestDTO.setStatus(rs.getString("STATUS"));
+		
+		harvestDTO.setDatetimeStarted(rs.getTimestamp("STARTED"));
+		harvestDTO.setDatetimeFinished(rs.getTimestamp("FINISHED"));
+		
+		harvestDTO.setTotalResources(new Integer(rs.getInt("TOT_RESOURCES")));
+		harvestDTO.setEncodingSchemes(new Integer(rs.getInt("ENC_SCHEMES")));
+		harvestDTO.setTotalStatements(new Integer(rs.getInt("TOT_STATEMENTS")));
+		harvestDTO.setLitObjStatements(new Integer(rs.getInt("LIT_STATEMENTS")));
+		
+		resultList.add(harvestDTO);
 	}
 
 	/**
-	 * @return the resultList
+	 * @return the resultListAAA
 	 */
-	public List<UrgentHarvestQueueItemDTO> getResultList() {
+	public List<HarvestDTO> getResultList() {
 		return resultList;
 	}
 }

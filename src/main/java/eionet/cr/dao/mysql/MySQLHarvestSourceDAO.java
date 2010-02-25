@@ -29,8 +29,8 @@ import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HarvestSourceDAO;
+import eionet.cr.dao.readers.HarvestSourceDTOReader;
 import eionet.cr.dto.HarvestSourceDTO;
-import eionet.cr.dto.readers.HarvestSourceDTOReader;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;

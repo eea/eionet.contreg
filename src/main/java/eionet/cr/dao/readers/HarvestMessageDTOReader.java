@@ -18,44 +18,45 @@
  * Contributor(s):
  * Jaanus Heinlaid, Tieto Eesti
  */
-package eionet.cr.search.util;
+package eionet.cr.dao.readers;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
-import eionet.cr.dto.ObjectDTO;
-import eionet.cr.util.sql.ResultSetBaseReader;
+import eionet.cr.dto.HarvestMessageDTO;
+import eionet.cr.util.sql.ResultSetListReader;
 
 /**
  * 
- * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
+ * @author heinljab
  *
  */
-public class PredicateLabelsReader extends ResultSetBaseReader{
-	
+public class HarvestMessageDTOReader extends ResultSetListReader<HarvestMessageDTO>{
+
 	/** */
-	private PredicateLabels predicateLabels;
-	
-	/**
-	 * 
-	 * @param predicateLabels
-	 */
-	public PredicateLabelsReader(PredicateLabels predicateLabels){
-		
-		if (predicateLabels==null)
-			throw new IllegalArgumentException();
-		
-		this.predicateLabels = predicateLabels;
-	}
+	List<HarvestMessageDTO> resultList = new ArrayList<HarvestMessageDTO>();
 
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
 	 */
 	public void readRow(ResultSet rs) throws SQLException {
-		predicateLabels.add(rs.getString("PREDICATE_URI"), rs.getString("LABEL"), rs.getString("LANG"));
+
+		HarvestMessageDTO harvestMessageDTO = new HarvestMessageDTO();
+		harvestMessageDTO.setHarvestId(new Integer(rs.getInt("HARVEST_ID")));
+		harvestMessageDTO.setType(rs.getString("TYPE"));
+		harvestMessageDTO.setMessage(rs.getString("MESSAGE"));
+		harvestMessageDTO.setStackTrace(rs.getString("STACK_TRACE"));
+		harvestMessageDTO.setHarvestMessageId(new Integer(rs.getInt("HARVEST_MESSAGE_ID")));
+		resultList.add(harvestMessageDTO);
+	}
+
+	/**
+	 * @return the resultListAAA
+	 */
+	public List<HarvestMessageDTO> getResultList() {
+		return resultList;
 	}
 }

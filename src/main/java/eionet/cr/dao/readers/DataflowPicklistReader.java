@@ -18,7 +18,7 @@
  * Contributor(s):
  * Jaanus Heinlaid, Tieto Eesti
  */
-package eionet.cr.search.util;
+package eionet.cr.dao.readers;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -29,6 +29,7 @@ import java.util.LinkedHashMap;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.dao.DAOException;
+import eionet.cr.search.util.UriLabelPair;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.sql.ConnectionUtil;
 import eionet.cr.util.sql.ResultSetBaseReader;

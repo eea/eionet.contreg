@@ -18,13 +18,13 @@
 * 
 * Contributor(s):
 * Jaanus Heinlaid, Tieto Eesti*/
-package eionet.cr.search.util;
+package eionet.cr.dao.readers;
 
 import java.util.Map;
 
 import eionet.cr.dto.SubjectDTO;
 
-public class SimpleSearchDataReader extends SubjectDataReader {
+public class FreeTextSearchDataReader extends SubjectDataReader {
 
 	/** */
 	private Map<Long,Long> hitSources;
@@ -33,7 +33,7 @@ public class SimpleSearchDataReader extends SubjectDataReader {
 	 * 
 	 * @param subjectsMap
 	 */
-	public SimpleSearchDataReader(Map<Long,SubjectDTO> subjectsMap, Map<Long,Long> hitSources){
+	public FreeTextSearchDataReader(Map<Long,SubjectDTO> subjectsMap, Map<Long,Long> hitSources){
 		
 		super(subjectsMap);
 		this.hitSources = hitSources;

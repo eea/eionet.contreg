@@ -34,12 +34,12 @@ import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.SearchDAO;
+import eionet.cr.dao.readers.FreeTextSearchDataReader;
+import eionet.cr.dao.readers.SubjectDataReader;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.util.BBOX;
 import eionet.cr.search.util.SearchExpression;
-import eionet.cr.search.util.SimpleSearchDataReader;
 import eionet.cr.search.util.SortOrder;
-import eionet.cr.search.util.SubjectDataReader;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
@@ -134,7 +134,7 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 				temp.put(subjectPair.getLeft(), null);
 				hitSources.put(subjectPair.getLeft(),subjectPair.getRight());
 			}
-			SubjectDataReader reader = new SimpleSearchDataReader(temp, hitSources);
+			SubjectDataReader reader = new FreeTextSearchDataReader(temp, hitSources);
 			executeQuery(getSubjectsDataQuery(temp.keySet()), null, reader);
 		}
 		logger.debug("subject data select query took " + (System.currentTimeMillis()-time) + " ms");

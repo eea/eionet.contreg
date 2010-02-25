@@ -32,7 +32,7 @@ import eionet.cr.common.Predicates;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
-import eionet.cr.search.util.DataflowPicklistReader;
+import eionet.cr.dao.readers.DataflowPicklistReader;
 import eionet.cr.web.util.ApplicationCache;
 
 /**

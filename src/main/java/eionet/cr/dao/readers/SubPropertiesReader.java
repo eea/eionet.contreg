@@ -18,37 +18,41 @@
  * Contributor(s):
  * Jaanus Heinlaid, Tieto Eesti
  */
-package eionet.cr.search.util;
+package eionet.cr.dao.readers;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Date;
-import java.util.Map;
 
-public class RecentUploadsHashesReader extends SubjectHashesReader {
+import eionet.cr.search.util.SubProperties;
+import eionet.cr.util.sql.ResultSetBaseReader;
+
+/**
+ * 
+ * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
+ *
+ */
+public class SubPropertiesReader extends ResultSetBaseReader{
 
 	/** */
-	private Map<Long,Date> firstSeenTimes;
-
+	private SubProperties subProperties;
+	
 	/**
 	 * 
-	 * @param firstSeenTimes
+	 * @param subProperties
 	 */
-	public RecentUploadsHashesReader(Map<Long,Date> firstSeenTimes){
+	public SubPropertiesReader(SubProperties subProperties) {
 		
-		super();
-		
-		if (firstSeenTimes==null)
+		if (subProperties==null)
 			throw new IllegalArgumentException();
-		this.firstSeenTimes = firstSeenTimes;
+
+		this.subProperties = subProperties;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * @see eionet.cr.search.util.SubjectHashesReader#readRow(java.sql.ResultSet)
+	 * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
 	 */
-	public void readRow(ResultSet rs) throws SQLException{
-		super.readRow(rs);
-		firstSeenTimes.put(Long.valueOf(rs.getLong("SUBJECT_HASH")), new Date(rs.getLong("FIRSTSEEN_TIME")));
+	public void readRow(ResultSet rs) throws SQLException {
+		subProperties.add(rs.getString("PREDICATE"), rs.getString("SUB_PROPERTY"));
 	}
 }

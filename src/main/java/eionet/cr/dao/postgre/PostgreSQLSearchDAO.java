@@ -38,12 +38,12 @@ import eionet.cr.dao.postgre.helpers.FilteredSearchHelper;
 import eionet.cr.dao.postgre.helpers.FreeTextSearchHelper;
 import eionet.cr.dao.postgre.helpers.ReferencesSearchHelper;
 import eionet.cr.dao.postgre.helpers.SpatialSearchHelper;
+import eionet.cr.dao.readers.FreeTextSearchDataReader;
+import eionet.cr.dao.readers.SubjectDataReader;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.search.util.BBOX;
 import eionet.cr.search.util.SearchExpression;
-import eionet.cr.search.util.SimpleSearchDataReader;
 import eionet.cr.search.util.SortOrder;
-import eionet.cr.search.util.SubjectDataReader;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
@@ -96,7 +96,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 			}
 			
 			// get the data of all found subjects, provide hit-sources to the reader
-			SubjectDataReader reader = new SimpleSearchDataReader(temp, hitSources);
+			SubjectDataReader reader = new FreeTextSearchDataReader(temp, hitSources);
 			executeQuery(getSubjectsDataQuery(temp.keySet()), null, reader);
 			
 			// get total number of found subjects, unless no paging required
