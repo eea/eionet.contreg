@@ -175,9 +175,10 @@ public class PostgreSQLPersister implements IHarvestPersister{
 			PostgreSQLDerivationEngine derivEngine = new PostgreSQLDerivationEngine(
 					sourceUrl, sourceUrlHash, genTime, connection);
 			if (config.isDeriveInferredTriples()){
-				derivEngine.deriveLabels();
+				
 				derivEngine.deriveParentClasses();
 				derivEngine.deriveParentProperties();
+				derivEngine.deriveLabels();
 			}
 			derivEngine.extractNewHarvestSources();
 			

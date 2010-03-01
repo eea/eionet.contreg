@@ -98,7 +98,8 @@ public class PostgreSQLDerivationEngine implements IDerivationEngine{
 		// Derive labels FROM freshly harvested source
 		
 		buf = new StringBuffer().
-		append("insert into SPO (SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, OBJECT_DOUBLE, ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG, ").
+		append("insert into SPO (").
+		append(" SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, OBJECT_DOUBLE, ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG, ").
 		append("OBJ_DERIV_SOURCE, OBJ_DERIV_SOURCE_GEN_TIME, OBJ_SOURCE_OBJECT, SOURCE, GEN_TIME) ").
 		append("select distinct SPO_ALL.SUBJECT, SPO_ALL.PREDICATE, SPO_FRESH.OBJECT, SPO_FRESH.OBJECT_HASH, ").
 		append("SPO_FRESH.OBJECT_DOUBLE, SPO_ALL.ANON_SUBJ, ").
@@ -106,13 +107,13 @@ public class PostgreSQLDerivationEngine implements IDerivationEngine{
 		append("SPO_FRESH.SOURCE as OBJ_DERIV_SOURCE, SPO_FRESH.GEN_TIME as OBJ_DERIV_SOURCE_GEN_TIME, ").
 		append("SPO_ALL.OBJECT_HASH as OBJ_SOURCE_OBJECT, SPO_ALL.SOURCE, SPO_ALL.GEN_TIME ").
 		append("from SPO as SPO_ALL, SPO as SPO_FRESH ").
-		append("where SPO_ALL.LIT_OBJ='N' and SPO_ALL.OBJECT_HASH=SPO_FRESH.SUBJECT and ").
-		append("SPO_FRESH.SOURCE=").append(sourceUrlHash).
+		append("where SPO_ALL.LIT_OBJ='N' and SPO_ALL.OBJECT_HASH=SPO_FRESH.SUBJECT").
+		append(" and SPO_FRESH.LIT_OBJ='Y' and SPO_FRESH.ANON_OBJ='N'").
+		append(" and SPO_FRESH.PREDICATE in (").append(LabelPredicates.getCommaSeparatedHashes()).append(")").
+		append(" and SPO_FRESH.SOURCE=").append(sourceUrlHash).
 		append(" and SPO_FRESH.GEN_TIME=").append(genTime).
-		append(" and SPO_FRESH.LIT_OBJ='Y' and SPO_FRESH.ANON_OBJ='N' and ").
-		append("SPO_FRESH.PREDICATE in (").
-		append(LabelPredicates.getCommaSeparatedHashes()).
-		append(")");
+		append(" and SPO_ALL.SOURCE<>").append(sourceUrlHash).
+		append(" and SPO_ALL.GEN_TIME<>").append(genTime);
 		
 		int j = SQLUtil.executeUpdate(buf.toString(), connection);
 		
@@ -158,10 +159,12 @@ public class PostgreSQLDerivationEngine implements IDerivationEngine{
 		append("from SPO, SPO as SPO_FRESH").
 		append(" where SPO.PREDICATE=").append(Hashes.spoHash(Predicates.RDF_TYPE)).
 		append(" and SPO.OBJECT_HASH=SPO_FRESH.SUBJECT").
+		append(" and SPO_FRESH.PREDICATE=").append(Hashes.spoHash(Predicates.RDFS_SUBCLASS_OF)). 
+		append(" and SPO_FRESH.LIT_OBJ='N' and SPO_FRESH.ANON_OBJ='N'").
 		append(" and SPO_FRESH.SOURCE=").append(sourceUrlHash).
 		append(" and SPO_FRESH.GEN_TIME=").append(genTime).
-		append(" and SPO_FRESH.PREDICATE=").append(Hashes.spoHash(Predicates.RDFS_SUBCLASS_OF)). 
-		append(" and SPO_FRESH.LIT_OBJ='N' and SPO_FRESH.ANON_OBJ='N'");
+		append(" and SPO.SOURCE<>").append(sourceUrlHash).
+		append(" and SPO.GEN_TIME<>").append(genTime);
 		
 		int j = SQLUtil.executeUpdate(buf.toString(), connection);
 		
@@ -204,10 +207,12 @@ public class PostgreSQLDerivationEngine implements IDerivationEngine{
 		append("SPO.ANON_SUBJ, SPO.ANON_OBJ, SPO.LIT_OBJ, SPO.OBJ_LANG, ").
 		append("SPO_FRESH.SOURCE as DERIV_SOURCE, SPO_FRESH.GEN_TIME as DERIV_SOURCE_GEN_TIME, SPO.SOURCE, SPO.GEN_TIME ").
 		append("from SPO, SPO as SPO_FRESH").
-		append(" where SPO_FRESH.SOURCE=").append(sourceUrlHash).
+		append(" where SPO_FRESH.PREDICATE=").append(Hashes.spoHash(Predicates.RDFS_SUBPROPERTY_OF)). 
+		append(" and SPO_FRESH.LIT_OBJ='N' and SPO_FRESH.ANON_OBJ='N' and SPO_FRESH.SUBJECT=SPO.PREDICATE").
+		append(" and SPO_FRESH.SOURCE=").append(sourceUrlHash).
 		append(" and SPO_FRESH.GEN_TIME=").append(genTime).
-		append(" and SPO_FRESH.PREDICATE=").append(Hashes.spoHash(Predicates.RDFS_SUBPROPERTY_OF)). 
-		append(" and SPO_FRESH.LIT_OBJ='N' and SPO_FRESH.ANON_OBJ='N' and SPO_FRESH.SUBJECT=SPO.PREDICATE");
+		append(" and SPO.SOURCE<>").append(sourceUrlHash).
+		append(" and SPO.GEN_TIME<>").append(genTime);
 		
 		int j = SQLUtil.executeUpdate(buf.toString(), connection);
 		

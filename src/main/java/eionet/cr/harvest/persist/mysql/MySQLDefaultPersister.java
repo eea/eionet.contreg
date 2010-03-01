@@ -254,9 +254,10 @@ public class MySQLDefaultPersister implements IHarvestPersister {
 			MySQLDerivationEngine derivEngine = new MySQLDerivationEngine(
 					sourceUrl, sourceUrlHash, genTime, connection);
 			if (config.isDeriveInferredTriples()){
-				derivEngine.deriveLabels();
+				
 				derivEngine.deriveParentClasses();
 				derivEngine.deriveParentProperties();
+				derivEngine.deriveLabels();
 			}
 			derivEngine.extractNewHarvestSources();
 			clearTemporaries();

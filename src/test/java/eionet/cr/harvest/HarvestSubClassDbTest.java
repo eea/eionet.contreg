@@ -38,6 +38,8 @@ import eionet.cr.test.helpers.CRDatabaseTestCase;
  * 
  */
 public class HarvestSubClassDbTest extends CRDatabaseTestCase {
+	
+	private static final String[] ignoreCols = {"SOURCE", "GEN_TIME"};
 
 	/*
 	 * (non-Javadoc)
@@ -104,6 +106,7 @@ public class HarvestSubClassDbTest extends CRDatabaseTestCase {
                     + " ORDER BY SUBJECT, PREDICATE, OBJECT");
 		ITable actSPOTable = queryDataSet.getTable("SPO");
 
+		queryDataSet = new QueryDataSet(getConnection());
 		queryDataSet.addTable("RESOURCE", "SELECT URI,URI_HASH FROM RESOURCE "
 				+ "WHERE URI NOT LIKE 'file:%' ORDER BY URI, URI_HASH");
 		ITable actResTable = queryDataSet.getTable("RESOURCE");
@@ -118,7 +121,7 @@ public class HarvestSubClassDbTest extends CRDatabaseTestCase {
 			ITable expResTable = expectedDataSet.getTable("RESOURCE");
 
 			// Assert that the actual SPO table matches the expected table
-			Assertion.assertEquals(expSpoTable, actSPOTable);
+			Assertion.assertEqualsIgnoreCols(expSpoTable, actSPOTable, ignoreCols);
 
 			// Assert that the actual RESOURCE table matches the expected table
 			Assertion.assertEquals(expResTable, actResTable);
