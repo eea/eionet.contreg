@@ -23,6 +23,7 @@ package eionet.cr.harvest;
 import java.io.FileOutputStream;
 import java.net.URL;
 
+import org.dbunit.Assertion;
 import org.dbunit.database.QueryDataSet;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.ITable;
@@ -117,10 +118,10 @@ public class HarvestSubClassDbTest extends CRDatabaseTestCase {
 			ITable expResTable = expectedDataSet.getTable("RESOURCE");
 
 			// Assert that the actual SPO table matches the expected table
-			assertEquals(expSpoTable, actSPOTable);
+			Assertion.assertEquals(expSpoTable, actSPOTable);
 
 			// Assert that the actual RESOURCE table matches the expected table
-			assertEquals(expResTable, actResTable);
+			Assertion.assertEquals(expResTable, actResTable);
 		}
 	}
 }

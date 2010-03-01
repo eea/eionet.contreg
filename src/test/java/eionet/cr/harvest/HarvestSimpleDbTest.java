@@ -23,6 +23,7 @@ package eionet.cr.harvest;
 import java.io.FileOutputStream;
 import java.net.URL;
 
+import org.dbunit.Assertion;
 import org.dbunit.database.QueryDataSet;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.ITable;
@@ -57,7 +58,7 @@ public class HarvestSimpleDbTest extends CRDatabaseTestCase {
 			
 			compareDatasets("simple-db.xml", false);
 		}
-		catch (Throwable e) {
+		catch (Exception e) {
 			e.printStackTrace();
 			fail("Was not expecting this exception: " + e.toString());
 		}
@@ -69,10 +70,10 @@ public class HarvestSimpleDbTest extends CRDatabaseTestCase {
 
 		try {
 			URL url = new URL("http://svn.eionet.europa.eu/repositories" +
-					"/Reportnet/cr2/trunk/src/test/resources/encoding-scheme-rdf.xml");
+			"/Reportnet/cr2/trunk/src/test/resources/encoding-scheme-rdf.xml");
 			Harvest harvest = new PullHarvest(url.toString(), null);
 			harvest.execute();
-			
+
 			// Fetch database data after executing your code.
 			QueryDataSet queryDataSet = new QueryDataSet(getConnection());
 			queryDataSet.addTable("SPO",
@@ -101,10 +102,10 @@ public class HarvestSimpleDbTest extends CRDatabaseTestCase {
 
 		try {
 			URL url = new URL("http://svn.eionet.europa.eu/repositories" +
-					"/Reportnet/cr2/trunk/src/test/resources/inline-rdf.xml");
+			"/Reportnet/cr2/trunk/src/test/resources/inline-rdf.xml");
 			Harvest harvest = new PullHarvest(url.toString(), null);
 			harvest.execute();
-			
+
 			compareDatasets("inline-db.xml", false);
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -117,23 +118,34 @@ public class HarvestSimpleDbTest extends CRDatabaseTestCase {
 	 * 
 	 * @param testData
 	 * @param dumpIt
-	 * @throws Exception
+	 * @throws Exception 
 	 */
-	private void compareDatasets(String testData, boolean dumpIt) throws Exception {
+	private void compareDatasets(String testData, boolean dumpIt) throws Exception{
 
 		// Fetch database data after executing your code.
 		QueryDataSet queryDataSet = new QueryDataSet(getConnection());
 		queryDataSet.addTable("SPO",
 			"SELECT DISTINCT SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ, "
-			+ "LIT_OBJ, OBJ_LANG, OBJ_DERIV_SOURCE, OBJ_SOURCE_OBJECT FROM SPO "
+			+ "LIT_OBJ, OBJ_LANG, OBJ_DERIV_SOURCE, OBJ_SOURCE_OBJECT, SOURCE, GEN_TIME FROM SPO "
                         + "WHERE PREDICATE NOT IN ( 8639511163630871821, 3296918264710147612, -2213704056277764256, 333311624525447614 )"
 			+ " ORDER BY SUBJECT, PREDICATE, OBJECT, OBJ_DERIV_SOURCE");
 		ITable actSPOTable = queryDataSet.getTable("SPO");
 
+		queryDataSet = new QueryDataSet(getConnection());
 		queryDataSet.addTable("RESOURCE", "SELECT URI,URI_HASH FROM RESOURCE "
 				+ "WHERE URI NOT LIKE 'file:%' ORDER BY URI, URI_HASH");
 		ITable actResTable = queryDataSet.getTable("RESOURCE");
 
+//		System.out.println("***********************************");
+//		int rowCount = actResTable.getRowCount();
+//		for (int i=0; i<rowCount; i++){
+//			Object uri = actResTable.getValue(i, "URI");
+//			Object uriHash = actResTable.getValue(i, "URI_HASH");
+//			System.out.println("uri: [" + uri.getClass().getSimpleName() + "] " + uri.toString());
+//			System.out.println("uriHash: [" + uriHash.getClass().getSimpleName() + "] " + uriHash.toString());
+//		}
+//		System.out.println("***********************************");
+		
 		if (dumpIt){
 			FlatXmlDataSet.write(queryDataSet, new FileOutputStream(testData));
 		}
@@ -144,10 +156,10 @@ public class HarvestSimpleDbTest extends CRDatabaseTestCase {
 			ITable expResTable = expectedDataSet.getTable("RESOURCE");
 
 			// Assert that the actual SPO table matches expected table.
-			assertEquals(expSpoTable, actSPOTable);
+			Assertion.assertEquals(expSpoTable, actSPOTable);
 
 			// Assert that the actual RESOURCE table matches expected table
-			assertEquals(expResTable, actResTable);
+			Assertion.assertEquals(expResTable, actResTable);
 		}
 	}
 }
