@@ -38,6 +38,7 @@ import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import eionet.cr.common.Predicates;
 import eionet.cr.dao.DAOException;
+import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
@@ -126,7 +127,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 		
 		populateSelectedFilters();
 		long startTime = System.currentTimeMillis();
-		Pair<Integer, List<SubjectDTO>> result = MySQLDAOFactory.get().getDao(SearchDAO.class)
+		Pair<Integer, List<SubjectDTO>> result = DAOFactory.get().getDao(SearchDAO.class)
 					.searchByFilters(
 							buildSearchCriteria(),
 							getLiteralEnabledFilters(),

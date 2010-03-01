@@ -21,56 +21,75 @@
 package eionet.cr.harvest;
 
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.net.URL;
 
-import org.dbunit.Assertion;
-import org.dbunit.DatabaseTestCase;
-import org.dbunit.database.DatabaseConnection;
-import org.dbunit.database.IDatabaseConnection;
 import org.dbunit.database.QueryDataSet;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.ITable;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.junit.Test;
 
-import eionet.cr.util.sql.ConnectionUtil;
+import eionet.cr.test.helpers.CRDatabaseTestCase;
 
 /**
  * 
  * @author roug
  * 
  */
-public class HarvestTaxonDbTest extends DatabaseTestCase {
+public class HarvestTaxonDbTest extends CRDatabaseTestCase {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.dbunit.DatabaseTestCase#getConnection()
+	 * @see eionet.cr.test.helpers.CRDatabaseTestCase#getDataSet()
 	 */
-	protected IDatabaseConnection getConnection() throws Exception {
-		ConnectionUtil.setReturnSimpleConnection(true);
-		return new DatabaseConnection(ConnectionUtil.getConnection());
+	protected IDataSet getDataSet() throws Exception {
+		return getXmlDataSet("emptydb.xml");
+	}
+
+	@Test
+	public void testTaxonUnderRdf() {
+
+		try {
+			URL url = new URL("http://svn.eionet.europa.eu/repositories/Reportnet/cr2/trunk/src/test/resources/taxon-under-rdf.xml");
+			Harvest harvest = new PullHarvest(url.toString(), null);
+			harvest.setDeriveInferredTriples(false);
+			harvest.execute();
+			assertEquals((int) 3, harvest.getDistinctSubjectsCount());
+			assertEquals((int) 22, harvest.getStoredTriplesCount());
+			compareDatasets("taxon-db.xml", true);
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+			fail("Was not expecting this exception: " + e.toString());
+		}
+	}
+
+	@Test
+	public void testTaxonOverRdf() {
+
+		try {
+			URL url = new URL("http://svn.eionet.europa.eu/repositories" +
+					"/Reportnet/cr2/trunk/src/test/resources/taxon-over-rdf.xml");
+			Harvest harvest = new PullHarvest(url.toString(), null);
+			harvest.setDeriveInferredTriples(false);
+			harvest.execute();
+			
+			assertEquals((int) 3, harvest.getDistinctSubjectsCount());
+			assertEquals((int) 22, harvest.getStoredTriplesCount());
+			
+			compareDatasets("taxon-db.xml", false);
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+			fail("Was not expecting this exception: " + e.toString());
+		}
 	}
 
 	/**
 	 * 
-	 * @param filename
-	 * @return
-	 */
-	private InputStream getFileAsStream(String filename) {
-		return this.getClass().getClassLoader().getResourceAsStream(filename);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.dbunit.DatabaseTestCase#getDataSet()
-	 */
-	protected IDataSet getDataSet() throws Exception {
-		return new FlatXmlDataSet(getFileAsStream("emptydb.xml"));
-	}
-
-	/*
-	 * 
+	 * @param testData
+	 * @param dumpIt
+	 * @throws Exception
 	 */
 	private void compareDatasets(String testData, boolean dumpIt) throws Exception {
 
@@ -86,57 +105,21 @@ public class HarvestTaxonDbTest extends DatabaseTestCase {
 		queryDataSet.addTable("RESOURCE",
                     "SELECT URI,URI_HASH FROM RESOURCE WHERE URI NOT LIKE 'http://svn.eionet%' ORDER BY URI, URI_HASH");
 		ITable actResTable = queryDataSet.getTable("RESOURCE");
-		if (dumpIt) {
+		
+		if (dumpIt){
 			FlatXmlDataSet.write(queryDataSet, new FileOutputStream(testData));
-		} else {
-
+		}
+		else{
 			// Load expected data from an XML dataset
-			IDataSet expectedDataSet = new FlatXmlDataSet(
-					getFileAsStream(testData));
+			IDataSet expectedDataSet = getXmlDataSet(testData);			
 			ITable expSpoTable = expectedDataSet.getTable("SPO");
 			ITable expResTable = expectedDataSet.getTable("RESOURCE");
 
-			// Assert actual SPO table matches expected table
-			Assertion.assertEquals(expSpoTable, actSPOTable);
+			// Assert that the actual SPO table matches the expected table
+			assertEquals(expSpoTable, actSPOTable);
 
-			// Assert actual Resource table matches expected table
-			Assertion.assertEquals(expResTable, actResTable);
+			// Assert that the actual Resource table matches the expected table
+			assertEquals(expResTable, actResTable);
 		}
 	}
-
-	@Test
-	public void testTaxonUnderRdf() {
-
-		try {
-			URL o = new URL("http://svn.eionet.europa.eu/repositories/Reportnet/cr2/trunk/src/test/resources/taxon-under-rdf.xml");
-			Harvest harvest = new PullHarvest(o.toString(), null);
-			harvest.setDeriveInferredTriples(false);
-			harvest.execute();
-			assertEquals((int) 3, harvest.getDistinctSubjectsCount());
-			assertEquals((int) 22, harvest.getStoredTriplesCount());
-			compareDatasets("taxon-db.xml", true);
-		} catch (Throwable e) {
-			e.printStackTrace();
-			fail("Was not expecting this exception: " + e.toString());
-		}
-
-	}
-
-	@Test
-	public void testTaxonOverRdf() {
-
-		try {
-			URL o = new URL("http://svn.eionet.europa.eu/repositories/Reportnet/cr2/trunk/src/test/resources/taxon-over-rdf.xml");
-			Harvest harvest = new PullHarvest(o.toString(), null);
-			harvest.setDeriveInferredTriples(false);
-			harvest.execute();
-			assertEquals((int) 3, harvest.getDistinctSubjectsCount());
-			assertEquals((int) 22, harvest.getStoredTriplesCount());
-			compareDatasets("taxon-db.xml", false);
-		} catch (Throwable e) {
-			e.printStackTrace();
-			fail("Was not expecting this exception: " + e.toString());
-		}
-	}
-
 }

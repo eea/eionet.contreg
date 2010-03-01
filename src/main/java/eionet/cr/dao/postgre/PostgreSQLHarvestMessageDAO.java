@@ -87,7 +87,7 @@ public class PostgreSQLHarvestMessageDAO extends PostgreSQLBaseDAO implements Ha
 		Connection conn = null;
 		try{
 			conn = getConnection();
-			return SQLUtil.executeUpdateReturnAutoKey(q_insertHarvestMessage, values, conn);
+			return SQLUtil.executeUpdateReturnAutoID(q_insertHarvestMessage, values, conn);
 		}
 		catch (Exception e){
 			throw new DAOException(e.getMessage(), e);

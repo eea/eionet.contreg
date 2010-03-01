@@ -21,65 +21,26 @@
 package eionet.cr.harvest;
 
 import java.net.URL;
-import java.sql.Connection;
 
-import org.dbunit.DBTestCase;
-import org.dbunit.DatabaseTestCase;
-import org.dbunit.database.DatabaseConnection;
-import org.dbunit.database.IDatabaseConnection;
 import org.dbunit.dataset.IDataSet;
-import org.dbunit.dataset.xml.FlatXmlDataSet;
-import org.dbunit.operation.DatabaseOperation;
 import org.junit.Test;
 
-import eionet.cr.util.sql.ConnectionUtil;
+import eionet.cr.test.helpers.CRDatabaseTestCase;
 
 /**
  * 
  * @author heinljab
  *
  */
-public class HarvestTest extends DatabaseTestCase{
-	
-	/**
-	 * 
-	 */
-	static{
-		ConnectionUtil.setReturnSimpleConnection(true);
-	}
+public class HarvestTest extends CRDatabaseTestCase{
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.dbunit.DBTestCase#getConnection()
-	 */
-	protected IDatabaseConnection getConnection() throws Exception {
-		Connection conn = ConnectionUtil.getConnection();
-		return new DatabaseConnection(ConnectionUtil.getConnection());
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.dbunit.DatabaseTestCase#getDataSet()
+	 * @see eionet.cr.test.helpers.CRDatabaseTestCase#getDataSet()
 	 */
 	protected IDataSet getDataSet() throws Exception {
-		return new FlatXmlDataSet(getClass().getClassLoader().getResourceAsStream("emptydb.xml"));
+		return getXmlDataSet("emptydb.xml");
 	}
-
-//	/*
-//	 * (non-Javadoc)
-//	 * @see org.dbunit.DatabaseTestCase#getSetUpOperation()
-//	 */
-//	protected DatabaseOperation getSetUpOperation() throws Exception{
-//		return DatabaseOperation.REFRESH;
-//	}
-//
-//	/*
-//	 * (non-Javadoc)
-//	 * @see org.dbunit.DatabaseTestCase#getTearDownOperation()
-//	 */
-//	protected DatabaseOperation getTearDownOperation()throws Exception{
-//		return DatabaseOperation.NONE;
-//	}
 
 	@Test
 	public void testHarvestFile(){
@@ -88,9 +49,9 @@ public class HarvestTest extends DatabaseTestCase{
 			URL o = getClass().getClassLoader().getResource("test-rdf.xml");
 			Harvest harvest = new PullHarvest(o.toString(), null);
 			harvest.execute();
-			assertEquals((int)11, harvest.getDistinctSubjectsCount());
-			assertEquals((int)48, harvest.getStoredTriplesCount());
 			
+			assertEquals((int)11, harvest.getDistinctSubjectsCount());
+			assertEquals((int)48, harvest.getStoredTriplesCount());			
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
@@ -98,33 +59,19 @@ public class HarvestTest extends DatabaseTestCase{
 		}
 	}
 
-//	@Test
-//	public void testHarvestURL(){
-//		
-//		try {
-//			Harvest harvest = new PullHarvest("http://dampos.eionet.europa.eu/dams.rdf", null);
-//			harvest.execute();
-//		}
-//		catch (Throwable e) {
-//			e.printStackTrace();
-//			fail("Was not expecting this exception: " + e.toString());			
-//		}
-//	}
-
 	@Test
 	public void testHarvestNonExistingURL(){
 		
-		ConnectionUtil.setReturnSimpleConnection(true);
-		
-		PullHarvest harvest = new PullHarvest("http://www.jaanusheinlaid.tw", null);
 		try {
+			PullHarvest harvest = new PullHarvest("http://www.jaanusheinlaid.tw", null);
 			harvest.execute();
+			
+			assertNotNull(harvest.getSourceAvailable());
+			assertFalse(harvest.getSourceAvailable().booleanValue());
 		}
 		catch (HarvestException e) {
 			e.printStackTrace();
 			fail("Was not expecting this exception: " + e.toString());
 		}
-		assertNotNull(harvest.getSourceAvailable());
-		assertFalse(harvest.getSourceAvailable().booleanValue());
 	}
 }

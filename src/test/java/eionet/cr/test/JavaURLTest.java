@@ -22,7 +22,13 @@ package eionet.cr.test;
 import java.net.URL;
 import junit.framework.TestCase;
 
+/**
+ * 
+ * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
+ *
+ */
 public class JavaURLTest extends TestCase {
+	
 	/**
 	 * This method tests the rdf:about="..." when the base URL ends with a "/"
 	 * @throws Exception

@@ -105,7 +105,7 @@ public class PostgreSQLHarvestDAO extends PostgreSQLBaseDAO implements HarvestDA
 		Connection conn = null;
 		try{
 			conn = getConnection();
-			return SQLUtil.executeUpdateReturnAutoKey(insertStartedHarvestSQL, values, conn);
+			return SQLUtil.executeUpdateReturnAutoID(insertStartedHarvestSQL, values, conn);
 		}
 		catch (Exception e){
 			throw new DAOException(e.getMessage(), e);

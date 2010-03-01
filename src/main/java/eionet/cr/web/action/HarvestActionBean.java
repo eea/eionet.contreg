@@ -28,6 +28,7 @@ import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import eionet.cr.dao.DAOException;
+import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dao.HarvestMessageDAO;
 import eionet.cr.dao.HarvestSourceDAO;
@@ -62,7 +63,7 @@ public class HarvestActionBean extends AbstractActionBean {
 	 */
 	@DontValidate
 	public Resolution unspecified() throws DAOException{
-		MySQLDAOFactory factory = MySQLDAOFactory.get();
+		DAOFactory factory = DAOFactory.get();
 		harvestDTO = factory.getDao(HarvestDAO.class).getHarvestById(harvestDTO.getHarvestId());
 		harvestSourceDTO = factory.getDao(HarvestSourceDAO.class).getHarvestSourceById(harvestDTO.getHarvestSourceId());
 		loadMessages();

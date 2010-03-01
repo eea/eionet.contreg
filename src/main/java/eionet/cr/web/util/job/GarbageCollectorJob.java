@@ -28,6 +28,7 @@ import org.quartz.JobExecutionException;
 import org.quartz.Scheduler;
 import org.quartz.StatefulJob;
 
+import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
 
@@ -66,7 +67,7 @@ public class GarbageCollectorJob implements StatefulJob {
 				return;
 			}
 			
-			HarvestSourceDAO harvestSourceDAO = MySQLDAOFactory.get().getDao(HarvestSourceDAO.class);
+			HarvestSourceDAO harvestSourceDAO = DAOFactory.get().getDao(HarvestSourceDAO.class);
 			harvestSourceDAO.deleteOrphanSources();
 			harvestSourceDAO.deleteHarvestHistory(NEEDED_TO_REMAIN);
 			logger.debug("garbage collector has finished its job");

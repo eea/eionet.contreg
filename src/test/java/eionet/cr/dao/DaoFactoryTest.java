@@ -29,7 +29,15 @@ import eionet.cr.dao.mysql.MySQLHarvestDAO;
 import eionet.cr.dao.mysql.MySQLHarvestMessageDAO;
 import eionet.cr.dao.mysql.MySQLHarvestSourceDAO;
 import eionet.cr.dao.mysql.MySQLHelperDAO;
+import eionet.cr.dao.mysql.MySQLSearchDAO;
 import eionet.cr.dao.mysql.MySQLUrgentHarvestQueueDAO;
+import eionet.cr.dao.postgre.PostgreSQLDAOFactory;
+import eionet.cr.dao.postgre.PostgreSQLHarvestDAO;
+import eionet.cr.dao.postgre.PostgreSQLHarvestMessageDAO;
+import eionet.cr.dao.postgre.PostgreSQLHarvestSourceDAO;
+import eionet.cr.dao.postgre.PostgreSQLHelperDAO;
+import eionet.cr.dao.postgre.PostgreSQLSearchDAO;
+import eionet.cr.dao.postgre.PostgreSQLUrgentHarvestQueueDAO;
 
 /**
  * Tests the factory getDao methods.
@@ -41,11 +49,22 @@ public class DaoFactoryTest extends TestCase {
 
 	@Test
 	public void testFactory() {
-		MySQLDAOFactory factory = MySQLDAOFactory.get();
+		
+		DAOFactory factory = MySQLDAOFactory.get();
 		assertTrue(factory.getDao(HarvestDAO.class) instanceof MySQLHarvestDAO);
 		assertTrue(factory.getDao(HarvestMessageDAO.class) instanceof MySQLHarvestMessageDAO);
 		assertTrue(factory.getDao(HarvestSourceDAO.class) instanceof MySQLHarvestSourceDAO);
 		assertTrue(factory.getDao(HelperDAO.class) instanceof MySQLHelperDAO);
+		assertTrue(factory.getDao(SearchDAO.class) instanceof MySQLSearchDAO);
 		assertTrue(factory.getDao(UrgentHarvestQueueDAO.class) instanceof MySQLUrgentHarvestQueueDAO);
+
+		
+		factory = PostgreSQLDAOFactory.get();
+		assertTrue(factory.getDao(HarvestDAO.class) instanceof PostgreSQLHarvestDAO);
+		assertTrue(factory.getDao(HarvestMessageDAO.class) instanceof PostgreSQLHarvestMessageDAO);
+		assertTrue(factory.getDao(HarvestSourceDAO.class) instanceof PostgreSQLHarvestSourceDAO);
+		assertTrue(factory.getDao(HelperDAO.class) instanceof PostgreSQLHelperDAO);
+		assertTrue(factory.getDao(SearchDAO.class) instanceof PostgreSQLSearchDAO);
+		assertTrue(factory.getDao(UrgentHarvestQueueDAO.class) instanceof PostgreSQLUrgentHarvestQueueDAO);
 	}
 }

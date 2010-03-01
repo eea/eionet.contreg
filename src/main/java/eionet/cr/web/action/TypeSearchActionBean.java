@@ -43,6 +43,7 @@ import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.dao.DAOException;
+import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
@@ -249,7 +250,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 				}
 				
 				Pair<Integer, List<SubjectDTO>> customSearch =
-					MySQLDAOFactory.get().getDao(SearchDAO.class).searchByFilters(
+					DAOFactory.get().getDao(SearchDAO.class).searchByFilters(
 									criteria,
 									null,
 									PagingRequest.create(getPageN()),
@@ -449,7 +450,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 			
 			Map<String,String> result = new LinkedHashMap<String,String>();
 			
-			List<SubjectDTO> usedPredicates = MySQLDAOFactory.get().getDao(
+			List<SubjectDTO> usedPredicates = DAOFactory.get().getDao(
 					HelperDAO.class).getPredicatesUsedForType(type);
 
 			result.put(Predicates.RDFS_LABEL, "Title");

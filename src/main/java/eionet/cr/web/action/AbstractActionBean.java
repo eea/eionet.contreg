@@ -42,6 +42,7 @@ import org.apache.commons.logging.LogFactory;
 
 import eionet.cr.common.CRException;
 import eionet.cr.config.GeneralConfig;
+import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.harvest.CurrentHarvests;
 import eionet.cr.harvest.Harvest;
@@ -76,7 +77,7 @@ public abstract class AbstractActionBean implements ActionBean {
 	private Harvest currentHarvest = CurrentHarvests.getQueuedHarvest();//HarvestingJob.getCurrentHarvest();
 	
 	/** */
-	protected MySQLDAOFactory factory = MySQLDAOFactory.get();
+	protected DAOFactory factory = DAOFactory.get();
 	
 	/** */
 	private HashSet<String> acceptedLanguages;

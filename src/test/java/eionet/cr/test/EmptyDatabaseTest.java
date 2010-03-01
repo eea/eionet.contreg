@@ -18,47 +18,36 @@
 * 
 * Contributor(s):
 * Jaanus Heinlaid, Tieto Eesti*/
-package eionet.cr.harvest;
-
-import java.sql.Connection;
+package eionet.cr.test;
 
 import org.dbunit.DatabaseTestCase;
-import org.dbunit.database.DatabaseConnection;
 import org.dbunit.database.IDatabaseConnection;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
-import org.dbunit.operation.DatabaseOperation;
-import org.junit.Test;
 
-import eionet.cr.test.helpers.CRDatabaseTestCase;
-import eionet.cr.util.sql.ConnectionUtil;
+import eionet.cr.test.helpers.dbunit.DbUnitDatabaseConnection;
 
 /**
  * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class InstantHarvestTest extends CRDatabaseTestCase{
+public class EmptyDatabaseTest extends DatabaseTestCase{
 
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.test.helpers.CRDatabaseTestCase#getDataSet()
-	 */
-	protected IDataSet getDataSet() throws Exception {
-		return getXmlDataSet("emptydb.xml");
+	@Override
+	protected IDatabaseConnection getConnection() throws Exception {
+		return DbUnitDatabaseConnection.get();
 	}
 
-	@Test
-	public void testInstantHarvest(){
-		
-		try{
-			InstantHarvest instantHarvest = new InstantHarvest(
-					"http://rod.eionet.europa.eu/obligations", null, "guest");
-			instantHarvest.execute();
-		}
-		catch (Throwable e) {
-			e.printStackTrace();
-			fail("Was not expecting this exception: " + e.toString());			
-		}
+	@Override
+	protected IDataSet getDataSet() throws Exception {
+		return new FlatXmlDataSet(
+				getClass().getClassLoader().getResourceAsStream("emptydb.xml"));
+	}
+
+	/**
+	 * Just a dummy test to simplet clean the database. 
+	 */
+	public void testMe(){
 	}
 }

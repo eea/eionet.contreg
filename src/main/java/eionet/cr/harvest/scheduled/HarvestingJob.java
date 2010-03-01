@@ -41,6 +41,7 @@ import org.quartz.StatefulJob;
 import eionet.cr.common.JobScheduler;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
+import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.HarvestSourceDTO;
@@ -118,7 +119,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 	 * deletes all sources, which are queued for deletion.
 	 */
 	private void deleteSourcesQueuedForRemoval() throws DAOException {
-		HarvestSourceDAO sourceDao = MySQLDAOFactory.get().getDao(HarvestSourceDAO.class); 
+		HarvestSourceDAO sourceDao = DAOFactory.get().getDao(HarvestSourceDAO.class); 
 		List<String> doomed = sourceDao.getScheduledForDeletion();
 		if (doomed != null && !doomed.isEmpty()) {
 			for (String url : doomed) {
@@ -139,7 +140,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 		if (isBatchHarvestingEnabled()){
 			
 			int numOfSegments = getNumberOfSegments();
-			batchHarvestingQueue = MySQLDAOFactory.get().getDao(HarvestSourceDAO.class).getNextScheduledSources(numOfSegments);
+			batchHarvestingQueue = DAOFactory.get().getDao(HarvestSourceDAO.class).getNextScheduledSources(numOfSegments);
 			
 			logger.debug(batchHarvestingQueue.size() + " sources added to batch harvesting queue (numOfSegments=" + numOfSegments + ")");
 		}

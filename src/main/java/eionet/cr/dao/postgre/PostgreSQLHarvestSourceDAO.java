@@ -182,23 +182,36 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
 	public Integer addSource(HarvestSourceDTO source, String user) throws DAOException {
 		
 		Integer harvestSourceID = null;
-    	
+
+		long urlHash = 0;
 		String url = source.getUrl();
 		if (url!=null){
 			url = StringUtils.substringBefore(url, "#"); // harvest sources where URL has fragment part, are not allowed
+			urlHash = Hashes.spoHash(url);
 		}
 		
     	List<Object> values = new ArrayList<Object>();
 		values.add(url);
-		values.add(Hashes.spoHash(url));
+		values.add(Long.valueOf(urlHash));
 		values.add(source.getEmails());
 		values.add(source.getIntervalMinutes());
 		values.add(YesNoBoolean.format(source.isTrackedFile()));
 		
 		Connection conn = null;
 		try{
+			// execute the insert statement
 			conn = getConnection();
-			return SQLUtil.executeUpdateReturnAutoKey(addSourceSQL, values, conn);
+			SQLUtil.executeUpdate(addSourceSQL, values, conn);
+			
+			// Get the freshly inserted record's ID.
+			// We are not using SQLUtil.executeUpdateReturnAutoID(), because in PostgreSQL one
+			// cannot use INSERT RETURNING on a table which has a conditional
+			// ON INSERT DO INSTEAD rule. And on HARVEST_SOURCE we have exactly such a rule.
+			// There should be no performance problems, as this method is expected to be called
+			// by human action only (i.e. adding a new source via web interface).
+			Object o = SQLUtil.executeSingleReturnValueQuery(
+					"select HARVEST_SOURCE_ID from HARVEST_SOURCE where URL_HASH="+urlHash, conn);
+			return o==null ? null : Integer.valueOf(o.toString());
 		}
 		catch (Exception e){
 			throw new DAOException(e.getMessage(), e);
@@ -262,7 +275,7 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
 			
 			// get ID of the harvest source identified by the given URL
 			List<Long> sourceIds = executeQuery(
-					"select HARVEST_SOURCE_ID from HARVEST_SOURCE where URL = ?",
+					"select HARVEST_SOURCE_ID from HARVEST_SOURCE where URL_HASH = ?",
 					hashList,
 					new SingleObjectReader<Long>());
 			String harvestSourceIdsCSV = Util.toCSV(sourceIds);
@@ -308,7 +321,7 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
 
 	/** */
 	private static final String editSourceSQL = "update HARVEST_SOURCE set URL=?," +
-			" EMAILS=?,INTERVAL_MINUTES=? where HARVEST_SOURCE_ID=?";
+			" URL_HASH=?, EMAILS=?,INTERVAL_MINUTES=? where HARVEST_SOURCE_ID=?";
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.dao.HarvestSourceDAO#editSource(eionet.cr.dto.HarvestSourceDTO)
@@ -317,6 +330,7 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
 		
 		List<Object> values = new ArrayList<Object>();
 		values.add(source.getUrl());
+		values.add(Long.valueOf(source.getUrl()==null ? 0 : Hashes.spoHash(source.getUrl())));
 		values.add(source.getEmails());
 		values.add(source.getIntervalMinutes());
 		values.add(source.getSourceId());

@@ -171,7 +171,7 @@ public class SQLUtil {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static int executeUpdateReturnAutoKey(String parameterizedSQL,
+	public static int executeUpdateReturnAutoID(String parameterizedSQL,
 			List<?> values, Connection conn) throws CRException{
 		
 		PreparedStatement pstmt = null;

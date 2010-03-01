@@ -27,6 +27,7 @@ import java.util.Date;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.dao.DAOException;
+import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
@@ -84,7 +85,7 @@ public class InstantHarvest extends PullHarvest{
 	 */
 	public static InstantHarvest createFullSetup(String sourceUrl, String userName) throws DAOException{
 		
-		HarvestSourceDTO dto = MySQLDAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(sourceUrl);
+		HarvestSourceDTO dto = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(sourceUrl);
 		InstantHarvest instantHarvest = new InstantHarvest(sourceUrl, null, userName);
 		
 		int numOfResources = dto.getResources()==null ? 0 : dto.getResources().intValue();

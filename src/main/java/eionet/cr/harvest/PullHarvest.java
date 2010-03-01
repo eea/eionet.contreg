@@ -43,6 +43,7 @@ import org.xml.sax.SAXException;
 import eionet.cr.common.Predicates;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
+import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
@@ -153,7 +154,7 @@ public class PullHarvest extends Harvest{
 					logger.debug(sourceNotExistMessage + ", going to delete the source");
 					try {
 						daoWriter = null; // we dont't want finishing actions to be done
-						MySQLDAOFactory.get().getDao(HarvestSourceDAO.class).queueSourcesForDeletion(Collections.singletonList(sourceUrlString));
+						DAOFactory.get().getDao(HarvestSourceDAO.class).queueSourcesForDeletion(Collections.singletonList(sourceUrlString));
 					}
 					catch (DAOException e){
 						logger.warn("Failure when deleting the source", e);
@@ -485,7 +486,8 @@ public class PullHarvest extends Harvest{
 	 */
 	public static PullHarvest createFullSetup(String sourceUrl, boolean urgent) throws DAOException{
 		
-		return createFullSetup(MySQLDAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(sourceUrl), urgent);
+		return createFullSetup(DAOFactory.get().getDao(
+				HarvestSourceDAO.class).getHarvestSourceByUrl(sourceUrl), urgent);
 	}
 	
 	/**

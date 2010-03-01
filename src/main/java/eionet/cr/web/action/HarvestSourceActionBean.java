@@ -36,6 +36,7 @@ import net.sourceforge.stripes.validation.SimpleError;
 import org.quartz.SchedulerException;
 
 import eionet.cr.dao.DAOException;
+import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
@@ -174,7 +175,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
      */
     private void populateSampleTriples() throws DAOException{
     	Pair<Integer, List<RawTripleDTO>> temp =
-    		MySQLDAOFactory.get().getDao(HelperDAO.class).getSampleTriples(
+    		DAOFactory.get().getDao(HelperDAO.class).getSampleTriples(
     				harvestSource.getUrl(), 10);
     	noOfResources = temp.getLeft();
     	sampleTriples = temp.getRight();

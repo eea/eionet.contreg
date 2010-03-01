@@ -20,12 +20,12 @@
  */
 package eionet.cr.dao;
 
-import static eionet.cr.dao.mysql.MySQLDAOFactory.get;
-
 import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.dbunit.DatabaseTestCase;
+import org.dbunit.database.IDatabaseConnection;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.junit.Test;
@@ -33,7 +33,10 @@ import org.junit.Test;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dto.HarvestMessageDTO;
 import eionet.cr.dto.HarvestSourceDTO;
-import eionet.cr.test.util.DbHelper;
+import eionet.cr.test.helpers.CRDatabaseTestCase;
+import eionet.cr.test.helpers.DbHelper;
+import eionet.cr.test.helpers.dbunit.DbUnitDatabaseConnection;
+import eionet.cr.util.Hashes;
 import eionet.cr.util.sql.ConnectionUtil;
 
 /**
@@ -42,79 +45,60 @@ import eionet.cr.util.sql.ConnectionUtil;
  * @author altnyris
  *
  */
-public class HarvestMessageDAOTest extends TestCase {
-	
-	/**
-	 * Provide a connection to the database.
-	 */
-	public HarvestMessageDAOTest(String name)
-	{
-		super( name );
-		DbHelper.createConnectionPropertiesInSystem();
-	}
-	/**
-	 * Load the data which will be inserted for the test
+public class HarvestMessageDAOTest extends CRDatabaseTestCase {
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.dbunit.DatabaseTestCase#getDataSet()
 	 */
 	protected IDataSet getDataSet() throws Exception {
-		IDataSet loadedDataSet = new FlatXmlDataSet(
-				getClass().getClassLoader().getResourceAsStream(GeneralConfig.SEED_FILE_NAME));
-		return loadedDataSet;
+		return getXmlDataSet("sources-harvests-messages.xml");
 	}
 	
 	@Test
-	public void testInsertHarvestMessage() throws Exception {
+	public void testInsertAndFindHarvestMessage() throws Exception {
+		
 		HarvestMessageDTO harvestMessage = new HarvestMessageDTO();
 		harvestMessage.setHarvestId(55);
 		harvestMessage.setMessage("test");
 		harvestMessage.setStackTrace("teststack");
 		harvestMessage.setType("01");
 		
-		ConnectionUtil.setReturnSimpleConnection(true);
-		Integer messageID = get().getDao(HarvestMessageDAO.class).insertHarvestMessage(harvestMessage);
+		HarvestMessageDAO dao = DAOFactory.get().getDao(HarvestMessageDAO.class);
+		Integer messageID = dao.insertHarvestMessage(harvestMessage);
 		assertNotNull(messageID);
+		
+		harvestMessage = dao.findHarvestMessageByMessageID(messageID.intValue());
+		assertEquals(messageID, harvestMessage.getHarvestMessageId());
 	}
 	
 	@Test
 	public void testFindHarvestMessagesByHarvestID() throws Exception {
 		
-		ConnectionUtil.setReturnSimpleConnection(true);
-		List<HarvestMessageDTO> messages = get().getDao(HarvestMessageDAO.class).findHarvestMessagesByHarvestID(121);
+		List<HarvestMessageDTO> messages = DAOFactory.get().getDao(HarvestMessageDAO.class).findHarvestMessagesByHarvestID(121);
 		assertEquals(2, messages.size());
-		
 	}
 	
 	@Test
-	public void testFindHarvestMessageByMessageID() throws Exception {
-		
-		ConnectionUtil.setReturnSimpleConnection(true);
-		HarvestMessageDTO message = get().getDao(HarvestMessageDAO.class).findHarvestMessageByMessageID(4);
-		assertEquals(new Integer(121), message.getHarvestId());
-		assertEquals("ERROR", message.getMessage());
-		assertEquals("Stack Trace: whatever", message.getStackTrace());
-		assertEquals("err", message.getType());
-	}
-		
-	@Test
 	public void testDeleteMessage() throws Exception {
 
-		ConnectionUtil.setReturnSimpleConnection(true);
-		get().getDao(HarvestMessageDAO.class).deleteMessage(5);
-		
-		HarvestMessageDTO message = get().getDao(HarvestMessageDAO.class).findHarvestMessageByMessageID(5);
+		DAOFactory.get().getDao(HarvestMessageDAO.class).deleteMessage(5);
+		HarvestMessageDTO message = DAOFactory.get().getDao(HarvestMessageDAO.class).findHarvestMessageByMessageID(5);
 		assertNull(message);
 	}
 	
 	@Test
 	public void testInsertSource() throws Exception {
-		ConnectionUtil.setReturnSimpleConnection(true);
+		
 		HarvestSourceDTO dto = new HarvestSourceDTO();
 		dto.setUrl("http://1.ee");
 		dto.setEmails("emails");
 		dto.setIntervalMinutes(1);
 		dto.setTrackedFile(true);
-		Integer id = get().getDao(HarvestSourceDAO.class).addSource(dto, "user");
+		
+		Integer id = DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(dto, "user");
 		assertNotNull(id);
-		get().getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(dto, "user");
+		
+		DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(dto, "user");
 	}
-
 }

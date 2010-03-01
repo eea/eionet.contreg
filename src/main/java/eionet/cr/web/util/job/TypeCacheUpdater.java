@@ -34,6 +34,7 @@ import org.quartz.StatefulJob;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.dao.DAOException;
+import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.SubjectDTO;
@@ -61,7 +62,7 @@ public class TypeCacheUpdater implements StatefulJob {
 			Map<String,String> criteria = new HashMap<String,String>();
 			criteria.put(Predicates.RDF_TYPE, Subjects.RDFS_CLASS);
 
-			Pair<Integer, List<SubjectDTO>> customSearch = MySQLDAOFactory.get()
+			Pair<Integer, List<SubjectDTO>> customSearch = DAOFactory.get()
 					.getDao(SearchDAO.class)
 					.searchByFilters(
 							criteria,

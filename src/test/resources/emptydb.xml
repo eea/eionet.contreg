@@ -1,10 +1,13 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <dataset>
-  <SPO/>
-  <RESOURCE/>
-  <RESOURCE_TEMP/>
-  <SPO_TEMP/>
+  <HARVEST/>
+  <HARVEST_MESSAGE/>
   <HARVEST_SOURCE/>
   <REMOVE_SOURCE_QUEUE/>
+  <RESOURCE/>
+  <RESOURCE_TEMP/>
+  <SPO/>
+  <SPO_TEMP/>
   <UNFINISHED_HARVEST/>
+  <URGENT_HARVEST_QUEUE/>
 </dataset>

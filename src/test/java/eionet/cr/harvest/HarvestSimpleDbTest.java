@@ -21,44 +21,107 @@
 package eionet.cr.harvest;
 
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.net.URL;
 
-import org.dbunit.Assertion;
-import org.dbunit.DatabaseTestCase;
-import org.dbunit.database.DatabaseConnection;
-import org.dbunit.database.IDatabaseConnection;
 import org.dbunit.database.QueryDataSet;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.ITable;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.junit.Test;
 
-import eionet.cr.util.sql.ConnectionUtil;
+import eionet.cr.test.helpers.CRDatabaseTestCase;
 
 /**
  * 
  * @author roug
  * 
  */
-public class HarvestSimpleDbTest extends DatabaseTestCase {
+public class HarvestSimpleDbTest extends CRDatabaseTestCase {
 
-	protected IDatabaseConnection getConnection() throws Exception {
-		ConnectionUtil.setReturnSimpleConnection(true);
-		return new DatabaseConnection(ConnectionUtil.getConnection());
-	}
-
-	private InputStream getFileAsStream(String filename) {
-		return this.getClass().getClassLoader().getResourceAsStream(filename);
-	}
-
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.test.helpers.CRDatabaseTestCase#getDataSet()
+	 */
 	protected IDataSet getDataSet() throws Exception {
-		return new FlatXmlDataSet(getFileAsStream("emptydb.xml"));
+		return getXmlDataSet("emptydb.xml");
 	}
 
+	@Test
+	public void testSimpleRdf() {
+
+		try {
+			URL url = new URL("http://svn.eionet.europa.eu/repositories" +
+					"/Reportnet/cr2/trunk/src/test/resources/simple-rdf.xml");
+			Harvest harvest = new PullHarvest(url.toString(), null);
+			harvest.execute();
+			
+			compareDatasets("simple-db.xml", false);
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+			fail("Was not expecting this exception: " + e.toString());
+		}
+
+	}
+
+	@Test
+	public void testEncodingRdf() {
+
+		try {
+			URL url = new URL("http://svn.eionet.europa.eu/repositories" +
+					"/Reportnet/cr2/trunk/src/test/resources/encoding-scheme-rdf.xml");
+			Harvest harvest = new PullHarvest(url.toString(), null);
+			harvest.execute();
+			
+			// Fetch database data after executing your code.
+			QueryDataSet queryDataSet = new QueryDataSet(getConnection());
+			queryDataSet.addTable("SPO",
+					"SELECT SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ,"
+					+ " LIT_OBJ, OBJ_LANG, OBJ_DERIV_SOURCE FROM SPO"
+					+ " WHERE SUBJECT=-1142222056026225699 AND PREDICATE=6813166255579199724 AND OBJECT='2009-04-09'"
+					+ " ORDER BY SUBJECT, PREDICATE, OBJECT, OBJ_DERIV_SOURCE");
+			ITable actSPOTable = queryDataSet.getTable("SPO");
+
+			// Load expected data from XML dataset.
+			IDataSet expectedDataSet = getXmlDataSet("encoding-scheme-db.xml");
+			ITable expSpoTable = expectedDataSet.getTable("SPO");
+
+			// Assert that the actual SPO table matches expected table.
+			assertEquals(expSpoTable, actSPOTable);
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+			fail("Was not expecting this exception: " + e.toString());
+		}
+
+	}
+
+	@Test
+	public void testInlineRdf() {
+
+		try {
+			URL url = new URL("http://svn.eionet.europa.eu/repositories" +
+					"/Reportnet/cr2/trunk/src/test/resources/inline-rdf.xml");
+			Harvest harvest = new PullHarvest(url.toString(), null);
+			harvest.execute();
+			
+			compareDatasets("inline-db.xml", false);
+		} catch (Throwable e) {
+			e.printStackTrace();
+			fail("Was not expecting this exception: " + e.toString());
+		}
+
+	}
+
+	/**
+	 * 
+	 * @param testData
+	 * @param dumpIt
+	 * @throws Exception
+	 */
 	private void compareDatasets(String testData, boolean dumpIt) throws Exception {
 
-		// Fetch database data after executing your code
+		// Fetch database data after executing your code.
 		QueryDataSet queryDataSet = new QueryDataSet(getConnection());
 		queryDataSet.addTable("SPO",
 			"SELECT DISTINCT SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ, "
@@ -71,86 +134,20 @@ public class HarvestSimpleDbTest extends DatabaseTestCase {
 				+ "WHERE URI NOT LIKE 'file:%' ORDER BY URI, URI_HASH");
 		ITable actResTable = queryDataSet.getTable("RESOURCE");
 
-		if ( dumpIt) {
+		if (dumpIt){
 			FlatXmlDataSet.write(queryDataSet, new FileOutputStream(testData));
-		} else {
-		// Load expected data from an XML dataset
-		IDataSet expectedDataSet = new FlatXmlDataSet(
-				getFileAsStream(testData));
-		ITable expSpoTable = expectedDataSet.getTable("SPO");
-		ITable expResTable = expectedDataSet.getTable("RESOURCE");
+		}
+		else{
+			// Load the expected data from an XML dataset.
+			IDataSet expectedDataSet = getXmlDataSet(testData);
+			ITable expSpoTable = expectedDataSet.getTable("SPO");
+			ITable expResTable = expectedDataSet.getTable("RESOURCE");
 
-		// Assert actual SPO table matches expected table
-		Assertion.assertEquals(actSPOTable, expSpoTable);
+			// Assert that the actual SPO table matches expected table.
+			assertEquals(expSpoTable, actSPOTable);
 
-		// Assert actual Resource table matches expected table
-		Assertion.assertEquals(actResTable, expResTable);
+			// Assert that the actual RESOURCE table matches expected table
+			assertEquals(expResTable, actResTable);
 		}
 	}
-
-
-	@Test
-	public void testSimpleRdf() {
-
-		try {
-//			URL o = getClass().getClassLoader().getResource("simple-rdf.xml");
-			URL o = new URL("http://svn.eionet.europa.eu/repositories/Reportnet/cr2/trunk/src/test/resources/simple-rdf.xml");
-			Harvest harvest = new PullHarvest(o.toString(), null);
-			harvest.execute();
-			compareDatasets("simple-db.xml", false);
-		} catch (Throwable e) {
-			e.printStackTrace();
-			fail("Was not expecting this exception: " + e.toString());
-		}
-
-	}
-
-	@Test
-	public void testEncodingRdf() {
-
-		try {
-//			URL o = getClass().getClassLoader().getResource("encoding-scheme-rdf.xml");
-			URL o = new URL("http://svn.eionet.europa.eu/repositories/Reportnet/cr2/trunk/src/test/resources/encoding-scheme-rdf.xml");
-			Harvest harvest = new PullHarvest(o.toString(), null);
-			harvest.execute();
-                        // Fetch database data after executing your code
-                        QueryDataSet queryDataSet = new QueryDataSet(getConnection());
-                        queryDataSet.addTable("SPO",
-                                "SELECT SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ,"
-                                + " LIT_OBJ, OBJ_LANG, OBJ_DERIV_SOURCE FROM SPO"
-                                + " WHERE SUBJECT=-1142222056026225699 AND PREDICATE=6813166255579199724 AND OBJECT='2009-04-09'"
-                                + " ORDER BY SUBJECT, PREDICATE, OBJECT, OBJ_DERIV_SOURCE");
-                        ITable actSPOTable = queryDataSet.getTable("SPO");
-
-//			FlatXmlDataSet.write(queryDataSet, new FileOutputStream("encoding-scheme-db.xml"));
-                        // Load expected data from an XML dataset
-                        IDataSet expectedDataSet = new FlatXmlDataSet(
-                                        getFileAsStream("encoding-scheme-db.xml"));
-                        ITable expSpoTable = expectedDataSet.getTable("SPO");
-
-                        // Assert actual SPO table matches expected table
-                        Assertion.assertEquals(expSpoTable, actSPOTable);
-		} catch (Throwable e) {
-			e.printStackTrace();
-			fail("Was not expecting this exception: " + e.toString());
-		}
-
-	}
-
-	@Test
-	public void testInlineRdf() {
-
-		try {
-//			URL o = getClass().getClassLoader().getResource("inline-rdf.xml");
-			URL o = new URL("http://svn.eionet.europa.eu/repositories/Reportnet/cr2/trunk/src/test/resources/inline-rdf.xml");
-			Harvest harvest = new PullHarvest(o.toString(), null);
-			harvest.execute();
-			compareDatasets("inline-db.xml", false);
-		} catch (Throwable e) {
-			e.printStackTrace();
-			fail("Was not expecting this exception: " + e.toString());
-		}
-
-	}
-
 }

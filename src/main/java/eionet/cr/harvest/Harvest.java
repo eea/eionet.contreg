@@ -35,6 +35,7 @@ import com.hp.hpl.jena.rdf.arp.ARP;
 import eionet.cr.common.CRRuntimeException;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
+import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.HarvestDTO;
 import eionet.cr.dto.SubjectDTO;
@@ -94,7 +95,7 @@ public abstract class Harvest {
 	protected boolean rdfContentFound = false;
 	
 	/** */
-	protected MySQLDAOFactory daoFactory = MySQLDAOFactory.get();
+	protected DAOFactory daoFactory = DAOFactory.get();
 	
 	/**
 	 * 

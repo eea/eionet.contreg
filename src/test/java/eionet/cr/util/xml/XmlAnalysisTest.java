@@ -38,7 +38,8 @@ public class XmlAnalysisTest extends TestCase{
 		
 		XmlAnalysis xmlAnalysis = new XmlAnalysis();
 		try{
-			xmlAnalysis.parse(new File(this.getClass().getClassLoader().getResource("test-xml.xml").getFile()));
+			xmlAnalysis.parse(
+					new File(getClass().getClassLoader().getResource("test-xml.xml").getFile()));
 		}
 		catch (Throwable t){
 			t.printStackTrace();

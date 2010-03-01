@@ -565,16 +565,12 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 			append("left join RESOURCE as SRC_RESOURCE on (SOURCE=SRC_RESOURCE.URI_HASH) ").
 			append("left join RESOURCE as DSRC_RESOURCE on (OBJ_DERIV_SOURCE=DSRC_RESOURCE.URI_HASH) ").
 		append("where ").
-			append("SPO.SOURCE=?");
+			append("SPO.SOURCE=").append(Hashes.spoHash(url));
+		
 		String queryWithoutLimit = buf.toString();
-		buf.append(" LIMIT 0, ?");
+		buf.append(" LIMIT ").append(Math.max(1, limit));
 		
-		List<Object> params = new LinkedList<Object>();
-		params.add(Hashes.spoHash(url));
-		params.add(limit);
-		
-		//Pair<Integer,List<RawTripleDTO>>
-		List<RawTripleDTO> list = executeQuery(buf.toString(), params,
+		List<RawTripleDTO> list = executeQuery(buf.toString(), new LinkedList<Object>(),
 				new ResultSetListReader<RawTripleDTO>(){
 
 					private List<RawTripleDTO> resultList = new LinkedList<RawTripleDTO>();
@@ -595,7 +591,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 					}
 				});
 		
-		if (list!=null && !list.isEmpty()){
+		if (list==null || list.isEmpty()){
 			return new Pair<Integer, List<RawTripleDTO>>(0, new LinkedList<RawTripleDTO>());
 		}
 		else{

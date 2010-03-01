@@ -21,92 +21,39 @@
 package eionet.cr.harvest;
 
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.net.URL;
 
-import org.dbunit.Assertion;
-import org.dbunit.DatabaseTestCase;
-import org.dbunit.database.DatabaseConnection;
-import org.dbunit.database.IDatabaseConnection;
 import org.dbunit.database.QueryDataSet;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.ITable;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.junit.Test;
 
-import eionet.cr.util.sql.ConnectionUtil;
+import eionet.cr.test.helpers.CRDatabaseTestCase;
 
-public class HarvestSubPropertyTest extends DatabaseTestCase {
-	protected IDatabaseConnection getConnection() throws Exception {
-		ConnectionUtil.setReturnSimpleConnection(true);
-		return new DatabaseConnection(ConnectionUtil.getConnection());
-	}
-
-	/**
-	 * 
-	 * @param filename
-	 * @return
-	 */
-	private InputStream getFileAsStream(String filename) {
-		return this.getClass().getClassLoader().getResourceAsStream(filename);
-	}
+public class HarvestSubPropertyTest extends CRDatabaseTestCase {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.dbunit.DatabaseTestCase#getDataSet()
+	 * @see eionet.cr.test.helpers.CRDatabaseTestCase#getDataSet()
 	 */
 	protected IDataSet getDataSet() throws Exception {
-		return new FlatXmlDataSet(getFileAsStream("emptydb.xml"));
-	}
-
-	/*
-	 * 
-	 */
-	private void compareDatasets(String testData, boolean dumpIt) throws Exception {
-
-		// Fetch database data after executing your code
-		QueryDataSet queryDataSet = new QueryDataSet(getConnection());
-		queryDataSet.addTable("SPO",
-                     "SELECT DISTINCT SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ,"
-                     + " LIT_OBJ, OBJ_DERIV_SOURCE, OBJ_SOURCE_OBJECT FROM SPO"
-                     + " WHERE PREDICATE NOT IN ( 8639511163630871821, 3296918264710147612, -2213704056277764256, 333311624525447614 )"
-                     + " ORDER BY SUBJECT, PREDICATE, OBJECT");
-		ITable actSPOTable = queryDataSet.getTable("SPO");
-
-		queryDataSet
-				.addTable(
-						"RESOURCE",
-						"SELECT URI_HASH, URI FROM RESOURCE ORDER BY URI_HASH");
-		ITable actResTable = queryDataSet.getTable("RESOURCE");
-		if (dumpIt) {
-			FlatXmlDataSet.write(queryDataSet, new FileOutputStream(testData));
-		} else {
-
-			// Load expected data from an XML dataset
-			IDataSet expectedDataSet = new FlatXmlDataSet(
-					getFileAsStream(testData));
-			ITable expSpoTable = expectedDataSet.getTable("SPO");
-			ITable expResTable = expectedDataSet.getTable("RESOURCE");
-
-			// Assert actual SPO table matches expected table
-			Assertion.assertEquals(expSpoTable, actSPOTable);
-
-			// Assert actual Resource table matches expected table
-			Assertion.assertEquals(expResTable, actResTable);
-		}
+		return getXmlDataSet("emptydb.xml");
 	}
 
 	@Test
 	public void testSimpleSubProperty() {
 
 		try {
-			URL o = new URL("http://svn.eionet.europa.eu/repositories/Reportnet/cr2/trunk/src/test/resources/subproperty-rdf.xml");
-//			URL o = getClass().getClassLoader().getResource("subproperty-rdf.xml");
-			Harvest harvest = new PullHarvest(o.toString(), null);
+			URL url = new URL("http://svn.eionet.europa.eu/repositories" +
+					"/Reportnet/cr2/trunk/src/test/resources/subproperty-rdf.xml");
+			Harvest harvest = new PullHarvest(url.toString(), null);
 			harvest.execute();
-                        // Change to true if you want to dump the result into an XML file
+			
+			// Change to true if you want to dump the result into an XML file
 			compareDatasets("subproperty-db.xml", true);
-		} catch (Throwable e) {
+		}
+		catch (Throwable e) {
 			e.printStackTrace();
 			fail("Was not expecting this exception: " + e.toString());
 		}
@@ -117,17 +64,55 @@ public class HarvestSubPropertyTest extends DatabaseTestCase {
 	public void testTripleSubProperty() {
 
 		try {
-			URL o = new URL("http://svn.eionet.europa.eu/repositories/Reportnet/cr2/trunk/src/test/resources/subproperty2-rdf.xml");
-//			URL o = getClass().getClassLoader().getResource("subproperty2-rdf.xml");
-			Harvest harvest = new PullHarvest(o.toString(), null);
+			URL url = new URL("http://svn.eionet.europa.eu/repositories" +
+					"/Reportnet/cr2/trunk/src/test/resources/subproperty2-rdf.xml");
+			Harvest harvest = new PullHarvest(url.toString(), null);
 			harvest.execute();
+			
 			compareDatasets("subproperty2-db.xml", false);
-		} catch (Throwable e) {
+		}
+		catch (Throwable e) {
 			e.printStackTrace();
 			fail("Was not expecting this exception: " + e.toString());
 		}
 
 	}
 
+	/**
+	 * 
+	 * @param testData
+	 * @param dumpIt
+	 * @throws Exception
+	 */
+	private void compareDatasets(String testData, boolean dumpIt) throws Exception {
 
+		// Fetch database data after executing your code
+		QueryDataSet queryDataSet = new QueryDataSet(getConnection());
+		queryDataSet.addTable("SPO",
+                     "SELECT DISTINCT SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ,"
+                     + " LIT_OBJ, OBJ_DERIV_SOURCE, OBJ_SOURCE_OBJECT FROM SPO"
+                     + " WHERE PREDICATE NOT IN ( 8639511163630871821, 3296918264710147612, -2213704056277764256, 333311624525447614 )"
+                     + " ORDER BY SUBJECT, PREDICATE, OBJECT");
+		
+		ITable actSPOTable = queryDataSet.getTable("SPO");
+		
+		queryDataSet.addTable("RESOURCE", "SELECT URI_HASH, URI FROM RESOURCE ORDER BY URI_HASH");
+		ITable actResTable = queryDataSet.getTable("RESOURCE");
+		
+		if (dumpIt){
+			FlatXmlDataSet.write(queryDataSet, new FileOutputStream(testData));
+		}
+		else{
+			// Load expected data from an XML dataset
+			IDataSet expectedDataSet = getXmlDataSet(testData);
+			ITable expSpoTable = expectedDataSet.getTable("SPO");
+			ITable expResTable = expectedDataSet.getTable("RESOURCE");
+
+			// Assert that the actual SPO table matches the expected table
+			assertEquals(expSpoTable, actSPOTable);
+
+			// Assert that the actual RESOURCE table matches the expected table
+			assertEquals(expResTable, actResTable);
+		}
+	}
 }

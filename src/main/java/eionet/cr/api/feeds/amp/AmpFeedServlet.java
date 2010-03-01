@@ -37,6 +37,7 @@ import eionet.cr.common.Namespace;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.SubjectProcessor;
 import eionet.cr.common.Subjects;
+import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.ObjectDTO;
@@ -68,7 +69,7 @@ public class AmpFeedServlet extends HttpServlet implements SubjectProcessor{
 		response.setContentType("text/xml");
 		
 		try {
-			SearchDAO searchDao = MySQLDAOFactory.get().getDao(SearchDAO.class);
+			SearchDAO searchDao = DAOFactory.get().getDao(SearchDAO.class);
 			Map<String, String> criteria = new HashMap<String, String>();
 			criteria.put(Predicates.RDF_TYPE, Subjects.AMP_PRODUCT);
 

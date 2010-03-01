@@ -216,7 +216,7 @@ public class XmlRpcServices implements Services{
 
 		Vector result = new Vector();
 		try{
-			Pair<Integer,List<SubjectDTO>> search = MySQLDAOFactory.get()
+			Pair<Integer,List<SubjectDTO>> search = DAOFactory.get()
 					.getDao(SearchDAO.class)
 					.searchByFilters(
 							criteria,
@@ -304,7 +304,7 @@ public class XmlRpcServices implements Services{
 			List<SubjectDTO> subjects = null;
 			if (!StringUtils.isBlank(schemaIdentifier)){
 				
-				SearchDAO searchDao = MySQLDAOFactory.get().getDao(SearchDAO.class);
+				SearchDAO searchDao = DAOFactory.get().getDao(SearchDAO.class);
 				Map<String, String> criteria = new HashMap<String, String>();
 				criteria.put(Predicates.CR_SCHEMA, schemaIdentifier);
 

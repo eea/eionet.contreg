@@ -21,15 +21,15 @@
  */
 package eionet.cr.web.action;
 
-import static eionet.cr.web.util.WebConstants.USER_SESSION_ATTR;
-import static org.junit.Assert.assertEquals;
 import net.sourceforge.stripes.mock.MockRoundtrip;
 import net.sourceforge.stripes.mock.MockServletContext;
 
+import org.junit.Assert;
 import org.junit.Test;
 
-import eionet.cr.test.util.AbstractStripesMvcTestHelper;
+import eionet.cr.test.helpers.AbstractStripesMvcTestHelper;
 import eionet.cr.web.security.CRUser;
+import eionet.cr.web.util.WebConstants;
 
 
 /**
@@ -50,12 +50,13 @@ public class AbstractCrActionBeanTest extends AbstractStripesMvcTestHelper {
 		MockServletContext context = getMockServletContext();
 		
 		MockRoundtrip trip = new MockRoundtrip(context, LoginActionBean.class);
-		trip.getRequest().getSession().setAttribute(USER_SESSION_ATTR, new CRUser("smithbob"));
+		trip.getRequest().getSession().setAttribute(
+				WebConstants.USER_SESSION_ATTR, new CRUser("smithbob"));
 		trip.execute();
 		
 		LoginActionBean actionBean = trip.getActionBean(LoginActionBean.class);
 		
-		assertEquals("smithbob", actionBean.getUserName());
+		Assert.assertEquals("smithbob", actionBean.getUserName());
 	}
 	
 	/**
@@ -68,12 +69,13 @@ public class AbstractCrActionBeanTest extends AbstractStripesMvcTestHelper {
 		MockServletContext context = getMockServletContext();
 		
 		MockRoundtrip trip = new MockRoundtrip(context, LoginActionBean.class);
-		trip.getRequest().getSession().setAttribute(USER_SESSION_ATTR, new CRUser("smithbob"));
+		trip.getRequest().getSession().setAttribute(
+				WebConstants.USER_SESSION_ATTR, new CRUser("smithbob"));
 		trip.execute();
 		
 		LoginActionBean actionBean = trip.getActionBean(LoginActionBean.class);
 		
-		assertEquals(true, actionBean.isUserLoggedIn());
+		Assert.assertEquals(true, actionBean.isUserLoggedIn());
 	}
 	
 	/**
@@ -86,11 +88,11 @@ public class AbstractCrActionBeanTest extends AbstractStripesMvcTestHelper {
 		MockServletContext context = getMockServletContext();
 		
 		MockRoundtrip trip = new MockRoundtrip(context, LoginActionBean.class);
-		trip.getRequest().getSession().setAttribute(USER_SESSION_ATTR, null);
+		trip.getRequest().getSession().setAttribute(WebConstants.USER_SESSION_ATTR, null);
 		trip.execute();
 		
 		LoginActionBean actionBean = trip.getActionBean(LoginActionBean.class);
 		
-		assertEquals(false, actionBean.isUserLoggedIn());
+		Assert.assertEquals(false, actionBean.isUserLoggedIn());
 	}
 }
