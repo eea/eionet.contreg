@@ -38,6 +38,9 @@ import eionet.cr.test.helpers.CRDatabaseTestCase;
  * 
  */
 public class HarvestSimpleDbTest extends CRDatabaseTestCase {
+	
+	/** */
+	private static final String[] ignoreCols = {"SOURCE", "GEN_TIME"};
 
 	/*
 	 * (non-Javadoc)
@@ -70,7 +73,7 @@ public class HarvestSimpleDbTest extends CRDatabaseTestCase {
 
 		try {
 			URL url = new URL("http://svn.eionet.europa.eu/repositories" +
-			"/Reportnet/cr2/trunk/src/test/resources/encoding-scheme-rdf.xml");
+					"/Reportnet/cr2/trunk/src/test/resources/encoding-scheme-rdf.xml");
 			Harvest harvest = new PullHarvest(url.toString(), null);
 			harvest.execute();
 
@@ -88,7 +91,7 @@ public class HarvestSimpleDbTest extends CRDatabaseTestCase {
 			ITable expSpoTable = expectedDataSet.getTable("SPO");
 
 			// Assert that the actual SPO table matches expected table.
-			assertEquals(expSpoTable, actSPOTable);
+			Assertion.assertEqualsIgnoreCols(expSpoTable, actSPOTable, ignoreCols);
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
@@ -102,12 +105,13 @@ public class HarvestSimpleDbTest extends CRDatabaseTestCase {
 
 		try {
 			URL url = new URL("http://svn.eionet.europa.eu/repositories" +
-			"/Reportnet/cr2/trunk/src/test/resources/inline-rdf.xml");
+					"/Reportnet/cr2/trunk/src/test/resources/inline-rdf.xml");
 			Harvest harvest = new PullHarvest(url.toString(), null);
 			harvest.execute();
 
 			compareDatasets("inline-db.xml", false);
-		} catch (Throwable e) {
+		}
+		catch (Throwable e) {
 			e.printStackTrace();
 			fail("Was not expecting this exception: " + e.toString());
 		}
@@ -136,16 +140,6 @@ public class HarvestSimpleDbTest extends CRDatabaseTestCase {
 				+ "WHERE URI NOT LIKE 'file:%' ORDER BY URI, URI_HASH");
 		ITable actResTable = queryDataSet.getTable("RESOURCE");
 
-//		System.out.println("***********************************");
-//		int rowCount = actResTable.getRowCount();
-//		for (int i=0; i<rowCount; i++){
-//			Object uri = actResTable.getValue(i, "URI");
-//			Object uriHash = actResTable.getValue(i, "URI_HASH");
-//			System.out.println("uri: [" + uri.getClass().getSimpleName() + "] " + uri.toString());
-//			System.out.println("uriHash: [" + uriHash.getClass().getSimpleName() + "] " + uriHash.toString());
-//		}
-//		System.out.println("***********************************");
-		
 		if (dumpIt){
 			FlatXmlDataSet.write(queryDataSet, new FileOutputStream(testData));
 		}
@@ -156,7 +150,7 @@ public class HarvestSimpleDbTest extends CRDatabaseTestCase {
 			ITable expResTable = expectedDataSet.getTable("RESOURCE");
 
 			// Assert that the actual SPO table matches expected table.
-			Assertion.assertEquals(expSpoTable, actSPOTable);
+			Assertion.assertEqualsIgnoreCols(expSpoTable, actSPOTable, ignoreCols);
 
 			// Assert that the actual RESOURCE table matches expected table
 			Assertion.assertEquals(expResTable, actResTable);

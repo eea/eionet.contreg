@@ -35,5 +35,6 @@
   <RESOURCE URI="http://www4.wiwiss.fu-berlin.de/eurostat/all/countries" URI_HASH="-4791582699144328160"/>
   <RESOURCE URI="http://www4.wiwiss.fu-berlin.de/eurostat/resource/countries/Danmark" URI_HASH="-4172275498203121502"/>
   <RESOURCE URI="http://www4.wiwiss.fu-berlin.de/eurostat/resource/countries/Eesti" URI_HASH="6505199765537126148"/>
+  <RESOURCE URI="http://www4.wiwiss.fu-berlin.de/eurostat/resource/eurostat/countries" URI_HASH="8343231686936957793"/>
   <RESOURCE URI="http://www4.wiwiss.fu-berlin.de/eurostat/resource/eurostat/name" URI_HASH="2936730963308230114"/>
 </dataset>

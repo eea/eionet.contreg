@@ -20,12 +20,15 @@
   <RESOURCE URI="http://cr.eionet.europa.eu/ontologies/contreg.rdf#mediaType" URI_HASH="333311624525447614"/>
   <RESOURCE URI="http://purl.org/dc/terms/issued" URI_HASH="133517385080018634"/>
   <RESOURCE URI="http://svn.eionet.europa.eu/repositories/Reportnet/cr2/trunk/src/test/resources/simple-rdf.xml" URI_HASH="-1193841814207334039"/>
+  <RESOURCE URI="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property" URI_HASH="2170852117422230170"/>
   <RESOURCE URI="http://www.w3.org/1999/02/22-rdf-syntax-ns#type" URI_HASH="-5251507576730213845"/>
+  <RESOURCE URI="http://www.w3.org/2000/01/rdf-schema#Class" URI_HASH="-413436351744164071"/>
   <RESOURCE URI="http://www.w3.org/2000/01/rdf-schema#comment" URI_HASH="4171861332787161232"/>
   <RESOURCE URI="http://www.w3.org/2000/01/rdf-schema#domain" URI_HASH="-2785858390031356069"/>
   <RESOURCE URI="http://www.w3.org/2000/01/rdf-schema#isDefinedBy" URI_HASH="7143970754346561049"/>
   <RESOURCE URI="http://www.w3.org/2000/01/rdf-schema#label" URI_HASH="8744745537220110927"/>
   <RESOURCE URI="http://www.w3.org/2000/01/rdf-schema#range" URI_HASH="5208071116833832492"/>
+  <RESOURCE URI="http://www.w3.org/2004/02/skos/core" URI_HASH="2403328652459648169"/>
   <RESOURCE URI="http://www.w3.org/2004/02/skos/core#Concept" URI_HASH="-6601083188331798490"/>
   <RESOURCE URI="http://www.w3.org/2004/02/skos/core#semanticRelation" URI_HASH="5550937339998314774"/>
 </dataset>
