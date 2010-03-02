@@ -32,8 +32,16 @@ import org.junit.Test;
 
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 
+/**
+ * 
+ * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
+ *
+ */
 public class HarvestSubPropertyTest extends CRDatabaseTestCase {
 
+	/** */
+	private static final String[] ignoreCols = {"SOURCE", "GEN_TIME"};
+	
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.test.helpers.CRDatabaseTestCase#getDataSet()
@@ -90,13 +98,14 @@ public class HarvestSubPropertyTest extends CRDatabaseTestCase {
 		// Fetch database data after executing your code
 		QueryDataSet queryDataSet = new QueryDataSet(getConnection());
 		queryDataSet.addTable("SPO",
-                     "SELECT DISTINCT SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ,"
-                     + " LIT_OBJ, OBJ_DERIV_SOURCE, OBJ_SOURCE_OBJECT FROM SPO"
-                     + " WHERE PREDICATE NOT IN ( 8639511163630871821, 3296918264710147612, -2213704056277764256, 333311624525447614 )"
-                     + " ORDER BY SUBJECT, PREDICATE, OBJECT");
-		
+             "SELECT DISTINCT SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ,"
+             + " LIT_OBJ, OBJ_DERIV_SOURCE, OBJ_SOURCE_OBJECT FROM SPO"
+             + " WHERE PREDICATE NOT IN"
+             + " (8639511163630871821,3296918264710147612,-2213704056277764256,333311624525447614)"
+             + " ORDER BY SUBJECT, PREDICATE, OBJECT");		
 		ITable actSPOTable = queryDataSet.getTable("SPO");
 		
+		queryDataSet = new QueryDataSet(getConnection());
 		queryDataSet.addTable("RESOURCE", "SELECT URI_HASH, URI FROM RESOURCE ORDER BY URI_HASH");
 		ITable actResTable = queryDataSet.getTable("RESOURCE");
 		
@@ -110,7 +119,7 @@ public class HarvestSubPropertyTest extends CRDatabaseTestCase {
 			ITable expResTable = expectedDataSet.getTable("RESOURCE");
 
 			// Assert that the actual SPO table matches the expected table
-			Assertion.assertEquals(expSpoTable, actSPOTable);
+			Assertion.assertEqualsIgnoreCols(expSpoTable, actSPOTable, ignoreCols);
 
 			// Assert that the actual RESOURCE table matches the expected table
 			Assertion.assertEquals(expResTable, actResTable);
