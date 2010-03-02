@@ -74,6 +74,7 @@ public class HarvestSimpleDbTest extends CRDatabaseTestCase {
 		try {
 			URL url = new URL("http://svn.eionet.europa.eu/repositories" +
 					"/Reportnet/cr2/trunk/src/test/resources/encoding-scheme-rdf.xml");
+			
 			Harvest harvest = new PullHarvest(url.toString(), null);
 			harvest.execute();
 
@@ -91,7 +92,10 @@ public class HarvestSimpleDbTest extends CRDatabaseTestCase {
 			ITable expSpoTable = expectedDataSet.getTable("SPO");
 
 			// Assert that the actual SPO table matches expected table.
-			Assertion.assertEqualsIgnoreCols(expSpoTable, actSPOTable, ignoreCols);
+			// We must ignore the OBJECT_HASH column, because we expect an UUID of an
+			// anonymous resource to be there, but the generated UUID is unique with every harvest.
+			String[] ignore = {"SOURCE", "GEN_TIME", "OBJECT_HASH"};
+			Assertion.assertEqualsIgnoreCols(expSpoTable, actSPOTable, ignore);
 		}
 		catch (Throwable e) {
 			e.printStackTrace();

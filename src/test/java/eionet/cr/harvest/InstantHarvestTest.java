@@ -20,6 +20,7 @@
 * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.harvest;
 
+import java.net.URL;
 import java.sql.Connection;
 
 import org.dbunit.DatabaseTestCase;
@@ -52,8 +53,8 @@ public class InstantHarvestTest extends CRDatabaseTestCase{
 	public void testInstantHarvest(){
 		
 		try{
-			InstantHarvest instantHarvest = new InstantHarvest(
-					"http://rod.eionet.europa.eu/obligations", null, "guest");
+			URL url = getClass().getClassLoader().getResource("taxon-over-rdf.xml");
+			InstantHarvest instantHarvest = new InstantHarvest(url.toString(), null, "guest");
 			instantHarvest.execute();
 		}
 		catch (Throwable e) {

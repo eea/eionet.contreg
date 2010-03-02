@@ -59,7 +59,7 @@ import eionet.cr.util.UnicodeUtils;
 public class RDFHandler implements StatementHandler{
 	
 	/** */
-	public static final String URN_UUID_PREFIX = "urn:uuid:";
+	private static final String URN_UUID = "urn:uuid:";
 	
 	private Log logger;
 
@@ -85,6 +85,8 @@ public class RDFHandler implements StatementHandler{
 	/** */
 	private int distinctSubjectsCount;
 
+	/** */
+	private String uuidNamePrefix;
 	
 	/**
 	 * 
@@ -102,8 +104,8 @@ public class RDFHandler implements StatementHandler{
 		
 		/* field assignments */
 		this.logger = new HarvestLog(config.getSourceUrl(), config.getGenTime(), LogFactory.getLog(this.getClass()));
-		
 		persister = PersisterFactory.getPersister(config);
+		uuidNamePrefix = uuidNamePrefix(Hashes.spoHash(config.getSourceUrl()), config.getGenTime());
 	}
 	
 	/** 
@@ -303,19 +305,21 @@ public class RDFHandler implements StatementHandler{
 	 * @return
 	 */
 	private String generateUUID(String name){
-		return generateUUID(URN_UUID_PREFIX, name);
+		
+		return generateUUID(uuidNamePrefix, name);
 	}
-
+	
 	/**
 	 * 
-	 * @param uuidNamePrefix
+	 * @param prefix
 	 * @param name
 	 * @return
 	 */
-	public static String generateUUID(String uuidNamePrefix, String name){
+	public static String generateUUID(String prefix, String name){
 		
-		String uuid = UUID.nameUUIDFromBytes(new StringBuilder(uuidNamePrefix).append(name).toString().getBytes()).toString();
-		return new StringBuilder(URN_UUID_PREFIX).append(uuid).toString();
+		UUID uuid = UUID.nameUUIDFromBytes(
+				new StringBuilder(prefix).append(name).toString().getBytes());
+		return new StringBuffer(URN_UUID).append(uuid.toString()).toString();
 	}
 	
 	/**
@@ -324,9 +328,9 @@ public class RDFHandler implements StatementHandler{
 	 * @param genTime
 	 * @return
 	 */
-	public static String createUuidNamePrefix(String sourceHash, String genTime){
+	public static String uuidNamePrefix(long sourceHash, long genTime){
 		
-		return new StringBuilder(sourceHash).append(":").append(genTime).append(":").toString();
+		return new StringBuffer().append(sourceHash).append(":").append(genTime).append(":").toString();
 	}
 
 	/**

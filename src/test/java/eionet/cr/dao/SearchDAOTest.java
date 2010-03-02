@@ -20,6 +20,30 @@
 * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.dao;
 
-public class SearchDAOTest {
+import org.dbunit.dataset.IDataSet;
 
+import eionet.cr.test.helpers.CRDatabaseTestCase;
+
+/**
+ * 
+ * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
+ *
+ */
+public class SearchDAOTest extends CRDatabaseTestCase{
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.test.helpers.CRDatabaseTestCase#getDataSet()
+	 */
+	@Override
+	protected IDataSet getDataSet() throws Exception {
+		return getXmlDataSet("emptydb.xml");
+	}
+
+	/**
+	 * 
+	 */
+	public void testNothing(){
+		
+	}
 }
