@@ -13,9 +13,16 @@
   <RESOURCE URI="http://purl.org/dc/terms/hasVersion" URI_HASH="1383918283326755379"/>
   <RESOURCE URI="http://purl.org/dc/terms/issued" URI_HASH="133517385080018634"/>
   <RESOURCE URI="http://purl.org/dc/terms/modified" URI_HASH="-2395129634300712752"/>
+  <RESOURCE URI="http://rs.tdwg.org/dwc/terms/" URI_HASH="-2401600647348674002"/>
+  <RESOURCE URI="http://rs.tdwg.org/dwc/terms/#kingdom-2009-04-24" URI_HASH="-4124880773033497262"/>
+  <RESOURCE URI="http://rs.tdwg.org/dwc/terms/#Taxon-2008-11-19" URI_HASH="6817490066860006600"/>
   <RESOURCE URI="http://rs.tdwg.org/dwc/terms/kingdom" URI_HASH="-1863610096029846001"/>
+  <RESOURCE URI="http://rs.tdwg.org/dwc/terms/kingdom-2009-04-24" URI_HASH="-344724432427231365"/>
   <RESOURCE URI="http://rs.tdwg.org/dwc/terms/Taxon" URI_HASH="-1177899728476679014"/>
+  <RESOURCE URI="http://rs.tdwg.org/dwc/terms/Taxon-2008-11-19" URI_HASH="-4500728889370309587"/>
+  <RESOURCE URI="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property" URI_HASH="2170852117422230170"/>
   <RESOURCE URI="http://www.w3.org/1999/02/22-rdf-syntax-ns#type" URI_HASH="-5251507576730213845"/>
+  <RESOURCE URI="http://www.w3.org/2000/01/rdf-schema#Class" URI_HASH="-413436351744164071"/>
   <RESOURCE URI="http://www.w3.org/2000/01/rdf-schema#comment" URI_HASH="4171861332787161232"/>
   <RESOURCE URI="http://www.w3.org/2000/01/rdf-schema#domain" URI_HASH="-2785858390031356069"/>
   <RESOURCE URI="http://www.w3.org/2000/01/rdf-schema#isDefinedBy" URI_HASH="7143970754346561049"/>

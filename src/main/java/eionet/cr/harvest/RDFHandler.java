@@ -228,8 +228,13 @@ public class RDFHandler implements StatementHandler{
 				}
 			}
 
-			// if subject not already added into resources, then do so
-			if (!isResourceAdded(subjectHash)){
+			// if subject already added into resources,
+			// then still make sure that it's present in the "subjects" part of the resources,
+			if (isResourceAdded(subjectHash)){
+				resources.getLeft().add(Long.valueOf(subjectHash));
+			}
+			// subject not yet added already added into resources
+			else{
 				addResource(subjectUri, subjectHash, true);
 			}
 
