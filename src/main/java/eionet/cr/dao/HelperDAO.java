@@ -41,12 +41,12 @@ public interface HelperDAO extends DAO {
 	
 	/**
 	 * 
-	 * @param rdfType TODO
+	 * @param rdfType
 	 * @param limit
 	 * @return
 	 * @throws DAOException
 	 */
-	List<SubjectDTO> getLatestSubjects(String rdfType, int limit) throws DAOException;
+	Collection<SubjectDTO> getLatestSubjects(String rdfType, int limit) throws DAOException;
 	
 	/**
 	 * 

@@ -708,9 +708,9 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 
 	/*
 	 * (non-Javadoc)
-	 * @see eionet.cr.dao.HelperDAO#getLatestSubjects(int)
+	 * @see eionet.cr.dao.HelperDAO#getLatestSubjects(java.lang.String, int)
 	 */
-	public List<SubjectDTO> getLatestSubjects(String rdfType, int limit) throws DAOException {
+	public Collection<SubjectDTO> getLatestSubjects(String rdfType, int limit) throws DAOException {
 		
 		// validate arguments
 		if (StringUtils.isBlank(rdfType))
@@ -720,40 +720,45 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 
 		// build SQL query
 		StringBuffer sqlBuf = new StringBuffer().
-		append("select SPO.SUBJECT as ").append(PairReader.LEFTCOL).
+		append("select RESOURCE.URI_HASH as ").append(PairReader.LEFTCOL).
 		append(", RESOURCE.FIRSTSEEN_TIME as ").append(PairReader.RIGHTCOL).
-		append(" from SPO, RESOURCE").
-		append(" where SPO.PREDICATE=").append(Hashes.spoHash(Predicates.RDF_TYPE)).
+		append(" from RESOURCE where URI_HASH in (select SUBJECT from SPO where ").
+		append(" SPO.PREDICATE=").append(Hashes.spoHash(Predicates.RDF_TYPE)).
 		append(" and SPO.OBJECT_HASH=").append(Hashes.spoHash(rdfType)).
-		append(" and SPO.SUBJECT=RESOURCE.URI_HASH").
-		append(" order by RESOURCE.FIRSTSEEN_TIME desc").
-		append(" limit ").append(limit);
+		append(" ) order by RESOURCE.FIRSTSEEN_TIME desc limit ").append(Math.max(1, limit));
 		
 		// execute SQL query
 		PairReader<Long,Long> pairReader = new PairReader<Long,Long>();
 		executeQuery(sqlBuf.toString(), pairReader);
 		List<Pair<Long,Long>> resultList = pairReader.getResultList();
 		
-		// if result list null or empty, return
-		if (resultList==null || resultList.isEmpty()){
-			return new LinkedList<SubjectDTO>();
-		}
+		executeQuery(sqlBuf.toString(), pairReader);
+		List<Pair<Long,Long>> pairList = pairReader.getResultList();
 		
-		// create helper objects
-		Map<Long,SubjectDTO> subjectsMap = new HashMap<Long, SubjectDTO>();
-		Map<Long,Date> firstSeenTimes = new HashMap<Long, Date>(); 
-		for (Pair<Long,Long> p : resultList){
-			subjectsMap.put(p.getLeft(), null);
-			firstSeenTimes.put(p.getLeft(), new Date(p.getRight()));
-		}
+		Collection<SubjectDTO> result = new LinkedList<SubjectDTO>();
 		
-		// get subjects data
-		List<SubjectDTO> result = executeQuery(getSubjectsDataQuery(subjectsMap.keySet()),
-				null, new SubjectDataReader(subjectsMap));
+		// if result list not empty, get the subjects data and set their first-seen times		
+		if (pairList!=null && !pairList.isEmpty()){
 		
-		// set firstseen-times of found subjects
-		for (SubjectDTO subject : result){
-			subject.setFirstSeenTime(firstSeenTimes.get(Long.valueOf(subject.getUriHash())));
+			// create helper objects
+			Map<Long,SubjectDTO> subjectsMap = new LinkedHashMap<Long, SubjectDTO>();
+			Map<Long,Date> firstSeenTimes = new HashMap<Long, Date>(); 
+			for (Pair<Long,Long> p : resultList){
+				subjectsMap.put(p.getLeft(), null);
+				firstSeenTimes.put(p.getLeft(), new Date(p.getRight()));
+			}
+			
+			// get subjects data
+			executeQuery(getSubjectsDataQuery(subjectsMap.keySet()),
+					null, new SubjectDataReader(subjectsMap));
+			
+			// set firstseen-times of found subjects
+			for (SubjectDTO subject : subjectsMap.values()){
+				subject.setFirstSeenTime(
+						firstSeenTimes.get(new Long(subject.getUriHash())));
+			}
+			
+			result = subjectsMap.values();
 		}
 		
 		return result;

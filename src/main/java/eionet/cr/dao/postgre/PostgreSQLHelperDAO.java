@@ -685,7 +685,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 	 * (non-Javadoc)
 	 * @see eionet.cr.dao.HelperDAO#getLatestSubjects(int)
 	 */
-	public List<SubjectDTO> getLatestSubjects(String rdfType, int limit) throws DAOException {
+	public Collection<SubjectDTO> getLatestSubjects(String rdfType, int limit) throws DAOException {
 		
 		// validate arguments
 		if (StringUtils.isBlank(rdfType))
@@ -720,30 +720,34 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		logger.debug("Recent uploads search, executing subject finder query: " + sqlBuf.toString());
 
 		executeQuery(sqlBuf.toString(), pairReader);
-		List<Pair<Long,Long>> resultList = pairReader.getResultList();
+		List<Pair<Long,Long>> pairList = pairReader.getResultList();
 		
-		// if result list null or empty, return
-		if (resultList==null || resultList.isEmpty()){
-			return new LinkedList<SubjectDTO>();
-		}
+		Collection<SubjectDTO> result = new LinkedList<SubjectDTO>();
 		
-		// create helper objects
-		Map<Long,SubjectDTO> subjectsMap = new HashMap<Long, SubjectDTO>();
-		Map<Long,Date> firstSeenTimes = new HashMap<Long, Date>(); 
-		for (Pair<Long,Long> p : resultList){
-			subjectsMap.put(p.getLeft(), null);
-			firstSeenTimes.put(p.getLeft(), new Date(p.getRight()));
-		}
-		
-		// get subjects data
-		
-		logger.debug("Recent uploads search, getting the data of the found subjects");
-		
-		List<SubjectDTO> result = getSubjectsData(subjectsMap);
-		
-		// set firstseen-times of found subjects
-		for (SubjectDTO subject : result){
-			subject.setFirstSeenTime(firstSeenTimes.get(Long.valueOf(subject.getUriHash())));
+		// if result list not empty, get the subjects data and set their first-seen times		
+		if (pairList!=null && !pairList.isEmpty()){
+			
+			// create helper objects
+			Map<Long,SubjectDTO> subjectsMap = new LinkedHashMap<Long, SubjectDTO>();
+			Map<Long,Date> firstSeenTimes = new HashMap<Long, Date>(); 
+			for (Pair<Long,Long> p : pairList){
+				subjectsMap.put(p.getLeft(), null);
+				firstSeenTimes.put(p.getLeft(), new Date(p.getRight()));
+			}
+			
+			// get subjects data
+			
+			logger.debug("Recent uploads search, getting the data of the found subjects");
+			
+			getSubjectsData(subjectsMap);
+			
+			// set firstseen-times of found subjects
+			for (SubjectDTO subject : subjectsMap.values()){
+				subject.setFirstSeenTime(
+						firstSeenTimes.get(new Long(subject.getUriHash())));
+			}
+			
+			result = subjectsMap.values();
 		}
 		
 		logger.debug("Recent uploads search, total query time " +
