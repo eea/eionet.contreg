@@ -354,12 +354,12 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		// Get the hashes and URIs of recent subjects of type=cr:file
 		// (we need URIs, because we might need to derive labels from them).
 		
-		String sql = "SELECT DISTINCT RESOURCE.URI_HASH, RESOURCE.URI FROM RESOURCE INNER JOIN SPO ON RESOURCE.URI_HASH = SPO.SUBJECT" +
-				" WHERE SPO.PREDICATE= ? AND OBJECT_HASH= ? ORDER BY FIRSTSEEN_TIME DESC LIMIT ?";
-		List<Long> params = new LinkedList<Long>();
-		params.add(Hashes.spoHash(Predicates.RDF_TYPE));
-		params.add( Hashes.spoHash(Subjects.CR_FILE));
-		params.add(new Long(limit));
+		String sql = "SELECT RESOURCE.URI_HASH, RESOURCE.URI, FIRSTSEEN_TIME" +
+				" FROM RESOURCE" +
+				" WHERE URI_HASH in" +
+				" (select SUBJECT from SPO" +
+				" where SPO.PREDICATE=? AND OBJECT_HASH=?)" +
+				" ORDER BY FIRSTSEEN_TIME DESC LIMIT ?";
 		
 		Map<String,String> labelMap = new LinkedHashMap<String,String>();
 		Map<String,String> uriMap = new LinkedHashMap<String,String>();
@@ -369,10 +369,12 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		ResultSet rs = null;
 		try{
 			conn = getConnection();
+			
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setLong(1, Hashes.spoHash(Predicates.RDF_TYPE));
 			pstmt.setLong(2, Hashes.spoHash(Subjects.CR_FILE));
-			pstmt.setLong(3, limit);
+			pstmt.setInt(3, Math.max(1, limit));
+			
 			rs = pstmt.executeQuery();
 			while (rs.next()){
 				uriMap.put(rs.getString(1), rs.getString(2));
@@ -380,10 +382,9 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 			}
 
 			/* if any subjects were found, let's find their labels */
-			
 			if (!labelMap.isEmpty()){
 				
-				sql = "SELECT DISTINCT SPO.SUBJECT as id, SPO.OBJECT as value FROM SPO WHERE SPO.PREDICATE=? " +
+				sql = "SELECT SUBJECT,OBJECT FROM SPO WHERE SPO.PREDICATE=? " +
 						"AND SPO.SUBJECT IN (" + Util.toCSV(labelMap.keySet()) + ")";				
 				pstmt = conn.prepareStatement(sql);
 				pstmt.setLong(1, Hashes.spoHash(Predicates.RDFS_LABEL));
@@ -471,8 +472,9 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 			for (Long hash : predicateUris) {
 				subjectsMap.put(hash, null);
 			}
-			executeQuery(getSubjectsDataQuery(
-					subjectsMap.keySet()), null, new SubjectDataReader(subjectsMap));
+
+			// get the subjects data
+			getSubjectsData(subjectsMap);
 			
 			// since a used predicate may not appear as a subject in SPO,
 			// there might unfound SubjectDTO objects 
@@ -629,9 +631,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		Map<Long,SubjectDTO> map = new LinkedHashMap<Long, SubjectDTO>();
 		map.put(subjectHash, null);
 		
-		List<SubjectDTO> subjects = executeQuery(getSubjectsDataQuery(map.keySet()),
-				null, new SubjectDataReader(map));
-		
+		List<SubjectDTO> subjects = getSubjectsData(map);
 		return subjects==null || subjects.isEmpty() ? null : subjects.get(0);
 	}
 
@@ -694,18 +694,31 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 			throw new IllegalArgumentException("limit must be greater than 0!");
 
 		// build SQL query
+//		StringBuffer sqlBuf = new StringBuffer().
+//		append("select SPO.SUBJECT as ").append(PairReader.LEFTCOL).
+//		append(", RESOURCE.FIRSTSEEN_TIME as ").append(PairReader.RIGHTCOL).
+//		append(" from SPO, RESOURCE").
+//		append(" where SPO.PREDICATE=").append(Hashes.spoHash(Predicates.RDF_TYPE)).
+//		append(" and SPO.OBJECT_HASH=").append(Hashes.spoHash(rdfType)).
+//		append(" and SPO.SUBJECT=RESOURCE.URI_HASH").
+//		append(" order by RESOURCE.FIRSTSEEN_TIME desc").
+//		append(" limit ").append(limit);
+		
 		StringBuffer sqlBuf = new StringBuffer().
-		append("select SPO.SUBJECT as ").append(PairReader.LEFTCOL).
+		append("select RESOURCE.URI_HASH as ").append(PairReader.LEFTCOL).
 		append(", RESOURCE.FIRSTSEEN_TIME as ").append(PairReader.RIGHTCOL).
-		append(" from SPO, RESOURCE").
-		append(" where SPO.PREDICATE=").append(Hashes.spoHash(Predicates.RDF_TYPE)).
+		append(" from RESOURCE where URI_HASH in (select SUBJECT from SPO where ").
+		append(" SPO.PREDICATE=").append(Hashes.spoHash(Predicates.RDF_TYPE)).
 		append(" and SPO.OBJECT_HASH=").append(Hashes.spoHash(rdfType)).
-		append(" and SPO.SUBJECT=RESOURCE.URI_HASH").
-		append(" order by RESOURCE.FIRSTSEEN_TIME desc").
-		append(" limit ").append(limit);
+		append(" ) order by RESOURCE.FIRSTSEEN_TIME desc limit ").append(Math.max(1, limit));
+
 		
 		// execute SQL query
 		PairReader<Long,Long> pairReader = new PairReader<Long,Long>();
+		
+		long startTime = System.currentTimeMillis();
+		logger.debug("Recent uploads search, executing subject finder query: " + sqlBuf.toString());
+
 		executeQuery(sqlBuf.toString(), pairReader);
 		List<Pair<Long,Long>> resultList = pairReader.getResultList();
 		
@@ -723,14 +736,19 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		}
 		
 		// get subjects data
-		List<SubjectDTO> result = executeQuery(getSubjectsDataQuery(subjectsMap.keySet()),
-				null, new SubjectDataReader(subjectsMap));
+		
+		logger.debug("Recent uploads search, getting the data of the found subjects");
+		
+		List<SubjectDTO> result = getSubjectsData(subjectsMap);
 		
 		// set firstseen-times of found subjects
 		for (SubjectDTO subject : result){
 			subject.setFirstSeenTime(firstSeenTimes.get(Long.valueOf(subject.getUriHash())));
 		}
 		
+		logger.debug("Recent uploads search, total query time " +
+				(System.currentTimeMillis()-startTime) + " ms");
+
 		return result;
 	}
 
@@ -776,8 +794,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		}
 		
 		// get subjects data
-		List<SubjectDTO> result = executeQuery(getSubjectsDataQuery(subjectsMap.keySet()),
-				null, new SubjectDataReader(subjectsMap));
+		List<SubjectDTO> result = getSubjectsData(subjectsMap);
 		return result;
 	}
 
@@ -844,5 +861,25 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		DataflowPicklistReader reader = new DataflowPicklistReader();
 		executeQuery(dataflowPicklistSQL, reader);
 		return reader.getResultMap();
+	}
+
+	private static final String getDistinctOrderedTypesSQL =
+		"";
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#getDistinctOrderedTypes()
+	 */
+	public ArrayList<Pair<String, String>> getDistinctOrderedTypes() throws DAOException {
+		
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	/**
+	 * 
+	 * @param args
+	 */
+	public static void main(String[] args){
+		System.out.println(dataflowPicklistSQL);
 	}
 }

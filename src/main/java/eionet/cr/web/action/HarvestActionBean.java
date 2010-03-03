@@ -32,7 +32,6 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dao.HarvestMessageDAO;
 import eionet.cr.dao.HarvestSourceDAO;
-import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.HarvestDTO;
 import eionet.cr.dto.HarvestMessageDTO;
 import eionet.cr.dto.HarvestSourceDTO;
@@ -76,10 +75,9 @@ public class HarvestActionBean extends AbstractActionBean {
 	 */
 	private void loadMessages() throws DAOException{
 		
-		List<HarvestMessageDTO> messageDTOs = MySQLDAOFactory
-				.get()
-				.getDao(HarvestMessageDAO.class)
-				.findHarvestMessagesByHarvestID(harvestDTO.getHarvestId());
+		List<HarvestMessageDTO> messageDTOs =
+			DAOFactory.get().getDao(HarvestMessageDAO.class).findHarvestMessagesByHarvestID(
+					harvestDTO.getHarvestId());
 		if (messageDTOs!=null){
 			loadMessages(HarvestMessageType.FATAL.toString(), messageDTOs, fatals = new ArrayList<HarvestMessageDTO>());
 			loadMessages(HarvestMessageType.ERROR.toString(), messageDTOs, errors = new ArrayList<HarvestMessageDTO>());

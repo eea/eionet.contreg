@@ -68,8 +68,6 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 			PagingRequest pagingRequest,
 			SortingRequest sortingRequest) throws DAOException{
 
-		long startTime = System.currentTimeMillis();
-
 		// create query helper
 		FreeTextSearchHelper helper = new FreeTextSearchHelper(
 				expression, pagingRequest, sortingRequest);
@@ -80,6 +78,9 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 		// let the helper create the query and fill IN parameters
 		String query = helper.getQuery(inParams);
 		
+		long startTime = System.currentTimeMillis();
+		logger.debug("Free-text search, executing subject finder query: " + query);
+
 		// execute the query, with the IN parameters
 		List<Pair<Long,Long>> list = executeQuery(query, inParams, new PairReader<Long,Long>());
 
@@ -97,16 +98,26 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 			
 			// get the data of all found subjects, provide hit-sources to the reader
 			SubjectDataReader reader = new FreeTextSearchDataReader(temp, hitSources);
-			executeQuery(getSubjectsDataQuery(temp.keySet()), null, reader);
+			
+			logger.debug("Free-text search, getting the data of the found subjects");
+			
+			getSubjectsData(reader);
 			
 			// get total number of found subjects, unless no paging required
 			if (pagingRequest!=null){
+				
 				inParams = new ArrayList<Object>();
-				totalRowCount = executeQueryUniqueResult(
-					helper.getCountQuery(inParams), inParams, new SingleObjectReader<Integer>());
+				query = helper.getCountQuery(inParams);
+				
+				logger.debug("Search by filters, executing rowcount query: " + query);
+				
+				totalRowCount = Integer.valueOf(executeQueryUniqueResult(query,
+					inParams, new SingleObjectReader<Long>()).toString());
+
 			}
 		}
-		logger.debug("Free text search, total query time " + (System.currentTimeMillis()-startTime) + " ms");
+		logger.debug("Free-text search, total query time " +
+				(System.currentTimeMillis()-startTime) + " ms");
 
 		// the result Pair contains total number of subjects and the requested sub-list
 		return new Pair<Integer, List<SubjectDTO>>(
@@ -130,32 +141,46 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 		
 		// let the helper create the query and fill IN parameters
 		String query = helper.getQuery(inParams);
+
+		long startTime = System.currentTimeMillis();
+		logger.debug("Search by filters, executing subject finder query: " + query);
 		
 		// execute the query, with the IN parameters
 		List<Long> list = executeQuery(query, inParams, new SingleObjectReader<Long>());
 
-		// if result list null or empty, return an empty Pair
-		if(list== null || list.isEmpty()){
-			return new Pair<Integer,List<SubjectDTO>>(0, new LinkedList<SubjectDTO>());
+		int totalRowCount = 0;
+		List<SubjectDTO> subjects = new ArrayList<SubjectDTO>();
+		
+		// if result list not null and not empty, then get the subjects data and total rowcount
+		if(list!= null && !list.isEmpty()){
+
+			// create the subjects map that needs to be fed into the subjects data reader
+			Map<Long,SubjectDTO> subjectsMap = new LinkedHashMap<Long, SubjectDTO>();
+			for (Long hash : list){
+				subjectsMap.put(hash, null);
+			}
+
+			logger.debug("Search by filters, getting the data of the found subjects");
+
+			// get the data of all found subjects
+			subjects = getSubjectsData(subjectsMap);
+
+			// if paging required, get the total number of found subjects too
+			if (pagingRequest!=null){
+				
+				inParams = new ArrayList<Object>();
+				query = helper.getCountQuery(inParams);
+				
+				logger.debug("Search by filters, executing rowcount query: " + query);
+				
+				totalRowCount = Integer.valueOf(executeQueryUniqueResult(query, inParams,
+						new SingleObjectReader<Long>()).toString());
+			}
 		}
 
-		// create the subjects map that needs to be fed into the subjects data reader
-		Map<Long,SubjectDTO> subjectsMap = new LinkedHashMap<Long, SubjectDTO>();
-		for (Long hash : list){
-			subjectsMap.put(hash, null);
-		}
-		
-		// get the data of all found subjects
-		List<SubjectDTO> subjects = executeQuery(getSubjectsDataQuery(
-				subjectsMap.keySet()), null, new SubjectDataReader(subjectsMap));
-		
-		// if paging required, get the total number of found subjects too
-		int totalRowCount = 0;
-		if (pagingRequest!=null){
-			inParams = new ArrayList<Object>();
-			totalRowCount = executeQueryUniqueResult(
-				helper.getCountQuery(inParams), inParams, new SingleObjectReader<Integer>());
-		}
+		//return new Pair<Integer,List<SubjectDTO>>(0, new LinkedList<SubjectDTO>());
+		logger.debug("Search by filters, total query time " +
+				(System.currentTimeMillis()-startTime) + " ms");
 
 		// the result Pair contains total number of subjects and the requested sub-list
 		return new Pair<Integer,List<SubjectDTO>>(totalRowCount, subjects);
@@ -178,31 +203,44 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 		// let the helper create the query and fill IN parameters
 		String query = helper.getQuery(inParams);
 		
+		long startTime = System.currentTimeMillis();
+		logger.debug("Search references, executing subject finder query: " + query);
+
 		// execute the query, with the IN parameters
 		List<Long> list = executeQuery(query, inParams, new SingleObjectReader<Long>());
 		
-		// if result list null or empty, return empty Pair
-		if (list==null || list.isEmpty()){
-			return new Pair<Integer, List<SubjectDTO>>(0, new LinkedList<SubjectDTO>());
+		int totalRowCount = 0;
+		List<SubjectDTO> subjects = new ArrayList<SubjectDTO>();
+		
+		// if result list not null and not empty, then get the subjects data and total rowcount
+		if (list!=null && !list.isEmpty()){
+			
+			// create the subjects map that needs to be fed into the subjects data reader
+			Map<Long,SubjectDTO> subjectsMap = new LinkedHashMap<Long, SubjectDTO>();
+			for (Long hash : list){
+				subjectsMap.put(hash, null);
+			}
+
+			logger.debug("Search references, getting the data of the found subjects");
+			
+			// get the data of all found subjects
+			subjects = getSubjectsData(subjectsMap);
+
+			// if paging required, get the total number of found subjects too
+			if (pagingRequest!=null){
+				
+				inParams = new ArrayList<Object>();
+				query = helper.getCountQuery(inParams);
+				
+				logger.debug("Search references, executing rowcount query: " + query);
+				
+				totalRowCount = Integer.valueOf(executeQueryUniqueResult(query,
+						inParams, new SingleObjectReader<Long>()).toString());
+			}
 		}
 		
-		// create the subjects map that needs to be fed into the subjects data reader
-		Map<Long,SubjectDTO> subjectsMap = new LinkedHashMap<Long, SubjectDTO>();
-		for (Long hash : list){
-			subjectsMap.put(hash, null);
-		}
-
-		// get the data of all found subjects
-		List<SubjectDTO> subjects = executeQuery(
-				getSubjectsDataQuery(subjectsMap.keySet()), null, new SubjectDataReader(subjectsMap));
-
-		// if paging required, get the total number of found subjects too
-		int totalRowCount = 0;
-		if (pagingRequest!=null){
-			inParams = new ArrayList<Object>();
-			totalRowCount = executeQueryUniqueResult(
-					helper.getCountQuery(inParams), inParams, new SingleObjectReader<Integer>());
-		}
+		logger.debug("Search references, total query time " +
+				(System.currentTimeMillis()-startTime) + " ms");
 
 		// the result Pair contains total number of subjects and the requested sub-list
 		return new Pair<Integer,List<SubjectDTO>>(Integer.valueOf(totalRowCount), subjects);
@@ -227,32 +265,46 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 		// let the helper create the query and fill IN parameters
 		String query = helper.getQuery(inParams);
 		
+		long startTime = System.currentTimeMillis();
+		logger.debug("Spatial search, executing subject finder query: " + query);
+		
 		// execute the query, with the IN parameters
 		List<Long> list = executeQuery(query, inParams, new SingleObjectReader<Long>());
 		
-		// if result list empty, return an empty Pair
-		if (list==null || list.isEmpty()){
-			return new Pair<Integer, List<SubjectDTO>>(0, new LinkedList<SubjectDTO>());
-		}
-		
-		// create the subjects map that needs to be fed into the subjects data reader
-		Map<Long,SubjectDTO> subjectsMap = new LinkedHashMap<Long, SubjectDTO>();
-		for (Long hash : list){
-			subjectsMap.put(hash, null);
-		}
-
-		// get the data of all found subjects
-		List<SubjectDTO> subjects = executeQuery(getSubjectsDataQuery(
-				subjectsMap.keySet()), null, new SubjectDataReader(subjectsMap));
-
-		// if paging required, get the total number of found subjects too
 		int totalRowCount = 0;
-		if (pagingRequest!=null){
-			inParams = new ArrayList<Object>();
-			totalRowCount = executeQueryUniqueResult(
-					helper.getCountQuery(inParams), inParams, new SingleObjectReader<Integer>());
+		List<SubjectDTO> subjects = new ArrayList<SubjectDTO>();
+		
+		// if result list not null and not empty, then get the subjects data and total rowcount
+		if (list!=null && !list.isEmpty()){
+		
+			// create the subjects map that needs to be fed into the subjects data reader
+			Map<Long,SubjectDTO> subjectsMap = new LinkedHashMap<Long, SubjectDTO>();
+			for (Long hash : list){
+				subjectsMap.put(hash, null);
+			}
+
+			logger.debug("Spatial search, getting the data of the found subjects");
+
+			// get the data of all found subjects
+			subjects = getSubjectsData(subjectsMap);
+
+			// if paging required, get the total number of found subjects too
+			if (pagingRequest!=null){
+
+				inParams = new ArrayList<Object>();
+				query = helper.getCountQuery(inParams);
+				
+				logger.debug("Spatial search, executing rowcount query: " + query);
+
+				totalRowCount = Integer.valueOf(executeQueryUniqueResult(
+						helper.getCountQuery(inParams),
+						inParams, new SingleObjectReader<Long>()).toString());
+			}
 		}
 
+		logger.debug("Search references, total query time " +
+				(System.currentTimeMillis()-startTime) + " ms");
+		
 		// the result Pair contains total number of subjects and the requested sub-list
 		return new Pair<Integer,List<SubjectDTO>>(Integer.valueOf(totalRowCount), subjects);
 	}

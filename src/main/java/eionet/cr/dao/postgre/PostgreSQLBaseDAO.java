@@ -23,12 +23,16 @@ package eionet.cr.dao.postgre;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
 import eionet.cr.dao.DAOException;
+import eionet.cr.dao.readers.SubjectDataReader;
+import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Pair;
 import eionet.cr.util.Util;
 import eionet.cr.util.sql.ConnectionUtil;
@@ -181,7 +185,7 @@ public abstract class PostgreSQLBaseDAO {
 	 * @param subjectHashes
 	 * @return
 	 */
-	protected String getSubjectsDataQuery(Collection<Long> subjectHashes) {
+	private String getSubjectsDataQuery(Collection<Long> subjectHashes) {
 
 		StringBuffer buf = new StringBuffer().
 		append("select distinct ").
@@ -199,5 +203,66 @@ public abstract class PostgreSQLBaseDAO {
 		append("order by ").
 		append("SUBJECT, PREDICATE, OBJECT");
 		return buf.toString();
-	}	
+	}
+
+	/**
+	 * 
+	 * @param subjectsMap
+	 * @return
+	 * @throws DAOException
+	 */
+	protected List<SubjectDTO> getSubjectsData(Map<Long,SubjectDTO> subjectsMap) throws DAOException{
+		return getSubjectsData(new SubjectDataReader(subjectsMap));
+	}
+
+	/**
+	 * 
+	 * @param reader
+	 * @return
+	 * @throws DAOException
+	 */
+	protected List<SubjectDTO> getSubjectsData(SubjectDataReader reader) throws DAOException{
+		
+		Map<Long,SubjectDTO> subjectsMap = reader.getSubjectsMap();
+		if (subjectsMap==null || subjectsMap.isEmpty())
+			throw new IllegalArgumentException("Subjects collection must not be null or empty");
+
+		// The idea below is that PostgreSQL hangs when the length of the executed query is
+		// more than 4096. This might happen if we execute the below query for too many subjects.
+		// So instead, we execute the query by every 150 subjects. That should be safe enough.
+		
+		int size = subjectsMap.size();
+		int max = 150;
+		int len = size / max;
+		if (size % max > 0){
+			len++;
+		}
+		
+		Connection conn = null;
+		try{
+			List<Long> list = new ArrayList<Long>(subjectsMap.keySet());
+			
+			for (int i=0; i<len; i++){
+
+				int from = Math.min(i*max, size);
+				int to = Math.min(from + max, size);
+				String query = getSubjectsDataQuery(list.subList(from, to));
+
+				if (conn==null){
+					conn = getConnection();
+				}
+				
+				logger.debug("Goint to execute subjects data query:" + query);				
+				SQLUtil.executeQuery(query, null, reader, conn);
+			}
+		}
+		catch (SQLException e){
+			throw new DAOException(e.getMessage(), e);
+		}
+		finally{
+			SQLUtil.close(conn);
+		}
+		
+		return reader.getResultList();
+	}
 }

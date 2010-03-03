@@ -133,4 +133,11 @@ public class SubjectDataReader extends ResultSetListReader<SubjectDTO>{
 	public List<SubjectDTO> getResultList() {
 		return new LinkedList<SubjectDTO>( subjectsMap.values());
 	}
+
+	/**
+	 * @return the subjectsMap
+	 */
+	public Map<Long, SubjectDTO> getSubjectsMap() {
+		return subjectsMap;
+	}
 }

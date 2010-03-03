@@ -20,8 +20,6 @@
  */
 package eionet.cr.harvest.scheduled;
 
-import static eionet.cr.dao.mysql.MySQLDAOFactory.get;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Iterator;
@@ -43,7 +41,6 @@ import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
-import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.UrgentHarvestQueueItemDTO;
 import eionet.cr.harvest.CurrentHarvests;
@@ -173,10 +170,13 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 				String url = queueItem.getUrl();
 				if (!StringUtils.isBlank(url)){
 					
-					if (queueItem.isPushHarvest())
+					if (queueItem.isPushHarvest()){
 						pushHarvest(url, queueItem.getPushedContent());
-					else
-						pullHarvest(get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(url), true);
+					}
+					else{
+						pullHarvest(DAOFactory.get().getDao(
+								HarvestSourceDAO.class).getHarvestSourceByUrl(url), true);
+					}
 				}
 			}
 		}
@@ -203,7 +203,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 			Integer sourceId = null;
 			int numOfResources = 0;
 			
-			HarvestSourceDAO harvestSourceDAO = get().getDao(HarvestSourceDAO.class);
+			HarvestSourceDAO harvestSourceDAO = DAOFactory.get().getDao(HarvestSourceDAO.class);
 			HarvestSourceDTO harvestSource = harvestSourceDAO.getHarvestSourceByUrl(url);
 			if (harvestSource==null){
 				harvestSource = new HarvestSourceDTO();

@@ -20,8 +20,6 @@
  */
 package eionet.cr.harvest.scheduled;
 
-import static eionet.cr.dao.mysql.MySQLDAOFactory.get;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -31,6 +29,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import eionet.cr.dao.DAOException;
+import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.UrgentHarvestQueueDAO;
 import eionet.cr.dto.UrgentHarvestQueueItemDTO;
 import eionet.cr.harvest.HarvestException;
@@ -71,7 +70,7 @@ public class UrgentHarvestQueue{
 				dtos.add(dto);
 			}
 			
-			get().getDao(UrgentHarvestQueueDAO.class).addPullHarvests(dtos);
+			DAOFactory.get().getDao(UrgentHarvestQueueDAO.class).addPullHarvests(dtos);
 			
 			for (Iterator<String> i=urls.iterator(); i.hasNext();){
 				logger.debug("Pull harvest added to the urgent queue, url = " + i.next());
@@ -96,7 +95,7 @@ public class UrgentHarvestQueue{
 		dto.setPushedContent(pushContent);
 		
 		try {
-			get().getDao(UrgentHarvestQueueDAO.class).addPushHarvest(dto);
+			DAOFactory.get().getDao(UrgentHarvestQueueDAO.class).addPushHarvest(dto);
 			logger.debug("Push harvest added to the urgent queue, url = " + url);
 		}
 		catch (DAOException e) {
@@ -111,6 +110,6 @@ public class UrgentHarvestQueue{
 	 */
 	public static synchronized UrgentHarvestQueueItemDTO poll() throws DAOException{
 		
-		return get().getDao(UrgentHarvestQueueDAO.class).poll();
+		return DAOFactory.get().getDao(UrgentHarvestQueueDAO.class).poll();
 	}
 }

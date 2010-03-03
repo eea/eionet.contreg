@@ -20,8 +20,6 @@
  */
 package eionet.cr.harvest;
 
-import static eionet.cr.dao.mysql.MySQLDAOFactory.get;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -47,7 +45,6 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
-import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.harvest.util.arp.ARPSource;
@@ -503,7 +500,8 @@ public class PullHarvest extends Harvest{
 		
 		PullHarvest harvest = new PullHarvest(dto.getUrl(), urgent ? null : dto.getLastHarvest());
 		
-		harvest.setPreviousHarvest(get().getDao(HarvestDAO.class).getLastHarvest(dto.getSourceId().intValue()));
+		harvest.setPreviousHarvest(DAOFactory.get().getDao(HarvestDAO.class).getLastHarvest(
+				dto.getSourceId().intValue()));
 		harvest.setDaoWriter(new HarvestDAOWriter(
 				dto.getSourceId().intValue(), Harvest.TYPE_PULL, numOfResources, CRUser.application.getUserName()));
 		harvest.setNotificationSender(new HarvestNotificationSender());

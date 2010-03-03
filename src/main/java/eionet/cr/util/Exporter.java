@@ -43,7 +43,6 @@ import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.SearchDAO;
-import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.pagination.PagingRequest;
 

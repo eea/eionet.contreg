@@ -41,7 +41,6 @@ import eionet.cr.common.Subjects;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.SearchDAO;
-import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
@@ -134,9 +133,8 @@ public class XmlRpcServices implements Services{
 		
 		List<DataflowResultDto> result = new ArrayList<DataflowResultDto>();
 		try{
-			Pair<Integer, List<SubjectDTO>> search = MySQLDAOFactory
-					.get().getDao(SearchDAO.class)
-					.searchByFilters(
+			Pair<Integer, List<SubjectDTO>> search =
+				DAOFactory.get().getDao(SearchDAO.class).searchByFilters(
 							criteria,
 							null,
 							PagingRequest.create(1, MAX_RESULTS),

@@ -120,7 +120,7 @@ public class FilteredSearchHelper extends AbstractSearchHelper{
 						|| URIUtil.isSchemedURI(objectValue)
 						|| !isLiteralPredicate(predicateUri)){
 					
-					whereBuf.append(spoAlias).append(".OBJECT_HASH=?").
+					whereBuf.append(spoAlias).append(".OBJECT_HASH=").
 					append(Hashes.spoHash(StringUtils.strip(objectValue, "\"")));
 				}
 				else{
@@ -185,7 +185,7 @@ public class FilteredSearchHelper extends AbstractSearchHelper{
 						|| URIUtil.isSchemedURI(objectValue)
 						|| !isLiteralPredicate(predicateUri)){
 					
-					whereBuf.append(spoAlias).append(".OBJECT_HASH=?").
+					whereBuf.append(spoAlias).append(".OBJECT_HASH=").
 					append(Hashes.spoHash(StringUtils.strip(objectValue, "\"")));
 				}
 				else{

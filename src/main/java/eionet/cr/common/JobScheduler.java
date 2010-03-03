@@ -61,6 +61,7 @@ public class JobScheduler implements ServletContextListener{
 	private static final Pair<String, JobDetail>[] cronJobs;
 	
 	static {
+//		intervalJobs = new Pair[0];
 		intervalJobs = new Pair[]{
 				new Pair(
 						GeneralConfig.DATAFLOW_PICKLIST_CACHE_UPDATE_INTERVAL,
@@ -82,6 +83,7 @@ public class JobScheduler implements ServletContextListener{
 								TypeCacheUpdater.class))	
 		};
 		
+//		cronJobs = new Pair[0];
 		cronJobs = new Pair[]{
 				new Pair(
 						GeneralConfig.GARBAGE_COLLECTOR_CRON_JOB,
@@ -178,6 +180,7 @@ public class JobScheduler implements ServletContextListener{
 	 * {@inheritDoc}
 	 */
 	public void contextInitialized(ServletContextEvent sce) {
+		
 		for (Pair<String,JobDetail> job : intervalJobs) {
 			try{
 				scheduleIntervalJob(
@@ -190,6 +193,7 @@ public class JobScheduler implements ServletContextListener{
 				logger.fatal("Error when scheduling " + job.getRight().getName(), e);
 			}
 		}
+		
 		for(Pair<String,JobDetail> job: cronJobs) {
 			try {
 				scheduleCronJob(

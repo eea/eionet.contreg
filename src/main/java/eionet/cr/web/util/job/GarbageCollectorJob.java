@@ -30,7 +30,6 @@ import org.quartz.StatefulJob;
 
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
-import eionet.cr.dao.mysql.MySQLDAOFactory;
 
 /**
  * background job to perform garbage collection on the database.
@@ -51,27 +50,42 @@ public class GarbageCollectorJob implements StatefulJob {
 	@SuppressWarnings("unchecked")
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		try {
-			logger.debug("garbage collector has started");
+			logger.debug("Executing garbage collector (pauses other jobs and waits for them to finish");
+			
 			Scheduler scheduler = context.getScheduler();
 			scheduler.pauseAll();
 			try {
 				List jobs = null;
 				do {
 					jobs = scheduler.getCurrentlyExecutingJobs();
-					if (jobs != null && jobs.size() > 1) {
+					if (jobs!=null && jobs.size()>1) {
 						Thread.sleep(1000);
 					}
-				} while (jobs != null && jobs.size() != 1); 
-			} catch (Exception ignored) {
-				logger.error("Exception was raised while sheduling garbage collector job", ignored);
+				}
+				while (jobs!=null && jobs.size()!=1); 
+			}
+			catch (Exception ignored) {
+				logger.error("Garbage collector" +
+						" had an exception while waiting for other jobs to finish", ignored);
 				return;
 			}
 			
 			HarvestSourceDAO harvestSourceDAO = DAOFactory.get().getDao(HarvestSourceDAO.class);
+						
+			logger.debug("Garbage collector going to delete orphan sources");
+			long start = System.currentTimeMillis();
 			harvestSourceDAO.deleteOrphanSources();
+			logger.debug("Orphan sources deleted with " +(System.currentTimeMillis()-start)+ " ms");
+
+			logger.debug("Garbage collector going to delete history of old harvests");
+			start = System.currentTimeMillis();
 			harvestSourceDAO.deleteHarvestHistory(NEEDED_TO_REMAIN);
-			logger.debug("garbage collector has finished its job");
-		} catch (Exception ignored) {
+			logger.debug("History of old harvests deleted with " +
+					(System.currentTimeMillis()-start)+ " ms");
+			
+			logger.debug("Garbage collector finished");
+		}
+		catch (Exception ignored) {
 			logger.error("error in garbage collector", ignored);
 		} finally {
 			try {

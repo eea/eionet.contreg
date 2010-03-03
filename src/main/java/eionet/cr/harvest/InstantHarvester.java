@@ -27,7 +27,6 @@ import org.apache.commons.lang.StringUtils;
 import eionet.cr.common.CRRuntimeException;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HarvestSourceDAO;
-import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.harvest.scheduled.HarvestingJob;
 

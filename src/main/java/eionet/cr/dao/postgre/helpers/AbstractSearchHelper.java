@@ -66,15 +66,15 @@ public abstract class AbstractSearchHelper implements SearchHelper{
 		
 		String query = StringUtils.isBlank(sortPredicate) ?
 				getUnorderedQuery(inParams) : getOrderedQuery(inParams);
-		
+
 		if (pagingRequest!=null){
-			return query;
-		}
-		else{
 			return new StringBuffer(query).
 			append(" limit ").append(pagingRequest.getItemsPerPage()).
 			append(" offset ").append(pagingRequest.getOffset()).
-			toString();
+			toString();			
+		}
+		else{
+			return query;
 		}
 	}
 

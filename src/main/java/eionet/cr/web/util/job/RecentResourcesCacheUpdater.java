@@ -29,7 +29,6 @@ import org.quartz.StatefulJob;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HelperDAO;
-import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.web.util.ApplicationCache;
 
 /**

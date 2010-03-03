@@ -37,8 +37,8 @@ import org.apache.commons.lang.StringUtils;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.dao.DAOException;
+import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.SearchDAO;
-import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dao.util.UriLabelPair;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Pair;
@@ -79,10 +79,8 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean<SubjectDT
 	 * @see eionet.cr.web.action.AbstractSearchActionBean#search()
 	 */
 	public Resolution search() throws DAOException{
-		Pair<Integer, List<SubjectDTO>> customSearch = MySQLDAOFactory
-					.get()
-					.getDao(SearchDAO.class)
-					.searchByFilters(
+		Pair<Integer, List<SubjectDTO>> customSearch =
+			DAOFactory.get().getDao(SearchDAO.class).searchByFilters(
 							buildSearchCriteria(),
 							null,
 							PagingRequest.create(getPageN()),

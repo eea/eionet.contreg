@@ -166,4 +166,11 @@ public interface HelperDAO extends DAO {
 	 * @throws DAOException
 	 */
 	HashMap<String, ArrayList<UriLabelPair>> getDataflowSearchPicklist() throws DAOException;
+	
+	/**
+	 * 
+	 * @return
+	 * @throws DAOException
+	 */
+	ArrayList<Pair<String,String>> getDistinctOrderedTypes() throws DAOException;
 }

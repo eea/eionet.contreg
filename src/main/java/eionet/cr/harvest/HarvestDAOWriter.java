@@ -20,12 +20,11 @@
  */
 package eionet.cr.harvest;
 
-import static eionet.cr.dao.mysql.MySQLDAOFactory.get;
-
 import java.util.Iterator;
 import java.util.List;
 
 import eionet.cr.dao.DAOException;
+import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dao.HarvestMessageDAO;
 import eionet.cr.dao.HarvestSourceDAO;
@@ -68,8 +67,9 @@ public class HarvestDAOWriter {
 	 */
 	protected void writeStarted(Harvest harvest) throws DAOException{
 
-		harvestId = get().getDao(HarvestDAO.class).insertStartedHarvest(sourceId, harvestType, userName, Harvest.STATUS_STARTED);
-		get().getDao(HarvestSourceDAO.class).updateHarvestStarted(sourceId);
+		harvestId = DAOFactory.get().getDao(HarvestDAO.class).insertStartedHarvest(
+				sourceId, harvestType, userName, Harvest.STATUS_STARTED);
+		DAOFactory.get().getDao(HarvestSourceDAO.class).updateHarvestStarted(sourceId);
 	}
 
 	/**
@@ -80,7 +80,8 @@ public class HarvestDAOWriter {
 	 */
 	protected void writeFinished(Harvest harvest) throws DAOException{
 		
-		get().getDao(HarvestDAO.class).updateFinishedHarvest(harvestId, Harvest.STATUS_FINISHED,
+		DAOFactory.get().getDao(HarvestDAO.class).updateFinishedHarvest(
+				harvestId, Harvest.STATUS_FINISHED,
 				harvest.getStoredTriplesCount(),
 				harvest.getDistinctSubjectsCount(),
 				0,
@@ -91,7 +92,7 @@ public class HarvestDAOWriter {
 				|| (harvest.getWarnings() != null && !harvest.getWarnings().isEmpty());
 		
 		if (harvest instanceof PullHarvest){
-			get().getDao(HarvestSourceDAO.class)
+			DAOFactory.get().getDao(HarvestSourceDAO.class)
 					.updateHarvestFinished(
 							sourceId,
 							null,
@@ -100,7 +101,7 @@ public class HarvestDAOWriter {
 							failed);
 		}
 		else{
-			get().getDao(HarvestSourceDAO.class)
+			DAOFactory.get().getDao(HarvestSourceDAO.class)
 					.updateHarvestFinished(
 							sourceId,
 							null,
@@ -134,7 +135,7 @@ public class HarvestDAOWriter {
 				harvestMessageDTO.setType(HarvestMessageType.INFO.toString());
 				harvestMessageDTO.setMessage(i.next());
 				harvestMessageDTO.setStackTrace("");
-				get().getDao(HarvestMessageDAO.class).insertHarvestMessage(harvestMessageDTO);
+				DAOFactory.get().getDao(HarvestMessageDAO.class).insertHarvestMessage(harvestMessageDTO);
 			}
 		}
 	}
@@ -155,7 +156,7 @@ public class HarvestDAOWriter {
 		harvestMessageDTO.setType(type);
 		harvestMessageDTO.setMessage(throwable.toString());
 		harvestMessageDTO.setStackTrace(Util.getStackTrace(throwable));
-		get().getDao(HarvestMessageDAO.class).insertHarvestMessage(harvestMessageDTO);
+		DAOFactory.get().getDao(HarvestMessageDAO.class).insertHarvestMessage(harvestMessageDTO);
 	}
 	
 	/**

@@ -838,4 +838,13 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 		executeQuery(dataflowPicklistSQL, reader);
 		return reader.getResultMap();
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#getDistinctOrderedTypes()
+	 */
+	public ArrayList<Pair<String, String>> getDistinctOrderedTypes() throws DAOException {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Method not implemented");
+	}
 }
