@@ -110,7 +110,7 @@ public interface HelperDAO extends DAO {
 	 * @return
 	 * @throws DAOException
 	 */
-	Pair<Integer, List<RawTripleDTO>> getSampleTriples(String url, int limit) throws DAOException;
+	List<RawTripleDTO> getSampleTriples(String url, int limit) throws DAOException;
 	
 	/**
 	 * 
@@ -173,4 +173,12 @@ public interface HelperDAO extends DAO {
 	 * @throws DAOException
 	 */
 	ArrayList<Pair<String,String>> getDistinctOrderedTypes() throws DAOException;
+	
+	/**
+	 * 
+	 * @param sourceHash
+	 * @return
+	 * @throws DAOException
+	 */
+	int getSubjectCountInSource(long sourceHash) throws DAOException;
 }

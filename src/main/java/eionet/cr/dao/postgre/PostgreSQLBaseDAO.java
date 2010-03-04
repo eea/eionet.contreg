@@ -159,26 +159,22 @@ public abstract class PostgreSQLBaseDAO {
 	 * 
 	 * @param sql
 	 * @return
-	 * @throws DAOException 
+	 * @throws DAOException
 	 */
-	protected int getQueryRowCount(String sqlQuery) throws DAOException{
-
+	protected Object executeSingleReturnValueQuery(String sql) throws DAOException {
+		
 		Connection conn = null;
-		try {
+		try{
 			conn = getConnection();
-			StringBuffer buf = new StringBuffer("select count(*) from (").
-			append(sqlQuery).append(") as foo");
-			Object o = SQLUtil.executeSingleReturnValueQuery(buf.toString(), conn);
-			return o==null ? 0 : Integer.valueOf(o.toString());
+			return SQLUtil.executeSingleReturnValueQuery(sql, conn);
 		}
-		catch (Exception e){
-			throw new DAOException(e.getMessage(), e);
+		catch (SQLException e){
+			throw new DAOException(e.toString(), e);
 		}
 		finally{
-			ConnectionUtil.closeConnection(conn);
+			SQLUtil.close(conn);
 		}
 	}
-
 	
 	/**
 	 * 

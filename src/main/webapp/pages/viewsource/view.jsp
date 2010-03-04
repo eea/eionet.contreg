@@ -20,10 +20,6 @@
 				<td><c:out value="${actionBean.harvestSource.timeCreated}" /></td>
 			</tr>
 			<tr>
-				<td>Number of resources:</td>
-				<td><c:out value="${actionBean.noOfResources}" /></td>
-			</tr>
-			<tr>
 				<td>Harvest interval:</td>
 				<td><c:out value="${actionBean.intervalMinutesDisplay}" /></td>
 			</tr>

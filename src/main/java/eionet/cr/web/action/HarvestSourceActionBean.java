@@ -45,6 +45,7 @@ import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.RawTripleDTO;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
+import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
 import eionet.cr.util.URLUtil;
 
@@ -64,9 +65,6 @@ public class HarvestSourceActionBean extends AbstractActionBean {
 	
 	/** */
 	private List<RawTripleDTO> sampleTriples;
-	
-	/** */
-	private int noOfResources = 0; // number of distinct resources harvested from this source right now
 	
 	/** */
 	private int intervalMultiplier;
@@ -116,8 +114,10 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     @DefaultHandler
     @HandlesEvent("view")
     public Resolution view() throws DAOException{
+    	
     	selectedTab = "view";
     	prepareDTO();
+    	
     	return new ForwardResolution("/pages/viewsource.jsp");
     }
     
@@ -148,13 +148,15 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     	prepareDTO();
 		if (harvestSource!=null){
 			// populate sample triples
-			populateSampleTriples();
+			sampleTriples = DAOFactory.get().getDao(HelperDAO.class).getSampleTriples(
+    				harvestSource.getUrl(), 10);
 		}
     
     	return new ForwardResolution("/pages/viewsource.jsp");
     }
 
     private void prepareDTO() throws DAOException {
+    	
     	if (harvestSource!=null){
     		Integer sourceId = harvestSource.getSourceId();
     		String url = harvestSource.getUrl();
@@ -168,18 +170,6 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     	}
     }
     
-    /**
-     * @throws DAOException 
-     * 
-     */
-    private void populateSampleTriples() throws DAOException{
-    	Pair<Integer, List<RawTripleDTO>> temp =
-    		DAOFactory.get().getDao(HelperDAO.class).getSampleTriples(
-    				harvestSource.getUrl(), 10);
-    	noOfResources = temp.getLeft();
-    	sampleTriples = temp.getRight();
-    }
-
 	/**
 	 * 
 	 * @return
@@ -316,13 +306,6 @@ public class HarvestSourceActionBean extends AbstractActionBean {
 	 */
 	public List<RawTripleDTO> getSampleTriples() {
 		return sampleTriples;
-	}
-
-	/**
-	 * @return the noOfResources
-	 */
-	public int getNoOfResources() {
-		return noOfResources;
 	}
 
 	/**

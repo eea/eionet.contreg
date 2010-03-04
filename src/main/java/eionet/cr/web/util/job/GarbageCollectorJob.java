@@ -30,6 +30,7 @@ import org.quartz.StatefulJob;
 
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
+import eionet.cr.util.Util;
 
 /**
  * background job to perform garbage collection on the database.
@@ -72,16 +73,15 @@ public class GarbageCollectorJob implements StatefulJob {
 			
 			HarvestSourceDAO harvestSourceDAO = DAOFactory.get().getDao(HarvestSourceDAO.class);
 						
-			logger.debug("Garbage collector going to delete orphan sources");
+			logger.debug("Garbage collector going to delete triples of missing sources");
 			long start = System.currentTimeMillis();
-			harvestSourceDAO.deleteOrphanSources();
-			logger.debug("Orphan sources deleted with " +(System.currentTimeMillis()-start)+ " ms");
+			harvestSourceDAO.deleteTriplesOfMissingSources();
+			logger.debug("Triples of missing sources deleted with " + Util.durationSince(start));
 
 			logger.debug("Garbage collector going to delete history of old harvests");
 			start = System.currentTimeMillis();
 			harvestSourceDAO.deleteHarvestHistory(NEEDED_TO_REMAIN);
-			logger.debug("History of old harvests deleted with " +
-					(System.currentTimeMillis()-start)+ " ms");
+			logger.debug("History of old harvests deleted with " + Util.durationSince(start));
 			
 			logger.debug("Garbage collector finished");
 		}

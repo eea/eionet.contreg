@@ -26,8 +26,10 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.readers.DataflowPicklistReader;
 import eionet.cr.dao.readers.PredicateLabelsReader;
+import eionet.cr.dao.readers.RawTripleDTOReader;
 import eionet.cr.dao.readers.SubPropertiesReader;
 import eionet.cr.dao.readers.SubjectDataReader;
+import eionet.cr.dao.readers.UriHashesReader;
 import eionet.cr.dao.util.PredicateLabels;
 import eionet.cr.dao.util.SubProperties;
 import eionet.cr.dao.util.UriLabelPair;
@@ -552,47 +554,34 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 	 * (non-Javadoc)
 	 * @see eionet.cr.dao.HelperDAO#getSampleTriples(java.lang.String, int)
 	 */
-	public Pair<Integer, List<RawTripleDTO>> getSampleTriples(String url, int limit)
-			throws DAOException {
-		StringBuffer buf = new StringBuffer().
-		append("select distinct sql_calc_found_rows ").
-			append("SUBJ_RESOURCE.URI as SUBJECT_URI, ").
-			append("PRED_RESOURCE.URI as PREDICATE_URI, ").
-			append("OBJECT, ").
-			append("DSRC_RESOURCE.URI as DERIV_SOURCE_URI ").
-		append("from SPO ").
-			append("left join RESOURCE as SUBJ_RESOURCE on (SUBJECT=SUBJ_RESOURCE.URI_HASH) ").
-			append("left join RESOURCE as PRED_RESOURCE on (PREDICATE=PRED_RESOURCE.URI_HASH) ").
-			append("left join RESOURCE as SRC_RESOURCE on (SOURCE=SRC_RESOURCE.URI_HASH) ").
-			append("left join RESOURCE as DSRC_RESOURCE on (OBJ_DERIV_SOURCE=DSRC_RESOURCE.URI_HASH) ").
-		append("where ").
-			append("SPO.SOURCE = ? LIMIT 0, ?");   
-		List<Object> params = new LinkedList<Object>();
-		params.add(Hashes.spoHash(url));
-		params.add(limit);
+	public List<RawTripleDTO> getSampleTriples(String url, int limit) throws DAOException {
 		
-		Pair<Integer,List<RawTripleDTO>> result = executeQueryWithRowCount(buf.toString(), params, new ResultSetListReader<RawTripleDTO>() {
-
-			private List<RawTripleDTO> resultList = new LinkedList<RawTripleDTO>();
+		StringBuffer buf = new StringBuffer("select * from SPO where SOURCE=").
+		append(Hashes.spoHash(url)).
+		append(" limit ").append(Math.max(1, limit));
+		
+		RawTripleDTOReader reader = new RawTripleDTOReader();
+		List<RawTripleDTO> triples = executeQuery(buf.toString(), new LinkedList<Object>(), reader);
+		
+		if (!triples.isEmpty() && !reader.getDistinctHashes().isEmpty()){
 			
-			@Override
-			public List<RawTripleDTO> getResultList() {
-				return resultList;
+			buf = new StringBuffer().
+			append("select URI_HASH, URI from RESOURCE where URI_HASH in (").
+			append(Util.toCSV(reader.getDistinctHashes())).append(")");
+			
+			HashMap<String,String> map = new HashMap<String, String>();
+			executeQuery(buf.toString(), new UriHashesReader(map));
+			
+			if (!map.isEmpty()){				
+				for (RawTripleDTO dto : triples){					
+					dto.setSubject(map.get(dto.getSubject()));
+					dto.setPredicate(map.get(dto.getPredicate()));
+					dto.setObjectDerivSource(map.get(dto.getObjectDerivSource()));
+				}
 			}
-
-			@Override
-			public void readRow(ResultSet rs) throws SQLException {
-				resultList.add(
-						new RawTripleDTO(
-								rs.getString("SUBJECT_URI"),
-								rs.getString("PREDICATE_URI"),
-								rs.getString("OBJECT"),
-								rs.getString("DERIV_SOURCE_URI")));
-			}
-		});
+		}
 		
-		
-		return new Pair<Integer, List<RawTripleDTO>>(result.getLeft(),result.getRight());
+		return triples;
 	}
 
 	/*
@@ -852,4 +841,27 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("Method not implemented");
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#getSubjectCountInSource(long)
+	 */
+	public int getSubjectCountInSource(long sourceHash) throws DAOException {
+		
+		Connection conn = null;
+		try{
+			conn = getConnection();
+			Object o = SQLUtil.executeSingleReturnValueQuery(
+					"select count(distinct SUBJECT) from SPO where SOURCE=" + sourceHash, conn);
+			return (o==null || StringUtils.isBlank(o.toString()))
+					? 0 : Integer.parseInt(o.toString());
+		}
+		catch (SQLException e){
+			throw new DAOException(e.toString(), e);
+		}
+		finally{
+			SQLUtil.close(conn);
+		}
+	}
+
 }

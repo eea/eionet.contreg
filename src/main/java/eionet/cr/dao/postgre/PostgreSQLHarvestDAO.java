@@ -55,7 +55,18 @@ public class PostgreSQLHarvestDAO extends PostgreSQLBaseDAO implements HarvestDA
 
 	/** */
 	private static final String getHarvestsBySourceIdSQL = 
-		"select distinct HARVEST.*, HARVEST.USERNAME as HARVEST_USER, HARVEST_MESSAGE.TYPE" +
+		"select distinct HARVEST.HARVEST_ID as HARVEST_ID," +
+		" HARVEST.HARVEST_SOURCE_ID as SOURCE_ID," +
+		" HARVEST.TYPE as HARVEST_TYPE," +
+		" HARVEST.USERNAME as HARVEST_USER," +
+		" HARVEST.STATUS as STATUS," +
+		" HARVEST.STARTED as STARTED," +
+		" HARVEST.FINISHED as FINISHED," +
+		" HARVEST.TOT_RESOURCES as TOT_RESOURCES," +
+		" HARVEST.ENC_SCHEMES as ENC_SCHEMES," +
+		" HARVEST.TOT_STATEMENTS as TOT_STATEMENTS," +
+		" HARVEST.LIT_STATEMENTS as LIT_STATEMENTS," +
+		" HARVEST_MESSAGE.TYPE as MESSAGE_TYPE" +
 		" from HARVEST left join HARVEST_MESSAGE on HARVEST.HARVEST_ID=HARVEST_MESSAGE.HARVEST_ID" +
 		" where HARVEST.HARVEST_SOURCE_ID=? order by HARVEST.STARTED desc limit ?";
 	/*
@@ -89,7 +100,7 @@ public class PostgreSQLHarvestDAO extends PostgreSQLBaseDAO implements HarvestDA
 
 	/** */
 	private static final String insertStartedHarvestSQL = 
-		"insert into HARVEST (HARVEST_SOURCE_ID, TYPE, USERNAME, STATUS, STARTED) values (?, ?, ?, ?, now()) returning HARVEST_ID";
+		"insert into HARVEST (HARVEST_SOURCE_ID, TYPE, USERNAME, STATUS, STARTED) values (?, ?, ?, ?, now())";
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.dao.HarvestDAO#insertHarvest(int, java.lang.String, java.lang.String, java.lang.String)

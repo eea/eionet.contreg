@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DurationFormatUtils;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
@@ -47,6 +48,7 @@ import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortOrder;
 import eionet.cr.util.SortingRequest;
+import eionet.cr.util.Util;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.util.sql.PairReader;
 import eionet.cr.util.sql.SingleObjectReader;
@@ -116,8 +118,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 
 			}
 		}
-		logger.debug("Free-text search, total query time " +
-				(System.currentTimeMillis()-startTime) + " ms");
+		logger.debug("Free-text search, total query time " + Util.durationSince(startTime));
 
 		// the result Pair contains total number of subjects and the requested sub-list
 		return new Pair<Integer, List<SubjectDTO>>(
@@ -179,8 +180,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 		}
 
 		//return new Pair<Integer,List<SubjectDTO>>(0, new LinkedList<SubjectDTO>());
-		logger.debug("Search by filters, total query time " +
-				(System.currentTimeMillis()-startTime) + " ms");
+		logger.debug("Search by filters, total query time " + Util.durationSince(startTime));
 
 		// the result Pair contains total number of subjects and the requested sub-list
 		return new Pair<Integer,List<SubjectDTO>>(totalRowCount, subjects);
@@ -240,7 +240,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 		}
 		
 		logger.debug("Search references, total query time " +
-				(System.currentTimeMillis()-startTime) + " ms");
+				Util.durationSince(startTime));
 
 		// the result Pair contains total number of subjects and the requested sub-list
 		return new Pair<Integer,List<SubjectDTO>>(Integer.valueOf(totalRowCount), subjects);
@@ -302,10 +302,19 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 			}
 		}
 
-		logger.debug("Search references, total query time " +
-				(System.currentTimeMillis()-startTime) + " ms");
+		logger.debug("Search references, total query time " + Util.durationSince(startTime));
 		
 		// the result Pair contains total number of subjects and the requested sub-list
 		return new Pair<Integer,List<SubjectDTO>>(Integer.valueOf(totalRowCount), subjects);
+	}
+	
+	/**
+	 * 
+	 * @param args
+	 */
+	public static void main(String[] args){
+		
+		long duration = 1001;
+		System.out.println(DurationFormatUtils.formatDuration(duration, "mm min ss sec"));
 	}
 }

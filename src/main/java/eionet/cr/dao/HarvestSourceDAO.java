@@ -149,7 +149,7 @@ public interface HarvestSourceDAO extends DAO{
 	 * @throws DAOException 
 	 * 
 	 */
-	void deleteOrphanSources() throws DAOException;
+	void deleteTriplesOfMissingSources() throws DAOException;
 
 	/**
 	 * @param neededToRemain

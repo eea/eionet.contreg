@@ -21,6 +21,7 @@
 package eionet.cr.dao.mysql;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -443,12 +444,26 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 
 	/** 
 	 * @throws DAOException 
-	 * @see eionet.cr.dao.HarvestSourceDAO#deleteOrphanSources()
+	 * @see eionet.cr.dao.HarvestSourceDAO#deleteTriplesOfMissingSources()
 	 * {@inheritDoc}
 	 */
-	public void deleteOrphanSources() throws DAOException {
-		String sql = "delete from SPO where source not in (select url_hash from harvest_source);";
-		execute(sql, null);
+	public void deleteTriplesOfMissingSources() throws DAOException {
+		
+		Connection conn = null;
+		try{
+			conn = getConnection();
+			
+			String sql = "delete from SPO where SOURCE not in (select URL_HASH from HARVEST_SOURCE)";
+			SQLUtil.executeUpdate(sql, conn);
+			sql = "delete from SPO where OBJ_DERIV_SOURCE not in (select URL_HASH from HARVEST_SOURCE)";
+			SQLUtil.executeUpdate(sql, conn);
+		}
+		catch (SQLException e){
+			throw new DAOException(e.toString(),e);
+		}
+		finally{
+			SQLUtil.close(conn);
+		}
 	}
 
 	/** 

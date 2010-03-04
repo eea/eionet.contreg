@@ -59,7 +59,7 @@ public class HarvestWithMessageTypesReader extends ResultSetListReader<HarvestDT
 	 */
 	public void readRow(ResultSet rs) throws SQLException {
 		
-		Integer harvestId = rs.getInt("HARVEST.HARVEST_ID");
+		Integer harvestId = rs.getInt("HARVEST_ID");
 		if (curHarvest==null || curHarvest.getHarvestId().equals(harvestId)==false){ // if first row or new harvest
 			
 			// create new harvest object and add it to the list, but only if the list has not reached it's max allowed size yet
@@ -71,22 +71,22 @@ public class HarvestWithMessageTypesReader extends ResultSetListReader<HarvestDT
 			resultList.add(curHarvest);
 			
 			curHarvest.setHarvestId(harvestId);
-			curHarvest.setHarvestSourceId(new Integer(rs.getInt("HARVEST.HARVEST_SOURCE_ID")));
+			curHarvest.setHarvestSourceId(new Integer(rs.getInt("SOURCE_ID")));
 			
-			curHarvest.setHarvestType(rs.getString("HARVEST.TYPE"));
+			curHarvest.setHarvestType(rs.getString("HARVEST_TYPE"));
 			curHarvest.setUser(rs.getString("HARVEST_USER"));
-			curHarvest.setStatus(rs.getString("HARVEST.STATUS"));
+			curHarvest.setStatus(rs.getString("STATUS"));
 			
-			curHarvest.setDatetimeStarted(rs.getTimestamp("HARVEST.STARTED"));
-			curHarvest.setDatetimeFinished(rs.getTimestamp("HARVEST.FINISHED"));
+			curHarvest.setDatetimeStarted(rs.getTimestamp("STARTED"));
+			curHarvest.setDatetimeFinished(rs.getTimestamp("FINISHED"));
 			
-			curHarvest.setTotalResources(new Integer(rs.getInt("HARVEST.TOT_RESOURCES")));
-			curHarvest.setEncodingSchemes(new Integer(rs.getInt("HARVEST.ENC_SCHEMES")));
-			curHarvest.setTotalStatements(new Integer(rs.getInt("HARVEST.TOT_STATEMENTS")));
-			curHarvest.setLitObjStatements(new Integer(rs.getInt("HARVEST.LIT_STATEMENTS")));
+			curHarvest.setTotalResources(new Integer(rs.getInt("TOT_RESOURCES")));
+			curHarvest.setEncodingSchemes(new Integer(rs.getInt("ENC_SCHEMES")));
+			curHarvest.setTotalStatements(new Integer(rs.getInt("TOT_STATEMENTS")));
+			curHarvest.setLitObjStatements(new Integer(rs.getInt("LIT_STATEMENTS")));
 		}
 		
-		HarvestBaseDTO.addMessageType(curHarvest, rs.getString("HARVEST_MESSAGE.TYPE"));
+		HarvestBaseDTO.addMessageType(curHarvest, rs.getString("MESSAGE_TYPE"));
 	}
 
 	/**

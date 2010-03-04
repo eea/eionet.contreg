@@ -370,14 +370,6 @@ public class Util {
 	
 	/**
 	 * 
-	 * @param args
-	 */
-	public static void main(String[] args){
-		System.out.println(toDouble("-0,1"));
-	}
-
-	/**
-	 * 
 	 * @param language
 	 */
 	public static String normalizeHTTPAcceptedLanguage(String httpAcceptedLanguage){
@@ -408,5 +400,46 @@ public class Util {
 	    }
 	    
 		return result.toLowerCase();
+	}
+
+	/**
+	 * 
+	 * @param startTime
+	 * @return
+	 */
+	public static String durationSince(long startTime){
+		
+		return duration(Math.max(0, System.currentTimeMillis()-startTime));
+	}
+	
+	/**
+	 * 
+	 * @param duration
+	 * @return
+	 */
+	protected static String duration(long duration){
+		
+		int minutes = (int)((duration / 1000) / 60);
+		int seconds = (int) ((duration / 1000) % 60);
+		int milliseconds = (int) (duration % 1000);
+		StringBuffer buf = new StringBuffer();
+		if (minutes>0){
+			buf.append(minutes).append(" min ");
+		}
+		buf.append(seconds).append(".");
+		if (milliseconds<10)
+			buf.append("00");
+		else if (milliseconds<100)
+			buf.append("0");
+			
+		return buf.append(milliseconds).append(" sec").toString();
+	}
+	
+	/**
+	 * 
+	 * @param args
+	 */
+	public static void main(String[] args){
+		
 	}
 }

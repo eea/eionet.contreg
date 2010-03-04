@@ -21,6 +21,7 @@
 package eionet.cr.dao.postgre;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -145,10 +146,12 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
     private Pair<Integer,List<HarvestSourceDTO>> getSources(String sql, String searchString,
     		PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException {
         	
-    	List<Object> paramValues = new LinkedList<Object>();
+    	List<Object> inParams = new LinkedList<Object>();
     	if (!StringUtils.isBlank(searchString)) {
-    		paramValues.add(searchString);
+    		inParams.add(searchString);
     	}
+    	String queryWithoutOrderAndLimit = new String(sql);
+    	List<Object> inParamsWithoutOrderAndLimit = new LinkedList<Object>(inParams);
     	
     	if (sortingRequest!=null && sortingRequest.getSortingColumnName()!=null) {
     		sql += " ORDER BY " +
@@ -158,16 +161,23 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
     		sql += " ORDER BY URL "; 
     	}
     	
-    	String queryWithoutOrderLimit = new String(sql);
-    	
     	if (pagingRequest!=null){
     		sql += " LIMIT ? OFFSET ? ";
-    		paramValues.add(pagingRequest.getItemsPerPage());
-    		paramValues.add(pagingRequest.getOffset());
+    		inParams.add(pagingRequest.getItemsPerPage());
+    		inParams.add(pagingRequest.getOffset());
     	}
     	
-    	List<HarvestSourceDTO> list = executeQuery(sql, paramValues, new HarvestSourceDTOReader());
-    	int rowCount = list.isEmpty() ? 0 : getQueryRowCount(queryWithoutOrderLimit);
+    	int rowCount = 0;
+    	List<HarvestSourceDTO> list = executeQuery(sql, inParams, new HarvestSourceDTOReader());
+    	if (list!=null && !list.isEmpty()){
+    		
+    		StringBuffer buf = new StringBuffer("select count(*) from (").
+			append(queryWithoutOrderAndLimit).append(") as foo");
+    		
+    		rowCount = Integer.parseInt(executeQueryUniqueResult(buf.toString(),
+    				inParamsWithoutOrderAndLimit, new SingleObjectReader<Long>()).toString());
+    	}
+    	
     	return new Pair<Integer,List<HarvestSourceDTO>>(rowCount,list);
     }
 
@@ -239,26 +249,66 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
 	 */
 	public void deleteHarvestHistory(int neededToRemain) throws DAOException {
 		
-		Long id = executeQueryUniqueResult(
-				"select max(HARVEST_ID) from HARVEST", null, new SingleObjectReader<Long>());
+		Connection conn = null;
+		try{
+			conn = getConnection();
+			conn.setAutoCommit(false);
+			
+			Object o = SQLUtil.executeSingleReturnValueQuery(
+					"select max(HARVEST_ID) from HARVEST", conn);			
+			Long maxId = o==null || StringUtils.isBlank(o.toString()) ?
+					0L : Long.valueOf(o.toString());
 
-		List<Object> params = new LinkedList<Object>();
-		params.add(id - neededToRemain);
-		execute("delete from HARVEST where HARVEST_ID <= ?", params);
-		execute("delete from HARVEST_MESSAGE where HARVEST_ID not in (select HARVEST_ID from HARVEST)", null);
+			if (maxId > neededToRemain){
+				SQLUtil.executeUpdate(
+						"delete from HARVEST where HARVEST_ID<=" + (maxId-neededToRemain), conn);
+			}
+
+			SQLUtil.executeUpdate("delete from HARVEST_MESSAGE" +
+					" where HARVEST_ID not in (select HARVEST_ID from HARVEST)", conn);
+			
+			conn.commit();
+		}
+		catch (SQLException e){
+			SQLUtil.rollback(conn);
+			throw new DAOException(e.toString(), e);
+		}
+		finally{
+			SQLUtil.close(conn);
+		}
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see eionet.cr.dao.HarvestSourceDAO#deleteOrphanSources()
+	 * @see eionet.cr.dao.HarvestSourceDAO#deleteTriplesOfMissingSources()
 	 */
-	public void deleteOrphanSources() throws DAOException {
+	public void deleteTriplesOfMissingSources() throws DAOException {
 		
-		// TODO there's something fishy here
-		String sql = "delete from SPO where source not in (select url_hash from harvest_source);";
-		execute(sql, null);
+		Connection conn = null;
+		try{
+			conn = getConnection();
+			conn.setAutoCommit(false);
+			
+			String sql = "delete from SPO where SOURCE not in (select URL_HASH from HARVEST_SOURCE)";
+			SQLUtil.executeUpdate(sql, conn);
+			sql = "delete from SPO where OBJ_DERIV_SOURCE not in (select URL_HASH from HARVEST_SOURCE)";
+			SQLUtil.executeUpdate(sql, conn);
+			
+			conn.commit();
+		}
+		catch (SQLException e){
+			SQLUtil.rollback(conn);
+			throw new DAOException(e.toString(),e);
+		}
+		finally{
+			SQLUtil.close(conn);
+		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HarvestSourceDAO#deleteSourceByUrl(java.lang.String)
+	 */
 	public void deleteSourceByUrl(String url) throws DAOException {
 		
     	// we'll need those wrappers later.

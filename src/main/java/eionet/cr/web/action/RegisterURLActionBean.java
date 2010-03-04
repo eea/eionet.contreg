@@ -151,6 +151,9 @@ public class RegisterURLActionBean extends AbstractActionBean{
 		if (StringUtils.isBlank(url) || !URLUtil.isURL(url)){
 			addGlobalValidationError(new SimpleError("Not a valid URL!"));
 		}
+		if (getUser()==null){
+			addGlobalValidationError(new SimpleError("You are not logged in!"));
+		}
 	}
 
 	/**

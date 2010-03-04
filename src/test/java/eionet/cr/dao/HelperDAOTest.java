@@ -84,12 +84,11 @@ public class HelperDAOTest extends CRDatabaseTestCase {
 	@Test
 	public void testGetSampleTriples() throws Exception {
 		
-		Pair<Integer, List<RawTripleDTO>> result =
+		List<RawTripleDTO> result =
 			DAOFactory.get().getDao(HelperDAO.class).getSampleTriples(
 					"http://cr.eionet.europa.eu/testsource.rdf", 10);
 		
 		assertNotNull(result);
-		assertNotNull(result.getRight());
-		assertEquals(10, result.getRight().size());
+		assertEquals(10, result.size());
 	}
 }
