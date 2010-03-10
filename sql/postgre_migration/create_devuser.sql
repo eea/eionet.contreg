@@ -1,0 +1,13 @@
+CREATE ROLE cr2dev LOGIN PASSWORD 'your_password' VALID UNTIL '2013-01-01';
+GRANT CREATE,CONNECT,TEMPORARY,TEMP on database cr2 to cr2dev;
+GRANT SELECT,INSERT,UPDATE,DELETE on harvest to cr2dev;
+GRANT SELECT,INSERT,UPDATE,DELETE on harvest_message to cr2dev;
+GRANT SELECT,INSERT,UPDATE,DELETE on harvest_source to cr2dev;
+GRANT SELECT,INSERT,UPDATE,DELETE on remove_source_queue to cr2dev;
+GRANT SELECT,INSERT,UPDATE,DELETE on resource to cr2dev;
+GRANT SELECT,INSERT,UPDATE,DELETE on resource_temp to cr2dev;
+GRANT SELECT,INSERT,UPDATE,DELETE on spo to cr2dev;
+GRANT SELECT,INSERT,UPDATE,DELETE on spo_temp to cr2dev;
+GRANT SELECT,INSERT,UPDATE,DELETE on spo_test to cr2dev;
+GRANT SELECT,INSERT,UPDATE,DELETE on unfinished_harvest to cr2dev;
+GRANT SELECT,INSERT,UPDATE,DELETE on urgent_harvest_queue to cr2dev;
