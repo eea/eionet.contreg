@@ -1,13 +1,4 @@
-CREATE ROLE cr2dev LOGIN PASSWORD 'your_password' VALID UNTIL '2013-01-01';
-GRANT CREATE,CONNECT,TEMPORARY,TEMP on database cr2 to cr2dev;
-GRANT SELECT,INSERT,UPDATE,DELETE on harvest to cr2dev;
-GRANT SELECT,INSERT,UPDATE,DELETE on harvest_message to cr2dev;
-GRANT SELECT,INSERT,UPDATE,DELETE on harvest_source to cr2dev;
-GRANT SELECT,INSERT,UPDATE,DELETE on remove_source_queue to cr2dev;
-GRANT SELECT,INSERT,UPDATE,DELETE on resource to cr2dev;
-GRANT SELECT,INSERT,UPDATE,DELETE on resource_temp to cr2dev;
-GRANT SELECT,INSERT,UPDATE,DELETE on spo to cr2dev;
-GRANT SELECT,INSERT,UPDATE,DELETE on spo_temp to cr2dev;
-GRANT SELECT,INSERT,UPDATE,DELETE on spo_test to cr2dev;
-GRANT SELECT,INSERT,UPDATE,DELETE on unfinished_harvest to cr2dev;
-GRANT SELECT,INSERT,UPDATE,DELETE on urgent_harvest_queue to cr2dev;
+CREATE ROLE cr2dev LOGIN PASSWORD 'your_password';
+GRANT CREATE,CONNECT,TEMPORARY,TEMP ON DATABASE cr2 TO cr2dev;
+GRANT SELECT,INSERT,UPDATE,DELETE ON harvest, harvest_message, harvest_message, harvest_source, remove_source_queue, resource, resource_temp, spo, spo_temp, unfinished_harvest, urgent_harvest_queue TO cr2dev;
+GRANT ALL ON SEQUENCE harvest_message_harvest_message_id_seq, harvest_source_harvest_source_id_seq, harvest_harvest_id_seq TO cr2dev;
