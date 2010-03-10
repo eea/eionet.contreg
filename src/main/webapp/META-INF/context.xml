@@ -2,7 +2,7 @@
 <Context>
 
 	<Logger className="org.apache.catalina.logger.FileLogger" timestamp="true" suffix=".txt" prefix="cr2." />
-	
+	<!-- Example for Mysql -->
 	<Resource name="jdbc/crDevDB"
 				auth="Container"
 				type="javax.sql.DataSource"
@@ -16,6 +16,7 @@
 				url="jdbc:mysql://192.168.10.15:3306/cr2?autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;characterSetResults=UTF-8&amp;zeroDateTimeBehavior=convertToNull&amp;jdbcCompliantTruncation=false">
 	</Resource>
 
+	<!-- Example for Postgresql -->
 	<Resource name="jdbc/crLocalDB"
 				auth="Container"
 				type="javax.sql.DataSource"
@@ -23,10 +24,10 @@
 				maxActive="100"
 				maxIdle="30"
 				maxWait="10000"
-				username="cr2"
-				password="cr2"
-				driverClassName="com.mysql.jdbc.Driver" 
-				url="jdbc:mysql://localhost:3306/eea?autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;characterSetResults=UTF-8&amp;zeroDateTimeBehavior=convertToNull&amp;jdbcCompliantTruncation=false">
+				username="crlocaldb"
+				password="xxx"
+				driverClassName="org.postgresql.Driver"
+				url="jdbc:postgresql://localhost:5432/cr2">
 	</Resource>
 
 </Context>
