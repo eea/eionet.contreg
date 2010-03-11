@@ -431,10 +431,13 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
 
 	/** */
 	private static final String getNextScheduledSourcesSQL =
-	"select * from HARVEST_SOURCE where INTERVAL_MINUTES>0"
-	+ " and timestampdiff(MINUTE,ifnull(LAST_HARVEST,timestampadd(MINUTE,-1*INTERVAL_MINUTES,TIME_CREATED)),NOW()) >= INTERVAL_MINUTES"
-	+ " order by timestampdiff(MINUTE,ifnull(LAST_HARVEST,timestampadd(MINUTE,-1*INTERVAL_MINUTES,TIME_CREATED)),NOW())/INTERVAL_MINUTES desc"
-	+ " limit ?";
+		
+		"select * from HARVEST_SOURCE where INTERVAL_MINUTES>0 and" +
+		" cast(extract(epoch from now()-(coalesce(LAST_HARVEST,(time_created - interval_minutes * interval '1 minute'))))/60 as integer) >= INTERVAL_MINUTES" +
+		" order by" +
+		" cast(extract(epoch from now()-(coalesce(LAST_HARVEST,(time_created - interval_minutes * interval '1 minute'))))/60 as integer)/INTERVAL_MINUTES" +
+		" desc limit ?";
+	
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.dao.HarvestSourceDAO#getNextScheduledSources(int)
