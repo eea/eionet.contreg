@@ -85,11 +85,14 @@
 			<artifactId>activation</artifactId>
 			<version>1.1</version>
 		</dependency>
+<!-- JavaMail now expected to be in the runtime classpath! -->
+<!-- 
 		<dependency>
 			<groupId>javax.mail</groupId>
 			<artifactId>mail</artifactId>
 			<version>1.4.1</version>
 		</dependency>
+-->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
