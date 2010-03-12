@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
 import eionet.cr.dao.DAOException;
 import eionet.cr.util.Pair;
 import eionet.cr.util.Util;
-import eionet.cr.util.sql.ConnectionUtil;
+import eionet.cr.util.sql.DbConnectionProvider;
 import eionet.cr.util.sql.MySQLUtil;
 import eionet.cr.util.sql.ResultSetBaseReader;
 import eionet.cr.util.sql.ResultSetListReader;
@@ -51,7 +51,7 @@ public abstract class MySQLBaseDAO {
 	 * @return
 	 */
 	protected Connection getConnection() throws SQLException{
-		return ConnectionUtil.getConnection();
+		return DbConnectionProvider.getConnection();
 	}
 	
 	/**
@@ -59,7 +59,7 @@ public abstract class MySQLBaseDAO {
 	 * @param conn
 	 */
 	protected void closeConnection(Connection conn){
-		ConnectionUtil.closeConnection(conn);
+		SQLUtil.close(conn);
 	}
 	
 	/**
@@ -94,7 +94,7 @@ public abstract class MySQLBaseDAO {
 			throw new DAOException(e.getMessage(), e);
 		}
 		finally{
-			ConnectionUtil.closeConnection(conn);
+			SQLUtil.close(conn);
 		}
 	}
 
@@ -114,7 +114,7 @@ public abstract class MySQLBaseDAO {
 			throw new DAOException(e.getMessage(), e);
 		}
 		finally{
-			ConnectionUtil.closeConnection(conn);
+			SQLUtil.close(conn);
 		}
 	}
 
@@ -139,8 +139,8 @@ public abstract class MySQLBaseDAO {
 		} catch (Exception e){
 			throw new DAOException(e.getMessage(), e);
 		} finally{
-			ConnectionUtil.closeConnection(conn);
-			ConnectionUtil.clostStatement(statement);
+			SQLUtil.close(conn);
+			SQLUtil.close(statement);
 		}
 	}
 
@@ -167,7 +167,7 @@ public abstract class MySQLBaseDAO {
 			throw new DAOException(fatal.getMessage(), fatal);
 		}
 		finally {
-			ConnectionUtil.closeConnection(conn);
+			SQLUtil.close(conn);
 		}
 	}
 	
@@ -191,7 +191,7 @@ public abstract class MySQLBaseDAO {
 		} catch (Exception fatal) {
 			throw new DAOException(fatal.getMessage(), fatal);
 		} finally {
-			ConnectionUtil.closeConnection(conn);
+			SQLUtil.close(conn);
 		}
 	}
 	

@@ -35,7 +35,7 @@ import eionet.cr.dto.SubjectDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.test.helpers.dbunit.DbUnitDatabaseConnection;
 import eionet.cr.util.Pair;
-import eionet.cr.util.sql.ConnectionUtil;
+import eionet.cr.util.sql.DbConnectionProvider;
 
 /**
  * 

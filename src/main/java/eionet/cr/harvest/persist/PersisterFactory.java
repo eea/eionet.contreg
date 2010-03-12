@@ -25,6 +25,7 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.postgre.PostgreSQLDAOFactory;
 import eionet.cr.harvest.persist.mysql.MySQLDefaultPersister;
 import eionet.cr.harvest.persist.postgresql.PostgreSQLPersister;
+import eionet.cr.util.sql.DbConnectionProvider;
 
 /**
  * 
@@ -39,7 +40,8 @@ public abstract class PersisterFactory {
 	 */
 	public static IHarvestPersister getPersister(PersisterConfig config){
 
-		String dbUrl = GeneralConfig.getRequiredProperty(GeneralConfig.DB_URL);
+		//String dbUrl = GeneralConfig.getRequiredProperty(GeneralConfig.DB_URL);
+		String dbUrl = DbConnectionProvider.getConnectionUrl();
 		if (dbUrl.startsWith("jdbc:mysql:"))
 			return new MySQLDefaultPersister(config);
 		else if (dbUrl.startsWith("jdbc:postgresql:"))

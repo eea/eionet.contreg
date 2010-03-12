@@ -26,7 +26,7 @@ import org.dbunit.database.DatabaseConnection;
 import org.dbunit.database.IDatabaseConnection;
 
 import eionet.cr.config.GeneralConfig;
-import eionet.cr.util.sql.ConnectionUtil;
+import eionet.cr.util.sql.DbConnectionProvider;
 
 /**
  * 
@@ -42,8 +42,8 @@ public abstract class DbUnitDatabaseConnection {
 	 */
 	public static IDatabaseConnection get() throws Exception{
 		
-		ConnectionUtil.setReturnSimpleConnection(true);
-		DatabaseConnection dbConn = new DatabaseConnection(ConnectionUtil.getConnection());
+		DbConnectionProvider.setConnectionType(DbConnectionProvider.ConnectionType.SIMPLE);
+		DatabaseConnection dbConn = new DatabaseConnection(DbConnectionProvider.getConnection());
 		dbConn.getConfig().setPropertiesByString(getConfigProperties());
 		return dbConn;
 	}

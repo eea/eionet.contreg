@@ -37,7 +37,7 @@ import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.test.helpers.DbHelper;
 import eionet.cr.test.helpers.dbunit.DbUnitDatabaseConnection;
 import eionet.cr.util.Hashes;
-import eionet.cr.util.sql.ConnectionUtil;
+import eionet.cr.util.sql.DbConnectionProvider;
 
 /**
  * JUnit test tests HarvestMessageDAO functionality.

@@ -32,7 +32,7 @@ import org.dbunit.operation.DatabaseOperation;
 import org.junit.Test;
 
 import eionet.cr.test.helpers.CRDatabaseTestCase;
-import eionet.cr.util.sql.ConnectionUtil;
+import eionet.cr.util.sql.DbConnectionProvider;
 
 /**
  * 

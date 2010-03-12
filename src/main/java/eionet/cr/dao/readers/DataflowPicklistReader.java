@@ -31,7 +31,7 @@ import eionet.cr.common.Predicates;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.util.UriLabelPair;
 import eionet.cr.util.Hashes;
-import eionet.cr.util.sql.ConnectionUtil;
+import eionet.cr.util.sql.DbConnectionProvider;
 import eionet.cr.util.sql.ResultSetBaseReader;
 import eionet.cr.util.sql.SQLUtil;
 
@@ -78,14 +78,14 @@ public class DataflowPicklistReader extends ResultSetBaseReader{
 		
 		Connection conn = null;
 		try{
-			conn = ConnectionUtil.getConnection();
+			conn = DbConnectionProvider.getConnection();
 			SQLUtil.executeQuery(sql, this, conn);
 		}
 		catch (SQLException e){
 			throw new DAOException(e.toString(), e);
 		}
 		finally{
-			ConnectionUtil.closeConnection(conn);
+			SQLUtil.close(conn);
 		}
 	}
 

@@ -31,7 +31,7 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.UrgentHarvestQueueDAO;
 import eionet.cr.dao.readers.HarvestQueueItemDTOReader;
 import eionet.cr.dto.UrgentHarvestQueueItemDTO;
-import eionet.cr.util.sql.ConnectionUtil;
+import eionet.cr.util.sql.DbConnectionProvider;
 import eionet.cr.util.sql.SQLUtil;
 
 /**
@@ -75,7 +75,7 @@ public class MySQLUrgentHarvestQueueDAO extends MySQLBaseDAO implements UrgentHa
 			throw new DAOException(e.getMessage(), e);
 		}
 		finally{
-			ConnectionUtil.closeConnection(conn);
+			SQLUtil.close(conn);
 		}
 	}
 
@@ -105,7 +105,7 @@ public class MySQLUrgentHarvestQueueDAO extends MySQLBaseDAO implements UrgentHa
 			throw new DAOException(e.getMessage(), e);
 		}
 		finally{
-			ConnectionUtil.closeConnection(conn);
+			SQLUtil.close(conn);
 		}
 	}
 

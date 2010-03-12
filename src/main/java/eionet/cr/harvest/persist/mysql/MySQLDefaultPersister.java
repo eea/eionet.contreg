@@ -41,7 +41,7 @@ import eionet.cr.harvest.util.HarvestLog;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Util;
 import eionet.cr.util.YesNoBoolean;
-import eionet.cr.util.sql.ConnectionUtil;
+import eionet.cr.util.sql.DbConnectionProvider;
 import eionet.cr.util.sql.SQLUtil;
 
 /**
@@ -332,7 +332,7 @@ public class MySQLDefaultPersister implements IHarvestPersister {
 		Connection conn = null;
 		ArrayList<UnfinishedHarvestDTO> list = new ArrayList<UnfinishedHarvestDTO>();
 		try{
-			conn = ConnectionUtil.getConnection();
+			conn = DbConnectionProvider.getConnection();
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery("select * from UNFINISHED_HARVEST");
 			while (rs!=null && rs.next()){
@@ -391,7 +391,7 @@ public class MySQLDefaultPersister implements IHarvestPersister {
 	 */
 	public void openResources() throws PersisterException {
 		try {
-			connection = ConnectionUtil.getConnection();
+			connection = DbConnectionProvider.getConnection();
 			// make sure SPO_TEMP and RESOURCE_TEMP are empty, because we do only one scheduled harvest at a time
 			// and so any possible leftovers from previous scheduled harvest must be deleted)
 			if (!isInstantHarvest()){

@@ -38,7 +38,7 @@ import eionet.cr.util.SortingRequest;
 import eionet.cr.util.Util;
 import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.pagination.PagingRequest;
-import eionet.cr.util.sql.ConnectionUtil;
+import eionet.cr.util.sql.DbConnectionProvider;
 import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
 
@@ -242,7 +242,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 			throw new DAOException(e.getMessage(), e);
 		}
 		finally{
-			ConnectionUtil.closeConnection(conn);
+			SQLUtil.close(conn);
 		}
 	}
 
@@ -271,7 +271,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 			throw new DAOException(e.getMessage(), e);
 		}
 		finally{
-			ConnectionUtil.closeConnection(conn);
+			SQLUtil.close(conn);
 		}
     }
 
@@ -355,7 +355,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 			throw new DAOException(e.getMessage(), e);
 		}
 		finally{
-			ConnectionUtil.closeConnection(conn);
+			SQLUtil.close(conn);
 		}
     }
 
@@ -386,7 +386,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 			throw new DAOException(e.getMessage(), e);
 		}
 		finally{
-			ConnectionUtil.closeConnection(conn);
+			SQLUtil.close(conn);
 		}
 	}
 
@@ -411,7 +411,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 			throw new DAOException(e.getMessage(), e);
 		}
 		finally{
-			ConnectionUtil.closeConnection(conn);
+			SQLUtil.close(conn);
 		}
 	}
 

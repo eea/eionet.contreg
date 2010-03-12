@@ -21,6 +21,7 @@
 package eionet.cr.util.sql;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -41,14 +42,23 @@ import eionet.cr.config.GeneralConfig;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class ConnectionUtil {
+public class DbConnectionProvider {
 	
 	/** */
-	private static Log logger = LogFactory.getLog(ConnectionUtil.class);
+	public enum ConnectionType {SIMPLE,JNDI};
+	
+	/** */
+	private static Log logger = LogFactory.getLog(DbConnectionProvider.class);
 
 	/** */
 	private static DataSource dataSource = null;
-	private static boolean returnSimpleConnection = false;
+	private static ConnectionType connectionType = null;
+	private static String connectionUrl = null;
+	
+	/** Lock objects */
+	private static Object dataSourceLock = new Object();
+	private static Object connectionTypeLock = new Object();
+	private static Object connectionUrlLock = new Object();
 	
 	/**
 	 * 
@@ -59,7 +69,7 @@ public class ConnectionUtil {
 		try{
 			Context initContext = new InitialContext();
 			Context context = (Context) initContext.lookup("java:comp/env");
-			ConnectionUtil.dataSource = (javax.sql.DataSource)context.lookup(dataSourceName);
+			DbConnectionProvider.dataSource = (javax.sql.DataSource)context.lookup(dataSourceName);
 		}
 		catch (NamingException e){
 			throw new CRRuntimeException("Failed to init JDBC resource " + dataSourceName, e);
@@ -72,10 +82,18 @@ public class ConnectionUtil {
 	 * @throws SQLException 
 	 */
 	public static Connection getConnection() throws SQLException {
-		if(ConnectionUtil.returnSimpleConnection)
-			return getSimpleConnection();
-		else
+		
+		if (connectionType==null){
 			return getJNDIConnection();
+		}
+		else if (connectionType.equals(ConnectionType.JNDI)){
+			return getJNDIConnection();
+		}
+		else if (connectionType.equals(ConnectionType.SIMPLE)){
+			return getSimpleConnection();
+		}
+		else
+			throw new CRRuntimeException("Unknown connection type: " + connectionType);
 	}
 
 	/**
@@ -83,10 +101,19 @@ public class ConnectionUtil {
 	 * @return
 	 * @throws SQLException 
 	 */
-	protected static synchronized Connection getJNDIConnection() throws SQLException{
+	private static Connection getJNDIConnection() throws SQLException{
 		
-		if (dataSource==null)
-			initDataSource();
+		if (dataSource==null){
+			synchronized (dataSourceLock) {
+				
+				// double-checked locking pattern
+				// (http://www.ibm.com/developerworks/java/library/j-dcl.html)
+				if (dataSource==null){
+					initDataSource();
+				}
+			}			
+		}
+		
 		return dataSource.getConnection();
 	}
 	
@@ -96,7 +123,7 @@ public class ConnectionUtil {
 	 * @throws SQLException 
 	 * @throws SQLException
 	 */
-	protected static Connection getSimpleConnection() throws SQLException{
+	private static Connection getSimpleConnection() throws SQLException{
 		
 		String drv = GeneralConfig.getProperty(GeneralConfig.DB_DRV);
 		if (drv==null || drv.trim().length()==0)
@@ -122,49 +149,69 @@ public class ConnectionUtil {
 			throw new CRRuntimeException("Failed to get connection, driver class not found: " + drv, e);
 		}
 	}
-	
-	/**
-	 * 
-	 * @param conn
-	 */
-	public static void closeConnection(Connection conn) {
-		try {
-			if (conn!=null && !conn.isClosed())
-				conn.close();
-		}
-		catch (SQLException e) {
-			logger.error("Failed to close connection", e);
-		}
-	}
 
 	/**
 	 * 
 	 * @return
 	 */
-	public static boolean isReturnSimpleConnection() {
-		return returnSimpleConnection;
+	public static ConnectionType getConnectionType() {
+		return connectionType;
 	}
 
 	/**
 	 * 
 	 * @param testConnection
 	 */
-	public static void setReturnSimpleConnection(boolean b) {
-		ConnectionUtil.returnSimpleConnection = b;
+	public static void setConnectionType(ConnectionType connType){
+		
+		if (connectionType==null){
+			
+			synchronized (connectionTypeLock) {
+				
+				// double-checked locking pattern
+				// (http://www.ibm.com/developerworks/java/library/j-dcl.html)
+				if (connectionType==null){
+					connectionType = connType;
+				}
+			}			
+		}
+		else{
+			throw new CRRuntimeException("Connection type already set!");
+		}
 	}
-
+	
 	/**
-	 * @param statement
+	 * 
+	 * @return
 	 */
-	public static void clostStatement(PreparedStatement statement) {
-		try {
-			if (statement != null) {
-				statement.close();
+	public static String getConnectionUrl(){
+		
+		if (connectionUrl==null || connectionUrl.trim().length()==0){
+			
+			synchronized (connectionUrlLock) {
+				
+				// double-checked locking pattern
+				// (http://www.ibm.com/developerworks/java/library/j-dcl.html)
+				if (connectionUrl==null || connectionUrl.trim().length()==0){
+
+					Connection conn = null;
+					try{
+						conn = getConnection();
+						DatabaseMetaData dbMetadata = conn.getMetaData();
+						connectionUrl = dbMetadata.getURL();
+					}
+					catch (SQLException sqle){
+						throw new CRRuntimeException("Failed to look up database url!", sqle);
+					}
+					finally{
+						if (conn!=null){
+							try{ conn.close(); } catch (Exception e){}
+						}
+					}
+				}
 			}
-		} catch (Exception ignored) {
-			logger.error("exception was raised while attempting to close the prepared statement", ignored);
 		}
 		
+		return connectionUrl;
 	}
-
 }

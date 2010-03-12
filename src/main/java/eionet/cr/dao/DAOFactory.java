@@ -20,9 +20,12 @@
 * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.dao;
 
+import java.sql.SQLException;
+
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.mysql.MySQLDAOFactory;
 import eionet.cr.dao.postgre.PostgreSQLDAOFactory;
+import eionet.cr.util.sql.DbConnectionProvider;
 
 /**
  * 
@@ -34,10 +37,12 @@ public abstract class DAOFactory {
 	/**
 	 * 
 	 * @return
+	 * @throws DAOException 
 	 */
 	public static DAOFactory get(){
 		
-		String dbUrl = GeneralConfig.getRequiredProperty(GeneralConfig.DB_URL);
+//		String dbUrl = GeneralConfig.getRequiredProperty(GeneralConfig.DB_URL);
+		String dbUrl = DbConnectionProvider.getConnectionUrl();
 		if (dbUrl.startsWith("jdbc:mysql:"))
 			return MySQLDAOFactory.get();
 		else if (dbUrl.startsWith("jdbc:postgresql:"))

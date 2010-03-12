@@ -31,7 +31,7 @@ import org.apache.commons.logging.LogFactory;
 
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.util.Hashes;
-import eionet.cr.util.sql.ConnectionUtil;
+import eionet.cr.util.sql.DbConnectionProvider;
 import eionet.cr.util.sql.SQLUtil;
 
 /**
@@ -152,8 +152,8 @@ public class ObjectHashesFixer extends Thread{
 		PreparedStatement pstmtResources = null;
 		ResultSet rs = null;
 		try{
-			ConnectionUtil.setReturnSimpleConnection(true);
-			conn = ConnectionUtil.getConnection();
+			DbConnectionProvider.setConnectionType(DbConnectionProvider.ConnectionType.SIMPLE);
+			conn = DbConnectionProvider.getConnection();
 			
 			selectStmt = conn.prepareStatement(selectSQL);
 			pstmtObjects = conn.prepareStatement(updateObjectsSQL);

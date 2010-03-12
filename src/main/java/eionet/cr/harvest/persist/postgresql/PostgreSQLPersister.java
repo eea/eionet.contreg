@@ -43,7 +43,7 @@ import eionet.cr.harvest.util.HarvestLog;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Util;
 import eionet.cr.util.YesNoBoolean;
-import eionet.cr.util.sql.ConnectionUtil;
+import eionet.cr.util.sql.DbConnectionProvider;
 import eionet.cr.util.sql.SQLUtil;
 
 /**
@@ -253,7 +253,7 @@ public class PostgreSQLPersister implements IHarvestPersister{
 	 */
 	public void openResources() throws PersisterException {
 		try {
-			connection = ConnectionUtil.getConnection();
+			connection = DbConnectionProvider.getConnection();
 			connection.setAutoCommit(false);
 			
 			// create unfinished harvest flag for the current harvest
@@ -369,7 +369,7 @@ public class PostgreSQLPersister implements IHarvestPersister{
 		Connection conn = null;
 		ArrayList<UnfinishedHarvestDTO> list = new ArrayList<UnfinishedHarvestDTO>();
 		try{
-			conn = ConnectionUtil.getConnection();
+			conn = DbConnectionProvider.getConnection();
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery("select * from UNFINISHED_HARVEST");
 			while (rs!=null && rs.next()){

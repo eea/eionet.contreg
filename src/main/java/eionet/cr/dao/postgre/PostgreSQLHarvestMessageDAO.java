@@ -28,7 +28,7 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HarvestMessageDAO;
 import eionet.cr.dao.readers.HarvestMessageDTOReader;
 import eionet.cr.dto.HarvestMessageDTO;
-import eionet.cr.util.sql.ConnectionUtil;
+import eionet.cr.util.sql.DbConnectionProvider;
 import eionet.cr.util.sql.SQLUtil;
 
 /**
@@ -119,7 +119,7 @@ public class PostgreSQLHarvestMessageDAO extends PostgreSQLBaseDAO implements Ha
 			throw new DAOException(e.getMessage(), e);
 		}
 		finally{
-			ConnectionUtil.closeConnection(conn);
+			SQLUtil.close(conn);
 		}
     }
 }

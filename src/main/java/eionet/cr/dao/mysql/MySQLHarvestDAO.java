@@ -30,7 +30,7 @@ import eionet.cr.dao.readers.HarvestDTOReader;
 import eionet.cr.dao.readers.HarvestWithMessageTypesReader;
 import eionet.cr.dto.HarvestDTO;
 import eionet.cr.harvest.util.HarvestMessageType;
-import eionet.cr.util.sql.ConnectionUtil;
+import eionet.cr.util.sql.DbConnectionProvider;
 import eionet.cr.util.sql.SQLUtil;
 
 /**
@@ -70,7 +70,7 @@ public class MySQLHarvestDAO extends MySQLBaseDAO implements HarvestDAO {
 			throw new DAOException(e.getMessage(), e);
 		}
 		finally{
-			ConnectionUtil.closeConnection(conn);
+			SQLUtil.close(conn);
 		}
 	}
 
@@ -104,7 +104,7 @@ public class MySQLHarvestDAO extends MySQLBaseDAO implements HarvestDAO {
 			throw new DAOException(e.getMessage(), e);
 		}
 		finally{
-			ConnectionUtil.closeConnection(conn);
+			SQLUtil.close(conn);
 		}
 	}
 	
