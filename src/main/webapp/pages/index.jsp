@@ -64,7 +64,6 @@
 	<h2>Simple search</h2>
 	<p>
 	    To quickly find content by text in any metadata element, you can start right here by using the text input below.
-	<em>Words shorter than four letters are ignored!</em>
 	</p>
 
 	<crfn:form name="searchForm" action="/simpleSearch.action" method="get" focus="searchExpression" style="padding-bottom:20px">

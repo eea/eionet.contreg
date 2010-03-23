@@ -9,9 +9,8 @@
 	<h1>Simple search</h1>
 	<p>
 	This page enables you to find content by case-insensitive text in any metadata element. For example:
-	to search for content that contains words "air" or "soil" or both, enter <span class="searchExprSample">air soil</span>.
-	Entering <span class="searchExprSample">"air pollution"</span> will search for the exact phrase "air pollution".
-	<em>Words shorter than four letters are ignored!</em>
+	to search for content that contains words "air" or "soil" or both, enter <span class="searchExprSample">air | soil</span>.
+	Entering <span class="searchExprSample">air &amp; pollution</span> will require the content to have both words.
 	</p>
 
 	<crfn:form action="/simpleSearch.action" method="get">
