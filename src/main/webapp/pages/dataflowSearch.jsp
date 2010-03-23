@@ -8,13 +8,18 @@
 	
 	<stripes:layout-component name="contents">
 	
-        <h1>Dataflow search</h1>
+        <h1>Search Reportnet deliveries</h1>
+				<p class="documentDescription">
+				A Reportnet delivery is a response from a country on a reporting obligation. Deliveries can reside on several locations
+				such as <a href="http://cdr.eionet.europa.eu/">CDR</a> or the country's own website.
+				Deliveries are tagged with the obligation, spatial coverage (locality) and temporal coverage (year).
+				</p>
         
         <div style="margin-top:15px">
 		    <crfn:form action="/dataflowSearch.action" method="get">
 				
-		    	<label for="dataflowSelect" style="font-weight:bold;margin-bottom:3px">Dataflow:</label>
-		    	<stripes:select name="dataflow" id="dataflowSelect" size="9" style="width:100%">
+		    	<label for="dataflowSelect" class="question" style="margin-bottom:3px">Obligation:</label>
+		    	<stripes:select name="dataflow" id="dataflowSelect" size="15" style="width:100%">
 		    		<c:forEach var="instr" items="${dataflowSearchActionBean.instrumentsObligations}">
 		    			<optgroup label="${instr.key}">
 		    				<c:forEach var="oblig" items="${instr.value}">
@@ -26,14 +31,14 @@
 				<br/>
 				<br/>
 				
-				<label for="localitySelect" style="font-weight:bold">Locality:</label>
+				<label for="localitySelect" class="question">Locality:</label>
 		    	<stripes:select name="locality" id="localitySelect" style="max-width:200px">
 		    		<stripes:option value="" label="-- All --"/>
 		    		<c:forEach var="loclty" items="${dataflowSearchActionBean.localities}">
 		    			<stripes:option value="${crfn:addQuotesIfWhitespaceInside(loclty)}" label="${loclty}"/>
 		    		</c:forEach>
 		    	</stripes:select>
-		    	<label for="yearSelect" style="font-weight:bold;display:inline;margin-left:20px">Delivery year:</label>
+		    	<label for="yearSelect" class="question" style="display:inline;margin-left:20px">Coverage year:</label>
 		    	<stripes:select name="year" id="yearSelect">
 		    		<stripes:option value="" label="-- All --"/>
 		    		<c:forEach var="y" items="${dataflowSearchActionBean.years}">
