@@ -43,20 +43,23 @@ Make a data dump of your CR2 MySQL database:
 
 This dump exports data only! The various options ensure that it later imports into PostgreSQL.
 
-
-
 3)
+Create the 'cr2' database in postgresql:
+[user@host]$ createdb -U postgres cr2 
+
+3.1)
 Import the script that creates tables and all other necessary structure in your freshly created cr2 database:
 
 [user@host]$ psql -U postgres cr2 < cr2-no-data.pgsql
 
-
+3.2)
+Create the database user you want to connect as from the web-application
+[user@host]$ psql -U postgres cr2 < create_devuser.sql
 
 4)
 To prepare for the data import, drop all indexes, constraints and rules by importing the following script:
 
 [user@host]$ psql -U postgres cr2 < drop_indexes_and_rules.pqsql
-
 
 
 5)
@@ -80,4 +83,10 @@ Fix the next values of sequences, because they go "broken" if serial IDs are ins
 [user@host]$ psql -U postgres cr2 < fix_sequences.pgsql
 
 
+8)
+Switch CR to use the postqresql driver and the correct URL for the database.
+Driver:  org.postgresql.Driver
+URL:     jdbc:postgresql://localhost:5432/cr2
+
+You might also have to add the postgresql-jdbc4 JAR file to tomcat5/common/lib
 
