@@ -75,6 +75,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 	private List<HourSpan> batchHarvestingHours;
 	private Integer intervalSeconds;
 	private Integer dailyActiveMinutes;
+	private boolean firstRunMade = false;
 	
 	/*
 	 * (non-Javadoc)
@@ -82,9 +83,14 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 	 */
 	public void execute(JobExecutionContext jobExecContext) throws JobExecutionException {
 		
+		if (firstRunMade==false){
+			firstRunMade = true;
+			logger.debug("First run of " + getClass().getName());
+		}
+		
 		try{
 			PersisterFactory.getPersister().rollbackUnfinishedHarvests();
-			deleteSourcesQueuedForRemoval();
+			deleteSourcesQueuedForRemoval();			
 			harvestUrgentQueue();
 
 			if (!isBatchHarvestingEnabled() || !isBatchHarvestingHour())
@@ -164,20 +170,38 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 	private void harvestUrgentQueue(){
 		
 		try{
+			int counter = 0;
 			UrgentHarvestQueueItemDTO queueItem = null;
 			for (queueItem = UrgentHarvestQueue.poll(); queueItem!=null; queueItem = UrgentHarvestQueue.poll()){
 				
+				counter++;
+				
 				String url = queueItem.getUrl();
 				if (!StringUtils.isBlank(url)){
+					
+					logger.debug("Found [" + url + "] in urgent harvest queue!");
 					
 					if (queueItem.isPushHarvest()){
 						pushHarvest(url, queueItem.getPushedContent());
 					}
 					else{
-						pullHarvest(DAOFactory.get().getDao(
-								HarvestSourceDAO.class).getHarvestSourceByUrl(url), true);
+						HarvestSourceDTO src = DAOFactory.get().getDao(
+								HarvestSourceDAO.class).getHarvestSourceByUrl(url);
+						if (src!=null){
+							pullHarvest(src, true);
+						}
+						else{
+							logger.debug("Could not find harvest source [" + url + "]");
+						}
 					}
 				}
+				else{
+					logger.debug("Found a source with a blank URL in urgent harvest queue!");
+				}
+			}
+			
+			if (counter==0){
+				logger.debug("Found no sources in urgent harvest queue right now!");
 			}
 		}
 		catch (DAOException e){
