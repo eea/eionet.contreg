@@ -75,7 +75,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 	private List<HourSpan> batchHarvestingHours;
 	private Integer intervalSeconds;
 	private Integer dailyActiveMinutes;
-	private boolean firstRunMade = false;
+	private static boolean firstRunMade = false;
 	
 	/*
 	 * (non-Javadoc)
