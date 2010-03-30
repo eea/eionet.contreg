@@ -25,6 +25,7 @@ import java.text.ParseException;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.quartz.CronTrigger;
@@ -180,30 +181,42 @@ public class JobScheduler implements ServletContextListener{
 	 * {@inheritDoc}
 	 */
 	public void contextInitialized(ServletContextEvent sce) {
+
+		// schedule interval jobs
 		
 		for (Pair<String,JobDetail> job : intervalJobs) {
+			
 			try{
-				scheduleIntervalJob(
-						Long.parseLong(GeneralConfig.getRequiredProperty(job.getLeft())),
-						job.getRight());
-				logger.debug(job.getRight().getName() + " scheduled");
-			} catch (ParseException e){
-				logger.fatal("Error when scheduling " + job.getRight().getName(), e);
-			} catch (SchedulerException e){
+				String intervString = GeneralConfig.getProperty(job.getLeft());
+				
+				// if interval specified, then schedule the job, otherwise
+				// consider it administrator's will to not schedule this particular job
+				if (!StringUtils.isBlank(intervString)){
+					
+					scheduleIntervalJob(Long.parseLong(intervString), job.getRight());
+					logger.debug(job.getRight().getName() + " scheduled, interval=" + intervString);
+				}
+			}
+			catch (Exception e){
 				logger.fatal("Error when scheduling " + job.getRight().getName(), e);
 			}
 		}
 		
+		// schedule cron jobs
+		
 		for(Pair<String,JobDetail> job: cronJobs) {
 			try {
-				scheduleCronJob(
-						GeneralConfig.getRequiredProperty(job.getLeft()),
-						job.getRight());
-				logger.debug(job.getRight().getName() + " scheduled with cron string: " 
-						+ GeneralConfig.getRequiredProperty(job.getLeft()));
-			} catch (SchedulerException e) {
-				logger.fatal("Error when scheduling " + job.getRight().getName(), e);
-			} catch (ParseException e){
+				String cronString = GeneralConfig.getProperty(job.getLeft());
+				
+				// if cron-expression specified, then schedule the job, otherwise
+				// consider it administrator's will to not schedule this particular job
+				if (!StringUtils.isBlank(cronString)){
+					
+					scheduleCronJob(cronString, job.getRight());
+					logger.debug(job.getRight().getName() + " scheduled with cron " + cronString);
+				}
+			}
+			catch (Exception e) {
 				logger.fatal("Error when scheduling " + job.getRight().getName(), e);
 			}
 		}

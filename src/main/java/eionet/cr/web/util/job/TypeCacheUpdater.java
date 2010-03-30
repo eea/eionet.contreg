@@ -56,6 +56,7 @@ public class TypeCacheUpdater implements StatefulJob {
 	 * {@inheritDoc}
 	 */
 	public void execute(JobExecutionContext arg0) throws JobExecutionException {
+		
 		try {
 			List<Pair<String,String>> types = new LinkedList<Pair<String,String>>();
 			Map<String,String> criteria = new HashMap<String,String>();
