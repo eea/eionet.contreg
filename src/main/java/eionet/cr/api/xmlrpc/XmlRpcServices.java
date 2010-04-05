@@ -313,9 +313,11 @@ public class XmlRpcServices implements Services{
 						null);
 
 				int subjectCount = results==null ?
-						0 : (results.getRight()==null ? 0 : results.getRight().size());  
+						0 : (results.getRight()==null ? 0 : results.getRight().size());
+				
 				logger.debug(getClass().getSimpleName() + ".getXmlFilesBySchema("
 						+ schemaIdentifier + "), " + subjectCount + " subjects found in total");
+				
 				subjects = results.getRight();
 				
 				if (subjects!=null){

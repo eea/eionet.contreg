@@ -216,7 +216,8 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 			append(pagingRequest.getOffset()).append(',').append(pagingRequest.getItemsPerPage());
 		}
 		
-		logger.debug(buf.toString());
+		logger.trace(buf.toString());
+		
 		Pair<Integer,List<Long>> pair = executeQueryWithRowCount(buf.toString(), parameters, new SingleObjectReader<Long>());
 		if(pair == null || pair.getLeft()==0) {
 			return new Pair<Integer,List<SubjectDTO>>(0, new LinkedList<SubjectDTO>());

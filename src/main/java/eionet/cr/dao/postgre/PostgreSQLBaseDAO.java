@@ -248,7 +248,7 @@ public abstract class PostgreSQLBaseDAO {
 					conn = getConnection();
 				}
 				
-				logger.debug("Goint to execute subjects data query:" + query);				
+				logger.trace("Goint to execute subjects data query:" + query);				
 				SQLUtil.executeQuery(query, null, reader, conn);
 			}
 		}

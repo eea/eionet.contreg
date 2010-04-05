@@ -27,5 +27,6 @@ package eionet.cr.util;
  */
 public enum TriStateBoolean {
 
-	TRUE,FALSE,NOTSURE;
+	TRUE,FALSE,UNKNOWN;
+	
 }

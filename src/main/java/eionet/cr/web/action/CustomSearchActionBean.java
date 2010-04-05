@@ -135,7 +135,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 									getSortP(),
 									SortOrder.parse(getSortO())));
 
-		logger.debug("it took " + (System.currentTimeMillis() - startTime) + " ms to execute custom search");
+		logger.debug("It took " + (System.currentTimeMillis() - startTime) + " ms to execute custom search");
 		
 		// we put the search result list into session and override getResultList() to retrieve the list from session
 		// (look for the override in this class)

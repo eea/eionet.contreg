@@ -64,7 +64,9 @@ public class AmpFeedServlet extends HttpServlet implements SubjectProcessor{
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
 		
 		String methodName = new StringBuffer(AmpFeedServlet.class.getSimpleName()).append(".doGet()").toString();
-		logger.debug(methodName);
+		
+		logger.debug("Entered " + methodName);
+		
 		response.setContentType("text/xml");
 		
 		try {

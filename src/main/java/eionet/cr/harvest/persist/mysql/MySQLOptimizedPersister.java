@@ -171,7 +171,9 @@ public class MySQLOptimizedPersister implements IHarvestPersister {
 	 * {@inheritDoc}
 	 */
 	public void openResources() throws PersisterException {
-		logger.debug("allocating writers");
+		
+		logger.debug(getClass().getSimpleName() + " allocating writers");
+		
 		String tempFolder = GeneralConfig.getRequiredProperty(GeneralConfig.HARVESTER_FILES_LOCATION);
 		try {
 			tripleFile = new File(tempFolder + File.separator+ TEMP_FILE_NAME);

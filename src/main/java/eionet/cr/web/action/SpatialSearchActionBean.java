@@ -102,7 +102,7 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
 	 */
 	private Resolution doKml() throws DAOException{
 		
-		logger.debug("kml requested, BBOX = " + BBOX);
+		logger.debug("KML requested, BBOX = " + BBOX);
 		
 		String[] ltudes = BBOX.split(",");
 		if (ltudes!=null && ltudes.length==4){

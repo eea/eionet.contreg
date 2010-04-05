@@ -700,7 +700,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		PairReader<Long,Long> pairReader = new PairReader<Long,Long>();
 		
 		long startTime = System.currentTimeMillis();
-		logger.debug("Recent uploads search, executing subject finder query: " + sqlBuf.toString());
+		logger.trace("Recent uploads search, executing subject finder query: " + sqlBuf.toString());
 
 		executeQuery(sqlBuf.toString(), pairReader);
 		List<Pair<Long,Long>> pairList = pairReader.getResultList();
@@ -720,7 +720,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 			
 			// get subjects data
 			
-			logger.debug("Recent uploads search, getting the data of the found subjects");
+			logger.trace("Recent uploads search, getting the data of the found subjects");
 			
 			getSubjectsData(subjectsMap);
 			

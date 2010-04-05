@@ -81,7 +81,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 		String query = helper.getQuery(inParams);
 		
 		long startTime = System.currentTimeMillis();
-		logger.debug("Free-text search, executing subject finder query: " + query);
+		logger.trace("Free-text search, executing subject finder query: " + query);
 
 		// execute the query, with the IN parameters
 		List<Pair<Long,Long>> list = executeQuery(query, inParams, new PairReader<Long,Long>());
@@ -101,7 +101,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 			// get the data of all found subjects, provide hit-sources to the reader
 			SubjectDataReader reader = new FreeTextSearchDataReader(temp, hitSources);
 			
-			logger.debug("Free-text search, getting the data of the found subjects");
+			logger.trace("Free-text search, getting the data of the found subjects");
 			
 			getSubjectsData(reader);
 			
@@ -111,7 +111,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 				inParams = new ArrayList<Object>();
 				query = helper.getCountQuery(inParams);
 				
-				logger.debug("Search by filters, executing rowcount query: " + query);
+				logger.trace("Search by filters, executing rowcount query: " + query);
 				
 				totalRowCount = Integer.valueOf(executeQueryUniqueResult(query,
 					inParams, new SingleObjectReader<Long>()).toString());
@@ -144,7 +144,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 		String query = helper.getQuery(inParams);
 
 		long startTime = System.currentTimeMillis();
-		logger.debug("Search by filters, executing subject finder query: " + query);
+		logger.trace("Search by filters, executing subject finder query: " + query);
 		
 		// execute the query, with the IN parameters
 		List<Long> list = executeQuery(query, inParams, new SingleObjectReader<Long>());
@@ -161,7 +161,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 				subjectsMap.put(hash, null);
 			}
 
-			logger.debug("Search by filters, getting the data of the found subjects");
+			logger.trace("Search by filters, getting the data of the found subjects");
 
 			// get the data of all found subjects
 			subjects = getSubjectsData(subjectsMap);
@@ -172,7 +172,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 				inParams = new ArrayList<Object>();
 				query = helper.getCountQuery(inParams);
 				
-				logger.debug("Search by filters, executing rowcount query: " + query);
+				logger.trace("Search by filters, executing rowcount query: " + query);
 				
 				totalRowCount = Integer.valueOf(executeQueryUniqueResult(query, inParams,
 						new SingleObjectReader<Long>()).toString());
@@ -204,7 +204,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 		String query = helper.getQuery(inParams);
 		
 		long startTime = System.currentTimeMillis();
-		logger.debug("Search references, executing subject finder query: " + query);
+		logger.trace("Search references, executing subject finder query: " + query);
 
 		// execute the query, with the IN parameters
 		List<Long> list = executeQuery(query, inParams, new SingleObjectReader<Long>());
@@ -221,7 +221,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 				subjectsMap.put(hash, null);
 			}
 
-			logger.debug("Search references, getting the data of the found subjects");
+			logger.trace("Search references, getting the data of the found subjects");
 			
 			// get the data of all found subjects
 			subjects = getSubjectsData(subjectsMap);
@@ -232,7 +232,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 				inParams = new ArrayList<Object>();
 				query = helper.getCountQuery(inParams);
 				
-				logger.debug("Search references, executing rowcount query: " + query);
+				logger.trace("Search references, executing rowcount query: " + query);
 				
 				totalRowCount = Integer.valueOf(executeQueryUniqueResult(query,
 						inParams, new SingleObjectReader<Long>()).toString());
@@ -266,7 +266,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 		String query = helper.getQuery(inParams);
 		
 		long startTime = System.currentTimeMillis();
-		logger.debug("Spatial search, executing subject finder query: " + query);
+		logger.trace("Spatial search, executing subject finder query: " + query);
 		
 		// execute the query, with the IN parameters
 		List<Long> list = executeQuery(query, inParams, new SingleObjectReader<Long>());
@@ -283,7 +283,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 				subjectsMap.put(hash, null);
 			}
 
-			logger.debug("Spatial search, getting the data of the found subjects");
+			logger.trace("Spatial search, getting the data of the found subjects");
 
 			// get the data of all found subjects
 			subjects = getSubjectsData(subjectsMap);
@@ -294,7 +294,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 				inParams = new ArrayList<Object>();
 				query = helper.getCountQuery(inParams);
 				
-				logger.debug("Spatial search, executing rowcount query: " + query);
+				logger.trace("Spatial search, executing rowcount query: " + query);
 
 				totalRowCount = Integer.valueOf(executeQueryUniqueResult(
 						helper.getCountQuery(inParams),
