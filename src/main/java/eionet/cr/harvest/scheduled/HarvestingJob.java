@@ -179,7 +179,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 				String url = queueItem.getUrl();
 				if (!StringUtils.isBlank(url)){
 					
-					logger.debug("Found [" + url + "] in urgent harvest queue!");
+					logger.trace("Found [" + url + "] in urgent harvest queue!");
 					
 					if (queueItem.isPushHarvest()){
 						pushHarvest(url, queueItem.getPushedContent());
@@ -191,17 +191,17 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 							pullHarvest(src, true);
 						}
 						else{
-							logger.debug("Could not find harvest source [" + url + "]");
+							logger.trace("Could not find harvest source [" + url + "]");
 						}
 					}
 				}
 				else{
-					logger.debug("Found a source with a blank URL in urgent harvest queue!");
+					logger.trace("Found a source with a blank URL in urgent harvest queue!");
 				}
 			}
 			
 			if (counter==0){
-				logger.debug("Found no sources in urgent harvest queue right now!");
+				logger.trace("Found no sources in urgent harvest queue right now!");
 			}
 		}
 		catch (DAOException e){
