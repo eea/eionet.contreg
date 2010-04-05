@@ -67,11 +67,14 @@ public class SubjectDTO implements Serializable{
 	 */
 	public SubjectDTO(String uri, boolean anonymous){
 		
-		this.uri = anonymous==false ? uri : URI_ANONYMOUS;
-		if (uri!=null){
-			uriHash = Hashes.spoHash(uri);
+		if (uri==null || uri.trim().length()==0){
+			throw new IllegalArgumentException("Trying to construct a subject with a blank URI");
 		}
+		
+		this.uri = uri;
 		this.anonymous = anonymous;
+		
+		uriHash = Hashes.spoHash(uri);		
 		predicates = new HashMap<String,Collection<ObjectDTO>>();
 	}
 
