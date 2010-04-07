@@ -20,6 +20,7 @@
 * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.dao.postgre.helpers;
 
+import java.util.HashSet;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -30,6 +31,7 @@ import eionet.cr.util.SortOrder;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.util.sql.PairReader;
+import eionet.cr.util.sql.PostgreSQLFullTextQuery;
 import eionet.cr.web.util.columns.SubjectLastModifiedColumn;
 
 /**
@@ -41,6 +43,7 @@ public class FreeTextSearchHelper extends AbstractSearchHelper{
 	
 	/** */
 	private SearchExpression expression;
+	private PostgreSQLFullTextQuery pgExpression;
 	
 	/**
 	 * 
@@ -49,11 +52,13 @@ public class FreeTextSearchHelper extends AbstractSearchHelper{
 	 * @param sortingRequest
 	 */
 	public FreeTextSearchHelper(SearchExpression expression,
+			PostgreSQLFullTextQuery pgExpression,
 			PagingRequest pagingRequest,
 			SortingRequest sortingRequest){
 		
 		super(pagingRequest, sortingRequest);
 		this.expression = expression;
+		this.pgExpression = pgExpression;
 	}
 
 	/*
@@ -75,7 +80,15 @@ public class FreeTextSearchHelper extends AbstractSearchHelper{
 		else{
 			buf.append(" where to_tsvector('simple', SPO.OBJECT) @@ to_tsquery('simple', ?)").
 			append(" and SPO.LIT_OBJ='Y'");
-			inParams.add(expression.toString());
+			inParams.add(pgExpression.getParsedQuery());
+			
+			HashSet<String> phrases = pgExpression.getPhrases();
+			for (String phrase : phrases){
+				if (!StringUtils.isBlank(phrase)){
+					buf.append(" and SPO.OBJECT like ?");
+					inParams.add("%" + phrase + "%");
+				}
+			}
 		}
 		
 		return buf.toString();
@@ -112,7 +125,15 @@ public class FreeTextSearchHelper extends AbstractSearchHelper{
 		else{
 			subSelect.append(" where to_tsvector('simple', SPO.OBJECT) @@ to_tsquery('simple', ?)").
 			append(" and SPO.LIT_OBJ='Y'");
-			inParams.add(expression.toString());
+			inParams.add(pgExpression.getParsedQuery());
+			
+			HashSet<String> phrases = pgExpression.getPhrases();
+			for (String phrase : phrases){
+				if (!StringUtils.isBlank(phrase)){
+					subSelect.append(" and SPO.OBJECT like ?");
+					inParams.add("%" + phrase + "%");
+				}
+			}
 		}
 
 		StringBuffer buf = new StringBuffer().
@@ -138,7 +159,15 @@ public class FreeTextSearchHelper extends AbstractSearchHelper{
 			buf.
 			append(" where to_tsvector('simple', SPO.OBJECT) @@ to_tsquery('simple', ?)").
 			append(" and SPO.LIT_OBJ='Y'");
-			inParams.add(expression.toString());
+			inParams.add(pgExpression.getParsedQuery());
+			
+			HashSet<String> phrases = pgExpression.getPhrases();
+			for (String phrase : phrases){
+				if (!StringUtils.isBlank(phrase)){
+					buf.append(" and SPO.OBJECT like ?");
+					inParams.add("%" + phrase + "%");
+				}
+			}
 		}
 		
 		return buf.toString();

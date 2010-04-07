@@ -31,7 +31,8 @@ public class SearchExpression {
 
 	/** */
 	private String expression;
-	private boolean exactPhrase = false;
+	
+	/** */
 	private boolean isUri = false;
 	private boolean isHash = false;
 	
@@ -42,13 +43,14 @@ public class SearchExpression {
 	public SearchExpression(String s){
 		
 		expression = s==null ? "" : s.trim();
-		isUri = URIUtil.isSchemedURI(expression);
 		
 		try{
 			Long.parseLong(expression);
 			isHash = true;
 		}
 		catch (NumberFormatException nfe){}
+		
+		isUri = URIUtil.isSchemedURI(expression);
 	}
 	
 	/**
@@ -56,7 +58,7 @@ public class SearchExpression {
 	 * @return
 	 */
 	public boolean isEmpty(){
-		return expression==null || expression.length()==0;
+		return expression.length()==0;
 	}
 
 	/*

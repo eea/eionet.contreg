@@ -20,6 +20,7 @@
 * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.dao.postgre.helpers;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -75,7 +76,7 @@ public class FilteredSearchHelper extends AbstractSearchHelper{
 		this.filters = filters;
 		this.literalPredicates = literalPredicates;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see eionet.cr.dao.postgre.helpers.AbstractSearchHelper#getOrderedQuery(java.util.List)
 	 */

@@ -20,6 +20,7 @@
 * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.dao.postgre;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -51,6 +52,7 @@ import eionet.cr.util.SortingRequest;
 import eionet.cr.util.Util;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.util.sql.PairReader;
+import eionet.cr.util.sql.PostgreSQLFullTextQuery;
 import eionet.cr.util.sql.SingleObjectReader;
 import eionet.cr.web.util.columns.SubjectLastModifiedColumn;
 
@@ -70,9 +72,29 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 			PagingRequest pagingRequest,
 			SortingRequest sortingRequest) throws DAOException{
 
+		// if search expression is null or empty, return empty result
+		if (expression==null || expression.isEmpty()){
+			return new Pair<Integer, List<SubjectDTO>>(0, new LinkedList<SubjectDTO>());
+		}
+
+		// parse search expression for PostgreSQL
+		PostgreSQLFullTextQuery pgQuery = null;
+		try{
+			pgQuery = PostgreSQLFullTextQuery.parse(expression);
+			logger.trace("Free-text search string parsed for PostgreSQL: " + pgQuery);
+		}
+		catch (ParseException pe){
+			throw new DAOException("Error parsing the search text", pe);
+		}
+
+		// if search expression is empty after being parsed for PostgreSQL, return empty result
+		if (pgQuery.getParsedQuery().length()==0){
+			return new Pair<Integer, List<SubjectDTO>>(0, new LinkedList<SubjectDTO>());
+		}
+
 		// create query helper
 		FreeTextSearchHelper helper = new FreeTextSearchHelper(
-				expression, pagingRequest, sortingRequest);
+				expression, pgQuery, pagingRequest, sortingRequest);
 
 		// create the list of IN parameters of the query
 		ArrayList<Object> inParams = new ArrayList<Object>();
