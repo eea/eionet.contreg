@@ -419,9 +419,9 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 	private static final String getNextScheduledSourcesSQL =
 		
 		"select * from HARVEST_SOURCE where INTERVAL_MINUTES>0"
-		+ " and timestampdiff(MINUTE,ifnull(LAST_HARVEST,timestampadd(MINUTE,-1*INTERVAL_MINUTES,TIME_CREATED)),NOW()) >= INTERVAL_MINUTES"
-		+ " order by timestampdiff(MINUTE,ifnull(LAST_HARVEST,timestampadd(MINUTE,-1*INTERVAL_MINUTES,TIME_CREATED)),NOW())/INTERVAL_MINUTES desc"
-		+ " limit ?";
+		+ " and timestampdiff(SECOND,ifnull(LAST_HARVEST,timestampadd(MINUTE,-1*INTERVAL_MINUTES,TIME_CREATED)),NOW()) >= (INTERVAL_MINUTES*60)"
+		+ " order by timestampdiff(SECOND,ifnull(LAST_HARVEST,timestampadd(MINUTE,-1*INTERVAL_MINUTES,TIME_CREATED)),NOW()) / (INTERVAL_MINUTES*60)" +
+		" desc limit ?";
 
 	/*
 	 * (non-Javadoc)
