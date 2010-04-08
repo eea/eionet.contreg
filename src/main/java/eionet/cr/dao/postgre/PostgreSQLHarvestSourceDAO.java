@@ -435,7 +435,7 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
 		"select * from HARVEST_SOURCE where INTERVAL_MINUTES>0 and" +
 		" cast(extract(epoch from now()-(coalesce(LAST_HARVEST,(time_created - interval_minutes * interval '1 minute'))))/60 as integer) >= INTERVAL_MINUTES" +
 		" order by" +
-		" cast(extract(epoch from now()-(coalesce(LAST_HARVEST,(time_created - interval_minutes * interval '1 minute'))))/60 as integer)/INTERVAL_MINUTES" +
+		" cast(extract(epoch from now()-(coalesce(LAST_HARVEST,(time_created - interval_minutes * interval '1 minute'))))/60 as float)/INTERVAL_MINUTES" +
 		" desc limit ?";
 	
 	/*
