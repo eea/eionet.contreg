@@ -20,6 +20,8 @@
  */
 package eionet.cr.web.util.columns;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 
 import net.sourceforge.stripes.action.UrlBinding;
@@ -28,10 +30,13 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.common.Predicates;
+import eionet.cr.dao.DAOException;
+import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.FormatUtils;
 import eionet.cr.util.URIUtil;
 import eionet.cr.util.Util;
+import eionet.cr.web.action.AbstractSearchActionBean;
 import eionet.cr.web.action.FactsheetActionBean;
 
 /**
@@ -94,58 +99,99 @@ public class SubjectPredicateColumn extends SearchResultColumn{
 	
 	/*
 	 * (non-Javadoc)
-	 * @see eionet.cr.web.util.search.SearchResultColumn#format(java.lang.Object)
+	 * @see eionet.cr.web.util.columns.SearchResultColumn#format(java.lang.Object)
 	 * 
 	 * Gets the collection of objects matching to the given predicate in the given subject.
-	 * Formats the given collection to comma-separated string and returns it.
-	 * Only distinct objects and only literal ones are selected (unless there is not a single literal
-	 * in which case the non-literals are returned.
+	 * Formats the given collection to comma-separated string. For literal objects, simply the
+	 * value of the literal will be used. For resource objects, clickable factsheet links will
+	 * be created. 
 	 */
 	public String format(Object object){
 		
-		String result = "";
+		String result = null;
 		if (object!=null && object instanceof SubjectDTO && predicateUri!=null){
 			
 			SubjectDTO subjectDTO = (SubjectDTO)object;
-			result = FormatUtils.getObjectValuesForPredicate(predicateUri, subjectDTO, getLanguages());
-			if (result==null) result = "";
-			result = StringEscapeUtils.escapeXml(result);
+			Collection<ObjectDTO> objects = subjectDTO.getObjectsForSearchResultsDisplay(
+					predicateUri, getLanguages());
 			
-			// IE is not able to display &apos; correctly. Workaround is to use &#39; instead. 
-			result = StringUtils.replace(result, "&apos;", "&#39;");
-			
-			// rdfs:label gets special treatment
 			if (predicateUri.equals(Predicates.RDFS_LABEL)){
 				
-				// if the result is blank, then guess the value from subject
-				if (result.trim().length()==0){
+				if (objects.isEmpty()){
+					result = URIUtil.deriveLabel(subjectDTO.getUri());
+					if (result.equals(subjectDTO.getUri())){
+						result = "No label";
+					}
+				}
+				else{
+					result = objectValuesToCSV(objects);
+				}
 
-					if (subjectDTO.isAnonymous()){
-						result = "Anonymous object";
+				result = buildFactsheetLink(subjectDTO.getUri(), result);
+			}
+			else if (!objects.isEmpty()){
+				
+				StringBuffer buf = new StringBuffer();
+				for (ObjectDTO o : objects){
+					
+					if (buf.length()>0){
+						buf.append(", ");
+					}
+					
+					if (o.isLiteral()){
+						buf.append(o.getValue());
 					}
 					else{
-						result = URIUtil.deriveLabel(subjectDTO.getUri());
-						if (result.trim().length()==0){
-							result = "No label";
+						String label = o.getDerviedLiteralValue();
+						if (label==null){
+							label = URIUtil.deriveLabel(o.getValue());
+							if (label.equals(o.getValue())){
+								label = "No label";
+							}
 						}
+						buf.append(buildFactsheetLink(o.getValue(), label));
 					}
-				}				
-				
-				// no we are sure we have a label to display, so let's generate the factsheet link based on that
-				String factsheetUrlBinding = FactsheetActionBean.class.getAnnotation(UrlBinding.class).value();
-				int i = factsheetUrlBinding.lastIndexOf("/");
-				StringBuffer href = new StringBuffer(i>=0 ? factsheetUrlBinding.substring(i+1) : factsheetUrlBinding).append("?");
-				if (subjectDTO.isAnonymous()){
-					href.append("uriHash=").append(subjectDTO.getUriHash());
 				}
-				else if (!StringUtils.isBlank(subjectDTO.getUri())){
-					href.append("uri=").append(Util.urlEncode(subjectDTO.getUri()));
-				}				
-				result = new StringBuffer("<a href=\"").append(href).append("\">").append(result).append("</a>").toString();
+				result = buf.toString();
+				
 			}
 		}
 		
-		return result.trim().length()>0 ? result : "No label";
+		return StringUtils.isBlank(result) ? "&nbsp;" : result;
+	}
+	
+	/**
+	 * 
+	 * @param objects
+	 * @return
+	 */
+	private String objectValuesToCSV(Collection<ObjectDTO> objects){
+		
+		StringBuffer buf = new StringBuffer();
+		for (ObjectDTO object : objects){
+			buf.append(buf.length()>0 ? ", " : "").append(object.getValue());
+		}
+		return buf.toString();
+	}
+	
+	/**
+	 * 
+	 * @param uri
+	 * @param label
+	 * @return
+	 */
+	private String buildFactsheetLink(String uri, String label){
+		
+		String factsheetUrlBinding =
+			FactsheetActionBean.class.getAnnotation(UrlBinding.class).value();
+		int i = factsheetUrlBinding.lastIndexOf("/");
+		
+		StringBuffer href = new StringBuffer(
+				i>=0 ? factsheetUrlBinding.substring(i+1) : factsheetUrlBinding).append("?");
+		href.append("uri=").append(Util.urlEncode(uri));
+		
+		return new StringBuffer("<a href=\"").append(href).append("\">").append(label).
+		   append("</a>").toString();
 	}
 
 	/*

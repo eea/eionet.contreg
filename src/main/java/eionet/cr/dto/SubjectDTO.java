@@ -25,9 +25,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.util.Hashes;
@@ -139,6 +143,73 @@ public class SubjectDTO implements Serializable{
 	public Collection<ObjectDTO> getObjects(String predicate){
 		
 		return predicates.get(predicate);
+	}
+	
+	/**
+	 * 
+	 * @param predicateUri
+	 * @param languages
+	 * @param preferHitSource
+	 * @return
+	 */
+	public Collection<ObjectDTO> getObjectsForSearchResultsDisplay(
+			String predicateUri, Set<String> languages){
+		
+		Collection<ObjectDTO> result = new ArrayList<ObjectDTO>();
+		Collection<ObjectDTO> fromHitSources = new ArrayList<ObjectDTO>();
+		boolean existLanguagePreferences = languages!=null && !languages.isEmpty();
+		
+		Collection<ObjectDTO> objects = getObjects(predicateUri);
+		if (objects!=null && !objects.isEmpty()){
+			
+			// remember the values of literals which have been derived from resource objects
+			HashMap<Long,String> derivedLiterals = new HashMap<Long,String>();
+			for (ObjectDTO object : objects){
+				
+				if (object.isLiteral() && object.getSourceObjectHash()!=0){
+					derivedLiterals.put(Long.valueOf(object.getSourceObjectHash()),object.getValue());
+				}
+			}
+			
+			for (ObjectDTO object : objects){
+				
+				// check that object value is not blank
+				String objectValue = object.getValue().trim();
+				if (!StringUtils.isBlank(objectValue)){
+
+					// skip literals that have been derived from resource objects
+					if (object.isLiteral() && object.getSourceObjectHash()!=0){
+						continue;
+					}
+					
+					// skip literals which have a language that is not present in the
+					// language preferences
+					if (object.isLiteral()
+							&& languages!=null && !languages.isEmpty()
+							&& object.getLanguage()!=null
+							&& !languages.contains(object.getLanguage())){
+						continue;
+					}
+						
+					// if object is from the subject's hit source, add it to a separate list
+					if (hitSource>0 && object.getSourceHashSmart()==hitSource){
+						fromHitSources.add(object);
+					}
+					else{
+						result.add(object);
+					}
+
+					// if resource object, set its derived literal
+					// (will be set to null if no derived literals found)
+					if (!object.isLiteral()){
+						object.setDerviedLiteralValue(derivedLiterals.get(
+								Long.valueOf(Hashes.spoHash(objectValue))));
+					}
+				}
+			}
+		}
+		
+		return new LinkedHashSet<ObjectDTO>(!fromHitSources.isEmpty() ? fromHitSources : result);
 	}
 
 	/**

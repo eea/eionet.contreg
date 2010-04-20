@@ -237,7 +237,8 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 		if (!StringUtils.isBlank(type)) {
 			restoreStateFromSession();
 			LastAction lastAction = getLastAction();
-			if (resultList == null || !(lastAction != null && lastAction.equals(LastAction.ADD_FILTER))) {
+			if (resultList==null || !(lastAction!=null && lastAction.equals(LastAction.ADD_FILTER))){
+				
 				Map<String,String> criteria = new HashMap<String,String>();
 				criteria.put(Predicates.RDF_TYPE, type);
 				if (selectedFilters != null && !selectedFilters.isEmpty()) {
@@ -248,14 +249,14 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 					}
 				}
 				
-				Pair<Integer, List<SubjectDTO>> customSearch =
+				Pair<Integer, List<SubjectDTO>> searchResult =
 					DAOFactory.get().getDao(SearchDAO.class).searchByFilters(
 									criteria,
 									null,
 									PagingRequest.create(getPageN()),
 									new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
-				resultList = customSearch.getRight();
-	    		matchCount = customSearch.getLeft();
+				resultList = searchResult.getRight();
+	    		matchCount = searchResult.getLeft();
 			}
 			//cache result list.
 			getSession().setAttribute(RESULT_LIST_CACHED, resultList);

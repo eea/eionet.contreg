@@ -54,6 +54,7 @@ public class ObjectDTO implements Serializable {
 	private long derivSourceGenTime;
 	
 	private long sourceObjectHash;
+	private String derviedLiteralValue;
 	
 	private String sourceUri;
 	private long sourceHash;
@@ -299,6 +300,20 @@ public class ObjectDTO implements Serializable {
 	public String getId(){
 
 		return FactsheetObjectId.format(this);
+	}
+
+	/**
+	 * @return the derviedLiteralValue
+	 */
+	public String getDerviedLiteralValue() {
+		return derviedLiteralValue;
+	}
+
+	/**
+	 * @param derviedLiteralValue the derviedLiteralValue to set
+	 */
+	public void setDerviedLiteralValue(String sourceObjectValue) {
+		this.derviedLiteralValue = sourceObjectValue;
 	}
 
 }
