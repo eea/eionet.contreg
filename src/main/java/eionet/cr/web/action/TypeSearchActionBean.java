@@ -47,8 +47,8 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.SearchDAO;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.util.ExportFormat;
-import eionet.cr.util.Exporter;
+import eionet.cr.util.export.ExportFormat;
+import eionet.cr.util.export.Exporter;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortOrder;
 import eionet.cr.util.SortingRequest;
@@ -121,7 +121,24 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 		return new ForwardResolution(TYPE_SEARCH_PATH);
 	}
 	
-	
+
+	/** 
+	 * Returns the list of export formats
+	 */
+	public ExportFormat[] getExportFormats() {
+		return ExportFormat.values();
+	}
+
+	/** 
+	 * Returns the list of export formats
+	 */
+	public boolean isShowExcelExport() {		
+		if(resultList!=null && resultList.size()>Exporter.getXlsRowsLimit()){
+			return false;
+		}
+		return true;
+	}
+
 	/**
 	 * exports search result as a file.
 	 * 
@@ -131,9 +148,8 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 	@SuppressWarnings("unchecked")
 	public Resolution export() throws Exception {
 		restoreStateFromSession();
-		Exporter exporter = new Exporter();
 		ExportFormat format = ExportFormat.fromName(exportFormat);
-		exporter.setExportFormat(format);
+		Exporter exporter = Exporter.getExporter(format);
 		
 		exporter.setLanguages(
 				getAcceptedLanguages() != null

@@ -44,8 +44,13 @@
 					</stripes:select>
 					&nbsp;
 					<label for="export_format">Export format</label>
+					<c:set var="XLS"><%=eionet.cr.util.export.ExportFormat.XLS.getName()%></c:set>
 					<stripes:select id="export_format" name="exportFormat">
-						<stripes:option value=".xls">.xls</stripes:option>
+						<c:forEach items="${ actionBean.exportFormats}" var="format">
+							<c:if test="${ (format.name eq XLS and actionBean.showExcelExport) or format.name ne XLS}">
+								<stripes:option value="${format.name}">${format.name}</stripes:option>					
+							</c:if>
+						</c:forEach>
 					</stripes:select> <br/>
 					<label for="export_columns">Select columns to be exported</label><br/>
 					<stripes:select name="exportColumns" multiple="multiple" size="5" style="min-width:250px; width:250px;">

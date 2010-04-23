@@ -18,10 +18,11 @@
  * Contributor(s):
  * Aleksandr Ivanov, Tieto Eesti
  */
-package eionet.cr.util;
+package eionet.cr.util.export;
 
 public enum ExportFormat {
-	XLS (".xls", "application/xls", "Exported_data.xls");
+	XLS (".xls", "application/xls", "Exported_data.xls"),
+	XML (".xml", "text/xml;charset=utf-8", "Exported_data.xml");
 
 	private String name;
 	private String contentType;
@@ -49,6 +50,12 @@ public enum ExportFormat {
 		return ExportFormat.XLS;
 	}
 
+	/**
+	 * @return the contentType
+	 */
+	public String getName() {
+		return name;
+	}
 	/**
 	 * @return the contentType
 	 */
