@@ -44,7 +44,7 @@ public class XMLExporterTest  extends TestCase {
 		assertEquals(exporter.getEscapedElementName("test:Elem1"),"test_Elem1");
 		assertEquals(exporter.getEscapedElementName("test.Elem"),"test_Elem");
 		assertEquals(exporter.getEscapedElementName("elem#"),"elem_");
-		assertEquals(exporter.getEscapedElementName("elemÄ"),"elem_");
+		assertEquals(exporter.getEscapedElementName("elem?"),"elem_");
 		assertEquals(exporter.getEscapedElementName("elem1  and  elem2"),"elem1__and__elem2");
 
 		assertEquals(exporter.getEscapedElementName("elem***"),"elem___");
