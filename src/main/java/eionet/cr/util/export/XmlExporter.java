@@ -53,7 +53,7 @@ public class XmlExporter extends Exporter {
 				getSelectedColumns().remove(new Pair<String,String>(Predicates.RDFS_LABEL, null));
 			}
 			
-			//create the list of elements 
+			//create the elements map, where the key is element name in lowercase and the value is escaped element value 
 			elements = new LinkedHashMap<String, String>();
 			//set Uri or Label element
 			elements.put(getUriOrLabel().toLowerCase(),getUriOrLabel());
