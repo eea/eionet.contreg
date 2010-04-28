@@ -176,7 +176,8 @@ public class DbConnectionProvider {
 			}			
 		}
 		else{
-			throw new CRRuntimeException("Connection type already set!");
+			//It's ok, do nothing
+			//throw new CRRuntimeException("Connection type already set!");
 		}
 	}
 	
