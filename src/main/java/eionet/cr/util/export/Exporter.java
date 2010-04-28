@@ -31,11 +31,13 @@ import java.util.Map.Entry;
 import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.common.CRRuntimeException;
+import eionet.cr.common.Predicates;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.SearchDAO;
 import eionet.cr.dto.SubjectDTO;
+import eionet.cr.util.FormatUtils;
 import eionet.cr.util.Pair;
 import eionet.cr.util.pagination.PagingRequest;
 
@@ -47,8 +49,6 @@ import eionet.cr.util.pagination.PagingRequest;
  */
 public abstract class Exporter {
 	
-	//config param in cr.properties
-	private static final String EXPORT_ROW_LIMIT = "exporter.xls.row.limit";
 	
 	private ExportFormat exportFormat;
 	private Map<String,String> selectedFilters;
@@ -68,7 +68,7 @@ public abstract class Exporter {
 	 * @return
 	 * @throws IOException
 	 */
-	protected abstract InputStream exportContent(Pair<Integer, List<SubjectDTO>> customSearch) throws IOException;
+	protected abstract InputStream doExport(Pair<Integer, List<SubjectDTO>> customSearch) throws ExportException, IOException;
 
 	/**
 	 * Creates Exporter object for given export format 
@@ -82,7 +82,7 @@ public abstract class Exporter {
 				exporter = new XlsExporter();
 				break;
 			case XML:
-				exporter = new XlsExporter();
+				exporter = new XmlExporter();
 				break;
 			default:
 				throw new CRRuntimeException("Exporter is not implemented for format: " + exportFormat);
@@ -92,7 +92,7 @@ public abstract class Exporter {
 		return exporter;
 	}
 
-	public InputStream export() throws DAOException, IOException {
+	public InputStream export() throws DAOException, IOException, ExportException {
 		Pair<Integer, List<SubjectDTO>> customSearch;
 		Map<String,String> criteria = new HashMap<String, String>();
 		for(Entry<String, String> entry : selectedFilters.entrySet()) {
@@ -103,13 +103,42 @@ public abstract class Exporter {
 				.searchByFilters(
 						criteria,
 						null,
-						PagingRequest.create(1, 
-								new Integer(GeneralConfig.getRequiredProperty(EXPORT_ROW_LIMIT))),
+						getRowLimitPagingRequest(),
 						null);
 		InputStream result = null;
-		result = exportContent(customSearch);
+		result = doExport(customSearch);
 		
 		return result;
+	}
+	
+	/**
+	 * Returns the label of subject's uri or label depending on exportResourceUri value 
+	 * @return 
+	 */
+	protected String getUriOrLabel(){ 
+		String uriOrLabelElement = isExportResourceUri() 
+		? "Uri"
+				: "Label";
+
+		return uriOrLabelElement;
+	}
+	/**
+	 * This method creates the PaginRequest object for limiting the rows in the search results 
+	 * @return
+	 */
+	protected PagingRequest getRowLimitPagingRequest(){
+		return null;
+	}
+
+	/**
+	 * Returns the value of subject's uri or label depending on exportResourceUri value 
+	 * @return 
+	 */
+	protected String getUriOrLabelValue(SubjectDTO subject){ 
+		String value = isExportResourceUri()
+			? subject.getUri()
+				: FormatUtils.getObjectValuesForPredicate(Predicates.RDFS_LABEL, subject, getLanguages());
+		return value;
 	}
 
 	/**
@@ -181,12 +210,11 @@ public abstract class Exporter {
 	public void setExportResourceUri(boolean exportResourceUri) {
 		this.exportResourceUri = exportResourceUri;
 	}
-	
 	/**
-	 * Rerturns the number of rows MS Excel can handle on one sheet 
+	 * Rerturns the number of rows the exporter output can handle 
 	 * @return
 	 */
-	public static Integer getXlsRowsLimit(){
-		return new Integer(GeneralConfig.getRequiredProperty(EXPORT_ROW_LIMIT));		
+	public static Integer getRowsLimit(){
+		return -1;		
 	}
 }

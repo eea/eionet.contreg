@@ -47,13 +47,14 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.SearchDAO;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.util.export.ExportFormat;
-import eionet.cr.util.export.Exporter;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortOrder;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.URIUtil;
 import eionet.cr.util.Util;
+import eionet.cr.util.export.ExportFormat;
+import eionet.cr.util.export.Exporter;
+import eionet.cr.util.export.XlsExporter;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.web.util.ApplicationCache;
 import eionet.cr.web.util.columns.SearchResultColumn;
@@ -101,6 +102,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 
 	private boolean uriResourceIdentifier;
 	private String exportFormat;
+
 	private List<String> exportColumns;
 
 	/**
@@ -133,7 +135,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 	 * Returns the list of export formats
 	 */
 	public boolean isShowExcelExport() {		
-		if(resultList!=null && resultList.size()>Exporter.getXlsRowsLimit()){
+		if(matchCount>XlsExporter.getRowsLimit()){
 			return false;
 		}
 		return true;
@@ -601,6 +603,21 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 		return exportColumns;
 	}
 
+
+	/**
+	 * @return the exportFormat
+	 */
+	public String getExportFormat() {
+		return exportFormat;
+	}
+
+	/**
+	 * set exportFormat parameter (xls, xml, ...)
+	 * @param exportFormat
+	 */
+	public void setExportFormat(String exportFormat) {
+		this.exportFormat = exportFormat;
+	}
 
 	/**
 	 * @param exportColumns the exportColumns to set

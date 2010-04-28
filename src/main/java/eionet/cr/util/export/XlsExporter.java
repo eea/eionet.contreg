@@ -17,9 +17,11 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
 
 import eionet.cr.common.Predicates;
+import eionet.cr.config.GeneralConfig;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.FormatUtils;
 import eionet.cr.util.Pair;
+import eionet.cr.util.pagination.PagingRequest;
 
 /**
  * @author Enriko Käsper, TietoEnator Estonia AS
@@ -27,6 +29,10 @@ import eionet.cr.util.Pair;
  */
 
 public class XlsExporter extends Exporter {
+
+	//config param in cr.properties
+	private static final String EXPORT_ROW_LIMIT = "exporter.xls.row.limit";
+
 	/**
 	 * exports custom search to XLS format.
 	 * 
@@ -34,7 +40,7 @@ public class XlsExporter extends Exporter {
 	 * @return
 	 * @throws IOException
 	 */
-	protected InputStream exportContent(Pair<Integer, List<SubjectDTO>> customSearch) throws IOException {
+	protected InputStream doExport(Pair<Integer, List<SubjectDTO>> customSearch) throws IOException {
 		HSSFWorkbook workbook = new HSSFWorkbook();
 		HSSFSheet sheet = workbook.createSheet("exported data");
 		
@@ -54,9 +60,8 @@ public class XlsExporter extends Exporter {
 		//store width of each column +1 for Uri or Label column
 		int[] columnWidth = new int[getSelectedColumns().size() + 1];
 		//output Uri or Label column
-		String uriOrLabelColumn = isExportResourceUri() 
-				? "Uri"
-				: "Label";
+		String uriOrLabelColumn = getUriOrLabel();
+		
 		columnWidth[0] = uriOrLabelColumn.length();
 		HSSFCell uriOrLabelCell= headers.createCell(0);
 		setCellValue(uriOrLabelCell, uriOrLabelColumn).setCellStyle(headerStyle);
@@ -79,9 +84,8 @@ public class XlsExporter extends Exporter {
 			HSSFRow row = sheet.createRow(rowNumber++);
 			
 			//output uri or label column value
-			String value = isExportResourceUri()
-					? subject.getUri()
-					: FormatUtils.getObjectValuesForPredicate(Predicates.RDFS_LABEL, subject, getLanguages());
+			String value = getUriOrLabelValue(subject);
+			
 			columnWidth[0] = Math.max(columnWidth[0], value.length());
 			setCellValue(row.createCell(0), value);
 
@@ -118,4 +122,18 @@ public class XlsExporter extends Exporter {
 		}
 		return cell;
 	}
+	@Override
+	protected PagingRequest getRowLimitPagingRequest(){
+		
+		if(getRowsLimit()>0){
+			return PagingRequest.create(1,getRowsLimit());
+		}
+		else{
+			return null;
+		}
+	}
+	public static Integer getRowsLimit(){
+		return new Integer(GeneralConfig.getRequiredProperty(EXPORT_ROW_LIMIT));
+	}
+
 }
