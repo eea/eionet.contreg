@@ -84,6 +84,9 @@ public abstract class Exporter {
 			case XML:
 				exporter = new XmlExporter();
 				break;
+			case XML_WITH_SCHEMA:
+				exporter = new XmlWithSchemaExporter();
+				break;
 			default:
 				throw new CRRuntimeException("Exporter is not implemented for format: " + exportFormat);
 		}

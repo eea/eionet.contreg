@@ -22,7 +22,8 @@ package eionet.cr.util.export;
 
 public enum ExportFormat {
 	XLS (".xls", "application/xls", "Exported_data.xls"),
-	XML (".xml", "text/xml;charset=utf-8", "Exported_data.xml");
+	XML (".xml", "text/xml;charset=utf-8", "Exported_data.xml"),
+	XML_WITH_SCHEMA (".xml (with XML Schema)", "text/xml;charset=utf-8", "Exported_data.xml");
 
 	private String name;
 	private String contentType;

@@ -1,5 +1,22 @@
 /*
- * Created on 23.04.2010
+ * The contents of this file are subject to the Mozilla Public
+ * License Version 1.1 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of
+ * the License at http://www.mozilla.org/MPL/
+ *
+ * Software distributed under the License is distributed on an "AS
+ * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ * The Original Code is Content Registry 2.0.
+ *
+ * The Initial Owner of the Original Code is European Environment
+ * Agency.  Portions created by Tieto Eesti are Copyright
+ * (C) European Environment Agency.  All Rights Reserved.
+ *
+ * Contributor(s):
+ * Enriko Käsper, Tieto Estonia
  */
 package eionet.cr.util.export;
 
@@ -29,12 +46,13 @@ import eionet.cr.util.Pair;
 public class XmlExporter extends Exporter {
 
 	private static final String ENCODING = "UTF-8";
-	private static final String ROOT_ELEMENT = "dataroot";
-	private static final String ROW_ELEMENT = "resources";
+	protected static final String ROOT_ELEMENT = "root";
+	protected static final String DATA_ROOT_ELEMENT = "dataroot";
+	protected static final String ROW_ELEMENT = "resources";
 
 	public static final String INVALID_ELEMENT_NAME = "unknown";
 	
-	private Map<String, String> elements=null;
+	private Map<String, XmlElementMetadata> elements=null;
 	
 	@Override
 	protected InputStream doExport(Pair<Integer, List<SubjectDTO>> customSearch) throws ExportException, IOException {
@@ -46,27 +64,13 @@ public class XmlExporter extends Exporter {
 			writer = XMLOutputFactory.newInstance().createXMLStreamWriter(outStream, ENCODING);
 			writer.writeStartDocument(ENCODING, "1.0");
 			//write root element
-			writer.writeStartElement(ROOT_ELEMENT);
+			writeDocumentStart(writer);
 			
-			//if exporting with labels no need to export RDFS_LABEL
-			if (!isExportResourceUri()) {
-				getSelectedColumns().remove(new Pair<String,String>(Predicates.RDFS_LABEL, null));
-			}
+			//create element names Map
+			parseElemNames();
 			
-			//create the elements map, where the key is element name in lowercase and the value is escaped element value 
-			elements = new LinkedHashMap<String, String>();
-			//set Uri or Label element
-			elements.put(getUriOrLabel().toLowerCase(),getUriOrLabel());
-
-			//set other element names
-			for(Pair<String,String> columnPair : getSelectedColumns()) {
-				String element = columnPair.getRight() != null
-					? columnPair.getRight()
-						: columnPair.getLeft();
-				String elemName = getUniqueElementName(getEscapedElementName(element));
-				elements.put(elemName.toLowerCase(), elemName);
-			}
-			String[] elementNames = elements.values().toArray(new String[elements.size()]);
+			String[] elementKeys = elements.keySet().toArray(new String[elements.size()]);
+			XmlElementMetadata elementMetada = null;
 			
 			// write data rows
 			for(SubjectDTO subject : customSearch.getRight()) {				
@@ -77,20 +81,25 @@ public class XmlExporter extends Exporter {
 				//get uri or label value
 				String uriOrLabelValue = getUriOrLabelValue(subject);
 					
+				elementMetada = elements.get(elementKeys[0]);
 				//write uri or label element
-				writeSimpleDataElement(writer, elementNames[0], uriOrLabelValue); 
+				writeSimpleDataElement(writer, elementMetada.getName(), uriOrLabelValue);
+				elementMetada.setMaxLength(uriOrLabelValue.length());
 
 				//write other elements
 				int elementIndex= 1;
 				for(Pair<String,String> columnPair : getSelectedColumns()) {
 					String value = FormatUtils.getObjectValuesForPredicate(columnPair.getLeft(), subject, getLanguages());
-					writeSimpleDataElement(writer, elementNames[elementIndex++], value); 
+					elementMetada = elements.get(elementKeys[elementIndex++]);
+					writeSimpleDataElement(writer, elementMetada.getName(), value); 
+					elementMetada.setMaxLength(value.length());
+					elementMetada.setType(value);
 				}
 				
 				writer.writeEndElement();
 			}
 			
-			writer.writeEndElement();
+			writeDocumentEnd(writer);
 			
 			writer.flush();
 		} catch (XMLStreamException e) {
@@ -107,6 +116,46 @@ public class XmlExporter extends Exporter {
 		
 		return new ByteArrayInputStream(outStream.toByteArray());
 	}
+	
+	/**
+	 * Create element names map
+	 */
+	private void parseElemNames() {
+
+		//if exporting with labels no need to export RDFS_LABEL
+		if (!isExportResourceUri()) {
+			getSelectedColumns().remove(new Pair<String,String>(Predicates.RDFS_LABEL, null));
+		}
+		//create the elements map, where the key is element name in lowercase and the value is escaped element value 
+		elements = new LinkedHashMap<String, XmlElementMetadata>();
+		//set Uri or Label element
+		elements.put(getUriOrLabel().toLowerCase(),new XmlElementMetadata(getUriOrLabel()));
+
+		//set other element names
+		for(Pair<String,String> columnPair : getSelectedColumns()) {
+			String element = columnPair.getRight() != null
+				? columnPair.getRight()
+					: columnPair.getLeft();
+			String elemName = getUniqueElementName(getEscapedElementName(element));
+			elements.put(elemName.toLowerCase(), new XmlElementMetadata(elemName));
+		}		
+	}
+	/**
+	 * Write doument start element(s)
+	 * @param writer
+	 * @throws XMLStreamException
+	 */
+	protected void writeDocumentStart(XMLStreamWriter writer) throws XMLStreamException{
+		writer.writeStartElement(DATA_ROOT_ELEMENT);	
+	}
+	/**
+	 * Write document end element(s)
+	 * @param writer
+	 * @throws XMLStreamException
+	 */
+	protected void writeDocumentEnd(XMLStreamWriter writer) throws XMLStreamException{
+		writer.writeEndElement();
+	}
 	/**
 	 * writes simple XML element with start tag, textual content and end tag
 	 * @param writer
@@ -114,7 +163,7 @@ public class XmlExporter extends Exporter {
 	 * @param value
 	 * @throws XMLStreamException
 	 */
-	private void writeSimpleDataElement(XMLStreamWriter writer, String element, String value) throws XMLStreamException{		
+	protected void writeSimpleDataElement(XMLStreamWriter writer, String element, String value) throws XMLStreamException{		
 		writer.writeStartElement(element);
 		writer.writeCharacters(value);
 		writer.writeEndElement();
@@ -123,7 +172,7 @@ public class XmlExporter extends Exporter {
 	 * returns the list of element names
 	 * @return
 	 */
-	public Map<String,String> getElements() {
+	public Map<String,XmlElementMetadata> getElements() {
 		return elements;
 	}
 	/**
@@ -131,7 +180,7 @@ public class XmlExporter extends Exporter {
 	 * if the name is not still valid, then replace it with INVALID_ELEMENT_NAME 
 	 *  
 	 */
-	public String getEscapedElementName(String elementName){
+	protected String getEscapedElementName(String elementName){
 		
 		if(elementName==null || elementName.length()==0)  elementName=INVALID_ELEMENT_NAME;
 		
@@ -153,7 +202,7 @@ public class XmlExporter extends Exporter {
 	 * @param elementName
 	 * @return
 	 */
-	public String getUniqueElementName(String elementName){
+	protected String getUniqueElementName(String elementName){
 		
 		if(elementName==null || elementName.length()==0)  elementName=INVALID_ELEMENT_NAME;
 		
