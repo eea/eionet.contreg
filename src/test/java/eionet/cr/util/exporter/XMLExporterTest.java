@@ -38,18 +38,18 @@ public class XMLExporterTest  extends TestCase {
 	@Test
 	public void testEscapeElementName(){
 		MockXmlExporter exporter = new MockXmlExporter();
-		assertEquals(exporter.getEscapedElementName("1invalidElem"),"_1invalidElem");
-		assertEquals(exporter.getEscapedElementName("xmlElem"),"_xmlElem");
-		assertEquals(exporter.getEscapedElementName(".Elem"),"_Elem");
+		assertEquals(exporter.getEscapedElementNameTest("1invalidElem"),"_1invalidElem");
+		assertEquals(exporter.getEscapedElementNameTest("xmlElem"),"_xmlElem");
+		assertEquals(exporter.getEscapedElementNameTest(".Elem"),"_Elem");
 
-		assertEquals(exporter.getEscapedElementName("test:Elem1"),"test_Elem1");
-		assertEquals(exporter.getEscapedElementName("test.Elem"),"test_Elem");
-		assertEquals(exporter.getEscapedElementName("elem#"),"elem_");
-		assertEquals(exporter.getEscapedElementName("elem?"),"elem_");
-		assertEquals(exporter.getEscapedElementName("elem1  and  elem2"),"elem1__and__elem2");
+		assertEquals(exporter.getEscapedElementNameTest("test:Elem1"),"test_Elem1");
+		assertEquals(exporter.getEscapedElementNameTest("test.Elem"),"test_Elem");
+		assertEquals(exporter.getEscapedElementNameTest("elem#"),"elem_");
+		assertEquals(exporter.getEscapedElementNameTest("elem?"),"elem_");
+		assertEquals(exporter.getEscapedElementNameTest("elem1  and  elem2"),"elem1__and__elem2");
 
-		assertEquals(exporter.getEscapedElementName("elem***"),"elem___");
-		assertEquals(exporter.getEscapedElementName(""),XmlExporter.INVALID_ELEMENT_NAME);
+		assertEquals(exporter.getEscapedElementNameTest("elem***"),"elem___");
+		assertEquals(exporter.getEscapedElementNameTest(""),XmlExporter.INVALID_ELEMENT_NAME);
 	}
 	@Test
 	public void testGetUniqueElementName(){
@@ -63,13 +63,13 @@ public class XMLExporterTest  extends TestCase {
 		elements.put("elemthree_2", new XmlElementMetadata("elemThree_2"));
 		exporter.setElements(elements);
 		
-		assertEquals(exporter.getUniqueElementName("elemFour"),"elemFour");
-		assertEquals(exporter.getUniqueElementName("elemOne"),"elemOne_1");
-		assertEquals(exporter.getUniqueElementName("elemTwo"),"elemTwo_2");
-		assertEquals(exporter.getUniqueElementName("elemThree"),"elemThree_3");
-		assertEquals(exporter.getUniqueElementName("ELEMONE"),"ELEMONE_1");
-		assertEquals(exporter.getUniqueElementName("ELEMTWO"),"ELEMTWO_2");
-		assertEquals(exporter.getUniqueElementName(""),XmlExporter.INVALID_ELEMENT_NAME);
+		assertEquals(exporter.getUniqueElementNameTest("elemFour"),"elemFour");
+		assertEquals(exporter.getUniqueElementNameTest("elemOne"),"elemOne_1");
+		assertEquals(exporter.getUniqueElementNameTest("elemTwo"),"elemTwo_2");
+		assertEquals(exporter.getUniqueElementNameTest("elemThree"),"elemThree_3");
+		assertEquals(exporter.getUniqueElementNameTest("ELEMONE"),"ELEMONE_1");
+		assertEquals(exporter.getUniqueElementNameTest("ELEMTWO"),"ELEMTWO_2");
+		assertEquals(exporter.getUniqueElementNameTest(""),XmlExporter.INVALID_ELEMENT_NAME);
 		
 	}
 	@Test
@@ -146,11 +146,11 @@ public class XMLExporterTest  extends TestCase {
 		public InputStream doExport(Pair<Integer, List<SubjectDTO>> customSearch) throws ExportException, IOException {
 			return super.doExport(customSearch);
 		}
-		public String getEscapedElementName(String elementName){
-			return super.getEscapedElementName(elementName);
+		public String getEscapedElementNameTest(String elementName){
+			return super.getEscapedElementNameTest(elementName);
 		}
-		public String getUniqueElementName(String elementName){
-			return super.getUniqueElementName(elementName);
+		public String getUniqueElementNameTest(String elementName){
+			return super.getUniqueElementNameTest(elementName);
 		}
 	}
 }

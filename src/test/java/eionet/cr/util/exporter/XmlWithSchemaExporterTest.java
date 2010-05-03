@@ -137,11 +137,11 @@ public class XmlWithSchemaExporterTest  extends TestCase {
 		public InputStream doExport(Pair<Integer, List<SubjectDTO>> customSearch) throws ExportException, IOException {
 			return super.doExport(customSearch);
 		}
-		public String getEscapedElementName(String elementName){
-			return super.getEscapedElementName(elementName);
+		public String getEscapedElementNameTest(String elementName){
+			return super.getEscapedElementNameTest(elementName);
 		}
-		public String getUniqueElementName(String elementName){
-			return super.getUniqueElementName(elementName);
+		public String getUniqueElementNameTest(String elementName){
+			return super.getUniqueElementNameTest(elementName);
 		}
 	}
 }
