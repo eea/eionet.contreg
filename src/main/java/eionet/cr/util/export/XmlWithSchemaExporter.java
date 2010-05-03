@@ -32,14 +32,10 @@ public class XmlWithSchemaExporter extends XmlExporter {
 	protected static final String SCHEMA_NS_URI = "http://www.w3.org/2001/XMLSchema";
 	protected static final String SCHEMA_NS_PREFIX = "xsd";
 
-	protected static final String MSOFFICE_NS_URI = "urn:schemas-microsoft-com:officedata";
-	protected static final String MSOFFICE_NS_PREFIX = "od";
-
 	@Override
 	protected void writeDocumentStart(XMLStreamWriter writer) throws XMLStreamException{
 		writer.writeStartElement(ROOT_ELEMENT);	
 		writer.writeNamespace(SCHEMA_NS_PREFIX, SCHEMA_NS_URI);
-		writer.writeNamespace(MSOFFICE_NS_PREFIX, MSOFFICE_NS_URI);
 		writer.writeStartElement(DATA_ROOT_ELEMENT);	
 	}
 
@@ -99,22 +95,12 @@ public class XmlWithSchemaExporter extends XmlExporter {
 		writer.writeAttribute("name", element.getName());
 		writer.writeAttribute("minOccurs", "0");
 		writer.writeAttribute("type", "xsd:double");
-		writer.writeAttribute(MSOFFICE_NS_URI, "jetType", "number");
-		writer.writeAttribute(MSOFFICE_NS_URI, "sqlSType", "float");
 		
 	}
 	private void writeStringElement(XMLStreamWriter writer, XmlElementMetadata element) throws XMLStreamException{
 		writer.writeStartElement(SCHEMA_NS_URI, "element");
 		writer.writeAttribute("name", element.getName());
-		writer.writeAttribute("minOccurs", "0");
-		if(element.getMaxLength()>255){
-			writer.writeAttribute(MSOFFICE_NS_URI, "jetType", "memo");
-			writer.writeAttribute(MSOFFICE_NS_URI, "sqlSType", "ntext");
-		}
-		else{
-			writer.writeAttribute(MSOFFICE_NS_URI, "jetType", "text");
-			writer.writeAttribute(MSOFFICE_NS_URI, "sqlSType", "nvarchar");
-		}		
+		writer.writeAttribute("minOccurs", "0");	
 		//write simple Type info
 		writer.writeStartElement(SCHEMA_NS_URI, "simpleType");
 		writer.writeStartElement(SCHEMA_NS_URI, "restriction");

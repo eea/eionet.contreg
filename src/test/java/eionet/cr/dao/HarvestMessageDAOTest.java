@@ -22,22 +22,12 @@ package eionet.cr.dao;
 
 import java.util.List;
 
-import junit.framework.TestCase;
-
-import org.dbunit.DatabaseTestCase;
-import org.dbunit.database.IDatabaseConnection;
 import org.dbunit.dataset.IDataSet;
-import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.junit.Test;
 
-import eionet.cr.config.GeneralConfig;
 import eionet.cr.dto.HarvestMessageDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
-import eionet.cr.test.helpers.DbHelper;
-import eionet.cr.test.helpers.dbunit.DbUnitDatabaseConnection;
-import eionet.cr.util.Hashes;
-import eionet.cr.util.sql.DbConnectionProvider;
 
 /**
  * JUnit test tests HarvestMessageDAO functionality.

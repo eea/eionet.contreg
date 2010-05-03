@@ -108,7 +108,6 @@ public class XmlWithSchemaExporterTest  extends TestCase {
 		// assert xml attribute values
 		assertTrue(xmlAttributeValues.contains("xsd:double"));
 		assertTrue(xmlAttributeValues.contains("xsd:string"));
-		assertTrue(xmlAttributeValues.contains("memo"));
 		assertTrue(xmlAttributeValues.contains("300"));
 	}
 	private String generateLongStringValue(int l){

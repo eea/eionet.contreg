@@ -20,24 +20,15 @@
  */
 package eionet.cr.dao;
 
-import java.util.Collections;
 import java.util.List;
 
-import org.dbunit.DBTestCase;
-import org.dbunit.DatabaseTestCase;
-import org.dbunit.database.IDatabaseConnection;
 import org.dbunit.dataset.IDataSet;
-import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.junit.Test;
 
-import eionet.cr.config.GeneralConfig;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
-import eionet.cr.test.helpers.DbHelper;
-import eionet.cr.test.helpers.dbunit.DbUnitDatabaseConnection;
 import eionet.cr.util.Pair;
 import eionet.cr.util.pagination.PagingRequest;
-import eionet.cr.util.sql.DbConnectionProvider;
 
 /**
  * JUnit test tests HarvestSourceDAO functionality.
