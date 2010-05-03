@@ -176,7 +176,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 		}
 		filters.put(Predicates.RDF_TYPE, type);
 		exporter.setSelectedFilters(filters);
-		getContext().getResponse().setHeader("Content-Disposition", "inline;filename=" + format.getFilename());
+		getContext().getResponse().setHeader("Content-Disposition", "attachment;filename=" + format.getFilename());
 		getContext().getResponse().setHeader("Cache-Control", "no-cache, must-revalidate");
 		
 		return new StreamingResolution(format.getContentType(), exporter.export());

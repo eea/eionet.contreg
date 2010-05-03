@@ -147,10 +147,10 @@ public class XMLExporterTest  extends TestCase {
 			return super.doExport(customSearch);
 		}
 		public String getEscapedElementNameTest(String elementName){
-			return super.getEscapedElementNameTest(elementName);
+			return super.getEscapedElementName(elementName);
 		}
 		public String getUniqueElementNameTest(String elementName){
-			return super.getUniqueElementNameTest(elementName);
+			return super.getUniqueElementName(elementName);
 		}
 	}
 }
