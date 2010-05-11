@@ -9,10 +9,24 @@
         <h1>Harvest queue</h1>
         
         <p>This page displays the harvest queue. It is divided into two: <em>urgent queue</em> and <em>batch queue</em>.
-        The batch queue contains the sources that are being harvested at the current run of the batch harvester. If it is empty,
-        it means the batch harvester is not running at the moment or there are currently no sources that it needs to harvest.
+        The batch queue contains the sources that are being harvested at the current run of the batch harvester. If the
+        batch harvester is not executing at the moment, then the batch queue displays the sources that will be harvested
+        next time the batch harvester executes. If the batch queue is empty then either there is nothing to harvest or
+        batch harevsting has been turned off.
         The urgent queue is created by system administrators who can request an urgent harvest at any time.
         Harvests in the urgent queue have always a higher priority over those in the batch queue.</p>
+        
+        <c:if test="${empty actionBean.batchHarvestingHours}">
+        	<div class="tip-msg" style="margin-bottom:10px">
+        		According to the current configuration, batch harvesting is turned off!
+        	</div>
+        </c:if>
+
+        <c:if test="${not empty actionBean.batchHarvestingHours}">
+        	<div class="tip-msg" style="margin-bottom:10px">
+        		Batch harvesting has been configured to run only at these hours: <c:out value="${actionBean.batchHarvestingHours}"/>
+        	</div>
+        </c:if>
         
         <c:if test="${not empty actionBean.currentHarvest}">
 			<div class="advise-msg" style="margin-bottom:10px">
@@ -81,8 +95,10 @@
 							<display:setProperty name="paging.banner.items_name" value="sources"/>
 							
 							<display:column property="url" title="URL" sortable="true"/>
-							<display:column property="lastHarvest" title="Last harvest" sortable="true"/>							
+							<display:column property="lastHarvest" title="Last harvest" sortable="true"/>
+														
 						</display:table>
+						
 					</c:when>
 					<c:otherwise>
 						<p>No items found in this queue.</p>

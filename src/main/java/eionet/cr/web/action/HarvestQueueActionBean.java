@@ -30,9 +30,11 @@ import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.UrgentHarvestQueueDAO;
 import eionet.cr.dto.HarvestSourceDTO;
@@ -64,6 +66,9 @@ public class HarvestQueueActionBean extends AbstractActionBean{
 	private List<UrgentHarvestQueueItemDTO> urgentQueue;
 	private List<HarvestSourceDTO> batchQueue;
 	
+	/** */
+	private static String batchHarvestingHours;
+	
 	/**
 	 * 
 	 */
@@ -81,6 +86,9 @@ public class HarvestQueueActionBean extends AbstractActionBean{
 		
 		if (getQueueType().equals(TYPE_BATCH)){
 			batchQueue = HarvestingJob.getBatchHarvestingQueue();
+			if (batchQueue==null || batchQueue.isEmpty()){
+				batchQueue = HarvestingJob.getNextScheduledSources();
+			}
 		}
 		else{
 			urgentQueue = factory.getDao(UrgentHarvestQueueDAO.class).getUrgentHarvestQueue();
@@ -160,5 +168,20 @@ public class HarvestQueueActionBean extends AbstractActionBean{
 	 */
 	public boolean isTypeBatch(){
 		return getQueueType().equals(TYPE_BATCH);
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public String getBatchHarvestingHours(){
+		
+		if (batchHarvestingHours==null){
+			
+			String s = GeneralConfig.getProperty(GeneralConfig.HARVESTER_BATCH_HARVESTING_HOURS);
+			batchHarvestingHours = StringUtils.isBlank(s) ? "" : s.trim();
+		}
+		
+		return batchHarvestingHours;
 	}
 }

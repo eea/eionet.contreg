@@ -22,6 +22,7 @@ package eionet.cr.harvest.scheduled;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -34,6 +35,7 @@ import org.apache.commons.logging.LogFactory;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.quartz.SimpleTrigger;
 import org.quartz.StatefulJob;
 
 import eionet.cr.common.JobScheduler;
@@ -61,22 +63,36 @@ import eionet.cr.web.security.CRUser;
  *
  */
 public class HarvestingJob implements StatefulJob, ServletContextListener{
-	
+
+	/** */
 	public static final String NAME = HarvestingJob.class.getClass().getSimpleName();
 	
 	/** */
-	private static Log logger = LogFactory.getLog(HarvestingJob.class);
+	private static Log logger;
 	
 	/** */
-//	private static Harvest currentHarvest = null;
-	private static List<HarvestSourceDTO> batchHarvestingQueue; 
+	private static List<HarvestSourceDTO> batchHarvestingQueue;
+	private static List<HarvestSourceDTO> nextScheduledSources;
 	
 	/** */
-	private List<HourSpan> batchHarvestingHours;
-	private Integer intervalSeconds;
-	private Integer dailyActiveMinutes;
+	private static List<HourSpan> batchHarvestingHours;
+	private static Integer intervalSeconds;
+	private static Integer dailyActiveMinutes;
 	private static boolean firstRunMade = false;
 	
+	/** */
+	private static SimpleTrigger trigger = null;
+
+//	private static Harvest currentHarvest = null;
+
+	/**
+	 * 
+	 */
+	static{
+		logger = LogFactory.getLog(HarvestingJob.class);
+		refreshNextScheduledSources();
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.quartz.Job#execute(org.quartz.JobExecutionContext)
@@ -93,14 +109,10 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 			deleteSourcesQueuedForRemoval();			
 			harvestUrgentQueue();
 
-			if (!isBatchHarvestingEnabled() || !isBatchHarvestingHour())
-				return;
-
-			updateBatchHarvestingQueue();
-			if (batchHarvestingQueue!=null && !batchHarvestingQueue.isEmpty()){
-				for (Iterator<HarvestSourceDTO> iter=batchHarvestingQueue.iterator(); iter.hasNext(); harvestUrgentQueue()){
-					pullHarvest(iter.next(), false);
-				}
+			if (isBatchHarvestingEnabled() && isBatchHarvestingHour()){
+				
+				loadBatchHarvestingQueue();
+				harvestBatchQueue();
 			}
 		}
 		catch (Exception e){
@@ -113,8 +125,37 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 			throw new JobExecutionException(e.toString(), e);
 		}
 		finally{
-			CurrentHarvests.setQueuedHarvest(null);
-			resetBatchHarvestingQueue();
+			refreshNextScheduledSources();
+			CurrentHarvests.setQueuedHarvest(null);			
+			resetBatchHarvestingQueue();			
+		}
+	}
+	
+	/**
+	 * 
+	 * @throws DAOException
+	 */
+	private void harvestBatchQueue() throws DAOException{
+		
+		if (isBatchHarvestingEnabled() && isBatchHarvestingHour()){
+			
+			if (batchHarvestingQueue!=null && !batchHarvestingQueue.isEmpty()){
+				
+				for (Iterator<HarvestSourceDTO> i=batchHarvestingQueue.iterator(); i.hasNext();){
+					
+					HarvestSourceDTO harvestSource = i.next();
+					i.remove();
+					if (batchHarvestingQueue.isEmpty()){
+						refreshNextScheduledSources();
+					}
+					
+					pullHarvest(harvestSource, false);
+					
+					if (!isBatchHarvestingEnabled() || !isBatchHarvestingHour()){
+						break;
+					}
+				}
+			}
 		}
 	}
 
@@ -138,17 +179,40 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 	 * @return
 	 * @throws DAOException 
 	 */
-	private void updateBatchHarvestingQueue() throws DAOException{
+	private void loadBatchHarvestingQueue() throws DAOException{
+		
+		int numOfSegments = getNumberOfSegments();
+		batchHarvestingQueue = DAOFactory.get().getDao(HarvestSourceDAO.class).getNextScheduledSources(numOfSegments);
+
+		logger.debug(batchHarvestingQueue.size() + " sources added to batch harvesting queue (numOfSegments=" + numOfSegments + ")");
+	}
+	
+	/**
+	 * 
+	 */
+	private static void refreshNextScheduledSources(){
 		
 		if (isBatchHarvestingEnabled()){
 			
-			int numOfSegments = getNumberOfSegments();
-			batchHarvestingQueue = DAOFactory.get().getDao(HarvestSourceDAO.class).getNextScheduledSources(numOfSegments);
-			
-			logger.debug(batchHarvestingQueue.size() + " sources added to batch harvesting queue (numOfSegments=" + numOfSegments + ")");
+			try {
+				nextScheduledSources = DAOFactory.get().getDao(
+						HarvestSourceDAO.class).getNextScheduledSources(getNumberOfSegments());
+			}
+			catch (DAOException e) {
+				logger.error("Error loading next scheduled sources: " + e.toString(), e);
+			}
 		}
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
+	public static List<HarvestSourceDTO> getNextScheduledSources(){
+		
+		return nextScheduledSources;
+	}
+
 	/**
 	 * 
 	 */
@@ -161,6 +225,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 	 * @return
 	 */
 	public static List<HarvestSourceDTO> getBatchHarvestingQueue(){
+		
 		return HarvestingJob.batchHarvestingQueue;
 	}
 
@@ -282,7 +347,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 		
 		if (harvest!=null){
 			CurrentHarvests.setQueuedHarvest(harvest);
-			try {				
+			try {
 				harvest.execute();
 			}
 			catch (HarvestException e){
@@ -351,7 +416,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 	/**
 	 * @return the activeHours
 	 */
-	public List<HourSpan> getBatchHarvestingHours() {
+	public static List<HourSpan> getBatchHarvestingHours() {
 		
 		if (batchHarvestingHours==null){
 			
@@ -387,12 +452,17 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 	/**
 	 * @return the intervalSeconds
 	 */
-	public Integer getIntervalSeconds() {
+	public static Integer getIntervalSeconds() {
+		
 		if (intervalSeconds==null){
-			intervalSeconds = Integer.parseInt(GeneralConfig.getRequiredProperty(GeneralConfig.HARVESTER_JOB_INTERVAL_SECONDS).trim());
-			intervalSeconds = Math.min(3600, intervalSeconds.intValue());
-			intervalSeconds = Math.max(5, intervalSeconds.intValue());
+			
+			int seconds = Integer.parseInt(GeneralConfig.getRequiredProperty(GeneralConfig.HARVESTER_JOB_INTERVAL_SECONDS).trim());
+			seconds = Math.min(3600, seconds);
+			seconds = Math.max(5, seconds);
+			
+			intervalSeconds = new Integer(seconds);
 		}
+		
 		return intervalSeconds;
 	}
 
@@ -400,38 +470,39 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 	 * 
 	 * @return
 	 */
-	public float getIntervalMinutes(){
+	public static float getIntervalMinutes(){
 		
-		return (float)getIntervalSeconds().intValue()/(float)60;
+		return getIntervalSeconds().floatValue()/(float)60;
 	}
 
 	/**
 	 * @return the dailyActiveMinutes
 	 */
-	public Integer getDailyActiveMinutes() {
+	public static Integer getDailyActiveMinutes() {
 
-		if (this.dailyActiveMinutes==null){
+		if (dailyActiveMinutes==null){
 
 			/* determine the amount of total active minutes in a day */
 
-			int dailyActiveMinutes = 0;
+			int minutes = 0;
 			List<HourSpan> activeHours = getBatchHarvestingHours();
-			for (Iterator<HourSpan> iter=activeHours.iterator(); iter.hasNext();){
-				dailyActiveMinutes += ((iter.next().length())+1)*(int)60;
+			for (HourSpan hourSpan : activeHours){
+				minutes += ((hourSpan.length())+1)*(int)60;
 			}
 
-			this.dailyActiveMinutes = dailyActiveMinutes>1440 ? new Integer(1440) : new Integer(dailyActiveMinutes);
+			dailyActiveMinutes = minutes>1440 ? new Integer(1440) : new Integer(minutes);
 		}
 		
-		return this.dailyActiveMinutes;
+		return dailyActiveMinutes;
 	}
 	
 	/**
 	 * 
 	 * @return
 	 */
-	private int getNumberOfSegments(){
-		return Math.round((float)getDailyActiveMinutes() / getIntervalMinutes());
+	private static int getNumberOfSegments(){
+		
+		return Math.round(getDailyActiveMinutes().floatValue() / getIntervalMinutes());
 	}
 
 	/**
@@ -440,12 +511,23 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 	 */
 	private boolean isBatchHarvestingHour(){
 		
+		return isBatchHarvestingHour(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
+	}
+
+	/**
+	 * 
+	 * @param calendar
+	 * @return
+	 */
+	private static boolean isBatchHarvestingHour(Calendar calendar){
+		
 		boolean result = false;
 		
-		int currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+		int hour = calendar.get(Calendar.HOUR_OF_DAY);
+		
 		List<HourSpan> activeHours = getBatchHarvestingHours();
-		for (Iterator<HourSpan> iter=activeHours.iterator(); iter.hasNext();){
-			if (iter.next().includes(currentHour)){
+		for (HourSpan hourSpan : activeHours){
+			if (hourSpan.includes(hour)){
 				result = true;
 				break;
 			}
@@ -456,63 +538,60 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 	
 	/**
 	 * 
+	 * @param hour
 	 * @return
 	 */
-	private boolean isBatchHarvestingEnabled(){
+	private static boolean isBatchHarvestingHour(int hour){
+		
+		boolean result = false;
+		List<HourSpan> activeHours = getBatchHarvestingHours();
+		for (HourSpan hourSpan : activeHours){
+			if (hourSpan.includes(hour)){
+				result = true;
+				break;
+			}
+		}
+		
+		return result;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	private static boolean isBatchHarvestingEnabled(){
 		return getDailyActiveMinutes().intValue()>0;
 	}
 	
 	/**
 	 * 
+	 * @return
 	 */
-	class HourSpan{
+	public static long getNextBatchHarvestTime(){
 		
-		/** */
-		private int from;
-		private int to;
-
-		/**
-		 * 
-		 * @param from
-		 * @param to
-		 */
-		HourSpan(int from, int to){
-			this.from = from;
-			this.to = to;
+		long result = 0;
+		if (trigger!=null){
+			
+			Date nextFireTime = trigger.getNextFireTime();
+			if (nextFireTime!=null){
+				
+				Calendar calendar = Calendar.getInstance();
+				calendar.setTime(nextFireTime);
+				
+				int i = 1;
+				for (;!isBatchHarvestingHour(calendar) && i<=24; i++){
+					calendar.add(Calendar.HOUR_OF_DAY, 1);
+				}
+				
+				// if i>25 then we've tried 24 hours and none of them was
+				// a batch harvesting hour				
+				if (i<=24){
+					calendar.set(Calendar.MINUTE, 0);
+					result = calendar.getTimeInMillis();
+				}
+			}
 		}
-		/**
-		 * @return the from
-		 */
-		public int getFrom() {
-			return from;
-		}
-		/**
-		 * @return the to
-		 */
-		public int getTo() {
-			return to;
-		}
-		/**
-		 * 
-		 * @return
-		 */
-		public int length(){
-			return to-from; // we assume the creator has made sure that to>=from
-		}
-		/**
-		 * 
-		 * @param hour
-		 * @return
-		 */
-		public boolean includes(int hour){
-			return hour>=from && hour<=to;
-		}
-		/*
-		 * (non-Javadoc)
-		 * @see java.lang.Object#toString()
-		 */
-		public String toString(){
-			return new StringBuffer().append(from).append("-").append(to).toString();
-		}
+		
+		return result;
 	}
 }

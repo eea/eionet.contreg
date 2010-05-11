@@ -863,5 +863,4 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 			SQLUtil.close(conn);
 		}
 	}
-
 }
