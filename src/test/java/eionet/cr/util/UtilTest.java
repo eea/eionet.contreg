@@ -59,5 +59,12 @@ public class UtilTest extends TestCase{
 		assertEquals("", Util.normalizeHTTPAcceptedLanguage(""));
 		assertEquals("", Util.normalizeHTTPAcceptedLanguage(" "));
 	}
+	
+	@Test
+	public void test_calculateHashesCount(){
+		assertEquals(1, Util.calculateHashesCount(0, 0));
+		assertEquals(1, Util.calculateHashesCount(100000, 100000));
+		assertEquals(9642, Util.calculateHashesCount( -9223272718994049566L, 9221558204482793360L));
+	}
 
 }
