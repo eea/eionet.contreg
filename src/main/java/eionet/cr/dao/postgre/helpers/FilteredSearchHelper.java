@@ -158,11 +158,13 @@ public class FilteredSearchHelper extends AbstractSearchHelper{
 	 */
 	@Override
 	protected String getUnorderedQuery(List<Object> inParams) {
-		
+		return getUnorderedQuery(inParams, "select distinct SPO1.SUBJECT as SUBJECT_HASH from SPO as SPO1 ");
+	}		
+	private String getUnorderedQuery(List<Object> inParams, String selectPart) {
 		// start the query with the selection of fields and the join to ordering table
 		
 		StringBuffer query = new StringBuffer().
-		append("select distinct SPO1.SUBJECT as SUBJECT_HASH from SPO as SPO1 ");
+		append(selectPart);
 		
 		// build the "where" part into a separate buffer
 		// validations in constructor ensure that there is at least one valid where-filter 
@@ -227,6 +229,16 @@ public class FilteredSearchHelper extends AbstractSearchHelper{
 				"select count(*) from (").append(query).append(") as FOO").toString();
 	}
 	
+	public String getMinHashQuery(List<Object> inParams) {
+		String query = getUnorderedQuery(inParams, "select min(SPO1.SUBJECT) as SUBJECT_HASH from SPO as SPO1 ");
+		return query;
+	}
+
+	public String getMaxHashQuery(List<Object> inParams) {
+		String query = getUnorderedQuery(inParams, "select max(SPO1.SUBJECT) as SUBJECT_HASH from SPO as SPO1 ");
+		return query;
+	}
+
 	/**
 	 * 
 	 * @param s

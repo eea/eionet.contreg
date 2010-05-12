@@ -77,6 +77,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 	private static final String RESULT_LIST_CACHED = TypeSearchActionBean.class.getName() + ".resultListCached";
 	private static final String LAST_ACTION = TypeSearchActionBean.class.getName() + ".lastAction";
 	private static final String MATCH_COUNT = TypeSearchActionBean.class.getName() + ".matchCount";
+	private static final String EXACT_COUNT = TypeSearchActionBean.class.getName() + ".exactCount";
 	
 	
 	private static final String PREVIOUS_TYPE =  TypeSearchActionBean.class.getName() + ".previousType";
@@ -275,11 +276,15 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 									new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
 				resultList = searchResult.getRight();
 	    		matchCount = searchResult.getLeft();
+	    		int exactRowCountLimit = DAOFactory.get().getDao(SearchDAO.class).getExactRowCountLimit();
+	    		exactCount = exactRowCountLimit<=0 || matchCount<=exactRowCountLimit;
+	    		
 			}
 			//cache result list.
 			getSession().setAttribute(RESULT_LIST_CACHED, resultList);
 			getSession().setAttribute(LAST_ACTION, LastAction.SEARCH);
 			getSession().setAttribute(MATCH_COUNT, matchCount);
+			getSession().setAttribute(EXACT_COUNT, exactCount);
 		}
 		setExportColumns(getSelectedColumnsFromCache());
 		return new ForwardResolution(TYPE_SEARCH_PATH);

@@ -59,6 +59,8 @@ import eionet.cr.web.util.columns.SubjectLastModifiedColumn;
  */
 public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 
+	private static final int EXACT_ROW_COUNT_LIMIT = 500;
+
 	MySQLSearchDAO() {
 		//reduced visibility
 	}
@@ -399,5 +401,9 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 					getSubjectsDataQuery(subjectsMap.keySet()), null, new SubjectDataReader(subjectsMap));
 			return new Pair<Integer,List<SubjectDTO>>(pair.getLeft(), subjects);
 		}
+	}
+
+	public int getExactRowCountLimit() {
+		return EXACT_ROW_COUNT_LIMIT;
 	}
 }

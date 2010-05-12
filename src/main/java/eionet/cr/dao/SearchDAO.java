@@ -93,4 +93,10 @@ public interface SearchDAO extends DAO{
 			String sourceUri,			
 			PagingRequest pagingRequest,
 			SortingRequest sortingRequest, boolean sortByObjectHash) throws DAOException;
+	
+	/**
+	 * 
+	 * @return
+	 */
+	int getExactRowCountLimit();
 }

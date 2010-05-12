@@ -23,6 +23,7 @@ package eionet.cr.util;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.text.ParseException;
@@ -434,7 +435,25 @@ public class Util {
 			
 		return buf.append(milliseconds).append(" sec").toString();
 	}
-	
+
+	/**
+	 * //algorithm calculates the estimated number of hashes 
+	 * 
+	 * @param minHash
+	 * @param maxHash
+	 * @return
+	 */
+	public static int calculateHashesCount(long minHash, long maxHash){
+		
+		BigDecimal minValue = new BigDecimal(Long.MIN_VALUE);
+		BigDecimal maxValue = new BigDecimal(Long.MAX_VALUE);
+		BigDecimal lowKey = new BigDecimal(minHash);
+		BigDecimal highKey = new BigDecimal(maxHash);
+		BigDecimal distance = maxValue.subtract(highKey).add(lowKey).subtract(minValue);
+		BigDecimal hitCount = new BigDecimal(2).pow(64).divide(distance, 0, BigDecimal.ROUND_HALF_UP);
+		
+		return hitCount.intValue();
+	}
 	/**
 	 * 
 	 * @param args

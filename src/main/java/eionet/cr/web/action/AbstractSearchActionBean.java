@@ -22,18 +22,11 @@ package eionet.cr.web.action;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 
 import net.sourceforge.stripes.action.Resolution;
 import eionet.cr.common.Predicates;
 import eionet.cr.dao.DAOException;
-import eionet.cr.dao.DAOFactory;
-import eionet.cr.dao.HelperDAO;
-import eionet.cr.dto.ObjectDTO;
-import eionet.cr.dto.SubjectDTO;
-import eionet.cr.util.Hashes;
-import eionet.cr.util.QueryString;
 import eionet.cr.util.SortOrder;
 import eionet.cr.util.Util;
 import eionet.cr.util.pagination.Pagination;
@@ -55,6 +48,7 @@ public abstract class AbstractSearchActionBean<T> extends AbstractActionBean{
 	protected String sortO = SortOrder.ASCENDING.toString();
 	protected String sortP = null;	
 	protected int matchCount = 0;
+	protected boolean exactCount=true;
 	
 	/** */
 	private Pagination pagination;
@@ -173,6 +167,13 @@ public abstract class AbstractSearchActionBean<T> extends AbstractActionBean{
 		return matchCount;
 	}
 	
+	/**
+	 * @return the calcCount
+	 */
+	public boolean isExactCount() {
+		return exactCount;
+	}
+
 	/**
 	 * 
 	 * @return

@@ -29,11 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DurationFormatUtils;
 
-import eionet.cr.common.Predicates;
-import eionet.cr.common.Subjects;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.postgre.helpers.FilteredSearchHelper;
@@ -45,16 +42,13 @@ import eionet.cr.dao.readers.SubjectDataReader;
 import eionet.cr.dao.util.BBOX;
 import eionet.cr.dao.util.SearchExpression;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
-import eionet.cr.util.SortOrder;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.Util;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.util.sql.PairReader;
 import eionet.cr.util.sql.PostgreSQLFullTextQuery;
 import eionet.cr.util.sql.SingleObjectReader;
-import eionet.cr.web.util.columns.SubjectLastModifiedColumn;
 
 /**
  * 
@@ -63,6 +57,7 @@ import eionet.cr.web.util.columns.SubjectLastModifiedColumn;
  */
 public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 
+	private static final int EXACT_ROW_COUNT_LIMIT = 500;
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.dao.SearchDAO#searchByFreeText(eionet.cr.search.util.SearchExpression, eionet.cr.util.PagingRequest, eionet.cr.util.SortingRequest)
@@ -188,17 +183,11 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 			// get the data of all found subjects
 			subjects = getSubjectsData(subjectsMap);
 
-			// if paging required, get the total number of found subjects too
-			if (pagingRequest!=null){
-				
-				inParams = new ArrayList<Object>();
-				query = helper.getCountQuery(inParams);
-				
-				logger.trace("Search by filters, executing rowcount query: " + query);
-				
-				totalRowCount = Integer.valueOf(executeQueryUniqueResult(query, inParams,
-						new SingleObjectReader<Long>()).toString());
-			}
+		}
+		// if paging required, get the total number of found subjects too
+		if (pagingRequest!=null){
+			
+			totalRowCount = new Integer(getEstimatedRowCount(helper));
 		}
 
 		//return new Pair<Integer,List<SubjectDTO>>(0, new LinkedList<SubjectDTO>());
@@ -329,6 +318,10 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 		// the result Pair contains total number of subjects and the requested sub-list
 		return new Pair<Integer,List<SubjectDTO>>(Integer.valueOf(totalRowCount), subjects);
 	}
+	@Override
+	public int getExactRowCountLimit() {
+		return EXACT_ROW_COUNT_LIMIT;
+	}
 	
 	/**
 	 * 
@@ -338,5 +331,55 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 		
 		long duration = 1001;
 		System.out.println(DurationFormatUtils.formatDuration(duration, "mm min ss sec"));
+	}
+	
+	/**
+	 * Calculates the estimated number of rows without using COUNT(*). 
+	 * If estimatation is lower than EXACT_ROW_COUNT_LIMIT, then find exact number of rows.
+	 * @param helper
+	 * @return
+	 * @throws DAOException
+	 */
+	private int getEstimatedRowCount(FilteredSearchHelper helper) throws DAOException{
+		
+		int totalRowCount = 0;		
+		long startTime = System.currentTimeMillis();
+		
+		ArrayList<Object> inParams = new ArrayList<Object>();
+
+		//get the minimum Hash
+		String query = helper.getMinHashQuery(inParams);
+		Long lMinHash = executeQueryUniqueResult(query, inParams,
+				new SingleObjectReader<Long>());
+		long minHash = lMinHash==null ? 0 : lMinHash;
+		logger.trace("Search by filters, executing minhash query: " + query);
+	
+		//get the maximum Hash
+		query = helper.getMaxHashQuery(inParams);
+		Long lMaxHash = executeQueryUniqueResult(query, inParams,
+				new SingleObjectReader<Long>());
+		long maxHash = lMaxHash==null ? 0 : lMaxHash;
+		logger.trace("Search by filters, executing maxhash query: " + query);
+		
+		// calculate number of rows estimation
+		totalRowCount = Util.calculateHashesCount(minHash, maxHash);
+		
+		logger.trace("Estimated rows count, total query time " + Util.durationSince(startTime));
+		logger.trace("Estimated rows count: " + totalRowCount);
+		if (totalRowCount <= EXACT_ROW_COUNT_LIMIT){
+			long startTime2 = System.currentTimeMillis();
+
+			// get exact number of rows
+			query = helper.getCountQuery(inParams);
+		
+			logger.trace("Search by filters, executing rowcount query: " + query);
+		
+			totalRowCount = Integer.valueOf(executeQueryUniqueResult(query, inParams,
+				new SingleObjectReader<Long>()).toString());
+			logger.trace("Exact rows count, total query time " + Util.durationSince(startTime2));
+			logger.trace("Exact row count: " + totalRowCount);
+		}
+
+		return totalRowCount;
 	}
 }
