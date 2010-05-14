@@ -451,9 +451,9 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 
 	/** */
 	private static final String getPredicatesUsedForType_SQL =
-		"select distinct SPOPRED.PREDICATE from SPO as SPOTYPE" +
-		", SPO as SPOPRED where SPOTYPE.PREDICATE=" + Hashes.spoHash(Predicates.RDF_TYPE) +
-		" and SPOTYPE.OBJECT_HASH=? and SPOTYPE.SUBJECT=SPOPRED.SUBJECT";
+		"select distinct PREDICATE from SPO where SUBJECT in " +
+		"(select distinct SUBJECT from SPO where PREDICATE=" +
+		Hashes.spoHash(Predicates.RDF_TYPE) + " and OBJECT_HASH=? )";
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.dao.HelperDAO#getPredicatesUsedForType(java.lang.String)
@@ -463,8 +463,12 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		ArrayList<Object> values = new ArrayList<Object>();
 		values.add(Long.valueOf(Hashes.spoHash(typeUri)));
 		
+		long startTime = System.currentTimeMillis();
+
 		List<Long> predicateUris = executeQuery(
 				getPredicatesUsedForType_SQL, values, new SingleObjectReader<Long>());
+		logger.trace("usedPredicates query took " + Util.durationSince(startTime));
+		
 		if (predicateUris==null || predicateUris.isEmpty()){
 			return new ArrayList<SubjectDTO>();
 		}

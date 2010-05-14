@@ -86,7 +86,7 @@ public class FilteredSearchHelper extends AbstractSearchHelper{
 		// start the query with the selection of fields and the join to ordering table
 		
 		StringBuffer subSelect = new StringBuffer().
-		append("select distinct on (SUBJECT_HASH) SPO1.SUBJECT as SUBJECT_HASH,");
+		append("select distinct SPO1.SUBJECT as SUBJECT_HASH,");
 		
 		if (sortPredicate.equals(SubjectLastModifiedColumn.class.getSimpleName())){
 			subSelect.append(" RESOURCE.LASTMODIFIED_TIME as OBJECT_ORDERED_BY from SPO as SPO1").
@@ -228,14 +228,9 @@ public class FilteredSearchHelper extends AbstractSearchHelper{
 		return new StringBuffer(
 				"select count(*) from (").append(query).append(") as FOO").toString();
 	}
-	
-	public String getMinHashQuery(List<Object> inParams) {
-		String query = getUnorderedQuery(inParams, "select min(SPO1.SUBJECT) as SUBJECT_HASH from SPO as SPO1 ");
-		return query;
-	}
 
-	public String getMaxHashQuery(List<Object> inParams) {
-		String query = getUnorderedQuery(inParams, "select max(SPO1.SUBJECT) as SUBJECT_HASH from SPO as SPO1 ");
+	public String getMinMaxHashQuery(List<Object> inParams) {
+		String query = getUnorderedQuery(inParams, "select min(SPO1.SUBJECT) as LCOL, max(SPO1.SUBJECT) as RCOL from SPO as SPO1 ");
 		return query;
 	}
 

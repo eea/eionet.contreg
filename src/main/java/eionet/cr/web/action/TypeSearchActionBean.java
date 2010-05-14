@@ -252,9 +252,14 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 	 * @see eionet.cr.web.action.AbstractSearchActionBean#search()
 	 */
 	public Resolution search() throws DAOException {
-		
+		logger.trace("**************  START SEARCH REQUEST  ***********");
 		if (!StringUtils.isBlank(type)) {
+			long startTime = System.currentTimeMillis();
+
 			restoreStateFromSession();
+			logger.trace("after restoreStateFromSession " + Util.durationSince(startTime));
+			startTime = System.currentTimeMillis();
+
 			LastAction lastAction = getLastAction();
 			if (resultList==null || !(lastAction!=null && lastAction.equals(LastAction.ADD_FILTER))){
 				
@@ -267,13 +272,13 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 						}
 					}
 				}
-				
 				Pair<Integer, List<SubjectDTO>> searchResult =
 					DAOFactory.get().getDao(SearchDAO.class).searchByFilters(
 									criteria,
 									null,
 									PagingRequest.create(getPageN()),
 									new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
+
 				resultList = searchResult.getRight();
 	    		matchCount = searchResult.getLeft();
 	    		int exactRowCountLimit = DAOFactory.get().getDao(SearchDAO.class).getExactRowCountLimit();
@@ -472,10 +477,10 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 		if (!cache.containsKey(type)) {
 			
 			Map<String,String> result = new LinkedHashMap<String,String>();
-			
+
 			List<SubjectDTO> usedPredicates = DAOFactory.get().getDao(
 					HelperDAO.class).getPredicatesUsedForType(type);
-
+			
 			result.put(Predicates.RDFS_LABEL, "Title");
 			if (usedPredicates!=null && !usedPredicates.isEmpty()){
 				

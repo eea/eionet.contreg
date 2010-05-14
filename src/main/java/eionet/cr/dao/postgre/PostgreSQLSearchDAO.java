@@ -348,24 +348,21 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 		ArrayList<Object> inParams = new ArrayList<Object>();
 
 		//get the minimum Hash
-		String query = helper.getMinHashQuery(inParams);
-		Long lMinHash = executeQueryUniqueResult(query, inParams,
-				new SingleObjectReader<Long>());
-		long minHash = lMinHash==null ? 0 : lMinHash;
-		logger.trace("Search by filters, executing minhash query: " + query);
-	
-		//get the maximum Hash
-		query = helper.getMaxHashQuery(inParams);
-		Long lMaxHash = executeQueryUniqueResult(query, inParams,
-				new SingleObjectReader<Long>());
-		long maxHash = lMaxHash==null ? 0 : lMaxHash;
-		logger.trace("Search by filters, executing maxhash query: " + query);
+		String query = helper.getMinMaxHashQuery(inParams);
+		Pair minMaxPair = executeQueryUniqueResult(query, inParams,
+				new PairReader<Long, Long>());
+		long minHash = minMaxPair==null || minMaxPair.getLeft()==null ? 0 : (Long)minMaxPair.getLeft();
+		long maxHash = minMaxPair==null || minMaxPair.getRight()==null ? 0 : (Long)minMaxPair.getRight();
+		logger.trace("Search by filters, executing min max hash query: " + query);
+		logger.trace("Estimated rows count, total query time " + Util.durationSince(startTime));
 		
 		// calculate number of rows estimation
+		startTime = System.currentTimeMillis();
 		totalRowCount = Util.calculateHashesCount(minHash, maxHash);
 		
-		logger.trace("Estimated rows count, total query time " + Util.durationSince(startTime));
+		logger.trace("Estimated rows count, calculation time " + Util.durationSince(startTime));		
 		logger.trace("Estimated rows count: " + totalRowCount);
+		
 		if (totalRowCount <= EXACT_ROW_COUNT_LIMIT){
 			long startTime2 = System.currentTimeMillis();
 
