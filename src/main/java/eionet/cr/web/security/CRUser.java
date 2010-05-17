@@ -77,6 +77,15 @@ public class CRUser {
 	
 	/**
 	 * 
+	 * @return
+	 */
+	public boolean isAdministrator(){
+		
+		return hasPermission("/", "u");
+	}
+	
+	/**
+	 * 
 	 * @param aclPath
 	 * @param prm
 	 * @return
