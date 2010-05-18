@@ -37,12 +37,10 @@ import eionet.cr.api.feeds.SubjectsRDFWriter;
 import eionet.cr.api.feeds.amp.AmpFeedServlet;
 import eionet.cr.common.Namespace;
 import eionet.cr.common.Predicates;
-import eionet.cr.common.Subjects;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.SearchDAO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Pair;
-import eionet.cr.util.pagination.PagingRequest;
 
 /**
  * 

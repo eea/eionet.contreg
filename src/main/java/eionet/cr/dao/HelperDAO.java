@@ -2,25 +2,22 @@
 
 package eionet.cr.dao;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-import eionet.cr.dao.readers.SubjectDataReader;
 import eionet.cr.dao.util.PredicateLabels;
-import eionet.cr.dao.util.SearchExpression;
 import eionet.cr.dao.util.SubProperties;
 import eionet.cr.dao.util.UriLabelPair;
 import eionet.cr.dto.RawTripleDTO;
 import eionet.cr.dto.SubjectDTO;
+import eionet.cr.harvest.statistics.dto.HarvestUrgencyScoreDTO;
+import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
 import eionet.cr.util.Pair;
-import eionet.cr.util.SortingRequest;
+import eionet.cr.util.pagination.PagingRequest;
 
 /**
  * Helper dao to use in different searches.
@@ -181,4 +178,23 @@ public interface HelperDAO extends DAO {
 	 * @throws DAOException
 	 */
 	int getSubjectCountInSource(long sourceHash) throws DAOException;
+	
+	/**
+	 * 
+	 * @param days
+	 * @return
+	 * @throws DAOException
+	 */
+	Pair<Integer, List<HarvestedUrlCountDTO>> getLatestHarvestedURLs(int days) throws DAOException;
+
+	/**
+	 * 
+	 * @param amount
+	 * @return
+	 * @throws DAOException
+	 */
+	
+	Pair <Integer, List <HarvestUrgencyScoreDTO>> getUrgencyOfComingHarvests(int amount) throws DAOException;
+	
+	
 }

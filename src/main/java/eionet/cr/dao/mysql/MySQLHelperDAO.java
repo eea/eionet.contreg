@@ -36,13 +36,15 @@ import eionet.cr.dao.util.UriLabelPair;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.RawTripleDTO;
 import eionet.cr.dto.SubjectDTO;
+import eionet.cr.harvest.statistics.dto.HarvestUrgencyScoreDTO;
+import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
 import eionet.cr.util.URIUtil;
 import eionet.cr.util.Util;
 import eionet.cr.util.YesNoBoolean;
+import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.util.sql.PairReader;
-import eionet.cr.util.sql.ResultSetListReader;
 import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
 
@@ -862,5 +864,24 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 		finally{
 			SQLUtil.close(conn);
 		}
+	}
+	
+	
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#getLatestHarvestedURLs()
+	 */
+	public Pair<Integer, List<HarvestedUrlCountDTO>> getLatestHarvestedURLs(int days) throws DAOException {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Method not implemented");
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#getUrgencyOfComingHarvests()
+	 */
+	public Pair <Integer, List <HarvestUrgencyScoreDTO>> getUrgencyOfComingHarvests(int amount) throws DAOException {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Method not implemented");
 	}
 }

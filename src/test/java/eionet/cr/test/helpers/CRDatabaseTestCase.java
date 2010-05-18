@@ -22,14 +22,10 @@ package eionet.cr.test.helpers;
 
 import java.io.IOException;
 
-import junit.framework.AssertionFailedError;
-
 import org.dbunit.DatabaseTestCase;
 import org.dbunit.database.IDatabaseConnection;
-import org.dbunit.dataset.Column;
 import org.dbunit.dataset.DataSetException;
 import org.dbunit.dataset.IDataSet;
-import org.dbunit.dataset.ITable;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
 
 import eionet.cr.test.helpers.dbunit.DbUnitDatabaseConnection;
