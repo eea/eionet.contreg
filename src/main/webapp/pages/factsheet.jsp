@@ -70,6 +70,15 @@
 												<a id="wait_link" href="${oldUrl }" onclick="javascript:showWait('${pageContext.request.contextPath}', '${url }');">Harvest</a>
 											</li>
 										</c:if>
+										
+										<c:if test="${actionBean.adminLoggedIn}">
+							    			<c:if test="${actionBean.urlFoundInHarvestSource}">
+							    				<li>
+							    				<stripes:link class="link-plain" href="/source.action?view=&harvestSource.url=${ subjectUrl }">Source  details</stripes:link>
+							    				</li>
+							    			</c:if>
+							    		</c:if>
+										
 									</ul>
 								</li>
 							</ul>
@@ -87,13 +96,7 @@
 				    				<div class="advice-msg" title="${fn:escapeXml(subjectUri)}">This is an unresolvable resource!</div>
 				    			</c:otherwise>
 				    		</c:choose>
-				    
-				    		<c:if test="${actionBean.adminLoggedIn}">
-				    			<c:if test="${actionBean.urlFoundInHarvestSource}">
-				    				<div class="advice-msg">This resource is a <stripes:link href="/source.action?view=&harvestSource.url=${ subjectUrl }">harvest source</stripes:link></div>
-				    			</c:if>
-				    		</c:if>
-				    		
+			    		
 				    		<crfn:form action="/factsheet.action" method="post">
 				    
 						    	<c:if test="${actionBean.context.eventName=='edit' && allowEdit}">
