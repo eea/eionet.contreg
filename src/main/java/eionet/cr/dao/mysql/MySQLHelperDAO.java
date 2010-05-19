@@ -884,4 +884,10 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("Method not implemented");
 	}
+	
+	public boolean isUrlInHarvestSource(String url) throws DAOException
+	{
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Method not implemented");
+	}
 }

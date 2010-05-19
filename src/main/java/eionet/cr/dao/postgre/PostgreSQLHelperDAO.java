@@ -989,4 +989,37 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		return new Pair<Integer, List<HarvestUrgencyScoreDTO>>(result.size(), result);
 		
 	}
+	
+	
+	public boolean isUrlInHarvestSource(String url) throws DAOException
+	{
+		StringBuffer buf = new StringBuffer().	
+		append("SELECT url FROM harvest_source WHERE url='"+url+"' ");
+		
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		
+		boolean returnValue = false;
+		
+		try{
+			conn = getConnection();
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(buf.toString());
+			if (rs.next()){
+				returnValue = true;
+			}
+		}
+		catch (SQLException e){
+			throw new DAOException(e.toString(), e);
+		}
+		finally{
+			SQLUtil.close(rs);
+			SQLUtil.close(stmt);
+			SQLUtil.close(conn);
+		}
+		
+		return returnValue;
+	}
+	
 }

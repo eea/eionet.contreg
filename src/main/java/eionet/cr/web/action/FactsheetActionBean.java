@@ -54,6 +54,7 @@ import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.InstantHarvester;
+import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
 import eionet.cr.util.URLUtil;
@@ -90,6 +91,9 @@ public class FactsheetActionBean extends AbstractActionBean{
 	/** */
 	private boolean noCriteria;
 	
+	private boolean urlFoundInHarvestSource = false;
+	private boolean adminLoggedIn = false;
+	
 	/**
 	 * 
 	 * @return
@@ -115,6 +119,19 @@ public class FactsheetActionBean extends AbstractActionBean{
 			predicateLabels = helperDAO.getPredicateLabels(
 					Collections.singleton(subjectHash)).getByLanguages(getAcceptedLanguages());
 			subProperties = helperDAO.getSubProperties(Collections.singleton(subjectHash));
+			
+			
+			if (getUser()!=null){
+				if (getUser().isAdministrator()){
+					setAdminLoggedIn(true);
+					urlFoundInHarvestSource = helperDAO.isUrlInHarvestSource(subject.getUrl());
+				} else {
+					setAdminLoggedIn(false);
+				}
+			} else {
+				setAdminLoggedIn(false);
+			}
+			
 		}
 		
 		return new ForwardResolution("/pages/factsheet.jsp");
@@ -458,5 +475,21 @@ public class FactsheetActionBean extends AbstractActionBean{
 	 */
 	public String getUrl(){
 		return uri!=null && URLUtil.isURL(uri) ? uri : null;
+	}
+
+	public boolean isUrlFoundInHarvestSource() {
+		return urlFoundInHarvestSource;
+	}
+
+	public void setUrlFoundInHarvestSource(boolean urlFoundInHarvestSource) {
+		this.urlFoundInHarvestSource = urlFoundInHarvestSource;
+	}
+
+	public boolean isAdminLoggedIn() {
+		return adminLoggedIn;
+	}
+
+	public void setAdminLoggedIn(boolean adminLoggedIn) {
+		this.adminLoggedIn = adminLoggedIn;
 	}
 }

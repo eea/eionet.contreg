@@ -88,6 +88,12 @@
 				    			</c:otherwise>
 				    		</c:choose>
 				    
+				    		<c:if test="${actionBean.adminLoggedIn}">
+				    			<c:if test="${actionBean.urlFoundInHarvestSource}">
+				    				<div class="advice-msg">This resource is a <stripes:link href="/source.action?view=&harvestSource.url=${ subjectUrl }">harvest source</stripes:link></div>
+				    			</c:if>
+				    		</c:if>
+				    		
 				    		<crfn:form action="/factsheet.action" method="post">
 				    
 						    	<c:if test="${actionBean.context.eventName=='edit' && allowEdit}">

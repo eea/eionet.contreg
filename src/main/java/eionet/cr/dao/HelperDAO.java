@@ -196,5 +196,13 @@ public interface HelperDAO extends DAO {
 	
 	Pair <Integer, List <HarvestUrgencyScoreDTO>> getUrgencyOfComingHarvests(int amount) throws DAOException;
 	
+	/**
+	 * 
+	 * @param amount
+	 * @return
+	 * @throws DAOException
+	 */
+	
+	boolean isUrlInHarvestSource(String url) throws DAOException;
 	
 }
