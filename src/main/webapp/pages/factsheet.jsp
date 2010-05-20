@@ -42,7 +42,7 @@
 				    	<c:set var="subjectUri" value="${actionBean.subject.uri}"/>
 				    	<c:set var="allowEdit" value="false"/>
 				    
-				    	<c:if test='${sessionScope.crUser!=null && crfn:hasPermission(sessionScope.crUser.userName, "/", "u")}'>
+				    	<c:if test='${actionBean.adminLoggedIn}'>
 				    		<c:set var="displayOperations" value="true"/>
 					    	<c:if test="${!subject.anonymous}">
 		    					<c:set var="allowEdit" value="true"/>
@@ -71,13 +71,11 @@
 											</li>
 										</c:if>
 										
-										<c:if test="${actionBean.adminLoggedIn}">
-							    			<c:if test="${actionBean.urlFoundInHarvestSource}">
-							    				<li>
-							    				<stripes:link class="link-plain" href="/source.action?view=&harvestSource.url=${ subjectUrl }">Source  details</stripes:link>
-							    				</li>
-							    			</c:if>
-							    		</c:if>
+						    			<c:if test="${actionBean.urlFoundInHarvestSource}">
+						    				<li>
+						    				<stripes:link class="link-plain" href="/source.action?view=&harvestSource.url=${ subjectUrl }">Source  details</stripes:link>
+						    				</li>
+						    			</c:if>
 										
 									</ul>
 								</li>

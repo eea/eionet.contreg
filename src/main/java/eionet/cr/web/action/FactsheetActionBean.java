@@ -110,27 +110,32 @@ public class FactsheetActionBean extends AbstractActionBean{
 			Long subjectHash = uriHash==0 ? Hashes.spoHash(uri) : uriHash;
 			HelperDAO helperDAO = DAOFactory.get().getDao(HelperDAO.class);
 			
-			subject = helperDAO.getSubject(subjectHash);
-			if (subject!=null) {
-				uri = subject.getUri();
-				uriHash = subject.getUriHash();
-			}
-			
-			predicateLabels = helperDAO.getPredicateLabels(
-					Collections.singleton(subjectHash)).getByLanguages(getAcceptedLanguages());
-			subProperties = helperDAO.getSubProperties(Collections.singleton(subjectHash));
-			
-			
 			if (getUser()!=null){
 				if (getUser().isAdministrator()){
 					setAdminLoggedIn(true);
-					urlFoundInHarvestSource = helperDAO.isUrlInHarvestSource(subject.getUrl());
 				} else {
 					setAdminLoggedIn(false);
 				}
 			} else {
 				setAdminLoggedIn(false);
 			}
+
+			subject = helperDAO.getSubject(subjectHash);
+			
+			if (subject!=null) {
+				uri = subject.getUri();
+				uriHash = subject.getUriHash();
+				
+				predicateLabels = helperDAO.getPredicateLabels(
+						Collections.singleton(subjectHash)).getByLanguages(getAcceptedLanguages());
+				subProperties = helperDAO.getSubProperties(Collections.singleton(subjectHash));
+				
+				if (isAdminLoggedIn()){
+					urlFoundInHarvestSource = helperDAO.isUrlInHarvestSource(subject.getUrl());
+				}
+
+			}
+			
 			
 		}
 		
