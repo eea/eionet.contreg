@@ -21,11 +21,25 @@
        	To view a resource's factsheet, click the relevant action icon next to it.   
        </p>
 		<crfn:form action="/typeSearch.action" method="get">
+			
+			<!-- Previous version that simple lists the same tags without grouping, sorted by url, not deleted for testing purposes.
 			<stripes:select name="type">
-				<c:forEach items="${actionBean.availableTypes }" var="type">
+				<c:forEach items="${actionBean.availableTypesNoGroup }" var="type">
 					<stripes:option value="${type.left}">${type.right} (${type.left})</stripes:option>
 				</c:forEach>
 			</stripes:select>
+			-->
+			
+		   	<stripes:select name="type">
+				<c:forEach var="groups" items="${actionBean.availableTypes}">
+					<optgroup label="${groups.left}">
+						<c:forEach var="type" items="${groups.right}">
+							<stripes:option value="${type.left}">${type.right}</stripes:option>
+						</c:forEach>		
+					</optgroup>
+				</c:forEach>
+			</stripes:select>
+			
 			<stripes:submit name="search" value="Search" /> 
 			<c:if test='${sessionScope.crUser!=null && crfn:hasPermission(sessionScope.crUser.userName, "/", "u")}'>
 				&nbsp;<stripes:submit name="introspect" value="Introspect"/>

@@ -26,9 +26,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -49,6 +51,7 @@ import eionet.cr.dao.SearchDAO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortOrder;
+import eionet.cr.util.SortStringPair;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.URIUtil;
 import eionet.cr.util.Util;
@@ -417,13 +420,79 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 		return columns;
 
 	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public List<Pair<String, String>> getAvailableTypesNoGroup(){
+		return SortStringPair.sortByLeftAsc(ApplicationCache.getTypes());
+	}
+
 	
 	/**
 	 * 
 	 * @return
 	 */
-	public List<Pair<String, String>> getAvailableTypes(){
-		return ApplicationCache.getTypes();
+	public List<Pair<String, List<Pair<String, String>>>> getAvailableTypes(){
+		List<Pair<String, String>> sourceTypes = ApplicationCache.getTypes();
+		
+		/** Defining the returnTypes so that it contains group name as the outer Left
+		 *  and contents as outer Right
+		 *  Those groups form a list that contains Pair's, each of them containing Pairs of types.
+		 */
+		List<Pair<String, List<Pair<String, String>>>> returnTypes = new ArrayList<Pair<String, List<Pair<String, String>>>>();
+		
+		String previousPrefix = "";
+		int i = 0;
+		
+		List <Pair<String, String>> groupedTypes;
+		
+		SortStringPair.sortByLeftAsc(sourceTypes);
+		boolean firstGroup = true;
+		groupedTypes = new ArrayList<Pair<String,String>>();
+		
+		while (i < sourceTypes.size()){
+			
+			String currentPrefix = "";
+			// Disassembling the prefix
+			if (sourceTypes.get(i).getLeft().replaceAll("[^#]","").length()>0){
+				// Meaning that the url contains #-char
+				currentPrefix = sourceTypes.get(i).getLeft().split("#")[0];
+			} else {
+				// Must be split by last '/'
+				String [] tokens = sourceTypes.get(i).getLeft().split("/"); 
+				for (int j=0; j<tokens.length - 1; j++){
+					currentPrefix += tokens[j]+"/";
+				}
+			}
+			
+			if (!currentPrefix.equals(previousPrefix)){
+				//Adding previous group to return output, initializing new groupedTypes.
+				if (!firstGroup){
+					returnTypes.add(new Pair<String, List<Pair<String,String>>>(previousPrefix, groupedTypes));
+				}
+				groupedTypes = new ArrayList<Pair<String,String>>();
+			}
+			
+			if (groupedTypes != null){
+				groupedTypes.add(sourceTypes.get(i));
+				firstGroup = false;
+			}
+
+			// Incrementing loop counter.
+			i++;
+			
+			// The loop is over, last group shall be added manually in case there are items (firstGroup == false).
+			if (i == sourceTypes.size()){
+				if (!firstGroup){
+					returnTypes.add(new Pair<String, List<Pair<String,String>>>(previousPrefix, groupedTypes));
+				}
+			}
+			previousPrefix = currentPrefix;
+		}
+		
+		return returnTypes;
 	}
 
 	/**
