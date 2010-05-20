@@ -449,7 +449,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 		List <Pair<String, String>> groupedTypes;
 		
 		SortStringPair.sortByLeftAsc(sourceTypes);
-		boolean firstGroup = true;
+		boolean itemsAdded = false;
 		groupedTypes = new ArrayList<Pair<String,String>>();
 		
 		while (i < sourceTypes.size()){
@@ -469,23 +469,24 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 			
 			if (!currentPrefix.equals(previousPrefix)){
 				//Adding previous group to return output, initializing new groupedTypes.
-				if (!firstGroup){
+				if (itemsAdded){
 					returnTypes.add(new Pair<String, List<Pair<String,String>>>(previousPrefix, groupedTypes));
+					itemsAdded = false;
 				}
 				groupedTypes = new ArrayList<Pair<String,String>>();
 			}
 			
 			if (groupedTypes != null){
 				groupedTypes.add(sourceTypes.get(i));
-				firstGroup = false;
+				itemsAdded = true;
 			}
 
 			// Incrementing loop counter.
 			i++;
 			
-			// The loop is over, last group shall be added manually in case there are items (firstGroup == false).
+			// The loop is over, last group shall be added manually in case there are items (itemsAdded == true).
 			if (i == sourceTypes.size()){
-				if (!firstGroup){
+				if (itemsAdded){
 					returnTypes.add(new Pair<String, List<Pair<String,String>>>(previousPrefix, groupedTypes));
 				}
 			}
