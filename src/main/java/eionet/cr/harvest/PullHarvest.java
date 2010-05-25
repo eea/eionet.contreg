@@ -50,6 +50,7 @@ import eionet.cr.dto.ObjectDTO;
 import eionet.cr.harvest.util.arp.ARPSource;
 import eionet.cr.harvest.util.arp.InputStreamBasedARPSource;
 import eionet.cr.util.FileUtil;
+import eionet.cr.util.GZip;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
 import eionet.cr.util.xml.ConversionsParser;
@@ -174,7 +175,9 @@ public class PullHarvest extends Harvest{
 					if (contentType!=null
 							&& !contentType.startsWith("text/xml")
 							&& !contentType.startsWith("application/xml")
-							&& !contentType.startsWith("application/rdf+xml")){
+							&& !contentType.startsWith("application/rdf+xml")
+							&& !contentType.startsWith("application/octet-stream")
+							&& !contentType.startsWith("application/x-gzip")){
 	
 						logger.debug("Unsupported content type: " + contentType);
 					}
@@ -264,6 +267,14 @@ public class PullHarvest extends Harvest{
 		// remember the file's absolute path, so we can later detect if a new file was created during the pre-processing
 		String originalPath = file.getAbsolutePath();
 		
+		
+		// Testing whether the input file is zipped. If true, it is uncompressed and used as original source file.
+		
+		File unGZipped = unCompressGZip(file);
+		if (unGZipped != null){
+			file = unGZipped;
+		}
+		
 		InputStream inputStream = null;
 		try{
 			
@@ -297,9 +308,25 @@ public class PullHarvest extends Harvest{
 			// the method is safe against situation where file or original file is actually null or doesn't exist
 			deleteDownloadedFile(file);
 			deleteDownloadedFile(originalPath);
+			deleteDownloadedFile(unGZipped);
 		}
 	}
 
+	private File unCompressGZip(File file){
+		
+		File unPackedFile = null;
+		
+		// Testing whether the input file is GZip or not.
+		if (GZip.isFileGZip(file)){
+			try {
+				unPackedFile = GZip.unPack(file);
+			} catch (Exception ex){
+				System.out.println(ex.getMessage());
+			}
+		}
+		return unPackedFile;
+	}
+	
 	/**
 	 * 
 	 * @param file
