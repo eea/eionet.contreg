@@ -50,6 +50,7 @@ import eionet.cr.dao.readers.DataflowPicklistReader;
 import eionet.cr.dao.readers.PredicateLabelsReader;
 import eionet.cr.dao.readers.RawTripleDTOReader;
 import eionet.cr.dao.readers.SubPropertiesReader;
+import eionet.cr.dao.readers.SubjectDataReader;
 import eionet.cr.dao.readers.UriHashesReader;
 import eionet.cr.dao.util.PredicateLabels;
 import eionet.cr.dao.util.SubProperties;
@@ -64,7 +65,6 @@ import eionet.cr.util.Pair;
 import eionet.cr.util.URIUtil;
 import eionet.cr.util.Util;
 import eionet.cr.util.YesNoBoolean;
-import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.util.sql.PairReader;
 import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
@@ -457,6 +457,9 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		"select distinct PREDICATE from SPO where SUBJECT in " +
 		"(select distinct SUBJECT from SPO where PREDICATE=" +
 		Hashes.spoHash(Predicates.RDF_TYPE) + " and OBJECT_HASH=? )";
+	/** */
+	private static final String getPredicatesUsedForTypeCache_SQL =
+		"select distinct PREDICATE from cache_SPO_TYPE_PREDICATE where OBJECT_HASH=? ";
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.dao.HelperDAO#getPredicatesUsedForType(java.lang.String)
@@ -467,10 +470,19 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		values.add(Long.valueOf(Hashes.spoHash(typeUri)));
 		
 		long startTime = System.currentTimeMillis();
-
-		List<Long> predicateUris = executeQuery(
+		List<Long> predicateUris = null;
+		boolean useCache = true;
+		try{
+			predicateUris = executeQuery(
+				getPredicatesUsedForTypeCache_SQL, values, new SingleObjectReader<Long>());
+		}
+		catch(DAOException e){
+			logger.warn("Cache tables are not created yet. Continue with spo table");
+			predicateUris = executeQuery(
 				getPredicatesUsedForType_SQL, values, new SingleObjectReader<Long>());
-		logger.trace("usedPredicates query took " + Util.durationSince(startTime));
+			useCache = false;
+		}
+		logger.trace("usedPredicatesForType query took " + Util.durationSince(startTime));
 		
 		if (predicateUris==null || predicateUris.isEmpty()){
 			return new ArrayList<SubjectDTO>();
@@ -482,8 +494,17 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 				subjectsMap.put(hash, null);
 			}
 
+			//restrict the query with specified predicates. For types we are interested only in labels 
+			SubjectDataReader reader = new SubjectDataReader(subjectsMap);
+			reader.addPredicateHash(Hashes.spoHash(Predicates.RDFS_LABEL));
+			
 			// get the subjects data
-			getSubjectsData(subjectsMap);
+			if(useCache){ 	
+				getSubjectsData(reader, StringUtils.replace(getPredicatesUsedForTypeCache_SQL, "?", String.valueOf(Hashes.spoHash(typeUri))));
+			}
+			else{
+				getSubjectsData(reader);
+			}
 			
 			// since a used predicate may not appear as a subject in SPO,
 			// there might unfound SubjectDTO objects 
@@ -517,6 +538,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 			return new LinkedList<SubjectDTO>( subjectsMap.values());
 		}
 	}
+
 
 	/**
 	 * 
@@ -1022,4 +1044,31 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		return returnValue;
 	}
 	
+	/** */
+	private static final String getUpdateTypeData_SQL =
+		"delete from cache_SPO_TYPE; " +
+		"insert into cache_SPO_TYPE " +
+			"select distinct SUBJECT from SPO where PREDICATE=" +
+			Hashes.spoHash(Predicates.RDF_TYPE) +
+			" and OBJECT_HASH=" + Hashes.spoHash(Subjects.RDFS_CLASS) + ";" +
+		"delete from cache_SPO_TYPE_SUBJECT; " + 
+		"insert into cache_SPO_TYPE_SUBJECT " +
+			"select distinct object_hash, subject from SPO where PREDICATE=" +
+			Hashes.spoHash(Predicates.RDF_TYPE) + " and OBJECT_HASH in (select subject from cache_SPO_TYPE); " + 
+		"delete from cache_SPO_TYPE_PREDICATE; " +
+		"insert into cache_SPO_TYPE_PREDICATE " +
+			"select distinct ct.object_hash, spo.predicate from SPO, cache_SPO_TYPE_SUBJECT as ct where " +
+			"spo.subject=ct.subject; "; 
+		
+		
+		
+	public void updateTypeDataCache() throws DAOException {
+		
+		long startTime = System.currentTimeMillis();
+		logger.trace("updateTypeDataCache query is: " + getUpdateTypeData_SQL);
+		
+		execute(getUpdateTypeData_SQL, null);
+		
+		logger.trace("updateTypeDataCache query took " + Util.durationSince(startTime));
+	}
 }

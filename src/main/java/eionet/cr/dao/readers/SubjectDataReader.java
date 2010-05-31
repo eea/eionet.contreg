@@ -31,6 +31,7 @@ import java.util.Map;
 
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
+import eionet.cr.util.Util;
 import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.sql.ResultSetListReader;
 
@@ -48,7 +49,7 @@ public class SubjectDataReader extends ResultSetListReader<SubjectDTO>{
 	private SubjectDTO currentSubject = null;
 	private String currentPredicate = null;
 	private Collection<ObjectDTO> currentObjects = null;
-	private StringBuffer predicateHashesCommaSeparated = new StringBuffer();
+	private Collection<Long> predicateHashes = null;
 	
 	/**
 	 * 
@@ -81,7 +82,7 @@ public class SubjectDataReader extends ResultSetListReader<SubjectDTO>{
 			currentSubject.getPredicates().put(predicateUri, currentObjects);
 		}
 		
-		addPredicateHash(rs.getString("PREDICATE_HASH"));
+		addPredicateHash(rs.getLong("PREDICATE_HASH"));
 		
 		ObjectDTO object = new ObjectDTO(rs.getString("OBJECT"),
 											rs.getString("OBJ_LANG"),
@@ -110,19 +111,21 @@ public class SubjectDataReader extends ResultSetListReader<SubjectDTO>{
 	 * 
 	 * @return
 	 */
-	protected void addPredicateHash(String predicateHash){
+	public void addPredicateHash(Long predicateHash){
 		
-		if (predicateHashesCommaSeparated.length()>0){
-			predicateHashesCommaSeparated.append(",");
+		if (predicateHashes==null){
+			this.predicateHashes = new ArrayList<Long>();
 		}
-		predicateHashesCommaSeparated.append(predicateHash);
+		if(!predicateHashes.contains(predicateHash)){
+			predicateHashes.add(predicateHash);
+		}
 	}
 
 	/**
 	 * 
 	 */
 	public String getPredicateHashesCommaSeparated() {
-		return predicateHashesCommaSeparated.toString();
+		return Util.toCSV(predicateHashes);
 	}
 
 	/** 

@@ -56,6 +56,7 @@ public interface SearchDAO extends DAO{
 	 * @param literalPredicates - set of literal predicates
 	 * @param pagingRequest - page request
 	 * @param sortingRequest - sorting request
+	 * @param selectedPredicates - predicates filter
 	 * @return
 	 * @throws DAOException
 	 */
@@ -63,7 +64,9 @@ public interface SearchDAO extends DAO{
 			Map<String,String> filters,
 			Set<String> literalPredicates,
 			PagingRequest pagingRequest,
-			SortingRequest sortingRequest) throws DAOException;
+			SortingRequest sortingRequest,
+			List<String> selectedPredicates
+			) throws DAOException;
 
 	/**
 	 * 
@@ -99,4 +102,20 @@ public interface SearchDAO extends DAO{
 	 * @return
 	 */
 	int getExactRowCountLimit();
+
+	/**
+	 * 
+	 * @param filters
+	 * @param literalPredicates
+	 * @param pagingRequest
+	 * @param sortingRequest
+	 * @param selectedPredicates
+	 * @return
+	 * @throws DAOException
+	 */
+	public Pair<Integer, List<SubjectDTO>> searchByTypeAndFilters(
+			Map<String, String> filters, Set<String> literalPredicates,
+			PagingRequest pagingRequest, SortingRequest sortingRequest,
+			List<String> selectedPredicates) throws DAOException;
+
 }

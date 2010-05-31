@@ -20,7 +20,7 @@
 * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.dao.postgre.helpers;
 
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -45,7 +45,9 @@ public class FilteredSearchHelper extends AbstractSearchHelper{
 	/** */
 	private Map<String, String> filters;
 	private Set<String> literalPredicates;
+	private boolean useCache=false;
 	
+
 	/**
 	 * 
 	 * @param pagingRequest
@@ -89,11 +91,11 @@ public class FilteredSearchHelper extends AbstractSearchHelper{
 		append("select distinct SPO1.SUBJECT as SUBJECT_HASH,");
 		
 		if (sortPredicate.equals(SubjectLastModifiedColumn.class.getSimpleName())){
-			subSelect.append(" RESOURCE.LASTMODIFIED_TIME as OBJECT_ORDERED_BY from SPO as SPO1").
+			subSelect.append(" RESOURCE.LASTMODIFIED_TIME as OBJECT_ORDERED_BY from " + getSpoTableName()+ " as SPO1").
 			append(" left join RESOURCE on (SPO1.SUBJECT=RESOURCE.URI_HASH)");
 		}
 		else{
-			subSelect.append(" ORDERING.OBJECT as OBJECT_ORDERED_BY from SPO as SPO1").
+			subSelect.append(" ORDERING.OBJECT as OBJECT_ORDERED_BY from " + getSpoTableName()+ " as SPO1").
 			append(" left join SPO as ORDERING").
 			append(" on (SPO1.SUBJECT=ORDERING.SUBJECT and ORDERING.PREDICATE=").
 			append(Hashes.spoHash(sortPredicate)).append(")");
@@ -102,8 +104,8 @@ public class FilteredSearchHelper extends AbstractSearchHelper{
 		// build the "where" part into a separate buffer
 		// validations in constructor ensure that there is at least one valid where-filter 
 		
-		int index = 1;
-		StringBuffer whereBuf = new StringBuffer();
+		int index = getSpoTableIndex();
+		StringBuffer whereBuf = new StringBuffer(getSpoTableCriteria());
 		for(Entry<String,String> entry : filters.entrySet()) {
 			
 			String predicateUri = entry.getKey();
@@ -138,14 +140,16 @@ public class FilteredSearchHelper extends AbstractSearchHelper{
 		// continue the query by extending the "from" part with inner joins
 		// to as many aliases as where put into the above-created "where" part
 		// (SPO1 is already present in the form part)
-		for (int i=2; i<index; i++) {
+		for (int i=2 ; i<index; i++) {
 			subSelect.
 			append(" inner join SPO as SPO").append(i).
 			append(" on SPO1.SUBJECT = SPO").append(i).append(".SUBJECT ");
 		}
 		
 		// finish the query by adding the above-created "where" part
-		subSelect.append(" where ").append(whereBuf);
+		if(whereBuf.length() > 0){
+			subSelect.append(" where ").append(whereBuf);
+		}
 		
 		// the final query selects all from the above-created sub-select
 		StringBuffer buf = new StringBuffer().
@@ -157,8 +161,8 @@ public class FilteredSearchHelper extends AbstractSearchHelper{
 	 * @see eionet.cr.dao.postgre.helpers.AbstractSearchHelper#getUnorderedQuery(java.util.List)
 	 */
 	@Override
-	protected String getUnorderedQuery(List<Object> inParams) {
-		return getUnorderedQuery(inParams, "select distinct SPO1.SUBJECT as SUBJECT_HASH from SPO as SPO1 ");
+	public String getUnorderedQuery(List<Object> inParams) {
+		return getUnorderedQuery(inParams, "select distinct SPO1.SUBJECT as SUBJECT_HASH from " + getSpoTableName()+ " as SPO1 ");
 	}		
 	private String getUnorderedQuery(List<Object> inParams, String selectPart) {
 		// start the query with the selection of fields and the join to ordering table
@@ -169,8 +173,8 @@ public class FilteredSearchHelper extends AbstractSearchHelper{
 		// build the "where" part into a separate buffer
 		// validations in constructor ensure that there is at least one valid where-filter 
 		
-		int index = 1;
-		StringBuffer whereBuf = new StringBuffer();
+		int index = getSpoTableIndex();
+		StringBuffer whereBuf = new StringBuffer(getSpoTableCriteria());
 		for(Entry<String,String> entry : filters.entrySet()) {
 			
 			String predicateUri = entry.getKey();
@@ -180,7 +184,6 @@ public class FilteredSearchHelper extends AbstractSearchHelper{
 			
 				String spoAlias = "SPO" + index;
 				whereBuf.append(whereBuf.length() > 0 ? " and " : "").
-				
 				append(spoAlias).append(".PREDICATE=").append(Hashes.spoHash(predicateUri)).
 				append(" and ");
 
@@ -212,7 +215,9 @@ public class FilteredSearchHelper extends AbstractSearchHelper{
 		}
 		
 		// finish the query by adding the above-created "where" part
-		query.append(" where ").append(whereBuf);
+		if(whereBuf.length()>0){
+			query.append(" where ").append(whereBuf);
+		}
 		
 		// return the query
 		return query.toString();
@@ -230,7 +235,7 @@ public class FilteredSearchHelper extends AbstractSearchHelper{
 	}
 
 	public String getMinMaxHashQuery(List<Object> inParams) {
-		String query = getUnorderedQuery(inParams, "select min(SPO1.SUBJECT) as LCOL, max(SPO1.SUBJECT) as RCOL from SPO as SPO1 ");
+		String query = getUnorderedQuery(inParams, "select min(SPO1.SUBJECT) as LCOL, max(SPO1.SUBJECT) as RCOL from " + getSpoTableName()+ " as SPO1 ");
 		return query;
 	}
 
@@ -252,4 +257,33 @@ public class FilteredSearchHelper extends AbstractSearchHelper{
 		return literalPredicates!=null && literalPredicates.contains(s);
 	}
 
+	public boolean isUseCache() {
+		return useCache;
+	}
+
+	public void setUseCache(boolean useCache) {
+		this.useCache = useCache;
+	}
+
+	protected String getSpoTableName(){
+		return "SPO";
+	}
+	protected String getSpoTableCriteria(){
+		return "";
+	}
+	protected void addFilter(String key, String value){
+		if(this.filters==null){
+			this.filters = new HashMap<String, String>();
+		}
+		filters.put(key, value);		
+	}
+	protected void removeFilter(String key){
+		if(this.filters!=null && filters.containsKey(key)){
+			filters.remove(key);
+		}
+	}
+	protected int getSpoTableIndex(){
+		return 1;
+	}
+	
 }

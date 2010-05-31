@@ -66,7 +66,7 @@ public class SpatialSearchHelper extends AbstractSearchHelper{
 	 * (non-Javadoc)
 	 * @see eionet.cr.dao.postgre.helpers.AbstractSearchHelper#getUnorderedQuery(java.util.List)
 	 */
-	protected String getUnorderedQuery(List<Object> inParams){
+	public String getUnorderedQuery(List<Object> inParams){
 		
 		StringBuffer buf = new StringBuffer().
 		append("select distinct SPO_POINT.SUBJECT as SUBJECT_HASH from SPO as SPO_POINT");

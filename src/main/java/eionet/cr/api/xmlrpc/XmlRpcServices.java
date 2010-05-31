@@ -138,6 +138,7 @@ public class XmlRpcServices implements Services{
 							criteria,
 							null,
 							PagingRequest.create(1, MAX_RESULTS),
+							null,
 							null);
 			
 			String[] strArray = {};
@@ -220,6 +221,7 @@ public class XmlRpcServices implements Services{
 							criteria,
 							null,
 							PagingRequest.create(1,MAX_RESULTS),
+							null,
 							null);
 			Collection<SubjectDTO> subjects = search.getRight();
 			if (subjects!=null){
@@ -309,6 +311,7 @@ public class XmlRpcServices implements Services{
 				Pair<Integer, List<SubjectDTO>> results = searchDao.searchByFilters(
 						criteria,
 						null, 
+						null,
 						null,
 						null);
 

@@ -55,6 +55,8 @@ public class ApplicationCache implements ServletContextListener {
 
 	private static final String TYPE_CACHE = "typeCache";
 
+	private static final String TYPE_COLUMNS_CACHE = "typeColumnsCache";
+
 	/** 
 	 * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
 	 * {@inheritDoc}
@@ -208,5 +210,22 @@ public class ApplicationCache implements ServletContextListener {
 	public void contextInitialized(ServletContextEvent arg0) {
 		CacheManager cacheManager = CacheManager.getInstance();
 		cacheManager.addCache(APPLICATION_CACHE);
+	}
+
+	public static void updateTypeColumns(Map<String, Map<String, String>> update) {
+		getCache().put(new Element(TYPE_COLUMNS_CACHE, update));
+	}
+	/**
+	 * fetch cached type columns.
+	 * 
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public static Map<String,String> getTypeColumns(String type) {
+		Element element = getCache().get(TYPE_COLUMNS_CACHE);
+		if (element == null || element.getValue() == null) {
+			return Collections.EMPTY_MAP;
+		}
+		return (Map<String, String>)((Map<String,Map<String, String>>) element.getValue()).get(type);
 	}
 }

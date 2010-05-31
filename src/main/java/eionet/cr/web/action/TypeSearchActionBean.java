@@ -153,6 +153,9 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 	 */
 	@SuppressWarnings("unchecked")
 	public Resolution export() throws Exception {
+		
+		logger.trace("**************  START EXPORT REQUEST  ***********");
+
 		restoreStateFromSession();
 		ExportFormat format = ExportFormat.fromName(exportFormat);
 		Exporter exporter = Exporter.getExporter(format);
@@ -276,11 +279,12 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 					}
 				}
 				Pair<Integer, List<SubjectDTO>> searchResult =
-					DAOFactory.get().getDao(SearchDAO.class).searchByFilters(
+					DAOFactory.get().getDao(SearchDAO.class).searchByTypeAndFilters(
 									criteria,
 									null,
 									PagingRequest.create(getPageN()),
-									new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
+									new SortingRequest(getSortP(), SortOrder.parse(getSortO())),
+									selectedColumns);
 
 				resultList = searchResult.getRight();
 	    		matchCount = searchResult.getLeft();

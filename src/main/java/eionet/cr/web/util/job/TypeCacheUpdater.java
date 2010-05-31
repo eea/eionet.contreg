@@ -21,6 +21,7 @@
 package eionet.cr.web.util.job;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -35,11 +36,14 @@ import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.SearchDAO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortOrder;
 import eionet.cr.util.SortingRequest;
+import eionet.cr.util.URIUtil;
+import eionet.cr.util.Util;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.web.util.ApplicationCache;
 
@@ -68,7 +72,8 @@ public class TypeCacheUpdater implements StatefulJob {
 							criteria,
 							null,
 							null,
-							new SortingRequest(Predicates.RDFS_LABEL, SortOrder.ASCENDING));
+							new SortingRequest(Predicates.RDFS_LABEL, SortOrder.ASCENDING),
+							null);
 			
 			if (customSearch != null && customSearch.getRight() != null){
 				for(SubjectDTO subject : customSearch.getRight()) {
@@ -82,9 +87,16 @@ public class TypeCacheUpdater implements StatefulJob {
 			}
 			ApplicationCache.updateTypes(types);
 			logger.debug("type cache successfully updated!");
+			
+			updateTypeCacheTables();
+			logger.debug("type cache tables successfully updated!");
+			
 		} catch (DAOException e) {
 			logger.error("Exception is thrown while updating type cache", e);
 		}
 	}
-
+	public void updateTypeCacheTables() throws DAOException {
+		DAOFactory.get().getDao(
+				HelperDAO.class).updateTypeDataCache();
+	}
 }

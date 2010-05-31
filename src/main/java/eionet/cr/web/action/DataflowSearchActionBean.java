@@ -84,7 +84,8 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean<SubjectDT
 							buildSearchCriteria(),
 							null,
 							PagingRequest.create(getPageN()),
-							new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
+							new SortingRequest(getSortP(), SortOrder.parse(getSortO())), 
+							null);
 		resultList = customSearch.getRight();
 		matchCount = customSearch.getLeft();
 		

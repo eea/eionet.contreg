@@ -22,6 +22,7 @@ package eionet.cr.util.export;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,16 +30,18 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 
 import eionet.cr.common.CRRuntimeException;
 import eionet.cr.common.Predicates;
-import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.SearchDAO;
+import eionet.cr.dao.postgre.PostgreSQLBaseDAO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.FormatUtils;
 import eionet.cr.util.Pair;
+import eionet.cr.util.Util;
 import eionet.cr.util.pagination.PagingRequest;
 
 /**
@@ -50,6 +53,8 @@ import eionet.cr.util.pagination.PagingRequest;
 public abstract class Exporter {
 	
 	
+	protected Logger logger = Logger.getLogger(Exporter.class);
+
 	private ExportFormat exportFormat;
 	private Map<String,String> selectedFilters;
 	private Set<String> languages;
@@ -96,6 +101,9 @@ public abstract class Exporter {
 	}
 
 	public InputStream export() throws DAOException, IOException, ExportException {
+		
+		long startTime = System.currentTimeMillis();
+		
 		Pair<Integer, List<SubjectDTO>> customSearch;
 		Map<String,String> criteria = new HashMap<String, String>();
 		for(Entry<String, String> entry : selectedFilters.entrySet()) {
@@ -103,17 +111,21 @@ public abstract class Exporter {
 		}
 		customSearch = DAOFactory.get()
 				.getDao(SearchDAO.class)
-				.searchByFilters(
+				.searchByTypeAndFilters(
 						criteria,
 						null,
 						getRowLimitPagingRequest(),
-						null);
+						null,
+						getSelectedColumnsList());
 		InputStream result = null;
 		result = doExport(customSearch);
+		
+		logger.trace("Export process took: " + Util.durationSince(startTime));
 		
 		return result;
 	}
 	
+
 	/**
 	 * Returns the label of subject's uri or label depending on exportResourceUri value 
 	 * @return 
@@ -219,5 +231,18 @@ public abstract class Exporter {
 	 */
 	public static Integer getRowsLimit(){
 		return -1;		
+	}
+	/**
+	 * Returns the list of selected predicates uris
+	 * @return
+	 */
+	public List<String> getSelectedColumnsList(){
+		List<String> list = new ArrayList<String>();
+		if(selectedColumns!=null && !selectedColumns.isEmpty()){
+			for (Pair<String, String> col : selectedColumns){
+				list.add(col.getLeft());
+			}
+		}
+		return list;
 	}
 }

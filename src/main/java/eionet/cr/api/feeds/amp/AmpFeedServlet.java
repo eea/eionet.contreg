@@ -78,6 +78,7 @@ public class AmpFeedServlet extends HttpServlet implements SubjectProcessor{
 					criteria,
 					null, 
 					null,
+					null,
 					null);
 			
 			int subjectCount = results==null ? 0 : (results.getRight()==null ? 0 : results.getRight().size());  

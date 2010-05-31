@@ -59,7 +59,7 @@ public class ReferencesSearchHelper extends AbstractSearchHelper{
 	 * (non-Javadoc)
 	 * @see eionet.cr.dao.postgre.helpers.AbstractSearchHelper#getUnorderedQuery(java.util.List)
 	 */
-	protected String getUnorderedQuery(List<Object> inParams){
+	public String getUnorderedQuery(List<Object> inParams){
 		
 		StringBuffer buf = new StringBuffer().
 		append("select SPO.SUBJECT as SUBJECT_HASH from SPO").

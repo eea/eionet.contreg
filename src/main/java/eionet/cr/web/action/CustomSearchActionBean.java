@@ -133,7 +133,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 							PagingRequest.create(getPageN()),
 							new SortingRequest(
 									getSortP(),
-									SortOrder.parse(getSortO())));
+									SortOrder.parse(getSortO())), null);
 
 		logger.debug("It took " + (System.currentTimeMillis() - startTime) + " ms to execute custom search");
 		

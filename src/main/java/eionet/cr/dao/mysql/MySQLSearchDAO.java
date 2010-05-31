@@ -153,7 +153,8 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 			Map<String, String> filters,
 			Set<String> literalPredicates,
 			PagingRequest pagingRequest,
-			SortingRequest sortingRequest)
+			SortingRequest sortingRequest, 
+			List<String> selectedPredicates)
 			throws DAOException {
 		
 		StringBuffer buf = new StringBuffer();
@@ -405,5 +406,13 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 
 	public int getExactRowCountLimit() {
 		return EXACT_ROW_COUNT_LIMIT;
+	}
+
+	@Override
+	public Pair<Integer, List<SubjectDTO>> searchByTypeAndFilters(Map<String, String> filters,
+			Set<String> literalPredicates, PagingRequest pagingRequest, SortingRequest sortingRequest,
+			List<String> selectedPredicates) throws DAOException {
+		// FIXME Auto-generated method stub
+		throw new UnsupportedOperationException("Method not implemented");
 	}
 }

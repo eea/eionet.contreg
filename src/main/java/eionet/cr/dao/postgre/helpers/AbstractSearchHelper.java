@@ -90,7 +90,7 @@ public abstract class AbstractSearchHelper implements SearchHelper{
 	 * @param inParams
 	 * @return
 	 */
-	protected abstract String getUnorderedQuery(List<Object> inParams);
+	public abstract String getUnorderedQuery(List<Object> inParams);
 	
 	/**
 	 * 

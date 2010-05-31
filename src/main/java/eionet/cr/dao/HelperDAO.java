@@ -202,7 +202,12 @@ public interface HelperDAO extends DAO {
 	 * @return
 	 * @throws DAOException
 	 */
-	
 	boolean isUrlInHarvestSource(String url) throws DAOException;
-	
+
+	/**
+	 * 
+	 * @throws DAOException
+	 */
+	public void updateTypeDataCache() throws DAOException;
+
 }

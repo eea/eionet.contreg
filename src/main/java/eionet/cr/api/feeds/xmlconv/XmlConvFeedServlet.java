@@ -79,6 +79,7 @@ public class XmlConvFeedServlet extends HttpServlet{
 						criteria,
 						null, 
 						null,
+						null,
 						null);
 
 				int subjectCount = results==null ? 0 : (results.getRight()==null ? 0 : results.getRight().size());  

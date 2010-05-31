@@ -37,11 +37,13 @@ import eionet.cr.dao.postgre.helpers.FilteredSearchHelper;
 import eionet.cr.dao.postgre.helpers.FreeTextSearchHelper;
 import eionet.cr.dao.postgre.helpers.ReferencesSearchHelper;
 import eionet.cr.dao.postgre.helpers.SpatialSearchHelper;
+import eionet.cr.dao.postgre.helpers.FilteredTypeSearchHelper;
 import eionet.cr.dao.readers.FreeTextSearchDataReader;
 import eionet.cr.dao.readers.SubjectDataReader;
 import eionet.cr.dao.util.BBOX;
 import eionet.cr.dao.util.SearchExpression;
 import eionet.cr.dto.SubjectDTO;
+import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.Util;
@@ -57,7 +59,7 @@ import eionet.cr.util.sql.SingleObjectReader;
  */
 public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 
-	private static final int EXACT_ROW_COUNT_LIMIT = 500;
+	private static final int EXACT_ROW_COUNT_LIMIT = 5000;
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.dao.SearchDAO#searchByFreeText(eionet.cr.search.util.SearchExpression, eionet.cr.util.PagingRequest, eionet.cr.util.SortingRequest)
@@ -148,7 +150,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 	 */
 	public Pair<Integer, List<SubjectDTO>> searchByFilters(
 			Map<String, String> filters, Set<String> literalPredicates,
-			PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException {
+			PagingRequest pagingRequest, SortingRequest sortingRequest, List<String> selectedPredicates) throws DAOException {
 
 		// create query helper
 		FilteredSearchHelper helper = new FilteredSearchHelper(filters, literalPredicates,
@@ -177,12 +179,19 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 			for (Long hash : list){
 				subjectsMap.put(hash, null);
 			}
-
-			logger.trace("Search by filters, getting the data of the found subjects");
-
+			
+			//restrict the query with specified columns, 
+			//otherwise if there are over 300 columns the performance is not acceptable
+			SubjectDataReader reader = new SubjectDataReader(subjectsMap);
+			if(selectedPredicates!=null && !selectedPredicates.isEmpty()){
+				for(String predicate : selectedPredicates){
+					reader.addPredicateHash(Hashes.spoHash(predicate));
+				}
+			}
+			
 			// get the data of all found subjects
-			subjects = getSubjectsData(subjectsMap);
-
+			logger.trace("Search by filters, getting the data of the found subjects");
+			subjects = getSubjectsData(reader);
 		}
 		// if paging required, get the total number of found subjects too
 		if (pagingRequest!=null){
@@ -192,6 +201,86 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 
 		//return new Pair<Integer,List<SubjectDTO>>(0, new LinkedList<SubjectDTO>());
 		logger.debug("Search by filters, total query time " + Util.durationSince(startTime));
+
+		// the result Pair contains total number of subjects and the requested sub-list
+		return new Pair<Integer,List<SubjectDTO>>(totalRowCount, subjects);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.SearchDAO#filteredSearch(java.util.Map, java.util.Set, eionet.cr.util.PagingRequest, eionet.cr.util.SortingRequest)
+	 */
+	public Pair<Integer, List<SubjectDTO>> searchByTypeAndFilters(
+			Map<String, String> filters, Set<String> literalPredicates,
+			PagingRequest pagingRequest, SortingRequest sortingRequest,
+			List<String> selectedPredicates) throws DAOException {
+
+		// create query helper
+		FilteredTypeSearchHelper helper = new FilteredTypeSearchHelper(filters, literalPredicates,
+				pagingRequest, sortingRequest);
+		
+		// create the list of IN parameters of the query
+		ArrayList<Object> inParams = new ArrayList<Object>();
+		
+		// let the helper create the query and fill IN parameters
+		String query = helper.getQuery(inParams);
+		
+		List<Long> list = null;
+		
+		long startTime = System.currentTimeMillis();
+
+		//get the list of subjects
+		try{
+			logger.trace("Search by type and filters, executing subject finder query: " + query);
+
+			// execute the query, with the IN parameters
+			list = executeQuery(query, inParams, new SingleObjectReader<Long>());
+		}
+		catch(DAOException e){
+			logger.warn("Cache tables are not created yet. Continue with spo table" + e.getMessage());
+			helper.setUseCache(false);
+			logger.trace("Search by type and filters, executing subject finder query: " + query);
+			list = executeQuery(query, inParams, new SingleObjectReader<Long>());
+		}
+			
+
+		int totalRowCount = 0;
+		List<SubjectDTO> subjects = new ArrayList<SubjectDTO>();
+		
+		// if result list not null and not empty, then get the subjects data and total rowcount
+		if(list!= null && !list.isEmpty()){
+
+			// create the subjects map that needs to be fed into the subjects data reader
+			Map<Long,SubjectDTO> subjectsMap = new LinkedHashMap<Long, SubjectDTO>();
+			for (Long hash : list){
+				subjectsMap.put(hash, null);
+			}
+			
+			//restrict the query with specified columns, 
+			//otherwise if there are over 300 columns the performance is not acceptable
+			SubjectDataReader reader = new SubjectDataReader(subjectsMap);
+			if(selectedPredicates!=null && !selectedPredicates.isEmpty()){
+				for(String predicate : selectedPredicates){
+					reader.addPredicateHash(Hashes.spoHash(predicate));
+				}
+			}
+
+			// use temp tables for quering all the subjects
+			if(list.size()>1000){
+				subjects = getSubjectsDataWithTempTable(reader, helper.getUnorderedQuery(inParams));
+			}
+			else{
+				subjects = getSubjectsData(reader);
+			}
+		}
+		// if paging required, get the total number of found subjects too
+		if (pagingRequest!=null){
+			
+			totalRowCount = new Integer(getEstimatedRowCount(helper));
+		}
+
+		//return new Pair<Integer,List<SubjectDTO>>(0, new LinkedList<SubjectDTO>());
+		logger.debug("Search by type and filters, total query time " + Util.durationSince(startTime));
 
 		// the result Pair contains total number of subjects and the requested sub-list
 		return new Pair<Integer,List<SubjectDTO>>(totalRowCount, subjects);
