@@ -20,9 +20,17 @@
 * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.dao;
 
-import org.dbunit.dataset.IDataSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
+import org.dbunit.dataset.IDataSet;
+import org.junit.Test;
+
+import eionet.cr.common.Predicates;
+import eionet.cr.dto.SubjectDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
+import eionet.cr.util.Pair;
 
 /**
  * 
@@ -37,13 +45,24 @@ public class SearchDAOTest extends CRDatabaseTestCase{
 	 */
 	@Override
 	protected IDataSet getDataSet() throws Exception {
-		return getXmlDataSet("emptydb.xml");
+		return getXmlDataSet("types-db.xml");
 	}
 
 	/**
 	 * 
 	 */
-	public void testNothing(){
+	@Test
+	public void testSearchByTypeAndFilters() throws Exception{
 		
+		//type search uses cache tables and they should be up to date
+		DAOFactory.get().getDao(HelperDAO.class).updateTypeDataCache();
+
+		Map<String, String> filters = new LinkedHashMap<String, String>();
+		filters.put(Predicates.RDF_TYPE, "http://www.w3.org/2004/02/skos/core#Concept");
+		List<String> selectedPredicates = null;
+		
+		Pair<Integer, List<SubjectDTO>> result =
+			DAOFactory.get().getDao(SearchDAO.class).searchByTypeAndFilters(
+					filters, null, null, null,selectedPredicates);
 	}
 }

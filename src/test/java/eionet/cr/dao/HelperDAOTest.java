@@ -24,18 +24,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.dbunit.DatabaseTestCase;
-import org.dbunit.database.IDatabaseConnection;
 import org.dbunit.dataset.IDataSet;
-import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.junit.Test;
 
 import eionet.cr.dto.RawTripleDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
-import eionet.cr.test.helpers.dbunit.DbUnitDatabaseConnection;
-import eionet.cr.util.Pair;
-import eionet.cr.util.sql.DbConnectionProvider;
 
 /**
  * 
@@ -90,5 +84,24 @@ public class HelperDAOTest extends CRDatabaseTestCase {
 		
 		assertNotNull(result);
 		assertEquals(10, result.size());
+	}
+	/**
+	 * 
+	 * @throws DAOException
+	 */
+	@Test
+	public void testUpdateTypeDataCache() throws Exception {
+
+		DAOFactory.get().getDao(HelperDAO.class).updateTypeDataCache();
+		
+	}
+	@Test
+	public void testGetPredicatesUsedForType() throws Exception{
+		DAOFactory.get().getDao(HelperDAO.class).updateTypeDataCache();
+
+		List<SubjectDTO> list = DAOFactory.get().getDao(HelperDAO.class).
+			getPredicatesUsedForType("http://www.w3.org/2004/02/skos/core#Concept");
+		
+		assertEquals(0, list.size());
 	}
 }
