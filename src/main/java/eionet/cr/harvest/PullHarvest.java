@@ -28,10 +28,11 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.net.UnknownHostException;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -45,13 +46,17 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
+import eionet.cr.dao.postgre.PostgreSQLHarvestSourceDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
+import eionet.cr.harvest.util.HarvestUrlConnection;
 import eionet.cr.harvest.util.arp.ARPSource;
 import eionet.cr.harvest.util.arp.InputStreamBasedARPSource;
 import eionet.cr.util.FileUtil;
 import eionet.cr.util.GZip;
 import eionet.cr.util.URLUtil;
+import eionet.cr.util.UrlRedirectAnalyzer;
+import eionet.cr.util.UrlRedirectionInfo;
 import eionet.cr.util.Util;
 import eionet.cr.util.xml.ConversionsParser;
 import eionet.cr.util.xml.XmlAnalysis;
@@ -64,12 +69,24 @@ import eionet.cr.web.security.CRUser;
  */
 public class PullHarvest extends Harvest{
 	
+	/**
+	 * 
+	 */
+	public static final int maxRedirectionsAllowed = 4;
+	private boolean fullSetupMode = false;
+	private boolean fullSetupModeUrgent = false;
+	
 	/** */
 	private Boolean sourceAvailable = null;	
 	private Date lastHarvest = null;
 	
 	/** */
 	private ConversionsParser convParser;
+	
+	/** 
+	 * In case of redirected sources, each redirected source will be harvested without additional recursive redirection.
+	 * */
+	private boolean recursiveHarvestDisabled = false;
 
 	/**
 	 * 
@@ -89,8 +106,10 @@ public class PullHarvest extends Harvest{
 		File file = fullFilePathForSourceUrl(sourceUrlString);
 		
 		String contentType = null;
-		InputStream inputStream = null;
+		
+		HarvestUrlConnection harvestUrlConnection = null;
 		try{
+			
 			// reuse the file if it exists and the configuration allows to do it (e.g. for debugging purposes) */			
 			if (file.exists() && Boolean.parseBoolean(GeneralConfig.getProperty(GeneralConfig.HARVESTER_USE_DOWNLOADED_FILES, "false"))){
 				
@@ -104,52 +123,22 @@ public class PullHarvest extends Harvest{
 				}
 				
 				// prepare URL connection
-				URL url = new URL(StringUtils.substringBefore(sourceUrlString, "#"));
-				URLConnection urlConnection = url.openConnection();				
-				urlConnection.setRequestProperty("Accept", "application/rdf+xml, text/xml, */*;q=0.6");
-				urlConnection.setRequestProperty("User-Agent", URLUtil.userAgentHeader());
-				if (lastHarvest!=null){
-					
-					Boolean conversionModified = isConversionModifiedSinceLastHarvest();
-					if (conversionModified==null || conversionModified.booleanValue()==false){
-						
-						urlConnection.setIfModifiedSince(lastHarvest.getTime());
-						if (conversionModified!=null){
-							logger.debug("The source's RDF conversion not modified since" + lastHarvest.toString());
-						}
-					}
-					else{
-						logger.debug("The source has an RDF conversion that has been modified since last harvest");
-					}
-				}
+				harvestUrlConnection = HarvestUrlConnection.getConnection(sourceUrlString);
+
+				setConversionModified(harvestUrlConnection.getUrlConnection());
 
 				// open connection stream				
 				logger.debug("Downloading");
-				IOException connectException = null;
 				try{
-					sourceAvailable = Boolean.FALSE;
-					inputStream = urlConnection.getInputStream();
-					sourceAvailable = Boolean.TRUE;					
+					harvestUrlConnection.openInputStream();
+					sourceAvailable = harvestUrlConnection.isSourceAvailable();
 				}
-				catch (IOException e){
-					connectException = e;
+				catch (Exception e){
 					logger.warn(e.toString());
 				}
 				
-				String sourceNotExistMessage = null; 
-				if (connectException!=null && connectException instanceof UnknownHostException){
-					sourceNotExistMessage = "IP address of the host could not be determined";
-				}
-				else if (urlConnection instanceof HttpURLConnection){
-					int responseCode = ((HttpURLConnection)urlConnection).getResponseCode();
-					if ((responseCode>=400 && responseCode<=499) || responseCode==501 || responseCode==505){
-						sourceNotExistMessage = "Got HTTP response code " + responseCode;
-					}
-				}
-
-				// if we see that the source for surely doesn't exist, we delete it and return right away
-				if (sourceNotExistMessage!=null){
-					logger.debug(sourceNotExistMessage + ", going to delete the source");
+				if (!harvestUrlConnection.isSourceAvailable()){	
+					logger.debug(harvestUrlConnection.getSourceNotExistMessage() + ", going to delete the source");
 					try {
 						daoWriter = null; // we dont't want finishing actions to be done
 						DAOFactory.get().getDao(HarvestSourceDAO.class).queueSourcesForDeletion(Collections.singletonList(sourceUrlString));
@@ -159,32 +148,29 @@ public class PullHarvest extends Harvest{
 					}
 					return;
 				}
-						
+				
 				// if source not available (i.e. link broken) then just set the last-refreshed metadata
-				if (sourceAvailable.booleanValue()==false){
-					setLastRefreshed(urlConnection, System.currentTimeMillis());
+				if (harvestUrlConnection.isSourceAvailable() == false){
+					setLastRefreshed(harvestUrlConnection.getConnection(), System.currentTimeMillis());
 				}
 				// source is available, so continue to extract it's contents and metadata
 				else{
 					
 					// extract various metadata about this harvest source from url connection object
-					setSourceMetadata(urlConnection);
+					setSourceMetadata(harvestUrlConnection.getConnection());
 
+					// if Url is redirected, take action. 
+					if (harvestUrlConnection.getRedirectionInfo().isRedirected() && harvestUrlConnection.isHttpConnection() && recursiveHarvestDisabled == false){
+						redirectedSourceHarvest(harvestUrlConnection);
+					} 
+					// NOTE: If URL is redirected, content type is null.
 					// skip if unsupported content type
-					contentType = sourceMetadata.getObjectValue(Predicates.CR_MEDIA_TYPE);
-					if (contentType!=null
-							&& !contentType.startsWith("text/xml")
-							&& !contentType.startsWith("application/xml")
-							&& !contentType.startsWith("application/rdf+xml")
-							&& !contentType.startsWith("application/octet-stream")
-							&& !contentType.startsWith("application/x-gzip")){
-	
-						logger.debug("Unsupported content type: " + contentType);
+					
+					if (!harvestUrlConnection.isContentTypeValid(sourceMetadata.getObjectValue(Predicates.CR_MEDIA_TYPE))){
+						logger.debug("Unsupported content type: " + harvestUrlConnection.getContentType());
 					}
 					else{
-						// set the field indicating if source has been modified since last harvest
-						if (urlConnection instanceof HttpURLConnection
-							&& ((HttpURLConnection)urlConnection).getResponseCode()==HttpURLConnection.HTTP_NOT_MODIFIED){
+						if (harvestUrlConnection.isHttpConnection() && harvestUrlConnection.getResponseCode()==HttpURLConnection.HTTP_NOT_MODIFIED){
 							
 							clearPreviousContent = false;
 							
@@ -197,18 +183,17 @@ public class PullHarvest extends Harvest{
 							String msg = "Source not modified since " + lastHarvest.toString();
 							logger.debug(msg);
 							infos.add(msg);
-						}
-						else{
+						} else{
 							// save the stream to file
-							int totalBytes = FileUtil.streamToFile(inputStream, file);
+							int totalBytes = FileUtil.streamToFile(harvestUrlConnection.getInputStream(), file);
 
 							// if content-length for source metadata was previously not found, then set it to file size
 							if (sourceMetadata.getObject(Predicates.CR_BYTE_SIZE)==null){
 								sourceMetadata.addObject(Predicates.CR_BYTE_SIZE, new ObjectDTO(String.valueOf(totalBytes), true));
 							}
 						}
-					}
-				}
+					} 
+				} // if Source is available.
 			}
 		}
 		catch (Exception e){
@@ -216,12 +201,140 @@ public class PullHarvest extends Harvest{
 		}
 		finally{
 			// close input stream
-			try{ if (inputStream!=null) inputStream.close(); } catch (IOException e){}
+			try{ 
+				if (harvestUrlConnection != null && harvestUrlConnection.getInputStream()!=null) 
+					harvestUrlConnection.getInputStream().close(); 
+			} catch (IOException e){}
 		}
 		
 		// perform the harvest
 		harvest(file, contentType);
 	}
+	
+	
+	/**
+	 * Performs the harvesting for redirected harvests.
+	 */
+	private void redirectedSourceHarvest(HarvestUrlConnection harvestUrlConnection) throws HarvestException{
+		
+		int redirectionsFound = -1;
+		
+		HarvestSourceDTO originalSource = new HarvestSourceDTO();
+		// Loading full information about the initial source
+		try {
+			try {
+				originalSource = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(sourceUrlString);
+			} catch (DAOException e){
+				throw new HarvestException("Original source not found in HARVEST_SOURCE. Cannot continue parsing redirected sources.");
+			}
+			
+			// The case when the original URL has been redirected to a new source.
+			// Before continuing with harvesting, the potential chain of further redirections
+			// is going to be analyzed and limited if necessary.
+			
+			String directedUrl = new URL(StringUtils.substringBefore(harvestUrlConnection.getRedirectionInfo().getTargetURL(), "#")).toString();
+			
+			List <UrlRedirectionInfo> redirectedUrls = new ArrayList<UrlRedirectionInfo>();
+			
+			UrlRedirectionInfo lastUrl = new UrlRedirectionInfo();
+			lastUrl = UrlRedirectAnalyzer.analyzeUrlRedirection(directedUrl);
+			redirectedUrls.add(lastUrl);
+			
+			while (lastUrl.isRedirected() == true){
+				lastUrl = UrlRedirectAnalyzer.analyzeUrlRedirection(lastUrl.getTargetURL());
+				redirectedUrls.add(lastUrl);
+				
+				redirectionsFound = redirectedUrls.size();
+				// Checking the count of redirects.
+				if (redirectionsFound>PullHarvest.maxRedirectionsAllowed){
+					throw new HarvestException("Too many redirections for url: " + sourceUrlString+". Found "+ redirectionsFound+", allowed "+PullHarvest.maxRedirectionsAllowed);
+				}
+			}
+			
+			// Going to harvest all directed url's
+			for (int i = 0; i < redirectedUrls.size(); i++){
+	
+				UrlRedirectionInfo current = redirectedUrls.get(i);
+
+				HarvestSourceDTO directedSource;
+				// Loading information about the source
+				directedSource = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(current.getSourceURL());
+				
+				if (directedSource != null){
+					// Checking if directedSource has larger interval_minutes value compared to original and updating accordingly
+					if (directedSource.getIntervalMinutes() > originalSource.getIntervalMinutes()){
+						directedSource.setIntervalMinutes(originalSource.getIntervalMinutes());
+						// Saving the updated source to database
+						DAOFactory.get().getDao(HarvestSourceDAO.class).editSource(directedSource);
+					}
+					
+				} else {
+					directedSource = new HarvestSourceDTO();
+					directedSource.setIntervalMinutes(originalSource.getIntervalMinutes());
+					directedSource.setUrl(current.getSourceURL());
+					DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(directedSource, null);
+				}
+				
+				Date now = new Date();
+				
+				// The conditions applies to current url only. If "current" is not harvested, the one following the "current" is still attempted.
+				
+				if (
+						directedSource.getLastHarvest() == null || 
+						this instanceof InstantHarvest ||
+						(now.getTime() - directedSource.getLastHarvest().getTime()) > directedSource.getIntervalMinutes() * 60 * 1000
+					){
+					//PullHarvest harvest = new PullHarvest(directedSource.getUrl(), null);
+					PullHarvest harvest = null;
+					// The flag for fullSetupMode is set in createFullSetup when initializing the harvest that way.
+					// The value for Urgent is also received there.
+					
+					if (this.isFullSetupMode()){
+						harvest = createFullSetup(directedSource, this.isFullSetupModeUrgent());
+					}
+					else {
+						harvest = new PullHarvest(directedSource.getUrl(), null);
+					}
+					
+					// setting the flag to not allow it recursively harvest their followers.
+					// During the harvest of this instance, the code won't reach this block.
+					harvest.setRecursiveHarvestDisabled(true);
+					harvest.execute();
+				}
+				
+			}
+		} catch (Exception ex){
+			throw new HarvestException("Exception during harvesting redirected sources: "+ex.getMessage(), ex);
+		}
+	}
+	
+	/**
+	 * 
+	 * @return
+	 * @throws ParserConfigurationException 
+	 * @throws SAXException 
+	 * @throws IOException 
+	 * @throws DAOException 
+	 */
+	
+	private void setConversionModified(HttpURLConnection urlConnection) throws DAOException, IOException, ParserConfigurationException, SAXException{
+		
+		if (lastHarvest!=null){
+			Boolean conversionModified = isConversionModifiedSinceLastHarvest();
+			if (conversionModified==null || conversionModified.booleanValue()==false){
+				
+				urlConnection.setIfModifiedSince(lastHarvest.getTime());
+				if (conversionModified!=null){
+					logger.debug("The source's RDF conversion not modified since" + lastHarvest.toString());
+				}
+			}
+			else{
+				logger.debug("The source has an RDF conversion that has been modified since last harvest");
+			}
+		}
+		
+	}
+
 	
 	/**
 	 * 
@@ -527,6 +640,8 @@ public class PullHarvest extends Harvest{
 		
 		PullHarvest harvest = new PullHarvest(dto.getUrl(), urgent ? null : dto.getLastHarvest());
 		
+		harvest.setFullSetupMode(true);
+		harvest.setFullSetupModeUrgent(urgent);
 		harvest.setPreviousHarvest(DAOFactory.get().getDao(HarvestDAO.class).getLastHarvest(
 				dto.getSourceId().intValue()));
 		harvest.setDaoWriter(new HarvestDAOWriter(
@@ -534,5 +649,29 @@ public class PullHarvest extends Harvest{
 		harvest.setNotificationSender(new HarvestNotificationSender());
 		
 		return harvest;
+	}
+
+	public boolean isRecursiveHarvestDisabled() {
+		return recursiveHarvestDisabled;
+	}
+
+	public void setRecursiveHarvestDisabled(boolean recursiveHarvestDisabled) {
+		this.recursiveHarvestDisabled = recursiveHarvestDisabled;
+	}
+
+	public boolean isFullSetupMode() {
+		return fullSetupMode;
+	}
+
+	public void setFullSetupMode(boolean fullSetupMode) {
+		this.fullSetupMode = fullSetupMode;
+	}
+
+	public boolean isFullSetupModeUrgent() {
+		return fullSetupModeUrgent;
+	}
+
+	public void setFullSetupModeUrgent(boolean fullSetupModeUrgent) {
+		this.fullSetupModeUrgent = fullSetupModeUrgent;
 	}
 }

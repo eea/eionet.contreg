@@ -74,4 +74,25 @@ public class HarvestTest extends CRDatabaseTestCase{
 			fail("Was not expecting this exception: " + e.toString());
 		}
 	}
+
+	@Test
+	public void testHarvestExistingURL(){
+		
+		try {
+			PullHarvest harvest = new PullHarvest("https://svn.eionet.europa.eu/repositories/Reportnet/cr2/trunk/test-rdf/test-rdf.xml", null);
+			harvest.execute();
+			
+			assertNotNull(harvest.getSourceAvailable());
+			assertTrue(harvest.getSourceAvailable().booleanValue());
+			assertEquals((int)11, harvest.getDistinctSubjectsCount());
+			assertEquals((int)48, harvest.getStoredTriplesCount());	
+		}
+		catch (HarvestException e) {
+			e.printStackTrace();
+			fail("Was not expecting this exception: " + e.toString());
+		}
+	}
+	
+
+	
 }
