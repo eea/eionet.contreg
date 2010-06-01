@@ -157,19 +157,23 @@ public class PostgreSQLPersister implements IHarvestPersister{
 	public void commit() throws PersisterException {
 		
 		try {
+			
+			// JH010610: clearing of previous harvests is now done just before inserting first triple
+			// (see openResources() method)
+			
 			// clear previous content if required (for example it's not required when push-harvest
-			if (config.isClearPreviousContent()){
-				
-				logger.debug("Deleting SPO rows of previous harvests");
-				
-				StringBuffer buf = new StringBuffer("delete from SPO where SOURCE=");
-				buf.append(sourceUrlHash).append(" and GEN_TIME<").append(genTime);			
-				SQLUtil.executeUpdate(buf.toString(), getConnection());
-				
-				buf = new StringBuffer("delete from SPO where OBJ_DERIV_SOURCE=");
-				buf.append(sourceUrlHash).append(" and OBJ_DERIV_SOURCE_GEN_TIME<").append(genTime);			
-				SQLUtil.executeUpdate(buf.toString(), getConnection());
-			}
+//			if (config.isClearPreviousContent()){
+//				
+//				logger.debug("Deleting SPO rows of previous harvests");
+//				
+//				StringBuffer buf = new StringBuffer("delete from SPO where SOURCE=");
+//				buf.append(sourceUrlHash).append(" and GEN_TIME<>").append(genTime);			
+//				SQLUtil.executeUpdate(buf.toString(), getConnection());
+//				
+//				buf = new StringBuffer("delete from SPO where OBJ_DERIV_SOURCE=");
+//				buf.append(sourceUrlHash).append(" and OBJ_DERIV_SOURCE_GEN_TIME<>").append(genTime);			
+//				SQLUtil.executeUpdate(buf.toString(), getConnection());
+//			}
 
 			// derive inferred triples, and extract new harvest sources 
 			PostgreSQLDerivationEngine derivEngine = new PostgreSQLDerivationEngine(
@@ -268,7 +272,22 @@ public class PostgreSQLPersister implements IHarvestPersister{
 			
 			// let the debugger know that we have got our first triple
 			logger.debug("Got first triple");
-		} catch (SQLException fatal) {
+			
+			//
+			if (config.isClearPreviousContent()){
+
+				logger.debug("Deleting SPO rows of previous harvests");
+
+				StringBuffer buf = new StringBuffer("delete from SPO where SOURCE=");
+				buf.append(sourceUrlHash);			
+				SQLUtil.executeUpdate(buf.toString(), getConnection());
+
+				buf = new StringBuffer("delete from SPO where OBJ_DERIV_SOURCE=");
+				buf.append(sourceUrlHash);			
+				SQLUtil.executeUpdate(buf.toString(), getConnection());
+			}
+		}
+		catch (SQLException fatal) {
 			throw new PersisterException(fatal.getMessage(), fatal);
 		}
 	}

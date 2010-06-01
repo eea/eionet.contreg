@@ -120,7 +120,8 @@ CREATE INDEX spo_source ON spo (source);
 CREATE INDEX spo_gen_time ON spo (gen_time);
 CREATE INDEX spo_obj_source_object ON spo (obj_source_object);
 CREATE INDEX spo_object_idx ON spo USING gin(to_tsvector('simple', object));
-
+CREATE INDEX spo_obj_deriv_source ON spo (obj_deriv_source);
+CREATE INDEX spo_obj_deriv_source_gen_time ON spo (obj_deriv_source_gen_time);
 
 
 CREATE TABLE spo_temp (
