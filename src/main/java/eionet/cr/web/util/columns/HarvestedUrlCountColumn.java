@@ -11,7 +11,7 @@ import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
 
 public class HarvestedUrlCountColumn extends SearchResultColumn {
 
-	public enum COLUMN {HARVESTDAY, HARVESTCOUNT};
+	public enum COLUMN {HARVESTDAY, HARVESTCOUNT, HARVESTDAYSTRING};
 
 	private COLUMN columnType;
 	
@@ -31,6 +31,13 @@ public class HarvestedUrlCountColumn extends SearchResultColumn {
 				Date date = harvestUrgencyScore.getHarvestDay();
 				if (date!=null && date.getTime()>0){
 					result = SIMPLE_DATE_FORMAT.format(date);
+				}
+			}
+			
+			if (columnType == COLUMN.HARVESTDAYSTRING){
+				Date date = harvestUrgencyScore.getHarvestDay();
+				if (date!=null && date.getTime()>0){
+					result = DATE_ONLY_FORMAT.format(date);
 				}
 			}
 			

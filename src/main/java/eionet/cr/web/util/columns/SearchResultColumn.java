@@ -35,6 +35,7 @@ import eionet.cr.web.action.AbstractActionBean;
 public abstract class SearchResultColumn {
 	
 	protected static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("dd.MM.yy HH:mm:ss");
+	protected static final SimpleDateFormat DATE_ONLY_FORMAT = new SimpleDateFormat("dd.MM.yy");
 
 	/** */
 	private String title;

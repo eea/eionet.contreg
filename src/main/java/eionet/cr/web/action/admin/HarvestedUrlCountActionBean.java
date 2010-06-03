@@ -74,7 +74,7 @@ public class HarvestedUrlCountActionBean extends AbstractSearchActionBean<Harves
 		LinkedList<SearchResultColumn> columnList = new LinkedList<SearchResultColumn>();
 
 		HarvestedUrlCountColumn dateColumn= new HarvestedUrlCountColumn();
-		dateColumn.setColumnType(COLUMN.HARVESTDAY);
+		dateColumn.setColumnType(COLUMN.HARVESTDAYSTRING);
 		dateColumn.setSortable(false);
 		dateColumn.setTitle("Harvest day");
 		columnList.add(dateColumn);

@@ -919,10 +919,10 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 	public Pair <Integer, List <HarvestedUrlCountDTO>> getLatestHarvestedURLs(int days) throws DAOException {
 
 		StringBuffer buf = new StringBuffer().
-		append("SELECT DATE(LAST_HARVEST) AS HARVESTDAY, COUNT(HARVEST_SOURCE_ID) AS HARVESTS").
+		append(" SELECT DATE(LAST_HARVEST) AS HARVESTDAY, COUNT(HARVEST_SOURCE_ID) AS HARVESTS").
 		append(" FROM HARVEST_SOURCE WHERE LAST_HARVEST IS NOT NULL").
 		append(" AND LAST_HARVEST + INTERVAL '"+days+" days' > current_date").
-		append(" GROUP BY DATE(LAST_HARVEST);");
+		append(" GROUP BY DATE(LAST_HARVEST) ORDER BY HARVESTDAY DESC ;");
 
 		List <HarvestedUrlCountDTO> result = new ArrayList();
 		Connection conn = null;
