@@ -128,7 +128,8 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 		ArrayList<Pair<String, String>> result = new ArrayList<Pair<String, String>>();
 		for (String uriHash:labelMap.keySet()){
 			if (StringUtils.isBlank(labelMap.get(uriHash))){
-				result.add(new Pair(uriHash, URIUtil.deriveLabel(uriMap.get(uriHash))));
+				String uri = uriMap.get(uriHash);
+				result.add(new Pair(uriHash, URIUtil.extractURILabel(uri,uri)));
 			}
 			else{
 				result.add(new Pair(uriHash, labelMap.get(uriHash)));

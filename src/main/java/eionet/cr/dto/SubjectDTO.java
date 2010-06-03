@@ -52,6 +52,7 @@ public class SubjectDTO implements Serializable{
 
 	/** */
 	public static final String URI_ANONYMOUS = "anonymous";
+	public static final String NO_LABEL = "No label";
 	
 	/** */
 	private String uri;
@@ -451,6 +452,6 @@ public class SubjectDTO implements Serializable{
 		else if (isAnonymous())
 			return "Anonymous resource";
 		else
-			return URIUtil.deriveLabel(getUri());
+			return URIUtil.extractURILabel(getUri(), NO_LABEL);
 	}
 }

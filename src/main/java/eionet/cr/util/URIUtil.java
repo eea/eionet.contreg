@@ -24,6 +24,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashSet;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
@@ -71,23 +73,44 @@ public class URIUtil {
 	 * @param uri
 	 * @return
 	 */
-	public static String deriveLabel(String uri){
+	public static String extractURILabel(String uri){
 		
-		if (uri==null){
-			return "";
-		}		
-		else if (URIUtil.isSchemedURI(uri) && !URLUtil.isURL(uri)){
-			return uri;
-		}
-		else{
-			int i = Math.max(Math.max(uri.lastIndexOf('#'), uri.lastIndexOf('/')), uri.lastIndexOf(':'));
+		String result = null;
+		if (URLUtil.isURL(uri)){
+			
+			int i = Math.max(uri.lastIndexOf('#'), uri.lastIndexOf('/'));
 			if (i>=0){
-				return uri.substring(i+1);
-			}
-			else{
-				return uri;
+				result = uri.substring(i+1);
+				if (result.trim().length()==0){
+					result = null;
+				}
 			}
 		}
+		
+		return result;
+	}
+
+	/**
+	 * 
+	 * @param uri
+	 * @param dflt
+	 * @return
+	 */
+	public static String extractURILabel(String uri, String dflt){
+		
+		String result = null;
+		if (URLUtil.isURL(uri)){
+			
+			int i = Math.max(uri.lastIndexOf('#'), uri.lastIndexOf('/'));
+			if (i>=0){
+				result = uri.substring(i+1);
+				if (result.trim().length()==0){
+					result = null;
+				}
+			}
+		}
+		
+		return result==null ? dflt : result;
 	}
 
 	/**

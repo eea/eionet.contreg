@@ -118,15 +118,11 @@ public class SubjectPredicateColumn extends SearchResultColumn{
 			if (predicateUri.equals(Predicates.RDFS_LABEL)){
 				
 				if (objects.isEmpty()){
-					result = URIUtil.deriveLabel(subjectDTO.getUri());
-					if (result.equals(subjectDTO.getUri())){
-						result = "No label";
-					}
+					result = URIUtil.extractURILabel(subjectDTO.getUri(), SubjectDTO.NO_LABEL);
 				}
 				else{
 					result = objectValuesToCSV(objects);
 				}
-
 				result = buildFactsheetLink(subjectDTO.getUri(), result);
 			}
 			else if (!objects.isEmpty()){
@@ -144,16 +140,12 @@ public class SubjectPredicateColumn extends SearchResultColumn{
 					else{
 						String label = o.getDerviedLiteralValue();
 						if (label==null){
-							label = URIUtil.deriveLabel(o.getValue());
-							if (label.equals(o.getValue())){
-								label = "No label";
-							}
+							label = URIUtil.extractURILabel(o.getValue(), SubjectDTO.NO_LABEL);
 						}
 						buf.append(buildFactsheetLink(o.getValue(), label));
 					}
 				}
 				result = buf.toString();
-				
 			}
 		}
 		

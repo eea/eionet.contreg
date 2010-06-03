@@ -564,7 +564,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 						String uri = subject.getUri();
 						String label = subject.getObjectValue(Predicates.RDFS_LABEL);
 						if (StringUtils.isBlank(label)){
-							label = URIUtil.deriveLabel(uri);
+							label = URIUtil.extractURILabel(uri,uri);
 						}
 
 						if (!StringUtils.isBlank(label)){
