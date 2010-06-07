@@ -22,12 +22,8 @@ package eionet.cr.dao.postgre.helpers;
 
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
-
 import eionet.cr.common.Predicates;
-import eionet.cr.common.Subjects;
 import eionet.cr.util.Hashes;
-import eionet.cr.util.SortOrder;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.web.util.columns.ReferringPredicatesColumn;
@@ -106,6 +102,12 @@ public class ReferencesSearchHelper extends AbstractSearchHelper{
 		String query = getUnorderedQuery(inParams);
 		return new StringBuffer(
 				"select count(*) from (").append(query).append(") as FOO").toString();
+	}
+
+	@Override
+	public String getMinMaxHashQuery(List<Object> inParams) {
+		// FIXME Auto-generated method stub
+		throw new UnsupportedOperationException("Method not implemented");
 	}
 
 }

@@ -34,10 +34,11 @@ import org.apache.commons.lang.time.DurationFormatUtils;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.postgre.helpers.FilteredSearchHelper;
+import eionet.cr.dao.postgre.helpers.FilteredTypeSearchHelper;
 import eionet.cr.dao.postgre.helpers.FreeTextSearchHelper;
 import eionet.cr.dao.postgre.helpers.ReferencesSearchHelper;
+import eionet.cr.dao.postgre.helpers.SearchHelper;
 import eionet.cr.dao.postgre.helpers.SpatialSearchHelper;
-import eionet.cr.dao.postgre.helpers.FilteredTypeSearchHelper;
 import eionet.cr.dao.readers.FreeTextSearchDataReader;
 import eionet.cr.dao.readers.SubjectDataReader;
 import eionet.cr.dao.util.BBOX;
@@ -127,13 +128,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 			// get total number of found subjects, unless no paging required
 			if (pagingRequest!=null){
 				
-				inParams = new ArrayList<Object>();
-				query = helper.getCountQuery(inParams);
-				
-				logger.trace("Search by filters, executing rowcount query: " + query);
-				
-				totalRowCount = Integer.valueOf(executeQueryUniqueResult(query,
-					inParams, new SingleObjectReader<Long>()).toString());
+				totalRowCount = new Integer(getEstimatedRowCount(helper));
 
 			}
 		}
@@ -407,7 +402,6 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 		// the result Pair contains total number of subjects and the requested sub-list
 		return new Pair<Integer,List<SubjectDTO>>(Integer.valueOf(totalRowCount), subjects);
 	}
-	@Override
 	public int getExactRowCountLimit() {
 		return EXACT_ROW_COUNT_LIMIT;
 	}
@@ -429,7 +423,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 	 * @return
 	 * @throws DAOException
 	 */
-	private int getEstimatedRowCount(FilteredSearchHelper helper) throws DAOException{
+	private int getEstimatedRowCount(SearchHelper helper) throws DAOException{
 		
 		int totalRowCount = 0;		
 		long startTime = System.currentTimeMillis();
@@ -453,19 +447,29 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 		logger.trace("Estimated rows count: " + totalRowCount);
 		
 		if (totalRowCount <= EXACT_ROW_COUNT_LIMIT){
-			long startTime2 = System.currentTimeMillis();
-
-			// get exact number of rows
-			query = helper.getCountQuery(inParams);
-		
-			logger.trace("Search by filters, executing rowcount query: " + query);
-		
-			totalRowCount = Integer.valueOf(executeQueryUniqueResult(query, inParams,
-				new SingleObjectReader<Long>()).toString());
-			logger.trace("Exact rows count, total query time " + Util.durationSince(startTime2));
-			logger.trace("Exact row count: " + totalRowCount);
+			totalRowCount = getExactRowCount(helper);
 		}
 
 		return totalRowCount;
 	}
+
+	private int getExactRowCount(SearchHelper helper) throws DAOException {
+		int totalRowCount;
+		ArrayList<Object> inParams;
+		String query;
+		long startTime2 = System.currentTimeMillis();
+
+		inParams = new ArrayList<Object>();
+		// get exact number of rows
+		query = helper.getCountQuery(inParams);
+
+		logger.trace("Search by filters, executing rowcount query: " + query);
+
+		totalRowCount = Integer.valueOf(executeQueryUniqueResult(query, inParams,
+			new SingleObjectReader<Long>()).toString());
+		logger.trace("Exact rows count, total query time " + Util.durationSince(startTime2));
+		logger.trace("Exact row count: " + totalRowCount);
+		return totalRowCount;
+	}
+	
 }

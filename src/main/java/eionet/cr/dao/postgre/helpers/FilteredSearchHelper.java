@@ -234,6 +234,7 @@ public class FilteredSearchHelper extends AbstractSearchHelper{
 				"select count(*) from (").append(query).append(") as FOO").toString();
 	}
 
+	@Override
 	public String getMinMaxHashQuery(List<Object> inParams) {
 		String query = getUnorderedQuery(inParams, "select min(SPO1.SUBJECT) as LCOL, max(SPO1.SUBJECT) as RCOL from " + getSpoTableName()+ " as SPO1 ");
 		return query;

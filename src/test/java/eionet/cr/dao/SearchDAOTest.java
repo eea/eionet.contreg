@@ -28,9 +28,11 @@ import org.dbunit.dataset.IDataSet;
 import org.junit.Test;
 
 import eionet.cr.common.Predicates;
+import eionet.cr.dao.util.SearchExpression;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.util.Pair;
+import eionet.cr.util.pagination.PagingRequest;
 
 /**
  * 
@@ -48,12 +50,26 @@ public class SearchDAOTest extends CRDatabaseTestCase{
 		return getXmlDataSet("types-db.xml");
 	}
 
+	@Test
+	public void testFreeTextSearchCountResults() throws Exception{
+			
+		PagingRequest pagingRequest = PagingRequest.create(1);
+		
+		
+		Pair<Integer, List<SubjectDTO>> result =
+			DAOFactory.get().getDao(SearchDAO.class).searchByFreeText(
+					new SearchExpression("KESKKONNAPOLIITIKA"), pagingRequest, null);
+		
+		
+		assertEquals(1, result.getLeft().intValue());
+	}
 	/**
 	 * 
 	 */
 	@Test
 	public void testSearchByTypeAndFilters() throws Exception{
-		
+		PagingRequest pagingRequest = PagingRequest.create(1);
+
 		//type search uses cache tables and they should be up to date
 		DAOFactory.get().getDao(HelperDAO.class).updateTypeDataCache();
 
@@ -63,6 +79,8 @@ public class SearchDAOTest extends CRDatabaseTestCase{
 		
 		Pair<Integer, List<SubjectDTO>> result =
 			DAOFactory.get().getDao(SearchDAO.class).searchByTypeAndFilters(
-					filters, null, null, null,selectedPredicates);
+					filters, null,pagingRequest, null,selectedPredicates);
+		
+		assertTrue(result.getLeft()>0);
 	}
 }

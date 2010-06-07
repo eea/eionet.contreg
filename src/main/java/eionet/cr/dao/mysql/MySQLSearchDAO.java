@@ -408,7 +408,6 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 		return EXACT_ROW_COUNT_LIMIT;
 	}
 
-	@Override
 	public Pair<Integer, List<SubjectDTO>> searchByTypeAndFilters(Map<String, String> filters,
 			Set<String> literalPredicates, PagingRequest pagingRequest, SortingRequest sortingRequest,
 			List<String> selectedPredicates) throws DAOException {

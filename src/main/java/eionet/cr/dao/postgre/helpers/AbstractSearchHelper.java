@@ -98,4 +98,11 @@ public abstract class AbstractSearchHelper implements SearchHelper{
 	 * @return
 	 */
 	public abstract String getCountQuery(List<Object> inParams);
+
+	/**
+	 * 
+	 * @param inParams
+	 * @return
+	 */
+	public abstract String getMinMaxHashQuery(List<Object> inParams);
 }

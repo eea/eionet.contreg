@@ -97,6 +97,9 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 
     			resultList = result.getRight();
     			matchCount = result.getLeft();
+
+    			int exactRowCountLimit = DAOFactory.get().getDao(SearchDAO.class).getExactRowCountLimit();
+	    		exactCount = exactRowCountLimit<=0 || matchCount<=exactRowCountLimit;
     		}
     	}
     	

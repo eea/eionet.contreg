@@ -892,7 +892,6 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 		throw new UnsupportedOperationException("Method not implemented");
 	}
 
-	@Override
 	public void updateTypeDataCache() throws DAOException {
 		// FIXME Auto-generated method stub
 		
