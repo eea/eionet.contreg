@@ -11,7 +11,7 @@
 		<c:when test="${actionBean.adminLoggedIn}">
 			<div id="operations">
 			<ul>
-				<li><stripes:link href="admin">Back to Admin</stripes:link></li>
+				<li><stripes:link href="/admin">Back to Admin</stripes:link></li>
 			</ul>
 			</div>
 			<h1>Urgency score for the next ${actionBean.urgencyScoreLimit} harvests</h1>
