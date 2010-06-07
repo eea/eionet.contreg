@@ -81,6 +81,7 @@ public class SearchDAOTest extends CRDatabaseTestCase{
 			DAOFactory.get().getDao(SearchDAO.class).searchByTypeAndFilters(
 					filters, null,pagingRequest, null,selectedPredicates);
 		
+		assertEquals(1, result.getLeft().intValue());
 		assertTrue(result.getLeft()>0);
 	}
 }
