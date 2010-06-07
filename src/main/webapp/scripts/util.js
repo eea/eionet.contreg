@@ -61,7 +61,7 @@ function showWait(contextRoot, url) {
 	$("#wait_div").load(url, 
 			function(){
 				$("#wait_div").oneTime(
-						1000,
+						5000,
 						function(){
 							$(this).hide(
 									"slow",
