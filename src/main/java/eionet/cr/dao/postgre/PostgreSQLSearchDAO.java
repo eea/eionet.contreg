@@ -135,7 +135,15 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 			// get total number of found subjects, unless no paging required
 			if (pagingRequest!=null){
 				
-				totalRowCount = new Integer(getEstimatedRowCount(helper));
+				long startTime2 = System.currentTimeMillis();
+				inParams = new ArrayList<Object>();
+				query = helper.getCountQuery(inParams);
+				
+				logger.trace("Search by filters, executing rowcount query: " + query);
+				
+				totalRowCount = Integer.valueOf(executeQueryUniqueResult(query,
+					inParams, new SingleObjectReader<Long>()).toString());
+				logger.debug("Exact rows count, total query time " + Util.durationSince(startTime2));
 
 			}
 		}
@@ -170,6 +178,8 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 		// execute the query, with the IN parameters
 		List<Long> list = executeQuery(query, inParams, new SingleObjectReader<Long>());
 
+		logger.debug("Search by filters, find subjects query time " + Util.durationSince(startTime));
+
 		int totalRowCount = 0;
 		List<SubjectDTO> subjects = new ArrayList<SubjectDTO>();
 		
@@ -198,7 +208,13 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 		// if paging required, get the total number of found subjects too
 		if (pagingRequest!=null){
 			
-			totalRowCount = new Integer(getEstimatedRowCount(helper));
+			inParams = new ArrayList<Object>();
+			query = helper.getCountQuery(inParams);
+			
+			logger.trace("Search by filters, executing rowcount query: " + query);
+			
+			totalRowCount = Integer.valueOf(executeQueryUniqueResult(query, inParams,
+					new SingleObjectReader<Long>()).toString());
 		}
 
 		//return new Pair<Integer,List<SubjectDTO>>(0, new LinkedList<SubjectDTO>());
@@ -244,7 +260,8 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 			logger.trace("Search by type and filters, executing subject finder query: " + query);
 			list = executeQuery(query, inParams, new SingleObjectReader<Long>());
 		}
-			
+
+		logger.debug("Search by type and filters, find subjects query time " + Util.durationSince(startTime));
 
 		int totalRowCount = 0;
 		List<SubjectDTO> subjects = new ArrayList<SubjectDTO>();

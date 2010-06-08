@@ -27,6 +27,7 @@ import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.dao.util.SearchExpression;
 import eionet.cr.util.Hashes;
+import eionet.cr.util.SortOrder;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.util.sql.PairReader;
@@ -71,7 +72,24 @@ public class FreeTextSearchHelper extends AbstractSearchHelper{
 		append("(CASE WHEN SPO.OBJ_DERIV_SOURCE<>0 THEN SPO.OBJ_DERIV_SOURCE ELSE SPO.SOURCE END)").
 		append(" as ").append(PairReader.RIGHTCOL).append(" from SPO ");
 		
-		buf.append(getFreetextQueryCondition(inParams));
+		if (expression.isUri() || expression.isHash()){
+			buf.append(" where SPO.OBJECT_HASH=?");
+			inParams.add(expression.isHash() ?
+					expression.toString() : Long.valueOf(Hashes.spoHash(expression.toString())));
+		}
+		else{
+			buf.append(" where to_tsvector('simple', SPO.OBJECT) @@ to_tsquery('simple', ?)").
+			append(" and SPO.LIT_OBJ='Y'");
+			inParams.add(pgExpression.getParsedQuery());
+			
+			HashSet<String> phrases = pgExpression.getPhrases();
+			for (String phrase : phrases){
+				if (!StringUtils.isBlank(phrase)){
+					buf.append(" and SPO.OBJECT like ?");
+					inParams.add("%" + phrase + "%");
+				}
+			}
+		}
 		
 		return buf.toString();
 	}
@@ -99,7 +117,24 @@ public class FreeTextSearchHelper extends AbstractSearchHelper{
 			append(Hashes.spoHash(sortPredicate)).append(")");
 		}
 		
-		subSelect.append(getFreetextQueryCondition(inParams));
+		if (expression.isUri() || expression.isHash()){
+			subSelect.append(" where SPO.OBJECT_HASH=?");
+			inParams.add(expression.isHash() ?
+					expression.toString() : Long.valueOf(Hashes.spoHash(expression.toString())));
+		}
+		else{
+			subSelect.append(" where to_tsvector('simple', SPO.OBJECT) @@ to_tsquery('simple', ?)").
+			append(" and SPO.LIT_OBJ='Y'");
+			inParams.add(pgExpression.getParsedQuery());
+			
+			HashSet<String> phrases = pgExpression.getPhrases();
+			for (String phrase : phrases){
+				if (!StringUtils.isBlank(phrase)){
+					subSelect.append(" and SPO.OBJECT like ?");
+					inParams.add("%" + phrase + "%");
+				}
+			}
+		}
 
 		StringBuffer buf = new StringBuffer().
 		append("select * from (").append(subSelect).append(") as FOO order by OBJECT_ORDERED_BY");
@@ -115,23 +150,6 @@ public class FreeTextSearchHelper extends AbstractSearchHelper{
 
 		StringBuffer buf = new StringBuffer("select count(distinct SPO.SUBJECT) from SPO");
 		
-		buf.append(getFreetextQueryCondition(inParams));
-		
-		return buf.toString();
-	}
-
-	@Override
-	public String getMinMaxHashQuery(List<Object> inParams) {
-		StringBuffer buf = new StringBuffer("select min(SPO.SUBJECT) as LCOL, max(SPO.SUBJECT) as RCOL from SPO ");
-		
-		buf.append(getFreetextQueryCondition(inParams));
-		
-		return buf.toString();
-	}
-
-	private String getFreetextQueryCondition(List<Object> inParams) {
-		
-		StringBuffer buf = new StringBuffer();
 		if (expression.isUri() || expression.isHash()){
 			buf.append(" where SPO.OBJECT_HASH=?");
 			inParams.add(expression.isHash() ?
@@ -151,6 +169,13 @@ public class FreeTextSearchHelper extends AbstractSearchHelper{
 				}
 			}
 		}
+		
 		return buf.toString();
+	}
+
+	@Override
+	public String getMinMaxHashQuery(List<Object> inParams) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Method not implemented");
 	}
 }
