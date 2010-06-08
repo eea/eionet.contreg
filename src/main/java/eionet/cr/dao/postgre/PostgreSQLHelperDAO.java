@@ -1062,7 +1062,9 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		"delete from cache_SPO_TYPE_SUBJECT; " + 
 		"insert into cache_SPO_TYPE_SUBJECT " +
 			"select distinct object_hash, subject from SPO where PREDICATE=" +
-			Hashes.spoHash(Predicates.RDF_TYPE) + " and OBJECT_HASH in (select subject from cache_SPO_TYPE); " + 
+			Hashes.spoHash(Predicates.RDF_TYPE) + " and OBJECT_HASH in (select subject from cache_SPO_TYPE);"; 
+	/** */
+	private static final String getUpdateTypePredicateData_SQL =
 		"delete from cache_SPO_TYPE_PREDICATE; " +
 		"insert into cache_SPO_TYPE_PREDICATE " +
 			"select distinct ct.object_hash, spo.predicate from SPO, cache_SPO_TYPE_SUBJECT as ct where " +
@@ -1074,11 +1076,14 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 	public void updateTypeDataCache() throws DAOException {
 		
 		long startTime = System.currentTimeMillis();
-		logger.trace("updateTypeDataCache query is: " + getUpdateTypeData_SQL);
-		
-		execute(getUpdateTypeData_SQL, null);
-		
-		logger.trace("updateTypeDataCache query took " + Util.durationSince(startTime));
+		logger.trace("updateTypeDataCache query is: " + getUpdateTypeData_SQL);		
+		execute(getUpdateTypeData_SQL, null);		
+		logger.debug("updateTypeDataCache query took " + Util.durationSince(startTime));
+
+		startTime = System.currentTimeMillis();
+		logger.trace("updateTypeDataPredicatesCache query is: " + getUpdateTypePredicateData_SQL);
+		execute(getUpdateTypePredicateData_SQL, null);		
+		logger.debug("updateTypeDataPredicatesCache query took " + Util.durationSince(startTime));
 	}
 
 	/*
