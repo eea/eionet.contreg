@@ -47,6 +47,7 @@ import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.util.sql.PairReader;
 import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
+import eionet.cr.web.security.CRUser;
 
 
 /**
@@ -893,7 +894,29 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 	}
 
 	public void updateTypeDataCache() throws DAOException {
-		// FIXME Auto-generated method stub
+
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Method not implemented");
+	}
+
+	@Override
+	public void registerUserUrl(CRUser user, String url, boolean isBookmark) throws DAOException {
+
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Method not implemented");
+	}
+
+	@Override
+	public void addUserBookmark(CRUser user, String url) throws DAOException {
 		
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Method not implemented");
+	}
+
+	@Override
+	public void deleteUserBookmark(CRUser user, String url) throws DAOException {
+		
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Method not implemented");
 	}
 }

@@ -18,6 +18,7 @@ import eionet.cr.harvest.statistics.dto.HarvestUrgencyScoreDTO;
 import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
 import eionet.cr.util.Pair;
 import eionet.cr.util.pagination.PagingRequest;
+import eionet.cr.web.security.CRUser;
 
 /**
  * Helper dao to use in different searches.
@@ -209,5 +210,30 @@ public interface HelperDAO extends DAO {
 	 * @throws DAOException
 	 */
 	public void updateTypeDataCache() throws DAOException;
+	
+	/**
+	 * 
+	 * @param user TODO
+	 * @param url 
+	 * @param isBookmark 
+	 * @throws DAOException
+	 */
+	public void registerUserUrl(CRUser user, String url, boolean isBookmark) throws DAOException;
+	
+	/**
+	 * 
+	 * @param user
+	 * @param url
+	 * @throws DAOException
+	 */
+	public void addUserBookmark(CRUser user, String url) throws DAOException;
+	
+	/**
+	 * 
+	 * @param user
+	 * @param url
+	 * @throws DAOException
+	 */
+	public void deleteUserBookmark(CRUser user, String url) throws DAOException;
 
 }

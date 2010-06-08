@@ -28,6 +28,7 @@ import com.tee.uit.security.AccessControlListIF;
 import com.tee.uit.security.AccessController;
 import com.tee.uit.security.SignOnException;
 
+import eionet.cr.util.Hashes;
 import eionet.cr.util.Util;
 
 /**
@@ -155,6 +156,16 @@ public class CRUser {
 	public String getHistoryUri(){
 		return CRUser.historyUri(userName);
 	}
+	
+	/**
+	 * 
+	 * @param uri
+	 * @return
+	 */
+	public String getHomeItemUri(String uri){
+		
+		return CRUser.homeItemUri(userName, uri);
+	}
 
 	/**
 	 * 
@@ -169,6 +180,22 @@ public class CRUser {
 			return "http://cr.eionet.europa.eu/home/" + userName;
 	}
 
+	/**
+	 * 
+	 * @param userName
+	 * @param uri
+	 * @return
+	 */
+	public static String homeItemUri(String userName, String uri){
+		
+		if (StringUtils.isBlank(userName) || StringUtils.isBlank(uri))
+			throw new IllegalArgumentException("userName and uri must not be blank");
+		else{
+			return new StringBuilder("http://cr.eionet.europa.eu/home/").
+			append(userName).append("/").append(Hashes.spoHash(uri)).toString();
+		}
+	}
+	
 	/**
 	 * 
 	 * @param userName

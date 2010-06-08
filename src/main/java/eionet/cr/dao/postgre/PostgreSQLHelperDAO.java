@@ -44,7 +44,10 @@ import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
+import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
+import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.readers.DataflowPicklistReader;
 import eionet.cr.dao.readers.PredicateLabelsReader;
@@ -55,19 +58,23 @@ import eionet.cr.dao.readers.UriHashesReader;
 import eionet.cr.dao.util.PredicateLabels;
 import eionet.cr.dao.util.SubProperties;
 import eionet.cr.dao.util.UriLabelPair;
+import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.RawTripleDTO;
 import eionet.cr.dto.SubjectDTO;
+import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.harvest.statistics.dto.HarvestUrgencyScoreDTO;
 import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
 import eionet.cr.util.URIUtil;
+import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
 import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.sql.PairReader;
 import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
+import eionet.cr.web.security.CRUser;
 
 /**
  * 
@@ -1060,9 +1067,10 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		"insert into cache_SPO_TYPE_PREDICATE " +
 			"select distinct ct.object_hash, spo.predicate from SPO, cache_SPO_TYPE_SUBJECT as ct where " +
 			"spo.subject=ct.subject; "; 
-		
-		
-		
+
+	/**
+	 * 
+	 */
 	public void updateTypeDataCache() throws DAOException {
 		
 		long startTime = System.currentTimeMillis();
@@ -1071,5 +1079,109 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		execute(getUpdateTypeData_SQL, null);
 		
 		logger.trace("updateTypeDataCache query took " + Util.durationSince(startTime));
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#registerUserUrl(eionet.cr.web.security.CRUser, java.lang.String, boolean)
+	 */
+	public void registerUserUrl(CRUser user, String url, boolean isBookmark) throws DAOException {
+		
+		if (user==null || StringUtils.isBlank(user.getUserName()))
+			throw new IllegalArgumentException("user must not be null and must have user name");
+		if (URLUtil.isURL(url)==false)
+			throw new IllegalArgumentException("url must not be null and must be valid URL");
+		
+		SubjectDTO registeredSubject = getSubject(Hashes.spoHash(url));
+
+		// if subject did not exist or it isn't registered in user's registrations yet,
+		// then add the necessary triples
+		if (registeredSubject==null || !registeredSubject.existsPredicateObjectSource(
+				Predicates.RDF_TYPE, Subjects.CR_FILE, user.getRegistrationsUri())){
+			
+			boolean subjectFirstSeen = registeredSubject==null;
+			
+			// add the rdf:type=cr:File triple into user's registrations
+			registeredSubject = new SubjectDTO(url, registeredSubject==null ? false : registeredSubject.isAnonymous());
+			ObjectDTO objectDTO = new ObjectDTO(Subjects.CR_FILE, false);
+			objectDTO.setSourceUri(user.getRegistrationsUri());
+			registeredSubject.addObject(Predicates.RDF_TYPE, objectDTO);
+			
+			addTriples(registeredSubject);
+			
+			// let the user registrations' URI be stored in RESOURCE
+			addResource(user.getRegistrationsUri(), user.getRegistrationsUri());
+			
+			// if this is the first time this subject is seen, store it in RESOURCE
+			if (subjectFirstSeen){
+				addResource(url, user.getRegistrationsUri());
+			}
+			
+			// add the URL into user's history, and also into user's bookmarks if requested
+			
+			SubjectDTO userHomeItemSubject = new SubjectDTO(user.getHomeItemUri(url), false);
+			objectDTO = new ObjectDTO(Util.dateToString(new Date(), "yyyy-MM-dd'T'HH:mm:ss"), true);
+			objectDTO.setSourceUri(user.getHistoryUri());
+			userHomeItemSubject.addObject(Predicates.CR_SAVETIME, objectDTO);
+			
+			if (isBookmark){
+				objectDTO = new ObjectDTO(url, false);
+				objectDTO.setSourceUri(user.getBookmarksUri());
+				userHomeItemSubject.addObject(Predicates.CR_BOOKMARK, objectDTO);
+			}
+			
+			addTriples(userHomeItemSubject);
+
+			// let the user home item subject URI be stored in RESOURCE
+			addResource(userHomeItemSubject.getUri(), user.getBookmarksUri());
+			
+			// let the save-time and bookmark predicates be stored in RESOURCE
+			addResource(Predicates.CR_BOOKMARK, user.getRegistrationsUri());
+			addResource(Predicates.CR_SAVETIME, user.getRegistrationsUri());
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#addUserBookmark(eionet.cr.web.security.CRUser, java.lang.String)
+	 */
+	public void addUserBookmark(CRUser user, String url) throws DAOException {
+		
+		if (user==null || StringUtils.isBlank(user.getUserName()))
+			throw new IllegalArgumentException("user must not be null and must have user name");
+		if (URLUtil.isURL(url)==false)
+			throw new IllegalArgumentException("url must not be null and must be valid URL");
+
+		SubjectDTO userHomeItemSubject = new SubjectDTO(user.getHomeItemUri(url), false);
+		ObjectDTO objectDTO = new ObjectDTO(url, false);
+		objectDTO.setSourceUri(user.getBookmarksUri());
+		userHomeItemSubject.addObject(Predicates.CR_BOOKMARK, objectDTO);
+		
+		addTriples(userHomeItemSubject);
+
+		// let the user home item subject URI be stored in RESOURCE
+		addResource(userHomeItemSubject.getUri(), user.getBookmarksUri());
+		
+		// let the bookmark predicate be stored in RESOURCE
+		addResource(Predicates.CR_BOOKMARK, user.getRegistrationsUri());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#deleteUserBookmark(eionet.cr.web.security.CRUser, java.lang.String)
+	 */
+	public void deleteUserBookmark(CRUser user, String url) throws DAOException {
+
+		if (user==null || StringUtils.isBlank(user.getUserName()))
+			throw new IllegalArgumentException("user must not be null and must have user name");
+		if (URLUtil.isURL(url)==false)
+			throw new IllegalArgumentException("url must not be null and must be valid URL");
+
+		SubjectDTO userHomeItemSubject = new SubjectDTO(user.getHomeItemUri(url), false);
+		ObjectDTO objectDTO = new ObjectDTO(url, false);
+		objectDTO.setSourceUri(user.getBookmarksUri());
+		userHomeItemSubject.addObject(Predicates.CR_BOOKMARK, objectDTO);
+		
+		deleteTriples(userHomeItemSubject);
 	}
 }
