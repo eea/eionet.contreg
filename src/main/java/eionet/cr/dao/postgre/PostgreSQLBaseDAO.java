@@ -265,7 +265,7 @@ public abstract class PostgreSQLBaseDAO {
 				logger.trace("Goint to execute subjects data query:" + query);				
 				long startTime1 = System.currentTimeMillis();
 				SQLUtil.executeQuery(query, null, reader, conn);
-				logger.trace("getSubjectsDataBlock, total query time " + Util.durationSince(startTime1));
+				logger.trace("getSubjectsDataBlock, sub query time " + Util.durationSince(startTime1));
 			}
 			logger.debug("getSubjectsData, total query time " + Util.durationSince(startTime));
 		}
@@ -382,7 +382,7 @@ public abstract class PostgreSQLBaseDAO {
 		logger.trace("create temporary table query:" + createTmpTableQuery);				
 		
 		SQLUtil.executeUpdate(createTmpTableQuery, conn);
-		conn.commit();
+		//conn.commit();
 		logger.debug("createTmpTableQuery, total query time " + Util.durationSince(startTime));
 		
 		String query = getSubjectsDataFromTmpTablesQuery();

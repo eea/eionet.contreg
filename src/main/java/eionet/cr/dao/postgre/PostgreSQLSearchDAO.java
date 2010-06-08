@@ -31,6 +31,7 @@ import java.util.Set;
 
 import org.apache.commons.lang.time.DurationFormatUtils;
 
+import eionet.cr.common.Predicates;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.postgre.helpers.FilteredSearchHelper;
@@ -106,6 +107,8 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 		// execute the query, with the IN parameters
 		List<Pair<Long,Long>> list = executeQuery(query, inParams, new PairReader<Long,Long>());
 
+		logger.debug("Free-text search, find subjects query time " + Util.durationSince(startTime));
+
 		// if result list not empty, do the necessary processing and get total row count
 		Integer totalRowCount = Integer.valueOf(0);
 		Map<Long,SubjectDTO> temp = new LinkedHashMap<Long,SubjectDTO>();
@@ -121,6 +124,10 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 			// get the data of all found subjects, provide hit-sources to the reader
 			SubjectDataReader reader = new FreeTextSearchDataReader(temp, hitSources);
 			
+			//query only needed predicates 
+			reader.addPredicateHash(Hashes.spoHash(Predicates.RDF_TYPE));
+			reader.addPredicateHash(Hashes.spoHash(Predicates.RDFS_LABEL));
+
 			logger.trace("Free-text search, getting the data of the found subjects");
 			
 			getSubjectsData(reader);
@@ -437,7 +444,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 		long minHash = minMaxPair==null || minMaxPair.getLeft()==null ? 0 : (Long)minMaxPair.getLeft();
 		long maxHash = minMaxPair==null || minMaxPair.getRight()==null ? 0 : (Long)minMaxPair.getRight();
 		logger.trace("Search by filters, executing min max hash query: " + query);
-		logger.trace("Estimated rows count, total query time " + Util.durationSince(startTime));
+		logger.debug("Estimated rows count, total query time " + Util.durationSince(startTime));
 		
 		// calculate number of rows estimation
 		startTime = System.currentTimeMillis();
@@ -467,7 +474,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 
 		totalRowCount = Integer.valueOf(executeQueryUniqueResult(query, inParams,
 			new SingleObjectReader<Long>()).toString());
-		logger.trace("Exact rows count, total query time " + Util.durationSince(startTime2));
+		logger.debug("Exact rows count, total query time " + Util.durationSince(startTime2));
 		logger.trace("Exact row count: " + totalRowCount);
 		return totalRowCount;
 	}
