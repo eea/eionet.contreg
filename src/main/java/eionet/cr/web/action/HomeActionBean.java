@@ -143,9 +143,8 @@ public class HomeActionBean extends AbstractActionBean{
 	}
 	
 	public List<UserBookmarkDTO> getBookmarks() {
-		CRUser user = new CRUser();
 		try {
-			bookmarks =DAOFactory.get().getDao(HelperDAO.class).getUserBookmarks(user);
+			bookmarks =DAOFactory.get().getDao(HelperDAO.class).getUserBookmarks(this.getUser());
 		} catch (DAOException ex){
 			
 		}

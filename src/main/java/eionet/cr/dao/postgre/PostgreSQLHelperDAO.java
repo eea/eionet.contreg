@@ -1071,6 +1071,9 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 			"select distinct ct.object_hash, spo.predicate from SPO, cache_SPO_TYPE_SUBJECT as ct where " +
 			"spo.subject=ct.subject; "; 
 
+	
+	
+	
 	/**
 	 * 
 	 */
@@ -1193,14 +1196,35 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 	
 	@Override
 	public List<UserBookmarkDTO> getUserBookmarks(CRUser user) throws DAOException{
-		// Mocking the output for testing
-		List<UserBookmarkDTO> mockList = new ArrayList<UserBookmarkDTO>();
 
-		UserBookmarkDTO mockItem1 = new UserBookmarkDTO();
-		mockItem1.setBookmarkUrl("http://www.gutenberg.org/dirs/1/2/8/2/12826/12826-h.zip");
+		String dbQuery = "select distinct OBJECT " +
+				"from SPO where LIT_OBJ='N' and " +
+				"PREDICATE="+Hashes.spoHash(Predicates.CR_BOOKMARK)+" and " +
+				"SOURCE="+Hashes.spoHash(CRUser.bookmarksUri(user.getUserName()))+""; 
 		
-		mockList.add(mockItem1);
-		
-		return mockList;
+		List<UserBookmarkDTO> returnBookmarks = new ArrayList<UserBookmarkDTO>();
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		try{
+			conn = getConnection();
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(dbQuery);
+			while (rs.next()){
+				UserBookmarkDTO bookmark = new UserBookmarkDTO();
+				bookmark.setBookmarkUrl(rs.getString("object"));
+				returnBookmarks.add(bookmark);
+			}
+		}
+		catch (SQLException e){
+			throw new DAOException(e.toString(), e);
+		}
+		finally{
+			SQLUtil.close(rs);
+			SQLUtil.close(stmt);
+			SQLUtil.close(conn);
+		}
+
+		return returnBookmarks;
 	}
 }
