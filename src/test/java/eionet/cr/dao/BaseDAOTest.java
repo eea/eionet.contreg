@@ -51,30 +51,7 @@ public class BaseDAOTest  extends CRDatabaseTestCase {
 		return getXmlDataSet("types-db.xml");
 	}
 	
-	/**
-	 * 
-	 * @throws DAOException
-	 */
-	@Test
-	public void testGetSubjectsDataWithTempTable() throws DAOException {
-		MockPostgreSQLBaseDAO baseDAO = new MockPostgreSQLBaseDAO();
-		
-		Map<Long,SubjectDTO> subjectsMap = new LinkedHashMap<Long, SubjectDTO>();
-		SubjectDataReader reader = new SubjectDataReader(subjectsMap);
-		
-		//retreive data with temp tables
-		List<SubjectDTO> list = baseDAO.getSubjectsDataWithTempTable(reader, "select SUBJECT from SPO");
-		assertTrue(list.size()>0);
-		assertEquals(3, list.get(0).getPredicateCount());
-		assertEquals(5, list.get(1).getPredicateCount());
 
-		//retreive data directly from spo
-		List<SubjectDTO> list2 = baseDAO.getSubjectsData(reader, "select SUBJECT from SPO");
-		
-		//compare results
-		assertTrue(list.equals(list2));
-
-	}
 	
 	/**
 	 * 
@@ -121,40 +98,7 @@ public class BaseDAOTest  extends CRDatabaseTestCase {
 		assertEquals(5, list.get(0).getPredicateCount());
 	}
 
-	/**
-	 * Test creating and droping temporary tables
-	 * @throws DAOException
-	 */
-	@Test
-	public void testCreateTempTables() throws Exception {
-		MockPostgreSQLBaseDAO baseDAO = new MockPostgreSQLBaseDAO();
 
-		String createTempSQL = baseDAO.getCreateTempSubjectsTablesQuery("select SUBJECT from SPO", null);
-		String dropTempSQL = baseDAO.getDropTempTableQuery();
-		String getSubjectsSQL = baseDAO.getSubjectsDataFromTmpTablesQuery();
-		Connection conn1 = null;
-		Connection conn2 = null;
-		try{
-			conn1 = baseDAO.getConnection();
-			conn2 = baseDAO.getConnection();
-			
-			SQLUtil.executeUpdate(createTempSQL, conn1);
-			SQLUtil.executeUpdate(dropTempSQL, conn2);
-
-			SubjectDataReader reader = new SubjectDataReader(new LinkedHashMap<Long, SubjectDTO>());
-			SQLUtil.executeQuery(getSubjectsSQL, null, reader, conn1);
-			
-			List<SubjectDTO> list = reader.getResultList();
-			assertTrue(list.size()>0);
-			
-		}
-		finally{
-			SQLUtil.close(conn1);
-			SQLUtil.close(conn2);
-		}
-		
-
-	}
 	/**
 	 * Mock class for accessing abstract class protected methods.
 	 * 
@@ -162,9 +106,6 @@ public class BaseDAOTest  extends CRDatabaseTestCase {
 	 */
 	class MockPostgreSQLBaseDAO extends PostgreSQLBaseDAO {
 		
-		protected List<SubjectDTO> getSubjectsDataWithTempTable(SubjectDataReader reader, String subjectsSubQuery) throws DAOException{
-			return super.getSubjectsDataWithTempTable(reader, subjectsSubQuery);
-		}
 		protected List<SubjectDTO> getSubjectsData(SubjectDataReader reader, String subjectsSubQuery) throws DAOException{
 			return super.getSubjectsData(reader, subjectsSubQuery);
 		}
@@ -173,15 +114,6 @@ public class BaseDAOTest  extends CRDatabaseTestCase {
 		}
 		protected List<SubjectDTO> getSubjectsData(Map<Long,SubjectDTO> subjectsMap) throws DAOException{
 			return super.getSubjectsData(subjectsMap);
-		}
-		protected String getCreateTempSubjectsTablesQuery(String subjectsSubQuery, String predicateHashesCommaSeparated) {
-			return super.getCreateTempSubjectsTablesQuery(subjectsSubQuery, predicateHashesCommaSeparated);
-		}
-		protected String getDropTempTableQuery(){
-			return super.getDropTempTableQuery();
-		}
-		protected String getSubjectsDataFromTmpTablesQuery(){
-			return super.getSubjectsDataFromTmpTablesQuery();
 		}
 		protected Connection getConnection() throws SQLException{
 			return super.getConnection();

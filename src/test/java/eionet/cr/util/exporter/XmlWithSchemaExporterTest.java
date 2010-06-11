@@ -3,6 +3,8 @@
  */
 package eionet.cr.util.exporter;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -10,7 +12,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -35,25 +39,17 @@ import eionet.cr.util.export.XmlWithSchemaExporter;
 public class XmlWithSchemaExporterTest  extends TestCase {
 
 
-	/**
-	 * validates the result of "Xml With XML Schema" export
-	 * @throws XMLStreamException
-	 * @throws ExportException
-	 * @throws IOException
-	 */
 	@Test
-	public void testDoExport() throws XMLStreamException, ExportException, IOException{
+	public void testExportedElementsInXmlSchema() throws Exception{
 		
 		//fill in search data
-		List<SubjectDTO> subjectsList = new ArrayList<SubjectDTO>();
 		SubjectDTO subject = new SubjectDTO("http://www.google.com",true);
 		subject.addObject(Predicates.RDFS_LABEL, new ObjectDTO("labelValue", false));
 		subject.addObject("comment", new ObjectDTO("commentValue", false));
 		subject.addObject("altitude", new ObjectDTO("123", false));
 		String longStringValue = generateLongStringValue(300);
 		subject.addObject("verylongtext", new ObjectDTO(longStringValue, false));
-		subjectsList.add(subject);
-		Pair<Integer,List<SubjectDTO>> searchParameters = new Pair<Integer,List<SubjectDTO>>(subjectsList.size(),subjectsList);
+
 		List<Pair<String, String>> selectedColumns = new ArrayList<Pair<String,String>>();
 		selectedColumns.add(new Pair<String,String>("comment", null));
 		selectedColumns.add(new Pair<String,String>("altitude", null));
@@ -63,7 +59,7 @@ public class XmlWithSchemaExporterTest  extends TestCase {
 		MockXmlWithSchemaExporter exporter = new MockXmlWithSchemaExporter();
 		exporter.setSelectedColumns(selectedColumns);
 		exporter.setExportResourceUri(true);
-		InputStream in = exporter.doExport(searchParameters);
+		InputStream in = exporter.writeSubjectIntoExporterOutputTest(subject);
 		
 		List<String> xmlElements = new ArrayList<String>();
 		List<String> xmlCharacters = new ArrayList<String>();
@@ -110,6 +106,7 @@ public class XmlWithSchemaExporterTest  extends TestCase {
 		assertTrue(xmlAttributeValues.contains("xsd:string"));
 		assertTrue(xmlAttributeValues.contains("300"));
 	}
+	
 	private String generateLongStringValue(int l){
 		StringBuilder s = new StringBuilder("");
 		for(int i=0;i<l;i++){
@@ -134,14 +131,44 @@ public class XmlWithSchemaExporterTest  extends TestCase {
 		public MockXmlWithSchemaExporter() {
 			super();
 		}
-		public InputStream doExport(Pair<Integer, List<SubjectDTO>> customSearch) throws ExportException, IOException {
-			return super.doExport(customSearch);
-		}
-		public String getEscapedElementNameTest(String elementName){
-			return super.getEscapedElementName(elementName);
+		public void setElements(Map<String,XmlElementMetadata> elements){
+			this.elements = elements;
 		}
 		public String getUniqueElementNameTest(String elementName){
 			return super.getUniqueElementName(elementName);
+		}
+		public InputStream writeSubjectIntoExporterOutputTest(SubjectDTO subject) throws ExportException {
+			ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+
+			try {
+				writer = XMLOutputFactory.newInstance().createXMLStreamWriter(outStream, ENCODING);
+				writer.writeStartDocument(ENCODING, "1.0");
+				//write root element
+				writeDocumentStart(writer);
+
+				//create element names Map
+				parseElemNames();
+
+				elementKeys = elements.keySet().toArray(new String[elements.size()]);
+
+				//test this method
+				super.writeSubjectIntoExporterOutput(subject);
+				
+				writeDocumentEnd(writer);
+
+				writer.flush();
+			} catch (XMLStreamException e) {
+				throw new ExportException(e.toString(), e);
+			} catch (FactoryConfigurationError e) {
+				throw new ExportException(e.toString(), e);
+			}
+			finally{
+				if(writer!=null){
+					try { writer.close();}catch (XMLStreamException e) {}
+				}
+			}
+			return new ByteArrayInputStream(outStream.toByteArray());
+			
 		}
 	}
 }

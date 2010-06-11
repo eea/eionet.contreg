@@ -3,6 +3,8 @@
  */
 package eionet.cr.util.exporter;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -11,46 +13,36 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 
 import junit.framework.TestCase;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import eionet.cr.common.Predicates;
+import eionet.cr.dao.DAOException;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Pair;
 import eionet.cr.util.export.ExportException;
 import eionet.cr.util.export.XmlElementMetadata;
 import eionet.cr.util.export.XmlExporter;
+import eionet.cr.util.export.XmlUtil;
 
 /**
- * @author Enriko Käsper, TietoEnator Estonia AS
+ * @author Enriko Käsper, Tieto Estonia AS
  * XMLExporterTest
  */
 
 public class XMLExporterTest  extends TestCase {
 
-	@Test
-	public void testEscapeElementName(){
-		MockXmlExporter exporter = new MockXmlExporter();
-		assertEquals(exporter.getEscapedElementNameTest("1invalidElem"),"_1invalidElem");
-		assertEquals(exporter.getEscapedElementNameTest("xmlElem"),"_xmlElem");
-		assertEquals(exporter.getEscapedElementNameTest(".Elem"),"_Elem");
-
-		assertEquals(exporter.getEscapedElementNameTest("test:Elem1"),"test_Elem1");
-		assertEquals(exporter.getEscapedElementNameTest("test.Elem"),"test_Elem");
-		assertEquals(exporter.getEscapedElementNameTest("elem#"),"elem_");
-		assertEquals(exporter.getEscapedElementNameTest("elem?"),"elem_");
-		assertEquals(exporter.getEscapedElementNameTest("elem1  and  elem2"),"elem1__and__elem2");
-
-		assertEquals(exporter.getEscapedElementNameTest("elem***"),"elem___");
-		assertEquals(exporter.getEscapedElementNameTest(""),XmlExporter.INVALID_ELEMENT_NAME);
-	}
 	@Test
 	public void testGetUniqueElementName(){
 		MockXmlExporter exporter = new MockXmlExporter();
@@ -69,19 +61,16 @@ public class XMLExporterTest  extends TestCase {
 		assertEquals(exporter.getUniqueElementNameTest("elemThree"),"elemThree_3");
 		assertEquals(exporter.getUniqueElementNameTest("ELEMONE"),"ELEMONE_1");
 		assertEquals(exporter.getUniqueElementNameTest("ELEMTWO"),"ELEMTWO_2");
-		assertEquals(exporter.getUniqueElementNameTest(""),XmlExporter.INVALID_ELEMENT_NAME);
+		assertEquals(exporter.getUniqueElementNameTest(""),XmlUtil.INVALID_ELEMENT_NAME);
 		
 	}
-	@Test
-	public void testDoExport() throws XMLStreamException, ExportException, IOException{
+	@Ignore
+	public void testDoExport() throws Exception{
 		
 		//fill in search data
-		List<SubjectDTO> subjectsList = new ArrayList<SubjectDTO>();
 		SubjectDTO subject = new SubjectDTO("http://www.google.com",true);
 		subject.addObject(Predicates.RDFS_LABEL, new ObjectDTO("labelValue", false));
 		subject.addObject("comment", new ObjectDTO("commentValue", false));
-		subjectsList.add(subject);
-		Pair<Integer,List<SubjectDTO>> searchParameters = new Pair<Integer,List<SubjectDTO>>(subjectsList.size(),subjectsList);
 		List<Pair<String, String>> selectedColumns = new ArrayList<Pair<String,String>>();
 		selectedColumns.add(new Pair<String,String>("comment", null));
 
@@ -89,7 +78,9 @@ public class XMLExporterTest  extends TestCase {
 		MockXmlExporter exporter = new MockXmlExporter();
 		exporter.setSelectedColumns(selectedColumns);
 		exporter.setExportResourceUri(true);
-		InputStream in = exporter.doExport(searchParameters);
+		//exporter.setSelectedFilters(searchParameters);
+		
+		InputStream in = exporter.writeSubjectIntoExporterOutputTest(subject);
 		
 		List<String> xmlElements = new ArrayList<String>();
 		List<String> xmlCharacters = new ArrayList<String>();
@@ -128,29 +119,48 @@ public class XMLExporterTest  extends TestCase {
 	 */
 	class MockXmlExporter extends XmlExporter {
 
-		/**
-		 * Override getDataset and construct the result of xml-rpc method (DDServiceClient.getDataset())
-		 * 
-		 */
-
-		Map<String, XmlElementMetadata> elements;
 		public MockXmlExporter() {
 			super();
-		}
-		public Map<String, XmlElementMetadata> getElements(){
-			return elements;
 		}
 		public void setElements(Map<String,XmlElementMetadata> elements){
 			this.elements = elements;
 		}
-		public InputStream doExport(Pair<Integer, List<SubjectDTO>> customSearch) throws ExportException, IOException {
-			return super.doExport(customSearch);
-		}
-		public String getEscapedElementNameTest(String elementName){
-			return super.getEscapedElementName(elementName);
-		}
 		public String getUniqueElementNameTest(String elementName){
 			return super.getUniqueElementName(elementName);
+		}
+		
+		public InputStream writeSubjectIntoExporterOutputTest(SubjectDTO subject) throws ExportException {
+			ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+
+			try {
+				writer = XMLOutputFactory.newInstance().createXMLStreamWriter(outStream, ENCODING);
+				writer.writeStartDocument(ENCODING, "1.0");
+				//write root element
+				writeDocumentStart(writer);
+
+				//create element names Map
+				parseElemNames();
+
+				elementKeys = elements.keySet().toArray(new String[elements.size()]);
+
+				//test this method
+				super.writeSubjectIntoExporterOutput(subject);
+				
+				writeDocumentEnd(writer);
+
+				writer.flush();
+			} catch (XMLStreamException e) {
+				throw new ExportException(e.toString(), e);
+			} catch (FactoryConfigurationError e) {
+				throw new ExportException(e.toString(), e);
+			}
+			finally{
+				if(writer!=null){
+					try { writer.close();}catch (XMLStreamException e) {}
+				}
+			}
+			return new ByteArrayInputStream(outStream.toByteArray());
+			
 		}
 	}
 }
