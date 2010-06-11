@@ -36,6 +36,7 @@ import eionet.cr.dao.util.UriLabelPair;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.RawTripleDTO;
 import eionet.cr.dto.SubjectDTO;
+import eionet.cr.dto.UserBookmarkDTO;
 import eionet.cr.harvest.statistics.dto.HarvestUrgencyScoreDTO;
 import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
 import eionet.cr.util.Hashes;
@@ -916,6 +917,11 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 	@Override
 	public void deleteUserBookmark(CRUser user, String url) throws DAOException {
 		
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Method not implemented");
+	}
+	@Override
+	public List<UserBookmarkDTO> getUserBookmarks(CRUser user) throws DAOException{
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("Method not implemented");
 	}

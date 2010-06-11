@@ -14,6 +14,7 @@ import eionet.cr.dao.util.SubProperties;
 import eionet.cr.dao.util.UriLabelPair;
 import eionet.cr.dto.RawTripleDTO;
 import eionet.cr.dto.SubjectDTO;
+import eionet.cr.dto.UserBookmarkDTO;
 import eionet.cr.harvest.statistics.dto.HarvestUrgencyScoreDTO;
 import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
 import eionet.cr.util.Pair;
@@ -235,5 +236,14 @@ public interface HelperDAO extends DAO {
 	 * @throws DAOException
 	 */
 	public void deleteUserBookmark(CRUser user, String url) throws DAOException;
+
+	
+	/**
+	 * 
+	 * @param user
+	 * @param url
+	 * @throws DAOException
+	 */
+	public List<UserBookmarkDTO> getUserBookmarks(CRUser user) throws DAOException;
 
 }

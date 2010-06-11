@@ -62,6 +62,7 @@ import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.RawTripleDTO;
 import eionet.cr.dto.SubjectDTO;
+import eionet.cr.dto.UserBookmarkDTO;
 import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.harvest.statistics.dto.HarvestUrgencyScoreDTO;
 import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
@@ -1188,5 +1189,18 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		userHomeItemSubject.addObject(Predicates.CR_BOOKMARK, objectDTO);
 		
 		deleteTriples(userHomeItemSubject);
+	}
+	
+	@Override
+	public List<UserBookmarkDTO> getUserBookmarks(CRUser user) throws DAOException{
+		// Mocking the output for testing
+		List<UserBookmarkDTO> mockList = new ArrayList<UserBookmarkDTO>();
+
+		UserBookmarkDTO mockItem1 = new UserBookmarkDTO();
+		mockItem1.setBookmarkUrl("http://www.gutenberg.org/dirs/1/2/8/2/12826/12826-h.zip");
+		
+		mockList.add(mockItem1);
+		
+		return mockList;
 	}
 }
