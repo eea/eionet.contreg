@@ -16,7 +16,7 @@
  * (C) European Environment Agency.  All Rights Reserved.
  *
  * Contributor(s):
- * Jaanus Heinlaid, Tieto Eesti
+ * Enriko Käsper, Tieto Eesti
  */
 package eionet.cr.util.sql;
 
@@ -24,15 +24,23 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
+import eionet.cr.util.export.ExportException;
+import eionet.cr.util.export.SubjectExportEvent;
+
 /**
  * 
- * @author heinljab
+ * @author kaspeenr
  *
  */
-public abstract class ResultSetBaseReader implements ResultSetReader{
+public abstract class ResultSetExportReader implements ResultSetReader{
 	
 	/** */
 	protected ResultSetMetaData rsMd = null;
+	protected SubjectExportEvent exporter = null;
+
+	public ResultSetExportReader(SubjectExportEvent exporter){
+		this.exporter = exporter;		
+	}
 
 	/**
 	 * 
@@ -47,6 +55,6 @@ public abstract class ResultSetBaseReader implements ResultSetReader{
 	 * @param rs
 	 * @throws SQLException 
 	 */
-	public abstract void readRow(ResultSet rs) throws SQLException;
+	public abstract void readRow(ResultSet rs) throws SQLException, ExportException;
 	
 }

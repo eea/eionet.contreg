@@ -164,7 +164,7 @@ public class FilteredSearchHelper extends AbstractSearchHelper{
 	public String getUnorderedQuery(List<Object> inParams) {
 		return getUnorderedQuery(inParams, "select distinct SPO1.SUBJECT as SUBJECT_HASH from " + getSpoTableName()+ " as SPO1 ");
 	}		
-	private String getUnorderedQuery(List<Object> inParams, String selectPart) {
+	protected String getUnorderedQuery(List<Object> inParams, String selectPart) {
 		// start the query with the selection of fields and the join to ordering table
 		
 		StringBuffer query = new StringBuffer().

@@ -25,7 +25,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.xml.stream.FactoryConfigurationError;
@@ -34,6 +33,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import eionet.cr.common.Predicates;
+import eionet.cr.dao.DAOException;
+import eionet.cr.dao.readers.SubjectExportReader;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.FormatUtils;
 import eionet.cr.util.Pair;
@@ -43,64 +44,40 @@ import eionet.cr.util.Pair;
  * XmlExporter
  */
 
-public class XmlExporter extends Exporter {
+public class XmlExporter extends Exporter implements SubjectExportEvent{
 
-	private static final String ENCODING = "UTF-8";
+	protected static final String ENCODING = "UTF-8";
 	protected static final String ROOT_ELEMENT = "root";
 	protected static final String DATA_ROOT_ELEMENT = "dataroot";
 	protected static final String ROW_ELEMENT = "resources";
 
-	public static final String INVALID_ELEMENT_NAME = "unknown";
-	
-	private Map<String, XmlElementMetadata> elements=null;
-	
+	protected XMLStreamWriter writer = null;
+
+
+	protected Map<String, XmlElementMetadata> elements=null;
+	protected String[] elementKeys = null;
+
 	@Override
-	protected InputStream doExport(Pair<Integer, List<SubjectDTO>> customSearch) throws ExportException, IOException {
-		
+	protected InputStream doExport() throws ExportException, IOException, DAOException {
+
 		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-		XMLStreamWriter writer = null;
-		
+
 		try{
 			writer = XMLOutputFactory.newInstance().createXMLStreamWriter(outStream, ENCODING);
 			writer.writeStartDocument(ENCODING, "1.0");
 			//write root element
 			writeDocumentStart(writer);
-			
+
 			//create element names Map
 			parseElemNames();
-			
-			String[] elementKeys = elements.keySet().toArray(new String[elements.size()]);
-			XmlElementMetadata elementMetada = null;
-			
-			// write data rows
-			for(SubjectDTO subject : customSearch.getRight()) {				
 
-				//write row start element
-				writer.writeStartElement(ROW_ELEMENT);
+			elementKeys = elements.keySet().toArray(new String[elements.size()]);
 
-				//get uri or label value
-				String uriOrLabelValue = getUriOrLabelValue(subject);
-					
-				elementMetada = elements.get(elementKeys[0]);
-				//write uri or label element
-				writeSimpleDataElement(writer, elementMetada.getName(), uriOrLabelValue);
-				elementMetada.setMaxLength(uriOrLabelValue.length());
+			SubjectExportReader reader = new SubjectExportReader(this);			
+			doExportQueryAndWriteDataIntoOutput(reader);
 
-				//write other elements
-				int elementIndex= 1;
-				for(Pair<String,String> columnPair : getSelectedColumns()) {
-					String value = FormatUtils.getObjectValuesForPredicate(columnPair.getLeft(), subject, getLanguages());
-					elementMetada = elements.get(elementKeys[elementIndex++]);
-					writeSimpleDataElement(writer, elementMetada.getName(), value); 
-					elementMetada.setMaxLength(value.length());
-					elementMetada.setType(value);
-				}
-				
-				writer.writeEndElement();
-			}
-			
 			writeDocumentEnd(writer);
-			
+
 			writer.flush();
 		} catch (XMLStreamException e) {
 			throw new ExportException(e.toString(), e);
@@ -113,19 +90,53 @@ public class XmlExporter extends Exporter {
 			}
 		}
 		//System.out.println(new String(outStream.toByteArray()));
-		
+
 		return new ByteArrayInputStream(outStream.toByteArray());
 	}
-	
+
+	/**
+	 * call-back method implements 
+	 */
+	public void writeSubjectIntoExporterOutput(SubjectDTO subject) throws ExportException {
+
+		try{
+			//	write row start element
+			writer.writeStartElement(ROW_ELEMENT);
+
+			//get uri or label value
+			String uriOrLabelValue = getUriOrLabelValue(subject);
+
+			XmlElementMetadata elementMetada = elements.get(elementKeys[0]);
+			//write uri or label element
+			XmlUtil.writeSimpleDataElement(writer, elementMetada.getName(), uriOrLabelValue);
+			elementMetada.setMaxLength(uriOrLabelValue.length());
+
+			//write other elements
+			int elementIndex= 1;
+			for(Pair<String,String> columnPair : getSelectedColumns()) {
+				//label is already written
+				if(Predicates.RDFS_LABEL.equals(columnPair.getLeft())) continue;
+
+				String value = FormatUtils.getObjectValuesForPredicate(columnPair.getLeft(), subject, getLanguages());
+				elementMetada = elements.get(elementKeys[elementIndex++]);
+				XmlUtil.writeSimpleDataElement(writer, elementMetada.getName(), value); 
+				elementMetada.setMaxLength(value.length());
+				elementMetada.setType(value);
+			}
+
+			writer.writeEndElement();
+		}
+		catch(Exception e){
+			throw new ExportException(e.getMessage(), e);
+		}
+	}
+
+
 	/**
 	 * Create element names map
 	 */
-	private void parseElemNames() {
+	protected void parseElemNames() {
 
-		//if exporting with labels no need to export RDFS_LABEL
-		if (!isExportResourceUri()) {
-			getSelectedColumns().remove(new Pair<String,String>(Predicates.RDFS_LABEL, null));
-		}
 		//create the elements map, where the key is element name in lowercase and the value is escaped element value 
 		elements = new LinkedHashMap<String, XmlElementMetadata>();
 		//set Uri or Label element
@@ -133,10 +144,13 @@ public class XmlExporter extends Exporter {
 
 		//set other element names
 		for(Pair<String,String> columnPair : getSelectedColumns()) {
+			//label is already added to the list of elements
+			if(Predicates.RDFS_LABEL.equals(columnPair.getLeft())) continue;
+			
 			String element = columnPair.getRight() != null
-				? columnPair.getRight()
+			? columnPair.getRight()
 					: columnPair.getLeft();
-			String elemName = getUniqueElementName(getEscapedElementName(element));
+			String elemName = getUniqueElementName(XmlUtil.getEscapedElementName(element));
 			elements.put(elemName.toLowerCase(), new XmlElementMetadata(elemName));
 		}		
 	}
@@ -157,43 +171,11 @@ public class XmlExporter extends Exporter {
 		writer.writeEndElement();
 	}
 	/**
-	 * writes simple XML element with start tag, textual content and end tag
-	 * @param writer
-	 * @param element
-	 * @param value
-	 * @throws XMLStreamException
-	 */
-	protected void writeSimpleDataElement(XMLStreamWriter writer, String element, String value) throws XMLStreamException{		
-		writer.writeStartElement(element);
-		writer.writeCharacters(value);
-		writer.writeEndElement();
-	}
-	/**
 	 * returns the list of element names
 	 * @return
 	 */
 	public Map<String,XmlElementMetadata> getElements() {
 		return elements;
-	}
-	/**
-	 * Escape invalid characters that are not allowed in XML element names
-	 * if the name is not still valid, then replace it with INVALID_ELEMENT_NAME 
-	 *  
-	 */
-	protected String getEscapedElementName(String elementName){
-		
-		if(elementName==null || elementName.length()==0)  elementName=INVALID_ELEMENT_NAME;
-		
-		//replace whitespaces and other reserved characters with underscore
-		elementName = elementName.replaceAll("[^A-Za-z0-9_-]", "_");
-
-		//add leading unerscore if the name starts with invalid character or if it starts with xml (any case)
-		if(!elementName.substring(0,1).matches("[A-Z]|_|[a-z]")||
-				elementName.toLowerCase().startsWith("xml")){
-			elementName = "_" + elementName;
-		}
-			
-		return elementName;
 	}
 	/**
 	 * If the given element name already exists (case insensitive) in the list of element names, 
@@ -203,29 +185,30 @@ public class XmlExporter extends Exporter {
 	 * @return
 	 */
 	protected String getUniqueElementName(String elementName){
-		
-		if(elementName==null || elementName.length()==0)  elementName=INVALID_ELEMENT_NAME;
-		
+
+		if(elementName==null || elementName.length()==0)  elementName=XmlUtil.INVALID_ELEMENT_NAME;
+
 		if(getElements()!=null){
 			while (getElements().containsKey(elementName.toLowerCase())){
 				int dashPos = elementName.lastIndexOf( "_" );
 				if (dashPos>1 && dashPos<elementName.length()-1){
 					String snum = elementName.substring(dashPos+1);
-			          try{
-			        	  int inum = Integer.parseInt(snum);
-			        	  elementName = elementName.substring(0, dashPos ) + "_" + (inum+1);
-			          }
-			          catch(Exception e){
-			        	  elementName = elementName + "_1";
-			          }
-			      }
-			      else{
-		        	  elementName = elementName + "_1";
-			      }
+					try{
+						int inum = Integer.parseInt(snum);
+						elementName = elementName.substring(0, dashPos ) + "_" + (inum+1);
+					}
+					catch(Exception e){
+						elementName = elementName + "_1";
+					}
+				}
+				else{
+					elementName = elementName + "_1";
+				}
 			}
 		}
 		return elementName;
-			
+
 	}
+
 }
 

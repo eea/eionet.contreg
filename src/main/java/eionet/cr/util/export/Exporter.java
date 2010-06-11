@@ -36,13 +36,13 @@ import eionet.cr.common.CRRuntimeException;
 import eionet.cr.common.Predicates;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
-import eionet.cr.dao.SearchDAO;
-import eionet.cr.dao.postgre.PostgreSQLBaseDAO;
+import eionet.cr.dao.ExporterDAO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.FormatUtils;
 import eionet.cr.util.Pair;
 import eionet.cr.util.Util;
 import eionet.cr.util.pagination.PagingRequest;
+import eionet.cr.util.sql.ResultSetExportReader;
 
 /**
  * Utility class to handle export procedure.
@@ -72,8 +72,9 @@ public abstract class Exporter {
 	 * @param customSearch
 	 * @return
 	 * @throws IOException
+	 * @throws DAOException 
 	 */
-	protected abstract InputStream doExport(Pair<Integer, List<SubjectDTO>> customSearch) throws ExportException, IOException;
+	protected abstract InputStream doExport() throws ExportException, IOException, DAOException;
 
 	/**
 	 * Creates Exporter object for given export format 
@@ -104,27 +105,32 @@ public abstract class Exporter {
 		
 		long startTime = System.currentTimeMillis();
 		
-		Pair<Integer, List<SubjectDTO>> customSearch;
-		Map<String,String> criteria = new HashMap<String, String>();
-		for(Entry<String, String> entry : selectedFilters.entrySet()) {
-			criteria.put(StringUtils.trim(entry.getKey()), StringUtils.trim(entry.getValue()));
+		//add label into selected columns if not exist yet
+		Pair<String,String> labelPredicate = new Pair<String,String>(Predicates.RDFS_LABEL,null);
+		if(!selectedColumns.contains(labelPredicate)){
+			selectedColumns.add(labelPredicate);
 		}
-		customSearch = DAOFactory.get()
-				.getDao(SearchDAO.class)
-				.searchByTypeAndFilters(
-						criteria,
-						null,
-						getRowLimitPagingRequest(),
-						null,
-						getSelectedColumnsList());
-		InputStream result = null;
-		result = doExport(customSearch);
+		
+		InputStream result = doExport();
 		
 		logger.trace("Export process took: " + Util.durationSince(startTime));
 		
 		return result;
 	}
 	
+	public void doExportQueryAndWriteDataIntoOutput(ResultSetExportReader reader) throws DAOException{
+		Map<String,String> criteria = new HashMap<String, String>();
+		for(Entry<String, String> entry : selectedFilters.entrySet()) {
+			criteria.put(StringUtils.trim(entry.getKey()), StringUtils.trim(entry.getValue()));
+		}
+		// do the query and write data rows directly to export file
+		DAOFactory.get().getDao(ExporterDAO.class)
+			.exportByTypeAndFilters(
+				criteria,
+				getSelectedColumnsList(), 
+				reader);
+
+	}
 
 	/**
 	 * Returns the label of subject's uri or label depending on exportResourceUri value 

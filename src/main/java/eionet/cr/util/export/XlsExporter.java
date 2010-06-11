@@ -24,7 +24,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -35,6 +34,8 @@ import org.apache.poi.ss.usermodel.Font;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.config.GeneralConfig;
+import eionet.cr.dao.DAOException;
+import eionet.cr.dao.readers.SubjectExportReader;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.FormatUtils;
 import eionet.cr.util.Pair;
@@ -45,10 +46,13 @@ import eionet.cr.util.pagination.PagingRequest;
  * XlsExporter
  */
 
-public class XlsExporter extends Exporter {
+public class XlsExporter extends Exporter implements SubjectExportEvent {
 
 	//config param in cr.properties
 	private static final String EXPORT_ROW_LIMIT = "exporter.xls.row.limit";
+	private HSSFSheet sheet;
+	int rowNumber = 1;
+	int[] columnWidth;
 
 	/**
 	 * exports custom search to XLS format.
@@ -56,92 +60,86 @@ public class XlsExporter extends Exporter {
 	 * @param customSearch
 	 * @return
 	 * @throws IOException
+	 * @throws DAOException 
 	 */
-	protected InputStream doExport(Pair<Integer, List<SubjectDTO>> customSearch) throws IOException {
+	protected InputStream doExport() throws IOException, DAOException {
 		HSSFWorkbook workbook = new HSSFWorkbook();
-		HSSFSheet sheet = workbook.createSheet("exported data");
-		
+		sheet = workbook.createSheet("exported data");
+
 		//some pretty print with headers
 		CellStyle headerStyle = workbook.createCellStyle();
 		Font headerFont = workbook.createFont();
 		headerFont.setBoldweight(Font.BOLDWEIGHT_BOLD);
 		headerStyle.setFont(headerFont);
-		
-		//if exporting with labels no need to export RDFS_LABEL
-		if (!isExportResourceUri()) {
-			getSelectedColumns().remove(new Pair<String,String>(Predicates.RDFS_LABEL, null));
-		}
-		
+
 		//output headers
 		HSSFRow headers = sheet.createRow(0);
 		//store width of each column +1 for Uri or Label column
-		int[] columnWidth = new int[getSelectedColumns().size() + 1];
+		columnWidth = new int[getSelectedColumns().size() + 1];
 		//output Uri or Label column
 		String uriOrLabelColumn = getUriOrLabel();
-		
+
 		columnWidth[0] = uriOrLabelColumn.length();
 		HSSFCell uriOrLabelCell= headers.createCell(0);
-		setCellValue(uriOrLabelCell, uriOrLabelColumn).setCellStyle(headerStyle);
+		XlsUtil.setCellValue(uriOrLabelCell, uriOrLabelColumn);
+		uriOrLabelCell.setCellStyle(headerStyle);
 
 		//output rest of the headers
 		int columnNumber= 1;
 		for(Pair<String,String> columnPair : getSelectedColumns()) {
+			//label is already added to the list of elements
+			if(Predicates.RDFS_LABEL.equals(columnPair.getLeft())) continue;
+
 			String column = columnPair.getRight() != null
-						? columnPair.getRight()
-						: columnPair.getLeft();
+			? columnPair.getRight()
+					: columnPair.getLeft();
 			columnWidth[columnNumber] = column.length();
 			HSSFCell cell = headers.createCell(columnNumber++);
-			setCellValue(cell, column).setCellStyle(headerStyle);
+			XlsUtil.setCellValue(cell, column);
+			cell.setCellStyle(headerStyle);
 		}
 		sheet.createFreezePane(0, 1);
-		
-		//output serarch results
-		int rowNumber = 1;
-		for(SubjectDTO subject : customSearch.getRight()) {
-			HSSFRow row = sheet.createRow(rowNumber++);
-			
-			//output uri or label column value
-			String value = getUriOrLabelValue(subject);
-			
-			columnWidth[0] = Math.max(columnWidth[0], value.length());
-			setCellValue(row.createCell(0), value);
 
-			//output other columns
-			columnNumber = 1;
-			for(Pair<String,String> columnPair : getSelectedColumns()) {
-				value = FormatUtils.getObjectValuesForPredicate(columnPair.getLeft(), subject, getLanguages());
-				columnWidth[columnNumber] = Math.max(columnWidth[columnNumber], value.length());
-				setCellValue(row.createCell(columnNumber++), value);
-			}
-		}
-		
+		//output serarch results
+		SubjectExportReader reader = new SubjectExportReader(this);			
+		doExportQueryAndWriteDataIntoOutput(reader);
+
 		//set column width
 		for (int i = 0; i < getSelectedColumns().size() + 1; i++) {
 			sheet.setColumnWidth(i, Math.min(256 * columnWidth[i], 256*255));				
 		}
-		
+
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
 		workbook.write(output);
 		return new ByteArrayInputStream(output.toByteArray());
 	}
-	
-	private HSSFCell setCellValue(HSSFCell cell, String stringValue) {
-		Double value = null;
-		try {
-			value = new Double(stringValue);
-		} catch (Exception ignored) {}
-		if (value != null) {
-			cell.setCellValue(value);
-		} else {
-			cell.setCellValue(stringValue == null
-					? "" 
-					: stringValue);
-		}
-		return cell;
+
+	/**
+	 * call-back method
+	 */
+	public void writeSubjectIntoExporterOutput(SubjectDTO subject) throws ExportException {
+		HSSFRow row = sheet.createRow(rowNumber++);
+
+		//output uri or label column value
+		String value = getUriOrLabelValue(subject);
+
+		columnWidth[0] = Math.max(columnWidth[0], value.length());
+		XlsUtil.setCellValue(row.createCell(0), value);
+
+		//output other columns
+		int columnNumber = 1;
+		for(Pair<String,String> columnPair : getSelectedColumns()) {
+			//label is already written
+			if(Predicates.RDFS_LABEL.equals(columnPair.getLeft())) continue;
+
+			value = FormatUtils.getObjectValuesForPredicate(columnPair.getLeft(), subject, getLanguages());
+			columnWidth[columnNumber] = Math.max(columnWidth[columnNumber], value.length());
+			XlsUtil.setCellValue(row.createCell(columnNumber++), value);
+		}		
 	}
 	@Override
 	protected PagingRequest getRowLimitPagingRequest(){
-		
+
 		if(getRowsLimit()>0){
 			return PagingRequest.create(1,getRowsLimit());
 		}
@@ -152,5 +150,4 @@ public class XlsExporter extends Exporter {
 	public static Integer getRowsLimit(){
 		return new Integer(GeneralConfig.getRequiredProperty(EXPORT_ROW_LIMIT));
 	}
-
 }

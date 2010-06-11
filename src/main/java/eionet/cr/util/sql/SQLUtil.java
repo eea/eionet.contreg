@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 import eionet.cr.common.CRException;
+import eionet.cr.util.export.ExportException;
 
 /**
  * 
@@ -68,8 +69,8 @@ public class SQLUtil {
 	 * @param conn
 	 * @throws SQLException
 	 */
-	public static void executeQuery(String parameterizedSQL, List<?> values, ResultSetBaseReader rsReader, Connection conn)
-																											throws SQLException{
+	public static void executeQuery(String parameterizedSQL, List<?> values, ResultSetReader rsReader, Connection conn)
+																											throws SQLException, ExportException{
 		ResultSet rs = null;
 		PreparedStatement pstmt = null;
 		try{

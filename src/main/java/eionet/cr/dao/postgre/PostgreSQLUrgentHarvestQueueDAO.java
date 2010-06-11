@@ -31,7 +31,6 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.UrgentHarvestQueueDAO;
 import eionet.cr.dao.readers.HarvestQueueItemDTOReader;
 import eionet.cr.dto.UrgentHarvestQueueItemDTO;
-import eionet.cr.util.sql.DbConnectionProvider;
 import eionet.cr.util.sql.SQLUtil;
 
 /**
@@ -129,7 +128,7 @@ public class PostgreSQLUrgentHarvestQueueDAO extends PostgreSQLBaseDAO implement
 			
 			return queueItem;
 		}
-		catch (SQLException e){
+		catch (Exception e){
 			throw new DAOException(e.getMessage(), e);
 		}
 		finally{
@@ -145,7 +144,7 @@ public class PostgreSQLUrgentHarvestQueueDAO extends PostgreSQLBaseDAO implement
 	 * @return
 	 * @throws SQLException
 	 */
-	private static UrgentHarvestQueueItemDTO peek(Connection conn) throws SQLException{
+	private static UrgentHarvestQueueItemDTO peek(Connection conn) throws Exception{
 		
 		List<Object> values = new ArrayList<Object>();
 				

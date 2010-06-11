@@ -134,7 +134,7 @@ public class MySQLUrgentHarvestQueueDAO extends MySQLBaseDAO implements UrgentHa
 			
 			return queueItem;
 		}
-		catch (SQLException e){
+		catch (Exception e){
 			throw new DAOException(e.getMessage(), e);
 		}
 		finally{
@@ -150,7 +150,7 @@ public class MySQLUrgentHarvestQueueDAO extends MySQLBaseDAO implements UrgentHa
 	 * @return
 	 * @throws SQLException
 	 */
-	private static UrgentHarvestQueueItemDTO peek(Connection conn) throws SQLException{
+	private static UrgentHarvestQueueItemDTO peek(Connection conn) throws Exception{
 		
 		List<Object> values = new ArrayList<Object>();
 				

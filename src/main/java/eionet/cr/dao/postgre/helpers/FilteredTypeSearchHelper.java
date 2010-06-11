@@ -20,6 +20,7 @@
  */
 package eionet.cr.dao.postgre.helpers;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -80,4 +81,7 @@ public class FilteredTypeSearchHelper extends FilteredSearchHelper {
 	protected int getSpoTableIndex(){
 		return 2;
 	}
+	public String getUnorderedQueryWithoutDistinct(List<Object> inParams) {
+		return getUnorderedQuery(inParams, "select SPO1.SUBJECT as SUBJECT_HASH from " + getSpoTableName()+ " as SPO1 ");
+	}		
 }

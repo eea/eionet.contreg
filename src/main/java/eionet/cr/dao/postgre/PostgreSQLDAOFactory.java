@@ -23,12 +23,13 @@ package eionet.cr.dao.postgre;
 import java.util.HashMap;
 import java.util.Map;
 
+import eionet.cr.dao.DAO;
 import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.ExporterDAO;
 import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dao.HarvestMessageDAO;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
-import eionet.cr.dao.DAO;
 import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.UrgentHarvestQueueDAO;
 
@@ -63,6 +64,7 @@ public final class PostgreSQLDAOFactory extends DAOFactory{
 		registeredDaos.put(HelperDAO.class, PostgreSQLHelperDAO.class);
 		registeredDaos.put(SearchDAO.class, PostgreSQLSearchDAO.class);
 		registeredDaos.put(UrgentHarvestQueueDAO.class, PostgreSQLUrgentHarvestQueueDAO.class);
+		registeredDaos.put(ExporterDAO.class, PostgreSQLExporterDAO.class);
 	}
 
 	/**

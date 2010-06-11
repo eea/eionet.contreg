@@ -284,13 +284,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 				}
 			}
 
-			// use temp tables for quering all the subjects
-			if(list.size()>1000){
-				subjects = getSubjectsDataWithTempTable(reader, helper.getUnorderedQuery(inParams));
-			}
-			else{
-				subjects = getSubjectsData(reader);
-			}
+			subjects = getSubjectsData(reader);
 		}
 		// if paging required, get the total number of found subjects too
 		if (pagingRequest!=null){
