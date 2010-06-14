@@ -400,10 +400,13 @@ public class SubjectDTO implements Serializable{
 	 */
 	public boolean existsPredicateObjectSource(String predicate, String objectValue, String sourceUri){
 		
-		for (ObjectDTO objectDTO:getObjects(predicate)){
-			if (objectDTO.getValue().equals(objectValue)){
-				if (objectDTO.getSourceUri().equals(sourceUri)){
-					return true;
+		Collection<ObjectDTO> objects = getObjects(predicate);
+		if (objects!=null && !objects.isEmpty()){
+			for (ObjectDTO objectDTO:objects){
+				if (objectDTO.getValue().equals(objectValue)){
+					if (objectDTO.getSourceUri().equals(sourceUri)){
+						return true;
+					}
 				}
 			}
 		}
