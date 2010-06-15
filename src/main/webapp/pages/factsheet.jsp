@@ -81,13 +81,20 @@
 						    			
 				    					<c:if test="${ !actionBean.urlUserBookmark }">
 				    						<li>
-						    				<stripes:link class="link-plain" href="/factsheet.action?addbookmark=&uri=${ subjectUrl }">Add bookmark</stripes:link>
+						    				<stripes:link class="link-plain" href="/factsheet.action">Add bookmark
+						    				<stripes:param name="addbookmark" value="" />
+						    				<stripes:param name="uri" value="${ subjectUrl }" />
+						    				</stripes:link>
 						    				</li>
 				    					</c:if>
 				    					
 				    					<c:if test="${ actionBean.urlUserBookmark }">
 				    						<li>
-						    				<stripes:link class="link-plain" href="/factsheet.action?removebookmark=&uri=${ subjectUrl }">Remove bookmark</stripes:link>
+						    				<stripes:link class="link-plain" href="/factsheet.action">Remove bookmark
+						    				<stripes:param name="removebookmark" value="" />
+						    				<stripes:param name="uri" value="${ subjectUrl }" />
+						    				</stripes:link>
+						    				
 						    				</li>
 				    					</c:if>
 				    					

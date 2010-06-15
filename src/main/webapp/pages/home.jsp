@@ -35,7 +35,9 @@
 						
 								<display:table name="${actionBean.bookmarks}" class="sortable" pagesize="20" sort="list" id="bookmark" htmlId="bookmarks" requestURI="${actionBean.urlBinding}" style="width:100%">
 									<display:column title="URL" sortable="false">
-										<stripes:link href="/factsheet.action?uri=${bookmark.bookmarkUrl}">${bookmark.bookmarkUrl}</stripes:link>
+										<stripes:link href="/factsheet.action">${bookmark.bookmarkUrl}
+											<stripes:param name="uri" value="${bookmark.bookmarkUrl}" />										
+										</stripes:link>
 									</display:column>
 								</display:table>
 							</c:when>
