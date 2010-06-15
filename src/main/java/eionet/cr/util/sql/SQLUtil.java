@@ -60,7 +60,31 @@ public class SQLUtil {
 			SQLUtil.close(stmt);
 		}
 	}
-	
+
+	/**
+	 * 
+	 * @param parameterizedSQL
+	 * @param values
+	 * @param conn
+	 * @return
+	 * @throws SQLException
+	 */
+	public static Object executeSingleReturnValueQuery(
+			String parameterizedSQL, List<?> values, Connection conn) throws SQLException{
+		
+		ResultSet rs = null;
+		PreparedStatement pstmt = null;
+		try{
+			pstmt = prepareStatement(parameterizedSQL, values, conn);
+			rs = pstmt.executeQuery();
+			return (rs!=null && rs.next()) ? rs.getObject(1) : null;
+		}
+		finally{
+			SQLUtil.close(rs);
+			SQLUtil.close(pstmt);
+		}
+	}
+
 	/**
 	 * 
 	 * @param parameterizedSQL

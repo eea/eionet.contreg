@@ -931,6 +931,12 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("Method not implemented");
 	}
+
+	@Override
+	public void updateUserHistory(CRUser user, String url) throws DAOException {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Method not implemented");
+	}
 }
 
 

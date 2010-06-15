@@ -65,6 +65,7 @@ public interface Predicates {
 	public static final String CR_LAST_REFRESHED = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#lastRefreshed";
 	public static final String CR_BOOKMARK = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#userBookmark";
 	public static final String CR_SAVETIME = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#userSaveTime";
+	public static final String CR_HISTORY = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#userHistory";
 	public static final String CR_TAG = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#tag";
 	public static final String CR_COMMENT = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#comment";
 	public static final String CR_HAS_SOURCE = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#hasSource";

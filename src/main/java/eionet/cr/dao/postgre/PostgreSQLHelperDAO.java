@@ -1135,7 +1135,11 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 			objectDTO = new ObjectDTO(Util.dateToString(new Date(), "yyyy-MM-dd'T'HH:mm:ss"), true);
 			objectDTO.setSourceUri(user.getHistoryUri());
 			userHomeItemSubject.addObject(Predicates.CR_SAVETIME, objectDTO);
-			
+
+			objectDTO = new ObjectDTO(url, false);
+			objectDTO.setSourceUri(user.getHistoryUri());
+			userHomeItemSubject.addObject(Predicates.CR_HISTORY, objectDTO);
+
 			// add the URL also into user's bookmarks if requested
 			
 			if (isBookmark){
@@ -1150,8 +1154,10 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 			// let the user home item subject URI be stored in RESOURCE
 			addResource(userHomeItemSubject.getUri(), user.getBookmarksUri());
 			
-			// store Predicates.CR_SAVETIME and user.getHistoryUri() in RESOURCE table 
-			addResource(Predicates.CR_SAVETIME, user.getRegistrationsUri());
+			// store Predicates.CR_SAVETIME, Predicates.CR_HISTORY and user.getHistoryUri()
+			// in RESOURCE table
+			addResource(Predicates.CR_SAVETIME, user.getHistoryUri());
+			addResource(Predicates.CR_HISTORY, user.getHistoryUri());
 			addResource(user.getHistoryUri(), user.getHistoryUri());
 			
 			// store Predicates.CR_BOOKMARK and user.getBookmarksUri() in RESOURCE table
@@ -1276,5 +1282,72 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		} else {
 			return true;
 		}
+	}
+
+	/** */
+	private static final String sqlDeleteUserSaveTime =
+		"delete from SPO where SUBJECT=? and PREDICATE=? and SOURCE=?";
+	private static final String sqlIsUrlInHistory =
+		"select count(*) from SPO where SUBJECT=? and PREDICATE=? and OBJECT_HASH=? and SOURCE=? " +
+		"and LIT_OBJ='N'";
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#updateUserSaveTime(eionet.cr.web.security.CRUser, java.lang.String)
+	 */
+	public void updateUserHistory(CRUser user, String url) throws DAOException {
+		
+		Connection conn = null;
+		try{
+			conn = getConnection();
+
+			// if URL not yet in user history, add it there
+			
+			List values = new ArrayList();
+			values.add(new Long(Hashes.spoHash(user.getHomeItemUri(url))));
+			values.add(new Long(Hashes.spoHash(Predicates.CR_HISTORY)));
+			values.add(new Long(Hashes.spoHash(url)));
+			values.add(new Long(Hashes.spoHash(user.getHistoryUri())));
+			
+			Object o = SQLUtil.executeSingleReturnValueQuery(sqlIsUrlInHistory, values, conn);
+			if (o==null || o.toString().equals("0")){
+				
+				SubjectDTO userHomeItemSubject = new SubjectDTO(user.getHomeItemUri(url), false);
+				ObjectDTO objectDTO = new ObjectDTO(url, false);
+				objectDTO.setSourceUri(user.getHistoryUri());
+				userHomeItemSubject.addObject(Predicates.CR_HISTORY, objectDTO);
+				
+				addTriples(userHomeItemSubject);
+			}
+			
+			// delete the previous save-time first
+
+			values = new ArrayList();
+			values.add(new Long(Hashes.spoHash(user.getHomeItemUri(url))));
+			values.add(new Long(Hashes.spoHash(Predicates.CR_SAVETIME)));
+			values.add(new Long(Hashes.spoHash(user.getHistoryUri())));
+			
+			SQLUtil.executeUpdate(sqlDeleteUserSaveTime, values, conn);
+		}
+		catch (SQLException e){
+			throw new DAOException(e.toString(), e);
+		}
+		finally{
+			SQLUtil.close(conn);
+		}
+
+		// now add new save-time
+		
+		SubjectDTO userHomeItemSubject = new SubjectDTO(user.getHomeItemUri(url), false);
+		ObjectDTO objectDTO = new ObjectDTO(
+				Util.dateToString(new Date(), "yyyy-MM-dd'T'HH:mm:ss"), true);
+		objectDTO.setSourceUri(user.getHistoryUri());
+		userHomeItemSubject.addObject(Predicates.CR_SAVETIME, objectDTO);
+		
+		addTriples(userHomeItemSubject);
+		
+		addResource(Predicates.CR_SAVETIME, user.getHistoryUri());
+		addResource(Predicates.CR_HISTORY, user.getHistoryUri());
+		addResource(user.getHistoryUri(), user.getHistoryUri());
 	}
 }

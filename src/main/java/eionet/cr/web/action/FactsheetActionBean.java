@@ -288,10 +288,11 @@ public class FactsheetActionBean extends AbstractActionBean{
 		objectDTO.setSourceUri(getUser().getRegistrationsUri());		
 		subjectDTO.addObject(propertyUri, objectDTO);
 		
-		HelperDAO spoHelperDao = factory.getDao(HelperDAO.class);			 
-		spoHelperDao.addTriples(subjectDTO);
-		spoHelperDao.addResource(propertyUri, getUser().getRegistrationsUri());
-		spoHelperDao.addResource(getUser().getRegistrationsUri(), getUser().getRegistrationsUri());
+		HelperDAO helperDao = factory.getDao(HelperDAO.class);			 
+		helperDao.addTriples(subjectDTO);
+		helperDao.addResource(propertyUri, getUser().getRegistrationsUri());
+		helperDao.addResource(getUser().getRegistrationsUri(), getUser().getRegistrationsUri());
+		helperDao.updateUserHistory(getUser(), uri);
 		
 		return new RedirectResolution(this.getClass(), "edit").addParameter("uri", uri);
 	}
@@ -324,8 +325,9 @@ public class FactsheetActionBean extends AbstractActionBean{
 			
 			if (execute==true){
 				
-				HelperDAO spoHelperDao = factory.getDao(HelperDAO.class);			 
-				spoHelperDao.deleteTriples(subjectDTO);
+				HelperDAO helperDao = factory.getDao(HelperDAO.class);			 
+				helperDao.deleteTriples(subjectDTO);
+				helperDao.updateUserHistory(getUser(), uri);
 			}
 		}
 		
