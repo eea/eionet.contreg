@@ -1188,7 +1188,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 
 		SubjectDTO userHomeItemSubject = new SubjectDTO(user.getHomeItemUri(url), false);
 		ObjectDTO objectDTO = new ObjectDTO(url, false);
-		objectDTO.setSourceUri(user.getBookmarksUri());
+		objectDTO.setSourceHash(Hashes.spoHash(user.getBookmarksUri()));
 		userHomeItemSubject.addObject(String.valueOf(Hashes.spoHash(Predicates.CR_BOOKMARK)), objectDTO);
 		
 		deleteTriples(userHomeItemSubject);
