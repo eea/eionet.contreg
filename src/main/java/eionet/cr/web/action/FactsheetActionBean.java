@@ -266,7 +266,7 @@ public class FactsheetActionBean extends AbstractActionBean{
 	public Resolution removebookmark() throws DAOException{
 		if (isUserLoggedIn()){
 			DAOFactory.get().getDao(HelperDAO.class).deleteUserBookmark(getUser(), getUrl());
-			bookmarkOperationMessage = "Succesfully removed this source from bookmarks."+getUrl()+"/"+getUser().getUserName();
+			bookmarkOperationMessage = "Succesfully removed this source from bookmarks.";
 			recentBookmarkOperation = true;
 		} else {
 			bookmarkOperationMessage = "Only logged in users can remove bookmarks.";
