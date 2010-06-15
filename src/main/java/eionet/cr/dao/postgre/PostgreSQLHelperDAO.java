@@ -1227,4 +1227,39 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 
 		return returnBookmarks;
 	}
+	
+	@Override
+	public boolean isUrlUserBookmark(CRUser user, String url) throws DAOException{
+		String dbQuery = "select count(*) as cnt from SPO " +
+				"where OBJECT_HASH=" + Hashes.spoHash(url) + " and " +
+				"LIT_OBJ='N' and " +
+				"PREDICATE="+Hashes.spoHash(Predicates.CR_BOOKMARK)+ " and " +
+				"SOURCE="+ Hashes.spoHash(CRUser.bookmarksUri(user.getUserName())) + "";
+		
+		int count = 0;
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		try{
+			conn = getConnection();
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(dbQuery);
+			while (rs.next()){
+				count = Integer.parseInt(rs.getString("cnt")); 
+			}
+		}
+		catch (SQLException e){
+			throw new DAOException(e.toString(), e);
+		}
+		finally{
+			SQLUtil.close(rs);
+			SQLUtil.close(stmt);
+			SQLUtil.close(conn);
+		}
+		if (count == 0){
+			return false;
+		} else {
+			return true;
+		}
+	}
 }

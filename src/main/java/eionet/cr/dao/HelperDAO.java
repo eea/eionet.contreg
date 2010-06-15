@@ -245,5 +245,14 @@ public interface HelperDAO extends DAO {
 	 * @throws DAOException
 	 */
 	public List<UserBookmarkDTO> getUserBookmarks(CRUser user) throws DAOException;
+	
+	
+	/**
+	 * 
+	 * @param user
+	 * @param url
+	 * @throws DAOException
+	 */
+	public boolean isUrlUserBookmark(CRUser user, String url) throws DAOException;
 
 }

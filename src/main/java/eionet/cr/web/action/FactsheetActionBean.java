@@ -94,6 +94,11 @@ public class FactsheetActionBean extends AbstractActionBean{
 	private boolean urlFoundInHarvestSource = false;
 	private boolean adminLoggedIn = false;
 	
+	private boolean urlUserBookmark = false;
+	
+	private String bookmarkOperationMessage = "";
+	private boolean recentBookmarkOperation;
+	
 	/**
 	 * 
 	 * @return
@@ -236,6 +241,39 @@ public class FactsheetActionBean extends AbstractActionBean{
 		
 		return view();
 	}
+	
+	/**
+	 * 
+	 * @return
+	 * @throws DAOException
+	 */
+	public Resolution addbookmark() throws DAOException{
+		if (isUserLoggedIn()){
+			DAOFactory.get().getDao(HelperDAO.class).addUserBookmark(getUser(), getUrl());
+			bookmarkOperationMessage = "Succesfully bookmarked this page.";
+			recentBookmarkOperation = true;
+		} else {
+			bookmarkOperationMessage = "Only logged in users can bookmark sources.";
+		}
+		return view();
+	}
+	
+	/**
+	 * 
+	 * @return
+	 * @throws DAOException
+	 */
+	public Resolution removebookmark() throws DAOException{
+		if (isUserLoggedIn()){
+			DAOFactory.get().getDao(HelperDAO.class).deleteUserBookmark(getUser(), getUrl());
+			bookmarkOperationMessage = "Succesfully removed this source from bookmarks."+getUrl()+"/"+getUser().getUserName();
+			recentBookmarkOperation = true;
+		} else {
+			bookmarkOperationMessage = "Only logged in users can remove bookmarks.";
+		}
+		return view();
+	}
+	
 	
 	/**
 	 * 
@@ -496,5 +534,39 @@ public class FactsheetActionBean extends AbstractActionBean{
 
 	public void setAdminLoggedIn(boolean adminLoggedIn) {
 		this.adminLoggedIn = adminLoggedIn;
+	}
+
+	public boolean isUrlUserBookmark() {
+		if (isUserLoggedIn()){
+			try {
+				urlUserBookmark = factory.getDao(HelperDAO.class).isUrlUserBookmark(getUser(), getUrl());
+			} catch (DAOException ex){
+				urlUserBookmark = false;
+			}
+		} else {
+			urlUserBookmark = false;
+		}
+		
+		return urlUserBookmark;
+	}
+
+	public void setUrlUserBookmark(boolean urlUserBookmark) {
+		this.urlUserBookmark = urlUserBookmark;
+	}
+
+	public String getBookmarkOperationMessage() {
+		return bookmarkOperationMessage;
+	}
+
+	public void setBookmarkOperationMessage(String bookmarkOperationMessage) {
+		this.bookmarkOperationMessage = bookmarkOperationMessage;
+	}
+
+	public boolean isRecentBookmarkOperation() {
+		return recentBookmarkOperation;
+	}
+
+	public void setRecentBookmarkOperation(boolean recentBookmarkOperation) {
+		this.recentBookmarkOperation = recentBookmarkOperation;
 	}
 }

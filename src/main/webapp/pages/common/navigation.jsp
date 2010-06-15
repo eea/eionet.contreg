@@ -15,6 +15,7 @@
 			<li><a href="registerUrl.action" title="URL registration">URL registration</a></li>						
 			<li><a href="sources.action" title="Manage harvest sources">Harvest sources</a></li>
 			<li><a href="harvestQueue.action" title="Monitor harvest queue">Harvest queue</a></li>
+			<li><a href="home/${ actionBean.userName }" title="User Home">My Home</a></li>
 		</c:if>		
     </ul>
 </div>

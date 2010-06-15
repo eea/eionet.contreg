@@ -7,11 +7,6 @@
 	<stripes:layout-component name="contents">
 		<c:choose>
 			<c:when test="${actionBean.userAuthorized}" >
-			
-		        <h1>User Home</h1>
-		        
-		        <p>This page is your home, ${ actionBean.attemptedUserName }</p>
-		        
 		        <div id="tabbedmenu">
 				    <ul>
 				    	<c:forEach items="${actionBean.tabs}" var="tab">
@@ -38,12 +33,10 @@
 						<c:choose>
 							<c:when test="${not empty actionBean.bookmarks}">
 						
-								<display:table name="${actionBean.bookmarks}" class="sortable" pagesize="20" sort="list" id="queueItem" htmlId="queueItems" requestURI="${actionBean.urlBinding}" style="width:100%">
-								
-									<display:setProperty name="paging.banner.items_name" value="queue items"/>
-									
-									<display:column property="bookmarkUrl" title="URL" sortable="true"/>
-									
+								<display:table name="${actionBean.bookmarks}" class="sortable" pagesize="20" sort="list" id="bookmark" htmlId="bookmarks" requestURI="${actionBean.urlBinding}" style="width:100%">
+									<display:column title="URL" sortable="false">
+										<stripes:link href="/factsheet.action?uri=${bookmark.bookmarkUrl}">${bookmark.bookmarkUrl}</stripes:link>
+									</display:column>
 								</display:table>
 							</c:when>
 							<c:otherwise>
@@ -51,6 +44,11 @@
 							</c:otherwise>
 						</c:choose>
 					</c:if>
+					<c:if test="${actionBean.sectionWorkspace}">
+						<h1>User Home</h1>
+		        		<p>This page is your home, ${ actionBean.attemptedUserName }</p>
+					</c:if>
+		
 		
 				</div> 
 			</c:when>

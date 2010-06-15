@@ -34,6 +34,7 @@ public class HomeActionBean extends AbstractActionBean{
 	
 	private static final String TYPE_BOOKMARK = "bookmark";
 	private static final String TYPE_HISTORY = "history";
+	private static final String TYPE_WORKSPACE = "workspace";
 	
 	/** */
 	private String tabType;
@@ -53,7 +54,14 @@ public class HomeActionBean extends AbstractActionBean{
 	static {
 		tabs = new ArrayList<Map<String,String>>();
 		
-		Map<String,String> tabType = new HashMap<String,String>();
+		Map<String,String> tabType;
+
+		tabType = new HashMap<String,String>();
+		tabType.put("title", "Workspace");
+		tabType.put("tabType", "workspace");
+		tabs.add(tabType);
+		
+		tabType = new HashMap<String,String>();
 		tabType.put("title", "Bookmarks");
 		tabType.put("tabType", "bookmark");
 		tabs.add(tabType);
@@ -114,11 +122,11 @@ public class HomeActionBean extends AbstractActionBean{
 	private void setDefaultSection(){
 		if (section == null ||
 			!section.equals(TYPE_BOOKMARK)&&
+			!section.equals(TYPE_WORKSPACE)&&
 			!section.equals(TYPE_HISTORY)
 		){
-			section = TYPE_BOOKMARK;
+			section = TYPE_WORKSPACE;
 		}
-			
 	}
 	
 	/**
@@ -136,7 +144,7 @@ public class HomeActionBean extends AbstractActionBean{
 	public String getTabType() {
 		
 		if (tabType == null){
-			tabType = TYPE_BOOKMARK;
+			tabType = TYPE_WORKSPACE;
 		}
 		
 		return tabType;
@@ -144,7 +152,7 @@ public class HomeActionBean extends AbstractActionBean{
 	
 	public List<UserBookmarkDTO> getBookmarks() {
 		try {
-			bookmarks =DAOFactory.get().getDao(HelperDAO.class).getUserBookmarks(this.getUser());
+			bookmarks = DAOFactory.get().getDao(HelperDAO.class).getUserBookmarks(this.getUser());
 		} catch (DAOException ex){
 			
 		}
@@ -195,6 +203,14 @@ public class HomeActionBean extends AbstractActionBean{
 		}
 	}
 
+	public boolean isSectionWorkspace() {
+		if (section.equals(TYPE_WORKSPACE)){
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	public boolean isUserAuthorized() {
 		return userAuthorized;
 	}

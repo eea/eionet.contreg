@@ -77,6 +77,21 @@
 						    				<stripes:link class="link-plain" href="/source.action?view=&harvestSource.url=${ subjectUrl }">Source  details</stripes:link>
 						    				</li>
 						    			</c:if>
+						    			
+						    			
+				    					<c:if test="${ !actionBean.urlUserBookmark }">
+				    						<li>
+						    				<stripes:link class="link-plain" href="/factsheet.action?addbookmark=&uri=${ subjectUrl }">Add bookmark</stripes:link>
+						    				</li>
+				    					</c:if>
+				    					
+				    					<c:if test="${ actionBean.urlUserBookmark }">
+				    						<li>
+						    				<stripes:link class="link-plain" href="/factsheet.action?removebookmark=&uri=${ subjectUrl }">Remove bookmark</stripes:link>
+						    				</li>
+				    					</c:if>
+				    					
+				    					
 										
 									</ul>
 								</li>
@@ -84,12 +99,21 @@
 						</c:if>
 				    	<div style="margin-top:20px" id="wait_container">
 				    
+				    		<c:if test="${ actionBean.recentBookmarkOperation }">
+				    			<div class="advice-msg">${actionBean.bookmarkOperationMessage}</div>
+				    		</c:if>
+				    
 				    		<c:choose>
 				    			<c:when test="${actionBean.subject.anonymous}">
 				    				<div class="advice-msg">This is an anonymous resource!</div>
 				    			</c:when>
 				    			<c:when test="${subjectUrl!=null}">
-				    				<div><p>Resource URL: <a class="link-external" href="${fn:escapeXml(subjectUrl)}"><c:out value="${subjectUrl}"/></a></p></div>
+				    				<div><p>Resource URL: <a class="link-external" href="${fn:escapeXml(subjectUrl)}"><c:out value="${subjectUrl}"/></a>
+				    				<c:choose>
+				    					<c:when	test ="${ actionBean.urlUserBookmark }"> (Bookmarked)</c:when>
+				    				</c:choose></p></div>
+				    				
+				    				
 				    			</c:when>
 				    			<c:otherwise>
 				    				<div class="advice-msg" title="${fn:escapeXml(subjectUri)}">This is an unresolvable resource!</div>
