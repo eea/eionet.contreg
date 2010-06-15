@@ -1096,21 +1096,24 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 	 */
 	public void registerUserUrl(CRUser user, String url, boolean isBookmark) throws DAOException {
 		
+		// input arguments sanity checking
+		
 		if (user==null || StringUtils.isBlank(user.getUserName()))
 			throw new IllegalArgumentException("user must not be null and must have user name");
 		if (URLUtil.isURL(url)==false)
 			throw new IllegalArgumentException("url must not be null and must be valid URL");
 		
+		// get the subject that the user wants to register
 		SubjectDTO registeredSubject = getSubject(Hashes.spoHash(url));
 
 		// if subject did not exist or it isn't registered in user's registrations yet,
 		// then add the necessary triples
-		if (registeredSubject==null || !registeredSubject.existsPredicateObjectSource(
-				Predicates.RDF_TYPE, Subjects.CR_FILE, user.getRegistrationsUri())){
+		if (registeredSubject==null || !registeredSubject.isRegisteredBy(user)){
 			
 			boolean subjectFirstSeen = registeredSubject==null;
 			
 			// add the rdf:type=cr:File triple into user's registrations
+			
 			registeredSubject = new SubjectDTO(url, registeredSubject==null ? false : registeredSubject.isAnonymous());
 			ObjectDTO objectDTO = new ObjectDTO(Subjects.CR_FILE, false);
 			objectDTO.setSourceUri(user.getRegistrationsUri());
@@ -1118,20 +1121,22 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 			
 			addTriples(registeredSubject);
 			
-			// let the user registrations' URI be stored in RESOURCE
-			addResource(user.getRegistrationsUri(), user.getRegistrationsUri());
-			
 			// if this is the first time this subject is seen, store it in RESOURCE
 			if (subjectFirstSeen){
 				addResource(url, user.getRegistrationsUri());
 			}
-			
-			// add the URL into user's history, and also into user's bookmarks if requested
+
+			// let the user registrations' URI be stored in RESOURCE
+			addResource(user.getRegistrationsUri(), user.getRegistrationsUri());
+
+			// add the URL into user's history
 			
 			SubjectDTO userHomeItemSubject = new SubjectDTO(user.getHomeItemUri(url), false);
 			objectDTO = new ObjectDTO(Util.dateToString(new Date(), "yyyy-MM-dd'T'HH:mm:ss"), true);
 			objectDTO.setSourceUri(user.getHistoryUri());
 			userHomeItemSubject.addObject(Predicates.CR_SAVETIME, objectDTO);
+			
+			// add the URL also into user's bookmarks if requested
 			
 			if (isBookmark){
 				objectDTO = new ObjectDTO(url, false);
@@ -1139,14 +1144,21 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 				userHomeItemSubject.addObject(Predicates.CR_BOOKMARK, objectDTO);
 			}
 			
+			// store the history and bookmark triples
 			addTriples(userHomeItemSubject);
 
 			// let the user home item subject URI be stored in RESOURCE
 			addResource(userHomeItemSubject.getUri(), user.getBookmarksUri());
 			
-			// let the save-time and bookmark predicates be stored in RESOURCE
-			addResource(Predicates.CR_BOOKMARK, user.getRegistrationsUri());
+			// store Predicates.CR_SAVETIME and user.getHistoryUri() in RESOURCE table 
 			addResource(Predicates.CR_SAVETIME, user.getRegistrationsUri());
+			addResource(user.getHistoryUri(), user.getHistoryUri());
+			
+			// store Predicates.CR_BOOKMARK and user.getBookmarksUri() in RESOURCE table
+			if (isBookmark){				
+				addResource(Predicates.CR_BOOKMARK, user.getRegistrationsUri());
+				addResource(user.getBookmarksUri(), user.getBookmarksUri());
+			}
 		}
 	}
 
@@ -1173,6 +1185,9 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		
 		// let the bookmark predicate be stored in RESOURCE
 		addResource(Predicates.CR_BOOKMARK, user.getRegistrationsUri());
+		
+		// store the user's bookmarks URI into RESOURCE table
+		addResource(user.getBookmarksUri(), user.getBookmarksUri());
 	}
 
 	/*

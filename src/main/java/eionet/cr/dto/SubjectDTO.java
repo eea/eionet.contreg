@@ -34,9 +34,11 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.common.Predicates;
+import eionet.cr.common.Subjects;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.URIUtil;
 import eionet.cr.util.URLUtil;
+import eionet.cr.web.security.CRUser;
 
 /**
  * 
@@ -456,5 +458,16 @@ public class SubjectDTO implements Serializable{
 			return "Anonymous resource";
 		else
 			return URIUtil.extractURILabel(getUri(), NO_LABEL);
+	}
+	
+	/**
+	 * 
+	 * @param user
+	 * @return
+	 */
+	public boolean isRegisteredBy(CRUser user){
+		
+		return existsPredicateObjectSource(
+				Predicates.RDF_TYPE, Subjects.CR_FILE, user.getRegistrationsUri());
 	}
 }
