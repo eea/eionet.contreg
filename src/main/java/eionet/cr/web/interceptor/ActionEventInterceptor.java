@@ -38,7 +38,9 @@ import net.sourceforge.stripes.controller.Interceptor;
 import net.sourceforge.stripes.controller.Intercepts;
 import net.sourceforge.stripes.controller.LifecycleStage;
 import eionet.cr.util.Util;
+import eionet.cr.web.action.HomeActionBean;
 import eionet.cr.web.interceptor.annotation.DontSaveLastActionEvent;
+import eionet.cr.web.util.UserHomeUrlExtractor;
 
 /**
  * Interceptor that saves to the session last action except login action.
@@ -65,14 +67,17 @@ public class ActionEventInterceptor implements Interceptor {
 			
 			HttpServletRequest request = context.getActionBean().getContext().getRequest(); 
 			String actionEventURL = null;
-			   
+			 
+			if (actionBeanClass.getName().equals(HomeActionBean.class.getName())){
+				actionEventURL = "/home/"+UserHomeUrlExtractor.extractUserNameFromHomeUrl(request.getRequestURI());
+			} else {
 				actionEventURL = getActionName(actionBeanClass) + "?" + 
 				((getEventName(eventMethod) != null) ? getEventName(eventMethod) + "=&" : "") + 
 				getRequestParameters(request);
 				
 				//this will handle pretty url integration
 				actionEventURL = postProcess(actionEventURL);
-				
+			}
 			request.getSession().setAttribute(LAST_ACTION_URL_SESSION_ATTR, actionEventURL);
 		}
 
