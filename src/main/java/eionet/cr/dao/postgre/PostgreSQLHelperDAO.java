@@ -63,6 +63,7 @@ import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.RawTripleDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.dto.UserBookmarkDTO;
+import eionet.cr.dto.UserHistoryDTO;
 import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.harvest.statistics.dto.HarvestUrgencyScoreDTO;
 import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
@@ -1349,5 +1350,54 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		addResource(Predicates.CR_SAVETIME, user.getHistoryUri());
 		addResource(Predicates.CR_HISTORY, user.getHistoryUri());
 		addResource(user.getHistoryUri(), user.getHistoryUri());
+	}
+	
+	/*
+	 * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
+	 */
+	@Override
+	public List<UserHistoryDTO> getUserHistory(CRUser user) throws DAOException{
+		
+		String dbQuery = "select " +
+				"SPOHIST.OBJECT as URL, " +
+				"SPOSAVE.OBJECT as LAST_UPDATE " +
+				"from SPO as SPOHIST, SPO as SPOSAVE " +
+				"where " +
+				"SPOHIST.PREDICATE=" + Hashes.spoHash(Predicates.CR_HISTORY) +
+				"and SPOSAVE.PREDICATE=" + Hashes.spoHash(Predicates.CR_SAVETIME) +
+				"and SPOHIST.SUBJECT=SPOSAVE.SUBJECT " +
+				"and SPOHIST.SOURCE=" + Hashes.spoHash(user.getHistoryUri()) +
+				"and SPOSAVE.SOURCE=" + Hashes.spoHash(user.getHistoryUri()) +
+				"order by " +
+				"SPOSAVE.GEN_TIME desc";
+
+
+		List<UserHistoryDTO> returnHistory = new ArrayList<UserHistoryDTO>();
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		try{
+			SimpleDateFormat sdf = new SimpleDateFormat ("yyyy-MM-dd'T'hh:mm:ss");
+			conn = getConnection();
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(dbQuery);
+
+			while (rs.next()){
+				UserHistoryDTO historyItem = new UserHistoryDTO();
+				historyItem.setUrl(rs.getString("URL"));
+				historyItem.setLastOperation(rs.getString("LAST_UPDATE"));
+				returnHistory.add(historyItem);
+			}
+		}
+		catch (SQLException e){
+			throw new DAOException(e.toString(), e);
+		}
+		finally{
+			SQLUtil.close(rs);
+			SQLUtil.close(stmt);
+			SQLUtil.close(conn);
+		}
+		
+		return returnHistory;
 	}
 }

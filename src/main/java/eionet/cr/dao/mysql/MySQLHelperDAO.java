@@ -37,6 +37,7 @@ import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.RawTripleDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.dto.UserBookmarkDTO;
+import eionet.cr.dto.UserHistoryDTO;
 import eionet.cr.harvest.statistics.dto.HarvestUrgencyScoreDTO;
 import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
 import eionet.cr.util.Hashes;
@@ -935,6 +936,11 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 	@Override
 	public void updateUserHistory(CRUser user, String url) throws DAOException {
 		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Method not implemented");
+	}
+	
+	@Override
+	public List<UserHistoryDTO> getUserHistory(CRUser user) throws DAOException{
 		throw new UnsupportedOperationException("Method not implemented");
 	}
 }

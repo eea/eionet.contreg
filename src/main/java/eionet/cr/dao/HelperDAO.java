@@ -15,6 +15,7 @@ import eionet.cr.dao.util.UriLabelPair;
 import eionet.cr.dto.RawTripleDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.dto.UserBookmarkDTO;
+import eionet.cr.dto.UserHistoryDTO;
 import eionet.cr.harvest.statistics.dto.HarvestUrgencyScoreDTO;
 import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
 import eionet.cr.util.Pair;
@@ -263,4 +264,11 @@ public interface HelperDAO extends DAO {
 	 */
 	public void updateUserHistory(CRUser user, String url) throws DAOException;
 
+	/**
+	 * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
+	 * @param user
+	 * @throws DAOException
+	 */
+	public List<UserHistoryDTO> getUserHistory(CRUser user) throws DAOException;
+	
 }

@@ -42,10 +42,31 @@
 								</display:table>
 							</c:when>
 							<c:otherwise>
-								<p>No bookmarks found for this user.</p>
+								<p>No bookmarks found.</p>
 							</c:otherwise>
 						</c:choose>
 					</c:if>
+					
+					<c:if test="${actionBean.sectionHistory}">
+						<c:choose>
+							<c:when test="${not empty actionBean.history}">
+						
+								<display:table name="${actionBean.history}" class="sortable" pagesize="20" sort="list" id="history" htmlId="historylist" requestURI="${actionBean.urlBinding}" style="width:100%">
+									<display:column title="URL" sortable="false">
+										<stripes:link href="/factsheet.action">${history.url}
+											<stripes:param name="uri" value="${history.url}" />										
+										</stripes:link>
+									</display:column>
+									<display:column title="Date" sortable="false" style="width:150px;">${history.lastOperation}
+									</display:column>
+								</display:table>
+							</c:when>
+							<c:otherwise>
+								<p>No history found.</p>
+							</c:otherwise>
+						</c:choose>
+					</c:if>
+					
 					<c:if test="${actionBean.sectionWorkspace}">
 						<h1>User Home</h1>
 		        		<p>This page is your home, ${ actionBean.attemptedUserName }</p>

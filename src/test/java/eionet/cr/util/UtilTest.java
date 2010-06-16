@@ -67,4 +67,9 @@ public class UtilTest extends TestCase{
 		assertEquals(9642, Util.calculateHashesCount( -9223272718994049566L, 9221558204482793360L));
 	}
 
+	@Test
+	public void test_dateToString(){
+		
+		System.out.println(Util.dateToString(new java.util.Date(), "yyyy-MM-dd'T'HH:mm:ss"));
+	}
 }

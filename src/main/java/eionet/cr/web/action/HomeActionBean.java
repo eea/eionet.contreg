@@ -15,11 +15,15 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dto.UserBookmarkDTO;
+import eionet.cr.dto.UserHistoryDTO;
 import eionet.cr.web.security.BadUserHomeUrlException;
-import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.UserHomeUrlExtractor;
+import eionet.cr.web.util.columns.DateColumn;
+import eionet.cr.web.util.columns.HarvestedUrlCountColumn;
 import eionet.cr.web.util.columns.SearchResultColumn;
 import eionet.cr.web.util.columns.SubjectPredicateColumn;
+import eionet.cr.web.util.columns.DateColumn.COLUMN_TYPE;
+import eionet.cr.web.util.columns.HarvestedUrlCountColumn.COLUMN;
 
 /**
  * 
@@ -43,6 +47,7 @@ public class HomeActionBean extends AbstractActionBean{
 	private String section;
 	
 	private List<UserBookmarkDTO> bookmarks;
+	private List<UserHistoryDTO> history;
 	
 	private boolean userAuthorized;
 	private String authenticationMessage;
@@ -76,6 +81,12 @@ public class HomeActionBean extends AbstractActionBean{
 		/* columns for bookmarks */
 		List<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
 		list.add(new SubjectPredicateColumn("Bookmark", false, Predicates.RDFS_LABEL));
+		typesColumns.put(Subjects.DUBLIN_CORE_SOURCE_URL, list);
+		
+		/* columns for history */
+		list = new ArrayList<SearchResultColumn>();
+		list.add(new SubjectPredicateColumn("URL", false, Predicates.RDFS_LABEL));
+		list.add(new SubjectPredicateColumn("Last Update", false, Predicates.RDFS_LABEL));
 		typesColumns.put(Subjects.DUBLIN_CORE_SOURCE_URL, list);
 		
 	}
@@ -158,6 +169,15 @@ public class HomeActionBean extends AbstractActionBean{
 		}
 		return bookmarks;
 	}
+	
+	public List<UserHistoryDTO> getHistory() {
+		try {
+			history = DAOFactory.get().getDao(HelperDAO.class).getUserHistory(this.getUser());
+		} catch (DAOException ex){
+			
+		}
+		return history;
+	}
 
 	public void setBookmarks(List<UserBookmarkDTO> bookmarks) {
 		this.bookmarks = bookmarks;
@@ -225,6 +245,12 @@ public class HomeActionBean extends AbstractActionBean{
 
 	public void setAuthenticationMessage(String authenticationMessage) {
 		this.authenticationMessage = authenticationMessage;
+	}
+
+
+
+	public void setHistory(List<UserHistoryDTO> history) {
+		this.history = history;
 	}
 	
 }
