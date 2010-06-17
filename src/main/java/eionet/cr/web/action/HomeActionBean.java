@@ -9,6 +9,9 @@ import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
+
+import org.apache.commons.lang.StringEscapeUtils;
+
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.dao.DAOException;
@@ -18,12 +21,8 @@ import eionet.cr.dto.UserBookmarkDTO;
 import eionet.cr.dto.UserHistoryDTO;
 import eionet.cr.web.security.BadUserHomeUrlException;
 import eionet.cr.web.util.UserHomeUrlExtractor;
-import eionet.cr.web.util.columns.DateColumn;
-import eionet.cr.web.util.columns.HarvestedUrlCountColumn;
 import eionet.cr.web.util.columns.SearchResultColumn;
 import eionet.cr.web.util.columns.SubjectPredicateColumn;
-import eionet.cr.web.util.columns.DateColumn.COLUMN_TYPE;
-import eionet.cr.web.util.columns.HarvestedUrlCountColumn.COLUMN;
 
 /**
  * 
@@ -55,6 +54,8 @@ public class HomeActionBean extends AbstractActionBean{
 	/** */
 	private static List<Map<String, String>> tabs;
 	private static final Map<String,List<SearchResultColumn>> typesColumns;
+	
+	List<String> selectedBookmarks;
 	
 	static {
 		tabs = new ArrayList<Map<String,String>>();
@@ -128,6 +129,35 @@ public class HomeActionBean extends AbstractActionBean{
 		}
 		baseHomeUrl = requestUrl.split(attemptedUserName)[0];
 		setDefaultSection();
+		
+		performSectionSpecificActions();
+	}
+	
+	private void performSectionSpecificActions(){
+		if (section.equals(TYPE_BOOKMARK)){
+			bookmarkActions();
+		}
+		if (section.equals(TYPE_HISTORY)){
+		}
+		if (section.equals(TYPE_WORKSPACE)){
+		}
+	}
+	
+	private void bookmarkActions(){
+		if (this.getContext().getRequest().getParameter("deletebookmarks") != null){
+			if (selectedBookmarks != null && !selectedBookmarks.isEmpty()) {
+				try {
+					for (int i=0; i<selectedBookmarks.size(); i++){
+						DAOFactory.get().getDao(HelperDAO.class).deleteUserBookmark(getUser(), selectedBookmarks.get(i));
+					}
+					addSystemMessage("Selected bookmarks were deleted from your personal bookmark list.");
+				} catch (DAOException ex){
+					addWarningMessage("Error occured during bookmark deletion.");
+				}
+			} else {
+				addCautionMessage("No bookmarks selected for deletion.");
+			}
+		}
 	}
 	
 	private void setDefaultSection(){
@@ -138,6 +168,13 @@ public class HomeActionBean extends AbstractActionBean{
 		){
 			section = TYPE_WORKSPACE;
 		}
+	}
+	
+	/**
+	 * @param sourceUrl the sourceUrl to set
+	 */
+	public void setBookmarkUrl(List<String> bookmarkUrl) {
+		selectedBookmarks = bookmarkUrl;
 	}
 	
 	/**
@@ -252,5 +289,6 @@ public class HomeActionBean extends AbstractActionBean{
 	public void setHistory(List<UserHistoryDTO> history) {
 		this.history = history;
 	}
-	
+
+
 }

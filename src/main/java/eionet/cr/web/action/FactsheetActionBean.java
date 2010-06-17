@@ -96,9 +96,6 @@ public class FactsheetActionBean extends AbstractActionBean{
 	
 	private boolean urlUserBookmark = false;
 	
-	private String bookmarkOperationMessage = "";
-	private boolean recentBookmarkOperation;
-	
 	/**
 	 * 
 	 * @return
@@ -250,10 +247,9 @@ public class FactsheetActionBean extends AbstractActionBean{
 	public Resolution addbookmark() throws DAOException{
 		if (isUserLoggedIn()){
 			DAOFactory.get().getDao(HelperDAO.class).addUserBookmark(getUser(), getUrl());
-			bookmarkOperationMessage = "Succesfully bookmarked this page.";
-			recentBookmarkOperation = true;
+			addSystemMessage("Succesfully bookmarked this source.");
 		} else {
-			bookmarkOperationMessage = "Only logged in users can bookmark sources.";
+			addSystemMessage("Only logged in users can bookmark sources.");
 		}
 		return view();
 	}
@@ -266,10 +262,9 @@ public class FactsheetActionBean extends AbstractActionBean{
 	public Resolution removebookmark() throws DAOException{
 		if (isUserLoggedIn()){
 			DAOFactory.get().getDao(HelperDAO.class).deleteUserBookmark(getUser(), getUrl());
-			bookmarkOperationMessage = "Succesfully removed this source from bookmarks.";
-			recentBookmarkOperation = true;
+			addSystemMessage("Succesfully removed this source from bookmarks.");
 		} else {
-			bookmarkOperationMessage = "Only logged in users can remove bookmarks.";
+			addSystemMessage("Only logged in users can remove bookmarks.");
 		}
 		return view();
 	}
@@ -555,20 +550,5 @@ public class FactsheetActionBean extends AbstractActionBean{
 	public void setUrlUserBookmark(boolean urlUserBookmark) {
 		this.urlUserBookmark = urlUserBookmark;
 	}
-
-	public String getBookmarkOperationMessage() {
-		return bookmarkOperationMessage;
-	}
-
-	public void setBookmarkOperationMessage(String bookmarkOperationMessage) {
-		this.bookmarkOperationMessage = bookmarkOperationMessage;
-	}
-
-	public boolean isRecentBookmarkOperation() {
-		return recentBookmarkOperation;
-	}
-
-	public void setRecentBookmarkOperation(boolean recentBookmarkOperation) {
-		this.recentBookmarkOperation = recentBookmarkOperation;
-	}
+	
 }

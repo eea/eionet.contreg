@@ -106,10 +106,6 @@
 						</c:if>
 				    	<div style="margin-top:20px" id="wait_container">
 				    
-				    		<c:if test="${ actionBean.recentBookmarkOperation }">
-				    			<div class="advice-msg">${actionBean.bookmarkOperationMessage}</div>
-				    		</c:if>
-				    
 				    		<c:choose>
 				    			<c:when test="${actionBean.subject.anonymous}">
 				    				<div class="advice-msg">This is an anonymous resource!</div>

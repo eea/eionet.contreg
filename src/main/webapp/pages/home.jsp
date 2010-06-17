@@ -32,14 +32,22 @@
 					<c:if test="${actionBean.sectionBookmarks}">
 						<c:choose>
 							<c:when test="${not empty actionBean.bookmarks}">
-						
-								<display:table name="${actionBean.bookmarks}" class="sortable" pagesize="20" sort="list" id="bookmark" htmlId="bookmarks" requestURI="${actionBean.urlBinding}" style="width:100%">
-									<display:column title="URL" sortable="false">
-										<stripes:link href="/factsheet.action">${bookmark.bookmarkUrl}
-											<stripes:param name="uri" value="${bookmark.bookmarkUrl}" />										
-										</stripes:link>
-									</display:column>
-								</display:table>
+								<crfn:form id="bookmarkForm" action="${actionBean.baseHomeUrl}${actionBean.attemptedUserName}/bookmark?deletebookmarks=1" method="post">
+									<display:table name="${actionBean.bookmarks}" class="sortable" pagesize="20" sort="list" id="bookmark" htmlId="bookmarks" requestURI="${actionBean.urlBinding}" style="width:100%">
+										<display:column title="" sortable="false"  style="width:50px;">
+											<input type="checkbox" value="${ bookmark.bookmarkUrlHtmlFormatted }"  name='bookmarkUrl'></input>  
+										</display:column>
+										<display:column title="URL" sortable="false">
+											<stripes:link href="/factsheet.action">${bookmark.bookmarkUrl}
+												<stripes:param name="uri" value="${bookmark.bookmarkUrl}" />										
+											</stripes:link>
+										</display:column>
+									</display:table>
+									<div>
+										<stripes:submit name="delete" value="Delete Bookmarks" title="Delete seleceted bookmarks"/>
+										<input type="button" name="selectAll" value="Select all" onclick="toggleSelectAll('bookmarkForm');return false"/>
+									</div>
+								</crfn:form>
 							</c:when>
 							<c:otherwise>
 								<p>No bookmarks found.</p>
@@ -52,12 +60,12 @@
 							<c:when test="${not empty actionBean.history}">
 						
 								<display:table name="${actionBean.history}" class="sortable" pagesize="20" sort="list" id="history" htmlId="historylist" requestURI="${actionBean.urlBinding}" style="width:100%">
+									<display:column title="Date" sortable="false" style="width:150px;">${history.lastOperation}
+									</display:column>
 									<display:column title="URL" sortable="false">
 										<stripes:link href="/factsheet.action">${history.url}
 											<stripes:param name="uri" value="${history.url}" />										
 										</stripes:link>
-									</display:column>
-									<display:column title="Date" sortable="false" style="width:150px;">${history.lastOperation}
 									</display:column>
 								</display:table>
 							</c:when>

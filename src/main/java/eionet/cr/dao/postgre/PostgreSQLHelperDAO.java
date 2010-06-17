@@ -1222,7 +1222,8 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		String dbQuery = "select distinct OBJECT " +
 				"from SPO where LIT_OBJ='N' and " +
 				"PREDICATE="+Hashes.spoHash(Predicates.CR_BOOKMARK)+" and " +
-				"SOURCE="+Hashes.spoHash(CRUser.bookmarksUri(user.getUserName()))+""; 
+				"SOURCE="+Hashes.spoHash(CRUser.bookmarksUri(user.getUserName()))+"" +
+				" ORDER BY OBJECT ASC"; 
 		
 		List<UserBookmarkDTO> returnBookmarks = new ArrayList<UserBookmarkDTO>();
 		Connection conn = null;
