@@ -118,4 +118,7 @@ public interface SearchDAO extends DAO{
 			PagingRequest pagingRequest, SortingRequest sortingRequest,
 			List<String> selectedPredicates) throws DAOException;
 
+	public Pair<Integer, List<SubjectDTO>> searchBySource(String sourceUrl,
+			PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException;
+
 }

@@ -143,7 +143,7 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 		
 		col = new SubjectPredicateColumn();
 		col.setPredicateUri(Predicates.RDFS_LABEL);
-		col.setTitle("Title");
+		col.setTitle("Label");
 		col.setSortable(true);
 		list.add(col);
 

@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DurationFormatUtils;
 
 import eionet.cr.common.Predicates;
@@ -38,6 +39,7 @@ import eionet.cr.dao.postgre.helpers.FilteredSearchHelper;
 import eionet.cr.dao.postgre.helpers.FilteredTypeSearchHelper;
 import eionet.cr.dao.postgre.helpers.FreeTextSearchHelper;
 import eionet.cr.dao.postgre.helpers.ReferencesSearchHelper;
+import eionet.cr.dao.postgre.helpers.SearchBySourceHelper;
 import eionet.cr.dao.postgre.helpers.SearchHelper;
 import eionet.cr.dao.postgre.helpers.SpatialSearchHelper;
 import eionet.cr.dao.readers.FreeTextSearchDataReader;
@@ -425,16 +427,6 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 	}
 	
 	/**
-	 * 
-	 * @param args
-	 */
-	public static void main(String[] args){
-		
-		long duration = 1001;
-		System.out.println(DurationFormatUtils.formatDuration(duration, "mm min ss sec"));
-	}
-	
-	/**
 	 * Calculates the estimated number of rows without using COUNT(*). 
 	 * If estimatation is lower than EXACT_ROW_COUNT_LIMIT, then find exact number of rows.
 	 * @param helper
@@ -471,6 +463,12 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 		return totalRowCount;
 	}
 
+	/**
+	 * 
+	 * @param helper
+	 * @return
+	 * @throws DAOException
+	 */
 	private int getExactRowCount(SearchHelper helper) throws DAOException {
 		int totalRowCount;
 		ArrayList<Object> inParams;
@@ -489,5 +487,71 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 		logger.trace("Exact row count: " + totalRowCount);
 		return totalRowCount;
 	}
-	
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.SearchDAO#searchBySource(java.lang.String, eionet.cr.util.pagination.PagingRequest, eionet.cr.util.SortingRequest)
+	 */
+	public Pair<Integer, List<SubjectDTO>> searchBySource(String sourceUrl,
+			PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException {
+		
+
+		// if search expression is null or empty, return empty result
+		if (StringUtils.isBlank(sourceUrl)){
+			return new Pair<Integer, List<SubjectDTO>>(0, new LinkedList<SubjectDTO>());
+		}
+
+		// create query helper
+		SearchBySourceHelper helper = new SearchBySourceHelper(sourceUrl,
+				pagingRequest, sortingRequest);
+		
+		// create the list of IN parameters of the query
+		// (in this case empty)
+		ArrayList<Object> inParams = new ArrayList<Object>();
+		
+		// let the helper create the query and fill IN parameters
+		String query = helper.getQuery(inParams);
+		
+		long startTime = System.currentTimeMillis();
+		logger.trace("Search subjects in source, executing subject finder query: " + query);
+
+		// execute the query, with the IN parameters
+		List<Long> list = executeQuery(query, inParams, new SingleObjectReader<Long>());
+		
+		int totalRowCount = 0;
+		List<SubjectDTO> subjects = new ArrayList<SubjectDTO>();
+		
+		// if result list not null and not empty, then get the subjects data and total rowcount
+		if (list!=null && !list.isEmpty()){
+			
+			// create the subjects map that needs to be fed into the subjects data reader
+			Map<Long,SubjectDTO> subjectsMap = new LinkedHashMap<Long, SubjectDTO>();
+			for (Long hash : list){
+				subjectsMap.put(hash, null);
+			}
+
+			logger.trace("Search subjects in source, getting the data of the found subjects");
+			
+			// get the data of all found subjects
+			subjects = getSubjectsData(subjectsMap);
+
+			// if paging required, get the total number of found subjects too
+			if (pagingRequest!=null){
+				
+				inParams = new ArrayList<Object>();
+				query = helper.getCountQuery(inParams);
+				
+				logger.trace("Search subjects in source, executing rowcount query: " + query);
+				
+				totalRowCount = Integer.valueOf(executeQueryUniqueResult(query,
+						inParams, new SingleObjectReader<Long>()).toString());
+			}
+		}
+		
+		logger.debug("Search subjects in source, total query time " +
+				Util.durationSince(startTime));
+
+		// the result Pair contains total number of subjects and the requested sub-list
+		return new Pair<Integer,List<SubjectDTO>>(Integer.valueOf(totalRowCount), subjects);
+	}
 }

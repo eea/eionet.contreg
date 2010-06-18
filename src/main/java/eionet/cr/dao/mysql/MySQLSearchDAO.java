@@ -414,4 +414,15 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 		// FIXME Auto-generated method stub
 		throw new UnsupportedOperationException("Method not implemented");
 	}
+
+	/*
+	 * 2(non-Javadoc)
+	 * @see eionet.cr.dao.SearchDAO#searchBySource(java.lang.String, eionet.cr.util.pagination.PagingRequest, eionet.cr.util.SortingRequest)
+	 */
+	public Pair<Integer, List<SubjectDTO>> searchBySource(String sourceUrl,
+			PagingRequest pagingRequest, SortingRequest sortingRequest)
+			throws DAOException {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Method not implemented");
+	}
 }
