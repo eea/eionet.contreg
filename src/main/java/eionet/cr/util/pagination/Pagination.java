@@ -198,7 +198,7 @@ public class Pagination {
 	 * @return
 	 */
 	public static int pageLength(){
-		return 15; // TODO should probably not be hard-coded
+		return DEFAULT_ITEMS_PER_PAGE; // TODO should probably be made dynamic somehow.
 	}
 	
 	/**

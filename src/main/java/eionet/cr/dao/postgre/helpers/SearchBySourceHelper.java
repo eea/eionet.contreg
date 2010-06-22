@@ -83,7 +83,7 @@ public class SearchBySourceHelper extends AbstractSearchHelper{
 		append("(SPO.SUBJECT=ORDERING.SUBJECT and ORDERING.PREDICATE=").
 		append(Hashes.spoHash(sortPredicate)).append(")");
 		
-		subSelect.append(" where SOURCE=").append(sourceHash);
+		subSelect.append(" where SPO.SOURCE=").append(sourceHash);
 		
 		StringBuffer buf = new StringBuffer().
 		append("select * from (").append(subSelect).append(") as FOO order by OBJECT_ORDERED_BY");

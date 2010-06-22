@@ -31,6 +31,25 @@
 							</c:otherwise>
 						</c:choose>
 			        </li>
+			        <li>
+						<c:choose>
+							<c:when test="${not empty actionBean.subject && not empty actionBean.subject.uri && !actionBean.subject.anonymous}">
+								<stripes:link href="/objectsInSource.action" event="search">Objects in Source
+									<stripes:param name="uri" value="${actionBean.subject.uri}"/>
+								</stripes:link>
+							</c:when>
+							<c:when test="${not empty actionBean.uri}">
+								<stripes:link href="/objectsInSource.action" event="search">Objects in Source
+									<stripes:param name="uri" value="${actionBean.uri}"/>
+								</stripes:link>
+							</c:when>
+							<c:otherwise>
+								<stripes:link href="/objectsInSource.action" event="search">Objects in Source
+									<stripes:param name="anonHash" value="${actionBean.uriHash}"/>
+								</stripes:link>
+							</c:otherwise>
+						</c:choose>
+			        </li>
 				    </ul>
 				</div>
 				<br style="clear:left" />
