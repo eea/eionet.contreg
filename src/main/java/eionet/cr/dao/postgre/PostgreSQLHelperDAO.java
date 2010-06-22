@@ -44,10 +44,7 @@ import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
-import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
-import eionet.cr.dao.DAOFactory;
-import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.readers.DataflowPicklistReader;
 import eionet.cr.dao.readers.PredicateLabelsReader;
@@ -58,13 +55,11 @@ import eionet.cr.dao.readers.UriHashesReader;
 import eionet.cr.dao.util.PredicateLabels;
 import eionet.cr.dao.util.SubProperties;
 import eionet.cr.dao.util.UriLabelPair;
-import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.RawTripleDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.dto.UserBookmarkDTO;
 import eionet.cr.dto.UserHistoryDTO;
-import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.harvest.statistics.dto.HarvestUrgencyScoreDTO;
 import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
 import eionet.cr.util.Hashes;
@@ -73,6 +68,7 @@ import eionet.cr.util.URIUtil;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
 import eionet.cr.util.YesNoBoolean;
+import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.util.sql.PairReader;
 import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
@@ -1401,4 +1397,33 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		
 		return returnHistory;
 	}
+	@Override
+	public List<RawTripleDTO> getTriplesFor(String sourceUrl, PagingRequest pagingRequest) throws DAOException{
+		StringBuffer buf = new StringBuffer("select * from SPO where SOURCE=").
+		append(Hashes.spoHash(sourceUrl));
+		
+		RawTripleDTOReader reader = new RawTripleDTOReader();
+		List<RawTripleDTO> triples = executeQuery(buf.toString(), new LinkedList<Object>(), reader);
+		
+		if (!triples.isEmpty() && !reader.getDistinctHashes().isEmpty()){
+			
+			buf = new StringBuffer().
+			append("select URI_HASH, URI from RESOURCE where URI_HASH in (").
+			append(Util.toCSV(reader.getDistinctHashes())).append(")");
+			
+			HashMap<String,String> map = new HashMap<String, String>();
+			executeQuery(buf.toString(), new UriHashesReader(map));
+			
+			if (!map.isEmpty()){				
+				for (RawTripleDTO dto : triples){					
+					dto.setSubject(map.get(dto.getSubject()));
+					dto.setPredicate(map.get(dto.getPredicate()));
+					dto.setObjectDerivSource(map.get(dto.getObjectDerivSource()));
+				}
+			}
+		}
+		
+		return triples;
+	}
+	
 }

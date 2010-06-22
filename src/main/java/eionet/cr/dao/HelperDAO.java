@@ -270,5 +270,15 @@ public interface HelperDAO extends DAO {
 	 * @throws DAOException
 	 */
 	public List<UserHistoryDTO> getUserHistory(CRUser user) throws DAOException;
+
+	/**
+	 * 
+	 * @param sourceUrl
+	 * @param pagingRequest
+	 * @return
+	 * @throws DAOException
+	 */
+	public List<RawTripleDTO> getTriplesFor(String sourceUrl,
+			PagingRequest pagingRequest) throws DAOException;
 	
 }

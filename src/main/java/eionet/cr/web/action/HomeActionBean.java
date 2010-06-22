@@ -9,17 +9,16 @@ import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
-
-import org.apache.commons.lang.StringEscapeUtils;
-
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HelperDAO;
+import eionet.cr.dto.RawTripleDTO;
 import eionet.cr.dto.UserBookmarkDTO;
 import eionet.cr.dto.UserHistoryDTO;
 import eionet.cr.web.security.BadUserHomeUrlException;
+import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.UserHomeUrlExtractor;
 import eionet.cr.web.util.columns.SearchResultColumn;
 import eionet.cr.web.util.columns.SubjectPredicateColumn;
@@ -38,6 +37,7 @@ public class HomeActionBean extends AbstractActionBean{
 	private static final String TYPE_BOOKMARK = "bookmark";
 	private static final String TYPE_HISTORY = "history";
 	private static final String TYPE_WORKSPACE = "workspace";
+	private static final String TYPE_REGISTRATIONS = "registrations";
 	
 	/** */
 	private String tabType;
@@ -46,6 +46,7 @@ public class HomeActionBean extends AbstractActionBean{
 	private String section;
 	
 	private List<UserBookmarkDTO> bookmarks;
+	private List<RawTripleDTO> registrations;
 	private List<UserHistoryDTO> history;
 	
 	private boolean userAuthorized;
@@ -73,6 +74,11 @@ public class HomeActionBean extends AbstractActionBean{
 		tabs.add(tabType);
 
 		tabType = new HashMap<String,String>();
+		tabType.put("title", "Registrations");
+		tabType.put("tabType", "registrations");
+		tabs.add(tabType);
+
+		tabType = new HashMap<String,String>();
 		tabType.put("title", "History");
 		tabType.put("tabType", "history");
 		tabs.add(tabType);
@@ -84,6 +90,13 @@ public class HomeActionBean extends AbstractActionBean{
 		list.add(new SubjectPredicateColumn("Bookmark", false, Predicates.RDFS_LABEL));
 		typesColumns.put(Subjects.DUBLIN_CORE_SOURCE_URL, list);
 		
+		/* columns for registrations */
+		list = new ArrayList<SearchResultColumn>();
+		list.add(new SubjectPredicateColumn("Subject", false, Predicates.RDFS_LABEL));
+		list.add(new SubjectPredicateColumn("Predicate", false, Predicates.RDFS_LABEL));
+		list.add(new SubjectPredicateColumn("Object", false, Predicates.RDFS_LABEL));
+		typesColumns.put(Subjects.DUBLIN_CORE_SOURCE_URL, list);
+
 		/* columns for history */
 		list = new ArrayList<SearchResultColumn>();
 		list.add(new SubjectPredicateColumn("URL", false, Predicates.RDFS_LABEL));
@@ -137,10 +150,6 @@ public class HomeActionBean extends AbstractActionBean{
 		if (section.equals(TYPE_BOOKMARK)){
 			bookmarkActions();
 		}
-		if (section.equals(TYPE_HISTORY)){
-		}
-		if (section.equals(TYPE_WORKSPACE)){
-		}
 	}
 	
 	private void bookmarkActions(){
@@ -162,9 +171,10 @@ public class HomeActionBean extends AbstractActionBean{
 	
 	private void setDefaultSection(){
 		if (section == null ||
-			!section.equals(TYPE_BOOKMARK)&&
+			(!section.equals(TYPE_BOOKMARK)&&
 			!section.equals(TYPE_WORKSPACE)&&
-			!section.equals(TYPE_HISTORY)
+			!section.equals(TYPE_HISTORY)&&
+			!section.equals(TYPE_REGISTRATIONS))
 		){
 			section = TYPE_WORKSPACE;
 		}
@@ -216,6 +226,23 @@ public class HomeActionBean extends AbstractActionBean{
 		return history;
 	}
 
+	public List<RawTripleDTO> getRegistrations()  throws DAOException{
+		if(this.getUser()==null){
+			registrations = DAOFactory.get().getDao(HelperDAO.class).
+				getTriplesFor((new CRUser(attemptedUserName)).getRegistrationsUri(), null);			
+		}
+		else{
+			registrations = DAOFactory.get().getDao(HelperDAO.class).
+				getTriplesFor(this.getUser().getRegistrationsUri(), null);
+		}
+
+		return registrations;
+	}
+
+	public void setRegistrations(List<RawTripleDTO> registrations) {
+		this.registrations = registrations;
+	}
+
 	public void setBookmarks(List<UserBookmarkDTO> bookmarks) {
 		this.bookmarks = bookmarks;
 	}
@@ -244,30 +271,6 @@ public class HomeActionBean extends AbstractActionBean{
 		this.section = section;
 	}
 
-	public boolean isSectionBookmarks() {
-		if (section.equals(TYPE_BOOKMARK)){
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	public boolean isSectionHistory() {
-		if (section.equals(TYPE_HISTORY)){
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	public boolean isSectionWorkspace() {
-		if (section.equals(TYPE_WORKSPACE)){
-			return true;
-		} else {
-			return false;
-		}
-	}
-	
 	public boolean isUserAuthorized() {
 		return userAuthorized;
 	}
@@ -283,8 +286,6 @@ public class HomeActionBean extends AbstractActionBean{
 	public void setAuthenticationMessage(String authenticationMessage) {
 		this.authenticationMessage = authenticationMessage;
 	}
-
-
 
 	public void setHistory(List<UserHistoryDTO> history) {
 		this.history = history;

@@ -943,6 +943,13 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 	public List<UserHistoryDTO> getUserHistory(CRUser user) throws DAOException{
 		throw new UnsupportedOperationException("Method not implemented");
 	}
+
+	@Override
+	public List<RawTripleDTO> getTriplesFor(String sourceUrl,
+			PagingRequest pagingRequest) throws DAOException {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Method not implemented");
+	}
 }
 
 
