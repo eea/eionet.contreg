@@ -27,9 +27,6 @@ import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 
-import org.mcavallo.opencloud.Cloud;
-import org.mcavallo.opencloud.Tag;
-
 import eionet.cr.dto.TagDTO;
 import eionet.cr.util.Pair;
 import eionet.cr.web.util.ApplicationCache;
