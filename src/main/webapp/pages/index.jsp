@@ -18,14 +18,7 @@
 		Help other researchers find the good datasets. Bookmark them on this site.
 	</div>
 	<div style="background-color:#f0f0f0; padding:0.5em; margin: 0.3em; border:1px dotted black;">
-		<div style="font-size:1.2em;font-weight:bold">Tag cloud here!</div>
-		In 2002 Jim Flanagan was the first using tag clouds as a display
-		form. Flickr, <span style="font-size:1.2em">Technorati</span> and Blogs have tightened the trend in the design
-		business and today leading enterprises like Spiegel.de, O2-online and
-		others use this tool. Will <span style="font-size:1.4em">tag</span> clouds become a <span style="font-size:0.8em">trend</span> , like a lot of
-		before, which came and disappeared again when we recognized that we benefit
-		less than we thought from them ? A tag <span style="font-size:1.4em">cloud</span> is a means of visualisation
-		of information within a specified area.
+		<stripes:layout-render name="/pages/tagcloud.jsp" />
 	</div>
 	<div style="background-color:#f0f0f0; padding:0.5em; margin: 0.3em; border:1px dotted black;">
 		<div style="font-size:1.2em;font-weight:bold">Recently discovered files:</div>
