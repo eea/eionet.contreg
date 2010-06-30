@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	<entry key="http://purl.org/dc/dcmitype/StillImage">
+		image/.+
+	</entry>
+	<entry key="http://purl.org/dc/dcmitype/MovingImage">
+		video/.+
+	</entry>
+	<entry key="http://purl.org/dc/dcmitype/Sound">
+		audio/.+
+	</entry>
+	<entry key="http://purl.org/dc/dcmitype/Text">
+		text/plain
+		text/html
+		text/rtf
+		application/pdf
+		application/msword
+		application/vnd.oasis.opendocument.text
+		application/vnd.openxmlformats-officedocument.wordprocessingml.document
+	</entry>
+	<entry key="http://purl.org/dc/dcmitype/Dataset">
+		application/vnd.ms-excel
+		application/vnd.openxmlformats-officedocument.spreadsheetml.sheet		
+		application/vnd.oasis.opendocument.spreadsheet
+		application/x-msaccess
+		text/xml
+		application/rdf+xml
+	</entry>
+</properties>
