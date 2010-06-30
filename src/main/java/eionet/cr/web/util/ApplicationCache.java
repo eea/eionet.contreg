@@ -37,6 +37,7 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import eionet.cr.dao.util.UriLabelPair;
+import eionet.cr.dto.TagDTO;
 import eionet.cr.util.Pair;
 
 /**
@@ -52,6 +53,7 @@ public class ApplicationCache implements ServletContextListener {
 	private static final String DATAFLOW_SEARCH_PICKLIST_CACHE = "dataflowSearchPicklist";
 	private static final String LOCALITIES_CACHE = "localitiesCache";
 	private static final String RECENT_RESOURCES_CACHE= "recentResources";
+	private static final String TAG_CLOUD_CACHE= "tagCloud";
 
 	private static final String TYPE_CACHE = "typeCache";
 
@@ -99,7 +101,41 @@ public class ApplicationCache implements ServletContextListener {
 						Math.max(0,cache.size() - limit),
 						cache.size()));
 	}
-	
+
+	/**
+	 * update tag cloud.
+	 * 
+	 * @param update
+	 */
+	public static void updateTagCloudCache(List<TagDTO> update) {
+		getCache().put(new Element(TAG_CLOUD_CACHE, update));
+	}
+
+	/**
+	 * get tag cloud.
+	 * 
+	 * @param limit - how many tags to fetch
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public static List<TagDTO> getTagCloud(int limit) {
+		Element element = getCache().get(TAG_CLOUD_CACHE);
+		
+		if (element == null || element.getValue() == null) {
+			return new LinkedList<TagDTO>();
+		}
+		
+		List<TagDTO> cache  = (List<TagDTO>) element.getValue();
+		
+		List<TagDTO> result = new LinkedList<TagDTO>(
+				cache.subList(0,Math.max(cache.size(),cache.size() - limit))); 
+
+		Collections.sort(result, new TagDTO.NameComparatorAsc());
+		
+		return result;
+		
+	}
+
 	/**
 	 * Update dataflow picklist cache.
 	 * 

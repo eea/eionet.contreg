@@ -31,6 +31,7 @@ import eionet.cr.dao.HarvestMessageDAO;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.SearchDAO;
+import eionet.cr.dao.TagsDAO;
 import eionet.cr.dao.UrgentHarvestQueueDAO;
 
 
@@ -65,6 +66,7 @@ public final class PostgreSQLDAOFactory extends DAOFactory{
 		registeredDaos.put(SearchDAO.class, PostgreSQLSearchDAO.class);
 		registeredDaos.put(UrgentHarvestQueueDAO.class, PostgreSQLUrgentHarvestQueueDAO.class);
 		registeredDaos.put(ExporterDAO.class, PostgreSQLExporterDAO.class);
+		registeredDaos.put(TagsDAO.class, PostgreSQLTagsDAO.class);
 	}
 
 	/**

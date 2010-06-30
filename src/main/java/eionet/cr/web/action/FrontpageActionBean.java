@@ -26,6 +26,11 @@ import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
+
+import org.mcavallo.opencloud.Cloud;
+import org.mcavallo.opencloud.Tag;
+
+import eionet.cr.dto.TagDTO;
 import eionet.cr.util.Pair;
 import eionet.cr.web.util.ApplicationCache;
 
@@ -39,10 +44,12 @@ import eionet.cr.web.util.ApplicationCache;
 public class FrontpageActionBean extends AbstractActionBean {
 	
 	private List<Pair<String,String>> recentFiles;
+	private List<TagDTO> tagCloud;
 	
 	@DefaultHandler
 	public Resolution frontpage() {
 		recentFiles = ApplicationCache.getRecentDiscoveredFiles(10);
+		initTagCloud();
 		return new ForwardResolution("/pages/index.jsp");
 	}
 
@@ -52,5 +59,15 @@ public class FrontpageActionBean extends AbstractActionBean {
 	public List<Pair<String, String>> getRecentFiles() {
 		return recentFiles;
 	}
-
+	/**
+	 * @return the tagCloud
+	 */
+	public List<TagDTO> getTagCloud() {
+		return tagCloud;
+	}
+	
+	private void initTagCloud(){
+		tagCloud = ApplicationCache.getTagCloud(100);	
+	}
+	
 }
