@@ -50,6 +50,7 @@ import eionet.cr.dao.postgre.PostgreSQLHarvestSourceDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.harvest.util.HarvestUrlConnection;
+import eionet.cr.harvest.util.MimeTypeConverter;
 import eionet.cr.harvest.util.arp.ARPSource;
 import eionet.cr.harvest.util.arp.InputStreamBasedARPSource;
 import eionet.cr.util.FileUtil;
@@ -564,6 +565,11 @@ public class PullHarvest extends Harvest{
 			}
 			
 			sourceMetadata.addObject(Predicates.CR_MEDIA_TYPE, new ObjectDTO(String.valueOf(contentType), true));
+			String rdfTypeOfMediaType = MimeTypeConverter.getRdfTypeFor(contentType);
+			if (!StringUtils.isBlank(rdfTypeOfMediaType)){
+				sourceMetadata.addObject(Predicates.RDF_TYPE, new ObjectDTO(String.valueOf(rdfTypeOfMediaType), false));
+			}
+			
 			if (charset!=null && charset.length()>0){
 				sourceMetadata.addObject(Predicates.CR_CHARSET, new ObjectDTO(String.valueOf(charset), true));
 			}

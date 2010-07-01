@@ -32,7 +32,7 @@ public class MimeTypeConverterTest extends TestCase{
 	/**
 	 * 
 	 */
-	public void test(){
+	public void testFewSampleConversions(){
 		
 		assertEquals("http://purl.org/dc/dcmitype/StillImage",
 				MimeTypeConverter.getRdfTypeFor("image/png"));
@@ -47,7 +47,7 @@ public class MimeTypeConverterTest extends TestCase{
 				MimeTypeConverter.getRdfTypeFor("application/msword"));
 
 		assertEquals("http://purl.org/dc/dcmitype/Dataset",
-				MimeTypeConverter.getRdfTypeFor("text/xml"));
+				MimeTypeConverter.getRdfTypeFor("text/xml;charset=UTF-8"));
 
 		assertEquals(null, MimeTypeConverter.getRdfTypeFor("application/x-tar"));
 	}

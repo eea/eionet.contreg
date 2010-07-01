@@ -2,13 +2,13 @@
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
 	<entry key="http://purl.org/dc/dcmitype/StillImage">
-		image/.+
+		image/
 	</entry>
 	<entry key="http://purl.org/dc/dcmitype/MovingImage">
-		video/.+
+		video/
 	</entry>
 	<entry key="http://purl.org/dc/dcmitype/Sound">
-		audio/.+
+		audio/
 	</entry>
 	<entry key="http://purl.org/dc/dcmitype/Text">
 		text/plain
