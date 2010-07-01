@@ -38,7 +38,7 @@ import net.sourceforge.stripes.controller.Interceptor;
 import net.sourceforge.stripes.controller.Intercepts;
 import net.sourceforge.stripes.controller.LifecycleStage;
 import eionet.cr.util.Util;
-import eionet.cr.web.action.HomeActionBean;
+import eionet.cr.web.action.home.HomeActionBean;
 import eionet.cr.web.interceptor.annotation.DontSaveLastActionEvent;
 import eionet.cr.web.util.UserHomeUrlExtractor;
 

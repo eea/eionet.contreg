@@ -88,6 +88,7 @@
 									</c:choose>>
 									<c:forEach items="${actionBean.columns}" var="col">
 										<%-- assume crfn:format() does the XML escaping --%>
+										<%-- is implemented in: public class JstlFunctions --%>
 										<td>${crfn:format(col, resultListItem, actionBean)}</td>
 									</c:forEach>
 								</tr>

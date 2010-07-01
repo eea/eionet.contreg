@@ -113,8 +113,50 @@
 							</div>
 						</c:if>
 					</stripes:layout-component>
+
+					<!--  Home headers, content or default content -->
+					<c:choose>
+						<c:when test="${actionBean.homeContext}">
+							<c:choose>
+								<c:when test="${actionBean.userAuthorized || actionBean.showPublic}" >
+							        <div id="tabbedmenu">
+									    <ul>
+									    	<c:forEach items="${actionBean.tabs}" var="tab">
+										    	<c:if test="${actionBean.userAuthorized || tab.showPublic == actionBean.showpublicYes }" >
+													<c:choose>
+												  		<c:when test="${actionBean.section == tab.tabType}" > 
+															<li id="currenttab"><span><c:out value="${tab.title}"/></span></li>
+														</c:when>
+														<c:otherwise>
+															<li>
+																<stripes:link href="${actionBean.baseHomeUrl}${actionBean.attemptedUserName}/${tab.tabType}">
+																	<c:out value="${tab.title}"/>
+													            </stripes:link>
+												            </li>
+														</c:otherwise>
+													</c:choose>
+												</c:if>
+											</c:forEach>
+											
+									    </ul>
+									</div>
+									<br style="clear:left" />
+									<div style="margin-top:10px">
+										<stripes:layout-component name="contents"/>
+									</div>
+								</c:when>
+								<c:otherwise>
+										<div class="error-msg">
+										${actionBean.authenticationMessage}
+										</div>
+								</c:otherwise>
+							</c:choose>
+						</c:when>
+						<c:otherwise>
+							<stripes:layout-component name="contents"/>
+						</c:otherwise>
+					</c:choose>
 					
-					<stripes:layout-component name="contents"/>
 				</div>
 				<div id="pagefoot" style="max-width: none;">
 					<p><a href="mailto:cr@eionet.europa.eu">E-mail</a> | Last harvest: 2008-01-29 | <a href="mailto:helpdesk@eionet.europa.eu?subject=Feedback from the Content Registry website">Feedback</a></p>

@@ -1,7 +1,17 @@
 <%@ include file="/pages/common/taglibs.jsp"%>
-<stripes:layout-definition>
+
+<stripes:layout-render name="/pages/common/template.jsp" pageTitle="User History">
+<stripes:layout-component name="contents">
 
 	<c:choose>
+		<c:when test="${actionBean.userAuthorized}" >
+			<H1>My registrations</H1>
+		</c:when>
+		<c:otherwise>
+			<H1>${actionBean.attemptedUserName}'s registrations</H1>
+		</c:otherwise>
+	</c:choose>
+		<c:choose>
 		<c:when test="${not empty actionBean.registrations}">
 			<display:table name="${actionBean.registrations}" class="datatable"
 				pagesize="20" sort="list" id="registrations" htmlId="registratioinslist"
@@ -25,4 +35,5 @@
 			<p>No registrations found.</p>
 		</c:otherwise>
 	</c:choose>
-</stripes:layout-definition>
+</stripes:layout-component>
+</stripes:layout-render>

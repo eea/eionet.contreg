@@ -1,6 +1,8 @@
 <%@ include file="/pages/common/taglibs.jsp"%>
-<stripes:layout-definition>
 
+<stripes:layout-render name="/pages/common/template.jsp" pageTitle="User History">
+
+<stripes:layout-component name="contents">
 	<c:choose>
 		<c:when test="${not empty actionBean.history}">
 
@@ -20,4 +22,5 @@
 			<p>No history found.</p>
 		</c:otherwise>
 	</c:choose>
-</stripes:layout-definition>
+</stripes:layout-component>
+</stripes:layout-render>

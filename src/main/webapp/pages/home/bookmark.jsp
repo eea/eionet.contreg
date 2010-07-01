@@ -1,5 +1,8 @@
 <%@ include file="/pages/common/taglibs.jsp"%>
-<stripes:layout-definition>
+<stripes:layout-render name="/pages/common/template.jsp" pageTitle="User bookmarks">
+
+<stripes:layout-component name="contents">
+
 	<c:choose>
 		<c:when test="${not empty actionBean.bookmarks}">
 			<crfn:form id="bookmarkForm"
@@ -14,7 +17,7 @@
 					</display:column>
 					<display:column title="URL" sortable="false">
 						<stripes:link href="/factsheet.action">${bookmark.bookmarkUrl}
-												<stripes:param name="uri" value="${bookmark.bookmarkUrl}" />
+							<stripes:param name="uri" value="${bookmark.bookmarkUrl}" />
 						</stripes:link>
 					</display:column>
 				</display:table>
@@ -28,4 +31,6 @@
 			<p>No bookmarks found.</p>
 		</c:otherwise>
 	</c:choose>
-</stripes:layout-definition>
+
+</stripes:layout-component>
+</stripes:layout-render>

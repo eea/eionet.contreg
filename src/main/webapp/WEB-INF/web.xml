@@ -37,7 +37,12 @@
 		<init-param>
         	<param-name>LocalePicker.Class</param-name>
         	<param-value>eionet.cr.web.util.LocalePicker</param-value>
-        </init-param>		
+        </init-param>
+        <init-param>
+    		<param-name>trimSpaces</param-name>
+    		<param-value>true</param-value>
+		</init-param>
+        		
 	</filter>
 	
 	<filter-mapping>
@@ -61,7 +66,7 @@
 		<filter-name>CAS Filter</filter-name>
 		<url-pattern>/login</url-pattern>
 	</filter-mapping>
-
+	
 	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 	<!--              listeners                 -->
 	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->

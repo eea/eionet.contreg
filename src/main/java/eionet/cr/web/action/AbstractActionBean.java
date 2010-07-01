@@ -81,6 +81,8 @@ public abstract class AbstractActionBean implements ActionBean {
 	/** */
 	private HashSet<String> acceptedLanguages;
 	
+	protected boolean homeContext;
+	
 	/*
 	 * (non-Javadoc)
 	 * @see net.sourceforge.stripes.action.ActionBean#getContext()
@@ -266,5 +268,13 @@ public abstract class AbstractActionBean implements ActionBean {
 	 */
 	public String[] excludeFromSortAndPagingUrls(){
 		return null;
+	}
+
+	public boolean isHomeContext() {
+		return homeContext;
+	}
+
+	public void setHomeContext(boolean homeContext) {
+		this.homeContext = homeContext;
 	}
 }
