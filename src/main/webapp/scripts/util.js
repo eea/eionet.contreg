@@ -23,6 +23,9 @@
 
 $(document).ready(
 		function(){
+
+			$("#propertyText").autocomplete("ever catch everyday cc");
+
 			$("#export_form_noscript").hide();
 			//export clicked
 			$(".export_div").show().click(function(){
@@ -45,6 +48,29 @@ $(document).ready(
 			    });
 				return false;
 			});
+
+			//Factsheet edit & autocomplete
+			$("#propertySelect").change(function(){
+				if(this.value=='http://cr.eionet.europa.eu/ontologies/contreg.rdf#tag'){
+					$('#propertyText').replaceWith('<input id="propertyText" type="text" name="propertyValue" value="' +  $('#propertyText').text() + '"  size="60" />');
+					var ac = $('#propertyText').autocomplete({ 
+					    serviceUrl:'json/tags.action',
+					    minChars:2, 
+					    delimiter: /(,|;)\s*/, 
+					    maxHeight:400,
+					    width:300,
+					    zIndex: 9999,
+					    deferRequestBy: 0, 
+					    noCache: true 
+					});
+				}
+				else {
+					if ($('input[id="propertyText"]').length>0){
+						$('#propertyText').replaceWith('<textarea id="propertyText" cols="100" name="propertyValue" rows="2">' +  $('#propertyText').text() + '</textarea>');
+					}
+				}
+			});
+
 });
 
 
@@ -124,99 +150,6 @@ function openWindow(windowName) {
 	var w = window.open(windowName,"",features);
 	w.focus();
 }
-
-/*function openSpatialHist(ID) {
-
-	var url = "spatialhistory.jsv?ID=" + ID;
-	var name = "History";
-	var features = "location=no, menubar=yes, width=750, height=600, top=50, left=30, scrollbars=yes";
-	var w = window.open(url,name,features);
-	w.focus(); 
-} */
-
-
-/*
-function openHistory(ID,TYPE){
-	var url = "history.jsv?entity=" + TYPE + "&id=" + ID;
-	var name = "History";
-	var features = "location=no, menubar=no, width=640, height=400, top=100, left=200, scrollbars=yes";
-	var w = window.open(url,name,features);
-	w.focus();
-
-}
-*/
-
-
-//
-// Opens edit help window
-//
-function openHelp(ID){
-	var url = "help.jsv?helpID=" + ID;
-	var name = "Help";
-	var features = "location=no, menubar=no, width=730, height=480, top=100, left=200, scrollbars=no";
-	var w = window.open(url,name,features);
-	w.focus();
-}
-
-//
-// Opens view help window
-//
-function openViewHelp(ID){
-	var url = "viewhelp.jsv?helpID=" + ID;
-	var name = "Help";
-	var features = "location=no, menubar=no, width=730, height=480, top=100, left=200, scrollbars=yes, resizable=yes";
-	var w = window.open(url,name,features);
-	w.focus();
-}
-
-//
-// Opens help list window
-//
-function openHelpList(mode){
-	var url = "helplist.jsv?mode=" + mode;
-	var name = "Help";
-	var features = "location=no, menubar=no, width=730, height=480, top=100, left=200, scrollbars=yes, resizable=yes";
-	var w = window.open(url,name,features);
-	w.focus();
-}
-
-/**
-* Opens deliveries window
-*/
-/*
-function openDeliveries(ACT_ID, COUNTRY_ID){
-
-	var url = "csdeliveries?ACT_DETAILS_ID=" + ACT_ID ; // + "&#038;mi6";
-	url = url + "&COUNTRY_ID=" + escape(COUNTRY_ID);
-	var name = "CSDeliveries";
-	var features = "location=no, menubar=yes, width=750, height=600, top=50, left=30, scrollbars=yes";
-	var w = window.open( url, name, features);
-	w.focus();
-}
-*/
-/**
-* opens client/issuer window
-*/
-/*function openClient(ID){
-
-	var url = "client.jsv?id=" + ID;
-	var name = "Client";
-	var features = "location=no, menubar=no, width=650, height=500, top=50, left=50, scrollbars=no, resizable=yes";
-	var w = window.open(url,name,features);
-	w.focus();
-
-}*/
-
-/**
-* Link to Circa
-*/
-function openCirca(url){
-	var name = "CSCIRCA";
-	var features = "location=yes, menubar=yes, width=750, height=600, top=30, left=30, resizable=yes, scrollbars=yes";
-	var w = window.open( url, name, features);
-	w.focus();
-}
-
 
 /**
 */

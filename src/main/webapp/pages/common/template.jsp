@@ -24,6 +24,7 @@
 			
 			<script type="text/javascript" src="<c:url value="/scripts/jquery-1.3.2.min.js"/>"></script>
 			<script type="text/javascript" src="<c:url value="/scripts/jquery-timers.js"/>"></script>
+			<script type="text/javascript" src="<c:url value="/scripts/jquery.autocomplete.js"/>"></script>
 			<script type="text/javascript" src="<c:url value="/scripts/util.js"/>"></script>
 			<script type="text/javascript" src="<c:url value="/scripts/pageops.js"/>"></script>
 		</head>
