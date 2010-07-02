@@ -28,7 +28,6 @@ import junit.framework.TestCase;
 import org.junit.Test;
 
 import eionet.cr.dto.TagDTO;
-import eionet.cr.util.Pair;
 
 /**
  * 
@@ -39,17 +38,35 @@ import eionet.cr.util.Pair;
 public class TagCloudCacheTest extends TestCase {
 	
 	@Test
-	public void testCacheLimit(){
+	public void testTagCacheLimit(){
 		new ApplicationCache().contextInitialized(null);
 		
-		ApplicationCache.updateTagCloudCache(getTestData(11));
+		ApplicationCache.updateTagCloudCache(getTestData(15));
 		
+		assertEquals(15, ApplicationCache.getTagCloud(0).size());		
+		assertEquals(15, ApplicationCache.getTagCloud(10000).size());		
 		assertEquals(10, ApplicationCache.getTagCloud(10).size());		
 		assertEquals(3, ApplicationCache.getTagCloud(3).size());
-		assertEquals("tag0", ApplicationCache.getTagCloud(3).get(0).getTag());		
+		assertEquals("tag100", ApplicationCache.getTagCloud(3).get(0).getTag());		
 		assertEquals(99, ApplicationCache.getTagCloud(3).get(1).getCount());		
-		assertEquals(9, ApplicationCache.getTagCloud(3).get(1).getScale());		
+		assertEquals(4, ApplicationCache.getTagCloud(3).get(1).getScale());		
 	}
+	@Test
+	public void testTagCacheSorting(){
+		
+		ApplicationCache.updateTagCloudCache(getTestData(10));
+		
+		assertEquals("tag100", ApplicationCache.getTagCloudSortedByName(10).get(0).getTag());		
+		assertEquals("tag91", ApplicationCache.getTagCloudSortedByName(10).get(1).getTag());		
+		assertEquals("tag92", ApplicationCache.getTagCloudSortedByName(10).get(2).getTag());		
+
+		assertEquals("tag100", ApplicationCache.getTagCloudSortedByCount(10).get(0).getTag());		
+		assertEquals("tag99", ApplicationCache.getTagCloudSortedByCount(10).get(1).getTag());		
+		assertEquals("tag98", ApplicationCache.getTagCloudSortedByCount(10).get(2).getTag());
+		//if equal count, then sort by name
+		assertEquals("tag95", ApplicationCache.getTagCloudSortedByCount(10).get(4).getTag());		
+		assertEquals("tag96", ApplicationCache.getTagCloudSortedByCount(10).get(5).getTag());		
+}
 
 	/**
 	 * @return
@@ -57,7 +74,7 @@ public class TagCloudCacheTest extends TestCase {
 	private List<TagDTO> getTestData(int size) {
 		List<TagDTO> result = new ArrayList<TagDTO>();
 		for(int i=0; i< size; i++) {
-			result.add(new TagDTO("tag" + i, 100 - i, 100));
+			result.add(new TagDTO("tag" + (100 - i), (i==5 ? 96 : 100 - i), 100));
 		}
 		return result;
 	}

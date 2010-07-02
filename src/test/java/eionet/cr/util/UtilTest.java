@@ -21,10 +21,11 @@
 package eionet.cr.util;
 
 import java.util.ArrayList;
-
-import org.junit.Test;
+import java.util.List;
 
 import junit.framework.TestCase;
+
+import org.junit.Test;
 
 /**
  * 
@@ -71,5 +72,24 @@ public class UtilTest extends TestCase{
 	public void test_dateToString(){
 		
 		System.out.println(Util.dateToString(new java.util.Date(), "yyyy-MM-dd'T'HH:mm:ss"));
+	}
+	@Test
+	public void testSplitStringBySpaces(){
+		String tags = "tag1 tag2 tag3 \"tag4  tag5\"  tag6 'tag7 tag8' tag9";
+		List<String> resultList = Util.splitStringBySpacesExpectBetweenQuotes(tags);
+		
+		assertEquals("tag1", resultList.get(0));
+		assertEquals("tag2", resultList.get(1));
+		assertEquals("tag3", resultList.get(2));
+		assertEquals("tag4  tag5", resultList.get(3));
+		assertEquals("tag6", resultList.get(4));
+		assertEquals("tag7 tag8", resultList.get(5));
+		assertEquals("tag9", resultList.get(6));
+
+		String tag = "tag1";
+		resultList = Util.splitStringBySpacesExpectBetweenQuotes(tag);
+		assertEquals(1, resultList.size());
+		assertEquals("tag1", resultList.get(0));
+
 	}
 }
