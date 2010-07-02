@@ -126,14 +126,26 @@ public class ApplicationCache implements ServletContextListener {
 		}
 		
 		List<TagDTO> cache  = (List<TagDTO>) element.getValue();
+		limit = limit==0 ? cache.size() : limit;
 		
 		List<TagDTO> result = new LinkedList<TagDTO>(
-				cache.subList(0,Math.max(cache.size(),cache.size() - limit))); 
+				cache.subList(0,Math.min(cache.size(), limit))); 
 
-		Collections.sort(result, new TagDTO.NameComparatorAsc());
 		
 		return result;
 		
+	}
+	public static List<TagDTO> getTagCloudSortedByName(int limit) {
+		List<TagDTO> result = getTagCloud(limit);
+		Collections.sort(result, new TagDTO.NameComparatorAsc());
+		
+		return result;
+	}
+	public static List<TagDTO> getTagCloudSortedByCount(int limit) {
+		List<TagDTO> result = getTagCloud(limit);
+		Collections.sort(result, new TagDTO.CountComparatorDesc());
+
+		return result;
 	}
 
 	/**

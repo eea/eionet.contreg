@@ -29,13 +29,14 @@ import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.jsp.PageContext;
 
@@ -454,11 +455,35 @@ public class Util {
 		
 		return hitCount.intValue();
 	}
+	
+	/**
+	 * 
+	 * @param subjectString
+	 * @return
+	 */
+	public static List<String> splitStringBySpacesExpectBetweenQuotes(String subjectString){
+		
+		List<String> matchList = new ArrayList<String>();
+		Pattern regex = Pattern.compile("[^\\s\"']+|\"([^\"]*)\"|'([^']*)'");
+		Matcher regexMatcher = regex.matcher(subjectString.trim());
+		while (regexMatcher.find()) {
+		    if (regexMatcher.group(1)!=null) {
+		        // Add double-quoted string without the quotes
+		        matchList.add(regexMatcher.group(1));
+			} else if (regexMatcher.group(2)!=null) {
+				// Add single-quoted string without the quotes
+				matchList.add(regexMatcher.group(2));
+		    } else {
+		        // Add unquoted word
+		        matchList.add(regexMatcher.group());
+		    }
+		}
+		return matchList;
+	}
 	/**
 	 * 
 	 * @param args
 	 */
 	public static void main(String[] args){
-		
 	}
 }

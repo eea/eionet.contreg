@@ -78,10 +78,10 @@ public class TagDTO implements Serializable {
 	/**
 	 * Compares two tags by count in ascending order
 	 */
-	static public class CountComparatorAsc implements Comparator<TagDTO> {
+	static public class CountComparatorDesc implements Comparator<TagDTO> {
 
 		public int compare(TagDTO tag1, TagDTO tag2) {
-			int countComparison = tag1.getCount() - tag2.getCount();
+			int countComparison = tag2.getCount() - tag1.getCount();
 			
 			// if the score is the same sort by name
 			if (countComparison == 0) {

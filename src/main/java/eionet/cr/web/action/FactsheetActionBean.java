@@ -58,6 +58,7 @@ import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
 import eionet.cr.util.URLUtil;
+import eionet.cr.util.Util;
 import eionet.cr.web.util.FactsheetObjectId;
 
 /**
@@ -279,11 +280,23 @@ public class FactsheetActionBean extends AbstractActionBean{
 		
 		SubjectDTO subjectDTO = new SubjectDTO(uri, anonymous);
 		
-		ObjectDTO objectDTO = new ObjectDTO(propertyValue, true);		
-		objectDTO.setSourceUri(getUser().getRegistrationsUri());		
-		subjectDTO.addObject(propertyUri, objectDTO);
+		if(propertyUri.equals(Predicates.CR_TAG)){
+			List<String> tags = Util.splitStringBySpacesExpectBetweenQuotes(propertyValue);
+			
+			for(String tag: tags){
+				ObjectDTO objectDTO = new ObjectDTO(tag, true);		
+				objectDTO.setSourceUri(getUser().getRegistrationsUri());		
+				subjectDTO.addObject(propertyUri, objectDTO);				
+			}
+		}
+		//other properties
+		else{
+			ObjectDTO objectDTO = new ObjectDTO(propertyValue, true);		
+			objectDTO.setSourceUri(getUser().getRegistrationsUri());		
+			subjectDTO.addObject(propertyUri, objectDTO);							
+		}
 		
-		HelperDAO helperDao = factory.getDao(HelperDAO.class);			 
+		HelperDAO helperDao = factory.getDao(HelperDAO.class);
 		helperDao.addTriples(subjectDTO);
 		helperDao.addResource(propertyUri, getUser().getRegistrationsUri());
 		helperDao.addResource(getUser().getRegistrationsUri(), getUser().getRegistrationsUri());
