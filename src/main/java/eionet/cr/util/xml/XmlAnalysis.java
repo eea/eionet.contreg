@@ -134,16 +134,16 @@ public class XmlAnalysis {
 	 * 
 	 * @return
 	 */
-	public String getStartTag(){
-		return handler.getStartTag();
+	public String getStartElemLocalName(){
+		return handler.getStartElemLocalName();
 	}
 
 	/**
 	 * 
 	 * @return
 	 */
-	public String getStartTagNamespace(){
-		return handler.getStartTagNamespace();
+	public String getStartElemNamespace(){
+		return handler.getStartElemNamespace();
 	}
 	
 	/**
@@ -160,6 +160,23 @@ public class XmlAnalysis {
 	 */
 	public String getSchemaNamespace(){
 		return handler.getSchemaNamespace();
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public String getStartElemUri(){
+		
+		String ns = handler.getStartElemNamespace();
+		if (ns!=null && ns.trim().length()>0){
+			String lName = handler.getStartElemLocalName();
+			if (lName!=null && lName.trim().length()>0){
+				return ns + lName;
+			}
+		}
+		
+		return null;
 	}
 	
 	/**
@@ -186,8 +203,8 @@ public class XmlAnalysis {
 	private class Handler extends DefaultHandler{
 		
 		/** */
-		private String startTag = null;
-		private String startTagNamespace = null;
+		private String startElemLocalName = null;
+		private String startElemNamespace = null;
 		private String schemaLocation = null;
 		private String schemaNamespace = null;
 		private HashMap<String,String> usedNamespaces = new HashMap<String,String>();
@@ -196,10 +213,10 @@ public class XmlAnalysis {
 		 * (non-Javadoc)
 		 * @see org.xml.sax.helpers.DefaultHandler#startElement(java.lang.String, java.lang.String, java.lang.String, org.xml.sax.Attributes)
 		 */
-		public void startElement(String uri, String localName, String name, Attributes attrs) throws SAXException {
+		public void startElement(String uri, String localName, String qName, Attributes attrs) throws SAXException {
 			
-			this.startTagNamespace = uri;
-			this.startTag = (localName==null || localName.length()==0) ? name : localName;
+			this.startElemNamespace = uri;
+			this.startElemLocalName = localName.length()>0 ? localName : qName;
 			 
 			int attrCount = attrs!=null ? attrs.getLength() : 0;
 			for (int i=0; i<attrCount; i++) {
@@ -254,17 +271,17 @@ public class XmlAnalysis {
 	    }
 
 		/**
-		 * @return the startTag
+		 * @return the startElemLocalName
 		 */
-		public String getStartTag() {
-			return startTag;
+		public String getStartElemLocalName() {
+			return startElemLocalName;
 		}
 
 		/**
-		 * @return the startTagNamespace
+		 * @return the startElemNamespace
 		 */
-		public String getStartTagNamespace() {
-			return startTagNamespace;
+		public String getStartElemNamespace() {
+			return startElemNamespace;
 		}
 
 		/**
@@ -287,8 +304,8 @@ public class XmlAnalysis {
 		XmlAnalysis info = new XmlAnalysis();
 		try{
 			info.parse(new File("C:/temp/schema.rdf"));
-			System.out.println(info.getStartTag());
-			System.out.println(info.getStartTagNamespace());
+			System.out.println(info.getStartElemLocalName());
+			System.out.println(info.getStartElemNamespace());
 		}
 		catch (Throwable t){
 			t.printStackTrace();

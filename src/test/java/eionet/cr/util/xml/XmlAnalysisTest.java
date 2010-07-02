@@ -51,10 +51,10 @@ public class XmlAnalysisTest extends TestCase{
 		
 		assertTrue(xmlAnalysis.getSchemaNamespace()==null || xmlAnalysis.getSchemaNamespace().length()==0);
 		
-		assertNotNull(xmlAnalysis.getStartTag());
-		assertEquals(xmlAnalysis.getStartTag(), "habitat");
+		assertNotNull(xmlAnalysis.getStartElemLocalName());
+		assertEquals(xmlAnalysis.getStartElemLocalName(), "habitat");
 		
-		assertTrue(xmlAnalysis.getStartTagNamespace()==null || xmlAnalysis.getStartTagNamespace().length()==0);
+		assertTrue(xmlAnalysis.getStartElemNamespace()==null || xmlAnalysis.getStartElemNamespace().length()==0);
 		
 		assertNull(xmlAnalysis.getSystemDtd());
 		assertNull(xmlAnalysis.getPublicDtd());

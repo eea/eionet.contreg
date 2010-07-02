@@ -59,6 +59,8 @@ import eionet.cr.util.URLUtil;
 import eionet.cr.util.UrlRedirectAnalyzer;
 import eionet.cr.util.UrlRedirectionInfo;
 import eionet.cr.util.Util;
+import eionet.cr.util.sql.DbConnectionProvider;
+import eionet.cr.util.sql.DbConnectionProvider.ConnectionType;
 import eionet.cr.util.xml.ConversionsParser;
 import eionet.cr.util.xml.XmlAnalysis;
 import eionet.cr.web.security.CRUser;
@@ -471,6 +473,12 @@ public class PullHarvest extends Harvest{
 				}
 			}
 			
+			// if no schema or DTD still found, assume the URI of the starting element
+			// to be the schema by which conversions should be looked for
+			if (schemaOrDtd==null || schemaOrDtd.length()==0){
+				schemaOrDtd = xmlAnalysis.getStartElemUri();
+			}
+			
 			// if this file has a conversion to RDF, run it and return the reference to the resulting file
 			if (schemaOrDtd!=null && schemaOrDtd.length()>0){
 				
@@ -679,5 +687,12 @@ public class PullHarvest extends Harvest{
 
 	public void setFullSetupModeUrgent(boolean fullSetupModeUrgent) {
 		this.fullSetupModeUrgent = fullSetupModeUrgent;
+	}
+	
+	public static void main(String[] args) throws HarvestException{
+
+		DbConnectionProvider.setConnectionType(ConnectionType.SIMPLE);
+		PullHarvest harvest = new PullHarvest("http://norman.walsh.name/atom/whatsnew.xml", null);
+		harvest.execute();
 	}
 }
