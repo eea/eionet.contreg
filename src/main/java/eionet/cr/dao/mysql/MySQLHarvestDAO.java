@@ -149,7 +149,7 @@ public class MySQLHarvestDAO extends MySQLBaseDAO implements HarvestDAO {
 	 * (non-Javadoc)
 	 * @see eionet.cr.dao.HarvestDAO#getLastHarvest(java.lang.Integer)
 	 */
-	public HarvestDTO getLastHarvest(Integer harvestSourceId) throws DAOException {
+	public HarvestDTO getLastHarvestBySourceId(Integer harvestSourceId) throws DAOException {
 		List<Object> values = new ArrayList<Object>();
     	values.add(harvestSourceId);
 		List<HarvestDTO> list = executeQuery(getLastHarvestSQL, values, new HarvestDTOReader());		

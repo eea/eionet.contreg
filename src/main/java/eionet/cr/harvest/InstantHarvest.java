@@ -88,7 +88,7 @@ public class InstantHarvest extends PullHarvest{
 		int numOfResources = dto.getResources()==null ? 0 : dto.getResources().intValue();
 		
 		instantHarvest.setPreviousHarvest(DAOFactory.get().getDao(
-				HarvestDAO.class).getLastHarvest(dto.getSourceId().intValue()));
+				HarvestDAO.class).getLastHarvestBySourceId(dto.getSourceId().intValue()));
 		instantHarvest.setDaoWriter(new HarvestDAOWriter(
 				dto.getSourceId().intValue(), Harvest.TYPE_PULL, numOfResources, CRUser.application.getUserName()));
 		instantHarvest.setNotificationSender(new HarvestNotificationSender());

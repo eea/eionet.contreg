@@ -30,6 +30,7 @@ import eionet.cr.dao.readers.HarvestDTOReader;
 import eionet.cr.dao.readers.HarvestWithMessageTypesReader;
 import eionet.cr.dto.HarvestDTO;
 import eionet.cr.harvest.util.HarvestMessageType;
+import eionet.cr.util.Hashes;
 import eionet.cr.util.sql.DbConnectionProvider;
 import eionet.cr.util.sql.SQLUtil;
 
@@ -85,16 +86,17 @@ public class PostgreSQLHarvestDAO extends PostgreSQLBaseDAO implements HarvestDA
     }
 
 	/** */
-	private static final String getLastHarvestSQL = "select *, USERNAME as USER" +
+	private static final String getLastHarvestBySourceIdSQL = "select *, USERNAME as USER" +
 			" from HARVEST where HARVEST_SOURCE_ID=? order by HARVEST.STARTED desc limit 1";
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.dao.HarvestDAO#getLastHarvest(java.lang.Integer)
 	 */
-	public HarvestDTO getLastHarvest(Integer harvestSourceId) throws DAOException {
+	public HarvestDTO getLastHarvestBySourceId(Integer harvestSourceId) throws DAOException {
+
 		List<Object> values = new ArrayList<Object>();
     	values.add(harvestSourceId);
-		List<HarvestDTO> list = executeQuery(getLastHarvestSQL, values, new HarvestDTOReader());		
+		List<HarvestDTO> list = executeQuery(getLastHarvestBySourceIdSQL, values, new HarvestDTOReader());		
 		return list!=null && !list.isEmpty() ? list.get(0) : null;
 	}
 

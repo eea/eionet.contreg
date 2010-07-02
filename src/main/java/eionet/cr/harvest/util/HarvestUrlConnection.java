@@ -121,6 +121,7 @@ public class HarvestUrlConnection {
 				&& !contentType.startsWith("text/xml")
 				&& !contentType.startsWith("application/xml")
 				&& !contentType.startsWith("application/rdf+xml")
+				&& !contentType.startsWith("application/atom+xml")
 				&& !contentType.startsWith("application/octet-stream")
 				&& !contentType.startsWith("application/x-gzip")){
 			contentTypeValid = false;

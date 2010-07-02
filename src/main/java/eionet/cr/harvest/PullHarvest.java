@@ -275,7 +275,9 @@ public class PullHarvest extends Harvest{
 					directedSource = new HarvestSourceDTO();
 					directedSource.setIntervalMinutes(originalSource.getIntervalMinutes());
 					directedSource.setUrl(current.getSourceURL());
-					DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(directedSource, null);
+					Integer sourceId = DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(
+							directedSource, null);
+					directedSource.setSourceId(sourceId.intValue());
 				}
 				
 				Date now = new Date();
@@ -656,7 +658,7 @@ public class PullHarvest extends Harvest{
 		
 		harvest.setFullSetupMode(true);
 		harvest.setFullSetupModeUrgent(urgent);
-		harvest.setPreviousHarvest(DAOFactory.get().getDao(HarvestDAO.class).getLastHarvest(
+		harvest.setPreviousHarvest(DAOFactory.get().getDao(HarvestDAO.class).getLastHarvestBySourceId(
 				dto.getSourceId().intValue()));
 		harvest.setDaoWriter(new HarvestDAOWriter(
 				dto.getSourceId().intValue(), Harvest.TYPE_PULL, numOfResources, CRUser.application.getUserName()));

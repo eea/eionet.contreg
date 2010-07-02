@@ -65,5 +65,5 @@ public interface HarvestDAO extends DAO {
      * @return
      * @throws DAOException
      */
-    public HarvestDTO getLastHarvest(Integer harvestSourceId) throws DAOException;
+    public HarvestDTO getLastHarvestBySourceId(Integer harvestSourceId) throws DAOException;
 }
