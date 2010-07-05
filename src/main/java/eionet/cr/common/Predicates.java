@@ -34,6 +34,8 @@ public interface Predicates {
 	public static final String DC_CONTRIBUTOR = "http://purl.org/dc/elements/1.1/contributor";
 	public static final String DC_RELATION = "http://purl.org/dc/elements/1.1/relation";
 	public static final String DC_LANGUAGE = "http://purl.org/dc/elements/1.1/language";
+	public static final String DC_FORMAT = "http://purl.org/dc/elements/1.1/format";
+	public static final String DC_TYPE = "http://purl.org/dc/elements/1.1/type";
 	
 	public static final String DCTERMS_ALTERNATIVE = "http://purl.org/dc/terms/alternative";
 	
@@ -54,6 +56,7 @@ public interface Predicates {
 	public static final String ROD_ISSUE_PROPERTY = "http://rod.eionet.europa.eu/schema.rdf#issue";
 	public static final String ROD_HAS_FILE = "http://rod.eionet.europa.eu/schema.rdf#hasFile";
 	public static final String ROD_PRODUCT_OF = "http://rod.eionet.europa.eu/schema.rdf#productOf";
+	public static final String ROD_PERIOD = "http://rod.eionet.europa.eu/schema.rdf#period";
 
 	public static final String CR_FIRSTSEEN_TIME = "urn:eionet:contreg:firstseen-time";
 	public static final String CR_URL = "urn:eionet:contreg:url";
@@ -70,6 +73,7 @@ public interface Predicates {
 	public static final String CR_COMMENT = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#comment";
 	public static final String CR_HAS_SOURCE = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#hasSource";
 	public static final String CR_HAS_FEEDBACK = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#hasFeedback";
+	public static final String CR_USER = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#user";
 	
 	public static final String WGS_LAT = "http://www.w3.org/2003/01/geo/wgs84_pos#lat";
 	public static final String WGS_LONG = "http://www.w3.org/2003/01/geo/wgs84_pos#long";
