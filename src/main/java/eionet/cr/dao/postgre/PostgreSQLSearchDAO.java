@@ -23,16 +23,20 @@ package eionet.cr.dao.postgre;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DurationFormatUtils;
 
 import eionet.cr.common.Predicates;
+import eionet.cr.common.Subjects;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.postgre.helpers.FilteredSearchHelper;
@@ -43,6 +47,7 @@ import eionet.cr.dao.postgre.helpers.SearchBySourceHelper;
 import eionet.cr.dao.postgre.helpers.SearchHelper;
 import eionet.cr.dao.postgre.helpers.SpatialSearchHelper;
 import eionet.cr.dao.readers.FreeTextSearchDataReader;
+import eionet.cr.dao.readers.RODDeliveryReader;
 import eionet.cr.dao.readers.SubjectDataReader;
 import eionet.cr.dao.util.BBOX;
 import eionet.cr.dao.util.SearchExpression;
@@ -553,5 +558,31 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 
 		// the result Pair contains total number of subjects and the requested sub-list
 		return new Pair<Integer,List<SubjectDTO>>(Integer.valueOf(totalRowCount), subjects);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.SearchDAO#searchDeliveriesForROD(eionet.cr.util.pagination.PagingRequest)
+	 */
+	public Vector<Hashtable<String,Vector<String>>> searchDeliveriesForROD(
+			PagingRequest pagingRequest)throws DAOException {
+
+		StringBuilder sBuilder = new StringBuilder("select distinct").
+		append(" SUBJECT as SUBJECT_HASH, PREDICATE as PREDICATE_HASH, OBJECT, LIT_OBJ").
+		append(" from SPO").
+		append(" where").
+		append(" PREDICATE in (").append(Util.toCSV(RODDeliveryReader.getPredicateHashes())).
+		append(") and ANON_OBJ='N'").
+		append(" and SUBJECT in (select distinct SUBJECT from SPO").
+		append(" where PREDICATE=").append(Hashes.spoHash(Predicates.RDF_TYPE)).
+		append(" and OBJECT_HASH=").append(Hashes.spoHash(Subjects.ROD_DELIVERY_CLASS)).
+		append(" order by SUBJECT offset ").append(pagingRequest.getOffset()).
+		append(" limit ").append(pagingRequest.getItemsPerPage()).
+		append(" ) order by SUBJECT");
+		
+
+		RODDeliveryReader reader = new RODDeliveryReader();
+		executeQuery(sBuilder.toString(), reader);
+		return reader.getResultVector();
 	}
 }

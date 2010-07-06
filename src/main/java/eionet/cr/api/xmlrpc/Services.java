@@ -72,4 +72,13 @@ public interface Services {
 	 * @throws CRException
 	 */
 	public Vector getXmlFilesBySchema(String schemaIdentifier) throws CRException;
+	
+	/**
+	 * 
+	 * @param pageNum
+	 * @param pageSize
+	 * @return
+	 * @throws CRException
+	 */
+	public Vector getDeliveries(Integer pageNum, Integer pageSize) throws CRException;
 }

@@ -38,6 +38,7 @@ import org.apache.commons.logging.LogFactory;
 import eionet.cr.common.CRException;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
+import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.SearchDAO;
@@ -62,7 +63,7 @@ public class XmlRpcServices implements Services{
 	
 	/** */
 	private static Log logger = LogFactory.getLog(XmlRpcServices.class);
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.api.xmlrpc.Services#getResourcesSinceTimestamp(java.util.Date)
@@ -254,6 +255,55 @@ public class XmlRpcServices implements Services{
 		return result;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.api.xmlrpc.Services#getDeliveries(java.lang.Integer, java.lang.Integer, java.lang.Integer)
+	 */
+	public Vector getDeliveries(Integer pageNum, Integer pageSize) throws CRException{
+
+		Vector result = new Vector();
+		
+		if (pageNum==null || pageSize==null || pageNum.intValue()<=0 || pageSize.intValue()<=0){
+			return result;
+		}
+		
+		try{
+			result = DAOFactory.get().getDao(SearchDAO.class).searchDeliveriesForROD(
+					PagingRequest.create(pageNum,pageSize));
+		}
+		catch (Throwable t){
+			t.printStackTrace();
+			if (t instanceof CRException)
+				throw (CRException)t;
+			else
+				throw new CRException(t.toString(), t);
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * 
+	 * @param subjectDTO
+	 * @param predicateUri
+	 * @param objType
+	 * @return
+	 */
+	private static Collection<String> getPredicateValues(
+			SubjectDTO subjectDTO, String predicateUri, ObjectDTO.Type objType){
+		
+		HashSet<String> result = new HashSet<String>();
+
+		Collection<ObjectDTO> objects = subjectDTO.getObjects(predicateUri, objType);
+		if (objects!=null && !objects.isEmpty()){
+			for (Iterator<ObjectDTO> iter = objects.iterator(); iter.hasNext();){
+				result.add(iter.next().getValue());
+			}
+		}
+
+		return result;
+	}
+
 	/**
 	 * 
 	 * @param subjectDTO
@@ -262,16 +312,7 @@ public class XmlRpcServices implements Services{
 	 */
 	private static Collection<String> getLiteralValues(SubjectDTO subjectDTO, String predicateUri){
 		
-		HashSet<String> result = new HashSet<String>();
-		
-		Collection<ObjectDTO> objects = subjectDTO.getObjects(predicateUri, ObjectDTO.Type.LITERAL);
-		if (objects!=null && !objects.isEmpty()){
-			for (Iterator<ObjectDTO> iter = objects.iterator(); iter.hasNext();){
-				result.add(iter.next().getValue());
-			}
-		}
-		
-		return result;
+		return getPredicateValues(subjectDTO, predicateUri, ObjectDTO.Type.LITERAL);
 	}
 	
 	/**

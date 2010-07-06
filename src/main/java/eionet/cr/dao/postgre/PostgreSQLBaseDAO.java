@@ -223,7 +223,7 @@ public abstract class PostgreSQLBaseDAO {
 
 	/**
 	 * The method performs the subjects data query based on the list of subjects IDs. 
-	 * The query reads subjecys and predicates filter from given Reader
+	 * The query reads subjects and predicates filter from the given reader.
 	 * 
 	 * @param reader
 	 * @return
@@ -233,8 +233,9 @@ public abstract class PostgreSQLBaseDAO {
 		
 		Map<Long,SubjectDTO> subjectsMap = reader.getSubjectsMap();
 		String predicateHashes = reader.getPredicateHashesCommaSeparated();
-		if (subjectsMap==null || subjectsMap.isEmpty())
+		if (subjectsMap==null || subjectsMap.isEmpty()){
 			throw new IllegalArgumentException("Subjects collection must not be null or empty");
+		}
 
 		// The idea below is that PostgreSQL hangs when the length of the executed query is
 		// more than 4096. This might happen if we execute the below query for too many subjects.
@@ -278,6 +279,7 @@ public abstract class PostgreSQLBaseDAO {
 		
 		return reader.getResultList();
 	}
+
 	/**
 	 * Queries the subjects using sub query and not the list of subject hashes.
 	 * The intention is to use cache tables in sub query.

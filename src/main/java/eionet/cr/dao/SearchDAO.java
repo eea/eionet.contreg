@@ -20,9 +20,11 @@
  */
 package eionet.cr.dao;
 
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
 
 import eionet.cr.dao.util.BBOX;
 import eionet.cr.dao.util.SearchExpression;
@@ -129,4 +131,12 @@ public interface SearchDAO extends DAO{
 	public Pair<Integer, List<SubjectDTO>> searchBySource(String sourceUrl,
 			PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException;
 
+	/**
+	 * 
+	 * @param pagingRequest
+	 * @return
+	 * @throws DAOException
+	 */
+	public Vector<Hashtable<String,Vector<String>>> searchDeliveriesForROD(
+			PagingRequest pagingRequest)throws DAOException;
 }

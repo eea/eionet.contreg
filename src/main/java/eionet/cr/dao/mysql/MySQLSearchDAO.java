@@ -21,11 +21,13 @@
 package eionet.cr.dao.mysql;
 
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringUtils;
@@ -423,6 +425,15 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 			PagingRequest pagingRequest, SortingRequest sortingRequest)
 			throws DAOException {
 		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Method not implemented");
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.SearchDAO#searchDeliveriesForROD(eionet.cr.util.pagination.PagingRequest)
+	 */
+	public Vector<Hashtable<String, Vector<String>>> searchDeliveriesForROD(
+			PagingRequest pagingRequest) throws DAOException {
 		throw new UnsupportedOperationException("Method not implemented");
 	}
 }
