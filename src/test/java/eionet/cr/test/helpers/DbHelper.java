@@ -20,14 +20,42 @@
  */
 package eionet.cr.test.helpers;
 
+import java.io.IOException;
+
 import org.dbunit.PropertiesBasedJdbcDatabaseTester;
+import org.dbunit.database.IDatabaseConnection;
+import org.dbunit.dataset.DataSetException;
+import org.dbunit.dataset.IDataSet;
+import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
+import org.dbunit.operation.DatabaseOperation;
 
 import eionet.cr.config.GeneralConfig;
+import eionet.cr.test.helpers.dbunit.DbUnitDatabaseConnection;
 
 /**
  * 
  */
 public class DbHelper {
+
+	public static void handleDbSetUpOperation(String datasetName) throws Exception {
+		IDatabaseConnection conn = getConnection();
+		IDataSet data = getXmlDataSet(datasetName);
+		try {
+			DatabaseOperation.CLEAN_INSERT.execute(conn, data);
+		} finally {
+			conn.close();
+		}
+	}
+
+	public static IDataSet getXmlDataSet(String fileName) throws DataSetException,
+			IOException {
+		return new FlatXmlDataSetBuilder().build(
+				CRDatabaseTestCase.class.getClassLoader().getResourceAsStream(fileName));
+	}
+
+	public static IDatabaseConnection getConnection() throws Exception {
+		return DbUnitDatabaseConnection.get();
+	}
 
 	/**
 	 * 

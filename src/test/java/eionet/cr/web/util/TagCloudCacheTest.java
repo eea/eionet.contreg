@@ -20,13 +20,14 @@
  */
 package eionet.cr.web.util;
 
+import static org.junit.Assert.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import eionet.cr.dto.TagDTO;
@@ -37,16 +38,14 @@ import eionet.cr.dto.TagDTO;
  *
  */
 
-public class TagCloudCacheTest extends TestCase {
+public class TagCloudCacheTest {
 	
 	@Before
-	protected void setUp() throws Exception {
-		super.setUp();
+	public void initializeContext() throws Exception {
 		new ApplicationCache().contextInitialized(null);	
 	}
 	@After
-	protected void tearDown() throws Exception {
-		super.tearDown();
+	public void destroyContext() throws Exception {
 		new ApplicationCache().contextDestroyed(null);	
 	}
 

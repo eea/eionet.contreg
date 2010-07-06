@@ -20,29 +20,26 @@
  */
 package eionet.cr.dao;
 
+import static org.junit.Assert.assertTrue;
+
 import java.util.List;
 
-import org.dbunit.dataset.IDataSet;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import eionet.cr.dto.TagDTO;
-import eionet.cr.test.helpers.CRDatabaseTestCase;
+import eionet.cr.test.helpers.DbHelper;
 
 /**
  * 
  * @author <a href="mailto:enriko.kasper@tieto.com">Enriko Käsper</a>
  * 
  */
-public class TagsDAOTest extends CRDatabaseTestCase {
+public class TagsDAOTest{
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see eionet.cr.test.helpers.CRDatabaseTestCase#getDataSet()
-	 */
-	@Override
-	protected IDataSet getDataSet() throws Exception {
-		return getXmlDataSet("tags-db.xml");
+	@BeforeClass	
+	public static void setUpBeforeClass() throws Exception {
+		DbHelper.handleDbSetUpOperation("tags-db.xml");
 	}
 	
 	@Test
