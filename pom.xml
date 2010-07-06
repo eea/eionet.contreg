@@ -249,5 +249,12 @@
 		    <artifactId>simple-xml</artifactId>
 		    <version>2.1.3</version>
 		</dependency>
+		<dependency>
+			<groupId>net.sf.json-lib</groupId>
+			<artifactId>json-lib</artifactId>
+			<version>2.3</version>
+			<type>jar</type>
+			<classifier>jdk15</classifier>
+		</dependency>
 	</dependencies>
 </project>
