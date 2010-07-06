@@ -25,6 +25,8 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import eionet.cr.dto.TagDTO;
@@ -37,9 +39,19 @@ import eionet.cr.dto.TagDTO;
 
 public class TagCloudCacheTest extends TestCase {
 	
+	@Before
+	protected void setUp() throws Exception {
+		super.setUp();
+		new ApplicationCache().contextInitialized(null);	
+	}
+	@After
+	protected void tearDown() throws Exception {
+		super.tearDown();
+		new ApplicationCache().contextDestroyed(null);	
+	}
+
 	@Test
 	public void testTagCacheLimit(){
-		new ApplicationCache().contextInitialized(null);
 		
 		ApplicationCache.updateTagCloudCache(getTestData(15));
 		

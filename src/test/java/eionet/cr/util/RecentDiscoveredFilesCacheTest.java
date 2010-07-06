@@ -25,6 +25,8 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import eionet.cr.web.util.ApplicationCache;
@@ -35,9 +37,19 @@ import eionet.cr.web.util.ApplicationCache;
  */
 public class RecentDiscoveredFilesCacheTest extends TestCase {
 	
+	@Before
+	protected void setUp() throws Exception {
+		super.setUp();
+		new ApplicationCache().contextInitialized(null);	
+	}
+	@After
+	protected void tearDown() throws Exception {
+		super.tearDown();
+		new ApplicationCache().contextDestroyed(null);	
+	}
+
 	@Test
 	public void testCache(){
-		new ApplicationCache().contextInitialized(null);
 		
 		for(int i = 0; i < 100; i++){
 			ApplicationCache.updateRecentResourceCache(getTestData(11));

@@ -2,19 +2,15 @@ package eionet.cr.dao;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.dbunit.dataset.IDataSet;
 import org.junit.Test;
 
-import eionet.cr.dao.BaseDAOTest.MockPostgreSQLBaseDAO;
 import eionet.cr.dao.postgre.PostgreSQLExporterDAO;
-import eionet.cr.dao.readers.SubjectDataReader;
-import eionet.cr.dto.SubjectDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.util.sql.SQLUtil;
+import eionet.cr.util.sql.SingleObjectReader;
 
 public class ExporterDAOTest  extends CRDatabaseTestCase {
 
@@ -43,10 +39,10 @@ public class ExporterDAOTest  extends CRDatabaseTestCase {
 			SQLUtil.executeUpdate(createTempSQL, conn1);
 			SQLUtil.executeUpdate(dropTempSQL, conn2);
 
-			SubjectDataReader reader = new SubjectDataReader(new LinkedHashMap<Long, SubjectDTO>());
+			SingleObjectReader<String> reader = new SingleObjectReader<String>();
 			SQLUtil.executeQuery(getSubjectsSQL, null, reader, conn1);
 			
-			List<SubjectDTO> list = reader.getResultList();
+			List<String> list = reader.getResultList();
 			assertTrue(list.size()>0);
 			
 		}
