@@ -74,6 +74,7 @@ public interface Predicates {
 	public static final String CR_HAS_SOURCE = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#hasSource";
 	public static final String CR_HAS_FEEDBACK = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#hasFeedback";
 	public static final String CR_USER = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#user";
+	public static final String CR_USER_REVIEW_LAST_NUMBER = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#userReviewLastNumber";
 	
 	public static final String WGS_LAT = "http://www.w3.org/2003/01/geo/wgs84_pos#lat";
 	public static final String WGS_LONG = "http://www.w3.org/2003/01/geo/wgs84_pos#long";
