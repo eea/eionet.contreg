@@ -20,16 +20,21 @@
  */
 package eionet.cr.web.action;
 
+import static org.junit.Assert.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import net.sourceforge.stripes.mock.MockRoundtrip;
 import net.sourceforge.stripes.mock.MockServletContext;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import eionet.cr.dto.TagDTO;
 import eionet.cr.test.helpers.AbstractStripesMvcTestHelper;
+import eionet.cr.util.sql.DbConnectionProvider;
+import eionet.cr.util.sql.DbConnectionProvider.ConnectionType;
 import eionet.cr.web.util.ApplicationCache;
 
 /**
@@ -40,21 +45,27 @@ import eionet.cr.web.util.ApplicationCache;
 
 public class JsonActionBeanTest extends AbstractStripesMvcTestHelper{
 	
+	@BeforeClass
+	public static void setUpActionContext(){
+		DbConnectionProvider.setConnectionType(ConnectionType.SIMPLE);
+	}
 	@Test
 	public void testJsonTagsResult() throws Exception {
+
 		new ApplicationCache().contextInitialized(null);
 		ApplicationCache.updateTagCloudCache(getTestData());
 
 		// Setup the servlet engine
 	    MockServletContext context = getMockServletContext();
-
 		
 		MockRoundtrip trip = new MockRoundtrip(context, JsonActionBean.class);
-		trip.getRequest().getSession().setAttribute(
+		trip.setParameter(
 				"query", "tag");
 		trip.execute();
-		
-		System.out.println(trip.getResponse());
+		System.out.println(trip.getResponse().getOutputString());
+		assertEquals("{\"query\":\"tag\"," +
+				"\"suggestions\":[\"tag1\",\"tag2\",\"tag3\",\"tag4\"]}",
+				trip.getResponse().getOutputString());
 
 
 	}
