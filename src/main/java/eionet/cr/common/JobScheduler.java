@@ -43,6 +43,7 @@ import eionet.cr.web.util.job.DataflowSearchPicklistCacheUpdater;
 import eionet.cr.web.util.job.GarbageCollectorJob;
 import eionet.cr.web.util.job.RecentResourcesCacheUpdater;
 import eionet.cr.web.util.job.TagCloudCacheUpdater;
+import eionet.cr.web.util.job.TypeCacheTablesUpdaterJob;
 import eionet.cr.web.util.job.TypeCacheUpdater;
 
 /**
@@ -78,7 +79,7 @@ public class JobScheduler implements ServletContextListener{
 								JobScheduler.class.getName(),
 								RecentResourcesCacheUpdater.class)),
 				new Pair(
-						GeneralConfig.RECENT_DISCOVERED_FILES_CACHE_UPDATE_INTERVAL,
+						GeneralConfig.TAG_CLOUD_CACHE_UPDATE_INTERVAL,
 						new JobDetail(
 								TagCloudCacheUpdater.class.getSimpleName(),
 								JobScheduler.class.getName(),
@@ -98,7 +99,13 @@ public class JobScheduler implements ServletContextListener{
 						new JobDetail(
 								GarbageCollectorJob.class.getSimpleName(),
 								JobScheduler.class.getName(),
-								GarbageCollectorJob.class))
+								GarbageCollectorJob.class)),
+				new Pair(
+						GeneralConfig.TYPE_CACHE_UPDATER_CRON_JOB,
+						new JobDetail(
+								TypeCacheTablesUpdaterJob.class.getSimpleName(),
+								JobScheduler.class.getName(),
+								TypeCacheTablesUpdaterJob.class))							
 		};
 		
 	}

@@ -66,6 +66,29 @@ public class TagDTO implements Serializable {
 
 		this.scale = scale;
 	}
+	
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		TagDTO other = (TagDTO) obj;
+		if (count != other.count)
+			return false;
+		if (scale != other.scale)
+			return false;
+		if (tag == null) {
+			if (other.tag != null)
+				return false;
+		} else if (!tag.equals(other.tag))
+			return false;
+		return true;
+	}
+
 	/**
 	 * Compares two tags by name in ascending order
 	 */

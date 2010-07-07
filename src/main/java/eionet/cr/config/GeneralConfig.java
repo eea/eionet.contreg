@@ -78,7 +78,9 @@ public class GeneralConfig {
 	public static final String DATAFLOW_PICKLIST_CACHE_UPDATE_INTERVAL = "dataflowPicklistCacheUpdateInterval";
 	public static final String RECENT_DISCOVERED_FILES_CACHE_UPDATE_INTERVAL = "recentDiscoveredFilesCacheUpdateInterval";
 	public static final String TYPE_CACHE_UPDATE_INTERVAL = "typeCacheUpdateInterval";
+	public static final String TAG_CLOUD_CACHE_UPDATE_INTERVAL = "tagCloudCacheUpdateInterval";
 	public static final String GARBAGE_COLLECTOR_CRON_JOB = "garbageCollectorCronJob";
+	public static final String TYPE_CACHE_UPDATER_CRON_JOB = "typeCacheTablesUpdateCronJob";
 	
 	/** */
 	public static final int SEVERITY_INFO = 1;
