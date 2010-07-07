@@ -34,6 +34,7 @@ import eionet.cr.dao.util.PredicateLabels;
 import eionet.cr.dao.util.SubProperties;
 import eionet.cr.dao.util.UriLabelPair;
 import eionet.cr.dto.ObjectDTO;
+import eionet.cr.dto.ReviewDTO;
 import eionet.cr.dto.RawTripleDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.dto.UserBookmarkDTO;
@@ -948,6 +949,21 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 	public List<RawTripleDTO> getTriplesFor(String sourceUrl,
 			PagingRequest pagingRequest) throws DAOException {
 		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Method not implemented");
+	}
+
+	@Override
+	public int getLastReviewId(CRUser user){
+		throw new UnsupportedOperationException("Method not implemented");
+	}
+	
+	@Override
+	public int generateNewReviewId(CRUser user){
+		throw new UnsupportedOperationException("Method not implemented");
+	}
+	
+	@Override
+	public ReviewDTO addReview(ReviewDTO review, CRUser user){
 		throw new UnsupportedOperationException("Method not implemented");
 	}
 }

@@ -22,12 +22,9 @@ package eionet.cr.web.action;
 
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.mysql.jdbc.Util;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;

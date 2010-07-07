@@ -25,7 +25,7 @@ public abstract class AbstractHomeActionBean extends AbstractActionBean {
 	protected static final String TYPE_HISTORY = "history";
 	protected static final String TYPE_WORKSPACE = "workspace";
 	protected static final String TYPE_REGISTRATIONS = "registrations";
-	protected static final String TYPE_QARAPORTS = "qaraports";
+	protected static final String TYPE_REVIEWS = "reviews";
 	
 	protected static final String SHOWPUBLIC_YES = "Y"; 
 	protected static final String SHOWPUBLIC_NO = "N";
@@ -79,8 +79,8 @@ public abstract class AbstractHomeActionBean extends AbstractActionBean {
 		tabs.add(tabType);
 
 		tabType = new HashMap<String,String>();
-		tabType.put("title", "QA Raports");
-		tabType.put("tabType", "qaraports");
+		tabType.put("title", "Reviews");
+		tabType.put("tabType", "reviews");
 		tabType.put("showPublic", SHOWPUBLIC_NO);
 		tabs.add(tabType);
 		
@@ -137,7 +137,7 @@ public abstract class AbstractHomeActionBean extends AbstractActionBean {
 			!section.equals(TYPE_WORKSPACE)&&
 			!section.equals(TYPE_HISTORY)&&
 			!section.equals(TYPE_REGISTRATIONS)&&
-			!section.equals(TYPE_QARAPORTS))
+			!section.equals(TYPE_REVIEWS))
 		){
 			section = TYPE_WORKSPACE;
 		}

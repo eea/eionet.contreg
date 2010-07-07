@@ -57,6 +57,7 @@ import eionet.cr.dao.util.SubProperties;
 import eionet.cr.dao.util.UriLabelPair;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.RawTripleDTO;
+import eionet.cr.dto.ReviewDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.dto.UserBookmarkDTO;
 import eionet.cr.dto.UserHistoryDTO;
@@ -1426,6 +1427,69 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		}
 		
 		return triples;
+	}
+	
+	@Override
+	public int getLastReviewId(CRUser user) throws DAOException{
+		String subjectUrl = user.getHomeUri();
+		
+		SubjectDTO subject = new SubjectDTO(subjectUrl, false);
+		
+		String dbQuery = "select OBJECT as lastid from SPO " +
+		"where "+
+		"PREDICATE="+Hashes.spoHash(Predicates.CR_USER_REVIEW_LAST_NUMBER)+ " and " +
+		"SUBJECT="+ Hashes.spoHash(subjectUrl) + "";
+
+		int lastid = 0;
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		try{
+			conn = getConnection();
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(dbQuery);
+			while (rs.next()){
+				lastid = Integer.parseInt(rs.getString("lastid")); 
+			}
+		}
+		catch (SQLException e){
+			throw new DAOException(e.toString(), e);
+		}
+		finally{
+			SQLUtil.close(rs);
+			SQLUtil.close(stmt);
+			SQLUtil.close(conn);
+		}
+
+		return lastid;
+	}
+
+	@Override
+	public int generateNewReviewId(CRUser user) throws DAOException{
+		
+		int currentLastId = getLastReviewId(user);
+		int newId = currentLastId + 1;
+		
+		SubjectDTO newValue = new SubjectDTO(user.getHomeUri(), false);
+		
+		ObjectDTO objectDTO = new ObjectDTO(String.valueOf(newId), false);
+		objectDTO.setSourceUri(user.getHomeUri());
+		
+		newValue.addObject(Predicates.CR_USER_REVIEW_LAST_NUMBER, objectDTO);
+		
+		addTriples(newValue);
+		
+		addResource(Predicates.CR_USER_REVIEW_LAST_NUMBER, user.getHomeUri());
+		addResource(user.getHomeUri(), user.getHomeUri());
+
+		
+		return newId;
+		
+	}
+	
+	@Override
+	public ReviewDTO addReview(ReviewDTO review, CRUser user){
+		throw new UnsupportedOperationException("Method not implemented");
 	}
 	
 }

@@ -12,6 +12,7 @@ import java.util.Set;
 import eionet.cr.dao.util.PredicateLabels;
 import eionet.cr.dao.util.SubProperties;
 import eionet.cr.dao.util.UriLabelPair;
+import eionet.cr.dto.ReviewDTO;
 import eionet.cr.dto.RawTripleDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.dto.UserBookmarkDTO;
@@ -280,5 +281,35 @@ public interface HelperDAO extends DAO {
 	 */
 	public List<RawTripleDTO> getTriplesFor(String sourceUrl,
 			PagingRequest pagingRequest) throws DAOException;
+
+	
+	/**
+	 * 
+	 * @param user
+	 * @return int
+	 * @throws DAOException
+	 * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
+	 */
+	public int generateNewReviewId(CRUser user) throws DAOException;
+	
+	/**
+	 * 
+	 * @param user
+	 * @return int
+	 * @throws DAOException
+	 * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
+	 */
+	public int getLastReviewId(CRUser user)  throws DAOException;
+	
+	
+	/**
+	 * 
+	 * @param qaReport
+	 * @param user
+	 * @return ReviewDTO
+	 * @throws DAOException
+	 * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
+	 */
+	public ReviewDTO addReview(ReviewDTO review, CRUser user)  throws DAOException;
 	
 }

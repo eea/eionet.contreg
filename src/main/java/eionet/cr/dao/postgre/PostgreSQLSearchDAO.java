@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +32,6 @@ import java.util.Set;
 import java.util.Vector;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.time.DurationFormatUtils;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
