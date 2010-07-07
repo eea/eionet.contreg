@@ -580,6 +580,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 		append(" limit ").append(pagingRequest.getItemsPerPage()).
 		append(" ) order by SUBJECT");
 		
+		logger.debug("Executing delivery search for ROD");
 
 		RODDeliveryReader reader = new RODDeliveryReader();
 		executeQuery(sBuilder.toString(), reader);

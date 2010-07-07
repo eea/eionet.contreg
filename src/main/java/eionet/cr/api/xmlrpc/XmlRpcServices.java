@@ -260,6 +260,9 @@ public class XmlRpcServices implements Services{
 	 * @see eionet.cr.api.xmlrpc.Services#getDeliveries(java.lang.Integer, java.lang.Integer, java.lang.Integer)
 	 */
 	public Vector getDeliveries(Integer pageNum, Integer pageSize) throws CRException{
+		
+		logger.debug(getClass().getSimpleName() +
+				".getDeliveries(" + pageNum + "," + pageSize + ") called");
 
 		Vector result = new Vector();
 		
