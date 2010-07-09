@@ -33,14 +33,15 @@ import eionet.cr.util.sql.ResultSetBaseReader;
  */
 public class UriHashesReader extends ResultSetBaseReader{
 	
-	private Map<String,String> map;
+	/** */
+	private Map<Long,String> urisByHashes;
 	
 	/**
 	 * 
-	 * @param map
+	 * @param urisByHashes
 	 */
-	public UriHashesReader(Map<String,String> map){
-		this.map = map;
+	public UriHashesReader(Map<Long,String> map){
+		this.urisByHashes = map;
 	}
 
 	/*
@@ -50,7 +51,7 @@ public class UriHashesReader extends ResultSetBaseReader{
 	@Override
 	public void readRow(ResultSet rs) throws SQLException {
 		
-		map.put(rs.getString("URI_HASH"), rs.getString("URI"));
+		urisByHashes.put(Long.valueOf(rs.getLong("URI_HASH")), rs.getString("URI"));
 	}
 
 }

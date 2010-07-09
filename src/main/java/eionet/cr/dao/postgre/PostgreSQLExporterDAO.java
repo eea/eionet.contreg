@@ -15,7 +15,9 @@ import eionet.cr.util.sql.SQLUtil;
 
 public class PostgreSQLExporterDAO extends PostgreSQLBaseDAO implements ExporterDAO {
 
-
+	/**
+	 * 
+	 */
 	public void exportByTypeAndFilters(
 			Map<String, String> filters, 
 			List<String> selectedPredicates,

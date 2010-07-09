@@ -593,6 +593,8 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 	public List<RawTripleDTO> getSampleTriples(String url, int limit)
 																	throws DAOException {
 		
+		// first, get all triples from the given source
+		
 		StringBuffer buf = new StringBuffer("select * from SPO where SOURCE=").
 		append(Hashes.spoHash(url)).
 		append(" limit ").append(Math.max(1, limit));
@@ -600,20 +602,24 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		RawTripleDTOReader reader = new RawTripleDTOReader();
 		List<RawTripleDTO> triples = executeQuery(buf.toString(), new LinkedList<Object>(), reader);
 		
+		// now get URIs for all distinct hashes found in the result set of the above query 
+		
 		if (!triples.isEmpty() && !reader.getDistinctHashes().isEmpty()){
 			
 			buf = new StringBuffer().
 			append("select URI_HASH, URI from RESOURCE where URI_HASH in (").
 			append(Util.toCSV(reader.getDistinctHashes())).append(")");
 			
-			HashMap<String,String> map = new HashMap<String, String>();
-			executeQuery(buf.toString(), new UriHashesReader(map));
+			HashMap<Long,String> urisByHashes = new HashMap<Long, String>();
+			executeQuery(buf.toString(), new UriHashesReader(urisByHashes));
 			
-			if (!map.isEmpty()){				
-				for (RawTripleDTO dto : triples){					
-					dto.setSubject(map.get(dto.getSubject()));
-					dto.setPredicate(map.get(dto.getPredicate()));
-					dto.setObjectDerivSource(map.get(dto.getObjectDerivSource()));
+			if (!urisByHashes.isEmpty()){				
+				for (RawTripleDTO tripleDto : triples){
+					
+					tripleDto.setSubjectUri(urisByHashes.get(tripleDto.getSubjectHash()));
+					tripleDto.setPredicateUri(urisByHashes.get(tripleDto.getPredicateHash()));
+					tripleDto.setObjectDerivSourceUri(
+							urisByHashes.get(tripleDto.getObjectDerivSourceHash()));
 				}
 			}
 		}
@@ -1414,14 +1420,16 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 			append("select URI_HASH, URI from RESOURCE where URI_HASH in (").
 			append(Util.toCSV(reader.getDistinctHashes())).append(")");
 			
-			HashMap<String,String> map = new HashMap<String, String>();
-			executeQuery(buf.toString(), new UriHashesReader(map));
+			HashMap<Long,String> urisByHashes = new HashMap<Long, String>();
+			executeQuery(buf.toString(), new UriHashesReader(urisByHashes));
 			
-			if (!map.isEmpty()){				
-				for (RawTripleDTO dto : triples){					
-					dto.setSubject(map.get(dto.getSubject()));
-					dto.setPredicate(map.get(dto.getPredicate()));
-					dto.setObjectDerivSource(map.get(dto.getObjectDerivSource()));
+			if (!urisByHashes.isEmpty()){				
+				for (RawTripleDTO tripleDTO : triples){
+					
+					tripleDTO.setSubjectUri(urisByHashes.get(tripleDTO.getSubjectHash()));
+					tripleDTO.setPredicateUri(urisByHashes.get(tripleDTO.getPredicateHash()));
+					tripleDTO.setObjectDerivSourceUri(
+							urisByHashes.get(tripleDTO.getObjectDerivSourceHash()));
 				}
 			}
 		}

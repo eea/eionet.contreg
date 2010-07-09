@@ -567,23 +567,26 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 		append(Hashes.spoHash(url)).
 		append(" limit ").append(Math.max(1, limit));
 		
-		RawTripleDTOReader reader = new RawTripleDTOReader();
-		List<RawTripleDTO> triples = executeQuery(buf.toString(), new LinkedList<Object>(), reader);
+		RawTripleDTOReader tripleDTOReader = new RawTripleDTOReader();
+		List<RawTripleDTO> triples = executeQuery(
+				buf.toString(), new LinkedList<Object>(), tripleDTOReader);
 		
-		if (!triples.isEmpty() && !reader.getDistinctHashes().isEmpty()){
+		if (!triples.isEmpty() && !tripleDTOReader.getDistinctHashes().isEmpty()){
 			
 			buf = new StringBuffer().
 			append("select URI_HASH, URI from RESOURCE where URI_HASH in (").
-			append(Util.toCSV(reader.getDistinctHashes())).append(")");
+			append(Util.toCSV(tripleDTOReader.getDistinctHashes())).append(")");
 			
-			HashMap<String,String> map = new HashMap<String, String>();
-			executeQuery(buf.toString(), new UriHashesReader(map));
+			HashMap<Long,String> urisByHashes = new HashMap<Long, String>();
+			executeQuery(buf.toString(), new UriHashesReader(urisByHashes));
 			
-			if (!map.isEmpty()){				
-				for (RawTripleDTO dto : triples){					
-					dto.setSubject(map.get(dto.getSubject()));
-					dto.setPredicate(map.get(dto.getPredicate()));
-					dto.setObjectDerivSource(map.get(dto.getObjectDerivSource()));
+			if (!urisByHashes.isEmpty()){				
+				for (RawTripleDTO tripleDTO : triples){
+					
+					tripleDTO.setSubjectUri(urisByHashes.get(tripleDTO.getSubjectHash()));
+					tripleDTO.setPredicateUri(urisByHashes.get(tripleDTO.getPredicateHash()));
+					tripleDTO.setObjectDerivSourceUri(
+							urisByHashes.get(tripleDTO.getObjectDerivSourceHash()));
 				}
 			}
 		}

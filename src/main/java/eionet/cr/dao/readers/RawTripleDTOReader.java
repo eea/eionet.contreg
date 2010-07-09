@@ -40,13 +40,12 @@ public class RawTripleDTOReader extends ResultSetListReader<RawTripleDTO>{
 	private List<RawTripleDTO> resultList = new LinkedList<RawTripleDTO>();
 	
 	/** */
-	private HashSet<String> distinctHashes = new HashSet<String>();
+	private HashSet<Long> distinctHashes = new HashSet<Long>();
 	
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.util.sql.ResultSetListReader#getResultList()
 	 */
-	@Override
 	public List<RawTripleDTO> getResultList() {
 		return resultList;
 	}
@@ -55,22 +54,28 @@ public class RawTripleDTOReader extends ResultSetListReader<RawTripleDTO>{
 	 * (non-Javadoc)
 	 * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
 	 */
-	@Override
 	public void readRow(ResultSet rs) throws SQLException {
 		
-		RawTripleDTO dto = new RawTripleDTO(rs.getString("SUBJECT"),rs.getString("PREDICATE"),
-							rs.getString("OBJECT"), rs.getString("OBJ_DERIV_SOURCE"));
-		resultList.add(dto);
+		RawTripleDTO dto = new RawTripleDTO();
+		dto.setSubjectHash(rs.getLong("SUBJECT"));
+		dto.setPredicateHash(rs.getLong("PREDICATE"));
+		dto.setObjectDerivSourceHash(rs.getLong("OBJ_DERIV_SOURCE"));
+		dto.setObject(rs.getString("OBJECT"));
+		dto.setObjectHash(rs.getLong("OBJECT_HASH"));
 		
-		distinctHashes.add(dto.getSubject());
-		distinctHashes.add(dto.getPredicate());
-		distinctHashes.add(dto.getObjectDerivSource());
+		resultList.add(dto);
+
+		// remember distinct hashes encountered
+		
+		distinctHashes.add(Long.valueOf(dto.getSubjectHash()));
+		distinctHashes.add(Long.valueOf(dto.getPredicateHash()));
+		distinctHashes.add(Long.valueOf(dto.getObjectDerivSourceHash()));
 	}
 
 	/**
 	 * @return the distinctHashes
 	 */
-	public HashSet<String> getDistinctHashes() {
+	public HashSet<Long> getDistinctHashes() {
 		return distinctHashes;
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * The contents of this file are subject to the Mozilla Public
+ * The contents of this file are subjectUri to the Mozilla Public
  * License Version 1.1 (the "License"); you may not use this file
  * except in compliance with the License. You may obtain a copy of
  * the License at http://www.mozilla.org/MPL/
@@ -28,55 +28,40 @@ package eionet.cr.dto;
 public class RawTripleDTO {
 
 	/** */
-	private String subject;
-	private String predicate;
+	private String subjectUri;
+	private String predicateUri;
 	private String object;
-	private String objectDerivSource;
+	private String objectDerivSourceUri;
 
-	/**
-	 * 
-	 */
-	public RawTripleDTO(){
-	}
+	/** */
+	private long subjectHash;
+	private long predicateHash;
+	private long objectHash;
+	private long objectDerivSourceHash;
 	
 	/**
-	 * @param subject
-	 * @param predicate
-	 * @param object
-	 * @param objectDerivSource
+	 * @return the subjectUri
 	 */
-	public RawTripleDTO(String subject, String predicate, String object,
-			String objectDerivSource) {
-		this.subject = subject;
-		this.predicate = predicate;
-		this.object = object;
-		this.objectDerivSource = objectDerivSource;
-	}
-
-
-	/**
-	 * @return the subject
-	 */
-	public String getSubject() {
-		return subject;
+	public String getSubjectUri() {
+		return subjectUri;
 	}
 	/**
-	 * @param subject the subject to set
+	 * @param subjectUri the subjectUri to set
 	 */
-	public void setSubject(String subject) {
-		this.subject = subject;
+	public void setSubjectUri(String subject) {
+		this.subjectUri = subject;
 	}
 	/**
-	 * @return the predicate
+	 * @return the predicateUri
 	 */
-	public String getPredicate() {
-		return predicate;
+	public String getPredicateUri() {
+		return predicateUri;
 	}
 	/**
-	 * @param predicate the predicate to set
+	 * @param predicateUri the predicateUri to set
 	 */
-	public void setPredicate(String predicate) {
-		this.predicate = predicate;
+	public void setPredicateUri(String predicate) {
+		this.predicateUri = predicate;
 	}
 	/**
 	 * @return the object
@@ -92,16 +77,64 @@ public class RawTripleDTO {
 	}
 
 	/**
-	 * @return the objectDerivSource
+	 * @return the objectDerivSourceUri
 	 */
-	public String getObjectDerivSource() {
-		return objectDerivSource;
+	public String getObjectDerivSourceUri() {
+		return objectDerivSourceUri;
 	}
 
 	/**
-	 * @param objectDerivSource the objectDerivSource to set
+	 * @param objectDerivSourceUri the objectDerivSourceUri to set
 	 */
-	public void setObjectDerivSource(String objectDerivSource) {
-		this.objectDerivSource = objectDerivSource;
+	public void setObjectDerivSourceUri(String objectDerivSource) {
+		this.objectDerivSourceUri = objectDerivSource;
+	}
+	/**
+	 * @return the subjectHash
+	 */
+	public long getSubjectHash() {
+		return subjectHash;
+	}
+	/**
+	 * @param subjectHash the subjectHash to set
+	 */
+	public void setSubjectHash(long subjectHash) {
+		this.subjectHash = subjectHash;
+	}
+	/**
+	 * @return the predicateHash
+	 */
+	public long getPredicateHash() {
+		return predicateHash;
+	}
+	/**
+	 * @param predicateHash the predicateHash to set
+	 */
+	public void setPredicateHash(long predicateHash) {
+		this.predicateHash = predicateHash;
+	}
+	/**
+	 * @return the objectHash
+	 */
+	public long getObjectHash() {
+		return objectHash;
+	}
+	/**
+	 * @param objectHash the objectHash to set
+	 */
+	public void setObjectHash(long objectHash) {
+		this.objectHash = objectHash;
+	}
+	/**
+	 * @return the objectDerivSourceHash
+	 */
+	public long getObjectDerivSourceHash() {
+		return objectDerivSourceHash;
+	}
+	/**
+	 * @param objectDerivSourceHash the objectDerivSourceHash to set
+	 */
+	public void setObjectDerivSourceHash(long objectDerivSourceHash) {
+		this.objectDerivSourceHash = objectDerivSourceHash;
 	}
 }

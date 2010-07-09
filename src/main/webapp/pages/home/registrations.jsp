@@ -17,13 +17,13 @@
 				pagesize="20" sort="list" id="registrations" htmlId="registratioinslist"
 				requestURI="${actionBean.urlBinding}" style="width:100%">
 					<display:column title="Subject" sortable="false">
-						<stripes:link href="/factsheet.action">${registrations.subject}
-							<stripes:param name="uri" value="${registrations.subject}" />
+						<stripes:link href="/factsheet.action">${registrations.subjectUri}
+							<stripes:param name="uri" value="${registrations.subjectUri}" />
 						</stripes:link>
 					</display:column>
 					<display:column title="Predicate" sortable="false">
-						<stripes:link href="/factsheet.action">${registrations.predicate}
-							<stripes:param name="uri" value="${registrations.predicate}" />
+						<stripes:link href="/factsheet.action">${registrations.predicateUri}
+							<stripes:param name="uri" value="${registrations.predicateUri}" />
 						</stripes:link>
 					</display:column>
 					<display:column title="Object" sortable="false">

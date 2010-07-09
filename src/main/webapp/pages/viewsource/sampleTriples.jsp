@@ -18,18 +18,18 @@
 					<c:forEach items="${actionBean.sampleTriples}" var="sampleTriple"
 						varStatus="loop">
 						<tr
-							<c:if test="${not empty sampleTriple.objectDerivSource}">class="derived"</c:if>>
+							<c:if test="${sampleTriple.objectDerivSourceHash > 0}">class="derived"</c:if>>
 							<td><c:choose>
-								<c:when test="${sampleTriple.subject!=null}">
+								<c:when test="${not empty sampleTriple.subjectUri}">
 									<c:out
-										value="${crfn:cutAtFirstLongToken(sampleTriple.subject, 100)}" />
+										value="${crfn:cutAtFirstLongToken(sampleTriple.subjectUri, 100)}" />
 								</c:when>
 								<c:otherwise>
-				        							Anonymous resource
-				        						</c:otherwise>
+									No URI found
+				        		</c:otherwise>
 							</c:choose></td>
 							<td><c:out
-								value="${crfn:cutAtFirstLongToken(sampleTriple.predicate, 100)}" /></td>
+								value="${crfn:cutAtFirstLongToken(sampleTriple.predicateUri, 100)}" /></td>
 							<td><c:out
 								value="${crfn:cutAtFirstLongToken(sampleTriple.object, 100)}" /></td>
 						</tr>
