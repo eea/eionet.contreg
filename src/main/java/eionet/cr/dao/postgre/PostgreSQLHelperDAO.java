@@ -1447,10 +1447,30 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 	public int generateNewReviewId(CRUser user) throws DAOException{
 		
 		int currentLastId = getLastReviewId(user);
+		// Deleting from the database the old value and creating a new one.
+		
+		String deleteQuery = "DELETE FROM spo WHERE "+
+		"PREDICATE="+Hashes.spoHash(Predicates.CR_USER_REVIEW_LAST_NUMBER)+ " and " +
+		"SUBJECT="+ Hashes.spoHash(user.getHomeUri()) + "";
+		Connection conn = null;
+		Statement stmt = null;
+		try{
+			conn = getConnection();
+			stmt = conn.createStatement();
+			stmt.execute(deleteQuery);
+		}
+		catch (SQLException e){
+			throw new DAOException(e.toString(), e);
+		}
+		finally{
+			SQLUtil.close(stmt);
+			SQLUtil.close(conn);
+		}
+		
+		// Generating new ID
 		int newId = currentLastId + 1;
 		
 		SubjectDTO newValue = new SubjectDTO(user.getHomeUri(), false);
-		
 		ObjectDTO objectDTO = new ObjectDTO(String.valueOf(newId), false);
 		objectDTO.setSourceUri(user.getHomeUri());
 		
@@ -1460,15 +1480,175 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		
 		addResource(Predicates.CR_USER_REVIEW_LAST_NUMBER, user.getHomeUri());
 		addResource(user.getHomeUri(), user.getHomeUri());
-
 		
 		return newId;
 		
 	}
 	
 	@Override
-	public ReviewDTO addReview(ReviewDTO review, CRUser user){
-		throw new UnsupportedOperationException("Method not implemented");
+	public int addReview(ReviewDTO review, CRUser user) throws DAOException{
+		
+		int reviewId = generateNewReviewId(user);
+		String userReviewUri = user.getReviewUri(reviewId);
+		SubjectDTO newReview = new SubjectDTO(userReviewUri, false);
+		
+		ObjectDTO typeObject = new ObjectDTO(Subjects.CR_FEEDBACK, false);
+		typeObject.setSourceUri(userReviewUri);
+		ObjectDTO titleObject = new ObjectDTO(review.getTitle(), false);
+		titleObject.setSourceUri(userReviewUri);
+		ObjectDTO feedbackForObject = new ObjectDTO(review.getObjectUrl(), false);
+		feedbackForObject.setSourceUri(userReviewUri);
+		ObjectDTO feedbackUserObject = new ObjectDTO(user.getHomeUri(), false);
+		feedbackUserObject.setSourceUri(userReviewUri);
+		
+		newReview.addObject(Predicates.RDF_TYPE, typeObject);
+		newReview.addObject(Predicates.DC_TITLE, titleObject);
+		newReview.addObject(Predicates.CR_FEEDBACK_FOR, feedbackForObject);
+		newReview.addObject(Predicates.CR_USER, feedbackUserObject);
+		
+		addTriples(newReview);
+		
+		addResource(Subjects.CR_FEEDBACK, userReviewUri);
+		addResource(Predicates.DC_TITLE, userReviewUri);
+		addResource(Predicates.CR_FEEDBACK_FOR, userReviewUri);
+		addResource(Predicates.CR_USER, userReviewUri);
+		addResource(userReviewUri, userReviewUri);
+		
+
+		// Creating a gross link to show that specific object has a review.
+		SubjectDTO grossLink = new SubjectDTO(review.getObjectUrl(), false);
+		ObjectDTO grossLinkObject = new ObjectDTO(userReviewUri,false);
+		grossLink.addObject(Predicates.CR_HAS_FEEDBACK, grossLinkObject);
+		
+		addResource(Predicates.CR_HAS_FEEDBACK, userReviewUri);
+		
+		return reviewId;
+	}
+
+	@Override
+	public List<ReviewDTO> getReviewList(CRUser user)  throws DAOException{
+		
+		String dbQuery = "SELECT uri, spoTitle.object AS title, spoObject.object AS object FROM spo AS spo1, spo AS spo2," +
+				" spo AS spoTitle, spo AS spoObject, resource " +
+				"WHERE " +
+				"(spo1.subject = spo2.subject) AND (spo1.subject = spoTitle.subject) AND (spo1.subject = spoObject.subject) AND " +
+				"spoObject.Predicate="+ Hashes.spoHash(Predicates.CR_FEEDBACK_FOR) + "AND " +
+				"spoTitle.Predicate="+ Hashes.spoHash(Predicates.DC_TITLE) + "AND " +
+				"spo1.subject=resource.uri_hash AND " +
+				"(spo1.predicate = " + Hashes.spoHash(Predicates.CR_USER) + ") AND "+
+				"(spo1.object_hash = " + Hashes.spoHash(user.getHomeUri()) +") AND " +
+				"(spo2.predicate = " + Hashes.spoHash(Predicates.RDF_TYPE) +") AND " +
+				"(spo2.object_hash = " + Hashes.spoHash(Subjects.CR_FEEDBACK) +") " +
+				"ORDER BY uri ASC"
+				;
+		
+		String resultHashResolveQuery = "SELECT uri FROM resource WHERE uri_hash IN (1,1,1,1)";
+		
+		List<ReviewDTO> returnList = new ArrayList();
+		
+		String stringList = "";
+		
+		int lastid = 0;
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		try{
+			conn = getConnection();
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(dbQuery);
+			while (rs.next()){
+				ReviewDTO tempReviewDTO = new ReviewDTO();
+				tempReviewDTO.setReviewSubjectUri(rs.getString("uri"));
+				tempReviewDTO.setTitle(rs.getString("title"));
+				tempReviewDTO.setObjectUrl(rs.getString("object"));
+				try {
+					tempReviewDTO.setReviewID(Integer.parseInt( tempReviewDTO.getReviewSubjectUri().split("reviews/")[1]));
+				} catch (Exception ex){
+					tempReviewDTO.setReviewID(0);
+				}
+				returnList.add(tempReviewDTO); 
+			}
+		}
+		catch (SQLException e){
+			throw new DAOException(e.toString(), e);
+		}
+		finally{
+			SQLUtil.close(rs);
+			SQLUtil.close(stmt);
+			SQLUtil.close(conn);
+		}
+		
+		return returnList;
+	}
+	
+	@Override
+	public ReviewDTO getReview(CRUser user, int reviewId)  throws DAOException{
+		
+		String userUri = user.getReviewUri(reviewId);
+		
+		String dbQuery = "SELECT uri, spoTitle.object AS title, spoObject.object AS object FROM spo AS spo1, spo AS spo2," +
+		" spo AS spoTitle, spo AS spoObject, resource " +
+		"WHERE " +
+		"(spo1.subject = " + Hashes.spoHash(userUri) + ") AND " +
+		"(spo1.subject = spo2.subject) AND (spo1.subject = spoTitle.subject) AND (spo1.subject = spoObject.subject) AND " +
+		"spoObject.Predicate="+ Hashes.spoHash(Predicates.CR_FEEDBACK_FOR) + "AND " +
+		"spoTitle.Predicate="+ Hashes.spoHash(Predicates.DC_TITLE) + "AND " +
+		"spo1.subject=resource.uri_hash AND " +
+		"(spo1.predicate = " + Hashes.spoHash(Predicates.CR_USER) + ") AND "+
+		"(spo1.object_hash = " + Hashes.spoHash(user.getHomeUri()) +") AND " +
+		"(spo2.predicate = " + Hashes.spoHash(Predicates.RDF_TYPE) +") AND " +
+		"(spo2.object_hash = " + Hashes.spoHash(Subjects.CR_FEEDBACK) +") " +
+		"ORDER BY uri ASC"
+		;
+
+		ReviewDTO returnItem = new ReviewDTO();
+		
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		try{
+			conn = getConnection();
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(dbQuery);
+			if (rs.next()){
+				returnItem = new ReviewDTO();
+				returnItem.setReviewSubjectUri(rs.getString("uri"));
+				returnItem.setTitle(rs.getString("title"));
+				returnItem.setObjectUrl(rs.getString("object"));
+				returnItem.setReviewID(reviewId);
+			}
+		}
+		catch (SQLException e){
+			throw new DAOException(e.toString(), e);
+		}
+		finally{
+			SQLUtil.close(rs);
+			SQLUtil.close(stmt);
+			SQLUtil.close(conn);
+		}
+		
+		return returnItem;
+	}
+
+	@Override
+	public void deleteReview(String reviewSubjectURI)  throws DAOException{
+		String deleteQuery = "DELETE FROM spo WHERE "+
+		"OBJECT_HASH="+Hashes.spoHash(reviewSubjectURI)+ " OR " +
+		"SUBJECT="+ Hashes.spoHash(reviewSubjectURI) + "";
+		Connection conn = null;
+		Statement stmt = null;
+		try{
+			conn = getConnection();
+			stmt = conn.createStatement();
+			stmt.execute(deleteQuery);
+		}
+		catch (SQLException e){
+			throw new DAOException(e.toString(), e);
+		}
+		finally{
+			SQLUtil.close(stmt);
+			SQLUtil.close(conn);
+		}
 	}
 	
 }

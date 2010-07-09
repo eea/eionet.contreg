@@ -22,7 +22,7 @@
 					</display:column>
 				</display:table>
 				<div><stripes:submit name="delete" value="Delete Bookmarks"
-					title="Delete seleceted bookmarks" /> <input type="button"
+					title="Delete selected bookmarks" /> <input type="button"
 					name="selectAll" value="Select all"
 					onclick="toggleSelectAll('bookmarkForm');return false" /></div>
 			</crfn:form>

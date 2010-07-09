@@ -294,12 +294,43 @@ public interface HelperDAO extends DAO {
 	
 	/**
 	 * 
-	 * @param qaReport
+	 * @param review
 	 * @param user
-	 * @return ReviewDTO
+	 * @return int
 	 * @throws DAOException
 	 * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
 	 */
-	public ReviewDTO addReview(ReviewDTO review, CRUser user)  throws DAOException;
+	public int addReview(ReviewDTO review, CRUser user)  throws DAOException;
+	
+	
+	/**
+	 * 
+	 * @param user
+	 * @return List<ReviewDTO
+	 * @throws DAOException
+	 * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
+	 */
+	public List<ReviewDTO> getReviewList(CRUser user)  throws DAOException;
+	
+	/**
+	 * 
+	 * @param user
+	 * @param reviewId
+	 * @return List<ReviewDTO
+	 * @throws DAOException
+	 * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
+	 */
+	public ReviewDTO getReview(CRUser user, int reviewId)  throws DAOException;
+	
+	
+	/**
+	 * 
+	 * @param reviewSubjectURI
+	 * @return void
+	 * @throws DAOException
+	 * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
+	 */
+	public void deleteReview(String reviewSubjectURI)  throws DAOException;
+	
 	
 }

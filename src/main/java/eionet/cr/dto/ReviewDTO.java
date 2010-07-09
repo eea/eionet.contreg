@@ -2,6 +2,8 @@ package eionet.cr.dto;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang.StringEscapeUtils;
+
 /**
  * 
  * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
@@ -9,9 +11,12 @@ import java.io.Serializable;
  */
 
 public class ReviewDTO  implements Serializable {
+	
+	private String reviewSubjectUri;
 	private String title;
 	private String objectUrl;
 	private String reviewContent;
+	private int reviewID;
 	
 	public String getTitle() {
 		return title;
@@ -30,6 +35,22 @@ public class ReviewDTO  implements Serializable {
 	}
 	public void setReviewContent(String reviewContent) {
 		this.reviewContent = reviewContent;
+	}
+	public String getReviewSubjectUri() {
+		return reviewSubjectUri;
+	}
+	public void setReviewSubjectUri(String reviewSubjectUri) {
+		this.reviewSubjectUri = reviewSubjectUri;
+	}
+	
+	public String getReviewSubjectHtmlFormatted() {
+		return StringEscapeUtils.escapeHtml(reviewSubjectUri);
+	}
+	public int getReviewID() {
+		return reviewID;
+	}
+	public void setReviewID(int reviewID) {
+		this.reviewID = reviewID;
 	}
 	
 }

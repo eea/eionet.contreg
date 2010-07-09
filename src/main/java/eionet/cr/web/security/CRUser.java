@@ -137,6 +137,14 @@ public class CRUser {
 	 * 
 	 * @return
 	 */
+	public String getReviewUri(int reviewId){
+		return CRUser.homeUri(userName)+"/reviews/"+reviewId;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
 	public String getRegistrationsUri(){
 		return CRUser.registrationsUri(userName);
 	}

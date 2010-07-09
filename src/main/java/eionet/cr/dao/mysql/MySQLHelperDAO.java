@@ -929,7 +929,22 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 	}
 	
 	@Override
-	public ReviewDTO addReview(ReviewDTO review, CRUser user){
+	public int addReview(ReviewDTO review, CRUser user){
+		throw new UnsupportedOperationException("Method not implemented");
+	}
+	
+	@Override
+	public List<ReviewDTO> getReviewList(CRUser user)  throws DAOException{
+		throw new UnsupportedOperationException("Method not implemented");
+	}
+
+	@Override
+	public ReviewDTO getReview(CRUser user, int reviewId)  throws DAOException{
+		throw new UnsupportedOperationException("Method not implemented");
+	}
+	
+	@Override
+	public void deleteReview(String reviewSubjectURI)  throws DAOException{
 		throw new UnsupportedOperationException("Method not implemented");
 	}
 }

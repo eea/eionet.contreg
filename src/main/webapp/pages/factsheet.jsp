@@ -91,6 +91,9 @@
 											</li>
 										</c:if>
 										
+										
+										
+										
 						    			<c:if test="${actionBean.urlFoundInHarvestSource}">
 						    				<li>
 						    				<stripes:link class="link-plain" href="/source.action?view=&harvestSource.url=${ subjectUrl }">Source  details</stripes:link>
@@ -117,6 +120,11 @@
 						    				</li>
 				    					</c:if>
 				    					
+				    					<c:if test="${subjectUrl!=null}">
+											<li>
+						    					<stripes:link class="link-plain" href="/home/${actionBean.userName}/reviews?add=Add&addUrl=${ subjectUrl }">Add review</stripes:link>
+						    				</li>
+						    			</c:if>
 				    					
 										
 									</ul>
