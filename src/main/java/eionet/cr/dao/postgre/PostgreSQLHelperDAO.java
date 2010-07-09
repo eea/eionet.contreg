@@ -1494,7 +1494,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		
 		ObjectDTO typeObject = new ObjectDTO(Subjects.CR_FEEDBACK, false);
 		typeObject.setSourceUri(userReviewUri);		
-		ObjectDTO titleObject = new ObjectDTO(review.getTitle(), false);
+		ObjectDTO titleObject = new ObjectDTO(review.getTitle(), true);
 		titleObject.setSourceUri(userReviewUri);
 		ObjectDTO feedbackForObject = new ObjectDTO(review.getObjectUrl(), false);
 		feedbackForObject.setSourceUri(userReviewUri);

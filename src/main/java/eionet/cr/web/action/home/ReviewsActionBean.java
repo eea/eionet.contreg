@@ -4,13 +4,13 @@ import java.util.List;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.HandlesEvent;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dto.ReviewDTO;
+import eionet.cr.web.security.CRUser;
 
 /**
  * 
@@ -115,7 +115,7 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
 	public ReviewDTO getReview() {
 		if (reviewView){
 			try {
-				review = DAOFactory.get().getDao(HelperDAO.class).getReview(this.getUser(), reviewId);
+				review = DAOFactory.get().getDao(HelperDAO.class).getReview(new CRUser(getAttemptedUserName()), reviewId);
 			} catch (Exception ex){
 			}
 		} else {
