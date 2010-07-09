@@ -30,6 +30,7 @@ import org.junit.Test;
 import eionet.cr.dto.TripleDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
+import eionet.cr.util.pagination.PagingRequest;
 
 /**
  * 
@@ -79,8 +80,8 @@ public class HelperDAOTest extends CRDatabaseTestCase {
 	public void testGetSampleTriples() throws Exception {
 		
 		List<TripleDTO> result =
-			DAOFactory.get().getDao(HelperDAO.class).getSampleTriples(
-					"http://cr.eionet.europa.eu/testsource.rdf", 10);
+			DAOFactory.get().getDao(HelperDAO.class).getSampleTriplesInSource(
+					"http://cr.eionet.europa.eu/testsource.rdf", PagingRequest.create(1, 10));
 		
 		assertNotNull(result);
 		assertEquals(10, result.size());

@@ -48,6 +48,7 @@ import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
 import eionet.cr.util.URLUtil;
+import eionet.cr.util.pagination.PagingRequest;
 
 /**
  * @author altnyris
@@ -148,8 +149,8 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     	prepareDTO();
 		if (harvestSource!=null){
 			// populate sample triples
-			sampleTriples = DAOFactory.get().getDao(HelperDAO.class).getSampleTriples(
-    				harvestSource.getUrl(), 10);
+			sampleTriples = DAOFactory.get().getDao(HelperDAO.class).getSampleTriplesInSource(
+    				harvestSource.getUrl(), PagingRequest.create(1, 10));
 		}
     
     	return new ForwardResolution("/pages/viewsource.jsp");

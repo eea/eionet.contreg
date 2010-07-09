@@ -104,16 +104,6 @@ public interface HelperDAO extends DAO {
 	String getSubjectSchemaUri(String subjectUri) throws DAOException;
 	
 	/**
-	 * fetch sample triplets for given source.
-	 * 
-	 * @param url - source url
-	 * @param limit - how many to fetch
-	 * @return
-	 * @throws DAOException
-	 */
-	List<TripleDTO> getSampleTriples(String url, int limit) throws DAOException;
-	
-	/**
 	 * 
 	 * @param predicateUri
 	 * @return
@@ -279,7 +269,7 @@ public interface HelperDAO extends DAO {
 	 * @return
 	 * @throws DAOException
 	 */
-	public List<TripleDTO> getTriplesFor(String sourceUrl,
+	public List<TripleDTO> getSampleTriplesInSource(String sourceUrl,
 			PagingRequest pagingRequest) throws DAOException;
 
 	

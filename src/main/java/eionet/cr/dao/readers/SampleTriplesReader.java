@@ -34,7 +34,7 @@ import eionet.cr.util.sql.ResultSetListReader;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class RawTripleDTOReader extends ResultSetListReader<TripleDTO>{
+public class SampleTriplesReader extends ResultSetListReader<TripleDTO>{
 
 	/** */
 	private List<TripleDTO> resultList = new LinkedList<TripleDTO>();
@@ -61,7 +61,6 @@ public class RawTripleDTOReader extends ResultSetListReader<TripleDTO>{
 		dto.setPredicateHash(rs.getLong("PREDICATE"));
 		dto.setObjectDerivSourceHash(rs.getLong("OBJ_DERIV_SOURCE"));
 		dto.setObject(rs.getString("OBJECT"));
-		dto.setObjectHash(rs.getLong("OBJECT_HASH"));
 		
 		resultList.add(dto);
 

@@ -48,7 +48,7 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.readers.DataflowPicklistReader;
 import eionet.cr.dao.readers.PredicateLabelsReader;
-import eionet.cr.dao.readers.RawTripleDTOReader;
+import eionet.cr.dao.readers.SampleTriplesReader;
 import eionet.cr.dao.readers.SubPropertiesReader;
 import eionet.cr.dao.readers.SubjectDataReader;
 import eionet.cr.dao.readers.UriHashesReader;
@@ -584,47 +584,6 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		}
 		
 		return result;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.dao.HelperDAO#getSampleTriples(java.lang.String, int)
-	 */
-	public List<TripleDTO> getSampleTriples(String url, int limit)
-																	throws DAOException {
-		
-		// first, get all triples from the given source
-		
-		StringBuffer buf = new StringBuffer("select * from SPO where SOURCE=").
-		append(Hashes.spoHash(url)).
-		append(" limit ").append(Math.max(1, limit));
-		
-		RawTripleDTOReader reader = new RawTripleDTOReader();
-		List<TripleDTO> triples = executeQuery(buf.toString(), new LinkedList<Object>(), reader);
-		
-		// now get URIs for all distinct hashes found in the result set of the above query 
-		
-		if (!triples.isEmpty() && !reader.getDistinctHashes().isEmpty()){
-			
-			buf = new StringBuffer().
-			append("select URI_HASH, URI from RESOURCE where URI_HASH in (").
-			append(Util.toCSV(reader.getDistinctHashes())).append(")");
-			
-			HashMap<Long,String> urisByHashes = new HashMap<Long, String>();
-			executeQuery(buf.toString(), new UriHashesReader(urisByHashes));
-			
-			if (!urisByHashes.isEmpty()){				
-				for (TripleDTO tripleDto : triples){
-					
-					tripleDto.setSubjectUri(urisByHashes.get(tripleDto.getSubjectHash()));
-					tripleDto.setPredicateUri(urisByHashes.get(tripleDto.getPredicateHash()));
-					tripleDto.setObjectDerivSourceUri(
-							urisByHashes.get(tripleDto.getObjectDerivSourceHash()));
-				}
-			}
-		}
-		
-		return triples;
 	}
 
 	/*
@@ -1406,12 +1365,23 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		
 		return returnHistory;
 	}
-	@Override
-	public List<TripleDTO> getTriplesFor(String sourceUrl, PagingRequest pagingRequest) throws DAOException{
-		StringBuffer buf = new StringBuffer("select * from SPO where SOURCE=").
-		append(Hashes.spoHash(sourceUrl));
+	
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#getTriplesFor(java.lang.String, eionet.cr.util.pagination.PagingRequest)
+	 */
+	public List<TripleDTO> getSampleTriplesInSource(String sourceUrl, PagingRequest pagingRequest) throws DAOException{
 		
-		RawTripleDTOReader reader = new RawTripleDTOReader();
+		StringBuffer buf = new StringBuffer("select SUBJECT,PREDICATE,OBJECT,OBJ_DERIV_SOURCE").
+		append(" from SPO where SOURCE=").append(Hashes.spoHash(sourceUrl));
+		
+		if (pagingRequest!=null){
+			buf.append(" limit ").append(pagingRequest.getItemsPerPage()).
+			append(" offset ").append(pagingRequest.getOffset()).
+			toString();			
+		}
+		
+		SampleTriplesReader reader = new SampleTriplesReader();
 		List<TripleDTO> triples = executeQuery(buf.toString(), new LinkedList<Object>(), reader);
 		
 		if (!triples.isEmpty() && !reader.getDistinctHashes().isEmpty()){
@@ -1423,7 +1393,8 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 			HashMap<Long,String> urisByHashes = new HashMap<Long, String>();
 			executeQuery(buf.toString(), new UriHashesReader(urisByHashes));
 			
-			if (!urisByHashes.isEmpty()){				
+			if (!urisByHashes.isEmpty()){
+				
 				for (TripleDTO tripleDTO : triples){
 					
 					tripleDTO.setSubjectUri(urisByHashes.get(tripleDTO.getSubjectHash()));

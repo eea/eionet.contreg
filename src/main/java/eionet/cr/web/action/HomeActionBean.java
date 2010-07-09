@@ -229,11 +229,11 @@ public class HomeActionBean extends AbstractActionBean{
 	public List<TripleDTO> getRegistrations()  throws DAOException{
 		if(this.getUser()==null){
 			registrations = DAOFactory.get().getDao(HelperDAO.class).
-				getTriplesFor((new CRUser(attemptedUserName)).getRegistrationsUri(), null);			
+				getSampleTriplesInSource((new CRUser(attemptedUserName)).getRegistrationsUri(), null);			
 		}
 		else{
 			registrations = DAOFactory.get().getDao(HelperDAO.class).
-				getTriplesFor(this.getUser().getRegistrationsUri(), null);
+				getSampleTriplesInSource(this.getUser().getRegistrationsUri(), null);
 		}
 
 		return registrations;
