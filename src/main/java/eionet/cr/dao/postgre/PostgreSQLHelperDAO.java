@@ -56,7 +56,7 @@ import eionet.cr.dao.util.PredicateLabels;
 import eionet.cr.dao.util.SubProperties;
 import eionet.cr.dao.util.UriLabelPair;
 import eionet.cr.dto.ObjectDTO;
-import eionet.cr.dto.RawTripleDTO;
+import eionet.cr.dto.TripleDTO;
 import eionet.cr.dto.ReviewDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.dto.UserBookmarkDTO;
@@ -590,7 +590,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 	 * (non-Javadoc)
 	 * @see eionet.cr.dao.HelperDAO#getSampleTriples(java.lang.String, int)
 	 */
-	public List<RawTripleDTO> getSampleTriples(String url, int limit)
+	public List<TripleDTO> getSampleTriples(String url, int limit)
 																	throws DAOException {
 		
 		// first, get all triples from the given source
@@ -600,7 +600,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		append(" limit ").append(Math.max(1, limit));
 		
 		RawTripleDTOReader reader = new RawTripleDTOReader();
-		List<RawTripleDTO> triples = executeQuery(buf.toString(), new LinkedList<Object>(), reader);
+		List<TripleDTO> triples = executeQuery(buf.toString(), new LinkedList<Object>(), reader);
 		
 		// now get URIs for all distinct hashes found in the result set of the above query 
 		
@@ -614,7 +614,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 			executeQuery(buf.toString(), new UriHashesReader(urisByHashes));
 			
 			if (!urisByHashes.isEmpty()){				
-				for (RawTripleDTO tripleDto : triples){
+				for (TripleDTO tripleDto : triples){
 					
 					tripleDto.setSubjectUri(urisByHashes.get(tripleDto.getSubjectHash()));
 					tripleDto.setPredicateUri(urisByHashes.get(tripleDto.getPredicateHash()));
@@ -1407,12 +1407,12 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		return returnHistory;
 	}
 	@Override
-	public List<RawTripleDTO> getTriplesFor(String sourceUrl, PagingRequest pagingRequest) throws DAOException{
+	public List<TripleDTO> getTriplesFor(String sourceUrl, PagingRequest pagingRequest) throws DAOException{
 		StringBuffer buf = new StringBuffer("select * from SPO where SOURCE=").
 		append(Hashes.spoHash(sourceUrl));
 		
 		RawTripleDTOReader reader = new RawTripleDTOReader();
-		List<RawTripleDTO> triples = executeQuery(buf.toString(), new LinkedList<Object>(), reader);
+		List<TripleDTO> triples = executeQuery(buf.toString(), new LinkedList<Object>(), reader);
 		
 		if (!triples.isEmpty() && !reader.getDistinctHashes().isEmpty()){
 			
@@ -1424,7 +1424,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 			executeQuery(buf.toString(), new UriHashesReader(urisByHashes));
 			
 			if (!urisByHashes.isEmpty()){				
-				for (RawTripleDTO tripleDTO : triples){
+				for (TripleDTO tripleDTO : triples){
 					
 					tripleDTO.setSubjectUri(urisByHashes.get(tripleDTO.getSubjectHash()));
 					tripleDTO.setPredicateUri(urisByHashes.get(tripleDTO.getPredicateHash()));

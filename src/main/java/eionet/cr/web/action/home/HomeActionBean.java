@@ -14,7 +14,7 @@ import eionet.cr.common.Subjects;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HelperDAO;
-import eionet.cr.dto.RawTripleDTO;
+import eionet.cr.dto.TripleDTO;
 import eionet.cr.dto.UserBookmarkDTO;
 import eionet.cr.dto.UserHistoryDTO;
 import eionet.cr.web.action.AbstractActionBean;

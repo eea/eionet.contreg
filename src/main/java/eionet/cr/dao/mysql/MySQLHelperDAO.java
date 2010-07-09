@@ -35,7 +35,7 @@ import eionet.cr.dao.util.SubProperties;
 import eionet.cr.dao.util.UriLabelPair;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.ReviewDTO;
-import eionet.cr.dto.RawTripleDTO;
+import eionet.cr.dto.TripleDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.dto.UserBookmarkDTO;
 import eionet.cr.dto.UserHistoryDTO;
@@ -561,14 +561,14 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 	 * (non-Javadoc)
 	 * @see eionet.cr.dao.HelperDAO#getSampleTriples(java.lang.String, int)
 	 */
-	public List<RawTripleDTO> getSampleTriples(String url, int limit) throws DAOException {
+	public List<TripleDTO> getSampleTriples(String url, int limit) throws DAOException {
 		
 		StringBuffer buf = new StringBuffer("select * from SPO where SOURCE=").
 		append(Hashes.spoHash(url)).
 		append(" limit ").append(Math.max(1, limit));
 		
 		RawTripleDTOReader tripleDTOReader = new RawTripleDTOReader();
-		List<RawTripleDTO> triples = executeQuery(
+		List<TripleDTO> triples = executeQuery(
 				buf.toString(), new LinkedList<Object>(), tripleDTOReader);
 		
 		if (!triples.isEmpty() && !tripleDTOReader.getDistinctHashes().isEmpty()){
@@ -581,7 +581,7 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 			executeQuery(buf.toString(), new UriHashesReader(urisByHashes));
 			
 			if (!urisByHashes.isEmpty()){				
-				for (RawTripleDTO tripleDTO : triples){
+				for (TripleDTO tripleDTO : triples){
 					
 					tripleDTO.setSubjectUri(urisByHashes.get(tripleDTO.getSubjectHash()));
 					tripleDTO.setPredicateUri(urisByHashes.get(tripleDTO.getPredicateHash()));
@@ -949,7 +949,7 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 	}
 
 	@Override
-	public List<RawTripleDTO> getTriplesFor(String sourceUrl,
+	public List<TripleDTO> getTriplesFor(String sourceUrl,
 			PagingRequest pagingRequest) throws DAOException {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("Method not implemented");

@@ -14,7 +14,7 @@ import eionet.cr.common.Subjects;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HelperDAO;
-import eionet.cr.dto.RawTripleDTO;
+import eionet.cr.dto.TripleDTO;
 import eionet.cr.dto.UserBookmarkDTO;
 import eionet.cr.dto.UserHistoryDTO;
 import eionet.cr.web.security.BadUserHomeUrlException;
@@ -46,7 +46,7 @@ public class HomeActionBean extends AbstractActionBean{
 	private String section;
 	
 	private List<UserBookmarkDTO> bookmarks;
-	private List<RawTripleDTO> registrations;
+	private List<TripleDTO> registrations;
 	private List<UserHistoryDTO> history;
 	
 	private boolean userAuthorized;
@@ -226,7 +226,7 @@ public class HomeActionBean extends AbstractActionBean{
 		return history;
 	}
 
-	public List<RawTripleDTO> getRegistrations()  throws DAOException{
+	public List<TripleDTO> getRegistrations()  throws DAOException{
 		if(this.getUser()==null){
 			registrations = DAOFactory.get().getDao(HelperDAO.class).
 				getTriplesFor((new CRUser(attemptedUserName)).getRegistrationsUri(), null);			
@@ -239,7 +239,7 @@ public class HomeActionBean extends AbstractActionBean{
 		return registrations;
 	}
 
-	public void setRegistrations(List<RawTripleDTO> registrations) {
+	public void setRegistrations(List<TripleDTO> registrations) {
 		this.registrations = registrations;
 	}
 

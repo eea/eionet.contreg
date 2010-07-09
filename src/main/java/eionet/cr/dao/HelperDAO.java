@@ -13,7 +13,7 @@ import eionet.cr.dao.util.PredicateLabels;
 import eionet.cr.dao.util.SubProperties;
 import eionet.cr.dao.util.UriLabelPair;
 import eionet.cr.dto.ReviewDTO;
-import eionet.cr.dto.RawTripleDTO;
+import eionet.cr.dto.TripleDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.dto.UserBookmarkDTO;
 import eionet.cr.dto.UserHistoryDTO;
@@ -111,7 +111,7 @@ public interface HelperDAO extends DAO {
 	 * @return
 	 * @throws DAOException
 	 */
-	List<RawTripleDTO> getSampleTriples(String url, int limit) throws DAOException;
+	List<TripleDTO> getSampleTriples(String url, int limit) throws DAOException;
 	
 	/**
 	 * 
@@ -279,7 +279,7 @@ public interface HelperDAO extends DAO {
 	 * @return
 	 * @throws DAOException
 	 */
-	public List<RawTripleDTO> getTriplesFor(String sourceUrl,
+	public List<TripleDTO> getTriplesFor(String sourceUrl,
 			PagingRequest pagingRequest) throws DAOException;
 
 	

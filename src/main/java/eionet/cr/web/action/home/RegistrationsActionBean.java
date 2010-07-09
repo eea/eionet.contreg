@@ -5,7 +5,7 @@ import java.util.List;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HelperDAO;
-import eionet.cr.dto.RawTripleDTO;
+import eionet.cr.dto.TripleDTO;
 import eionet.cr.web.security.CRUser;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
@@ -21,7 +21,7 @@ import net.sourceforge.stripes.action.UrlBinding;
 @UrlBinding("/home/{username}/registrations")
 public class RegistrationsActionBean extends AbstractHomeActionBean {
 
-	private List<RawTripleDTO> registrations;
+	private List<TripleDTO> registrations;
 	
 	/*
 	 * (non-Javadoc)
@@ -34,7 +34,7 @@ public class RegistrationsActionBean extends AbstractHomeActionBean {
 		return new ForwardResolution("/pages/home/registrations.jsp");
 	}
 	
-	public List<RawTripleDTO> getRegistrations()  throws DAOException{
+	public List<TripleDTO> getRegistrations()  throws DAOException{
 		if(this.getUser()==null){
 			registrations = DAOFactory.get().getDao(HelperDAO.class).
 				getTriplesFor((new CRUser(getAttemptedUserName())).getRegistrationsUri(), null);			
@@ -47,7 +47,7 @@ public class RegistrationsActionBean extends AbstractHomeActionBean {
 		return registrations;
 	}
 	
-	public void setRegistrations(List<RawTripleDTO> registrations) {
+	public void setRegistrations(List<TripleDTO> registrations) {
 		this.registrations = registrations;
 	}
 }

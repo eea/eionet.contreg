@@ -27,7 +27,7 @@ import java.util.List;
 import org.dbunit.dataset.IDataSet;
 import org.junit.Test;
 
-import eionet.cr.dto.RawTripleDTO;
+import eionet.cr.dto.TripleDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 
@@ -78,7 +78,7 @@ public class HelperDAOTest extends CRDatabaseTestCase {
 	@Test
 	public void testGetSampleTriples() throws Exception {
 		
-		List<RawTripleDTO> result =
+		List<TripleDTO> result =
 			DAOFactory.get().getDao(HelperDAO.class).getSampleTriples(
 					"http://cr.eionet.europa.eu/testsource.rdf", 10);
 		

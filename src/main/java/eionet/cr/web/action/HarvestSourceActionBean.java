@@ -42,7 +42,7 @@ import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dto.HarvestDTO;
 import eionet.cr.dto.HarvestSourceDTO;
-import eionet.cr.dto.RawTripleDTO;
+import eionet.cr.dto.TripleDTO;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.util.Hashes;
@@ -64,7 +64,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
 	private List<HarvestDTO> harvests;
 	
 	/** */
-	private List<RawTripleDTO> sampleTriples;
+	private List<TripleDTO> sampleTriples;
 	
 	/** */
 	private int intervalMultiplier;
@@ -304,7 +304,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
 	/**
 	 * @return the sampleTriples
 	 */
-	public List<RawTripleDTO> getSampleTriples() {
+	public List<TripleDTO> getSampleTriples() {
 		return sampleTriples;
 	}
 

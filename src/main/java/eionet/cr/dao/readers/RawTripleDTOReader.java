@@ -26,7 +26,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
-import eionet.cr.dto.RawTripleDTO;
+import eionet.cr.dto.TripleDTO;
 import eionet.cr.util.sql.ResultSetListReader;
 
 /**
@@ -34,10 +34,10 @@ import eionet.cr.util.sql.ResultSetListReader;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class RawTripleDTOReader extends ResultSetListReader<RawTripleDTO>{
+public class RawTripleDTOReader extends ResultSetListReader<TripleDTO>{
 
 	/** */
-	private List<RawTripleDTO> resultList = new LinkedList<RawTripleDTO>();
+	private List<TripleDTO> resultList = new LinkedList<TripleDTO>();
 	
 	/** */
 	private HashSet<Long> distinctHashes = new HashSet<Long>();
@@ -46,7 +46,7 @@ public class RawTripleDTOReader extends ResultSetListReader<RawTripleDTO>{
 	 * (non-Javadoc)
 	 * @see eionet.cr.util.sql.ResultSetListReader#getResultList()
 	 */
-	public List<RawTripleDTO> getResultList() {
+	public List<TripleDTO> getResultList() {
 		return resultList;
 	}
 
@@ -56,7 +56,7 @@ public class RawTripleDTOReader extends ResultSetListReader<RawTripleDTO>{
 	 */
 	public void readRow(ResultSet rs) throws SQLException {
 		
-		RawTripleDTO dto = new RawTripleDTO();
+		TripleDTO dto = new TripleDTO();
 		dto.setSubjectHash(rs.getLong("SUBJECT"));
 		dto.setPredicateHash(rs.getLong("PREDICATE"));
 		dto.setObjectDerivSourceHash(rs.getLong("OBJ_DERIV_SOURCE"));
