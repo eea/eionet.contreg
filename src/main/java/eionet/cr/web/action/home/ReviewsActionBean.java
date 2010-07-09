@@ -65,6 +65,7 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
 				}
 			} catch (Exception ex){
 				addCautionMessage("Not correct review ID. Only numerical values allowed after /reviews/.");
+				reviewView = true;
 				this.setHomeContext(false);
 				reviewId = 0;
 			}
@@ -116,6 +117,10 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
 		if (reviewView){
 			try {
 				review = DAOFactory.get().getDao(HelperDAO.class).getReview(new CRUser(getAttemptedUserName()), reviewId);
+				if (review.getReviewID()==0){
+					addCautionMessage("Review with this ID is not found.");
+					review = null;
+				}
 			} catch (Exception ex){
 			}
 		} else {

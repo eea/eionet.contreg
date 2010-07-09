@@ -8,26 +8,26 @@
 
 	<c:choose>
 		<c:when test="${actionBean.reviewView}">
-		
-		<h1>Review #${actionBean.reviewId}</h1>
-		
-		<table>
-			<col style="width:100em"/>
-			<col style="width:300em"/>
-			<tr>
-				<td><label><b>Title</b></label></td>
-				<td><label>${actionBean.review.title}</label></td>
-			</tr>
-			<tr>
-				<td><label><b>Object URL</b></label></td>
-				<td><label>${actionBean.review.objectUrl}</label></td>
-			</tr>
-			<tr>
-				<td><label><b>Review content</b></label></td>
-				<td><label>Not implemented yet</label></td>
-			</tr>
-		</table>
-		
+			<c:if test="${ actionBean.review != null }">
+				<h1>Review #${actionBean.reviewId}</h1>
+				
+				<table>
+					<col style="width:100em"/>
+					<col style="width:300em"/>
+					<tr>
+						<td><label><b>Title</b></label></td>
+						<td><label>${actionBean.review.title}</label></td>
+					</tr>
+					<tr>
+						<td><label><b>Object URL</b></label></td>
+						<td><label>${actionBean.review.objectUrl}</label></td>
+					</tr>
+					<tr>
+						<td><label><b>Review content</b></label></td>
+						<td><label>Not implemented yet</label></td>
+					</tr>
+				</table>
+			</c:if>
 		</c:when>
 		<c:otherwise>
 			<c:choose>
