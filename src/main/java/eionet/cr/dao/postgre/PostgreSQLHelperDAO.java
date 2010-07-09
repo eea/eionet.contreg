@@ -1514,12 +1514,13 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		addResource(Predicates.CR_USER, userReviewUri);
 		addResource(userReviewUri, userReviewUri);
 		
-
 		// creating a cross link to show that specific object has a review.
-		SubjectDTO crossLink = new SubjectDTO(review.getObjectUrl(), false);
+		SubjectDTO crossLinkSubject = new SubjectDTO(review.getObjectUrl(), false);
 		ObjectDTO grossLinkObject = new ObjectDTO(userReviewUri,false);
 		grossLinkObject.setSourceUri(userReviewUri);
-		crossLink.addObject(Predicates.CR_HAS_FEEDBACK, grossLinkObject);
+		crossLinkSubject.addObject(Predicates.CR_HAS_FEEDBACK, grossLinkObject);
+		
+		addTriples(crossLinkSubject);
 		
 		addResource(Predicates.CR_HAS_FEEDBACK, userReviewUri);
 		
