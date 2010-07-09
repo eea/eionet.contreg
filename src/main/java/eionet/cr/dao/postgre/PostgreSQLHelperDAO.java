@@ -1493,7 +1493,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		SubjectDTO newReview = new SubjectDTO(userReviewUri, false);
 		
 		ObjectDTO typeObject = new ObjectDTO(Subjects.CR_FEEDBACK, false);
-		typeObject.setSourceUri(userReviewUri);
+		typeObject.setSourceUri(userReviewUri);		
 		ObjectDTO titleObject = new ObjectDTO(review.getTitle(), false);
 		titleObject.setSourceUri(userReviewUri);
 		ObjectDTO feedbackForObject = new ObjectDTO(review.getObjectUrl(), false);
@@ -1515,10 +1515,11 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		addResource(userReviewUri, userReviewUri);
 		
 
-		// Creating a gross link to show that specific object has a review.
-		SubjectDTO grossLink = new SubjectDTO(review.getObjectUrl(), false);
+		// creating a cross link to show that specific object has a review.
+		SubjectDTO crossLink = new SubjectDTO(review.getObjectUrl(), false);
 		ObjectDTO grossLinkObject = new ObjectDTO(userReviewUri,false);
-		grossLink.addObject(Predicates.CR_HAS_FEEDBACK, grossLinkObject);
+		grossLinkObject.setSourceUri(userReviewUri);
+		crossLink.addObject(Predicates.CR_HAS_FEEDBACK, grossLinkObject);
 		
 		addResource(Predicates.CR_HAS_FEEDBACK, userReviewUri);
 		
@@ -1581,7 +1582,10 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		return returnList;
 	}
 	
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#getReview(eionet.cr.web.security.CRUser, int)
+	 */
 	public ReviewDTO getReview(CRUser user, int reviewId)  throws DAOException{
 		
 		String userUri = user.getReviewUri(reviewId);
@@ -1630,17 +1634,21 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		return returnItem;
 	}
 
-	@Override
+	/** */
+	private static String sqlDeleteReview = "DELETE FROM spo WHERE subject=? OR object_hash=?" +
+			"OR source=? OR obj_deriv_source=? OR obj_source_object=?";
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#deleteReview(java.lang.String)
+	 */
 	public void deleteReview(String reviewSubjectURI)  throws DAOException{
-		String deleteQuery = "DELETE FROM spo WHERE "+
-		"OBJECT_HASH="+Hashes.spoHash(reviewSubjectURI)+ " OR " +
-		"SUBJECT="+ Hashes.spoHash(reviewSubjectURI) + "";
+		
 		Connection conn = null;
 		Statement stmt = null;
 		try{
 			conn = getConnection();
-			stmt = conn.createStatement();
-			stmt.execute(deleteQuery);
+			SQLUtil.executeUpdate(StringUtils.replace(
+					sqlDeleteReview, "?", String.valueOf(Hashes.spoHash(reviewSubjectURI))), conn);
 		}
 		catch (SQLException e){
 			throw new DAOException(e.toString(), e);
