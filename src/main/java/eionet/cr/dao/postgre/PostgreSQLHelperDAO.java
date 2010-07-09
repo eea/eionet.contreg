@@ -1503,6 +1503,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		
 		newReview.addObject(Predicates.RDF_TYPE, typeObject);
 		newReview.addObject(Predicates.DC_TITLE, titleObject);
+		newReview.addObject(Predicates.RDFS_LABEL, titleObject);
 		newReview.addObject(Predicates.CR_FEEDBACK_FOR, feedbackForObject);
 		newReview.addObject(Predicates.CR_USER, feedbackUserObject);
 		
@@ -1523,6 +1524,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		addTriples(crossLinkSubject);
 		
 		addResource(Predicates.CR_HAS_FEEDBACK, userReviewUri);
+		addResource(review.getObjectUrl(), userReviewUri);
 		
 		return reviewId;
 	}
