@@ -42,6 +42,7 @@ import eionet.cr.dao.postgre.helpers.FilteredTypeSearchHelper;
 import eionet.cr.dao.postgre.helpers.FreeTextSearchHelper;
 import eionet.cr.dao.postgre.helpers.ReferencesSearchHelper;
 import eionet.cr.dao.postgre.helpers.SearchBySourceHelper;
+import eionet.cr.dao.postgre.helpers.SearchByTagsHelper;
 import eionet.cr.dao.postgre.helpers.SearchHelper;
 import eionet.cr.dao.postgre.helpers.SpatialSearchHelper;
 import eionet.cr.dao.readers.FreeTextSearchDataReader;
@@ -583,5 +584,73 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 		RODDeliveryReader reader = new RODDeliveryReader();
 		executeQuery(sBuilder.toString(), reader);
 		return reader.getResultVector();
+	}
+
+	@Override
+	public Pair<Integer, List<SubjectDTO>> searchByTags(List<String> tags,
+			PagingRequest pagingRequest, SortingRequest sortingRequest, List<String> selectedPredicates)
+			throws DAOException {
+		// if search expression is null or empty, return empty result
+		if (tags==null || tags.isEmpty()){
+			return new Pair<Integer, List<SubjectDTO>>(0, new LinkedList<SubjectDTO>());
+		}	
+		// create query helper
+		SearchByTagsHelper helper = new SearchByTagsHelper(tags, 
+				pagingRequest, sortingRequest);
+		
+		// create the list of IN parameters of the query
+		ArrayList<Object> inParams = new ArrayList<Object>();
+		
+		// let the helper create the query and fill IN parameters
+		String query = helper.getQuery(inParams);
+
+		long startTime = System.currentTimeMillis();
+		logger.trace("Search by tags, executing subject finder query: " + query);
+		
+		// execute the query, with the IN parameters
+		List<Long> list = executeQuery(query, inParams, new SingleObjectReader<Long>());
+
+		logger.debug("Search by tags, find subjects query time " + Util.durationSince(startTime));
+
+		int totalRowCount = 0;
+		List<SubjectDTO> subjects = new ArrayList<SubjectDTO>();
+		
+		// if result list not null and not empty, then get the subjects data and total rowcount
+		if(list!= null && !list.isEmpty()){
+
+			// create the subjects map that needs to be fed into the subjects data reader
+			Map<Long,SubjectDTO> subjectsMap = new LinkedHashMap<Long, SubjectDTO>();
+			for (Long hash : list){
+				subjectsMap.put(hash, null);
+			}
+			
+			//restrict the query with specified columns, 
+			//otherwise if there are over 300 columns the performance is not acceptable
+			SubjectDataReader reader = new SubjectDataReader(subjectsMap);
+			if(selectedPredicates!=null && !selectedPredicates.isEmpty()){
+				for(String predicate : selectedPredicates){
+					reader.addPredicateHash(Hashes.spoHash(predicate));
+				}
+			}
+			// get the data of all found subjects
+			logger.trace("Search by tags, getting the data of the found subjects");
+			subjects = getSubjectsData(reader);
+		}
+		// if paging required, get the total number of found subjects too
+		if (pagingRequest!=null){
+			
+			inParams = new ArrayList<Object>();
+			query = helper.getCountQuery(inParams);
+			
+			logger.trace("Search by tags, executing rowcount query: " + query);
+			
+			totalRowCount = Integer.valueOf(executeQueryUniqueResult(query, inParams,
+					new SingleObjectReader<Long>()).toString());
+		}
+
+		logger.debug("Search by tags, total query time " + Util.durationSince(startTime));
+
+		// the result Pair contains total number of subjects and the requested sub-list
+		return new Pair<Integer,List<SubjectDTO>>(totalRowCount, subjects);		
 	}
 }

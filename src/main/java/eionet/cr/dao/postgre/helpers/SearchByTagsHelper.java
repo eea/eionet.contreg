@@ -17,10 +17,9 @@
 * (C) European Environment Agency. All Rights Reserved.
 * 
 * Contributor(s):
-* Jaanus Heinlaid, Tieto Eesti*/
+* Enriko Käsper, Tieto Estonia*/
 package eionet.cr.dao.postgre.helpers;
 
-import java.util.HashSet;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -29,31 +28,27 @@ import eionet.cr.common.Predicates;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.pagination.PagingRequest;
-import eionet.cr.util.sql.PairReader;
-import eionet.cr.web.util.columns.ReferringPredicatesColumn;
 
 /**
  * 
- * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
+ * @author <a href="mailto:enriko.kasper@tieto.com">Enriko Käsper</a>
  *
  */
-public class SearchBySourceHelper extends AbstractSearchHelper{
+public class SearchByTagsHelper extends AbstractSearchHelper{
 
-	private String sourceUrl;
-	private long sourceHash;
+	private List<String> tags;
 	
 	/**
 	 * 
 	 * @param pagingRequest
 	 * @param sortingRequest
 	 */
-	public SearchBySourceHelper(String sourceUrl,
+	public SearchByTagsHelper(List<String> tags,
 			PagingRequest pagingRequest, SortingRequest sortingRequest) {
 		
 		super(pagingRequest, sortingRequest);
 		
-		this.sourceUrl = sourceUrl;
-		this.sourceHash = Hashes.spoHash(sourceUrl);
+		this.tags = tags;
 	}
 
 	/*
@@ -63,8 +58,33 @@ public class SearchBySourceHelper extends AbstractSearchHelper{
 	public String getUnorderedQuery(List<Object> inParams) {
 
 		StringBuffer buf = new StringBuffer().
-		append("select distinct SPO.SUBJECT as SUBJECT_HASH from SPO").
-		append(" where SOURCE=").append(sourceHash);
+		append("select distinct SPO1.SUBJECT as SUBJECT_HASH from SPO as SPO1 ");
+		
+		int index=2;
+		StringBuffer whereBuffer = new StringBuffer();
+		for (String tag : tags){
+			String spoAlias = "SPO" + index;
+			whereBuffer.append(whereBuffer.length() > 0 ? " and " : "");
+			
+			whereBuffer.append(spoAlias).append(".PREDICATE=").append(Hashes.spoHash(Predicates.CR_TAG)).
+			append(" AND ").append(spoAlias).append(".OBJECT_HASH=");
+			whereBuffer.append(Hashes.spoHash(StringUtils.strip(tag, "\"")));
+
+			index++;
+		}
+		// continue the query by extending the "from" part with inner joins
+		// to as many aliases as where put into the above-created "where" part
+		// (SPO1 is already present in the form part)
+		for (int i=2 ; i<index; i++) {
+			buf.
+			append(" inner join SPO as SPO").append(i).
+			append(" on SPO1.SUBJECT = SPO").append(i).append(".SUBJECT ");
+		}
+		
+		// finish the query by adding the above-created "where" part
+		if(whereBuffer.length() > 0){
+			buf.append(" where ").append(whereBuffer);
+		}
 		
 		return buf.toString();
 	}
@@ -76,20 +96,43 @@ public class SearchBySourceHelper extends AbstractSearchHelper{
 	protected String getOrderedQuery(List<Object> inParams) {
 		
 		StringBuffer subSelect = new StringBuffer().
-		append("select distinct SPO.SUBJECT as SUBJECT_HASH,").
-		append(" ORDERING.OBJECT as OBJECT_ORDERED_BY from SPO");
+		append("select distinct SPO1.SUBJECT as SUBJECT_HASH,").
+		append(" ORDERING.OBJECT as OBJECT_ORDERED_BY from SPO as SPO1");
 		
 		subSelect.append(" left join SPO as ORDERING on ").
-		append("(SPO.SUBJECT=ORDERING.SUBJECT and ORDERING.PREDICATE=").
+		append("(SPO1.SUBJECT=ORDERING.SUBJECT and ORDERING.PREDICATE=").
 		append(Hashes.spoHash(sortPredicate)).append(")");
 		
-		subSelect.append(" where SPO.SOURCE=").append(sourceHash);
+		int index=2;
+		StringBuffer whereBuffer = new StringBuffer();
+		for (String tag : tags){
+			String spoAlias = "SPO" + index;
+			whereBuffer.append(whereBuffer.length() > 0 ? " and " : "");
+			
+			whereBuffer.append(spoAlias).append(".PREDICATE=").append(Hashes.spoHash(Predicates.CR_TAG)).
+			append(" AND ").append(spoAlias).append(".OBJECT_HASH=");
+			whereBuffer.append(Hashes.spoHash(StringUtils.strip(tag, "\"")));
+
+			index++;
+		}
+		// continue the query by extending the "from" part with inner joins
+		// to as many aliases as where put into the above-created "where" part
+		// (SPO1 is already present in the form part)
+		for (int i=2 ; i<index; i++) {
+			subSelect.append(" inner join SPO as SPO").append(i).
+			append(" on SPO1.SUBJECT = SPO").append(i).append(".SUBJECT ");
+		}
+		
+		// finish the query by adding the above-created "where" part
+		if(whereBuffer.length() > 0){
+			subSelect.append(" where ").append(whereBuffer);
+		}
+		
 		
 		StringBuffer buf = new StringBuffer().
 		append("select * from (").append(subSelect).append(") as FOO order by OBJECT_ORDERED_BY");
 
 		return buf.toString();
-
 	}
 
 	/*
@@ -111,4 +154,3 @@ public class SearchBySourceHelper extends AbstractSearchHelper{
 		throw new UnsupportedOperationException("Method not implemented");
 	}
 }
-

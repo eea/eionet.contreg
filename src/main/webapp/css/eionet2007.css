@@ -176,16 +176,24 @@ a.numberedpage:hover, a.nextpage:hover, a.prevpage:hover, a.firstpage:hover, a.l
 
 
 /*  Tag Cloud styles  */
+#cloud{
+	border-top: 1px solid #cccccc;
+	border-bottom: 1px solid #cccccc;
+	clear:both;
+}
 #cloud a{
 	text-decoration: none;
 	padding-right: 3px;
 }
 
 #cloud a.tag:hover{
+	background-color: #b9cfe2;
+	color:black;
+	/*
 	color: #FFFFFF;
 	background-color: #575757;
+	*/
 }
-
 #cloud a.size0 { 
 	font-size: 100%;
 	line-height: 1.5em;
@@ -217,4 +225,7 @@ a.numberedpage:hover, a.nextpage:hover, a.prevpage:hover, a.firstpage:hover, a.l
 .autocomplete .selected { background:#F0F0F0; }
 .autocomplete div { padding:2px 5px; white-space:nowrap; }
 .autocomplete strong { font-weight:normal; color:#3399FF; }
-
+#sort{
+	float:right;
+	clear:both;
+}

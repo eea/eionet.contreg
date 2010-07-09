@@ -70,6 +70,17 @@ $(document).ready(
 					}
 				}
 			});
+			//Tag search autocomplete
+			$('#tagText').autocomplete({ 
+			    serviceUrl:'json/tags.action',
+			    minChars:2, 
+			    delimiter: /(,|;)\s*/, 
+			    maxHeight:400,
+			    width:300,
+			    zIndex: 9999,
+			    deferRequestBy: 0, 
+			    noCache: true 
+			});
 
 });
 

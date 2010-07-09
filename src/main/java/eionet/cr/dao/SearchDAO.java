@@ -139,4 +139,19 @@ public interface SearchDAO extends DAO{
 	 */
 	public Vector<Hashtable<String,Vector<String>>> searchDeliveriesForROD(
 			PagingRequest pagingRequest)throws DAOException;
+	
+	/**
+	 * 
+	 * @param tags
+	 * @param pagingRequest
+	 * @param sortingRequest
+	 * @param selectedPredicates
+	 * @return
+	 * @throws DAOException
+	 */
+	Pair<Integer, List<SubjectDTO>> searchByTags(
+				List<String> tags,
+				PagingRequest pagingRequest,
+				SortingRequest sortingRequest,
+				List<String> selectedPredicates) throws DAOException;
 }

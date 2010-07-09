@@ -436,4 +436,12 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 			PagingRequest pagingRequest) throws DAOException {
 		throw new UnsupportedOperationException("Method not implemented");
 	}
+
+	@Override
+	public Pair<Integer, List<SubjectDTO>> searchByTags(List<String> tags,
+			PagingRequest pagingRequest, SortingRequest sortingRequest, List<String> selectedPredicates)
+			throws DAOException {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Method not implemented");
+	}
 }
