@@ -1654,5 +1654,32 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 			SQLUtil.close(conn);
 		}
 	}
-	
+
+	/** */
+	private static final String deleteTriplesOfSourceSQL = "delete from SPO where SOURCE=?";
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#deleteTriplesOfSource(long)
+	 */
+	public void deleteTriplesOfSource(long sourceHash) throws DAOException {
+		
+		if (sourceHash<=0){
+			throw new IllegalArgumentException("The given source hash should be >0");
+		}
+		
+		Connection conn = null;
+		Statement stmt = null;
+		try{
+			conn = getConnection();
+			SQLUtil.executeUpdate(StringUtils.replace(
+					deleteTriplesOfSourceSQL, "?", String.valueOf(sourceHash)), conn);
+		}
+		catch (SQLException e){
+			throw new DAOException(e.toString(), e);
+		}
+		finally{
+			SQLUtil.close(stmt);
+			SQLUtil.close(conn);
+		}
+	}
 }

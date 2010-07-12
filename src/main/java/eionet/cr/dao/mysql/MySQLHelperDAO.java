@@ -895,6 +895,12 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 		
 		throw new UnsupportedOperationException("Method not implemented");
 	}
+
+	@Override
+	public void deleteTriplesOfSource(long sourceHash) throws DAOException {
+		
+		throw new UnsupportedOperationException("Method not implemented");
+	}
 }
 
 

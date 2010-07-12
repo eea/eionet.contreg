@@ -331,4 +331,11 @@ public interface HelperDAO extends DAO {
 	 * @throws DAOException
 	 */
 	public void deleteTriples(Collection<TripleDTO> triples) throws DAOException;
+	
+	/**
+	 * 
+	 * @param sourceHash
+	 * @throws DAOException
+	 */
+	public void deleteTriplesOfSource(long sourceHash) throws DAOException;
 }
