@@ -482,7 +482,8 @@ public class PullHarvest extends Harvest{
 			}
 			
 			// if this file has a conversion to RDF, run it and return the reference to the resulting file
-			if (schemaOrDtd!=null && schemaOrDtd.length()>0){
+			if (schemaOrDtd!=null && schemaOrDtd.length()>0
+					&& !schemaOrDtd.equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#RDF")){
 				
 				sourceMetadata.addObject(Predicates.CR_SCHEMA, new ObjectDTO(schemaOrDtd, false));
 				convParser = ConversionsParser.parseForSchema(schemaOrDtd);
@@ -689,12 +690,5 @@ public class PullHarvest extends Harvest{
 
 	public void setFullSetupModeUrgent(boolean fullSetupModeUrgent) {
 		this.fullSetupModeUrgent = fullSetupModeUrgent;
-	}
-	
-	public static void main(String[] args) throws HarvestException{
-
-		DbConnectionProvider.setConnectionType(ConnectionType.SIMPLE);
-		PullHarvest harvest = new PullHarvest("http://norman.walsh.name/atom/whatsnew.xml", null);
-		harvest.execute();
 	}
 }
