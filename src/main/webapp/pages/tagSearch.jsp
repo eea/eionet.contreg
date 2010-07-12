@@ -23,7 +23,7 @@
 			<stripes:label for="tagText" class="question">Inserted tags </stripes:label>
 			<c:forEach items="${actionBean.selectedTags}" var="selectedTag">
 				> <a href="tagSearch.action?search=Search&searchTag=${selectedTag }" class="tag" >${selectedTag }</a> 
-				<a href="tagSearch.action?removeTag=Remove&searchTag=${selectedTag }"><img src="/cr/images/delete_small.gif" title="remove tag" alt="remove tag"/></a>
+				<a href="tagSearch.action?removeTag=Remove&searchTag=${selectedTag }"><img src="${pageContext.request.contextPath}/images/delete_small.gif" title="remove tag" alt="remove tag"/></a>
 			</c:forEach>
 			</p>
 		</c:if>
