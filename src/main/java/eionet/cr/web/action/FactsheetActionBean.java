@@ -52,6 +52,7 @@ import eionet.cr.dao.util.UriLabelPair;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
+import eionet.cr.dto.TripleDTO;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.InstantHarvester;
 import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
@@ -314,29 +315,30 @@ public class FactsheetActionBean extends AbstractActionBean{
 		
 		if (rowId!=null && !rowId.isEmpty()){
 			
-			SubjectDTO subjectDTO = new SubjectDTO(uri, anonymous);
-
-			boolean execute = false;
-			for (String s:rowId){
+			long subjectHash = Hashes.spoHash(uri);
+			ArrayList<TripleDTO> triples = new ArrayList<TripleDTO>();
+			
+			for (String row:rowId){
 				
-				int i = s.indexOf("_");
-				if (i<=0 || i==(s.length()-1)){
-					throw new IllegalArgumentException("Illegal rowId: " + s);
+				int i = row.indexOf("_");
+				if (i<=0 || i==(row.length()-1)){
+					throw new IllegalArgumentException("Illegal rowId: " + row);
 				}
 				
-				ObjectDTO object = FactsheetObjectId.parse(s.substring(i+1));
-				subjectDTO.addObject(s.substring(0,i), object);
-				if (execute==false){
-					execute = true;
-				}
+				long predicateHash = Long.parseLong(row.substring(0,i));
+				ObjectDTO object = FactsheetObjectId.parse(row.substring(i+1));
+				
+				TripleDTO triple = new TripleDTO(subjectHash, predicateHash, object.getHash());
+				triple.setSourceHash(Long.valueOf(object.getSourceHash()));
+				triple.setObjectDerivSourceHash(Long.valueOf(object.getDerivSourceHash()));
+				triple.setObjectSourceObjectHash(Long.valueOf(object.getSourceObjectHash()));
+				
+				triples.add(triple);
 			}
 			
-			if (execute==true){
-				
-				HelperDAO helperDao = factory.getDao(HelperDAO.class);			 
-				helperDao.deleteTriples(subjectDTO);
-				helperDao.updateUserHistory(getUser(), uri);
-			}
+			HelperDAO helperDao = factory.getDao(HelperDAO.class);			 
+			helperDao.deleteTriples(triples);
+			helperDao.updateUserHistory(getUser(), uri);
 		}
 		
 		return new RedirectResolution(this.getClass(), "edit").addParameter("uri", uri);

@@ -90,13 +90,6 @@ public interface HelperDAO extends DAO {
 	
 	/**
 	 * 
-	 * @param subject
-	 * @throws DAOException
-	 */
-	void deleteTriples(SubjectDTO subject) throws DAOException;
-
-	/**
-	 * 
 	 * @param subjectUri
 	 * @return
 	 * @throws DAOException
@@ -332,5 +325,10 @@ public interface HelperDAO extends DAO {
 	 */
 	public void deleteReview(String reviewSubjectURI)  throws DAOException;
 	
-	
+	/**
+	 * 
+	 * @param triples
+	 * @throws DAOException
+	 */
+	public void deleteTriples(Collection<TripleDTO> triples) throws DAOException;
 }

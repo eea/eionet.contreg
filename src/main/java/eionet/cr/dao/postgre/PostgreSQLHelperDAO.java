@@ -188,60 +188,54 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 			SQLUtil.close(conn);
 		}
 	}
-
+	
 	/** */
-	private static final String deleteTriplesSQL = "delete from SPO where SUBJECT=? and PREDICATE=?" +
-			" and OBJECT_HASH=? and SOURCE=? and OBJ_DERIV_SOURCE=? and OBJ_SOURCE_OBJECT=?";
+	private static String sqlDeleteTriples = "delete from SPO where SUBJECT=? and PREDICATE=? and OBJECT_HASH=?";
+
 	/*
 	 * (non-Javadoc)
-	 * @see eionet.cr.dao.HelperDAO#deleteTriples(eionet.cr.dto.SubjectDTO)
+	 * @see eionet.cr.dao.HelperDAO#deleteTriples2(java.util.Collection)
 	 */
-	public void deleteTriples(SubjectDTO subject) throws DAOException{
+	public void deleteTriples(Collection<TripleDTO> triples) throws DAOException{
 		
-		if (subject==null || subject.getPredicateCount()==0){
+		if (triples==null || triples.isEmpty()){
 			return;
 		}
 		
+		Statement stmt = null;
 		Connection conn = null;
-		PreparedStatement pstmt = null;
-		boolean executeBatch = false;
 		try{
 			conn = getConnection();
-			pstmt = conn.prepareStatement(deleteTriplesSQL);
-			Map<String,Collection<ObjectDTO>> predicates = subject.getPredicates();
-			for (String predicate:predicates.keySet()){
-				
-				Collection<ObjectDTO> objects = subject.getObjects(predicate);
-				if (objects!=null && !objects.isEmpty()){
-					
-					for (ObjectDTO object:objects){
-						
-						pstmt.setLong(1, subject.getUriHash());
-						pstmt.setLong(2, Long.parseLong(predicate));
-						pstmt.setLong(3, object.getHash());
-						pstmt.setLong(4, object.getSourceHash());
-						pstmt.setLong(5, object.getDerivSourceHash());
-						pstmt.setLong(6, object.getSourceObjectHash());
-						pstmt.addBatch();
-						
-						if (executeBatch==false){
-							executeBatch = true;
-						}
-					}
+			stmt = conn.createStatement();
+			
+			for (TripleDTO triple : triples){
+
+				String sql = StringUtils.replace(
+						sqlDeleteTriples, "?", String.valueOf(triple.getSubjectHash()), 1);
+				sql = StringUtils.replace(sql, "?", String.valueOf(triple.getPredicateHash()), 1);
+				sql = StringUtils.replace(sql, "?", String.valueOf(triple.getObjectHash()), 1);
+
+				StringBuilder bld = new StringBuilder(sql);
+				if (triple.getSourceHash()!=null){
+					bld.append(" and SOURCE=").append(triple.getSourceHash());
 				}
+				if (triple.getObjectDerivSourceHash()!=null){
+					bld.append(" and OBJ_DERIV_SOURCE=").append(triple.getObjectDerivSourceHash());
+				}
+				if (triple.getObjectSourceObjectHash()!=null){
+					bld.append(" and OBJ_SOURCE_OBJECT=").append(triple.getObjectSourceObjectHash());
+				}
+
+				stmt.addBatch(bld.toString());
 			}
 			
-			if (executeBatch==true){
-				pstmt.executeBatch();
-			}
-		}
-		catch (NumberFormatException e){
-			throw new IllegalArgumentException("Expected the predicates to be in hash format");
+			stmt.executeBatch();
 		}
 		catch (SQLException e){
 			throw new DAOException(e.toString(), e);
 		}
 		finally{
+			SQLUtil.close(stmt);
 			SQLUtil.close(conn);
 		}
 	}
@@ -1172,12 +1166,11 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		if (URLUtil.isURL(url)==false)
 			throw new IllegalArgumentException("url must not be null and must be valid URL");
 
-		SubjectDTO userHomeItemSubject = new SubjectDTO(user.getHomeItemUri(url), false);
-		ObjectDTO objectDTO = new ObjectDTO(url, false);
-		objectDTO.setSourceHash(Hashes.spoHash(user.getBookmarksUri()));
-		userHomeItemSubject.addObject(String.valueOf(Hashes.spoHash(Predicates.CR_BOOKMARK)), objectDTO);
+		TripleDTO triple = new TripleDTO(Long.parseLong(user.getHomeItemUri(url)),
+				Hashes.spoHash(Predicates.CR_BOOKMARK), Hashes.spoHash(url));
+		triple.setSourceHash(Long.valueOf(Hashes.spoHash(user.getBookmarksUri())));
 		
-		deleteTriples(userHomeItemSubject);
+		deleteTriples(Collections.singletonList(triple));
 	}
 	
 	@Override
@@ -1471,7 +1464,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		int newId = currentLastId + 1;
 		
 		SubjectDTO newValue = new SubjectDTO(user.getHomeUri(), false);
-		ObjectDTO objectDTO = new ObjectDTO(String.valueOf(newId), false);
+		ObjectDTO objectDTO = new ObjectDTO(String.valueOf(newId), true);
 		objectDTO.setSourceUri(user.getHomeUri());
 		
 		newValue.addObject(Predicates.CR_USER_REVIEW_LAST_NUMBER, objectDTO);

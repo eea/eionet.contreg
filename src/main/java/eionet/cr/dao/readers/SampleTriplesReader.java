@@ -56,11 +56,9 @@ public class SampleTriplesReader extends ResultSetListReader<TripleDTO>{
 	 */
 	public void readRow(ResultSet rs) throws SQLException {
 		
-		TripleDTO dto = new TripleDTO();
-		dto.setSubjectHash(rs.getLong("SUBJECT"));
-		dto.setPredicateHash(rs.getLong("PREDICATE"));
+		TripleDTO dto = new TripleDTO(rs.getLong("SUBJECT"),
+				rs.getLong("PREDICATE"), rs.getString("OBJECT"));
 		dto.setObjectDerivSourceHash(rs.getLong("OBJ_DERIV_SOURCE"));
-		dto.setObject(rs.getString("OBJECT"));
 		
 		resultList.add(dto);
 

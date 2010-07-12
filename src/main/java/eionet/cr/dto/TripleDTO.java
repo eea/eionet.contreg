@@ -20,6 +20,8 @@
  */
 package eionet.cr.dto;
 
+import eionet.cr.util.Hashes;
+
 /**
  * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
@@ -31,9 +33,11 @@ public class TripleDTO {
 	private long subjectHash;
 	private long predicateHash;
 	private long objectHash;
-	private long sourceHash;
-	private long objectDerivSourceHash;
-	private long objectSourceObjectHash;
+	
+	/** */
+	private Long sourceHash;
+	private Long objectDerivSourceHash;
+	private Long objectSourceObjectHash;
 
 	/** */
 	private boolean isAnonymousSubject;
@@ -46,14 +50,45 @@ public class TripleDTO {
 	private Double objectDouble;
 	
 	/** */
-	private long genTime;
-	private long objectDerivGenTime;
+	private Long genTime;
+	private Long objectDerivGenTime;
 	
 	/** */
 	private String subjectUri;
 	private String predicateUri;
 	private String sourceUri;
 	private String objectDerivSourceUri;
+	
+	/**
+	 * 
+	 * @param subjectHash
+	 * @param predicateHash
+	 * @param objectHash
+	 */
+	public TripleDTO(long subjectHash, long predicateHash, long objectHash){
+		
+		this.subjectHash = subjectHash;
+		this.predicateHash = predicateHash;
+		this.objectHash = objectHash;
+	}
+
+	/**
+	 * 
+	 * @param subjectHash
+	 * @param predicateHash
+	 * @param object
+	 */
+	public TripleDTO(long subjectHash, long predicateHash, String object){
+		
+		if (object==null){
+			throw new IllegalArgumentException("object must not be null!");
+		}
+		
+		this.subjectHash = subjectHash;
+		this.predicateHash = predicateHash;
+		this.object = object;
+		this.objectHash = Hashes.spoHash(object);
+	}
 
 	/**
 	 * @return the subjectHash
@@ -62,70 +97,16 @@ public class TripleDTO {
 		return subjectHash;
 	}
 	/**
-	 * @param subjectHash the subjectHash to set
-	 */
-	public void setSubjectHash(long subjectHash) {
-		this.subjectHash = subjectHash;
-	}
-	/**
 	 * @return the predicateHash
 	 */
 	public long getPredicateHash() {
 		return predicateHash;
 	}
 	/**
-	 * @param predicateHash the predicateHash to set
-	 */
-	public void setPredicateHash(long predicateHash) {
-		this.predicateHash = predicateHash;
-	}
-	/**
 	 * @return the objectHash
 	 */
 	public long getObjectHash() {
 		return objectHash;
-	}
-	/**
-	 * @param objectHash the objectHash to set
-	 */
-	public void setObjectHash(long objectHash) {
-		this.objectHash = objectHash;
-	}
-	/**
-	 * @return the sourceHash
-	 */
-	public long getSourceHash() {
-		return sourceHash;
-	}
-	/**
-	 * @param sourceHash the sourceHash to set
-	 */
-	public void setSourceHash(long sourceHash) {
-		this.sourceHash = sourceHash;
-	}
-	/**
-	 * @return the objectDerivSourceHash
-	 */
-	public long getObjectDerivSourceHash() {
-		return objectDerivSourceHash;
-	}
-	/**
-	 * @param objectDerivSourceHash the objectDerivSourceHash to set
-	 */
-	public void setObjectDerivSourceHash(long objectDerivSourceHash) {
-		this.objectDerivSourceHash = objectDerivSourceHash;
-	}
-	/**
-	 * @return the objectSourceObjectHash
-	 */
-	public long getObjectSourceObjectHash() {
-		return objectSourceObjectHash;
-	}
-	/**
-	 * @param objectSourceObjectHash the objectSourceObjectHash to set
-	 */
-	public void setObjectSourceObjectHash(long objectSourceObjectHash) {
-		this.objectSourceObjectHash = objectSourceObjectHash;
 	}
 	/**
 	 * @return the subjectUri
@@ -218,12 +199,6 @@ public class TripleDTO {
 		return object;
 	}
 	/**
-	 * @param object the object to set
-	 */
-	public void setObject(String object) {
-		this.object = object;
-	}
-	/**
 	 * @return the objectLanguage
 	 */
 	public String getObjectLanguage() {
@@ -247,28 +222,74 @@ public class TripleDTO {
 	public void setObjectDouble(Double objectDouble) {
 		this.objectDouble = objectDouble;
 	}
+
+	/**
+	 * @return the sourceHash
+	 */
+	public Long getSourceHash() {
+		return sourceHash;
+	}
+
+	/**
+	 * @param sourceHash the sourceHash to set
+	 */
+	public void setSourceHash(Long sourceHash) {
+		this.sourceHash = sourceHash;
+	}
+
+	/**
+	 * @return the objectDerivSourceHash
+	 */
+	public Long getObjectDerivSourceHash() {
+		return objectDerivSourceHash;
+	}
+
+	/**
+	 * @param objectDerivSourceHash the objectDerivSourceHash to set
+	 */
+	public void setObjectDerivSourceHash(Long objectDerivSourceHash) {
+		this.objectDerivSourceHash = objectDerivSourceHash;
+	}
+
+	/**
+	 * @return the objectSourceObjectHash
+	 */
+	public Long getObjectSourceObjectHash() {
+		return objectSourceObjectHash;
+	}
+
+	/**
+	 * @param objectSourceObjectHash the objectSourceObjectHash to set
+	 */
+	public void setObjectSourceObjectHash(Long objectSourceObjectHash) {
+		this.objectSourceObjectHash = objectSourceObjectHash;
+	}
+
 	/**
 	 * @return the genTime
 	 */
-	public long getGenTime() {
+	public Long getGenTime() {
 		return genTime;
 	}
+
 	/**
 	 * @param genTime the genTime to set
 	 */
-	public void setGenTime(long genTime) {
+	public void setGenTime(Long genTime) {
 		this.genTime = genTime;
 	}
+
 	/**
 	 * @return the objectDerivGenTime
 	 */
-	public long getObjectDerivGenTime() {
+	public Long getObjectDerivGenTime() {
 		return objectDerivGenTime;
 	}
+
 	/**
 	 * @param objectDerivGenTime the objectDerivGenTime to set
 	 */
-	public void setObjectDerivGenTime(long objectDerivGenTime) {
+	public void setObjectDerivGenTime(Long objectDerivGenTime) {
 		this.objectDerivGenTime = objectDerivGenTime;
 	}
 }
