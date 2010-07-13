@@ -29,8 +29,6 @@
 	</entry>
 	<entry key="http://purl.org/dc/dcmitype/Dataset">
 		application/vnd.ms-excel
-		application/vnd.ms-excel.sheet.macroEnabled.12
-		application/vnd.ms-excel.sheet.macroenabled.12
 		application/vnd.msexcel
 		application/ms-excel
 		application/x-excel
@@ -39,7 +37,9 @@
 		application/vnd.oasis.opendocument.spreadsheet
 		application/x-msaccess
 		text/xml
+		application/xml
 		application/rdf+xml
+		application/doc
 		application/x-excel5.0
 		application/x-msexcel
 		application/msaccess
@@ -47,6 +47,7 @@
 		application/vnd.google-earth.kmz
 	</entry>
 	<entry key="http://purl.org/dc/dcmitype/Collection">
+		application/zip
 	</entry>
 	<entry key="http://purl.org/dc/dcmitype/Event">
 	</entry>
