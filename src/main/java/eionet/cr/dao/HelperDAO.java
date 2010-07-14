@@ -295,6 +295,15 @@ public interface HelperDAO extends DAO {
 	 */
 	public int addReview(ReviewDTO review, CRUser user)  throws DAOException;
 	
+	/**
+	 * 
+	 * @param reviewiD
+	 * @param review
+	 * @param user
+	 * @throws DAOException
+	 * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
+	 */	
+	public void saveReview(int reviewId, ReviewDTO review, CRUser user) throws DAOException;
 	
 	/**
 	 * 
@@ -338,4 +347,6 @@ public interface HelperDAO extends DAO {
 	 * @throws DAOException
 	 */
 	public void deleteTriplesOfSource(long sourceHash) throws DAOException;
+	
+	
 }

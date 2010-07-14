@@ -1,6 +1,7 @@
 package eionet.cr.dto;
 
 import java.io.Serializable;
+import java.util.List;
 
 import org.apache.commons.lang.StringEscapeUtils;
 
@@ -17,6 +18,7 @@ public class ReviewDTO  implements Serializable {
 	private String objectUrl;
 	private String reviewContent;
 	private int reviewID;
+	private List<String> attachments;
 	
 	public String getTitle() {
 		return title;
@@ -51,6 +53,12 @@ public class ReviewDTO  implements Serializable {
 	}
 	public void setReviewID(int reviewID) {
 		this.reviewID = reviewID;
+	}
+	public List<String> getAttachments() {
+		return attachments;
+	}
+	public void setAttachments(List<String> attachments) {
+		this.attachments = attachments;
 	}
 	
 }

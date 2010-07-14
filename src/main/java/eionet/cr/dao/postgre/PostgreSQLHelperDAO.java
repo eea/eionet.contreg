@@ -56,9 +56,9 @@ import eionet.cr.dao.util.PredicateLabels;
 import eionet.cr.dao.util.SubProperties;
 import eionet.cr.dao.util.UriLabelPair;
 import eionet.cr.dto.ObjectDTO;
-import eionet.cr.dto.TripleDTO;
 import eionet.cr.dto.ReviewDTO;
 import eionet.cr.dto.SubjectDTO;
+import eionet.cr.dto.TripleDTO;
 import eionet.cr.dto.UserBookmarkDTO;
 import eionet.cr.dto.UserHistoryDTO;
 import eionet.cr.harvest.statistics.dto.HarvestUrgencyScoreDTO;
@@ -1480,8 +1480,19 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 	
 	@Override
 	public int addReview(ReviewDTO review, CRUser user) throws DAOException{
-		
 		int reviewId = generateNewReviewId(user);
+		insertReviewToDB(review, user, reviewId);
+		return reviewId;
+	}
+	
+	@Override
+	public void saveReview(int reviewId, ReviewDTO review, CRUser user) throws DAOException{
+		deleteReview(user.getReviewUri(reviewId));
+		insertReviewToDB(review, user, reviewId);
+	}
+
+	private void insertReviewToDB(ReviewDTO review, CRUser user, int reviewId) throws DAOException{
+		
 		String userReviewUri = user.getReviewUri(reviewId);
 		SubjectDTO newReview = new SubjectDTO(userReviewUri, false);
 		
@@ -1519,9 +1530,8 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		addResource(Predicates.CR_HAS_FEEDBACK, userReviewUri);
 		addResource(review.getObjectUrl(), userReviewUri);
 		
-		return reviewId;
 	}
-
+	
 	@Override
 	public List<ReviewDTO> getReviewList(CRUser user)  throws DAOException{
 		

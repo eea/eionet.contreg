@@ -40,51 +40,72 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
 	public Resolution view() throws DAOException {
 
 		loadReview();
-		
+	
 		setEnvironmentParams(this.getContext(), AbstractHomeActionBean.TYPE_REVIEWS);
-		if (this.getContext().getRequest().getParameter("save") != null){
+		if (this.getContext().getRequest().getParameter("addSave") != null){
+			add();
+		}
+		
+		if (this.getContext().getRequest().getParameter("editSave") != null){
 			save();
 		}
 		
 		if (this.getContext().getRequest().getParameter("delete") != null){
 			deleteReviews();
 		}
+
+		if (this.getContext().getRequest().getParameter("deleteReview") != null){
+			deleteSingleReview();
+		}
+		
+
 		
 		return new ForwardResolution("/pages/home/reviews.jsp");
 	}
 	
 	private void loadReview(){
-		String reviewString="";
-		try {
-			reviewString = this.getContext().getRequest().getRequestURL().toString().split("reviews/")[1];
+		if (reviewId == 0){
+			String reviewString="";
 			try {
-				reviewId = Integer.parseInt(reviewString);
-				if (reviewId > 0){
-					this.setHomeContext(false); // Do not show tabs and headers.
-					reviewView = true;
+				reviewString = this.getContext().getRequest().getRequestURL().toString().split("reviews/")[1];
+				if (reviewString.contains("?")){
+					reviewString = reviewString.split("?")[0];
 				}
-			} catch (Exception ex){
-				addCautionMessage("Not correct review ID. Only numerical values allowed after /reviews/.");
-				reviewView = true;
-				this.setHomeContext(false);
+				try {
+					reviewId = Integer.parseInt(reviewString);
+					if (reviewId > 0){
+						this.setHomeContext(false); // Do not show tabs and headers.
+						reviewView = true;
+					}
+				} catch (Exception ex){
+					addCautionMessage("Not correct review ID. Only numerical values allowed after /reviews/.");
+					reviewView = true;
+					this.setHomeContext(false);
+					reviewId = 0;
+				}
+			} catch (Exception ex) {
+				// Meaning that the split didn't succeed because there is no ID following.
 				reviewId = 0;
 			}
-		} catch (Exception ex) {
-			// Meaning that the split didn't succeed because there is no ID following.
-			reviewId = 0;
 		}
-		
-		
+	}
+	
+	public void add() {
+		try {
+			reviewId = factory.getDao(HelperDAO.class).addReview(review, this.getUser());
+			addSystemMessage("Review successfully added.");
+		} catch (DAOException ex){
+			addWarningMessage("Error while adding a review. The review was not added.");
+		}
 	}
 	
 	public void save() {
 		try {
-			factory.getDao(HelperDAO.class).addReview(review, this.getUser());
+			factory.getDao(HelperDAO.class).saveReview(reviewId, review, this.getUser());
 			addSystemMessage("Review successfully saved.");
 		} catch (DAOException ex){
-			addWarningMessage("Error while saving a review. The review was not saved.");
+			addWarningMessage("Error while saving the review. The review was not saved.");
 		}
-		review.setTitle("Saved");
 	}
 	
 	public void deleteReviews() throws DAOException{
@@ -104,6 +125,18 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
 		}
 	}
 	
+	public void deleteSingleReview() throws DAOException{
+		if (this.getContext().getRequest().getParameter("deleteReview") != null){
+			try {
+				reviewId = Integer.parseInt(this.getContext().getRequest().getParameter("deleteReview"));
+				DAOFactory.get().getDao(HelperDAO.class).deleteReview(this.getUser().getReviewUri(reviewId));
+				addSystemMessage("Review #"+reviewId+" was deleted.");
+				reviewId = 0;
+			} catch (DAOException ex){
+				addWarningMessage("Error occured during review deletion.");
+			}
+		}
+	}
 	
 	public List<String> getRaportsListing() {
 		return raportsListing;

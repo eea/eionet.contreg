@@ -8,32 +8,182 @@
 
 	<c:choose>
 		<c:when test="${actionBean.reviewView}">
+			
 			<c:if test="${ actionBean.review != null }">
-				<h1>Review #${actionBean.reviewId}</h1>
-				
-				<table>
-					<col style="width:100em"/>
-					<col style="width:300em"/>
-					<tr>
-						<td><label><b>Title</b></label></td>
-						<td><label>${actionBean.review.title}</label></td>
-					</tr>
-					<tr>
-						<td><label><b>Object URL</b></label></td>
-						<td><label>${actionBean.review.objectUrl}</label></td>
-					</tr>
-					<tr>
-						<td><label><b>Review content</b></label></td>
-						<td><label>Not implemented yet</label></td>
-					</tr>
-				</table>
+				<c:choose>
+					<c:when test="${not empty param.edit}">
+						<h1>Edit review #${actionBean.reviewId}</h1>
+							<crfn:form action="${actionBean.baseHomeUrl}${actionBean.attemptedUserName}/reviews/${actionBean.reviewId}" method="post">	
+							<table>
+								<col style="width:10em"/>
+								<col style="width:100%"/>
+								<tr>
+									<td><label class="question required" for="title">Title</label></td>
+									<td><stripes:text id="title" name="review.title" size="80">${ actionBean.review.title }</stripes:text></td>
+								</tr>
+								<tr>
+									<td><label class="question required" for="objecturl">Object URL</label></td>
+									<td><stripes:text id="objecturl" name="review.objectUrl" size="80">${ actionBean.review.objectUrl }</stripes:text></td>
+								</tr>
+								<tr>
+									<td><label class="question" for="reviewcontent">Review content</label></td>
+									<td><stripes:textarea id="reviewcontent" name="review.reviewContent" cols="80" rows="10" disabled="true">${ actionBean.review.reviewContent }</stripes:textarea></td>
+								</tr>
+								<tr>
+									<td colspan="2">
+										<stripes:submit name="cancel" value="Cancel"/>
+										<stripes:submit name="editSave" value="Save review"/>
+									</td>
+								</tr>
+							</table>
+						</crfn:form>
+					</c:when>
+					<c:when test="${not empty param.editAttachments}">
+					
+					<div id="operations">
+						<ul>
+							<li>
+								<stripes:link href="${actionBean.baseHomeUrl}${actionBean.attemptedUserName}/reviews/${actionBean.reviewId}">Back</stripes:link>
+							</li>
+						</ul>
+					</div>
+					
+						<h1>Review #${actionBean.reviewId} - edit attachments</h1>
+						
+						<table>
+							<col style="width:100em"/>
+							<col style="width:300em"/>
+							<tr>
+								<td><label><b>Title</b></label></td>
+								<td><label>${actionBean.review.title}</label></td>
+							</tr>
+							<tr>
+								<td><label><b>Object URL</b></label></td>
+								<td><label>${actionBean.review.objectUrl}</label></td>
+							</tr>
+						</table>
+						
+						<crfn:form action="${actionBean.baseHomeUrl}${actionBean.attemptedUserName}/reviews/${actionBean.reviewId}?editAttachments=Edit" method="post">
+							<table>
+								<col style="width:10em"/>
+								<col style="width:100%"/>
+								<tr>
+									<td><label class="question" for="attachment"><b>Upload file:</b></label></td>
+									<td><stripes:file name="attachment" id="attachment" size="80"/></td>
+								</tr>
+								<tr>
+									<td colspan="2">
+										<stripes:submit name="upload" value="Upload"/>       
+									</td>
+								</tr>
+							</table>
+						</crfn:form>
+						
+						
+						<br/>
+						<c:choose>
+							<c:when test="${not empty actionBean.review.attachments}">
+								<display:table name="${actionBean.review.attachments}" class="sortable"
+									pagesize="20" sort="list" id="bookmark" htmlId="bookmarks"
+									requestURI="${actionBean.urlBinding}" style="width:100%">
+									<display:column title="" sortable="false" style="width:50px;">
+										<input type="checkbox"
+											value="${ bookmark.bookmarkUrlHtmlFormatted }" name='bookmarkUrl'></input>
+									</display:column>
+									<display:column title="URL" sortable="false">
+										<stripes:link href="/factsheet.action">${bookmark.bookmarkUrl}
+											<stripes:param name="uri" value="${bookmark.bookmarkUrl}" />
+										</stripes:link>
+									</display:column>
+								</display:table>
+							</c:when>
+							<c:otherwise>
+								<p>No attachments added.</p>
+							</c:otherwise>
+						</c:choose>
+					</c:when>
+					
+					<c:otherwise>
+					
+					<div id="operations">
+						<ul>
+							<li>
+								<stripes:link href="${actionBean.baseHomeUrl}${actionBean.attemptedUserName}/reviews/">Back to reviews</stripes:link>
+							</li>
+						</ul>
+					</div>
+					<br/>
+						<ul id="dropdown-operations">
+							<li><a href="#">Operations</a>
+								<ul>
+									<li>
+										<stripes:link class="link-plain" href="${actionBean.baseHomeUrl}${actionBean.attemptedUserName}/reviews/${actionBean.reviewId}?edit=Edit">
+										Edit
+										</stripes:link>
+									</li>
+									<li>
+										<stripes:link class="link-plain" href="${actionBean.baseHomeUrl}${actionBean.attemptedUserName}/reviews/${actionBean.reviewId}?editAttachments=Edit">
+										Edit attachments
+										</stripes:link>
+									</li>
+									<li>
+										<stripes:link class="link-plain" href="${actionBean.baseHomeUrl}${actionBean.attemptedUserName}/reviews?deleteReview=${actionBean.reviewId}">
+										Delete
+										</stripes:link>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					
+						<h1>Review #${actionBean.reviewId}</h1>
+						
+						<table>
+							<col style="width:100em"/>
+							<col style="width:300em"/>
+							<tr>
+								<td><label><b>Title</b></label></td>
+								<td><label>${actionBean.review.title}</label></td>
+							</tr>
+							<tr>
+								<td><label><b>Object URL</b></label></td>
+								<td><label>${actionBean.review.objectUrl}</label></td>
+							</tr>
+							<tr>
+								<td><label><b>Review content</b></label></td>
+								<td><label>${ actionBean.review.reviewContent }</label></td>
+							</tr>
+						</table>
+						<br/>
+						<c:choose>
+							<c:when test="${not empty actionBean.review.attachments}">
+								<display:table name="${actionBean.review.attachments}" class="sortable"
+									pagesize="20" sort="list" id="bookmark" htmlId="bookmarks"
+									requestURI="${actionBean.urlBinding}" style="width:100%">
+									<display:column title="" sortable="false" style="width:50px;">
+										<input type="checkbox"
+											value="${ bookmark.bookmarkUrlHtmlFormatted }" name='bookmarkUrl'></input>
+									</display:column>
+									<display:column title="URL" sortable="false">
+										<stripes:link href="/factsheet.action">${bookmark.bookmarkUrl}
+											<stripes:param name="uri" value="${bookmark.bookmarkUrl}" />
+										</stripes:link>
+									</display:column>
+								</display:table>
+							</c:when>
+							<c:otherwise>
+								<p>No attachments added.</p>
+							</c:otherwise>
+						</c:choose>
+						
+					</c:otherwise>
+				</c:choose>
 			</c:if>
 		</c:when>
 		<c:otherwise>
 			<c:choose>
 				<c:when test="${not empty param.add}">
 					<h1>Adding new review</h1>
-					<crfn:form action="${actionBean.baseHomeUrl}${actionBean.attemptedUserName}/reviews" method="post">
+						<crfn:form action="${actionBean.baseHomeUrl}${actionBean.attemptedUserName}/reviews" method="post">
 						<table>
 							<col style="width:10em"/>
 							<col style="width:100%"/>
@@ -51,15 +201,15 @@
 							</tr>
 							<tr>
 								<td colspan="2">
-									<stripes:submit name="save" value="Save"/>       
+									<stripes:submit name="addSave" value="Add review"/>       
 								</td>
 							</tr>
 						</table>
 					</crfn:form>
-					
-					
-					
 				</c:when>
+				
+				
+				
 				<c:otherwise>
 				
 				
@@ -76,7 +226,7 @@
 					<c:choose>
 						<c:when test="${not empty actionBean.reviews}">
 						<crfn:form id="reviewList"
-						action="${actionBean.baseHomeUrl}${actionBean.attemptedUserName}/reviews?delete=1"
+						action="${actionBean.baseHomeUrl}${actionBean.attemptedUserName}/reviews?delete=delete"
 						method="post">
 						<display:table name="${actionBean.reviews}" class="sortable"
 							pagesize="20" sort="list" id="review" htmlId="reviews"
