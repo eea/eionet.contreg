@@ -19,6 +19,7 @@ public class ReviewDTO  implements Serializable {
 	private String reviewContent;
 	private int reviewID;
 	private List<String> attachments;
+	private String reviewContentType;
 	
 	public String getTitle() {
 		return title;
@@ -59,6 +60,13 @@ public class ReviewDTO  implements Serializable {
 	}
 	public void setAttachments(List<String> attachments) {
 		this.attachments = attachments;
+	}
+
+	public String getReviewContentType() {
+		return reviewContentType;
+	}
+	public void setReviewContentType(String reviewContentType) {
+		this.reviewContentType = reviewContentType;
 	}
 	
 }

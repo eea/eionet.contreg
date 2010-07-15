@@ -1,8 +1,10 @@
 package eionet.cr.web.action.home;
 
+import java.io.IOException;
 import java.util.List;
 
 import net.sourceforge.stripes.action.DefaultHandler;
+import net.sourceforge.stripes.action.FileBean;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
@@ -28,9 +30,12 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
 	
 	private List<ReviewDTO> reviews;
 	
-	private List<String> reviewSubjectUrls;
+	private List<Integer> reviewIds;
+	private List<String> attachmentList;
 	private int reviewId = 0;
 	private boolean reviewView;
+	
+	private FileBean attachment;
 	
 	/*
 	 * (non-Javadoc)
@@ -58,7 +63,13 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
 			deleteSingleReview();
 		}
 		
+		if (this.getContext().getRequest().getParameter("upload") != null){
+			upload();
+		}
 
+		if (this.getContext().getRequest().getParameter("deleteAttachments") != null){
+			deleteAttachments();
+		}
 		
 		return new ForwardResolution("/pages/home/reviews.jsp");
 	}
@@ -110,10 +121,10 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
 	
 	public void deleteReviews() throws DAOException{
 		if (this.getContext().getRequest().getParameter("delete") != null){
-			if (reviewSubjectUrls != null && !reviewSubjectUrls.isEmpty()) {
+			if (reviewIds != null && !reviewIds.isEmpty()) {
 				try {
-					for (int i=0; i<reviewSubjectUrls.size(); i++){
-						DAOFactory.get().getDao(HelperDAO.class).deleteReview(reviewSubjectUrls.get(i));
+					for (int i=0; i<reviewIds.size(); i++){
+						DAOFactory.get().getDao(HelperDAO.class).deleteReview(this.getUser(), reviewIds.get(i));
 					}
 					addSystemMessage("Selected reviews were deleted.");
 				} catch (DAOException ex){
@@ -129,12 +140,36 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
 		if (this.getContext().getRequest().getParameter("deleteReview") != null){
 			try {
 				reviewId = Integer.parseInt(this.getContext().getRequest().getParameter("deleteReview"));
-				DAOFactory.get().getDao(HelperDAO.class).deleteReview(this.getUser().getReviewUri(reviewId));
+				DAOFactory.get().getDao(HelperDAO.class).deleteReview(this.getUser(), reviewId);
 				addSystemMessage("Review #"+reviewId+" was deleted.");
 				reviewId = 0;
 			} catch (DAOException ex){
 				addWarningMessage("Error occured during review deletion.");
 			}
+		}
+	}
+	
+	public void upload(){
+		try {
+			try {
+				DAOFactory.get().getDao(HelperDAO.class).addReviewAttachment(this.getUser(), reviewId, attachment.getFileName(), attachment.getSize(), attachment.getContentType(), attachment.getInputStream());
+			} catch (IOException ioex){
+				addSystemMessage(ioex.getMessage());
+			}
+		} catch (DAOException ex){
+			addSystemMessage(ex.getMessage());
+		}
+	}
+	
+	public void deleteAttachments(){
+		try {
+			if (attachmentList != null && attachmentList.size()>0){
+				for (int i=0; i<attachmentList.size(); i++){
+					DAOFactory.get().getDao(HelperDAO.class).deleteAttachment(this.getUser(), 0, attachmentList.get(i));
+				}
+			}
+		} catch (DAOException ex){
+			addCautionMessage(ex.getMessage());
 		}
 	}
 	
@@ -153,6 +188,9 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
 				if (review.getReviewID()==0){
 					addCautionMessage("Review with this ID is not found.");
 					review = null;
+				} else {
+					// Load attachments list only when it is needed - viewing a review.
+					review.setAttachments(DAOFactory.get().getDao(HelperDAO.class).getReviewAttachmentList(new CRUser(getAttemptedUserName()), reviewId));
 				}
 			} catch (Exception ex){
 			}
@@ -162,6 +200,7 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
 	}
 
 	public void setReview(ReviewDTO review) {
+		review.setReviewContentType("text/plain");
 		this.review = review;
 	}
 
@@ -185,12 +224,12 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
 		this.reviews = reviews;
 	}
 
-	public List<String> getReviewSubjectUrls() {
-		return reviewSubjectUrls;
+	public List<Integer> getReviewIds() {
+		return reviewIds;
 	}
 
-	public void setReviewSubjectUrls(List<String> reviewSubjectUrls) {
-		this.reviewSubjectUrls = reviewSubjectUrls;
+	public void setReviewIds(List<Integer> reviewIds) {
+		this.reviewIds = reviewIds;
 	}
 
 	public int getReviewId() {
@@ -207,6 +246,22 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
 
 	public void setReviewView(boolean reviewView) {
 		this.reviewView = reviewView;
+	}
+
+	public FileBean getAttachment() {
+		return attachment;
+	}
+
+	public void setAttachment(FileBean attachment) {
+		this.attachment = attachment;
+	}
+
+	public List<String> getAttachmentList() {
+		return attachmentList;
+	}
+
+	public void setAttachmentList(List<String> attachmentList) {
+		this.attachmentList = attachmentList;
 	}
 	
 

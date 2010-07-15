@@ -145,6 +145,14 @@ public class CRUser {
 	 * 
 	 * @return
 	 */
+	public String getReviewAttachmentUri(int reviewId, String attachmentFileName){
+		return CRUser.homeUri(userName)+"/reviews/"+reviewId+"/"+attachmentFileName;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
 	public String getRegistrationsUri(){
 		return CRUser.registrationsUri(userName);
 	}

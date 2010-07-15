@@ -27,7 +27,7 @@
 								</tr>
 								<tr>
 									<td><label class="question" for="reviewcontent">Review content</label></td>
-									<td><stripes:textarea id="reviewcontent" name="review.reviewContent" cols="80" rows="10" disabled="true">${ actionBean.review.reviewContent }</stripes:textarea></td>
+									<td><stripes:textarea id="reviewcontent" name="review.reviewContent" cols="80" rows="10">${ actionBean.review.reviewContent }</stripes:textarea></td>
 								</tr>
 								<tr>
 									<td colspan="2">
@@ -79,23 +79,32 @@
 							</table>
 						</crfn:form>
 						
+						<c:if test="${not empty actionBean.attachment}">
+						<p>${ actionBean.attachment.fileName } / ${ actionBean.attachment.size }</p>
+						</c:if>
 						
 						<br/>
 						<c:choose>
 							<c:when test="${not empty actionBean.review.attachments}">
+							<crfn:form id="attachmentList"
+								action="${actionBean.baseHomeUrl}${actionBean.attemptedUserName}/reviews/${actionBean.reviewId}?editAttachments=Edit?deleteAttachments=delete"
+								method="post">
 								<display:table name="${actionBean.review.attachments}" class="sortable"
-									pagesize="20" sort="list" id="bookmark" htmlId="bookmarks"
+									pagesize="20" sort="list" id="attachment" htmlId="attachments"
 									requestURI="${actionBean.urlBinding}" style="width:100%">
 									<display:column title="" sortable="false" style="width:50px;">
-										<input type="checkbox"
-											value="${ bookmark.bookmarkUrlHtmlFormatted }" name='bookmarkUrl'></input>
+										<input type="checkbox" value="${ attachment }" name='attachmentList'></input>
 									</display:column>
 									<display:column title="URL" sortable="false">
-										<stripes:link href="/factsheet.action">${bookmark.bookmarkUrl}
-											<stripes:param name="uri" value="${bookmark.bookmarkUrl}" />
-										</stripes:link>
+										${ attachment }	
 									</display:column>
 								</display:table>
+								
+								<div><stripes:submit name="deleteAttachments" value="Delete"
+									title="Delete selected attachments" /> <input type="button"
+									name="selectAll" value="Select all"
+									onclick="toggleSelectAll('attachmentList');return false" /></div>
+								</crfn:form>
 							</c:when>
 							<c:otherwise>
 								<p>No attachments added.</p>
@@ -149,24 +158,20 @@
 								<td><label>${actionBean.review.objectUrl}</label></td>
 							</tr>
 							<tr>
-								<td><label><b>Review content</b></label></td>
-								<td><label>${ actionBean.review.reviewContent }</label></td>
+								<td colspan="2"><label><b>Review content</b> (${ actionBean.review.reviewContentType })</label></td>
+							</tr>
+							<tr>
+								<td colspan="2"><label>${ actionBean.review.reviewContent }</label></td>
 							</tr>
 						</table>
 						<br/>
 						<c:choose>
 							<c:when test="${not empty actionBean.review.attachments}">
 								<display:table name="${actionBean.review.attachments}" class="sortable"
-									pagesize="20" sort="list" id="bookmark" htmlId="bookmarks"
+									pagesize="20" sort="list" id="attachment" htmlId="attachments"
 									requestURI="${actionBean.urlBinding}" style="width:100%">
-									<display:column title="" sortable="false" style="width:50px;">
-										<input type="checkbox"
-											value="${ bookmark.bookmarkUrlHtmlFormatted }" name='bookmarkUrl'></input>
-									</display:column>
 									<display:column title="URL" sortable="false">
-										<stripes:link href="/factsheet.action">${bookmark.bookmarkUrl}
-											<stripes:param name="uri" value="${bookmark.bookmarkUrl}" />
-										</stripes:link>
+										${ attachment }
 									</display:column>
 								</display:table>
 							</c:when>
@@ -197,7 +202,7 @@
 							</tr>
 							<tr>
 								<td><label class="question" for="reviewcontent">Review content</label></td>
-								<td><stripes:textarea id="reviewcontent" name="review.reviewContent" cols="80" rows="10" disabled="true">Saving this field is not implemented yet</stripes:textarea></td>
+								<td><stripes:textarea id="reviewcontent" name="review.reviewContent" cols="80" rows="10"></stripes:textarea></td>
 							</tr>
 							<tr>
 								<td colspan="2">
@@ -233,7 +238,7 @@
 							requestURI="${actionBean.urlBinding}" style="width:100%">
 							<display:column title="" sortable="false" style="width:50px;">
 								<input type="checkbox"
-									value="${ review.reviewSubjectHtmlFormatted }" name='reviewSubjectUrls'></input>
+									value="${review.reviewID}" name='reviewIds'></input>
 							</display:column>
 							<display:column title="Title" sortable="false" style="width:300px;">
 								<stripes:link href="${actionBean.baseHomeUrl}${actionBean.attemptedUserName}/reviews/${review.reviewID}">

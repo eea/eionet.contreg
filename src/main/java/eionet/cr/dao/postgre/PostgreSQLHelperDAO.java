@@ -20,6 +20,8 @@
 * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.dao.postgre;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -1487,10 +1489,12 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 	
 	@Override
 	public void saveReview(int reviewId, ReviewDTO review, CRUser user) throws DAOException{
-		deleteReview(user.getReviewUri(reviewId));
+		deleteReview(user, reviewId);
 		insertReviewToDB(review, user, reviewId);
 	}
 
+	private static String insertReviewContentQuery = "INSERT INTO spo_binary (SUBJECT, OBJECT, DATATYPE, MUST_EMBED) VALUES (?,?,?, TRUE);";
+	
 	private void insertReviewToDB(ReviewDTO review, CRUser user, int reviewId) throws DAOException{
 		
 		String userReviewUri = user.getReviewUri(reviewId);
@@ -1530,17 +1534,41 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		addResource(Predicates.CR_HAS_FEEDBACK, userReviewUri);
 		addResource(review.getObjectUrl(), userReviewUri);
 		
+		// Adding content review to DB too.
+		
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try{
+			conn = getConnection();
+			stmt = conn.prepareStatement(insertReviewContentQuery);
+			stmt.setLong(1, Hashes.spoHash(user.getReviewUri(reviewId)));
+			stmt.setBinaryStream(2, new ByteArrayInputStream(review.getReviewContent().getBytes()), review.getReviewContent().length());
+			stmt.setString(3, review.getReviewContentType());
+			stmt.executeUpdate();
+		}
+		catch (SQLException e){
+			throw new DAOException(e.toString(), e);
+		}
+		finally{
+			SQLUtil.close(rs);
+			SQLUtil.close(stmt);
+			SQLUtil.close(conn);
+		}
+		
+		
 	}
 	
 	@Override
 	public List<ReviewDTO> getReviewList(CRUser user)  throws DAOException{
 		
-		String dbQuery = "SELECT uri, spoTitle.object AS title, spoObject.object AS object FROM spo AS spo1, spo AS spo2," +
-				" spo AS spoTitle, spo AS spoObject, resource " +
+		String dbQuery = "SELECT uri, spoTitle.object AS title, spoObject.object AS object, spo_binary.object AS reviewcontent, spo_binary.datatype AS datatype " +
+				"FROM spo AS spo1, spo AS spo2, resource, " +
+				" spo AS spoTitle, spo AS spoObject LEFT OUTER JOIN spo_binary ON (spoObject.subject=spo_binary.subject AND spo_binary.must_embed = TRUE) " +
 				"WHERE " +
 				"(spo1.subject = spo2.subject) AND (spo1.subject = spoTitle.subject) AND (spo1.subject = spoObject.subject) AND " +
-				"spoObject.Predicate="+ Hashes.spoHash(Predicates.CR_FEEDBACK_FOR) + "AND " +
-				"spoTitle.Predicate="+ Hashes.spoHash(Predicates.DC_TITLE) + "AND " +
+				"spoObject.Predicate="+ Hashes.spoHash(Predicates.CR_FEEDBACK_FOR) + " AND " +
+				"spoTitle.Predicate="+ Hashes.spoHash(Predicates.DC_TITLE) + " AND " +
 				"spo1.subject=resource.uri_hash AND " +
 				"(spo1.predicate = " + Hashes.spoHash(Predicates.CR_USER) + ") AND "+
 				"(spo1.object_hash = " + Hashes.spoHash(user.getHomeUri()) +") AND " +
@@ -1568,6 +1596,8 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 				tempReviewDTO.setReviewSubjectUri(rs.getString("uri"));
 				tempReviewDTO.setTitle(rs.getString("title"));
 				tempReviewDTO.setObjectUrl(rs.getString("object"));
+				tempReviewDTO.setReviewContent(rs.getString("reviewcontent"));
+				tempReviewDTO.setReviewContentType(rs.getString("datatype"));
 				try {
 					tempReviewDTO.setReviewID(Integer.parseInt( tempReviewDTO.getReviewSubjectUri().split("reviews/")[1]));
 				} catch (Exception ex){
@@ -1596,8 +1626,9 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		
 		String userUri = user.getReviewUri(reviewId);
 		
-		String dbQuery = "SELECT uri, spoTitle.object AS title, spoObject.object AS object FROM spo AS spo1, spo AS spo2," +
-		" spo AS spoTitle, spo AS spoObject, resource " +
+		String dbQuery = "SELECT uri, spoTitle.object AS title, spoObject.object AS object, spo_binary.object AS reviewcontent, spo_binary.datatype AS datatype " +
+				"FROM spo AS spo1, spo AS spo2," +
+		" spo AS spoTitle, resource, spo AS spoObject LEFT OUTER JOIN spo_binary ON (spoObject.subject=spo_binary.subject AND spo_binary.must_embed = TRUE) " +
 		"WHERE " +
 		"(spo1.subject = " + Hashes.spoHash(userUri) + ") AND " +
 		"(spo1.subject = spo2.subject) AND (spo1.subject = spoTitle.subject) AND (spo1.subject = spoObject.subject) AND " +
@@ -1626,6 +1657,8 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 				returnItem.setTitle(rs.getString("title"));
 				returnItem.setObjectUrl(rs.getString("object"));
 				returnItem.setReviewID(reviewId);
+				returnItem.setReviewContent(rs.getString("reviewcontent"));
+				returnItem.setReviewContentType(rs.getString("datatype"));
 			}
 		}
 		catch (SQLException e){
@@ -1643,11 +1676,16 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 	/** */
 	private static String sqlDeleteReview = "DELETE FROM spo WHERE subject=? OR object_hash=?" +
 			"OR source=? OR obj_deriv_source=? OR obj_source_object=?";
+	
+	private static String sqlDeleteReviewContent = "DELETE FROM spo_binary WHERE subject=?";
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.dao.HelperDAO#deleteReview(java.lang.String)
 	 */
-	public void deleteReview(String reviewSubjectURI)  throws DAOException{
+	public void deleteReview(CRUser user, int reviewId)  throws DAOException{
+		
+		List<String> reviewAttachments = this.getReviewAttachmentList(user, reviewId);
+		String reviewSubjectURI = user.getReviewUri(reviewId);
 		
 		Connection conn = null;
 		Statement stmt = null;
@@ -1655,6 +1693,11 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 			conn = getConnection();
 			SQLUtil.executeUpdate(StringUtils.replace(
 					sqlDeleteReview, "?", String.valueOf(Hashes.spoHash(reviewSubjectURI))), conn);
+			SQLUtil.executeUpdate(StringUtils.replace(sqlDeleteReviewContent, "?", String.valueOf(Hashes.spoHash(reviewSubjectURI))), conn);
+			
+			for (int i=0; i<reviewAttachments.size(); i++){
+				SQLUtil.executeUpdate("DELETE FROM spo_binary WHERE subject = "+Hashes.spoHash(reviewAttachments.get(i)), conn);
+			}
 		}
 		catch (SQLException e){
 			throw new DAOException(e.toString(), e);
@@ -1665,6 +1708,98 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		}
 	}
 
+	private static String insertAttachmentQuery = "INSERT INTO spo_binary (SUBJECT, OBJECT, DATATYPE) VALUES (?,?,?);";
+	
+	public void addReviewAttachment(CRUser user, int reviewId, String filename, long fileSize, String contentType, InputStream fileStream)  throws DAOException{
+		
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try{
+			conn = getConnection();
+			stmt = conn.prepareStatement(insertAttachmentQuery);
+			stmt.setLong(1, Hashes.spoHash(user.getReviewAttachmentUri(reviewId, filename)));
+			stmt.setBinaryStream(2, fileStream, (int) fileSize);
+			stmt.setString(3, contentType);
+			stmt.executeUpdate();
+		}
+		catch (SQLException e){
+			throw new DAOException(e.toString(), e);
+		}
+		finally{
+			SQLUtil.close(rs);
+			SQLUtil.close(stmt);
+			SQLUtil.close(conn);
+		}
+
+		String userReviewAttachmentUri = user.getReviewAttachmentUri(reviewId, filename);
+		SubjectDTO newAttachment = new SubjectDTO(user.getReviewUri(reviewId), false);
+		
+		ObjectDTO attachmentObject = new ObjectDTO(userReviewAttachmentUri, false);
+		attachmentObject.setSourceUri(user.getReviewUri(reviewId));
+		
+		newAttachment.addObject(Predicates.CR_HAS_ATTACHMENT, attachmentObject);
+		
+		addTriples(newAttachment);
+		
+		addResource(userReviewAttachmentUri, userReviewAttachmentUri);
+		addResource(Predicates.CR_HAS_ATTACHMENT, user.getReviewUri(reviewId));
+	}
+	
+	
+	
+	
+	@Override
+	public List<String> getReviewAttachmentList(CRUser user, int reviewId) throws DAOException {
+		
+		String dbQuery = "SELECT object FROM spo WHERE " +
+			"(subject = " + Hashes.spoHash(user.getReviewUri(reviewId)) + ") AND " +
+			"(predicate = " + Hashes.spoHash(Predicates.CR_HAS_ATTACHMENT) +")";
+		
+		List<String> returnList = new ArrayList<String>();
+		
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		try{
+			conn = getConnection();
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(dbQuery);
+			while (rs.next()){
+				returnList.add(rs.getString("object"));
+			}
+		}
+		catch (SQLException e){
+			throw new DAOException(e.toString(), e);
+		}
+		finally{
+			SQLUtil.close(rs);
+			SQLUtil.close(stmt);
+			SQLUtil.close(conn);
+		}
+		
+		return returnList;
+	}
+	
+	@Override
+	public void deleteAttachment(CRUser user, int reviewId, String attachmentUri) throws DAOException {
+
+		Connection conn = null;
+		Statement stmt = null;
+		try{
+			conn = getConnection();
+			SQLUtil.executeUpdate("DELETE FROM spo WHERE object_hash = "+Hashes.spoHash(attachmentUri), conn);
+			SQLUtil.executeUpdate("DELETE FROM spo_binary WHERE subject = "+Hashes.spoHash(attachmentUri), conn);
+		}
+		catch (SQLException e){
+			throw new DAOException(e.toString(), e);
+		}
+		finally{
+			SQLUtil.close(stmt);
+			SQLUtil.close(conn);
+		}
+	}
+	
 	/** */
 	private static final String deleteTriplesOfSourceSQL = "delete from SPO where SOURCE=?";
 	/*
@@ -1692,4 +1827,6 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 			SQLUtil.close(conn);
 		}
 	}
+
+
 }

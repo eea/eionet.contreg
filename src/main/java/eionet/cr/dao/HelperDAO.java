@@ -2,6 +2,7 @@
 
 package eionet.cr.dao;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -13,8 +14,8 @@ import eionet.cr.dao.util.PredicateLabels;
 import eionet.cr.dao.util.SubProperties;
 import eionet.cr.dao.util.UriLabelPair;
 import eionet.cr.dto.ReviewDTO;
-import eionet.cr.dto.TripleDTO;
 import eionet.cr.dto.SubjectDTO;
+import eionet.cr.dto.TripleDTO;
 import eionet.cr.dto.UserBookmarkDTO;
 import eionet.cr.dto.UserHistoryDTO;
 import eionet.cr.harvest.statistics.dto.HarvestUrgencyScoreDTO;
@@ -324,6 +325,30 @@ public interface HelperDAO extends DAO {
 	 */
 	public ReviewDTO getReview(CRUser user, int reviewId)  throws DAOException;
 	
+	/**
+	 * 
+	 * @param user
+	 * @param reviewId
+	 * @param filename
+	 * @param fileSize
+	 * @param contentType
+	 * @param fileStream
+	 * @throws DAOException
+	 * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
+	 */
+	public void addReviewAttachment(CRUser user, int reviewId, String filename, long fileSize, String contentType, InputStream fileStream)  throws DAOException;
+	
+	/**
+	 * 
+	 * @param user
+	 * @param reviewId
+	 * @return List<String>
+	 * @throws DAOException
+	 * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
+	 */
+	public List<String> getReviewAttachmentList(CRUser user, int reviewId)  throws DAOException;
+	
+	
 	
 	/**
 	 * 
@@ -332,7 +357,19 @@ public interface HelperDAO extends DAO {
 	 * @throws DAOException
 	 * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
 	 */
-	public void deleteReview(String reviewSubjectURI)  throws DAOException;
+	public void deleteReview(CRUser user, int reviewId)  throws DAOException;
+	
+	/**
+	 * 
+	 * 
+	 * @param user
+	 * @param reviewId
+	 * @param attachmentUri
+	 * @throws DAOException
+	 * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
+	 */
+	public void deleteAttachment(CRUser user, int reviewId, String attachmentUri)  throws DAOException;
+	
 	
 	/**
 	 * 
@@ -347,6 +384,7 @@ public interface HelperDAO extends DAO {
 	 * @throws DAOException
 	 */
 	public void deleteTriplesOfSource(long sourceHash) throws DAOException;
+	
 	
 	
 }

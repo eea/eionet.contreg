@@ -1,5 +1,6 @@
 package eionet.cr.dao.mysql;
 
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -891,9 +892,11 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 	}
 	
 	@Override
-	public void deleteReview(String reviewSubjectURI)  throws DAOException{
+	public void deleteReview(CRUser user, int reviewId)  throws DAOException{
 		throw new UnsupportedOperationException("Method not implemented");
 	}
+	
+
 
 	@Override
 	public void deleteTriples(Collection<TripleDTO> triples) throws DAOException {
@@ -904,6 +907,24 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 	@Override
 	public void deleteTriplesOfSource(long sourceHash) throws DAOException {
 		
+		throw new UnsupportedOperationException("Method not implemented");
+	}
+
+	@Override
+	public void addReviewAttachment(CRUser user, int reviewId, String filename, long fileSize, String contentType,
+			InputStream fileStream) throws DAOException {
+		throw new UnsupportedOperationException("Method not implemented");
+	}
+
+	@Override
+	public List<String> getReviewAttachmentList(CRUser user, int reviewId)
+			throws DAOException {
+		throw new UnsupportedOperationException("Method not implemented");	
+	}
+
+	@Override
+	public void deleteAttachment(CRUser user, int reviewId, String attachmentUri)
+			throws DAOException {
 		throw new UnsupportedOperationException("Method not implemented");
 	}
 }
