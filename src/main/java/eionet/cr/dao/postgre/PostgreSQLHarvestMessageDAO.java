@@ -93,7 +93,7 @@ public class PostgreSQLHarvestMessageDAO extends PostgreSQLBaseDAO implements Ha
 			throw new DAOException(e.getMessage(), e);
 		}
 		finally{
-			closeConnection(conn);
+			SQLUtil.close(conn);
 		}
 	}
 	

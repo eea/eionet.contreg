@@ -101,7 +101,7 @@ public class MySQLHarvestMessageDAO extends MySQLBaseDAO implements HarvestMessa
 			throw new DAOException(e.getMessage(), e);
 		}
 		finally{
-			closeConnection(conn);
+			SQLUtil.close(conn);
 		}
 	}
 	

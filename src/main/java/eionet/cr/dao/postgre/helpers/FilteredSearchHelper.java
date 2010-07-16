@@ -45,8 +45,8 @@ public class FilteredSearchHelper extends AbstractSearchHelper{
 	/** */
 	private Map<String, String> filters;
 	private Set<String> literalPredicates;
-	private boolean useCache=false;
-	
+	private boolean useCache = false;
+	private Boolean requiresFullTextSearch = null;
 
 	/**
 	 * 
@@ -119,9 +119,7 @@ public class FilteredSearchHelper extends AbstractSearchHelper{
 				append(spoAlias).append(".PREDICATE=").append(Hashes.spoHash(predicateUri)).
 				append(" and ");
 
-				if (isSurroundedWithQuotes(objectValue)
-						|| URIUtil.isSchemedURI(objectValue)
-						|| !isLiteralPredicate(predicateUri)){
+				if (!requireFullTextSearch(predicateUri, objectValue)){
 					
 					whereBuf.append(spoAlias).append(".OBJECT_HASH=").
 					append(Hashes.spoHash(StringUtils.strip(objectValue, "\"")));
@@ -131,6 +129,8 @@ public class FilteredSearchHelper extends AbstractSearchHelper{
 					append(".OBJECT) @@ to_tsquery('simple', ?)").
 					append(" and ").append(spoAlias).append(".LIT_OBJ='Y'");
 					inParams.add(objectValue);
+					
+					requiresFullTextSearch = Boolean.TRUE;
 				}
 			}
 			
@@ -187,9 +187,7 @@ public class FilteredSearchHelper extends AbstractSearchHelper{
 				append(spoAlias).append(".PREDICATE=").append(Hashes.spoHash(predicateUri)).
 				append(" and ");
 
-				if (isSurroundedWithQuotes(objectValue)
-						|| URIUtil.isSchemedURI(objectValue)
-						|| !isLiteralPredicate(predicateUri)){
+				if (!requireFullTextSearch(predicateUri, objectValue)){
 					
 					whereBuf.append(spoAlias).append(".OBJECT_HASH=").
 					append(Hashes.spoHash(StringUtils.strip(objectValue, "\"")));
@@ -199,6 +197,8 @@ public class FilteredSearchHelper extends AbstractSearchHelper{
 					append(".OBJECT) @@ to_tsquery('simple', ?)").
 					append(" and ").append(spoAlias).append(".LIT_OBJ='Y'");
 					inParams.add(objectValue);
+					
+					requiresFullTextSearch = Boolean.TRUE;
 				}
 			}
 			
@@ -258,33 +258,102 @@ public class FilteredSearchHelper extends AbstractSearchHelper{
 		return literalPredicates!=null && literalPredicates.contains(s);
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public boolean isUseCache() {
 		return useCache;
 	}
 
+	/**
+	 * 
+	 * @param useCache
+	 */
 	public void setUseCache(boolean useCache) {
 		this.useCache = useCache;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	protected String getSpoTableName(){
 		return "SPO";
 	}
+	
+	/**
+	 * 
+	 * @return
+	 */
 	protected String getSpoTableCriteria(){
 		return "";
 	}
+	
+	/**
+	 * 
+	 * @param key
+	 * @param value
+	 */
 	protected void addFilter(String key, String value){
 		if(this.filters==null){
 			this.filters = new HashMap<String, String>();
 		}
 		filters.put(key, value);		
 	}
+	
+	/**
+	 * 
+	 * @param key
+	 */
 	protected void removeFilter(String key){
 		if(this.filters!=null && filters.containsKey(key)){
 			filters.remove(key);
 		}
 	}
+	
+	/**
+	 * 
+	 * @return
+	 */
 	protected int getSpoTableIndex(){
 		return 1;
 	}
 	
+	/**
+	 * 
+	 * @param predicateUri
+	 * @param objectValue
+	 * @return
+	 */
+	private boolean requireFullTextSearch(String predicateUri, String objectValue){
+		
+		return (isSurroundedWithQuotes(objectValue)
+			|| URIUtil.isSchemedURI(objectValue)
+			|| !isLiteralPredicate(predicateUri))==false;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean requiresFullTextSearch(){
+		
+		if (requiresFullTextSearch==null){
+			
+			requiresFullTextSearch = Boolean.FALSE;
+			for(Entry<String,String> entry : filters.entrySet()) {
+
+				String predicateUri = entry.getKey();
+				String objectValue = entry.getValue();
+				
+				if (requireFullTextSearch(predicateUri, objectValue)){
+					requiresFullTextSearch = Boolean.TRUE;
+					break;
+				}
+			}
+		}
+		
+		return requiresFullTextSearch;
+	}
 }

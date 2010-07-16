@@ -288,8 +288,8 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 	    		matchCount = searchResult.getLeft();
 	    		int exactRowCountLimit = DAOFactory.get().getDao(SearchDAO.class).getExactRowCountLimit();
 	    		exactCount = exactRowCountLimit<=0 || matchCount<=exactRowCountLimit;
-	    		
 			}
+			
 			//cache result list.
 			getSession().setAttribute(RESULT_LIST_CACHED, resultList);
 			getSession().setAttribute(LAST_ACTION, LastAction.SEARCH);

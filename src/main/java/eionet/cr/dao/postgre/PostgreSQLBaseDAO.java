@@ -51,18 +51,18 @@ public abstract class PostgreSQLBaseDAO {
 	
 	/**
 	 * 
-	 * @return
+	 * @param conn
 	 */
-	protected Connection getConnection() throws SQLException{
-		return DbConnectionProvider.getConnection();
+	public void setConnection(Connection conn){
 	}
 	
 	/**
 	 * 
-	 * @param conn
+	 * @return
 	 */
-	protected void closeConnection(Connection conn){
-		SQLUtil.close(conn);
+	protected Connection getConnection() throws SQLException{
+		
+		return DbConnectionProvider.getConnection();
 	}
 	
 	/**

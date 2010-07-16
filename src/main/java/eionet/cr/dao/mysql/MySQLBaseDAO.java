@@ -45,21 +45,14 @@ import eionet.cr.util.sql.SQLUtil;
 public abstract class MySQLBaseDAO {
 	
 	protected Logger logger = Logger.getLogger(MySQLBaseDAO.class);
-	
+
 	/**
 	 * 
 	 * @return
 	 */
 	protected Connection getConnection() throws SQLException{
+		
 		return DbConnectionProvider.getConnection();
-	}
-	
-	/**
-	 * 
-	 * @param conn
-	 */
-	protected void closeConnection(Connection conn){
-		SQLUtil.close(conn);
 	}
 	
 	/**
