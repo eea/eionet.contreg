@@ -891,7 +891,7 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 	}
 	
 	@Override
-	public void deleteReview(CRUser user, int reviewId)  throws DAOException{
+	public void deleteReview(CRUser user, int reviewId, boolean deleteAttachments)  throws DAOException{
 		throw new UnsupportedOperationException("Method not implemented");
 	}
 	

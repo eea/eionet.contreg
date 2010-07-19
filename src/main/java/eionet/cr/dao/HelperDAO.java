@@ -358,7 +358,7 @@ public interface HelperDAO extends DAO {
 	 * @throws DAOException
 	 * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
 	 */
-	public void deleteReview(CRUser user, int reviewId)  throws DAOException;
+	public void deleteReview(CRUser user, int reviewId, boolean deleteAttachments)  throws DAOException;
 	
 	/**
 	 * 

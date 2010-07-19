@@ -1490,7 +1490,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 	
 	@Override
 	public void saveReview(int reviewId, ReviewDTO review, CRUser user) throws DAOException{
-		deleteReview(user, reviewId);
+		deleteReview(user, reviewId, false);
 		insertReviewToDB(review, user, reviewId);
 	}
 
@@ -1537,26 +1537,27 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		
 		// Adding content review to DB too.
 		
-		Connection conn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try{
-			conn = getConnection();
-			stmt = conn.prepareStatement(insertReviewContentQuery);
-			stmt.setLong(1, Hashes.spoHash(user.getReviewUri(reviewId)));
-			stmt.setBinaryStream(2, new ByteArrayInputStream(review.getReviewContent().getBytes()), review.getReviewContent().length());
-			stmt.setString(3, review.getReviewContentType());
-			stmt.executeUpdate();
+		if (review.getReviewContent() != null && review.getReviewContent().length()>0){
+			Connection conn = null;
+			PreparedStatement stmt = null;
+			ResultSet rs = null;
+			try{
+				conn = getConnection();
+				stmt = conn.prepareStatement(insertReviewContentQuery);
+				stmt.setLong(1, Hashes.spoHash(user.getReviewUri(reviewId)));
+				stmt.setBinaryStream(2, new ByteArrayInputStream(review.getReviewContent().getBytes()), review.getReviewContent().length());
+				stmt.setString(3, review.getReviewContentType());
+				stmt.executeUpdate();
+			}
+			catch (SQLException e){
+				throw new DAOException(e.toString(), e);
+			}
+			finally{
+				SQLUtil.close(rs);
+				SQLUtil.close(stmt);
+				SQLUtil.close(conn);
+			}
 		}
-		catch (SQLException e){
-			throw new DAOException(e.toString(), e);
-		}
-		finally{
-			SQLUtil.close(rs);
-			SQLUtil.close(stmt);
-			SQLUtil.close(conn);
-		}
-		
 		
 	}
 	
@@ -1674,31 +1675,40 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		return returnItem;
 	}
 
-	/** */
-	private static String sqlDeleteReview = "DELETE FROM spo WHERE subject=? OR object_hash=?" +
-			"OR source=? OR obj_deriv_source=? OR obj_source_object=?";
-	
+		
 	private static String sqlDeleteReviewContent = "DELETE FROM spo_binary WHERE subject=?";
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.dao.HelperDAO#deleteReview(java.lang.String)
 	 */
-	public void deleteReview(CRUser user, int reviewId)  throws DAOException{
+	public void deleteReview(CRUser user, int reviewId, boolean deleteAttachments)  throws DAOException{
 		
-		List<String> reviewAttachments = this.getReviewAttachmentList(user, reviewId);
+		String sqlDeleteReview = "DELETE FROM spo WHERE (subject=? OR object_hash=?" +
+		"OR source=? OR obj_deriv_source=? OR obj_source_object=?)";	
+		
+		if (!deleteAttachments){
+			sqlDeleteReview += " AND (predicate <> "+Hashes.spoHash(Predicates.CR_HAS_ATTACHMENT)+")";	 
+		}
+		
 		String reviewSubjectURI = user.getReviewUri(reviewId);
 		
 		Connection conn = null;
 		Statement stmt = null;
 		try{
 			conn = getConnection();
+
+			if (deleteAttachments){
+				List<String> reviewAttachments = this.getReviewAttachmentList(user, reviewId);
+				for (int i=0; i<reviewAttachments.size(); i++){
+					SQLUtil.executeUpdate("DELETE FROM spo_binary WHERE subject = "+Hashes.spoHash(reviewAttachments.get(i)), conn);
+				}
+			}
+			
 			SQLUtil.executeUpdate(StringUtils.replace(
 					sqlDeleteReview, "?", String.valueOf(Hashes.spoHash(reviewSubjectURI))), conn);
 			SQLUtil.executeUpdate(StringUtils.replace(sqlDeleteReviewContent, "?", String.valueOf(Hashes.spoHash(reviewSubjectURI))), conn);
-			
-			for (int i=0; i<reviewAttachments.size(); i++){
-				SQLUtil.executeUpdate("DELETE FROM spo_binary WHERE subject = "+Hashes.spoHash(reviewAttachments.get(i)), conn);
-			}
+		
+
 		}
 		catch (SQLException e){
 			throw new DAOException(e.toString(), e);
@@ -1755,7 +1765,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		
 		String dbQuery = "SELECT object FROM spo WHERE " +
 			"(subject = " + Hashes.spoHash(user.getReviewUri(reviewId)) + ") AND " +
-			"(predicate = " + Hashes.spoHash(Predicates.CR_HAS_ATTACHMENT) +")";
+			"(predicate = " + Hashes.spoHash(Predicates.CR_HAS_ATTACHMENT) +") ORDER BY object ASC";
 		
 		List<String> returnList = new ArrayList<String>();
 		

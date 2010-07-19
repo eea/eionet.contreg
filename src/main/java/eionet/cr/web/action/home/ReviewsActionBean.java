@@ -47,29 +47,55 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
 		loadReview();
 	
 		setEnvironmentParams(this.getContext(), AbstractHomeActionBean.TYPE_REVIEWS);
+		
 		if (this.getContext().getRequest().getParameter("addSave") != null){
-			add();
+			if (isUserAuthorized()){
+				add();
+			} else {
+				addWarningMessage("User must be logged in to add a review.");
+			}
 		}
 		
 		if (this.getContext().getRequest().getParameter("editSave") != null){
-			save();
+			if (isUserAuthorized()){
+				save();
+			} else {
+				addWarningMessage("User must be logged in to save a review.");
+			}
 		}
 		
 		if (this.getContext().getRequest().getParameter("delete") != null){
-			deleteReviews();
+			if (isUserAuthorized()){
+				deleteReviews();
+			} else {
+				addWarningMessage("User must be logged in to delete reviews.");
+			}
 		}
 
 		if (this.getContext().getRequest().getParameter("deleteReview") != null){
-			deleteSingleReview();
+			if (isUserAuthorized()){
+				deleteSingleReview();
+			} else {
+				addWarningMessage("User must be logged in to delete a review.");
+			}
 		}
 		
 		if (this.getContext().getRequest().getParameter("upload") != null){
-			upload();
+			if (isUserAuthorized()){
+				upload();
+			} else {
+				addWarningMessage("User must be logged in to upload attachments.");
+			}
 		}
 
 		if (this.getContext().getRequest().getParameter("deleteAttachments") != null){
-			deleteAttachments();
+			if (isUserAuthorized()){
+				deleteAttachments();
+			} else {
+				addWarningMessage("User must be logged in to delete attachments.");
+			}
 		}
+		
 		
 		return new ForwardResolution("/pages/home/reviews.jsp");
 	}
@@ -124,7 +150,7 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
 			if (reviewIds != null && !reviewIds.isEmpty()) {
 				try {
 					for (int i=0; i<reviewIds.size(); i++){
-						DAOFactory.get().getDao(HelperDAO.class).deleteReview(this.getUser(), reviewIds.get(i));
+						DAOFactory.get().getDao(HelperDAO.class).deleteReview(this.getUser(), reviewIds.get(i), true);
 					}
 					addSystemMessage("Selected reviews were deleted.");
 				} catch (DAOException ex){
@@ -140,7 +166,7 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
 		if (this.getContext().getRequest().getParameter("deleteReview") != null){
 			try {
 				reviewId = Integer.parseInt(this.getContext().getRequest().getParameter("deleteReview"));
-				DAOFactory.get().getDao(HelperDAO.class).deleteReview(this.getUser(), reviewId);
+				DAOFactory.get().getDao(HelperDAO.class).deleteReview(this.getUser(), reviewId, true);
 				addSystemMessage("Review #"+reviewId+" was deleted.");
 				reviewId = 0;
 			} catch (DAOException ex){
@@ -198,7 +224,35 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
 		}
 		return review;
 	}
+	
+	public String getReviewContentHTML(){
+		if (review.getReviewContent() != null){
+			return review.getReviewContent().replace("\\015\\012", "<br/>").replace("&", "&amp;").replace("<", "&lt;");
+		} else {
+			return "";
+		}
+	}
 
+	public String getReviewContentForm(){
+		if (review.getReviewContent() != null){
+			return review.getReviewContent().replace("\\015\\012", "\r\n");
+		} else {
+			return "";
+		}
+	}
+	
+	public boolean isReviewContentPresent(){
+		if (review.getReviewContent() != null && review.getReviewContent().length()>0){
+			if (review.getReviewContent().replace(" ", "").length()>0) {
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
+	}
+	
 	public void setReview(ReviewDTO review) {
 		review.setReviewContentType("text/plain");
 		this.review = review;
