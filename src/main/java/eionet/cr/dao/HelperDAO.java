@@ -13,6 +13,7 @@ import java.util.Set;
 import eionet.cr.dao.util.PredicateLabels;
 import eionet.cr.dao.util.SubProperties;
 import eionet.cr.dao.util.UriLabelPair;
+import eionet.cr.dto.DownloadFileDTO;
 import eionet.cr.dto.ReviewDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.dto.TripleDTO;
@@ -369,6 +370,17 @@ public interface HelperDAO extends DAO {
 	 * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
 	 */
 	public void deleteAttachment(CRUser user, int reviewId, String attachmentUri)  throws DAOException;
+	
+	/**
+	 * 
+	 * 
+	 * @param attachmentUri
+	 * @return InputStream
+	 * @throws DAOException
+	 * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
+	 */
+	public  DownloadFileDTO loadAttachment(String attachmentUri) throws DAOException;
+	
 	
 	
 	/**

@@ -27,17 +27,16 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.readers.DataflowPicklistReader;
 import eionet.cr.dao.readers.PredicateLabelsReader;
-import eionet.cr.dao.readers.SampleTriplesReader;
 import eionet.cr.dao.readers.SubPropertiesReader;
 import eionet.cr.dao.readers.SubjectDataReader;
-import eionet.cr.dao.readers.UriHashesReader;
 import eionet.cr.dao.util.PredicateLabels;
 import eionet.cr.dao.util.SubProperties;
 import eionet.cr.dao.util.UriLabelPair;
+import eionet.cr.dto.DownloadFileDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.ReviewDTO;
-import eionet.cr.dto.TripleDTO;
 import eionet.cr.dto.SubjectDTO;
+import eionet.cr.dto.TripleDTO;
 import eionet.cr.dto.UserBookmarkDTO;
 import eionet.cr.dto.UserHistoryDTO;
 import eionet.cr.harvest.statistics.dto.HarvestUrgencyScoreDTO;
@@ -926,6 +925,12 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 	public void deleteAttachment(CRUser user, int reviewId, String attachmentUri)
 			throws DAOException {
 		throw new UnsupportedOperationException("Method not implemented");
+	}
+
+	@Override
+	public DownloadFileDTO loadAttachment(String attachmentUri) throws DAOException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
 

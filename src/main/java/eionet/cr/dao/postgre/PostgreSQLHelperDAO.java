@@ -57,6 +57,7 @@ import eionet.cr.dao.readers.UriHashesReader;
 import eionet.cr.dao.util.PredicateLabels;
 import eionet.cr.dao.util.SubProperties;
 import eionet.cr.dao.util.UriLabelPair;
+import eionet.cr.dto.DownloadFileDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.ReviewDTO;
 import eionet.cr.dto.SubjectDTO;
@@ -1800,6 +1801,32 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		}
 	}
 	
+	@Override
+	public DownloadFileDTO loadAttachment(String attachmentUri) throws DAOException {
+
+		DownloadFileDTO returnFileDTO = new DownloadFileDTO();
+		
+		Connection conn = null;
+		InputStream result = null;
+		try{
+			conn = getConnection();
+			PreparedStatement ps = conn.prepareStatement("SELECT object, datatype FROM spo_binary WHERE subject = ?");
+			ps.setLong(1, Hashes.spoHash(attachmentUri));
+			ResultSet rs = ps.executeQuery();
+			while (rs.next()) {
+				returnFileDTO.setContentType(rs.getString("datatype"));
+			    returnFileDTO.setInputStream(rs.getBinaryStream("object"));
+			}
+		}
+		catch (SQLException e){
+			throw new DAOException(e.toString(), e);
+		}
+		finally{
+			SQLUtil.close(conn);
+		}
+		return returnFileDTO;
+	}
+	
 	/** */
 	private static final String deleteTriplesOfSourceSQL = "delete from SPO where SOURCE=?";
 	/*
@@ -1827,6 +1854,5 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 			SQLUtil.close(conn);
 		}
 	}
-
 
 }

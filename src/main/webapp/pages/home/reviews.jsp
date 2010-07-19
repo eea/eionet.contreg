@@ -96,7 +96,9 @@
 										<input type="checkbox" value="${ attachment }" name='attachmentList'></input>
 									</display:column>
 									<display:column title="URL" sortable="false">
+										<stripes:link href="/download.action?download=${ attachment }">
 										${ attachment }	
+										</stripes:link>
 									</display:column>
 								</display:table>
 								
@@ -171,7 +173,9 @@
 									pagesize="20" sort="list" id="attachment" htmlId="attachments"
 									requestURI="${actionBean.urlBinding}" style="width:100%">
 									<display:column title="URL" sortable="false">
-										${ attachment }
+										<stripes:link href="/download.action?download=${ attachment }">
+										${ attachment }	
+										</stripes:link>
 									</display:column>
 								</display:table>
 							</c:when>
