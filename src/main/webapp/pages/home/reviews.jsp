@@ -28,6 +28,7 @@
 								<tr>
 									<td><label class="question" for="reviewcontent">Review content</label></td>
 									<td><stripes:textarea id="reviewcontent" name="review.reviewContent" cols="80" rows="20">${ actionBean.reviewContentForm }</stripes:textarea></td>
+									
 								</tr>
 								<tr>
 									<td colspan="2">
@@ -98,7 +99,6 @@
 						</c:if>
 						
 						<h1>Review #${actionBean.reviewId}</h1>
-						
 						<table class="datatable">
 							<col style="width:50em"/>
 							<col style="width:300em"/>

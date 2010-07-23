@@ -22,6 +22,7 @@ package eionet.cr.dao.postgre;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -1545,7 +1546,13 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 				conn = getConnection();
 				stmt = conn.prepareStatement(insertReviewContentQuery);
 				stmt.setLong(1, Hashes.spoHash(user.getReviewUri(reviewId)));
-				stmt.setBinaryStream(2, new ByteArrayInputStream(review.getReviewContent().getBytes()), review.getReviewContent().length());
+				
+				byte[] bytes = new byte[0];
+				try {
+					bytes = review.getReviewContent().getBytes("UTF-8");
+				} catch (Exception ex){
+				}
+				stmt.setBinaryStream(2, new ByteArrayInputStream(bytes), bytes.length);
 				stmt.setString(3, review.getReviewContentType());
 				stmt.executeUpdate();
 			}
@@ -1659,7 +1666,12 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 				returnItem.setTitle(rs.getString("title"));
 				returnItem.setObjectUrl(rs.getString("object"));
 				returnItem.setReviewID(reviewId);
-				returnItem.setReviewContent(rs.getString("reviewcontent"));
+				
+				byte [] bytes = rs.getBytes("reviewcontent");
+				try {
+					returnItem.setReviewContent(new String(bytes, "UTF-8"));
+				} catch (UnsupportedEncodingException ex){
+				}
 				returnItem.setReviewContentType(rs.getString("datatype"));
 			}
 		}

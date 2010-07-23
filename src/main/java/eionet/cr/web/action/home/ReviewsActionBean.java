@@ -1,6 +1,7 @@
 package eionet.cr.web.action.home;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import net.sourceforge.stripes.action.DefaultHandler;
@@ -227,7 +228,7 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
 	
 	public String getReviewContentHTML(){
 		if (review.getReviewContent() != null){
-			return review.getReviewContent().replace("\\015\\012", "<br/>").replace("&", "&amp;").replace("<", "&lt;");
+			return review.getReviewContent().replace("&", "&amp;").replace("<", "&lt;").replace("\r\n", "<br/>").replace("\n", "<br/>");
 		} else {
 			return "";
 		}
@@ -235,7 +236,7 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
 
 	public String getReviewContentForm(){
 		if (review.getReviewContent() != null){
-			return review.getReviewContent().replace("\\015\\012", "\r\n");
+			return review.getReviewContent();
 		} else {
 			return "";
 		}
@@ -318,5 +319,4 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
 		this.attachmentList = attachmentList;
 	}
 	
-
 }
