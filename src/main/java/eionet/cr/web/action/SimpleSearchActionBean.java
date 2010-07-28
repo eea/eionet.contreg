@@ -35,6 +35,7 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.SearchDAO;
+import eionet.cr.dao.postgre.helpers.FreeTextSearchHelper;
 import eionet.cr.dao.util.SearchExpression;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Hashes;
@@ -57,6 +58,7 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 	/** */
 	private String searchExpression;
 	private boolean isUri;
+	private String simpleFilter;
 	
 	/**
 	 * 
@@ -74,6 +76,21 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
     public Resolution search() throws DAOException{
 		
     	SearchExpression searchExpression = new SearchExpression(this.searchExpression);
+    	
+    	FreeTextSearchHelper.FILTER_TYPE filterType = FreeTextSearchHelper.FILTER_TYPE.ANY_OBJECT;
+    	
+    	if (simpleFilter.equals("anyObject")){
+    		filterType = FreeTextSearchHelper.FILTER_TYPE.ANY_OBJECT;
+    	} else if (simpleFilter.equals("anyFile")){
+    		filterType = FreeTextSearchHelper.FILTER_TYPE.ANY_FILE;
+    	} else if (simpleFilter.equals("texts")){
+    		filterType = FreeTextSearchHelper.FILTER_TYPE.TEXTS;
+    	} else if (simpleFilter.equals("datasets")){
+    		filterType = FreeTextSearchHelper.FILTER_TYPE.DATASETS;
+    	} else if (simpleFilter.equals("images")){
+    		filterType = FreeTextSearchHelper.FILTER_TYPE.IMAGES;
+    	}
+    	
     	if (!searchExpression.isEmpty()) {
 
     		if (searchExpression.isUri()) {
@@ -92,6 +109,7 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
     				DAOFactory.get().getDao(SearchDAO.class)
     				.searchByFreeText(
     						searchExpression,
+    						filterType,
     						PagingRequest.create(getPageN()),
     						new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
 
@@ -167,5 +185,13 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 	 */
 	public void setUri(boolean isUri) {
 		this.isUri = isUri;
+	}
+
+	public String getSimpleFilter() {
+		return simpleFilter;
+	}
+
+	public void setSimpleFilter(String simpleFilter) {
+		this.simpleFilter = simpleFilter;
 	}
 }

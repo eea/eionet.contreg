@@ -25,6 +25,8 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
+import eionet.cr.common.Predicates;
+import eionet.cr.common.Subjects;
 import eionet.cr.dao.util.SearchExpression;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.SortingRequest;
@@ -40,9 +42,12 @@ import eionet.cr.web.util.columns.SubjectLastModifiedColumn;
  */
 public class FreeTextSearchHelper extends AbstractSearchHelper{
 	
+	public enum FILTER_TYPE {ANY_OBJECT, ANY_FILE, TEXTS, DATASETS, IMAGES};
+	
 	/** */
 	private SearchExpression expression;
 	private PostgreSQLFullTextQuery pgExpression;
+	private FILTER_TYPE filter = FILTER_TYPE.ANY_OBJECT;
 	
 	/**
 	 * 
@@ -67,9 +72,13 @@ public class FreeTextSearchHelper extends AbstractSearchHelper{
 	public String getUnorderedQuery(List<Object> inParams){
 		
 		StringBuffer buf = new StringBuffer().
-		append("select distinct SPO.SUBJECT as ").append(PairReader.LEFTCOL).append(", ").
-		append("(CASE WHEN SPO.OBJ_DERIV_SOURCE<>0 THEN SPO.OBJ_DERIV_SOURCE ELSE SPO.SOURCE END)").
-		append(" as ").append(PairReader.RIGHTCOL).append(" from SPO ");
+		append("select distinct F.SUBJECT as ").append(PairReader.LEFTCOL).append(", ").
+		append("(CASE WHEN F.OBJ_DERIV_SOURCE<>0 THEN F.OBJ_DERIV_SOURCE ELSE F.SOURCE END)").
+		append(" as ").append(PairReader.RIGHTCOL).append(" from SPO as F ");
+		
+		
+		buf.append(addFilterParams());
+		
 		
 		buf.append(getFreetextQueryCondition(inParams));
 		
@@ -80,25 +89,51 @@ public class FreeTextSearchHelper extends AbstractSearchHelper{
 	 * (non-Javadoc)
 	 * @see eionet.cr.dao.postgre.helpers.AbstractSearchHelper#getOrderedQuery(java.util.List)
 	 */
+	
+	private String addFilterParams(){
+		
+		StringBuffer buf = new StringBuffer();
+		
+		if (filter != FILTER_TYPE.ANY_OBJECT){
+			buf.append(" join SPO as Ty on F.SUBJECT=Ty.SUBJECT ");
+			buf.append(" AND Ty.PREDICATE=").append(Hashes.spoHash(Predicates.RDF_TYPE)).append(" ");
+			
+			long objectHash = 0;
+			
+			if (filter == FILTER_TYPE.ANY_FILE){
+				objectHash = Hashes.spoHash(Subjects.CR_FILE);
+			} else if (filter == FILTER_TYPE.DATASETS){
+				objectHash = Hashes.spoHash(Predicates.DC_MITYPE_DATASET);
+			} else if (filter == FILTER_TYPE.IMAGES){
+				objectHash = Hashes.spoHash(Predicates.DC_MITYPE_IMAGE);
+			} else if (filter == FILTER_TYPE.TEXTS){
+				objectHash = Hashes.spoHash(Predicates.DC_MITYPE_TEXT);
+			}
+			
+			buf.append(" AND Ty.object_hash =").append(objectHash).append(" ");
+		}
+		return buf.toString();
+	}
+	
 	protected String getOrderedQuery(List<Object> inParams){
 
 		StringBuffer subSelect = new StringBuffer().
 		append("select distinct on (").append(PairReader.LEFTCOL).append(")").
-		append(" SPO.SUBJECT as ").append(PairReader.LEFTCOL).append(", ").
-		append("(CASE WHEN SPO.OBJ_DERIV_SOURCE<>0 THEN SPO.OBJ_DERIV_SOURCE ELSE SPO.SOURCE END)").
+		append(" F.SUBJECT as ").append(PairReader.LEFTCOL).append(", ").
+		append("(CASE WHEN F.OBJ_DERIV_SOURCE<>0 THEN F.OBJ_DERIV_SOURCE ELSE F.SOURCE END)").
 		append(" as ").append(PairReader.RIGHTCOL).append(", ");
 		
 		if (sortPredicate.equals(SubjectLastModifiedColumn.class.getSimpleName())){
-			subSelect.append(" RESOURCE.LASTMODIFIED_TIME as OBJECT_ORDERED_BY from SPO").
-			append(" left join RESOURCE on (SPO.SUBJECT=RESOURCE.URI_HASH)");
+			subSelect.append(" RESOURCE.LASTMODIFIED_TIME as OBJECT_ORDERED_BY from SPO as F").
+			append(" left join RESOURCE on (F.SUBJECT=RESOURCE.URI_HASH)");
 		}
 		else{
-			subSelect.append(" ORDERING.OBJECT as OBJECT_ORDERED_BY from SPO").
+			subSelect.append(" ORDERING.OBJECT as OBJECT_ORDERED_BY from SPO as F").
 			append(" left join SPO as ORDERING on").
-			append(" (SPO.SUBJECT=ORDERING.SUBJECT and ORDERING.PREDICATE=").
+			append(" (F.SUBJECT=ORDERING.SUBJECT and ORDERING.PREDICATE=").
 			append(Hashes.spoHash(sortPredicate)).append(")");
 		}
-		
+		subSelect.append(addFilterParams());
 		subSelect.append(getFreetextQueryCondition(inParams));
 
 		StringBuffer buf = new StringBuffer().
@@ -113,8 +148,8 @@ public class FreeTextSearchHelper extends AbstractSearchHelper{
 	 */
 	public String getCountQuery(List<Object> inParams){
 
-		StringBuffer buf = new StringBuffer("select count(distinct SPO.SUBJECT) from SPO");
-		
+		StringBuffer buf = new StringBuffer("select count(distinct F.SUBJECT) from SPO as F ");
+		buf.append(addFilterParams());
 		buf.append(getFreetextQueryCondition(inParams));
 		
 		return buf.toString();
@@ -122,8 +157,8 @@ public class FreeTextSearchHelper extends AbstractSearchHelper{
 
 	@Override
 	public String getMinMaxHashQuery(List<Object> inParams) {
-		StringBuffer buf = new StringBuffer("select min(SPO.SUBJECT) as LCOL, max(SPO.SUBJECT) as RCOL from SPO ");
-		
+		StringBuffer buf = new StringBuffer("select min(F.SUBJECT) as LCOL, max(F.SUBJECT) as RCOL from SPO as F");
+		buf.append(addFilterParams());
 		buf.append(getFreetextQueryCondition(inParams));
 		
 		return buf.toString();
@@ -133,24 +168,32 @@ public class FreeTextSearchHelper extends AbstractSearchHelper{
 		
 		StringBuffer buf = new StringBuffer();
 		if (expression.isUri() || expression.isHash()){
-			buf.append(" where SPO.OBJECT_HASH=?");
+			buf.append(" where F.OBJECT_HASH=?");
 			inParams.add(expression.isHash() ?
 					expression.toString() : Long.valueOf(Hashes.spoHash(expression.toString())));
 		}
 		else{
 			buf.
-			append(" where to_tsvector('simple', SPO.OBJECT) @@ to_tsquery('simple', ?)").
-			append(" and SPO.LIT_OBJ='Y'");
+			append(" where to_tsvector('simple', F.OBJECT) @@ to_tsquery('simple', ?)").
+			append(" and F.LIT_OBJ='Y'");
 			inParams.add(pgExpression.getParsedQuery());
 			
 			HashSet<String> phrases = pgExpression.getPhrases();
 			for (String phrase : phrases){
 				if (!StringUtils.isBlank(phrase)){
-					buf.append(" and SPO.OBJECT like ?");
+					buf.append(" and F.OBJECT like ?");
 					inParams.add("%" + phrase + "%");
 				}
 			}
 		}
 		return buf.toString();
+	}
+
+	public FILTER_TYPE getFilter() {
+		return filter;
+	}
+
+	public void setFilter(FILTER_TYPE filter) {
+		this.filter = filter;
 	}
 }

@@ -37,6 +37,10 @@ public interface Predicates {
 	public static final String DC_FORMAT = "http://purl.org/dc/elements/1.1/format";
 	public static final String DC_TYPE = "http://purl.org/dc/elements/1.1/type";
 	
+	public static final String DC_MITYPE_TEXT = "http://purl.org/dc/dcmitype/Text";
+	public static final String DC_MITYPE_DATASET = "http://purl.org/dc/dcmitype/Dataset";
+	public static final String DC_MITYPE_IMAGE = "http://purl.org/dc/dcmitype/Image";
+	
 	public static final String DCTERMS_ALTERNATIVE = "http://purl.org/dc/terms/alternative";
 	
 	public static final String RDF_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";

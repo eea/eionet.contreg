@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
+import eionet.cr.dao.postgre.helpers.FreeTextSearchHelper;
 import eionet.cr.dao.util.BBOX;
 import eionet.cr.dao.util.SearchExpression;
 import eionet.cr.dto.SubjectDTO;
@@ -50,6 +51,7 @@ public interface SearchDAO extends DAO{
 	 */
 	Pair<Integer, List<SubjectDTO>> searchByFreeText(
 				SearchExpression expression,
+				FreeTextSearchHelper.FILTER_TYPE filterType,
 				PagingRequest pagingRequest,
 				SortingRequest sortingRequest) throws DAOException;
 	

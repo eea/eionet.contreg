@@ -20,7 +20,22 @@
 	<crfn:form action="/simpleSearch.action" method="get">
 		<stripes:label for="expressionText" class="question">Expression</stripes:label>
 		<stripes:text name="searchExpression" id="expressionText" size="50"/>
-		<stripes:submit name="search" value="Search" id="searchButton"/>
+		<stripes:submit name="search" value="Search" id="searchButton"/><br/>
+		<stripes:radio id="anyObject" name="simpleFilter" value="anyObject" checked="anyObject" title="Any Object"/>
+		<stripes:label for="anyObject">Any Object</stripes:label>
+		
+		<stripes:radio id="anyFile" name="simpleFilter" value="anyFile"/>
+		<stripes:label for="anyFile">Any File</stripes:label>
+		
+		<stripes:radio id="texts" name="simpleFilter" value="texts"/>
+		<stripes:label for="texts">Texts</stripes:label>
+		
+		<stripes:radio id="datasets" name="simpleFilter" value="datasets"/>
+		<stripes:label for="datasets">Datasets</stripes:label>
+		
+		<stripes:radio id="images" name="simpleFilter" value="images"/>
+		<stripes:label for="images">Images</stripes:label>
+		
 		<stripes:text name="dummy" style="visibility:hidden;display:none" disabled="disabled" size="1"/>
 	</crfn:form>
 	<c:choose>

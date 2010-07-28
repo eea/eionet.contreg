@@ -36,6 +36,7 @@ import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.SearchDAO;
+import eionet.cr.dao.postgre.helpers.FreeTextSearchHelper;
 import eionet.cr.dao.readers.FreeTextSearchDataReader;
 import eionet.cr.dao.readers.SubjectDataReader;
 import eionet.cr.dao.util.BBOX;
@@ -73,6 +74,7 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 	 */
 	public Pair<Integer, List<SubjectDTO>> searchByFreeText(
 				SearchExpression expression,
+				FreeTextSearchHelper.FILTER_TYPE filterType,
 				PagingRequest pagingRequest,
 				SortingRequest sortingRequest) throws DAOException{
 		

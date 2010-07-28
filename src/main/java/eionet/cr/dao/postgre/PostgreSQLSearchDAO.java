@@ -76,6 +76,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 	 */
 	public Pair<Integer, List<SubjectDTO>> searchByFreeText(
 			SearchExpression expression,
+			FreeTextSearchHelper.FILTER_TYPE filterType,
 			PagingRequest pagingRequest,
 			SortingRequest sortingRequest) throws DAOException{
 
@@ -102,6 +103,11 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 		// create query helper
 		FreeTextSearchHelper helper = new FreeTextSearchHelper(
 				expression, pgQuery, pagingRequest, sortingRequest);
+		
+		// Set Filter
+		if (filterType != FreeTextSearchHelper.FILTER_TYPE.ANY_OBJECT){
+			helper.setFilter(filterType);
+		}
 
 		// create the list of IN parameters of the query
 		ArrayList<Object> inParams = new ArrayList<Object>();
