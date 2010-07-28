@@ -63,6 +63,7 @@
 	    	<stripes:label for="expressionText">Expression:</stripes:label>
 	    	<stripes:text name="searchExpression" id="expressionText" size="40"/>
 	    	<stripes:submit name="search" value="Search" id="searchButton"/>
+		<stripes:hidden name="simpleFilter" value="anyObject"/>
 		<stripes:text name="dummy" style="visibility:hidden;display:none" disabled="disabled" size="1"/>
 	</crfn:form>
 
