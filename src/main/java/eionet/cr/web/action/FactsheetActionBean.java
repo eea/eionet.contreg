@@ -410,10 +410,11 @@ public class FactsheetActionBean extends AbstractActionBean{
 			HashMap<String,String> props = helperDAO.getAddibleProperties(getSubjectTypesHashes());
 			
 			// add some hard-coded properties, HashMap assures there won't be duplicates
-			props.put(Predicates.RDF_TYPE, "Type");
-			props.put(Predicates.RDFS_LABEL, "Label");
+			//props.put(Predicates.RDF_TYPE, "Type");
+			props.put(Predicates.DC_TITLE, "Title");
 			props.put(Predicates.CR_TAG, "Tag");
-			props.put(Predicates.CR_COMMENT, "Comment");
+			props.put(Predicates.RDFS_COMMENT, "Other comments"); // Don't use CR_COMMENT
+			props.put(Predicates.DC_DESCRIPTION, "Description");
 			props.put(Predicates.CR_HAS_SOURCE, "hasSource");
 			props.put(Predicates.ROD_PRODUCT_OF, "productOf");
 			
