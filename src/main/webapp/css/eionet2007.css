@@ -195,27 +195,27 @@ a.numberedpage:hover, a.nextpage:hover, a.prevpage:hover, a.firstpage:hover, a.l
 	*/
 }
 #cloud a.size0 { 
-	font-size: 100%;
+	font-size: 80%;
 	line-height: 1.5em;
 	color: #888888;
 }
 #cloud a.size1 { 
-	font-size: 120%;
+	font-size: 100%;
 	line-height: 1.4em;
 	color: #777777;
 }
 #cloud a.size2 { 
-	font-size: 140%;
+	font-size: 120%;
 	line-height: 1.3em;
 	color: #666666;
 }
 #cloud a.size3 {
-	font-size: 160%;
+	font-size: 140%;
 	line-height: 1.2em;
 	color: #444444;
 }
 #cloud a.size4 { 
-	font-size: 180%;
+	font-size: 160%;
 	line-height: 1.1em;
 	color: #333333;
 }
