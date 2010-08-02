@@ -51,11 +51,11 @@
 				    							</c:if>
 				    							<c:if test="${availableFilter.value.provideValues}">
 					    							<c:if test="${actionBean.showPicklist && actionBean.picklistFilter==availableFilter.key && actionBean.picklist!=null && fn:length(actionBean.picklist)>0}">
-														<select name="value_${availableFilter.key}" style="max-width:400px">
+														<select name="value_${availableFilter.key}" style="max-width:100%">
 						                        			<option value="" selected="selected">- select a value -</option>
 						                        			<c:if test="${actionBean.picklist!=null}">
 							                        			<c:forEach var="picklistItem" items="${actionBean.picklist}">
-							                        				<option value="${fn:escapeXml(crfn:addQuotesIfWhitespaceInside(picklistItem))}" title="${fn:escapeXml(picklistItem)}" style="max-width:400px"><c:out value="${picklistItem}"/></option>
+							                        				<option value="${fn:escapeXml(crfn:addQuotesIfWhitespaceInside(picklistItem))}" title="${fn:escapeXml(picklistItem)}" style="max-width:100%"><c:out value="${picklistItem}"/></option>
 							                        			</c:forEach>
 							                        		</c:if>
 														</select>
