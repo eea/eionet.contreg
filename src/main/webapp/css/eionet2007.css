@@ -174,11 +174,29 @@ a.numberedpage:hover, a.nextpage:hover, a.prevpage:hover, a.firstpage:hover, a.l
 	width: 144px;
 }
 
+.action-box {
+	background-color:#f0f0f0;
+	padding:0.5em;
+	margin: 0.3em;
+	border:1px dotted black;
+}
+#workarea .action-box h2 {
+	font-size:1.2em;
+	padding: 0;
+	margin: 0;
+	font-weight:bold;
+	border-top: none;
+	border-bottom: 1px solid #cccccc;
+	background-image: none;
+	background-color: transparent;
+}
+.action-box h2 a {
+	text-decoration: none;
+	color: black;
+}
 
 /*  Tag Cloud styles  */
 #cloud{
-	border-top: 1px solid #cccccc;
-	border-bottom: 1px solid #cccccc;
 	clear:both;
 }
 #cloud a{

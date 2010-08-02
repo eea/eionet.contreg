@@ -6,7 +6,7 @@
 
 	<stripes:layout-component name="contents">
 <div style="float:right; background-color:white; width: 20em; padding-left: 1em;">
-	<div style="background-color:#f0f0f0; padding:0.5em; margin: 0.3em; border:1px dotted black;">
+	<div class="action-box">
 		<c:choose>
 			<c:when test='${sessionScope.crUser!=null}'>
 				<stripes:link href="/registerUrl.action" style="font-weight:bold">Suggest a URL!</stripes:link>
@@ -17,11 +17,11 @@
 		</c:choose>
 		Help other researchers find the good datasets. Bookmark them on this site.
 	</div>
-	<div style="background-color:#f0f0f0; padding:0.5em; margin: 0.3em; border:1px dotted black;">
+	<div class="action-box">
 		<stripes:layout-render name="/pages/tagcloud.jsp" />
 	</div>
-	<div style="background-color:#f0f0f0; padding:0.5em; margin: 0.3em; border:1px dotted black;">
-		<div style="font-size:1.2em;font-weight:bold">Recently discovered files:</div>
+	<div class="action-box">
+		<h2>Recently discovered files</h2>
 		<c:choose>
 			<c:when test="${empty actionBean.recentFiles}">
 				<p class="system-msg">No recently discovered files found</p>
