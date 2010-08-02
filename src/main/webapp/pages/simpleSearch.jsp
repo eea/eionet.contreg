@@ -12,31 +12,48 @@
 	to search for content that contains words "air" or "soil" or both, enter <span class="searchExprSample">air | soil</span>.
 	Entering <span class="searchExprSample">air pollution</span> or <span class="searchExprSample">air &amp; pollution</span>
 	will require the content to have both words.<br/>
-	Entering <span class="searchExprSample">"air pollution"</span> will require the content to have both "air" and "soil" and
-	also the exact phrase "air pollution".<br/>
+	Entering <span class="searchExprSample">"air pollution"</span> will require the content to have the exact phrase "air pollution".
+	</p>
+	<p>
 	Words shorter than 3 letters are ignored.
 	</p>
 
 	<crfn:form action="/simpleSearch.action" method="get">
-		<stripes:label for="expressionText" class="question">Expression</stripes:label>
-		<stripes:text name="searchExpression" id="expressionText" size="50"/>
-		<stripes:submit name="search" value="Search" id="searchButton"/><br/>
-		<stripes:radio id="anyObject" name="simpleFilter" value="anyObject" checked="anyObject" title="Any Object"/>
-		<stripes:label for="anyObject">Any Object</stripes:label>
-		
-		<stripes:radio id="anyFile" name="simpleFilter" value="anyFile"/>
-		<stripes:label for="anyFile">Any File</stripes:label>
-		
-		<stripes:radio id="texts" name="simpleFilter" value="texts"/>
-		<stripes:label for="texts">Texts</stripes:label>
-		
-		<stripes:radio id="datasets" name="simpleFilter" value="datasets"/>
-		<stripes:label for="datasets">Datasets</stripes:label>
-		
-		<stripes:radio id="images" name="simpleFilter" value="images"/>
-		<stripes:label for="images">Images</stripes:label>
-		
-		<stripes:text name="dummy" style="visibility:hidden;display:none" disabled="disabled" size="1"/>
+		<table class="formtable">
+			<tr>
+				<td>
+				<stripes:label for="expressionText" class="question">Expression</stripes:label>
+				</td>
+				<td>
+				<stripes:text name="searchExpression" id="expressionText" size="70"/>
+				<stripes:text name="dummy" style="visibility:hidden;display:none" disabled="disabled" size="1"/>
+				</td>
+				<td>
+				<stripes:submit name="search" value="Search" id="searchButton"/>
+				</td>
+			</tr>
+			</tr>
+				<td>
+					<stripes:label for="nofield" class="question">What type</stripes:label>
+				</td>
+				<td colspan="2">
+					<stripes:radio id="anyObject" name="simpleFilter" value="anyObject" checked="anyObject" title="Any Object"/>
+					<stripes:label for="anyObject">Any Object</stripes:label>
+					
+					<stripes:radio id="anyFile" name="simpleFilter" value="anyFile"/>
+					<stripes:label for="anyFile">Any File</stripes:label>
+					
+					<stripes:radio id="texts" name="simpleFilter" value="texts"/>
+					<stripes:label for="texts">Texts</stripes:label>
+					
+					<stripes:radio id="datasets" name="simpleFilter" value="datasets"/>
+					<stripes:label for="datasets">Datasets</stripes:label>
+					
+					<stripes:radio id="images" name="simpleFilter" value="images"/>
+					<stripes:label for="images">Images</stripes:label>
+				</td>
+			</tr>
+		</table>
 	</crfn:form>
 	<c:choose>
 		<c:when test="${not empty param.search}">
