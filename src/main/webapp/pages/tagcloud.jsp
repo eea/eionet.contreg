@@ -8,8 +8,8 @@
 		</c:when>
 		<c:otherwise>
 			<c:forEach items="${actionBean.tagCloud}" var="tagEntry">
-				<c:url var="tagClass" value="size${tagEntry.scale}" />
-				<a class="tag ${tagClass} d" href="tagSearch.action?search=Search&searchTag=${tagEntry.tag }">${tagEntry.tag}</a> 
+				<c:set var="tagClass" value="size${tagEntry.scale}" />
+				<a class="tag ${tagClass}" href="tagSearch.action?search=Search&amp;searchTag=${tagEntry.tag }">${tagEntry.tag}</a> 
 			</c:forEach>
 		</c:otherwise>
 	</c:choose>
