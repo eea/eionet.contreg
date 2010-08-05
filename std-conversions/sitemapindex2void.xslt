@@ -11,6 +11,7 @@
     xmlns:dcterms ="http://purl.org/dc/terms/"
     xmlns:void ="http://rdfs.org/ns/void#">
 
+<!-- Identical to sitemap2void.xslt -->
 
 <output indent="yes" method="xml" media-type="application/rdf+xml" encoding="UTF-8" omit-xml-declaration="no"/>
 
