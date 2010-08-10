@@ -143,10 +143,7 @@ public class FactsheetActionBean extends AbstractActionBean{
 				if (isAdminLoggedIn()){
 					urlFoundInHarvestSource = helperDAO.isUrlInHarvestSource(subject.getUrl());
 				}
-
 			}
-			
-			
 		}
 		
 		return new ForwardResolution("/pages/factsheet.jsp");

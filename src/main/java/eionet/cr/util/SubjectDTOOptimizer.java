@@ -15,22 +15,15 @@ public class SubjectDTOOptimizer {
 	public static SubjectDTO optimizeSubjectDTOFactsheetView(SubjectDTO subject, List<String> languages){
 		
 		SubjectDTO returnSubject = subject;
-		
 		Map<String,Collection<ObjectDTO>> predicates = subject.getPredicates();
-		
 		Iterator it = predicates.entrySet().iterator();
 		
-		int counter = 0;
 	    while (it.hasNext()) {
 	        Map.Entry pairs = (Map.Entry)it.next();
-	        System.out.println("Predicate: "+pairs.getKey());
-	        
 	        Collection<ObjectDTO> filteredObjects = new ArrayList<ObjectDTO>();
 	        Collection<ObjectDTO> foundResources = new ArrayList<ObjectDTO>();
-	        
 	        Collection<ObjectDTO> objects = subject.getObjects(pairs.getKey().toString());
-	        int objectCount = objects.size();    
-
+	    
 	        // STEP 1
 	        // First, let's find out all the resources we have in the list and add them to the new query.
 	        // Resource is identified by not being Literal.
@@ -43,7 +36,6 @@ public class SubjectDTOOptimizer {
 
 	        // STEP 2
 	        // We must extend the language list in order to include also these languages that were left out before
-	        
 	        for (ObjectDTO object:objects){
 	        	boolean languageAlreadyListed = false;
 	        	for (int a=0; a<languages.size(); a++){
@@ -57,11 +49,9 @@ public class SubjectDTOOptimizer {
 	        	}
 	        }
 	        
-	        
 	        // STEP 3
 	        // Now, let's try to find a suitable label for each resource already in filteredObjects list.
 	        // Suitable label is literal with obj_source_obj == object.source 
-	        
 	        for (ObjectDTO object:foundResources){
 	        	boolean suitableLabelFound = false;
 		        for (int a=0; a<languages.size(); a++){
@@ -77,7 +67,6 @@ public class SubjectDTOOptimizer {
 		        	}
 		        }
 	        }
-      
         
 	        // STEP 4
 	        // Now let's find all the literals that aren't labels for any resource.
@@ -99,8 +88,6 @@ public class SubjectDTOOptimizer {
 		        	}
 		        }
 	        }
-	        
-	        
 	        predicates.put(pairs.getKey().toString(), filteredObjects);
 	    }
 		

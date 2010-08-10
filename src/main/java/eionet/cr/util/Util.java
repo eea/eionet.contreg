@@ -447,7 +447,6 @@ public class Util {
 					acceptedLanguages.add(Util.normalizeHTTPAcceptedLanguage(languages[i]));
 				}
 			}
-			
 			acceptedLanguages.add("en");
 			acceptedLanguages.add("");
 		}
@@ -464,7 +463,6 @@ public class Util {
 		List<String> returnValues = new ArrayList<String>();
 		
 		List<LanguagePrioritySorter> acceptedLanguagesByPriority = null;
-		List<Double> priorities = null; 
 		
 		if (acceptedLanguagesByPriority==null){
 			
@@ -474,11 +472,8 @@ public class Util {
 				String[] languages = StringUtils.split(acceptLanguageHeader, ',');
 				for (int i=0; i<languages.length; i++){
 					LanguagePrioritySorter languagePriority = new LanguagePrioritySorter();
-					
-					
 					languagePriority.setPriority(Util.getHTTPAcceptedLanguageImportance(languages[i]));
 					languagePriority.setLanguageValue(Util.normalizeHTTPAcceptedLanguage(languages[i]));
-				
 					acceptedLanguagesByPriority.add(languagePriority);
 				}
 			}
