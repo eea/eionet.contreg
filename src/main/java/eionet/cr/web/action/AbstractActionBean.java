@@ -80,6 +80,7 @@ public abstract class AbstractActionBean implements ActionBean {
 	
 	/** */
 	private HashSet<String> acceptedLanguages;
+	private List<String> acceptedLanguagesByImportance;
 	
 	protected boolean homeContext;
 	
@@ -237,23 +238,22 @@ public abstract class AbstractActionBean implements ActionBean {
 	public HashSet<String> getAcceptedLanguages(){
 		
 		if (acceptedLanguages==null){
-			
-			acceptedLanguages = new HashSet<String>();
-
-			String acceptLanguageHeader = getContext().getRequest().getHeader("Accept-Language");
-			if (!StringUtils.isBlank(acceptLanguageHeader)){
-				String[] languages = StringUtils.split(acceptLanguageHeader, ',');
-				for (int i=0; i<languages.length; i++){
-					acceptedLanguages.add(Util.normalizeHTTPAcceptedLanguage(languages[i]));
-				}
-			}
-			
-			acceptedLanguages.add("en");
-			acceptedLanguages.add("");
+			acceptedLanguages = Util.getAcceptedLanguages(getContext().getRequest().getHeader("Accept-Language"));
 		}
-		
 		return acceptedLanguages;
 	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public List<String> getAcceptedLanguagesByImportance(){
+		if (acceptedLanguagesByImportance == null){
+			acceptedLanguagesByImportance = Util.getAcceptedLanguagesByImportance(getContext().getRequest().getHeader("Accept-Language"));
+		}
+		return acceptedLanguagesByImportance;
+	}
+	
 	
 	/**
 	 * @return session associated with current request

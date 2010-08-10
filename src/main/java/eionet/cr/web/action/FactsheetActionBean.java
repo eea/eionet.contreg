@@ -58,6 +58,7 @@ import eionet.cr.harvest.InstantHarvester;
 import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
+import eionet.cr.util.SubjectDTOOptimizer;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
 import eionet.cr.web.util.FactsheetObjectId;
@@ -124,7 +125,12 @@ public class FactsheetActionBean extends AbstractActionBean{
 				setAdminLoggedIn(false);
 			}
 
-			subject = helperDAO.getSubject(subjectHash);
+			
+			if (this.getContext().getRequest().getParameter("nofilter") != null){
+				subject = helperDAO.getSubject(subjectHash);
+			} else {
+				subject = SubjectDTOOptimizer.optimizeSubjectDTOFactsheetView(helperDAO.getSubject(subjectHash), getAcceptedLanguagesByImportance());
+			}
 			
 			if (subject!=null) {
 				uri = subject.getUri();
