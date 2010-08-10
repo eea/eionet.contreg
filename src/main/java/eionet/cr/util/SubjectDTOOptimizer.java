@@ -42,6 +42,23 @@ public class SubjectDTOOptimizer {
 	        }
 
 	        // STEP 2
+	        // We must extend the language list in order to include also these languages that were left out before
+	        
+	        for (ObjectDTO object:objects){
+	        	boolean languageAlreadyListed = false;
+	        	for (int a=0; a<languages.size(); a++){
+	        		if (object.getLanguage().equals(languages.get(a)) ){
+	        			languageAlreadyListed = true;
+	        			break;
+	        		}
+	        	}
+	        	if (!languageAlreadyListed){
+	        		languages.add(object.getLanguage());
+	        	}
+	        }
+	        
+	        
+	        // STEP 3
 	        // Now, let's try to find a suitable label for each resource already in filteredObjects list.
 	        // Suitable label is literal with obj_source_obj == object.source 
 	        
@@ -60,23 +77,8 @@ public class SubjectDTOOptimizer {
 		        	}
 		        }
 	        }
-	        
-	        // STEP 3
-	        // We must extend the language list in order to include also these languages that were left out before
-	        
-	        for (ObjectDTO object:objects){
-	        	boolean languageAlreadyListed = false;
-	        	for (int a=0; a<languages.size(); a++){
-	        		if (object.getLanguage().equals(languages.get(a)) ){
-	        			languageAlreadyListed = true;
-	        			break;
-	        		}
-	        	}
-	        	if (!languageAlreadyListed){
-	        		languages.add(object.getLanguage());
-	        	}
-	        }
-	        
+      
+        
 	        // STEP 4
 	        // Now let's find all the literals that aren't labels for any resource.
 	        // We are going to add them based on the language priority.
