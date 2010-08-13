@@ -31,25 +31,23 @@
 							</c:otherwise>
 						</c:choose>
 			        </li>
-			        <li>
-						<c:choose>
-							<c:when test="${not empty actionBean.subject && not empty actionBean.subject.uri && !actionBean.subject.anonymous}">
-								<stripes:link href="/objectsInSource.action" event="search">Objects in Source
+			        <c:if test="${actionBean.uriIsHarvestSource}">
+				        <li>
+				        	<stripes:link href="/objectsInSource.action" event="search">Objects in Source
+							<c:choose>
+								<c:when test="${not empty actionBean.subject && not empty actionBean.subject.uri && !actionBean.subject.anonymous}">
 									<stripes:param name="uri" value="${actionBean.subject.uri}"/>
-								</stripes:link>
-							</c:when>
-							<c:when test="${not empty actionBean.uri}">
-								<stripes:link href="/objectsInSource.action" event="search">Objects in Source
+								</c:when>
+								<c:when test="${not empty actionBean.uri}">
 									<stripes:param name="uri" value="${actionBean.uri}"/>
-								</stripes:link>
-							</c:when>
-							<c:otherwise>
-								<stripes:link href="/objectsInSource.action" event="search">Objects in Source
+								</c:when>
+								<c:otherwise>
 									<stripes:param name="anonHash" value="${actionBean.uriHash}"/>
-								</stripes:link>
-							</c:otherwise>
-						</c:choose>
-			        </li>
+								</c:otherwise>
+							</c:choose>
+				    	    </stripes:link>
+			        	</li>
+			        </c:if>
 				    </ul>
 				</div>
 				<br style="clear:left" />

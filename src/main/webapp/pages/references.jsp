@@ -28,20 +28,20 @@
 						<li id="currenttab">
 							<span>Resource references</span>
 						</li>
-						<li>
-							<c:choose>
-								<c:when test="${not empty actionBean.uri}">
-									<stripes:link href="/objectsInSource.action"  event="search">Objects in Source
-										<stripes:param name="uri" value="${actionBean.uri}"/>
-									</stripes:link>
-								</c:when>
-								<c:otherwise>
-									<stripes:link href="/objectsInSource.action"  event="search">Objects in Source
-										<stripes:param name="uriHash" value="${actionBean.anonHash}"/>
-									</stripes:link>
-								</c:otherwise>
-							</c:choose>
-			        	</li>
+						<c:if test="${actionBean.uriIsHarvestSource}">
+							<li>
+								<stripes:link href="/objectsInSource.action"  event="search">Objects in Source
+									<c:choose>
+										<c:when test="${not empty actionBean.uri}">
+												<stripes:param name="uri" value="${actionBean.uri}"/>
+										</c:when>
+										<c:otherwise>
+												<stripes:param name="uriHash" value="${actionBean.anonHash}"/>
+										</c:otherwise>
+									</c:choose>
+								</stripes:link>
+				        	</li>
+				        </c:if>
 				    </ul>
 				</div>
 				<br style="clear:left" />

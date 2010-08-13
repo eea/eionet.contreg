@@ -99,6 +99,9 @@ public class FactsheetActionBean extends AbstractActionBean{
 	
 	private boolean urlUserBookmark = false;
 	
+	/** */
+	private Boolean uriIsHarvestSource;
+	
 	/**
 	 * 
 	 * @return
@@ -569,5 +572,24 @@ public class FactsheetActionBean extends AbstractActionBean{
 	public void setUrlUserBookmark(boolean urlUserBookmark) {
 		this.urlUserBookmark = urlUserBookmark;
 	}
-	
+
+	/**
+	 * @return the uriIsHarvestSource
+	 * @throws DAOException 
+	 */
+	public Boolean getUriIsHarvestSource() throws DAOException {
+		
+		if (uriIsHarvestSource==null){
+			
+			if ((uri==null && subject==null) || (subject!=null && subject.isAnonymous())){
+				uriIsHarvestSource = Boolean.FALSE;
+			}
+			else{
+				String s = subject!=null ? subject.getUri() : uri;
+				HarvestSourceDTO dto = factory.getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(s);
+				uriIsHarvestSource = dto==null ? Boolean.FALSE : Boolean.TRUE;
+			}
+		}
+		return uriIsHarvestSource;
+	}
 }

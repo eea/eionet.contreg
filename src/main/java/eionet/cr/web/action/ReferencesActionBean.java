@@ -35,8 +35,10 @@ import org.apache.commons.lang.StringUtils;
 import eionet.cr.common.Predicates;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.SearchDAO;
+import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
@@ -71,6 +73,9 @@ public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
 	
 	/** */
 	private Map<String,String> predicateLabels;
+	
+	/** */
+	private Boolean uriIsHarvestSource;
 	
 	/*
 	 * (non-Javadoc)
@@ -190,5 +195,25 @@ public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
 	public boolean isUriResolvable(){
 		
 		return uri==null ? false : URLUtil.isURL(uri);
+	}
+	
+	/**
+	 * @return the uriIsHarvestSource
+	 * @throws DAOException 
+	 */
+	public Boolean getUriIsHarvestSource() throws DAOException {
+		
+		if (uriIsHarvestSource==null){
+			
+			if ((uri==null && subject==null) || anonHash>0 || (subject!=null && subject.isAnonymous())){
+				uriIsHarvestSource = Boolean.FALSE;
+			}
+			else{
+				String s = subject!=null ? subject.getUri() : uri;
+				HarvestSourceDTO dto = factory.getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(s);
+				uriIsHarvestSource = dto==null ? Boolean.FALSE : Boolean.TRUE;
+			}
+		}
+		return uriIsHarvestSource;
 	}
 }
