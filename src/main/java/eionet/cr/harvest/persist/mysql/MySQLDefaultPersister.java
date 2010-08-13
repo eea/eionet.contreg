@@ -25,6 +25,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.DateFormat;
 import java.util.ArrayList;
 
 import org.apache.commons.logging.Log;
@@ -523,5 +524,13 @@ public class MySQLDefaultPersister implements IHarvestPersister {
 	 */
 	public int getStoredTriplesCount() {
 		return storedTriplesCount;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.harvest.persist.IHarvestPersister#updateLastRefreshed()
+	 */
+	public void updateLastRefreshed(long subjectHash, DateFormat dateFormat) {
+		throw new UnsupportedOperationException("Method not implemented");
 	}
 }

@@ -23,6 +23,7 @@ package eionet.cr.harvest.persist.mysql;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DateFormat;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
@@ -218,5 +219,13 @@ public class MySQLOptimizedPersister implements IHarvestPersister {
 	public int getStoredTriplesCount() {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.harvest.persist.IHarvestPersister#updateLastRefreshed()
+	 */
+	public void updateLastRefreshed(long subjectHash, DateFormat dateFormat) {
+		throw new UnsupportedOperationException("Method not implemented");
 	}
 }

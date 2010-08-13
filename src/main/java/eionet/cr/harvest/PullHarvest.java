@@ -28,7 +28,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.sql.SQLException;
 import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -49,12 +51,15 @@ import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.postgre.PostgreSQLHarvestSourceDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
+import eionet.cr.harvest.persist.PersisterConfig;
+import eionet.cr.harvest.persist.PersisterFactory;
 import eionet.cr.harvest.util.HarvestUrlConnection;
 import eionet.cr.harvest.util.MimeTypeConverter;
 import eionet.cr.harvest.util.arp.ARPSource;
 import eionet.cr.harvest.util.arp.InputStreamBasedARPSource;
 import eionet.cr.util.FileUtil;
 import eionet.cr.util.GZip;
+import eionet.cr.util.Hashes;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.UrlRedirectAnalyzer;
 import eionet.cr.util.UrlRedirectionInfo;
@@ -90,6 +95,10 @@ public class PullHarvest extends Harvest{
 	 * In case of redirected sources, each redirected source will be harvested without additional recursive redirection.
 	 * */
 	private boolean recursiveHarvestDisabled = false;
+	
+	/** */
+	private static SimpleDateFormat lastRefreshedDateFormat =
+		new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
 	/**
 	 * 
@@ -174,19 +183,11 @@ public class PullHarvest extends Harvest{
 					}
 					else{
 						if (harvestUrlConnection.isHttpConnection() && harvestUrlConnection.getResponseCode()==HttpURLConnection.HTTP_NOT_MODIFIED){
-							
-							clearPreviousContent = false;
-							
-							if (previousHarvest!=null){
-								// copy the number of triples and distinct subjects from previous harvest
-								setStoredTriplesCount(previousHarvest.getTotalStatements());
-								setDistinctSubjectsCount(previousHarvest.getTotalResources());
-							}
-							
-							String msg = "Source not modified since " + lastHarvest.toString();
-							logger.debug(msg);
-							infos.add(msg);
-						} else{
+						
+							handleSourceNotModified();
+							return;
+						}
+						else{
 							// save the stream to file
 							int totalBytes = FileUtil.streamToFile(harvestUrlConnection.getInputStream(), file);
 
@@ -214,11 +215,34 @@ public class PullHarvest extends Harvest{
 		harvest(file, contentType);
 	}
 	
+	/**
+	 * @throws SQLException 
+	 * 
+	 */
+	private void handleSourceNotModified() throws SQLException{
+
+		// update lastRefreshed predicate for this source
+		PersisterFactory.getPersister().updateLastRefreshed(
+				Hashes.spoHash(sourceUrlString), lastRefreshedDateFormat);
+
+		// copy the harvest's number of triples and resources from previous harvest
+		if (previousHarvest!=null){
+			setStoredTriplesCount(previousHarvest.getTotalStatements());
+			setDistinctSubjectsCount(previousHarvest.getTotalResources());
+		}
+
+		String msg = "Source not modified since " + lastHarvest.toString();
+		logger.debug(msg);
+		infos.add(msg);
+	}
+	
 	
 	/**
 	 * Performs the harvesting for redirected harvests.
 	 */
 	private void redirectedSourceHarvest(HarvestUrlConnection harvestUrlConnection) throws HarvestException{
+		
+		logger.debug("Entered into redirectedSourceHarvest");
 		
 		int redirectionsFound = -1;
 		
@@ -533,7 +557,7 @@ public class PullHarvest extends Harvest{
 	 */
 	private void setLastRefreshed(URLConnection urlConnection, long lastRefreshedTime){
 		
-		String lastRefreshed = Util.dateToString(new Date(lastRefreshedTime), "yyyy-MM-dd'T'HH:mm:ss");
+		String lastRefreshed = lastRefreshedDateFormat.format(new Date(lastRefreshedTime));
 		sourceMetadata.addObject(Predicates.CR_LAST_REFRESHED, new ObjectDTO(String.valueOf(lastRefreshed), true));
 	}
 	
@@ -554,7 +578,7 @@ public class PullHarvest extends Harvest{
 		}
 
 		// set the last-modified predicate
-		String s = Util.dateToString(new Date(sourceLastModified), "yyyy-MM-dd'T'HH:mm:ss");
+		String s = lastRefreshedDateFormat.format(new Date(sourceLastModified));
 		sourceMetadata.addObject(Predicates.CR_LAST_MODIFIED, new ObjectDTO(s, true));
 		
 		int contentLength = urlConnection.getContentLength();
@@ -653,18 +677,18 @@ public class PullHarvest extends Harvest{
 	 * @throws DAOException
 	 */
 	public static PullHarvest createFullSetup(HarvestSourceDTO dto, boolean urgent) throws DAOException{
-		
-		int numOfResources = dto.getResources()==null ? 0 : dto.getResources().intValue();
-		
+
 		PullHarvest harvest = new PullHarvest(dto.getUrl(), urgent ? null : dto.getLastHarvest());
 		
 		harvest.setFullSetupMode(true);
 		harvest.setFullSetupModeUrgent(urgent);
 		harvest.setPreviousHarvest(DAOFactory.get().getDao(HarvestDAO.class).getLastHarvestBySourceId(
 				dto.getSourceId().intValue()));
+		harvest.setNotificationSender(new HarvestNotificationSender());
+		
+		int numOfResources = dto.getResources()==null ? 0 : dto.getResources().intValue();
 		harvest.setDaoWriter(new HarvestDAOWriter(
 				dto.getSourceId().intValue(), Harvest.TYPE_PULL, numOfResources, CRUser.application.getUserName()));
-		harvest.setNotificationSender(new HarvestNotificationSender());
 		
 		return harvest;
 	}

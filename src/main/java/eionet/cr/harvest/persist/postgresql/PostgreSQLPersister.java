@@ -26,11 +26,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+
+import javax.servlet.jsp.jstl.sql.SQLExecutionTag;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import eionet.cr.common.Predicates;
 import eionet.cr.dto.UnfinishedHarvestDTO;
 import eionet.cr.harvest.CurrentHarvests;
 import eionet.cr.harvest.RDFHandler;
@@ -467,5 +472,54 @@ public class PostgreSQLPersister implements IHarvestPersister{
 	 */
 	public int getStoredTriplesCount() {
 		return storedTriplesCount;
+	}
+
+	/** */
+	private static String sql_insertLastRefreshed =
+		"insert into SPO (SUBJECT,PREDICATE,OBJECT,OBJECT_HASH,LIT_OBJ,SOURCE,GEN_TIME)" +
+			" values (?,?,?,?,cast(? as ynboolean),?,?)";
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.harvest.persist.IHarvestPersister#updateLastRefreshed()
+	 */
+	public void updateLastRefreshed(long subjectHash, DateFormat dateFormat) throws SQLException {
+
+		long time = System.currentTimeMillis();
+		String dateString = dateFormat.format(new Date(time));
+		
+		long predicateHash = Hashes.spoHash(Predicates.CR_LAST_REFRESHED);
+		
+		StringBuffer deleteSQL = new StringBuffer("delete from SPO where SUBJECT=").
+		append(subjectHash).append(" and PREDICATE=").append(predicateHash);
+
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		try{
+			conn = DbConnectionProvider.getConnection();
+			conn.setAutoCommit(false);
+			
+			pstmt = conn.prepareStatement(sql_insertLastRefreshed);
+			pstmt.setLong(1, subjectHash);
+			pstmt.setLong(2, predicateHash);
+			pstmt.setString(3, dateString);
+			pstmt.setLong(4, Hashes.spoHash(dateString));
+			pstmt.setString(5, YesNoBoolean.format(true));
+			pstmt.setLong(6, subjectHash);
+			pstmt.setLong(7, time);
+			
+			SQLUtil.executeUpdate(deleteSQL.toString(), conn);
+			pstmt.execute();
+			
+			conn.commit();
+		}
+		catch (SQLException e){
+			try{
+				conn.rollback();
+			}
+			catch (SQLException ee){
+				logger.fatal("Rollback failed", ee);
+			}
+			throw e;
+		}
 	}
 }

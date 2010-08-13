@@ -20,6 +20,9 @@
  */
 package eionet.cr.harvest.persist;
 
+import java.sql.SQLException;
+import java.text.DateFormat;
+
 
 /**
  * @author Aleksandr Ivanov
@@ -98,4 +101,12 @@ public interface IHarvestPersister {
 	 * @return
 	 */
 	int getStoredTriplesCount();
+	
+	/**
+	 * @param subjectHash TODO
+	 * @param dateFormat TODO
+	 * @throws SQLException 
+	 * 
+	 */
+	void updateLastRefreshed(long subjectHash, DateFormat dateFormat) throws SQLException;
 }
