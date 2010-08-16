@@ -1,5 +1,6 @@
 
 This script implements the FNV1A (64-bit) hashing algorithm for Python
+It has to match the implementation of ../../src/main/java/eionet/cr/util/Hashes.java
 
 To build:
   python setup.py build

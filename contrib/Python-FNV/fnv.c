@@ -51,10 +51,10 @@ static PyMemberDef fnv_struct_members[] = {
 
 static PyObject * fnv_update(fnv_struct *self, PyObject *args)
 {
-	unsigned char *cp;
+	Py_UNICODE *cp;
 	int len;
 
-	if (!PyArg_ParseTuple(args, "s#:update", &cp, &len))
+	if (!PyArg_ParseTuple(args, "u#:update", &cp, &len))
 		return NULL;
 
 	int i;
