@@ -31,7 +31,6 @@ public class HarvestUrlConnection {
 	private UrlRedirectionInfo redirectionInfo = new UrlRedirectionInfo();
 	
 	InputStream inputStream = null;
-	private String contentType = null;
 	private boolean sourceAvailable = false;
 	private String sourceNotExistMessage = "";
 	private boolean fileConnection = false;
@@ -170,14 +169,6 @@ public class HarvestUrlConnection {
 
 	public void setSourceNotExistMessage(String sourceNotExistMessage) {
 		this.sourceNotExistMessage = sourceNotExistMessage;
-	}
-
-	public String getContentType() {
-		return contentType;
-	}
-
-	public void setContentType(String contentType) {
-		this.contentType = contentType;
 	}
 
 	public URLConnection getGeneralConnection() {

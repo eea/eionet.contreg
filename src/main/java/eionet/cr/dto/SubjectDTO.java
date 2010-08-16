@@ -84,7 +84,7 @@ public class SubjectDTO implements Serializable{
 		uriHash = Hashes.spoHash(uri);		
 		predicates = new HashMap<String,Collection<ObjectDTO>>();
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Object#toString()

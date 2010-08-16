@@ -37,6 +37,8 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -569,6 +571,28 @@ public class Util {
 		}
 		return matchList;
 	}
+	
+	/**
+	 * 
+	 * @param <K>
+	 * @param <V>
+	 * @param map
+	 * @return
+	 */
+	public static <K,V> Set<K> getNullValueKeys(Map<K,V> map){
+		
+		HashSet<K> result = new HashSet<K>();
+		if (map!=null && !map.isEmpty()){
+			for (Map.Entry<K,V> entry : map.entrySet()){
+				if (entry.getValue()==null){
+					result.add(entry.getKey());
+				}
+			}
+		}
+		
+		return result;
+	}
+	
 	/**
 	 * 
 	 * @param args

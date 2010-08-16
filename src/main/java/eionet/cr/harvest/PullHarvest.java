@@ -180,7 +180,7 @@ public class PullHarvest extends Harvest{
 					
 					contentType = sourceMetadata.getObjectValue(Predicates.CR_MEDIA_TYPE);
 					if (contentType!=null && !isSupportedContentType(contentType)){
-						logger.debug("Unsupported content type: " + harvestUrlConnection.getContentType());
+						logger.debug("Unsupported content type: " + contentType);
 					}
 					else{
 						if (harvestUrlConnection.isHttpConnection() && harvestUrlConnection.getResponseCode()==HttpURLConnection.HTTP_NOT_MODIFIED){

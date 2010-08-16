@@ -25,13 +25,17 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.readers.SubjectDataReader;
+import eionet.cr.dao.readers.MinimalSubjectReader;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Util;
 import eionet.cr.util.sql.DbConnectionProvider;
@@ -265,9 +269,22 @@ public abstract class PostgreSQLBaseDAO {
 				
 				logger.trace("Goint to execute subjects data query:" + query);				
 				long startTime1 = System.currentTimeMillis();
-				SQLUtil.executeQuery(query, null, reader, conn);
+				SQLUtil.executeQuery(query, null, reader, conn);				
 				logger.trace("getSubjectsData, sub query time " + Util.durationSince(startTime1));
 			}
+
+			// if any subjects were not created (which might happen if they don't have any
+			// triples with the predicates that were asked for), then create them now
+			
+			Set<Long> unfilledSubjects = Util.getNullValueKeys(subjectsMap);
+			if (unfilledSubjects!=null && !unfilledSubjects.isEmpty()){
+				
+				StringBuffer buf = new StringBuffer().
+				append("select distinct SUBJECT,URI,ANON_SUBJ from SPO,RESOURCE where SUBJECT in (").
+				append(Util.toCSV(unfilledSubjects)).append(") and SUBJECT=URI_HASH");
+				SQLUtil.executeQuery(buf.toString(),null,new MinimalSubjectReader(subjectsMap),conn);
+			}
+
 			logger.debug("getSubjectsData, total query time " + Util.durationSince(startTime));
 		}
 		catch (Exception e){
