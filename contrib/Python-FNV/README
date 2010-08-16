@@ -1,0 +1,8 @@
+
+This script implements the FNV1A (64-bit) hashing algorithm for Python
+
+To build:
+  python setup.py build
+  mv build/lib*/fnv.so .
+
+
