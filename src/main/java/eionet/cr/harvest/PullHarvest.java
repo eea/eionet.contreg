@@ -178,7 +178,8 @@ public class PullHarvest extends Harvest{
 					// NOTE: If URL is redirected, content type is null.
 					// skip if unsupported content type
 					
-					if (!harvestUrlConnection.isContentTypeValid(sourceMetadata.getObjectValue(Predicates.CR_MEDIA_TYPE))){
+					contentType = sourceMetadata.getObjectValue(Predicates.CR_MEDIA_TYPE);
+					if (contentType!=null && !isSupportedContentType(contentType)){
 						logger.debug("Unsupported content type: " + harvestUrlConnection.getContentType());
 					}
 					else{
@@ -215,6 +216,34 @@ public class PullHarvest extends Harvest{
 		harvest(file, contentType);
 	}
 	
+	/**
+	 * 
+	 * @param contentType
+	 * @return
+	 */
+	private boolean isSupportedContentType(String contentType){
+		
+		return contentType.startsWith("text/xml")
+				|| contentType.startsWith("application/xml")
+				|| contentType.startsWith("application/rdf+xml")
+				|| contentType.startsWith("application/atom+xml")
+				|| contentType.startsWith("application/octet-stream")
+				|| contentType.startsWith("application/x-gzip");
+	}
+
+	/**
+	 * 
+	 * @param contentType
+	 * @return
+	 */
+	private boolean isXmlContentType(String contentType){
+		
+		return contentType.startsWith("text/xml")
+				|| contentType.startsWith("application/xml")
+				|| contentType.startsWith("application/rdf+xml")
+				|| contentType.startsWith("application/atom+xml");
+	}
+
 	/**
 	 * @throws SQLException 
 	 * 
@@ -417,6 +446,9 @@ public class PullHarvest extends Harvest{
 		if (unGZipped != null){
 			file = unGZipped;
 		}
+		else if (contentType!=null && !isXmlContentType(contentType)){
+			file = null;
+		}
 		
 		InputStream inputStream = null;
 		try{
@@ -425,7 +457,7 @@ public class PullHarvest extends Harvest{
 			
 			/* pre-process the file; if it's still valid then open input stream and create ARP source object */
 			/* (the file may not exist, if content type was unsupported or other reasons (see caller)*/
-			if (file.exists()){
+			if (file!=null && file.exists()){
 				try{
 					if ((file=preProcess(file, contentType))!=null){
 						

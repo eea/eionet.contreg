@@ -31,7 +31,6 @@ public class HarvestUrlConnection {
 	private UrlRedirectionInfo redirectionInfo = new UrlRedirectionInfo();
 	
 	InputStream inputStream = null;
-	private boolean contentTypeValid = false;
 	private String contentType = null;
 	private boolean sourceAvailable = false;
 	private String sourceNotExistMessage = "";
@@ -114,23 +113,6 @@ public class HarvestUrlConnection {
 		}
 		return sourceAvailable;
 	}
-	
-	public boolean isContentTypeValid(String contentType) {
-		
-		if (contentType!=null
-				&& !contentType.startsWith("text/xml")
-				&& !contentType.startsWith("application/xml")
-				&& !contentType.startsWith("application/rdf+xml")
-				&& !contentType.startsWith("application/atom+xml")
-				&& !contentType.startsWith("application/octet-stream")
-				&& !contentType.startsWith("application/x-gzip")){
-			contentTypeValid = false;
-		} else {
-			contentTypeValid = true;
-		}
-		
-		return contentTypeValid;
-	}
 
 	public URLConnection getConnection(){
 		if (fileConnection){
@@ -188,14 +170,6 @@ public class HarvestUrlConnection {
 
 	public void setSourceNotExistMessage(String sourceNotExistMessage) {
 		this.sourceNotExistMessage = sourceNotExistMessage;
-	}
-
-	public boolean isContentTypeValid() {
-		return contentTypeValid;
-	}
-
-	public void setContentTypeValid(boolean contentTypeValid) {
-		this.contentTypeValid = contentTypeValid;
 	}
 
 	public String getContentType() {
