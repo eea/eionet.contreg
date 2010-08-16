@@ -513,13 +513,12 @@ public class PostgreSQLPersister implements IHarvestPersister{
 			conn.commit();
 		}
 		catch (SQLException e){
-			try{
-				conn.rollback();
-			}
-			catch (SQLException ee){
-				logger.fatal("Rollback failed", ee);
-			}
+			SQLUtil.rollback(conn);
 			throw e;
+		}
+		finally{
+			SQLUtil.close(pstmt);
+			SQLUtil.close(conn);
 		}
 	}
 }
