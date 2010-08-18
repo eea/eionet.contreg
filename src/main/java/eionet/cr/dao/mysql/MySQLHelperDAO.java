@@ -238,17 +238,17 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 	 * (non-Javadoc)
 	 * @see eionet.cr.dao.SpoHelperDao#addResource(java.lang.String, java.lang.String)
 	 */
-	public void addResource(String uri, String firstSeenSourceUri) throws DAOException {
+	public void addResource(String uri, String sourceUri) throws DAOException {
 		
 		ArrayList values = new ArrayList();
 		values.add(uri);
 		values.add(Long.valueOf(Hashes.spoHash(uri)));
-		if (StringUtils.isBlank(firstSeenSourceUri)){
+		if (StringUtils.isBlank(sourceUri)){
 			values.add(Long.valueOf(0));
 			values.add(Long.valueOf(0));
 		}
 		else{
-			values.add(Long.valueOf(Hashes.spoHash(firstSeenSourceUri)));
+			values.add(Long.valueOf(Hashes.spoHash(sourceUri)));
 			values.add(Long.valueOf(System.currentTimeMillis()));
 		}
 		

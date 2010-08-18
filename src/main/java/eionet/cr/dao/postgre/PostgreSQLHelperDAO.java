@@ -88,24 +88,26 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 
 	/** */
 	public static final String insertResourceSQL = "insert into RESOURCE" +
-			" (URI, URI_HASH, FIRSTSEEN_SOURCE, FIRSTSEEN_TIME) values (?, ?, ?, ?)";
+			" (URI, URI_HASH, FIRSTSEEN_SOURCE, FIRSTSEEN_TIME, LASTMODIFIED_TIME) values (?, ?, ?, ?, ?)";
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.dao.SpoHelperDao#addResource(java.lang.String, java.lang.String)
 	 */
-	public void addResource(String uri, String firstSeenSourceUri) throws DAOException {
+	public void addResource(String uri, String sourceUri) throws DAOException {
+		
+		if (StringUtils.isBlank(uri)){
+			throw new IllegalArgumentException("Resource URI must not be blank");
+		}
+		
+		long time = System.currentTimeMillis();
+		long sourceHash = StringUtils.isBlank(sourceUri) ? 0 : Hashes.spoHash(sourceUri);
 		
 		ArrayList values = new ArrayList();
 		values.add(uri);
 		values.add(Long.valueOf(Hashes.spoHash(uri)));
-		if (StringUtils.isBlank(firstSeenSourceUri)){
-			values.add(Long.valueOf(0));
-			values.add(Long.valueOf(0));
-		}
-		else{
-			values.add(Long.valueOf(Hashes.spoHash(firstSeenSourceUri)));
-			values.add(Long.valueOf(System.currentTimeMillis()));
-		}
+		values.add(Long.valueOf(sourceHash));
+		values.add(Long.valueOf(time));
+		values.add(Long.valueOf(time));
 		
 		Connection conn = null;
 		try{

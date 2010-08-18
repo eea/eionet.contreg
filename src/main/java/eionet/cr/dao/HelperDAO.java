@@ -77,10 +77,10 @@ public interface HelperDAO extends DAO {
 	/**
 	 * 
 	 * @param uri
-	 * @param firstSeenSourceUri
+	 * @param sourceUri
 	 * @throws DAOException
 	 */
-	void addResource(String uri, String firstSeenSourceUri) throws DAOException;
+	void addResource(String uri, String sourceUri) throws DAOException;
 	
 	/**
 	 * 
