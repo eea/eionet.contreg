@@ -37,10 +37,11 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
 	private boolean reviewView;
 	
 	private FileBean attachment;
-	
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.web.action.AbstractSearchActionBean#search()
+
+	/**
+	 * 
+	 * @return
+	 * @throws DAOException
 	 */
 	@DefaultHandler
 	public Resolution view() throws DAOException {
@@ -101,51 +102,70 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
 		return new ForwardResolution("/pages/home/reviews.jsp");
 	}
 	
+	/**
+	 * 
+	 */
 	private void loadReview(){
-		if (reviewId == 0){
-			String reviewString="";
+		
+		if (reviewId!=0){
+			return;
+		}
+			
+		String[] splits = getContext().getRequest().getRequestURL().toString().split("reviews/");
+		if (splits==null || splits.length<2){
+			reviewId = 0;
+		}
+		else{
+			String reviewString = splits[1];
+			if (reviewString.contains("?")){
+				reviewString = reviewString.split("?")[0];
+			}
+			
 			try {
-				reviewString = this.getContext().getRequest().getRequestURL().toString().split("reviews/")[1];
-				if (reviewString.contains("?")){
-					reviewString = reviewString.split("?")[0];
-				}
-				try {
-					reviewId = Integer.parseInt(reviewString);
-					if (reviewId > 0){
-						this.setHomeContext(false); // Do not show tabs and headers.
-						reviewView = true;
-					}
-				} catch (Exception ex){
-					addCautionMessage("Not correct review ID. Only numerical values allowed after /reviews/.");
+				reviewId = Integer.parseInt(reviewString);
+				if (reviewId > 0){
+					setHomeContext(false); // Do not show tabs and headers.
 					reviewView = true;
-					this.setHomeContext(false);
-					reviewId = 0;
 				}
-			} catch (Exception ex) {
-				// Meaning that the split didn't succeed because there is no ID following.
+			}
+			catch (Exception ex){
 				reviewId = 0;
+				reviewView = true;
+				setHomeContext(false);
+				addCautionMessage("Not correct review ID. Only numerical values allowed after /reviews/.");
 			}
 		}
 	}
 	
+	/**
+	 * 
+	 */
 	public void add() {
 		try {
 			reviewId = factory.getDao(HelperDAO.class).addReview(review, this.getUser());
 			addSystemMessage("Review successfully added.");
 		} catch (DAOException ex){
-			addWarningMessage("Error while adding a review. The review was not added.");
+			logger.error(ex);
+			addWarningMessage("System error while adding a review. The review was not added.");
 		}
 	}
 	
+	/**
+	 * 
+	 */
 	public void save() {
 		try {
 			factory.getDao(HelperDAO.class).saveReview(reviewId, review, this.getUser());
 			addSystemMessage("Review successfully saved.");
 		} catch (DAOException ex){
-			addWarningMessage("Error while saving the review. The review was not saved.");
+			logger.error(ex);
+			addWarningMessage("System error while saving the review. The review was not saved.");
 		}
 	}
 	
+	/**
+	 * @throws DAOException
+	 */
 	public void deleteReviews() throws DAOException{
 		if (this.getContext().getRequest().getParameter("delete") != null){
 			if (reviewIds != null && !reviewIds.isEmpty()) {
@@ -155,7 +175,8 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
 					}
 					addSystemMessage("Selected reviews were deleted.");
 				} catch (DAOException ex){
-					addWarningMessage("Error occured during review deletion.");
+					logger.error(ex);
+					addWarningMessage("System error occured during review deletion.");
 				}
 			} else {
 				addCautionMessage("No reviews selected for deletion.");
@@ -163,6 +184,9 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
 		}
 	}
 	
+	/**
+	 * @throws DAOException
+	 */
 	public void deleteSingleReview() throws DAOException{
 		if (this.getContext().getRequest().getParameter("deleteReview") != null){
 			try {
@@ -171,11 +195,15 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
 				addSystemMessage("Review #"+reviewId+" was deleted.");
 				reviewId = 0;
 			} catch (DAOException ex){
-				addWarningMessage("Error occured during review deletion.");
+				logger.error(ex);
+				addWarningMessage("System error occured during review deletion.");
 			}
 		}
 	}
 	
+	/**
+	 * 
+	 */
 	public void upload(){
 		try {
 			try {
@@ -184,10 +212,14 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
 				addSystemMessage(ioex.getMessage());
 			}
 		} catch (DAOException ex){
+			logger.error(ex);
 			addSystemMessage(ex.getMessage());
 		}
 	}
 	
+	/**
+	 * 
+	 */
 	public void deleteAttachments(){
 		try {
 			if (attachmentList != null && attachmentList.size()>0){
@@ -196,19 +228,30 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
 				}
 			}
 		} catch (DAOException ex){
+			logger.error(ex);
 			addCautionMessage(ex.getMessage());
 		}
 	}
 	
+	/**
+	 * @return
+	 */
 	public List<String> getRaportsListing() {
 		return raportsListing;
 	}
 
+	/**
+	 * @param raportsListing
+	 */
 	public void setRaportsListing(List<String> raportsListing) {
 		this.raportsListing = raportsListing;
 	}
 
+	/**
+	 * @return
+	 */
 	public ReviewDTO getReview() {
+		
 		if (reviewView){
 			try {
 				review = DAOFactory.get().getDao(HelperDAO.class).getReview(new CRUser(getAttemptedUserName()), reviewId);
@@ -219,13 +262,18 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
 					// Load attachments list only when it is needed - viewing a review.
 					review.setAttachments(DAOFactory.get().getDao(HelperDAO.class).getReviewAttachmentList(new CRUser(getAttemptedUserName()), reviewId));
 				}
-			} catch (Exception ex){
 			}
-		} else {
+			catch (DAOException ex){
+				logger.error("Error when getting review", ex);
+			}
 		}
+		
 		return review;
 	}
 	
+	/**
+	 * @return
+	 */
 	public String getReviewContentHTML(){
 		if (review.getReviewContent() != null){
 			return review.getReviewContent().replace("&", "&amp;").replace("<", "&lt;").replace("\r\n", "<br/>").replace("\n", "<br/>");
@@ -234,6 +282,9 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
 		}
 	}
 
+	/**
+	 * @return
+	 */
 	public String getReviewContentForm(){
 		if (review.getReviewContent() != null){
 			return review.getReviewContent();
@@ -242,6 +293,9 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
 		}
 	}
 	
+	/**
+	 * @return
+	 */
 	public boolean isReviewContentPresent(){
 		if (review.getReviewContent() != null && review.getReviewContent().length()>0){
 			if (review.getReviewContent().replace(" ", "").length()>0) {
@@ -254,19 +308,31 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
 		}
 	}
 	
+	/**
+	 * @param review
+	 */
 	public void setReview(ReviewDTO review) {
 		review.setReviewContentType("text/plain");
 		this.review = review;
 	}
 
+	/**
+	 * @return
+	 */
 	public boolean isTestvar() {
 		return testvar;
 	}
 
+	/**
+	 * @param testvar
+	 */
 	public void setTestvar(boolean testvar) {
 		this.testvar = testvar;
 	}
 
+	/**
+	 * @return
+	 */
 	public List<ReviewDTO> getReviews() {
 		try {
 			return DAOFactory.get().getDao(HelperDAO.class).getReviewList(this.getUser());
@@ -275,46 +341,79 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
 		}
 	}
 
+	/**
+	 * @param reviews
+	 */
 	public void setReviews(List<ReviewDTO> reviews) {
 		this.reviews = reviews;
 	}
 
+	/**
+	 * @return
+	 */
 	public List<Integer> getReviewIds() {
 		return reviewIds;
 	}
 
+	/**
+	 * @param reviewIds
+	 */
 	public void setReviewIds(List<Integer> reviewIds) {
 		this.reviewIds = reviewIds;
 	}
 
+	/**
+	 * @return
+	 */
 	public int getReviewId() {
 		return reviewId;
 	}
 
+	/**
+	 * @param reviewId
+	 */
 	public void setReviewId(int reviewId) {
 		this.reviewId = reviewId;
 	}
 
+	/**
+	 * @return
+	 */
 	public boolean isReviewView() {
 		return reviewView;
 	}
 
+	/**
+	 * @param reviewView
+	 */
 	public void setReviewView(boolean reviewView) {
 		this.reviewView = reviewView;
 	}
 
+	/**
+	 * @return
+	 */
 	public FileBean getAttachment() {
 		return attachment;
 	}
 
+	/**
+	 * @param attachment
+	 */
 	public void setAttachment(FileBean attachment) {
 		this.attachment = attachment;
 	}
 
+	/**
+	 * @return
+	 */
 	public List<String> getAttachmentList() {
 		return attachmentList;
 	}
 
+	/**
+	 * @param attachmentList
+	 */
 	public void setAttachmentList(List<String> attachmentList) {
 		this.attachmentList = attachmentList;
 	}

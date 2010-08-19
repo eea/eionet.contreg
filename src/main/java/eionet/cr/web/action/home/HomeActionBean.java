@@ -1,28 +1,34 @@
+/*
+* The contents of this file are subject to the Mozilla Public
+* 
+* License Version 1.1 (the "License"); you may not use this file
+* except in compliance with the License. You may obtain a copy of
+* the License at http://www.mozilla.org/MPL/
+* 
+* Software distributed under the License is distributed on an "AS
+* IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+* implied. See the License for the specific language governing
+* rights and limitations under the License.
+* 
+* The Original Code is Content Registry 2.0.
+* 
+* The Initial Owner of the Original Code is European Environment
+* Agency. Portions created by Tieto Eesti are Copyright
+* (C) European Environment Agency. All Rights Reserved.
+* 
+* Contributor(s):
+* Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.web.action.home;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
-import eionet.cr.common.Predicates;
-import eionet.cr.common.Subjects;
-import eionet.cr.dao.DAOException;
-import eionet.cr.dao.DAOFactory;
-import eionet.cr.dao.HelperDAO;
-import eionet.cr.dto.TripleDTO;
-import eionet.cr.dto.UserBookmarkDTO;
-import eionet.cr.dto.UserHistoryDTO;
+
+import org.apache.commons.lang.StringUtils;
+
+import eionet.cr.common.CRRuntimeException;
 import eionet.cr.web.action.AbstractActionBean;
-import eionet.cr.web.security.BadUserHomeUrlException;
-import eionet.cr.web.security.CRUser;
-import eionet.cr.web.util.UserHomeUrlExtractor;
-import eionet.cr.web.util.columns.SearchResultColumn;
-import eionet.cr.web.util.columns.SubjectPredicateColumn;
 
 /**
  * 
@@ -31,5 +37,20 @@ import eionet.cr.web.util.columns.SubjectPredicateColumn;
  */
 
 @UrlBinding("/home/{username}")
-public class HomeActionBean extends WorkspaceActionBean{
+public class HomeActionBean extends AbstractActionBean{
+
+	/**
+	 * 
+	 * @return
+	 */
+	@DefaultHandler
+	public Resolution noEvent(){
+		
+		String username = getContext().getRequest().getParameter("username");
+		if (StringUtils.isBlank(username)){
+			throw new CRRuntimeException("Could not detect username from request parameters");
+		}
+		
+		return new RedirectResolution("/home/" + username + "/uploads");
+	}
 }

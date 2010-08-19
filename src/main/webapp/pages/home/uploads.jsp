@@ -7,7 +7,7 @@
 		<li><a href="#">Operations</a>
 			<ul>
 				<li>
-					<stripes:link href="${actionBean.baseHomeUrl}${actionBean.attemptedUserName}">Upload RDF file</stripes:link>
+					<stripes:link href="${actionBean.baseHomeUrl}${actionBean.attemptedUserName}/uploads?uploadContentFile=">Upload content file</stripes:link>
 				</li>
 				<li>
 					<stripes:link class="link-plain" href="${actionBean.baseHomeUrl}${actionBean.attemptedUserName}">

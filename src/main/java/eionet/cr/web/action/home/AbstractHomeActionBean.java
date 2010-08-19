@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
+
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.web.action.AbstractActionBean;
@@ -23,7 +25,7 @@ public abstract class AbstractHomeActionBean extends AbstractActionBean {
 	
 	protected static final String TYPE_BOOKMARK = "bookmark";
 	protected static final String TYPE_HISTORY = "history";
-	protected static final String TYPE_WORKSPACE = "workspace";
+	protected static final String TYPE_UPLOADS = "uploads";
 	protected static final String TYPE_REGISTRATIONS = "registrations";
 	protected static final String TYPE_REVIEWS = "reviews";
 	
@@ -55,8 +57,8 @@ public abstract class AbstractHomeActionBean extends AbstractActionBean {
 		Map<String,String> tabType;
 
 		tabType = new HashMap<String,String>();
-		tabType.put("title", "Workspace");
-		tabType.put("tabType", "workspace");
+		tabType.put("title", "Uploads");
+		tabType.put("tabType", "uploads");
 		tabType.put("showPublic", SHOWPUBLIC_NO);
 		tabs.add(tabType);
 		
@@ -125,21 +127,22 @@ public abstract class AbstractHomeActionBean extends AbstractActionBean {
 			}
 		} else {
 			userAuthorized = false;
-			authenticationMessage = "User must be logged in to access his home";
+			authenticationMessage = "You must be logged in to access your home";
 		}
 		
-		baseHomeUrl = context.getRequest().getRequestURI().split(attemptedUserName)[0];
+		String s = context.getRequest().getRequestURI().split(attemptedUserName)[0];
+		baseHomeUrl = StringUtils.substringAfter(s, context.getRequest().getContextPath());
 	}
 
 	private void setDefaultSection(){
 		if (section == null ||
 			(!section.equals(TYPE_BOOKMARK)&&
-			!section.equals(TYPE_WORKSPACE)&&
+			!section.equals(TYPE_UPLOADS)&&
 			!section.equals(TYPE_HISTORY)&&
 			!section.equals(TYPE_REGISTRATIONS)&&
 			!section.equals(TYPE_REVIEWS))
 		){
-			section = TYPE_WORKSPACE;
+			section = TYPE_UPLOADS;
 		}
 	}
 	
@@ -149,7 +152,7 @@ public abstract class AbstractHomeActionBean extends AbstractActionBean {
 	public String getTabType() {
 		
 		if (tabType == null){
-			tabType = TYPE_WORKSPACE;
+			tabType = TYPE_UPLOADS;
 		}
 		
 		return tabType;

@@ -29,6 +29,7 @@ import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
+import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.HandlesEvent;
 import net.sourceforge.stripes.action.Resolution;
@@ -38,7 +39,7 @@ import net.sourceforge.stripes.controller.Interceptor;
 import net.sourceforge.stripes.controller.Intercepts;
 import net.sourceforge.stripes.controller.LifecycleStage;
 import eionet.cr.util.Util;
-import eionet.cr.web.action.home.HomeActionBean;
+import eionet.cr.web.action.home.AbstractHomeActionBean;
 import eionet.cr.web.interceptor.annotation.DontSaveLastActionEvent;
 import eionet.cr.web.util.UserHomeUrlExtractor;
 
@@ -58,7 +59,7 @@ public class ActionEventInterceptor implements Interceptor {
 	public Resolution intercept(ExecutionContext context) throws Exception {
 		Resolution resolution = null;
 		
-		Class<?> actionBeanClass = context.getActionBean().getClass();
+		ActionBean actionBean = context.getActionBean();
 		
 		Method eventMethod = context.getHandler();
 		
@@ -68,10 +69,10 @@ public class ActionEventInterceptor implements Interceptor {
 			HttpServletRequest request = context.getActionBean().getContext().getRequest(); 
 			String actionEventURL = null;
 			 
-			if (actionBeanClass.getName().equals(HomeActionBean.class.getName())){
+			if (actionBean instanceof AbstractHomeActionBean){
 				actionEventURL = "/home/"+UserHomeUrlExtractor.extractUserNameFromHomeUrl(request.getRequestURI());
 			} else {
-				actionEventURL = getActionName(actionBeanClass) + "?" + 
+				actionEventURL = getActionName(actionBean.getClass()) + "?" + 
 				((getEventName(eventMethod) != null) ? getEventName(eventMethod) + "=&" : "") + 
 				getRequestParameters(request);
 				
