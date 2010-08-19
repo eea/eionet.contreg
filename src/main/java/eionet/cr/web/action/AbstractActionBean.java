@@ -201,6 +201,14 @@ public abstract class AbstractActionBean implements ActionBean {
 
 	/**
 	 * 
+	 * @param simpleErrorMessage
+	 */
+	public void addGlobalValidationError(String simpleErrorMessage) {
+		context.getValidationErrors().addGlobalError(new SimpleError(simpleErrorMessage));
+	}
+
+	/**
+	 * 
 	 * @return
 	 */
 	public boolean hasValidationErrors() {

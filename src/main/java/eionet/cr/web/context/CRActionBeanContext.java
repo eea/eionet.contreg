@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import net.sourceforge.stripes.action.ActionBeanContext;
+import net.sourceforge.stripes.action.Resolution;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.security.EionetCASFilter;
@@ -43,7 +44,11 @@ import eionet.cr.web.security.EionetCASFilter;
  */
 public class CRActionBeanContext extends ActionBeanContext {
 	
+	/** */
 	private int severity;
+	
+	/** */
+	private Resolution sourcePageResolution;
 	
 	/**
 	 * Wrapper method for {@link ServletRequest#getParameter(String)}.
@@ -107,11 +112,39 @@ public class CRActionBeanContext extends ActionBeanContext {
 		return (String) getRequest().getSession().getAttribute(LAST_ACTION_URL_SESSION_ATTR);
 	}
 
+	/**
+	 * @return
+	 */
 	public int getSeverity() {
 		return severity;
 	}
 
+	/**
+	 * @param severity
+	 */
 	public void setSeverity(int severity) {
 		this.severity = severity;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see net.sourceforge.stripes.action.ActionBeanContext#getSourcePageResolution()
+	 */
+	public Resolution getSourcePageResolution(){
+		
+		if (this.sourcePageResolution!=null){
+			return this.sourcePageResolution;
+		}
+		else{
+			return super.getSourcePageResolution();
+		}
+	}
+
+	/**
+	 * 
+	 * @param resolution
+	 */
+	public void setSourcePageResolution(Resolution resolution){
+		this.sourcePageResolution = resolution;
 	}
 }
