@@ -161,26 +161,14 @@ public class PostgreSQLPersister implements IHarvestPersister{
 	 */
 	public void commit() throws PersisterException {
 		
+		// if no DB updates were made at all
+		if (connection==null){
+			return;
+		}
+		
 		try {
-			
-			// JH010610: clearing of previous harvests is now done just before inserting first triple
-			// (see openResources() method)
-			
-			// clear previous content if required (for example it's not required when push-harvest
-//			if (config.isClearPreviousContent()){
-//				
-//				logger.debug("Deleting SPO rows of previous harvests");
-//				
-//				StringBuffer buf = new StringBuffer("delete from SPO where SOURCE=");
-//				buf.append(sourceUrlHash).append(" and GEN_TIME<>").append(genTime);			
-//				SQLUtil.executeUpdate(buf.toString(), getConnection());
-//				
-//				buf = new StringBuffer("delete from SPO where OBJ_DERIV_SOURCE=");
-//				buf.append(sourceUrlHash).append(" and OBJ_DERIV_SOURCE_GEN_TIME<>").append(genTime);			
-//				SQLUtil.executeUpdate(buf.toString(), getConnection());
-//			}
 
-			// derive inferred triples, and extract new harvest sources 
+			// derive inferred triples 
 			PostgreSQLDerivationEngine derivEngine = new PostgreSQLDerivationEngine(
 					sourceUrl, sourceUrlHash, genTime, connection);
 			if (config.isDeriveInferredTriples()){
@@ -189,6 +177,8 @@ public class PostgreSQLPersister implements IHarvestPersister{
 				derivEngine.deriveParentProperties();
 				derivEngine.deriveLabels();
 			}
+			
+			// extract new harvest sources
 			derivEngine.extractNewHarvestSources();
 			
 			// lower the "unfinished-harvest" flag
@@ -208,11 +198,13 @@ public class PostgreSQLPersister implements IHarvestPersister{
 	 */
 	public void rollback() throws PersisterException {
 
-		try {
-			connection.rollback();
-		}
-		catch (SQLException e1) {
-			throw new PersisterException(e1.getMessage(), e1);
+		if (connection!=null){
+			try {
+				connection.rollback();
+			}
+			catch (SQLException e) {
+				throw new PersisterException(e.getMessage(), e);
+			}
 		}
 	}
 

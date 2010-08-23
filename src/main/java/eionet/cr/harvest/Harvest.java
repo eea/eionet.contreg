@@ -24,11 +24,13 @@ import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xml.sax.SAXException;
 
 import com.hp.hpl.jena.rdf.arp.ARP;
 
@@ -96,6 +98,10 @@ public abstract class Harvest {
 	/** */
 	protected DAOFactory daoFactory = DAOFactory.get();
 	
+	/** */
+	protected static SimpleDateFormat lastRefreshedDateFormat =
+		new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+
 	/**
 	 * 
 	 * @param sourceUrlString
@@ -143,15 +149,25 @@ public abstract class Harvest {
 	 * @throws HarvestException
 	 */
 	protected abstract void doExecute() throws HarvestException;
+	
+	/**
+	 * 
+	 * @param arpSource
+	 * @throws HarvestException
+	 */
+	protected void harvest(ARPSource arpSource) throws HarvestException{
+		harvest(arpSource, false);
+	}
 
 	/**
 	 * Harvest the given ARPSource.
 	 * The caller is responsible for closing the resources that the given ARPSource uses.
 	 * 
 	 * @param arpSource
+	 * @param ignoreParsingError
 	 * @throws HarvestException
 	 */
-	protected void harvest(ARPSource arpSource) throws HarvestException{
+	protected void harvest(ARPSource arpSource, boolean ignoreParsingError) throws HarvestException{
 		
 		RDFHandler rdfHandler = null;
 		try{
@@ -170,13 +186,28 @@ public abstract class Harvest {
 				ARP arp = new ARP();
 		        arp.setStatementHandler(rdfHandler);
 		        arp.setErrorHandler(errorHandler);
-		        arpSource.load(arp, sourceUrlString);
+		        
+		        if (!ignoreParsingError){
+		        	arpSource.load(arp, sourceUrlString);
+		        }
+		        else{
+		        	try{
+		        		arpSource.load(arp, sourceUrlString);
+		        	}
+		        	catch (SAXException e){
+		        		logger.info("Following exception happened when parsing as RDF", e);
+		        	}
+		        }
 			}
-			else if (sourceMetadata.getPredicateCount()>0){
-				logger.debug("No content to harvest, but storing triples *about* the source");
+			else {
+				logger.debug("No structured content to harvest");
 			}
-
-			rdfHandler.addSourceMetadata(sourceMetadata);
+			
+			if (sourceMetadata.getPredicateCount()>0){
+				logger.debug("Storing auto-generated triples for the source");
+				rdfHandler.addSourceMetadata(sourceMetadata);
+			}
+			
 	        rdfHandler.endOfFile();
 	        
 	        if (errorHandler.getSaxError()!=null)

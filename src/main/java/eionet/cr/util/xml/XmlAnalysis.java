@@ -31,6 +31,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import net.sourceforge.stripes.action.FileBean;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xml.sax.Attributes;
@@ -75,12 +77,31 @@ public class XmlAnalysis {
 		}
 		finally{
 			try{
-				if (inputStream!=null) inputStream.close();
+				if (inputStream!=null){
+					inputStream.close();
+				}
 			}
 			catch (IOException e){}
 		}
 	}
-	
+
+	public void parse(FileBean fileBean) throws ParserConfigurationException, SAXException, IOException{
+		
+		InputStream inputStream = null;
+		try{
+			inputStream = fileBean.getInputStream();
+			parse(inputStream);
+		}
+		finally{
+			try{
+				if (inputStream!=null){
+					inputStream.close();
+				}
+			}
+			catch (IOException e){}
+		}
+	}
+
 	/**
 	 * 
 	 * @param inputStream

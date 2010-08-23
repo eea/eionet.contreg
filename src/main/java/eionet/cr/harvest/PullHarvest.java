@@ -96,10 +96,6 @@ public class PullHarvest extends Harvest{
 	 * */
 	private boolean recursiveHarvestDisabled = false;
 	
-	/** */
-	private static SimpleDateFormat lastRefreshedDateFormat =
-		new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-
 	/**
 	 * 
 	 * @param sourceUrlString
@@ -439,9 +435,7 @@ public class PullHarvest extends Harvest{
 		// remember the file's absolute path, so we can later detect if a new file was created during the pre-processing
 		String originalPath = file.getAbsolutePath();
 		
-		
 		// Testing whether the input file is zipped. If true, it is uncompressed and used as original source file.
-		
 		File unGZipped = unCompressGZip(file);
 		if (unGZipped != null){
 			file = unGZipped;
@@ -450,17 +444,18 @@ public class PullHarvest extends Harvest{
 			file = null;
 		}
 		
+		ARPSource arpSource = null;
 		InputStream inputStream = null;
 		try{
-			
-			ARPSource arpSource = null;
-			
-			/* pre-process the file; if it's still valid then open input stream and create ARP source object */
-			/* (the file may not exist, if content type was unsupported or other reasons (see caller)*/
+			// Pre-process the file. If it's still valid then open input stream
+			// and create ARP source object. Tthe file may not exist,
+			// if content type was unsupported or other reasons (see caller)
 			if (file!=null && file.exists()){
+				
 				try{
-					if ((file=preProcess(file, contentType))!=null){
-						
+					file = preProcess(file, contentType);
+					if (file!=null){
+
 						inputStream = new FileInputStream(file);
 						arpSource = new InputStreamBasedARPSource(inputStream);
 					}
@@ -469,11 +464,10 @@ public class PullHarvest extends Harvest{
 					throw new HarvestException(e.toString(), e);
 				}
 			}
-
+			
 			harvest(arpSource);
 		}
 		finally{
-			
 			// close input stream
 			if (inputStream!=null){
 				try{ inputStream.close(); } catch (Exception e){ logger.error(e.toString(), e);}
@@ -515,6 +509,8 @@ public class PullHarvest extends Harvest{
 			return file;
 		}
 
+		// if conversion ID not yet detected by caller, detect it here by parsing the
+		// file as XML
 		String conversionId = convParser==null ? null : convParser.getRdfConversionId();
 		if (StringUtils.isBlank(conversionId)){
 			
@@ -538,7 +534,8 @@ public class PullHarvest extends Harvest{
 				schemaOrDtd = xmlAnalysis.getStartElemUri();
 			}
 			
-			// if this file has a conversion to RDF, run it and return the reference to the resulting file
+			// if schema or DTD found, and it's not rdf:DRF, then get its RDF conversion ID,
+			// otherwise assume the file is RDF and return
 			if (schemaOrDtd!=null && schemaOrDtd.length()>0
 					&& !schemaOrDtd.equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#RDF")){
 				
@@ -554,6 +551,7 @@ public class PullHarvest extends Harvest{
 			}
 		}
 		
+		// if conversion ID detected, run it
 		if (!StringUtils.isBlank(conversionId)){
 			
 			logger.debug("Going to run RDF conversion");

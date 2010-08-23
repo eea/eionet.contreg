@@ -1,11 +1,15 @@
 package eionet.cr.web.action.home;
 
+import java.io.IOException;
+
 import org.apache.commons.lang.StringUtils;
 
 import com.sun.corba.se.spi.legacy.connection.GetEndPointInfoAgainException;
 
 import eionet.cr.common.CRRuntimeException;
 import eionet.cr.dao.DAOException;
+import eionet.cr.harvest.HarvestException;
+import eionet.cr.harvest.UploadHarvest;
 import net.sourceforge.stripes.action.Before;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.FileBean;
@@ -51,11 +55,46 @@ public class UploadsActionBean extends AbstractHomeActionBean {
 		
 		Resolution resolution = new ForwardResolution("/pages/home/addUpload.jsp");
 		if (isPostRequest()){
+
+			logger.debug("Uploaded file: " + uploadedFile);
 			
+			if (uploadedFile!=null){
+				
+				String sourceUri = getUser().getHomeUri() + uploadedFile.getFileName();
+				logger.debug("Uploaded file's pseudo-source: " + sourceUri);
+				
+				try {
+					UploadHarvest uploadHarvest = new UploadHarvest(sourceUri, uploadedFile);
+					uploadHarvest.execute();
+				}
+				catch (HarvestException e) {
+					logger.info("Exception when trying to harvest uploaded file content", e);
+				}
+
+				// delete uploaded file now that the parsing has been done
+				deleteUploadedFile();
+			}
 			resolution = new ForwardResolution("/pages/home/uploads.jsp");
 		}
 		
 		return resolution;
+	}
+	
+	/**
+	 * 
+	 */
+	private void deleteUploadedFile(){
+		
+		// double check for null, even though this method should only be called
+		// when the file object IS NOT null
+		if (uploadedFile!=null){
+			try{
+				uploadedFile.delete();
+			}
+			catch (IOException ioe){
+				logger.error("Failed to delete the temporarily saved uploaded file", ioe);
+			}
+		}
 	}
 	
 	/**
@@ -90,7 +129,7 @@ public class UploadsActionBean extends AbstractHomeActionBean {
 		}
 		
 		// for all the above POST events, user must be authorized
-		if (!isUserAuthorized()){
+		if (!isUserAuthorized() || getUser()==null){
 			addGlobalValidationError("User not logged in!");
 			return;
 		}

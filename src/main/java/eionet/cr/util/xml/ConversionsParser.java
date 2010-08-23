@@ -169,6 +169,25 @@ public class ConversionsParser {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param schemaUri
+	 * @return
+	 * @throws ParserConfigurationException 
+	 * @throws SAXException 
+	 * @throws IOException 
+	 */
+	public static String getRdfConversionId(String schemaUri) throws IOException, SAXException, ParserConfigurationException{
+		
+		ConversionsParser convParser = ConversionsParser.parseForSchema(schemaUri);
+		if (convParser!=null){
+			return convParser.getRdfConversionId();
+		}
+		else{
+			return null;
+		}
+	}
+	
 
 	/**
 	 * @return the rdfConversionId
