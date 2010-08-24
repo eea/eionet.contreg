@@ -33,16 +33,8 @@ public class SubjectDTOOptimizerTest extends CRDatabaseTestCase {
 	public void testOptimizer(){
 
 		try {
-			// Alias for> 
 			String uri = "http://www.eionet.europa.eu/gemet/concept/7697";
-			//String uri = "http://www.eionet.europa.eu/gemet/concept?ns=1&cp=7697";
-			
-			HarvestSourceDTO newSource = new HarvestSourceDTO();
-			newSource.setUrl(uri);
-			newSource.setIntervalMinutes(100);
-			
-			DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(newSource, "test");
-
+			DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(uri, 100, false, null);
 			
 			URL url = new URL(uri);
 			Harvest harvest = new PullHarvest(url.toString(), null);

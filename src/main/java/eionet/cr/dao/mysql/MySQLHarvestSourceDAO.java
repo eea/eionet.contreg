@@ -191,20 +191,19 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 	private static final String addSourceIgnoreSQL = "insert ignore into HARVEST_SOURCE (URL,URL_HASH,EMAILS,TIME_CREATED,INTERVAL_MINUTES,TRACKED_FILE) VALUES (?,?,?,NOW(),?,?)";
 
 	/*
-     * (non-Javadoc)
-     * 
-     * @see eionet.cr.dao.HarvestSourceDao#addSource()
-     */
-    public Integer addSource(HarvestSourceDTO source, String user) throws DAOException {
-    	return addSource(addSourceSQL, source, user);
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HarvestSourceDAO#addSource(java.lang.String, int, boolean, java.lang.String)
+	 */
+    public Integer addSource(String url, int intervalMinutes, boolean trackedFile, String emails) throws DAOException {
+    	return addSource(addSourceSQL, url, intervalMinutes, trackedFile, emails);
     }
 
     /*
      * (non-Javadoc)
-     * @see eionet.cr.dao.HarvestSourceDAO#addSourceIgnoreDuplicate(eionet.cr.dto.HarvestSourceDTO, java.lang.String)
+     * @see eionet.cr.dao.HarvestSourceDAO#addSourceIgnoreDuplicate(java.lang.String, int, boolean, java.lang.String)
      */
-	public void addSourceIgnoreDuplicate(HarvestSourceDTO source, String user) throws DAOException {
-		addSource(addSourceIgnoreSQL, source, user);
+	public void addSourceIgnoreDuplicate(String url, int intervalMinutes, boolean trackedFile, String emails) throws DAOException {
+		addSource(addSourceIgnoreSQL, url, intervalMinutes, trackedFile, emails);
 	}
 
 	/**
@@ -215,28 +214,27 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 	 * @return
 	 * @throws DAOException 
 	 */
-	private Integer addSource(String sql, HarvestSourceDTO source, String user) throws DAOException{
-		
-		Integer harvestSourceID = null;
-    	
-		String url = source.getUrl();
-		if (url!=null){
-			url = StringUtils.substringBefore(url, "#"); // harvest sources where URL has fragment part, are not allowed
+	private Integer addSource(String sql, String url, int intervalMinutes, boolean trackedFile, String emails) throws DAOException{
+
+		if (StringUtils.isBlank(url)){
+			throw new IllegalArgumentException("url must not be blank");
 		}
+		
+		// harvest sources where URL has fragment part, are not allowed
+		url = StringUtils.substringBefore(url, "#");
 		
     	List<Object> values = new ArrayList<Object>();
 		values.add(url);
 		values.add(Hashes.spoHash(url));
-		values.add(source.getEmails());
-		values.add(source.getIntervalMinutes());
-		values.add(YesNoBoolean.format(source.isTrackedFile()));
+		values.add(emails);
+		values.add(intervalMinutes);
+		values.add(YesNoBoolean.format(trackedFile));
 		
 		Connection conn = null;
 		try{
 			conn = getConnection();
 			SQLUtil.executeUpdate(sql, values, conn);
-			harvestSourceID = getLastInsertID(conn);
-			return harvestSourceID;
+			return getLastInsertID(conn);
 		}
 		catch (Exception e){
 			throw new DAOException(e.getMessage(), e);

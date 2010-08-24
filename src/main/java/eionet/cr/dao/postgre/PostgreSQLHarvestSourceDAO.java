@@ -185,27 +185,26 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
 	private static final String addSourceSQL = "insert into HARVEST_SOURCE" +
 			" (URL,URL_HASH,EMAILS,TIME_CREATED,INTERVAL_MINUTES,TRACKED_FILE)" +
 			" VALUES (?,?,?,NOW(),?,cast(? as ynboolean))";
-    /*
-     * (non-Javadoc)
-     * @see eionet.cr.dao.HarvestSourceDAO#addSource(eionet.cr.dto.HarvestSourceDTO, java.lang.String)
-     */
-	public Integer addSource(HarvestSourceDTO source, String user) throws DAOException {
-		
-		Integer harvestSourceID = null;
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HarvestSourceDAO#addSource(java.lang.String, int, boolean, java.lang.String)
+	 */
+	public Integer addSource(String url, int intervalMinutes, boolean trackedFile, String emails) throws DAOException {
 
-		long urlHash = 0;
-		String url = source.getUrl();
-		if (url!=null){
-			url = StringUtils.substringBefore(url, "#"); // harvest sources where URL has fragment part, are not allowed
-			urlHash = Hashes.spoHash(url);
+		if (StringUtils.isBlank(url)){
+			throw new IllegalArgumentException("url must not be null");
 		}
+		
+		// harvest sources where URL has fragment part, are not allowed
+		url = StringUtils.substringBefore(url, "#");
+		long urlHash = Hashes.spoHash(url);
 		
     	List<Object> values = new ArrayList<Object>();
 		values.add(url);
 		values.add(Long.valueOf(urlHash));
-		values.add(source.getEmails());
-		values.add(source.getIntervalMinutes());
-		values.add(YesNoBoolean.format(source.isTrackedFile()));
+		values.add(emails);
+		values.add(Integer.valueOf(intervalMinutes));
+		values.add(YesNoBoolean.format(trackedFile));
 		
 		Connection conn = null;
 		try{
@@ -233,14 +232,14 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
 
 	/*
 	 * (non-Javadoc)
-	 * @see eionet.cr.dao.HarvestSourceDAO#addSourceIgnoreDuplicate(eionet.cr.dto.HarvestSourceDTO, java.lang.String)
+	 * @see eionet.cr.dao.HarvestSourceDAO#addSourceIgnoreDuplicate(java.lang.String, int, boolean, java.lang.String)
 	 */
-	public void addSourceIgnoreDuplicate(HarvestSourceDTO source, String user) throws DAOException{
+	public void addSourceIgnoreDuplicate(String url, int intervalMinutes, boolean trackedFile, String emails) throws DAOException{
 		
 		// JH160210 - in PostgreSQL schema we assume there is a rule created that does nothing if
 		// duplicate source added. We lose the ability to notify user if she's trying to add
 		// a source that already exists, but for the time being we can live with that.
-		addSource(source, user);
+		addSource(url, intervalMinutes, trackedFile, emails);
 	}
 
 	/*

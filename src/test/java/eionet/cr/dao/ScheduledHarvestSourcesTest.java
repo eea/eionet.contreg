@@ -43,29 +43,10 @@ public class ScheduledHarvestSourcesTest extends CRDatabaseTestCase{
 		
 		HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
 		
-		HarvestSourceDTO harvestSource = new HarvestSourceDTO();
-		harvestSource.setUrl("http://url.ee/id/1");
-		harvestSource.setEmails("bob@europe.eu");
-		harvestSource.setIntervalMinutes(new Integer(5));
-		dao.addSource(harvestSource, "bobsmith");
-		
-		harvestSource = new HarvestSourceDTO();
-		harvestSource.setUrl("http://url.ee/id/2");
-		harvestSource.setEmails("bob@europe.eu");
-		harvestSource.setIntervalMinutes(new Integer(10));
-		dao.addSource(harvestSource, "bobsmith");
-		
-		harvestSource = new HarvestSourceDTO();
-		harvestSource.setUrl("http://url.ee/id/3");
-		harvestSource.setEmails("bob@europe.eu");
-		harvestSource.setIntervalMinutes(new Integer(15));
-		dao.addSource(harvestSource, "bobsmith");
-
-		harvestSource = new HarvestSourceDTO();
-		harvestSource.setUrl("http://url.ee/id/4");
-		harvestSource.setEmails("bob@europe.eu");
-		harvestSource.setIntervalMinutes(new Integer(20));
-		dao.addSource(harvestSource, "bobsmith");
+		dao.addSource("http://url.ee/id/1", 5, false, "bob@europe.eu");
+		dao.addSource("http://url.ee/id/2", 10, false, "bob@europe.eu");
+		dao.addSource("http://url.ee/id/3", 15, false, "bob@europe.eu");
+		dao.addSource("http://url.ee/id/4", 20, false, "bob@europe.eu");
 
 		List<HarvestSourceDTO> dtos = dao.getNextScheduledSources(1);
 		assertNotNull(dtos);

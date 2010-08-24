@@ -325,8 +325,13 @@ public class PullHarvest extends Harvest{
 					directedSource.setTrackedFile(true);
 					directedSource.setIntervalMinutes(originalSource.getIntervalMinutes());
 					directedSource.setUrl(current.getSourceURL());
+					
 					Integer sourceId = DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(
-							directedSource, null);
+							directedSource.getUrl(),
+							directedSource.getIntervalMinutes(),
+							directedSource.isTrackedFile(),
+							null);
+					
 					directedSource.setSourceId(sourceId.intValue());
 				}
 				

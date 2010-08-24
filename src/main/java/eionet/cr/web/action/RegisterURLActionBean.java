@@ -82,21 +82,18 @@ public class RegisterURLActionBean extends AbstractActionBean{
 		// register URL
 		factory.getDao(HelperDAO.class).registerUserUrl(getUser(), url, bookmark);
 		
+		String _url = StringUtils.substringBefore(url, "#");
+		Integer intervalMinutes = Integer.valueOf(
+				GeneralConfig.getProperty(GeneralConfig.HARVESTER_REFERRALS_INTERVAL,
+						String.valueOf(HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL)));
+
 		// add the URL into HARVEST_SOURCE
 		// (the dao is responsible for handling if HARVEST_SOURCE already has such a URL)
-		
-		HarvestSourceDTO harvestSource = new HarvestSourceDTO();
-		harvestSource.setUrl(StringUtils.substringBefore(url, "#"));
-		harvestSource.setIntervalMinutes(
-				Integer.valueOf(
-						GeneralConfig.getProperty(GeneralConfig.HARVESTER_REFERRALS_INTERVAL,
-								String.valueOf(HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL))));
-		harvestSource.setTrackedFile(true);
 		DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(
-				harvestSource, getUser().getUserName());
+				_url, intervalMinutes, true, null);
 		
 		// schedule urgent harvest
-		UrgentHarvestQueue.addPullHarvest(harvestSource.getUrl());
+		UrgentHarvestQueue.addPullHarvest(_url);
 		
 		// go to factsheet in edit mode
 		return new RedirectResolution(FactsheetActionBean.class, "edit").addParameter("uri", url);

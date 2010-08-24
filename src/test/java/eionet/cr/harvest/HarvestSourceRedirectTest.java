@@ -35,16 +35,10 @@ public class HarvestSourceRedirectTest extends CRDatabaseTestCase {
 		try {
 
 			String url = "http://localhost:8080/url-redirect-testcase/url1.jsp";
-			
-			HarvestSourceDTO harvestSource = new HarvestSourceDTO();
-			harvestSource = new HarvestSourceDTO();
-			harvestSource.setUrl(url);
-			harvestSource.setEmails("bob@europe.eu");
-			harvestSource.setIntervalMinutes(200);
 			try {
-				DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(harvestSource, "bobsmith");
-			} catch (DAOException ex){
-				
+				DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(url, 200, false, "bob@europe.eu");
+			}
+			catch (DAOException ex){
 			}
 			
 			PullHarvest harvest = new PullHarvest(url, null);
@@ -96,9 +90,9 @@ public class HarvestSourceRedirectTest extends CRDatabaseTestCase {
 			harvestSource.setEmails("bob@europe.eu");
 			harvestSource.setIntervalMinutes(200);
 			try {
-				DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(harvestSource, "bobsmith");
-			} catch (DAOException ex){
-				
+				DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(url, 200, false, "bob@europe.eu");
+			}
+			catch (DAOException ex){
 			}
 			
 			PullHarvest harvest = new PullHarvest(url, null);

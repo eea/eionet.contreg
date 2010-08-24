@@ -289,7 +289,10 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 				harvestSource = new HarvestSourceDTO();
 				harvestSource.setUrl(url);
 				harvestSource.setTrackedFile(false);
-				sourceId = harvestSourceDAO.addSource(harvestSource, CRUser.application.getUserName());
+				
+				sourceId = harvestSourceDAO.addSource(harvestSource.getUrl(),
+						harvestSource.getIntervalMinutes(),
+						harvestSource.isTrackedFile(), harvestSource.getEmails());
 			}
 			else{
 				sourceId = harvestSource.getSourceId();

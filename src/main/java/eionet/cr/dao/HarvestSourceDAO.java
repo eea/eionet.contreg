@@ -76,18 +76,27 @@ public interface HarvestSourceDAO extends DAO{
      * @throws DAOException
      */
     public HarvestSourceDTO getHarvestSourceByUrl(String url) throws DAOException;
-    
-    /**
-     * @throws DAOException
-     * @param HarvestSourceDTO source
-     */
-    public Integer addSource(HarvestSourceDTO source, String user) throws DAOException;
 
     /**
+     * 
+     * @param url
+     * @param intervalMinutes
+     * @param trackedFile
+     * @param emails
+     * @return
      * @throws DAOException
-     * @param HarvestSourceDTO source
      */
-    public void addSourceIgnoreDuplicate(HarvestSourceDTO source, String user) throws DAOException;
+    public Integer addSource(String url, int intervalMinutes, boolean trackedFile, String emails) throws DAOException;
+
+    /**
+     * 
+     * @param url
+     * @param intervalMinutes
+     * @param trackedFile
+     * @param emails
+     * @throws DAOException
+     */
+    public void addSourceIgnoreDuplicate(String url, int intervalMinutes, boolean trackedFile, String emails) throws DAOException;
 
     /**
      * @throws DAOException

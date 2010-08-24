@@ -56,6 +56,7 @@ public class GeneralConfig {
 	/** */
 	public static final String XMLCONV_LIST_CONVERSIONS_URL = "xmlconv.listConversions.url";
 	public static final String XMLCONV_CONVERT_URL = "xmlconv.convert.url";
+	public static final String XMLCONV_CONVERT_PUSH_URL = "xmlconv.convertPush.url";
 	public static final String XMLCONV_XSL_URL = "xmlconv.xsl.url";
 	
 	/** */

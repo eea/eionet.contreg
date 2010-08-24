@@ -80,15 +80,11 @@ public class HarvestMessageDAOTest extends CRDatabaseTestCase {
 	@Test
 	public void testInsertSource() throws Exception {
 		
-		HarvestSourceDTO dto = new HarvestSourceDTO();
-		dto.setUrl("http://1.ee");
-		dto.setEmails("emails");
-		dto.setIntervalMinutes(1);
-		dto.setTrackedFile(true);
-		
-		Integer id = DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(dto, "user");
+		Integer id = DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(
+				"http://1.ee", 1, true, "emails");
 		assertNotNull(id);
 		
-		DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(dto, "user");
+		DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(
+				"http://1.ee", 1, true, "emails");
 	}
 }

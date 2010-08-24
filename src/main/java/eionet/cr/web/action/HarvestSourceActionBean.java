@@ -187,7 +187,11 @@ public class HarvestSourceActionBean extends AbstractActionBean {
 				if (validateAddEdit()){
 				
 					// create new harvest source
-					factory.getDao(HarvestSourceDAO.class).addSource(getHarvestSource(), getUserName());
+					HarvestSourceDTO hSourceDTO = getHarvestSource();
+					factory.getDao(HarvestSourceDAO.class).addSource(hSourceDTO.getUrl(),
+							hSourceDTO.getIntervalMinutes(),
+							hSourceDTO.isTrackedFile(),
+							hSourceDTO.getEmails());
 
 					// set up the resolution
 					resolution = new ForwardResolution(HarvestSourcesActionBean.class);

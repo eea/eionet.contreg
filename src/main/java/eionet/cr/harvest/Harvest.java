@@ -199,8 +199,10 @@ public abstract class Harvest {
 		        	}
 		        }
 			}
-			else {
-				logger.debug("No structured content to harvest");
+			
+			rdfContentFound = rdfHandler.isRdfContentFound();
+			if (rdfContentFound==false){
+				logger.debug("No content found by RDF parser");
 			}
 			
 			if (sourceMetadata.getPredicateCount()>0){

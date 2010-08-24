@@ -209,7 +209,8 @@ public class FactsheetActionBean extends AbstractActionBean{
 						GeneralConfig.HARVESTER_REFERRALS_INTERVAL,
 								String.valueOf(HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL))));
 				dto.setTrackedFile(true);
-				dao.addSourceIgnoreDuplicate(dto, getUserName());
+				dao.addSourceIgnoreDuplicate(dto.getUrl(), dto.getIntervalMinutes(),
+						dto.isTrackedFile(), dto.getEmails());
 				
 				/* issue an instant harvest of this url */
 				
