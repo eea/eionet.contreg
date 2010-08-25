@@ -159,7 +159,7 @@ public class UploadHarvest extends Harvest{
 					inputStream = new FileInputStream(convertedFile);
 				}
 				else{
-					logger.debug("No conversion made, uploaded file will be harvested as it is");
+					logger.debug("No conversion made, will harvest the file as it is");
 					inputStream = fileBean.getInputStream();
 				}
 				

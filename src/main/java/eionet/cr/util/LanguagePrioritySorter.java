@@ -1,4 +1,4 @@
-package eionet.cr.dto;
+package eionet.cr.util;
 
 public class LanguagePrioritySorter  implements Comparable<LanguagePrioritySorter> {
 

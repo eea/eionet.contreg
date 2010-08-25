@@ -37,6 +37,7 @@ import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.ReviewDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.dto.TripleDTO;
+import eionet.cr.dto.UploadDTO;
 import eionet.cr.dto.UserBookmarkDTO;
 import eionet.cr.dto.UserHistoryDTO;
 import eionet.cr.harvest.statistics.dto.HarvestUrgencyScoreDTO;
@@ -927,10 +928,20 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 		throw new UnsupportedOperationException("Method not implemented");
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#loadAttachment(java.lang.String)
+	 */
 	public DownloadFileDTO loadAttachment(String attachmentUri) throws DAOException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("Method not implemented");
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#getUserUploads(eionet.cr.web.security.CRUser)
+	 */
+	public Collection<UploadDTO> getUserUploads(CRUser crUser) throws DAOException {
+		throw new UnsupportedOperationException("Method not implemented");
 	}
 }
 

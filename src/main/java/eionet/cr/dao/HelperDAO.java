@@ -17,6 +17,7 @@ import eionet.cr.dto.DownloadFileDTO;
 import eionet.cr.dto.ReviewDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.dto.TripleDTO;
+import eionet.cr.dto.UploadDTO;
 import eionet.cr.dto.UserBookmarkDTO;
 import eionet.cr.dto.UserHistoryDTO;
 import eionet.cr.harvest.statistics.dto.HarvestUrgencyScoreDTO;
@@ -397,6 +398,12 @@ public interface HelperDAO extends DAO {
 	 */
 	public void deleteTriplesOfSource(long sourceHash) throws DAOException;
 	
-	
+	/**
+	 * 
+	 * @param crUser
+	 * @return
+	 * @throws DAOException
+	 */
+	public Collection<UploadDTO> getUserUploads(CRUser crUser) throws DAOException;
 	
 }

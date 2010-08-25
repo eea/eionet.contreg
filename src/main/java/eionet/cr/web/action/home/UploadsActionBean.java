@@ -1,11 +1,13 @@
 package eionet.cr.web.action.home;
 
 import java.io.IOException;
+import java.util.Collection;
 
 import net.sourceforge.stripes.action.Before;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.FileBean;
 import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.controller.LifecycleStage;
@@ -23,8 +25,10 @@ import eionet.cr.dao.HelperDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
+import eionet.cr.dto.UploadDTO;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.UploadHarvest;
+import eionet.cr.web.security.CRUser;
 
 /**
  * 
@@ -41,18 +45,18 @@ public class UploadsActionBean extends AbstractHomeActionBean {
 	private FileBean uploadedFile;
 	/** */
 	private boolean replaceExisting;
+	/** */
+	private Collection<UploadDTO> uploads;
 
 	/**
 	 * 
 	 * @return
-	 * @throws DAOException
 	 */
 	@DefaultHandler
-	public Resolution view() throws DAOException {
+	public Resolution view(){
+		
 		return new ForwardResolution("/pages/home/uploads.jsp");
 	}
-	
-	
 	
 	/**
 	 * 
@@ -67,6 +71,10 @@ public class UploadsActionBean extends AbstractHomeActionBean {
 			logger.debug("Uploaded file: " + uploadedFile);
 			
 			if (uploadedFile!=null){
+				
+				String urlBinding = getUrlBinding();
+				resolution = new RedirectResolution(StringUtils.replace(
+						urlBinding, "{username}", getUserName()));
 
 				// source url for any triples (incl. auto-generated) that will be harvested 
 				String sourceUrl = getUser().getHomeUri() + "/" + uploadedFile.getFileName();
@@ -119,8 +127,6 @@ public class UploadsActionBean extends AbstractHomeActionBean {
 				// delete uploaded file now that the parsing has been done
 				deleteUploadedFile();
 			}
-			
-			resolution = new ForwardResolution("/pages/home/uploads.jsp");
 		}
 		
 		return resolution;
@@ -168,6 +174,16 @@ public class UploadsActionBean extends AbstractHomeActionBean {
 
 	/**
 	 * 
+	 * @return
+	 */
+	public Resolution rename(){
+		
+		// TODO
+		return new ForwardResolution("/pages/home/uploads.jsp");
+	}
+
+	/**
+	 * 
 	 */
 	@ValidationMethod(on={"add", "edit", "delete"})
 	public void validatePostEvent(){
@@ -198,7 +214,7 @@ public class UploadsActionBean extends AbstractHomeActionBean {
 		
 		if (hasValidationErrors()){
 			
-			Resolution resolution = new ForwardResolution("/pages/home/uploads.jsp");;
+			Resolution resolution = new ForwardResolution("/pages/home/uploads.jsp");
 			if (eventName.equals("add")){
 				resolution = new ForwardResolution("/pages/home/addUpload.jsp");
 			}
@@ -267,5 +283,22 @@ public class UploadsActionBean extends AbstractHomeActionBean {
 	 */
 	public void setReplaceExisting(boolean replaceExisting) {
 		this.replaceExisting = replaceExisting;
+	}
+
+	/**
+	 * @return the uploads
+	 * @throws DAOException 
+	 */
+	public Collection<UploadDTO> getUploads() throws DAOException {
+
+		if (uploads==null || uploads.isEmpty()){
+			
+			CRUser crUser = getUser();
+			if (crUser!=null){
+				uploads = DAOFactory.get().getDao(HelperDAO.class).getUserUploads(getUser());
+			}
+		}
+		
+		return uploads;
 	}
 }

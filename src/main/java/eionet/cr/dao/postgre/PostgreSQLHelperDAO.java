@@ -54,6 +54,7 @@ import eionet.cr.dao.readers.PredicateLabelsReader;
 import eionet.cr.dao.readers.SampleTriplesReader;
 import eionet.cr.dao.readers.SubPropertiesReader;
 import eionet.cr.dao.readers.SubjectDataReader;
+import eionet.cr.dao.readers.UploadDTOReader;
 import eionet.cr.dao.readers.UriHashesReader;
 import eionet.cr.dao.util.PredicateLabels;
 import eionet.cr.dao.util.SubProperties;
@@ -63,6 +64,7 @@ import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.ReviewDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.dto.TripleDTO;
+import eionet.cr.dto.UploadDTO;
 import eionet.cr.dto.UserBookmarkDTO;
 import eionet.cr.dto.UserHistoryDTO;
 import eionet.cr.harvest.statistics.dto.HarvestUrgencyScoreDTO;
@@ -1873,5 +1875,50 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 			SQLUtil.close(conn);
 		}
 	}
-
+	
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#getUserUploads(eionet.cr.web.security.CRUser)
+	 */
+	public Collection<UploadDTO> getUserUploads(CRUser crUser) throws DAOException{
+		
+		if (crUser==null){
+			throw new IllegalArgumentException("User object must not be null");
+		}
+		
+		if (StringUtils.isBlank(crUser.getUserName())){
+			throw new IllegalArgumentException("User name must not be blank");
+		}
+		
+		StringBuffer buf = new StringBuffer().
+		append("select URI, PREDICATE, OBJECT ").
+		append("from SPO left join RESOURCE on (SPO.SUBJECT=RESOURCE.URI_HASH) ").
+		append("where PREDICATE in (").append(Hashes.spoHash(Predicates.RDFS_LABEL)).
+		append(",").append(Hashes.spoHash(Predicates.CR_LAST_MODIFIED)).
+		append(") and SUBJECT in (select distinct OBJECT_HASH from SPO where SUBJECT=").
+		append(Hashes.spoHash(crUser.getHomeUri())).append(" and PREDICATE=").
+		append(Hashes.spoHash(Predicates.CR_HAS_FILE)).append(") order by URI,PREDICATE,OBJECT");
+		
+		UploadDTOReader reader = new UploadDTOReader();
+		Connection conn = null;
+		try{
+			conn = getConnection();
+			SQLUtil.executeQuery(buf.toString(), reader, conn);
+			Collection<UploadDTO> uploads = reader.getResultList();
+			for (UploadDTO uploadDTO : uploads){
+				if (StringUtils.isBlank(uploadDTO.getLabel())){
+					uploadDTO.setLabel(
+							URIUtil.extractURILabel(uploadDTO.getSubjectUri(), SubjectDTO.NO_LABEL));
+				}
+			}
+			
+			return uploads;
+		}
+		catch (SQLException e){
+			throw new DAOException(e.toString(), e);
+		}
+		finally{
+			SQLUtil.close(conn);
+		}
+	}
 }
