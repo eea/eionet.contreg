@@ -120,7 +120,7 @@ public abstract class AbstractActionBean implements ActionBean {
 	 * 
 	 * @return
 	 */
-	protected CRUser getUser(){
+	public CRUser getUser(){
 		return getContext().getCRUser();
 	}
 	
