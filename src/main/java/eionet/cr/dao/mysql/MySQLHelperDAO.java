@@ -943,6 +943,14 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 	public Collection<UploadDTO> getUserUploads(CRUser crUser) throws DAOException {
 		throw new UnsupportedOperationException("Method not implemented");
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#isExistingSubject(long)
+	 */
+	public boolean isExistingSubject(String subjectUri) throws DAOException {
+		throw new UnsupportedOperationException("Method not implemented");
+	}
 }
 
 

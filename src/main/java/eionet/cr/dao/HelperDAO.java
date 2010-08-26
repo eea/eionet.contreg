@@ -406,4 +406,12 @@ public interface HelperDAO extends DAO {
 	 */
 	public Collection<UploadDTO> getUserUploads(CRUser crUser) throws DAOException;
 	
+	/**
+	 * 
+	 * @param subjectUri
+	 * @return
+	 * @throws DAOException
+	 */
+	public boolean isExistingSubject(String subjectUri) throws DAOException;
+	
 }

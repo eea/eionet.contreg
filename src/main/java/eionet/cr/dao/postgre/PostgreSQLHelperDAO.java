@@ -1921,4 +1921,29 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 			SQLUtil.close(conn);
 		}
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#isExistingSubject(long)
+	 */
+	public boolean isExistingSubject(String subjectUri) throws DAOException {
+		
+		if (StringUtils.isBlank(subjectUri)){
+			throw new IllegalArgumentException("Subject uri must not be empty");
+		}
+		
+		Connection conn = null;
+		try{
+			conn = getConnection();
+			Object o = SQLUtil.executeSingleReturnValueQuery(
+					"select count(*) from SPO where SUBJECT=" + Hashes.spoHash(subjectUri), conn);
+			return o!=null && Integer.parseInt(o.toString()) > 0;
+		}
+		catch (SQLException e){
+			throw new DAOException(e.getMessage(), e);
+		}
+		finally{
+			SQLUtil.close(conn);
+		}
+	}
 }

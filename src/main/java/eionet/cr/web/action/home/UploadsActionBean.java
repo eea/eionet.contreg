@@ -72,12 +72,17 @@ public class UploadsActionBean extends AbstractHomeActionBean {
 			
 			if (uploadedFile!=null){
 				
-				String urlBinding = getUrlBinding();
-				resolution = new RedirectResolution(StringUtils.replace(
-						urlBinding, "{username}", getUserName()));
-
-				// source url for any triples (incl. auto-generated) that will be harvested 
-				String sourceUrl = getUser().getHomeUri() + "/" + uploadedFile.getFileName();
+				// initialize subjectUri 
+				String subjectUri = getUser().getHomeUri() + "/" + uploadedFile.getFileName();
+				
+				// unless a replace requested, make sure file does not already exist
+				if (replaceExisting==false){
+					if (DAOFactory.get().getDao(HelperDAO.class).isExistingSubject(subjectUri)){
+						addWarningMessage("A file with such a name already exists!" +
+								" Use \"replace existing\" checkbox to overwrite.");
+						return resolution;
+					}
+				}
 
 				// create and store harvest source for the above source url,
 				// don't throw exceptions, as an uploaded file does not have to be harevstable
@@ -85,8 +90,8 @@ public class UploadsActionBean extends AbstractHomeActionBean {
 				try {
 					logger.debug("Creating and storing harvest source");
 					HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
-					dao.addSourceIgnoreDuplicate(sourceUrl, 0, false, null);
-					hSourceDTO = dao.getHarvestSourceByUrl(sourceUrl);
+					dao.addSourceIgnoreDuplicate(subjectUri, 0, false, null);
+					hSourceDTO = dao.getHarvestSourceByUrl(subjectUri);
 				}
 				catch (DAOException e){
 					logger.info("Exception when trying to create" +
@@ -114,7 +119,7 @@ public class UploadsActionBean extends AbstractHomeActionBean {
 				logger.debug("Creating the cr:hasFile predicate");
 				
 				SubjectDTO subjectDTO = new SubjectDTO(getUser().getHomeUri(), false);
-				ObjectDTO objectDTO = new ObjectDTO(sourceUrl, false);
+				ObjectDTO objectDTO = new ObjectDTO(subjectUri, false);
 				objectDTO.setSourceUri(getUser().getHomeUri());
 				subjectDTO.addObject(Predicates.CR_HAS_FILE, objectDTO);
 				
@@ -126,6 +131,11 @@ public class UploadsActionBean extends AbstractHomeActionBean {
 
 				// delete uploaded file now that the parsing has been done
 				deleteUploadedFile();
+				
+				// redirect to the uploads list
+				String urlBinding = getUrlBinding();
+				resolution = new RedirectResolution(StringUtils.replace(
+						urlBinding, "{username}", getUserName()));
 			}
 		}
 		
@@ -183,10 +193,11 @@ public class UploadsActionBean extends AbstractHomeActionBean {
 	}
 
 	/**
+	 * @throws DAOException 
 	 * 
 	 */
 	@ValidationMethod(on={"add", "edit", "delete"})
-	public void validatePostEvent(){
+	public void validatePostEvent() throws DAOException{
 		
 		// the below validation is relevant only when the event is requested through POST method
 		if (!isPostRequest()){
@@ -199,6 +210,7 @@ public class UploadsActionBean extends AbstractHomeActionBean {
 			return;
 		}
 		
+		// for edit and add events, the Title is mandatory
 		String eventName = getContext().getEventName();
 		if (eventName.equals("add") || eventName.equals("edit")){
 			if (StringUtils.isBlank(title)){
@@ -206,12 +218,15 @@ public class UploadsActionBean extends AbstractHomeActionBean {
 			}
 		}
 		
+		// if add event, make sure the file bean is not null,
 		if (eventName.equals("add")){
+			
 			if (uploadedFile==null){
-				addGlobalValidationError("No file specified!");
+				addGlobalValidationError("No file specified!");				
 			}
 		}
 		
+		// if any validation errors were set above, make sure the right resolution is returned
 		if (hasValidationErrors()){
 			
 			Resolution resolution = new ForwardResolution("/pages/home/uploads.jsp");
