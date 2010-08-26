@@ -10,7 +10,7 @@
 					<stripes:link href="${actionBean.baseHomeUrl}${actionBean.attemptedUserName}/uploads?add=">Upload file</stripes:link>
 				</li>
 				<li>
-					<stripes:link class="link-plain" href="${actionBean.baseHomeUrl}${actionBean.attemptedUserName}">
+					<stripes:link class="link-plain" href="/factsheet.action?edit=&uri=${actionBean.user.homeUri}" title="Edit your home url properties">
 					Edit folder
 					</stripes:link>
 				</li>
