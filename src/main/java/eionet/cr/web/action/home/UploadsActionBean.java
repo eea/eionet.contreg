@@ -90,36 +90,6 @@ public class UploadsActionBean extends AbstractHomeActionBean {
 					}
 				}
 
-				// create and store harvest source for the above source url,
-				// don't throw exceptions, as an uploaded file does not have to be harevstable
-				HarvestSourceDTO hSourceDTO = null;
-				try {
-					logger.debug("Creating and storing harvest source");
-					HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
-					dao.addSourceIgnoreDuplicate(subjectUri, 0, false, null);
-					hSourceDTO = dao.getHarvestSourceByUrl(subjectUri);
-				}
-				catch (DAOException e){
-					logger.info("Exception when trying to create" +
-							"harvest source for the uploaded file content", e);
-				}
-					
-				// perform harvest,
-				// don't throw exceptions, as an uploaded file does not have to be harevstable
-				try{
-					if (hSourceDTO!=null){
-						UploadHarvest uploadHarvest =
-							new UploadHarvest(hSourceDTO, uploadedFile, title, getUserName());
-						uploadHarvest.execute();
-					}
-					else{
-						logger.debug("Harvest source was not created, so skipping harvest");
-					}
-				}
-				catch (HarvestException e) {
-					logger.info("Exception when trying to harvest uploaded file content", e);
-				}
-				
 				// save the file's content into database
 				saveContent(subjectUri, uploadedFile);
 
@@ -138,8 +108,11 @@ public class UploadsActionBean extends AbstractHomeActionBean {
 				DAOFactory.get().getDao(HelperDAO.class).addResource(
 						Predicates.CR_HAS_FILE, getUser().getHomeUri());
 
+				// attempt to harvest the uploaded file
+				harvestUploadedFile(subjectUri, uploadedFile, title);
+
 				// delete uploaded file now that the parsing has been done
-				deleteUploadedFile();
+				deleteUploadedFile(uploadedFile);
 				
 				// redirect to the uploads list
 				String urlBinding = getUrlBinding();
@@ -173,26 +146,6 @@ public class UploadsActionBean extends AbstractHomeActionBean {
 		}
 		finally{
 			IOUtils.closeQuietly(contentStream);
-		}
-	}
-	
-	/**
-	 * 
-	 */
-	private void deleteUploadedFile(){
-		
-		// double check for null, even though this method should only be called
-		// when the file object IS NOT null
-		if (uploadedFile!=null){
-			
-			logger.debug("Deleting uploaded file");
-			
-			try{
-				uploadedFile.delete();
-			}
-			catch (IOException ioe){
-				logger.error("Failed to delete the temporarily saved uploaded file", ioe);
-			}
 		}
 	}
 	

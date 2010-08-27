@@ -1740,48 +1740,6 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 			SQLUtil.close(conn);
 		}
 	}
-
-	private static String insertAttachmentQuery = "INSERT INTO spo_binary (SUBJECT, OBJECT, DATATYPE) VALUES (?,?,?);";
-	
-	public void addReviewAttachment(CRUser user, int reviewId, String filename, long fileSize, String contentType, InputStream fileStream)  throws DAOException{
-		
-		Connection conn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try{
-			conn = getConnection();
-			stmt = conn.prepareStatement(insertAttachmentQuery);
-			stmt.setLong(1, Hashes.spoHash(user.getReviewAttachmentUri(reviewId, filename)));
-			stmt.setBinaryStream(2, fileStream, (int) fileSize);
-			stmt.setString(3, contentType);
-			stmt.executeUpdate();
-		}
-		catch (SQLException e){
-			throw new DAOException(e.toString(), e);
-		}
-		finally{
-			IOUtils.closeQuietly(fileStream);
-			SQLUtil.close(rs);
-			SQLUtil.close(stmt);
-			SQLUtil.close(conn);
-		}
-
-		String userReviewAttachmentUri = user.getReviewAttachmentUri(reviewId, filename);
-		SubjectDTO newAttachment = new SubjectDTO(user.getReviewUri(reviewId), false);
-		
-		ObjectDTO attachmentObject = new ObjectDTO(userReviewAttachmentUri, false);
-		attachmentObject.setSourceUri(user.getReviewUri(reviewId));
-		
-		newAttachment.addObject(Predicates.CR_HAS_ATTACHMENT, attachmentObject);
-		
-		addTriples(newAttachment);
-		
-		addResource(userReviewAttachmentUri, userReviewAttachmentUri);
-		addResource(Predicates.CR_HAS_ATTACHMENT, user.getReviewUri(reviewId));
-	}
-	
-	
-	
 	
 	@Override
 	public List<String> getReviewAttachmentList(CRUser user, int reviewId) throws DAOException {

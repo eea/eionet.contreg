@@ -1,18 +1,27 @@
 package eionet.cr.web.action.home;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
+
+import org.apache.commons.io.IOUtils;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.FileBean;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
+import eionet.cr.common.Predicates;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HelperDAO;
+import eionet.cr.dao.SpoBinaryDAO;
+import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.ReviewDTO;
+import eionet.cr.dto.SpoBinaryDTO;
+import eionet.cr.dto.SubjectDTO;
+import eionet.cr.util.Hashes;
 import eionet.cr.web.security.CRUser;
 
 /**
@@ -202,18 +211,61 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
 	}
 	
 	/**
-	 * 
 	 */
 	public void upload(){
-		try {
-			try {
-				DAOFactory.get().getDao(HelperDAO.class).addReviewAttachment(this.getUser(), reviewId, attachment.getFileName(), attachment.getSize(), attachment.getContentType(), attachment.getInputStream());
-			} catch (IOException ioex){
-				addSystemMessage(ioex.getMessage());
-			}
-		} catch (DAOException ex){
-			logger.error(ex);
-			addSystemMessage(ex.getMessage());
+		
+		logger.debug("Storing uploaded review attachment, file bean = " + attachment);
+		
+		if (attachment==null){
+			return;
+		}
+		
+		// construct attachment uri
+		String attachmentUri = getUser().getReviewAttachmentUri(
+				reviewId, attachment.getFileName());
+		
+		InputStream attachmentContentStream = null;
+		try{
+			// save attachment contents into database
+			attachmentContentStream = attachment.getInputStream();
+			SpoBinaryDTO dto = new SpoBinaryDTO(
+					Hashes.spoHash(attachmentUri), attachmentContentStream);
+			DAOFactory.get().getDao(SpoBinaryDAO.class).add(dto, attachment.getSize());
+
+			// construct review uri
+			String reviewUri = getUser().getReviewUri(reviewId);
+
+			// construct review SubjectDTO
+			SubjectDTO subjectDTO = new SubjectDTO(reviewUri, false);
+
+			// add cr:hasAttachment triple to review SubjectDTO 
+			ObjectDTO objectDTO = new ObjectDTO(attachmentUri, false);
+			objectDTO.setSourceUri(reviewUri);
+			subjectDTO.addObject(Predicates.CR_HAS_ATTACHMENT, objectDTO);
+
+			HelperDAO helperDAO = DAOFactory.get().getDao(HelperDAO.class);
+
+			// persist review SubjectDTO
+			helperDAO.addTriples(subjectDTO);
+
+			// make sure both attachment uri and cr:hasAttachment are present in RESOURCE table
+			helperDAO.addResource(attachmentUri, attachmentUri);
+			helperDAO.addResource(Predicates.CR_HAS_ATTACHMENT, reviewUri);
+			
+			// finally, attempt to harvest the uploaded file's contents
+			harvestUploadedFile(attachmentUri, attachment, null);
+		}
+		catch (DAOException daoe){
+			logger.error("Error when storing attachment", daoe);
+			addSystemMessage("Error when storing attachment");
+		}
+		catch (IOException ioe){
+			logger.error("File could not be successfully uploaded", ioe);
+			addSystemMessage("File could not be successfully uploaded");
+		}
+		finally{
+			IOUtils.closeQuietly(attachmentContentStream);
+			deleteUploadedFile(attachment);
 		}
 	}
 	

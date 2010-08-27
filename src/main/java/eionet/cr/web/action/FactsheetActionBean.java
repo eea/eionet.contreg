@@ -47,6 +47,7 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
+import eionet.cr.dao.SpoBinaryDAO;
 import eionet.cr.dao.util.SubProperties;
 import eionet.cr.dao.util.UriLabelPair;
 import eionet.cr.dto.HarvestSourceDTO;
@@ -102,6 +103,9 @@ public class FactsheetActionBean extends AbstractActionBean{
 	/** */
 	private Boolean uriIsHarvestSource;
 	
+	/** */
+	private boolean subjectDownloadable;
+	
 	/**
 	 * 
 	 * @return
@@ -146,6 +150,10 @@ public class FactsheetActionBean extends AbstractActionBean{
 				if (isAdminLoggedIn()){
 					urlFoundInHarvestSource = helperDAO.isUrlInHarvestSource(subject.getUrl());
 				}
+				
+				logger.debug("Determining if the subject has content stored in database");
+				
+				subjectDownloadable = DAOFactory.get().getDao(SpoBinaryDAO.class).exists(uri);
 			}
 		}
 		
@@ -592,5 +600,12 @@ public class FactsheetActionBean extends AbstractActionBean{
 			}
 		}
 		return uriIsHarvestSource;
+	}
+
+	/**
+	 * @return the subjectDownloadable
+	 */
+	public boolean isSubjectDownloadable() {
+		return subjectDownloadable;
 	}
 }

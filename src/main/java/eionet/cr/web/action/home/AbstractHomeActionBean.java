@@ -1,14 +1,23 @@
 package eionet.cr.web.action.home;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sourceforge.stripes.action.FileBean;
+
 import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
+import eionet.cr.dao.DAOException;
+import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.HarvestSourceDAO;
+import eionet.cr.dto.HarvestSourceDTO;
+import eionet.cr.harvest.HarvestException;
+import eionet.cr.harvest.UploadHarvest;
 import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.context.CRActionBeanContext;
 import eionet.cr.web.util.columns.SearchResultColumn;
@@ -238,4 +247,58 @@ public abstract class AbstractHomeActionBean extends AbstractActionBean {
 		return SHOWPUBLIC_NO;
 	}
 
+	/**
+	 * 
+	 * @param sourceUrl
+	 * @param uploadedFile
+	 * @param dcTitle
+	 */
+	protected void harvestUploadedFile(String sourceUrl, FileBean uploadedFile, String dcTitle){
+		
+		// create and store harvest source for the above source url,
+		// don't throw exceptions, as an uploaded file does not have to be harevstable
+		HarvestSourceDTO hSourceDTO = null;
+		try {
+			logger.debug("Creating and storing harvest source");
+			HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
+			dao.addSourceIgnoreDuplicate(sourceUrl, 0, false, null);
+			hSourceDTO = dao.getHarvestSourceByUrl(sourceUrl);
+		}
+		catch (DAOException e){
+			logger.info("Exception when trying to create" +
+					"harvest source for the uploaded file content", e);
+		}
+			
+		// perform harvest,
+		// don't throw exceptions, as an uploaded file does not have to be harevstable
+		try{
+			if (hSourceDTO!=null){
+				UploadHarvest uploadHarvest =
+					new UploadHarvest(hSourceDTO, uploadedFile, dcTitle, getUserName());
+				uploadHarvest.execute();
+			}
+			else{
+				logger.debug("Harvest source was not created, so skipping harvest");
+			}
+		}
+		catch (HarvestException e) {
+			logger.info("Exception when trying to harvest uploaded file content", e);
+		}
+	}
+	
+	/**
+	 * 
+	 * @param uploadedFile
+	 */
+	protected void deleteUploadedFile(FileBean uploadedFile){
+		
+		if (uploadedFile!=null){
+			try{
+				uploadedFile.delete();
+			}
+			catch (IOException e){
+				logger.error("Failed to delete uploaded file [" + uploadedFile + "]", e);
+			}
+		}
+	}
 }

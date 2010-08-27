@@ -911,12 +911,6 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 	}
 
 	@Override
-	public void addReviewAttachment(CRUser user, int reviewId, String filename, long fileSize, String contentType,
-			InputStream fileStream) throws DAOException {
-		throw new UnsupportedOperationException("Method not implemented");
-	}
-
-	@Override
 	public List<String> getReviewAttachmentList(CRUser user, int reviewId)
 			throws DAOException {
 		throw new UnsupportedOperationException("Method not implemented");	

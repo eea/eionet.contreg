@@ -45,4 +45,12 @@ public interface SpoBinaryDAO extends DAO{
 	 * @throws DAOException
 	 */
 	SpoBinaryDTO get(String subjectUri) throws DAOException;
+	
+	/**
+	 * 
+	 * @param subjectUri
+	 * @return
+	 * @throws DAOException
+	 */
+	boolean exists(String subjectUri) throws DAOException;
 }

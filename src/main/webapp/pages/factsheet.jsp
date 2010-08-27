@@ -85,20 +85,18 @@
 														<stripes:param name="uri" value="${actionBean.uri}"/>
 												</stripes:url>
 												<a id="wait_link" href="${oldUrl }" onclick="javascript:showWait('${pageContext.request.contextPath}', '${url }'); return false;">Harvest</a>
-
 											</li>
 										</c:if>
-										
-										
-										
-										
 						    			<c:if test="${actionBean.urlFoundInHarvestSource}">
 						    				<li>
 						    				<stripes:link class="link-plain" href="/source.action?view=&harvestSource.url=${ subjectUrl }">Source  details</stripes:link>
 						    				</li>
 						    			</c:if>
-						    			
-						    			
+						    			<c:if test="${actionBean.subjectDownloadable}">
+						    				<li>
+						    					<stripes:link class="link-plain" href="/download.action?uri=${subjectUri}">Download</stripes:link>
+						    				</li>
+						    			</c:if>
 				    					<c:if test="${ !actionBean.urlUserBookmark }">
 				    						<li>
 						    				<stripes:link class="link-plain" href="/factsheet.action">Add bookmark
@@ -106,8 +104,7 @@
 						    				<stripes:param name="uri" value="${ subjectUrl }" />
 						    				</stripes:link>
 						    				</li>
-				    					</c:if>
-				    					
+				    					</c:if>				    					
 				    					<c:if test="${ actionBean.urlUserBookmark }">
 				    						<li>
 						    				<stripes:link class="link-plain" href="/factsheet.action">Remove bookmark
@@ -117,14 +114,11 @@
 						    				
 						    				</li>
 				    					</c:if>
-				    					
 				    					<c:if test="${subjectUrl!=null}">
 											<li>
 						    					<stripes:link class="link-plain" href="/home/${actionBean.userName}/reviews?add=Add&addUrl=${ subjectUrl }">Add review</stripes:link>
 						    				</li>
 						    			</c:if>
-				    					
-										
 									</ul>
 								</li>
 							</ul>

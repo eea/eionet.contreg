@@ -47,4 +47,12 @@ public class MySQLSpoBinaryDAO extends MySQLBaseDAO implements SpoBinaryDAO{
 	public SpoBinaryDTO get(String subjectUri) throws DAOException {
 		throw new UnsupportedOperationException("Method not implemented");
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.SpoBinaryDAO#exists(java.lang.String)
+	 */
+	public boolean exists(String subjectUri) throws DAOException {
+		throw new UnsupportedOperationException("Method not implemented");
+	}
 }

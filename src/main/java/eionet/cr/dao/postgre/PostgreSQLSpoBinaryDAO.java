@@ -28,6 +28,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -144,5 +145,32 @@ public class PostgreSQLSpoBinaryDAO extends PostgreSQLBaseDAO implements SpoBina
 		}
 		
 		return null;
+	}
+	
+	/** */
+	private static final String sqlExists = "select count(*) from SPO_BINARY where SUBJECT=?";
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.SpoBinaryDAO#exists(java.lang.String)
+	 */
+	public boolean exists(String subjectUri) throws DAOException {
+		
+		if (StringUtils.isBlank(subjectUri)){
+			throw new IllegalArgumentException("Subject uri must not be blank");
+		}
+		
+		Connection conn = null;
+		try{
+			conn = getConnection();
+			Object o = SQLUtil.executeSingleReturnValueQuery(sqlExists,
+					Collections.singletonList(Long.valueOf(Hashes.spoHash(subjectUri))), conn);
+			return o!=null && Integer.parseInt(o.toString()) > 0;
+		}
+		catch (SQLException e){
+			throw new DAOException(e.getMessage(), e);
+		}
+		finally{
+			SQLUtil.close(conn);
+		}
 	}
 }

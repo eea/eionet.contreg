@@ -331,19 +331,6 @@ public interface HelperDAO extends DAO {
 	 * 
 	 * @param user
 	 * @param reviewId
-	 * @param filename
-	 * @param fileSize
-	 * @param contentType
-	 * @param fileStream
-	 * @throws DAOException
-	 * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
-	 */
-	public void addReviewAttachment(CRUser user, int reviewId, String filename, long fileSize, String contentType, InputStream fileStream)  throws DAOException;
-	
-	/**
-	 * 
-	 * @param user
-	 * @param reviewId
 	 * @return List<String>
 	 * @throws DAOException
 	 * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
