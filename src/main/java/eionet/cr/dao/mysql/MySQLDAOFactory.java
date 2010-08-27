@@ -30,6 +30,7 @@ import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.DAO;
 import eionet.cr.dao.SearchDAO;
+import eionet.cr.dao.SpoBinaryDAO;
 import eionet.cr.dao.UrgentHarvestQueueDAO;
 
 
@@ -63,6 +64,7 @@ public final class MySQLDAOFactory extends DAOFactory{
 		registeredDaos.put(HelperDAO.class, MySQLHelperDAO.class);
 		registeredDaos.put(SearchDAO.class, MySQLSearchDAO.class);
 		registeredDaos.put(UrgentHarvestQueueDAO.class, MySQLUrgentHarvestQueueDAO.class);
+		registeredDaos.put(SpoBinaryDAO.class, MySQLSpoBinaryDAO.class);
 	}
 
 	/**

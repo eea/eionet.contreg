@@ -1,6 +1,7 @@
 package eionet.cr.web.action.home;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 
 import net.sourceforge.stripes.action.Before;
@@ -13,6 +14,7 @@ import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.controller.LifecycleStage;
 import net.sourceforge.stripes.validation.ValidationMethod;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.common.Predicates;
@@ -22,12 +24,15 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
+import eionet.cr.dao.SpoBinaryDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
+import eionet.cr.dto.SpoBinaryDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.dto.UploadDTO;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.UploadHarvest;
+import eionet.cr.util.Hashes;
 import eionet.cr.web.security.CRUser;
 
 /**
@@ -62,8 +67,9 @@ public class UploadsActionBean extends AbstractHomeActionBean {
 	 * 
 	 * @return
 	 * @throws DAOException 
+	 * @throws IOException 
 	 */
-	public Resolution add() throws DAOException{
+	public Resolution add() throws DAOException, IOException{
 		
 		Resolution resolution = new ForwardResolution("/pages/home/addUpload.jsp");
 		if (isPostRequest()){
@@ -113,6 +119,9 @@ public class UploadsActionBean extends AbstractHomeActionBean {
 				catch (HarvestException e) {
 					logger.info("Exception when trying to harvest uploaded file content", e);
 				}
+				
+				// save the file's content into database
+				saveContent(subjectUri, uploadedFile);
 
 				// add cr:hasFile predicate to the user's home URI in SPO
 				
@@ -140,6 +149,31 @@ public class UploadsActionBean extends AbstractHomeActionBean {
 		}
 		
 		return resolution;
+	}
+	
+	/**
+	 * 
+	 * @param subjectUri
+	 * @param fileBean
+	 * @throws DAOException
+	 * @throws IOException
+	 */
+	private void saveContent(String subjectUri, FileBean fileBean) throws DAOException, IOException{
+		
+		logger.debug("Going to save the uploaded file's content into database");
+		
+		SpoBinaryDTO dto = new SpoBinaryDTO(Hashes.spoHash(subjectUri), fileBean.getInputStream());
+		dto.setContentType(uploadedFile.getContentType());
+		dto.setLanguage("");
+		dto.setMustEmbed(false);
+		InputStream contentStream = null;
+		try{
+			contentStream = uploadedFile.getInputStream();
+			DAOFactory.get().getDao(SpoBinaryDAO.class).add(dto, uploadedFile.getSize());
+		}
+		finally{
+			IOUtils.closeQuietly(contentStream);
+		}
 	}
 	
 	/**
