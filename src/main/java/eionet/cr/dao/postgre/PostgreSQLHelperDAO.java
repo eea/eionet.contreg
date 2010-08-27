@@ -43,6 +43,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.common.Predicates;
@@ -1541,6 +1542,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 			Connection conn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
+			ByteArrayInputStream byteArrayInputStream = null;
 			try{
 				conn = getConnection();
 				stmt = conn.prepareStatement(insertReviewContentQuery);
@@ -1551,7 +1553,8 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 					bytes = review.getReviewContent().getBytes("UTF-8");
 				} catch (Exception ex){
 				}
-				stmt.setBinaryStream(2, new ByteArrayInputStream(bytes), bytes.length);
+				byteArrayInputStream = new ByteArrayInputStream(bytes);
+				stmt.setBinaryStream(2, byteArrayInputStream, bytes.length);
 				stmt.setString(3, review.getReviewContentType());
 				stmt.executeUpdate();
 			}
@@ -1559,6 +1562,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 				throw new DAOException(e.toString(), e);
 			}
 			finally{
+				IOUtils.closeQuietly(byteArrayInputStream);
 				SQLUtil.close(rs);
 				SQLUtil.close(stmt);
 				SQLUtil.close(conn);
@@ -1587,7 +1591,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		
 		String resultHashResolveQuery = "SELECT uri FROM resource WHERE uri_hash IN (1,1,1,1)";
 		
-		List<ReviewDTO> returnList = new ArrayList();
+		List<ReviewDTO> returnList = new ArrayList<ReviewDTO>();
 		
 		String stringList = "";
 		
@@ -1749,6 +1753,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 			throw new DAOException(e.toString(), e);
 		}
 		finally{
+			IOUtils.closeQuietly(fileStream);
 			SQLUtil.close(rs);
 			SQLUtil.close(stmt);
 			SQLUtil.close(conn);
