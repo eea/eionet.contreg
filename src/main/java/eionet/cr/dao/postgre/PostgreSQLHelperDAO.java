@@ -1574,7 +1574,12 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 	@Override
 	public List<ReviewDTO> getReviewList(CRUser user)  throws DAOException{
 		
-		String dbQuery = "SELECT uri, spoTitle.object AS title, spoObject.object AS object, spo_binary.object AS reviewcontent, spo_binary.datatype AS datatype " +
+		String dbQuery = "SELECT " +
+				"uri" +
+				", spoTitle.object AS title" +
+				", spoObject.object AS object" +
+				", spo_binary.object AS reviewcontent" +
+				", spo_binary.datatype AS datatype " +
 				"FROM spo AS spo1, spo AS spo2, resource, " +
 				" spo AS spoTitle, spo AS spoObject LEFT OUTER JOIN spo_binary ON (spoObject.subject=spo_binary.subject AND spo_binary.must_embed = TRUE) " +
 				"WHERE " +
@@ -1586,16 +1591,12 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 				"(spo1.object_hash = " + Hashes.spoHash(user.getHomeUri()) +") AND " +
 				"(spo2.predicate = " + Hashes.spoHash(Predicates.RDF_TYPE) +") AND " +
 				"(spo2.object_hash = " + Hashes.spoHash(Subjects.CR_FEEDBACK) +") " +
+				" AND (spoObject.lit_obj = 'N') " +
 				"ORDER BY uri ASC"
 				;
-		
-		String resultHashResolveQuery = "SELECT uri FROM resource WHERE uri_hash IN (1,1,1,1)";
-		
+
 		List<ReviewDTO> returnList = new ArrayList<ReviewDTO>();
 		
-		String stringList = "";
-		
-		int lastid = 0;
 		Connection conn = null;
 		Statement stmt = null;
 		ResultSet rs = null;
@@ -1638,21 +1639,27 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		
 		String userUri = user.getReviewUri(reviewId);
 		
-		String dbQuery = "SELECT uri, spoTitle.object AS title, spoObject.object AS object, spo_binary.object AS reviewcontent, spo_binary.datatype AS datatype " +
-				"FROM spo AS spo1, spo AS spo2," +
-		" spo AS spoTitle, resource, spo AS spoObject LEFT OUTER JOIN spo_binary ON (spoObject.subject=spo_binary.subject AND spo_binary.must_embed = TRUE) " +
-		"WHERE " +
-		"(spo1.subject = " + Hashes.spoHash(userUri) + ") AND " +
-		"(spo1.subject = spo2.subject) AND (spo1.subject = spoTitle.subject) AND (spo1.subject = spoObject.subject) AND " +
-		"spoObject.Predicate="+ Hashes.spoHash(Predicates.CR_FEEDBACK_FOR) + "AND " +
-		"spoTitle.Predicate="+ Hashes.spoHash(Predicates.DC_TITLE) + "AND " +
-		"spo1.subject=resource.uri_hash AND " +
-		"(spo1.predicate = " + Hashes.spoHash(Predicates.CR_USER) + ") AND "+
-		"(spo1.object_hash = " + Hashes.spoHash(user.getHomeUri()) +") AND " +
-		"(spo2.predicate = " + Hashes.spoHash(Predicates.RDF_TYPE) +") AND " +
-		"(spo2.object_hash = " + Hashes.spoHash(Subjects.CR_FEEDBACK) +") " +
-		"ORDER BY uri ASC"
-		;
+		String dbQuery = "SELECT " +
+				"uri" +
+				", spoTitle.object AS title" +
+				", spoObject.object AS object" +
+				", spo_binary.object AS reviewcontent" +
+				", spo_binary.datatype AS datatype " +
+				" FROM spo AS spo1, spo AS spo2," +
+				" spo AS spoTitle, resource, spo AS spoObject LEFT OUTER JOIN spo_binary ON (spoObject.subject=spo_binary.subject AND spo_binary.must_embed = TRUE) " +
+				"WHERE " +
+				"(spo1.subject = " + Hashes.spoHash(userUri) + ") AND " +
+				"(spo1.subject = spo2.subject) AND (spo1.subject = spoTitle.subject) AND (spo1.subject = spoObject.subject) AND " +
+				"spoObject.Predicate="+ Hashes.spoHash(Predicates.CR_FEEDBACK_FOR) + "AND " +
+				"spoTitle.Predicate="+ Hashes.spoHash(Predicates.DC_TITLE) + "AND " +
+				"spo1.subject=resource.uri_hash AND " +
+				"(spo1.predicate = " + Hashes.spoHash(Predicates.CR_USER) + ") AND "+
+				"(spo1.object_hash = " + Hashes.spoHash(user.getHomeUri()) +") AND " +
+				"(spo2.predicate = " + Hashes.spoHash(Predicates.RDF_TYPE) +") AND " +
+				"(spo2.object_hash = " + Hashes.spoHash(Subjects.CR_FEEDBACK) +") AND " +
+				"(spoObject.lit_obj = 'N') " +
+				"ORDER BY uri ASC"
+				;
 
 		ReviewDTO returnItem = new ReviewDTO();
 		

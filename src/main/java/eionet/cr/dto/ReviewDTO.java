@@ -30,6 +30,11 @@ public class ReviewDTO  implements Serializable {
 	public String getObjectUrl() {
 		return objectUrl;
 	}
+	
+	public String getObjectUrlHTML() {
+		return StringEscapeUtils.escapeHtml(objectUrl);
+	}
+	
 	public void setObjectUrl(String objectUrl) {
 		this.objectUrl = objectUrl;
 	}
