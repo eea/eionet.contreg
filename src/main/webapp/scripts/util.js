@@ -24,8 +24,6 @@
 $(document).ready(
 		function(){
 
-			$("#propertyText").autocomplete("ever catch everyday cc");
-
 			$("#export_form_noscript").hide();
 			//export clicked
 			$(".export_div").show().click(function(){
@@ -39,9 +37,12 @@ $(document).ready(
 						.append('<div id="export_form_div" ' +
 								'style="padding: 20px; padding-top:0px; border: 1px solid; background-color: #cccccc; width: 500px;' +
 								'height: 190px; position:absolute; z-index:100000;  left: 200px; top: 300px; ">' +
-								'<a href="#" style="float:right; clear:both">close</a><br/>' + $("#export_form_noscript").html() + "</div>");
+								'<a href="#" style="float:right; clear:both" id="export_form_close">close</a><br/>' + $("#export_form_noscript").html() + "</div>");
 			    // attach close link
-			    $("#export_form_div > a").click(function(){ $("#export_form_div").hide();});
+			    $("a#export_form_close").click(function(event){ 
+					event.preventDefault();
+					$("#export_form_div").hide();
+				});
 			    // hide the div on submit
 			    $("#export_form_submit").click(function(){
 			    	$("#export_form_div").hide();
@@ -71,17 +72,18 @@ $(document).ready(
 				}
 			});
 			//Tag search autocomplete
-			$('#tagText').autocomplete({ 
-			    serviceUrl:'json/tags.action',
-			    minChars:2, 
-			    delimiter: /(,|;)\s*/, 
-			    maxHeight:400,
-			    width:300,
-			    zIndex: 9999,
-			    deferRequestBy: 0, 
-			    noCache: true 
-			});
-
+			if ($("#tagText").length > 0){
+				$('#tagText').autocomplete({ 
+					serviceUrl:'json/tags.action',
+					minChars:2, 
+					delimiter: /(,|;)\s*/, 
+					maxHeight:400,
+					width:300,
+					zIndex: 9999,
+					deferRequestBy: 0, 
+					noCache: true 
+				});
+			}
 });
 
 
