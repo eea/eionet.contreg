@@ -40,6 +40,7 @@ import eionet.cr.dao.ExporterDAO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.FormatUtils;
 import eionet.cr.util.Pair;
+import eionet.cr.util.URIUtil;
 import eionet.cr.util.Util;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.util.sql.ResultSetExportReader;
@@ -156,9 +157,20 @@ public abstract class Exporter {
 	 * @return 
 	 */
 	protected String getUriOrLabelValue(SubjectDTO subject){ 
-		String value = isExportResourceUri()
-			? subject.getUri()
-				: FormatUtils.getObjectValuesForPredicate(Predicates.RDFS_LABEL, subject, getLanguages());
+		String value = "";
+		String uri = subject.getUri(); 
+		
+		if(isExportResourceUri()){
+			value = uri;
+		}else{
+			value = FormatUtils.getObjectValuesForPredicate(Predicates.RDFS_LABEL, subject, getLanguages());
+			//extract value from uri
+			if (StringUtils.isBlank(value)){
+				value = URIUtil.extractURILabel(uri,uri);
+			}
+
+		}
+		
 		return value;
 	}
 
