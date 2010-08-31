@@ -108,9 +108,7 @@ public class FreeTextSearchHelper extends AbstractSearchHelper{
 				objectHash = Hashes.spoHash(Predicates.DC_MITYPE_IMAGE);
 			} else if (filter == FILTER_TYPE.TEXTS){
 				objectHash = Hashes.spoHash(Predicates.DC_MITYPE_TEXT);
-			} else if (filter == FILTER_TYPE.EXACT_MATCH){
-				objectHash = Hashes.spoHash(expression.toString());
-			}
+			} 
 			
 			buf.append(" AND Ty.object_hash =").append(objectHash).append(" ");
 		}
@@ -169,10 +167,11 @@ public class FreeTextSearchHelper extends AbstractSearchHelper{
 	private String getFreetextQueryCondition(List<Object> inParams) {
 		
 		StringBuffer buf = new StringBuffer();
+		
 		if (expression.isUri() || expression.isHash()){
 			buf.append(" where F.OBJECT_HASH=?");
 			inParams.add(expression.isHash() ?
-					expression.toString() : Long.valueOf(Hashes.spoHash(expression.toString())));
+					Long.valueOf(expression.toString()) : Long.valueOf(Hashes.spoHash(expression.toString())));
 		}
 		else{
 			buf.

@@ -79,22 +79,23 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
     	
     	FreeTextSearchHelper.FILTER_TYPE filterType = FreeTextSearchHelper.FILTER_TYPE.ANY_OBJECT;
     	
-    	if (simpleFilter.equals("anyObject")){
-    		filterType = FreeTextSearchHelper.FILTER_TYPE.ANY_OBJECT;
-    	} else if (simpleFilter.equals("anyFile")){
-    		filterType = FreeTextSearchHelper.FILTER_TYPE.ANY_FILE;
-    	} else if (simpleFilter.equals("texts")){
-    		filterType = FreeTextSearchHelper.FILTER_TYPE.TEXTS;
-    	} else if (simpleFilter.equals("datasets")){
-    		filterType = FreeTextSearchHelper.FILTER_TYPE.DATASETS;
-    	} else if (simpleFilter.equals("images")){
-    		filterType = FreeTextSearchHelper.FILTER_TYPE.IMAGES;
-    	} else if (simpleFilter.equals("exactMatch")){
-    		filterType = FreeTextSearchHelper.FILTER_TYPE.EXACT_MATCH;
-    	}
-    	
     	if (!searchExpression.isEmpty()) {
 
+    	   	if (simpleFilter.equals("anyObject")){
+        		filterType = FreeTextSearchHelper.FILTER_TYPE.ANY_OBJECT;
+        	} else if (simpleFilter.equals("anyFile")){
+        		filterType = FreeTextSearchHelper.FILTER_TYPE.ANY_FILE;
+        	} else if (simpleFilter.equals("texts")){
+        		filterType = FreeTextSearchHelper.FILTER_TYPE.TEXTS;
+        	} else if (simpleFilter.equals("datasets")){
+        		filterType = FreeTextSearchHelper.FILTER_TYPE.DATASETS;
+        	} else if (simpleFilter.equals("images")){
+        		filterType = FreeTextSearchHelper.FILTER_TYPE.IMAGES;
+        	} else if (simpleFilter.equals("exactMatch")){
+        		filterType = FreeTextSearchHelper.FILTER_TYPE.EXACT_MATCH;
+        		searchExpression = new SearchExpression(Long.valueOf(Hashes.spoHash(this.searchExpression.toString())).toString());
+        	}
+    		
     		if (searchExpression.isUri()) {
 
     			this.isUri = true;

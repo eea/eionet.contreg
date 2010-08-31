@@ -105,8 +105,9 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 				expression, pgQuery, pagingRequest, sortingRequest);
 		
 		// Set Filter
-		if (filterType != FreeTextSearchHelper.FILTER_TYPE.ANY_OBJECT){
-			helper.setFilter(filterType);
+		if (filterType != FreeTextSearchHelper.FILTER_TYPE.ANY_OBJECT
+			&& filterType != FreeTextSearchHelper.FILTER_TYPE.EXACT_MATCH){
+				helper.setFilter(filterType);
 		}
 
 		// create the list of IN parameters of the query

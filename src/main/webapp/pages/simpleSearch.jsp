@@ -32,7 +32,7 @@
 				<stripes:submit name="search" value="Search" id="searchButton"/>
 				</td>
 			</tr>
-			</tr>
+			<tr>
 				<td>
 					<stripes:label for="nofield" class="question">What type</stripes:label>
 				</td>
