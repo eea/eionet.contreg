@@ -42,7 +42,7 @@ import eionet.cr.web.util.columns.SubjectLastModifiedColumn;
  */
 public class FreeTextSearchHelper extends AbstractSearchHelper{
 	
-	public enum FILTER_TYPE {ANY_OBJECT, ANY_FILE, TEXTS, DATASETS, IMAGES};
+	public enum FILTER_TYPE { ANY_OBJECT, ANY_FILE, TEXTS, DATASETS, IMAGES, EXACT_MATCH };
 	
 	/** */
 	private SearchExpression expression;
@@ -108,6 +108,8 @@ public class FreeTextSearchHelper extends AbstractSearchHelper{
 				objectHash = Hashes.spoHash(Predicates.DC_MITYPE_IMAGE);
 			} else if (filter == FILTER_TYPE.TEXTS){
 				objectHash = Hashes.spoHash(Predicates.DC_MITYPE_TEXT);
+			} else if (filter == FILTER_TYPE.EXACT_MATCH){
+				objectHash = Hashes.spoHash(expression.toString());
 			}
 			
 			buf.append(" AND Ty.object_hash =").append(objectHash).append(" ");

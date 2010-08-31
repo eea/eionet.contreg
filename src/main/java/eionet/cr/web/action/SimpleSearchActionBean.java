@@ -89,6 +89,8 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
     		filterType = FreeTextSearchHelper.FILTER_TYPE.DATASETS;
     	} else if (simpleFilter.equals("images")){
     		filterType = FreeTextSearchHelper.FILTER_TYPE.IMAGES;
+    	} else if (simpleFilter.equals("exactMatch")){
+    		filterType = FreeTextSearchHelper.FILTER_TYPE.EXACT_MATCH;
     	}
     	
     	if (!searchExpression.isEmpty()) {

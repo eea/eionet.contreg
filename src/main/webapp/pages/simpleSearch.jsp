@@ -51,6 +51,9 @@
 					
 					<stripes:radio id="images" name="simpleFilter" value="images"/>
 					<stripes:label for="images">Images</stripes:label>
+					
+					<stripes:radio id="exactMatch" name="simpleFilter" value="exactMatch"/>
+					<stripes:label for="exactMatch">Exact match</stripes:label>
 				</td>
 			</tr>
 		</table>

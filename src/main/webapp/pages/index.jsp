@@ -60,10 +60,28 @@
 	</p>
 
 	<crfn:form name="searchForm" action="/simpleSearch.action" method="get" focus="searchExpression" style="padding-bottom:20px">
-	    	<stripes:label for="expressionText">Expression:</stripes:label>
-	    	<stripes:text name="searchExpression" id="expressionText" size="40"/>
-	    	<stripes:submit name="search" value="Search" id="searchButton"/>
-		<stripes:hidden name="simpleFilter" value="anyObject"/>
+		<table class="formtable">
+			<tr>
+			<td>
+		    	<stripes:label for="expressionText">Expression:</stripes:label>
+		    </td>
+			<td>
+		    	<stripes:text name="searchExpression" id="expressionText" size="40"/>
+		    </td>
+			<td>
+		    	<stripes:submit name="search" value="Search" id="searchButton"/>
+		    </td>
+			</tr>
+			<tr>
+			<td colspan="3">
+				<stripes:radio id="anyObject" name="simpleFilter" value="anyObject" checked="anyObject" title="Any Object"/>
+				<stripes:label for="anyObject">Full text search</stripes:label>
+				
+				<stripes:radio id="exactMatch" name="simpleFilter" value="exactMatch"/>
+				<stripes:label for="exactMatch">Exact match</stripes:label>
+			</td>
+			</tr>
+		</table>
 		<stripes:text name="dummy" style="visibility:hidden;display:none" disabled="disabled" size="1"/>
 	</crfn:form>
 
