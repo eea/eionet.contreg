@@ -78,12 +78,8 @@ public class CRActionBeanContext extends ActionBeanContext {
 	 * @return {@link CRUser} from session or null if user is not logged in.
 	 */
 	public CRUser getCRUser() {
-		CRUser user = (CRUser)getRequest().getSession().getAttribute(USER_SESSION_ATTR);
-//		if (user==null){
-//			user = new CRUser("heinlja");
-//			getRequest().getSession().setAttribute(USER_SESSION_ATTR, user);
-//		}
-		return user;
+		
+		return (CRUser)getRequest().getSession().getAttribute(USER_SESSION_ATTR);
 	}
 	
 	/**

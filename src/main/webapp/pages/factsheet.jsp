@@ -84,7 +84,7 @@
 												<stripes:url value="${actionBean.urlBinding}" event="harvest"  var="oldUrl">
 														<stripes:param name="uri" value="${actionBean.uri}"/>
 												</stripes:url>
-												<a id="wait_link" href="${oldUrl }" onclick="javascript:showWait('${pageContext.request.contextPath}', '${url }'); return false;">Harvest</a>
+												<a id="wait_link" href="${oldUrl }" onclick="javascript:loadAndWait('The resource is being harvested. Please wait ...', '${url }', '${pageContext.request.contextPath}'); return false;">Harvest</a>
 											</li>
 										</c:if>
 						    			<c:if test="${actionBean.urlFoundInHarvestSource}">

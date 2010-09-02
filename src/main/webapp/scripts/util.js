@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the Mozilla Public
  * License Version 1.1 (the "License"); you may not use this file
  * except in compliance with the License. You may obtain a copy of
@@ -9,18 +9,19 @@
  * implied. See the License for the specific language governing
  * rights and limitations under the License.
  *
- * The Original Code is "EINRC-5 / WebROD Project".
+ * The Original Code is Content Registry 2.0.
  *
- * The Initial Developer of the Original Code is TietoEnator.
- * The Original Code code was developed for the European
- * Environment Agency (EEA) under the IDA/EINRC framework contract.
+ * The Initial Owner of the Original Code is European Environment
+ * Agency.  Portions created by Tieto Eesti are Copyright
+ * (C) European Environment Agency.  All Rights Reserved.
  *
- * Copyright (C) 2000-2002 by European Environment Agency.  All
- * Rights Reserved.
- *
- * Original Code: Ander Tenno (TietoEnator)
+ * Contributor(s):
+ * Aleksandr Ivanov, Tieto Eesti
+ * Jaanus Heinlaid, Tieto Eesti
+ * Enriko Käsper, Tieto Eesti
+ * Jaak Kapten, Tieto Eesti
  */
-
+ 
 $(document).ready(
 		function(){
 
@@ -86,17 +87,38 @@ $(document).ready(
 			}
 });
 
+/**
+ * Opens a div that displayes the wait clock image and wait message.
+ * Into that same div it then loads the response from the given url.
+ * After the reponse has arrived, displays it for 5 seconds and then
+ * smoothly closes the div.
+ * 
+ * Input parameters:
+ *   message - the wait message to display
+ *   url - the url which is loaded
+ *   contextRoot - the webapp's context path, needed to display the wait clock image.
+ *
+ * Return value: false
+ */
+function loadAndWait(message, url, contextRoot) {
 
-function showWait(contextRoot, url) {
+	// if this method was called as a result to onclick event on a link (identified as "wait_link"),
+	// make sure the link's href value is overrided with '#'	
 	var v = $('#wait_link')[0].href ='#';
 	
+	// if the waiting div is already opened 
 	if($('#wait_div').length > 0){
 		return false;
 	}
+	
+	// display the waiting div (append to a div whose id="wait_container")
 	$("#wait_container").append('<div id="wait_div"' + 
 		'style="padding: 20px; border: 1px solid; background-color: #cccccc; width: 500px;' +
 		'height: 50px; position:absolute; z-index:100000;  left: 300px; top: 300px; ">' +
-		'<img src="' + contextRoot + '/images/wait.gif"/> Feedback will be available soon</div>');
+		'<img src="' + contextRoot + '/images/wait.gif" alt="Wait clock"/>' + message + '</div>');
+	
+	// load the given url into the displayed waiting div,
+	// if the response has arrived then display it for 5000 milliseconds and close the div slowly
 	$("#wait_div").load(url, 
 			function(){
 				$("#wait_div").oneTime(
@@ -110,154 +132,47 @@ function showWait(contextRoot, url) {
 	return false;
 }
 
-//
-// Replaces some text in a string with other text
-//
-function replaceText(string,text,by) {
-  var strLength = string.length, txtLength = text.length;
-  if((strLength == 0) || (txtLength == 0)) 
-    return string;
-
-  var i = string.indexOf(text);
-  if((!i) && (text != string.substring(0,txtLength))) 
-    return string;
-
-  if(i == -1) 
-    return string;
-
-  var newstr = string.substring(0,i) + by;
-  if(i+txtLength < strLength)
-    newstr += replace(string.substring(i+txtLength,strLength),text,by);
-  return newstr;
-}
-
 /**
-* checks if the entered value is a valid URL, resets the filed if not
-* quick hard-code - field is not selected - needs studying
-*/
-function chkUrl(fld) {
-	var s = fld.value;
-	if ( s != "" &&  (s.substr(0,7) != "http://") && (s.substr(0,8) != "https://") && (s.substr(0,6) != "ftp://") )	{
-		alert("Wrong URL format");
-	}
-}
-
-function openPopup(servletName, params) {
-	var url = servletName + "?" + params;
-	//alert(url);
-
-	var name = servletName;
-
-	if (servletName.indexOf(".") != -1)
-		name=servletName.substr(0, servletName.indexOf("."));
-
-
-	
-	var features = "location=no, menubar=yes, width=750, height=600, top=50, left=30, resizable=yes, scrollbars=yes";
-	var w = window.open(url,name,features);
-	w.focus();
-}
-
-function openWindow(windowName) {
-	var features = "";//"location=no, menubar=yes, width=750, height=600, top=50, left=30, resizable=yes, scrollbars=yes";
-	var w = window.open(windowName,"",features);
-	w.focus();
-}
-
-/**
-*/
-	function getRequestParameter(name) {
-		var url = document.URL;
-		var value="";
-
-		i = url.indexOf(name + '=');
-
-		len = name.length + 1;
-
-		if (i > 0) {
-			beg = url.substring(0,i+len);
-
-			sStr= url.substring(i+len);
-			j = sStr.indexOf('&');
-
-			if (j > 0)
-				value = sStr.substring(0,j);
-			else
-				value = sStr; //.substring(i+len);
-
-		}
-		else
-			value="";
-	
-		
-		//alert(value);
-		return value;
-
-	}
-	function changeParamInUrl(sName, sValue){
-		var sUrl, i, j,  sBeg, sEnd, sStr;
-	
-		sUrl = document.URL;
-		i = sUrl.indexOf(sName + '=');
-		if (i > 0) {
-			sBeg=sUrl.substr(0, i); 
-			sStr=sUrl.substr(i);
-			j = sStr.indexOf('&');
-			if (j > 0)
-			   sEnd = sStr.substr(j);
-			else
-			   sEnd= '';
-
-			sUrl=sBeg + sName + '=' + sValue + sEnd ;
-
-			}
-		else
-			{
-
-			j = sUrl.indexOf('?');
-			if (j>0)
-				sUrl = sUrl + '&' + sName + '=' + sValue;
-			else
-				sUrl = sUrl + '?' + sName + '=' + sValue;
-			}
-		return sUrl ;
-	}
-
-
-	function changeParamInString(sUrl, sName, sValue){
-		var  i, j,  sBeg, sEnd, sStr;
-		
-		i = sUrl.indexOf(sName + '=');
-		if (i > 0) {
-			sBeg=sUrl.substr(0, i); 
-			sStr=sUrl.substr(i);
-			j = sStr.indexOf('&');
-			if (j > 0)
-			   sEnd = sStr.substr(j);
-			else
-			   sEnd= '';
-
-			sUrl=sBeg + sName + '=' + sValue + sEnd ;
-
-			}
-		else
-			{
-
-			j = sUrl.indexOf('?');
-			if (j>0)
-				sUrl = sUrl + '&' + sName + '=' + sValue;
-			else
-				sUrl = sUrl + '?' + sName + '=' + sValue;
-			}
-		redirect(sUrl);
-	}
-
-	function redirect(url){
-		document.location=url;
-	}
-
-/**
+ * Opens a div that displayes the wait clock image and wait message.
+ * Example usage situation:
+ *   When the user clicks a form's submit button or clicks an internal link, this div
+ *   is displayed to let the user know that something is being done and he
+ *   should wait for the response. The response comes from server could direct or
+ *   forward to another page, or reload the same page. All of the latter cases will
+ *   result in new page loaded into the window, in which case the div disappears.
+ *   It should then be the server's responsibility that a proper feedback message
+ *   is displayed in the newly loaded page.
+ * 
+ * Input parameters:
+ *   message - the wait message to display
+ *   contextRoot - the webapp's context path, needed to display the wait clock image.
  *
+ * Return value: true
+ */
+function showWait(message, contextRoot) {
+
+	// if the waiting div is already opened 
+	if($('#wait_div').length > 0){
+		return false;
+	}
+	
+	// display the waiting div (append to a div whose id="wait_container")
+	$("#wait_container").append('<div id="wait_div"' + 
+		'style="padding: 20px; border: 1px solid; background-color: #cccccc; width: 500px;' +
+		'height: 50px; position:absolute; z-index:100000;  left: 300px; top: 300px; ">' +
+		'<img src="' + contextRoot + '/images/wait.gif" alt="Wait clock"/>' + message + '</div>');
+		
+	return true;
+}
+
+/**
+ * Toggles the "select all" feature for ALL checkboxes found inside
+ * the given form.
+ *
+ * Input parameters:
+ *   formname - the name of the form object where these checkboxes are looked for
+ *
+ * Return value: none
  */
 function toggleSelectAll(formname) {
   formobj = document.getElementById(formname);
@@ -278,12 +193,3 @@ function toggleSelectAll(formname) {
 	formobj.selectAll.value = "Select all";
   }
 }
-
-function disableElement(elementId) {
-	this.document.getElementById(elementId).disabled = true;
-}
-
-function hideElement(elementId) {
-	this.document.getElementById(elementId).style.display = 'none';
-}
-

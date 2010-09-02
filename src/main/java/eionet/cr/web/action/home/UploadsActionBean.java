@@ -10,6 +10,7 @@ import net.sourceforge.stripes.action.FileBean;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.action.StreamingResolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.controller.LifecycleStage;
 import net.sourceforge.stripes.validation.ValidationMethod;
@@ -17,6 +18,7 @@ import net.sourceforge.stripes.validation.ValidationMethod;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 
+import eionet.cr.common.CRRuntimeException;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.config.GeneralConfig;
@@ -42,7 +44,7 @@ import eionet.cr.web.security.CRUser;
  */
 
 @UrlBinding("/home/{username}/uploads")
-public class UploadsActionBean extends AbstractHomeActionBean {
+public class UploadsActionBean extends AbstractHomeActionBean implements Runnable{
 	
 	/** */
 	private String title;
@@ -52,6 +54,13 @@ public class UploadsActionBean extends AbstractHomeActionBean {
 	private boolean replaceExisting;
 	/** */
 	private Collection<UploadDTO> uploads;
+	/** */
+	private boolean contentSaved;
+	/** */
+	private Exception saveAndHarvestException;
+	
+	/** URI assigned to the uploaded file as a subject. */
+	private String subjectUri;
 
 	/**
 	 * 
@@ -71,6 +80,23 @@ public class UploadsActionBean extends AbstractHomeActionBean {
 	 */
 	public Resolution add() throws DAOException, IOException{
 		
+		try{
+			return doAdd();
+		}
+		finally{
+			deleteUploadedFile(uploadedFile);
+		}
+	}
+	
+	/**
+	 * 
+	 * @return
+	 * @throws DAOException
+	 * @throws IOException
+	 */
+	private Resolution doAdd() throws DAOException, IOException{
+		
+		Thread thread = null;
 		Resolution resolution = new ForwardResolution("/pages/home/addUpload.jsp");
 		if (isPostRequest()){
 
@@ -78,42 +104,18 @@ public class UploadsActionBean extends AbstractHomeActionBean {
 			
 			if (uploadedFile!=null){
 				
-				// initialize subjectUri 
-				String subjectUri = getUser().getHomeUri() + "/" + uploadedFile.getFileName();
-				
 				// unless a replace requested, make sure file does not already exist
 				if (replaceExisting==false){
-					if (DAOFactory.get().getDao(HelperDAO.class).isExistingSubject(subjectUri)){
+					if (DAOFactory.get().getDao(HelperDAO.class).isExistingSubject(getSubjectUri())){
 						addWarningMessage("A file with such a name already exists!" +
 								" Use \"replace existing\" checkbox to overwrite.");
 						return resolution;
 					}
 				}
+				
+				// save the file's content and try to harvest it
+				saveAndHarvest();
 
-				// save the file's content into database
-				saveContent(subjectUri, uploadedFile);
-
-				// add cr:hasFile predicate to the user's home URI in SPO
-				
-				logger.debug("Creating the cr:hasFile predicate");
-				
-				SubjectDTO subjectDTO = new SubjectDTO(getUser().getHomeUri(), false);
-				ObjectDTO objectDTO = new ObjectDTO(subjectUri, false);
-				objectDTO.setSourceUri(getUser().getHomeUri());
-				subjectDTO.addObject(Predicates.CR_HAS_FILE, objectDTO);
-				
-				DAOFactory.get().getDao(HelperDAO.class).addTriples(subjectDTO);
-				
-				// make sure cr:hasFile is present in RESOURCE
-				DAOFactory.get().getDao(HelperDAO.class).addResource(
-						Predicates.CR_HAS_FILE, getUser().getHomeUri());
-
-				// attempt to harvest the uploaded file
-				harvestUploadedFile(subjectUri, uploadedFile, title);
-
-				// delete uploaded file now that the parsing has been done
-				deleteUploadedFile(uploadedFile);
-				
 				// redirect to the uploads list
 				String urlBinding = getUrlBinding();
 				resolution = new RedirectResolution(StringUtils.replace(
@@ -123,6 +125,108 @@ public class UploadsActionBean extends AbstractHomeActionBean {
 		
 		return resolution;
 	}
+	
+	/**
+	 * @throws IOException 
+	 * @throws DAOException 
+	 * 
+	 */
+	private void saveAndHarvest() throws IOException, DAOException{
+		
+		// start the thread that saves the file's content and attempts to harvest it
+		Thread thread = new Thread(this);
+		thread.start();
+
+		// check the thread after every second, exit loop if it hasn't finished in 15 seconds 
+		for (int loopCount = 0; thread.isAlive() && loopCount<15; loopCount++){
+			try {
+				Thread.sleep(1000);
+			}
+			catch (InterruptedException e) {
+				throw new CRRuntimeException(e.toString(), e);
+			}
+		}
+		
+		// if the the thread reported an exception, throw it
+		if (saveAndHarvestException!=null){
+			if (saveAndHarvestException instanceof DAOException){
+				throw (DAOException)saveAndHarvestException;
+			}
+			else if (saveAndHarvestException instanceof IOException){
+				throw (IOException)saveAndHarvestException;
+			}
+			else if (saveAndHarvestException instanceof RuntimeException){
+				throw (RuntimeException)saveAndHarvestException;
+			}
+			else{
+				throw new CRRuntimeException(
+						saveAndHarvestException.getMessage(), saveAndHarvestException);
+			}
+		}
+		
+		// add feedback message to the bean's context
+		if (!thread.isAlive()){
+			addSystemMessage("File saved and harvested!");
+		}
+		else{
+			if (!contentSaved){
+				addSystemMessage("Saving and harvesting the file continues in the background!");
+			}
+			else{
+				addSystemMessage("File content saved, but harvest continues in the background!");
+			}
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Runnable#run()
+	 */
+	public void run() {
+		
+		if (uploadedFile==null){
+			throw new CRRuntimeException("Uploaded file object must not be null");
+		}
+		
+		// save the file's content into database
+		try {
+			saveContent(getSubjectUri(), uploadedFile);
+			contentSaved = true;
+		}
+		catch (DAOException e) {
+			saveAndHarvestException = e;
+			return;
+		}
+		catch (IOException e) {
+			saveAndHarvestException = e;
+			return;
+		}
+
+		// add cr:hasFile predicate to the user's home URI in SPO
+		
+		logger.debug("Creating the cr:hasFile predicate");
+		
+		SubjectDTO subjectDTO = new SubjectDTO(getUser().getHomeUri(), false);
+		ObjectDTO objectDTO = new ObjectDTO(getSubjectUri(), false);
+		objectDTO.setSourceUri(getUser().getHomeUri());
+		subjectDTO.addObject(Predicates.CR_HAS_FILE, objectDTO);
+		
+		try{
+			DAOFactory.get().getDao(HelperDAO.class).addTriples(subjectDTO);
+
+			// make sure cr:hasFile is present in RESOURCE
+			DAOFactory.get().getDao(HelperDAO.class).addResource(
+					Predicates.CR_HAS_FILE, getUser().getHomeUri());
+		}
+		catch (DAOException e){
+			saveAndHarvestException = e;
+			return;
+		}
+		
+		// attempt to harvest the uploaded file
+		harvestUploadedFile(getSubjectUri(), uploadedFile, title);
+	}
+
 	
 	/**
 	 * 
@@ -177,6 +281,16 @@ public class UploadsActionBean extends AbstractHomeActionBean {
 		
 		// TODO
 		return new ForwardResolution("/pages/home/uploads.jsp");
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public Resolution cancel(){
+		
+		return new RedirectResolution(StringUtils.replace(
+				getUrlBinding(), "{username}", getUserName()));
 	}
 
 	/**
@@ -302,5 +416,20 @@ public class UploadsActionBean extends AbstractHomeActionBean {
 		}
 		
 		return uploads;
+	}
+
+
+	/**
+	 * @return the subjectUri
+	 */
+	public String getSubjectUri() {
+		
+		if (StringUtils.isBlank(subjectUri)){
+			if (uploadedFile!=null && getUser()!=null){
+				subjectUri = getUser().getHomeUri() + "/" + uploadedFile.getFileName();
+			}
+		}
+		
+		return subjectUri;
 	}
 }

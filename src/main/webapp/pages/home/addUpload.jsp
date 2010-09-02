@@ -29,12 +29,16 @@
 					</tr>
 					<tr>
 						<td colspan="2">
-							<stripes:submit name="add" value="Upload"/>
-							<input type="button" name="cancel" value="Cancel" onclick="history.go(-1);" />
+							<stripes:submit name="add" value="Upload"
+								onclick="javascript:showWait('The file is being uploaded, and its harevst is attempted. Please wait ...', '${pageContext.request.contextPath}');return true;"/>
+							<stripes:submit name="cancel" value="Cancel" onclick="history.go(-1);" />
 						</td>       
 					</tr>
 				</table>
 			</crfn:form>
+			
+			<!-- dummy container used to display wait messages (see util.js) -->
+			<div id="wait_container"></div>
 	
 	</stripes:layout-component>
 	

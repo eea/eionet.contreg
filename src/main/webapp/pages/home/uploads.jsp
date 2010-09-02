@@ -19,7 +19,7 @@
 	</ul>
 	</c:if>
 	<h1>My files</h1>
-	<crfn:form action="#" method="post">
+	<crfn:form action="${actionBean.baseHomeUrl}${actionBean.attemptedUserName}/uploads" method="post">
 	
 		<display:table name="${actionBean.uploads}" class="sortable"
 						pagesize="20" sort="list" id="uploadDTO" htmlId="uploads"
