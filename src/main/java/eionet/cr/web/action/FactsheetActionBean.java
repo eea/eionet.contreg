@@ -95,10 +95,11 @@ public class FactsheetActionBean extends AbstractActionBean{
 	/** */
 	private boolean noCriteria;
 	
-	private boolean urlFoundInHarvestSource = false;
-	private boolean adminLoggedIn = false;
+	private boolean urlFoundInHarvestSource;
+	private boolean adminLoggedIn;
 	
-	private boolean urlUserBookmark = false;
+	/** */
+	private Boolean subjectIsUserBookmark;
 	
 	/** */
 	private Boolean uriIsHarvestSource;
@@ -564,22 +565,24 @@ public class FactsheetActionBean extends AbstractActionBean{
 		this.adminLoggedIn = adminLoggedIn;
 	}
 
-	public boolean isUrlUserBookmark() {
-		if (isUserLoggedIn()){
-			try {
-				urlUserBookmark = factory.getDao(HelperDAO.class).isUrlUserBookmark(getUser(), getUrl());
-			} catch (DAOException ex){
-				urlUserBookmark = false;
-			}
-		} else {
-			urlUserBookmark = false;
+	/**
+	 * 
+	 * @return
+	 * @throws DAOException 
+	 */
+	public boolean getSubjectIsUserBookmark() throws DAOException {
+		
+		if (!isUserLoggedIn()){
+			return false;
 		}
 		
-		return urlUserBookmark;
-	}
-
-	public void setUrlUserBookmark(boolean urlUserBookmark) {
-		this.urlUserBookmark = urlUserBookmark;
+		if (subjectIsUserBookmark==null){
+			long subjectHash = StringUtils.isBlank(uri) ? uriHash : Hashes.spoHash(uri);
+			subjectIsUserBookmark = Boolean.valueOf(
+					factory.getDao(HelperDAO.class).isSubjectUserBookmark(getUser(), subjectHash));
+		}
+		
+		return subjectIsUserBookmark.booleanValue();
 	}
 
 	/**

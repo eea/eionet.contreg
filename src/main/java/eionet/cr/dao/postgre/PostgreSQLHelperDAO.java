@@ -1212,10 +1212,18 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 		return returnBookmarks;
 	}
 	
-	@Override
-	public boolean isUrlUserBookmark(CRUser user, String url) throws DAOException{
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#isSubjectUserBookmark(eionet.cr.web.security.CRUser, long)
+	 */
+	public boolean isSubjectUserBookmark(CRUser user, long subjectHash) throws DAOException{
+		
+		if (user==null){
+			throw new IllegalArgumentException("User object must not be null");
+		}
+		
 		String dbQuery = "select count(*) as cnt from SPO " +
-				"where OBJECT_HASH=" + Hashes.spoHash(url) + " and " +
+				"where OBJECT_HASH=" + subjectHash + " and " +
 				"LIT_OBJ='N' and " +
 				"PREDICATE="+Hashes.spoHash(Predicates.CR_BOOKMARK)+ " and " +
 				"SOURCE="+ Hashes.spoHash(CRUser.bookmarksUri(user.getUserName())) + "";

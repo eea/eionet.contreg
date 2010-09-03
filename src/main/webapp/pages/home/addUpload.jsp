@@ -6,6 +6,7 @@
 
 	<stripes:layout-component name="contents">
 	
+		<div id="wait_container">
 			<h1>Upload content file</h1>
 			
 		    <crfn:form action="${actionBean.baseHomeUrl}${actionBean.attemptedUserName}/uploads" method="post">
@@ -37,8 +38,7 @@
 				</table>
 			</crfn:form>
 			
-			<!-- dummy container used to display wait messages (see util.js) -->
-			<div id="wait_container"></div>
+		</div>
 	
 	</stripes:layout-component>
 	

@@ -97,7 +97,7 @@
 						    					<stripes:link class="link-plain" href="/download.action?uri=${subjectUri}">Download</stripes:link>
 						    				</li>
 						    			</c:if>
-				    					<c:if test="${ !actionBean.urlUserBookmark }">
+				    					<c:if test="${!actionBean.subjectIsUserBookmark}">
 				    						<li>
 						    				<stripes:link class="link-plain" href="/factsheet.action">Add bookmark
 						    				<stripes:param name="addbookmark" value="" />
@@ -105,7 +105,7 @@
 						    				</stripes:link>
 						    				</li>
 				    					</c:if>				    					
-				    					<c:if test="${ actionBean.urlUserBookmark }">
+				    					<c:if test="${actionBean.subjectIsUserBookmark}">
 				    						<li>
 						    				<stripes:link class="link-plain" href="/factsheet.action">Remove bookmark
 						    				<stripes:param name="removebookmark" value="" />
@@ -132,7 +132,7 @@
 				    			<c:when test="${subjectUrl!=null}">
 				    				<div><p>Resource URL: <a class="link-external" href="${fn:escapeXml(subjectUrl)}"><c:out value="${subjectUrl}"/></a>
 				    				<c:choose>
-				    					<c:when	test ="${ actionBean.urlUserBookmark }"> (Bookmarked)</c:when>
+				    					<c:when	test ="${actionBean.subjectIsUserBookmark}"> (Bookmarked)</c:when>
 				    				</c:choose></p></div>
 				    				
 				    				

@@ -238,10 +238,10 @@ public interface HelperDAO extends DAO {
 	/**
 	 * 
 	 * @param user
-	 * @param url
+	 * @param subjectHash
 	 * @throws DAOException
 	 */
-	public boolean isUrlUserBookmark(CRUser user, String url) throws DAOException;
+	public boolean isSubjectUserBookmark(CRUser user, long subjectHash) throws DAOException;
 	
 	/**
 	 * 

@@ -838,7 +838,7 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 	}
 	
 	@Override
-	public boolean isUrlUserBookmark(CRUser user, String url)  throws DAOException {
+	public boolean isSubjectUserBookmark(CRUser user, long subjectHash)  throws DAOException {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("Method not implemented");
 	}
