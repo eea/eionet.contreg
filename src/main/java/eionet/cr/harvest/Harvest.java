@@ -313,14 +313,15 @@ public abstract class Harvest {
 			throw new HarvestException(e.toString(), e);
 		}
 	}
-	
+
 	/**
-	 * @throws HarvestException 
+	 * Saves the "harvest-finished" status and any harvest error/warning messages into the database,
+	 * and sends e-mail notification of those messages.
 	 */
 	protected void doHarvestFinishedActions(){
 		
-		/* send notification of messages that occurred during the harvest */
-		
+		// send e-mail notification of messages that occurred DURING the harvest
+		// (see below about messages that occurred AFTER the harvest)
 		try{
 			if (notificationSender!=null)
 				notificationSender.notifyMessages(this);
@@ -330,11 +331,11 @@ public abstract class Harvest {
 			logger.error("Harvest notification sender threw an error: " + e.toString(), e);
 		}
 		
-		// let's be so ambitious and try to remember even the errors that will happen during the finishing actions
+		// let's be so ambitious and try to remember even the errors that will happen during the
+		// finishing actions
 		ArrayList<Throwable> finishingErrors  = new ArrayList<Throwable>();
 		
-		/* call harvest-finished functions of the DAO */
-		
+		// log harvest finished event into the database
 		if (daoWriter!=null){
 			try{
 				daoWriter.writeFinished(this);
@@ -354,8 +355,7 @@ public abstract class Harvest {
 			}
 		}
 
-		/* send notification of finishing errors */
-		
+		// send e-mail notification of finishing errors
 		try{
 			if (notificationSender!=null && finishingErrors.size()>0){
 				notificationSender.notifyMessagesAfterHarvest(finishingErrors, this);

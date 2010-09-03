@@ -1924,4 +1924,48 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 			SQLUtil.close(conn);
 		}
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#deleteSubjects(java.util.List)
+	 */
+	public void deleteSubjects(List<String> subjectUris) throws DAOException {
+		
+		// make sure the list is not null or empty
+		if (subjectUris==null || subjectUris.isEmpty()){
+			return;
+		}
+		
+		// convert URIs to hashes
+		ArrayList<Long> hashes = new ArrayList<Long>();
+		for (String uri : subjectUris){
+			hashes.add(Long.valueOf(Hashes.spoHash(uri)));
+		}
+		
+		// prepare connection and the hashes comma-separated
+		Connection conn = null;
+		String hashesStr = "(" + Util.toCSV(hashes) + ")";
+		
+		try{
+			// do it in a transaction
+			conn = getConnection();
+			conn.setAutoCommit(false);
+			
+			// delete references from SPO and SPO_BINARY
+			SQLUtil.executeUpdate("delete from SPO where SUBJECT in " + hashesStr, conn);
+			SQLUtil.executeUpdate("delete from SPO where OBJECT_HASH in " + hashesStr, conn);
+			SQLUtil.executeUpdate("delete from SPO where OBJ_SOURCE_OBJECT in " + hashesStr, conn);
+			SQLUtil.executeUpdate("delete from SPO_BINARY where SUBJECT in " + hashesStr, conn);
+
+			// commit the transaction
+			conn.commit();
+		}
+		catch (SQLException e){
+			throw new DAOException(e.getMessage(), e);
+		}
+		finally{
+			SQLUtil.rollback(conn);
+			SQLUtil.close(conn);
+		}
+	}
 }

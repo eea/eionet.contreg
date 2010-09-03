@@ -945,6 +945,14 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 	public boolean isExistingSubject(String subjectUri) throws DAOException {
 		throw new UnsupportedOperationException("Method not implemented");
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#deleteSubjects(java.util.List)
+	 */
+	public void deleteSubjects(List<String> subjectUris) throws DAOException {
+		throw new UnsupportedOperationException("Method not implemented");
+	}
 }
 
 

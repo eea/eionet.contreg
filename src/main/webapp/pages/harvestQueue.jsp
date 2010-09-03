@@ -28,12 +28,12 @@
         	</div>
         </c:if>
         
-        <c:if test="${not empty actionBean.currentHarvest}">
+        <c:if test="${not empty actionBean.currentQueuedHarvest}">
 			<div class="advise-msg" style="margin-bottom:10px">
 				<c:choose>
 					<c:when test="${fn:endsWith(currentHarvest.class.name, 'PushHarvest')}">Currently push-harvesting:&nbsp;</c:when>
 					<c:otherwise>Currently pull-harvesting:&nbsp;</c:otherwise>
-				</c:choose><span title="${actionBean.currentHarvest.sourceUrlString}"><c:out value="${crfn:cutAtFirstLongToken(actionBean.currentHarvest.sourceUrlString,55)}"/></span>
+				</c:choose><span title="${actionBean.currentQueuedHarvest.sourceUrlString}"><c:out value="${crfn:cutAtFirstLongToken(actionBean.currentQueuedHarvest.sourceUrlString,55)}"/></span>
 			</div>
 		</c:if>
 		

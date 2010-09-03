@@ -272,10 +272,9 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 	 */
 	private void pushHarvest(String url, String pushedContent){
 		
-		// if the source is currently being harvested by InstantHarvester then return
-		//if (url!=null && url.equals(InstantHarvester.getCurrentHarvestSourceUrl())){
+		// if the source is currently being harvested then return
 		if (url!=null && CurrentHarvests.contains(url)){
-			logger.debug("The source is currently being instantly-harvested, so skipping it");
+			logger.debug("The source is currently being harvested, so skipping it");
 			return;
 		}
 		
@@ -321,10 +320,9 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 		
 		if (harvestSource!=null){
 			
-			// if the source is currently being harvested by InstantHarvester then return
-			//if (harvestSource.getUrl().equals(InstantHarvester.getCurrentHarvestSourceUrl())){
+			// if the source is currently being harvested then return
 			if (CurrentHarvests.contains(harvestSource.getUrl())){
-				logger.debug("The source is currently being instantly-harvested, so skipping it");
+				logger.debug("The source is currently being harvested, so skipping it");
 				return;
 			}
 			

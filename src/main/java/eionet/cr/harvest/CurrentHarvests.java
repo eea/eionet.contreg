@@ -33,13 +33,13 @@ public class CurrentHarvests {
 
 	/** */
 	private static Harvest queuedHarvest;
-	private static HashMap<String,String> instantHarvests;
+	private static HashMap<String,String> onDemandHarvests;
 	
 	/**
 	 * 
 	 */
 	static{
-		instantHarvests = new HashMap<String,String>();
+		onDemandHarvests = new HashMap<String,String>();
 	}
 
 	/**
@@ -61,10 +61,10 @@ public class CurrentHarvests {
 	 * @param url
 	 * @param user
 	 */
-	public static synchronized void addInstantHarvest(String url, String user) {
+	public static synchronized void addOnDemandHarvest(String url, String user) {
 		
 		if (url!=null && user!=null){
-			instantHarvests.put(url, user);
+			onDemandHarvests.put(url, user);
 		}
 	}
 	
@@ -72,19 +72,10 @@ public class CurrentHarvests {
 	 * 
 	 * @param url
 	 */
-	public static synchronized void removeInstantHarvest(String url) {
+	public static synchronized void removeOnDemandHarvest(String url) {
 		if (url!=null){
-			instantHarvests.remove(url);
+			onDemandHarvests.remove(url);
 		}
-	}
-	
-	/**
-	 * 
-	 * @param url
-	 * @return
-	 */
-	public static synchronized boolean containsInstantHarvest(String url) {
-		return url==null ? false : instantHarvests.containsKey(url);
 	}
 	
 	/**
@@ -93,7 +84,7 @@ public class CurrentHarvests {
 	 * @return
 	 */
 	public static synchronized boolean contains(String url) {		
-		return url==null ? false : (queuedHarvest!=null && url.equals(queuedHarvest.getSourceUrlString())) || instantHarvests.containsKey(url);
+		return url==null ? false : (queuedHarvest!=null && url.equals(queuedHarvest.getSourceUrlString())) || onDemandHarvests.containsKey(url);
 	}
 
 	/**
@@ -106,7 +97,7 @@ public class CurrentHarvests {
 		if (queuedHarvest!=null && Hashes.spoHash(queuedHarvest.getSourceUrlString())==urlHash)
 			return true;
 		
-		for (String url:instantHarvests.keySet()){
+		for (String url:onDemandHarvests.keySet()){
 			if (Hashes.spoHash(url)==urlHash){
 				return true;
 			}

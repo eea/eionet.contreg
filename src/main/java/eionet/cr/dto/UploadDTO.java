@@ -20,6 +20,7 @@
 * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.dto;
 
+
 /**
  * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>

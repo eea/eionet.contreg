@@ -270,7 +270,7 @@ public abstract class AbstractHomeActionBean extends AbstractActionBean {
 		}
 			
 		// perform harvest,
-		// don't throw exceptions, as an uploaded file does not have to be harvestable
+		// don't throw exceptions, as an uploaded file does not HAVE to be harvestable
 		try{
 			if (hSourceDTO!=null){
 				UploadHarvest uploadHarvest =

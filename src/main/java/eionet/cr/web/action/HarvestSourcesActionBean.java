@@ -64,6 +64,19 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
 	public static final List<Pair<String, String>> sourceTypes;
 	private static final List<SearchResultColumn> columnList;
 	
+	/**
+	 * the string to be searched 
+	 */
+	private String searchString;
+	
+
+	/** */
+	private String type;
+
+	/** */
+	private List<String> sourceUrl;
+
+	/** */
 	static {
 		sourceTypes = new LinkedList<Pair<String,String>>();
 		sourceTypes.add(new Pair<String, String>(null, "Sources"));
@@ -90,25 +103,7 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
 		columnList.add(dateColumn);
 		
 	}
-	
-	
-	/**
-	 * the string to be searched 
-	 */
-	private String searchString;
-	
 
-	/** */
-	private String type;
-
-	/** */
-	private List<String> sourceUrl;
-
-
-	/** */
-	public HarvestSourcesActionBean(){
-	}
-	
 	/** 
 	 * @see eionet.cr.web.action.AbstractSearchActionBean#search()
 	 * {@inheritDoc}

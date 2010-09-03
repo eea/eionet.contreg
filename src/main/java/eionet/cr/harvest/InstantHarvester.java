@@ -40,20 +40,9 @@ public class InstantHarvester extends Thread{
 	/** */
 	public enum Resolution{ALREADY_HARVESTING, UNCOMPLETE, COMPLETE, NO_STRUCTURED_DATA, SOURCE_UNAVAILABLE;}
 	
-//	/** */
-//	private static String currentHarvestSourceUrl;
-//	
-//	/** */
-//	private static HashSet<String> currentlyHarvestingUrls;
-	
 	/** */
 	private String sourceUrl;
 	private String userName;
-	
-//	/** */
-//	static{
-//		currentlyHarvestingUrls = new HashSet<String>();
-//	}
 	
 	/** */
 	private HarvestException harvestException = null;
@@ -99,8 +88,7 @@ public class InstantHarvester extends Thread{
 				rdfContentFound = instantHarvest.isRdfContentFound();
 				sourceAvailable = instantHarvest.getSourceAvailable()!=null && instantHarvest.getSourceAvailable().booleanValue();
 			}
-			CurrentHarvests.removeInstantHarvest(sourceUrl);
-//			InstantHarvester.setCurrentHarvestSourceUrl(null);
+			CurrentHarvests.removeOnDemandHarvest(sourceUrl);
 		}
 	}
 	
@@ -112,33 +100,6 @@ public class InstantHarvester extends Thread{
 		return harvestException!=null;
 	}
 	
-//	/**
-//	 * @return the currentHarvestSourceUrl
-//	 */
-//	public static synchronized String getCurrentHarvestSourceUrl() {
-//		return currentHarvestSourceUrl;
-//	}
-//
-//	/**
-//	 * @param currentHarvestSourceUrl the currentHarvestSourceUrl to set
-//	 */
-//	public static synchronized void setCurrentHarvestSourceUrl(String currentHarvestSource) {
-//		InstantHarvester.currentHarvestSourceUrl = currentHarvestSource;
-//	}
-	
-//	/**
-//	 * 
-//	 * @param sourceUrl
-//	 * @return
-//	 */
-//	private static boolean isCurrentlyHarvested(String sourceUrl){
-//
-//		return sourceUrl.equals(HarvestingJob.getCurrentHarvestUrl()) || InstantHarvester.currentlyHarvestingUrls.contains(sourceUrl);
-////		Harvest currentScheduledHarvest = HarvestingJob.getCurrentHarvest();		
-////		return sourceUrl.equals(InstantHarvester.getCurrentHarvestSourceUrl())
-////		       || (currentScheduledHarvest!=null && sourceUrl.equals(currentScheduledHarvest.getSourceUrlString()));
-//	}
-
 	/**
 	 * 
 	 * @param sourceUrl
@@ -152,13 +113,11 @@ public class InstantHarvester extends Thread{
 		else if (StringUtils.isBlank(userName))
 			throw new IllegalArgumentException("Instant harvest user name must not be null or blank!");
 				
-//		if (InstantHarvester.isCurrentlyHarvested(sourceUrl)){
 		if (CurrentHarvests.contains(sourceUrl)){
 			return Resolution.ALREADY_HARVESTING;
 		}
 		
-		CurrentHarvests.addInstantHarvest(sourceUrl, userName);
-//		setCurrentHarvestSourceUrl(sourceUrl);
+		CurrentHarvests.addOnDemandHarvest(sourceUrl, userName);
 
 		InstantHarvester instantHarvester = null;
 		try{
@@ -193,8 +152,7 @@ public class InstantHarvester extends Thread{
 			// if the instant harvester was never constructed or it isn't alive any more,
 			// make sure the current-harvest-source-url is nullified
 			if (instantHarvester==null || !instantHarvester.isAlive()){
-				CurrentHarvests.removeInstantHarvest(sourceUrl);
-//				setCurrentHarvestSourceUrl(null);
+				CurrentHarvests.removeOnDemandHarvest(sourceUrl);
 			}
 		}
 	}

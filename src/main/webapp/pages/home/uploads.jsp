@@ -43,8 +43,8 @@
 		<div>
 			<stripes:submit name="delete" value="Delete" title="Delete selecetd files"/>
 			<stripes:submit name="rename" value="Rename" title="Rename selecetd file"/>
-			<stripes:submit name="edit" value="Edit" title="Edit selecetd file"/>
 		</div>
+		
 	</crfn:form>
 	
 </stripes:layout-component>

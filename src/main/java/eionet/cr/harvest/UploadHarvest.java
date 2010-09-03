@@ -135,6 +135,8 @@ public class UploadHarvest extends Harvest{
 	 */
 	protected void doExecute() throws HarvestException{
 		
+		CurrentHarvests.addOnDemandHarvest(sourceUrlString, userName);
+		
 		logger.debug("Execution started");
 		
 		File convertedFile = null;
@@ -191,6 +193,8 @@ public class UploadHarvest extends Harvest{
 			if (convertedFile!=null && convertedFile.exists()){
 				convertedFile.delete();
 			}
+			
+			CurrentHarvests.removeOnDemandHarvest(sourceUrlString);
 		}
 	}
 	
@@ -215,8 +219,7 @@ public class UploadHarvest extends Harvest{
 
 		if (parsingException!=null){
 
-			logger.debug("Assuming the file is not XML, due to following error on parsing",
-					parsingException);
+			logger.debug("Error when parsing as XML: " + parsingException.toString());
 			return null;
 		}
 		

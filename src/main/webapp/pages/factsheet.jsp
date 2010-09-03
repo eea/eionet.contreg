@@ -65,6 +65,7 @@
 		    					<c:set var="allowEdit" value="true"/>
 		    				</c:if>
 		    			</c:if>
+		    			
 	    			 	<c:if test="${displayOperations}">
 				    		<ul id="dropdown-operations">
 								<li><a href="#">Operations</a>
@@ -76,7 +77,7 @@
 												</stripes:link>
 											</li>
 										</c:if>
-										<c:if test="${subjectUrl!=null}">
+										<c:if test="${subjectUrl!=null && actionBean.currentlyHarvested==false}">
 											<li>
 												<stripes:url value="${actionBean.urlBinding}" event="harvestAjax"  var="url">
 														<stripes:param name="uri" value="${actionBean.uri}"/>
@@ -130,12 +131,16 @@
 				    				<div class="advice-msg">This is an anonymous resource!</div>
 				    			</c:when>
 				    			<c:when test="${subjectUrl!=null}">
-				    				<div><p>Resource URL: <a class="link-external" href="${fn:escapeXml(subjectUrl)}"><c:out value="${subjectUrl}"/></a>
-				    				<c:choose>
-				    					<c:when	test ="${actionBean.subjectIsUserBookmark}"> (Bookmarked)</c:when>
-				    				</c:choose></p></div>
-				    				
-				    				
+				    				<div>
+				    					<p>Resource URL: <a class="link-external" href="${fn:escapeXml(subjectUrl)}"><c:out value="${subjectUrl}"/></a>
+						    				<c:choose>
+						    					<c:when	test ="${actionBean.subjectIsUserBookmark}">(Bookmarked)</c:when>
+						    				</c:choose>
+						    			</p>
+						    			<c:if test="${actionBean.currentlyHarvested}">
+						    				<p>The resource is currently being harvested!</p>
+						    			</c:if>
+						    		</div>
 				    			</c:when>
 				    			<c:otherwise>
 				    				<div class="advice-msg" title="${fn:escapeXml(subjectUri)}">This is an unresolvable resource!</div>
@@ -177,36 +182,45 @@
 				    		</crfn:form>
 						</div>				    
 				    </c:when>
+				    
+				    <%-- The section that is displayed if the subject does not yet exist in the database, --%>
+				    <%-- that is: actionBean.subject==null --%>
+				    
 				    <c:otherwise>
 				    	<c:choose>
 			    			<c:when test="${not empty actionBean.uri}">
 			    				<c:if test='${sessionScope.crUser!=null && crfn:hasPermission(sessionScope.crUser.userName, "/", "u")}'>
 				    				<c:if test="${not empty actionBean.url}">
 					    				<ul id="dropdown-operations">
-										<li><a href="#">Operations</a>
-											<ul>
-												<li>
-													<stripes:link href="${actionBean.urlBinding}" event="harvest">Harvest
+											<li>
+												<a href="#">Operations</a>
+												<ul>
+													<li>
+														<stripes:url value="${actionBean.urlBinding}" event="harvestAjax"  var="url">
 															<stripes:param name="uri" value="${actionBean.uri}"/>
-													</stripes:link>
-												</li>
-											</ul>
-										</li>
-									</ul>
+														</stripes:url>
+														<stripes:url value="${actionBean.urlBinding}" event="harvest"  var="oldUrl">
+															<stripes:param name="uri" value="${actionBean.uri}"/>
+														</stripes:url>
+														<a id="wait_link" href="${oldUrl }" onclick="javascript:loadAndWait('The resource is being harvested. Please wait ...', '${url }', '${pageContext.request.contextPath}'); return false;">Harvest</a>
+													</li>
+												</ul>
+											</li>
+										</ul>
+									</c:if>
 								</c:if>
-							</c:if>
-			    				<div style="margin-top:20px" class="note-msg">
-								<strong>Unknown</strong>
-								<p>Nothing is known about
-			    					<c:choose>
-			    						<c:when test="${not empty actionBean.url}">
-			    							<a class="link-external" href="${actionBean.url}">${actionBean.url}</a>
-			    						</c:when>
-			    						<c:otherwise>
-			    							${actionBean.uri}
-			    						</c:otherwise>
-			    					</c:choose>
-								in Content Registry</p>
+			    				<div style="margin-top:20px" class="note-msg" id="wait_container">
+									<strong>Unknown</strong>
+									<p>Nothing is known about
+				    					<c:choose>
+				    						<c:when test="${not empty actionBean.url}">
+				    							<a class="link-external" href="${actionBean.url}">${actionBean.url}</a>
+				    						</c:when>
+				    						<c:otherwise>
+				    							${actionBean.uri}
+				    						</c:otherwise>
+				    					</c:choose>
+									in Content Registry</p>
 			    				</div>
 			    			</c:when>
 			    			<c:when test="${actionBean.uriHash!=0}">

@@ -399,5 +399,12 @@ public interface HelperDAO extends DAO {
 	 * @return
 	 * @throws DAOException
 	 */
-	public boolean isExistingSubject(String subjectUri) throws DAOException;	
+	public boolean isExistingSubject(String subjectUri) throws DAOException;
+	
+	/**
+	 * 
+	 * @param subjectUris
+	 * @throws DAOException
+	 */
+	public void deleteSubjects(List<String> subjectUris) throws DAOException;
 }

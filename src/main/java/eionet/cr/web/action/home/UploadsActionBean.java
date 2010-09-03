@@ -3,6 +3,7 @@ package eionet.cr.web.action.home;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.List;
 
 import net.sourceforge.stripes.action.Before;
 import net.sourceforge.stripes.action.DefaultHandler;
@@ -60,7 +61,10 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
 	private Exception saveAndHarvestException;
 	
 	/** URI assigned to the uploaded file as a subject. */
-	private String subjectUri;
+	private String uploadedFileSubjectUri;
+	
+	/** URIs of subjects that were selected on submit event */
+	private List<String> subjectUris;
 
 	/**
 	 * 
@@ -103,10 +107,16 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
 			logger.debug("Uploaded file: " + uploadedFile);
 			
 			if (uploadedFile!=null){
+
+				// if file content is empty (e.f. 0 KB file), no point in continuing
+				if (uploadedFile.getSize()<=0){
+					addWarningMessage("The file must not be empty!");
+					return resolution;
+				}
 				
 				// unless a replace requested, make sure file does not already exist
 				if (replaceExisting==false){
-					if (DAOFactory.get().getDao(HelperDAO.class).isExistingSubject(getSubjectUri())){
+					if (DAOFactory.get().getDao(HelperDAO.class).isExistingSubject(getUploadedFileSubjectUri())){
 						addWarningMessage("A file with such a name already exists!" +
 								" Use \"replace existing\" checkbox to overwrite.");
 						return resolution;
@@ -190,7 +200,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
 		
 		// save the file's content into database
 		try {
-			saveContent(getSubjectUri(), uploadedFile);
+			saveContent(uploadedFile);
 			contentSaved = true;
 		}
 		catch (DAOException e) {
@@ -207,7 +217,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
 		logger.debug("Creating the cr:hasFile predicate");
 		
 		SubjectDTO subjectDTO = new SubjectDTO(getUser().getHomeUri(), false);
-		ObjectDTO objectDTO = new ObjectDTO(getSubjectUri(), false);
+		ObjectDTO objectDTO = new ObjectDTO(getUploadedFileSubjectUri(), false);
 		objectDTO.setSourceUri(getUser().getHomeUri());
 		subjectDTO.addObject(Predicates.CR_HAS_FILE, objectDTO);
 		
@@ -224,10 +234,9 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
 		}
 		
 		// attempt to harvest the uploaded file
-		harvestUploadedFile(getSubjectUri(), uploadedFile, title);
+		harvestUploadedFile(getUploadedFileSubjectUri(), uploadedFile, title);
 	}
 
-	
 	/**
 	 * 
 	 * @param subjectUri
@@ -235,11 +244,12 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
 	 * @throws DAOException
 	 * @throws IOException
 	 */
-	private void saveContent(String subjectUri, FileBean fileBean) throws DAOException, IOException{
+	private void saveContent(FileBean fileBean) throws DAOException, IOException{
 		
 		logger.debug("Going to save the uploaded file's content into database");
 		
-		SpoBinaryDTO dto = new SpoBinaryDTO(Hashes.spoHash(subjectUri), fileBean.getInputStream());
+		SpoBinaryDTO dto = new SpoBinaryDTO(
+				Hashes.spoHash(getUploadedFileSubjectUri()), fileBean.getInputStream());
 		dto.setContentType(uploadedFile.getContentType());
 		dto.setLanguage("");
 		dto.setMustEmbed(false);
@@ -266,10 +276,16 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
 	/**
 	 * 
 	 * @return
+	 * @throws DAOException 
 	 */
-	public Resolution delete(){
+	public Resolution delete() throws DAOException{
 		
-		// TODO
+		if (subjectUris!=null && !subjectUris.isEmpty()){
+			
+			DAOFactory.get().getDao(HelperDAO.class).deleteSubjects(subjectUris);
+			DAOFactory.get().getDao(HarvestSourceDAO.class).queueSourcesForDeletion(subjectUris);
+		}
+		
 		return new ForwardResolution("/pages/home/uploads.jsp");
 	}
 
@@ -420,16 +436,23 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
 
 
 	/**
-	 * @return the subjectUri
+	 * @return the uploadedFileSubjectUri
 	 */
-	public String getSubjectUri() {
+	public String getUploadedFileSubjectUri() {
 		
-		if (StringUtils.isBlank(subjectUri)){
+		if (StringUtils.isBlank(uploadedFileSubjectUri)){
 			if (uploadedFile!=null && getUser()!=null){
-				subjectUri = getUser().getHomeUri() + "/" + uploadedFile.getFileName();
+				uploadedFileSubjectUri = getUser().getHomeUri() + "/" + uploadedFile.getFileName();
 			}
 		}
 		
-		return subjectUri;
+		return uploadedFileSubjectUri;
+	}
+
+	/**
+	 * @param subjectUris the subjectUris to set
+	 */
+	public void setSubjectUris(List<String> subjectUris) {
+		this.subjectUris = subjectUris;
 	}
 }

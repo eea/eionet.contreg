@@ -73,7 +73,7 @@ public abstract class AbstractActionBean implements ActionBean {
 	private CRActionBeanContext context;
 	
 	/** */
-	private Harvest currentHarvest = CurrentHarvests.getQueuedHarvest();//HarvestingJob.getCurrentHarvest();
+	private Harvest currentQueuedHarvest = CurrentHarvests.getQueuedHarvest();
 	
 	/** */
 	protected DAOFactory factory = DAOFactory.get();
@@ -235,8 +235,8 @@ public abstract class AbstractActionBean implements ActionBean {
 	 * 
 	 * @return
 	 */
-	public Harvest getCurrentHarvest(){
-		return currentHarvest;
+	public Harvest getCurrentQueuedHarvest(){
+		return currentQueuedHarvest;
 	}
 	
 	/**

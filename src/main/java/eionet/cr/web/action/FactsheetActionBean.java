@@ -54,6 +54,7 @@ import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.dto.TripleDTO;
+import eionet.cr.harvest.CurrentHarvests;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.InstantHarvester;
 import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
@@ -611,4 +612,14 @@ public class FactsheetActionBean extends AbstractActionBean{
 	public boolean isSubjectDownloadable() {
 		return subjectDownloadable;
 	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isCurrentlyHarvested(){
+		
+		return uri==null ? false : CurrentHarvests.contains(uri);
+	}
+
 }
