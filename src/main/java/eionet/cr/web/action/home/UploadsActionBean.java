@@ -3,7 +3,11 @@ package eionet.cr.web.action.home;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
+
+import javax.servlet.ServletRequest;
 
 import net.sourceforge.stripes.action.Before;
 import net.sourceforge.stripes.action.DefaultHandler;
@@ -48,6 +52,9 @@ import eionet.cr.web.security.CRUser;
 public class UploadsActionBean extends AbstractHomeActionBean implements Runnable{
 	
 	/** */
+	public static final String FNAME_PARAM_PREFIX = "name_";
+	
+	/** */
 	private String title;
 	/** */
 	private FileBean uploadedFile;
@@ -65,7 +72,10 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
 	
 	/** URIs of subjects that were selected on submit event */
 	private List<String> subjectUris;
-
+	
+	/** The part of the uploaded file's URI which precedes the filename */
+	private String uriPrefix;
+	
 	/**
 	 * 
 	 * @return
@@ -266,16 +276,6 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
 	/**
 	 * 
 	 * @return
-	 */
-	public Resolution edit(){
-		
-		// TODO
-		return new ForwardResolution("/pages/home/uploads.jsp");
-	}
-
-	/**
-	 * 
-	 * @return
 	 * @throws DAOException 
 	 */
 	public Resolution delete() throws DAOException{
@@ -292,11 +292,43 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
 	/**
 	 * 
 	 * @return
+	 * @throws DAOException 
 	 */
-	public Resolution rename(){
+	public Resolution rename() throws DAOException{
+
+		Resolution resolution = new ForwardResolution("/pages/home/renameUploads.jsp");
+		if (isPostRequest()){
+			
+			HashMap<Long,String> newUris = new HashMap<Long, String>();
+			String uriPrefix = getUriPrefix();
+			
+			ServletRequest request = getContext().getRequest();
+			Enumeration paramNames = request.getParameterNames();
+			while (paramNames.hasMoreElements()){
+				
+				String paramName = (String)paramNames.nextElement();
+				if (paramName.startsWith(FNAME_PARAM_PREFIX)){
+					
+					String newName = request.getParameter(paramName);
+					if (StringUtils.isBlank(newName)==false){
+						
+						String oldHash = StringUtils.substringAfter(paramName, FNAME_PARAM_PREFIX);
+						String newUri = uriPrefix + newName;
+						newUris.put(Long.valueOf(oldHash), newUri);
+					}
+				}
+			}
+			
+			if (!newUris.isEmpty()){
+				
+				DAOFactory.get().getDao(HelperDAO.class).renameSubjects(newUris);
+				addSystemMessage("Files renamed successfully!");
+				resolution = new RedirectResolution(
+						StringUtils.replace(getUrlBinding(), "{username}", getUserName()));
+			}
+		}
 		
-		// TODO
-		return new ForwardResolution("/pages/home/uploads.jsp");
+		return resolution;
 	}
 
 	/**
@@ -313,7 +345,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
 	 * @throws DAOException 
 	 * 
 	 */
-	@ValidationMethod(on={"add", "edit", "delete"})
+	@ValidationMethod(on={"add", "rename", "delete"})
 	public void validatePostEvent() throws DAOException{
 		
 		// the below validation is relevant only when the event is requested through POST method
@@ -442,7 +474,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
 		
 		if (StringUtils.isBlank(uploadedFileSubjectUri)){
 			if (uploadedFile!=null && getUser()!=null){
-				uploadedFileSubjectUri = getUser().getHomeUri() + "/" + uploadedFile.getFileName();
+				uploadedFileSubjectUri = getUriPrefix() + uploadedFile.getFileName();
 			}
 		}
 		
@@ -450,9 +482,35 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
 	}
 
 	/**
+	 * @return the subjectUris
+	 */
+	public List<String> getSubjectUris() {
+		return subjectUris;
+	}
+
+	/**
 	 * @param subjectUris the subjectUris to set
 	 */
 	public void setSubjectUris(List<String> subjectUris) {
 		this.subjectUris = subjectUris;
+	}
+
+	/**
+	 * @return the uriPrefix
+	 */
+	public String getUriPrefix() {
+		
+		if (uriPrefix==null){
+			uriPrefix = getUser().getHomeUri() + "/";
+		}
+		return uriPrefix;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public String getFileNameParamPrefix(){
+		return FNAME_PARAM_PREFIX;
 	}
 }

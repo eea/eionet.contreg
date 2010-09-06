@@ -19,7 +19,7 @@
 	</ul>
 	</c:if>
 	<h1>My files</h1>
-	<crfn:form action="${actionBean.baseHomeUrl}${actionBean.attemptedUserName}/uploads" method="post">
+	<crfn:form id="uploadsForm" action="${actionBean.baseHomeUrl}${actionBean.attemptedUserName}/uploads" method="post">
 	
 		<display:table name="${actionBean.uploads}" class="sortable"
 						pagesize="20" sort="list" id="uploadDTO" htmlId="uploads"
@@ -43,6 +43,7 @@
 		<div>
 			<stripes:submit name="delete" value="Delete" title="Delete selecetd files"/>
 			<stripes:submit name="rename" value="Rename" title="Rename selecetd file"/>
+			<input type="button" name="selectAll" value="Select all" onclick="toggleSelectAll('uploadsForm');return false"/>
 		</div>
 		
 	</crfn:form>

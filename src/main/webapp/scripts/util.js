@@ -170,12 +170,12 @@ function showWait(message, contextRoot) {
  * the given form.
  *
  * Input parameters:
- *   formname - the name of the form object where these checkboxes are looked for
+ *   formId - the id of the form object where these checkboxes are looked for
  *
  * Return value: none
  */
-function toggleSelectAll(formname) {
-  formobj = document.getElementById(formname);
+function toggleSelectAll(formId) {
+  formobj = document.getElementById(formId);
   checkboxes = formobj.getElementsByTagName('input');
   var isAllSelected = (formobj.selectAll.value == "Select all")?false:true;
 

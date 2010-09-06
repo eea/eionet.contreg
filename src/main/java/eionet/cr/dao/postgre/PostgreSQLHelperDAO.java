@@ -1968,4 +1968,110 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 			SQLUtil.close(conn);
 		}
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#renameSubjects(java.util.Map)
+	 */
+	public void renameSubjects(Map<Long,String> newUrisByOldHashes) throws DAOException {
+		
+		if (newUrisByOldHashes==null || newUrisByOldHashes.isEmpty()){
+			throw new IllegalArgumentException("Supplied map must not be null or empty!");
+		}
+		
+		Connection conn = null;
+		PreparedStatement stmt_SUBJECT = null;
+		PreparedStatement stmt_SOURCE = null;
+		PreparedStatement stmt_DERIV_SOURCE = null;
+		PreparedStatement stmt_SOURCE_OBJECT = null;
+		PreparedStatement stmt_OBJECT = null;
+		PreparedStatement stmt_HARVEST_SOURCE = null;
+		PreparedStatement stmt_SPO_BINARY = null;
+		PreparedStatement stmt_RESOURCE = null;
+		long time = System.currentTimeMillis();
+		
+		try{
+			conn = getConnection();
+			conn.setAutoCommit(false);
+			
+			stmt_SUBJECT = conn.prepareStatement("update SPO set SUBJECT=? where SUBJECT=?");
+			stmt_SOURCE = conn.prepareStatement("update SPO set SOURCE=? where SOURCE=?");
+			stmt_DERIV_SOURCE = conn.prepareStatement("update SPO set OBJ_DERIV_SOURCE=? where OBJ_DERIV_SOURCE=?");
+			stmt_SOURCE_OBJECT = conn.prepareStatement("update SPO set OBJ_SOURCE_OBJECT=? where OBJ_SOURCE_OBJECT=?");
+			stmt_OBJECT = conn.prepareStatement("update SPO set OBJECT=?,OBJECT_HASH=? where OBJECT_HASH=?");
+			stmt_HARVEST_SOURCE = conn.prepareStatement("update HARVEST_SOURCE set URL=?,URL_HASH=? where URL_HASH=?");
+			stmt_SPO_BINARY = conn.prepareStatement("update SPO_BINARY set SUBJECT=? where SUBJECT=?");
+			stmt_RESOURCE = conn.prepareStatement("insert into RESOURCE (URI,URI_HASH,FIRSTSEEN_SOURCE,FIRSTSEEN_TIME,LASTMODIFIED_TIME) values (?,?,?,?,?)");
+
+			for (Map.Entry<Long,String> entry : newUrisByOldHashes.entrySet()){
+				
+				long oldHash = entry.getKey().longValue();
+				String newUri = entry.getValue();
+				long newHash = Hashes.spoHash(newUri);
+				
+				stmt_SUBJECT.setLong(1, newHash);
+				stmt_SUBJECT.setLong(2, oldHash);
+				stmt_SUBJECT.addBatch();
+				
+				stmt_SOURCE.setLong(1, newHash);
+				stmt_SOURCE.setLong(2, oldHash);
+				stmt_SOURCE.addBatch();
+				
+				stmt_DERIV_SOURCE.setLong(1, newHash);
+				stmt_DERIV_SOURCE.setLong(2, oldHash);
+				stmt_DERIV_SOURCE.addBatch();
+				
+				stmt_SOURCE_OBJECT.setLong(1, newHash);
+				stmt_SOURCE_OBJECT.setLong(2, oldHash);
+				stmt_SOURCE_OBJECT.addBatch();
+				
+				stmt_OBJECT.setString(1, newUri);
+				stmt_OBJECT.setLong(2, newHash);
+				stmt_OBJECT.setLong(3, oldHash);
+				stmt_OBJECT.addBatch();
+				
+				stmt_HARVEST_SOURCE.setString(1, newUri);
+				stmt_HARVEST_SOURCE.setLong(2, newHash);
+				stmt_HARVEST_SOURCE.setLong(3, oldHash);
+				stmt_HARVEST_SOURCE.addBatch();
+				
+				stmt_SPO_BINARY.setLong(1, newHash);
+				stmt_SPO_BINARY.setLong(2, oldHash);
+				stmt_SPO_BINARY.addBatch();
+				
+				stmt_RESOURCE.setString(1, newUri);
+				stmt_RESOURCE.setLong(2, newHash);
+				stmt_RESOURCE.setLong(3, newHash);
+				stmt_RESOURCE.setLong(4, time);
+				stmt_RESOURCE.setLong(5, time);
+				stmt_RESOURCE.addBatch();
+			}
+			
+			stmt_SUBJECT.executeBatch();
+			stmt_SOURCE.executeBatch();
+			stmt_DERIV_SOURCE.executeBatch();
+			stmt_SOURCE_OBJECT.executeBatch();
+			stmt_OBJECT.executeBatch();
+			stmt_HARVEST_SOURCE.executeBatch();
+			stmt_SPO_BINARY.executeBatch();
+			stmt_RESOURCE.executeBatch();
+			
+			conn.commit();
+		}
+		catch (SQLException e){
+			SQLUtil.rollback(conn);
+			throw new DAOException(e.getMessage(), e);
+		}
+		finally{
+			SQLUtil.close(stmt_SUBJECT);
+			SQLUtil.close(stmt_SOURCE);
+			SQLUtil.close(stmt_DERIV_SOURCE);
+			SQLUtil.close(stmt_SOURCE_OBJECT);
+			SQLUtil.close(stmt_OBJECT);
+			SQLUtil.close(stmt_HARVEST_SOURCE);
+			SQLUtil.close(stmt_SPO_BINARY);
+			SQLUtil.close(stmt_RESOURCE);
+			SQLUtil.close(conn);
+		}
+	}
 }

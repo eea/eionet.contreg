@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import eionet.cr.dao.util.PredicateLabels;
@@ -407,4 +408,11 @@ public interface HelperDAO extends DAO {
 	 * @throws DAOException
 	 */
 	public void deleteSubjects(List<String> subjectUris) throws DAOException;
+	
+	/**
+	 * 
+	 * @param newUrisByOldHashes
+	 * @throws DAOException
+	 */
+	public void renameSubjects(Map<Long,String> newUrisByOldHashes) throws DAOException;
 }
