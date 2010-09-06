@@ -48,6 +48,7 @@ import eionet.cr.util.Hashes;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
 import eionet.cr.web.security.CRUser;
+import eionet.cr.web.util.RegisterUrl;
 
 /**
  * 
@@ -80,21 +81,7 @@ public class RegisterURLActionBean extends AbstractActionBean{
 	public Resolution save() throws DAOException, HarvestException{
 		
 		// register URL
-		factory.getDao(HelperDAO.class).registerUserUrl(getUser(), url, bookmark);
-		
-		String _url = StringUtils.substringBefore(url, "#");
-		Integer intervalMinutes = Integer.valueOf(
-				GeneralConfig.getProperty(GeneralConfig.HARVESTER_REFERRALS_INTERVAL,
-						String.valueOf(HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL)));
-
-		// add the URL into HARVEST_SOURCE
-		// (the dao is responsible for handling if HARVEST_SOURCE already has such a URL)
-		DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(
-				_url, intervalMinutes, true, null);
-		
-		// schedule urgent harvest
-		UrgentHarvestQueue.addPullHarvest(_url);
-		
+		RegisterUrl.register(url, getUser(), bookmark);
 		// go to factsheet in edit mode
 		return new RedirectResolution(FactsheetActionBean.class, "edit").addParameter("uri", url);
 	}

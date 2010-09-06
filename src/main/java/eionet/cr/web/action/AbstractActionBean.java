@@ -285,4 +285,9 @@ public abstract class AbstractActionBean implements ActionBean {
 	public void setHomeContext(boolean homeContext) {
 		this.homeContext = homeContext;
 	}
+	
+	public String getBaseUrl(CRActionBeanContext context){
+		String url =  context.getRequest().getRequestURL().toString();
+		return url.substring(0, url.lastIndexOf("/pages/"));
+	}
 }

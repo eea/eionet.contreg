@@ -16,6 +16,12 @@
 			</c:otherwise>
 		</c:choose>
 		Help other researchers find the good datasets. Bookmark them on this site.
+		<p>
+	Now you can use a 
+	<a href="http://en.wikipedia.org/wiki/Bookmarklet" target="new">bookmarklet</a>
+	to simplify the process of adding resources to the system.
+	Follow this link to <a href="quickAddBookmark.action?installation">add the bookmarklet to your browser</a>.
+	</p>
 	</div>
 	<div class="action-box">
 		<stripes:layout-render name="/pages/tagcloud.jsp" />

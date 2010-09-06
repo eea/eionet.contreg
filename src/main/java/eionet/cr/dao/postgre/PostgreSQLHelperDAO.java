@@ -87,7 +87,7 @@ import eionet.cr.web.security.CRUser;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
+public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO {
 
 	/** */
 	public static final String insertResourceSQL = "insert into RESOURCE" +
@@ -1103,14 +1103,6 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 			objectDTO.setSourceUri(user.getHistoryUri());
 			userHomeItemSubject.addObject(Predicates.CR_HISTORY, objectDTO);
 
-			// add the URL also into user's bookmarks if requested
-			
-			if (isBookmark){
-				objectDTO = new ObjectDTO(url, false);
-				objectDTO.setSourceUri(user.getBookmarksUri());
-				userHomeItemSubject.addObject(Predicates.CR_BOOKMARK, objectDTO);
-			}
-			
 			// store the history and bookmark triples
 			addTriples(userHomeItemSubject);
 
@@ -1122,11 +1114,11 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO{
 			addResource(Predicates.CR_SAVETIME, user.getHistoryUri());
 			addResource(Predicates.CR_HISTORY, user.getHistoryUri());
 			addResource(user.getHistoryUri(), user.getHistoryUri());
-			
-			// store Predicates.CR_BOOKMARK and user.getBookmarksUri() in RESOURCE table
-			if (isBookmark){				
-				addResource(Predicates.CR_BOOKMARK, user.getRegistrationsUri());
-				addResource(user.getBookmarksUri(), user.getBookmarksUri());
+		}
+		
+		if (isBookmark){
+			if (!isSubjectUserBookmark(user, Hashes.spoHash(url))){
+				addUserBookmark(user, url);
 			}
 		}
 	}
