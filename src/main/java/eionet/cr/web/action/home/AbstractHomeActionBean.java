@@ -68,13 +68,13 @@ public abstract class AbstractHomeActionBean extends AbstractActionBean {
 		tabType = new HashMap<String,String>();
 		tabType.put("title", "Uploads");
 		tabType.put("tabType", "uploads");
-		tabType.put("showPublic", SHOWPUBLIC_NO);
+		tabType.put("showPublic", SHOWPUBLIC_YES);
 		tabs.add(tabType);
 		
 		tabType = new HashMap<String,String>();
 		tabType.put("title", "Bookmarks");
 		tabType.put("tabType", "bookmark");
-		tabType.put("showPublic", SHOWPUBLIC_NO);
+		tabType.put("showPublic", SHOWPUBLIC_YES);
 		tabs.add(tabType);
 
 		tabType = new HashMap<String,String>();
@@ -86,13 +86,13 @@ public abstract class AbstractHomeActionBean extends AbstractActionBean {
 		tabType = new HashMap<String,String>();
 		tabType.put("title", "History");
 		tabType.put("tabType", "history");
-		tabType.put("showPublic", SHOWPUBLIC_NO);
+		tabType.put("showPublic", SHOWPUBLIC_YES);
 		tabs.add(tabType);
 
 		tabType = new HashMap<String,String>();
 		tabType.put("title", "Reviews");
 		tabType.put("tabType", "reviews");
-		tabType.put("showPublic", SHOWPUBLIC_NO);
+		tabType.put("showPublic", SHOWPUBLIC_YES);
 		tabs.add(tabType);
 		
 		typesColumns = new HashMap<String,List<SearchResultColumn>>();
@@ -122,7 +122,10 @@ public abstract class AbstractHomeActionBean extends AbstractActionBean {
 		//setUrlParams();
 	}
 	
-	protected void setEnvironmentParams(CRActionBeanContext context, String activeSection) {
+	protected void setEnvironmentParams(CRActionBeanContext context, String activeSection, boolean showPublic) {
+		
+		setShowPublic(showPublic);
+		
 		attemptedUserName = context.getRequest().getParameter("username");
 		section = activeSection;
 		setDefaultSection();

@@ -1162,7 +1162,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		if (URLUtil.isURL(url)==false)
 			throw new IllegalArgumentException("url must not be null and must be valid URL");
 
-		TripleDTO triple = new TripleDTO(Long.parseLong(user.getHomeItemUri(url)),
+		TripleDTO triple = new TripleDTO(Hashes.spoHash(user.getHomeItemUri(url)),
 				Hashes.spoHash(Predicates.CR_BOOKMARK), Hashes.spoHash(url));
 		triple.setSourceHash(Long.valueOf(Hashes.spoHash(user.getBookmarksUri())));
 		

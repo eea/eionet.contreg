@@ -6,6 +6,7 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dto.UserBookmarkDTO;
+import eionet.cr.web.security.CRUser;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
@@ -30,8 +31,10 @@ public class BookmarksActionBean extends AbstractHomeActionBean {
 	 */
 	@DefaultHandler
 	public Resolution view() throws DAOException {
-		setEnvironmentParams(this.getContext(), AbstractHomeActionBean.TYPE_BOOKMARK);
-		bookmarkActions();
+		setEnvironmentParams(this.getContext(), AbstractHomeActionBean.TYPE_BOOKMARK, true);
+		if (isUserAuthorized()){
+			bookmarkActions();
+		}
 		return new ForwardResolution("/pages/home/bookmark.jsp");
 	}
 	
@@ -61,7 +64,11 @@ public class BookmarksActionBean extends AbstractHomeActionBean {
 	
 	public List<UserBookmarkDTO> getBookmarks() {
 		try {
-			bookmarks = DAOFactory.get().getDao(HelperDAO.class).getUserBookmarks(this.getUser());
+			if (this.getUser()!=null){
+				bookmarks = DAOFactory.get().getDao(HelperDAO.class).getUserBookmarks(this.getUser());
+			} else {
+				bookmarks = DAOFactory.get().getDao(HelperDAO.class).getUserBookmarks(new CRUser(this.getAttemptedUserName()));
+			}
 		} catch (DAOException ex){
 			
 		}

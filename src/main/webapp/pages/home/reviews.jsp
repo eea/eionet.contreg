@@ -222,45 +222,54 @@
 				<c:otherwise>
 				
 				
+				<c:if test="${ actionBean.userAuthorized}">
 				<h1>My ${actionBean.section}</h1>
-		
-				<div id="operations">
+					<div id="operations">
 						<ul>
 							<li>
 								<stripes:link href="${actionBean.baseHomeUrl}${actionBean.attemptedUserName}/reviews?add=Add">Add new Review</stripes:link>
 							</li>
 						</ul>
 					</div>
+				</c:if>
+				<c:if test="${ !actionBean.userAuthorized}">
+					<h1>${actionBean.attemptedUserName}'s reviews</h1>
+				</c:if>
 				
 					<c:choose>
 						<c:when test="${not empty actionBean.reviews}">
 						<crfn:form id="reviewList"
 						action="${actionBean.baseHomeUrl}${actionBean.attemptedUserName}/reviews?delete=delete"
 						method="post">
-						<display:table name="${actionBean.reviews}" class="sortable"
-							pagesize="20" sort="list" id="review" htmlId="reviews"
-							requestURI="${actionBean.urlBinding}" style="width:100%">
-							<display:column title="" sortable="false" style="width:50px;">
-								<input type="checkbox"
-									value="${review.reviewID}" name='reviewIds'></input>
-							</display:column>
-							<display:column title="Title" sortable="false" style="width:300px;">
-								<stripes:link href="${actionBean.baseHomeUrl}${actionBean.attemptedUserName}/reviews/${review.reviewID}">
-									${review.title}
-								</stripes:link>
-							</display:column>
-							<display:column title="URL" sortable="false">
-								<stripes:link href="/factsheet.action">${review.objectUrl}
-									<stripes:param name="uri" value="${review.objectUrl}" />
-								</stripes:link>
-							</display:column>
-							
-						</display:table>
-						<div><stripes:submit name="delete" value="Delete Reviews"
-							title="Delete selected reviews"  onclick=" return confirm('Are you sure you want to delete selected reviews?');" /> <input type="button"
-							name="selectAll" value="Select all"
-							onclick="toggleSelectAll('reviewList');return false" /></div>
-					</crfn:form>
+							<display:table name="${actionBean.reviews}" class="sortable"
+								pagesize="20" sort="list" id="review" htmlId="reviews"
+								requestURI="${actionBean.urlBinding}" style="width:100%">
+								<c:if test="${ actionBean.userAuthorized}">
+									<display:column title="" sortable="false" style="width:50px;">
+										<input type="checkbox"
+											value="${review.reviewID}" name='reviewIds'></input>
+									</display:column>
+								</c:if>
+								<display:column title="Title" sortable="false" style="width:300px;">
+									<stripes:link href="${actionBean.baseHomeUrl}${actionBean.attemptedUserName}/reviews/${review.reviewID}">
+										${review.title}
+									</stripes:link>
+								</display:column>
+								<display:column title="URL" sortable="false">
+									<stripes:link href="/factsheet.action">${review.objectUrl}
+										<stripes:param name="uri" value="${review.objectUrl}" />
+									</stripes:link>
+								</display:column>
+								
+							</display:table>
+							<c:if test="${ actionBean.userAuthorized}">
+								<div><stripes:submit name="delete" value="Delete Reviews"
+									title="Delete selected reviews"  onclick=" return confirm('Are you sure you want to delete selected reviews?');" /> <input type="button"
+									name="selectAll" value="Select all"
+									onclick="toggleSelectAll('reviewList');return false" />
+								</div>
+							</c:if>
+						</crfn:form>
 						</c:when>
 						<c:otherwise>
 							<p>No Reviews found.</p>

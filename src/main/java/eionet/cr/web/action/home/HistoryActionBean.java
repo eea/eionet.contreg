@@ -6,6 +6,7 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dto.UserHistoryDTO;
+import eionet.cr.web.security.CRUser;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
@@ -28,13 +29,17 @@ public class HistoryActionBean extends AbstractHomeActionBean {
 	 */
 	@DefaultHandler
 	public Resolution view() throws DAOException {
-		setEnvironmentParams(this.getContext(), AbstractHomeActionBean.TYPE_HISTORY);
+		setEnvironmentParams(this.getContext(), AbstractHomeActionBean.TYPE_HISTORY, true);
 		return new ForwardResolution("/pages/home/history.jsp");
 	}
 	
 	public List<UserHistoryDTO> getHistory() {
 		try {
-			history = DAOFactory.get().getDao(HelperDAO.class).getUserHistory(this.getUser());
+			if (this.getUser() != null){
+				history = DAOFactory.get().getDao(HelperDAO.class).getUserHistory(this.getUser());
+			} else {
+				history = DAOFactory.get().getDao(HelperDAO.class).getUserHistory(new CRUser(this.getAttemptedUserName()));
+			}
 		} catch (DAOException ex){
 			
 		}

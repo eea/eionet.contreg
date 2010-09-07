@@ -392,7 +392,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
 	 */
 	@Before(stages=LifecycleStage.CustomValidation)
 	public void setEnvironmentParams(){
-		setEnvironmentParams(getContext(), AbstractHomeActionBean.TYPE_UPLOADS);
+		setEnvironmentParams(getContext(), AbstractHomeActionBean.TYPE_UPLOADS, true);
 	}
 
 
@@ -460,6 +460,8 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
 			CRUser crUser = getUser();
 			if (crUser!=null){
 				uploads = DAOFactory.get().getDao(HelperDAO.class).getUserUploads(getUser());
+			} else {
+				uploads = DAOFactory.get().getDao(HelperDAO.class).getUserUploads(new CRUser(this.getAttemptedUserName()));
 			}
 		}
 		

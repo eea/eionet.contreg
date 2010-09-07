@@ -30,7 +30,7 @@ public class RegistrationsActionBean extends AbstractHomeActionBean {
 	@DefaultHandler
 	public Resolution view() throws DAOException {
 		setShowPublic(true);
-		setEnvironmentParams(this.getContext(), AbstractHomeActionBean.TYPE_REGISTRATIONS);
+		setEnvironmentParams(this.getContext(), AbstractHomeActionBean.TYPE_REGISTRATIONS, true);
 		return new ForwardResolution("/pages/home/registrations.jsp");
 	}
 	

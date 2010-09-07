@@ -57,7 +57,7 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
 
 		loadReview();
 	
-		setEnvironmentParams(this.getContext(), AbstractHomeActionBean.TYPE_REVIEWS);
+		setEnvironmentParams(this.getContext(), AbstractHomeActionBean.TYPE_REVIEWS, true);
 		
 		if (this.getContext().getRequest().getParameter("addSave") != null){
 			if (isUserAuthorized()){
@@ -150,12 +150,16 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
 	 * 
 	 */
 	public void add() {
-		try {
-			reviewId = factory.getDao(HelperDAO.class).addReview(review, this.getUser());
-			addSystemMessage("Review successfully added.");
-		} catch (DAOException ex){
-			logger.error(ex);
-			addWarningMessage("System error while adding a review. The review was not added.");
+		if (isUserAuthorized()){
+			try {
+				reviewId = factory.getDao(HelperDAO.class).addReview(review, this.getUser());
+				addSystemMessage("Review successfully added.");
+			} catch (DAOException ex){
+				logger.error(ex);
+				addWarningMessage("System error while adding a review. The review was not added.");
+			}
+		} else {
+			addWarningMessage("Only the owner of this home space can add reviews.");
 		}
 	}
 	
@@ -163,12 +167,16 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
 	 * 
 	 */
 	public void save() {
-		try {
-			factory.getDao(HelperDAO.class).saveReview(reviewId, review, this.getUser());
-			addSystemMessage("Review successfully saved.");
-		} catch (DAOException ex){
-			logger.error(ex);
-			addWarningMessage("System error while saving the review. The review was not saved.");
+		if (isUserAuthorized()){
+			try {
+				factory.getDao(HelperDAO.class).saveReview(reviewId, review, this.getUser());
+				addSystemMessage("Review successfully saved.");
+			} catch (DAOException ex){
+				logger.error(ex);
+				addWarningMessage("System error while saving the review. The review was not saved.");
+			}
+		} else {
+			addWarningMessage("Only the owner of this home space can save reviews.");
 		}
 	}
 	
@@ -176,20 +184,24 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
 	 * @throws DAOException
 	 */
 	public void deleteReviews() throws DAOException{
-		if (this.getContext().getRequest().getParameter("delete") != null){
-			if (reviewIds != null && !reviewIds.isEmpty()) {
-				try {
-					for (int i=0; i<reviewIds.size(); i++){
-						DAOFactory.get().getDao(HelperDAO.class).deleteReview(this.getUser(), reviewIds.get(i), true);
+		if (isUserAuthorized()){
+			if (this.getContext().getRequest().getParameter("delete") != null){
+				if (reviewIds != null && !reviewIds.isEmpty()) {
+					try {
+						for (int i=0; i<reviewIds.size(); i++){
+							DAOFactory.get().getDao(HelperDAO.class).deleteReview(this.getUser(), reviewIds.get(i), true);
+						}
+						addSystemMessage("Selected reviews were deleted.");
+					} catch (DAOException ex){
+						logger.error(ex);
+						addWarningMessage("System error occured during review deletion.");
 					}
-					addSystemMessage("Selected reviews were deleted.");
-				} catch (DAOException ex){
-					logger.error(ex);
-					addWarningMessage("System error occured during review deletion.");
+				} else {
+					addCautionMessage("No reviews selected for deletion.");
 				}
-			} else {
-				addCautionMessage("No reviews selected for deletion.");
 			}
+		} else {
+			addWarningMessage("Only the owner of this home space can delete reviews.");
 		}
 	}
 	
@@ -197,16 +209,20 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
 	 * @throws DAOException
 	 */
 	public void deleteSingleReview() throws DAOException{
-		if (this.getContext().getRequest().getParameter("deleteReview") != null){
-			try {
-				reviewId = Integer.parseInt(this.getContext().getRequest().getParameter("deleteReview"));
-				DAOFactory.get().getDao(HelperDAO.class).deleteReview(this.getUser(), reviewId, true);
-				addSystemMessage("Review #"+reviewId+" was deleted.");
-				reviewId = 0;
-			} catch (DAOException ex){
-				logger.error(ex);
-				addWarningMessage("System error occured during review deletion.");
-			}
+		if (isUserAuthorized()){
+			if (this.getContext().getRequest().getParameter("deleteReview") != null){
+				try {
+					reviewId = Integer.parseInt(this.getContext().getRequest().getParameter("deleteReview"));
+					DAOFactory.get().getDao(HelperDAO.class).deleteReview(this.getUser(), reviewId, true);
+					addSystemMessage("Review #"+reviewId+" was deleted.");
+					reviewId = 0;
+				} catch (DAOException ex){
+					logger.error(ex);
+					addWarningMessage("System error occured during review deletion.");
+				}
+			} 
+		} else {
+			addWarningMessage("Only the owner of this home space can delete reviews.");
 		}
 	}
 	
@@ -273,15 +289,19 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
 	 * 
 	 */
 	public void deleteAttachments(){
-		try {
-			if (attachmentList != null && attachmentList.size()>0){
-				for (int i=0; i<attachmentList.size(); i++){
-					DAOFactory.get().getDao(HelperDAO.class).deleteAttachment(this.getUser(), 0, attachmentList.get(i));
+		if (isUserAuthorized()){
+			try {
+				if (attachmentList != null && attachmentList.size()>0){
+					for (int i=0; i<attachmentList.size(); i++){
+						DAOFactory.get().getDao(HelperDAO.class).deleteAttachment(this.getUser(), 0, attachmentList.get(i));
+					}
 				}
+			} catch (DAOException ex){
+				logger.error(ex);
+				addCautionMessage(ex.getMessage());
 			}
-		} catch (DAOException ex){
-			logger.error(ex);
-			addCautionMessage(ex.getMessage());
+		} else {
+			addWarningMessage("Only the owner of this review can delete attachments.");
 		}
 	}
 	
@@ -387,7 +407,11 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
 	 */
 	public List<ReviewDTO> getReviews() {
 		try {
-			return DAOFactory.get().getDao(HelperDAO.class).getReviewList(this.getUser());
+			if (this.getUser() != null){
+				return DAOFactory.get().getDao(HelperDAO.class).getReviewList(this.getUser());
+			} else {
+				return DAOFactory.get().getDao(HelperDAO.class).getReviewList(new CRUser(this.getAttemptedUserName()));
+			}
 		} catch (Exception ex){
 			return null;
 		}
