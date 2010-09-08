@@ -64,7 +64,7 @@ public class BookmarksActionBean extends AbstractHomeActionBean {
 	
 	public List<UserBookmarkDTO> getBookmarks() {
 		try {
-			if (this.getUser()!=null){
+			if (this.isUserAuthorized() && this.getUser()!=null){
 				bookmarks = DAOFactory.get().getDao(HelperDAO.class).getUserBookmarks(this.getUser());
 			} else {
 				bookmarks = DAOFactory.get().getDao(HelperDAO.class).getUserBookmarks(new CRUser(this.getAttemptedUserName()));

@@ -407,7 +407,7 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
 	 */
 	public List<ReviewDTO> getReviews() {
 		try {
-			if (this.getUser() != null){
+			if (this.isUserAuthorized() && this.getUser() != null){
 				return DAOFactory.get().getDao(HelperDAO.class).getReviewList(this.getUser());
 			} else {
 				return DAOFactory.get().getDao(HelperDAO.class).getReviewList(new CRUser(this.getAttemptedUserName()));

@@ -35,13 +35,14 @@ public class RegistrationsActionBean extends AbstractHomeActionBean {
 	}
 	
 	public List<TripleDTO> getRegistrations()  throws DAOException{
-		if(this.getUser()==null){
+		
+		if(this.isUserAuthorized() && this.getUser()!=null){
 			registrations = DAOFactory.get().getDao(HelperDAO.class).
-				getSampleTriplesInSource((new CRUser(getAttemptedUserName())).getRegistrationsUri(), null);			
+			getSampleTriplesInSource(this.getUser().getRegistrationsUri(), null);
 		}
 		else{
 			registrations = DAOFactory.get().getDao(HelperDAO.class).
-				getSampleTriplesInSource(this.getUser().getRegistrationsUri(), null);
+			getSampleTriplesInSource((new CRUser(getAttemptedUserName())).getRegistrationsUri(), null);
 		}
 
 		return registrations;
