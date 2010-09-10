@@ -74,9 +74,13 @@ public class HarvestSourceRedirectTest extends CRDatabaseTestCase {
 		}
 	}
 	
+	
+	
+	
 	/**
 	 * This test should test up to 4 redirections and harvest all the sources.
 	 */
+	
 	@Test
 	public void testHarvestRedirectedURLUpTo4(){
 		
@@ -101,7 +105,7 @@ public class HarvestSourceRedirectTest extends CRDatabaseTestCase {
 			assertNotNull(harvest.getSourceAvailable());
 			assertTrue(harvest.getSourceAvailable().booleanValue()); // This source is available
 			assertEquals((int)1, harvest.getDistinctSubjectsCount());
-			assertEquals((int)5, harvest.getStoredTriplesCount());	
+			assertEquals((int)6, harvest.getStoredTriplesCount());	
 		}
 		catch (HarvestException e) {
 			e.printStackTrace();
@@ -109,5 +113,38 @@ public class HarvestSourceRedirectTest extends CRDatabaseTestCase {
 		}
 	}
 	
+	/**
+	 * This test should test http://rod.eionet.europa.eu/clients/10.
+	 */
+	
+	@Test
+	public void testSpecificUrl_1(){
+		
+		try {
+
+			String url = "http://rod.eionet.europa.eu/clients/10";
+			
+			HarvestSourceDTO harvestSource = new HarvestSourceDTO();
+			harvestSource = new HarvestSourceDTO();
+			harvestSource.setUrl(url);
+			harvestSource.setEmails("bob@europe.eu");
+			harvestSource.setIntervalMinutes(200);
+			try {
+				DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(url, 200, false, "bob@europe.eu");
+			}
+			catch (DAOException ex){
+			}
+			
+			PullHarvest harvest = new PullHarvest(url, null);
+			harvest.execute();
+
+			// If we get this far without exception, it's OK.
+			assertTrue (true);
+		}
+		catch (HarvestException e) {
+			// If test reaches exception, it is considered failed.
+			assertTrue (false);
+		}
+	}
 	
 }

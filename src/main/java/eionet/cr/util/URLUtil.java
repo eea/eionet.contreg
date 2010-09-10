@@ -145,4 +145,29 @@ public class URLUtil {
 		       || responseCode==501
 		       || responseCode==505;
 	}
+	
+	
+	/**
+	 * 
+	 * @param uri
+	 * @param dflt
+	 * @return
+	 */
+	public static String extractUrlHost(String uri){
+		
+		if (URLUtil.isURL(uri)){
+			String host = "";
+			URL url;
+			try {
+				url = new URL(StringUtils.substringBefore(uri, "#"));
+				host = uri.substring(0, uri.indexOf(url.getPath()));
+				
+			} catch (Exception ex){
+				
+			}
+			return host;
+		}else {
+			return null;
+		}
+	}
 }

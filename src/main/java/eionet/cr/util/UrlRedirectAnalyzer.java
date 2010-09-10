@@ -35,11 +35,15 @@ public class UrlRedirectAnalyzer {
 
 			if (isCodeRedirectionResponseCode(responseCode)){
 				returnUrlRedirectionInfo.setRedirected(true);
-				returnUrlRedirectionInfo.setTargetURL(connection.getHeaderField("Location"));
+				returnUrlRedirectionInfo.setTargetURL(
+						fixRelativeUrl(
+						connection.getHeaderField("Location"), 
+						responseCode, 
+						testUrl)
+						);
 			}
 			
 		} catch (Exception ex){
-			
 		}
 		finally{
 			// close input stream
@@ -50,6 +54,20 @@ public class UrlRedirectAnalyzer {
 		}
 		
 		return returnUrlRedirectionInfo;
+	}
+	
+	public static String fixRelativeUrl(String relativeUrl, int responseCode, String sourceUrl){
+		String fixedUrl = "";
+		if (responseCode == 303 && !relativeUrl.isEmpty()){
+			if (relativeUrl.startsWith("/")){
+				 fixedUrl = URLUtil.extractUrlHost(sourceUrl)+relativeUrl;
+			} else {
+				fixedUrl = sourceUrl.substring(0, sourceUrl.lastIndexOf("/")) + "/" + relativeUrl;
+			}
+			return fixedUrl;
+		} else {
+			return relativeUrl;
+		}
 	}
 	
 	public static boolean isCodeRedirectionResponseCode(int responseCode){

@@ -24,8 +24,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashSet;
 
-import org.apache.commons.lang.StringUtils;
-
 /**
  * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
@@ -112,7 +110,7 @@ public class URIUtil {
 		
 		return result==null ? dflt : result;
 	}
-
+	
 	/**
 	 * 
 	 */

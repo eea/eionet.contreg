@@ -40,7 +40,9 @@ public class HarvestUrlConnection {
 		
 		HarvestUrlConnection returnConnection = new HarvestUrlConnection();
 		returnConnection.url = new URL(StringUtils.substringBefore(sourceUrlString, "#"));
-		returnConnection.redirectionInfo.setSourceURL(sourceUrlString); 
+
+		//returnConnection.redirectionInfo.setSourceURL(sourceUrlString);
+		returnConnection.redirectionInfo = UrlRedirectAnalyzer.analyzeUrlRedirection(sourceUrlString);
 		
 		if (returnConnection.url.getProtocol().equals("http")||returnConnection.url.getProtocol().equals("https")){
 			returnConnection.httpConnection = true;
@@ -67,6 +69,8 @@ public class HarvestUrlConnection {
 		 * 303 See Other
 		 * 307 Temporary Redirect
 		 */
+		
+		/*
 		try {
 			
 			if (UrlRedirectAnalyzer.isCodeRedirectionResponseCode(responseCode)){
@@ -82,6 +86,9 @@ public class HarvestUrlConnection {
 			System.out.println(ex.getMessage());
 			return false;
 		}
+		*/
+		
+		return redirectionInfo.isRedirected();
 	}
 	
 	public boolean openInputStream() throws Exception{
