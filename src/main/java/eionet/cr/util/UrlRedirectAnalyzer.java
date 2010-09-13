@@ -6,6 +6,7 @@ package eionet.cr.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.apache.commons.lang.StringUtils;
@@ -56,15 +57,10 @@ public class UrlRedirectAnalyzer {
 		return returnUrlRedirectionInfo;
 	}
 	
-	public static String fixRelativeUrl(String relativeUrl, int responseCode, String sourceUrl){
-		String fixedUrl = "";
+	public static String fixRelativeUrl(String relativeUrl, int responseCode, String sourceUrl) throws MalformedURLException {
 		if (responseCode == 303 && !relativeUrl.isEmpty()){
-			if (relativeUrl.startsWith("/")){
-				 fixedUrl = URLUtil.extractUrlHost(sourceUrl)+relativeUrl;
-			} else {
-				fixedUrl = sourceUrl.substring(0, sourceUrl.lastIndexOf("/")) + "/" + relativeUrl;
-			}
-			return fixedUrl;
+			URL fixedUrl = new URL (new URL(sourceUrl), relativeUrl);
+			return fixedUrl.toString();
 		} else {
 			return relativeUrl;
 		}

@@ -20,6 +20,8 @@
 * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.util;
 
+import java.net.MalformedURLException;
+
 import junit.framework.TestCase;
 
 /**
@@ -48,9 +50,13 @@ public class URIUtilTest extends TestCase{
 	
 	public void testFixRelativeUrl(){
 		assertEquals("http://sws.geonames.org", URLUtil.extractUrlHost("http://sws.geonames.org/6255148/"));
-		assertEquals("http://rod.eionet.europa.eu/clients.rdf", UrlRedirectAnalyzer.fixRelativeUrl("/clients.rdf", 303, "http://rod.eionet.europa.eu/clients/10"));
-		assertEquals("http://rod.eionet.europa.eu/clients/clients.rdf", UrlRedirectAnalyzer.fixRelativeUrl("clients.rdf", 303, "http://rod.eionet.europa.eu/clients/10"));
-		assertEquals("http://rod.eionet.europa.eu/clients/clients.rdf", UrlRedirectAnalyzer.fixRelativeUrl("clients.rdf", 303, "http://rod.eionet.europa.eu/clients/"));
+		try {
+			assertEquals("http://rod.eionet.europa.eu/clients.rdf", UrlRedirectAnalyzer.fixRelativeUrl("/clients.rdf", 303, "http://rod.eionet.europa.eu/clients/10"));
+			assertEquals("http://rod.eionet.europa.eu/clients/clients.rdf", UrlRedirectAnalyzer.fixRelativeUrl("clients.rdf", 303, "http://rod.eionet.europa.eu/clients/10"));
+			assertEquals("http://rod.eionet.europa.eu/clients/clients.rdf", UrlRedirectAnalyzer.fixRelativeUrl("clients.rdf", 303, "http://rod.eionet.europa.eu/clients/"));
+		} catch (MalformedURLException ex ){
+			fail(ex.getMessage());
+		}
 	}
 	
 }
