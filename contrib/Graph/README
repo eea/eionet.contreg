@@ -10,4 +10,5 @@ You must also have the GraphViz tools to create the images.
 To get the fnv library, build it in ../Python-FNV/ and then place the fnv.so in
 this directory.
 
-The database connection parameters are stored inside the source file
+The database connection parameters are stored in the db.conf file. Make a copy
+of the db.conf.dist and change the values.

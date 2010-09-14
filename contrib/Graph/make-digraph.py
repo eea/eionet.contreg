@@ -19,9 +19,14 @@
 # Contributor(s):
 # Søren Roug, EEA
 #
-DB="cr2"
-DBUSER="dbuser"
-DBPASS="dbpass"
+import ConfigParser
+
+config = ConfigParser.SafeConfigParser()
+config.read('db.conf')
+DB = config.get('database', 'db')
+DBHOST = config.get('database', 'host')
+DBUSER = config.get('database', 'user')
+DBPASS = config.get('database', 'password')
 
 import sys, getopt, fnv, textwrap
 import psycopg2

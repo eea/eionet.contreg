@@ -1,0 +1,5 @@
+[database]
+db: cr2
+host: localhost
+user: userid
+password: dbpassword
