@@ -9,7 +9,7 @@
 # implied. See the License for the specific language governing
 # rights and limitations under the License.
 #
-# The Original Code is RDFDatabase version 1.0.
+# The Original Code is make-digraph.py version 1.0.
 #
 # The Initial Developer of the Original Code is European Environment
 # Agency (EEA).  Portions created by EEA are
@@ -19,9 +19,17 @@
 # Contributor(s):
 # Søren Roug, EEA
 #
+DB="cr2"
+DBUSER="dbuser"
+DBPASS="dbpass"
 
-import sys, getopt, hashlib, textwrap
+import sys, getopt, fnv, textwrap
 import psycopg2
+
+def hashcode(s):
+    newhash = fnv.new()
+    newhash.update(s)
+    return newhash.aslong
 
 def localpart(s):
     if s[-1] in ('/','#'): s=s[:-1]
@@ -37,7 +45,7 @@ def wrap_literal(s):
 
 class MakeDigraph:
     def __init__(self):
-        self.db = psycopg2.connect(database='cr2', user='user', password='password')
+        self.db = psycopg2.connect(database=DB, user=DBUSER, password=DBPASS)
         self.cursor = self.db.cursor()
         self.subjects = {}
         self.invertedalso = False
@@ -46,8 +54,8 @@ class MakeDigraph:
         self.cursor.close()
         self.db.close()
 
-    def writeout(self, str):
-        sys.stdout.write(str.encode('utf-8'))
+    def writeout(self, s):
+        sys.stdout.write(s)
 
     def prologue(self):
         self.writeout("""digraph linkednode {
@@ -66,7 +74,7 @@ edge [fontsize=9];\n""")
             self.subjects[subject] = True
 
     def drawemptynode(self, subject):
-        self.writeout('''S%s [label="%s"];\n''' % (hashlib.md5(subject).hexdigest(), shorten_url(subject)))
+        self.writeout('''S%d [label="%s"];\n''' % (abs(hashcode(subject)), shorten_url(subject)))
 
     def drawnode(self, startsubj, limit):
         self.has_drawn(startsubj)
@@ -74,7 +82,7 @@ edge [fontsize=9];\n""")
             self.drawemptynode(startsubj)
             return
         # Draw literal attributes
-        self.cursor.execute ("""SELECT subject, predicate, object, lang FROM SPO WHERE lit_obj='Y' AND subject=%s LIMIT 50""", (startsubj,))
+        self.cursor.execute ("""SELECT s.uri as subject_uri, p.uri AS predicate, object, obj_lang, subject FROM SPO JOIN RESOURCE AS s ON subject=s.uri_hash JOIN RESOURCE AS p ON predicate=p.uri_hash WHERE lit_obj='Y' AND subject=%s AND obj_deriv_source=0 LIMIT 50""", (hashcode(startsubj),));
         object_dict = {}
         rows = self.cursor.fetchall()
         if len(rows) == 0:
@@ -82,10 +90,10 @@ edge [fontsize=9];\n""")
         else:
             currentsubj = None
             for row in rows:
-                if row[3][:2] not in ('en',''): continue # Only English
-                md5subj = hashlib.md5(row[0]).hexdigest()
+                if str(row[3])[:2] not in ('en',''): continue # Only English
+                md5subj = hashcode(row[0])
                 if currentsubj != row[0]:
-                    self.writeout('''S%s [label="%s|''' % (md5subj, shorten_url(row[0])))
+                    self.writeout('''S%d [label="%s|''' % (abs(md5subj), shorten_url(row[0])))
                     currentsubj = row[0]
                 self.writeout('''%s:%s\\l''' % (localpart(row[1]), wrap_literal(row[2])))
             self.writeout('''"];\n''')
@@ -94,16 +102,16 @@ edge [fontsize=9];\n""")
             return
         # Draw edges
         if self.invertedalso:
-            self.cursor.execute ("""SELECT subject, predicate, object FROM SPO WHERE lit_obj='N' AND (subject=%s OR OBJECT=%s) ORDER BY SUBJECT""", (startsubj,startsubj))
+            self.cursor.execute ("""SELECT s.uri as subject_uri, p.uri AS predicate, object, subject FROM SPO JOIN RESOURCE AS s ON subject=s.uri_hash JOIN RESOURCE AS p ON predicate=p.uri_hash WHERE lit_obj='N' AND obj_deriv_source=0 AND (subject=%s OR OBJECT_HASH=%s) LIMIT 50""", (hashcode(startsubj),hashcode(startsubj)));
         else:
-            self.cursor.execute ("""SELECT subject, predicate, object FROM SPO WHERE lit_obj='N' AND subject=%s""", (startsubj,))
+            self.cursor.execute ("""SELECT s.uri as subject_uri, p.uri AS predicate, object, subject FROM SPO JOIN RESOURCE AS s ON subject=s.uri_hash JOIN RESOURCE AS p ON predicate=p.uri_hash WHERE lit_obj='N' AND obj_deriv_source=0 AND subject=%s""", (hashcode(startsubj),));
         rows = self.cursor.fetchall()
         for row in rows:
-            md5subj = hashlib.md5(row[0]).hexdigest()
+            md5subj = hashcode(row[0])
             self.must_draw(row[0])
             self.must_draw(row[2])
-            md5obj = hashlib.md5(row[2]).hexdigest()
-            self.writeout('''S%s -> S%s [label="%s"];\n''' % (md5subj, md5obj, localpart(row[1])))
+            md5obj = hashcode(row[2])
+            self.writeout('''S%d -> S%d [label="%s"];\n''' % (abs(md5subj), abs(md5obj), localpart(row[1])))
 
         for o,seen in self.subjects.items():
             if not seen:

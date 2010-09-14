@@ -1,0 +1,13 @@
+This draws graphs of links between object in the Linked Data space. I the
+directory is an example of Tim Berners-Lee. http://identi.ca/user/45563
+
+It was done with:
+ python  make-digraph.py -i http://identi.ca/user/45563 >berners-lee.gv
+ dot -Tpng -o berners-lee.png berners-lee.gv
+
+You must also have the GraphViz tools to create the images.
+
+To get the fnv library, build it in ../Python-FNV/ and then place the fnv.so in
+this directory.
+
+The database connection parameters are stored inside the source file
