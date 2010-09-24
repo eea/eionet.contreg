@@ -2,7 +2,6 @@
 
 package eionet.cr.dao;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -11,10 +10,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import eionet.cr.dao.readers.RDFExporter;
 import eionet.cr.dao.util.PredicateLabels;
 import eionet.cr.dao.util.SubProperties;
 import eionet.cr.dao.util.UriLabelPair;
 import eionet.cr.dto.DownloadFileDTO;
+import eionet.cr.dto.PredicateDTO;
 import eionet.cr.dto.ReviewDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.dto.TripleDTO;
@@ -415,4 +416,30 @@ public interface HelperDAO extends DAO {
 	 * @throws DAOException
 	 */
 	public void renameSubjects(Map<Long,String> newUrisByOldHashes) throws DAOException;
+	
+	/**
+	 * 
+	 * @param sourceHash
+	 * @return List<PredicateDTO>
+	 * @throws DAOException
+	 */
+	public List<PredicateDTO> readDistinctPredicates(Long sourceHash) throws DAOException;
+	
+	/**
+	 * 
+	 * @param sourceHash
+	 * @return List<String>
+	 * @throws DAOException
+	 */
+	public List<String> readDistinctSubjectUrls(Long sourceHash) throws DAOException;
+	
+	
+	/**
+	 * 
+	 * @param sourceHash
+	 * @return List<PredicateDTO>
+	 * @throws DAOException
+	 */	
+	public void outputSourceTriples(RDFExporter reader) throws DAOException;
+	
 }

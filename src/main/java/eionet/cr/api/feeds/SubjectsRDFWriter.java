@@ -22,7 +22,6 @@ package eionet.cr.api.feeds;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -82,7 +81,6 @@ public class SubjectsRDFWriter {
 	 * @param prefix
 	 */
 	public void addNamespace(Namespace namespace){
-		
 		namespaces.put(namespace.getUri(), namespace.getPrefix());
 	}
 	
@@ -209,15 +207,7 @@ public class SubjectsRDFWriter {
 	 */
 	public static String extractNamespace(String url){
 		
-		if (url==null)
-			return null;
-		
-		int i = url.lastIndexOf("#");
-		if (i<0){
-			i = url.lastIndexOf("/");
-		}
-		
-		return i<0 ? null : url.substring(0, i+1);
+		return eionet.cr.util.NamespaceUtil.extractNamespace(url);
 	}
 	
 	/**

@@ -52,9 +52,10 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.readers.DataflowPicklistReader;
 import eionet.cr.dao.readers.PredicateLabelsReader;
-import eionet.cr.dao.readers.SampleTriplesReader;
+import eionet.cr.dao.readers.RDFExporter;
 import eionet.cr.dao.readers.SubPropertiesReader;
 import eionet.cr.dao.readers.SubjectDataReader;
+import eionet.cr.dao.readers.TriplesReader;
 import eionet.cr.dao.readers.UploadDTOReader;
 import eionet.cr.dao.readers.UriHashesReader;
 import eionet.cr.dao.util.PredicateLabels;
@@ -62,6 +63,7 @@ import eionet.cr.dao.util.SubProperties;
 import eionet.cr.dao.util.UriLabelPair;
 import eionet.cr.dto.DownloadFileDTO;
 import eionet.cr.dto.ObjectDTO;
+import eionet.cr.dto.PredicateDTO;
 import eionet.cr.dto.ReviewDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.dto.TripleDTO;
@@ -1378,7 +1380,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 			toString();			
 		}
 		
-		SampleTriplesReader reader = new SampleTriplesReader();
+		TriplesReader reader = new TriplesReader();
 		List<TripleDTO> triples = executeQuery(buf.toString(), new LinkedList<Object>(), reader);
 		
 		if (!triples.isEmpty() && !reader.getDistinctHashes().isEmpty()){
@@ -2065,5 +2067,85 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 			SQLUtil.close(stmt_RESOURCE);
 			SQLUtil.close(conn);
 		}
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#readDistinctPredicates(Long)
+	 */
+	public List<PredicateDTO> readDistinctPredicates(Long sourceHash) throws DAOException{
+		
+		//SELECT DISTINCT spo.predicate, resource.uri FROM spo INNER JOIN 
+		// resource ON spo.predicate = resource.uri_hash WHERE spo.subject = -4588940245862567022;
+		
+		List<PredicateDTO> returnList = new ArrayList<PredicateDTO>();
+
+		StringBuffer buf = new StringBuffer().
+		append("select URI AS predicateuri from RESOURCE where URI_HASH in (select distinct PREDICATE from SPO where SOURCE="+sourceHash+")");
+		
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		try{
+			conn = getConnection();
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(buf.toString());
+			PredicateDTO singleItem = null;
+			while (rs.next()){
+				singleItem = new PredicateDTO(rs.getString("predicateuri"));
+				returnList.add(singleItem);
+			}
+		}
+		catch (SQLException e){
+			throw new DAOException(e.toString(), e);
+		}
+		finally{
+			SQLUtil.close(rs);
+			SQLUtil.close(stmt);
+			SQLUtil.close(conn);
+		}
+		return returnList;
+	}
+	
+	public List<String> readDistinctSubjectUrls(Long sourceHash) throws DAOException{
+
+		List<String> returnList = new ArrayList<String>();
+		StringBuffer buf = new StringBuffer().
+		append("select URI AS subjecturi from RESOURCE where URI_HASH in (select distinct SUBJECT from SPO where SOURCE="+sourceHash+")");
+		
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		try{
+			conn = getConnection();
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(buf.toString());
+			while (rs.next()){
+				returnList.add(rs.getString("subjecturi"));
+			}
+		}
+		catch (SQLException e){
+			throw new DAOException(e.toString(), e);
+		}
+		finally{
+			SQLUtil.close(rs);
+			SQLUtil.close(stmt);
+			SQLUtil.close(conn);
+		}
+		return returnList;
+	}
+	
+	public void outputSourceTriples(RDFExporter reader) throws DAOException{
+		
+		StringBuffer buf = new StringBuffer("select spo.subject AS subjecthash, spo.predicate AS predicatehash, ")
+		.append ("spo.object AS object, spo.obj_deriv_source AS obj_deriv_source")
+		.append (", resource.uri AS subject, spo.lit_obj AS litobject ")
+		.append(" from SPO LEFT JOIN resource ON spo.subject = resource.uri_hash WHERE ")
+		.append("spo.source = " +reader.getSourceHash() )
+		.append(" AND spo.OBJ_DERIV_SOURCE = 0 ORDER BY spo.subject ASC");
+
+		executeQuery(buf.toString(), reader);
+
+		
 	}
 }

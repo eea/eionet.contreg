@@ -34,7 +34,7 @@ import eionet.cr.util.sql.ResultSetListReader;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class SampleTriplesReader extends ResultSetListReader<TripleDTO>{
+public class TriplesReader extends ResultSetListReader<TripleDTO>{
 
 	/** */
 	private List<TripleDTO> resultList = new LinkedList<TripleDTO>();

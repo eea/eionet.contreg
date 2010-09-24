@@ -93,6 +93,4 @@ public class HarvestTest extends CRDatabaseTestCase{
 		}
 	}
 	
-
-	
 }

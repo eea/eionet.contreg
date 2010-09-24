@@ -1,6 +1,5 @@
 package eionet.cr.dao.mysql;
 
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -27,6 +26,7 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.readers.DataflowPicklistReader;
 import eionet.cr.dao.readers.PredicateLabelsReader;
+import eionet.cr.dao.readers.RDFExporter;
 import eionet.cr.dao.readers.SubPropertiesReader;
 import eionet.cr.dao.readers.SubjectDataReader;
 import eionet.cr.dao.util.PredicateLabels;
@@ -34,6 +34,7 @@ import eionet.cr.dao.util.SubProperties;
 import eionet.cr.dao.util.UriLabelPair;
 import eionet.cr.dto.DownloadFileDTO;
 import eionet.cr.dto.ObjectDTO;
+import eionet.cr.dto.PredicateDTO;
 import eionet.cr.dto.ReviewDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.dto.TripleDTO;
@@ -959,6 +960,22 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 	 * @see eionet.cr.dao.HelperDAO#renameSubjects(java.util.Map)
 	 */
 	public void renameSubjects(Map<Long, String> newUrisByOldHashes) throws DAOException {
+		throw new UnsupportedOperationException("Method not implemented");
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#readDistinctPredicates(Long)
+	 */
+	public List<PredicateDTO> readDistinctPredicates(Long sourceHash) throws DAOException{
+		throw new UnsupportedOperationException("Method not implemented");
+	}
+	
+	public List<String> readDistinctSubjectUrls(Long sourceHash) throws DAOException{
+		throw new UnsupportedOperationException("Method not implemented");
+	}
+	
+	public void outputSourceTriples(RDFExporter reader) throws DAOException{
 		throw new UnsupportedOperationException("Method not implemented");
 	}
 }
