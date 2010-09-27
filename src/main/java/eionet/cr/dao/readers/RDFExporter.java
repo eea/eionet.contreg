@@ -1,5 +1,7 @@
 package eionet.cr.dao.readers;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -9,7 +11,6 @@ import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringEscapeUtils;
 
-import eionet.cr.common.Namespace;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HelperDAO;
@@ -27,31 +28,28 @@ public class RDFExporter extends ResultSetBaseReader {
 	private HashMap<Long,String> namespaces = new HashMap<Long, String>();
 	private String outputRDF = "";
 	private long lastSubjectHash = 0;
-	private boolean lastSubjectDescriptionTagClosed = true; // Meaning that no need to close the previous subject.
+	private boolean lastSubjectTagNotOpen = true; // Meaning that no need to close the previous subject.
+	private OutputStream output;
 	
-	public static String export(long sourceHash){
+	public static void export(long sourceHash, OutputStream out){
 		RDFExporter reader = null;
 		try {
-			reader = new RDFExporter(sourceHash);
-			 
+			reader = new RDFExporter(sourceHash, out);
 			DAOFactory.get().getDao(HelperDAO.class).outputSourceTriples(reader);
 		} catch (Exception ex){
 			
 		}
 		reader.closeOutput();
-		return reader.getOutputRDF();
 	}
 	
-	public RDFExporter(long sourceHash){
-		
-		NamespaceUtil.addNamespace(namespaces, Namespace.RDF);
-		NamespaceUtil.addNamespace(namespaces, Namespace.RDFS);
+	public RDFExporter(long sourceHash, OutputStream out){
 		
 		this.sourceHash = sourceHash;
+		output = out;
+		
 		try {
-			namespaces = getNamespaces();
 			distinctPredicates = DAOFactory.get().getDao(HelperDAO.class).readDistinctPredicates(sourceHash);
-
+			namespaces = getNamespaces();
 		} catch (Exception ex){
 		}
 		outputHeader();
@@ -62,27 +60,23 @@ public class RDFExporter extends ResultSetBaseReader {
 	 * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
 	 */
 	public void readRow(ResultSet rs) throws SQLException {
-/*		
-		TripleDTO dto = new TripleDTO(rs.getLong("SUBJECT"),
-				rs.getLong("PREDICATE"), rs.getString("OBJECT"));
-		dto.setObjectDerivSourceHash(rs.getLong("OBJ_DERIV_SOURCE"));
-*/
+
 		long subjectHash = rs.getLong("subjecthash");
 		String subject = rs.getString("subject");
 		long predicateHash = rs.getLong("predicatehash");
 		String object = rs.getString("object");
 		String litobject = rs.getString("litobject");
 		
-		System.out.println( rs.getLong("subjecthash") + " - " + rs.getString("subject") + " - "+ rs.getLong("predicatehash") + " - "+ rs.getString("object"));
-		
 		if (subjectHash != lastSubjectHash){
-			if (!lastSubjectDescriptionTagClosed){
-				outputRDF += "\n</rdf:Description>";
+			if (!lastSubjectTagNotOpen){
+				outputString( "\n</rdf:Description>");
 			}			
-			StringBuffer buf = new StringBuffer("\n\n<rdf:Description rdf:about=\"");
-			lastSubjectDescriptionTagClosed = false;
-			buf.append(subject).append("\">");
-			outputRDF += buf.toString();			
+			String buf = "\n\n<rdf:Description rdf:about=\"";
+			lastSubjectTagNotOpen = false;
+			buf += subject + "\">";
+			
+
+			outputString(buf);
 		}
 		
 		boolean literal = false;
@@ -90,17 +84,19 @@ public class RDFExporter extends ResultSetBaseReader {
 			literal = true;
 		}
 		
-		String predicate = NamespaceUtil.extractPredicate(findPredicateValue(predicateHash));
-		outputRDF += "\n\t\t<" + namespaces.get(predicateHash) + ":" + predicate;
+		String predicate = NamespaceUtil.extractPredicate(findPredicate(predicateHash));
+		
+		String namespace = namespaces.get(Hashes.spoHash(NamespaceUtil.extractNamespace(findPredicate(predicateHash))));
+		outputString("\n\t<" + namespace + ":" + predicate);
 
 		String escapedValue = StringEscapeUtils.escapeXml(object);
 		if (!literal && URLUtil.isURL(object)){
-			outputRDF += " rdf:resource=\"" + escapedValue + "\"/>";
+			outputString( " rdf:resource=\"" + escapedValue + "\"/>");
 		}
 		else{
-			outputRDF += ">";
-			outputRDF += escapedValue;
-			outputRDF += "</" + namespaces.get(predicateHash) + ":"  + predicate + ">";
+			outputString(">");
+			outputString(escapedValue);
+			outputString("</" + namespace + ":"  + predicate + ">");
 		}
 		
 		
@@ -121,22 +117,27 @@ public class RDFExporter extends ResultSetBaseReader {
 	}
 	
 	private void outputHeader(){
-		outputRDF = "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n";
-		outputRDF += ("<rdf:RDF" + getNamespaceDeclarations() + ">");
+		outputString("<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n");
+		outputString("<rdf:RDF" + getNamespaceDeclarations() + ">");
 	}
 	
 	public void closeOutput(){
-		if (!lastSubjectDescriptionTagClosed){
-			outputRDF += "\n</rdf:Description>";
+		if (!lastSubjectTagNotOpen){
+			outputString("\n</rdf:Description>");
 		}	
-		outputRDF += "\n\n</rdf:RDF>\n";
+		outputString("\n\n</rdf:RDF>\n");
+		try {
+			output.close();
+		} catch (Exception ex){
+			System.out.println(ex.getMessage());
+		}
 	}
 	
 	private String getNamespaceDeclarations(){
 		StringBuffer namespaceDeclaration = new StringBuffer();
 		if (!namespaces.isEmpty()){
 			for (Entry<Long, String> entry : namespaces.entrySet()){
-				namespaceDeclaration.append("\n   xmlns:").append(entry.getValue()).append("=\"").append(findPredicateNamespace(entry.getKey())).append("\"");
+				namespaceDeclaration.append("\n   xmlns:").append(entry.getValue()).append("=\"").append(findNameSpace(entry.getKey())).append("\"");
 			}
 		}
 		return namespaceDeclaration.toString();
@@ -148,22 +149,30 @@ public class RDFExporter extends ResultSetBaseReader {
 		return outputRDF;
 	}
 	
-	private String findPredicateValue(Long predicateHash){
+	private String findPredicate(Long predicateHash){
 		for (PredicateDTO predicate:distinctPredicates){
-			
-			if (Hashes.spoHash(NamespaceUtil.extractNamespace(predicate.getValue())) == predicateHash){
-				return NamespaceUtil.extractPredicate(predicate.getValue());
+			if (Hashes.spoHash(predicate.getValue()) == predicateHash){
+				return predicate.getValue();
 			}
 		}
 		return null;
 	}
 	
-	private String findPredicateNamespace(Long predicateHash){
+	private String findNameSpace(Long namespaceHash){
 		for (PredicateDTO predicate:distinctPredicates){
-			if (Hashes.spoHash(NamespaceUtil.extractNamespace(predicate.getValue())) == predicateHash){
+			if (Hashes.spoHash( NamespaceUtil.extractNamespace(predicate.getValue())) == namespaceHash){
 				return NamespaceUtil.extractNamespace(predicate.getValue());
 			}
 		}
 		return null;
 	}
+	
+	private void outputString(String outputString){
+		try {
+			output.write(outputString.getBytes());
+		} catch (IOException ex){
+			
+		}
+	}
+	
 }

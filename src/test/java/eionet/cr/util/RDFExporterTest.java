@@ -1,9 +1,8 @@
 package eionet.cr.util;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 
 import org.dbunit.dataset.IDataSet;
 
@@ -11,7 +10,6 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.readers.RDFExporter;
-import eionet.cr.dto.PredicateDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.Harvest;
 import eionet.cr.harvest.PullHarvest;
@@ -106,20 +104,18 @@ public class RDFExporterTest extends CRDatabaseTestCase{
 	public void testTriplesReader(){
 		try {
 			String uri = "http://www.eionet.europa.eu/gemet/concept/7697";
+			//String uri = "http://cdr.eionet.europa.eu/cz/eper/envrnk1lg/eper_cz_2004.xml";
+			
 			DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(uri, 100, false, null);
 			
 			URL url = new URL(uri);
 			Harvest harvest = new PullHarvest(url.toString(), null);
 			harvest.execute();
 			
-			Long sourceHash = Hashes.spoHash("http://www.eionet.europa.eu/gemet/concept/7697");
+			Long sourceHash = Hashes.spoHash(uri);
 			
 			SubjectDTO subject = DAOFactory.get().getDao(HelperDAO.class).getSubject(sourceHash);
 			assertNotNull(subject);
-			
-			System.out.println(subject.getUri());
-			
-			System.out.println(RDFExporter.export(sourceHash));
 			
 		} catch(Exception ex){
 			System.out.println(ex.getMessage());

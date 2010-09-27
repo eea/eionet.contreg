@@ -9,7 +9,8 @@
 	<p>Url: ${ actionBean.url }</p>
 
 	
-	<crfn:form action="/export.action" method="get">
+	<crfn:form action="/download.action" method="get">
+	<stripes:hidden name="exportSource">${ actionBean.url }</stripes:hidden>
 		<table class="formtable">
 			<tr>
 				<td>
@@ -19,7 +20,7 @@
 			</tr>
 			<tr>
 				<td>
-					<stripes:radio id="toHomespace" name="exportSelect" value="toHomespace"/>
+					<stripes:radio id="toHomespace" name="exportSelect" value="toHomespace" disabled="true"/>
 					<stripes:label for="toHomespace">To Homespace</stripes:label>
 				</td>
 			</tr>

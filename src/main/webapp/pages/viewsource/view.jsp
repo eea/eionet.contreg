@@ -37,8 +37,13 @@
 			<tr>
 				<td colspan="2" style="padding-top: 10px"><stripes:submit
 					name="goToEdit" value="Edit" title="Edit this harvest source" /> <stripes:submit
-					name="scheduleUrgentHarvest" value="Schedule urgent harvest" /></td>
+					name="scheduleUrgentHarvest" value="Schedule urgent harvest" />
+					<stripes:button name="export" onclick="document.location.href='export.action?url=${ fn:escapeXml(actionBean.harvestSource.url) }'">Export triples</stripes:button>
+					</td>
 			</tr>
+			
+			
+						    				
 		</table>
 	</crfn:form>
 </stripes:layout-definition>

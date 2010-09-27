@@ -5,8 +5,6 @@ import java.util.List;
 
 import eionet.cr.common.Namespace;
 import eionet.cr.dao.DAOException;
-import eionet.cr.dao.DAOFactory;
-import eionet.cr.dao.HelperDAO;
 import eionet.cr.dto.PredicateDTO;
 
 public class NamespaceUtil {
@@ -70,6 +68,9 @@ public class NamespaceUtil {
 		
 		int unknownNamespaceCounter = 0;
 		
+		returnValues.put(Hashes.spoHash(Namespace.RDF.getUri()), Namespace.RDF.getPrefix());
+		returnValues.put(Hashes.spoHash(Namespace.RDFS.getUri()), Namespace.RDFS.getPrefix());
+		
 		for(PredicateDTO predicate:distinctPredicates){
 			String namespace = NamespaceUtil.extractNamespace(predicate.getValue());
 			String knownNamespacePrefix = NamespaceUtil.getKnownNamespace(namespace);
@@ -77,10 +78,8 @@ public class NamespaceUtil {
 			if (knownNamespacePrefix == null || knownNamespacePrefix.isEmpty()){
 				unknownNamespaceCounter ++;
 				returnValues.put(Hashes.spoHash(namespace), "ns"+unknownNamespaceCounter);
-				System.out.println("New namespace: "+"ns"+unknownNamespaceCounter);
 			} else {
 				returnValues.put(Hashes.spoHash(namespace), knownNamespacePrefix);
-				System.out.println("Known namespace: "+knownNamespacePrefix);
 			}
 		}
 		return returnValues;

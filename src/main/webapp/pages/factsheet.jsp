@@ -120,10 +120,6 @@
 						    					<stripes:link class="link-plain" href="/home/${actionBean.userName}/reviews?add=Add&addUrl=${ subjectUrl }">Add review</stripes:link>
 						    				</li>
 						    			</c:if>
-						    			
-						    				<li>
-						    					<stripes:link class="link-plain" href="/export.action?url=${ subjectUrl }">Export triples</stripes:link>
-						    				</li>
 									</ul>
 								</li>
 							</ul>
