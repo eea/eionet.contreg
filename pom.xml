@@ -25,11 +25,18 @@
 			<name>ehcache repository</name>
 			<url>http://oss.sonatype.org/content/repositories/sourceforge-releases</url>
 		</repository>
+<!-- 		<repository>
+			<id>codehaus-release-repo</id>
+			<name>Codehaus Release Repo</name>
+			<url>http://repository.codehaus.org</url>
+		</repository> -->
+		
 	</repositories>
 
 	<build>
 		<pluginManagement>
 			<plugins>
+			
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
@@ -52,7 +59,20 @@
 					<version>2.3</version>
 					<configuration></configuration>
 				</plugin>
-			</plugins>
+<!-- 				
+				<plugin>
+			        <groupId>org.mortbay.jetty</groupId>
+			        <artifactId>maven-jetty-plugin</artifactId>
+			        <version>6.1.10</version>
+			        <configuration>
+			        
+			                <scanIntervalSeconds>10</scanIntervalSeconds>
+			                <stopKey>stop</stopKey>
+			                <stopPort>9014</stopPort>
+			        </configuration>
+				</plugin>
+-->
+			</plugins>			
 		</pluginManagement>
 		<!-- Define resource specific filtering -->
 		<resources>
@@ -278,5 +298,12 @@
 			<artifactId>httpmime</artifactId>
 			<version>4.0.1</version>
 		</dependency>
+<!--
+		<dependency>
+			<groupId>org.mortbay.jetty</groupId>
+			<artifactId>maven-jetty-plugin</artifactId>
+			<version>6.1.10</version>
+		</dependency>
+-->
 	</dependencies>
 </project>

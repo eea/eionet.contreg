@@ -69,11 +69,6 @@ public class UtilTest extends TestCase{
 	}
 
 	@Test
-	public void test_dateToString(){
-		
-		System.out.println(Util.dateToString(new java.util.Date(), "yyyy-MM-dd'T'HH:mm:ss"));
-	}
-	@Test
 	public void testSplitStringBySpaces(){
 		String tags = "tag1 tag2 tag3 \"tag4  tag5\"  tag6 'tag7 tag8' tag9";
 		List<String> resultList = Util.splitStringBySpacesExpectBetweenQuotes(tags);

@@ -5,6 +5,7 @@ import java.util.List;
 import org.dbunit.dataset.IDataSet;
 import org.junit.Test;
 
+import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dto.ReviewDTO;
@@ -28,8 +29,8 @@ public class UserReviewTest extends CRDatabaseTestCase {
 	}
 	
 	@Test
-	public void testReadLastReviewId(){
-		try {
+	public void testReadLastReviewId() throws DAOException{
+		
 		CRUser user = new CRUser("kaptejaa");
 		int lastReviewId = DAOFactory.get().getDao(HelperDAO.class).getLastReviewId(user);
 		
@@ -55,125 +56,91 @@ public class UserReviewTest extends CRDatabaseTestCase {
 
 		lastReviewId = DAOFactory.get().getDao(HelperDAO.class).getLastReviewId(user);
 		assertEquals(2, lastReviewId);
-		
-		} catch(Exception ex){
-			
-		}
 	}
 	
 	@Test
-	public void testAddNewReview(){
-		try {
-			ReviewDTO testReview = new ReviewDTO();
-			testReview.setObjectUrl("http://www.tieto.com");
-			testReview.setReviewContent("Some content");
-			testReview.setTitle("Title");
-			
-			CRUser user = new CRUser("kaptejaa");
-			int lastReviewId = DAOFactory.get().getDao(HelperDAO.class).getLastReviewId(user);
-			assertEquals(0, lastReviewId);
-			
-			lastReviewId = DAOFactory.get().getDao(HelperDAO.class).addReview(testReview, user);
-			assertEquals(1, lastReviewId);
-			
-			lastReviewId = DAOFactory.get().getDao(HelperDAO.class).addReview(testReview, user);
-			assertEquals(2, lastReviewId);
-			
-		} catch (Exception ex){
-			
-		}
+	public void testAddNewReview() throws DAOException{
 		
+		ReviewDTO testReview = new ReviewDTO();
+		testReview.setObjectUrl("http://www.tieto.com");
+		testReview.setReviewContent("Some content");
+		testReview.setTitle("Title");
+
+		CRUser user = new CRUser("kaptejaa");
+		int lastReviewId = DAOFactory.get().getDao(HelperDAO.class).getLastReviewId(user);
+		assertEquals(0, lastReviewId);
+
+		lastReviewId = DAOFactory.get().getDao(HelperDAO.class).addReview(testReview, user);
+		assertEquals(1, lastReviewId);
+
+		lastReviewId = DAOFactory.get().getDao(HelperDAO.class).addReview(testReview, user);
+		assertEquals(2, lastReviewId);
 	}
 
 	@Test
-	public void testAddNewReviewWithoutPrecondition(){
-		try {
-			ReviewDTO testReview;
-			testReview = new ReviewDTO();
-			testReview.setObjectUrl("http://www.tieto.com");
-			testReview.setReviewContent("Some content");
-			testReview.setTitle("Title");
-			
-			CRUser user = new CRUser("kaptejaa");
-			int lastReviewId;
-			
-			lastReviewId = DAOFactory.get().getDao(HelperDAO.class).addReview(testReview, user);
-			assertEquals(1, lastReviewId);
-			
-			lastReviewId = DAOFactory.get().getDao(HelperDAO.class).addReview(testReview, user);
-			assertEquals(2, lastReviewId);
-			
-		} catch (Exception ex){
-			
-		}
+	public void testAddNewReviewWithoutPrecondition() throws DAOException{
 		
+		ReviewDTO testReview;
+		testReview = new ReviewDTO();
+		testReview.setObjectUrl("http://www.tieto.com");
+		testReview.setReviewContent("Some content");
+		testReview.setTitle("Title");
+
+		CRUser user = new CRUser("kaptejaa");
+		int lastReviewId;
+
+		lastReviewId = DAOFactory.get().getDao(HelperDAO.class).addReview(testReview, user);
+		assertEquals(1, lastReviewId);
+
+		lastReviewId = DAOFactory.get().getDao(HelperDAO.class).addReview(testReview, user);
+		assertEquals(2, lastReviewId);
 	}
 	
 	@Test
-	public void testReadReviews(){
-		try {
-			ReviewDTO testReview1;
-			testReview1 = new ReviewDTO();
-			testReview1.setObjectUrl("http://www.tieto.com");
-			testReview1.setReviewContent("Some content");
-			testReview1.setTitle("Title 1");
-
-			ReviewDTO testReview2;
-			testReview2 = new ReviewDTO();
-			testReview2.setObjectUrl("http://www.tieto.com");
-			testReview2.setReviewContent("Some content");
-			testReview2.setTitle("Title 2");
-
-			
-			CRUser user = new CRUser("kaptejaa");
-			int lastReviewId;
-			
-			lastReviewId = DAOFactory.get().getDao(HelperDAO.class).addReview(testReview1, user);
-			assertEquals(1, lastReviewId);
-			
-			lastReviewId = DAOFactory.get().getDao(HelperDAO.class).addReview(testReview2, user);
-			assertEquals(2, lastReviewId);
-			
-			List<ReviewDTO> reviews = DAOFactory.get().getDao(HelperDAO.class).getReviewList(user);
-			
-			System.out.println("Review count: "+reviews.size());
-			
-			for (int a=0; a<reviews.size(); a++){
-				System.out.println("Review @" + a +": "+reviews.get(a).getReviewSubjectUri()+ " / "+reviews.get(a).getTitle());
-			}
-			
-		} catch (Exception ex){
-			System.out.println("Error: "+ex.getMessage());
-		}
+	public void testReadReviews() throws DAOException{
 		
+		ReviewDTO testReview1;
+		testReview1 = new ReviewDTO();
+		testReview1.setObjectUrl("http://www.tieto.com");
+		testReview1.setReviewContent("Some content");
+		testReview1.setTitle("Title 1");
+
+		ReviewDTO testReview2;
+		testReview2 = new ReviewDTO();
+		testReview2.setObjectUrl("http://www.tieto.com");
+		testReview2.setReviewContent("Some content");
+		testReview2.setTitle("Title 2");
+
+
+		CRUser user = new CRUser("kaptejaa");
+		int lastReviewId;
+
+		lastReviewId = DAOFactory.get().getDao(HelperDAO.class).addReview(testReview1, user);
+		assertEquals(1, lastReviewId);
+
+		lastReviewId = DAOFactory.get().getDao(HelperDAO.class).addReview(testReview2, user);
+		assertEquals(2, lastReviewId);
+
+		List<ReviewDTO> reviews = DAOFactory.get().getDao(HelperDAO.class).getReviewList(user);
 	}
 	
 	@Test
-	public void testReadSingleReview(){
-		try {
-			ReviewDTO testReview1;
-			testReview1 = new ReviewDTO();
-			testReview1.setObjectUrl("http://www.tieto.com");
-			testReview1.setReviewContent("Some content");
-			testReview1.setTitle("Title 1");
+	public void testReadSingleReview() throws DAOException{
+		
+		ReviewDTO testReview1;
+		testReview1 = new ReviewDTO();
+		testReview1.setObjectUrl("http://www.tieto.com");
+		testReview1.setReviewContent("Some content");
+		testReview1.setTitle("Title 1");
 
-		
-			CRUser user = new CRUser("kaptejaa");
-			int lastReviewId;
-			
-			lastReviewId = DAOFactory.get().getDao(HelperDAO.class).addReview(testReview1, user);
-			assertEquals(1, lastReviewId);
-			
-			ReviewDTO result = DAOFactory.get().getDao(HelperDAO.class).getReview(user, 1);
-			assertEquals(1, result.getReviewID());
-			
-			System.out.println(result.getTitle());
-			
-			
-		} catch (Exception ex){
-			System.out.println("Error: "+ex.getMessage());
-		}
-		
+
+		CRUser user = new CRUser("kaptejaa");
+		int lastReviewId;
+
+		lastReviewId = DAOFactory.get().getDao(HelperDAO.class).addReview(testReview1, user);
+		assertEquals(1, lastReviewId);
+
+		ReviewDTO result = DAOFactory.get().getDao(HelperDAO.class).getReview(user, 1);
+		assertEquals(1, result.getReviewID());
 	}
-	
 }

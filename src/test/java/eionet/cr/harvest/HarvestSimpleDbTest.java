@@ -27,6 +27,7 @@ import org.dbunit.Assertion;
 import org.dbunit.database.QueryDataSet;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.ITable;
+import org.dbunit.dataset.ITableMetaData;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.junit.Test;
 
@@ -151,6 +152,7 @@ public class HarvestSimpleDbTest extends CRDatabaseTestCase {
 			// Load the expected data from an XML dataset.
 			IDataSet expectedDataSet = getXmlDataSet(testData);
 			ITable expSpoTable = expectedDataSet.getTable("SPO");
+			
 			ITable expResTable = expectedDataSet.getTable("RESOURCE");
 
 			// Assert that the actual SPO table matches expected table.

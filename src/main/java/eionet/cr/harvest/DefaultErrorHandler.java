@@ -42,12 +42,10 @@ public class DefaultErrorHandler implements ErrorHandler {
 	 */
 	public void error(SAXParseException e) throws SAXException {
 
-			logger.warn("SAX error encountered: " + e.toString(), e);			
-			saxError = new SAXParseException(new String(e.getMessage()==null ? "" : e.getMessage()),
-											 new String(e.getPublicId()==null ? "" : e.getPublicId()),
-											 new String(e.getSystemId()==null ? "" : e.getSystemId()),
-											 e.getLineNumber(),
-											 e.getColumnNumber());
+		logger.warn(e.toString() +
+				" (line=" + e.getLineNumber() + ", col=" + e.getColumnNumber() + ")");
+		
+		saxError = sanitizeSAXParseException(e);
 	}
 
 	/** 
@@ -56,12 +54,10 @@ public class DefaultErrorHandler implements ErrorHandler {
 	 */
 	public void warning(SAXParseException e) throws SAXException {
 		
-			logger.warn("SAX warning encountered: " + e.toString(), e);
-			saxWarning = new SAXParseException(new String(e.getMessage()==null ? "" : e.getMessage()),
-					 new String(e.getPublicId()==null ? "" : e.getPublicId()),
-					 new String(e.getSystemId()==null ? "" : e.getSystemId()),
-					 e.getLineNumber(),
-					 e.getColumnNumber());
+		logger.warn(e.toString() +
+				" (line=" + e.getLineNumber() + ", col=" + e.getColumnNumber() + ")");
+			
+		saxWarning = sanitizeSAXParseException(e);
 	}
 
 	/** 
@@ -84,5 +80,38 @@ public class DefaultErrorHandler implements ErrorHandler {
 	 */
 	public SAXParseException getSaxWarning() {
 		return saxWarning;
+	}
+	
+	/**
+	 * This method returns a copy of the input SAXParseException where the
+	 * message, publicId and systemId have been replaced with an empty string
+	 * if they were null. This is to prevent NullPointerException in the later
+	 * usage of the exception.
+	 * 
+	 * @param e
+	 * @return
+	 */
+	private SAXParseException sanitizeSAXParseException(SAXParseException e){
+		
+		String message = e.getMessage();
+		if (message==null){
+			message = "";
+		}
+		
+		String erroneousEntityPublicId = e.getPublicId();
+		if (erroneousEntityPublicId==null){
+			erroneousEntityPublicId = "";
+		}
+		
+		String erroneousEntitySystemId = e.getSystemId();
+		if (erroneousEntitySystemId==null){
+			erroneousEntitySystemId= "";
+		}
+		
+		return new SAXParseException(message,
+				erroneousEntityPublicId,
+				erroneousEntitySystemId,
+				e.getLineNumber(),
+				e.getColumnNumber());
 	}
 }

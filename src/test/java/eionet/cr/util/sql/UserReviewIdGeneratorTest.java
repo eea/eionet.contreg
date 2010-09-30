@@ -3,6 +3,7 @@ package eionet.cr.util.sql;
 import org.dbunit.dataset.IDataSet;
 import org.junit.Test;
 
+import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
@@ -25,8 +26,8 @@ public class UserReviewIdGeneratorTest extends CRDatabaseTestCase {
 	}
 	
 	@Test
-	public void testReadLastReviewId(){
-		try {
+	public void testReadLastReviewId() throws DAOException{
+		
 		CRUser user = new CRUser("kaptejaa");
 		int lastReviewId = DAOFactory.get().getDao(HelperDAO.class).getLastReviewId(user);
 		
@@ -52,10 +53,5 @@ public class UserReviewIdGeneratorTest extends CRDatabaseTestCase {
 
 		lastReviewId = DAOFactory.get().getDao(HelperDAO.class).getLastReviewId(user);
 		assertEquals(2, lastReviewId);
-		
-		} catch(Exception ex){
-			
-		}
 	}
-
 }

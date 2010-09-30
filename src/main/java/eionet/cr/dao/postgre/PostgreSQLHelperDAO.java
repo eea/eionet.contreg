@@ -1484,21 +1484,35 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		
 	}
 	
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#addReview(eionet.cr.dto.ReviewDTO, eionet.cr.web.security.CRUser)
+	 */
 	public int addReview(ReviewDTO review, CRUser user) throws DAOException{
 		int reviewId = generateNewReviewId(user);
 		insertReviewToDB(review, user, reviewId);
 		return reviewId;
 	}
 	
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#saveReview(int, eionet.cr.dto.ReviewDTO, eionet.cr.web.security.CRUser)
+	 */
 	public void saveReview(int reviewId, ReviewDTO review, CRUser user) throws DAOException{
 		deleteReview(user, reviewId, false);
 		insertReviewToDB(review, user, reviewId);
 	}
 
+	/** */
 	private static String insertReviewContentQuery = "INSERT INTO spo_binary (SUBJECT, OBJECT, DATATYPE, MUST_EMBED) VALUES (?,?,?, TRUE);";
 	
+	/**
+	 * 
+	 * @param review
+	 * @param user
+	 * @param reviewId
+	 * @throws DAOException
+	 */
 	private void insertReviewToDB(ReviewDTO review, CRUser user, int reviewId) throws DAOException{
 		
 		String userReviewUri = user.getReviewUri(reviewId);
@@ -1541,6 +1555,12 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		// Adding content review to DB too.
 		
 		if (review.getReviewContent() != null && review.getReviewContent().length()>0){
+			
+			String contentType = review.getReviewContentType();
+			if (contentType==null){
+				contentType = "";
+			}
+			
 			Connection conn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
@@ -1550,18 +1570,19 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 				stmt = conn.prepareStatement(insertReviewContentQuery);
 				stmt.setLong(1, Hashes.spoHash(user.getReviewUri(reviewId)));
 				
-				byte[] bytes = new byte[0];
-				try {
-					bytes = review.getReviewContent().getBytes("UTF-8");
-				} catch (Exception ex){
-				}
+				byte[] bytes = review.getReviewContent().getBytes("UTF-8");
 				byteArrayInputStream = new ByteArrayInputStream(bytes);
 				stmt.setBinaryStream(2, byteArrayInputStream, bytes.length);
-				stmt.setString(3, review.getReviewContentType());
+				stmt.setString(3, contentType);
 				stmt.executeUpdate();
 			}
 			catch (SQLException e){
-				throw new DAOException(e.toString(), e);
+				
+				throw new DAOException(e.getMessage(), e);
+			}
+			catch (UnsupportedEncodingException e) {
+				
+				throw new DAOException(e.getMessage(), e);
 			}
 			finally{
 				IOUtils.closeQuietly(byteArrayInputStream);

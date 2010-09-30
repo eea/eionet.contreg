@@ -178,15 +178,17 @@ public class PullHarvest extends Harvest{
 					
 					contentType = sourceMetadata.getObjectValue(Predicates.CR_MEDIA_TYPE);
 					if (contentType!=null && !isSupportedContentType(contentType)){
-						logger.debug("Unsupported content type: " + contentType);
+						logger.debug("Unsupported response content type: " + contentType);
 					}
 					else{
+						logger.debug("Response content type was " + contentType);
 						if (harvestUrlConnection.isHttpConnection() && harvestUrlConnection.getResponseCode()==HttpURLConnection.HTTP_NOT_MODIFIED){
 						
 							handleSourceNotModified();
 							return;
 						}
 						else{
+							logger.debug("Streaming the content to file " + contentType);
 							// save the stream to file
 							int totalBytes = FileUtil.streamToFile(harvestUrlConnection.getInputStream(), file);
 
@@ -452,6 +454,8 @@ public class PullHarvest extends Harvest{
 		// Testing whether the input file is zipped. If true, it is uncompressed and used as original source file.
 		File unGZipped = unCompressGZip(file);
 		if (unGZipped != null){
+			
+			logger.debug("The file was gzipped, going to process unzipped file now");
 			file = unGZipped;
 		}
 		else if (contentType!=null && !isXmlContentType(contentType)){
@@ -519,6 +523,8 @@ public class PullHarvest extends Harvest{
 	 */
 	private File preProcess(File file, String contentType) throws ParserConfigurationException, SAXException, IOException{
 
+		// if content type declared to be application/rdf+xml, then believe it and go to parsing
+		// straight away
 		if (contentType!=null && contentType.startsWith("application/rdf+xml")){
 			return file;
 		}
@@ -528,7 +534,7 @@ public class PullHarvest extends Harvest{
 		String conversionId = convParser==null ? null : convParser.getRdfConversionId();
 		if (StringUtils.isBlank(conversionId)){
 			
-			logger.debug("Response content type was " + contentType + ", trying to extract schema or DTD");
+			logger.debug("Trying to extract schema or DTD");
 			
 			XmlAnalysis xmlAnalysis = new XmlAnalysis();
 			xmlAnalysis.parse(file);
@@ -545,13 +551,19 @@ public class PullHarvest extends Harvest{
 			// if no schema or DTD still found, assume the URI of the starting element
 			// to be the schema by which conversions should be looked for
 			if (schemaOrDtd==null || schemaOrDtd.length()==0){
+				
 				schemaOrDtd = xmlAnalysis.getStartElemUri();
+				if (schemaOrDtd.equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#RDF")){
+					
+					logger.debug("File seems to be RDF, going to parse like that");
+					return file;
+				}
 			}
 			
-			// if schema or DTD found, and it's not rdf:DRF, then get its RDF conversion ID,
-			// otherwise assume the file is RDF and return
-			if (schemaOrDtd!=null && schemaOrDtd.length()>0
-					&& !schemaOrDtd.equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#RDF")){
+			// if schema or DTD found, then get its RDF conversion ID
+			if (!StringUtils.isBlank(schemaOrDtd)){
+				
+				logger.debug("Found schema or DTD: " + schemaOrDtd);
 				
 				sourceMetadata.addObject(Predicates.CR_SCHEMA, new ObjectDTO(schemaOrDtd, false));
 				convParser = ConversionsParser.parseForSchema(schemaOrDtd);
@@ -560,17 +572,22 @@ public class PullHarvest extends Harvest{
 				}
 			}
 			else{
-				logger.debug("No schema or DTD declared, going to parse as RDF");
-				return file;
+				logger.debug("No schema or DTD declared");
 			}
 		}
 		
-		// if conversion ID detected, run it
-		if (!StringUtils.isBlank(conversionId)){
+		// if no conversion found, still return the file for parsing as RDF
+		// (we know that at least it's XML, because otherwise a SAXException
+		// would have been thrown above)
+		if (StringUtils.isBlank(conversionId)){
 			
-			logger.debug("Going to run RDF conversion");
+			logger.debug("No RDF conversion found, trying to parse as RDF");
+			return file;
+		}
+		else{
+			logger.debug("Going to run the found RDF conversion (id = " + conversionId + ")");
 			
-			/* prepare conversion URL */
+			// prepare conversion URL
 
 			String convertUrl = GeneralConfig.getRequiredProperty(GeneralConfig.XMLCONV_CONVERT_URL);
 			Object[] args = new String[2];
@@ -578,7 +595,7 @@ public class PullHarvest extends Harvest{
 			args[1] = URLEncoder.encode(sourceUrlString);
 			convertUrl = MessageFormat.format(convertUrl, args);
 
-			/* run conversion and save the response to file */
+			// run conversion and save the response to file
 
 			File convertedFile = new File(file.getAbsolutePath() + ".converted");
 			FileUtil.downloadUrlToFile(convertUrl, convertedFile);
@@ -588,10 +605,6 @@ public class PullHarvest extends Harvest{
 
 			// return converted file
 			return convertedFile;
-		}
-		else{
-			logger.debug("No RDF conversion found, no parsing will be done");
-			return null;
 		}
 	}
 

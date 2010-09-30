@@ -48,6 +48,9 @@ public class URIUtilTest extends TestCase{
 		assertEquals(null, URIUtil.extractURILabel("http://sws.geonames.org/6255148/", null));
 	}
 	
+	/**
+	 * 
+	 */
 	public void testFixRelativeUrl(){
 		assertEquals("http://sws.geonames.org", URLUtil.extractUrlHost("http://sws.geonames.org/6255148/"));
 		try {
@@ -55,7 +58,7 @@ public class URIUtilTest extends TestCase{
 			assertEquals("http://rod.eionet.europa.eu/clients/clients.rdf", UrlRedirectAnalyzer.fixRelativeUrl("clients.rdf", 303, "http://rod.eionet.europa.eu/clients/10"));
 			assertEquals("http://rod.eionet.europa.eu/clients/clients.rdf", UrlRedirectAnalyzer.fixRelativeUrl("clients.rdf", 303, "http://rod.eionet.europa.eu/clients/"));
 		} catch (MalformedURLException ex ){
-			fail(ex.getMessage());
+			fail("Did not expect this exception: " + ex.toString());
 		}
 	}
 	

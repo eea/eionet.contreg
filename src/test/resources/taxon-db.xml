@@ -6,28 +6,29 @@
 -->
 <dataset>
   <RESOURCE URI="http://cr.eionet.europa.eu/ontologies/contreg.rdf#byteSize" URI_HASH="8639511163630871821"/>
-  <RESOURCE URI="http://cr.eionet.europa.eu/ontologies/contreg.rdf#contentLastModified" URI_HASH="3296918264710147612"/>
-  <RESOURCE URI="http://cr.eionet.europa.eu/ontologies/contreg.rdf#lastRefreshed" URI_HASH="-2213704056277764256"/>
-  <RESOURCE URI="http://cr.eionet.europa.eu/ontologies/contreg.rdf#mediaType" URI_HASH="333311624525447614"/>
-  <RESOURCE URI="http://purl.org/dc/terms/description" URI_HASH="-7864036825501654521"/>
-  <RESOURCE URI="http://purl.org/dc/terms/hasVersion" URI_HASH="1383918283326755379"/>
-  <RESOURCE URI="http://purl.org/dc/terms/issued" URI_HASH="133517385080018634"/>
-  <RESOURCE URI="http://purl.org/dc/terms/modified" URI_HASH="-2395129634300712752"/>
-  <RESOURCE URI="http://rs.tdwg.org/dwc/terms/" URI_HASH="-2401600647348674002"/>
-  <RESOURCE URI="http://rs.tdwg.org/dwc/terms/#kingdom-2009-04-24" URI_HASH="-4124880773033497262"/>
-  <RESOURCE URI="http://rs.tdwg.org/dwc/terms/#Taxon-2008-11-19" URI_HASH="6817490066860006600"/>
-  <RESOURCE URI="http://rs.tdwg.org/dwc/terms/kingdom" URI_HASH="-1863610096029846001"/>
-  <RESOURCE URI="http://rs.tdwg.org/dwc/terms/kingdom-2009-04-24" URI_HASH="-344724432427231365"/>
-  <RESOURCE URI="http://rs.tdwg.org/dwc/terms/Taxon" URI_HASH="-1177899728476679014"/>
-  <RESOURCE URI="http://rs.tdwg.org/dwc/terms/Taxon-2008-11-19" URI_HASH="-4500728889370309587"/>
-  <RESOURCE URI="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property" URI_HASH="2170852117422230170"/>
-  <RESOURCE URI="http://www.w3.org/1999/02/22-rdf-syntax-ns#type" URI_HASH="-5251507576730213845"/>
-  <RESOURCE URI="http://www.w3.org/2000/01/rdf-schema#Class" URI_HASH="-413436351744164071"/>
-  <RESOURCE URI="http://www.w3.org/2000/01/rdf-schema#comment" URI_HASH="4171861332787161232"/>
-  <RESOURCE URI="http://www.w3.org/2000/01/rdf-schema#domain" URI_HASH="-2785858390031356069"/>
-  <RESOURCE URI="http://www.w3.org/2000/01/rdf-schema#isDefinedBy" URI_HASH="7143970754346561049"/>
-  <RESOURCE URI="http://www.w3.org/2000/01/rdf-schema#label" URI_HASH="8744745537220110927"/>
-  <RESOURCE URI="http://www.w3.org/2000/01/rdf-schema#replaces" URI_HASH="-3724607133605829850"/>
+<RESOURCE URI="http://cr.eionet.europa.eu/ontologies/contreg.rdf#contentLastModified" URI_HASH="3296918264710147612"/>
+<RESOURCE URI="http://cr.eionet.europa.eu/ontologies/contreg.rdf#lastRefreshed" URI_HASH="-2213704056277764256"/>
+<RESOURCE URI="http://cr.eionet.europa.eu/ontologies/contreg.rdf#mediaType" URI_HASH="333311624525447614"/>
+<RESOURCE URI="http://purl.org/dc/dcmitype/Dataset" URI_HASH="-7344237574819089041"/>
+<RESOURCE URI="http://purl.org/dc/terms/description" URI_HASH="-7864036825501654521"/>
+<RESOURCE URI="http://purl.org/dc/terms/hasVersion" URI_HASH="1383918283326755379"/>
+<RESOURCE URI="http://purl.org/dc/terms/issued" URI_HASH="133517385080018634"/>
+<RESOURCE URI="http://purl.org/dc/terms/modified" URI_HASH="-2395129634300712752"/>
+<RESOURCE URI="http://rs.tdwg.org/dwc/terms/" URI_HASH="-2401600647348674002"/>
+<RESOURCE URI="http://rs.tdwg.org/dwc/terms/kingdom" URI_HASH="-1863610096029846001"/>
+<RESOURCE URI="http://rs.tdwg.org/dwc/terms/#kingdom-2009-04-24" URI_HASH="-4124880773033497262"/>
+<RESOURCE URI="http://rs.tdwg.org/dwc/terms/kingdom-2009-04-24" URI_HASH="-344724432427231365"/>
+<RESOURCE URI="http://rs.tdwg.org/dwc/terms/Taxon" URI_HASH="-1177899728476679014"/>
+<RESOURCE URI="http://rs.tdwg.org/dwc/terms/#Taxon-2008-11-19" URI_HASH="6817490066860006600"/>
+<RESOURCE URI="http://rs.tdwg.org/dwc/terms/Taxon-2008-11-19" URI_HASH="-4500728889370309587"/>
+<RESOURCE URI="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property" URI_HASH="2170852117422230170"/>
+<RESOURCE URI="http://www.w3.org/1999/02/22-rdf-syntax-ns#type" URI_HASH="-5251507576730213845"/>
+<RESOURCE URI="http://www.w3.org/2000/01/rdf-schema#Class" URI_HASH="-413436351744164071"/>
+<RESOURCE URI="http://www.w3.org/2000/01/rdf-schema#comment" URI_HASH="4171861332787161232"/>
+<RESOURCE URI="http://www.w3.org/2000/01/rdf-schema#domain" URI_HASH="-2785858390031356069"/>
+<RESOURCE URI="http://www.w3.org/2000/01/rdf-schema#isDefinedBy" URI_HASH="7143970754346561049"/>
+<RESOURCE URI="http://www.w3.org/2000/01/rdf-schema#label" URI_HASH="8744745537220110927"/>
+<RESOURCE URI="http://www.w3.org/2000/01/rdf-schema#replaces" URI_HASH="-3724607133605829850"/>
 
   <SPO SUBJECT="-1863610096029846001" PREDICATE="-7864036825501654521"
   OBJECT="Example: &quot;Animalia&quot;"
@@ -118,5 +119,10 @@
   OBJECT="Taxon"
   OBJECT_HASH="1681060441615649299" ANON_SUBJ="N" ANON_OBJ="N" LIT_OBJ="Y" OBJ_LANG="en-US"
   OBJ_DERIV_SOURCE="0" OBJ_DERIV_SOURCE_GEN_TIME="0" OBJ_SOURCE_OBJECT="0"/>
-
+  
+  <SPO SUBJECT="536485969578762798" PREDICATE="-5251507576730213845"
+  OBJECT="http://purl.org/dc/dcmitype/Dataset"
+  OBJECT_HASH="-7344237574819089041" ANON_SUBJ="N" ANON_OBJ="N" LIT_OBJ="N" OBJ_LANG=""
+  OBJ_DERIV_SOURCE="0" OBJ_DERIV_SOURCE_GEN_TIME="0" OBJ_SOURCE_OBJECT="0"/>
+  
 </dataset>

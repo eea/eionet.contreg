@@ -107,12 +107,15 @@ public class RDFHandler implements StatementHandler{
 		persister = PersisterFactory.getPersister(config);
 		uuidNamePrefix = uuidNamePrefix(Hashes.spoHash(config.getSourceUrl()), config.getGenTime());
 	}
-	
-	/** 
-	 * @see eionet.cr.harvest.IRDFHandler#statement(com.hp.hpl.jena.rdf.arp.AResource, com.hp.hpl.jena.rdf.arp.AResource, com.hp.hpl.jena.rdf.arp.AResource)
-	 * {@inheritDoc}
+
+	private int statementCounter = 0;
+	/*
+	 * (non-Javadoc)
+	 * @see com.hp.hpl.jena.rdf.arp.StatementHandler#statement(com.hp.hpl.jena.rdf.arp.AResource, com.hp.hpl.jena.rdf.arp.AResource, com.hp.hpl.jena.rdf.arp.AResource)
 	 */
 	public void statement(AResource subject, AResource predicate, AResource object){
+		
+		logger.debug("Resource statement, counter = " + (++statementCounter));
 		
 		if (rdfContentFound==false){
 			rdfContentFound = true;
@@ -121,11 +124,13 @@ public class RDFHandler implements StatementHandler{
 		statement(subject, predicate, object.isAnonymous() ? object.getAnonymousID() : object.getURI(), EMPTY_STRING, false, object.isAnonymous());
 	}
 
-	/** 
-	 * @see eionet.cr.harvest.IRDFHandler#statement(com.hp.hpl.jena.rdf.arp.AResource, com.hp.hpl.jena.rdf.arp.AResource, com.hp.hpl.jena.rdf.arp.ALiteral)
-	 * {@inheritDoc}
+	/*
+	 * (non-Javadoc)
+	 * @see com.hp.hpl.jena.rdf.arp.StatementHandler#statement(com.hp.hpl.jena.rdf.arp.AResource, com.hp.hpl.jena.rdf.arp.AResource, com.hp.hpl.jena.rdf.arp.ALiteral)
 	 */
 	public void statement(AResource subject, AResource predicate, ALiteral object){
+		
+		logger.debug("Literal statement, counter = " + (++statementCounter));
 		
 		if (rdfContentFound==false){
 			rdfContentFound = true;

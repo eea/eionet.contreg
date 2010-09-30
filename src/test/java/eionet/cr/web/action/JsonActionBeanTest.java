@@ -45,10 +45,18 @@ import eionet.cr.web.util.ApplicationCache;
 
 public class JsonActionBeanTest extends AbstractStripesMvcTestHelper{
 	
+	/**
+	 * 
+	 */
 	@BeforeClass
 	public static void setUpActionContext(){
 		DbConnectionProvider.setConnectionType(ConnectionType.SIMPLE);
 	}
+	
+	/**
+	 * 
+	 * @throws Exception
+	 */
 	@Test
 	public void testJsonTagsResult() throws Exception {
 
@@ -62,13 +70,18 @@ public class JsonActionBeanTest extends AbstractStripesMvcTestHelper{
 		trip.setParameter(
 				"query", "tag");
 		trip.execute();
-		System.out.println(trip.getResponse().getOutputString());
+		
 		assertEquals("{\"query\":\"tag\"," +
 				"\"suggestions\":[\"tag1\",\"tag2\",\"tag3\",\"tag4\"]}",
 				trip.getResponse().getOutputString());
 
 
 	}
+	
+	/**
+	 * 
+	 * @return
+	 */
 	private List<TagDTO> getTestData() {
 		List<TagDTO> result = new ArrayList<TagDTO>();
 		result.add(new TagDTO("tag4", 10, 10));

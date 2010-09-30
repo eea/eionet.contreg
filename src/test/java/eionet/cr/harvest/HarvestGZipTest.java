@@ -33,7 +33,7 @@ public class HarvestGZipTest extends CRDatabaseTestCase {
 			harvest.execute();
 			
 			assertEquals((int)11, harvest.getDistinctSubjectsCount());
-			assertEquals((int)48, harvest.getStoredTriplesCount());
+			assertEquals((int)49, harvest.getStoredTriplesCount());
 		}
 		catch (Throwable e) {
 			e.printStackTrace();
