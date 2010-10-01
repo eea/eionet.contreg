@@ -84,13 +84,44 @@
 	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 	<!--              servlets                  -->
 	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-		
+	
+	<!--  StripesDispatcher -->
+	
 	<servlet>
 		<servlet-name>StripesDispatcher</servlet-name>
 		<servlet-class>net.sourceforge.stripes.controller.DispatcherServlet</servlet-class>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
+	<servlet-mapping>
+		<servlet-name>StripesDispatcher</servlet-name>
+		<url-pattern>/dispatcher</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>StripesDispatcher</servlet-name>
+		<url-pattern>/action/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>StripesDispatcher</servlet-name>
+		<url-pattern>*.action</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>StripesDispatcher</servlet-name>
+		<url-pattern>/index.jsp</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>StripesDispatcher</servlet-name>
+		<url-pattern>/admin</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>StripesDispatcher</servlet-name>
+		<url-pattern>/admin/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>StripesDispatcher</servlet-name>
+		<url-pattern>/home/*</url-pattern>
+	</servlet-mapping>
 	
+	<!--  XmlRpcServlet (for XML-RPC 3) -->
 	<servlet>
         <servlet-name>XmlRpcServlet</servlet-name>
         <servlet-class>eionet.cr.api.xmlrpc.CRXmlRpcServlet</servlet-class>
@@ -99,18 +130,25 @@
           <param-value>true</param-value>
         </init-param>
     </servlet>
+    <servlet-mapping>
+        <servlet-name>XmlRpcServlet</servlet-name>
+        <url-pattern>/xmlrpc</url-pattern>
+    </servlet-mapping>
+    
+    <!--  AMP feed servlet -->
     
     <servlet>
 		<servlet-name>AmpServlet</servlet-name>
 		<servlet-class>eionet.cr.api.feeds.amp.AmpFeedServlet</servlet-class>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
-	
 	<servlet-mapping>
         <servlet-name>AmpServlet</servlet-name>
         <url-pattern>/ampService</url-pattern>
     </servlet-mapping>
 
+	<!-- XmlConvServlet -->
+	
     <servlet>
 		<servlet-name>XmlConvServlet</servlet-name>
 		<servlet-class>eionet.cr.api.feeds.xmlconv.XmlConvFeedServlet</servlet-class>
@@ -120,58 +158,32 @@
         <servlet-name>XmlConvServlet</servlet-name>
         <url-pattern>/xmlConvService</url-pattern>
     </servlet-mapping>
+
+	<!-- RPC router servlet (for XML-RPC 2)-->
+	
+    <servlet>
+		<servlet-name>rpcrouter</servlet-name>
+		<servlet-class>com.tee.uit.servlets.XmlRpcRouter</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>rpcrouter</servlet-name>
+		<url-pattern>/rpcrouter</url-pattern>
+	</servlet-mapping>
     
-    <servlet-mapping>
-        <servlet-name>XmlRpcServlet</servlet-name>
-        <url-pattern>/xmlrpc</url-pattern>
-    </servlet-mapping>
-	
-	<servlet-mapping>
-		<servlet-name>StripesDispatcher</servlet-name>
-		<url-pattern>/dispatcher</url-pattern>
-	</servlet-mapping>
-
-	<servlet-mapping>
-		<servlet-name>StripesDispatcher</servlet-name>
-		<url-pattern>/action/*</url-pattern>
-	</servlet-mapping>
-	
-	<servlet-mapping>
-		<servlet-name>StripesDispatcher</servlet-name>
-		<url-pattern>*.action</url-pattern>
-	</servlet-mapping>
-	
-	<servlet-mapping>
-		<servlet-name>StripesDispatcher</servlet-name>
-		<url-pattern>/index.jsp</url-pattern>
-	</servlet-mapping>
-
-	<servlet-mapping>
-		<servlet-name>StripesDispatcher</servlet-name>
-		<url-pattern>/admin</url-pattern>
-	</servlet-mapping>
-
-	<servlet-mapping>
-		<servlet-name>StripesDispatcher</servlet-name>
-		<url-pattern>/admin/*</url-pattern>
-	</servlet-mapping>
-	
-	<servlet-mapping>
-		<servlet-name>StripesDispatcher</servlet-name>
-		<url-pattern>/home/*</url-pattern>
-	</servlet-mapping>
-	
+    <!-- welcome file list -->
+    	
 	<welcome-file-list>
 		<welcome-file>index.jsp</welcome-file>
 	</welcome-file-list>
-  
+	
+	<!-- resource references -->
+	
 	<resource-ref>
 		<description>DB connection at development server</description>
 		<res-ref-name>jdbc/crDevDB</res-ref-name>
 		<res-type>javax.sql.DataSource</res-type>
 		<res-auth>Container</res-auth>
 	</resource-ref>
-
 	<resource-ref>
 		<description>DB connection at development server</description>
 		<res-ref-name>jdbc/crLocalDB</res-ref-name>

@@ -223,6 +223,12 @@
 			<artifactId>xmlrpc-common</artifactId>
 			<version>3.1</version>
 		</dependency>
+ 		<dependency>
+			<groupId>xmlrpc</groupId>
+			<artifactId>xmlrpc</artifactId>
+			<version>2.0</version>
+			<scope>runtime</scope>
+		</dependency>
 		<dependency>
 			<groupId>ws-commons-util</groupId>
 			<artifactId>ws-commons-util</artifactId>
@@ -242,6 +248,16 @@
 		<dependency>
 			<groupId>eionet</groupId>
 			<artifactId>uit-security</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>eionet</groupId>
+			<artifactId>uit-server</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>eionet</groupId>
+			<artifactId>uit-definition</artifactId>
 			<version>1.0</version>
 		</dependency>
 		<dependency>
@@ -298,6 +314,19 @@
 			<artifactId>httpmime</artifactId>
 			<version>4.0.1</version>
 		</dependency>
+		<dependency>
+			<groupId>eionet</groupId>
+			<artifactId>eionet-dir</artifactId>
+			<version>1.0</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>castor</groupId>
+			<artifactId>castor</artifactId>
+			<version>1.22</version>
+			<scope>runtime</scope>
+		</dependency>
+		
 <!--
 		<dependency>
 			<groupId>org.mortbay.jetty</groupId>
