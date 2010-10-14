@@ -189,15 +189,17 @@ public class XmlAnalysis {
 	 */
 	public String getStartElemUri(){
 		
-		String ns = handler.getStartElemNamespace();
-		if (ns!=null && ns.trim().length()>0){
-			String lName = handler.getStartElemLocalName();
-			if (lName!=null && lName.trim().length()>0){
-				return ns + lName;
-			}
+		String startElemNamespace = handler.getStartElemNamespace();
+		if (startElemNamespace==null){
+			startElemNamespace = "";
 		}
 		
-		return null;
+		String startElemLocalName = handler.getStartElemLocalName();
+		if (startElemLocalName==null){
+			startElemLocalName = "";
+		}
+		
+		return startElemNamespace + startElemLocalName;
 	}
 	
 	/**
@@ -266,7 +268,8 @@ public class XmlAnalysis {
 				}
 			}
 			
-			// quit parsing now, since we don't need any more info
+			// quit parsing now, since we need info only about the very first element,
+			// meaning we need only one call to this method
 			throw new SAXException(new CRException());
 		}
 
@@ -320,16 +323,16 @@ public class XmlAnalysis {
 		}
 	}
 	
-	public static void main(String[] args){
-		
-		XmlAnalysis info = new XmlAnalysis();
-		try{
-			info.parse(new File("C:/temp/schema.rdf"));
-			System.out.println(info.getStartElemLocalName());
-			System.out.println(info.getStartElemNamespace());
-		}
-		catch (Throwable t){
-			t.printStackTrace();
-		}
-	}
+//	public static void main(String[] args){
+//		
+//		XmlAnalysis info = new XmlAnalysis();
+//		try{
+//			info.parse(new File("C:/temp/MonthlyOzoneExceedances_Sept2010.xml"));
+//			System.out.println(info.getStartElemLocalName());
+//			System.out.println(info.getStartElemNamespace());
+//		}
+//		catch (Throwable t){
+//			t.printStackTrace();
+//		}
+//	}
 }
