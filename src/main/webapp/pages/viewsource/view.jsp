@@ -4,6 +4,7 @@
 	<br />
 	<crfn:form action="/source.action" focus="">
 		<stripes:hidden name="harvestSource.sourceId" />
+		<stripes:hidden name="harvestSource.url" />
 		<table>
 			<tr>
 				<td>URL:</td>
@@ -35,11 +36,11 @@
 			</c:if>
 
 			<tr>
-				<td colspan="2" style="padding-top: 10px"><stripes:submit
-					name="goToEdit" value="Edit" title="Edit this harvest source" /> <stripes:submit
-					name="scheduleUrgentHarvest" value="Schedule urgent harvest" />
-					<stripes:button name="export" onclick="document.location.href='export.action?url=${ fn:escapeXml(actionBean.harvestSource.url) }'">Export triples</stripes:button>
-					</td>
+				<td colspan="2" style="padding-top: 10px">
+					<stripes:submit name="goToEdit" value="Edit" title="Edit this harvest source"/>
+					<stripes:submit name="scheduleUrgentHarvest" value="Schedule urgent harvest" />
+					<stripes:submit name="export" value="Export triples" />
+				</td>
 			</tr>
 			
 			

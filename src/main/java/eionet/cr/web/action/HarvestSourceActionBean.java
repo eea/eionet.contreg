@@ -20,26 +20,34 @@
  */
 package eionet.cr.web.action;
 
+import java.io.OutputStream;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletResponse;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.HandlesEvent;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.action.StreamingResolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.validation.SimpleError;
 
+import org.apache.commons.lang.StringUtils;
 import org.quartz.SchedulerException;
+
+import com.sun.org.apache.bcel.internal.generic.RETURN;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
+import eionet.cr.dao.readers.RDFExporter;
 import eionet.cr.dto.HarvestDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.TripleDTO;
@@ -74,6 +82,12 @@ public class HarvestSourceActionBean extends AbstractActionBean {
 	/** */
 	private static final List<Pair<String,String>> tabs;
 	private String selectedTab = "view";
+	
+	/** */
+	private enum ExportType {FILE, HOMESPACE};
+	
+	/** */
+	private String exportType;
 	
 	/** */
 	static {
@@ -265,6 +279,44 @@ public class HarvestSourceActionBean extends AbstractActionBean {
      * 
      * @return
      */
+    public Resolution export(){
+    	
+    	Resolution resolution = new ForwardResolution("/pages/export.jsp");
+    	
+    	// process further only if exportType has been specified
+    	if (!StringUtils.isBlank(exportType)){
+    		
+    		// process further only if source URL has been specified
+    		if (harvestSource!=null && !StringUtils.isBlank(harvestSource.getUrl())){
+    			
+    			// if exporting to file, generate and stream RDF into servlet response
+    			if (ExportType.FILE.toString().equals(exportType)){
+        			
+    				resolution = new StreamingResolution("application/rdf+xml"){
+
+    					public void stream(HttpServletResponse response) throws Exception{
+    							RDFExporter.export(Hashes.spoHash(harvestSource.getUrl()),
+    									response.getOutputStream());
+    					}
+    				}.setFilename("rdf.xml");
+        		}
+        		else if (ExportType.HOMESPACE.toString().equals(exportType)){
+        			// TODO handle export to home space
+        			;
+        		}
+        		else{
+        			throw new IllegalArgumentException("Unknown export type: " + exportType);
+        		}
+    		}
+    	}
+    	
+    	return resolution;
+    }
+    
+    /**
+     * 
+     * @return
+     */
     public Resolution goToEdit(){
     	if (harvestSource!=null)
     		return new RedirectResolution(getUrlBinding() + "?edit=&harvestSource.sourceId=" + harvestSource.getSourceId());
@@ -404,5 +456,19 @@ public class HarvestSourceActionBean extends AbstractActionBean {
 	 */
 	public void setSelectedTab(String selectedTab) {
 		this.selectedTab = selectedTab;
+	}
+
+	/**
+	 * @return the exportType
+	 */
+	public String getExportType() {
+		return exportType;
+	}
+
+	/**
+	 * @param exportType the exportType to set
+	 */
+	public void setExportType(String exportType) {
+		this.exportType = exportType;
 	}
 }

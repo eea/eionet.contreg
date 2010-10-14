@@ -18,11 +18,15 @@ import eionet.cr.dto.PredicateDTO;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.NamespaceUtil;
 import eionet.cr.util.URLUtil;
+import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.sql.ResultSetBaseReader;
 
-
+/**
+ * 
+ */
 public class RDFExporter extends ResultSetBaseReader {
 
+	/** */
 	private long sourceHash;
 	private List<PredicateDTO> distinctPredicates = new ArrayList<PredicateDTO>();
 	private HashMap<Long,String> namespaces = new HashMap<Long, String>();
@@ -31,27 +35,39 @@ public class RDFExporter extends ResultSetBaseReader {
 	private boolean lastSubjectTagNotOpen = true; // Meaning that no need to close the previous subject.
 	private OutputStream output;
 	
-	public static void export(long sourceHash, OutputStream out){
+	/**
+	 * 
+	 * @param sourceHash
+	 * @param output
+	 * @throws DAOException 
+	 */
+	public static void export(long sourceHash, OutputStream output) throws DAOException{
+		
 		RDFExporter reader = null;
 		try {
-			reader = new RDFExporter(sourceHash, out);
+			reader = new RDFExporter(sourceHash, output);
 			DAOFactory.get().getDao(HelperDAO.class).outputSourceTriples(reader);
-		} catch (Exception ex){
-			
 		}
-		reader.closeOutput();
+		finally{
+			if (reader!=null){
+				reader.closeOutput();
+			}
+		}
 	}
 	
-	public RDFExporter(long sourceHash, OutputStream out){
+	/**
+	 * 
+	 * @param sourceHash
+	 * @param output
+	 * @throws DAOException 
+	 */
+	public RDFExporter(long sourceHash, OutputStream output) throws DAOException{
 		
 		this.sourceHash = sourceHash;
-		output = out;
+		this.output = output;
 		
-		try {
-			distinctPredicates = DAOFactory.get().getDao(HelperDAO.class).readDistinctPredicates(sourceHash);
-			namespaces = getNamespaces();
-		} catch (Exception ex){
-		}
+		distinctPredicates = DAOFactory.get().getDao(HelperDAO.class).readDistinctPredicates(sourceHash);
+		namespaces = getNamespaces();
 		outputHeader();
 	}
 	
@@ -65,7 +81,7 @@ public class RDFExporter extends ResultSetBaseReader {
 		String subject = rs.getString("subject");
 		long predicateHash = rs.getLong("predicatehash");
 		String object = rs.getString("object");
-		String litobject = rs.getString("litobject");
+		boolean literal = YesNoBoolean.parse(rs.getString("litobject"));
 		
 		if (subjectHash != lastSubjectHash){
 			if (!lastSubjectTagNotOpen){
@@ -77,11 +93,6 @@ public class RDFExporter extends ResultSetBaseReader {
 			
 
 			outputString(buf);
-		}
-		
-		boolean literal = false;
-		if (litobject.toLowerCase().equals("y")){
-			literal = true;
 		}
 		
 		String predicate = NamespaceUtil.extractPredicate(findPredicate(predicateHash));

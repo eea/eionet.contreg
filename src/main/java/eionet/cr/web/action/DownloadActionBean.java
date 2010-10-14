@@ -32,53 +32,45 @@ public class DownloadActionBean extends AbstractActionBean {
 	
 	/** */
 	private String uri = "";
-	private String exportSource = "";
 
+	/**
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
 	@DefaultHandler
 	public Resolution download() throws Exception{
 		
-		if (!uri.isEmpty()) {
-			SpoBinaryDTO dto = DAOFactory.get().getDao(SpoBinaryDAO.class).get(uri);
-			if (dto==null){
-				addCautionMessage("Requested file not found.");
-				return new ForwardResolution("/pages/fileDownloadError.jsp");
-			}
-			
-			InputStream contentStream = dto.getContentStream();
-			if (contentStream==null || contentStream.available()==0){
-				addCautionMessage("Requested file content not found.");
-				return new ForwardResolution("/pages/fileDownloadError.jsp");
-			}
-			
-			String filename = StringUtils.substringAfterLast(uri, "/");
-			if (StringUtils.isBlank(filename)){
-				filename = String.valueOf(Math.abs(Hashes.spoHash(uri)));
-			}
-			return new StreamingResolution(dto.getContentType(), contentStream).setFilename(filename);
+		// get the binary content DTO of the requested file
+		SpoBinaryDTO dto = DAOFactory.get().getDao(SpoBinaryDAO.class).get(uri);
+		if (dto==null){
+			addCautionMessage("Requested file not found.");
+			return new ForwardResolution("/pages/empty.jsp");
+		}
+
+		// get the actual content stream
+		InputStream contentStream = dto.getContentStream();
+		if (contentStream==null || contentStream.available()==0){
+			addCautionMessage("Requested file content not found.");
+			return new ForwardResolution("/pages/empty.jsp");
+		}
+
+		// prepare name for the file to be streamed to the user
+		String filename = StringUtils.substringAfterLast(uri, "/");
+		if (StringUtils.isBlank(filename)){
+			filename = String.valueOf(Math.abs(Hashes.spoHash(uri)));
 		}
 		
-		if (!exportSource.isEmpty()){
-			return new StreamingResolution("application/rdf+xml"){
-		        public void stream(HttpServletResponse response) {
-		        	try {
-			            OutputStream out = response.getOutputStream();
-						RDFExporter.export(Hashes.spoHash(exportSource), out);
-		        	} catch (Exception ex){
-		        	}
-		        }
-		    }.setFilename("rdf.xml");
-		}
-		
-		
-		return null;
+		// stream the above-received content to the user 
+		return new StreamingResolution(dto.getContentType(), contentStream).setFilename(filename);
 	}
 	
 	@ValidationMethod(on={"download"})
 	public void validate(){
 		
-		if (StringUtils.isBlank(uri) && StringUtils.isBlank(exportSource)){
+		if (StringUtils.isBlank(uri)){
 			addGlobalValidationError("Uri must not be blank");
-			getContext().setSourcePageResolution(new ForwardResolution("/pages/fileDownloadError.jsp"));
+			getContext().setSourcePageResolution(new ForwardResolution("/pages/empty.jsp"));
 		}
 	}
 
@@ -94,13 +86,5 @@ public class DownloadActionBean extends AbstractActionBean {
 	 */
 	public void setUri(String uri) {
 		this.uri = uri;
-	}
-
-	public String getExportSource() {
-		return exportSource;
-	}
-
-	public void setExportSource(String exportSource) {
-		this.exportSource = exportSource;
 	}
 }
