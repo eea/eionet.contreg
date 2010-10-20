@@ -25,6 +25,8 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 
+import org.apache.commons.lang.StringUtils;
+
 import eionet.cr.common.Predicates;
 import eionet.cr.dto.UploadDTO;
 import eionet.cr.util.Hashes;
@@ -40,6 +42,7 @@ public class UploadDTOReader extends ResultSetBaseReader{
 	/** */
 	private static final long labelHash = Hashes.spoHash(Predicates.RDFS_LABEL);
 	private static final long lastModifiedHash = Hashes.spoHash(Predicates.CR_LAST_MODIFIED);
+	private static final long dcTitleHash = Hashes.spoHash(Predicates.DC_TITLE);
 
 	/** */
 	private LinkedHashMap<String,UploadDTO> uploadsMap = new LinkedHashMap<String,UploadDTO>();
@@ -65,6 +68,13 @@ public class UploadDTOReader extends ResultSetBaseReader{
 		}
 		else if (predicateHash==lastModifiedHash){
 			uploadDTO.setDateModified(objectValue);
+		}
+		else if (predicateHash==dcTitleHash){
+			
+			// label not yet set, prefer dc:title as the label
+			if (StringUtils.isBlank(uploadDTO.getLabel())){
+				uploadDTO.setLabel(objectValue);
+			}
 		}
 	}
 

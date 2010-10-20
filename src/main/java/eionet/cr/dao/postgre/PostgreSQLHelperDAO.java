@@ -1886,9 +1886,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		StringBuffer buf = new StringBuffer().
 		append("select URI, PREDICATE, OBJECT ").
 		append("from SPO left join RESOURCE on (SPO.SUBJECT=RESOURCE.URI_HASH) ").
-		append("where PREDICATE in (").append(Hashes.spoHash(Predicates.RDFS_LABEL)).
-		append(",").append(Hashes.spoHash(Predicates.CR_LAST_MODIFIED)).
-		append(") and SUBJECT in (select distinct OBJECT_HASH from SPO where SUBJECT=").
+		append("where SUBJECT in (select distinct OBJECT_HASH from SPO where SUBJECT=").
 		append(Hashes.spoHash(crUser.getHomeUri())).append(" and PREDICATE=").
 		append(Hashes.spoHash(Predicates.CR_HAS_FILE)).append(") order by URI,PREDICATE,OBJECT");
 		
@@ -1897,11 +1895,16 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		try{
 			conn = getConnection();
 			SQLUtil.executeQuery(buf.toString(), reader, conn);
+			
+			// loop through all the found uploads and make sure they all have the label set
 			Collection<UploadDTO> uploads = reader.getResultList();
 			for (UploadDTO uploadDTO : uploads){
+				
 				if (StringUtils.isBlank(uploadDTO.getLabel())){
-					uploadDTO.setLabel(
-							URIUtil.extractURILabel(uploadDTO.getSubjectUri(), SubjectDTO.NO_LABEL));
+					
+					String subjectUri = uploadDTO.getSubjectUri();
+					String uriLabel = URIUtil.extractURILabel(subjectUri, SubjectDTO.NO_LABEL);
+					uploadDTO.setLabel(uriLabel);
 				}
 			}
 			

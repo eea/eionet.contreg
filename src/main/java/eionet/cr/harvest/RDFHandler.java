@@ -256,7 +256,7 @@ public class RDFHandler implements StatementHandler{
 			}
 		}
 		catch (Exception e){
-			throw new LoadException(e.toString(), e);
+			throw new RDFLoadingException(e.toString(), e);
 		}
 	}
 

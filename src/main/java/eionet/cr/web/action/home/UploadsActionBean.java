@@ -40,6 +40,7 @@ import eionet.cr.dto.UploadDTO;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.UploadHarvest;
 import eionet.cr.util.Hashes;
+import eionet.cr.util.URIUtil;
 import eionet.cr.web.security.CRUser;
 
 /**
@@ -204,9 +205,12 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
 	 */
 	public void run() {
 		
+		// at this stage, the uploaded file must not be null
 		if (uploadedFile==null){
 			throw new CRRuntimeException("Uploaded file object must not be null");
 		}
+		
+		String userName = getUserName();
 		
 		// save the file's content into database
 		try {
@@ -222,21 +226,37 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
 			return;
 		}
 
-		// add cr:hasFile predicate to the user's home URI in SPO
-		
-		logger.debug("Creating the cr:hasFile predicate");
-		
-		SubjectDTO subjectDTO = new SubjectDTO(getUser().getHomeUri(), false);
+		// prepare cr:hasFile predicate
 		ObjectDTO objectDTO = new ObjectDTO(getUploadedFileSubjectUri(), false);
 		objectDTO.setSourceUri(getUser().getHomeUri());
-		subjectDTO.addObject(Predicates.CR_HAS_FILE, objectDTO);
+		SubjectDTO homeSubjectDTO = new SubjectDTO(getUser().getHomeUri(), false);
+		homeSubjectDTO.addObject(Predicates.CR_HAS_FILE, objectDTO);
 		
-		try{
-			DAOFactory.get().getDao(HelperDAO.class).addTriples(subjectDTO);
+		// prepare the actual value of dc:title to store
+		String titleToStore = title;
+		if (StringUtils.isBlank(titleToStore)){
+			titleToStore = URIUtil.extractURILabel(getUploadedFileSubjectUri(),SubjectDTO.NO_LABEL);
+		}
+		
+		// prepare dc:title predicate
+		objectDTO = new ObjectDTO(titleToStore, true);
+		objectDTO.setSourceUri(getUser().getHomeUri());
+		SubjectDTO fileSubjectDTO = new SubjectDTO(getUploadedFileSubjectUri(), false);
+		fileSubjectDTO.addObject(Predicates.DC_TITLE, objectDTO);
 
+		logger.debug("Creating the cr:hasFile predicate");
+		try{
 			// make sure cr:hasFile is present in RESOURCE
 			DAOFactory.get().getDao(HelperDAO.class).addResource(
 					Predicates.CR_HAS_FILE, getUser().getHomeUri());
+
+			// make sure file subject URI is present in RESOURCE
+			DAOFactory.get().getDao(HelperDAO.class).addResource(
+					getUploadedFileSubjectUri(), getUser().getHomeUri());
+
+			// persist the prepared cr:hasFile and dc:title predicates
+			DAOFactory.get().getDao(HelperDAO.class).addTriples(homeSubjectDTO);
+			DAOFactory.get().getDao(HelperDAO.class).addTriples(fileSubjectDTO);
 		}
 		catch (DAOException e){
 			saveAndHarvestException = e;
@@ -244,7 +264,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
 		}
 		
 		// attempt to harvest the uploaded file
-		harvestUploadedFile(getUploadedFileSubjectUri(), uploadedFile, title);
+		harvestUploadedFile(getUploadedFileSubjectUri(), uploadedFile, null, userName);
 	}
 
 	/**
@@ -359,15 +379,8 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
 			return;
 		}
 		
-		// for edit and add events, the Title is mandatory
+		// if add event, make sure the file bean is not null
 		String eventName = getContext().getEventName();
-		if (eventName.equals("add") || eventName.equals("edit")){
-			if (StringUtils.isBlank(title)){
-				addGlobalValidationError("Title is missing!");
-			}
-		}
-		
-		// if add event, make sure the file bean is not null,
 		if (eventName.equals("add")){
 			
 			if (uploadedFile==null){

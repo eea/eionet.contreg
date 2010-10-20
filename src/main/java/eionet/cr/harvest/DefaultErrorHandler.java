@@ -65,7 +65,7 @@ public class DefaultErrorHandler implements ErrorHandler {
 	 * {@inheritDoc}
 	 */
 	public void fatalError(SAXParseException e) throws SAXException {
-		throw new LoadException(e.toString(), e);
+		throw new RDFLoadingException(e.toString(), e);
 	}
 
 	/**

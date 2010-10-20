@@ -27,12 +27,12 @@ import eionet.cr.common.CRRuntimeException;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class LoadException extends CRRuntimeException{
+public class RDFLoadingException extends CRRuntimeException{
 
 	/**
 	 * 
 	 */
-	public LoadException(){
+	public RDFLoadingException(){
 		super();
 	}
 	
@@ -40,7 +40,7 @@ public class LoadException extends CRRuntimeException{
 	 * 
 	 * @param message
 	 */
-	public LoadException(String message){
+	public RDFLoadingException(String message){
 		super(message);
 	}
 
@@ -49,7 +49,7 @@ public class LoadException extends CRRuntimeException{
 	 * @param message
 	 * @param cause
 	 */
-	public LoadException(String message, Throwable cause){
+	public RDFLoadingException(String message, Throwable cause){
 		super(message, cause);
 	}
 }

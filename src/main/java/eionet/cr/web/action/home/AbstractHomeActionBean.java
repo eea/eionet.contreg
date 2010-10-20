@@ -256,7 +256,7 @@ public abstract class AbstractHomeActionBean extends AbstractActionBean {
 	 * @param uploadedFile
 	 * @param dcTitle
 	 */
-	protected void harvestUploadedFile(String sourceUrl, FileBean uploadedFile, String dcTitle){
+	protected void harvestUploadedFile(String sourceUrl, FileBean uploadedFile, String dcTitle, String userName){
 		
 		// create and store harvest source for the above source url,
 		// don't throw exceptions, as an uploaded file does not have to be harvestable
@@ -277,7 +277,7 @@ public abstract class AbstractHomeActionBean extends AbstractActionBean {
 		try{
 			if (hSourceDTO!=null){
 				UploadHarvest uploadHarvest =
-					new UploadHarvest(hSourceDTO, uploadedFile, dcTitle, getUserName());
+					new UploadHarvest(hSourceDTO, uploadedFile, dcTitle, userName);
 				uploadHarvest.execute();
 			}
 			else{

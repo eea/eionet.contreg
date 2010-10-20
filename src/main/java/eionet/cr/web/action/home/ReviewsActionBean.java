@@ -269,7 +269,7 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
 			helperDAO.addResource(Predicates.CR_HAS_ATTACHMENT, reviewUri);
 			
 			// finally, attempt to harvest the uploaded file's contents
-			harvestUploadedFile(attachmentUri, attachment, null);
+			harvestUploadedFile(attachmentUri, attachment, null, getUserName());
 		}
 		catch (DAOException daoe){
 			logger.error("Error when storing attachment", daoe);

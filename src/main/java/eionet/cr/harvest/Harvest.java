@@ -31,8 +31,10 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 import com.hp.hpl.jena.rdf.arp.ARP;
+import com.hp.hpl.jena.rdf.arp.ParseException;
 
 import eionet.cr.common.CRRuntimeException;
 import eionet.cr.config.GeneralConfig;
@@ -197,6 +199,15 @@ public abstract class Harvest {
 		        	catch (SAXException e){
 		        		logger.info("Following exception happened when parsing as RDF", e);
 		        	}
+		        	catch (RDFLoadingException e){
+		        		Throwable cause = e.getCause();
+		        		if (cause instanceof SAXParseException){
+		        			logger.info("Following exception happened when parsing as RDF", e);
+		        		}
+		        		else{
+		        			throw e;
+		        		}
+		        	}
 		        }
 			}
 			
@@ -245,7 +256,7 @@ public abstract class Harvest {
 				}
 			}
 			
-			Throwable t = (e instanceof LoadException) && e.getCause()!=null ? e.getCause() : e;
+			Throwable t = (e instanceof RDFLoadingException) && e.getCause()!=null ? e.getCause() : e;
 			throw new HarvestException(t.toString(), t);
 		}
 		finally{

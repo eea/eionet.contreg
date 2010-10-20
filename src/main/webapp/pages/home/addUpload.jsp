@@ -14,7 +14,7 @@
 					<col style="width:10em"/>
 					<col style="width:100%"/>
 					<tr>
-						<td><label class="question required" for="txtTitle">Title</label></td>
+						<td><label for="txtTitle">Title</label></td>
 						<td><stripes:text id="txtTitle" name="title" size="80"/></td>
 					</tr>
 					<tr>

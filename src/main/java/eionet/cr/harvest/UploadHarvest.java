@@ -92,10 +92,15 @@ public class UploadHarvest extends Harvest{
 	 */
 	public UploadHarvest(String sourceUrlString, FileBean fileBean, String dcTitle, String userName){
 		
+		// call super-class constructor
 		super(sourceUrlString);
+		
+		// make sure file bean is not null
 		if (fileBean==null){
 			throw new IllegalArgumentException("File bean must not be null");
 		}
+		
+		// assign fields
 		this.fileBean = fileBean;
 		this.userName = userName;
 		
