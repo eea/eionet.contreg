@@ -211,21 +211,6 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
 		}
 		
 		String userName = getUserName();
-		
-		// save the file's content into database
-		try {
-			saveContent(uploadedFile);
-			contentSaved = true;
-		}
-		catch (DAOException e) {
-			saveAndHarvestException = e;
-			return;
-		}
-		catch (IOException e) {
-			saveAndHarvestException = e;
-			return;
-		}
-
 		// prepare cr:hasFile predicate
 		ObjectDTO objectDTO = new ObjectDTO(getUploadedFileSubjectUri(), false);
 		objectDTO.setSourceUri(getUser().getHomeUri());
@@ -262,7 +247,21 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
 			saveAndHarvestException = e;
 			return;
 		}
-		
+
+		// save the file's content into database
+		try {
+			saveContent(uploadedFile);
+			contentSaved = true;
+		}
+		catch (DAOException e) {
+			saveAndHarvestException = e;
+			return;
+		}
+		catch (IOException e) {
+			saveAndHarvestException = e;
+			return;
+		}
+
 		// attempt to harvest the uploaded file
 		harvestUploadedFile(getUploadedFileSubjectUri(), uploadedFile, null, userName);
 	}
