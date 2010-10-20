@@ -971,11 +971,27 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 		throw new UnsupportedOperationException("Method not implemented");
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#readDistinctSubjectUrls(java.lang.Long)
+	 */
 	public List<String> readDistinctSubjectUrls(Long sourceHash) throws DAOException{
 		throw new UnsupportedOperationException("Method not implemented");
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#outputSourceTriples(eionet.cr.dao.readers.RDFExporter)
+	 */
 	public void outputSourceTriples(RDFExporter reader) throws DAOException{
+		throw new UnsupportedOperationException("Method not implemented");
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#deleteTriples(java.lang.String, java.lang.String, java.lang.String)
+	 */
+	public void deleteTriples(String subjectUri, String predicateUri, String sourceUri) throws DAOException {
 		throw new UnsupportedOperationException("Method not implemented");
 	}
 }

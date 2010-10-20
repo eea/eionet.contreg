@@ -77,6 +77,9 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
 	/** The part of the uploaded file's URI which precedes the filename */
 	private String uriPrefix;
 	
+	/** */
+	private boolean fileExists;
+	
 	/**
 	 * 
 	 * @return
@@ -125,13 +128,15 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
 					return resolution;
 				}
 				
-				// unless a replace requested, make sure file does not already exist
-				if (replaceExisting==false){
-					if (DAOFactory.get().getDao(HelperDAO.class).isExistingSubject(getUploadedFileSubjectUri())){
-						addWarningMessage("A file with such a name already exists!" +
-								" Use \"replace existing\" checkbox to overwrite.");
-						return resolution;
-					}
+				// check if the file exists
+				fileExists = DAOFactory.get().getDao(
+						HelperDAO.class).isExistingSubject(getUploadedFileSubjectUri());
+				
+				// if file exists and replace not requested, report a warning
+				if (replaceExisting==false && fileExists){
+					addWarningMessage("A file with such a name already exists!" +
+					" Use \"replace existing\" checkbox to overwrite.");
+					return resolution;
 				}
 				
 				// save the file's content and try to harvest it
@@ -211,24 +216,30 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
 		}
 		
 		String userName = getUserName();
+		
 		// prepare cr:hasFile predicate
 		ObjectDTO objectDTO = new ObjectDTO(getUploadedFileSubjectUri(), false);
 		objectDTO.setSourceUri(getUser().getHomeUri());
 		SubjectDTO homeSubjectDTO = new SubjectDTO(getUser().getHomeUri(), false);
 		homeSubjectDTO.addObject(Predicates.CR_HAS_FILE, objectDTO);
 		
-		// prepare the actual value of dc:title to store
-		String titleToStore = title;
-		if (StringUtils.isBlank(titleToStore)){
-			titleToStore = URIUtil.extractURILabel(getUploadedFileSubjectUri(),SubjectDTO.NO_LABEL);
+		// declare file subject DTO, set it to null for starters
+		SubjectDTO fileSubjectDTO = null;
+		
+		// if title needs to be stored, add it to file subject DTO
+		if (!fileExists || !StringUtils.isBlank(title)){
+			
+			String titleToStore = title;
+			if (StringUtils.isBlank(titleToStore)){
+				titleToStore = URIUtil.extractURILabel(getUploadedFileSubjectUri(),SubjectDTO.NO_LABEL);
+			}
+			
+			objectDTO = new ObjectDTO(titleToStore, true);
+			objectDTO.setSourceUri(getUser().getHomeUri());
+			fileSubjectDTO = new SubjectDTO(getUploadedFileSubjectUri(), false);
+			fileSubjectDTO.addObject(Predicates.DC_TITLE, objectDTO);
 		}
 		
-		// prepare dc:title predicate
-		objectDTO = new ObjectDTO(titleToStore, true);
-		objectDTO.setSourceUri(getUser().getHomeUri());
-		SubjectDTO fileSubjectDTO = new SubjectDTO(getUploadedFileSubjectUri(), false);
-		fileSubjectDTO.addObject(Predicates.DC_TITLE, objectDTO);
-
 		logger.debug("Creating the cr:hasFile predicate");
 		try{
 			// make sure cr:hasFile is present in RESOURCE
@@ -241,7 +252,17 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
 
 			// persist the prepared cr:hasFile and dc:title predicates
 			DAOFactory.get().getDao(HelperDAO.class).addTriples(homeSubjectDTO);
-			DAOFactory.get().getDao(HelperDAO.class).addTriples(fileSubjectDTO);
+			
+			// store file subject DTO if it has been initialized
+			if (fileSubjectDTO!=null){
+				
+				// delete previous value of dc:title if new one set
+				if (fileExists && fileSubjectDTO.hasPredicate(Predicates.DC_TITLE)){
+					DAOFactory.get().getDao(HelperDAO.class).deleteTriples(
+							fileSubjectDTO.getUri(), Predicates.DC_TITLE, getUser().getHomeUri());
+				}
+				DAOFactory.get().getDao(HelperDAO.class).addTriples(fileSubjectDTO);
+			}
 		}
 		catch (DAOException e){
 			saveAndHarvestException = e;

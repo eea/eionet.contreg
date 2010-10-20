@@ -346,6 +346,16 @@ public class SubjectDTO implements Serializable{
 	
 	/**
 	 * 
+	 * @param predicateUri
+	 * @return
+	 */
+	public boolean hasPredicate(String predicateUri){
+		
+		return predicates!=null && predicates.containsKey(predicateUri);
+	}
+	
+	/**
+	 * 
 	 * @param predicate
 	 * @param objectValue
 	 * @return

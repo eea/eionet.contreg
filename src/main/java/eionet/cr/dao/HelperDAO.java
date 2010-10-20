@@ -433,7 +433,6 @@ public interface HelperDAO extends DAO {
 	 */
 	public List<String> readDistinctSubjectUrls(Long sourceHash) throws DAOException;
 	
-	
 	/**
 	 * 
 	 * @param sourceHash
@@ -442,4 +441,12 @@ public interface HelperDAO extends DAO {
 	 */	
 	public void outputSourceTriples(RDFExporter reader) throws DAOException;
 	
+	/**
+	 * 
+	 * @param subjectUri
+	 * @param predicateUri
+	 * @param sourceUri
+	 * @throws DAOException
+	 */
+	public void deleteTriples(String subjectUri, String predicateUri, String sourceUri) throws DAOException;
 }

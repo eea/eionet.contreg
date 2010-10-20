@@ -2172,4 +2172,30 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
 		
 	}
+
+	/** */
+	private static final String deleteTriplesOfPredicate = "delete from SPO where SUBJECT=? and PREDICATE=? and SOURCE=?";
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#deleteTriples(java.lang.String, java.lang.String, java.lang.String)
+	 */
+	public void deleteTriples(String subjectUri, String predicateUri, String sourceUri) throws DAOException {
+		
+		ArrayList values = new ArrayList();
+		values.add(Long.valueOf(Hashes.spoHash(subjectUri)));
+		values.add(Long.valueOf(Hashes.spoHash(predicateUri)));
+		values.add(Long.valueOf(Hashes.spoHash(sourceUri)));
+		
+		Connection conn = null;
+		try{
+			conn = getConnection();
+			SQLUtil.executeUpdate(deleteTriplesOfPredicate, values, conn);
+		}
+		catch (SQLException e){
+			throw new DAOException(e.getMessage(), e);
+		}
+		finally{
+			SQLUtil.close(conn);
+		}
+	}
 }
