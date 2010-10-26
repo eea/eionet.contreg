@@ -21,19 +21,12 @@
 #
 import ConfigParser
 
-config = ConfigParser.SafeConfigParser()
-config.read('db.conf')
-DB = config.get('database', 'db')
-DBHOST = config.get('database', 'host')
-DBUSER = config.get('database', 'user')
-DBPASS = config.get('database', 'password')
-
 import sys, getopt, fnv, textwrap
 import psycopg2
 
 def hashcode(s):
     newhash = fnv.new()
-    newhash.update(s)
+    newhash.update(unicode(s, 'utf-8'))
     return newhash.aslong
 
 def localpart(s):
@@ -41,6 +34,7 @@ def localpart(s):
     return s[max(s.rfind('#'), s.rfind('/'))+1:]
 
 def shorten_url(u):
+    return u
     if len(u) < 40: return u
     return u[:10] + "..." + u[-27:]
 
@@ -50,6 +44,13 @@ def wrap_literal(s):
 
 class MakeDigraph:
     def __init__(self):
+        config = ConfigParser.SafeConfigParser()
+        config.read('db.conf')
+        DB = config.get('database', 'db')
+        DBHOST = config.get('database', 'host')
+        DBUSER = config.get('database', 'user')
+        DBPASS = config.get('database', 'password')
+
         self.db = psycopg2.connect(database=DB, user=DBUSER, password=DBPASS)
         self.cursor = self.db.cursor()
         self.subjects = {}
@@ -75,14 +76,15 @@ edge [fontsize=9];\n""")
         if not self.subjects.has_key(subject):
             self.subjects[subject] = False
 
-    def has_drawn(self, subject):
-            self.subjects[subject] = True
+    def setHasDrawn(self, subject):
+        self.subjects[subject] = True
 
     def drawemptynode(self, subject):
         self.writeout('''S%d [label="%s"];\n''' % (abs(hashcode(subject)), shorten_url(subject)))
 
     def drawnode(self, startsubj, limit):
-        self.has_drawn(startsubj)
+        if self.subjects.get(startsubj, False): return
+        self.setHasDrawn(startsubj)
         if limit < 0:
             self.drawemptynode(startsubj)
             return
@@ -96,9 +98,9 @@ edge [fontsize=9];\n""")
             currentsubj = None
             for row in rows:
                 if str(row[3])[:2] not in ('en',''): continue # Only English
-                md5subj = hashcode(row[0])
+                hashsubj = hashcode(row[0])
                 if currentsubj != row[0]:
-                    self.writeout('''S%d [label="%s|''' % (abs(md5subj), shorten_url(row[0])))
+                    self.writeout('''S%d [label="%s|''' % (abs(hashsubj), shorten_url(row[0])))
                     currentsubj = row[0]
                 self.writeout('''%s:%s\\l''' % (localpart(row[1]), wrap_literal(row[2])))
             self.writeout('''"];\n''')
@@ -112,16 +114,15 @@ edge [fontsize=9];\n""")
             self.cursor.execute ("""SELECT s.uri as subject_uri, p.uri AS predicate, object, subject FROM SPO JOIN RESOURCE AS s ON subject=s.uri_hash JOIN RESOURCE AS p ON predicate=p.uri_hash WHERE lit_obj='N' AND obj_deriv_source=0 AND subject=%s""", (hashcode(startsubj),));
         rows = self.cursor.fetchall()
         for row in rows:
-            md5subj = hashcode(row[0])
+            hashsubj = hashcode(row[0])
             self.must_draw(row[0])
             self.must_draw(row[2])
-            md5obj = hashcode(row[2])
-            self.writeout('''S%d -> S%d [label="%s"];\n''' % (abs(md5subj), abs(md5obj), localpart(row[1])))
+            hashobj = hashcode(row[2])
+            self.writeout('''S%d -> S%d [label="%s"];\n''' % (abs(hashsubj), abs(hashobj), localpart(row[1])))
 
         for o,seen in self.subjects.items():
             if not seen:
                 self.drawnode(o, limit-1)
-                self.has_drawn(o)
 
 
 def exitwithusage(exitcode=2):
@@ -148,9 +149,9 @@ if __name__ == '__main__':
     r.prologue()
     if len(args) > 0:
         for url in args:
-            r.drawnode(unicode(url), recurselevel)
+            r.drawnode(url, recurselevel)
     else:
-        r.drawnode(u"http://ec.europa.eu/eurostat/ramon/rdfdata/estat-legis.rdf#L62450", recurselevel)
+        r.drawnode("http://www.w3.org/2000/01/rdf-schema#Class", recurselevel)
     r.epilogue()
     r.closedown()
 #
