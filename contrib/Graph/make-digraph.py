@@ -148,9 +148,9 @@ if __name__ == '__main__':
     r.prologue()
     if len(args) > 0:
         for url in args:
-            r.drawnode(url, recurselevel)
+            r.drawnode(unicode(url), recurselevel)
     else:
-        r.drawnode("http://ec.europa.eu/eurostat/ramon/rdfdata/estat-legis.rdf#L62450", recurselevel)
+        r.drawnode(u"http://ec.europa.eu/eurostat/ramon/rdfdata/estat-legis.rdf#L62450", recurselevel)
     r.epilogue()
     r.closedown()
 #
