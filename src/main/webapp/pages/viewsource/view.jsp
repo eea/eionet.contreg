@@ -8,8 +8,8 @@
 		<table>
 			<tr>
 				<td>URL:</td>
-				<td><a class="link-external"
-					href="${fn:escapeXml(actionBean.harvestSource.url)}"><c:out
+				<td><a 
+					href="/factsheet.action?uri=${crfn:urlEncode(actionBean.harvestSource.url)}"><c:out
 					value="${actionBean.harvestSource.url}" /></a></td>
 			</tr>
 			<tr>
