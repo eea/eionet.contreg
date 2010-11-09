@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <stylesheet
-    xmlns:xsl  ="http://www.w3.org/1999/XSL/Transform" version="1.0"
+    version="1.0"
     xmlns      ="http://www.w3.org/1999/XSL/Transform"
     xmlns:cr   ="http://cr.eionet.europa.eu/ontologies/contreg.rdf#"
     xmlns:s    ="http://www.sitemaps.org/schemas/sitemap/0.9"
@@ -22,9 +22,9 @@
 
 <template match="s:sitemap">
     <cr:File>
-        <xsl:attribute  name="rdf:about">
-            <xsl:value-of select="normalize-space(s:loc)" />
-        </xsl:attribute> 
+        <attribute  name="rdf:about">
+            <value-of select="normalize-space(s:loc)" />
+        </attribute> 
     </cr:File>
 </template>
 
@@ -36,73 +36,79 @@
 </template>
 
 <template match="s:url">
-    <xsl:element name="bibo:Webpage">
+    <element name="bibo:Webpage">
         <!-- map sc:datasetURI to dataset -->	
-        <xsl:attribute  name="rdf:about">
-            <xsl:value-of select="normalize-space(s:loc)" />
-        </xsl:attribute> 
+        <attribute  name="rdf:about">
+            <value-of select="normalize-space(s:loc)" />
+        </attribute> 
         <!-- This means we'll harvest the page -->
-        <xsl:element name="rdf:type">
-            <xsl:attribute  name="rdf:resource">http://cr.eionet.europa.eu/ontologies/contreg.rdf#File</xsl:attribute>
-        </xsl:element>
-    </xsl:element> 
+        <element name="rdf:type">
+            <attribute  name="rdf:resource">http://cr.eionet.europa.eu/ontologies/contreg.rdf#File</attribute>
+        </element>
+    </element> 
 </template>
 
 <template match="sc:dataset">
-  
-	<xsl:element name="void:Dataset">
-
-		<!-- map sc:datasetURI to dataset -->	
-		<xsl:attribute  name="rdf:about">
-			<xsl:value-of select="sc:datasetURI" />
-		</xsl:attribute> 
-		
-		<!-- map sc:datasetLabel to rdfs:comment -->
-		<xsl:element name="rdfs:label">
-			<xsl:value-of select="sc:datasetLabel" />
-		</xsl:element>		
-		
-   		<!-- process sub-elements  -->
-		<apply-templates select="sc:sampleURI" /> 		
-		<apply-templates select="sc:sparqlEndpointLocation" /> 
-		<apply-templates select="sc:dataDumpLocation" /> 	
-		<apply-templates select="sc:linkedDataPrefix" /> 		
-   </xsl:element> 
-   
+    <element name="void:Dataset">
+        <!-- map sc:datasetURI to dataset -->	
+        <if test="normalize-space(sc:datasetURI) = ''">
+            <attribute  name="rdf:ID">
+                <value-of select="generate-id()"/>
+            </attribute> 
+        </if>
+        <if test="normalize-space(sc:datasetURI) != ''">
+            <attribute  name="rdf:about">
+                <value-of select="sc:datasetURI" />
+            </attribute> 
+        </if>
+        
+        <!-- map sc:datasetLabel to rdfs:comment -->
+        <element name="rdfs:label">
+                <value-of select="sc:datasetLabel" />
+        </element>		
+        
+        <!-- process sub-elements  -->
+        <apply-templates select="sc:sampleURI" /> 		
+        <apply-templates select="sc:sparqlEndpointLocation" /> 
+        <apply-templates select="sc:dataDumpLocation" /> 	
+        <apply-templates select="sc:linkedDataPrefix" /> 		
+   </element> 
 </template>
 
 
 <!-- map sc:sampleURI to void:exampleResource -->
 <template match="sc:sampleURI">
-	<xsl:element name="void:exampleResource">
-		<xsl:attribute name="rdf:resource">
-			<xsl:value-of select="." />
-		</xsl:attribute> 
-   </xsl:element>  
+	<element name="void:exampleResource">
+		<attribute name="rdf:resource">
+			<value-of select="." />
+		</attribute> 
+   </element>  
 </template>
  
 <!-- map sc:sparqlEndpointLocation to void:sparqlEndpoint -->
 <template match="sc:sparqlEndpointLocation">
-	<xsl:element name="void:sparqlEndpoint">
-		<xsl:attribute name="rdf:resource">
-			<xsl:value-of select="." />
-		</xsl:attribute> 
-   </xsl:element>  
+	<element name="void:sparqlEndpoint">
+		<attribute name="rdf:resource">
+			<value-of select="." />
+		</attribute> 
+   </element>  
 </template>  
 
 <!-- map sc:dataDumpLocation to void:dataDumpLocation -->
 <template match="sc:dataDumpLocation">
-	<xsl:element name="void:dataDumpLocation">
-		<xsl:attribute name="rdf:resource">
-			<xsl:value-of select="." />
-		</xsl:attribute> 
-   </xsl:element>  
+	<element name="void:dataDumpLocation">
+              <cr:File> <!-- Could also use http://purl.org/dc/dcmitype/Dataset -->
+		<attribute name="rdf:about">
+			<value-of select="." />
+		</attribute> 
+              </cr:File>
+   </element>  
 </template>  
 
 
 <!-- map sc:linkedDataPrefix to void:uriPattern -->
 <template match="sc:linkedDataPrefix">
-	<xsl:element name="void:uriRegexPattern">^<xsl:value-of select="." />$</xsl:element>  
+	<element name="void:uriRegexPattern">^<value-of select="." />$</element>  
 </template>  
 
 
