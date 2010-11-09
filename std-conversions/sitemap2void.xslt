@@ -11,6 +11,7 @@
     xmlns:dcterms ="http://purl.org/dc/terms/"
     xmlns:void ="http://rdfs.org/ns/void#">
 
+<!-- sitemapindex2void.xslt is identical to sitemap2void.xslt -->
 
 <output indent="yes" method="xml" media-type="application/rdf+xml" encoding="UTF-8" omit-xml-declaration="no"/>
 
@@ -42,9 +43,11 @@
             <value-of select="normalize-space(s:loc)" />
         </attribute> 
         <!-- This means we'll harvest the page -->
+        <!--
         <element name="rdf:type">
             <attribute  name="rdf:resource">http://cr.eionet.europa.eu/ontologies/contreg.rdf#File</attribute>
         </element>
+        -->
     </element> 
 </template>
 
