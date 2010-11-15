@@ -48,6 +48,7 @@ public class HarvestSourceDTOReader extends ResultSetListReader<HarvestSourceDTO
 		HarvestSourceDTO harvestSourceDTO = new HarvestSourceDTO();
 		harvestSourceDTO.setSourceId(new Integer(rs.getInt("HARVEST_SOURCE_ID")));
 		harvestSourceDTO.setUrl(rs.getString("URL"));
+		harvestSourceDTO.setUrlHash(Long.valueOf(rs.getLong("URL_HASH")));
 		harvestSourceDTO.setEmails(rs.getString("EMAILS"));
 		harvestSourceDTO.setTimeCreated(rs.getDate("TIME_CREATED"));
 		harvestSourceDTO.setStatements(new Integer(rs.getInt("STATEMENTS")));
@@ -62,7 +63,7 @@ public class HarvestSourceDTOReader extends ResultSetListReader<HarvestSourceDTO
 	}
 
 	/**
-	 * @return the resultListAAA
+	 * @return the resultList
 	 */
 	public List<HarvestSourceDTO> getResultList() {
 		return resultList;

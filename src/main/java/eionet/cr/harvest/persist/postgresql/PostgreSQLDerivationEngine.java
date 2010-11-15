@@ -22,6 +22,7 @@ package eionet.cr.harvest.persist.postgresql;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -219,6 +220,20 @@ public class PostgreSQLDerivationEngine implements IDerivationEngine{
 		logger.debug(i + " parent-properties derived FOR and " + j + " parent-properties derived FROM the current harvest");
 	}
 
+	/** */
+	private static final String temp_New_Sources_SQL =
+		"select distinct" +
+		" (case when position('#' in URI)>1 then substring(URI from 1 for position('#' in URI)-1) else URI END) as URL" +
+		" from" +
+		" SPO, RESOURCE" +
+		" where" +
+		" SPO.SOURCE=?" +
+		" and SPO.GEN_TIME=?" +
+		" and SPO.PREDICATE=?" +
+		" and SPO.ANON_OBJ='N'" +
+		" and SPO.OBJECT_HASH=?" +
+		" and SPO.SUBJECT=RESOURCE.URI_HASH";
+	
 	/* (non-Javadoc)
 	 * @see eionet.cr.harvest.persist.IDerivationEngine#extractNewHarvestSources()
 	 */
@@ -226,26 +241,40 @@ public class PostgreSQLDerivationEngine implements IDerivationEngine{
 		
 		logger.debug("Extracting tracked files");
 		
-		// harvest interval for tracked files		
+		// calculate harvest interval for tracked files		
 		Integer interval = Integer.valueOf(
 				GeneralConfig.getProperty(
 						GeneralConfig.HARVESTER_REFERRALS_INTERVAL,
 						String.valueOf(HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL)));
 
-		StringBuffer buf = new StringBuffer().
-		append("insert into HARVEST_SOURCE").
-		append(" (URL, URL_HASH, TRACKED_FILE, TIME_CREATED, INTERVAL_MINUTES, SOURCE, GEN_TIME) ").		
-		append("select (case when position('#' in URI)>1 then substring(URI from 1 for position('#' in URI)-1) else URI END),").
-		append(" URI_HASH, cast('Y' as ynboolean), now(),").append(interval).append(",").
-		append(sourceUrlHash).append(", ").append(genTime).
-		append(" from SPO,RESOURCE where SPO.SOURCE=").append(sourceUrlHash).
-		append(" and SPO.GEN_TIME=").append(genTime).append(" and SPO.PREDICATE=").
-		append(Hashes.spoHash(Predicates.RDF_TYPE)).append(" and SPO.ANON_OBJ='N' and SPO.OBJECT_HASH=").
-		append(Hashes.spoHash(Subjects.CR_FILE)).append(" and SPO.SUBJECT=RESOURCE.URI_HASH");
+		// create temporary table for distinct URLs of new sources to be extracted
 		
-		int i = SQLUtil.executeUpdate(buf.toString(), connection);		
+		String tempTableName = "NEW_SOURCES_" + Math.abs(sourceUrlHash);
+		StringBuilder bld = new StringBuilder("create temp table ").
+		append(tempTableName).append(" on commit drop as ").append(temp_New_Sources_SQL);
+		
+		ArrayList inParams = new ArrayList();
+		inParams.add(Long.valueOf(sourceUrlHash));
+		inParams.add(Long.valueOf(genTime));
+		inParams.add(Long.valueOf(Hashes.spoHash(Predicates.RDF_TYPE)));
+		inParams.add(Long.valueOf(Hashes.spoHash(Subjects.CR_FILE)));
+		
+		SQLUtil.executeUpdate(bld.toString(), inParams, connection);
+		
+		// insert new rows into HARVEST_SOURCE, using above-created temporary table
+		
+		bld = new StringBuilder().
+		append("insert into HARVEST_SOURCE").
+		append(" (URL, URL_HASH, TRACKED_FILE, TIME_CREATED, INTERVAL_MINUTES, SOURCE, GEN_TIME)").		
+		append(" select URI, URI_HASH, cast('Y' as ynboolean), now(),").append(interval).append(",").
+		append(sourceUrlHash).append(", ").append(genTime).
+		append(" from RESOURCE,").append(tempTableName).
+		append(" where ").append(tempTableName).append(".URL=RESOURCE.URI");
+		
+		int i = SQLUtil.executeUpdate(bld.toString(), connection);
+		
+		// log results
+		
 		logger.debug(i + " tracked files extracted and inserted as NEW harvest sources");
-
 	}
-
 }

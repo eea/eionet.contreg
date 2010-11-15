@@ -52,6 +52,7 @@ public class HarvestSourceDTO implements Serializable {
 	private Date lastHarvest;
 	private boolean lastHarvestFailed;
 	private Integer intervalMinutes;
+	private Long urlHash;
 	
 	/**
 	 * 
@@ -226,6 +227,20 @@ public class HarvestSourceDTO implements Serializable {
 	 */
 	public void setLastHarvestFailed(boolean lastHarvestFailed) {
 		this.lastHarvestFailed = lastHarvestFailed;
+	}
+
+	/**
+	 * @return the urlHash
+	 */
+	public Long getUrlHash() {
+		return urlHash;
+	}
+
+	/**
+	 * @param urlHash the urlHash to set
+	 */
+	public void setUrlHash(Long urlHash) {
+		this.urlHash = urlHash;
 	}
 
 	
