@@ -159,17 +159,6 @@
         <url-pattern>/xmlConvService</url-pattern>
     </servlet-mapping>
 
-	<!-- RPC router servlet (for XML-RPC 2)-->
-	
-    <servlet>
-		<servlet-name>rpcrouter</servlet-name>
-		<servlet-class>com.tee.uit.servlets.XmlRpcRouter</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>rpcrouter</servlet-name>
-		<url-pattern>/rpcrouter</url-pattern>
-	</servlet-mapping>
-    
     <!-- welcome file list -->
     	
 	<welcome-file-list>
