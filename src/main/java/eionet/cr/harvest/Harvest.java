@@ -28,6 +28,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xml.sax.SAXException;
@@ -282,19 +283,16 @@ public abstract class Harvest {
 	 * @return
 	 */
 	protected static File fullFilePathForSourceUrl(String sourceUrl){
-
-		char replacerForIllegal = '_';
-		StringBuffer buf = new StringBuffer();
-		for (int i=0; i<sourceUrl.length(); i++){
-			char c = sourceUrl.charAt(i);			
-			// if not (latin upper case or latin lower case or numbers 0-9 or '-' or '.' or '_') then replace with replacer
-			if (!(c>=65 && c<=90) && !(c>=97 && c<=122) && !(c>=48 && c<=57) && c!=45 && c!=46 && c!=95){
-				c = replacerForIllegal;
-			}			
-			buf.append(c);
+		
+		if (StringUtils.isBlank(sourceUrl)){
+			return null;
 		}
 		
-		return new File(GeneralConfig.getProperty(GeneralConfig.HARVESTER_FILES_LOCATION), buf.append(HARVEST_FILE_NAME_EXTENSION).toString());
+		String folder = GeneralConfig.getRequiredProperty(GeneralConfig.HARVESTER_FILES_LOCATION);
+		String fileName = new StringBuilder(Hashes.md5(sourceUrl)).append("_").
+		append(System.currentTimeMillis()).append(HARVEST_FILE_NAME_EXTENSION).toString();
+
+		return new File(folder, fileName);
 	}
 	
 	/**
