@@ -76,25 +76,33 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
     public Resolution search() throws DAOException{
 		
     	SearchExpression searchExpression = new SearchExpression(this.searchExpression);
-    	
-    	FreeTextSearchHelper.FILTER_TYPE filterType = FreeTextSearchHelper.FILTER_TYPE.ANY_OBJECT;
+    	FreeTextSearchHelper.FilterType filterType = FreeTextSearchHelper.FilterType.ANY_OBJECT;
     	
     	if (!searchExpression.isEmpty()) {
 
-    	   	if (simpleFilter.equals("anyObject")){
-        		filterType = FreeTextSearchHelper.FILTER_TYPE.ANY_OBJECT;
-        	} else if (simpleFilter.equals("anyFile")){
-        		filterType = FreeTextSearchHelper.FILTER_TYPE.ANY_FILE;
-        	} else if (simpleFilter.equals("texts")){
-        		filterType = FreeTextSearchHelper.FILTER_TYPE.TEXTS;
-        	} else if (simpleFilter.equals("datasets")){
-        		filterType = FreeTextSearchHelper.FILTER_TYPE.DATASETS;
-        	} else if (simpleFilter.equals("images")){
-        		filterType = FreeTextSearchHelper.FILTER_TYPE.IMAGES;
-        	} else if (simpleFilter.equals("exactMatch")){
-        		filterType = FreeTextSearchHelper.FILTER_TYPE.EXACT_MATCH;
-        		searchExpression = new SearchExpression(Long.valueOf(Hashes.spoHash(this.searchExpression.toString())).toString());
-        	}
+    		if (simpleFilter!=null){
+    			
+    			if (simpleFilter.equals("anyObject")){
+    				filterType = FreeTextSearchHelper.FilterType.ANY_OBJECT;
+    			}
+    			else if (simpleFilter.equals("anyFile")){
+    				filterType = FreeTextSearchHelper.FilterType.ANY_FILE;
+    			}
+    			else if (simpleFilter.equals("texts")){
+    				filterType = FreeTextSearchHelper.FilterType.TEXTS;
+    			}
+    			else if (simpleFilter.equals("datasets")){
+    				filterType = FreeTextSearchHelper.FilterType.DATASETS;
+    			}
+    			else if (simpleFilter.equals("images")){
+    				filterType = FreeTextSearchHelper.FilterType.IMAGES;
+    			}
+    			else if (simpleFilter.equals("exactMatch")){
+    				filterType = FreeTextSearchHelper.FilterType.EXACT_MATCH;
+    				searchExpression = new SearchExpression(
+    						Long.valueOf(Hashes.spoHash(this.searchExpression.toString())).toString());
+    			}
+    		}
     		
     		if (searchExpression.isUri()) {
 

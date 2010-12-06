@@ -51,7 +51,7 @@ public interface SearchDAO extends DAO{
 	 */
 	Pair<Integer, List<SubjectDTO>> searchByFreeText(
 				SearchExpression expression,
-				FreeTextSearchHelper.FILTER_TYPE filterType,
+				FreeTextSearchHelper.FilterType filterType,
 				PagingRequest pagingRequest,
 				SortingRequest sortingRequest) throws DAOException;
 	

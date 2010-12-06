@@ -76,7 +76,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 	 */
 	public Pair<Integer, List<SubjectDTO>> searchByFreeText(
 			SearchExpression expression,
-			FreeTextSearchHelper.FILTER_TYPE filterType,
+			FreeTextSearchHelper.FilterType filterType,
 			PagingRequest pagingRequest,
 			SortingRequest sortingRequest) throws DAOException{
 
@@ -105,8 +105,8 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 				expression, pgQuery, pagingRequest, sortingRequest);
 		
 		// Set Filter
-		if (filterType != FreeTextSearchHelper.FILTER_TYPE.ANY_OBJECT
-			&& filterType != FreeTextSearchHelper.FILTER_TYPE.EXACT_MATCH){
+		if (filterType != FreeTextSearchHelper.FilterType.ANY_OBJECT
+			&& filterType != FreeTextSearchHelper.FilterType.EXACT_MATCH){
 				helper.setFilter(filterType);
 		}
 

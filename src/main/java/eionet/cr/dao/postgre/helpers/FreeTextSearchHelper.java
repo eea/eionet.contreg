@@ -42,12 +42,13 @@ import eionet.cr.web.util.columns.SubjectLastModifiedColumn;
  */
 public class FreeTextSearchHelper extends AbstractSearchHelper{
 	
-	public enum FILTER_TYPE { ANY_OBJECT, ANY_FILE, TEXTS, DATASETS, IMAGES, EXACT_MATCH };
+	/** */
+	public enum FilterType { ANY_OBJECT, ANY_FILE, TEXTS, DATASETS, IMAGES, EXACT_MATCH };
 	
 	/** */
 	private SearchExpression expression;
 	private PostgreSQLFullTextQuery pgExpression;
-	private FILTER_TYPE filter = FILTER_TYPE.ANY_OBJECT;
+	private FilterType filter = FilterType.ANY_OBJECT;
 	
 	/**
 	 * 
@@ -94,19 +95,19 @@ public class FreeTextSearchHelper extends AbstractSearchHelper{
 		
 		StringBuffer buf = new StringBuffer();
 		
-		if (filter != FILTER_TYPE.ANY_OBJECT){
+		if (filter != FilterType.ANY_OBJECT){
 			buf.append(" join SPO as Ty on F.SUBJECT=Ty.SUBJECT ");
 			buf.append(" AND Ty.PREDICATE=").append(Hashes.spoHash(Predicates.RDF_TYPE)).append(" ");
 			
 			long objectHash = 0;
 			
-			if (filter == FILTER_TYPE.ANY_FILE){
+			if (filter == FilterType.ANY_FILE){
 				objectHash = Hashes.spoHash(Subjects.CR_FILE);
-			} else if (filter == FILTER_TYPE.DATASETS){
+			} else if (filter == FilterType.DATASETS){
 				objectHash = Hashes.spoHash(Predicates.DC_MITYPE_DATASET);
-			} else if (filter == FILTER_TYPE.IMAGES){
+			} else if (filter == FilterType.IMAGES){
 				objectHash = Hashes.spoHash(Predicates.DC_MITYPE_IMAGE);
-			} else if (filter == FILTER_TYPE.TEXTS){
+			} else if (filter == FilterType.TEXTS){
 				objectHash = Hashes.spoHash(Predicates.DC_MITYPE_TEXT);
 			} 
 			
@@ -190,11 +191,11 @@ public class FreeTextSearchHelper extends AbstractSearchHelper{
 		return buf.toString();
 	}
 
-	public FILTER_TYPE getFilter() {
+	public FilterType getFilter() {
 		return filter;
 	}
 
-	public void setFilter(FILTER_TYPE filter) {
+	public void setFilter(FilterType filter) {
 		this.filter = filter;
 	}
 }
