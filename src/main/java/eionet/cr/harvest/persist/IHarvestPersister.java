@@ -43,6 +43,7 @@ public interface IHarvestPersister {
 	 * @param objSourceObject
 	 * @throws PersisterException
 	 */
+	// TODO this method has got way too many arguments, the whole approach needs refactoring
 	void addTriple(long subjectHash, boolean anonSubject, long predicateHash,
 			String object, long objectHash, String objectLang, boolean litObject, boolean anonObject, long objSourceObject) throws PersisterException;
 
@@ -109,4 +110,10 @@ public interface IHarvestPersister {
 	 * 
 	 */
 	void updateLastRefreshed(long subjectHash, DateFormat dateFormat) throws SQLException;
+	
+	/**
+	 * 
+	 * @param flag
+	 */
+	void setAddingSourceMetadata(boolean flag);
 }

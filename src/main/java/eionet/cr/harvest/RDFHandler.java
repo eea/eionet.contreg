@@ -115,8 +115,6 @@ public class RDFHandler implements StatementHandler{
 	 */
 	public void statement(AResource subject, AResource predicate, AResource object){
 		
-		logger.debug("Resource statement, counter = " + (++statementCounter));
-		
 		if (rdfContentFound==false){
 			rdfContentFound = true;
 		}
@@ -130,36 +128,49 @@ public class RDFHandler implements StatementHandler{
 	 */
 	public void statement(AResource subject, AResource predicate, ALiteral object){
 		
-		logger.debug("Literal statement, counter = " + (++statementCounter));
-		
 		if (rdfContentFound==false){
 			rdfContentFound = true;
 		}
 		
 		statement(subject, predicate, object.toString(), object.getLang(), true, false);
 	}
-	
-	/** 
-	 * @see eionet.cr.harvest.IRDFHandler#addSourceMetadata(eionet.cr.dto.SubjectDTO)
-	 * {@inheritDoc}
+
+	/**
+	 * 
+	 * @param subjectDTO
+	 * @throws PersisterException 
 	 */
-	public void addSourceMetadata(SubjectDTO subjectDTO){
+	public void addSourceMetadata(SubjectDTO subjectDTO) throws PersisterException{
 		
-		if (subjectDTO!=null && subjectDTO.getPredicateCount()>0){
-			
-			AResource subject = new AResourceImpl(subjectDTO.getUri());
-			for (String predicateUri:subjectDTO.getPredicates().keySet()){
-				
-				Collection<ObjectDTO> objects = subjectDTO.getObjects(predicateUri);
-				if (objects!=null && !objects.isEmpty()){
-					
-					AResource predicate = new AResourceImpl(predicateUri);
-					for (ObjectDTO object:objects){
-						
-						statement(subject, predicate, object.toString(), object.getLanguage(), object.isLiteral(), object.isAnonymous());
+		persister.setAddingSourceMetadata(true);
+		
+		try{
+			if (subjectDTO!=null && subjectDTO.getPredicateCount()>0){
+
+				int statementsAdded = 0;
+				AResource subject = new AResourceImpl(subjectDTO.getUri());
+				for (String predicateUri:subjectDTO.getPredicates().keySet()){
+
+					Collection<ObjectDTO> objects = subjectDTO.getObjects(predicateUri);
+					if (objects!=null && !objects.isEmpty()){
+
+						AResource predicate = new AResourceImpl(predicateUri);
+						for (ObjectDTO object:objects){
+
+							statement(subject, predicate, object.toString(),
+									object.getLanguage(), object.isLiteral(), object.isAnonymous());
+							statementsAdded++;
+						}
 					}
 				}
+				
+				if (statementsAdded>0){
+					addResource(Harvest.HARVESTER_URI, Hashes.spoHash(Harvest.HARVESTER_URI), true);
+				}
 			}
+		}
+		finally{
+			persister.setAddingSourceMetadata(false);
 		}
 
 	}
@@ -173,7 +184,9 @@ public class RDFHandler implements StatementHandler{
 	 * @param litObject
 	 * @param anonObject
 	 */
-	private void statement(AResource subject, AResource predicate, String object, String objectLang, boolean litObject, boolean anonObject){
+	// TODO this method has got way too many arguments, the whole approach needs refactoring
+	private void statement(AResource subject, AResource predicate, String object,
+			String objectLang, boolean litObject, boolean anonObject){
 
 		try{
 			// if this is the first statement, perform certain "startup" actions
@@ -279,8 +292,10 @@ public class RDFHandler implements StatementHandler{
 	 * @param anonObject
 	 * @throws SQLException
 	 */
+	// TODO this method has got way too many arguments, the whole approach needs refactoring
 	private void addTriple(long subjectHash, boolean anonSubject, long predicateHash,
-			String object, long objectHash, String objectLang, boolean litObject, boolean anonObject) throws PersisterException {
+			String object, long objectHash,
+			String objectLang, boolean litObject, boolean anonObject) throws PersisterException {
 		
 		addTriple(subjectHash, anonSubject, predicateHash, object, objectHash, objectLang, litObject, anonObject, 0);
 	}
@@ -297,8 +312,10 @@ public class RDFHandler implements StatementHandler{
 	 * @param objSourceObject
 	 * @throws SQLException
 	 */
+	// TODO this method has got way too many arguments, the whole approach needs refactoring
 	private void addTriple(long subjectHash, boolean anonSubject, long predicateHash,
-			String object, long objectHash, String objectLang, boolean litObject, boolean anonObject, long objSourceObject) throws PersisterException {
+			String object, long objectHash, String objectLang,
+			boolean litObject, boolean anonObject, long objSourceObject) throws PersisterException {
 		
 		persister.addTriple(subjectHash, anonSubject, predicateHash, object, objectHash, objectLang, litObject, anonObject, objSourceObject);
 	}

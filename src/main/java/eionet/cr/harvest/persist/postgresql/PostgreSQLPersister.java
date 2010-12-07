@@ -32,12 +32,14 @@ import java.util.Date;
 
 import javax.servlet.jsp.jstl.sql.SQLExecutionTag;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.dto.UnfinishedHarvestDTO;
 import eionet.cr.harvest.CurrentHarvests;
+import eionet.cr.harvest.Harvest;
 import eionet.cr.harvest.RDFHandler;
 import eionet.cr.harvest.persist.IHarvestPersister;
 import eionet.cr.harvest.persist.PersisterConfig;
@@ -78,11 +80,15 @@ public class PostgreSQLPersister implements IHarvestPersister{
 	/** */
 	private PreparedStatement preparedStatementForTriples;
 	private PreparedStatement preparedStatementForResources;
+	private PreparedStatement preparedStatementForSourceMetadata;
 	private int tripleCounter;
 	private PersisterConfig config;
 
 	/** */
 	private int storedTriplesCount;
+	
+	/** */
+	private boolean isAddingSourceMetadata;
 
 	/**
 	 * 
@@ -109,8 +115,16 @@ public class PostgreSQLPersister implements IHarvestPersister{
 	 * (non-Javadoc)
 	 * @see eionet.cr.harvest.persist.IHarvestPersister#addTriple(long, boolean, long, java.lang.String, long, java.lang.String, boolean, boolean, long)
 	 */
+	// TODO this method has got way too many arguments, the whole approach needs refactoring
 	public void addTriple(long subjectHash, boolean anonSubject, long predicateHash,
 			String object, long objectHash, String objectLang, boolean litObject, boolean anonObject, long objSourceObject) throws PersisterException {
+		
+		if (isAddingSourceMetadata){
+			logger.debug("isAddingSourceMetadata = " + isAddingSourceMetadata);
+			addSourceMetadataTriple(subjectHash, anonSubject, predicateHash,
+					object, objectHash, objectLang, litObject, anonObject, objSourceObject);
+			return;
+		}
 		
 		try {
 			preparedStatementForTriples.setLong  ( 1, subjectHash);
@@ -127,6 +141,51 @@ public class PostgreSQLPersister implements IHarvestPersister{
 			preparedStatementForTriples.setLong  (12, objSourceObject);
 
 			preparedStatementForTriples.addBatch();
+			tripleCounter++;
+
+			// if at BULK_INSERT_SIZE, execute the batch
+			if (tripleCounter % BULK_INSERT_SIZE == 0){
+				executeBatch();
+			}
+		}
+		catch (SQLException e) {
+			throw new PersisterException(e.getMessage(), e);
+		}
+	}
+	
+	/**
+	 * 
+	 * @param subjectHash
+	 * @param anonSubject
+	 * @param predicateHash
+	 * @param object
+	 * @param objectHash
+	 * @param objectLang
+	 * @param litObject
+	 * @param anonObject
+	 * @param objSourceObject
+	 * @throws PersisterException
+	 */
+	private void addSourceMetadataTriple(long subjectHash, boolean anonSubject, long predicateHash,
+			String object, long objectHash, String objectLang, boolean litObject, boolean anonObject, long objSourceObject) throws PersisterException {
+		
+		logger.debug("addSourceMetadataTriple entered");
+		
+		try {
+			preparedStatementForSourceMetadata.setLong  ( 1, subjectHash);
+			preparedStatementForSourceMetadata.setLong  ( 2, predicateHash);
+			preparedStatementForSourceMetadata.setString( 3, object);
+			preparedStatementForSourceMetadata.setLong  ( 4, objectHash);
+			preparedStatementForSourceMetadata.setObject( 5, Util.toDouble(object));
+			preparedStatementForSourceMetadata.setString( 6, YesNoBoolean.format(anonSubject));
+			preparedStatementForSourceMetadata.setString( 7, YesNoBoolean.format(anonObject));
+			preparedStatementForSourceMetadata.setString( 8, YesNoBoolean.format(litObject));
+			preparedStatementForSourceMetadata.setString( 9, objectLang==null ? "" : objectLang);		
+			preparedStatementForSourceMetadata.setLong  (10, objSourceObject==0 ? 0 : sourceUrlHash);
+			preparedStatementForSourceMetadata.setLong  (11, objSourceObject==0 ? 0 : genTime);
+			preparedStatementForSourceMetadata.setLong  (12, objSourceObject);
+
+			preparedStatementForSourceMetadata.addBatch();
 			tripleCounter++;
 
 			// if at BULK_INSERT_SIZE, execute the batch
@@ -213,23 +272,34 @@ public class PostgreSQLPersister implements IHarvestPersister{
 	 * @throws PersisterException
 	 */
 	public void executeBatch() throws PersisterException {
+		
 		try {
-			int[] counts = preparedStatementForTriples.executeBatch();
+			int[] tripleCounts = preparedStatementForTriples.executeBatch();
 			preparedStatementForTriples.clearParameters();
 			System.gc();
+			
+			int[] sourceMetadataCounts = preparedStatementForSourceMetadata.executeBatch();
+			preparedStatementForSourceMetadata.clearParameters();
+			System.gc();
+			
 			preparedStatementForResources.executeBatch();
 			preparedStatementForResources.clearParameters();
 			System.gc();
 			
-			int len = counts.length;
+			int len = tripleCounts.length;
 			for (int i=0; i<len; i++){
-				storedTriplesCount = storedTriplesCount+ counts[i];
+				storedTriplesCount = storedTriplesCount + tripleCounts[i];
+			}
+			len = sourceMetadataCounts.length;
+			for (int i=0; i<len; i++){
+				storedTriplesCount = storedTriplesCount + sourceMetadataCounts[i];
 			}
 			
 			if (tripleCounter % TRIPLE_PROGRESS_INTERVAL == 0){
 				logger.debug("Progress: " + String.valueOf(tripleCounter) + " triples processed");
 			}
-		} catch(SQLException e) {
+		}
+		catch(SQLException e) {
 			throw new PersisterException(e.getMessage(), e);
 		}
 	}
@@ -262,6 +332,7 @@ public class PostgreSQLPersister implements IHarvestPersister{
 			
 			// prepare statements
 			prepareStatementForTriples();
+			prepareStatementForSourceMetadata();
 			prepareStatementForResources();
 	
 			// store the hash of the source itself
@@ -282,6 +353,13 @@ public class PostgreSQLPersister implements IHarvestPersister{
 				buf = new StringBuffer("delete from SPO where OBJ_DERIV_SOURCE=");
 				buf.append(sourceUrlHash);			
 				SQLUtil.executeUpdate(buf.toString(), getConnection());
+				
+				// delete also source metadata that was previously auto-generated by harvester 
+				buf = new StringBuffer("delete from SPO where SUBJECT=");
+				buf.append(sourceUrlHash).append(" and SOURCE=").
+				append(Hashes.spoHash(Harvest.HARVESTER_URI));
+				
+				SQLUtil.executeUpdate(buf.toString(), getConnection());
 			}
 		}
 		catch (SQLException fatal) {
@@ -296,6 +374,7 @@ public class PostgreSQLPersister implements IHarvestPersister{
 	public void closeResources(){
 		
 		SQLUtil.close(preparedStatementForTriples);
+		SQLUtil.close(preparedStatementForSourceMetadata);
 		SQLUtil.close(preparedStatementForResources);
 		SQLUtil.close(connection);
 	}
@@ -314,6 +393,22 @@ public class PostgreSQLPersister implements IHarvestPersister{
 		append(sourceUrlHash).append(",").append(genTime).append(")");
 
         preparedStatementForTriples = getConnection().prepareStatement(buf.toString());
+	}
+	
+	/**
+	 * 
+	 * @throws SQLException
+	 */
+	private void prepareStatementForSourceMetadata() throws SQLException{
+		
+		StringBuffer buf = new StringBuffer().
+		append("insert into SPO (SUBJECT,PREDICATE,OBJECT,OBJECT_HASH,OBJECT_DOUBLE").
+		append(",ANON_SUBJ,ANON_OBJ,LIT_OBJ,OBJ_LANG").
+		append(",OBJ_DERIV_SOURCE,OBJ_DERIV_SOURCE_GEN_TIME,OBJ_SOURCE_OBJECT,SOURCE,GEN_TIME)").
+		append(" values (?,?,?,?,?,cast(? as ynboolean),cast(? as ynboolean),cast(? as ynboolean),?,?,?,?,").
+		append(Hashes.spoHash(Harvest.HARVESTER_URI)).append(",").append(genTime).append(")");
+
+        preparedStatementForSourceMetadata = getConnection().prepareStatement(buf.toString());
 	}
 
 	/**
@@ -435,9 +530,14 @@ public class PostgreSQLPersister implements IHarvestPersister{
 			buf.append(sourceUrlHash).append(" and GEN_TIME=").append(genTime).
 			append(") or (OBJ_DERIV_SOURCE=").append(sourceUrlHash).
 			append(" and OBJ_DERIV_SOURCE_GEN_TIME=").append(genTime).append(")");
-
 			SQLUtil.executeUpdate(buf.toString(), conn);
-
+			
+			// delete rows that represent the source metadata that harvester auto-generated
+			buf = new StringBuffer("delete from SPO where SUBJECT=").append(sourceUrlHash).
+			append(" and SOURCE=").append(Hashes.spoHash(Harvest.HARVESTER_URI)).
+			append(" and GEN_TIME=").append(genTime);
+			SQLUtil.executeUpdate(buf.toString(), conn);
+			
 			// delete rows of given harvest from RESOURCE
 			buf = new StringBuffer("delete from RESOURCE where FIRSTSEEN_SOURCE=");
 			buf.append(sourceUrlHash).append(" and FIRSTSEEN_TIME=").append(genTime);
@@ -512,5 +612,14 @@ public class PostgreSQLPersister implements IHarvestPersister{
 			SQLUtil.close(pstmt);
 			SQLUtil.close(conn);
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.harvest.persist.IHarvestPersister#setAddingSourceMetadata(boolean)
+	 */
+	public void setAddingSourceMetadata(boolean flag){
+		
+		isAddingSourceMetadata = flag;
 	}
 }

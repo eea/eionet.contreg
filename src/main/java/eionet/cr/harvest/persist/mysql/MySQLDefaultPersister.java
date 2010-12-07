@@ -28,12 +28,14 @@ import java.sql.Statement;
 import java.text.DateFormat;
 import java.util.ArrayList;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Logger;
 
 import eionet.cr.dto.UnfinishedHarvestDTO;
 import eionet.cr.harvest.CurrentHarvests;
+import eionet.cr.harvest.Harvest;
 import eionet.cr.harvest.RDFHandler;
 import eionet.cr.harvest.persist.IHarvestPersister;
 import eionet.cr.harvest.persist.PersisterConfig;
@@ -110,7 +112,12 @@ public class MySQLDefaultPersister implements IHarvestPersister {
 			buf.append(sourceUrlHash).append(" and GEN_TIME=").append(genTime).
 			append(") or (OBJ_DERIV_SOURCE=").append(sourceUrlHash).
 			append(" and OBJ_DERIV_SOURCE_GEN_TIME=").append(genTime).append(")");
+			SQLUtil.executeUpdate(buf.toString(), connection);
 			
+			// delete rows that represent the source metadata that harvester auto-generated
+			buf = new StringBuffer("delete from SPO where SUBJECT=").append(sourceUrlHash).
+			append(" and SOURCE=").append(Hashes.spoHash(Harvest.HARVESTER_URI)).
+			append(" and GEN_TIME=").append(genTime);
 			SQLUtil.executeUpdate(buf.toString(), connection);
 	
 			// delete rows of current harvest from RESOURCE
@@ -174,7 +181,8 @@ public class MySQLDefaultPersister implements IHarvestPersister {
 	 * @see eionet.cr.harvest.persist.IHarvestPersister#addTriple(long, boolean, long, java.lang.String, long, java.lang.String, boolean, boolean, long)
 	 */
 	public void addTriple(long subjectHash, boolean anonSubject, long predicateHash,
-			String object, long objectHash, String objectLang, boolean litObject, boolean anonObject, long objSourceObject) throws PersisterException {
+			String object, long objectHash, String objectLang,
+			boolean litObject, boolean anonObject, long objSourceObject) throws PersisterException {
 		
 		try {
 			preparedStatementForTriples.setLong  ( 1, subjectHash);
@@ -531,6 +539,15 @@ public class MySQLDefaultPersister implements IHarvestPersister {
 	 * @see eionet.cr.harvest.persist.IHarvestPersister#updateLastRefreshed()
 	 */
 	public void updateLastRefreshed(long subjectHash, DateFormat dateFormat) {
+		throw new UnsupportedOperationException("Method not implemented");
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.harvest.persist.IHarvestPersister#setAddingSourceMetadata(boolean)
+	 */
+	public void setAddingSourceMetadata(boolean flag) {
+		
 		throw new UnsupportedOperationException("Method not implemented");
 	}
 }

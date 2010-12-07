@@ -92,6 +92,7 @@ public class MySQLOptimizedPersister implements IHarvestPersister {
 	 */
 	public void addTriple(long subjectHash, boolean anonSubject, long predicateHash, String object, long objectHash, String objectLang,
 			boolean litObject, boolean anonObject, long objSourceObject) throws PersisterException {
+		
 		StringBuffer sb = new StringBuffer()
 				.append(escapeCSV(subjectHash)).append(',')
 				.append(escapeCSV(predicateHash)).append(',')
@@ -105,6 +106,7 @@ public class MySQLOptimizedPersister implements IHarvestPersister {
 				.append(escapeCSV(objSourceObject == 0 ? 0 : config.getSourceUrlHash())).append(',')
 				.append(escapeCSV(objSourceObject == 0 ? 0 : config.getGenTime())).append(',')
 				.append(escapeCSV(objSourceObject)).append('\n');
+		
 		try {
 			triplesWriter.write(sb.toString());
 			triplesWriter.flush();
@@ -226,6 +228,15 @@ public class MySQLOptimizedPersister implements IHarvestPersister {
 	 * @see eionet.cr.harvest.persist.IHarvestPersister#updateLastRefreshed()
 	 */
 	public void updateLastRefreshed(long subjectHash, DateFormat dateFormat) {
+		throw new UnsupportedOperationException("Method not implemented");
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.harvest.persist.IHarvestPersister#setAddingSourceMetadata(boolean)
+	 */
+	public void setAddingSourceMetadata(boolean flag) {
+		
 		throw new UnsupportedOperationException("Method not implemented");
 	}
 }
