@@ -38,27 +38,27 @@ public class HarvestUrlConnection {
 
 	public static HarvestUrlConnection getConnection(String sourceUrlString) throws IOException, MalformedURLException{
 		
-		HarvestUrlConnection returnConnection = new HarvestUrlConnection();
-		returnConnection.url = new URL(StringUtils.substringBefore(sourceUrlString, "#"));
+		HarvestUrlConnection result = new HarvestUrlConnection();
+		result.url = new URL(StringUtils.substringBefore(sourceUrlString, "#"));
 
 		//returnConnection.redirectionInfo.setSourceURL(sourceUrlString);
-		returnConnection.redirectionInfo = UrlRedirectAnalyzer.analyzeUrlRedirection(sourceUrlString);
+		result.redirectionInfo = UrlRedirectAnalyzer.analyzeUrlRedirection(sourceUrlString);
 		
-		if (returnConnection.url.getProtocol().equals("http")||returnConnection.url.getProtocol().equals("https")){
-			returnConnection.httpConnection = true;
-			returnConnection.urlConnection = (HttpURLConnection)returnConnection.url.openConnection();
-			returnConnection.urlConnection.setRequestProperty("Accept", "application/rdf+xml, text/xml, */*;q=0.6");
-			returnConnection.urlConnection.setRequestProperty("User-Agent", URLUtil.userAgentHeader());
-			returnConnection.urlConnection.setInstanceFollowRedirects(false);
+		if (result.url.getProtocol().equals("http")||result.url.getProtocol().equals("https")){
+			result.httpConnection = true;
+			result.urlConnection = (HttpURLConnection)result.url.openConnection();
+			result.urlConnection.setRequestProperty("Accept", "application/rdf+xml, text/xml, */*;q=0.6");
+			result.urlConnection.setRequestProperty("User-Agent", URLUtil.userAgentHeader());
+			result.urlConnection.setInstanceFollowRedirects(false);
 		} else {
-			returnConnection.fileConnection = true;
-			returnConnection.generalConnection = (URLConnection)returnConnection.url.openConnection();
-			returnConnection.generalConnection.setRequestProperty("Accept", "application/rdf+xml, text/xml, */*;q=0.6");
-			returnConnection.generalConnection.setRequestProperty("User-Agent", URLUtil.userAgentHeader());
+			result.fileConnection = true;
+			result.generalConnection = (URLConnection)result.url.openConnection();
+			result.generalConnection.setRequestProperty("Accept", "application/rdf+xml, text/xml, */*;q=0.6");
+			result.generalConnection.setRequestProperty("User-Agent", URLUtil.userAgentHeader());
 		}
 		
 		
-		return returnConnection;
+		return result;
 	}
 	
 	private boolean checkUrlRedirected(){

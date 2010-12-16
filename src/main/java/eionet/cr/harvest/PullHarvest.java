@@ -25,6 +25,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
@@ -172,7 +173,6 @@ public class PullHarvest extends Harvest{
 						redirectedSourceHarvest(harvestUrlConnection);
 					}
 
-
 					// NOTE: If URL is redirected, content type is null.
 					// skip if unsupported content type
 					
@@ -268,114 +268,110 @@ public class PullHarvest extends Harvest{
 	
 	/**
 	 * Performs the harvesting for redirected harvests.
+	 * 
+	 * @throws DAOException 
+	 * @throws HarvestException 
+	 * @throws MalformedURLException 
 	 */
-	private void redirectedSourceHarvest(HarvestUrlConnection harvestUrlConnection) throws HarvestException{
+	private void redirectedSourceHarvest(HarvestUrlConnection harvestUrlConnection)
+									throws DAOException, HarvestException, MalformedURLException{
 		
-		logger.debug("Entered into redirectedSourceHarvest");
+		logger.debug("Going to handle redirected harvest");
 		
 		int redirectionsFound = -1;
 		
-		HarvestSourceDTO originalSource = new HarvestSourceDTO();
-		// Loading full information about the initial source
-		try {
-			try {
-				originalSource = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(sourceUrlString);
-			} catch (DAOException e){
-				throw new HarvestException("Original source not found in HARVEST_SOURCE. Cannot continue parsing redirected sources.");
-			}
+		// Load full information about the initial source.
+		HarvestSourceDTO originalSource = DAOFactory.get().getDao(
+				HarvestSourceDAO.class).getHarvestSourceByUrl(sourceUrlString);
 
-			// The case when the original URL has been redirected to a new source.
-			// Before continuing with harvesting, the potential chain of further redirections
-			// is going to be analyzed and limited if necessary.
-			
-			String directedUrl = new URL(StringUtils.substringBefore(harvestUrlConnection.getRedirectionInfo().getTargetURL(), "#")).toString();
-			
-			List <UrlRedirectionInfo> redirectedUrls = new ArrayList<UrlRedirectionInfo>();
-			
-			UrlRedirectionInfo lastUrl = UrlRedirectAnalyzer.analyzeUrlRedirection(directedUrl);
-			
+		// The case when the original URL has been redirected to a new source.
+		// Before continuing with harvesting, the potential chain of further redirections
+		// is going to be analyzed and limited if necessary.
+
+		String targetUrlNormalized = StringUtils.substringBefore(
+				harvestUrlConnection.getRedirectionInfo().getTargetURL(), "#"); 
+		String directedUrl = new URL(targetUrlNormalized).toString();
+		UrlRedirectionInfo lastUrl = UrlRedirectAnalyzer.analyzeUrlRedirection(directedUrl);
+		
+		List <UrlRedirectionInfo> redirectedUrls = new ArrayList<UrlRedirectionInfo>();
+		redirectedUrls.add(lastUrl);
+
+		while (lastUrl.isRedirected() == true){
+
+			lastUrl = UrlRedirectAnalyzer.analyzeUrlRedirection(lastUrl.getTargetURL());
 			redirectedUrls.add(lastUrl);
+			redirectionsFound = redirectedUrls.size();
 			
-			while (lastUrl.isRedirected() == true){
-				
-				lastUrl = UrlRedirectAnalyzer.analyzeUrlRedirection(lastUrl.getTargetURL());
-				
-				redirectedUrls.add(lastUrl);
-				
-				redirectionsFound = redirectedUrls.size();
-				// Checking the count of redirects.
-				if (redirectionsFound>PullHarvest.maxRedirectionsAllowed){
-					throw new HarvestException("Too many redirections for url: " + sourceUrlString+". Found "+ redirectionsFound+", allowed "+PullHarvest.maxRedirectionsAllowed);
-				}
+			// Checking the count of redirects.
+			if (redirectionsFound>PullHarvest.maxRedirectionsAllowed){
+				throw new HarvestException("Too many redirections for url: " + sourceUrlString
+						+". Found "+ redirectionsFound+", allowed "+PullHarvest.maxRedirectionsAllowed);
 			}
-			
-			// Going to harvest all directed url's
-			for (int i = 0; i < redirectedUrls.size(); i++){
-				
-				UrlRedirectionInfo current = redirectedUrls.get(i);
+		}
 
-				HarvestSourceDTO directedSource;
-				// Loading information about the source
-				directedSource = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(current.getSourceURL());
-	
-				if (directedSource != null){
+		// Going to harvest all directed url's
+		for (int i = 0; i < redirectedUrls.size(); i++){
+
+			UrlRedirectionInfo current = redirectedUrls.get(i);
+			HarvestSourceDTO directedSource = DAOFactory.get().getDao(
+					HarvestSourceDAO.class).getHarvestSourceByUrl(current.getSourceURL());
+			
+			if (directedSource != null){
+
+				// Checking if directedSource has larger interval_minutes value
+				// compared to original and updating accordingly.
+				if (directedSource.getIntervalMinutes() > originalSource.getIntervalMinutes()){
 					
-					// Checking if directedSource has larger interval_minutes value compared to original and updating accordingly
-					if (directedSource.getIntervalMinutes() > originalSource.getIntervalMinutes()){
-						directedSource.setIntervalMinutes(originalSource.getIntervalMinutes());
-						// Saving the updated source to database
-						DAOFactory.get().getDao(HarvestSourceDAO.class).editSource(directedSource);
-					}
-				} else {
-					directedSource = new HarvestSourceDTO();
-					directedSource.setTrackedFile(true);
 					directedSource.setIntervalMinutes(originalSource.getIntervalMinutes());
-					directedSource.setUrl(current.getSourceURL());
 					
-					Integer sourceId = DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(
-							directedSource.getUrl(),
-							directedSource.getIntervalMinutes(),
-							directedSource.isTrackedFile(),
-							null);
-					
-					directedSource.setSourceId(sourceId.intValue());
-					
+					// Saving the updated source to database.
+					DAOFactory.get().getDao(HarvestSourceDAO.class).editSource(directedSource);
 				}
-	
-				
-				Date now = new Date();
-				
-				// The conditions applies to current url only. If "current" is not harvested, the one following the "current" is still attempted.
-				
-				
-				if (
-						directedSource.getLastHarvest() == null || 
-						this instanceof InstantHarvest ||
-						(now.getTime() - directedSource.getLastHarvest().getTime()) > directedSource.getIntervalMinutes() * 60 * 1000
-					){
-					//PullHarvest harvest = new PullHarvest(directedSource.getUrl(), null);
-					PullHarvest harvest = null;
-					// The flag for fullSetupMode is set in createFullSetup when initializing the harvest that way.
-					// The value for Urgent is also received there.
-				
-					
-					if (this.isFullSetupMode()){
-						harvest = createFullSetup(directedSource, this.isFullSetupModeUrgent());
-					}
-					else {
-						harvest = new PullHarvest(directedSource.getUrl(), null);
-					}
-					
-					// setting the flag to not allow it recursively harvest their followers.
-					// During the harvest of this instance, the code won't reach this block.
-					harvest.setRecursiveHarvestDisabled(true);
-					harvest.execute();
-					
-				}
-				
 			}
-		} catch (Exception ex){
-			throw new HarvestException("Exception during harvesting redirected sources: "+ex.getMessage(), ex);
+			else {
+				directedSource = new HarvestSourceDTO();
+				directedSource.setTrackedFile(true);
+				directedSource.setIntervalMinutes(originalSource.getIntervalMinutes());
+				directedSource.setUrl(current.getSourceURL());
+
+				Integer sourceId = DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(
+						directedSource.getUrl(),
+						directedSource.getIntervalMinutes(),
+						directedSource.isTrackedFile(),
+						null);
+
+				directedSource.setSourceId(sourceId.intValue());
+			}
+
+			long now = System.currentTimeMillis();
+			long lastHarvestTime =
+				directedSource.getLastHarvest()==null ? 0 : directedSource.getLastHarvest().getTime();
+			long sinceLastHarvest = now - lastHarvestTime;
+			long harvestIntervalMillis = directedSource.getIntervalMinutes()==null ? 0L :
+				directedSource.getIntervalMinutes().longValue() * 60L * 1000L;
+
+			// The conditions applies to current url only.
+			// If "current" is not harvested, the one following the "current" is still attempted.
+
+			if (lastHarvestTime==0 ||  this instanceof InstantHarvest ||
+					(lastHarvestTime>0 && sinceLastHarvest > harvestIntervalMillis)){
+				
+				PullHarvest harvest = null;
+				
+				// The flag for fullSetupMode is set in createFullSetup
+				// when initializing the harvest that way. The value for Urgent is also received there.
+				if (this.isFullSetupMode()){
+					harvest = createFullSetup(directedSource, this.isFullSetupModeUrgent());
+				}
+				else {
+					harvest = new PullHarvest(directedSource.getUrl(), null);
+				}
+
+				// Setting the flag to not allow it recursively harvest their followers.
+				// During the harvest of this instance, the code won't reach this block.
+				harvest.setRecursiveHarvestDisabled(true);
+				harvest.execute();
+			}
 		}
 	}
 	
