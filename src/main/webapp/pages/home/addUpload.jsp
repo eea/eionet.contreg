@@ -31,7 +31,7 @@
 					<tr>
 						<td colspan="2">
 							<stripes:submit name="add" value="Upload"
-								onclick="javascript:showWait('The file is being uploaded, and its harevst is attempted. Please wait ...', '${pageContext.request.contextPath}');return true;"/>
+								onclick="javascript:showWait('The file is being uploaded, and its harvest is attempted. Please wait ...', '${pageContext.request.contextPath}');return true;"/>
 							<stripes:submit name="view" value="Cancel"/>
 						</td>       
 					</tr>

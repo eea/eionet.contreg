@@ -12,7 +12,7 @@
         The batch queue contains the sources that are being harvested at the current run of the batch harvester. If the
         batch harvester is not executing at the moment, then the batch queue displays the sources that will be harvested
         next time the batch harvester executes. If the batch queue is empty then either there is nothing to harvest or
-        batch harevsting has been turned off.
+        batch harvesting has been turned off.
         The urgent queue is created by system administrators who can request an urgent harvest at any time.
         Harvests in the urgent queue have always a higher priority over those in the batch queue.</p>
         
