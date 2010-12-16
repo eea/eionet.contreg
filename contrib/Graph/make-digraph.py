@@ -40,6 +40,7 @@ def shorten_url(u):
 
 def wrap_literal(s):
     if len(s) > 200: s=s[:197] + '...'
+    s = s.replace('"','\\"')
     return '\\l    '.join(textwrap.wrap(s, 50))
 
 class MakeDigraph:
