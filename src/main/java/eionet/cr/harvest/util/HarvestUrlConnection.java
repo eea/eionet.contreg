@@ -44,15 +44,18 @@ public class HarvestUrlConnection {
 		//returnConnection.redirectionInfo.setSourceURL(sourceUrlString);
 		result.redirectionInfo = UrlRedirectAnalyzer.analyzeUrlRedirection(sourceUrlString);
 		
+		URL normalizedURL = URLUtil.replaceURLSpaces(result.url);
 		if (result.url.getProtocol().equals("http")||result.url.getProtocol().equals("https")){
+			
 			result.httpConnection = true;
-			result.urlConnection = (HttpURLConnection)result.url.openConnection();
+			result.urlConnection = (HttpURLConnection)normalizedURL.openConnection();
 			result.urlConnection.setRequestProperty("Accept", "application/rdf+xml, text/xml, */*;q=0.6");
 			result.urlConnection.setRequestProperty("User-Agent", URLUtil.userAgentHeader());
 			result.urlConnection.setInstanceFollowRedirects(false);
-		} else {
+		}
+		else {
 			result.fileConnection = true;
-			result.generalConnection = (URLConnection)result.url.openConnection();
+			result.generalConnection = (URLConnection)normalizedURL.openConnection();
 			result.generalConnection.setRequestProperty("Accept", "application/rdf+xml, text/xml, */*;q=0.6");
 			result.generalConnection.setRequestProperty("User-Agent", URLUtil.userAgentHeader());
 		}

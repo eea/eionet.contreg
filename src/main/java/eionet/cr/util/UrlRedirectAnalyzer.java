@@ -5,9 +5,14 @@ package eionet.cr.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -37,7 +42,7 @@ public class UrlRedirectAnalyzer {
 		try {
 			URL url = new URL(StringUtils.substringBefore(urlToAnlayze, "#"));
 			
-			urlConnection = (HttpURLConnection)url.openConnection();
+			urlConnection = (HttpURLConnection)URLUtil.replaceURLSpaces(url).openConnection();
 			urlConnection.setRequestProperty("Accept", "application/rdf+xml, text/xml, */*;q=0.6");
 			urlConnection.setRequestProperty("User-Agent", URLUtil.userAgentHeader());
 			urlConnection.setInstanceFollowRedirects(false);
@@ -56,7 +61,7 @@ public class UrlRedirectAnalyzer {
 			
 		}
 		catch (IOException e) {
-			logger.warn("Ignoring this URL redirection analyze exception: " + e.getMessage());
+			logger.warn("Ignoring this URL redirection analyze exception: " + e.getMessage(), e);
 		}
 		finally{
 			try{
@@ -95,10 +100,11 @@ public class UrlRedirectAnalyzer {
 		}
 	}
 	
-	public static void main(String[] args) throws MalformedURLException{
+	public static void main(String[] args) throws URISyntaxException, MalformedURLException{
 		
-		URL url = new URL(new URL("http://seis-basis.jrc.ec.europa.eu/preview/search_bynation.cfm?id_nation=13"), "");
-		System.out.println(url.toString());
+		URL url = new URL("http://foo.com/hello world");
+		URI uri = url.toURI();
+		url = uri.toURL();
+		System.out.println(uri.toString());
 	}
-	
 }

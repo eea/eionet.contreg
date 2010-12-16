@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -51,7 +52,7 @@ public class FileUtil {
 		
 		InputStream inputStream = null;
 		try{
-			URL url = new URL(urlString);
+			URL url = new URL(urlString==null ? urlString : StringUtils.replace(urlString, " ", "%20"));
 			URLConnection httpConn = url.openConnection();
 			inputStream = httpConn.getInputStream();
 			FileUtil.streamToFile(inputStream, toFile);

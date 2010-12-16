@@ -88,7 +88,7 @@ public class URLUtil {
 		InputStream inputStream = null;
 		try{
 			URL url = new URL(StringUtils.substringBefore(urlString, "#"));
-			URLConnection urlConnection = url.openConnection();
+			URLConnection urlConnection = replaceURLSpaces(url).openConnection();
 			urlConnection.setRequestProperty("User-Agent", userAgentHeader());
 			urlConnection.setIfModifiedSince(timestamp);
 			inputStream = urlConnection.getInputStream();
@@ -126,7 +126,7 @@ public class URLUtil {
 		InputStream inputStream = null;
 		try{
 			URL url = new URL(StringUtils.substringBefore(urlStr, "#"));
-			URLConnection urlConnection = url.openConnection();
+			URLConnection urlConnection = replaceURLSpaces(url).openConnection();
 			inputStream = urlConnection.getInputStream();
 			responseCode = ((HttpURLConnection)urlConnection).getResponseCode();
 		}
@@ -169,5 +169,16 @@ public class URLUtil {
 		}else {
 			return null;
 		}
+	}
+
+	/**
+	 * 
+	 * @param url
+	 * @return
+	 * @throws MalformedURLException 
+	 */
+	public static URL replaceURLSpaces(URL url) throws MalformedURLException{
+		
+		return url==null ? null : new URL(StringUtils.replace(url.toString(), " ", "%20"));
 	}
 }
