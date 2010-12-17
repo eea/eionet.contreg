@@ -120,7 +120,7 @@ public class PostgreSQLPersister implements IHarvestPersister{
 			String object, long objectHash, String objectLang, boolean litObject, boolean anonObject, long objSourceObject) throws PersisterException {
 		
 		if (isAddingSourceMetadata){
-			logger.debug("isAddingSourceMetadata = " + isAddingSourceMetadata);
+			
 			addSourceMetadataTriple(subjectHash, anonSubject, predicateHash,
 					object, objectHash, objectLang, litObject, anonObject, objSourceObject);
 			return;
@@ -168,8 +168,6 @@ public class PostgreSQLPersister implements IHarvestPersister{
 	 */
 	private void addSourceMetadataTriple(long subjectHash, boolean anonSubject, long predicateHash,
 			String object, long objectHash, String objectLang, boolean litObject, boolean anonObject, long objSourceObject) throws PersisterException {
-		
-		logger.debug("addSourceMetadataTriple entered");
 		
 		try {
 			preparedStatementForSourceMetadata.setLong  ( 1, subjectHash);

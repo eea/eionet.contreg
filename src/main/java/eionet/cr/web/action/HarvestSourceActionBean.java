@@ -40,8 +40,6 @@ import net.sourceforge.stripes.validation.SimpleError;
 import org.apache.commons.lang.StringUtils;
 import org.quartz.SchedulerException;
 
-import com.sun.org.apache.bcel.internal.generic.RETURN;
-
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestDAO;
