@@ -87,7 +87,7 @@ public class HarvestNotificationSender {
 		if (throwables==null || throwables.isEmpty())
 			return;
 		
-		StringBuffer buf = new StringBuffer("The following error(s) happened *after* harvesting").
+		StringBuffer buf = new StringBuffer("The following error(s) happened *after* harvesting ").
 		append(harvest.getSourceUrlString());
 		
 		for (Iterator<Throwable> iter=throwables.iterator(); iter.hasNext();){
