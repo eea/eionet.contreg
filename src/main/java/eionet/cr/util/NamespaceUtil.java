@@ -27,7 +27,12 @@ public class NamespaceUtil {
 		return i<0 ? null : url.substring(0, i+1);
 	}
 	
-	public static String extractPredicate(String url){
+	/**
+	 * 
+	 * @param url
+	 * @return
+	 */
+	public static String extractLocalName(String url){
 		if (url==null)
 			return null;
 		
@@ -48,6 +53,11 @@ public class NamespaceUtil {
 		namespaces.put(Hashes.spoHash(namespace.getUri()), namespace.getPrefix());
 	}
 	
+	/**
+	 * 
+	 * @param namespace
+	 * @return
+	 */
 	public static String getKnownNamespace(String namespace){
 		
 		Namespace knownNamespaces[] = Namespace.values();
@@ -60,30 +70,4 @@ public class NamespaceUtil {
 		
 		return null;
 	}
-	
-	
-	public static HashMap <Long, String> getNamespacePrefix(List<PredicateDTO> distinctPredicates) throws DAOException{
-		
-		HashMap <Long, String> returnValues = new HashMap<Long, String>();
-		
-		int unknownNamespaceCounter = 0;
-		
-		returnValues.put(Hashes.spoHash(Namespace.RDF.getUri()), Namespace.RDF.getPrefix());
-		returnValues.put(Hashes.spoHash(Namespace.RDFS.getUri()), Namespace.RDFS.getPrefix());
-		
-		for(PredicateDTO predicate:distinctPredicates){
-			String namespace = NamespaceUtil.extractNamespace(predicate.getValue());
-			String knownNamespacePrefix = NamespaceUtil.getKnownNamespace(namespace);
-			
-			if (knownNamespacePrefix == null || knownNamespacePrefix.isEmpty()){
-				unknownNamespaceCounter ++;
-				returnValues.put(Hashes.spoHash(namespace), "ns"+unknownNamespaceCounter);
-			} else {
-				returnValues.put(Hashes.spoHash(namespace), knownNamespacePrefix);
-			}
-		}
-		return returnValues;
-	}
-
-	
 }
