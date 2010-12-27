@@ -72,8 +72,8 @@ public class RDFExporterTest extends CRDatabaseTestCase{
 	 */
 	public void testGetPredicate(){
 		
-		assertEquals("predicate1", NamespaceUtil.extractPredicate("http://www.w3.org/1999/02/22-rdf-syntax-ns#predicate1"));
-		assertEquals("predicate1", NamespaceUtil.extractPredicate("http://www.w3.org/1999/02/22-rdf-syntax-ns/predicate1"));
+		assertEquals("predicate1", NamespaceUtil.extractLocalName("http://www.w3.org/1999/02/22-rdf-syntax-ns#predicate1"));
+		assertEquals("predicate1", NamespaceUtil.extractLocalName("http://www.w3.org/1999/02/22-rdf-syntax-ns/predicate1"));
 	}
 
 }
