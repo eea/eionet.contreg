@@ -10,7 +10,11 @@
 
 	<script type="text/javascript">
 	function goBackWithDelay() {
-		setTimeout('goBackToPage()', 5000);
+		setTimeout('closeWindow()', 5000);
+	}
+
+	function closeWindow(){
+		this.close();
 	}
 	
 	function goBackToPage() {
@@ -24,10 +28,10 @@
 	<form method="get" action="${actionBean.originalPageUrl}">
 	<p>
 	URL was successfully added to the system.
-	<input type="submit" value="OK"/>
+	<input type="button" onClick="closeWindow()" value="OK"/>
 	</p>
 	<p>
-	In few seconds you'll be redirected back to the page you came from.
+	In a few seconds this window will be closed.
 	</p>
 	</form>
 	

@@ -29,10 +29,14 @@ public class QuickAddBookmarkActionBean extends AbstractActionBean {
 	private boolean saveToBookmarks;
 	private BookmarkFormDTO resource;
 	private String originalPageUrl;
+	private boolean loggedIn = false;
 	
 	@DefaultHandler
 	@HandlesEvent("addBookmark")
 	public Resolution init(){
+		if (getUser() != null){
+			loggedIn = true;
+		}
 		return new ForwardResolution("/pages/bookmarklet/quickAddBookmark.jsp");
 	}
 	
@@ -69,7 +73,7 @@ public class QuickAddBookmarkActionBean extends AbstractActionBean {
 	 */
 	public String getBookmarklet() {
 		
-		return "javascript:" +
+		return "javascript: function go() {" +
 				"u=location.href;" +
 				"a=false;" +
 				"x=window;" +
@@ -83,8 +87,9 @@ public class QuickAddBookmarkActionBean extends AbstractActionBean {
 				":a=true;" +
 			"a" +
 			"?alert('Please highlight a full URL, or deselect text to add this page.')" +
-				":location.href=" +
-				"'"+ getBaseUrl(this.getContext()) +"/quickAddBookmark.action?resource.source='+e(u)+'&amp;resource.title='+e(d.title)+'&amp;originalPageUrl='+e(location.href);";
+				":window.open(" +
+				"'"+ getBaseUrl(this.getContext()) +"/quickAddBookmark.action?resource.source='+e(u)+'&amp;resource.title='+e(d.title)+'&amp;originalPageUrl='+e(location.href)" +
+				", 'Add bookmark to Content Registry', 'left=20,top=20,width=700,height=500')}; go();";
 	}
 
 
@@ -125,6 +130,14 @@ public class QuickAddBookmarkActionBean extends AbstractActionBean {
 
 	public void setSaveToBookmarks(boolean saveToBookmarks) {
 		this.saveToBookmarks = saveToBookmarks;
+	}
+
+	public boolean isLoggedIn() {
+		return loggedIn;
+	}
+
+	public void setLoggedIn(boolean loggedIn) {
+		this.loggedIn = loggedIn;
 	}
 
 }
