@@ -28,6 +28,10 @@
 				<td>Last harvest:</td>
 				<td><c:out value="${actionBean.harvestSource.lastHarvest}" /></td>
 			</tr>
+			<tr>
+				<td>Urgency score:</td>
+				<td>${actionBean.urgencyScoreFormatted}</td>
+			</tr>
 			<c:if test="${actionBean.harvestSource.unavailable}">
 				<tr>
 					<td colspan="2" class="warning-msg" style="color: #E6E6E6">The

@@ -190,6 +190,15 @@ public interface HelperDAO extends DAO {
 	
 	/**
 	 * 
+	 * @param harvestSourceId
+	 * @return urgencyScore
+	 * @throws DAOException
+	 */
+	public double getUrgencyScore(int harvestSourceId) throws DAOException;
+	
+	
+	/**
+	 * 
 	 * @param amount
 	 * @return
 	 * @throws DAOException

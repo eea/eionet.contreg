@@ -989,6 +989,46 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#getUrgencyOfComingHarvests()
+	 */
+	public double getUrgencyScore(int harvestSourceId) throws DAOException {
+		double result = -1;
+		StringBuffer buf = new StringBuffer().	
+		append("SELECT ").
+		append(" EXTRACT (EPOCH FROM NOW()-(coalesce(last_harvest,").
+		append(" (time_created - interval_minutes * interval '1 minute') ").
+		append(" )))/(interval_minutes * 60) AS urgency ").
+		append(" FROM HARVEST_SOURCE ").
+		append(" WHERE interval_minutes > 0 AND harvest_source_id = ").
+		append(harvestSourceId);
+
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		try{
+			conn = getConnection();
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(buf.toString());
+			while (rs.next()){
+				result = rs.getDouble("urgency");
+			}
+		}
+		catch (SQLException e){
+			throw new DAOException(e.toString(), e);
+		}
+		finally{
+			SQLUtil.close(rs);
+			SQLUtil.close(stmt);
+			SQLUtil.close(conn);
+		}
+		return result;
+		
+	}
+	
+	
+	
 	
 	public boolean isUrlInHarvestSource(String url) throws DAOException
 	{

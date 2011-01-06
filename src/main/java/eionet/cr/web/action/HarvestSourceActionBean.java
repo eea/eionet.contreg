@@ -20,7 +20,7 @@
  */
 package eionet.cr.web.action;
 
-import java.io.OutputStream;
+import java.text.DecimalFormat;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -119,6 +119,17 @@ public class HarvestSourceActionBean extends AbstractActionBean {
 		return harvests;
 	}
 
+	
+	public String getUrgencyScoreFormatted() throws DAOException{
+		double urgency = factory.getDao(HelperDAO.class).getUrgencyScore(harvestSource.getSourceId());
+        DecimalFormat df = new DecimalFormat("#.####");
+        if (urgency>=0){
+        	return df.format(urgency);
+        } else {
+        	return "<i>Cannot be calculated</i>"; 
+        }
+	}
+	
     /**
      * 
      * @return
