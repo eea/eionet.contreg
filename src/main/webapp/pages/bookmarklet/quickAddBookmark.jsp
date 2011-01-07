@@ -3,9 +3,16 @@
 
 <%@ include file="/pages/common/taglibs.jsp"%>	
 
-<stripes:layout-render name="/pages/common/template.jsp" pageTitle="Bookmarklet installer">
+<stripes:layout-render name="/pages/common/popuptemplate.jsp" siteTitle="Content Registry bookmarklet installer">
 
 	<stripes:layout-component name="contents">
+	
+		<script type="text/javascript">
+			function closeWindow(){
+				this.close();
+			}
+		</script>
+	
 		<h1>Add bookmark</h1>
 		<!--<stripes:errors/>-->
 		<c:choose>
@@ -45,7 +52,11 @@
 		</c:otherwise>
 	</c:choose>
 		
-		
+		<form method="get" action="${actionBean.originalPageUrl}">
+		<p>
+		<input type="button" onClick="closeWindow()" value="Cancel"/>&nbsp;<input type="button" onClick="closeWindow()" value="Close window"/>
+		</p>
+		</form>
 		
 	</stripes:layout-component>
 </stripes:layout-render>

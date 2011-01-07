@@ -64,7 +64,7 @@ public class FrontpageActionBean extends AbstractActionBean {
 	}
 	
 	private void initTagCloud(){
-		tagCloud = ApplicationCache.getTagCloudSortedByName(100);	
+		tagCloud = ApplicationCache.getTagCloudSortedByName(100);
 	}
 	
 }

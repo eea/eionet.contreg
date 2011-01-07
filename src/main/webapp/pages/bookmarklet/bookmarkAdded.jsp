@@ -2,7 +2,7 @@
 
 <%@ include file="/pages/common/taglibs.jsp"%>	
 
-<stripes:layout-render name="/pages/common/template.jsp" pageTitle="Bookmark installed">
+<stripes:layout-render name="/pages/common/popuptemplate.jsp" pageTitle="Bookmark installed">
 
 	<stripes:layout-component name="contents">
 	
