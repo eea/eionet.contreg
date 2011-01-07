@@ -53,8 +53,9 @@
 	</c:choose>
 		
 		<form method="get" action="${actionBean.originalPageUrl}">
-		<p>
-		<input type="button" onClick="closeWindow()" value="Cancel"/>&nbsp;<input type="button" onClick="closeWindow()" value="Close window"/>
+		<hr/>
+		<p align="right">
+		<input type="button" onClick="closeWindow()" value="Close window"/>
 		</p>
 		</form>
 		
