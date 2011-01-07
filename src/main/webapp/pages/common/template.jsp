@@ -27,6 +27,7 @@
 			<script type="text/javascript" src="<c:url value="/scripts/jquery.autocomplete.js"/>"></script>
 			<script type="text/javascript" src="<c:url value="/scripts/util.js"/>"></script>
 			<script type="text/javascript" src="<c:url value="/scripts/pageops.js"/>"></script>
+			<script type="text/javascript" src="<c:url value="/scripts/prototype.js"/>"></script>
 		</head>
 		<body>
 			<div id="container">

@@ -15,7 +15,7 @@
 			<id>project-local</id>
 			<name>project-local repository</name>
 			<layout>default</layout>
-			<url>file:///C:/projects/eeasvn/cr2/lib</url>
+			<url>file:///C:/Projektid/cr2/lib</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
@@ -325,12 +325,26 @@
 			<version>1.22</version>
 			<scope>runtime</scope>
 		</dependency>
-		
 		<dependency>
 			<groupId>xalan</groupId>
 			<artifactId>xalan</artifactId>
 			<version>2.7.0</version>
 			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>virtuoso</groupId>
+			<artifactId>virt-jena</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>virtuoso</groupId>
+			<artifactId>virtjdbc</artifactId>
+			<version>3.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.hp.hpl.jena</groupId>
+			<artifactId>jena</artifactId>
+			<version>2.6.4</version>
 		</dependency>
 		
 <!--
