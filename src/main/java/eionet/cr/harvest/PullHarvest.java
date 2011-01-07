@@ -115,6 +115,7 @@ public class PullHarvest extends Harvest{
 		File file = fullFilePathForSourceUrl(sourceUrlString);
 		
 		String contentType = null;
+		int totalBytes = 0;
 		
 		HarvestUrlConnection harvestUrlConnection = null;
 		try{
@@ -188,9 +189,9 @@ public class PullHarvest extends Harvest{
 							return;
 						}
 						else{
-							logger.debug("Streaming the content to file " + contentType);
+							logger.debug("Streaming the content to file " + file);
 							// save the stream to file
-							int totalBytes = FileUtil.streamToFile(harvestUrlConnection.getInputStream(), file);
+							totalBytes = FileUtil.streamToFile(harvestUrlConnection.getInputStream(), file);
 
 							// if content-length for source metadata was previously not found, then set it to file size
 							if (sourceMetadata.getObject(Predicates.CR_BYTE_SIZE)==null){
@@ -213,7 +214,74 @@ public class PullHarvest extends Harvest{
 		}
 		
 		// perform the harvest
-		harvest(file, contentType);
+		harvest(file, contentType, totalBytes);
+	}
+
+	/**
+	 * Harvest the given file.
+	 * 
+	 * @param file
+	 * @param contentType
+	 * @param fileSize
+	 * @throws HarvestException
+	 */
+	private void harvest(File file, String contentType, int fileSize) throws HarvestException{
+		
+		// remember the file's absolute path, so we can later detect if a new file was created during the pre-processing
+		String originalPath = file.getAbsolutePath();
+		
+		File unGZipped = null;
+		if (fileSize==0){
+			file = null;
+			logger.debug("File size = 0");
+		}
+		else{
+			// see if file is zipped, and if yes, then unzip
+			unGZipped = unCompressGZip(file);
+			if (unGZipped != null){
+				logger.debug("The file was gzipped, going to process unzipped file now");
+				file = unGZipped;
+			}
+			else if (contentType!=null && !isXmlContentType(contentType)){
+				file = null;
+			}
+		}
+		
+		ARPSource arpSource = null;
+		InputStream inputStream = null;
+		try{
+			// Pre-process the file. If it's still valid then open input stream
+			// and create ARP source object. Tthe file may not exist,
+			// if content type was unsupported or other reasons (see caller)
+			if (file!=null && file.exists()){
+				
+				try{
+					file = preProcess(file, contentType);
+					if (file!=null){
+
+						inputStream = new FileInputStream(file);
+						arpSource = new InputStreamBasedARPSource(inputStream);
+					}
+				}
+				catch (Exception e){
+					throw new HarvestException(e.toString(), e);
+				}
+			}
+			
+			harvest(arpSource);
+		}
+		finally{
+			// close input stream
+			if (inputStream!=null){
+				try{ inputStream.close(); } catch (Exception e){ logger.error(e.toString(), e);}
+			}
+			
+			// delete the file we harvested and the original one (in case a new file was created during the pre-processing)
+			// the method is safe against situation where file or original file is actually null or doesn't exist
+			deleteDownloadedFile(file);
+			deleteDownloadedFile(originalPath);
+			deleteDownloadedFile(unGZipped);
+		}
 	}
 	
 	/**
@@ -434,65 +502,6 @@ public class PullHarvest extends Harvest{
 		}
 		
 		return result;
-	}
-
-	/**
-	 * Harvest the given file.
-	 * 
-	 * @param file
-	 * @throws HarvestException 
-	 */
-	private void harvest(File file, String contentType) throws HarvestException{
-		
-		// remember the file's absolute path, so we can later detect if a new file was created during the pre-processing
-		String originalPath = file.getAbsolutePath();
-		
-		// Testing whether the input file is zipped. If true, it is uncompressed and used as original source file.
-		File unGZipped = unCompressGZip(file);
-		if (unGZipped != null){
-			
-			logger.debug("The file was gzipped, going to process unzipped file now");
-			file = unGZipped;
-		}
-		else if (contentType!=null && !isXmlContentType(contentType)){
-			file = null;
-		}
-		
-		ARPSource arpSource = null;
-		InputStream inputStream = null;
-		try{
-			// Pre-process the file. If it's still valid then open input stream
-			// and create ARP source object. Tthe file may not exist,
-			// if content type was unsupported or other reasons (see caller)
-			if (file!=null && file.exists()){
-				
-				try{
-					file = preProcess(file, contentType);
-					if (file!=null){
-
-						inputStream = new FileInputStream(file);
-						arpSource = new InputStreamBasedARPSource(inputStream);
-					}
-				}
-				catch (Exception e){
-					throw new HarvestException(e.toString(), e);
-				}
-			}
-			
-			harvest(arpSource);
-		}
-		finally{
-			// close input stream
-			if (inputStream!=null){
-				try{ inputStream.close(); } catch (Exception e){ logger.error(e.toString(), e);}
-			}
-			
-			// delete the file we harvested and the original one (in case a new file was created during the pre-processing)
-			// the method is safe against situation where file or original file is actually null or doesn't exist
-			deleteDownloadedFile(file);
-			deleteDownloadedFile(originalPath);
-			deleteDownloadedFile(unGZipped);
-		}
 	}
 
 	private File unCompressGZip(File file){

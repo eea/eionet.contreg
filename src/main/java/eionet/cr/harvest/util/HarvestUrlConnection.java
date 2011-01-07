@@ -19,7 +19,6 @@ import eionet.cr.util.URLUtil;
  * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
  *
  */
-
 public class HarvestUrlConnection {
 
 	private URL url;
@@ -36,16 +35,21 @@ public class HarvestUrlConnection {
 	private boolean fileConnection = false;
 	private boolean httpConnection = false;
 
+	/**
+	 * @param sourceUrlString
+	 * @return
+	 * @throws IOException
+	 * @throws MalformedURLException
+	 */
 	public static HarvestUrlConnection getConnection(String sourceUrlString) throws IOException, MalformedURLException{
 		
 		HarvestUrlConnection result = new HarvestUrlConnection();
 		result.url = new URL(StringUtils.substringBefore(sourceUrlString, "#"));
 
-		//returnConnection.redirectionInfo.setSourceURL(sourceUrlString);
 		result.redirectionInfo = UrlRedirectAnalyzer.analyzeUrlRedirection(sourceUrlString);
 		
 		URL normalizedURL = URLUtil.replaceURLSpaces(result.url);
-		if (result.url.getProtocol().equals("http")||result.url.getProtocol().equals("https")){
+		if (result.url.getProtocol().equals("http") || result.url.getProtocol().equals("https")){
 			
 			result.httpConnection = true;
 			result.urlConnection = (HttpURLConnection)normalizedURL.openConnection();
@@ -60,53 +64,38 @@ public class HarvestUrlConnection {
 			result.generalConnection.setRequestProperty("User-Agent", URLUtil.userAgentHeader());
 		}
 		
-		
 		return result;
 	}
-	
+
+	/**
+	 * 
+	 * @return
+	 */
 	private boolean checkUrlRedirected(){
-		// Checking redirection conditions.
-		/*
-		 * 301 Moved Permanently
-		 * 302 Found
-		 * 303 See Other
-		 * 307 Temporary Redirect
-		 */
-		
-		/*
-		try {
-			
-			if (UrlRedirectAnalyzer.isCodeRedirectionResponseCode(responseCode)){
-				redirectionInfo.setTargetURL(urlConnection.getHeaderField("Location"));
-				redirectionInfo.setResponseCode(responseCode);
-				redirectionInfo.setRedirected(true);
-				return true;
-			}
-			else {
-				return false;
-			}
-		} catch (Exception ex){
-			System.out.println(ex.getMessage());
-			return false;
-		}
-		*/
 		
 		return redirectionInfo.isRedirected();
 	}
 	
+	/**
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
 	public boolean openInputStream() throws Exception{
-		// open connection stream
+		
 		try {
 			sourceAvailable = Boolean.FALSE;
 			if (httpConnection){
 				inputStream = urlConnection.getInputStream();
 				responseCode = urlConnection.getResponseCode();
-				checkUrlRedirected();
-			} else if(fileConnection){
+			}
+			else if(fileConnection){
 				inputStream = generalConnection.getInputStream();
 			}
+			
 			sourceAvailable = Boolean.TRUE;
-		} catch (Exception e){
+		}
+		catch (Exception e){
 			
 			if (e!=null && e instanceof UnknownHostException){
 				sourceNotExistMessage = "IP address of the host could not be determined";
@@ -120,9 +109,14 @@ public class HarvestUrlConnection {
 			
 			System.out.println(e.getMessage()+" - "+sourceNotExistMessage);
 		}
+		
 		return sourceAvailable;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public URLConnection getConnection(){
 		if (fileConnection){
 			return (URLConnection) generalConnection;
