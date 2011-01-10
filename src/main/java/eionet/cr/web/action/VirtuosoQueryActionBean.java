@@ -11,6 +11,7 @@ import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.StreamingResolution;
 import net.sourceforge.stripes.action.UrlBinding;
+import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 
 @UrlBinding("/virtuosoQuery.action")
@@ -39,7 +40,9 @@ public class VirtuosoQueryActionBean extends AbstractActionBean {
 		if(query == null)
 			query = "";
 		
-		String endpoint = "http://localhost:8890/sparql?default-graph-uri="+URLEncoder.encode(defaultUri,"UTF-8")+"&query="+URLEncoder.encode(query,"UTF-8");
+		String sparqlEndpoint = GeneralConfig.getProperty("virtuoso.sparql.endpoint");
+		
+		String endpoint = sparqlEndpoint+"?default-graph-uri="+URLEncoder.encode(defaultUri,"UTF-8")+"&query="+URLEncoder.encode(query,"UTF-8");
 		URL url = new URL(endpoint);
 		InputStream is = url.openStream();
 		

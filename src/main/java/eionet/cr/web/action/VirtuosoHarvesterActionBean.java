@@ -5,6 +5,7 @@ import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
+import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 
 @UrlBinding("/virtuosoHarvester.action")
@@ -23,10 +24,15 @@ public class VirtuosoHarvesterActionBean extends AbstractActionBean {
 	}
 	
 	public Resolution harvest() throws DAOException {
-		VirtGraph graph = new VirtGraph ("Example2", "jdbc:virtuoso://localhost:1111/charset=UTF-8/log_enable=2", "dba", "dba");
+		
+		String url = GeneralConfig.getProperty("virtuoso.db.url");
+		String username = GeneralConfig.getProperty("virtuoso.db.username");
+		String password = GeneralConfig.getProperty("virtuoso.db.password");
+		
+		VirtGraph graph = new VirtGraph ("CR3", url, username, password);
 		graph.clear ();
 
-		System.out.println("Begin read from 'http://rod.eionet.europa.eu/spatial'  ");
+		System.out.println("Begin read from: "+sourceUrl);
 		graph.read(sourceUrl, "RDF/XML");
 		System.out.println ("\t\t\t Done.");
 		
