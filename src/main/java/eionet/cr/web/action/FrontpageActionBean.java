@@ -27,6 +27,7 @@ import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 
+import eionet.cr.config.GeneralConfig;
 import eionet.cr.dto.TagDTO;
 import eionet.cr.util.Pair;
 import eionet.cr.web.util.ApplicationCache;
@@ -64,7 +65,7 @@ public class FrontpageActionBean extends AbstractActionBean {
 	}
 	
 	private void initTagCloud(){
-		tagCloud = ApplicationCache.getTagCloudSortedByName(100);
+		tagCloud = ApplicationCache.getTagCloudSortedByName(Integer.parseInt(GeneralConfig.getProperty(GeneralConfig.TAGCLOUD_FRONTPAGE_SIZE)));
 	}
 	
 }

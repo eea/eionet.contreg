@@ -139,13 +139,6 @@ public interface HarvestSourceDAO extends DAO{
     
     /**
      * 
-     * @param sourceId
-     * @throws DAOException
-     */
-    public void updateHarvestStarted(int sourceId) throws DAOException;
-    
-    /**
-     * 
      * @param numOfSegments
      * @return
      * @throws DAOException

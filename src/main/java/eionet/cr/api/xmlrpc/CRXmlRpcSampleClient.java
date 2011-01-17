@@ -30,6 +30,8 @@ import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 
+import eionet.cr.common.Predicates;
+import eionet.cr.common.Subjects;
 import eionet.cr.util.Util;
 import eionet.qawcommons.DataflowResultDto;
 
@@ -146,24 +148,60 @@ public class CRXmlRpcSampleClient {
 				System.out.println(result[i].toString());
 			}
 		}
-		else
+		else{
 			System.out.println("result array null or empty");
+		}
 
+	}
+	
+	/**
+	 * 
+	 * @throws MalformedURLException
+	 * @throws XmlRpcException
+	 */
+	public static void sample_getDeliveries() throws MalformedURLException, XmlRpcException{
+		
+		// set up the client configuration
+		XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
+		config.setServerURL(new URL("http://localhost:8080/cr/xmlrpc"));
+		//config.setServerURL(new URL("http://cr.eionet.europa.eu/xmlrpc"));
+	    config.setEnabledForExtensions(true);
+	    
+	    // create client with above configuration
+	    XmlRpcClient client = new XmlRpcClient();
+	    client.setConfig(config);
+	    
+	    // set up call parameters
+	    Object[] params = new Object[]{new Integer(1), new Integer(1)};
+	    
+	    // execute the call
+	    System.out.println("Executing the call ...");
+	    Object[] result = (Object[])client.execute("ContRegService.getDeliveries", params);
+	    if (result==null){
+	    	System.out.println("Call executed, result is null");
+	    }
+	    else if (result.length==0){
+	    	System.out.println("Call executed, result is an empty array");
+	    }
+	    else{
+	    	System.out.println("Call executed, result is the following array");
+	    	for (int i=0; i<result.length; i++){
+	    		System.out.println(i + ": " + result[i]);
+	    	}
+	    }
 	}
 	/**
 	 * 
 	 * @param args
+	 * @throws XmlRpcException 
+	 * @throws MalformedURLException 
 	 */
-	public static void main(String[] args){
+	public static void main(String[] args) throws MalformedURLException, XmlRpcException{
 		
-		try{
-			sample_getXmlFilesBySchema();
+			sample_getDeliveries();
+//			sample_getXmlFilesBySchema();
 //			sample_getResourcesSinceTimestamp();
-			//sample_simpleAndSearch();
-			//sample_dataflowSearch();
-		}
-		catch (Throwable t){
-			t.printStackTrace();
-		}
+//			sample_simpleAndSearch();
+//			sample_dataflowSearch();
 	}
 }

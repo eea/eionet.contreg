@@ -87,7 +87,6 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 	private static final String TYPE_SEARCH_PATH = "/pages/typeSearch.jsp";
 
 
-	private static final int MAX_DISPLAYED_COLUMNS = 5;
 
 	//type to search
 	private String type;
@@ -330,7 +329,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 			selectedColumns = new LinkedList<String>();
 			int i = 0;
 			for (Entry<String,String> pair : getAvailableColumns().entrySet()){
-				if(i++ == MAX_DISPLAYED_COLUMNS || Predicates.RDF_TYPE.equals(pair.getKey())) {
+				if(Predicates.RDF_TYPE.equals(pair.getKey())) {
 					break;
 				}
 				selectedColumns.add(pair.getKey());
@@ -379,11 +378,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 				selectedColumns.add(0, Predicates.RDFS_LABEL);
 			}
 			selectedColumns = new LinkedList<String>(
-					selectedColumns.subList(
-							0,
-							Math.min(
-									MAX_DISPLAYED_COLUMNS,
-									selectedColumns.size())));
+					selectedColumns.subList(0,selectedColumns.size()));
 		}
 		cache.put(type, selectedColumns);
 		getSession().setAttribute(SELECTED_COLUMNS_CACHE, cache);
@@ -671,10 +666,6 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 	 */
 	public void setUriResourceIdentifier(boolean uriResourceIdentifier) {
 		this.uriResourceIdentifier = uriResourceIdentifier;
-	}
-	
-	public int getMaxDisplayedColumns() {
-		return MAX_DISPLAYED_COLUMNS;
 	}
 
 

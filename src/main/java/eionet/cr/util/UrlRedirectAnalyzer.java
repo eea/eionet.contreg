@@ -61,7 +61,7 @@ public class UrlRedirectAnalyzer {
 			
 		}
 		catch (IOException e) {
-			logger.warn("Ignoring this URL redirection analyze exception: " + e.getMessage(), e);
+			logger.warn("Ignoring this URL redirection analyze exception: " + e.toString());
 		}
 		finally{
 			try{

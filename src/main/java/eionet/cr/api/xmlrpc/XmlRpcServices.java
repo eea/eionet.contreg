@@ -70,6 +70,10 @@ public class XmlRpcServices implements Services{
 	 */
 	public List getResourcesSinceTimestamp(Date timestamp) throws CRException {
 		
+		if (logger.isInfoEnabled()){
+			logger.info("Entered " + Thread.currentThread().getStackTrace()[1].getMethodName());
+		}
+		
 		List<Map<String,String[]>> result = new ArrayList<Map<String,String[]>>();		
 		if (timestamp!=null){
 			
@@ -125,7 +129,11 @@ public class XmlRpcServices implements Services{
 	 * @see eionet.cr.api.xmlrpc.Services#dataflowSearch(java.util.Map)
 	 */
 	public List dataflowSearch(Map<String,String> criteria) throws CRException{
-		
+
+		if (logger.isInfoEnabled()){
+			logger.info("Entered " + Thread.currentThread().getStackTrace()[1].getMethodName());
+		}
+
 		if (criteria==null)
 			criteria = new HashMap<String,String>();
 		
@@ -178,7 +186,11 @@ public class XmlRpcServices implements Services{
 	 * @see eionet.cr.api.xmlrpc.Services#pushContent(java.lang.String)
 	 */
 	public String pushContent(String content, String sourceUrl) throws CRException {
-		
+
+		if (logger.isInfoEnabled()){
+			logger.info("Entered " + Thread.currentThread().getStackTrace()[1].getMethodName());
+		}
+
 		if (content!=null && content.trim().length()>0){
 			if (StringUtils.isBlank(sourceUrl))
 				throw new CRException("Missing source URL!");
@@ -213,6 +225,10 @@ public class XmlRpcServices implements Services{
 	 * 
 	 */
 	public Vector getEntries(Hashtable criteria) throws CRException {
+
+		if (logger.isInfoEnabled()){
+			logger.info("Entered " + Thread.currentThread().getStackTrace()[1].getMethodName());
+		}
 
 		Vector result = new Vector();
 		try{
@@ -260,9 +276,10 @@ public class XmlRpcServices implements Services{
 	 * @see eionet.cr.api.xmlrpc.Services#getDeliveries(java.lang.Integer, java.lang.Integer, java.lang.Integer)
 	 */
 	public Vector getDeliveries(Integer pageNum, Integer pageSize) throws CRException{
-		
-		logger.debug(getClass().getSimpleName() +
-				".getDeliveries(" + pageNum + "," + pageSize + ") called");
+
+		if (logger.isInfoEnabled()){
+			logger.info("Entered " + Thread.currentThread().getStackTrace()[1].getMethodName());
+		}
 
 		Vector result = new Vector();
 		
@@ -342,6 +359,10 @@ public class XmlRpcServices implements Services{
 	 * @see eionet.cr.api.xmlrpc.Services#getXmlFilesBySchema(java.lang.String)
 	 */
 	public Vector getXmlFilesBySchema(String schemaIdentifier) throws CRException {
+
+		if (logger.isInfoEnabled()){
+			logger.info("Entered " + Thread.currentThread().getStackTrace()[1].getMethodName());
+		}
 
 		Vector result = new Vector();
 		try{

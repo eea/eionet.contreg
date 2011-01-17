@@ -316,8 +316,9 @@ public abstract class Harvest {
 	protected void doHarvestStartedActions() throws HarvestException{
 		
 		try{
-			if (daoWriter!=null)
+			if (daoWriter!=null){
 				daoWriter.writeStarted(this);
+			}
 		}
 		catch (DAOException e){
 			throw new HarvestException(e.toString(), e);
@@ -333,8 +334,9 @@ public abstract class Harvest {
 		// send e-mail notification of messages that occurred DURING the harvest
 		// (see below about messages that occurred AFTER the harvest)
 		try{
-			if (notificationSender!=null)
+			if (notificationSender!=null){
 				notificationSender.notifyMessages(this);
+			}
 		}
 		catch (HarvestException e){
 			errors.add(e);

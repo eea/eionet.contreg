@@ -83,6 +83,13 @@ public class GeneralConfig {
 	public static final String GARBAGE_COLLECTOR_CRON_JOB = "garbageCollectorCronJob";
 	public static final String TYPE_CACHE_UPDATER_CRON_JOB = "typeCacheTablesUpdateCronJob";
 	
+	/*
+	 * TagCloud sizes.
+	 */
+	public static final String TAGCLOUD_FRONTPAGE_SIZE = "tagcloud.frontpage.size";
+	public static final String TAGCOLUD_TAGSEARCH_SIZE = "tagcloud.tagsearch.size";
+	
+	
 	/** */
 	public static final int SEVERITY_INFO = 1;
 	public static final int SEVERITY_CAUTION = 2;

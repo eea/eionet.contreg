@@ -41,6 +41,7 @@ import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortOrder;
 import eionet.cr.util.SortingRequest;
+import eionet.cr.util.URIUtil;
 import eionet.cr.web.util.ApplicationCache;
 
 /**
@@ -74,20 +75,32 @@ public class TypeCacheUpdater implements StatefulJob {
 							new SortingRequest(Predicates.RDFS_LABEL, SortOrder.ASCENDING),
 							predicates);
 			
-			if (customSearch != null && customSearch.getRight() != null){
-				for(SubjectDTO subject : customSearch.getRight()) {
-					if (!subject.isAnonymous()){
-						String label = subject.getObjectValue(Predicates.RDFS_LABEL);
-						if (!StringUtils.isBlank(label)){
-							types.add(new Pair<String,String>(subject.getUri(), label));
+			if (customSearch != null){
+				
+				List<SubjectDTO> subjects = customSearch.getRight();
+				if (subjects!=null && !subjects.isEmpty()){
+					
+					for(SubjectDTO subject : subjects) {
+						
+						String uri = subject.getUri();
+						if (uri!=null && !subject.isAnonymous()){
+							
+							String label = subject.getObjectValue(Predicates.RDFS_LABEL);
+							if (StringUtils.isBlank(label)){
+								label = URIUtil.extractURILabel(uri, uri);
+							}
+							
+							types.add(new Pair<String,String>(uri, label));
 						}
 					}
 				}
 			}
+			
 			ApplicationCache.updateTypes(types);
 			logger.debug("type cache successfully updated!");
 					
-		} catch (DAOException e) {
+		}
+		catch (DAOException e) {
 			logger.error("Exception is thrown while updating type cache", e);
 		}
 	}

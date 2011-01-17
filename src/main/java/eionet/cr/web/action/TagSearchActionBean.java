@@ -32,6 +32,7 @@ import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import eionet.cr.common.Predicates;
+import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.SearchDAO;
@@ -64,6 +65,8 @@ public class TagSearchActionBean  extends AbstractSearchActionBean<SubjectDTO> {
 	private List<String> selectedTags;
 	//columns
 	private final static ArrayList<SearchResultColumn> columns;
+	
+	private int tagCloudSize = Integer.parseInt(GeneralConfig.getProperty(GeneralConfig.TAGCOLUD_TAGSEARCH_SIZE));
 
 	static{
 		columns = new ArrayList<SearchResultColumn>();
@@ -92,16 +95,16 @@ public class TagSearchActionBean  extends AbstractSearchActionBean<SubjectDTO> {
 	 */
 	@DefaultHandler
 	public Resolution preparePage () throws Exception {
-		tagCloud = ApplicationCache.getTagCloudSortedByName(1000);
+		tagCloud = ApplicationCache.getTagCloudSortedByName(tagCloudSize);
 		return new ForwardResolution(TAG_SEARCH_PATH);
 	}
 	public Resolution sortByName () throws Exception {
-		tagCloud = ApplicationCache.getTagCloudSortedByName(1000);
+		tagCloud = ApplicationCache.getTagCloudSortedByName(tagCloudSize);
 		cloudSorted = "name";
 		return new ForwardResolution(TAG_SEARCH_PATH);
 	}
 	public Resolution sortByCount () throws Exception {
-		tagCloud = ApplicationCache.getTagCloudSortedByCount(1000);	
+		tagCloud = ApplicationCache.getTagCloudSortedByCount(tagCloudSize);	
 		cloudSorted = "count";
 		return new ForwardResolution(TAG_SEARCH_PATH);
 	}

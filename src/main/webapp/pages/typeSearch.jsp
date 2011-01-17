@@ -21,17 +21,26 @@
        	To view a resource's factsheet, click the relevant action icon next to it.   
        </p>
 		<crfn:form action="/typeSearch.action" method="get">
-			
-			<!-- Previous version that simple lists the same tags without grouping, sorted by url, not deleted for testing purposes.
-			<stripes:select name="type">
-				<c:forEach items="${actionBean.availableTypesNoGroup }" var="type">
-					<stripes:option value="${type.left}">${type.right} (${type.left})</stripes:option>
-				</c:forEach>
-			</stripes:select>
-			-->
-			
-		   	<stripes:select name="type">
-				<c:forEach var="groups" items="${actionBean.availableTypes}">
+			<c:choose>
+			<c:when test="${not empty actionBean.type}">
+				<script language="javascript">
+
+				function hidediv() {
+					if (document.getElementById) { // DOM3 = IE5, NS6
+						document.body.className = 'fullscreen';
+					} else {
+						if (document.layers) { // Netscape 4
+							document.body.className = 'fullscreen';
+						} else { // IE 4
+							document.body.className = 'fullscreen';
+						}
+					}
+				}
+	
+				hidediv();
+				</script>
+		   		<stripes:select name="type">
+		   		<c:forEach var="groups" items="${actionBean.availableTypes}">
 					<optgroup label="${groups.left}">
 						<c:forEach var="type" items="${groups.right}">
 							<stripes:option value="${type.left}">${type.right}</stripes:option>
@@ -39,13 +48,40 @@
 					</optgroup>
 				</c:forEach>
 			</stripes:select>
+
+			
+		   	</c:when>
+		   	<c:otherwise>
+		   		<stripes:select name="type" size="20" style="min-width:450px; width:450px;">
+			   		<c:forEach var="groups" items="${actionBean.availableTypes}">
+						<optgroup label="${groups.left}">
+							<c:forEach var="type" items="${groups.right}">
+								<stripes:option value="${type.left}">${type.right}</stripes:option>
+							</c:forEach>		
+						</optgroup>
+					</c:forEach>
+				</stripes:select>
+		   	</c:otherwise>
+		   	</c:choose>
+				
 			
 			<stripes:submit name="search" value="Search" /> 
 			<c:if test='${sessionScope.crUser!=null && crfn:hasPermission(sessionScope.crUser.userName, "/", "u")}'>
 				&nbsp;<stripes:submit name="introspect" value="Introspect"/>
 			</c:if>		
-		</crfn:form><br/>
+		</crfn:form>
+		
+		
+			<br/>
 			<c:if test="${not empty actionBean.type}">
+			
+			<script>
+				$(document).ready(function() {	
+					  $("#export_form_noscript").draggable();
+					  $("#select_filters").draggable();
+				});
+			</script>
+			
 			<div id="export_form_noscript">
 				<fieldset>
 				<legend>Export options</legend>
@@ -76,7 +112,7 @@
 				</crfn:form>
 				</fieldset>
 			</div>
-			<div style="margin-bottom:10px; float:right;  min-width:400px; width:50%;">
+			<div id="select_filters" style="margin-bottom:10px; float:right;  min-width:400px; width:50%;">
 				<fieldset>
 				<legend>Select filters</legend>
 				<c:if test="${not empty actionBean.availableFilters}">
@@ -119,9 +155,14 @@
 			</div>
 			</c:if>
 		<c:if test="${not empty actionBean.type and not empty actionBean.availableColumns}">
-			<div style="max-width: 350px;">
+			<script>
+				$(document).ready(function() {	
+					  $("#select_columns").draggable();
+				});
+			</script>
+			<div style="max-width: 350px;" id="select_columns">
 				<fieldset>
-				<legend>Select columns to be displayed (max <c:out value="${actionBean.maxDisplayedColumns}"/>)</legend>
+				<legend>Select columns to be displayed</legend>
 				<crfn:form action="/typeSearch.action" method="post">
 					<stripes:hidden name="type" value="${actionBean.type }"/>
 					<stripes:select name="selectedColumns" multiple="multiple" size="5" style="min-width:250px; width:250px;">

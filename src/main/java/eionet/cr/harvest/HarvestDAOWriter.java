@@ -69,7 +69,6 @@ public class HarvestDAOWriter {
 
 		harvestId = DAOFactory.get().getDao(HarvestDAO.class).insertStartedHarvest(
 				sourceId, harvestType, userName, Harvest.STATUS_STARTED);
-		DAOFactory.get().getDao(HarvestSourceDAO.class).updateHarvestStarted(sourceId);
 	}
 
 	/**
@@ -86,7 +85,8 @@ public class HarvestDAOWriter {
 				harvest.getDistinctSubjectsCount(),
 				0,
 				0);
-		//harvest failed IFF it has a fatal error || warnings || errors
+		
+		// harvest failed if it has a fatal error || warnings || errors
 		boolean failed = harvest.getFatalError() != null 
 				|| (harvest.getErrors() != null && !harvest.getErrors().isEmpty())
 				|| (harvest.getWarnings() != null && !harvest.getWarnings().isEmpty());

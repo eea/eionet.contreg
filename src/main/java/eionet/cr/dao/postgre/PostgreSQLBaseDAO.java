@@ -273,9 +273,10 @@ public abstract class PostgreSQLBaseDAO {
 				logger.trace("getSubjectsData, sub query time " + Util.durationSince(startTime1));
 			}
 
-			// if any subjects were not created (which might happen if they don't have any
-			// triples with the predicates that were asked for), then create them now
-			
+			// By now the data of matched subjects should be present as SubjectDTO values in
+			// subjectsMap (where keys denote subject hashes). If any value in subjectsMap
+			// is null (which might happen if they don't have any triples with the predicates that
+			// were asked for), then create them "artificially" now
 			Set<Long> unfilledSubjects = Util.getNullValueKeys(subjectsMap);
 			if (unfilledSubjects!=null && !unfilledSubjects.isEmpty()){
 				

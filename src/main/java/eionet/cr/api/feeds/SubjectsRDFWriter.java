@@ -33,6 +33,7 @@ import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.common.CRRuntimeException;
 import eionet.cr.common.Namespace;
+import eionet.cr.common.Predicates;
 import eionet.cr.common.SubjectProcessor;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
@@ -127,30 +128,40 @@ public class SubjectsRDFWriter {
 	 */
 	public void write(List<SubjectDTO> subjects, OutputStream out) throws IOException{
 
+		// if no subjects, write empty rdf:RDF tag
 		if (subjects==null || subjects.isEmpty()){
 			out.write("<rdf:RDF/>".getBytes());
 			return;
 		}
 		
+		// start rdf:RDF element
 		out.write(("<rdf:RDF" + getAttributes() + ">").getBytes());
 		
+		// loop over subjects
 		for (SubjectDTO subject:subjects){
 			
+			// initialize subject processor if not initialized yet 
 			if (subjectProcessor!=null){
 				subjectProcessor.process(subject);
 			}
 			
+			// continuing has only point if subject has at least one predicate
 			if (subject.getPredicateCount()>0){
 				
+				// start rdf:Description tag
 				StringBuffer buf = new StringBuffer("\n\t<rdf:Description rdf:about=\"");
-				buf.append(subject.getUri()).append("\">");
+				buf.append(StringEscapeUtils.escapeXml(subject.getUri())).append("\">");
 				
+				// loop over this subject's predicates
 				for (Entry<String,Collection<ObjectDTO>> entry : subject.getPredicates().entrySet()){
 
 					String predicate = entry.getKey();
+					Collection<ObjectDTO> objects = entry.getValue();
 					
-					if (entry.getValue()!=null && !entry.getValue().isEmpty()){
+					// continue only if predicate has at least one object 
+					if (objects!=null && !objects.isEmpty()){
 						
+						// get namespace URI for this predicate
 						String nsUrl = extractNamespace(predicate);
 						if (nsUrl==null || nsUrl.trim().length()==0){
 							throw new CRRuntimeException("Could not extract namespace URL from " + predicate);
@@ -159,44 +170,65 @@ public class SubjectsRDFWriter {
 						// include only predicates from supplied namespaces
 						if (namespaces.containsKey(nsUrl)){
 							
+							// extract predicate's local name
 							String localName = StringUtils.substringAfterLast(predicate, nsUrl);
 							if (localName==null || localName.trim().length()==0){
 								throw new CRRuntimeException("Could not extract local name from " + predicate);
 							}
 
+							// hash-set for remembering already written object values
 							HashSet<String> alreadyWritten = new HashSet<String>();
+							
+							// loop over this predicate's objects
 							for (ObjectDTO object : entry.getValue()){
+								
+								// skip literal values of rdf:type
+								if (object.isLiteral() && predicate.equals(Predicates.RDF_TYPE)){
+									continue;
+								}
 
-								// include only non-blank and non-derived objects that have not been already written
-								if (!StringUtils.isBlank(object.getValue())
-										&& !alreadyWritten.contains(object.getValue())
-										&& (includeDerivedValues || object.getDerivSourceHash()==0)){
+								String objectValue = object.getValue();
+								boolean isDerivedObject = object.getDerivSourceHash()!=0;
 
-									buf.append("\n\t\t<").append(namespaces.get(nsUrl)).append(":").append(localName);
+								// include only non-blank and non-derived objects
+								// that have not been written yet
+								if (!StringUtils.isBlank(objectValue)
+										&& !alreadyWritten.contains(objectValue)
+										&& (includeDerivedValues || !isDerivedObject)){
 
-									String escapedValue = StringEscapeUtils.escapeXml(object.getValue());
-									if (!object.isLiteral() && URLUtil.isURL(object.getValue())){
+									// start predicate tag
+									buf.append("\n\t\t<").
+									append(namespaces.get(nsUrl)).append(":").append(localName);
+
+									// prepare escaped-for-XML object value
+									String escapedValue = StringEscapeUtils.escapeXml(objectValue);
+									
+									// write object value, depending on whether it is literal or not
+									// (close the predicate tag too)
+									if (!object.isLiteral() && URLUtil.isURL(objectValue)){
 										
 										buf.append(" rdf:resource=\"").append(escapedValue).append("\"/>");
 									}
 									else{
-										buf.append(">").
-										append(escapedValue).
-										append("</").append(namespaces.get(nsUrl)).append(":").append(localName).append(">");
+										buf.append(">").append(escapedValue).append("</").
+										append(namespaces.get(nsUrl)).
+										append(":").append(localName).append(">");
 									}
 									
-									alreadyWritten.add(object.getValue());
+									alreadyWritten.add(objectValue);
 								}
 							}
 						}
 					}
 				}
 				
+				// close rdf:Description tag
 				buf.append("\n\t</rdf:Description>");
 				out.write(buf.toString().getBytes());
 			}
 		}
 		
+		// close rdf:RDF tag
 		out.write("</rdf:RDF>\n".getBytes());
 	}
 	

@@ -134,14 +134,17 @@
 				    				<div class="advice-msg">This is an anonymous resource!</div>
 				    			</c:when>
 				    			<c:when test="${subjectUrl!=null}">
-								<p>Resource URL: <a class="link-external" href="${fn:escapeXml(subjectUrl)}"><c:out value="${subjectUrl}"/></a>
-									<c:choose>
-										<c:when	test ="${actionBean.subjectIsUserBookmark}">(Bookmarked)</c:when>
-									</c:choose>
-								</p>
-								<c:if test="${actionBean.currentlyHarvested}">
-									<div class="advice-msg">The resource is currently being harvested!</div>
-								</c:if>
+									<p>Resource URL: <a class="link-external" href="${fn:escapeXml(subjectUrl)}"><c:out value="${subjectUrl}"/></a>
+										<c:choose>
+											<c:when	test ="${actionBean.subjectIsUserBookmark}">(Bookmarked)</c:when>
+										</c:choose>
+									</p>
+									<c:if test="${actionBean.currentlyHarvested}">
+										<div class="advice-msg">The resource is currently being harvested!</div>
+									</c:if>
+				    			</c:when>
+				    			<c:when test="${subjectUri!=null}">
+				    				<p>Resource URI: <c:out value="${subjectUri}"/>
 				    			</c:when>
 				    			<c:otherwise>
 				    				<div class="advice-msg" title="${fn:escapeXml(subjectUri)}">This is an unresolvable resource!</div>

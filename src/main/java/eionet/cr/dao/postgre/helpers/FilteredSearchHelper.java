@@ -120,7 +120,6 @@ public class FilteredSearchHelper extends AbstractSearchHelper{
 				append(" and ");
 
 				if (!requireFullTextSearch(predicateUri, objectValue)){
-					
 					whereBuf.append(spoAlias).append(".OBJECT_HASH=").
 					append(Hashes.spoHash(StringUtils.strip(objectValue, "\"")));
 				}

@@ -498,11 +498,11 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
 	/** */
     private static final String updateHarvestFinishedSQL =
     	"update HARVEST_SOURCE set STATEMENTS=?, RESOURCES=?," +
-    	" LAST_HARVEST_FAILED=cast(? as ynboolean) where HARVEST_SOURCE_ID=?";
+    	" LAST_HARVEST_FAILED=cast(? as ynboolean), LAST_HARVEST=NOW() where HARVEST_SOURCE_ID=?";
     private static final String updateHarvestFinishedSQL_avail =
     	"update HARVEST_SOURCE set STATEMENTS=?, RESOURCES=?," +
     	" COUNT_UNAVAIL=(case when ?=1 then 0 else (COUNT_UNAVAIL+1) end)," +
-    	" LAST_HARVEST_FAILED=cast(? as ynboolean) where HARVEST_SOURCE_ID=?";
+    	" LAST_HARVEST_FAILED=cast(? as ynboolean), LAST_HARVEST=NOW() where HARVEST_SOURCE_ID=?";
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.dao.HarvestSourceDAO#updateHarvestFinished(int, java.lang.Integer, java.lang.Integer, java.lang.Boolean, boolean)
@@ -523,31 +523,6 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
 		try{
 			conn = getConnection();
 			SQLUtil.executeUpdate(sourceAvailable!=null ? updateHarvestFinishedSQL_avail : updateHarvestFinishedSQL, values, conn);
-		}
-		catch (Exception e){
-			throw new DAOException(e.getMessage(), e);
-		}
-		finally{
-			SQLUtil.close(conn);
-		}
-	}
-
-	/** */
-	private static final String updateHarvestStartedSQL =
-		"update HARVEST_SOURCE set LAST_HARVEST=NOW() where HARVEST_SOURCE_ID=?";
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.dao.HarvestSourceDAO#updateHarvestStarted(int)
-	 */
-	public void updateHarvestStarted(int sourceId) throws DAOException {
-		
-		List<Object> values = new ArrayList<Object>();
-		values.add(new Integer(sourceId));		
-		
-		Connection conn = null;
-		try{
-			conn = getConnection();
-			SQLUtil.executeUpdate(updateHarvestStartedSQL, values, conn);
 		}
 		catch (Exception e){
 			throw new DAOException(e.getMessage(), e);

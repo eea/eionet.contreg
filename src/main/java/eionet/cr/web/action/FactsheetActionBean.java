@@ -57,7 +57,6 @@ import eionet.cr.dto.TripleDTO;
 import eionet.cr.harvest.CurrentHarvests;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.InstantHarvester;
-import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SubjectDTOOptimizer;
@@ -179,15 +178,16 @@ public class FactsheetActionBean extends AbstractActionBean{
 	}
 
 	/**
-	 * schedules a harvest for resource.
+	 * Schedules a harvest for resource.
 	 * 
 	 * @return view resolution
 	 * @throws HarvestException
 	 * @throws DAOException 
 	 */
 	public Resolution harvest() throws HarvestException, DAOException {
+		
 		Pair<Boolean, String> message = harvestNow();
-		if (message.getLeft()) {
+		if (message.getLeft()==true) {
 			addWarningMessage(message.getRight());
 		} else {
 			addSystemMessage(message.getRight());
@@ -621,5 +621,4 @@ public class FactsheetActionBean extends AbstractActionBean{
 		
 		return uri==null ? false : CurrentHarvests.contains(uri);
 	}
-
 }
