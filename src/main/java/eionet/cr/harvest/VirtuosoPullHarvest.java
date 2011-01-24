@@ -1,29 +1,7 @@
-/*
- * The contents of this file are subject to the Mozilla Public
- * License Version 1.1 (the "License"); you may not use this file
- * except in compliance with the License. You may obtain a copy of
- * the License at http://www.mozilla.org/MPL/
- *
- * Software distributed under the License is distributed on an "AS
- * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
- * implied. See the License for the specific language governing
- * rights and limitations under the License.
- *
- * The Original Code is Content Registry 2.0.
- *
- * The Initial Owner of the Original Code is European Environment
- * Agency.  Portions created by Tieto Eesti are Copyright
- * (C) European Environment Agency.  All Rights Reserved.
- *
- * Contributor(s):
- * Jaanus Heinlaid, Tieto Eesti
- */
 package eionet.cr.harvest;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -39,8 +17,14 @@ import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang.StringUtils;
+import org.openrdf.model.URI;
+import org.openrdf.repository.Repository;
+import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryException;
+import org.openrdf.rio.RDFFormat;
 import org.xml.sax.SAXException;
 
+import virtuoso.sesame2.driver.VirtuosoRepository;
 import eionet.cr.common.Predicates;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
@@ -53,8 +37,6 @@ import eionet.cr.dto.ObjectDTO;
 import eionet.cr.harvest.persist.PersisterFactory;
 import eionet.cr.harvest.util.HarvestUrlConnection;
 import eionet.cr.harvest.util.MimeTypeConverter;
-import eionet.cr.harvest.util.arp.ARPSource;
-import eionet.cr.harvest.util.arp.InputStreamBasedARPSource;
 import eionet.cr.util.FileUtil;
 import eionet.cr.util.GZip;
 import eionet.cr.util.Hashes;
@@ -71,7 +53,7 @@ import eionet.cr.web.security.CRUser;
  * @author heinljab
  *
  */
-public class PullHarvest extends Harvest{
+public class VirtuosoPullHarvest extends Harvest{
 	
 	/**
 	 * 
@@ -79,6 +61,7 @@ public class PullHarvest extends Harvest{
 	public static final int maxRedirectionsAllowed = 4;
 	private boolean fullSetupMode = false;
 	private boolean fullSetupModeUrgent = false;
+	private boolean rdfContentFound = false;
 	
 	/** */
 	private Boolean sourceAvailable = null;	
@@ -96,7 +79,7 @@ public class PullHarvest extends Harvest{
 	 * 
 	 * @param sourceUrlString
 	 */
-	public PullHarvest(String sourceUrlString, Date lastHarvest) {
+	public VirtuosoPullHarvest(String sourceUrlString, Date lastHarvest) {
 		super(sourceUrlString);
 		this.lastHarvest = lastHarvest;
 	}
@@ -242,41 +225,43 @@ public class PullHarvest extends Harvest{
 			}
 		}
 		
-		ARPSource arpSource = null;
-		InputStream inputStream = null;
-		try{
-			// Pre-process the file. If it's still valid then open input stream
-			// and create ARP source object. Tthe file may not exist,
-			// if content type was unsupported or other reasons (see caller)
-			if (file!=null && file.exists()){
+		String url = GeneralConfig.getProperty("virtuoso.db.url");
+		String username = GeneralConfig.getProperty("virtuoso.db.username");
+		String password = GeneralConfig.getProperty("virtuoso.db.password");
+		
+		if (file!=null && file.exists()){
+			rdfContentFound = true;
+			try{
+				file = preProcess(file, contentType);
+				
+				Repository myRepository = new VirtuosoRepository(url,username,password);
+				myRepository.initialize();
+				RepositoryConnection con = myRepository.getConnection();
+				
+				URL sourceUrl = new URL(sourceUrlString);
+				String host = sourceUrl.getHost();
+				String protocol = sourceUrl.getProtocol();
 				
 				try{
-					file = preProcess(file, contentType);
-					if (file!=null){
-
-						inputStream = new FileInputStream(file);
-						arpSource = new InputStreamBasedARPSource(inputStream);
-					}
+					
+					con.setAutoCommit(true);
+					URI context = myRepository.getValueFactory().createURI(sourceUrlString);
+					con.add(file, protocol+"://"+host, RDFFormat.RDFXML, context);
+					
+				} finally {
+					con.close();
+					
+					deleteDownloadedFile(file);
+					deleteDownloadedFile(originalPath);
+					deleteDownloadedFile(unGZipped);
 				}
-				catch (Exception e){
-					throw new HarvestException(e.toString(), e);
-				}
+			} catch (RepositoryException rex) {
+				throw new HarvestException(rex.toString(), rex);
+			} catch (Exception e) {
+				throw new HarvestException(e.toString(), e);
 			}
-			
-			harvest(arpSource);
 		}
-		finally{
-			// close input stream
-			if (inputStream!=null){
-				try{ inputStream.close(); } catch (Exception e){ logger.error(e.toString(), e);}
-			}
-			
-			// delete the file we harvested and the original one (in case a new file was created during the pre-processing)
-			// the method is safe against situation where file or original file is actually null or doesn't exist
-			deleteDownloadedFile(file);
-			deleteDownloadedFile(originalPath);
-			deleteDownloadedFile(unGZipped);
-		}
+		
 	}
 	
 	/**
@@ -366,9 +351,9 @@ public class PullHarvest extends Harvest{
 			redirectionsFound = redirectedUrls.size();
 			
 			// Checking the count of redirects.
-			if (redirectionsFound>PullHarvest.maxRedirectionsAllowed){
+			if (redirectionsFound>VirtuosoPullHarvest.maxRedirectionsAllowed){
 				throw new HarvestException("Too many redirections for url: " + sourceUrlString
-						+". Found "+ redirectionsFound+", allowed "+PullHarvest.maxRedirectionsAllowed);
+						+". Found "+ redirectionsFound+", allowed "+VirtuosoPullHarvest.maxRedirectionsAllowed);
 			}
 		}
 
@@ -416,10 +401,10 @@ public class PullHarvest extends Harvest{
 			// The conditions applies to current url only.
 			// If "current" is not harvested, the one following the "current" is still attempted.
 
-			if (lastHarvestTime==0 ||  this instanceof InstantHarvest ||
+			if (lastHarvestTime==0 || this instanceof VirtuosoInstantHarvest ||
 					(lastHarvestTime>0 && sinceLastHarvest > harvestIntervalMillis)){
 				
-				PullHarvest harvest = null;
+				VirtuosoPullHarvest harvest = null;
 				
 				// The flag for fullSetupMode is set in createFullSetup
 				// when initializing the harvest that way. The value for Urgent is also received there.
@@ -427,7 +412,7 @@ public class PullHarvest extends Harvest{
 					harvest = createFullSetup(directedSource, this.isFullSetupModeUrgent());
 				}
 				else {
-					harvest = new PullHarvest(directedSource.getUrl(), null);
+					harvest = new VirtuosoPullHarvest(directedSource.getUrl(), null);
 				}
 
 				// Setting the flag to not allow it recursively harvest their followers.
@@ -720,7 +705,7 @@ public class PullHarvest extends Harvest{
 	 * @return
 	 * @throws DAOException 
 	 */
-	public static PullHarvest createFullSetup(String sourceUrl, boolean urgent) throws DAOException{
+	public static VirtuosoPullHarvest createFullSetup(String sourceUrl, boolean urgent) throws DAOException{
 		
 		return createFullSetup(DAOFactory.get().getDao(
 				HarvestSourceDAO.class).getHarvestSourceByUrl(sourceUrl), urgent);
@@ -733,9 +718,9 @@ public class PullHarvest extends Harvest{
 	 * @return
 	 * @throws DAOException
 	 */
-	public static PullHarvest createFullSetup(HarvestSourceDTO dto, boolean urgent) throws DAOException{
+	public static VirtuosoPullHarvest createFullSetup(HarvestSourceDTO dto, boolean urgent) throws DAOException{
 
-		PullHarvest harvest = new PullHarvest(dto.getUrl(), urgent ? null : dto.getLastHarvest());
+		VirtuosoPullHarvest harvest = new VirtuosoPullHarvest(dto.getUrl(), urgent ? null : dto.getLastHarvest());
 		
 		harvest.setFullSetupMode(true);
 		harvest.setFullSetupModeUrgent(urgent);
@@ -772,5 +757,9 @@ public class PullHarvest extends Harvest{
 
 	public void setFullSetupModeUrgent(boolean fullSetupModeUrgent) {
 		this.fullSetupModeUrgent = fullSetupModeUrgent;
+	}
+	
+	public boolean isRdfContentFound() {
+		return rdfContentFound;
 	}
 }

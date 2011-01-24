@@ -88,6 +88,17 @@
 												<a id="wait_link" href="${oldUrl }" onclick="javascript:loadAndWait('The resource is being harvested. Please wait ...', '${url }', '${pageContext.request.contextPath}'); return false;">Harvest</a>
 											</li>
 										</c:if>
+										<c:if test="${subjectUrl!=null && actionBean.currentlyHarvested==false}">
+											<li>
+												<stripes:url value="${actionBean.urlBinding}" event="harvestAjaxVirtuoso"  var="urlVirt">
+														<stripes:param name="uri" value="${actionBean.uri}"/>
+												</stripes:url>
+												<stripes:url value="${actionBean.urlBinding}" event="harvestVirtuoso"  var="oldUrlVirt">
+														<stripes:param name="uri" value="${actionBean.uri}"/>
+												</stripes:url>
+												<a id="wait_link" href="${oldUrlVirt }" onclick="javascript:loadAndWait('The resource is being harvested. Please wait ...', '${urlVirt }', '${pageContext.request.contextPath}'); return false;">Harvest (virtuoso)</a>
+											</li>
+										</c:if>
 						    			<c:if test="${actionBean.urlFoundInHarvestSource}">
 						    				<li>
 						    				<stripes:link class="link-plain" href="/source.action?view=&harvestSource.url=${ subjectUrl }">Source details</stripes:link>

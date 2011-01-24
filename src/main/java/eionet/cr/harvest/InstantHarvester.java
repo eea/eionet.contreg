@@ -20,15 +20,8 @@
 * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.harvest;
 
-import java.util.HashSet;
-
 import org.apache.commons.lang.StringUtils;
-
 import eionet.cr.common.CRRuntimeException;
-import eionet.cr.dao.DAOException;
-import eionet.cr.dao.HarvestSourceDAO;
-import eionet.cr.dto.HarvestSourceDTO;
-import eionet.cr.harvest.scheduled.HarvestingJob;
 
 /**
  * 
@@ -43,22 +36,20 @@ public class InstantHarvester extends Thread{
 	/** */
 	private String sourceUrl;
 	private String userName;
+	private boolean isVirtuosoHarvest;
 	
 	/** */
 	private HarvestException harvestException = null;
 	
 	/** */
-	private boolean rdfContentFound = false;
+	private boolean rdfContentFound = false; 
 	private boolean sourceAvailable = false;
 	
-	/**
-	 * 
-	 * @param sourceUrl
-	 */
-	private InstantHarvester(String sourceUrl, String userName){
+	private InstantHarvester(String sourceUrl, String userName, boolean isVirtuosoHarvest){
 		
 		this.sourceUrl = sourceUrl;
 		this.userName = userName;
+		this.isVirtuosoHarvest = isVirtuosoHarvest;
 	}
 
 	/*
@@ -68,9 +59,15 @@ public class InstantHarvester extends Thread{
 	public void run(){
 		
 		InstantHarvest instantHarvest = null;
+		VirtuosoInstantHarvest virtInstantHarvest = null;
 		try{
-			instantHarvest = InstantHarvest.createFullSetup(sourceUrl, userName);
-			instantHarvest.execute();
+			if(!isVirtuosoHarvest){
+				instantHarvest = InstantHarvest.createFullSetup(sourceUrl, userName);
+				instantHarvest.execute();
+			} else {
+				virtInstantHarvest = VirtuosoInstantHarvest.createFullSetup(sourceUrl, userName);
+				virtInstantHarvest.execute();
+			}
 		}
 		catch (HarvestException e){
 			harvestException = e;
@@ -87,6 +84,10 @@ public class InstantHarvester extends Thread{
 			if (instantHarvest!=null){
 				rdfContentFound = instantHarvest.isRdfContentFound();
 				sourceAvailable = instantHarvest.getSourceAvailable()!=null && instantHarvest.getSourceAvailable().booleanValue();
+			}
+			if (virtInstantHarvest!=null){
+				rdfContentFound = virtInstantHarvest.isRdfContentFound();
+				sourceAvailable = virtInstantHarvest.getSourceAvailable()!=null && virtInstantHarvest.getSourceAvailable().booleanValue();
 			}
 			CurrentHarvests.removeOnDemandHarvest(sourceUrl);
 		}
@@ -106,7 +107,7 @@ public class InstantHarvester extends Thread{
 	 * @return
 	 * @throws HarvestException 
 	 */
-	public static Resolution harvest(String sourceUrl, String userName) throws HarvestException{
+	public static Resolution harvest(String sourceUrl, String userName, boolean isVirtuosoHarvest) throws HarvestException{
 		
 		if (StringUtils.isBlank(sourceUrl))
 			throw new IllegalArgumentException("Source URL must not be null or blank!");
@@ -121,7 +122,7 @@ public class InstantHarvester extends Thread{
 
 		InstantHarvester instantHarvester = null;
 		try{
-			instantHarvester = new InstantHarvester(sourceUrl, userName);
+			instantHarvester = new InstantHarvester(sourceUrl, userName, isVirtuosoHarvest);
 			instantHarvester.start();
 
 			for (int loopCount = 0; instantHarvester.isAlive() && loopCount<15; loopCount++){

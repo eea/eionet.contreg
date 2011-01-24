@@ -99,6 +99,14 @@ public class HarvestDAOWriter {
 							harvest.getDistinctSubjectsCount(),
 							((PullHarvest)harvest).getSourceAvailable(),
 							failed);
+		} else if (harvest instanceof VirtuosoPullHarvest){
+			DAOFactory.get().getDao(HarvestSourceDAO.class)
+			.updateHarvestFinished(
+					sourceId,
+					null,
+					harvest.getDistinctSubjectsCount(),
+					((VirtuosoPullHarvest)harvest).getSourceAvailable(),
+					failed);
 		}
 		else{
 			DAOFactory.get().getDao(HarvestSourceDAO.class)

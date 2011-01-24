@@ -169,7 +169,23 @@ public class FactsheetActionBean extends AbstractActionBean{
 	public Resolution harvestAjax() {
 		String message;
 		try {
-			message = harvestNow().getRight();
+			message = harvestNow(false).getRight();
+		} catch (Exception ignored) {
+			logger.error("error while scheduling ajax harvest", ignored);
+			message = "Error occured, more info can be obtained in application logs";
+		}
+		return new StreamingResolution("text/html", message);
+	}
+	
+	/**
+	 * Handle for ajax virtuoso harvesting.
+	 * 
+	 * @return
+	 */
+	public Resolution harvestAjaxVirtuoso() {
+		String message;
+		try {
+			message = harvestNow(true).getRight();
 		} catch (Exception ignored) {
 			logger.error("error while scheduling ajax harvest", ignored);
 			message = "Error occured, more info can be obtained in application logs";
@@ -186,7 +202,26 @@ public class FactsheetActionBean extends AbstractActionBean{
 	 */
 	public Resolution harvest() throws HarvestException, DAOException {
 		
-		Pair<Boolean, String> message = harvestNow();
+		Pair<Boolean, String> message = harvestNow(false);
+		if (message.getLeft()==true) {
+			addWarningMessage(message.getRight());
+		} else {
+			addSystemMessage(message.getRight());
+		}
+		
+		return new RedirectResolution(this.getClass(), "view").addParameter("uri", uri);
+	}
+	
+	/**
+	 * Schedules a virtuoso harvest for resource.
+	 * 
+	 * @return view resolution
+	 * @throws HarvestException
+	 * @throws DAOException 
+	 */
+	public Resolution harvestVirtuoso() throws HarvestException, DAOException {
+		
+		Pair<Boolean, String> message = harvestNow(true);
 		if (message.getLeft()==true) {
 			addWarningMessage(message.getRight());
 		} else {
@@ -203,7 +238,7 @@ public class FactsheetActionBean extends AbstractActionBean{
 	 * @throws HarvestException
 	 * @throws DAOException
 	 */
-	private Pair<Boolean, String> harvestNow() throws HarvestException, DAOException  {
+	private Pair<Boolean, String> harvestNow(boolean isVirtuosoHarvest) throws HarvestException, DAOException  {
 		
 		String message = null;
 		if(isUserLoggedIn()){
@@ -224,7 +259,7 @@ public class FactsheetActionBean extends AbstractActionBean{
 				
 				/* issue an instant harvest of this url */
 				
-				InstantHarvester.Resolution resolution = InstantHarvester.harvest(dto.getUrl(), getUserName());
+				InstantHarvester.Resolution resolution = InstantHarvester.harvest(dto.getUrl(), getUserName(), isVirtuosoHarvest);
 				
 				/* give feedback to the user */
 				
