@@ -10,6 +10,7 @@ import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -17,6 +18,7 @@ import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang.StringUtils;
+import org.openrdf.model.Literal;
 import org.openrdf.model.URI;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
@@ -34,6 +36,7 @@ import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
+import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.persist.PersisterFactory;
 import eionet.cr.harvest.util.HarvestUrlConnection;
 import eionet.cr.harvest.util.MimeTypeConverter;
@@ -248,6 +251,21 @@ public class VirtuosoPullHarvest extends Harvest{
 					URI context = myRepository.getValueFactory().createURI(sourceUrlString);
 					con.add(file, protocol+"://"+host, RDFFormat.RDFXML, context);
 					
+					long tripleCount = con.size(context);
+					//RepositoryResult<Resource> list = con.getContextIDs();
+					
+					int autoTriples = 0;
+					if (sourceMetadata.getPredicateCount()>0){
+						logger.debug("Storing auto-generated triples for the source");
+						autoTriples = addSourceMetadata(sourceMetadata, con, myRepository, context);
+					}
+					
+					int totalTriples = new Long(tripleCount).intValue() + autoTriples;
+					setStoredTriplesCount(totalTriples);
+					//int TripleCount = con.getStatements(null, null, null, true, context).asList().size();
+					
+					//String a = "a";
+					
 				} finally {
 					con.close();
 					
@@ -263,6 +281,39 @@ public class VirtuosoPullHarvest extends Harvest{
 		}
 		
 	}
+	
+	private int addSourceMetadata(SubjectDTO subjectDTO, RepositoryConnection con, Repository rep, URI context) throws Exception {
+		int statementsAdded = 0;
+		if (subjectDTO!=null && subjectDTO.getPredicateCount()>0){
+
+			URI subject = rep.getValueFactory().createURI(subjectDTO.getUri());
+			for (String predicateUri:subjectDTO.getPredicates().keySet()){
+
+				Collection<ObjectDTO> objects = subjectDTO.getObjects(predicateUri);
+				if (objects!=null && !objects.isEmpty()){
+
+					URI predicate = rep.getValueFactory().createURI(predicateUri);
+					for (ObjectDTO object:objects){
+						if(object.isLiteral()){
+							Literal object_lit = rep.getValueFactory().createLiteral(object.toString()); 
+							con.add(subject, predicate, object_lit, context);
+						} else {
+							URI object_uri = rep.getValueFactory().createURI(object.toString());
+							con.add(subject, predicate, object_uri, context);
+						}
+						
+						statementsAdded++;
+					}
+				}
+			}
+			
+			//if (statementsAdded>0){
+				//addResource(Harvest.HARVESTER_URI, Hashes.spoHash(Harvest.HARVESTER_URI), true);
+			//}
+		}
+		return statementsAdded;
+	}
+	
 	
 	/**
 	 * 
