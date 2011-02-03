@@ -30,7 +30,6 @@ import java.util.StringTokenizer;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.PageContext;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.dto.ObjectDTO;
@@ -40,7 +39,6 @@ import eionet.cr.util.QueryString;
 import eionet.cr.util.SortOrder;
 import eionet.cr.util.Util;
 import eionet.cr.web.action.AbstractActionBean;
-import eionet.cr.web.action.FactsheetActionBean;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.columns.SearchResultColumn;
 

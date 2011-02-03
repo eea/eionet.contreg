@@ -247,3 +247,11 @@ a.numberedpage:hover, a.nextpage:hover, a.prevpage:hover, a.firstpage:hover, a.l
 	float:right;
 	clear:both;
 }
+
+table.datatable tr.odd {
+	background: #D2DDED;
+}
+
+table.datatable tr.even {
+	background: #FFFFFF;
+}
