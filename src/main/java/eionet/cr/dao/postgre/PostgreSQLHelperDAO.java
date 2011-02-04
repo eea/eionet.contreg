@@ -1940,12 +1940,14 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 			Collection<UploadDTO> uploads = reader.getResultList();
 			for (UploadDTO uploadDTO : uploads){
 				
-				if (StringUtils.isBlank(uploadDTO.getLabel())){
-					
-					String subjectUri = uploadDTO.getSubjectUri();
-					String uriLabel = URIUtil.extractURILabel(subjectUri, SubjectDTO.NO_LABEL);
+				String currentLabel = uploadDTO.getLabel();
+				String subjectUri = uploadDTO.getSubjectUri();
+				String uriLabel = URIUtil.extractURILabel(subjectUri, SubjectDTO.NO_LABEL);
+				
+				if(StringUtils.isBlank(currentLabel) && !StringUtils.isBlank(uriLabel))
 					uploadDTO.setLabel(uriLabel);
-				}
+				else
+					uploadDTO.setLabel(uriLabel + " (" + currentLabel + ")");
 			}
 			
 			return uploads;
