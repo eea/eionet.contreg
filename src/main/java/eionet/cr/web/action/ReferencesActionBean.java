@@ -49,6 +49,7 @@ import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.web.util.columns.ReferringPredicatesColumn;
 import eionet.cr.web.util.columns.SearchResultColumn;
 import eionet.cr.web.util.columns.SubjectPredicateColumn;
+import eionet.cr.web.util.columns.SubjectPredicateRefsColumn;
 
 /**
  * 
@@ -125,11 +126,11 @@ public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
 		predCol.setSortable(true);
 		list.add(predCol);
 
-		predCol = new SubjectPredicateColumn();
-		predCol.setPredicateUri(Predicates.RDFS_LABEL);
-		predCol.setTitle("Title");
-		predCol.setSortable(true);
-		list.add(predCol);
+		SubjectPredicateRefsColumn predRefCol = new SubjectPredicateRefsColumn();
+		predRefCol.setPredicateUri(Predicates.RDFS_LABEL);
+		predRefCol.setTitle("Title");
+		predRefCol.setSortable(true);
+		list.add(predRefCol);
 		
 		SearchResultColumn col = new ReferringPredicatesColumn(this);
 		col.setTitle("Relationship");

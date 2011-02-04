@@ -34,12 +34,14 @@ import eionet.cr.util.URIUtil;
 import eionet.cr.util.Util;
 import eionet.cr.web.action.FactsheetActionBean;
 
+//same as SubjectPredicateColumn class exept Title is shown as combination of Uri ending + actual label.
+
 /**
  * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class SubjectPredicateColumn extends SearchResultColumn{
+public class SubjectPredicateRefsColumn extends SearchResultColumn{
 
 	/** */
 	private String predicateUri;
@@ -50,7 +52,7 @@ public class SubjectPredicateColumn extends SearchResultColumn{
 	/**
 	 * 
 	 */
-	public SubjectPredicateColumn() {
+	public SubjectPredicateRefsColumn() {
 		//blank
 	}
 	
@@ -59,7 +61,7 @@ public class SubjectPredicateColumn extends SearchResultColumn{
 	 * @param isSortable
 	 * @param predicateUri
 	 */
-	public SubjectPredicateColumn(String title, boolean isSortable, String predicateUri) {
+	public SubjectPredicateRefsColumn(String title, boolean isSortable, String predicateUri) {
 		
 		super(title, isSortable);
 		this.predicateUri = predicateUri;
@@ -73,7 +75,7 @@ public class SubjectPredicateColumn extends SearchResultColumn{
 	 * @param predicateUri
 	 * @param actionRequestParameter
 	 */
-	public SubjectPredicateColumn(String title, boolean isSortable, String predicateUri, String actionRequestParameter) {
+	public SubjectPredicateRefsColumn(String title, boolean isSortable, String predicateUri, String actionRequestParameter) {
 		super(title, isSortable);
 		this.predicateUri = predicateUri;
 		setActionRequestParameter(actionRequestParameter);
@@ -118,6 +120,8 @@ public class SubjectPredicateColumn extends SearchResultColumn{
 				else{
 					result = objectValuesToCSV(objects);
 				}
+				String uriLabel = URIUtil.extractURILabel(subjectDTO.getUri(), SubjectDTO.NO_LABEL);
+				result = uriLabel + " ("+result+")";
 				result = buildFactsheetLink(subjectDTO.getUri(), result);
 			}
 			else if (!objects.isEmpty()){
