@@ -15,7 +15,7 @@
 			<id>project-local</id>
 			<name>project-local repository</name>
 			<layout>default</layout>
-			<url>file:///C:/Projektid/cr3/lib</url>
+			<url>file:///${basedir}/lib</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
