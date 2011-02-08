@@ -24,6 +24,7 @@ import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFParseException;
 import org.xml.sax.SAXException;
 
 import virtuoso.sesame2.driver.VirtuosoRepository;
@@ -204,7 +205,7 @@ public class VirtuosoPullHarvest extends Harvest{
 	 * @param file
 	 * @param contentType
 	 * @param fileSize
-	 * @throws HarvestException
+	 * @throws HarvestException 
 	 */
 	private void harvest(File file, String contentType, int fileSize) throws HarvestException{
 		
@@ -228,61 +229,102 @@ public class VirtuosoPullHarvest extends Harvest{
 			}
 		}
 		
-		String url = GeneralConfig.getProperty("virtuoso.db.url");
-		String username = GeneralConfig.getProperty("virtuoso.db.username");
-		String password = GeneralConfig.getProperty("virtuoso.db.password");
-		
 		if (file!=null && file.exists()){
+			
 			rdfContentFound = true;
+			
 			try{
 				file = preProcess(file, contentType);
-				
-				Repository myRepository = new VirtuosoRepository(url,username,password);
-				myRepository.initialize();
-				RepositoryConnection con = myRepository.getConnection();
-				
-				URL sourceUrl = new URL(sourceUrlString);
-				String host = sourceUrl.getHost();
-				String protocol = sourceUrl.getProtocol();
-				
-				try{
-					
-					con.setAutoCommit(true);
-					URI context = myRepository.getValueFactory().createURI(sourceUrlString);
-					con.add(file, protocol+"://"+host, RDFFormat.RDFXML, context);
-					
-					long tripleCount = con.size(context);
-					//RepositoryResult<Resource> list = con.getContextIDs();
-					
-					int autoTriples = 0;
-					if (sourceMetadata.getPredicateCount()>0){
-						logger.debug("Storing auto-generated triples for the source");
-						autoTriples = addSourceMetadata(sourceMetadata, con, myRepository, context);
-					}
-					
-					int totalTriples = new Long(tripleCount).intValue() + autoTriples;
-					setStoredTriplesCount(totalTriples);
-					//int TripleCount = con.getStatements(null, null, null, true, context).asList().size();
-					
-					//String a = "a";
-					
-				} finally {
-					con.close();
-					
-					deleteDownloadedFile(file);
-					deleteDownloadedFile(originalPath);
-					deleteDownloadedFile(unGZipped);
+				if (file!=null){
+					addToRepository(file);
 				}
-			} catch (RepositoryException rex) {
-				throw new HarvestException(rex.toString(), rex);
-			} catch (Exception e) {
+			}
+			catch (Exception e){
 				throw new HarvestException(e.toString(), e);
 			}
+			finally{
+				deleteDownloadedFile(file);
+				deleteDownloadedFile(originalPath);
+				deleteDownloadedFile(unGZipped);
+			}
 		}
+	}
+
+	/**
+	 * 
+	 * @param file
+	 * @throws IOException 
+	 * @throws RepositoryException 
+	 * @throws RDFParseException 
+	 */
+	private void addToRepository(File file) throws RDFParseException, RepositoryException, IOException{
 		
+		String repoUrl = GeneralConfig.getProperty("virtuoso.db.url");
+		String repoUsr = GeneralConfig.getProperty("virtuoso.db.username");
+		String repoPwd = GeneralConfig.getProperty("virtuoso.db.password");
+		
+		boolean isSuccess = false;
+		Repository repository = null;
+		RepositoryConnection conn = null;
+		try{
+			repository = new VirtuosoRepository(repoUrl,repoUsr,repoPwd);
+			repository.initialize();
+			conn = repository.getConnection();
+			
+			// see http://www.openrdf.org/doc/sesame2/users/ch08.html#d0e1218
+			// for what's a context
+			org.openrdf.model.URI context = repository.getValueFactory().createURI(sourceUrlString);
+
+			// start transaction
+			conn.setAutoCommit(false);
+			
+			// clear previous triples of this context
+			conn.clear(context);
+			
+			// add the file's contents into repository and under this context
+			conn.add(file, sourceUrlString, RDFFormat.RDFXML, context);
+			
+			long tripleCount = conn.size(context);
+			
+			// add CR's auto-generated metadata
+			int autoGenTripleCount = 0;
+			if (sourceMetadata.getPredicateCount()>0){
+				logger.debug("Storing auto-generated triples for the source");
+				autoGenTripleCount = addSourceMetadata(sourceMetadata, conn, repository, context);
+			}
+			
+			// commit transaction
+			conn.commit();
+			
+			// set total stored triples count
+			setStoredTriplesCount(Long.valueOf(tripleCount).intValue() + autoGenTripleCount);
+			
+			// no transaction rollback needed, when reached this point 
+			isSuccess = true;
+		}
+		finally{
+			if (!isSuccess && conn!=null){
+				try{conn.rollback();}catch(RepositoryException e){}
+			}
+			
+			if (conn!=null){
+				try{conn.close();}catch(RepositoryException e){}
+			}
+		}
 	}
 	
-	private int addSourceMetadata(SubjectDTO subjectDTO, RepositoryConnection con, Repository rep, URI context) throws Exception {
+	/**
+	 * 
+	 * @param subjectDTO
+	 * @param conn
+	 * @param rep
+	 * @param contextURI
+	 * @return
+	 * @throws RepositoryException 
+	 * @throws Exception
+	 */
+	private int addSourceMetadata(SubjectDTO subjectDTO, RepositoryConnection conn, Repository rep, URI contextURI) throws RepositoryException{
+		
 		int statementsAdded = 0;
 		if (subjectDTO!=null && subjectDTO.getPredicateCount()>0){
 
@@ -295,11 +337,11 @@ public class VirtuosoPullHarvest extends Harvest{
 					URI predicate = rep.getValueFactory().createURI(predicateUri);
 					for (ObjectDTO object:objects){
 						if(object.isLiteral()){
-							Literal object_lit = rep.getValueFactory().createLiteral(object.toString()); 
-							con.add(subject, predicate, object_lit, context);
+							Literal literalObject = rep.getValueFactory().createLiteral(object.toString()); 
+							conn.add(subject, predicate, literalObject, contextURI);
 						} else {
-							URI object_uri = rep.getValueFactory().createURI(object.toString());
-							con.add(subject, predicate, object_uri, context);
+							URI resourceObject = rep.getValueFactory().createURI(object.toString());
+							conn.add(subject, predicate, resourceObject, contextURI);
 						}
 						
 						statementsAdded++;
