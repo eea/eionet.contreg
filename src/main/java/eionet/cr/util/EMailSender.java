@@ -56,6 +56,12 @@ public class EMailSender {
 	 */
 	public static void send(String[] to, String subject, String body, boolean ccSysAdmin) throws AddressException, MessagingException{
 
+		// if no mail.host specified in the properties, go no further 
+		String mailHost = GeneralConfig.getProperty("mail.host");
+		if (mailHost==null || mailHost.trim().length()==0){
+			return;
+		}
+		
 		Session session = Session.getDefaultInstance(GeneralConfig.getProperties(), null);
 		MimeMessage message = new MimeMessage(session);
 		for (int i=0; i<to.length; i++){
