@@ -1,10 +1,13 @@
 package eionet.cr.web.action;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Iterator;
+
+import com.hp.hpl.jena.query.ResultSet;
+
+import virtuoso.jena.driver.VirtGraph;
+import virtuoso.jena.driver.VirtuosoQueryExecution;
+import virtuoso.jena.driver.VirtuosoQueryExecutionFactory;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
@@ -13,11 +16,12 @@ import net.sourceforge.stripes.action.StreamingResolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
+import eionet.cr.web.sparqlClient.helpers.QueryResult;
+import eionet.cr.web.sparqlClient.helpers.ResultValue;
 
 @UrlBinding("/virtuosoQuery.action")
 public class VirtuosoQueryActionBean extends AbstractActionBean {
 	
-	private String defaultUri;
 	private String query;
 	
 	/**
@@ -34,38 +38,58 @@ public class VirtuosoQueryActionBean extends AbstractActionBean {
 		
 		StringBuffer ret = new StringBuffer();
 		
-		if(defaultUri == null)
-			defaultUri = "";
-		
 		if(query == null)
 			query = "";
 		
-		String sparqlEndpoint = GeneralConfig.getProperty("virtuoso.sparql.endpoint");
+		String repoUrl = GeneralConfig.getProperty("virtuoso.db.url");
+		String repoUsr = GeneralConfig.getProperty("virtuoso.db.username");
+		String repoPwd = GeneralConfig.getProperty("virtuoso.db.password");
 		
-		String endpoint = sparqlEndpoint+"?default-graph-uri="+URLEncoder.encode(defaultUri,"UTF-8")+"&query="+URLEncoder.encode(query,"UTF-8");
-		URL url = new URL(endpoint);
-		InputStream is = url.openStream();
+		VirtGraph set = new VirtGraph(repoUrl, repoUsr, repoPwd);
 		
-		BufferedReader in = new BufferedReader(new InputStreamReader(is));
-		String line = null;
-		int cnt = 0;
-		while((line = in.readLine()) != null) {
-			if(cnt == 0)
-				ret.append("<br/><b>Query result: </b><br/>");
-			ret.append(line);
-			cnt++;
+		VirtuosoQueryExecution vqe = VirtuosoQueryExecutionFactory.create (query, set);
+		long start = System.currentTimeMillis();
+		ResultSet rs = vqe.execSelect();
+		long end = System.currentTimeMillis();
+		QueryResult results = new QueryResult(rs);
+		
+		long executionTime = end - start;
+		
+		if(results != null && results.getRows() != null && results.getVariables() != null){
+			ret.append("<table class=\"datatable\">");
+			ret.append("<thead>");
+			for(Iterator<String> cols = results.getVariables().iterator(); cols.hasNext(); ){
+				String col = cols.next();
+				ret.append("<th>").append(col).append("</th>");
+			}
+			ret.append("</thead>");
+			ret.append("<tbody>");
+			int cnt = 0;
+			for(Iterator<HashMap<String, ResultValue>> it = results.getRows().iterator(); it.hasNext(); ){
+				HashMap<String, ResultValue> row = it.next();
+				if(cnt % 2 == 0)
+					ret.append("<tr class=\"odd\">");
+				else
+					ret.append("<tr class=\"even\">");
+				
+				for(Iterator<String> it2 = results.getVariables().iterator(); it2.hasNext(); ){
+					String col = it2.next();
+					ResultValue val = row.get(col);
+					ret.append("<td>");
+					ret.append(val.getValue());
+					ret.append("</td>");
+				}
+				ret.append("<tr>");
+				cnt++;
+			}
+			ret.append("</tbody>");
+			ret.append("</table>");
+			ret.append("<br/> Done, -- ").append(executionTime).append(" msec.");
+		} else {
+			ret.append("The query gave no results!");
 		}
 
-
 		return new StreamingResolution("text/html", ret.toString());
-	}
-	
-	public String getDefaultUri() {
-		return defaultUri;
-	}
-
-	public void setDefaultUri(String defaultUri) {
-		this.defaultUri = defaultUri;
 	}
 
 	public String getQuery() {

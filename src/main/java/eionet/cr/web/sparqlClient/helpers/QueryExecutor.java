@@ -20,6 +20,7 @@ public class QueryExecutor {
 	
 	/** */
 	private QueryResult results;
+	private long executionTime;
 
 	/**
 	 * 
@@ -37,7 +38,11 @@ public class QueryExecutor {
 		QueryExecution queryExecution = null;
 		try{
 			queryExecution = QueryExecutionFactory.sparqlService(endpoint, query);
+			long start = System.currentTimeMillis();
 			ResultSet rs = queryExecution.execSelect();
+			long end = System.currentTimeMillis();
+			
+			executionTime = end - start;
 
 			if (rs==null || !rs.hasNext()){
 				logger.info("The query gave no results");
@@ -81,5 +86,9 @@ public class QueryExecutor {
 	 */
 	public QueryResult getResults(){
 		return results;
+	}
+
+	public long getExecutionTime() {
+		return executionTime;
 	}
 }

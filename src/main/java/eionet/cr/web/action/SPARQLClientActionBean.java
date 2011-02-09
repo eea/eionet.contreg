@@ -28,6 +28,7 @@ public class SPARQLClientActionBean extends AbstractActionBean{
 	private String endpoint;
 	private String query;
 	private String explore;
+	private long executionTime;
 	
 	
 	/** */
@@ -46,11 +47,13 @@ public class SPARQLClientActionBean extends AbstractActionBean{
 				QueryExecutor queryExecutor = new QueryExecutor();
 				query = queryExecutor.executeExploreQuery(endpoint, explore);
 				result = queryExecutor.getResults();
+				executionTime = queryExecutor.getExecutionTime();
 			}
 			else if (!StringUtils.isBlank(query)){
 				QueryExecutor queryExecutor = new QueryExecutor();
 				queryExecutor.executeQuery(endpoint, query);
 				result = queryExecutor.getResults();
+				executionTime = queryExecutor.getExecutionTime();
 			}
 		}
 		
@@ -113,5 +116,9 @@ public class SPARQLClientActionBean extends AbstractActionBean{
 	 */
 	public String getExplore() {
 		return explore;
+	}
+
+	public long getExecutionTime() {
+		return executionTime;
 	}
 }

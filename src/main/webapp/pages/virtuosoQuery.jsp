@@ -21,14 +21,6 @@
 			<table width="470" border="0">
 				<tr>
 					<td>
-						<stripes:label for="defaultUri">Default URI:</stripes:label>
-					</td>
-					<td>
-						<stripes:text name="defaultUri" id="defaultUri" size="59"/><br/>
-					</td>
-				</tr>
-				<tr>
-					<td>
 						<stripes:label for="query">Query:</stripes:label>
 					</td>
 					<td>

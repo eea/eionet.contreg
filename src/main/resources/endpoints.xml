@@ -8,4 +8,5 @@
 	<entry key="http://services.data.gov.uk/transport/sparql"/>
 	<entry key="http://services.data.gov.uk/finance/sparql"/>
 	<entry key="http://services.data.gov.uk/education/sparql"/>
+	<entry key="http://localhost:8890/sparql"/>
 </properties>
