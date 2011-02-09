@@ -310,6 +310,10 @@ public class VirtuosoPullHarvest extends Harvest{
 			if (conn!=null){
 				try{conn.close();}catch(RepositoryException e){}
 			}
+			
+			if (repository!=null){
+				try{repository.shutDown();}catch(RepositoryException e){}
+			}
 		}
 	}
 	

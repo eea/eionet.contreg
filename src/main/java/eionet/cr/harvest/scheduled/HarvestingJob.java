@@ -52,6 +52,7 @@ import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.HarvestNotificationSender;
 import eionet.cr.harvest.PullHarvest;
 import eionet.cr.harvest.PushHarvest;
+import eionet.cr.harvest.VirtuosoPullHarvest;
 import eionet.cr.harvest.persist.PersisterFactory;
 import eionet.cr.harvest.persist.mysql.MySQLDefaultPersister;
 import eionet.cr.util.EMailSender;
@@ -326,7 +327,8 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 				return;
 			}
 			
-			Harvest harvest = PullHarvest.createFullSetup(harvestSource, urgent);
+//			Harvest harvest = PullHarvest.createFullSetup(harvestSource, urgent);
+			VirtuosoPullHarvest harvest = VirtuosoPullHarvest.createFullSetup(harvestSource, urgent);
 			executeHarvest(harvest);
 		}
 	}

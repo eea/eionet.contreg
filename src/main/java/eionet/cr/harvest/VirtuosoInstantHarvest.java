@@ -49,10 +49,9 @@ public class VirtuosoInstantHarvest extends VirtuosoPullHarvest {
 	public static VirtuosoInstantHarvest createFullSetup(String sourceUrl, String userName) throws DAOException{
 		
 		HarvestSourceDTO dto = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(sourceUrl);
-		VirtuosoInstantHarvest instantHarvest = new VirtuosoInstantHarvest(sourceUrl, null, userName);
-		
 		int numOfResources = dto.getResources()==null ? 0 : dto.getResources().intValue();
 		
+		VirtuosoInstantHarvest instantHarvest = new VirtuosoInstantHarvest(sourceUrl, null, userName);
 		instantHarvest.setPreviousHarvest(DAOFactory.get().getDao(HarvestDAO.class).getLastHarvestBySourceId(dto.getSourceId().intValue()));
 		instantHarvest.setDaoWriter(new HarvestDAOWriter(dto.getSourceId().intValue(), Harvest.TYPE_PULL, numOfResources, CRUser.application.getUserName()));
 		instantHarvest.setNotificationSender(new HarvestNotificationSender());

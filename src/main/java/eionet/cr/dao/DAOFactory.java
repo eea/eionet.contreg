@@ -41,14 +41,7 @@ public abstract class DAOFactory {
 	 */
 	public static DAOFactory get(){
 		
-//		String dbUrl = GeneralConfig.getRequiredProperty(GeneralConfig.DB_URL);
-		String dbUrl = DbConnectionProvider.getConnectionUrl();
-		if (dbUrl.startsWith("jdbc:mysql:"))
-			return MySQLDAOFactory.get();
-		else if (dbUrl.startsWith("jdbc:postgresql:"))
-			return PostgreSQLDAOFactory.get();
-		else
-			return null;
+		return MixedDAOFactory.get();
 	}
 	
 	/**

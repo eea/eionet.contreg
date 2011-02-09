@@ -221,6 +221,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
 
 					// schedule urgent harvest, unless explicitly requested not to
 					if (getContext().getRequestParameter("dontHarvest")==null){
+						
 						UrgentHarvestQueue.addPullHarvest(getHarvestSource().getUrl());
 						addSystemMessage("Harvest source successfully created and scheduled for urgent harvest!");
 					}
