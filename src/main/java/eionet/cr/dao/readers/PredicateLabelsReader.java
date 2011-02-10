@@ -26,6 +26,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.openrdf.query.BindingSet;
+
 import eionet.cr.dao.util.PredicateLabels;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.util.sql.ResultSetBaseReader;
@@ -58,5 +60,11 @@ public class PredicateLabelsReader extends ResultSetBaseReader{
 	 */
 	public void readRow(ResultSet rs) throws SQLException {
 		predicateLabels.add(rs.getString("PREDICATE_URI"), rs.getString("LABEL"), rs.getString("LANG"));
+	}
+
+	@Override
+	public void readTuple(BindingSet bindingSet) {
+		// TODO Auto-generated method stub
+		
 	}
 }

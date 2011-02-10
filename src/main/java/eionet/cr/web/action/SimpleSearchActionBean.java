@@ -35,7 +35,7 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.SearchDAO;
-import eionet.cr.dao.postgre.helpers.FreeTextSearchHelper;
+import eionet.cr.dao.helpers.FreeTextSearchHelper;
 import eionet.cr.dao.util.SearchExpression;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Hashes;

@@ -89,6 +89,10 @@ public class GeneralConfig {
 	public static final String TAGCLOUD_FRONTPAGE_SIZE = "tagcloud.frontpage.size";
 	public static final String TAGCOLUD_TAGSEARCH_SIZE = "tagcloud.tagsearch.size";
 	
+	/** */
+	public static final String VIRTUOSO_DB_URL = "virtuoso.db.url";
+	public static final String VIRTUOSO_DB_USR = "virtuoso.db.username";
+	public static final String VIRTUOSO_DB_PWD = "virtuoso.db.password";
 	
 	/** */
 	public static final int SEVERITY_INFO = 1;
@@ -171,5 +175,15 @@ public class GeneralConfig {
 			init();
 		
 		return properties;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public static synchronized boolean useVirtuoso(){
+		
+		String virtuosoDbUrl = getProperty(VIRTUOSO_DB_URL);
+		return virtuosoDbUrl!=null && virtuosoDbUrl.trim().length()>0;
 	}
 }

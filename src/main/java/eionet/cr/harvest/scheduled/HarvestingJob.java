@@ -327,8 +327,9 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 				return;
 			}
 			
-//			Harvest harvest = PullHarvest.createFullSetup(harvestSource, urgent);
-			VirtuosoPullHarvest harvest = VirtuosoPullHarvest.createFullSetup(harvestSource, urgent);
+			Harvest harvest = GeneralConfig.useVirtuoso() ?
+					VirtuosoPullHarvest.createFullSetup(harvestSource, urgent)
+					:PullHarvest.createFullSetup(harvestSource, urgent); 
 			executeHarvest(harvest);
 		}
 	}

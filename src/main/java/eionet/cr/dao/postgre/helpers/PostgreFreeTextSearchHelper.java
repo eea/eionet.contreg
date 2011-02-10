@@ -27,6 +27,8 @@ import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
+import eionet.cr.dao.helpers.AbstractSearchHelper;
+import eionet.cr.dao.helpers.FreeTextSearchHelper;
 import eionet.cr.dao.util.SearchExpression;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.SortingRequest;
@@ -40,15 +42,15 @@ import eionet.cr.web.util.columns.SubjectLastModifiedColumn;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class FreeTextSearchHelper extends AbstractSearchHelper{
+public class PostgreFreeTextSearchHelper extends FreeTextSearchHelper{
 	
 	/** */
-	public enum FilterType { ANY_OBJECT, ANY_FILE, TEXTS, DATASETS, IMAGES, EXACT_MATCH };
+//	public enum FilterType { ANY_OBJECT, ANY_FILE, TEXTS, DATASETS, IMAGES, EXACT_MATCH };
 	
 	/** */
 	private SearchExpression expression;
 	private PostgreSQLFullTextQuery pgExpression;
-	private FilterType filter = FilterType.ANY_OBJECT;
+//	private FilterType filter = FilterType.ANY_OBJECT;
 	
 	/**
 	 * 
@@ -56,7 +58,7 @@ public class FreeTextSearchHelper extends AbstractSearchHelper{
 	 * @param pagingRequest
 	 * @param sortingRequest
 	 */
-	public FreeTextSearchHelper(SearchExpression expression,
+	public PostgreFreeTextSearchHelper(SearchExpression expression,
 			PostgreSQLFullTextQuery pgExpression,
 			PagingRequest pagingRequest,
 			SortingRequest sortingRequest){
@@ -191,11 +193,11 @@ public class FreeTextSearchHelper extends AbstractSearchHelper{
 		return buf.toString();
 	}
 
-	public FilterType getFilter() {
-		return filter;
-	}
-
-	public void setFilter(FilterType filter) {
-		this.filter = filter;
-	}
+//	public FilterType getFilter() {
+//		return filter;
+//	}
+//
+//	public void setFilter(FilterType filter) {
+//		this.filter = filter;
+//	}
 }

@@ -18,7 +18,7 @@
 * 
 * Contributor(s):
 * Jaanus Heinlaid, Tieto Eesti*/
-package eionet.cr.dao.postgre.helpers;
+package eionet.cr.dao.helpers;
 
 import java.util.List;
 

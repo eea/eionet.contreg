@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 
 import org.apache.commons.lang.StringUtils;
+import org.openrdf.query.BindingSet;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.dto.UploadDTO;
@@ -84,5 +85,11 @@ public class UploadDTOReader extends ResultSetBaseReader{
 	 */
 	public Collection<UploadDTO> getResultList(){
 		return uploadsMap.values();
+	}
+
+	@Override
+	public void readTuple(BindingSet bindingSet) {
+		// TODO Auto-generated method stub
+		
 	}
 }

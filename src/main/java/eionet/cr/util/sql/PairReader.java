@@ -25,6 +25,8 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.openrdf.query.BindingSet;
+
 import eionet.cr.util.Pair;
 
 /**
@@ -57,6 +59,12 @@ public class PairReader<T, T1> extends ResultSetListReader<Pair<T, T1>> {
 	@SuppressWarnings("unchecked")
 	public void readRow(ResultSet rs) throws SQLException {
 		resultList.add(new Pair<T, T1>((T)rs.getObject(LEFTCOL), (T1)rs.getObject(RIGHTCOL)));
+	}
+
+	@Override
+	public void readTuple(BindingSet bindingSet) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

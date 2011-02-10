@@ -259,9 +259,9 @@ public class VirtuosoPullHarvest extends Harvest{
 	 */
 	private void addToRepository(File file) throws RDFParseException, RepositoryException, IOException{
 		
-		String repoUrl = GeneralConfig.getProperty("virtuoso.db.url");
-		String repoUsr = GeneralConfig.getProperty("virtuoso.db.username");
-		String repoPwd = GeneralConfig.getProperty("virtuoso.db.password");
+		String repoUrl = GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_URL);
+		String repoUsr = GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_USR);
+		String repoPwd = GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_PWD);
 		
 		boolean isSuccess = false;
 		Repository repository = null;

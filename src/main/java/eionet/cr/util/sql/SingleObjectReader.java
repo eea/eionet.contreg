@@ -25,6 +25,8 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.openrdf.query.BindingSet;
+
 /**
  * @author Aleksandr Ivanov
  * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
@@ -50,6 +52,12 @@ public class SingleObjectReader<T> extends ResultSetListReader<T> {
 	@SuppressWarnings("unchecked")
 	public void readRow(ResultSet rs) throws SQLException {
 		resultList.add((T) rs.getObject(1));
+	}
+
+	@Override
+	public void readTuple(BindingSet bindingSet) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

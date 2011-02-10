@@ -32,7 +32,7 @@ import eionet.cr.util.export.SubjectExportEvent;
  * @author kaspeenr
  *
  */
-public abstract class ResultSetExportReader implements ResultSetReader{
+public abstract class ResultSetExportReader implements SQLResultSetReader{
 	
 	/** */
 	protected ResultSetMetaData rsMd = null;

@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
+import org.openrdf.query.BindingSet;
+
 import eionet.cr.common.Predicates;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.util.UriLabelPair;
@@ -111,5 +113,11 @@ public class DataflowPicklistReader extends ResultSetBaseReader{
 	public HashMap<String,ArrayList<UriLabelPair>> getResultMap(){
 		
 		return resultMap;
+	}
+
+	@Override
+	public void readTuple(BindingSet bindingSet) {
+		// TODO Auto-generated method stub
+		
 	}
 }

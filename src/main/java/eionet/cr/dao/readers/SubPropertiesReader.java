@@ -23,6 +23,8 @@ package eionet.cr.dao.readers;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.openrdf.query.BindingSet;
+
 import eionet.cr.dao.util.SubProperties;
 import eionet.cr.util.sql.ResultSetBaseReader;
 
@@ -54,5 +56,11 @@ public class SubPropertiesReader extends ResultSetBaseReader{
 	 */
 	public void readRow(ResultSet rs) throws SQLException {
 		subProperties.add(rs.getString("PREDICATE"), rs.getString("SUB_PROPERTY"));
+	}
+
+	@Override
+	public void readTuple(BindingSet bindingSet) {
+		// TODO Auto-generated method stub
+		
 	}
 }

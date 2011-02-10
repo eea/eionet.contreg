@@ -28,7 +28,7 @@ import org.dbunit.dataset.IDataSet;
 import org.junit.Test;
 
 import eionet.cr.common.Predicates;
-import eionet.cr.dao.postgre.helpers.FreeTextSearchHelper;
+import eionet.cr.dao.postgre.helpers.PostgreFreeTextSearchHelper;
 import eionet.cr.dao.util.SearchExpression;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
@@ -59,7 +59,7 @@ public class SearchDAOTest extends CRDatabaseTestCase{
 		
 		Pair<Integer, List<SubjectDTO>> result =
 			DAOFactory.get().getDao(SearchDAO.class).searchByFreeText(
-					new SearchExpression("KESKKONNAPOLIITIKA"), FreeTextSearchHelper.FilterType.ANY_OBJECT, pagingRequest, null);
+					new SearchExpression("KESKKONNAPOLIITIKA"), PostgreFreeTextSearchHelper.FilterType.ANY_OBJECT, pagingRequest, null);
 		
 		
 		assertEquals(1, result.getLeft().intValue());

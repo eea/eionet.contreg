@@ -27,6 +27,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.openrdf.query.BindingSet;
+
 /**
  * 
  * @author heinljab
@@ -43,11 +45,11 @@ public class SQLValueReader extends ResultSetListReader<Map<String,SQLValue>>{
 	 */
 	public void readRow(ResultSet rs) throws SQLException {
 		
-		int colCount = rsMd.getColumnCount();
+		int colCount = sqlResultSetMetadata.getColumnCount();
 		Map<String,SQLValue> rowMap = new HashMap<String,SQLValue>();
 		for (int i=1; i<=colCount; i++){
-			String colName = rsMd.getColumnName(i);
-			int colSQLType = rsMd.getColumnType(i);
+			String colName = sqlResultSetMetadata.getColumnName(i);
+			int colSQLType = sqlResultSetMetadata.getColumnType(i);
 			rowMap.put(colName, new SQLValue(rs.getObject(i), colSQLType));
 		}
 		if (rowMap.size()>0)
@@ -60,5 +62,11 @@ public class SQLValueReader extends ResultSetListReader<Map<String,SQLValue>>{
 	 */
 	public List<Map<String,SQLValue>> getResultList(){
 		return result.size()==0 ? null : result;
+	}
+
+	@Override
+	public void readTuple(BindingSet bindingSet) {
+		// TODO Auto-generated method stub
+		
 	}
 }

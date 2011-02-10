@@ -93,7 +93,7 @@ public class SQLUtil {
 	 * @param conn
 	 * @throws SQLException
 	 */
-	public static void executeQuery(String parameterizedSQL, List<?> values, ResultSetReader rsReader, Connection conn)
+	public static void executeQuery(String parameterizedSQL, List<?> values, SQLResultSetReader rsReader, Connection conn)
 																											throws SQLException, ExportException{
 		ResultSet rs = null;
 		PreparedStatement pstmt = null;

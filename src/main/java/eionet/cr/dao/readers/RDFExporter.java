@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.openrdf.query.BindingSet;
 
 import eionet.cr.common.Namespace;
 import eionet.cr.dao.DAOException;
@@ -241,5 +242,11 @@ public class RDFExporter extends ResultSetBaseReader {
 		Long rdfNamespaceHash = Long.valueOf(Hashes.spoHash(Namespace.RDF.getUri()));
 		namespacePrefixes.put(rdfNamespaceHash, Namespace.RDF.getPrefix());
 		namespaceUris.put(rdfNamespaceHash, Namespace.RDF.getUri());
+	}
+
+	@Override
+	public void readTuple(BindingSet bindingSet) {
+		// TODO Auto-generated method stub
+		
 	}
 }

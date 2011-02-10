@@ -23,30 +23,51 @@ package eionet.cr.util.sql;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.List;
+
+import org.openrdf.query.BindingSet;
+
+import eionet.cr.dao.readers.TupleResultSetReader;
 
 /**
  * 
  * @author heinljab
  *
  */
-public abstract class ResultSetBaseReader implements ResultSetReader{
+public abstract class ResultSetBaseReader implements SQLResultSetReader, TupleResultSetReader{
 	
 	/** */
-	protected ResultSetMetaData rsMd = null;
+	protected ResultSetMetaData sqlResultSetMetadata = null;
+	protected List<String> tupleResultSetBindingNames = null;
 
-	/**
-	 * 
-	 * @param rsMd
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.util.sql.SQLResultSetReader#setResultSetMetaData(java.sql.ResultSetMetaData)
 	 */
+	@Override
 	public void setResultSetMetaData(ResultSetMetaData rsMd){
-		this.rsMd = rsMd;
+		this.sqlResultSetMetadata = rsMd;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.util.sql.SQLResultSetReader#readRow(java.sql.ResultSet)
+	 */
+	@Override
+	public abstract void readRow(ResultSet rs) throws SQLException;
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.readers.TupleResultSetReader#setResultSetBindingNames()
+	 */
+	@Override
+	public void setResultSetBindingNames(){
 	}
 	
-	/**
-	 * 
-	 * @param rs
-	 * @throws SQLException 
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.readers.TupleResultSetReader#readTuple(org.openrdf.query.BindingSet)
 	 */
-	public abstract void readRow(ResultSet rs) throws SQLException;
-	
+	@Override
+	public abstract void readTuple(BindingSet bindingSet);
 }

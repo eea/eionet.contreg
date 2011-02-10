@@ -25,6 +25,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.openrdf.query.BindingSet;
+
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.sql.ResultSetListReader;
@@ -67,5 +69,11 @@ public class HarvestSourceDTOReader extends ResultSetListReader<HarvestSourceDTO
 	 */
 	public List<HarvestSourceDTO> getResultList() {
 		return resultList;
+	}
+
+	@Override
+	public void readTuple(BindingSet bindingSet) {
+		// TODO Auto-generated method stub
+		
 	}
 }

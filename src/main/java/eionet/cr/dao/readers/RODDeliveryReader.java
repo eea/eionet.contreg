@@ -31,6 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import org.openrdf.query.BindingSet;
+
 import eionet.cr.common.Predicates;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
@@ -128,5 +130,11 @@ public class RODDeliveryReader extends ResultSetBaseReader{
 	 */
 	public static Collection<Long> getPredicateHashes(){
 		return predicateUrisByHashes.keySet();
+	}
+
+	@Override
+	public void readTuple(BindingSet bindingSet) {
+		// TODO Auto-generated method stub
+		
 	}
 }

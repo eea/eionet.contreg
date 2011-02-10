@@ -26,6 +26,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.openrdf.query.BindingSet;
+
 import eionet.cr.dto.TripleDTO;
 import eionet.cr.util.sql.ResultSetListReader;
 
@@ -74,5 +76,11 @@ public class TriplesReader extends ResultSetListReader<TripleDTO>{
 	 */
 	public HashSet<Long> getDistinctHashes() {
 		return distinctHashes;
+	}
+
+	@Override
+	public void readTuple(BindingSet bindingSet) {
+		// TODO Auto-generated method stub
+		
 	}
 }

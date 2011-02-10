@@ -37,14 +37,14 @@ import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.SearchDAO;
-import eionet.cr.dao.postgre.helpers.FilteredSearchHelper;
-import eionet.cr.dao.postgre.helpers.FilteredTypeSearchHelper;
-import eionet.cr.dao.postgre.helpers.FreeTextSearchHelper;
-import eionet.cr.dao.postgre.helpers.ReferencesSearchHelper;
-import eionet.cr.dao.postgre.helpers.SearchBySourceHelper;
-import eionet.cr.dao.postgre.helpers.SearchByTagsHelper;
-import eionet.cr.dao.postgre.helpers.SearchHelper;
-import eionet.cr.dao.postgre.helpers.SpatialSearchHelper;
+import eionet.cr.dao.helpers.SearchHelper;
+import eionet.cr.dao.postgre.helpers.PostgreFilteredSearchHelper;
+import eionet.cr.dao.postgre.helpers.PostgreFilteredTypeSearchHelper;
+import eionet.cr.dao.postgre.helpers.PostgreFreeTextSearchHelper;
+import eionet.cr.dao.postgre.helpers.PostgreReferencesSearchHelper;
+import eionet.cr.dao.postgre.helpers.PostgreSearchBySourceHelper;
+import eionet.cr.dao.postgre.helpers.PostgreSearchByTagsHelper;
+import eionet.cr.dao.postgre.helpers.PostgreSpatialSearchHelper;
 import eionet.cr.dao.readers.FreeTextSearchDataReader;
 import eionet.cr.dao.readers.RODDeliveryReader;
 import eionet.cr.dao.readers.SubjectDataReader;
@@ -76,7 +76,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 	 */
 	public Pair<Integer, List<SubjectDTO>> searchByFreeText(
 			SearchExpression expression,
-			FreeTextSearchHelper.FilterType filterType,
+			PostgreFreeTextSearchHelper.FilterType filterType,
 			PagingRequest pagingRequest,
 			SortingRequest sortingRequest) throws DAOException{
 
@@ -101,12 +101,12 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 		}
 
 		// create query helper
-		FreeTextSearchHelper helper = new FreeTextSearchHelper(
+		PostgreFreeTextSearchHelper helper = new PostgreFreeTextSearchHelper(
 				expression, pgQuery, pagingRequest, sortingRequest);
 		
 		// Set Filter
-		if (filterType != FreeTextSearchHelper.FilterType.ANY_OBJECT
-			&& filterType != FreeTextSearchHelper.FilterType.EXACT_MATCH){
+		if (filterType != PostgreFreeTextSearchHelper.FilterType.ANY_OBJECT
+			&& filterType != PostgreFreeTextSearchHelper.FilterType.EXACT_MATCH){
 				helper.setFilter(filterType);
 		}
 
@@ -170,7 +170,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 			PagingRequest pagingRequest, SortingRequest sortingRequest, List<String> selectedPredicates) throws DAOException {
 
 		// create query helper
-		FilteredSearchHelper helper = new FilteredSearchHelper(filters, literalPredicates,
+		PostgreFilteredSearchHelper helper = new PostgreFilteredSearchHelper(filters, literalPredicates,
 				pagingRequest, sortingRequest);
 		
 		// create the list of IN parameters of the query
@@ -242,7 +242,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 			List<String> selectedPredicates) throws DAOException {
 
 		// create query helper
-		FilteredTypeSearchHelper helper = new FilteredTypeSearchHelper(filters, literalPredicates,
+		PostgreFilteredTypeSearchHelper helper = new PostgreFilteredTypeSearchHelper(filters, literalPredicates,
 				pagingRequest, sortingRequest);
 		
 		// create the list of IN parameters of the query
@@ -322,7 +322,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 			PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException {
 		
 		// create query helper
-		ReferencesSearchHelper helper = new ReferencesSearchHelper(
+		PostgreReferencesSearchHelper helper = new PostgreReferencesSearchHelper(
 				subjectHash, pagingRequest, sortingRequest);
 		
 		// create the list of IN parameters of the query
@@ -384,7 +384,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 
 		
 		// create query helper
-		SpatialSearchHelper helper = new SpatialSearchHelper(box, sourceUri,
+		PostgreSpatialSearchHelper helper = new PostgreSpatialSearchHelper(box, sourceUri,
 				pagingRequest, sortingRequest, sortByObjectHash);
 		
 		// create the list of IN parameters of the query
@@ -450,7 +450,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 		}
 
 		// create query helper
-		SearchBySourceHelper helper = new SearchBySourceHelper(sourceUrl,
+		PostgreSearchBySourceHelper helper = new PostgreSearchBySourceHelper(sourceUrl,
 				pagingRequest, sortingRequest);
 		
 		// create the list of IN parameters of the query
@@ -539,7 +539,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 			return new Pair<Integer, List<SubjectDTO>>(0, new LinkedList<SubjectDTO>());
 		}	
 		// create query helper
-		SearchByTagsHelper helper = new SearchByTagsHelper(tags, 
+		PostgreSearchByTagsHelper helper = new PostgreSearchByTagsHelper(tags, 
 				pagingRequest, sortingRequest);
 		
 		// create the list of IN parameters of the query

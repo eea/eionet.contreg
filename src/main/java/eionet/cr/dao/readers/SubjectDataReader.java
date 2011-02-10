@@ -29,6 +29,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.openrdf.query.BindingSet;
+
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Util;
@@ -46,6 +48,9 @@ public class SubjectDataReader extends ResultSetListReader<SubjectDTO>{
 	private Map<Long,SubjectDTO> subjectsMap;
 	
 	/** */
+	private List<String> subjectUris;
+	
+	/** */
 	private SubjectDTO currentSubject = null;
 	private String currentPredicate = null;
 	private Collection<ObjectDTO> currentObjects = null;
@@ -56,6 +61,15 @@ public class SubjectDataReader extends ResultSetListReader<SubjectDTO>{
 	 * @param subjectsMap
 	 */
 	public SubjectDataReader(Map<Long,SubjectDTO> subjectsMap){
+		this.subjectsMap = subjectsMap;
+	}
+	
+	/**
+	 * 
+	 * @param subjectsMap
+	 * @param subjectUris
+	 */
+	public SubjectDataReader(Map<Long,SubjectDTO> subjectsMap, List<String> subjectUris){
 		this.subjectsMap = subjectsMap;
 	}
 	
@@ -142,5 +156,11 @@ public class SubjectDataReader extends ResultSetListReader<SubjectDTO>{
 	 */
 	public Map<Long, SubjectDTO> getSubjectsMap() {
 		return subjectsMap;
+	}
+
+	@Override
+	public void readTuple(BindingSet bindingSet) {
+		// TODO Auto-generated method stub
+		
 	}
 }

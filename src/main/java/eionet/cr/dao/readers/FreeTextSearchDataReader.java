@@ -20,6 +20,7 @@
 * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.dao.readers;
 
+import java.util.List;
 import java.util.Map;
 
 import eionet.cr.dto.SubjectDTO;
@@ -36,6 +37,18 @@ public class FreeTextSearchDataReader extends SubjectDataReader {
 	public FreeTextSearchDataReader(Map<Long,SubjectDTO> subjectsMap, Map<Long,Long> hitSources){
 		
 		super(subjectsMap);
+		this.hitSources = hitSources;
+	}
+	
+	/**
+	 * 
+	 * @param subjectsMap
+	 * @param hitSources
+	 * @param subjectUris
+	 */
+	public FreeTextSearchDataReader(Map<Long,SubjectDTO> subjectsMap, Map<Long,Long> hitSources, List<String> subjectUris){
+		
+		super(subjectsMap, subjectUris);
 		this.hitSources = hitSources;
 	}
 	

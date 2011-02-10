@@ -24,6 +24,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
+import org.openrdf.query.BindingSet;
+
 import eionet.cr.util.sql.ResultSetBaseReader;
 
 /**
@@ -52,6 +54,12 @@ public class UriHashesReader extends ResultSetBaseReader{
 	public void readRow(ResultSet rs) throws SQLException {
 		
 		urisByHashes.put(Long.valueOf(rs.getLong("URI_HASH")), rs.getString("URI"));
+	}
+
+	@Override
+	public void readTuple(BindingSet bindingSet) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

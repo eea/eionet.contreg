@@ -24,6 +24,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
+import org.openrdf.query.BindingSet;
+
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.sql.ResultSetBaseReader;
@@ -57,5 +59,11 @@ public class MinimalSubjectReader extends ResultSetBaseReader{
 			subjectsMap.put(hash, new SubjectDTO(
 					rs.getString("URI"), YesNoBoolean.parse(rs.getString("ANON_SUBJ"))));
 		}
+	}
+
+	@Override
+	public void readTuple(BindingSet bindingSet) {
+		// TODO Auto-generated method stub
+		
 	}
 }

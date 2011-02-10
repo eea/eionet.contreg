@@ -29,6 +29,7 @@ import java.util.Map.Entry;
 import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.common.CRRuntimeException;
+import eionet.cr.dao.helpers.AbstractSearchHelper;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.URIUtil;
@@ -40,7 +41,7 @@ import eionet.cr.web.util.columns.SubjectLastModifiedColumn;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class FilteredSearchHelper extends AbstractSearchHelper{
+public class PostgreFilteredSearchHelper extends AbstractSearchHelper{
 	
 	/** */
 	private Map<String, String> filters;
@@ -53,7 +54,7 @@ public class FilteredSearchHelper extends AbstractSearchHelper{
 	 * @param pagingRequest
 	 * @param sortingRequest
 	 */
-	public FilteredSearchHelper(Map<String, String> filters, Set<String> literalPredicates,
+	public PostgreFilteredSearchHelper(Map<String, String> filters, Set<String> literalPredicates,
 			PagingRequest pagingRequest, SortingRequest sortingRequest){
 		
 		super(pagingRequest, sortingRequest);

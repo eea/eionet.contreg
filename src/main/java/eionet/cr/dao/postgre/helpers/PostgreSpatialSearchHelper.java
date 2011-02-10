@@ -26,6 +26,7 @@ import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
+import eionet.cr.dao.helpers.AbstractSearchHelper;
 import eionet.cr.dao.util.BBOX;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.SortingRequest;
@@ -36,7 +37,7 @@ import eionet.cr.util.pagination.PagingRequest;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class SpatialSearchHelper extends AbstractSearchHelper{
+public class PostgreSpatialSearchHelper extends AbstractSearchHelper{
 
 	/** */
 	private BBOX box;
@@ -51,7 +52,7 @@ public class SpatialSearchHelper extends AbstractSearchHelper{
 	 * @param pagingRequest
 	 * @param sortingRequest
 	 */
-	public SpatialSearchHelper(BBOX box, String sourceUri,
+	public PostgreSpatialSearchHelper(BBOX box, String sourceUri,
 			PagingRequest pagingRequest, SortingRequest sortingRequest, boolean sortByObjectHash){
 		
 		super(pagingRequest, sortingRequest);

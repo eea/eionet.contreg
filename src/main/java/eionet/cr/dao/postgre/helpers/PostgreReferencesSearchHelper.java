@@ -23,6 +23,7 @@ package eionet.cr.dao.postgre.helpers;
 import java.util.List;
 
 import eionet.cr.common.Predicates;
+import eionet.cr.dao.helpers.AbstractSearchHelper;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.pagination.PagingRequest;
@@ -33,7 +34,7 @@ import eionet.cr.web.util.columns.ReferringPredicatesColumn;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class ReferencesSearchHelper extends AbstractSearchHelper{
+public class PostgreReferencesSearchHelper extends AbstractSearchHelper{
 
 	/** */
 	private Long subjectHash;
@@ -44,7 +45,7 @@ public class ReferencesSearchHelper extends AbstractSearchHelper{
 	 * @param pagingRequest
 	 * @param sortingRequest
 	 */
-	public ReferencesSearchHelper(Long subjectHash,
+	public PostgreReferencesSearchHelper(Long subjectHash,
 			PagingRequest pagingRequest, SortingRequest sortingRequest){
 
 		super(pagingRequest, sortingRequest);

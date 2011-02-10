@@ -25,9 +25,9 @@ public class VirtuosoHarvesterActionBean extends AbstractActionBean {
 	
 	public Resolution harvest() throws DAOException {
 		
-		String url = GeneralConfig.getProperty("virtuoso.db.url");
-		String username = GeneralConfig.getProperty("virtuoso.db.username");
-		String password = GeneralConfig.getProperty("virtuoso.db.password");
+		String url = GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_URL);
+		String username = GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_USR);
+		String password = GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_PWD);
 		
 		VirtGraph graph = new VirtGraph ("CR3", url, username, password);
 		graph.clear ();

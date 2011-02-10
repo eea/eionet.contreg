@@ -7,7 +7,7 @@ import java.util.Map;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.ExporterDAO;
-import eionet.cr.dao.postgre.helpers.FilteredTypeSearchHelper;
+import eionet.cr.dao.postgre.helpers.PostgreFilteredTypeSearchHelper;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Util;
 import eionet.cr.util.sql.ResultSetExportReader;
@@ -24,7 +24,7 @@ public class PostgreSQLExporterDAO extends PostgreSQLBaseDAO implements Exporter
 			ResultSetExportReader reader) throws DAOException {
 
 		// create query helper
-		FilteredTypeSearchHelper helper = new FilteredTypeSearchHelper(filters, null,
+		PostgreFilteredTypeSearchHelper helper = new PostgreFilteredTypeSearchHelper(filters, null,
 				null, null);
 
 		// create the list of IN parameters of the query

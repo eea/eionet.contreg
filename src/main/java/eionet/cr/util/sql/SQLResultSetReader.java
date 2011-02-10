@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 import eionet.cr.util.export.ExportException;
 
-public interface ResultSetReader {
+public interface SQLResultSetReader {
 
 	public void setResultSetMetaData(ResultSetMetaData rsMd);
 
