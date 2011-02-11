@@ -42,6 +42,7 @@ import net.sourceforge.stripes.validation.ValidationMethod;
 import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.common.Predicates;
+import eionet.cr.common.Subjects;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
@@ -656,4 +657,36 @@ public class FactsheetActionBean extends AbstractActionBean{
 		
 		return uri==null ? false : CurrentHarvests.contains(uri);
 	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isMapDisplayable(){
+		
+		if (subject!=null){
+			
+			Collection<ObjectDTO> objects = subject.getObjects(Predicates.RDF_TYPE, ObjectDTO.Type.RESOURCE);
+			if (objects!=null){
+				
+				boolean isWgsPoint = false;
+				for (ObjectDTO objectDTO : objects){
+					if (objectDTO.getValue()!=null && objectDTO.equals(Subjects.WGS_POINT)){
+						isWgsPoint = true;
+						break;
+					}
+				}
+				
+				if (isWgsPoint){
+					
+					if (subject.getObject(Predicates.WGS_LAT)!=null && subject.getObject(Predicates.WGS_LONG)!=null){
+						return true;
+					}
+				}
+			}
+		}
+		
+		return false;
+	}
+	
 }
