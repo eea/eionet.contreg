@@ -54,7 +54,6 @@ import eionet.cr.harvest.PullHarvest;
 import eionet.cr.harvest.PushHarvest;
 import eionet.cr.harvest.VirtuosoPullHarvest;
 import eionet.cr.harvest.persist.PersisterFactory;
-import eionet.cr.harvest.persist.mysql.MySQLDefaultPersister;
 import eionet.cr.util.EMailSender;
 import eionet.cr.util.Util;
 import eionet.cr.web.security.CRUser;
@@ -110,7 +109,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 			deleteSourcesQueuedForRemoval();			
 			harvestUrgentQueue();
 
-			if (isBatchHarvestingEnabled() && isBatchHarvestingHour()){
+			if (isBatchHarvestingEnabled()){
 				
 				loadBatchHarvestingQueue();
 				harvestBatchQueue();
@@ -138,22 +137,25 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 	 */
 	private void harvestBatchQueue() throws DAOException{
 		
-		if (isBatchHarvestingEnabled() && isBatchHarvestingHour()){
+		if (isBatchHarvestingEnabled()){
 			
 			if (batchHarvestingQueue!=null && !batchHarvestingQueue.isEmpty()){
 				
 				for (Iterator<HarvestSourceDTO> i=batchHarvestingQueue.iterator(); i.hasNext();){
 					
 					HarvestSourceDTO harvestSource = i.next();
-					i.remove();
-					if (batchHarvestingQueue.isEmpty()){
-						refreshNextScheduledSources();
-					}
-					
-					pullHarvest(harvestSource, false);
-					
-					if (!isBatchHarvestingEnabled() || !isBatchHarvestingHour()){
-						break;
+					boolean lessThan8Hours = harvestSource.getIntervalMinutes().intValue() < 480;
+					if(lessThan8Hours || isBatchHarvestingHour()){
+						i.remove();
+						if (batchHarvestingQueue.isEmpty()){
+							refreshNextScheduledSources();
+						}
+						
+						pullHarvest(harvestSource, false);
+						
+						if (!isBatchHarvestingEnabled()){
+							break;
+						}
 					}
 				}
 			}

@@ -20,11 +20,11 @@
 		<stripes:form action="/virtuosoQuery.action" method="post" name="f">
 			<table width="470" border="0">
 				<tr>
-					<td>
+					<td valign="top">
 						<stripes:label for="query">Query:</stripes:label>
 					</td>
 					<td>
-						<stripes:textarea name="query" id="query" cols="45" rows="4"></stripes:textarea><br/>
+						<stripes:textarea name="query" id="query" cols="75" rows="8"></stripes:textarea><br/>
 					</td>
 				</tr>
 				<tr>
