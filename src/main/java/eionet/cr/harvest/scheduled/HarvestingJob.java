@@ -144,6 +144,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
 				for (Iterator<HarvestSourceDTO> i=batchHarvestingQueue.iterator(); i.hasNext();){
 					
 					HarvestSourceDTO harvestSource = i.next();
+					//For sources where interval is less than 8 hours, the batch harvesting hours doesn't apply. They are always harvested.
 					boolean lessThan8Hours = harvestSource.getIntervalMinutes().intValue() < 480;
 					if(lessThan8Hours || isBatchHarvestingHour()){
 						i.remove();
