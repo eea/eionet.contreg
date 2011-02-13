@@ -22,42 +22,46 @@ package eionet.cr.util.sql;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.LinkedList;
-import java.util.List;
 
+import org.openrdf.query.Binding;
 import org.openrdf.query.BindingSet;
 
+import eionet.cr.dao.readers.ResultSetMixedReader;
+import eionet.cr.dao.readers.ResultSetReaderException;
+
 /**
- * @author Aleksandr Ivanov
- * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
+ * 
+ * @author jaanus
+ *
+ * @param <T>
  */
-public class SingleObjectReader<T> extends ResultSetListReader<T> {
-	
-	private List<T> resultList = new LinkedList<T>();
+public class SingleObjectReader<T> extends ResultSetMixedReader<T> {
 
-	/** 
-	 * @see eionet.cr.util.sql.ResultSetListReader#getResultList()
-	 * {@inheritDoc}
-	 */
-	@Override
-	public List<T> getResultList() {
-		return resultList;
-	}
-
-	/** 
-	 * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
-	 * {@inheritDoc}
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.util.sql.SQLResultSetReader#readRow(java.sql.ResultSet)
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public void readRow(ResultSet rs) throws SQLException {
+	public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
 		resultList.add((T) rs.getObject(1));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
+	 */
+	@SuppressWarnings("unchecked")
 	@Override
-	public void readTuple(BindingSet bindingSet) {
-		// TODO Auto-generated method stub
+	public void readRow(BindingSet bindingSet) {
 		
-	}
+		if (bindingSet!=null && bindingSet.size()>0){
 
+			Binding binding = bindingSet.iterator().next();
+			if (binding!=null){
+
+				resultList.add((T)binding.getValue().stringValue());
+			}
+		}
+	}
 }

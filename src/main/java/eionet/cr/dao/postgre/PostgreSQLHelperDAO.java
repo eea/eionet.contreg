@@ -40,8 +40,8 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -53,6 +53,7 @@ import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.readers.DataflowPicklistReader;
 import eionet.cr.dao.readers.PredicateLabelsReader;
 import eionet.cr.dao.readers.RDFExporter;
+import eionet.cr.dao.readers.ResultSetReaderException;
 import eionet.cr.dao.readers.SubPropertiesReader;
 import eionet.cr.dao.readers.SubjectDataReader;
 import eionet.cr.dao.readers.TriplesReader;
@@ -80,6 +81,7 @@ import eionet.cr.util.Util;
 import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.util.sql.PairReader;
+import eionet.cr.util.sql.SQLResultSetReader;
 import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
 import eionet.cr.web.security.CRUser;
@@ -116,7 +118,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		
 		Connection conn = null;
 		try{
-			conn = getConnection();
+			conn = getSQLConnection();
 			SQLUtil.executeUpdate(insertResourceSQL, values, conn);
 		}
 		catch (SQLException e){
@@ -147,7 +149,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try{
-			conn = getConnection();
+			conn = getSQLConnection();
 			pstmt = conn.prepareStatement(tripleInsertSQL);
 
 			boolean doExecuteBatch = false;
@@ -216,7 +218,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		Statement stmt = null;
 		Connection conn = null;
 		try{
-			conn = getConnection();
+			conn = getSQLConnection();
 			stmt = conn.createStatement();
 			
 			for (TripleDTO triple : triples){
@@ -273,7 +275,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		try{
 			/* get the DublinCore properties */
 			
-			conn = getConnection();
+			conn = getSQLConnection();
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(getDCPropertiesSQL);			
 			List<String> dcPropertiesHashes = new ArrayList<String>();
@@ -334,7 +336,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		ResultSet rs = null;
 		try{
 			if (conn==null){
-				conn = getConnection();
+				conn = getSQLConnection();
 				closeConnection = true;
 			}
 			stmt = conn.createStatement();
@@ -384,7 +386,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		try{
-			conn = getConnection();
+			conn = getSQLConnection();
 			
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setLong(1, Hashes.spoHash(Predicates.RDF_TYPE));
@@ -449,7 +451,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 			return Collections.emptyList();
 		}
 		
-		List<String> resultList = executeQuery(
+		List<String> resultList = executeSQL(
 				sqlPicklist,
 				Collections.singletonList((Object)Hashes.spoHash(predicateUri)),
 				new SingleObjectReader<String>());
@@ -485,12 +487,12 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		List<Long> predicateUris = null;
 		boolean useCache = true;
 		try{
-			predicateUris = executeQuery(
+			predicateUris = executeSQL(
 				getPredicatesUsedForTypeCache_SQL, values, new SingleObjectReader<Long>());
 		}
 		catch(DAOException e){
 			logger.warn("Cache tables are not created yet. Continue with spo table");
-			predicateUris = executeQuery(
+			predicateUris = executeSQL(
 				getPredicatesUsedForType_SQL, values, new SingleObjectReader<Long>());
 			useCache = false;
 		}
@@ -569,7 +571,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		Statement stmt = null;
 		ResultSet rs = null;
 		try{
-			conn = getConnection();
+			conn = getSQLConnection();
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(buf.toString());
 			while (rs.next()){
@@ -604,9 +606,19 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		params.add(Hashes.spoHash(Predicates.RDF_TYPE));
 		params.add(Hashes.spoHash(Subjects.WGS_POINT));
 		
-		return executeQuery(sql, params, new SingleObjectReader<String>());
+		return executeSQL(sql, params, new SingleObjectReader<String>());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#getSubject(java.lang.String)
+	 */
+	@Override
+	public SubjectDTO getSubject(String subjectUri) throws DAOException {
+		
+		return getSubject(Hashes.spoHash(subjectUri));
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.dao.HelperDAO#getSubject(java.lang.String)
@@ -641,7 +653,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 			append(" and SPO.LIT_OBJ='Y'").
 			append(" and SPO.SUBJECT=RESOURCE.URI_HASH");
 			
-			executeQuery(sqlBuf.toString(), new PredicateLabelsReader(predLabels));
+			executeSQL(sqlBuf.toString(), new PredicateLabelsReader(predLabels));
 		}
 		
 		return predLabels;
@@ -664,7 +676,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 			append(" and SPO.LIT_OBJ='N' and SPO.ANON_OBJ='N'").
 			append(" and SPO.SUBJECT=RESOURCE.URI_HASH");
 
-			executeQuery(sqlBuf.toString(), new SubPropertiesReader(subProperties));
+			executeSQL(sqlBuf.toString(), new SubPropertiesReader(subProperties));
 		}
 		
 		return subProperties;
@@ -708,7 +720,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		long startTime = System.currentTimeMillis();
 		logger.trace("Recent uploads search, executing subject finder query: " + sqlBuf.toString());
 
-		executeQuery(sqlBuf.toString(), pairReader);
+		executeSQL(sqlBuf.toString(), pairReader);
 		List<Pair<Long,Long>> pairList = pairReader.getResultList();
 		
 		Collection<SubjectDTO> result = new LinkedList<SubjectDTO>();
@@ -771,7 +783,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		
 		// execute SQL query
 		SingleObjectReader<Long> reader = new SingleObjectReader<Long>();
-		executeQuery(sqlBuf.toString(), inParameters, reader);
+		executeSQL(sqlBuf.toString(), inParameters, reader);
 		List<Long> resultList = reader.getResultList();
 		
 		// if result list null or empty, return
@@ -807,7 +819,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try{
-			conn = getConnection();
+			conn = getSQLConnection();
 			stmt = conn.prepareStatement(getSubjectSchemaUriSQL);
 			stmt.setLong(1, Hashes.spoHash(subjectUri));
 			rs = stmt.executeQuery();
@@ -851,7 +863,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 	                                                                    throws DAOException {
 		
 		DataflowPicklistReader reader = new DataflowPicklistReader();
-		executeQuery(dataflowPicklistSQL, reader);
+		executeSQL(dataflowPicklistSQL, reader);
 		return reader.getResultMap();
 	}
 
@@ -875,7 +887,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		
 		Connection conn = null;
 		try{
-			conn = getConnection();
+			conn = getSQLConnection();
 			Object o = SQLUtil.executeSingleReturnValueQuery(
 					"select count(distinct SUBJECT) from SPO where SOURCE=" + sourceHash, conn);
 			return (o==null || StringUtils.isBlank(o.toString()))
@@ -908,7 +920,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		try{
 			SimpleDateFormat sdf = new SimpleDateFormat ("yyyy-MM-dd");
 			
-			conn = getConnection();
+			conn = getSQLConnection();
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(buf.toString());
 			while (rs.next()){
@@ -959,7 +971,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		try{
 			SimpleDateFormat sdf = new SimpleDateFormat ("yyyy-MM-dd hh:mm:ss");
 			
-			conn = getConnection();
+			conn = getSQLConnection();
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(buf.toString());
 			while (rs.next()){
@@ -1008,7 +1020,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		Statement stmt = null;
 		ResultSet rs = null;
 		try{
-			conn = getConnection();
+			conn = getSQLConnection();
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(buf.toString());
 			while (rs.next()){
@@ -1042,7 +1054,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		boolean returnValue = false;
 		
 		try{
-			conn = getConnection();
+			conn = getSQLConnection();
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(buf.toString());
 			if (rs.next()){
@@ -1086,12 +1098,12 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		
 		long startTime = System.currentTimeMillis();
 		logger.trace("updateTypeDataCache query is: " + getUpdateTypeData_SQL);		
-		execute(getUpdateTypeData_SQL, null);		
+		executeSQL(getUpdateTypeData_SQL, (SQLResultSetReader)null);		
 		logger.debug("updateTypeDataCache query took " + Util.durationSince(startTime));
 
 		startTime = System.currentTimeMillis();
 		logger.trace("updateTypeDataPredicatesCache query is: " + getUpdateTypePredicateData_SQL);
-		execute(getUpdateTypePredicateData_SQL, null);		
+		executeSQL(getUpdateTypePredicateData_SQL, (SQLResultSetReader)null);		
 		logger.debug("updateTypeDataPredicatesCache query took " + Util.durationSince(startTime));
 	}
 
@@ -1225,7 +1237,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		Statement stmt = null;
 		ResultSet rs = null;
 		try{
-			conn = getConnection();
+			conn = getSQLConnection();
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(dbQuery);
 			while (rs.next()){
@@ -1267,7 +1279,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		Statement stmt = null;
 		ResultSet rs = null;
 		try{
-			conn = getConnection();
+			conn = getSQLConnection();
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(dbQuery);
 			while (rs.next()){
@@ -1304,7 +1316,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		
 		Connection conn = null;
 		try{
-			conn = getConnection();
+			conn = getSQLConnection();
 
 			// if URL not yet in user history, add it there
 			
@@ -1382,7 +1394,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		ResultSet rs = null;
 		try{
 			SimpleDateFormat sdf = new SimpleDateFormat ("yyyy-MM-dd'T'hh:mm:ss");
-			conn = getConnection();
+			conn = getSQLConnection();
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(dbQuery);
 
@@ -1421,7 +1433,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		}
 		
 		TriplesReader reader = new TriplesReader();
-		List<TripleDTO> triples = executeQuery(buf.toString(), new LinkedList<Object>(), reader);
+		List<TripleDTO> triples = executeSQL(buf.toString(), new LinkedList<Object>(), reader);
 		
 		if (!triples.isEmpty() && !reader.getDistinctHashes().isEmpty()){
 			
@@ -1430,7 +1442,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 			append(Util.toCSV(reader.getDistinctHashes())).append(")");
 			
 			HashMap<Long,String> urisByHashes = new HashMap<Long, String>();
-			executeQuery(buf.toString(), new UriHashesReader(urisByHashes));
+			executeSQL(buf.toString(), new UriHashesReader(urisByHashes));
 			
 			if (!urisByHashes.isEmpty()){
 				
@@ -1463,7 +1475,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		Statement stmt = null;
 		ResultSet rs = null;
 		try{
-			conn = getConnection();
+			conn = getSQLConnection();
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(dbQuery);
 			while (rs.next()){
@@ -1494,7 +1506,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		Connection conn = null;
 		Statement stmt = null;
 		try{
-			conn = getConnection();
+			conn = getSQLConnection();
 			stmt = conn.createStatement();
 			stmt.execute(deleteQuery);
 		}
@@ -1606,7 +1618,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 			ResultSet rs = null;
 			ByteArrayInputStream byteArrayInputStream = null;
 			try{
-				conn = getConnection();
+				conn = getSQLConnection();
 				stmt = conn.prepareStatement(insertReviewContentQuery);
 				stmt.setLong(1, Hashes.spoHash(user.getReviewUri(reviewId)));
 				
@@ -1664,7 +1676,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		Statement stmt = null;
 		ResultSet rs = null;
 		try{
-			conn = getConnection();
+			conn = getSQLConnection();
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(dbQuery);
 			while (rs.next()){
@@ -1730,7 +1742,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		Statement stmt = null;
 		ResultSet rs = null;
 		try{
-			conn = getConnection();
+			conn = getSQLConnection();
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(dbQuery);
 			if (rs.next()){
@@ -1780,7 +1792,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		Connection conn = null;
 		Statement stmt = null;
 		try{
-			conn = getConnection();
+			conn = getSQLConnection();
 
 			if (deleteAttachments){
 				List<String> reviewAttachments = this.getReviewAttachmentList(user, reviewId);
@@ -1817,7 +1829,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		Statement stmt = null;
 		ResultSet rs = null;
 		try{
-			conn = getConnection();
+			conn = getSQLConnection();
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(dbQuery);
 			while (rs.next()){
@@ -1842,7 +1854,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		Connection conn = null;
 		Statement stmt = null;
 		try{
-			conn = getConnection();
+			conn = getSQLConnection();
 			SQLUtil.executeUpdate("DELETE FROM spo WHERE object_hash = "+Hashes.spoHash(attachmentUri), conn);
 			SQLUtil.executeUpdate("DELETE FROM spo_binary WHERE subject = "+Hashes.spoHash(attachmentUri), conn);
 		}
@@ -1863,7 +1875,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		Connection conn = null;
 		InputStream result = null;
 		try{
-			conn = getConnection();
+			conn = getSQLConnection();
 			PreparedStatement ps = conn.prepareStatement("SELECT object, datatype FROM spo_binary WHERE subject = ?");
 			ps.setLong(1, Hashes.spoHash(attachmentUri));
 			ResultSet rs = ps.executeQuery();
@@ -1896,7 +1908,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		Connection conn = null;
 		Statement stmt = null;
 		try{
-			conn = getConnection();
+			conn = getSQLConnection();
 			SQLUtil.executeUpdate(StringUtils.replace(
 					deleteTriplesOfSourceSQL, "?", String.valueOf(sourceHash)), conn);
 		}
@@ -1933,7 +1945,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		UploadDTOReader reader = new UploadDTOReader();
 		Connection conn = null;
 		try{
-			conn = getConnection();
+			conn = getSQLConnection();
 			SQLUtil.executeQuery(buf.toString(), reader, conn);
 			
 			// loop through all the found uploads and make sure they all have the label set
@@ -1955,6 +1967,9 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		catch (SQLException e){
 			throw new DAOException(e.toString(), e);
 		}
+		catch (ResultSetReaderException e) {
+			throw new DAOException(e.toString(), e);
+		}
 		finally{
 			SQLUtil.close(conn);
 		}
@@ -1972,7 +1987,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		
 		Connection conn = null;
 		try{
-			conn = getConnection();
+			conn = getSQLConnection();
 			Object o = SQLUtil.executeSingleReturnValueQuery(
 					"select count(*) from SPO where SUBJECT=" + Hashes.spoHash(subjectUri), conn);
 			return o!=null && Integer.parseInt(o.toString()) > 0;
@@ -2008,7 +2023,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		
 		try{
 			// do it in a transaction
-			conn = getConnection();
+			conn = getSQLConnection();
 			conn.setAutoCommit(false);
 			
 			// delete references from SPO and SPO_BINARY
@@ -2051,7 +2066,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		long time = System.currentTimeMillis();
 		
 		try{
-			conn = getConnection();
+			conn = getSQLConnection();
 			conn.setAutoCommit(false);
 			
 			stmt_SUBJECT = conn.prepareStatement("update SPO set SUBJECT=? where SUBJECT=?");
@@ -2153,7 +2168,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		Statement stmt = null;
 		ResultSet rs = null;
 		try{
-			conn = getConnection();
+			conn = getSQLConnection();
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(buf.toString());
 			PredicateDTO singleItem = null;
@@ -2183,7 +2198,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		Statement stmt = null;
 		ResultSet rs = null;
 		try{
-			conn = getConnection();
+			conn = getSQLConnection();
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(buf.toString());
 			while (rs.next()){
@@ -2210,7 +2225,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		.append("spo.source = " +reader.getSourceHash() )
 		.append(" AND spo.OBJ_DERIV_SOURCE = 0 ORDER BY spo.subject ASC");
 
-		executeQuery(buf.toString(), reader);
+		executeSQL(buf.toString(), reader);
 
 		
 	}
@@ -2230,7 +2245,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 		
 		Connection conn = null;
 		try{
-			conn = getConnection();
+			conn = getSQLConnection();
 			SQLUtil.executeUpdate(deleteTriplesOfPredicate, values, conn);
 		}
 		catch (SQLException e){

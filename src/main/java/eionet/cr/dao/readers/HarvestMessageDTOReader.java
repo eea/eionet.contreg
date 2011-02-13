@@ -22,29 +22,22 @@ package eionet.cr.dao.readers;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.openrdf.query.BindingSet;
 
 import eionet.cr.dto.HarvestMessageDTO;
-import eionet.cr.util.sql.ResultSetListReader;
+import eionet.cr.util.sql.SQLResultSetBaseReader;
 
 /**
  * 
  * @author heinljab
  *
  */
-public class HarvestMessageDTOReader extends ResultSetListReader<HarvestMessageDTO>{
-
-	/** */
-	List<HarvestMessageDTO> resultList = new ArrayList<HarvestMessageDTO>();
+public class HarvestMessageDTOReader extends SQLResultSetBaseReader<HarvestMessageDTO>{
 
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
 	 */
-	public void readRow(ResultSet rs) throws SQLException {
+	public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
 
 		HarvestMessageDTO harvestMessageDTO = new HarvestMessageDTO();
 		harvestMessageDTO.setHarvestId(new Integer(rs.getInt("HARVEST_ID")));
@@ -53,18 +46,5 @@ public class HarvestMessageDTOReader extends ResultSetListReader<HarvestMessageD
 		harvestMessageDTO.setStackTrace(rs.getString("STACK_TRACE"));
 		harvestMessageDTO.setHarvestMessageId(new Integer(rs.getInt("HARVEST_MESSAGE_ID")));
 		resultList.add(harvestMessageDTO);
-	}
-
-	/**
-	 * @return the resultListAAA
-	 */
-	public List<HarvestMessageDTO> getResultList() {
-		return resultList;
-	}
-
-	@Override
-	public void readTuple(BindingSet bindingSet) {
-		// TODO Auto-generated method stub
-		
 	}
 }

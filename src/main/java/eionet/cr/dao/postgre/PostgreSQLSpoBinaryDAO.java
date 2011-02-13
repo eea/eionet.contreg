@@ -69,7 +69,7 @@ public class PostgreSQLSpoBinaryDAO extends PostgreSQLBaseDAO implements SpoBina
 				throw new IllegalArgumentException("Content stream must not be null or empty");
 			}
 
-			conn = getConnection();
+			conn = getSQLConnection();
 			stmt = conn.prepareStatement(sqlAdd);
 			
 			stmt.setLong(1, dto.getSubjectHash());
@@ -120,7 +120,7 @@ public class PostgreSQLSpoBinaryDAO extends PostgreSQLBaseDAO implements SpoBina
 		PreparedStatement stmt = null;
 		Connection conn = null;
 		try{
-			conn = getConnection();
+			conn = getSQLConnection();
 			stmt = conn.prepareStatement(sqlGet);
 			stmt.setLong(1, Hashes.spoHash(subjectUri));
 			rs = stmt.executeQuery();
@@ -161,7 +161,7 @@ public class PostgreSQLSpoBinaryDAO extends PostgreSQLBaseDAO implements SpoBina
 		
 		Connection conn = null;
 		try{
-			conn = getConnection();
+			conn = getSQLConnection();
 			Object o = SQLUtil.executeSingleReturnValueQuery(sqlExists,
 					Collections.singletonList(Long.valueOf(Hashes.spoHash(subjectUri))), conn);
 			return o!=null && Integer.parseInt(o.toString()) > 0;

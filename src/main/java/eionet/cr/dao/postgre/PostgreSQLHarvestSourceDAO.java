@@ -168,13 +168,13 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
     	}
     	
     	int rowCount = 0;
-    	List<HarvestSourceDTO> list = executeQuery(sql, inParams, new HarvestSourceDTOReader());
+    	List<HarvestSourceDTO> list = executeSQL(sql, inParams, new HarvestSourceDTOReader());
     	if (list!=null && !list.isEmpty()){
     		
     		StringBuffer buf = new StringBuffer("select count(*) from (").
 			append(queryWithoutOrderAndLimit).append(") as foo");
     		
-    		rowCount = Integer.parseInt(executeQueryUniqueResult(buf.toString(),
+    		rowCount = Integer.parseInt(executeUniqueResultSQL(buf.toString(),
     				inParamsWithoutOrderAndLimit, new SingleObjectReader<Long>()).toString());
     	}
     	
@@ -209,7 +209,7 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
 		Connection conn = null;
 		try{
 			// execute the insert statement
-			conn = getConnection();
+			conn = getSQLConnection();
 			SQLUtil.executeUpdate(addSourceSQL, values, conn);
 			
 			// Get the freshly inserted record's ID.
@@ -250,7 +250,7 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
 		
 		Connection conn = null;
 		try{
-			conn = getConnection();
+			conn = getSQLConnection();
 			conn.setAutoCommit(false);
 			
 			Object o = SQLUtil.executeSingleReturnValueQuery(
@@ -285,7 +285,7 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
 		
 		Connection conn = null;
 		try{
-			conn = getConnection();
+			conn = getSQLConnection();
 			conn.setAutoCommit(false);
 			
 			String sql = "delete from SPO where SOURCE not in (select URL_HASH from HARVEST_SOURCE)";
@@ -319,11 +319,11 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
 		Connection conn = null;
 		try{
 			// start transaction
-			conn = getConnection();
+			conn = getSQLConnection();
 			conn.setAutoCommit(false);
 			
 			// get ID of the harvest source identified by the given URL
-			List<Long> sourceIds = executeQuery(
+			List<Long> sourceIds = executeSQL(
 					"select HARVEST_SOURCE_ID from HARVEST_SOURCE where URL_HASH = ?",
 					hashList,
 					new SingleObjectReader<Long>());
@@ -332,7 +332,7 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
 			// if harvest source ID found, delete harvests and harvest messages by it 
 			if (!StringUtils.isBlank(harvestSourceIdsCSV)){
 				
-				List<Long> harvestIds = executeQuery(
+				List<Long> harvestIds = executeSQL(
 					"select HARVEST_ID from HARVEST where HARVEST_SOURCE_ID in ("
 						+ harvestSourceIdsCSV + ")",
 					null,
@@ -391,7 +391,7 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
 		
 		Connection conn = null;
 		try{
-			conn = getConnection();
+			conn = getSQLConnection();
 			SQLUtil.executeUpdate(editSourceSQL, values, conn);
 		}
 		catch (Exception e){
@@ -413,7 +413,7 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
 		
     	List<Object> values = new ArrayList<Object>();
     	values.add(harvestSourceID);
-    	List<HarvestSourceDTO> list = executeQuery(
+    	List<HarvestSourceDTO> list = executeSQL(
     			getSourcesByIdSQL, values, new HarvestSourceDTOReader());
     	return (list!=null && !list.isEmpty()) ? list.get(0) : null;
 	}
@@ -428,7 +428,7 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
 		
 		List<Object> values = new ArrayList<Object>();
 		values.add(url);
-		List<HarvestSourceDTO> list = executeQuery(
+		List<HarvestSourceDTO> list = executeSQL(
 				getSourcesByUrlSQL, values, new HarvestSourceDTOReader());
 		return (list!=null && !list.isEmpty()) ? list.get(0) : null;
 	}
@@ -447,7 +447,7 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
 	 */
 	public List<HarvestSourceDTO> getNextScheduledSources(int numOfSegments) throws DAOException {
 		
-		Long numberOfSources = executeQueryUniqueResult(
+		Long numberOfSources = executeUniqueResultSQL(
 				"select count(*) from HARVEST_SOURCE",
 				null,
 				new SingleObjectReader<Long>());
@@ -459,7 +459,7 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
 		List<Object> values = new ArrayList<Object>();
     	values.add(new Integer(limit));
     	
-		return executeQuery(getNextScheduledSourcesSQL, values, new HarvestSourceDTOReader());
+		return executeSQL(getNextScheduledSourcesSQL, values, new HarvestSourceDTOReader());
 	}
 
 	/*
@@ -468,7 +468,7 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
 	 */
 	public List<String> getScheduledForDeletion() throws DAOException {
 		
-		return executeQuery("select URL from REMOVE_SOURCE_QUEUE",
+		return executeSQL("select URL from REMOVE_SOURCE_QUEUE",
 				null, new SingleObjectReader<String>());
 	}
 
@@ -491,7 +491,7 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
     		}
     		params.add(url);
     	}
-    	execute(sql.toString(), params);
+    	executeSQL(sql.toString(), params);
 	}
 
 	/** */
@@ -520,7 +520,7 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
 		
 		Connection conn = null;
 		try{
-			conn = getConnection();
+			conn = getSQLConnection();
 			SQLUtil.executeUpdate(sourceAvailable!=null ? updateHarvestFinishedSQL_avail : updateHarvestFinishedSQL, values, conn);
 		}
 		catch (Exception e){

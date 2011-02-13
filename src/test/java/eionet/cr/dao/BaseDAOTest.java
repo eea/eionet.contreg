@@ -115,8 +115,8 @@ public class BaseDAOTest  extends CRDatabaseTestCase {
 		protected List<SubjectDTO> getSubjectsData(Map<Long,SubjectDTO> subjectsMap) throws DAOException{
 			return super.getSubjectsData(subjectsMap);
 		}
-		protected Connection getConnection() throws SQLException{
-			return super.getConnection();
+		protected Connection getSQLConnection() throws SQLException{
+			return super.getSQLConnection();
 		}
 	}
 	

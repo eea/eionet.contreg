@@ -28,6 +28,7 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper{
 			PagingRequest pagingRequest, SortingRequest sortingRequest) {
 		
 		super(pagingRequest, sortingRequest);
+		this.expression = expression;
 	}
 
 	/* (non-Javadoc)
@@ -35,8 +36,7 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper{
 	 */
 	@Override
 	protected String getOrderedQuery(List<Object> inParams) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("Method not implemented");
 	}
 
 	/* (non-Javadoc)
@@ -44,8 +44,12 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper{
 	 */
 	@Override
 	public String getUnorderedQuery(List<Object> inParams) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		StringBuilder strBuilder = new StringBuilder().
+		append("select distinct ?s where {?s ?p ?o . ?o bif:contains \"").
+		append(expression.toString()).append("\".}");
+		
+		return strBuilder.toString();
 	}
 
 	/* (non-Javadoc)
@@ -53,8 +57,12 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper{
 	 */
 	@Override
 	public String getCountQuery(List<Object> inParams) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		StringBuilder strBuilder = new StringBuilder().
+		append("select count(distinct ?s) where {?s ?p ?o . ?o bif:contains \"").
+		append(expression.toString()).append("\".}");
+		
+		return strBuilder.toString();
 	}
 
 	/* (non-Javadoc)
@@ -62,8 +70,7 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper{
 	 */
 	@Override
 	public String getMinMaxHashQuery(List<Object> inParams) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("Method not implemented");
 	}
 
 }

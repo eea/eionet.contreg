@@ -135,6 +135,14 @@ public interface HelperDAO extends DAO {
 	
 	/**
 	 * 
+	 * @param subjectUri
+	 * @return
+	 * @throws DAOException
+	 */
+	SubjectDTO getSubject(String subjectUri) throws DAOException;
+	
+	/**
+	 * 
 	 * @param subjectHashes
 	 * @return
 	 * @throws DAOException

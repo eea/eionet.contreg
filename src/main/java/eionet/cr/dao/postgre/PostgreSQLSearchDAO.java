@@ -120,7 +120,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 		logger.trace("Free-text search, executing subject finder query: " + query);
 
 		// execute the query, with the IN parameters
-		List<Pair<Long,Long>> list = executeQuery(query, inParams, new PairReader<Long,Long>());
+		List<Pair<Long,Long>> list = executeSQL(query, inParams, new PairReader<Long,Long>());
 
 		logger.debug("Free-text search, find subjects query time " + Util.durationSince(startTime));
 
@@ -183,7 +183,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 		logger.trace("Search by filters, executing subject finder query: " + query);
 		
 		// execute the query, with the IN parameters
-		List<Long> list = executeQuery(query, inParams, new SingleObjectReader<Long>());
+		List<Long> list = executeSQL(query, inParams, new SingleObjectReader<Long>());
 
 		logger.debug("Search by filters, find subjects query time " + Util.durationSince(startTime));
 
@@ -260,13 +260,13 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 			logger.trace("Search by type and filters, executing subject finder query: " + query);
 
 			// execute the query, with the IN parameters
-			list = executeQuery(query, inParams, new SingleObjectReader<Long>());
+			list = executeSQL(query, inParams, new SingleObjectReader<Long>());
 		}
 		catch(DAOException e){
 			logger.warn("Cache tables are not created yet. Continue with spo table" + e.getMessage());
 			helper.setUseCache(false);
 			logger.trace("Search by type and filters, executing subject finder query: " + query);
-			list = executeQuery(query, inParams, new SingleObjectReader<Long>());
+			list = executeSQL(query, inParams, new SingleObjectReader<Long>());
 		}
 
 		logger.debug("Search by type and filters, find subjects query time " + Util.durationSince(startTime));
@@ -335,7 +335,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 		logger.trace("Search references, executing subject finder query: " + query);
 
 		// execute the query, with the IN parameters
-		List<Long> list = executeQuery(query, inParams, new SingleObjectReader<Long>());
+		List<Long> list = executeSQL(query, inParams, new SingleObjectReader<Long>());
 		
 		int totalRowCount = 0;
 		List<SubjectDTO> subjects = new ArrayList<SubjectDTO>();
@@ -362,7 +362,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 				
 				logger.trace("Search references, executing rowcount query: " + query);
 				
-				totalRowCount = Integer.valueOf(executeQueryUniqueResult(query,
+				totalRowCount = Integer.valueOf(executeUniqueResultSQL(query,
 						inParams, new SingleObjectReader<Long>()).toString());
 			}
 		}
@@ -397,7 +397,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 		logger.trace("Spatial search, executing subject finder query: " + query);
 		
 		// execute the query, with the IN parameters
-		List<Long> list = executeQuery(query, inParams, new SingleObjectReader<Long>());
+		List<Long> list = executeSQL(query, inParams, new SingleObjectReader<Long>());
 		
 		int totalRowCount = 0;
 		List<SubjectDTO> subjects = new ArrayList<SubjectDTO>();
@@ -424,7 +424,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 				
 				logger.trace("Spatial search, executing rowcount query: " + query);
 
-				totalRowCount = Integer.valueOf(executeQueryUniqueResult(
+				totalRowCount = Integer.valueOf(executeUniqueResultSQL(
 						helper.getCountQuery(inParams),
 						inParams, new SingleObjectReader<Long>()).toString());
 			}
@@ -464,7 +464,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 		logger.trace("Search subjects in source, executing subject finder query: " + query);
 
 		// execute the query, with the IN parameters
-		List<Long> list = executeQuery(query, inParams, new SingleObjectReader<Long>());
+		List<Long> list = executeSQL(query, inParams, new SingleObjectReader<Long>());
 		
 		int totalRowCount = 0;
 		List<SubjectDTO> subjects = new ArrayList<SubjectDTO>();
@@ -491,7 +491,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 				
 				logger.trace("Search subjects in source, executing rowcount query: " + query);
 				
-				totalRowCount = Integer.valueOf(executeQueryUniqueResult(query,
+				totalRowCount = Integer.valueOf(executeUniqueResultSQL(query,
 						inParams, new SingleObjectReader<Long>()).toString());
 			}
 		}
@@ -526,7 +526,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 		logger.debug("Executing delivery search for ROD");
 
 		RODDeliveryReader reader = new RODDeliveryReader();
-		executeQuery(sBuilder.toString(), reader);
+		executeSQL(sBuilder.toString(), reader);
 		return reader.getResultVector();
 	}
 
@@ -552,7 +552,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 		logger.trace("Search by tags, executing subject finder query: " + query);
 		
 		// execute the query, with the IN parameters
-		List<Long> list = executeQuery(query, inParams, new SingleObjectReader<Long>());
+		List<Long> list = executeSQL(query, inParams, new SingleObjectReader<Long>());
 
 		logger.debug("Search by tags, find subjects query time " + Util.durationSince(startTime));
 
@@ -588,7 +588,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 			
 			logger.trace("Search by tags, executing rowcount query: " + query);
 			
-			totalRowCount = Integer.valueOf(executeQueryUniqueResult(query, inParams,
+			totalRowCount = Integer.valueOf(executeUniqueResultSQL(query, inParams,
 					new SingleObjectReader<Long>()).toString());
 		}
 
@@ -609,7 +609,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 		
 		// get the minimum and maximum hashes
 		ArrayList inParams = new ArrayList();
-		Pair minMaxPair = executeQueryUniqueResult(helper.getMinMaxHashQuery(inParams), inParams,
+		Pair minMaxPair = executeUniqueResultSQL(helper.getMinMaxHashQuery(inParams), inParams,
 				new PairReader<Long, Long>());
 		
 		long minHash = minMaxPair==null || minMaxPair.getLeft()==null ? 0 : (Long)minMaxPair.getLeft();
@@ -633,7 +633,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 	private int getExactRowCount(SearchHelper helper) throws DAOException{
 		
 		ArrayList inParams = new ArrayList();
-		return Integer.valueOf(executeQueryUniqueResult(helper.getCountQuery(inParams), inParams,
+		return Integer.valueOf(executeUniqueResultSQL(helper.getCountQuery(inParams), inParams,
 				new SingleObjectReader<Long>()).toString());
 	}
 

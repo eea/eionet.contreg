@@ -62,7 +62,7 @@ public class PostgreSQLUrgentHarvestQueueDAO extends PostgreSQLBaseDAO implement
 		
 		Connection conn = null;
 		try{
-			conn = getConnection();
+			conn = getSQLConnection();
 			SQLUtil.executeUpdate(buf.toString(), values, conn);
 		}
 		catch (Exception e){
@@ -92,7 +92,7 @@ public class PostgreSQLUrgentHarvestQueueDAO extends PostgreSQLBaseDAO implement
 		
 		Connection conn = null;
 		try{
-			conn = getConnection();
+			conn = getSQLConnection();
 			SQLUtil.executeUpdate(addPushHarvestSQL, values, conn);
 		}
 		catch (Exception e){
@@ -110,7 +110,7 @@ public class PostgreSQLUrgentHarvestQueueDAO extends PostgreSQLBaseDAO implement
 	 * @see eionet.cr.dao.HarvestQueueDAO#getUrgentHarvestQueue()
 	 */
 	public List<UrgentHarvestQueueItemDTO> getUrgentHarvestQueue() throws DAOException{
-		return executeQuery(getUrgentHarvestQueueSQL, new ArrayList<Object>(), new HarvestQueueItemDTOReader());
+		return executeSQL(getUrgentHarvestQueueSQL, new ArrayList<Object>(), new HarvestQueueItemDTOReader());
 	}
 
 	/*
@@ -121,7 +121,7 @@ public class PostgreSQLUrgentHarvestQueueDAO extends PostgreSQLBaseDAO implement
 		
 		Connection conn = null;
 		try{
-			conn = getConnection();
+			conn = getSQLConnection();
 			UrgentHarvestQueueItemDTO queueItem = peek(conn);
 			if (queueItem!=null)
 				deleteQueueItem(queueItem, conn);

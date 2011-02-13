@@ -33,8 +33,8 @@ import eionet.cr.util.Pair;
 import eionet.cr.util.Util;
 import eionet.cr.util.sql.DbConnectionProvider;
 import eionet.cr.util.sql.MySQLUtil;
-import eionet.cr.util.sql.ResultSetBaseReader;
-import eionet.cr.util.sql.ResultSetListReader;
+import eionet.cr.util.sql.SQLResultSetBaseReader;
+import eionet.cr.util.sql.SQLResultSetReader;
 import eionet.cr.util.sql.SQLUtil;
 
 /**
@@ -75,7 +75,7 @@ public abstract class MySQLBaseDAO {
 	 * @return result of the sql query
 	 * @throws DAOException
 	 */
-	protected <T> List<T> executeQuery(String sql, List<?> params, ResultSetListReader<T> reader) throws DAOException {
+	protected <T> List<T> executeQuery(String sql, List<?> params, SQLResultSetReader<T> reader) throws DAOException {
 		Connection conn = null;
 		try {
 			conn = getConnection();
@@ -97,7 +97,8 @@ public abstract class MySQLBaseDAO {
 	 * @param reader
 	 * @throws DAOException
 	 */
-	protected void executeQuery(String sql, ResultSetBaseReader reader) throws DAOException {
+	@SuppressWarnings("rawtypes")
+	protected void executeQuery(String sql, SQLResultSetReader reader) throws DAOException {
 		Connection conn = null;
 		try {
 			conn = getConnection();
@@ -146,7 +147,7 @@ public abstract class MySQLBaseDAO {
 	 * @return
 	 * @throws DAOException
 	 */
-	protected <T> Pair<Integer, List<T>> executeQueryWithRowCount(String sql, List<?> params, ResultSetListReader<T> reader) throws DAOException {
+	protected <T> Pair<Integer, List<T>> executeQueryWithRowCount(String sql, List<?> params, SQLResultSetReader<T> reader) throws DAOException {
 		
 		Connection conn = null;
 		try {
@@ -172,7 +173,7 @@ public abstract class MySQLBaseDAO {
 	 * @return
 	 * @throws DAOException
 	 */
-	protected <T> Pair<Integer, List<T>> executeQueryWithRowCount(String sql, ResultSetListReader<T> reader) throws DAOException {
+	protected <T> Pair<Integer, List<T>> executeQueryWithRowCount(String sql, SQLResultSetReader<T> reader) throws DAOException {
 		
 		Connection conn = null;
 		try {
@@ -197,7 +198,7 @@ public abstract class MySQLBaseDAO {
 	 * @return
 	 * @throws DAOException
 	 */
-	protected <T> T executeQueryUniqueResult(String sql, List<?> params, ResultSetListReader<T> reader) throws DAOException {
+	protected <T> T executeQueryUniqueResult(String sql, List<?> params, SQLResultSetReader<T> reader) throws DAOException {
 		List<T> result = executeQuery(sql, params, reader);
 		return result == null || result.isEmpty()
 				? null
@@ -212,7 +213,7 @@ public abstract class MySQLBaseDAO {
 	protected String getSubjectsDataQuery(Collection<Long> subjectHashes) {
 		
 		if (subjectHashes==null || subjectHashes.isEmpty())
-			throw new IllegalArgumentException("The subject hashes collection must be null or empty!");
+			throw new IllegalArgumentException("The subject hashes collection must not be null or empty!");
 
 		StringBuffer buf = new StringBuffer().
 		append("select distinct ").

@@ -28,7 +28,6 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HarvestMessageDAO;
 import eionet.cr.dao.readers.HarvestMessageDTOReader;
 import eionet.cr.dto.HarvestMessageDTO;
-import eionet.cr.util.sql.DbConnectionProvider;
 import eionet.cr.util.sql.SQLUtil;
 
 /**
@@ -47,7 +46,7 @@ public class PostgreSQLHarvestMessageDAO extends PostgreSQLBaseDAO implements Ha
 	public List<HarvestMessageDTO> findHarvestMessagesByHarvestID(int harvestID) throws DAOException {
 		List<Object> values = new ArrayList<Object>();
 		values.add(new Integer(harvestID));
-		return executeQuery(q_HarvestMessageByHarvestID, values, new HarvestMessageDTOReader());
+		return executeSQL(q_HarvestMessageByHarvestID, values, new HarvestMessageDTOReader());
 	}
 	
 	/** */
@@ -60,7 +59,7 @@ public class PostgreSQLHarvestMessageDAO extends PostgreSQLBaseDAO implements Ha
 	public HarvestMessageDTO findHarvestMessageByMessageID(int messageID) throws DAOException {
 		List<Object> values = new ArrayList<Object>();
 		values.add(new Integer(messageID));
-		List<HarvestMessageDTO> list = executeQuery(q_HarvestMessageByMessageID, values, new HarvestMessageDTOReader());		
+		List<HarvestMessageDTO> list = executeSQL(q_HarvestMessageByMessageID, values, new HarvestMessageDTOReader());		
 		return list!=null && list.size()>0 ? list.get(0) : null;
 	}
 
@@ -73,8 +72,6 @@ public class PostgreSQLHarvestMessageDAO extends PostgreSQLBaseDAO implements Ha
 	 */
 	public Integer insertHarvestMessage(HarvestMessageDTO harvestMessageDTO) throws DAOException {
 		
-		Integer harvestMessageID = null;
-		
 		if (harvestMessageDTO==null)
 			return null;
 		
@@ -86,7 +83,7 @@ public class PostgreSQLHarvestMessageDAO extends PostgreSQLBaseDAO implements Ha
 		
 		Connection conn = null;
 		try{
-			conn = getConnection();
+			conn = getSQLConnection();
 			return SQLUtil.executeUpdateReturnAutoID(q_insertHarvestMessage, values, conn);
 		}
 		catch (Exception e){
@@ -112,7 +109,7 @@ public class PostgreSQLHarvestMessageDAO extends PostgreSQLBaseDAO implements Ha
 		
 		Connection conn = null;
 		try{
-			conn = getConnection();
+			conn = getSQLConnection();
 			SQLUtil.executeUpdate(deleteHarvestMessageSQL, values, conn);
 		}
 		catch (Exception e){

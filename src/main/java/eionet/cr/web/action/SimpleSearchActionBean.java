@@ -108,7 +108,7 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 
     			this.isUri = true;
     			SubjectDTO subject = DAOFactory.get().getDao(HelperDAO.class).getSubject(
-    					Hashes.spoHash(searchExpression.toString()));
+    					searchExpression.toString());
     			if (subject!=null){
     				resultList = Collections.singleton(subject);
     				matchCount = 1;

@@ -30,8 +30,6 @@ import eionet.cr.dao.readers.HarvestDTOReader;
 import eionet.cr.dao.readers.HarvestWithMessageTypesReader;
 import eionet.cr.dto.HarvestDTO;
 import eionet.cr.harvest.util.HarvestMessageType;
-import eionet.cr.util.Hashes;
-import eionet.cr.util.sql.DbConnectionProvider;
 import eionet.cr.util.sql.SQLUtil;
 
 /**
@@ -50,7 +48,7 @@ public class PostgreSQLHarvestDAO extends PostgreSQLBaseDAO implements HarvestDA
 	public HarvestDTO getHarvestById(Integer harvestId) throws DAOException {
 		List<Object> values = new ArrayList<Object>();
     	values.add(harvestId);
-		List<HarvestDTO> list = executeQuery(getHarvestByIdSQL, values, new HarvestDTOReader());
+		List<HarvestDTO> list = executeSQL(getHarvestByIdSQL, values, new HarvestDTOReader());
 		return list!=null && list.size()>0 ? list.get(0) : null;
 	}
 
@@ -82,7 +80,7 @@ public class PostgreSQLHarvestDAO extends PostgreSQLBaseDAO implements HarvestDA
     	List<Object> values = new ArrayList<Object>();
     	values.add(harvestSourceId);
     	values.add(HarvestMessageType.values().length * maxDistinctHarvests);
-		return executeQuery(getHarvestsBySourceIdSQL, values, new HarvestWithMessageTypesReader(maxDistinctHarvests));		
+		return executeSQL(getHarvestsBySourceIdSQL, values, new HarvestWithMessageTypesReader(maxDistinctHarvests));		
     }
 
 	/** */
@@ -96,7 +94,7 @@ public class PostgreSQLHarvestDAO extends PostgreSQLBaseDAO implements HarvestDA
 
 		List<Object> values = new ArrayList<Object>();
     	values.add(harvestSourceId);
-		List<HarvestDTO> list = executeQuery(getLastHarvestBySourceIdSQL, values, new HarvestDTOReader());		
+		List<HarvestDTO> list = executeSQL(getLastHarvestBySourceIdSQL, values, new HarvestDTOReader());		
 		return list!=null && !list.isEmpty() ? list.get(0) : null;
 	}
 
@@ -117,7 +115,7 @@ public class PostgreSQLHarvestDAO extends PostgreSQLBaseDAO implements HarvestDA
 		
 		Connection conn = null;
 		try{
-			conn = getConnection();
+			conn = getSQLConnection();
 			return SQLUtil.executeUpdateReturnAutoID(insertStartedHarvestSQL, values, conn);
 		}
 		catch (Exception e){
@@ -150,7 +148,7 @@ public class PostgreSQLHarvestDAO extends PostgreSQLBaseDAO implements HarvestDA
 		
 		Connection conn = null;
 		try{
-			conn = getConnection();
+			conn = getSQLConnection();
 			SQLUtil.executeUpdate(updateFinishedHarvestSQL, values, conn);
 		}
 		catch (Exception e){

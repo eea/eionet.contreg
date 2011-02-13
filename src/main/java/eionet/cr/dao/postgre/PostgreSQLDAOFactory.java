@@ -86,7 +86,7 @@ public final class PostgreSQLDAOFactory extends DAOFactory{
 	 * (non-Javadoc)
 	 * @see eionet.cr.dao.DAOFactory#getDao(java.lang.Class)
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public <T extends DAO> T getDao(Class<T> implementedInterface) {
 		
 		//due to synchronization problems we have to create DAOs for each method invocation.

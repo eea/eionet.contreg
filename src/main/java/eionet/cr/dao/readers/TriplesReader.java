@@ -29,14 +29,13 @@ import java.util.List;
 import org.openrdf.query.BindingSet;
 
 import eionet.cr.dto.TripleDTO;
-import eionet.cr.util.sql.ResultSetListReader;
 
 /**
  * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class TriplesReader extends ResultSetListReader<TripleDTO>{
+public class TriplesReader extends ResultSetMixedReader<TripleDTO>{
 
 	/** */
 	private List<TripleDTO> resultList = new LinkedList<TripleDTO>();
@@ -56,7 +55,7 @@ public class TriplesReader extends ResultSetListReader<TripleDTO>{
 	 * (non-Javadoc)
 	 * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
 	 */
-	public void readRow(ResultSet rs) throws SQLException {
+	public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
 		
 		TripleDTO dto = new TripleDTO(rs.getLong("SUBJECT"),
 				rs.getLong("PREDICATE"), rs.getString("OBJECT"));
@@ -78,9 +77,13 @@ public class TriplesReader extends ResultSetListReader<TripleDTO>{
 		return distinctHashes;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
+	 */
 	@Override
-	public void readTuple(BindingSet bindingSet) {
-		// TODO Auto-generated method stub
+	public void readRow(BindingSet bindingSet) {
 		
+		// TODO Auto-generated method stub
 	}
 }

@@ -59,7 +59,7 @@ public class PostgreSQLExporterDAO extends PostgreSQLBaseDAO implements Exporter
 		Connection conn = null;
 		try{
 			if (conn==null){
-				conn = getConnection();
+				conn = getSQLConnection();
 			}
 
 			long startTime = System.currentTimeMillis();

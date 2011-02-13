@@ -29,20 +29,22 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.openrdf.model.Literal;
+import org.openrdf.model.Value;
 import org.openrdf.query.BindingSet;
 
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
+import eionet.cr.util.Hashes;
 import eionet.cr.util.Util;
 import eionet.cr.util.YesNoBoolean;
-import eionet.cr.util.sql.ResultSetListReader;
 
 /**
  * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class SubjectDataReader extends ResultSetListReader<SubjectDTO>{
+public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO>{
 
 	/** */
 	private Map<Long,SubjectDTO> subjectsMap;
@@ -61,6 +63,7 @@ public class SubjectDataReader extends ResultSetListReader<SubjectDTO>{
 	 * @param subjectsMap
 	 */
 	public SubjectDataReader(Map<Long,SubjectDTO> subjectsMap){
+		
 		this.subjectsMap = subjectsMap;
 	}
 	
@@ -70,14 +73,16 @@ public class SubjectDataReader extends ResultSetListReader<SubjectDTO>{
 	 * @param subjectUris
 	 */
 	public SubjectDataReader(Map<Long,SubjectDTO> subjectsMap, List<String> subjectUris){
+		
 		this.subjectsMap = subjectsMap;
+		this.subjectUris = subjectUris;
 	}
 	
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
 	 */
-	public void readRow(ResultSet rs) throws SQLException {
+	public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
 		
 		long subjectHash = rs.getLong("SUBJECT_HASH");
 		boolean newSubject = currentSubject==null || subjectHash!=currentSubject.getUriHash();
@@ -158,9 +163,63 @@ public class SubjectDataReader extends ResultSetListReader<SubjectDTO>{
 		return subjectsMap;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
+	 */
 	@Override
-	public void readTuple(BindingSet bindingSet) {
-		// TODO Auto-generated method stub
+	public void readRow(BindingSet bindingSet) {
 		
+		String subjectUri = bindingSet.getValue("s").stringValue();
+		long subjectHash = Hashes.spoHash(subjectUri);
+		
+		boolean newSubject = currentSubject==null || subjectHash!=currentSubject.getUriHash();
+		if (newSubject){
+			// TODO: fix isAnonymous flag
+			currentSubject = new SubjectDTO(subjectUri, false);
+			currentSubject.setUriHash(subjectHash);
+			addNewSubject(subjectHash, currentSubject);
+		}
+		
+		String predicateUri = bindingSet.getValue("p").stringValue();
+		boolean newPredicate = newSubject || currentPredicate==null || !currentPredicate.equals(predicateUri);
+		if (newPredicate){
+			currentPredicate = predicateUri;
+			currentObjects = new ArrayList<ObjectDTO>();
+			currentSubject.getPredicates().put(predicateUri, currentObjects);
+		}
+		
+		addPredicateHash(Long.valueOf(Hashes.spoHash(predicateUri)));
+		
+		Value objectValue = bindingSet.getValue("o");
+		boolean isLiteral = objectValue instanceof Literal;
+		String objectLang = isLiteral ? ((Literal)objectValue).getLanguage() : null;
+		
+		ObjectDTO object = new ObjectDTO(objectValue.stringValue(),
+				objectLang==null ? "" : objectLang,
+				isLiteral,
+				false); // TODO: fix anonymous flag
+		
+		object.setHash(Hashes.spoHash(objectValue.stringValue()));
+		
+		String sourceUri = bindingSet.getValue("g").stringValue();
+		long sourceHash = Hashes.spoHash(sourceUri);
+		
+		object.setSourceUri(sourceUri);
+		object.setSourceHash(sourceHash);
+		object.setDerivSourceUri(sourceUri);
+		object.setDerivSourceHash(sourceHash);
+		
+		// TODO: what about object's source object
+		// object.setSourceObjectHash(rs.getLong("OBJ_SOURCE_OBJECT"));
+		
+		currentObjects.add(object);
+	}
+
+	/**
+	 * @return the subjectUris
+	 */
+	public List<String> getSubjectUris() {
+		return subjectUris;
 	}
 }

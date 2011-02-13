@@ -20,14 +20,14 @@
  */
 package eionet.cr.util.export;
 
-import eionet.cr.common.CRException;
+import eionet.cr.dao.readers.ResultSetReaderException;
 
 /**
  * @author Enriko Käsper, TietoEnator Estonia AS
  * ExporterException
  */
 
-public class ExportException  extends CRException{
+public class ExportException  extends ResultSetReaderException{
 
 	/**
 	 * 

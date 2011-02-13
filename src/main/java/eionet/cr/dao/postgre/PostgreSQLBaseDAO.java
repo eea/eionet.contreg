@@ -21,12 +21,8 @@
 package eionet.cr.dao.postgre;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,13 +30,11 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import eionet.cr.dao.DAOException;
-import eionet.cr.dao.readers.SubjectDataReader;
+import eionet.cr.dao.SQLBaseDAO;
 import eionet.cr.dao.readers.MinimalSubjectReader;
+import eionet.cr.dao.readers.SubjectDataReader;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Util;
-import eionet.cr.util.sql.DbConnectionProvider;
-import eionet.cr.util.sql.ResultSetBaseReader;
-import eionet.cr.util.sql.ResultSetListReader;
 import eionet.cr.util.sql.SQLUtil;
 
 /**
@@ -48,135 +42,10 @@ import eionet.cr.util.sql.SQLUtil;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public abstract class PostgreSQLBaseDAO {
+public abstract class PostgreSQLBaseDAO extends SQLBaseDAO{
 
 	/** */
 	protected Logger logger = Logger.getLogger(PostgreSQLBaseDAO.class);
-	
-	/**
-	 * 
-	 * @param conn
-	 */
-	public void setConnection(Connection conn){
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	protected Connection getConnection() throws SQLException{
-		
-		return DbConnectionProvider.getConnection();
-	}
-	
-	/**
-	 * helper method to execute sql queries.
-	 * Handles connection init, close. Wraps Exceptions into {@link DAOException}
-	 * @param <T> - type of the returned object
-	 * @param sql - sql string
-	 * @param params - parameters to insert into sql string
-	 * @param reader - reader, to convert resultset
-	 * @return result of the sql query
-	 * @throws DAOException
-	 */
-	protected <T> List<T> executeQuery(String sql, List<?> params, ResultSetListReader<T> reader) throws DAOException {
-		Connection conn = null;
-		try {
-			conn = getConnection();
-			SQLUtil.executeQuery(sql, params, reader, conn);
-			List<T>  list = reader.getResultList();
-			return list;
-		}
-		catch (Exception e){
-			throw new DAOException(e.getMessage(), e);
-		}
-		finally{
-			SQLUtil.close(conn);
-		}
-	}
-
-	/**
-	 * 
-	 * @param sql
-	 * @param reader
-	 * @throws DAOException
-	 */
-	protected void executeQuery(String sql, ResultSetBaseReader reader) throws DAOException {
-		Connection conn = null;
-		try {
-			conn = getConnection();
-			SQLUtil.executeQuery(sql, reader, conn);
-		}
-		catch (Exception e){
-			throw new DAOException(e.getMessage(), e);
-		}
-		finally{
-			SQLUtil.close(conn);
-		}
-	}
-
-	/**
-	 * executes insert or update with given sql and parameters.
-	 * 
-	 * @param sql - sql string to execute
-	 * @param params - sql params
-	 * @throws DAOException
-	 */
-	protected void execute(String sql, List<?> params) throws DAOException {
-		Connection conn = null;
-		PreparedStatement statement = null;
-		try {
-			conn = getConnection();
-			if (params != null && !params.isEmpty()) {
-				statement  = SQLUtil.prepareStatement(sql, params, conn);
-				statement.execute();
-			} else {
-				SQLUtil.executeUpdate(sql, conn);
-			}
-		} catch (Exception e){
-			throw new DAOException(e.getMessage(), e);
-		} finally{
-			SQLUtil.close(conn);
-			SQLUtil.close(statement);
-		}
-	}
-
-	/**
-	 * 
-	 * @param <T>
-	 * @param sql
-	 * @param params
-	 * @param reader
-	 * @return
-	 * @throws DAOException
-	 */
-	protected <T> T executeQueryUniqueResult(String sql, List<?> params, ResultSetListReader<T> reader) throws DAOException {
-		List<T> result = executeQuery(sql, params, reader);
-		return result == null || result.isEmpty()
-				? null
-				: result.get(0);
-	}
-
-	/**
-	 * 
-	 * @param sql
-	 * @return
-	 * @throws DAOException
-	 */
-	protected Object executeSingleReturnValueQuery(String sql) throws DAOException {
-		
-		Connection conn = null;
-		try{
-			conn = getConnection();
-			return SQLUtil.executeSingleReturnValueQuery(sql, conn);
-		}
-		catch (SQLException e){
-			throw new DAOException(e.toString(), e);
-		}
-		finally{
-			SQLUtil.close(conn);
-		}
-	}
 	
 	/**
 	 * 
@@ -264,7 +133,7 @@ public abstract class PostgreSQLBaseDAO {
 				String query = getSubjectsDataQuery(list.subList(from, to), predicateHashes);
 
 				if (conn==null){
-					conn = getConnection();
+					conn = getSQLConnection();
 				}
 				
 				logger.trace("Goint to execute subjects data query:" + query);				
@@ -317,7 +186,7 @@ public abstract class PostgreSQLBaseDAO {
 		String query = getSubjectsDataQuery(subjectsSubQuery, predicateHashes);
 		logger.trace("Goint to execute subjects data query:" + query);				
 
-		executeQuery(query, reader);
+		executeSQL(query, reader);
 		logger.debug("getSubjectsData, total query time " + Util.durationSince(startTime));
 		return reader.getResultList();
 	}

@@ -4,11 +4,27 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
-import eionet.cr.util.export.ExportException;
+import eionet.cr.dao.readers.ResultSetReader;
+import eionet.cr.dao.readers.ResultSetReaderException;
 
-public interface SQLResultSetReader {
+/**
+ * 
+ * @author jaanus
+ *
+ */
+public interface SQLResultSetReader<T> extends ResultSetReader<T>{
 
-	public void setResultSetMetaData(ResultSetMetaData rsMd);
+	/**
+	 * 
+	 * @param resultSetMetaData
+	 */
+	public void startResultSet(ResultSetMetaData resultSetMetaData);
 
-	public void readRow(ResultSet rs) throws ExportException, SQLException;
+	/**
+	 * 
+	 * @param rs
+	 * @throws SQLException
+	 * @throws ResultSetReaderException TODO
+	 */
+	public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException;
 }

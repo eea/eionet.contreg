@@ -24,29 +24,22 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Vector;
 
 import org.openrdf.query.BindingSet;
 
 import eionet.cr.common.Predicates;
-import eionet.cr.dto.ObjectDTO;
-import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.YesNoBoolean;
-import eionet.cr.util.sql.ResultSetBaseReader;
-import eionet.cr.util.sql.ResultSetListReader;
 
 /**
  * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class RODDeliveryReader extends ResultSetBaseReader{
+@SuppressWarnings("rawtypes")
+public class RODDeliveryReader extends ResultSetMixedReader{
 	
 	/** */
 	private static HashMap<Long,String> predicateUrisByHashes;
@@ -78,7 +71,7 @@ public class RODDeliveryReader extends ResultSetBaseReader{
 	 * (non-Javadoc)
 	 * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
 	 */
-	public void readRow(ResultSet rs) throws SQLException {
+	public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
 
 		// get (or create and put) the subject's hashtable
 		Long subjectHash = Long.valueOf(rs.getLong("SUBJECT_HASH"));
@@ -132,9 +125,13 @@ public class RODDeliveryReader extends ResultSetBaseReader{
 		return predicateUrisByHashes.keySet();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
+	 */
 	@Override
-	public void readTuple(BindingSet bindingSet) {
-		// TODO Auto-generated method stub
+	public void readRow(BindingSet bindingSet) {
 		
+		// TODO Auto-generated method stub
 	}
 }

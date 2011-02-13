@@ -22,25 +22,20 @@ package eionet.cr.util.sql;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.LinkedList;
 import java.util.List;
 
-import org.openrdf.query.BindingSet;
-
+import eionet.cr.dao.readers.ResultSetReaderException;
 import eionet.cr.util.Pair;
 
 /**
  * @author Aleksandr Ivanov
  * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
-public class PairReader<T, T1> extends ResultSetListReader<Pair<T, T1>> {
+public class PairReader<T, T1> extends SQLResultSetBaseReader<Pair<T, T1>> {
 
 	/** */
 	public static final String LEFTCOL = "LCOL";
 	public static final String RIGHTCOL = "RCOL";
-	
-	/** */
-	private List<Pair<T,T1>> resultList = new LinkedList<Pair<T,T1>>();
 	
 	/** 
 	 * @see eionet.cr.util.sql.ResultSetListReader#getResultList()
@@ -57,14 +52,7 @@ public class PairReader<T, T1> extends ResultSetListReader<Pair<T, T1>> {
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public void readRow(ResultSet rs) throws SQLException {
+	public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
 		resultList.add(new Pair<T, T1>((T)rs.getObject(LEFTCOL), (T1)rs.getObject(RIGHTCOL)));
 	}
-
-	@Override
-	public void readTuple(BindingSet bindingSet) {
-		// TODO Auto-generated method stub
-		
-	}
-
 }

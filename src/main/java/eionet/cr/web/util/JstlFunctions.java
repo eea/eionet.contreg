@@ -175,7 +175,7 @@ public class JstlFunctions {
 	 */
 	public static String getPredicateLabel(Map predicateLabels, String predicate){
 
-		Object o = predicateLabels.get(predicate);
+		Object o = predicateLabels==null ? null : predicateLabels.get(predicate);
 		String label = o==null ? null : o.toString();
 		if (StringUtils.isBlank(label)){
 			int last = Math.max(Math.max(predicate.lastIndexOf('#'), predicate.lastIndexOf('/')), predicate.lastIndexOf(':'));

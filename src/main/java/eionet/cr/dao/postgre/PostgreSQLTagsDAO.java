@@ -50,7 +50,7 @@ public class PostgreSQLTagsDAO extends PostgreSQLBaseDAO implements TagsDAO{
 		List<Long> params = new ArrayList<Long>();
 		params.add(Hashes.spoHash(Predicates.CR_TAG));
 		
-		executeQuery(getTagsWithFrequencies_SQL, params, pairReader);
+		executeSQL(getTagsWithFrequencies_SQL, params, pairReader);
 		List<Pair<String,Long>> pairList = pairReader.getResultList();
 		
 		List<TagDTO> resultList = new ArrayList<TagDTO>(pairList.size());

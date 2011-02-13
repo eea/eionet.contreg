@@ -22,30 +22,23 @@ package eionet.cr.dao.readers;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.openrdf.query.BindingSet;
 
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.util.YesNoBoolean;
-import eionet.cr.util.sql.ResultSetListReader;
+import eionet.cr.util.sql.SQLResultSetBaseReader;
 
 /**
  * 
  * @author altnyris
  *
  */
-public class HarvestSourceDTOReader extends ResultSetListReader<HarvestSourceDTO> {
-
-	/** */
-	List<HarvestSourceDTO> resultList = new ArrayList<HarvestSourceDTO>();
+public class HarvestSourceDTOReader extends SQLResultSetBaseReader<HarvestSourceDTO> {
 
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
 	 */
-	public void readRow(ResultSet rs) throws SQLException {
+	public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
 
 		HarvestSourceDTO harvestSourceDTO = new HarvestSourceDTO();
 		harvestSourceDTO.setSourceId(new Integer(rs.getInt("HARVEST_SOURCE_ID")));
@@ -62,18 +55,5 @@ public class HarvestSourceDTOReader extends ResultSetListReader<HarvestSourceDTO
 		harvestSourceDTO.setTrackedFile(YesNoBoolean.parse(rs.getString("TRACKED_FILE")));
 		
 		resultList.add(harvestSourceDTO);
-	}
-
-	/**
-	 * @return the resultList
-	 */
-	public List<HarvestSourceDTO> getResultList() {
-		return resultList;
-	}
-
-	@Override
-	public void readTuple(BindingSet bindingSet) {
-		// TODO Auto-generated method stub
-		
 	}
 }

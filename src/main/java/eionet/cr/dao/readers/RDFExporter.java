@@ -21,12 +21,11 @@ import eionet.cr.util.Hashes;
 import eionet.cr.util.NamespaceUtil;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.YesNoBoolean;
-import eionet.cr.util.sql.ResultSetBaseReader;
 
 /**
  * 
  */
-public class RDFExporter extends ResultSetBaseReader {
+public class RDFExporter extends ResultSetMixedReader {
 
 	/** */
 	private long sourceHash;
@@ -80,7 +79,7 @@ public class RDFExporter extends ResultSetBaseReader {
 	 * (non-Javadoc)
 	 * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
 	 */
-	public void readRow(ResultSet rs) throws SQLException {
+	public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
 
 		long subjectHash = rs.getLong("subjecthash");
 		String subject = rs.getString("subject");
@@ -244,9 +243,13 @@ public class RDFExporter extends ResultSetBaseReader {
 		namespaceUris.put(rdfNamespaceHash, Namespace.RDF.getUri());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
+	 */
 	@Override
-	public void readTuple(BindingSet bindingSet) {
-		// TODO Auto-generated method stub
+	public void readRow(BindingSet bindingSet) {
 		
+		// TODO Auto-generated method stub
 	}
 }

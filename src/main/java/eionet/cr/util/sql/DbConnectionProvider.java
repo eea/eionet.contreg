@@ -23,16 +23,12 @@ package eionet.cr.util.sql;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import eionet.cr.common.CRRuntimeException;
 import eionet.cr.config.GeneralConfig;
@@ -47,9 +43,6 @@ public class DbConnectionProvider {
 	/** */
 	public enum ConnectionType {SIMPLE,JNDI};
 	
-	/** */
-	private static Log logger = LogFactory.getLog(DbConnectionProvider.class);
-
 	/** */
 	private static DataSource dataSource = null;
 	private static ConnectionType connectionType = null;

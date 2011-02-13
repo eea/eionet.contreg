@@ -22,29 +22,22 @@ package eionet.cr.dao.readers;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.openrdf.query.BindingSet;
 
 import eionet.cr.dto.UrgentHarvestQueueItemDTO;
-import eionet.cr.util.sql.ResultSetListReader;
+import eionet.cr.util.sql.SQLResultSetBaseReader;
 
 /**
  * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class HarvestQueueItemDTOReader extends ResultSetListReader<UrgentHarvestQueueItemDTO>{
-
-	/** */
-	List<UrgentHarvestQueueItemDTO> resultList = new ArrayList<UrgentHarvestQueueItemDTO>();
+public class HarvestQueueItemDTOReader extends SQLResultSetBaseReader<UrgentHarvestQueueItemDTO>{
 
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
 	 */
-	public void readRow(ResultSet rs) throws SQLException {
+	public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
 		
 		UrgentHarvestQueueItemDTO dto = new UrgentHarvestQueueItemDTO();
 		dto.setUrl(rs.getString("URL"));
@@ -52,18 +45,5 @@ public class HarvestQueueItemDTOReader extends ResultSetListReader<UrgentHarvest
 		dto.setPushedContent(rs.getString("PUSHED_CONTENT"));
 		
 		resultList.add(dto);
-	}
-
-	/**
-	 * @return the resultList
-	 */
-	public List<UrgentHarvestQueueItemDTO> getResultList() {
-		return resultList;
-	}
-
-	@Override
-	public void readTuple(BindingSet bindingSet) {
-		// TODO Auto-generated method stub
-		
 	}
 }

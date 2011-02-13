@@ -30,6 +30,7 @@ import eionet.cr.util.Util;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.util.sql.PairReader;
 import eionet.cr.util.sql.PostgreSQLFullTextQuery;
+import eionet.cr.util.sql.SingleObjectReader;
 
 /**
  * 
@@ -73,43 +74,37 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
 		logger.trace("Free-text search, executing subject finder query: " + query);
 
 		// execute the query, with the IN parameters
-		List<Pair<String,String>> list = executeQuery(query, new PairReader<String,String>());
+		List<String> subjectUris = executeSPARQL(query, new SingleObjectReader<String>());
 
 		logger.debug("Free-text search, find subjects query time " + Util.durationSince(startTime));
 
 		// if result list not empty, do the necessary processing and get total row count
 		Integer totalRowCount = Integer.valueOf(0);
 		Map<Long,SubjectDTO> temp = new LinkedHashMap<Long,SubjectDTO>();
-		if (list!=null && !list.isEmpty()) {
+		if (subjectUris!=null && !subjectUris.isEmpty()) {
 
-			ArrayList<String> subjectUris = new ArrayList<String>();
-			
 			// get the hashes of harvest sources where the search hits came from (i.e. hit-sources)
 			Map<Long,Long> hitSources = new HashMap<Long,Long>();
-			for (Pair<String,String> subjectPair : list) {
+			for (String subjectUri : subjectUris) {
 				
-				String subjectUri = subjectPair.getLeft();
-				String sourceUri = subjectPair.getRight();
 				long subjectHash = Hashes.spoHash(subjectUri);
-				long sourceHash = Hashes.spoHash(sourceUri);
-				
-				subjectUris.add(subjectUri);
 				
 				temp.put(Long.valueOf(subjectHash), null);
-				hitSources.put(Long.valueOf(subjectHash), Long.valueOf(sourceHash));
+				hitSources.put(Long.valueOf(subjectHash), Long.valueOf(0));
 			}
 			
 			// get the data of all found subjects, provide hit-sources to the reader
 			SubjectDataReader reader = new FreeTextSearchDataReader(temp, hitSources, subjectUris);
 			
-			//query only needed predicates 
-			reader.addPredicateHash(Hashes.spoHash(Predicates.RDF_TYPE));
-			reader.addPredicateHash(Hashes.spoHash(Predicates.RDFS_LABEL));
+			// query only needed predicates
+			ArrayList<String> predicateUris = new ArrayList<String>();
+			predicateUris.add(Predicates.RDF_TYPE);
+			predicateUris.add(Predicates.RDFS_LABEL);
 
 			logger.trace("Free-text search, getting the data of the found subjects");
-			
-			String subjectsDataQuery = getSubjectsDataQuery(subjectUris);
-			executeQuery(subjectsDataQuery, reader);
+
+			// get the subjects data
+			getSubjectsData(subjectUris, predicateUris, reader);
 			
 			// get total number of found subjects, unless no paging required
 			if (pagingRequest!=null){
@@ -157,15 +152,6 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
 			String sourceUri, PagingRequest pagingRequest,
 			SortingRequest sortingRequest, boolean sortByObjectHash)
 			throws DAOException {
-		throw new UnsupportedOperationException("Method not implemented");
-		
-	}
-
-	/* (non-Javadoc)
-	 * @see eionet.cr.dao.SearchDAO#getExactRowCountLimit()
-	 */
-	@Override
-	public int getExactRowCountLimit() {
 		throw new UnsupportedOperationException("Method not implemented");
 		
 	}
@@ -221,7 +207,18 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
 	 * @throws DAOException
 	 */
 	private int getExactRowCount(SearchHelper helper) throws DAOException{
-		// TODO: implement this method
-		return 0;
+		
+		String query = helper.getCountQuery(new ArrayList());
+		Object resultObject = executeUniqueResultSPARQL(query, new SingleObjectReader<Long>());
+		return Integer.valueOf(resultObject.toString());
+	}
+
+	/* (non-Javadoc)
+	 * @see eionet.cr.dao.SearchDAO#getExactRowCountLimit()
+	 */
+	@Override
+	public int getExactRowCountLimit() {
+		
+		return Integer.MAX_VALUE;
 	}
 }

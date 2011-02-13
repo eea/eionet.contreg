@@ -2,15 +2,20 @@ package eionet.cr.dao.virtuoso;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
+
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.readers.RDFExporter;
+import eionet.cr.dao.readers.SubjectDataReader;
 import eionet.cr.dao.util.PredicateLabels;
 import eionet.cr.dao.util.SubProperties;
 import eionet.cr.dao.util.UriLabelPair;
@@ -24,6 +29,7 @@ import eionet.cr.dto.UserBookmarkDTO;
 import eionet.cr.dto.UserHistoryDTO;
 import eionet.cr.harvest.statistics.dto.HarvestUrgencyScoreDTO;
 import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
+import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.web.security.CRUser;
@@ -139,6 +145,26 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO{
 		
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#getSubject(java.lang.String)
+	 */
+	@Override
+	public SubjectDTO getSubject(String subjectUri) throws DAOException {
+		
+		if (StringUtils.isBlank(subjectUri)){
+			return null;
+		}
+		
+		Map<Long,SubjectDTO> map = new LinkedHashMap<Long, SubjectDTO>();
+		long subjectHash = Hashes.spoHash(subjectUri);
+		map.put(Long.valueOf(subjectHash), null);
+		SubjectDataReader reader = new SubjectDataReader(map);
+		
+		List<SubjectDTO> subjects = getSubjectsData(Collections.singletonList(subjectUri), null, reader);
+		return subjects==null || subjects.isEmpty() ? null : subjects.get(0);
+	}
+
 	/* (non-Javadoc)
 	 * @see eionet.cr.dao.HelperDAO#getSubject(java.lang.Long)
 	 */
@@ -152,20 +178,19 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO{
 	 * @see eionet.cr.dao.HelperDAO#getPredicateLabels(java.util.Set)
 	 */
 	@Override
-	public PredicateLabels getPredicateLabels(Set<Long> subjectHashes)
-			throws DAOException {
-		throw new UnsupportedOperationException("Method not implemented");
+	public PredicateLabels getPredicateLabels(Set<Long> subjectHashes) throws DAOException {
 		
+		// TODO: implement this method
+		return null;
 	}
 
 	/* (non-Javadoc)
 	 * @see eionet.cr.dao.HelperDAO#getSubProperties(java.util.Set)
 	 */
 	@Override
-	public SubProperties getSubProperties(Set<Long> subjectHashes)
-			throws DAOException {
-		throw new UnsupportedOperationException("Method not implemented");
-		
+	public SubProperties getSubProperties(Set<Long> subjectHashes) throws DAOException {
+		// TODO: implement this method
+		return null;
 	}
 
 	/* (non-Javadoc)
@@ -230,8 +255,9 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO{
 	 */
 	@Override
 	public boolean isUrlInHarvestSource(String url) throws DAOException {
-		throw new UnsupportedOperationException("Method not implemented");
 		
+		// TODO: implement this method
+		return false;
 	}
 
 	/* (non-Javadoc)
@@ -509,5 +535,4 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO{
 		throw new UnsupportedOperationException("Method not implemented");
 		
 	}
-
 }

@@ -34,7 +34,6 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.util.UriLabelPair;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.sql.DbConnectionProvider;
-import eionet.cr.util.sql.ResultSetBaseReader;
 import eionet.cr.util.sql.SQLUtil;
 
 /**
@@ -42,7 +41,7 @@ import eionet.cr.util.sql.SQLUtil;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class DataflowPicklistReader extends ResultSetBaseReader{
+public class DataflowPicklistReader<T> extends ResultSetMixedReader<T>{
 
 	/** */
 	private static final String sql = new StringBuffer().
@@ -86,6 +85,9 @@ public class DataflowPicklistReader extends ResultSetBaseReader{
 		catch (SQLException e){
 			throw new DAOException(e.toString(), e);
 		}
+		catch (ResultSetReaderException e) {
+			throw new DAOException(e.toString(), e);
+		}
 		finally{
 			SQLUtil.close(conn);
 		}
@@ -95,7 +97,7 @@ public class DataflowPicklistReader extends ResultSetBaseReader{
 	 * (non-Javadoc)
 	 * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
 	 */
-	public void readRow(ResultSet rs) throws SQLException {
+	public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
 
 		String instrument = rs.getString("INSTRUMENT_TITLE");
 		if (currentInstrument==null || !currentInstrument.equals(instrument)){
@@ -115,9 +117,13 @@ public class DataflowPicklistReader extends ResultSetBaseReader{
 		return resultMap;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
+	 */
 	@Override
-	public void readTuple(BindingSet bindingSet) {
-		// TODO Auto-generated method stub
+	public void readRow(BindingSet bindingSet) {
 		
+		// TODO Auto-generated method stub
 	}
 }

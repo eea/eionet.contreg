@@ -22,27 +22,20 @@ package eionet.cr.dao.readers;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.openrdf.query.BindingSet;
 
 import eionet.cr.dto.HarvestBaseDTO;
 import eionet.cr.dto.HarvestDTO;
-import eionet.cr.util.sql.ResultSetListReader;
+import eionet.cr.util.sql.SQLResultSetBaseReader;
 
 /**
  * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class HarvestWithMessageTypesReader extends ResultSetListReader<HarvestDTO> {
+public class HarvestWithMessageTypesReader extends SQLResultSetBaseReader<HarvestDTO> {
 	
 	/** */
-	private List<HarvestDTO> resultList = new ArrayList<HarvestDTO>();
-	
-	/** */
-	private HarvestDTO curHarvest;
+	private HarvestDTO currHarvest;
 	
 	/** */
 	private int maxDistinctHarvests;
@@ -59,48 +52,35 @@ public class HarvestWithMessageTypesReader extends ResultSetListReader<HarvestDT
 	 * (non-Javadoc)
 	 * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
 	 */
-	public void readRow(ResultSet rs) throws SQLException {
+	public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
 		
 		Integer harvestId = rs.getInt("HARVEST_ID");
-		if (curHarvest==null || curHarvest.getHarvestId().equals(harvestId)==false){ // if first row or new harvest
+		if (currHarvest==null || currHarvest.getHarvestId().equals(harvestId)==false){ // if first row or new harvest
 			
 			// create new harvest object and add it to the list, but only if the list has not reached it's max allowed size yet
 			if (resultList.size() >= maxDistinctHarvests){
 				return;
 			}
 				
-			curHarvest = new HarvestDTO();
-			resultList.add(curHarvest);
+			currHarvest = new HarvestDTO();
+			resultList.add(currHarvest);
 			
-			curHarvest.setHarvestId(harvestId);
-			curHarvest.setHarvestSourceId(new Integer(rs.getInt("SOURCE_ID")));
+			currHarvest.setHarvestId(harvestId);
+			currHarvest.setHarvestSourceId(new Integer(rs.getInt("SOURCE_ID")));
 			
-			curHarvest.setHarvestType(rs.getString("HARVEST_TYPE"));
-			curHarvest.setUser(rs.getString("HARVEST_USER"));
-			curHarvest.setStatus(rs.getString("STATUS"));
+			currHarvest.setHarvestType(rs.getString("HARVEST_TYPE"));
+			currHarvest.setUser(rs.getString("HARVEST_USER"));
+			currHarvest.setStatus(rs.getString("STATUS"));
 			
-			curHarvest.setDatetimeStarted(rs.getTimestamp("STARTED"));
-			curHarvest.setDatetimeFinished(rs.getTimestamp("FINISHED"));
+			currHarvest.setDatetimeStarted(rs.getTimestamp("STARTED"));
+			currHarvest.setDatetimeFinished(rs.getTimestamp("FINISHED"));
 			
-			curHarvest.setTotalResources(new Integer(rs.getInt("TOT_RESOURCES")));
-			curHarvest.setEncodingSchemes(new Integer(rs.getInt("ENC_SCHEMES")));
-			curHarvest.setTotalStatements(new Integer(rs.getInt("TOT_STATEMENTS")));
-			curHarvest.setLitObjStatements(new Integer(rs.getInt("LIT_STATEMENTS")));
+			currHarvest.setTotalResources(new Integer(rs.getInt("TOT_RESOURCES")));
+			currHarvest.setEncodingSchemes(new Integer(rs.getInt("ENC_SCHEMES")));
+			currHarvest.setTotalStatements(new Integer(rs.getInt("TOT_STATEMENTS")));
+			currHarvest.setLitObjStatements(new Integer(rs.getInt("LIT_STATEMENTS")));
 		}
 		
-		HarvestBaseDTO.addMessageType(curHarvest, rs.getString("MESSAGE_TYPE"));
-	}
-
-	/**
-	 * @return the resultList
-	 */
-	public List<HarvestDTO> getResultList() {
-		return resultList;
-	}
-
-	@Override
-	public void readTuple(BindingSet bindingSet) {
-		// TODO Auto-generated method stub
-		
+		HarvestBaseDTO.addMessageType(currHarvest, rs.getString("MESSAGE_TYPE"));
 	}
 }

@@ -24,18 +24,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
-import org.openrdf.query.BindingSet;
-
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.YesNoBoolean;
-import eionet.cr.util.sql.ResultSetBaseReader;
+import eionet.cr.util.sql.SQLResultSetBaseReader;
 
 /**
  * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class MinimalSubjectReader extends ResultSetBaseReader{
+public class MinimalSubjectReader extends SQLResultSetBaseReader<SubjectDTO>{
 	
 	/** */
 	private Map<Long, SubjectDTO> subjectsMap;
@@ -52,18 +50,12 @@ public class MinimalSubjectReader extends ResultSetBaseReader{
 	 * (non-Javadoc)
 	 * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
 	 */
-	public void readRow(ResultSet rs) throws SQLException {
+	public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
 		
 		Long hash = Long.valueOf(rs.getLong("SUBJECT"));
 		if (subjectsMap.get(hash)==null){
 			subjectsMap.put(hash, new SubjectDTO(
 					rs.getString("URI"), YesNoBoolean.parse(rs.getString("ANON_SUBJ"))));
 		}
-	}
-
-	@Override
-	public void readTuple(BindingSet bindingSet) {
-		// TODO Auto-generated method stub
-		
 	}
 }

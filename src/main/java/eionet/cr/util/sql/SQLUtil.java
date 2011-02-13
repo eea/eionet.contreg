@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 import eionet.cr.common.CRException;
-import eionet.cr.util.export.ExportException;
+import eionet.cr.dao.readers.ResultSetReaderException;
 
 /**
  * 
@@ -92,9 +92,12 @@ public class SQLUtil {
 	 * @param rsReader
 	 * @param conn
 	 * @throws SQLException
+	 * @throws ResultSetReaderException
 	 */
-	public static void executeQuery(String parameterizedSQL, List<?> values, SQLResultSetReader rsReader, Connection conn)
-																											throws SQLException, ExportException{
+	@SuppressWarnings("rawtypes")
+	public static void executeQuery(String parameterizedSQL, List<?> values,
+			SQLResultSetReader rsReader, Connection conn) throws SQLException, ResultSetReaderException{
+		
 		ResultSet rs = null;
 		PreparedStatement pstmt = null;
 		try{
@@ -103,7 +106,7 @@ public class SQLUtil {
 			if (rs!=null){
 				ResultSetMetaData rsMd = rs.getMetaData();
 				if (rsMd!=null && rsMd.getColumnCount()>0){
-					rsReader.setResultSetMetaData(rsMd);
+					rsReader.startResultSet(rsMd);
 					while (rs.next())
 						rsReader.readRow(rs);
 				}
@@ -125,8 +128,9 @@ public class SQLUtil {
 	 * @param conn
 	 * @return
 	 * @throws SQLException
+	 * @throws ResultSetReaderException 
 	 */
-	public static List<Map<String,SQLValue>> executeQuery(String sql, Connection conn) throws SQLException{
+	public static List<Map<String,SQLValue>> executeQuery(String sql, Connection conn) throws SQLException, ResultSetReaderException{
 		
 		SQLValueReader sqlValueReader = new SQLValueReader();
 		executeQuery(sql, sqlValueReader, conn);
@@ -139,8 +143,10 @@ public class SQLUtil {
 	 * @param rsReader
 	 * @param conn
 	 * @throws SQLException
+	 * @throws ResultSetReaderException TODO
 	 */
-	public static void executeQuery(String sql, ResultSetBaseReader rsReader, Connection conn) throws SQLException{
+	@SuppressWarnings("rawtypes")
+	public static void executeQuery(String sql, SQLResultSetReader rsReader, Connection conn) throws SQLException, ResultSetReaderException{
 		
 		ResultSet rs = null;
 		Statement stmt = null;
@@ -150,9 +156,10 @@ public class SQLUtil {
 			if (rs!=null){
 				ResultSetMetaData rsMd = rs.getMetaData();
 				if (rsMd!=null && rsMd.getColumnCount()>0){
-					rsReader.setResultSetMetaData(rsMd);
-					while (rs.next())
+					rsReader.startResultSet(rsMd);
+					while (rs.next()){
 						rsReader.readRow(rs);
+					}
 				}
 			}
 		}

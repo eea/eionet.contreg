@@ -49,6 +49,7 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.SpoBinaryDAO;
+import eionet.cr.dao.util.PredicateLabels;
 import eionet.cr.dao.util.SubProperties;
 import eionet.cr.dao.util.UriLabelPair;
 import eionet.cr.dto.HarvestSourceDTO;
@@ -124,29 +125,22 @@ public class FactsheetActionBean extends AbstractActionBean{
 			Long subjectHash = uriHash==0 ? Hashes.spoHash(uri) : uriHash;
 			HelperDAO helperDAO = DAOFactory.get().getDao(HelperDAO.class);
 			
-			if (getUser()!=null){
-				if (getUser().isAdministrator()){
-					setAdminLoggedIn(true);
-				} else {
-					setAdminLoggedIn(false);
+			setAdminLoggedIn(getUser()!=null && getUser().isAdministrator());
+			
+			subject = helperDAO.getSubject(uri);
+			if (subject!=null){
+				
+				if (getContext().getRequest().getParameter("nofilter") == null){
+					subject = SubjectDTOOptimizer.optimizeSubjectDTOFactsheetView(subject, getAcceptedLanguagesByImportance());
 				}
-			} else {
-				setAdminLoggedIn(false);
-			}
-
 			
-			if (this.getContext().getRequest().getParameter("nofilter") != null){
-				subject = helperDAO.getSubject(subjectHash);
-			} else {
-				subject = SubjectDTOOptimizer.optimizeSubjectDTOFactsheetView(helperDAO.getSubject(subjectHash), getAcceptedLanguagesByImportance());
-			}
-			
-			if (subject!=null) {
 				uri = subject.getUri();
 				uriHash = subject.getUriHash();
 				
-				predicateLabels = helperDAO.getPredicateLabels(
-						Collections.singleton(subjectHash)).getByLanguages(getAcceptedLanguages());
+				PredicateLabels predLabels = helperDAO.getPredicateLabels(Collections.singleton(subjectHash));
+				if (predLabels!=null){
+					predicateLabels = predLabels.getByLanguages(getAcceptedLanguages());
+				}
 				subProperties = helperDAO.getSubProperties(Collections.singleton(subjectHash));
 				
 				if (isAdminLoggedIn()){

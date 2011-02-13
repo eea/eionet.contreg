@@ -135,10 +135,10 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 		for (String uriHash:labelMap.keySet()){
 			if (StringUtils.isBlank(labelMap.get(uriHash))){
 				String uri = uriMap.get(uriHash);
-				result.add(new Pair(uriHash, URIUtil.extractURILabel(uri,uri)));
+				result.add(new Pair<String,String>(uriHash, URIUtil.extractURILabel(uri,uri)));
 			}
 			else{
-				result.add(new Pair(uriHash, labelMap.get(uriHash)));
+				result.add(new Pair<String,String>(uriHash, labelMap.get(uriHash)));
 			}
 		}
 		
@@ -996,6 +996,11 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 	 * @see eionet.cr.dao.HelperDAO#deleteTriples(java.lang.String, java.lang.String, java.lang.String)
 	 */
 	public void deleteTriples(String subjectUri, String predicateUri, String sourceUri) throws DAOException {
+		throw new UnsupportedOperationException("Method not implemented");
+	}
+
+	@Override
+	public SubjectDTO getSubject(String subjectUri) throws DAOException {
 		throw new UnsupportedOperationException("Method not implemented");
 	}
 }

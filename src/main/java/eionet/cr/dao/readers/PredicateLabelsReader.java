@@ -22,22 +22,17 @@ package eionet.cr.dao.readers;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 import org.openrdf.query.BindingSet;
 
 import eionet.cr.dao.util.PredicateLabels;
-import eionet.cr.dto.ObjectDTO;
-import eionet.cr.util.sql.ResultSetBaseReader;
 
 /**
  * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class PredicateLabelsReader extends ResultSetBaseReader{
+public class PredicateLabelsReader extends ResultSetMixedReader{
 	
 	/** */
 	private PredicateLabels predicateLabels;
@@ -58,13 +53,17 @@ public class PredicateLabelsReader extends ResultSetBaseReader{
 	 * (non-Javadoc)
 	 * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
 	 */
-	public void readRow(ResultSet rs) throws SQLException {
+	public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
 		predicateLabels.add(rs.getString("PREDICATE_URI"), rs.getString("LABEL"), rs.getString("LANG"));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
+	 */
 	@Override
-	public void readTuple(BindingSet bindingSet) {
-		// TODO Auto-generated method stub
+	public void readRow(BindingSet bindingSet) {
 		
+		// TODO Auto-generated method stub
 	}
 }

@@ -22,23 +22,23 @@ package eionet.cr.dao.readers;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.openrdf.query.BindingSet;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.dto.UploadDTO;
 import eionet.cr.util.Hashes;
-import eionet.cr.util.sql.ResultSetBaseReader;
+import eionet.cr.util.sql.SQLResultSetBaseReader;
 
 /**
  * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class UploadDTOReader extends ResultSetBaseReader{
+public class UploadDTOReader extends SQLResultSetBaseReader<UploadDTO>{
 	
 	/** */
 	private static final long labelHash = Hashes.spoHash(Predicates.RDFS_LABEL);
@@ -52,7 +52,7 @@ public class UploadDTOReader extends ResultSetBaseReader{
 	 * (non-Javadoc)
 	 * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
 	 */
-	public void readRow(ResultSet rs) throws SQLException {
+	public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
 		
 		String subjectUri = rs.getString("URI");
 		UploadDTO uploadDTO = uploadsMap.get(subjectUri);
@@ -79,17 +79,11 @@ public class UploadDTOReader extends ResultSetBaseReader{
 		}
 	}
 
-	/**
-	 * 
-	 * @return
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.util.sql.SQLResultSetBaseReader#getResultList()
 	 */
-	public Collection<UploadDTO> getResultList(){
-		return uploadsMap.values();
-	}
-
-	@Override
-	public void readTuple(BindingSet bindingSet) {
-		// TODO Auto-generated method stub
-		
+	public List<UploadDTO> getResultList(){
+		return new ArrayList<UploadDTO>(uploadsMap.values());
 	}
 }

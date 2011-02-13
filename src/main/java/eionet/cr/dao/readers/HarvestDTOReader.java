@@ -22,29 +22,22 @@ package eionet.cr.dao.readers;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.openrdf.query.BindingSet;
 
 import eionet.cr.dto.HarvestDTO;
-import eionet.cr.util.sql.ResultSetListReader;
+import eionet.cr.util.sql.SQLResultSetBaseReader;
 
 /**
  * 
  * @author altnyris
  *
  */
-public class HarvestDTOReader extends ResultSetListReader<HarvestDTO> {
-
-	/** */
-	List<HarvestDTO> resultList = new ArrayList<HarvestDTO>();
+public class HarvestDTOReader extends SQLResultSetBaseReader<HarvestDTO> {
 
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
 	 */
-	public void readRow(ResultSet rs) throws SQLException {
+	public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
 
 		HarvestDTO harvestDTO = new HarvestDTO();
 		
@@ -64,18 +57,5 @@ public class HarvestDTOReader extends ResultSetListReader<HarvestDTO> {
 		harvestDTO.setLitObjStatements(new Integer(rs.getInt("LIT_STATEMENTS")));
 		
 		resultList.add(harvestDTO);
-	}
-
-	/**
-	 * @return the resultListAAA
-	 */
-	public List<HarvestDTO> getResultList() {
-		return resultList;
-	}
-
-	@Override
-	public void readTuple(BindingSet bindingSet) {
-		// TODO Auto-generated method stub
-		
 	}
 }

@@ -33,8 +33,8 @@ public class ExporterDAOTest  extends CRDatabaseTestCase {
 		Connection conn1 = null;
 		Connection conn2 = null;
 		try{
-			conn1 = mockExporterDAO.getConnection();
-			conn2 = mockExporterDAO.getConnection();
+			conn1 = mockExporterDAO.getSQLConnection();
+			conn2 = mockExporterDAO.getSQLConnection();
 			
 			SQLUtil.executeUpdate(createTempSQL, conn1);
 			SQLUtil.executeUpdate(dropTempSQL, conn2);
@@ -69,8 +69,8 @@ public class ExporterDAOTest  extends CRDatabaseTestCase {
 		protected String getSubjectsDataFromTmpTablesQuery(){
 			return super.getSubjectsDataFromTmpTablesQuery();
 		}
-		protected Connection getConnection() throws SQLException{
-			return super.getConnection();
+		protected Connection getSQLConnection() throws SQLException{
+			return super.getSQLConnection();
 		}
 	}
 	

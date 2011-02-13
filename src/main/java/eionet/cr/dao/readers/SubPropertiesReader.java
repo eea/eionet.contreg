@@ -26,14 +26,14 @@ import java.sql.SQLException;
 import org.openrdf.query.BindingSet;
 
 import eionet.cr.dao.util.SubProperties;
-import eionet.cr.util.sql.ResultSetBaseReader;
 
 /**
  * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class SubPropertiesReader extends ResultSetBaseReader{
+@SuppressWarnings("rawtypes")
+public class SubPropertiesReader extends ResultSetMixedReader{
 
 	/** */
 	private SubProperties subProperties;
@@ -54,13 +54,17 @@ public class SubPropertiesReader extends ResultSetBaseReader{
 	 * (non-Javadoc)
 	 * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
 	 */
-	public void readRow(ResultSet rs) throws SQLException {
+	public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
 		subProperties.add(rs.getString("PREDICATE"), rs.getString("SUB_PROPERTY"));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
+	 */
 	@Override
-	public void readTuple(BindingSet bindingSet) {
-		// TODO Auto-generated method stub
+	public void readRow(BindingSet bindingSet) {
 		
+		// TODO Auto-generated method stub
 	}
 }

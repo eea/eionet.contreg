@@ -23,8 +23,10 @@ package eionet.cr.util.sql;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
-import eionet.cr.util.export.ExportException;
+import eionet.cr.dao.readers.ResultSetReaderException;
 import eionet.cr.util.export.SubjectExportEvent;
 
 /**
@@ -32,29 +34,54 @@ import eionet.cr.util.export.SubjectExportEvent;
  * @author kaspeenr
  *
  */
-public abstract class ResultSetExportReader implements SQLResultSetReader{
+public abstract class ResultSetExportReader<T> implements SQLResultSetReader<T>{
 	
 	/** */
-	protected ResultSetMetaData rsMd = null;
+	protected List<T> resultList = new ArrayList<T>();
+	
+	/** */
+	protected ResultSetMetaData resultSetMetaData;
+	
+	/** */
 	protected SubjectExportEvent exporter = null;
 
+	/**
+	 * 
+	 * @param exporter
+	 */
 	public ResultSetExportReader(SubjectExportEvent exporter){
 		this.exporter = exporter;		
 	}
 
-	/**
-	 * 
-	 * @param rsMd
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.util.sql.SQLResultSetReader#startResultSet(java.sql.ResultSetMetaData)
 	 */
-	public void setResultSetMetaData(ResultSetMetaData rsMd){
-		this.rsMd = rsMd;
+	@Override
+	public void startResultSet(ResultSetMetaData resultSetMetaData){
+		this.resultSetMetaData = resultSetMetaData;
 	}
-	
-	/**
-	 * 
-	 * @param rs
-	 * @throws SQLException 
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.util.sql.SQLResultSetReader#readRow(java.sql.ResultSet)
 	 */
-	public abstract void readRow(ResultSet rs) throws SQLException, ExportException;
+	public abstract void readRow(ResultSet rs) throws SQLException, ResultSetReaderException;
 	
+	/* (non-Javadoc)
+	 * @see eionet.cr.dao.readers.ResultSetReader#endResultSet()
+	 */
+	@Override
+	public void endResultSet() {
+		
+		// default implementation, which does nothing, implementors can override
+	}
+
+	/* (non-Javadoc)
+	 * @see eionet.cr.dao.readers.ResultSetReader#getResultList()
+	 */
+	@Override
+	public List<T> getResultList() {
+		return resultList;
+	}
 }
