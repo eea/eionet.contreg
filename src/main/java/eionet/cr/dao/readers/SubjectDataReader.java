@@ -25,6 +25,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -50,14 +51,11 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO>{
 	private Map<Long,SubjectDTO> subjectsMap;
 	
 	/** */
-	private List<String> subjectUris;
-	
-	/** */
 	private SubjectDTO currentSubject = null;
 	private String currentPredicate = null;
 	private Collection<ObjectDTO> currentObjects = null;
 	private Collection<Long> predicateHashes = null;
-	
+
 	/**
 	 * 
 	 * @param subjectsMap
@@ -69,15 +67,17 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO>{
 	
 	/**
 	 * 
-	 * @param subjectsMap
 	 * @param subjectUris
 	 */
-	public SubjectDataReader(Map<Long,SubjectDTO> subjectsMap, List<String> subjectUris){
+	public SubjectDataReader(List<String> subjectUris){
 		
-		this.subjectsMap = subjectsMap;
-		this.subjectUris = subjectUris;
+		subjectsMap = new LinkedHashMap<Long,SubjectDTO>();
+		for (String subjectUri : subjectUris){
+			Long subjectHash = Long.valueOf(Hashes.spoHash(subjectUri));
+			subjectsMap.put(subjectHash, null);
+		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
@@ -140,29 +140,6 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO>{
 		}
 	}
 
-	/**
-	 * 
-	 */
-	public String getPredicateHashesCommaSeparated() {
-		return Util.toCSV(predicateHashes);
-	}
-
-	/** 
-	 * @see eionet.cr.util.sql.ResultSetListReader#getResultList()
-	 * {@inheritDoc}
-	 */
-	@Override
-	public List<SubjectDTO> getResultList() {
-		return new LinkedList<SubjectDTO>( subjectsMap.values());
-	}
-
-	/**
-	 * @return the subjectsMap
-	 */
-	public Map<Long, SubjectDTO> getSubjectsMap() {
-		return subjectsMap;
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
@@ -217,9 +194,25 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO>{
 	}
 
 	/**
-	 * @return the subjectUris
+	 * 
 	 */
-	public List<String> getSubjectUris() {
-		return subjectUris;
+	public String getPredicateHashesCommaSeparated() {
+		return Util.toCSV(predicateHashes);
+	}
+
+	/** 
+	 * @see eionet.cr.util.sql.ResultSetListReader#getResultList()
+	 * {@inheritDoc}
+	 */
+	@Override
+	public List<SubjectDTO> getResultList() {
+		return new LinkedList<SubjectDTO>( subjectsMap.values());
+	}
+
+	/**
+	 * @return the subjectsMap
+	 */
+	public Map<Long, SubjectDTO> getSubjectsMap() {
+		return subjectsMap;
 	}
 }

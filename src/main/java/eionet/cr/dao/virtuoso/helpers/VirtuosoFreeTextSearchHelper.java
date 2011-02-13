@@ -46,8 +46,8 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper{
 	public String getUnorderedQuery(List<Object> inParams) {
 		
 		StringBuilder strBuilder = new StringBuilder().
-		append("select distinct ?s where {?s ?p ?o . ?o bif:contains \"").
-		append(expression.toString()).append("\".}");
+		append("select distinct ?s ?g where { graph ?g {?s ?p ?o . ?o bif:contains \"").
+		append(expression.toString()).append("\".}}");
 		
 		return strBuilder.toString();
 	}

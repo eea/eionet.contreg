@@ -20,15 +20,14 @@
  */
 package eionet.cr.dao.mysql;
 
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Vector;
-import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -37,7 +36,7 @@ import eionet.cr.common.Subjects;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.postgre.helpers.PostgreFreeTextSearchHelper;
-import eionet.cr.dao.readers.FreeTextSearchDataReader;
+import eionet.cr.dao.readers.FreeTextSearchReader;
 import eionet.cr.dao.readers.SubjectDataReader;
 import eionet.cr.dao.util.BBOX;
 import eionet.cr.dao.util.SearchExpression;
@@ -127,26 +126,30 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 			.append(pagingRequest.getOffset()).append(',').append(pagingRequest.getItemsPerPage());
 		}
 		
-		Pair<Integer,List<Pair<Long,Long>>> pair = executeQueryWithRowCount(
-				selectQuery.toString(),
-				searchParams,
-				new PairReader<Long,Long>());
+		FreeTextSearchReader<Long> matchReader = new FreeTextSearchReader<Long>();
+		Pair<Integer,List<Long>> resultPair = executeQueryWithRowCount(selectQuery.toString(),
+				searchParams, matchReader);
 		
-		Map<Long,SubjectDTO> temp = new LinkedHashMap<Long,SubjectDTO>();
-		if (pair != null && !pair.getRight().isEmpty()) {
+		Map<Long,SubjectDTO> subjectsMap = new LinkedHashMap<Long,SubjectDTO>();
+		if (resultPair != null && !resultPair.getRight().isEmpty()) {
 
-			Map<Long,Long> hitSources = new HashMap<Long,Long>();
-			for (Pair<Long,Long> subjectPair : pair.getRight()) {
-				temp.put(subjectPair.getLeft(), null);
-				hitSources.put(subjectPair.getLeft(),subjectPair.getRight());
+			// pre-fill subjects map
+			for (Long subjectHash : resultPair.getRight()) {
+				subjectsMap.put(subjectHash, null);
 			}
-			SubjectDataReader reader = new FreeTextSearchDataReader(temp, hitSources);
-			executeQuery(getSubjectsDataQuery(temp.keySet()), null, reader);
+			
+			// get subjects' data
+			SubjectDataReader reader = new SubjectDataReader(subjectsMap);
+			executeQuery(getSubjectsDataQuery(subjectsMap.keySet()), null, reader);
+			
+			// for each SubjectDTO now in map, set search hit source
+			matchReader.populateHitSources(subjectsMap.values());
 		}
 		logger.debug("subject data select query took " + (System.currentTimeMillis()-time) + " ms");
-			                                         
+
+		// the result pair contains total match count + requested page of the result list
 		return new Pair<Integer, List<SubjectDTO>>(
-				pair.getLeft(), new LinkedList<SubjectDTO>(temp.values()));
+				resultPair.getLeft(), new LinkedList<SubjectDTO>(subjectsMap.values()));
 	}
 	
 	/** 

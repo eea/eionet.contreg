@@ -82,7 +82,7 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO{
 	 * @throws DAOException 
 	 */
 	protected List<SubjectDTO> getSubjectsData(
-			Collection<String> subjectUris, Collection<String> predicateUris, SubjectDataReader reader) throws DAOException{
+			Collection<String> subjectUris, String[] predicateUris, SubjectDataReader reader) throws DAOException{
 		
 		if (subjectUris==null || subjectUris.isEmpty()){
 			throw new IllegalArgumentException("Subjects collection must not be null or empty!");
@@ -116,7 +116,7 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO{
 	 * @return
 	 * @throws DAOException
 	 */
-	private String getSubjectsDataQuery(Collection<String> subjectUris, Collection<String> predicateUris){
+	private String getSubjectsDataQuery(Collection<String> subjectUris, String[] predicateUris){
 		
 		if (subjectUris==null || subjectUris.isEmpty()){
 			throw new IllegalArgumentException("Subjects collection must not be null or empty!");
@@ -136,7 +136,8 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO{
 		}
 		strBuilder.append(") ");
 		
-		if (predicateUris!=null && !predicateUris.isEmpty()){
+		// if only certain predicates needed, add relevant filter
+		if (predicateUris!=null && predicateUris.length>0){
 			
 			i = 0;
 			strBuilder.append("filter (");

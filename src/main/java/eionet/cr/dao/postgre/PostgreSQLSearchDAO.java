@@ -22,7 +22,6 @@ package eionet.cr.dao.postgre;
 
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -45,7 +44,7 @@ import eionet.cr.dao.postgre.helpers.PostgreReferencesSearchHelper;
 import eionet.cr.dao.postgre.helpers.PostgreSearchBySourceHelper;
 import eionet.cr.dao.postgre.helpers.PostgreSearchByTagsHelper;
 import eionet.cr.dao.postgre.helpers.PostgreSpatialSearchHelper;
-import eionet.cr.dao.readers.FreeTextSearchDataReader;
+import eionet.cr.dao.readers.FreeTextSearchReader;
 import eionet.cr.dao.readers.RODDeliveryReader;
 import eionet.cr.dao.readers.SubjectDataReader;
 import eionet.cr.dao.util.BBOX;
@@ -120,45 +119,49 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 		logger.trace("Free-text search, executing subject finder query: " + query);
 
 		// execute the query, with the IN parameters
-		List<Pair<Long,Long>> list = executeSQL(query, inParams, new PairReader<Long,Long>());
+		FreeTextSearchReader<Long> matchReader = new FreeTextSearchReader<Long>();
+		List<Long> subjectHashes = executeSQL(query, inParams, matchReader);
 
 		logger.debug("Free-text search, find subjects query time " + Util.durationSince(startTime));
 
 		// if result list not empty, do the necessary processing and get total row count
-		Integer totalRowCount = Integer.valueOf(0);
-		Map<Long,SubjectDTO> temp = new LinkedHashMap<Long,SubjectDTO>();
-		if (list!=null && !list.isEmpty()) {
+		Integer totalMatchCount = Integer.valueOf(0);
+		
+		Map<Long,SubjectDTO> subjectsMap = new LinkedHashMap<Long,SubjectDTO>();
+		if (subjectHashes!=null && !subjectHashes.isEmpty()) {
 
-			// get the hashes of harvest sources where the search hits came from (i.e. hit-sources)
-			Map<Long,Long> hitSources = new HashMap<Long,Long>();
-			for (Pair<Long,Long> subjectPair : list) {
-				temp.put(subjectPair.getLeft(), null);
-				hitSources.put(subjectPair.getLeft(),subjectPair.getRight());
+			// pre-fill subjects map
+			for (Long subjectHash : subjectHashes) {
+				subjectsMap.put(subjectHash, null);
 			}
 			
 			// get the data of all found subjects, provide hit-sources to the reader
-			SubjectDataReader reader = new FreeTextSearchDataReader(temp, hitSources);
+			SubjectDataReader reader = new SubjectDataReader(subjectsMap);
 			
-			//query only needed predicates 
+			// only these predicates will be queried for 
 			reader.addPredicateHash(Hashes.spoHash(Predicates.RDF_TYPE));
 			reader.addPredicateHash(Hashes.spoHash(Predicates.RDFS_LABEL));
 
 			logger.trace("Free-text search, getting the data of the found subjects");
 			
+			// get the subjects' data
 			getSubjectsData(reader);
 			
-			// get total number of found subjects, unless no paging required
+			// for each SubjectDTO now in map, set search hit source
+			matchReader.populateHitSources(subjectsMap.values());
+			
+			// if paging required, get total number of found subjects
 			if (pagingRequest!=null){
 				
 				logger.trace("Free-text search, getting exact row count");
-				totalRowCount = new Integer(getExactRowCount(helper));
+				totalMatchCount = new Integer(getExactRowCount(helper));
 			}
 		}
 		logger.debug("Free-text search, total query time " + Util.durationSince(startTime));
 
 		// the result Pair contains total number of subjects and the requested sub-list
 		return new Pair<Integer, List<SubjectDTO>>(
-				totalRowCount, new LinkedList<SubjectDTO>(temp.values()));
+				totalMatchCount, new LinkedList<SubjectDTO>(subjectsMap.values()));
 	}
 
 	/*
