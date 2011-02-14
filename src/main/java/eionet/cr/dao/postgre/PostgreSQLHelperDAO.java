@@ -2255,4 +2255,28 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 			SQLUtil.close(conn);
 		}
 	}
+	
+	/* (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#getTriplesCount()
+	 */
+	@Override
+	public long getTriplesCount() throws DAOException {
+		
+		String query = "SELECT count(*) FROM SPO";
+		
+		Object val = null;
+		Connection conn = null;
+		try{
+			conn = getSQLConnection();
+			val = SQLUtil.executeSingleReturnValueQuery(query, conn);
+		}
+		catch (SQLException e){
+			throw new DAOException(e.toString(), e);
+		}
+		finally{
+			SQLUtil.close(conn);
+		}
+		return (val == null) ? 0 : Long.valueOf(val.toString());
+		
+	}
 }

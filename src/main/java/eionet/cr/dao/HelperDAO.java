@@ -466,4 +466,11 @@ public interface HelperDAO extends DAO {
 	 * @throws DAOException
 	 */
 	public void deleteTriples(String subjectUri, String predicateUri, String sourceUri) throws DAOException;
+	
+	/**
+	 * 
+	 * @return long
+	 * @throws DAOException
+	 */
+	public long getTriplesCount() throws DAOException;
 }

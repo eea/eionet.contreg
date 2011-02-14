@@ -32,6 +32,7 @@ import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
 import eionet.cr.util.pagination.PagingRequest;
+import eionet.cr.util.sql.SingleObjectReader;
 import eionet.cr.web.security.CRUser;
 
 /**
@@ -535,4 +536,17 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO{
 		throw new UnsupportedOperationException("Method not implemented");
 		
 	}
+	
+	/* (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#getTriplesCount()
+	 */
+	@Override
+	public long getTriplesCount() throws DAOException {
+		
+		String query = "SELECT count(*) WHERE {?s ?p ?o}";
+		Object resultObject = executeUniqueResultSPARQL(query, new SingleObjectReader<Long>());
+		return Long.valueOf(resultObject.toString());
+		
+	}
+	
 }

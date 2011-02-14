@@ -1003,6 +1003,11 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 	public SubjectDTO getSubject(String subjectUri) throws DAOException {
 		throw new UnsupportedOperationException("Method not implemented");
 	}
+	
+	@Override
+	public long getTriplesCount() throws DAOException {
+		throw new UnsupportedOperationException("Method not implemented");
+	}
 }
 
 

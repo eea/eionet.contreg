@@ -6,25 +6,9 @@ import java.util.Map;
 import eionet.cr.dao.DAO;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.ExporterDAO;
-import eionet.cr.dao.HarvestDAO;
-import eionet.cr.dao.HarvestMessageDAO;
-import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.SearchDAO;
-import eionet.cr.dao.SpoBinaryDAO;
 import eionet.cr.dao.TagsDAO;
-import eionet.cr.dao.UrgentHarvestQueueDAO;
-import eionet.cr.dao.postgre.PostgreSQLBaseDAO;
-import eionet.cr.dao.postgre.PostgreSQLDAOFactory;
-import eionet.cr.dao.postgre.PostgreSQLExporterDAO;
-import eionet.cr.dao.postgre.PostgreSQLHarvestDAO;
-import eionet.cr.dao.postgre.PostgreSQLHarvestMessageDAO;
-import eionet.cr.dao.postgre.PostgreSQLHarvestSourceDAO;
-import eionet.cr.dao.postgre.PostgreSQLHelperDAO;
-import eionet.cr.dao.postgre.PostgreSQLSearchDAO;
-import eionet.cr.dao.postgre.PostgreSQLSpoBinaryDAO;
-import eionet.cr.dao.postgre.PostgreSQLTagsDAO;
-import eionet.cr.dao.postgre.PostgreSQLUrgentHarvestQueueDAO;
 
 /**
  * 

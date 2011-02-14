@@ -48,7 +48,7 @@
 	                    </c:choose>
 						<a id="printlink" title="Print this page" href="javascript:this.print();"><span>Print</span></a>
 				        <a id="fullscreenlink" href="javascript:toggleFullScreenMode()" title="Switch to/from full screen mode"><span>Switch to/from full screen mode</span></a>
-				        <a id="acronymlink" href="http://www.eionet.europa.eu/acronyms" title="Look up acronyms"><span>Acronyms</span></a>
+				        <a id="acronymlink" href="about.action" title="About Content Registry"><span>About</span></a>
 				        <form action="http://search.eionet.europa.eu/search.jsp" method="get">
 							<div id="freesrchform"><label for="freesrchfld">Search</label>
 								<input type="text" id="freesrchfld" name="query"/>
