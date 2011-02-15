@@ -2,6 +2,7 @@ package eionet.cr.dao.virtuoso;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -14,11 +15,13 @@ import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.helpers.FreeTextSearchHelper.FilterType;
 import eionet.cr.dao.helpers.SearchHelper;
 import eionet.cr.dao.postgre.helpers.PostgreFreeTextSearchHelper;
+import eionet.cr.dao.postgre.helpers.PostgreReferencesSearchHelper;
 import eionet.cr.dao.readers.FreeTextSearchReader;
 import eionet.cr.dao.readers.SubjectDataReader;
 import eionet.cr.dao.util.BBOX;
 import eionet.cr.dao.util.SearchExpression;
 import eionet.cr.dao.virtuoso.helpers.VirtuosoFreeTextSearchHelper;
+import eionet.cr.dao.virtuoso.helpers.VirtuosoReferencesSearchHelper;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
@@ -67,6 +70,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
 
 		// execute the query, using dedicated reader
 		FreeTextSearchReader<String> matchReader = new FreeTextSearchReader<String>();
+		matchReader.setBlankNodeUriPrefix(VirtuosoBaseDAO.BNODE_URI_PREFIX);
 		List<String> subjectUris = executeSPARQL(query, matchReader);
 
 		logger.debug("Free-text search, find subjects query time " + Util.durationSince(startTime));
@@ -122,10 +126,9 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
 	 */
 	@Override
 	public Pair<Integer, List<SubjectDTO>> searchReferences(Long subjectHash,
-			PagingRequest pagingRequest, SortingRequest sortingRequest)
-			throws DAOException {
-		throw new UnsupportedOperationException("Method not implemented");
+			PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException {
 		
+		throw new UnsupportedOperationException("Method not implemented");
 	}
 
 	/* (non-Javadoc)
@@ -204,5 +207,54 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
 	public int getExactRowCountLimit() {
 		
 		return Integer.MAX_VALUE;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.SearchDAO#searchReferences(java.lang.String, eionet.cr.util.pagination.PagingRequest, eionet.cr.util.SortingRequest)
+	 */
+	@Override
+	public Pair<Integer, List<SubjectDTO>> searchReferences(String subjectUri,
+			PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException {
+		
+		// create query helper
+		// TODO: make use of sortingRequest, instead of passing null
+		VirtuosoReferencesSearchHelper helper = new VirtuosoReferencesSearchHelper(
+				subjectUri, pagingRequest, sortingRequest);
+		
+		// let the helper create the query
+		// (no query parameters needed here, so supplying null)
+		String query = helper.getQuery(null);
+		
+		long startTime = System.currentTimeMillis();
+		logger.trace("Search references, executing subject finder query: " + query);
+
+		// execute the query, with the IN parameters
+		List<String> subjectUris = executeSPARQL(query, new SingleObjectReader<String>());
+		
+		Integer totalMatchCount = Integer.valueOf(0);
+		List<SubjectDTO> resultList = new ArrayList<SubjectDTO>();
+		
+		// if result list not null and not empty, then get the subjects data and total rowcount
+		if (subjectUris!=null && !subjectUris.isEmpty()){
+			
+			logger.trace("Search references, getting the data of the found subjects");
+			
+			// get the data of all found subjects
+			resultList = getSubjectsData(subjectUris, null, new SubjectDataReader(subjectUris));
+
+			// if paging required, get the total number of found subjects too
+			if (pagingRequest!=null){
+				
+				logger.trace("Search references, executing rowcount query: " + query);
+				totalMatchCount = new Integer(getExactRowCount(helper));
+			}
+		}
+		
+		logger.debug("Search references, total query time " +
+				Util.durationSince(startTime));
+
+		// the result Pair contains total number of subjects and the requested sub-list
+		return new Pair<Integer,List<SubjectDTO>>(totalMatchCount, resultList);
 	}
 }

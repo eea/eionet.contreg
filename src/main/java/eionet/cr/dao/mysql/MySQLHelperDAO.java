@@ -800,12 +800,12 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 		throw new UnsupportedOperationException("Method not implemented");
 	}
 	
-	public double getUrgencyScore(int harvestSourceId) throws DAOException {
-		throw new UnsupportedOperationException("Method not implemented");
-	}
-	
-	public boolean isUrlInHarvestSource(String url) throws DAOException
-	{
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HelperDAO#isUrlInHarvestSource(java.lang.String)
+	 */
+	@Override
+	public boolean isUrlInHarvestSource(String url) throws DAOException{
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("Method not implemented");
 	}

@@ -159,5 +159,13 @@ public interface HarvestSourceDAO extends DAO{
 	 */
 	void deleteHarvestHistory(int neededToRemain) throws DAOException;
 
+	/**
+	 * 
+	 * @param harvestSourceId
+	 * @return urgencyScore
+	 * @throws DAOException
+	 */
+	public double getUrgencyScore(int harvestSourceId) throws DAOException;
+
 
 }

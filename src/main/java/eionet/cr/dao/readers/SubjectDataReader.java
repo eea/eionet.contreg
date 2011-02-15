@@ -30,6 +30,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.openrdf.model.BNode;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Value;
 import org.openrdf.query.BindingSet;
@@ -147,13 +148,18 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO>{
 	@Override
 	public void readRow(BindingSet bindingSet) {
 		
-		String subjectUri = bindingSet.getValue("s").stringValue();
+		Value subjectValue = bindingSet.getValue("s");
+		String subjectUri = subjectValue.stringValue();
+		
+		boolean isAnonSubject = subjectValue instanceof BNode;
+		if (isAnonSubject && blankNodeUriPrefix!=null){			
+			subjectUri = blankNodeUriPrefix + subjectUri;
+		}
 		long subjectHash = Hashes.spoHash(subjectUri);
 		
 		boolean newSubject = currentSubject==null || subjectHash!=currentSubject.getUriHash();
 		if (newSubject){
-			// TODO: fix isAnonymous flag
-			currentSubject = new SubjectDTO(subjectUri, false);
+			currentSubject = new SubjectDTO(subjectUri, isAnonSubject);
 			currentSubject.setUriHash(subjectHash);
 			addNewSubject(subjectHash, currentSubject);
 		}
@@ -175,7 +181,7 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO>{
 		ObjectDTO object = new ObjectDTO(objectValue.stringValue(),
 				objectLang==null ? "" : objectLang,
 				isLiteral,
-				false); // TODO: fix anonymous flag
+				objectValue instanceof BNode);
 		
 		object.setHash(Hashes.spoHash(objectValue.stringValue()));
 		

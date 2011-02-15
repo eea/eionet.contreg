@@ -449,4 +449,10 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("Method not implemented");
 	}
+
+	@Override
+	public Pair<Integer, List<SubjectDTO>> searchReferences(String subjectUri,
+			PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException {
+		throw new UnsupportedOperationException("Method not implemented");
+	}
 }

@@ -119,9 +119,14 @@ public class HarvestSourceActionBean extends AbstractActionBean {
 		return harvests;
 	}
 
-	
+	/**
+	 * 
+	 * @return
+	 * @throws DAOException
+	 */
 	public String getUrgencyScoreFormatted() throws DAOException{
-		double urgency = factory.getDao(HelperDAO.class).getUrgencyScore(harvestSource.getSourceId());
+		
+		double urgency = factory.getDao(HarvestSourceDAO.class).getUrgencyScore(harvestSource.getSourceId());
         DecimalFormat df = new DecimalFormat("#.####");
         if (urgency>=0){
         	return df.format(urgency);

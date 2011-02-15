@@ -7,6 +7,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
+import org.apache.commons.lang.StringUtils;
+import org.openrdf.model.BNode;
+import org.openrdf.model.Value;
 import org.openrdf.query.Binding;
 import org.openrdf.query.BindingSet;
 
@@ -23,7 +26,7 @@ public class FreeTextSearchReader<T> extends ResultSetMixedReader<T>{
 	
 	/** */
 	private LinkedHashMap<Long,Long> hitSourcesBySubjectHashes = new LinkedHashMap<Long, Long>();
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see eionet.cr.util.sql.SQLResultSetReader#readRow(java.sql.ResultSet)
@@ -51,9 +54,15 @@ public class FreeTextSearchReader<T> extends ResultSetMixedReader<T>{
 	public void readRow(BindingSet bindingSet) throws ResultSetReaderException {
 		
 		Iterator<Binding> iterator = bindingSet.iterator();
+		Value subjectValue = bindingSet.getValue("s");
 		
 		// expecting the URI of the matching subject to be in column "s"
-		String subjectUri = bindingSet.getValue("s").stringValue();
+		String subjectUri = subjectValue.stringValue();
+		if (subjectValue instanceof BNode && blankNodeUriPrefix!=null){
+			if (!subjectUri.startsWith(blankNodeUriPrefix)){
+				subjectUri = blankNodeUriPrefix + subjectUri;
+			}
+		}
 		resultList.add((T)subjectUri);
 		
 		// expecting the column "g" to contain the URI of the triple source

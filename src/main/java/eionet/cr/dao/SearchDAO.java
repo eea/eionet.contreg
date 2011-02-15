@@ -151,9 +151,20 @@ public interface SearchDAO extends DAO{
 	 * @return
 	 * @throws DAOException
 	 */
-	Pair<Integer, List<SubjectDTO>> searchByTags(
+	public Pair<Integer, List<SubjectDTO>> searchByTags(
 				List<String> tags,
 				PagingRequest pagingRequest,
 				SortingRequest sortingRequest,
 				List<String> selectedPredicates) throws DAOException;
+	
+	/**
+	 * 
+	 * @param subjectUri
+	 * @param pagingRequest
+	 * @param sortingRequest
+	 * @return
+	 * @throws DAOException
+	 */
+	public Pair<Integer, List<SubjectDTO>> searchReferences(String subjectUri,
+			PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException;
 }

@@ -243,15 +243,6 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO{
 	}
 
 	/* (non-Javadoc)
-	 * @see eionet.cr.dao.HelperDAO#getUrgencyScore(int)
-	 */
-	@Override
-	public double getUrgencyScore(int harvestSourceId) throws DAOException {
-		throw new UnsupportedOperationException("Method not implemented");
-		
-	}
-
-	/* (non-Javadoc)
 	 * @see eionet.cr.dao.HelperDAO#isUrlInHarvestSource(java.lang.String)
 	 */
 	@Override
@@ -312,9 +303,10 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO{
 	 * @see eionet.cr.dao.HelperDAO#isSubjectUserBookmark(eionet.cr.web.security.CRUser, long)
 	 */
 	@Override
-	public boolean isSubjectUserBookmark(CRUser user, long subjectHash)
-			throws DAOException {
-		throw new UnsupportedOperationException("Method not implemented");
+	public boolean isSubjectUserBookmark(CRUser user, long subjectHash) throws DAOException {
+		
+		// TODO: implement actual logic
+		return false;
 		
 	}
 

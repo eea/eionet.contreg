@@ -3,8 +3,6 @@ package eionet.cr.dao.virtuoso.helpers;
 import java.util.List;
 
 import eionet.cr.dao.helpers.AbstractSearchHelper;
-import eionet.cr.dao.helpers.FreeTextSearchHelper;
-import eionet.cr.dao.util.SearchExpression;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.pagination.PagingRequest;
 
@@ -13,22 +11,22 @@ import eionet.cr.util.pagination.PagingRequest;
  * @author jaanus
  *
  */
-public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper{
-
-	/** */
-	private SearchExpression expression;
+public class VirtuosoReferencesSearchHelper extends AbstractSearchHelper{
 	
+	/** */
+	private String subjectUri;
+
 	/**
 	 * 
-	 * @param expression
+	 * @param subjectUri
 	 * @param pagingRequest
 	 * @param sortingRequest
 	 */
-	public VirtuosoFreeTextSearchHelper(SearchExpression expression,
+	public VirtuosoReferencesSearchHelper(String subjectUri,
 			PagingRequest pagingRequest, SortingRequest sortingRequest) {
 		
 		super(pagingRequest, sortingRequest);
-		this.expression = expression;
+		this.subjectUri = subjectUri;
 	}
 
 	/* (non-Javadoc)
@@ -46,8 +44,8 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper{
 	public String getUnorderedQuery(List<Object> inParams) {
 		
 		StringBuilder strBuilder = new StringBuilder().
-		append("select distinct ?s ?g where { graph ?g {?s ?p ?o . ?o bif:contains \"'").
-		append(expression.toString()).append("'\".}}");
+		append("select ?s where {?s ?p ?o. filter(isURI(?o) && ?o=<").
+		append(subjectUri).append(">)}");
 		
 		return strBuilder.toString();
 	}
@@ -59,8 +57,8 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper{
 	public String getCountQuery(List<Object> inParams) {
 		
 		StringBuilder strBuilder = new StringBuilder().
-		append("select count(distinct ?s) where {?s ?p ?o . ?o bif:contains \"'").
-		append(expression.toString()).append("'\".}");
+		append("select count(?s) where {?s ?p ?o. filter(isURI(?o) && ?o=<").
+		append(subjectUri).append(">)}");
 		
 		return strBuilder.toString();
 	}
@@ -72,5 +70,4 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper{
 	public String getMinMaxHashQuery(List<Object> inParams) {
 		throw new UnsupportedOperationException("Method not implemented");
 	}
-
 }

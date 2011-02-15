@@ -9,7 +9,7 @@
 			<tr>
 				<td>URL:</td>
 				<td><a 
-					href="/factsheet.action?uri=${crfn:urlEncode(actionBean.harvestSource.url)}"><c:out
+					href="${pageContext.request.contextPath}/factsheet.action?uri=${crfn:urlEncode(actionBean.harvestSource.url)}"><c:out
 					value="${actionBean.harvestSource.url}" /></a></td>
 			</tr>
 			<tr>

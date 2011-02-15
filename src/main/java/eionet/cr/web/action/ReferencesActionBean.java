@@ -21,6 +21,7 @@
 package eionet.cr.web.action;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -38,6 +39,7 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.SearchDAO;
+import eionet.cr.dao.util.PredicateLabels;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Hashes;
@@ -90,11 +92,18 @@ public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
 			addCautionMessage("Resource identifier not specified!");
 		}
 		else{
-			Pair<Integer, List<SubjectDTO>> searchResult =
-				DAOFactory.get().getDao(SearchDAO.class).searchReferences(
-						anonHash==0 ? Hashes.spoHash(uri) : anonHash,
+			Pair<Integer, List<SubjectDTO>> searchResult = null;
+			SearchDAO searchDAO = DAOFactory.get().getDao(SearchDAO.class);
+			
+			if (anonHash==0){
+				searchResult = searchDAO.searchReferences(uri, PagingRequest.create(getPageN()),
+								new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
+			}
+			else{
+				searchResult = searchDAO.searchReferences(anonHash,
 								PagingRequest.create(getPageN()),
 								new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
+			}
 
 			resultList = searchResult.getRight();
 			matchCount = searchResult.getLeft();
@@ -103,8 +112,11 @@ public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
 			for (SubjectDTO subject : resultList){
 				subjectHashes.add(subject.getUriHash());
 			}
-			predicateLabels = DAOFactory.get().getDao(HelperDAO.class).getPredicateLabels(
-					subjectHashes).getByLanguages(getAcceptedLanguages());
+			
+			PredicateLabels predLabels = DAOFactory.get().getDao(HelperDAO.class).getPredicateLabels(subjectHashes);
+			if (predLabels!=null){
+				predicateLabels = predLabels.getByLanguages(getAcceptedLanguages());
+			}
 		}
 		
 		return new ForwardResolution("/pages/references.jsp");

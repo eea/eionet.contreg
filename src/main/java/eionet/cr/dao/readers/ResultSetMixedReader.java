@@ -22,6 +22,9 @@ public abstract class ResultSetMixedReader<T> implements SQLResultSetReader<T>, 
 
 	/** */
 	protected ResultSetMetaData resultSetMetaData;
+
+	/** */
+	protected String blankNodeUriPrefix;
 	
 	/* (non-Javadoc)
 	 * @see eionet.cr.util.sql.SQLResultSetReader#startResultSet(java.sql.ResultSetMetaData)
@@ -56,4 +59,10 @@ public abstract class ResultSetMixedReader<T> implements SQLResultSetReader<T>, 
 		return resultList;
 	}
 
+	/**
+	 * @param blnakNodeUriPrefix the blnakNodeUriPrefix to set
+	 */
+	public void setBlankNodeUriPrefix(String blankNodeUriPrefix) {
+		this.blankNodeUriPrefix = blankNodeUriPrefix;
+	}
 }

@@ -647,4 +647,14 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 	public int getExactRowCountLimit() {
 		return EXACT_ROW_COUNT_LIMIT;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.SearchDAO#searchReferences(java.lang.String, eionet.cr.util.pagination.PagingRequest, eionet.cr.util.SortingRequest)
+	 */
+	@Override
+	public Pair<Integer, List<SubjectDTO>> searchReferences(String subjectUri,
+			PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException {
+		throw new UnsupportedOperationException("Method not implemented");
+	}
 }

@@ -484,4 +484,13 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 		execute("delete from HARVEST_MESSAGE where HARVEST_ID not in (select HARVEST_ID from HARVEST)", null);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see eionet.cr.dao.HarvestSourceDAO#getUrgencyScore(int)
+	 */
+	@Override
+	public double getUrgencyScore(int harvestSourceId) throws DAOException {
+		
+		throw new UnsupportedOperationException("Method not implemented");
+	}
 }
