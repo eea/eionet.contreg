@@ -88,7 +88,7 @@ public class DbConnectionProvider {
 		else
 			throw new CRRuntimeException("Unknown connection type: " + connectionType);
 	}
-
+	
 	/**
 	 * 
 	 * @return
@@ -113,26 +113,61 @@ public class DbConnectionProvider {
 	/**
 	 * 
 	 * @return
-	 * @throws SQLException 
+	 * @throws SQLException
+	 */
+	public static Connection getUnitTestConnection() throws SQLException{
+		
+		DbConnectionProvider.setConnectionType(DbConnectionProvider.ConnectionType.SIMPLE);
+		return getSimpleConnection(true);
+	}
+
+	/**
+	 * 
+	 * @return
 	 * @throws SQLException
 	 */
 	private static Connection getSimpleConnection() throws SQLException{
-		
-		String drv = GeneralConfig.getProperty(GeneralConfig.DB_DRV);
-		if (drv==null || drv.trim().length()==0)
-			throw new SQLException("Failed to get connection, missing property: " + GeneralConfig.DB_DRV);
-		
-		String url = GeneralConfig.getProperty(GeneralConfig.DB_URL);
-		if (url==null || url.trim().length()==0)
-			throw new SQLException("Failed to get connection, missing property: " + GeneralConfig.DB_URL);
 
-		String usr = GeneralConfig.getProperty(GeneralConfig.DB_USER_ID);
-		if (usr==null || usr.trim().length()==0)
-			throw new SQLException("Failed to get connection, missing property: " + GeneralConfig.DB_USER_ID);
+		// see if this code is being executed at Maven's test time right now
+		String mavenPhase = System.getProperty("contreg.maven.phase");
+		boolean isUnitTest = mavenPhase!=null && mavenPhase.trim().equals("test");
 
-		String pwd = GeneralConfig.getProperty(GeneralConfig.DB_USER_PWD);
-		if (pwd==null || pwd.trim().length()==0)
-			throw new SQLException("Failed to get connection, missing property: " + GeneralConfig.DB_USER_PWD);
+		return getSimpleConnection(isUnitTest);
+	}
+	/**
+	 * 
+	 * @return
+	 * @throws SQLException
+	 */
+	private static Connection getSimpleConnection(boolean isUnitTest) throws SQLException{
+		
+		// property names depending on whether it's Maven unit test currently
+		// (this is just to avoid shooting in the leg by running unit tests
+		// accidentally against the real database)
+		String drvProperty = isUnitTest ? GeneralConfig.DB_UNITTEST_DRV : GeneralConfig.DB_DRV;
+		String urlProperty = isUnitTest ? GeneralConfig.DB_UNITTEST_URL : GeneralConfig.DB_URL;
+		String usrProperty = isUnitTest ? GeneralConfig.DB_UNITTEST_USR : GeneralConfig.DB_USR;
+		String pwdProperty = isUnitTest ? GeneralConfig.DB_UNITTEST_PWD : GeneralConfig.DB_PWD;
+		
+		String drv = GeneralConfig.getProperty(drvProperty);
+		if (drv==null || drv.trim().length()==0){
+			throw new SQLException("Failed to get connection, missing property: " + drvProperty);
+		}
+		
+		String url = GeneralConfig.getProperty(urlProperty);
+		if (url==null || url.trim().length()==0){
+			throw new SQLException("Failed to get connection, missing property: " + urlProperty);
+		}
+
+		String usr = GeneralConfig.getProperty(usrProperty);
+		if (usr==null || usr.trim().length()==0){
+			throw new SQLException("Failed to get connection, missing property: " + usrProperty);
+		}
+
+		String pwd = GeneralConfig.getProperty(pwdProperty);
+		if (pwd==null || pwd.trim().length()==0){
+			throw new SQLException("Failed to get connection, missing property: " + pwdProperty);
+		}
 
 		try{
 			Class.forName(drv);

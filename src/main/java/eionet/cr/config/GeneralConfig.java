@@ -41,9 +41,15 @@ public class GeneralConfig {
 	/** */
 	public static final String DB_URL = "db.url";
 	public static final String DB_DRV = "db.drv";
-	public static final String DB_USER_ID = "db.usr";
-	public static final String DB_USER_PWD = "db.pwd";
-	
+	public static final String DB_USR = "db.usr";
+	public static final String DB_PWD = "db.pwd";
+
+	/** */
+	public static final String DB_UNITTEST_DRV = "db.unittest.drv";
+	public static final String DB_UNITTEST_URL = "db.unittest.url";
+	public static final String DB_UNITTEST_USR = "db.unittest.usr";
+	public static final String DB_UNITTEST_PWD = "db.unittest.pwd";
+
 	/** */
 	public static final String HARVESTER_FILES_LOCATION = "harvester.tempFileDir";
 	public static final String HARVESTER_BATCH_HARVESTING_HOURS = "harvester.batchHarvestingHours";

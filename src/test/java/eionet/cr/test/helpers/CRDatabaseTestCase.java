@@ -21,6 +21,7 @@
 package eionet.cr.test.helpers;
 
 import java.io.IOException;
+import java.util.Properties;
 
 import org.dbunit.DatabaseTestCase;
 import org.dbunit.database.IDatabaseConnection;
@@ -28,7 +29,9 @@ import org.dbunit.dataset.DataSetException;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
 
+import eionet.cr.config.GeneralConfig;
 import eionet.cr.test.helpers.dbunit.DbUnitDatabaseConnection;
+import eionet.cr.util.sql.DbConnectionProvider;
 
 /**
  * 

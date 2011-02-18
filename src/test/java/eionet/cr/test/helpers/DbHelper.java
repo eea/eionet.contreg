@@ -70,10 +70,10 @@ public class DbHelper {
 		System.setProperty(
 				PropertiesBasedJdbcDatabaseTester.DBUNIT_CONNECTION_URL, url);
 		
-		String usr = GeneralConfig.getProperty(GeneralConfig.DB_USER_ID);
+		String usr = GeneralConfig.getProperty(GeneralConfig.DB_USR);
 		System.setProperty(PropertiesBasedJdbcDatabaseTester.DBUNIT_USERNAME, usr);
 		
-		String pwd = GeneralConfig.getProperty(GeneralConfig.DB_USER_PWD);
+		String pwd = GeneralConfig.getProperty(GeneralConfig.DB_PWD);
 		System.setProperty(PropertiesBasedJdbcDatabaseTester.DBUNIT_PASSWORD, pwd);
 	}
 }
