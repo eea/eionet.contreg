@@ -48,6 +48,16 @@
 				    	    </stripes:link>
 			        	</li>
 			        </c:if>
+	    			<c:if test="${actionBean.mapDisplayable}">
+		   				<li>
+							<stripes:link class="link-plain" href="/factsheet.action" event="showOnMap">Show on Map
+							<stripes:param name="uri" value="${actionBean.subject.uri}"/>
+							<stripes:param name="latitude" value="${actionBean.latitude}" />
+							<stripes:param name="longitude" value="${actionBean.longitude}" />
+							</stripes:link>						    					
+		   				</li>
+	    			</c:if>
+			        
 				    </ul>
 				</div>
 				<br style="clear:left" />

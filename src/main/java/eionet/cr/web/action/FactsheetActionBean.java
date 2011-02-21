@@ -108,6 +108,7 @@ public class FactsheetActionBean extends AbstractActionBean{
 	
 	/** */
 	private boolean subjectDownloadable;
+
 	
 	/**
 	 * 
@@ -659,21 +660,20 @@ public class FactsheetActionBean extends AbstractActionBean{
 	public boolean isMapDisplayable(){
 		
 		if (subject!=null){
-			
 			Collection<ObjectDTO> objects = subject.getObjects(Predicates.RDF_TYPE, ObjectDTO.Type.RESOURCE);
 			if (objects!=null){
-				
 				boolean isWgsPoint = false;
 				for (ObjectDTO objectDTO : objects){
-					if (objectDTO.getValue()!=null && objectDTO.equals(Subjects.WGS_POINT)){
+					if (objectDTO.getValue()!=null && objectDTO.getValue(). equals(Subjects.WGS_POINT)){
 						isWgsPoint = true;
 						break;
 					}
 				}
 				
 				if (isWgsPoint){
-					
+					logger.debug("FactSheetActionBean() isWgsPoint=true");
 					if (subject.getObject(Predicates.WGS_LAT)!=null && subject.getObject(Predicates.WGS_LONG)!=null){
+						logger.debug("FactSheetActionBean() has coordinates");
 						return true;
 					}
 				}
@@ -681,6 +681,28 @@ public class FactsheetActionBean extends AbstractActionBean{
 		}
 		
 		return false;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public Resolution showOnMap(){
+		return new ForwardResolution("/pages/map.jsp");
+	}
+	
+	public String getLongitude() {
+		if (subject.getObject(Predicates.WGS_LONG)!=null){
+			return subject.getObject(Predicates.WGS_LONG).getValue();
+		}
+		return null;
+	}
+	
+	public String getLatitude() {
+		if (subject.getObject(Predicates.WGS_LAT)!=null ) {
+			return subject.getObject(Predicates.WGS_LAT).getValue();
+		}
+		return null;
 	}
 	
 }
