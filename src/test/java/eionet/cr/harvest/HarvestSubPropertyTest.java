@@ -47,12 +47,13 @@ public class HarvestSubPropertyTest extends CRDatabaseTestCase {
 	 * @see eionet.cr.test.helpers.CRDatabaseTestCase#getDataSet()
 	 */
 	protected IDataSet getDataSet() throws Exception {
+		
 		return getXmlDataSet("emptydb.xml");
 	}
 
 	@Test
 	public void testSimpleSubProperty() {
-
+		
 		try {
 			URL url = new URL("http://svn.eionet.europa.eu/repositories" +
 					"/Reportnet/cr2/trunk/src/test/resources/subproperty-rdf.xml");

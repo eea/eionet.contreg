@@ -41,9 +41,9 @@ public class VirtuosoQueryActionBean extends AbstractActionBean {
 		if(query == null)
 			query = "";
 		
-		String repoUrl = GeneralConfig.getProperty("virtuoso.db.url");
-		String repoUsr = GeneralConfig.getProperty("virtuoso.db.username");
-		String repoPwd = GeneralConfig.getProperty("virtuoso.db.password");
+		String repoUrl = GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_DB_URL);
+		String repoUsr = GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_DB_USR);
+		String repoPwd = GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_DB_PWD);
 		
 		VirtGraph set = new VirtGraph(repoUrl, repoUsr, repoPwd);
 		

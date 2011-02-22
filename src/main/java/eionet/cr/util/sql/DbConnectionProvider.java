@@ -42,6 +42,9 @@ public class DbConnectionProvider {
 	
 	/** */
 	public enum ConnectionType {SIMPLE,JNDI};
+
+	/** */
+	private static final String DATASOURCE_NAME = "jdbc/cr";
 	
 	/** */
 	private static DataSource dataSource = null;
@@ -58,14 +61,13 @@ public class DbConnectionProvider {
 	 */
 	private static void initDataSource(){
 		
-		String dataSourceName = GeneralConfig.getRequiredProperty(GeneralConfig.DATASOURCE_NAME);
 		try{
 			Context initContext = new InitialContext();
 			Context context = (Context) initContext.lookup("java:comp/env");
-			DbConnectionProvider.dataSource = (javax.sql.DataSource)context.lookup(dataSourceName);
+			DbConnectionProvider.dataSource = (javax.sql.DataSource)context.lookup(DATASOURCE_NAME);
 		}
 		catch (NamingException e){
-			throw new CRRuntimeException("Failed to init JDBC resource " + dataSourceName, e);
+			throw new CRRuntimeException("Failed to init JDBC resource " + DATASOURCE_NAME, e);
 		}
 	}
 	

@@ -31,7 +31,6 @@ import org.dbunit.dataset.xml.FlatXmlDataSet;
 
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.test.helpers.dbunit.DbUnitDatabaseConnection;
-import eionet.cr.util.sql.DbConnectionProvider;
 
 /**
  * 
@@ -39,7 +38,7 @@ import eionet.cr.util.sql.DbConnectionProvider;
  *
  */
 public abstract class CRDatabaseTestCase extends DatabaseTestCase{
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.dbunit.DatabaseTestCase#getConnection()

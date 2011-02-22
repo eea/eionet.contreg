@@ -57,9 +57,6 @@ public class GeneralConfig {
 	public static final String HARVESTER_REFERRALS_INTERVAL = "harvester.referrals.intervalMinutes";
 	
 	/** */
-	public static final String DATASOURCE_NAME = "datasource.name";
-
-	/** */
 	public static final String XMLCONV_LIST_CONVERSIONS_URL = "xmlconv.listConversions.url";
 	public static final String XMLCONV_CONVERT_URL = "xmlconv.convert.url";
 	public static final String XMLCONV_CONVERT_PUSH_URL = "xmlconv.convertPush.url";
@@ -97,8 +94,8 @@ public class GeneralConfig {
 	
 	/** */
 	public static final String VIRTUOSO_DB_URL = "virtuoso.db.url";
-	public static final String VIRTUOSO_DB_USR = "virtuoso.db.username";
-	public static final String VIRTUOSO_DB_PWD = "virtuoso.db.password";
+	public static final String VIRTUOSO_DB_USR = "virtuoso.db.usr";
+	public static final String VIRTUOSO_DB_PWD = "virtuoso.db.pwd";
 	
 	/** */
 	public static final int SEVERITY_INFO = 1;
