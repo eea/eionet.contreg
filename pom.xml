@@ -378,14 +378,20 @@
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
-			<groupId>virtuoso</groupId>
-			<artifactId>virtjdbc</artifactId>
-			<version>3.0</version>
+			<groupId>org.openrdf</groupId>
+			<artifactId>openrdf-sesame</artifactId>
+			<version>2.3.2</version>
 		</dependency>
 		<dependency>
 			<groupId>virtuoso</groupId>
 			<artifactId>virt-sesame</artifactId>
 			<version>2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>virtuoso</groupId>
+			<artifactId>virtjdbc</artifactId>
+			<version>3.0</version>
+			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.hp.hpl.jena</groupId>
@@ -397,18 +403,7 @@
 			<artifactId>arq</artifactId>
 			<version>2.8.5</version>
 		</dependency>
-		<dependency>
-			<groupId>org.openrdf</groupId>
-			<artifactId>openrdf-sesame</artifactId>
-			<version>2.3.2</version>
-		</dependency>
 		
-<!--
-		<dependency>
-			<groupId>org.mortbay.jetty</groupId>
-			<artifactId>maven-jetty-plugin</artifactId>
-			<version>6.1.10</version>
-		</dependency>
--->
+		
 	</dependencies>
 </project>
