@@ -2,19 +2,16 @@
 <%@ include file="/pages/common/taglibs.jsp"%>	
 
 <stripes:layout-render name="/pages/common/template.jsp" pageTitle="Show on Map">
-	<stripes:layout-component name="contents">
+<stripes:layout-component name="head">
+	<meta http-equiv="X-UA-Compatible" content="IE=7" />
+	<link rel="stylesheet" type="text/css" href="http://serverapi.arcgisonline.com/jsapi/arcgis/1.6/js/dojo/dijit/themes/tundra/tundra.css"/>
+	<script type="text/javascript" src="http://serverapi.arcgisonline.com/jsapi/arcgis/?v=1.6"></script>
+	<script type="text/javascript">
+		loadMap();
+	</script>
+</stripes:layout-component>	
 
-	  <head>
-	    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-	    <meta http-equiv="X-UA-Compatible" content="IE=7" />
-	    <link rel="stylesheet" type="text/css" href="http://serverapi.arcgisonline.com/jsapi/arcgis/1.6/js/dojo/dijit/themes/tundra/tundra.css"/>
-	  
-	  <script type="text/javascript" src="http://serverapi.arcgisonline.com/jsapi/arcgis/?v=1.6"></script>
-	  <script type="text/javascript">
-	  	loadMap();
-	  </script>
-	
-	</head>
+<stripes:layout-component name="contents">
 		<div id="tabbedmenu">
 	    <ul>
 	    <li>
@@ -57,9 +54,7 @@
 	</div>
 	<br style="clear:left" />
 	<div style="margin-top:20px">
-		<p>	
-			<div id="map" style="width:900px; height:400px; border:1px solid #000;"></div>
-		</p>
+		<div id="map" style="width:900px; height:400px; border:1px solid #000;"></div>
 	</div>
 	</stripes:layout-component>
 </stripes:layout-render>
