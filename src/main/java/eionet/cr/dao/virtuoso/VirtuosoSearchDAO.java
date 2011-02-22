@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
+import org.apache.commons.lang.StringUtils;
+
 import eionet.cr.common.Predicates;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.SearchDAO;
@@ -16,12 +18,14 @@ import eionet.cr.dao.helpers.FreeTextSearchHelper.FilterType;
 import eionet.cr.dao.helpers.SearchHelper;
 import eionet.cr.dao.postgre.helpers.PostgreFreeTextSearchHelper;
 import eionet.cr.dao.postgre.helpers.PostgreReferencesSearchHelper;
+import eionet.cr.dao.postgre.helpers.PostgreSearchBySourceHelper;
 import eionet.cr.dao.readers.FreeTextSearchReader;
 import eionet.cr.dao.readers.SubjectDataReader;
 import eionet.cr.dao.util.BBOX;
 import eionet.cr.dao.util.SearchExpression;
 import eionet.cr.dao.virtuoso.helpers.VirtuosoFreeTextSearchHelper;
 import eionet.cr.dao.virtuoso.helpers.VirtuosoReferencesSearchHelper;
+import eionet.cr.dao.virtuoso.helpers.VirtuosoSearchBySourceHelper;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
@@ -160,10 +164,50 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
 	 */
 	@Override
 	public Pair<Integer, List<SubjectDTO>> searchBySource(String sourceUrl,
-			PagingRequest pagingRequest, SortingRequest sortingRequest)
-			throws DAOException {
-		throw new UnsupportedOperationException("Method not implemented");
+			PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException {
 		
+		// if source URL to search by is blank, return empty result
+		if (StringUtils.isBlank(sourceUrl)){
+			return new Pair<Integer, List<SubjectDTO>>(0, new LinkedList<SubjectDTO>());
+		}
+
+		// create query helper
+		VirtuosoSearchBySourceHelper helper = new VirtuosoSearchBySourceHelper(sourceUrl,
+				pagingRequest, sortingRequest);
+		
+		// let the helper create the query
+		String query = helper.getQuery(null);
+		
+		long startTime = System.currentTimeMillis();
+		logger.trace("Search subjects in source, executing subject finder query: " + query);
+
+		// execute the query
+		List<String> subjectUris = executeSPARQL(query, new SingleObjectReader<String>());
+		
+		Integer totalMatchCount = Integer.valueOf(0);
+		List<SubjectDTO> resultList = new ArrayList<SubjectDTO>();
+		
+		// if result list not null and not empty, then get the subjects data and total rowcount
+		if (subjectUris!=null && !subjectUris.isEmpty()){
+			
+			logger.trace("Search subjects in sources, getting the data of the found subjects");
+			
+			// get the data of all found subjects
+			resultList = getSubjectsData(subjectUris, null, new SubjectDataReader(subjectUris));
+
+			// if paging required, get the total number of found subjects too
+			if (pagingRequest!=null){
+				
+				logger.trace("Search subjects in source, executing rowcount query: " + query);
+				totalMatchCount = new Integer(getExactRowCount(helper));
+			}
+		}
+		
+		logger.debug("Search subjects in source, total query time " +
+				Util.durationSince(startTime));
+
+		// the result Pair contains total number of subjects and the requested sub-list
+		return new Pair<Integer,List<SubjectDTO>>(totalMatchCount, resultList);
 	}
 
 	/* (non-Javadoc)
@@ -229,7 +273,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
 		long startTime = System.currentTimeMillis();
 		logger.trace("Search references, executing subject finder query: " + query);
 
-		// execute the query, with the IN parameters
+		// execute the query
 		List<String> subjectUris = executeSPARQL(query, new SingleObjectReader<String>());
 		
 		Integer totalMatchCount = Integer.valueOf(0);
