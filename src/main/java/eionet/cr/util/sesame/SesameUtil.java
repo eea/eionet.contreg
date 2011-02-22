@@ -53,9 +53,11 @@ public class SesameUtil {
 					
 					if (isFirstRow){
 						reader.startResultSet(queryResult.getBindingNames());
+						isFirstRow = false;
 					}
 					reader.readRow(queryResult.next());
 				}
+				reader.endResultSet();
 			}
 		}
 		finally{

@@ -2,12 +2,14 @@ package eionet.cr.web.action;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+
+import org.openrdf.model.Value;
+import org.openrdf.query.Binding;
+import org.openrdf.query.BindingSet;
+import org.openrdf.repository.RepositoryConnection;
 
 import com.hp.hpl.jena.query.ResultSet;
-
-import virtuoso.jena.driver.VirtGraph;
-import virtuoso.jena.driver.VirtuosoQueryExecution;
-import virtuoso.jena.driver.VirtuosoQueryExecutionFactory;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
@@ -16,9 +18,18 @@ import net.sourceforge.stripes.action.StreamingResolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
+import eionet.cr.dao.readers.ResultSetReaderException;
+import eionet.cr.util.sesame.SPARQLResultSetBaseReader;
+import eionet.cr.util.sesame.SPARQLResultSetReader;
+import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.web.sparqlClient.helpers.QueryResult;
 import eionet.cr.web.sparqlClient.helpers.ResultValue;
 
+/**
+ * 
+ * @author jaanus
+ *
+ */
 @UrlBinding("/virtuosoQuery.action")
 public class VirtuosoQueryActionBean extends AbstractActionBean {
 	
@@ -27,79 +38,141 @@ public class VirtuosoQueryActionBean extends AbstractActionBean {
 	/**
 	 * 
 	 * @return
-	 * @throws DAOException TODO
 	 */
 	@DefaultHandler
-	public Resolution view() throws DAOException {
+	public Resolution view(){
 		return new ForwardResolution("/pages/virtuosoQuery.jsp");
 	}
 	
-	public StreamingResolution query() throws Exception {
+	/**
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public StreamingResolution query() throws DAOException {
 		
-		StringBuffer ret = new StringBuffer();
-		
-		if(query == null)
-			query = "";
-		
-		String repoUrl = GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_DB_URL);
-		String repoUsr = GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_DB_USR);
-		String repoPwd = GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_DB_PWD);
-		
-		VirtGraph set = new VirtGraph(repoUrl, repoUsr, repoPwd);
-		
-		VirtuosoQueryExecution vqe = VirtuosoQueryExecutionFactory.create (query, set);
-		long start = System.currentTimeMillis();
-		ResultSet rs = vqe.execSelect();
-		long end = System.currentTimeMillis();
-		QueryResult results = new QueryResult(rs);
-		
-		long executionTime = end - start;
-		
-		if(results != null && results.getRows() != null && results.getVariables() != null){
-			ret.append("<table class=\"datatable\">");
-			ret.append("<thead>");
-			for(Iterator<String> cols = results.getVariables().iterator(); cols.hasNext(); ){
-				String col = cols.next();
-				ret.append("<th>").append(col).append("</th>");
+		RepositoryConnection conn = null;
+		try {
+			conn = SesameUtil.getConnection();
+			ResultReader reader = new ResultReader();
+			
+			long startTime = System.currentTimeMillis();
+			SesameUtil.executeQuery(query, reader, conn);
+			long execTime = System.currentTimeMillis() - startTime;
+			
+			String result = reader.getResult();
+			if (result==null || result.trim().length()==0){
+				result = "The query gave no results!";
 			}
-			ret.append("</thead>");
-			ret.append("<tbody>");
-			int cnt = 0;
-			for(Iterator<HashMap<String, ResultValue>> it = results.getRows().iterator(); it.hasNext(); ){
-				HashMap<String, ResultValue> row = it.next();
-				if(cnt % 2 == 0)
-					ret.append("<tr class=\"odd\">");
-				else
-					ret.append("<tr class=\"even\">");
-				
-				for(Iterator<String> it2 = results.getVariables().iterator(); it2.hasNext(); ){
-					String col = it2.next();
-					ResultValue val = row.get(col);
-					ret.append("<td>");
-					ret.append(val.getValue());
-					ret.append("</td>");
-				}
-				ret.append("<tr>");
-				cnt++;
+			else{
+				result = result + "<br/> Done, -- " + execTime + " ms.";
 			}
-			ret.append("</tbody>");
-			ret.append("</table>");
-			ret.append("<br/> Done, -- ").append(executionTime).append(" msec.");
-		} else {
-			ret.append("The query gave no results!");
+			
+			return new StreamingResolution("text/html", result);
 		}
-
-		return new StreamingResolution("text/html", ret.toString());
+		catch (Exception e) {
+			throw new DAOException(e.toString(), e);
+		}
+		finally{
+			SesameUtil.close(conn);
+		}
 	}
 
+	/**
+	 * @return
+	 */
 	public String getQuery() {
 		return query;
 	}
 
+	/**
+	 * @param query
+	 */
 	public void setQuery(String query) {
 		this.query = query;
 	}
 	
-	
+	/**
+	 * 
+	 * @author jaanus
+	 *
+	 */
+	private class ResultReader extends SPARQLResultSetBaseReader{
 
+		/** */
+		private StringBuffer result = new StringBuffer();
+		
+		/** */
+		private int rowCounter = 0;
+
+		/*
+		 * (non-Javadoc)
+		 * @see eionet.cr.util.sesame.SPARQLResultSetBaseReader#startResultSet()
+		 */
+		protected void startResultSet(){
+			
+			if (bindingNames==null || bindingNames.isEmpty()){
+				return;
+			}
+			
+			result.append("<table class=\"datatable\">");
+			result.append("<thead>");
+			
+			for (Object bindingName : bindingNames){
+				result.append("<th>").append(bindingName).append("</th>");
+			}
+			
+			result.append("</thead>");
+			result.append("<tbody>");
+		}
+		
+		/*
+		 * (non-Javadoc)
+		 * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
+		 */
+		@Override
+		public void readRow(BindingSet bindingSet) throws ResultSetReaderException {
+			
+			if(rowCounter % 2 == 0){
+				result.append("<tr class=\"odd\">");
+			}
+			else{
+				result.append("<tr class=\"even\">");
+			}
+			
+			for(Object bindingName : bindingNames){
+
+				Binding binding = bindingSet.getBinding(bindingName.toString());
+				
+				Value value = bindingSet.getValue(bindingName.toString());
+				
+				result.append("<td>").append(value.stringValue()).append("</td>");
+			}
+			
+			result.append("<tr>");
+			rowCounter++;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see eionet.cr.util.sesame.SPARQLResultSetBaseReader#endResultSet()
+		 */
+		@Override
+		public void endResultSet() {
+			
+			if (rowCounter>0 && result.length()>0){
+				
+				result.append("</tbody>");
+				result.append("</table>");
+			}
+		}
+		
+		/**
+		 * 
+		 */
+		public String getResult() {
+			return result.toString();
+		}
+	}
 }
