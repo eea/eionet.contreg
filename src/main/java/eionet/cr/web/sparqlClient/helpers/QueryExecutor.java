@@ -3,18 +3,20 @@ package eionet.cr.web.sparqlClient.helpers;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.ResultSet;
+import org.openrdf.OpenRDFException;
+import org.openrdf.query.QueryLanguage;
+import org.openrdf.query.TupleQuery;
+import org.openrdf.query.TupleQueryResult;
+import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.http.HTTPRepository;
 
 /**
  * 
- * @author <a href="mailto:jaanus.heinlaid@tieto.com">Jaanus Heinlaid</a>
+ * @author jaanus
  *
  */
 public class QueryExecutor {
-	
+
 	/** */
 	private static Log logger = LogFactory.getLog(QueryExecutor.class);
 	
@@ -27,40 +29,57 @@ public class QueryExecutor {
 	 */
 	public QueryExecutor(){
 	}
-	
+
 	/**
 	 * 
 	 * @param endpoint
 	 * @param query
+	 * @throws OpenRDFException
 	 */
-	public void executeQuery(String endpoint, String query){
-				
-		QueryExecution queryExecution = null;
-		try{
-			queryExecution = QueryExecutionFactory.sparqlService(endpoint, query);
-			long start = System.currentTimeMillis();
-			ResultSet rs = queryExecution.execSelect();
-			long end = System.currentTimeMillis();
-			
-			executionTime = end - start;
+	public void executeQuery(String endpoint, String query) throws OpenRDFException{
 
-			if (rs==null || !rs.hasNext()){
+		HTTPRepository httpRepository = null;
+		RepositoryConnection conn = null;
+		TupleQueryResult queryResult = null;
+		try {
+			httpRepository =  new HTTPRepository(endpoint, "");
+			httpRepository.initialize();
+			conn = httpRepository.getConnection();
+			
+			TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query);
+			
+			long startTime = System.currentTimeMillis();
+			queryResult = tupleQuery.evaluate();
+			executionTime = System.currentTimeMillis() - startTime;
+			
+			if (queryResult==null || !queryResult.hasNext()){
 				logger.info("The query gave no results");
 			}
 			else{
-//				ResultSetFormatter.outputAsXML(System.out, rs);
-				results = new QueryResult(rs);
+				results = new QueryResult(queryResult);
 			}
 		}
-		finally{
-			if (queryExecution!=null){
-				try{
-					queryExecution.close();
-				}
-				catch (Exception e){
-					logger.info("Failed to close QueryExecution object: " + e.toString());
+		finally {
+			try{
+				if (queryResult!=null){
+					queryResult.close();
 				}
 			}
+			catch (OpenRDFException e){}
+			
+			try{
+				if (conn!=null){
+					conn.close();
+				}
+			}
+			catch (OpenRDFException e){}
+			
+			try{
+				if (httpRepository!=null){
+					httpRepository.shutDown();
+				}
+			}
+			catch (OpenRDFException e){}
 		}
 	}
 
@@ -72,8 +91,9 @@ public class QueryExecutor {
 	 * 
 	 * @param endpoint
 	 * @param exploreSubject
+	 * @throws OpenRDFException 
 	 */
-	public String executeExploreQuery(String endpoint, String exploreSubject){
+	public String executeExploreQuery(String endpoint, String exploreSubject) throws OpenRDFException{
 		
 		String exploreQuery = StringUtils.replace(exploreQueryTempl, "@exploreSubject@", exploreSubject);
 		executeQuery(endpoint, exploreQuery);
@@ -88,6 +108,10 @@ public class QueryExecutor {
 		return results;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public long getExecutionTime() {
 		return executionTime;
 	}

@@ -1,27 +1,20 @@
 package eionet.cr.web.action;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import net.sourceforge.stripes.action.DefaultHandler;
+import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.action.StreamingResolution;
+import net.sourceforge.stripes.action.UrlBinding;
 
 import org.openrdf.model.Value;
 import org.openrdf.query.Binding;
 import org.openrdf.query.BindingSet;
 import org.openrdf.repository.RepositoryConnection;
 
-import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.action.StreamingResolution;
-import net.sourceforge.stripes.action.UrlBinding;
-import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.readers.ResultSetReaderException;
 import eionet.cr.util.sesame.SPARQLResultSetBaseReader;
-import eionet.cr.util.sesame.SPARQLResultSetReader;
 import eionet.cr.util.sesame.SesameUtil;
-import eionet.cr.web.sparqlClient.helpers.QueryResult;
-import eionet.cr.web.sparqlClient.helpers.ResultValue;
 
 /**
  * 

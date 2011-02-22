@@ -8,10 +8,11 @@ import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 
 import org.apache.commons.lang.StringUtils;
+import org.openrdf.OpenRDFException;
 
+import eionet.cr.web.sparqlClient.helpers.SPARQLEndpoints;
 import eionet.cr.web.sparqlClient.helpers.QueryExecutor;
 import eionet.cr.web.sparqlClient.helpers.QueryResult;
-import eionet.cr.web.sparqlClient.helpers.SPARQLEndpoints;
 
 /**
  * 
@@ -37,9 +38,10 @@ public class SPARQLClientActionBean extends AbstractActionBean{
 	/**
 	 * 
 	 * @return
+	 * @throws OpenRDFException 
 	 */
 	@DefaultHandler
-	public Resolution execute(){
+	public Resolution execute() throws OpenRDFException{
 		
 		if (!StringUtils.isBlank(endpoint)){
 			

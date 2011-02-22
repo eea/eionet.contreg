@@ -43,7 +43,7 @@ SELECT DISTINCT ?class ?label WHERE {
 						      		<display:column property="map(${cl.property})" title="${cl.title}" sortable="${cl.sortable}"/>
 						    	</c:forEach>
 						  	</display:table>
-						  	<br/>Done. -- ${actionBean.executionTime} msec.
+						  	<br/>Done. -- ${actionBean.executionTime} ms.
 						</c:when>
 						<c:otherwise>
 							<div class="system-msg">The query gave no results!</div>

@@ -5,17 +5,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.rdf.model.RDFNode;
+import org.openrdf.model.Literal;
+import org.openrdf.model.Value;
+import org.openrdf.query.BindingSet;
+import org.openrdf.query.QueryEvaluationException;
+import org.openrdf.query.TupleQueryResult;
 
 /**
  * 
- * @author altnyris
+ * @author jaanus
  *
  */
-public class QueryResult{
-	
+public class QueryResult {
+
 	/** */
 	private List<String> variables;
 	private ArrayList<HashMap<String,ResultValue>> rows;
@@ -23,27 +25,24 @@ public class QueryResult{
 
 	/**
 	 * 
-	 * @param rs
+	 * @param queryResult
+	 * @throws QueryEvaluationException 
 	 */
-	public QueryResult(ResultSet rs){
+	public QueryResult(TupleQueryResult queryResult) throws QueryEvaluationException{
 		
-		if (rs!=null && rs.hasNext()){
-			
-			this.variables = rs.getResultVars();
+		if (queryResult!=null && queryResult.hasNext()){
+
+			this.variables = queryResult.getBindingNames();
 			addCols();
-			while (rs.hasNext()){
-				add(rs.next());
+			while (queryResult.hasNext()){
+				add(queryResult.next());
 			}
 		}
 	}
-
-	/**
-	 * 
-	 * @param querySolution
-	 */
-	private void add(QuerySolution querySolution){
+	
+	private void add(BindingSet bindingSet){
 		
-		if (querySolution==null || variables==null || variables.isEmpty()){
+		if (bindingSet==null || variables==null || variables.isEmpty()){
 			return;
 		}
 		
@@ -51,13 +50,16 @@ public class QueryResult{
 		for (String variable : variables){
 			
 			ResultValue resultValue = null;
-			RDFNode rdfNode = querySolution.get(variable);
-			if (rdfNode!=null){
-				if (rdfNode.isLiteral()){
-					resultValue = new ResultValue(rdfNode.asLiteral().getString(), true);
+			Value value = bindingSet.getValue(variable);
+			
+			if (value!=null){
+				
+				String valueString = value.stringValue();
+				if (value instanceof Literal){
+					resultValue = new ResultValue(valueString, true);
 				}
-				else if (rdfNode.isResource()){
-					resultValue = new ResultValue(rdfNode.asResource().toString(), false);
+				else{
+					resultValue = new ResultValue(valueString, false);
 				}
 			}
 			
@@ -70,26 +72,29 @@ public class QueryResult{
 		rows.add(map);
 	}
 	
+	/**
+	 * 
+	 */
 	private void addCols(){
-		
+
 		if (variables==null || variables.isEmpty()){
 			return;
 		}
 
 		for (String variable : variables){
-			
+
 			Map<String, Object> col = new HashMap<String, Object>();
 			col.put("property", variable);
 			col.put("title", variable);
 			col.put("sortable", Boolean.TRUE);
-			
+
 			if (cols == null){
 				cols = new ArrayList<Map<String,Object>>();
 			}
 			cols.add(col);
 		}
 	}
-
+	
 	/**
 	 * @return the variables
 	 */
