@@ -30,8 +30,11 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
+import org.apache.log4j.Logger;
+
 import eionet.cr.common.CRRuntimeException;
 import eionet.cr.config.GeneralConfig;
+import eionet.cr.util.Util;
 
 /**
  * 
@@ -41,35 +44,21 @@ import eionet.cr.config.GeneralConfig;
 public class DbConnectionProvider {
 	
 	/** */
-	public enum ConnectionType {SIMPLE,JNDI};
-
+	private static Logger logger = Logger.getLogger(DbConnectionProvider.class);
+	
 	/** */
 	private static final String DATASOURCE_NAME = "jdbc/cr";
 	
 	/** */
 	private static DataSource dataSource = null;
-	private static ConnectionType connectionType = null;
 	private static String connectionUrl = null;
+	private static Boolean isJNDIDataSource = null;
+	private static Boolean isJUnitRuntime = null;
 	
 	/** Lock objects */
-	private static Object dataSourceLock = new Object();
-	private static Object connectionTypeLock = new Object();
 	private static Object connectionUrlLock = new Object();
-	
-	/**
-	 * 
-	 */
-	private static void initDataSource(){
-		
-		try{
-			Context initContext = new InitialContext();
-			Context context = (Context) initContext.lookup("java:comp/env");
-			DbConnectionProvider.dataSource = (javax.sql.DataSource)context.lookup(DATASOURCE_NAME);
-		}
-		catch (NamingException e){
-			throw new CRRuntimeException("Failed to init JDBC resource " + DATASOURCE_NAME, e);
-		}
-	}
+	private static Object isJNDIDataSourceLock = new Object();
+	private static Object isJUnitRuntimeLock = new Object();
 	
 	/**
 	 * 
@@ -78,64 +67,14 @@ public class DbConnectionProvider {
 	 */
 	public static Connection getConnection() throws SQLException {
 		
-		if (connectionType==null){
-			return getJNDIConnection();
+		if (isJNDIDataSource()){
+			return dataSource.getConnection();
 		}
-		else if (connectionType.equals(ConnectionType.JNDI)){
-			return getJNDIConnection();
+		else{
+			return getSimpleConnection(isJUnitRuntime());
 		}
-		else if (connectionType.equals(ConnectionType.SIMPLE)){
-			return getSimpleConnection();
-		}
-		else
-			throw new CRRuntimeException("Unknown connection type: " + connectionType);
 	}
 	
-	/**
-	 * 
-	 * @return
-	 * @throws SQLException 
-	 */
-	private static Connection getJNDIConnection() throws SQLException{
-		
-		if (dataSource==null){
-			synchronized (dataSourceLock) {
-				
-				// double-checked locking pattern
-				// (http://www.ibm.com/developerworks/java/library/j-dcl.html)
-				if (dataSource==null){
-					initDataSource();
-				}
-			}			
-		}
-		
-		return dataSource.getConnection();
-	}
-	
-	/**
-	 * 
-	 * @return
-	 * @throws SQLException
-	 */
-	public static Connection getUnitTestConnection() throws SQLException{
-		
-		DbConnectionProvider.setConnectionType(DbConnectionProvider.ConnectionType.SIMPLE);
-		return getSimpleConnection(true);
-	}
-
-	/**
-	 * 
-	 * @return
-	 * @throws SQLException
-	 */
-	private static Connection getSimpleConnection() throws SQLException{
-
-		// see if this code is being executed at Maven's test time right now
-		String mavenPhase = System.getProperty("contreg.maven.phase");
-		boolean isUnitTest = mavenPhase!=null && mavenPhase.trim().equals("test");
-
-		return getSimpleConnection(isUnitTest);
-	}
 	/**
 	 * 
 	 * @return
@@ -143,7 +82,7 @@ public class DbConnectionProvider {
 	 */
 	private static Connection getSimpleConnection(boolean isUnitTest) throws SQLException{
 		
-		// property names depending on whether it's Maven unit test currently
+		// property names depending on whether the code is being run by a unit test
 		// (this is just to avoid shooting in the leg by running unit tests
 		// accidentally against the real database)
 		String drvProperty = isUnitTest ? GeneralConfig.DB_UNITTEST_DRV : GeneralConfig.DB_DRV;
@@ -177,37 +116,6 @@ public class DbConnectionProvider {
 		}
 		catch (ClassNotFoundException e){
 			throw new CRRuntimeException("Failed to get connection, driver class not found: " + drv, e);
-		}
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public static ConnectionType getConnectionType() {
-		return connectionType;
-	}
-
-	/**
-	 * 
-	 * @param testConnection
-	 */
-	public static void setConnectionType(ConnectionType connType){
-		
-		if (connectionType==null){
-			
-			synchronized (connectionTypeLock) {
-				
-				// double-checked locking pattern
-				// (http://www.ibm.com/developerworks/java/library/j-dcl.html)
-				if (connectionType==null){
-					connectionType = connType;
-				}
-			}			
-		}
-		else{
-			//It's ok, do nothing
-			//throw new CRRuntimeException("Connection type already set!");
 		}
 	}
 	
@@ -245,4 +153,62 @@ public class DbConnectionProvider {
 		
 		return connectionUrl;
 	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	private static boolean isJNDIDataSource(){
+		
+		if (isJNDIDataSource==null){
+			synchronized (isJNDIDataSourceLock) {
+				
+				// double-checked locking pattern
+				// (http://www.ibm.com/developerworks/java/library/j-dcl.html)
+				if (isJNDIDataSource==null){
+					
+					try{
+						Context initContext = new InitialContext();
+						Context context = (Context) initContext.lookup("java:comp/env");
+						dataSource = (javax.sql.DataSource)context.lookup(DATASOURCE_NAME);
+						
+						isJNDIDataSource = Boolean.TRUE;
+						logger.info("Found and initialized JNDI data source named " + DATASOURCE_NAME);
+					}
+					catch (NamingException e){
+						isJNDIDataSource = Boolean.FALSE;
+						logger.info("No JNDI data source named " + DATASOURCE_NAME + " could be found: " + e.toString());
+					}
+				}
+			}
+		}
+		
+		return isJNDIDataSource.booleanValue();
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	private static boolean isJUnitRuntime(){
+		
+		if (isJUnitRuntime==null){
+			
+			synchronized (isJUnitRuntimeLock) {
+				
+				// double-checked locking pattern
+				// (http://www.ibm.com/developerworks/java/library/j-dcl.html)
+				if (isJUnitRuntime==null){
+
+					String stackTrace = Util.getStackTrace(new Throwable());
+					isJUnitRuntime = Boolean.valueOf(stackTrace.indexOf("at junit.framework.TestCase.run") > 0);
+					
+					logger.info("Detected that the code is running in JUnit runtime");
+				}
+			}
+		}
+		
+		return isJUnitRuntime.booleanValue();
+	}
+
 }

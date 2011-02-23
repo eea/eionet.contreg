@@ -31,6 +31,7 @@ import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.junit.Test;
 
 import eionet.cr.test.helpers.CRDatabaseTestCase;
+import eionet.cr.util.Util;
 
 /**
  * 

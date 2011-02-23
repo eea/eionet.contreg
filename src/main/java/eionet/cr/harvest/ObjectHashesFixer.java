@@ -152,7 +152,6 @@ public class ObjectHashesFixer extends Thread{
 		PreparedStatement pstmtResources = null;
 		ResultSet rs = null;
 		try{
-			DbConnectionProvider.setConnectionType(DbConnectionProvider.ConnectionType.SIMPLE);
 			conn = DbConnectionProvider.getConnection();
 			
 			selectStmt = conn.prepareStatement(selectSQL);

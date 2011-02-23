@@ -42,8 +42,7 @@ public abstract class DbUnitDatabaseConnection {
 	 */
 	public static IDatabaseConnection get() throws Exception{
 		
-		DbConnectionProvider.setConnectionType(DbConnectionProvider.ConnectionType.SIMPLE);
-		DatabaseConnection dbConn = new DatabaseConnection(DbConnectionProvider.getUnitTestConnection());
+		DatabaseConnection dbConn = new DatabaseConnection(DbConnectionProvider.getConnection());
 		dbConn.getConfig().setPropertiesByString(getConfigProperties());
 		return dbConn;
 	}

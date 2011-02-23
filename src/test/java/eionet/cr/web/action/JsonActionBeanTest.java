@@ -34,7 +34,6 @@ import org.junit.Test;
 import eionet.cr.dto.TagDTO;
 import eionet.cr.test.helpers.AbstractStripesMvcTestHelper;
 import eionet.cr.util.sql.DbConnectionProvider;
-import eionet.cr.util.sql.DbConnectionProvider.ConnectionType;
 import eionet.cr.web.util.ApplicationCache;
 
 /**
@@ -44,14 +43,6 @@ import eionet.cr.web.util.ApplicationCache;
  */
 
 public class JsonActionBeanTest extends AbstractStripesMvcTestHelper{
-	
-	/**
-	 * 
-	 */
-	@BeforeClass
-	public static void setUpActionContext(){
-		DbConnectionProvider.setConnectionType(ConnectionType.SIMPLE);
-	}
 	
 	/**
 	 * 

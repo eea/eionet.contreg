@@ -33,7 +33,6 @@ import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
 import eionet.cr.util.sql.DbConnectionProvider;
-import eionet.cr.util.sql.DbConnectionProvider.ConnectionType;
 
 /**
  * 

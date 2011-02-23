@@ -30,7 +30,6 @@ import eionet.cr.common.Predicates;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.sql.DbConnectionProvider;
 import eionet.cr.util.sql.SQLUtil;
-import eionet.cr.util.sql.DbConnectionProvider.ConnectionType;
 import eionet.cr.web.security.CRUser;
 
 /**
@@ -47,7 +46,6 @@ public class AddDeleteTriplpesTest extends TestCase{
 	 */
 	public void test() throws DAOException, SQLException{
 
-		DbConnectionProvider.setConnectionType(ConnectionType.SIMPLE);
 		CRUser user = new CRUser("heinlja");
 		String url = "http://eionet.europa.eu";
 		
