@@ -395,4 +395,18 @@
 		</dependency>
 		
 	</dependencies>
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-pmd-plugin</artifactId>
+				<configuration>
+					<linkXref>false</linkXref>
+					<sourceEncoding>utf-8</sourceEncoding>
+					<minimumTokens>300</minimumTokens>
+					<targetJdk>1.6</targetJdk>
+				</configuration>
+			</plugin>
+		</plugins>
+	</reporting>
 </project>
