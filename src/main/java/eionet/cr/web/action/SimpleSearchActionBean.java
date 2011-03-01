@@ -62,7 +62,7 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 	
 	/**
 	 * 
-	 * @return
+	 * @return ForwardResolution
 	 */
 	@DefaultHandler
 	public Resolution init(){

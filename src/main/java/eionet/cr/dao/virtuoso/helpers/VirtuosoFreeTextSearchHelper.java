@@ -2,7 +2,6 @@ package eionet.cr.dao.virtuoso.helpers;
 
 import java.util.List;
 
-import eionet.cr.dao.helpers.AbstractSearchHelper;
 import eionet.cr.dao.helpers.FreeTextSearchHelper;
 import eionet.cr.dao.util.SearchExpression;
 import eionet.cr.util.SortingRequest;

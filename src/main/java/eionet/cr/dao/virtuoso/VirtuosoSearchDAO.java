@@ -1,8 +1,8 @@
 package eionet.cr.dao.virtuoso;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Hashtable;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.Vector;
 
 import org.apache.commons.lang.StringUtils;
+import org.openrdf.repository.RepositoryConnection;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.dao.DAOException;
@@ -17,9 +18,8 @@ import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.helpers.FreeTextSearchHelper.FilterType;
 import eionet.cr.dao.helpers.SearchHelper;
 import eionet.cr.dao.postgre.helpers.PostgreFreeTextSearchHelper;
-import eionet.cr.dao.postgre.helpers.PostgreReferencesSearchHelper;
-import eionet.cr.dao.postgre.helpers.PostgreSearchBySourceHelper;
 import eionet.cr.dao.readers.FreeTextSearchReader;
+import eionet.cr.dao.readers.GraphLastModifiedReader;
 import eionet.cr.dao.readers.SubjectDataReader;
 import eionet.cr.dao.util.BBOX;
 import eionet.cr.dao.util.SearchExpression;
@@ -31,6 +31,7 @@ import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.Util;
 import eionet.cr.util.pagination.PagingRequest;
+import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SingleObjectReader;
 
 /**
@@ -76,6 +77,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
 		FreeTextSearchReader<String> matchReader = new FreeTextSearchReader<String>();
 		matchReader.setBlankNodeUriPrefix(VirtuosoBaseDAO.BNODE_URI_PREFIX);
 		List<String> subjectUris = executeSPARQL(query, matchReader);
+		List<String> graphUris = matchReader.getGraphUris();
 
 		logger.debug("Free-text search, find subjects query time " + Util.durationSince(startTime));
 
@@ -85,9 +87,12 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
 
 		// if result list not empty, do the necessary processing and get total match count
 		if (subjectUris!=null && !subjectUris.isEmpty()) {
+	    
+	          //get graphs last modified dates
+            Map<String,Date> lastModifiedDates = getGraphsLastModified(graphUris);
 
 			// get the data of all found subjects, provide hit-sources to the reader
-			SubjectDataReader dataReader = new SubjectDataReader(subjectUris);
+			SubjectDataReader dataReader = new SubjectDataReader(subjectUris, lastModifiedDates);
 			
 			// only these predicates will be queried for
 			String[] neededPredicates = {Predicates.RDF_TYPE, Predicates.RDFS_LABEL};
@@ -111,6 +116,36 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
 
 		// the result Pair contains total number of subjects and the requested sub-list
 		return new Pair<Integer, List<SubjectDTO>>(totalMatchCount, resultList);
+	}
+	
+	private Map<String,Date> getGraphsLastModified(List<String> graphUris) throws DAOException {
+	    StringBuilder strBuilder = new StringBuilder().
+        append("select ?s ?o where {graph ?g {?s ?p ?o. ").
+        append("filter (");
+	    int i=0;
+        for (String graphUri : graphUris){
+            if (i>0){
+                strBuilder.append(" || ");
+            }
+            strBuilder.append("?g = <").append(graphUri).append(">");
+            i++;
+        }
+        strBuilder.append(") ");
+        strBuilder.append("filter (?p = <").append(Predicates.CR_LAST_MODIFIED).append(">)");
+        strBuilder.append("}}");
+        
+        GraphLastModifiedReader<Map<String,Date>> reader = new GraphLastModifiedReader<Map<String,Date>>();
+        
+        RepositoryConnection conn = null;
+        try {
+            conn = SesameUtil.getConnection();
+            SesameUtil.executeQuery(strBuilder.toString(), reader, conn);
+            return reader.getResultMap();
+        } catch (Exception e) {
+            throw new DAOException(e.toString(), e);
+        } finally{
+            SesameUtil.close(conn);
+        }
 	}
 
 	/* (non-Javadoc)
@@ -239,7 +274,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
 	 */
 	private int getExactRowCount(SearchHelper helper) throws DAOException{
 		
-		String query = helper.getCountQuery(new ArrayList());
+		String query = helper.getCountQuery(new ArrayList<Object>());
 		Object resultObject = executeUniqueResultSPARQL(query, new SingleObjectReader<Long>());
 		return Integer.valueOf(resultObject.toString());
 	}

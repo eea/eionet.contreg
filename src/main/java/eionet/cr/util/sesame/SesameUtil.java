@@ -10,8 +10,6 @@ import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 
-import virtuoso.sesame2.driver.VirtuosoRepository;
-import eionet.cr.dao.DAOException;
 import eionet.cr.dao.readers.ResultSetReaderException;
 
 /**
@@ -23,7 +21,7 @@ public class SesameUtil {
 	
 	/**
 	 * 
-	 * @return
+	 * @return RepositoryConnection
 	 * @throws RepositoryException 
 	 */
 	public static RepositoryConnection getConnection() throws RepositoryException{

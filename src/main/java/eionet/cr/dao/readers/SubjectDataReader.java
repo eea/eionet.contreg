@@ -25,6 +25,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -56,6 +57,8 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO>{
 	private String currentPredicate = null;
 	private Collection<ObjectDTO> currentObjects = null;
 	private Collection<Long> predicateHashes = null;
+	
+	private Map<String,Date> lastModifiedDates = new HashMap<String, Date>();
 
 	/**
 	 * 
@@ -67,17 +70,29 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO>{
 	}
 	
 	/**
-	 * 
 	 * @param subjectUris
+	 * @param lastModifiedDates
 	 */
-	public SubjectDataReader(List<String> subjectUris){
-		
+	public SubjectDataReader(List<String> subjectUris, Map<String,Date> lastModifiedDates){
+		this.lastModifiedDates = lastModifiedDates;
 		subjectsMap = new LinkedHashMap<Long,SubjectDTO>();
 		for (String subjectUri : subjectUris){
 			Long subjectHash = Long.valueOf(Hashes.spoHash(subjectUri));
 			subjectsMap.put(subjectHash, null);
 		}
 	}
+	
+	/**
+     * 
+     * @param subjectUris
+     */
+    public SubjectDataReader(List<String> subjectUris){
+        subjectsMap = new LinkedHashMap<Long,SubjectDTO>();
+        for (String subjectUri : subjectUris){
+            Long subjectHash = Long.valueOf(Hashes.spoHash(subjectUri));
+            subjectsMap.put(subjectHash, null);
+        }
+    }
 
 	/*
 	 * (non-Javadoc)
@@ -128,8 +143,7 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO>{
 	}
 	
 	/**
-	 * 
-	 * @return
+	 * @param predicateHash 
 	 */
 	public void addPredicateHash(Long predicateHash){
 		
@@ -188,6 +202,9 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO>{
 		String sourceUri = bindingSet.getValue("g").stringValue();
 		long sourceHash = Hashes.spoHash(sourceUri);
 		
+        if(lastModifiedDates.containsKey(sourceUri))
+            currentSubject.setLastModifiedTime(lastModifiedDates.get(sourceUri));
+		
 		object.setSourceUri(sourceUri);
 		object.setSourceHash(sourceHash);
 		object.setDerivSourceUri(sourceUri);
@@ -200,6 +217,7 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO>{
 	}
 
 	/**
+	 * @return String
 	 * 
 	 */
 	public String getPredicateHashesCommaSeparated() {

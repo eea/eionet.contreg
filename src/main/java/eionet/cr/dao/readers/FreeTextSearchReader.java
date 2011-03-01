@@ -2,15 +2,13 @@ package eionet.cr.dao.readers;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.openrdf.model.BNode;
 import org.openrdf.model.Value;
-import org.openrdf.query.Binding;
 import org.openrdf.query.BindingSet;
 
 import eionet.cr.dto.SubjectDTO;
@@ -26,6 +24,7 @@ public class FreeTextSearchReader<T> extends ResultSetMixedReader<T>{
 	
 	/** */
 	private LinkedHashMap<Long,Long> hitSourcesBySubjectHashes = new LinkedHashMap<Long, Long>();
+	private List<String> graphUris = new ArrayList<String>();
 	
 	/*
 	 * (non-Javadoc)
@@ -53,7 +52,6 @@ public class FreeTextSearchReader<T> extends ResultSetMixedReader<T>{
 	@Override
 	public void readRow(BindingSet bindingSet) throws ResultSetReaderException {
 		
-		Iterator<Binding> iterator = bindingSet.iterator();
 		Value subjectValue = bindingSet.getValue("s");
 		
 		// expecting the URI of the matching subject to be in column "s"
@@ -69,13 +67,16 @@ public class FreeTextSearchReader<T> extends ResultSetMixedReader<T>{
 		// where the search hit came from
 		String hitSourceUri = bindingSet.getValue("g").stringValue();
 		
+		//Store graph uris to get cr:contentLastModified later
+		if(graphUris != null && !graphUris.contains(hitSourceUri))
+		    graphUris.add(hitSourceUri);
+		
 		Long subjectHash = Long.valueOf(Hashes.spoHash(subjectUri));
 		Long hitSourceHash = Long.valueOf(Hashes.spoHash(hitSourceUri));
 		hitSourcesBySubjectHashes.put(subjectHash, hitSourceHash);
 	}
 
 	/**
-	 * 
 	 * @param subjects
 	 */
 	public void populateHitSources(Collection<SubjectDTO> subjects){
@@ -88,5 +89,12 @@ public class FreeTextSearchReader<T> extends ResultSetMixedReader<T>{
 				subjectDTO.setHitSource(hitSource.longValue());
 			}
 		}
+	}
+	
+	/**
+     * @return List<String>
+     */
+	public List<String> getGraphUris() {
+	    return graphUris;
 	}
 }

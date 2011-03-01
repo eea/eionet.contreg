@@ -145,7 +145,7 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO{
 			strBuilder.append(") ");
 		}
 		
-		strBuilder.append("}}");		
+		strBuilder.append("}} ORDER BY ?s");		
 		return strBuilder.toString();
 	}
 }
