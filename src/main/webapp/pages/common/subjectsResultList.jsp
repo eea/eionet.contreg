@@ -80,10 +80,10 @@
 								<tr
 									<c:choose>
 										<c:when test="${rowStatus.count%2 != 0}">
-								 			class="zebraodd"
+								 			class="odd"
 										</c:when>
 										<c:otherwise>
-											class="zebraeven"
+											class="even"
 										</c:otherwise>
 									</c:choose>>
 									<c:forEach items="${actionBean.columns}" var="col">

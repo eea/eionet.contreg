@@ -78,22 +78,9 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean<SubjectDTO
 		typeMap.put("title", "Obligations");
 		typeMap.put("uri", Subjects.ROD_OBLIGATION_CLASS);
 		RecentUploadsActionBean.types.add(typeMap);
-		
-		typeMap = new HashMap<String,String>();
-		typeMap.put("title", "Full reports");
-		typeMap.put("uri", Subjects.FULL_REPORT_CLASS);
-		RecentUploadsActionBean.types.add(typeMap);
-
-		typeMap = new HashMap<String,String>();
-		typeMap.put("title", "News releases");
-		typeMap.put("uri", Subjects.RSS_ITEM_CLASS.toLowerCase());
-			// we do toLowerCase(), because http://reports.eea.europa.eu/whatsnew.rdf wrongfully uses
-			// http://purl.org/rss/1.0/item, instead of http://purl.org/rss/1.0/Item
-		RecentUploadsActionBean.types.add(typeMap);
-
-		
+				
 		typesColumns = new HashMap<String,List<SearchResultColumn>>();
-		SubjectUploadedColumn uploaded = new SubjectUploadedColumn("Uploaded", false);
+		SubjectUploadedColumn uploaded = new SubjectUploadedColumn("Date", false);
 		
 		/* columns for deliveries */
 		List<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
@@ -110,19 +97,6 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean<SubjectDTO
 		list.add(new SubjectPredicateColumn("Instrument", false, Predicates.ROD_INSTRUMENT_PROPERTY));
 		list.add(uploaded);
 		typesColumns.put(Subjects.ROD_OBLIGATION_CLASS, list);
-
-		/* columns for full reports */
-		list = new ArrayList<SearchResultColumn>();
-		list.add(new SubjectPredicateColumn("Title", false, Predicates.RDFS_LABEL));
-		list.add(new SubjectPredicateColumn("Subject", false, Predicates.DC_SUBJECT));
-		list.add(new SubjectPredicateColumn("Coverage", false, Predicates.DC_COVERAGE));
-		list.add(uploaded);
-		typesColumns.put(Subjects.FULL_REPORT_CLASS, list);
-
-		/* columns for news releases  are the same as for full reports */
-		// we do toLowerCase(), because http://reports.eea.europa.eu/whatsnew.rdf wrongfully uses
-		// http://purl.org/rss/1.0/item, instead of http://purl.org/rss/1.0/Item
-		typesColumns.put(Subjects.RSS_ITEM_CLASS.toLowerCase(), list);
 	}
 	
 	
@@ -151,7 +125,7 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean<SubjectDTO
 	
 	/**
 	 * 
-	 * @return
+	 * @return String
 	 */
 	public String getType() {
 		return type;
@@ -167,7 +141,7 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean<SubjectDTO
 
 	/**
 	 * 
-	 * @return
+	 * @return List<Map<String, String>>
 	 */
 	public List<Map<String, String>> getTypes(){
 		return RecentUploadsActionBean.types;
@@ -175,7 +149,7 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean<SubjectDTO
 	
 	/**
 	 * 
-	 * @return
+	 * @return int
 	 */
 	public int getMaxResults(){
 		return RecentUploadsActionBean.MAX_RESULTS;

@@ -121,8 +121,8 @@ public class AmpFeedServlet extends HttpServlet implements SubjectProcessor{
 		}
 		
 		// add dc:date if missing
-		if (subject.getObjectValue(Predicates.DC_DATE)==null && subject.getFirstSeenTime()!=null){			
-			subject.addObject(Predicates.DC_DATE, new ObjectDTO(subject.getFirstSeenTime().toString(), true));
+		if (subject.getObjectValue(Predicates.DC_DATE)==null && subject.getDcDate()!=null){			
+			subject.addObject(Predicates.DC_DATE, new ObjectDTO(subject.getDcDate().toString(), true));
 		}
 	}
 }

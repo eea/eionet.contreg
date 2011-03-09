@@ -55,4 +55,5 @@ public class PairReader<T, T1> extends SQLResultSetBaseReader<Pair<T, T1>> {
 	public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
 		resultList.add(new Pair<T, T1>((T)rs.getObject(LEFTCOL), (T1)rs.getObject(RIGHTCOL)));
 	}
+	
 }

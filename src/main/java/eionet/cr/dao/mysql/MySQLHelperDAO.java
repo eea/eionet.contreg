@@ -660,7 +660,7 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 			
 			// set firstseen-times of found subjects
 			for (SubjectDTO subject : subjectsMap.values()){
-				subject.setFirstSeenTime(
+				subject.setDcDate(
 						firstSeenTimes.get(new Long(subject.getUriHash())));
 			}
 			

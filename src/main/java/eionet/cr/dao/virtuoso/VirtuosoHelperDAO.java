@@ -12,9 +12,12 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 
+import eionet.cr.common.Predicates;
+import eionet.cr.common.Subjects;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.readers.RDFExporter;
+import eionet.cr.dao.readers.RecentUploadsReader;
 import eionet.cr.dao.readers.SubjectDataReader;
 import eionet.cr.dao.util.PredicateLabels;
 import eionet.cr.dao.util.SubProperties;
@@ -57,8 +60,57 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO{
 	@Override
 	public Collection<SubjectDTO> getLatestSubjects(String rdfType, int limit)
 			throws DAOException {
-		throw new UnsupportedOperationException("Method not implemented");
 		
+	    // validate arguments
+        if (StringUtils.isBlank(rdfType))
+            throw new IllegalArgumentException("rdfType must not be blank!");
+        if (limit<=0)
+            throw new IllegalArgumentException("limit must be greater than 0!");
+        
+        StringBuffer sqlBuf = new StringBuffer()
+        .append("prefix dc: <http://purl.org/dc/elements/1.1/>")
+        .append("select distinct ?s ?d where {")
+        .append("?s a <").append(rdfType).append("> .")
+        .append("OPTIONAL { ?s dc:date ?d }")
+        .append("} ORDER BY DESC(?d)");
+        
+        logger.trace("Recent uploads search, executing subject finder query: " + sqlBuf.toString());
+        
+        RecentUploadsReader<String> matchReader = new RecentUploadsReader<String>();
+        List<String> subjectUris = executeSPARQL(sqlBuf.toString(), matchReader);
+        Map<String,Date> pairMap = matchReader.getResultMap();
+        
+        List<SubjectDTO> resultList = new ArrayList<SubjectDTO>();
+        
+        // if result map not empty, get the subjects data and set their dates       
+        if (pairMap != null && !pairMap.isEmpty()){
+            
+            logger.trace("Recent uploads search, getting the data of the found subjects");
+            
+            // get the data of all found subjects
+            SubjectDataReader dataReader = new SubjectDataReader(subjectUris);
+            
+            // only these predicates will be queried for
+            String[] neededPredicates = null;
+            if(rdfType.equals(Subjects.ROD_OBLIGATION_CLASS)){
+                //properties for obligations
+                String[] neededPredicatesObl = {Predicates.RDFS_LABEL, Predicates.ROD_ISSUE_PROPERTY, Predicates.ROD_INSTRUMENT_PROPERTY};
+                neededPredicates = neededPredicatesObl;
+            } else if(rdfType.equals(Subjects.ROD_DELIVERY_CLASS)){
+                //properties for deliveries
+                String[] neededPredicatesDeliveries = {Predicates.RDFS_LABEL, Predicates.ROD_OBLIGATION_PROPERTY, Predicates.ROD_LOCALITY_PROPERTY};
+                neededPredicates = neededPredicatesDeliveries;
+            }
+            
+            // get the subjects data
+            resultList = getSubjectsData(subjectUris, neededPredicates, dataReader);
+            
+            // set dublin core date of found subjects
+            for (SubjectDTO subject : resultList){
+                subject.setDcDate(pairMap.get(subject.getUri()));
+            }
+        }
+        return resultList;
 	}
 
 	/* (non-Javadoc)

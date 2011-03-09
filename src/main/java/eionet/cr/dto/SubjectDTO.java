@@ -60,7 +60,7 @@ public class SubjectDTO implements Serializable{
 	private long uriHash;
 	private boolean anonymous;
 	private Map<String,Collection<ObjectDTO>> predicates;
-	private Date firstSeenTime;
+	private Date dcDate;
 	private Date lastModifiedTime;
 	
 	/** */
@@ -374,19 +374,6 @@ public class SubjectDTO implements Serializable{
 		return result;
 	}
 
-	/**
-	 * @return the firstSeenTime
-	 */
-	public Date getFirstSeenTime() {
-		return firstSeenTime;
-	}
-
-	/**
-	 * @param firstSeenTime the firstSeenTime to set
-	 */
-	public void setFirstSeenTime(Date firstSeenTime) {
-		this.firstSeenTime = firstSeenTime;
-	}
 
 	/**
 	 * @return the uriHash
@@ -479,4 +466,12 @@ public class SubjectDTO implements Serializable{
 		return existsPredicateObjectSource(
 				Predicates.RDF_TYPE, Subjects.CR_FILE, user.getRegistrationsUri());
 	}
+
+    public Date getDcDate() {
+        return dcDate;
+    }
+
+    public void setDcDate(Date dcDate) {
+        this.dcDate = dcDate;
+    }
 }
