@@ -34,75 +34,75 @@ import eionet.cr.util.export.SubjectExportEvent;
 import eionet.cr.util.sql.ResultSetExportReader;
 
 /**
- * 
+ *
  * @author <a href="mailto:enriko.kasper@tietoenator.com">Enriko Käsper</a>
  *
  */
 @SuppressWarnings("rawtypes")
 public class SubjectExportReader extends ResultSetExportReader{
 
-	/** */
-	protected Logger logger = Logger.getLogger(SubjectExportReader.class);
+    /** */
+    protected Logger logger = Logger.getLogger(SubjectExportReader.class);
 
-	/** */
-	private SubjectDTO currentSubject = null;
-	private String currentPredicate = null;
-	private Collection<ObjectDTO> currentObjects = null;
+    /** */
+    private SubjectDTO currentSubject = null;
+    private String currentPredicate = null;
+    private Collection<ObjectDTO> currentObjects = null;
 
-	/**
-	 * 
-	 * @param exporter
-	 */
-	public SubjectExportReader(SubjectExportEvent exporter) {
-		super(exporter);
-	}
+    /**
+     *
+     * @param exporter
+     */
+    public SubjectExportReader(SubjectExportEvent exporter) {
+        super(exporter);
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.util.sql.ResultSetExportReader#readRow(java.sql.ResultSet)
-	 */
-	@Override
-	public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
-		
-		if(rs.isFirst()){
-			logger.trace("start writing data");
-		}
-		long subjectHash = rs.getLong("SUBJECT_HASH");
-		boolean newSubject = currentSubject==null || subjectHash!=currentSubject.getUriHash();
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.util.sql.ResultSetExportReader#readRow(java.sql.ResultSet)
+     */
+    @Override
+    public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
 
-		if (newSubject){
-			if (currentSubject != null) {					
-				exporter.writeSubjectIntoExporterOutput(currentSubject);
-			}
-			currentSubject = new SubjectDTO(rs.getString("SUBJECT_URI"), YesNoBoolean.parse(rs.getString("ANON_SUBJ")));
-			currentSubject.setUriHash(subjectHash);
-			//currentSubject.setLastModifiedTime(new Date(rs.getLong("SUBJECT_MODIFIED")));
-		}
+        if(rs.isFirst()){
+            logger.trace("start writing data");
+        }
+        long subjectHash = rs.getLong("SUBJECT_HASH");
+        boolean newSubject = currentSubject==null || subjectHash!=currentSubject.getUriHash();
 
-		String predicateUri = rs.getString("PREDICATE_URI");
-		boolean newPredicate = newSubject || currentPredicate==null || !currentPredicate.equals(predicateUri);			
-		if (newPredicate){
+        if (newSubject){
+            if (currentSubject != null) {
+                exporter.writeSubjectIntoExporterOutput(currentSubject);
+            }
+            currentSubject = new SubjectDTO(rs.getString("SUBJECT_URI"), YesNoBoolean.parse(rs.getString("ANON_SUBJ")));
+            currentSubject.setUriHash(subjectHash);
+            //currentSubject.setLastModifiedTime(new Date(rs.getLong("SUBJECT_MODIFIED")));
+        }
 
-			currentPredicate = predicateUri;
-			currentObjects = new ArrayList<ObjectDTO>();
-			currentSubject.getPredicates().put(predicateUri, currentObjects);
-		}
+        String predicateUri = rs.getString("PREDICATE_URI");
+        boolean newPredicate = newSubject || currentPredicate==null || !currentPredicate.equals(predicateUri);
+        if (newPredicate){
 
-		ObjectDTO object = new ObjectDTO(rs.getString("OBJECT"),
-				rs.getString("OBJ_LANG"),
-				YesNoBoolean.parse(rs.getString("LIT_OBJ")),
-				YesNoBoolean.parse(rs.getString("ANON_OBJ")));
-		object.setHash(rs.getLong("OBJECT_HASH"));
-		//object.setSourceUri(rs.getString("SOURCE_URI"));
-		//object.setSourceHash(rs.getLong("SOURCE"));
-		//object.setDerivSourceUri(rs.getString("DERIV_SOURCE_URI"));
-		//object.setDerivSourceHash(rs.getLong("OBJ_DERIV_SOURCE"));
-		//object.setSourceObjectHash(rs.getLong("OBJ_SOURCE_OBJECT"));
+            currentPredicate = predicateUri;
+            currentObjects = new ArrayList<ObjectDTO>();
+            currentSubject.getPredicates().put(predicateUri, currentObjects);
+        }
 
-		currentObjects.add(object);
+        ObjectDTO object = new ObjectDTO(rs.getString("OBJECT"),
+                rs.getString("OBJ_LANG"),
+                YesNoBoolean.parse(rs.getString("LIT_OBJ")),
+                YesNoBoolean.parse(rs.getString("ANON_OBJ")));
+        object.setHash(rs.getLong("OBJECT_HASH"));
+        //object.setSourceUri(rs.getString("SOURCE_URI"));
+        //object.setSourceHash(rs.getLong("SOURCE"));
+        //object.setDerivSourceUri(rs.getString("DERIV_SOURCE_URI"));
+        //object.setDerivSourceHash(rs.getLong("OBJ_DERIV_SOURCE"));
+        //object.setSourceObjectHash(rs.getLong("OBJ_SOURCE_OBJECT"));
 
-		if (rs.isLast()) {					
-			exporter.writeSubjectIntoExporterOutput(currentSubject);
-		}
-	}
+        currentObjects.add(object);
+
+        if (rs.isLast()) {
+            exporter.writeSubjectIntoExporterOutput(currentSubject);
+        }
+    }
 }

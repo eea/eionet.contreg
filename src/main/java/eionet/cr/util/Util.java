@@ -52,248 +52,248 @@ import eionet.cr.common.CRRuntimeException;
 
 
 /**
- * 
+ *
  * @author heinljab
  *
  */
 public class Util {
 
-	/**
-	 * 
-	 * @param t
-	 * @return
-	 */
-	public static String getStackTrace(Throwable t){
-		
-		StringWriter sw = new StringWriter();
+    /**
+     *
+     * @param t
+     * @return
+     */
+    public static String getStackTrace(Throwable t){
+
+        StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw, true);
         t.printStackTrace(pw);
         return sw.getBuffer().toString();
-	}
+    }
 
-	/**
-	 * 
-	 * @param t
-	 * @return
-	 */
-	public static String getStackTraceForHTML(Throwable t){
-		
-		return processStackTraceForHTML(getStackTrace(t));
-	}
-	
-	/**
-	 * 
-	 * @param stackTrace
-	 * @return
-	 */
-	public static String processStackTraceForHTML(String stackTrace){
-		
-		if (stackTrace==null || stackTrace.trim().length()==0)
-			return stackTrace;
-		
-		StringBuffer buf = new StringBuffer();
-		String[] stackFrames = getStackFrames(stackTrace);
-		for (int i=0; stackFrames!=null && i<stackFrames.length; i++){
-			buf.append(stackFrames[i].replaceFirst("\t", "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")).append("<br/>");
-		}
-		
-		return buf.length()>0 ? buf.toString() : stackTrace;
-	}
-	
-	/**
-	 * 
-	 * @param stackTrace
-	 * @return
-	 */
-	public static String[] getStackFrames(String stackTrace){
+    /**
+     *
+     * @param t
+     * @return
+     */
+    public static String getStackTraceForHTML(Throwable t){
+
+        return processStackTraceForHTML(getStackTrace(t));
+    }
+
+    /**
+     *
+     * @param stackTrace
+     * @return
+     */
+    public static String processStackTraceForHTML(String stackTrace){
+
+        if (stackTrace==null || stackTrace.trim().length()==0)
+            return stackTrace;
+
+        StringBuffer buf = new StringBuffer();
+        String[] stackFrames = getStackFrames(stackTrace);
+        for (int i=0; stackFrames!=null && i<stackFrames.length; i++){
+            buf.append(stackFrames[i].replaceFirst("\t", "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")).append("<br/>");
+        }
+
+        return buf.length()>0 ? buf.toString() : stackTrace;
+    }
+
+    /**
+     *
+     * @param stackTrace
+     * @return
+     */
+    public static String[] getStackFrames(String stackTrace){
         StringTokenizer frames = new StringTokenizer(stackTrace, System.getProperty("line.separator"));
         List list = new LinkedList();
         for(; frames.hasMoreTokens(); list.add(frames.nextToken()));
         return (String[])list.toArray(new String[list.size()]);
     }
-	
-	/**
-	 * 
-	 * @param array
-	 * @param separator
-	 * @return
-	 */
-	public static String arrayToString(Object[] array, String separator){
-		
-		if (array==null)
-			return null;
-		
-		StringBuffer buf = new StringBuffer();
-		for (int i=0; i<array.length; i++){
-			if (i>0)
-				buf.append(separator);
-			buf.append(array[i].toString());
-		}
-		return buf.toString();
-	}
-	
-	/**
-	 * 
-	 * @param date
-	 * @param datePattern
-	 * @return
-	 */
-    public static String dateToString(java.util.Date date, String datePattern){
-
-    	if (date==null)
-    		return null;
-    	
-    	SimpleDateFormat formatter = datePattern==null ? new SimpleDateFormat() : new SimpleDateFormat(datePattern);
-    	return formatter.format(date);
-	}
 
     /**
-     * 
+     *
+     * @param array
+     * @param separator
+     * @return
+     */
+    public static String arrayToString(Object[] array, String separator){
+
+        if (array==null)
+            return null;
+
+        StringBuffer buf = new StringBuffer();
+        for (int i=0; i<array.length; i++){
+            if (i>0)
+                buf.append(separator);
+            buf.append(array[i].toString());
+        }
+        return buf.toString();
+    }
+
+    /**
+     *
+     * @param date
+     * @param datePattern
+     * @return
+     */
+    public static String dateToString(java.util.Date date, String datePattern){
+
+        if (date==null)
+            return null;
+
+        SimpleDateFormat formatter = datePattern==null ? new SimpleDateFormat() : new SimpleDateFormat(datePattern);
+        return formatter.format(date);
+    }
+
+    /**
+     *
      * @param str
      * @param datePattern
      * @return
      */
     public static java.util.Date stringToDate(String str, String datePattern){
 
-    	if (str==null || str.trim().length()==0)
-    		return null;
-    	
-    	SimpleDateFormat formatter = new SimpleDateFormat(datePattern);
-    	try {
-			return formatter.parse(str);
-		}
-    	catch (ParseException e){
-    		throw new CRRuntimeException("Failed to convert the given string to java.util.Date: " + e.toString(), e);
-		}
-	}
+        if (str==null || str.trim().length()==0)
+            return null;
 
-    /**
-     * 
-     * @return
-     */
-    public static long currentTimeSeconds(){
-    	return (long)(System.currentTimeMillis() / (long)1000);
+        SimpleDateFormat formatter = new SimpleDateFormat(datePattern);
+        try {
+            return formatter.parse(str);
+        }
+        catch (ParseException e){
+            throw new CRRuntimeException("Failed to convert the given string to java.util.Date: " + e.toString(), e);
+        }
     }
 
     /**
-     * 
+     *
+     * @return
+     */
+    public static long currentTimeSeconds(){
+        return (long)(System.currentTimeMillis() / (long)1000);
+    }
+
+    /**
+     *
      * @param milliSeconds
      * @return
      */
     public static long getSeconds(long milliSeconds){
-    	return (long)(milliSeconds/(long)1000);
+        return (long)(milliSeconds/(long)1000);
     }
-    
+
     /**
-     * 
+     *
      * @param str
      * @return
      */
     public static boolean isNullOrEmpty(String str){
-    	return str == null || str.length() == 0 || str.trim().length() == 0;
+        return str == null || str.length() == 0 || str.trim().length() == 0;
     }
-    
+
     /**
      * Returns true if the given string has any whitespace in it, including the leading and trailing whitespace.
      * @param s
      * @return
      */
     public static boolean hasWhiteSpace(String s){
-    	
-    	if (s==null || s.length()!=s.trim().length())
-    		return true;
-    	else{
-	    	StringTokenizer st = new StringTokenizer(s);
-	    	int count = 0;
-	    	for (; st.hasMoreTokens() && count<2; count++)
-	    		st.nextToken();
-	    	return count>1;
-    	}
+
+        if (s==null || s.length()!=s.trim().length())
+            return true;
+        else{
+            StringTokenizer st = new StringTokenizer(s);
+            int count = 0;
+            for (; st.hasMoreTokens() && count<2; count++)
+                st.nextToken();
+            return count>1;
+        }
     }
-    
+
     /**
-     * 
+     *
      * @param array
      * @return
      */
     public static Object getFirst(Object[] array){
-    	return array!=null && array.length>0 ? array[0] : null;
+        return array!=null && array.length>0 ? array[0] : null;
     }
 
     /**
-     * 
+     *
      * @param array
      * @return
      */
     public static String getFirst(String[] array){
-    	return array!=null && array.length>0 ? array[0] : null;
+        return array!=null && array.length>0 ? array[0] : null;
     }
 
     /**
-     * 
+     *
      * @param array
      * @return
      */
     public static String[] pruneUrls(String[] array){
-    	
-    	if (array==null || array.length==0)
-    		return array;
-    	
-    	ArrayList<String> list = new ArrayList<String>();
-    	for (int i=0; i<array.length; i++){
-    		if (!URLUtil.isURL(array[i]))
-    			list.add(array[i]);
-    	}
-    	
-    	if (list.isEmpty())
-    		return array;
-    	else{
-	    	String[] result = new String[list.size()];
-	    	for (int i=0; i<list.size(); i++){
-	    		result[i] = list.get(i);
-	    	}
-	    	return result;
-    	}
+
+        if (array==null || array.length==0)
+            return array;
+
+        ArrayList<String> list = new ArrayList<String>();
+        for (int i=0; i<array.length; i++){
+            if (!URLUtil.isURL(array[i]))
+                list.add(array[i]);
+        }
+
+        if (list.isEmpty())
+            return array;
+        else{
+            String[] result = new String[list.size()];
+            for (int i=0; i<list.size(); i++){
+                result[i] = list.get(i);
+            }
+            return result;
+        }
     }
-    
+
     /**
-     * 
+     *
      * @param pageContext
      * @param objectClass
      * @return
      */
     public static Object findInAnyScope(PageContext pageContext, Class objectClass){
-    	
-    	if (pageContext==null || objectClass==null)
-    		return null;
- 
-    	int[] scopes = {PageContext.APPLICATION_SCOPE, PageContext.PAGE_SCOPE, PageContext.REQUEST_SCOPE, PageContext.SESSION_SCOPE};
-		for (int i=0; i<scopes.length; i++){
-			Enumeration attrs = pageContext.getAttributeNamesInScope(scopes[i]);
-			while (attrs!=null && attrs.hasMoreElements()){
-				String name = (String)attrs.nextElement();
-				Object o = pageContext.getAttribute(name, scopes[i]);
-				if (o!=null && objectClass.isInstance(o)){
-					return o;
-				}
-			}
-		}
-		
-		return null;
+
+        if (pageContext==null || objectClass==null)
+            return null;
+
+        int[] scopes = {PageContext.APPLICATION_SCOPE, PageContext.PAGE_SCOPE, PageContext.REQUEST_SCOPE, PageContext.SESSION_SCOPE};
+        for (int i=0; i<scopes.length; i++){
+            Enumeration attrs = pageContext.getAttributeNamesInScope(scopes[i]);
+            while (attrs!=null && attrs.hasMoreElements()){
+                String name = (String)attrs.nextElement();
+                Object o = pageContext.getAttribute(name, scopes[i]);
+                if (o!=null && objectClass.isInstance(o)){
+                    return o;
+                }
+            }
+        }
+
+        return null;
     }
-    
+
     /**
      * Convenience method for URL-encoding the given string.
      * @param s
      * @return
      */
     public static String urlEncode(String s){
-    	try {
-			return URLEncoder.encode(s, "UTF-8");
-		}
-		catch (UnsupportedEncodingException e) {
-			throw new CRRuntimeException(e.toString(), e);
-		}
+        try {
+            return URLEncoder.encode(s, "UTF-8");
+        }
+        catch (UnsupportedEncodingException e) {
+            throw new CRRuntimeException(e.toString(), e);
+        }
     }
 
     /**
@@ -302,314 +302,314 @@ public class Util {
      * @return
      */
     public static String urlDecode(String s){
-    	try {
-			return URLDecoder.decode(s, "UTF-8");
-		}
-		catch (UnsupportedEncodingException e) {
-			throw new CRRuntimeException(e.toString(), e);
-		}
+        try {
+            return URLDecoder.decode(s, "UTF-8");
+        }
+        catch (UnsupportedEncodingException e) {
+            throw new CRRuntimeException(e.toString(), e);
+        }
     }
 
-	/**
-	 * 
-	 * @param o
-	 * @return
-	 */
-	public static Object[] toArray(Object o){
-		if (o==null)
-			return null;
-		else{
-			Object[] oo = new Object[1];
-			oo[0] = o;
-			return oo;
-		}
-	}
-	
-	/**
-	 * 
-	 * @param expression
-	 */
-	public static boolean isValidQuartzCronExpression(String expression){
-		
-		if (Util.isNullOrEmpty(expression))
-			return false;
-		else
-			return CronExpression.isValidExpression(expression);
-	}
-	
-	/**
-	 * 
-	 * @param coll
-	 * @return
-	 */
-	public static String toCSV(Collection coll){
-		
-		StringBuffer buf = new StringBuffer();
-		if (coll!=null){
-			for (Iterator it = coll.iterator(); it.hasNext();){
-				
-				if (buf.length()>0){
-					buf.append(",");
-				}
-				buf.append(it.next());
-			}
-		}
-		return buf.toString();
-	}
+    /**
+     *
+     * @param o
+     * @return
+     */
+    public static Object[] toArray(Object o){
+        if (o==null)
+            return null;
+        else{
+            Object[] oo = new Object[1];
+            oo[0] = o;
+            return oo;
+        }
+    }
 
-	/**
-	 * 
-	 * @param s
-	 * @return
-	 */
-	public static Double toDouble(String s){
-		
-		if (s==null || s.trim().length()==0)
-			return null;
-		else{
-			try{
-				return Double.valueOf(s);
-			}
-			catch (NumberFormatException nfe){
-				return null;
-			}
-		}
-	}
-	
-	/**
-	 * 
-	 * @param language
-	 */
-	public static String normalizeHTTPAcceptedLanguage(String httpAcceptedLanguage){
-		
-		if (httpAcceptedLanguage==null){
-			return httpAcceptedLanguage;
-		}
-		else{
-			httpAcceptedLanguage = httpAcceptedLanguage.trim();
-		}
-			
-		String result = new String(httpAcceptedLanguage);
-		
-		/* ignore quality value which is separated by ';' */
-		
-	    int j = result.indexOf(";");
-	    if (j != -1)
-	    	result = result.substring(0, j);
-	
-	    /* ignore language refinement (e.g. en-US, en_UK) which is separated either by '-' or '_' */
-	    
-	    j = result.indexOf("-");
-	    if (j<0){
-	    	j = result.indexOf("_");
-	    }
-	    if (j>=0){
-	    	result = result.substring(0, j);
-	    }
-	    
-		return result.toLowerCase();
-	}
-	
-	/**
-	 * 
-	 * @param language
-	 */
-	public static double getHTTPAcceptedLanguageImportance(String httpAcceptedLanguage){
-		if (httpAcceptedLanguage.contains(";q=")){
-			int j = httpAcceptedLanguage.indexOf(";q=");
-			
-			String importanceValue = httpAcceptedLanguage.substring(j+3, httpAcceptedLanguage.length());
-			try {
-				double returnValue = Double.parseDouble(importanceValue);
-				return returnValue;
-			} catch (Exception ex){
-				return 0;
-			}
-		} else {
-			return 1;
-		}
-	}
+    /**
+     *
+     * @param expression
+     */
+    public static boolean isValidQuartzCronExpression(String expression){
 
-	/**
-	 * 
-	 * @return
-	 */
-	public static HashSet<String> getAcceptedLanguages(String acceptLanguageHeader){
-		
-		HashSet<String> acceptedLanguages = null;
-		
-		if (acceptedLanguages==null){
-			
-			acceptedLanguages = new HashSet<String>();
+        if (Util.isNullOrEmpty(expression))
+            return false;
+        else
+            return CronExpression.isValidExpression(expression);
+    }
 
-			if (!StringUtils.isBlank(acceptLanguageHeader)){
-				String[] languages = StringUtils.split(acceptLanguageHeader, ',');
-				for (int i=0; i<languages.length; i++){
-					acceptedLanguages.add(Util.normalizeHTTPAcceptedLanguage(languages[i]));
-				}
-			}
-			acceptedLanguages.add("en");
-			acceptedLanguages.add("");
-		}
-		
-		return acceptedLanguages;
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public static List<String> getAcceptedLanguagesByImportance(String acceptLanguageHeader){
-		
-		List<String> returnValues = new ArrayList<String>();
-		
-		List<LanguagePrioritySorter> acceptedLanguagesByPriority = null;
-		
-		if (acceptedLanguagesByPriority==null){
-			
-			acceptedLanguagesByPriority = new ArrayList<LanguagePrioritySorter>();
+    /**
+     *
+     * @param coll
+     * @return
+     */
+    public static String toCSV(Collection coll){
 
-			if (!StringUtils.isBlank(acceptLanguageHeader)){
-				String[] languages = StringUtils.split(acceptLanguageHeader, ',');
-				for (int i=0; i<languages.length; i++){
-					LanguagePrioritySorter languagePriority = new LanguagePrioritySorter();
-					languagePriority.setPriority(Util.getHTTPAcceptedLanguageImportance(languages[i]));
-					languagePriority.setLanguageValue(Util.normalizeHTTPAcceptedLanguage(languages[i]));
-					acceptedLanguagesByPriority.add(languagePriority);
-				}
-			}
-			
-			Collections.sort(acceptedLanguagesByPriority);
-			
-			for (int a=0; a<acceptedLanguagesByPriority.size(); a++){
-				returnValues.add(acceptedLanguagesByPriority.get(a).getLanguageValue());
-			}
-			
-			returnValues.add("en");
-			returnValues.add("");
-		}
-		
-		return returnValues;
-	}
-	
-	
-	
-	/**
-	 * 
-	 * @param startTime
-	 * @return
-	 */
-	public static String durationSince(long startTime){
-		
-		return duration(Math.max(0, System.currentTimeMillis()-startTime));
-	}
-	
-	/**
-	 * 
-	 * @param duration
-	 * @return
-	 */
-	protected static String duration(long duration){
-		
-		int minutes = (int)((duration / 1000) / 60);
-		int seconds = (int) ((duration / 1000) % 60);
-		int milliseconds = (int) (duration % 1000);
-		StringBuffer buf = new StringBuffer();
-		if (minutes>0){
-			buf.append(minutes).append(" min ");
-		}
-		buf.append(seconds).append(".");
-		if (milliseconds<10)
-			buf.append("00");
-		else if (milliseconds<100)
-			buf.append("0");
-			
-		return buf.append(milliseconds).append(" sec").toString();
-	}
+        StringBuffer buf = new StringBuffer();
+        if (coll!=null){
+            for (Iterator it = coll.iterator(); it.hasNext();){
 
-	/**
-	 * //algorithm calculates the estimated number of hashes 
-	 * 
-	 * @param minHash
-	 * @param maxHash
-	 * @return
-	 */
-	public static int calculateHashesCount(long minHash, long maxHash){
-		
-		BigDecimal minValue = new BigDecimal(Long.MIN_VALUE);
-		BigDecimal maxValue = new BigDecimal(Long.MAX_VALUE);
-		BigDecimal lowKey = new BigDecimal(minHash);
-		BigDecimal highKey = new BigDecimal(maxHash);
-		BigDecimal distance = maxValue.subtract(highKey).add(lowKey).subtract(minValue);
-		BigDecimal hitCount = new BigDecimal(2).pow(64).divide(distance, 0, BigDecimal.ROUND_HALF_UP);
-		
-		return hitCount.intValue();
-	}
-	
-	/**
-	 * 
-	 * @param subjectString
-	 * @return
-	 */
-	public static List<String> splitStringBySpacesExpectBetweenQuotes(String subjectString){
-		
-		List<String> matchList = new ArrayList<String>();
-		Pattern regex = Pattern.compile("[^\\s\"']+|\"([^\"]*)\"|'([^']*)'");
-		Matcher regexMatcher = regex.matcher(subjectString.trim());
-		while (regexMatcher.find()) {
-		    if (regexMatcher.group(1)!=null) {
-		        // Add double-quoted string without the quotes
-		        matchList.add(regexMatcher.group(1));
-			} else if (regexMatcher.group(2)!=null) {
-				// Add single-quoted string without the quotes
-				matchList.add(regexMatcher.group(2));
-		    } else {
-		        // Add unquoted word
-		        matchList.add(regexMatcher.group());
-		    }
-		}
-		return matchList;
-	}
-	
-	/**
-	 * 
-	 * @param <K>
-	 * @param <V>
-	 * @param map
-	 * @return
-	 */
-	public static <K,V> Set<K> getNullValueKeys(Map<K,V> map){
-		
-		HashSet<K> result = new HashSet<K>();
-		if (map!=null && !map.isEmpty()){
-			for (Map.Entry<K,V> entry : map.entrySet()){
-				if (entry.getValue()==null){
-					result.add(entry.getKey());
-				}
-			}
-		}
-		
-		return result;
-	}
-	
-	/**
-	 * 
-	 * @param l
-	 * @return
-	 */
-	public static int safeLongToInt(long l) {
-		
-	    if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE) {
-	        throw new IllegalArgumentException
-	            (l + " cannot be cast to int without changing its value");
-	    }
-	    return (int)l;
-	}
-	
-	/**
-	 * 
-	 * @param args
-	 */
-	public static void main(String[] args){
-	}
+                if (buf.length()>0){
+                    buf.append(",");
+                }
+                buf.append(it.next());
+            }
+        }
+        return buf.toString();
+    }
+
+    /**
+     *
+     * @param s
+     * @return
+     */
+    public static Double toDouble(String s){
+
+        if (s==null || s.trim().length()==0)
+            return null;
+        else{
+            try{
+                return Double.valueOf(s);
+            }
+            catch (NumberFormatException nfe){
+                return null;
+            }
+        }
+    }
+
+    /**
+     *
+     * @param language
+     */
+    public static String normalizeHTTPAcceptedLanguage(String httpAcceptedLanguage){
+
+        if (httpAcceptedLanguage==null){
+            return httpAcceptedLanguage;
+        }
+        else{
+            httpAcceptedLanguage = httpAcceptedLanguage.trim();
+        }
+
+        String result = new String(httpAcceptedLanguage);
+
+        /* ignore quality value which is separated by ';' */
+
+        int j = result.indexOf(";");
+        if (j != -1)
+            result = result.substring(0, j);
+
+        /* ignore language refinement (e.g. en-US, en_UK) which is separated either by '-' or '_' */
+
+        j = result.indexOf("-");
+        if (j<0){
+            j = result.indexOf("_");
+        }
+        if (j>=0){
+            result = result.substring(0, j);
+        }
+
+        return result.toLowerCase();
+    }
+
+    /**
+     *
+     * @param language
+     */
+    public static double getHTTPAcceptedLanguageImportance(String httpAcceptedLanguage){
+        if (httpAcceptedLanguage.contains(";q=")){
+            int j = httpAcceptedLanguage.indexOf(";q=");
+
+            String importanceValue = httpAcceptedLanguage.substring(j+3, httpAcceptedLanguage.length());
+            try {
+                double returnValue = Double.parseDouble(importanceValue);
+                return returnValue;
+            } catch (Exception ex){
+                return 0;
+            }
+        } else {
+            return 1;
+        }
+    }
+
+    /**
+     *
+     * @return
+     */
+    public static HashSet<String> getAcceptedLanguages(String acceptLanguageHeader){
+
+        HashSet<String> acceptedLanguages = null;
+
+        if (acceptedLanguages==null){
+
+            acceptedLanguages = new HashSet<String>();
+
+            if (!StringUtils.isBlank(acceptLanguageHeader)){
+                String[] languages = StringUtils.split(acceptLanguageHeader, ',');
+                for (int i=0; i<languages.length; i++){
+                    acceptedLanguages.add(Util.normalizeHTTPAcceptedLanguage(languages[i]));
+                }
+            }
+            acceptedLanguages.add("en");
+            acceptedLanguages.add("");
+        }
+
+        return acceptedLanguages;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public static List<String> getAcceptedLanguagesByImportance(String acceptLanguageHeader){
+
+        List<String> returnValues = new ArrayList<String>();
+
+        List<LanguagePrioritySorter> acceptedLanguagesByPriority = null;
+
+        if (acceptedLanguagesByPriority==null){
+
+            acceptedLanguagesByPriority = new ArrayList<LanguagePrioritySorter>();
+
+            if (!StringUtils.isBlank(acceptLanguageHeader)){
+                String[] languages = StringUtils.split(acceptLanguageHeader, ',');
+                for (int i=0; i<languages.length; i++){
+                    LanguagePrioritySorter languagePriority = new LanguagePrioritySorter();
+                    languagePriority.setPriority(Util.getHTTPAcceptedLanguageImportance(languages[i]));
+                    languagePriority.setLanguageValue(Util.normalizeHTTPAcceptedLanguage(languages[i]));
+                    acceptedLanguagesByPriority.add(languagePriority);
+                }
+            }
+
+            Collections.sort(acceptedLanguagesByPriority);
+
+            for (int a=0; a<acceptedLanguagesByPriority.size(); a++){
+                returnValues.add(acceptedLanguagesByPriority.get(a).getLanguageValue());
+            }
+
+            returnValues.add("en");
+            returnValues.add("");
+        }
+
+        return returnValues;
+    }
+
+
+
+    /**
+     *
+     * @param startTime
+     * @return
+     */
+    public static String durationSince(long startTime){
+
+        return duration(Math.max(0, System.currentTimeMillis()-startTime));
+    }
+
+    /**
+     *
+     * @param duration
+     * @return
+     */
+    protected static String duration(long duration){
+
+        int minutes = (int)((duration / 1000) / 60);
+        int seconds = (int) ((duration / 1000) % 60);
+        int milliseconds = (int) (duration % 1000);
+        StringBuffer buf = new StringBuffer();
+        if (minutes>0){
+            buf.append(minutes).append(" min ");
+        }
+        buf.append(seconds).append(".");
+        if (milliseconds<10)
+            buf.append("00");
+        else if (milliseconds<100)
+            buf.append("0");
+
+        return buf.append(milliseconds).append(" sec").toString();
+    }
+
+    /**
+     * //algorithm calculates the estimated number of hashes
+     *
+     * @param minHash
+     * @param maxHash
+     * @return
+     */
+    public static int calculateHashesCount(long minHash, long maxHash){
+
+        BigDecimal minValue = new BigDecimal(Long.MIN_VALUE);
+        BigDecimal maxValue = new BigDecimal(Long.MAX_VALUE);
+        BigDecimal lowKey = new BigDecimal(minHash);
+        BigDecimal highKey = new BigDecimal(maxHash);
+        BigDecimal distance = maxValue.subtract(highKey).add(lowKey).subtract(minValue);
+        BigDecimal hitCount = new BigDecimal(2).pow(64).divide(distance, 0, BigDecimal.ROUND_HALF_UP);
+
+        return hitCount.intValue();
+    }
+
+    /**
+     *
+     * @param subjectString
+     * @return
+     */
+    public static List<String> splitStringBySpacesExpectBetweenQuotes(String subjectString){
+
+        List<String> matchList = new ArrayList<String>();
+        Pattern regex = Pattern.compile("[^\\s\"']+|\"([^\"]*)\"|'([^']*)'");
+        Matcher regexMatcher = regex.matcher(subjectString.trim());
+        while (regexMatcher.find()) {
+            if (regexMatcher.group(1)!=null) {
+                // Add double-quoted string without the quotes
+                matchList.add(regexMatcher.group(1));
+            } else if (regexMatcher.group(2)!=null) {
+                // Add single-quoted string without the quotes
+                matchList.add(regexMatcher.group(2));
+            } else {
+                // Add unquoted word
+                matchList.add(regexMatcher.group());
+            }
+        }
+        return matchList;
+    }
+
+    /**
+     *
+     * @param <K>
+     * @param <V>
+     * @param map
+     * @return
+     */
+    public static <K,V> Set<K> getNullValueKeys(Map<K,V> map){
+
+        HashSet<K> result = new HashSet<K>();
+        if (map!=null && !map.isEmpty()){
+            for (Map.Entry<K,V> entry : map.entrySet()){
+                if (entry.getValue()==null){
+                    result.add(entry.getKey());
+                }
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     *
+     * @param l
+     * @return
+     */
+    public static int safeLongToInt(long l) {
+
+        if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException
+                (l + " cannot be cast to int without changing its value");
+        }
+        return (int)l;
+    }
+
+    /**
+     *
+     * @param args
+     */
+    public static void main(String[] args){
+    }
 }

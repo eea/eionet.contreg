@@ -32,71 +32,71 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
 public class FileUtil {
-	
-	/** */
-	private static Log logger = LogFactory.getLog(FileUtil.class);
 
-	/**
-	 * Downloads the contents of the given URL into the given file and closes the file.
-	 * 
-	 * @param urlString
-	 * @param toFile
-	 * @throws IOException
-	 */
-	public static void downloadUrlToFile(String urlString, File toFile) throws IOException{
-		
-		InputStream inputStream = null;
-		try{
-			URL url = new URL(urlString==null ? urlString : StringUtils.replace(urlString, " ", "%20"));
-			URLConnection httpConn = url.openConnection();
-			inputStream = httpConn.getInputStream();
-			FileUtil.streamToFile(inputStream, toFile);
-		}
-		finally{
-			try{
-		        if (inputStream!=null) inputStream.close();
-			}
-			catch (IOException e){
-				logger.error("Failed to close URLConnection's input stream: " + e.toString(), e);
-			}
-		}
-	}
+    /** */
+    private static Log logger = LogFactory.getLog(FileUtil.class);
 
-	/**
-	 * Writes the content of the given InputStream into the given file and closes the file.
-	 * The caller is responsible for closing the InputStream!
-	 * 
-	 * @param inputStream
-	 * @param toFile
-	 * @throws IOException
-	 */
-	public static int streamToFile(InputStream inputStream, File toFile) throws IOException{
-		
-		FileOutputStream fos = null;
-		try{
-			int i = -1;
-			int totalBytes = 0;
-			byte[] bytes = new byte[1024];
-			fos = new FileOutputStream(toFile);
-	        while ((i = inputStream.read(bytes, 0, bytes.length)) != -1){
-	        	fos.write(bytes, 0, i);
-	        	totalBytes = totalBytes + i;
-	        }
-	        
-	        return totalBytes;
-		}
-		finally{
-			try{
-				if (fos!=null) fos.close();
-			}
-			catch (IOException e){
-				logger.error("Failed to close file output stream: " + e.toString(), e);
-			}
-		}
-	}
+    /**
+     * Downloads the contents of the given URL into the given file and closes the file.
+     *
+     * @param urlString
+     * @param toFile
+     * @throws IOException
+     */
+    public static void downloadUrlToFile(String urlString, File toFile) throws IOException{
+
+        InputStream inputStream = null;
+        try{
+            URL url = new URL(urlString==null ? urlString : StringUtils.replace(urlString, " ", "%20"));
+            URLConnection httpConn = url.openConnection();
+            inputStream = httpConn.getInputStream();
+            FileUtil.streamToFile(inputStream, toFile);
+        }
+        finally{
+            try{
+                if (inputStream!=null) inputStream.close();
+            }
+            catch (IOException e){
+                logger.error("Failed to close URLConnection's input stream: " + e.toString(), e);
+            }
+        }
+    }
+
+    /**
+     * Writes the content of the given InputStream into the given file and closes the file.
+     * The caller is responsible for closing the InputStream!
+     *
+     * @param inputStream
+     * @param toFile
+     * @throws IOException
+     */
+    public static int streamToFile(InputStream inputStream, File toFile) throws IOException{
+
+        FileOutputStream fos = null;
+        try{
+            int i = -1;
+            int totalBytes = 0;
+            byte[] bytes = new byte[1024];
+            fos = new FileOutputStream(toFile);
+            while ((i = inputStream.read(bytes, 0, bytes.length)) != -1){
+                fos.write(bytes, 0, i);
+                totalBytes = totalBytes + i;
+            }
+
+            return totalBytes;
+        }
+        finally{
+            try{
+                if (fos!=null) fos.close();
+            }
+            catch (IOException e){
+                logger.error("Failed to close file output stream: " + e.toString(), e);
+            }
+        }
+    }
 }

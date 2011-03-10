@@ -31,25 +31,25 @@ import eionet.cr.dto.TagDTO;
 import eionet.cr.test.helpers.DbHelper;
 
 /**
- * 
+ *
  * @author <a href="mailto:enriko.kasper@tieto.com">Enriko Käsper</a>
- * 
+ *
  */
 public class TagsDAOTest{
 
-	@BeforeClass	
-	public static void setUpBeforeClass() throws Exception {
-		DbHelper.handleDbSetUpOperation("tags-db.xml");
-	}
-	
-	@Test
-	public void testTagCloudFrequencies()throws Exception{
-		List<TagDTO> result =
-			DAOFactory.get().getDao(TagsDAO.class).getTagCloud();
-		
-		assertTrue(result.contains(new TagDTO("tag1", 1, 4)));
-		assertTrue(result.contains(new TagDTO("tag2", 2, 4)));
-		assertTrue(result.contains(new TagDTO("tag3", 3, 4)));		
-		assertTrue(result.contains(new TagDTO("tag4", 4, 4)));
-	}
+    @BeforeClass
+    public static void setUpBeforeClass() throws Exception {
+        DbHelper.handleDbSetUpOperation("tags-db.xml");
+    }
+
+    @Test
+    public void testTagCloudFrequencies()throws Exception{
+        List<TagDTO> result =
+            DAOFactory.get().getDao(TagsDAO.class).getTagCloud();
+
+        assertTrue(result.contains(new TagDTO("tag1", 1, 4)));
+        assertTrue(result.contains(new TagDTO("tag2", 2, 4)));
+        assertTrue(result.contains(new TagDTO("tag3", 3, 4)));
+        assertTrue(result.contains(new TagDTO("tag4", 4, 4)));
+    }
 }

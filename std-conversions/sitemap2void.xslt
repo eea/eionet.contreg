@@ -17,7 +17,7 @@
 
 <template match="s:sitemapindex">
     <rdf:RDF xmlns:rdf ="http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
-        <apply-templates select="s:sitemap" /> 		
+        <apply-templates select="s:sitemap" />
     </rdf:RDF>
 </template>
 
@@ -25,94 +25,94 @@
     <cr:File>
         <attribute  name="rdf:about">
             <value-of select="normalize-space(s:loc)" />
-        </attribute> 
+        </attribute>
     </cr:File>
 </template>
 
 <template match="s:urlset">
     <rdf:RDF xmlns:rdf ="http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
-        <apply-templates select="sc:dataset" /> 		
-        <apply-templates select="s:url" /> 		
+        <apply-templates select="sc:dataset" />
+        <apply-templates select="s:url" />
     </rdf:RDF>
 </template>
 
 <template match="s:url">
     <element name="bibo:Webpage">
-        <!-- map sc:datasetURI to dataset -->	
+        <!-- map sc:datasetURI to dataset -->
         <attribute  name="rdf:about">
             <value-of select="normalize-space(s:loc)" />
-        </attribute> 
+        </attribute>
         <!-- This means we'll harvest the page -->
         <!--
         <element name="rdf:type">
             <attribute  name="rdf:resource">http://cr.eionet.europa.eu/ontologies/contreg.rdf#File</attribute>
         </element>
         -->
-    </element> 
+    </element>
 </template>
 
 <template match="sc:dataset">
     <element name="void:Dataset">
-        <!-- map sc:datasetURI to dataset -->	
+        <!-- map sc:datasetURI to dataset -->
         <if test="normalize-space(sc:datasetURI) = ''">
             <attribute  name="rdf:ID">
                 <value-of select="generate-id()"/>
-            </attribute> 
+            </attribute>
         </if>
         <if test="normalize-space(sc:datasetURI) != ''">
             <attribute  name="rdf:about">
                 <value-of select="sc:datasetURI" />
-            </attribute> 
+            </attribute>
         </if>
-        
+
         <!-- map sc:datasetLabel to rdfs:comment -->
         <element name="rdfs:label">
                 <value-of select="sc:datasetLabel" />
-        </element>		
-        
+        </element>
+
         <!-- process sub-elements  -->
-        <apply-templates select="sc:sampleURI" /> 		
-        <apply-templates select="sc:sparqlEndpointLocation" /> 
-        <apply-templates select="sc:dataDumpLocation" /> 	
-        <apply-templates select="sc:linkedDataPrefix" /> 		
-   </element> 
+        <apply-templates select="sc:sampleURI" />
+        <apply-templates select="sc:sparqlEndpointLocation" />
+        <apply-templates select="sc:dataDumpLocation" />
+        <apply-templates select="sc:linkedDataPrefix" />
+   </element>
 </template>
 
 
 <!-- map sc:sampleURI to void:exampleResource -->
 <template match="sc:sampleURI">
-	<element name="void:exampleResource">
-		<attribute name="rdf:resource">
-			<value-of select="." />
-		</attribute> 
-   </element>  
+    <element name="void:exampleResource">
+        <attribute name="rdf:resource">
+            <value-of select="." />
+        </attribute>
+   </element>
 </template>
- 
+
 <!-- map sc:sparqlEndpointLocation to void:sparqlEndpoint -->
 <template match="sc:sparqlEndpointLocation">
-	<element name="void:sparqlEndpoint">
-		<attribute name="rdf:resource">
-			<value-of select="." />
-		</attribute> 
-   </element>  
-</template>  
+    <element name="void:sparqlEndpoint">
+        <attribute name="rdf:resource">
+            <value-of select="." />
+        </attribute>
+   </element>
+</template>
 
 <!-- map sc:dataDumpLocation to void:dataDumpLocation -->
 <template match="sc:dataDumpLocation">
-	<element name="void:dataDumpLocation">
+    <element name="void:dataDumpLocation">
               <cr:File> <!-- Could also use http://purl.org/dc/dcmitype/Dataset -->
-		<attribute name="rdf:about">
-			<value-of select="." />
-		</attribute> 
+        <attribute name="rdf:about">
+            <value-of select="." />
+        </attribute>
               </cr:File>
-   </element>  
-</template>  
+   </element>
+</template>
 
 
 <!-- map sc:linkedDataPrefix to void:uriPattern -->
 <template match="sc:linkedDataPrefix">
-	<element name="void:uriRegexPattern">^<value-of select="." />$</element>  
-</template>  
+    <element name="void:uriRegexPattern">^<value-of select="." />$</element>
+</template>
 
 
 

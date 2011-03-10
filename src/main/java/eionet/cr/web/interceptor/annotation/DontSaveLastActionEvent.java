@@ -30,7 +30,7 @@ import eionet.cr.web.interceptor.ActionEventInterceptor;
 /**
  * When method is annotated with this annotation {@link ActionEventInterceptor}
  * will not save in session this event as last event.
- * 
+ *
  * @author gerasvad
  *
  */

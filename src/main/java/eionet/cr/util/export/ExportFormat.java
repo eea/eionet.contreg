@@ -21,53 +21,53 @@
 package eionet.cr.util.export;
 
 public enum ExportFormat {
-	XLS (".xls", "application/xls", "Exported_data.xls"),
-	XML (".xml", "text/xml;charset=utf-8", "Exported_data.xml"),
-	XML_WITH_SCHEMA (".xml (with XML Schema)", "text/xml;charset=utf-8", "Exported_data.xml");
+    XLS (".xls", "application/xls", "Exported_data.xls"),
+    XML (".xml", "text/xml;charset=utf-8", "Exported_data.xml"),
+    XML_WITH_SCHEMA (".xml (with XML Schema)", "text/xml;charset=utf-8", "Exported_data.xml");
 
-	private String name;
-	private String contentType;
-	private String filename;
-	
-	/**
-	 * @param format
-	 */
-	private ExportFormat(String format, String contentType, String filename) {
-		this.name = format;
-		this.contentType = contentType;
-		this.filename = filename;
-	}
+    private String name;
+    private String contentType;
+    private String filename;
 
-	/**
-	 * @param exportFormat
-	 * @return
-	 */
-	public static ExportFormat fromName(String exportFormat) {
-		for( ExportFormat format: ExportFormat.values()) {
-			if(format.name.equals(exportFormat)) {
-				return format;
-			}
-		}
-		return ExportFormat.XLS;
-	}
+    /**
+     * @param format
+     */
+    private ExportFormat(String format, String contentType, String filename) {
+        this.name = format;
+        this.contentType = contentType;
+        this.filename = filename;
+    }
 
-	/**
-	 * @return the contentType
-	 */
-	public String getName() {
-		return name;
-	}
-	/**
-	 * @return the contentType
-	 */
-	public String getContentType() {
-		return contentType;
-	}
+    /**
+     * @param exportFormat
+     * @return
+     */
+    public static ExportFormat fromName(String exportFormat) {
+        for( ExportFormat format: ExportFormat.values()) {
+            if(format.name.equals(exportFormat)) {
+                return format;
+            }
+        }
+        return ExportFormat.XLS;
+    }
 
-	/**
-	 * @return the filename
-	 */
-	public String getFilename() {
-		return filename;
-	}
+    /**
+     * @return the contentType
+     */
+    public String getName() {
+        return name;
+    }
+    /**
+     * @return the contentType
+     */
+    public String getContentType() {
+        return contentType;
+    }
+
+    /**
+     * @return the filename
+     */
+    public String getFilename() {
+        return filename;
+    }
 }

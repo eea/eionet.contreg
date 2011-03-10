@@ -36,172 +36,172 @@ import eionet.cr.util.Util;
 import eionet.qawcommons.DataflowResultDto;
 
 /**
- * 
+ *
  * @author heinljab
  *
  */
 public class CRXmlRpcSampleClient {
-	
-	/**
-	 * @throws XmlRpcException 
-	 * @throws MalformedURLException 
-	 * 
-	 */
-	public static void sample_getResourcesSinceTimestamp() throws XmlRpcException, MalformedURLException{
-		
-		// set up the XmlRpcClient
-		XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
-	    config.setServerURL(new URL("http://ww010646:8080/cr/xmlrpc"));
-	    config.setEnabledForExtensions(true);
-	    XmlRpcClient client = new XmlRpcClient();
-	    client.setConfig(config);
-	    
-	    // execute the call
-	    Object[] params = new Object[]{Util.stringToDate("2010-01-01 00:00:00", "yyyy-MM-dd HH:mm:ss")};
-	    Object[] result = (Object[])client.execute("ContRegService.getResourcesSinceTimestamp", params);
-	    
-	    // loop through the results, do type casting to see if any ClassCastExceptions are thrown
-	    if (result!=null && result.length>0){
-	    	
-		    for (int i=0; i<result.length; i++){
-		    	Map<String,Object[]> map = (Map<String,Object[]>)result[i];
-		    	if (map!=null && !map.isEmpty()){
-			    	Iterator<String> keys = map.keySet().iterator();
-			    	while (keys.hasNext()){
-			    		String key = keys.next();
-			    		Object[] values = map.get(key);
-			    		StringBuffer buf = new StringBuffer(values==null ? "null array" : "");
-			    		for (int j=0; values!=null && j<values.length; j++){
-			    			if (j>0)
-			    				buf.append(", ");
-			    			buf.append(values[j].toString());
-			    		}
-			    		System.out.println(key + " = " + buf.toString());
-			    	}
-		    	}
-		    	else
-		    		System.out.println("map null or empty");
-		    	System.out.println("====================================================================================");
-		    }
-	    }
-	    else
-	    	System.out.println("result array null or empty");
 
-	}
-	
-	/**
-	 * 
-	 * @throws MalformedURLException
-	 * @throws XmlRpcException
-	 */
-	public static void sample_dataflowSearch() throws MalformedURLException, XmlRpcException{
-		
-		// set up the XmlRpcClient
-		XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
-	    //config.setServerURL(new URL("http://80.235.29.171:8080/cr/xmlrpc"));
-		config.setServerURL(new URL("http://localhost:8080/cr/xmlrpc"));
-	    config.setEnabledForExtensions(true);
-	    XmlRpcClient client = new XmlRpcClient();
-	    client.setConfig(config);
-	    
-	    // execute the call
-	    Map criteria = new HashMap();
-	    criteria.put("http://rod.eionet.europa.eu/schema.rdf#locality", "http://rod.eionet.europa.eu/spatial/28"); // Norway
-	    criteria.put("http://rod.eionet.europa.eu/schema.rdf#obligation", "http://rod.eionet.europa.eu/obligations/452");
-	    criteria.put("http://purl.org/dc/elements/1.1/coverage", "2006");
-	    
-	    Object[] params = new Object[]{criteria};
-	    Object[] result = (Object[])client.execute("ContRegService.dataflowSearch", params);
-	    
-	    // get the first object in the result set
-	    if (result!=null && result.length>0){
-	    	
-	    	Object o = result[0];
-	    	DataflowResultDto dto = (DataflowResultDto)o;
-	    	System.out.println(o);
-	    }
-	    else
-	    	System.out.println("result array null or empty");
-	}
+    /**
+     * @throws XmlRpcException
+     * @throws MalformedURLException
+     *
+     */
+    public static void sample_getResourcesSinceTimestamp() throws XmlRpcException, MalformedURLException{
 
-	/**
-	 * 
-	 * @throws XmlRpcException
-	 * @throws MalformedURLException
-	 */
-	public static void sample_getXmlFilesBySchema() throws XmlRpcException, MalformedURLException{
+        // set up the XmlRpcClient
+        XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
+        config.setServerURL(new URL("http://ww010646:8080/cr/xmlrpc"));
+        config.setEnabledForExtensions(true);
+        XmlRpcClient client = new XmlRpcClient();
+        client.setConfig(config);
 
-		// set up the XmlRpcClient
-		XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
-		config.setServerURL(new URL("http://ww010646:8080/cr/xmlrpc"));
-		config.setEnabledForExtensions(true);
-		XmlRpcClient client = new XmlRpcClient();
-		client.setConfig(config);
+        // execute the call
+        Object[] params = new Object[]{Util.stringToDate("2010-01-01 00:00:00", "yyyy-MM-dd HH:mm:ss")};
+        Object[] result = (Object[])client.execute("ContRegService.getResourcesSinceTimestamp", params);
 
-		// execute the call
-		Object[] params = new Object[]{"eper.xsd"};
-		Object[] result = (Object[])client.execute("ContRegService.getXmlFilesBySchema", params);
+        // loop through the results, do type casting to see if any ClassCastExceptions are thrown
+        if (result!=null && result.length>0){
 
-		// loop through the results, do type casting to see if any ClassCastExceptions are thrown
-		if (result!=null && result.length>0){
-			for (int i=0; i<result.length; i++){
-				System.out.println(result[i].toString());
-			}
-		}
-		else{
-			System.out.println("result array null or empty");
-		}
+            for (int i=0; i<result.length; i++){
+                Map<String,Object[]> map = (Map<String,Object[]>)result[i];
+                if (map!=null && !map.isEmpty()){
+                    Iterator<String> keys = map.keySet().iterator();
+                    while (keys.hasNext()){
+                        String key = keys.next();
+                        Object[] values = map.get(key);
+                        StringBuffer buf = new StringBuffer(values==null ? "null array" : "");
+                        for (int j=0; values!=null && j<values.length; j++){
+                            if (j>0)
+                                buf.append(", ");
+                            buf.append(values[j].toString());
+                        }
+                        System.out.println(key + " = " + buf.toString());
+                    }
+                }
+                else
+                    System.out.println("map null or empty");
+                System.out.println("====================================================================================");
+            }
+        }
+        else
+            System.out.println("result array null or empty");
 
-	}
-	
-	/**
-	 * 
-	 * @throws MalformedURLException
-	 * @throws XmlRpcException
-	 */
-	public static void sample_getDeliveries() throws MalformedURLException, XmlRpcException{
-		
-		// set up the client configuration
-		XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
-		config.setServerURL(new URL("http://localhost:8080/cr/xmlrpc"));
-		//config.setServerURL(new URL("http://cr.eionet.europa.eu/xmlrpc"));
-	    config.setEnabledForExtensions(true);
-	    
-	    // create client with above configuration
-	    XmlRpcClient client = new XmlRpcClient();
-	    client.setConfig(config);
-	    
-	    // set up call parameters
-	    Object[] params = new Object[]{new Integer(1), new Integer(1)};
-	    
-	    // execute the call
-	    System.out.println("Executing the call ...");
-	    Object[] result = (Object[])client.execute("ContRegService.getDeliveries", params);
-	    if (result==null){
-	    	System.out.println("Call executed, result is null");
-	    }
-	    else if (result.length==0){
-	    	System.out.println("Call executed, result is an empty array");
-	    }
-	    else{
-	    	System.out.println("Call executed, result is the following array");
-	    	for (int i=0; i<result.length; i++){
-	    		System.out.println(i + ": " + result[i]);
-	    	}
-	    }
-	}
-	/**
-	 * 
-	 * @param args
-	 * @throws XmlRpcException 
-	 * @throws MalformedURLException 
-	 */
-	public static void main(String[] args) throws MalformedURLException, XmlRpcException{
-		
-			sample_getDeliveries();
+    }
+
+    /**
+     *
+     * @throws MalformedURLException
+     * @throws XmlRpcException
+     */
+    public static void sample_dataflowSearch() throws MalformedURLException, XmlRpcException{
+
+        // set up the XmlRpcClient
+        XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
+        //config.setServerURL(new URL("http://80.235.29.171:8080/cr/xmlrpc"));
+        config.setServerURL(new URL("http://localhost:8080/cr/xmlrpc"));
+        config.setEnabledForExtensions(true);
+        XmlRpcClient client = new XmlRpcClient();
+        client.setConfig(config);
+
+        // execute the call
+        Map criteria = new HashMap();
+        criteria.put("http://rod.eionet.europa.eu/schema.rdf#locality", "http://rod.eionet.europa.eu/spatial/28"); // Norway
+        criteria.put("http://rod.eionet.europa.eu/schema.rdf#obligation", "http://rod.eionet.europa.eu/obligations/452");
+        criteria.put("http://purl.org/dc/elements/1.1/coverage", "2006");
+
+        Object[] params = new Object[]{criteria};
+        Object[] result = (Object[])client.execute("ContRegService.dataflowSearch", params);
+
+        // get the first object in the result set
+        if (result!=null && result.length>0){
+
+            Object o = result[0];
+            DataflowResultDto dto = (DataflowResultDto)o;
+            System.out.println(o);
+        }
+        else
+            System.out.println("result array null or empty");
+    }
+
+    /**
+     *
+     * @throws XmlRpcException
+     * @throws MalformedURLException
+     */
+    public static void sample_getXmlFilesBySchema() throws XmlRpcException, MalformedURLException{
+
+        // set up the XmlRpcClient
+        XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
+        config.setServerURL(new URL("http://ww010646:8080/cr/xmlrpc"));
+        config.setEnabledForExtensions(true);
+        XmlRpcClient client = new XmlRpcClient();
+        client.setConfig(config);
+
+        // execute the call
+        Object[] params = new Object[]{"eper.xsd"};
+        Object[] result = (Object[])client.execute("ContRegService.getXmlFilesBySchema", params);
+
+        // loop through the results, do type casting to see if any ClassCastExceptions are thrown
+        if (result!=null && result.length>0){
+            for (int i=0; i<result.length; i++){
+                System.out.println(result[i].toString());
+            }
+        }
+        else{
+            System.out.println("result array null or empty");
+        }
+
+    }
+
+    /**
+     *
+     * @throws MalformedURLException
+     * @throws XmlRpcException
+     */
+    public static void sample_getDeliveries() throws MalformedURLException, XmlRpcException{
+
+        // set up the client configuration
+        XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
+        config.setServerURL(new URL("http://localhost:8080/cr/xmlrpc"));
+        //config.setServerURL(new URL("http://cr.eionet.europa.eu/xmlrpc"));
+        config.setEnabledForExtensions(true);
+
+        // create client with above configuration
+        XmlRpcClient client = new XmlRpcClient();
+        client.setConfig(config);
+
+        // set up call parameters
+        Object[] params = new Object[]{new Integer(1), new Integer(1)};
+
+        // execute the call
+        System.out.println("Executing the call ...");
+        Object[] result = (Object[])client.execute("ContRegService.getDeliveries", params);
+        if (result==null){
+            System.out.println("Call executed, result is null");
+        }
+        else if (result.length==0){
+            System.out.println("Call executed, result is an empty array");
+        }
+        else{
+            System.out.println("Call executed, result is the following array");
+            for (int i=0; i<result.length; i++){
+                System.out.println(i + ": " + result[i]);
+            }
+        }
+    }
+    /**
+     *
+     * @param args
+     * @throws XmlRpcException
+     * @throws MalformedURLException
+     */
+    public static void main(String[] args) throws MalformedURLException, XmlRpcException{
+
+            sample_getDeliveries();
 //			sample_getXmlFilesBySchema();
 //			sample_getResourcesSinceTimestamp();
 //			sample_simpleAndSearch();
 //			sample_dataflowSearch();
-	}
+    }
 }

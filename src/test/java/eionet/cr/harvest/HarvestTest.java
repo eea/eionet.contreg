@@ -28,69 +28,69 @@ import org.junit.Test;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 
 /**
- * 
+ *
  * @author heinljab
  *
  */
 public class HarvestTest extends CRDatabaseTestCase{
 
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.test.helpers.CRDatabaseTestCase#getDataSet()
-	 */
-	protected IDataSet getDataSet() throws Exception {
-		return getXmlDataSet("emptydb.xml");
-	}
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.test.helpers.CRDatabaseTestCase#getDataSet()
+     */
+    protected IDataSet getDataSet() throws Exception {
+        return getXmlDataSet("emptydb.xml");
+    }
 
-	@Test
-	public void testHarvestFile(){
-				
-		try {
-			URL o = getClass().getClassLoader().getResource("test-rdf.xml");
-			Harvest harvest = new PullHarvest(o.toString(), null);
-			harvest.execute();
-			
-			assertEquals((int)11, harvest.getDistinctSubjectsCount());
-			assertEquals((int)49, harvest.getStoredTriplesCount());			
-		}
-		catch (Throwable e) {
-			e.printStackTrace();
-			fail("Was not expecting this exception: " + e.toString());			
-		}
-	}
+    @Test
+    public void testHarvestFile(){
 
-	@Test
-	public void testHarvestNonExistingURL(){
-		
-		try {
-			PullHarvest harvest = new PullHarvest("http://www.jaanusheinlaid.tw", null);
-			harvest.execute();
-			
-			assertNotNull(harvest.getSourceAvailable());
-			assertFalse(harvest.getSourceAvailable().booleanValue());
-		}
-		catch (HarvestException e) {
-			e.printStackTrace();
-			fail("Was not expecting this exception: " + e.toString());
-		}
-	}
+        try {
+            URL o = getClass().getClassLoader().getResource("test-rdf.xml");
+            Harvest harvest = new PullHarvest(o.toString(), null);
+            harvest.execute();
 
-	@Test
-	public void testHarvestExistingURL(){
-		
-		try {
-			PullHarvest harvest = new PullHarvest("https://svn.eionet.europa.eu/repositories/Reportnet/cr2/trunk/test-rdf/test-rdf.xml", null);
-			harvest.execute();
-			
-			assertNotNull(harvest.getSourceAvailable());
-			assertTrue(harvest.getSourceAvailable().booleanValue());
-			assertEquals((int)11, harvest.getDistinctSubjectsCount());
-			assertEquals((int)49, harvest.getStoredTriplesCount());	
-		}
-		catch (HarvestException e) {
-			e.printStackTrace();
-			fail("Was not expecting this exception: " + e.toString());
-		}
-	}
-	
+            assertEquals((int)11, harvest.getDistinctSubjectsCount());
+            assertEquals((int)49, harvest.getStoredTriplesCount());
+        }
+        catch (Throwable e) {
+            e.printStackTrace();
+            fail("Was not expecting this exception: " + e.toString());
+        }
+    }
+
+    @Test
+    public void testHarvestNonExistingURL(){
+
+        try {
+            PullHarvest harvest = new PullHarvest("http://www.jaanusheinlaid.tw", null);
+            harvest.execute();
+
+            assertNotNull(harvest.getSourceAvailable());
+            assertFalse(harvest.getSourceAvailable().booleanValue());
+        }
+        catch (HarvestException e) {
+            e.printStackTrace();
+            fail("Was not expecting this exception: " + e.toString());
+        }
+    }
+
+    @Test
+    public void testHarvestExistingURL(){
+
+        try {
+            PullHarvest harvest = new PullHarvest("https://svn.eionet.europa.eu/repositories/Reportnet/cr2/trunk/test-rdf/test-rdf.xml", null);
+            harvest.execute();
+
+            assertNotNull(harvest.getSourceAvailable());
+            assertTrue(harvest.getSourceAvailable().booleanValue());
+            assertEquals((int)11, harvest.getDistinctSubjectsCount());
+            assertEquals((int)49, harvest.getStoredTriplesCount());
+        }
+        catch (HarvestException e) {
+            e.printStackTrace();
+            fail("Was not expecting this exception: " + e.toString());
+        }
+    }
+
 }

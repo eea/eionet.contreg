@@ -29,86 +29,86 @@ import javax.xml.stream.XMLStreamWriter;
 
 public class XmlWithSchemaExporter extends XmlExporter {
 
-	protected static final String SCHEMA_NS_URI = "http://www.w3.org/2001/XMLSchema";
-	protected static final String SCHEMA_NS_PREFIX = "xsd";
+    protected static final String SCHEMA_NS_URI = "http://www.w3.org/2001/XMLSchema";
+    protected static final String SCHEMA_NS_PREFIX = "xsd";
 
-	@Override
-	protected void writeDocumentStart(XMLStreamWriter writer) throws XMLStreamException{
-		writer.writeStartElement(ROOT_ELEMENT);	
-		writer.writeNamespace(SCHEMA_NS_PREFIX, SCHEMA_NS_URI);
-		writer.writeStartElement(DATA_ROOT_ELEMENT);	
-	}
+    @Override
+    protected void writeDocumentStart(XMLStreamWriter writer) throws XMLStreamException{
+        writer.writeStartElement(ROOT_ELEMENT);
+        writer.writeNamespace(SCHEMA_NS_PREFIX, SCHEMA_NS_URI);
+        writer.writeStartElement(DATA_ROOT_ELEMENT);
+    }
 
-	@Override
-	protected void writeDocumentEnd(XMLStreamWriter writer) throws XMLStreamException{
-		//data root element
-		writer.writeEndElement();
-		
-		// write XML schema
-		writeXmlSchema(writer);
-		
-		// root element
-		writer.writeEndElement();
-	}
+    @Override
+    protected void writeDocumentEnd(XMLStreamWriter writer) throws XMLStreamException{
+        //data root element
+        writer.writeEndElement();
 
-	protected void writeXmlSchema(XMLStreamWriter writer) throws XMLStreamException{
-		writer.writeStartElement(SCHEMA_NS_URI, "schema");
+        // write XML schema
+        writeXmlSchema(writer);
 
-		//data root element definition
-		writer.writeStartElement(SCHEMA_NS_URI, "element");
-		writer.writeAttribute("name", DATA_ROOT_ELEMENT);
-		writer.writeStartElement(SCHEMA_NS_URI, "complexType");
-		writer.writeStartElement(SCHEMA_NS_URI, "sequence");
-		writer.writeEmptyElement(SCHEMA_NS_URI, "element");
-		writer.writeAttribute("ref", ROW_ELEMENT);
-		writer.writeAttribute("minOccurs", "0");
-		writer.writeAttribute("maxOccurs", "unbounded");
-		writer.writeEndElement(); //sequence 
-		writer.writeEndElement(); //complexType 
-		writer.writeEndElement(); //element
+        // root element
+        writer.writeEndElement();
+    }
 
-		//table element definition
-		writer.writeStartElement(SCHEMA_NS_URI, "element");
-		writer.writeAttribute("name", ROW_ELEMENT);
-		writer.writeStartElement(SCHEMA_NS_URI, "complexType");
-		writer.writeStartElement(SCHEMA_NS_URI, "sequence");
-		
-		//write elements
-		for(XmlElementMetadata element : getElements().values()){
-			if(element.getType() == XmlElementMetadata.Type.DOUBLE){
-				writeDoubleElement(writer, element);
-			}
-			else{
-				writeStringElement(writer, element);
-			}			
-		}
-		//end of table element definition
-		writer.writeEndElement(); //sequence 
-		writer.writeEndElement(); //complexType 
-		writer.writeEndElement(); //element
-		
-		//end of schema
-		writer.writeEndElement();		
-	}
-	private void writeDoubleElement(XMLStreamWriter writer, XmlElementMetadata element) throws XMLStreamException{
-		writer.writeEmptyElement(SCHEMA_NS_URI, "element");
-		writer.writeAttribute("name", element.getName());
-		writer.writeAttribute("minOccurs", "0");
-		writer.writeAttribute("type", "xsd:double");
-		
-	}
-	private void writeStringElement(XMLStreamWriter writer, XmlElementMetadata element) throws XMLStreamException{
-		writer.writeStartElement(SCHEMA_NS_URI, "element");
-		writer.writeAttribute("name", element.getName());
-		writer.writeAttribute("minOccurs", "0");	
-		//write simple Type info
-		writer.writeStartElement(SCHEMA_NS_URI, "simpleType");
-		writer.writeStartElement(SCHEMA_NS_URI, "restriction");
-		writer.writeAttribute("base", "xsd:string");
-		writer.writeEmptyElement(SCHEMA_NS_URI, "maxLength");
-		writer.writeAttribute("value", String.valueOf((element.getMaxLength()>255)?element.getMaxLength():255));
-		writer.writeEndElement();//restriction
-		writer.writeEndElement();//simpleType
-		writer.writeEndElement();//element
-	}
+    protected void writeXmlSchema(XMLStreamWriter writer) throws XMLStreamException{
+        writer.writeStartElement(SCHEMA_NS_URI, "schema");
+
+        //data root element definition
+        writer.writeStartElement(SCHEMA_NS_URI, "element");
+        writer.writeAttribute("name", DATA_ROOT_ELEMENT);
+        writer.writeStartElement(SCHEMA_NS_URI, "complexType");
+        writer.writeStartElement(SCHEMA_NS_URI, "sequence");
+        writer.writeEmptyElement(SCHEMA_NS_URI, "element");
+        writer.writeAttribute("ref", ROW_ELEMENT);
+        writer.writeAttribute("minOccurs", "0");
+        writer.writeAttribute("maxOccurs", "unbounded");
+        writer.writeEndElement(); //sequence
+        writer.writeEndElement(); //complexType
+        writer.writeEndElement(); //element
+
+        //table element definition
+        writer.writeStartElement(SCHEMA_NS_URI, "element");
+        writer.writeAttribute("name", ROW_ELEMENT);
+        writer.writeStartElement(SCHEMA_NS_URI, "complexType");
+        writer.writeStartElement(SCHEMA_NS_URI, "sequence");
+
+        //write elements
+        for(XmlElementMetadata element : getElements().values()){
+            if(element.getType() == XmlElementMetadata.Type.DOUBLE){
+                writeDoubleElement(writer, element);
+            }
+            else{
+                writeStringElement(writer, element);
+            }
+        }
+        //end of table element definition
+        writer.writeEndElement(); //sequence
+        writer.writeEndElement(); //complexType
+        writer.writeEndElement(); //element
+
+        //end of schema
+        writer.writeEndElement();
+    }
+    private void writeDoubleElement(XMLStreamWriter writer, XmlElementMetadata element) throws XMLStreamException{
+        writer.writeEmptyElement(SCHEMA_NS_URI, "element");
+        writer.writeAttribute("name", element.getName());
+        writer.writeAttribute("minOccurs", "0");
+        writer.writeAttribute("type", "xsd:double");
+
+    }
+    private void writeStringElement(XMLStreamWriter writer, XmlElementMetadata element) throws XMLStreamException{
+        writer.writeStartElement(SCHEMA_NS_URI, "element");
+        writer.writeAttribute("name", element.getName());
+        writer.writeAttribute("minOccurs", "0");
+        //write simple Type info
+        writer.writeStartElement(SCHEMA_NS_URI, "simpleType");
+        writer.writeStartElement(SCHEMA_NS_URI, "restriction");
+        writer.writeAttribute("base", "xsd:string");
+        writer.writeEmptyElement(SCHEMA_NS_URI, "maxLength");
+        writer.writeAttribute("value", String.valueOf((element.getMaxLength()>255)?element.getMaxLength():255));
+        writer.writeEndElement();//restriction
+        writer.writeEndElement();//simpleType
+        writer.writeEndElement();//element
+    }
 }

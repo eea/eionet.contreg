@@ -35,65 +35,65 @@ import eionet.cr.util.Util;
 /**
  * background job to perform garbage collection on the database.
  * Pauses all other jobs
- * 
+ *
  * @author Aleksandr Ivanov
  * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
 public class GarbageCollectorJob implements StatefulJob {
-	
-	private static final Logger logger = Logger.getLogger(GarbageCollectorJob.class);
-	private static final int NEEDED_TO_REMAIN = 10;
 
-	/** 
-	 * @see org.quartz.Job#execute(org.quartz.JobExecutionContext)
-	 * {@inheritDoc}
-	 */
-	@SuppressWarnings("unchecked")
-	public void execute(JobExecutionContext context) throws JobExecutionException {
-		try {
-			logger.debug("Executing garbage collector (pauses other jobs and waits for them to finish");
-			
-			Scheduler scheduler = context.getScheduler();
-			scheduler.pauseAll();
-			try {
-				List jobs = null;
-				do {
-					jobs = scheduler.getCurrentlyExecutingJobs();
-					if (jobs!=null && jobs.size()>1) {
-						Thread.sleep(1000);
-					}
-				}
-				while (jobs!=null && jobs.size()!=1); 
-			}
-			catch (Exception ignored) {
-				logger.error("Garbage collector" +
-						" had an exception while waiting for other jobs to finish", ignored);
-				return;
-			}
-			
-			HarvestSourceDAO harvestSourceDAO = DAOFactory.get().getDao(HarvestSourceDAO.class);
-						
-			logger.debug("Garbage collector going to delete triples of missing sources");
-			long start = System.currentTimeMillis();
-			harvestSourceDAO.deleteTriplesOfMissingSources();
-			logger.debug("Triples of missing sources deleted with " + Util.durationSince(start));
+    private static final Logger logger = Logger.getLogger(GarbageCollectorJob.class);
+    private static final int NEEDED_TO_REMAIN = 10;
 
-			logger.debug("Garbage collector going to delete history of old harvests");
-			start = System.currentTimeMillis();
-			harvestSourceDAO.deleteHarvestHistory(NEEDED_TO_REMAIN);
-			logger.debug("History of old harvests deleted with " + Util.durationSince(start));
-			
-			logger.debug("Garbage collector finished");
-		}
-		catch (Exception ignored) {
-			logger.error("error in garbage collector", ignored);
-		} finally {
-			try {
-				context.getScheduler().resumeAll();
-			} catch (Exception fatal) {
-				throw new RuntimeException("couldn't resume the scheduler");
-			}
-		}
-	}
+    /**
+     * @see org.quartz.Job#execute(org.quartz.JobExecutionContext)
+     * {@inheritDoc}
+     */
+    @SuppressWarnings("unchecked")
+    public void execute(JobExecutionContext context) throws JobExecutionException {
+        try {
+            logger.debug("Executing garbage collector (pauses other jobs and waits for them to finish");
+
+            Scheduler scheduler = context.getScheduler();
+            scheduler.pauseAll();
+            try {
+                List jobs = null;
+                do {
+                    jobs = scheduler.getCurrentlyExecutingJobs();
+                    if (jobs!=null && jobs.size()>1) {
+                        Thread.sleep(1000);
+                    }
+                }
+                while (jobs!=null && jobs.size()!=1);
+            }
+            catch (Exception ignored) {
+                logger.error("Garbage collector" +
+                        " had an exception while waiting for other jobs to finish", ignored);
+                return;
+            }
+
+            HarvestSourceDAO harvestSourceDAO = DAOFactory.get().getDao(HarvestSourceDAO.class);
+
+            logger.debug("Garbage collector going to delete triples of missing sources");
+            long start = System.currentTimeMillis();
+            harvestSourceDAO.deleteTriplesOfMissingSources();
+            logger.debug("Triples of missing sources deleted with " + Util.durationSince(start));
+
+            logger.debug("Garbage collector going to delete history of old harvests");
+            start = System.currentTimeMillis();
+            harvestSourceDAO.deleteHarvestHistory(NEEDED_TO_REMAIN);
+            logger.debug("History of old harvests deleted with " + Util.durationSince(start));
+
+            logger.debug("Garbage collector finished");
+        }
+        catch (Exception ignored) {
+            logger.error("error in garbage collector", ignored);
+        } finally {
+            try {
+                context.getScheduler().resumeAll();
+            } catch (Exception fatal) {
+                throw new RuntimeException("couldn't resume the scheduler");
+            }
+        }
+    }
 
 }

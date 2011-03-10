@@ -35,51 +35,51 @@ import eionet.cr.web.action.HarvestSourceActionBean;
  * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
 public class HarvestSourcesColumn extends SearchResultColumn {
-	
-	private boolean dateFormat;
-	
-	/**
-	 * @param dateFormat
-	 */
-	public HarvestSourcesColumn(boolean dateFormat) {
-		this.dateFormat = dateFormat;
-	}
 
-	/** 
-	 * @see eionet.cr.web.util.columns.SearchResultColumn#format(java.lang.Object)
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String format(Object object) {
-		if (object instanceof HarvestSourceDTO) {
-			if (dateFormat) {
-				Date date =  ((HarvestSourceDTO) object).getLastHarvest();
-				return date != null 
-						? SIMPLE_DATE_FORMAT.format(date)
-						: "";
-			} else {
-				String factsheetUrlBinding = HarvestSourceActionBean.class.getAnnotation(UrlBinding.class).value();
-				int i = factsheetUrlBinding.lastIndexOf("/");
-				String hrefName = ((HarvestSourceDTO) object).getUrl();
-				
-				StringBuffer href = new StringBuffer(i>=0 ? factsheetUrlBinding.substring(i+1) : factsheetUrlBinding).append("?view=&amp;harvestSource.url=")
-				.append(Util.urlEncode(hrefName));
-				
-				return new StringBuffer("<a href=\"").append(href).append("\">").append(StringEscapeUtils.escapeHtml(hrefName)).append("</a>").toString();
-			}
-		} 
-		return "";
-	}
+    private boolean dateFormat;
 
-	/** 
-	 * @see eionet.cr.web.util.columns.SearchResultColumn#getSortParamValue()
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String getSortParamValue() {
-		return dateFormat 
-				? "LAST_HARVEST"
-				: "URL";
-	}
+    /**
+     * @param dateFormat
+     */
+    public HarvestSourcesColumn(boolean dateFormat) {
+        this.dateFormat = dateFormat;
+    }
+
+    /**
+     * @see eionet.cr.web.util.columns.SearchResultColumn#format(java.lang.Object)
+     * {@inheritDoc}
+     */
+    @Override
+    public String format(Object object) {
+        if (object instanceof HarvestSourceDTO) {
+            if (dateFormat) {
+                Date date =  ((HarvestSourceDTO) object).getLastHarvest();
+                return date != null
+                        ? SIMPLE_DATE_FORMAT.format(date)
+                        : "";
+            } else {
+                String factsheetUrlBinding = HarvestSourceActionBean.class.getAnnotation(UrlBinding.class).value();
+                int i = factsheetUrlBinding.lastIndexOf("/");
+                String hrefName = ((HarvestSourceDTO) object).getUrl();
+
+                StringBuffer href = new StringBuffer(i>=0 ? factsheetUrlBinding.substring(i+1) : factsheetUrlBinding).append("?view=&amp;harvestSource.url=")
+                .append(Util.urlEncode(hrefName));
+
+                return new StringBuffer("<a href=\"").append(href).append("\">").append(StringEscapeUtils.escapeHtml(hrefName)).append("</a>").toString();
+            }
+        }
+        return "";
+    }
+
+    /**
+     * @see eionet.cr.web.util.columns.SearchResultColumn#getSortParamValue()
+     * {@inheritDoc}
+     */
+    @Override
+    public String getSortParamValue() {
+        return dateFormat
+                ? "LAST_HARVEST"
+                : "URL";
+    }
 
 }

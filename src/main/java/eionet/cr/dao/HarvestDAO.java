@@ -25,42 +25,42 @@ import java.util.List;
 import eionet.cr.dto.HarvestDTO;
 
 /**
- * 
+ *
  * @author heinljab
  *
  */
 public interface HarvestDAO extends DAO {
 
-	/**
-	 * 
-	 * @param harvestDTO
-	 */
-	public int insertStartedHarvest(int harvestSourceId, String harvestType, String user, String status) throws DAOException;
-	
-	/**
-	 * 
-	 * @param harvestDTO
-	 * @throws DAOException
-	 */
-	public void updateFinishedHarvest(int harvestId, String status, int totStatements,
-			int totResources, int litStatements, int encSchemes) throws DAOException;
-	
-	/**
-	 * 
-	 * @param harvestSourceId
-	 */
-	public List<HarvestDTO> getHarvestsBySourceId(Integer harvestSourceId) throws DAOException;
-
-	/**
-	 * 
-	 * @param harvestId
-	 * @return
-	 * @throws DAOException
-	 */
-    public HarvestDTO getHarvestById(Integer harvestId) throws DAOException;
-    
     /**
-     * 
+     *
+     * @param harvestDTO
+     */
+    public int insertStartedHarvest(int harvestSourceId, String harvestType, String user, String status) throws DAOException;
+
+    /**
+     *
+     * @param harvestDTO
+     * @throws DAOException
+     */
+    public void updateFinishedHarvest(int harvestId, String status, int totStatements,
+            int totResources, int litStatements, int encSchemes) throws DAOException;
+
+    /**
+     *
+     * @param harvestSourceId
+     */
+    public List<HarvestDTO> getHarvestsBySourceId(Integer harvestSourceId) throws DAOException;
+
+    /**
+     *
+     * @param harvestId
+     * @return
+     * @throws DAOException
+     */
+    public HarvestDTO getHarvestById(Integer harvestId) throws DAOException;
+
+    /**
+     *
      * @param harvestSourceId
      * @return
      * @throws DAOException

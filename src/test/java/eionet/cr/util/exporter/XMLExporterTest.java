@@ -43,124 +43,124 @@ import eionet.cr.util.export.XmlUtil;
 
 public class XMLExporterTest  extends TestCase {
 
-	@Test
-	public void testGetUniqueElementName(){
-		MockXmlExporter exporter = new MockXmlExporter();
-		Map<String, XmlElementMetadata> elements = new HashMap<String,XmlElementMetadata>();
-		elements.put("elemone", new XmlElementMetadata("elemOne"));
-		elements.put("elemtwo", new XmlElementMetadata("elemTwo"));
-		elements.put("elemthree", new XmlElementMetadata("elemThree"));
-		elements.put("elemtwo_1", new XmlElementMetadata("elemTwo_1"));
-		elements.put("elemthree_1", new XmlElementMetadata("elemThree_1"));
-		elements.put("elemthree_2", new XmlElementMetadata("elemThree_2"));
-		exporter.setElements(elements);
-		
-		assertEquals(exporter.getUniqueElementNameTest("elemFour"),"elemFour");
-		assertEquals(exporter.getUniqueElementNameTest("elemOne"),"elemOne_1");
-		assertEquals(exporter.getUniqueElementNameTest("elemTwo"),"elemTwo_2");
-		assertEquals(exporter.getUniqueElementNameTest("elemThree"),"elemThree_3");
-		assertEquals(exporter.getUniqueElementNameTest("ELEMONE"),"ELEMONE_1");
-		assertEquals(exporter.getUniqueElementNameTest("ELEMTWO"),"ELEMTWO_2");
-		assertEquals(exporter.getUniqueElementNameTest(""),XmlUtil.INVALID_ELEMENT_NAME);
-		
-	}
-	@Ignore
-	public void testDoExport() throws Exception{
-		
-		//fill in search data
-		SubjectDTO subject = new SubjectDTO("http://www.google.com",true);
-		subject.addObject(Predicates.RDFS_LABEL, new ObjectDTO("labelValue", false));
-		subject.addObject("comment", new ObjectDTO("commentValue", false));
-		List<Pair<String, String>> selectedColumns = new ArrayList<Pair<String,String>>();
-		selectedColumns.add(new Pair<String,String>("comment", null));
+    @Test
+    public void testGetUniqueElementName(){
+        MockXmlExporter exporter = new MockXmlExporter();
+        Map<String, XmlElementMetadata> elements = new HashMap<String,XmlElementMetadata>();
+        elements.put("elemone", new XmlElementMetadata("elemOne"));
+        elements.put("elemtwo", new XmlElementMetadata("elemTwo"));
+        elements.put("elemthree", new XmlElementMetadata("elemThree"));
+        elements.put("elemtwo_1", new XmlElementMetadata("elemTwo_1"));
+        elements.put("elemthree_1", new XmlElementMetadata("elemThree_1"));
+        elements.put("elemthree_2", new XmlElementMetadata("elemThree_2"));
+        exporter.setElements(elements);
 
-		// execute export
-		MockXmlExporter exporter = new MockXmlExporter();
-		exporter.setSelectedColumns(selectedColumns);
-		exporter.setExportResourceUri(true);
-		//exporter.setSelectedFilters(searchParameters);
-		
-		InputStream in = exporter.writeSubjectIntoExporterOutputTest(subject);
-		
-		List<String> xmlElements = new ArrayList<String>();
-		List<String> xmlCharacters = new ArrayList<String>();
-		
-		// check if the result is valid XML
-		XMLInputFactory factory = XMLInputFactory.newInstance();
-		XMLStreamReader parser = factory.createXMLStreamReader(in);
-		
-		while (true) {
-		    int event = parser.next();
-		    if (event == XMLStreamConstants.END_DOCUMENT) {
-		       parser.close();
-		       break;
-		    }
-		    if (event == XMLStreamConstants.START_ELEMENT) {
-		        xmlElements.add(parser.getLocalName());
-		    }
-		    if (event == XMLStreamConstants.CHARACTERS) {
-		    	xmlCharacters.add(parser.getText());
-		    }
-		}
-		parser.close();
-		//assert xml elements
-		assertEquals(xmlElements, Arrays.asList("dataroot", "resources", "Uri", "comment"));
-		//assert xml element values
-		assertEquals(xmlCharacters, Arrays.asList("http://www.google.com", "commentValue"));
-		
-	}
+        assertEquals(exporter.getUniqueElementNameTest("elemFour"),"elemFour");
+        assertEquals(exporter.getUniqueElementNameTest("elemOne"),"elemOne_1");
+        assertEquals(exporter.getUniqueElementNameTest("elemTwo"),"elemTwo_2");
+        assertEquals(exporter.getUniqueElementNameTest("elemThree"),"elemThree_3");
+        assertEquals(exporter.getUniqueElementNameTest("ELEMONE"),"ELEMONE_1");
+        assertEquals(exporter.getUniqueElementNameTest("ELEMTWO"),"ELEMTWO_2");
+        assertEquals(exporter.getUniqueElementNameTest(""),XmlUtil.INVALID_ELEMENT_NAME);
 
-	
-	/**
-	 * XmlError mocked class for setting private data
-	 * MockXmlExporter
-	 *
-	 * @author Enriko Käsper, TietoEnator Estonia AS
-	 */
-	class MockXmlExporter extends XmlExporter {
+    }
+    @Ignore
+    public void testDoExport() throws Exception{
 
-		public MockXmlExporter() {
-			super();
-		}
-		public void setElements(Map<String,XmlElementMetadata> elements){
-			this.elements = elements;
-		}
-		public String getUniqueElementNameTest(String elementName){
-			return super.getUniqueElementName(elementName);
-		}
-		
-		public InputStream writeSubjectIntoExporterOutputTest(SubjectDTO subject) throws ExportException {
-			ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+        //fill in search data
+        SubjectDTO subject = new SubjectDTO("http://www.google.com",true);
+        subject.addObject(Predicates.RDFS_LABEL, new ObjectDTO("labelValue", false));
+        subject.addObject("comment", new ObjectDTO("commentValue", false));
+        List<Pair<String, String>> selectedColumns = new ArrayList<Pair<String,String>>();
+        selectedColumns.add(new Pair<String,String>("comment", null));
 
-			try {
-				writer = XMLOutputFactory.newInstance().createXMLStreamWriter(outStream, ENCODING);
-				writer.writeStartDocument(ENCODING, "1.0");
-				//write root element
-				writeDocumentStart(writer);
+        // execute export
+        MockXmlExporter exporter = new MockXmlExporter();
+        exporter.setSelectedColumns(selectedColumns);
+        exporter.setExportResourceUri(true);
+        //exporter.setSelectedFilters(searchParameters);
 
-				//create element names Map
-				parseElemNames();
+        InputStream in = exporter.writeSubjectIntoExporterOutputTest(subject);
 
-				elementKeys = elements.keySet().toArray(new String[elements.size()]);
+        List<String> xmlElements = new ArrayList<String>();
+        List<String> xmlCharacters = new ArrayList<String>();
 
-				//test this method
-				super.writeSubjectIntoExporterOutput(subject);
-				
-				writeDocumentEnd(writer);
+        // check if the result is valid XML
+        XMLInputFactory factory = XMLInputFactory.newInstance();
+        XMLStreamReader parser = factory.createXMLStreamReader(in);
 
-				writer.flush();
-			} catch (XMLStreamException e) {
-				throw new ExportException(e.toString(), e);
-			} catch (FactoryConfigurationError e) {
-				throw new ExportException(e.toString(), e);
-			}
-			finally{
-				if(writer!=null){
-					try { writer.close();}catch (XMLStreamException e) {}
-				}
-			}
-			return new ByteArrayInputStream(outStream.toByteArray());
-			
-		}
-	}
+        while (true) {
+            int event = parser.next();
+            if (event == XMLStreamConstants.END_DOCUMENT) {
+               parser.close();
+               break;
+            }
+            if (event == XMLStreamConstants.START_ELEMENT) {
+                xmlElements.add(parser.getLocalName());
+            }
+            if (event == XMLStreamConstants.CHARACTERS) {
+                xmlCharacters.add(parser.getText());
+            }
+        }
+        parser.close();
+        //assert xml elements
+        assertEquals(xmlElements, Arrays.asList("dataroot", "resources", "Uri", "comment"));
+        //assert xml element values
+        assertEquals(xmlCharacters, Arrays.asList("http://www.google.com", "commentValue"));
+
+    }
+
+
+    /**
+     * XmlError mocked class for setting private data
+     * MockXmlExporter
+     *
+     * @author Enriko Käsper, TietoEnator Estonia AS
+     */
+    class MockXmlExporter extends XmlExporter {
+
+        public MockXmlExporter() {
+            super();
+        }
+        public void setElements(Map<String,XmlElementMetadata> elements){
+            this.elements = elements;
+        }
+        public String getUniqueElementNameTest(String elementName){
+            return super.getUniqueElementName(elementName);
+        }
+
+        public InputStream writeSubjectIntoExporterOutputTest(SubjectDTO subject) throws ExportException {
+            ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+
+            try {
+                writer = XMLOutputFactory.newInstance().createXMLStreamWriter(outStream, ENCODING);
+                writer.writeStartDocument(ENCODING, "1.0");
+                //write root element
+                writeDocumentStart(writer);
+
+                //create element names Map
+                parseElemNames();
+
+                elementKeys = elements.keySet().toArray(new String[elements.size()]);
+
+                //test this method
+                super.writeSubjectIntoExporterOutput(subject);
+
+                writeDocumentEnd(writer);
+
+                writer.flush();
+            } catch (XMLStreamException e) {
+                throw new ExportException(e.toString(), e);
+            } catch (FactoryConfigurationError e) {
+                throw new ExportException(e.toString(), e);
+            }
+            finally{
+                if(writer!=null){
+                    try { writer.close();}catch (XMLStreamException e) {}
+                }
+            }
+            return new ByteArrayInputStream(outStream.toByteArray());
+
+        }
+    }
 }

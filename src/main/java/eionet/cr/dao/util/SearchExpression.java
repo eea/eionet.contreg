@@ -23,63 +23,63 @@ package eionet.cr.dao.util;
 import eionet.cr.util.URIUtil;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
 public class SearchExpression {
 
-	/** */
-	private String expression;
-	
-	/** */
-	private boolean isUri = false;
-	private boolean isHash = false;
-	
-	/**
-	 * 
-	 * @param s
-	 */
-	public SearchExpression(String s){
-		
-		expression = s==null ? "" : s.trim();
-		
-		try{
-			Long.parseLong(expression);
-			isHash = true;
-		}
-		catch (NumberFormatException nfe){}
-		
-		isUri = URIUtil.isSchemedURI(expression);
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public boolean isEmpty(){
-		return expression.length()==0;
-	}
+    /** */
+    private String expression;
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	public String toString(){
-		return expression;
-	}
+    /** */
+    private boolean isUri = false;
+    private boolean isHash = false;
 
-	/**
-	 * @return the isUri
-	 */
-	public boolean isUri() {
-		return isUri;
-	}
+    /**
+     *
+     * @param s
+     */
+    public SearchExpression(String s){
 
-	/**
-	 * @return the isHash
-	 */
-	public boolean isHash() {
-		return isHash;
-	}
+        expression = s==null ? "" : s.trim();
+
+        try{
+            Long.parseLong(expression);
+            isHash = true;
+        }
+        catch (NumberFormatException nfe){}
+
+        isUri = URIUtil.isSchemedURI(expression);
+    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean isEmpty(){
+        return expression.length()==0;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    public String toString(){
+        return expression;
+    }
+
+    /**
+     * @return the isUri
+     */
+    public boolean isUri() {
+        return isUri;
+    }
+
+    /**
+     * @return the isHash
+     */
+    public boolean isHash() {
+        return isHash;
+    }
 }

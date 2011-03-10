@@ -37,50 +37,50 @@ import eionet.cr.util.sql.DbConnectionProvider;
 import eionet.cr.web.util.ApplicationCache;
 
 /**
- * 
+ *
  * @author <a href="mailto:enriko.kasper@tieto.com">Enriko Käsper</a>
  *
  */
 
 public class JsonActionBeanTest extends AbstractStripesMvcTestHelper{
-	
-	/**
-	 * 
-	 * @throws Exception
-	 */
-	@Test
-	public void testJsonTagsResult() throws Exception {
 
-		new ApplicationCache().contextInitialized(null);
-		ApplicationCache.updateTagCloudCache(getTestData());
+    /**
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testJsonTagsResult() throws Exception {
 
-		// Setup the servlet engine
-	    MockServletContext context = getMockServletContext();
-		
-		MockRoundtrip trip = new MockRoundtrip(context, JsonActionBean.class);
-		trip.setParameter(
-				"query", "tag");
-		trip.execute();
-		
-		assertEquals("{\"query\":\"tag\"," +
-				"\"suggestions\":[\"tag1\",\"tag2\",\"tag3\",\"tag4\"]}",
-				trip.getResponse().getOutputString());
+        new ApplicationCache().contextInitialized(null);
+        ApplicationCache.updateTagCloudCache(getTestData());
+
+        // Setup the servlet engine
+        MockServletContext context = getMockServletContext();
+
+        MockRoundtrip trip = new MockRoundtrip(context, JsonActionBean.class);
+        trip.setParameter(
+                "query", "tag");
+        trip.execute();
+
+        assertEquals("{\"query\":\"tag\"," +
+                "\"suggestions\":[\"tag1\",\"tag2\",\"tag3\",\"tag4\"]}",
+                trip.getResponse().getOutputString());
 
 
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	private List<TagDTO> getTestData() {
-		List<TagDTO> result = new ArrayList<TagDTO>();
-		result.add(new TagDTO("tag4", 10, 10));
-		result.add(new TagDTO("tag2", 10, 10));
-		result.add(new TagDTO("tag1", 10, 10));
-		result.add(new TagDTO("unknown2", 10, 10));
-		result.add(new TagDTO("tag3", 10, 10));
+    }
 
-		return result;
-	}
+    /**
+     *
+     * @return
+     */
+    private List<TagDTO> getTestData() {
+        List<TagDTO> result = new ArrayList<TagDTO>();
+        result.add(new TagDTO("tag4", 10, 10));
+        result.add(new TagDTO("tag2", 10, 10));
+        result.add(new TagDTO("tag1", 10, 10));
+        result.add(new TagDTO("unknown2", 10, 10));
+        result.add(new TagDTO("tag3", 10, 10));
+
+        return result;
+    }
 }

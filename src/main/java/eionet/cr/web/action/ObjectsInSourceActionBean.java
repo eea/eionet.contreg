@@ -21,112 +21,112 @@ import eionet.cr.web.util.columns.SubjectPredicateColumn;
 
 
 /**
- * 
+ *
  * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
  *
  */
 @UrlBinding("/objectsInSource.action")
 public class ObjectsInSourceActionBean extends AbstractSearchActionBean<SubjectDTO> {
-	
-	/** */
-	private String uri;
-	private long uriHash;
-	private long anonHash;
-	private boolean noCriteria;
-	
-	
-	/**
-	 * 
-	 * @return
-	 */
-	@DefaultHandler
-	public Resolution init(){
-		return new ForwardResolution("/pages/objectsInSource.jsp");
-	}
-	
-	
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.web.action.AbstractSearchActionBean#search()
-	 */
+
+    /** */
+    private String uri;
+    private long uriHash;
+    private long anonHash;
+    private boolean noCriteria;
+
+
+    /**
+     *
+     * @return
+     */
+    @DefaultHandler
+    public Resolution init(){
+        return new ForwardResolution("/pages/objectsInSource.jsp");
+    }
+
+
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.web.action.AbstractSearchActionBean#search()
+     */
     public Resolution search() throws DAOException{
 
-		if (resultList == null || resultList.size() == 0) {
-			Pair<Integer, List<SubjectDTO>> result = 
-				DAOFactory.get().getDao(SearchDAO.class)
-				.searchBySource(
-						uri,
-						PagingRequest.create(getPageN()),
-						new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
+        if (resultList == null || resultList.size() == 0) {
+            Pair<Integer, List<SubjectDTO>> result =
+                DAOFactory.get().getDao(SearchDAO.class)
+                .searchBySource(
+                        uri,
+                        PagingRequest.create(getPageN()),
+                        new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
 
-			resultList = result.getRight();
-			matchCount = result.getLeft();
-		}
-    	
-		return new ForwardResolution("/pages/objectsInSource.jsp");
+            resultList = result.getRight();
+            matchCount = result.getLeft();
+        }
+
+        return new ForwardResolution("/pages/objectsInSource.jsp");
     }
-	
-	
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
-	 */
-	public List<SearchResultColumn> getColumns(){
-		
-		ArrayList<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
-		
-		SubjectPredicateColumn col = new SubjectPredicateColumn();
-		col.setPredicateUri(Predicates.RDF_TYPE);
-		col.setTitle("Type");
-		col.setSortable(true);
-		list.add(col);
-		
-		col = new SubjectPredicateColumn();
-		col.setPredicateUri(Predicates.RDFS_LABEL);
-		col.setTitle("Label");
-		col.setSortable(true);
-		list.add(col);
-
-		return list;
-	}
 
 
-	public String getUri() {
-		return uri;
-	}
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
+     */
+    public List<SearchResultColumn> getColumns(){
+
+        ArrayList<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
+
+        SubjectPredicateColumn col = new SubjectPredicateColumn();
+        col.setPredicateUri(Predicates.RDF_TYPE);
+        col.setTitle("Type");
+        col.setSortable(true);
+        list.add(col);
+
+        col = new SubjectPredicateColumn();
+        col.setPredicateUri(Predicates.RDFS_LABEL);
+        col.setTitle("Label");
+        col.setSortable(true);
+        list.add(col);
+
+        return list;
+    }
 
 
-	public void setUri(String uri) {
-		this.uri = uri;
-	}
+    public String getUri() {
+        return uri;
+    }
 
 
-	public long getUriHash() {
-		return uriHash;
-	}
+    public void setUri(String uri) {
+        this.uri = uri;
+    }
 
 
-	public void setUriHash(long uriHash) {
-		this.uriHash = uriHash;
-	}
-
-	public long getAnonHash() {
-		return anonHash;
-	}
+    public long getUriHash() {
+        return uriHash;
+    }
 
 
-	public void setAnonHash(long anonHash) {
-		this.anonHash = anonHash;
-	}
+    public void setUriHash(long uriHash) {
+        this.uriHash = uriHash;
+    }
+
+    public long getAnonHash() {
+        return anonHash;
+    }
 
 
-	public boolean isNoCriteria() {
-		return noCriteria;
-	}
+    public void setAnonHash(long anonHash) {
+        this.anonHash = anonHash;
+    }
 
 
-	public void setNoCriteria(boolean noCriteria) {
-		this.noCriteria = noCriteria;
-	}
+    public boolean isNoCriteria() {
+        return noCriteria;
+    }
+
+
+    public void setNoCriteria(boolean noCriteria) {
+        this.noCriteria = noCriteria;
+    }
 
 }

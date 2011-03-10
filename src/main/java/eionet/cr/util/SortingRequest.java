@@ -23,58 +23,58 @@ package eionet.cr.util;
 
 /**
  * Encapsulates data about table sorting.
- * 
+ *
  * @author Aleksandr Ivanov
  * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
 public class SortingRequest {
-	
-	private String sortingColumnName;
-	private SortOrder sortOrder = SortOrder.ASCENDING;
-	private boolean sortByPredicateObjectHash = false;
-	
-	/**
-	 * @param sortingColumnName
-	 * @param sortingColumnOrder
-	 */
-	public SortingRequest(String sortingColumnName, SortOrder sortingColumnOrder) {
-		this.sortingColumnName = sortingColumnName;
-		this.sortOrder = sortingColumnOrder;
-	}
-	/**
-	 * @return the sortingColumnName
-	 */
-	public String getSortingColumnName() {
-		return sortingColumnName;
-	}
-	/**
-	 * @param sortingColumnName the sortingColumnName to set
-	 */
-	public void setSortingColumnName(String sortingColumnName) {
-		this.sortingColumnName = sortingColumnName;
-	}
-	/**
-	 * @return the sortOrder
-	 */
-	public SortOrder getSortOrder() {
-		return sortOrder;
-	}
-	/**
-	 * @param sortOrder the sortOrder to set
-	 */
-	public void setSortOrder(SortOrder sortOrder) {
-		this.sortOrder = sortOrder;
-	}
-	/**
-	 * @return the sortByPredicateObjectHash
-	 */
-	public boolean isSortByPredicateObjectHash() {
-		return sortByPredicateObjectHash;
-	}
-	/**
-	 * @param sortByPredicateObjectHash the sortByPredicateObjectHash to set
-	 */
-	public void setSortByPredicateObjectHash(boolean sortByPredicateObjectHash) {
-		this.sortByPredicateObjectHash = sortByPredicateObjectHash;
-	}
+
+    private String sortingColumnName;
+    private SortOrder sortOrder = SortOrder.ASCENDING;
+    private boolean sortByPredicateObjectHash = false;
+
+    /**
+     * @param sortingColumnName
+     * @param sortingColumnOrder
+     */
+    public SortingRequest(String sortingColumnName, SortOrder sortingColumnOrder) {
+        this.sortingColumnName = sortingColumnName;
+        this.sortOrder = sortingColumnOrder;
+    }
+    /**
+     * @return the sortingColumnName
+     */
+    public String getSortingColumnName() {
+        return sortingColumnName;
+    }
+    /**
+     * @param sortingColumnName the sortingColumnName to set
+     */
+    public void setSortingColumnName(String sortingColumnName) {
+        this.sortingColumnName = sortingColumnName;
+    }
+    /**
+     * @return the sortOrder
+     */
+    public SortOrder getSortOrder() {
+        return sortOrder;
+    }
+    /**
+     * @param sortOrder the sortOrder to set
+     */
+    public void setSortOrder(SortOrder sortOrder) {
+        this.sortOrder = sortOrder;
+    }
+    /**
+     * @return the sortByPredicateObjectHash
+     */
+    public boolean isSortByPredicateObjectHash() {
+        return sortByPredicateObjectHash;
+    }
+    /**
+     * @param sortByPredicateObjectHash the sortByPredicateObjectHash to set
+     */
+    public void setSortByPredicateObjectHash(boolean sortByPredicateObjectHash) {
+        this.sortByPredicateObjectHash = sortByPredicateObjectHash;
+    }
 }

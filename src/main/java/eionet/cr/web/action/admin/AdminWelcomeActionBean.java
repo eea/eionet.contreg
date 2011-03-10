@@ -8,36 +8,36 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.web.action.AbstractActionBean;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
  *
  */
 
 @UrlBinding("/admin")
 public class AdminWelcomeActionBean extends AbstractActionBean {
-	
-	private boolean adminLoggedIn = false;
-	
-	@DefaultHandler
-	public Resolution view() throws DAOException{
-		if (getUser()!=null){
-			if (getUser().isAdministrator()){
-				setAdminLoggedIn(true);
-			} else {
-				setAdminLoggedIn(false);
-			}
-		} else {
-			setAdminLoggedIn(false);
-		}
-		return new ForwardResolution("/pages/admin/adminWelcome.jsp");
-	}
 
-	public boolean isAdminLoggedIn() {
-		return adminLoggedIn;
-	}
+    private boolean adminLoggedIn = false;
 
-	public void setAdminLoggedIn(boolean adminLoggedIn) {
-		this.adminLoggedIn = adminLoggedIn;
-	}
-	
+    @DefaultHandler
+    public Resolution view() throws DAOException{
+        if (getUser()!=null){
+            if (getUser().isAdministrator()){
+                setAdminLoggedIn(true);
+            } else {
+                setAdminLoggedIn(false);
+            }
+        } else {
+            setAdminLoggedIn(false);
+        }
+        return new ForwardResolution("/pages/admin/adminWelcome.jsp");
+    }
+
+    public boolean isAdminLoggedIn() {
+        return adminLoggedIn;
+    }
+
+    public void setAdminLoggedIn(boolean adminLoggedIn) {
+        this.adminLoggedIn = adminLoggedIn;
+    }
+
 }

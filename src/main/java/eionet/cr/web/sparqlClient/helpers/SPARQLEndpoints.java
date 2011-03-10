@@ -12,76 +12,76 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tieto.com">Jaanus Heinlaid</a>
  *
  */
 public class SPARQLEndpoints extends ArrayList<String>{
-	
-	/** */
-	private static final String FILENAME = "endpoints.xml";
-	
-	/** */
-	private static Log logger = LogFactory.getLog(SPARQLEndpoints.class);
-	
-	/** */
-	private static SPARQLEndpoints instance;
-	private static Object lock = new Object();
 
-	/**
-	 * 
-	 */
-	private SPARQLEndpoints(){
-		
-		super();
-		loadFromProperties();
-		Collections.sort(this);
-	}
-	
-	/**
-	 * 
-	 */
-	private void loadFromProperties(){
-		
-		InputStream inputStream = null;
-		try{
-			inputStream = SPARQLEndpoints.class.getClassLoader().getResourceAsStream(FILENAME);
-			Properties properties = new Properties();
-			properties.loadFromXML(inputStream);
-			
-			for (Object key : properties.keySet()){
-				this.add(key.toString());
-			}
-		}
-		catch (InvalidPropertiesFormatException e){
-			logger.error("Failed to load endpoints from " + FILENAME, e);
-		}
-		catch (IOException e){
-			logger.error("Failed to load endpoints from " + FILENAME, e);
-		}
-		finally{
-			IOUtils.closeQuietly(inputStream);
-		}
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public static SPARQLEndpoints getInstance(){
-		
-		if (instance==null){
-			
-			synchronized (lock) {
-				
-				// double-checked locking pattern
-				// (http://www.ibm.com/developerworks/java/library/j-dcl.html)
-				if (instance==null){
-					instance = new SPARQLEndpoints();
-				}
-			}	
-		}
-		
-		return instance;
-	}
+    /** */
+    private static final String FILENAME = "endpoints.xml";
+
+    /** */
+    private static Log logger = LogFactory.getLog(SPARQLEndpoints.class);
+
+    /** */
+    private static SPARQLEndpoints instance;
+    private static Object lock = new Object();
+
+    /**
+     *
+     */
+    private SPARQLEndpoints(){
+
+        super();
+        loadFromProperties();
+        Collections.sort(this);
+    }
+
+    /**
+     *
+     */
+    private void loadFromProperties(){
+
+        InputStream inputStream = null;
+        try{
+            inputStream = SPARQLEndpoints.class.getClassLoader().getResourceAsStream(FILENAME);
+            Properties properties = new Properties();
+            properties.loadFromXML(inputStream);
+
+            for (Object key : properties.keySet()){
+                this.add(key.toString());
+            }
+        }
+        catch (InvalidPropertiesFormatException e){
+            logger.error("Failed to load endpoints from " + FILENAME, e);
+        }
+        catch (IOException e){
+            logger.error("Failed to load endpoints from " + FILENAME, e);
+        }
+        finally{
+            IOUtils.closeQuietly(inputStream);
+        }
+    }
+
+    /**
+     *
+     * @return
+     */
+    public static SPARQLEndpoints getInstance(){
+
+        if (instance==null){
+
+            synchronized (lock) {
+
+                // double-checked locking pattern
+                // (http://www.ibm.com/developerworks/java/library/j-dcl.html)
+                if (instance==null){
+                    instance = new SPARQLEndpoints();
+                }
+            }
+        }
+
+        return instance;
+    }
 }

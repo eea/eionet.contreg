@@ -30,88 +30,88 @@ import org.xml.sax.SAXParseException;
  * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
 public class DefaultErrorHandler implements ErrorHandler {
-	
-	private static final Logger logger = Logger.getLogger(DefaultErrorHandler.class);
-	
-	private SAXParseException saxError;
-	private SAXParseException saxWarning;
 
-	/** 
-	 * @see eionet.cr.harvest.IRDFHandler#error(org.xml.sax.SAXParseException)
-	 * {@inheritDoc}
-	 */
-	public void error(SAXParseException e) throws SAXException {
+    private static final Logger logger = Logger.getLogger(DefaultErrorHandler.class);
 
-		logger.warn(e.toString() +
-				" (line=" + e.getLineNumber() + ", col=" + e.getColumnNumber() + ")");
-		
-		saxError = sanitizeSAXParseException(e);
-	}
+    private SAXParseException saxError;
+    private SAXParseException saxWarning;
 
-	/** 
-	 * @see eionet.cr.harvest.IRDFHandler#warning(org.xml.sax.SAXParseException)
-	 * {@inheritDoc}
-	 */
-	public void warning(SAXParseException e) throws SAXException {
-		
-		logger.warn(e.toString() +
-				" (line=" + e.getLineNumber() + ", col=" + e.getColumnNumber() + ")");
-			
-		saxWarning = sanitizeSAXParseException(e);
-	}
+    /**
+     * @see eionet.cr.harvest.IRDFHandler#error(org.xml.sax.SAXParseException)
+     * {@inheritDoc}
+     */
+    public void error(SAXParseException e) throws SAXException {
 
-	/** 
-	 * @see eionet.cr.harvest.IRDFHandler#fatalError(org.xml.sax.SAXParseException)
-	 * {@inheritDoc}
-	 */
-	public void fatalError(SAXParseException e) throws SAXException {
-		throw new RDFLoadingException(e.toString(), e);
-	}
+        logger.warn(e.toString() +
+                " (line=" + e.getLineNumber() + ", col=" + e.getColumnNumber() + ")");
 
-	/**
-	 * @return the saxError
-	 */
-	public SAXParseException getSaxError() {
-		return saxError;
-	}
+        saxError = sanitizeSAXParseException(e);
+    }
 
-	/**
-	 * @return the saxWarning
-	 */
-	public SAXParseException getSaxWarning() {
-		return saxWarning;
-	}
-	
-	/**
-	 * This method returns a copy of the input SAXParseException where the
-	 * message, publicId and systemId have been replaced with an empty string
-	 * if they were null. This is to prevent NullPointerException in the later
-	 * usage of the exception.
-	 * 
-	 * @param e
-	 * @return
-	 */
-	private SAXParseException sanitizeSAXParseException(SAXParseException e){
-		
-		String message = e.getMessage();
-		if (message==null){
-			message = "";
-		}
-		
-		String erroneousEntityPublicId = e.getPublicId();
-		if (erroneousEntityPublicId==null){
-			erroneousEntityPublicId = "";
-		}
-		
-		String erroneousEntitySystemId = e.getSystemId();
-		if (erroneousEntitySystemId==null){
-			erroneousEntitySystemId= "";
-		}
-		
-		return new SAXParseException(message,
-				erroneousEntityPublicId,
-				erroneousEntitySystemId,
-				e.getLineNumber(),
-				e.getColumnNumber());
-	}
+    /**
+     * @see eionet.cr.harvest.IRDFHandler#warning(org.xml.sax.SAXParseException)
+     * {@inheritDoc}
+     */
+    public void warning(SAXParseException e) throws SAXException {
+
+        logger.warn(e.toString() +
+                " (line=" + e.getLineNumber() + ", col=" + e.getColumnNumber() + ")");
+
+        saxWarning = sanitizeSAXParseException(e);
+    }
+
+    /**
+     * @see eionet.cr.harvest.IRDFHandler#fatalError(org.xml.sax.SAXParseException)
+     * {@inheritDoc}
+     */
+    public void fatalError(SAXParseException e) throws SAXException {
+        throw new RDFLoadingException(e.toString(), e);
+    }
+
+    /**
+     * @return the saxError
+     */
+    public SAXParseException getSaxError() {
+        return saxError;
+    }
+
+    /**
+     * @return the saxWarning
+     */
+    public SAXParseException getSaxWarning() {
+        return saxWarning;
+    }
+
+    /**
+     * This method returns a copy of the input SAXParseException where the
+     * message, publicId and systemId have been replaced with an empty string
+     * if they were null. This is to prevent NullPointerException in the later
+     * usage of the exception.
+     *
+     * @param e
+     * @return
+     */
+    private SAXParseException sanitizeSAXParseException(SAXParseException e){
+
+        String message = e.getMessage();
+        if (message==null){
+            message = "";
+        }
+
+        String erroneousEntityPublicId = e.getPublicId();
+        if (erroneousEntityPublicId==null){
+            erroneousEntityPublicId = "";
+        }
+
+        String erroneousEntitySystemId = e.getSystemId();
+        if (erroneousEntitySystemId==null){
+            erroneousEntitySystemId= "";
+        }
+
+        return new SAXParseException(message,
+                erroneousEntityPublicId,
+                erroneousEntitySystemId,
+                e.getLineNumber(),
+                e.getColumnNumber());
+    }
 }

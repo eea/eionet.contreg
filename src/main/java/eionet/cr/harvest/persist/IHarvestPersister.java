@@ -29,91 +29,91 @@ import java.text.DateFormat;
  * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
 public interface IHarvestPersister {
-	
-	/**
-	 * Add triple to store.
-	 * 
-	 * @param subjectHash
-	 * @param anonSubject
-	 * @param predicateHash
-	 * @param object
-	 * @param objectLang
-	 * @param litObject
-	 * @param anonObject
-	 * @param objSourceObject
-	 * @throws PersisterException
-	 */
-	// TODO this method has got way too many arguments, the whole approach needs refactoring
-	void addTriple(long subjectHash, boolean anonSubject, long predicateHash,
-			String object, long objectHash, String objectLang, boolean litObject, boolean anonObject, long objSourceObject) throws PersisterException;
 
-	/**
-	 * 
-	 * @param uri
-	 * @param uriHash
-	 * @throws PersisterException
-	 */
-	void addResource(String uri, long uriHash) throws PersisterException;
-	
-	/**
-	 * rollbacks harvest.
-	 * 
-	 * @throws PersisterException
-	 */
-	void rollback() throws PersisterException;
-	
-	/**
-	 * commits resources when harvest is finished.
-	 * 
-	 * @throws PersisterException
-	 */
-	void commit() throws PersisterException;
-	
-	/**
-	 * called, when end of file is hit.
-	 * 
-	 * @throws PersisterException
-	 */
-	void endOfFile() throws PersisterException;
-	
-	/**
-	 * release all related resources.
-	 * 
-	 * @throws PersisterException
-	 */
-	void closeResources() throws PersisterException;
-	
-	/**
-	 * opens and prepares needed resources.
-	 * 
-	 * @throws PersisterException
-	 */
-	void openResources() throws PersisterException;
-	
-	/**
-	 * rollback any unfinished harvests.
-	 * 
-	 * @throws PersisterException
-	 */
-	void rollbackUnfinishedHarvests() throws PersisterException;
+    /**
+     * Add triple to store.
+     *
+     * @param subjectHash
+     * @param anonSubject
+     * @param predicateHash
+     * @param object
+     * @param objectLang
+     * @param litObject
+     * @param anonObject
+     * @param objSourceObject
+     * @throws PersisterException
+     */
+    // TODO this method has got way too many arguments, the whole approach needs refactoring
+    void addTriple(long subjectHash, boolean anonSubject, long predicateHash,
+            String object, long objectHash, String objectLang, boolean litObject, boolean anonObject, long objSourceObject) throws PersisterException;
 
-	/**
-	 * 
-	 * @return
-	 */
-	int getStoredTriplesCount();
-	
-	/**
-	 * @param subjectHash TODO
-	 * @param dateFormat TODO
-	 * @throws SQLException 
-	 * 
-	 */
-	void updateLastRefreshed(long subjectHash, DateFormat dateFormat) throws SQLException;
-	
-	/**
-	 * 
-	 * @param flag
-	 */
-	void setAddingSourceMetadata(boolean flag);
+    /**
+     *
+     * @param uri
+     * @param uriHash
+     * @throws PersisterException
+     */
+    void addResource(String uri, long uriHash) throws PersisterException;
+
+    /**
+     * rollbacks harvest.
+     *
+     * @throws PersisterException
+     */
+    void rollback() throws PersisterException;
+
+    /**
+     * commits resources when harvest is finished.
+     *
+     * @throws PersisterException
+     */
+    void commit() throws PersisterException;
+
+    /**
+     * called, when end of file is hit.
+     *
+     * @throws PersisterException
+     */
+    void endOfFile() throws PersisterException;
+
+    /**
+     * release all related resources.
+     *
+     * @throws PersisterException
+     */
+    void closeResources() throws PersisterException;
+
+    /**
+     * opens and prepares needed resources.
+     *
+     * @throws PersisterException
+     */
+    void openResources() throws PersisterException;
+
+    /**
+     * rollback any unfinished harvests.
+     *
+     * @throws PersisterException
+     */
+    void rollbackUnfinishedHarvests() throws PersisterException;
+
+    /**
+     *
+     * @return
+     */
+    int getStoredTriplesCount();
+
+    /**
+     * @param subjectHash TODO
+     * @param dateFormat TODO
+     * @throws SQLException
+     *
+     */
+    void updateLastRefreshed(long subjectHash, DateFormat dateFormat) throws SQLException;
+
+    /**
+     *
+     * @param flag
+     */
+    void setAddingSourceMetadata(boolean flag);
 }

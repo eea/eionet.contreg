@@ -37,14 +37,14 @@ import org.apache.commons.logging.LogFactory;
  *
  */
 public class StripesExceptionHandler implements ExceptionHandler {
-	
-	/** */
-	private static Log logger = LogFactory.getLog(StripesExceptionHandler.class);
 
-	/*
-	 * (non-Javadoc)
-	 * @see net.sourceforge.stripes.config.ConfigurableComponent#init(net.sourceforge.stripes.config.Configuration)
-	 */
+    /** */
+    private static Log logger = LogFactory.getLog(StripesExceptionHandler.class);
+
+    /*
+     * (non-Javadoc)
+     * @see net.sourceforge.stripes.config.ConfigurableComponent#init(net.sourceforge.stripes.config.Configuration)
+     */
     public void init(Configuration configuration) throws Exception {
     }
 
@@ -55,27 +55,27 @@ public class StripesExceptionHandler implements ExceptionHandler {
     public void handle(Throwable t,
                        HttpServletRequest request,
                        HttpServletResponse response) throws ServletException, IOException {
-    	
-    	Throwable newThrowable = (t instanceof ServletException) ? getRootCause((ServletException)t) : t;
-    	if (newThrowable==null)
-    		newThrowable = t;
 
-    	logger.error(newThrowable.getMessage(), newThrowable);
-    	request.setAttribute("exception", newThrowable);
-    	request.getRequestDispatcher("/pages/error.jsp").forward(request, response);
+        Throwable newThrowable = (t instanceof ServletException) ? getRootCause((ServletException)t) : t;
+        if (newThrowable==null)
+            newThrowable = t;
+
+        logger.error(newThrowable.getMessage(), newThrowable);
+        request.setAttribute("exception", newThrowable);
+        request.getRequestDispatcher("/pages/error.jsp").forward(request, response);
     }
 
     /**
-     * 
+     *
      * @param servletException
      * @return
      */
     private Throwable getRootCause(ServletException servletException){
-    	
-    	Throwable rootCause = servletException.getRootCause();
-    	if (rootCause instanceof ServletException)
-    		return getRootCause((ServletException)rootCause);
-    	else
-    		return rootCause;
+
+        Throwable rootCause = servletException.getRootCause();
+        if (rootCause instanceof ServletException)
+            return getRootCause((ServletException)rootCause);
+        else
+            return rootCause;
     }
 }

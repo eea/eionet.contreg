@@ -4,6 +4,6 @@ import eionet.cr.dto.SubjectDTO;
 
 public interface SubjectExportEvent {
 
-	public void writeSubjectIntoExporterOutput(SubjectDTO subject) throws ExportException;
+    public void writeSubjectIntoExporterOutput(SubjectDTO subject) throws ExportException;
 
 }

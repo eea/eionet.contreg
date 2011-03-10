@@ -14,7 +14,7 @@ import org.openrdf.query.BindingSet;
 
 
 /**
- * 
+ *
  * @author risto
  *
  * @param <T>
@@ -68,7 +68,7 @@ public class RecentUploadsReader<T> extends ResultSetMixedReader<T>{
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-        }	
+        }
 
     }
 

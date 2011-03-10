@@ -30,68 +30,68 @@ import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 
 /**
- * 
+ *
  * Utility class to hold handy functions for formatting.
- * 
+ *
  * @author Aleksandr Ivanov
  * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
 public final class FormatUtils {
-	
-	private FormatUtils() {
-		//blank
-	}
-	
-	public static String getObjectValuesForPredicate(String predicateUri, SubjectDTO subjectDTO, Set<String> languages) {
-		String result = "";
 
-		if (subjectDTO.getPredicateCount()>0){
-			
-			Collection<ObjectDTO> objects = subjectDTO.getObjects(predicateUri);
-			if (objects!=null && !objects.isEmpty()){
-			
-				LinkedHashSet<ObjectDTO> distinctObjects = new LinkedHashSet<ObjectDTO>(objects);		
-				StringBuffer bufLiterals = new StringBuffer();
-				StringBuffer bufNonLiterals = new StringBuffer();
+    private FormatUtils() {
+        //blank
+    }
 
-				String resultFromHitSource = null;
-				for (ObjectDTO objectDTO:distinctObjects){
+    public static String getObjectValuesForPredicate(String predicateUri, SubjectDTO subjectDTO, Set<String> languages) {
+        String result = "";
 
-					String objectString = objectDTO.getValue().trim();
-					
-					// if the source of the object matches the search-hit source of the subject then
-					// remember the object value and break
-					if (subjectDTO.getHitSource()>0 && objectDTO.getSourceHashSmart()==subjectDTO.getHitSource()
-							&& !StringUtils.isBlank(objectString)
-							&& objectDTO.isLiteral()){
+        if (subjectDTO.getPredicateCount()>0){
 
-						resultFromHitSource = objectString;
-						break;
-					}
-					
-					if (objectString.length()>0){
+            Collection<ObjectDTO> objects = subjectDTO.getObjects(predicateUri);
+            if (objects!=null && !objects.isEmpty()){
 
-						if (objectDTO.isLiteral()){
-							if (languages.isEmpty() || languages.contains(objectDTO.getLanguage())){
-								bufLiterals.append(bufLiterals.length()>0 ? ", " : "").append(objectString);
-							}
-						}
-						else{
-							bufNonLiterals.append(bufNonLiterals.length()>0 ? ", " : "").append(objectString);
-						}
-					}
-				}
+                LinkedHashSet<ObjectDTO> distinctObjects = new LinkedHashSet<ObjectDTO>(objects);
+                StringBuffer bufLiterals = new StringBuffer();
+                StringBuffer bufNonLiterals = new StringBuffer();
 
-				// if there was a value found that came from search-hit source then prefer that one as the result
-				if (!StringUtils.isBlank(resultFromHitSource)){
-					result = resultFromHitSource;
-				}
-				else{
-					result = bufLiterals.length()>0 ? bufLiterals.toString() : bufNonLiterals.toString();
-				}
-			}
-		}
-		return result;
-	}
-	
+                String resultFromHitSource = null;
+                for (ObjectDTO objectDTO:distinctObjects){
+
+                    String objectString = objectDTO.getValue().trim();
+
+                    // if the source of the object matches the search-hit source of the subject then
+                    // remember the object value and break
+                    if (subjectDTO.getHitSource()>0 && objectDTO.getSourceHashSmart()==subjectDTO.getHitSource()
+                            && !StringUtils.isBlank(objectString)
+                            && objectDTO.isLiteral()){
+
+                        resultFromHitSource = objectString;
+                        break;
+                    }
+
+                    if (objectString.length()>0){
+
+                        if (objectDTO.isLiteral()){
+                            if (languages.isEmpty() || languages.contains(objectDTO.getLanguage())){
+                                bufLiterals.append(bufLiterals.length()>0 ? ", " : "").append(objectString);
+                            }
+                        }
+                        else{
+                            bufNonLiterals.append(bufNonLiterals.length()>0 ? ", " : "").append(objectString);
+                        }
+                    }
+                }
+
+                // if there was a value found that came from search-hit source then prefer that one as the result
+                if (!StringUtils.isBlank(resultFromHitSource)){
+                    result = resultFromHitSource;
+                }
+                else{
+                    result = bufLiterals.length()>0 ? bufLiterals.toString() : bufNonLiterals.toString();
+                }
+            }
+        }
+        return result;
+    }
+
 }

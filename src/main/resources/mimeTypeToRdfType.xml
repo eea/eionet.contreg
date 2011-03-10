@@ -1,63 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
-	<entry key="http://purl.org/dc/dcmitype/StillImage">
-		image/
-	</entry>
-	<entry key="http://purl.org/dc/dcmitype/MovingImage">
-		video/
-	</entry>
-	<entry key="http://purl.org/dc/dcmitype/Sound">
-		audio/
-	</entry>
-	<entry key="http://purl.org/dc/dcmitype/Text">
-		text/plain
-		text/html
-		text/rtf
-		text/richtext
-		application/rtf
-		application/pdf
-		application/msword
-		application/vnd.oasis.opendocument.text
-		application/vnd.openxmlformats-officedocument.wordprocessingml.document
-		application/pdf/force-download
-		application/x-unknown-application-pdf
-		application/doc
-		application/excel
-		application/vnd.ms-powerpoint
-		application/x-word6.0
-	</entry>
-	<entry key="http://purl.org/dc/dcmitype/Dataset">
-		application/vnd.ms-excel
-		application/vnd.msexcel
-		application/ms-excel
-		application/x-excel
-		application/ms-excel
-		application/vnd.openxmlformats-officedocument.spreadsheetml.sheet		
-		application/vnd.oasis.opendocument.spreadsheet
-		application/x-msaccess
-		text/xml
-		application/xml
-		application/rdf+xml
-		application/doc
-		application/x-excel5.0
-		application/x-msexcel
-		application/msaccess
-		application/vnd.google-earth.kml+xml
-		application/vnd.google-earth.kmz
-	</entry>
-	<entry key="http://purl.org/dc/dcmitype/Collection">
-		application/zip
-	</entry>
-	<entry key="http://purl.org/dc/dcmitype/Event">
-	</entry>
-	<entry key="http://purl.org/dc/dcmitype/InteractiveResource">
-	</entry>
-	<entry key="http://purl.org/dc/dcmitype/Service">
-	</entry>
-	<entry key="http://purl.org/dc/dcmitype/Software">
-	</entry>
-	<entry key="http://purl.org/dc/dcmitype/PhysicalObject">
-	</entry>
+    <entry key="http://purl.org/dc/dcmitype/StillImage">
+        image/
+    </entry>
+    <entry key="http://purl.org/dc/dcmitype/MovingImage">
+        video/
+    </entry>
+    <entry key="http://purl.org/dc/dcmitype/Sound">
+        audio/
+    </entry>
+    <entry key="http://purl.org/dc/dcmitype/Text">
+        text/plain
+        text/html
+        text/rtf
+        text/richtext
+        application/rtf
+        application/pdf
+        application/msword
+        application/vnd.oasis.opendocument.text
+        application/vnd.openxmlformats-officedocument.wordprocessingml.document
+        application/pdf/force-download
+        application/x-unknown-application-pdf
+        application/doc
+        application/excel
+        application/vnd.ms-powerpoint
+        application/x-word6.0
+    </entry>
+    <entry key="http://purl.org/dc/dcmitype/Dataset">
+        application/vnd.ms-excel
+        application/vnd.msexcel
+        application/ms-excel
+        application/x-excel
+        application/ms-excel
+        application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+        application/vnd.oasis.opendocument.spreadsheet
+        application/x-msaccess
+        text/xml
+        application/xml
+        application/rdf+xml
+        application/doc
+        application/x-excel5.0
+        application/x-msexcel
+        application/msaccess
+        application/vnd.google-earth.kml+xml
+        application/vnd.google-earth.kmz
+    </entry>
+    <entry key="http://purl.org/dc/dcmitype/Collection">
+        application/zip
+    </entry>
+    <entry key="http://purl.org/dc/dcmitype/Event">
+    </entry>
+    <entry key="http://purl.org/dc/dcmitype/InteractiveResource">
+    </entry>
+    <entry key="http://purl.org/dc/dcmitype/Service">
+    </entry>
+    <entry key="http://purl.org/dc/dcmitype/Software">
+    </entry>
+    <entry key="http://purl.org/dc/dcmitype/PhysicalObject">
+    </entry>
 
 </properties>

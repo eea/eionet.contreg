@@ -47,125 +47,125 @@ import eionet.cr.web.util.columns.SubjectPredicateColumn;
 import eionet.cr.web.util.columns.SubjectUploadedColumn;
 
 /**
- * 
+ *
  * @author altnyris
  *
  */
 @UrlBinding("/recentUploads.action")
 public class RecentUploadsActionBean extends AbstractSearchActionBean<SubjectDTO> {
-	
-	/** */
-	public static final int MAX_RESULTS = 20;
-	
-	/** */
-	private static Log logger = LogFactory.getLog(RecentUploadsActionBean.class);
-	/** */
-	private String type;
 
-	/** */
-	private static final List<Map<String,String>> types;
-	private static final Map<String,List<SearchResultColumn>> typesColumns;
-	
+    /** */
+    public static final int MAX_RESULTS = 20;
 
-	static {
-		types = new LinkedList<Map<String,String>>();
-		Map<String,String> typeMap = new HashMap<String,String>();
-		typeMap.put("title", "Deliveries");
-		typeMap.put("uri", Subjects.ROD_DELIVERY_CLASS);
-		RecentUploadsActionBean.types.add(typeMap);
-		
-		typeMap = new HashMap<String,String>();
-		typeMap.put("title", "Obligations");
-		typeMap.put("uri", Subjects.ROD_OBLIGATION_CLASS);
-		RecentUploadsActionBean.types.add(typeMap);
-				
-		typesColumns = new HashMap<String,List<SearchResultColumn>>();
-		SubjectUploadedColumn uploaded = new SubjectUploadedColumn("Date", false);
-		
-		/* columns for deliveries */
-		List<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
-		list.add(new SubjectPredicateColumn("Title", false, Predicates.RDFS_LABEL));
-		list.add(new SubjectPredicateColumn("Obligation", false, Predicates.ROD_OBLIGATION_PROPERTY));
-		list.add(new SubjectPredicateColumn("Locality", false, Predicates.ROD_LOCALITY_PROPERTY));
-		list.add(uploaded);
-		typesColumns.put(Subjects.ROD_DELIVERY_CLASS, list);
+    /** */
+    private static Log logger = LogFactory.getLog(RecentUploadsActionBean.class);
+    /** */
+    private String type;
 
-		/* columns for obligations */
-		list = new ArrayList<SearchResultColumn>();
-		list.add(new SubjectPredicateColumn("Title", false, Predicates.RDFS_LABEL));
-		list.add(new SubjectPredicateColumn("Issue", false, Predicates.ROD_ISSUE_PROPERTY));
-		list.add(new SubjectPredicateColumn("Instrument", false, Predicates.ROD_INSTRUMENT_PROPERTY));
-		list.add(uploaded);
-		typesColumns.put(Subjects.ROD_OBLIGATION_CLASS, list);
-	}
-	
-	
-	/**
-	 * 
-	 */
-	public RecentUploadsActionBean(){
-		this.type = Subjects.ROD_DELIVERY_CLASS; // default type
-	}
+    /** */
+    private static final List<Map<String,String>> types;
+    private static final Map<String,List<SearchResultColumn>> typesColumns;
 
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.web.action.AbstractSearchActionBean#search()
-	 */
-	@DefaultHandler
-	public Resolution search() throws DAOException {
-		
-		if (!StringUtils.isBlank(type)){
-			//String decodedType = Util.urlDecode(type);
-				resultList = DAOFactory.get().getDao(HelperDAO.class).getLatestSubjects(
-						type, MAX_RESULTS);
-		}
-			
-		return new ForwardResolution("/pages/recent.jsp");
-	}
-	
-	/**
-	 * 
-	 * @return String
-	 */
-	public String getType() {
-		return type;
-	}
 
-	/**
-	 * 
-	 * @param type
-	 */
-	public void setType(String type) {
-		this.type = type;
-	}
+    static {
+        types = new LinkedList<Map<String,String>>();
+        Map<String,String> typeMap = new HashMap<String,String>();
+        typeMap.put("title", "Deliveries");
+        typeMap.put("uri", Subjects.ROD_DELIVERY_CLASS);
+        RecentUploadsActionBean.types.add(typeMap);
 
-	/**
-	 * 
-	 * @return List<Map<String, String>>
-	 */
-	public List<Map<String, String>> getTypes(){
-		return RecentUploadsActionBean.types;
-	}
-	
-	/**
-	 * 
-	 * @return int
-	 */
-	public int getMaxResults(){
-		return RecentUploadsActionBean.MAX_RESULTS;
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
-	 */
-	public List<SearchResultColumn> getColumns(){
-		if (StringUtils.isEmpty(type)){
-			return getDefaultColumns();
-		}
-		String decodedType = Util.urlDecode(type);
-		return StringUtils.isEmpty(decodedType) 
-				? null 
-				: typesColumns.get(decodedType);
-	}
+        typeMap = new HashMap<String,String>();
+        typeMap.put("title", "Obligations");
+        typeMap.put("uri", Subjects.ROD_OBLIGATION_CLASS);
+        RecentUploadsActionBean.types.add(typeMap);
+
+        typesColumns = new HashMap<String,List<SearchResultColumn>>();
+        SubjectUploadedColumn uploaded = new SubjectUploadedColumn("Date", false);
+
+        /* columns for deliveries */
+        List<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
+        list.add(new SubjectPredicateColumn("Title", false, Predicates.RDFS_LABEL));
+        list.add(new SubjectPredicateColumn("Obligation", false, Predicates.ROD_OBLIGATION_PROPERTY));
+        list.add(new SubjectPredicateColumn("Locality", false, Predicates.ROD_LOCALITY_PROPERTY));
+        list.add(uploaded);
+        typesColumns.put(Subjects.ROD_DELIVERY_CLASS, list);
+
+        /* columns for obligations */
+        list = new ArrayList<SearchResultColumn>();
+        list.add(new SubjectPredicateColumn("Title", false, Predicates.RDFS_LABEL));
+        list.add(new SubjectPredicateColumn("Issue", false, Predicates.ROD_ISSUE_PROPERTY));
+        list.add(new SubjectPredicateColumn("Instrument", false, Predicates.ROD_INSTRUMENT_PROPERTY));
+        list.add(uploaded);
+        typesColumns.put(Subjects.ROD_OBLIGATION_CLASS, list);
+    }
+
+
+    /**
+     *
+     */
+    public RecentUploadsActionBean(){
+        this.type = Subjects.ROD_DELIVERY_CLASS; // default type
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.web.action.AbstractSearchActionBean#search()
+     */
+    @DefaultHandler
+    public Resolution search() throws DAOException {
+
+        if (!StringUtils.isBlank(type)){
+            //String decodedType = Util.urlDecode(type);
+                resultList = DAOFactory.get().getDao(HelperDAO.class).getLatestSubjects(
+                        type, MAX_RESULTS);
+        }
+
+        return new ForwardResolution("/pages/recent.jsp");
+    }
+
+    /**
+     *
+     * @return String
+     */
+    public String getType() {
+        return type;
+    }
+
+    /**
+     *
+     * @param type
+     */
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    /**
+     *
+     * @return List<Map<String, String>>
+     */
+    public List<Map<String, String>> getTypes(){
+        return RecentUploadsActionBean.types;
+    }
+
+    /**
+     *
+     * @return int
+     */
+    public int getMaxResults(){
+        return RecentUploadsActionBean.MAX_RESULTS;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
+     */
+    public List<SearchResultColumn> getColumns(){
+        if (StringUtils.isEmpty(type)){
+            return getDefaultColumns();
+        }
+        String decodedType = Util.urlDecode(type);
+        return StringUtils.isEmpty(decodedType)
+                ? null
+                : typesColumns.get(decodedType);
+    }
 }

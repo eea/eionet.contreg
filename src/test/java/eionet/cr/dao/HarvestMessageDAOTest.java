@@ -31,60 +31,60 @@ import eionet.cr.test.helpers.CRDatabaseTestCase;
 
 /**
  * JUnit test tests HarvestMessageDAO functionality.
- * 
+ *
  * @author altnyris
  *
  */
 public class HarvestMessageDAOTest extends CRDatabaseTestCase {
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.dbunit.DatabaseTestCase#getDataSet()
-	 */
-	protected IDataSet getDataSet() throws Exception {
-		return getXmlDataSet("sources-harvests-messages.xml");
-	}
-	
-	@Test
-	public void testInsertAndFindHarvestMessage() throws Exception {
-		
-		HarvestMessageDTO harvestMessage = new HarvestMessageDTO();
-		harvestMessage.setHarvestId(55);
-		harvestMessage.setMessage("test");
-		harvestMessage.setStackTrace("teststack");
-		harvestMessage.setType("01");
-		
-		HarvestMessageDAO dao = DAOFactory.get().getDao(HarvestMessageDAO.class);
-		Integer messageID = dao.insertHarvestMessage(harvestMessage);
-		assertNotNull(messageID);
-		
-		harvestMessage = dao.findHarvestMessageByMessageID(messageID.intValue());
-		assertEquals(messageID, harvestMessage.getHarvestMessageId());
-	}
-	
-	@Test
-	public void testFindHarvestMessagesByHarvestID() throws Exception {
-		
-		List<HarvestMessageDTO> messages = DAOFactory.get().getDao(HarvestMessageDAO.class).findHarvestMessagesByHarvestID(121);
-		assertEquals(2, messages.size());
-	}
-	
-	@Test
-	public void testDeleteMessage() throws Exception {
+    /*
+     * (non-Javadoc)
+     * @see org.dbunit.DatabaseTestCase#getDataSet()
+     */
+    protected IDataSet getDataSet() throws Exception {
+        return getXmlDataSet("sources-harvests-messages.xml");
+    }
 
-		DAOFactory.get().getDao(HarvestMessageDAO.class).deleteMessage(5);
-		HarvestMessageDTO message = DAOFactory.get().getDao(HarvestMessageDAO.class).findHarvestMessageByMessageID(5);
-		assertNull(message);
-	}
-	
-	@Test
-	public void testInsertSource() throws Exception {
-		
-		Integer id = DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(
-				"http://1.ee", 1, true, "emails");
-		assertNotNull(id);
-		
-		DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(
-				"http://1.ee", 1, true, "emails");
-	}
+    @Test
+    public void testInsertAndFindHarvestMessage() throws Exception {
+
+        HarvestMessageDTO harvestMessage = new HarvestMessageDTO();
+        harvestMessage.setHarvestId(55);
+        harvestMessage.setMessage("test");
+        harvestMessage.setStackTrace("teststack");
+        harvestMessage.setType("01");
+
+        HarvestMessageDAO dao = DAOFactory.get().getDao(HarvestMessageDAO.class);
+        Integer messageID = dao.insertHarvestMessage(harvestMessage);
+        assertNotNull(messageID);
+
+        harvestMessage = dao.findHarvestMessageByMessageID(messageID.intValue());
+        assertEquals(messageID, harvestMessage.getHarvestMessageId());
+    }
+
+    @Test
+    public void testFindHarvestMessagesByHarvestID() throws Exception {
+
+        List<HarvestMessageDTO> messages = DAOFactory.get().getDao(HarvestMessageDAO.class).findHarvestMessagesByHarvestID(121);
+        assertEquals(2, messages.size());
+    }
+
+    @Test
+    public void testDeleteMessage() throws Exception {
+
+        DAOFactory.get().getDao(HarvestMessageDAO.class).deleteMessage(5);
+        HarvestMessageDTO message = DAOFactory.get().getDao(HarvestMessageDAO.class).findHarvestMessageByMessageID(5);
+        assertNull(message);
+    }
+
+    @Test
+    public void testInsertSource() throws Exception {
+
+        Integer id = DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(
+                "http://1.ee", 1, true, "emails");
+        assertNotNull(id);
+
+        DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(
+                "http://1.ee", 1, true, "emails");
+    }
 }

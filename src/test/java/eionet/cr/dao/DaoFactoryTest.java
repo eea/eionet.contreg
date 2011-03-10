@@ -41,30 +41,30 @@ import eionet.cr.dao.postgre.PostgreSQLUrgentHarvestQueueDAO;
 
 /**
  * Tests the factory getDao methods.
- * 
+ *
  * @author Aleksandr Ivanov
  * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
 public class DaoFactoryTest extends TestCase {
 
-	@Test
-	public void testFactory() {
-		
-		DAOFactory factory = MySQLDAOFactory.get();
-		assertTrue(factory.getDao(HarvestDAO.class) instanceof MySQLHarvestDAO);
-		assertTrue(factory.getDao(HarvestMessageDAO.class) instanceof MySQLHarvestMessageDAO);
-		assertTrue(factory.getDao(HarvestSourceDAO.class) instanceof MySQLHarvestSourceDAO);
-		assertTrue(factory.getDao(HelperDAO.class) instanceof MySQLHelperDAO);
-		assertTrue(factory.getDao(SearchDAO.class) instanceof MySQLSearchDAO);
-		assertTrue(factory.getDao(UrgentHarvestQueueDAO.class) instanceof MySQLUrgentHarvestQueueDAO);
+    @Test
+    public void testFactory() {
 
-		
-		factory = PostgreSQLDAOFactory.get();
-		assertTrue(factory.getDao(HarvestDAO.class) instanceof PostgreSQLHarvestDAO);
-		assertTrue(factory.getDao(HarvestMessageDAO.class) instanceof PostgreSQLHarvestMessageDAO);
-		assertTrue(factory.getDao(HarvestSourceDAO.class) instanceof PostgreSQLHarvestSourceDAO);
-		assertTrue(factory.getDao(HelperDAO.class) instanceof PostgreSQLHelperDAO);
-		assertTrue(factory.getDao(SearchDAO.class) instanceof PostgreSQLSearchDAO);
-		assertTrue(factory.getDao(UrgentHarvestQueueDAO.class) instanceof PostgreSQLUrgentHarvestQueueDAO);
-	}
+        DAOFactory factory = MySQLDAOFactory.get();
+        assertTrue(factory.getDao(HarvestDAO.class) instanceof MySQLHarvestDAO);
+        assertTrue(factory.getDao(HarvestMessageDAO.class) instanceof MySQLHarvestMessageDAO);
+        assertTrue(factory.getDao(HarvestSourceDAO.class) instanceof MySQLHarvestSourceDAO);
+        assertTrue(factory.getDao(HelperDAO.class) instanceof MySQLHelperDAO);
+        assertTrue(factory.getDao(SearchDAO.class) instanceof MySQLSearchDAO);
+        assertTrue(factory.getDao(UrgentHarvestQueueDAO.class) instanceof MySQLUrgentHarvestQueueDAO);
+
+
+        factory = PostgreSQLDAOFactory.get();
+        assertTrue(factory.getDao(HarvestDAO.class) instanceof PostgreSQLHarvestDAO);
+        assertTrue(factory.getDao(HarvestMessageDAO.class) instanceof PostgreSQLHarvestMessageDAO);
+        assertTrue(factory.getDao(HarvestSourceDAO.class) instanceof PostgreSQLHarvestSourceDAO);
+        assertTrue(factory.getDao(HelperDAO.class) instanceof PostgreSQLHelperDAO);
+        assertTrue(factory.getDao(SearchDAO.class) instanceof PostgreSQLSearchDAO);
+        assertTrue(factory.getDao(UrgentHarvestQueueDAO.class) instanceof PostgreSQLUrgentHarvestQueueDAO);
+    }
 }

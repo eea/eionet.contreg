@@ -27,54 +27,54 @@ import java.io.StringReader;
 import eionet.cr.harvest.util.arp.ReaderBasedARPSource;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
 public class PushHarvest extends Harvest{
-	
-	/** */
-	protected String content = null;
 
-	/**
-	 * 
-	 * @param sourceUri
-	 */
-	public PushHarvest(String content, String sourceUri) {
-		super(sourceUri);
-		this.content = content;
-		this.clearPreviousContent = false;
-	}
+    /** */
+    protected String content = null;
 
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.harvest.Harvest#doExecute()
-	 */
-	protected void doExecute() throws HarvestException {
-		
-		if (content==null || content.trim().length()==0)
-			throw new HarvestException("No content supplied for push-harvesting from url [" + sourceUrlString + "]");
-		
-		Reader stringReader = null;
-		try{
-			stringReader = new StringReader(content);
-			sourceLastModified = System.currentTimeMillis();
-			harvest(new ReaderBasedARPSource(stringReader));
-		}
-		finally{
-			if (stringReader!=null){
-				try{stringReader.close();}catch (IOException e){}
-			}
-		}
-	}
+    /**
+     *
+     * @param sourceUri
+     */
+    public PushHarvest(String content, String sourceUri) {
+        super(sourceUri);
+        this.content = content;
+        this.clearPreviousContent = false;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.harvest.Harvest#doHarvestStartedActions()
-	 */
-	protected void doHarvestStartedActions() throws HarvestException{
-		
-		logger.debug("Push harvest started");
-		super.doHarvestStartedActions();
-	}
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.harvest.Harvest#doExecute()
+     */
+    protected void doExecute() throws HarvestException {
+
+        if (content==null || content.trim().length()==0)
+            throw new HarvestException("No content supplied for push-harvesting from url [" + sourceUrlString + "]");
+
+        Reader stringReader = null;
+        try{
+            stringReader = new StringReader(content);
+            sourceLastModified = System.currentTimeMillis();
+            harvest(new ReaderBasedARPSource(stringReader));
+        }
+        finally{
+            if (stringReader!=null){
+                try{stringReader.close();}catch (IOException e){}
+            }
+        }
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.harvest.Harvest#doHarvestStartedActions()
+     */
+    protected void doHarvestStartedActions() throws HarvestException{
+
+        logger.debug("Push harvest started");
+        super.doHarvestStartedActions();
+    }
 }

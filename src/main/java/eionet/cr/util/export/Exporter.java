@@ -47,220 +47,220 @@ import eionet.cr.util.sql.ResultSetExportReader;
 
 /**
  * Utility class to handle export procedure.
- * 
+ *
  * @author Aleksandr Ivanov
  * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
 public abstract class Exporter {
-	
-	
-	protected Logger logger = Logger.getLogger(Exporter.class);
 
-	private ExportFormat exportFormat;
-	private Map<String,String> selectedFilters;
-	private Set<String> languages;
-	
-	//if true exports Resource uri, label otherwise.
-	private boolean exportResourceUri;
-	
-	//List of selected columns Pair.id - column URI, Pair.value - optional column label
-	// if label is present - it is used in the output. Otherwise URI is used.
-	// URI should be always present
-	private List<Pair<String,String>> selectedColumns;
-	
-	/**
-	 * exports search result into given fomrat
-	 * @param customSearch
-	 * @return
-	 * @throws IOException
-	 * @throws DAOException 
-	 */
-	protected abstract InputStream doExport() throws ExportException, IOException, DAOException;
 
-	/**
-	 * Creates Exporter object for given export format 
-	 * @param exportFormat
-	 * @return
-	 */
-	public static Exporter getExporter(ExportFormat exportFormat){
-		Exporter exporter = null;
-		switch (exportFormat){
-			case XLS:
-				exporter = new XlsExporter();
-				break;
-			case XML:
-				exporter = new XmlExporter();
-				break;
-			case XML_WITH_SCHEMA:
-				exporter = new XmlWithSchemaExporter();
-				break;
-			default:
-				throw new CRRuntimeException("Exporter is not implemented for format: " + exportFormat);
-		}
-		exporter.setExportFormat(exportFormat);
-		
-		return exporter;
-	}
+    protected Logger logger = Logger.getLogger(Exporter.class);
 
-	public InputStream export() throws DAOException, IOException, ExportException {
-		
-		long startTime = System.currentTimeMillis();
-		
-		//add label into selected columns if not exist yet
-		Pair<String,String> labelPredicate = new Pair<String,String>(Predicates.RDFS_LABEL,null);
-		if(!selectedColumns.contains(labelPredicate)){
-			selectedColumns.add(labelPredicate);
-		}
-		
-		InputStream result = doExport();
-		
-		logger.trace("Export process took: " + Util.durationSince(startTime));
-		
-		return result;
-	}
-	
-	public void doExportQueryAndWriteDataIntoOutput(ResultSetExportReader reader) throws DAOException{
-		Map<String,String> criteria = new HashMap<String, String>();
-		for(Entry<String, String> entry : selectedFilters.entrySet()) {
-			criteria.put(StringUtils.trim(entry.getKey()), StringUtils.trim(entry.getValue()));
-		}
-		// do the query and write data rows directly to export file
-		DAOFactory.get().getDao(ExporterDAO.class)
-			.exportByTypeAndFilters(
-				criteria,
-				getSelectedColumnsList(), 
-				reader);
+    private ExportFormat exportFormat;
+    private Map<String,String> selectedFilters;
+    private Set<String> languages;
 
-	}
+    //if true exports Resource uri, label otherwise.
+    private boolean exportResourceUri;
 
-	/**
-	 * Returns the label of subject's uri or label depending on exportResourceUri value 
-	 * @return 
-	 */
-	protected String getUriOrLabel(){ 
-		String uriOrLabelElement = isExportResourceUri() 
-		? "Uri"
-				: "Label";
+    //List of selected columns Pair.id - column URI, Pair.value - optional column label
+    // if label is present - it is used in the output. Otherwise URI is used.
+    // URI should be always present
+    private List<Pair<String,String>> selectedColumns;
 
-		return uriOrLabelElement;
-	}
-	/**
-	 * This method creates the PaginRequest object for limiting the rows in the search results 
-	 * @return
-	 */
-	protected PagingRequest getRowLimitPagingRequest(){
-		return null;
-	}
+    /**
+     * exports search result into given fomrat
+     * @param customSearch
+     * @return
+     * @throws IOException
+     * @throws DAOException
+     */
+    protected abstract InputStream doExport() throws ExportException, IOException, DAOException;
 
-	/**
-	 * Returns the value of subject's uri or label depending on exportResourceUri value 
-	 * @return 
-	 */
-	protected String getUriOrLabelValue(SubjectDTO subject){ 
-		String value = "";
-		String uri = subject.getUri(); 
-		
-		if(isExportResourceUri()){
-			value = uri;
-		}else{
-			value = FormatUtils.getObjectValuesForPredicate(Predicates.RDFS_LABEL, subject, getLanguages());
-			//extract value from uri
-			if (StringUtils.isBlank(value)){
-				value = URIUtil.extractURILabel(uri,uri);
-			}
+    /**
+     * Creates Exporter object for given export format
+     * @param exportFormat
+     * @return
+     */
+    public static Exporter getExporter(ExportFormat exportFormat){
+        Exporter exporter = null;
+        switch (exportFormat){
+            case XLS:
+                exporter = new XlsExporter();
+                break;
+            case XML:
+                exporter = new XmlExporter();
+                break;
+            case XML_WITH_SCHEMA:
+                exporter = new XmlWithSchemaExporter();
+                break;
+            default:
+                throw new CRRuntimeException("Exporter is not implemented for format: " + exportFormat);
+        }
+        exporter.setExportFormat(exportFormat);
 
-		}
-		
-		return value;
-	}
+        return exporter;
+    }
 
-	/**
-	 * @return the exportFormat
-	 */
-	public ExportFormat getExportFormat() {
-		return exportFormat;
-	}
+    public InputStream export() throws DAOException, IOException, ExportException {
 
-	/**
-	 * @param exportFormat the exportFormat to set
-	 */
-	public void setExportFormat(ExportFormat exportFormat) {
-		this.exportFormat = exportFormat;
-	}
+        long startTime = System.currentTimeMillis();
 
-	/**
-	 * @return the selectedFilters
-	 */
-	public Map<String, String> getSelectedFilters() {
-		return selectedFilters;
-	}
+        //add label into selected columns if not exist yet
+        Pair<String,String> labelPredicate = new Pair<String,String>(Predicates.RDFS_LABEL,null);
+        if(!selectedColumns.contains(labelPredicate)){
+            selectedColumns.add(labelPredicate);
+        }
 
-	/**
-	 * @param selectedFilters the selectedFilters to set
-	 */
-	public void setSelectedFilters(Map<String, String> selectedFilters) {
-		this.selectedFilters = selectedFilters;
-	}
+        InputStream result = doExport();
 
-	/**
-	 * @return the selectedColumns
-	 */
-	public List<Pair<String, String>> getSelectedColumns() {
-		return selectedColumns;
-	}
+        logger.trace("Export process took: " + Util.durationSince(startTime));
 
-	/**
-	 * @param selectedColumns the selectedColumns to set
-	 */
-	public void setSelectedColumns(List<Pair<String, String>> selectedColumns) {
-		this.selectedColumns = selectedColumns;
-	}
+        return result;
+    }
 
-	/**
-	 * @return the languages
-	 */
-	public Set<String> getLanguages() {
-		return languages;
-	}
+    public void doExportQueryAndWriteDataIntoOutput(ResultSetExportReader reader) throws DAOException{
+        Map<String,String> criteria = new HashMap<String, String>();
+        for(Entry<String, String> entry : selectedFilters.entrySet()) {
+            criteria.put(StringUtils.trim(entry.getKey()), StringUtils.trim(entry.getValue()));
+        }
+        // do the query and write data rows directly to export file
+        DAOFactory.get().getDao(ExporterDAO.class)
+            .exportByTypeAndFilters(
+                criteria,
+                getSelectedColumnsList(),
+                reader);
 
-	/**
-	 * @param set the languages to set
-	 */
-	public void setLanguages(Set<String> set) {
-		this.languages = set;
-	}
+    }
 
-	/**
-	 * @return the exportResourceUri
-	 */
-	public boolean isExportResourceUri() {
-		return exportResourceUri;
-	}
+    /**
+     * Returns the label of subject's uri or label depending on exportResourceUri value
+     * @return
+     */
+    protected String getUriOrLabel(){
+        String uriOrLabelElement = isExportResourceUri()
+        ? "Uri"
+                : "Label";
 
-	/**
-	 * @param exportResourceUri the exportResourceUri to set
-	 */
-	public void setExportResourceUri(boolean exportResourceUri) {
-		this.exportResourceUri = exportResourceUri;
-	}
-	/**
-	 * Rerturns the number of rows the exporter output can handle 
-	 * @return
-	 */
-	public static Integer getRowsLimit(){
-		return -1;		
-	}
-	/**
-	 * Returns the list of selected predicates uris
-	 * @return
-	 */
-	public List<String> getSelectedColumnsList(){
-		List<String> list = new ArrayList<String>();
-		if(selectedColumns!=null && !selectedColumns.isEmpty()){
-			for (Pair<String, String> col : selectedColumns){
-				list.add(col.getLeft());
-			}
-		}
-		return list;
-	}
+        return uriOrLabelElement;
+    }
+    /**
+     * This method creates the PaginRequest object for limiting the rows in the search results
+     * @return
+     */
+    protected PagingRequest getRowLimitPagingRequest(){
+        return null;
+    }
+
+    /**
+     * Returns the value of subject's uri or label depending on exportResourceUri value
+     * @return
+     */
+    protected String getUriOrLabelValue(SubjectDTO subject){
+        String value = "";
+        String uri = subject.getUri();
+
+        if(isExportResourceUri()){
+            value = uri;
+        }else{
+            value = FormatUtils.getObjectValuesForPredicate(Predicates.RDFS_LABEL, subject, getLanguages());
+            //extract value from uri
+            if (StringUtils.isBlank(value)){
+                value = URIUtil.extractURILabel(uri,uri);
+            }
+
+        }
+
+        return value;
+    }
+
+    /**
+     * @return the exportFormat
+     */
+    public ExportFormat getExportFormat() {
+        return exportFormat;
+    }
+
+    /**
+     * @param exportFormat the exportFormat to set
+     */
+    public void setExportFormat(ExportFormat exportFormat) {
+        this.exportFormat = exportFormat;
+    }
+
+    /**
+     * @return the selectedFilters
+     */
+    public Map<String, String> getSelectedFilters() {
+        return selectedFilters;
+    }
+
+    /**
+     * @param selectedFilters the selectedFilters to set
+     */
+    public void setSelectedFilters(Map<String, String> selectedFilters) {
+        this.selectedFilters = selectedFilters;
+    }
+
+    /**
+     * @return the selectedColumns
+     */
+    public List<Pair<String, String>> getSelectedColumns() {
+        return selectedColumns;
+    }
+
+    /**
+     * @param selectedColumns the selectedColumns to set
+     */
+    public void setSelectedColumns(List<Pair<String, String>> selectedColumns) {
+        this.selectedColumns = selectedColumns;
+    }
+
+    /**
+     * @return the languages
+     */
+    public Set<String> getLanguages() {
+        return languages;
+    }
+
+    /**
+     * @param set the languages to set
+     */
+    public void setLanguages(Set<String> set) {
+        this.languages = set;
+    }
+
+    /**
+     * @return the exportResourceUri
+     */
+    public boolean isExportResourceUri() {
+        return exportResourceUri;
+    }
+
+    /**
+     * @param exportResourceUri the exportResourceUri to set
+     */
+    public void setExportResourceUri(boolean exportResourceUri) {
+        this.exportResourceUri = exportResourceUri;
+    }
+    /**
+     * Rerturns the number of rows the exporter output can handle
+     * @return
+     */
+    public static Integer getRowsLimit(){
+        return -1;
+    }
+    /**
+     * Returns the list of selected predicates uris
+     * @return
+     */
+    public List<String> getSelectedColumnsList(){
+        List<String> list = new ArrayList<String>();
+        if(selectedColumns!=null && !selectedColumns.isEmpty()){
+            for (Pair<String, String> col : selectedColumns){
+                list.add(col.getLeft());
+            }
+        }
+        return list;
+    }
 }

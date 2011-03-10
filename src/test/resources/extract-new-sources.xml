@@ -9,17 +9,17 @@
   </rdf:Description>
 
   <rdf:Description rdf:about="http://test.com/datasets#dataset1">
-  	<rdfs:label>Dataset 1</rdfs:label>
+      <rdfs:label>Dataset 1</rdfs:label>
     <rdf:type rdf:resource="http://cr.eionet.europa.eu/ontologies/contreg.rdf#File"/>
   </rdf:Description>
-  
+
   <rdf:Description rdf:about="http://test.com/datasets#dataset2">
-  	<rdfs:label>Dataset 2</rdfs:label>
+      <rdfs:label>Dataset 2</rdfs:label>
     <rdf:type rdf:resource="http://cr.eionet.europa.eu/ontologies/contreg.rdf#File"/>
   </rdf:Description>
-  
+
   <rdf:Description rdf:about="http://test.com/datasets#dataset3">
-  	<rdfs:label>Dataset 3</rdfs:label>
+      <rdfs:label>Dataset 3</rdfs:label>
     <rdf:type rdf:resource="http://cr.eionet.europa.eu/ontologies/contreg.rdf#File"/>
   </rdf:Description>
 

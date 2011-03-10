@@ -1,4 +1,4 @@
-<% 
-String redirectURL = "url2.jsp"; 
-response.sendRedirect(redirectURL); 
-%> 
+<%
+String redirectURL = "url2.jsp";
+response.sendRedirect(redirectURL);
+%>

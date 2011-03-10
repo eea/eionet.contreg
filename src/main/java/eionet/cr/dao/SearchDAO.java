@@ -36,135 +36,135 @@ import eionet.cr.util.pagination.PagingRequest;
 
 /**
  * Interface to define search related dao methods.
- * 
+ *
  * @author Aleksandr Ivanov
  * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
 public interface SearchDAO extends DAO{
 
-	/**
-	 * @param expression - search expression to find
-	 * @param pagingRequest - page request
-	 * @param sortingRequest - sorting request to set
-	 * @return
-	 * @throws DAOException
-	 */
-	Pair<Integer, List<SubjectDTO>> searchByFreeText(
-				SearchExpression expression,
-				PostgreFreeTextSearchHelper.FilterType filterType,
-				PagingRequest pagingRequest,
-				SortingRequest sortingRequest) throws DAOException;
-	
-	/**
-	 * @param filters - search filters.
-	 * @param literalPredicates - set of literal predicates
-	 * @param pagingRequest - page request
-	 * @param sortingRequest - sorting request
-	 * @param selectedPredicates - predicates filter
-	 * @return
-	 * @throws DAOException
-	 */
-	Pair<Integer, List<SubjectDTO>> searchByFilters(
-			Map<String,String> filters,
-			Set<String> literalPredicates,
-			PagingRequest pagingRequest,
-			SortingRequest sortingRequest,
-			List<String> selectedPredicates
-			) throws DAOException;
+    /**
+     * @param expression - search expression to find
+     * @param pagingRequest - page request
+     * @param sortingRequest - sorting request to set
+     * @return
+     * @throws DAOException
+     */
+    Pair<Integer, List<SubjectDTO>> searchByFreeText(
+                SearchExpression expression,
+                PostgreFreeTextSearchHelper.FilterType filterType,
+                PagingRequest pagingRequest,
+                SortingRequest sortingRequest) throws DAOException;
 
-	/**
-	 * 
-	 * @param subjectHash
-	 * @param pagingRequest
-	 * @param sortingRequest
-	 * @return
-	 * @throws DAOException
-	 */
-	Pair<Integer, List<SubjectDTO>> searchReferences(
-			Long subjectHash,
-			PagingRequest pagingRequest,
-			SortingRequest sortingRequest) throws DAOException;
+    /**
+     * @param filters - search filters.
+     * @param literalPredicates - set of literal predicates
+     * @param pagingRequest - page request
+     * @param sortingRequest - sorting request
+     * @param selectedPredicates - predicates filter
+     * @return
+     * @throws DAOException
+     */
+    Pair<Integer, List<SubjectDTO>> searchByFilters(
+            Map<String,String> filters,
+            Set<String> literalPredicates,
+            PagingRequest pagingRequest,
+            SortingRequest sortingRequest,
+            List<String> selectedPredicates
+            ) throws DAOException;
 
-	/**
-	 * 
-	 * @param box
-	 * @param sourceUri
-	 * @param pagingRequest
-	 * @param sortingRequest
-	 * @param sortByObjectHash
-	 * @return
-	 * @throws DAOException
-	 */
-	Pair<Integer, List<SubjectDTO>> searchBySpatialBox(
-			BBOX box,
-			String sourceUri,			
-			PagingRequest pagingRequest,
-			SortingRequest sortingRequest, boolean sortByObjectHash) throws DAOException;
-	
-	/**
-	 * 
-	 * @return
-	 */
-	int getExactRowCountLimit();
+    /**
+     *
+     * @param subjectHash
+     * @param pagingRequest
+     * @param sortingRequest
+     * @return
+     * @throws DAOException
+     */
+    Pair<Integer, List<SubjectDTO>> searchReferences(
+            Long subjectHash,
+            PagingRequest pagingRequest,
+            SortingRequest sortingRequest) throws DAOException;
 
-	/**
-	 * 
-	 * @param filters
-	 * @param literalPredicates
-	 * @param pagingRequest
-	 * @param sortingRequest
-	 * @param selectedPredicates
-	 * @return
-	 * @throws DAOException
-	 */
-	public Pair<Integer, List<SubjectDTO>> searchByTypeAndFilters(
-			Map<String, String> filters, Set<String> literalPredicates,
-			PagingRequest pagingRequest, SortingRequest sortingRequest,
-			List<String> selectedPredicates) throws DAOException;
+    /**
+     *
+     * @param box
+     * @param sourceUri
+     * @param pagingRequest
+     * @param sortingRequest
+     * @param sortByObjectHash
+     * @return
+     * @throws DAOException
+     */
+    Pair<Integer, List<SubjectDTO>> searchBySpatialBox(
+            BBOX box,
+            String sourceUri,
+            PagingRequest pagingRequest,
+            SortingRequest sortingRequest, boolean sortByObjectHash) throws DAOException;
 
-	/**
-	 * 
-	 * @param sourceUrl
-	 * @param pagingRequest
-	 * @param sortingRequest
-	 * @return
-	 * @throws DAOException
-	 */
-	public Pair<Integer, List<SubjectDTO>> searchBySource(String sourceUrl,
-			PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException;
+    /**
+     *
+     * @return
+     */
+    int getExactRowCountLimit();
 
-	/**
-	 * 
-	 * @param pagingRequest
-	 * @return
-	 * @throws DAOException
-	 */
-	public Vector<Hashtable<String,Vector<String>>> searchDeliveriesForROD(
-			PagingRequest pagingRequest)throws DAOException;
-	
-	/**
-	 * 
-	 * @param tags
-	 * @param pagingRequest
-	 * @param sortingRequest
-	 * @param selectedPredicates
-	 * @return
-	 * @throws DAOException
-	 */
-	public Pair<Integer, List<SubjectDTO>> searchByTags(
-				List<String> tags,
-				PagingRequest pagingRequest,
-				SortingRequest sortingRequest,
-				List<String> selectedPredicates) throws DAOException;
-	
-	/**
-	 * 
-	 * @param subjectUri
-	 * @param pagingRequest
-	 * @param sortingRequest
-	 * @return
-	 * @throws DAOException
-	 */
-	public Pair<Integer, List<SubjectDTO>> searchReferences(String subjectUri,
-			PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException;
+    /**
+     *
+     * @param filters
+     * @param literalPredicates
+     * @param pagingRequest
+     * @param sortingRequest
+     * @param selectedPredicates
+     * @return
+     * @throws DAOException
+     */
+    public Pair<Integer, List<SubjectDTO>> searchByTypeAndFilters(
+            Map<String, String> filters, Set<String> literalPredicates,
+            PagingRequest pagingRequest, SortingRequest sortingRequest,
+            List<String> selectedPredicates) throws DAOException;
+
+    /**
+     *
+     * @param sourceUrl
+     * @param pagingRequest
+     * @param sortingRequest
+     * @return
+     * @throws DAOException
+     */
+    public Pair<Integer, List<SubjectDTO>> searchBySource(String sourceUrl,
+            PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException;
+
+    /**
+     *
+     * @param pagingRequest
+     * @return
+     * @throws DAOException
+     */
+    public Vector<Hashtable<String,Vector<String>>> searchDeliveriesForROD(
+            PagingRequest pagingRequest)throws DAOException;
+
+    /**
+     *
+     * @param tags
+     * @param pagingRequest
+     * @param sortingRequest
+     * @param selectedPredicates
+     * @return
+     * @throws DAOException
+     */
+    public Pair<Integer, List<SubjectDTO>> searchByTags(
+                List<String> tags,
+                PagingRequest pagingRequest,
+                SortingRequest sortingRequest,
+                List<String> selectedPredicates) throws DAOException;
+
+    /**
+     *
+     * @param subjectUri
+     * @param pagingRequest
+     * @param sortingRequest
+     * @return
+     * @throws DAOException
+     */
+    public Pair<Integer, List<SubjectDTO>> searchReferences(String subjectUri,
+            PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException;
 }

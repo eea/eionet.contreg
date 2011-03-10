@@ -1,18 +1,18 @@
 <%@page contentType="text/html;charset=UTF-8"%>
 
-<%@ include file="/pages/common/taglibs.jsp"%>	
+<%@ include file="/pages/common/taglibs.jsp"%>
 
 <stripes:layout-render name="/pages/common/template.jsp" pageTitle="Harvest">
 
-	<stripes:layout-component name="contents">
-	
-		<h1>Harvest</h1>
-		
+    <stripes:layout-component name="contents">
+
+        <h1>Harvest</h1>
+
         <table>
-        	<tr>
+            <tr>
                 <td>Harvest source:</td>
                 <td>
-                	<stripes:link href="/source.action" event="preViewHarvestSource">
+                    <stripes:link href="/source.action" event="preViewHarvestSource">
                         <c:out value="${actionBean.harvestSourceDTO.url}"/>
                         <stripes:param name="harvestSource.sourceId" value="${actionBean.harvestSourceDTO.sourceId}"/>
                     </stripes:link>
@@ -29,7 +29,7 @@
             <tr>
                 <td>Status:</td>
                 <td>
-                	<c:out value="${actionBean.harvestDTO.status}"/>
+                    <c:out value="${actionBean.harvestDTO.status}"/>
                 </td>
             </tr>
             <tr>
@@ -51,79 +51,79 @@
         </table>
         <br/><br/>
         <c:choose>
-        	<c:when test="${(empty actionBean.fatals) && (empty actionBean.errors) && (empty actionBean.warnings) && (empty actionBean.infos)}">
-        		<strong>No messages found for this harvest.</strong>
-			</c:when>
-			<c:otherwise>
-				<c:if test="${!(empty actionBean.fatals)}">
-					<strong>Fatal errors:</strong>
-					<table class="datatable">
-			        	<thead>
-				        	<tr>
-				        		<th scope="col">Message</th>
-				        		<th scope="col">StackTrace</th>
-				        	</tr>
-			        	</thead>
-			        	<tbody>
-			        		<c:forEach items="${actionBean.fatals}" var="msg" varStatus="loop">
-			        			<tr>
-			        				<td><c:out value="${msg.message}"/></td>
-			        				<td><c:out value="${msg.stackTrace}"/></td>
-			        			</tr>
-			        		</c:forEach>
-			        	</tbody>
-			        </table>
-				</c:if>
-				<c:if test="${!(empty actionBean.errors)}">
-					<strong>Errors:</strong>
-					<table class="datatable">
-			        	<thead>
-				        	<tr>
-				        		<th scope="col">Message</th>
-				        		<th scope="col">StackTrace</th>
-				        	</tr>
-			        	</thead>
-			        	<tbody>
-			        		<c:forEach items="${actionBean.errors}" var="msg" varStatus="loop">
-			        			<tr>
-			        				<td><c:out value="${msg.message}"/></td>
-			        				<td><c:out value="${msg.stackTrace}"/></td>
-			        			</tr>
-			        		</c:forEach>
-			        	</tbody>
-			        </table>
-				</c:if>
-				<c:if test="${!(empty actionBean.warnings)}">
-					<strong>Warnings:</strong>
-					<table class="datatable">
-			        	<thead>
-				        	<tr>
-				        		<th scope="col">Message</th>
-				        		<th scope="col">StackTrace</th>
-				        	</tr>
-			        	</thead>
-			        	<tbody>
-			        		<c:forEach items="${actionBean.warnings}" var="msg" varStatus="loop">
-			        			<tr>
-			        				<td><c:out value="${msg.message}"/></td>
-			        				<td><c:out value="${msg.stackTrace}"/></td>
-			        			</tr>
-			        		</c:forEach>
-			        	</tbody>
-			        </table>
-				</c:if>
-				<c:if test="${!(empty actionBean.infos)}">
-					<strong>Info messages:</strong>
-					<ul>
-		        		<c:forEach items="${actionBean.infos}" var="info" varStatus="loop">
-		        			<li>
-		        				<c:out value="${info.message}"/></td>
-		        			</li>
-		        		</c:forEach>
-					</ul>
-				</c:if>				
-			</c:otherwise>
+            <c:when test="${(empty actionBean.fatals) && (empty actionBean.errors) && (empty actionBean.warnings) && (empty actionBean.infos)}">
+                <strong>No messages found for this harvest.</strong>
+            </c:when>
+            <c:otherwise>
+                <c:if test="${!(empty actionBean.fatals)}">
+                    <strong>Fatal errors:</strong>
+                    <table class="datatable">
+                        <thead>
+                            <tr>
+                                <th scope="col">Message</th>
+                                <th scope="col">StackTrace</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <c:forEach items="${actionBean.fatals}" var="msg" varStatus="loop">
+                                <tr>
+                                    <td><c:out value="${msg.message}"/></td>
+                                    <td><c:out value="${msg.stackTrace}"/></td>
+                                </tr>
+                            </c:forEach>
+                        </tbody>
+                    </table>
+                </c:if>
+                <c:if test="${!(empty actionBean.errors)}">
+                    <strong>Errors:</strong>
+                    <table class="datatable">
+                        <thead>
+                            <tr>
+                                <th scope="col">Message</th>
+                                <th scope="col">StackTrace</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <c:forEach items="${actionBean.errors}" var="msg" varStatus="loop">
+                                <tr>
+                                    <td><c:out value="${msg.message}"/></td>
+                                    <td><c:out value="${msg.stackTrace}"/></td>
+                                </tr>
+                            </c:forEach>
+                        </tbody>
+                    </table>
+                </c:if>
+                <c:if test="${!(empty actionBean.warnings)}">
+                    <strong>Warnings:</strong>
+                    <table class="datatable">
+                        <thead>
+                            <tr>
+                                <th scope="col">Message</th>
+                                <th scope="col">StackTrace</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <c:forEach items="${actionBean.warnings}" var="msg" varStatus="loop">
+                                <tr>
+                                    <td><c:out value="${msg.message}"/></td>
+                                    <td><c:out value="${msg.stackTrace}"/></td>
+                                </tr>
+                            </c:forEach>
+                        </tbody>
+                    </table>
+                </c:if>
+                <c:if test="${!(empty actionBean.infos)}">
+                    <strong>Info messages:</strong>
+                    <ul>
+                        <c:forEach items="${actionBean.infos}" var="info" varStatus="loop">
+                            <li>
+                                <c:out value="${info.message}"/></td>
+                            </li>
+                        </c:forEach>
+                    </ul>
+                </c:if>
+            </c:otherwise>
         </c:choose>
 
-	</stripes:layout-component>
+    </stripes:layout-component>
 </stripes:layout-render>

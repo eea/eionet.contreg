@@ -51,225 +51,225 @@ import eionet.cr.web.util.columns.SearchResultColumn;
  */
 @UrlBinding("/sources.action")
 public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSourceDTO> {
-	
-	/** */
-	private static final String UNAVAILABLE_TYPE = "unavail";
-	private static final String TRACKED_FILES = "tracked_file";
-	private static final String FAILED_HARVESTS = "failed";
-	
-	/** */
-	private static final String[] EXCLUDE_FROM_SORT_AND_PAGING_URLS = {"harvest", "delete", "sourceUrl"};
-	
-	/** */
-	public static final List<Pair<String, String>> sourceTypes;
-	private static final List<SearchResultColumn> columnList;
-	
-	/**
-	 * the string to be searched 
-	 */
-	private String searchString;
-	
 
-	/** */
-	private String type;
+    /** */
+    private static final String UNAVAILABLE_TYPE = "unavail";
+    private static final String TRACKED_FILES = "tracked_file";
+    private static final String FAILED_HARVESTS = "failed";
 
-	/** */
-	private List<String> sourceUrl;
+    /** */
+    private static final String[] EXCLUDE_FROM_SORT_AND_PAGING_URLS = {"harvest", "delete", "sourceUrl"};
 
-	/** */
-	static {
-		sourceTypes = new LinkedList<Pair<String,String>>();
-		sourceTypes.add(new Pair<String, String>(null, "Sources"));
-		sourceTypes.add(new Pair<String, String>(TRACKED_FILES, "Tracked files"));
-		sourceTypes.add(new Pair<String, String>(UNAVAILABLE_TYPE, "Unavaliable"));
-		sourceTypes.add(new Pair<String, String>(FAILED_HARVESTS, "Failed harvests"));
-		
-		columnList = new LinkedList<SearchResultColumn>();
-		GenericColumn checkbox = new GenericColumn();
-		checkbox.setTitle("");
-		checkbox.setSortable(false);
-		checkbox.setEscapeXml(false);
-		columnList.add(checkbox);
-		
-		HarvestSourcesColumn urlColumn = new HarvestSourcesColumn(false);
-		urlColumn.setSortable(true);
-		urlColumn.setTitle("URL");
-		urlColumn.setEscapeXml(false);
-		columnList.add(urlColumn);
+    /** */
+    public static final List<Pair<String, String>> sourceTypes;
+    private static final List<SearchResultColumn> columnList;
 
-		HarvestSourcesColumn dateColumn= new HarvestSourcesColumn(true);
-		dateColumn.setSortable(true);
-		dateColumn.setTitle("Last harvest");
-		columnList.add(dateColumn);
-		
-	}
+    /**
+     * the string to be searched
+     */
+    private String searchString;
 
-	/** 
-	 * @see eionet.cr.web.action.AbstractSearchActionBean#search()
-	 * {@inheritDoc}
-	 */
-	@DefaultHandler
-	public Resolution search() throws DAOException {
-		
-		try {
-			String filterString = null; 
-			if(!StringUtils.isEmpty(this.searchString)) {
-				filterString = "%" + StringEscapeUtils.escapeSql(this.searchString) + "%";
-			}
-			
-			PagingRequest pagingRequest = PagingRequest.create(getPageN());
-			SortingRequest sortingRequest = new SortingRequest(sortP, SortOrder.parse(sortO));
-			
-			Pair<Integer,List<HarvestSourceDTO>> pair = null;
-			if(StringUtils.isBlank(type)) {
-				pair = factory.getDao(HarvestSourceDAO.class).getHarvestSources(
-						filterString, pagingRequest, sortingRequest);
-			}
-			else if (TRACKED_FILES.equals(type)) {
-				pair = factory.getDao(HarvestSourceDAO.class).getHarvestTrackedFiles(
-						filterString, pagingRequest, sortingRequest);
-			}
-			else if (UNAVAILABLE_TYPE.equals(type)) {
-				pair = factory.getDao(HarvestSourceDAO.class).getHarvestSourcesUnavailable(
-						filterString, pagingRequest, sortingRequest);
-			}
-			else if (FAILED_HARVESTS.equals(type)) {
-				pair = factory.getDao(HarvestSourceDAO.class).getHarvestSourcesFailed(
-						filterString, pagingRequest, sortingRequest);
-			}
-			
-			if (pair!=null){
-				resultList = pair.getRight();
-				if (resultList==null){
-					resultList = new LinkedList<HarvestSourceDTO>();
-				}
-				matchCount = pair.getLeft();
-			}
-			else{
-				matchCount = 0;
-			}
-			
-			setPagination(Pagination.createPagination(
-					matchCount, pagingRequest.getPageNumber(), this));
-			
-			return new ForwardResolution("/pages/sources.jsp");
-		}
-		catch (DAOException exception) {
-			throw new RuntimeException("error in search", exception);
-		}
-	}
 
-	
-	/**
-	 * 
-	 * @return
-	 * @throws DAOException 
-	 */
-	public Resolution delete() throws DAOException{
-		
-		if(isUserLoggedIn()){
-			if (sourceUrl!=null && !sourceUrl.isEmpty()){
-				factory.getDao(HarvestSourceDAO.class).queueSourcesForDeletion(sourceUrl);
-				addSystemMessage("Harvest source(s) sheduled for removal!");
-			}
-		}
-		else
-			addWarningMessage(getBundle().getString("not.logged.in"));
-		return search();
-	}
-	
-	/**
-	 * @throws DAOException 
-	 * @throws HarvestException 
-	 * 
-	 */
-	public Resolution harvest() throws DAOException, HarvestException{
-		
-		if(isUserLoggedIn()){
-			if (sourceUrl!=null && !sourceUrl.isEmpty()){
-				UrgentHarvestQueue.addPullHarvests(sourceUrl);
-				if (sourceUrl.size()==1)
-					addSystemMessage("The source has been scheduled for urgent harvest!");
-				else
-					addSystemMessage("The sources have been scheduled for urgent harvest!");
-			}
-		}
-		else
-			addWarningMessage(getBundle().getString("not.logged.in"));
-		
-		return search();
-	}
+    /** */
+    private String type;
 
-	/**
-	 * 
-	 * @return
-	 */
-	public List<Pair<String, String>> getSourceTypes(){
-		return sourceTypes;
-	}
+    /** */
+    private List<String> sourceUrl;
 
-	/**
-	 * @return the type
-	 */
-	public String getType() {
-		return type;
-	}
+    /** */
+    static {
+        sourceTypes = new LinkedList<Pair<String,String>>();
+        sourceTypes.add(new Pair<String, String>(null, "Sources"));
+        sourceTypes.add(new Pair<String, String>(TRACKED_FILES, "Tracked files"));
+        sourceTypes.add(new Pair<String, String>(UNAVAILABLE_TYPE, "Unavaliable"));
+        sourceTypes.add(new Pair<String, String>(FAILED_HARVESTS, "Failed harvests"));
 
-	/**
-	 * @param type the type to set
-	 */
-	public void setType(String type) {
-		this.type = type;
-	}
-	
-	/**
-	 * @param sourceUrl the sourceUrl to set
-	 */
-	public void setSourceUrl(List<String> sourceUrl) {
-		this.sourceUrl = sourceUrl;
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public String getPagingUrl(){
-		
-		String urlBinding = getUrlBinding();
-		if (urlBinding.startsWith("/")){
-			urlBinding = urlBinding.substring(1);
-		}
-		
-		StringBuffer buf = new StringBuffer(urlBinding);
-		return buf.append("?view=").toString();
-	}
+        columnList = new LinkedList<SearchResultColumn>();
+        GenericColumn checkbox = new GenericColumn();
+        checkbox.setTitle("");
+        checkbox.setSortable(false);
+        checkbox.setEscapeXml(false);
+        columnList.add(checkbox);
 
-	/**
-	 * @param searchString the searchString to set
-	 */
-	public void setSearchString(String searchString) {
-		this.searchString = searchString;
-	}
+        HarvestSourcesColumn urlColumn = new HarvestSourcesColumn(false);
+        urlColumn.setSortable(true);
+        urlColumn.setTitle("URL");
+        urlColumn.setEscapeXml(false);
+        columnList.add(urlColumn);
 
-	/**
-	 * @return the searchString
-	 */
-	public String getSearchString() {
-		return searchString;
-	}
+        HarvestSourcesColumn dateColumn= new HarvestSourcesColumn(true);
+        dateColumn.setSortable(true);
+        dateColumn.setTitle("Last harvest");
+        columnList.add(dateColumn);
 
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
-	 */
-	public List<SearchResultColumn> getColumns() throws DAOException {
-		return columnList;
-	}
-	
-	/**
-	 * 
-	 */
-	public String[] excludeFromSortAndPagingUrls(){
-		return EXCLUDE_FROM_SORT_AND_PAGING_URLS;
-	}
+    }
+
+    /**
+     * @see eionet.cr.web.action.AbstractSearchActionBean#search()
+     * {@inheritDoc}
+     */
+    @DefaultHandler
+    public Resolution search() throws DAOException {
+
+        try {
+            String filterString = null;
+            if(!StringUtils.isEmpty(this.searchString)) {
+                filterString = "%" + StringEscapeUtils.escapeSql(this.searchString) + "%";
+            }
+
+            PagingRequest pagingRequest = PagingRequest.create(getPageN());
+            SortingRequest sortingRequest = new SortingRequest(sortP, SortOrder.parse(sortO));
+
+            Pair<Integer,List<HarvestSourceDTO>> pair = null;
+            if(StringUtils.isBlank(type)) {
+                pair = factory.getDao(HarvestSourceDAO.class).getHarvestSources(
+                        filterString, pagingRequest, sortingRequest);
+            }
+            else if (TRACKED_FILES.equals(type)) {
+                pair = factory.getDao(HarvestSourceDAO.class).getHarvestTrackedFiles(
+                        filterString, pagingRequest, sortingRequest);
+            }
+            else if (UNAVAILABLE_TYPE.equals(type)) {
+                pair = factory.getDao(HarvestSourceDAO.class).getHarvestSourcesUnavailable(
+                        filterString, pagingRequest, sortingRequest);
+            }
+            else if (FAILED_HARVESTS.equals(type)) {
+                pair = factory.getDao(HarvestSourceDAO.class).getHarvestSourcesFailed(
+                        filterString, pagingRequest, sortingRequest);
+            }
+
+            if (pair!=null){
+                resultList = pair.getRight();
+                if (resultList==null){
+                    resultList = new LinkedList<HarvestSourceDTO>();
+                }
+                matchCount = pair.getLeft();
+            }
+            else{
+                matchCount = 0;
+            }
+
+            setPagination(Pagination.createPagination(
+                    matchCount, pagingRequest.getPageNumber(), this));
+
+            return new ForwardResolution("/pages/sources.jsp");
+        }
+        catch (DAOException exception) {
+            throw new RuntimeException("error in search", exception);
+        }
+    }
+
+
+    /**
+     *
+     * @return
+     * @throws DAOException
+     */
+    public Resolution delete() throws DAOException{
+
+        if(isUserLoggedIn()){
+            if (sourceUrl!=null && !sourceUrl.isEmpty()){
+                factory.getDao(HarvestSourceDAO.class).queueSourcesForDeletion(sourceUrl);
+                addSystemMessage("Harvest source(s) sheduled for removal!");
+            }
+        }
+        else
+            addWarningMessage(getBundle().getString("not.logged.in"));
+        return search();
+    }
+
+    /**
+     * @throws DAOException
+     * @throws HarvestException
+     *
+     */
+    public Resolution harvest() throws DAOException, HarvestException{
+
+        if(isUserLoggedIn()){
+            if (sourceUrl!=null && !sourceUrl.isEmpty()){
+                UrgentHarvestQueue.addPullHarvests(sourceUrl);
+                if (sourceUrl.size()==1)
+                    addSystemMessage("The source has been scheduled for urgent harvest!");
+                else
+                    addSystemMessage("The sources have been scheduled for urgent harvest!");
+            }
+        }
+        else
+            addWarningMessage(getBundle().getString("not.logged.in"));
+
+        return search();
+    }
+
+    /**
+     *
+     * @return
+     */
+    public List<Pair<String, String>> getSourceTypes(){
+        return sourceTypes;
+    }
+
+    /**
+     * @return the type
+     */
+    public String getType() {
+        return type;
+    }
+
+    /**
+     * @param type the type to set
+     */
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    /**
+     * @param sourceUrl the sourceUrl to set
+     */
+    public void setSourceUrl(List<String> sourceUrl) {
+        this.sourceUrl = sourceUrl;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public String getPagingUrl(){
+
+        String urlBinding = getUrlBinding();
+        if (urlBinding.startsWith("/")){
+            urlBinding = urlBinding.substring(1);
+        }
+
+        StringBuffer buf = new StringBuffer(urlBinding);
+        return buf.append("?view=").toString();
+    }
+
+    /**
+     * @param searchString the searchString to set
+     */
+    public void setSearchString(String searchString) {
+        this.searchString = searchString;
+    }
+
+    /**
+     * @return the searchString
+     */
+    public String getSearchString() {
+        return searchString;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
+     */
+    public List<SearchResultColumn> getColumns() throws DAOException {
+        return columnList;
+    }
+
+    /**
+     *
+     */
+    public String[] excludeFromSortAndPagingUrls(){
+        return EXCLUDE_FROM_SORT_AND_PAGING_URLS;
+    }
 }

@@ -33,306 +33,306 @@ import eionet.cr.common.CRException;
 import eionet.cr.dao.readers.ResultSetReaderException;
 
 /**
- * 
+ *
  * @author heinljab
  *
  */
 public class SQLUtil {
-	
-	/**
-	 * 
-	 * @param sql
-	 * @param conn
-	 * @return
-	 * @throws SQLException
-	 */
-	public static Object executeSingleReturnValueQuery(String sql, Connection conn) throws SQLException{
-		
-		ResultSet rs = null;
-		Statement stmt = null;
-		try{
-			stmt = conn.createStatement();
-			rs = stmt.executeQuery(sql);
-			return (rs!=null && rs.next()) ? rs.getObject(1) : null;
-		}
-		finally{
-			SQLUtil.close(rs);
-			SQLUtil.close(stmt);
-		}
-	}
 
-	/**
-	 * 
-	 * @param parameterizedSQL
-	 * @param values
-	 * @param conn
-	 * @return
-	 * @throws SQLException
-	 */
-	public static Object executeSingleReturnValueQuery(
-			String parameterizedSQL, List<?> values, Connection conn) throws SQLException{
-		
-		ResultSet rs = null;
-		PreparedStatement pstmt = null;
-		try{
-			pstmt = prepareStatement(parameterizedSQL, values, conn);
-			rs = pstmt.executeQuery();
-			return (rs!=null && rs.next()) ? rs.getObject(1) : null;
-		}
-		finally{
-			SQLUtil.close(rs);
-			SQLUtil.close(pstmt);
-		}
-	}
+    /**
+     *
+     * @param sql
+     * @param conn
+     * @return
+     * @throws SQLException
+     */
+    public static Object executeSingleReturnValueQuery(String sql, Connection conn) throws SQLException{
 
-	/**
-	 * 
-	 * @param parameterizedSQL
-	 * @param values
-	 * @param rsReader
-	 * @param conn
-	 * @throws SQLException
-	 * @throws ResultSetReaderException
-	 */
-	@SuppressWarnings("rawtypes")
-	public static void executeQuery(String parameterizedSQL, List<?> values,
-			SQLResultSetReader rsReader, Connection conn) throws SQLException, ResultSetReaderException{
-		
-		ResultSet rs = null;
-		PreparedStatement pstmt = null;
-		try{
-			pstmt = prepareStatement(parameterizedSQL, values, conn);
-			rs = pstmt.executeQuery();
-			if (rs!=null){
-				ResultSetMetaData rsMd = rs.getMetaData();
-				if (rsMd!=null && rsMd.getColumnCount()>0){
-					rsReader.startResultSet(rsMd);
-					while (rs.next())
-						rsReader.readRow(rs);
-				}
-			}
-		}
-		finally{
-			try{
-				if (rs!=null) rs.close();
-				if (pstmt!=null) pstmt.close();
-			}
-			catch (SQLException e){}
-		}
+        ResultSet rs = null;
+        Statement stmt = null;
+        try{
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+            return (rs!=null && rs.next()) ? rs.getObject(1) : null;
+        }
+        finally{
+            SQLUtil.close(rs);
+            SQLUtil.close(stmt);
+        }
+    }
 
-	}
+    /**
+     *
+     * @param parameterizedSQL
+     * @param values
+     * @param conn
+     * @return
+     * @throws SQLException
+     */
+    public static Object executeSingleReturnValueQuery(
+            String parameterizedSQL, List<?> values, Connection conn) throws SQLException{
 
-	/**
-	 * 
-	 * @param sql
-	 * @param conn
-	 * @return
-	 * @throws SQLException
-	 * @throws ResultSetReaderException 
-	 */
-	public static List<Map<String,SQLValue>> executeQuery(String sql, Connection conn) throws SQLException, ResultSetReaderException{
-		
-		SQLValueReader sqlValueReader = new SQLValueReader();
-		executeQuery(sql, sqlValueReader, conn);
-		return sqlValueReader.getResultList();
-	}
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
+        try{
+            pstmt = prepareStatement(parameterizedSQL, values, conn);
+            rs = pstmt.executeQuery();
+            return (rs!=null && rs.next()) ? rs.getObject(1) : null;
+        }
+        finally{
+            SQLUtil.close(rs);
+            SQLUtil.close(pstmt);
+        }
+    }
 
-	/**
-	 * 
-	 * @param sql
-	 * @param rsReader
-	 * @param conn
-	 * @throws SQLException
-	 * @throws ResultSetReaderException TODO
-	 */
-	@SuppressWarnings("rawtypes")
-	public static void executeQuery(String sql, SQLResultSetReader rsReader, Connection conn) throws SQLException, ResultSetReaderException{
-		
-		ResultSet rs = null;
-		Statement stmt = null;
-		try{
-			stmt = conn.createStatement();
-			rs = stmt.executeQuery(sql);
-			if (rs!=null){
-				ResultSetMetaData rsMd = rs.getMetaData();
-				if (rsMd!=null && rsMd.getColumnCount()>0){
-					rsReader.startResultSet(rsMd);
-					while (rs.next()){
-						rsReader.readRow(rs);
-					}
-				}
-			}
-		}
-		finally{
-			try{
-				if (rs!=null) rs.close();
-				if (stmt!=null) stmt.close();
-			}
-			catch (SQLException e){}
-		}
-	}
-	
-	/**
-	 * 
-	 * @param parameterizedSQL
-	 * @param valueMap
-	 * @param conn
-	 * @return
-	 * @throws SQLException
-	 */
-	public static int executeUpdate(String parameterizedSQL, List<?> values, Connection conn) throws SQLException{
-		
-		PreparedStatement pstmt = null;
-		try{
-			pstmt = prepareStatement(parameterizedSQL, values, conn);
-			return pstmt.executeUpdate();
-		}
-		finally{
-			try{
-				if (pstmt!=null) pstmt.close();
-			}
-			catch (SQLException e){}
-		}
-	}
+    /**
+     *
+     * @param parameterizedSQL
+     * @param values
+     * @param rsReader
+     * @param conn
+     * @throws SQLException
+     * @throws ResultSetReaderException
+     */
+    @SuppressWarnings("rawtypes")
+    public static void executeQuery(String parameterizedSQL, List<?> values,
+            SQLResultSetReader rsReader, Connection conn) throws SQLException, ResultSetReaderException{
 
-	/**
-	 * 
-	 * @param parameterizedSQL
-	 * @param values
-	 * @param conn
-	 * @return
-	 * @throws SQLException
-	 */
-	public static int executeUpdateReturnAutoID(String parameterizedSQL,
-			List<?> values, Connection conn) throws CRException{
-		
-		PreparedStatement pstmt = null;
-		try{
-			pstmt = prepareStatement(parameterizedSQL, values, conn, true);
-			pstmt.executeUpdate();
-			ResultSet genKeys = pstmt.getGeneratedKeys();
-			if (genKeys.next())
-				return genKeys.getInt(1);
-			else
-				throw new CRException("No auto-generated keys returned!");
-		}
-		catch (SQLException sqle){
-			throw new CRException(sqle.toString(), sqle);
-		}
-		finally{
-			try{
-				if (pstmt!=null) pstmt.close();
-			}
-			catch (SQLException e){}
-		}
-	}
+        ResultSet rs = null;
+        PreparedStatement pstmt = null;
+        try{
+            pstmt = prepareStatement(parameterizedSQL, values, conn);
+            rs = pstmt.executeQuery();
+            if (rs!=null){
+                ResultSetMetaData rsMd = rs.getMetaData();
+                if (rsMd!=null && rsMd.getColumnCount()>0){
+                    rsReader.startResultSet(rsMd);
+                    while (rs.next())
+                        rsReader.readRow(rs);
+                }
+            }
+        }
+        finally{
+            try{
+                if (rs!=null) rs.close();
+                if (pstmt!=null) pstmt.close();
+            }
+            catch (SQLException e){}
+        }
 
-	/**
-	 * 
-	 * @param sql
-	 * @param conn
-	 * @return
-	 * @throws SQLException
-	 */
-	public static int executeUpdate(String sql, Connection conn) throws SQLException{
-		
-		Statement stmt = null;
-		try{
-			stmt = conn.createStatement();
-			return stmt.executeUpdate(sql);
-		}
-		finally{
-			SQLUtil.close(stmt);
-		}
-	}
-	
-	/**
-	 * 
-	 * @param parameterizedSQL
-	 * @param valueMap
-	 * @param conn
-	 * @return
-	 * @throws SQLException
-	 */
-	public static PreparedStatement prepareStatement(String parameterizedSQL, List<?> values, Connection conn) throws SQLException{
-		
-		PreparedStatement pstmt= conn.prepareStatement(parameterizedSQL);
-		for (int i=0; values!=null && i<values.size(); i++){
-			pstmt.setObject(i+1, values.get(i));
-		}
-		return pstmt;
-	}
+    }
 
-	/**
-	 * 
-	 * @param parameterizedSQL
-	 * @param values
-	 * @param conn
-	 * @param autoGeneratedKeys
-	 * @return
-	 * @throws SQLException
-	 */
-	public static PreparedStatement prepareStatement(String parameterizedSQL,
-			List<?> values, Connection conn, boolean autoGeneratedKeys) throws SQLException{
-		
-		PreparedStatement pstmt= conn.prepareStatement(parameterizedSQL,
-				autoGeneratedKeys ? Statement.RETURN_GENERATED_KEYS : Statement.NO_GENERATED_KEYS);
-		for (int i=0; values!=null && i<values.size(); i++){
-			pstmt.setObject(i+1, values.get(i));
-		}
-		return pstmt;
-	}
+    /**
+     *
+     * @param sql
+     * @param conn
+     * @return
+     * @throws SQLException
+     * @throws ResultSetReaderException
+     */
+    public static List<Map<String,SQLValue>> executeQuery(String sql, Connection conn) throws SQLException, ResultSetReaderException{
 
-	/**
-	 * 
-	 * @param conn
-	 */
-	public static void close(Connection conn){
-		if (conn!=null){
-			try{
-				conn.close();
-			}
-			catch (SQLException e){}
-		}
-	}
+        SQLValueReader sqlValueReader = new SQLValueReader();
+        executeQuery(sql, sqlValueReader, conn);
+        return sqlValueReader.getResultList();
+    }
 
-	/**
-	 * 
-	 * @param stmt
-	 */
-	public static void close(Statement stmt){
-		if (stmt!=null){
-			try{
-				stmt.close();
-			}
-			catch (SQLException e){}
-		}
-	}
-	
-	/**
-	 * 
-	 * @param rs
-	 */
-	public static void close(ResultSet rs){
-		if (rs!=null){
-			try{
-				rs.close();
-			}
-			catch (SQLException e){}
-		}
-	}
-	
-	/**
-	 * 
-	 * @param conn
-	 */
-	public static void rollback(Connection conn){
-		
-		if (conn!=null){
-			try{
-				conn.rollback();
-			}
-			catch (SQLException e){}
-		}
-	}
+    /**
+     *
+     * @param sql
+     * @param rsReader
+     * @param conn
+     * @throws SQLException
+     * @throws ResultSetReaderException TODO
+     */
+    @SuppressWarnings("rawtypes")
+    public static void executeQuery(String sql, SQLResultSetReader rsReader, Connection conn) throws SQLException, ResultSetReaderException{
+
+        ResultSet rs = null;
+        Statement stmt = null;
+        try{
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+            if (rs!=null){
+                ResultSetMetaData rsMd = rs.getMetaData();
+                if (rsMd!=null && rsMd.getColumnCount()>0){
+                    rsReader.startResultSet(rsMd);
+                    while (rs.next()){
+                        rsReader.readRow(rs);
+                    }
+                }
+            }
+        }
+        finally{
+            try{
+                if (rs!=null) rs.close();
+                if (stmt!=null) stmt.close();
+            }
+            catch (SQLException e){}
+        }
+    }
+
+    /**
+     *
+     * @param parameterizedSQL
+     * @param valueMap
+     * @param conn
+     * @return
+     * @throws SQLException
+     */
+    public static int executeUpdate(String parameterizedSQL, List<?> values, Connection conn) throws SQLException{
+
+        PreparedStatement pstmt = null;
+        try{
+            pstmt = prepareStatement(parameterizedSQL, values, conn);
+            return pstmt.executeUpdate();
+        }
+        finally{
+            try{
+                if (pstmt!=null) pstmt.close();
+            }
+            catch (SQLException e){}
+        }
+    }
+
+    /**
+     *
+     * @param parameterizedSQL
+     * @param values
+     * @param conn
+     * @return
+     * @throws SQLException
+     */
+    public static int executeUpdateReturnAutoID(String parameterizedSQL,
+            List<?> values, Connection conn) throws CRException{
+
+        PreparedStatement pstmt = null;
+        try{
+            pstmt = prepareStatement(parameterizedSQL, values, conn, true);
+            pstmt.executeUpdate();
+            ResultSet genKeys = pstmt.getGeneratedKeys();
+            if (genKeys.next())
+                return genKeys.getInt(1);
+            else
+                throw new CRException("No auto-generated keys returned!");
+        }
+        catch (SQLException sqle){
+            throw new CRException(sqle.toString(), sqle);
+        }
+        finally{
+            try{
+                if (pstmt!=null) pstmt.close();
+            }
+            catch (SQLException e){}
+        }
+    }
+
+    /**
+     *
+     * @param sql
+     * @param conn
+     * @return
+     * @throws SQLException
+     */
+    public static int executeUpdate(String sql, Connection conn) throws SQLException{
+
+        Statement stmt = null;
+        try{
+            stmt = conn.createStatement();
+            return stmt.executeUpdate(sql);
+        }
+        finally{
+            SQLUtil.close(stmt);
+        }
+    }
+
+    /**
+     *
+     * @param parameterizedSQL
+     * @param valueMap
+     * @param conn
+     * @return
+     * @throws SQLException
+     */
+    public static PreparedStatement prepareStatement(String parameterizedSQL, List<?> values, Connection conn) throws SQLException{
+
+        PreparedStatement pstmt= conn.prepareStatement(parameterizedSQL);
+        for (int i=0; values!=null && i<values.size(); i++){
+            pstmt.setObject(i+1, values.get(i));
+        }
+        return pstmt;
+    }
+
+    /**
+     *
+     * @param parameterizedSQL
+     * @param values
+     * @param conn
+     * @param autoGeneratedKeys
+     * @return
+     * @throws SQLException
+     */
+    public static PreparedStatement prepareStatement(String parameterizedSQL,
+            List<?> values, Connection conn, boolean autoGeneratedKeys) throws SQLException{
+
+        PreparedStatement pstmt= conn.prepareStatement(parameterizedSQL,
+                autoGeneratedKeys ? Statement.RETURN_GENERATED_KEYS : Statement.NO_GENERATED_KEYS);
+        for (int i=0; values!=null && i<values.size(); i++){
+            pstmt.setObject(i+1, values.get(i));
+        }
+        return pstmt;
+    }
+
+    /**
+     *
+     * @param conn
+     */
+    public static void close(Connection conn){
+        if (conn!=null){
+            try{
+                conn.close();
+            }
+            catch (SQLException e){}
+        }
+    }
+
+    /**
+     *
+     * @param stmt
+     */
+    public static void close(Statement stmt){
+        if (stmt!=null){
+            try{
+                stmt.close();
+            }
+            catch (SQLException e){}
+        }
+    }
+
+    /**
+     *
+     * @param rs
+     */
+    public static void close(ResultSet rs){
+        if (rs!=null){
+            try{
+                rs.close();
+            }
+            catch (SQLException e){}
+        }
+    }
+
+    /**
+     *
+     * @param conn
+     */
+    public static void rollback(Connection conn){
+
+        if (conn!=null){
+            try{
+                conn.rollback();
+            }
+            catch (SQLException e){}
+        }
+    }
 }

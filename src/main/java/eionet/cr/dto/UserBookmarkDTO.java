@@ -6,20 +6,20 @@ import org.apache.commons.lang.StringEscapeUtils;
 
 public class UserBookmarkDTO implements Serializable {
 
-	private String bookmarkUrl;
+    private String bookmarkUrl;
 
-	public String getBookmarkUrl() {
-		return bookmarkUrl;
-	}
+    public String getBookmarkUrl() {
+        return bookmarkUrl;
+    }
 
-	public void setBookmarkUrl(String bookmarkUrl) {
-		this.bookmarkUrl = bookmarkUrl;
-	}
+    public void setBookmarkUrl(String bookmarkUrl) {
+        this.bookmarkUrl = bookmarkUrl;
+    }
 
-	public String getBookmarkUrlHtmlFormatted() {
-		return StringEscapeUtils.escapeHtml(bookmarkUrl);
-	}
-	
-	
-	
+    public String getBookmarkUrlHtmlFormatted() {
+        return StringEscapeUtils.escapeHtml(bookmarkUrl);
+    }
+
+
+
 }

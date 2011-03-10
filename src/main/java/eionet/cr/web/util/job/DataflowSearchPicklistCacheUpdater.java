@@ -40,28 +40,28 @@ import eionet.cr.web.util.ApplicationCache;
  */
 public class DataflowSearchPicklistCacheUpdater  implements StatefulJob {
 
-	/** */
-	private static Log logger = LogFactory.getLog(DataflowSearchPicklistCacheUpdater.class);
-			
-	/*
-	 * (non-Javadoc)
-	 * @see org.quartz.Job#execute(org.quartz.JobExecutionContext)
-	 */
-	public void execute(JobExecutionContext context) throws JobExecutionException {
-		
-		try {
-			Collection<String> localities =
-				DAOFactory.get().getDao(HelperDAO.class).getPicklistForPredicate(
-						Predicates.ROD_LOCALITY_PROPERTY);
-			
-			ApplicationCache.updateDataflowPicklistCache(
-					DAOFactory.get().getDao(HelperDAO.class).getDataflowSearchPicklist(),
-					localities);
-			logger.debug("Dataflow picklist cache updated");
-		}
-		catch (Exception e) {
-			logger.error("Error when updating dataflow picklist cache cache: ", e);
-		}
-	}
+    /** */
+    private static Log logger = LogFactory.getLog(DataflowSearchPicklistCacheUpdater.class);
+
+    /*
+     * (non-Javadoc)
+     * @see org.quartz.Job#execute(org.quartz.JobExecutionContext)
+     */
+    public void execute(JobExecutionContext context) throws JobExecutionException {
+
+        try {
+            Collection<String> localities =
+                DAOFactory.get().getDao(HelperDAO.class).getPicklistForPredicate(
+                        Predicates.ROD_LOCALITY_PROPERTY);
+
+            ApplicationCache.updateDataflowPicklistCache(
+                    DAOFactory.get().getDao(HelperDAO.class).getDataflowSearchPicklist(),
+                    localities);
+            logger.debug("Dataflow picklist cache updated");
+        }
+        catch (Exception e) {
+            logger.error("Error when updating dataflow picklist cache cache: ", e);
+        }
+    }
 
 }

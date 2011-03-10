@@ -28,59 +28,59 @@ import eionet.cr.dto.HarvestDTO;
 import eionet.cr.util.sql.SQLResultSetBaseReader;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
 public class HarvestWithMessageTypesReader extends SQLResultSetBaseReader<HarvestDTO> {
-	
-	/** */
-	private HarvestDTO currHarvest;
-	
-	/** */
-	private int maxDistinctHarvests;
 
-	/**
-	 * 
-	 * @param maxDistinctHarvests
-	 */
-	public HarvestWithMessageTypesReader(int maxDistinctHarvests){
-		this.maxDistinctHarvests = maxDistinctHarvests;
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
-	 */
-	public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
-		
-		Integer harvestId = rs.getInt("HARVEST_ID");
-		if (currHarvest==null || currHarvest.getHarvestId().equals(harvestId)==false){ // if first row or new harvest
-			
-			// create new harvest object and add it to the list, but only if the list has not reached it's max allowed size yet
-			if (resultList.size() >= maxDistinctHarvests){
-				return;
-			}
-				
-			currHarvest = new HarvestDTO();
-			resultList.add(currHarvest);
-			
-			currHarvest.setHarvestId(harvestId);
-			currHarvest.setHarvestSourceId(new Integer(rs.getInt("SOURCE_ID")));
-			
-			currHarvest.setHarvestType(rs.getString("HARVEST_TYPE"));
-			currHarvest.setUser(rs.getString("HARVEST_USER"));
-			currHarvest.setStatus(rs.getString("STATUS"));
-			
-			currHarvest.setDatetimeStarted(rs.getTimestamp("STARTED"));
-			currHarvest.setDatetimeFinished(rs.getTimestamp("FINISHED"));
-			
-			currHarvest.setTotalResources(new Integer(rs.getInt("TOT_RESOURCES")));
-			currHarvest.setEncodingSchemes(new Integer(rs.getInt("ENC_SCHEMES")));
-			currHarvest.setTotalStatements(new Integer(rs.getInt("TOT_STATEMENTS")));
-			currHarvest.setLitObjStatements(new Integer(rs.getInt("LIT_STATEMENTS")));
-		}
-		
-		HarvestBaseDTO.addMessageType(currHarvest, rs.getString("MESSAGE_TYPE"));
-	}
+    /** */
+    private HarvestDTO currHarvest;
+
+    /** */
+    private int maxDistinctHarvests;
+
+    /**
+     *
+     * @param maxDistinctHarvests
+     */
+    public HarvestWithMessageTypesReader(int maxDistinctHarvests){
+        this.maxDistinctHarvests = maxDistinctHarvests;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
+     */
+    public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
+
+        Integer harvestId = rs.getInt("HARVEST_ID");
+        if (currHarvest==null || currHarvest.getHarvestId().equals(harvestId)==false){ // if first row or new harvest
+
+            // create new harvest object and add it to the list, but only if the list has not reached it's max allowed size yet
+            if (resultList.size() >= maxDistinctHarvests){
+                return;
+            }
+
+            currHarvest = new HarvestDTO();
+            resultList.add(currHarvest);
+
+            currHarvest.setHarvestId(harvestId);
+            currHarvest.setHarvestSourceId(new Integer(rs.getInt("SOURCE_ID")));
+
+            currHarvest.setHarvestType(rs.getString("HARVEST_TYPE"));
+            currHarvest.setUser(rs.getString("HARVEST_USER"));
+            currHarvest.setStatus(rs.getString("STATUS"));
+
+            currHarvest.setDatetimeStarted(rs.getTimestamp("STARTED"));
+            currHarvest.setDatetimeFinished(rs.getTimestamp("FINISHED"));
+
+            currHarvest.setTotalResources(new Integer(rs.getInt("TOT_RESOURCES")));
+            currHarvest.setEncodingSchemes(new Integer(rs.getInt("ENC_SCHEMES")));
+            currHarvest.setTotalStatements(new Integer(rs.getInt("TOT_STATEMENTS")));
+            currHarvest.setLitObjStatements(new Integer(rs.getInt("LIT_STATEMENTS")));
+        }
+
+        HarvestBaseDTO.addMessageType(currHarvest, rs.getString("MESSAGE_TYPE"));
+    }
 }

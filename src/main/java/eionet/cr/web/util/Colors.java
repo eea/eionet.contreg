@@ -1,21 +1,21 @@
 /*
 * The contents of this file are subject to the Mozilla Public
-* 
+*
 * License Version 1.1 (the "License"); you may not use this file
 * except in compliance with the License. You may obtain a copy of
 * the License at http://www.mozilla.org/MPL/
-* 
+*
 * Software distributed under the License is distributed on an "AS
 * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
 * implied. See the License for the specific language governing
 * rights and limitations under the License.
-* 
+*
 * The Original Code is Content Registry 2.0.
-* 
+*
 * The Initial Owner of the Original Code is European Environment
 * Agency. Portions created by Tieto Eesti are Copyright
 * (C) European Environment Agency. All Rights Reserved.
-* 
+*
 * Contributor(s):
 * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.web.util;
@@ -23,45 +23,45 @@ package eionet.cr.web.util;
 import eionet.cr.util.Hashes;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
 public class Colors {
-	
-	/**
-	 * 
-	 * @param hash
-	 * @return
-	 */
-	public static String colorByModulus(long hash){
-		
-		int index = Math.abs((int)(hash % (long)colors.length));
-		index = Math.max(0, index);
-		index = Math.min(colors.length-1, index);
-		return colors[index];
-	}
-	
-	/**
-	 * 
-	 * @param rgbColor
-	 * @return
-	 */
-	public static String toKML(String rgbColor, boolean transparent){		
-		return new StringBuffer(transparent ? "00" : "ff").
-			append(rgbColor.substring(4,6)).append(rgbColor.substring(2,4)).append(rgbColor.substring(0,2)).toString();
-	}
 
-	/**
-	 * 
-	 * @param args
-	 */
-	public static void main(String[] args){
-		System.out.println(Colors.colorByModulus(Hashes.spoHash("http://cdr.eionet.europa.eu/de/eper/colpofz1w/envr49rta/EPER_2004_DE.xml")));
-	}
+    /**
+     *
+     * @param hash
+     * @return
+     */
+    public static String colorByModulus(long hash){
 
-	/** */
-	public static final String[] colors = {
+        int index = Math.abs((int)(hash % (long)colors.length));
+        index = Math.max(0, index);
+        index = Math.min(colors.length-1, index);
+        return colors[index];
+    }
+
+    /**
+     *
+     * @param rgbColor
+     * @return
+     */
+    public static String toKML(String rgbColor, boolean transparent){
+        return new StringBuffer(transparent ? "00" : "ff").
+            append(rgbColor.substring(4,6)).append(rgbColor.substring(2,4)).append(rgbColor.substring(0,2)).toString();
+    }
+
+    /**
+     *
+     * @param args
+     */
+    public static void main(String[] args){
+        System.out.println(Colors.colorByModulus(Hashes.spoHash("http://cdr.eionet.europa.eu/de/eper/colpofz1w/envr49rta/EPER_2004_DE.xml")));
+    }
+
+    /** */
+    public static final String[] colors = {
         "eee8cd", "d8bfd8", "40e0d0", "cdb38b", "cae1ff", "cdb5cd", "f5f5f5",
         "ee9a49", "1e90ff", "ff00ff", "556b2f", "cdc9c9", "e0eeee", "8b8989",
         "cd5c5c", "ff83fa", "76ee00", "8a2be2", "8deeee", "c1ffc1", "8b3a3a",
@@ -116,6 +116,6 @@ public class Colors {
         "6e7b8b", "43cd80", "bcee68", "caff70", "8b7d7b", "cd661d", "6959cd",
         "8b3e2f", "00f5ff", "7ac5cd", "cdb79e", "ffb90f", "fffff0", "8b7d6b",
         "da70d6", "6c7b8b", "ee6a50", "4169e1"
-	};
-	
+    };
+
 }

@@ -31,7 +31,7 @@ import eionet.cr.web.util.columns.SearchResultColumn;
 import eionet.cr.web.util.columns.HarvestedUrlCountColumn.COLUMN;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
  *
  */
@@ -39,82 +39,82 @@ import eionet.cr.web.util.columns.HarvestedUrlCountColumn.COLUMN;
 @UrlBinding("/admin/harvestedurl")
 public class HarvestedUrlCountActionBean extends AbstractSearchActionBean<HarvestedUrlCountDTO> {
 
-	private int harvestedUrlDays = 30;
-	private boolean adminLoggedIn = false;
-	private int resultsFound = 0;
-	
-	@DefaultHandler
-	public Resolution view() throws DAOException{
-		if (getUser()!=null){
-			if (getUser().isAdministrator()){
-				setAdminLoggedIn(true);
-				Pair<Integer, List<HarvestedUrlCountDTO>> result = DAOFactory.get().getDao(HelperDAO.class).getLatestHarvestedURLs(harvestedUrlDays);
-    			resultList = result.getRight();
-    			matchCount = 0;
-    			resultsFound = result.getLeft();
-			} else {
-				setAdminLoggedIn(false);
-			}
-		} else {
-			setAdminLoggedIn(false);
-		}
-		return new ForwardResolution("/pages/admin/harvestedUrlCount.jsp");
-	}
-	
-	public Resolution search() throws DAOException{
-		return view();
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
-	 */
-	public List<SearchResultColumn> getColumns(){
-		
-		LinkedList<SearchResultColumn> columnList = new LinkedList<SearchResultColumn>();
+    private int harvestedUrlDays = 30;
+    private boolean adminLoggedIn = false;
+    private int resultsFound = 0;
 
-		HarvestedUrlCountColumn dateColumn= new HarvestedUrlCountColumn();
-		dateColumn.setColumnType(COLUMN.HARVESTDAYSTRING);
-		dateColumn.setSortable(false);
-		dateColumn.setTitle("Harvest day");
-		columnList.add(dateColumn);
-		
-		HarvestedUrlCountColumn intervalColumn= new HarvestedUrlCountColumn();
-		intervalColumn.setColumnType(COLUMN.HARVESTCOUNT);
-		intervalColumn.setSortable(false);
-		intervalColumn.setTitle("Harvest count");
-		columnList.add(intervalColumn);
+    @DefaultHandler
+    public Resolution view() throws DAOException{
+        if (getUser()!=null){
+            if (getUser().isAdministrator()){
+                setAdminLoggedIn(true);
+                Pair<Integer, List<HarvestedUrlCountDTO>> result = DAOFactory.get().getDao(HelperDAO.class).getLatestHarvestedURLs(harvestedUrlDays);
+                resultList = result.getRight();
+                matchCount = 0;
+                resultsFound = result.getLeft();
+            } else {
+                setAdminLoggedIn(false);
+            }
+        } else {
+            setAdminLoggedIn(false);
+        }
+        return new ForwardResolution("/pages/admin/harvestedUrlCount.jsp");
+    }
 
-		return columnList;
-	}
-	
+    public Resolution search() throws DAOException{
+        return view();
+    }
 
-	public Resolution filter() throws DAOException, AccessException{
-		return view();
-	}
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
+     */
+    public List<SearchResultColumn> getColumns(){
 
-	public int getHarvestedUrlDays() {
-		return harvestedUrlDays;
-	}
+        LinkedList<SearchResultColumn> columnList = new LinkedList<SearchResultColumn>();
 
-	public void setHarvestedUrlDays(int harvestedUrlDays) {
-		this.harvestedUrlDays = harvestedUrlDays;
-	}
+        HarvestedUrlCountColumn dateColumn= new HarvestedUrlCountColumn();
+        dateColumn.setColumnType(COLUMN.HARVESTDAYSTRING);
+        dateColumn.setSortable(false);
+        dateColumn.setTitle("Harvest day");
+        columnList.add(dateColumn);
 
-	public boolean isAdminLoggedIn() {
-		return adminLoggedIn;
-	}
+        HarvestedUrlCountColumn intervalColumn= new HarvestedUrlCountColumn();
+        intervalColumn.setColumnType(COLUMN.HARVESTCOUNT);
+        intervalColumn.setSortable(false);
+        intervalColumn.setTitle("Harvest count");
+        columnList.add(intervalColumn);
 
-	public void setAdminLoggedIn(boolean adminLoggedIn) {
-		this.adminLoggedIn = adminLoggedIn;
-	}
+        return columnList;
+    }
 
-	public int getResultsFound() {
-		return resultsFound;
-	}
 
-	public void setResultsFound(int resultsFound) {
-		this.resultsFound = resultsFound;
-	}
-	
+    public Resolution filter() throws DAOException, AccessException{
+        return view();
+    }
+
+    public int getHarvestedUrlDays() {
+        return harvestedUrlDays;
+    }
+
+    public void setHarvestedUrlDays(int harvestedUrlDays) {
+        this.harvestedUrlDays = harvestedUrlDays;
+    }
+
+    public boolean isAdminLoggedIn() {
+        return adminLoggedIn;
+    }
+
+    public void setAdminLoggedIn(boolean adminLoggedIn) {
+        this.adminLoggedIn = adminLoggedIn;
+    }
+
+    public int getResultsFound() {
+        return resultsFound;
+    }
+
+    public void setResultsFound(int resultsFound) {
+        this.resultsFound = resultsFound;
+    }
+
 }

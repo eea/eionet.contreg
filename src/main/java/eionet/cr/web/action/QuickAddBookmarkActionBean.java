@@ -25,119 +25,119 @@ import eionet.cr.web.util.RegisterUrl;
  */
 @UrlBinding("/quickAddBookmark.action")
 public class QuickAddBookmarkActionBean extends AbstractActionBean {
-	
-	private boolean saveToBookmarks;
-	private BookmarkFormDTO resource;
-	private String originalPageUrl;
-	private boolean loggedIn = false;
-	
-	@DefaultHandler
-	@HandlesEvent("addBookmark")
-	public Resolution init(){
-		if (getUser() != null){
-			loggedIn = true;
-		}
-		return new ForwardResolution("/pages/bookmarklet/quickAddBookmark.jsp");
-	}
-	
-	@HandlesEvent("processForm")
-	public Resolution  addBookmark()  throws DAOException, HarvestException{
-		String url = resource.getSource();
-		RegisterUrl.register(url, getUser(), saveToBookmarks);
-		return new ForwardResolution("/pages/bookmarklet/bookmarkAdded.jsp");
-	}
-	
-	
-	/**
-	 * 
-	 */
-	@ValidationMethod(on="processForm")
-	public void validateSave(){
-		
-		if (StringUtils.isBlank(resource.getSource()) || !URLUtil.isURL(resource.getSource())){
-			addGlobalValidationError(new SimpleError("Not a valid URL!"));
-		} 
-		if (getUser()==null){
-			addGlobalValidationError(new SimpleError("You are not logged in!"));
-		}
-	}
-	
-	@HandlesEvent("installation")
-	public Resolution installation() {
-		return new ForwardResolution("/pages/bookmarklet/bookmarkletInstaller.jsp");
-	}
-	
-	
-	/**
-	 * @return bookmarklet script
-	 */
-	public String getBookmarklet() {
-		
-		return "javascript: function go() {" +
-				"u=location.href;" +
-				"a=false;" +
-				"x=window;" +
-				"e=x.encodeURIComponent;" +
-				"d=document;" +
-				"if((s=d.selection)" +
-				"?t=s.createRange().text" +
-				":t=x.getSelection()+'')" +
-			"(r=/^http:\\/\\/\\S+$/.exec(t))" +
-				"?u=t" +
-				":a=true;" +
-			"a" +
-			"?alert('Please highlight a full URL, or deselect text to add this page.')" +
-				":window.open(" +
-				"'"+ getBaseUrl(this.getContext()) +"/quickAddBookmark.action?resource.source='+e(u)+'&amp;resource.title='+e(d.title)+'&amp;originalPageUrl='+e(location.href)" +
-				", 'Add bookmark to Content Registry', 'left=20,top=20,width=700,height=500')}; go();";
-	}
+
+    private boolean saveToBookmarks;
+    private BookmarkFormDTO resource;
+    private String originalPageUrl;
+    private boolean loggedIn = false;
+
+    @DefaultHandler
+    @HandlesEvent("addBookmark")
+    public Resolution init(){
+        if (getUser() != null){
+            loggedIn = true;
+        }
+        return new ForwardResolution("/pages/bookmarklet/quickAddBookmark.jsp");
+    }
+
+    @HandlesEvent("processForm")
+    public Resolution  addBookmark()  throws DAOException, HarvestException{
+        String url = resource.getSource();
+        RegisterUrl.register(url, getUser(), saveToBookmarks);
+        return new ForwardResolution("/pages/bookmarklet/bookmarkAdded.jsp");
+    }
+
+
+    /**
+     *
+     */
+    @ValidationMethod(on="processForm")
+    public void validateSave(){
+
+        if (StringUtils.isBlank(resource.getSource()) || !URLUtil.isURL(resource.getSource())){
+            addGlobalValidationError(new SimpleError("Not a valid URL!"));
+        }
+        if (getUser()==null){
+            addGlobalValidationError(new SimpleError("You are not logged in!"));
+        }
+    }
+
+    @HandlesEvent("installation")
+    public Resolution installation() {
+        return new ForwardResolution("/pages/bookmarklet/bookmarkletInstaller.jsp");
+    }
+
+
+    /**
+     * @return bookmarklet script
+     */
+    public String getBookmarklet() {
+
+        return "javascript: function go() {" +
+                "u=location.href;" +
+                "a=false;" +
+                "x=window;" +
+                "e=x.encodeURIComponent;" +
+                "d=document;" +
+                "if((s=d.selection)" +
+                "?t=s.createRange().text" +
+                ":t=x.getSelection()+'')" +
+            "(r=/^http:\\/\\/\\S+$/.exec(t))" +
+                "?u=t" +
+                ":a=true;" +
+            "a" +
+            "?alert('Please highlight a full URL, or deselect text to add this page.')" +
+                ":window.open(" +
+                "'"+ getBaseUrl(this.getContext()) +"/quickAddBookmark.action?resource.source='+e(u)+'&amp;resource.title='+e(d.title)+'&amp;originalPageUrl='+e(location.href)" +
+                ", 'Add bookmark to Content Registry', 'left=20,top=20,width=700,height=500')}; go();";
+    }
 
 
 
-	/**
-	 * @return the resource
-	 */
-	public BookmarkFormDTO getResource() {
-		return resource;
-	}
+    /**
+     * @return the resource
+     */
+    public BookmarkFormDTO getResource() {
+        return resource;
+    }
 
-	/**
-	 * @param resource the resource to set
-	 */
-	public void setResource(BookmarkFormDTO resource) {
-		this.resource = resource;
-	}
-	
-	
+    /**
+     * @param resource the resource to set
+     */
+    public void setResource(BookmarkFormDTO resource) {
+        this.resource = resource;
+    }
 
-	/**
-	 * @return the originalPageUrl
-	 */
-	public String getOriginalPageUrl() {
-		return originalPageUrl;
-	}
 
-	/**
-	 * @param originalPageUrl the originalPageUrl to set
-	 */
-	public void setOriginalPageUrl(String originalPageUrl) {
-		this.originalPageUrl = originalPageUrl;
-	}
 
-	public boolean isSaveToBookmarks() {
-		return saveToBookmarks;
-	}
+    /**
+     * @return the originalPageUrl
+     */
+    public String getOriginalPageUrl() {
+        return originalPageUrl;
+    }
 
-	public void setSaveToBookmarks(boolean saveToBookmarks) {
-		this.saveToBookmarks = saveToBookmarks;
-	}
+    /**
+     * @param originalPageUrl the originalPageUrl to set
+     */
+    public void setOriginalPageUrl(String originalPageUrl) {
+        this.originalPageUrl = originalPageUrl;
+    }
 
-	public boolean isLoggedIn() {
-		return loggedIn;
-	}
+    public boolean isSaveToBookmarks() {
+        return saveToBookmarks;
+    }
 
-	public void setLoggedIn(boolean loggedIn) {
-		this.loggedIn = loggedIn;
-	}
+    public void setSaveToBookmarks(boolean saveToBookmarks) {
+        this.saveToBookmarks = saveToBookmarks;
+    }
+
+    public boolean isLoggedIn() {
+        return loggedIn;
+    }
+
+    public void setLoggedIn(boolean loggedIn) {
+        this.loggedIn = loggedIn;
+    }
 
 }

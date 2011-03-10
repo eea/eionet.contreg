@@ -30,58 +30,58 @@ import eionet.cr.dao.readers.ResultSetReaderException;
 import eionet.cr.util.export.SubjectExportEvent;
 
 /**
- * 
+ *
  * @author kaspeenr
  *
  */
 public abstract class ResultSetExportReader<T> implements SQLResultSetReader<T>{
-	
-	/** */
-	protected List<T> resultList = new ArrayList<T>();
-	
-	/** */
-	protected ResultSetMetaData resultSetMetaData;
-	
-	/** */
-	protected SubjectExportEvent exporter = null;
 
-	/**
-	 * 
-	 * @param exporter
-	 */
-	public ResultSetExportReader(SubjectExportEvent exporter){
-		this.exporter = exporter;		
-	}
+    /** */
+    protected List<T> resultList = new ArrayList<T>();
 
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.util.sql.SQLResultSetReader#startResultSet(java.sql.ResultSetMetaData)
-	 */
-	@Override
-	public void startResultSet(ResultSetMetaData resultSetMetaData){
-		this.resultSetMetaData = resultSetMetaData;
-	}
+    /** */
+    protected ResultSetMetaData resultSetMetaData;
 
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.util.sql.SQLResultSetReader#readRow(java.sql.ResultSet)
-	 */
-	public abstract void readRow(ResultSet rs) throws SQLException, ResultSetReaderException;
-	
-	/* (non-Javadoc)
-	 * @see eionet.cr.dao.readers.ResultSetReader#endResultSet()
-	 */
-	@Override
-	public void endResultSet() {
-		
-		// default implementation, which does nothing, implementors can override
-	}
+    /** */
+    protected SubjectExportEvent exporter = null;
 
-	/* (non-Javadoc)
-	 * @see eionet.cr.dao.readers.ResultSetReader#getResultList()
-	 */
-	@Override
-	public List<T> getResultList() {
-		return resultList;
-	}
+    /**
+     *
+     * @param exporter
+     */
+    public ResultSetExportReader(SubjectExportEvent exporter){
+        this.exporter = exporter;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.util.sql.SQLResultSetReader#startResultSet(java.sql.ResultSetMetaData)
+     */
+    @Override
+    public void startResultSet(ResultSetMetaData resultSetMetaData){
+        this.resultSetMetaData = resultSetMetaData;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.util.sql.SQLResultSetReader#readRow(java.sql.ResultSet)
+     */
+    public abstract void readRow(ResultSet rs) throws SQLException, ResultSetReaderException;
+
+    /* (non-Javadoc)
+     * @see eionet.cr.dao.readers.ResultSetReader#endResultSet()
+     */
+    @Override
+    public void endResultSet() {
+
+        // default implementation, which does nothing, implementors can override
+    }
+
+    /* (non-Javadoc)
+     * @see eionet.cr.dao.readers.ResultSetReader#getResultList()
+     */
+    @Override
+    public List<T> getResultList() {
+        return resultList;
+    }
 }

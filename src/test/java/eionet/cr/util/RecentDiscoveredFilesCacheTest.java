@@ -36,40 +36,40 @@ import eionet.cr.web.util.ApplicationCache;
  * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
 public class RecentDiscoveredFilesCacheTest extends TestCase {
-	
-	@Before
-	protected void setUp() throws Exception {
-		super.setUp();
-		new ApplicationCache().contextInitialized(null);	
-	}
-	@After
-	protected void tearDown() throws Exception {
-		super.tearDown();
-		new ApplicationCache().contextDestroyed(null);	
-	}
 
-	@Test
-	public void testCache(){
-		
-		for(int i = 0; i < 100; i++){
-			ApplicationCache.updateRecentResourceCache(getTestData(11));
-			assertEquals(10, ApplicationCache.getRecentDiscoveredFiles(10).size());
-		}
-		
-		assertEquals(3, ApplicationCache.getRecentDiscoveredFiles(3).size());
-		assertEquals("8", ApplicationCache.getRecentDiscoveredFiles(3).get(0).getLeft());
-		
-	}
+    @Before
+    protected void setUp() throws Exception {
+        super.setUp();
+        new ApplicationCache().contextInitialized(null);
+    }
+    @After
+    protected void tearDown() throws Exception {
+        super.tearDown();
+        new ApplicationCache().contextDestroyed(null);
+    }
 
-	/**
-	 * @return
-	 */
-	private List<Pair<String, String>> getTestData(int size) {
-		List<Pair<String,String>> result = new LinkedList<Pair<String,String>>();
-		for(int i=0; i< size; i++) {
-			result.add(new Pair<String, String>(i + "", "value"));
-		}
-		return result;
-	}
+    @Test
+    public void testCache(){
+
+        for(int i = 0; i < 100; i++){
+            ApplicationCache.updateRecentResourceCache(getTestData(11));
+            assertEquals(10, ApplicationCache.getRecentDiscoveredFiles(10).size());
+        }
+
+        assertEquals(3, ApplicationCache.getRecentDiscoveredFiles(3).size());
+        assertEquals("8", ApplicationCache.getRecentDiscoveredFiles(3).get(0).getLeft());
+
+    }
+
+    /**
+     * @return
+     */
+    private List<Pair<String, String>> getTestData(int size) {
+        List<Pair<String,String>> result = new LinkedList<Pair<String,String>>();
+        for(int i=0; i< size; i++) {
+            result.add(new Pair<String, String>(i + "", "value"));
+        }
+        return result;
+    }
 
 }

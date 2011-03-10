@@ -30,38 +30,38 @@ import eionet.cr.dao.readers.ResultSetMixedReader;
 import eionet.cr.dao.readers.ResultSetReaderException;
 
 /**
- * 
+ *
  * @author jaanus
  *
  * @param <T>
  */
 public class SingleObjectReader<T> extends ResultSetMixedReader<T> {
 
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.util.sql.SQLResultSetReader#readRow(java.sql.ResultSet)
-	 */
-	@Override
-	@SuppressWarnings("unchecked")
-	public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
-		resultList.add((T) rs.getObject(1));
-	}
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.util.sql.SQLResultSetReader#readRow(java.sql.ResultSet)
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
+        resultList.add((T) rs.getObject(1));
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
-	 */
-	@SuppressWarnings("unchecked")
-	@Override
-	public void readRow(BindingSet bindingSet) {
-		
-		if (bindingSet!=null && bindingSet.size()>0){
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public void readRow(BindingSet bindingSet) {
 
-			Binding binding = bindingSet.iterator().next();
-			if (binding!=null){
+        if (bindingSet!=null && bindingSet.size()>0){
 
-				resultList.add((T)binding.getValue().stringValue());
-			}
-		}
-	}
+            Binding binding = bindingSet.iterator().next();
+            if (binding!=null){
+
+                resultList.add((T)binding.getValue().stringValue());
+            }
+        }
+    }
 }

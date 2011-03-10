@@ -30,19 +30,19 @@ import net.sourceforge.stripes.exception.StripesJspException;
 /**
  * Modified Stripes {@link net.sourceforge.stripes.tag.FormTag}.
  * This form tag doesn't include _sourcePage and _fp parameters.
- * 
+ *
  * @author Aleksandr Ivanov
  * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
 public class FormTag extends net.sourceforge.stripes.tag.FormTag{
 
-	/** 
-	 * @see net.sourceforge.stripes.tag.FormTag#doEndTag()
-	 * {@inheritDoc}
-	 */
-	@Override
-	public int doEndTag() throws JspException {
-		try {
+    /**
+     * @see net.sourceforge.stripes.tag.FormTag#doEndTag()
+     * {@inheritDoc}
+     */
+    @Override
+    public int doEndTag() throws JspException {
+        try {
             // Default the method to post
             if (getMethod() == null) {
                 setMethod("post");
@@ -70,8 +70,8 @@ public class FormTag extends net.sourceforge.stripes.tag.FormTag{
 
         return EVAL_PAGE;
 
-	}
+    }
 
-	
-	
+
+
 }

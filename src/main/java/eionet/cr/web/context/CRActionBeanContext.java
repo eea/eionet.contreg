@@ -19,7 +19,7 @@
  * Jaanus Heinlaid, Tieto Eesti
  */
 /**
- * 
+ *
  */
 package eionet.cr.web.context;
 
@@ -38,109 +38,109 @@ import eionet.cr.web.security.EionetCASFilter;
 
 /**
  * Extension of stripes ActionBeanContext.
- * 
+ *
  * @author altnyris
  *
  */
 public class CRActionBeanContext extends ActionBeanContext {
-	
-	/** */
-	private int severity;
-	
-	/** */
-	private Resolution sourcePageResolution;
-	
-	/**
-	 * Wrapper method for {@link ServletRequest#getParameter(String)}.
-	 * <p>
-	 * The wrapper allows to avoid direct usage of {@link HttpServletRequest}.
-	 * @param parameterName parameter name.
-	 * @return corresponding parameter value from {@link HttpServletRequest}.
-	 */
-	public String getRequestParameter(String parameterName) {
-		return getRequest().getParameter(parameterName);
-	}
-	
-	/**
-	 * Wrapper method for {@link HttpSession#setAttribute(String, ObjectDTO)}.
-	 * <p>
-	 * The wrapper allows to avoid direct usage of {@link HttpSession}.
-	 * @param name session attribute name.
-	 * @param value session attribute value.
-	 */
-	public void setSessionAttribute(String name, Object value) {
-		getRequest().getSession().setAttribute(name, value);
-	}
-	
-	/**
-	 * Method returns {@link CRUser} from session.
-	 * 
-	 * @return {@link CRUser} from session or null if user is not logged in.
-	 */
-	public CRUser getCRUser() {
-		
-		return (CRUser)getRequest().getSession().getAttribute(USER_SESSION_ATTR);
-	}
-	
-	/**
-	 * A wrapper for {@link EionetCASFilter#getCASLoginURL(javax.servlet.http.HttpServletRequest)}.
-	 * 
-	 * @return central authentication system login URL.
-	 */
-	public String getCASLoginURL() {
-		return EionetCASFilter.getCASLoginURL(getRequest());
-	}
-	
-	/**
-	 * A wrapper for {@link EionetCASFilter#getCASLogoutURL(javax.servlet.http.HttpServletRequest)}.
-	 * 
-	 * @return central authentication system logout URL.
-	 */
-	public String getCASLogoutURL() {
-		return EionetCASFilter.getCASLogoutURL(getRequest());
-	}
-	
-	/**
-	 * 
-	 * @return last action event URL.
-	 */
-	public String getLastActionEventUrl() {
-		return (String) getRequest().getSession().getAttribute(LAST_ACTION_URL_SESSION_ATTR);
-	}
 
-	/**
-	 * @return
-	 */
-	public int getSeverity() {
-		return severity;
-	}
+    /** */
+    private int severity;
 
-	/**
-	 * @param severity
-	 */
-	public void setSeverity(int severity) {
-		this.severity = severity;
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see net.sourceforge.stripes.action.ActionBeanContext#getSourcePageResolution()
-	 */
-	public Resolution getSourcePageResolution(){
-		
-		if (this.sourcePageResolution!=null){
-			return this.sourcePageResolution;
-		}
-		else{
-			return super.getSourcePageResolution();
-		}
-	}
+    /** */
+    private Resolution sourcePageResolution;
 
-	/**
-	 * 
-	 * @param resolution
-	 */
-	public void setSourcePageResolution(Resolution resolution){
-		this.sourcePageResolution = resolution;
-	}
+    /**
+     * Wrapper method for {@link ServletRequest#getParameter(String)}.
+     * <p>
+     * The wrapper allows to avoid direct usage of {@link HttpServletRequest}.
+     * @param parameterName parameter name.
+     * @return corresponding parameter value from {@link HttpServletRequest}.
+     */
+    public String getRequestParameter(String parameterName) {
+        return getRequest().getParameter(parameterName);
+    }
+
+    /**
+     * Wrapper method for {@link HttpSession#setAttribute(String, ObjectDTO)}.
+     * <p>
+     * The wrapper allows to avoid direct usage of {@link HttpSession}.
+     * @param name session attribute name.
+     * @param value session attribute value.
+     */
+    public void setSessionAttribute(String name, Object value) {
+        getRequest().getSession().setAttribute(name, value);
+    }
+
+    /**
+     * Method returns {@link CRUser} from session.
+     *
+     * @return {@link CRUser} from session or null if user is not logged in.
+     */
+    public CRUser getCRUser() {
+
+        return (CRUser)getRequest().getSession().getAttribute(USER_SESSION_ATTR);
+    }
+
+    /**
+     * A wrapper for {@link EionetCASFilter#getCASLoginURL(javax.servlet.http.HttpServletRequest)}.
+     *
+     * @return central authentication system login URL.
+     */
+    public String getCASLoginURL() {
+        return EionetCASFilter.getCASLoginURL(getRequest());
+    }
+
+    /**
+     * A wrapper for {@link EionetCASFilter#getCASLogoutURL(javax.servlet.http.HttpServletRequest)}.
+     *
+     * @return central authentication system logout URL.
+     */
+    public String getCASLogoutURL() {
+        return EionetCASFilter.getCASLogoutURL(getRequest());
+    }
+
+    /**
+     *
+     * @return last action event URL.
+     */
+    public String getLastActionEventUrl() {
+        return (String) getRequest().getSession().getAttribute(LAST_ACTION_URL_SESSION_ATTR);
+    }
+
+    /**
+     * @return
+     */
+    public int getSeverity() {
+        return severity;
+    }
+
+    /**
+     * @param severity
+     */
+    public void setSeverity(int severity) {
+        this.severity = severity;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see net.sourceforge.stripes.action.ActionBeanContext#getSourcePageResolution()
+     */
+    public Resolution getSourcePageResolution(){
+
+        if (this.sourcePageResolution!=null){
+            return this.sourcePageResolution;
+        }
+        else{
+            return super.getSourcePageResolution();
+        }
+    }
+
+    /**
+     *
+     * @param resolution
+     */
+    public void setSourcePageResolution(Resolution resolution){
+        this.sourcePageResolution = resolution;
+    }
 }

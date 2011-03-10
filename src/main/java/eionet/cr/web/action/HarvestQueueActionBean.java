@@ -42,146 +42,146 @@ import eionet.cr.dto.UrgentHarvestQueueItemDTO;
 import eionet.cr.harvest.scheduled.HarvestingJob;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
 @UrlBinding("/harvestQueue.action")
 public class HarvestQueueActionBean extends AbstractActionBean{
-	
-	/** */
-	private static final String TYPE_BATCH = "batch";
-	private static final String TYPE_URGENT = "urgent";
 
-	/** */
-	private static Log logger = LogFactory.getLog(HarvestQueueActionBean.class);
-	
-	/** */
-	private static List<Map<String, String>> queueTypes;
-	
-	/** */
-	private String queueType;
-	
-	/** */
-	private List<UrgentHarvestQueueItemDTO> urgentQueue;
-	private List<HarvestSourceDTO> batchQueue;
-	
-	/** */
-	private static String batchHarvestingHours;
-	
-	/**
-	 * 
-	 */
-	public HarvestQueueActionBean(){
-		setQueueType(TYPE_URGENT);
-	}
-	
-	/**
-	 * 
-	 * @return
-	 * @throws DAOException 
-	 */
-	@DefaultHandler
-	public Resolution view() throws DAOException{
-		
-		if (getQueueType().equals(TYPE_BATCH)){
-			batchQueue = HarvestingJob.getBatchHarvestingQueue();
-			if (batchQueue==null || batchQueue.isEmpty()){
-				batchQueue = HarvestingJob.getNextScheduledSources();
-			}
-		}
-		else{
-			urgentQueue = factory.getDao(UrgentHarvestQueueDAO.class).getUrgentHarvestQueue();
-		}
-		
-		return new ForwardResolution("/pages/harvestQueue.jsp");
-	}
+    /** */
+    private static final String TYPE_BATCH = "batch";
+    private static final String TYPE_URGENT = "urgent";
+
+    /** */
+    private static Log logger = LogFactory.getLog(HarvestQueueActionBean.class);
+
+    /** */
+    private static List<Map<String, String>> queueTypes;
+
+    /** */
+    private String queueType;
+
+    /** */
+    private List<UrgentHarvestQueueItemDTO> urgentQueue;
+    private List<HarvestSourceDTO> batchQueue;
+
+    /** */
+    private static String batchHarvestingHours;
+
+    /**
+     *
+     */
+    public HarvestQueueActionBean(){
+        setQueueType(TYPE_URGENT);
+    }
+
+    /**
+     *
+     * @return
+     * @throws DAOException
+     */
+    @DefaultHandler
+    public Resolution view() throws DAOException{
+
+        if (getQueueType().equals(TYPE_BATCH)){
+            batchQueue = HarvestingJob.getBatchHarvestingQueue();
+            if (batchQueue==null || batchQueue.isEmpty()){
+                batchQueue = HarvestingJob.getNextScheduledSources();
+            }
+        }
+        else{
+            urgentQueue = factory.getDao(UrgentHarvestQueueDAO.class).getUrgentHarvestQueue();
+        }
+
+        return new ForwardResolution("/pages/harvestQueue.jsp");
+    }
 
 
-	/**
-	 * @return the queueType
-	 */
-	public String getQueueType() {
-		
-		if (queueType==null){
-			queueType = TYPE_URGENT;
-		}
-		return queueType;
-	}
+    /**
+     * @return the queueType
+     */
+    public String getQueueType() {
 
-	/**
-	 * @param queueType the queueType to set
-	 */
-	public void setQueueType(String queueType) {
-		this.queueType = queueType;
-	}
+        if (queueType==null){
+            queueType = TYPE_URGENT;
+        }
+        return queueType;
+    }
 
-	/**
-	 * @return the list
-	 */
-	public List<UrgentHarvestQueueItemDTO> getUrgentQueue() {
-		return urgentQueue;
-	}
+    /**
+     * @param queueType the queueType to set
+     */
+    public void setQueueType(String queueType) {
+        this.queueType = queueType;
+    }
 
-	/**
-	 * @return the batchQueue
-	 */
-	public List<HarvestSourceDTO> getBatchQueue() {
-		return batchQueue;
-	}
+    /**
+     * @return the list
+     */
+    public List<UrgentHarvestQueueItemDTO> getUrgentQueue() {
+        return urgentQueue;
+    }
 
-	/**
-	 * 
-	 * @return
-	 */
-	public List<Map<String, String>> getQueueTypes(){
-		
-		if (queueTypes==null){
-			
-			queueTypes = new ArrayList<Map<String,String>>();
-			
-			Map<String,String> queueType = new HashMap<String,String>();
-			queueType.put("title", "Urgent queue");
-			queueType.put("queueType", TYPE_URGENT);
-			queueTypes.add(queueType);
+    /**
+     * @return the batchQueue
+     */
+    public List<HarvestSourceDTO> getBatchQueue() {
+        return batchQueue;
+    }
 
-			queueType = new HashMap<String,String>();
-			queueType.put("title", "Batch queue");
-			queueType.put("queueType", TYPE_BATCH);
-			queueTypes.add(queueType);
-		}
-		
-		return queueTypes;
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public boolean isTypeUrgent(){
-		return getQueueType().equals(TYPE_URGENT);
-	}
+    /**
+     *
+     * @return
+     */
+    public List<Map<String, String>> getQueueTypes(){
 
-	/**
-	 * 
-	 * @return
-	 */
-	public boolean isTypeBatch(){
-		return getQueueType().equals(TYPE_BATCH);
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public String getBatchHarvestingHours(){
-		
-		if (batchHarvestingHours==null){
-			
-			String s = GeneralConfig.getProperty(GeneralConfig.HARVESTER_BATCH_HARVESTING_HOURS);
-			batchHarvestingHours = StringUtils.isBlank(s) ? "" : s.trim();
-		}
-		
-		return batchHarvestingHours;
-	}
+        if (queueTypes==null){
+
+            queueTypes = new ArrayList<Map<String,String>>();
+
+            Map<String,String> queueType = new HashMap<String,String>();
+            queueType.put("title", "Urgent queue");
+            queueType.put("queueType", TYPE_URGENT);
+            queueTypes.add(queueType);
+
+            queueType = new HashMap<String,String>();
+            queueType.put("title", "Batch queue");
+            queueType.put("queueType", TYPE_BATCH);
+            queueTypes.add(queueType);
+        }
+
+        return queueTypes;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean isTypeUrgent(){
+        return getQueueType().equals(TYPE_URGENT);
+    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean isTypeBatch(){
+        return getQueueType().equals(TYPE_BATCH);
+    }
+
+    /**
+     *
+     * @return
+     */
+    public String getBatchHarvestingHours(){
+
+        if (batchHarvestingHours==null){
+
+            String s = GeneralConfig.getProperty(GeneralConfig.HARVESTER_BATCH_HARVESTING_HOURS);
+            batchHarvestingHours = StringUtils.isBlank(s) ? "" : s.trim();
+        }
+
+        return batchHarvestingHours;
+    }
 }

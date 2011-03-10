@@ -23,33 +23,33 @@ package eionet.cr.harvest;
 import eionet.cr.common.CRRuntimeException;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
 public class RDFLoadingException extends CRRuntimeException{
 
-	/**
-	 * 
-	 */
-	public RDFLoadingException(){
-		super();
-	}
-	
-	/**
-	 * 
-	 * @param message
-	 */
-	public RDFLoadingException(String message){
-		super(message);
-	}
+    /**
+     *
+     */
+    public RDFLoadingException(){
+        super();
+    }
 
-	/**
-	 * 
-	 * @param message
-	 * @param cause
-	 */
-	public RDFLoadingException(String message, Throwable cause){
-		super(message, cause);
-	}
+    /**
+     *
+     * @param message
+     */
+    public RDFLoadingException(String message){
+        super(message);
+    }
+
+    /**
+     *
+     * @param message
+     * @param cause
+     */
+    public RDFLoadingException(String message, Throwable cause){
+        super(message, cause);
+    }
 }

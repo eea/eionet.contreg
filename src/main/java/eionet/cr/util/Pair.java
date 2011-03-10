@@ -30,68 +30,68 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
 public class Pair<L,R> implements Serializable {
-	
-	/** */
-	private static final String[] excludeFromEquals = new String[]{"right"};
 
-	/**
-	 * serial.
-	 */
-	private static final long serialVersionUID = 1L;
-	
-	/** */
-	private L left;
-	private R right;
+    /** */
+    private static final String[] excludeFromEquals = new String[]{"right"};
 
-	/**
-	 * @param left
-	 * @param right
-	 */
-	public Pair(L left, R right) {
-		this.left = left;
-		this.right = right;
-	}
+    /**
+     * serial.
+     */
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * @return the left
-	 */
-	public L getLeft() {
-		return left;
-	}
-	/**
-	 * @param left the left to set
-	 */
-	public void setLeft(L id) {
-		this.left = id;
-	}
-	/**
-	 * @return the right
-	 */
-	public R getRight() {
-		return right;
-	}
-	/**
-	 * @param right the right to set
-	 */
-	public void setRight(R value) {
-		this.right = value;
-	}
+    /** */
+    private L left;
+    private R right;
 
-	/** 
-	 * @see java.lang.Object#hashCode()
-	 * {@inheritDoc}
-	 */
-	@Override
-	public int hashCode() {
-		return HashCodeBuilder.reflectionHashCode(this);
-	}
+    /**
+     * @param left
+     * @param right
+     */
+    public Pair(L left, R right) {
+        this.left = left;
+        this.right = right;
+    }
 
-	/** 
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		return EqualsBuilder.reflectionEquals(this, obj, excludeFromEquals);
-	}
+    /**
+     * @return the left
+     */
+    public L getLeft() {
+        return left;
+    }
+    /**
+     * @param left the left to set
+     */
+    public void setLeft(L id) {
+        this.left = id;
+    }
+    /**
+     * @return the right
+     */
+    public R getRight() {
+        return right;
+    }
+    /**
+     * @param right the right to set
+     */
+    public void setRight(R value) {
+        this.right = value;
+    }
+
+    /**
+     * @see java.lang.Object#hashCode()
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return HashCodeBuilder.reflectionHashCode(this);
+    }
+
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object obj) {
+        return EqualsBuilder.reflectionEquals(this, obj, excludeFromEquals);
+    }
 }

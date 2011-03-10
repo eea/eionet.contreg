@@ -50,185 +50,185 @@ import eionet.cr.web.util.columns.SearchResultColumn;
 import eionet.cr.web.util.columns.SubjectPredicateColumn;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
 @UrlBinding("/dataflowSearch.action")
 public class DataflowSearchActionBean extends AbstractSearchActionBean<SubjectDTO>{
-	
-	/** */
-	private List<String> years;
-	
-	/** */
-	private String dataflow;
-	private String locality;
-	private String year;
 
-	/**
-	 * 
-	 * @return
-	 */
-	@DefaultHandler
-	public Resolution init(){
-		return new ForwardResolution("/pages/dataflowSearch.jsp");
-	}
+    /** */
+    private List<String> years;
 
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.web.action.AbstractSearchActionBean#search()
-	 */
-	public Resolution search() throws DAOException{
-		Pair<Integer, List<SubjectDTO>> customSearch =
-			DAOFactory.get().getDao(SearchDAO.class).searchByFilters(
-							buildSearchCriteria(),
-							null,
-							PagingRequest.create(getPageN()),
-							new SortingRequest(getSortP(), SortOrder.parse(getSortO())), 
-							null);
-		resultList = customSearch.getRight();
-		matchCount = customSearch.getLeft();
-		
-		return new ForwardResolution("/pages/dataflowSearch.jsp");
-	}
+    /** */
+    private String dataflow;
+    private String locality;
+    private String year;
 
-	/**
-	 * 
-	 * @return
-	 */
-	private Map<String, String> buildSearchCriteria(){
-		
-		Map<String, String> result = new HashMap<String, String>();
-		
-		result.put(Predicates.RDF_TYPE, Subjects.ROD_DELIVERY_CLASS);
-		if (!StringUtils.isBlank(dataflow))
-			result.put(Predicates.ROD_OBLIGATION_PROPERTY, dataflow);
-		
-		if (!StringUtils.isBlank(locality))
-			result.put(Predicates.ROD_LOCALITY_PROPERTY, locality);
-		
-		if (!StringUtils.isBlank(year))
-			result.put(Predicates.DC_COVERAGE, year);
-		
-		return result;
-	}
+    /**
+     *
+     * @return
+     */
+    @DefaultHandler
+    public Resolution init(){
+        return new ForwardResolution("/pages/dataflowSearch.jsp");
+    }
 
-	/**
-	 * @return the instrumentsObligations
-	 */
-	public Map<String,List<UriLabelPair>> getInstrumentsObligations() {
-		return ApplicationCache.getDataflowPicklist();
-	}
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.web.action.AbstractSearchActionBean#search()
+     */
+    public Resolution search() throws DAOException{
+        Pair<Integer, List<SubjectDTO>> customSearch =
+            DAOFactory.get().getDao(SearchDAO.class).searchByFilters(
+                            buildSearchCriteria(),
+                            null,
+                            PagingRequest.create(getPageN()),
+                            new SortingRequest(getSortP(), SortOrder.parse(getSortO())),
+                            null);
+        resultList = customSearch.getRight();
+        matchCount = customSearch.getLeft();
 
-	/**
-	 * @return the countries
-	 */
-	public Collection<String> getLocalities() {
-		return ApplicationCache.getLocalities();
-	}
+        return new ForwardResolution("/pages/dataflowSearch.jsp");
+    }
 
-	/**
-	 * @return the years
-	 */
-	public List<String> getYears() {
-		
-		if (years==null){
-			years = new ArrayList<String>();
-			int curYear = Calendar.getInstance().get(Calendar.YEAR);
-			int earliestYear = 1990;
-			for (int i=curYear; i>=earliestYear; i--)
-				years.add(String.valueOf(i));
-		}
-		
-		return years;
-	}
+    /**
+     *
+     * @return
+     */
+    private Map<String, String> buildSearchCriteria(){
 
-	/**
-	 * @return the dataflow
-	 */
-	public String getDataflow() {
-		return dataflow;
-	}
+        Map<String, String> result = new HashMap<String, String>();
 
-	/**
-	 * @return the locality
-	 */
-	public String getLocality() {
-		return locality;
-	}
+        result.put(Predicates.RDF_TYPE, Subjects.ROD_DELIVERY_CLASS);
+        if (!StringUtils.isBlank(dataflow))
+            result.put(Predicates.ROD_OBLIGATION_PROPERTY, dataflow);
 
-	/**
-	 * @return the year
-	 */
-	public String getYear() {
-		return year;
-	}
+        if (!StringUtils.isBlank(locality))
+            result.put(Predicates.ROD_LOCALITY_PROPERTY, locality);
 
-	/**
-	 * @param dataflow the dataflow to set
-	 */
-	public void setDataflow(String dataflow) {
-		this.dataflow = dataflow;
-	}
+        if (!StringUtils.isBlank(year))
+            result.put(Predicates.DC_COVERAGE, year);
 
-	/**
-	 * @param locality the locality to set
-	 */
-	public void setLocality(String locality) {
-		this.locality = locality;
-	}
+        return result;
+    }
 
-	/**
-	 * @param year the year to set
-	 */
-	public void setYear(String year) {
-		this.year = year;
-	}
+    /**
+     * @return the instrumentsObligations
+     */
+    public Map<String,List<UriLabelPair>> getInstrumentsObligations() {
+        return ApplicationCache.getDataflowPicklist();
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
-	 */
-	public List<SearchResultColumn> getColumns(){
-		
-		ArrayList<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
-		
-		SubjectPredicateColumn col = new SubjectPredicateColumn();
-		col.setPredicateUri(Predicates.RDFS_LABEL);
-		col.setTitle("Title");
-		col.setSortable(true);
-		list.add(col);
-		
+    /**
+     * @return the countries
+     */
+    public Collection<String> getLocalities() {
+        return ApplicationCache.getLocalities();
+    }
+
+    /**
+     * @return the years
+     */
+    public List<String> getYears() {
+
+        if (years==null){
+            years = new ArrayList<String>();
+            int curYear = Calendar.getInstance().get(Calendar.YEAR);
+            int earliestYear = 1990;
+            for (int i=curYear; i>=earliestYear; i--)
+                years.add(String.valueOf(i));
+        }
+
+        return years;
+    }
+
+    /**
+     * @return the dataflow
+     */
+    public String getDataflow() {
+        return dataflow;
+    }
+
+    /**
+     * @return the locality
+     */
+    public String getLocality() {
+        return locality;
+    }
+
+    /**
+     * @return the year
+     */
+    public String getYear() {
+        return year;
+    }
+
+    /**
+     * @param dataflow the dataflow to set
+     */
+    public void setDataflow(String dataflow) {
+        this.dataflow = dataflow;
+    }
+
+    /**
+     * @param locality the locality to set
+     */
+    public void setLocality(String locality) {
+        this.locality = locality;
+    }
+
+    /**
+     * @param year the year to set
+     */
+    public void setYear(String year) {
+        this.year = year;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
+     */
+    public List<SearchResultColumn> getColumns(){
+
+        ArrayList<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
+
+        SubjectPredicateColumn col = new SubjectPredicateColumn();
+        col.setPredicateUri(Predicates.RDFS_LABEL);
+        col.setTitle("Title");
+        col.setSortable(true);
+        list.add(col);
+
 //		col = new SubjectPredicateColumn();
 //		col.setPredicateUri(Predicates.ROD_OBLIGATION_PROPERTY);
 //		col.setTitle("Dataflow");
 //		col.setSortable(true);
 //		list.add(col);
 
-		col = new SubjectPredicateColumn();
-		col.setPredicateUri(Predicates.ROD_HAS_FILE);
-		col.setTitle("File");
-		col.setSortable(true);
-		list.add(col);
+        col = new SubjectPredicateColumn();
+        col.setPredicateUri(Predicates.ROD_HAS_FILE);
+        col.setTitle("File");
+        col.setSortable(true);
+        list.add(col);
 
-		col = new SubjectPredicateColumn();
-		col.setPredicateUri(Predicates.CR_HAS_FEEDBACK);
-		col.setTitle("Feedback");
-		col.setSortable(true);
-		list.add(col);
+        col = new SubjectPredicateColumn();
+        col.setPredicateUri(Predicates.CR_HAS_FEEDBACK);
+        col.setTitle("Feedback");
+        col.setSortable(true);
+        list.add(col);
 
-		col = new SubjectPredicateColumn();
-		col.setPredicateUri(Predicates.ROD_LOCALITY_PROPERTY);
-		col.setTitle("Locality");
-		col.setSortable(true);
-		list.add(col);
+        col = new SubjectPredicateColumn();
+        col.setPredicateUri(Predicates.ROD_LOCALITY_PROPERTY);
+        col.setTitle("Locality");
+        col.setSortable(true);
+        list.add(col);
 
-		col = new SubjectPredicateColumn();
-		col.setPredicateUri(Predicates.DC_DATE);
-		col.setTitle("Date");
-		col.setSortable(true);
-		list.add(col);
+        col = new SubjectPredicateColumn();
+        col.setPredicateUri(Predicates.DC_DATE);
+        col.setTitle("Date");
+        col.setSortable(true);
+        list.add(col);
 
-		return list;
-	}
+        return list;
+    }
 }

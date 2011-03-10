@@ -31,47 +31,47 @@ import eionet.cr.web.action.AbstractActionBean;
 
 /**
  * Helper class for testing Stripes action beans.
- * 
+ *
  * @author gerasvad, altnyris
  *
  */
 public abstract class AbstractStripesMvcTestHelper extends AbstractActionBean {
-	
-	/** */
-	private static MockServletContext mockServletContext;
 
-	/**
-	 * 
-	 */
-	protected MockServletContext getMockServletContext() {
-		if (mockServletContext == null) {
-			initMockServletContext();
-		}
-		
-		return mockServletContext;
-	}
-	
-	/**
-	 * 
-	 */
-	private void initMockServletContext() {
-		
-		mockServletContext = new MockServletContext("test");
+    /** */
+    private static MockServletContext mockServletContext;
 
-		// Add the Stripes Filter
-		Map<String,String> filterParams = new HashMap<String,String>();
-		
-		// JH280210 - the following two lines are out-commented, because
-		// we have upgraded to Stripes 1.5, and "ActionResolver.Packages" should be
-		// used instead "ActionResolver.UrlFilters" and "ActionResolver.PackageFilters"
-		//
-		// filterParams.put("ActionResolver.UrlFilters", "target/classes, target/test-classes");
-		// filterParams.put("ActionResolver.PackageFilters", "eionet.cr.web.action.*");
-		
-		filterParams.put("ActionResolver.Packages", "eionet.cr.web.action");
-		filterParams.put("ActionBeanContext.Class", "eionet.cr.web.context.CRActionBeanContext");
-		
-		mockServletContext.addFilter(StripesFilter.class, "StripesFilter", filterParams);
-		mockServletContext.setServlet(DispatcherServlet.class, "StripesDispatcher", null);
-	}
+    /**
+     *
+     */
+    protected MockServletContext getMockServletContext() {
+        if (mockServletContext == null) {
+            initMockServletContext();
+        }
+
+        return mockServletContext;
+    }
+
+    /**
+     *
+     */
+    private void initMockServletContext() {
+
+        mockServletContext = new MockServletContext("test");
+
+        // Add the Stripes Filter
+        Map<String,String> filterParams = new HashMap<String,String>();
+
+        // JH280210 - the following two lines are out-commented, because
+        // we have upgraded to Stripes 1.5, and "ActionResolver.Packages" should be
+        // used instead "ActionResolver.UrlFilters" and "ActionResolver.PackageFilters"
+        //
+        // filterParams.put("ActionResolver.UrlFilters", "target/classes, target/test-classes");
+        // filterParams.put("ActionResolver.PackageFilters", "eionet.cr.web.action.*");
+
+        filterParams.put("ActionResolver.Packages", "eionet.cr.web.action");
+        filterParams.put("ActionBeanContext.Class", "eionet.cr.web.context.CRActionBeanContext");
+
+        mockServletContext.addFilter(StripesFilter.class, "StripesFilter", filterParams);
+        mockServletContext.setServlet(DispatcherServlet.class, "StripesDispatcher", null);
+    }
 }

@@ -43,17 +43,17 @@
 
 <template match="app:collection">
 
-	<xsl:element name="app:Collection">
+    <xsl:element name="app:Collection">
         <xsl:attribute  name="rdf:about">
             <xsl:value-of select="@href" />
-        </xsl:attribute> 
+        </xsl:attribute>
         <xsl:for-each select="atom:title">
             <rdfs:label>
                 <xsl:apply-templates select="." mode="object"/>
             </rdfs:label>
         </xsl:for-each>
 
-</xsl:element>  
+</xsl:element>
 </template>
 
   <xsl:template match="*[not(*)]" mode="object">

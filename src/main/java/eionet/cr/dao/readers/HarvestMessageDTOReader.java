@@ -27,24 +27,24 @@ import eionet.cr.dto.HarvestMessageDTO;
 import eionet.cr.util.sql.SQLResultSetBaseReader;
 
 /**
- * 
+ *
  * @author heinljab
  *
  */
 public class HarvestMessageDTOReader extends SQLResultSetBaseReader<HarvestMessageDTO>{
 
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
-	 */
-	public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
+     */
+    public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
 
-		HarvestMessageDTO harvestMessageDTO = new HarvestMessageDTO();
-		harvestMessageDTO.setHarvestId(new Integer(rs.getInt("HARVEST_ID")));
-		harvestMessageDTO.setType(rs.getString("TYPE"));
-		harvestMessageDTO.setMessage(rs.getString("MESSAGE"));
-		harvestMessageDTO.setStackTrace(rs.getString("STACK_TRACE"));
-		harvestMessageDTO.setHarvestMessageId(new Integer(rs.getInt("HARVEST_MESSAGE_ID")));
-		resultList.add(harvestMessageDTO);
-	}
+        HarvestMessageDTO harvestMessageDTO = new HarvestMessageDTO();
+        harvestMessageDTO.setHarvestId(new Integer(rs.getInt("HARVEST_ID")));
+        harvestMessageDTO.setType(rs.getString("TYPE"));
+        harvestMessageDTO.setMessage(rs.getString("MESSAGE"));
+        harvestMessageDTO.setStackTrace(rs.getString("STACK_TRACE"));
+        harvestMessageDTO.setHarvestMessageId(new Integer(rs.getInt("HARVEST_MESSAGE_ID")));
+        resultList.add(harvestMessageDTO);
+    }
 }

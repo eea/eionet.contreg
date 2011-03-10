@@ -28,113 +28,113 @@ import eionet.cr.web.action.AbstractActionBean;
 
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
 public abstract class SearchResultColumn {
-	
-	protected static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("dd.MM.yy HH:mm:ss");
-	protected static final SimpleDateFormat DATE_ONLY_FORMAT = new SimpleDateFormat("dd.MM.yy");
 
-	/** */
-	private String title;
-	private boolean isSortable;
+    protected static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("dd.MM.yy HH:mm:ss");
+    protected static final SimpleDateFormat DATE_ONLY_FORMAT = new SimpleDateFormat("dd.MM.yy");
 
-	/** */
-	private boolean escapeXml;
-	private String actionRequestParameter;
-	
-	/** */
-	protected AbstractActionBean actionBean;
-	
-	/**
-	 * 
-	 */
-	public SearchResultColumn() {
-		//blank constructor
-	}
+    /** */
+    private String title;
+    private boolean isSortable;
 
-	/**
-	 * @param title
-	 * @param isSortable
-	 */
-	public SearchResultColumn(String title, boolean isSortable) {
-		this.title = title;
-		this.isSortable = isSortable;
-	}
+    /** */
+    private boolean escapeXml;
+    private String actionRequestParameter;
 
-	/**
-	 * 
-	 * @param object
-	 * @return
-	 */
-	public abstract String format(Object object);
+    /** */
+    protected AbstractActionBean actionBean;
 
-	/**
-	 * 
-	 * @param escapeXml
-	 */
-	public void setEscapeXml(boolean escapeXml) {
-		this.escapeXml = escapeXml;
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public abstract String getSortParamValue();
+    /**
+     *
+     */
+    public SearchResultColumn() {
+        //blank constructor
+    }
 
-	/**
-	 * @return the title
-	 */
-	public String getTitle() {
-		return title;
-	}
-	/**
-	 * @param title the title to set
-	 */
-	public void setTitle(String title) {
-		this.title = title;
-	}
-	/**
-	 * @return the isSortable
-	 */
-	public boolean isSortable() {
-		return isSortable;
-	}
-	/**
-	 * @param isSortable the isSortable to set
-	 */
-	public void setSortable(boolean isSortable) {
-		this.isSortable = isSortable;
-	}
+    /**
+     * @param title
+     * @param isSortable
+     */
+    public SearchResultColumn(String title, boolean isSortable) {
+        this.title = title;
+        this.isSortable = isSortable;
+    }
 
-	/**
-	 * @return the actionRequestParameter
-	 */
-	public String getActionRequestParameter() {
-		return actionRequestParameter;
-	}
+    /**
+     *
+     * @param object
+     * @return
+     */
+    public abstract String format(Object object);
 
-	/**
-	 * @param actionRequestParameter the actionRequestParameter to set
-	 */
-	public void setActionRequestParameter(String actionRequestParameter) {
-		this.actionRequestParameter = actionRequestParameter;
-	}
+    /**
+     *
+     * @param escapeXml
+     */
+    public void setEscapeXml(boolean escapeXml) {
+        this.escapeXml = escapeXml;
+    }
 
-	/**
-	 * @return the actionBean
-	 */
-	public AbstractActionBean getActionBean() {
-		return actionBean;
-	}
+    /**
+     *
+     * @return
+     */
+    public abstract String getSortParamValue();
 
-	/**
-	 * @param actionBean the actionBean to set
-	 */
-	public void setActionBean(AbstractActionBean actionBean) {
-		this.actionBean = actionBean;
-	}
+    /**
+     * @return the title
+     */
+    public String getTitle() {
+        return title;
+    }
+    /**
+     * @param title the title to set
+     */
+    public void setTitle(String title) {
+        this.title = title;
+    }
+    /**
+     * @return the isSortable
+     */
+    public boolean isSortable() {
+        return isSortable;
+    }
+    /**
+     * @param isSortable the isSortable to set
+     */
+    public void setSortable(boolean isSortable) {
+        this.isSortable = isSortable;
+    }
+
+    /**
+     * @return the actionRequestParameter
+     */
+    public String getActionRequestParameter() {
+        return actionRequestParameter;
+    }
+
+    /**
+     * @param actionRequestParameter the actionRequestParameter to set
+     */
+    public void setActionRequestParameter(String actionRequestParameter) {
+        this.actionRequestParameter = actionRequestParameter;
+    }
+
+    /**
+     * @return the actionBean
+     */
+    public AbstractActionBean getActionBean() {
+        return actionBean;
+    }
+
+    /**
+     * @param actionBean the actionBean to set
+     */
+    public void setActionBean(AbstractActionBean actionBean) {
+        this.actionBean = actionBean;
+    }
 }

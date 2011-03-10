@@ -19,61 +19,61 @@ import eionet.cr.harvest.PullHarvest;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
 public class RDFExporterTest extends CRDatabaseTestCase{
 
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.test.helpers.CRDatabaseTestCase#getDataSet()
-	 */
-	protected IDataSet getDataSet() throws Exception {
-			return getXmlDataSet("emptydb.xml");
-	}
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.test.helpers.CRDatabaseTestCase#getDataSet()
+     */
+    protected IDataSet getDataSet() throws Exception {
+            return getXmlDataSet("emptydb.xml");
+    }
 
-	/**
-	 * @throws DAOException 
-	 * @throws HarvestException 
-	 * @throws MalformedURLException 
-	 * 
-	 */
-	public void testTriplesReader() throws DAOException, HarvestException, MalformedURLException{
-		
-		String uri = "http://www.eionet.europa.eu/gemet/concept/7697";
+    /**
+     * @throws DAOException
+     * @throws HarvestException
+     * @throws MalformedURLException
+     *
+     */
+    public void testTriplesReader() throws DAOException, HarvestException, MalformedURLException{
 
-		DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(uri, 100, false, null);
+        String uri = "http://www.eionet.europa.eu/gemet/concept/7697";
 
-		URL url = new URL(uri);
-		Harvest harvest = new PullHarvest(url.toString(), null);
-		harvest.execute();
+        DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(uri, 100, false, null);
 
-		Long sourceHash = Hashes.spoHash(uri);
+        URL url = new URL(uri);
+        Harvest harvest = new PullHarvest(url.toString(), null);
+        harvest.execute();
 
-		SubjectDTO subject = DAOFactory.get().getDao(HelperDAO.class).getSubject(sourceHash);
-		assertNotNull(subject);
-	}
-	
-	/**
-	 * 
-	 */
-	public void testGetKnownNamespace(){
-		
-		assertEquals("rdf", NamespaceUtil.getKnownNamespace("http://www.w3.org/1999/02/22-rdf-syntax-ns#"));
-		assertEquals("rdfs", NamespaceUtil.getKnownNamespace("http://www.w3.org/2000/01/rdf-schema#"));
-		assertEquals("owl", NamespaceUtil.getKnownNamespace("http://www.w3.org/2002/07/owl#"));
-		assertEquals("dc", NamespaceUtil.getKnownNamespace("http://purl.org/dc/elements/1.1/"));
-		assertEquals("eper", NamespaceUtil.getKnownNamespace("http://rdfdata.eionet.europa.eu/eper/dataflow"));
-	}
-	
-	/**
-	 * 
-	 */
-	public void testGetPredicate(){
-		
-		assertEquals("predicate1", NamespaceUtil.extractLocalName("http://www.w3.org/1999/02/22-rdf-syntax-ns#predicate1"));
-		assertEquals("predicate1", NamespaceUtil.extractLocalName("http://www.w3.org/1999/02/22-rdf-syntax-ns/predicate1"));
-	}
+        Long sourceHash = Hashes.spoHash(uri);
+
+        SubjectDTO subject = DAOFactory.get().getDao(HelperDAO.class).getSubject(sourceHash);
+        assertNotNull(subject);
+    }
+
+    /**
+     *
+     */
+    public void testGetKnownNamespace(){
+
+        assertEquals("rdf", NamespaceUtil.getKnownNamespace("http://www.w3.org/1999/02/22-rdf-syntax-ns#"));
+        assertEquals("rdfs", NamespaceUtil.getKnownNamespace("http://www.w3.org/2000/01/rdf-schema#"));
+        assertEquals("owl", NamespaceUtil.getKnownNamespace("http://www.w3.org/2002/07/owl#"));
+        assertEquals("dc", NamespaceUtil.getKnownNamespace("http://purl.org/dc/elements/1.1/"));
+        assertEquals("eper", NamespaceUtil.getKnownNamespace("http://rdfdata.eionet.europa.eu/eper/dataflow"));
+    }
+
+    /**
+     *
+     */
+    public void testGetPredicate(){
+
+        assertEquals("predicate1", NamespaceUtil.extractLocalName("http://www.w3.org/1999/02/22-rdf-syntax-ns#predicate1"));
+        assertEquals("predicate1", NamespaceUtil.extractLocalName("http://www.w3.org/1999/02/22-rdf-syntax-ns/predicate1"));
+    }
 
 }

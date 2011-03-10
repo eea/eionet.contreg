@@ -32,87 +32,87 @@ import eionet.cr.util.pagination.PagingRequest;
 
 /**
  * JUnit test tests HarvestSourceDAO functionality.
- * 
+ *
  * @author altnyris
  *
  */
 public class HarvestSourceDAOTest extends CRDatabaseTestCase {
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.dbunit.DatabaseTestCase#getDataSet()
-	 */
-	protected IDataSet getDataSet() throws Exception {
-		return getXmlDataSet("sources-harvests-messages.xml");
-	}
-	
-	@Test
-	public void testAddSource() throws Exception {
-		
-		HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
-		Integer harvestSourceID = dao.addSource("http://rod.eionet.europa.eu/testObligations",
-				0, false, "bob@europe.eu");
-		assertNotNull(harvestSourceID);
-		
-		HarvestSourceDTO harvestSource = dao.getHarvestSourceById(harvestSourceID);
-		assertEquals("bob@europe.eu", harvestSource.getEmails());
-		assertEquals("http://rod.eionet.europa.eu/testObligations", harvestSource.getUrl());
-		assertEquals("bob@europe.eu", harvestSource.getEmails());
-	}
-	
-	@Test
-	public void testGetHarvestSourceByUrl() throws Exception{
-		
-		HarvestSourceDTO dto =
-			DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(
-					"http://www.eionet.europa.eu/seris/rdf");
-		assertNotNull(dto);
-	}
-	
-	@Test
-	public void testGetHarvestSources() throws Exception {
-		
-		
-		Pair<Integer,List<HarvestSourceDTO>> result = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSources("", PagingRequest.create(1,100), null);
-		assertNotNull(result);
-		assertNotNull(result.getRight());
-		assertEquals(42, result.getRight().size());
-	}
-	
-	@Test
-	public void testEditSource() throws Exception {
-		
-		// get the source by URL
-		HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
-		HarvestSourceDTO harvestSource = dao.getHarvestSourceByUrl(
-				"http://www.eionet.europa.eu/seris/rdf");
-		assertNotNull(harvestSource);
-		
-		// change the URL of the source
-		harvestSource.setUrl("http://www.eionet.europa.eu/seris/rdf-dummy");
-		dao.editSource(harvestSource);
-		
-		// get the source by previous URL again- now it must be null
-		assertNull(dao.getHarvestSourceByUrl("http://www.eionet.europa.eu/seris/rdf"));
-		
-		// get the source by new URL, it must not be null
-		assertNotNull(dao.getHarvestSourceByUrl("http://www.eionet.europa.eu/seris/rdf-dummy"));
-	}
-	
-	@Test
-	public void testDeleteSource() throws Exception {
+    /*
+     * (non-Javadoc)
+     * @see org.dbunit.DatabaseTestCase#getDataSet()
+     */
+    protected IDataSet getDataSet() throws Exception {
+        return getXmlDataSet("sources-harvests-messages.xml");
+    }
 
-		// get the source's ID
-		HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
-		HarvestSourceDTO dto = dao.getHarvestSourceByUrl("http://localhost:8080/cr/pages/test.xml");
-		assertNotNull(dto);
-		assertNotNull(dto.getSourceId());
+    @Test
+    public void testAddSource() throws Exception {
 
-		// delete the source
-		dao.deleteSourceByUrl("http://localhost:8080/cr/pages/test.xml");
-		
-		// now get the source by ID- it must be null now
-		dto = dao.getHarvestSourceById(dto.getSourceId());
-		assertNull(dto);
-	}
+        HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
+        Integer harvestSourceID = dao.addSource("http://rod.eionet.europa.eu/testObligations",
+                0, false, "bob@europe.eu");
+        assertNotNull(harvestSourceID);
+
+        HarvestSourceDTO harvestSource = dao.getHarvestSourceById(harvestSourceID);
+        assertEquals("bob@europe.eu", harvestSource.getEmails());
+        assertEquals("http://rod.eionet.europa.eu/testObligations", harvestSource.getUrl());
+        assertEquals("bob@europe.eu", harvestSource.getEmails());
+    }
+
+    @Test
+    public void testGetHarvestSourceByUrl() throws Exception{
+
+        HarvestSourceDTO dto =
+            DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(
+                    "http://www.eionet.europa.eu/seris/rdf");
+        assertNotNull(dto);
+    }
+
+    @Test
+    public void testGetHarvestSources() throws Exception {
+
+
+        Pair<Integer,List<HarvestSourceDTO>> result = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSources("", PagingRequest.create(1,100), null);
+        assertNotNull(result);
+        assertNotNull(result.getRight());
+        assertEquals(42, result.getRight().size());
+    }
+
+    @Test
+    public void testEditSource() throws Exception {
+
+        // get the source by URL
+        HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
+        HarvestSourceDTO harvestSource = dao.getHarvestSourceByUrl(
+                "http://www.eionet.europa.eu/seris/rdf");
+        assertNotNull(harvestSource);
+
+        // change the URL of the source
+        harvestSource.setUrl("http://www.eionet.europa.eu/seris/rdf-dummy");
+        dao.editSource(harvestSource);
+
+        // get the source by previous URL again- now it must be null
+        assertNull(dao.getHarvestSourceByUrl("http://www.eionet.europa.eu/seris/rdf"));
+
+        // get the source by new URL, it must not be null
+        assertNotNull(dao.getHarvestSourceByUrl("http://www.eionet.europa.eu/seris/rdf-dummy"));
+    }
+
+    @Test
+    public void testDeleteSource() throws Exception {
+
+        // get the source's ID
+        HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
+        HarvestSourceDTO dto = dao.getHarvestSourceByUrl("http://localhost:8080/cr/pages/test.xml");
+        assertNotNull(dto);
+        assertNotNull(dto.getSourceId());
+
+        // delete the source
+        dao.deleteSourceByUrl("http://localhost:8080/cr/pages/test.xml");
+
+        // now get the source by ID- it must be null now
+        dto = dao.getHarvestSourceById(dto.getSourceId());
+        assertNull(dto);
+    }
 }

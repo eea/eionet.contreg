@@ -35,53 +35,53 @@ import eionet.cr.util.pagination.PagingRequest;
  */
 
 public class PostgreFilteredTypeSearchHelper extends PostgreFilteredSearchHelper {
-	
-	private String type = null;
-	private long typeHash = 0;
 
-	public PostgreFilteredTypeSearchHelper(Map<String, String> filters, Set<String> literalPredicates,
-			PagingRequest pagingRequest, SortingRequest sortingRequest) {
-		
-		super(filters, literalPredicates, pagingRequest, sortingRequest);
-		
-		String type = null;
-		
-		if(filters!=null && !filters.isEmpty() && filters.containsKey(Predicates.RDF_TYPE)){
-			type= filters.get(Predicates.RDF_TYPE);
-		}		
-		if (type==null){
-			throw new CRRuntimeException("Type URI can not be empty!");
-		}	
-		setUseCache(true);
-		setType(type);
-		removeFilter(Predicates.RDF_TYPE);
-	}
+    private String type = null;
+    private long typeHash = 0;
 
-	public void setType(String type){
-		this.type = type;
-		this.typeHash = Hashes.spoHash(type);
-	}
-	protected String getSpoTableName(){
-		return isUseCache() ? 
-				"CACHE_SPO_TYPE_SUBJECT":
-					super.getSpoTableName();
-	}
+    public PostgreFilteredTypeSearchHelper(Map<String, String> filters, Set<String> literalPredicates,
+            PagingRequest pagingRequest, SortingRequest sortingRequest) {
 
-	protected String getSpoTableCriteria(){
-		return isUseCache() ? 
-			"SPO1.OBJECT_HASH=" + typeHash :
-				super.getSpoTableCriteria();
-	}
-	public void setUserCache(boolean useCache){
-		super.setUseCache(useCache);
-		if(!useCache){
-			addFilter(Predicates.RDF_TYPE, this.type);
-		}
-	}
-	protected int getSpoTableIndex(){
-		return 2;
-	}
-	public String getUnorderedQueryWithoutDistinct(List<Object> inParams) {
-		return getUnorderedQuery(inParams, "select SPO1.SUBJECT as SUBJECT_HASH from " + getSpoTableName()+ " as SPO1 ");
-	}		
+        super(filters, literalPredicates, pagingRequest, sortingRequest);
+
+        String type = null;
+
+        if(filters!=null && !filters.isEmpty() && filters.containsKey(Predicates.RDF_TYPE)){
+            type= filters.get(Predicates.RDF_TYPE);
+        }
+        if (type==null){
+            throw new CRRuntimeException("Type URI can not be empty!");
+        }
+        setUseCache(true);
+        setType(type);
+        removeFilter(Predicates.RDF_TYPE);
+    }
+
+    public void setType(String type){
+        this.type = type;
+        this.typeHash = Hashes.spoHash(type);
+    }
+    protected String getSpoTableName(){
+        return isUseCache() ?
+                "CACHE_SPO_TYPE_SUBJECT":
+                    super.getSpoTableName();
+    }
+
+    protected String getSpoTableCriteria(){
+        return isUseCache() ?
+            "SPO1.OBJECT_HASH=" + typeHash :
+                super.getSpoTableCriteria();
+    }
+    public void setUserCache(boolean useCache){
+        super.setUseCache(useCache);
+        if(!useCache){
+            addFilter(Predicates.RDF_TYPE, this.type);
+        }
+    }
+    protected int getSpoTableIndex(){
+        return 2;
+    }
+    public String getUnorderedQueryWithoutDistinct(List<Object> inParams) {
+        return getUnorderedQuery(inParams, "select SPO1.SUBJECT as SUBJECT_HASH from " + getSpoTableName()+ " as SPO1 ");
+    }
 }

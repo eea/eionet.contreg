@@ -28,28 +28,28 @@ import java.util.Map;
 import eionet.cr.dao.readers.ResultSetReaderException;
 
 /**
- * 
+ *
  * @author heinljab
  *
  */
 public class SQLValueReader extends SQLResultSetBaseReader<Map<String,SQLValue>>{
-	
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.util.sql.ResultSetReader#readRow(java.sql.ResultSet)
-	 */
-	public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
-		
-		int colCount = resultSetMetaData.getColumnCount();
-		Map<String,SQLValue> rowMap = new HashMap<String,SQLValue>();
-		for (int i=1; i<=colCount; i++){
-			String colName = resultSetMetaData.getColumnName(i);
-			int colSQLType = resultSetMetaData.getColumnType(i);
-			rowMap.put(colName, new SQLValue(rs.getObject(i), colSQLType));
-		}
-		
-		if (rowMap.size()>0){
-			resultList.add(rowMap);
-		}
-	}
+
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.util.sql.ResultSetReader#readRow(java.sql.ResultSet)
+     */
+    public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
+
+        int colCount = resultSetMetaData.getColumnCount();
+        Map<String,SQLValue> rowMap = new HashMap<String,SQLValue>();
+        for (int i=1; i<=colCount; i++){
+            String colName = resultSetMetaData.getColumnName(i);
+            int colSQLType = resultSetMetaData.getColumnType(i);
+            rowMap.put(colName, new SQLValue(rs.getObject(i), colSQLType));
+        }
+
+        if (rowMap.size()>0){
+            resultList.add(rowMap);
+        }
+    }
 }

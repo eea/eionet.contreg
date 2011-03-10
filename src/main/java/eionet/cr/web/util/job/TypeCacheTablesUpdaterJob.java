@@ -30,35 +30,35 @@ import eionet.cr.dao.HelperDAO;
 
 /**
  * background job to perform database updates on type cache tables
- * 
+ *
  * @author Enriko Käsper
  * <a href="mailto:enriko.kasper@tieto.com">Enriko Käsper</a>
  */
 public class TypeCacheTablesUpdaterJob implements StatefulJob {
-	
-	private static final Logger logger = Logger.getLogger(TypeCacheTablesUpdaterJob.class);
 
-	/** 
-	 * @see org.quartz.Job#execute(org.quartz.JobExecutionContext)
-	 * {@inheritDoc}
-	 */
-	public void execute(JobExecutionContext context) throws JobExecutionException {
-		try {
-			logger.debug("Executing database update on type cache tables");
-			
-			DAOFactory.get().getDao(
-					HelperDAO.class).updateTypeDataCache();
-			logger.debug("type cache tables update job finished");
-			
-		}catch (Exception ignored) {
-			logger.error("Exception is thrown while updating type cache tables", ignored);
-		} finally {
-			try {
-				context.getScheduler().resumeAll();
-			} catch (Exception fatal) {
-				throw new RuntimeException("couldn't resume the scheduler");
-			}
-		}
-	}
+    private static final Logger logger = Logger.getLogger(TypeCacheTablesUpdaterJob.class);
+
+    /**
+     * @see org.quartz.Job#execute(org.quartz.JobExecutionContext)
+     * {@inheritDoc}
+     */
+    public void execute(JobExecutionContext context) throws JobExecutionException {
+        try {
+            logger.debug("Executing database update on type cache tables");
+
+            DAOFactory.get().getDao(
+                    HelperDAO.class).updateTypeDataCache();
+            logger.debug("type cache tables update job finished");
+
+        }catch (Exception ignored) {
+            logger.error("Exception is thrown while updating type cache tables", ignored);
+        } finally {
+            try {
+                context.getScheduler().resumeAll();
+            } catch (Exception fatal) {
+                throw new RuntimeException("couldn't resume the scheduler");
+            }
+        }
+    }
 
 }

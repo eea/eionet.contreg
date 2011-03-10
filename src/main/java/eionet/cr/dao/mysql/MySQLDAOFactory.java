@@ -36,62 +36,62 @@ import eionet.cr.dao.UrgentHarvestQueueDAO;
 
 
 /**
- * 
+ *
  * @author heinljab, altnyris
  *
  */
 public final class MySQLDAOFactory extends DAOFactory{
-	
-	/** */
-	private static MySQLDAOFactory instance;
-	private Map<Class<? extends DAO>, Class<? extends MySQLBaseDAO>> registeredDaos;
 
-	/**
-	 * 
-	 */
-	private MySQLDAOFactory() {
-		init();
-	}
+    /** */
+    private static MySQLDAOFactory instance;
+    private Map<Class<? extends DAO>, Class<? extends MySQLBaseDAO>> registeredDaos;
 
-	/**
-	 * 
-	 */
-	private void init() {
-		registeredDaos = new HashMap<Class<? extends DAO>, Class<? extends MySQLBaseDAO>>();
-		registeredDaos.put(HarvestDAO.class, MySQLHarvestDAO.class);
-		registeredDaos.put(HarvestMessageDAO.class, MySQLHarvestMessageDAO.class);
-		registeredDaos.put(HarvestSourceDAO.class, MySQLHarvestSourceDAO.class);
-		registeredDaos.put(HelperDAO.class, MySQLHelperDAO.class);
-		registeredDaos.put(SearchDAO.class, MySQLSearchDAO.class);
-		registeredDaos.put(UrgentHarvestQueueDAO.class, MySQLUrgentHarvestQueueDAO.class);
-		registeredDaos.put(SpoBinaryDAO.class, MySQLSpoBinaryDAO.class);
-	}
+    /**
+     *
+     */
+    private MySQLDAOFactory() {
+        init();
+    }
 
-	/**
-	 * 
-	 * @return
-	 */
-	public static MySQLDAOFactory get() {
-		if(instance == null) {
-			instance = new MySQLDAOFactory();
-		}
-		return instance;
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.dao.DAOFactory#getDao(java.lang.Class)
-	 */
-	@SuppressWarnings("unchecked")
-	public <T extends DAO> T getDao(Class<T> implementedInterface) {
-		
-		//due to synchronization problems we have to create DAOs for each method invocation.
-		try {
-			Class implClass = registeredDaos.get(implementedInterface);
-			return (T) implClass.newInstance();
-		}
-		catch (Exception fatal) {
-			throw new RuntimeException(fatal);
-		}
-	}
+    /**
+     *
+     */
+    private void init() {
+        registeredDaos = new HashMap<Class<? extends DAO>, Class<? extends MySQLBaseDAO>>();
+        registeredDaos.put(HarvestDAO.class, MySQLHarvestDAO.class);
+        registeredDaos.put(HarvestMessageDAO.class, MySQLHarvestMessageDAO.class);
+        registeredDaos.put(HarvestSourceDAO.class, MySQLHarvestSourceDAO.class);
+        registeredDaos.put(HelperDAO.class, MySQLHelperDAO.class);
+        registeredDaos.put(SearchDAO.class, MySQLSearchDAO.class);
+        registeredDaos.put(UrgentHarvestQueueDAO.class, MySQLUrgentHarvestQueueDAO.class);
+        registeredDaos.put(SpoBinaryDAO.class, MySQLSpoBinaryDAO.class);
+    }
+
+    /**
+     *
+     * @return
+     */
+    public static MySQLDAOFactory get() {
+        if(instance == null) {
+            instance = new MySQLDAOFactory();
+        }
+        return instance;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.dao.DAOFactory#getDao(java.lang.Class)
+     */
+    @SuppressWarnings("unchecked")
+    public <T extends DAO> T getDao(Class<T> implementedInterface) {
+
+        //due to synchronization problems we have to create DAOs for each method invocation.
+        try {
+            Class implClass = registeredDaos.get(implementedInterface);
+            return (T) implClass.newInstance();
+        }
+        catch (Exception fatal) {
+            throw new RuntimeException(fatal);
+        }
+    }
 }

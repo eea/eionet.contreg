@@ -33,27 +33,27 @@ import eionet.cr.util.Pair;
  */
 public class PairReader<T, T1> extends SQLResultSetBaseReader<Pair<T, T1>> {
 
-	/** */
-	public static final String LEFTCOL = "LCOL";
-	public static final String RIGHTCOL = "RCOL";
-	
-	/** 
-	 * @see eionet.cr.util.sql.ResultSetListReader#getResultList()
-	 * {@inheritDoc}
-	 */
-	@Override
-	public List<Pair<T, T1>> getResultList() {
-		return resultList;
-	}
+    /** */
+    public static final String LEFTCOL = "LCOL";
+    public static final String RIGHTCOL = "RCOL";
 
-	/** 
-	 * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
-	 * {@inheritDoc}
-	 */
-	@Override
-	@SuppressWarnings("unchecked")
-	public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
-		resultList.add(new Pair<T, T1>((T)rs.getObject(LEFTCOL), (T1)rs.getObject(RIGHTCOL)));
-	}
-	
+    /**
+     * @see eionet.cr.util.sql.ResultSetListReader#getResultList()
+     * {@inheritDoc}
+     */
+    @Override
+    public List<Pair<T, T1>> getResultList() {
+        return resultList;
+    }
+
+    /**
+     * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
+     * {@inheritDoc}
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
+        resultList.add(new Pair<T, T1>((T)rs.getObject(LEFTCOL), (T1)rs.getObject(RIGHTCOL)));
+    }
+
 }

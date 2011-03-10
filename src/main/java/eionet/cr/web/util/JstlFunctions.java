@@ -43,326 +43,326 @@ import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.columns.SearchResultColumn;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
 public class JstlFunctions {
 
-	/**
-	 * Parses the given string with a whitespace tokenizer and looks up the first
-	 * token whose length exceeds <tt>cutAtLength</tt>. If such a token is found, returns
-	 * the given string's <code>substring(0, i + cutAtLength) + "..."</code>, where <code>i</code>
-	 * is the start index of the found token.
-	 * If no tokens are found that exceed the length of <tt>cutAtLength</tt>, then this method
-	 * simply return the given string.
-	 * 
-	 * @return
-	 */
-	public static java.lang.String cutAtFirstLongToken(java.lang.String str, int cutAtLength){
-		
-		if (str==null)
-			return "";
-		
-		String firstLongToken = null;
-		StringTokenizer st = new StringTokenizer(str);
-		while (st.hasMoreTokens()){
-			String token = st.nextToken();
-			if (token.length()>cutAtLength){
-				firstLongToken = token;
-				break;
-			}
-		}
-		
-		if (firstLongToken!=null){
-			int i = str.indexOf(firstLongToken);
-			StringBuffer buf = new StringBuffer(str.substring(0, i+cutAtLength));
-			return buf.append("...").toString();
-		}
-		else
-			return str;
-	}
-	
-	/**
-	 * Checks if the given string (after being trimmed first) contains any whitespace. If yes, returns
-	 * the given string surrounded by quotes. Otherwise returns the given string.
-	 * If the given string is <code>null</code>, returns null.
-	 * 
-	 * @param str
-	 * @return
-	 */
-	public static java.lang.String addQuotesIfWhitespaceInside(java.lang.String str){
-		
-		if (str==null || str.trim().length()==0)
-			return str;
-		
-		if (!Util.hasWhiteSpace(str.trim()))
-			return str;
-		else
-			return "\"" + str + "\"";
-	}
+    /**
+     * Parses the given string with a whitespace tokenizer and looks up the first
+     * token whose length exceeds <tt>cutAtLength</tt>. If such a token is found, returns
+     * the given string's <code>substring(0, i + cutAtLength) + "..."</code>, where <code>i</code>
+     * is the start index of the found token.
+     * If no tokens are found that exceed the length of <tt>cutAtLength</tt>, then this method
+     * simply return the given string.
+     *
+     * @return
+     */
+    public static java.lang.String cutAtFirstLongToken(java.lang.String str, int cutAtLength){
 
-	/**
-	 * 
-	 * @param userName
-	 * @param aclName
-	 * @param permission
-	 * @return
-	 */
-	public static boolean hasPermission(java.lang.String userName, java.lang.String aclName, java.lang.String permission){
-		return CRUser.hasPermission(userName, aclName, permission);
-	}
+        if (str==null)
+            return "";
 
-	/**
-	 * Returns a string that is constructed by concatenating the given bean request's getRequestURI() + "?" +
-	 * the given bean request's getQueryString(), and replacing the sort predicate with the given one.
-	 * The present sort order is replaced by the opposite.
-	 * 
-	 * @param request
-	 * @param sortP
-	 * @param sortO
-	 * @return
-	 */
-	public static String sortUrl(AbstractActionBean actionBean, SearchResultColumn column){
-		
-		HttpServletRequest request = actionBean.getContext().getRequest();
-		StringBuffer buf = new StringBuffer(actionBean.getUrlBinding());
-		buf.append("?");
-		if (StringUtils.isBlank(column.getActionRequestParameter())) {
-			
-			if (!StringUtils.isBlank(request.getQueryString())){
-				
-				QueryString queryString = QueryString.createQueryString(request);
-				queryString.removeParameters(actionBean.excludeFromSortAndPagingUrls());
-				buf.append(queryString.toURLFormat());
-			}
-		}
-		else {
-			buf.append(column.getActionRequestParameter());
-		}
-		
-		String sortParamValue = column.getSortParamValue();
-		if (sortParamValue==null)
-			sortParamValue = "";
-		
-		String curValue = request.getParameter("sortP");
-		if (curValue!=null){
-			buf = new StringBuffer(
-					StringUtils.replace(buf.toString(), "sortP=" + Util.urlEncode(curValue), "sortP=" + Util.urlEncode(sortParamValue)));
-		}
-		else
-			buf.append("&amp;sortP=").append(Util.urlEncode(sortParamValue)); 
+        String firstLongToken = null;
+        StringTokenizer st = new StringTokenizer(str);
+        while (st.hasMoreTokens()){
+            String token = st.nextToken();
+            if (token.length()>cutAtLength){
+                firstLongToken = token;
+                break;
+            }
+        }
 
-		curValue = request.getParameter("sortO");
-		if (curValue!=null)
-			buf = new StringBuffer(StringUtils.replace(buf.toString(), "sortO=" + curValue, "sortO=" + SortOrder.oppositeSortOrder(curValue)));
-		else
-			buf.append("&amp;sortO=").append(SortOrder.oppositeSortOrder(curValue)); 
+        if (firstLongToken!=null){
+            int i = str.indexOf(firstLongToken);
+            StringBuffer buf = new StringBuffer(str.substring(0, i+cutAtLength));
+            return buf.append("...").toString();
+        }
+        else
+            return str;
+    }
 
-		String result = buf.toString();
-		return result.startsWith("/") ? result.substring(1) : result;
-	}
-	
-	/**
-	 * Finds the label for the given predicate in the given predicate-label map.
-	 * If there is no match, then looks for the last occurrence of '#' or '/' or ':' in the predicate.
-	 * If such an occurrence is found, returns everything after that occurrence.
-	 * Otherwise returns the predicate as it was given.
-	 * 
-	 * @param predicateLabels
-	 * @param predicate
-	 * @return
-	 */
-	public static String getPredicateLabel(Map predicateLabels, String predicate){
+    /**
+     * Checks if the given string (after being trimmed first) contains any whitespace. If yes, returns
+     * the given string surrounded by quotes. Otherwise returns the given string.
+     * If the given string is <code>null</code>, returns null.
+     *
+     * @param str
+     * @return
+     */
+    public static java.lang.String addQuotesIfWhitespaceInside(java.lang.String str){
 
-		Object o = predicateLabels==null ? null : predicateLabels.get(predicate);
-		String label = o==null ? null : o.toString();
-		if (StringUtils.isBlank(label)){
-			int last = Math.max(Math.max(predicate.lastIndexOf('#'), predicate.lastIndexOf('/')), predicate.lastIndexOf(':'));
-			if (last>=0){
-				label = predicate.substring(last+1);
-			}
-		}
-		
-		return StringUtils.isBlank(label) ? predicate : label;
-	}
-	
-	/**
-	 * 
-	 * @param subjectDTO
-	 * @param predicates
-	 * @param object
-	 * @return
-	 */
-	public static boolean subjectHasPredicateObject(SubjectDTO subjectDTO, Set predicates, String object){
-		
-		boolean result = false;
-		
-		if (predicates==null)
-			return result;
-		
-		for (Iterator i=predicates.iterator(); i.hasNext();){
-			if (subjectDTO.hasPredicateObject(i.next().toString(), object)){
-				result = true;
-				break;
-			}
-		}
-			
-		return result;
-	}
-	
-	/**
-	 * 
-	 * @param objects
-	 * @param findObjectHash
-	 * @return
-	 */
-	public static boolean isSourceToAny(long objectHash, Collection objects){
-		
-		boolean result = false;
-		for (Iterator i=objects.iterator(); i.hasNext();){
-			ObjectDTO objectDTO = (ObjectDTO)i.next();
-			if (objectHash == objectDTO.getSourceObjectHash()){
-				result = true;
-				break;
-			}
-		}
-		
-		return result;
-	}
-	
-	/**
-	 * Returns a color for the given source by supplying the source's hash to the
-	 * <code>Colors.colorByModulus(long)</code>.
-	 * 
-	 * @param source
-	 * @return
-	 */
-	public static String colorForSource(String source){
-		
-		return Colors.toKML(Colors.colorByModulus(Hashes.spoHash(source==null ? "" : source)), false);
-	}
-	
-	/**
-	 * 
-	 * @param s
-	 * @return
-	 */
-	public static String urlEncode(String s){
-		
-		return Util.urlEncode(s);
-	}
-	
-	/**
-	 * 
-	 * @param column
-	 * @param object
-	 * @param actionBean
-	 * @return
-	 */
-	public static String format(SearchResultColumn column, Object object, AbstractActionBean actionBean){
-		column.setActionBean(actionBean);
-		return column.format(object);
-	}
+        if (str==null || str.trim().length()==0)
+            return str;
 
-	/**
-	 * 
-	 * @param s
-	 * @return
-	 */
-	public static long spoHash(String s){
-		return Hashes.spoHash(s);
-	}
-	
-	/**
-	 * 
-	 * @param subject
-	 * @param predicate
-	 * @return
-	 */
-	public static String getObjectLiteral(SubjectDTO subject, String predicate){
-		
-		if (subject==null)
-			return "";
-		
-		ObjectDTO object = subject.getObject(predicate, ObjectDTO.Type.LITERAL);
-		return object==null ? "" : object.getValue();
-	}
-	
-	/**
-	 * 
-	 * @param actionBean
-	 * @param object
-	 * @return
-	 */
-	public static boolean isObjectInAcceptedLanguage(AbstractActionBean actionBean, ObjectDTO object){
-		
-		return actionBean.getAcceptedLanguages().contains(Util.normalizeHTTPAcceptedLanguage(object.getLanguage()));
-	}
+        if (!Util.hasWhiteSpace(str.trim()))
+            return str;
+        else
+            return "\"" + str + "\"";
+    }
 
-	/**
-	 * 
-	 * @param object
-	 * @return
-	 */
-	public static String rawModeTitle(ObjectDTO object, Collection allObjects){
-		
-		StringBuffer buf = new StringBuffer();
-		if (object!=null){
-			
-			buf.append("[Type: ").append(object.isLiteral() ? "Literal" : object.isAnonymous() ? "Anonymous resource" : "Resource");
-			buf.append("]   [Inferred from object: ").append(getMatchingObjectValue(object.getSourceObjectHash(), allObjects));
-			buf.append("]   [Inferred from source: ").append(StringUtils.isBlank(object.getDerivSourceUri()) ? object.getDerivSourceHash() : object.getDerivSourceUri());
-			buf.append("]");
-		}
-		return buf.toString();
-	}
-	
-	/**
-	 * 
-	 * @param hash
-	 * @param objects
-	 * @return
-	 */
-	private static String getMatchingObjectValue(long hash, Collection objects){
-		
-		String result = String.valueOf(hash);
-		if (hash!=0 && objects!=null && !objects.isEmpty()){
-			for (Object o:objects){
-				ObjectDTO object = (ObjectDTO)o;
-				if (object.getHash()==hash){
-					result = object.getValue();
-					break;
-				}
-			}
-		}
-		return result;
-		
-	}
+    /**
+     *
+     * @param userName
+     * @param aclName
+     * @param permission
+     * @return
+     */
+    public static boolean hasPermission(java.lang.String userName, java.lang.String aclName, java.lang.String permission){
+        return CRUser.hasPermission(userName, aclName, permission);
+    }
 
-	/**
-	 * 
-	 * @param objectValue
-	 * @param pageContext
-	 * @return
-	 */
-	public static boolean isObjectValueDisplayed(String predicate, String objectValue, PageContext pageContext){
-		
-		boolean result = false;		
-		if (predicate!=null){
-			
-			String previousPredicate = (String)pageContext.getAttribute("prevPredicate");
-			HashSet<String> objectValues = (HashSet<String>)pageContext.getAttribute("displayedObjectValues");
-			if (objectValues==null || previousPredicate==null || !predicate.equals(previousPredicate)){
-				objectValues = new HashSet<String>();
-				pageContext.setAttribute("displayedObjectValues", objectValues);
-			}
-			
-			result = objectValues.contains(objectValue);		
-			pageContext.setAttribute("prevPredicate", predicate);
-			objectValues.add(objectValue);
-		}
-		
-		return result;
-	}
+    /**
+     * Returns a string that is constructed by concatenating the given bean request's getRequestURI() + "?" +
+     * the given bean request's getQueryString(), and replacing the sort predicate with the given one.
+     * The present sort order is replaced by the opposite.
+     *
+     * @param request
+     * @param sortP
+     * @param sortO
+     * @return
+     */
+    public static String sortUrl(AbstractActionBean actionBean, SearchResultColumn column){
+
+        HttpServletRequest request = actionBean.getContext().getRequest();
+        StringBuffer buf = new StringBuffer(actionBean.getUrlBinding());
+        buf.append("?");
+        if (StringUtils.isBlank(column.getActionRequestParameter())) {
+
+            if (!StringUtils.isBlank(request.getQueryString())){
+
+                QueryString queryString = QueryString.createQueryString(request);
+                queryString.removeParameters(actionBean.excludeFromSortAndPagingUrls());
+                buf.append(queryString.toURLFormat());
+            }
+        }
+        else {
+            buf.append(column.getActionRequestParameter());
+        }
+
+        String sortParamValue = column.getSortParamValue();
+        if (sortParamValue==null)
+            sortParamValue = "";
+
+        String curValue = request.getParameter("sortP");
+        if (curValue!=null){
+            buf = new StringBuffer(
+                    StringUtils.replace(buf.toString(), "sortP=" + Util.urlEncode(curValue), "sortP=" + Util.urlEncode(sortParamValue)));
+        }
+        else
+            buf.append("&amp;sortP=").append(Util.urlEncode(sortParamValue));
+
+        curValue = request.getParameter("sortO");
+        if (curValue!=null)
+            buf = new StringBuffer(StringUtils.replace(buf.toString(), "sortO=" + curValue, "sortO=" + SortOrder.oppositeSortOrder(curValue)));
+        else
+            buf.append("&amp;sortO=").append(SortOrder.oppositeSortOrder(curValue));
+
+        String result = buf.toString();
+        return result.startsWith("/") ? result.substring(1) : result;
+    }
+
+    /**
+     * Finds the label for the given predicate in the given predicate-label map.
+     * If there is no match, then looks for the last occurrence of '#' or '/' or ':' in the predicate.
+     * If such an occurrence is found, returns everything after that occurrence.
+     * Otherwise returns the predicate as it was given.
+     *
+     * @param predicateLabels
+     * @param predicate
+     * @return
+     */
+    public static String getPredicateLabel(Map predicateLabels, String predicate){
+
+        Object o = predicateLabels==null ? null : predicateLabels.get(predicate);
+        String label = o==null ? null : o.toString();
+        if (StringUtils.isBlank(label)){
+            int last = Math.max(Math.max(predicate.lastIndexOf('#'), predicate.lastIndexOf('/')), predicate.lastIndexOf(':'));
+            if (last>=0){
+                label = predicate.substring(last+1);
+            }
+        }
+
+        return StringUtils.isBlank(label) ? predicate : label;
+    }
+
+    /**
+     *
+     * @param subjectDTO
+     * @param predicates
+     * @param object
+     * @return
+     */
+    public static boolean subjectHasPredicateObject(SubjectDTO subjectDTO, Set predicates, String object){
+
+        boolean result = false;
+
+        if (predicates==null)
+            return result;
+
+        for (Iterator i=predicates.iterator(); i.hasNext();){
+            if (subjectDTO.hasPredicateObject(i.next().toString(), object)){
+                result = true;
+                break;
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     *
+     * @param objects
+     * @param findObjectHash
+     * @return
+     */
+    public static boolean isSourceToAny(long objectHash, Collection objects){
+
+        boolean result = false;
+        for (Iterator i=objects.iterator(); i.hasNext();){
+            ObjectDTO objectDTO = (ObjectDTO)i.next();
+            if (objectHash == objectDTO.getSourceObjectHash()){
+                result = true;
+                break;
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Returns a color for the given source by supplying the source's hash to the
+     * <code>Colors.colorByModulus(long)</code>.
+     *
+     * @param source
+     * @return
+     */
+    public static String colorForSource(String source){
+
+        return Colors.toKML(Colors.colorByModulus(Hashes.spoHash(source==null ? "" : source)), false);
+    }
+
+    /**
+     *
+     * @param s
+     * @return
+     */
+    public static String urlEncode(String s){
+
+        return Util.urlEncode(s);
+    }
+
+    /**
+     *
+     * @param column
+     * @param object
+     * @param actionBean
+     * @return
+     */
+    public static String format(SearchResultColumn column, Object object, AbstractActionBean actionBean){
+        column.setActionBean(actionBean);
+        return column.format(object);
+    }
+
+    /**
+     *
+     * @param s
+     * @return
+     */
+    public static long spoHash(String s){
+        return Hashes.spoHash(s);
+    }
+
+    /**
+     *
+     * @param subject
+     * @param predicate
+     * @return
+     */
+    public static String getObjectLiteral(SubjectDTO subject, String predicate){
+
+        if (subject==null)
+            return "";
+
+        ObjectDTO object = subject.getObject(predicate, ObjectDTO.Type.LITERAL);
+        return object==null ? "" : object.getValue();
+    }
+
+    /**
+     *
+     * @param actionBean
+     * @param object
+     * @return
+     */
+    public static boolean isObjectInAcceptedLanguage(AbstractActionBean actionBean, ObjectDTO object){
+
+        return actionBean.getAcceptedLanguages().contains(Util.normalizeHTTPAcceptedLanguage(object.getLanguage()));
+    }
+
+    /**
+     *
+     * @param object
+     * @return
+     */
+    public static String rawModeTitle(ObjectDTO object, Collection allObjects){
+
+        StringBuffer buf = new StringBuffer();
+        if (object!=null){
+
+            buf.append("[Type: ").append(object.isLiteral() ? "Literal" : object.isAnonymous() ? "Anonymous resource" : "Resource");
+            buf.append("]   [Inferred from object: ").append(getMatchingObjectValue(object.getSourceObjectHash(), allObjects));
+            buf.append("]   [Inferred from source: ").append(StringUtils.isBlank(object.getDerivSourceUri()) ? object.getDerivSourceHash() : object.getDerivSourceUri());
+            buf.append("]");
+        }
+        return buf.toString();
+    }
+
+    /**
+     *
+     * @param hash
+     * @param objects
+     * @return
+     */
+    private static String getMatchingObjectValue(long hash, Collection objects){
+
+        String result = String.valueOf(hash);
+        if (hash!=0 && objects!=null && !objects.isEmpty()){
+            for (Object o:objects){
+                ObjectDTO object = (ObjectDTO)o;
+                if (object.getHash()==hash){
+                    result = object.getValue();
+                    break;
+                }
+            }
+        }
+        return result;
+
+    }
+
+    /**
+     *
+     * @param objectValue
+     * @param pageContext
+     * @return
+     */
+    public static boolean isObjectValueDisplayed(String predicate, String objectValue, PageContext pageContext){
+
+        boolean result = false;
+        if (predicate!=null){
+
+            String previousPredicate = (String)pageContext.getAttribute("prevPredicate");
+            HashSet<String> objectValues = (HashSet<String>)pageContext.getAttribute("displayedObjectValues");
+            if (objectValues==null || previousPredicate==null || !predicate.equals(previousPredicate)){
+                objectValues = new HashSet<String>();
+                pageContext.setAttribute("displayedObjectValues", objectValues);
+            }
+
+            result = objectValues.contains(objectValue);
+            pageContext.setAttribute("prevPredicate", predicate);
+            objectValues.add(objectValue);
+        }
+
+        return result;
+    }
 }

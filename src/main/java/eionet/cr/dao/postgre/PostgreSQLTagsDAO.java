@@ -32,34 +32,34 @@ import eionet.cr.util.Pair;
 import eionet.cr.util.sql.PairReader;
 
 /**
- * 
+ *
  * @author <a href="mailto:enriko.kasper@tieto.com">Enriko Käsper</a>
  *
  */
 
 public class PostgreSQLTagsDAO extends PostgreSQLBaseDAO implements TagsDAO{
 
-	private static final String getTagsWithFrequencies_SQL =
-		"select OBJECT as LCOL, count(*) as RCOL from SPO where PREDICATE =? " +
-			"group by object order by RCOL desc";
+    private static final String getTagsWithFrequencies_SQL =
+        "select OBJECT as LCOL, count(*) as RCOL from SPO where PREDICATE =? " +
+            "group by object order by RCOL desc";
 
-	@Override
-	public List<TagDTO> getTagCloud() throws DAOException {
-		
-		PairReader<String, Long> pairReader = new PairReader<String, Long>();
-		List<Long> params = new ArrayList<Long>();
-		params.add(Hashes.spoHash(Predicates.CR_TAG));
-		
-		executeSQL(getTagsWithFrequencies_SQL, params, pairReader);
-		List<Pair<String,Long>> pairList = pairReader.getResultList();
-		
-		List<TagDTO> resultList = new ArrayList<TagDTO>(pairList.size());
-		int maxTagCount = pairList.size()>0 ? pairList.get(0).getRight().intValue() : 0;
-		
-		for (Pair<String, Long> tagPair : pairList){
-			resultList.add(new TagDTO(tagPair.getLeft(), tagPair.getRight().intValue(), maxTagCount));
-		}		
-		return resultList;
-	}
+    @Override
+    public List<TagDTO> getTagCloud() throws DAOException {
+
+        PairReader<String, Long> pairReader = new PairReader<String, Long>();
+        List<Long> params = new ArrayList<Long>();
+        params.add(Hashes.spoHash(Predicates.CR_TAG));
+
+        executeSQL(getTagsWithFrequencies_SQL, params, pairReader);
+        List<Pair<String,Long>> pairList = pairReader.getResultList();
+
+        List<TagDTO> resultList = new ArrayList<TagDTO>(pairList.size());
+        int maxTagCount = pairList.size()>0 ? pairList.get(0).getRight().intValue() : 0;
+
+        for (Pair<String, Long> tagPair : pairList){
+            resultList.add(new TagDTO(tagPair.getLeft(), tagPair.getRight().intValue(), maxTagCount));
+        }
+        return resultList;
+    }
 
 }

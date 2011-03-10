@@ -26,33 +26,33 @@ import eionet.cr.dto.HarvestSourceDTO;
 
 /**
  * Basic implementation of {@link SearchResultColumn}.
- * 
+ *
  * @author Aleksandr Ivanov
  * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
 public class GenericColumn extends SearchResultColumn {
 
-	/** 
-	 * @see eionet.cr.web.util.columns.SearchResultColumn#format(java.lang.Object)
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String format(Object object) {
-		if (object instanceof HarvestSourceDTO) {
-			return "<input type='checkbox' value='" 
-					+ StringEscapeUtils.escapeHtml(((HarvestSourceDTO) object).getUrl()) 
-					+ "' name='sourceUrl'/>";
-		}
-		return "";
-	}
+    /**
+     * @see eionet.cr.web.util.columns.SearchResultColumn#format(java.lang.Object)
+     * {@inheritDoc}
+     */
+    @Override
+    public String format(Object object) {
+        if (object instanceof HarvestSourceDTO) {
+            return "<input type='checkbox' value='"
+                    + StringEscapeUtils.escapeHtml(((HarvestSourceDTO) object).getUrl())
+                    + "' name='sourceUrl'/>";
+        }
+        return "";
+    }
 
-	/** 
-	 * @see eionet.cr.web.util.columns.SearchResultColumn#getSortParamValue()
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String getSortParamValue() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /**
+     * @see eionet.cr.web.util.columns.SearchResultColumn#getSortParamValue()
+     * {@inheritDoc}
+     */
+    @Override
+    public String getSortParamValue() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

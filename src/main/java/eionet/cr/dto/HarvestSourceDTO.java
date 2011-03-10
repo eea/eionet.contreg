@@ -31,217 +31,217 @@ import java.util.Date;
  *
  */
 public class HarvestSourceDTO implements Serializable {
-	
-	/**
-	 * serial.
-	 */
-	private static final long serialVersionUID = 1L;
-	/** */
-	public static final int COUNT_UNAVAIL_THRESHOLD = 5;
-	public static final int DEFAULT_REFERRALS_INTERVAL = 60480;
-	
-	/** */
-	private Integer sourceId;
-	private String url;
-	private String emails;
-	private boolean trackedFile;
-	private Date timeCreated;
-	private Integer statements;
-	private Integer resources;
-	private Integer countUnavail;
-	private Date lastHarvest;
-	private boolean lastHarvestFailed;
-	private Integer intervalMinutes;
-	private Long urlHash;
-	
-	/**
-	 * 
-	 */
-	public HarvestSourceDTO(){
-	}
 
-	/**
-	 * @return the sourceId
-	 */
-	public Integer getSourceId() {
-		return sourceId;
-	}
+    /**
+     * serial.
+     */
+    private static final long serialVersionUID = 1L;
+    /** */
+    public static final int COUNT_UNAVAIL_THRESHOLD = 5;
+    public static final int DEFAULT_REFERRALS_INTERVAL = 60480;
 
-	/**
-	 * @param sourceId the sourceId to set
-	 */
-	public void setSourceId(Integer sourceId) {
-		this.sourceId = sourceId;
-	}
+    /** */
+    private Integer sourceId;
+    private String url;
+    private String emails;
+    private boolean trackedFile;
+    private Date timeCreated;
+    private Integer statements;
+    private Integer resources;
+    private Integer countUnavail;
+    private Date lastHarvest;
+    private boolean lastHarvestFailed;
+    private Integer intervalMinutes;
+    private Long urlHash;
 
-	/**
-	 * @return the url
-	 */
-	public String getUrl() {
-		return url;
-	}
+    /**
+     *
+     */
+    public HarvestSourceDTO(){
+    }
 
-	/**
-	 * @param url the url to set
-	 */
-	public void setUrl(String url) {
-		this.url = url;
-	}
+    /**
+     * @return the sourceId
+     */
+    public Integer getSourceId() {
+        return sourceId;
+    }
 
-	/**
-	 * @return the emails
-	 */
-	public String getEmails() {
-		return emails;
-	}
+    /**
+     * @param sourceId the sourceId to set
+     */
+    public void setSourceId(Integer sourceId) {
+        this.sourceId = sourceId;
+    }
 
-	/**
-	 * @param emails the emails to set
-	 */
-	public void setEmails(String emails) {
-		this.emails = emails;
-	}
+    /**
+     * @return the url
+     */
+    public String getUrl() {
+        return url;
+    }
 
-	/**
-	 * @return the timeCreated
-	 */
-	public Date getTimeCreated() {
-		return timeCreated;
-	}
+    /**
+     * @param url the url to set
+     */
+    public void setUrl(String url) {
+        this.url = url;
+    }
 
-	/**
-	 * @param timeCreated the timeCreated to set
-	 */
-	public void setTimeCreated(Date timeCreated) {
-		this.timeCreated = timeCreated;
-	}
+    /**
+     * @return the emails
+     */
+    public String getEmails() {
+        return emails;
+    }
 
-	/**
-	 * @return the statements
-	 */
-	public Integer getStatements() {
-		return statements;
-	}
+    /**
+     * @param emails the emails to set
+     */
+    public void setEmails(String emails) {
+        this.emails = emails;
+    }
 
-	/**
-	 * @param statements the statements to set
-	 */
-	public void setStatements(Integer statements) {
-		this.statements = statements;
-	}
+    /**
+     * @return the timeCreated
+     */
+    public Date getTimeCreated() {
+        return timeCreated;
+    }
 
-	/**
-	 * @return the resources
-	 */
-	public Integer getResources() {
-		return resources;
-	}
+    /**
+     * @param timeCreated the timeCreated to set
+     */
+    public void setTimeCreated(Date timeCreated) {
+        this.timeCreated = timeCreated;
+    }
 
-	/**
-	 * @param resources the resources to set
-	 */
-	public void setResources(Integer resources) {
-		this.resources = resources;
-	}
+    /**
+     * @return the statements
+     */
+    public Integer getStatements() {
+        return statements;
+    }
 
-	/**
-	 * @return the countUnavail
-	 */
-	public Integer getCountUnavail() {
-		return countUnavail;
-	}
+    /**
+     * @param statements the statements to set
+     */
+    public void setStatements(Integer statements) {
+        this.statements = statements;
+    }
 
-	/**
-	 * @param countUnavail the countUnavail to set
-	 */
-	public void setCountUnavail(Integer countUnavail) {
-		this.countUnavail = countUnavail;
-	}
+    /**
+     * @return the resources
+     */
+    public Integer getResources() {
+        return resources;
+    }
 
-	/**
-	 * 
-	 * @return
-	 */
-	public boolean isUnavailable(){
-		
-		return countUnavail!=null && countUnavail.intValue()>=COUNT_UNAVAIL_THRESHOLD;
-	}
+    /**
+     * @param resources the resources to set
+     */
+    public void setResources(Integer resources) {
+        this.resources = resources;
+    }
 
-	/**
-	 */
-	public Integer getIntervalMinutes() {
-		return intervalMinutes;
-	}
+    /**
+     * @return the countUnavail
+     */
+    public Integer getCountUnavail() {
+        return countUnavail;
+    }
 
-	/**
-	 */
-	public void setIntervalMinutes(Integer intervalMinutes) {
-		this.intervalMinutes = intervalMinutes;
-	}
+    /**
+     * @param countUnavail the countUnavail to set
+     */
+    public void setCountUnavail(Integer countUnavail) {
+        this.countUnavail = countUnavail;
+    }
 
-	/**
-	 * @return the lastHarvest
-	 */
-	public Date getLastHarvest() {
-		return lastHarvest;
-	}
+    /**
+     *
+     * @return
+     */
+    public boolean isUnavailable(){
 
-	/**
-	 * @param lastHarvest the lastHarvest to set
-	 */
-	public void setLastHarvest(Date lastHarvest) {
-		this.lastHarvest = lastHarvest;
-	}
-	
-	/**
-	 * @return the trackedFile
-	 */
-	public boolean isTrackedFile() {
-		return trackedFile;
-	}
+        return countUnavail!=null && countUnavail.intValue()>=COUNT_UNAVAIL_THRESHOLD;
+    }
 
-	/**
-	 * @param trackedFile the trackedFile to set
-	 */
-	public void setTrackedFile(boolean trackedFile) {
-		this.trackedFile = trackedFile;
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	public String toString(){
-		return new StringBuffer().append("Harvest source ").append(url).toString();
-	}
+    /**
+     */
+    public Integer getIntervalMinutes() {
+        return intervalMinutes;
+    }
 
-	/**
-	 * @return the lastHarvestFailed
-	 */
-	public boolean isLastHarvestFailed() {
-		return lastHarvestFailed;
-	}
+    /**
+     */
+    public void setIntervalMinutes(Integer intervalMinutes) {
+        this.intervalMinutes = intervalMinutes;
+    }
 
-	/**
-	 * @param lastHarvestFailed the lastHarvestFailed to set
-	 */
-	public void setLastHarvestFailed(boolean lastHarvestFailed) {
-		this.lastHarvestFailed = lastHarvestFailed;
-	}
+    /**
+     * @return the lastHarvest
+     */
+    public Date getLastHarvest() {
+        return lastHarvest;
+    }
 
-	/**
-	 * @return the urlHash
-	 */
-	public Long getUrlHash() {
-		return urlHash;
-	}
+    /**
+     * @param lastHarvest the lastHarvest to set
+     */
+    public void setLastHarvest(Date lastHarvest) {
+        this.lastHarvest = lastHarvest;
+    }
 
-	/**
-	 * @param urlHash the urlHash to set
-	 */
-	public void setUrlHash(Long urlHash) {
-		this.urlHash = urlHash;
-	}
+    /**
+     * @return the trackedFile
+     */
+    public boolean isTrackedFile() {
+        return trackedFile;
+    }
 
-	
+    /**
+     * @param trackedFile the trackedFile to set
+     */
+    public void setTrackedFile(boolean trackedFile) {
+        this.trackedFile = trackedFile;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    public String toString(){
+        return new StringBuffer().append("Harvest source ").append(url).toString();
+    }
+
+    /**
+     * @return the lastHarvestFailed
+     */
+    public boolean isLastHarvestFailed() {
+        return lastHarvestFailed;
+    }
+
+    /**
+     * @param lastHarvestFailed the lastHarvestFailed to set
+     */
+    public void setLastHarvestFailed(boolean lastHarvestFailed) {
+        this.lastHarvestFailed = lastHarvestFailed;
+    }
+
+    /**
+     * @return the urlHash
+     */
+    public Long getUrlHash() {
+        return urlHash;
+    }
+
+    /**
+     * @param urlHash the urlHash to set
+     */
+    public void setUrlHash(Long urlHash) {
+        this.urlHash = urlHash;
+    }
+
+
 }

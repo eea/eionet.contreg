@@ -47,190 +47,190 @@ import eionet.cr.web.util.job.TypeCacheTablesUpdaterJob;
 import eionet.cr.web.util.job.TypeCacheUpdater;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
 @SuppressWarnings("unchecked")
 public class JobScheduler implements ServletContextListener{
-	
-	/** */
-	private static Log logger = LogFactory.getLog(JobScheduler.class);
 
-	/** */
-	private static Scheduler quartzScheduler = null;
-	
-	private static final Pair<String, JobDetail>[] intervalJobs;
-	private static final Pair<String, JobDetail>[] cronJobs;
-	
-	static {
-		intervalJobs = new Pair[]{
-				new Pair(
-						GeneralConfig.DATAFLOW_PICKLIST_CACHE_UPDATE_INTERVAL,
-						new JobDetail(
-								DataflowSearchPicklistCacheUpdater.class.getSimpleName(),
-								JobScheduler.class.getName(),
-								DataflowSearchPicklistCacheUpdater.class)),
-				new Pair(
-						GeneralConfig.RECENT_DISCOVERED_FILES_CACHE_UPDATE_INTERVAL,
-						new JobDetail(
-								RecentResourcesCacheUpdater.class.getSimpleName(),
-								JobScheduler.class.getName(),
-								RecentResourcesCacheUpdater.class)),
-				new Pair(
-						GeneralConfig.TAG_CLOUD_CACHE_UPDATE_INTERVAL,
-						new JobDetail(
-								TagCloudCacheUpdater.class.getSimpleName(),
-								JobScheduler.class.getName(),
-								TagCloudCacheUpdater.class)),
-				new Pair(
-						GeneralConfig.TYPE_CACHE_UPDATE_INTERVAL,
-						new JobDetail(
-								TypeCacheUpdater.class.getSimpleName(),
-								JobScheduler.class.getName(),
-								TypeCacheUpdater.class))	
-		};
-		
-		cronJobs = new Pair[]{
-				new Pair(
-						GeneralConfig.GARBAGE_COLLECTOR_CRON_JOB,
-						new JobDetail(
-								GarbageCollectorJob.class.getSimpleName(),
-								JobScheduler.class.getName(),
-								GarbageCollectorJob.class)),
-				new Pair(
-						GeneralConfig.TYPE_CACHE_UPDATER_CRON_JOB,
-						new JobDetail(
-								TypeCacheTablesUpdaterJob.class.getSimpleName(),
-								JobScheduler.class.getName(),
-								TypeCacheTablesUpdaterJob.class))							
-		};
-		
-	}
-	
-	/**
-	 * 
-	 * @return
-	 * @throws SchedulerException 
-	 */
-	private static void init() throws SchedulerException{
-		
-		SchedulerFactory schedFact = new StdSchedulerFactory();
-		quartzScheduler = schedFact.getScheduler();
-		quartzScheduler.start();
-	}
+    /** */
+    private static Log logger = LogFactory.getLog(JobScheduler.class);
 
-	/**
-	 * 
-	 * @param cronExpression
-	 * @param jobDetails
-	 * @throws SchedulerException 
-	 * @throws ParseException 
-	 */
-	public static synchronized void scheduleCronJob(String cronExpression, JobDetail jobDetails) throws SchedulerException, ParseException{
-		
-		CronTrigger trigger = new CronTrigger(jobDetails.getName(), jobDetails.getGroup());
-		trigger.setCronExpression(cronExpression);
+    /** */
+    private static Scheduler quartzScheduler = null;
 
-		if (quartzScheduler==null)
-			init();
-		
-		quartzScheduler.scheduleJob(jobDetails, trigger);
-	}
+    private static final Pair<String, JobDetail>[] intervalJobs;
+    private static final Pair<String, JobDetail>[] cronJobs;
 
-	/**
-	 * 
-	 * @param repeatInterval
-	 * @param jobDetails
-	 * @throws SchedulerException
-	 * @throws ParseException
-	 */
-	public static synchronized void scheduleIntervalJob(long repeatInterval, JobDetail jobDetails) throws SchedulerException, ParseException{
-		
-		SimpleTrigger trigger = new SimpleTrigger(jobDetails.getName(), jobDetails.getGroup());
-		trigger.setRepeatInterval(repeatInterval);
-		trigger.setRepeatCount(SimpleTrigger.REPEAT_INDEFINITELY);
+    static {
+        intervalJobs = new Pair[]{
+                new Pair(
+                        GeneralConfig.DATAFLOW_PICKLIST_CACHE_UPDATE_INTERVAL,
+                        new JobDetail(
+                                DataflowSearchPicklistCacheUpdater.class.getSimpleName(),
+                                JobScheduler.class.getName(),
+                                DataflowSearchPicklistCacheUpdater.class)),
+                new Pair(
+                        GeneralConfig.RECENT_DISCOVERED_FILES_CACHE_UPDATE_INTERVAL,
+                        new JobDetail(
+                                RecentResourcesCacheUpdater.class.getSimpleName(),
+                                JobScheduler.class.getName(),
+                                RecentResourcesCacheUpdater.class)),
+                new Pair(
+                        GeneralConfig.TAG_CLOUD_CACHE_UPDATE_INTERVAL,
+                        new JobDetail(
+                                TagCloudCacheUpdater.class.getSimpleName(),
+                                JobScheduler.class.getName(),
+                                TagCloudCacheUpdater.class)),
+                new Pair(
+                        GeneralConfig.TYPE_CACHE_UPDATE_INTERVAL,
+                        new JobDetail(
+                                TypeCacheUpdater.class.getSimpleName(),
+                                JobScheduler.class.getName(),
+                                TypeCacheUpdater.class))
+        };
 
-		if (quartzScheduler==null)
-			init();
-		
-		quartzScheduler.scheduleJob(jobDetails, trigger);
-	}
+        cronJobs = new Pair[]{
+                new Pair(
+                        GeneralConfig.GARBAGE_COLLECTOR_CRON_JOB,
+                        new JobDetail(
+                                GarbageCollectorJob.class.getSimpleName(),
+                                JobScheduler.class.getName(),
+                                GarbageCollectorJob.class)),
+                new Pair(
+                        GeneralConfig.TYPE_CACHE_UPDATER_CRON_JOB,
+                        new JobDetail(
+                                TypeCacheTablesUpdaterJob.class.getSimpleName(),
+                                JobScheduler.class.getName(),
+                                TypeCacheTablesUpdaterJob.class))
+        };
 
-	/**
-	 * 
-	 * @param jobListener
-	 * @throws SchedulerException 
-	 */
-	public static synchronized void registerJobListener(JobListener jobListener) throws SchedulerException{
-		
-		if (jobListener==null)
-			return;
-		
-		if (quartzScheduler==null)
-			init();
-		
-		quartzScheduler.addJobListener(jobListener);
-	}
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
-	 */
-	public void contextDestroyed(ServletContextEvent servletContextEvent) {
-		
-		if (quartzScheduler!=null){
-			try{
-				quartzScheduler.shutdown(false);
-			}
-			catch (SchedulerException e){
-			}
-		}
-	}
+    /**
+     *
+     * @return
+     * @throws SchedulerException
+     */
+    private static void init() throws SchedulerException{
 
-	/** 
-	 * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
-	 * {@inheritDoc}
-	 */
-	public void contextInitialized(ServletContextEvent sce) {
+        SchedulerFactory schedFact = new StdSchedulerFactory();
+        quartzScheduler = schedFact.getScheduler();
+        quartzScheduler.start();
+    }
 
-		// schedule interval jobs
-		
-		for (Pair<String,JobDetail> job : intervalJobs) {
-			
-			try{
-				String intervString = GeneralConfig.getProperty(job.getLeft());
-				
-				// if interval specified, then schedule the job, otherwise
-				// consider it administrator's will to not schedule this particular job
-				if (!StringUtils.isBlank(intervString)){
-					
-					scheduleIntervalJob(Long.parseLong(intervString), job.getRight());
-					logger.debug(job.getRight().getName() + " scheduled, interval=" + intervString);
-				}
-			}
-			catch (Exception e){
-				logger.fatal("Error when scheduling " + job.getRight().getName(), e);
-			}
-		}
-		
-		// schedule cron jobs
-		
-		for(Pair<String,JobDetail> job: cronJobs) {
-			try {
-				String cronString = GeneralConfig.getProperty(job.getLeft());
-				
-				// if cron-expression specified, then schedule the job, otherwise
-				// consider it administrator's will to not schedule this particular job
-				if (!StringUtils.isBlank(cronString)){
-					
-					scheduleCronJob(cronString, job.getRight());
-					logger.debug(job.getRight().getName() + " scheduled with cron " + cronString);
-				}
-			}
-			catch (Exception e) {
-				logger.fatal("Error when scheduling " + job.getRight().getName(), e);
-			}
-		}
-	}
+    /**
+     *
+     * @param cronExpression
+     * @param jobDetails
+     * @throws SchedulerException
+     * @throws ParseException
+     */
+    public static synchronized void scheduleCronJob(String cronExpression, JobDetail jobDetails) throws SchedulerException, ParseException{
+
+        CronTrigger trigger = new CronTrigger(jobDetails.getName(), jobDetails.getGroup());
+        trigger.setCronExpression(cronExpression);
+
+        if (quartzScheduler==null)
+            init();
+
+        quartzScheduler.scheduleJob(jobDetails, trigger);
+    }
+
+    /**
+     *
+     * @param repeatInterval
+     * @param jobDetails
+     * @throws SchedulerException
+     * @throws ParseException
+     */
+    public static synchronized void scheduleIntervalJob(long repeatInterval, JobDetail jobDetails) throws SchedulerException, ParseException{
+
+        SimpleTrigger trigger = new SimpleTrigger(jobDetails.getName(), jobDetails.getGroup());
+        trigger.setRepeatInterval(repeatInterval);
+        trigger.setRepeatCount(SimpleTrigger.REPEAT_INDEFINITELY);
+
+        if (quartzScheduler==null)
+            init();
+
+        quartzScheduler.scheduleJob(jobDetails, trigger);
+    }
+
+    /**
+     *
+     * @param jobListener
+     * @throws SchedulerException
+     */
+    public static synchronized void registerJobListener(JobListener jobListener) throws SchedulerException{
+
+        if (jobListener==null)
+            return;
+
+        if (quartzScheduler==null)
+            init();
+
+        quartzScheduler.addJobListener(jobListener);
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
+     */
+    public void contextDestroyed(ServletContextEvent servletContextEvent) {
+
+        if (quartzScheduler!=null){
+            try{
+                quartzScheduler.shutdown(false);
+            }
+            catch (SchedulerException e){
+            }
+        }
+    }
+
+    /**
+     * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
+     * {@inheritDoc}
+     */
+    public void contextInitialized(ServletContextEvent sce) {
+
+        // schedule interval jobs
+
+        for (Pair<String,JobDetail> job : intervalJobs) {
+
+            try{
+                String intervString = GeneralConfig.getProperty(job.getLeft());
+
+                // if interval specified, then schedule the job, otherwise
+                // consider it administrator's will to not schedule this particular job
+                if (!StringUtils.isBlank(intervString)){
+
+                    scheduleIntervalJob(Long.parseLong(intervString), job.getRight());
+                    logger.debug(job.getRight().getName() + " scheduled, interval=" + intervString);
+                }
+            }
+            catch (Exception e){
+                logger.fatal("Error when scheduling " + job.getRight().getName(), e);
+            }
+        }
+
+        // schedule cron jobs
+
+        for(Pair<String,JobDetail> job: cronJobs) {
+            try {
+                String cronString = GeneralConfig.getProperty(job.getLeft());
+
+                // if cron-expression specified, then schedule the job, otherwise
+                // consider it administrator's will to not schedule this particular job
+                if (!StringUtils.isBlank(cronString)){
+
+                    scheduleCronJob(cronString, job.getRight());
+                    logger.debug(job.getRight().getName() + " scheduled with cron " + cronString);
+                }
+            }
+            catch (Exception e) {
+                logger.fatal("Error when scheduling " + job.getRight().getName(), e);
+            }
+        }
+    }
 }

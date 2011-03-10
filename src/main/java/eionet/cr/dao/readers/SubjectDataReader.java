@@ -43,47 +43,47 @@ import eionet.cr.util.Util;
 import eionet.cr.util.YesNoBoolean;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
 public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO>{
 
-	/** */
-	private Map<Long,SubjectDTO> subjectsMap;
-	
-	/** */
-	private SubjectDTO currentSubject = null;
-	private String currentPredicate = null;
-	private Collection<ObjectDTO> currentObjects = null;
-	private Collection<Long> predicateHashes = null;
-	
-	private Map<String,Date> lastModifiedDates = new HashMap<String, Date>();
+    /** */
+    private Map<Long,SubjectDTO> subjectsMap;
 
-	/**
-	 * 
-	 * @param subjectsMap
-	 */
-	public SubjectDataReader(Map<Long,SubjectDTO> subjectsMap){
-		
-		this.subjectsMap = subjectsMap;
-	}
-	
-	/**
-	 * @param subjectUris
-	 * @param lastModifiedDates
-	 */
-	public SubjectDataReader(List<String> subjectUris, Map<String,Date> lastModifiedDates){
-		this.lastModifiedDates = lastModifiedDates;
-		subjectsMap = new LinkedHashMap<Long,SubjectDTO>();
-		for (String subjectUri : subjectUris){
-			Long subjectHash = Long.valueOf(Hashes.spoHash(subjectUri));
-			subjectsMap.put(subjectHash, null);
-		}
-	}
-	
-	/**
-     * 
+    /** */
+    private SubjectDTO currentSubject = null;
+    private String currentPredicate = null;
+    private Collection<ObjectDTO> currentObjects = null;
+    private Collection<Long> predicateHashes = null;
+
+    private Map<String,Date> lastModifiedDates = new HashMap<String, Date>();
+
+    /**
+     *
+     * @param subjectsMap
+     */
+    public SubjectDataReader(Map<Long,SubjectDTO> subjectsMap){
+
+        this.subjectsMap = subjectsMap;
+    }
+
+    /**
+     * @param subjectUris
+     * @param lastModifiedDates
+     */
+    public SubjectDataReader(List<String> subjectUris, Map<String,Date> lastModifiedDates){
+        this.lastModifiedDates = lastModifiedDates;
+        subjectsMap = new LinkedHashMap<Long,SubjectDTO>();
+        for (String subjectUri : subjectUris){
+            Long subjectHash = Long.valueOf(Hashes.spoHash(subjectUri));
+            subjectsMap.put(subjectHash, null);
+        }
+    }
+
+    /**
+     *
      * @param subjectUris
      */
     public SubjectDataReader(List<String> subjectUris){
@@ -94,149 +94,149 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO>{
         }
     }
 
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
-	 */
-	public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
-		
-		long subjectHash = rs.getLong("SUBJECT_HASH");
-		boolean newSubject = currentSubject==null || subjectHash!=currentSubject.getUriHash();
-		if (newSubject){
-			currentSubject = new SubjectDTO(rs.getString("SUBJECT_URI"), YesNoBoolean.parse(rs.getString("ANON_SUBJ")));
-			currentSubject.setUriHash(subjectHash);
-			currentSubject.setLastModifiedTime(new Date(rs.getLong("SUBJECT_MODIFIED")));
-			addNewSubject(subjectHash, currentSubject);
-		}
-		
-		String predicateUri = rs.getString("PREDICATE_URI");
-		boolean newPredicate = newSubject || currentPredicate==null || !currentPredicate.equals(predicateUri);
-		if (newPredicate){
-			currentPredicate = predicateUri;
-			currentObjects = new ArrayList<ObjectDTO>();
-			currentSubject.getPredicates().put(predicateUri, currentObjects);
-		}
-		
-		addPredicateHash(rs.getLong("PREDICATE_HASH"));
-		
-		ObjectDTO object = new ObjectDTO(rs.getString("OBJECT"),
-											rs.getString("OBJ_LANG"),
-											YesNoBoolean.parse(rs.getString("LIT_OBJ")),
-											YesNoBoolean.parse(rs.getString("ANON_OBJ")));
-		object.setHash(rs.getLong("OBJECT_HASH"));
-		object.setSourceUri(rs.getString("SOURCE_URI"));
-		object.setSourceHash(rs.getLong("SOURCE"));
-		object.setDerivSourceUri(rs.getString("DERIV_SOURCE_URI"));
-		object.setDerivSourceHash(rs.getLong("OBJ_DERIV_SOURCE"));
-		object.setSourceObjectHash(rs.getLong("OBJ_SOURCE_OBJECT"));
-		
-		currentObjects.add(object);
-	}
-	
-	/**
-	 * 
-	 * @param subjectHash
-	 * @param subjectDTO
-	 */
-	protected void addNewSubject(long subjectHash, SubjectDTO subjectDTO){
-		subjectsMap.put(Long.valueOf(subjectHash), currentSubject);
-	}
-	
-	/**
-	 * @param predicateHash 
-	 */
-	public void addPredicateHash(Long predicateHash){
-		
-		if (predicateHashes==null){
-			this.predicateHashes = new ArrayList<Long>();
-		}
-		if(!predicateHashes.contains(predicateHash)){
-			predicateHashes.add(predicateHash);
-		}
-	}
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
+     */
+    public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
 
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
-	 */
-	@Override
-	public void readRow(BindingSet bindingSet) {
-		
-		Value subjectValue = bindingSet.getValue("s");
-		String subjectUri = subjectValue.stringValue();
-		
-		boolean isAnonSubject = subjectValue instanceof BNode;
-		if (isAnonSubject && blankNodeUriPrefix!=null){			
-			subjectUri = blankNodeUriPrefix + subjectUri;
-		}
-		long subjectHash = Hashes.spoHash(subjectUri);
-		
-		boolean newSubject = currentSubject==null || subjectHash!=currentSubject.getUriHash();
-		if (newSubject){
-			currentSubject = new SubjectDTO(subjectUri, isAnonSubject);
-			currentSubject.setUriHash(subjectHash);
-			addNewSubject(subjectHash, currentSubject);
-		}
-		
-		String predicateUri = bindingSet.getValue("p").stringValue();
-		boolean newPredicate = newSubject || currentPredicate==null || !currentPredicate.equals(predicateUri);
-		if (newPredicate){
-			currentPredicate = predicateUri;
-			currentObjects = new ArrayList<ObjectDTO>();
-			currentSubject.getPredicates().put(predicateUri, currentObjects);
-		}
-		
-		addPredicateHash(Long.valueOf(Hashes.spoHash(predicateUri)));
-		
-		Value objectValue = bindingSet.getValue("o");
-		boolean isLiteral = objectValue instanceof Literal;
-		String objectLang = isLiteral ? ((Literal)objectValue).getLanguage() : null;
-		
-		ObjectDTO object = new ObjectDTO(objectValue.stringValue(),
-				objectLang==null ? "" : objectLang,
-				isLiteral,
-				objectValue instanceof BNode);
-		
-		object.setHash(Hashes.spoHash(objectValue.stringValue()));
-		
-		String sourceUri = bindingSet.getValue("g").stringValue();
-		long sourceHash = Hashes.spoHash(sourceUri);
-		
+        long subjectHash = rs.getLong("SUBJECT_HASH");
+        boolean newSubject = currentSubject==null || subjectHash!=currentSubject.getUriHash();
+        if (newSubject){
+            currentSubject = new SubjectDTO(rs.getString("SUBJECT_URI"), YesNoBoolean.parse(rs.getString("ANON_SUBJ")));
+            currentSubject.setUriHash(subjectHash);
+            currentSubject.setLastModifiedTime(new Date(rs.getLong("SUBJECT_MODIFIED")));
+            addNewSubject(subjectHash, currentSubject);
+        }
+
+        String predicateUri = rs.getString("PREDICATE_URI");
+        boolean newPredicate = newSubject || currentPredicate==null || !currentPredicate.equals(predicateUri);
+        if (newPredicate){
+            currentPredicate = predicateUri;
+            currentObjects = new ArrayList<ObjectDTO>();
+            currentSubject.getPredicates().put(predicateUri, currentObjects);
+        }
+
+        addPredicateHash(rs.getLong("PREDICATE_HASH"));
+
+        ObjectDTO object = new ObjectDTO(rs.getString("OBJECT"),
+                                            rs.getString("OBJ_LANG"),
+                                            YesNoBoolean.parse(rs.getString("LIT_OBJ")),
+                                            YesNoBoolean.parse(rs.getString("ANON_OBJ")));
+        object.setHash(rs.getLong("OBJECT_HASH"));
+        object.setSourceUri(rs.getString("SOURCE_URI"));
+        object.setSourceHash(rs.getLong("SOURCE"));
+        object.setDerivSourceUri(rs.getString("DERIV_SOURCE_URI"));
+        object.setDerivSourceHash(rs.getLong("OBJ_DERIV_SOURCE"));
+        object.setSourceObjectHash(rs.getLong("OBJ_SOURCE_OBJECT"));
+
+        currentObjects.add(object);
+    }
+
+    /**
+     *
+     * @param subjectHash
+     * @param subjectDTO
+     */
+    protected void addNewSubject(long subjectHash, SubjectDTO subjectDTO){
+        subjectsMap.put(Long.valueOf(subjectHash), currentSubject);
+    }
+
+    /**
+     * @param predicateHash
+     */
+    public void addPredicateHash(Long predicateHash){
+
+        if (predicateHashes==null){
+            this.predicateHashes = new ArrayList<Long>();
+        }
+        if(!predicateHashes.contains(predicateHash)){
+            predicateHashes.add(predicateHash);
+        }
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
+     */
+    @Override
+    public void readRow(BindingSet bindingSet) {
+
+        Value subjectValue = bindingSet.getValue("s");
+        String subjectUri = subjectValue.stringValue();
+
+        boolean isAnonSubject = subjectValue instanceof BNode;
+        if (isAnonSubject && blankNodeUriPrefix!=null){
+            subjectUri = blankNodeUriPrefix + subjectUri;
+        }
+        long subjectHash = Hashes.spoHash(subjectUri);
+
+        boolean newSubject = currentSubject==null || subjectHash!=currentSubject.getUriHash();
+        if (newSubject){
+            currentSubject = new SubjectDTO(subjectUri, isAnonSubject);
+            currentSubject.setUriHash(subjectHash);
+            addNewSubject(subjectHash, currentSubject);
+        }
+
+        String predicateUri = bindingSet.getValue("p").stringValue();
+        boolean newPredicate = newSubject || currentPredicate==null || !currentPredicate.equals(predicateUri);
+        if (newPredicate){
+            currentPredicate = predicateUri;
+            currentObjects = new ArrayList<ObjectDTO>();
+            currentSubject.getPredicates().put(predicateUri, currentObjects);
+        }
+
+        addPredicateHash(Long.valueOf(Hashes.spoHash(predicateUri)));
+
+        Value objectValue = bindingSet.getValue("o");
+        boolean isLiteral = objectValue instanceof Literal;
+        String objectLang = isLiteral ? ((Literal)objectValue).getLanguage() : null;
+
+        ObjectDTO object = new ObjectDTO(objectValue.stringValue(),
+                objectLang==null ? "" : objectLang,
+                isLiteral,
+                objectValue instanceof BNode);
+
+        object.setHash(Hashes.spoHash(objectValue.stringValue()));
+
+        String sourceUri = bindingSet.getValue("g").stringValue();
+        long sourceHash = Hashes.spoHash(sourceUri);
+
         if(lastModifiedDates.containsKey(sourceUri))
             currentSubject.setLastModifiedTime(lastModifiedDates.get(sourceUri));
-		
-		object.setSourceUri(sourceUri);
-		object.setSourceHash(sourceHash);
-		object.setDerivSourceUri(sourceUri);
-		object.setDerivSourceHash(sourceHash);
-		
-		// TODO: what about object's source object
-		// object.setSourceObjectHash(rs.getLong("OBJ_SOURCE_OBJECT"));
-		
-		currentObjects.add(object);
-	}
 
-	/**
-	 * @return String
-	 * 
-	 */
-	public String getPredicateHashesCommaSeparated() {
-		return Util.toCSV(predicateHashes);
-	}
+        object.setSourceUri(sourceUri);
+        object.setSourceHash(sourceHash);
+        object.setDerivSourceUri(sourceUri);
+        object.setDerivSourceHash(sourceHash);
 
-	/** 
-	 * @see eionet.cr.util.sql.ResultSetListReader#getResultList()
-	 * {@inheritDoc}
-	 */
-	@Override
-	public List<SubjectDTO> getResultList() {
-		return new LinkedList<SubjectDTO>( subjectsMap.values());
-	}
+        // TODO: what about object's source object
+        // object.setSourceObjectHash(rs.getLong("OBJ_SOURCE_OBJECT"));
 
-	/**
-	 * @return the subjectsMap
-	 */
-	public Map<Long, SubjectDTO> getSubjectsMap() {
-		return subjectsMap;
-	}
+        currentObjects.add(object);
+    }
+
+    /**
+     * @return String
+     *
+     */
+    public String getPredicateHashesCommaSeparated() {
+        return Util.toCSV(predicateHashes);
+    }
+
+    /**
+     * @see eionet.cr.util.sql.ResultSetListReader#getResultList()
+     * {@inheritDoc}
+     */
+    @Override
+    public List<SubjectDTO> getResultList() {
+        return new LinkedList<SubjectDTO>( subjectsMap.values());
+    }
+
+    /**
+     * @return the subjectsMap
+     */
+    public Map<Long, SubjectDTO> getSubjectsMap() {
+        return subjectsMap;
+    }
 }

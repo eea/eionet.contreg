@@ -36,88 +36,88 @@ import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.util.sql.SQLUtil;
 
 /**
- * The class tests different methods in PostgreSQLBaseDAO class 
+ * The class tests different methods in PostgreSQLBaseDAO class
  * @author <a href="mailto:enriko.kasper@tieto.com">Enriko Käsper</a>, Tieto Estonia
  */
 
 public class BaseDAOTest  extends CRDatabaseTestCase {
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.dbunit.DatabaseTestCase#getDataSet()
-	 */
-	@Override	
-	protected IDataSet getDataSet() throws Exception {
-		return getXmlDataSet("types-db.xml");
-	}
-	
-
-	
-	/**
-	 * 
-	 * @throws DAOException
-	 */
-	@Test
-	public void testGetSubjectsDataWithPredicate() throws DAOException {
-		MockPostgreSQLBaseDAO baseDAO = new MockPostgreSQLBaseDAO();
-		
-		Map<Long,SubjectDTO> subjectsMap = new LinkedHashMap<Long, SubjectDTO>();
-		subjectsMap.put(5550937339998314774L, null);
-		SubjectDataReader reader = new SubjectDataReader(subjectsMap);
-		reader.addPredicateHash(8744745537220110927L);
-		
-		//retreive data with subquery
-		List<SubjectDTO> list1 = baseDAO.getSubjectsData(reader, "select SUBJECT from SPO where SUBJECT = 5550937339998314774");
-		assertEquals(1, list1.size());
-		assertEquals(1, list1.get(0).getPredicateCount());
-		
-		//retreive data for list of subjects
-		List<SubjectDTO> list2 = baseDAO.getSubjectsData(reader);
-		assertEquals(1, list2.size());
-		assertEquals(1, list2.get(0).getPredicateCount());
-		
-		//compare results
-		assertTrue(list1.equals(list2));
-
-	}
-
-	/**
-	 * 
-	 * @throws DAOException
-	 */
-	@Test
-	public void testGetSubjectsData() throws DAOException {
-		MockPostgreSQLBaseDAO baseDAO = new MockPostgreSQLBaseDAO();
-		
-		Map<Long,SubjectDTO> subjectsMap = new LinkedHashMap<Long, SubjectDTO>();
-		subjectsMap.put(-6601083188331798490L, null);
-		
-		//retreive data for list of subjects
-		List<SubjectDTO> list = baseDAO.getSubjectsData(subjectsMap);
-		assertEquals(1, list.size());
-		assertEquals(5, list.get(0).getPredicateCount());
-	}
+    /*
+     * (non-Javadoc)
+     * @see org.dbunit.DatabaseTestCase#getDataSet()
+     */
+    @Override
+    protected IDataSet getDataSet() throws Exception {
+        return getXmlDataSet("types-db.xml");
+    }
 
 
-	/**
-	 * Mock class for accessing abstract class protected methods.
-	 * 
-	 * @author <a href="mailto:enriko.kasper@tieto.com">Enriko Käsper</a>, Tieto Estonia
-	 */
-	class MockPostgreSQLBaseDAO extends PostgreSQLBaseDAO {
-		
-		protected List<SubjectDTO> getSubjectsData(SubjectDataReader reader, String subjectsSubQuery) throws DAOException{
-			return super.getSubjectsData(reader, subjectsSubQuery);
-		}
-		protected List<SubjectDTO> getSubjectsData(SubjectDataReader reader) throws DAOException{
-			return super.getSubjectsData(reader);
-		}
-		protected List<SubjectDTO> getSubjectsData(Map<Long,SubjectDTO> subjectsMap) throws DAOException{
-			return super.getSubjectsData(subjectsMap);
-		}
-		protected Connection getSQLConnection() throws SQLException{
-			return super.getSQLConnection();
-		}
-	}
-	
+
+    /**
+     *
+     * @throws DAOException
+     */
+    @Test
+    public void testGetSubjectsDataWithPredicate() throws DAOException {
+        MockPostgreSQLBaseDAO baseDAO = new MockPostgreSQLBaseDAO();
+
+        Map<Long,SubjectDTO> subjectsMap = new LinkedHashMap<Long, SubjectDTO>();
+        subjectsMap.put(5550937339998314774L, null);
+        SubjectDataReader reader = new SubjectDataReader(subjectsMap);
+        reader.addPredicateHash(8744745537220110927L);
+
+        //retreive data with subquery
+        List<SubjectDTO> list1 = baseDAO.getSubjectsData(reader, "select SUBJECT from SPO where SUBJECT = 5550937339998314774");
+        assertEquals(1, list1.size());
+        assertEquals(1, list1.get(0).getPredicateCount());
+
+        //retreive data for list of subjects
+        List<SubjectDTO> list2 = baseDAO.getSubjectsData(reader);
+        assertEquals(1, list2.size());
+        assertEquals(1, list2.get(0).getPredicateCount());
+
+        //compare results
+        assertTrue(list1.equals(list2));
+
+    }
+
+    /**
+     *
+     * @throws DAOException
+     */
+    @Test
+    public void testGetSubjectsData() throws DAOException {
+        MockPostgreSQLBaseDAO baseDAO = new MockPostgreSQLBaseDAO();
+
+        Map<Long,SubjectDTO> subjectsMap = new LinkedHashMap<Long, SubjectDTO>();
+        subjectsMap.put(-6601083188331798490L, null);
+
+        //retreive data for list of subjects
+        List<SubjectDTO> list = baseDAO.getSubjectsData(subjectsMap);
+        assertEquals(1, list.size());
+        assertEquals(5, list.get(0).getPredicateCount());
+    }
+
+
+    /**
+     * Mock class for accessing abstract class protected methods.
+     *
+     * @author <a href="mailto:enriko.kasper@tieto.com">Enriko Käsper</a>, Tieto Estonia
+     */
+    class MockPostgreSQLBaseDAO extends PostgreSQLBaseDAO {
+
+        protected List<SubjectDTO> getSubjectsData(SubjectDataReader reader, String subjectsSubQuery) throws DAOException{
+            return super.getSubjectsData(reader, subjectsSubQuery);
+        }
+        protected List<SubjectDTO> getSubjectsData(SubjectDataReader reader) throws DAOException{
+            return super.getSubjectsData(reader);
+        }
+        protected List<SubjectDTO> getSubjectsData(Map<Long,SubjectDTO> subjectsMap) throws DAOException{
+            return super.getSubjectsData(subjectsMap);
+        }
+        protected Connection getSQLConnection() throws SQLException{
+            return super.getSQLConnection();
+        }
+    }
+
 }

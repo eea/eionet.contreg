@@ -54,179 +54,179 @@ import eionet.cr.web.util.columns.SubjectPredicateColumn;
 import eionet.cr.web.util.columns.SubjectPredicateRefsColumn;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
 @UrlBinding("/references.action")
 public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
-	
-	/** */
-	private static final String REFERRING_PREDICATES = ReferencesActionBean.class.getName() + ".referringPredicates";
-	private static final String PREV_OBJECT = ReferencesActionBean.class.getName() + ".previousObject";
 
-	/** */
-	private String uri;
-	private long anonHash;
-	private SubjectDTO subject;
-	private boolean noCriteria;
+    /** */
+    private static final String REFERRING_PREDICATES = ReferencesActionBean.class.getName() + ".referringPredicates";
+    private static final String PREV_OBJECT = ReferencesActionBean.class.getName() + ".previousObject";
 
-	/** */
-	private HashMap<String,List<String>> referringPredicates;
-	
-	/** */
-	private Map<String,String> predicateLabels;
-	
-	/** */
-	private Boolean uriIsHarvestSource;
-	
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.web.action.AbstractSearchActionBean#search()
-	 */
-	public Resolution search() throws DAOException {
-		
-		if (StringUtils.isBlank(uri) && anonHash==0){
-			
-			noCriteria = true;
-			addCautionMessage("Resource identifier not specified!");
-		}
-		else{
-			Pair<Integer, List<SubjectDTO>> searchResult = null;
-			SearchDAO searchDAO = DAOFactory.get().getDao(SearchDAO.class);
-			
-			if (anonHash==0){
-				searchResult = searchDAO.searchReferences(uri, PagingRequest.create(getPageN()),
-								new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
-			}
-			else{
-				searchResult = searchDAO.searchReferences(anonHash,
-								PagingRequest.create(getPageN()),
-								new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
-			}
+    /** */
+    private String uri;
+    private long anonHash;
+    private SubjectDTO subject;
+    private boolean noCriteria;
 
-			resultList = searchResult.getRight();
-			matchCount = searchResult.getLeft();
+    /** */
+    private HashMap<String,List<String>> referringPredicates;
 
-			HashSet<Long> subjectHashes = new HashSet<Long>();
-			for (SubjectDTO subject : resultList){
-				subjectHashes.add(subject.getUriHash());
-			}
-			
-			PredicateLabels predLabels = DAOFactory.get().getDao(HelperDAO.class).getPredicateLabels(subjectHashes);
-			if (predLabels!=null){
-				predicateLabels = predLabels.getByLanguages(getAcceptedLanguages());
-			}
-		}
-		
-		return new ForwardResolution("/pages/references.jsp");
-	}
+    /** */
+    private Map<String,String> predicateLabels;
 
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
-	 */
-	public List<SearchResultColumn> getColumns() throws DAOException {
-		
-		ArrayList<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
+    /** */
+    private Boolean uriIsHarvestSource;
 
-		/* let's always include rdf:type and rdfs:label in the columns */
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.web.action.AbstractSearchActionBean#search()
+     */
+    public Resolution search() throws DAOException {
 
-		SubjectPredicateColumn predCol = new SubjectPredicateColumn();
-		predCol.setPredicateUri(Predicates.RDF_TYPE);
-		predCol.setTitle("Type");
-		predCol.setSortable(true);
-		list.add(predCol);
+        if (StringUtils.isBlank(uri) && anonHash==0){
 
-		SubjectPredicateRefsColumn predRefCol = new SubjectPredicateRefsColumn();
-		predRefCol.setPredicateUri(Predicates.RDFS_LABEL);
-		predRefCol.setTitle("Title");
-		predRefCol.setSortable(true);
-		list.add(predRefCol);
-		
-		SearchResultColumn col = new ReferringPredicatesColumn(this);
-		col.setTitle("Relationship");
-		col.setSortable(true);
-		list.add(col);		
-		
-		return list;
-	}
+            noCriteria = true;
+            addCautionMessage("Resource identifier not specified!");
+        }
+        else{
+            Pair<Integer, List<SubjectDTO>> searchResult = null;
+            SearchDAO searchDAO = DAOFactory.get().getDao(SearchDAO.class);
 
-	/**
-	 * @return the predicateLabels
-	 */
-	public Map<String, String> getPredicateLabels() {
-		return predicateLabels;
-	}
+            if (anonHash==0){
+                searchResult = searchDAO.searchReferences(uri, PagingRequest.create(getPageN()),
+                                new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
+            }
+            else{
+                searchResult = searchDAO.searchReferences(anonHash,
+                                PagingRequest.create(getPageN()),
+                                new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
+            }
 
-	/**
-	 * @return the uri
-	 */
-	public String getUri() {
-		return uri;
-	}
+            resultList = searchResult.getRight();
+            matchCount = searchResult.getLeft();
 
-	/**
-	 * @param uri the uri to set
-	 */
-	public void setUri(String uri) {
-		this.uri = uri;
-	}
+            HashSet<Long> subjectHashes = new HashSet<Long>();
+            for (SubjectDTO subject : resultList){
+                subjectHashes.add(subject.getUriHash());
+            }
 
-	/**
-	 * @return the anonHash
-	 */
-	public long getAnonHash() {
-		return anonHash;
-	}
+            PredicateLabels predLabels = DAOFactory.get().getDao(HelperDAO.class).getPredicateLabels(subjectHashes);
+            if (predLabels!=null){
+                predicateLabels = predLabels.getByLanguages(getAcceptedLanguages());
+            }
+        }
 
-	/**
-	 * @param anonHash the anonHash to set
-	 */
-	public void setAnonHash(long hash) {
-		this.anonHash = hash;
-	}
+        return new ForwardResolution("/pages/references.jsp");
+    }
 
-	/**
-	 * @return the subject
-	 */
-	public SubjectDTO getSubject() {
-		return subject;
-	}
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
+     */
+    public List<SearchResultColumn> getColumns() throws DAOException {
 
-	/**
-	 * @return the noCriteria
-	 */
-	public boolean isNoCriteria() {
-		return noCriteria;
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public boolean isUriResolvable(){
-		
-		return uri==null ? false : URLUtil.isURL(uri);
-	}
-	
-	/**
-	 * @return the uriIsHarvestSource
-	 * @throws DAOException 
-	 */
-	public Boolean getUriIsHarvestSource() throws DAOException {
-		
-		if (uriIsHarvestSource==null){
-			
-			if ((uri==null && subject==null) || anonHash>0 || (subject!=null && subject.isAnonymous())){
-				uriIsHarvestSource = Boolean.FALSE;
-			}
-			else{
-				String s = subject!=null ? subject.getUri() : uri;
-				HarvestSourceDTO dto = factory.getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(s);
-				uriIsHarvestSource = dto==null ? Boolean.FALSE : Boolean.TRUE;
-			}
-		}
-		return uriIsHarvestSource;
-	}
+        ArrayList<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
+
+        /* let's always include rdf:type and rdfs:label in the columns */
+
+        SubjectPredicateColumn predCol = new SubjectPredicateColumn();
+        predCol.setPredicateUri(Predicates.RDF_TYPE);
+        predCol.setTitle("Type");
+        predCol.setSortable(true);
+        list.add(predCol);
+
+        SubjectPredicateRefsColumn predRefCol = new SubjectPredicateRefsColumn();
+        predRefCol.setPredicateUri(Predicates.RDFS_LABEL);
+        predRefCol.setTitle("Title");
+        predRefCol.setSortable(true);
+        list.add(predRefCol);
+
+        SearchResultColumn col = new ReferringPredicatesColumn(this);
+        col.setTitle("Relationship");
+        col.setSortable(true);
+        list.add(col);
+
+        return list;
+    }
+
+    /**
+     * @return the predicateLabels
+     */
+    public Map<String, String> getPredicateLabels() {
+        return predicateLabels;
+    }
+
+    /**
+     * @return the uri
+     */
+    public String getUri() {
+        return uri;
+    }
+
+    /**
+     * @param uri the uri to set
+     */
+    public void setUri(String uri) {
+        this.uri = uri;
+    }
+
+    /**
+     * @return the anonHash
+     */
+    public long getAnonHash() {
+        return anonHash;
+    }
+
+    /**
+     * @param anonHash the anonHash to set
+     */
+    public void setAnonHash(long hash) {
+        this.anonHash = hash;
+    }
+
+    /**
+     * @return the subject
+     */
+    public SubjectDTO getSubject() {
+        return subject;
+    }
+
+    /**
+     * @return the noCriteria
+     */
+    public boolean isNoCriteria() {
+        return noCriteria;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean isUriResolvable(){
+
+        return uri==null ? false : URLUtil.isURL(uri);
+    }
+
+    /**
+     * @return the uriIsHarvestSource
+     * @throws DAOException
+     */
+    public Boolean getUriIsHarvestSource() throws DAOException {
+
+        if (uriIsHarvestSource==null){
+
+            if ((uri==null && subject==null) || anonHash>0 || (subject!=null && subject.isAnonymous())){
+                uriIsHarvestSource = Boolean.FALSE;
+            }
+            else{
+                String s = subject!=null ? subject.getUri() : uri;
+                HarvestSourceDTO dto = factory.getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(s);
+                uriIsHarvestSource = dto==null ? Boolean.FALSE : Boolean.TRUE;
+            }
+        }
+        return uriIsHarvestSource;
+    }
 }

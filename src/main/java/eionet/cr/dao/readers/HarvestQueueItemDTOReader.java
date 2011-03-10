@@ -27,23 +27,23 @@ import eionet.cr.dto.UrgentHarvestQueueItemDTO;
 import eionet.cr.util.sql.SQLResultSetBaseReader;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
 public class HarvestQueueItemDTOReader extends SQLResultSetBaseReader<UrgentHarvestQueueItemDTO>{
 
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
-	 */
-	public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
-		
-		UrgentHarvestQueueItemDTO dto = new UrgentHarvestQueueItemDTO();
-		dto.setUrl(rs.getString("URL"));
-		dto.setTimeAdded(rs.getTimestamp("TIMESTAMP"));
-		dto.setPushedContent(rs.getString("PUSHED_CONTENT"));
-		
-		resultList.add(dto);
-	}
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
+     */
+    public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
+
+        UrgentHarvestQueueItemDTO dto = new UrgentHarvestQueueItemDTO();
+        dto.setUrl(rs.getString("URL"));
+        dto.setTimeAdded(rs.getTimestamp("TIMESTAMP"));
+        dto.setPushedContent(rs.getString("PUSHED_CONTENT"));
+
+        resultList.add(dto);
+    }
 }

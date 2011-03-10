@@ -33,98 +33,98 @@ import org.junit.Test;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 
 /**
- * 
+ *
  * @author roug
- * 
+ *
  */
 public class HarvestSubClassDbTest extends CRDatabaseTestCase {
-	
-	private static final String[] ignoreCols = {"SOURCE", "GEN_TIME"};
 
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.test.helpers.CRDatabaseTestCase#getDataSet()
-	 */
-	@Override
-	protected IDataSet getDataSet() throws Exception {
-		return getXmlDataSet("emptydb.xml");
-	}
+    private static final String[] ignoreCols = {"SOURCE", "GEN_TIME"};
 
-	@Test
-	public void testSubClassOfRdf() {
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.test.helpers.CRDatabaseTestCase#getDataSet()
+     */
+    @Override
+    protected IDataSet getDataSet() throws Exception {
+        return getXmlDataSet("emptydb.xml");
+    }
 
-		try {
-			URL url = getClass().getClassLoader().getResource("subclass-rdf.xml");
-			Harvest harvest = new PullHarvest(url.toString(), null);
-			harvest.execute();
-			
-			compareDatasets("subclass-db.xml", false);
-		}
-		catch (Throwable e) {
-			e.printStackTrace();
-			fail("Was not expecting this exception: " + e.toString());
-		}
+    @Test
+    public void testSubClassOfRdf() {
 
-	}
-	
-	@Test
-	public void testSplitSubClassOfRdf() {
+        try {
+            URL url = getClass().getClassLoader().getResource("subclass-rdf.xml");
+            Harvest harvest = new PullHarvest(url.toString(), null);
+            harvest.execute();
 
-		try {
-			URL url = getClass().getClassLoader().getResource("subclass-s1-rdf.xml");
-			Harvest harvest = new PullHarvest(url.toString(), null);
-			harvest.execute();
-			
-			url = getClass().getClassLoader().getResource("subclass-s2-rdf.xml");
-			harvest = new PullHarvest(url.toString(), null);
-			harvest.execute();
-			
-			compareDatasets("subclass-db.xml", false);
-		}
-		catch (Throwable e) {
-			e.printStackTrace();
-			fail("Was not expecting this exception: " + e.toString());
-		}
+            compareDatasets("subclass-db.xml", false);
+        }
+        catch (Throwable e) {
+            e.printStackTrace();
+            fail("Was not expecting this exception: " + e.toString());
+        }
 
-	}
+    }
 
-	/**
-	 * 
-	 * @param testData
-	 * @param dumpIt
-	 * @throws Exception
-	 */
-	private void compareDatasets(String testData, boolean dumpIt) throws Exception {
+    @Test
+    public void testSplitSubClassOfRdf() {
 
-		// Fetch database data after executing your code.
-		QueryDataSet queryDataSet = new QueryDataSet(getConnection());
-		queryDataSet.addTable("SPO",
+        try {
+            URL url = getClass().getClassLoader().getResource("subclass-s1-rdf.xml");
+            Harvest harvest = new PullHarvest(url.toString(), null);
+            harvest.execute();
+
+            url = getClass().getClassLoader().getResource("subclass-s2-rdf.xml");
+            harvest = new PullHarvest(url.toString(), null);
+            harvest.execute();
+
+            compareDatasets("subclass-db.xml", false);
+        }
+        catch (Throwable e) {
+            e.printStackTrace();
+            fail("Was not expecting this exception: " + e.toString());
+        }
+
+    }
+
+    /**
+     *
+     * @param testData
+     * @param dumpIt
+     * @throws Exception
+     */
+    private void compareDatasets(String testData, boolean dumpIt) throws Exception {
+
+        // Fetch database data after executing your code.
+        QueryDataSet queryDataSet = new QueryDataSet(getConnection());
+        queryDataSet.addTable("SPO",
                     "SELECT DISTINCT SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ,"
                     + " LIT_OBJ, OBJ_LANG, OBJ_SOURCE_OBJECT FROM SPO"
                     + " WHERE PREDICATE NOT IN ( 8639511163630871821, 3296918264710147612, -2213704056277764256, 333311624525447614 )"
 
                     + " ORDER BY SUBJECT, PREDICATE, OBJECT");
-		ITable actSPOTable = queryDataSet.getTable("SPO");
+        ITable actSPOTable = queryDataSet.getTable("SPO");
 
-		queryDataSet = new QueryDataSet(getConnection());
-		queryDataSet.addTable("RESOURCE", "SELECT URI,URI_HASH FROM RESOURCE "
-				+ "WHERE URI NOT LIKE 'file:%' ORDER BY URI, URI_HASH");
-		ITable actResTable = queryDataSet.getTable("RESOURCE");
+        queryDataSet = new QueryDataSet(getConnection());
+        queryDataSet.addTable("RESOURCE", "SELECT URI,URI_HASH FROM RESOURCE "
+                + "WHERE URI NOT LIKE 'file:%' ORDER BY URI, URI_HASH");
+        ITable actResTable = queryDataSet.getTable("RESOURCE");
 
-		if (dumpIt){
-			FlatXmlDataSet.write(queryDataSet, new FileOutputStream(testData));
-		}
-		else{
-			// Load expected data from an XML dataset
-			IDataSet expectedDataSet = getXmlDataSet(testData);
-			ITable expSpoTable = expectedDataSet.getTable("SPO");
-			ITable expResTable = expectedDataSet.getTable("RESOURCE");
+        if (dumpIt){
+            FlatXmlDataSet.write(queryDataSet, new FileOutputStream(testData));
+        }
+        else{
+            // Load expected data from an XML dataset
+            IDataSet expectedDataSet = getXmlDataSet(testData);
+            ITable expSpoTable = expectedDataSet.getTable("SPO");
+            ITable expResTable = expectedDataSet.getTable("RESOURCE");
 
-			// Assert that the actual SPO table matches the expected table
-			Assertion.assertEqualsIgnoreCols(expSpoTable, actSPOTable, ignoreCols);
+            // Assert that the actual SPO table matches the expected table
+            Assertion.assertEqualsIgnoreCols(expSpoTable, actSPOTable, ignoreCols);
 
-			// Assert that the actual RESOURCE table matches the expected table
-			Assertion.assertEquals(expResTable, actResTable);
-		}
-	}
+            // Assert that the actual RESOURCE table matches the expected table
+            Assertion.assertEquals(expResTable, actResTable);
+        }
+    }
 }

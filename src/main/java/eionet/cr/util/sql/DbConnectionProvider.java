@@ -37,178 +37,178 @@ import eionet.cr.config.GeneralConfig;
 import eionet.cr.util.Util;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
 public class DbConnectionProvider {
-	
-	/** */
-	private static Logger logger = Logger.getLogger(DbConnectionProvider.class);
-	
-	/** */
-	private static final String DATASOURCE_NAME = "jdbc/cr";
-	
-	/** */
-	private static DataSource dataSource = null;
-	private static String connectionUrl = null;
-	private static Boolean isJNDIDataSource = null;
-	private static Boolean isJUnitRuntime = null;
-	
-	/** Lock objects */
-	private static Object connectionUrlLock = new Object();
-	private static Object isJNDIDataSourceLock = new Object();
-	private static Object isJUnitRuntimeLock = new Object();
-	
-	/**
-	 * 
-	 * @return
-	 * @throws SQLException 
-	 */
-	public static Connection getConnection() throws SQLException {
-		
-		if (isJNDIDataSource()){
-			return dataSource.getConnection();
-		}
-		else{
-			return getSimpleConnection(isJUnitRuntime());
-		}
-	}
-	
-	/**
-	 * 
-	 * @return
-	 * @throws SQLException
-	 */
-	private static Connection getSimpleConnection(boolean isUnitTest) throws SQLException{
-		
-		// property names depending on whether the code is being run by a unit test
-		// (this is just to avoid shooting in the leg by running unit tests
-		// accidentally against the real database)
-		String drvProperty = isUnitTest ? GeneralConfig.DB_UNITTEST_DRV : GeneralConfig.DB_DRV;
-		String urlProperty = isUnitTest ? GeneralConfig.DB_UNITTEST_URL : GeneralConfig.DB_URL;
-		String usrProperty = isUnitTest ? GeneralConfig.DB_UNITTEST_USR : GeneralConfig.DB_USR;
-		String pwdProperty = isUnitTest ? GeneralConfig.DB_UNITTEST_PWD : GeneralConfig.DB_PWD;
-		
-		String drv = GeneralConfig.getProperty(drvProperty);
-		if (drv==null || drv.trim().length()==0){
-			throw new SQLException("Failed to get connection, missing property: " + drvProperty);
-		}
-		
-		String url = GeneralConfig.getProperty(urlProperty);
-		if (url==null || url.trim().length()==0){
-			throw new SQLException("Failed to get connection, missing property: " + urlProperty);
-		}
 
-		String usr = GeneralConfig.getProperty(usrProperty);
-		if (usr==null || usr.trim().length()==0){
-			throw new SQLException("Failed to get connection, missing property: " + usrProperty);
-		}
+    /** */
+    private static Logger logger = Logger.getLogger(DbConnectionProvider.class);
 
-		String pwd = GeneralConfig.getProperty(pwdProperty);
-		if (pwd==null || pwd.trim().length()==0){
-			throw new SQLException("Failed to get connection, missing property: " + pwdProperty);
-		}
+    /** */
+    private static final String DATASOURCE_NAME = "jdbc/cr";
 
-		try{
-			Class.forName(drv);
-			return DriverManager.getConnection(url, usr, pwd);
-		}
-		catch (ClassNotFoundException e){
-			throw new CRRuntimeException("Failed to get connection, driver class not found: " + drv, e);
-		}
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public static String getConnectionUrl(){
-		
-		if (connectionUrl==null || connectionUrl.trim().length()==0){
-			
-			synchronized (connectionUrlLock) {
-				
-				// double-checked locking pattern
-				// (http://www.ibm.com/developerworks/java/library/j-dcl.html)
-				if (connectionUrl==null || connectionUrl.trim().length()==0){
+    /** */
+    private static DataSource dataSource = null;
+    private static String connectionUrl = null;
+    private static Boolean isJNDIDataSource = null;
+    private static Boolean isJUnitRuntime = null;
 
-					Connection conn = null;
-					try{
-						conn = getConnection();
-						DatabaseMetaData dbMetadata = conn.getMetaData();
-						connectionUrl = dbMetadata.getURL();
-					}
-					catch (SQLException sqle){
-						throw new CRRuntimeException("Failed to look up database url!", sqle);
-					}
-					finally{
-						if (conn!=null){
-							try{ conn.close(); } catch (Exception e){}
-						}
-					}
-				}
-			}
-		}
-		
-		return connectionUrl;
-	}
+    /** Lock objects */
+    private static Object connectionUrlLock = new Object();
+    private static Object isJNDIDataSourceLock = new Object();
+    private static Object isJUnitRuntimeLock = new Object();
 
-	/**
-	 * 
-	 * @return
-	 */
-	private static boolean isJNDIDataSource(){
-		
-		if (isJNDIDataSource==null){
-			synchronized (isJNDIDataSourceLock) {
-				
-				// double-checked locking pattern
-				// (http://www.ibm.com/developerworks/java/library/j-dcl.html)
-				if (isJNDIDataSource==null){
-					
-					try{
-						Context initContext = new InitialContext();
-						Context context = (Context) initContext.lookup("java:comp/env");
-						dataSource = (javax.sql.DataSource)context.lookup(DATASOURCE_NAME);
-						
-						isJNDIDataSource = Boolean.TRUE;
-						logger.info("Found and initialized JNDI data source named " + DATASOURCE_NAME);
-					}
-					catch (NamingException e){
-						isJNDIDataSource = Boolean.FALSE;
-						logger.info("No JNDI data source named " + DATASOURCE_NAME + " could be found: " + e.toString());
-					}
-				}
-			}
-		}
-		
-		return isJNDIDataSource.booleanValue();
-	}
+    /**
+     *
+     * @return
+     * @throws SQLException
+     */
+    public static Connection getConnection() throws SQLException {
 
-	/**
-	 * 
-	 * @return
-	 */
-	private static boolean isJUnitRuntime(){
-		
-		if (isJUnitRuntime==null){
-			
-			synchronized (isJUnitRuntimeLock) {
-				
-				// double-checked locking pattern
-				// (http://www.ibm.com/developerworks/java/library/j-dcl.html)
-				if (isJUnitRuntime==null){
+        if (isJNDIDataSource()){
+            return dataSource.getConnection();
+        }
+        else{
+            return getSimpleConnection(isJUnitRuntime());
+        }
+    }
 
-					String stackTrace = Util.getStackTrace(new Throwable());
-					isJUnitRuntime = Boolean.valueOf(stackTrace.indexOf("at junit.framework.TestCase.run") > 0);
-					
-					logger.info("Detected that the code is running in JUnit runtime");
-				}
-			}
-		}
-		
-		return isJUnitRuntime.booleanValue();
-	}
+    /**
+     *
+     * @return
+     * @throws SQLException
+     */
+    private static Connection getSimpleConnection(boolean isUnitTest) throws SQLException{
+
+        // property names depending on whether the code is being run by a unit test
+        // (this is just to avoid shooting in the leg by running unit tests
+        // accidentally against the real database)
+        String drvProperty = isUnitTest ? GeneralConfig.DB_UNITTEST_DRV : GeneralConfig.DB_DRV;
+        String urlProperty = isUnitTest ? GeneralConfig.DB_UNITTEST_URL : GeneralConfig.DB_URL;
+        String usrProperty = isUnitTest ? GeneralConfig.DB_UNITTEST_USR : GeneralConfig.DB_USR;
+        String pwdProperty = isUnitTest ? GeneralConfig.DB_UNITTEST_PWD : GeneralConfig.DB_PWD;
+
+        String drv = GeneralConfig.getProperty(drvProperty);
+        if (drv==null || drv.trim().length()==0){
+            throw new SQLException("Failed to get connection, missing property: " + drvProperty);
+        }
+
+        String url = GeneralConfig.getProperty(urlProperty);
+        if (url==null || url.trim().length()==0){
+            throw new SQLException("Failed to get connection, missing property: " + urlProperty);
+        }
+
+        String usr = GeneralConfig.getProperty(usrProperty);
+        if (usr==null || usr.trim().length()==0){
+            throw new SQLException("Failed to get connection, missing property: " + usrProperty);
+        }
+
+        String pwd = GeneralConfig.getProperty(pwdProperty);
+        if (pwd==null || pwd.trim().length()==0){
+            throw new SQLException("Failed to get connection, missing property: " + pwdProperty);
+        }
+
+        try{
+            Class.forName(drv);
+            return DriverManager.getConnection(url, usr, pwd);
+        }
+        catch (ClassNotFoundException e){
+            throw new CRRuntimeException("Failed to get connection, driver class not found: " + drv, e);
+        }
+    }
+
+    /**
+     *
+     * @return
+     */
+    public static String getConnectionUrl(){
+
+        if (connectionUrl==null || connectionUrl.trim().length()==0){
+
+            synchronized (connectionUrlLock) {
+
+                // double-checked locking pattern
+                // (http://www.ibm.com/developerworks/java/library/j-dcl.html)
+                if (connectionUrl==null || connectionUrl.trim().length()==0){
+
+                    Connection conn = null;
+                    try{
+                        conn = getConnection();
+                        DatabaseMetaData dbMetadata = conn.getMetaData();
+                        connectionUrl = dbMetadata.getURL();
+                    }
+                    catch (SQLException sqle){
+                        throw new CRRuntimeException("Failed to look up database url!", sqle);
+                    }
+                    finally{
+                        if (conn!=null){
+                            try{ conn.close(); } catch (Exception e){}
+                        }
+                    }
+                }
+            }
+        }
+
+        return connectionUrl;
+    }
+
+    /**
+     *
+     * @return
+     */
+    private static boolean isJNDIDataSource(){
+
+        if (isJNDIDataSource==null){
+            synchronized (isJNDIDataSourceLock) {
+
+                // double-checked locking pattern
+                // (http://www.ibm.com/developerworks/java/library/j-dcl.html)
+                if (isJNDIDataSource==null){
+
+                    try{
+                        Context initContext = new InitialContext();
+                        Context context = (Context) initContext.lookup("java:comp/env");
+                        dataSource = (javax.sql.DataSource)context.lookup(DATASOURCE_NAME);
+
+                        isJNDIDataSource = Boolean.TRUE;
+                        logger.info("Found and initialized JNDI data source named " + DATASOURCE_NAME);
+                    }
+                    catch (NamingException e){
+                        isJNDIDataSource = Boolean.FALSE;
+                        logger.info("No JNDI data source named " + DATASOURCE_NAME + " could be found: " + e.toString());
+                    }
+                }
+            }
+        }
+
+        return isJNDIDataSource.booleanValue();
+    }
+
+    /**
+     *
+     * @return
+     */
+    private static boolean isJUnitRuntime(){
+
+        if (isJUnitRuntime==null){
+
+            synchronized (isJUnitRuntimeLock) {
+
+                // double-checked locking pattern
+                // (http://www.ibm.com/developerworks/java/library/j-dcl.html)
+                if (isJUnitRuntime==null){
+
+                    String stackTrace = Util.getStackTrace(new Throwable());
+                    isJUnitRuntime = Boolean.valueOf(stackTrace.indexOf("at junit.framework.TestCase.run") > 0);
+
+                    logger.info("Detected that the code is running in JUnit runtime");
+                }
+            }
+        }
+
+        return isJUnitRuntime.booleanValue();
+    }
 
 }

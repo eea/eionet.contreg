@@ -5,22 +5,22 @@
 
 <%@page import="net.sourceforge.stripes.action.ActionBean"%><stripes:layout-render name="/pages/common/template.jsp" pageTitle="Harvesting Statistics">
 
-	<stripes:layout-component name="contents">
+    <stripes:layout-component name="contents">
 
-	<c:choose>
-		<c:when test="${actionBean.adminLoggedIn}">
-			<h1>Content Registry Administration</h1>
-			<ul>
-			<li><stripes:link href="/admin/harvestedurl">Harvested Urls</stripes:link></li>
-			<li><stripes:link href="/admin/nhus">Next Harvest Urgency Score </stripes:link></li>
-			</ul>
-		</c:when>
-		<c:otherwise>
-			<div class="error-msg">
-			No Access
-			</div>
-		</c:otherwise>
-	</c:choose>
-	</stripes:layout-component>
+    <c:choose>
+        <c:when test="${actionBean.adminLoggedIn}">
+            <h1>Content Registry Administration</h1>
+            <ul>
+            <li><stripes:link href="/admin/harvestedurl">Harvested Urls</stripes:link></li>
+            <li><stripes:link href="/admin/nhus">Next Harvest Urgency Score </stripes:link></li>
+            </ul>
+        </c:when>
+        <c:otherwise>
+            <div class="error-msg">
+            No Access
+            </div>
+        </c:otherwise>
+    </c:choose>
+    </stripes:layout-component>
 
 </stripes:layout-render>

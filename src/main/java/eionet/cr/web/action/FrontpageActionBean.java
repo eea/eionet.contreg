@@ -34,38 +34,38 @@ import eionet.cr.web.util.ApplicationCache;
 
 /**
  * ActionBean class responsible for preparing data for index.jsp rendering.
- * 
+ *
  * @author Aleksandr Ivanov
  * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
 @UrlBinding("/index.jsp")
 public class FrontpageActionBean extends AbstractActionBean {
-	
-	private List<Pair<String,String>> recentFiles;
-	private List<TagDTO> tagCloud;
-	
-	@DefaultHandler
-	public Resolution frontpage() {
-		recentFiles = ApplicationCache.getRecentDiscoveredFiles(10);
-		initTagCloud();
-		return new ForwardResolution("/pages/index.jsp");
-	}
 
-	/**
-	 * @return the recentFiles
-	 */
-	public List<Pair<String, String>> getRecentFiles() {
-		return recentFiles;
-	}
-	/**
-	 * @return the tagCloud
-	 */
-	public List<TagDTO> getTagCloud() {
-		return tagCloud;
-	}
-	
-	private void initTagCloud(){
-		tagCloud = ApplicationCache.getTagCloudSortedByName(Integer.parseInt(GeneralConfig.getProperty(GeneralConfig.TAGCLOUD_FRONTPAGE_SIZE)));
-	}
-	
+    private List<Pair<String,String>> recentFiles;
+    private List<TagDTO> tagCloud;
+
+    @DefaultHandler
+    public Resolution frontpage() {
+        recentFiles = ApplicationCache.getRecentDiscoveredFiles(10);
+        initTagCloud();
+        return new ForwardResolution("/pages/index.jsp");
+    }
+
+    /**
+     * @return the recentFiles
+     */
+    public List<Pair<String, String>> getRecentFiles() {
+        return recentFiles;
+    }
+    /**
+     * @return the tagCloud
+     */
+    public List<TagDTO> getTagCloud() {
+        return tagCloud;
+    }
+
+    private void initTagCloud(){
+        tagCloud = ApplicationCache.getTagCloudSortedByName(Integer.parseInt(GeneralConfig.getProperty(GeneralConfig.TAGCLOUD_FRONTPAGE_SIZE)));
+    }
+
 }

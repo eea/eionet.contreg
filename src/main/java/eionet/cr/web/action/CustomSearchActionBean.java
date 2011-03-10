@@ -55,492 +55,492 @@ import eionet.cr.web.util.columns.SubjectLastModifiedColumn;
 import eionet.cr.web.util.columns.SubjectPredicateColumn;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
 @UrlBinding("/customSearch.action")
 public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>{
-	
-	/** */
-	private static final String SELECTED_FILTERS_SESSION_ATTR_NAME = CustomSearchActionBean.class.getName() + ".selectedFilters";
-	private static final String RESULT_LIST_SESSION_ATTR_NAME = CustomSearchActionBean.class.getName() + ".resultList";
-	private static final String MATCH_COUNT_SESSION_ATTR_NAME = CustomSearchActionBean.class.getName() + ".matchCount";
-	private static final String PAGINATION_SESSION_ATTR_NAME = CustomSearchActionBean.class.getName() + ".pagination";
-	private static final String LITERAL_SEARCH_ENABLED_FILTERS = CustomSearchActionBean.class.getName() + ".literalSearchEnabledFilters";
-	
-	/** */
-	private static final String SELECTED_VALUE_PREFIX = "value_";
-	private static final String SHOW_PICKLIST_VALUE_PREFIX = "showPicklist_";
-	private static final String REMOVE_FILTER_VALUE_PREFIX = "removeFilter_";
-	
-	/** */
-	private static final String ASSOCIATED_JSP = "/pages/customSearch.jsp";
-	
-	/** */
-	private static Map<String,CustomSearchFilter> availableFilters;
-	private String addedFilter;
-	private String picklistFilter;
-	private String removedFilter;
-	private Collection<String> picklist;
-	
-	/**
-	 * 
-	 * @return
-	 */
-	@DefaultHandler
-	public Resolution unspecifiedEvent(){
-		if (isShowPicklist())
-			populateSelectedFilters();
-		else if (isRemoveFilter()){
-			populateSelectedFilters();
-			
-			Map selectedFilters = getSelectedFilters(false);
-			if (selectedFilters!=null){
-				selectedFilters.remove(getRemovedFilter());
-			}
-		}
-		else
-			clearSessionAttributes();
-		
-		return new ForwardResolution(ASSOCIATED_JSP);
-	}
 
-	/**
-	 * 
-	 */
-	private void clearSessionAttributes(){
-		HttpSession session = getContext().getRequest().getSession();
-		session.removeAttribute(RESULT_LIST_SESSION_ATTR_NAME);
-		session.removeAttribute(MATCH_COUNT_SESSION_ATTR_NAME);
-		session.removeAttribute(PAGINATION_SESSION_ATTR_NAME);
-		session.removeAttribute(SELECTED_FILTERS_SESSION_ATTR_NAME);
-		session.removeAttribute(LITERAL_SEARCH_ENABLED_FILTERS);
-	}
+    /** */
+    private static final String SELECTED_FILTERS_SESSION_ATTR_NAME = CustomSearchActionBean.class.getName() + ".selectedFilters";
+    private static final String RESULT_LIST_SESSION_ATTR_NAME = CustomSearchActionBean.class.getName() + ".resultList";
+    private static final String MATCH_COUNT_SESSION_ATTR_NAME = CustomSearchActionBean.class.getName() + ".matchCount";
+    private static final String PAGINATION_SESSION_ATTR_NAME = CustomSearchActionBean.class.getName() + ".pagination";
+    private static final String LITERAL_SEARCH_ENABLED_FILTERS = CustomSearchActionBean.class.getName() + ".literalSearchEnabledFilters";
 
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.web.action.AbstractSearchActionBean#search()
-	 */
-	public Resolution search() throws DAOException{
-		
-		populateSelectedFilters();
-		long startTime = System.currentTimeMillis();
-		Pair<Integer, List<SubjectDTO>> result = DAOFactory.get().getDao(SearchDAO.class)
-					.searchByFilters(
-							buildSearchCriteria(),
-							getLiteralEnabledFilters(),
-							PagingRequest.create(getPageN()),
-							new SortingRequest(
-									getSortP(),
-									SortOrder.parse(getSortO())), null);
+    /** */
+    private static final String SELECTED_VALUE_PREFIX = "value_";
+    private static final String SHOW_PICKLIST_VALUE_PREFIX = "showPicklist_";
+    private static final String REMOVE_FILTER_VALUE_PREFIX = "removeFilter_";
 
-		logger.debug("It took " + (System.currentTimeMillis() - startTime) + " ms to execute custom search");
-		
-		// we put the search result list into session and override getResultList() to retrieve the list from session
-		// (look for the override in this class)
-		HttpSession session = getContext().getRequest().getSession();
-		session.setAttribute(RESULT_LIST_SESSION_ATTR_NAME, result.getRight());
-		
-		// we do the same for matchCount and pagination as well
-		session.setAttribute(MATCH_COUNT_SESSION_ATTR_NAME, result.getLeft());
-		session.setAttribute(PAGINATION_SESSION_ATTR_NAME, super.getPagination());
-		
-		return new ForwardResolution(ASSOCIATED_JSP);
-	}
+    /** */
+    private static final String ASSOCIATED_JSP = "/pages/customSearch.jsp";
 
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.web.action.AbstractSearchActionBean#getResultList()
-	 */
-	public Collection<SubjectDTO> getResultList(){
-		return (Collection<SubjectDTO>)getContext().getRequest().getSession().getAttribute(RESULT_LIST_SESSION_ATTR_NAME);
-	}
+    /** */
+    private static Map<String,CustomSearchFilter> availableFilters;
+    private String addedFilter;
+    private String picklistFilter;
+    private String removedFilter;
+    private Collection<String> picklist;
 
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.web.action.AbstractSearchActionBean#getPagination()
-	 */
-	public Pagination getPagination(){
-		return (Pagination)getContext().getRequest().getSession().getAttribute(PAGINATION_SESSION_ATTR_NAME);
-	}
+    /**
+     *
+     * @return
+     */
+    @DefaultHandler
+    public Resolution unspecifiedEvent(){
+        if (isShowPicklist())
+            populateSelectedFilters();
+        else if (isRemoveFilter()){
+            populateSelectedFilters();
 
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.web.action.AbstractSearchActionBean#getMatchCount()
-	 */
-	public int getMatchCount(){
-		Integer i = (Integer)getContext().getRequest().getSession().getAttribute(MATCH_COUNT_SESSION_ATTR_NAME);
-		return i==null ? super.getMatchCount() : i.intValue();
-	}
-	
-	
-	/**
-	 * 
-	 * @return
-	 * @throws DAOException 
-	 */
-	public Resolution addFilter() throws DAOException{
-		
-		populateSelectedFilters();
-		
-		if (addedFilter!=null){
-			
-			getSelectedFilters().put(addedFilter, "");
-			
-			String predicateUri = getAvailableFilters().get(addedFilter).getUri();
-			
-			boolean literalsEnabled = factory.getDao(HelperDAO.class).isAllowLiteralSearch(predicateUri);
-			if (literalsEnabled)
-				getLiteralEnabledFilters().add(predicateUri);
-			else
-				getLiteralEnabledFilters().remove(predicateUri);
-		}
-		
-		return new ForwardResolution(ASSOCIATED_JSP);
-	}
-	
-	/**
-	 * 
-	 * @return
-	 * @throws DAOException 
-	 */
-	public Collection<String> getPicklist() throws DAOException{
-		String picklistFilter = getPicklistFilter();
-		if (!isShowPicklist()) {
-			return null;
-		} else if (!getAvailableFilters().containsKey(picklistFilter)) {
-			return null;
-		}
-		String uri = getAvailableFilters().get(picklistFilter).getUri();
-		if(Predicates.RDF_TYPE.equals(uri)) {
-			picklist = ApplicationCache.getTypeURIs();
-		} else if (Predicates.ROD_LOCALITY_PROPERTY.equals(uri)) {
-			picklist = ApplicationCache.getLocalities();
-		} else if (Predicates.ROD_OBLIGATION_PROPERTY.equals(uri)) {
-			picklist = ApplicationCache.getDataflows();
-		} else if (Predicates.ROD_INSTRUMENT_PROPERTY.equals(uri)) {
-			picklist = ApplicationCache.getInstruments();
-		}
-	
-		if (picklist == null){
-			picklist = factory.getDao(HelperDAO.class).getPicklistForPredicate(
-					getAvailableFilters().get(picklistFilter).getUri());
-		}
-		
-		
-		return picklist;
-	}
-	
-	/**
-	 * @return the selectedFilter
-	 */
-	public String getAddedFilter() {
-		return addedFilter;
-	}
+            Map selectedFilters = getSelectedFilters(false);
+            if (selectedFilters!=null){
+                selectedFilters.remove(getRemovedFilter());
+            }
+        }
+        else
+            clearSessionAttributes();
 
-	/**
-	 * @param selectedFilter the selectedFilter to set
-	 */
-	public void setAddedFilter(String selectedFilter) {
-		this.addedFilter = selectedFilter;
-	}
+        return new ForwardResolution(ASSOCIATED_JSP);
+    }
 
-	/**
-	 * 
-	 * @return
-	 */
-	public Map<String,String> getSelectedFilters(){
-		
-		return getSelectedFilters(true);
-	}
-	
-	/**
-	 * 
-	 * @param create
-	 * @return
-	 */
-	private Map<String,String> getSelectedFilters(boolean create){
-		
-		HttpSession session = getContext().getRequest().getSession();
-		Map<String,String> selectedFilters =
-			(Map<String,String>)session.getAttribute(SELECTED_FILTERS_SESSION_ATTR_NAME);
-		if (selectedFilters==null && create==true){
-			selectedFilters = new LinkedHashMap<String,String>();
-			session.setAttribute(SELECTED_FILTERS_SESSION_ATTR_NAME, selectedFilters);
-		}
-		
-		return selectedFilters;
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	private HashSet<String> getLiteralEnabledFilters(){
-		
-		HttpSession session = getContext().getRequest().getSession();
-		HashSet<String> set = (HashSet<String>)session.getAttribute(LITERAL_SEARCH_ENABLED_FILTERS);
-		if (set==null){
-			set = new HashSet<String>();
-			session.setAttribute(LITERAL_SEARCH_ENABLED_FILTERS, set);
-		}
-		
-		return set;
-	}
+    /**
+     *
+     */
+    private void clearSessionAttributes(){
+        HttpSession session = getContext().getRequest().getSession();
+        session.removeAttribute(RESULT_LIST_SESSION_ATTR_NAME);
+        session.removeAttribute(MATCH_COUNT_SESSION_ATTR_NAME);
+        session.removeAttribute(PAGINATION_SESSION_ATTR_NAME);
+        session.removeAttribute(SELECTED_FILTERS_SESSION_ATTR_NAME);
+        session.removeAttribute(LITERAL_SEARCH_ENABLED_FILTERS);
+    }
 
-	/**
-	 * 
-	 */
-	private void populateSelectedFilters(){
-		
-		Map<String,String> selected = getSelectedFilters();
-		if (!selected.isEmpty()){
-			Enumeration paramNames = this.getContext().getRequest().getParameterNames();
-			while (paramNames!=null && paramNames.hasMoreElements()){
-				String paramName = (String)paramNames.nextElement();
-				if (paramName.startsWith(SELECTED_VALUE_PREFIX)){
-					String key = paramName.substring(SELECTED_VALUE_PREFIX.length());
-					if (key.length()>0 && selected.containsKey(key))
-						selected.put(key, getContext().getRequest().getParameter(paramName));
-				}
-			}
-		}		
-	}
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.web.action.AbstractSearchActionBean#search()
+     */
+    public Resolution search() throws DAOException{
 
-	/**
-	 * @return the availableFilters
-	 */
-	public Map<String,CustomSearchFilter> getAvailableFilters() {
-		
-		if (availableFilters==null){
-			
-			ArrayList<CustomSearchFilter> list = new ArrayList<CustomSearchFilter>();
-			
-			CustomSearchFilter filter = new CustomSearchFilter();
-			filter.setUri(Predicates.RDF_TYPE);
-			filter.setTitle("Type");
-			filter.setDescription("");
-			filter.setProvideValues(true);
-			list.add(filter);
+        populateSelectedFilters();
+        long startTime = System.currentTimeMillis();
+        Pair<Integer, List<SubjectDTO>> result = DAOFactory.get().getDao(SearchDAO.class)
+                    .searchByFilters(
+                            buildSearchCriteria(),
+                            getLiteralEnabledFilters(),
+                            PagingRequest.create(getPageN()),
+                            new SortingRequest(
+                                    getSortP(),
+                                    SortOrder.parse(getSortO())), null);
 
-			filter = new CustomSearchFilter();
-			filter.setUri(Predicates.RDFS_LABEL);
-			filter.setTitle("Title");
-			filter.setDescription("");
-			filter.setProvideValues(false);
-			list.add(filter);
+        logger.debug("It took " + (System.currentTimeMillis() - startTime) + " ms to execute custom search");
 
-			filter = new CustomSearchFilter();
-			filter.setUri(Predicates.DC_SUBJECT);
-			filter.setTitle("Subject");
-			filter.setDescription("");
-			filter.setProvideValues(true);
-			list.add(filter);
+        // we put the search result list into session and override getResultList() to retrieve the list from session
+        // (look for the override in this class)
+        HttpSession session = getContext().getRequest().getSession();
+        session.setAttribute(RESULT_LIST_SESSION_ATTR_NAME, result.getRight());
 
-			filter = new CustomSearchFilter();
-			filter.setUri(Predicates.DC_COVERAGE);
-			filter.setTitle("Coverage");
-			filter.setDescription("");
-			filter.setProvideValues(true);
-			list.add(filter);
+        // we do the same for matchCount and pagination as well
+        session.setAttribute(MATCH_COUNT_SESSION_ATTR_NAME, result.getLeft());
+        session.setAttribute(PAGINATION_SESSION_ATTR_NAME, super.getPagination());
 
-			filter = new CustomSearchFilter();
-			filter.setUri(Predicates.ROD_OBLIGATION_PROPERTY);
-			filter.setTitle("Dataflow");
-			filter.setDescription("");
-			filter.setProvideValues(true);
-			list.add(filter);
+        return new ForwardResolution(ASSOCIATED_JSP);
+    }
 
-			filter = new CustomSearchFilter();
-			filter.setUri(Predicates.ROD_LOCALITY_PROPERTY);
-			filter.setTitle("Locality");
-			filter.setDescription("");
-			filter.setProvideValues(true);
-			list.add(filter);
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.web.action.AbstractSearchActionBean#getResultList()
+     */
+    public Collection<SubjectDTO> getResultList(){
+        return (Collection<SubjectDTO>)getContext().getRequest().getSession().getAttribute(RESULT_LIST_SESSION_ATTR_NAME);
+    }
 
-			filter = new CustomSearchFilter();
-			filter.setUri(Predicates.ROD_ISSUE_PROPERTY);
-			filter.setTitle("Issue");
-			filter.setDescription("");
-			filter.setProvideValues(true);
-			list.add(filter);
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.web.action.AbstractSearchActionBean#getPagination()
+     */
+    public Pagination getPagination(){
+        return (Pagination)getContext().getRequest().getSession().getAttribute(PAGINATION_SESSION_ATTR_NAME);
+    }
 
-			filter = new CustomSearchFilter();
-			filter.setUri(Predicates.ROD_INSTRUMENT_PROPERTY);
-			filter.setTitle("Instrument");
-			filter.setDescription("");
-			filter.setProvideValues(true);
-			list.add(filter);
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.web.action.AbstractSearchActionBean#getMatchCount()
+     */
+    public int getMatchCount(){
+        Integer i = (Integer)getContext().getRequest().getSession().getAttribute(MATCH_COUNT_SESSION_ATTR_NAME);
+        return i==null ? super.getMatchCount() : i.intValue();
+    }
 
-			filter = new CustomSearchFilter();
-			filter.setUri(Predicates.CR_SCHEMA);
-			filter.setTitle("XML Schema");
-			filter.setDescription("");
-			filter.setProvideValues(true);
-			list.add(filter);
 
-			filter = new CustomSearchFilter();
-			filter.setUri(Predicates.DC_CREATOR);
-			filter.setTitle("Creator");
-			filter.setDescription("");
-			filter.setProvideValues(true);
-			list.add(filter);
+    /**
+     *
+     * @return
+     * @throws DAOException
+     */
+    public Resolution addFilter() throws DAOException{
 
-			filter = new CustomSearchFilter();
-			filter.setUri(Predicates.DC_DESCRIPTION);
-			filter.setTitle("Description");
-			filter.setDescription("Abstract description of content");
-			filter.setProvideValues(false);
-			list.add(filter);
+        populateSelectedFilters();
 
-			filter = new CustomSearchFilter();
-			filter.setUri(Predicates.DC_PUBLISHER);
-			filter.setTitle("Publisher");
-			filter.setDescription("");
-			filter.setProvideValues(true);
-			list.add(filter);
+        if (addedFilter!=null){
 
-			filter = new CustomSearchFilter();
-			filter.setUri(Predicates.DC_CONTRIBUTOR);
-			filter.setTitle("Contributor");
-			filter.setDescription("");
-			filter.setProvideValues(true);
-			list.add(filter);
+            getSelectedFilters().put(addedFilter, "");
 
-			filter = new CustomSearchFilter();
-			filter.setUri(Predicates.DC_RELATION);
-			filter.setTitle("Relation");
-			filter.setDescription("Url to a related resource");
-			filter.setProvideValues(false);
-			list.add(filter);
+            String predicateUri = getAvailableFilters().get(addedFilter).getUri();
 
-			filter = new CustomSearchFilter();
-			filter.setUri(Predicates.DC_LANGUAGE);
-			filter.setTitle("Language");
-			filter.setDescription("");
-			filter.setProvideValues(true);
-			list.add(filter);
+            boolean literalsEnabled = factory.getDao(HelperDAO.class).isAllowLiteralSearch(predicateUri);
+            if (literalsEnabled)
+                getLiteralEnabledFilters().add(predicateUri);
+            else
+                getLiteralEnabledFilters().remove(predicateUri);
+        }
 
-			availableFilters = new LinkedHashMap<String,CustomSearchFilter>();
-			for (int i=0; i<list.size(); i++)
-				availableFilters.put(String.valueOf(i+1), list.get(i));
-		}
-		
-		return availableFilters;
-	}
+        return new ForwardResolution(ASSOCIATED_JSP);
+    }
 
-	/**
-	 * @return the picklistFilter
-	 */
-	public String getPicklistFilter() {
-		
-		if (picklistFilter==null){
-			picklistFilter = "";
-			Enumeration paramNames = this.getContext().getRequest().getParameterNames();
-			while (paramNames!=null && paramNames.hasMoreElements()){
-				String paramName = (String)paramNames.nextElement();
-				if (paramName.startsWith(SHOW_PICKLIST_VALUE_PREFIX)){
-					int i = paramName.indexOf('.')<0 ? paramName.length() : paramName.indexOf('.');
-					String key = paramName.substring(SHOW_PICKLIST_VALUE_PREFIX.length(), i);
-					if (key.length()>0 && getSelectedFilters().containsKey(key)){
-						picklistFilter = key;
-						break;
-					}
-				}
-			}
+    /**
+     *
+     * @return
+     * @throws DAOException
+     */
+    public Collection<String> getPicklist() throws DAOException{
+        String picklistFilter = getPicklistFilter();
+        if (!isShowPicklist()) {
+            return null;
+        } else if (!getAvailableFilters().containsKey(picklistFilter)) {
+            return null;
+        }
+        String uri = getAvailableFilters().get(picklistFilter).getUri();
+        if(Predicates.RDF_TYPE.equals(uri)) {
+            picklist = ApplicationCache.getTypeURIs();
+        } else if (Predicates.ROD_LOCALITY_PROPERTY.equals(uri)) {
+            picklist = ApplicationCache.getLocalities();
+        } else if (Predicates.ROD_OBLIGATION_PROPERTY.equals(uri)) {
+            picklist = ApplicationCache.getDataflows();
+        } else if (Predicates.ROD_INSTRUMENT_PROPERTY.equals(uri)) {
+            picklist = ApplicationCache.getInstruments();
+        }
 
-		}
-		return picklistFilter;
-	}
+        if (picklist == null){
+            picklist = factory.getDao(HelperDAO.class).getPicklistForPredicate(
+                    getAvailableFilters().get(picklistFilter).getUri());
+        }
 
-	/**
-	 * @return the removedFilter
-	 */
-	public String getRemovedFilter() {
-		
-		if (removedFilter==null){
-			removedFilter = "";
-			Enumeration paramNames = this.getContext().getRequest().getParameterNames();
-			while (paramNames!=null && paramNames.hasMoreElements()){
-				String paramName = (String)paramNames.nextElement();
-				if (paramName.startsWith(REMOVE_FILTER_VALUE_PREFIX)){
-					int i = paramName.indexOf('.')<0 ? paramName.length() : paramName.indexOf('.');
-					String key = paramName.substring(REMOVE_FILTER_VALUE_PREFIX.length(), i);
-					if (key.length()>0 && getSelectedFilters().containsKey(key)){
-						removedFilter = key;
-						break;
-					}
-				}
-			}
 
-		}
-		return removedFilter;
-	}
+        return picklist;
+    }
 
-	/**
-	 * 
-	 * @return
-	 */
-	public boolean isShowPicklist(){
-		return !Util.isNullOrEmpty(getPicklistFilter());
-	}
+    /**
+     * @return the selectedFilter
+     */
+    public String getAddedFilter() {
+        return addedFilter;
+    }
 
-	/**
-	 * 
-	 * @return
-	 */
-	public boolean isRemoveFilter(){
-		return !Util.isNullOrEmpty(getRemovedFilter());
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	private Map<String,String> buildSearchCriteria(){
-		
-		Map<String,String> result = new HashMap<String,String>();
-		
-		Map<String,String> selected = getSelectedFilters();
-		for (Iterator<String> keys=selected.keySet().iterator(); keys.hasNext();){
-			String key = keys.next();
-			String value = selected.get(key);
-			if (value!=null && value.trim().length()>0){
-				CustomSearchFilter filter = getAvailableFilters().get(key);
-				if (filter!=null)
-					result.put(filter.getUri(), value.trim());
-			}
-		}
-		
-		return result;
-	}
+    /**
+     * @param selectedFilter the selectedFilter to set
+     */
+    public void setAddedFilter(String selectedFilter) {
+        this.addedFilter = selectedFilter;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
-	 */
-	public List<SearchResultColumn> getColumns(){
-		
-		ArrayList<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
-		
-		SubjectPredicateColumn col = new SubjectPredicateColumn();
-		col.setPredicateUri(Predicates.RDF_TYPE);
-		col.setTitle("Type");
-		col.setSortable(true);
-		list.add(col);
-		
-		col = new SubjectPredicateColumn();
-		col.setPredicateUri(Predicates.RDFS_LABEL);
-		col.setTitle("Title");
-		col.setSortable(true);
-		list.add(col);
+    /**
+     *
+     * @return
+     */
+    public Map<String,String> getSelectedFilters(){
 
-		SubjectLastModifiedColumn col2 = new SubjectLastModifiedColumn();
-		col2.setTitle("Date");
-		col2.setSortable(true);
-		list.add(col2);
+        return getSelectedFilters(true);
+    }
 
-		return list;
-	}
+    /**
+     *
+     * @param create
+     * @return
+     */
+    private Map<String,String> getSelectedFilters(boolean create){
+
+        HttpSession session = getContext().getRequest().getSession();
+        Map<String,String> selectedFilters =
+            (Map<String,String>)session.getAttribute(SELECTED_FILTERS_SESSION_ATTR_NAME);
+        if (selectedFilters==null && create==true){
+            selectedFilters = new LinkedHashMap<String,String>();
+            session.setAttribute(SELECTED_FILTERS_SESSION_ATTR_NAME, selectedFilters);
+        }
+
+        return selectedFilters;
+    }
+
+    /**
+     *
+     * @return
+     */
+    private HashSet<String> getLiteralEnabledFilters(){
+
+        HttpSession session = getContext().getRequest().getSession();
+        HashSet<String> set = (HashSet<String>)session.getAttribute(LITERAL_SEARCH_ENABLED_FILTERS);
+        if (set==null){
+            set = new HashSet<String>();
+            session.setAttribute(LITERAL_SEARCH_ENABLED_FILTERS, set);
+        }
+
+        return set;
+    }
+
+    /**
+     *
+     */
+    private void populateSelectedFilters(){
+
+        Map<String,String> selected = getSelectedFilters();
+        if (!selected.isEmpty()){
+            Enumeration paramNames = this.getContext().getRequest().getParameterNames();
+            while (paramNames!=null && paramNames.hasMoreElements()){
+                String paramName = (String)paramNames.nextElement();
+                if (paramName.startsWith(SELECTED_VALUE_PREFIX)){
+                    String key = paramName.substring(SELECTED_VALUE_PREFIX.length());
+                    if (key.length()>0 && selected.containsKey(key))
+                        selected.put(key, getContext().getRequest().getParameter(paramName));
+                }
+            }
+        }
+    }
+
+    /**
+     * @return the availableFilters
+     */
+    public Map<String,CustomSearchFilter> getAvailableFilters() {
+
+        if (availableFilters==null){
+
+            ArrayList<CustomSearchFilter> list = new ArrayList<CustomSearchFilter>();
+
+            CustomSearchFilter filter = new CustomSearchFilter();
+            filter.setUri(Predicates.RDF_TYPE);
+            filter.setTitle("Type");
+            filter.setDescription("");
+            filter.setProvideValues(true);
+            list.add(filter);
+
+            filter = new CustomSearchFilter();
+            filter.setUri(Predicates.RDFS_LABEL);
+            filter.setTitle("Title");
+            filter.setDescription("");
+            filter.setProvideValues(false);
+            list.add(filter);
+
+            filter = new CustomSearchFilter();
+            filter.setUri(Predicates.DC_SUBJECT);
+            filter.setTitle("Subject");
+            filter.setDescription("");
+            filter.setProvideValues(true);
+            list.add(filter);
+
+            filter = new CustomSearchFilter();
+            filter.setUri(Predicates.DC_COVERAGE);
+            filter.setTitle("Coverage");
+            filter.setDescription("");
+            filter.setProvideValues(true);
+            list.add(filter);
+
+            filter = new CustomSearchFilter();
+            filter.setUri(Predicates.ROD_OBLIGATION_PROPERTY);
+            filter.setTitle("Dataflow");
+            filter.setDescription("");
+            filter.setProvideValues(true);
+            list.add(filter);
+
+            filter = new CustomSearchFilter();
+            filter.setUri(Predicates.ROD_LOCALITY_PROPERTY);
+            filter.setTitle("Locality");
+            filter.setDescription("");
+            filter.setProvideValues(true);
+            list.add(filter);
+
+            filter = new CustomSearchFilter();
+            filter.setUri(Predicates.ROD_ISSUE_PROPERTY);
+            filter.setTitle("Issue");
+            filter.setDescription("");
+            filter.setProvideValues(true);
+            list.add(filter);
+
+            filter = new CustomSearchFilter();
+            filter.setUri(Predicates.ROD_INSTRUMENT_PROPERTY);
+            filter.setTitle("Instrument");
+            filter.setDescription("");
+            filter.setProvideValues(true);
+            list.add(filter);
+
+            filter = new CustomSearchFilter();
+            filter.setUri(Predicates.CR_SCHEMA);
+            filter.setTitle("XML Schema");
+            filter.setDescription("");
+            filter.setProvideValues(true);
+            list.add(filter);
+
+            filter = new CustomSearchFilter();
+            filter.setUri(Predicates.DC_CREATOR);
+            filter.setTitle("Creator");
+            filter.setDescription("");
+            filter.setProvideValues(true);
+            list.add(filter);
+
+            filter = new CustomSearchFilter();
+            filter.setUri(Predicates.DC_DESCRIPTION);
+            filter.setTitle("Description");
+            filter.setDescription("Abstract description of content");
+            filter.setProvideValues(false);
+            list.add(filter);
+
+            filter = new CustomSearchFilter();
+            filter.setUri(Predicates.DC_PUBLISHER);
+            filter.setTitle("Publisher");
+            filter.setDescription("");
+            filter.setProvideValues(true);
+            list.add(filter);
+
+            filter = new CustomSearchFilter();
+            filter.setUri(Predicates.DC_CONTRIBUTOR);
+            filter.setTitle("Contributor");
+            filter.setDescription("");
+            filter.setProvideValues(true);
+            list.add(filter);
+
+            filter = new CustomSearchFilter();
+            filter.setUri(Predicates.DC_RELATION);
+            filter.setTitle("Relation");
+            filter.setDescription("Url to a related resource");
+            filter.setProvideValues(false);
+            list.add(filter);
+
+            filter = new CustomSearchFilter();
+            filter.setUri(Predicates.DC_LANGUAGE);
+            filter.setTitle("Language");
+            filter.setDescription("");
+            filter.setProvideValues(true);
+            list.add(filter);
+
+            availableFilters = new LinkedHashMap<String,CustomSearchFilter>();
+            for (int i=0; i<list.size(); i++)
+                availableFilters.put(String.valueOf(i+1), list.get(i));
+        }
+
+        return availableFilters;
+    }
+
+    /**
+     * @return the picklistFilter
+     */
+    public String getPicklistFilter() {
+
+        if (picklistFilter==null){
+            picklistFilter = "";
+            Enumeration paramNames = this.getContext().getRequest().getParameterNames();
+            while (paramNames!=null && paramNames.hasMoreElements()){
+                String paramName = (String)paramNames.nextElement();
+                if (paramName.startsWith(SHOW_PICKLIST_VALUE_PREFIX)){
+                    int i = paramName.indexOf('.')<0 ? paramName.length() : paramName.indexOf('.');
+                    String key = paramName.substring(SHOW_PICKLIST_VALUE_PREFIX.length(), i);
+                    if (key.length()>0 && getSelectedFilters().containsKey(key)){
+                        picklistFilter = key;
+                        break;
+                    }
+                }
+            }
+
+        }
+        return picklistFilter;
+    }
+
+    /**
+     * @return the removedFilter
+     */
+    public String getRemovedFilter() {
+
+        if (removedFilter==null){
+            removedFilter = "";
+            Enumeration paramNames = this.getContext().getRequest().getParameterNames();
+            while (paramNames!=null && paramNames.hasMoreElements()){
+                String paramName = (String)paramNames.nextElement();
+                if (paramName.startsWith(REMOVE_FILTER_VALUE_PREFIX)){
+                    int i = paramName.indexOf('.')<0 ? paramName.length() : paramName.indexOf('.');
+                    String key = paramName.substring(REMOVE_FILTER_VALUE_PREFIX.length(), i);
+                    if (key.length()>0 && getSelectedFilters().containsKey(key)){
+                        removedFilter = key;
+                        break;
+                    }
+                }
+            }
+
+        }
+        return removedFilter;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean isShowPicklist(){
+        return !Util.isNullOrEmpty(getPicklistFilter());
+    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean isRemoveFilter(){
+        return !Util.isNullOrEmpty(getRemovedFilter());
+    }
+
+    /**
+     *
+     * @return
+     */
+    private Map<String,String> buildSearchCriteria(){
+
+        Map<String,String> result = new HashMap<String,String>();
+
+        Map<String,String> selected = getSelectedFilters();
+        for (Iterator<String> keys=selected.keySet().iterator(); keys.hasNext();){
+            String key = keys.next();
+            String value = selected.get(key);
+            if (value!=null && value.trim().length()>0){
+                CustomSearchFilter filter = getAvailableFilters().get(key);
+                if (filter!=null)
+                    result.put(filter.getUri(), value.trim());
+            }
+        }
+
+        return result;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
+     */
+    public List<SearchResultColumn> getColumns(){
+
+        ArrayList<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
+
+        SubjectPredicateColumn col = new SubjectPredicateColumn();
+        col.setPredicateUri(Predicates.RDF_TYPE);
+        col.setTitle("Type");
+        col.setSortable(true);
+        list.add(col);
+
+        col = new SubjectPredicateColumn();
+        col.setPredicateUri(Predicates.RDFS_LABEL);
+        col.setTitle("Title");
+        col.setSortable(true);
+        list.add(col);
+
+        SubjectLastModifiedColumn col2 = new SubjectLastModifiedColumn();
+        col2.setTitle("Date");
+        col2.setSortable(true);
+        list.add(col2);
+
+        return list;
+    }
 }

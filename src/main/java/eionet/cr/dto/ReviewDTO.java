@@ -6,72 +6,72 @@ import java.util.List;
 import org.apache.commons.lang.StringEscapeUtils;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
  *
  */
 
 public class ReviewDTO  implements Serializable {
-	
-	private String reviewSubjectUri;
-	private String title;
-	private String objectUrl;
-	private String reviewContent;
-	private int reviewID;
-	private List<String> attachments;
-	private String reviewContentType;
-	
-	public String getTitle() {
-		return title;
-	}
-	public void setTitle(String title) {
-		this.title = title;
-	}
-	public String getObjectUrl() {
-		return objectUrl;
-	}
-	
-	public String getObjectUrlHTML() {
-		return StringEscapeUtils.escapeHtml(objectUrl);
-	}
-	
-	public void setObjectUrl(String objectUrl) {
-		this.objectUrl = objectUrl;
-	}
-	public String getReviewContent() {
-		return reviewContent;
-	}
-	public void setReviewContent(String reviewContent) {
-		this.reviewContent = reviewContent;
-	}
-	public String getReviewSubjectUri() {
-		return reviewSubjectUri;
-	}
-	public void setReviewSubjectUri(String reviewSubjectUri) {
-		this.reviewSubjectUri = reviewSubjectUri;
-	}
-	
-	public String getReviewSubjectHtmlFormatted() {
-		return StringEscapeUtils.escapeHtml(reviewSubjectUri);
-	}
-	public int getReviewID() {
-		return reviewID;
-	}
-	public void setReviewID(int reviewID) {
-		this.reviewID = reviewID;
-	}
-	public List<String> getAttachments() {
-		return attachments;
-	}
-	public void setAttachments(List<String> attachments) {
-		this.attachments = attachments;
-	}
 
-	public String getReviewContentType() {
-		return reviewContentType;
-	}
-	public void setReviewContentType(String reviewContentType) {
-		this.reviewContentType = reviewContentType;
-	}
-	
+    private String reviewSubjectUri;
+    private String title;
+    private String objectUrl;
+    private String reviewContent;
+    private int reviewID;
+    private List<String> attachments;
+    private String reviewContentType;
+
+    public String getTitle() {
+        return title;
+    }
+    public void setTitle(String title) {
+        this.title = title;
+    }
+    public String getObjectUrl() {
+        return objectUrl;
+    }
+
+    public String getObjectUrlHTML() {
+        return StringEscapeUtils.escapeHtml(objectUrl);
+    }
+
+    public void setObjectUrl(String objectUrl) {
+        this.objectUrl = objectUrl;
+    }
+    public String getReviewContent() {
+        return reviewContent;
+    }
+    public void setReviewContent(String reviewContent) {
+        this.reviewContent = reviewContent;
+    }
+    public String getReviewSubjectUri() {
+        return reviewSubjectUri;
+    }
+    public void setReviewSubjectUri(String reviewSubjectUri) {
+        this.reviewSubjectUri = reviewSubjectUri;
+    }
+
+    public String getReviewSubjectHtmlFormatted() {
+        return StringEscapeUtils.escapeHtml(reviewSubjectUri);
+    }
+    public int getReviewID() {
+        return reviewID;
+    }
+    public void setReviewID(int reviewID) {
+        this.reviewID = reviewID;
+    }
+    public List<String> getAttachments() {
+        return attachments;
+    }
+    public void setAttachments(List<String> attachments) {
+        this.attachments = attachments;
+    }
+
+    public String getReviewContentType() {
+        return reviewContentType;
+    }
+    public void setReviewContentType(String reviewContentType) {
+        this.reviewContentType = reviewContentType;
+    }
+
 }

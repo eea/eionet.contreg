@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Context>
 
-	<Logger className="org.apache.catalina.logger.FileLogger" timestamp="true" suffix=".txt" prefix="cr3." />
-	
-	<Resource name="jdbc/cr"
-				auth="Container"
-				type="javax.sql.DataSource"
-				maxActive="100"
-				maxIdle="30"
-				maxWait="10000"
-				username="${db.usr}"
-				password="${db.pwd}"
-				driverClassName="${db.drv}" 
-				url="${db.url}">
-	</Resource>
+    <Logger className="org.apache.catalina.logger.FileLogger" timestamp="true" suffix=".txt" prefix="cr3." />
+
+    <Resource name="jdbc/cr"
+                auth="Container"
+                type="javax.sql.DataSource"
+                maxActive="100"
+                maxIdle="30"
+                maxWait="10000"
+                username="${db.usr}"
+                password="${db.pwd}"
+                driverClassName="${db.drv}"
+                url="${db.url}">
+    </Resource>
 
 </Context>

@@ -25,93 +25,93 @@ import java.util.Comparator;
 
 public class TagDTO implements Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
 
-	private String tag;
-	private int count;
-	private int scale;
+    private String tag;
+    private int count;
+    private int scale;
 
-	public TagDTO(String tag, int count, int maxTagCount) {
+    public TagDTO(String tag, int count, int maxTagCount) {
 
-		this.tag = tag;
-		this.count = count;
+        this.tag = tag;
+        this.count = count;
 
-		if (maxTagCount <= 0) {
-			scale = 0;
-		} else {
-			setScale((count * 5) / maxTagCount);
-		}
-	}
+        if (maxTagCount <= 0) {
+            scale = 0;
+        } else {
+            setScale((count * 5) / maxTagCount);
+        }
+    }
 
-	public String getTag() {
-		return tag;
-	}
+    public String getTag() {
+        return tag;
+    }
 
-	public int getCount() {
-		return count;
-	}
+    public int getCount() {
+        return count;
+    }
 
-	public int getScale() {
-		return scale;
-	}
+    public int getScale() {
+        return scale;
+    }
 
-	public void setScale(int scale) {
-		if (scale < 0)
-			scale = 0;
-		if (scale > 4)
-			scale = 4;
+    public void setScale(int scale) {
+        if (scale < 0)
+            scale = 0;
+        if (scale > 4)
+            scale = 4;
 
-		this.scale = scale;
-	}
-	
+        this.scale = scale;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		TagDTO other = (TagDTO) obj;
-		if (count != other.count)
-			return false;
-		if (scale != other.scale)
-			return false;
-		if (tag == null) {
-			if (other.tag != null)
-				return false;
-		} else if (!tag.equals(other.tag))
-			return false;
-		return true;
-	}
 
-	/**
-	 * Compares two tags by name in ascending order
-	 */
-	static public class NameComparatorAsc implements Comparator<TagDTO> {
-		public int compare(TagDTO tag1, TagDTO tag2) {
-			return tag1.getTag().compareToIgnoreCase(tag2.getTag());
-		}	
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        TagDTO other = (TagDTO) obj;
+        if (count != other.count)
+            return false;
+        if (scale != other.scale)
+            return false;
+        if (tag == null) {
+            if (other.tag != null)
+                return false;
+        } else if (!tag.equals(other.tag))
+            return false;
+        return true;
+    }
 
-	/**
-	 * Compares two tags by count in ascending order
-	 */
-	static public class CountComparatorDesc implements Comparator<TagDTO> {
+    /**
+     * Compares two tags by name in ascending order
+     */
+    static public class NameComparatorAsc implements Comparator<TagDTO> {
+        public int compare(TagDTO tag1, TagDTO tag2) {
+            return tag1.getTag().compareToIgnoreCase(tag2.getTag());
+        }
+    }
 
-		public int compare(TagDTO tag1, TagDTO tag2) {
-			int countComparison = tag2.getCount() - tag1.getCount();
-			
-			// if the score is the same sort by name
-			if (countComparison == 0) {
-				return (new NameComparatorAsc()).compare(tag1, tag2);
-			} else {
-				return countComparison;
-			}
-		}
-	}
+    /**
+     * Compares two tags by count in ascending order
+     */
+    static public class CountComparatorDesc implements Comparator<TagDTO> {
+
+        public int compare(TagDTO tag1, TagDTO tag2) {
+            int countComparison = tag2.getCount() - tag1.getCount();
+
+            // if the score is the same sort by name
+            if (countComparison == 0) {
+                return (new NameComparatorAsc()).compare(tag1, tag2);
+            } else {
+                return countComparison;
+            }
+        }
+    }
 }

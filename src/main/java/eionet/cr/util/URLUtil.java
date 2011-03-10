@@ -35,150 +35,150 @@ import eionet.cr.config.GeneralConfig;
 import eionet.cr.harvest.PullHarvest;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
 public class URLUtil {
 
-	/**
-	 * 
-	 * @param s
-	 * @return
-	 */
-	public static boolean isURL(String s){
-		
-		if (s==null || s.trim().length()==0)
-			return false;
-		
-		try{
-			URL url = new URL(s);
-			return true;
-		}
-		catch (MalformedURLException e){
-			return false;
-		}
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public static String userAgentHeader(){
-		
-		String ua = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_USERAGENT);
-		Object[] args = new String[1];
-		args[0] = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_VERSION);
-		return MessageFormat.format(ua, args);
-	}
-	
-	/**
-	 * 
-	 * @param timestamp
-	 * @return
-	 */
-	public static Boolean isModifiedSince(String urlString, long timestamp){
-		
-		if (!URLUtil.isURL(urlString))
-			return false;
-		
-		if (timestamp==0)
-			return true;
-		
-		InputStream inputStream = null;
-		try{
-			URL url = new URL(StringUtils.substringBefore(urlString, "#"));
-			URLConnection urlConnection = replaceURLSpaces(url).openConnection();
-			urlConnection.setRequestProperty("User-Agent", userAgentHeader());
-			urlConnection.setIfModifiedSince(timestamp);
-			inputStream = urlConnection.getInputStream();
-			
-			int responseCode = ((HttpURLConnection)urlConnection).getResponseCode();
-			if (responseCode==HttpURLConnection.HTTP_NOT_MODIFIED){
-				return Boolean.FALSE;
-			}
-			else if (responseCode==HttpURLConnection.HTTP_OK){
-				return Boolean.TRUE;
-			}
-			else{
-				return null;
-			}
-		}
-		catch (IOException ioe){
-			return null;
-		}
-		finally{
-			if (inputStream!=null){
-				try{ inputStream.close(); } catch (IOException ioe){}
-			}
-		}
-	}
-	
-	/**
-	 * 
-	 * @param uri
-	 * @return
-	 */
-	public static boolean isNotExisting(String urlStr){
-		
-		int responseCode = -1;
-		IOException ioe = null;		
-		InputStream inputStream = null;
-		try{
-			URL url = new URL(StringUtils.substringBefore(urlStr, "#"));
-			URLConnection urlConnection = replaceURLSpaces(url).openConnection();
-			inputStream = urlConnection.getInputStream();
-			responseCode = ((HttpURLConnection)urlConnection).getResponseCode();
-		}
-		catch (IOException e){
-			ioe = e;
-		}
-		finally{
-			if (inputStream!=null){
-				try{inputStream.close();}catch (IOException e){}
-			}
-		}
+    /**
+     *
+     * @param s
+     * @return
+     */
+    public static boolean isURL(String s){
 
-		return    ioe instanceof MalformedURLException
-		       || ioe instanceof UnknownHostException
-		       || (responseCode>=400 && responseCode<=499)
-		       || responseCode==501
-		       || responseCode==505;
-	}
-	
-	
-	/**
-	 * 
-	 * @param uri
-	 * @param dflt
-	 * @return
-	 */
-	public static String extractUrlHost(String uri){
-		
-		if (URLUtil.isURL(uri)){
-			String host = "";
-			URL url;
-			try {
-				url = new URL(StringUtils.substringBefore(uri, "#"));
-				host = uri.substring(0, uri.indexOf(url.getPath()));
-				
-			} catch (Exception ex){
-				
-			}
-			return host;
-		}else {
-			return null;
-		}
-	}
+        if (s==null || s.trim().length()==0)
+            return false;
 
-	/**
-	 * 
-	 * @param url
-	 * @return
-	 * @throws MalformedURLException 
-	 */
-	public static URL replaceURLSpaces(URL url) throws MalformedURLException{
-		
-		return url==null ? null : new URL(StringUtils.replace(url.toString(), " ", "%20"));
-	}
+        try{
+            URL url = new URL(s);
+            return true;
+        }
+        catch (MalformedURLException e){
+            return false;
+        }
+    }
+
+    /**
+     *
+     * @return
+     */
+    public static String userAgentHeader(){
+
+        String ua = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_USERAGENT);
+        Object[] args = new String[1];
+        args[0] = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_VERSION);
+        return MessageFormat.format(ua, args);
+    }
+
+    /**
+     *
+     * @param timestamp
+     * @return
+     */
+    public static Boolean isModifiedSince(String urlString, long timestamp){
+
+        if (!URLUtil.isURL(urlString))
+            return false;
+
+        if (timestamp==0)
+            return true;
+
+        InputStream inputStream = null;
+        try{
+            URL url = new URL(StringUtils.substringBefore(urlString, "#"));
+            URLConnection urlConnection = replaceURLSpaces(url).openConnection();
+            urlConnection.setRequestProperty("User-Agent", userAgentHeader());
+            urlConnection.setIfModifiedSince(timestamp);
+            inputStream = urlConnection.getInputStream();
+
+            int responseCode = ((HttpURLConnection)urlConnection).getResponseCode();
+            if (responseCode==HttpURLConnection.HTTP_NOT_MODIFIED){
+                return Boolean.FALSE;
+            }
+            else if (responseCode==HttpURLConnection.HTTP_OK){
+                return Boolean.TRUE;
+            }
+            else{
+                return null;
+            }
+        }
+        catch (IOException ioe){
+            return null;
+        }
+        finally{
+            if (inputStream!=null){
+                try{ inputStream.close(); } catch (IOException ioe){}
+            }
+        }
+    }
+
+    /**
+     *
+     * @param uri
+     * @return
+     */
+    public static boolean isNotExisting(String urlStr){
+
+        int responseCode = -1;
+        IOException ioe = null;
+        InputStream inputStream = null;
+        try{
+            URL url = new URL(StringUtils.substringBefore(urlStr, "#"));
+            URLConnection urlConnection = replaceURLSpaces(url).openConnection();
+            inputStream = urlConnection.getInputStream();
+            responseCode = ((HttpURLConnection)urlConnection).getResponseCode();
+        }
+        catch (IOException e){
+            ioe = e;
+        }
+        finally{
+            if (inputStream!=null){
+                try{inputStream.close();}catch (IOException e){}
+            }
+        }
+
+        return    ioe instanceof MalformedURLException
+               || ioe instanceof UnknownHostException
+               || (responseCode>=400 && responseCode<=499)
+               || responseCode==501
+               || responseCode==505;
+    }
+
+
+    /**
+     *
+     * @param uri
+     * @param dflt
+     * @return
+     */
+    public static String extractUrlHost(String uri){
+
+        if (URLUtil.isURL(uri)){
+            String host = "";
+            URL url;
+            try {
+                url = new URL(StringUtils.substringBefore(uri, "#"));
+                host = uri.substring(0, uri.indexOf(url.getPath()));
+
+            } catch (Exception ex){
+
+            }
+            return host;
+        }else {
+            return null;
+        }
+    }
+
+    /**
+     *
+     * @param url
+     * @return
+     * @throws MalformedURLException
+     */
+    public static URL replaceURLSpaces(URL url) throws MalformedURLException{
+
+        return url==null ? null : new URL(StringUtils.replace(url.toString(), " ", "%20"));
+    }
 }

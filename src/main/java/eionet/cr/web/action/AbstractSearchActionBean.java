@@ -34,160 +34,160 @@ import eionet.cr.web.util.columns.SearchResultColumn;
 import eionet.cr.web.util.columns.SubjectPredicateColumn;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
 public abstract class AbstractSearchActionBean<T> extends AbstractActionBean{
 
-	/** */
-	protected Collection<T> resultList;
-	
-	/** */
-	protected int pageN = 1;
-	protected String sortO = SortOrder.ASCENDING.toString();
-	protected String sortP = null;	
-	protected int matchCount = 0;
-	protected boolean exactCount=true;
-	
-	/** */
-	private Pagination pagination;
-	
-	/**
-	 * 
-	 * @return
-	 * @throws DAOException TODO
-	 */
-	public abstract Resolution search() throws DAOException;
+    /** */
+    protected Collection<T> resultList;
 
-	/**
-	 * @return the columns
-	 * @throws DAOException 
-	 */
-	public abstract List<SearchResultColumn> getColumns() throws DAOException;
+    /** */
+    protected int pageN = 1;
+    protected String sortO = SortOrder.ASCENDING.toString();
+    protected String sortP = null;
+    protected int matchCount = 0;
+    protected boolean exactCount=true;
 
-	/**
-	 * 
-	 * @return
-	 */
-	public Collection<T> getResultList() {
-		return resultList;
-	}
+    /** */
+    private Pagination pagination;
 
-	/**
-	 * @param resultList the resultList to set
-	 */
-	public void setResultList(List<T> resultList) {
-		this.resultList = resultList;
-	}
+    /**
+     *
+     * @return
+     * @throws DAOException TODO
+     */
+    public abstract Resolution search() throws DAOException;
 
-	/**
-	 * 
-	 * @return
-	 */
-	public int getMaxResultSetSize(){
-		return Pagination.pageLength();
-	}
+    /**
+     * @return the columns
+     * @throws DAOException
+     */
+    public abstract List<SearchResultColumn> getColumns() throws DAOException;
 
-	/**
-	 * 
-	 * @return
-	 */
-	protected List<SearchResultColumn> getDefaultColumns(){
-		
-		ArrayList<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
-		
-		SubjectPredicateColumn col = new SubjectPredicateColumn();
-		col.setPredicateUri(Predicates.RDF_TYPE);
-		col.setTitle("Type");
-		col.setSortable(true);
-		list.add(col);
-		
-		col = new SubjectPredicateColumn();
-		col.setPredicateUri(Predicates.RDFS_LABEL);
-		col.setTitle("Title");
-		col.setSortable(true);
-		list.add(col);
+    /**
+     *
+     * @return
+     */
+    public Collection<T> getResultList() {
+        return resultList;
+    }
 
-		col = new SubjectPredicateColumn();
-		col.setPredicateUri(Predicates.DC_DATE);
-		col.setTitle("Date");
-		col.setSortable(true);
-		list.add(col);
+    /**
+     * @param resultList the resultList to set
+     */
+    public void setResultList(List<T> resultList) {
+        this.resultList = resultList;
+    }
 
-		return list;
-	}
+    /**
+     *
+     * @return
+     */
+    public int getMaxResultSetSize(){
+        return Pagination.pageLength();
+    }
 
-	/**
-	 * @return the pageN
-	 */
-	public int getPageN() {
-		return pageN;
-	}
+    /**
+     *
+     * @return
+     */
+    protected List<SearchResultColumn> getDefaultColumns(){
 
-	/**
-	 * @param pageN the pageN to set
-	 */
-	public void setPageN(int pageNumber) {
-		this.pageN = pageNumber<1 ? 1 : pageNumber;
-	}
+        ArrayList<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
 
-	/**
-	 * @return the sortO
-	 */
-	public String getSortO() {
-		return sortO;
-	}
+        SubjectPredicateColumn col = new SubjectPredicateColumn();
+        col.setPredicateUri(Predicates.RDF_TYPE);
+        col.setTitle("Type");
+        col.setSortable(true);
+        list.add(col);
 
-	/**
-	 * @param sortO the sortO to set
-	 */
-	public void setSortO(String sortOrder) {
-		this.sortO = sortOrder;
-	}
+        col = new SubjectPredicateColumn();
+        col.setPredicateUri(Predicates.RDFS_LABEL);
+        col.setTitle("Title");
+        col.setSortable(true);
+        list.add(col);
 
-	/**
-	 * @return the sortP
-	 */
-	public String getSortP() {
-		return sortP;
-	}
+        col = new SubjectPredicateColumn();
+        col.setPredicateUri(Predicates.DC_DATE);
+        col.setTitle("Date");
+        col.setSortable(true);
+        list.add(col);
 
-	/**
-	 * @param sortP the sortP to set
-	 */
-	public void setSortP(String sortPredicate) {
-		this.sortP = sortPredicate;
-	}
+        return list;
+    }
 
-	/**
-	 * @return the matchCount
-	 */
-	public int getMatchCount() {
-		return matchCount;
-	}
-	
-	/**
-	 * @return the calcCount
-	 */
-	public boolean isExactCount() {
-		return exactCount;
-	}
+    /**
+     * @return the pageN
+     */
+    public int getPageN() {
+        return pageN;
+    }
 
-	/**
-	 * 
-	 * @return
-	 */
-	public Pagination getPagination(){
-		
-		if (pagination==null){
-			pagination = Pagination.createPagination(this);
-		}
-		
-		return pagination;
-	}
-	
-	public void setPagination(Pagination pagination) {
-		this.pagination = pagination;
-	}
+    /**
+     * @param pageN the pageN to set
+     */
+    public void setPageN(int pageNumber) {
+        this.pageN = pageNumber<1 ? 1 : pageNumber;
+    }
+
+    /**
+     * @return the sortO
+     */
+    public String getSortO() {
+        return sortO;
+    }
+
+    /**
+     * @param sortO the sortO to set
+     */
+    public void setSortO(String sortOrder) {
+        this.sortO = sortOrder;
+    }
+
+    /**
+     * @return the sortP
+     */
+    public String getSortP() {
+        return sortP;
+    }
+
+    /**
+     * @param sortP the sortP to set
+     */
+    public void setSortP(String sortPredicate) {
+        this.sortP = sortPredicate;
+    }
+
+    /**
+     * @return the matchCount
+     */
+    public int getMatchCount() {
+        return matchCount;
+    }
+
+    /**
+     * @return the calcCount
+     */
+    public boolean isExactCount() {
+        return exactCount;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Pagination getPagination(){
+
+        if (pagination==null){
+            pagination = Pagination.createPagination(this);
+        }
+
+        return pagination;
+    }
+
+    public void setPagination(Pagination pagination) {
+        this.pagination = pagination;
+    }
 }

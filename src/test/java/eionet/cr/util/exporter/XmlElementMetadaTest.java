@@ -33,31 +33,31 @@ import eionet.cr.util.export.XmlElementMetadata.Type;
 
 public class XmlElementMetadaTest extends TestCase{
 
-	@Test
-	public void testXmlElementMetada(){
-		XmlElementMetadata elem = new XmlElementMetadata("nameValue");
-		//get default type
-		assertEquals(elem.getType(), XmlElementMetadata.Type.STRING);
-		
-		elem.setMaxLength(100);
-		assertEquals(elem.getMaxLength(), 100);
-		elem.setMaxLength(300);
-		assertEquals(elem.getMaxLength(), 300);
-		elem.setMaxLength(100);
-		assertEquals(elem.getMaxLength(), 300);
-	
-		elem.setType("111");
-		assertEquals(elem.getType(), XmlElementMetadata.Type.DOUBLE);
+    @Test
+    public void testXmlElementMetada(){
+        XmlElementMetadata elem = new XmlElementMetadata("nameValue");
+        //get default type
+        assertEquals(elem.getType(), XmlElementMetadata.Type.STRING);
 
-		elem.setType("some string");
-		assertEquals(elem.getType(), XmlElementMetadata.Type.STRING);
+        elem.setMaxLength(100);
+        assertEquals(elem.getMaxLength(), 100);
+        elem.setMaxLength(300);
+        assertEquals(elem.getMaxLength(), 300);
+        elem.setMaxLength(100);
+        assertEquals(elem.getMaxLength(), 300);
 
-		elem.setType(Type.STRING);
-		assertEquals(elem.getType(), XmlElementMetadata.Type.STRING);
+        elem.setType("111");
+        assertEquals(elem.getType(), XmlElementMetadata.Type.DOUBLE);
 
-		//if element is already a string data type, then it's impossible to change it to numeric
-		elem.setType(Type.DOUBLE);
-		assertEquals(elem.getType(), XmlElementMetadata.Type.STRING);
+        elem.setType("some string");
+        assertEquals(elem.getType(), XmlElementMetadata.Type.STRING);
 
-	}
+        elem.setType(Type.STRING);
+        assertEquals(elem.getType(), XmlElementMetadata.Type.STRING);
+
+        //if element is already a string data type, then it's impossible to change it to numeric
+        elem.setType(Type.DOUBLE);
+        assertEquals(elem.getType(), XmlElementMetadata.Type.STRING);
+
+    }
 }

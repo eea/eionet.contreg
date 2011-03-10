@@ -49,7 +49,7 @@
     this.initialize();
     this.setOptions(options);
   }
-  
+
   $.fn.autocomplete = function(options) {
     return new Autocomplete(this.get(0)||$('<input />'), options);
   };
@@ -89,7 +89,7 @@
       this.el.blur(function() { me.enableKillerFn(); });
       this.el.focus(function() { me.fixPosition(); });
     },
-    
+
     setOptions: function(options){
       var o = this.options;
       $.extend(o, options);
@@ -100,16 +100,16 @@
       $('#'+this.mainContainerId).css({ zIndex:o.zIndex });
       this.container.css({ maxHeight: o.maxHeight + 'px', width:o.width });
     },
-    
+
     clearCache: function(){
       this.cachedResponse = [];
       this.badQueries = [];
     },
-    
+
     disable: function(){
       this.disabled = true;
     },
-    
+
     enable: function(){
       this.disabled = false;
     },
@@ -228,7 +228,7 @@
       }
       return ret;
     },
-    
+
     getSuggestions: function(q) {
       var cr, me;
       cr = this.isLocal ? this.getSuggestionsLocal(q) : this.cachedResponse[q];
@@ -295,7 +295,7 @@
       if (response.query === this.getQuery(this.currentValue)) {
         this.suggestions = response.suggestions;
         this.data = response.data;
-        this.suggest(); 
+        this.suggest();
       }
     },
 
@@ -373,7 +373,7 @@
       me.el.val(me.getValue(s));
       if ($.isFunction(fn)) { fn(s, d, me.el); }
     },
-    
+
     getValue: function(value){
         var del, currVal, arr, me;
         me = this;

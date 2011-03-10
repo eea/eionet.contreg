@@ -28,165 +28,165 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * 
+ *
  * @author heinljab
  *
  */
 public class GeneralConfig {
-	
-	/** */
-	public static final String BUNDLE_NAME = "cr";
-	public static final String PROPERTIES_FILE_NAME = "cr.properties";
 
-	/** */
-	public static final String DB_URL = "db.url";
-	public static final String DB_DRV = "db.drv";
-	public static final String DB_USR = "db.usr";
-	public static final String DB_PWD = "db.pwd";
+    /** */
+    public static final String BUNDLE_NAME = "cr";
+    public static final String PROPERTIES_FILE_NAME = "cr.properties";
 
-	/** */
-	public static final String DB_UNITTEST_DRV = "db.unittest.drv";
-	public static final String DB_UNITTEST_URL = "db.unittest.url";
-	public static final String DB_UNITTEST_USR = "db.unittest.usr";
-	public static final String DB_UNITTEST_PWD = "db.unittest.pwd";
+    /** */
+    public static final String DB_URL = "db.url";
+    public static final String DB_DRV = "db.drv";
+    public static final String DB_USR = "db.usr";
+    public static final String DB_PWD = "db.pwd";
 
-	/** */
-	public static final String HARVESTER_FILES_LOCATION = "harvester.tempFileDir";
-	public static final String HARVESTER_BATCH_HARVESTING_HOURS = "harvester.batchHarvestingHours";
-	public static final String HARVESTER_JOB_INTERVAL_SECONDS = "harvester.batchHarvestingIntervalSeconds";
-	public static final String HARVESTER_REFERRALS_INTERVAL = "harvester.referrals.intervalMinutes";
-	
-	/** */
-	public static final String XMLCONV_LIST_CONVERSIONS_URL = "xmlconv.listConversions.url";
-	public static final String XMLCONV_CONVERT_URL = "xmlconv.convert.url";
-	public static final String XMLCONV_CONVERT_PUSH_URL = "xmlconv.convertPush.url";
-	public static final String XMLCONV_XSL_URL = "xmlconv.xsl.url";
-	
-	/** */
-	public static final String MAIL_SYSADMINS = "mail.sysAdmins";
-	
-	/** */
-	public static final String HARVESTER_USE_DOWNLOADED_FILES = "harvest.debug.useDownloadedFiles";
-	public static final String HARVESTER_DELETE_DOWNLOADED_FILES = "harvest.debug.deleteDownloadedFiles";
-	
-	/** */
-	public static final String APPLICATION_VERSION = "application.version";
-	public static final String APPLICATION_USERAGENT = "application.userAgent";
-	
-	/** */
-	public static final String SUBJECT_SELECT_MODE = "subjectSelectMode";
-	
-	/**
-	 * Constant to get dataflow picklist cache update interval (in milliseconds). 
-	 */
-	public static final String DATAFLOW_PICKLIST_CACHE_UPDATE_INTERVAL = "dataflowPicklistCacheUpdateInterval";
-	public static final String RECENT_DISCOVERED_FILES_CACHE_UPDATE_INTERVAL = "recentDiscoveredFilesCacheUpdateInterval";
-	public static final String TYPE_CACHE_UPDATE_INTERVAL = "typeCacheUpdateInterval";
-	public static final String TAG_CLOUD_CACHE_UPDATE_INTERVAL = "tagCloudCacheUpdateInterval";
-	public static final String GARBAGE_COLLECTOR_CRON_JOB = "garbageCollectorCronJob";
-	public static final String TYPE_CACHE_UPDATER_CRON_JOB = "typeCacheTablesUpdateCronJob";
-	
-	/*
-	 * TagCloud sizes.
-	 */
-	public static final String TAGCLOUD_FRONTPAGE_SIZE = "tagcloud.frontpage.size";
-	public static final String TAGCOLUD_TAGSEARCH_SIZE = "tagcloud.tagsearch.size";
-	
-	/** */
-	public static final String VIRTUOSO_DB_URL = "virtuoso.db.url";
-	public static final String VIRTUOSO_DB_USR = "virtuoso.db.usr";
-	public static final String VIRTUOSO_DB_PWD = "virtuoso.db.pwd";
-	
-	/** */
-	public static final int SEVERITY_INFO = 1;
-	public static final int SEVERITY_CAUTION = 2;
-	public static final int SEVERITY_WARNING = 3;
+    /** */
+    public static final String DB_UNITTEST_DRV = "db.unittest.drv";
+    public static final String DB_UNITTEST_URL = "db.unittest.url";
+    public static final String DB_UNITTEST_USR = "db.unittest.usr";
+    public static final String DB_UNITTEST_PWD = "db.unittest.pwd";
 
-	/** */
-	private static Log logger = LogFactory.getLog(GeneralConfig.class);
+    /** */
+    public static final String HARVESTER_FILES_LOCATION = "harvester.tempFileDir";
+    public static final String HARVESTER_BATCH_HARVESTING_HOURS = "harvester.batchHarvestingHours";
+    public static final String HARVESTER_JOB_INTERVAL_SECONDS = "harvester.batchHarvestingIntervalSeconds";
+    public static final String HARVESTER_REFERRALS_INTERVAL = "harvester.referrals.intervalMinutes";
 
-	/** */
-	private static Properties properties = null;
-	
-	/** */
-	private static void init(){
-		properties = new Properties();
-		try{
-			String s = GeneralConfig.class.getClassLoader().getResource(PROPERTIES_FILE_NAME).toString();
-			properties.load(GeneralConfig.class.getClassLoader().getResourceAsStream(PROPERTIES_FILE_NAME));
-			
-			// trim all the values (i.e. we don't allow preceding or trailing white space in property values)
-			for (Entry<Object,Object> entry : properties.entrySet()){
-				entry.setValue(entry.getValue().toString().trim());
-			}
-			
-		}
-		catch (IOException e){
-			logger.fatal("Failed to load properties from " + PROPERTIES_FILE_NAME, e);
-		}
-	}
+    /** */
+    public static final String XMLCONV_LIST_CONVERSIONS_URL = "xmlconv.listConversions.url";
+    public static final String XMLCONV_CONVERT_URL = "xmlconv.convert.url";
+    public static final String XMLCONV_CONVERT_PUSH_URL = "xmlconv.convertPush.url";
+    public static final String XMLCONV_XSL_URL = "xmlconv.xsl.url";
 
-	/**
-	 * 
-	 * @param name
-	 * @return
-	 */
-	public static synchronized String getProperty(String key){
-		
-		if (properties==null)
-			init();
-		
-		return properties.getProperty(key);
-	}
+    /** */
+    public static final String MAIL_SYSADMINS = "mail.sysAdmins";
 
-	/**
-	 * 
-	 * @param key
-	 * @param defaultValue
-	 * @return
-	 */
-	public static synchronized String getProperty(String key, String defaultValue){
-		
-		if (properties==null)
-			init();
-		
-		return properties.getProperty(key, defaultValue);
-	}
-	
-	/**
-	 * 
-	 * @param key
-	 * @return
-	 * @throws CRConfigException 
-	 */
-	public static synchronized String getRequiredProperty(String key){
-		
-		String value = getProperty(key);
-		if (value==null || value.trim().length()==0)
-			throw new CRConfigException("Missing required property: " + key);
-		else
-			return value;
-	}
+    /** */
+    public static final String HARVESTER_USE_DOWNLOADED_FILES = "harvest.debug.useDownloadedFiles";
+    public static final String HARVESTER_DELETE_DOWNLOADED_FILES = "harvest.debug.deleteDownloadedFiles";
 
-	/**
-	 * 
-	 * @return
-	 */
-	public static synchronized Properties getProperties(){
+    /** */
+    public static final String APPLICATION_VERSION = "application.version";
+    public static final String APPLICATION_USERAGENT = "application.userAgent";
 
-		if (properties==null)
-			init();
-		
-		return properties;
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public static synchronized boolean useVirtuoso(){
-		
-		String virtuosoDbUrl = getProperty(VIRTUOSO_DB_URL);
-		return virtuosoDbUrl!=null && virtuosoDbUrl.trim().length()>0;
-	}
+    /** */
+    public static final String SUBJECT_SELECT_MODE = "subjectSelectMode";
+
+    /**
+     * Constant to get dataflow picklist cache update interval (in milliseconds).
+     */
+    public static final String DATAFLOW_PICKLIST_CACHE_UPDATE_INTERVAL = "dataflowPicklistCacheUpdateInterval";
+    public static final String RECENT_DISCOVERED_FILES_CACHE_UPDATE_INTERVAL = "recentDiscoveredFilesCacheUpdateInterval";
+    public static final String TYPE_CACHE_UPDATE_INTERVAL = "typeCacheUpdateInterval";
+    public static final String TAG_CLOUD_CACHE_UPDATE_INTERVAL = "tagCloudCacheUpdateInterval";
+    public static final String GARBAGE_COLLECTOR_CRON_JOB = "garbageCollectorCronJob";
+    public static final String TYPE_CACHE_UPDATER_CRON_JOB = "typeCacheTablesUpdateCronJob";
+
+    /*
+     * TagCloud sizes.
+     */
+    public static final String TAGCLOUD_FRONTPAGE_SIZE = "tagcloud.frontpage.size";
+    public static final String TAGCOLUD_TAGSEARCH_SIZE = "tagcloud.tagsearch.size";
+
+    /** */
+    public static final String VIRTUOSO_DB_URL = "virtuoso.db.url";
+    public static final String VIRTUOSO_DB_USR = "virtuoso.db.usr";
+    public static final String VIRTUOSO_DB_PWD = "virtuoso.db.pwd";
+
+    /** */
+    public static final int SEVERITY_INFO = 1;
+    public static final int SEVERITY_CAUTION = 2;
+    public static final int SEVERITY_WARNING = 3;
+
+    /** */
+    private static Log logger = LogFactory.getLog(GeneralConfig.class);
+
+    /** */
+    private static Properties properties = null;
+
+    /** */
+    private static void init(){
+        properties = new Properties();
+        try{
+            String s = GeneralConfig.class.getClassLoader().getResource(PROPERTIES_FILE_NAME).toString();
+            properties.load(GeneralConfig.class.getClassLoader().getResourceAsStream(PROPERTIES_FILE_NAME));
+
+            // trim all the values (i.e. we don't allow preceding or trailing white space in property values)
+            for (Entry<Object,Object> entry : properties.entrySet()){
+                entry.setValue(entry.getValue().toString().trim());
+            }
+
+        }
+        catch (IOException e){
+            logger.fatal("Failed to load properties from " + PROPERTIES_FILE_NAME, e);
+        }
+    }
+
+    /**
+     *
+     * @param name
+     * @return
+     */
+    public static synchronized String getProperty(String key){
+
+        if (properties==null)
+            init();
+
+        return properties.getProperty(key);
+    }
+
+    /**
+     *
+     * @param key
+     * @param defaultValue
+     * @return
+     */
+    public static synchronized String getProperty(String key, String defaultValue){
+
+        if (properties==null)
+            init();
+
+        return properties.getProperty(key, defaultValue);
+    }
+
+    /**
+     *
+     * @param key
+     * @return
+     * @throws CRConfigException
+     */
+    public static synchronized String getRequiredProperty(String key){
+
+        String value = getProperty(key);
+        if (value==null || value.trim().length()==0)
+            throw new CRConfigException("Missing required property: " + key);
+        else
+            return value;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public static synchronized Properties getProperties(){
+
+        if (properties==null)
+            init();
+
+        return properties;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public static synchronized boolean useVirtuoso(){
+
+        String virtuosoDbUrl = getProperty(VIRTUOSO_DB_URL);
+        return virtuosoDbUrl!=null && virtuosoDbUrl.trim().length()>0;
+    }
 }

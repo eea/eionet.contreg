@@ -52,242 +52,242 @@ import eionet.cr.web.security.CRUser;
 
 /**
  * Root class for all CR ActionBeans.
- * 
+ *
  * @author altnyris
  *
  */
 public abstract class AbstractActionBean implements ActionBean {
-	
-	/** */
-	private static final String SESSION_MESSAGES = AbstractActionBean.class.getName() + ".sessionMessages";
-	
-	/** */
-	private static final String SYSTEM_MESSAGES = "systemMessages";
-	private static final String CAUTION_MESSAGES = "cautionMessages";
-	private static final String WARNING_MESSAGES = "warningMessages";
-	
-	/** */
-	protected static Log logger = LogFactory.getLog(AbstractActionBean.class);
-	
-	/** */
-	private CRActionBeanContext context;
-	
-	/** */
-	private Harvest currentQueuedHarvest = CurrentHarvests.getQueuedHarvest();
-	
-	/** */
-	protected DAOFactory factory = DAOFactory.get();
-	
-	/** */
-	private HashSet<String> acceptedLanguages;
-	private List<String> acceptedLanguagesByImportance;
-	
-	protected boolean homeContext;
-	
-	/*
-	 * (non-Javadoc)
-	 * @see net.sourceforge.stripes.action.ActionBean#getContext()
-	 */
-	public CRActionBeanContext getContext() {
-		return this.context;
-	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see net.sourceforge.stripes.action.ActionBean#setContext(net.sourceforge.stripes.action.ActionBeanContext)
-	 */
-	public void setContext(ActionBeanContext context) {
-		this.context = (CRActionBeanContext) context; 
-	}
-	
-	/**
-	 * @return logged in user name or default value for not logged in users.
-	 */
-	public final String getUserName() {
-		return getUser().getUserName();
-	}
-	
-	/**
-	 * Method checks whether user is logged in or not.
-	 * 
-	 * @return true if user is logged in.
-	 */
-	public final boolean isUserLoggedIn() {
-		return getUser()!=null;
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public CRUser getUser(){
-		return getContext().getCRUser();
-	}
-	
-	/**
-	 * 
-	 * @param message
-	 */
-	protected void addSystemMessage(String message){
-		getContext().getMessages(SYSTEM_MESSAGES).add(new SimpleMessage(message));
-	}
+    /** */
+    private static final String SESSION_MESSAGES = AbstractActionBean.class.getName() + ".sessionMessages";
 
-	/**
-	 * 
-	 * @param message
-	 */
-	protected void addCautionMessage(String message){
-		getContext().getMessages(CAUTION_MESSAGES).add(new SimpleMessage(message));
-	}
+    /** */
+    private static final String SYSTEM_MESSAGES = "systemMessages";
+    private static final String CAUTION_MESSAGES = "cautionMessages";
+    private static final String WARNING_MESSAGES = "warningMessages";
 
-	/**
-	 * 
-	 * @param message
-	 */
-	protected void addWarningMessage(String message){
-		getContext().getMessages(WARNING_MESSAGES).add(new SimpleMessage(message));
-	}
+    /** */
+    protected static Log logger = LogFactory.getLog(AbstractActionBean.class);
 
-	/**
-	 * 
-	 * @return
-	 */
+    /** */
+    private CRActionBeanContext context;
+
+    /** */
+    private Harvest currentQueuedHarvest = CurrentHarvests.getQueuedHarvest();
+
+    /** */
+    protected DAOFactory factory = DAOFactory.get();
+
+    /** */
+    private HashSet<String> acceptedLanguages;
+    private List<String> acceptedLanguagesByImportance;
+
+    protected boolean homeContext;
+
+    /*
+     * (non-Javadoc)
+     * @see net.sourceforge.stripes.action.ActionBean#getContext()
+     */
+    public CRActionBeanContext getContext() {
+        return this.context;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see net.sourceforge.stripes.action.ActionBean#setContext(net.sourceforge.stripes.action.ActionBeanContext)
+     */
+    public void setContext(ActionBeanContext context) {
+        this.context = (CRActionBeanContext) context;
+    }
+
+    /**
+     * @return logged in user name or default value for not logged in users.
+     */
+    public final String getUserName() {
+        return getUser().getUserName();
+    }
+
+    /**
+     * Method checks whether user is logged in or not.
+     *
+     * @return true if user is logged in.
+     */
+    public final boolean isUserLoggedIn() {
+        return getUser()!=null;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public CRUser getUser(){
+        return getContext().getCRUser();
+    }
+
+    /**
+     *
+     * @param message
+     */
+    protected void addSystemMessage(String message){
+        getContext().getMessages(SYSTEM_MESSAGES).add(new SimpleMessage(message));
+    }
+
+    /**
+     *
+     * @param message
+     */
+    protected void addCautionMessage(String message){
+        getContext().getMessages(CAUTION_MESSAGES).add(new SimpleMessage(message));
+    }
+
+    /**
+     *
+     * @param message
+     */
+    protected void addWarningMessage(String message){
+        getContext().getMessages(WARNING_MESSAGES).add(new SimpleMessage(message));
+    }
+
+    /**
+     *
+     * @return
+     */
     public ResourceBundle getBundle() {
-    	ResourceBundle bundle = ResourceBundle.getBundle("/StripesResources");
+        ResourceBundle bundle = ResourceBundle.getBundle("/StripesResources");
         return bundle;
     }
-    
+
     /**
-     * 
+     *
      * @return
      */
     public String getUrlBinding(){
-    	AnnotatedClassActionResolver resolver = new AnnotatedClassActionResolver();
-    	return resolver.getUrlBinding(this.getClass());
+        AnnotatedClassActionResolver resolver = new AnnotatedClassActionResolver();
+        return resolver.getUrlBinding(this.getClass());
     }
-    
+
     /**
-     * 
+     *
      * @return
      */
     public boolean isPostRequest(){
-    	return getContext().getRequest().getMethod().equalsIgnoreCase("POST");
+        return getContext().getRequest().getMethod().equalsIgnoreCase("POST");
     }
 
     /**
-     * 
+     *
      * @return
      */
     public boolean isGetRequest(){
-    	return getContext().getRequest().getMethod().equalsIgnoreCase("GET");
+        return getContext().getRequest().getMethod().equalsIgnoreCase("GET");
     }
 
     /**
-     * 
+     *
      * @param field
      * @param error
      */
-	public void addFieldValidationError(String field, ValidationError error) {
-		context.getValidationErrors().add(field, error);
-	}
+    public void addFieldValidationError(String field, ValidationError error) {
+        context.getValidationErrors().add(field, error);
+    }
 
-	/**
-	 * 
-	 * @param error
-	 */
-	public void addGlobalValidationError(ValidationError error) {
-		context.getValidationErrors().addGlobalError(error);
-	}
+    /**
+     *
+     * @param error
+     */
+    public void addGlobalValidationError(ValidationError error) {
+        context.getValidationErrors().addGlobalError(error);
+    }
 
-	/**
-	 * 
-	 * @param simpleErrorMessage
-	 */
-	public void addGlobalValidationError(String simpleErrorMessage) {
-		context.getValidationErrors().addGlobalError(new SimpleError(simpleErrorMessage));
-	}
+    /**
+     *
+     * @param simpleErrorMessage
+     */
+    public void addGlobalValidationError(String simpleErrorMessage) {
+        context.getValidationErrors().addGlobalError(new SimpleError(simpleErrorMessage));
+    }
 
-	/**
-	 * 
-	 * @return
-	 */
-	public boolean hasValidationErrors() {
-		return context.getValidationErrors()!=null && !context.getValidationErrors().isEmpty();
-	}
+    /**
+     *
+     * @return
+     */
+    public boolean hasValidationErrors() {
+        return context.getValidationErrors()!=null && !context.getValidationErrors().isEmpty();
+    }
 
-	/**
-	 * 
-	 * @param message
-	 */
-	public void addMessage(Message message) {
-		context.getMessages().add(message);
-	}
+    /**
+     *
+     * @param message
+     */
+    public void addMessage(Message message) {
+        context.getMessages().add(message);
+    }
 
-	/**
-	 * 
-	 * @param message
-	 */
-	public void addMessage(String message) {
-		addMessage(new SimpleMessage(message));
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public Harvest getCurrentQueuedHarvest(){
-		return currentQueuedHarvest;
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public HashSet<String> getAcceptedLanguages(){
-		
-		if (acceptedLanguages==null){
-			acceptedLanguages = Util.getAcceptedLanguages(getContext().getRequest().getHeader("Accept-Language"));
-		}
-		return acceptedLanguages;
-	}
+    /**
+     *
+     * @param message
+     */
+    public void addMessage(String message) {
+        addMessage(new SimpleMessage(message));
+    }
 
-	/**
-	 * 
-	 * @return
-	 */
-	public List<String> getAcceptedLanguagesByImportance(){
-		if (acceptedLanguagesByImportance == null){
-			acceptedLanguagesByImportance = Util.getAcceptedLanguagesByImportance(getContext().getRequest().getHeader("Accept-Language"));
-		}
-		return acceptedLanguagesByImportance;
-	}
-	
-	
-	/**
-	 * @return session associated with current request
-	 */
-	protected HttpSession getSession() {
-		return context.getRequest().getSession();
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public String[] excludeFromSortAndPagingUrls(){
-		return null;
-	}
+    /**
+     *
+     * @return
+     */
+    public Harvest getCurrentQueuedHarvest(){
+        return currentQueuedHarvest;
+    }
 
-	public boolean isHomeContext() {
-		return homeContext;
-	}
+    /**
+     *
+     * @return
+     */
+    public HashSet<String> getAcceptedLanguages(){
 
-	public void setHomeContext(boolean homeContext) {
-		this.homeContext = homeContext;
-	}
-	
-	public String getBaseUrl(CRActionBeanContext context){
-		String url =  context.getRequest().getRequestURL().toString();
-		return url.substring(0, url.lastIndexOf("/pages/"));
-	}
+        if (acceptedLanguages==null){
+            acceptedLanguages = Util.getAcceptedLanguages(getContext().getRequest().getHeader("Accept-Language"));
+        }
+        return acceptedLanguages;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public List<String> getAcceptedLanguagesByImportance(){
+        if (acceptedLanguagesByImportance == null){
+            acceptedLanguagesByImportance = Util.getAcceptedLanguagesByImportance(getContext().getRequest().getHeader("Accept-Language"));
+        }
+        return acceptedLanguagesByImportance;
+    }
+
+
+    /**
+     * @return session associated with current request
+     */
+    protected HttpSession getSession() {
+        return context.getRequest().getSession();
+    }
+
+    /**
+     *
+     * @return
+     */
+    public String[] excludeFromSortAndPagingUrls(){
+        return null;
+    }
+
+    public boolean isHomeContext() {
+        return homeContext;
+    }
+
+    public void setHomeContext(boolean homeContext) {
+        this.homeContext = homeContext;
+    }
+
+    public String getBaseUrl(CRActionBeanContext context){
+        String url =  context.getRequest().getRequestURL().toString();
+        return url.substring(0, url.lastIndexOf("/pages/"));
+    }
 }

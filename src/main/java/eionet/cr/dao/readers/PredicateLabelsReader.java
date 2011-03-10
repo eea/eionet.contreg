@@ -28,42 +28,42 @@ import org.openrdf.query.BindingSet;
 import eionet.cr.dao.util.PredicateLabels;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
 public class PredicateLabelsReader extends ResultSetMixedReader{
-	
-	/** */
-	private PredicateLabels predicateLabels;
-	
-	/**
-	 * 
-	 * @param predicateLabels
-	 */
-	public PredicateLabelsReader(PredicateLabels predicateLabels){
-		
-		if (predicateLabels==null)
-			throw new IllegalArgumentException();
-		
-		this.predicateLabels = predicateLabels;
-	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
-	 */
-	public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
-		predicateLabels.add(rs.getString("PREDICATE_URI"), rs.getString("LABEL"), rs.getString("LANG"));
-	}
+    /** */
+    private PredicateLabels predicateLabels;
 
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
-	 */
-	@Override
-	public void readRow(BindingSet bindingSet) {
-		
-		// TODO Auto-generated method stub
-	}
+    /**
+     *
+     * @param predicateLabels
+     */
+    public PredicateLabelsReader(PredicateLabels predicateLabels){
+
+        if (predicateLabels==null)
+            throw new IllegalArgumentException();
+
+        this.predicateLabels = predicateLabels;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
+     */
+    public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
+        predicateLabels.add(rs.getString("PREDICATE_URI"), rs.getString("LABEL"), rs.getString("LANG"));
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
+     */
+    @Override
+    public void readRow(BindingSet bindingSet) {
+
+        // TODO Auto-generated method stub
+    }
 }

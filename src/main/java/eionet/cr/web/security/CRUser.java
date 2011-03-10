@@ -33,212 +33,212 @@ import eionet.cr.util.Util;
 
 /**
  * Class represents authenticated user.
- * 
+ *
  * @author altnyris
  *
  */
 public class CRUser {
-	
-	/** */
-	private static Log logger = LogFactory.getLog(CRUser.class);
-	
-	/** */
-	public static final CRUser application = new CRUser("application");
-	
-	/** */
-	private String userName;
 
-	/**
-	 * 
-	 */
-	public CRUser() {		
-	}
-	
-	/**
-	 * 
-	 * @param userName
-	 */
-	public CRUser(String userName) {
-		this.userName = userName;
-	}
-	
-	/**
-	 * @return the userName
-	 */
-	public String getUserName() {
-		return userName;
-	}
+    /** */
+    private static Log logger = LogFactory.getLog(CRUser.class);
 
-	/**
-	 * @param username the userName to set
-	 */
-	public void setUserName(String username) {
-		this.userName = username;
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public boolean isAdministrator(){
-		
-		return hasPermission("/", "u");
-	}
-	
-	/**
-	 * 
-	 * @param aclPath
-	 * @param prm
-	 * @return
-	 */
-	public boolean hasPermission(String aclPath, String prm){
-		return hasPermission(userName, aclPath, prm);
-	}
-	
-	/**
-	 * 
-	 * @param userName
-	 * @param aclPath
-	 * @param prm
-	 * @return
-	 */
-	public static boolean hasPermission(String userName, String aclPath, String prm){
+    /** */
+    public static final CRUser application = new CRUser("application");
 
-		if (Util.isNullOrEmpty(userName) || Util.isNullOrEmpty(aclPath) || Util.isNullOrEmpty(prm))
-			return false;
-		
-		boolean result = false;
-		try{
-			AccessControlListIF acl = AccessController.getAcl(aclPath);
-			if (acl!=null){
-				result = acl.checkPermission(userName, prm);
-				if (result==false)
-					logger.debug("User " + userName + " does not have permission " + prm + " in acl \"" + aclPath + "\"");
-			}
-			else
-				logger.warn("acl \"" + aclPath + "\" not found!");
-		}
-		catch (SignOnException soe){
-			logger.error(soe.toString(), soe);
-		}
-		
-		return result;
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public String getHomeUri(){
-		return CRUser.homeUri(userName);
-	}
+    /** */
+    private String userName;
 
-	/**
-	 * 
-	 * @return
-	 */
-	public String getReviewUri(int reviewId){
-		return CRUser.homeUri(userName)+"/reviews/"+reviewId;
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public String getReviewAttachmentUri(int reviewId, String attachmentFileName){
-		return CRUser.homeUri(userName)+"/reviews/"+reviewId+"/"+attachmentFileName;
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public String getRegistrationsUri(){
-		return CRUser.registrationsUri(userName);
-	}
+    /**
+     *
+     */
+    public CRUser() {
+    }
 
-	/**
-	 * 
-	 * @return
-	 */
-	public String getBookmarksUri(){
-		return CRUser.bookmarksUri(userName);
-	}
+    /**
+     *
+     * @param userName
+     */
+    public CRUser(String userName) {
+        this.userName = userName;
+    }
 
-	/**
-	 * 
-	 * @return
-	 */
-	public String getHistoryUri(){
-		return CRUser.historyUri(userName);
-	}
-	
-	/**
-	 * 
-	 * @param uri
-	 * @return
-	 */
-	public String getHomeItemUri(String uri){
-		
-		return CRUser.homeItemUri(userName, uri);
-	}
+    /**
+     * @return the userName
+     */
+    public String getUserName() {
+        return userName;
+    }
 
-	/**
-	 * 
-	 * @param userName
-	 * @return
-	 */
-	public static String homeUri(String userName){
-		
-		if (StringUtils.isBlank(userName))
-			throw new IllegalArgumentException("userName must not be blank");
-		else
-			return "http://cr.eionet.europa.eu/home/" + userName;
-	}
+    /**
+     * @param username the userName to set
+     */
+    public void setUserName(String username) {
+        this.userName = username;
+    }
 
-	/**
-	 * 
-	 * @param userName
-	 * @param uri
-	 * @return
-	 */
-	public static String homeItemUri(String userName, String uri){
-		
-		if (StringUtils.isBlank(userName) || StringUtils.isBlank(uri))
-			throw new IllegalArgumentException("userName and uri must not be blank");
-		else{
-			return new StringBuilder("http://cr.eionet.europa.eu/home/").
-			append(userName).append("/").append(Hashes.spoHash(uri)).toString();
-		}
-	}
-	
-	/**
-	 * 
-	 * @param userName
-	 * @return
-	 */
-	public static String bookmarksUri(String userName){
-		
-		return CRUser.homeUri(userName) + "/bookmarks";
-	}
+    /**
+     *
+     * @return
+     */
+    public boolean isAdministrator(){
 
-	/**
-	 * 
-	 * @param userName
-	 * @return
-	 */
-	public static String registrationsUri(String userName){
-		
-		return CRUser.homeUri(userName) + "/registrations";
-	}
+        return hasPermission("/", "u");
+    }
 
-	/**
-	 * 
-	 * @param userName
-	 * @return
-	 */
-	public static String historyUri(String userName){
-		
-		return CRUser.homeUri(userName) + "/history";
-	}
+    /**
+     *
+     * @param aclPath
+     * @param prm
+     * @return
+     */
+    public boolean hasPermission(String aclPath, String prm){
+        return hasPermission(userName, aclPath, prm);
+    }
+
+    /**
+     *
+     * @param userName
+     * @param aclPath
+     * @param prm
+     * @return
+     */
+    public static boolean hasPermission(String userName, String aclPath, String prm){
+
+        if (Util.isNullOrEmpty(userName) || Util.isNullOrEmpty(aclPath) || Util.isNullOrEmpty(prm))
+            return false;
+
+        boolean result = false;
+        try{
+            AccessControlListIF acl = AccessController.getAcl(aclPath);
+            if (acl!=null){
+                result = acl.checkPermission(userName, prm);
+                if (result==false)
+                    logger.debug("User " + userName + " does not have permission " + prm + " in acl \"" + aclPath + "\"");
+            }
+            else
+                logger.warn("acl \"" + aclPath + "\" not found!");
+        }
+        catch (SignOnException soe){
+            logger.error(soe.toString(), soe);
+        }
+
+        return result;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public String getHomeUri(){
+        return CRUser.homeUri(userName);
+    }
+
+    /**
+     *
+     * @return
+     */
+    public String getReviewUri(int reviewId){
+        return CRUser.homeUri(userName)+"/reviews/"+reviewId;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public String getReviewAttachmentUri(int reviewId, String attachmentFileName){
+        return CRUser.homeUri(userName)+"/reviews/"+reviewId+"/"+attachmentFileName;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public String getRegistrationsUri(){
+        return CRUser.registrationsUri(userName);
+    }
+
+    /**
+     *
+     * @return
+     */
+    public String getBookmarksUri(){
+        return CRUser.bookmarksUri(userName);
+    }
+
+    /**
+     *
+     * @return
+     */
+    public String getHistoryUri(){
+        return CRUser.historyUri(userName);
+    }
+
+    /**
+     *
+     * @param uri
+     * @return
+     */
+    public String getHomeItemUri(String uri){
+
+        return CRUser.homeItemUri(userName, uri);
+    }
+
+    /**
+     *
+     * @param userName
+     * @return
+     */
+    public static String homeUri(String userName){
+
+        if (StringUtils.isBlank(userName))
+            throw new IllegalArgumentException("userName must not be blank");
+        else
+            return "http://cr.eionet.europa.eu/home/" + userName;
+    }
+
+    /**
+     *
+     * @param userName
+     * @param uri
+     * @return
+     */
+    public static String homeItemUri(String userName, String uri){
+
+        if (StringUtils.isBlank(userName) || StringUtils.isBlank(uri))
+            throw new IllegalArgumentException("userName and uri must not be blank");
+        else{
+            return new StringBuilder("http://cr.eionet.europa.eu/home/").
+            append(userName).append("/").append(Hashes.spoHash(uri)).toString();
+        }
+    }
+
+    /**
+     *
+     * @param userName
+     * @return
+     */
+    public static String bookmarksUri(String userName){
+
+        return CRUser.homeUri(userName) + "/bookmarks";
+    }
+
+    /**
+     *
+     * @param userName
+     * @return
+     */
+    public static String registrationsUri(String userName){
+
+        return CRUser.homeUri(userName) + "/registrations";
+    }
+
+    /**
+     *
+     * @param userName
+     * @return
+     */
+    public static String historyUri(String userName){
+
+        return CRUser.homeUri(userName) + "/history";
+    }
 }

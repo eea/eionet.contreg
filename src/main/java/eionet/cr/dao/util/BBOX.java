@@ -21,94 +21,94 @@
 package eionet.cr.dao.util;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
 public class BBOX {
 
-	/** */
-	private Double latitudeSouth;
-	private Double latitudeNorth;
-	private Double longitudeWest;
-	private Double longitudeEast;
+    /** */
+    private Double latitudeSouth;
+    private Double latitudeNorth;
+    private Double longitudeWest;
+    private Double longitudeEast;
 
-	/**
-	 * 
-	 */
-	public BBOX(){
-	}
-	
-	/**
-	 * @return the latitudeSouth
-	 */
-	public Double getLatitudeSouth() {
-		return latitudeSouth;
-	}
-	/**
-	 * @param latitudeSouth the latitudeSouth to set
-	 */
-	public void setLatitudeSouth(Double lowerLat) {
-		this.latitudeSouth = lowerLat;
-	}
-	/**
-	 * @return the latitudeNorth
-	 */
-	public Double getLatitudeNorth() {
-		return latitudeNorth;
-	}
-	/**
-	 * @param latitudeNorth the latitudeNorth to set
-	 */
-	public void setLatitudeNorth(Double upperLat) {
-		this.latitudeNorth = upperLat;
-	}
-	/**
-	 * @return the longitudeWest
-	 */
-	public Double getLongitudeWest() {
-		return longitudeWest;
-	}
-	/**
-	 * @param longitudeWest the longitudeWest to set
-	 */
-	public void setLongitudeWest(Double lowerLong) {
-		this.longitudeWest = lowerLong;
-	}
-	/**
-	 * @return the longitudeEast
-	 */
-	public Double getLongitudeEast() {
-		return longitudeEast;
-	}
-	/**
-	 * @param longitudeEast the longitudeEast to set
-	 */
-	public void setLongitudeEast(Double upperLong) {
-		this.longitudeEast = upperLong;
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public boolean isUndefined(){
-		return latitudeSouth==null && latitudeNorth==null && longitudeWest==null && longitudeEast==null;
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public boolean hasLatitude(){
-		return latitudeSouth!=null || latitudeNorth!=null;
-	}
+    /**
+     *
+     */
+    public BBOX(){
+    }
 
-	/**
-	 * 
-	 * @return
-	 */
-	public boolean hasLongitude(){
-		return longitudeWest!=null || longitudeEast!=null;
-	}
+    /**
+     * @return the latitudeSouth
+     */
+    public Double getLatitudeSouth() {
+        return latitudeSouth;
+    }
+    /**
+     * @param latitudeSouth the latitudeSouth to set
+     */
+    public void setLatitudeSouth(Double lowerLat) {
+        this.latitudeSouth = lowerLat;
+    }
+    /**
+     * @return the latitudeNorth
+     */
+    public Double getLatitudeNorth() {
+        return latitudeNorth;
+    }
+    /**
+     * @param latitudeNorth the latitudeNorth to set
+     */
+    public void setLatitudeNorth(Double upperLat) {
+        this.latitudeNorth = upperLat;
+    }
+    /**
+     * @return the longitudeWest
+     */
+    public Double getLongitudeWest() {
+        return longitudeWest;
+    }
+    /**
+     * @param longitudeWest the longitudeWest to set
+     */
+    public void setLongitudeWest(Double lowerLong) {
+        this.longitudeWest = lowerLong;
+    }
+    /**
+     * @return the longitudeEast
+     */
+    public Double getLongitudeEast() {
+        return longitudeEast;
+    }
+    /**
+     * @param longitudeEast the longitudeEast to set
+     */
+    public void setLongitudeEast(Double upperLong) {
+        this.longitudeEast = upperLong;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean isUndefined(){
+        return latitudeSouth==null && latitudeNorth==null && longitudeWest==null && longitudeEast==null;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean hasLatitude(){
+        return latitudeSouth!=null || latitudeNorth!=null;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean hasLongitude(){
+        return longitudeWest!=null || longitudeEast!=null;
+    }
 }

@@ -28,32 +28,32 @@ import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.sql.SQLResultSetBaseReader;
 
 /**
- * 
+ *
  * @author altnyris
  *
  */
 public class HarvestSourceDTOReader extends SQLResultSetBaseReader<HarvestSourceDTO> {
 
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
-	 */
-	public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
+     */
+    public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
 
-		HarvestSourceDTO harvestSourceDTO = new HarvestSourceDTO();
-		harvestSourceDTO.setSourceId(new Integer(rs.getInt("HARVEST_SOURCE_ID")));
-		harvestSourceDTO.setUrl(rs.getString("URL"));
-		harvestSourceDTO.setUrlHash(Long.valueOf(rs.getLong("URL_HASH")));
-		harvestSourceDTO.setEmails(rs.getString("EMAILS"));
-		harvestSourceDTO.setTimeCreated(rs.getDate("TIME_CREATED"));
-		harvestSourceDTO.setStatements(new Integer(rs.getInt("STATEMENTS")));
-		harvestSourceDTO.setResources(new Integer(rs.getInt("RESOURCES")));
-		harvestSourceDTO.setCountUnavail(new Integer(rs.getInt("COUNT_UNAVAIL")));
-		harvestSourceDTO.setLastHarvest(rs.getTimestamp("LAST_HARVEST"));
-		harvestSourceDTO.setIntervalMinutes(rs.getInt("INTERVAL_MINUTES"));
-		harvestSourceDTO.setLastHarvestFailed(YesNoBoolean.parse(rs.getString("LAST_HARVEST_FAILED")));
-		harvestSourceDTO.setTrackedFile(YesNoBoolean.parse(rs.getString("TRACKED_FILE")));
-		
-		resultList.add(harvestSourceDTO);
-	}
+        HarvestSourceDTO harvestSourceDTO = new HarvestSourceDTO();
+        harvestSourceDTO.setSourceId(new Integer(rs.getInt("HARVEST_SOURCE_ID")));
+        harvestSourceDTO.setUrl(rs.getString("URL"));
+        harvestSourceDTO.setUrlHash(Long.valueOf(rs.getLong("URL_HASH")));
+        harvestSourceDTO.setEmails(rs.getString("EMAILS"));
+        harvestSourceDTO.setTimeCreated(rs.getDate("TIME_CREATED"));
+        harvestSourceDTO.setStatements(new Integer(rs.getInt("STATEMENTS")));
+        harvestSourceDTO.setResources(new Integer(rs.getInt("RESOURCES")));
+        harvestSourceDTO.setCountUnavail(new Integer(rs.getInt("COUNT_UNAVAIL")));
+        harvestSourceDTO.setLastHarvest(rs.getTimestamp("LAST_HARVEST"));
+        harvestSourceDTO.setIntervalMinutes(rs.getInt("INTERVAL_MINUTES"));
+        harvestSourceDTO.setLastHarvestFailed(YesNoBoolean.parse(rs.getString("LAST_HARVEST_FAILED")));
+        harvestSourceDTO.setTrackedFile(YesNoBoolean.parse(rs.getString("TRACKED_FILE")));
+
+        resultList.add(harvestSourceDTO);
+    }
 }

@@ -28,43 +28,43 @@ import org.openrdf.query.BindingSet;
 import eionet.cr.dao.util.SubProperties;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
 @SuppressWarnings("rawtypes")
 public class SubPropertiesReader extends ResultSetMixedReader{
 
-	/** */
-	private SubProperties subProperties;
-	
-	/**
-	 * 
-	 * @param subProperties
-	 */
-	public SubPropertiesReader(SubProperties subProperties) {
-		
-		if (subProperties==null)
-			throw new IllegalArgumentException();
+    /** */
+    private SubProperties subProperties;
 
-		this.subProperties = subProperties;
-	}
+    /**
+     *
+     * @param subProperties
+     */
+    public SubPropertiesReader(SubProperties subProperties) {
 
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
-	 */
-	public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
-		subProperties.add(rs.getString("PREDICATE"), rs.getString("SUB_PROPERTY"));
-	}
+        if (subProperties==null)
+            throw new IllegalArgumentException();
 
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
-	 */
-	@Override
-	public void readRow(BindingSet bindingSet) {
-		
-		// TODO Auto-generated method stub
-	}
+        this.subProperties = subProperties;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
+     */
+    public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
+        subProperties.add(rs.getString("PREDICATE"), rs.getString("SUB_PROPERTY"));
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
+     */
+    @Override
+    public void readRow(BindingSet bindingSet) {
+
+        // TODO Auto-generated method stub
+    }
 }

@@ -30,65 +30,65 @@ import java.util.Set;
 import eionet.cr.util.Util;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
 public class PredicateLabels extends HashMap<String,HashMap<String,HashSet<String>>>{
 
-	/**
-	 * 
-	 * @param predicate
-	 * @param label
-	 * @param language
-	 */
-	public void add(String predicate, String label, String language){
-		
-		HashMap<String,HashSet<String>> labels = get(predicate);
-		if (labels==null){
-			labels = new HashMap<String,HashSet<String>>();
-			put(predicate, labels);
-		}
-		
-		String parsedLanguage = Util.normalizeHTTPAcceptedLanguage(language);
-		HashSet<String> labelsOfLang = labels.get(parsedLanguage);
-		if (labelsOfLang==null){
-			labelsOfLang = new HashSet<String>();
-			labels.put(parsedLanguage, labelsOfLang);
-		}
-		
-		labelsOfLang.add(label);
-	}
-	
-	/**
-	 * 
-	 * @param languages
-	 * @return
-	 */
-	public Map<String,String> getByLanguages(HashSet<String> languages){
-		
-		Map<String,String> result = new HashMap<String,String>();		
-		if (languages!=null && !languages.isEmpty()){
-			
-			if (!isEmpty()){
-				
-				for (String predicate:keySet()){
-					
-					HashMap<String,HashSet<String>> labels = get(predicate);
-					
-					HashSet<String> labelsInRequestedLanguages = null;
-					for (String language:languages){
-						labelsInRequestedLanguages = labels.get(language);
-					}
-					
-					if (labelsInRequestedLanguages!=null && !labelsInRequestedLanguages.isEmpty()){
-						result.put(predicate, labelsInRequestedLanguages.iterator().next());
-					}
-				}
-			}
-		}
-		
-		return result;
-	}
-	
+    /**
+     *
+     * @param predicate
+     * @param label
+     * @param language
+     */
+    public void add(String predicate, String label, String language){
+
+        HashMap<String,HashSet<String>> labels = get(predicate);
+        if (labels==null){
+            labels = new HashMap<String,HashSet<String>>();
+            put(predicate, labels);
+        }
+
+        String parsedLanguage = Util.normalizeHTTPAcceptedLanguage(language);
+        HashSet<String> labelsOfLang = labels.get(parsedLanguage);
+        if (labelsOfLang==null){
+            labelsOfLang = new HashSet<String>();
+            labels.put(parsedLanguage, labelsOfLang);
+        }
+
+        labelsOfLang.add(label);
+    }
+
+    /**
+     *
+     * @param languages
+     * @return
+     */
+    public Map<String,String> getByLanguages(HashSet<String> languages){
+
+        Map<String,String> result = new HashMap<String,String>();
+        if (languages!=null && !languages.isEmpty()){
+
+            if (!isEmpty()){
+
+                for (String predicate:keySet()){
+
+                    HashMap<String,HashSet<String>> labels = get(predicate);
+
+                    HashSet<String> labelsInRequestedLanguages = null;
+                    for (String language:languages){
+                        labelsInRequestedLanguages = labels.get(language);
+                    }
+
+                    if (labelsInRequestedLanguages!=null && !labelsInRequestedLanguages.isEmpty()){
+                        result.put(predicate, labelsInRequestedLanguages.iterator().next());
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
 }

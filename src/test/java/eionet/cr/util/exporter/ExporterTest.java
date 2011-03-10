@@ -17,12 +17,12 @@ import eionet.cr.util.export.XmlExporter;
 
 public class ExporterTest extends TestCase {
 
-	@Test
-	public void testGetRowsLimit(){
-		int limit = XlsExporter.getRowsLimit();
-		assertTrue(limit>100);
+    @Test
+    public void testGetRowsLimit(){
+        int limit = XlsExporter.getRowsLimit();
+        assertTrue(limit>100);
 
-		int limit2 = XmlExporter.getRowsLimit();
-		assertTrue(limit2==-1);
-	}
+        int limit2 = XmlExporter.getRowsLimit();
+        assertTrue(limit2==-1);
+    }
 }

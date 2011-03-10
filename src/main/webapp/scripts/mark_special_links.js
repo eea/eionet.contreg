@@ -34,7 +34,7 @@ function wrapNode(node, wrappertype, wrapperclass){
 };
 
 function scanforlinks() {
-    contentarea = getContentArea(); 
+    contentarea = getContentArea();
     scanforlinksinarea(contentarea);
 }
 
@@ -52,7 +52,7 @@ function scanforlinksinarea(contentarea) {
             var linkval = links[i].getAttribute('href');
 
             // ADD CSS CLASSES FOR FILE EXTENSIONS
-            // grab file extension 
+            // grab file extension
             colonIdx = linkval.lastIndexOf(':');
             // add host name if relative links (for FireFox)
             if (colonIdx < 0) {linkval = 'http://'+window.location.host+'/'+linkval; }
@@ -66,7 +66,7 @@ function scanforlinksinarea(contentarea) {
                if (ext_idx0 > 0 && links[i].getElementsByTagName('img').length == 0  ) {
                   wrapNode(links[i], 'span', 'link-'+extension.toLowerCase());
                 }
-	    }
+        }
             // ADD CSS CLASSES FOR SPECIAL PROTOCOLS
             // check if the link href is a relative link, or an absolute link to
             // the current host.

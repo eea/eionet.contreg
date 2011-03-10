@@ -23,273 +23,273 @@ package eionet.cr.dto;
 import eionet.cr.util.Hashes;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
 public class TripleDTO {
 
-	/** */
-	private long subjectHash;
-	private long predicateHash;
-	private long objectHash;
-	
-	/** */
-	private Long sourceHash;
-	private Long objectDerivSourceHash;
-	private Long objectSourceObjectHash;
+    /** */
+    private long subjectHash;
+    private long predicateHash;
+    private long objectHash;
 
-	/** */
-	private boolean isAnonymousSubject;
-	private boolean isAnonymousObject;
-	private boolean isLiteralObject;
+    /** */
+    private Long sourceHash;
+    private Long objectDerivSourceHash;
+    private Long objectSourceObjectHash;
 
-	/** */
-	private String object;
-	private String objectLanguage;
-	private Double objectDouble;
-	
-	/** */
-	private Long genTime;
-	private Long objectDerivGenTime;
-	
-	/** */
-	private String subjectUri;
-	private String predicateUri;
-	private String sourceUri;
-	private String objectDerivSourceUri;
-	
-	/**
-	 * 
-	 * @param subjectHash
-	 * @param predicateHash
-	 * @param objectHash
-	 */
-	public TripleDTO(long subjectHash, long predicateHash, long objectHash){
-		
-		this.subjectHash = subjectHash;
-		this.predicateHash = predicateHash;
-		this.objectHash = objectHash;
-	}
+    /** */
+    private boolean isAnonymousSubject;
+    private boolean isAnonymousObject;
+    private boolean isLiteralObject;
 
-	/**
-	 * 
-	 * @param subjectHash
-	 * @param predicateHash
-	 * @param object
-	 */
-	public TripleDTO(long subjectHash, long predicateHash, String object){
-		
-		if (object==null){
-			throw new IllegalArgumentException("object must not be null!");
-		}
-		
-		this.subjectHash = subjectHash;
-		this.predicateHash = predicateHash;
-		this.object = object;
-		this.objectHash = Hashes.spoHash(object);
-	}
+    /** */
+    private String object;
+    private String objectLanguage;
+    private Double objectDouble;
 
-	/**
-	 * @return the subjectHash
-	 */
-	public long getSubjectHash() {
-		return subjectHash;
-	}
-	/**
-	 * @return the predicateHash
-	 */
-	public long getPredicateHash() {
-		return predicateHash;
-	}
-	/**
-	 * @return the objectHash
-	 */
-	public long getObjectHash() {
-		return objectHash;
-	}
-	/**
-	 * @return the subjectUri
-	 */
-	public String getSubjectUri() {
-		return subjectUri;
-	}
-	/**
-	 * @param subjectUri the subjectUri to set
-	 */
-	public void setSubjectUri(String subjectUri) {
-		this.subjectUri = subjectUri;
-	}
-	/**
-	 * @return the predicateUri
-	 */
-	public String getPredicateUri() {
-		return predicateUri;
-	}
-	/**
-	 * @param predicateUri the predicateUri to set
-	 */
-	public void setPredicateUri(String predicateUri) {
-		this.predicateUri = predicateUri;
-	}
-	/**
-	 * @return the sourceUri
-	 */
-	public String getSourceUri() {
-		return sourceUri;
-	}
-	/**
-	 * @param sourceUri the sourceUri to set
-	 */
-	public void setSourceUri(String sourceUri) {
-		this.sourceUri = sourceUri;
-	}
-	/**
-	 * @return the objectDerivSourceUri
-	 */
-	public String getObjectDerivSourceUri() {
-		return objectDerivSourceUri;
-	}
-	/**
-	 * @param objectDerivSourceUri the objectDerivSourceUri to set
-	 */
-	public void setObjectDerivSourceUri(String objectDerivSourceUri) {
-		this.objectDerivSourceUri = objectDerivSourceUri;
-	}
-	/**
-	 * @return the isAnonymousSubject
-	 */
-	public boolean isAnonymousSubject() {
-		return isAnonymousSubject;
-	}
-	/**
-	 * @param isAnonymousSubject the isAnonymousSubject to set
-	 */
-	public void setAnonymousSubject(boolean isAnonymousSubject) {
-		this.isAnonymousSubject = isAnonymousSubject;
-	}
-	/**
-	 * @return the isAnonymousObject
-	 */
-	public boolean isAnonymousObject() {
-		return isAnonymousObject;
-	}
-	/**
-	 * @param isAnonymousObject the isAnonymousObject to set
-	 */
-	public void setAnonymousObject(boolean isAnonymousObject) {
-		this.isAnonymousObject = isAnonymousObject;
-	}
-	/**
-	 * @return the isLiteralObject
-	 */
-	public boolean isLiteralObject() {
-		return isLiteralObject;
-	}
-	/**
-	 * @param isLiteralObject the isLiteralObject to set
-	 */
-	public void setLiteralObject(boolean isLiteralObject) {
-		this.isLiteralObject = isLiteralObject;
-	}
-	/**
-	 * @return the object
-	 */
-	public String getObject() {
-		return object;
-	}
-	/**
-	 * @return the objectLanguage
-	 */
-	public String getObjectLanguage() {
-		return objectLanguage;
-	}
-	/**
-	 * @param objectLanguage the objectLanguage to set
-	 */
-	public void setObjectLanguage(String objectLanguage) {
-		this.objectLanguage = objectLanguage;
-	}
-	/**
-	 * @return the objectDouble
-	 */
-	public Double getObjectDouble() {
-		return objectDouble;
-	}
-	/**
-	 * @param objectDouble the objectDouble to set
-	 */
-	public void setObjectDouble(Double objectDouble) {
-		this.objectDouble = objectDouble;
-	}
+    /** */
+    private Long genTime;
+    private Long objectDerivGenTime;
 
-	/**
-	 * @return the sourceHash
-	 */
-	public Long getSourceHash() {
-		return sourceHash;
-	}
+    /** */
+    private String subjectUri;
+    private String predicateUri;
+    private String sourceUri;
+    private String objectDerivSourceUri;
 
-	/**
-	 * @param sourceHash the sourceHash to set
-	 */
-	public void setSourceHash(Long sourceHash) {
-		this.sourceHash = sourceHash;
-	}
+    /**
+     *
+     * @param subjectHash
+     * @param predicateHash
+     * @param objectHash
+     */
+    public TripleDTO(long subjectHash, long predicateHash, long objectHash){
 
-	/**
-	 * @return the objectDerivSourceHash
-	 */
-	public Long getObjectDerivSourceHash() {
-		return objectDerivSourceHash;
-	}
+        this.subjectHash = subjectHash;
+        this.predicateHash = predicateHash;
+        this.objectHash = objectHash;
+    }
 
-	/**
-	 * @param objectDerivSourceHash the objectDerivSourceHash to set
-	 */
-	public void setObjectDerivSourceHash(Long objectDerivSourceHash) {
-		this.objectDerivSourceHash = objectDerivSourceHash;
-	}
+    /**
+     *
+     * @param subjectHash
+     * @param predicateHash
+     * @param object
+     */
+    public TripleDTO(long subjectHash, long predicateHash, String object){
 
-	/**
-	 * @return the objectSourceObjectHash
-	 */
-	public Long getObjectSourceObjectHash() {
-		return objectSourceObjectHash;
-	}
+        if (object==null){
+            throw new IllegalArgumentException("object must not be null!");
+        }
 
-	/**
-	 * @param objectSourceObjectHash the objectSourceObjectHash to set
-	 */
-	public void setObjectSourceObjectHash(Long objectSourceObjectHash) {
-		this.objectSourceObjectHash = objectSourceObjectHash;
-	}
+        this.subjectHash = subjectHash;
+        this.predicateHash = predicateHash;
+        this.object = object;
+        this.objectHash = Hashes.spoHash(object);
+    }
 
-	/**
-	 * @return the genTime
-	 */
-	public Long getGenTime() {
-		return genTime;
-	}
+    /**
+     * @return the subjectHash
+     */
+    public long getSubjectHash() {
+        return subjectHash;
+    }
+    /**
+     * @return the predicateHash
+     */
+    public long getPredicateHash() {
+        return predicateHash;
+    }
+    /**
+     * @return the objectHash
+     */
+    public long getObjectHash() {
+        return objectHash;
+    }
+    /**
+     * @return the subjectUri
+     */
+    public String getSubjectUri() {
+        return subjectUri;
+    }
+    /**
+     * @param subjectUri the subjectUri to set
+     */
+    public void setSubjectUri(String subjectUri) {
+        this.subjectUri = subjectUri;
+    }
+    /**
+     * @return the predicateUri
+     */
+    public String getPredicateUri() {
+        return predicateUri;
+    }
+    /**
+     * @param predicateUri the predicateUri to set
+     */
+    public void setPredicateUri(String predicateUri) {
+        this.predicateUri = predicateUri;
+    }
+    /**
+     * @return the sourceUri
+     */
+    public String getSourceUri() {
+        return sourceUri;
+    }
+    /**
+     * @param sourceUri the sourceUri to set
+     */
+    public void setSourceUri(String sourceUri) {
+        this.sourceUri = sourceUri;
+    }
+    /**
+     * @return the objectDerivSourceUri
+     */
+    public String getObjectDerivSourceUri() {
+        return objectDerivSourceUri;
+    }
+    /**
+     * @param objectDerivSourceUri the objectDerivSourceUri to set
+     */
+    public void setObjectDerivSourceUri(String objectDerivSourceUri) {
+        this.objectDerivSourceUri = objectDerivSourceUri;
+    }
+    /**
+     * @return the isAnonymousSubject
+     */
+    public boolean isAnonymousSubject() {
+        return isAnonymousSubject;
+    }
+    /**
+     * @param isAnonymousSubject the isAnonymousSubject to set
+     */
+    public void setAnonymousSubject(boolean isAnonymousSubject) {
+        this.isAnonymousSubject = isAnonymousSubject;
+    }
+    /**
+     * @return the isAnonymousObject
+     */
+    public boolean isAnonymousObject() {
+        return isAnonymousObject;
+    }
+    /**
+     * @param isAnonymousObject the isAnonymousObject to set
+     */
+    public void setAnonymousObject(boolean isAnonymousObject) {
+        this.isAnonymousObject = isAnonymousObject;
+    }
+    /**
+     * @return the isLiteralObject
+     */
+    public boolean isLiteralObject() {
+        return isLiteralObject;
+    }
+    /**
+     * @param isLiteralObject the isLiteralObject to set
+     */
+    public void setLiteralObject(boolean isLiteralObject) {
+        this.isLiteralObject = isLiteralObject;
+    }
+    /**
+     * @return the object
+     */
+    public String getObject() {
+        return object;
+    }
+    /**
+     * @return the objectLanguage
+     */
+    public String getObjectLanguage() {
+        return objectLanguage;
+    }
+    /**
+     * @param objectLanguage the objectLanguage to set
+     */
+    public void setObjectLanguage(String objectLanguage) {
+        this.objectLanguage = objectLanguage;
+    }
+    /**
+     * @return the objectDouble
+     */
+    public Double getObjectDouble() {
+        return objectDouble;
+    }
+    /**
+     * @param objectDouble the objectDouble to set
+     */
+    public void setObjectDouble(Double objectDouble) {
+        this.objectDouble = objectDouble;
+    }
 
-	/**
-	 * @param genTime the genTime to set
-	 */
-	public void setGenTime(Long genTime) {
-		this.genTime = genTime;
-	}
+    /**
+     * @return the sourceHash
+     */
+    public Long getSourceHash() {
+        return sourceHash;
+    }
 
-	/**
-	 * @return the objectDerivGenTime
-	 */
-	public Long getObjectDerivGenTime() {
-		return objectDerivGenTime;
-	}
+    /**
+     * @param sourceHash the sourceHash to set
+     */
+    public void setSourceHash(Long sourceHash) {
+        this.sourceHash = sourceHash;
+    }
 
-	/**
-	 * @param objectDerivGenTime the objectDerivGenTime to set
-	 */
-	public void setObjectDerivGenTime(Long objectDerivGenTime) {
-		this.objectDerivGenTime = objectDerivGenTime;
-	}
+    /**
+     * @return the objectDerivSourceHash
+     */
+    public Long getObjectDerivSourceHash() {
+        return objectDerivSourceHash;
+    }
+
+    /**
+     * @param objectDerivSourceHash the objectDerivSourceHash to set
+     */
+    public void setObjectDerivSourceHash(Long objectDerivSourceHash) {
+        this.objectDerivSourceHash = objectDerivSourceHash;
+    }
+
+    /**
+     * @return the objectSourceObjectHash
+     */
+    public Long getObjectSourceObjectHash() {
+        return objectSourceObjectHash;
+    }
+
+    /**
+     * @param objectSourceObjectHash the objectSourceObjectHash to set
+     */
+    public void setObjectSourceObjectHash(Long objectSourceObjectHash) {
+        this.objectSourceObjectHash = objectSourceObjectHash;
+    }
+
+    /**
+     * @return the genTime
+     */
+    public Long getGenTime() {
+        return genTime;
+    }
+
+    /**
+     * @param genTime the genTime to set
+     */
+    public void setGenTime(Long genTime) {
+        this.genTime = genTime;
+    }
+
+    /**
+     * @return the objectDerivGenTime
+     */
+    public Long getObjectDerivGenTime() {
+        return objectDerivGenTime;
+    }
+
+    /**
+     * @param objectDerivGenTime the objectDerivGenTime to set
+     */
+    public void setObjectDerivGenTime(Long objectDerivGenTime) {
+        this.objectDerivGenTime = objectDerivGenTime;
+    }
 }

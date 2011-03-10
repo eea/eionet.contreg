@@ -36,65 +36,65 @@ import eionet.cr.web.util.WebConstants;
 
 /**
  * JUnit test tests AbstractQawActionBean functionality.
- * 
+ *
  * @author gerasvad, altnyris
  *
  */
 public class AbstractCrActionBeanTest extends AbstractStripesMvcTestHelper {
-	
-	/**
-	 * Tests method {@link AbstractCrActionBean#getUserName()} when user is logged in.
-	 * 
-	 * @throws Exception
-	 */
-	@Test
-	public void testGetUserNameWhenLoggedIn() throws Exception {
-		MockServletContext context = getMockServletContext();
-		
-		MockRoundtrip trip = new MockRoundtrip(context, LoginActionBean.class);
-		trip.getRequest().getSession().setAttribute(
-				WebConstants.USER_SESSION_ATTR, new CRUser("smithbob"));
-		trip.execute();
-		
-		LoginActionBean actionBean = trip.getActionBean(LoginActionBean.class);
-		
-		Assert.assertEquals("smithbob", actionBean.getUserName());
-	}
-	
-	/**
-	 * Tests method {@link AbstractCrActionBean#isUserLoggedIn()} when user is logged in.
-	 * 
-	 * @throws Exception
-	 */
-	@Test
-	public void testIsUserLoggedInTrue() throws Exception {
-		MockServletContext context = getMockServletContext();
-		
-		MockRoundtrip trip = new MockRoundtrip(context, LoginActionBean.class);
-		trip.getRequest().getSession().setAttribute(
-				WebConstants.USER_SESSION_ATTR, new CRUser("smithbob"));
-		trip.execute();
-		
-		LoginActionBean actionBean = trip.getActionBean(LoginActionBean.class);
-		
-		Assert.assertEquals(true, actionBean.isUserLoggedIn());
-	}
-	
-	/**
-	 * Tests method {@link AbstractCrActionBean#isUserLoggedIn()} when user is not logged in.
-	 * 
-	 * @throws Exception
-	 */
-	@Test
-	public void testIsUserLoggedInFalse() throws Exception {
-		MockServletContext context = getMockServletContext();
-		
-		MockRoundtrip trip = new MockRoundtrip(context, LoginActionBean.class);
-		trip.getRequest().getSession().setAttribute(WebConstants.USER_SESSION_ATTR, null);
-		trip.execute();
-		
-		LoginActionBean actionBean = trip.getActionBean(LoginActionBean.class);
-		
-		Assert.assertEquals(false, actionBean.isUserLoggedIn());
-	}
+
+    /**
+     * Tests method {@link AbstractCrActionBean#getUserName()} when user is logged in.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testGetUserNameWhenLoggedIn() throws Exception {
+        MockServletContext context = getMockServletContext();
+
+        MockRoundtrip trip = new MockRoundtrip(context, LoginActionBean.class);
+        trip.getRequest().getSession().setAttribute(
+                WebConstants.USER_SESSION_ATTR, new CRUser("smithbob"));
+        trip.execute();
+
+        LoginActionBean actionBean = trip.getActionBean(LoginActionBean.class);
+
+        Assert.assertEquals("smithbob", actionBean.getUserName());
+    }
+
+    /**
+     * Tests method {@link AbstractCrActionBean#isUserLoggedIn()} when user is logged in.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testIsUserLoggedInTrue() throws Exception {
+        MockServletContext context = getMockServletContext();
+
+        MockRoundtrip trip = new MockRoundtrip(context, LoginActionBean.class);
+        trip.getRequest().getSession().setAttribute(
+                WebConstants.USER_SESSION_ATTR, new CRUser("smithbob"));
+        trip.execute();
+
+        LoginActionBean actionBean = trip.getActionBean(LoginActionBean.class);
+
+        Assert.assertEquals(true, actionBean.isUserLoggedIn());
+    }
+
+    /**
+     * Tests method {@link AbstractCrActionBean#isUserLoggedIn()} when user is not logged in.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testIsUserLoggedInFalse() throws Exception {
+        MockServletContext context = getMockServletContext();
+
+        MockRoundtrip trip = new MockRoundtrip(context, LoginActionBean.class);
+        trip.getRequest().getSession().setAttribute(WebConstants.USER_SESSION_ATTR, null);
+        trip.execute();
+
+        LoginActionBean actionBean = trip.getActionBean(LoginActionBean.class);
+
+        Assert.assertEquals(false, actionBean.isUserLoggedIn());
+    }
 }
