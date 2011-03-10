@@ -12,7 +12,7 @@
                 username="${db.usr}"
                 password="${db.pwd}"
                 driverClassName="${db.drv}"
-                url="${db.url}">
+                url="${db.host}">
     </Resource>
 
 </Context>
