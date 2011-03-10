@@ -68,10 +68,10 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO{
             throw new IllegalArgumentException("limit must be greater than 0!");
         
         StringBuffer sqlBuf = new StringBuffer()
-        .append("prefix dc: <http://purl.org/dc/elements/1.1/>")
-        .append("select distinct ?s ?d where {")
-        .append("?s a <").append(rdfType).append("> .")
-        .append("OPTIONAL { ?s dc:date ?d }")
+        .append("prefix dc: <http://purl.org/dc/elements/1.1/> ")
+        .append("select distinct ?s ?d where { ")
+        .append("?s a <").append(rdfType).append("> . ")
+        .append("OPTIONAL { ?s dc:date ?d } ")
         .append("} ORDER BY DESC(?d)");
         
         logger.trace("Recent uploads search, executing subject finder query: " + sqlBuf.toString());
@@ -82,8 +82,8 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO{
         
         List<SubjectDTO> resultList = new ArrayList<SubjectDTO>();
         
-        // if result map not empty, get the subjects data and set their dates       
-        if (pairMap != null && !pairMap.isEmpty()){
+        // if subjectUris not empty, get the subjects data and set their dates       
+        if (subjectUris != null && !subjectUris.isEmpty()){
             
             logger.trace("Recent uploads search, getting the data of the found subjects");
             
@@ -106,8 +106,10 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO{
             resultList = getSubjectsData(subjectUris, neededPredicates, dataReader);
             
             // set dublin core date of found subjects
-            for (SubjectDTO subject : resultList){
-                subject.setDcDate(pairMap.get(subject.getUri()));
+            if(pairMap != null){
+                for (SubjectDTO subject : resultList){
+                    subject.setDcDate(pairMap.get(subject.getUri()));
+                }
             }
         }
         return resultList;
