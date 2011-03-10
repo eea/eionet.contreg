@@ -34,7 +34,7 @@ public enum YesNoBoolean {
      * @param b
      * @return
      */
-    public static String format(boolean b){
+    public static String format(boolean b) {
         return b==true ? Y.toString() : N.toString();
     }
 
@@ -43,7 +43,7 @@ public enum YesNoBoolean {
      * @param s
      * @return
      */
-    public static boolean parse(String s){
+    public static boolean parse(String s) {
 
         if (s.equals(Y.toString()))
             return true;

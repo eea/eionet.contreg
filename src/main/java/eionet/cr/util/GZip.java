@@ -15,18 +15,18 @@ import java.util.zip.GZIPInputStream;
 
 public class GZip {
 
-    public static boolean isFileGZip(File file){
+    public static boolean isFileGZip(File file) {
         try {
             FileInputStream inputStream = new FileInputStream(file);
             try {
                 new GZIPInputStream(inputStream);
                 return true;
-            } catch (Exception ex){
+            } catch (Exception ex) {
                 // Exception that the file was not recognized as GZIP
                 // System.out.println("Exception 1 occured: "+ex.getMessage());
                 return false;
             }
-        } catch (Exception ex){
+        } catch (Exception ex) {
             // Exception in case the file was not found or any other IO error occured.
             // System.out.println("Exception 2 occured: "+ex.getMessage());
             return false;

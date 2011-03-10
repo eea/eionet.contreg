@@ -38,7 +38,7 @@ public enum SortOrder {
      *
      * @param s
      */
-    SortOrder(String s){
+    SortOrder(String s) {
         this.s = s;
     }
 
@@ -46,7 +46,7 @@ public enum SortOrder {
      * (non-Javadoc)
      * @see java.lang.Enum#toString()
      */
-    public String toString(){
+    public String toString() {
         return s;
     }
 
@@ -54,7 +54,7 @@ public enum SortOrder {
      *
      * @return
      */
-    public String toSQL(){
+    public String toSQL() {
         return s;
     }
 
@@ -62,7 +62,7 @@ public enum SortOrder {
      *
      * @return
      */
-    public SortOrder toOpposite(){
+    public SortOrder toOpposite() {
         if (this.equals(ASCENDING))
             return DESCENDING;
         else
@@ -74,7 +74,7 @@ public enum SortOrder {
      * @param order
      * @return
      */
-    public static String oppositeSortOrder(String order){
+    public static String oppositeSortOrder(String order) {
         if (StringUtils.isBlank(order))
             return ASCENDING.toString();
         else
@@ -86,7 +86,7 @@ public enum SortOrder {
      * @param s
      * @return
      */
-    public static SortOrder parse(String s){
+    public static SortOrder parse(String s) {
 
         if (s==null)
             return null;

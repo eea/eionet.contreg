@@ -45,17 +45,17 @@ public final class FormatUtils {
     public static String getObjectValuesForPredicate(String predicateUri, SubjectDTO subjectDTO, Set<String> languages) {
         String result = "";
 
-        if (subjectDTO.getPredicateCount()>0){
+        if (subjectDTO.getPredicateCount()>0) {
 
             Collection<ObjectDTO> objects = subjectDTO.getObjects(predicateUri);
-            if (objects!=null && !objects.isEmpty()){
+            if (objects!=null && !objects.isEmpty()) {
 
                 LinkedHashSet<ObjectDTO> distinctObjects = new LinkedHashSet<ObjectDTO>(objects);
                 StringBuffer bufLiterals = new StringBuffer();
                 StringBuffer bufNonLiterals = new StringBuffer();
 
                 String resultFromHitSource = null;
-                for (ObjectDTO objectDTO:distinctObjects){
+                for (ObjectDTO objectDTO:distinctObjects) {
 
                     String objectString = objectDTO.getValue().trim();
 
@@ -63,16 +63,16 @@ public final class FormatUtils {
                     // remember the object value and break
                     if (subjectDTO.getHitSource()>0 && objectDTO.getSourceHashSmart()==subjectDTO.getHitSource()
                             && !StringUtils.isBlank(objectString)
-                            && objectDTO.isLiteral()){
+                            && objectDTO.isLiteral()) {
 
                         resultFromHitSource = objectString;
                         break;
                     }
 
-                    if (objectString.length()>0){
+                    if (objectString.length()>0) {
 
-                        if (objectDTO.isLiteral()){
-                            if (languages.isEmpty() || languages.contains(objectDTO.getLanguage())){
+                        if (objectDTO.isLiteral()) {
+                            if (languages.isEmpty() || languages.contains(objectDTO.getLanguage())) {
                                 bufLiterals.append(bufLiterals.length()>0 ? ", " : "").append(objectString);
                             }
                         }
@@ -83,7 +83,7 @@ public final class FormatUtils {
                 }
 
                 // if there was a value found that came from search-hit source then prefer that one as the result
-                if (!StringUtils.isBlank(resultFromHitSource)){
+                if (!StringUtils.isBlank(resultFromHitSource)) {
                     result = resultFromHitSource;
                 }
                 else{

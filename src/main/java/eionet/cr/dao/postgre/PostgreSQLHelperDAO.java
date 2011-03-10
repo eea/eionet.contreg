@@ -94,15 +94,15 @@ import eionet.cr.web.security.CRUser;
 public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO {
 
     /** */
-    public static final String insertResourceSQL = "insert into RESOURCE" +
-            " (URI, URI_HASH, FIRSTSEEN_SOURCE, FIRSTSEEN_TIME, LASTMODIFIED_TIME) values (?, ?, ?, ?, ?)";
+    public static final String insertResourceSQL = "insert into RESOURCE"
+           + " (URI, URI_HASH, FIRSTSEEN_SOURCE, FIRSTSEEN_TIME, LASTMODIFIED_TIME) values (?, ?, ?, ?, ?)";
     /*
      * (non-Javadoc)
      * @see eionet.cr.dao.SpoHelperDao#addResource(java.lang.String, java.lang.String)
      */
     public void addResource(String uri, String sourceUri) throws DAOException {
 
-        if (StringUtils.isBlank(uri)){
+        if (StringUtils.isBlank(uri)) {
             throw new IllegalArgumentException("Resource URI must not be blank");
         }
 
@@ -121,7 +121,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             conn = getSQLConnection();
             SQLUtil.executeUpdate(insertResourceSQL, values, conn);
         }
-        catch (SQLException e){
+        catch (SQLException e) {
             throw new DAOException(e.toString(), e);
         }
         finally{
@@ -130,18 +130,18 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
     }
 
     /** */
-    private static final String tripleInsertSQL = "insert into SPO (SUBJECT, PREDICATE, OBJECT," +
-            " OBJECT_HASH, OBJECT_DOUBLE, ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG," +
-            " OBJ_DERIV_SOURCE, OBJ_DERIV_SOURCE_GEN_TIME, OBJ_SOURCE_OBJECT, SOURCE," +
-            " GEN_TIME) values (?, ?, ?, ?, ?," +
-            " cast(? as ynboolean), cast(? as ynboolean), cast(? as ynboolean), ?, ?, ?, ?, ?, ?)";
+    private static final String tripleInsertSQL = "insert into SPO (SUBJECT, PREDICATE, OBJECT,"
+            + " OBJECT_HASH, OBJECT_DOUBLE, ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG,"
+            + " OBJ_DERIV_SOURCE, OBJ_DERIV_SOURCE_GEN_TIME, OBJ_SOURCE_OBJECT, SOURCE,"
+            + " GEN_TIME) values (?, ?, ?, ?, ?,"
+            + " cast(? as ynboolean), cast(? as ynboolean), cast(? as ynboolean), ?, ?, ?, ?, ?, ?)";
     /*
      * (non-Javadoc)
      * @see eionet.cr.dao.SpoHelperDao#addTriples(eionet.cr.dto.SubjectDTO)
      */
     public void addTriples(SubjectDTO subjectDTO) throws DAOException{
 
-        if (subjectDTO==null || subjectDTO.getPredicateCount()==0)
+        if (subjectDTO == null || subjectDTO.getPredicateCount() == 0)
             return;
 
         long firstSeenTime = System.currentTimeMillis();
@@ -154,13 +154,13 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
             boolean doExecuteBatch = false;
             long subjectHash = subjectDTO.getUriHash();
-            for (String predicateUri:subjectDTO.getPredicateUris()){
+            for (String predicateUri:subjectDTO.getPredicateUris()) {
 
                 Collection<ObjectDTO> objects = subjectDTO.getObjects(predicateUri);
-                if (objects!=null && !objects.isEmpty()){
+                if (objects!=null && !objects.isEmpty()) {
 
                     long predicateHash = Hashes.spoHash(predicateUri);
-                    for (ObjectDTO object:objects){
+                    for (ObjectDTO object:objects) {
 
                         pstmt.setLong(   1, subjectHash);
                         pstmt.setLong(   2, predicateHash);
@@ -171,7 +171,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
                         pstmt.setString( 7, YesNoBoolean.format(object.isAnonymous()));
                         pstmt.setString( 8, YesNoBoolean.format(object.isLiteral()));
                         pstmt.setString( 9, StringUtils.trimToEmpty(object.getLanguage()));
-                        pstmt.setLong(  10, object.getDerivSourceUri()==null ?
+                        pstmt.setLong(  10, object.getDerivSourceUri() == null ?
                                 0 : Hashes.spoHash(object.getDerivSourceUri()));
                         pstmt.setLong(  11, object.getDerivSourceGenTime());
                         pstmt.setLong(  12, object.getSourceObjectHash());
@@ -179,20 +179,20 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
                         pstmt.setLong(  14, System.currentTimeMillis());
 
                         pstmt.addBatch();
-                        if (doExecuteBatch==false){
+                        if (doExecuteBatch == false) {
                             doExecuteBatch = true;
                         }
                     }
                 }
             }
 
-            if (doExecuteBatch==true){
+            if (doExecuteBatch == true) {
                 conn.setAutoCommit(false);
                 pstmt.executeBatch();
                 conn.commit();
             }
         }
-        catch (SQLException e){
+        catch (SQLException e) {
             SQLUtil.rollback(conn);
             throw new DAOException(e.toString(), e);
         }
@@ -211,7 +211,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
      */
     public void deleteTriples(Collection<TripleDTO> triples) throws DAOException{
 
-        if (triples==null || triples.isEmpty()){
+        if (triples == null || triples.isEmpty()) {
             return;
         }
 
@@ -221,7 +221,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             conn = getSQLConnection();
             stmt = conn.createStatement();
 
-            for (TripleDTO triple : triples){
+            for (TripleDTO triple : triples) {
 
                 String sql = StringUtils.replace(
                         sqlDeleteTriples, "?", String.valueOf(triple.getSubjectHash()), 1);
@@ -229,13 +229,13 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
                 sql = StringUtils.replace(sql, "?", String.valueOf(triple.getObjectHash()), 1);
 
                 StringBuilder bld = new StringBuilder(sql);
-                if (triple.getSourceHash()!=null){
+                if (triple.getSourceHash()!=null) {
                     bld.append(" and SOURCE=").append(triple.getSourceHash());
                 }
-                if (triple.getObjectDerivSourceHash()!=null){
+                if (triple.getObjectDerivSourceHash()!=null) {
                     bld.append(" and OBJ_DERIV_SOURCE=").append(triple.getObjectDerivSourceHash());
                 }
-                if (triple.getObjectSourceObjectHash()!=null){
+                if (triple.getObjectSourceObjectHash()!=null) {
                     bld.append(" and OBJ_SOURCE_OBJECT=").append(triple.getObjectSourceObjectHash());
                 }
 
@@ -244,7 +244,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
             stmt.executeBatch();
         }
-        catch (SQLException e){
+        catch (SQLException e) {
             throw new DAOException(e.toString(), e);
         }
         finally{
@@ -279,18 +279,18 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             stmt = conn.createStatement();
             rs = stmt.executeQuery(getDCPropertiesSQL);
             List<String> dcPropertiesHashes = new ArrayList<String>();
-            while (rs.next()){
+            while (rs.next()) {
                 dcPropertiesHashes.add(rs.getString(1));
             }
             SQLUtil.close(rs);
 
-            if (!dcPropertiesHashes.isEmpty()){
+            if (!dcPropertiesHashes.isEmpty()) {
                 result.putAll(getSubjectLabels(dcPropertiesHashes, conn));
             }
 
             /* get the properties for given subject types */
 
-            if (subjectTypes!=null && !subjectTypes.isEmpty()){
+            if (subjectTypes!=null && !subjectTypes.isEmpty()) {
 
                 StringBuilder buf = new StringBuilder().
                 append("select distinct SUBJECT from SPO where PREDICATE=").
@@ -299,16 +299,16 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
                 rs = stmt.executeQuery(buf.toString());
                 List<String> otherPropertiesHashes = new ArrayList<String>();
-                while (rs.next()){
+                while (rs.next()) {
                     otherPropertiesHashes.add(rs.getString(1));
                 }
 
-                if (!otherPropertiesHashes.isEmpty()){
+                if (!otherPropertiesHashes.isEmpty()) {
                     result.putAll(getSubjectLabels(otherPropertiesHashes, conn));
                 }
             }
         }
-        catch (SQLException e){
+        catch (SQLException e) {
             throw new DAOException(e.toString(), e);
         }
         finally{
@@ -335,7 +335,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
         Statement stmt = null;
         ResultSet rs = null;
         try{
-            if (conn==null){
+            if (conn == null) {
                 conn = getSQLConnection();
                 closeConnection = true;
             }
@@ -348,14 +348,14 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             append(Hashes.spoHash(Predicates.RDFS_LABEL)).append(" and LIT_OBJ='Y'");
 
             rs = stmt.executeQuery(buf.toString());
-            while (rs.next()){
+            while (rs.next()) {
                 result.put(rs.getString("SUBJECT_URI"), rs.getString("SUBJECT_LABEL"));
             }
         }
         finally{
             SQLUtil.close(rs);
             SQLUtil.close(stmt);
-            if (closeConnection){
+            if (closeConnection) {
                 SQLUtil.close(conn);
             }
         }
@@ -394,25 +394,25 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             pstmt.setInt(3, Math.max(1, limit));
 
             rs = pstmt.executeQuery();
-            while (rs.next()){
+            while (rs.next()) {
                 uriMap.put(rs.getString(1), rs.getString(2));
                 labelMap.put(rs.getString(1), "");
             }
 
             /* if any subjects were found, let's find their labels */
-            if (!labelMap.isEmpty()){
+            if (!labelMap.isEmpty()) {
 
                 sql = "SELECT SUBJECT,OBJECT FROM SPO WHERE SPO.PREDICATE=? " +
                         "AND SPO.SUBJECT IN (" + Util.toCSV(labelMap.keySet()) + ")";
                 pstmt = conn.prepareStatement(sql);
                 pstmt.setLong(1, Hashes.spoHash(Predicates.RDFS_LABEL));
                 rs = pstmt.executeQuery();
-                while (rs.next()){
+                while (rs.next()) {
                     labelMap.put(rs.getString(1), rs.getString(2));
                 }
             }
         }
-        catch (SQLException e){
+        catch (SQLException e) {
             throw new DAOException(e.toString(), e);
         }
         finally{
@@ -425,8 +425,8 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
          * then derive the label from the subject's URI.
          */
         ArrayList<Pair<String, String>> result = new ArrayList<Pair<String, String>>();
-        for (String uriHash:labelMap.keySet()){
-            if (StringUtils.isBlank(labelMap.get(uriHash))){
+        for (String uriHash:labelMap.keySet()) {
+            if (StringUtils.isBlank(labelMap.get(uriHash))) {
                 String uri = uriMap.get(uriHash);
                 result.add(new Pair(uriHash, URIUtil.extractURILabel(uri,uri)));
             }
@@ -490,7 +490,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             predicateUris = executeSQL(
                 getPredicatesUsedForTypeCache_SQL, values, new SingleObjectReader<Long>());
         }
-        catch(DAOException e){
+        catch(DAOException e) {
             logger.warn("Cache tables are not created yet. Continue with spo table");
             predicateUris = executeSQL(
                 getPredicatesUsedForType_SQL, values, new SingleObjectReader<Long>());
@@ -498,7 +498,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
         }
         logger.trace("usedPredicatesForType query took " + Util.durationSince(startTime));
 
-        if (predicateUris==null || predicateUris.isEmpty()){
+        if (predicateUris == null || predicateUris.isEmpty()) {
             return new ArrayList<SubjectDTO>();
         }
         else{
@@ -513,7 +513,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             reader.addPredicateHash(Hashes.spoHash(Predicates.RDFS_LABEL));
 
             // get the subjects data
-            if(useCache){
+            if(useCache) {
                 getSubjectsData(reader, StringUtils.replace(getPredicatesUsedForTypeCache_SQL, "?", String.valueOf(Hashes.spoHash(typeUri))));
             }
             else{
@@ -523,20 +523,20 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             // since a used predicate may not appear as a subject in SPO,
             // there might unfound SubjectDTO objects
             HashSet<Long> unfoundSubjects = new HashSet<Long>();
-            for (Entry<Long,SubjectDTO> entry : subjectsMap.entrySet()){
-                if (entry.getValue()==null){
+            for (Entry<Long,SubjectDTO> entry : subjectsMap.entrySet()) {
+                if (entry.getValue() == null) {
                     unfoundSubjects.add(entry.getKey());
                 }
             }
 
             // if there were indeed any unfound SubjectDTO objects, find URIs for those predicates
             // and create dummy SubjectDTO objects from those URIs
-            if (!unfoundSubjects.isEmpty()){
+            if (!unfoundSubjects.isEmpty()) {
                 Map<Long,String> resourceUris = getResourceUris(unfoundSubjects);
-                for (Entry<Long,SubjectDTO> entry : subjectsMap.entrySet()){
-                    if (entry.getValue()==null){
+                for (Entry<Long,SubjectDTO> entry : subjectsMap.entrySet()) {
+                    if (entry.getValue() == null) {
                         String uri = resourceUris.get(entry.getKey());
-                        if (!StringUtils.isBlank(uri)){
+                        if (!StringUtils.isBlank(uri)) {
                             unfoundSubjects.remove(entry.getKey());
                             entry.setValue(new SubjectDTO(uri, false));
                         }
@@ -545,7 +545,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             }
 
             // clean the subjectsMap of unfound subjects
-            for (Long hash : unfoundSubjects){
+            for (Long hash : unfoundSubjects) {
                 subjectsMap.remove(hash);
             }
 
@@ -574,14 +574,14 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             conn = getSQLConnection();
             stmt = conn.createStatement();
             rs = stmt.executeQuery(buf.toString());
-            while (rs.next()){
+            while (rs.next()) {
                 String uri = rs.getString("URI");
-                if (!StringUtils.isBlank(uri)){
+                if (!StringUtils.isBlank(uri)) {
                     result.put(Long.valueOf(rs.getLong("URI_HASH")), uri);
                 }
             }
         }
-        catch (SQLException e){
+        catch (SQLException e) {
             throw new DAOException(e.toString(), e);
         }
         finally{
@@ -625,7 +625,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
      */
     public SubjectDTO getSubject(Long subjectHash) throws DAOException {
 
-        if (subjectHash==null){
+        if (subjectHash == null) {
             return null;
         }
 
@@ -633,7 +633,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
         map.put(subjectHash, null);
 
         List<SubjectDTO> subjects = getSubjectsData(map);
-        return subjects==null || subjects.isEmpty() ? null : subjects.get(0);
+        return subjects == null || subjects.isEmpty() ? null : subjects.get(0);
     }
 
     /*
@@ -643,7 +643,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
     public PredicateLabels getPredicateLabels(Set<Long> subjectHashes) throws DAOException {
 
         PredicateLabels predLabels = new PredicateLabels();
-        if (subjectHashes!=null && !subjectHashes.isEmpty()){
+        if (subjectHashes!=null && !subjectHashes.isEmpty()) {
 
             StringBuffer sqlBuf = new StringBuffer().
             append("select RESOURCE.URI as PREDICATE_URI, SPO.OBJECT as LABEL, SPO.OBJ_LANG as LANG").
@@ -666,7 +666,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
     public SubProperties getSubProperties(Set<Long> subjectHashes) throws DAOException {
 
         SubProperties subProperties = new SubProperties();
-        if (subjectHashes!=null && !subjectHashes.isEmpty()){
+        if (subjectHashes!=null && !subjectHashes.isEmpty()) {
 
             StringBuffer sqlBuf = new StringBuffer().
             append("select distinct SPO.OBJECT as PREDICATE, RESOURCE.URI as SUB_PROPERTY").
@@ -726,12 +726,12 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
         Collection<SubjectDTO> result = new LinkedList<SubjectDTO>();
 
         // if result list not empty, get the subjects data and set their first-seen times
-        if (pairList!=null && !pairList.isEmpty()){
+        if (pairList!=null && !pairList.isEmpty()) {
 
             // create helper objects
             Map<Long,SubjectDTO> subjectsMap = new LinkedHashMap<Long, SubjectDTO>();
             Map<Long,Date> firstSeenTimes = new HashMap<Long, Date>();
-            for (Pair<Long,Long> p : pairList){
+            for (Pair<Long,Long> p : pairList) {
                 subjectsMap.put(p.getLeft(), null);
                 firstSeenTimes.put(p.getLeft(), new Date(p.getRight()));
             }
@@ -743,7 +743,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             getSubjectsData(subjectsMap);
 
             // set firstseen-times of found subjects
-            for (SubjectDTO subject : subjectsMap.values()){
+            for (SubjectDTO subject : subjectsMap.values()) {
                 subject.setDcDate(
                         firstSeenTimes.get(new Long(subject.getUriHash())));
             }
@@ -763,7 +763,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
     public List<SubjectDTO> getSubjectsNewerThan(Date timestamp, int limit) throws DAOException {
 
         // validate arguments
-        if (timestamp==null || timestamp.after(new Date()))
+        if (timestamp == null || timestamp.after(new Date()))
             throw new IllegalArgumentException("timestamp must not be null or after current time!");
         if (limit<=0)
             throw new IllegalArgumentException("limit must be greater than 0!");
@@ -787,13 +787,13 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
         List<Long> resultList = reader.getResultList();
 
         // if result list null or empty, return
-        if (resultList==null || resultList.isEmpty()){
+        if (resultList == null || resultList.isEmpty()) {
             return new LinkedList<SubjectDTO>();
         }
 
         // create helper objects
         Map<Long,SubjectDTO> subjectsMap = new HashMap<Long, SubjectDTO>();
-        for (Long subjectHash : resultList){
+        for (Long subjectHash : resultList) {
             subjectsMap.put(subjectHash, null);
         }
 
@@ -825,7 +825,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             rs = stmt.executeQuery();
             return rs.next() ? rs.getString(1) : null;
         }
-        catch (SQLException e){
+        catch (SQLException e) {
             throw new DAOException(e.toString(), e);
         }
         finally{
@@ -890,10 +890,10 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             conn = getSQLConnection();
             Object o = SQLUtil.executeSingleReturnValueQuery(
                     "select count(distinct SUBJECT) from SPO where SOURCE=" + sourceHash, conn);
-            return (o==null || StringUtils.isBlank(o.toString()))
+            return (o == null || StringUtils.isBlank(o.toString()))
                     ? 0 : Integer.parseInt(o.toString());
         }
-        catch (SQLException e){
+        catch (SQLException e) {
             throw new DAOException(e.toString(), e);
         }
         finally{
@@ -923,18 +923,18 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             conn = getSQLConnection();
             stmt = conn.createStatement();
             rs = stmt.executeQuery(buf.toString());
-            while (rs.next()){
+            while (rs.next()) {
                 HarvestedUrlCountDTO resultRow = new HarvestedUrlCountDTO();
                 try {
                     resultRow.setHarvestDay(sdf.parse(rs.getString("HARVESTDAY")));
-                } catch (ParseException ex){
+                } catch (ParseException ex) {
                     throw new DAOException(ex.toString(), ex);
                 }
                 resultRow.setHarvestCount(rs.getLong("HARVESTS"));
                 result.add(resultRow);
             }
         }
-        catch (SQLException e){
+        catch (SQLException e) {
             throw new DAOException(e.toString(), e);
         }
         finally{
@@ -974,12 +974,12 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             conn = getSQLConnection();
             stmt = conn.createStatement();
             rs = stmt.executeQuery(buf.toString());
-            while (rs.next()){
+            while (rs.next()) {
                 HarvestUrgencyScoreDTO resultRow = new HarvestUrgencyScoreDTO();
                 resultRow.setUrl(rs.getString("url"));
                 try {
                     resultRow.setLastHarvest(sdf.parse(rs.getString("last_harvest")+""));
-                } catch (ParseException ex){
+                } catch (ParseException ex) {
                     resultRow.setLastHarvest(null);
                     //throw new DAOException(ex.toString(), ex);
                 }
@@ -988,7 +988,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
                 result.add(resultRow);
             }
         }
-        catch (SQLException e){
+        catch (SQLException e) {
             throw new DAOException(e.toString(), e);
         }
         finally{
@@ -1020,11 +1020,11 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             conn = getSQLConnection();
             stmt = conn.createStatement();
             rs = stmt.executeQuery(buf.toString());
-            if (rs.next()){
+            if (rs.next()) {
                 returnValue = true;
             }
         }
-        catch (SQLException e){
+        catch (SQLException e) {
             throw new DAOException(e.toString(), e);
         }
         finally{
@@ -1078,9 +1078,9 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
         // input arguments sanity checking
 
-        if (user==null || StringUtils.isBlank(user.getUserName()))
+        if (user == null || StringUtils.isBlank(user.getUserName()))
             throw new IllegalArgumentException("user must not be null and must have user name");
-        if (URLUtil.isURL(url)==false)
+        if (URLUtil.isURL(url) == false)
             throw new IllegalArgumentException("url must not be null and must be valid URL");
 
         // get the subject that the user wants to register
@@ -1088,13 +1088,13 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
         // if subject did not exist or it isn't registered in user's registrations yet,
         // then add the necessary triples
-        if (registeredSubject==null || !registeredSubject.isRegisteredBy(user)){
+        if (registeredSubject == null || !registeredSubject.isRegisteredBy(user)) {
 
-            boolean subjectFirstSeen = registeredSubject==null;
+            boolean subjectFirstSeen = registeredSubject == null;
 
             // add the rdf:type=cr:File triple into user's registrations
 
-            registeredSubject = new SubjectDTO(url, registeredSubject==null ? false : registeredSubject.isAnonymous());
+            registeredSubject = new SubjectDTO(url, registeredSubject == null ? false : registeredSubject.isAnonymous());
             ObjectDTO objectDTO = new ObjectDTO(Subjects.CR_FILE, false);
             objectDTO.setSourceUri(user.getRegistrationsUri());
             registeredSubject.addObject(Predicates.RDF_TYPE, objectDTO);
@@ -1102,7 +1102,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             addTriples(registeredSubject);
 
             // if this is the first time this subject is seen, store it in RESOURCE
-            if (subjectFirstSeen){
+            if (subjectFirstSeen) {
                 addResource(url, user.getRegistrationsUri());
             }
 
@@ -1133,8 +1133,8 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             addResource(user.getHistoryUri(), user.getHistoryUri());
         }
 
-        if (isBookmark){
-            if (!isSubjectUserBookmark(user, Hashes.spoHash(url))){
+        if (isBookmark) {
+            if (!isSubjectUserBookmark(user, Hashes.spoHash(url))) {
                 addUserBookmark(user, url);
             }
         }
@@ -1146,9 +1146,9 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
      */
     public void addUserBookmark(CRUser user, String url) throws DAOException {
 
-        if (user==null || StringUtils.isBlank(user.getUserName()))
+        if (user == null || StringUtils.isBlank(user.getUserName()))
             throw new IllegalArgumentException("user must not be null and must have user name");
-        if (URLUtil.isURL(url)==false)
+        if (URLUtil.isURL(url) == false)
             throw new IllegalArgumentException("url must not be null and must be valid URL");
 
         SubjectDTO userHomeItemSubject = new SubjectDTO(user.getHomeItemUri(url), false);
@@ -1174,9 +1174,9 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
      */
     public void deleteUserBookmark(CRUser user, String url) throws DAOException {
 
-        if (user==null || StringUtils.isBlank(user.getUserName()))
+        if (user == null || StringUtils.isBlank(user.getUserName()))
             throw new IllegalArgumentException("user must not be null and must have user name");
-        if (URLUtil.isURL(url)==false)
+        if (URLUtil.isURL(url) == false)
             throw new IllegalArgumentException("url must not be null and must be valid URL");
 
         TripleDTO triple = new TripleDTO(Hashes.spoHash(user.getHomeItemUri(url)),
@@ -1203,13 +1203,13 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             conn = getSQLConnection();
             stmt = conn.createStatement();
             rs = stmt.executeQuery(dbQuery);
-            while (rs.next()){
+            while (rs.next()) {
                 UserBookmarkDTO bookmark = new UserBookmarkDTO();
                 bookmark.setBookmarkUrl(rs.getString("object"));
                 returnBookmarks.add(bookmark);
             }
         }
-        catch (SQLException e){
+        catch (SQLException e) {
             throw new DAOException(e.toString(), e);
         }
         finally{
@@ -1227,7 +1227,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
      */
     public boolean isSubjectUserBookmark(CRUser user, long subjectHash) throws DAOException{
 
-        if (user==null){
+        if (user == null) {
             throw new IllegalArgumentException("User object must not be null");
         }
 
@@ -1245,11 +1245,11 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             conn = getSQLConnection();
             stmt = conn.createStatement();
             rs = stmt.executeQuery(dbQuery);
-            while (rs.next()){
+            while (rs.next()) {
                 count = Integer.parseInt(rs.getString("cnt"));
             }
         }
-        catch (SQLException e){
+        catch (SQLException e) {
             throw new DAOException(e.toString(), e);
         }
         finally{
@@ -1257,7 +1257,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             SQLUtil.close(stmt);
             SQLUtil.close(conn);
         }
-        if (count == 0){
+        if (count == 0) {
             return false;
         } else {
             return true;
@@ -1290,7 +1290,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             values.add(new Long(Hashes.spoHash(user.getHistoryUri())));
 
             Object o = SQLUtil.executeSingleReturnValueQuery(sqlIsUrlInHistory, values, conn);
-            if (o==null || o.toString().equals("0")){
+            if (o == null || o.toString().equals("0")) {
 
                 SubjectDTO userHomeItemSubject = new SubjectDTO(user.getHomeItemUri(url), false);
                 ObjectDTO objectDTO = new ObjectDTO(url, false);
@@ -1309,7 +1309,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
             SQLUtil.executeUpdate(sqlDeleteUserSaveTime, values, conn);
         }
-        catch (SQLException e){
+        catch (SQLException e) {
             throw new DAOException(e.toString(), e);
         }
         finally{
@@ -1361,14 +1361,14 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             stmt = conn.createStatement();
             rs = stmt.executeQuery(dbQuery);
 
-            while (rs.next()){
+            while (rs.next()) {
                 UserHistoryDTO historyItem = new UserHistoryDTO();
                 historyItem.setUrl(rs.getString("URL"));
                 historyItem.setLastOperation(rs.getString("LAST_UPDATE"));
                 returnHistory.add(historyItem);
             }
         }
-        catch (SQLException e){
+        catch (SQLException e) {
             throw new DAOException(e.toString(), e);
         }
         finally{
@@ -1389,7 +1389,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
         StringBuffer buf = new StringBuffer("select SUBJECT,PREDICATE,OBJECT,OBJ_DERIV_SOURCE").
         append(" from SPO where SOURCE=").append(Hashes.spoHash(sourceUrl));
 
-        if (pagingRequest!=null){
+        if (pagingRequest!=null) {
             buf.append(" limit ").append(pagingRequest.getItemsPerPage()).
             append(" offset ").append(pagingRequest.getOffset()).
             toString();
@@ -1398,7 +1398,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
         TriplesReader reader = new TriplesReader();
         List<TripleDTO> triples = executeSQL(buf.toString(), new LinkedList<Object>(), reader);
 
-        if (!triples.isEmpty() && !reader.getDistinctHashes().isEmpty()){
+        if (!triples.isEmpty() && !reader.getDistinctHashes().isEmpty()) {
 
             buf = new StringBuffer().
             append("select URI_HASH, URI from RESOURCE where URI_HASH in (").
@@ -1407,9 +1407,9 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             HashMap<Long,String> urisByHashes = new HashMap<Long, String>();
             executeSQL(buf.toString(), new UriHashesReader(urisByHashes));
 
-            if (!urisByHashes.isEmpty()){
+            if (!urisByHashes.isEmpty()) {
 
-                for (TripleDTO tripleDTO : triples){
+                for (TripleDTO tripleDTO : triples) {
 
                     tripleDTO.setSubjectUri(urisByHashes.get(tripleDTO.getSubjectHash()));
                     tripleDTO.setPredicateUri(urisByHashes.get(tripleDTO.getPredicateHash()));
@@ -1441,11 +1441,11 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             conn = getSQLConnection();
             stmt = conn.createStatement();
             rs = stmt.executeQuery(dbQuery);
-            while (rs.next()){
+            while (rs.next()) {
                 lastid = Integer.parseInt(rs.getString("lastid"));
             }
         }
-        catch (SQLException e){
+        catch (SQLException e) {
             throw new DAOException(e.toString(), e);
         }
         finally{
@@ -1473,7 +1473,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             stmt = conn.createStatement();
             stmt.execute(deleteQuery);
         }
-        catch (SQLException e){
+        catch (SQLException e) {
             throw new DAOException(e.toString(), e);
         }
         finally{
@@ -1569,10 +1569,10 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
         // Adding content review to DB too.
 
-        if (review.getReviewContent() != null && review.getReviewContent().length()>0){
+        if (review.getReviewContent() != null && review.getReviewContent().length()>0) {
 
             String contentType = review.getReviewContentType();
-            if (contentType==null){
+            if (contentType == null) {
                 contentType = "";
             }
 
@@ -1591,7 +1591,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
                 stmt.setString(3, contentType);
                 stmt.executeUpdate();
             }
-            catch (SQLException e){
+            catch (SQLException e) {
 
                 throw new DAOException(e.getMessage(), e);
             }
@@ -1642,7 +1642,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             conn = getSQLConnection();
             stmt = conn.createStatement();
             rs = stmt.executeQuery(dbQuery);
-            while (rs.next()){
+            while (rs.next()) {
                 ReviewDTO tempReviewDTO = new ReviewDTO();
                 tempReviewDTO.setReviewSubjectUri(rs.getString("uri"));
                 tempReviewDTO.setTitle(rs.getString("title"));
@@ -1651,13 +1651,13 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
                 tempReviewDTO.setReviewContentType(rs.getString("datatype"));
                 try {
                     tempReviewDTO.setReviewID(Integer.parseInt( tempReviewDTO.getReviewSubjectUri().split("reviews/")[1]));
-                } catch (Exception ex){
+                } catch (Exception ex) {
                     tempReviewDTO.setReviewID(0);
                 }
                 returnList.add(tempReviewDTO);
             }
         }
-        catch (SQLException e){
+        catch (SQLException e) {
             throw new DAOException(e.toString(), e);
         }
         finally{
@@ -1708,7 +1708,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             conn = getSQLConnection();
             stmt = conn.createStatement();
             rs = stmt.executeQuery(dbQuery);
-            if (rs.next()){
+            if (rs.next()) {
                 returnItem = new ReviewDTO();
                 returnItem.setReviewSubjectUri(rs.getString("uri"));
                 returnItem.setTitle(rs.getString("title"));
@@ -1718,12 +1718,12 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
                 byte [] bytes = rs.getBytes("reviewcontent");
                 try {
                     returnItem.setReviewContent(new String(bytes, "UTF-8"));
-                } catch (UnsupportedEncodingException ex){
+                } catch (UnsupportedEncodingException ex) {
                 }
                 returnItem.setReviewContentType(rs.getString("datatype"));
             }
         }
-        catch (SQLException e){
+        catch (SQLException e) {
             throw new DAOException(e.toString(), e);
         }
         finally{
@@ -1746,7 +1746,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
         String sqlDeleteReview = "DELETE FROM spo WHERE (subject=? OR object_hash=?" +
         "OR source=? OR obj_deriv_source=? OR obj_source_object=?)";
 
-        if (!deleteAttachments){
+        if (!deleteAttachments) {
             sqlDeleteReview += " AND (predicate <> "+Hashes.spoHash(Predicates.CR_HAS_ATTACHMENT)+")";
         }
 
@@ -1757,9 +1757,9 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
         try{
             conn = getSQLConnection();
 
-            if (deleteAttachments){
+            if (deleteAttachments) {
                 List<String> reviewAttachments = this.getReviewAttachmentList(user, reviewId);
-                for (int i=0; i<reviewAttachments.size(); i++){
+                for (int i=0; i<reviewAttachments.size(); i++) {
                     SQLUtil.executeUpdate("DELETE FROM spo_binary WHERE subject = "+Hashes.spoHash(reviewAttachments.get(i)), conn);
                 }
             }
@@ -1770,7 +1770,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
 
         }
-        catch (SQLException e){
+        catch (SQLException e) {
             throw new DAOException(e.toString(), e);
         }
         finally{
@@ -1795,11 +1795,11 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             conn = getSQLConnection();
             stmt = conn.createStatement();
             rs = stmt.executeQuery(dbQuery);
-            while (rs.next()){
+            while (rs.next()) {
                 returnList.add(rs.getString("object"));
             }
         }
-        catch (SQLException e){
+        catch (SQLException e) {
             throw new DAOException(e.toString(), e);
         }
         finally{
@@ -1821,7 +1821,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             SQLUtil.executeUpdate("DELETE FROM spo WHERE object_hash = "+Hashes.spoHash(attachmentUri), conn);
             SQLUtil.executeUpdate("DELETE FROM spo_binary WHERE subject = "+Hashes.spoHash(attachmentUri), conn);
         }
-        catch (SQLException e){
+        catch (SQLException e) {
             throw new DAOException(e.toString(), e);
         }
         finally{
@@ -1847,7 +1847,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
                 returnFileDTO.setInputStream(rs.getBinaryStream("object"));
             }
         }
-        catch (SQLException e){
+        catch (SQLException e) {
             throw new DAOException(e.toString(), e);
         }
         finally{
@@ -1864,7 +1864,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
      */
     public void deleteTriplesOfSource(long sourceHash) throws DAOException {
 
-        if (sourceHash<=0){
+        if (sourceHash<=0) {
             throw new IllegalArgumentException("The given source hash should be >0");
         }
 
@@ -1875,7 +1875,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             SQLUtil.executeUpdate(StringUtils.replace(
                     deleteTriplesOfSourceSQL, "?", String.valueOf(sourceHash)), conn);
         }
-        catch (SQLException e){
+        catch (SQLException e) {
             throw new DAOException(e.toString(), e);
         }
         finally{
@@ -1890,11 +1890,11 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
      */
     public Collection<UploadDTO> getUserUploads(CRUser crUser) throws DAOException{
 
-        if (crUser==null){
+        if (crUser == null) {
             throw new IllegalArgumentException("User object must not be null");
         }
 
-        if (StringUtils.isBlank(crUser.getUserName())){
+        if (StringUtils.isBlank(crUser.getUserName())) {
             throw new IllegalArgumentException("User name must not be blank");
         }
 
@@ -1913,7 +1913,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
             // loop through all the found uploads and make sure they all have the label set
             Collection<UploadDTO> uploads = reader.getResultList();
-            for (UploadDTO uploadDTO : uploads){
+            for (UploadDTO uploadDTO : uploads) {
 
                 String currentLabel = uploadDTO.getLabel();
                 String subjectUri = uploadDTO.getSubjectUri();
@@ -1927,7 +1927,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
             return uploads;
         }
-        catch (SQLException e){
+        catch (SQLException e) {
             throw new DAOException(e.toString(), e);
         }
         catch (ResultSetReaderException e) {
@@ -1944,7 +1944,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
      */
     public boolean isExistingSubject(String subjectUri) throws DAOException {
 
-        if (StringUtils.isBlank(subjectUri)){
+        if (StringUtils.isBlank(subjectUri)) {
             throw new IllegalArgumentException("Subject uri must not be empty");
         }
 
@@ -1955,7 +1955,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
                     "select count(*) from SPO where SUBJECT=" + Hashes.spoHash(subjectUri), conn);
             return o!=null && Integer.parseInt(o.toString()) > 0;
         }
-        catch (SQLException e){
+        catch (SQLException e) {
             throw new DAOException(e.getMessage(), e);
         }
         finally{
@@ -1970,13 +1970,13 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
     public void deleteSubjects(List<String> subjectUris) throws DAOException {
 
         // make sure the list is not null or empty
-        if (subjectUris==null || subjectUris.isEmpty()){
+        if (subjectUris == null || subjectUris.isEmpty()) {
             return;
         }
 
         // convert URIs to hashes
         ArrayList<Long> hashes = new ArrayList<Long>();
-        for (String uri : subjectUris){
+        for (String uri : subjectUris) {
             hashes.add(Long.valueOf(Hashes.spoHash(uri)));
         }
 
@@ -1998,7 +1998,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             // commit the transaction
             conn.commit();
         }
-        catch (SQLException e){
+        catch (SQLException e) {
             throw new DAOException(e.getMessage(), e);
         }
         finally{
@@ -2013,7 +2013,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
      */
     public void renameSubjects(Map<Long,String> newUrisByOldHashes) throws DAOException {
 
-        if (newUrisByOldHashes==null || newUrisByOldHashes.isEmpty()){
+        if (newUrisByOldHashes == null || newUrisByOldHashes.isEmpty()) {
             throw new IllegalArgumentException("Supplied map must not be null or empty!");
         }
 
@@ -2041,7 +2041,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             stmt_SPO_BINARY = conn.prepareStatement("update SPO_BINARY set SUBJECT=? where SUBJECT=?");
             stmt_RESOURCE = conn.prepareStatement("insert into RESOURCE (URI,URI_HASH,FIRSTSEEN_SOURCE,FIRSTSEEN_TIME,LASTMODIFIED_TIME) values (?,?,?,?,?)");
 
-            for (Map.Entry<Long,String> entry : newUrisByOldHashes.entrySet()){
+            for (Map.Entry<Long,String> entry : newUrisByOldHashes.entrySet()) {
 
                 long oldHash = entry.getKey().longValue();
                 String newUri = entry.getValue();
@@ -2096,7 +2096,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
             conn.commit();
         }
-        catch (SQLException e){
+        catch (SQLException e) {
             SQLUtil.rollback(conn);
             throw new DAOException(e.getMessage(), e);
         }
@@ -2135,12 +2135,12 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             stmt = conn.createStatement();
             rs = stmt.executeQuery(buf.toString());
             PredicateDTO singleItem = null;
-            while (rs.next()){
+            while (rs.next()) {
                 singleItem = new PredicateDTO(rs.getString("predicateuri"));
                 returnList.add(singleItem);
             }
         }
-        catch (SQLException e){
+        catch (SQLException e) {
             throw new DAOException(e.toString(), e);
         }
         finally{
@@ -2164,11 +2164,11 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             conn = getSQLConnection();
             stmt = conn.createStatement();
             rs = stmt.executeQuery(buf.toString());
-            while (rs.next()){
+            while (rs.next()) {
                 returnList.add(rs.getString("subjecturi"));
             }
         }
-        catch (SQLException e){
+        catch (SQLException e) {
             throw new DAOException(e.toString(), e);
         }
         finally{
@@ -2211,7 +2211,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             conn = getSQLConnection();
             SQLUtil.executeUpdate(deleteTriplesOfPredicate, values, conn);
         }
-        catch (SQLException e){
+        catch (SQLException e) {
             throw new DAOException(e.getMessage(), e);
         }
         finally{
@@ -2233,7 +2233,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             conn = getSQLConnection();
             val = SQLUtil.executeSingleReturnValueQuery(query, conn);
         }
-        catch (SQLException e){
+        catch (SQLException e) {
             throw new DAOException(e.toString(), e);
         }
         finally{

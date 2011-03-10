@@ -41,7 +41,7 @@ public class Hashes {
      * @param s
      * @return
      */
-    public static long spoHash(String s){
+    public static long spoHash(String s) {
         return Hashes.fnv64(s);
     }
 
@@ -50,7 +50,7 @@ public class Hashes {
      * @param s
      * @return
      */
-    public static long spoHash(String s, long seed){
+    public static long spoHash(String s, long seed) {
         return Hashes.fnv64(s, seed);
     }
 
@@ -59,7 +59,7 @@ public class Hashes {
      * @param s
      * @return
      */
-    private static long fnv64(String s){
+    private static long fnv64(String s) {
         return Hashes.fnv64(s, SEED);
     }
 
@@ -68,10 +68,10 @@ public class Hashes {
      * @param s
      * @return
      */
-    private static long fnv64(String s, long seed){
+    private static long fnv64(String s, long seed) {
 
         int sLen = s.length();
-        for (int i=0; i<sLen; i++){
+        for (int i=0; i<sLen; i++) {
             seed ^= (long)s.charAt(i);
             seed += (seed << 1) + (seed << 4) + (seed << 5) + (seed << 7) + (seed << 8) + (seed << 40);
         }
@@ -84,7 +84,7 @@ public class Hashes {
      * @param s
      * @return
      */
-    public static String md5(String s){
+    public static String md5(String s) {
         return Hashes.digest(s, "md5");
     }
 
@@ -94,7 +94,7 @@ public class Hashes {
      * @param algorithm
      * @return
      */
-    public static String digest(String src, String algorithm){
+    public static String digest(String src, String algorithm) {
 
         byte[] srcBytes = src.getBytes();
         byte[] dstBytes = new byte[16];
@@ -103,7 +103,7 @@ public class Hashes {
         try{
             md = MessageDigest.getInstance(algorithm);
         }
-        catch (GeneralSecurityException e){
+        catch (GeneralSecurityException e) {
             throw new CRRuntimeException(e.toString(), e);
         }
         md.update(srcBytes);
@@ -111,7 +111,7 @@ public class Hashes {
         md.reset();
 
         StringBuffer buf = new StringBuffer();
-        for (int i=0; i<dstBytes.length; i++){
+        for (int i=0; i<dstBytes.length; i++) {
             Byte byteWrapper = new Byte(dstBytes[i]);
             int k = byteWrapper.intValue();
             String s = Integer.toHexString(byteWrapper.intValue());

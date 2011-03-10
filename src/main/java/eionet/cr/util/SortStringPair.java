@@ -11,11 +11,11 @@ import java.util.List;
 
 public class SortStringPair {
 
-    public static List<Pair<String, String>> sortByLeftAsc(List<Pair<String, String>> sourcePairs){
+    public static List<Pair<String, String>> sortByLeftAsc(List<Pair<String, String>> sourcePairs) {
         // Sorting the types by Pair left.
-        for (int i=0; i<sourcePairs.size(); i++){
-            for (int j = i; j<sourcePairs.size(); j++){
-                if (sourcePairs.get(i).getLeft().compareTo(sourcePairs.get(j).getLeft())>0){
+        for (int i=0; i<sourcePairs.size(); i++) {
+            for (int j = i; j<sourcePairs.size(); j++) {
+                if (sourcePairs.get(i).getLeft().compareTo(sourcePairs.get(j).getLeft())>0) {
                     Collections.swap(sourcePairs, i, j);
                 }
             }

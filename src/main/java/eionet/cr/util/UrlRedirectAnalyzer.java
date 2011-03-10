@@ -32,7 +32,7 @@ public class UrlRedirectAnalyzer {
     /**
      *
      */
-    public static UrlRedirectionInfo analyzeUrlRedirection(String urlToAnlayze){
+    public static UrlRedirectionInfo analyzeUrlRedirection(String urlToAnlayze) {
 
         UrlRedirectionInfo result = new UrlRedirectionInfo();
         result.setSourceURL(urlToAnlayze);
@@ -50,7 +50,7 @@ public class UrlRedirectAnalyzer {
             inputStream = urlConnection.getInputStream();
             int responseCode = urlConnection.getResponseCode();
 
-            if (isRedirectionResponseCode(responseCode)){
+            if (isRedirectionResponseCode(responseCode)) {
 
                 String redirectLocation = urlConnection.getHeaderField("Location");
                 String fullRedirectUrl = constructFullUrl(urlToAnlayze, redirectLocation);
@@ -65,7 +65,7 @@ public class UrlRedirectAnalyzer {
         }
         finally{
             try{
-                if (inputStream!=null){
+                if (inputStream!=null) {
                     inputStream.close();
                 }
             }
@@ -84,7 +84,7 @@ public class UrlRedirectAnalyzer {
      */
     public static String constructFullUrl(String baseUrl, String relativeUrl)
                                                                     throws MalformedURLException {
-        if (relativeUrl==null){
+        if (relativeUrl==null) {
             return baseUrl;
         }
         else{
@@ -92,8 +92,8 @@ public class UrlRedirectAnalyzer {
         }
     }
 
-    public static boolean isRedirectionResponseCode(int responseCode){
-        if ((responseCode == 301)||(responseCode == 302)||(responseCode == 303)||(responseCode == 307)){
+    public static boolean isRedirectionResponseCode(int responseCode) {
+        if ((responseCode == 301)||(responseCode == 302)||(responseCode == 303)||(responseCode == 307)) {
             return true;
         } else {
             return false;

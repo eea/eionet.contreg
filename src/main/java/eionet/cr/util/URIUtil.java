@@ -46,7 +46,7 @@ public class URIUtil {
      * @param str
      * @return
      */
-    public static boolean isSchemedURI(String str){
+    public static boolean isSchemedURI(String str) {
 
         if (Util.isNullOrEmpty(str))
             return false;
@@ -71,15 +71,15 @@ public class URIUtil {
      * @param uri
      * @return
      */
-    public static String extractURILabel(String uri){
+    public static String extractURILabel(String uri) {
 
         String result = null;
-        if (URLUtil.isURL(uri)){
+        if (URLUtil.isURL(uri)) {
 
             int i = Math.max(uri.lastIndexOf('#'), uri.lastIndexOf('/'));
-            if (i>=0){
+            if (i>=0) {
                 result = uri.substring(i+1);
-                if (result.trim().length()==0){
+                if (result.trim().length()==0) {
                     result = null;
                 }
             }
@@ -94,15 +94,15 @@ public class URIUtil {
      * @param dflt
      * @return
      */
-    public static String extractURILabel(String uri, String dflt){
+    public static String extractURILabel(String uri, String dflt) {
 
         String result = null;
-        if (URLUtil.isURL(uri)){
+        if (URLUtil.isURL(uri)) {
 
             int i = Math.max(uri.lastIndexOf('#'), uri.lastIndexOf('/'));
-            if (i>=0){
+            if (i>=0) {
                 result = uri.substring(i+1);
-                if (result.trim().length()==0){
+                if (result.trim().length()==0) {
                     result = null;
                 }
             }

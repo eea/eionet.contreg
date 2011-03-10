@@ -61,7 +61,7 @@ public class FileUtil {
             try{
                 if (inputStream!=null) inputStream.close();
             }
-            catch (IOException e){
+            catch (IOException e) {
                 logger.error("Failed to close URLConnection's input stream: " + e.toString(), e);
             }
         }
@@ -83,7 +83,7 @@ public class FileUtil {
             int totalBytes = 0;
             byte[] bytes = new byte[1024];
             fos = new FileOutputStream(toFile);
-            while ((i = inputStream.read(bytes, 0, bytes.length)) != -1){
+            while ((i = inputStream.read(bytes, 0, bytes.length)) != -1) {
                 fos.write(bytes, 0, i);
                 totalBytes = totalBytes + i;
             }
@@ -94,7 +94,7 @@ public class FileUtil {
             try{
                 if (fos!=null) fos.close();
             }
-            catch (IOException e){
+            catch (IOException e) {
                 logger.error("Failed to close file output stream: " + e.toString(), e);
             }
         }

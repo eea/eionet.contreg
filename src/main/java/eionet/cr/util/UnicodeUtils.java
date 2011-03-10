@@ -32,7 +32,7 @@ public class UnicodeUtils {
      * @param entityReference
      * @return
      */
-    public static int getEntityReferenceDecimal(String entityReference){
+    public static int getEntityReferenceDecimal(String entityReference) {
 
         String s = getEntityRefrenceMap().get(entityReference);
         return s==null ? -1 : Integer.parseInt(s);
@@ -45,20 +45,20 @@ public class UnicodeUtils {
      * @param literal
      * @return
      */
-    public static String replaceEntityReferences(String str){
+    public static String replaceEntityReferences(String str) {
 
         int strLen = str.length();
         StringBuilder budiler = new StringBuilder();
-        for (int i=0; i<strLen; i++){
+        for (int i=0; i<strLen; i++) {
 
             char c = str.charAt(i);
 
-            if (c=='&'){
+            if (c=='&') {
                 int j = str.indexOf(";", i);
-                if (j > i){
+                if (j > i) {
                     char cc = str.charAt(i+1);
                     int decimal = -1;
-                    if (cc=='#'){
+                    if (cc=='#') {
                         // handle Unicode decimal escape
                         String sDecimal = str.substring(i+2, j);
 
@@ -73,7 +73,7 @@ public class UnicodeUtils {
                         decimal = UnicodeUtils.getEntityReferenceDecimal(ent);
                     }
 
-                    if (decimal >= 0){
+                    if (decimal >= 0) {
                         // if decimal was found, use the corresponding char. otherwise stick to c.
                         c = (char)decimal;
                         i = j;
@@ -91,9 +91,9 @@ public class UnicodeUtils {
      *
      * @return
      */
-    private static HashMap<String,String> getEntityRefrenceMap(){
+    private static HashMap<String,String> getEntityRefrenceMap() {
 
-        if (entityReferenceMap==null){
+        if (entityReferenceMap==null) {
 
             entityReferenceMap = new HashMap<String,String>();
             entityReferenceMap.put("nbsp", "160");

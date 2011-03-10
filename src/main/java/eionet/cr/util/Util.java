@@ -63,7 +63,7 @@ public class Util {
      * @param t
      * @return
      */
-    public static String getStackTrace(Throwable t){
+    public static String getStackTrace(Throwable t) {
 
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw, true);
@@ -76,7 +76,7 @@ public class Util {
      * @param t
      * @return
      */
-    public static String getStackTraceForHTML(Throwable t){
+    public static String getStackTraceForHTML(Throwable t) {
 
         return processStackTraceForHTML(getStackTrace(t));
     }
@@ -86,14 +86,14 @@ public class Util {
      * @param stackTrace
      * @return
      */
-    public static String processStackTraceForHTML(String stackTrace){
+    public static String processStackTraceForHTML(String stackTrace) {
 
         if (stackTrace==null || stackTrace.trim().length()==0)
             return stackTrace;
 
         StringBuffer buf = new StringBuffer();
         String[] stackFrames = getStackFrames(stackTrace);
-        for (int i=0; stackFrames!=null && i<stackFrames.length; i++){
+        for (int i=0; stackFrames!=null && i<stackFrames.length; i++) {
             buf.append(stackFrames[i].replaceFirst("\t", "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")).append("<br/>");
         }
 
@@ -105,7 +105,7 @@ public class Util {
      * @param stackTrace
      * @return
      */
-    public static String[] getStackFrames(String stackTrace){
+    public static String[] getStackFrames(String stackTrace) {
         StringTokenizer frames = new StringTokenizer(stackTrace, System.getProperty("line.separator"));
         List list = new LinkedList();
         for(; frames.hasMoreTokens(); list.add(frames.nextToken()));
@@ -118,13 +118,13 @@ public class Util {
      * @param separator
      * @return
      */
-    public static String arrayToString(Object[] array, String separator){
+    public static String arrayToString(Object[] array, String separator) {
 
         if (array==null)
             return null;
 
         StringBuffer buf = new StringBuffer();
-        for (int i=0; i<array.length; i++){
+        for (int i=0; i<array.length; i++) {
             if (i>0)
                 buf.append(separator);
             buf.append(array[i].toString());
@@ -138,7 +138,7 @@ public class Util {
      * @param datePattern
      * @return
      */
-    public static String dateToString(java.util.Date date, String datePattern){
+    public static String dateToString(java.util.Date date, String datePattern) {
 
         if (date==null)
             return null;
@@ -153,7 +153,7 @@ public class Util {
      * @param datePattern
      * @return
      */
-    public static java.util.Date stringToDate(String str, String datePattern){
+    public static java.util.Date stringToDate(String str, String datePattern) {
 
         if (str==null || str.trim().length()==0)
             return null;
@@ -162,7 +162,7 @@ public class Util {
         try {
             return formatter.parse(str);
         }
-        catch (ParseException e){
+        catch (ParseException e) {
             throw new CRRuntimeException("Failed to convert the given string to java.util.Date: " + e.toString(), e);
         }
     }
@@ -171,7 +171,7 @@ public class Util {
      *
      * @return
      */
-    public static long currentTimeSeconds(){
+    public static long currentTimeSeconds() {
         return (long)(System.currentTimeMillis() / (long)1000);
     }
 
@@ -180,7 +180,7 @@ public class Util {
      * @param milliSeconds
      * @return
      */
-    public static long getSeconds(long milliSeconds){
+    public static long getSeconds(long milliSeconds) {
         return (long)(milliSeconds/(long)1000);
     }
 
@@ -189,7 +189,7 @@ public class Util {
      * @param str
      * @return
      */
-    public static boolean isNullOrEmpty(String str){
+    public static boolean isNullOrEmpty(String str) {
         return str == null || str.length() == 0 || str.trim().length() == 0;
     }
 
@@ -198,7 +198,7 @@ public class Util {
      * @param s
      * @return
      */
-    public static boolean hasWhiteSpace(String s){
+    public static boolean hasWhiteSpace(String s) {
 
         if (s==null || s.length()!=s.trim().length())
             return true;
@@ -216,7 +216,7 @@ public class Util {
      * @param array
      * @return
      */
-    public static Object getFirst(Object[] array){
+    public static Object getFirst(Object[] array) {
         return array!=null && array.length>0 ? array[0] : null;
     }
 
@@ -225,7 +225,7 @@ public class Util {
      * @param array
      * @return
      */
-    public static String getFirst(String[] array){
+    public static String getFirst(String[] array) {
         return array!=null && array.length>0 ? array[0] : null;
     }
 
@@ -234,13 +234,13 @@ public class Util {
      * @param array
      * @return
      */
-    public static String[] pruneUrls(String[] array){
+    public static String[] pruneUrls(String[] array) {
 
         if (array==null || array.length==0)
             return array;
 
         ArrayList<String> list = new ArrayList<String>();
-        for (int i=0; i<array.length; i++){
+        for (int i=0; i<array.length; i++) {
             if (!URLUtil.isURL(array[i]))
                 list.add(array[i]);
         }
@@ -249,7 +249,7 @@ public class Util {
             return array;
         else{
             String[] result = new String[list.size()];
-            for (int i=0; i<list.size(); i++){
+            for (int i=0; i<list.size(); i++) {
                 result[i] = list.get(i);
             }
             return result;
@@ -262,18 +262,18 @@ public class Util {
      * @param objectClass
      * @return
      */
-    public static Object findInAnyScope(PageContext pageContext, Class objectClass){
+    public static Object findInAnyScope(PageContext pageContext, Class objectClass) {
 
         if (pageContext==null || objectClass==null)
             return null;
 
         int[] scopes = {PageContext.APPLICATION_SCOPE, PageContext.PAGE_SCOPE, PageContext.REQUEST_SCOPE, PageContext.SESSION_SCOPE};
-        for (int i=0; i<scopes.length; i++){
+        for (int i=0; i<scopes.length; i++) {
             Enumeration attrs = pageContext.getAttributeNamesInScope(scopes[i]);
-            while (attrs!=null && attrs.hasMoreElements()){
+            while (attrs!=null && attrs.hasMoreElements()) {
                 String name = (String)attrs.nextElement();
                 Object o = pageContext.getAttribute(name, scopes[i]);
-                if (o!=null && objectClass.isInstance(o)){
+                if (o!=null && objectClass.isInstance(o)) {
                     return o;
                 }
             }
@@ -287,7 +287,7 @@ public class Util {
      * @param s
      * @return
      */
-    public static String urlEncode(String s){
+    public static String urlEncode(String s) {
         try {
             return URLEncoder.encode(s, "UTF-8");
         }
@@ -301,7 +301,7 @@ public class Util {
      * @param s
      * @return
      */
-    public static String urlDecode(String s){
+    public static String urlDecode(String s) {
         try {
             return URLDecoder.decode(s, "UTF-8");
         }
@@ -315,7 +315,7 @@ public class Util {
      * @param o
      * @return
      */
-    public static Object[] toArray(Object o){
+    public static Object[] toArray(Object o) {
         if (o==null)
             return null;
         else{
@@ -329,7 +329,7 @@ public class Util {
      *
      * @param expression
      */
-    public static boolean isValidQuartzCronExpression(String expression){
+    public static boolean isValidQuartzCronExpression(String expression) {
 
         if (Util.isNullOrEmpty(expression))
             return false;
@@ -342,13 +342,13 @@ public class Util {
      * @param coll
      * @return
      */
-    public static String toCSV(Collection coll){
+    public static String toCSV(Collection coll) {
 
         StringBuffer buf = new StringBuffer();
-        if (coll!=null){
-            for (Iterator it = coll.iterator(); it.hasNext();){
+        if (coll!=null) {
+            for (Iterator it = coll.iterator(); it.hasNext();) {
 
-                if (buf.length()>0){
+                if (buf.length()>0) {
                     buf.append(",");
                 }
                 buf.append(it.next());
@@ -362,7 +362,7 @@ public class Util {
      * @param s
      * @return
      */
-    public static Double toDouble(String s){
+    public static Double toDouble(String s) {
 
         if (s==null || s.trim().length()==0)
             return null;
@@ -370,7 +370,7 @@ public class Util {
             try{
                 return Double.valueOf(s);
             }
-            catch (NumberFormatException nfe){
+            catch (NumberFormatException nfe) {
                 return null;
             }
         }
@@ -380,9 +380,9 @@ public class Util {
      *
      * @param language
      */
-    public static String normalizeHTTPAcceptedLanguage(String httpAcceptedLanguage){
+    public static String normalizeHTTPAcceptedLanguage(String httpAcceptedLanguage) {
 
-        if (httpAcceptedLanguage==null){
+        if (httpAcceptedLanguage==null) {
             return httpAcceptedLanguage;
         }
         else{
@@ -400,10 +400,10 @@ public class Util {
         /* ignore language refinement (e.g. en-US, en_UK) which is separated either by '-' or '_' */
 
         j = result.indexOf("-");
-        if (j<0){
+        if (j<0) {
             j = result.indexOf("_");
         }
-        if (j>=0){
+        if (j>=0) {
             result = result.substring(0, j);
         }
 
@@ -414,15 +414,15 @@ public class Util {
      *
      * @param language
      */
-    public static double getHTTPAcceptedLanguageImportance(String httpAcceptedLanguage){
-        if (httpAcceptedLanguage.contains(";q=")){
+    public static double getHTTPAcceptedLanguageImportance(String httpAcceptedLanguage) {
+        if (httpAcceptedLanguage.contains(";q=")) {
             int j = httpAcceptedLanguage.indexOf(";q=");
 
             String importanceValue = httpAcceptedLanguage.substring(j+3, httpAcceptedLanguage.length());
             try {
                 double returnValue = Double.parseDouble(importanceValue);
                 return returnValue;
-            } catch (Exception ex){
+            } catch (Exception ex) {
                 return 0;
             }
         } else {
@@ -434,17 +434,17 @@ public class Util {
      *
      * @return
      */
-    public static HashSet<String> getAcceptedLanguages(String acceptLanguageHeader){
+    public static HashSet<String> getAcceptedLanguages(String acceptLanguageHeader) {
 
         HashSet<String> acceptedLanguages = null;
 
-        if (acceptedLanguages==null){
+        if (acceptedLanguages==null) {
 
             acceptedLanguages = new HashSet<String>();
 
-            if (!StringUtils.isBlank(acceptLanguageHeader)){
+            if (!StringUtils.isBlank(acceptLanguageHeader)) {
                 String[] languages = StringUtils.split(acceptLanguageHeader, ',');
-                for (int i=0; i<languages.length; i++){
+                for (int i=0; i<languages.length; i++) {
                     acceptedLanguages.add(Util.normalizeHTTPAcceptedLanguage(languages[i]));
                 }
             }
@@ -459,19 +459,19 @@ public class Util {
      *
      * @return
      */
-    public static List<String> getAcceptedLanguagesByImportance(String acceptLanguageHeader){
+    public static List<String> getAcceptedLanguagesByImportance(String acceptLanguageHeader) {
 
         List<String> returnValues = new ArrayList<String>();
 
         List<LanguagePrioritySorter> acceptedLanguagesByPriority = null;
 
-        if (acceptedLanguagesByPriority==null){
+        if (acceptedLanguagesByPriority==null) {
 
             acceptedLanguagesByPriority = new ArrayList<LanguagePrioritySorter>();
 
-            if (!StringUtils.isBlank(acceptLanguageHeader)){
+            if (!StringUtils.isBlank(acceptLanguageHeader)) {
                 String[] languages = StringUtils.split(acceptLanguageHeader, ',');
-                for (int i=0; i<languages.length; i++){
+                for (int i=0; i<languages.length; i++) {
                     LanguagePrioritySorter languagePriority = new LanguagePrioritySorter();
                     languagePriority.setPriority(Util.getHTTPAcceptedLanguageImportance(languages[i]));
                     languagePriority.setLanguageValue(Util.normalizeHTTPAcceptedLanguage(languages[i]));
@@ -481,7 +481,7 @@ public class Util {
 
             Collections.sort(acceptedLanguagesByPriority);
 
-            for (int a=0; a<acceptedLanguagesByPriority.size(); a++){
+            for (int a=0; a<acceptedLanguagesByPriority.size(); a++) {
                 returnValues.add(acceptedLanguagesByPriority.get(a).getLanguageValue());
             }
 
@@ -499,7 +499,7 @@ public class Util {
      * @param startTime
      * @return
      */
-    public static String durationSince(long startTime){
+    public static String durationSince(long startTime) {
 
         return duration(Math.max(0, System.currentTimeMillis()-startTime));
     }
@@ -509,13 +509,13 @@ public class Util {
      * @param duration
      * @return
      */
-    protected static String duration(long duration){
+    protected static String duration(long duration) {
 
         int minutes = (int)((duration / 1000) / 60);
         int seconds = (int) ((duration / 1000) % 60);
         int milliseconds = (int) (duration % 1000);
         StringBuffer buf = new StringBuffer();
-        if (minutes>0){
+        if (minutes>0) {
             buf.append(minutes).append(" min ");
         }
         buf.append(seconds).append(".");
@@ -534,7 +534,7 @@ public class Util {
      * @param maxHash
      * @return
      */
-    public static int calculateHashesCount(long minHash, long maxHash){
+    public static int calculateHashesCount(long minHash, long maxHash) {
 
         BigDecimal minValue = new BigDecimal(Long.MIN_VALUE);
         BigDecimal maxValue = new BigDecimal(Long.MAX_VALUE);
@@ -551,7 +551,7 @@ public class Util {
      * @param subjectString
      * @return
      */
-    public static List<String> splitStringBySpacesExpectBetweenQuotes(String subjectString){
+    public static List<String> splitStringBySpacesExpectBetweenQuotes(String subjectString) {
 
         List<String> matchList = new ArrayList<String>();
         Pattern regex = Pattern.compile("[^\\s\"']+|\"([^\"]*)\"|'([^']*)'");
@@ -578,12 +578,12 @@ public class Util {
      * @param map
      * @return
      */
-    public static <K,V> Set<K> getNullValueKeys(Map<K,V> map){
+    public static <K,V> Set<K> getNullValueKeys(Map<K,V> map) {
 
         HashSet<K> result = new HashSet<K>();
-        if (map!=null && !map.isEmpty()){
-            for (Map.Entry<K,V> entry : map.entrySet()){
-                if (entry.getValue()==null){
+        if (map!=null && !map.isEmpty()) {
+            for (Map.Entry<K,V> entry : map.entrySet()) {
+                if (entry.getValue()==null) {
                     result.add(entry.getKey());
                 }
             }
@@ -610,6 +610,6 @@ public class Util {
      *
      * @param args
      */
-    public static void main(String[] args){
+    public static void main(String[] args) {
     }
 }

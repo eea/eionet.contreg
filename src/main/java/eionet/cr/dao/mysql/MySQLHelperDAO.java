@@ -100,26 +100,26 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
             pstmt.setLong(2, Hashes.spoHash(Subjects.CR_FILE));
             pstmt.setLong(3, limit);
             rs = pstmt.executeQuery();
-            while (rs.next()){
+            while (rs.next()) {
                 uriMap.put(rs.getString(1), rs.getString(2));
                 labelMap.put(rs.getString(1), "");
             }
 
             /* if any subjects were found, let's find their labels */
 
-            if (!labelMap.isEmpty()){
+            if (!labelMap.isEmpty()) {
 
                 sql = "SELECT DISTINCT SPO.SUBJECT as id, SPO.OBJECT as value FROM SPO WHERE SPO.PREDICATE=? " +
                         "AND SPO.SUBJECT IN (" + Util.toCSV(labelMap.keySet()) + ")";
                 pstmt = conn.prepareStatement(sql);
                 pstmt.setLong(1, Hashes.spoHash(Predicates.RDFS_LABEL));
                 rs = pstmt.executeQuery();
-                while (rs.next()){
+                while (rs.next()) {
                     labelMap.put(rs.getString(1), rs.getString(2));
                 }
             }
         }
-        catch (SQLException e){
+        catch (SQLException e) {
             throw new DAOException(e.toString(), e);
         }
         finally{
@@ -132,8 +132,8 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
          * then derive the label from the subject's URI.
          */
         ArrayList<Pair<String, String>> result = new ArrayList<Pair<String, String>>();
-        for (String uriHash:labelMap.keySet()){
-            if (StringUtils.isBlank(labelMap.get(uriHash))){
+        for (String uriHash:labelMap.keySet()) {
+            if (StringUtils.isBlank(labelMap.get(uriHash))) {
                 String uri = uriMap.get(uriHash);
                 result.add(new Pair<String,String>(uriHash, URIUtil.extractURILabel(uri,uri)));
             }
@@ -165,16 +165,16 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
     }
 
     /** */
-    private static final String tripleInsertSQL = "insert into SPO (SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, OBJECT_DOUBLE," +
-            " ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG, OBJ_DERIV_SOURCE, OBJ_DERIV_SOURCE_GEN_TIME, OBJ_SOURCE_OBJECT, SOURCE," +
-            " GEN_TIME) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    private static final String tripleInsertSQL = "insert into SPO (SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, OBJECT_DOUBLE,"
+            + " ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG, OBJ_DERIV_SOURCE, OBJ_DERIV_SOURCE_GEN_TIME, OBJ_SOURCE_OBJECT, SOURCE,"
+            + " GEN_TIME) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     /*
      * (non-Javadoc)
      * @see eionet.cr.dao.SpoHelperDao#addTriples(eionet.cr.dto.SubjectDTO)
      */
     public void addTriples(SubjectDTO subjectDTO) throws DAOException{
 
-        if (subjectDTO==null || subjectDTO.getPredicateCount()==0)
+        if (subjectDTO == null || subjectDTO.getPredicateCount() == 0)
             return;
 
         long firstSeenTime = System.currentTimeMillis();
@@ -187,13 +187,13 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 
             boolean doExecuteBatch = false;
             long subjectHash = subjectDTO.getUriHash();
-            for (String predicateUri:subjectDTO.getPredicateUris()){
+            for (String predicateUri:subjectDTO.getPredicateUris()) {
 
                 Collection<ObjectDTO> objects = subjectDTO.getObjects(predicateUri);
-                if (objects!=null && !objects.isEmpty()){
+                if (objects!=null && !objects.isEmpty()) {
 
                     long predicateHash = Hashes.spoHash(predicateUri);
-                    for (ObjectDTO object:objects){
+                    for (ObjectDTO object:objects) {
 
                         pstmt.setLong(   1, subjectHash);
                         pstmt.setLong(   2, predicateHash);
@@ -204,27 +204,27 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
                         pstmt.setString( 7, YesNoBoolean.format(object.isAnonymous()));
                         pstmt.setString( 8, YesNoBoolean.format(object.isLiteral()));
                         pstmt.setString( 9, StringUtils.trimToEmpty(object.getLanguage()));
-                        pstmt.setLong(  10, object.getDerivSourceUri()==null ? 0 : Hashes.spoHash(object.getDerivSourceUri()));
+                        pstmt.setLong(  10, object.getDerivSourceUri() == null ? 0 : Hashes.spoHash(object.getDerivSourceUri()));
                         pstmt.setLong(  11, object.getDerivSourceGenTime());
                         pstmt.setLong(  12, object.getSourceObjectHash());
                         pstmt.setLong(  13, Hashes.spoHash(object.getSourceUri()));
                         pstmt.setLong(  14, System.currentTimeMillis());
 
                         pstmt.addBatch();
-                        if (doExecuteBatch==false){
+                        if (doExecuteBatch == false) {
                             doExecuteBatch = true;
                         }
                     }
                 }
             }
 
-            if (doExecuteBatch==true){
+            if (doExecuteBatch == true) {
 
                 // insert triples
                 pstmt.executeBatch();
             }
         }
-        catch (SQLException e){
+        catch (SQLException e) {
             throw new DAOException(e.toString(), e);
         }
         finally{
@@ -234,8 +234,8 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
     }
 
     /** */
-    public static final String insertResourceSQL = "insert ignore into RESOURCE" +
-            " (URI, URI_HASH, FIRSTSEEN_SOURCE, FIRSTSEEN_TIME) values (?, ?, ?, ?)";
+    public static final String insertResourceSQL = "insert ignore into RESOURCE"
+            + " (URI, URI_HASH, FIRSTSEEN_SOURCE, FIRSTSEEN_TIME) values (?, ?, ?, ?)";
     /*
      * (non-Javadoc)
      * @see eionet.cr.dao.SpoHelperDao#addResource(java.lang.String, java.lang.String)
@@ -245,7 +245,7 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
         ArrayList values = new ArrayList();
         values.add(uri);
         values.add(Long.valueOf(Hashes.spoHash(uri)));
-        if (StringUtils.isBlank(sourceUri)){
+        if (StringUtils.isBlank(sourceUri)) {
             values.add(Long.valueOf(0));
             values.add(Long.valueOf(0));
         }
@@ -259,7 +259,7 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
             conn = getConnection();
             SQLUtil.executeUpdate(insertResourceSQL, values, conn);
         }
-        catch (SQLException e){
+        catch (SQLException e) {
             throw new DAOException(e.toString(), e);
         }
         finally{
@@ -268,10 +268,10 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
     }
 
     /** */
-    private static final String getDCPropertiesSQL = "select distinct SUBJECT from SPO" +
-            " where SOURCE=" + Hashes.spoHash(Subjects.DUBLIN_CORE_SOURCE_URL) +
-            " and PREDICATE=" + Hashes.spoHash(Predicates.RDF_TYPE) +
-            " and OBJECT_HASH=" + Hashes.spoHash(Subjects.RDF_PROPERTY);
+    private static final String getDCPropertiesSQL = "select distinct SUBJECT from SPO"
+            + " where SOURCE=" + Hashes.spoHash(Subjects.DUBLIN_CORE_SOURCE_URL)
+            + " and PREDICATE=" + Hashes.spoHash(Predicates.RDF_TYPE)
+            + " and OBJECT_HASH=" + Hashes.spoHash(Subjects.RDF_PROPERTY);
     /*
      * (non-Javadoc)
      * @see eionet.cr.dao.HelperDAO#getAddibleProperties(java.util.Collection)
@@ -290,18 +290,18 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
             stmt = conn.createStatement();
             rs = stmt.executeQuery(getDCPropertiesSQL);
             List<String> dcPropertiesHashes = new ArrayList<String>();
-            while (rs.next()){
+            while (rs.next()) {
                 dcPropertiesHashes.add(rs.getString(1));
             }
             SQLUtil.close(rs);
 
-            if (!dcPropertiesHashes.isEmpty()){
+            if (!dcPropertiesHashes.isEmpty()) {
                 result.putAll(getSubjectLabels(dcPropertiesHashes, conn));
             }
 
             /* get the properties for given subject types */
 
-            if (subjectTypes!=null && !subjectTypes.isEmpty()){
+            if (subjectTypes!=null && !subjectTypes.isEmpty()) {
 
                 StringBuilder buf = new StringBuilder("select distinct SUBJECT from SPO where PREDICATE=").
                 append(Hashes.spoHash(Predicates.RDFS_DOMAIN)).append(" and OBJECT_HASH in (").
@@ -309,16 +309,16 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 
                 rs = stmt.executeQuery(buf.toString());
                 List<String> otherPropertiesHashes = new ArrayList<String>();
-                while (rs.next()){
+                while (rs.next()) {
                     otherPropertiesHashes.add(rs.getString(1));
                 }
 
-                if (!otherPropertiesHashes.isEmpty()){
+                if (!otherPropertiesHashes.isEmpty()) {
                     result.putAll(getSubjectLabels(otherPropertiesHashes, conn));
                 }
             }
         }
-        catch (SQLException e){
+        catch (SQLException e) {
             throw new DAOException(e.toString(), e);
         }
         finally{
@@ -345,7 +345,7 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
         Statement stmt = null;
         ResultSet rs = null;
         try{
-            if (conn==null){
+            if (conn == null) {
                 conn = getConnection();
                 closeConnection = true;
             }
@@ -358,14 +358,14 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
                 append(Hashes.spoHash(Predicates.RDFS_LABEL)).append(" and LIT_OBJ='Y'");
 
             rs = stmt.executeQuery(buf.toString());
-            while (rs.next()){
+            while (rs.next()) {
                 result.put(rs.getString("SUBJECT_URI"), rs.getString("SUBJECT_LABEL"));
             }
         }
         finally{
             SQLUtil.close(rs);
             SQLUtil.close(stmt);
-            if (closeConnection){
+            if (closeConnection) {
                 SQLUtil.close(conn);
             }
         }
@@ -396,7 +396,7 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
             rs = stmt.executeQuery();
             return rs.next() ? rs.getString(1) : null;
         }
-        catch (SQLException e){
+        catch (SQLException e) {
             throw new DAOException(e.toString(), e);
         }
         finally{
@@ -420,7 +420,7 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
         values.add(Long.valueOf(Hashes.spoHash(typeUri)));
 
         List<Long> predicateUris = executeQuery(getPredicatesUsedForType_SQL, values, new SingleObjectReader<Long>());
-        if (predicateUris==null || predicateUris.isEmpty()){
+        if (predicateUris == null || predicateUris.isEmpty()) {
             return new ArrayList<SubjectDTO>();
         }
         else{
@@ -433,20 +433,20 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 
             // since a used predicate may not appear as a subject in SPO, there might unfound SubjectDTO objects
             HashSet<Long> unfoundSubjects = new HashSet<Long>();
-            for (Entry<Long,SubjectDTO> entry : subjectsMap.entrySet()){
-                if (entry.getValue()==null){
+            for (Entry<Long,SubjectDTO> entry : subjectsMap.entrySet()) {
+                if (entry.getValue() == null) {
                     unfoundSubjects.add(entry.getKey());
                 }
             }
 
             // if there were indeed any unfound SubjectDTO objects, find URIs for those predicates
             // and create dummy SubjectDTO objects from those URIs
-            if (!unfoundSubjects.isEmpty()){
+            if (!unfoundSubjects.isEmpty()) {
                 Map<Long,String> resourceUris = getResourceUris(unfoundSubjects);
-                for (Entry<Long,SubjectDTO> entry : subjectsMap.entrySet()){
-                    if (entry.getValue()==null){
+                for (Entry<Long,SubjectDTO> entry : subjectsMap.entrySet()) {
+                    if (entry.getValue() == null) {
                         String uri = resourceUris.get(entry.getKey());
-                        if (!StringUtils.isBlank(uri)){
+                        if (!StringUtils.isBlank(uri)) {
                             unfoundSubjects.remove(entry.getKey());
                             entry.setValue(new SubjectDTO(uri, false));
                         }
@@ -455,7 +455,7 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
             }
 
             // clean the subjectsMap of unfound subjects
-            for (Long hash : unfoundSubjects){
+            for (Long hash : unfoundSubjects) {
                 subjectsMap.remove(hash);
             }
 
@@ -482,14 +482,14 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
             conn = getConnection();
             stmt = conn.createStatement();
             rs = stmt.executeQuery(buf.toString());
-            while (rs.next()){
+            while (rs.next()) {
                 String uri = rs.getString("URI");
-                if (!StringUtils.isBlank(uri)){
+                if (!StringUtils.isBlank(uri)) {
                     result.put(Long.valueOf(rs.getLong("URI_HASH")), uri);
                 }
             }
         }
-        catch (SQLException e){
+        catch (SQLException e) {
             throw new DAOException(e.toString(), e);
         }
         finally{
@@ -522,8 +522,8 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
             return true; // if not rdfs:domain specified at all, then lets allow literal search
         }
 
-        for (String result : resultList){
-            if (Subjects.RDFS_LITERAL.equals(result)){
+        for (String result : resultList) {
+            if (Subjects.RDFS_LITERAL.equals(result)) {
                 return true; // rdfs:Literal is present in the specified rdfs:domain
             }
         }
@@ -553,7 +553,7 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
      */
     public SubjectDTO getSubject(Long subjectHash) throws DAOException {
 
-        if (subjectHash==null){
+        if (subjectHash == null) {
             return null;
         }
 
@@ -563,7 +563,7 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
         List<SubjectDTO> subjects = executeQuery(getSubjectsDataQuery(map.keySet()),
                 null, new SubjectDataReader(map));
 
-        return subjects==null || subjects.isEmpty() ? null : subjects.get(0);
+        return subjects == null || subjects.isEmpty() ? null : subjects.get(0);
     }
 
     /*
@@ -573,7 +573,7 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
     public PredicateLabels getPredicateLabels(Set<Long> subjectHashes) throws DAOException {
 
         PredicateLabels predLabels = new PredicateLabels();
-        if (subjectHashes!=null && !subjectHashes.isEmpty()){
+        if (subjectHashes!=null && !subjectHashes.isEmpty()) {
 
             StringBuffer sqlBuf = new StringBuffer().
             append("select RESOURCE.URI as PREDICATE_URI, SPO.OBJECT as LABEL, SPO.OBJ_LANG as LANG").
@@ -596,7 +596,7 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
     public SubProperties getSubProperties(Set<Long> subjectHashes) throws DAOException {
 
         SubProperties subProperties = new SubProperties();
-        if (subjectHashes!=null && !subjectHashes.isEmpty()){
+        if (subjectHashes!=null && !subjectHashes.isEmpty()) {
 
             StringBuffer sqlBuf = new StringBuffer().
             append("select distinct SPO.OBJECT as PREDICATE, RESOURCE.URI as SUB_PROPERTY").
@@ -644,12 +644,12 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
         Collection<SubjectDTO> result = new LinkedList<SubjectDTO>();
 
         // if result list not empty, get the subjects data and set their first-seen times
-        if (pairList!=null && !pairList.isEmpty()){
+        if (pairList!=null && !pairList.isEmpty()) {
 
             // create helper objects
             Map<Long,SubjectDTO> subjectsMap = new LinkedHashMap<Long, SubjectDTO>();
             Map<Long,Date> firstSeenTimes = new HashMap<Long, Date>();
-            for (Pair<Long,Long> p : resultList){
+            for (Pair<Long,Long> p : resultList) {
                 subjectsMap.put(p.getLeft(), null);
                 firstSeenTimes.put(p.getLeft(), new Date(p.getRight()));
             }
@@ -659,7 +659,7 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
                     null, new SubjectDataReader(subjectsMap));
 
             // set firstseen-times of found subjects
-            for (SubjectDTO subject : subjectsMap.values()){
+            for (SubjectDTO subject : subjectsMap.values()) {
                 subject.setDcDate(
                         firstSeenTimes.get(new Long(subject.getUriHash())));
             }
@@ -677,7 +677,7 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
     public List<SubjectDTO> getSubjectsNewerThan(Date timestamp, int limit) throws DAOException {
 
         // validate arguments
-        if (timestamp==null || timestamp.after(new Date()))
+        if (timestamp == null || timestamp.after(new Date()))
             throw new IllegalArgumentException("timestamp must not be null or after current time!");
         if (limit<=0)
             throw new IllegalArgumentException("limit must be greater than 0!");
@@ -701,13 +701,13 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
         List<Long> resultList = reader.getResultList();
 
         // if result list null or empty, return
-        if (resultList==null || resultList.isEmpty()){
+        if (resultList == null || resultList.isEmpty()) {
             return new LinkedList<SubjectDTO>();
         }
 
         // create helper objects
         Map<Long,SubjectDTO> subjectsMap = new HashMap<Long, SubjectDTO>();
-        for (Long subjectHash : resultList){
+        for (Long subjectHash : resultList) {
             subjectsMap.put(subjectHash, null);
         }
 
@@ -770,10 +770,10 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
             conn = getConnection();
             Object o = SQLUtil.executeSingleReturnValueQuery(
                     "select count(distinct SUBJECT) from SPO where SOURCE=" + sourceHash, conn);
-            return (o==null || StringUtils.isBlank(o.toString()))
+            return (o == null || StringUtils.isBlank(o.toString()))
                     ? 0 : Integer.parseInt(o.toString());
         }
-        catch (SQLException e){
+        catch (SQLException e) {
             throw new DAOException(e.toString(), e);
         }
         finally{
@@ -867,17 +867,17 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
     }
 
     @Override
-    public int getLastReviewId(CRUser user){
+    public int getLastReviewId(CRUser user) {
         throw new UnsupportedOperationException("Method not implemented");
     }
 
     @Override
-    public int generateNewReviewId(CRUser user){
+    public int generateNewReviewId(CRUser user) {
         throw new UnsupportedOperationException("Method not implemented");
     }
 
     @Override
-    public int addReview(ReviewDTO review, CRUser user){
+    public int addReview(ReviewDTO review, CRUser user) {
         throw new UnsupportedOperationException("Method not implemented");
     }
 

@@ -39,7 +39,7 @@ public class QueryString extends HashMap<String,Set<String>>{
     /**
      *
      */
-    private QueryString(){
+    private QueryString() {
         super();
     }
 
@@ -48,15 +48,15 @@ public class QueryString extends HashMap<String,Set<String>>{
      * @param request
      * @param excludeParameters
      */
-    private QueryString(ServletRequest request){
+    private QueryString(ServletRequest request) {
 
         super();
 
         Enumeration e = request.getParameterNames();
-        while (e!=null && e.hasMoreElements()){
+        while (e!=null && e.hasMoreElements()) {
             String parName = e.nextElement().toString();
             String[] parValues = request.getParameterValues(parName);
-            for (int i=0; i<parValues.length; i++){
+            for (int i=0; i<parValues.length; i++) {
                 addParameterValue(parName, parValues[i]);
             }
         }
@@ -67,10 +67,10 @@ public class QueryString extends HashMap<String,Set<String>>{
      * @param parName
      * @param parValue
      */
-    public QueryString addParameterValue(String parName, String parValue){
+    public QueryString addParameterValue(String parName, String parValue) {
 
         Set<String> values = get(parName);
-        if (values==null){
+        if (values==null) {
             values = new HashSet<String>();
             put(parName, values);
         }
@@ -84,12 +84,12 @@ public class QueryString extends HashMap<String,Set<String>>{
      * @param parName
      * @param parValue
      */
-    public QueryString removeParameterValue(String parName, String parValue){
+    public QueryString removeParameterValue(String parName, String parValue) {
 
         Set<String> values = get(parName);
-        if (values!=null){
+        if (values!=null) {
             values.remove(parValue);
-            if (values.isEmpty()){
+            if (values.isEmpty()) {
                 values = null;
                 remove(parName);
             }
@@ -102,7 +102,7 @@ public class QueryString extends HashMap<String,Set<String>>{
      *
      * @param parName
      */
-    public QueryString removeParameter(String parName){
+    public QueryString removeParameter(String parName) {
         remove(parName);
         return this;
     }
@@ -111,10 +111,10 @@ public class QueryString extends HashMap<String,Set<String>>{
      *
      * @param parName
      */
-    public QueryString removeParameters(String[] parNames){
+    public QueryString removeParameters(String[] parNames) {
 
-        if (parNames!=null){
-            for (int i=0; i<parNames.length; i++){
+        if (parNames!=null) {
+            for (int i=0; i<parNames.length; i++) {
                 remove(parNames[i]);
             }
         }
@@ -126,7 +126,7 @@ public class QueryString extends HashMap<String,Set<String>>{
      *
      * @param parName
      */
-    public QueryString setParameterValue(String parName, String parValue){
+    public QueryString setParameterValue(String parName, String parValue) {
         remove(parName);
         return addParameterValue(parName, parValue);
     }
@@ -135,13 +135,13 @@ public class QueryString extends HashMap<String,Set<String>>{
      *
      * @return
      */
-    public String toURLFormat(){
+    public String toURLFormat() {
 
         StringBuffer buf = new StringBuffer();
-        for (Iterator<String> keys = keySet().iterator(); keys.hasNext();){
+        for (Iterator<String> keys = keySet().iterator(); keys.hasNext();) {
             String parName = keys.next();
             Set<String> parValueSet = get(parName);
-            for (Iterator<String> parValues = parValueSet.iterator(); parValues.hasNext();){
+            for (Iterator<String> parValues = parValueSet.iterator(); parValues.hasNext();) {
                 buf.append(buf.length()>0 ? "&amp;" : "").append(parName).append("=").append(Util.urlEncode(parValues.next()));
             }
         }
@@ -154,7 +154,7 @@ public class QueryString extends HashMap<String,Set<String>>{
      * @param request
      * @return
      */
-    public static QueryString createQueryString(ServletRequest request){
+    public static QueryString createQueryString(ServletRequest request) {
         return new QueryString(request);
     }
 
@@ -162,7 +162,7 @@ public class QueryString extends HashMap<String,Set<String>>{
      *
      * @return
      */
-    public static QueryString createQueryString(){
+    public static QueryString createQueryString() {
         return new QueryString();
     }
 }

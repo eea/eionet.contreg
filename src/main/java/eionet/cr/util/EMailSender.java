@@ -58,22 +58,22 @@ public class EMailSender {
 
         // if no mail.host specified in the properties, go no further
         String mailHost = GeneralConfig.getProperty("mail.host");
-        if (mailHost==null || mailHost.trim().length()==0){
+        if (mailHost==null || mailHost.trim().length()==0) {
             return;
         }
 
         Session session = Session.getDefaultInstance(GeneralConfig.getProperties(), null);
         MimeMessage message = new MimeMessage(session);
-        for (int i=0; i<to.length; i++){
+        for (int i=0; i<to.length; i++) {
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(to[i]));
         }
 
-        if (ccSysAdmin){
+        if (ccSysAdmin) {
             String[] sysAdmins = getSysAdmins();
-            if (sysAdmins!=null){
-                for (int i=0; i<sysAdmins.length; i++){
+            if (sysAdmins!=null) {
+                for (int i=0; i<sysAdmins.length; i++) {
                     String sysAdmin = sysAdmins[i].trim();
-                    if (sysAdmin.length()>0){
+                    if (sysAdmin.length()>0) {
                         message.addRecipient(Message.RecipientType.CC, new InternetAddress(sysAdmin));
                     }
                 }
@@ -89,12 +89,12 @@ public class EMailSender {
      *
      * @return
      */
-    private static String[] getSysAdmins(){
+    private static String[] getSysAdmins() {
 
         String s = GeneralConfig.getProperty(GeneralConfig.MAIL_SYSADMINS);
-        if (s!=null){
+        if (s!=null) {
             s = s.trim();
-            if (s.length()>0){
+            if (s.length()>0) {
                 return s.split(",");
             }
         }

@@ -46,7 +46,7 @@ public class URLUtil {
      * @param s
      * @return
      */
-    public static boolean isURL(String s){
+    public static boolean isURL(String s) {
 
         if (s==null || s.trim().length()==0)
             return false;
@@ -55,7 +55,7 @@ public class URLUtil {
             URL url = new URL(s);
             return true;
         }
-        catch (MalformedURLException e){
+        catch (MalformedURLException e) {
             return false;
         }
     }
@@ -64,7 +64,7 @@ public class URLUtil {
      *
      * @return
      */
-    public static String userAgentHeader(){
+    public static String userAgentHeader() {
 
         String ua = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_USERAGENT);
         Object[] args = new String[1];
@@ -77,7 +77,7 @@ public class URLUtil {
      * @param timestamp
      * @return
      */
-    public static Boolean isModifiedSince(String urlString, long timestamp){
+    public static Boolean isModifiedSince(String urlString, long timestamp) {
 
         if (!URLUtil.isURL(urlString))
             return false;
@@ -94,21 +94,21 @@ public class URLUtil {
             inputStream = urlConnection.getInputStream();
 
             int responseCode = ((HttpURLConnection)urlConnection).getResponseCode();
-            if (responseCode==HttpURLConnection.HTTP_NOT_MODIFIED){
+            if (responseCode==HttpURLConnection.HTTP_NOT_MODIFIED) {
                 return Boolean.FALSE;
             }
-            else if (responseCode==HttpURLConnection.HTTP_OK){
+            else if (responseCode==HttpURLConnection.HTTP_OK) {
                 return Boolean.TRUE;
             }
             else{
                 return null;
             }
         }
-        catch (IOException ioe){
+        catch (IOException ioe) {
             return null;
         }
         finally{
-            if (inputStream!=null){
+            if (inputStream!=null) {
                 try{ inputStream.close(); } catch (IOException ioe){}
             }
         }
@@ -119,7 +119,7 @@ public class URLUtil {
      * @param uri
      * @return
      */
-    public static boolean isNotExisting(String urlStr){
+    public static boolean isNotExisting(String urlStr) {
 
         int responseCode = -1;
         IOException ioe = null;
@@ -130,11 +130,11 @@ public class URLUtil {
             inputStream = urlConnection.getInputStream();
             responseCode = ((HttpURLConnection)urlConnection).getResponseCode();
         }
-        catch (IOException e){
+        catch (IOException e) {
             ioe = e;
         }
         finally{
-            if (inputStream!=null){
+            if (inputStream!=null) {
                 try{inputStream.close();}catch (IOException e){}
             }
         }
@@ -153,16 +153,16 @@ public class URLUtil {
      * @param dflt
      * @return
      */
-    public static String extractUrlHost(String uri){
+    public static String extractUrlHost(String uri) {
 
-        if (URLUtil.isURL(uri)){
+        if (URLUtil.isURL(uri)) {
             String host = "";
             URL url;
             try {
                 url = new URL(StringUtils.substringBefore(uri, "#"));
                 host = uri.substring(0, uri.indexOf(url.getPath()));
 
-            } catch (Exception ex){
+            } catch (Exception ex) {
 
             }
             return host;
