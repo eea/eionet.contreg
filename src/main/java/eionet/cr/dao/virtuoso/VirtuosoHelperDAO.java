@@ -34,6 +34,7 @@ import eionet.cr.harvest.statistics.dto.HarvestUrgencyScoreDTO;
 import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
+import eionet.cr.util.Util;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.util.sql.SingleObjectReader;
 import eionet.cr.web.security.CRUser;
@@ -187,8 +188,52 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO{
     @Override
     public List<SubjectDTO> getPredicatesUsedForType(String typeUri)
             throws DAOException {
-        throw new UnsupportedOperationException("Method not implemented");
+        StringBuilder strBuilder = new StringBuilder();
+        strBuilder.append("SELECT distinct ?p WHERE { ?s ?p ?o . ?s <").append(Predicates.RDF_TYPE);
+        strBuilder.append("> <").append(typeUri).append("> }");
 
+        long startTime = System.currentTimeMillis();
+        logger.trace("usedPredicatesForType query: " + strBuilder.toString());
+
+        // execute the query, with the IN parameters
+        List<String> predicateUris = executeSPARQL(strBuilder.toString(), new SingleObjectReader<String>());
+
+        logger.trace("usedPredicatesForType query took " + Util.durationSince(startTime));
+
+        List<SubjectDTO> resultList = new ArrayList<SubjectDTO>();
+        if (predicateUris != null && !predicateUris.isEmpty()) {
+
+            // only these predicates will be queried for
+            String[] neededPredicates = { Predicates.RDF_TYPE, Predicates.RDFS_LABEL };
+
+            // get the data of all found subjects
+            logger.trace("Search by filters, getting the data of the found subjects");
+            resultList = getSubjectsData(predicateUris, neededPredicates, new SubjectDataReader(predicateUris));
+
+            // since a used predicate may not appear as a subject in SPO,
+            // there might unfound SubjectDTO objects
+            List<String> unfoundSubjects = new ArrayList<String>();
+            for (String entry : predicateUris) {
+                SubjectDTO newSubject = new SubjectDTO(entry, false);
+                if (!resultList.contains(newSubject)) {
+                    unfoundSubjects.add(entry);
+                }
+            }
+
+            // if there were indeed any unfound SubjectDTO objects, find URIs
+            // for those predicates
+            // and create dummy SubjectDTO objects from those URIs
+            if (!unfoundSubjects.isEmpty()) {
+                for (String entry : unfoundSubjects) {
+                    if (!StringUtils.isBlank(entry)) {
+                        unfoundSubjects.remove(entry);
+                        resultList.add(new SubjectDTO(entry, false));
+                    }
+                }
+            }
+        }
+
+        return resultList;
     }
 
     /* (non-Javadoc)

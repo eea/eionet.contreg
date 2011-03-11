@@ -612,4 +612,13 @@ public class Util {
      */
     public static void main(String[] args) {
     }
+
+    /**
+    *
+    * @param s
+    * @return
+    */
+   public static boolean isSurroundedWithQuotes(String s){
+       return s.startsWith("\"") && s.endsWith("\"");
+   }
 }

@@ -23,6 +23,7 @@ import eionet.cr.dao.readers.GraphLastModifiedReader;
 import eionet.cr.dao.readers.SubjectDataReader;
 import eionet.cr.dao.util.BBOX;
 import eionet.cr.dao.util.SearchExpression;
+import eionet.cr.dao.virtuoso.helpers.VirtuosoFilteredSearchHelper;
 import eionet.cr.dao.virtuoso.helpers.VirtuosoFreeTextSearchHelper;
 import eionet.cr.dao.virtuoso.helpers.VirtuosoReferencesSearchHelper;
 import eionet.cr.dao.virtuoso.helpers.VirtuosoSearchBySourceHelper;
@@ -156,8 +157,54 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
             Map<String, String> filters, Set<String> literalPredicates,
             PagingRequest pagingRequest, SortingRequest sortingRequest,
             List<String> selectedPredicates) throws DAOException {
-        throw new UnsupportedOperationException("Method not implemented");
+        // create query helper
+        VirtuosoFilteredSearchHelper helper = new VirtuosoFilteredSearchHelper(filters, literalPredicates,
+                pagingRequest, sortingRequest);
 
+        // create the list of IN parameters of the query
+        ArrayList<Object> inParams = new ArrayList<Object>();
+
+        // let the helper create the query and fill IN parameters
+        String query = helper.getQuery(inParams);
+
+        long startTime = System.currentTimeMillis();
+        logger.trace("Search by filters, executing subject finder query: " + query);
+
+        // execute the query, with the IN parameters
+        List<String> subjectUris = executeSPARQL(query, new SingleObjectReader<String>());
+
+        logger.debug("Search by filters, find subjects query time " + Util.durationSince(startTime));
+
+        int totalRowCount = 0;
+        List<SubjectDTO> resultList = new ArrayList<SubjectDTO>();
+
+        // if result list not null and not empty, then get the subjects data and
+        // total rowcount
+        if (subjectUris != null && !subjectUris.isEmpty()) {
+
+            // only these predicates will be queried for
+            String[] neededPredicates = null;
+            if (literalPredicates != null && literalPredicates.size() > 0) {
+                neededPredicates = literalPredicates.toArray(neededPredicates);
+            }
+
+            // get the data of all found subjects
+            logger.trace("Search by filters, getting the data of the found subjects");
+            resultList = getSubjectsData(subjectUris, neededPredicates, new SubjectDataReader(subjectUris));
+        }
+        // if paging required, get the total number of found subjects too
+        if (pagingRequest != null) {
+            logger.trace("Search by filters, getting exact row count");
+            totalRowCount = new Integer(getExactRowCount(helper));
+        }
+
+        // return new Pair<Integer,List<SubjectDTO>>(0, new
+        // LinkedList<SubjectDTO>());
+        logger.debug("Search by filters, total query time " + Util.durationSince(startTime));
+
+        // the result Pair contains total number of subjects and the requested
+        // sub-list
+        return new Pair<Integer, List<SubjectDTO>>(totalRowCount, resultList);
     }
 
     /* (non-Javadoc)
@@ -190,8 +237,8 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
             Map<String, String> filters, Set<String> literalPredicates,
             PagingRequest pagingRequest, SortingRequest sortingRequest,
             List<String> selectedPredicates) throws DAOException {
-        throw new UnsupportedOperationException("Method not implemented");
 
+        return searchByFilters(filters, literalPredicates, pagingRequest, sortingRequest, selectedPredicates);
     }
 
     /* (non-Javadoc)

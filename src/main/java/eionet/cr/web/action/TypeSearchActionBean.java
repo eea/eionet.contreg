@@ -534,6 +534,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
     /**
      * @return the availableColumns
      */
+    @SuppressWarnings("unchecked")
     public Map<String, String> getAvailableColumns() throws DAOException {
 
         Map<String, Map<String,String>> cache =

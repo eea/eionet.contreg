@@ -185,6 +185,7 @@ public class VirtuosoPullHarvest extends Harvest{
             }
         }
         catch (Exception e){
+            e.printStackTrace();
             throw new HarvestException(e.toString(), e);
         }
         finally{
