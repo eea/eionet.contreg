@@ -74,6 +74,7 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
     public Pair<Integer, List<SubjectDTO>> searchByFreeText(
                 SearchExpression expression,
                 PostgreFreeTextSearchHelper.FilterType filterType,
+                boolean exactMatch,
                 PagingRequest pagingRequest,
                 SortingRequest sortingRequest) throws DAOException{
 

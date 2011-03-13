@@ -38,7 +38,6 @@ import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.helpers.FreeTextSearchHelper;
 import eionet.cr.dao.util.SearchExpression;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortOrder;
 import eionet.cr.util.SortingRequest;
@@ -59,6 +58,7 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
     private String searchExpression;
     private boolean isUri;
     private String simpleFilter;
+    private boolean exactMatch;
 
     /**
      *
@@ -96,11 +96,9 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
                 }
                 else if (simpleFilter.equals("images")){
                     filterType = FreeTextSearchHelper.FilterType.IMAGES;
-                }
+                } 
                 else if (simpleFilter.equals("exactMatch")){
-                    filterType = FreeTextSearchHelper.FilterType.EXACT_MATCH;
-                    searchExpression = new SearchExpression(
-                            Long.valueOf(Hashes.spoHash(this.searchExpression.toString())).toString());
+                    exactMatch = true;
                 }
             }
 
@@ -121,6 +119,7 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
                     .searchByFreeText(
                             searchExpression,
                             filterType,
+                            exactMatch,
                             PagingRequest.create(getPageN()),
                             new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
 
@@ -204,5 +203,13 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 
     public void setSimpleFilter(String simpleFilter) {
         this.simpleFilter = simpleFilter;
+    }
+
+    public boolean isExactMatch() {
+        return exactMatch;
+    }
+
+    public void setExactMatch(boolean exactMatch) {
+        this.exactMatch = exactMatch;
     }
 }

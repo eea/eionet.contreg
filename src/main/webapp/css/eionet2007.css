@@ -18,6 +18,10 @@ th.order2 a {
     background-color: #D9EDF2;
 }
 
+.exactMatch {
+	background-color: #D9EDF2;
+}
+
 div.errorHeader {
     color: #FF0000;
 }

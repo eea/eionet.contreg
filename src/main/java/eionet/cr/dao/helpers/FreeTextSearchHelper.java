@@ -13,7 +13,7 @@ import eionet.cr.util.pagination.PagingRequest;
 public abstract class FreeTextSearchHelper extends AbstractSearchHelper{
 
     /** */
-    public enum FilterType { ANY_OBJECT, ANY_FILE, TEXTS, DATASETS, IMAGES, EXACT_MATCH };
+    public enum FilterType { ANY_OBJECT, ANY_FILE, TEXTS, DATASETS, IMAGES };
 
     /** */
     protected FilterType filter = FilterType.ANY_OBJECT;
@@ -28,7 +28,7 @@ public abstract class FreeTextSearchHelper extends AbstractSearchHelper{
     }
 
     /**
-     * @return
+     * @return FilterType
      */
     public FilterType getFilter() {
         return filter;

@@ -1,5 +1,6 @@
 package eionet.cr.dao.virtuoso;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
@@ -17,7 +18,6 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.helpers.FreeTextSearchHelper.FilterType;
 import eionet.cr.dao.helpers.SearchHelper;
-import eionet.cr.dao.postgre.helpers.PostgreFreeTextSearchHelper;
 import eionet.cr.dao.readers.FreeTextSearchReader;
 import eionet.cr.dao.readers.GraphLastModifiedReader;
 import eionet.cr.dao.readers.SubjectDataReader;
@@ -34,6 +34,7 @@ import eionet.cr.util.Util;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SingleObjectReader;
+import eionet.cr.util.sql.VirtuosoFullTextQuery;
 
 /**
  *
@@ -47,7 +48,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
      */
     @Override
     public Pair<Integer, List<SubjectDTO>> searchByFreeText(
-            SearchExpression expression, FilterType filterType,
+            SearchExpression expression, FilterType filterType, boolean exactMatch,
             PagingRequest pagingRequest,SortingRequest sortingRequest) throws DAOException {
 
 
@@ -55,17 +56,26 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
         if (expression==null || expression.isEmpty()){
             return new Pair<Integer, List<SubjectDTO>>(0, new LinkedList<SubjectDTO>());
         }
+        
+        // parse search expression for Virtuoso SPARQL
+        VirtuosoFullTextQuery virtQuery = null;
+        try{
+            virtQuery = VirtuosoFullTextQuery.parse(expression, filterType);
+            logger.trace("Free-text search string parsed for Virtuoso SPARQL: " + virtQuery);
+        }
+        catch (ParseException pe){
+            throw new DAOException("Error parsing the search text", pe);
+        }
+
+        // if search expression is empty after being parsed for Virtuoso SPARQL, return empty result
+        if (virtQuery.getParsedQuery().length()==0){
+            return new Pair<Integer, List<SubjectDTO>>(0, new LinkedList<SubjectDTO>());
+        }
 
         // create query helper
         // TODO: make use of SortingRequest, instead of passing null to helper
         VirtuosoFreeTextSearchHelper helper = new VirtuosoFreeTextSearchHelper(
-                expression, pagingRequest, null);
-
-        // Set Filter
-        if (filterType != PostgreFreeTextSearchHelper.FilterType.ANY_OBJECT
-            && filterType != PostgreFreeTextSearchHelper.FilterType.EXACT_MATCH){
-                helper.setFilter(filterType);
-        }
+                expression, virtQuery, exactMatch, pagingRequest, null);
 
         // let the helper create the query
         // (no query parameters needed here, so supplying null)

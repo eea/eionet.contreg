@@ -6,28 +6,35 @@ import eionet.cr.dao.helpers.FreeTextSearchHelper;
 import eionet.cr.dao.util.SearchExpression;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.pagination.PagingRequest;
+import eionet.cr.util.sql.VirtuosoFullTextQuery;
 
 /**
  *
- * @author jaanus
+ * @author risto
  *
  */
 public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper{
 
     /** */
     private SearchExpression expression;
+    private VirtuosoFullTextQuery virtExpression;
+    private boolean exactMatch;
 
     /**
      *
      * @param expression
+     * @param virtExpression
+     * @param exactMatch
      * @param pagingRequest
      * @param sortingRequest
      */
     public VirtuosoFreeTextSearchHelper(SearchExpression expression,
-            PagingRequest pagingRequest, SortingRequest sortingRequest) {
+            VirtuosoFullTextQuery virtExpression, boolean exactMatch, PagingRequest pagingRequest, SortingRequest sortingRequest) {
 
         super(pagingRequest, sortingRequest);
         this.expression = expression;
+        this.virtExpression = virtExpression;
+        this.exactMatch = exactMatch;
     }
 
     /* (non-Javadoc)
@@ -44,9 +51,15 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper{
     @Override
     public String getUnorderedQuery(List<Object> inParams) {
 
-        StringBuilder strBuilder = new StringBuilder().
-        append("select distinct ?s ?g where { graph ?g {?s ?p ?o . ?o bif:contains \"'").
-        append(expression.toString()).append("'\".}}");
+        StringBuilder strBuilder = new StringBuilder();
+        strBuilder.append("select distinct ?s ?g where { graph ?g {");
+        if(exactMatch){
+            strBuilder.append("?s ?p ?o .").append(virtExpression.getType())
+                    .append(" FILTER (?o = '").append(expression.toString()).append("').");
+        } else {
+            strBuilder.append(virtExpression.getParsedQuery());
+        }
+        strBuilder.append("}}");
 
         return strBuilder.toString();
     }
@@ -57,13 +70,19 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper{
     @Override
     public String getCountQuery(List<Object> inParams) {
 
-        StringBuilder strBuilder = new StringBuilder().
-        append("select count(distinct ?s) where {?s ?p ?o . ?o bif:contains \"'").
-        append(expression.toString()).append("'\".}");
+        StringBuilder strBuilder = new StringBuilder();
+        strBuilder.append("select count(distinct ?s) where { graph ?g {");
+        if (exactMatch){
+            strBuilder.append("?s ?p ?o .").append(virtExpression.getType())
+                    .append(" FILTER (?o = '").append(expression.toString()).append("').");
+        } else {
+            strBuilder.append(virtExpression.getParsedQuery());
+        }
+        strBuilder.append("}}");
 
         return strBuilder.toString();
     }
-
+    
     /* (non-Javadoc)
      * @see eionet.cr.dao.helpers.AbstractSearchHelper#getMinMaxHashQuery(java.util.List)
      */

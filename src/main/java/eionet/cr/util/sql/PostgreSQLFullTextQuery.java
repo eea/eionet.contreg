@@ -214,7 +214,7 @@ public class PostgreSQLFullTextQuery {
     public static void main(String[] args) throws ParseException{
 
 //		String s = "mina \"olen robert\" ja sina oled (paha | kuri)";
-        String s = "air | soil";
+        String s = "\"air soil\" \"juku juhan\"";
 
         PostgreSQLFullTextQuery query = PostgreSQLFullTextQuery.parse(s);
 

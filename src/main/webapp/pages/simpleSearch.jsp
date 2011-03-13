@@ -15,6 +15,10 @@
     Entering <span class="searchExprSample">"air pollution"</span> will require the content to have the exact phrase "air pollution".
     </p>
     <p>
+    If search expression contains only one word or multiple words with <span class="searchExprSample"> | </span> separating them then wildcards (*) can be used.
+    Wildcard requires at least four leading characters. Example: <span class="searchExprSample">nois* | water</span>
+    </p>
+    <p>
     Words shorter than 3 letters are ignored.
     </p>
 
@@ -24,11 +28,9 @@
                 <td>
                 <stripes:label for="expressionText" class="question">Expression</stripes:label>
                 </td>
-                <td>
+                <td colspan="2">
                 <stripes:text name="searchExpression" id="expressionText" size="70"/>
                 <stripes:text name="dummy" style="visibility:hidden;display:none" disabled="disabled" size="1"/>
-                </td>
-                <td>
                 <stripes:submit name="search" value="Search" id="searchButton"/>
                 </td>
             </tr>
@@ -36,7 +38,7 @@
                 <td>
                     <stripes:label for="nofield" class="question">What type</stripes:label>
                 </td>
-                <td colspan="2">
+                <td>
                     <stripes:radio id="anyObject" name="simpleFilter" value="anyObject" checked="anyObject" title="Any Object"/>
                     <stripes:label for="anyObject">Any Object</stripes:label>
 
@@ -51,10 +53,11 @@
 
                     <stripes:radio id="images" name="simpleFilter" value="images"/>
                     <stripes:label for="images">Images</stripes:label>
-
-                    <stripes:radio id="exactMatch" name="simpleFilter" value="exactMatch"/>
-                    <stripes:label for="exactMatch">Exact match</stripes:label>
                 </td>
+                <td class="exactMatch">
+                    <stripes:checkbox name="exactMatch" id="exactMatch"/>
+		            <stripes:label for="exactMatch">Exact match</stripes:label>
+		        </td>
             </tr>
         </table>
     </crfn:form>
