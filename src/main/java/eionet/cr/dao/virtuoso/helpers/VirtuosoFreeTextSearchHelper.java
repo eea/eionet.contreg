@@ -2,6 +2,8 @@ package eionet.cr.dao.virtuoso.helpers;
 
 import java.util.List;
 
+import eionet.cr.common.Predicates;
+import eionet.cr.common.Subjects;
 import eionet.cr.dao.helpers.FreeTextSearchHelper;
 import eionet.cr.dao.util.SearchExpression;
 import eionet.cr.util.SortingRequest;
@@ -52,12 +54,11 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper{
     public String getUnorderedQuery(List<Object> inParams) {
 
         StringBuilder strBuilder = new StringBuilder();
-        strBuilder.append("select distinct ?s ?g where { graph ?g {");
+        strBuilder.append("select distinct ?s ?g where { graph ?g {?s ?p ?o .").append(addFilterParams());
         if(exactMatch){
-            strBuilder.append("?s ?p ?o .").append(virtExpression.getType())
-                    .append(" FILTER (?o = '").append(expression.toString()).append("').");
+            strBuilder.append(" FILTER (?o = '").append(expression.toString()).append("').");
         } else {
-            strBuilder.append(virtExpression.getParsedQuery());
+            strBuilder.append(" FILTER bif:contains(?o, \"").append(virtExpression.getParsedQuery()).append("\").");
         }
         strBuilder.append("}}");
 
@@ -71,16 +72,38 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper{
     public String getCountQuery(List<Object> inParams) {
 
         StringBuilder strBuilder = new StringBuilder();
-        strBuilder.append("select count(distinct ?s) where { graph ?g {");
+        strBuilder.append("select count(distinct ?s) where { graph ?g {?s ?p ?o .").append(addFilterParams());
         if (exactMatch){
-            strBuilder.append("?s ?p ?o .").append(virtExpression.getType())
-                    .append(" FILTER (?o = '").append(expression.toString()).append("').");
+            strBuilder.append(" FILTER (?o = '").append(expression.toString()).append("').");
         } else {
-            strBuilder.append(virtExpression.getParsedQuery());
+            strBuilder.append(" FILTER bif:contains(?o, \"").append(virtExpression.getParsedQuery()).append("\").");
         }
         strBuilder.append("}}");
 
         return strBuilder.toString();
+    }
+    
+    private String addFilterParams(){
+
+        StringBuffer buf = new StringBuffer();
+        buf.append(" ");
+
+        if (filter != FilterType.ANY_OBJECT){
+            
+            buf.append("?s <").append(Predicates.RDF_TYPE).append("> ");
+            if (filter == FilterType.ANY_FILE){
+                buf.append("<").append(Subjects.CR_FILE).append(">");
+            } else if (filter == FilterType.DATASETS){
+                buf.append("<").append(Predicates.DC_MITYPE_DATASET).append(">");
+            } else if (filter == FilterType.IMAGES){
+                buf.append("<").append(Predicates.DC_MITYPE_IMAGE).append(">");
+            } else if (filter == FilterType.TEXTS){
+                buf.append("<").append(Predicates.DC_MITYPE_TEXT).append(">");
+            }
+
+            buf.append(" .");
+        }
+        return buf.toString();
     }
     
     /* (non-Javadoc)

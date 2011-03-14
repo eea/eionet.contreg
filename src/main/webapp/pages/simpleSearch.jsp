@@ -15,8 +15,7 @@
     Entering <span class="searchExprSample">"air pollution"</span> will require the content to have the exact phrase "air pollution".
     </p>
     <p>
-    If search expression contains only one word or multiple words with <span class="searchExprSample"> | </span> separating them then wildcards (*) can be used.
-    Wildcard requires at least four leading characters. Example: <span class="searchExprSample">nois* | water</span>
+    Wildcards (*) can also be used. Wildcard requires at least four leading characters. Example: <span class="searchExprSample">nois* | water</span>
     </p>
     <p>
     Words shorter than 3 letters are ignored.

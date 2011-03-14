@@ -60,7 +60,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
         // parse search expression for Virtuoso SPARQL
         VirtuosoFullTextQuery virtQuery = null;
         try{
-            virtQuery = VirtuosoFullTextQuery.parse(expression, filterType);
+            virtQuery = VirtuosoFullTextQuery.parse(expression);
             logger.trace("Free-text search string parsed for Virtuoso SPARQL: " + virtQuery);
         }
         catch (ParseException pe){
@@ -76,6 +76,9 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
         // TODO: make use of SortingRequest, instead of passing null to helper
         VirtuosoFreeTextSearchHelper helper = new VirtuosoFreeTextSearchHelper(
                 expression, virtQuery, exactMatch, pagingRequest, null);
+        
+        // Set Filter
+        helper.setFilter(filterType);
 
         // let the helper create the query
         // (no query parameters needed here, so supplying null)
