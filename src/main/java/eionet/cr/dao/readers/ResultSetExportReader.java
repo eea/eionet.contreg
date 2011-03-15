@@ -18,7 +18,7 @@
  * Contributor(s):
  * Enriko Käsper, Tieto Eesti
  */
-package eionet.cr.util.sql;
+package eionet.cr.dao.readers;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -26,7 +26,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import eionet.cr.dao.readers.ResultSetReaderException;
 import eionet.cr.util.export.SubjectExportEvent;
 
 /**
@@ -34,7 +33,7 @@ import eionet.cr.util.export.SubjectExportEvent;
  * @author kaspeenr
  *
  */
-public abstract class ResultSetExportReader<T> implements SQLResultSetReader<T>{
+public abstract class ResultSetExportReader<T> extends ResultSetMixedReader<T>{
 
     /** */
     protected List<T> resultList = new ArrayList<T>();
@@ -57,7 +56,7 @@ public abstract class ResultSetExportReader<T> implements SQLResultSetReader<T>{
      * (non-Javadoc)
      * @see eionet.cr.util.sql.SQLResultSetReader#startResultSet(java.sql.ResultSetMetaData)
      */
-    @Override
+
     public void startResultSet(ResultSetMetaData resultSetMetaData){
         this.resultSetMetaData = resultSetMetaData;
     }
@@ -71,7 +70,7 @@ public abstract class ResultSetExportReader<T> implements SQLResultSetReader<T>{
     /* (non-Javadoc)
      * @see eionet.cr.dao.readers.ResultSetReader#endResultSet()
      */
-    @Override
+
     public void endResultSet() {
 
         // default implementation, which does nothing, implementors can override
@@ -80,7 +79,7 @@ public abstract class ResultSetExportReader<T> implements SQLResultSetReader<T>{
     /* (non-Javadoc)
      * @see eionet.cr.dao.readers.ResultSetReader#getResultList()
      */
-    @Override
+
     public List<T> getResultList() {
         return resultList;
     }

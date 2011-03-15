@@ -8,9 +8,9 @@ import java.util.Map;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.ExporterDAO;
 import eionet.cr.dao.postgre.helpers.PostgreFilteredTypeSearchHelper;
+import eionet.cr.dao.readers.ResultSetExportReader;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Util;
-import eionet.cr.util.sql.ResultSetExportReader;
 import eionet.cr.util.sql.SQLUtil;
 
 public class PostgreSQLExporterDAO extends PostgreSQLBaseDAO implements ExporterDAO {

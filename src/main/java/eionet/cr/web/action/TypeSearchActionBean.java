@@ -327,11 +327,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
             selectedColumns = cache.get(type);
         } else {
             selectedColumns = new LinkedList<String>();
-            int i = 0;
             for (Entry<String,String> pair : getAvailableColumns().entrySet()){
-                if(Predicates.RDF_TYPE.equals(pair.getKey())) {
-                    break;
-                }
                 selectedColumns.add(pair.getKey());
             }
         }

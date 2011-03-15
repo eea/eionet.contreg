@@ -37,13 +37,13 @@ import eionet.cr.common.Predicates;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.ExporterDAO;
+import eionet.cr.dao.readers.ResultSetExportReader;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.FormatUtils;
 import eionet.cr.util.Pair;
 import eionet.cr.util.URIUtil;
 import eionet.cr.util.Util;
 import eionet.cr.util.pagination.PagingRequest;
-import eionet.cr.util.sql.ResultSetExportReader;
 
 /**
  * Utility class to handle export procedure.

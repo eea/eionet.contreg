@@ -3,7 +3,7 @@ package eionet.cr.dao;
 import java.util.List;
 import java.util.Map;
 
-import eionet.cr.util.sql.ResultSetExportReader;
+import eionet.cr.dao.readers.ResultSetExportReader;
 
 public interface ExporterDAO extends DAO {
 

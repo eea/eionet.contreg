@@ -21,7 +21,6 @@ import eionet.cr.util.pagination.PagingRequest;
  */
 public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
 
-
     private Map<String, String> filters;
     private Set<String> literalPredicates;
     private Boolean requiresFullTextSearch = null;
@@ -85,8 +84,10 @@ public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
         throw new UnsupportedOperationException("Method not implemented");
     }
 
-    private String getQueryParameters(List<Object> inParams) {
+    public String getQueryParameters(List<Object> inParams) {
         StringBuilder strBuilder = new StringBuilder();
+        int i = 1;
+
         for (Entry<String, String> entry : filters.entrySet()) {
 
             String predicateUri = entry.getKey();
@@ -94,13 +95,19 @@ public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
 
             if (!StringUtils.isBlank(predicateUri) && !StringUtils.isBlank(objectValue)) {
 
-                if (!requireFullTextSearch(predicateUri, objectValue)) {
-                    strBuilder.append(". ?s <").append(predicateUri).append("> <").append(objectValue).append(">");
+                if (Util.isSurroundedWithQuotes(objectValue)) {
+                    strBuilder.append(" . ?s <").append(predicateUri).append("> ").append(objectValue);
+                } else if (URIUtil.isSchemedURI(objectValue)) {
+                    strBuilder.append(" . ?s <").append(predicateUri).append("> <").append(objectValue).append(">");
+                    // TODO check if it is a number??
                 } else {
-                    strBuilder.append(". ?s <").append(predicateUri).append("> ?o . ?o bif:contains \"'").
+                    strBuilder.append(" . ?s <").append(predicateUri).append("> ?o").append(i).append(" . ?o")
+                            .append(i).append(" bif:contains \"'").
                             append(objectValue).append("'\"");
                     inParams.add(objectValue);
+                    // TODO is it really needed in Virtuoso
                     requiresFullTextSearch = Boolean.TRUE;
+                    i++;
                 }
             }
         }
@@ -154,12 +161,12 @@ public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
     }
 
     /**
-    *
-    * @param key
-    */
-   protected void removeFilter(String key){
-       if(this.filters!=null && filters.containsKey(key)){
-           filters.remove(key);
-       }
-   }
+     *
+     * @param key
+     */
+    protected void removeFilter(String key) {
+        if (this.filters != null && filters.containsKey(key)) {
+            filters.remove(key);
+        }
+    }
 }
