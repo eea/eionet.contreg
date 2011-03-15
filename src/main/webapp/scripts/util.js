@@ -18,11 +18,11 @@
  * Contributor(s):
  * Aleksandr Ivanov, Tieto Eesti
  * Jaanus Heinlaid, Tieto Eesti
- * Enriko K�sper, Tieto Eesti
+ * Enriko Käsper, Tieto Eesti
  * Jaak Kapten, Tieto Eesti
  */
-
-$(document).ready(
+( function($) {
+	$(document).ready(
         function(){
 
             $("#export_form_noscript").hide();
@@ -48,8 +48,15 @@ $(document).ready(
                 $("#export_form_submit").click(function(){
                     $("#export_form_div").hide();
                 });
+                $("#export_form_div").draggable();
                 return false;
             });
+            if ($("#select_filters").length > 0){
+            	$("#select_filters").draggable();
+            }
+            if ($("#select_columns").length > 0){
+            	$("#select_columns").draggable();
+            }
 
             //Factsheet edit & autocomplete
             $("#propertySelect").change(function(){
@@ -85,8 +92,8 @@ $(document).ready(
                     noCache: true
                 });
             }
-});
-
+        });
+} ) ( jQuery );
 /**
  * Opens a div that displayes the wait clock image and wait message.
  * Into that same div it then loads the response from the given url.

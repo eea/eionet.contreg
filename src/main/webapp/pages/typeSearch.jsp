@@ -75,13 +75,6 @@
             <br/>
             <c:if test="${not empty actionBean.type}">
 
-            <script>
-                $(document).ready(function() {
-                      $("#export_form_noscript").draggable();
-                      $("#select_filters").draggable();
-                });
-            </script>
-
             <div id="export_form_noscript">
                 <fieldset>
                 <legend>Export options</legend>
@@ -155,11 +148,6 @@
             </div>
             </c:if>
         <c:if test="${not empty actionBean.type and not empty actionBean.availableColumns}">
-            <script>
-                $(document).ready(function() {
-                      $("#select_columns").draggable();
-                });
-            </script>
             <div style="max-width: 350px;" id="select_columns">
                 <fieldset>
                 <legend>Select columns to be displayed</legend>

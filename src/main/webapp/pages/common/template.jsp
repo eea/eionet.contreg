@@ -22,10 +22,10 @@
             <link rel="stylesheet" type="text/css" href="<c:url value="/css/application.css"/>" media="screen" title="application style sheet"/>
             <link rel="shortcut icon" href="<c:url value="/favicon.ico"/>" type="image/x-icon" />
 
-            <script type="text/javascript" src="<c:url value="/scripts/jquery-1.3.2.min.js"/>"></script>
+            <script type="text/javascript" src="<c:url value="/scripts/jquery-1.5.1.min.js"/>"></script>
             <script type="text/javascript" src="<c:url value="/scripts/jquery-timers.js"/>"></script>
             <script type="text/javascript" src="<c:url value="/scripts/jquery.autocomplete.js"/>"></script>
-              <script type="text/javascript" src="<c:url value="/scripts/jquery-ui.min.js"/>"></script>
+            <script type="text/javascript" src="<c:url value="/scripts/jquery-ui.min.js"/>"></script>
             <script type="text/javascript" src="<c:url value="/scripts/util.js"/>"></script>
             <script type="text/javascript" src="<c:url value="/scripts/pageops.js"/>"></script>
             <script type="text/javascript" src="<c:url value="/scripts/prototype.js"/>"></script>
