@@ -142,22 +142,26 @@ public class JstlFunctions {
         }
 
         String sortParamValue = column.getSortParamValue();
-        if (sortParamValue==null)
+        if (sortParamValue==null){
             sortParamValue = "";
+        }
 
         String curValue = request.getParameter("sortP");
-        if (curValue!=null){
+        if (curValue!=null && buf.indexOf("sortP=")>0){
             buf = new StringBuffer(
                     StringUtils.replace(buf.toString(), "sortP=" + Util.urlEncode(curValue), "sortP=" + Util.urlEncode(sortParamValue)));
         }
-        else
+        else{
             buf.append("&amp;sortP=").append(Util.urlEncode(sortParamValue));
+        }
 
         curValue = request.getParameter("sortO");
-        if (curValue!=null)
+        if (curValue!=null && buf.indexOf("sortO=")>0){
             buf = new StringBuffer(StringUtils.replace(buf.toString(), "sortO=" + curValue, "sortO=" + SortOrder.oppositeSortOrder(curValue)));
-        else
+        }
+        else{
             buf.append("&amp;sortO=").append(SortOrder.oppositeSortOrder(curValue));
+        }
 
         String result = buf.toString();
         return result.startsWith("/") ? result.substring(1) : result;
