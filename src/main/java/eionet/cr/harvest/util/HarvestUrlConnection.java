@@ -105,6 +105,14 @@ public class HarvestUrlConnection {
                 if ((responseCode>=400 && responseCode<=499) || responseCode==501 || responseCode==505){
                     sourceNotExistMessage = "Got HTTP response code " + responseCode;
                 }
+
+                //release TCP connection properly when HTTP connection fails
+                if(e instanceof IOException){
+                    inputStream = ((HttpURLConnection)urlConnection).getErrorStream();
+                    // read the response body
+                    while (inputStream.read(new byte[1024]) >= 0) {}
+                    //inputstream is closed in VirtuosoPullHarvest final block
+                }
             }
 
             System.out.println(e.getMessage()+" - "+sourceNotExistMessage);

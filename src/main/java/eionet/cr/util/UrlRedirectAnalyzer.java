@@ -46,8 +46,8 @@ public class UrlRedirectAnalyzer {
             urlConnection.setRequestProperty("Accept", "application/rdf+xml, text/xml, */*;q=0.6");
             urlConnection.setRequestProperty("User-Agent", URLUtil.userAgentHeader());
             urlConnection.setInstanceFollowRedirects(false);
+            urlConnection.setRequestMethod("HEAD");
 
-            inputStream = urlConnection.getInputStream();
             int responseCode = urlConnection.getResponseCode();
 
             if (isRedirectionResponseCode(responseCode)) {
