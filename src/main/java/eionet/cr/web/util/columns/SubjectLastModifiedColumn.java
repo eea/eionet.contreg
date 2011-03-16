@@ -39,8 +39,6 @@ public class SubjectLastModifiedColumn extends SearchResultColumn{
 
         String result = "";
         if (object!=null && object instanceof SubjectDTO){
-
-            SubjectDTO subjectDTO = (SubjectDTO)object;
             Date date = ((SubjectDTO)object).getLastModifiedTime();
             if (date!=null && date.getTime()>0){
                 result = SIMPLE_DATE_FORMAT.format(date);

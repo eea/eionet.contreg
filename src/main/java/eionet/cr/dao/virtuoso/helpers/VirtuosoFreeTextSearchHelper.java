@@ -9,6 +9,7 @@ import eionet.cr.dao.util.SearchExpression;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.util.sql.VirtuosoFullTextQuery;
+import eionet.cr.web.util.columns.SubjectLastModifiedColumn;
 
 /**
  *
@@ -38,14 +39,50 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper{
         this.virtExpression = virtExpression;
         this.exactMatch = exactMatch;
     }
+    
+    //If relevant subject is found from multiple graphs, then query returns only the record where the cr:contentLastModified is latest.
+    //That is why query includes such hokus-pokus as max(), group by and subquery.
 
     /* (non-Javadoc)
      * @see eionet.cr.dao.helpers.AbstractSearchHelper#getOrderedQuery(java.util.List)
      */
     @Override
     protected String getOrderedQuery(List<Object> inParams) {
-        throw new UnsupportedOperationException("Method not implemented");
+        StringBuilder strBuilder = new StringBuilder();
+        
+        if (sortPredicate.equals(SubjectLastModifiedColumn.class.getSimpleName())){
+            strBuilder.append("select ?s where { graph ?g {")
+            .append("select ?s max(?time) AS ?order where {")
+            .append("?s ?p ?o .").append(addFilterParams());
+            if(exactMatch){
+                strBuilder.append(" FILTER (?o = '").append(expression.toString()).append("').");
+            } else {
+                strBuilder.append(" FILTER bif:contains(?o, \"").append(virtExpression.getParsedQuery()).append("\").");
+            }
+            strBuilder.append(" optional {?g <").append(Predicates.CR_LAST_MODIFIED).append("> ?time} ").append("} ")
+            .append("GROUP BY ?s }} ORDER BY ");
+            if(sortOrder != null)
+                strBuilder.append(sortOrder);
+            strBuilder.append("(?order)");
+        } else {
+            strBuilder.append("select distinct ?s where { graph ?g {?s ?p ?o .").append(addFilterParams());
+            if(exactMatch){
+                strBuilder.append(" FILTER (?o = '").append(expression.toString()).append("').");
+            } else {
+                strBuilder.append(" FILTER bif:contains(?o, \"").append(virtExpression.getParsedQuery()).append("\").");
+            }
+            strBuilder.append(" optional {?s <").append(sortPredicate).append("> ?ord} ").append("}}");
+            
+            //Ordering - first replace all / with # and then get string after last #
+            strBuilder.append(" ORDER BY ");
+            if(sortOrder != null)
+                strBuilder.append(sortOrder);
+            strBuilder.append("(bif:subseq (bif:replace (?ord, '/', '#'), bif:strrchr (bif:replace (?ord, '/', '#'), '#')+1))");
+        }
+
+        return strBuilder.toString();
     }
+    
 
     /* (non-Javadoc)
      * @see eionet.cr.dao.helpers.AbstractSearchHelper#getUnorderedQuery(java.util.List)
@@ -54,13 +91,14 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper{
     public String getUnorderedQuery(List<Object> inParams) {
 
         StringBuilder strBuilder = new StringBuilder();
-        strBuilder.append("select distinct ?s ?g where { graph ?g {?s ?p ?o .").append(addFilterParams());
+        strBuilder.append("select ?s where { graph ?g {select ?s max(?time) AS ?order where {?s ?p ?o . ").append(addFilterParams());
         if(exactMatch){
             strBuilder.append(" FILTER (?o = '").append(expression.toString()).append("').");
         } else {
-            strBuilder.append(" FILTER bif:contains(?o, \"").append(virtExpression.getParsedQuery()).append("\").");
+            strBuilder.append(" FILTER bif:contains(?o, \"").append(virtExpression.getParsedQuery()).append("\"). ");
         }
-        strBuilder.append("}}");
+        strBuilder.append("optional {?g <http://cr.eionet.europa.eu/ontologies/contreg.rdf#contentLastModified> ?time} ")
+        .append("} GROUP BY ?s").append(" }}");
 
         return strBuilder.toString();
     }
@@ -72,13 +110,14 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper{
     public String getCountQuery(List<Object> inParams) {
 
         StringBuilder strBuilder = new StringBuilder();
-        strBuilder.append("select count(distinct ?s) where { graph ?g {?s ?p ?o .").append(addFilterParams());
-        if (exactMatch){
+        strBuilder.append("select count(?s) where { graph ?g {select ?s max(?time) AS ?order where {?s ?p ?o . ").append(addFilterParams());
+        if(exactMatch){
             strBuilder.append(" FILTER (?o = '").append(expression.toString()).append("').");
         } else {
-            strBuilder.append(" FILTER bif:contains(?o, \"").append(virtExpression.getParsedQuery()).append("\").");
+            strBuilder.append(" FILTER bif:contains(?o, \"").append(virtExpression.getParsedQuery()).append("\"). ");
         }
-        strBuilder.append("}}");
+        strBuilder.append("optional {?g <http://cr.eionet.europa.eu/ontologies/contreg.rdf#contentLastModified> ?time} ")
+        .append("} GROUP BY ?s").append(" }}");
 
         return strBuilder.toString();
     }

@@ -22,15 +22,17 @@ package eionet.cr.dao.readers;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.openrdf.model.BNode;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Value;
@@ -58,8 +60,6 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO>{
     private Collection<ObjectDTO> currentObjects = null;
     private Collection<Long> predicateHashes = null;
 
-    private Map<String,Date> lastModifiedDates = new HashMap<String, Date>();
-
     /**
      *
      * @param subjectsMap
@@ -69,18 +69,6 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO>{
         this.subjectsMap = subjectsMap;
     }
 
-    /**
-     * @param subjectUris
-     * @param lastModifiedDates
-     */
-    public SubjectDataReader(List<String> subjectUris, Map<String,Date> lastModifiedDates){
-        this.lastModifiedDates = lastModifiedDates;
-        subjectsMap = new LinkedHashMap<Long,SubjectDTO>();
-        for (String subjectUri : subjectUris){
-            Long subjectHash = Long.valueOf(Hashes.spoHash(subjectUri));
-            subjectsMap.put(subjectHash, null);
-        }
-    }
 
     /**
      *
@@ -202,9 +190,6 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO>{
         String sourceUri = bindingSet.getValue("g").stringValue();
         long sourceHash = Hashes.spoHash(sourceUri);
 
-        if(lastModifiedDates.containsKey(sourceUri))
-            currentSubject.setLastModifiedTime(lastModifiedDates.get(sourceUri));
-
         object.setSourceUri(sourceUri);
         object.setSourceHash(sourceHash);
         object.setDerivSourceUri(sourceUri);
@@ -214,6 +199,29 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO>{
         // object.setSourceObjectHash(rs.getLong("OBJ_SOURCE_OBJECT"));
 
         currentObjects.add(object);
+        
+        //If current date is after new date, then leave the current date
+        Date prevDate = null;
+        SubjectDTO subj = subjectsMap.get(subjectHash);
+        if(subj != null){
+            prevDate = subj.getLastModifiedTime();
+        }
+        
+        Value t = bindingSet.getValue("t");
+        if(t != null){
+            String time = t.stringValue();
+            if(StringUtils.isNotEmpty(time)){
+                try {
+                    SimpleDateFormat lastModifiedDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                    Date lastModDate = lastModifiedDateFormat.parse(time);
+                    if(prevDate == null || (prevDate != null && lastModDate != null && lastModDate.after(prevDate))){
+                        currentSubject.setLastModifiedTime(lastModDate);
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     /**
@@ -226,7 +234,6 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO>{
 
     /**
      * @see eionet.cr.util.sql.ResultSetListReader#getResultList()
-     * {@inheritDoc}
      */
     @Override
     public List<SubjectDTO> getResultList() {

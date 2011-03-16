@@ -104,7 +104,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO{
             }
 
             // get the subjects data
-            resultList = getSubjectsData(subjectUris, neededPredicates, dataReader);
+            resultList = getSubjectsData(subjectUris, neededPredicates, dataReader, null);
 
             // set dublin core date of found subjects
             if(pairMap != null){
@@ -208,7 +208,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO{
 
             // get the data of all found subjects
             logger.trace("Search by filters, getting the data of the found subjects");
-            resultList = getSubjectsData(predicateUris, neededPredicates, new SubjectDataReader(predicateUris));
+            resultList = getSubjectsData(predicateUris, neededPredicates, new SubjectDataReader(predicateUris), null);
 
             // since a used predicate may not appear as a subject in SPO,
             // there might unfound SubjectDTO objects
@@ -261,7 +261,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO{
         map.put(Long.valueOf(subjectHash), null);
         SubjectDataReader reader = new SubjectDataReader(map);
 
-        List<SubjectDTO> subjects = getSubjectsData(Collections.singletonList(subjectUri), null, reader);
+        List<SubjectDTO> subjects = getSubjectsData(Collections.singletonList(subjectUri), null, reader, null);
         return subjects==null || subjects.isEmpty() ? null : subjects.get(0);
     }
 

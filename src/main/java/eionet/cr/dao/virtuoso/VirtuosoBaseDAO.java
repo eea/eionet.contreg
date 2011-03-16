@@ -7,6 +7,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.openrdf.repository.RepositoryConnection;
 
+import eionet.cr.common.Predicates;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.SQLBaseDAO;
 import eionet.cr.dao.readers.SubjectDataReader;
@@ -75,13 +76,13 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO{
      * @throws DAOException
      */
     protected List<SubjectDTO> getSubjectsData(
-            Collection<String> subjectUris, String[] predicateUris, SubjectDataReader reader) throws DAOException{
+            Collection<String> subjectUris, String[] predicateUris, SubjectDataReader reader, Collection<String> graphUris) throws DAOException{
 
         if (subjectUris==null || subjectUris.isEmpty()){
             throw new IllegalArgumentException("Subjects collection must not be null or empty!");
         }
 
-        String query = getSubjectsDataQuery(subjectUris, predicateUris);
+        String query = getSubjectsDataQuery(subjectUris, predicateUris, graphUris);
         executeSPARQL(query, reader);
 
         Map<Long, SubjectDTO> subjectsMap = reader.getSubjectsMap();
@@ -109,7 +110,7 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO{
      * @return
      * @throws DAOException
      */
-    private String getSubjectsDataQuery(Collection<String> subjectUris, String[] predicateUris){
+    private String getSubjectsDataQuery(Collection<String> subjectUris, String[] predicateUris, Collection<String> graphUris){
 
         if (subjectUris==null || subjectUris.isEmpty()){
             throw new IllegalArgumentException("Subjects collection must not be null or empty!");
@@ -144,6 +145,22 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO{
 
             strBuilder.append(") ");
         }
+        
+        // if only certain graphs needed, add relevant filter
+        int z=0;
+        if(graphUris != null && graphUris.size() > 0){
+            strBuilder.append("filter (");
+            for (String graphUri : graphUris){
+                if (z>0){
+                    strBuilder.append(" || ");
+                }
+                strBuilder.append("?g = <").append(graphUri).append(">");
+                z++;
+            }
+            strBuilder.append(") ");
+        }
+        
+        strBuilder.append("OPTIONAL {?g <").append(Predicates.CR_LAST_MODIFIED).append("> ?t} ");
 
         strBuilder.append("}} ORDER BY ?s");
         return strBuilder.toString();

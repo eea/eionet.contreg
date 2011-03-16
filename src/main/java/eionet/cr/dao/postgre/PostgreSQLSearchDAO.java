@@ -148,7 +148,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
             getSubjectsData(reader);
 
             // for each SubjectDTO now in map, set search hit source
-            matchReader.populateHitSources(subjectsMap.values());
+            //matchReader.populateHitSources(subjectsMap.values());
 
             // if paging required, get total number of found subjects
             if (pagingRequest!=null){

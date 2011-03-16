@@ -144,7 +144,7 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
             executeQuery(getSubjectsDataQuery(subjectsMap.keySet()), null, reader);
 
             // for each SubjectDTO now in map, set search hit source
-            matchReader.populateHitSources(subjectsMap.values());
+            //matchReader.populateHitSources(subjectsMap.values());
         }
         logger.debug("subject data select query took " + (System.currentTimeMillis()-time) + " ms");
 

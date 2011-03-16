@@ -2,7 +2,6 @@ package eionet.cr.dao.virtuoso;
 
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,7 +18,7 @@ import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.helpers.FreeTextSearchHelper.FilterType;
 import eionet.cr.dao.helpers.SearchHelper;
 import eionet.cr.dao.readers.FreeTextSearchReader;
-import eionet.cr.dao.readers.GraphLastModifiedReader;
+import eionet.cr.dao.readers.GraphUrisReader;
 import eionet.cr.dao.readers.SubjectDataReader;
 import eionet.cr.dao.util.BBOX;
 import eionet.cr.dao.util.SearchExpression;
@@ -75,7 +74,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
         // create query helper
         // TODO: make use of SortingRequest, instead of passing null to helper
         VirtuosoFreeTextSearchHelper helper = new VirtuosoFreeTextSearchHelper(
-                expression, virtQuery, exactMatch, pagingRequest, null);
+                expression, virtQuery, exactMatch, pagingRequest, sortingRequest);
         
         // Set Filter
         helper.setFilter(filterType);
@@ -91,7 +90,9 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
         FreeTextSearchReader<String> matchReader = new FreeTextSearchReader<String>();
         matchReader.setBlankNodeUriPrefix(VirtuosoBaseDAO.BNODE_URI_PREFIX);
         List<String> subjectUris = executeSPARQL(query, matchReader);
-        List<String> graphUris = matchReader.getGraphUris();
+        
+        //get matching graph URIs
+        List<String> graphUris = getGraphUris(expression, virtQuery, exactMatch);
 
         logger.debug("Free-text search, find subjects query time " + Util.durationSince(startTime));
 
@@ -102,11 +103,8 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
         // if result list not empty, do the necessary processing and get total match count
         if (subjectUris!=null && !subjectUris.isEmpty()) {
 
-              //get graphs last modified dates
-            Map<String,Date> lastModifiedDates = getGraphsLastModified(graphUris);
-
             // get the data of all found subjects, provide hit-sources to the reader
-            SubjectDataReader dataReader = new SubjectDataReader(subjectUris, lastModifiedDates);
+            SubjectDataReader dataReader = new SubjectDataReader(subjectUris);
 
             // only these predicates will be queried for
             String[] neededPredicates = {Predicates.RDF_TYPE, Predicates.RDFS_LABEL};
@@ -114,10 +112,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
             logger.trace("Free-text search, getting the data of the found subjects");
 
             // get the subjects data
-            resultList = getSubjectsData(subjectUris, neededPredicates, dataReader);
-
-            // for each SubjectDTO, set search hit source
-            matchReader.populateHitSources(resultList);
+            resultList = getSubjectsData(subjectUris, neededPredicates, dataReader, graphUris);
 
             // if paging required, get distinct subjects total match count
             if (pagingRequest!=null){
@@ -131,30 +126,26 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
         // the result Pair contains total number of subjects and the requested sub-list
         return new Pair<Integer, List<SubjectDTO>>(totalMatchCount, resultList);
     }
-
-    private Map<String,Date> getGraphsLastModified(List<String> graphUris) throws DAOException {
+    
+    //Graph URIs are used to get correct cr:contentLastModified for the subject
+    //If subject from one graph gave the hit and the same subject in another graph didn't, then only the date of the first graph should be used 
+    private List<String> getGraphUris(SearchExpression expression, VirtuosoFullTextQuery virtExpression, boolean exactMatch) throws DAOException {
         StringBuilder strBuilder = new StringBuilder().
-        append("select ?s ?o where {graph ?g {?s ?p ?o. ").
-        append("filter (");
-        int i=0;
-        for (String graphUri : graphUris){
-            if (i>0){
-                strBuilder.append(" || ");
-            }
-            strBuilder.append("?g = <").append(graphUri).append(">");
-            i++;
+        append("select distinct(?g) where {graph ?g {?s ?p ?o. ");
+        if (exactMatch){
+            strBuilder.append(" FILTER (?o = '").append(expression.toString()).append("').");
+        } else {
+            strBuilder.append(" FILTER bif:contains(?o, \"").append(virtExpression.getParsedQuery()).append("\").");
         }
-        strBuilder.append(") ");
-        strBuilder.append("filter (?p = <").append(Predicates.CR_LAST_MODIFIED).append(">)");
         strBuilder.append("}}");
 
-        GraphLastModifiedReader<Map<String,Date>> reader = new GraphLastModifiedReader<Map<String,Date>>();
+        GraphUrisReader<String> reader = new GraphUrisReader<String>();
 
         RepositoryConnection conn = null;
         try {
             conn = SesameUtil.getConnection();
             SesameUtil.executeQuery(strBuilder.toString(), reader, conn);
-            return reader.getResultMap();
+            return reader.getResultList();
         } catch (Exception e) {
             throw new DAOException(e.toString(), e);
         } finally{
@@ -203,7 +194,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
 
             // get the data of all found subjects
             logger.trace("Search by filters, getting the data of the found subjects");
-            resultList = getSubjectsData(subjectUris, neededPredicates, new SubjectDataReader(subjectUris));
+            resultList = getSubjectsData(subjectUris, neededPredicates, new SubjectDataReader(subjectUris), null);
         }
         // if paging required, get the total number of found subjects too
         if (pagingRequest != null) {
@@ -288,7 +279,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
             logger.trace("Search subjects in sources, getting the data of the found subjects");
 
             // get the data of all found subjects
-            resultList = getSubjectsData(subjectUris, null, new SubjectDataReader(subjectUris));
+            resultList = getSubjectsData(subjectUris, null, new SubjectDataReader(subjectUris), null);
 
             // if paging required, get the total number of found subjects too
             if (pagingRequest!=null){
@@ -380,7 +371,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
             logger.trace("Search references, getting the data of the found subjects");
 
             // get the data of all found subjects
-            resultList = getSubjectsData(subjectUris, null, new SubjectDataReader(subjectUris));
+            resultList = getSubjectsData(subjectUris, null, new SubjectDataReader(subjectUris), null);
 
             // if paging required, get the total number of found subjects too
             if (pagingRequest!=null){
