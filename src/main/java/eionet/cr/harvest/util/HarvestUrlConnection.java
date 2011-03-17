@@ -108,10 +108,16 @@ public class HarvestUrlConnection {
 
                 //release TCP connection properly when HTTP connection fails
                 if(e instanceof IOException){
-                    inputStream = ((HttpURLConnection)urlConnection).getErrorStream();
-                    // read the response body
-                    while (inputStream.read(new byte[1024]) >= 0) {}
-                    //inputstream is closed in VirtuosoPullHarvest final block
+                    try{
+                        inputStream = ((HttpURLConnection)urlConnection).getErrorStream();
+                    //  read the response body
+                        if(inputStream!=null){
+                            while (inputStream.read(new byte[1024]) >= 0) {}
+                        }
+                    //  inputstream is closed in VirtuosoPullHarvest final block
+                    } catch(IOException ioe){
+                        e.printStackTrace();
+                    }
                 }
             }
 
