@@ -65,19 +65,20 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper{
                 strBuilder.append(sortOrder);
             strBuilder.append("(?order)");
         } else {
-            strBuilder.append("select distinct ?s where { graph ?g {?s ?p ?o .").append(addFilterParams());
-            if(exactMatch){
-                strBuilder.append(" FILTER (?o = '").append(expression.toString()).append("').");
-            } else {
-                strBuilder.append(" FILTER bif:contains(?o, \"").append(virtExpression.getParsedQuery()).append("\").");
-            }
-            strBuilder.append(" optional {?s <").append(sortPredicate).append("> ?ord} ").append("}}");
             
-            //Ordering - first replace all / with # and then get string after last #
-            strBuilder.append(" ORDER BY ");
+            strBuilder.append("select distinct ?s where {?s ?p ?o . ").append(addFilterParams());
+            if(exactMatch){
+                strBuilder.append("FILTER (?o = '").append(expression.toString()).append("'). ");
+            } else {
+                strBuilder.append("FILTER bif:contains(?o, \"").append(virtExpression.getParsedQuery()).append("\"). ");
+            }
+            strBuilder.append("optional {?s <").append(sortPredicate).append("> ?ord} }");
+            strBuilder.append("ORDER BY ");
             if(sortOrder != null)
                 strBuilder.append(sortOrder);
-            strBuilder.append("(bif:subseq (bif:replace (?ord, '/', '#'), bif:strrchr (bif:replace (?ord, '/', '#'), '#')+1))");
+            //If Label is not null then use Label. Otherwise use subject where we replace all / with # and then get the string after last #. 
+            strBuilder.append("(bif:either(bif:isnull(?ord), (bif:subseq (bif:replace (?s, '/', '#'), bif:strrchr (bif:replace (?s, '/', '#'), '#')+1)), ?ord))");
+            
         }
 
         return strBuilder.toString();
@@ -91,14 +92,13 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper{
     public String getUnorderedQuery(List<Object> inParams) {
 
         StringBuilder strBuilder = new StringBuilder();
-        strBuilder.append("select ?s where { graph ?g {select ?s max(?time) AS ?order where {?s ?p ?o . ").append(addFilterParams());
+        strBuilder.append("select distinct ?s where { ?s ?p ?o . ").append(addFilterParams());
         if(exactMatch){
             strBuilder.append(" FILTER (?o = '").append(expression.toString()).append("').");
         } else {
             strBuilder.append(" FILTER bif:contains(?o, \"").append(virtExpression.getParsedQuery()).append("\"). ");
         }
-        strBuilder.append("optional {?g <http://cr.eionet.europa.eu/ontologies/contreg.rdf#contentLastModified> ?time} ")
-        .append("} GROUP BY ?s").append(" }}");
+        strBuilder.append("}");
 
         return strBuilder.toString();
     }
@@ -110,14 +110,13 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper{
     public String getCountQuery(List<Object> inParams) {
 
         StringBuilder strBuilder = new StringBuilder();
-        strBuilder.append("select count(?s) where { graph ?g {select ?s max(?time) AS ?order where {?s ?p ?o . ").append(addFilterParams());
+        strBuilder.append("select count(distinct ?s) where { ?s ?p ?o . ").append(addFilterParams());
         if(exactMatch){
             strBuilder.append(" FILTER (?o = '").append(expression.toString()).append("').");
         } else {
             strBuilder.append(" FILTER bif:contains(?o, \"").append(virtExpression.getParsedQuery()).append("\"). ");
         }
-        strBuilder.append("optional {?g <http://cr.eionet.europa.eu/ontologies/contreg.rdf#contentLastModified> ?time} ")
-        .append("} GROUP BY ?s").append(" }}");
+        strBuilder.append("}");
 
         return strBuilder.toString();
     }
@@ -140,7 +139,7 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper{
                 buf.append("<").append(Predicates.DC_MITYPE_TEXT).append(">");
             }
 
-            buf.append(" .");
+            buf.append(" . ");
         }
         return buf.toString();
     }
