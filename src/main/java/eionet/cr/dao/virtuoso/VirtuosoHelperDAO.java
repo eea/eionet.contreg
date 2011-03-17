@@ -169,8 +169,18 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO{
      */
     @Override
     public String getSubjectSchemaUri(String subjectUri) throws DAOException {
-        throw new UnsupportedOperationException("Method not implemented");
 
+        if (StringUtils.isBlank(subjectUri)){
+            return null;
+        }
+        StringBuilder strBuilder = new StringBuilder();
+        strBuilder.append("select distinct ?o where { ")
+        .append("<").append(subjectUri).append("> <").append(Predicates.CR_SCHEMA).append("> ?o ")
+        .append("} limit 1");
+
+        List<String> objectUri = executeSPARQL(strBuilder.toString(), new SingleObjectReader<String>());
+
+        return objectUri.get(0);
     }
 
     /* (non-Javadoc)
