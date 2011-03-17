@@ -37,6 +37,7 @@ public abstract class AbstractSearchHelper implements SearchHelper{
 
     /** */
     protected PagingRequest pagingRequest;
+    protected SortingRequest sortingRequest;
 
     /** */
     protected String sortPredicate;
@@ -50,6 +51,7 @@ public abstract class AbstractSearchHelper implements SearchHelper{
     protected AbstractSearchHelper(PagingRequest pagingRequest, SortingRequest sortingRequest){
 
         this.pagingRequest = pagingRequest;
+        this.sortingRequest = sortingRequest;
         if (sortingRequest!=null){
             sortPredicate = sortingRequest.getSortingColumnName();
             sortOrder = sortingRequest.getSortOrder() == null  ? SortOrder.ASCENDING.toSQL()

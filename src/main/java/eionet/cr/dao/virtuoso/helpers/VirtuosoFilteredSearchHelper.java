@@ -8,6 +8,7 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.common.CRRuntimeException;
+import eionet.cr.common.Predicates;
 import eionet.cr.dao.helpers.AbstractSearchHelper;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.URIUtil;
@@ -54,7 +55,16 @@ public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
         StringBuilder strBuilder = new StringBuilder();
         strBuilder.append("select distinct ?s where { ?s ?p ?o ");
         strBuilder.append(getQueryParameters(inParams));
-        strBuilder.append("} ORDER BY ?s");
+        strBuilder.append("} ORDER BY ");
+        if (sortOrder != null) {
+            strBuilder.append(sortOrder);
+        }
+        if (Predicates.RDFS_LABEL.equals(sortPredicate)) {
+            strBuilder
+                    .append("(bif:either( bif:isnull(?oorderby) , (bif:lcase(bif:subseq (bif:replace (?s, '/', '#'), bif:strrchr (bif:replace (?s, '/', '#'), '#')+1))) , bif:lcase(?oorderby)))");
+        } else {
+            strBuilder.append("(bif:lcase(?oorderby))");
+        }
 
         return strBuilder.toString();
     }
@@ -87,6 +97,7 @@ public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
     public String getQueryParameters(List<Object> inParams) {
         StringBuilder strBuilder = new StringBuilder();
         int i = 1;
+        boolean hasSortingPredicate = false;
 
         for (Entry<String, String> entry : filters.entrySet()) {
 
@@ -95,21 +106,32 @@ public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
 
             if (!StringUtils.isBlank(predicateUri) && !StringUtils.isBlank(objectValue)) {
 
+                String objectAlias = "?o".concat(String.valueOf(i));
+                if (sortPredicate != null && predicateUri.equals(sortPredicate) && !hasSortingPredicate) {
+                    objectAlias = "?oorderby";
+                    hasSortingPredicate = true;
+                }
+                strBuilder.append(" . { ?s <").append(predicateUri).append("> ").append(objectAlias);
+
                 if (Util.isSurroundedWithQuotes(objectValue)) {
-                    strBuilder.append(" . ?s <").append(predicateUri).append("> ").append(objectValue);
+                    strBuilder.append(" . FILTER (").append(objectAlias).append(" = ").append(objectValue).append(")");
                 } else if (URIUtil.isSchemedURI(objectValue)) {
-                    strBuilder.append(" . ?s <").append(predicateUri).append("> <").append(objectValue).append(">");
+                    strBuilder.append(" . FILTER (").append(objectAlias).append(" = <").append(objectValue)
+                            .append(">)");
                     // TODO check if it is a number??
                 } else {
-                    strBuilder.append(" . ?s <").append(predicateUri).append("> ?o").append(i).append(" . ?o")
-                            .append(i).append(" bif:contains \"'").
-                            append(objectValue).append("'\"");
+                    strBuilder.append(" . FILTER bif:contains(").append(objectAlias).append(", \"'").
+                            append(objectValue).append("'\")");
                     inParams.add(objectValue);
                     // TODO is it really needed in Virtuoso
                     requiresFullTextSearch = Boolean.TRUE;
-                    i++;
                 }
+                strBuilder.append("}");
+                i++;
             }
+        }
+        if (!hasSortingPredicate && sortPredicate != null) {
+            strBuilder.append(" . OPTIONAL {?s <").append(sortPredicate).append("> ?oorderby }");
         }
         return strBuilder.toString();
 

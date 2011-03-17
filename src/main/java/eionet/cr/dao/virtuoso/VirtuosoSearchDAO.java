@@ -55,7 +55,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
         if (expression==null || expression.isEmpty()){
             return new Pair<Integer, List<SubjectDTO>>(0, new LinkedList<SubjectDTO>());
         }
-        
+
         // parse search expression for Virtuoso SPARQL
         VirtuosoFullTextQuery virtQuery = null;
         try{
@@ -72,10 +72,9 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
         }
 
         // create query helper
-        // TODO: make use of SortingRequest, instead of passing null to helper
         VirtuosoFreeTextSearchHelper helper = new VirtuosoFreeTextSearchHelper(
                 expression, virtQuery, exactMatch, pagingRequest, sortingRequest);
-        
+
         // Set Filter
         helper.setFilter(filterType);
 
@@ -90,7 +89,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
         FreeTextSearchReader<String> matchReader = new FreeTextSearchReader<String>();
         matchReader.setBlankNodeUriPrefix(VirtuosoBaseDAO.BNODE_URI_PREFIX);
         List<String> subjectUris = executeSPARQL(query, matchReader);
-        
+
         //get matching graph URIs
         List<String> graphUris = getGraphUris(expression, virtQuery, exactMatch);
 
@@ -126,9 +125,9 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
         // the result Pair contains total number of subjects and the requested sub-list
         return new Pair<Integer, List<SubjectDTO>>(totalMatchCount, resultList);
     }
-    
+
     //Graph URIs are used to get correct cr:contentLastModified for the subject
-    //If subject from one graph gave the hit and the same subject in another graph didn't, then only the date of the first graph should be used 
+    //If subject from one graph gave the hit and the same subject in another graph didn't, then only the date of the first graph should be used
     private List<String> getGraphUris(SearchExpression expression, VirtuosoFullTextQuery virtExpression, boolean exactMatch) throws DAOException {
         StringBuilder strBuilder = new StringBuilder().
         append("select distinct(?g) where {graph ?g {?s ?p ?o. ");
@@ -202,12 +201,10 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
             totalRowCount = new Integer(getExactRowCount(helper));
         }
 
-        // return new Pair<Integer,List<SubjectDTO>>(0, new
-        // LinkedList<SubjectDTO>());
+        // return new Pair<Integer,List<SubjectDTO>>(0, new LinkedList<SubjectDTO>());
         logger.debug("Search by filters, total query time " + Util.durationSince(startTime));
 
-        // the result Pair contains total number of subjects and the requested
-        // sub-list
+        // the result Pair contains total number of subjects and the requested sub-list
         return new Pair<Integer, List<SubjectDTO>>(totalRowCount, resultList);
     }
 
