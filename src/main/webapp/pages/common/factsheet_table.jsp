@@ -83,7 +83,7 @@
                                                     </c:when>
                                                     <c:otherwise>
                                                         <stripes:link class="infolink" href="/factsheet.action">Anonymous resource
-                                                            <stripes:param name="uriHash" value="${object.hash}"/>
+                                                            <stripes:param name="uri" value="${object.value}"/>
                                                         </stripes:link>
                                                     </c:otherwise>
                                                 </c:choose>

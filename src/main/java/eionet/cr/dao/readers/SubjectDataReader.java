@@ -180,12 +180,18 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO>{
         boolean isLiteral = objectValue instanceof Literal;
         String objectLang = isLiteral ? ((Literal)objectValue).getLanguage() : null;
 
-        ObjectDTO object = new ObjectDTO(objectValue.stringValue(),
+        String strObjectValue = objectValue.stringValue();
+        boolean isAnonObject = objectValue instanceof BNode;
+        if (!isLiteral && isAnonObject && blankNodeUriPrefix!=null){
+            strObjectValue = blankNodeUriPrefix.concat(strObjectValue);
+        }
+
+        ObjectDTO object = new ObjectDTO(strObjectValue,
                 objectLang==null ? "" : objectLang,
                 isLiteral,
                 objectValue instanceof BNode);
 
-        object.setHash(Hashes.spoHash(objectValue.stringValue()));
+        object.setHash(Hashes.spoHash(strObjectValue));
 
         String sourceUri = bindingSet.getValue("g").stringValue();
         long sourceHash = Hashes.spoHash(sourceUri);
@@ -199,14 +205,14 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO>{
         // object.setSourceObjectHash(rs.getLong("OBJ_SOURCE_OBJECT"));
 
         currentObjects.add(object);
-        
+
         //If current date is after new date, then leave the current date
         Date prevDate = null;
         SubjectDTO subj = subjectsMap.get(subjectHash);
         if(subj != null){
             prevDate = subj.getLastModifiedTime();
         }
-        
+
         Value t = bindingSet.getValue("t");
         if(t != null){
             String time = t.stringValue();
