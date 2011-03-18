@@ -132,7 +132,22 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO{
     @Override
     public Collection<String> getPicklistForPredicate(String predicateUri)
             throws DAOException {
-        throw new UnsupportedOperationException("Method not implemented");
+    	if (StringUtils.isBlank(predicateUri)) {
+    		return Collections.emptyList();
+    	}
+    	StringBuilder strBuilder = new StringBuilder();
+        strBuilder.append("SELECT distinct ?o WHERE { ?s <").append(predicateUri).append("> ?o FILTER isLiteral(?o) } ORDER BY ?o");
+
+        long startTime = System.currentTimeMillis();
+        logger.trace("getPicklistForPredicate query: " + strBuilder.toString());
+
+        // execute the query, with the IN parameters
+        List<String> pickListObjects = executeSPARQL(strBuilder.toString(), new SingleObjectReader<String>());
+
+        logger.trace("getPicklistForPredicate query took " + Util.durationSince(startTime));
+    	
+        return pickListObjects;
+    	//throw new UnsupportedOperationException("Method not implemented");
 
     }
 
@@ -189,7 +204,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO{
     @Override
     public boolean isAllowLiteralSearch(String predicateUri)
             throws DAOException {
-        throw new UnsupportedOperationException("Method not implemented");
+        return false;
     }
 
     /* (non-Javadoc)
