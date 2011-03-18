@@ -270,6 +270,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO{
         long subjectHash = Hashes.spoHash(subjectUri);
         map.put(Long.valueOf(subjectHash), null);
         SubjectDataReader reader = new SubjectDataReader(map);
+        reader.setBlankNodeUriPrefix(VirtuosoBaseDAO.BNODE_URI_PREFIX);
 
         List<SubjectDTO> subjects = getSubjectsData(Collections.singletonList(subjectUri), null, reader, null);
         return subjects==null || subjects.isEmpty() ? null : subjects.get(0);

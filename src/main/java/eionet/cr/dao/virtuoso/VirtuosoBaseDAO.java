@@ -24,7 +24,8 @@ import eionet.cr.util.sesame.SesameUtil;
 public abstract class VirtuosoBaseDAO extends SQLBaseDAO{
 
     /** */
-    public static final String BNODE_URI_PREFIX = "nodeID://";
+    //public static final String BNODE_URI_PREFIX = "nodeID://";
+    public static final String BNODE_URI_PREFIX = "_:";
 
     /** */
     protected Logger logger = Logger.getLogger(VirtuosoBaseDAO.class);

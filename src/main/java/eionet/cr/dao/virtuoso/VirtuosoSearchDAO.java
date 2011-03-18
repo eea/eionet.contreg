@@ -104,6 +104,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
 
             // get the data of all found subjects, provide hit-sources to the reader
             SubjectDataReader dataReader = new SubjectDataReader(subjectUris);
+            dataReader.setBlankNodeUriPrefix(VirtuosoBaseDAO.BNODE_URI_PREFIX);
 
             // only these predicates will be queried for
             String[] neededPredicates = {Predicates.RDF_TYPE, Predicates.RDFS_LABEL};
