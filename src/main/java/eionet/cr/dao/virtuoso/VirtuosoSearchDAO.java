@@ -346,7 +346,6 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
             PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException {
 
         // create query helper
-        // TODO: make use of sortingRequest, instead of passing null
         VirtuosoReferencesSearchHelper helper = new VirtuosoReferencesSearchHelper(
                 subjectUri, pagingRequest, sortingRequest);
 
@@ -369,7 +368,8 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
             logger.trace("Search references, getting the data of the found subjects");
 
             // get the data of all found subjects
-            resultList = getSubjectsData(subjectUris, null, new SubjectDataReader(subjectUris), null);
+            String predicateQuery = helper.getSubjectsDataQuery(subjectUris, subjectUri);
+            resultList = executeSPARQL(predicateQuery, new SubjectDataReader(subjectUris));
 
             // if paging required, get the total number of found subjects too
             if (pagingRequest!=null){

@@ -119,17 +119,17 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO{
 
         StringBuilder strBuilder = new StringBuilder().
         append("select * where {graph ?g {?s ?p ?o. ").
-        append("filter (");
+        append("filter (?s IN (");
 
         int i=0;
         for (String subjectUri : subjectUris){
             if (i>0){
-                strBuilder.append(" || ");
+                strBuilder.append(", ");
             }
-            strBuilder.append("?s = <").append(subjectUri).append(">");
+            strBuilder.append("<").append(subjectUri).append(">");
             i++;
         }
-        strBuilder.append(") ");
+        strBuilder.append(")) ");
 
         // if only certain predicates needed, add relevant filter
         if (predicateUris!=null && predicateUris.length>0){
@@ -146,7 +146,7 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO{
 
             strBuilder.append(") ");
         }
-        
+
         // if only certain graphs needed, add relevant filter
         int z=0;
         if(graphUris != null && graphUris.size() > 0){
@@ -160,7 +160,7 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO{
             }
             strBuilder.append(") ");
         }
-        
+
         strBuilder.append("OPTIONAL {?g <").append(Predicates.CR_LAST_MODIFIED).append("> ?t} ");
 
         strBuilder.append("}} ORDER BY ?s");
