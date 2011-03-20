@@ -54,12 +54,10 @@
                                             <c:when test="${not predicateLabelDisplayed}">
                                                 <c:out value="${crfn:getPredicateLabel(actionBean.predicateLabels, predicate.key)}"/>
                                                 <c:set var="predicateLabelDisplayed" value="${true}"/>
-                                                <c:if test='${sessionScope.crUser!=null && crfn:hasPermission(sessionScope.crUser.userName, "/", "u")}'>
-                                                    <stripes:link  href="/factsheet.action">
-                                                        <stripes:param name="uri" value="${predicate.key}"/>
-                                                        <img src="${pageContext.request.contextPath}/images/view2.gif" alt="Definition"/>
-                                                    </stripes:link>
-                                                </c:if>
+                                                <stripes:link  href="/factsheet.action">
+                                                    <stripes:param name="uri" value="${predicate.key}"/>
+                                                    <img src="${pageContext.request.contextPath}/images/view2.gif" alt="Definition"/>
+                                                </stripes:link>
                                             </c:when>
                                             <c:otherwise>&nbsp;</c:otherwise>
                                         </c:choose>
