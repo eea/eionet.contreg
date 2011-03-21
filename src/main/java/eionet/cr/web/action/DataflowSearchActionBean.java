@@ -199,11 +199,11 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean<SubjectDT
         col.setSortable(true);
         list.add(col);
 
-//		col = new SubjectPredicateColumn();
-//		col.setPredicateUri(Predicates.ROD_OBLIGATION_PROPERTY);
-//		col.setTitle("Dataflow");
-//		col.setSortable(true);
-//		list.add(col);
+//      col = new SubjectPredicateColumn();
+//      col.setPredicateUri(Predicates.ROD_OBLIGATION_PROPERTY);
+//      col.setTitle("Dataflow");
+//      col.setSortable(true);
+//      list.add(col);
 
         col = new SubjectPredicateColumn();
         col.setPredicateUri(Predicates.ROD_HAS_FILE);

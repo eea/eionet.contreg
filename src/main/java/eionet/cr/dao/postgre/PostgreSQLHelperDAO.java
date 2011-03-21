@@ -695,15 +695,15 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             throw new IllegalArgumentException("limit must be greater than 0!");
 
         // build SQL query
-//		StringBuffer sqlBuf = new StringBuffer().
-//		append("select SPO.SUBJECT as ").append(PairReader.LEFTCOL).
-//		append(", RESOURCE.FIRSTSEEN_TIME as ").append(PairReader.RIGHTCOL).
-//		append(" from SPO, RESOURCE").
-//		append(" where SPO.PREDICATE=").append(Hashes.spoHash(Predicates.RDF_TYPE)).
-//		append(" and SPO.OBJECT_HASH=").append(Hashes.spoHash(rdfType)).
-//		append(" and SPO.SUBJECT=RESOURCE.URI_HASH").
-//		append(" order by RESOURCE.FIRSTSEEN_TIME desc").
-//		append(" limit ").append(limit);
+//      StringBuffer sqlBuf = new StringBuffer().
+//      append("select SPO.SUBJECT as ").append(PairReader.LEFTCOL).
+//      append(", RESOURCE.FIRSTSEEN_TIME as ").append(PairReader.RIGHTCOL).
+//      append(" from SPO, RESOURCE").
+//      append(" where SPO.PREDICATE=").append(Hashes.spoHash(Predicates.RDF_TYPE)).
+//      append(" and SPO.OBJECT_HASH=").append(Hashes.spoHash(rdfType)).
+//      append(" and SPO.SUBJECT=RESOURCE.URI_HASH").
+//      append(" order by RESOURCE.FIRSTSEEN_TIME desc").
+//      append(" limit ").append(limit);
 
         StringBuffer sqlBuf = new StringBuffer().
         append("select RESOURCE.URI_HASH as ").append(PairReader.LEFTCOL).

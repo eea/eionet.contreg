@@ -56,7 +56,7 @@ import eionet.cr.web.security.CRUser;
 
 
 /**
- *	Mysql implementation of {@link HelperDAO}.
+ *  Mysql implementation of {@link HelperDAO}.
  *
  * @author Aleksandr Ivanov
  * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>

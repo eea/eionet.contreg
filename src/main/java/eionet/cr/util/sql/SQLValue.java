@@ -43,7 +43,7 @@ public class SQLValue {
      * @param value
      * @param sqlType
      */
-    public SQLValue(Object value, int sqlType){
+    public SQLValue(Object value, int sqlType) {
         this.value = value;
         this.sqlType = sqlType;
     }
@@ -51,9 +51,9 @@ public class SQLValue {
     /**
      * Returns value of this <code>SQLValue</code> as <code>java.lang.String</code>.
      */
-    public String getString(){
+    public String getString() {
 
-        return value==null ? null : value.toString();
+        return value == null ? null : value.toString();
     }
 
     /**
@@ -65,7 +65,7 @@ public class SQLValue {
         if (value == null)
             return null;
 
-        switch (sqlType){
+        switch (sqlType) {
             case Types.DATE:
                 return (Date)value;
             case Types.TIME:
@@ -81,9 +81,11 @@ public class SQLValue {
      * or throws <code>SQLException</code>, if conversion to timestamp fails.
      */
     public Timestamp getTimestamp() throws SQLException {
-        if (value == null)	return null;
+        if (value == null) {
+            return null;
+        }
 
-        switch (sqlType)	{
+        switch (sqlType) {
         case Types.TIMESTAMP:
             return (Timestamp) value;
         case Types.TIME:
@@ -99,9 +101,11 @@ public class SQLValue {
      * or throws <code>SQLException</code>, if conversion to integer fails.
      */
     public int getIntegerValue() throws SQLException {
-        if (value == null)	return 0;
+        if (value == null) {
+            return 0;
+        }
 
-        switch (sqlType)	{
+        switch (sqlType) {
         case Types.INTEGER:
             return (int) ((Long)value).longValue();
         case Types.NUMERIC:
@@ -124,7 +128,9 @@ public class SQLValue {
      * or throws <code>SQLException</code>, if conversion to integer fails.
      */
     public Integer getInteger() throws SQLException {
-        if (value == null)	return null;
+        if (value == null) {
+            return null;
+        }
 
         return new Integer(getIntegerValue());
     }
@@ -134,9 +140,11 @@ public class SQLValue {
      * or throws <code>SQLException</code>, if conversion to long integer fails.
      */
     public Long getLong() throws SQLException {
-        if (value == null)	return null;
+        if (value == null) {
+            return null;
+        }
 
-        switch (sqlType)	{
+        switch (sqlType) {
         case Types.INTEGER:
             return (Long) value;
         case Types.NUMERIC:
@@ -159,9 +167,11 @@ public class SQLValue {
      * or throws <code>SQLException</code>, if conversion to long integer fails.
      */
     public long getLongValue() throws SQLException {
-        if (value == null)	return 0;
+        if (value == null) {
+            return 0;
+        }
 
-        switch (sqlType)	{
+        switch (sqlType) {
         case Types.INTEGER:
             return ((Long) value).longValue();
         case Types.NUMERIC:
@@ -184,7 +194,9 @@ public class SQLValue {
      * or throws <code>SQLException</code>, if conversion to double fails.
      */
     public Double getDouble() throws SQLException {
-        if (value == null)	return null;
+        if (value == null) {
+            return null;
+        }
 
         return new Double(getDoubleValue());
     }
@@ -194,9 +206,11 @@ public class SQLValue {
      * or throws <code>SQLException</code>, if conversion to double fails.
      */
     public double getDoubleValue() throws SQLException {
-        if (value == null)	return 0.;
+        if (value == null) {
+            return 0.;
+        }
 
-        switch (sqlType)	{
+        switch (sqlType) {
         case Types.NUMERIC:
             return ((BigDecimal)value).doubleValue();
         case Types.INTEGER:
@@ -218,10 +232,12 @@ public class SQLValue {
      * Returns value of this <code>SQLValue</code> as <code>byte[]</code>
      * or throws <code>SQLException</code>, if conversion to byte array fails.
      */
-    public byte[] getBytes() throws SQLException	{
-        if (value == null)	return null;
+    public byte[] getBytes() throws SQLException {
+        if (value == null) {
+            return null;
+        }
 
-        switch (sqlType)	{
+        switch (sqlType) {
         case Types.BINARY:
             return (byte[]) value;
         case Types.VARCHAR:
@@ -229,7 +245,7 @@ public class SQLValue {
         //case Types.LONGNVARCHAR:
             try {
                 return ((String) value).getBytes("UTF-8");
-            } catch (UnsupportedEncodingException ue)	{
+            } catch (UnsupportedEncodingException ue) {
                 throw new SQLException("Failed conversion to bytes: " + value);
             }
         default:
@@ -249,7 +265,7 @@ public class SQLValue {
      *
      * @return
      */
-    public Object getObject(){
+    public Object getObject() {
         return value;
     }
 
@@ -257,7 +273,7 @@ public class SQLValue {
      *
      * @return
      */
-    public int getSQLType(){
+    public int getSQLType() {
         return sqlType;
     }
 }

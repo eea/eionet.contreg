@@ -213,7 +213,7 @@ public class PostgreSQLFullTextQuery {
      */
     public static void main(String[] args) throws ParseException{
 
-//		String s = "mina \"olen robert\" ja sina oled (paha | kuri)";
+//      String s = "mina \"olen robert\" ja sina oled (paha | kuri)";
         String s = "\"air soil\" \"juku juhan\"";
 
         PostgreSQLFullTextQuery query = PostgreSQLFullTextQuery.parse(s);
@@ -221,27 +221,27 @@ public class PostgreSQLFullTextQuery {
         System.out.println(">" + query.toString() + "<");
         System.out.println(query.getPhrases());
 
-//		System.out.println(Arrays.binarySearch(booleanOperators, "AND"));
+//      System.out.println(Arrays.binarySearch(booleanOperators, "AND"));
 
-//		StringTokenizer st = new StringTokenizer("jaanus kala\"mees", " \"");
-//		while (st.hasMoreTokens()){
-//			System.out.println(st.nextToken());
-//		}
+//      StringTokenizer st = new StringTokenizer("jaanus kala\"mees", " \"");
+//      while (st.hasMoreTokens()){
+//          System.out.println(st.nextToken());
+//      }
 
-//		PostgreSQLFullTextQuery query = PostgreSQLFullTextQuery.parse("\"jaanus \"");
-//		System.out.println(query.phrases);
+//      PostgreSQLFullTextQuery query = PostgreSQLFullTextQuery.parse("\"jaanus \"");
+//      System.out.println(query.phrases);
 
-//		System.out.println(StringUtils.containsAny("jaanus", "\t\r\n "));
+//      System.out.println(StringUtils.containsAny("jaanus", "\t\r\n "));
 
-//		QueryParser parser = new QueryParser("", new StandardAnalyzer());
-//		Query query = parser.parse("\"jaanus juhan\"");
-//		System.out.println(query.getClass().getSimpleName() + ": " + query);
+//      QueryParser parser = new QueryParser("", new StandardAnalyzer());
+//      Query query = parser.parse("\"jaanus juhan\"");
+//      System.out.println(query.getClass().getSimpleName() + ": " + query);
 //
-//		HashSet<Term> terms = new HashSet<Term>();
-//		query.extractTerms(terms);
-//		for (Term term : terms){
-//			System.out.println(term);
-//		}
+//      HashSet<Term> terms = new HashSet<Term>();
+//      query.extractTerms(terms);
+//      for (Term term : terms){
+//          System.out.println(term);
+//      }
     }
 
 

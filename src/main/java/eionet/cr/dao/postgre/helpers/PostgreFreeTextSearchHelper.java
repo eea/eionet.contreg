@@ -45,12 +45,12 @@ import eionet.cr.web.util.columns.SubjectLastModifiedColumn;
 public class PostgreFreeTextSearchHelper extends FreeTextSearchHelper{
 
     /** */
-//	public enum FilterType { ANY_OBJECT, ANY_FILE, TEXTS, DATASETS, IMAGES, EXACT_MATCH };
+//  public enum FilterType { ANY_OBJECT, ANY_FILE, TEXTS, DATASETS, IMAGES, EXACT_MATCH };
 
     /** */
     private SearchExpression expression;
     private PostgreSQLFullTextQuery pgExpression;
-//	private FilterType filter = FilterType.ANY_OBJECT;
+//  private FilterType filter = FilterType.ANY_OBJECT;
 
     /**
      *
@@ -61,7 +61,7 @@ public class PostgreFreeTextSearchHelper extends FreeTextSearchHelper{
     public PostgreFreeTextSearchHelper(SearchExpression expression,
             PostgreSQLFullTextQuery pgExpression,
             PagingRequest pagingRequest,
-            SortingRequest sortingRequest){
+            SortingRequest sortingRequest) {
 
         super(pagingRequest, sortingRequest);
         this.expression = expression;
@@ -72,7 +72,7 @@ public class PostgreFreeTextSearchHelper extends FreeTextSearchHelper{
      * (non-Javadoc)
      * @see eionet.cr.dao.postgre.helpers.AbstractSearchHelper#getUnorderedQuery(java.util.List)
      */
-    public String getUnorderedQuery(List<Object> inParams){
+    public String getUnorderedQuery(List<Object> inParams) {
 
         StringBuffer buf = new StringBuffer().
         append("select distinct F.SUBJECT as ").append(PairReader.LEFTCOL).append(", ").
@@ -93,23 +93,23 @@ public class PostgreFreeTextSearchHelper extends FreeTextSearchHelper{
      * @see eionet.cr.dao.postgre.helpers.AbstractSearchHelper#getOrderedQuery(java.util.List)
      */
 
-    private String addFilterParams(){
+    private String addFilterParams() {
 
         StringBuffer buf = new StringBuffer();
 
-        if (filter != FilterType.ANY_OBJECT){
+        if (filter != FilterType.ANY_OBJECT) {
             buf.append(" join SPO as Ty on F.SUBJECT=Ty.SUBJECT ");
             buf.append(" AND Ty.PREDICATE=").append(Hashes.spoHash(Predicates.RDF_TYPE)).append(" ");
 
             long objectHash = 0;
 
-            if (filter == FilterType.ANY_FILE){
+            if (filter == FilterType.ANY_FILE) {
                 objectHash = Hashes.spoHash(Subjects.CR_FILE);
-            } else if (filter == FilterType.DATASETS){
+            } else if (filter == FilterType.DATASETS) {
                 objectHash = Hashes.spoHash(Predicates.DC_MITYPE_DATASET);
-            } else if (filter == FilterType.IMAGES){
+            } else if (filter == FilterType.IMAGES) {
                 objectHash = Hashes.spoHash(Predicates.DC_MITYPE_IMAGE);
-            } else if (filter == FilterType.TEXTS){
+            } else if (filter == FilterType.TEXTS) {
                 objectHash = Hashes.spoHash(Predicates.DC_MITYPE_TEXT);
             }
 
@@ -118,7 +118,7 @@ public class PostgreFreeTextSearchHelper extends FreeTextSearchHelper{
         return buf.toString();
     }
 
-    protected String getOrderedQuery(List<Object> inParams){
+    protected String getOrderedQuery(List<Object> inParams) {
 
         StringBuffer subSelect = new StringBuffer().
         append("select distinct on (").append(PairReader.LEFTCOL).append(")").
@@ -126,7 +126,7 @@ public class PostgreFreeTextSearchHelper extends FreeTextSearchHelper{
         append("(CASE WHEN F.OBJ_DERIV_SOURCE<>0 THEN F.OBJ_DERIV_SOURCE ELSE F.SOURCE END)").
         append(" as ").append(PairReader.RIGHTCOL).append(", ");
 
-        if (sortPredicate.equals(SubjectLastModifiedColumn.class.getSimpleName())){
+        if (sortPredicate.equals(SubjectLastModifiedColumn.class.getSimpleName())) {
             subSelect.append(" RESOURCE.LASTMODIFIED_TIME as OBJECT_ORDERED_BY from SPO as F").
             append(" left join RESOURCE on (F.SUBJECT=RESOURCE.URI_HASH)");
         }
@@ -149,7 +149,7 @@ public class PostgreFreeTextSearchHelper extends FreeTextSearchHelper{
      * (non-Javadoc)
      * @see eionet.cr.dao.postgre.helpers.AbstractSearchHelper#getCountQuery(java.util.List)
      */
-    public String getCountQuery(List<Object> inParams){
+    public String getCountQuery(List<Object> inParams) {
 
         StringBuffer buf = new StringBuffer("select count(distinct F.SUBJECT) from SPO as F ");
         buf.append(addFilterParams());
@@ -171,7 +171,7 @@ public class PostgreFreeTextSearchHelper extends FreeTextSearchHelper{
 
         StringBuffer buf = new StringBuffer();
 
-        if (expression.isUri() || expression.isHash()){
+        if (expression.isUri() || expression.isHash()) {
             buf.append(" where F.OBJECT_HASH=?");
             inParams.add(expression.isHash() ?
                     Long.valueOf(expression.toString()) : Long.valueOf(Hashes.spoHash(expression.toString())));
@@ -183,8 +183,8 @@ public class PostgreFreeTextSearchHelper extends FreeTextSearchHelper{
             inParams.add(pgExpression.getParsedQuery());
 
             HashSet<String> phrases = pgExpression.getPhrases();
-            for (String phrase : phrases){
-                if (!StringUtils.isBlank(phrase)){
+            for (String phrase : phrases) {
+                if (!StringUtils.isBlank(phrase)) {
                     buf.append(" and F.OBJECT like ?");
                     inParams.add("%" + phrase + "%");
                 }
@@ -193,11 +193,11 @@ public class PostgreFreeTextSearchHelper extends FreeTextSearchHelper{
         return buf.toString();
     }
 
-//	public FilterType getFilter() {
-//		return filter;
-//	}
+//  public FilterType getFilter() {
+//      return filter;
+//  }
 //
-//	public void setFilter(FilterType filter) {
-//		this.filter = filter;
-//	}
+//  public void setFilter(FilterType filter) {
+//      this.filter = filter;
+//  }
 }

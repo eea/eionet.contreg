@@ -61,18 +61,18 @@ public class CRXmlRpcSampleClient {
         Object[] result = (Object[])client.execute("ContRegService.getResourcesSinceTimestamp", params);
 
         // loop through the results, do type casting to see if any ClassCastExceptions are thrown
-        if (result!=null && result.length>0){
+        if (result != null && result.length > 0) {
 
-            for (int i=0; i<result.length; i++){
+            for (int i=0; i < result.length; i++) {
                 Map<String,Object[]> map = (Map<String,Object[]>)result[i];
-                if (map!=null && !map.isEmpty()){
+                if (map != null && !map.isEmpty()) {
                     Iterator<String> keys = map.keySet().iterator();
-                    while (keys.hasNext()){
+                    while (keys.hasNext()) {
                         String key = keys.next();
                         Object[] values = map.get(key);
-                        StringBuffer buf = new StringBuffer(values==null ? "null array" : "");
-                        for (int j=0; values!=null && j<values.length; j++){
-                            if (j>0)
+                        StringBuffer buf = new StringBuffer(values == null ? "null array" : "");
+                        for (int j=0; values != null && j < values.length; j++) {
+                            if (j > 0)
                                 buf.append(", ");
                             buf.append(values[j].toString());
                         }
@@ -114,7 +114,7 @@ public class CRXmlRpcSampleClient {
         Object[] result = (Object[])client.execute("ContRegService.dataflowSearch", params);
 
         // get the first object in the result set
-        if (result!=null && result.length>0){
+        if (result != null && result.length > 0) {
 
             Object o = result[0];
             DataflowResultDto dto = (DataflowResultDto)o;
@@ -143,8 +143,8 @@ public class CRXmlRpcSampleClient {
         Object[] result = (Object[])client.execute("ContRegService.getXmlFilesBySchema", params);
 
         // loop through the results, do type casting to see if any ClassCastExceptions are thrown
-        if (result!=null && result.length>0){
-            for (int i=0; i<result.length; i++){
+        if (result != null && result.length > 0) {
+            for (int i=0; i < result.length; i++) {
                 System.out.println(result[i].toString());
             }
         }
@@ -159,7 +159,7 @@ public class CRXmlRpcSampleClient {
      * @throws MalformedURLException
      * @throws XmlRpcException
      */
-    public static void sample_getDeliveries() throws MalformedURLException, XmlRpcException{
+    public static void sample_getDeliveries() throws MalformedURLException, XmlRpcException {
 
         // set up the client configuration
         XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
@@ -177,15 +177,15 @@ public class CRXmlRpcSampleClient {
         // execute the call
         System.out.println("Executing the call ...");
         Object[] result = (Object[])client.execute("ContRegService.getDeliveries", params);
-        if (result==null){
+        if (result == null) {
             System.out.println("Call executed, result is null");
         }
-        else if (result.length==0){
+        else if (result.length == 0) {
             System.out.println("Call executed, result is an empty array");
         }
         else{
             System.out.println("Call executed, result is the following array");
-            for (int i=0; i<result.length; i++){
+            for (int i=0; i < result.length; i++) {
                 System.out.println(i + ": " + result[i]);
             }
         }
@@ -199,9 +199,9 @@ public class CRXmlRpcSampleClient {
     public static void main(String[] args) throws MalformedURLException, XmlRpcException{
 
             sample_getDeliveries();
-//			sample_getXmlFilesBySchema();
-//			sample_getResourcesSinceTimestamp();
-//			sample_simpleAndSearch();
-//			sample_dataflowSearch();
+//          sample_getXmlFilesBySchema();
+//          sample_getResourcesSinceTimestamp();
+//          sample_simpleAndSearch();
+//          sample_dataflowSearch();
     }
 }

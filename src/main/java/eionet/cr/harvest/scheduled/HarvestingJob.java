@@ -83,7 +83,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
     /** */
     private static SimpleTrigger trigger = null;
 
-//	private static Harvest currentHarvest = null;
+//  private static Harvest currentHarvest = null;
 
     /**
      *
@@ -387,29 +387,29 @@ public class HarvestingJob implements StatefulJob, ServletContextListener{
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
     }
 
-//	/**
-//	 *
-//	 * @return
-//	 */
-//	public static synchronized Harvest getCurrentHarvest() {
-//		return currentHarvest;
-//	}
+//  /**
+//   *
+//   * @return
+//   */
+//  public static synchronized Harvest getCurrentHarvest() {
+//      return currentHarvest;
+//  }
 //
-//	/**
-//	 *
-//	 * @return
-//	 */
-//	public static synchronized String getCurrentHarvestUrl() {
-//		return currentHarvest==null ? null : currentHarvest.getSourceUrlString();
-//	}
+//  /**
+//   *
+//   * @return
+//   */
+//  public static synchronized String getCurrentHarvestUrl() {
+//      return currentHarvest==null ? null : currentHarvest.getSourceUrlString();
+//  }
 //
-//	/**
-//	 *
-//	 * @param item
-//	 */
-//	public static synchronized void setCurrentHarvest(Harvest harvest) {
-//		currentHarvest = harvest;
-//	}
+//  /**
+//   *
+//   * @param item
+//   */
+//  public static synchronized void setCurrentHarvest(Harvest harvest) {
+//      currentHarvest = harvest;
+//  }
 
     /**
      * @return the activeHours

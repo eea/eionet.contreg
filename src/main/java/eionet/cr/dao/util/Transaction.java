@@ -49,9 +49,9 @@ public class Transaction {
     /**
      *
      */
-    private Transaction(Connection conn){
+    private Transaction(Connection conn) {
 
-        if (conn==null){
+        if (conn == null) {
             throw new IllegalArgumentException("Connection must not be null!");
         }
         this.conn = conn;
@@ -67,7 +67,7 @@ public class Transaction {
         try{
             return new Transaction(DbConnectionProvider.getConnection());
         }
-        catch (SQLException e){
+        catch (SQLException e) {
             throw new DAOException(e.toString(), e);
         }
     }
@@ -75,12 +75,12 @@ public class Transaction {
     /**
      *
      */
-    public void commit(){
+    public void commit() {
 
         try{
             conn.commit();
         }
-        catch (SQLException e){
+        catch (SQLException e) {
             logger.error("Transaction commit failed: " + e.toString());
         }
     }
@@ -88,12 +88,12 @@ public class Transaction {
     /**
      *
      */
-    public void rollback(){
+    public void rollback() {
 
         try{
             conn.rollback();
         }
-        catch (SQLException e){
+        catch (SQLException e) {
             logger.error("Transaction rollback failed: " + e.toString());
         }
     }
@@ -101,9 +101,9 @@ public class Transaction {
     /**
      *
      */
-    public static void rollback(Transaction transaction){
+    public static void rollback(Transaction transaction) {
 
-        if (transaction!=null){
+        if (transaction!=null) {
             transaction.rollback();
         }
     }
@@ -117,7 +117,7 @@ public class Transaction {
     public <T extends DAO> T getDao(Class<T> implementedInterface) {
 
         T dao = DAOFactory.get().getDao(implementedInterface);
-//		dao.setConnection(conn);
+//      dao.setConnection(conn);
         return dao;
     }
 
@@ -125,7 +125,7 @@ public class Transaction {
      *
      * @param args
      */
-    public static void main(String[] args){
+    public static void main(String[] args) {
 
         Transaction transaction = null;;
         try{
@@ -133,7 +133,7 @@ public class Transaction {
             transaction.getDao(HelperDAO.class).addTriples(null);
             // do some DAO operations here
         }
-        catch (DAOException e){
+        catch (DAOException e) {
             Transaction.rollback(transaction);
         }
     }

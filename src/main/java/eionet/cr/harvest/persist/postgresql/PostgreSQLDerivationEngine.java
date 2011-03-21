@@ -212,8 +212,8 @@ public class PostgreSQLDerivationEngine implements IDerivationEngine{
         append(" and SPO_FRESH.LIT_OBJ='N' and SPO_FRESH.ANON_OBJ='N' and SPO_FRESH.SUBJECT=SPO.PREDICATE").
         append(" and SPO_FRESH.SOURCE=").append(sourceUrlHash).
         append(" and SPO_FRESH.GEN_TIME=").append(genTime);
-//		append(" and SPO.SOURCE<>").append(sourceUrlHash).
-//		append(" and SPO.GEN_TIME<>").append(genTime);
+//      append(" and SPO.SOURCE<>").append(sourceUrlHash).
+//      append(" and SPO.GEN_TIME<>").append(genTime);
 
         int j = SQLUtil.executeUpdate(buf.toString(), connection);
 

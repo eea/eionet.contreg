@@ -85,7 +85,7 @@ public class XmlExporter extends Exporter implements SubjectExportEvent{
             throw new ExportException(e.toString(), e);
         }
         finally{
-            if(writer!=null){
+            if(writer!=null) {
                 try { writer.close();}catch (XMLStreamException e) {}
             }
         }
@@ -100,7 +100,7 @@ public class XmlExporter extends Exporter implements SubjectExportEvent{
     public void writeSubjectIntoExporterOutput(SubjectDTO subject) throws ExportException {
 
         try{
-            //	write row start element
+            // write row start element
             writer.writeStartElement(ROW_ELEMENT);
 
             //get uri or label value
@@ -112,7 +112,7 @@ public class XmlExporter extends Exporter implements SubjectExportEvent{
             elementMetada.setMaxLength(uriOrLabelValue.length());
 
             //write other elements
-            int elementIndex= 1;
+            int elementIndex = 1;
             for(Pair<String,String> columnPair : getSelectedColumns()) {
                 //label is already written
                 if(Predicates.RDFS_LABEL.equals(columnPair.getLeft())) continue;
@@ -126,7 +126,7 @@ public class XmlExporter extends Exporter implements SubjectExportEvent{
 
             writer.writeEndElement();
         }
-        catch(Exception e){
+        catch(Exception e) {
             throw new ExportException(e.getMessage(), e);
         }
     }
@@ -184,20 +184,20 @@ public class XmlExporter extends Exporter implements SubjectExportEvent{
      * @param elementName
      * @return
      */
-    protected String getUniqueElementName(String elementName){
+    protected String getUniqueElementName(String elementName) {
 
-        if(elementName==null || elementName.length()==0)  elementName=XmlUtil.INVALID_ELEMENT_NAME;
+        if(elementName == null || elementName.length() == 0)  elementName=XmlUtil.INVALID_ELEMENT_NAME;
 
-        if(getElements()!=null){
-            while (getElements().containsKey(elementName.toLowerCase())){
+        if(getElements()!=null) {
+            while (getElements().containsKey(elementName.toLowerCase())) {
                 int dashPos = elementName.lastIndexOf( "_" );
-                if (dashPos>1 && dashPos<elementName.length()-1){
+                if (dashPos > 1 && dashPos < elementName.length()-1) {
                     String snum = elementName.substring(dashPos+1);
                     try{
                         int inum = Integer.parseInt(snum);
                         elementName = elementName.substring(0, dashPos ) + "_" + (inum+1);
                     }
-                    catch(Exception e){
+                    catch(Exception e) {
                         elementName = elementName + "_1";
                     }
                 }

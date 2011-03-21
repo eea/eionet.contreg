@@ -174,7 +174,7 @@ public class ObjectHashesFixer extends Thread{
                 long newHash = Hashes.spoHash(uuidUri);
                 long oldHash = rs.getLong("OBJECT_HASH");
 
-//				logger.debug("Old " + object + " = " + oldHash + ", new " + uuidUri + " = " + newHash);
+//              logger.debug("Old " + object + " = " + oldHash + ", new " + uuidUri + " = " + newHash);
 
                 // update objects
                 pstmtObjects.setString(1, uuidUri);
@@ -204,13 +204,13 @@ public class ObjectHashesFixer extends Thread{
 
             if (batchSize>0){
 
-//				logger.debug("Executing batch for objects");
+//              logger.debug("Executing batch for objects");
                 pstmtObjects.executeBatch();
-//				logger.debug("Executing batch for subjects");
+//              logger.debug("Executing batch for subjects");
                 pstmtSubjects.executeBatch();
-//				logger.debug("Executing batch for source-objects");
+//              logger.debug("Executing batch for source-objects");
                 pstmtSourceObjects.executeBatch();
-//				logger.debug("Executing batch for resources");
+//              logger.debug("Executing batch for resources");
                 pstmtResources.executeBatch();
             }
         }

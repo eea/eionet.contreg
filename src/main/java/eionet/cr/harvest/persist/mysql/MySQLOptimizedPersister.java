@@ -210,8 +210,8 @@ public class MySQLOptimizedPersister implements IHarvestPersister {
      *
      */
     private void deleteTempFiles() {
-//		new File(TEMP_FILE_NAME).delete();
-//		new File(SOURCE_TEMP_FILE).delete();
+//      new File(TEMP_FILE_NAME).delete();
+//      new File(SOURCE_TEMP_FILE).delete();
     }
 
     /*

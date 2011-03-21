@@ -85,7 +85,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO{
         List<SubjectDTO> resultList = new ArrayList<SubjectDTO>();
 
         // if subjectUris not empty, get the subjects data and set their dates
-        if (subjectUris != null && !subjectUris.isEmpty()){
+        if (subjectUris != null && !subjectUris.isEmpty()) {
 
             logger.trace("Recent uploads search, getting the data of the found subjects");
 
@@ -95,11 +95,11 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO{
 
             // only these predicates will be queried for
             String[] neededPredicates = null;
-            if(rdfType.equals(Subjects.ROD_OBLIGATION_CLASS)){
+            if(rdfType.equals(Subjects.ROD_OBLIGATION_CLASS)) {
                 //properties for obligations
                 String[] neededPredicatesObl = {Predicates.RDFS_LABEL, Predicates.ROD_ISSUE_PROPERTY, Predicates.ROD_INSTRUMENT_PROPERTY};
                 neededPredicates = neededPredicatesObl;
-            } else if(rdfType.equals(Subjects.ROD_DELIVERY_CLASS)){
+            } else if(rdfType.equals(Subjects.ROD_DELIVERY_CLASS)) {
                 //properties for deliveries
                 String[] neededPredicatesDeliveries = {Predicates.RDFS_LABEL, Predicates.ROD_OBLIGATION_PROPERTY, Predicates.ROD_LOCALITY_PROPERTY};
                 neededPredicates = neededPredicatesDeliveries;
@@ -109,8 +109,8 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO{
             resultList = getSubjectsData(subjectUris, neededPredicates, dataReader, null);
 
             // set dublin core date of found subjects
-            if(pairMap != null){
-                for (SubjectDTO subject : resultList){
+            if(pairMap != null) {
+                for (SubjectDTO subject : resultList) {
                     subject.setDcDate(pairMap.get(subject.getUri()));
                 }
             }
@@ -134,10 +134,10 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO{
     @Override
     public Collection<String> getPicklistForPredicate(String predicateUri)
             throws DAOException {
-    	if (StringUtils.isBlank(predicateUri)) {
-    		return Collections.emptyList();
-    	}
-    	StringBuilder strBuilder = new StringBuilder();
+        if (StringUtils.isBlank(predicateUri)) {
+            return Collections.emptyList();
+        }
+        StringBuilder strBuilder = new StringBuilder();
         strBuilder.append("SELECT distinct ?o WHERE { ?s <").append(predicateUri).append("> ?o FILTER isLiteral(?o) } ORDER BY ?o");
 
         long startTime = System.currentTimeMillis();
@@ -147,9 +147,9 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO{
         List<String> pickListObjects = executeSPARQL(strBuilder.toString(), new SingleObjectReader<String>());
 
         logger.trace("getPicklistForPredicate query took " + Util.durationSince(startTime));
-    	
+
         return pickListObjects;
-    	//throw new UnsupportedOperationException("Method not implemented");
+        //throw new UnsupportedOperationException("Method not implemented");
 
     }
 
@@ -187,7 +187,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO{
     @Override
     public String getSubjectSchemaUri(String subjectUri) throws DAOException {
 
-        if (StringUtils.isBlank(subjectUri)){
+        if (StringUtils.isBlank(subjectUri)) {
             return null;
         }
         StringBuilder strBuilder = new StringBuilder();
@@ -279,7 +279,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO{
     @Override
     public SubjectDTO getSubject(String subjectUri) throws DAOException {
 
-        if (StringUtils.isBlank(subjectUri)){
+        if (StringUtils.isBlank(subjectUri)) {
             return null;
         }
 
@@ -290,7 +290,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO{
         reader.setBlankNodeUriPrefix(VirtuosoBaseDAO.BNODE_URI_PREFIX);
 
         List<SubjectDTO> subjects = getSubjectsData(Collections.singletonList(subjectUri), null, reader, null);
-        return subjects==null || subjects.isEmpty() ? null : subjects.get(0);
+        return subjects == null || subjects.isEmpty() ? null : subjects.get(0);
     }
 
     /* (non-Javadoc)
