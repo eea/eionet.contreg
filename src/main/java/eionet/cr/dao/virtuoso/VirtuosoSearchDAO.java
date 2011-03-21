@@ -266,7 +266,9 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
         logger.trace("Search subjects in source, executing subject finder query: " + query);
 
         // execute the query
-        List<String> subjectUris = executeSPARQL(query, new SingleObjectReader<String>());
+        SingleObjectReader<String> matchReader = new SingleObjectReader<String>();
+        matchReader.setBlankNodeUriPrefix(VirtuosoBaseDAO.BNODE_URI_PREFIX);
+        List<String> subjectUris = executeSPARQL(query, matchReader);
 
         Integer totalMatchCount = Integer.valueOf(0);
         List<SubjectDTO> resultList = new ArrayList<SubjectDTO>();
@@ -277,7 +279,9 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
             logger.trace("Search subjects in sources, getting the data of the found subjects");
 
             // get the data of all found subjects
-            resultList = getSubjectsData(subjectUris, null, new SubjectDataReader(subjectUris), null);
+            SubjectDataReader dataReader = new SubjectDataReader(subjectUris);
+            dataReader.setBlankNodeUriPrefix(VirtuosoBaseDAO.BNODE_URI_PREFIX);
+            resultList = getSubjectsData(subjectUris, null, dataReader, null);
 
             // if paging required, get the total number of found subjects too
             if (pagingRequest!=null){
