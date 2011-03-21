@@ -78,6 +78,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO{
         logger.trace("Recent uploads search, executing subject finder query: " + sqlBuf.toString());
 
         RecentUploadsReader<String> matchReader = new RecentUploadsReader<String>();
+        matchReader.setBlankNodeUriPrefix(VirtuosoBaseDAO.BNODE_URI_PREFIX);
         List<String> subjectUris = executeSPARQL(sqlBuf.toString(), matchReader);
         Map<String,Date> pairMap = matchReader.getResultMap();
 
@@ -90,6 +91,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO{
 
             // get the data of all found subjects
             SubjectDataReader dataReader = new SubjectDataReader(subjectUris);
+            dataReader.setBlankNodeUriPrefix(VirtuosoBaseDAO.BNODE_URI_PREFIX);
 
             // only these predicates will be queried for
             String[] neededPredicates = null;
