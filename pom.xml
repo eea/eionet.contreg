@@ -385,7 +385,6 @@
             <groupId>virtuoso</groupId>
             <artifactId>virtjdbc</artifactId>
             <version>3.0</version>
-            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>commons-httpclient</groupId>

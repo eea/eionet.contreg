@@ -73,7 +73,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO{
         .append("select distinct ?s ?d where { ")
         .append("?s a <").append(rdfType).append("> . ")
         .append("OPTIONAL { ?s dc:date ?d } ")
-        .append("} ORDER BY DESC(?d)");
+        .append("} ORDER BY DESC(?d) LIMIT "+limit);
 
         logger.trace("Recent uploads search, executing subject finder query: " + sqlBuf.toString());
 

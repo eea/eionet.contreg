@@ -161,7 +161,7 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO{
             strBuilder.append(") ");
         }
 
-        strBuilder.append("OPTIONAL {?g <").append(Predicates.CR_LAST_MODIFIED).append("> ?t} ");
+        strBuilder.append("OPTIONAL { ?g <").append(Predicates.CR_LAST_MODIFIED).append("> ?t } ");
 
         strBuilder.append("}} ORDER BY ?s");
         return strBuilder.toString();
