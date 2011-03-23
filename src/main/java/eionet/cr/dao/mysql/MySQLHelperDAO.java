@@ -45,6 +45,7 @@ import eionet.cr.harvest.statistics.dto.HarvestUrgencyScoreDTO;
 import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
+import eionet.cr.util.ObjectLabelPair;
 import eionet.cr.util.URIUtil;
 import eionet.cr.util.Util;
 import eionet.cr.util.YesNoBoolean;
@@ -151,17 +152,17 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
      * @see eionet.cr.dao.HelperDAO#getPicklistForPredicate(java.lang.String)
      * {@inheritDoc}
      */
-    public Collection<String> getPicklistForPredicate(String predicateUri) throws DAOException {
-
-        if (StringUtils.isBlank(predicateUri)) {
-            return Collections.emptyList();
-        }
-
-        List<String> resultList = executeQuery(
-                sqlPicklist,
-                Collections.singletonList((Object)Hashes.spoHash(predicateUri)),
-                new SingleObjectReader<String>());
-        return resultList;
+    public Collection<ObjectLabelPair> getPicklistForPredicate(String predicateUri) throws DAOException {
+        return null;
+//        if (StringUtils.isBlank(predicateUri)) {
+//            return Collections.emptyList();
+//        }
+//
+//        List<String> resultList = executeQuery(
+//                sqlPicklist,
+//                Collections.singletonList((Object)Hashes.spoHash(predicateUri)),
+//                new SingleObjectReader<String>());
+//        return resultList;
     }
 
     /** */

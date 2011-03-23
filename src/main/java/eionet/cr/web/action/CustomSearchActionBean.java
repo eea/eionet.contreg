@@ -41,10 +41,12 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.SearchDAO;
+import eionet.cr.dao.util.UriLabelPair;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortOrder;
 import eionet.cr.util.SortingRequest;
+import eionet.cr.util.ObjectLabelPair;
 import eionet.cr.util.Util;
 import eionet.cr.util.pagination.Pagination;
 import eionet.cr.util.pagination.PagingRequest;
@@ -82,7 +84,10 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
     private String addedFilter;
     private String picklistFilter;
     private String removedFilter;
-    private Collection<String> picklist;
+    //private Collection<String> picklist;
+    
+    
+    private Collection<ObjectLabelPair> picklist;
 
     /**
      *
@@ -205,7 +210,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
      * @return
      * @throws DAOException
      */
-    public Collection<String> getPicklist() throws DAOException{
+    public Collection<ObjectLabelPair> getPicklist() throws DAOException{
         String picklistFilter = getPicklistFilter();
         if (!isShowPicklist()) {
             return null;

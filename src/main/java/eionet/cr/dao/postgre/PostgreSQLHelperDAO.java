@@ -75,6 +75,7 @@ import eionet.cr.harvest.statistics.dto.HarvestUrgencyScoreDTO;
 import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
+import eionet.cr.util.ObjectLabelPair;
 import eionet.cr.util.URIUtil;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
@@ -441,12 +442,13 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
     /** */
     private static final String sqlPicklist = "select distinct OBJECT from SPO" +
             " where PREDICATE=? and LIT_OBJ='Y' order by OBJECT asc";
+
     /*
      * (non-Javadoc)
      * @see eionet.cr.dao.HelperDAO#getPicklistForPredicate(java.lang.String)
      */
-    public Collection<String> getPicklistForPredicate(String predicateUri) throws DAOException {
-
+    public Collection<ObjectLabelPair> getPicklistForPredicate(String predicateUri) throws DAOException {
+/*
         if (StringUtils.isBlank(predicateUri)) {
             return Collections.emptyList();
         }
@@ -455,7 +457,8 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
                 sqlPicklist,
                 Collections.singletonList((Object)Hashes.spoHash(predicateUri)),
                 new SingleObjectReader<String>());
-        return resultList;
+*/
+        return null;
     }
 
     /*

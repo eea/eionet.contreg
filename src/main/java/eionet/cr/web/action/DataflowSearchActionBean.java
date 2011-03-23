@@ -44,6 +44,7 @@ import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortOrder;
 import eionet.cr.util.SortingRequest;
+import eionet.cr.util.ObjectLabelPair;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.web.util.ApplicationCache;
 import eionet.cr.web.util.columns.SearchResultColumn;
@@ -123,7 +124,7 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean<SubjectDT
     /**
      * @return the countries
      */
-    public Collection<String> getLocalities() {
+    public Collection<ObjectLabelPair> getLocalities() {
         return ApplicationCache.getLocalities();
     }
 

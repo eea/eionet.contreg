@@ -25,6 +25,7 @@ import eionet.cr.dto.UserHistoryDTO;
 import eionet.cr.harvest.statistics.dto.HarvestUrgencyScoreDTO;
 import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
 import eionet.cr.util.Pair;
+import eionet.cr.util.ObjectLabelPair;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.web.security.CRUser;
 
@@ -68,7 +69,7 @@ public interface HelperDAO extends DAO {
      * @return
      * @throws DAOException
      */
-    Collection<String> getPicklistForPredicate(String predicateUri) throws DAOException;
+    Collection<ObjectLabelPair> getPicklistForPredicate(String predicateUri) throws DAOException;
 
     /**
      *
