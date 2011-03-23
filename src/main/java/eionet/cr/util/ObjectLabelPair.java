@@ -10,20 +10,8 @@ public class ObjectLabelPair extends Pair<String, String> implements Comparable<
 
     @Override
     public int compareTo(ObjectLabelPair other) {
-        return getComparableStr().compareTo(other.getComparableStr());
+        return getRight().compareTo(other.getRight());
     }
 
-    /**
-     * Label by what the string is sorted by
-     * 
-     * @return
-     */
-    public String getComparableStr() {
-        if (!URLUtil.isURL(getRight())) {
-            return getRight();
-        }
-
-        return URIUtil.extractURILabel(getRight(), getRight());
-    }
-
+  
 }
