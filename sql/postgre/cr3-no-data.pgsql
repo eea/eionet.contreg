@@ -554,7 +554,7 @@ GRANT ALL ON SCHEMA public TO PUBLIC;
 REVOKE ALL ON TABLE harvest FROM PUBLIC;
 REVOKE ALL ON TABLE harvest FROM postgres;
 GRANT ALL ON TABLE harvest TO postgres;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE harvest TO cr3dev;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE harvest TO cr3user;
 
 
 --
@@ -564,7 +564,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE harvest TO cr3dev;
 REVOKE ALL ON SEQUENCE harvest_harvest_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE harvest_harvest_id_seq FROM postgres;
 GRANT ALL ON SEQUENCE harvest_harvest_id_seq TO postgres;
-GRANT ALL ON SEQUENCE harvest_harvest_id_seq TO cr3dev;
+GRANT ALL ON SEQUENCE harvest_harvest_id_seq TO cr3user;
 
 
 --
@@ -574,7 +574,7 @@ GRANT ALL ON SEQUENCE harvest_harvest_id_seq TO cr3dev;
 REVOKE ALL ON TABLE harvest_message FROM PUBLIC;
 REVOKE ALL ON TABLE harvest_message FROM postgres;
 GRANT ALL ON TABLE harvest_message TO postgres;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE harvest_message TO cr3dev;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE harvest_message TO cr3user;
 
 
 --
@@ -584,7 +584,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE harvest_message TO cr3dev;
 REVOKE ALL ON SEQUENCE harvest_message_harvest_message_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE harvest_message_harvest_message_id_seq FROM postgres;
 GRANT ALL ON SEQUENCE harvest_message_harvest_message_id_seq TO postgres;
-GRANT ALL ON SEQUENCE harvest_message_harvest_message_id_seq TO cr3dev;
+GRANT ALL ON SEQUENCE harvest_message_harvest_message_id_seq TO cr3user;
 
 
 --
@@ -594,7 +594,7 @@ GRANT ALL ON SEQUENCE harvest_message_harvest_message_id_seq TO cr3dev;
 REVOKE ALL ON TABLE harvest_source FROM PUBLIC;
 REVOKE ALL ON TABLE harvest_source FROM postgres;
 GRANT ALL ON TABLE harvest_source TO postgres;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE harvest_source TO cr3dev;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE harvest_source TO cr3user;
 
 
 --
@@ -604,7 +604,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE harvest_source TO cr3dev;
 REVOKE ALL ON SEQUENCE harvest_source_harvest_source_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE harvest_source_harvest_source_id_seq FROM postgres;
 GRANT ALL ON SEQUENCE harvest_source_harvest_source_id_seq TO postgres;
-GRANT ALL ON SEQUENCE harvest_source_harvest_source_id_seq TO cr3dev;
+GRANT ALL ON SEQUENCE harvest_source_harvest_source_id_seq TO cr3user;
 
 
 --
@@ -614,7 +614,7 @@ GRANT ALL ON SEQUENCE harvest_source_harvest_source_id_seq TO cr3dev;
 REVOKE ALL ON TABLE remove_source_queue FROM PUBLIC;
 REVOKE ALL ON TABLE remove_source_queue FROM postgres;
 GRANT ALL ON TABLE remove_source_queue TO postgres;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE remove_source_queue TO cr3dev;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE remove_source_queue TO cr3user;
 
 
 --
@@ -624,7 +624,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE remove_source_queue TO cr3dev;
 REVOKE ALL ON TABLE resource FROM PUBLIC;
 REVOKE ALL ON TABLE resource FROM postgres;
 GRANT ALL ON TABLE resource TO postgres;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE resource TO cr3dev;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE resource TO cr3user;
 
 
 --
@@ -634,7 +634,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE resource TO cr3dev;
 REVOKE ALL ON TABLE resource_temp FROM PUBLIC;
 REVOKE ALL ON TABLE resource_temp FROM postgres;
 GRANT ALL ON TABLE resource_temp TO postgres;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE resource_temp TO cr3dev;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE resource_temp TO cr3user;
 
 
 --
@@ -644,7 +644,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE resource_temp TO cr3dev;
 REVOKE ALL ON TABLE spo FROM PUBLIC;
 REVOKE ALL ON TABLE spo FROM postgres;
 GRANT ALL ON TABLE spo TO postgres;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE spo TO cr3dev;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE spo TO cr3user;
 
 
 --
@@ -654,7 +654,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE spo TO cr3dev;
 REVOKE ALL ON TABLE spo_binary FROM PUBLIC;
 REVOKE ALL ON TABLE spo_binary FROM postgres;
 GRANT ALL ON TABLE spo_binary TO postgres;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE spo_binary TO cr3dev;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE spo_binary TO cr3user;
 
 
 --
@@ -664,7 +664,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE spo_binary TO cr3dev;
 REVOKE ALL ON TABLE spo_temp FROM PUBLIC;
 REVOKE ALL ON TABLE spo_temp FROM postgres;
 GRANT ALL ON TABLE spo_temp TO postgres;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE spo_temp TO cr3dev;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE spo_temp TO cr3user;
 
 
 --
@@ -674,7 +674,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE spo_temp TO cr3dev;
 REVOKE ALL ON TABLE unfinished_harvest FROM PUBLIC;
 REVOKE ALL ON TABLE unfinished_harvest FROM postgres;
 GRANT ALL ON TABLE unfinished_harvest TO postgres;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE unfinished_harvest TO cr3dev;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE unfinished_harvest TO cr3user;
 
 
 --
@@ -684,7 +684,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE unfinished_harvest TO cr3dev;
 REVOKE ALL ON TABLE urgent_harvest_queue FROM PUBLIC;
 REVOKE ALL ON TABLE urgent_harvest_queue FROM postgres;
 GRANT ALL ON TABLE urgent_harvest_queue TO postgres;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE urgent_harvest_queue TO cr3dev;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE urgent_harvest_queue TO cr3user;
 
 
 --
