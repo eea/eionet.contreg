@@ -19,6 +19,12 @@ import eionet.cr.util.sesame.SPARQLResultSetBaseReader;
  */
 public class ObjectLabelReader extends SPARQLResultSetBaseReader<ObjectLabelPair> {
 
+    public ObjectLabelReader(boolean extractLabels) {
+        this.extractLabels = extractLabels;
+    }
+
+    private boolean extractLabels;
+
     /**
      * If label exists use label otherwise take last part of object URI
      */
@@ -31,9 +37,10 @@ public class ObjectLabelReader extends SPARQLResultSetBaseReader<ObjectLabelPair
             String labelStr = "";
             if (label != null && StringUtils.isNotBlank(label.stringValue())) {
                 labelStr = label.stringValue();
-                // object is literal
-            } else if (obj != null && StringUtils.isNotBlank(obj.stringValue())
-                    && !URIUtil.isSchemedURI(obj.stringValue())) {
+                // labels must not be extracted from URI or object is not URI:
+            } else if (!extractLabels
+                    || (obj != null && StringUtils.isNotBlank(obj.stringValue()) && !URIUtil.isSchemedURI(obj
+                            .stringValue()))) {
                 labelStr = obj.stringValue();
 
             } else {

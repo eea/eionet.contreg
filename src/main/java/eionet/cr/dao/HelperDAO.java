@@ -66,10 +66,11 @@ public interface HelperDAO extends DAO {
 
     /**
      * @param predicateUri
+     * @param extractLabels - if true, labels are extracted if label is URL
      * @return
      * @throws DAOException
      */
-    Collection<ObjectLabelPair> getPicklistForPredicate(String predicateUri) throws DAOException;
+    Collection<ObjectLabelPair> getPicklistForPredicate(String predicateUri, boolean extractLabels) throws DAOException;
 
     /**
      *

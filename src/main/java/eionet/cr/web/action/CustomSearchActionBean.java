@@ -226,11 +226,14 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
             picklist = ApplicationCache.getDataflows();
         } else if (Predicates.ROD_INSTRUMENT_PROPERTY.equals(uri)) {
             picklist = ApplicationCache.getInstruments();
+        }  else if (Predicates.CR_SCHEMA.equals(uri)) {
+            picklist = factory.getDao(HelperDAO.class).getPicklistForPredicate(
+                    getAvailableFilters().get(picklistFilter).getUri(), false);
         }
 
         if (picklist == null){
             picklist = factory.getDao(HelperDAO.class).getPicklistForPredicate(
-                    getAvailableFilters().get(picklistFilter).getUri());
+                    getAvailableFilters().get(picklistFilter).getUri(), true);
         }
 
 

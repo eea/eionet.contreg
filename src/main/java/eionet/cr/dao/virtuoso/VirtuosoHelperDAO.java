@@ -139,7 +139,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
      * @see eionet.cr.dao.HelperDAO#getPicklistForPredicate(java.lang.String)
      */
     @Override
-    public Collection<ObjectLabelPair> getPicklistForPredicate(String predicateUri) throws DAOException {
+    public Collection<ObjectLabelPair> getPicklistForPredicate(String predicateUri, boolean extractLabels) throws DAOException {
         if (StringUtils.isBlank(predicateUri)) {
             return Collections.emptyList();
         }
@@ -151,7 +151,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         long startTime = System.currentTimeMillis();
         logger.trace("getPicklistForPredicate query: " + strBuilder.toString());
 
-        ObjectLabelReader reader = new ObjectLabelReader();
+        ObjectLabelReader reader = new ObjectLabelReader(extractLabels);
         // execute the query, with the IN parameters
         executeSPARQL(strBuilder.toString(), reader);
 

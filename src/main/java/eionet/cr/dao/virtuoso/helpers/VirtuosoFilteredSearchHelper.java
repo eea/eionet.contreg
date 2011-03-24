@@ -117,7 +117,7 @@ public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
                     strBuilder.append(" . FILTER (").append(objectAlias).append(" = ").append(objectValue).append(")");
                 } else if (URIUtil.isSchemedURI(objectValue)) {
                     strBuilder.append(" . FILTER (").append(objectAlias).append(" = <").append(objectValue)
-                            .append(">)");
+                            .append("> || ").append(objectAlias).append(" = \"").append(objectValue).append("\")");
                     // TODO check if it is a number??
                 } else {
                     strBuilder.append(" . FILTER bif:contains(").append(objectAlias).append(", \"'").

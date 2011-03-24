@@ -152,7 +152,7 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
      * @see eionet.cr.dao.HelperDAO#getPicklistForPredicate(java.lang.String)
      * {@inheritDoc}
      */
-    public Collection<ObjectLabelPair> getPicklistForPredicate(String predicateUri) throws DAOException {
+    public Collection<ObjectLabelPair> getPicklistForPredicate(String predicateUri, boolean extractLabels) throws DAOException {
         return null;
 //        if (StringUtils.isBlank(predicateUri)) {
 //            return Collections.emptyList();

@@ -52,7 +52,7 @@ public class DataflowSearchPicklistCacheUpdater implements StatefulJob {
 
         try {
             Collection<ObjectLabelPair> localities = DAOFactory.get().getDao(HelperDAO.class).getPicklistForPredicate(
-                    Predicates.ROD_LOCALITY_PROPERTY);
+                    Predicates.ROD_LOCALITY_PROPERTY, true);
 
             ApplicationCache.updateDataflowPicklistCache(DAOFactory.get().getDao(HelperDAO.class)
                     .getDataflowSearchPicklist(), localities);

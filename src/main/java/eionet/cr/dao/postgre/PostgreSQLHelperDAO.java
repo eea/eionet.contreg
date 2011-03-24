@@ -447,7 +447,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
      * (non-Javadoc)
      * @see eionet.cr.dao.HelperDAO#getPicklistForPredicate(java.lang.String)
      */
-    public Collection<ObjectLabelPair> getPicklistForPredicate(String predicateUri) throws DAOException {
+    public Collection<ObjectLabelPair> getPicklistForPredicate(String predicateUri, boolean extractLabels) throws DAOException {
 /*
         if (StringUtils.isBlank(predicateUri)) {
             return Collections.emptyList();
