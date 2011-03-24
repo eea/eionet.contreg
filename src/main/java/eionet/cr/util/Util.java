@@ -88,16 +88,16 @@ public class Util {
      */
     public static String processStackTraceForHTML(String stackTrace) {
 
-        if (stackTrace==null || stackTrace.trim().length()==0)
+        if (stackTrace == null || stackTrace.trim().length() == 0)
             return stackTrace;
 
         StringBuffer buf = new StringBuffer();
         String[] stackFrames = getStackFrames(stackTrace);
-        for (int i=0; stackFrames!=null && i<stackFrames.length; i++) {
+        for (int i = 0; stackFrames != null && i < stackFrames.length; i++) {
             buf.append(stackFrames[i].replaceFirst("\t", "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")).append("<br/>");
         }
 
-        return buf.length()>0 ? buf.toString() : stackTrace;
+        return buf.length() > 0 ? buf.toString() : stackTrace;
     }
 
     /**
@@ -120,12 +120,12 @@ public class Util {
      */
     public static String arrayToString(Object[] array, String separator) {
 
-        if (array==null)
+        if (array == null)
             return null;
 
         StringBuffer buf = new StringBuffer();
-        for (int i=0; i<array.length; i++) {
-            if (i>0)
+        for (int i = 0; i < array.length; i++) {
+            if (i > 0)
                 buf.append(separator);
             buf.append(array[i].toString());
         }
@@ -140,10 +140,10 @@ public class Util {
      */
     public static String dateToString(java.util.Date date, String datePattern) {
 
-        if (date==null)
+        if (date == null)
             return null;
 
-        SimpleDateFormat formatter = datePattern==null ? new SimpleDateFormat() : new SimpleDateFormat(datePattern);
+        SimpleDateFormat formatter = datePattern == null ? new SimpleDateFormat() : new SimpleDateFormat(datePattern);
         return formatter.format(date);
     }
 
@@ -155,7 +155,7 @@ public class Util {
      */
     public static java.util.Date stringToDate(String str, String datePattern) {
 
-        if (str==null || str.trim().length()==0)
+        if (str == null || str.trim().length() == 0)
             return null;
 
         SimpleDateFormat formatter = new SimpleDateFormat(datePattern);
@@ -200,14 +200,14 @@ public class Util {
      */
     public static boolean hasWhiteSpace(String s) {
 
-        if (s==null || s.length()!=s.trim().length())
+        if (s == null || s.length() != s.trim().length()) {
             return true;
-        else{
+        } else {
             StringTokenizer st = new StringTokenizer(s);
             int count = 0;
-            for (; st.hasMoreTokens() && count<2; count++)
+            for (; st.hasMoreTokens() && count < 2; count++)
                 st.nextToken();
-            return count>1;
+            return count > 1;
         }
     }
 
@@ -217,7 +217,7 @@ public class Util {
      * @return
      */
     public static Object getFirst(Object[] array) {
-        return array!=null && array.length>0 ? array[0] : null;
+        return array != null && array.length > 0 ? array[0] : null;
     }
 
     /**
@@ -226,7 +226,7 @@ public class Util {
      * @return
      */
     public static String getFirst(String[] array) {
-        return array!=null && array.length>0 ? array[0] : null;
+        return array != null && array.length > 0 ? array[0] : null;
     }
 
     /**
@@ -236,20 +236,20 @@ public class Util {
      */
     public static String[] pruneUrls(String[] array) {
 
-        if (array==null || array.length==0)
+        if (array == null || array.length == 0)
             return array;
 
         ArrayList<String> list = new ArrayList<String>();
-        for (int i=0; i<array.length; i++) {
+        for (int i = 0; i < array.length; i++) {
             if (!URLUtil.isURL(array[i]))
                 list.add(array[i]);
         }
 
         if (list.isEmpty())
             return array;
-        else{
+        else {
             String[] result = new String[list.size()];
-            for (int i=0; i<list.size(); i++) {
+            for (int i = 0; i < list.size(); i++) {
                 result[i] = list.get(i);
             }
             return result;
@@ -264,16 +264,16 @@ public class Util {
      */
     public static Object findInAnyScope(PageContext pageContext, Class objectClass) {
 
-        if (pageContext==null || objectClass==null)
+        if (pageContext == null || objectClass == null)
             return null;
 
         int[] scopes = {PageContext.APPLICATION_SCOPE, PageContext.PAGE_SCOPE, PageContext.REQUEST_SCOPE, PageContext.SESSION_SCOPE};
-        for (int i=0; i<scopes.length; i++) {
+        for (int i = 0; i < scopes.length; i++) {
             Enumeration attrs = pageContext.getAttributeNamesInScope(scopes[i]);
-            while (attrs!=null && attrs.hasMoreElements()) {
+            while (attrs != null && attrs.hasMoreElements()) {
                 String name = (String)attrs.nextElement();
                 Object o = pageContext.getAttribute(name, scopes[i]);
-                if (o!=null && objectClass.isInstance(o)) {
+                if (o != null && objectClass.isInstance(o)) {
                     return o;
                 }
             }
@@ -316,9 +316,9 @@ public class Util {
      * @return
      */
     public static Object[] toArray(Object o) {
-        if (o==null)
+        if (o == null)
             return null;
-        else{
+        else {
             Object[] oo = new Object[1];
             oo[0] = o;
             return oo;
@@ -345,10 +345,10 @@ public class Util {
     public static String toCSV(Collection coll) {
 
         StringBuffer buf = new StringBuffer();
-        if (coll!=null) {
+        if (coll != null) {
             for (Iterator it = coll.iterator(); it.hasNext();) {
 
-                if (buf.length()>0) {
+                if (buf.length() > 0) {
                     buf.append(",");
                 }
                 buf.append(it.next());
@@ -364,10 +364,10 @@ public class Util {
      */
     public static Double toDouble(String s) {
 
-        if (s==null || s.trim().length()==0)
+        if (s == null || s.trim().length() == 0)
             return null;
-        else{
-            try{
+        else {
+            try {
                 return Double.valueOf(s);
             }
             catch (NumberFormatException nfe) {
@@ -382,10 +382,10 @@ public class Util {
      */
     public static String normalizeHTTPAcceptedLanguage(String httpAcceptedLanguage) {
 
-        if (httpAcceptedLanguage==null) {
+        if (httpAcceptedLanguage == null) {
             return httpAcceptedLanguage;
         }
-        else{
+        else {
             httpAcceptedLanguage = httpAcceptedLanguage.trim();
         }
 
@@ -400,10 +400,10 @@ public class Util {
         /* ignore language refinement (e.g. en-US, en_UK) which is separated either by '-' or '_' */
 
         j = result.indexOf("-");
-        if (j<0) {
+        if (j < 0) {
             j = result.indexOf("_");
         }
-        if (j>=0) {
+        if (j >= 0) {
             result = result.substring(0, j);
         }
 
@@ -438,13 +438,13 @@ public class Util {
 
         HashSet<String> acceptedLanguages = null;
 
-        if (acceptedLanguages==null) {
+        if (acceptedLanguages == null) {
 
             acceptedLanguages = new HashSet<String>();
 
             if (!StringUtils.isBlank(acceptLanguageHeader)) {
                 String[] languages = StringUtils.split(acceptLanguageHeader, ',');
-                for (int i=0; i<languages.length; i++) {
+                for (int i = 0; i < languages.length; i++) {
                     acceptedLanguages.add(Util.normalizeHTTPAcceptedLanguage(languages[i]));
                 }
             }
@@ -465,13 +465,13 @@ public class Util {
 
         List<LanguagePrioritySorter> acceptedLanguagesByPriority = null;
 
-        if (acceptedLanguagesByPriority==null) {
+        if (acceptedLanguagesByPriority == null) {
 
             acceptedLanguagesByPriority = new ArrayList<LanguagePrioritySorter>();
 
             if (!StringUtils.isBlank(acceptLanguageHeader)) {
                 String[] languages = StringUtils.split(acceptLanguageHeader, ',');
-                for (int i=0; i<languages.length; i++) {
+                for (int i = 0; i < languages.length; i++) {
                     LanguagePrioritySorter languagePriority = new LanguagePrioritySorter();
                     languagePriority.setPriority(Util.getHTTPAcceptedLanguageImportance(languages[i]));
                     languagePriority.setLanguageValue(Util.normalizeHTTPAcceptedLanguage(languages[i]));
@@ -481,7 +481,7 @@ public class Util {
 
             Collections.sort(acceptedLanguagesByPriority);
 
-            for (int a=0; a<acceptedLanguagesByPriority.size(); a++) {
+            for (int a = 0; a < acceptedLanguagesByPriority.size(); a++) {
                 returnValues.add(acceptedLanguagesByPriority.get(a).getLanguageValue());
             }
 
@@ -515,13 +515,13 @@ public class Util {
         int seconds = (int) ((duration / 1000) % 60);
         int milliseconds = (int) (duration % 1000);
         StringBuffer buf = new StringBuffer();
-        if (minutes>0) {
+        if (minutes > 0) {
             buf.append(minutes).append(" min ");
         }
         buf.append(seconds).append(".");
-        if (milliseconds<10)
+        if (milliseconds < 10)
             buf.append("00");
-        else if (milliseconds<100)
+        else if (milliseconds < 100)
             buf.append("0");
 
         return buf.append(milliseconds).append(" sec").toString();
@@ -557,10 +557,10 @@ public class Util {
         Pattern regex = Pattern.compile("[^\\s\"']+|\"([^\"]*)\"|'([^']*)'");
         Matcher regexMatcher = regex.matcher(subjectString.trim());
         while (regexMatcher.find()) {
-            if (regexMatcher.group(1)!=null) {
+            if (regexMatcher.group(1) != null) {
                 // Add double-quoted string without the quotes
                 matchList.add(regexMatcher.group(1));
-            } else if (regexMatcher.group(2)!=null) {
+            } else if (regexMatcher.group(2) != null) {
                 // Add single-quoted string without the quotes
                 matchList.add(regexMatcher.group(2));
             } else {
@@ -581,9 +581,9 @@ public class Util {
     public static <K,V> Set<K> getNullValueKeys(Map<K,V> map) {
 
         HashSet<K> result = new HashSet<K>();
-        if (map!=null && !map.isEmpty()) {
+        if (map != null && !map.isEmpty()) {
             for (Map.Entry<K,V> entry : map.entrySet()) {
-                if (entry.getValue()==null) {
+                if (entry.getValue() == null) {
                     result.add(entry.getKey());
                 }
             }
@@ -618,7 +618,7 @@ public class Util {
     * @param s
     * @return
     */
-   public static boolean isSurroundedWithQuotes(String s){
+   public static boolean isSurroundedWithQuotes(String s) {
        return s.startsWith("\"") && s.endsWith("\"");
    }
 }
