@@ -55,10 +55,10 @@ public class SingleObjectReader<T> extends ResultSetMixedReader<T> {
     @Override
     public void readRow(BindingSet bindingSet) {
 
-        if (bindingSet!=null && bindingSet.size()>0){
+        if (bindingSet != null && bindingSet.size() > 0) {
 
             Binding binding = bindingSet.iterator().next();
-            if (binding!=null){
+            if (binding != null) {
 
                 resultList.add((T)binding.getValue().stringValue());
             }

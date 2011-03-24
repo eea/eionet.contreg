@@ -35,12 +35,13 @@ public class UnicodeUtils {
     public static int getEntityReferenceDecimal(String entityReference) {
 
         String s = getEntityRefrenceMap().get(entityReference);
-        return s==null ? -1 : Integer.parseInt(s);
+        return s == null ? -1 : Integer.parseInt(s);
     }
 
     /**
-     * Parses the given string, replaces all occurrences of Unicode entity references with corresponding
-     * Java characters (primitive type char) and returns the resulting string.
+     * Parses the given string, replaces all occurrences of Unicode entity
+     * references with corresponding Java characters (primitive type char)
+     * and returns the resulting string.
      *
      * @param literal
      * @return
@@ -49,33 +50,33 @@ public class UnicodeUtils {
 
         int strLen = str.length();
         StringBuilder budiler = new StringBuilder();
-        for (int i=0; i<strLen; i++) {
+        for (int i = 0; i < strLen; i++) {
 
             char c = str.charAt(i);
 
-            if (c=='&') {
+            if (c == '&') {
                 int j = str.indexOf(";", i);
                 if (j > i) {
-                    char cc = str.charAt(i+1);
+                    char cc = str.charAt(i + 1);
                     int decimal = -1;
-                    if (cc=='#') {
+                    if (cc == '#') {
                         // handle Unicode decimal escape
-                        String sDecimal = str.substring(i+2, j);
+                        String sDecimal = str.substring(i + 2, j);
 
-                        try{
+                        try {
                             decimal = Integer.parseInt(sDecimal);
                         }
-                        catch (Exception e){}
+                        catch (Exception e) {}
                     }
-                    else{
+                    else {
                         // handle entity
-                        String ent = str.substring(i+1, j);
+                        String ent = str.substring(i + 1, j);
                         decimal = UnicodeUtils.getEntityReferenceDecimal(ent);
                     }
 
                     if (decimal >= 0) {
                         // if decimal was found, use the corresponding char. otherwise stick to c.
-                        c = (char)decimal;
+                        c = (char) decimal;
                         i = j;
                     }
                 }
@@ -91,11 +92,11 @@ public class UnicodeUtils {
      *
      * @return
      */
-    private static HashMap<String,String> getEntityRefrenceMap() {
+    private static HashMap<String, String> getEntityRefrenceMap() {
 
-        if (entityReferenceMap==null) {
+        if (entityReferenceMap == null) {
 
-            entityReferenceMap = new HashMap<String,String>();
+            entityReferenceMap = new HashMap<String, String>();
             entityReferenceMap.put("nbsp", "160");
             entityReferenceMap.put("iexcl", "161");
             entityReferenceMap.put("cent", "162");
