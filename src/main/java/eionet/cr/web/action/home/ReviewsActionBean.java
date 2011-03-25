@@ -59,48 +59,48 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
 
         setEnvironmentParams(this.getContext(), AbstractHomeActionBean.TYPE_REVIEWS, true);
 
-        if (this.getContext().getRequest().getParameter("addSave") != null){
-            if (isUserAuthorized()){
+        if (this.getContext().getRequest().getParameter("addSave") != null) {
+            if (isUserAuthorized()) {
                 add();
             } else {
                 addWarningMessage("User must be logged in to add a review.");
             }
         }
 
-        if (this.getContext().getRequest().getParameter("editSave") != null){
-            if (isUserAuthorized()){
+        if (this.getContext().getRequest().getParameter("editSave") != null) {
+            if (isUserAuthorized()) {
                 save();
             } else {
                 addWarningMessage("User must be logged in to save a review.");
             }
         }
 
-        if (this.getContext().getRequest().getParameter("delete") != null){
-            if (isUserAuthorized()){
+        if (this.getContext().getRequest().getParameter("delete") != null) {
+            if (isUserAuthorized()) {
                 deleteReviews();
             } else {
                 addWarningMessage("User must be logged in to delete reviews.");
             }
         }
 
-        if (this.getContext().getRequest().getParameter("deleteReview") != null){
-            if (isUserAuthorized()){
+        if (this.getContext().getRequest().getParameter("deleteReview") != null) {
+            if (isUserAuthorized()) {
                 deleteSingleReview();
             } else {
                 addWarningMessage("User must be logged in to delete a review.");
             }
         }
 
-        if (this.getContext().getRequest().getParameter("upload") != null){
-            if (isUserAuthorized()){
+        if (this.getContext().getRequest().getParameter("upload") != null) {
+            if (isUserAuthorized()) {
                 upload();
             } else {
                 addWarningMessage("User must be logged in to upload attachments.");
             }
         }
 
-        if (this.getContext().getRequest().getParameter("deleteAttachments") != null){
-            if (isUserAuthorized()){
+        if (this.getContext().getRequest().getParameter("deleteAttachments") != null) {
+            if (isUserAuthorized()) {
                 deleteAttachments();
             } else {
                 addWarningMessage("User must be logged in to delete attachments.");
@@ -114,30 +114,29 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
     /**
      *
      */
-    private void loadReview(){
+    private void loadReview() {
 
-        if (reviewId!=0){
+        if (reviewId != 0) {
             return;
         }
 
         String[] splits = getContext().getRequest().getRequestURL().toString().split("reviews/");
-        if (splits==null || splits.length<2){
+        if (splits == null || splits.length < 2) {
             reviewId = 0;
         }
         else{
             String reviewString = splits[1];
-            if (reviewString.contains("?")){
+            if (reviewString.contains("?")) {
                 reviewString = reviewString.split("?")[0];
             }
 
             try {
                 reviewId = Integer.parseInt(reviewString);
-                if (reviewId > 0){
+                if (reviewId > 0) {
                     setHomeContext(false); // Do not show tabs and headers.
                     reviewView = true;
                 }
-            }
-            catch (Exception ex){
+            } catch (Exception ex) {
                 reviewId = 0;
                 reviewView = true;
                 setHomeContext(false);
@@ -150,11 +149,11 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
      *
      */
     public void add() {
-        if (isUserAuthorized()){
+        if (isUserAuthorized()) {
             try {
                 reviewId = factory.getDao(HelperDAO.class).addReview(review, this.getUser());
                 addSystemMessage("Review successfully added.");
-            } catch (DAOException ex){
+            } catch (DAOException ex) {
                 logger.error(ex);
                 addWarningMessage("System error while adding a review. The review was not added.");
             }
@@ -167,11 +166,11 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
      *
      */
     public void save() {
-        if (isUserAuthorized()){
+        if (isUserAuthorized()) {
             try {
                 factory.getDao(HelperDAO.class).saveReview(reviewId, review, this.getUser());
                 addSystemMessage("Review successfully saved.");
-            } catch (DAOException ex){
+            } catch (DAOException ex) {
                 logger.error(ex);
                 addWarningMessage("System error while saving the review. The review was not saved.");
             }
@@ -184,15 +183,15 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
      * @throws DAOException
      */
     public void deleteReviews() throws DAOException{
-        if (isUserAuthorized()){
-            if (this.getContext().getRequest().getParameter("delete") != null){
+        if (isUserAuthorized()) {
+            if (this.getContext().getRequest().getParameter("delete") != null) {
                 if (reviewIds != null && !reviewIds.isEmpty()) {
                     try {
-                        for (int i=0; i<reviewIds.size(); i++){
+                        for (int i = 0; i < reviewIds.size(); i++) {
                             DAOFactory.get().getDao(HelperDAO.class).deleteReview(this.getUser(), reviewIds.get(i), true);
                         }
                         addSystemMessage("Selected reviews were deleted.");
-                    } catch (DAOException ex){
+                    } catch (DAOException ex) {
                         logger.error(ex);
                         addWarningMessage("System error occured during review deletion.");
                     }
@@ -209,14 +208,14 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
      * @throws DAOException
      */
     public void deleteSingleReview() throws DAOException{
-        if (isUserAuthorized()){
-            if (this.getContext().getRequest().getParameter("deleteReview") != null){
+        if (isUserAuthorized()) {
+            if (this.getContext().getRequest().getParameter("deleteReview") != null) {
                 try {
                     reviewId = Integer.parseInt(this.getContext().getRequest().getParameter("deleteReview"));
                     DAOFactory.get().getDao(HelperDAO.class).deleteReview(this.getUser(), reviewId, true);
                     addSystemMessage("Review #"+reviewId+" was deleted.");
                     reviewId = 0;
-                } catch (DAOException ex){
+                } catch (DAOException ex) {
                     logger.error(ex);
                     addWarningMessage("System error occured during review deletion.");
                 }
@@ -228,11 +227,11 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
 
     /**
      */
-    public void upload(){
+    public void upload() {
 
         logger.debug("Storing uploaded review attachment, file bean = " + attachment);
 
-        if (attachment==null){
+        if (attachment == null) {
             return;
         }
 
@@ -271,11 +270,11 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
             // finally, attempt to harvest the uploaded file's contents
             harvestUploadedFile(attachmentUri, attachment, null, getUserName());
         }
-        catch (DAOException daoe){
+        catch (DAOException daoe) {
             logger.error("Error when storing attachment", daoe);
             addSystemMessage("Error when storing attachment");
         }
-        catch (IOException ioe){
+        catch (IOException ioe) {
             logger.error("File could not be successfully uploaded", ioe);
             addSystemMessage("File could not be successfully uploaded");
         }
@@ -288,15 +287,15 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
     /**
      *
      */
-    public void deleteAttachments(){
-        if (isUserAuthorized()){
+    public void deleteAttachments() {
+        if (isUserAuthorized()) {
             try {
-                if (attachmentList != null && attachmentList.size()>0){
-                    for (int i=0; i<attachmentList.size(); i++){
+                if (attachmentList != null && attachmentList.size() > 0) {
+                    for (int i = 0; i < attachmentList.size(); i++) {
                         DAOFactory.get().getDao(HelperDAO.class).deleteAttachment(this.getUser(), 0, attachmentList.get(i));
                     }
                 }
-            } catch (DAOException ex){
+            } catch (DAOException ex) {
                 logger.error(ex);
                 addCautionMessage(ex.getMessage());
             }
@@ -324,18 +323,17 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
      */
     public ReviewDTO getReview() {
 
-        if (reviewView){
+        if (reviewView) {
             try {
                 review = DAOFactory.get().getDao(HelperDAO.class).getReview(new CRUser(getAttemptedUserName()), reviewId);
-                if (review.getReviewID()==0){
+                if (review.getReviewID() == 0) {
                     addCautionMessage("Review with this ID is not found.");
                     review = null;
                 } else {
                     // Load attachments list only when it is needed - viewing a review.
                     review.setAttachments(DAOFactory.get().getDao(HelperDAO.class).getReviewAttachmentList(new CRUser(getAttemptedUserName()), reviewId));
                 }
-            }
-            catch (DAOException ex){
+            } catch (DAOException ex) {
                 logger.error("Error when getting review", ex);
             }
         }
@@ -346,8 +344,8 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
     /**
      * @return
      */
-    public String getReviewContentHTML(){
-        if (review.getReviewContent() != null){
+    public String getReviewContentHTML() {
+        if (review.getReviewContent() != null) {
             return review.getReviewContent().replace("&", "&amp;").replace("<", "&lt;").replace("\r\n", "<br/>").replace("\n", "<br/>");
         } else {
             return "";
@@ -357,8 +355,8 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
     /**
      * @return
      */
-    public String getReviewContentForm(){
-        if (review.getReviewContent() != null){
+    public String getReviewContentForm() {
+        if (review.getReviewContent() != null) {
             return review.getReviewContent();
         } else {
             return "";
@@ -368,9 +366,9 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
     /**
      * @return
      */
-    public boolean isReviewContentPresent(){
-        if (review.getReviewContent() != null && review.getReviewContent().length()>0){
-            if (review.getReviewContent().replace(" ", "").length()>0) {
+    public boolean isReviewContentPresent() {
+        if (review.getReviewContent() != null && review.getReviewContent().length() > 0) {
+            if (review.getReviewContent().replace(" ", "").length() > 0) {
                 return true;
             } else {
                 return false;
@@ -407,12 +405,12 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
      */
     public List<ReviewDTO> getReviews() {
         try {
-            if (this.isUserAuthorized() && this.getUser() != null){
+            if (this.isUserAuthorized() && this.getUser() != null) {
                 return DAOFactory.get().getDao(HelperDAO.class).getReviewList(this.getUser());
             } else {
                 return DAOFactory.get().getDao(HelperDAO.class).getReviewList(new CRUser(this.getAttemptedUserName()));
             }
-        } catch (Exception ex){
+        } catch (Exception ex) {
             return null;
         }
     }

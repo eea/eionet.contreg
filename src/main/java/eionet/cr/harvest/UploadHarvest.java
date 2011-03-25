@@ -57,7 +57,7 @@ import eionet.cr.util.xml.XmlAnalysis;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class UploadHarvest extends Harvest{
+public class UploadHarvest extends Harvest {
 
     /** */
     private FileBean fileBean;
@@ -75,12 +75,12 @@ public class UploadHarvest extends Harvest{
      * @param dcTitle
      * @param userName
      */
-    public UploadHarvest(HarvestSourceDTO dto, FileBean fileBean, String dcTitle, String userName){
+    public UploadHarvest(HarvestSourceDTO dto, FileBean fileBean, String dcTitle, String userName) {
 
         this(dto.getUrl(), fileBean, dcTitle, userName);
 
         // set harvest log writer
-        int numOfResources = dto.getResources()==null ? 0 : dto.getResources();
+        int numOfResources = dto.getResources() == null ? 0 : dto.getResources();
         setDaoWriter(new HarvestDAOWriter(
                 dto.getSourceId(), Harvest.TYPE_PUSH, numOfResources, userName));
     }
@@ -90,13 +90,13 @@ public class UploadHarvest extends Harvest{
      * @param sourceUrlString
      * @param fileBean
      */
-    public UploadHarvest(String sourceUrlString, FileBean fileBean, String dcTitle, String userName){
+    public UploadHarvest(String sourceUrlString, FileBean fileBean, String dcTitle, String userName) {
 
         // call super-class constructor
         super(sourceUrlString);
 
         // make sure file bean is not null
-        if (fileBean==null){
+        if (fileBean == null) {
             throw new IllegalArgumentException("File bean must not be null");
         }
 
@@ -110,7 +110,7 @@ public class UploadHarvest extends Harvest{
                 new ObjectDTO(String.valueOf(fileBean.getSize()), true));
 
         String contentType = fileBean.getContentType();
-        if (!StringUtils.isBlank(contentType)){
+        if (!StringUtils.isBlank(contentType)) {
             sourceMetadata.addObject(Predicates.CR_MEDIA_TYPE,
                     new ObjectDTO(fileBean.getContentType(), true));
         }
@@ -118,7 +118,7 @@ public class UploadHarvest extends Harvest{
         sourceMetadata.addObject(Predicates.CR_LAST_MODIFIED, new ObjectDTO(
                 lastRefreshedDateFormat.format(new Date()), true));
 
-        if (!StringUtils.isBlank(dcTitle)){
+        if (!StringUtils.isBlank(dcTitle)) {
             sourceMetadata.addObject(Predicates.DC_TITLE, new ObjectDTO(dcTitle, true));
         }
     }
@@ -127,9 +127,9 @@ public class UploadHarvest extends Harvest{
      *
      * @throws HarvestException
      */
-    public void createDaoWriter(HarvestSourceDTO dto) throws HarvestException{
+    public void createDaoWriter(HarvestSourceDTO dto) throws HarvestException {
 
-        int numOfResources = dto.getResources()==null ? 0 : dto.getResources();
+        int numOfResources = dto.getResources() == null ? 0 : dto.getResources();
         setDaoWriter(new HarvestDAOWriter(
                 dto.getSourceId(), Harvest.TYPE_PUSH, numOfResources, userName));
     }
@@ -138,7 +138,7 @@ public class UploadHarvest extends Harvest{
      * (non-Javadoc)
      * @see eionet.cr.harvest.Harvest#doExecute()
      */
-    protected void doExecute() throws HarvestException{
+    protected void doExecute() throws HarvestException {
 
         CurrentHarvests.addOnDemandHarvest(sourceUrlString, userName);
 
@@ -147,12 +147,12 @@ public class UploadHarvest extends Harvest{
         File convertedFile = null;
         InputStream inputStream = null;
 
-        try{
+        try {
             ARPSource arpSource = null;
             XmlAnalysis xmlAnalysis = parse();
 
             // if file is XML
-            if (xmlAnalysis!=null){
+            if (xmlAnalysis!=null) {
 
                 logger.debug("File is XML, trying conversion");
 
@@ -160,42 +160,36 @@ public class UploadHarvest extends Harvest{
                 // otherwise construct it from original file
 
                 convertedFile = convert(xmlAnalysis, fileBean);
-                if (convertedFile!=null && convertedFile.exists()){
+                if (convertedFile!=null && convertedFile.exists()) {
 
                     logger.debug("Converted file will be harvested");
                     inputStream = new FileInputStream(convertedFile);
-                }
-                else{
+                } else {
                     logger.debug("No conversion made, will harvest the file as it is");
                     inputStream = fileBean.getInputStream();
                 }
 
                 // create ARP source from input stream
                 arpSource = new InputStreamBasedARPSource(inputStream);
-            }
-            else{
+            } else {
                 logger.debug("File is not XML");
             }
 
             // harvest ARP source (which in the case of non-XML files is null)
             harvest(arpSource, true);
-        }
-        catch (ParserConfigurationException e){
+        } catch (ParserConfigurationException e) {
             throw new HarvestException(e.toString(), e);
-        }
-        catch (IOException e){
+        } catch (IOException e) {
             throw new HarvestException(e.toString(), e);
-        }
-        catch (SAXException e){
+        } catch (SAXException e) {
             throw new HarvestException(e.toString(), e);
-        }
-        finally{
+        } finally {
 
-            if (inputStream!=null){
-                try{inputStream.close();}catch (IOException ioe){}
+            if (inputStream!=null) {
+                try {inputStream.close();} catch (IOException ioe) {}
             }
 
-            if (convertedFile!=null && convertedFile.exists()){
+            if (convertedFile!=null && convertedFile.exists()) {
                 convertedFile.delete();
             }
 
@@ -208,21 +202,19 @@ public class UploadHarvest extends Harvest{
      * @return
      * @throws ParserConfigurationException
      */
-    private XmlAnalysis parse() throws ParserConfigurationException{
+    private XmlAnalysis parse() throws ParserConfigurationException {
 
         Exception parsingException = null;
         XmlAnalysis xmlAnalysis = new XmlAnalysis();
         try {
             xmlAnalysis.parse(fileBean);
-        }
-        catch (SAXException e) {
+        } catch (SAXException e) {
             parsingException = e;
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             parsingException = e;
         }
 
-        if (parsingException!=null){
+        if (parsingException!=null) {
 
             logger.debug("Error when parsing as XML: " + parsingException.toString());
             return null;
@@ -240,11 +232,11 @@ public class UploadHarvest extends Harvest{
      * @throws SAXException
      * @throws IOException
      */
-    private File convert(XmlAnalysis xmlAnalysis, FileBean fileBean) throws IOException, SAXException, ParserConfigurationException{
+    private File convert(XmlAnalysis xmlAnalysis, FileBean fileBean) throws IOException, SAXException, ParserConfigurationException {
 
         // detect conversion id, if it's blank then return null, as no point in going further
         String conversionId = getConversionId(xmlAnalysis);
-        if (StringUtils.isBlank(conversionId)){
+        if (StringUtils.isBlank(conversionId)) {
             return null;
         }
 
@@ -275,14 +267,13 @@ public class UploadHarvest extends Harvest{
         InputStream inputStream = null;
         OutputStream outputStream = null;
         File convertedFile = new File(renamedFile.getAbsolutePath() + ".converted");
-        try{
+        try {
             logger.debug("Storing conversion response to " + convertedFile);
 
             inputStream = response.getEntity().getContent();
             outputStream = new FileOutputStream(convertedFile);
             IOUtils.copy(inputStream, outputStream);
-        }
-        finally{
+        } finally {
             IOUtils.closeQuietly(inputStream);
             IOUtils.closeQuietly(outputStream);
         }
@@ -299,29 +290,29 @@ public class UploadHarvest extends Harvest{
      * @throws ParserConfigurationException
      */
     private String getConversionId(
-            XmlAnalysis xmlAnalysis) throws IOException,SAXException, ParserConfigurationException{
+            XmlAnalysis xmlAnalysis) throws IOException,SAXException, ParserConfigurationException {
 
         String result = null;
 
         // Get schema uri, if it's not found then fall back to DTD.
         String schemaOrDtd = xmlAnalysis.getSchemaLocation();
-        if (schemaOrDtd==null || schemaOrDtd.length()==0){
+        if (schemaOrDtd == null || schemaOrDtd.length() == 0) {
             schemaOrDtd = xmlAnalysis.getSystemDtd();
-            if (schemaOrDtd==null || !URLUtil.isURL(schemaOrDtd)){
+            if (schemaOrDtd == null || !URLUtil.isURL(schemaOrDtd)) {
                 schemaOrDtd = xmlAnalysis.getPublicDtd();
             }
         }
 
         // If no schema or DTD still found, assume the URI of the starting element
         // to be the schema by which conversions should be looked for.
-        if (schemaOrDtd==null || schemaOrDtd.length()==0){
+        if (schemaOrDtd == null || schemaOrDtd.length() == 0) {
             schemaOrDtd = xmlAnalysis.getStartElemUri();
         }
 
         // If schema or DTD found, and it's not rdf:DRF, then get its RDF conversion ID,
         // otherwise assume the file is RDF and return.
-        if (schemaOrDtd!=null && schemaOrDtd.length()>0
-                && !schemaOrDtd.equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#RDF")){
+        if (schemaOrDtd!=null && schemaOrDtd.length() > 0
+                && !schemaOrDtd.equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#RDF")) {
 
             sourceMetadata.addObject(Predicates.CR_SCHEMA, new ObjectDTO(schemaOrDtd, false));
             result = ConversionsParser.getRdfConversionId(schemaOrDtd);

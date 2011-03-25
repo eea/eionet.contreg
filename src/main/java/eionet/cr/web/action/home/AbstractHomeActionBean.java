@@ -43,7 +43,7 @@ public abstract class AbstractHomeActionBean extends AbstractActionBean {
 
     /** */
     protected static List<Map<String, String>> tabs;
-    private static final Map<String,List<SearchResultColumn>> typesColumns;
+    private static final Map<String, List<SearchResultColumn>> typesColumns;
 
     // Note: attemptedUserName might be used in some situations where showPublic = true and content of that user is visible to everyone.
     private String attemptedUserName;
@@ -61,41 +61,41 @@ public abstract class AbstractHomeActionBean extends AbstractActionBean {
     private boolean showPublic;
 
     static {
-        tabs = new ArrayList<Map<String,String>>();
+        tabs = new ArrayList<Map<String, String>>();
 
-        Map<String,String> tabType;
+        Map<String, String> tabType;
 
-        tabType = new HashMap<String,String>();
+        tabType = new HashMap<String, String>();
         tabType.put("title", "Uploads");
         tabType.put("tabType", "uploads");
         tabType.put("showPublic", SHOWPUBLIC_YES);
         tabs.add(tabType);
 
-        tabType = new HashMap<String,String>();
+        tabType = new HashMap<String, String>();
         tabType.put("title", "Bookmarks");
         tabType.put("tabType", "bookmark");
         tabType.put("showPublic", SHOWPUBLIC_YES);
         tabs.add(tabType);
 
-        tabType = new HashMap<String,String>();
+        tabType = new HashMap<String, String>();
         tabType.put("title", "Registrations");
         tabType.put("tabType", "registrations");
         tabType.put("showPublic", SHOWPUBLIC_YES);
         tabs.add(tabType);
 
-        tabType = new HashMap<String,String>();
+        tabType = new HashMap<String, String>();
         tabType.put("title", "History");
         tabType.put("tabType", "history");
         tabType.put("showPublic", SHOWPUBLIC_YES);
         tabs.add(tabType);
 
-        tabType = new HashMap<String,String>();
+        tabType = new HashMap<String, String>();
         tabType.put("title", "Reviews");
         tabType.put("tabType", "reviews");
         tabType.put("showPublic", SHOWPUBLIC_YES);
         tabs.add(tabType);
 
-        typesColumns = new HashMap<String,List<SearchResultColumn>>();
+        typesColumns = new HashMap<String, List<SearchResultColumn>>();
 
         /* columns for bookmarks */
         List<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
@@ -117,7 +117,7 @@ public abstract class AbstractHomeActionBean extends AbstractActionBean {
 
     }
 
-    public AbstractHomeActionBean(){
+    public AbstractHomeActionBean() {
         setHomeContext(true);
         //setUrlParams();
     }
@@ -129,8 +129,8 @@ public abstract class AbstractHomeActionBean extends AbstractActionBean {
         attemptedUserName = context.getRequest().getParameter("username");
         section = activeSection;
         setDefaultSection();
-        if (this.isUserLoggedIn()){
-            if (attemptedUserName.toLowerCase().equals(this.getUser().getUserName().toLowerCase())){
+        if (this.isUserLoggedIn()) {
+            if (attemptedUserName.toLowerCase().equals(this.getUser().getUserName().toLowerCase())) {
                 userAuthorized = true;
                 authenticatedUserName = attemptedUserName;
             } else {
@@ -146,14 +146,14 @@ public abstract class AbstractHomeActionBean extends AbstractActionBean {
         baseHomeUrl = StringUtils.substringAfter(s, context.getRequest().getContextPath());
     }
 
-    private void setDefaultSection(){
-        if (section == null ||
-            (!section.equals(TYPE_BOOKMARK)&&
-            !section.equals(TYPE_UPLOADS)&&
-            !section.equals(TYPE_HISTORY)&&
-            !section.equals(TYPE_REGISTRATIONS)&&
-            !section.equals(TYPE_REVIEWS))
-        ){
+    private void setDefaultSection() {
+        if (section == null
+            || (!section.equals(TYPE_BOOKMARK)
+            && !section.equals(TYPE_UPLOADS)
+            && !section.equals(TYPE_HISTORY)
+            && !section.equals(TYPE_REGISTRATIONS)
+            && !section.equals(TYPE_REVIEWS))
+        ) {
             section = TYPE_UPLOADS;
         }
     }
@@ -163,7 +163,7 @@ public abstract class AbstractHomeActionBean extends AbstractActionBean {
      */
     public String getTabType() {
 
-        if (tabType == null){
+        if (tabType == null) {
             tabType = TYPE_UPLOADS;
         }
 
@@ -256,7 +256,7 @@ public abstract class AbstractHomeActionBean extends AbstractActionBean {
      * @param uploadedFile
      * @param dcTitle
      */
-    protected void harvestUploadedFile(String sourceUrl, FileBean uploadedFile, String dcTitle, String userName){
+    protected void harvestUploadedFile(String sourceUrl, FileBean uploadedFile, String dcTitle, String userName) {
 
         // create and store harvest source for the above source url,
         // don't throw exceptions, as an uploaded file does not have to be harvestable
@@ -266,25 +266,22 @@ public abstract class AbstractHomeActionBean extends AbstractActionBean {
             HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
             dao.addSourceIgnoreDuplicate(sourceUrl, 0, false, null);
             hSourceDTO = dao.getHarvestSourceByUrl(sourceUrl);
-        }
-        catch (DAOException e){
-            logger.info("Exception when trying to create" +
-                    "harvest source for the uploaded file content", e);
+        } catch (DAOException e) {
+            logger.info("Exception when trying to create"
+                + "harvest source for the uploaded file content", e);
         }
 
         // perform harvest,
         // don't throw exceptions, as an uploaded file does not HAVE to be harvestable
-        try{
-            if (hSourceDTO!=null){
+        try {
+            if (hSourceDTO!=null) {
                 UploadHarvest uploadHarvest =
                     new UploadHarvest(hSourceDTO, uploadedFile, dcTitle, userName);
                 uploadHarvest.execute();
-            }
-            else{
+            } else {
                 logger.debug("Harvest source was not created, so skipping harvest");
             }
-        }
-        catch (HarvestException e) {
+        } catch (HarvestException e) {
             logger.info("Exception when trying to harvest uploaded file content", e);
         }
     }
@@ -293,13 +290,12 @@ public abstract class AbstractHomeActionBean extends AbstractActionBean {
      *
      * @param uploadedFile
      */
-    protected void deleteUploadedFile(FileBean uploadedFile){
+    protected void deleteUploadedFile(FileBean uploadedFile) {
 
-        if (uploadedFile!=null){
-            try{
+        if (uploadedFile!=null) {
+            try {
                 uploadedFile.delete();
-            }
-            catch (IOException e){
+            } catch (IOException e) {
                 logger.error("Failed to delete uploaded file [" + uploadedFile + "]", e);
             }
         }

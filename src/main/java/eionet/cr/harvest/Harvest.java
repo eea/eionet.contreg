@@ -106,11 +106,11 @@ public abstract class Harvest {
      *
      * @param sourceUrlString
      */
-    protected Harvest(String sourceUrlString){
+    protected Harvest(String sourceUrlString) {
 
-        if (sourceUrlString==null)
+        if (sourceUrlString == null)
             throw new IllegalArgumentException("Harvest source URL cannot be null");
-        else if (sourceUrlString.indexOf("#")>=0){
+        else if (sourceUrlString.indexOf("#") >= 0) {
             throw new IllegalArgumentException("Harvest source URL must no contain a fragment part");
         }
 
@@ -123,23 +123,21 @@ public abstract class Harvest {
      *
      * @throws HarvestException
      */
-    public void execute() throws HarvestException{
+    public void execute() throws HarvestException {
 
-        try{
+        try {
             doHarvestStartedActions();
             doExecute();
-        }
-        catch (Exception e){
+        } catch (Exception e) {
 
             fatalError = e;
-            try{ logger.error("Exception when harvesting [" + sourceUrlString + "]: " + e.toString(), e); }catch (Exception ee){}
+            try { logger.error("Exception when harvesting [" + sourceUrlString + "]: " + e.toString(), e); } catch (Exception ee) {}
 
             if (e instanceof HarvestException)
                 throw (HarvestException)e;
             else
                 throw new HarvestException(e.toString(), e);
-        }
-        finally{
+        } finally {
             doHarvestFinishedActions();
         }
     }
@@ -155,7 +153,7 @@ public abstract class Harvest {
      * @param arpSource
      * @throws HarvestException
      */
-    protected void harvest(ARPSource arpSource) throws HarvestException{
+    protected void harvest(ARPSource arpSource) throws HarvestException {
         harvest(arpSource, false);
     }
 
@@ -167,10 +165,10 @@ public abstract class Harvest {
      * @param ignoreParsingError
      * @throws HarvestException
      */
-    protected void harvest(ARPSource arpSource, boolean ignoreParsingError) throws HarvestException{
+    protected void harvest(ARPSource arpSource, boolean ignoreParsingError) throws HarvestException {
 
         RDFHandler rdfHandler = null;
-        try{
+        try {
 
             PersisterConfig config = new PersisterConfig(
                     deriveInferredTriples,
@@ -182,27 +180,25 @@ public abstract class Harvest {
                     null);
             rdfHandler = createRDFHandler(config);
             DefaultErrorHandler errorHandler = new DefaultErrorHandler();
-            if (arpSource!=null){
+            if (arpSource != null) {
                 ARP arp = new ARP();
                 arp.setStatementHandler(rdfHandler);
                 arp.setErrorHandler(errorHandler);
 
-                if (!ignoreParsingError){
+                if (!ignoreParsingError) {
                     arpSource.load(arp, sourceUrlString);
                 }
-                else{
-                    try{
+                else {
+                    try {
                         arpSource.load(arp, sourceUrlString);
-                    }
-                    catch (SAXException e){
+                    } catch (SAXException e) {
                         logger.info("Following exception happened when parsing as RDF", e);
-                    }
-                    catch (RDFLoadingException e){
+                    } catch (RDFLoadingException e) {
                         Throwable cause = e.getCause();
-                        if (cause instanceof SAXParseException){
+                        if (cause instanceof SAXParseException) {
                             logger.info("Following exception happened when parsing as RDF", e);
                         }
-                        else{
+                        else {
                             throw e;
                         }
                     }
@@ -210,20 +206,20 @@ public abstract class Harvest {
             }
 
             rdfContentFound = rdfHandler.isRdfContentFound();
-            if (rdfContentFound==false){
+            if (rdfContentFound == false) {
                 logger.debug("No content found by RDF parser");
             }
 
-            if (sourceMetadata.getPredicateCount()>0){
+            if (sourceMetadata.getPredicateCount() > 0) {
                 logger.debug("Storing auto-generated triples for the source");
                 rdfHandler.addSourceMetadata(sourceMetadata);
             }
 
             rdfHandler.endOfFile();
 
-            if (errorHandler.getSaxError()!=null)
+            if (errorHandler.getSaxError() != null)
                 errors.add(errorHandler.getSaxError());
-            if (errorHandler.getSaxWarning()!=null)
+            if (errorHandler.getSaxWarning() != null)
                 warnings.add(errorHandler.getSaxWarning());
 
             rdfHandler.commit();
@@ -234,35 +230,31 @@ public abstract class Harvest {
 
             logger.debug("Harvest committed. " + storedTriplesCount + " triples stored. "
                     + distinctSubjectsCount + " subjects found in source");
-        }
-        catch (Exception e){
+        } catch (Exception e) {
 
-            try{logger.error("Harvest error: " + e.toString());}catch (Exception ee){}
+            try {logger.error("Harvest error: " + e.toString());} catch (Exception ee) {}
 
-            if (e instanceof SQLException){
+            if (e instanceof SQLException) {
                 logger.error("Next exception: ", ((SQLException)e).getNextException());
             }
 
-            if (rdfHandler!=null){
-                try{
+            if (rdfHandler != null) {
+                try {
                     rdfHandler.rollback();
-                }
-                catch (Exception ee){
+                } catch (Exception ee) {
                     logger.fatal("Harvest rollback failed", ee);
                     // TODO - handle rollback failure somehow
                     // (e.g. send e-mail notification, store failure into database and retry rollback at later harvests)
                 }
             }
 
-            Throwable t = (e instanceof RDFLoadingException) && e.getCause()!=null ? e.getCause() : e;
+            Throwable t = (e instanceof RDFLoadingException) && e.getCause() != null ? e.getCause() : e;
             throw new HarvestException(t.toString(), t);
-        }
-        finally{
-            if (rdfHandler!=null){
-                try{
+        } finally {
+            if (rdfHandler != null) {
+                try {
                     rdfHandler.closeResources();
-                }
-                catch (Exception e){}
+                } catch (Exception e) {}
             }
         }
     }
@@ -270,7 +262,7 @@ public abstract class Harvest {
     /**
      *
      */
-    protected RDFHandler createRDFHandler(PersisterConfig config){
+    protected RDFHandler createRDFHandler(PersisterConfig config) {
         return new RDFHandler(config);
     }
 
@@ -279,9 +271,9 @@ public abstract class Harvest {
      * @param sourceUrl
      * @return
      */
-    protected static File fullFilePathForSourceUrl(String sourceUrl){
+    protected static File fullFilePathForSourceUrl(String sourceUrl) {
 
-        if (StringUtils.isBlank(sourceUrl)){
+        if (StringUtils.isBlank(sourceUrl)) {
             return null;
         }
 
@@ -309,14 +301,13 @@ public abstract class Harvest {
     /**
      * @throws HarvestException
      */
-    protected void doHarvestStartedActions() throws HarvestException{
+    protected void doHarvestStartedActions() throws HarvestException {
 
-        try{
-            if (daoWriter!=null){
+        try {
+            if (daoWriter != null) {
                 daoWriter.writeStarted(this);
             }
-        }
-        catch (DAOException e){
+        } catch (DAOException e) {
             throw new HarvestException(e.toString(), e);
         }
     }
@@ -325,16 +316,15 @@ public abstract class Harvest {
      * Saves the "harvest-finished" status and any harvest error/warning messages into the database,
      * and sends e-mail notification of those messages.
      */
-    protected void doHarvestFinishedActions(){
+    protected void doHarvestFinishedActions() {
 
         // send e-mail notification of messages that occurred DURING the harvest
         // (see below about messages that occurred AFTER the harvest)
-        try{
-            if (notificationSender!=null){
+        try {
+            if (notificationSender != null) {
                 notificationSender.notifyMessages(this);
             }
-        }
-        catch (HarvestException e){
+        } catch (HarvestException e) {
             errors.add(e);
             logger.error("Harvest notification sender threw an error: " + e.toString(), e);
         }
@@ -344,19 +334,17 @@ public abstract class Harvest {
         ArrayList<Throwable> finishingErrors  = new ArrayList<Throwable>();
 
         // log harvest finished event into the database
-        if (daoWriter!=null){
-            try{
+        if (daoWriter != null) {
+            try {
                 daoWriter.writeFinished(this);
-            }
-            catch (DAOException e){
+            } catch (DAOException e) {
                 errors.add(e);
                 finishingErrors.add(e);
                 logger.error("Harvest DAO writer threw an exception: " + e.toString(), e);
             }
-            try{
+            try {
                 daoWriter.writeMessages(this);
-            }
-            catch (DAOException e){
+            } catch (DAOException e) {
                 errors.add(e);
                 finishingErrors.add(e);
                 logger.error("Harvest DAO writer threw an exception: " + e.toString(), e);
@@ -364,12 +352,11 @@ public abstract class Harvest {
         }
 
         // send e-mail notification of finishing errors
-        try{
-            if (notificationSender!=null && finishingErrors.size()>0){
+        try {
+            if (notificationSender != null && finishingErrors.size() > 0) {
                 notificationSender.notifyMessagesAfterHarvest(finishingErrors, this);
             }
-        }
-        catch (HarvestException ee){
+        } catch (HarvestException ee) {
             logger.error("Harvest notification sender threw an error: " + ee.toString(), ee);
         }
 
