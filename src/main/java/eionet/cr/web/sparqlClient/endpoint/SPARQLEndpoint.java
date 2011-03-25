@@ -1,5 +1,8 @@
 package eionet.cr.web.sparqlClient.endpoint;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.List;
 
 import javax.ws.rs.FormParam;
@@ -8,9 +11,10 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.StreamingOutput;
 
-import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang.StringUtils;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.QueryLanguage;
@@ -35,41 +39,81 @@ public class SPARQLEndpoint {
     // This method is called if XML is request
     @GET
     @Produces( {"application/sparql-results+xml", MediaType.APPLICATION_XML, "application/rdf+xml"})
-    public String queryXml(@QueryParam("query") String query) {
-        return runQuery(query, FORMAT_XML);
+    public StreamingOutput queryXml(@QueryParam("query") String query) {
+        final String q = query;
+        return new StreamingOutput() {
+            @Override
+            public void write(OutputStream output) throws IOException, WebApplicationException {
+                try {
+                    runQuery(q, FORMAT_XML, output);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
     }
     
     // This method is called if XML is request
     @GET
     @Produces("application/sparql-results+json")
-    public String queryJson(@QueryParam("query") String query) {
-        return runQuery(query, FORMAT_JSON);
+    public StreamingOutput queryJson(@QueryParam("query") String query) {
+        final String q = query;
+        return new StreamingOutput() {
+            @Override
+            public void write(OutputStream output) throws IOException, WebApplicationException {
+                try {
+                    runQuery(q, FORMAT_JSON, output);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
     }
 
     // This method is called if HTML is request
     @GET
     @Produces(MediaType.TEXT_HTML)
-    public String query(@QueryParam("query") String query, @QueryParam("format") String format) {
-        if(format != null && format.equals(FORMAT_XML))
-            return runQuery(query, FORMAT_XML);
-        else if(format != null && format.equals(FORMAT_JSON))
-            return runQuery(query, FORMAT_JSON);
-        else
-            return "<html><title>" + "Query result" + "</title><body>" + runQuery(query, FORMAT_HTML) + "</body></html> ";
+    public StreamingOutput query(@QueryParam("query") String query, @QueryParam("format") String format) {
+        
+        final String q = query;
+        final String f = format;
+        
+        return new StreamingOutput() {
+            @Override
+            public void write(OutputStream output) throws IOException, WebApplicationException {
+                try {
+                    if(f != null && f.equals(FORMAT_XML))
+                        runQuery(q, FORMAT_XML, output);
+                    else if(f != null && f.equals(FORMAT_JSON))
+                        runQuery(q, FORMAT_JSON, output);
+                    else
+                        runQuery(q, FORMAT_HTML, output);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
     }
     
  // This method is called if is POST request
     @POST
     @Produces( {"application/sparql-results+xml", MediaType.APPLICATION_XML, "application/rdf+xml"})
-    public String queryPost(@FormParam("query") String query) {
-        return runQuery(query, FORMAT_XML);
+    public StreamingOutput queryPost(@FormParam("query") String query) {
+        final String q = query;
+        return new StreamingOutput() {
+            @Override
+            public void write(OutputStream output) throws IOException, WebApplicationException {
+                try {
+                    runQuery(q, FORMAT_XML, output);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
     }
     
-    private String runQuery(String query, String format) {
+    private void runQuery(String query, String format, OutputStream out) {
         
-        String ret = "";
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-
         if (!StringUtils.isBlank(query)){
             String url = GeneralConfig.getProperty("virtuoso.db.url");
             String username = GeneralConfig.getProperty("virtuoso.db.usr");
@@ -86,39 +130,40 @@ public class SPARQLEndpoint {
                     if(format != null && format.equals(FORMAT_XML)){
                         SPARQLResultsXMLWriter sparqlWriter = new SPARQLResultsXMLWriter(out);
                         resultsTable.evaluate(sparqlWriter);
-                        ret = new String(out.toByteArray());
                     } else if(format != null && format.equals(FORMAT_JSON)){
                         SPARQLResultsJSONWriter sparqlWriter = new SPARQLResultsJSONWriter(out);
                         resultsTable.evaluate(sparqlWriter);
-                        ret = new String(out.toByteArray());
                     } else if(format != null && format.equals(FORMAT_HTML)){
-                        StringBuffer sb = new StringBuffer();
-                        
                         TupleQueryResult bindings = resultsTable.evaluate();
                         if(bindings != null){
-                            sb.append("<table><tr>");
+                            PrintWriter outWriter = new PrintWriter(out);
+                            outWriter.println("<table><tr>");
                             List<String> names = bindings.getBindingNames();
                             for(String name : names){
-                                sb.append("<th>").append(name).append("</th>");
+                                outWriter.println("<th>");
+                                outWriter.println(name);
+                                outWriter.println("</th>");
                             }
-                            sb.append("</tr>");
+                            outWriter.println("</tr>");
                             for (int row = 0; bindings.hasNext(); row++) {
-                                sb.append("<tr>");
+                                outWriter.println("<tr>");
                                 BindingSet pairs = bindings.next();
                                 for (int i = 0; i < names.size(); i++) {
                                     String name = names.get(i);
                                     String val = "";
                                     if(pairs.getValue(name) != null)
                                         val = pairs.getValue(name).stringValue();
-                                    sb.append("<td>").append(val).append("</td>");
+                                    outWriter.println("<td>");
+                                    outWriter.println(val);
+                                    outWriter.println("</td>");
                                 }
-                                sb.append("</tr>");
+                                outWriter.println("</tr>");
                             }
-                            sb.append("</table>");
+                            outWriter.println("</table>");
+                            outWriter.flush();
+                            outWriter.close();
                         }
-                        ret = sb.toString();
                     }
-                    
                 } finally {
                     con.close();
                 }
@@ -126,12 +171,14 @@ public class SPARQLEndpoint {
                 rex.printStackTrace();
             } catch (Exception e) {
                 e.printStackTrace();
+            } finally {
+                try {
+                    out.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-        } else {
-            return "Query is empty!";
         }
-        
-        return ret;
     }
 
 
