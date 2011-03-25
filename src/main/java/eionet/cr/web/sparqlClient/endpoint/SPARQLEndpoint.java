@@ -107,7 +107,10 @@ public class SPARQLEndpoint {
                                 BindingSet pairs = bindings.next();
                                 for (int i = 0; i < names.size(); i++) {
                                     String name = names.get(i);
-                                    sb.append("<td>").append(pairs.getValue(name).stringValue()).append("</td>");
+                                    String val = "";
+                                    if(pairs.getValue(name) != null)
+                                        val = pairs.getValue(name).stringValue();
+                                    sb.append("<td>").append(val).append("</td>");
                                 }
                                 sb.append("</tr>");
                             }
