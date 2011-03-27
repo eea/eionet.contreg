@@ -153,13 +153,13 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
             boolean doExecuteBatch = false;
             long subjectHash = subjectDTO.getUriHash();
-            for (String predicateUri:subjectDTO.getPredicateUris()) {
+            for (String predicateUri : subjectDTO.getPredicateUris()) {
 
                 Collection<ObjectDTO> objects = subjectDTO.getObjects(predicateUri);
-                if (objects!=null && !objects.isEmpty()) {
+                if (objects != null && !objects.isEmpty()) {
 
                     long predicateHash = Hashes.spoHash(predicateUri);
-                    for (ObjectDTO object:objects) {
+                    for (ObjectDTO object : objects) {
 
                         pstmt.setLong(   1, subjectHash);
                         pstmt.setLong(   2, predicateHash);
@@ -226,13 +226,13 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
                 sql = StringUtils.replace(sql, "?", String.valueOf(triple.getObjectHash()), 1);
 
                 StringBuilder bld = new StringBuilder(sql);
-                if (triple.getSourceHash()!=null) {
+                if (triple.getSourceHash() != null) {
                     bld.append(" and SOURCE=").append(triple.getSourceHash());
                 }
-                if (triple.getObjectDerivSourceHash()!=null) {
+                if (triple.getObjectDerivSourceHash() != null) {
                     bld.append(" and OBJ_DERIV_SOURCE=").append(triple.getObjectDerivSourceHash());
                 }
-                if (triple.getObjectSourceObjectHash()!=null) {
+                if (triple.getObjectSourceObjectHash() != null) {
                     bld.append(" and OBJ_SOURCE_OBJECT=").append(triple.getObjectSourceObjectHash());
                 }
 
@@ -259,10 +259,10 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
      * @return
      * @throws DAOException
      */
-    public HashMap<String,String> getAddibleProperties(Collection<String> subjectTypes)
+    public HashMap<String, String> getAddibleProperties(Collection<String> subjectTypes)
                                                                         throws DAOException {
 
-        HashMap<String,String> result = new HashMap<String,String>();
+        HashMap<String, String> result = new HashMap<String, String>();
 
         Connection conn = null;
         Statement stmt = null;
@@ -285,7 +285,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
             /* get the properties for given subject types */
 
-            if (subjectTypes!=null && !subjectTypes.isEmpty()) {
+            if (subjectTypes != null && !subjectTypes.isEmpty()) {
 
                 StringBuilder buf = new StringBuilder().
                 append("select distinct SUBJECT from SPO where PREDICATE=").
@@ -320,9 +320,9 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
      * @return
      * @throws SQLException
      */
-    private HashMap<String,String> getSubjectLabels(Collection<String> subjectHashes, Connection conn) throws SQLException {
+    private HashMap<String, String> getSubjectLabels(Collection<String> subjectHashes, Connection conn) throws SQLException {
 
-        HashMap<String,String> result = new HashMap<String,String>();
+        HashMap<String, String> result = new HashMap<String, String>();
         boolean closeConnection = false;
 
         Statement stmt = null;
@@ -371,8 +371,8 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             + " where SPO.PREDICATE=? AND OBJECT_HASH=?)"
             + " ORDER BY FIRSTSEEN_TIME DESC LIMIT ?";
 
-        Map<String,String> labelMap = new LinkedHashMap<String,String>();
-        Map<String,String> uriMap = new LinkedHashMap<String,String>();
+        Map<String, String> labelMap = new LinkedHashMap<String, String>();
+        Map<String, String> uriMap = new LinkedHashMap<String, String>();
 
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -394,7 +394,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             /* if any subjects were found, let's find their labels */
             if (!labelMap.isEmpty()) {
 
-                sql = "SELECT SUBJECT,OBJECT FROM SPO WHERE SPO.PREDICATE=? "
+                sql = "SELECT SUBJECT, OBJECT FROM SPO WHERE SPO.PREDICATE=? "
                     + "AND SPO.SUBJECT IN (" + Util.toCSV(labelMap.keySet()) + ")";
                 pstmt = conn.prepareStatement(sql);
                 pstmt.setLong(1, Hashes.spoHash(Predicates.RDFS_LABEL));
@@ -415,10 +415,10 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
          * then derive the label from the subject's URI.
          */
         ArrayList<Pair<String, String>> result = new ArrayList<Pair<String, String>>();
-        for (String uriHash:labelMap.keySet()) {
+        for (String uriHash : labelMap.keySet()) {
             if (StringUtils.isBlank(labelMap.get(uriHash))) {
                 String uri = uriMap.get(uriHash);
-                result.add(new Pair(uriHash, URIUtil.extractURILabel(uri,uri)));
+                result.add(new Pair(uriHash, URIUtil.extractURILabel(uri, uri)));
             }
             else {
                 result.add(new Pair(uriHash, labelMap.get(uriHash)));
@@ -494,7 +494,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
         }
         else {
             // get the SubjectDTO objects of the found predicates
-            Map<Long,SubjectDTO> subjectsMap = new HashMap<Long,SubjectDTO>();
+            Map<Long, SubjectDTO> subjectsMap = new HashMap<Long, SubjectDTO>();
             for (Long hash : predicateUris) {
                 subjectsMap.put(hash, null);
             }
@@ -514,7 +514,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             // since a used predicate may not appear as a subject in SPO,
             // there might unfound SubjectDTO objects
             HashSet<Long> unfoundSubjects = new HashSet<Long>();
-            for (Entry<Long,SubjectDTO> entry : subjectsMap.entrySet()) {
+            for (Entry<Long, SubjectDTO> entry : subjectsMap.entrySet()) {
                 if (entry.getValue() == null) {
                     unfoundSubjects.add(entry.getKey());
                 }
@@ -523,8 +523,8 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             // if there were indeed any unfound SubjectDTO objects, find URIs for those predicates
             // and create dummy SubjectDTO objects from those URIs
             if (!unfoundSubjects.isEmpty()) {
-                Map<Long,String> resourceUris = getResourceUris(unfoundSubjects);
-                for (Entry<Long,SubjectDTO> entry : subjectsMap.entrySet()) {
+                Map<Long, String> resourceUris = getResourceUris(unfoundSubjects);
+                for (Entry<Long, SubjectDTO> entry : subjectsMap.entrySet()) {
                     if (entry.getValue() == null) {
                         String uri = resourceUris.get(entry.getKey());
                         if (!StringUtils.isBlank(uri)) {
@@ -551,13 +551,13 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
      * @return
      * @throws DAOException
      */
-    private Map<Long,String> getResourceUris(HashSet<Long> resourceHashes) throws DAOException {
+    private Map<Long, String> getResourceUris(HashSet<Long> resourceHashes) throws DAOException {
 
         StringBuffer buf = new StringBuffer().
         append("select URI_HASH, URI from RESOURCE where URI_HASH in (").
         append(Util.toCSV(resourceHashes)).append(")");
 
-        HashMap<Long,String> result = new HashMap<Long,String>();
+        HashMap<Long, String> result = new HashMap<Long, String>();
         Connection conn = null;
         Statement stmt = null;
         ResultSet rs = null;
@@ -588,7 +588,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
      */
     public List<String> getSpatialSources() throws DAOException {
 
-        String sql = "select distinct URI from SPO,RESOURCE where "
+        String sql = "select distinct URI from SPO, RESOURCE where "
             + "PREDICATE= ? and OBJECT_HASH= ? and SOURCE=RESOURCE.URI_HASH";
 
         List<Long> params = new LinkedList<Long>();
@@ -618,7 +618,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             return null;
         }
 
-        Map<Long,SubjectDTO> map = new LinkedHashMap<Long, SubjectDTO>();
+        Map<Long, SubjectDTO> map = new LinkedHashMap<Long, SubjectDTO>();
         map.put(subjectHash, null);
 
         List<SubjectDTO> subjects = getSubjectsData(map);
@@ -632,7 +632,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
     public PredicateLabels getPredicateLabels(Set<Long> subjectHashes) throws DAOException {
 
         PredicateLabels predLabels = new PredicateLabels();
-        if (subjectHashes!=null && !subjectHashes.isEmpty()) {
+        if (subjectHashes != null && !subjectHashes.isEmpty()) {
 
             StringBuffer sqlBuf = new StringBuffer().
             append("select RESOURCE.URI as PREDICATE_URI, SPO.OBJECT as LABEL, SPO.OBJ_LANG as LANG").
@@ -655,7 +655,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
     public SubProperties getSubProperties(Set<Long> subjectHashes) throws DAOException {
 
         SubProperties subProperties = new SubProperties();
-        if (subjectHashes!=null && !subjectHashes.isEmpty()) {
+        if (subjectHashes != null && !subjectHashes.isEmpty()) {
 
             StringBuffer sqlBuf = new StringBuffer().
             append("select distinct SPO.OBJECT as PREDICATE, RESOURCE.URI as SUB_PROPERTY").
@@ -704,23 +704,23 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
 
         // execute SQL query
-        PairReader<Long,Long> pairReader = new PairReader<Long,Long>();
+        PairReader<Long, Long> pairReader = new PairReader<Long, Long>();
 
         long startTime = System.currentTimeMillis();
         logger.trace("Recent uploads search, executing subject finder query: " + sqlBuf.toString());
 
         executeSQL(sqlBuf.toString(), pairReader);
-        List<Pair<Long,Long>> pairList = pairReader.getResultList();
+        List<Pair<Long, Long>> pairList = pairReader.getResultList();
 
         Collection<SubjectDTO> result = new LinkedList<SubjectDTO>();
 
         // if result list not empty, get the subjects data and set their first-seen times
-        if (pairList!=null && !pairList.isEmpty()) {
+        if (pairList != null && !pairList.isEmpty()) {
 
             // create helper objects
-            Map<Long,SubjectDTO> subjectsMap = new LinkedHashMap<Long, SubjectDTO>();
-            Map<Long,Date> firstSeenTimes = new HashMap<Long, Date>();
-            for (Pair<Long,Long> p : pairList) {
+            Map<Long, SubjectDTO> subjectsMap = new LinkedHashMap<Long, SubjectDTO>();
+            Map<Long, Date> firstSeenTimes = new HashMap<Long, Date>();
+            for (Pair<Long, Long> p : pairList) {
                 subjectsMap.put(p.getLeft(), null);
                 firstSeenTimes.put(p.getLeft(), new Date(p.getRight()));
             }
@@ -781,7 +781,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
         }
 
         // create helper objects
-        Map<Long,SubjectDTO> subjectsMap = new HashMap<Long, SubjectDTO>();
+        Map<Long, SubjectDTO> subjectsMap = new HashMap<Long, SubjectDTO>();
         for (Long subjectHash : resultList) {
             subjectsMap.put(subjectHash, null);
         }
@@ -1357,10 +1357,10 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
      */
     public List<TripleDTO> getSampleTriplesInSource(String sourceUrl, PagingRequest pagingRequest) throws DAOException {
 
-        StringBuffer buf = new StringBuffer("select SUBJECT,PREDICATE,OBJECT,OBJ_DERIV_SOURCE").
+        StringBuffer buf = new StringBuffer("select SUBJECT, PREDICATE, OBJECT, OBJ_DERIV_SOURCE").
         append(" from SPO where SOURCE=").append(Hashes.spoHash(sourceUrl));
 
-        if (pagingRequest!=null) {
+        if (pagingRequest != null) {
             buf.append(" limit ").append(pagingRequest.getItemsPerPage()).
             append(" offset ").append(pagingRequest.getOffset()).
             toString();
@@ -1375,7 +1375,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             append("select URI_HASH, URI from RESOURCE where URI_HASH in (").
             append(Util.toCSV(reader.getDistinctHashes())).append(")");
 
-            HashMap<Long,String> urisByHashes = new HashMap<Long, String>();
+            HashMap<Long, String> urisByHashes = new HashMap<Long, String>();
             executeSQL(buf.toString(), new UriHashesReader(urisByHashes));
 
             if (!urisByHashes.isEmpty()) {
@@ -1526,7 +1526,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
         // creating a cross link to show that specific object has a review.
         SubjectDTO crossLinkSubject = new SubjectDTO(review.getObjectUrl(), false);
-        ObjectDTO grossLinkObject = new ObjectDTO(userReviewUri,false);
+        ObjectDTO grossLinkObject = new ObjectDTO(userReviewUri, false);
         grossLinkObject.setSourceUri(userReviewUri);
         crossLinkSubject.addObject(Predicates.CR_HAS_FEEDBACK, grossLinkObject);
 
@@ -1854,7 +1854,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
         append("from SPO left join RESOURCE on (SPO.SUBJECT=RESOURCE.URI_HASH) ").
         append("where SUBJECT in (select distinct OBJECT_HASH from SPO where SUBJECT=").
         append(Hashes.spoHash(crUser.getHomeUri())).append(" and PREDICATE=").
-        append(Hashes.spoHash(Predicates.CR_HAS_FILE)).append(") order by URI,PREDICATE,OBJECT");
+        append(Hashes.spoHash(Predicates.CR_HAS_FILE)).append(") order by URI, PREDICATE, OBJECT");
 
         UploadDTOReader reader = new UploadDTOReader();
         Connection conn = null;
@@ -1901,7 +1901,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             conn = getSQLConnection();
             Object o = SQLUtil.executeSingleReturnValueQuery(
                     "select count(*) from SPO where SUBJECT=" + Hashes.spoHash(subjectUri), conn);
-            return o!=null && Integer.parseInt(o.toString()) > 0;
+            return o != null && Integer.parseInt(o.toString()) > 0;
         } catch (SQLException e) {
             throw new DAOException(e.getMessage(), e);
         } finally {
@@ -1955,7 +1955,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
      * (non-Javadoc)
      * @see eionet.cr.dao.HelperDAO#renameSubjects(java.util.Map)
      */
-    public void renameSubjects(Map<Long,String> newUrisByOldHashes) throws DAOException {
+    public void renameSubjects(Map<Long, String> newUrisByOldHashes) throws DAOException {
 
         if (newUrisByOldHashes == null || newUrisByOldHashes.isEmpty()) {
             throw new IllegalArgumentException("Supplied map must not be null or empty!");
@@ -1980,12 +1980,12 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             stmt_SOURCE = conn.prepareStatement("update SPO set SOURCE=? where SOURCE=?");
             stmt_DERIV_SOURCE = conn.prepareStatement("update SPO set OBJ_DERIV_SOURCE=? where OBJ_DERIV_SOURCE=?");
             stmt_SOURCE_OBJECT = conn.prepareStatement("update SPO set OBJ_SOURCE_OBJECT=? where OBJ_SOURCE_OBJECT=?");
-            stmt_OBJECT = conn.prepareStatement("update SPO set OBJECT=?,OBJECT_HASH=? where OBJECT_HASH=?");
-            stmt_HARVEST_SOURCE = conn.prepareStatement("update HARVEST_SOURCE set URL=?,URL_HASH=? where URL_HASH=?");
+            stmt_OBJECT = conn.prepareStatement("update SPO set OBJECT=?, OBJECT_HASH=? where OBJECT_HASH=?");
+            stmt_HARVEST_SOURCE = conn.prepareStatement("update HARVEST_SOURCE set URL=?, URL_HASH=? where URL_HASH=?");
             stmt_SPO_BINARY = conn.prepareStatement("update SPO_BINARY set SUBJECT=? where SUBJECT=?");
-            stmt_RESOURCE = conn.prepareStatement("insert into RESOURCE (URI,URI_HASH,FIRSTSEEN_SOURCE,FIRSTSEEN_TIME,LASTMODIFIED_TIME) values (?,?,?,?,?)");
+            stmt_RESOURCE = conn.prepareStatement("insert into RESOURCE (URI, URI_HASH, FIRSTSEEN_SOURCE, FIRSTSEEN_TIME, LASTMODIFIED_TIME) values (?,?,?,?,?)");
 
-            for (Map.Entry<Long,String> entry : newUrisByOldHashes.entrySet()) {
+            for (Map.Entry<Long, String> entry : newUrisByOldHashes.entrySet()) {
 
                 long oldHash = entry.getKey().longValue();
                 String newUri = entry.getValue();
@@ -2123,7 +2123,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
         .append ("spo.object AS object, spo.obj_deriv_source AS obj_deriv_source")
         .append (", resource.uri AS subject, spo.lit_obj AS litobject ")
         .append(" from SPO LEFT JOIN resource ON spo.subject = resource.uri_hash WHERE ")
-        .append("spo.source = " +reader.getSourceHash() )
+        .append("spo.source = " + reader.getSourceHash() )
         .append(" AND spo.OBJ_DERIV_SOURCE = 0 ORDER BY spo.subject ASC");
 
         executeSQL(buf.toString(), reader);

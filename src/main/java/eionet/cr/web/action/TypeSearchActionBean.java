@@ -97,9 +97,9 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
     //filter to be removed
     private String clearFilter;
     //selected filters
-    private Map<String,String> selectedFilters;
+    private Map<String, String> selectedFilters;
     //selected filters with labels.
-    private Map<String, Pair<String,String>> displayFilters;
+    private Map<String, Pair<String, String>> displayFilters;
 
     private boolean uriResourceIdentifier;
     private String exportFormat;
@@ -136,7 +136,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
      * Returns the list of export formats
      */
     public boolean isShowExcelExport() {
-        if(matchCount>XlsExporter.getRowsLimit()){
+        if(matchCount>XlsExporter.getRowsLimit()) {
             return false;
         }
         return true;
@@ -161,7 +161,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
                 getAcceptedLanguages() != null
                         ? getAcceptedLanguages()
                         : Collections.EMPTY_SET);
-        List<Pair<String,String>> columnPairs = new LinkedList<Pair<String,String>>();
+        List<Pair<String, String>> columnPairs = new LinkedList<Pair<String, String>>();
 
         exporter.setExportResourceUri(uriResourceIdentifier);
         selectedColumns = exportColumns == null || exportColumns.isEmpty()
@@ -169,7 +169,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
                 : exportColumns;
         for (String selectedColumn : selectedColumns) {
             columnPairs.add(
-                    new Pair<String,String>(
+                    new Pair<String, String>(
                             selectedColumn,
                             getAvailableColumns().get(selectedColumn)));
         }
@@ -189,9 +189,9 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
     /**
      * @return
      */
-    public Resolution introspect(){
+    public Resolution introspect() {
 
-        if (!StringUtils.isBlank(type)){
+        if (!StringUtils.isBlank(type)) {
             return new RedirectResolution(FactsheetActionBean.class).addParameter("uri", type);
         }
         else
@@ -201,14 +201,14 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
     /**
      * @return
      */
-    public Resolution addFilter(){
+    public Resolution addFilter() {
 
-        Map<String, Map<String,String>> cache = (Map<String, Map<String, String>>) getSession().getAttribute(SELECTED_FILTERS_CACHE);
+        Map<String, Map<String, String>> cache = (Map<String, Map<String, String>>) getSession().getAttribute(SELECTED_FILTERS_CACHE);
         if (cache == null) {
-            cache = new HashMap<String, Map<String,String>>();
+            cache = new HashMap<String, Map<String, String>>();
         }
         if (!cache.containsKey(type)) {
-            Map<String,String> filters = new LinkedHashMap<String, String>();
+            Map<String, String> filters = new LinkedHashMap<String, String>();
             cache.put(type, filters);
         }
         cache.get(type).put(newFilter, null);
@@ -221,9 +221,9 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
     /**
      * @return
      */
-    public Resolution removeFilter(){
+    public Resolution removeFilter() {
 
-        Map<String,Map<String,String>> cache = (Map<String, Map<String, String>>) getSession().getAttribute(SELECTED_FILTERS_CACHE);
+        Map<String, Map<String, String>> cache = (Map<String, Map<String, String>>) getSession().getAttribute(SELECTED_FILTERS_CACHE);
         if(cache != null && cache.containsKey(type) && cache.get(type) != null
                 && cache.get(type).containsKey(clearFilter)) {
             cache.get(type).remove(clearFilter);
@@ -240,7 +240,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
     public Resolution applyFilters() throws DAOException {
         if(selectedFilters != null && !selectedFilters.isEmpty()) {
             //save selected filters for future use
-            Map<String,Map<String,String>> cache = (Map<String, Map<String, String>>) getSession().getAttribute(SELECTED_FILTERS_CACHE);
+            Map<String, Map<String, String>> cache = (Map<String, Map<String, String>>) getSession().getAttribute(SELECTED_FILTERS_CACHE);
             if (cache != null && cache.containsKey(type)) {
                 cache.get(type).putAll(selectedFilters);
             }
@@ -264,12 +264,12 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
             startTime = System.currentTimeMillis();
 
             LastAction lastAction = getLastAction();
-            if (resultList==null || !(lastAction!=null && lastAction.equals(LastAction.ADD_FILTER))){
+            if (resultList == null || !(lastAction != null && lastAction.equals(LastAction.ADD_FILTER))) {
 
-                Map<String,String> criteria = new HashMap<String,String>();
+                Map<String, String> criteria = new HashMap<String, String>();
                 criteria.put(Predicates.RDF_TYPE, type);
                 if (selectedFilters != null && !selectedFilters.isEmpty()) {
-                    for (Entry<String,String> entry : selectedFilters.entrySet()) {
+                    for (Entry<String, String> entry : selectedFilters.entrySet()) {
                         if (!StringUtils.isBlank(entry.getValue())) {
                             criteria.put(entry.getKey(), StringUtils.trim(entry.getValue().trim()));
                         }
@@ -286,7 +286,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
                 resultList = searchResult.getRight();
                 matchCount = searchResult.getLeft();
                 int exactRowCountLimit = DAOFactory.get().getDao(SearchDAO.class).getExactRowCountLimit();
-                exactCount = exactRowCountLimit<=0 || matchCount<=exactRowCountLimit;
+                exactCount = exactRowCountLimit <= 0 || matchCount <= exactRowCountLimit;
             }
 
             //cache result list.
@@ -322,12 +322,12 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
         matchCount = temp == null ? 0 : temp.intValue();
 
         //check if user has previously selected some columns.
-        Map<String,List<String>> cache = (Map<String, List<String>>) getSession().getAttribute(SELECTED_COLUMNS_CACHE);
+        Map<String, List<String>> cache = (Map<String, List<String>>) getSession().getAttribute(SELECTED_COLUMNS_CACHE);
         if (cache != null && cache.containsKey(type) ) {
             selectedColumns = cache.get(type);
         } else {
             selectedColumns = new LinkedList<String>();
-            for (Entry<String,String> pair : getAvailableColumns().entrySet()){
+            for (Entry<String, String> pair : getAvailableColumns().entrySet()) {
                 selectedColumns.add(pair.getKey());
             }
         }
@@ -336,22 +336,22 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
         String previousType = (String) getSession().getAttribute(PREVIOUS_TYPE);
         getSession().setAttribute(PREVIOUS_TYPE, type);
         if (!type.equals(previousType)) {
-            Map<String,Map<String,String>> filterCache = (Map<String, Map<String, String>>) getSession().getAttribute(SELECTED_FILTERS_CACHE);
+            Map<String, Map<String, String>> filterCache = (Map<String, Map<String, String>>) getSession().getAttribute(SELECTED_FILTERS_CACHE);
             if (filterCache != null && filterCache.containsKey(type)) {
                 filterCache.remove(type);
             }
         } else {
             //check for selected filters and add labels to them
-            Map<String,Map<String,String>> filterCache = (Map<String, Map<String, String>>) getSession().getAttribute(SELECTED_FILTERS_CACHE);
+            Map<String, Map<String, String>> filterCache = (Map<String, Map<String, String>>) getSession().getAttribute(SELECTED_FILTERS_CACHE);
             if (filterCache != null && filterCache.containsKey(type)) {
                 selectedFilters = filterCache.get(type);
-                displayFilters = new HashMap<String, Pair<String,String>>();
-                Map<String,String> availableColumns = getAvailableColumns();
-                for(Entry<String,String> entry : selectedFilters.entrySet()){
+                displayFilters = new HashMap<String, Pair<String, String>>();
+                Map<String, String> availableColumns = getAvailableColumns();
+                for(Entry<String, String> entry : selectedFilters.entrySet()) {
                     if(availableColumns.containsKey(entry.getKey())) {
                         displayFilters.put(
                                 availableColumns.get(entry.getKey()),
-                                new Pair<String,String>(entry.getKey(), entry.getValue()));
+                                new Pair<String, String>(entry.getKey(), entry.getValue()));
                     }
                 }
             }
@@ -362,9 +362,9 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
      *
      * @return
      */
-    public Resolution setSearchColumns(){
+    public Resolution setSearchColumns() {
 
-        Map<String,List<String>> cache = (Map<String, List<String>>) getSession().getAttribute(SELECTED_COLUMNS_CACHE);
+        Map<String, List<String>> cache = (Map<String, List<String>>) getSession().getAttribute(SELECTED_COLUMNS_CACHE);
         if (cache == null) {
             cache = new HashMap<String, List<String>>();
         }
@@ -374,7 +374,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
                 selectedColumns.add(0, Predicates.RDFS_LABEL);
             }
             selectedColumns = new LinkedList<String>(
-                    selectedColumns.subList(0,selectedColumns.size()));
+                    selectedColumns.subList(0, selectedColumns.size()));
         }
         cache.put(type, selectedColumns);
         getSession().setAttribute(SELECTED_COLUMNS_CACHE, cache);
@@ -382,8 +382,8 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
         return new RedirectResolution(getUrlBinding() + "?search=Search&type=" + Util.urlEncode(type));
     }
 
-    private List<String> getSelectedColumnsFromCache(){
-        Map<String,List<String>> cache = (Map<String, List<String>>) getSession().getAttribute(SELECTED_COLUMNS_CACHE);
+    private List<String> getSelectedColumnsFromCache() {
+        Map<String, List<String>> cache = (Map<String, List<String>>) getSession().getAttribute(SELECTED_COLUMNS_CACHE);
         return cache == null
                 ? selectedColumns
                 : cache.get(type);
@@ -402,7 +402,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
         //add every selected column to the output
         if (selectedColumns != null && !selectedColumns.isEmpty()) {
             for(String string : selectedColumns) {
-                for (Entry<String,String> pair : getAvailableColumns().entrySet()) {
+                for (Entry<String, String> pair : getAvailableColumns().entrySet()) {
                     if (pair.getKey().equals(string)) {
                         columns.add(new SubjectPredicateColumn(pair.getValue(), true, string, actionParameter));
                     }
@@ -418,7 +418,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
      *
      * @return
      */
-    public List<Pair<String, String>> getAvailableTypesNoGroup(){
+    public List<Pair<String, String>> getAvailableTypesNoGroup() {
         return SortStringPair.sortByLeftAsc(ApplicationCache.getTypes());
     }
 
@@ -427,7 +427,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
      *
      * @return
      */
-    public List<Pair<String, List<Pair<String, String>>>> getAvailableTypes(){
+    public List<Pair<String, List<Pair<String, String>>>> getAvailableTypes() {
         List<Pair<String, String>> sourceTypes = ApplicationCache.getTypes();
 
         /** Defining the returnTypes so that it contains group name as the outer Left
@@ -443,33 +443,33 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 
         SortStringPair.sortByLeftAsc(sourceTypes);
         boolean itemsAdded = false;
-        groupedTypes = new ArrayList<Pair<String,String>>();
+        groupedTypes = new ArrayList<Pair<String, String>>();
 
-        while (i < sourceTypes.size()){
+        while (i < sourceTypes.size()) {
 
             String currentPrefix = "";
             // Disassembling the prefix
-            if (sourceTypes.get(i).getLeft().replaceAll("[^#]","").length()>0){
+            if (sourceTypes.get(i).getLeft().replaceAll("[^#]","").length() > 0) {
                 // Meaning that the url contains #-char
                 currentPrefix = sourceTypes.get(i).getLeft().split("#")[0];
             } else {
                 // Must be split by last '/'
                 String [] tokens = sourceTypes.get(i).getLeft().split("/");
-                for (int j=0; j<tokens.length - 1; j++){
+                for (int j=0; j<tokens.length - 1; j++) {
                     currentPrefix += tokens[j]+"/";
                 }
             }
 
-            if (!currentPrefix.equals(previousPrefix)){
+            if (!currentPrefix.equals(previousPrefix)) {
                 //Adding previous group to return output, initializing new groupedTypes.
-                if (itemsAdded){
-                    returnTypes.add(new Pair<String, List<Pair<String,String>>>(previousPrefix, groupedTypes));
+                if (itemsAdded) {
+                    returnTypes.add(new Pair<String, List<Pair<String, String>>>(previousPrefix, groupedTypes));
                     itemsAdded = false;
                 }
-                groupedTypes = new ArrayList<Pair<String,String>>();
+                groupedTypes = new ArrayList<Pair<String, String>>();
             }
 
-            if (groupedTypes != null){
+            if (groupedTypes != null) {
                 groupedTypes.add(sourceTypes.get(i));
                 itemsAdded = true;
             }
@@ -478,9 +478,9 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
             i++;
 
             // The loop is over, last group shall be added manually in case there are items (itemsAdded == true).
-            if (i == sourceTypes.size()){
-                if (itemsAdded){
-                    returnTypes.add(new Pair<String, List<Pair<String,String>>>(previousPrefix, groupedTypes));
+            if (i == sourceTypes.size()) {
+                if (itemsAdded) {
+                    returnTypes.add(new Pair<String, List<Pair<String, String>>>(previousPrefix, groupedTypes));
                 }
             }
             previousPrefix = currentPrefix;
@@ -533,31 +533,31 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
     @SuppressWarnings("unchecked")
     public Map<String, String> getAvailableColumns() throws DAOException {
 
-        Map<String, Map<String,String>> cache =
+        Map<String, Map<String, String>> cache =
             (Map<String, Map<String, String>>) getSession().getAttribute(AVAILABLE_COLUMNS_CACHE);
         if (cache == null) {
-            cache = new HashMap<String, Map<String,String>>();
+            cache = new HashMap<String, Map<String, String>>();
         }
         if (!cache.containsKey(type)) {
 
-            Map<String,String> result = new LinkedHashMap<String,String>();
+            Map<String, String> result = new LinkedHashMap<String, String>();
 
             List<SubjectDTO> usedPredicates = DAOFactory.get().getDao(
                     HelperDAO.class).getPredicatesUsedForType(type);
 
             result.put(Predicates.RDFS_LABEL, "Title");
-            if (usedPredicates!=null && !usedPredicates.isEmpty()){
+            if (usedPredicates != null && !usedPredicates.isEmpty()) {
 
                 for(SubjectDTO subject : usedPredicates) {
-                    if (subject!=null && !subject.isAnonymous()){
+                    if (subject != null && !subject.isAnonymous()) {
 
                         String uri = subject.getUri();
                         String label = subject.getObjectValue(Predicates.RDFS_LABEL);
-                        if (StringUtils.isBlank(label)){
-                            label = URIUtil.extractURILabel(uri,uri);
+                        if (StringUtils.isBlank(label)) {
+                            label = URIUtil.extractURILabel(uri, uri);
                         }
 
-                        if (!StringUtils.isBlank(label)){
+                        if (!StringUtils.isBlank(label)) {
                             result.put(uri, label);
                         }
                     }
@@ -578,8 +578,8 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
      * @return available filters.
      * @throws DAOException
      */
-    public Map<String,String> getAvailableFilters() throws DAOException {
-        Map<String,String> result = new HashMap<String, String>();
+    public Map<String, String> getAvailableFilters() throws DAOException {
+        Map<String, String> result = new HashMap<String, String>();
         result.putAll(getAvailableColumns());
         result.remove(Predicates.RDF_TYPE);
         if (selectedFilters != null) {
@@ -595,7 +595,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
      * @return
      * @throws DAOException
      */
-    public Map<String,String> getAvailableFiltersSorted() throws DAOException {
+    public Map<String, String> getAvailableFiltersSorted() throws DAOException {
 
         return sortByValueIgnoreCase(getAvailableFilters());
     }
@@ -701,17 +701,17 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
      * @param map
      * @return
      */
-    private Map<String,String> sortByValueIgnoreCase(Map<String,String> map){
+    private Map<String, String> sortByValueIgnoreCase(Map<String, String> map) {
 
-        LinkedHashMap<String,String> result = new LinkedHashMap<String,String>();
-        if (map!=null && !map.isEmpty()){
+        LinkedHashMap<String, String> result = new LinkedHashMap<String, String>();
+        if (map != null && !map.isEmpty()) {
 
             List<String> keys = new ArrayList<String>(map.keySet());
             List<String> values = new ArrayList<String>(map.values());
 
             List<String> sortedValues = new ArrayList<String>(map.values());
             Collections.sort(sortedValues, new CaseInsensitiveStringComparator());
-            for (int i=0; i<sortedValues.size(); i++){
+            for (int i = 0; i < sortedValues.size(); i++) {
                 result.put(keys.get(values.indexOf(sortedValues.get(i))), sortedValues.get(i));
             }
         }
@@ -732,11 +732,11 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
          */
         public int compare(String str1, String str2) {
 
-            if (str1==null && str2==null)
+            if (str1 == null && str2 == null)
                 return 0;
-            else if (str1==null && str2!=null)
+            else if (str1 == null && str2 != null)
                 return -1;
-            else if (str1!=null && str2==null)
+            else if (str1 != null && str2 == null)
                 return 1;
             else
                 return ((String)str1).compareToIgnoreCase((String)str2);

@@ -57,7 +57,7 @@ import eionet.cr.web.security.CRUser;
  * @author heinljab
  *
  */
-public class VirtuosoPullHarvest extends Harvest{
+public class VirtuosoPullHarvest extends Harvest {
 
     /**
      *
@@ -92,7 +92,7 @@ public class VirtuosoPullHarvest extends Harvest{
      * @throws HarvestException
      *
      */
-    protected void doExecute() throws HarvestException{
+    protected void doExecute() throws HarvestException {
 
         File file = fullFilePathForSourceUrl(sourceUrlString);
 
@@ -100,17 +100,16 @@ public class VirtuosoPullHarvest extends Harvest{
         int totalBytes = 0;
 
         HarvestUrlConnection harvestUrlConnection = null;
-        try{
+        try {
 
             // reuse the file if it exists and the configuration allows to do it (e.g. for debugging purposes) */
-            if (file.exists() && Boolean.parseBoolean(GeneralConfig.getProperty(GeneralConfig.HARVESTER_USE_DOWNLOADED_FILES, "false"))){
+            if (file.exists() && Boolean.parseBoolean(GeneralConfig.getProperty(GeneralConfig.HARVESTER_USE_DOWNLOADED_FILES, "false"))) {
 
                 sourceAvailable = Boolean.TRUE;
                 logger.debug("Harvesting the already downloaded file");
-            }
-            else{
+            } else {
                 // delete the old file, should it exist
-                if (file.exists()){
+                if (file.exists()) {
                     file.delete();
                 }
                 // prepare URL connection
@@ -120,39 +119,36 @@ public class VirtuosoPullHarvest extends Harvest{
 
                 // open connection stream
                 logger.debug("Downloading");
-                try{
+                try {
                     harvestUrlConnection.openInputStream();
                     sourceAvailable = harvestUrlConnection.isSourceAvailable();
-                }
-                catch (Exception e){
+                } catch (Exception e) {
                     logger.warn(e.toString());
                 }
 
-                if (!harvestUrlConnection.isSourceAvailable()){
+                if (!harvestUrlConnection.isSourceAvailable()) {
                     logger.debug(harvestUrlConnection.getSourceNotExistMessage() + ", going to delete the source");
                     try {
                         daoWriter = null; // we dont't want finishing actions to be done
                         DAOFactory.get().getDao(HarvestSourceDAO.class).queueSourcesForDeletion(Collections.singletonList(sourceUrlString));
-                    }
-                    catch (DAOException e){
+                    } catch (DAOException e) {
                         logger.warn("Failure when deleting the source", e);
                     }
                     return;
                 }
 
                 // if source not available (i.e. link broken) then just set the last-refreshed metadata
-                if (harvestUrlConnection.isSourceAvailable() == false){
+                if (harvestUrlConnection.isSourceAvailable() == false) {
                     setLastRefreshed(harvestUrlConnection.getConnection(), System.currentTimeMillis());
-                }
+                } else {
                 // source is available, so continue to extract it's contents and metadata
-                else{
 
                     // extract various metadata about this harvest source from url connection object
                     setSourceMetadata(harvestUrlConnection.getConnection());
 
                     // if Url is redirected, take action.
 
-                    if (harvestUrlConnection.getRedirectionInfo().isRedirected() && harvestUrlConnection.isHttpConnection() && recursiveHarvestDisabled == false){
+                    if (harvestUrlConnection.getRedirectionInfo().isRedirected() && harvestUrlConnection.isHttpConnection() && recursiveHarvestDisabled == false) {
                         redirectedSourceHarvest(harvestUrlConnection);
                     }
 
@@ -160,40 +156,36 @@ public class VirtuosoPullHarvest extends Harvest{
                     // skip if unsupported content type
 
                     contentType = sourceMetadata.getObjectValue(Predicates.CR_MEDIA_TYPE);
-                    if (contentType!=null && !isSupportedContentType(contentType)){
+                    if (contentType != null && !isSupportedContentType(contentType)) {
                         logger.debug("Unsupported response content type: " + contentType);
-                    }
-                    else{
+                    } else {
                         logger.debug("Response content type was " + contentType);
-                        if (harvestUrlConnection.isHttpConnection() && harvestUrlConnection.getResponseCode()==HttpURLConnection.HTTP_NOT_MODIFIED){
+                        if (harvestUrlConnection.isHttpConnection() && harvestUrlConnection.getResponseCode() == HttpURLConnection.HTTP_NOT_MODIFIED) {
 
                             handleSourceNotModified();
                             return;
-                        }
-                        else{
+                        } else {
                             logger.debug("Streaming the content to file " + file);
                             // save the stream to file
                             totalBytes = FileUtil.streamToFile(harvestUrlConnection.getInputStream(), file);
 
                             // if content-length for source metadata was previously not found, then set it to file size
-                            if (sourceMetadata.getObject(Predicates.CR_BYTE_SIZE)==null){
+                            if (sourceMetadata.getObject(Predicates.CR_BYTE_SIZE) == null) {
                                 sourceMetadata.addObject(Predicates.CR_BYTE_SIZE, new ObjectDTO(String.valueOf(totalBytes), true));
                             }
                         }
                     }
                 } // if Source is available.
             }
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             throw new HarvestException(e.toString(), e);
-        }
-        finally{
+        } finally {
             // close input stream
-            try{
-                if (harvestUrlConnection != null && harvestUrlConnection.getInputStream()!=null)
+            try {
+                if (harvestUrlConnection != null && harvestUrlConnection.getInputStream() != null)
                     harvestUrlConnection.getInputStream().close();
-            } catch (IOException e){}
+            } catch (IOException e) {}
         }
 
         // perform the harvest
@@ -208,42 +200,38 @@ public class VirtuosoPullHarvest extends Harvest{
      * @param fileSize
      * @throws HarvestException
      */
-    private void harvest(File file, String contentType, int fileSize) throws HarvestException{
+    private void harvest(File file, String contentType, int fileSize) throws HarvestException {
 
         // remember the file's absolute path, so we can later detect if a new file was created during the pre-processing
         String originalPath = file.getAbsolutePath();
 
         File unGZipped = null;
-        if (fileSize==0){
+        if (fileSize == 0) {
             file = null;
             logger.debug("File size = 0");
-        }
-        else{
+        } else {
             // see if file is zipped, and if yes, then unzip
             unGZipped = unCompressGZip(file);
-            if (unGZipped != null){
+            if (unGZipped != null) {
                 logger.debug("The file was gzipped, going to process unzipped file now");
                 file = unGZipped;
-            }
-            else if (contentType!=null && !isXmlContentType(contentType)){
+            } else if (contentType != null && !isXmlContentType(contentType)) {
                 file = null;
             }
         }
 
-        if (file!=null && file.exists()){
+        if (file != null && file.exists()) {
 
             rdfContentFound = true;
 
-            try{
+            try {
                 file = preProcess(file, contentType);
-                if (file!=null){
+                if (file != null) {
                     addToRepository(file);
                 }
-            }
-            catch (Exception e){
+            } catch (Exception e) {
                 throw new HarvestException(e.toString(), e);
-            }
-            finally{
+            } finally {
                 deleteDownloadedFile(file);
                 deleteDownloadedFile(originalPath);
                 deleteDownloadedFile(unGZipped);
@@ -258,7 +246,7 @@ public class VirtuosoPullHarvest extends Harvest{
      * @throws RepositoryException
      * @throws RDFParseException
      */
-    private void addToRepository(File file) throws RDFParseException, RepositoryException, IOException{
+    private void addToRepository(File file) throws RDFParseException, RepositoryException, IOException {
 
         String repoUrl = GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_URL);
         String repoUsr = GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_USR);
@@ -267,8 +255,8 @@ public class VirtuosoPullHarvest extends Harvest{
         boolean isSuccess = false;
         Repository repository = null;
         RepositoryConnection conn = null;
-        try{
-            repository = new VirtuosoRepository(repoUrl,repoUsr,repoPwd);
+        try {
+            repository = new VirtuosoRepository(repoUrl, repoUsr, repoPwd);
             repository.initialize();
             conn = repository.getConnection();
 
@@ -289,7 +277,7 @@ public class VirtuosoPullHarvest extends Harvest{
 
             // add CR's auto-generated metadata
             int autoGenTripleCount = 0;
-            if (sourceMetadata.getPredicateCount()>0){
+            if (sourceMetadata.getPredicateCount() > 0) {
                 logger.debug("Storing auto-generated triples for the source");
                 autoGenTripleCount = addSourceMetadata(sourceMetadata, conn, repository, context);
             }
@@ -302,18 +290,17 @@ public class VirtuosoPullHarvest extends Harvest{
 
             // no transaction rollback needed, when reached this point
             isSuccess = true;
-        }
-        finally{
-            if (!isSuccess && conn!=null){
-                try{conn.rollback();}catch(RepositoryException e){}
+        } finally {
+            if (!isSuccess && conn != null) {
+                try {conn.rollback();} catch(RepositoryException e) {}
             }
 
-            if (conn!=null){
-                try{conn.close();}catch(RepositoryException e){}
+            if (conn != null) {
+                try {conn.close();} catch(RepositoryException e) {}
             }
 
-            if (repository!=null){
-                try{repository.shutDown();}catch(RepositoryException e){}
+            if (repository != null) {
+                try {repository.shutDown();} catch(RepositoryException e) {}
             }
         }
     }
@@ -328,20 +315,20 @@ public class VirtuosoPullHarvest extends Harvest{
      * @throws RepositoryException
      * @throws Exception
      */
-    private int addSourceMetadata(SubjectDTO subjectDTO, RepositoryConnection conn, Repository rep, URI contextURI) throws RepositoryException{
+    private int addSourceMetadata(SubjectDTO subjectDTO, RepositoryConnection conn, Repository rep, URI contextURI) throws RepositoryException {
 
         int statementsAdded = 0;
-        if (subjectDTO!=null && subjectDTO.getPredicateCount()>0){
+        if (subjectDTO != null && subjectDTO.getPredicateCount() > 0) {
 
             URI subject = rep.getValueFactory().createURI(subjectDTO.getUri());
-            for (String predicateUri:subjectDTO.getPredicates().keySet()){
+            for (String predicateUri : subjectDTO.getPredicates().keySet()) {
 
                 Collection<ObjectDTO> objects = subjectDTO.getObjects(predicateUri);
-                if (objects!=null && !objects.isEmpty()){
+                if (objects != null && !objects.isEmpty()) {
 
                     URI predicate = rep.getValueFactory().createURI(predicateUri);
-                    for (ObjectDTO object:objects){
-                        if(object.isLiteral()){
+                    for (ObjectDTO object : objects) {
+                        if(object.isLiteral()) {
                             Literal literalObject = rep.getValueFactory().createLiteral(object.toString());
                             conn.add(subject, predicate, literalObject, contextURI);
                         } else {
@@ -354,7 +341,7 @@ public class VirtuosoPullHarvest extends Harvest{
                 }
             }
 
-            //if (statementsAdded>0){
+            //if (statementsAdded > 0) {
                 //addResource(Harvest.HARVESTER_URI, Hashes.spoHash(Harvest.HARVESTER_URI), true);
             //}
         }
@@ -367,7 +354,7 @@ public class VirtuosoPullHarvest extends Harvest{
      * @param contentType
      * @return
      */
-    private boolean isSupportedContentType(String contentType){
+    private boolean isSupportedContentType(String contentType) {
 
         return contentType.startsWith("text/xml")
                 || contentType.startsWith("application/xml")
@@ -382,7 +369,7 @@ public class VirtuosoPullHarvest extends Harvest{
      * @param contentType
      * @return
      */
-    private boolean isXmlContentType(String contentType){
+    private boolean isXmlContentType(String contentType) {
 
         return contentType.startsWith("text/xml")
                 || contentType.startsWith("application/xml")
@@ -394,14 +381,14 @@ public class VirtuosoPullHarvest extends Harvest{
      * @throws SQLException
      *
      */
-    private void handleSourceNotModified() throws SQLException{
+    private void handleSourceNotModified() throws SQLException {
 
         // update lastRefreshed predicate for this source
         PersisterFactory.getPersister().updateLastRefreshed(
                 Hashes.spoHash(sourceUrlString), lastRefreshedDateFormat);
 
         // copy the harvest's number of triples and resources from previous harvest
-        if (previousHarvest!=null){
+        if (previousHarvest != null) {
             setStoredTriplesCount(previousHarvest.getTotalStatements());
             setDistinctSubjectsCount(previousHarvest.getTotalResources());
         }
@@ -420,7 +407,7 @@ public class VirtuosoPullHarvest extends Harvest{
      * @throws MalformedURLException
      */
     private void redirectedSourceHarvest(HarvestUrlConnection harvestUrlConnection)
-                                    throws DAOException, HarvestException, MalformedURLException{
+                                    throws DAOException, HarvestException, MalformedURLException {
 
         logger.debug("Going to handle redirected harvest");
 
@@ -442,39 +429,40 @@ public class VirtuosoPullHarvest extends Harvest{
         List <UrlRedirectionInfo> redirectedUrls = new ArrayList<UrlRedirectionInfo>();
         redirectedUrls.add(lastUrl);
 
-        while (lastUrl.isRedirected() == true){
+        while (lastUrl.isRedirected() == true) {
 
             lastUrl = UrlRedirectAnalyzer.analyzeUrlRedirection(lastUrl.getTargetURL());
             redirectedUrls.add(lastUrl);
             redirectionsFound = redirectedUrls.size();
 
             // Checking the count of redirects.
-            if (redirectionsFound>VirtuosoPullHarvest.maxRedirectionsAllowed){
-                throw new HarvestException("Too many redirections for url: " + sourceUrlString
-                        +". Found "+ redirectionsFound+", allowed "+VirtuosoPullHarvest.maxRedirectionsAllowed);
+            if (redirectionsFound > VirtuosoPullHarvest.maxRedirectionsAllowed) {
+                throw new HarvestException("Too many redirections for url: "
+                        + sourceUrlString
+                        + ". Found " + redirectionsFound + ", allowed "
+                        + VirtuosoPullHarvest.maxRedirectionsAllowed);
             }
         }
 
         // Going to harvest all directed url's
-        for (int i = 0; i < redirectedUrls.size(); i++){
+        for (int i = 0; i < redirectedUrls.size(); i++) {
 
             UrlRedirectionInfo current = redirectedUrls.get(i);
             HarvestSourceDTO directedSource = DAOFactory.get().getDao(
                     HarvestSourceDAO.class).getHarvestSourceByUrl(current.getSourceURL());
 
-            if (directedSource != null){
+            if (directedSource != null) {
 
                 // Checking if directedSource has larger interval_minutes value
                 // compared to original and updating accordingly.
-                if (directedSource.getIntervalMinutes() > originalSource.getIntervalMinutes()){
+                if (directedSource.getIntervalMinutes() > originalSource.getIntervalMinutes()) {
 
                     directedSource.setIntervalMinutes(originalSource.getIntervalMinutes());
 
                     // Saving the updated source to database.
                     DAOFactory.get().getDao(HarvestSourceDAO.class).editSource(directedSource);
                 }
-            }
-            else {
+            } else {
                 directedSource = new HarvestSourceDTO();
                 directedSource.setTrackedFile(true);
                 directedSource.setIntervalMinutes(originalSource.getIntervalMinutes());
@@ -491,25 +479,24 @@ public class VirtuosoPullHarvest extends Harvest{
 
             long now = System.currentTimeMillis();
             long lastHarvestTime =
-                directedSource.getLastHarvest()==null ? 0 : directedSource.getLastHarvest().getTime();
+                directedSource.getLastHarvest() == null ? 0 : directedSource.getLastHarvest().getTime();
             long sinceLastHarvest = now - lastHarvestTime;
-            long harvestIntervalMillis = directedSource.getIntervalMinutes()==null ? 0L :
+            long harvestIntervalMillis = directedSource.getIntervalMinutes() == null ? 0L :
                 directedSource.getIntervalMinutes().longValue() * 60L * 1000L;
 
             // The conditions applies to current url only.
             // If "current" is not harvested, the one following the "current" is still attempted.
 
-            if (lastHarvestTime==0 || this instanceof VirtuosoInstantHarvest ||
-                    (lastHarvestTime>0 && sinceLastHarvest > harvestIntervalMillis)){
+            if (lastHarvestTime == 0 || this instanceof VirtuosoInstantHarvest ||
+                    (lastHarvestTime > 0 && sinceLastHarvest > harvestIntervalMillis)) {
 
                 VirtuosoPullHarvest harvest = null;
 
                 // The flag for fullSetupMode is set in createFullSetup
                 // when initializing the harvest that way. The value for Urgent is also received there.
-                if (this.isFullSetupMode()){
+                if (this.isFullSetupMode()) {
                     harvest = createFullSetup(directedSource, this.isFullSetupModeUrgent());
-                }
-                else {
+                } else {
                     harvest = new VirtuosoPullHarvest(directedSource.getUrl(), null);
                 }
 
@@ -530,18 +517,17 @@ public class VirtuosoPullHarvest extends Harvest{
      * @throws DAOException
      */
 
-    private void setConversionModified(HttpURLConnection urlConnection) throws DAOException, IOException, ParserConfigurationException, SAXException{
+    private void setConversionModified(HttpURLConnection urlConnection) throws DAOException, IOException, ParserConfigurationException, SAXException {
 
-        if (lastHarvest!=null){
+        if (lastHarvest != null) {
             Boolean conversionModified = isConversionModifiedSinceLastHarvest();
-            if (conversionModified==null || conversionModified.booleanValue()==false){
+            if (conversionModified == null || conversionModified.booleanValue() == false) {
 
                 urlConnection.setIfModifiedSince(lastHarvest.getTime());
-                if (conversionModified!=null){
+                if (conversionModified != null) {
                     logger.debug("The source's RDF conversion not modified since" + lastHarvest.toString());
                 }
-            }
-            else{
+            } else {
                 logger.debug("The source has an RDF conversion that has been modified since last harvest");
             }
         }
@@ -557,20 +543,20 @@ public class VirtuosoPullHarvest extends Harvest{
      * @throws IOException
      * @throws DAOException
      */
-    private Boolean isConversionModifiedSinceLastHarvest() throws IOException, SAXException, ParserConfigurationException, DAOException{
+    private Boolean isConversionModifiedSinceLastHarvest() throws IOException, SAXException, ParserConfigurationException, DAOException {
 
         Boolean result = null;
 
         String schemaUri = daoFactory.getDao(HelperDAO.class).getSubjectSchemaUri(sourceUrlString);
-        if (!StringUtils.isBlank(schemaUri)){
+        if (!StringUtils.isBlank(schemaUri)) {
 
             // see if schema has RDF conversion
             convParser = ConversionsParser.parseForSchema(schemaUri);
-            if (!StringUtils.isBlank(convParser.getRdfConversionId())){
+            if (!StringUtils.isBlank(convParser.getRdfConversionId())) {
 
                 // see if the conversion XSL has changed since last harvest
                 String xsl = convParser.getRdfConversionXslFileName();
-                if (!StringUtils.isBlank(xsl)){
+                if (!StringUtils.isBlank(xsl)) {
 
                     String xslUrl = GeneralConfig.getRequiredProperty(GeneralConfig.XMLCONV_XSL_URL);
                     xslUrl = MessageFormat.format(xslUrl, Util.toArray(xsl));
@@ -582,15 +568,15 @@ public class VirtuosoPullHarvest extends Harvest{
         return result;
     }
 
-    private File unCompressGZip(File file){
+    private File unCompressGZip(File file) {
 
         File unPackedFile = null;
 
         // Testing whether the input file is GZip or not.
-        if (GZip.isFileGZip(file)){
+        if (GZip.isFileGZip(file)) {
             try {
                 unPackedFile = GZip.unPack(file);
-            } catch (Exception ex){
+            } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
         }
@@ -604,18 +590,18 @@ public class VirtuosoPullHarvest extends Harvest{
      * @throws SAXException
      * @throws ParserConfigurationException
      */
-    private File preProcess(File file, String contentType) throws ParserConfigurationException, SAXException, IOException{
+    private File preProcess(File file, String contentType) throws ParserConfigurationException, SAXException, IOException {
 
         // if content type declared to be application/rdf+xml, then believe it and go to parsing
         // straight away
-        if (contentType!=null && contentType.startsWith("application/rdf+xml")){
+        if (contentType != null && contentType.startsWith("application/rdf+xml")) {
             return file;
         }
 
         // if conversion ID not yet detected by caller, detect it here by parsing the
         // file as XML
-        String conversionId = convParser==null ? null : convParser.getRdfConversionId();
-        if (StringUtils.isBlank(conversionId)){
+        String conversionId = convParser == null ? null : convParser.getRdfConversionId();
+        if (StringUtils.isBlank(conversionId)) {
 
             logger.debug("Trying to extract schema or DTD");
 
@@ -624,19 +610,19 @@ public class VirtuosoPullHarvest extends Harvest{
 
             // get schema uri, if it's not found then fall back to dtd
             String schemaOrDtd = xmlAnalysis.getSchemaLocation();
-            if (schemaOrDtd==null || schemaOrDtd.length()==0){
+            if (schemaOrDtd == null || schemaOrDtd.length() == 0) {
                 schemaOrDtd = xmlAnalysis.getSystemDtd();
-                if (schemaOrDtd==null || !URLUtil.isURL(schemaOrDtd)){
+                if (schemaOrDtd == null || !URLUtil.isURL(schemaOrDtd)) {
                     schemaOrDtd = xmlAnalysis.getPublicDtd();
                 }
             }
 
             // if no schema or DTD still found, assume the URI of the starting element
             // to be the schema by which conversions should be looked for
-            if (schemaOrDtd==null || schemaOrDtd.length()==0){
+            if (schemaOrDtd == null || schemaOrDtd.length() == 0) {
 
                 schemaOrDtd = xmlAnalysis.getStartElemUri();
-                if (schemaOrDtd.equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#RDF")){
+                if (schemaOrDtd.equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#RDF")) {
 
                     logger.debug("File seems to be RDF, going to parse like that");
                     return file;
@@ -644,17 +630,16 @@ public class VirtuosoPullHarvest extends Harvest{
             }
 
             // if schema or DTD found, then get its RDF conversion ID
-            if (!StringUtils.isBlank(schemaOrDtd)){
+            if (!StringUtils.isBlank(schemaOrDtd)) {
 
                 logger.debug("Found schema or DTD: " + schemaOrDtd);
 
                 sourceMetadata.addObject(Predicates.CR_SCHEMA, new ObjectDTO(schemaOrDtd, false));
                 convParser = ConversionsParser.parseForSchema(schemaOrDtd);
-                if (convParser!=null){
+                if (convParser != null) {
                     conversionId = convParser.getRdfConversionId();
                 }
-            }
-            else{
+            } else {
                 logger.debug("No schema or DTD declared");
             }
         }
@@ -662,12 +647,11 @@ public class VirtuosoPullHarvest extends Harvest{
         // if no conversion found, still return the file for parsing as RDF
         // (we know that at least it's XML, because otherwise a SAXException
         // would have been thrown above)
-        if (StringUtils.isBlank(conversionId)){
+        if (StringUtils.isBlank(conversionId)) {
 
             logger.debug("No RDF conversion found, trying to parse as RDF");
             return file;
-        }
-        else{
+        } else {
             logger.debug("Going to run the found RDF conversion (id = " + conversionId + ")");
 
             // prepare conversion URL
@@ -695,7 +679,7 @@ public class VirtuosoPullHarvest extends Harvest{
      *
      * @param urlConnection
      */
-    private void setLastRefreshed(URLConnection urlConnection, long lastRefreshedTime){
+    private void setLastRefreshed(URLConnection urlConnection, long lastRefreshedTime) {
 
         String lastRefreshed = lastRefreshedDateFormat.format(new Date(lastRefreshedTime));
         sourceMetadata.addObject(Predicates.CR_LAST_REFRESHED, new ObjectDTO(String.valueOf(lastRefreshed), true));
@@ -705,7 +689,7 @@ public class VirtuosoPullHarvest extends Harvest{
      *
      * @param urlConnetion
      */
-    private void setSourceMetadata(URLConnection urlConnection){
+    private void setSourceMetadata(URLConnection urlConnection) {
 
         // set last-refreshed predicate
         long lastRefreshed = System.currentTimeMillis();
@@ -713,7 +697,7 @@ public class VirtuosoPullHarvest extends Harvest{
 
         // detect the last-modified-date from HTTP response, if it's not >0, then take the value of last-refreshed
         sourceLastModified = urlConnection.getLastModified();
-        if (sourceLastModified<=0){
+        if (sourceLastModified <= 0) {
             sourceLastModified = lastRefreshed;
         }
 
@@ -722,19 +706,19 @@ public class VirtuosoPullHarvest extends Harvest{
         sourceMetadata.addObject(Predicates.CR_LAST_MODIFIED, new ObjectDTO(s, true));
 
         int contentLength = urlConnection.getContentLength();
-        if (contentLength>=0){
+        if (contentLength >= 0) {
             sourceMetadata.addObject(Predicates.CR_BYTE_SIZE, new ObjectDTO(String.valueOf(contentLength), true));
         }
 
         String contentType = urlConnection.getContentType();
-        if (contentType!=null && contentType.length()>0){
+        if (contentType != null && contentType.length() > 0) {
             String charset = null;
             int i = contentType.indexOf(";");
-            if (i>0){
+            if (i > 0) {
                 int j = contentType.indexOf("charset=", i);
-                if (j>i){
+                if (j > i) {
                     int k = contentType.indexOf(";", j);
-                    k = k<0 ? contentType.length() : k;
+                    k = k < 0 ? contentType.length() : k;
                     charset = contentType.substring(j + "charset=".length(), k).trim();
                 }
                 contentType = contentType.substring(0, i).trim();
@@ -742,11 +726,11 @@ public class VirtuosoPullHarvest extends Harvest{
 
             sourceMetadata.addObject(Predicates.CR_MEDIA_TYPE, new ObjectDTO(String.valueOf(contentType), true));
             String rdfTypeOfMediaType = MimeTypeConverter.getRdfTypeFor(contentType);
-            if (!StringUtils.isBlank(rdfTypeOfMediaType)){
+            if (!StringUtils.isBlank(rdfTypeOfMediaType)) {
                 sourceMetadata.addObject(Predicates.RDF_TYPE, new ObjectDTO(String.valueOf(rdfTypeOfMediaType), false));
             }
 
-            if (charset!=null && charset.length()>0){
+            if (charset != null && charset.length() > 0) {
                 sourceMetadata.addObject(Predicates.CR_CHARSET, new ObjectDTO(String.valueOf(charset), true));
             }
         }
@@ -756,7 +740,7 @@ public class VirtuosoPullHarvest extends Harvest{
      *
      * @param path
      */
-    private void deleteDownloadedFile(String path){
+    private void deleteDownloadedFile(String path) {
         deleteDownloadedFile(new File(path));
     }
 
@@ -764,18 +748,17 @@ public class VirtuosoPullHarvest extends Harvest{
      *
      * @param file
      */
-    private void deleteDownloadedFile(File file){
+    private void deleteDownloadedFile(File file) {
 
-        if (file==null || !file.exists())
+        if (file == null || !file.exists())
             return;
 
-        try{
+        try {
             // delete unless the configuration requires otherwise
-            if (GeneralConfig.getProperty(GeneralConfig.HARVESTER_DELETE_DOWNLOADED_FILES, "true").equals("true")){
+            if (GeneralConfig.getProperty(GeneralConfig.HARVESTER_DELETE_DOWNLOADED_FILES, "true").equals("true")) {
                 file.delete();
             }
-        }
-        catch (RuntimeException e){
+        } catch (RuntimeException e) {
             logger.error(e.toString(), e);
         }
     }
@@ -791,7 +774,7 @@ public class VirtuosoPullHarvest extends Harvest{
      * (non-Javadoc)
      * @see eionet.cr.harvest.Harvest#doHarvestStartedActions()
      */
-    protected void doHarvestStartedActions() throws HarvestException{
+    protected void doHarvestStartedActions() throws HarvestException {
 
         logger.debug("Pull harvest started");
         super.doHarvestStartedActions();
@@ -803,7 +786,7 @@ public class VirtuosoPullHarvest extends Harvest{
      * @return
      * @throws DAOException
      */
-    public static VirtuosoPullHarvest createFullSetup(String sourceUrl, boolean urgent) throws DAOException{
+    public static VirtuosoPullHarvest createFullSetup(String sourceUrl, boolean urgent) throws DAOException {
 
         return createFullSetup(DAOFactory.get().getDao(
                 HarvestSourceDAO.class).getHarvestSourceByUrl(sourceUrl), urgent);
@@ -816,7 +799,7 @@ public class VirtuosoPullHarvest extends Harvest{
      * @return
      * @throws DAOException
      */
-    public static VirtuosoPullHarvest createFullSetup(HarvestSourceDTO dto, boolean urgent) throws DAOException{
+    public static VirtuosoPullHarvest createFullSetup(HarvestSourceDTO dto, boolean urgent) throws DAOException {
 
         VirtuosoPullHarvest harvest = new VirtuosoPullHarvest(dto.getUrl(), urgent ? null : dto.getLastHarvest());
 
@@ -826,7 +809,7 @@ public class VirtuosoPullHarvest extends Harvest{
                 dto.getSourceId().intValue()));
         harvest.setNotificationSender(new HarvestNotificationSender());
 
-        int numOfResources = dto.getResources()==null ? 0 : dto.getResources().intValue();
+        int numOfResources = dto.getResources() == null ? 0 : dto.getResources().intValue();
         harvest.setDaoWriter(new HarvestDAOWriter(
                 dto.getSourceId().intValue(), Harvest.TYPE_PULL, numOfResources, CRUser.application.getUserName()));
 
