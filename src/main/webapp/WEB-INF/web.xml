@@ -120,22 +120,10 @@
         <servlet-name>StripesDispatcher</servlet-name>
         <url-pattern>/home/*</url-pattern>
     </servlet-mapping>
-    
-    <!--  SPARQL endpoint service -->
-    <servlet>
-	<servlet-name>Jersey REST Service</servlet-name>
-	<servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
-	<init-param>
-		<param-name>com.sun.jersey.config.property.packages</param-name>
-		<param-value>eionet.cr.web.sparqlClient.endpoint</param-value>
-	</init-param>
-	<load-on-startup>1</load-on-startup>
-    </servlet>
     <servlet-mapping>
-	<servlet-name>Jersey REST Service</servlet-name>
-	<url-pattern>/sparql/*</url-pattern>
+        <servlet-name>StripesDispatcher</servlet-name>
+        <url-pattern>/sparql</url-pattern>
     </servlet-mapping>
-
 
     <!--  XmlRpcServlet (for XML-RPC 3) -->
     <servlet>
