@@ -16,7 +16,6 @@ import org.openrdf.OpenRDFException;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
-import org.openrdf.query.resultio.sparqlxml.SPARQLResultsXMLWriter;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
@@ -25,6 +24,7 @@ import virtuoso.sesame2.driver.VirtuosoRepository;
 
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.web.sparqlClient.helpers.CRJsonWriter;
+import eionet.cr.web.sparqlClient.helpers.CRXmlWriter;
 import eionet.cr.web.sparqlClient.helpers.QueryResult;
 
 /**
@@ -110,7 +110,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                     TupleQuery resultsTable = con.prepareTupleQuery(QueryLanguage.SPARQL, query);
                     
                     if (format != null && format.equals(FORMAT_XML)) {
-                        SPARQLResultsXMLWriter sparqlWriter = new SPARQLResultsXMLWriter(out);
+                        CRXmlWriter sparqlWriter = new CRXmlWriter(out);
                         resultsTable.evaluate(sparqlWriter);
                     } else if (format != null && format.equals(FORMAT_JSON)) {
                         CRJsonWriter sparqlWriter = new CRJsonWriter(out);
