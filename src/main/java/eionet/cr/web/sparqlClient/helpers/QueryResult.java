@@ -11,6 +11,8 @@ import org.openrdf.query.BindingSet;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.TupleQueryResult;
 
+import eionet.cr.util.Util;
+
 /**
  *
  * @author jaanus
@@ -54,7 +56,7 @@ public class QueryResult {
 
             if (value!=null){
 
-                String valueString = value.stringValue();
+                String valueString = Util.escapeHtml(value.stringValue());
                 if (value instanceof Literal){
                     resultValue = new ResultValue(valueString, true);
                 }

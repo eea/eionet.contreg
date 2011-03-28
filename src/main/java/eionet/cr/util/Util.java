@@ -33,7 +33,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -45,6 +44,7 @@ import java.util.regex.Pattern;
 
 import javax.servlet.jsp.PageContext;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.quartz.CronExpression;
 
@@ -621,4 +621,17 @@ public class Util {
    public static boolean isSurroundedWithQuotes(String s) {
        return s.startsWith("\"") && s.endsWith("\"");
    }
+   
+   /**
+   *
+   * @param s
+   * @return escaped string
+   */
+  public static String escapeHtml(String s) {
+      if(!StringUtils.isBlank(s)){
+          s = StringEscapeUtils.escapeHtml(s);
+          s = s.replaceAll("\n", "<br/>");
+      }
+      return s;
+  }
 }
