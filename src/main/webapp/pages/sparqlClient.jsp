@@ -6,7 +6,7 @@
 
     <stripes:layout-component name="contents">
 
-        <h1>Simple SPARQL client</h1>
+        <h1>SPARQL endpoint</h1>
 
         <p>
             Type a SPARQL SELECT query, select output format and press Execute.
@@ -21,15 +21,15 @@
 SELECT DISTINCT ?class ?label WHERE {
   _:subj a ?class .
   OPTIONAL { ?class rdfs:label ?label }
-} LIMIT 50 OFFSET 0</c:if>${actionBean.query}</textarea>
+} LIMIT 50</c:if>${actionBean.query}</textarea>
                 </div>
                 <div style="position: relative;">
-            		<div style="position: absolute; top:5px; left:0px;">
+										<div style="position: absolute; top:5px; left:0px;">
                         <label for="format" class="question">Display result as:</label>
                         <stripes:select name="format" id="format">
                            	<stripes:option value="text/html" label="HTML"/>
-                           	<stripes:option value="application/sparql-results+xml" label="XML"/>
                            	<stripes:option value="application/sparql-results+json" label="JSON"/>
+                           	<stripes:option value="application/sparql-results+xml" label="XML"/>
                         </stripes:select>
                     </div>
                     <div style="position:absolute; top:5px; left:200px;">
