@@ -15,32 +15,33 @@
         <div style="margin-top:15px">
             <stripes:form action="/sparql" method="get">
                 <div>
-                            <label for="queryText" class="question">Query:</label>
-                            <textarea name="query" id="queryText" rows="8" cols="80" style="display:block; width:100%"><c:if test="${empty actionBean.query}">PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
+                    <label for="queryText" class="question">Query:</label>
+                    <textarea name="query" id="queryText" rows="8" cols="80" style="display:block; width:100%"><c:if test="${empty actionBean.query}">PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
 
 SELECT DISTINCT ?class ?label WHERE {
   _:subj a ?class .
   OPTIONAL { ?class rdfs:label ?label }
 } LIMIT 50</c:if>${actionBean.query}</textarea>
                 </div>
-                <div style="position: relative;">
-										<div style="position: absolute; top:5px; left:0px;">
+                <div style="position: relative; margin-bottom:30px">
+                    <div style="position: absolute; top:5px; left:0px;">
                         <label for="format" class="question">Display result as:</label>
                         <stripes:select name="format" id="format">
-                           	<stripes:option value="text/html" label="HTML"/>
-                           	<stripes:option value="application/sparql-results+json" label="JSON"/>
-                           	<stripes:option value="application/sparql-results+xml" label="XML"/>
+                            <stripes:option value="text/html" label="HTML"/>
+                            <stripes:option value="application/sparql-results+json" label="JSON"/>
+                            <stripes:option value="application/sparql-results+xml" label="XML"/>
                         </stripes:select>
                     </div>
                     <div style="position:absolute; top:5px; left:200px;">
-                    	<stripes:label for="nrOfHits" class="question">Number of hits per page</stripes:label>
-                    	<stripes:text name="nrOfHits" size="2" id="nrOfHits"/>
+                        <stripes:label for="nrOfHits" class="question">Number of hits per page</stripes:label>
+                        <stripes:text name="nrOfHits" size="2" id="nrOfHits"/>
                     </div>
                     <div style="position: absolute; top:5px; right:0px;">
-                    	<stripes:submit name="execute" value="Execute" id="executeButton"/>
+                        <stripes:submit name="execute" value="Execute" id="executeButton"/>
                     </div>
                 </div>
-				<div style="margin-top:30px">
+
+                <div>
                 <c:if test="${not empty actionBean.query}">
                     <c:choose>
                         <c:when test="${not empty actionBean.result && not empty actionBean.result.rows}">
@@ -58,10 +59,8 @@ SELECT DISTINCT ?class ?label WHERE {
                     </c:choose>
                 </c:if>
                 <c:if test="${empty actionBean.query}">
-								<p>
-								Useful namespaces:
-								</p>
-								<pre>
+                    <h2>Useful namespaces</h2>
+                    <pre>
 PREFIX rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;
 PREFIX rdfs:  &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
 PREFIX dc:  &lt;http://purl.org/dc/elements/1.1/&gt;
@@ -70,7 +69,9 @@ PREFIX xsd:     &lt;http://www.w3.org/2001/XMLSchema#&gt;
 PREFIX foaf:  &lt;http://xmlns.com/foaf/0.1/&gt;
 PREFIX vcard: &lt;http://www.w3.org/2001/vcard-rdf/3.0#&gt;
 PREFIX geo: &lt;http://www.w3.org/2003/01/geo/wgs84_pos#&gt;
-								</pre>
+PREFIX cr: &lt;http://cr.eionet.europa.eu/ontologies/contreg.rdf#&gt;
+PREFIX rod: &lt;http://rod.eionet.europa.eu/schema.rdf#&gt;
+                    </pre>
                 </c:if>
                 </div>
             </stripes:form>
