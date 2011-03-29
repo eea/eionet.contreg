@@ -2,6 +2,8 @@ package eionet.cr.web.action;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -41,6 +43,16 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     
     /** */
     private static final String FORM_PAGE = "/pages/sparqlClient.jsp";
+    
+    private static List<String> xmlFormats = new ArrayList<String>();
+    
+    static{
+        xmlFormats.add("application/sparql-results+xml");
+        xmlFormats.add("application/rdf+xml");
+        xmlFormats.add("application/xml");
+        xmlFormats.add("text/xml");
+        xmlFormats.add("application/x-binary-rdf-results-table");
+    }
 
     /** */
     private String query;
@@ -74,11 +86,12 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             nrOfHits = 20;
         }
 
-        if (accept != null && accept[0].equals("text/html")) {
-            if (!StringUtils.isBlank(query)) {
-                runQuery(query, FORMAT_HTML, null);
-            }
-            return new ForwardResolution(FORM_PAGE);
+        if (accept != null && xmlFormats.contains(accept[0])) {
+            return new StreamingResolution("application/sparql-results+xml") {
+                public void stream(HttpServletResponse response) throws Exception {
+                    runQuery(query, FORMAT_XML, response.getOutputStream());
+                }
+            };
         } else if (accept != null && accept[0].equals("application/sparql-results+json")) {
             return new StreamingResolution("application/sparql-results+json") {
                 public void stream(HttpServletResponse response) throws Exception {
@@ -86,11 +99,10 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                 }
             };
         } else {
-            return new StreamingResolution("application/sparql-results+xml") {
-                public void stream(HttpServletResponse response) throws Exception {
-                    runQuery(query, FORMAT_XML, response.getOutputStream());
-                }
-            };
+            if (!StringUtils.isBlank(query)) {
+                runQuery(query, FORMAT_HTML, null);
+            }
+            return new ForwardResolution(FORM_PAGE);
         }
     }
     
