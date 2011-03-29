@@ -57,6 +57,21 @@ SELECT DISTINCT ?class ?label WHERE {
                         </c:otherwise>
                     </c:choose>
                 </c:if>
+                <c:if test="${empty actionBean.query}">
+								<p>
+								Useful namespaces:
+								</p>
+								<pre>
+PREFIX rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;
+PREFIX rdfs:  &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
+PREFIX dc:  &lt;http://purl.org/dc/elements/1.1/&gt;
+PREFIX dcterms:  &lt;http://purl.org/dc/terms/&gt;
+PREFIX xsd:     &lt;http://www.w3.org/2001/XMLSchema#&gt;
+PREFIX foaf:  &lt;http://xmlns.com/foaf/0.1/&gt;
+PREFIX vcard: &lt;http://www.w3.org/2001/vcard-rdf/3.0#&gt;
+PREFIX geo: &lt;http://www.w3.org/2003/01/geo/wgs84_pos#&gt;
+								</pre>
+                </c:if>
                 </div>
             </stripes:form>
         </div>
