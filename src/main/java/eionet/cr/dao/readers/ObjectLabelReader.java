@@ -1,5 +1,8 @@
 package eionet.cr.dao.readers;
 
+import java.util.Collection;
+import java.util.Collections;
+
 import org.apache.commons.lang.StringUtils;
 import org.openrdf.model.Value;
 import org.openrdf.query.BindingSet;
@@ -50,4 +53,10 @@ public class ObjectLabelReader extends SPARQLResultSetBaseReader<ObjectLabelPair
             resultList.add(new ObjectLabelPair(obj.stringValue(), labelStr));
         }
     }
+    
+    public void endResultSet() {
+
+        Collections.sort(resultList);
+    }
+
 }

@@ -230,6 +230,7 @@ public class ApplicationCache implements ServletContextListener {
         for (Pair<String, String> type : types) {
             typeUris.add(new ObjectLabelPair(type.getLeft(), type.getLeft()));
         }
+        Collections.sort(typeUris);
         return typeUris;
     }
 
