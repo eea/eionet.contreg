@@ -128,8 +128,10 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                 }
             } catch (RepositoryException rex) {
                 rex.printStackTrace();
+                throw new RuntimeException(rex.toString(), rex);
             } catch (Exception e) {
                 e.printStackTrace();
+                throw new RuntimeException(e.toString(), e);
             } finally {
                 try {
                     if(out != null)
