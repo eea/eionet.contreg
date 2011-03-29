@@ -212,7 +212,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
         List<String> objectUri = executeSPARQL(strBuilder.toString(), new SingleObjectReader<String>());
 
-        return objectUri.get(0);
+        return (objectUri != null && objectUri.size() > 0) ? objectUri.get(0) : null;
     }
 
     /*

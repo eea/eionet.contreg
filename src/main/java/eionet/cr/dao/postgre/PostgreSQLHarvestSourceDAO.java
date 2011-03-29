@@ -30,6 +30,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
+import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.readers.HarvestSourceDTOReader;
@@ -458,6 +459,16 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
         }
 
         int limit = Math.round((float)numberOfSources/(float)numOfSegments);
+        
+        String upperLimitStr = GeneralConfig.getProperty(GeneralConfig.HARVESTER_SOURCES_UPPER_LIMIT);
+        if (upperLimitStr != null && upperLimitStr.length() > 0) {
+            upperLimitStr = upperLimitStr.trim();
+            int upperLimit = Integer.parseInt(upperLimitStr);
+            if (upperLimit > 0) {
+                limit = upperLimit;
+            }
+        }
+        
         List<Object> values = new ArrayList<Object>();
         values.add(new Integer(limit));
 

@@ -82,6 +82,7 @@ public class VirtuosoPullHarvest extends Harvest {
     /**
      *
      * @param sourceUrlString
+     * @param lastHarvest
      */
     public VirtuosoPullHarvest(String sourceUrlString, Date lastHarvest) {
         super(sourceUrlString);
@@ -510,7 +511,6 @@ public class VirtuosoPullHarvest extends Harvest {
 
     /**
      *
-     * @return
      * @throws ParserConfigurationException
      * @throws SAXException
      * @throws IOException
@@ -783,7 +783,8 @@ public class VirtuosoPullHarvest extends Harvest {
     /**
      *
      * @param sourceUrl
-     * @return
+     * @param urgent
+     * @return VirtuosoPullHarvest
      * @throws DAOException
      */
     public static VirtuosoPullHarvest createFullSetup(String sourceUrl, boolean urgent) throws DAOException {
@@ -796,7 +797,7 @@ public class VirtuosoPullHarvest extends Harvest {
      *
      * @param dto
      * @param urgent
-     * @return
+     * @return VirtuosoPullHarvest
      * @throws DAOException
      */
     public static VirtuosoPullHarvest createFullSetup(HarvestSourceDTO dto, boolean urgent) throws DAOException {
