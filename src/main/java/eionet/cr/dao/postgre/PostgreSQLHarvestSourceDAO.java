@@ -50,7 +50,7 @@ import eionet.cr.util.sql.SingleObjectReader;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements HarvestSourceDAO{
+public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements HarvestSourceDAO {
 
     /** */
     private static final String getSourcesSQL =
@@ -156,15 +156,15 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
         String queryWithoutOrderAndLimit = new String(sql);
         List<Object> inParamsWithoutOrderAndLimit = new LinkedList<Object>(inParams);
 
-        if (sortingRequest!=null && sortingRequest.getSortingColumnName()!=null) {
-            sql += " ORDER BY " +
-               sortingRequest.getSortingColumnName() + " " + sortingRequest.getSortOrder().toSQL();
-        }
-        else {
+        if (sortingRequest != null && sortingRequest.getSortingColumnName() != null) {
+            sql += " ORDER BY "
+                + sortingRequest.getSortingColumnName()
+                + " " + sortingRequest.getSortOrder().toSQL();
+        } else {
             sql += " ORDER BY URL ";
         }
 
-        if (pagingRequest!=null){
+        if (pagingRequest != null) {
             sql += " LIMIT ? OFFSET ? ";
             inParams.add(pagingRequest.getItemsPerPage());
             inParams.add(pagingRequest.getOffset());
@@ -172,7 +172,7 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
 
         int rowCount = 0;
         List<HarvestSourceDTO> list = executeSQL(sql, inParams, new HarvestSourceDTOReader());
-        if (list!=null && !list.isEmpty()){
+        if (list != null && !list.isEmpty()) {
 
             StringBuffer buf = new StringBuffer("select count(*) from (").
             append(queryWithoutOrderAndLimit).append(") as foo");
@@ -185,16 +185,16 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
     }
 
     /** */
-    private static final String addSourceSQL = "insert into HARVEST_SOURCE" +
-            " (URL,URL_HASH,EMAILS,TIME_CREATED,INTERVAL_MINUTES,TRACKED_FILE)" +
-            " VALUES (?,?,?,NOW(),?,cast(? as ynboolean))";
+    private static final String addSourceSQL = "insert into HARVEST_SOURCE"
+        + " (URL,URL_HASH,EMAILS,TIME_CREATED,INTERVAL_MINUTES,TRACKED_FILE)"
+        + " VALUES (?,?,?,NOW(),?,cast(? as ynboolean))";
     /*
      * (non-Javadoc)
      * @see eionet.cr.dao.HarvestSourceDAO#addSource(java.lang.String, int, boolean, java.lang.String)
      */
     public Integer addSource(String url, int intervalMinutes, boolean trackedFile, String emails) throws DAOException {
 
-        if (StringUtils.isBlank(url)){
+        if (StringUtils.isBlank(url)) {
             throw new IllegalArgumentException("url must not be null");
         }
 
@@ -210,7 +210,7 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
         values.add(YesNoBoolean.format(trackedFile));
 
         Connection conn = null;
-        try{
+        try {
             // execute the insert statement
             conn = getSQLConnection();
             SQLUtil.executeUpdate(addSourceSQL, values, conn);
@@ -223,12 +223,10 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
             // by human action only (i.e. adding a new source via web interface).
             Object o = SQLUtil.executeSingleReturnValueQuery(
                     "select HARVEST_SOURCE_ID from HARVEST_SOURCE where URL_HASH="+urlHash, conn);
-            return o==null ? null : Integer.valueOf(o.toString());
-        }
-        catch (Exception e){
+            return o == null ? null : Integer.valueOf(o.toString());
+        } catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
-        }
-        finally{
+        } finally {
             SQLUtil.close(conn);
         }
     }
@@ -237,7 +235,7 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
      * (non-Javadoc)
      * @see eionet.cr.dao.HarvestSourceDAO#addSourceIgnoreDuplicate(java.lang.String, int, boolean, java.lang.String)
      */
-    public void addSourceIgnoreDuplicate(String url, int intervalMinutes, boolean trackedFile, String emails) throws DAOException{
+    public void addSourceIgnoreDuplicate(String url, int intervalMinutes, boolean trackedFile, String emails) throws DAOException {
 
         // JH160210 - in PostgreSQL schema we assume there is a rule created that does nothing if
         // duplicate source added. We lose the ability to notify user if she's trying to add
@@ -252,30 +250,28 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
     public void deleteHarvestHistory(int neededToRemain) throws DAOException {
 
         Connection conn = null;
-        try{
+        try {
             conn = getSQLConnection();
             conn.setAutoCommit(false);
 
             Object o = SQLUtil.executeSingleReturnValueQuery(
                     "select max(HARVEST_ID) from HARVEST", conn);
-            Long maxId = o==null || StringUtils.isBlank(o.toString()) ?
+            Long maxId = o == null || StringUtils.isBlank(o.toString()) ?
                     0L : Long.valueOf(o.toString());
 
-            if (maxId > neededToRemain){
+            if (maxId > neededToRemain) {
                 SQLUtil.executeUpdate(
                         "delete from HARVEST where HARVEST_ID<=" + (maxId-neededToRemain), conn);
             }
 
-            SQLUtil.executeUpdate("delete from HARVEST_MESSAGE" +
-                    " where HARVEST_ID not in (select HARVEST_ID from HARVEST)", conn);
+            SQLUtil.executeUpdate("delete from HARVEST_MESSAGE"
+                + " where HARVEST_ID not in (select HARVEST_ID from HARVEST)", conn);
 
             conn.commit();
-        }
-        catch (SQLException e){
+        } catch (SQLException e) {
             SQLUtil.rollback(conn);
             throw new DAOException(e.toString(), e);
-        }
-        finally{
+        } finally {
             SQLUtil.close(conn);
         }
     }
@@ -287,7 +283,7 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
     public void deleteTriplesOfMissingSources() throws DAOException {
 
         Connection conn = null;
-        try{
+        try {
             conn = getSQLConnection();
             conn.setAutoCommit(false);
 
@@ -297,12 +293,10 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
             SQLUtil.executeUpdate(sql, conn);
 
             conn.commit();
-        }
-        catch (SQLException e){
+        } catch (SQLException e) {
             SQLUtil.rollback(conn);
-            throw new DAOException(e.toString(),e);
-        }
-        finally{
+            throw new DAOException(e.toString(), e);
+        } finally {
             SQLUtil.close(conn);
         }
     }
@@ -320,7 +314,7 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
         urlList.add(url);
 
         Connection conn = null;
-        try{
+        try {
             // start transaction
             conn = getSQLConnection();
             conn.setAutoCommit(false);
@@ -333,7 +327,7 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
             String harvestSourceIdsCSV = Util.toCSV(sourceIds);
 
             // if harvest source ID found, delete harvests and harvest messages by it
-            if (!StringUtils.isBlank(harvestSourceIdsCSV)){
+            if (!StringUtils.isBlank(harvestSourceIdsCSV)) {
 
                 List<Long> harvestIds = executeSQL(
                     "select HARVEST_ID from HARVEST where HARVEST_SOURCE_ID in ("
@@ -342,12 +336,12 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
                     new SingleObjectReader<Long>());
 
                 String harvestIdsCSV = Util.toCSV(harvestIds);
-                if (!StringUtils.isBlank(harvestIdsCSV)){
+                if (!StringUtils.isBlank(harvestIdsCSV)) {
                     SQLUtil.executeUpdate("delete from HARVEST_MESSAGE where HARVEST_ID in ("
                             + harvestIdsCSV + ")", conn);
                 }
-                SQLUtil.executeUpdate("delete from HARVEST where HARVEST_SOURCE_ID in (" +
-                        harvestSourceIdsCSV + ")", conn);
+                SQLUtil.executeUpdate("delete from HARVEST where HARVEST_SOURCE_ID in ("
+                        + harvestSourceIdsCSV + ")", conn);
             }
 
             // delete dependencies of this harvest source in other tables
@@ -366,19 +360,17 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
 
             // end transaction
             conn.commit();
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             SQLUtil.rollback(conn);
             throw new DAOException(e.getMessage(), e);
-        }
-        finally{
+        } finally {
             SQLUtil.close(conn);
         }
     }
 
     /** */
-    private static final String editSourceSQL = "update HARVEST_SOURCE set URL=?," +
-            " URL_HASH=?, EMAILS=?,INTERVAL_MINUTES=? where HARVEST_SOURCE_ID=?";
+    private static final String editSourceSQL = "update HARVEST_SOURCE set URL=?,"
+            + " URL_HASH=?, EMAILS=?,INTERVAL_MINUTES=? where HARVEST_SOURCE_ID=?";
     /*
      * (non-Javadoc)
      * @see eionet.cr.dao.HarvestSourceDAO#editSource(eionet.cr.dto.HarvestSourceDTO)
@@ -387,20 +379,18 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
 
         List<Object> values = new ArrayList<Object>();
         values.add(source.getUrl());
-        values.add(Long.valueOf(source.getUrl()==null ? 0 : Hashes.spoHash(source.getUrl())));
+        values.add(Long.valueOf(source.getUrl() == null ? 0 : Hashes.spoHash(source.getUrl())));
         values.add(source.getEmails());
         values.add(source.getIntervalMinutes());
         values.add(source.getSourceId());
 
         Connection conn = null;
-        try{
+        try {
             conn = getSQLConnection();
             SQLUtil.executeUpdate(editSourceSQL, values, conn);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
-        }
-        finally{
+        } finally {
             SQLUtil.close(conn);
         }
     }
@@ -418,7 +408,7 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
         values.add(harvestSourceID);
         List<HarvestSourceDTO> list = executeSQL(
                 getSourcesByIdSQL, values, new HarvestSourceDTOReader());
-        return (list!=null && !list.isEmpty()) ? list.get(0) : null;
+        return (list != null && !list.isEmpty()) ? list.get(0) : null;
     }
 
     /** */
@@ -433,16 +423,18 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
         values.add(url);
         List<HarvestSourceDTO> list = executeSQL(
                 getSourcesByUrlSQL, values, new HarvestSourceDTOReader());
-        return (list!=null && !list.isEmpty()) ? list.get(0) : null;
+        return (list != null && !list.isEmpty()) ? list.get(0) : null;
     }
 
     /** */
     private static final String getNextScheduledSourcesSQL =
 
-        "select * from HARVEST_SOURCE where INTERVAL_MINUTES>0" +
-        " and extract(epoch from now()-(coalesce(LAST_HARVEST,(TIME_CREATED - INTERVAL_MINUTES * interval '1 minute')))) >= (INTERVAL_MINUTES*60)" +
-        " order by extract(epoch from now()-(coalesce(LAST_HARVEST,(TIME_CREATED - INTERVAL_MINUTES * interval '1 minute')))) / (INTERVAL_MINUTES*60)" +
-        " desc limit ?";
+        "select * from HARVEST_SOURCE where INTERVAL_MINUTES>0"
+        + " and extract(epoch from now()-(coalesce(LAST_HARVEST,"
+        + "(TIME_CREATED - INTERVAL_MINUTES * interval '1 minute')))) >= (INTERVAL_MINUTES*60)"
+        + " order by extract(epoch from now()-(coalesce(LAST_HARVEST,"
+        + "(TIME_CREATED - INTERVAL_MINUTES * interval '1 minute')))) / (INTERVAL_MINUTES*60)"
+        + " desc limit ?";
 
     /*
      * (non-Javadoc)
@@ -454,21 +446,26 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
                 "select count(*) from HARVEST_SOURCE",
                 null,
                 new SingleObjectReader<Long>());
-        if (numberOfSources== null){
+        if (numberOfSources == null) {
             numberOfSources = Long.valueOf(0);
         }
 
-        int limit = Math.round((float)numberOfSources/(float)numOfSegments);
-        
+        /*
+         * We calculate how many sources we need to harvest in this round,
+         * but if the amount is over the limit we lower it to the limit.
+         * The purpose is to avoid tsunamis of harvesting.
+         */
+        int limit = Math.round((float)numberOfSources / (float)numOfSegments);
+
         String upperLimitStr = GeneralConfig.getProperty(GeneralConfig.HARVESTER_SOURCES_UPPER_LIMIT);
         if (upperLimitStr != null && upperLimitStr.length() > 0) {
             upperLimitStr = upperLimitStr.trim();
             int upperLimit = Integer.parseInt(upperLimitStr);
-            if (upperLimit > 0) {
+            if (upperLimit > 0 && limit > upperLimit) {
                 limit = upperLimit;
             }
         }
-        
+
         List<Object> values = new ArrayList<Object>();
         values.add(new Integer(limit));
 
@@ -509,12 +506,14 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
 
     /** */
     private static final String updateHarvestFinishedSQL =
-        "update HARVEST_SOURCE set STATEMENTS=?, RESOURCES=?," +
-        " LAST_HARVEST_FAILED=cast(? as ynboolean), LAST_HARVEST=NOW() where HARVEST_SOURCE_ID=?";
+        "update HARVEST_SOURCE set STATEMENTS=?, RESOURCES=?,"
+            + " LAST_HARVEST_FAILED=cast(? as ynboolean),"
+            + " LAST_HARVEST=NOW() where HARVEST_SOURCE_ID=?";
     private static final String updateHarvestFinishedSQL_avail =
-        "update HARVEST_SOURCE set STATEMENTS=?, RESOURCES=?," +
-        " COUNT_UNAVAIL=(case when ?=1 then 0 else (COUNT_UNAVAIL+1) end)," +
-        " LAST_HARVEST_FAILED=cast(? as ynboolean), LAST_HARVEST=NOW() where HARVEST_SOURCE_ID=?";
+        "update HARVEST_SOURCE set STATEMENTS=?, RESOURCES=?,"
+            + " COUNT_UNAVAIL=(case when ?=1 then 0 else (COUNT_UNAVAIL+1) end),"
+            + " LAST_HARVEST_FAILED=cast(? as ynboolean), LAST_HARVEST=NOW()"
+            + " where HARVEST_SOURCE_ID=?";
     /*
      * (non-Javadoc)
      * @see eionet.cr.dao.HarvestSourceDAO#updateHarvestFinished(int, java.lang.Integer, java.lang.Integer, java.lang.Boolean, boolean)
@@ -526,20 +525,18 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
         List<Object> values = new ArrayList<Object>();
         values.add(numStatements);
         values.add(numResources);
-        if (sourceAvailable!=null)
-            values.add(sourceAvailable.booleanValue()==true ? new Integer(1) : new Integer(0));
+        if (sourceAvailable != null)
+            values.add(sourceAvailable.booleanValue() == true ? new Integer(1) : new Integer(0));
         values.add(YesNoBoolean.format(failed));
         values.add(new Integer(sourceId));
 
         Connection conn = null;
-        try{
+        try {
             conn = getSQLConnection();
-            SQLUtil.executeUpdate(sourceAvailable!=null ? updateHarvestFinishedSQL_avail : updateHarvestFinishedSQL, values, conn);
-        }
-        catch (Exception e){
+            SQLUtil.executeUpdate(sourceAvailable != null ? updateHarvestFinishedSQL_avail : updateHarvestFinishedSQL, values, conn);
+        } catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
-        }
-        finally{
+        } finally {
             SQLUtil.close(conn);
         }
     }
@@ -564,18 +561,16 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
         Connection conn = null;
         Statement stmt = null;
         ResultSet rs = null;
-        try{
+        try {
             conn = getSQLConnection();
             stmt = conn.createStatement();
             rs = stmt.executeQuery(buf.toString());
-            while (rs.next()){
+            while (rs.next()) {
                 result = rs.getDouble("urgency");
             }
-        }
-        catch (SQLException e){
+        } catch (SQLException e) {
             throw new DAOException(e.toString(), e);
-        }
-        finally{
+        } finally {
             SQLUtil.close(rs);
             SQLUtil.close(stmt);
             SQLUtil.close(conn);
