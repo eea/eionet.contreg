@@ -53,9 +53,9 @@ import eionet.cr.util.sql.SingleObjectReader;
 public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements HarvestSourceDAO {
 
     /** */
-    private static final String getSourcesSQL =
+    private static final String GET_SOURCES_SQL =
         "SELECT * FROM HARVEST_SOURCE WHERE TRACKED_FILE = 'N' AND COUNT_UNAVAIL = 0 AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
-    private static final String searchSourcesSQL =
+    private static final String SEARCH_SOURCES_SQL =
         "SELECT * FROM HARVEST_SOURCE WHERE TRACKED_FILE = 'N' AND COUNT_UNAVAIL = 0 AND URL like (?) AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
     private static final String getHarvestSourcesFailedSQL =
         "SELECT * FROM HARVEST_SOURCE WHERE LAST_HARVEST_FAILED = 'Y' AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)";
@@ -79,8 +79,8 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
 
         return getSources(
                 StringUtils.isBlank(searchString)
-                        ? getSourcesSQL
-                        : searchSourcesSQL,
+                        ? GET_SOURCES_SQL
+                        : SEARCH_SOURCES_SQL,
                 searchString,
                 pagingRequest,
                 sortingRequest);
@@ -185,7 +185,7 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
     }
 
     /** */
-    private static final String addSourceSQL = "insert into HARVEST_SOURCE"
+    private static final String ADD_SOURCE_SQL = "insert into HARVEST_SOURCE"
         + " (URL,URL_HASH,EMAILS,TIME_CREATED,INTERVAL_MINUTES,TRACKED_FILE)"
         + " VALUES (?,?,?,NOW(),?,cast(? as ynboolean))";
     /*
@@ -213,7 +213,7 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
         try {
             // execute the insert statement
             conn = getSQLConnection();
-            SQLUtil.executeUpdate(addSourceSQL, values, conn);
+            SQLUtil.executeUpdate(ADD_SOURCE_SQL, values, conn);
 
             // Get the freshly inserted record's ID.
             // We are not using SQLUtil.executeUpdateReturnAutoID(), because in PostgreSQL one
@@ -427,7 +427,7 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
     }
 
     /** */
-    private static final String getNextScheduledSourcesSQL =
+    private static final String GET_NEXT_SCHEDULED_SOURCES_SQL =
 
         "select * from HARVEST_SOURCE where INTERVAL_MINUTES>0"
         + " and extract(epoch from now()-(coalesce(LAST_HARVEST,"
@@ -436,8 +436,22 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
         + "(TIME_CREATED - INTERVAL_MINUTES * interval '1 minute')))) / (INTERVAL_MINUTES*60)"
         + " desc limit ?";
 
-    /*
-     * (non-Javadoc)
+    /**
+     * List the next batch of sources to harvest. We calculate how many sources
+     * we need to harvest in this round, then find the ones with the highest
+     * priority.
+     *
+     * FIXME: The calculation is number-of-sources / by number of segments. But
+     * the sources are <em>typically</em> to be harvested on a 42 day schedule
+     * and the number of segments are for one day. The limit is therefore
+     * 42 times too high!
+     *
+     * Example: If the scheduling is set to every 20 seconds (3 times a minute)
+     * and the harvesting is all day (1440 minutes), then there are 4320
+     * segments, divided into e.g. 150.000 sources = 34 source to harvest per
+     * 20-second segment.
+     * Solution: only divide into the sources that have an urgency above 1.0.
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#getNextScheduledSources(int)
      */
     public List<HarvestSourceDTO> getNextScheduledSources(int numOfSegments) throws DAOException {
@@ -450,11 +464,9 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
             numberOfSources = Long.valueOf(0);
         }
 
-        /*
-         * We calculate how many sources we need to harvest in this round,
-         * but if the amount is over the limit we lower it to the limit.
-         * The purpose is to avoid tsunamis of harvesting.
-         */
+        // We calculate how many sources we need to harvest in this round,
+        // but if the amount is over the limit we lower it to the limit.
+        // The purpose is to avoid tsunamis of harvesting.
         int limit = Math.round((float)numberOfSources / (float)numOfSegments);
 
         String upperLimitStr = GeneralConfig.getProperty(GeneralConfig.HARVESTER_SOURCES_UPPER_LIMIT);
@@ -469,7 +481,7 @@ public class PostgreSQLHarvestSourceDAO extends PostgreSQLBaseDAO implements Har
         List<Object> values = new ArrayList<Object>();
         values.add(new Integer(limit));
 
-        return executeSQL(getNextScheduledSourcesSQL, values, new HarvestSourceDTOReader());
+        return executeSQL(GET_NEXT_SCHEDULED_SOURCES_SQL, values, new HarvestSourceDTOReader());
     }
 
     /*
