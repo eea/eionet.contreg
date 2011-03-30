@@ -78,25 +78,25 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
             PostgreFreeTextSearchHelper.FilterType filterType,
             boolean exactMatch,
             PagingRequest pagingRequest,
-            SortingRequest sortingRequest) throws DAOException{
+            SortingRequest sortingRequest) throws DAOException {
 
         // if search expression is null or empty, return empty result
-        if (expression==null || expression.isEmpty()){
+        if (expression == null || expression.isEmpty()) {
             return new Pair<Integer, List<SubjectDTO>>(0, new LinkedList<SubjectDTO>());
         }
 
         // parse search expression for PostgreSQL
         PostgreSQLFullTextQuery pgQuery = null;
-        try{
+        try {
             pgQuery = PostgreSQLFullTextQuery.parse(expression);
             logger.trace("Free-text search string parsed for PostgreSQL: " + pgQuery);
         }
-        catch (ParseException pe){
+        catch (ParseException pe) {
             throw new DAOException("Error parsing the search text", pe);
         }
 
         // if search expression is empty after being parsed for PostgreSQL, return empty result
-        if (pgQuery.getParsedQuery().length()==0){
+        if (pgQuery.getParsedQuery().length() == 0) {
             return new Pair<Integer, List<SubjectDTO>>(0, new LinkedList<SubjectDTO>());
         }
 
@@ -105,7 +105,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
                 expression, pgQuery, pagingRequest, sortingRequest);
 
         // Set Filter
-        if (filterType != PostgreFreeTextSearchHelper.FilterType.ANY_OBJECT){
+        if (filterType != PostgreFreeTextSearchHelper.FilterType.ANY_OBJECT) {
                 helper.setFilter(filterType);
         }
 
@@ -128,7 +128,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
         Integer totalMatchCount = Integer.valueOf(0);
 
         Map<Long,SubjectDTO> subjectsMap = new LinkedHashMap<Long,SubjectDTO>();
-        if (subjectHashes!=null && !subjectHashes.isEmpty()) {
+        if (subjectHashes != null && !subjectHashes.isEmpty()) {
 
             // pre-fill subjects map
             for (Long subjectHash : subjectHashes) {
@@ -151,7 +151,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
             //matchReader.populateHitSources(subjectsMap.values());
 
             // if paging required, get total number of found subjects
-            if (pagingRequest!=null){
+            if (pagingRequest != null) {
 
                 logger.trace("Free-text search, getting exact row count");
                 totalMatchCount = new Integer(getExactRowCount(helper));
@@ -194,19 +194,19 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
         List<SubjectDTO> subjects = new ArrayList<SubjectDTO>();
 
         // if result list not null and not empty, then get the subjects data and total rowcount
-        if(list!= null && !list.isEmpty()){
+        if(list != null && !list.isEmpty()) {
 
             // create the subjects map that needs to be fed into the subjects data reader
             Map<Long,SubjectDTO> subjectsMap = new LinkedHashMap<Long, SubjectDTO>();
-            for (Long hash : list){
+            for (Long hash : list) {
                 subjectsMap.put(hash, null);
             }
 
             //restrict the query with specified columns,
             //otherwise if there are over 300 columns the performance is not acceptable
             SubjectDataReader reader = new SubjectDataReader(subjectsMap);
-            if(selectedPredicates!=null && !selectedPredicates.isEmpty()){
-                for(String predicate : selectedPredicates){
+            if(selectedPredicates != null && !selectedPredicates.isEmpty()) {
+                for(String predicate : selectedPredicates) {
                     reader.addPredicateHash(Hashes.spoHash(predicate));
                 }
             }
@@ -216,13 +216,13 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
             subjects = getSubjectsData(reader);
         }
         // if paging required, get the total number of found subjects too
-        if (pagingRequest!=null){
+        if (pagingRequest != null) {
 
-            if (helper.requiresFullTextSearch()){
+            if (helper.requiresFullTextSearch()) {
                 logger.trace("Search by filters, getting exact row count");
                 totalRowCount = new Integer(getExactRowCount(helper));
             }
-            else{
+            else {
                 logger.trace("Search by filters, getting the clever row count");
                 totalRowCount = new Integer(getCleverRowCount(helper));
             }
@@ -259,13 +259,13 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
         long startTime = System.currentTimeMillis();
 
         //get the list of subjects
-        try{
+        try {
             logger.trace("Search by type and filters, executing subject finder query: " + query);
 
             // execute the query, with the IN parameters
             list = executeSQL(query, inParams, new SingleObjectReader<Long>());
         }
-        catch(DAOException e){
+        catch(DAOException e) {
             logger.warn("Cache tables are not created yet. Continue with spo table" + e.getMessage());
             helper.setUseCache(false);
             logger.trace("Search by type and filters, executing subject finder query: " + query);
@@ -278,19 +278,19 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
         List<SubjectDTO> subjects = new ArrayList<SubjectDTO>();
 
         // if result list not null and not empty, then get the subjects data and total rowcount
-        if(list!= null && !list.isEmpty()){
+        if(list != null && !list.isEmpty()) {
 
             // create the subjects map that needs to be fed into the subjects data reader
             Map<Long,SubjectDTO> subjectsMap = new LinkedHashMap<Long, SubjectDTO>();
-            for (Long hash : list){
+            for (Long hash : list) {
                 subjectsMap.put(hash, null);
             }
 
             //restrict the query with specified columns,
             //otherwise if there are over 300 columns the performance is not acceptable
             SubjectDataReader reader = new SubjectDataReader(subjectsMap);
-            if(selectedPredicates!=null && !selectedPredicates.isEmpty()){
-                for(String predicate : selectedPredicates){
+            if(selectedPredicates != null && !selectedPredicates.isEmpty()) {
+                for(String predicate : selectedPredicates) {
                     reader.addPredicateHash(Hashes.spoHash(predicate));
                 }
             }
@@ -298,13 +298,13 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
             subjects = getSubjectsData(reader);
         }
         // if paging required, get the total number of found subjects too
-        if (pagingRequest!=null){
+        if (pagingRequest != null) {
 
-            if (helper.requiresFullTextSearch()){
+            if (helper.requiresFullTextSearch()) {
                 logger.trace("Search by type and filters, getting exact row count");
                 totalRowCount = new Integer(getExactRowCount(helper));
             }
-            else{
+            else {
                 logger.trace("Search by type and filters, getting the clever row count");
                 totalRowCount = new Integer(getCleverRowCount(helper));
             }
@@ -344,11 +344,11 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
         List<SubjectDTO> subjects = new ArrayList<SubjectDTO>();
 
         // if result list not null and not empty, then get the subjects data and total rowcount
-        if (list!=null && !list.isEmpty()){
+        if (list != null && !list.isEmpty()) {
 
             // create the subjects map that needs to be fed into the subjects data reader
             Map<Long,SubjectDTO> subjectsMap = new LinkedHashMap<Long, SubjectDTO>();
-            for (Long hash : list){
+            for (Long hash : list) {
                 subjectsMap.put(hash, null);
             }
 
@@ -358,7 +358,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
             subjects = getSubjectsData(subjectsMap);
 
             // if paging required, get the total number of found subjects too
-            if (pagingRequest!=null){
+            if (pagingRequest != null) {
 
                 inParams = new ArrayList<Object>();
                 query = helper.getCountQuery(inParams);
@@ -406,11 +406,11 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
         List<SubjectDTO> subjects = new ArrayList<SubjectDTO>();
 
         // if result list not null and not empty, then get the subjects data and total rowcount
-        if (list!=null && !list.isEmpty()){
+        if (list != null && !list.isEmpty()) {
 
             // create the subjects map that needs to be fed into the subjects data reader
             Map<Long,SubjectDTO> subjectsMap = new LinkedHashMap<Long, SubjectDTO>();
-            for (Long hash : list){
+            for (Long hash : list) {
                 subjectsMap.put(hash, null);
             }
 
@@ -420,7 +420,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
             subjects = getSubjectsData(subjectsMap);
 
             // if paging required, get the total number of found subjects too
-            if (pagingRequest!=null){
+            if (pagingRequest != null) {
 
                 inParams = new ArrayList<Object>();
                 query = helper.getCountQuery(inParams);
@@ -448,7 +448,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 
 
         // if search expression is null or empty, return empty result
-        if (StringUtils.isBlank(sourceUrl)){
+        if (StringUtils.isBlank(sourceUrl)) {
             return new Pair<Integer, List<SubjectDTO>>(0, new LinkedList<SubjectDTO>());
         }
 
@@ -473,11 +473,11 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
         List<SubjectDTO> subjects = new ArrayList<SubjectDTO>();
 
         // if result list not null and not empty, then get the subjects data and total rowcount
-        if (list!=null && !list.isEmpty()){
+        if (list != null && !list.isEmpty()) {
 
             // create the subjects map that needs to be fed into the subjects data reader
             Map<Long,SubjectDTO> subjectsMap = new LinkedHashMap<Long, SubjectDTO>();
-            for (Long hash : list){
+            for (Long hash : list) {
                 subjectsMap.put(hash, null);
             }
 
@@ -487,7 +487,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
             subjects = getSubjectsData(subjectsMap);
 
             // if paging required, get the total number of found subjects too
-            if (pagingRequest!=null){
+            if (pagingRequest != null) {
 
                 inParams = new ArrayList<Object>();
                 query = helper.getCountQuery(inParams);
@@ -538,7 +538,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
             PagingRequest pagingRequest, SortingRequest sortingRequest, List<String> selectedPredicates)
             throws DAOException {
         // if search expression is null or empty, return empty result
-        if (tags==null || tags.isEmpty()){
+        if (tags == null || tags.isEmpty()) {
             return new Pair<Integer, List<SubjectDTO>>(0, new LinkedList<SubjectDTO>());
         }
         // create query helper
@@ -563,19 +563,19 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
         List<SubjectDTO> subjects = new ArrayList<SubjectDTO>();
 
         // if result list not null and not empty, then get the subjects data and total rowcount
-        if(list!= null && !list.isEmpty()){
+        if(list != null && !list.isEmpty()) {
 
             // create the subjects map that needs to be fed into the subjects data reader
             Map<Long,SubjectDTO> subjectsMap = new LinkedHashMap<Long, SubjectDTO>();
-            for (Long hash : list){
+            for (Long hash : list) {
                 subjectsMap.put(hash, null);
             }
 
             //restrict the query with specified columns,
             //otherwise if there are over 300 columns the performance is not acceptable
             SubjectDataReader reader = new SubjectDataReader(subjectsMap);
-            if(selectedPredicates!=null && !selectedPredicates.isEmpty()){
-                for(String predicate : selectedPredicates){
+            if(selectedPredicates != null && !selectedPredicates.isEmpty()) {
+                for(String predicate : selectedPredicates) {
                     reader.addPredicateHash(Hashes.spoHash(predicate));
                 }
             }
@@ -584,7 +584,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
             subjects = getSubjectsData(reader);
         }
         // if paging required, get the total number of found subjects too
-        if (pagingRequest!=null){
+        if (pagingRequest != null) {
 
             inParams = new ArrayList<Object>();
             query = helper.getCountQuery(inParams);
@@ -608,19 +608,19 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
      * @return
      * @throws DAOException
      */
-    private int getCleverRowCount(SearchHelper helper) throws DAOException{
+    private int getCleverRowCount(SearchHelper helper) throws DAOException {
 
         // get the minimum and maximum hashes
         ArrayList inParams = new ArrayList();
         Pair minMaxPair = executeUniqueResultSQL(helper.getMinMaxHashQuery(inParams), inParams,
                 new PairReader<Long, Long>());
 
-        long minHash = minMaxPair==null || minMaxPair.getLeft()==null ? 0 : (Long)minMaxPair.getLeft();
-        long maxHash = minMaxPair==null || minMaxPair.getRight()==null ? 0 : (Long)minMaxPair.getRight();
+        long minHash = minMaxPair == null || minMaxPair.getLeft() == null ? 0 : (Long)minMaxPair.getLeft();
+        long maxHash = minMaxPair == null || minMaxPair.getRight() == null ? 0 : (Long)minMaxPair.getRight();
 
         // estimate the number of rows based on the found min and max hashes
         int result = Util.calculateHashesCount(minHash, maxHash);
-        if (result <= EXACT_ROW_COUNT_LIMIT){
+        if (result <= EXACT_ROW_COUNT_LIMIT) {
             result = getExactRowCount(helper);
         }
 
@@ -633,7 +633,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
      * @return
      * @throws DAOException
      */
-    private int getExactRowCount(SearchHelper helper) throws DAOException{
+    private int getExactRowCount(SearchHelper helper) throws DAOException {
 
         ArrayList inParams = new ArrayList();
         return Integer.valueOf(executeUniqueResultSQL(helper.getCountQuery(inParams), inParams,

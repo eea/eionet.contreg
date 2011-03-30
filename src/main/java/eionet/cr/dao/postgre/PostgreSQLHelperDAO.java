@@ -94,7 +94,9 @@ import eionet.cr.web.security.CRUser;
  */
 public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO {
 
-    /** */
+    /**
+     * FIXME: This constant is public?
+     */
     public static final String insertResourceSQL = "insert into RESOURCE"
            + " (URI, URI_HASH, FIRSTSEEN_SOURCE, FIRSTSEEN_TIME, LASTMODIFIED_TIME) values (?, ?, ?, ?, ?)";
     /*
