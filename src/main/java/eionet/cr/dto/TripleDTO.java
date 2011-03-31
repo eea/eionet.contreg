@@ -59,6 +59,11 @@ public class TripleDTO {
     private String sourceUri;
     private String objectDerivSourceUri;
 
+    public TripleDTO(String subjectUri, String predicateUri, String object) {
+        this.subjectUri = subjectUri;
+        this.predicateUri = predicateUri;
+        this.object = object;
+    }
     /**
      *
      * @param subjectHash
