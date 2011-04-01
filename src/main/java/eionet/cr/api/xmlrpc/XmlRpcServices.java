@@ -56,7 +56,7 @@ import eionet.qawcommons.DataflowResultDto;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class XmlRpcServices implements Services{
+public class XmlRpcServices implements Services {
 
     /** */
     private static final int MAX_RESULTS = 1000;
@@ -70,28 +70,28 @@ public class XmlRpcServices implements Services{
      */
     public List getResourcesSinceTimestamp(Date timestamp) throws CRException {
 
-        if (logger.isInfoEnabled()){
+        if (logger.isInfoEnabled()) {
             logger.info("Entered " + Thread.currentThread().getStackTrace()[1].getMethodName());
         }
 
         List<Map<String,String[]>> result = new ArrayList<Map<String,String[]>>();
-        if (timestamp!=null){
+        if (timestamp!=null) {
 
             // given timestamp must be less than current time (in seconds)
             long curTimeSeconds = Util.currentTimeSeconds();
             long givenTimeSeconds = Util.getSeconds(timestamp.getTime());
-            if (givenTimeSeconds < curTimeSeconds){
+            if (givenTimeSeconds < curTimeSeconds) {
 
-                try{
+                try {
                     Collection<SubjectDTO> subjects =
                         DAOFactory.get().getDao(HelperDAO.class).getSubjectsNewerThan(
                             timestamp, MAX_RESULTS);
 
-                    for (Iterator<SubjectDTO> subjectsIter=subjects.iterator(); subjectsIter.hasNext();){
+                    for (Iterator<SubjectDTO> subjectsIter=subjects.iterator(); subjectsIter.hasNext();) {
 
                         SubjectDTO subjectDTO = subjectsIter.next();
                         HashMap<String,String[]> map = new HashMap<String,String[]>();
-                        for (Iterator<String> predicatesIter=subjectDTO.getPredicates().keySet().iterator(); predicatesIter.hasNext();){
+                        for (Iterator<String> predicatesIter=subjectDTO.getPredicates().keySet().iterator(); predicatesIter.hasNext();) {
 
                             String predicate = predicatesIter.next();
                             map.put(predicate, toStringArray(subjectDTO.getObjects(predicate)));
@@ -99,9 +99,9 @@ public class XmlRpcServices implements Services{
 
                         // if map not empty and the subject has a URL (i.e. getUrl() is not blank)
                         // then add the map to result
-                        if (!map.isEmpty()){
+                        if (!map.isEmpty()) {
                             String url = subjectDTO.getUrl();
-                            if (!StringUtils.isBlank(url)){
+                            if (!StringUtils.isBlank(url)) {
                                 String[] arr = new String[1];
                                 arr[0] = url;
                                 map.put(Predicates.CR_URL, arr); // QAW needs this special reserved predicate
@@ -109,8 +109,7 @@ public class XmlRpcServices implements Services{
                             }
                         }
                     }
-                }
-                catch (Throwable t){
+                } catch (Throwable t) {
                     t.printStackTrace();
                     if (t instanceof CRException)
                         throw (CRException)t;
@@ -128,20 +127,20 @@ public class XmlRpcServices implements Services{
      * (non-Javadoc)
      * @see eionet.cr.api.xmlrpc.Services#dataflowSearch(java.util.Map)
      */
-    public List dataflowSearch(Map<String,String> criteria) throws CRException{
+    public List dataflowSearch(Map<String,String> criteria) throws CRException {
 
-        if (logger.isInfoEnabled()){
+        if (logger.isInfoEnabled()) {
             logger.info("Entered " + Thread.currentThread().getStackTrace()[1].getMethodName());
         }
 
-        if (criteria==null)
+        if (criteria == null)
             criteria = new HashMap<String,String>();
 
         if (!criteria.containsKey(Predicates.RDF_TYPE))
             criteria.put(Predicates.RDF_TYPE, Subjects.ROD_DELIVERY_CLASS);
 
         List<DataflowResultDto> result = new ArrayList<DataflowResultDto>();
-        try{
+        try {
             Pair<Integer, List<SubjectDTO>> search =
                 DAOFactory.get().getDao(SearchDAO.class).searchByFilters(
                             criteria,
@@ -152,8 +151,8 @@ public class XmlRpcServices implements Services{
 
             String[] strArray = {};
             Collection<SubjectDTO> subjects = search.getRight();
-            if (subjects!=null){
-                for (Iterator<SubjectDTO> iter=subjects.iterator(); iter.hasNext();){
+            if (subjects!=null) {
+                for (Iterator<SubjectDTO> iter=subjects.iterator(); iter.hasNext();) {
 
                     SubjectDTO subjectDTO = iter.next();
                     DataflowResultDto resultDTO = new DataflowResultDto();
@@ -169,8 +168,7 @@ public class XmlRpcServices implements Services{
                     result.add(resultDTO);
                 }
             }
-        }
-        catch (Throwable t){
+        } catch (Throwable t) {
             t.printStackTrace();
             if (t instanceof CRException)
                 throw (CRException)t;
@@ -187,16 +185,16 @@ public class XmlRpcServices implements Services{
      */
     public String pushContent(String content, String sourceUrl) throws CRException {
 
-        if (logger.isInfoEnabled()){
+        if (logger.isInfoEnabled()) {
             logger.info("Entered " + Thread.currentThread().getStackTrace()[1].getMethodName());
         }
 
-        if (content!=null && content.trim().length()>0){
+        if (content!=null && content.trim().length() > 0) {
             if (StringUtils.isBlank(sourceUrl))
                 throw new CRException("Missing source URL!");
             else if (!URLUtil.isURL(sourceUrl))
                 throw new CRException("Invalid source URL!");
-            else if (sourceUrl.indexOf("#")>=0)
+            else if (sourceUrl.indexOf("#") >= 0)
                 throw new CRException("Source URL must not contain a fragment part!");
             else
                 UrgentHarvestQueue.addPushHarvest(content, sourceUrl);
@@ -226,12 +224,12 @@ public class XmlRpcServices implements Services{
      */
     public Vector getEntries(Hashtable criteria) throws CRException {
 
-        if (logger.isInfoEnabled()){
+        if (logger.isInfoEnabled()) {
             logger.info("Entered " + Thread.currentThread().getStackTrace()[1].getMethodName());
         }
 
         Vector result = new Vector();
-        try{
+        try {
             Pair<Integer,List<SubjectDTO>> search = DAOFactory.get()
                     .getDao(SearchDAO.class)
                     .searchByFilters(
@@ -241,26 +239,25 @@ public class XmlRpcServices implements Services{
                             null,
                             null);
             Collection<SubjectDTO> subjects = search.getRight();
-            if (subjects!=null){
-                for (Iterator<SubjectDTO> iter=subjects.iterator(); iter.hasNext();){
+            if (subjects!=null) {
+                for (Iterator<SubjectDTO> iter = subjects.iterator(); iter.hasNext();) {
 
                     SubjectDTO subjectDTO = iter.next();
                     Hashtable<String,Vector<String>> predicatesTable = new Hashtable<String,Vector<String>>();
-                    for (Iterator<String> predicatesIter=subjectDTO.getPredicates().keySet().iterator(); predicatesIter.hasNext();){
+                    for (Iterator<String> predicatesIter=subjectDTO.getPredicates().keySet().iterator(); predicatesIter.hasNext();) {
 
                         String predicate = predicatesIter.next();
                         predicatesTable.put(predicate, new Vector<String>(getLiteralValues(subjectDTO, predicate)));
                     }
 
-                    if (!predicatesTable.isEmpty()){
+                    if (!predicatesTable.isEmpty()) {
                         Hashtable<String,Hashtable> subjectTable = new Hashtable<String,Hashtable>();
                         subjectTable.put(subjectDTO.getUri(), predicatesTable);
                         result.add(subjectTable);
                     }
                 }
             }
-        }
-        catch (Throwable t){
+        } catch (Throwable t) {
             t.printStackTrace();
             if (t instanceof CRException)
                 throw (CRException)t;
@@ -275,23 +272,22 @@ public class XmlRpcServices implements Services{
      * (non-Javadoc)
      * @see eionet.cr.api.xmlrpc.Services#getDeliveries(java.lang.Integer, java.lang.Integer, java.lang.Integer)
      */
-    public Vector getDeliveries(Integer pageNum, Integer pageSize) throws CRException{
+    public Vector getDeliveries(Integer pageNum, Integer pageSize) throws CRException {
 
-        if (logger.isInfoEnabled()){
+        if (logger.isInfoEnabled()) {
             logger.info("Entered " + Thread.currentThread().getStackTrace()[1].getMethodName());
         }
 
         Vector result = new Vector();
 
-        if (pageNum==null || pageSize==null || pageNum.intValue()<=0 || pageSize.intValue()<=0){
+        if (pageNum == null || pageSize == null || pageNum.intValue() <= 0 || pageSize.intValue() <= 0) {
             return result;
         }
 
-        try{
+        try {
             result = DAOFactory.get().getDao(SearchDAO.class).searchDeliveriesForROD(
                     PagingRequest.create(pageNum,pageSize));
-        }
-        catch (Throwable t){
+        } catch (Throwable t) {
             t.printStackTrace();
             if (t instanceof CRException)
                 throw (CRException)t;
@@ -310,13 +306,13 @@ public class XmlRpcServices implements Services{
      * @return
      */
     private static Collection<String> getPredicateValues(
-            SubjectDTO subjectDTO, String predicateUri, ObjectDTO.Type objType){
+            SubjectDTO subjectDTO, String predicateUri, ObjectDTO.Type objType) {
 
         HashSet<String> result = new HashSet<String>();
 
         Collection<ObjectDTO> objects = subjectDTO.getObjects(predicateUri, objType);
-        if (objects!=null && !objects.isEmpty()){
-            for (Iterator<ObjectDTO> iter = objects.iterator(); iter.hasNext();){
+        if (objects!=null && !objects.isEmpty()) {
+            for (Iterator<ObjectDTO> iter = objects.iterator(); iter.hasNext();) {
                 result.add(iter.next().getValue());
             }
         }
@@ -330,7 +326,7 @@ public class XmlRpcServices implements Services{
      * @param predicateUri
      * @return
      */
-    private static Collection<String> getLiteralValues(SubjectDTO subjectDTO, String predicateUri){
+    private static Collection<String> getLiteralValues(SubjectDTO subjectDTO, String predicateUri) {
 
         return getPredicateValues(subjectDTO, predicateUri, ObjectDTO.Type.LITERAL);
     }
@@ -340,14 +336,14 @@ public class XmlRpcServices implements Services{
      * @param objects
      * @return
      */
-    private static String[] toStringArray(Collection<ObjectDTO> objects){
+    private static String[] toStringArray(Collection<ObjectDTO> objects) {
 
-        if (objects==null)
+        if (objects == null)
             return new String[0];
 
         int i = 0;
         String[] result = new String[objects.size()];
-        for (Iterator<ObjectDTO> iter=objects.iterator(); iter.hasNext();i++){
+        for (Iterator<ObjectDTO> iter=objects.iterator(); iter.hasNext();i++) {
             result[i] = iter.next().getValue();
         }
 
@@ -360,14 +356,14 @@ public class XmlRpcServices implements Services{
      */
     public Vector getXmlFilesBySchema(String schemaIdentifier) throws CRException {
 
-        if (logger.isInfoEnabled()){
+        if (logger.isInfoEnabled()) {
             logger.info("Entered " + Thread.currentThread().getStackTrace()[1].getMethodName());
         }
 
         Vector result = new Vector();
-        try{
+        try {
             List<SubjectDTO> subjects = null;
-            if (!StringUtils.isBlank(schemaIdentifier)){
+            if (!StringUtils.isBlank(schemaIdentifier)) {
 
                 SearchDAO searchDao = DAOFactory.get().getDao(SearchDAO.class);
                 Map<String, String> criteria = new HashMap<String, String>();
@@ -380,27 +376,27 @@ public class XmlRpcServices implements Services{
                         null,
                         null);
 
-                int subjectCount = results==null ?
-                        0 : (results.getRight()==null ? 0 : results.getRight().size());
+                int subjectCount = results == null ?
+                        0 : (results.getRight() == null ? 0 : results.getRight().size());
 
                 logger.debug(getClass().getSimpleName() + ".getXmlFilesBySchema("
-                        + schemaIdentifier + "), " + subjectCount + " subjects found in total");
+                        + schemaIdentifier + "), " + subjectCount
+                        + " subjects found in total");
 
                 subjects = results.getRight();
 
-                if (subjects!=null){
-                    for (SubjectDTO subjectDTO : subjects){
+                if (subjects!=null) {
+                    for (SubjectDTO subjectDTO : subjects) {
 
                         String lastModif = subjectDTO.getObjectValue(Predicates.CR_LAST_MODIFIED);
                         Hashtable hashtable = new Hashtable();
                         hashtable.put("uri", subjectDTO.getUri());
-                        hashtable.put("lastModified", lastModif==null ? "" : lastModif.trim());
+                        hashtable.put("lastModified", lastModif == null ? "" : lastModif.trim());
                         result.add(hashtable);
                     }
                 }
             }
-        }
-        catch (Throwable t){
+        } catch (Throwable t) {
             t.printStackTrace();
             if (t instanceof CRException)
                 throw (CRException)t;
