@@ -15,6 +15,9 @@ import eionet.cr.util.UrlRedirectionInfo;
 import eionet.cr.util.URLUtil;
 
 /**
+ * Class to open a connection to a remote source or local file.
+ * Doesn't have a close method. You have to know how the class works to close
+ * the connection via the inputStream field.
  *
  * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
  *
@@ -36,12 +39,17 @@ public class HarvestUrlConnection {
     private boolean httpConnection = false;
 
     /**
+     * Behaves almost as a constructor, but isn't called HarvestUrlConnection.
+     * FIXME: Remote URL is always opened twice. Here and in
+     * {@link eionet.cr.util.UrlRedirectAnalyzer#analyzeUrlRedirection(String)}.
+     *
      * @param sourceUrlString
      * @return
      * @throws IOException
      * @throws MalformedURLException
      */
-    public static HarvestUrlConnection getConnection(String sourceUrlString) throws IOException, MalformedURLException{
+    public static HarvestUrlConnection getConnection(String sourceUrlString)
+            throws IOException, MalformedURLException {
 
         HarvestUrlConnection result = new HarvestUrlConnection();
         result.url = new URL(StringUtils.substringBefore(sourceUrlString, "#"));
@@ -49,15 +57,17 @@ public class HarvestUrlConnection {
         result.redirectionInfo = UrlRedirectAnalyzer.analyzeUrlRedirection(sourceUrlString);
 
         URL normalizedURL = URLUtil.replaceURLSpaces(result.url);
-        if (result.url.getProtocol().equals("http") || result.url.getProtocol().equals("https")){
+        if (result.url.getProtocol().equals("http") || result.url.getProtocol().equals("https")) {
 
             result.httpConnection = true;
             result.urlConnection = (HttpURLConnection)normalizedURL.openConnection();
             result.urlConnection.setRequestProperty("Accept", "application/rdf+xml, text/xml, */*;q=0.6");
             result.urlConnection.setRequestProperty("User-Agent", URLUtil.userAgentHeader());
+            // FIXME: Doesn't act on redirects. A redirection to a location that
+            // then redirects again is very plausible.
+            // Note: we don't care about the middle redirects - only the last.
             result.urlConnection.setInstanceFollowRedirects(false);
-        }
-        else {
+        } else {
             result.fileConnection = true;
             result.generalConnection = (URLConnection)normalizedURL.openConnection();
             result.generalConnection.setRequestProperty("Accept", "application/rdf+xml, text/xml, */*;q=0.6");
@@ -68,54 +78,54 @@ public class HarvestUrlConnection {
     }
 
     /**
-     *
-     * @return
+     * Check if URL is redirected.
+     * @return true if URL is redirected
      */
-    private boolean checkUrlRedirected(){
+    private boolean checkUrlRedirected() {
 
         return redirectionInfo.isRedirected();
     }
 
     /**
-     *
-     * @return
+     * Opens the source and stores the file descriptor in inputStream.
+     * @return true if the source is available.
      * @throws Exception
      */
-    public boolean openInputStream() throws Exception{
+    public boolean openInputStream() throws Exception {
 
         try {
             sourceAvailable = Boolean.FALSE;
-            if (httpConnection){
+            if (httpConnection) {
                 inputStream = urlConnection.getInputStream();
                 responseCode = urlConnection.getResponseCode();
-            }
-            else if(fileConnection){
+            } else if(fileConnection) {
                 inputStream = generalConnection.getInputStream();
             }
 
             sourceAvailable = Boolean.TRUE;
-        }
-        catch (Exception e){
+        } catch (Exception e) {
 
-            if (e!=null && e instanceof UnknownHostException){
+            if (e != null && e instanceof UnknownHostException) {
                 sourceNotExistMessage = "IP address of the host could not be determined";
-            }
-            else if (urlConnection instanceof HttpURLConnection){
+            // FIXME: Can urlConnection be anything else than an HttpURLConnection?
+            } else if (urlConnection instanceof HttpURLConnection) {
                 responseCode = urlConnection.getResponseCode();
-                if ((responseCode>=400 && responseCode<=499) || responseCode==501 || responseCode==505){
+                if ((responseCode >= 400 && responseCode <= 499) || responseCode == 501 || responseCode == 505) {
                     sourceNotExistMessage = "Got HTTP response code " + responseCode;
                 }
 
                 //release TCP connection properly when HTTP connection fails
-                if(e instanceof IOException){
-                    try{
+                // FIXME: If e can't be null, then why check for it on line 97?
+                if(e instanceof IOException) {
+                    try {
                         inputStream = ((HttpURLConnection)urlConnection).getErrorStream();
-                    //  read the response body
-                        if(inputStream!=null){
+                    //  read the response body - use a new buffer at every read
+                    //  Hope the GC will run before we run out of memory.
+                        if(inputStream != null) {
                             while (inputStream.read(new byte[1024]) >= 0) {}
                         }
                     //  inputstream is closed in VirtuosoPullHarvest final block
-                    } catch(IOException ioe){
+                    } catch (IOException ioe) {
                         e.printStackTrace();
                     }
                 }
@@ -123,19 +133,28 @@ public class HarvestUrlConnection {
 
             System.out.println(e.getMessage()+" - "+sourceNotExistMessage);
         }
-
+        // FIXME: The current rules to follow are in ticket:1992. They say that
+        // response codes 502, 503 and 504 don't cause the source to be
+        // considered unavailable. The only thing this code does is to not log
+        // codes 502, 503 and 504. Any error causes sourceAvailable = FALSE.
         return sourceAvailable;
     }
 
     /**
-     *
-     * @return
+     * Returns the connection. Connections can be stored in two variables:
+     * {@link #generalConnection} and {@link #urlConnection}. It has been
+     * decided to use two fields even though one type (HttpURLConnection) is
+     * a subclass of the other (URLConnection). Uses another two fields to
+     * decide which field is the one to use.
+     * No relation to {@link #getConnection(String)}. Just a confusing name
+     * clash.
+     * @return the connection
      */
-    public URLConnection getConnection(){
-        if (fileConnection){
+    public URLConnection getConnection() {
+        if (fileConnection) {
             return (URLConnection) generalConnection;
         }
-        if (httpConnection){
+        if (httpConnection) {
             return (URLConnection) urlConnection;
         }
         return null;
