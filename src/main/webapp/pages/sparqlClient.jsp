@@ -2,7 +2,7 @@
 
 <%@ include file="/pages/common/taglibs.jsp"%>
 
-<stripes:layout-render name="/pages/common/template.jsp" pageTitle="Simple SPARQL client">
+<stripes:layout-render name="/pages/common/template.jsp" pageTitle="SPARQL endpoint">
 
     <stripes:layout-component name="contents">
 
