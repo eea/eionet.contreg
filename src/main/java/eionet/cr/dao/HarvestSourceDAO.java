@@ -31,7 +31,7 @@ import eionet.cr.util.pagination.PagingRequest;
  * @author altnyris
  *
  */
-public interface HarvestSourceDAO extends DAO{
+public interface HarvestSourceDAO extends DAO {
     /**
      *
      * @param sortingRequest

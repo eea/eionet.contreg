@@ -62,7 +62,8 @@ public final class PostgreSQLDAOFactory extends DAOFactory{
         registeredDaos = new HashMap<Class<? extends DAO>, Class<? extends PostgreSQLBaseDAO>>();
         registeredDaos.put(HarvestDAO.class, PostgreSQLHarvestDAO.class);
         registeredDaos.put(HarvestMessageDAO.class, PostgreSQLHarvestMessageDAO.class);
-        registeredDaos.put(HarvestSourceDAO.class, PostgreSQLHarvestSourceDAO.class);
+
+        //registeredDaos.put(HarvestSourceDAO.class, PostgreSQLHarvestSourceDAO.class);
         registeredDaos.put(HelperDAO.class, PostgreSQLHelperDAO.class);
         registeredDaos.put(SearchDAO.class, PostgreSQLSearchDAO.class);
         registeredDaos.put(UrgentHarvestQueueDAO.class, PostgreSQLUrgentHarvestQueueDAO.class);

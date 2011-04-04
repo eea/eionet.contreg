@@ -6,6 +6,7 @@ import java.util.Map;
 import eionet.cr.dao.DAO;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.ExporterDAO;
+import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.TagsDAO;
@@ -35,6 +36,7 @@ public class VirtuosoDAOFactory extends DAOFactory{
 
         registeredDaos = new HashMap<Class<? extends DAO>, Class<? extends VirtuosoBaseDAO>>();
         registeredDaos.put(ExporterDAO.class, VirtuosoExporterDAO.class);
+        registeredDaos.put(HarvestSourceDAO.class, VirtuosoHarvestSourceDAO.class);
         registeredDaos.put(HelperDAO.class, VirtuosoHelperDAO.class);
         registeredDaos.put(SearchDAO.class, VirtuosoSearchDAO.class);
         registeredDaos.put(TagsDAO.class, VirtuosoTagsDAO.class);

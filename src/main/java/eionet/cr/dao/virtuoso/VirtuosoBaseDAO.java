@@ -54,6 +54,14 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO{
         }
     }
 
+    protected void executeUpdateSPARQL (String sparql, RepositoryConnection conn) throws DAOException {
+        try {
+            SesameUtil.executeUpdateQuery(sparql, conn);
+        }
+        catch (Exception e) {
+            throw new DAOException(e.toString(), e);
+        }
+    }
     /**
      *
      * @param <T>
