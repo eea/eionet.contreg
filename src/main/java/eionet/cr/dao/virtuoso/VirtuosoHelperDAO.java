@@ -337,7 +337,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         reader.setBlankNodeUriPrefix(VirtuosoBaseDAO.BNODE_URI_PREFIX);
 
         List<SubjectDTO> subjects = getSubjectsData(Collections
-                .singletonList(subjectUri), null, reader, null);
+                .singletonList(subjectUri), null, reader, null, false);
         return subjects == null || subjects.isEmpty() ? null : subjects.get(0);
     }
 

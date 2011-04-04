@@ -17,53 +17,53 @@ import eionet.cr.util.sesame.SPARQLResultSetReader;
 import eionet.cr.util.sesame.SesameUtil;
 
 /**
- *
+ * 
  * @author jaanus
- *
+ * 
  */
-public abstract class VirtuosoBaseDAO extends SQLBaseDAO{
+public abstract class VirtuosoBaseDAO extends SQLBaseDAO {
 
     /** */
-    //public static final String BNODE_URI_PREFIX = "nodeID://";
+    // public static final String BNODE_URI_PREFIX = "nodeID://";
     public static final String BNODE_URI_PREFIX = "_:";
 
     /** */
     protected Logger logger = Logger.getLogger(VirtuosoBaseDAO.class);
 
     /**
-     *
+     * 
      * @param <T>
      * @param query
      * @param reader
      * @return
      * @throws DAOException
      */
-    protected <T> List<T> executeSPARQL(String sparql, SPARQLResultSetReader<T> reader) throws DAOException {
+    protected <T> List<T> executeSPARQL(String sparql,
+            SPARQLResultSetReader<T> reader) throws DAOException {
 
         RepositoryConnection conn = null;
         try {
             conn = SesameUtil.getConnection();
             SesameUtil.executeQuery(sparql, reader, conn);
             return reader.getResultList();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new DAOException(e.toString(), e);
-        }
-        finally{
+        } finally {
             SesameUtil.close(conn);
         }
     }
 
-    protected void executeUpdateSPARQL (String sparql, RepositoryConnection conn) throws DAOException {
+    protected void executeUpdateSPARQL(String sparql, RepositoryConnection conn)
+            throws DAOException {
         try {
             SesameUtil.executeUpdateQuery(sparql, conn);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new DAOException(e.toString(), e);
         }
     }
+
     /**
-     *
+     * 
      * @param <T>
      * @param sql
      * @param params
@@ -71,36 +71,59 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO{
      * @return
      * @throws DAOException
      */
-    protected <T> T executeUniqueResultSPARQL(String sql, SPARQLResultSetReader<T> reader) throws DAOException {
+    protected <T> T executeUniqueResultSPARQL(String sql,
+            SPARQLResultSetReader<T> reader) throws DAOException {
 
         List<T> result = executeSPARQL(sql, reader);
         return (result == null || result.isEmpty()) ? null : result.get(0);
     }
 
     /**
-     *
      * @param subjectUris
      * @param predicateUris
      * @return
      * @throws DAOException
+     *             Default call of getSubjectsData() - SubjectDTO are created if
+     *             not existing
      */
-    protected List<SubjectDTO> getSubjectsData(
-            Collection<String> subjectUris, String[] predicateUris, SubjectDataReader reader, Collection<String> graphUris) throws DAOException{
+    protected List<SubjectDTO> getSubjectsData(Collection<String> subjectUris,
+            String[] predicateUris, SubjectDataReader reader,
+            Collection<String> graphUris) throws DAOException {
+        return getSubjectsData(subjectUris, predicateUris, reader, graphUris,
+                true);
+    }
 
-        if (subjectUris==null || subjectUris.isEmpty()){
-            throw new IllegalArgumentException("Subjects collection must not be null or empty!");
+    /**
+     * 
+     * @param subjectUris
+     * @param predicateUris
+     * @param createMissingSubjects
+     *            - indicates if to create a SubjectDTO object if it does not
+     *            exist
+     * @return
+     * @throws DAOException
+     */
+    protected List<SubjectDTO> getSubjectsData(Collection<String> subjectUris,
+            String[] predicateUris, SubjectDataReader reader,
+            Collection<String> graphUris, boolean createMissingDTOs)
+            throws DAOException {
+
+        if (subjectUris == null || subjectUris.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Subjects collection must not be null or empty!");
         }
 
-        String query = getSubjectsDataQuery(subjectUris, predicateUris, graphUris);
+        String query = getSubjectsDataQuery(subjectUris, predicateUris,
+                graphUris);
         executeSPARQL(query, reader);
 
         Map<Long, SubjectDTO> subjectsMap = reader.getSubjectsMap();
-        if (subjectsMap!=null && !subjectsMap.isEmpty()){
+        if (subjectsMap != null && !subjectsMap.isEmpty()) {
 
-            for (String subjectUri : subjectUris){
+            for (String subjectUri : subjectUris) {
 
                 Long subjectHash = Long.valueOf(Hashes.spoHash(subjectUri));
-                if (subjectsMap.get(subjectHash)==null){
+                if (subjectsMap.get(subjectHash) == null && createMissingDTOs) {
 
                     // TODO: don't hardcode isAnonymous to false
                     SubjectDTO subjectDTO = new SubjectDTO(subjectUri, false);
@@ -113,25 +136,27 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO{
     }
 
     /**
-     *
+     * 
      * @param predicateUris
      * @param reader
      * @return
      * @throws DAOException
      */
-    private String getSubjectsDataQuery(Collection<String> subjectUris, String[] predicateUris, Collection<String> graphUris){
+    private String getSubjectsDataQuery(Collection<String> subjectUris,
+            String[] predicateUris, Collection<String> graphUris) {
 
-        if (subjectUris==null || subjectUris.isEmpty()){
-            throw new IllegalArgumentException("Subjects collection must not be null or empty!");
+        if (subjectUris == null || subjectUris.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Subjects collection must not be null or empty!");
         }
 
-        StringBuilder strBuilder = new StringBuilder().
-        append("select * where {graph ?g {?s ?p ?o. ").
-        append("filter (?s IN (");
+        StringBuilder strBuilder = new StringBuilder().append(
+                "select * where {graph ?g {?s ?p ?o. ").append(
+                "filter (?s IN (");
 
-        int i=0;
-        for (String subjectUri : subjectUris){
-            if (i>0){
+        int i = 0;
+        for (String subjectUri : subjectUris) {
+            if (i > 0) {
                 strBuilder.append(", ");
             }
             strBuilder.append("<").append(subjectUri).append(">");
@@ -140,12 +165,12 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO{
         strBuilder.append(")) ");
 
         // if only certain predicates needed, add relevant filter
-        if (predicateUris!=null && predicateUris.length>0){
+        if (predicateUris != null && predicateUris.length > 0) {
 
             i = 0;
             strBuilder.append("filter (");
-            for (String predicateUri : predicateUris){
-                if (i>0){
+            for (String predicateUri : predicateUris) {
+                if (i > 0) {
                     strBuilder.append(" || ");
                 }
                 strBuilder.append("?p = <").append(predicateUri).append(">");
@@ -156,11 +181,11 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO{
         }
 
         // if only certain graphs needed, add relevant filter
-        int z=0;
-        if(graphUris != null && graphUris.size() > 0){
+        int z = 0;
+        if (graphUris != null && graphUris.size() > 0) {
             strBuilder.append("filter (");
-            for (String graphUri : graphUris){
-                if (z>0){
+            for (String graphUri : graphUris) {
+                if (z > 0) {
                     strBuilder.append(" || ");
                 }
                 strBuilder.append("?g = <").append(graphUri).append(">");
@@ -169,7 +194,8 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO{
             strBuilder.append(") ");
         }
 
-        strBuilder.append("OPTIONAL { ?g <").append(Predicates.CR_LAST_MODIFIED).append("> ?t } ");
+        strBuilder.append("OPTIONAL { ?g <")
+                .append(Predicates.CR_LAST_MODIFIED).append("> ?t } ");
 
         strBuilder.append("}} ORDER BY ?s");
         return strBuilder.toString();
