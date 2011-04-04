@@ -15,7 +15,7 @@
         specified by the administrators of this site.</p>
 
 	<p>
-        There are currently about 55 million triples in the database.
+        There are currently about 75 million triples in the database.
 	</p>
 
 	<p>
