@@ -100,6 +100,8 @@ public class GeneralConfig {
     public static final String VIRTUOSO_DB_USR = "virtuoso.db.usr";
     public static final String VIRTUOSO_DB_PWD = "virtuoso.db.pwd";
 
+    public static final String VIRTUOSO_DB_ROUSR = "virtuoso.db.rousr";
+    public static final String VIRTUOSO_DB_ROPWD = "virtuoso.db.ropwd";
     /**
      * General ruleSet name for inferencing. Schema sources are added into that
      * ruleset.

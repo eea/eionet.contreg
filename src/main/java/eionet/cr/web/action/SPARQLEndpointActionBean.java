@@ -120,9 +120,12 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     private void runQuery(String query, String format, OutputStream out) {
 
         if (!StringUtils.isBlank(query)) {
-            String url = GeneralConfig.getProperty("virtuoso.db.url");
-            String username = GeneralConfig.getProperty("virtuoso.db.usr");
-            String password = GeneralConfig.getProperty("virtuoso.db.pwd");
+            String url = GeneralConfig
+                    .getProperty(GeneralConfig.VIRTUOSO_DB_URL);
+            String username = GeneralConfig
+                    .getProperty(GeneralConfig.VIRTUOSO_DB_ROUSR);
+            String password = GeneralConfig
+                    .getProperty(GeneralConfig.VIRTUOSO_DB_ROPWD);
 
             try {
 
@@ -130,6 +133,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                         password);
                 myRepository.initialize();
                 RepositoryConnection con = myRepository.getConnection();
+
                 try {
                     TupleQuery resultsTable = con.prepareTupleQuery(
                             QueryLanguage.SPARQL, query);
