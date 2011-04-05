@@ -88,10 +88,13 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         }
 
         if (useInferencing && !StringUtils.isBlank(query)) {
-            query = "DEFINE input:inference '"
+            String infCommand = "DEFINE input:inference '"
                     + GeneralConfig
                             .getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME)
-                    + "'\n" + query;
+                    + "'";
+            if (!query.startsWith(infCommand)) {
+                query = infCommand + "\n" + query;
+            }
         }
 
         if (accept != null && xmlFormats.contains(accept[0])) {
