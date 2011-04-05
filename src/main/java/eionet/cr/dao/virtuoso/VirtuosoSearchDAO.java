@@ -143,7 +143,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
 
         RepositoryConnection conn = null;
         try {
-            conn = SesameUtil.getConnection();
+            conn = SesameUtil.getRepositoryConnection();
             SesameUtil.executeQuery(strBuilder.toString(), reader, conn);
             return reader.getResultList();
         } catch (Exception e) {

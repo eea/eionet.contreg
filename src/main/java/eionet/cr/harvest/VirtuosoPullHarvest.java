@@ -132,10 +132,17 @@ public class VirtuosoPullHarvest extends Harvest {
                 // Until this is fixed, we don't delete sources.
                 /*
                 if (!harvestUrlConnection.isSourceAvailable()) {
-                    logger.debug(harvestUrlConnection.getSourceNotExistMessage() + ", going to delete the source");
                     try {
-                        daoWriter = null; // we dont't want finishing actions to be done
-                        DAOFactory.get().getDao(HarvestSourceDAO.class).queueSourcesForDeletion(Collections.singletonList(sourceUrlString));
+                        HarvestSourceDTO source = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(sourceUrlString);
+                        if(source != null && source.isPrioritySource()){
+                            //Priority sources will not be deleted by system. Instead email will be sent to administrator.
+                            logger.debug(harvestUrlConnection.getSourceNotExistMessage() + ", will not delete the source because it is Priority source");
+                            throw new HarvestException(harvestUrlConnection.getSourceNotExistMessage(), new Throwable());
+                        } else {
+                            daoWriter = null; // we dont't want finishing actions to be done
+                            logger.debug(harvestUrlConnection.getSourceNotExistMessage() + ", going to delete the source");
+                            DAOFactory.get().getDao(HarvestSourceDAO.class).queueSourcesForDeletion(Collections.singletonList(sourceUrlString));
+                        }
                     } catch (DAOException e) {
                         logger.warn("Failure when deleting the source", e);
                     }
@@ -481,15 +488,11 @@ public class VirtuosoPullHarvest extends Harvest {
                 }
             } else {
                 directedSource = new HarvestSourceDTO();
-                directedSource.setTrackedFile(true);
+                directedSource.setPrioritySource(true);
                 directedSource.setIntervalMinutes(originalSource.getIntervalMinutes());
                 directedSource.setUrl(current.getSourceURL());
 
-                Integer sourceId = DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(
-                        directedSource.getUrl(),
-                        directedSource.getIntervalMinutes(),
-                        directedSource.isTrackedFile(),
-                        null);
+                Integer sourceId = DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(directedSource);
 
                 directedSource.setSourceId(sourceId.intValue());
             }

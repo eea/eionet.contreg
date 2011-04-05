@@ -52,7 +52,8 @@ public class HarvestSourceDTOReader extends SQLResultSetBaseReader<HarvestSource
         harvestSourceDTO.setLastHarvest(rs.getTimestamp("LAST_HARVEST"));
         harvestSourceDTO.setIntervalMinutes(rs.getInt("INTERVAL_MINUTES"));
         harvestSourceDTO.setLastHarvestFailed(YesNoBoolean.parse(rs.getString("LAST_HARVEST_FAILED")));
-        harvestSourceDTO.setTrackedFile(YesNoBoolean.parse(rs.getString("TRACKED_FILE")));
+        harvestSourceDTO.setPrioritySource(YesNoBoolean.parse(rs.getString("PRIORITY_SOURCE")));
+        harvestSourceDTO.setOwner(rs.getString("SOURCE_OWNER"));
 
         resultList.add(harvestSourceDTO);
     }

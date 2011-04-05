@@ -31,6 +31,18 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>Is "Schema" source</td>
+                    <td>
+                        <stripes:checkbox name="schemaSource"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Is "Priority" source</td>
+                    <td>
+                        <stripes:checkbox name="harvestSource.prioritySource"/>
+                    </td>
+                </tr>
+                <tr>
                     <td colspan="2">
                         <stripes:submit name="edit" value="Save"/>
                     </td>

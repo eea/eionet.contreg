@@ -54,13 +54,13 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 
     /** */
     private static final String getSourcesSQL =
-        "SELECT SQL_CALC_FOUND_ROWS * FROM HARVEST_SOURCE WHERE TRACKED_FILE = 'N' AND COUNT_UNAVAIL = 0 AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
+        "SELECT SQL_CALC_FOUND_ROWS * FROM HARVEST_SOURCE WHERE URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
     private static final String searchSourcesSQL =
-        "SELECT SQL_CALC_FOUND_ROWS * FROM HARVEST_SOURCE WHERE TRACKED_FILE = 'N' AND COUNT_UNAVAIL = 0 AND URL like (?) AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
+        "SELECT SQL_CALC_FOUND_ROWS * FROM HARVEST_SOURCE WHERE URL like (?) AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
     private static final String getHarvestTrackedFiles =
-        "SELECT SQL_CALC_FOUND_ROWS * FROM HARVEST_SOURCE WHERE TRACKED_FILE = 'Y' AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)  ";
+        "SELECT SQL_CALC_FOUND_ROWS * FROM HARVEST_SOURCE WHERE PRIORITY_SOURCE = 'Y' AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)  ";
     private static final String searchHarvestTrackedFiles =
-        "SELECT SQL_CALC_FOUND_ROWS * FROM HARVEST_SOURCE WHERE TRACKED_FILE = 'Y' and URL like(?) AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
+        "SELECT SQL_CALC_FOUND_ROWS * FROM HARVEST_SOURCE WHERE PRIORITY_SOURCE = 'Y' and URL like(?) AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
     private static final String getHarvestSourcesUnavailableSQL =
         "SELECT SQL_CALC_FOUND_ROWS * FROM HARVEST_SOURCE WHERE COUNT_UNAVAIL > " + HarvestSourceDTO.COUNT_UNAVAIL_THRESHOLD + " AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)";
     private static final String searchHarvestSourcesUnavailableSQL =
@@ -92,7 +92,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 
     /*
      * (non-Javadoc)
-     * @see eionet.cr.dao.HarvestSourceDAO#getHarvestTrackedFiles(java.lang.String, eionet.cr.util.PagingRequest, eionet.cr.util.SortingRequest)
+     * @see eionet.cr.dao.HarvestSourceDAO#getHarvestPrioritySources(java.lang.String, eionet.cr.util.PagingRequest, eionet.cr.util.SortingRequest)
      */
     public Pair<Integer, List<HarvestSourceDTO>> getHarvestTrackedFiles(String searchString, PagingRequest pagingRequest, SortingRequest sortingRequest)
             throws DAOException {
@@ -185,50 +185,68 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
         List<HarvestSourceDTO> list = executeQuery(getSourcesByUrlSQL, values, new HarvestSourceDTOReader());
         return (list!=null && !list.isEmpty()) ? list.get(0) : null;
     }
+    
+    /** */
+    private static final String URGENCY_SOURCES_COUNT = "select count(*) from HARVEST_SOURCE where"
+            + " INTERVAL_MINUTES>0 AND (extract(epoch from now()-(coalesce(LAST_HARVEST,(TIME_CREATED -"
+            + " INTERVAL_MINUTES * interval '1 minute')))) / (INTERVAL_MINUTES*60)) > 1.0";
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.dao.HarvestSourceDAO#getUrgencySourcesCount()
+     */
+    public Long getUrgencySourcesCount() throws DAOException {
+        
+        Connection conn = null;
+        try {
+            Object o = SQLUtil.executeSingleReturnValueQuery(URGENCY_SOURCES_COUNT, conn);
+            return o == null ? new Long(0) : Long.valueOf(o.toString());
+        } catch (Exception e) {
+            throw new DAOException(e.getMessage(), e);
+        } finally {
+            SQLUtil.close(conn);
+        }
+    }
 
     /** */
-    private static final String addSourceSQL       = "insert into HARVEST_SOURCE (URL,URL_HASH,EMAILS,TIME_CREATED,INTERVAL_MINUTES,TRACKED_FILE) VALUES (?,?,?,NOW(),?,?)";
-    private static final String addSourceIgnoreSQL = "insert ignore into HARVEST_SOURCE (URL,URL_HASH,EMAILS,TIME_CREATED,INTERVAL_MINUTES,TRACKED_FILE) VALUES (?,?,?,NOW(),?,?)";
+    private static final String addSourceSQL       = "insert into HARVEST_SOURCE (URL,URL_HASH,EMAILS,TIME_CREATED,INTERVAL_MINUTES) VALUES (?,?,?,NOW(),?)";
+    private static final String addSourceIgnoreSQL = "insert ignore into HARVEST_SOURCE (URL,URL_HASH,EMAILS,TIME_CREATED,INTERVAL_MINUTES) VALUES (?,?,?,NOW(),?)";
 
     /*
      * (non-Javadoc)
-     * @see eionet.cr.dao.HarvestSourceDAO#addSource(java.lang.String, int, boolean, java.lang.String)
+     * @see eionet.cr.dao.HarvestSourceDAO#addSource(HarvestSourceDTO source)
      */
-    public Integer addSource(String url, int intervalMinutes, boolean trackedFile, String emails) throws DAOException {
-        return addSource(addSourceSQL, url, intervalMinutes, trackedFile, emails);
+    public Integer addSource(HarvestSourceDTO source) throws DAOException {
+        return addSource(addSourceSQL, source);
     }
 
     /*
      * (non-Javadoc)
-     * @see eionet.cr.dao.HarvestSourceDAO#addSourceIgnoreDuplicate(java.lang.String, int, boolean, java.lang.String)
+     * @see eionet.cr.dao.HarvestSourceDAO#addSourceIgnoreDuplicate(java.lang.String, int, boolean, java.lang.String, boolean schema, boolean priority, String owner)
      */
-    public void addSourceIgnoreDuplicate(String url, int intervalMinutes, boolean trackedFile, String emails) throws DAOException {
-        addSource(addSourceIgnoreSQL, url, intervalMinutes, trackedFile, emails);
+    public void addSourceIgnoreDuplicate(HarvestSourceDTO source) throws DAOException {
+        addSource(addSourceIgnoreSQL, source);
     }
 
     /**
      *
-     * @param sql
      * @param source
-     * @param user
-     * @return
+     * @return Integer
      * @throws DAOException
      */
-    private Integer addSource(String sql, String url, int intervalMinutes, boolean trackedFile, String emails) throws DAOException{
+    private Integer addSource(String sql, HarvestSourceDTO source) throws DAOException{
 
-        if (StringUtils.isBlank(url)){
+        if (StringUtils.isBlank(source.getUrl())){
             throw new IllegalArgumentException("url must not be blank");
         }
 
         // harvest sources where URL has fragment part, are not allowed
-        url = StringUtils.substringBefore(url, "#");
+        String url = StringUtils.substringBefore(source.getUrl(), "#");
 
         List<Object> values = new ArrayList<Object>();
         values.add(url);
         values.add(Hashes.spoHash(url));
-        values.add(emails);
-        values.add(intervalMinutes);
-        values.add(YesNoBoolean.format(trackedFile));
+        values.add(source.getEmails());
+        values.add(source.getIntervalMinutes());
 
         Connection conn = null;
         try{
@@ -430,18 +448,10 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
      * (non-Javadoc)
      * @see eionet.cr.dao.HarvestSourceDAO#getNextScheduledSources(int)
      */
-    public List<HarvestSourceDTO> getNextScheduledSources(int numOfSegments) throws DAOException {
-
-        Long numberOfSources = executeQueryUniqueResult(
-                "select count(*) from HARVEST_SOURCE",
-                null,
-                new SingleObjectReader<Long>());
-        numberOfSources = numberOfSources == null ? 0 : numberOfSources;
-        int limit = Math.round((float)numberOfSources/(float)numOfSegments);
+    public List<HarvestSourceDTO> getNextScheduledSources(int limit) throws DAOException {
 
         List<Object> values = new ArrayList<Object>();
         values.add(new Integer(limit));
-
         return executeQuery(getNextScheduledSourcesSQL, values, new HarvestSourceDTOReader());
     }
 
@@ -491,6 +501,57 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
     @Override
     public double getUrgencyScore(int harvestSourceId) throws DAOException {
 
+        throw new UnsupportedOperationException("Method not implemented");
+    }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see eionet.cr.dao.HarvestSourceDAO#getSourcesInInferenceRule()
+     */
+    @Override
+    public String getSourcesInInferenceRules() throws DAOException {
+        throw new UnsupportedOperationException("Method not implemented");
+    }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see eionet.cr.dao.HarvestSourceDAO#getInferenceSources()
+     */
+    @Override
+    public Pair<Integer, List<HarvestSourceDTO>> getInferenceSources (String searchString, 
+            PagingRequest pagingRequest, SortingRequest sortingRequest, String sourceUris) throws DAOException{
+        throw new UnsupportedOperationException("Method not implemented");
+    }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see eionet.cr.dao.HarvestSourceDAO#isSourceInInferenceRule()
+     */
+    @Override
+    public boolean isSourceInInferenceRule(String url) throws DAOException {
+        throw new UnsupportedOperationException("Method not implemented");
+    }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see eionet.cr.dao.HarvestSourceDAO#addSourceIntoInferenceRule()
+     */
+    @Override
+    public boolean addSourceIntoInferenceRule(String url) throws DAOException {
+        throw new UnsupportedOperationException("Method not implemented");
+    }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see eionet.cr.dao.HarvestSourceDAO#removeSourceFromInferenceRule()
+     */
+    @Override
+    public boolean removeSourceFromInferenceRule(String url) throws DAOException {
         throw new UnsupportedOperationException("Method not implemented");
     }
 }

@@ -45,7 +45,7 @@ public class VirtuosoQueryActionBean extends AbstractActionBean {
 
         RepositoryConnection conn = null;
         try {
-            conn = SesameUtil.getConnection();
+            conn = SesameUtil.getRepositoryConnection();
             ResultReader reader = new ResultReader();
 
             long startTime = System.currentTimeMillis();

@@ -264,7 +264,12 @@ public abstract class AbstractHomeActionBean extends AbstractActionBean {
         try {
             logger.debug("Creating and storing harvest source");
             HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
-            dao.addSourceIgnoreDuplicate(sourceUrl, 0, false, null);
+            
+            HarvestSourceDTO source = new HarvestSourceDTO();
+            source.setUrl(sourceUrl);
+            source.setIntervalMinutes(0);
+            
+            dao.addSourceIgnoreDuplicate(source);
             hSourceDTO = dao.getHarvestSourceByUrl(sourceUrl);
         } catch (DAOException e) {
             logger.info("Exception when trying to create"

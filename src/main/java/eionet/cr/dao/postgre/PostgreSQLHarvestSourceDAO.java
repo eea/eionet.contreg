@@ -29,14 +29,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-
-import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.readers.HarvestSourceDTOReader;
 import eionet.cr.dao.virtuoso.VirtuosoBaseDAO;
 import eionet.cr.dto.HarvestSourceDTO;
-import eionet.cr.harvest.Harvest;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
@@ -56,18 +53,22 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements
     // PostgreSQLBaseDAO implements HarvestSourceDAO {
 
     /** */
-    private static final String GET_SOURCES_SQL = "SELECT * FROM HARVEST_SOURCE WHERE TRACKED_FILE = 'N' AND COUNT_UNAVAIL = 0 AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
-    private static final String SEARCH_SOURCES_SQL = "SELECT * FROM HARVEST_SOURCE WHERE TRACKED_FILE = 'N' AND COUNT_UNAVAIL = 0 AND URL like (?) AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
-    private static final String getHarvestSourcesFailedSQL = "SELECT * FROM HARVEST_SOURCE WHERE LAST_HARVEST_FAILED = 'Y' AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)";
-    private static final String searchHarvestSourcesFailedSQL = "SELECT * FROM HARVEST_SOURCE WHERE LAST_HARVEST_FAILED = 'Y' AND URL LIKE(?) AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)";
-    private static final String getHarvestSourcesUnavailableSQL = "SELECT * FROM HARVEST_SOURCE WHERE COUNT_UNAVAIL > "
-            + HarvestSourceDTO.COUNT_UNAVAIL_THRESHOLD
-            + " AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)";
-    private static final String searchHarvestSourcesUnavailableSQL = "SELECT * FROM HARVEST_SOURCE WHERE URL LIKE (?) AND COUNT_UNAVAIL > "
-            + HarvestSourceDTO.COUNT_UNAVAIL_THRESHOLD
-            + " AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)";
-    private static final String getHarvestTrackedFiles = "SELECT * FROM HARVEST_SOURCE WHERE TRACKED_FILE = 'Y' AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)  ";
-    private static final String searchHarvestTrackedFiles = "SELECT * FROM HARVEST_SOURCE WHERE TRACKED_FILE = 'Y' and URL like(?) AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
+    private static final String GET_SOURCES_SQL =
+        "SELECT * FROM HARVEST_SOURCE WHERE URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
+    private static final String SEARCH_SOURCES_SQL =
+        "SELECT * FROM HARVEST_SOURCE WHERE URL like (?) AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
+    private static final String getHarvestSourcesFailedSQL =
+        "SELECT * FROM HARVEST_SOURCE WHERE LAST_HARVEST_FAILED = 'Y' AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)";
+    private static final String searchHarvestSourcesFailedSQL =
+        "SELECT * FROM HARVEST_SOURCE WHERE LAST_HARVEST_FAILED = 'Y' AND URL LIKE(?) AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)";
+    private static final String getHarvestSourcesUnavailableSQL =
+        "SELECT * FROM HARVEST_SOURCE WHERE COUNT_UNAVAIL > " + HarvestSourceDTO.COUNT_UNAVAIL_THRESHOLD + " AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)";
+    private static final String searchHarvestSourcesUnavailableSQL =
+        "SELECT * FROM HARVEST_SOURCE WHERE URL LIKE (?) AND COUNT_UNAVAIL > " + HarvestSourceDTO.COUNT_UNAVAIL_THRESHOLD + " AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)";
+    private static final String getHarvestTrackedFiles =
+        "SELECT * FROM HARVEST_SOURCE WHERE PRIORITY_SOURCE = 'Y' AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)  ";
+    private static final String searchHarvestTrackedFiles =
+        "SELECT * FROM HARVEST_SOURCE WHERE PRIORITY_SOURCE = 'Y' and URL like(?) AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
 
     /*
      * (non-Javadoc)
@@ -134,6 +135,30 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements
                         : searchHarvestTrackedFiles, searchString,
                 pagingRequest, sortingRequest);
     }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * eionet.cr.dao.HarvestSourceDAO#getInferenceSources(java.lang.String,
+     * eionet.cr.util.PagingRequest, eionet.cr.util.SortingRequest)
+     */
+    public Pair<Integer, List<HarvestSourceDTO>> getInferenceSources (
+            String searchString, PagingRequest pagingRequest,
+            SortingRequest sortingRequest, String sourceUris) throws DAOException {
+        
+        if(StringUtils.isBlank(sourceUris)) {
+            return new Pair<Integer, List<HarvestSourceDTO>>(0, new ArrayList<HarvestSourceDTO>());
+        }
+        
+        String query = "SELECT * FROM HARVEST_SOURCE WHERE URL IN (<sources>) AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
+        if (!StringUtils.isBlank(searchString)) {
+            query = "SELECT * FROM HARVEST_SOURCE WHERE URL like (?) AND URL IN (<sources>) AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
+        }
+        query = query.replace("<sources>", sourceUris);
+
+        return getSources(query, searchString, pagingRequest, sortingRequest);
+    }
 
     /**
      * 
@@ -185,35 +210,62 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements
 
         return new Pair<Integer, List<HarvestSourceDTO>>(rowCount, list);
     }
+    
+    /** */
+    private static final String URGENCY_SOURCES_COUNT = "select count(*) from HARVEST_SOURCE where"
+    		+ " INTERVAL_MINUTES>0 AND (extract(epoch from now()-(coalesce(LAST_HARVEST,(TIME_CREATED -"
+    		+ " INTERVAL_MINUTES * interval '1 minute')))) / (INTERVAL_MINUTES*60)) > 1.0";
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.dao.HarvestSourceDAO#getUrgencySourcesCount()
+     */
+    public Long getUrgencySourcesCount() throws DAOException {
+        
+        Connection conn = null;
+        try {
+            conn = getSQLConnection();
+            Object o = SQLUtil.executeSingleReturnValueQuery(URGENCY_SOURCES_COUNT, conn);
+            return o == null ? new Long(0) : Long.valueOf(o.toString());
+        } catch (Exception e) {
+            throw new DAOException(e.getMessage(), e);
+        } finally {
+            SQLUtil.close(conn);
+        }
+    }
 
     /** */
     private static final String ADD_SOURCE_SQL = "insert into HARVEST_SOURCE"
-            + " (URL,URL_HASH,EMAILS,TIME_CREATED,INTERVAL_MINUTES,TRACKED_FILE)"
-            + " VALUES (?,?,?,NOW(),?,cast(? as ynboolean))";
-
+        + " (URL,URL_HASH,EMAILS,TIME_CREATED,INTERVAL_MINUTES,PRIORITY_SOURCE,SOURCE_OWNER)"
+        + " VALUES (?,?,?,NOW(),?,cast(? as ynboolean),?)";
     /*
      * (non-Javadoc)
-     * 
-     * @see eionet.cr.dao.HarvestSourceDAO#addSource(java.lang.String, int,
-     * boolean, java.lang.String)
+     * @see eionet.cr.dao.HarvestSourceDAO#addSource(HarvestSourceDTO source)
      */
-    public Integer addSource(String url, int intervalMinutes,
-            boolean trackedFile, String emails) throws DAOException {
+    public Integer addSource(HarvestSourceDTO source) throws DAOException {
+        
+        if (source == null) {
+            throw new IllegalArgumentException("harvest source must not be null");
+        }
 
-        if (StringUtils.isBlank(url)) {
+        if (StringUtils.isBlank(source.getUrl())) {
             throw new IllegalArgumentException("url must not be null");
         }
 
         // harvest sources where URL has fragment part, are not allowed
-        url = StringUtils.substringBefore(url, "#");
+        String url = StringUtils.substringBefore(source.getUrl(), "#");
         long urlHash = Hashes.spoHash(url);
 
         List<Object> values = new ArrayList<Object>();
         values.add(url);
         values.add(Long.valueOf(urlHash));
-        values.add(emails);
-        values.add(Integer.valueOf(intervalMinutes));
-        values.add(YesNoBoolean.format(trackedFile));
+        values.add(source.getEmails());
+        values.add(Integer.valueOf(source.getIntervalMinutes()));
+        values.add(YesNoBoolean.format(source.isPrioritySource()));
+        if (source.getOwner() == null || source.getOwner().length() == 0) {
+            values.add("harvester");
+        } else {
+            values.add(source.getOwner());
+        }
 
         Connection conn = null;
         try {
@@ -244,13 +296,9 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements
 
     /*
      * (non-Javadoc)
-     * 
-     * @see
-     * eionet.cr.dao.HarvestSourceDAO#addSourceIgnoreDuplicate(java.lang.String,
-     * int, boolean, java.lang.String)
+     * @see eionet.cr.dao.HarvestSourceDAO#addSourceIgnoreDuplicate(HarvestSourceDTO source)
      */
-    public void addSourceIgnoreDuplicate(String url, int intervalMinutes,
-            boolean trackedFile, String emails) throws DAOException {
+    public void addSourceIgnoreDuplicate(HarvestSourceDTO source) throws DAOException {
 
         // JH160210 - in PostgreSQL schema we assume there is a rule created
         // that does nothing if
@@ -258,7 +306,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements
         // trying to add
         // a source that already exists, but for the time being we can live with
         // that.
-        addSource(url, intervalMinutes, trackedFile, emails);
+        addSource(source);
     }
 
     /*
@@ -428,7 +476,8 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements
 
     /** */
     private static final String editSourceSQL = "update HARVEST_SOURCE set URL=?,"
-            + " URL_HASH=?, EMAILS=?,INTERVAL_MINUTES=? where HARVEST_SOURCE_ID=?";
+            + " URL_HASH=?, EMAILS=?, INTERVAL_MINUTES=?," 
+            + " PRIORITY_SOURCE=cast(? as ynboolean), SOURCE_OWNER=? where HARVEST_SOURCE_ID=?";
 
     /*
      * (non-Javadoc)
@@ -444,6 +493,8 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements
                 .spoHash(source.getUrl())));
         values.add(source.getEmails());
         values.add(source.getIntervalMinutes());
+        values.add(YesNoBoolean.format(source.isPrioritySource()));
+        values.add(source.getOwner());
         values.add(source.getSourceId());
 
         Connection conn = null;
@@ -497,7 +548,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements
 
     /** */
     private static final String GET_NEXT_SCHEDULED_SOURCES_SQL =
-
+        
     "select * from HARVEST_SOURCE where INTERVAL_MINUTES>0"
             + " and extract(epoch from now()-(coalesce(LAST_HARVEST,"
             + "(TIME_CREATED - INTERVAL_MINUTES * interval '1 minute')))) >= (INTERVAL_MINUTES*60)"
@@ -527,34 +578,10 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements
      * @see eionet.cr.harvest.scheduled.HarvestingJob#getNextScheduledSources()
      * @see eionet.cr.dao.HarvestSourceDAO#getNextScheduledSources(int)
      */
-    public List<HarvestSourceDTO> getNextScheduledSources(int numOfSegments)
-            throws DAOException {
-
-        Long numberOfSources = executeUniqueResultSQL(
-                "select count(*) from HARVEST_SOURCE", null,
-                new SingleObjectReader<Long>());
-        if (numberOfSources == null) {
-            numberOfSources = Long.valueOf(0);
-        }
-
-        // We calculate how many sources we need to harvest in this round,
-        // but if the amount is over the limit we lower it to the limit.
-        // The purpose is to avoid tsunamis of harvesting.
-        int limit = Math.round((float) numberOfSources / (float) numOfSegments);
-
-        String upperLimitStr = GeneralConfig
-                .getProperty(GeneralConfig.HARVESTER_SOURCES_UPPER_LIMIT);
-        if (upperLimitStr != null && upperLimitStr.length() > 0) {
-            upperLimitStr = upperLimitStr.trim();
-            int upperLimit = Integer.parseInt(upperLimitStr);
-            if (upperLimit > 0 && limit > upperLimit) {
-                limit = upperLimit;
-            }
-        }
+    public List<HarvestSourceDTO> getNextScheduledSources(int limit) throws DAOException {
 
         List<Object> values = new ArrayList<Object>();
         values.add(new Integer(limit));
-
         return executeSQL(GET_NEXT_SCHEDULED_SOURCES_SQL, values,
                 new HarvestSourceDTOReader());
     }
@@ -673,5 +700,44 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements
         return result;
 
     }
-
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see eionet.cr.dao.HelperDAO#getSourcesInInferenceRule()
+     */
+    @Override
+    public String getSourcesInInferenceRules() throws DAOException {
+        throw new UnsupportedOperationException("Method not implemented");
+    }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see eionet.cr.dao.HarvestSourceDAO#isSourceInInferenceRule()
+     */
+    @Override
+    public boolean isSourceInInferenceRule(String url) throws DAOException {
+        throw new UnsupportedOperationException("Method not implemented");
+    }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see eionet.cr.dao.HarvestSourceDAO#addSourceIntoInferenceRule()
+     */
+    @Override
+    public boolean addSourceIntoInferenceRule(String url) throws DAOException {
+        throw new UnsupportedOperationException("Method not implemented");
+    }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see eionet.cr.dao.HarvestSourceDAO#removeSourceFromInferenceRule()
+     */
+    @Override
+    public boolean removeSourceFromInferenceRule(String url) throws DAOException {
+        throw new UnsupportedOperationException("Method not implemented");
+    }
 }

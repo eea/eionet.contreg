@@ -20,13 +20,6 @@
 * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.dao;
 
-import java.sql.SQLException;
-
-import eionet.cr.config.GeneralConfig;
-import eionet.cr.dao.mysql.MySQLDAOFactory;
-import eionet.cr.dao.postgre.PostgreSQLDAOFactory;
-import eionet.cr.util.sql.DbConnectionProvider;
-
 /**
  *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
@@ -36,7 +29,7 @@ public abstract class DAOFactory {
 
     /**
      *
-     * @return
+     * @return DAOFactory
      * @throws DAOException
      */
     public static DAOFactory get(){
@@ -48,7 +41,7 @@ public abstract class DAOFactory {
      *
      * @param <T>
      * @param implementedInterface
-     * @return
+     * @return <T extends DAO>
      */
     public abstract <T extends DAO> T getDao(Class<T> implementedInterface);
 }

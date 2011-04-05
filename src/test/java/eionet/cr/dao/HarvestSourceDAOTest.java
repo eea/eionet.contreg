@@ -50,8 +50,14 @@ public class HarvestSourceDAOTest extends CRDatabaseTestCase {
     public void testAddSource() throws Exception {
 
         HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
-        Integer harvestSourceID = dao.addSource("http://rod.eionet.europa.eu/testObligations",
-                0, false, "bob@europe.eu");
+        
+        HarvestSourceDTO source = new HarvestSourceDTO();
+        source.setUrl("http://rod.eionet.europa.eu/testObligations");
+        source.setIntervalMinutes(0);
+        source.setPrioritySource(false);
+        source.setEmails("bob@europe.eu");
+        
+        Integer harvestSourceID = dao.addSource(source);
         assertNotNull(harvestSourceID);
 
         HarvestSourceDTO harvestSource = dao.getHarvestSourceById(harvestSourceID);

@@ -33,7 +33,8 @@ import eionet.cr.util.pagination.PagingRequest;
  */
 public interface HarvestSourceDAO extends DAO {
     /**
-     *
+     * @param searchString
+     * @param pagingRequest
      * @param sortingRequest
      * @return list of harvesting sources (excluding unavailable sources and tracked files)
      * @throws DAOException
@@ -41,6 +42,8 @@ public interface HarvestSourceDAO extends DAO {
     Pair<Integer,List<HarvestSourceDTO>> getHarvestSources(String searchString, PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException;
 
     /**
+     * @param searchString
+     * @param pagingRequest
      * @param sortingRequest
      * @return list of harvest tracked files
      * @throws DAOException
@@ -48,6 +51,8 @@ public interface HarvestSourceDAO extends DAO {
     Pair<Integer, List<HarvestSourceDTO>> getHarvestTrackedFiles(String searchString, PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException;
 
     /**
+     * @param searchString
+     * @param pagingRequest
      * @param sortingRequest
      * @return list of unavailable harvest sources
      * @throws DAOException
@@ -55,52 +60,53 @@ public interface HarvestSourceDAO extends DAO {
     Pair<Integer, List<HarvestSourceDTO>> getHarvestSourcesUnavailable(String searchString, PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException;
 
     /**
-     * @param filterString
-     * @param pageRequest
+     * @param searchString
+     * @param pagingRequest
      * @param sortingRequest
-     * @return
+     * @return Pair<Integer, List<HarvestSourceDTO>>
+     * @throws DAOException
      */
     Pair<Integer, List<HarvestSourceDTO>> getHarvestSourcesFailed(String searchString, PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException;
 
     /**
+     * @param harvestSourceID
      * @return harvesting sources
      * @throws DAOException
-     * @param int harvestSourceID
      */
     public HarvestSourceDTO getHarvestSourceById(Integer harvestSourceID) throws DAOException;
 
     /**
      *
      * @param url
-     * @return
+     * @return HarvestSourceDTO
      * @throws DAOException
      */
     public HarvestSourceDTO getHarvestSourceByUrl(String url) throws DAOException;
+    
+    /**
+     * @return Long
+     * @throws DAOException
+     */
+     public Long getUrgencySourcesCount() throws DAOException;
 
     /**
      *
-     * @param url
-     * @param intervalMinutes
-     * @param trackedFile
-     * @param emails
-     * @return
+     * @param source
+     * @return Integer
      * @throws DAOException
      */
-    public Integer addSource(String url, int intervalMinutes, boolean trackedFile, String emails) throws DAOException;
+    public Integer addSource(HarvestSourceDTO source) throws DAOException;
 
     /**
      *
-     * @param url
-     * @param intervalMinutes
-     * @param trackedFile
-     * @param emails
+     * @param source
      * @throws DAOException
      */
-    public void addSourceIgnoreDuplicate(String url, int intervalMinutes, boolean trackedFile, String emails) throws DAOException;
-
+    public void addSourceIgnoreDuplicate(HarvestSourceDTO source) throws DAOException;
+    
     /**
+     * @param source
      * @throws DAOException
-     * @param HarvestSourceDTO source
      */
     public void editSource(HarvestSourceDTO source) throws DAOException;
 
@@ -113,9 +119,9 @@ public interface HarvestSourceDAO extends DAO {
     public void queueSourcesForDeletion(List<String> urls) throws DAOException;
 
     /**
+     * @return List<String>
+     * @throws DAOException
      * fetches all scheduled source URLs, which are scheduled for removal.
-     *
-     * @return
      */
     List<String> getScheduledForDeletion() throws DAOException;
     /**
@@ -139,11 +145,11 @@ public interface HarvestSourceDAO extends DAO {
 
     /**
      *
-     * @param numOfSegments
-     * @return
+     * @param limit
+     * @return List<HarvestSourceDTO>
      * @throws DAOException
      */
-    public List<HarvestSourceDTO> getNextScheduledSources(int numOfSegments) throws DAOException;
+    public List<HarvestSourceDTO> getNextScheduledSources(int limit) throws DAOException;
 
     /**
      * deletes orphans from SPO table.
@@ -166,6 +172,45 @@ public interface HarvestSourceDAO extends DAO {
      * @throws DAOException
      */
     public double getUrgencyScore(int harvestSourceId) throws DAOException;
+    
+
+    /**
+     * @return String
+     * @throws DAOException
+     */
+    String getSourcesInInferenceRules() throws DAOException;
+    
+    /**
+     * @param searchString
+     * @param pagingRequest
+     * @param sortingRequest
+     * @param sourceUris
+     * @return Pair<Integer, List<HarvestSourceDTO>>
+     * @throws DAOException
+     */
+    Pair<Integer, List<HarvestSourceDTO>> getInferenceSources (String searchString, 
+            PagingRequest pagingRequest, SortingRequest sortingRequest, String sourceUris) throws DAOException;
+    
+    /**
+     * @param url
+     * @return boolean
+     * @throws DAOException
+     */
+    boolean isSourceInInferenceRule(String url) throws DAOException;
+    
+    /**
+     * @param url
+     * @return boolean
+     * @throws DAOException
+     */
+    boolean addSourceIntoInferenceRule(String url) throws DAOException;
+    
+    /**
+     * @param url
+     * @return boolean
+     * @throws DAOException
+     */
+    boolean removeSourceFromInferenceRule(String url) throws DAOException;
 
 
 }

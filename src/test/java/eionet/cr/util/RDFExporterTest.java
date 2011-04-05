@@ -1,7 +1,5 @@
 package eionet.cr.util;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -11,7 +9,7 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
-import eionet.cr.dao.readers.RDFExporter;
+import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.Harvest;
 import eionet.cr.harvest.HarvestException;
@@ -42,8 +40,14 @@ public class RDFExporterTest extends CRDatabaseTestCase{
     public void testTriplesReader() throws DAOException, HarvestException, MalformedURLException{
 
         String uri = "http://www.eionet.europa.eu/gemet/concept/7697";
+        
+        HarvestSourceDTO source = new HarvestSourceDTO();
+        source.setUrl(uri);
+        source.setIntervalMinutes(100);
+        source.setPrioritySource(false);
+        source.setEmails(null);
 
-        DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(uri, 100, false, null);
+        DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(source);
 
         URL url = new URL(uri);
         Harvest harvest = new PullHarvest(url.toString(), null);

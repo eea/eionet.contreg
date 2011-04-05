@@ -32,21 +32,32 @@
                 <td>Urgency score:</td>
                 <td>${actionBean.urgencyScoreFormatted}</td>
             </tr>
+            <tr>
+                <td>"Schema" source:</td>
+                <td>${actionBean.schemaSourceDisplay}</td>
+            </tr>
+            <tr>
+                <td>"Priority" source:</td>
+                <td>${actionBean.prioritySourceDisplay}</td>
+            </tr>
             <c:if test="${actionBean.harvestSource.unavailable}">
                 <tr>
                     <td colspan="2" class="warning-msg" style="color: #E6E6E6">The
                     source has been unavailable for too many times!</td>
                 </tr>
             </c:if>
-
-            <tr>
-                <td colspan="2" style="padding-top: 10px">
-                    <stripes:submit name="goToEdit" value="Edit" title="Edit this harvest source"/>
-                    <stripes:submit name="scheduleUrgentHarvest" value="Schedule urgent harvest" />
-                    <stripes:submit name="export" value="Export triples" />
-                </td>
-            </tr>
-
+            
+            <c:if test='${sessionScope.crUser!=null}'>
+                <tr>
+                    <td colspan="2" style="padding-top: 10px">
+                        <c:if test='${crfn:hasPermission(sessionScope.crUser.userName, "/", "u")}'>
+                            <stripes:submit name="goToEdit" value="Edit" title="Edit this harvest source"/>
+                        </c:if>
+                        <stripes:submit name="scheduleUrgentHarvest" value="Schedule urgent harvest" />
+                        <stripes:submit name="export" value="Export triples" />
+                    </td>
+                </tr>
+            </c:if>
 
 
         </table>

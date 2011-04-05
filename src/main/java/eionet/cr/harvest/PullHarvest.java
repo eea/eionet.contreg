@@ -95,6 +95,7 @@ public class PullHarvest extends Harvest {
     /**
      *
      * @param sourceUrlString
+     * @param lastHarvest
      */
     public PullHarvest(String sourceUrlString, Date lastHarvest) {
         super(sourceUrlString);
@@ -393,15 +394,11 @@ public class PullHarvest extends Harvest {
             }
             else {
                 directedSource = new HarvestSourceDTO();
-                directedSource.setTrackedFile(true);
+                directedSource.setPrioritySource(true);
                 directedSource.setIntervalMinutes(originalSource.getIntervalMinutes());
                 directedSource.setUrl(current.getSourceURL());
 
-                Integer sourceId = DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(
-                        directedSource.getUrl(),
-                        directedSource.getIntervalMinutes(),
-                        directedSource.isTrackedFile(),
-                        null);
+                Integer sourceId = DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(directedSource);
 
                 directedSource.setSourceId(sourceId.intValue());
             }
@@ -440,7 +437,6 @@ public class PullHarvest extends Harvest {
 
     /**
      *
-     * @return
      * @throws ParserConfigurationException
      * @throws SAXException
      * @throws IOException
@@ -717,7 +713,8 @@ public class PullHarvest extends Harvest {
     /**
      *
      * @param sourceUrl
-     * @return
+     * @param urgent
+     * @return PullHarvest
      * @throws DAOException
      */
     public static PullHarvest createFullSetup(String sourceUrl, boolean urgent) throws DAOException {
@@ -730,7 +727,7 @@ public class PullHarvest extends Harvest {
      *
      * @param dto
      * @param urgent
-     * @return
+     * @return PullHarvest
      * @throws DAOException
      */
     public static PullHarvest createFullSetup(HarvestSourceDTO dto, boolean urgent) throws DAOException {

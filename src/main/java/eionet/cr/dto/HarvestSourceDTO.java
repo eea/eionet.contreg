@@ -44,7 +44,6 @@ public class HarvestSourceDTO implements Serializable {
     private Integer sourceId;
     private String url;
     private String emails;
-    private boolean trackedFile;
     private Date timeCreated;
     private Integer statements;
     private Integer resources;
@@ -53,6 +52,8 @@ public class HarvestSourceDTO implements Serializable {
     private boolean lastHarvestFailed;
     private Integer intervalMinutes;
     private Long urlHash;
+    private boolean prioritySource;
+    private String owner;
 
     /**
      *
@@ -160,7 +161,7 @@ public class HarvestSourceDTO implements Serializable {
 
     /**
      *
-     * @return
+     * @return boolean
      */
     public boolean isUnavailable(){
 
@@ -168,12 +169,14 @@ public class HarvestSourceDTO implements Serializable {
     }
 
     /**
+     * @return Integer
      */
     public Integer getIntervalMinutes() {
         return intervalMinutes;
     }
 
     /**
+     * @param intervalMinutes
      */
     public void setIntervalMinutes(Integer intervalMinutes) {
         this.intervalMinutes = intervalMinutes;
@@ -191,20 +194,6 @@ public class HarvestSourceDTO implements Serializable {
      */
     public void setLastHarvest(Date lastHarvest) {
         this.lastHarvest = lastHarvest;
-    }
-
-    /**
-     * @return the trackedFile
-     */
-    public boolean isTrackedFile() {
-        return trackedFile;
-    }
-
-    /**
-     * @param trackedFile the trackedFile to set
-     */
-    public void setTrackedFile(boolean trackedFile) {
-        this.trackedFile = trackedFile;
     }
 
     /*
@@ -241,6 +230,22 @@ public class HarvestSourceDTO implements Serializable {
      */
     public void setUrlHash(Long urlHash) {
         this.urlHash = urlHash;
+    }
+
+    public boolean isPrioritySource() {
+        return prioritySource;
+    }
+
+    public void setPrioritySource(boolean prioritySource) {
+        this.prioritySource = prioritySource;
+    }
+
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
     }
 
 

@@ -25,7 +25,6 @@ import java.sql.SQLException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.Logger;
 
 import eionet.cr.common.LabelPredicates;
 import eionet.cr.common.Predicates;
@@ -235,8 +234,8 @@ public class MySQLDerivationEngine implements IDerivationEngine{
                         String.valueOf(HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL)));
 
         StringBuffer buf = new StringBuffer().
-        append("insert ignore into HARVEST_SOURCE (URL, URL_HASH, TRACKED_FILE, TIME_CREATED, INTERVAL_MINUTES, SOURCE, GEN_TIME) ").
-        append("select substring_index(URI,'#',1), URI_HASH, 'Y', now(),").append(interval).append(",").append(sourceUrlHash).append(", ").append(genTime).
+        append("insert ignore into HARVEST_SOURCE (URL, URL_HASH, TIME_CREATED, INTERVAL_MINUTES, SOURCE, GEN_TIME) ").
+        append("select substring_index(URI,'#',1), URI_HASH, now(),").append(interval).append(",").append(sourceUrlHash).append(", ").append(genTime).
         append(" from SPO,RESOURCE where SPO.SOURCE=").append(sourceUrlHash).append(" and SPO.GEN_TIME=").append(genTime).
         append(" and SPO.PREDICATE=").append(Hashes.spoHash(Predicates.RDF_TYPE)).
         append(" and SPO.ANON_OBJ='N' and SPO.OBJECT_HASH=").append(Hashes.spoHash(Subjects.CR_FILE)).

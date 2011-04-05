@@ -1,5 +1,8 @@
 package eionet.cr.dao.virtuoso;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -40,6 +43,8 @@ import eionet.cr.util.Pair;
 import eionet.cr.util.ObjectLabelPair;
 import eionet.cr.util.Util;
 import eionet.cr.util.pagination.PagingRequest;
+import eionet.cr.util.sesame.SesameUtil;
+import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
 import eionet.cr.web.security.CRUser;
 
@@ -853,5 +858,5 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         return Long.valueOf(resultObject.toString());
 
     }
-
+    
 }

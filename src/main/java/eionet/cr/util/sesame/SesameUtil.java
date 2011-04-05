@@ -1,5 +1,8 @@
 package eionet.cr.util.sesame;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+
 import org.openrdf.OpenRDFException;
 import org.openrdf.query.BooleanQuery;
 import org.openrdf.query.GraphQueryResult;
@@ -26,10 +29,19 @@ public class SesameUtil {
      * @return RepositoryConnection
      * @throws RepositoryException
      */
-    public static RepositoryConnection getConnection()
-            throws RepositoryException {
+    public static RepositoryConnection getRepositoryConnection() throws RepositoryException{
 
-        return SesameConnectionProvider.getConnection();
+        return SesameConnectionProvider.getRepositoryConnection();
+    }
+    
+    /**
+    *
+    * @return Connection
+    * @throws SQLException
+    */
+    public static Connection getConnection() throws SQLException {
+
+        return SesameConnectionProvider.getSimpleConnection();
     }
 
     /**

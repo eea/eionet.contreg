@@ -42,11 +42,20 @@ public class ScheduledHarvestSourcesTest extends CRDatabaseTestCase{
     public void testScheduledSources() throws Exception{
 
         HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
+        
+        HarvestSourceDTO source = new HarvestSourceDTO();
+        source.setUrl("http://rod.eionet.europa.eu/testObligations");
+        source.setIntervalMinutes(5);
+        source.setPrioritySource(false);
+        source.setEmails("bob@europe.eu");
 
-        dao.addSource("http://url.ee/id/1", 5, false, "bob@europe.eu");
-        dao.addSource("http://url.ee/id/2", 10, false, "bob@europe.eu");
-        dao.addSource("http://url.ee/id/3", 15, false, "bob@europe.eu");
-        dao.addSource("http://url.ee/id/4", 20, false, "bob@europe.eu");
+        dao.addSource(source);
+        source.setIntervalMinutes(10);
+        dao.addSource(source);
+        source.setIntervalMinutes(15);
+        dao.addSource(source);
+        source.setIntervalMinutes(20);
+        dao.addSource(source);
 
         List<HarvestSourceDTO> dtos = dao.getNextScheduledSources(1);
         assertNotNull(dtos);

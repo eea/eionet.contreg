@@ -40,8 +40,12 @@ public class RegisterUrl {
                 GeneralConfig.getProperty(GeneralConfig.HARVESTER_REFERRALS_INTERVAL,
                         String.valueOf(HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL)));
 
-        DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(
-                                            urlWithoutFragment, intervalMinutes, true, null);
+        HarvestSourceDTO source = new HarvestSourceDTO();
+        source.setUrl(urlWithoutFragment);
+        source.setIntervalMinutes(intervalMinutes);
+        source.setPrioritySource(true);
+        
+        DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(source);
         // schedule urgent harvest of this URL
         UrgentHarvestQueue.addPullHarvest(urlWithoutFragment);
     }

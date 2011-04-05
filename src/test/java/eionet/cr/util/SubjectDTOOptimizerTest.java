@@ -2,12 +2,7 @@ package eionet.cr.util;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.dbunit.dataset.IDataSet;
 
@@ -16,7 +11,6 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dto.HarvestSourceDTO;
-import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.Harvest;
 import eionet.cr.harvest.HarvestException;
@@ -42,7 +36,14 @@ public class SubjectDTOOptimizerTest extends CRDatabaseTestCase {
     public void testOptimizer() throws DAOException, HarvestException, MalformedURLException{
 
         String uri = "http://www.eionet.europa.eu/gemet/concept/7697";
-        DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(uri, 100, false, null);
+        
+        HarvestSourceDTO source = new HarvestSourceDTO();
+        source.setUrl(uri);
+        source.setIntervalMinutes(100);
+        source.setPrioritySource(false);
+        source.setEmails(null);
+        
+        DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(source);
 
         URL url = new URL(uri);
         Harvest harvest = new PullHarvest(url.toString(), null);

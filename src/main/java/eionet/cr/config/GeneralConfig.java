@@ -94,9 +94,15 @@ public class GeneralConfig {
     public static final String TAGCOLUD_TAGSEARCH_SIZE = "tagcloud.tagsearch.size";
 
     /** */
+    public static final String VIRTUOSO_DB_DRV = "virtuoso.db.drv";
     public static final String VIRTUOSO_DB_URL = "virtuoso.db.url";
     public static final String VIRTUOSO_DB_USR = "virtuoso.db.usr";
     public static final String VIRTUOSO_DB_PWD = "virtuoso.db.pwd";
+    
+    /** 
+     * General ruleSet name for inferencing. Schema sources are added into that ruleset.
+     * */
+    public static final String VIRTUOSO_CR_RULESET_NAME = "virtuoso.cr.ruleset.name";
 
     /** */
     public static final int SEVERITY_INFO = 1;

@@ -265,8 +265,8 @@ public class PostgreSQLDerivationEngine implements IDerivationEngine{
 
         bld = new StringBuilder().
         append("insert into HARVEST_SOURCE").
-        append(" (URL, URL_HASH, TRACKED_FILE, TIME_CREATED, INTERVAL_MINUTES, SOURCE, GEN_TIME)").
-        append(" select URI, URI_HASH, cast('Y' as ynboolean), now(),").append(interval).append(",").
+        append(" (URL, URL_HASH, TIME_CREATED, INTERVAL_MINUTES, SOURCE, GEN_TIME)").
+        append(" select URI, URI_HASH, now(),").append(interval).append(",").
         append(sourceUrlHash).append(", ").append(genTime).
         append(" from RESOURCE,").append(tempTableName).
         append(" where ").append(tempTableName).append(".URL=RESOURCE.URI");

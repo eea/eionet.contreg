@@ -20,6 +20,7 @@
  */
 package eionet.cr.web.action;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -56,6 +57,7 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
     private static final String UNAVAILABLE_TYPE = "unavail";
     private static final String TRACKED_FILES = "tracked_file";
     private static final String FAILED_HARVESTS = "failed";
+    private static final String SCHEMAS = "schemas";
 
     /** */
     private static final String[] EXCLUDE_FROM_SORT_AND_PAGING_URLS = {"harvest", "delete", "sourceUrl"};
@@ -68,7 +70,8 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
      * the string to be searched
      */
     private String searchString;
-
+    
+    private List<String> sources;
 
     /** */
     private String type;
@@ -79,10 +82,11 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
     /** */
     static {
         sourceTypes = new LinkedList<Pair<String,String>>();
-        sourceTypes.add(new Pair<String, String>(null, "Sources"));
+        sourceTypes.add(new Pair<String, String>(null, "Priority"));
         sourceTypes.add(new Pair<String, String>(TRACKED_FILES, "Tracked files"));
         sourceTypes.add(new Pair<String, String>(UNAVAILABLE_TYPE, "Unavaliable"));
         sourceTypes.add(new Pair<String, String>(FAILED_HARVESTS, "Failed harvests"));
+        sourceTypes.add(new Pair<String, String>(SCHEMAS, "Schemas"));
 
         columnList = new LinkedList<SearchResultColumn>();
         GenericColumn checkbox = new GenericColumn();
@@ -106,7 +110,6 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
 
     /**
      * @see eionet.cr.web.action.AbstractSearchActionBean#search()
-     * {@inheritDoc}
      */
     @DefaultHandler
     public Resolution search() throws DAOException {
@@ -137,6 +140,12 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
                 pair = factory.getDao(HarvestSourceDAO.class).getHarvestSourcesFailed(
                         filterString, pagingRequest, sortingRequest);
             }
+            else if (SCHEMAS.equals(type)) {
+                //Get comma separated sources that are included into inferencing ruleset
+                String sourceUris = factory.getDao(HarvestSourceDAO.class).getSourcesInInferenceRules();
+                pair = factory.getDao(HarvestSourceDAO.class).getInferenceSources(
+                        filterString, pagingRequest, sortingRequest, sourceUris);
+            }
 
             if (pair!=null){
                 resultList = pair.getRight();
@@ -162,26 +171,74 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
 
     /**
      *
-     * @return
+     * @return Resolution
      * @throws DAOException
      */
     public Resolution delete() throws DAOException{
 
         if(isUserLoggedIn()){
             if (sourceUrl!=null && !sourceUrl.isEmpty()){
-                factory.getDao(HarvestSourceDAO.class).queueSourcesForDeletion(sourceUrl);
-                addSystemMessage("Harvest source(s) sheduled for removal!");
+                
+                //An authenticated user can delete sources he own. An administrator can delete any source. 
+                //A priority source can not be deleted. The administrator must first change it to a non-priority source, then delete it. 
+                List<String> sourcesToBeDeleted = new ArrayList<String>();
+                List<String> notOwner = new ArrayList<String>();
+                List<String> prioritySources = new ArrayList<String>();
+                
+                for (String uri : sourceUrl) {
+                    HarvestSourceDTO source = factory.getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(uri);
+                    if (source != null) {
+                        if (source.isPrioritySource()) {
+                            prioritySources.add(uri);
+                        } else if (getUser().isAdministrator() || (source.getOwner() != null && source.getOwner().equals(getUserName()))) { 
+                            sourcesToBeDeleted.add(uri);
+                        } else {
+                            notOwner.add(uri);
+                        }
+                    }
+                }
+                
+                factory.getDao(HarvestSourceDAO.class).queueSourcesForDeletion(sourcesToBeDeleted);
+                
+                if (sourcesToBeDeleted != null && !sourcesToBeDeleted.isEmpty()) {
+                    StringBuffer msg = new StringBuffer();
+                    msg.append("Following source(s) were sheduled for removal: <ul>");
+                    for (String uri : sourcesToBeDeleted) {
+                        msg.append("<li>").append(uri).append("</li>");
+                    }
+                    msg.append("</ul>");
+                    addSystemMessage(msg.toString());
+                }
+                
+                StringBuffer warnings = new StringBuffer();
+                if (prioritySources != null && !prioritySources.isEmpty()) {
+                    warnings.append("Following source(s) could not be deleted because they are Priority sources: <ul>");
+                    for (String uri : prioritySources) {
+                        warnings.append("<li>").append(uri).append("</li>");
+                    }
+                    warnings.append("</ul>");
+                }
+                if (notOwner != null && !notOwner.isEmpty()) {
+                    warnings.append("Following source(s) could not be deleted because you are not the owner of these sources: <ul>");
+                    for (String uri : notOwner) {
+                        warnings.append("<li>").append(uri).append("</li>");
+                    }
+                    warnings.append("</ul>");
+                }
+                if (warnings.length() > 0) {
+                    addWarningMessage(warnings.toString());
+                }
             }
-        }
-        else
+        } else {
             addWarningMessage(getBundle().getString("not.logged.in"));
+        }
         return search();
     }
 
     /**
+     * @return Resolution
      * @throws DAOException
      * @throws HarvestException
-     *
      */
     public Resolution harvest() throws DAOException, HarvestException{
 
@@ -202,7 +259,7 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
 
     /**
      *
-     * @return
+     * @return List<Pair<String, String>>
      */
     public List<Pair<String, String>> getSourceTypes(){
         return sourceTypes;
@@ -231,7 +288,7 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
 
     /**
      *
-     * @return
+     * @return String
      */
     public String getPagingUrl(){
 
@@ -271,5 +328,15 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
      */
     public String[] excludeFromSortAndPagingUrls(){
         return EXCLUDE_FROM_SORT_AND_PAGING_URLS;
+    }
+
+
+    public List<String> getSources() {
+        return sources;
+    }
+
+
+    public void setSources(List<String> sources) {
+        this.sources = sources;
     }
 }

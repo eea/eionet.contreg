@@ -77,6 +77,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     /** */
     private static List<HourSpan> batchHarvestingHours;
     private static Integer intervalSeconds;
+    private static Integer harvesterUpperLimit;
     private static Integer dailyActiveMinutes;
     private static boolean firstRunMade = false;
 
@@ -171,6 +172,12 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
             for (String url : doomed) {
                 if (!CurrentHarvests.contains(url)) {
                     sourceDao.deleteSourceByUrl(url);
+                    
+                    //Also remove from ruleset
+                    boolean isInRuleset = sourceDao.isSourceInInferenceRule(url);
+                    if (isInRuleset) {
+                        sourceDao.removeSourceFromInferenceRule(url);
+                    }
                 }
             }
         }
@@ -178,14 +185,14 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
 
     /**
      *
-     * @return
      * @throws DAOException
      */
     private void loadBatchHarvestingQueue() throws DAOException {
 
         int numOfSegments = getNumberOfSegments();
+        int limit = getSourcesLimitForInterval();
         batchHarvestingQueue = DAOFactory.get().getDao(
-                HarvestSourceDAO.class).getNextScheduledSources(numOfSegments);
+                HarvestSourceDAO.class).getNextScheduledSources(limit);
 
         logger.debug(batchHarvestingQueue.size() + " sources added to batch harvesting queue (numOfSegments=" + numOfSegments + ")");
     }
@@ -199,7 +206,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
 
             try {
                 nextScheduledSources = DAOFactory.get().getDao(
-                        HarvestSourceDAO.class).getNextScheduledSources(getNumberOfSegments());
+                        HarvestSourceDAO.class).getNextScheduledSources(getSourcesLimitForInterval());
             } catch (DAOException e) {
                 logger.error("Error loading next scheduled sources: " + e.toString(), e);
             }
@@ -208,7 +215,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
 
     /**
      *
-     * @return
+     * @return List<HarvestSourceDTO>
      */
     public static List<HarvestSourceDTO> getNextScheduledSources() {
 
@@ -224,7 +231,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
 
     /**
      *
-     * @return
+     * @return List<HarvestSourceDTO>
      */
     public static List<HarvestSourceDTO> getBatchHarvestingQueue() {
 
@@ -286,11 +293,8 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
             if (harvestSource == null) {
                 harvestSource = new HarvestSourceDTO();
                 harvestSource.setUrl(url);
-                harvestSource.setTrackedFile(false);
 
-                sourceId = harvestSourceDAO.addSource(harvestSource.getUrl(),
-                        harvestSource.getIntervalMinutes(),
-                        harvestSource.isTrackedFile(), harvestSource.getEmails());
+                sourceId = harvestSourceDAO.addSource(harvestSource);
             } else {
                 sourceId = harvestSource.getSourceId();
                 numOfResources = harvestSource.getResources() == null ? 0 : harvestSource.getResources().intValue();
@@ -458,12 +462,32 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
 
         return intervalSeconds;
     }
+    
+    /**
+     * Returns the upper limit on the number of sources that are harvested in 
+     * each interval. The value is retrieved from the general configuration file.
+     *
+     * @return the upper limit
+     */
+    public static Integer getHarvesterUpperLimit() {
+
+        if (harvesterUpperLimit == null) {
+            String upperLimitStr = GeneralConfig.getProperty(GeneralConfig.HARVESTER_SOURCES_UPPER_LIMIT).trim();
+            if (upperLimitStr != null && upperLimitStr.length() > 0) {
+                harvesterUpperLimit = Integer.parseInt(upperLimitStr);
+            } else {
+                harvesterUpperLimit = new Integer(0);
+            }
+        }
+
+        return harvesterUpperLimit;
+    }
 
     /**
      * Returns the interval in minutes  where the harvester checks for checks
      * for new urgent or scheduled tasks. Value can be less than 1.0.
      *
-     * @return the interval in minutes
+     * @return float
      */
     public static float getIntervalMinutes() {
 
@@ -504,6 +528,31 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     private static int getNumberOfSegments() {
 
         return Math.round(getDailyActiveMinutes().floatValue() / getIntervalMinutes());
+    }
+    
+    /**
+     * We calculate how many sources we need to harvest in this round,
+     * but if the amount is over the limit we lower it to the limit.
+     * The purpose is to avoid tsunamis of harvesting.
+     *
+     * @return the limit of sources returned
+     */
+    private static int getSourcesLimitForInterval() {
+        int limit = 0;
+        try{
+            int numOfSegments = getNumberOfSegments();
+            Long numberOfSources = DAOFactory.get().getDao(HarvestSourceDAO.class).getUrgencySourcesCount();
+            int upperLimit = getHarvesterUpperLimit();
+            
+            limit = Math.round((float)numberOfSources / (float)numOfSegments);
+            if (upperLimit > 0 && limit > upperLimit) {
+                limit = upperLimit;
+            }
+        } catch (DAOException e) {
+            logger.error(e.toString(), e);
+        }
+
+        return limit;
     }
 
     /**
@@ -566,7 +615,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
 
     /**
      *
-     * @return
+     * @return long
      */
     public static long getNextBatchHarvestTime() {
 

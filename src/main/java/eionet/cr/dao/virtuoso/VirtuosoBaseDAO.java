@@ -43,7 +43,7 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO {
 
         RepositoryConnection conn = null;
         try {
-            conn = SesameUtil.getConnection();
+            conn = SesameUtil.getRepositoryConnection();
             SesameUtil.executeQuery(sparql, reader, conn);
             return reader.getResultList();
         } catch (Exception e) {

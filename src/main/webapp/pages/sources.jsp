@@ -6,13 +6,15 @@
 
     <stripes:layout-component name="contents">
 
-            <div id="operations">
-                <ul>
-                    <li>
-                        <stripes:link href="/source.action" event="add">Add new source</stripes:link>
-                    </li>
-                </ul>
-            </div>
+            <c:if test='${sessionScope.crUser!=null}'>
+                <div id="operations">
+                    <ul>
+                        <li>
+                            <stripes:link href="/source.action" event="add">Add new source</stripes:link>
+                        </li>
+                    </ul>
+                </div>
+            </c:if>
 
             <h1>Harvesting sources</h1>
             <p></p>
@@ -34,7 +36,7 @@
                 <ul>
                     <c:forEach items="${actionBean.sourceTypes}" var="loopItem">
                         <c:choose>
-                              <c:when test="${actionBean.type==loopItem.left}" >
+                            <c:when test="${actionBean.type==loopItem.left}" >
                                 <li id="currenttab"><span><c:out value="${loopItem.right}"/></span></li>
                             </c:when>
                             <c:otherwise>
