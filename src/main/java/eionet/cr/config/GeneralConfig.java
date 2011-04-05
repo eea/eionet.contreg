@@ -28,9 +28,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- *
+ * 
  * @author heinljab
- *
+ * 
  */
 public class GeneralConfig {
 
@@ -78,7 +78,8 @@ public class GeneralConfig {
     public static final String SUBJECT_SELECT_MODE = "subjectSelectMode";
 
     /**
-     * Constant to get dataflow picklist cache update interval (in milliseconds).
+     * Constant to get dataflow picklist cache update interval (in
+     * milliseconds).
      */
     public static final String DATAFLOW_PICKLIST_CACHE_UPDATE_INTERVAL = "dataflowPicklistCacheUpdateInterval";
     public static final String RECENT_DISCOVERED_FILES_CACHE_UPDATE_INTERVAL = "recentDiscoveredFilesCacheUpdateInterval";
@@ -98,9 +99,10 @@ public class GeneralConfig {
     public static final String VIRTUOSO_DB_URL = "virtuoso.db.url";
     public static final String VIRTUOSO_DB_USR = "virtuoso.db.usr";
     public static final String VIRTUOSO_DB_PWD = "virtuoso.db.pwd";
-    
-    /** 
-     * General ruleSet name for inferencing. Schema sources are added into that ruleset.
+
+    /**
+     * General ruleSet name for inferencing. Schema sources are added into that
+     * ruleset.
      * */
     public static final String VIRTUOSO_CR_RULESET_NAME = "virtuoso.cr.ruleset.name";
 
@@ -116,84 +118,88 @@ public class GeneralConfig {
     private static Properties properties = null;
 
     /** */
-    private static void init(){
+    private static void init() {
         properties = new Properties();
-        try{
-            String s = GeneralConfig.class.getClassLoader().getResource(PROPERTIES_FILE_NAME).toString();
-            properties.load(GeneralConfig.class.getClassLoader().getResourceAsStream(PROPERTIES_FILE_NAME));
+        try {
+            String s = GeneralConfig.class.getClassLoader()
+                    .getResource(PROPERTIES_FILE_NAME).toString();
+            properties.load(GeneralConfig.class.getClassLoader()
+                    .getResourceAsStream(PROPERTIES_FILE_NAME));
 
-            // trim all the values (i.e. we don't allow preceding or trailing white space in property values)
-            for (Entry<Object,Object> entry : properties.entrySet()){
+            // trim all the values (i.e. we don't allow preceding or trailing
+            // white space in property values)
+            for (Entry<Object, Object> entry : properties.entrySet()) {
                 entry.setValue(entry.getValue().toString().trim());
             }
 
-        }
-        catch (IOException e){
-            logger.fatal("Failed to load properties from " + PROPERTIES_FILE_NAME, e);
+        } catch (IOException e) {
+            logger.fatal("Failed to load properties from "
+                    + PROPERTIES_FILE_NAME, e);
         }
     }
 
     /**
-     *
+     * 
      * @param name
      * @return
      */
-    public static synchronized String getProperty(String key){
+    public static synchronized String getProperty(String key) {
 
-        if (properties==null)
+        if (properties == null)
             init();
 
         return properties.getProperty(key);
     }
 
     /**
-     *
+     * 
      * @param key
      * @param defaultValue
      * @return
      */
-    public static synchronized String getProperty(String key, String defaultValue){
+    public static synchronized String getProperty(String key,
+            String defaultValue) {
 
-        if (properties==null)
+        if (properties == null)
             init();
 
         return properties.getProperty(key, defaultValue);
     }
 
     /**
-     *
+     * 
      * @param key
      * @return
      * @throws CRConfigException
      */
-    public static synchronized String getRequiredProperty(String key){
+    public static synchronized String getRequiredProperty(String key) {
 
         String value = getProperty(key);
-        if (value==null || value.trim().length()==0)
+        if (value == null || value.trim().length() == 0)
             throw new CRConfigException("Missing required property: " + key);
         else
             return value;
     }
 
     /**
-     *
+     * 
      * @return
      */
-    public static synchronized Properties getProperties(){
+    public static synchronized Properties getProperties() {
 
-        if (properties==null)
+        if (properties == null)
             init();
 
         return properties;
     }
 
     /**
-     *
+     * 
      * @return
      */
-    public static synchronized boolean useVirtuoso(){
+    public static synchronized boolean useVirtuoso() {
 
         String virtuosoDbUrl = getProperty(VIRTUOSO_DB_URL);
-        return virtuosoDbUrl!=null && virtuosoDbUrl.trim().length()>0;
+        return virtuosoDbUrl != null && virtuosoDbUrl.trim().length() > 0;
     }
 }

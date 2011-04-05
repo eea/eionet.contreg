@@ -29,16 +29,17 @@ public class SesameUtil {
      * @return RepositoryConnection
      * @throws RepositoryException
      */
-    public static RepositoryConnection getRepositoryConnection() throws RepositoryException{
+    public static RepositoryConnection getRepositoryConnection()
+            throws RepositoryException {
 
         return SesameConnectionProvider.getRepositoryConnection();
     }
-    
+
     /**
-    *
-    * @return Connection
-    * @throws SQLException
-    */
+     * 
+     * @return Connection
+     * @throws SQLException
+     */
     public static Connection getConnection() throws SQLException {
 
         return SesameConnectionProvider.getSimpleConnection();

@@ -71,30 +71,32 @@ public class HarvestSourceActionBean extends AbstractActionBean {
 
     /** */
     private int intervalMultiplier;
-    private static LinkedHashMap<Integer,String> intervalMultipliers;
+    private static LinkedHashMap<Integer, String> intervalMultipliers;
 
     /** */
-    private static final List<Pair<String,String>> tabs;
+    private static final List<Pair<String, String>> tabs;
     private String selectedTab = "view";
 
     /** */
-    private enum ExportType {FILE, HOMESPACE};
+    private enum ExportType {
+        FILE, HOMESPACE
+    };
 
     /** */
     private String exportType;
-    
+
     private boolean schemaSource;
 
     /** */
     static {
-        tabs = new LinkedList<Pair<String,String>>();
-        tabs.add(new Pair<String,String>("view", "View"));
-        tabs.add(new Pair<String,String>("sampleTriples", "Sample triples"));
-        tabs.add(new Pair<String,String>("history", "History"));
+        tabs = new LinkedList<Pair<String, String>>();
+        tabs.add(new Pair<String, String>("view", "View"));
+        tabs.add(new Pair<String, String>("sampleTriples", "Sample triples"));
+        tabs.add(new Pair<String, String>("history", "History"));
     }
 
     /**
-     *
+     * 
      * @return HarvestSourceDTO
      */
     public HarvestSourceDTO getHarvestSource() {
@@ -102,7 +104,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @param harvestSource
      */
     public void setHarvestSource(HarvestSourceDTO harvestSource) {
@@ -118,15 +120,16 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @return String
      * @throws DAOException
      */
-    public String getUrgencyScoreFormatted() throws DAOException{
+    public String getUrgencyScoreFormatted() throws DAOException {
 
-        double urgency = factory.getDao(HarvestSourceDAO.class).getUrgencyScore(harvestSource.getSourceId());
+        double urgency = factory.getDao(HarvestSourceDAO.class)
+                .getUrgencyScore(harvestSource.getSourceId());
         DecimalFormat df = new DecimalFormat("#.####");
-        if (urgency>=0){
+        if (urgency >= 0) {
             return df.format(urgency);
         } else {
             return "<i>Cannot be calculated</i>";
@@ -134,17 +137,18 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @return Resolution
      * @throws DAOException
      */
     @DefaultHandler
     @HandlesEvent("view")
-    public Resolution view() throws DAOException{
+    public Resolution view() throws DAOException {
 
         selectedTab = "view";
-        if (harvestSource!=null){
-            schemaSource = factory.getDao(HarvestSourceDAO.class).isSourceInInferenceRule(harvestSource.getUrl());
+        if (harvestSource != null) {
+            schemaSource = factory.getDao(HarvestSourceDAO.class)
+                    .isSourceInInferenceRule(harvestSource.getUrl());
             prepareDTO();
         }
 
@@ -156,13 +160,14 @@ public class HarvestSourceActionBean extends AbstractActionBean {
      * @throws DAOException
      */
     @HandlesEvent("history")
-    public Resolution history() throws DAOException{
+    public Resolution history() throws DAOException {
 
         selectedTab = "history";
-        if (harvestSource!=null){
+        if (harvestSource != null) {
             prepareDTO();
             // populate history of harvests
-            harvests = factory.getDao(HarvestDAO.class).getHarvestsBySourceId(harvestSource.getSourceId());
+            harvests = factory.getDao(HarvestDAO.class).getHarvestsBySourceId(
+                    harvestSource.getSourceId());
         }
 
         return new ForwardResolution("/pages/viewsource.jsp");
@@ -173,13 +178,16 @@ public class HarvestSourceActionBean extends AbstractActionBean {
      * @throws DAOException
      */
     @HandlesEvent("sampleTriples")
-    public Resolution sampleTriples() throws DAOException{
+    public Resolution sampleTriples() throws DAOException {
         selectedTab = "sampleTriples";
-        if (harvestSource!=null){
+        if (harvestSource != null) {
             prepareDTO();
             // populate sample triples
-            sampleTriples = DAOFactory.get().getDao(HelperDAO.class).getSampleTriplesInSource(
-                    harvestSource.getUrl(), PagingRequest.create(1, 10));
+            sampleTriples = DAOFactory
+                    .get()
+                    .getDao(HelperDAO.class)
+                    .getSampleTriplesInSource(harvestSource.getUrl(),
+                            PagingRequest.create(1, 10));
         }
 
         return new ForwardResolution("/pages/viewsource.jsp");
@@ -190,65 +198,69 @@ public class HarvestSourceActionBean extends AbstractActionBean {
         Integer sourceId = harvestSource.getSourceId();
         String url = harvestSource.getUrl();
 
-        if (sourceId!=null){
-            harvestSource = factory.getDao(HarvestSourceDAO.class).getHarvestSourceById(sourceId);
-        }
-        else if (url!=null && url.trim().length()>0){
-            harvestSource = factory.getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(url);
+        if (sourceId != null) {
+            harvestSource = factory.getDao(HarvestSourceDAO.class)
+                    .getHarvestSourceById(sourceId);
+        } else if (url != null && url.trim().length() > 0) {
+            harvestSource = factory.getDao(HarvestSourceDAO.class)
+                    .getHarvestSourceByUrl(url);
         }
     }
 
     /**
-     *
+     * 
      * @return Resolution
      * @throws DAOException
      * @throws SchedulerException
      * @throws HarvestException
      */
-    public Resolution add() throws DAOException, SchedulerException, HarvestException {
+    public Resolution add() throws DAOException, SchedulerException,
+            HarvestException {
 
         Resolution resolution = new ForwardResolution("/pages/addsource.jsp");
-        if(isUserLoggedIn()){
-            if (isPostRequest()){
+        if (isUserLoggedIn()) {
+            if (isPostRequest()) {
 
-                if (validateAddEdit()){
+                if (validateAddEdit()) {
 
                     // create new harvest source
                     HarvestSourceDTO hSourceDTO = getHarvestSource();
-                    if(hSourceDTO != null){
+                    if (hSourceDTO != null) {
                         hSourceDTO.setOwner(getUserName());
-                        //All Schema sources are also Priority sources
-                        if(schemaSource){
+                        // All Schema sources are also Priority sources
+                        if (schemaSource) {
                             hSourceDTO.setPrioritySource(true);
                         }
-                        //Add/remove source into/from inferencing ruleset
+                        // Add/remove source into/from inferencing ruleset
                         manageRuleset(hSourceDTO.getUrl());
                     }
-                    factory.getDao(HarvestSourceDAO.class).addSource(hSourceDTO);
+                    factory.getDao(HarvestSourceDAO.class)
+                            .addSource(hSourceDTO);
 
                     // set up the resolution
-                    resolution = new ForwardResolution(HarvestSourcesActionBean.class);
+                    resolution = new ForwardResolution(
+                            HarvestSourcesActionBean.class);
 
-                    // schedule urgent harvest, unless explicitly requested not to
-                    if (getContext().getRequestParameter("dontHarvest")==null){
+                    // schedule urgent harvest, unless explicitly requested not
+                    // to
+                    if (getContext().getRequestParameter("dontHarvest") == null) {
 
-                        UrgentHarvestQueue.addPullHarvest(getHarvestSource().getUrl());
+                        UrgentHarvestQueue.addPullHarvest(getHarvestSource()
+                                .getUrl());
                         addSystemMessage("Harvest source successfully created and scheduled for urgent harvest!");
-                    }
-                    else{
+                    } else {
                         addSystemMessage("Harvest source successfully created!");
                     }
                 }
             }
-        }
-        else
+        } else
             addWarningMessage(getBundle().getString("not.logged.in"));
 
         return resolution;
     }
 
     /**
-     *
+     * 
      * @return Resolution
      * @throws DAOException
      * @throws SchedulerException
@@ -256,98 +268,108 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     public Resolution edit() throws DAOException, SchedulerException {
 
         Resolution resolution = new ForwardResolution("/pages/editsource.jsp");
-        if(isUserLoggedIn()){
-            if (isPostRequest()){
+        if (isUserLoggedIn()) {
+            if (isPostRequest()) {
 
-                if (validateAddEdit()){
+                if (validateAddEdit()) {
                     HarvestSourceDTO source = getHarvestSource();
-                    if(source != null){
+                    if (source != null) {
                         source.setOwner(getUserName());
-                        //All Schema sources are also Priority sources
-                        if(schemaSource){
+                        // All Schema sources are also Priority sources
+                        if (schemaSource) {
                             source.setPrioritySource(true);
                         }
-                        //Add/remove source into/from inferencing ruleset
+                        // Add/remove source into/from inferencing ruleset
                         manageRuleset(source.getUrl());
                     }
                     factory.getDao(HarvestSourceDAO.class).editSource(source);
                     addSystemMessage(getBundle().getString("update.success"));
                 }
+            } else {
+                harvestSource = factory.getDao(HarvestSourceDAO.class)
+                        .getHarvestSourceById(harvestSource.getSourceId());
+                schemaSource = factory.getDao(HarvestSourceDAO.class)
+                        .isSourceInInferenceRule(harvestSource.getUrl());
             }
-            else {
-                harvestSource = factory.getDao(HarvestSourceDAO.class).getHarvestSourceById(harvestSource.getSourceId());
-                schemaSource = factory.getDao(HarvestSourceDAO.class).isSourceInInferenceRule(harvestSource.getUrl());
-            }
-        }
-        else
+        } else
             addWarningMessage(getBundle().getString("not.logged.in"));
 
         return resolution;
     }
-    
+
     private void manageRuleset(String url) throws DAOException {
-        
-        boolean isAlreadyInRuleset = factory.getDao(HarvestSourceDAO.class).isSourceInInferenceRule(url);
+
+        boolean isAlreadyInRuleset = factory.getDao(HarvestSourceDAO.class)
+                .isSourceInInferenceRule(url);
         if (schemaSource && !isAlreadyInRuleset) {
-            factory.getDao(HarvestSourceDAO.class).addSourceIntoInferenceRule(url);
+            factory.getDao(HarvestSourceDAO.class).addSourceIntoInferenceRule(
+                    url);
         } else if (!schemaSource && isAlreadyInRuleset) {
-            factory.getDao(HarvestSourceDAO.class).removeSourceFromInferenceRule(url);
+            factory.getDao(HarvestSourceDAO.class)
+                    .removeSourceFromInferenceRule(url);
         }
-        
+
     }
 
     /**
-     *
+     * 
      * @return Resolution
      * @throws DAOException
      * @throws HarvestException
      */
-    public Resolution scheduleUrgentHarvest() throws DAOException, HarvestException{
+    public Resolution scheduleUrgentHarvest() throws DAOException,
+            HarvestException {
 
-        // we need to re-fetch this.harvestSource, because the requested post has nulled it
-        harvestSource = factory.getDao(HarvestSourceDAO.class).getHarvestSourceById(harvestSource.getSourceId());
+        // we need to re-fetch this.harvestSource, because the requested post
+        // has nulled it
+        harvestSource = factory.getDao(HarvestSourceDAO.class)
+                .getHarvestSourceById(harvestSource.getSourceId());
 
         // schedule the harvest
         UrgentHarvestQueue.addPullHarvest(getHarvestSource().getUrl());
 
         // retrieve list of harvests (for display)
-        harvests = factory.getDao(HarvestDAO.class).getHarvestsBySourceId(harvestSource.getSourceId());
+        harvests = factory.getDao(HarvestDAO.class).getHarvestsBySourceId(
+                harvestSource.getSourceId());
 
         addSystemMessage("Successfully scheduled for urgent harvest!");
         return new ForwardResolution("/pages/viewsource.jsp");
     }
 
     /**
-     *
+     * 
      * @return Resolution
      */
-    public Resolution export(){
+    public Resolution export() {
 
         Resolution resolution = new ForwardResolution("/pages/export.jsp");
 
         // process further only if exportType has been specified
-        if (!StringUtils.isBlank(exportType)){
+        if (!StringUtils.isBlank(exportType)) {
 
             // process further only if source URL has been specified
-            if (harvestSource!=null && !StringUtils.isBlank(harvestSource.getUrl())){
+            if (harvestSource != null
+                    && !StringUtils.isBlank(harvestSource.getUrl())) {
 
-                // if exporting to file, generate and stream RDF into servlet response
-                if (ExportType.FILE.toString().equals(exportType)){
+                // if exporting to file, generate and stream RDF into servlet
+                // response
+                if (ExportType.FILE.toString().equals(exportType)) {
 
-                    resolution = new StreamingResolution("application/rdf+xml"){
+                    resolution = new StreamingResolution("application/rdf+xml") {
 
-                        public void stream(HttpServletResponse response) throws Exception{
-                                RDFExporter.export(Hashes.spoHash(harvestSource.getUrl()),
-                                        response.getOutputStream());
+                        public void stream(HttpServletResponse response)
+                                throws Exception {
+                            RDFExporter.export(
+                                    Hashes.spoHash(harvestSource.getUrl()),
+                                    response.getOutputStream());
                         }
                     }.setFilename("rdf.xml");
-                }
-                else if (ExportType.HOMESPACE.toString().equals(exportType)){
+                } else if (ExportType.HOMESPACE.toString().equals(exportType)) {
                     // TODO handle export to home space
                     ;
-                }
-                else{
-                    throw new IllegalArgumentException("Unknown export type: " + exportType);
+                } else {
+                    throw new IllegalArgumentException("Unknown export type: "
+                            + exportType);
                 }
             }
         }
@@ -356,49 +378,60 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @return Resolution
      */
-    public Resolution goToEdit(){
-        if (harvestSource!=null)
-            return new RedirectResolution(getUrlBinding() + "?edit=&harvestSource.sourceId=" + harvestSource.getSourceId());
+    public Resolution goToEdit() {
+        if (harvestSource != null)
+            return new RedirectResolution(getUrlBinding()
+                    + "?edit=&harvestSource.sourceId="
+                    + harvestSource.getSourceId());
         else
             return new ForwardResolution("/pages/viewsource.jsp");
     }
 
     /**
-     *
+     * 
      * @return boolean
      */
-    public boolean validateAddEdit(){
+    public boolean validateAddEdit() {
 
-        if (isPostRequest()){
+        if (isPostRequest()) {
 
-            if (harvestSource.getUrl()==null || harvestSource.getUrl().trim().length()==0 || !URLUtil.isURL(harvestSource.getUrl())){
+            if (harvestSource.getUrl() == null
+                    || harvestSource.getUrl().trim().length() == 0
+                    || !URLUtil.isURL(harvestSource.getUrl())) {
                 addGlobalValidationError(new SimpleError("Invalid URL!"));
             }
 
-            if (harvestSource.getUrl()!=null && harvestSource.getUrl().indexOf("#")>=0){
-                addGlobalValidationError(new SimpleError("URL with a fragment part not allowed!"));
+            if (harvestSource.getUrl() != null
+                    && harvestSource.getUrl().indexOf("#") >= 0) {
+                addGlobalValidationError(new SimpleError(
+                        "URL with a fragment part not allowed!"));
             }
 
-            if (harvestSource.getUrl()!=null && URLUtil.isNotExisting(harvestSource.getUrl())){
-                addGlobalValidationError(new SimpleError("There is no resource existing behind this URL!"));
+            if (harvestSource.getUrl() != null
+                    && URLUtil.isNotExisting(harvestSource.getUrl())) {
+                addGlobalValidationError(new SimpleError(
+                        "There is no resource existing behind this URL!"));
             }
 
-            if (harvestSource.getIntervalMinutes()!=null){
-                if (harvestSource.getIntervalMinutes().intValue()<0 || intervalMultiplier<0){
-                    addGlobalValidationError(new SimpleError("Harvest interval must be >=0"));
+            if (harvestSource.getIntervalMinutes() != null) {
+                if (harvestSource.getIntervalMinutes().intValue() < 0
+                        || intervalMultiplier < 0) {
+                    addGlobalValidationError(new SimpleError(
+                            "Harvest interval must be >=0"));
+                } else {
+                    harvestSource.setIntervalMinutes(new Integer(harvestSource
+                            .getIntervalMinutes().intValue()
+                            * intervalMultiplier));
                 }
-                else{
-                    harvestSource.setIntervalMinutes(new Integer(harvestSource.getIntervalMinutes().intValue() * intervalMultiplier));
-                }
-            }
-            else
+            } else
                 harvestSource.setIntervalMinutes(new Integer(0));
         }
 
-        return getContext().getValidationErrors()==null || getContext().getValidationErrors().isEmpty();
+        return getContext().getValidationErrors() == null
+                || getContext().getValidationErrors().isEmpty();
     }
 
     /**
@@ -409,20 +442,21 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param intervalMultiplier the intervalMultiplier to set
+     * @param intervalMultiplier
+     *            the intervalMultiplier to set
      */
     public void setIntervalMultiplier(int intervalMultiplier) {
         this.intervalMultiplier = intervalMultiplier;
     }
 
     /**
-     *
+     * 
      * @return Map<Integer,String>
      */
-    public Map<Integer,String> getIntervalMultipliers(){
+    public Map<Integer, String> getIntervalMultipliers() {
 
-        if (intervalMultipliers==null){
-            intervalMultipliers = new LinkedHashMap<Integer,String>();
+        if (intervalMultipliers == null) {
+            intervalMultipliers = new LinkedHashMap<Integer, String>();
             intervalMultipliers.put(new Integer(1), "minutes");
             intervalMultipliers.put(new Integer(60), "hours");
             intervalMultipliers.put(new Integer(1440), "days");
@@ -433,53 +467,56 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @return int
      */
-    public int getSelectedIntervalMultiplier(){
+    public int getSelectedIntervalMultiplier() {
         return getIntervalMultipliers().keySet().iterator().next().intValue();
     }
 
     /**
-     *
+     * 
      * @return String
      */
-    public String getIntervalMinutesDisplay(){
+    public String getIntervalMinutesDisplay() {
 
         String result = "";
-        if (this.harvestSource!=null && this.harvestSource.getIntervalMinutes()!=null){
-            result = HarvestSourceActionBean.getMinutesDisplay(this.harvestSource.getIntervalMinutes().intValue());
+        if (this.harvestSource != null
+                && this.harvestSource.getIntervalMinutes() != null) {
+            result = HarvestSourceActionBean
+                    .getMinutesDisplay(this.harvestSource.getIntervalMinutes()
+                            .intValue());
         }
 
         return result;
     }
-    
+
     /**
-    *
-    * @return String
-    */
-    public String getPrioritySourceDisplay(){
+     * 
+     * @return String
+     */
+    public String getPrioritySourceDisplay() {
 
         String result = "";
-        if (this.harvestSource!=null){
-            if(harvestSource.isPrioritySource()){
-                result = "yes"; 
+        if (this.harvestSource != null) {
+            if (harvestSource.isPrioritySource()) {
+                result = "yes";
             } else {
                 result = "no";
             }
         }
         return result;
     }
-    
+
     /**
-    *
-    * @return String
-    */
-    public String getSchemaSourceDisplay(){
+     * 
+     * @return String
+     */
+    public String getSchemaSourceDisplay() {
 
         String result = "";
-        if(schemaSource){
-            result = "yes"; 
+        if (schemaSource) {
+            result = "yes";
         } else {
             result = "no";
         }
@@ -487,11 +524,11 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @param minutes
      * @return
      */
-    private static String getMinutesDisplay(int minutes){
+    private static String getMinutesDisplay(int minutes) {
 
         int days = minutes / 1440;
         minutes = minutes - (days * 1440);
@@ -499,14 +536,16 @@ public class HarvestSourceActionBean extends AbstractActionBean {
         minutes = minutes - (hours * 60);
 
         StringBuffer buf = new StringBuffer();
-        if (days>0){
-            buf.append(days).append(days==1 ? " day" : " days");
+        if (days > 0) {
+            buf.append(days).append(days == 1 ? " day" : " days");
         }
-        if (hours>0){
-            buf.append(buf.length()>0 ? ", " : "").append(hours).append(hours==1 ? " hour" : " hours");
+        if (hours > 0) {
+            buf.append(buf.length() > 0 ? ", " : "").append(hours)
+                    .append(hours == 1 ? " hour" : " hours");
         }
-        if (minutes>0){
-            buf.append(buf.length()>0 ? ", " : "").append(minutes).append(minutes==1 ? " minute" : " minutes");
+        if (minutes > 0) {
+            buf.append(buf.length() > 0 ? ", " : "").append(minutes)
+                    .append(minutes == 1 ? " minute" : " minutes");
         }
 
         return buf.toString();
@@ -527,7 +566,8 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param selectedTab the selectedTab to set
+     * @param selectedTab
+     *            the selectedTab to set
      */
     public void setSelectedTab(String selectedTab) {
         this.selectedTab = selectedTab;
@@ -541,7 +581,8 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param exportType the exportType to set
+     * @param exportType
+     *            the exportType to set
      */
     public void setExportType(String exportType) {
         this.exportType = exportType;

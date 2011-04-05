@@ -1,8 +1,5 @@
 package eionet.cr.dao.virtuoso;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -43,8 +40,6 @@ import eionet.cr.util.Pair;
 import eionet.cr.util.ObjectLabelPair;
 import eionet.cr.util.Util;
 import eionet.cr.util.pagination.PagingRequest;
-import eionet.cr.util.sesame.SesameUtil;
-import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
 import eionet.cr.web.security.CRUser;
 
@@ -81,10 +76,11 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         if (limit <= 0)
             throw new IllegalArgumentException("limit must be greater than 0!");
 
-        StringBuffer sqlBuf = new StringBuffer().append(
-                "prefix dc: <http://purl.org/dc/elements/1.1/> ").append(
-                "select distinct ?s ?d where { ").append("?s a <").append(
-                rdfType).append("> . ").append("OPTIONAL { ?s dc:date ?d } ")
+        StringBuffer sqlBuf = new StringBuffer()
+                .append("prefix dc: <http://purl.org/dc/elements/1.1/> ")
+                .append("select distinct ?s ?d where { ").append("?s a <")
+                .append(rdfType).append("> . ")
+                .append("OPTIONAL { ?s dc:date ?d } ")
                 .append("} ORDER BY DESC(?d) LIMIT " + limit);
 
         logger.trace("Recent uploads search, executing subject finder query: "
@@ -100,8 +96,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         // if subjectUris not empty, get the subjects data and set their dates
         if (subjectUris != null && !subjectUris.isEmpty()) {
 
-            logger
-                    .trace("Recent uploads search, getting the data of the found subjects");
+            logger.trace("Recent uploads search, getting the data of the found subjects");
 
             // get the data of all found subjects
             SubjectDataReader dataReader = new SubjectDataReader(subjectUris);
@@ -163,8 +158,8 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         // TODO use CustomSearch instead?
         StringBuilder strBuilder = new StringBuilder();
         strBuilder.append("SELECT DISTINCT ?label ?object WHERE { ?s <")
-                .append(predicateUri).append("> ?object ").append(
-                        "OPTIONAL {?object <").append(Predicates.RDFS_LABEL)
+                .append(predicateUri).append("> ?object ")
+                .append("OPTIONAL {?object <").append(Predicates.RDFS_LABEL)
                 .append("> ?label }} ORDER BY ?label");
 
         long startTime = System.currentTimeMillis();
@@ -228,9 +223,9 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
             return null;
         }
         StringBuilder strBuilder = new StringBuilder();
-        strBuilder.append("select distinct ?o where { ").append("<").append(
-                subjectUri).append("> <").append(Predicates.CR_SCHEMA).append(
-                "> ?o ").append("} limit 1");
+        strBuilder.append("select distinct ?o where { ").append("<")
+                .append(subjectUri).append("> <").append(Predicates.CR_SCHEMA)
+                .append("> ?o ").append("} limit 1");
 
         List<String> objectUri = executeSPARQL(strBuilder.toString(),
                 new SingleObjectReader<String>());
@@ -281,8 +276,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
                     Predicates.RDFS_LABEL };
 
             // get the data of all found subjects
-            logger
-                    .trace("Search by filters, getting the data of the found subjects");
+            logger.trace("Search by filters, getting the data of the found subjects");
             resultList = getSubjectsData(predicateUris, neededPredicates,
                     new SubjectDataReader(predicateUris), null);
 
@@ -341,8 +335,9 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         SubjectDataReader reader = new SubjectDataReader(map);
         reader.setBlankNodeUriPrefix(VirtuosoBaseDAO.BNODE_URI_PREFIX);
 
-        List<SubjectDTO> subjects = getSubjectsData(Collections
-                .singletonList(subjectUri), null, reader, null, false);
+        List<SubjectDTO> subjects = getSubjectsData(
+                Collections.singletonList(subjectUri), null, reader, null,
+                false);
         return subjects == null || subjects.isEmpty() ? null : subjects.get(0);
     }
 
@@ -394,10 +389,10 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         StringBuilder strBuilder = new StringBuilder();
         strBuilder.append("SELECT ?li_title ?ro_title ?ro_uri  WHERE { ")
                 .append("?ro_uri <").append(Predicates.ROD_INSTRUMENT_PROPERTY)
-                .append("> ?li_uri . ").append("?li_uri <").append(
-                        Predicates.DCTERMS_ALTERNATIVE)
-                .append("> ?li_title . ").append("?ro_uri <").append(
-                        Predicates.DCTERMS_TITLE).append("> ?ro_title ")
+                .append("> ?li_uri . ").append("?li_uri <")
+                .append(Predicates.DCTERMS_ALTERNATIVE)
+                .append("> ?li_title . ").append("?ro_uri <")
+                .append(Predicates.DCTERMS_TITLE).append("> ?ro_title ")
                 .append("} ORDER BY ?li_title ?ro_title");
 
         long startTime = System.currentTimeMillis();
@@ -590,8 +585,8 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
             PagingRequest pagingRequest) throws DAOException {
 
         StringBuilder strBuilder = new StringBuilder();
-        strBuilder.append("SELECT ?s ?p ?o FROM <").append(sourceUrl).append(
-                "> WHERE {?s ?p ?o} LIMIT 100");
+        strBuilder.append("SELECT ?s ?p ?o FROM <").append(sourceUrl)
+                .append("> WHERE {?s ?p ?o} LIMIT 100");
 
         TriplesReader reader = new TriplesReader();
         return executeSPARQL(strBuilder.toString(), reader);
@@ -858,5 +853,5 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         return Long.valueOf(resultObject.toString());
 
     }
-    
+
 }

@@ -24,13 +24,12 @@ import eionet.cr.web.util.columns.SearchResultColumn;
 import eionet.cr.web.util.columns.SubjectPredicateColumn;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
- *
+ * 
  */
 
 public abstract class AbstractHomeActionBean extends AbstractActionBean {
-
 
     protected static final String TYPE_BOOKMARK = "bookmark";
     protected static final String TYPE_HISTORY = "history";
@@ -45,7 +44,8 @@ public abstract class AbstractHomeActionBean extends AbstractActionBean {
     protected static List<Map<String, String>> tabs;
     private static final Map<String, List<SearchResultColumn>> typesColumns;
 
-    // Note: attemptedUserName might be used in some situations where showPublic = true and content of that user is visible to everyone.
+    // Note: attemptedUserName might be used in some situations where showPublic
+    // = true and content of that user is visible to everyone.
     private String attemptedUserName;
 
     private String section;
@@ -99,30 +99,36 @@ public abstract class AbstractHomeActionBean extends AbstractActionBean {
 
         /* columns for bookmarks */
         List<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
-        list.add(new SubjectPredicateColumn("Bookmark", false, Predicates.RDFS_LABEL));
+        list.add(new SubjectPredicateColumn("Bookmark", false,
+                Predicates.RDFS_LABEL));
         typesColumns.put(Subjects.DUBLIN_CORE_SOURCE_URL, list);
 
         /* columns for registrations */
         list = new ArrayList<SearchResultColumn>();
-        list.add(new SubjectPredicateColumn("Subject", false, Predicates.RDFS_LABEL));
-        list.add(new SubjectPredicateColumn("Predicate", false, Predicates.RDFS_LABEL));
-        list.add(new SubjectPredicateColumn("Object", false, Predicates.RDFS_LABEL));
+        list.add(new SubjectPredicateColumn("Subject", false,
+                Predicates.RDFS_LABEL));
+        list.add(new SubjectPredicateColumn("Predicate", false,
+                Predicates.RDFS_LABEL));
+        list.add(new SubjectPredicateColumn("Object", false,
+                Predicates.RDFS_LABEL));
         typesColumns.put(Subjects.DUBLIN_CORE_SOURCE_URL, list);
 
         /* columns for history */
         list = new ArrayList<SearchResultColumn>();
         list.add(new SubjectPredicateColumn("URL", false, Predicates.RDFS_LABEL));
-        list.add(new SubjectPredicateColumn("Last Update", false, Predicates.RDFS_LABEL));
+        list.add(new SubjectPredicateColumn("Last Update", false,
+                Predicates.RDFS_LABEL));
         typesColumns.put(Subjects.DUBLIN_CORE_SOURCE_URL, list);
 
     }
 
     public AbstractHomeActionBean() {
         setHomeContext(true);
-        //setUrlParams();
+        // setUrlParams();
     }
 
-    protected void setEnvironmentParams(CRActionBeanContext context, String activeSection, boolean showPublic) {
+    protected void setEnvironmentParams(CRActionBeanContext context,
+            String activeSection, boolean showPublic) {
 
         setShowPublic(showPublic);
 
@@ -130,7 +136,8 @@ public abstract class AbstractHomeActionBean extends AbstractActionBean {
         section = activeSection;
         setDefaultSection();
         if (this.isUserLoggedIn()) {
-            if (attemptedUserName.toLowerCase().equals(this.getUser().getUserName().toLowerCase())) {
+            if (attemptedUserName.toLowerCase().equals(
+                    this.getUser().getUserName().toLowerCase())) {
                 userAuthorized = true;
                 authenticatedUserName = attemptedUserName;
             } else {
@@ -142,18 +149,19 @@ public abstract class AbstractHomeActionBean extends AbstractActionBean {
             authenticationMessage = "You must be logged in to access your home";
         }
 
-        String s = context.getRequest().getRequestURI().split(attemptedUserName)[0];
-        baseHomeUrl = StringUtils.substringAfter(s, context.getRequest().getContextPath());
+        String s = context.getRequest().getRequestURI()
+                .split(attemptedUserName)[0];
+        baseHomeUrl = StringUtils.substringAfter(s, context.getRequest()
+                .getContextPath());
     }
 
     private void setDefaultSection() {
         if (section == null
-            || (!section.equals(TYPE_BOOKMARK)
-            && !section.equals(TYPE_UPLOADS)
-            && !section.equals(TYPE_HISTORY)
-            && !section.equals(TYPE_REGISTRATIONS)
-            && !section.equals(TYPE_REVIEWS))
-        ) {
+                || (!section.equals(TYPE_BOOKMARK)
+                        && !section.equals(TYPE_UPLOADS)
+                        && !section.equals(TYPE_HISTORY)
+                        && !section.equals(TYPE_REGISTRATIONS) && !section
+                        .equals(TYPE_REVIEWS))) {
             section = TYPE_UPLOADS;
         }
     }
@@ -251,57 +259,63 @@ public abstract class AbstractHomeActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @param sourceUrl
      * @param uploadedFile
      * @param dcTitle
      */
-    protected void harvestUploadedFile(String sourceUrl, FileBean uploadedFile, String dcTitle, String userName) {
+    protected void harvestUploadedFile(String sourceUrl, FileBean uploadedFile,
+            String dcTitle, String userName) {
 
         // create and store harvest source for the above source url,
-        // don't throw exceptions, as an uploaded file does not have to be harvestable
+        // don't throw exceptions, as an uploaded file does not have to be
+        // harvestable
         HarvestSourceDTO hSourceDTO = null;
         try {
             logger.debug("Creating and storing harvest source");
-            HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
-            
+            HarvestSourceDAO dao = DAOFactory.get().getDao(
+                    HarvestSourceDAO.class);
+
             HarvestSourceDTO source = new HarvestSourceDTO();
             source.setUrl(sourceUrl);
             source.setIntervalMinutes(0);
-            
+
             dao.addSourceIgnoreDuplicate(source);
             hSourceDTO = dao.getHarvestSourceByUrl(sourceUrl);
         } catch (DAOException e) {
             logger.info("Exception when trying to create"
-                + "harvest source for the uploaded file content", e);
+                    + "harvest source for the uploaded file content", e);
         }
 
         // perform harvest,
-        // don't throw exceptions, as an uploaded file does not HAVE to be harvestable
+        // don't throw exceptions, as an uploaded file does not HAVE to be
+        // harvestable
         try {
-            if (hSourceDTO!=null) {
-                UploadHarvest uploadHarvest =
-                    new UploadHarvest(hSourceDTO, uploadedFile, dcTitle, userName);
+            if (hSourceDTO != null) {
+                UploadHarvest uploadHarvest = new UploadHarvest(hSourceDTO,
+                        uploadedFile, dcTitle, userName);
                 uploadHarvest.execute();
             } else {
                 logger.debug("Harvest source was not created, so skipping harvest");
             }
         } catch (HarvestException e) {
-            logger.info("Exception when trying to harvest uploaded file content", e);
+            logger.info(
+                    "Exception when trying to harvest uploaded file content", e);
         }
     }
 
     /**
-     *
+     * 
      * @param uploadedFile
      */
     protected void deleteUploadedFile(FileBean uploadedFile) {
 
-        if (uploadedFile!=null) {
+        if (uploadedFile != null) {
             try {
                 uploadedFile.delete();
             } catch (IOException e) {
-                logger.error("Failed to delete uploaded file [" + uploadedFile + "]", e);
+                logger.error("Failed to delete uploaded file [" + uploadedFile
+                        + "]", e);
             }
         }
     }

@@ -14,9 +14,9 @@ import eionet.cr.common.CRRuntimeException;
 import eionet.cr.config.GeneralConfig;
 
 /**
- *
+ * 
  * @author jaanus
- *
+ * 
  */
 public class SesameConnectionProvider {
 
@@ -29,34 +29,37 @@ public class SesameConnectionProvider {
     /**
      *
      */
-    private static void initRepository(){
+    private static void initRepository() {
 
-        String url = GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_URL);
-        String usr = GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_USR);
-        String pwd = GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_PWD);
+        String url = GeneralConfig
+                .getRequiredProperty(GeneralConfig.VIRTUOSO_DB_URL);
+        String usr = GeneralConfig
+                .getRequiredProperty(GeneralConfig.VIRTUOSO_DB_USR);
+        String pwd = GeneralConfig
+                .getRequiredProperty(GeneralConfig.VIRTUOSO_DB_PWD);
 
         try {
             repository = new VirtuosoRepository(url, usr, pwd);
             repository.initialize();
-        }
-        catch (RepositoryException e) {
+        } catch (RepositoryException e) {
             throw new CRRuntimeException("Failed to initialize repository", e);
         }
     }
 
     /**
-     *
+     * 
      * @return RepositoryConnection
      * @throws RepositoryException
      */
-    public static RepositoryConnection getRepositoryConnection() throws RepositoryException{
+    public static RepositoryConnection getRepositoryConnection()
+            throws RepositoryException {
 
-        if (repository==null){
+        if (repository == null) {
             synchronized (repositoryLock) {
 
                 // double-checked locking pattern
                 // (http://www.ibm.com/developerworks/java/library/j-dcl.html)
-                if (repository==null){
+                if (repository == null) {
                     initRepository();
                 }
             }
@@ -64,41 +67,54 @@ public class SesameConnectionProvider {
 
         return repository.getConnection();
     }
-    
+
     /**
-    *
-    * @return Connection
-    * @throws SQLException
-    */
+     * 
+     * @return Connection
+     * @throws SQLException
+     */
     public static Connection getSimpleConnection() throws SQLException {
 
-       String drv = GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_DRV);
-       String url = GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_URL);
-       String usr = GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_USR);
-       String pwd = GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_PWD);
+        String drv = GeneralConfig
+                .getRequiredProperty(GeneralConfig.VIRTUOSO_DB_DRV);
+        String url = GeneralConfig
+                .getRequiredProperty(GeneralConfig.VIRTUOSO_DB_URL);
+        String usr = GeneralConfig
+                .getRequiredProperty(GeneralConfig.VIRTUOSO_DB_USR);
+        String pwd = GeneralConfig
+                .getRequiredProperty(GeneralConfig.VIRTUOSO_DB_PWD);
 
-       if (drv == null || drv.trim().length() == 0) {
-           throw new SQLException("Failed to get connection, missing property: " + GeneralConfig.VIRTUOSO_DB_DRV);
-       }
+        if (drv == null || drv.trim().length() == 0) {
+            throw new SQLException(
+                    "Failed to get connection, missing property: "
+                            + GeneralConfig.VIRTUOSO_DB_DRV);
+        }
 
-       if (url == null || url.trim().length() == 0) {
-           throw new SQLException("Failed to get connection, missing property: " + GeneralConfig.VIRTUOSO_DB_URL);
-       }
+        if (url == null || url.trim().length() == 0) {
+            throw new SQLException(
+                    "Failed to get connection, missing property: "
+                            + GeneralConfig.VIRTUOSO_DB_URL);
+        }
 
-       if (usr == null || usr.trim().length() == 0) {
-           throw new SQLException("Failed to get connection, missing property: " + GeneralConfig.VIRTUOSO_DB_USR);
-       }
+        if (usr == null || usr.trim().length() == 0) {
+            throw new SQLException(
+                    "Failed to get connection, missing property: "
+                            + GeneralConfig.VIRTUOSO_DB_USR);
+        }
 
-       if (pwd == null || pwd.trim().length() == 0) {
-           throw new SQLException("Failed to get connection, missing property: " + GeneralConfig.VIRTUOSO_DB_PWD);
-       }
+        if (pwd == null || pwd.trim().length() == 0) {
+            throw new SQLException(
+                    "Failed to get connection, missing property: "
+                            + GeneralConfig.VIRTUOSO_DB_PWD);
+        }
 
-       try {
-           Class.forName(drv);
-           return DriverManager.getConnection(url, usr, pwd);
-       }
-       catch (ClassNotFoundException e) {
-           throw new CRRuntimeException("Failed to get connection, driver class not found: " + drv, e);
-       }
-   }
+        try {
+            Class.forName(drv);
+            return DriverManager.getConnection(url, usr, pwd);
+        } catch (ClassNotFoundException e) {
+            throw new CRRuntimeException(
+                    "Failed to get connection, driver class not found: " + drv,
+                    e);
+        }
+    }
 }

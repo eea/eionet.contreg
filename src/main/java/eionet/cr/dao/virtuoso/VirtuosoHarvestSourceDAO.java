@@ -68,7 +68,7 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
         }
 
     }
-    
+
     /*
      * (non-Javadoc)
      * 
@@ -79,36 +79,38 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
 
         Connection conn = null;
         String ret = "";
-        try{
+        try {
             conn = SesameUtil.getConnection();
-            PreparedStatement stmt = conn.prepareStatement("SELECT RS_URI FROM sys_rdf_schema where RS_NAME = ?");
-            stmt.setString(1, GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME));
+            PreparedStatement stmt = conn
+                    .prepareStatement("SELECT RS_URI FROM sys_rdf_schema where RS_NAME = ?");
+            stmt.setString(
+                    1,
+                    GeneralConfig
+                            .getRequiredProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME));
             ResultSet rs = stmt.executeQuery();
             StringBuffer sb = new StringBuffer();
-            while (rs.next()){
+            while (rs.next()) {
                 String graphUri = rs.getString("RS_URI");
                 if (!StringUtils.isBlank(graphUri)) {
                     sb.append("'").append(graphUri).append("'");
                     sb.append(",");
                 }
             }
-            
+
             ret = sb.toString();
-            //remove last comma
+            // remove last comma
             if (!StringUtils.isBlank(ret)) {
                 ret = ret.substring(0, ret.lastIndexOf(","));
             }
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
-        }
-        finally{
+        } finally {
             SQLUtil.close(conn);
         }
-        
+
         return ret;
     }
-    
+
     /*
      * (non-Javadoc)
      * 
@@ -119,25 +121,27 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
 
         Connection conn = null;
         boolean ret = false;
-        try{
+        try {
             conn = SesameUtil.getConnection();
-            PreparedStatement stmt = conn.prepareStatement("SELECT RS_NAME FROM sys_rdf_schema where RS_NAME = ? AND RS_URI = ?");
-            stmt.setString(1, GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME));
+            PreparedStatement stmt = conn
+                    .prepareStatement("SELECT RS_NAME FROM sys_rdf_schema where RS_NAME = ? AND RS_URI = ?");
+            stmt.setString(
+                    1,
+                    GeneralConfig
+                            .getRequiredProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME));
             stmt.setString(2, url);
             ResultSet rs = stmt.executeQuery();
-            while (rs.next()){
+            while (rs.next()) {
                 ret = true;
             }
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
-        }
-        finally{
+        } finally {
             SQLUtil.close(conn);
         }
         return ret;
     }
-    
+
     /*
      * (non-Javadoc)
      * 
@@ -145,48 +149,53 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
      */
     @Override
     public boolean addSourceIntoInferenceRule(String url) throws DAOException {
-        
+
         Connection conn = null;
         boolean ret = false;
-        
+
         try {
             conn = SesameUtil.getConnection();
-            PreparedStatement stmt = conn.prepareStatement("rdfs_rule_set (?, ?)");
-            stmt.setString(1, GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME));
+            PreparedStatement stmt = conn
+                    .prepareStatement("rdfs_rule_set (?, ?)");
+            stmt.setString(
+                    1,
+                    GeneralConfig
+                            .getRequiredProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME));
             stmt.setString(2, url);
             ret = stmt.execute();
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
-        }
-        finally{
+        } finally {
             SQLUtil.close(conn);
         }
         return ret;
     }
-    
+
     /*
      * (non-Javadoc)
      * 
      * @see eionet.cr.dao.HarvestSourceDAO#removeSourceFromInferenceRule()
      */
     @Override
-    public boolean removeSourceFromInferenceRule(String url) throws DAOException {
-        
+    public boolean removeSourceFromInferenceRule(String url)
+            throws DAOException {
+
         Connection conn = null;
         boolean ret = false;
-        
+
         try {
             conn = SesameUtil.getConnection();
-            PreparedStatement stmt = conn.prepareStatement("rdfs_rule_set (?, ?, 1)");
-            stmt.setString(1, GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME));
+            PreparedStatement stmt = conn
+                    .prepareStatement("rdfs_rule_set (?, ?, 1)");
+            stmt.setString(
+                    1,
+                    GeneralConfig
+                            .getRequiredProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME));
             stmt.setString(2, url);
             ret = stmt.execute();
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
-        }
-        finally{
+        } finally {
             SQLUtil.close(conn);
         }
         return ret;

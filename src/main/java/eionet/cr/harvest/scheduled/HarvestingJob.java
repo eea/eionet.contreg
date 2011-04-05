@@ -57,15 +57,17 @@ import eionet.cr.harvest.persist.PersisterFactory;
 import eionet.cr.util.EMailSender;
 import eionet.cr.util.Util;
 import eionet.cr.web.security.CRUser;
+
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 public class HarvestingJob implements StatefulJob, ServletContextListener {
 
     /** */
-    public static final String NAME = HarvestingJob.class.getClass().getSimpleName();
+    public static final String NAME = HarvestingJob.class.getClass()
+            .getSimpleName();
 
     /** */
     private static Log logger;
@@ -84,7 +86,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     /** */
     private static SimpleTrigger trigger = null;
 
-//  private static Harvest currentHarvest = null;
+    // private static Harvest currentHarvest = null;
 
     /**
      *
@@ -96,9 +98,11 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.quartz.Job#execute(org.quartz.JobExecutionContext)
      */
-    public void execute(JobExecutionContext jobExecContext) throws JobExecutionException {
+    public void execute(JobExecutionContext jobExecContext)
+            throws JobExecutionException {
 
         if (firstRunMade == false) {
             firstRunMade = true;
@@ -117,9 +121,13 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
             }
         } catch (Exception e) {
             try {
-                EMailSender.sendToSysAdmin(getClass().getName() + " encountered the following error", Util.getStackTrace(e));
+                EMailSender.sendToSysAdmin(getClass().getName()
+                        + " encountered the following error",
+                        Util.getStackTrace(e));
             } catch (Exception ee) {
-                logger.error("Exception when sending error notification to system administrator", ee);
+                logger.error(
+                        "Exception when sending error notification to system administrator",
+                        ee);
             }
             throw new JobExecutionException(e.toString(), e);
         } finally {
@@ -130,7 +138,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     }
 
     /**
-     *
+     * 
      * @throws DAOException
      */
     private void harvestBatchQueue() throws DAOException {
@@ -139,13 +147,16 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
 
             if (batchHarvestingQueue != null && !batchHarvestingQueue.isEmpty()) {
 
-                for (Iterator<HarvestSourceDTO> i=batchHarvestingQueue.iterator(); i.hasNext();) {
+                for (Iterator<HarvestSourceDTO> i = batchHarvestingQueue
+                        .iterator(); i.hasNext();) {
 
                     HarvestSourceDTO harvestSource = i.next();
-                    //For sources where interval is less than 8 hours, the
-                    //batch harvesting hours doesn't apply. They are always harvested.
-                    boolean lessThan8Hours = harvestSource.getIntervalMinutes().intValue() < 480;
-                    if(lessThan8Hours || isBatchHarvestingHour()) {
+                    // For sources where interval is less than 8 hours, the
+                    // batch harvesting hours doesn't apply. They are always
+                    // harvested.
+                    boolean lessThan8Hours = harvestSource.getIntervalMinutes()
+                            .intValue() < 480;
+                    if (lessThan8Hours || isBatchHarvestingHour()) {
                         i.remove();
                         if (batchHarvestingQueue.isEmpty()) {
                             refreshNextScheduledSources();
@@ -166,15 +177,17 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
      * deletes all sources, which are queued for deletion.
      */
     private void deleteSourcesQueuedForRemoval() throws DAOException {
-        HarvestSourceDAO sourceDao = DAOFactory.get().getDao(HarvestSourceDAO.class);
+        HarvestSourceDAO sourceDao = DAOFactory.get().getDao(
+                HarvestSourceDAO.class);
         List<String> doomed = sourceDao.getScheduledForDeletion();
         if (doomed != null && !doomed.isEmpty()) {
             for (String url : doomed) {
                 if (!CurrentHarvests.contains(url)) {
                     sourceDao.deleteSourceByUrl(url);
-                    
-                    //Also remove from ruleset
-                    boolean isInRuleset = sourceDao.isSourceInInferenceRule(url);
+
+                    // Also remove from ruleset
+                    boolean isInRuleset = sourceDao
+                            .isSourceInInferenceRule(url);
                     if (isInRuleset) {
                         sourceDao.removeSourceFromInferenceRule(url);
                     }
@@ -184,17 +197,19 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     }
 
     /**
-     *
+     * 
      * @throws DAOException
      */
     private void loadBatchHarvestingQueue() throws DAOException {
 
         int numOfSegments = getNumberOfSegments();
         int limit = getSourcesLimitForInterval();
-        batchHarvestingQueue = DAOFactory.get().getDao(
-                HarvestSourceDAO.class).getNextScheduledSources(limit);
+        batchHarvestingQueue = DAOFactory.get().getDao(HarvestSourceDAO.class)
+                .getNextScheduledSources(limit);
 
-        logger.debug(batchHarvestingQueue.size() + " sources added to batch harvesting queue (numOfSegments=" + numOfSegments + ")");
+        logger.debug(batchHarvestingQueue.size()
+                + " sources added to batch harvesting queue (numOfSegments="
+                + numOfSegments + ")");
     }
 
     /**
@@ -205,16 +220,19 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
         if (isBatchHarvestingEnabled()) {
 
             try {
-                nextScheduledSources = DAOFactory.get().getDao(
-                        HarvestSourceDAO.class).getNextScheduledSources(getSourcesLimitForInterval());
+                nextScheduledSources = DAOFactory.get()
+                        .getDao(HarvestSourceDAO.class)
+                        .getNextScheduledSources(getSourcesLimitForInterval());
             } catch (DAOException e) {
-                logger.error("Error loading next scheduled sources: " + e.toString(), e);
+                logger.error(
+                        "Error loading next scheduled sources: " + e.toString(),
+                        e);
             }
         }
     }
 
     /**
-     *
+     * 
      * @return List<HarvestSourceDTO>
      */
     public static List<HarvestSourceDTO> getNextScheduledSources() {
@@ -230,7 +248,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     }
 
     /**
-     *
+     * 
      * @return List<HarvestSourceDTO>
      */
     public static List<HarvestSourceDTO> getBatchHarvestingQueue() {
@@ -246,7 +264,8 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
         try {
             int counter = 0;
             UrgentHarvestQueueItemDTO queueItem = null;
-            for (queueItem = UrgentHarvestQueue.poll(); queueItem != null; queueItem = UrgentHarvestQueue.poll()) {
+            for (queueItem = UrgentHarvestQueue.poll(); queueItem != null; queueItem = UrgentHarvestQueue
+                    .poll()) {
 
                 counter++;
 
@@ -256,12 +275,14 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
                     if (queueItem.isPushHarvest()) {
                         pushHarvest(url, queueItem.getPushedContent());
                     } else {
-                        HarvestSourceDTO src = DAOFactory.get().getDao(
-                                HarvestSourceDAO.class).getHarvestSourceByUrl(url);
+                        HarvestSourceDTO src = DAOFactory.get()
+                                .getDao(HarvestSourceDAO.class)
+                                .getHarvestSourceByUrl(url);
                         if (src != null) {
                             pullHarvest(src, true);
                         } else {
-                            logger.trace("Could not find harvest source [" + url + "]");
+                            logger.trace("Could not find harvest source ["
+                                    + url + "]");
                         }
                     }
                 }
@@ -272,7 +293,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     }
 
     /**
-     *
+     * 
      * @param url
      * @param pushedContent
      */
@@ -288,8 +309,10 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
             Integer sourceId = null;
             int numOfResources = 0;
 
-            HarvestSourceDAO harvestSourceDAO = DAOFactory.get().getDao(HarvestSourceDAO.class);
-            HarvestSourceDTO harvestSource = harvestSourceDAO.getHarvestSourceByUrl(url);
+            HarvestSourceDAO harvestSourceDAO = DAOFactory.get().getDao(
+                    HarvestSourceDAO.class);
+            HarvestSourceDTO harvestSource = harvestSourceDAO
+                    .getHarvestSourceByUrl(url);
             if (harvestSource == null) {
                 harvestSource = new HarvestSourceDTO();
                 harvestSource.setUrl(url);
@@ -297,12 +320,15 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
                 sourceId = harvestSourceDAO.addSource(harvestSource);
             } else {
                 sourceId = harvestSource.getSourceId();
-                numOfResources = harvestSource.getResources() == null ? 0 : harvestSource.getResources().intValue();
+                numOfResources = harvestSource.getResources() == null ? 0
+                        : harvestSource.getResources().intValue();
             }
 
             Harvest harvest = new PushHarvest(pushedContent, url);
             if (sourceId != null && sourceId.intValue() > 0) {
-                harvest.setDaoWriter(new HarvestDAOWriter(sourceId.intValue(), Harvest.TYPE_PUSH, numOfResources, CRUser.application.getUserName()));
+                harvest.setDaoWriter(new HarvestDAOWriter(sourceId.intValue(),
+                        Harvest.TYPE_PUSH, numOfResources, CRUser.application
+                                .getUserName()));
             }
 
             harvest.setNotificationSender(new HarvestNotificationSender());
@@ -313,11 +339,12 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     }
 
     /**
-     *
+     * 
      * @param harvestSource
      * @throws DAOException
      */
-    private void pullHarvest(HarvestSourceDTO harvestSource, boolean urgent) throws DAOException {
+    private void pullHarvest(HarvestSourceDTO harvestSource, boolean urgent)
+            throws DAOException {
 
         if (harvestSource != null) {
 
@@ -327,15 +354,15 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
                 return;
             }
 
-            Harvest harvest = GeneralConfig.useVirtuoso() ?
-                    VirtuosoPullHarvest.createFullSetup(harvestSource, urgent)
-                    :PullHarvest.createFullSetup(harvestSource, urgent);
+            Harvest harvest = GeneralConfig.useVirtuoso() ? VirtuosoPullHarvest
+                    .createFullSetup(harvestSource, urgent) : PullHarvest
+                    .createFullSetup(harvestSource, urgent);
             executeHarvest(harvest);
         }
     }
 
     /**
-     *
+     * 
      * @param harvest
      */
     private void executeHarvest(Harvest harvest) {
@@ -354,56 +381,67 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
 
     /*
      * (non-Javadoc)
-     * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
+     * 
+     * @see
+     * javax.servlet.ServletContextListener#contextInitialized(javax.servlet
+     * .ServletContextEvent)
      */
     public void contextInitialized(ServletContextEvent servletContextEvent) {
 
         try {
-            JobDetail jobDetails = new JobDetail(HarvestingJob.NAME, JobScheduler.class.getName(), HarvestingJob.class);
+            JobDetail jobDetails = new JobDetail(HarvestingJob.NAME,
+                    JobScheduler.class.getName(), HarvestingJob.class);
 
             HarvestingJobListener listener = new HarvestingJobListener();
             jobDetails.addJobListener(listener.getName());
             JobScheduler.registerJobListener(listener);
 
-            JobScheduler.scheduleIntervalJob((long)getIntervalSeconds().intValue()*(long)1000, jobDetails);
+            JobScheduler.scheduleIntervalJob((long) getIntervalSeconds()
+                    .intValue() * (long) 1000, jobDetails);
 
-            logger.debug(getClass().getSimpleName() + " scheduled with interval seconds " + getIntervalSeconds()
-                    + ", batch harvesting hours = " + getBatchHarvestingHours());
+            logger.debug(getClass().getSimpleName()
+                    + " scheduled with interval seconds "
+                    + getIntervalSeconds() + ", batch harvesting hours = "
+                    + getBatchHarvestingHours());
         } catch (Exception e) {
-            logger.fatal("Error when scheduling " + getClass().getSimpleName() + " with interval seconds " + getIntervalSeconds(), e);
+            logger.fatal("Error when scheduling " + getClass().getSimpleName()
+                    + " with interval seconds " + getIntervalSeconds(), e);
         }
     }
 
     /*
      * (non-Javadoc)
-     * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
+     * 
+     * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.
+     * ServletContextEvent)
      */
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
     }
 
-//  /**
-//   *
-//   * @return
-//   */
-//  public static synchronized Harvest getCurrentHarvest() {
-//      return currentHarvest;
-//  }
-//
-//  /**
-//   *
-//   * @return
-//   */
-//  public static synchronized String getCurrentHarvestUrl() {
-//      return currentHarvest == null ? null : currentHarvest.getSourceUrlString();
-//  }
-//
-//  /**
-//   *
-//   * @param item
-//   */
-//  public static synchronized void setCurrentHarvest(Harvest harvest) {
-//      currentHarvest = harvest;
-//  }
+    // /**
+    // *
+    // * @return
+    // */
+    // public static synchronized Harvest getCurrentHarvest() {
+    // return currentHarvest;
+    // }
+    //
+    // /**
+    // *
+    // * @return
+    // */
+    // public static synchronized String getCurrentHarvestUrl() {
+    // return currentHarvest == null ? null :
+    // currentHarvest.getSourceUrlString();
+    // }
+    //
+    // /**
+    // *
+    // * @param item
+    // */
+    // public static synchronized void setCurrentHarvest(Harvest harvest) {
+    // currentHarvest = harvest;
+    // }
 
     /**
      * @return the activeHours
@@ -413,11 +451,12 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
         if (batchHarvestingHours == null) {
 
             batchHarvestingHours = new ArrayList<HourSpan>();
-            String hoursString = GeneralConfig.getProperty(GeneralConfig.HARVESTER_BATCH_HARVESTING_HOURS);
+            String hoursString = GeneralConfig
+                    .getProperty(GeneralConfig.HARVESTER_BATCH_HARVESTING_HOURS);
             if (!StringUtils.isBlank(hoursString)) {
 
                 String[] spans = hoursString.trim().split(",");
-                for (int i=0; i < spans.length; i++) {
+                for (int i = 0; i < spans.length; i++) {
 
                     String span = spans[i].trim();
                     if (span.length() > 0) {
@@ -442,18 +481,19 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     }
 
     /**
-     * Returns the interval in seconds where the harvester checks for checks
-     * for new urgent or scheduled tasks. The interval can't be more than 3600
+     * Returns the interval in seconds where the harvester checks for checks for
+     * new urgent or scheduled tasks. The interval can't be more than 3600
      * seconds or less than 5 seconds. The value is retrieved from the general
      * configuration file.
-     *
+     * 
      * @return the interval in seconds
      */
     public static Integer getIntervalSeconds() {
 
         if (intervalSeconds == null) {
 
-            int seconds = Integer.parseInt(GeneralConfig.getRequiredProperty(GeneralConfig.HARVESTER_JOB_INTERVAL_SECONDS).trim());
+            int seconds = Integer.parseInt(GeneralConfig.getRequiredProperty(
+                    GeneralConfig.HARVESTER_JOB_INTERVAL_SECONDS).trim());
             seconds = Math.min(3600, seconds);
             seconds = Math.max(5, seconds);
 
@@ -462,17 +502,19 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
 
         return intervalSeconds;
     }
-    
+
     /**
-     * Returns the upper limit on the number of sources that are harvested in 
-     * each interval. The value is retrieved from the general configuration file.
-     *
+     * Returns the upper limit on the number of sources that are harvested in
+     * each interval. The value is retrieved from the general configuration
+     * file.
+     * 
      * @return the upper limit
      */
     public static Integer getHarvesterUpperLimit() {
 
         if (harvesterUpperLimit == null) {
-            String upperLimitStr = GeneralConfig.getProperty(GeneralConfig.HARVESTER_SOURCES_UPPER_LIMIT).trim();
+            String upperLimitStr = GeneralConfig.getProperty(
+                    GeneralConfig.HARVESTER_SOURCES_UPPER_LIMIT).trim();
             if (upperLimitStr != null && upperLimitStr.length() > 0) {
                 harvesterUpperLimit = Integer.parseInt(upperLimitStr);
             } else {
@@ -484,20 +526,20 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     }
 
     /**
-     * Returns the interval in minutes  where the harvester checks for checks
-     * for new urgent or scheduled tasks. Value can be less than 1.0.
-     *
+     * Returns the interval in minutes where the harvester checks for checks for
+     * new urgent or scheduled tasks. Value can be less than 1.0.
+     * 
      * @return float
      */
     public static float getIntervalMinutes() {
 
-        return getIntervalSeconds().floatValue()/(float)60;
+        return getIntervalSeconds().floatValue() / (float) 60;
     }
 
     /**
-     * Calculates how many minutes a day the batch harvester is active.
-     * If the batch harvesting is from 5-6, then the return value is 120.
-     *
+     * Calculates how many minutes a day the batch harvester is active. If the
+     * batch harvesting is from 5-6, then the return value is 120.
+     * 
      * @return the dailyActiveMinutes
      */
     public static Integer getDailyActiveMinutes() {
@@ -509,10 +551,11 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
             int minutes = 0;
             List<HourSpan> activeHours = getBatchHarvestingHours();
             for (HourSpan hourSpan : activeHours) {
-                minutes += ((hourSpan.length()) + 1) * (int)60;
+                minutes += ((hourSpan.length()) + 1) * (int) 60;
             }
 
-            dailyActiveMinutes = minutes > 1440 ? new Integer(1440) : new Integer(minutes);
+            dailyActiveMinutes = minutes > 1440 ? new Integer(1440)
+                    : new Integer(minutes);
         }
 
         return dailyActiveMinutes;
@@ -522,29 +565,31 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
      * Calculates how many harvesting segments there is in a day. If the
      * harvester is active 120 minutes and the interval is 15 seconds (i.e. 1/4
      * minute, then there are 480 harvesting segments in the day.
-     *
+     * 
      * @return the number of harvesting segments
      */
     private static int getNumberOfSegments() {
 
-        return Math.round(getDailyActiveMinutes().floatValue() / getIntervalMinutes());
+        return Math.round(getDailyActiveMinutes().floatValue()
+                / getIntervalMinutes());
     }
-    
+
     /**
-     * We calculate how many sources we need to harvest in this round,
-     * but if the amount is over the limit we lower it to the limit.
-     * The purpose is to avoid tsunamis of harvesting.
-     *
+     * We calculate how many sources we need to harvest in this round, but if
+     * the amount is over the limit we lower it to the limit. The purpose is to
+     * avoid tsunamis of harvesting.
+     * 
      * @return the limit of sources returned
      */
     private static int getSourcesLimitForInterval() {
         int limit = 0;
-        try{
+        try {
             int numOfSegments = getNumberOfSegments();
-            Long numberOfSources = DAOFactory.get().getDao(HarvestSourceDAO.class).getUrgencySourcesCount();
+            Long numberOfSources = DAOFactory.get()
+                    .getDao(HarvestSourceDAO.class).getUrgencySourcesCount();
             int upperLimit = getHarvesterUpperLimit();
-            
-            limit = Math.round((float)numberOfSources / (float)numOfSegments);
+
+            limit = Math.round((float) numberOfSources / (float) numOfSegments);
             if (upperLimit > 0 && limit > upperLimit) {
                 limit = upperLimit;
             }
@@ -556,16 +601,17 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     }
 
     /**
-     *
+     * 
      * @return
      */
     private boolean isBatchHarvestingHour() {
 
-        return isBatchHarvestingHour(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
+        return isBatchHarvestingHour(Calendar.getInstance().get(
+                Calendar.HOUR_OF_DAY));
     }
 
     /**
-     *
+     * 
      * @param calendar
      * @return
      */
@@ -587,7 +633,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     }
 
     /**
-     *
+     * 
      * @param hour
      * @return
      */
@@ -606,7 +652,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     }
 
     /**
-     *
+     * 
      * @return true if batch harvesting is enabled
      */
     private static boolean isBatchHarvestingEnabled() {
@@ -614,7 +660,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     }
 
     /**
-     *
+     * 
      * @return long
      */
     public static long getNextBatchHarvestTime() {
@@ -629,7 +675,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
                 calendar.setTime(nextFireTime);
 
                 int i = 1;
-                for (;!isBatchHarvestingHour(calendar) && i <= 24; i++) {
+                for (; !isBatchHarvestingHour(calendar) && i <= 24; i++) {
                     calendar.add(Calendar.HOUR_OF_DAY, 1);
                 }
 
