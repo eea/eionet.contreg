@@ -241,7 +241,8 @@ public class VirtuosoPullHarvest extends Harvest {
     }
 
     /**
-     *
+     * Loads the file into the repository (triple store). File is required to
+     * be RDF.
      * @param file
      * @throws IOException
      * @throws RepositoryException
@@ -278,6 +279,8 @@ public class VirtuosoPullHarvest extends Harvest {
 
             // add CR's auto-generated metadata
             int autoGenTripleCount = 0;
+            // FIXME: Files that have no triples still generate harvesting metadata.
+            // The user must be able to see that the file is known.
             if (sourceMetadata.getPredicateCount() > 0) {
                 logger.debug("Storing auto-generated triples for the source");
                 autoGenTripleCount = addSourceMetadata(sourceMetadata, conn, repository, context);
@@ -287,27 +290,28 @@ public class VirtuosoPullHarvest extends Harvest {
             conn.commit();
 
             // set total stored triples count
+            // FIXME: The autoGenTripleCount is not part of the harvested content
             setStoredTriplesCount(Long.valueOf(tripleCount).intValue() + autoGenTripleCount);
 
             // no transaction rollback needed, when reached this point
             isSuccess = true;
         } finally {
             if (!isSuccess && conn != null) {
-                try {conn.rollback();} catch(RepositoryException e) {}
+                try {conn.rollback();} catch (RepositoryException e) {}
             }
 
             if (conn != null) {
-                try {conn.close();} catch(RepositoryException e) {}
+                try {conn.close();} catch (RepositoryException e) {}
             }
 
             if (repository != null) {
-                try {repository.shutDown();} catch(RepositoryException e) {}
+                try {repository.shutDown();} catch (RepositoryException e) {}
             }
         }
     }
 
     /**
-     *
+     * Adds the meta information the harvester has collected about the source.
      * @param subjectDTO
      * @param conn
      * @param rep
@@ -318,6 +322,8 @@ public class VirtuosoPullHarvest extends Harvest {
      */
     private int addSourceMetadata(SubjectDTO subjectDTO, RepositoryConnection conn, Repository rep, URI contextURI) throws RepositoryException {
 
+        // FIXME: The contextURI is always the harvester URI
+        // (which is generated from the deployment hostname).
         int statementsAdded = 0;
         if (subjectDTO != null && subjectDTO.getPredicateCount() > 0) {
 
@@ -586,6 +592,7 @@ public class VirtuosoPullHarvest extends Harvest {
     /**
      *
      * @param file
+     * @param contentType
      * @throws IOException
      * @throws SAXException
      * @throws ParserConfigurationException
@@ -677,7 +684,7 @@ public class VirtuosoPullHarvest extends Harvest {
 
     /**
      *
-     * @param urlConnection
+     * @param urlConnection is not used TODO
      */
     private void setLastRefreshed(URLConnection urlConnection, long lastRefreshedTime) {
 

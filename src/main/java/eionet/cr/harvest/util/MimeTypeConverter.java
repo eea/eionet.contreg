@@ -17,7 +17,8 @@
 * (C) European Environment Agency. All Rights Reserved.
 *
 * Contributor(s):
-* Jaanus Heinlaid, Tieto Eesti*/
+* Jaanus Heinlaid, Tieto Eesti
+*/
 package eionet.cr.harvest.util;
 
 import java.io.File;
@@ -42,7 +43,9 @@ import eionet.cr.util.Hashes;
  */
 public class MimeTypeConverter {
 
-    /** */
+    /**
+     * File containing mimetypes in properties format.
+     */
     private static final String MAPPINGS_FILENAME = "mimeTypeToRdfType.xml";
 
     /** */
@@ -55,7 +58,7 @@ public class MimeTypeConverter {
     private static Object initializationLock = new Object();
 
     /**
-     *
+     * Loads the mimetypes from the file and puts them into mimeToRdfMap.
      */
     private static void initialize() {
 
@@ -63,35 +66,33 @@ public class MimeTypeConverter {
 
         InputStream inputStream = null;
         Properties properties = new Properties();
-        try{
+        try {
             inputStream =
                 MimeTypeConverter.class.getClassLoader().getResourceAsStream(MAPPINGS_FILENAME);
             properties.loadFromXML(inputStream);
-        }
-        catch (IOException e){
+        } catch (IOException e) {
             logger.error("Failed to load XML-formatted properties from " + MAPPINGS_FILENAME, e);
-        }
-        finally{
-            if (inputStream!=null){
-                try{
+        } finally {
+            if (inputStream != null) {
+                try {
                     inputStream.close();
-                }
-                catch (IOException e){}
+                } catch (IOException e) {}
             }
         }
 
-        if (!properties.isEmpty()){
+        if (!properties.isEmpty()) {
 
-            for (Map.Entry entry : properties.entrySet()){
+            for (Map.Entry entry : properties.entrySet()) {
 
                 String rdfType = entry.getKey().toString();
                 String[] mediaTypes = entry.getValue().toString().split("\\s+");
 
-                if (!StringUtils.isBlank(rdfType) && mediaTypes!=null && mediaTypes.length>0){
+                if (!StringUtils.isBlank(rdfType) && mediaTypes != null
+                        && mediaTypes.length > 0) {
 
-                    for (int i=0; i<mediaTypes.length; i++){
+                    for (int i = 0; i < mediaTypes.length; i++) {
 
-                        if (!StringUtils.isBlank(mediaTypes[i])){
+                        if (!StringUtils.isBlank(mediaTypes[i])) {
 
                             mimeToRdfMap.put(mediaTypes[i].trim(), rdfType.trim());
                         }
@@ -102,16 +103,16 @@ public class MimeTypeConverter {
     }
 
     /**
-     *
-     * @param mimeType
-     * @return
+     * Looks up the rdf:type from mimeToRdfMap
+     * @param mimeType the media type to look up
+     * @return String containing the rdf:type
      */
-    public static String getRdfTypeFor(String mimeType){
+    public static String getRdfTypeFor(String mimeType) {
 
-        if (mimeToRdfMap==null){
+        if (mimeToRdfMap == null) {
 
             synchronized (initializationLock) {
-                if (mimeToRdfMap==null){
+                if (mimeToRdfMap == null) {
                     initialize();
                 }
             }
@@ -122,11 +123,11 @@ public class MimeTypeConverter {
         // and do starts-with matching for each.
 
         String result = mimeToRdfMap.get(mimeType);
-        if (StringUtils.isBlank(result)){
+        if (StringUtils.isBlank(result)) {
 
-            for (Map.Entry<String,String> entry : mimeToRdfMap.entrySet()){
+            for (Map.Entry<String,String> entry : mimeToRdfMap.entrySet()) {
 
-                if (mimeType.startsWith(entry.getKey())){
+                if (mimeType.startsWith(entry.getKey())) {
                     result = entry.getValue();
                 }
             }
@@ -139,7 +140,7 @@ public class MimeTypeConverter {
      *
      * @param args
      */
-    public static void main(String[] args){
+    public static void main(String[] args) {
 
         initialize();
 
@@ -149,11 +150,11 @@ public class MimeTypeConverter {
         " select subject, -5251507576730213845, '?', ?, null, anon_subj, 'N', 'N', '', 0, 0, 0, source, gen_time" +
         " from SPO where PREDICATE=333311624525447614 and OBJECT_HASH=?;";
 
-        for (Map.Entry<String,String> entry : mimeToRdfMap.entrySet()){
+        for (Map.Entry<String,String> entry : mimeToRdfMap.entrySet()) {
 
             String key = entry.getKey();
             String value = entry.getValue();
-            if (!key.trim().endsWith(".+")){
+            if (!key.trim().endsWith(".+")) {
 
                 String s = new String(sql);
                 s = StringUtils.replace(s, "?", value.trim(), 1);
