@@ -36,6 +36,10 @@ SELECT DISTINCT ?class ?label WHERE {
                         <stripes:label for="nrOfHits" class="question">Number of hits per page</stripes:label>
                         <stripes:text name="nrOfHits" size="2" id="nrOfHits"/>
                     </div>
+                    <div style="position:absolute; top:5px; left:430px;">
+                        <stripes:label for="inferencing" class="question">Use CR inferencing</stripes:label>
+                        <stripes:checkbox name="useInferencing" id="inferencing"/>
+                    </div>
                     <div style="position: absolute; top:5px; right:0px;">
                         <stripes:submit name="execute" value="Execute" id="executeButton"/>
                     </div>
