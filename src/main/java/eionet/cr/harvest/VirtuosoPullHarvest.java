@@ -127,6 +127,10 @@ public class VirtuosoPullHarvest extends Harvest {
                     logger.warn(e.toString());
                 }
 
+                // FIXME: Last line of SELF-DEFENSE: The isSourceAvailable()
+                // returns FALSE on *ALL* errors. That's way too agressive.
+                // Until this is fixed, we don't delete sources.
+                /*
                 if (!harvestUrlConnection.isSourceAvailable()) {
                     logger.debug(harvestUrlConnection.getSourceNotExistMessage() + ", going to delete the source");
                     try {
@@ -137,6 +141,7 @@ public class VirtuosoPullHarvest extends Harvest {
                     }
                     return;
                 }
+                */
 
                 // if source not available (i.e. link broken) then just set the last-refreshed metadata
                 if (harvestUrlConnection.isSourceAvailable() == false) {
@@ -184,6 +189,7 @@ public class VirtuosoPullHarvest extends Harvest {
         } finally {
             // close input stream
             try {
+                // TODO: Provide close() method for harvestUrlConnection
                 if (harvestUrlConnection != null && harvestUrlConnection.getInputStream() != null)
                     harvestUrlConnection.getInputStream().close();
             } catch (IOException e) {}
@@ -203,7 +209,8 @@ public class VirtuosoPullHarvest extends Harvest {
      */
     private void harvest(File file, String contentType, int fileSize) throws HarvestException {
 
-        // remember the file's absolute path, so we can later detect if a new file was created during the pre-processing
+        // remember the file's absolute path, so we can later detect if a new
+        // file was created during the pre-processing.
         String originalPath = file.getAbsolutePath();
 
         File unGZipped = null;
@@ -312,6 +319,9 @@ public class VirtuosoPullHarvest extends Harvest {
 
     /**
      * Adds the meta information the harvester has collected about the source.
+     * The meta data is considered part of the harvester and not the source.
+     * Therefore the meta data is stored in the harvester's named graph (or
+     * context)
      * @param subjectDTO
      * @param conn
      * @param rep
@@ -357,9 +367,9 @@ public class VirtuosoPullHarvest extends Harvest {
 
 
     /**
-     *
+     * Check if the content-type is one that is supported.
      * @param contentType
-     * @return
+     * @return true if content-type is supported
      */
     private boolean isSupportedContentType(String contentType) {
 
@@ -372,9 +382,9 @@ public class VirtuosoPullHarvest extends Harvest {
     }
 
     /**
-     *
+     * Check if the content-type is one of the XML types.
      * @param contentType
-     * @return
+     * @return true if content-type is XML
      */
     private boolean isXmlContentType(String contentType) {
 
