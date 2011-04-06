@@ -1,5 +1,4 @@
-[database]
-db: cr2
-host: localhost
+[endpoint]
+url: http://cr3.eionet.europa.eu/sparql
 user: userid
 password: dbpassword

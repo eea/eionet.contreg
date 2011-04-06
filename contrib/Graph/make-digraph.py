@@ -9,7 +9,7 @@
 # implied. See the License for the specific language governing
 # rights and limitations under the License.
 #
-# The Original Code is make-digraph.py version 1.0.
+# The Original Code is make-digraph.py version 2.0.
 #
 # The Initial Developer of the Original Code is European Environment
 # Agency (EEA).  Portions created by EEA are
@@ -21,13 +21,13 @@
 #
 import ConfigParser
 
-import sys, getopt, fnv, textwrap
-import psycopg2
+import sys, getopt, hashlib, textwrap
+import sparql
 
 def hashcode(s):
-    newhash = fnv.new()
-    newhash.update(unicode(s, 'utf-8'))
-    return newhash.aslong
+    newhash = hashlib.new('md5')
+    newhash.update(s)
+    return newhash.hexdigest()
 
 def localpart(s):
     if s[-1] in ('/','#'): s=s[:-1]
@@ -47,19 +47,16 @@ class MakeDigraph:
     def __init__(self):
         config = ConfigParser.SafeConfigParser()
         config.read('db.conf')
-        DB = config.get('database', 'db')
-        DBHOST = config.get('database', 'host')
-        DBUSER = config.get('database', 'user')
-        DBPASS = config.get('database', 'password')
+        endpoint = config.get('endpoint', 'url')
+#       DBUSER = config.get('database', 'user')
+#       DBPASS = config.get('database', 'password')
 
-        self.db = psycopg2.connect(database=DB, user=DBUSER, password=DBPASS)
-        self.cursor = self.db.cursor()
+        self.server = sparql.Service(endpoint)
         self.subjects = {}
         self.invertedalso = False
 
     def closedown(self):
-        self.cursor.close()
-        self.db.close()
+        pass
 
     def writeout(self, s):
         sys.stdout.write(s)
@@ -81,7 +78,7 @@ edge [fontsize=9];\n""")
         self.subjects[subject] = True
 
     def drawemptynode(self, subject):
-        self.writeout('''S%d [label="%s"];\n''' % (abs(hashcode(subject)), shorten_url(subject)))
+        self.writeout('''S%s [label="%s"];\n''' % (hashcode(subject), shorten_url(subject)))
 
     def drawnode(self, startsubj, limit):
         if self.subjects.get(startsubj, False): return
@@ -90,36 +87,51 @@ edge [fontsize=9];\n""")
             self.drawemptynode(startsubj)
             return
         # Draw literal attributes
-        self.cursor.execute ("""SELECT s.uri as subject_uri, p.uri AS predicate, object, obj_lang, subject FROM SPO JOIN RESOURCE AS s ON subject=s.uri_hash JOIN RESOURCE AS p ON predicate=p.uri_hash WHERE lit_obj='Y' AND subject=%s AND obj_deriv_source=0 LIMIT 50""", (hashcode(startsubj),));
+        q = """SELECT ?subject ?predicate ?object
+WHERE {
+?subject ?predicate ?object 
+FILTER ( ?subject = <%s> && isLITERAL(?object) && (LANG(?object) = 'en' || LANG(?object) = ''))} LIMIT 50""" % startsubj
+#       print q
+        result = self.server.query(q)
         object_dict = {}
-        rows = self.cursor.fetchall()
-        if len(rows) == 0:
+        currentsubj = None
+        for row in result.values():
+#           if str(row[3])[:2] not in ('en',''): continue # Only English
+            hashsubj = hashcode(row[0])
+            if currentsubj != row[0]:
+                self.writeout('''S%s [label="%s|''' % (hashsubj, shorten_url(row[0])))
+                currentsubj = row[0]
+            self.writeout('''%s:%s\\l''' % (localpart(row[1]), wrap_literal(row[2])))
+        if currentsubj is None:
             self.drawemptynode(startsubj)
         else:
-            currentsubj = None
-            for row in rows:
-                if str(row[3])[:2] not in ('en',''): continue # Only English
-                hashsubj = hashcode(row[0])
-                if currentsubj != row[0]:
-                    self.writeout('''S%d [label="%s|''' % (abs(hashsubj), shorten_url(row[0])))
-                    currentsubj = row[0]
-                self.writeout('''%s:%s\\l''' % (localpart(row[1]), wrap_literal(row[2])))
             self.writeout('''"];\n''')
 
         if limit <= 0:
             return
         # Draw edges
         if self.invertedalso:
-            self.cursor.execute ("""SELECT s.uri as subject_uri, p.uri AS predicate, object, subject FROM SPO JOIN RESOURCE AS s ON subject=s.uri_hash JOIN RESOURCE AS p ON predicate=p.uri_hash WHERE lit_obj='N' AND obj_deriv_source=0 AND (subject=%s OR OBJECT_HASH=%s) LIMIT 50""", (hashcode(startsubj),hashcode(startsubj)));
+            q = """
+SELECT DISTINCT ?subject ?predicate ?object
+WHERE {
+  {?subject ?predicate ?object . FILTER (?subject = <%s> &&  isIRI(?object)) }
+  UNION
+  {?subject ?predicate ?object . FILTER (?object = <%s> &&  isIRI(?object) ) }
+  } LIMIT 50""" % ( startsubj , startsubj)
         else:
-            self.cursor.execute ("""SELECT s.uri as subject_uri, p.uri AS predicate, object, subject FROM SPO JOIN RESOURCE AS s ON subject=s.uri_hash JOIN RESOURCE AS p ON predicate=p.uri_hash WHERE lit_obj='N' AND obj_deriv_source=0 AND subject=%s""", (hashcode(startsubj),));
-        rows = self.cursor.fetchall()
-        for row in rows:
+            q = """SELECT ?subject ?predicate ?object
+WHERE {
+ ?subject ?predicate ?object .
+  FILTER (?subject = <%s> &&  isIRI(?object)) 
+} LIMIT 50""" % startsubj
+#       print q
+        result = self.server.query(q)
+        for row in result.values():
             hashsubj = hashcode(row[0])
             self.must_draw(row[0])
             self.must_draw(row[2])
             hashobj = hashcode(row[2])
-            self.writeout('''S%d -> S%d [label="%s"];\n''' % (abs(hashsubj), abs(hashobj), localpart(row[1])))
+            self.writeout('''S%s -> S%s [label="%s"];\n''' % (hashsubj, hashobj, localpart(row[1])))
 
         for o,seen in self.subjects.items():
             if not seen:
@@ -156,4 +168,4 @@ if __name__ == '__main__':
     r.epilogue()
     r.closedown()
 #
-#    "http://ec.europa.eu/eurostat/ramon/rdfdata/countries.rdf#BE")
+#    "http://ec.europa.eu/eurostat/ramon/rdfdata/countries/BE")
