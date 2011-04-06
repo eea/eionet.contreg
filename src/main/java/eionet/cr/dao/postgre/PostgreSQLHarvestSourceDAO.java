@@ -63,8 +63,8 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements
     private static final String searchHarvestSourcesUnavailableSQL = "SELECT * FROM HARVEST_SOURCE WHERE URL LIKE (?) AND COUNT_UNAVAIL > "
             + HarvestSourceDTO.COUNT_UNAVAIL_THRESHOLD
             + " AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)";
-    private static final String getHarvestTrackedFiles = "SELECT * FROM HARVEST_SOURCE WHERE PRIORITY_SOURCE = 'Y' AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)  ";
-    private static final String searchHarvestTrackedFiles = "SELECT * FROM HARVEST_SOURCE WHERE PRIORITY_SOURCE = 'Y' and URL like(?) AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
+    private static final String getPrioritySources = "SELECT * FROM HARVEST_SOURCE WHERE PRIORITY_SOURCE = 'Y' AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)  ";
+    private static final String searchPrioritySources = "SELECT * FROM HARVEST_SOURCE WHERE PRIORITY_SOURCE = 'Y' and URL like(?) AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
 
     /*
      * (non-Javadoc)
@@ -118,18 +118,17 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * eionet.cr.dao.HarvestSourceDAO#getHarvestTrackedFiles(java.lang.String,
+     * @see eionet.cr.dao.HarvestSourceDAO#getPrioritySources(java.lang.String,
      * eionet.cr.util.PagingRequest, eionet.cr.util.SortingRequest)
      */
-    public Pair<Integer, List<HarvestSourceDTO>> getHarvestTrackedFiles(
+    public Pair<Integer, List<HarvestSourceDTO>> getPrioritySources(
             String searchString, PagingRequest pagingRequest,
             SortingRequest sortingRequest) throws DAOException {
 
         return getSources(
-                StringUtils.isBlank(searchString) ? getHarvestTrackedFiles
-                        : searchHarvestTrackedFiles, searchString,
-                pagingRequest, sortingRequest);
+                StringUtils.isBlank(searchString) ? getPrioritySources
+                        : searchPrioritySources, searchString, pagingRequest,
+                sortingRequest);
     }
 
     /*

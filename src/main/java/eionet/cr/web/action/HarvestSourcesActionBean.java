@@ -56,7 +56,7 @@ public class HarvestSourcesActionBean extends
 
     /** */
     private static final String UNAVAILABLE_TYPE = "unavail";
-    private static final String TRACKED_FILES = "tracked_file";
+    private static final String PRIORITY = "priority";
     private static final String FAILED_HARVESTS = "failed";
     private static final String SCHEMAS = "schemas";
 
@@ -84,14 +84,13 @@ public class HarvestSourcesActionBean extends
     /** */
     static {
         sourceTypes = new LinkedList<Pair<String, String>>();
-        sourceTypes.add(new Pair<String, String>(null, "Priority"));
-        sourceTypes
-                .add(new Pair<String, String>(TRACKED_FILES, "Tracked files"));
-        sourceTypes.add(new Pair<String, String>(UNAVAILABLE_TYPE,
-                "Unavaliable"));
+        sourceTypes.add(new Pair<String, String>(null, "Tracked files"));
+        sourceTypes.add(new Pair<String, String>(PRIORITY, "Priority"));
+        sourceTypes.add(new Pair<String, String>(SCHEMAS, "Schemas"));
         sourceTypes.add(new Pair<String, String>(FAILED_HARVESTS,
                 "Failed harvests"));
-        sourceTypes.add(new Pair<String, String>(SCHEMAS, "Schemas"));
+        sourceTypes.add(new Pair<String, String>(UNAVAILABLE_TYPE,
+                "Unavaliable"));
 
         columnList = new LinkedList<SearchResultColumn>();
         GenericColumn checkbox = new GenericColumn();
@@ -135,9 +134,9 @@ public class HarvestSourcesActionBean extends
                 pair = factory.getDao(HarvestSourceDAO.class)
                         .getHarvestSources(filterString, pagingRequest,
                                 sortingRequest);
-            } else if (TRACKED_FILES.equals(type)) {
+            } else if (PRIORITY.equals(type)) {
                 pair = factory.getDao(HarvestSourceDAO.class)
-                        .getHarvestTrackedFiles(filterString, pagingRequest,
+                        .getPrioritySources(filterString, pagingRequest,
                                 sortingRequest);
             } else if (UNAVAILABLE_TYPE.equals(type)) {
                 pair = factory.getDao(HarvestSourceDAO.class)

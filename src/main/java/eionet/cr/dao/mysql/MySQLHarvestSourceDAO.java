@@ -89,11 +89,10 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * eionet.cr.dao.HarvestSourceDAO#getHarvestPrioritySources(java.lang.String
-     * , eionet.cr.util.PagingRequest, eionet.cr.util.SortingRequest)
+     * @see eionet.cr.dao.HarvestSourceDAO#getPrioritySources(java.lang.String ,
+     * eionet.cr.util.PagingRequest, eionet.cr.util.SortingRequest)
      */
-    public Pair<Integer, List<HarvestSourceDTO>> getHarvestTrackedFiles(
+    public Pair<Integer, List<HarvestSourceDTO>> getPrioritySources(
             String searchString, PagingRequest pagingRequest,
             SortingRequest sortingRequest) throws DAOException {
         return getSources(
