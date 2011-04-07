@@ -39,17 +39,18 @@ import eionet.cr.harvest.HarvestException;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class UrgentHarvestQueue{
+public class UrgentHarvestQueue {
 
     /** */
     private static Log logger = LogFactory.getLog(UrgentHarvestQueue.class);
 
     /**
+     * Adds a pull-harvest to the urgent queue.
      *
-     * @param priority
+     * @param url URL to put on the queue
      * @throws HarvestException
      */
-    public static synchronized void addPullHarvest(String url) throws HarvestException{
+    public static synchronized void addPullHarvest(String url) throws HarvestException {
 
         addPullHarvests(Collections.singletonList(url));
     }
@@ -57,14 +58,13 @@ public class UrgentHarvestQueue{
     /**
      *
      * @param urls
-     * @param priority
      * @throws HarvestException
      */
-    public static synchronized void addPullHarvests(List<String> urls) throws HarvestException{
+    public static synchronized void addPullHarvests(List<String> urls) throws HarvestException {
 
         try {
             List<UrgentHarvestQueueItemDTO> dtos = new ArrayList<UrgentHarvestQueueItemDTO>();
-            for (Iterator<String> i=urls.iterator(); i.hasNext();){
+            for (Iterator<String> i = urls.iterator(); i.hasNext();) {
                 UrgentHarvestQueueItemDTO dto = new UrgentHarvestQueueItemDTO();
                 dto.setUrl(i.next());
                 dtos.add(dto);
@@ -72,23 +72,23 @@ public class UrgentHarvestQueue{
 
             DAOFactory.get().getDao(UrgentHarvestQueueDAO.class).addPullHarvests(dtos);
 
-            for (Iterator<String> i=urls.iterator(); i.hasNext();){
+            for (Iterator<String> i = urls.iterator(); i.hasNext();) {
                 logger.debug("Pull harvest added to the urgent queue, url = " + i.next());
             }
-        }
-        catch (DAOException e) {
+        } catch (DAOException e) {
             throw new HarvestException(e.toString(), e);
         }
     }
 
     /**
+     * Adds a push-harvest to the urgent queue. Since it is pushed, the content
+     * is already provided.
      *
      * @param pushContent
-     * @param url
-     * @param priority
+     * @param url URL to register it on
      * @throws HarvestException
      */
-    public static synchronized void addPushHarvest(String pushContent, String url) throws HarvestException{
+    public static synchronized void addPushHarvest(String pushContent, String url) throws HarvestException {
 
         UrgentHarvestQueueItemDTO dto = new UrgentHarvestQueueItemDTO();
         dto.setUrl(url);
@@ -108,7 +108,7 @@ public class UrgentHarvestQueue{
      * @return
      * @throws DAOException
      */
-    public static synchronized UrgentHarvestQueueItemDTO poll() throws DAOException{
+    public static synchronized UrgentHarvestQueueItemDTO poll() throws DAOException {
 
         return DAOFactory.get().getDao(UrgentHarvestQueueDAO.class).poll();
     }
