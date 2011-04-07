@@ -44,7 +44,7 @@ public class HarvestUrlConnection {
      * {@link eionet.cr.util.UrlRedirectAnalyzer#analyzeUrlRedirection(String)}.
      *
      * @param sourceUrlString
-     * @return
+     * @return HarvestUrlConnection
      * @throws IOException
      * @throws MalformedURLException
      */

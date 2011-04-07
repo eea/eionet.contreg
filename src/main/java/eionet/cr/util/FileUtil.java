@@ -73,17 +73,23 @@ public class FileUtil {
      *
      * @param inputStream
      * @param toFile
+     * @return total bytes count
      * @throws IOException
      */
     public static int streamToFile(InputStream inputStream, File toFile) throws IOException{
 
         FileOutputStream fos = null;
         try{
+            
+            String enc = "UTF-8";
+            UnicodeInputStream uin = new UnicodeInputStream(inputStream, enc);
+            enc = uin.getEncoding();
+            
             int i = -1;
             int totalBytes = 0;
             byte[] bytes = new byte[1024];
             fos = new FileOutputStream(toFile);
-            while ((i = inputStream.read(bytes, 0, bytes.length)) != -1) {
+            while ((i = uin.read(bytes, 0, bytes.length)) != -1) {
                 fos.write(bytes, 0, i);
                 totalBytes = totalBytes + i;
             }

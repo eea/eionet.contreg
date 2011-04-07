@@ -32,7 +32,6 @@ import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
-import eionet.cr.util.sql.DbConnectionProvider;
 
 /**
  *
@@ -58,7 +57,7 @@ public class ExtractNewHarvestSourcesTest extends CRDatabaseTestCase{
             harvest.execute();
 
             Pair<Integer,List<HarvestSourceDTO>> resultPair =
-                DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestTrackedFiles(
+                DAOFactory.get().getDao(HarvestSourceDAO.class).getPrioritySources(
                                                                             null, null, null);
             assertNotNull(resultPair);
             assertNotNull(resultPair.getLeft());
