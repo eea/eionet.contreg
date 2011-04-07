@@ -56,6 +56,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
     /** */
     private String query;
+    private String newQuery;
     private String format;
     private int nrOfHits;
     private long executionTime;
@@ -86,22 +87,23 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         if (nrOfHits == 0) {
             nrOfHits = 20;
         }
-
+        
+        //If user has marked CR Inferencing checkbob, 
+        //then add inferencing command to the query
+        newQuery = query;
         if (useInferencing && !StringUtils.isBlank(query)) {
             String infCommand = "DEFINE input:inference '"
                     + GeneralConfig
                             .getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME)
                     + "'";
-            if (!query.startsWith(infCommand)) {
-                query = infCommand + "\n" + query;
-            }
+            newQuery = infCommand + "\n" + query;
         }
 
         if (accept != null && xmlFormats.contains(accept[0])) {
             return new StreamingResolution("application/sparql-results+xml") {
                 public void stream(HttpServletResponse response)
                         throws Exception {
-                    runQuery(query, FORMAT_XML, response.getOutputStream());
+                    runQuery(newQuery, FORMAT_XML, response.getOutputStream());
                 }
             };
         } else if (accept != null
@@ -109,12 +111,12 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             return new StreamingResolution("application/sparql-results+json") {
                 public void stream(HttpServletResponse response)
                         throws Exception {
-                    runQuery(query, FORMAT_JSON, response.getOutputStream());
+                    runQuery(newQuery, FORMAT_JSON, response.getOutputStream());
                 }
             };
         } else {
             if (!StringUtils.isBlank(query)) {
-                runQuery(query, FORMAT_HTML, null);
+                runQuery(newQuery, FORMAT_HTML, null);
             }
             return new ForwardResolution(FORM_PAGE);
         }
