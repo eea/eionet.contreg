@@ -565,21 +565,6 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements
      * List the next batch of sources to harvest. We calculate how many sources
      * we need to harvest in this round, then find the ones with the highest
      * priority.
-     * <p>
-     * FIXME: The calculation is number-of-sources / by number of segments. But
-     * the sources are <em>typically</em> to be harvested on a 42 day schedule
-     * and the number of segments are for one day. The limit is therefore 42
-     * times too high!
-     * <p>
-     * Example: If the scheduling is set to every 20 seconds (3 times a minute)
-     * and the harvesting is all day (1440 minutes), then there are 4320
-     * segments, divided into e.g. 150.000 sources = 34 source to harvest per
-     * 20-second segment. Solution: only divide into the sources that have an
-     * urgency above 1.0.
-     * <p>
-     * FIXME: The non-SQL parts of this method should have been placed in
-     * {@link eionet.cr.harvest.scheduled.HarvestingJob}.
-     * 
      * @see eionet.cr.harvest.scheduled.HarvestingJob#getNextScheduledSources()
      * @see eionet.cr.dao.HarvestSourceDAO#getNextScheduledSources(int)
      */
