@@ -59,9 +59,9 @@ import eionet.cr.util.Util;
 import eionet.cr.web.security.CRUser;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class HarvestingJob implements StatefulJob, ServletContextListener {
 
@@ -69,6 +69,10 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     public static final String NAME = HarvestingJob.class.getClass()
             .getSimpleName();
 
+    /**
+     * Number of minutes in an hour.
+     */
+    private static final int MINUTES = 60;
     /** */
     private static Log logger;
 
@@ -98,7 +102,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.quartz.Job#execute(org.quartz.JobExecutionContext)
      */
     public void execute(JobExecutionContext jobExecContext)
@@ -138,7 +142,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     }
 
     /**
-     * 
+     *
      * @throws DAOException
      */
     private void harvestBatchQueue() throws DAOException {
@@ -197,7 +201,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     }
 
     /**
-     * 
+     *
      * @throws DAOException
      */
     private void loadBatchHarvestingQueue() throws DAOException {
@@ -232,7 +236,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     }
 
     /**
-     * 
+     *
      * @return List<HarvestSourceDTO>
      */
     public static List<HarvestSourceDTO> getNextScheduledSources() {
@@ -248,7 +252,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     }
 
     /**
-     * 
+     *
      * @return List<HarvestSourceDTO>
      */
     public static List<HarvestSourceDTO> getBatchHarvestingQueue() {
@@ -293,7 +297,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     }
 
     /**
-     * 
+     *
      * @param url
      * @param pushedContent
      */
@@ -339,7 +343,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     }
 
     /**
-     * 
+     *
      * @param harvestSource
      * @throws DAOException
      */
@@ -362,7 +366,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     }
 
     /**
-     * 
+     *
      * @param harvest
      */
     private void executeHarvest(Harvest harvest) {
@@ -381,7 +385,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * javax.servlet.ServletContextListener#contextInitialized(javax.servlet
      * .ServletContextEvent)
@@ -411,7 +415,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.
      * ServletContextEvent)
      */
@@ -444,7 +448,15 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     // }
 
     /**
-     * @return the activeHours
+     * Read the hours the harvester is allowed to do batch harvesting
+     * from the general configuration file.
+     * The clock hours (0-23) when batch harvesting should be active are
+     * written as comma separated from-to spans (e.g 10-15, 19-23), where in
+     * every span both from and to are inclusive and there must be from
+     * &lt;= to (so, to say from 18.00 to 9.00 you must write 18-23,0-8).
+     * (leave the field completely empty to disable batch harvesting)
+     *
+     * @return list containing the activeHours
      */
     public static List<HourSpan> getBatchHarvestingHours() {
 
@@ -485,7 +497,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
      * new urgent or scheduled tasks. The interval can't be more than 3600
      * seconds or less than 5 seconds. The value is retrieved from the general
      * configuration file.
-     * 
+     *
      * @return the interval in seconds
      */
     public static Integer getIntervalSeconds() {
@@ -507,7 +519,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
      * Returns the upper limit on the number of sources that are harvested in
      * each interval. The value is retrieved from the general configuration
      * file.
-     * 
+     *
      * @return the upper limit
      */
     public static Integer getHarvesterUpperLimit() {
@@ -528,18 +540,18 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     /**
      * Returns the interval in minutes where the harvester checks for checks for
      * new urgent or scheduled tasks. Value can be less than 1.0.
-     * 
-     * @return float
+     *
+     * @return interval in minutes
      */
     public static float getIntervalMinutes() {
 
-        return getIntervalSeconds().floatValue() / (float) 60;
+        return getIntervalSeconds().floatValue() / (float) MINUTES;
     }
 
     /**
      * Calculates how many minutes a day the batch harvester is active. If the
      * batch harvesting is from 5-6, then the return value is 120.
-     * 
+     *
      * @return the dailyActiveMinutes
      */
     public static Integer getDailyActiveMinutes() {
@@ -551,7 +563,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
             int minutes = 0;
             List<HourSpan> activeHours = getBatchHarvestingHours();
             for (HourSpan hourSpan : activeHours) {
-                minutes += ((hourSpan.length()) + 1) * (int) 60;
+                minutes += ((hourSpan.length()) + 1) * (int) MINUTES;
             }
 
             dailyActiveMinutes = minutes > 1440 ? new Integer(1440)
@@ -565,7 +577,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
      * Calculates how many harvesting segments there is in a day. If the
      * harvester is active 120 minutes and the interval is 15 seconds (i.e. 1/4
      * minute, then there are 480 harvesting segments in the day.
-     * 
+     *
      * @return the number of harvesting segments
      */
     private static int getNumberOfSegments() {
@@ -575,10 +587,13 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     }
 
     /**
-     * We calculate how many sources we need to harvest in this round, but if
+     * Calculates how many sources we need to harvest in this round, but if
      * the amount is over the limit we lower it to the limit. The purpose is to
      * avoid tsunamis of harvesting.
-     * 
+     * <p>
+     * Example: If there are 4320 time segments, and there are 216 sources
+     * with a score of 1.0 or above, the number of sources to harvest in this
+     * round is 216 / 4320 = 0.05. This we then round up to one.
      * @return the limit of sources returned
      */
     private static int getSourcesLimitForInterval() {
@@ -589,7 +604,8 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
                     .getDao(HarvestSourceDAO.class).getUrgencySourcesCount();
             int upperLimit = getHarvesterUpperLimit();
 
-            limit = Math.round((float) numberOfSources / (float) numOfSegments);
+            // Round up to 1 if there is something at all to harvest
+            limit = (int) Math.ceil((double) numberOfSources / (double) numOfSegments);
             if (upperLimit > 0 && limit > upperLimit) {
                 limit = upperLimit;
             }
@@ -601,7 +617,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     }
 
     /**
-     * 
+     *
      * @return
      */
     private boolean isBatchHarvestingHour() {
@@ -611,7 +627,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     }
 
     /**
-     * 
+     *
      * @param calendar
      * @return
      */
@@ -633,9 +649,9 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     }
 
     /**
-     * 
-     * @param hour
-     * @return
+     * Checks if the argument is an hour where batch harvesting is active.
+     * @param hour values can be from 0-23
+     * @return true if the hour is a batch harvesting hour.
      */
     private static boolean isBatchHarvestingHour(int hour) {
 
@@ -652,7 +668,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     }
 
     /**
-     * 
+     * Checks if batch harvesting is enabled.
      * @return true if batch harvesting is enabled
      */
     private static boolean isBatchHarvestingEnabled() {
@@ -660,7 +676,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     }
 
     /**
-     * 
+     *
      * @return long
      */
     public static long getNextBatchHarvestTime() {
