@@ -35,7 +35,7 @@
                 <stripes:select name="locality" id="localitySelect" style="max-width:200px">
                     <stripes:option value="" label="-- All --"/>
                     <c:forEach var="loclty" items="${dataflowSearchActionBean.localities}">
-                        <stripes:option value="${crfn:addQuotesIfWhitespaceInside(loclty)}" label="${loclty}"/>
+                        <stripes:option value="${crfn:addQuotesIfWhitespaceInside(loclty.left)}" label="${loclty.right}"/>
                     </c:forEach>
                 </stripes:select>
                 <label for="yearSelect" class="question" style="display:inline;margin-left:20px">Coverage year:</label>
