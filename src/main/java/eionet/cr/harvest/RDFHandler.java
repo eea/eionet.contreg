@@ -56,7 +56,7 @@ import eionet.cr.util.UnicodeUtils;
  * @author Jaanus Heinlaid, e-mail: <a href="mailto:jaanus.heinlaid@tietoenator.com">jaanus.heinlaid@tietoenator.com</a>
  *
  */
-public class RDFHandler implements StatementHandler{
+public class RDFHandler implements StatementHandler {
 
     /** */
     private static final String URN_UUID = "urn:uuid:";
@@ -93,7 +93,7 @@ public class RDFHandler implements StatementHandler{
      * @param sourceUrl
      * @param genTime
      */
-    public RDFHandler(PersisterConfig config){
+    public RDFHandler(PersisterConfig config) {
 
         /* argument validations */
 
@@ -113,9 +113,9 @@ public class RDFHandler implements StatementHandler{
      * (non-Javadoc)
      * @see com.hp.hpl.jena.rdf.arp.StatementHandler#statement(com.hp.hpl.jena.rdf.arp.AResource, com.hp.hpl.jena.rdf.arp.AResource, com.hp.hpl.jena.rdf.arp.AResource)
      */
-    public void statement(AResource subject, AResource predicate, AResource object){
+    public void statement(AResource subject, AResource predicate, AResource object) {
 
-        if (rdfContentFound==false){
+        if (rdfContentFound == false) {
             rdfContentFound = true;
         }
 
@@ -126,9 +126,9 @@ public class RDFHandler implements StatementHandler{
      * (non-Javadoc)
      * @see com.hp.hpl.jena.rdf.arp.StatementHandler#statement(com.hp.hpl.jena.rdf.arp.AResource, com.hp.hpl.jena.rdf.arp.AResource, com.hp.hpl.jena.rdf.arp.ALiteral)
      */
-    public void statement(AResource subject, AResource predicate, ALiteral object){
+    public void statement(AResource subject, AResource predicate, ALiteral object) {
 
-        if (rdfContentFound==false){
+        if (rdfContentFound == false) {
             rdfContentFound = true;
         }
 
@@ -140,22 +140,22 @@ public class RDFHandler implements StatementHandler{
      * @param subjectDTO
      * @throws PersisterException
      */
-    public void addSourceMetadata(SubjectDTO subjectDTO) throws PersisterException{
+    public void addSourceMetadata(SubjectDTO subjectDTO) throws PersisterException {
 
         persister.setAddingSourceMetadata(true);
 
-        try{
-            if (subjectDTO!=null && subjectDTO.getPredicateCount()>0){
+        try {
+            if (subjectDTO != null && subjectDTO.getPredicateCount() > 0) {
 
                 int statementsAdded = 0;
                 AResource subject = new AResourceImpl(subjectDTO.getUri());
-                for (String predicateUri:subjectDTO.getPredicates().keySet()){
+                for (String predicateUri : subjectDTO.getPredicates().keySet()) {
 
                     Collection<ObjectDTO> objects = subjectDTO.getObjects(predicateUri);
-                    if (objects!=null && !objects.isEmpty()){
+                    if (objects != null && !objects.isEmpty()) {
 
                         AResource predicate = new AResourceImpl(predicateUri);
-                        for (ObjectDTO object:objects){
+                        for (ObjectDTO object : objects) {
 
                             statement(subject, predicate, object.toString(),
                                     object.getLanguage(), object.isLiteral(), object.isAnonymous());
@@ -164,12 +164,11 @@ public class RDFHandler implements StatementHandler{
                     }
                 }
 
-                if (statementsAdded>0){
+                if (statementsAdded > 0) {
                     addResource(Harvest.HARVESTER_URI, Hashes.spoHash(Harvest.HARVESTER_URI), true);
                 }
             }
-        }
-        finally{
+        } finally {
             persister.setAddingSourceMetadata(false);
         }
 
@@ -186,22 +185,22 @@ public class RDFHandler implements StatementHandler{
      */
     // TODO this method has got way too many arguments, the whole approach needs refactoring
     private void statement(AResource subject, AResource predicate, String object,
-            String objectLang, boolean litObject, boolean anonObject){
+            String objectLang, boolean litObject, boolean anonObject) {
 
-        try{
+        try {
             // if this is the first statement, perform certain "startup" actions
-            if (parsingStarted==false){
+            if (parsingStarted == false) {
                 onParsingStarted();
                 parsingStarted = true;
             }
 
             // ignore statements with anonymous predicates
-            if (predicate.isAnonymous()){
+            if (predicate.isAnonymous()) {
                 return;
             }
 
-            // ignore literal objects with length==0
-            if (litObject && object.length()==0){
+            // ignore literal objects with length == 0
+            if (litObject && object.length() == 0) {
                 return;
             }
 
@@ -212,12 +211,12 @@ public class RDFHandler implements StatementHandler{
             long predicateHash = Hashes.spoHash(predicate.getURI());
 
             // replace entity references in the object if it's a literal
-            if (litObject){
+            if (litObject) {
                 object = UnicodeUtils.replaceEntityReferences(object);
             }
 
             // replace object with its UUID, if it's an anonymous resource
-            if (anonObject && !litObject){
+            if (anonObject && !litObject) {
                 object = generateUUID(object);
             }
 
@@ -225,9 +224,9 @@ public class RDFHandler implements StatementHandler{
             long objectHash = Hashes.spoHash(object);
 
             // we remember rdfValues
-            if (anonSubject && predicate.getURI().equals(Predicates.RDF_VALUE)){
+            if (anonSubject && predicate.getURI().equals(Predicates.RDF_VALUE)) {
                 List<Pair<String,String>> subjectRdfValues = rdfValues.get(subject.getAnonymousID());
-                if (subjectRdfValues==null){
+                if (subjectRdfValues == null) {
                     subjectRdfValues = new ArrayList<Pair<String,String>>();
                     rdfValues.put(subjectUri, subjectRdfValues);
                 }
@@ -238,10 +237,10 @@ public class RDFHandler implements StatementHandler{
             addTriple(subjectHash, anonSubject, predicateHash, object, objectHash, objectLang, litObject, anonObject);
 
             // if the object represents an anonymous subject, lookup the rdf:value(s) of the latter and insert it(them) as derived
-            if (anonObject && !litObject){
+            if (anonObject && !litObject) {
                 List<Pair<String,String>> objectRdfValues = rdfValues.get(object);
-                if (objectRdfValues!=null){
-                    for (Pair<String,String> objectLangPair : objectRdfValues){
+                if (objectRdfValues != null) {
+                    for (Pair<String,String> objectLangPair : objectRdfValues) {
                         addTriple(subjectHash, anonSubject, predicateHash, objectLangPair.getLeft(), objectHash, objectLangPair.getRight(),
                                 true, false, Hashes.spoHash(object));
                     }
@@ -250,25 +249,23 @@ public class RDFHandler implements StatementHandler{
 
             // if subject already added into resources,
             // then still make sure that it's present in the "subjects" part of the resources,
-            if (isResourceAdded(subjectHash)){
+            if (isResourceAdded(subjectHash)) {
                 resources.getLeft().add(Long.valueOf(subjectHash));
-            }
+            } else {
             // subject not yet added already added into resources
-            else{
                 addResource(subjectUri, subjectHash, true);
             }
 
             // if predicate not already added into resources, then do so
-            if (!isResourceAdded(predicateHash)){
+            if (!isResourceAdded(predicateHash)) {
                 addResource(predicate.getURI(), predicateHash, false);
             }
 
             // if object is a resource and it's not already added into resources, then do so
-            if (litObject==false && !isResourceAdded(objectHash)){
+            if (litObject == false && !isResourceAdded(objectHash)) {
                 addResource(object, objectHash, false);
             }
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             throw new RDFLoadingException(e.toString(), e);
         }
     }
@@ -277,7 +274,7 @@ public class RDFHandler implements StatementHandler{
      * @throws SQLException
      *
      */
-    private void onParsingStarted() throws PersisterException{
+    private void onParsingStarted() throws PersisterException {
         persister.openResources();
     }
 
@@ -326,7 +323,7 @@ public class RDFHandler implements StatementHandler{
      * @param name
      * @return
      */
-    private String generateUUID(String name){
+    private String generateUUID(String name) {
 
         return generateUUID(uuidNamePrefix, name);
     }
@@ -337,7 +334,7 @@ public class RDFHandler implements StatementHandler{
      * @param name
      * @return
      */
-    public static String generateUUID(String prefix, String name){
+    public static String generateUUID(String prefix, String name) {
 
         UUID uuid = UUID.nameUUIDFromBytes(
                 new StringBuilder(prefix).append(name).toString().getBytes());
@@ -350,7 +347,7 @@ public class RDFHandler implements StatementHandler{
      * @param genTime
      * @return
      */
-    public static String uuidNamePrefix(long sourceHash, long genTime){
+    public static String uuidNamePrefix(long sourceHash, long genTime) {
 
         return new StringBuffer().append(sourceHash).append(":").append(genTime).append(":").toString();
     }
@@ -374,7 +371,7 @@ public class RDFHandler implements StatementHandler{
      *
      * @throws PersisterException
      */
-    public void endOfFile() throws PersisterException{
+    public void endOfFile() throws PersisterException {
         persister.endOfFile();
     }
 
@@ -389,7 +386,7 @@ public class RDFHandler implements StatementHandler{
      *
      * @throws SQLException
      */
-    public void rollback() throws PersisterException{
+    public void rollback() throws PersisterException {
         logger.debug("Doing harvest rollback");
         persister.rollback();
     }
@@ -412,7 +409,7 @@ public class RDFHandler implements StatementHandler{
      * @throws PersisterException
      *
      */
-    public void closeResources() throws PersisterException  {
+    public void closeResources() throws PersisterException {
         persister.closeResources();
     }
 
@@ -421,7 +418,7 @@ public class RDFHandler implements StatementHandler{
      * @param hash
      * @return
      */
-    private boolean isResourceAdded(long hash){
+    private boolean isResourceAdded(long hash) {
 
         return resources.getLeft().contains(Long.valueOf(hash))
         || resources.getRight().contains(Long.valueOf(hash));
@@ -431,7 +428,7 @@ public class RDFHandler implements StatementHandler{
      *
      * @return
      */
-    public int getSubjectCount(){
+    public int getSubjectCount() {
         return resources.getLeft().size();
     }
 }

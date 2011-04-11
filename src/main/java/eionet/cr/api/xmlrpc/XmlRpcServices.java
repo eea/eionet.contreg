@@ -74,8 +74,8 @@ public class XmlRpcServices implements Services {
             logger.info("Entered " + Thread.currentThread().getStackTrace()[1].getMethodName());
         }
 
-        List<Map<String,String[]>> result = new ArrayList<Map<String,String[]>>();
-        if (timestamp!=null) {
+        List<Map<String,String[]>> result = new ArrayList<Map<String, String[]>>();
+        if (timestamp != null) {
 
             // given timestamp must be less than current time (in seconds)
             long curTimeSeconds = Util.currentTimeSeconds();
@@ -91,7 +91,7 @@ public class XmlRpcServices implements Services {
 
                         SubjectDTO subjectDTO = subjectsIter.next();
                         HashMap<String,String[]> map = new HashMap<String,String[]>();
-                        for (Iterator<String> predicatesIter=subjectDTO.getPredicates().keySet().iterator(); predicatesIter.hasNext();) {
+                        for (Iterator<String> predicatesIter = subjectDTO.getPredicates().keySet().iterator(); predicatesIter.hasNext();) {
 
                             String predicate = predicatesIter.next();
                             map.put(predicate, toStringArray(subjectDTO.getObjects(predicate)));
@@ -151,8 +151,8 @@ public class XmlRpcServices implements Services {
 
             String[] strArray = {};
             Collection<SubjectDTO> subjects = search.getRight();
-            if (subjects!=null) {
-                for (Iterator<SubjectDTO> iter=subjects.iterator(); iter.hasNext();) {
+            if (subjects != null) {
+                for (Iterator<SubjectDTO> iter = subjects.iterator(); iter.hasNext();) {
 
                     SubjectDTO subjectDTO = iter.next();
                     DataflowResultDto resultDTO = new DataflowResultDto();
@@ -189,7 +189,7 @@ public class XmlRpcServices implements Services {
             logger.info("Entered " + Thread.currentThread().getStackTrace()[1].getMethodName());
         }
 
-        if (content!=null && content.trim().length() > 0) {
+        if (content != null && content.trim().length() > 0) {
             if (StringUtils.isBlank(sourceUrl))
                 throw new CRException("Missing source URL!");
             else if (!URLUtil.isURL(sourceUrl))
@@ -215,10 +215,11 @@ public class XmlRpcServices implements Services {
      * attribute names and values represent their values. Data type of both keys and
      * values is <code>java.lang.String</code>.
      *
-     * The method returns a <code>java.util.Vector</code> of type <code>java.util.Hashtable</code>. Every such hashtable represents one
-     * resource that contains exactly 1 key that is a String that represents the resource's URI. The value is
-     * another <code>java.lang.Hashtable</code> where the data type of keys is <code>java.lang.String</code> and the data type of values
-     * is <code>java.util.Vector</code>. They keys represent URIs of the resource's attributes and the value-vectors represent values
+     * The method returns a <code>java.util.Vector</code> of type <code>java.util.Hashtable</code>.
+     * Every such hashtable represents one resource that contains exactly 1 key that is a String that
+     * represents the resource's URI. The value is another <code>java.lang.Hashtable</code> where the
+     * data type of keys is <code>java.lang.String</code> and the data type of values is <code>java.util.Vector</code>.
+     * They keys represent URIs of the resource's attributes and the value-vectors represent values
      * of attributes. These values are of type <code>java.lang.String</code>.
      *
      */
@@ -239,12 +240,12 @@ public class XmlRpcServices implements Services {
                             null,
                             null);
             Collection<SubjectDTO> subjects = search.getRight();
-            if (subjects!=null) {
+            if (subjects != null) {
                 for (Iterator<SubjectDTO> iter = subjects.iterator(); iter.hasNext();) {
 
                     SubjectDTO subjectDTO = iter.next();
                     Hashtable<String,Vector<String>> predicatesTable = new Hashtable<String,Vector<String>>();
-                    for (Iterator<String> predicatesIter=subjectDTO.getPredicates().keySet().iterator(); predicatesIter.hasNext();) {
+                    for (Iterator<String> predicatesIter = subjectDTO.getPredicates().keySet().iterator(); predicatesIter.hasNext();) {
 
                         String predicate = predicatesIter.next();
                         predicatesTable.put(predicate, new Vector<String>(getLiteralValues(subjectDTO, predicate)));
@@ -311,7 +312,7 @@ public class XmlRpcServices implements Services {
         HashSet<String> result = new HashSet<String>();
 
         Collection<ObjectDTO> objects = subjectDTO.getObjects(predicateUri, objType);
-        if (objects!=null && !objects.isEmpty()) {
+        if (objects != null && !objects.isEmpty()) {
             for (Iterator<ObjectDTO> iter = objects.iterator(); iter.hasNext();) {
                 result.add(iter.next().getValue());
             }
@@ -343,7 +344,7 @@ public class XmlRpcServices implements Services {
 
         int i = 0;
         String[] result = new String[objects.size()];
-        for (Iterator<ObjectDTO> iter=objects.iterator(); iter.hasNext();i++) {
+        for (Iterator<ObjectDTO> iter = objects.iterator(); iter.hasNext();i++) {
             result[i] = iter.next().getValue();
         }
 
@@ -385,7 +386,7 @@ public class XmlRpcServices implements Services {
 
                 subjects = results.getRight();
 
-                if (subjects!=null) {
+                if (subjects != null) {
                     for (SubjectDTO subjectDTO : subjects) {
 
                         String lastModif = subjectDTO.getObjectValue(Predicates.CR_LAST_MODIFIED);
