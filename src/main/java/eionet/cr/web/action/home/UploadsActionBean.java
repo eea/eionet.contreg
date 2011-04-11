@@ -45,7 +45,7 @@ import eionet.cr.web.security.CRUser;
  */
 
 @UrlBinding("/home/{username}/uploads")
-public class UploadsActionBean extends AbstractHomeActionBean implements Runnable{
+public class UploadsActionBean extends AbstractHomeActionBean implements Runnable {
 
     /** */
     public static final String FNAME_PARAM_PREFIX = "name_";
@@ -80,7 +80,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
      * @return
      */
     @DefaultHandler
-    public Resolution view(){
+    public Resolution view() {
 
         return new ForwardResolution("/pages/home/uploads.jsp");
     }
@@ -91,12 +91,11 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
      * @throws DAOException
      * @throws IOException
      */
-    public Resolution add() throws DAOException, IOException{
+    public Resolution add() throws DAOException, IOException {
 
-        try{
+        try {
             return doAdd();
-        }
-        finally{
+        } finally {
             deleteUploadedFile(uploadedFile);
         }
     }
@@ -107,18 +106,18 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
      * @throws DAOException
      * @throws IOException
      */
-    private Resolution doAdd() throws DAOException, IOException{
+    private Resolution doAdd() throws DAOException, IOException {
 
         Thread thread = null;
         Resolution resolution = new ForwardResolution("/pages/home/addUpload.jsp");
-        if (isPostRequest()){
+        if (isPostRequest()) {
 
             logger.debug("Uploaded file: " + uploadedFile);
 
-            if (uploadedFile!=null){
+            if (uploadedFile != null) {
 
                 // if file content is empty (e.f. 0 KB file), no point in continuing
-                if (uploadedFile.getSize()<=0){
+                if (uploadedFile.getSize() <= 0) {
                     addWarningMessage("The file must not be empty!");
                     return resolution;
                 }
@@ -128,9 +127,9 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
                         HelperDAO.class).isExistingSubject(getUploadedFileSubjectUri());
 
                 // if file exists and replace not requested, report a warning
-                if (replaceExisting==false && fileExists){
-                    addWarningMessage("A file with such a name already exists!" +
-                    " Use \"replace existing\" checkbox to overwrite.");
+                if (replaceExisting == false && fileExists) {
+                    addWarningMessage("A file with such a name already exists!"
+                        + " Use \"replace existing\" checkbox to overwrite.");
                     return resolution;
                 }
 
@@ -152,48 +151,42 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
      * @throws DAOException
      *
      */
-    private void saveAndHarvest() throws IOException, DAOException{
+    private void saveAndHarvest() throws IOException, DAOException {
 
         // start the thread that saves the file's content and attempts to harvest it
         Thread thread = new Thread(this);
         thread.start();
 
         // check the thread after every second, exit loop if it hasn't finished in 15 seconds
-        for (int loopCount = 0; thread.isAlive() && loopCount<15; loopCount++){
+        for (int loopCount = 0; thread.isAlive() && loopCount < 15; loopCount++) {
             try {
                 Thread.sleep(1000);
-            }
-            catch (InterruptedException e) {
+            } catch (InterruptedException e) {
                 throw new CRRuntimeException(e.toString(), e);
             }
         }
 
         // if the the thread reported an exception, throw it
-        if (saveAndHarvestException!=null){
-            if (saveAndHarvestException instanceof DAOException){
-                throw (DAOException)saveAndHarvestException;
-            }
-            else if (saveAndHarvestException instanceof IOException){
-                throw (IOException)saveAndHarvestException;
-            }
-            else if (saveAndHarvestException instanceof RuntimeException){
-                throw (RuntimeException)saveAndHarvestException;
-            }
-            else{
+        if (saveAndHarvestException != null) {
+            if (saveAndHarvestException instanceof DAOException) {
+                throw (DAOException) saveAndHarvestException;
+            } else if (saveAndHarvestException instanceof IOException) {
+                throw (IOException) saveAndHarvestException;
+            } else if (saveAndHarvestException instanceof RuntimeException) {
+                throw (RuntimeException) saveAndHarvestException;
+            } else {
                 throw new CRRuntimeException(
                         saveAndHarvestException.getMessage(), saveAndHarvestException);
             }
         }
 
         // add feedback message to the bean's context
-        if (!thread.isAlive()){
+        if (!thread.isAlive()) {
             addSystemMessage("File saved and harvested!");
-        }
-        else{
-            if (!contentSaved){
+        } else {
+            if (!contentSaved) {
                 addSystemMessage("Saving and harvesting the file continues in the background!");
-            }
-            else{
+            } else {
                 addSystemMessage("File content saved, but harvest continues in the background!");
             }
         }
@@ -206,7 +199,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
     public void run() {
 
         // at this stage, the uploaded file must not be null
-        if (uploadedFile==null){
+        if (uploadedFile == null) {
             throw new CRRuntimeException("Uploaded file object must not be null");
         }
 
@@ -222,10 +215,10 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
         SubjectDTO fileSubjectDTO = null;
 
         // if title needs to be stored, add it to file subject DTO
-        if (!fileExists || !StringUtils.isBlank(title)){
+        if (!fileExists || !StringUtils.isBlank(title)) {
 
             String titleToStore = title;
-            if (StringUtils.isBlank(titleToStore)){
+            if (StringUtils.isBlank(titleToStore)) {
                 titleToStore = URIUtil.extractURILabel(getUploadedFileSubjectUri(),SubjectDTO.NO_LABEL);
             }
 
@@ -236,7 +229,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
         }
 
         logger.debug("Creating the cr:hasFile predicate");
-        try{
+        try {
             // make sure cr:hasFile is present in RESOURCE
             DAOFactory.get().getDao(HelperDAO.class).addResource(
                     Predicates.CR_HAS_FILE, getUser().getHomeUri());
@@ -249,17 +242,16 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
             DAOFactory.get().getDao(HelperDAO.class).addTriples(homeSubjectDTO);
 
             // store file subject DTO if it has been initialized
-            if (fileSubjectDTO!=null){
+            if (fileSubjectDTO != null) {
 
                 // delete previous value of dc:title if new one set
-                if (fileExists && fileSubjectDTO.hasPredicate(Predicates.DC_TITLE)){
+                if (fileExists && fileSubjectDTO.hasPredicate(Predicates.DC_TITLE)) {
                     DAOFactory.get().getDao(HelperDAO.class).deleteTriples(
                             fileSubjectDTO.getUri(), Predicates.DC_TITLE, getUser().getHomeUri());
                 }
                 DAOFactory.get().getDao(HelperDAO.class).addTriples(fileSubjectDTO);
             }
-        }
-        catch (DAOException e){
+        } catch (DAOException e) {
             saveAndHarvestException = e;
             return;
         }
@@ -268,12 +260,10 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
         try {
             saveContent(uploadedFile);
             contentSaved = true;
-        }
-        catch (DAOException e) {
+        } catch (DAOException e) {
             saveAndHarvestException = e;
             return;
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             saveAndHarvestException = e;
             return;
         }
@@ -289,7 +279,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
      * @throws DAOException
      * @throws IOException
      */
-    private void saveContent(FileBean fileBean) throws DAOException, IOException{
+    private void saveContent(FileBean fileBean) throws DAOException, IOException {
 
         logger.debug("Going to save the uploaded file's content into database");
 
@@ -299,11 +289,10 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
         dto.setLanguage("");
         dto.setMustEmbed(false);
         InputStream contentStream = null;
-        try{
+        try {
             contentStream = uploadedFile.getInputStream();
             DAOFactory.get().getDao(SpoBinaryDAO.class).add(dto, uploadedFile.getSize());
-        }
-        finally{
+        } finally {
             IOUtils.closeQuietly(contentStream);
         }
     }
@@ -313,9 +302,9 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
      * @return
      * @throws DAOException
      */
-    public Resolution delete() throws DAOException{
+    public Resolution delete() throws DAOException {
 
-        if (subjectUris!=null && !subjectUris.isEmpty()){
+        if (subjectUris != null && !subjectUris.isEmpty()) {
 
             DAOFactory.get().getDao(HelperDAO.class).deleteSubjects(subjectUris);
             DAOFactory.get().getDao(HarvestSourceDAO.class).queueSourcesForDeletion(subjectUris);
@@ -329,23 +318,23 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
      * @return
      * @throws DAOException
      */
-    public Resolution rename() throws DAOException{
+    public Resolution rename() throws DAOException {
 
         Resolution resolution = new ForwardResolution("/pages/home/renameUploads.jsp");
-        if (isPostRequest()){
+        if (isPostRequest()) {
 
             HashMap<Long,String> newUris = new HashMap<Long, String>();
             String uriPrefix = getUriPrefix();
 
             ServletRequest request = getContext().getRequest();
             Enumeration paramNames = request.getParameterNames();
-            while (paramNames.hasMoreElements()){
+            while (paramNames.hasMoreElements()) {
 
-                String paramName = (String)paramNames.nextElement();
-                if (paramName.startsWith(FNAME_PARAM_PREFIX)){
+                String paramName = (String) paramNames.nextElement();
+                if (paramName.startsWith(FNAME_PARAM_PREFIX)) {
 
                     String newName = request.getParameter(paramName);
-                    if (StringUtils.isBlank(newName)==false){
+                    if (StringUtils.isBlank(newName) == false) {
 
                         String oldHash = StringUtils.substringAfter(paramName, FNAME_PARAM_PREFIX);
                         String newUri = uriPrefix + newName;
@@ -354,7 +343,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
                 }
             }
 
-            if (!newUris.isEmpty()){
+            if (!newUris.isEmpty()) {
 
                 DAOFactory.get().getDao(HelperDAO.class).renameSubjects(newUris);
                 addSystemMessage("Files renamed successfully!");
@@ -370,7 +359,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
      *
      * @return
      */
-    public Resolution cancel(){
+    public Resolution cancel() {
 
         return new RedirectResolution(StringUtils.replace(
                 getUrlBinding(), "{username}", getUserName()));
@@ -381,33 +370,33 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
      *
      */
     @ValidationMethod(on={"add", "rename", "delete"})
-    public void validatePostEvent() throws DAOException{
+    public void validatePostEvent() throws DAOException {
 
         // the below validation is relevant only when the event is requested through POST method
-        if (!isPostRequest()){
+        if (!isPostRequest()) {
             return;
         }
 
         // for all the above POST events, user must be authorized
-        if (!isUserAuthorized() || getUser()==null){
+        if (!isUserAuthorized() || getUser() == null) {
             addGlobalValidationError("User not logged in!");
             return;
         }
 
         // if add event, make sure the file bean is not null
         String eventName = getContext().getEventName();
-        if (eventName.equals("add")){
+        if (eventName.equals("add")) {
 
-            if (uploadedFile==null){
+            if (uploadedFile == null) {
                 addGlobalValidationError("No file specified!");
             }
         }
 
         // if any validation errors were set above, make sure the right resolution is returned
-        if (hasValidationErrors()){
+        if (hasValidationErrors()) {
 
             Resolution resolution = new ForwardResolution("/pages/home/uploads.jsp");
-            if (eventName.equals("add")){
+            if (eventName.equals("add")) {
                 resolution = new ForwardResolution("/pages/home/addUpload.jsp");
             }
 
@@ -419,7 +408,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
      *
      */
     @Before(stages=LifecycleStage.CustomValidation)
-    public void setEnvironmentParams(){
+    public void setEnvironmentParams() {
         setEnvironmentParams(getContext(), AbstractHomeActionBean.TYPE_UPLOADS, true);
     }
 
@@ -483,10 +472,10 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
      */
     public Collection<UploadDTO> getUploads() throws DAOException {
 
-        if (uploads==null || uploads.isEmpty()){
+        if (uploads == null || uploads.isEmpty()) {
 
             CRUser crUser = getUser();
-            if (this.isUserAuthorized() && crUser!=null){
+            if (this.isUserAuthorized() && crUser != null) {
                 uploads = DAOFactory.get().getDao(HelperDAO.class).getUserUploads(getUser());
             } else {
                 uploads = DAOFactory.get().getDao(HelperDAO.class).getUserUploads(new CRUser(this.getAttemptedUserName()));
@@ -502,8 +491,8 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
      */
     public String getUploadedFileSubjectUri() {
 
-        if (StringUtils.isBlank(uploadedFileSubjectUri)){
-            if (uploadedFile!=null && getUser()!=null){
+        if (StringUtils.isBlank(uploadedFileSubjectUri)) {
+            if (uploadedFile != null && getUser() != null) {
                 uploadedFileSubjectUri = getUriPrefix() + uploadedFile.getFileName();
             }
         }
@@ -530,7 +519,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
      */
     public String getUriPrefix() {
 
-        if (uriPrefix==null){
+        if (uriPrefix == null) {
             uriPrefix = getUser().getHomeUri() + "/";
         }
         return uriPrefix;
@@ -540,7 +529,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
      *
      * @return
      */
-    public String getFileNameParamPrefix(){
+    public String getFileNameParamPrefix() {
         return FNAME_PARAM_PREFIX;
     }
 }

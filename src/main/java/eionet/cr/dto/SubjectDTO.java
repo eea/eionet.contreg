@@ -44,7 +44,7 @@ import eionet.cr.web.security.CRUser;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class SubjectDTO implements Serializable{
+public class SubjectDTO implements Serializable {
 
     /**
      * serial.
@@ -71,9 +71,9 @@ public class SubjectDTO implements Serializable{
      * @param uri
      * @param anonymous
      */
-    public SubjectDTO(String uri, boolean anonymous){
+    public SubjectDTO(String uri, boolean anonymous) {
 
-        if (uri==null || uri.trim().length()==0){
+        if (uri == null || uri.trim().length() == 0) {
             throw new IllegalArgumentException("Trying to construct a subject with a blank URI");
         }
 
@@ -99,10 +99,10 @@ public class SubjectDTO implements Serializable{
      * @param predicate
      * @param object
      */
-    public void addObject(String predicate, ObjectDTO object){
+    public void addObject(String predicate, ObjectDTO object) {
 
         Collection<ObjectDTO> objects = predicates.get(predicate);
-        if (objects==null){
+        if (objects == null) {
             objects = new ArrayList<ObjectDTO>();
             predicates.put(predicate, objects);
         }
@@ -114,7 +114,7 @@ public class SubjectDTO implements Serializable{
      * @param predicate
      * @param object
      */
-    public void setObject(String predicate, ObjectDTO object){
+    public void setObject(String predicate, ObjectDTO object) {
 
         Collection<ObjectDTO> objects = new ArrayList<ObjectDTO>();
         objects.add(object);
@@ -125,7 +125,7 @@ public class SubjectDTO implements Serializable{
      *
      * @return
      */
-    public Map<String,Collection<ObjectDTO>> getPredicates(){
+    public Map<String,Collection<ObjectDTO>> getPredicates() {
         return predicates;
     }
 
@@ -133,7 +133,7 @@ public class SubjectDTO implements Serializable{
      *
      * @return
      */
-    public Set<String> getPredicateUris(){
+    public Set<String> getPredicateUris() {
         return predicates.keySet();
     }
 
@@ -142,7 +142,7 @@ public class SubjectDTO implements Serializable{
      * @param predicate
      * @return
      */
-    public Collection<ObjectDTO> getObjects(String predicate){
+    public Collection<ObjectDTO> getObjects(String predicate) {
 
         return predicates.get(predicate);
     }
@@ -155,55 +155,54 @@ public class SubjectDTO implements Serializable{
      * @return
      */
     public Collection<ObjectDTO> getObjectsForSearchResultsDisplay(
-            String predicateUri, Set<String> languages){
+            String predicateUri, Set<String> languages) {
 
         Collection<ObjectDTO> result = new ArrayList<ObjectDTO>();
         Collection<ObjectDTO> fromHitSources = new ArrayList<ObjectDTO>();
-        boolean existLanguagePreferences = languages!=null && !languages.isEmpty();
+        boolean existLanguagePreferences = languages != null && !languages.isEmpty();
 
         Collection<ObjectDTO> objects = getObjects(predicateUri);
-        if (objects!=null && !objects.isEmpty()){
+        if (objects != null && !objects.isEmpty()) {
 
             // remember the values of literals which have been derived from resource objects
             HashMap<Long,String> derivedLiterals = new HashMap<Long,String>();
-            for (ObjectDTO object : objects){
+            for (ObjectDTO object : objects) {
 
-                if (object.isLiteral() && object.getSourceObjectHash()!=0){
-                    derivedLiterals.put(Long.valueOf(object.getSourceObjectHash()),object.getValue());
+                if (object.isLiteral() && object.getSourceObjectHash() != 0) {
+                    derivedLiterals.put(Long.valueOf(object.getSourceObjectHash()), object.getValue());
                 }
             }
 
-            for (ObjectDTO object : objects){
+            for (ObjectDTO object : objects) {
 
                 // check that object value is not blank
                 String objectValue = object.getValue().trim();
-                if (!StringUtils.isBlank(objectValue)){
+                if (!StringUtils.isBlank(objectValue)) {
 
                     // skip literals that have been derived from resource objects
-                    if (object.isLiteral() && object.getSourceObjectHash()!=0){
+                    if (object.isLiteral() && object.getSourceObjectHash() != 0) {
                         continue;
                     }
 
                     // skip literals which have a language that is not present in the
                     // language preferences
                     if (object.isLiteral()
-                            && languages!=null && !languages.isEmpty()
-                            && object.getLanguage()!=null
-                            && !languages.contains(object.getLanguage())){
+                            && languages != null && !languages.isEmpty()
+                            && object.getLanguage() != null
+                            && !languages.contains(object.getLanguage())) {
                         continue;
                     }
 
                     // if object is from the subject's hit source, add it to a separate list
-                    if (hitSource>0 && object.getSourceHashSmart()==hitSource){
+                    if (hitSource > 0 && object.getSourceHashSmart() == hitSource) {
                         fromHitSources.add(object);
-                    }
-                    else{
+                    } else {
                         result.add(object);
                     }
 
                     // if resource object, set its derived literal
                     // (will be set to null if no derived literals found)
-                    if (!object.isLiteral()){
+                    if (!object.isLiteral()) {
                         object.setDerviedLiteralValue(derivedLiterals.get(
                                 Long.valueOf(Hashes.spoHash(objectValue))));
                     }
@@ -220,13 +219,13 @@ public class SubjectDTO implements Serializable{
      * @param objectType
      * @return
      */
-    public Collection<ObjectDTO> getObjects(String predicate, ObjectDTO.Type objectType){
+    public Collection<ObjectDTO> getObjects(String predicate, ObjectDTO.Type objectType) {
 
         ArrayList<ObjectDTO> result = new ArrayList<ObjectDTO>();
 
         Collection<ObjectDTO> coll = getObjects(predicate);
-        if (coll!=null && !coll.isEmpty()){
-            for (Iterator<ObjectDTO> iter=coll.iterator(); iter.hasNext();){
+        if (coll != null && !coll.isEmpty()) {
+            for (Iterator<ObjectDTO> iter = coll.iterator(); iter.hasNext();) {
                 ObjectDTO objectDTO = iter.next();
                 if (objectType.equals(ObjectDTO.Type.LITERAL) && objectDTO.isLiteral())
                     result.add(objectDTO);
@@ -243,9 +242,9 @@ public class SubjectDTO implements Serializable{
      * @param predicate
      * @return
      */
-    public ObjectDTO getObject(String predicate){
+    public ObjectDTO getObject(String predicate) {
         Collection<ObjectDTO> objects = getObjects(predicate);
-        return objects==null || objects.isEmpty() ? null : objects.iterator().next();
+        return objects == null || objects.isEmpty() ? null : objects.iterator().next();
     }
 
     /**
@@ -254,9 +253,9 @@ public class SubjectDTO implements Serializable{
      * @param objectType
      * @return
      */
-    public ObjectDTO getObject(String predicate, ObjectDTO.Type objectType){
+    public ObjectDTO getObject(String predicate, ObjectDTO.Type objectType) {
         Collection<ObjectDTO> objects = getObjects(predicate, objectType);
-        return objects==null || objects.isEmpty() ? null : objects.iterator().next();
+        return objects == null || objects.isEmpty() ? null : objects.iterator().next();
     }
 
     /**
@@ -264,9 +263,9 @@ public class SubjectDTO implements Serializable{
      * @param predicate
      * @return
      */
-    public String getObjectValue(String predicate){
+    public String getObjectValue(String predicate) {
         ObjectDTO objectDTO = getObject(predicate);
-        return objectDTO==null ? null : objectDTO.getValue();
+        return objectDTO == null ? null : objectDTO.getValue();
     }
 
     /**
@@ -274,16 +273,16 @@ public class SubjectDTO implements Serializable{
      * @param predicate
      * @return
      */
-    public String getObjectValue(String predicate, ObjectDTO.Type objectType){
+    public String getObjectValue(String predicate, ObjectDTO.Type objectType) {
         ObjectDTO objectDTO = getObject(predicate, objectType);
-        return objectDTO==null ? null : objectDTO.getValue();
+        return objectDTO == null ? null : objectDTO.getValue();
     }
 
     /**
      *
      * @return
      */
-    public int getPredicateCount(){
+    public int getPredicateCount() {
         return predicates.size();
     }
 
@@ -291,7 +290,7 @@ public class SubjectDTO implements Serializable{
      *
      * @return
      */
-    public String getUri(){
+    public String getUri() {
         return uri;
     }
 
@@ -299,7 +298,7 @@ public class SubjectDTO implements Serializable{
      *
      * @return
      */
-    public boolean isAnonymous(){
+    public boolean isAnonymous() {
         return anonymous;
     }
 
@@ -307,9 +306,9 @@ public class SubjectDTO implements Serializable{
      * (non-Javadoc)
      * @see java.lang.Object#equals(java.lang.Object)
      */
-    public boolean equals(Object other){
+    public boolean equals(Object other) {
 
-        if (this==other)
+        if (this == other)
             return true;
 
         if (!(other instanceof SubjectDTO))
@@ -317,29 +316,29 @@ public class SubjectDTO implements Serializable{
 
 
         String otherUri = ((SubjectDTO)other).getUri();
-        return getUri()==null ? otherUri==null : getUri().equals(otherUri);
+        return getUri() == null ? otherUri == null : getUri().equals(otherUri);
     }
 
     /*
      * (non-Javadoc)
      * @see java.lang.Object#hashCode()
      */
-    public int hashCode(){
+    public int hashCode() {
 
-        return getUri()==null ? 0 : getUri().hashCode();
+        return getUri() == null ? 0 : getUri().hashCode();
     }
 
     /**
      *
      * @return
      */
-    public String getUrl(){
+    public String getUrl() {
 
-        if (uri!=null && URLUtil.isURL(uri))
+        if (uri != null && URLUtil.isURL(uri))
             return uri;
-        else{
+        else {
             ObjectDTO o = getObject(Predicates.DC_IDENTIFIER);
-            return o==null || !URLUtil.isURL(o.getValue()) ? null : o.getValue();
+            return o == null || !URLUtil.isURL(o.getValue()) ? null : o.getValue();
         }
     }
 
@@ -348,9 +347,9 @@ public class SubjectDTO implements Serializable{
      * @param predicateUri
      * @return
      */
-    public boolean hasPredicate(String predicateUri){
+    public boolean hasPredicate(String predicateUri) {
 
-        return predicates!=null && predicates.containsKey(predicateUri);
+        return predicates != null && predicates.containsKey(predicateUri);
     }
 
     /**
@@ -359,13 +358,13 @@ public class SubjectDTO implements Serializable{
      * @param objectValue
      * @return
      */
-    public boolean hasPredicateObject(String predicate, String objectValue){
+    public boolean hasPredicateObject(String predicate, String objectValue) {
 
         boolean result = false;
         Collection<ObjectDTO> objects = getObjects(predicate);
-        if (objects!=null && !objects.isEmpty()){
-            for (Iterator<ObjectDTO> i=objects.iterator(); i.hasNext();){
-                if (objectValue.equals(i.next().getValue())){
+        if (objects != null && !objects.isEmpty()) {
+            for (Iterator<ObjectDTO> i = objects.iterator(); i.hasNext();) {
+                if (objectValue.equals(i.next().getValue())) {
                     result = true;
                     break;
                 }
@@ -396,13 +395,13 @@ public class SubjectDTO implements Serializable{
      * @param sourceHash
      * @return
      */
-    public boolean existsPredicateObjectSource(String predicate, String objectValue, String sourceUri){
+    public boolean existsPredicateObjectSource(String predicate, String objectValue, String sourceUri) {
 
         Collection<ObjectDTO> objects = getObjects(predicate);
-        if (objects!=null && !objects.isEmpty()){
-            for (ObjectDTO objectDTO:objects){
-                if (objectDTO.getValue().equals(objectValue)){
-                    if (objectDTO.getSourceUri().equals(sourceUri)){
+        if (objects != null && !objects.isEmpty()) {
+            for (ObjectDTO objectDTO:objects) {
+                if (objectDTO.getValue().equals(objectValue)) {
+                    if (objectDTO.getSourceUri().equals(sourceUri)) {
                         return true;
                     }
                 }
@@ -444,11 +443,11 @@ public class SubjectDTO implements Serializable{
      *
      * @return
      */
-    public String getLabel(){
+    public String getLabel() {
 
         ObjectDTO object = getObject(Predicates.RDFS_LABEL, ObjectDTO.Type.LITERAL);
         String label = object.getValue();
-        if (label!=null && label.trim().length()>0)
+        if (label != null && label.trim().length() > 0)
             return label;
         else if (isAnonymous())
             return "Anonymous resource";
@@ -461,7 +460,7 @@ public class SubjectDTO implements Serializable{
      * @param user
      * @return
      */
-    public boolean isRegisteredBy(CRUser user){
+    public boolean isRegisteredBy(CRUser user) {
 
         return existsPredicateObjectSource(
                 Predicates.RDF_TYPE, Subjects.CR_FILE, user.getRegistrationsUri());

@@ -39,7 +39,7 @@ public class ObjectDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /** */
-    public enum Type{LITERAL, RESOURCE;}
+    public enum Type { LITERAL, RESOURCE; }
 
     /** */
     private String value;
@@ -66,7 +66,7 @@ public class ObjectDTO implements Serializable {
      * @param literal
      * @param anonymous
      */
-    public ObjectDTO(String value, String language, boolean literal, boolean anonymous){
+    public ObjectDTO(String value, String language, boolean literal, boolean anonymous) {
 
         this.value = value;
         this.language = language;
@@ -80,7 +80,7 @@ public class ObjectDTO implements Serializable {
      * @param value
      * @param literal
      */
-    public ObjectDTO(String value, boolean literal){
+    public ObjectDTO(String value, boolean literal) {
         this(value, null, literal, false);
     }
 
@@ -91,7 +91,7 @@ public class ObjectDTO implements Serializable {
      * @param derivSourceHash
      * @param sourceObjectHash
      */
-    private ObjectDTO(long hash, long sourceHash, long derivSourceHash, long sourceObjectHash){
+    private ObjectDTO(long hash, long sourceHash, long derivSourceHash, long sourceObjectHash) {
 
         this.hash = hash;
         this.sourceHash = sourceHash;
@@ -107,7 +107,7 @@ public class ObjectDTO implements Serializable {
      * @param sourceObjectHash
      * @return
      */
-    public static ObjectDTO create(long hash, long sourceHash, long derivSourceHash, long sourceObjectHash){
+    public static ObjectDTO create(long hash, long sourceHash, long derivSourceHash, long sourceObjectHash) {
 
         return new ObjectDTO(hash, sourceHash, derivSourceHash, sourceObjectHash);
     }
@@ -142,7 +142,7 @@ public class ObjectDTO implements Serializable {
      * (non-Javadoc)
      * @see java.lang.Object#toString()
      */
-    public String toString(){
+    public String toString() {
         return getValue();
     }
 
@@ -150,9 +150,9 @@ public class ObjectDTO implements Serializable {
      * (non-Javadoc)
      * @see java.lang.Object#equals(java.lang.Object)
      */
-    public boolean equals(Object other){
+    public boolean equals(Object other) {
 
-        if (this==other)
+        if (this == other)
             return true;
 
         if (!(other instanceof ObjectDTO))
@@ -160,22 +160,22 @@ public class ObjectDTO implements Serializable {
 
 
         String otherValue = ((ObjectDTO)other).getValue();
-        return getValue()==null ? otherValue==null : getValue().equals(otherValue);
+        return getValue() == null ? otherValue == null : getValue().equals(otherValue);
     }
 
     /*
      * (non-Javadoc)
      * @see java.lang.Object#hashCode()
      */
-    public int hashCode(){
-        return getValue()==null ? 0 : getValue().hashCode();
+    public int hashCode() {
+        return getValue() == null ? 0 : getValue().hashCode();
     }
 
     /**
      *
      * @return
      */
-    public long getHash(){
+    public long getHash() {
         return hash;
     }
 
@@ -213,9 +213,9 @@ public class ObjectDTO implements Serializable {
      */
     public String getSourceSmart() {
 
-        if (derivSourceUri!=null && derivSourceUri.trim().length()>0)
+        if (derivSourceUri != null && derivSourceUri.trim().length() > 0)
             return derivSourceUri;
-        else if (sourceUri!=null && sourceUri.trim().length()>0)
+        else if (sourceUri != null && sourceUri.trim().length() > 0)
             return sourceUri;
         else
             return null;
@@ -283,7 +283,7 @@ public class ObjectDTO implements Serializable {
      * @return
      */
     public long getSourceHashSmart() {
-        return derivSourceHash!=0 ? derivSourceHash : sourceHash;
+        return derivSourceHash != 0 ? derivSourceHash : sourceHash;
     }
 
     /**
@@ -297,7 +297,7 @@ public class ObjectDTO implements Serializable {
      *
      * @return
      */
-    public String getId(){
+    public String getId() {
 
         return FactsheetObjectId.format(this);
     }
