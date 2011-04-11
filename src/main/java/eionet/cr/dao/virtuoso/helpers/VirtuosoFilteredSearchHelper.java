@@ -17,35 +17,39 @@ import eionet.cr.util.Util;
 import eionet.cr.util.pagination.PagingRequest;
 
 /**
- *
+ * 
  * @author Enriko Käsper
- *
+ * 
  */
 public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
 
     private Map<String, String> filters;
     private Set<String> literalPredicates;
     private Boolean requiresFullTextSearch = null;
-    
+
     private static final String inferenceDef = "DEFINE input:inference";
 
-    public VirtuosoFilteredSearchHelper(Map<String, String> filters, Set<String> literalPredicates,
-            PagingRequest pagingRequest, SortingRequest sortingRequest) {
+    public VirtuosoFilteredSearchHelper(Map<String, String> filters,
+            Set<String> literalPredicates, PagingRequest pagingRequest,
+            SortingRequest sortingRequest) {
         super(pagingRequest, sortingRequest);
         // check the validity of filters
         if (filters == null || filters.isEmpty())
-            throw new CRRuntimeException("The map of filters must not be null or empty!");
+            throw new CRRuntimeException(
+                    "The map of filters must not be null or empty!");
         else {
             boolean atLeastOneValidEntry = false;
             for (Map.Entry<String, String> entry : filters.entrySet()) {
-                if (!StringUtils.isBlank(entry.getKey()) && !StringUtils.isBlank(entry.getValue())) {
+                if (!StringUtils.isBlank(entry.getKey())
+                        && !StringUtils.isBlank(entry.getValue())) {
                     atLeastOneValidEntry = true;
                     break;
                 }
             }
             if (atLeastOneValidEntry == false) {
-                throw new CRRuntimeException("The map of filters must contain at least one enrty" +
-                        " where key and value are not blank!");
+                throw new CRRuntimeException(
+                        "The map of filters must contain at least one enrty"
+                                + " where key and value are not blank!");
             }
         }
 
@@ -56,7 +60,10 @@ public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
     @Override
     protected String getOrderedQuery(List<Object> inParams) {
         StringBuilder strBuilder = new StringBuilder();
-        strBuilder.append(inferenceDef).append("'").append(GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME)).append("' ");
+        strBuilder.append(inferenceDef).append("'").append(
+                GeneralConfig
+                        .getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME))
+                .append("' ");
         strBuilder.append("select distinct ?s where { ?s ?p ?o ");
         strBuilder.append(getQueryParameters(inParams));
         strBuilder.append("} ORDER BY ");
@@ -76,7 +83,10 @@ public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
     @Override
     public String getUnorderedQuery(List<Object> inParams) {
         StringBuilder strBuilder = new StringBuilder();
-        strBuilder.append(inferenceDef).append("'").append(GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME)).append("' ");
+        strBuilder.append(inferenceDef).append("'").append(
+                GeneralConfig
+                        .getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME))
+                .append("' ");
         strBuilder.append("select distinct ?s where { ?s ?p ?o ");
         strBuilder.append(getQueryParameters(inParams));
         strBuilder.append("}");
@@ -109,27 +119,36 @@ public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
             String predicateUri = entry.getKey();
             String objectValue = entry.getValue();
 
-            if (!StringUtils.isBlank(predicateUri) && !StringUtils.isBlank(objectValue)) {
+            if (!StringUtils.isBlank(predicateUri)
+                    && !StringUtils.isBlank(objectValue)) {
 
                 String objectAlias = "?o".concat(String.valueOf(i));
-                String predicateAlias = "?p" .concat(String.valueOf(i));
-                
-                if (sortPredicate != null && predicateUri.equals(sortPredicate) && !hasSortingPredicate) {
+                String predicateAlias = "?p".concat(String.valueOf(i));
+
+                if (sortPredicate != null && predicateUri.equals(sortPredicate)
+                        && !hasSortingPredicate) {
                     objectAlias = "?oorderby";
                     hasSortingPredicate = true;
                 }
-                strBuilder.append(" . {{?s ").append(predicateAlias).append(" " ).append(objectAlias).append(" . ?s <").append(predicateUri).append("> ").append(objectAlias)
-                    .append("} . { ?s ").append(predicateAlias).append(" ").append(objectAlias);
+                strBuilder.append(" . {{?s ").append(predicateAlias)
+                        .append(" ").append(objectAlias).append(" . ?s <")
+                        .append(predicateUri).append("> ").append(objectAlias)
+                        .append("} . { ?s ").append(predicateAlias).append(" ")
+                        .append(objectAlias);
 
                 if (Util.isSurroundedWithQuotes(objectValue)) {
-                    strBuilder.append(" . FILTER (").append(objectAlias).append(" = ").append(objectValue).append(")");
+                    strBuilder.append(" . FILTER (").append(objectAlias)
+                            .append(" = ").append(objectValue).append(")");
                 } else if (URIUtil.isSchemedURI(objectValue)) {
-                    strBuilder.append(" . FILTER (").append(objectAlias).append(" = <").append(objectValue)
-                            .append("> || ").append(objectAlias).append(" = \"").append(objectValue).append("\")");
+                    strBuilder.append(" . FILTER (").append(objectAlias)
+                            .append(" = <").append(objectValue).append("> || ")
+                            .append(objectAlias).append(" = \"").append(
+                                    objectValue).append("\")");
                     // TODO check if it is a number??
                 } else {
-                    strBuilder.append(" . FILTER bif:contains(").append(objectAlias).append(", \"'").
-                            append(objectValue).append("'\")");
+                    strBuilder.append(" . FILTER bif:contains(").append(
+                            objectAlias).append(", \"'").append(objectValue)
+                            .append("'\")");
                     inParams.add(objectValue);
                     // TODO is it really needed in Virtuoso
                     requiresFullTextSearch = Boolean.TRUE;
@@ -139,26 +158,28 @@ public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
             }
         }
         if (!hasSortingPredicate && sortPredicate != null) {
-            strBuilder.append(" . OPTIONAL {?s <").append(sortPredicate).append("> ?oorderby }");
+            strBuilder.append(" . OPTIONAL {?s <").append(sortPredicate)
+                    .append("> ?oorderby }");
         }
         return strBuilder.toString();
 
     }
 
     /**
-     *
+     * 
      * @param predicateUri
      * @param objectValue
      * @return
      */
-    private boolean requireFullTextSearch(String predicateUri, String objectValue) {
+    private boolean requireFullTextSearch(String predicateUri,
+            String objectValue) {
 
         return (Util.isSurroundedWithQuotes(objectValue)
                 || URIUtil.isSchemedURI(objectValue) || !isLiteralPredicate(predicateUri)) == false;
     }
 
     /**
-     *
+     * 
      * @return
      */
     public boolean requiresFullTextSearch() {
@@ -182,7 +203,7 @@ public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
     }
 
     /**
-     *
+     * 
      * @param s
      * @return
      */
@@ -191,7 +212,7 @@ public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
     }
 
     /**
-     *
+     * 
      * @param key
      */
     protected void removeFilter(String key) {
