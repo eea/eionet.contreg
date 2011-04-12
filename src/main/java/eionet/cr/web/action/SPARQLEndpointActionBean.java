@@ -1,6 +1,7 @@
 package eionet.cr.web.action;
 
 import java.io.IOException;
+
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +14,7 @@ import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.StreamingResolution;
 import net.sourceforge.stripes.action.UrlBinding;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.openrdf.OpenRDFException;
 import org.openrdf.query.QueryLanguage;
@@ -88,15 +90,17 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             nrOfHits = 20;
         }
         
-        //If user has marked CR Inferencing checkbob, 
-        //then add inferencing command to the query
-        newQuery = query;
+        //        
+        // If user has marked CR Inferencing checkbob,
+        // then add inferencing command to the query
+ 
+        newQuery = StringEscapeUtils.unescapeHtml(query);
         if (useInferencing && !StringUtils.isBlank(query)) {
             String infCommand = "DEFINE input:inference '"
                     + GeneralConfig
                             .getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME)
                     + "'";
-            newQuery = infCommand + "\n" + query;
+            newQuery = infCommand + "\n" + newQuery;
         }
 
         if (accept != null && xmlFormats.contains(accept[0])) {
@@ -162,10 +166,14 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                 }
             } catch (RepositoryException rex) {
                 rex.printStackTrace();
-                throw new RuntimeException(rex.toString(), rex);
+                addWarningMessage("Repository exception: '" + rex.toString()
+                        + "'");
+//                throw new RuntimeException(rex.toString(), rex);
             } catch (Exception e) {
                 e.printStackTrace();
-                throw new RuntimeException(e.toString(), e);
+                addWarningMessage("Error processing SPARQL: '" + e.toString()
+                        + "'");
+                // throw new RuntimeException(e.toString(), e);
             } finally {
                 try {
                     if (out != null)
@@ -226,4 +234,5 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     public void setUseInferencing(boolean useInferencing) {
         this.useInferencing = useInferencing;
     }
+
 }

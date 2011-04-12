@@ -27,7 +27,7 @@
         <init-param>
             <param-name>Interceptor.Classes</param-name>
             <param-value>
-                eionet.cr.web.interceptor.ActionEventInterceptor
+                eionet.cr.web.interceptor.ActionEventInterceptor,com.samaxes.stripes.xss.XSSInterceptor
             </param-value>
         </init-param>
         <init-param>
