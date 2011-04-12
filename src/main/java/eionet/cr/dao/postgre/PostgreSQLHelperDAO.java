@@ -421,8 +421,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             if (StringUtils.isBlank(labelMap.get(uriHash))) {
                 String uri = uriMap.get(uriHash);
                 result.add(new Pair(uriHash, URIUtil.extractURILabel(uri, uri)));
-            }
-            else {
+            } else {
                 result.add(new Pair(uriHash, labelMap.get(uriHash)));
             }
         }
@@ -483,7 +482,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
         try {
             predicateUris = executeSQL(
                 getPredicatesUsedForTypeCache_SQL, values, new SingleObjectReader<Long>());
-        } catch(DAOException e) {
+        } catch (DAOException e) {
             logger.warn("Cache tables are not created yet. Continue with spo table");
             predicateUris = executeSQL(
                 getPredicatesUsedForType_SQL, values, new SingleObjectReader<Long>());
@@ -493,8 +492,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
         if (predicateUris == null || predicateUris.isEmpty()) {
             return new ArrayList<SubjectDTO>();
-        }
-        else {
+        } else {
             // get the SubjectDTO objects of the found predicates
             Map<Long, SubjectDTO> subjectsMap = new HashMap<Long, SubjectDTO>();
             for (Long hash : predicateUris) {
@@ -506,10 +504,9 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             reader.addPredicateHash(Hashes.spoHash(Predicates.RDFS_LABEL));
 
             // get the subjects data
-            if(useCache) {
+            if (useCache) {
                 getSubjectsData(reader, StringUtils.replace(getPredicatesUsedForTypeCache_SQL, "?", String.valueOf(Hashes.spoHash(typeUri))));
-            }
-            else {
+            } else {
                 getSubjectsData(reader);
             }
 
@@ -542,7 +539,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
                 subjectsMap.remove(hash);
             }
 
-            return new LinkedList<SubjectDTO>( subjectsMap.values());
+            return new LinkedList<SubjectDTO>(subjectsMap.values());
         }
     }
 
@@ -682,7 +679,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
         // validate arguments
         if (StringUtils.isBlank(rdfType))
             throw new IllegalArgumentException("rdfType must not be blank!");
-        if (limit<=0)
+        if (limit <= 0)
             throw new IllegalArgumentException("limit must be greater than 0!");
 
         // build SQL query
@@ -756,7 +753,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
         // validate arguments
         if (timestamp == null || timestamp.after(new Date()))
             throw new IllegalArgumentException("timestamp must not be null or after current time!");
-        if (limit<=0)
+        if (limit <= 0)
             throw new IllegalArgumentException("limit must be greater than 0!");
 
         // build SQL query
@@ -1819,7 +1816,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
      */
     public void deleteTriplesOfSource(long sourceHash) throws DAOException {
 
-        if (sourceHash<=0) {
+        if (sourceHash <= 0) {
             throw new IllegalArgumentException("The given source hash should be >0");
         }
 
@@ -1872,7 +1869,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
                 String subjectUri = uploadDTO.getSubjectUri();
                 String uriLabel = URIUtil.extractURILabel(subjectUri, SubjectDTO.NO_LABEL);
 
-                if(StringUtils.isBlank(currentLabel) && !StringUtils.isBlank(uriLabel))
+                if (StringUtils.isBlank(currentLabel) && !StringUtils.isBlank(uriLabel))
                     uploadDTO.setLabel(uriLabel);
                 else
                     uploadDTO.setLabel(uriLabel + " (" + currentLabel + ")");
