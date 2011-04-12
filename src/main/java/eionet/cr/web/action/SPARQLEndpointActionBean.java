@@ -89,11 +89,11 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         if (nrOfHits == 0) {
             nrOfHits = 20;
         }
-        
+
         //        
         // If user has marked CR Inferencing checkbob,
         // then add inferencing command to the query
- 
+
         newQuery = StringEscapeUtils.unescapeHtml(query);
         if (useInferencing && !StringUtils.isBlank(query)) {
             String infCommand = "DEFINE input:inference '"
@@ -166,13 +166,13 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                 }
             } catch (RepositoryException rex) {
                 rex.printStackTrace();
-                addWarningMessage("Repository exception: '" + rex.toString()
-                        + "'");
-//                throw new RuntimeException(rex.toString(), rex);
+                addWarningMessage("Repository exception: '"
+                        + StringEscapeUtils.escapeHtml(rex.toString()) + "'");
+                // throw new RuntimeException(rex.toString(), rex);
             } catch (Exception e) {
                 e.printStackTrace();
-                addWarningMessage("Error processing SPARQL: '" + e.toString()
-                        + "'");
+                addWarningMessage("Error processing SPARQL: '"
+                        + StringEscapeUtils.escapeHtml(e.toString()) + "'");
                 // throw new RuntimeException(e.toString(), e);
             } finally {
                 try {
