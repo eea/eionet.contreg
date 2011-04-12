@@ -93,8 +93,10 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         //        
         // If user has marked CR Inferencing checkbob,
         // then add inferencing command to the query
-
-        newQuery = StringEscapeUtils.unescapeHtml(query);
+        
+        newQuery = query;
+        
+        query = StringEscapeUtils.escapeHtml(query);
         if (useInferencing && !StringUtils.isBlank(query)) {
             String infCommand = "DEFINE input:inference '"
                     + GeneralConfig
