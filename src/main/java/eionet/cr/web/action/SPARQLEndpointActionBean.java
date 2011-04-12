@@ -91,7 +91,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         }
 
         //        
-        // If user has marked CR Inferencing checkbob,
+        // If user has marked CR Inferencing checkbox,
         // then add inferencing command to the query
         
         newQuery = query;
@@ -99,8 +99,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         query = StringEscapeUtils.escapeHtml(query);
         if (useInferencing && !StringUtils.isBlank(query)) {
             String infCommand = "DEFINE input:inference '"
-                    + GeneralConfig
-                            .getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME)
+                    + GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME)
                     + "'";
             newQuery = infCommand + "\n" + newQuery;
         }
@@ -140,8 +139,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
             try {
 
-                Repository myRepository = new VirtuosoRepository(url, username,
-                        password);
+                Repository myRepository = new VirtuosoRepository(url, username, password);
                 myRepository.initialize();
                 RepositoryConnection con = myRepository.getConnection();
 
