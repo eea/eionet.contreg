@@ -60,13 +60,13 @@ public class Pagination {
      * @param curPageNum
      * @param urlPath
      */
-    private Pagination(int matchCount, int numOfPages, int curPageNum, String urlPath, QueryString queryString){
+    private Pagination(int matchCount, int numOfPages, int curPageNum, String urlPath, QueryString queryString) {
 
         this.matchCount = matchCount;
         this.numOfPages = numOfPages;
         this.curPageNum = curPageNum;
         this.urlPath = urlPath;
-        this.queryString = queryString==null ? QueryString.createQueryString() :  queryString;
+        this.queryString = queryString == null ? QueryString.createQueryString() :  queryString;
 
         constructPages();
     }
@@ -78,7 +78,7 @@ public class Pagination {
      * @param urlPath
      * @return
      */
-    public static Pagination createPagination(int matchCount, int curPageNum, String urlPath, QueryString queryString){
+    public static Pagination createPagination(int matchCount, int curPageNum, String urlPath, QueryString queryString) {
 
         int numOfPages = matchCount / pageLength();
         if (matchCount % pageLength() != 0)
@@ -88,7 +88,7 @@ public class Pagination {
             urlPath = urlPath.substring(1);
         }
 
-        if (numOfPages>1)
+        if (numOfPages > 1)
             return new Pagination(matchCount, numOfPages, Math.min(numOfPages, Math.max(1, curPageNum)), urlPath, queryString);
         else
             return null;
@@ -125,33 +125,34 @@ public class Pagination {
     /**
      *
      */
-    private void constructPages(){
+    private void constructPages() {
 
-        if (curPageNum>1){
+        if (curPageNum > 1) {
             first = createPage(1);
-            prev = createPage(curPageNum-1);
+            prev = createPage(curPageNum - 1);
         }
 
-        if (curPageNum<numOfPages){
+        if (curPageNum < numOfPages) {
             last = createPage(numOfPages);
-            next = createPage(curPageNum+1);
+            next = createPage(curPageNum + 1);
         }
 
-        int startPage = Math.max(Math.min(curPageNum - groupSize()/2, numOfPages-(groupSize()-1)), 1);
+        int startPage = Math.max(Math.min(curPageNum - groupSize() / 2, numOfPages - (groupSize() - 1)), 1);
         int endPage = Math.min(startPage + groupSize() - 1, numOfPages);
 
         group = new ArrayList<Page>();
-        for (int i=startPage; i<=endPage; i++){
+        for (int i = startPage; i <= endPage; i++) {
             group.add(createPage(i));
         }
     }
 
     /**
+     * Creates the query string to append to a link for a given page number.
      *
      * @param newPageNum
      * @return
      */
-    private String getPageHref(int pageNum){
+    private String getPageHref(int pageNum) {
 
         StringBuffer buf = new StringBuffer(urlPath);
         return buf.append("?").append(queryString.setParameterValue(PAGE_NUM_PARAM, String.valueOf(pageNum)).toURLFormat()).toString();
@@ -162,11 +163,11 @@ public class Pagination {
      * @param pageNum
      * @return
      */
-    private Page createPage(int pageNum){
+    private Page createPage(int pageNum) {
 
         Page page = new Page();
         page.setNumber(pageNum);
-        page.setSelected(curPageNum==pageNum);
+        page.setSelected(curPageNum == pageNum);
         page.setHref(getPageHref(pageNum));
 
         return page;
@@ -197,7 +198,7 @@ public class Pagination {
      *
      * @return
      */
-    public static int pageLength(){
+    public static int pageLength() {
         return DEFAULT_ITEMS_PER_PAGE; // TODO should probably be made dynamic somehow.
     }
 
@@ -205,7 +206,7 @@ public class Pagination {
      *
      * @return
      */
-    public static int groupSize(){
+    public static int groupSize() {
         return 9; // TODO should probably not be hard-coded
     }
 
@@ -213,14 +214,14 @@ public class Pagination {
      * @return the rowsFrom
      */
     public int getRowsFrom() {
-        return (curPageNum-1)*pageLength()+1;
+        return (curPageNum - 1) * pageLength() + 1;
     }
 
     /**
      * @return the rowsTo
      */
     public int getRowsTo() {
-        return Math.min(curPageNum*pageLength(), matchCount);
+        return Math.min(curPageNum * pageLength(), matchCount);
     }
 
     /**

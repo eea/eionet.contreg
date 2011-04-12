@@ -29,6 +29,7 @@ import org.apache.commons.lang.StringUtils;
 import eionet.cr.dao.util.SearchExpression;
 
 /**
+ * Full text queries.
  *
  * @author risto
  *
@@ -45,7 +46,7 @@ public class VirtuosoFullTextQuery {
     private static HashSet<String> booleanOperators;
 
     /** */
-    static{
+    static {
         booleanOperators = new HashSet<String>();
         booleanOperators.add("&");
         booleanOperators.add("|");
@@ -69,7 +70,7 @@ public class VirtuosoFullTextQuery {
      * @param query
      * @throws ParseException
      */
-    private VirtuosoFullTextQuery(String query) throws ParseException{
+    private VirtuosoFullTextQuery(String query) throws ParseException {
         this.query = query;
         parse();
     }
@@ -80,7 +81,7 @@ public class VirtuosoFullTextQuery {
      * @return VirtuosoFullTextQuery
      * @throws ParseException
      */
-    public static VirtuosoFullTextQuery parse(String query) throws ParseException{
+    public static VirtuosoFullTextQuery parse(String query) throws ParseException {
 
         return new VirtuosoFullTextQuery(query);
     }
@@ -91,23 +92,23 @@ public class VirtuosoFullTextQuery {
      * @return VirtuosoFullTextQuery
      * @throws ParseException
      */
-    public static VirtuosoFullTextQuery parse(SearchExpression searchExpression) throws ParseException{
+    public static VirtuosoFullTextQuery parse(SearchExpression searchExpression) throws ParseException {
 
-        return new VirtuosoFullTextQuery(searchExpression==null ? "" : searchExpression.toString());
+        return new VirtuosoFullTextQuery(searchExpression == null ? "" : searchExpression.toString());
     }
 
     /**
      * @throws ParseException
      *
      */
-    private void parse() throws ParseException{
+    private void parse() throws ParseException {
 
-        if (query==null){
+        if (query == null) {
             return;
         }
 
         query = query.trim();
-        if (query.length()==0){
+        if (query.length() == 0) {
             return;
         }
 
@@ -115,32 +116,31 @@ public class VirtuosoFullTextQuery {
 
         int unclosedQuotes = -1;
         int len = query.length();
-        for (int i=0; i<len; i++){
-            if (query.charAt(i)=='"'){
-                if (unclosedQuotes!=-1){
-                    String phrase = query.substring(unclosedQuotes+1, i);
-                    if (phrase.trim().length()>=MIN_WORD_LENGTH){
-                        if (StringUtils.containsAny(phrase, " \t\r\n\f")){
-                            phrases.add(query.substring(unclosedQuotes+1, i));
+        for (int i = 0; i < len; i++) {
+            if (query.charAt(i) == '"') {
+                if (unclosedQuotes != -1) {
+                    String phrase = query.substring(unclosedQuotes + 1, i);
+                    if (phrase.trim().length() >= MIN_WORD_LENGTH) {
+                        if (StringUtils.containsAny(phrase, " \t\r\n\f")) {
+                            phrases.add(query.substring(unclosedQuotes + 1, i));
                         }
                     }
                     unclosedQuotes = -1;
-                }
-                else{
+                } else {
                     unclosedQuotes = i;
                 }
             }
         }
-        
+
         //remove phrases from expression
-        if(phrases != null){
-            for(String phrase : phrases){
-                query = query.replaceAll("\""+phrase+"\"", "");
+        if (phrases != null) {
+            for (String phrase : phrases) {
+                query = query.replaceAll("\"" + phrase + "\"", "");
             }
         }
 
         // there must be no unclosed quotes left
-        if (unclosedQuotes!=-1){
+        if (unclosedQuotes != -1) {
             throw new ParseException("Unclosed quotes at index " + unclosedQuotes, unclosedQuotes);
         }
 
@@ -149,12 +149,12 @@ public class VirtuosoFullTextQuery {
         //remove any redundant logical operands and too short words from the beginning of query
         query = removeOperands(st);
         st = new StringTokenizer(query, " \t\r\n\f\"");
-        while (st.hasMoreTokens()){
+        while (st.hasMoreTokens()) {
 
             String token = st.nextToken();
-            
-            if(token.equals("&")) token = "AND";
-            if(token.equals("|")) token = "OR";
+
+            if (token.equals("&")) token = "AND";
+            if (token.equals("|")) token = "OR";
 
             // If this token is a PostgreSQL full-text query's boolean operator
             // then append it to the parsed query only if the previous token
@@ -166,76 +166,80 @@ public class VirtuosoFullTextQuery {
 
             boolean appendThisToken = false;
 
-            if (isBooleanOperator(token)){
-                if (prevToken!=null && !isBooleanOperator(prevToken)){
+            if (isBooleanOperator(token)) {
+                if (prevToken != null && !isBooleanOperator(prevToken)) {
                     appendThisToken = true;
                 }
-            }
-            else{
-                if (token.length()>=MIN_WORD_LENGTH){
+            } else {
+                if (token.length() >= MIN_WORD_LENGTH) {
 
                     appendThisToken = true;
-                    if (prevToken!=null && !isBooleanOperator(prevToken)){
+                    if (prevToken != null && !isBooleanOperator(prevToken)) {
                         parsedQuery.append(" ").append(DEFAULT_BOOLEAN_OPERATOR);
                     }
                 }
             }
 
-            if (appendThisToken){
+            if (appendThisToken) {
 
-                if (parsedQuery.length()>0){
+                if (parsedQuery.length() > 0) {
                     parsedQuery.append(" ");
                 }
-                
-                if(isBooleanOperator(token))
+
+                if (isBooleanOperator(token))
                     parsedQuery.append(token);
                 else
                     parsedQuery.append("'").append(token).append("'");
-                
+
                 prevToken = token;
             }
         }
-        
+
         //add phrases to query
-        if(phrases != null && phrases.size() > 0){
-            for(String phrase : phrases){
-                if(parsedQuery != null && parsedQuery.length() > 0)
+        if (phrases != null && phrases.size() > 0) {
+            for (String phrase : phrases) {
+                if (parsedQuery != null && parsedQuery.length() > 0)
                     parsedQuery.append(" and ");
                 parsedQuery.append("'").append(phrase).append("'");
             }
         }
     }
-    
-    //remove any redundant logical operands and too short words from the beginning of query
+
+    /**
+     * Remove any redundant logical operands and too short words from the beginning of query.
+     *
+     * @param st
+     * @return the cleaned query string
+     */
     private String removeOperands(StringTokenizer st) {
-        
+
         StringBuffer ret = new StringBuffer();
         boolean nonLogicalTokenFound = false;
-        
-        if(st != null){
-            while (st.hasMoreTokens()){
+
+        if (st != null) {
+            while (st.hasMoreTokens()) {
                 String token = st.nextToken();
-                
-                if(token.equals(" ") || isBooleanOperator(token)){
-                    if(nonLogicalTokenFound){
+
+                if (token.equals(" ") || isBooleanOperator(token)) {
+                    if (nonLogicalTokenFound) {
                         ret.append(token).append(" ");
                     }
-                } else if(!isBooleanOperator(token) && token.length() >= MIN_WORD_LENGTH){
+                } else if (!isBooleanOperator(token) && token.length() >= MIN_WORD_LENGTH) {
                     ret.append(token).append(" ");
                     nonLogicalTokenFound = true;
                 }
             }
         }
-        
+
         return ret.toString();
     }
 
     /**
-     *
+     * Check if the string is a boolean operator.
      * @param s
-     * @return
+     * @return true if the string is in the list of boolean operators
      */
-    private boolean isBooleanOperator(String s){
+    private boolean isBooleanOperator(String s) {
         return booleanOperators.contains(s);
     }
 
@@ -243,12 +247,12 @@ public class VirtuosoFullTextQuery {
      * (non-Javadoc)
      * @see java.lang.Object#toString()
      */
-    public String toString(){
+    public String toString() {
         return new StringBuffer("parsedQuery=[").
         append(parsedQuery).append("], phrases=").append(phrases).toString();
     }
 
-    public String getParsedQuery(){
+    public String getParsedQuery() {
         return parsedQuery.toString();
     }
 
@@ -264,7 +268,7 @@ public class VirtuosoFullTextQuery {
      * @param args
      * @throws ParseException
      */
-    public static void main(String[] args) throws ParseException{
+    public static void main(String[] args) throws ParseException {
 
 //      String s = "mina \"olen robert\" ja sina oled (paha | kuri)";
         String s = "kukaj OR puke";
@@ -277,7 +281,7 @@ public class VirtuosoFullTextQuery {
 //      System.out.println(Arrays.binarySearch(booleanOperators, "AND"));
 
 //      StringTokenizer st = new StringTokenizer("jaanus kala\"mees", " \"");
-//      while (st.hasMoreTokens()){
+//      while (st.hasMoreTokens()) {
 //          System.out.println(st.nextToken());
 //      }
 
@@ -292,7 +296,7 @@ public class VirtuosoFullTextQuery {
 //
 //      HashSet<Term> terms = new HashSet<Term>();
 //      query.extractTerms(terms);
-//      for (Term term : terms){
+//      for (Term term : terms) {
 //          System.out.println(term);
 //      }
     }
