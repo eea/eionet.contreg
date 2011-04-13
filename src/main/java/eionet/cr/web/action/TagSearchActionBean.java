@@ -59,7 +59,7 @@ public class TagSearchActionBean  extends AbstractSearchActionBean<SubjectDTO> {
     private static final String SELECTED_TAGS_CACHE = TypeSearchActionBean.class.getName() + ".selectedTagsCache";
 
     private List<TagDTO> tagCloud;
-    private String cloudSorted="name";
+    private String cloudSorted = "name";
     private String searchTag;
     //selected tags
     private List<String> selectedTags;
@@ -68,7 +68,7 @@ public class TagSearchActionBean  extends AbstractSearchActionBean<SubjectDTO> {
 
     private int tagCloudSize = Integer.parseInt(GeneralConfig.getProperty(GeneralConfig.TAGCOLUD_TAGSEARCH_SIZE));
 
-    static{
+    static {
         columns = new ArrayList<SearchResultColumn>();
 
         SubjectPredicateColumn col = new SubjectPredicateColumn();
@@ -112,15 +112,15 @@ public class TagSearchActionBean  extends AbstractSearchActionBean<SubjectDTO> {
     @Override
     public Resolution search() throws DAOException {
 
-        if((searchTag==null || searchTag.isEmpty()) &&
-                (selectedTags==null || selectedTags.isEmpty())){
+        if ((searchTag == null || searchTag.isEmpty()) &&
+                (selectedTags == null || selectedTags.isEmpty())) {
             return new ForwardResolution(TAG_SEARCH_PATH);
         }
-        if(selectedTags==null){
+        if (selectedTags == null) {
             selectedTags = new LinkedList<String>();
         }
 
-        if(!selectedTags.contains(searchTag) && searchTag!=null && !searchTag.isEmpty()){
+        if (!selectedTags.contains(searchTag) && searchTag != null && !searchTag.isEmpty()) {
             selectedTags.add(getSearchTag().trim());
         }
 
@@ -153,19 +153,18 @@ public class TagSearchActionBean  extends AbstractSearchActionBean<SubjectDTO> {
     @SuppressWarnings("unchecked")
     public Resolution removeTag() throws Exception {
         selectedTags = (List<String>)getSession().getAttribute(SELECTED_TAGS_CACHE);
-        if (selectedTags!=null && !selectedTags.isEmpty()){
+        if (selectedTags != null && !selectedTags.isEmpty()) {
             selectedTags.remove(searchTag);
         }
-        searchTag="";
+        searchTag = "";
 
-        Resolution result=null;
-        if(selectedTags.size()==0){
+        Resolution result = null;
+        if (selectedTags.size() == 0) {
             result = preparePage();
-        }
-        else{
+        } else {
             result = search();
         }
-        if(result instanceof ForwardResolution){
+        if (result instanceof ForwardResolution) {
             ((ForwardResolution)result).addParameter("searchTag", "");
         }
         return result;

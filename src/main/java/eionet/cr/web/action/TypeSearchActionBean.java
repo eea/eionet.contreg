@@ -111,11 +111,11 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
      * @throws Exception
      */
     @DefaultHandler
-    public Resolution preparePage () throws Exception {
+    public Resolution preparePage() throws Exception {
         Enumeration<String> names = getContext().getRequest().getParameterNames();
         while(names.hasMoreElements()) {
             String next = names.nextElement();
-            if(next.startsWith("removeFilter_")) {
+            if (next.startsWith("removeFilter_")) {
                 clearFilter = next.replaceFirst("removeFilter_", "");
                 return removeFilter();
             }
@@ -126,24 +126,24 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 
 
     /**
-     * Returns the list of export formats
+     * Returns the list of export formats.
      */
     public ExportFormat[] getExportFormats() {
         return ExportFormat.values();
     }
 
     /**
-     * Returns the list of export formats
+     * Returns the list of export formats.
      */
     public boolean isShowExcelExport() {
-        if(matchCount>XlsExporter.getRowsLimit()) {
+        if (matchCount > XlsExporter.getRowsLimit()) {
             return false;
         }
         return true;
     }
 
     /**
-     * exports search result as a file.
+     * Exports search result as a file.
      *
      * @return
      * @throws Exception
@@ -193,8 +193,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 
         if (!StringUtils.isBlank(type)) {
             return new RedirectResolution(FactsheetActionBean.class).addParameter("uri", type);
-        }
-        else
+        } else
             return new ForwardResolution(TYPE_SEARCH_PATH);
     }
 
@@ -224,7 +223,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
     public Resolution removeFilter() {
 
         Map<String, Map<String, String>> cache = (Map<String, Map<String, String>>) getSession().getAttribute(SELECTED_FILTERS_CACHE);
-        if(cache != null && cache.containsKey(type) && cache.get(type) != null
+        if (cache != null && cache.containsKey(type) && cache.get(type) != null
                 && cache.get(type).containsKey(clearFilter)) {
             cache.get(type).remove(clearFilter);
         }
@@ -238,7 +237,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
      * @throws DAOException
      */
     public Resolution applyFilters() throws DAOException {
-        if(selectedFilters != null && !selectedFilters.isEmpty()) {
+        if (selectedFilters != null && !selectedFilters.isEmpty()) {
             //save selected filters for future use
             Map<String, Map<String, String>> cache = (Map<String, Map<String, String>>) getSession().getAttribute(SELECTED_FILTERS_CACHE);
             if (cache != null && cache.containsKey(type)) {
@@ -312,7 +311,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
     }
 
     /**
-     * restores actionBean state from session.
+     * Restores actionBean state from session.
      */
     private void restoreStateFromSession() throws DAOException {
 
@@ -323,7 +322,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 
         //check if user has previously selected some columns.
         Map<String, List<String>> cache = (Map<String, List<String>>) getSession().getAttribute(SELECTED_COLUMNS_CACHE);
-        if (cache != null && cache.containsKey(type) ) {
+        if (cache != null && cache.containsKey(type)) {
             selectedColumns = cache.get(type);
         } else {
             selectedColumns = new LinkedList<String>();
@@ -347,8 +346,8 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
                 selectedFilters = filterCache.get(type);
                 displayFilters = new HashMap<String, Pair<String, String>>();
                 Map<String, String> availableColumns = getAvailableColumns();
-                for(Entry<String, String> entry : selectedFilters.entrySet()) {
-                    if(availableColumns.containsKey(entry.getKey())) {
+                for (Entry<String, String> entry : selectedFilters.entrySet()) {
+                    if (availableColumns.containsKey(entry.getKey())) {
                         displayFilters.put(
                                 availableColumns.get(entry.getKey()),
                                 new Pair<String, String>(entry.getKey(), entry.getValue()));
@@ -401,7 +400,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
         String actionParameter = "search=Search&amp;type=" + eionet.cr.util.Util.urlEncode(type);
         //add every selected column to the output
         if (selectedColumns != null && !selectedColumns.isEmpty()) {
-            for(String string : selectedColumns) {
+            for (String string : selectedColumns) {
                 for (Entry<String, String> pair : getAvailableColumns().entrySet()) {
                     if (pair.getKey().equals(string)) {
                         columns.add(new SubjectPredicateColumn(pair.getValue(), true, string, actionParameter));
@@ -455,8 +454,8 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
             } else {
                 // Must be split by last '/'
                 String [] tokens = sourceTypes.get(i).getLeft().split("/");
-                for (int j=0; j<tokens.length - 1; j++) {
-                    currentPrefix += tokens[j]+"/";
+                for (int j = 0; j < tokens.length - 1; j++) {
+                    currentPrefix += tokens[j] + "/";
                 }
             }
 
@@ -548,7 +547,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
             result.put(Predicates.RDFS_LABEL, "Title");
             if (usedPredicates != null && !usedPredicates.isEmpty()) {
 
-                for(SubjectDTO subject : usedPredicates) {
+                for (SubjectDTO subject : usedPredicates) {
                     if (subject != null && !subject.isAnonymous()) {
 
                         String uri = subject.getUri();
@@ -720,11 +719,12 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
     }
 
     /**
+     * Case-insensitive string comparator that handles null arguments.
      *
      * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
      *
      */
-    private class CaseInsensitiveStringComparator implements Comparator<String>{
+    private class CaseInsensitiveStringComparator implements Comparator<String> {
 
         /*
          * (non-Javadoc)

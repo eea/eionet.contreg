@@ -5,39 +5,39 @@
     <crfn:form action="/source.action" focus="">
         <stripes:hidden name="harvestSource.sourceId" />
         <stripes:hidden name="harvestSource.url" />
-        <table>
+        <table class="datatable">
             <tr>
-                <td>URL:</td>
+                <th scope="row">URL:</th>
                 <td><a
                     href="${pageContext.request.contextPath}/factsheet.action?uri=${crfn:urlEncode(actionBean.harvestSource.url)}"><c:out
                     value="${actionBean.harvestSource.url}" /></a></td>
             </tr>
             <tr>
-                <td>E-mails:</td>
+                <th scope="row">E-mails:</th>
                 <td><c:out value="${actionBean.harvestSource.emails}" /></td>
             </tr>
             <tr>
-                <td>Date created:</td>
+                <th scope="row">Date created:</th>
                 <td><c:out value="${actionBean.harvestSource.timeCreated}" /></td>
             </tr>
             <tr>
-                <td>Harvest interval:</td>
+                <th scope="row">Harvest interval:</th>
                 <td><c:out value="${actionBean.intervalMinutesDisplay}" /></td>
             </tr>
             <tr>
-                <td>Last harvest:</td>
+                <th scope="row">Last harvest:</th>
                 <td><c:out value="${actionBean.harvestSource.lastHarvest}" /></td>
             </tr>
             <tr>
-                <td>Urgency score:</td>
+                <th scope="row">Urgency score:</th>
                 <td>${actionBean.urgencyScoreFormatted}</td>
             </tr>
             <tr>
-                <td>"Schema" source:</td>
+                <th scope="row">"Schema" source:</th>
                 <td>${actionBean.schemaSourceDisplay}</td>
             </tr>
             <tr>
-                <td>"Priority" source:</td>
+                <th scope="row">"Priority" source:</th>
                 <td>${actionBean.prioritySourceDisplay}</td>
             </tr>
             <c:if test="${actionBean.harvestSource.unavailable}">

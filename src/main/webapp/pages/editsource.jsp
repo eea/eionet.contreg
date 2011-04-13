@@ -11,13 +11,15 @@
         <crfn:form action="/source.action" focus="">
             <stripes:hidden name="harvestSource.sourceId"/>
             <table>
+						    <col style="width:9em"/>
+								<col/>
                 <tr>
                     <td>URL:</td>
-                    <td><stripes:text name="harvestSource.url" size="100"/></td>
+                    <td><stripes:text name="harvestSource.url" size="100" style="width:100%"/></td>
                 </tr>
                 <tr>
                     <td>E-mails:</td>
-                    <td><stripes:text name="harvestSource.emails" size="100"/></td>
+                    <td><stripes:text name="harvestSource.emails" size="100" style="width:100%"/></td>
                 </tr>
                 <tr>
                     <td>Harvest interval:</td>

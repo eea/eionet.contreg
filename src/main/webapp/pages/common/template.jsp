@@ -9,8 +9,9 @@
     <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
         <head>
             <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+						<meta name="viewport" content="initial-scale=1.0" />
             <meta name="Publisher" content="EEA, The European Environment Agency" />
-            <meta name="Rights" content="Copyright EEA Copenhagen 2003-2008" />
+            <meta name="Rights" content="Copyright EEA Copenhagen 2003-2011" />
             <base href="<%= BaseUrl.getBaseUrl(request) %>"/>
 
             <title>Content Registry - ${pageTitle}</title>
