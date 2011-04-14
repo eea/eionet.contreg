@@ -48,21 +48,21 @@ public class URLUtil {
      */
     public static boolean isURL(String s) {
 
-        if (s==null || s.trim().length()==0)
+        if (s == null || s.trim().length() == 0)
             return false;
 
-        try{
+        try {
             URL url = new URL(s);
             return true;
-        }
-        catch (MalformedURLException e) {
+        } catch (MalformedURLException e) {
             return false;
         }
     }
 
     /**
+     * Create the User-agent header value from config file.
      *
-     * @return
+     * @return the User-agent value.
      */
     public static String userAgentHeader() {
 
@@ -73,20 +73,21 @@ public class URLUtil {
     }
 
     /**
+     * Connect to the URL and check if it is modified since the timestamp argument.
      *
      * @param timestamp
-     * @return
+     * @return true if it is modified.
      */
     public static Boolean isModifiedSince(String urlString, long timestamp) {
 
         if (!URLUtil.isURL(urlString))
             return false;
 
-        if (timestamp==0)
+        if (timestamp == 0)
             return true;
 
         InputStream inputStream = null;
-        try{
+        try {
             URL url = new URL(StringUtils.substringBefore(urlString, "#"));
             URLConnection urlConnection = replaceURLSpaces(url).openConnection();
             urlConnection.setRequestProperty("User-Agent", userAgentHeader());
@@ -94,60 +95,62 @@ public class URLUtil {
             inputStream = urlConnection.getInputStream();
 
             int responseCode = ((HttpURLConnection)urlConnection).getResponseCode();
-            if (responseCode==HttpURLConnection.HTTP_NOT_MODIFIED) {
+            if (responseCode == HttpURLConnection.HTTP_NOT_MODIFIED) {
+                //TODO: At the top of the method the simpler "false" is returned.
+                //Here we use a class member.
                 return Boolean.FALSE;
-            }
-            else if (responseCode==HttpURLConnection.HTTP_OK) {
+            } else if (responseCode == HttpURLConnection.HTTP_OK) {
                 return Boolean.TRUE;
-            }
-            else{
+            } else {
+                //TODO: Is that a "false"?
                 return null;
             }
-        }
-        catch (IOException ioe) {
+        } catch (IOException ioe) {
             return null;
-        }
-        finally{
-            if (inputStream!=null) {
-                try{ inputStream.close(); } catch (IOException ioe){}
+        } finally {
+            if (inputStream != null) {
+                try { inputStream.close(); } catch (IOException ioe) {}
             }
         }
     }
 
     /**
+     * Connect to the URL and check if it exists at the remote end.
+     * Local ids are removed (the part after the '#') before connecting.
      *
-     * @param uri
-     * @return
+     * @param uri the URL to check.
+     * @return true is the URL does <b>NOT</b> exist.
      */
     public static boolean isNotExisting(String urlStr) {
 
         int responseCode = -1;
         IOException ioe = null;
         InputStream inputStream = null;
-        try{
+        try {
             URL url = new URL(StringUtils.substringBefore(urlStr, "#"));
             URLConnection urlConnection = replaceURLSpaces(url).openConnection();
             inputStream = urlConnection.getInputStream();
             responseCode = ((HttpURLConnection)urlConnection).getResponseCode();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             ioe = e;
-        }
-        finally{
-            if (inputStream!=null) {
-                try{inputStream.close();}catch (IOException e){}
+        } finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {}
             }
         }
 
         return    ioe instanceof MalformedURLException
                || ioe instanceof UnknownHostException
-               || (responseCode>=400 && responseCode<=499)
-               || responseCode==501
-               || responseCode==505;
+               || (responseCode >= 400 && responseCode <= 499)
+               || responseCode == HttpURLConnection.HTTP_NOT_IMPLEMENTED 
+               || responseCode == HttpURLConnection.HTTP_VERSION;
     }
 
 
     /**
+     * A cross-the-stream-to-get-water replacement for {@link java.net.URL#getHost()}.
      *
      * @param uri
      * @param dflt
@@ -166,7 +169,7 @@ public class URLUtil {
 
             }
             return host;
-        }else {
+        } else {
             return null;
         }
     }
@@ -177,8 +180,8 @@ public class URLUtil {
      * @return
      * @throws MalformedURLException
      */
-    public static URL replaceURLSpaces(URL url) throws MalformedURLException{
+    public static URL replaceURLSpaces(URL url) throws MalformedURLException {
 
-        return url==null ? null : new URL(StringUtils.replace(url.toString(), " ", "%20"));
+        return url == null ? null : new URL(StringUtils.replace(url.toString(), " ", "%20"));
     }
 }
