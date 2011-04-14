@@ -1,5 +1,5 @@
 /**
- * Dataset readers for DAO methods
+ * Dataset readers for DAO methods.
  */
 
 package eionet.cr.dao.readers;

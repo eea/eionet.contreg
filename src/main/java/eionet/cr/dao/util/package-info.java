@@ -1,5 +1,5 @@
 /**
- * CR DAO methods for Virtuoso repository
+ * CR DAO methods for Virtuoso repository.
  */
 
 package eionet.cr.dao.util;

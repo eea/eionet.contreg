@@ -33,7 +33,7 @@ import eionet.cr.util.export.SubjectExportEvent;
  * @author kaspeenr
  *
  */
-public abstract class ResultSetExportReader<T> extends ResultSetMixedReader<T>{
+public abstract class ResultSetExportReader<T> extends ResultSetMixedReader<T> {
 
     /** */
     protected List<T> resultList = new ArrayList<T>();
@@ -48,7 +48,7 @@ public abstract class ResultSetExportReader<T> extends ResultSetMixedReader<T>{
      *
      * @param exporter
      */
-    public ResultSetExportReader(SubjectExportEvent exporter){
+    public ResultSetExportReader(SubjectExportEvent exporter) {
         this.exporter = exporter;
     }
 
@@ -57,7 +57,7 @@ public abstract class ResultSetExportReader<T> extends ResultSetMixedReader<T>{
      * @see eionet.cr.util.sql.SQLResultSetReader#startResultSet(java.sql.ResultSetMetaData)
      */
 
-    public void startResultSet(ResultSetMetaData resultSetMetaData){
+    public void startResultSet(ResultSetMetaData resultSetMetaData) {
         this.resultSetMetaData = resultSetMetaData;
     }
 

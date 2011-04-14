@@ -29,7 +29,7 @@ public class GraphUrisReader<T> extends ResultSetMixedReader<T>{
     public void readRow(BindingSet bindingSet) throws ResultSetReaderException {
 
         Value graphValue = bindingSet.getValue("g");
-        if(graphValue != null){
+        if(graphValue != null) {
             // expecting the URI of the matching graph to be in column "g"
             String graphUri = graphValue.stringValue();
             resultList.add((T)graphUri);

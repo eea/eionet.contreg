@@ -33,7 +33,7 @@ import eionet.cr.dao.util.SubProperties;
  *
  */
 @SuppressWarnings("rawtypes")
-public class SubPropertiesReader extends ResultSetMixedReader{
+public class SubPropertiesReader extends ResultSetMixedReader {
 
     /** */
     private SubProperties subProperties;
@@ -44,7 +44,7 @@ public class SubPropertiesReader extends ResultSetMixedReader{
      */
     public SubPropertiesReader(SubProperties subProperties) {
 
-        if (subProperties==null)
+        if (subProperties == null)
             throw new IllegalArgumentException();
 
         this.subProperties = subProperties;

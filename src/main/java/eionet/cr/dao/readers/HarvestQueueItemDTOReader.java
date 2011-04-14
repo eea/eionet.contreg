@@ -31,7 +31,7 @@ import eionet.cr.util.sql.SQLResultSetBaseReader;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class HarvestQueueItemDTOReader extends SQLResultSetBaseReader<UrgentHarvestQueueItemDTO>{
+public class HarvestQueueItemDTOReader extends SQLResultSetBaseReader<UrgentHarvestQueueItemDTO> {
 
     /*
      * (non-Javadoc)

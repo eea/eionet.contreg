@@ -54,7 +54,7 @@ public class RODDeliveryReader extends ResultSetMixedReader{
                 Predicates.RDF_TYPE};
 
         predicateUrisByHashes = new HashMap<Long,String>();
-        for (int i=0; i<ss.length; i++){
+        for (int i = 0; i < ss.length; i++) {
             predicateUrisByHashes.put(Long.valueOf(Hashes.spoHash(ss[i])), ss[i]);
         }
     }
@@ -63,7 +63,7 @@ public class RODDeliveryReader extends ResultSetMixedReader{
     private HashMap<Long, Hashtable<String,Vector<String>>> subjectsMap =
         new HashMap<Long, Hashtable<String,Vector<String>>>();
 
-    public RODDeliveryReader(){
+    public RODDeliveryReader() {
 
     }
 
@@ -76,7 +76,7 @@ public class RODDeliveryReader extends ResultSetMixedReader{
         // get (or create and put) the subject's hashtable
         Long subjectHash = Long.valueOf(rs.getLong("SUBJECT_HASH"));
         Hashtable<String,Vector<String>> subjectHashtable = subjectsMap.get(subjectHash);
-        if (subjectHashtable==null){
+        if (subjectHashtable == null) {
             subjectHashtable = new Hashtable<String,Vector<String>>();
             subjectsMap.put(subjectHash, subjectHashtable);
         }
@@ -84,22 +84,22 @@ public class RODDeliveryReader extends ResultSetMixedReader{
         // skip if predicate not required
         String predicateUri = predicateUrisByHashes.get(
                 Long.valueOf(rs.getLong("PREDICATE_HASH")));
-        if (predicateUri==null || predicateUri.equals(Predicates.RDF_TYPE)){
+        if (predicateUri == null || predicateUri.equals(Predicates.RDF_TYPE)) {
             return;
         }
 
         // skip literal objects if Predicates.ROD_OBLIGATION_PROPERTY
         boolean isLiteral = YesNoBoolean.parse(rs.getString("LIT_OBJ"));
-        if (isLiteral && predicateUri.equals(Predicates.ROD_OBLIGATION_PROPERTY)){
+        if (isLiteral && predicateUri.equals(Predicates.ROD_OBLIGATION_PROPERTY)) {
             return;
         }
-        else if (!isLiteral && !predicateUri.equals(Predicates.ROD_OBLIGATION_PROPERTY)){
+        else if (!isLiteral && !predicateUri.equals(Predicates.ROD_OBLIGATION_PROPERTY)) {
             return;
         }
 
         // get (or create and put) the predicate's value vector from subject's hashtable
         Vector<String> valueVector = subjectHashtable.get(predicateUri);
-        if (valueVector==null){
+        if (valueVector == null) {
             valueVector = new Vector<String>();
             subjectHashtable.put(predicateUri, valueVector);
         }
@@ -112,7 +112,7 @@ public class RODDeliveryReader extends ResultSetMixedReader{
      *
      * @return
      */
-    public Vector<Hashtable<String,Vector<String>>> getResultVector(){
+    public Vector<Hashtable<String,Vector<String>>> getResultVector() {
 
         return new Vector<Hashtable<String,Vector<String>>>(subjectsMap.values());
     }
@@ -121,7 +121,7 @@ public class RODDeliveryReader extends ResultSetMixedReader{
      *
      * @return
      */
-    public static Collection<Long> getPredicateHashes(){
+    public static Collection<Long> getPredicateHashes() {
         return predicateUrisByHashes.keySet();
     }
 

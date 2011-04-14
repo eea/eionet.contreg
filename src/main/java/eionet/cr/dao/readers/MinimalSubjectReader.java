@@ -33,7 +33,7 @@ import eionet.cr.util.sql.SQLResultSetBaseReader;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class MinimalSubjectReader extends SQLResultSetBaseReader<SubjectDTO>{
+public class MinimalSubjectReader extends SQLResultSetBaseReader<SubjectDTO> {
 
     /** */
     private Map<Long, SubjectDTO> subjectsMap;
@@ -42,7 +42,7 @@ public class MinimalSubjectReader extends SQLResultSetBaseReader<SubjectDTO>{
      *
      * @param subjectsMap
      */
-    public MinimalSubjectReader(Map<Long,SubjectDTO> subjectsMap){
+    public MinimalSubjectReader(Map<Long,SubjectDTO> subjectsMap) {
         this.subjectsMap = subjectsMap;
     }
 
@@ -53,7 +53,7 @@ public class MinimalSubjectReader extends SQLResultSetBaseReader<SubjectDTO>{
     public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
 
         Long hash = Long.valueOf(rs.getLong("SUBJECT"));
-        if (subjectsMap.get(hash)==null){
+        if (subjectsMap.get(hash) == null) {
             subjectsMap.put(hash, new SubjectDTO(
                     rs.getString("URI"), YesNoBoolean.parse(rs.getString("ANON_SUBJ"))));
         }

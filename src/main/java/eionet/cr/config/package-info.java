@@ -1,5 +1,5 @@
 /**
- * Content Registry configuration handler classes
+ * Content Registry configuration handler classes.
  */
 
 package eionet.cr.config;

@@ -1,5 +1,5 @@
 /**
- * Utilities used by CR harvester 
+ * Utilities used by CR harvester.
  */
 
 package eionet.cr.harvest.util;

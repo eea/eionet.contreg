@@ -19,7 +19,7 @@ import org.openrdf.query.BindingSet;
  *
  * @param <T>
  */
-public class RecentUploadsReader<T> extends ResultSetMixedReader<T>{
+public class RecentUploadsReader<T> extends ResultSetMixedReader<T> {
 
     private Map<String,Date> resultMap;
 
@@ -48,8 +48,8 @@ public class RecentUploadsReader<T> extends ResultSetMixedReader<T>{
 
         // expecting the URI of the matching subject to be in column "s"
         String subjectUri = subjectValue.stringValue();
-        if (subjectValue instanceof BNode && blankNodeUriPrefix!=null){
-            if (!subjectUri.startsWith(blankNodeUriPrefix)){
+        if (subjectValue instanceof BNode && blankNodeUriPrefix != null) {
+            if (!subjectUri.startsWith(blankNodeUriPrefix)) {
                 subjectUri = blankNodeUriPrefix + subjectUri;
             }
         }
@@ -57,10 +57,10 @@ public class RecentUploadsReader<T> extends ResultSetMixedReader<T>{
 
         // expecting the column "d" to contain the date
         Value dateValue = bindingSet.getValue("d");
-        if(dateValue != null){
+        if(dateValue != null) {
             try {
                 String dateStr = dateValue.stringValue();
-                if(dateStr != null && dateStr.length() > 0){
+                if(dateStr != null && dateStr.length() > 0) {
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
                     Date date = dateFormat.parse(dateStr);
                     resultMap.put(subjectUri, date);

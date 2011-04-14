@@ -12,7 +12,7 @@ import eionet.cr.util.sql.SQLResultSetReader;
  * @author jaanus
  *
  */
-public abstract class ResultSetMixedReader<T> implements SQLResultSetReader<T>, SPARQLResultSetReader<T>{
+public abstract class ResultSetMixedReader<T> implements SQLResultSetReader<T>, SPARQLResultSetReader<T> {
 
     /** */
     protected List<T> resultList = new ArrayList<T>();
@@ -38,7 +38,7 @@ public abstract class ResultSetMixedReader<T> implements SQLResultSetReader<T>, 
      *
      * @param bindingNames
      */
-    public void startResultSet(List<String> bindingNames){
+    public void startResultSet(List<String> bindingNames) {
         this.bindingNames = bindingNames;
     }
 

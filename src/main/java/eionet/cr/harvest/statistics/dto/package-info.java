@@ -1,5 +1,5 @@
 /**
- * Data Object classes for harvesting results statistics
+ * Data Object classes for harvesting results statistics.
  */
 
 package eionet.cr.harvest.statistics.dto;

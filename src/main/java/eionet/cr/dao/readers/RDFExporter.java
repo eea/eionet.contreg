@@ -45,15 +45,14 @@ public class RDFExporter extends ResultSetMixedReader {
      * @param output
      * @throws DAOException
      */
-    public static void export(long sourceHash, OutputStream output) throws DAOException{
+    public static void export(long sourceHash, OutputStream output) throws DAOException {
 
         RDFExporter reader = null;
         try {
             reader = new RDFExporter(sourceHash, output);
             DAOFactory.get().getDao(HelperDAO.class).outputSourceTriples(reader);
-        }
-        finally{
-            if (reader!=null){
+        } finally {
+            if (reader != null) {
                 reader.closeOutput();
             }
         }
@@ -65,7 +64,7 @@ public class RDFExporter extends ResultSetMixedReader {
      * @param output
      * @throws DAOException
      */
-    public RDFExporter(long sourceHash, OutputStream output) throws DAOException{
+    public RDFExporter(long sourceHash, OutputStream output) throws DAOException {
 
         this.sourceHash = sourceHash;
         this.output = output;
@@ -87,9 +86,9 @@ public class RDFExporter extends ResultSetMixedReader {
         String object = rs.getString("object");
         boolean literal = YesNoBoolean.parse(rs.getString("litobject"));
 
-        if (subjectHash != lastSubjectHash){
-            if (!lastSubjectTagNotOpen){
-                outputString( "\n</rdf:Description>");
+        if (subjectHash != lastSubjectHash) {
+            if (!lastSubjectTagNotOpen) {
+                outputString("\n</rdf:Description>");
             }
             String buf = "\n\n<rdf:Description rdf:about=\"";
             lastSubjectTagNotOpen = false;
@@ -108,10 +107,9 @@ public class RDFExporter extends ResultSetMixedReader {
         outputString("\n\t<" + namespacePrefix + ":" + predicateLocalName);
 
         String escapedValue = StringEscapeUtils.escapeXml(object);
-        if (!literal && URLUtil.isURL(object)){
+        if (!literal && URLUtil.isURL(object)) {
             outputString( " rdf:resource=\"" + escapedValue + "\"/>");
-        }
-        else{
+        } else {
             outputString(">");
             outputString(escapedValue);
             outputString("</" + namespacePrefix + ":"  + predicateLocalName + ">");
@@ -124,19 +122,19 @@ public class RDFExporter extends ResultSetMixedReader {
         return sourceHash;
     }
 
-    private void outputHeader(){
+    private void outputHeader() {
         outputString("<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n");
         outputString("<rdf:RDF" + getNamespaceDeclarations() + ">");
     }
 
-    public void closeOutput(){
-        if (!lastSubjectTagNotOpen){
+    public void closeOutput() {
+        if (!lastSubjectTagNotOpen) {
             outputString("\n</rdf:Description>");
         }
         outputString("\n\n</rdf:RDF>\n");
         try {
             output.close();
-        } catch (Exception ex){
+        } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
     }
@@ -145,12 +143,12 @@ public class RDFExporter extends ResultSetMixedReader {
      *
      * @return
      */
-    private String getNamespaceDeclarations(){
+    private String getNamespaceDeclarations() {
 
         StringBuffer buf = new StringBuffer();
-        if (namespacePrefixes!=null){
+        if (namespacePrefixes != null) {
 
-            for (Entry<Long,String> entry : namespacePrefixes.entrySet()){
+            for (Entry<Long,String> entry : namespacePrefixes.entrySet()) {
 
                 String namespacePrefix = entry.getValue();
                 Long namespaceHash = entry.getKey();
@@ -170,9 +168,9 @@ public class RDFExporter extends ResultSetMixedReader {
         return outputRDF;
     }
 
-    private String findPredicate(Long predicateHash){
-        for (PredicateDTO predicate:distinctPredicates){
-            if (Hashes.spoHash(predicate.getValue()) == predicateHash){
+    private String findPredicate(Long predicateHash) {
+        for (PredicateDTO predicate:distinctPredicates) {
+            if (Hashes.spoHash(predicate.getValue()) == predicateHash) {
                 return predicate.getValue();
             }
         }
@@ -184,16 +182,16 @@ public class RDFExporter extends ResultSetMixedReader {
      * @param namespaceHash
      * @return
      */
-    private String findNamespaceUri(Long namespaceHash){
+    private String findNamespaceUri(Long namespaceHash) {
 
-        if (namespaceHash!=null && distinctPredicates!=null && !distinctPredicates.isEmpty()){
+        if (namespaceHash != null && distinctPredicates != null && !distinctPredicates.isEmpty()) {
 
-            for (PredicateDTO predicateDTO:distinctPredicates){
+            for (PredicateDTO predicateDTO:distinctPredicates) {
 
                 String predicateUri = predicateDTO.getValue();
                 String namespaceUri = NamespaceUtil.extractNamespace(predicateUri);
 
-                if (Hashes.spoHash(namespaceUri) == namespaceHash){
+                if (Hashes.spoHash(namespaceUri) == namespaceHash) {
                     return namespaceUri;
                 }
             }
@@ -202,10 +200,10 @@ public class RDFExporter extends ResultSetMixedReader {
         return null;
     }
 
-    private void outputString(String outputString){
+    private void outputString(String outputString) {
         try {
             output.write(outputString.getBytes());
-        } catch (IOException ex){
+        } catch (IOException ex) {
 
         }
     }
@@ -213,12 +211,12 @@ public class RDFExporter extends ResultSetMixedReader {
     /**
      *
      */
-    private void fillNamespaceTables(){
+    private void fillNamespaceTables() {
 
         int unknownNamespaceCounter = 0;
 
-        if (distinctPredicates!=null){
-            for(PredicateDTO predicateDTO:distinctPredicates){
+        if (distinctPredicates != null) {
+            for (PredicateDTO predicateDTO:distinctPredicates) {
 
                 String predicateUri = predicateDTO.getValue();
                 String namespaceUri = NamespaceUtil.extractNamespace(predicateUri);
@@ -227,12 +225,11 @@ public class RDFExporter extends ResultSetMixedReader {
                 namespaceUris.put(namespaceHash, namespaceUri);
 
                 String knownNamespacePrefix = NamespaceUtil.getKnownNamespace(namespaceUri);
-                if (knownNamespacePrefix==null || knownNamespacePrefix.isEmpty()){
+                if (knownNamespacePrefix == null || knownNamespacePrefix.isEmpty()) {
 
                     unknownNamespaceCounter++;
                     namespacePrefixes.put(namespaceHash, "ns"+unknownNamespaceCounter);
-                }
-                else{
+                } else {
                     namespacePrefixes.put(namespaceHash, knownNamespacePrefix);
                 }
             }
