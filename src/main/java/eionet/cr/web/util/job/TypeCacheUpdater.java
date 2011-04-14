@@ -49,18 +49,20 @@ import eionet.cr.web.util.ApplicationCache;
  * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
 public class TypeCacheUpdater implements StatefulJob {
-
-    private static final Logger logger = Logger.getLogger(TypeCacheUpdater.class);
+    /**
+     * Internal logger.
+     */
+    private static final Logger LOGGER = Logger.getLogger(TypeCacheUpdater.class);
 
     /**
      * @see org.quartz.Job#execute(org.quartz.JobExecutionContext)
      * {@inheritDoc}
      */
-    public void execute(JobExecutionContext arg0) throws JobExecutionException {
+    public void execute(final JobExecutionContext arg0) throws JobExecutionException {
 
         try {
-            List<Pair<String,String>> types = new LinkedList<Pair<String,String>>();
-            Map<String,String> criteria = new HashMap<String,String>();
+            List<Pair<String, String>> types = new LinkedList<Pair<String, String>>();
+            Map<String, String> criteria = new HashMap<String, String>();
             criteria.put(Predicates.RDF_TYPE, Subjects.RDFS_CLASS);
 
             List<String> predicates = new ArrayList<String>();
@@ -75,33 +77,32 @@ public class TypeCacheUpdater implements StatefulJob {
                             new SortingRequest(Predicates.RDFS_LABEL, SortOrder.ASCENDING),
                             predicates);
 
-            if (customSearch != null){
+            if (customSearch != null) {
 
                 List<SubjectDTO> subjects = customSearch.getRight();
-                if (subjects!=null && !subjects.isEmpty()){
+                if (subjects != null && !subjects.isEmpty()) {
 
-                    for(SubjectDTO subject : subjects) {
+                    for (SubjectDTO subject : subjects) {
 
                         String uri = subject.getUri();
-                        if (uri!=null && !subject.isAnonymous()){
+                        if (uri != null && !subject.isAnonymous()) {
 
                             String label = subject.getObjectValue(Predicates.RDFS_LABEL);
-                            if (StringUtils.isBlank(label)){
+                            if (StringUtils.isBlank(label)) {
                                 label = URIUtil.extractURILabel(uri, uri);
                             }
 
-                            types.add(new Pair<String,String>(uri, label));
+                            types.add(new Pair<String, String>(uri, label));
                         }
                     }
                 }
             }
 
             ApplicationCache.updateTypes(types);
-            logger.debug("type cache successfully updated!");
+            LOGGER.debug("type cache successfully updated!");
 
-        }
-        catch (DAOException e) {
-            logger.error("Exception is thrown while updating type cache", e);
+        } catch (DAOException e) {
+            LOGGER.error("Exception is thrown while updating type cache", e);
         }
     }
 }
