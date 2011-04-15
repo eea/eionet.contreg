@@ -94,7 +94,7 @@ public class XmlExporter extends Exporter implements SubjectExportEvent {
     }
 
     /**
-     * call-back method implements
+     * call-back method implements.
      */
     public void writeSubjectIntoExporterOutput(SubjectDTO subject) throws ExportException {
 
@@ -131,7 +131,7 @@ public class XmlExporter extends Exporter implements SubjectExportEvent {
 
 
     /**
-     * Create element names map
+     * Create element names map.
      */
     protected void parseElemNames() {
 
@@ -153,7 +153,7 @@ public class XmlExporter extends Exporter implements SubjectExportEvent {
         }
     }
     /**
-     * Write doument start element(s)
+     * Write doument start element(s).
      * @param writer
      * @throws XMLStreamException
      */
@@ -161,7 +161,7 @@ public class XmlExporter extends Exporter implements SubjectExportEvent {
         writer.writeStartElement(DATA_ROOT_ELEMENT);
     }
     /**
-     * Write document end element(s)
+     * Write document end element(s).
      * @param writer
      * @throws XMLStreamException
      */
@@ -169,8 +169,8 @@ public class XmlExporter extends Exporter implements SubjectExportEvent {
         writer.writeEndElement();
     }
     /**
-     * returns the list of element names
-     * @return
+     * Get elements.
+     * @return the list of element names.
      */
     public Map<String, XmlElementMetadata> getElements() {
         return elements;
