@@ -30,7 +30,6 @@ import eionet.cr.dao.readers.HarvestDTOReader;
 import eionet.cr.dao.readers.HarvestWithMessageTypesReader;
 import eionet.cr.dto.HarvestDTO;
 import eionet.cr.harvest.util.HarvestMessageType;
-import eionet.cr.util.sql.DbConnectionProvider;
 import eionet.cr.util.sql.SQLUtil;
 
 /**
@@ -76,14 +75,14 @@ public class MySQLHarvestDAO extends MySQLBaseDAO implements HarvestDAO {
 
     /** */
     private static final String updateFinishedHarvestSQL =
-        "update HARVEST set STATUS=?, FINISHED=now(), TOT_STATEMENTS=?, LIT_STATEMENTS=?, RES_STATEMENTS=?, TOT_RESOURCES=?, ENC_SCHEMES=? " +
+        "update HARVEST set STATUS=?, FINISHED=now(), TOT_STATEMENTS=?, LIT_STATEMENTS=?, RES_STATEMENTS=?, ENC_SCHEMES=? " +
         "where HARVEST_ID=?";
 
     /*
      * (non-Javadoc)
-     * @see eionet.cr.dao.HarvestDAO#updateFinishedHarvest(int, int, int, int, int, java.lang.String)
+     * @see eionet.cr.dao.HarvestDAO#updateFinishedHarvest(int, int, int, int, java.lang.String)
      */
-    public void updateFinishedHarvest(int harvestId, String status, int totStatements, int totResources,
+    public void updateFinishedHarvest(int harvestId, String status, int totStatements, 
             int litStatements, int encSchemes) throws DAOException {
 
         List<Object> values = new ArrayList<Object>();
@@ -91,7 +90,6 @@ public class MySQLHarvestDAO extends MySQLBaseDAO implements HarvestDAO {
         values.add(new Integer(totStatements));
         values.add(new Integer(litStatements));
         values.add(new Integer(totStatements-litStatements));
-        values.add(new Integer(totResources));
         values.add(new Integer(encSchemes));
         values.add(new Integer(harvestId));
 

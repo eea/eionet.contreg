@@ -37,16 +37,21 @@ public class HarvestLog implements Log{
     private long harvestGenTime;
 
     /**
-     *
+     * @param harvestSourceUrl
+     * @param logger
+     * @returns HarvestLog
      */
-    public HarvestLog(String harvestSourceUrl, Log logger){
+    public HarvestLog(String harvestSourceUrl, Log logger) {
         this(harvestSourceUrl, -1, logger);
     }
 
     /**
-     *
+     * @param harvestSourceUrl
+     * @param harvestGenTime
+     * @param logger
+     * @returns HarvestLog
      */
-    public HarvestLog(String harvestSourceUrl, long harvestGenTime, Log logger){
+    public HarvestLog(String harvestSourceUrl, long harvestGenTime, Log logger) {
 
         this.harvestSourceUrl = harvestSourceUrl;
         this.harvestGenTime = harvestGenTime;
@@ -193,5 +198,9 @@ public class HarvestLog implements Log{
         }
         sb.append("]");
         return sb.toString();
+    }
+
+    public void setHarvestSourceUrl(String harvestSourceUrl) {
+        this.harvestSourceUrl = harvestSourceUrl;
     }
 }

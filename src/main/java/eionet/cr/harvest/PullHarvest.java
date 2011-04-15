@@ -321,7 +321,6 @@ public class PullHarvest extends Harvest {
         // copy the harvest's number of triples and resources from previous harvest
         if (previousHarvest != null) {
             setStoredTriplesCount(previousHarvest.getTotalStatements());
-            setDistinctSubjectsCount(previousHarvest.getTotalResources());
         }
 
         String msg = "Source not modified since " + lastHarvest.toString();
@@ -740,9 +739,8 @@ public class PullHarvest extends Harvest {
                 dto.getSourceId().intValue()));
         harvest.setNotificationSender(new HarvestNotificationSender());
 
-        int numOfResources = dto.getResources() == null ? 0 : dto.getResources().intValue();
         harvest.setDaoWriter(new HarvestDAOWriter(
-                dto.getSourceId().intValue(), Harvest.TYPE_PULL, numOfResources, CRUser.application.getUserName()));
+                dto.getSourceId().intValue(), Harvest.TYPE_PULL, CRUser.application.getUserName()));
 
         return harvest;
     }

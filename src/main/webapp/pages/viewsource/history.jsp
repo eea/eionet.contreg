@@ -11,7 +11,6 @@
                         <th scope="col">Started</th>
                         <th scope="col">Finished</th>
                         <th scope="col">Triples</th>
-                        <th scope="col">Subjects</th>
                         <th scope="col"></th>
                     </tr>
                 </thead>
@@ -26,7 +25,6 @@
                             <td><fmt:formatDate value="${harv.datetimeFinished}"
                                 pattern="dd-MM-yy HH:mm:ss" /></td>
                             <td><c:out value="${harv.totalStatements}" /></td>
-                            <td><c:out value="${harv.totalResources}" /></td>
                             <td><stripes:link href="/harvest.action">
                                 <img src="${pageContext.request.contextPath}/images/view2.gif"
                                     title="View" alt="View" />

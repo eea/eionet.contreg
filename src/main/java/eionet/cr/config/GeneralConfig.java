@@ -37,6 +37,9 @@ public class GeneralConfig {
     /** */
     public static final String BUNDLE_NAME = "cr";
     public static final String PROPERTIES_FILE_NAME = "cr.properties";
+    
+    /** */
+    public static final String DEPLOYMENT_HOST = "deployment.host";
 
     /** */
     public static final String DB_URL = "db.url";

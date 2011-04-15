@@ -473,4 +473,8 @@ public class SubjectDTO implements Serializable {
     public void setDcDate(Date dcDate) {
         this.dcDate = dcDate;
     }
+
+    public void setUri(String uri) {
+        this.uri = uri;
+    }
 }

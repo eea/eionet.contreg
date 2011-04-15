@@ -63,9 +63,6 @@ public class UploadHarvest extends Harvest {
     private FileBean fileBean;
 
     /** */
-    private File convertedFile;
-
-    /** */
     private String userName;
 
     /**
@@ -80,15 +77,16 @@ public class UploadHarvest extends Harvest {
         this(dto.getUrl(), fileBean, dcTitle, userName);
 
         // set harvest log writer
-        int numOfResources = dto.getResources() == null ? 0 : dto.getResources();
         setDaoWriter(new HarvestDAOWriter(
-                dto.getSourceId(), Harvest.TYPE_PUSH, numOfResources, userName));
+                dto.getSourceId(), Harvest.TYPE_PUSH, userName));
     }
 
     /**
      *
      * @param sourceUrlString
      * @param fileBean
+     * @param dcTitle
+     * @param userName
      */
     public UploadHarvest(String sourceUrlString, FileBean fileBean, String dcTitle, String userName) {
 
@@ -124,14 +122,14 @@ public class UploadHarvest extends Harvest {
     }
 
     /**
-     *
+     * @param dto
      * @throws HarvestException
+     * 
      */
     public void createDaoWriter(HarvestSourceDTO dto) throws HarvestException {
 
-        int numOfResources = dto.getResources() == null ? 0 : dto.getResources();
         setDaoWriter(new HarvestDAOWriter(
-                dto.getSourceId(), Harvest.TYPE_PUSH, numOfResources, userName));
+                dto.getSourceId(), Harvest.TYPE_PUSH, userName));
     }
 
     /*

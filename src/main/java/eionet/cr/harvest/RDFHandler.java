@@ -44,7 +44,6 @@ import eionet.cr.harvest.persist.IHarvestPersister;
 import eionet.cr.harvest.persist.PersisterConfig;
 import eionet.cr.harvest.persist.PersisterException;
 import eionet.cr.harvest.persist.PersisterFactory;
-import eionet.cr.harvest.persist.mysql.MySQLDefaultPersister;
 import eionet.cr.harvest.util.HarvestLog;
 import eionet.cr.harvest.util.arp.AResourceImpl;
 import eionet.cr.util.Hashes;
@@ -83,15 +82,11 @@ public class RDFHandler implements StatementHandler {
     private IHarvestPersister persister;
 
     /** */
-    private int distinctSubjectsCount;
-
-    /** */
     private String uuidNamePrefix;
 
     /**
      *
-     * @param sourceUrl
-     * @param genTime
+     * @param config
      */
     public RDFHandler(PersisterConfig config) {
 
@@ -108,7 +103,6 @@ public class RDFHandler implements StatementHandler {
         uuidNamePrefix = uuidNamePrefix(Hashes.spoHash(config.getSourceUrl()), config.getGenTime());
     }
 
-    private int statementCounter = 0;
     /*
      * (non-Javadoc)
      * @see com.hp.hpl.jena.rdf.arp.StatementHandler#statement(com.hp.hpl.jena.rdf.arp.AResource, com.hp.hpl.jena.rdf.arp.AResource, com.hp.hpl.jena.rdf.arp.AResource)
@@ -332,7 +326,7 @@ public class RDFHandler implements StatementHandler {
      *
      * @param prefix
      * @param name
-     * @return
+     * @return String
      */
     public static String generateUUID(String prefix, String name) {
 
@@ -345,7 +339,7 @@ public class RDFHandler implements StatementHandler {
      *
      * @param sourceHash
      * @param genTime
-     * @return
+     * @return String
      */
     public static String uuidNamePrefix(long sourceHash, long genTime) {
 
@@ -384,7 +378,7 @@ public class RDFHandler implements StatementHandler {
 
     /**
      *
-     * @throws SQLException
+     * @throws PersisterException
      */
     public void rollback() throws PersisterException {
         logger.debug("Doing harvest rollback");
@@ -399,7 +393,7 @@ public class RDFHandler implements StatementHandler {
     }
 
     /**
-     * @return
+     * @return boolean
      */
     public boolean isRdfContentFound() {
         return rdfContentFound;
@@ -426,7 +420,7 @@ public class RDFHandler implements StatementHandler {
 
     /**
      *
-     * @return
+     * @return int
      */
     public int getSubjectCount() {
         return resources.getLeft().size();

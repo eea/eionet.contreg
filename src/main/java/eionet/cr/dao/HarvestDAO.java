@@ -43,7 +43,7 @@ public interface HarvestDAO extends DAO {
      * @throws DAOException
      */
     public void updateFinishedHarvest(int harvestId, String status, int totStatements,
-            int totResources, int litStatements, int encSchemes) throws DAOException;
+            int litStatements, int encSchemes) throws DAOException;
 
     /**
      *

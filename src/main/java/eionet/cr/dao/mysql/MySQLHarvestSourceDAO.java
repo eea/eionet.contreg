@@ -20,6 +20,8 @@
  */
 package eionet.cr.dao.mysql;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -27,11 +29,14 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.openrdf.repository.RepositoryException;
+import org.openrdf.rio.RDFParseException;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.readers.HarvestSourceDTOReader;
 import eionet.cr.dto.HarvestSourceDTO;
+import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.Harvest;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
@@ -413,7 +418,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements
 
     /** */
     private static final String updateHarvestFinishedSQL = "update HARVEST_SOURCE set STATEMENTS=?, RESOURCES=?, LAST_HARVEST_FAILED=? where HARVEST_SOURCE_ID=?";
-    private static final String updateHarvestFinishedSQL_avail = "update HARVEST_SOURCE set STATEMENTS=?, RESOURCES=?, COUNT_UNAVAIL=if(?,0,(COUNT_UNAVAIL+1)), LAST_HARVEST_FAILED=?  where HARVEST_SOURCE_ID=?";
+    private static final String updateHarvestFinishedSQL_avail = "update HARVEST_SOURCE set STATEMENTS=?, COUNT_UNAVAIL=if(?,0,(COUNT_UNAVAIL+1)), LAST_HARVEST_FAILED=?  where HARVEST_SOURCE_ID=?";
 
     /*
      * (non-Javadoc)
@@ -422,12 +427,11 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements
      * Integer)
      */
     public void updateHarvestFinished(int sourceId, Integer numStatements,
-            Integer numResources, Boolean sourceAvailable, boolean failed)
+            Boolean sourceAvailable, boolean failed)
             throws DAOException {
 
         List<Object> values = new ArrayList<Object>();
         values.add(numStatements);
-        values.add(numResources);
         if (sourceAvailable != null)
             values.add(sourceAvailable.booleanValue() == true ? new Integer(1)
                     : new Integer(0));
@@ -594,6 +598,71 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements
     @Override
     public boolean removeSourceFromInferenceRule(String url)
             throws DAOException {
+        throw new UnsupportedOperationException("Method not implemented");
+    }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see eionet.cr.dao.HarvestSourceDAO#addSourceToRepository(File, String)
+     */
+    @Override
+    public int addSourceToRepository(File file, String sourceUrlString)
+            throws DAOException, RepositoryException, RDFParseException,
+            IOException {
+        throw new UnsupportedOperationException("Method not implemented");
+    }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see eionet.cr.dao.HarvestSourceDAO#addSourceMetadata(SubjectDTO)
+     */
+    @Override
+    public void addSourceMetadata(SubjectDTO sourceMetadata)
+            throws DAOException, RDFParseException, RepositoryException, IOException {
+        throw new UnsupportedOperationException("Method not implemented");
+    }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see eionet.cr.dao.HarvestSourceDAO#getNewSources(String)
+     */
+    @Override
+    public List<String> getNewSources(String sourceUrl)
+            throws DAOException, RDFParseException, RepositoryException,
+            IOException {
+        throw new UnsupportedOperationException("Method not implemented");
+    }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see eionet.cr.dao.HarvestSourceDAO#getSourceMetadata(String, String)
+     */
+    @Override
+    public String getSourceMetadata(String subject, String predicate) throws DAOException, RepositoryException {
+        throw new UnsupportedOperationException("Method not implemented");
+    }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see eionet.cr.dao.HarvestSourceDAO#insertUpdateSourceMetadata(String, String, String)
+     */
+    @Override
+    public void insertUpdateSourceMetadata(String subject, String predicate, String value) throws DAOException, RepositoryException {
+        throw new UnsupportedOperationException("Method not implemented");
+    }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * eionet.cr.dao.HarvestSourceDAO#editRedirectedSource(eionet.cr.dto.HarvestSourceDTO)
+     */
+    public void editRedirectedSource(HarvestSourceDTO source) throws DAOException {
         throw new UnsupportedOperationException("Method not implemented");
     }
 }

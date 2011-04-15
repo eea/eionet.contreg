@@ -35,7 +35,6 @@ public class HarvestDTO extends HarvestBaseDTO implements java.io.Serializable{
     private String status;
     private java.util.Date datetimeStarted;
     private java.util.Date datetimeFinished;
-    private Integer totalResources;
     private Integer encodingSchemes;
     private Integer totalStatements;
     private Integer litObjStatements;
@@ -170,20 +169,6 @@ public class HarvestDTO extends HarvestBaseDTO implements java.io.Serializable{
      */
     public void setLitObjStatements(Integer litObjStatements) {
         this.litObjStatements = litObjStatements;
-    }
-
-    /**
-     * @return the totalResources
-     */
-    public Integer getTotalResources() {
-        return totalResources;
-    }
-
-    /**
-     * @param totalResources the totalResources to set
-     */
-    public void setTotalResources(Integer totalResources) {
-        this.totalResources = totalResources;
     }
 
     /**

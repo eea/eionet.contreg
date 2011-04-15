@@ -27,8 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openrdf.repository.RepositoryException;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
@@ -45,9 +45,9 @@ import eionet.cr.harvest.util.arp.ARPSource;
 import eionet.cr.util.Hashes;
 
 /**
- *
+ * 
  * @author heinljab
- *
+ * 
  */
 public abstract class Harvest {
 
@@ -61,11 +61,13 @@ public abstract class Harvest {
 
     /** */
     protected String sourceUrlString = null;
-    protected Log logger = null;
+    protected HarvestLog logger = null;
 
     /** */
-    private int distinctSubjectsCount = 0;
     private int storedTriplesCount = 0;
+
+    protected int finalSourceId = 0;
+    protected List<String> redirectedUrls;
 
     /** */
     protected HarvestDAOWriter daoWriter = null;
@@ -87,6 +89,10 @@ public abstract class Harvest {
     protected SubjectDTO sourceMetadata;
 
     /** */
+    protected boolean needsHarvesting;
+    protected boolean isRedirectedSource;
+
+    /** */
     protected boolean clearPreviousContent = true;
 
     /** */
@@ -99,11 +105,10 @@ public abstract class Harvest {
     protected DAOFactory daoFactory = DAOFactory.get();
 
     /** */
-    protected static SimpleDateFormat lastRefreshedDateFormat =
-        new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    protected static SimpleDateFormat lastRefreshedDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
     /**
-     *
+     * 
      * @param sourceUrlString
      */
     protected Harvest(String sourceUrlString) {
@@ -120,7 +125,7 @@ public abstract class Harvest {
     }
 
     /**
-     *
+     * 
      * @throws HarvestException
      */
     public void execute() throws HarvestException {
@@ -131,10 +136,13 @@ public abstract class Harvest {
         } catch (Exception e) {
 
             fatalError = e;
-            try { logger.error("Exception when harvesting [" + sourceUrlString + "]: " + e.toString(), e); } catch (Exception ee) {}
+            try {
+                logger.error("Exception when harvesting [" + sourceUrlString + "]: " + e.toString(), e);
+            } catch (Exception ee) {
+            }
 
             if (e instanceof HarvestException)
-                throw (HarvestException)e;
+                throw (HarvestException) e;
             else
                 throw new HarvestException(e.toString(), e);
         } finally {
@@ -143,13 +151,13 @@ public abstract class Harvest {
     }
 
     /**
-     *
+     * 
      * @throws HarvestException
      */
     protected abstract void doExecute() throws HarvestException;
 
     /**
-     *
+     * 
      * @param arpSource
      * @throws HarvestException
      */
@@ -158,9 +166,9 @@ public abstract class Harvest {
     }
 
     /**
-     * Harvest the given ARPSource.
-     * The caller is responsible for closing the resources that the given ARPSource uses.
-     *
+     * Harvest the given ARPSource. The caller is responsible for closing the
+     * resources that the given ARPSource uses.
+     * 
      * @param arpSource
      * @param ignoreParsingError
      * @throws HarvestException
@@ -170,14 +178,8 @@ public abstract class Harvest {
         RDFHandler rdfHandler = null;
         try {
 
-            PersisterConfig config = new PersisterConfig(
-                    deriveInferredTriples,
-                    clearPreviousContent,
-                    sourceLastModified,
-                    sourceUrlString,
-                    System.currentTimeMillis(),
-                    Hashes.spoHash(sourceUrlString),
-                    null);
+            PersisterConfig config = new PersisterConfig(deriveInferredTriples, clearPreviousContent, sourceLastModified,
+                    sourceUrlString, System.currentTimeMillis(), Hashes.spoHash(sourceUrlString), null);
             rdfHandler = createRDFHandler(config);
             DefaultErrorHandler errorHandler = new DefaultErrorHandler();
             if (arpSource != null) {
@@ -187,8 +189,7 @@ public abstract class Harvest {
 
                 if (!ignoreParsingError) {
                     arpSource.load(arp, sourceUrlString);
-                }
-                else {
+                } else {
                     try {
                         arpSource.load(arp, sourceUrlString);
                     } catch (SAXException e) {
@@ -197,8 +198,7 @@ public abstract class Harvest {
                         Throwable cause = e.getCause();
                         if (cause instanceof SAXParseException) {
                             logger.info("Following exception happened when parsing as RDF", e);
-                        }
-                        else {
+                        } else {
                             throw e;
                         }
                     }
@@ -226,16 +226,17 @@ public abstract class Harvest {
 
             rdfContentFound = rdfHandler.isRdfContentFound();
             storedTriplesCount = rdfHandler.getStoredTriplesCount();
-            distinctSubjectsCount = rdfHandler.getSubjectCount();
 
-            logger.debug("Harvest committed. " + storedTriplesCount + " triples stored. "
-                    + distinctSubjectsCount + " subjects found in source");
+            logger.debug("Harvest committed. " + storedTriplesCount + " triples stored.");
         } catch (Exception e) {
 
-            try {logger.error("Harvest error: " + e.toString());} catch (Exception ee) {}
+            try {
+                logger.error("Harvest error: " + e.toString());
+            } catch (Exception ee) {
+            }
 
             if (e instanceof SQLException) {
-                logger.error("Next exception: ", ((SQLException)e).getNextException());
+                logger.error("Next exception: ", ((SQLException) e).getNextException());
             }
 
             if (rdfHandler != null) {
@@ -244,7 +245,8 @@ public abstract class Harvest {
                 } catch (Exception ee) {
                     logger.fatal("Harvest rollback failed", ee);
                     // TODO - handle rollback failure somehow
-                    // (e.g. send e-mail notification, store failure into database and retry rollback at later harvests)
+                    // (e.g. send e-mail notification, store failure into
+                    // database and retry rollback at later harvests)
                 }
             }
 
@@ -254,7 +256,8 @@ public abstract class Harvest {
             if (rdfHandler != null) {
                 try {
                     rdfHandler.closeResources();
-                } catch (Exception e) {}
+                } catch (Exception e) {
+                }
             }
         }
     }
@@ -267,7 +270,7 @@ public abstract class Harvest {
     }
 
     /**
-     *
+     * 
      * @param sourceUrl
      * @return
      */
@@ -278,17 +281,10 @@ public abstract class Harvest {
         }
 
         String folder = GeneralConfig.getRequiredProperty(GeneralConfig.HARVESTER_FILES_LOCATION);
-        String fileName = new StringBuilder(Hashes.md5(sourceUrl)).append("_").
-        append(System.currentTimeMillis()).append(HARVEST_FILE_NAME_EXTENSION).toString();
+        String fileName = new StringBuilder(Hashes.md5(sourceUrl)).append("_").append(System.currentTimeMillis())
+                .append(HARVEST_FILE_NAME_EXTENSION).toString();
 
         return new File(folder, fileName);
-    }
-
-    /**
-     * @return the distinctSubjectsCount
-     */
-    public int getDistinctSubjectsCount() {
-        return distinctSubjectsCount;
     }
 
     /**
@@ -313,8 +309,9 @@ public abstract class Harvest {
     }
 
     /**
-     * Saves the "harvest-finished" status and any harvest error/warning messages into the database,
-     * and sends e-mail notification of those messages.
+     * Saves the "harvest-finished" status and any harvest error/warning
+     * messages into the database, and sends e-mail notification of those
+     * messages.
      */
     protected void doHarvestFinishedActions() {
 
@@ -329,9 +326,10 @@ public abstract class Harvest {
             logger.error("Harvest notification sender threw an error: " + e.toString(), e);
         }
 
-        // let's be so ambitious and try to remember even the errors that will happen during the
+        // let's be so ambitious and try to remember even the errors that will
+        // happen during the
         // finishing actions
-        ArrayList<Throwable> finishingErrors  = new ArrayList<Throwable>();
+        ArrayList<Throwable> finishingErrors = new ArrayList<Throwable>();
 
         // log harvest finished event into the database
         if (daoWriter != null) {
@@ -341,6 +339,10 @@ public abstract class Harvest {
                 errors.add(e);
                 finishingErrors.add(e);
                 logger.error("Harvest DAO writer threw an exception: " + e.toString(), e);
+            } catch (RepositoryException e) {
+                errors.add(e);
+                finishingErrors.add(e);
+                logger.error("Harvest DAO writer threw a repository exception: " + e.toString(), e);
             }
             try {
                 daoWriter.writeMessages(this);
@@ -392,14 +394,16 @@ public abstract class Harvest {
     }
 
     /**
-     * @param daoWriter the daoWriter to set
+     * @param daoWriter
+     *            the daoWriter to set
      */
     public void setDaoWriter(HarvestDAOWriter daoWriter) {
         this.daoWriter = daoWriter;
     }
 
     /**
-     * @param notificationSender the notificationSender to set
+     * @param notificationSender
+     *            the notificationSender to set
      */
     public void setNotificationSender(HarvestNotificationSender notificationSender) {
         this.notificationSender = notificationSender;
@@ -413,28 +417,24 @@ public abstract class Harvest {
     }
 
     /**
-     * @param deriveInferredTriples the deriveInferredTriples to set
+     * @param deriveInferredTriples
+     *            the deriveInferredTriples to set
      */
     public void setDeriveInferredTriples(boolean deriveInferredTriples) {
         this.deriveInferredTriples = deriveInferredTriples;
     }
 
     /**
-     * @param previousHarvest the previousHarvest to set
+     * @param previousHarvest
+     *            the previousHarvest to set
      */
     public void setPreviousHarvest(HarvestDTO previousHarvest) {
         this.previousHarvest = previousHarvest;
     }
 
     /**
-     * @param distinctSubjectsCount the distinctSubjectsCount to set
-     */
-    protected void setDistinctSubjectsCount(int distinctSubjectsCount) {
-        this.distinctSubjectsCount = distinctSubjectsCount;
-    }
-
-    /**
-     * @param storedTriplesCount the storedTriplesCount to set
+     * @param storedTriplesCount
+     *            the storedTriplesCount to set
      */
     protected void setStoredTriplesCount(int storedTriplesCount) {
         this.storedTriplesCount = storedTriplesCount;

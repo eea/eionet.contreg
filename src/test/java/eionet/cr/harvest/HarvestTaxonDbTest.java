@@ -58,7 +58,6 @@ public class HarvestTaxonDbTest extends CRDatabaseTestCase {
             harvest.setDeriveInferredTriples(false);
             harvest.execute();
 
-            assertEquals((int) 3, harvest.getDistinctSubjectsCount());
             assertEquals((int) 23, harvest.getStoredTriplesCount());
 
             compareDatasets("taxon-db.xml", true);
@@ -80,7 +79,6 @@ public class HarvestTaxonDbTest extends CRDatabaseTestCase {
             harvest.setDeriveInferredTriples(false);
             harvest.execute();
 
-            assertEquals((int) 3, harvest.getDistinctSubjectsCount());
             assertEquals((int) 23, harvest.getStoredTriplesCount());
 
             compareDatasets("taxon-db.xml", false);

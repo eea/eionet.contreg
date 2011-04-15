@@ -23,108 +23,160 @@ package eionet.cr.harvest;
 import java.util.Iterator;
 import java.util.List;
 
+import org.openrdf.repository.RepositoryException;
+
+import eionet.cr.common.Predicates;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dao.HarvestMessageDAO;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.HarvestMessageDTO;
+import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.harvest.util.HarvestMessageType;
 import eionet.cr.util.Util;
 
-
 /**
- *
+ * 
  * @author heinljab
- *
+ * 
  */
 public class HarvestDAOWriter {
 
     /** */
     private int sourceId;
     private String harvestType;
-    private int numOfResources;
     private String userName;
 
     /** */
     private int harvestId;
 
     /**
-     * @param numOfResources TODO
-     *
+     * @param sourceId
+     * @param harvestType
+     * @param userName
      */
-    public HarvestDAOWriter(int sourceId, String harvestType, int numOfResources, String userName){
+    public HarvestDAOWriter(int sourceId, String harvestType, String userName) {
 
         this.sourceId = sourceId;
         this.harvestType = harvestType;
-        this.numOfResources = numOfResources;
         this.userName = userName;
     }
 
     /**
-     *
+     * 
      * @throws DAOException
      */
-    protected void writeStarted(Harvest harvest) throws DAOException{
+    protected void writeStarted(Harvest harvest) throws DAOException {
 
-        harvestId = DAOFactory.get().getDao(HarvestDAO.class).insertStartedHarvest(
-                sourceId, harvestType, userName, Harvest.STATUS_STARTED);
+        harvestId = DAOFactory.get().getDao(HarvestDAO.class)
+                .insertStartedHarvest(sourceId, harvestType, userName, Harvest.STATUS_STARTED);
     }
 
     /**
-     *
+     * 
      * @param harvest
-     * @param numResourcesInSource
      * @throws DAOException
      */
-    protected void writeFinished(Harvest harvest) throws DAOException{
+    protected void writeFinished(Harvest harvest) throws DAOException, RepositoryException {
 
-        DAOFactory.get().getDao(HarvestDAO.class).updateFinishedHarvest(
-                harvestId, Harvest.STATUS_FINISHED,
-                harvest.getStoredTriplesCount(),
-                harvest.getDistinctSubjectsCount(),
-                0,
-                0);
+        if (!(harvest instanceof VirtuosoPullHarvest) || (harvest instanceof VirtuosoPullHarvest && harvest.needsHarvesting)) {
+            DAOFactory.get().getDao(HarvestDAO.class)
+                    .updateFinishedHarvest(harvestId, Harvest.STATUS_FINISHED, harvest.getStoredTriplesCount(), 0, 0);
+        }
 
         // harvest failed if it has a fatal error || warnings || errors
-        boolean failed = harvest.getFatalError() != null
-                || (harvest.getErrors() != null && !harvest.getErrors().isEmpty())
+        boolean failed = harvest.getFatalError() != null || (harvest.getErrors() != null && !harvest.getErrors().isEmpty())
                 || (harvest.getWarnings() != null && !harvest.getWarnings().isEmpty());
 
-        if (harvest instanceof PullHarvest){
+        if (harvest instanceof PullHarvest) {
             DAOFactory.get().getDao(HarvestSourceDAO.class)
-                    .updateHarvestFinished(
-                            sourceId,
-                            null,
-                            harvest.getDistinctSubjectsCount(),
-                            ((PullHarvest)harvest).getSourceAvailable(),
-                            failed);
-        } else if (harvest instanceof VirtuosoPullHarvest){
-            DAOFactory.get().getDao(HarvestSourceDAO.class)
-            .updateHarvestFinished(
-                    sourceId,
-                    null,
-                    harvest.getDistinctSubjectsCount(),
-                    ((VirtuosoPullHarvest)harvest).getSourceAvailable(),
-                    failed);
-        }
-        else{
-            DAOFactory.get().getDao(HarvestSourceDAO.class)
-                    .updateHarvestFinished(
-                            sourceId,
-                            null,
-                            numOfResources + harvest.getDistinctSubjectsCount(),
-                            null,
-                            failed);
+                    .updateHarvestFinished(sourceId, null, ((PullHarvest) harvest).getSourceAvailable(), failed);
+        } else if (harvest instanceof VirtuosoPullHarvest) {
+            if (harvest.needsHarvesting) {
+                if (harvest.isRedirectedSource) {
+                    sourceId = harvest.finalSourceId;
+                }
+                DAOFactory
+                        .get()
+                        .getDao(HarvestSourceDAO.class)
+                        .updateHarvestFinished(sourceId, harvest.getStoredTriplesCount(),
+                                ((VirtuosoPullHarvest) harvest).getSourceAvailable(), failed);
+            }
+            // Update redirected sources metadata
+            if (harvest.isRedirectedSource) {
+                updateRedirectedSourcesMetadata(harvest);
+            }
+        } else {
+            DAOFactory.get().getDao(HarvestSourceDAO.class).updateHarvestFinished(sourceId, null, null, failed);
         }
     }
 
     /**
-     *
+     * Updates metadata for redirected URLs. Updates last_harvest and
+     * last_harvest_failed in HARVEST_SOURCE table, plus #lastRefreshed
+     * predicate in Virtuoso /harvester context
+     * 
+     * @param harvest
+     * @throws DAOException
+     * @throws RepositoryException
+     */
+    private void updateRedirectedSourcesMetadata(Harvest harvest) throws DAOException, RepositoryException {
+
+        HarvestSourceDTO finalSource = DAOFactory.get().getDao(HarvestSourceDAO.class)
+                .getHarvestSourceByUrl(harvest.sourceUrlString);
+        String finalSourceLastRefreshedDate = DAOFactory.get().getDao(HarvestSourceDAO.class)
+                .getSourceMetadata(harvest.sourceUrlString, Predicates.CR_LAST_REFRESHED);
+
+        if (harvest.redirectedUrls != null && harvest.redirectedUrls.size() > 0) {
+            for (String url : harvest.redirectedUrls) {
+                if (!url.equals(harvest.sourceUrlString)) {
+                    HarvestSourceDTO redirectedSource = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(url);
+                    // Update SQL metadata
+                    if (redirectedSource != null) {
+                        redirectedSource.setLastHarvest(finalSource.getLastHarvest());
+                        redirectedSource.setLastHarvestFailed(finalSource.isLastHarvestFailed());
+                        // Saving the updated source to database.
+                        DAOFactory.get().getDao(HarvestSourceDAO.class).editRedirectedSource(redirectedSource);
+                    }
+
+                    // Update Virtuoso cr:lastRefreshed metadata. Context
+                    // /harvester
+                    DAOFactory.get().getDao(HarvestSourceDAO.class)
+                            .insertUpdateSourceMetadata(url, Predicates.CR_LAST_REFRESHED, finalSourceLastRefreshedDate);
+                }
+            }
+        }
+    }
+
+    /**
+     * 
+     * @param harvest
+     * @param finalSourceId
+     * @param redirectedUrls
+     * @throws DAOException
+     */
+    protected void writeFinishedRedirected(Harvest harvest, int finalSourceId, List<String> redirectedUrls) throws DAOException {
+
+        // harvest failed if it has a fatal error || warnings || errors
+        boolean failed = harvest.getFatalError() != null || (harvest.getErrors() != null && !harvest.getErrors().isEmpty())
+                || (harvest.getWarnings() != null && !harvest.getWarnings().isEmpty());
+
+        if (harvest instanceof VirtuosoPullHarvest) {
+            DAOFactory
+                    .get()
+                    .getDao(HarvestSourceDAO.class)
+                    .updateHarvestFinished(finalSourceId, harvest.getStoredTriplesCount(),
+                            ((VirtuosoPullHarvest) harvest).getSourceAvailable(), failed);
+        }
+    }
+
+    /**
+     * 
      * @param harvest
      * @throws DAOException
      */
-    protected void writeMessages(Harvest harvest) throws DAOException{
+    protected void writeMessages(Harvest harvest) throws DAOException {
 
         // save the fatal exception
         writeThrowable(harvest.getFatalError(), HarvestMessageType.FATAL.toString());
@@ -135,8 +187,8 @@ public class HarvestDAOWriter {
 
         // save infos
         List<String> infos = harvest.getInfos();
-        if (infos!=null && !infos.isEmpty()){
-            for (Iterator<String> i=infos.iterator(); i.hasNext();){
+        if (infos != null && !infos.isEmpty()) {
+            for (Iterator<String> i = infos.iterator(); i.hasNext();) {
 
                 HarvestMessageDTO harvestMessageDTO = new HarvestMessageDTO();
                 harvestMessageDTO.setHarvestId(new Integer(harvestId));
@@ -149,14 +201,14 @@ public class HarvestDAOWriter {
     }
 
     /**
-     *
+     * 
      * @param throwable
      * @param type
      * @throws DAOException
      */
-    protected void writeThrowable(Throwable throwable, String type) throws DAOException{
+    protected void writeThrowable(Throwable throwable, String type) throws DAOException {
 
-        if (throwable==null)
+        if (throwable == null)
             return;
 
         HarvestMessageDTO harvestMessageDTO = new HarvestMessageDTO();
@@ -168,18 +220,26 @@ public class HarvestDAOWriter {
     }
 
     /**
-     *
+     * 
      * @param throwables
      * @param type
      * @throws DAOException
      */
-    protected void writeThrowables(List<Throwable> throwables, String type) throws DAOException{
+    protected void writeThrowables(List<Throwable> throwables, String type) throws DAOException {
 
-        if (throwables==null)
+        if (throwables == null)
             return;
 
-        for (int i=0; i<throwables.size(); i++){
+        for (int i = 0; i < throwables.size(); i++) {
             writeThrowable(throwables.get(i), type);
         }
+    }
+
+    public int getHarvestId() {
+        return harvestId;
+    }
+
+    public void setHarvestId(int harvestId) {
+        this.harvestId = harvestId;
     }
 }

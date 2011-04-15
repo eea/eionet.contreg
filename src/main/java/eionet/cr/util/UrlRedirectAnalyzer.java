@@ -5,16 +5,12 @@ package eionet.cr.util;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -30,18 +26,20 @@ public class UrlRedirectAnalyzer {
     public static Logger logger = Logger.getLogger(UrlRedirectAnalyzer.class);
 
     /**
-     *
+     * @param urlToAnlayze
+     * @param urlConnection
+     * @return UrlRedirectionInfo
+     * @throws MalformedURLException
      */
     public static UrlRedirectionInfo analyzeUrlRedirection(String urlToAnlayze) {
 
         UrlRedirectionInfo result = new UrlRedirectionInfo();
         result.setSourceURL(urlToAnlayze);
 
-        HttpURLConnection urlConnection = null;
         InputStream inputStream = null;
+        HttpURLConnection urlConnection = null;
         try {
             URL url = new URL(StringUtils.substringBefore(urlToAnlayze, "#"));
-
             urlConnection = (HttpURLConnection)URLUtil.replaceURLSpaces(url).openConnection();
             urlConnection.setRequestProperty("Accept", "application/rdf+xml, text/xml, */*;q=0.6");
             urlConnection.setRequestProperty("User-Agent", URLUtil.userAgentHeader());
@@ -79,7 +77,7 @@ public class UrlRedirectAnalyzer {
      *
      * @param baseUrl
      * @param relativeUrl
-     * @return
+     * @return String
      * @throws MalformedURLException
      */
     public static String constructFullUrl(String baseUrl, String relativeUrl)

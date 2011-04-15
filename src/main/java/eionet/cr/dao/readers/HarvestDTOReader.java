@@ -51,7 +51,6 @@ public class HarvestDTOReader extends SQLResultSetBaseReader<HarvestDTO> {
         harvestDTO.setDatetimeStarted(rs.getTimestamp("STARTED"));
         harvestDTO.setDatetimeFinished(rs.getTimestamp("FINISHED"));
 
-        harvestDTO.setTotalResources(new Integer(rs.getInt("TOT_RESOURCES")));
         harvestDTO.setEncodingSchemes(new Integer(rs.getInt("ENC_SCHEMES")));
         harvestDTO.setTotalStatements(new Integer(rs.getInt("TOT_STATEMENTS")));
         harvestDTO.setLitObjStatements(new Integer(rs.getInt("LIT_STATEMENTS")));

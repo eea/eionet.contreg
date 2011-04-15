@@ -64,7 +64,6 @@ public class PostgreSQLHarvestDAO extends PostgreSQLBaseDAO implements
             + " HARVEST.STATUS as STATUS,"
             + " HARVEST.STARTED as STARTED,"
             + " HARVEST.FINISHED as FINISHED,"
-            + " HARVEST.TOT_RESOURCES as TOT_RESOURCES,"
             + " HARVEST.ENC_SCHEMES as ENC_SCHEMES,"
             + " HARVEST.TOT_STATEMENTS as TOT_STATEMENTS,"
             + " HARVEST.LIT_STATEMENTS as LIT_STATEMENTS,"
@@ -139,25 +138,24 @@ public class PostgreSQLHarvestDAO extends PostgreSQLBaseDAO implements
     }
 
     /** */
-    private static final String updateFinishedHarvestSQL = "update HARVEST set STATUS=?, FINISHED=now(), TOT_STATEMENTS=?, LIT_STATEMENTS=?, RES_STATEMENTS=?, TOT_RESOURCES=?, ENC_SCHEMES=? "
+    private static final String updateFinishedHarvestSQL = "update HARVEST set STATUS=?, FINISHED=now(), TOT_STATEMENTS=?, LIT_STATEMENTS=?, RES_STATEMENTS=?, ENC_SCHEMES=? "
             + "where HARVEST_ID=?";
 
     /*
      * (non-Javadoc)
      * 
      * @see eionet.cr.dao.HarvestDAO#updateFinishedHarvest(int, int, int, int,
-     * int, java.lang.String)
+     * java.lang.String)
      */
     public void updateFinishedHarvest(int harvestId, String status,
-            int totStatements, int totResources, int litStatements,
-            int encSchemes) throws DAOException {
+            int totStatements, int litStatements, int encSchemes)
+            throws DAOException {
 
         List<Object> values = new ArrayList<Object>();
         values.add(status);
         values.add(new Integer(totStatements));
         values.add(new Integer(litStatements));
         values.add(new Integer(totStatements - litStatements));
-        values.add(new Integer(totResources));
         values.add(new Integer(encSchemes));
         values.add(new Integer(harvestId));
 

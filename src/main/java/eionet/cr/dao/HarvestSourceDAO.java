@@ -20,9 +20,15 @@
  */
 package eionet.cr.dao;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
+import org.openrdf.repository.RepositoryException;
+import org.openrdf.rio.RDFParseException;
+
 import eionet.cr.dto.HarvestSourceDTO;
+import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.pagination.PagingRequest;
@@ -158,8 +164,7 @@ public interface HarvestSourceDAO extends DAO {
      * @throws DAOException
      */
     public void updateHarvestFinished(int sourceId, Integer numStatements,
-            Integer numResources, Boolean sourceAvailable, boolean failed)
-            throws DAOException;
+            Boolean sourceAvailable, boolean failed) throws DAOException;
 
     /**
      * 
@@ -232,5 +237,80 @@ public interface HarvestSourceDAO extends DAO {
      * @throws DAOException
      */
     boolean removeSourceFromInferenceRule(String url) throws DAOException;
+
+    /**
+     * Loads the file into the repository (triple store). File is required to be
+     * RDF.
+     * 
+     * @param file
+     * @param sourceUrlString
+     * @return int
+     * @throws DAOException
+     * @throws RepositoryException
+     * @throws RDFParseException
+     * @throws IOException
+     */
+    public int addSourceToRepository(File file, String sourceUrlString)
+            throws DAOException, RepositoryException, RDFParseException,
+            IOException;
+
+    /**
+     * Adds the meta information the harvester has collected about the source.
+     * The meta data is considered part of the harvester and not the source.
+     * Therefore the meta data is stored in the harvester's named graph (or
+     * context)
+     * 
+     * @param sourceMetadata
+     * @throws DAOException
+     * @throws RepositoryException
+     * @throws RDFParseException
+     * @throws IOException
+     */
+    public void addSourceMetadata(SubjectDTO sourceMetadata)
+            throws DAOException, RDFParseException, RepositoryException,
+            IOException;
+    
+    /**
+     * Returns new harvest sources found by HarvestingJob
+     * 
+     * @param sourceUrl
+     * @return List<String>
+     * @throws DAOException
+     * @throws RepositoryException
+     * @throws RDFParseException
+     * @throws IOException
+     */
+    public List<String> getNewSources(String sourceUrl)
+            throws DAOException, RDFParseException, RepositoryException,
+            IOException;
+    
+   
+    /**
+     * Returns metadata from /harvester context
+     * 
+     * @param subject
+     * @param predicate
+     * @return String
+     * @throws DAOException
+     * @throws RepositoryException
+     */
+    public String getSourceMetadata(String subject, String predicate) throws DAOException, RepositoryException;
+    
+    /**
+     * Inserts given metadata into /harvester context
+     * 
+     * @param subject
+     * @param predicate
+     * @param value
+     * @throws DAOException
+     * @throws RepositoryException
+     */
+    public void insertUpdateSourceMetadata(String subject, String predicate, String value) throws DAOException, RepositoryException;
+    
+    /**
+     * @param source
+     * @throws DAOException
+     */
+    public void editRedirectedSource(HarvestSourceDTO source) throws DAOException;
 
 }

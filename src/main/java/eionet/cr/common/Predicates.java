@@ -83,6 +83,7 @@ public interface Predicates {
     public static final String CR_USER_REVIEW_LAST_NUMBER = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#userReviewLastNumber";
     public static final String CR_HAS_ATTACHMENT = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#hasAttachment";
     public static final String CR_HAS_FILE = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#hasFile";
+    public static final String CR_REDIRECTED_TO = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#redirectedTo";
 
     public static final String WGS_LAT = "http://www.w3.org/2003/01/geo/wgs84_pos#lat";
     public static final String WGS_LONG = "http://www.w3.org/2003/01/geo/wgs84_pos#long";

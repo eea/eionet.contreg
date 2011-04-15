@@ -50,7 +50,6 @@ public class HarvestTest extends CRDatabaseTestCase{
             Harvest harvest = new PullHarvest(o.toString(), null);
             harvest.execute();
 
-            assertEquals((int)11, harvest.getDistinctSubjectsCount());
             assertEquals((int)49, harvest.getStoredTriplesCount());
         }
         catch (Throwable e) {
@@ -84,7 +83,6 @@ public class HarvestTest extends CRDatabaseTestCase{
 
             assertNotNull(harvest.getSourceAvailable());
             assertTrue(harvest.getSourceAvailable().booleanValue());
-            assertEquals((int)11, harvest.getDistinctSubjectsCount());
             assertEquals((int)49, harvest.getStoredTriplesCount());
         }
         catch (HarvestException e) {

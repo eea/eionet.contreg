@@ -3,7 +3,6 @@
  */
 package eionet.cr.harvest;
 
-import java.io.File;
 import java.net.URL;
 
 import org.dbunit.dataset.IDataSet;
@@ -32,7 +31,6 @@ public class HarvestGZipTest extends CRDatabaseTestCase {
             Harvest harvest = new PullHarvest(url.toString(), null);
             harvest.execute();
 
-            assertEquals((int)11, harvest.getDistinctSubjectsCount());
             assertEquals((int)49, harvest.getStoredTriplesCount());
         }
         catch (Throwable e) {

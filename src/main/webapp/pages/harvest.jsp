@@ -44,10 +44,6 @@
                 <td>Triples:</td>
                 <td><c:out value="${actionBean.harvestDTO.totalStatements}"/></td>
             </tr>
-            <tr>
-                <td>Subjects:</td>
-                <td><c:out value="${actionBean.harvestDTO.totalResources}"/></td>
-            </tr>
         </table>
         <br/><br/>
         <c:choose>

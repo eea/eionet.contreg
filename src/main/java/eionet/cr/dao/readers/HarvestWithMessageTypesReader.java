@@ -75,7 +75,6 @@ public class HarvestWithMessageTypesReader extends SQLResultSetBaseReader<Harves
             currHarvest.setDatetimeStarted(rs.getTimestamp("STARTED"));
             currHarvest.setDatetimeFinished(rs.getTimestamp("FINISHED"));
 
-            currHarvest.setTotalResources(new Integer(rs.getInt("TOT_RESOURCES")));
             currHarvest.setEncodingSchemes(new Integer(rs.getInt("ENC_SCHEMES")));
             currHarvest.setTotalStatements(new Integer(rs.getInt("TOT_STATEMENTS")));
             currHarvest.setLitObjStatements(new Integer(rs.getInt("LIT_STATEMENTS")));

@@ -42,6 +42,7 @@ public class InstantHarvest extends PullHarvest{
      *
      * @param sourceUrlString
      * @param lastHarvest
+     * @param userName
      */
     public InstantHarvest(String sourceUrlString, Date lastHarvest, String userName){
 
@@ -77,7 +78,7 @@ public class InstantHarvest extends PullHarvest{
      *
      * @param sourceUrl
      * @param userName
-     * @return
+     * @return InstantHarvest
      * @throws DAOException
      */
     public static InstantHarvest createFullSetup(String sourceUrl, String userName) throws DAOException{
@@ -85,12 +86,10 @@ public class InstantHarvest extends PullHarvest{
         HarvestSourceDTO dto = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(sourceUrl);
         InstantHarvest instantHarvest = new InstantHarvest(sourceUrl, null, userName);
 
-        int numOfResources = dto.getResources()==null ? 0 : dto.getResources().intValue();
-
         instantHarvest.setPreviousHarvest(DAOFactory.get().getDao(
                 HarvestDAO.class).getLastHarvestBySourceId(dto.getSourceId().intValue()));
         instantHarvest.setDaoWriter(new HarvestDAOWriter(
-                dto.getSourceId().intValue(), Harvest.TYPE_PULL, numOfResources, CRUser.application.getUserName()));
+                dto.getSourceId().intValue(), Harvest.TYPE_PULL, CRUser.application.getUserName()));
         instantHarvest.setNotificationSender(new HarvestNotificationSender());
 
         return instantHarvest;

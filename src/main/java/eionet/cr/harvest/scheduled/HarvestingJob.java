@@ -311,7 +311,6 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
 
         try {
             Integer sourceId = null;
-            int numOfResources = 0;
 
             HarvestSourceDAO harvestSourceDAO = DAOFactory.get().getDao(
                     HarvestSourceDAO.class);
@@ -324,14 +323,12 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
                 sourceId = harvestSourceDAO.addSource(harvestSource);
             } else {
                 sourceId = harvestSource.getSourceId();
-                numOfResources = harvestSource.getResources() == null ? 0
-                        : harvestSource.getResources().intValue();
             }
 
             Harvest harvest = new PushHarvest(pushedContent, url);
             if (sourceId != null && sourceId.intValue() > 0) {
                 harvest.setDaoWriter(new HarvestDAOWriter(sourceId.intValue(),
-                        Harvest.TYPE_PUSH, numOfResources, CRUser.application
+                        Harvest.TYPE_PUSH, CRUser.application
                                 .getUserName()));
             }
 
