@@ -131,7 +131,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
     }
 
     /** */
-    private static final String tripleInsertSQL = "insert into SPO (SUBJECT, PREDICATE, OBJECT,"
+    private static final String TRIPLE_INSERT_SQL = "insert into SPO (SUBJECT, PREDICATE, OBJECT,"
             + " OBJECT_HASH, OBJECT_DOUBLE, ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG,"
             + " OBJ_DERIV_SOURCE, OBJ_DERIV_SOURCE_GEN_TIME, OBJ_SOURCE_OBJECT, SOURCE,"
             + " GEN_TIME) values (?, ?, ?, ?, ?,"
@@ -151,7 +151,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
         PreparedStatement pstmt = null;
         try {
             conn = getSQLConnection();
-            pstmt = conn.prepareStatement(tripleInsertSQL);
+            pstmt = conn.prepareStatement(TRIPLE_INSERT_SQL);
 
             boolean doExecuteBatch = false;
             long subjectHash = subjectDTO.getUriHash();
@@ -163,21 +163,21 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
                     long predicateHash = Hashes.spoHash(predicateUri);
                     for (ObjectDTO object : objects) {
 
-                        pstmt.setLong(   1, subjectHash);
-                        pstmt.setLong(   2, predicateHash);
-                        pstmt.setString( 3, object.getValue());
-                        pstmt.setLong(   4, object.getHash());
-                        pstmt.setObject( 5, Util.toDouble(object.getValue()));
-                        pstmt.setString( 6, YesNoBoolean.format(subjectDTO.isAnonymous()));
-                        pstmt.setString( 7, YesNoBoolean.format(object.isAnonymous()));
-                        pstmt.setString( 8, YesNoBoolean.format(object.isLiteral()));
-                        pstmt.setString( 9, StringUtils.trimToEmpty(object.getLanguage()));
-                        pstmt.setLong(  10, object.getDerivSourceUri() == null ?
+                        pstmt.setLong(1, subjectHash);
+                        pstmt.setLong(2, predicateHash);
+                        pstmt.setString(3, object.getValue());
+                        pstmt.setLong(4, object.getHash());
+                        pstmt.setObject(5, Util.toDouble(object.getValue()));
+                        pstmt.setString(6, YesNoBoolean.format(subjectDTO.isAnonymous()));
+                        pstmt.setString(7, YesNoBoolean.format(object.isAnonymous()));
+                        pstmt.setString(8, YesNoBoolean.format(object.isLiteral()));
+                        pstmt.setString(9, StringUtils.trimToEmpty(object.getLanguage()));
+                        pstmt.setLong(10, object.getDerivSourceUri() == null ?
                                 0 : Hashes.spoHash(object.getDerivSourceUri()));
-                        pstmt.setLong(  11, object.getDerivSourceGenTime());
-                        pstmt.setLong(  12, object.getSourceObjectHash());
-                        pstmt.setLong(  13, Hashes.spoHash(object.getSourceUri()));
-                        pstmt.setLong(  14, System.currentTimeMillis());
+                        pstmt.setLong(11, object.getDerivSourceGenTime());
+                        pstmt.setLong(12, object.getSourceObjectHash());
+                        pstmt.setLong(13, Hashes.spoHash(object.getSourceUri()));
+                        pstmt.setLong(14, System.currentTimeMillis());
 
                         pstmt.addBatch();
                         if (doExecuteBatch == false) {
@@ -465,7 +465,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             + "(select distinct SUBJECT from SPO where PREDICATE="
             + Hashes.spoHash(Predicates.RDF_TYPE) + " and OBJECT_HASH=? )";
     /** */
-    private static final String getPredicatesUsedForTypeCache_SQL =
+    private static final String GET_PREDICATES_USED_FOR_TYPE_CACHE_SQL =
         "select distinct PREDICATE from cache_SPO_TYPE_PREDICATE where OBJECT_HASH=? ";
     /*
      * (non-Javadoc)
@@ -481,7 +481,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
         boolean useCache = true;
         try {
             predicateUris = executeSQL(
-                getPredicatesUsedForTypeCache_SQL, values, new SingleObjectReader<Long>());
+                GET_PREDICATES_USED_FOR_TYPE_CACHE_SQL, values, new SingleObjectReader<Long>());
         } catch (DAOException e) {
             logger.warn("Cache tables are not created yet. Continue with spo table");
             predicateUris = executeSQL(
@@ -505,7 +505,8 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
             // get the subjects data
             if (useCache) {
-                getSubjectsData(reader, StringUtils.replace(getPredicatesUsedForTypeCache_SQL, "?", String.valueOf(Hashes.spoHash(typeUri))));
+                getSubjectsData(reader, StringUtils.replace(GET_PREDICATES_USED_FOR_TYPE_CACHE_SQL, "?",
+                        String.valueOf(Hashes.spoHash(typeUri))));
             } else {
                 getSubjectsData(reader);
             }
@@ -889,13 +890,13 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
      * (non-Javadoc)
      * @see eionet.cr.dao.HelperDAO#getLatestHarvestedURLs()
      */
-    public Pair <Integer, List <HarvestedUrlCountDTO>> getLatestHarvestedURLs(int days) throws DAOException {
+    public Pair<Integer, List<HarvestedUrlCountDTO>> getLatestHarvestedURLs(int days) throws DAOException {
 
         StringBuffer buf = new StringBuffer().
-        append(" SELECT DATE(LAST_HARVEST) AS HARVESTDAY, COUNT(HARVEST_SOURCE_ID) AS HARVESTS").
-        append(" FROM HARVEST_SOURCE WHERE LAST_HARVEST IS NOT NULL").
-        append(" AND LAST_HARVEST + INTERVAL '"+days+" days' > current_date").
-        append(" GROUP BY DATE(LAST_HARVEST) ORDER BY HARVESTDAY DESC ;");
+            append(" SELECT DATE(LAST_HARVEST) AS HARVESTDAY, COUNT(HARVEST_SOURCE_ID) AS HARVESTS").
+            append(" FROM HARVEST_SOURCE WHERE LAST_HARVEST IS NOT NULL").
+            append(" AND LAST_HARVEST + INTERVAL '" + days + " days' > current_date").
+            append(" GROUP BY DATE(LAST_HARVEST) ORDER BY HARVESTDAY DESC ;");
 
         List <HarvestedUrlCountDTO> result = new ArrayList();
         Connection conn = null;
@@ -944,7 +945,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
         append(" FROM HARVEST_SOURCE ").
         append(" WHERE interval_minutes > 0 ").
         append(" ORDER BY urgency DESC ").
-        append(" LIMIT "+amount+" ");
+        append(" LIMIT " + amount + " ");
 
         List <HarvestUrgencyScoreDTO> result = new ArrayList();
         Connection conn = null;
@@ -960,7 +961,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
                 HarvestUrgencyScoreDTO resultRow = new HarvestUrgencyScoreDTO();
                 resultRow.setUrl(rs.getString("url"));
                 try {
-                    resultRow.setLastHarvest(sdf.parse(rs.getString("last_harvest")+""));
+                    resultRow.setLastHarvest(sdf.parse(rs.getString("last_harvest") + ""));
                 } catch (ParseException ex) {
                     resultRow.setLastHarvest(null);
                     //throw new DAOException(ex.toString(), ex);
@@ -988,7 +989,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
     public boolean isUrlInHarvestSource(String url) throws DAOException {
 
         StringBuffer buf = new StringBuffer().
-        append("SELECT url FROM harvest_source WHERE url='"+url+"' ");
+        append("SELECT url FROM harvest_source WHERE url='" + url + "' ");
 
         Connection conn = null;
         Statement stmt = null;
@@ -1169,8 +1170,8 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
         String dbQuery = "select distinct OBJECT "
             + "from SPO where LIT_OBJ='N' and "
-            + "PREDICATE="+Hashes.spoHash(Predicates.CR_BOOKMARK)+" and "
-            + "SOURCE="+Hashes.spoHash(CRUser.bookmarksUri(user.getUserName()))+""
+            + "PREDICATE=" + Hashes.spoHash(Predicates.CR_BOOKMARK) + " and "
+            + "SOURCE=" + Hashes.spoHash(CRUser.bookmarksUri(user.getUserName())) + ""
             + " ORDER BY OBJECT ASC";
 
         List<UserBookmarkDTO> returnBookmarks = new ArrayList<UserBookmarkDTO>();
@@ -1210,8 +1211,8 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
         String dbQuery = "select count(*) as cnt from SPO "
             + "where OBJECT_HASH=" + subjectHash + " and "
             + "LIT_OBJ='N' and "
-            + "PREDICATE="+Hashes.spoHash(Predicates.CR_BOOKMARK)+ " and "
-            + "SOURCE="+ Hashes.spoHash(CRUser.bookmarksUri(user.getUserName())) + "";
+            + "PREDICATE=" + Hashes.spoHash(Predicates.CR_BOOKMARK) + " and "
+            + "SOURCE=" + Hashes.spoHash(CRUser.bookmarksUri(user.getUserName())) + "";
 
         int count = 0;
         Connection conn = null;
@@ -1400,8 +1401,8 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
         String dbQuery = "select OBJECT as lastid from SPO "
             + "where "
-            + "PREDICATE="+Hashes.spoHash(Predicates.CR_USER_REVIEW_LAST_NUMBER)+ " and "
-            + "SUBJECT="+ Hashes.spoHash(subjectUrl) + "";
+            + "PREDICATE=" + Hashes.spoHash(Predicates.CR_USER_REVIEW_LAST_NUMBER) + " and "
+            + "SUBJECT=" + Hashes.spoHash(subjectUrl) + "";
 
         int lastid = 0;
         Connection conn = null;
@@ -1432,9 +1433,9 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
         // Deleting from the database the old value and creating a new one.
 
         String deleteQuery = "DELETE FROM spo WHERE "
-            + "PREDICATE="+Hashes.spoHash(Predicates.CR_USER_REVIEW_LAST_NUMBER)
+            + "PREDICATE=" + Hashes.spoHash(Predicates.CR_USER_REVIEW_LAST_NUMBER)
             + " and "
-            + "SUBJECT="+ Hashes.spoHash(user.getHomeUri()) + "";
+            + "SUBJECT=" + Hashes.spoHash(user.getHomeUri()) + "";
         Connection conn = null;
         Statement stmt = null;
         try {
@@ -1576,25 +1577,25 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
     @Override
     public List<ReviewDTO> getReviewList(CRUser user)  throws DAOException {
 
-        String dbQuery = "SELECT " +
-                "uri" +
-                ", spoTitle.object AS title" +
-                ", spoObject.object AS object" +
-                ", spo_binary.object AS reviewcontent" +
-                ", spo_binary.datatype AS datatype " +
-                "FROM spo AS spo1, spo AS spo2, resource, " +
-                " spo AS spoTitle, spo AS spoObject LEFT OUTER JOIN spo_binary ON (spoObject.subject=spo_binary.subject AND spo_binary.must_embed = TRUE) " +
-                "WHERE " +
-                "(spo1.subject = spo2.subject) AND (spo1.subject = spoTitle.subject) AND (spo1.subject = spoObject.subject) AND " +
-                "spoObject.Predicate="+ Hashes.spoHash(Predicates.CR_FEEDBACK_FOR) + " AND " +
-                "spoTitle.Predicate="+ Hashes.spoHash(Predicates.DC_TITLE) + " AND " +
-                "spo1.subject=resource.uri_hash AND " +
-                "(spo1.predicate = " + Hashes.spoHash(Predicates.CR_USER) + ") AND "+
-                "(spo1.object_hash = " + Hashes.spoHash(user.getHomeUri()) +") AND " +
-                "(spo2.predicate = " + Hashes.spoHash(Predicates.RDF_TYPE) +") AND " +
-                "(spo2.object_hash = " + Hashes.spoHash(Subjects.CR_FEEDBACK) +") " +
-                " AND (spoObject.lit_obj = 'N') " +
-                "ORDER BY uri ASC"
+        String dbQuery = "SELECT "
+                + "uri"
+                + ", spoTitle.object AS title"
+                + ", spoObject.object AS object"
+                + ", spo_binary.object AS reviewcontent"
+                + ", spo_binary.datatype AS datatype "
+                + "FROM spo AS spo1, spo AS spo2, resource, "
+                + " spo AS spoTitle, spo AS spoObject LEFT OUTER JOIN spo_binary ON (spoObject.subject=spo_binary.subject AND spo_binary.must_embed = TRUE) "
+                + "WHERE "
+                + "(spo1.subject = spo2.subject) AND (spo1.subject = spoTitle.subject) AND (spo1.subject = spoObject.subject) AND "
+                + "spoObject.Predicate=" + Hashes.spoHash(Predicates.CR_FEEDBACK_FOR) + " AND "
+                + "spoTitle.Predicate=" + Hashes.spoHash(Predicates.DC_TITLE) + " AND "
+                + "spo1.subject=resource.uri_hash AND "
+                + "(spo1.predicate = " + Hashes.spoHash(Predicates.CR_USER) + ") AND "
+                + "(spo1.object_hash = " + Hashes.spoHash(user.getHomeUri()) + ") AND "
+                + "(spo2.predicate = " + Hashes.spoHash(Predicates.RDF_TYPE) + ") AND "
+                + "(spo2.object_hash = " + Hashes.spoHash(Subjects.CR_FEEDBACK) + ") "
+                + "AND (spoObject.lit_obj = 'N') "
+                + "ORDER BY uri ASC"
                 ;
 
         List<ReviewDTO> returnList = new ArrayList<ReviewDTO>();
@@ -1639,26 +1640,26 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
         String userUri = user.getReviewUri(reviewId);
 
-        String dbQuery = "SELECT " +
-                "uri" +
-                ", spoTitle.object AS title" +
-                ", spoObject.object AS object" +
-                ", spo_binary.object AS reviewcontent" +
-                ", spo_binary.datatype AS datatype " +
-                " FROM spo AS spo1, spo AS spo2," +
-                " spo AS spoTitle, resource, spo AS spoObject LEFT OUTER JOIN spo_binary ON (spoObject.subject=spo_binary.subject AND spo_binary.must_embed = TRUE) " +
-                "WHERE " +
-                "(spo1.subject = " + Hashes.spoHash(userUri) + ") AND " +
-                "(spo1.subject = spo2.subject) AND (spo1.subject = spoTitle.subject) AND (spo1.subject = spoObject.subject) AND " +
-                "spoObject.Predicate="+ Hashes.spoHash(Predicates.CR_FEEDBACK_FOR) + "AND " +
-                "spoTitle.Predicate="+ Hashes.spoHash(Predicates.DC_TITLE) + "AND " +
-                "spo1.subject=resource.uri_hash AND " +
-                "(spo1.predicate = " + Hashes.spoHash(Predicates.CR_USER) + ") AND "+
-                "(spo1.object_hash = " + Hashes.spoHash(user.getHomeUri()) +") AND " +
-                "(spo2.predicate = " + Hashes.spoHash(Predicates.RDF_TYPE) +") AND " +
-                "(spo2.object_hash = " + Hashes.spoHash(Subjects.CR_FEEDBACK) +") AND " +
-                "(spoObject.lit_obj = 'N') " +
-                "ORDER BY uri ASC"
+        String dbQuery = "SELECT "
+                + "uri"
+                + ", spoTitle.object AS title"
+                + ", spoObject.object AS object"
+                + ", spo_binary.object AS reviewcontent"
+                + ", spo_binary.datatype AS datatype "
+                + " FROM spo AS spo1, spo AS spo2,"
+                + " spo AS spoTitle, resource, spo AS spoObject LEFT OUTER JOIN spo_binary ON (spoObject.subject=spo_binary.subject AND spo_binary.must_embed = TRUE) "
+                + "WHERE "
+                + "(spo1.subject = " + Hashes.spoHash(userUri) + ") AND "
+                + "(spo1.subject = spo2.subject) AND (spo1.subject = spoTitle.subject) AND (spo1.subject = spoObject.subject) AND "
+                + "spoObject.Predicate=" + Hashes.spoHash(Predicates.CR_FEEDBACK_FOR) + "AND "
+                + "spoTitle.Predicate=" + Hashes.spoHash(Predicates.DC_TITLE) + "AND "
+                + "spo1.subject=resource.uri_hash AND "
+                + "(spo1.predicate = " + Hashes.spoHash(Predicates.CR_USER) + ") AND "
+                + "(spo1.object_hash = " + Hashes.spoHash(user.getHomeUri()) + ") AND "
+                + "(spo2.predicate = " + Hashes.spoHash(Predicates.RDF_TYPE) + ") AND "
+                + "(spo2.object_hash = " + Hashes.spoHash(Subjects.CR_FEEDBACK) + ") AND "
+                + "(spoObject.lit_obj = 'N') "
+                + "ORDER BY uri ASC"
                 ;
 
         ReviewDTO returnItem = new ReviewDTO();
@@ -1704,10 +1705,10 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
     public void deleteReview(CRUser user, int reviewId, boolean deleteAttachments)  throws DAOException {
 
         String sqlDeleteReview = "DELETE FROM spo WHERE (subject=? OR object_hash=?"
-        + "OR source=? OR obj_deriv_source=? OR obj_source_object=?)";
+            + "OR source=? OR obj_deriv_source=? OR obj_source_object=?)";
 
         if (!deleteAttachments) {
-            sqlDeleteReview += " AND (predicate <> "+Hashes.spoHash(Predicates.CR_HAS_ATTACHMENT)+")";
+            sqlDeleteReview += " AND (predicate <> " + Hashes.spoHash(Predicates.CR_HAS_ATTACHMENT) + ")";
         }
 
         String reviewSubjectURI = user.getReviewUri(reviewId);
@@ -1720,7 +1721,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             if (deleteAttachments) {
                 List<String> reviewAttachments = this.getReviewAttachmentList(user, reviewId);
                 for (int i=0; i<reviewAttachments.size(); i++) {
-                    SQLUtil.executeUpdate("DELETE FROM spo_binary WHERE subject = "+Hashes.spoHash(reviewAttachments.get(i)), conn);
+                    SQLUtil.executeUpdate("DELETE FROM spo_binary WHERE subject = " + Hashes.spoHash(reviewAttachments.get(i)), conn);
                 }
             }
 
@@ -1742,7 +1743,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
         String dbQuery = "SELECT object FROM spo WHERE "
             + "(subject = " + Hashes.spoHash(user.getReviewUri(reviewId)) + ") AND "
-            + "(predicate = " + Hashes.spoHash(Predicates.CR_HAS_ATTACHMENT) +") ORDER BY object ASC";
+            + "(predicate = " + Hashes.spoHash(Predicates.CR_HAS_ATTACHMENT) + ") ORDER BY object ASC";
 
         List<String> returnList = new ArrayList<String>();
 
@@ -1774,8 +1775,8 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
         Statement stmt = null;
         try {
             conn = getSQLConnection();
-            SQLUtil.executeUpdate("DELETE FROM spo WHERE object_hash = "+Hashes.spoHash(attachmentUri), conn);
-            SQLUtil.executeUpdate("DELETE FROM spo_binary WHERE subject = "+Hashes.spoHash(attachmentUri), conn);
+            SQLUtil.executeUpdate("DELETE FROM spo WHERE object_hash = " + Hashes.spoHash(attachmentUri), conn);
+            SQLUtil.executeUpdate("DELETE FROM spo_binary WHERE subject = " + Hashes.spoHash(attachmentUri), conn);
         } catch (SQLException e) {
             throw new DAOException(e.toString(), e);
         } finally {
@@ -2066,7 +2067,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
         List<PredicateDTO> returnList = new ArrayList<PredicateDTO>();
 
         StringBuffer buf = new StringBuffer().
-        append("select URI AS predicateuri from RESOURCE where URI_HASH in (select distinct PREDICATE from SPO where SOURCE="+sourceHash+")");
+        append("select URI AS predicateuri from RESOURCE where URI_HASH in (select distinct PREDICATE from SPO where SOURCE=" + sourceHash + ")");
 
         Connection conn = null;
         Statement stmt = null;
@@ -2094,7 +2095,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
         List<String> returnList = new ArrayList<String>();
         StringBuffer buf = new StringBuffer().
-        append("select URI AS subjecturi from RESOURCE where URI_HASH in (select distinct SUBJECT from SPO where SOURCE="+sourceHash+")");
+        append("select URI AS subjecturi from RESOURCE where URI_HASH in (select distinct SUBJECT from SPO where SOURCE=" + sourceHash + ")");
 
         Connection conn = null;
         Statement stmt = null;
@@ -2119,11 +2120,11 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
     public void outputSourceTriples(RDFExporter reader) throws DAOException {
 
         StringBuffer buf = new StringBuffer("select spo.subject AS subjecthash, spo.predicate AS predicatehash, ")
-        .append ("spo.object AS object, spo.obj_deriv_source AS obj_deriv_source")
-        .append (", resource.uri AS subject, spo.lit_obj AS litobject ")
-        .append(" from SPO LEFT JOIN resource ON spo.subject = resource.uri_hash WHERE ")
-        .append("spo.source = " + reader.getSourceHash() )
-        .append(" AND spo.OBJ_DERIV_SOURCE = 0 ORDER BY spo.subject ASC");
+            .append ("spo.object AS object, spo.obj_deriv_source AS obj_deriv_source")
+            .append (", resource.uri AS subject, spo.lit_obj AS litobject ")
+            .append(" from SPO LEFT JOIN resource ON spo.subject = resource.uri_hash WHERE ")
+            .append("spo.source = " + reader.getSourceHash() )
+            .append(" AND spo.OBJ_DERIV_SOURCE = 0 ORDER BY spo.subject ASC");
 
         executeSQL(buf.toString(), reader);
 

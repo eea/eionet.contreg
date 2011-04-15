@@ -23,10 +23,10 @@ import org.openrdf.query.resultio.TupleQueryResultFormat;
 import org.openrdf.query.resultio.TupleQueryResultWriter;
 
 /**
-*
-* @author altnyris
-*
-*/
+ * JSON writer.
+ * @author altnyris
+ *
+ */
 public class CRJsonWriter implements TupleQueryResultWriter {
     /*-----------*
      * Variables *
@@ -55,8 +55,7 @@ public class CRJsonWriter implements TupleQueryResultWriter {
     }
 
     public void startQueryResult(List<String> columnHeaders)
-        throws TupleQueryResultHandlerException
-    {
+        throws TupleQueryResultHandlerException {
         try {
             openBraces();
 
@@ -76,34 +75,29 @@ public class CRJsonWriter implements TupleQueryResultWriter {
             openArray();
 
             firstTupleWritten = false;
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new TupleQueryResultHandlerException(e);
         }
     }
 
     public void endQueryResult()
-        throws TupleQueryResultHandlerException
-    {
+        throws TupleQueryResultHandlerException {
         try {
             closeArray(); // bindings array
             closeBraces(); // results braces
             closeBraces(); // root braces
             writer.flush();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new TupleQueryResultHandlerException(e);
         }
     }
 
     public void handleSolution(BindingSet bindingSet)
-        throws TupleQueryResultHandlerException
-    {
+        throws TupleQueryResultHandlerException {
         try {
             if (firstTupleWritten) {
                 writeComma();
-            }
-            else {
+            } else {
                 firstTupleWritten = true;
             }
 
@@ -123,64 +117,55 @@ public class CRJsonWriter implements TupleQueryResultWriter {
             closeBraces(); // end solution
 
             writer.flush();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new TupleQueryResultHandlerException(e);
         }
     }
 
     private void writeKeyValue(String key, String value)
-        throws IOException
-    {
+        throws IOException {
         writeKey(key);
         writeString(value);
     }
 
     private void writeKeyValue(String key, Value value)
-        throws IOException, TupleQueryResultHandlerException
-    {
+        throws IOException, TupleQueryResultHandlerException {
         writeKey(key);
         writeValue(value);
     }
 
     private void writeKeyValue(String key, Iterable<String> array)
-        throws IOException
-    {
+        throws IOException {
         writeKey(key);
         writeArray(array);
     }
 
     private void writeKey(String key)
-        throws IOException
-    {
+        throws IOException {
         writeString(key);
         writer.write(": ");
     }
 
     private void writeValue(Value value)
-        throws IOException, TupleQueryResultHandlerException
-    {
+        throws IOException, TupleQueryResultHandlerException {
         writer.write("{ ");
         if(value != null){
             if (value instanceof URI) {
                 writeKeyValue("type", "uri");
                 writer.write(", ");
                 writeKeyValue("value", ((URI)value).toString());
-            }
-            else if (value instanceof BNode) {
+            } else if (value instanceof BNode) {
                 writeKeyValue("type", "bnode");
                 writer.write(", ");
                 writeKeyValue("value", ((BNode)value).getID());
-            }
-            else if (value instanceof Literal) {
+            } else if (value instanceof Literal) {
                 Literal lit = (Literal)value;
     
                 if (lit.getDatatype() != null) {
                     writeKeyValue("type", "typed-literal");
                     writer.write(", ");
                     writeKeyValue("datatype", lit.getDatatype().toString());
-                }
-                else {
+                } else {
                     writeKeyValue("type", "literal");
                     if (lit.getLanguage() != null) {
                         writer.write(", ");
@@ -190,8 +175,7 @@ public class CRJsonWriter implements TupleQueryResultWriter {
     
                 writer.write(", ");
                 writeKeyValue("value", lit.getLabel());
-            }
-            else {
+            } else {
                 throw new TupleQueryResultHandlerException("Unknown Value object type: " + value.getClass());
             }
         }
@@ -200,8 +184,7 @@ public class CRJsonWriter implements TupleQueryResultWriter {
     }
 
     private void writeString(String value)
-        throws IOException
-    {
+        throws IOException {
         // Escape special characters
         value = StringUtil.gsub("\\", "\\\\", value);
         value = StringUtil.gsub("\"", "\\\"", value);
@@ -218,8 +201,7 @@ public class CRJsonWriter implements TupleQueryResultWriter {
     }
 
     private void writeArray(Iterable<String> array)
-        throws IOException
-    {
+        throws IOException {
         writer.write("[ ");
 
         Iterator<String> iter = array.iterator();
@@ -237,40 +219,35 @@ public class CRJsonWriter implements TupleQueryResultWriter {
     }
 
     private void openArray()
-        throws IOException
-    {
+        throws IOException {
         writer.write("[");
         writer.writeEOL();
         writer.increaseIndentation();
     }
 
     private void closeArray()
-        throws IOException
-    {
+        throws IOException {
         writer.writeEOL();
         writer.decreaseIndentation();
         writer.write("]");
     }
 
     private void openBraces()
-        throws IOException
-    {
+        throws IOException {
         writer.write("{");
         writer.writeEOL();
         writer.increaseIndentation();
     }
 
     private void closeBraces()
-        throws IOException
-    {
+        throws IOException {
         writer.writeEOL();
         writer.decreaseIndentation();
         writer.write("}");
     }
 
     private void writeComma()
-        throws IOException
-    {
+        throws IOException {
         writer.write(", ");
         writer.writeEOL();
     }

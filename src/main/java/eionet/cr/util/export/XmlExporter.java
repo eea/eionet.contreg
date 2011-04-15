@@ -44,7 +44,7 @@ import eionet.cr.util.Pair;
  * XmlExporter
  */
 
-public class XmlExporter extends Exporter implements SubjectExportEvent{
+public class XmlExporter extends Exporter implements SubjectExportEvent {
 
     protected static final String ENCODING = "UTF-8";
     protected static final String ROOT_ELEMENT = "root";
@@ -62,7 +62,7 @@ public class XmlExporter extends Exporter implements SubjectExportEvent{
 
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 
-        try{
+        try {
             writer = XMLOutputFactory.newInstance().createXMLStreamWriter(outStream, ENCODING);
             writer.writeStartDocument(ENCODING, "1.0");
             //write root element
@@ -83,10 +83,9 @@ public class XmlExporter extends Exporter implements SubjectExportEvent{
             throw new ExportException(e.toString(), e);
         } catch (FactoryConfigurationError e) {
             throw new ExportException(e.toString(), e);
-        }
-        finally{
-            if(writer!=null) {
-                try { writer.close();}catch (XMLStreamException e) {}
+        } finally {
+            if (writer != null) {
+                try { writer.close(); } catch (XMLStreamException e) {}
             }
         }
         //System.out.println(new String(outStream.toByteArray()));
@@ -99,7 +98,7 @@ public class XmlExporter extends Exporter implements SubjectExportEvent{
      */
     public void writeSubjectIntoExporterOutput(SubjectDTO subject) throws ExportException {
 
-        try{
+        try {
             // write row start element
             writer.writeStartElement(ROW_ELEMENT);
 
@@ -113,9 +112,9 @@ public class XmlExporter extends Exporter implements SubjectExportEvent{
 
             //write other elements
             int elementIndex = 1;
-            for(Pair<String,String> columnPair : getSelectedColumns()) {
+            for (Pair<String,String> columnPair : getSelectedColumns()) {
                 //label is already written
-                if(Predicates.RDFS_LABEL.equals(columnPair.getLeft())) continue;
+                if (Predicates.RDFS_LABEL.equals(columnPair.getLeft())) continue;
 
                 String value = FormatUtils.getObjectValuesForPredicate(columnPair.getLeft(), subject, getLanguages());
                 elementMetada = elements.get(elementKeys[elementIndex++]);
@@ -125,8 +124,7 @@ public class XmlExporter extends Exporter implements SubjectExportEvent{
             }
 
             writer.writeEndElement();
-        }
-        catch(Exception e) {
+        } catch(Exception e) {
             throw new ExportException(e.getMessage(), e);
         }
     }
@@ -140,15 +138,15 @@ public class XmlExporter extends Exporter implements SubjectExportEvent{
         //create the elements map, where the key is element name in lowercase and the value is escaped element value
         elements = new LinkedHashMap<String, XmlElementMetadata>();
         //set Uri or Label element
-        elements.put(getUriOrLabel().toLowerCase(),new XmlElementMetadata(getUriOrLabel()));
+        elements.put(getUriOrLabel().toLowerCase(), new XmlElementMetadata(getUriOrLabel()));
 
         //set other element names
-        for(Pair<String,String> columnPair : getSelectedColumns()) {
+        for (Pair<String, String> columnPair : getSelectedColumns()) {
             //label is already added to the list of elements
-            if(Predicates.RDFS_LABEL.equals(columnPair.getLeft())) continue;
+            if (Predicates.RDFS_LABEL.equals(columnPair.getLeft())) continue;
 
             String element = columnPair.getRight() != null
-            ? columnPair.getRight()
+                ? columnPair.getRight()
                     : columnPair.getLeft();
             String elemName = getUniqueElementName(XmlUtil.getEscapedElementName(element));
             elements.put(elemName.toLowerCase(), new XmlElementMetadata(elemName));
@@ -159,7 +157,7 @@ public class XmlExporter extends Exporter implements SubjectExportEvent{
      * @param writer
      * @throws XMLStreamException
      */
-    protected void writeDocumentStart(XMLStreamWriter writer) throws XMLStreamException{
+    protected void writeDocumentStart(XMLStreamWriter writer) throws XMLStreamException {
         writer.writeStartElement(DATA_ROOT_ELEMENT);
     }
     /**
@@ -167,14 +165,14 @@ public class XmlExporter extends Exporter implements SubjectExportEvent{
      * @param writer
      * @throws XMLStreamException
      */
-    protected void writeDocumentEnd(XMLStreamWriter writer) throws XMLStreamException{
+    protected void writeDocumentEnd(XMLStreamWriter writer) throws XMLStreamException {
         writer.writeEndElement();
     }
     /**
      * returns the list of element names
      * @return
      */
-    public Map<String,XmlElementMetadata> getElements() {
+    public Map<String, XmlElementMetadata> getElements() {
         return elements;
     }
     /**
@@ -186,22 +184,20 @@ public class XmlExporter extends Exporter implements SubjectExportEvent{
      */
     protected String getUniqueElementName(String elementName) {
 
-        if(elementName == null || elementName.length() == 0)  elementName=XmlUtil.INVALID_ELEMENT_NAME;
+        if (elementName == null || elementName.length() == 0)  elementName = XmlUtil.INVALID_ELEMENT_NAME;
 
-        if(getElements()!=null) {
+        if (getElements() != null) {
             while (getElements().containsKey(elementName.toLowerCase())) {
                 int dashPos = elementName.lastIndexOf( "_" );
                 if (dashPos > 1 && dashPos < elementName.length()-1) {
-                    String snum = elementName.substring(dashPos+1);
-                    try{
+                    String snum = elementName.substring(dashPos + 1);
+                    try {
                         int inum = Integer.parseInt(snum);
-                        elementName = elementName.substring(0, dashPos ) + "_" + (inum+1);
-                    }
-                    catch(Exception e) {
+                        elementName = elementName.substring(0, dashPos ) + "_" + (inum + 1);
+                    } catch(Exception e) {
                         elementName = elementName + "_1";
                     }
-                }
-                else{
+                } else {
                     elementName = elementName + "_1";
                 }
             }

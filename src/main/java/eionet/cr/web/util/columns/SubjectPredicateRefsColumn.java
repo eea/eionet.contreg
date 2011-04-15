@@ -41,7 +41,7 @@ import eionet.cr.web.action.FactsheetActionBean;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class SubjectPredicateRefsColumn extends SearchResultColumn{
+public class SubjectPredicateRefsColumn extends SearchResultColumn {
 
     /** */
     private String predicateUri;
@@ -103,42 +103,39 @@ public class SubjectPredicateRefsColumn extends SearchResultColumn{
      * value of the literal will be used. For resource objects, clickable factsheet links will
      * be created.
      */
-    public String format(Object object){
+    public String format(Object object) {
 
         String result = null;
-        if (object!=null && object instanceof SubjectDTO && predicateUri!=null){
+        if (object != null && object instanceof SubjectDTO && predicateUri != null) {
 
             SubjectDTO subjectDTO = (SubjectDTO)object;
             Collection<ObjectDTO> objects = subjectDTO.getObjectsForSearchResultsDisplay(
                     predicateUri, getLanguages());
 
-            if (predicateUri.equals(Predicates.RDFS_LABEL)){
+            if (predicateUri.equals(Predicates.RDFS_LABEL)) {
 
-                if (objects.isEmpty()){
+                if (objects.isEmpty()) {
                     result = URIUtil.extractURILabel(subjectDTO.getUri(), SubjectDTO.NO_LABEL);
-                }
-                else{
+                } else {
                     result = objectValuesToCSV(objects);
                 }
                 String uriLabel = URIUtil.extractURILabel(subjectDTO.getUri(), SubjectDTO.NO_LABEL);
-                result = uriLabel + " ("+result+")";
+                result = uriLabel + " (" + result + ")";
                 result = buildFactsheetLink(subjectDTO.getUri(), result);
-            }
-            else if (!objects.isEmpty()){
+            } else if (!objects.isEmpty()) {
 
                 StringBuffer buf = new StringBuffer();
-                for (ObjectDTO o : objects){
+                for (ObjectDTO o : objects) {
 
-                    if (buf.length()>0){
+                    if (buf.length() > 0) {
                         buf.append(", ");
                     }
 
-                    if (o.isLiteral()){
+                    if (o.isLiteral()) {
                         buf.append(o.getValue());
-                    }
-                    else{
+                    } else {
                         String label = o.getDerviedLiteralValue();
-                        if (label==null){
+                        if (label == null) {
                             label = URIUtil.extractURILabel(o.getValue(), SubjectDTO.NO_LABEL);
                         }
                         buf.append(buildFactsheetLink(o.getValue(), label));
@@ -156,11 +153,11 @@ public class SubjectPredicateRefsColumn extends SearchResultColumn{
      * @param objects
      * @return
      */
-    private String objectValuesToCSV(Collection<ObjectDTO> objects){
+    private String objectValuesToCSV(Collection<ObjectDTO> objects) {
 
         StringBuffer buf = new StringBuffer();
-        for (ObjectDTO object : objects){
-            buf.append(buf.length()>0 ? ", " : "").append(object.getValue());
+        for (ObjectDTO object : objects) {
+            buf.append(buf.length() > 0 ? ", " : "").append(object.getValue());
         }
         return buf.toString();
     }
@@ -171,14 +168,14 @@ public class SubjectPredicateRefsColumn extends SearchResultColumn{
      * @param label
      * @return
      */
-    private String buildFactsheetLink(String uri, String label){
+    private String buildFactsheetLink(String uri, String label) {
 
         String factsheetUrlBinding =
             FactsheetActionBean.class.getAnnotation(UrlBinding.class).value();
         int i = factsheetUrlBinding.lastIndexOf("/");
 
         StringBuffer href = new StringBuffer(
-                i>=0 ? factsheetUrlBinding.substring(i+1) : factsheetUrlBinding).append("?");
+                i >= 0 ? factsheetUrlBinding.substring(i + 1) : factsheetUrlBinding).append("?");
         href.append("uri=").append(Util.urlEncode(uri));
 
         return new StringBuffer("<a href=\"").append(href).append("\">").append(label).
@@ -197,13 +194,13 @@ public class SubjectPredicateRefsColumn extends SearchResultColumn{
      *
      * @return
      */
-    private HashSet<String> getLanguages(){
+    private HashSet<String> getLanguages() {
 
-        if (languages==null){
-            if (actionBean!=null){
+        if (languages == null) {
+            if (actionBean != null) {
                 languages = actionBean.getAcceptedLanguages();
             }
-            if (languages==null){
+            if (languages == null) {
                 languages = new HashSet<String>();
             }
         }
