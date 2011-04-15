@@ -67,9 +67,9 @@ import eionet.cr.util.Util;
 import eionet.cr.web.util.FactsheetObjectId;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 @UrlBinding("/factsheet.action")
 public class FactsheetActionBean extends AbstractActionBean {
@@ -83,7 +83,7 @@ public class FactsheetActionBean extends AbstractActionBean {
     private SubjectDTO subject;
 
     /** */
-    private Map<String,String> predicateLabels;
+    private Map<String, String> predicateLabels;
     private SubProperties subProperties;
 
     /** */
@@ -109,11 +109,11 @@ public class FactsheetActionBean extends AbstractActionBean {
     /** */
     private boolean subjectDownloadable;
 
-
     /**
-     *
-     * @return
-     * @throws DAOException TODO
+     * 
+     * @return Resolution
+     * @throws DAOException
+     *             TODO
      */
     @DefaultHandler
     public Resolution view() throws DAOException {
@@ -158,8 +158,8 @@ public class FactsheetActionBean extends AbstractActionBean {
 
     /**
      * Handle for ajax harvesting.
-     *
-     * @return
+     * 
+     * @return Resolution
      */
     public Resolution harvestAjax() {
         String message;
@@ -174,8 +174,8 @@ public class FactsheetActionBean extends AbstractActionBean {
 
     /**
      * Handle for ajax virtuoso harvesting.
-     *
-     * @return
+     * 
+     * @return Resolution
      */
     public Resolution harvestAjaxVirtuoso() {
         String message;
@@ -190,7 +190,7 @@ public class FactsheetActionBean extends AbstractActionBean {
 
     /**
      * Schedules a harvest for resource.
-     *
+     * 
      * @return view resolution
      * @throws HarvestException
      * @throws DAOException
@@ -209,7 +209,7 @@ public class FactsheetActionBean extends AbstractActionBean {
 
     /**
      * Schedules a virtuoso harvest for resource.
-     *
+     * 
      * @return view resolution
      * @throws HarvestException
      * @throws DAOException
@@ -228,15 +228,15 @@ public class FactsheetActionBean extends AbstractActionBean {
 
     /**
      * helper method to eliminate code duplication.
-     *
+     * 
      * @return
      * @throws HarvestException
      * @throws DAOException
      */
-    private Pair<Boolean, String> harvestNow(boolean isVirtuosoHarvest) throws HarvestException, DAOException  {
+    private Pair<Boolean, String> harvestNow(boolean isVirtuosoHarvest) throws HarvestException, DAOException {
 
         String message = null;
-        if(isUserLoggedIn()) {
+        if (isUserLoggedIn()) {
             if (!StringUtils.isBlank(uri) && URLUtil.isURL(uri)) {
 
                 /* add this url into HARVEST_SOURCE table */
@@ -245,9 +245,8 @@ public class FactsheetActionBean extends AbstractActionBean {
                 HarvestSourceDTO dto = new HarvestSourceDTO();
                 dto.setUrl(StringUtils.substringBefore(uri, "#"));
                 dto.setEmails("");
-                dto.setIntervalMinutes(Integer.valueOf(GeneralConfig.getProperty(
-                        GeneralConfig.HARVESTER_REFERRALS_INTERVAL,
-                                String.valueOf(HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL))));
+                dto.setIntervalMinutes(Integer.valueOf(GeneralConfig.getProperty(GeneralConfig.HARVESTER_REFERRALS_INTERVAL,
+                        String.valueOf(HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL))));
                 dto.setPrioritySource(true);
                 dto.setOwner(null);
                 dao.addSourceIgnoreDuplicate(dto);
@@ -268,18 +267,20 @@ public class FactsheetActionBean extends AbstractActionBean {
                     message = "The resource was not available!";
                 else if (resolution.equals(InstantHarvester.Resolution.NO_STRUCTURED_DATA))
                     message = "The resource contained no structured data!";
+                else if (resolution.equals(InstantHarvester.Resolution.RECENTLY_HARVESTED))
+                    message = "Source redirects to another source that has recently been harvested! Will not harvest.";
                 else
                     message = "No feedback given from harvest!";
             }
-            return new Pair<Boolean,String> (false, message);
+            return new Pair<Boolean, String>(false, message);
         } else {
-            return new Pair<Boolean, String> (true, getBundle().getString("not.logged.in"));
+            return new Pair<Boolean, String>(true, getBundle().getString("not.logged.in"));
         }
     }
 
     /**
-     *
-     * @return
+     * 
+     * @return Resolution
      * @throws DAOException
      */
     public Resolution edit() throws DAOException {
@@ -288,8 +289,8 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     *
-     * @return
+     * 
+     * @return Resolution
      * @throws DAOException
      */
     public Resolution addbookmark() throws DAOException {
@@ -303,8 +304,8 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     *
-     * @return
+     * 
+     * @return Resolution
      * @throws DAOException
      */
     public Resolution removebookmark() throws DAOException {
@@ -317,26 +318,25 @@ public class FactsheetActionBean extends AbstractActionBean {
         return view();
     }
 
-
     /**
-     *
-     * @return
+     * 
+     * @return Resolution
      * @throws DAOException
      */
     public Resolution save() throws DAOException {
 
         SubjectDTO subjectDTO = new SubjectDTO(uri, anonymous);
 
-        if(propertyUri.equals(Predicates.CR_TAG)) {
+        if (propertyUri.equals(Predicates.CR_TAG)) {
             List<String> tags = Util.splitStringBySpacesExpectBetweenQuotes(propertyValue);
 
-            for(String tag: tags) {
+            for (String tag : tags) {
                 ObjectDTO objectDTO = new ObjectDTO(tag, true);
                 objectDTO.setSourceUri(getUser().getRegistrationsUri());
                 subjectDTO.addObject(propertyUri, objectDTO);
             }
         } else {
-            //other properties
+            // other properties
             ObjectDTO objectDTO = new ObjectDTO(propertyValue, true);
             objectDTO.setSourceUri(getUser().getRegistrationsUri());
             subjectDTO.addObject(propertyUri, objectDTO);
@@ -352,8 +352,8 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     *
-     * @return
+     * 
+     * @return Resolution
      * @throws DAOException
      */
     public Resolution delete() throws DAOException {
@@ -363,15 +363,15 @@ public class FactsheetActionBean extends AbstractActionBean {
             long subjectHash = Hashes.spoHash(uri);
             ArrayList<TripleDTO> triples = new ArrayList<TripleDTO>();
 
-            for (String row:rowId) {
+            for (String row : rowId) {
 
                 int i = row.indexOf("_");
-                if (i <= 0 || i == (row.length()-1)) {
+                if (i <= 0 || i == (row.length() - 1)) {
                     throw new IllegalArgumentException("Illegal rowId: " + row);
                 }
 
-                long predicateHash = Long.parseLong(row.substring(0,i));
-                ObjectDTO object = FactsheetObjectId.parse(row.substring(i+1));
+                long predicateHash = Long.parseLong(row.substring(0, i));
+                ObjectDTO object = FactsheetObjectId.parse(row.substring(i + 1));
 
                 TripleDTO triple = new TripleDTO(subjectHash, predicateHash, object.getHash());
                 triple.setSourceHash(Long.valueOf(object.getSourceHash()));
@@ -389,7 +389,7 @@ public class FactsheetActionBean extends AbstractActionBean {
         return new RedirectResolution(this.getClass(), "edit").addParameter("uri", uri);
     }
 
-    @ValidationMethod(on={"save","delete","edit","harvest"})
+    @ValidationMethod(on = { "save", "delete", "edit", "harvest" })
     public void validateUserKnown() {
 
         if (getUser() == null) {
@@ -407,7 +407,8 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param resourceUri the resourceUri to set
+     * @param resourceUri
+     *            the resourceUri to set
      */
     public void setUri(String resourceUri) {
         this.uri = resourceUri;
@@ -443,7 +444,7 @@ public class FactsheetActionBean extends AbstractActionBean {
         /* get the addible properties from session */
 
         HttpSession session = getContext().getRequest().getSession();
-        ArrayList<UriLabelPair> result = (ArrayList<UriLabelPair>)session.getAttribute(ADDIBLE_PROPERTIES_SESSION_ATTR);
+        ArrayList<UriLabelPair> result = (ArrayList<UriLabelPair>) session.getAttribute(ADDIBLE_PROPERTIES_SESSION_ATTR);
 
         // if not in session, create them and add to session
         if (result == null || result.isEmpty()) {
@@ -451,23 +452,28 @@ public class FactsheetActionBean extends AbstractActionBean {
             /* get addible properties from database */
 
             HelperDAO helperDAO = factory.getDao(HelperDAO.class);
-            HashMap<String,String> props = helperDAO.getAddibleProperties(getSubjectTypesHashes());
+            HashMap<String, String> props = helperDAO.getAddibleProperties(getSubjectTypesHashes());
 
-            // add some hard-coded properties, HashMap assures there won't be duplicates
-            //props.put(Predicates.RDF_TYPE, "Type");
+            // add some hard-coded properties, HashMap assures there won't be
+            // duplicates
+            // props.put(Predicates.RDF_TYPE, "Type");
             props.put(Predicates.RDFS_LABEL, "Title");
             props.put(Predicates.CR_TAG, "Tag");
-            props.put(Predicates.RDFS_COMMENT, "Other comments"); // Don't use CR_COMMENT
+            props.put(Predicates.RDFS_COMMENT, "Other comments"); // Don't use
+                                                                  // CR_COMMENT
             props.put(Predicates.DC_DESCRIPTION, "Description");
             props.put(Predicates.CR_HAS_SOURCE, "hasSource");
             props.put(Predicates.ROD_PRODUCT_OF, "productOf");
 
-            /* create the result object from the found and hard-coded properties, sort it */
+            /*
+             * create the result object from the found and hard-coded
+             * properties, sort it
+             */
 
             result = new ArrayList<UriLabelPair>();
             if (props != null && !props.isEmpty()) {
 
-                for (String uri:props.keySet()) {
+                for (String uri : props.keySet()) {
                     result.add(UriLabelPair.create(uri, props.get(uri)));
                 }
                 Collections.sort(result);
@@ -481,7 +487,7 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @return
      */
     private Collection<String> getSubjectTypesHashes() {
@@ -490,7 +496,7 @@ public class FactsheetActionBean extends AbstractActionBean {
         Collection<ObjectDTO> typeObjects = subject.getObjects(Predicates.RDF_TYPE, ObjectDTO.Type.RESOURCE);
         if (typeObjects != null && !typeObjects.isEmpty()) {
 
-            for (ObjectDTO object:typeObjects) {
+            for (ObjectDTO object : typeObjects) {
 
                 result.add(String.valueOf(object.getHash()));
             }
@@ -500,49 +506,56 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param anonymous the anonymous to set
+     * @param anonymous
+     *            the anonymous to set
      */
     public void setAnonymous(boolean anonymous) {
         this.anonymous = anonymous;
     }
 
     /**
-     * @param subject the subject to set
+     * @param subject
+     *            the subject to set
      */
     public void setSubject(SubjectDTO subject) {
         this.subject = subject;
     }
 
     /**
-     * @param predicateLabels the predicateLabels to set
+     * @param predicateLabels
+     *            the predicateLabels to set
      */
     public void setPredicateLabels(Map<String, String> predicateLabels) {
         this.predicateLabels = predicateLabels;
     }
 
     /**
-     * @param subProperties the subProperties to set
+     * @param subProperties
+     *            the subProperties to set
      */
     public void setSubProperties(SubProperties subProperties) {
         this.subProperties = subProperties;
     }
 
     /**
-     * @param propertyUri the propertyUri to set
+     * @param propertyUri
+     *            the propertyUri to set
      */
     public void setPropertyUri(String propertyUri) {
         this.propertyUri = propertyUri;
     }
 
     /**
-     * @param propertyValue the propertyValue to set
+     * @param propertyValue
+     *            the propertyValue to set
      */
     public void setPropertyValue(String propertyValue) {
         this.propertyValue = propertyValue;
     }
 
     /**
-     * @param rowId the rowId to set
+     * @param rowId
+     *            the rowId to set
      */
     public void setRowId(List<String> rowId) {
         this.rowId = rowId;
@@ -563,15 +576,16 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param uriHash the uriHash to set
+     * @param uriHash
+     *            the uriHash to set
      */
     public void setUriHash(long uriHash) {
         this.uriHash = uriHash;
     }
 
     /**
-     *
-     * @return
+     * 
+     * @return String
      */
     public String getUrl() {
         return uri != null && URLUtil.isURL(uri) ? uri : null;
@@ -594,8 +608,8 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     *
-     * @return
+     * 
+     * @return boolean
      * @throws DAOException
      */
     public boolean getSubjectIsUserBookmark() throws DAOException {
@@ -606,8 +620,7 @@ public class FactsheetActionBean extends AbstractActionBean {
 
         if (subjectIsUserBookmark == null) {
             long subjectHash = StringUtils.isBlank(uri) ? uriHash : Hashes.spoHash(uri);
-            subjectIsUserBookmark = Boolean.valueOf(
-                    factory.getDao(HelperDAO.class).isSubjectUserBookmark(getUser(), subjectHash));
+            subjectIsUserBookmark = Boolean.valueOf(factory.getDao(HelperDAO.class).isSubjectUserBookmark(getUser(), subjectHash));
         }
 
         return subjectIsUserBookmark.booleanValue();
@@ -640,8 +653,8 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     *
-     * @return
+     * 
+     * @return boolean
      */
     public boolean isCurrentlyHarvested() {
 
@@ -649,8 +662,8 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     *
-     * @return
+     * 
+     * @return boolean
      */
     public boolean isMapDisplayable() {
 
@@ -659,7 +672,7 @@ public class FactsheetActionBean extends AbstractActionBean {
             if (objects != null) {
                 boolean isWgsPoint = false;
                 for (ObjectDTO objectDTO : objects) {
-                    if (objectDTO.getValue() != null && objectDTO.getValue(). equals(Subjects.WGS_POINT)) {
+                    if (objectDTO.getValue() != null && objectDTO.getValue().equals(Subjects.WGS_POINT)) {
                         isWgsPoint = true;
                         break;
                     }
@@ -679,8 +692,8 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     *
-     * @return
+     * 
+     * @return Resolution
      */
     public Resolution showOnMap() {
         return new ForwardResolution("/pages/map.jsp");
@@ -694,7 +707,7 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     public String getLatitude() {
-        if (subject.getObject(Predicates.WGS_LAT) != null ) {
+        if (subject.getObject(Predicates.WGS_LAT) != null) {
             return subject.getObject(Predicates.WGS_LAT).getValue();
         }
         return null;

@@ -1,37 +1,39 @@
 /*
-* The contents of this file are subject to the Mozilla Public
-*
-* License Version 1.1 (the "License"); you may not use this file
-* except in compliance with the License. You may obtain a copy of
-* the License at http://www.mozilla.org/MPL/
-*
-* Software distributed under the License is distributed on an "AS
-* IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
-* implied. See the License for the specific language governing
-* rights and limitations under the License.
-*
-* The Original Code is Content Registry 2.0.
-*
-* The Initial Owner of the Original Code is European Environment
-* Agency. Portions created by Tieto Eesti are Copyright
-* (C) European Environment Agency. All Rights Reserved.
-*
-* Contributor(s):
-* Jaanus Heinlaid, Tieto Eesti*/
+ * The contents of this file are subject to the Mozilla Public
+ *
+ * License Version 1.1 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of
+ * the License at http://www.mozilla.org/MPL/
+ *
+ * Software distributed under the License is distributed on an "AS
+ * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ * The Original Code is Content Registry 2.0.
+ *
+ * The Initial Owner of the Original Code is European Environment
+ * Agency. Portions created by Tieto Eesti are Copyright
+ * (C) European Environment Agency. All Rights Reserved.
+ *
+ * Contributor(s):
+ * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.harvest;
 
 import org.apache.commons.lang.StringUtils;
 import eionet.cr.common.CRRuntimeException;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 public class InstantHarvester extends Thread {
 
     /** */
-    public enum Resolution { ALREADY_HARVESTING, UNCOMPLETE, COMPLETE, NO_STRUCTURED_DATA, SOURCE_UNAVAILABLE; }
+    public enum Resolution {
+        ALREADY_HARVESTING, UNCOMPLETE, COMPLETE, NO_STRUCTURED_DATA, SOURCE_UNAVAILABLE, RECENTLY_HARVESTED;
+    }
 
     /** */
     private String sourceUrl;
@@ -44,6 +46,7 @@ public class InstantHarvester extends Thread {
     /** */
     private boolean rdfContentFound = false;
     private boolean sourceAvailable = false;
+    private boolean needsHarvesting = true;
 
     private InstantHarvester(String sourceUrl, String userName, boolean isVirtuosoHarvest) {
 
@@ -54,6 +57,7 @@ public class InstantHarvester extends Thread {
 
     /*
      * (non-Javadoc)
+     * 
      * @see java.lang.Thread#run()
      */
     public void run() {
@@ -61,7 +65,7 @@ public class InstantHarvester extends Thread {
         InstantHarvest instantHarvest = null;
         VirtuosoInstantHarvest virtInstantHarvest = null;
         try {
-            if(!isVirtuosoHarvest) {
+            if (!isVirtuosoHarvest) {
                 instantHarvest = InstantHarvest.createFullSetup(sourceUrl, userName);
                 instantHarvest.execute();
             } else {
@@ -72,27 +76,29 @@ public class InstantHarvester extends Thread {
             harvestException = e;
         } catch (Throwable e) {
             if (e instanceof HarvestException) {
-                harvestException = (HarvestException)e;
+                harvestException = (HarvestException) e;
             } else {
                 harvestException = new HarvestException(e.toString(), e);
             }
         } finally {
             if (instantHarvest != null) {
                 rdfContentFound = instantHarvest.isRdfContentFound();
-                sourceAvailable = instantHarvest.getSourceAvailable() != null
-                        && instantHarvest.getSourceAvailable().booleanValue();
+                sourceAvailable = instantHarvest.getSourceAvailable() != null && instantHarvest.getSourceAvailable().booleanValue();
             }
             if (virtInstantHarvest != null) {
                 rdfContentFound = virtInstantHarvest.isRdfContentFound();
                 sourceAvailable = virtInstantHarvest.getSourceAvailable() != null
                         && virtInstantHarvest.getSourceAvailable().booleanValue();
+                // Check if source is redirected and destination
+                // source has been recently updated
+                needsHarvesting = virtInstantHarvest.needsHarvesting;
             }
             CurrentHarvests.removeOnDemandHarvest(sourceUrl);
         }
     }
 
     /**
-     *
+     * 
      * @return
      */
     private boolean wasException() {
@@ -100,9 +106,11 @@ public class InstantHarvester extends Thread {
     }
 
     /**
-     *
+     * 
      * @param sourceUrl
-     * @return
+     * @param userName
+     * @param isVirtuosoHarvest
+     * @return Resolution
      * @throws HarvestException
      */
     public static Resolution harvest(String sourceUrl, String userName, boolean isVirtuosoHarvest) throws HarvestException {
@@ -123,7 +131,7 @@ public class InstantHarvester extends Thread {
             instantHarvester = new InstantHarvester(sourceUrl, userName, isVirtuosoHarvest);
             instantHarvester.start();
 
-            for (int loopCount = 0; instantHarvester.isAlive() && loopCount<15; loopCount++) {
+            for (int loopCount = 0; instantHarvester.isAlive() && loopCount < 15; loopCount++) {
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
@@ -139,13 +147,17 @@ public class InstantHarvester extends Thread {
                 } else {
                     if (!instantHarvester.isSourceAvailable())
                         return Resolution.SOURCE_UNAVAILABLE;
+                    else if (!instantHarvester.isRdfContentFound())
+                        return Resolution.NO_STRUCTURED_DATA;
+                    else if (!instantHarvester.isNeedsHarvesting())
+                        return Resolution.RECENTLY_HARVESTED;
                     else
-                        return instantHarvester.isRdfContentFound() ? Resolution.COMPLETE : Resolution.NO_STRUCTURED_DATA;
+                        return Resolution.COMPLETE;
                 }
             }
         } finally {
-            // if the instant harvester was never constructed or it isn't alive any more,
-            // make sure the current-harvest-source-url is nullified
+            // if the instant harvester was never constructed or it isn't alive
+            // any more, make sure the current-harvest-source-url is nullified
             if (instantHarvester == null || !instantHarvester.isAlive()) {
                 CurrentHarvests.removeOnDemandHarvest(sourceUrl);
             }
@@ -171,5 +183,12 @@ public class InstantHarvester extends Thread {
      */
     public boolean isSourceAvailable() {
         return sourceAvailable;
+    }
+
+    /**
+     * @return the needsHarvesting
+     */
+    public boolean isNeedsHarvesting() {
+        return needsHarvesting;
     }
 }

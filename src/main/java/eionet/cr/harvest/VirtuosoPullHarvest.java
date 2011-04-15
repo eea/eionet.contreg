@@ -124,8 +124,7 @@ public class VirtuosoPullHarvest extends Harvest {
                 }
 
                 // Source shouldn't be harvested if it redirects to another
-                // source
-                // and the destination source is recently harvested (within its
+                // source and the destination source is recently harvested (within its
                 // harvesting minutes)
                 if (needsHarvesting) {
                     // prepare URL connection
@@ -143,8 +142,7 @@ public class VirtuosoPullHarvest extends Harvest {
                     }
 
                     // Response codes 502, 503 and 504 don't cause the source to
-                    // be
-                    // considered unavailable
+                    // be considered unavailable
                     // See ticket #1992
                     if (!harvestUrlConnection.isSourceAvailable()
                             && !(harvestUrlConnection.getResponseCode() >= 502 && harvestUrlConnection.getResponseCode() <= 504)) {
@@ -218,6 +216,12 @@ public class VirtuosoPullHarvest extends Harvest {
                         DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceMetadata(sourceMetadata);
 
                     } // if Source is available.
+                } else {
+                    // Harvest source redirects to another source that has
+                    // recently been updated
+                    // therefore we can set these values TRUE
+                    sourceAvailable = Boolean.TRUE;
+                    rdfContentFound = Boolean.TRUE;
                 }
             }
         } catch (Exception e) {
