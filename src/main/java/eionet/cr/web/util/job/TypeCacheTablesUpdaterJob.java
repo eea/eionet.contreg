@@ -29,29 +29,30 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HelperDAO;
 
 /**
- * background job to perform database updates on type cache tables
- *
- * @author Enriko Käsper
- * <a href="mailto:enriko.kasper@tieto.com">Enriko Käsper</a>
+ * background job to perform database updates on type cache tables.
+ * @author Enriko Käsper <a href="mailto:enriko.kasper@tieto.com">Enriko Käsper</a>
  */
 public class TypeCacheTablesUpdaterJob implements StatefulJob {
-
-    private static final Logger logger = Logger.getLogger(TypeCacheTablesUpdaterJob.class);
+    /**
+     * Internal logger.
+     */
+    private static final Logger LOGGER = Logger.getLogger(TypeCacheTablesUpdaterJob.class);
 
     /**
-     * @see org.quartz.Job#execute(org.quartz.JobExecutionContext)
-     * {@inheritDoc}
+     * Executes the job.
+     * @see org.quartz.Job#execute(org.quartz.JobExecutionContext) {@inheritDoc}
+     * @param context current context.
+     * @throws JobExecutionException if execution fails.
      */
-    public void execute(JobExecutionContext context) throws JobExecutionException {
+    public void execute(final JobExecutionContext context) throws JobExecutionException {
         try {
-            logger.debug("Executing database update on type cache tables");
+            LOGGER.debug("Executing database update on type cache tables");
 
-            DAOFactory.get().getDao(
-                    HelperDAO.class).updateTypeDataCache();
-            logger.debug("type cache tables update job finished");
+            DAOFactory.get().getDao(HelperDAO.class).updateTypeDataCache();
+            LOGGER.debug("type cache tables update job finished");
 
-        }catch (Exception ignored) {
-            logger.error("Exception is thrown while updating type cache tables", ignored);
+        } catch (Exception ignored) {
+            LOGGER.error("Exception is thrown while updating type cache tables", ignored);
         } finally {
             try {
                 context.getScheduler().resumeAll();

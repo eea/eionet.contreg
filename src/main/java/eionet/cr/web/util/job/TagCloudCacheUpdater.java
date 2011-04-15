@@ -32,7 +32,7 @@ import eionet.cr.dao.TagsDAO;
 import eionet.cr.web.util.ApplicationCache;
 
 /**
- *
+ * TagCloud cache updater job.
  * @author <a href="mailto:enriko.kasper@tieto.com">Enriko Käsper</a>
  *
  */
@@ -41,18 +41,19 @@ public class TagCloudCacheUpdater implements StatefulJob {
     /** */
     private static Log logger = LogFactory.getLog(TagCloudCacheUpdater.class);
 
-    /*
-     * (non-Javadoc)
+    /**
+     * Executes the job.
      * @see org.quartz.Job#execute(org.quartz.JobExecutionContext)
+     * @param context current context.
+     * @throws JobExecutionException if execution fails.
      */
-    public void execute(JobExecutionContext context) throws JobExecutionException {
+    public void execute(final JobExecutionContext context) throws JobExecutionException {
 
         try {
             TagsDAO dao = DAOFactory.get().getDao(TagsDAO.class);
             ApplicationCache.updateTagCloudCache(dao.getTagCloud());
             logger.debug("Tag cloud cache updated!");
-        }
-        catch (DAOException e) {
+        } catch (DAOException e) {
             logger.error("Error when updating tag cloud cache: ", e);
         }
     }

@@ -35,20 +35,24 @@ import eionet.cr.util.ObjectLabelPair;
 import eionet.cr.web.util.ApplicationCache;
 
 /**
+ * Job fills DataFlow pickuplist cache.
+ *
  * @author Aleksandr Ivanov <a
  *         href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
 public class DataflowSearchPicklistCacheUpdater implements StatefulJob {
 
-    /** */
+    /** Class internal logger.
+    */
     private static Log logger = LogFactory.getLog(DataflowSearchPicklistCacheUpdater.class);
 
-    /*
-     * (non-Javadoc)
-     * 
+    /**
+     * Executes the job.
      * @see org.quartz.Job#execute(org.quartz.JobExecutionContext)
+     * @param context current context.
+     * @throws JobExecutionException if execution fails.
      */
-    public void execute(JobExecutionContext context) throws JobExecutionException {
+    public void execute(final JobExecutionContext context) throws JobExecutionException {
 
         try {
             Collection<ObjectLabelPair> localities = DAOFactory.get().getDao(HelperDAO.class).getPicklistForPredicate(

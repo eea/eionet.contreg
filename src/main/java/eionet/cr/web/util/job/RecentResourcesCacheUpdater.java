@@ -32,27 +32,33 @@ import eionet.cr.dao.HelperDAO;
 import eionet.cr.web.util.ApplicationCache;
 
 /**
- *
+ * Job updates cache that contains recent resources.
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
  */
 public class RecentResourcesCacheUpdater implements StatefulJob {
 
-    /** */
+    /**
+     * Count of resources shown in the cache.
+     */
+    private static final int LASTRESOURCES_COUNT = 10;
+    /**
+     * Internal logger.
+     */
     private static Log logger = LogFactory.getLog(RecentResourcesCacheUpdater.class);
 
-    /*
-     * (non-Javadoc)
+    /**
+     * Executes the job.
      * @see org.quartz.Job#execute(org.quartz.JobExecutionContext)
+     * @param context current context.
+     * @throws JobExecutionException if execution fails.
      */
-    public void execute(JobExecutionContext context) throws JobExecutionException {
+    public void execute(final JobExecutionContext context) throws JobExecutionException {
 
         try {
             HelperDAO dao = DAOFactory.get().getDao(HelperDAO.class);
-            ApplicationCache.updateRecentResourceCache(dao.getLatestFiles(10));
+            ApplicationCache.updateRecentResourceCache(dao.getLatestFiles(LASTRESOURCES_COUNT));
             logger.debug("Recently discovered resources cache updated!");
-        }
-        catch (DAOException e) {
+        } catch (DAOException e) {
             logger.error("Error when updating recently discovered files cache: ", e);
         }
     }
