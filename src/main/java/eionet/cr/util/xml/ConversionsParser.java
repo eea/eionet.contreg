@@ -60,18 +60,16 @@ public class ConversionsParser {
      * @throws SAXException
      * @throws IOException
      */
-    public void parse(File file) throws ParserConfigurationException, SAXException, IOException{
+    public void parse(File file) throws ParserConfigurationException, SAXException, IOException {
 
         FileInputStream inputStream = null;
-        try{
+        try {
             inputStream = new FileInputStream(file);
             parse(inputStream);
-        }
-        finally{
-            try{
-                if (inputStream!=null) inputStream.close();
-            }
-            catch (IOException e){}
+        } finally {
+            try {
+                if (inputStream != null) inputStream.close();
+            } catch (IOException e) {}
         }
     }
 
@@ -82,16 +80,16 @@ public class ConversionsParser {
      * @throws SAXException
      * @throws ParserConfigurationException
      */
-    public void parse(InputStream inputStream) throws SAXException, IOException, ParserConfigurationException{
+    public void parse(InputStream inputStream) throws SAXException, IOException, ParserConfigurationException {
 
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
         Document dom = db.parse(inputStream);
 
         Element rootElem = dom.getDocumentElement();
-        if (rootElem!=null){
+        if (rootElem != null) {
             NodeList nl = rootElem.getElementsByTagName("conversion");
-            for(int i=0; nl!=null && i<nl.getLength(); i++){
+            for(int i = 0; nl != null && i < nl.getLength(); i++) {
                 readConversion((Element)nl.item(i));
             }
         }
@@ -101,38 +99,38 @@ public class ConversionsParser {
      *
      * @param conversionElement
      */
-    private void readConversion(Element conversionElement){
+    private void readConversion(Element conversionElement) {
 
-        if (conversionElement!=null){
+        if (conversionElement != null) {
 
             boolean isRDFConversion = false;
             NodeList nl = conversionElement.getElementsByTagName("result_type");
-            if (nl!=null && nl.getLength()>0){
+            if (nl != null && nl.getLength()>0) {
                 Element element = (Element)nl.item(0);
                 Text text = (Text)element.getFirstChild();
-                if (text!=null){
+                if (text != null) {
                     String resultType = text.getData();
-                    if (resultType!=null && resultType.equals("RDF"))
+                    if (resultType != null && resultType.equals("RDF"))
                         isRDFConversion = true;
                 }
             }
 
-            if (isRDFConversion && (rdfConversionId==null || rdfConversionId.length()==0)){
+            if (isRDFConversion && (rdfConversionId == null || rdfConversionId.length() == 0)) {
 
                 nl = conversionElement.getElementsByTagName("convert_id");
-                if (nl!=null && nl.getLength()>0){
+                if (nl != null && nl.getLength()>0) {
                     Element element = (Element)nl.item(0);
                     Text text = (Text)element.getFirstChild();
-                    if (text!=null){
+                    if (text != null) {
                         this.rdfConversionId = text.getData();
                     }
                 }
 
                 nl = conversionElement.getElementsByTagName("xsl");
-                if (nl!=null && nl.getLength()>0){
+                if (nl != null && nl.getLength()>0) {
                     Element element = (Element)nl.item(0);
                     Text text = (Text)element.getFirstChild();
-                    if (text!=null){
+                    if (text != null) {
                         this.rdfConversionXslFileName = text.getData();
                     }
                 }
@@ -148,7 +146,7 @@ public class ConversionsParser {
      * @throws ParserConfigurationException
      * @throws SAXException
      */
-    public static ConversionsParser parseForSchema(String schemaUri) throws IOException, SAXException, ParserConfigurationException{
+    public static ConversionsParser parseForSchema(String schemaUri) throws IOException, SAXException, ParserConfigurationException {
 
         String listConversionsUrl = GeneralConfig.getRequiredProperty(GeneralConfig.XMLCONV_LIST_CONVERSIONS_URL);
         listConversionsUrl = MessageFormat.format(listConversionsUrl, Util.toArray(URLEncoder.encode(schemaUri)));
@@ -156,15 +154,14 @@ public class ConversionsParser {
         URL url = new URL(listConversionsUrl);
         URLConnection httpConn = url.openConnection();
         InputStream inputStream = null;
-        try{
+        try {
             inputStream = httpConn.getInputStream();
             ConversionsParser conversionsParser = new ConversionsParser();
             conversionsParser.parse(inputStream);
             return conversionsParser;
-        }
-        finally{
-            if (inputStream!=null){
-                try{inputStream.close();}catch (IOException e){}
+        } finally {
+            if (inputStream != null) {
+                try {inputStream.close();} catch (IOException e) {}
             }
         }
     }
@@ -177,13 +174,13 @@ public class ConversionsParser {
      * @throws SAXException
      * @throws IOException
      */
-    public static String getRdfConversionId(String schemaUri) throws IOException, SAXException, ParserConfigurationException{
+    public static String getRdfConversionId(String schemaUri) throws IOException, SAXException, ParserConfigurationException {
 
         ConversionsParser convParser = ConversionsParser.parseForSchema(schemaUri);
-        if (convParser!=null){
+        if (convParser != null) {
             return convParser.getRdfConversionId();
         }
-        else{
+        else {
             return null;
         }
     }

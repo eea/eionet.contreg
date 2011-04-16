@@ -16,7 +16,7 @@ import eionet.cr.web.util.columns.SubjectLastModifiedColumn;
  * @author risto
  *
  */
-public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper{
+public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper {
 
     /** */
     private SearchExpression expression;
@@ -50,36 +50,36 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper{
     protected String getOrderedQuery(List<Object> inParams) {
         StringBuilder strBuilder = new StringBuilder();
         
-        if (sortPredicate.equals(SubjectLastModifiedColumn.class.getSimpleName())){
+        if (sortPredicate.equals(SubjectLastModifiedColumn.class.getSimpleName())) {
             strBuilder.append("select ?s where { graph ?g {")
             .append("select ?s max(?time) AS ?order where {")
             .append("?s ?p ?o .").append(addFilterParams());
-            if(exactMatch){
+            if (exactMatch) {
                 strBuilder.append(" FILTER (?o = '").append(expression.toString()).append("').");
             } else {
                 strBuilder.append(" FILTER bif:contains(?o, \"").append(virtExpression.getParsedQuery()).append("\").");
             }
             strBuilder.append(" optional {?g <").append(Predicates.CR_LAST_MODIFIED).append("> ?time} ").append("} ")
             .append("GROUP BY ?s }} ORDER BY ");
-            if(sortOrder != null)
+            if (sortOrder != null)
                 strBuilder.append(sortOrder);
             strBuilder.append("(?order)");
         } else {
             
             strBuilder.append("select distinct ?s where {?s ?p ?o . ").append(addFilterParams());
-            if(exactMatch){
+            if (exactMatch) {
                 strBuilder.append("FILTER (?o = '").append(expression.toString()).append("'). ");
             } else {
                 strBuilder.append("FILTER bif:contains(?o, \"").append(virtExpression.getParsedQuery()).append("\"). ");
             }
             strBuilder.append("optional {?s <").append(sortPredicate).append("> ?ord} }");
             strBuilder.append("ORDER BY ");
-            if(sortOrder != null)
+            if (sortOrder != null)
                 strBuilder.append(sortOrder);
-            if(sortPredicate != null && sortPredicate.equals(Predicates.RDFS_LABEL)){
+            if (sortPredicate != null && sortPredicate.equals(Predicates.RDFS_LABEL)) {
               //If Label is not null then use Label. Otherwise use subject where we replace all / with # and then get the string after last #.
                 strBuilder.append("(bif:lcase(bif:either(bif:isnull(?ord), (bif:subseq (bif:replace (?s, '/', '#'), bif:strrchr (bif:replace (?s, '/', '#'), '#')+1)), ?ord)))");
-            } else if(sortPredicate != null && sortPredicate.equals(Predicates.RDF_TYPE)){
+            } else if (sortPredicate != null && sortPredicate.equals(Predicates.RDF_TYPE)) {
                 //Replace all / with # and then get the string after last #
                 strBuilder.append("(bif:lcase(bif:subseq (bif:replace (?ord, '/', '#'), bif:strrchr (bif:replace (?ord, '/', '#'), '#')+1)))");
             } else {
@@ -100,7 +100,7 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper{
 
         StringBuilder strBuilder = new StringBuilder();
         strBuilder.append("select distinct ?s where { ?s ?p ?o . ").append(addFilterParams());
-        if(exactMatch){
+        if (exactMatch) {
             strBuilder.append(" FILTER (?o = '").append(expression.toString()).append("').");
         } else {
             strBuilder.append(" FILTER bif:contains(?o, \"").append(virtExpression.getParsedQuery()).append("\"). ");
@@ -118,7 +118,7 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper{
 
         StringBuilder strBuilder = new StringBuilder();
         strBuilder.append("select count(distinct ?s) where { ?s ?p ?o . ").append(addFilterParams());
-        if(exactMatch){
+        if (exactMatch) {
             strBuilder.append(" FILTER (?o = '").append(expression.toString()).append("').");
         } else {
             strBuilder.append(" FILTER bif:contains(?o, \"").append(virtExpression.getParsedQuery()).append("\"). ");
@@ -128,21 +128,21 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper{
         return strBuilder.toString();
     }
     
-    private String addFilterParams(){
+    private String addFilterParams() {
 
         StringBuffer buf = new StringBuffer();
         buf.append(" ");
 
-        if (filter != FilterType.ANY_OBJECT){
+        if (filter != FilterType.ANY_OBJECT) {
             
             buf.append("?s <").append(Predicates.RDF_TYPE).append("> ");
-            if (filter == FilterType.ANY_FILE){
+            if (filter == FilterType.ANY_FILE) {
                 buf.append("<").append(Subjects.CR_FILE).append(">");
-            } else if (filter == FilterType.DATASETS){
+            } else if (filter == FilterType.DATASETS) {
                 buf.append("<").append(Predicates.DC_MITYPE_DATASET).append(">");
-            } else if (filter == FilterType.IMAGES){
+            } else if (filter == FilterType.IMAGES) {
                 buf.append("<").append(Predicates.DC_MITYPE_IMAGE).append(">");
-            } else if (filter == FilterType.TEXTS){
+            } else if (filter == FilterType.TEXTS) {
                 buf.append("<").append(Predicates.DC_MITYPE_TEXT).append(">");
             }
 

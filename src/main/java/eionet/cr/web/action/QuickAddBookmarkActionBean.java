@@ -33,8 +33,8 @@ public class QuickAddBookmarkActionBean extends AbstractActionBean {
 
     @DefaultHandler
     @HandlesEvent("addBookmark")
-    public Resolution init(){
-        if (getUser() != null){
+    public Resolution init() {
+        if (getUser() != null) {
             loggedIn = true;
         }
         return new ForwardResolution("/pages/bookmarklet/quickAddBookmark.jsp");
@@ -52,12 +52,12 @@ public class QuickAddBookmarkActionBean extends AbstractActionBean {
      *
      */
     @ValidationMethod(on="processForm")
-    public void validateSave(){
+    public void validateSave() {
 
-        if (StringUtils.isBlank(resource.getSource()) || !URLUtil.isURL(resource.getSource())){
+        if (StringUtils.isBlank(resource.getSource()) || !URLUtil.isURL(resource.getSource())) {
             addGlobalValidationError(new SimpleError("Not a valid URL!"));
         }
-        if (getUser()==null){
+        if (getUser() == null) {
             addGlobalValidationError(new SimpleError("You are not logged in!"));
         }
     }
@@ -73,23 +73,25 @@ public class QuickAddBookmarkActionBean extends AbstractActionBean {
      */
     public String getBookmarklet() {
 
-        return "javascript: function go() {" +
-                "u=location.href;" +
-                "a=false;" +
-                "x=window;" +
-                "e=x.encodeURIComponent;" +
-                "d=document;" +
-                "if((s=d.selection)" +
-                "?t=s.createRange().text" +
-                ":t=x.getSelection()+'')" +
-            "(r=/^http:\\/\\/\\S+$/.exec(t))" +
-                "?u=t" +
-                ":a=true;" +
-            "a" +
-            "?alert('Please highlight a full URL, or deselect text to add this page.')" +
-                ":window.open(" +
-                "'"+ getBaseUrl(this.getContext()) +"/quickAddBookmark.action?resource.source='+e(u)+'&amp;resource.title='+e(d.title)+'&amp;originalPageUrl='+e(location.href)" +
-                ", 'Add bookmark to Content Registry', 'left=20,top=20,width=700,height=500')}; go();";
+        return "javascript: function go() {"
+                + "u=location.href;"
+                + "a=false;"
+                + "x=window;"
+                + "e=x.encodeURIComponent;"
+                + "d=document;"
+                + "if((s=d.selection)"
+                + "?t=s.createRange().text"
+                + ":t=x.getSelection()+'')"
+                + "(r=/^http:\\/\\/\\S+$/.exec(t))"
+                + "?u=t"
+                + ":a=true;"
+                + "a"
+                + "?alert('Please highlight a full URL, or deselect text to add this page.')"
+                + ":window.open("
+                + "'"
+                + getBaseUrl(this.getContext())
+                + "/quickAddBookmark.action?resource.source='+e(u)+'&amp;resource.title='+e(d.title)+'&amp;originalPageUrl='+e(location.href)"
+                + ", 'Add bookmark to Content Registry', 'left=20,top=20,width=700,height=500')}; go();";
     }
 
 

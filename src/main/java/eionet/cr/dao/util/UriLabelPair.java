@@ -25,7 +25,7 @@ package eionet.cr.dao.util;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class UriLabelPair implements Comparable{
+public class UriLabelPair implements Comparable {
 
     /** */
     private String uri;
@@ -37,7 +37,7 @@ public class UriLabelPair implements Comparable{
      * @param label
      * @return
      */
-    public static UriLabelPair create(String uri, String label){
+    public static UriLabelPair create(String uri, String label) {
 
         UriLabelPair pair = new UriLabelPair();
         pair.setUri(uri);
@@ -68,10 +68,10 @@ public class UriLabelPair implements Comparable{
         // throw ClassCastException if (o instanceof UriLabelPair)==false
         UriLabelPair otherOption = (UriLabelPair)o;
 
-        if (otherOption==null)
+        if (otherOption == null)
             return 1;
-        else if (label==null)
-            return otherOption.getLabel()==null ? 0 : -1;
+        else if (label == null)
+            return otherOption.getLabel() == null ? 0 : -1;
         else
             return label.compareTo(otherOption.getLabel());
     }
@@ -80,8 +80,8 @@ public class UriLabelPair implements Comparable{
      * (non-Javadoc)
      * @see java.lang.Object#equals(java.lang.Object)
      */
-    public boolean equals(Object o){
-        return compareTo(o)==0;
+    public boolean equals(Object o) {
+        return compareTo(o) == 0;
     }
 
     /**
@@ -102,7 +102,7 @@ public class UriLabelPair implements Comparable{
      * (non-Javadoc)
      * @see java.lang.Object#toString()
      */
-    public String toString(){
+    public String toString() {
         return new StringBuffer().append(uri).append(" [").append(label).append("]").toString();
     }
 }

@@ -62,7 +62,7 @@ import eionet.cr.web.util.columns.SubjectPredicateColumn;
  *
  */
 @UrlBinding("/customSearch.action")
-public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>{
+public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 
     /** */
     private static final String SELECTED_FILTERS_SESSION_ATTR_NAME = CustomSearchActionBean.class.getName() + ".selectedFilters";
@@ -85,8 +85,8 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
     private String picklistFilter;
     private String removedFilter;
     //private Collection<String> picklist;
-    
-    
+
+
     private Collection<ObjectLabelPair> picklist;
 
     /**
@@ -94,18 +94,17 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
      * @return
      */
     @DefaultHandler
-    public Resolution unspecifiedEvent(){
+    public Resolution unspecifiedEvent() {
         if (isShowPicklist())
             populateSelectedFilters();
-        else if (isRemoveFilter()){
+        else if (isRemoveFilter()) {
             populateSelectedFilters();
 
             Map selectedFilters = getSelectedFilters(false);
-            if (selectedFilters!=null){
+            if (selectedFilters != null) {
                 selectedFilters.remove(getRemovedFilter());
             }
-        }
-        else
+        } else
             clearSessionAttributes();
 
         return new ForwardResolution(ASSOCIATED_JSP);
@@ -114,7 +113,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
     /**
      *
      */
-    private void clearSessionAttributes(){
+    private void clearSessionAttributes() {
         HttpSession session = getContext().getRequest().getSession();
         session.removeAttribute(RESULT_LIST_SESSION_ATTR_NAME);
         session.removeAttribute(MATCH_COUNT_SESSION_ATTR_NAME);
@@ -127,7 +126,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
      * (non-Javadoc)
      * @see eionet.cr.web.action.AbstractSearchActionBean#search()
      */
-    public Resolution search() throws DAOException{
+    public Resolution search() throws DAOException {
 
         populateSelectedFilters();
         long startTime = System.currentTimeMillis();
@@ -158,7 +157,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
      * (non-Javadoc)
      * @see eionet.cr.web.action.AbstractSearchActionBean#getResultList()
      */
-    public Collection<SubjectDTO> getResultList(){
+    public Collection<SubjectDTO> getResultList() {
         return (Collection<SubjectDTO>)getContext().getRequest().getSession().getAttribute(RESULT_LIST_SESSION_ATTR_NAME);
     }
 
@@ -166,7 +165,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
      * (non-Javadoc)
      * @see eionet.cr.web.action.AbstractSearchActionBean#getPagination()
      */
-    public Pagination getPagination(){
+    public Pagination getPagination() {
         return (Pagination)getContext().getRequest().getSession().getAttribute(PAGINATION_SESSION_ATTR_NAME);
     }
 
@@ -174,9 +173,9 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
      * (non-Javadoc)
      * @see eionet.cr.web.action.AbstractSearchActionBean#getMatchCount()
      */
-    public int getMatchCount(){
+    public int getMatchCount() {
         Integer i = (Integer)getContext().getRequest().getSession().getAttribute(MATCH_COUNT_SESSION_ATTR_NAME);
-        return i==null ? super.getMatchCount() : i.intValue();
+        return i == null ? super.getMatchCount() : i.intValue();
     }
 
 
@@ -185,11 +184,11 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
      * @return
      * @throws DAOException
      */
-    public Resolution addFilter() throws DAOException{
+    public Resolution addFilter() throws DAOException {
 
         populateSelectedFilters();
 
-        if (addedFilter!=null){
+        if (addedFilter != null) {
 
             getSelectedFilters().put(addedFilter, "");
 
@@ -210,7 +209,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
      * @return
      * @throws DAOException
      */
-    public Collection<ObjectLabelPair> getPicklist() throws DAOException{
+    public Collection<ObjectLabelPair> getPicklist() throws DAOException {
         String picklistFilter = getPicklistFilter();
         if (!isShowPicklist()) {
             return null;
@@ -226,12 +225,12 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
             picklist = ApplicationCache.getDataflows();
         } else if (Predicates.ROD_INSTRUMENT_PROPERTY.equals(uri)) {
             picklist = ApplicationCache.getInstruments();
-        }  else if (Predicates.CR_SCHEMA.equals(uri)) {
+        } else if (Predicates.CR_SCHEMA.equals(uri)) {
             picklist = factory.getDao(HelperDAO.class).getPicklistForPredicate(
                     getAvailableFilters().get(picklistFilter).getUri(), false);
         }
 
-        if (picklist == null){
+        if (picklist == null) {
             picklist = factory.getDao(HelperDAO.class).getPicklistForPredicate(
                     getAvailableFilters().get(picklistFilter).getUri(), true);
         }
@@ -258,7 +257,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
      *
      * @return
      */
-    public Map<String,String> getSelectedFilters(){
+    public Map<String,String> getSelectedFilters() {
 
         return getSelectedFilters(true);
     }
@@ -268,12 +267,12 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
      * @param create
      * @return
      */
-    private Map<String,String> getSelectedFilters(boolean create){
+    private Map<String,String> getSelectedFilters(boolean create) {
 
         HttpSession session = getContext().getRequest().getSession();
         Map<String,String> selectedFilters =
             (Map<String,String>)session.getAttribute(SELECTED_FILTERS_SESSION_ATTR_NAME);
-        if (selectedFilters==null && create==true){
+        if (selectedFilters == null && create == true) {
             selectedFilters = new LinkedHashMap<String,String>();
             session.setAttribute(SELECTED_FILTERS_SESSION_ATTR_NAME, selectedFilters);
         }
@@ -285,11 +284,11 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
      *
      * @return
      */
-    private HashSet<String> getLiteralEnabledFilters(){
+    private HashSet<String> getLiteralEnabledFilters() {
 
         HttpSession session = getContext().getRequest().getSession();
         HashSet<String> set = (HashSet<String>)session.getAttribute(LITERAL_SEARCH_ENABLED_FILTERS);
-        if (set==null){
+        if (set == null) {
             set = new HashSet<String>();
             session.setAttribute(LITERAL_SEARCH_ENABLED_FILTERS, set);
         }
@@ -300,16 +299,16 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
     /**
      *
      */
-    private void populateSelectedFilters(){
+    private void populateSelectedFilters() {
 
         Map<String,String> selected = getSelectedFilters();
-        if (!selected.isEmpty()){
+        if (!selected.isEmpty()) {
             Enumeration paramNames = this.getContext().getRequest().getParameterNames();
-            while (paramNames!=null && paramNames.hasMoreElements()){
+            while (paramNames != null && paramNames.hasMoreElements()) {
                 String paramName = (String)paramNames.nextElement();
-                if (paramName.startsWith(SELECTED_VALUE_PREFIX)){
+                if (paramName.startsWith(SELECTED_VALUE_PREFIX)) {
                     String key = paramName.substring(SELECTED_VALUE_PREFIX.length());
-                    if (key.length()>0 && selected.containsKey(key))
+                    if (key.length() > 0 && selected.containsKey(key))
                         selected.put(key, getContext().getRequest().getParameter(paramName));
                 }
             }
@@ -321,7 +320,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
      */
     public Map<String,CustomSearchFilter> getAvailableFilters() {
 
-        if (availableFilters==null){
+        if (availableFilters == null) {
 
             ArrayList<CustomSearchFilter> list = new ArrayList<CustomSearchFilter>();
 
@@ -431,8 +430,8 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
             list.add(filter);
 
             availableFilters = new LinkedHashMap<String,CustomSearchFilter>();
-            for (int i=0; i<list.size(); i++)
-                availableFilters.put(String.valueOf(i+1), list.get(i));
+            for (int i=0; i < list.size(); i++)
+                availableFilters.put(String.valueOf(i + 1), list.get(i));
         }
 
         return availableFilters;
@@ -443,15 +442,15 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
      */
     public String getPicklistFilter() {
 
-        if (picklistFilter==null){
+        if (picklistFilter == null) {
             picklistFilter = "";
             Enumeration paramNames = this.getContext().getRequest().getParameterNames();
-            while (paramNames!=null && paramNames.hasMoreElements()){
+            while (paramNames != null && paramNames.hasMoreElements()) {
                 String paramName = (String)paramNames.nextElement();
-                if (paramName.startsWith(SHOW_PICKLIST_VALUE_PREFIX)){
-                    int i = paramName.indexOf('.')<0 ? paramName.length() : paramName.indexOf('.');
+                if (paramName.startsWith(SHOW_PICKLIST_VALUE_PREFIX)) {
+                    int i = paramName.indexOf('.') < 0 ? paramName.length() : paramName.indexOf('.');
                     String key = paramName.substring(SHOW_PICKLIST_VALUE_PREFIX.length(), i);
-                    if (key.length()>0 && getSelectedFilters().containsKey(key)){
+                    if (key.length() > 0 && getSelectedFilters().containsKey(key)) {
                         picklistFilter = key;
                         break;
                     }
@@ -467,15 +466,15 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
      */
     public String getRemovedFilter() {
 
-        if (removedFilter==null){
+        if (removedFilter == null) {
             removedFilter = "";
             Enumeration paramNames = this.getContext().getRequest().getParameterNames();
-            while (paramNames!=null && paramNames.hasMoreElements()){
+            while (paramNames != null && paramNames.hasMoreElements()) {
                 String paramName = (String)paramNames.nextElement();
-                if (paramName.startsWith(REMOVE_FILTER_VALUE_PREFIX)){
-                    int i = paramName.indexOf('.')<0 ? paramName.length() : paramName.indexOf('.');
+                if (paramName.startsWith(REMOVE_FILTER_VALUE_PREFIX)) {
+                    int i = paramName.indexOf('.') < 0 ? paramName.length() : paramName.indexOf('.');
                     String key = paramName.substring(REMOVE_FILTER_VALUE_PREFIX.length(), i);
-                    if (key.length()>0 && getSelectedFilters().containsKey(key)){
+                    if (key.length() > 0 && getSelectedFilters().containsKey(key)) {
                         removedFilter = key;
                         break;
                     }
@@ -490,7 +489,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
      *
      * @return
      */
-    public boolean isShowPicklist(){
+    public boolean isShowPicklist() {
         return !Util.isNullOrEmpty(getPicklistFilter());
     }
 
@@ -498,7 +497,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
      *
      * @return
      */
-    public boolean isRemoveFilter(){
+    public boolean isRemoveFilter() {
         return !Util.isNullOrEmpty(getRemovedFilter());
     }
 
@@ -506,17 +505,17 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
      *
      * @return
      */
-    private Map<String,String> buildSearchCriteria(){
+    private Map<String,String> buildSearchCriteria() {
 
         Map<String,String> result = new HashMap<String,String>();
 
         Map<String,String> selected = getSelectedFilters();
-        for (Iterator<String> keys=selected.keySet().iterator(); keys.hasNext();){
+        for (Iterator<String> keys=selected.keySet().iterator(); keys.hasNext();) {
             String key = keys.next();
             String value = selected.get(key);
-            if (value!=null && value.trim().length()>0){
+            if (value != null && value.trim().length() > 0) {
                 CustomSearchFilter filter = getAvailableFilters().get(key);
-                if (filter!=null)
+                if (filter != null)
                     result.put(filter.getUri(), value.trim());
             }
         }
@@ -528,7 +527,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
      * (non-Javadoc)
      * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
      */
-    public List<SearchResultColumn> getColumns(){
+    public List<SearchResultColumn> getColumns() {
 
         ArrayList<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
 

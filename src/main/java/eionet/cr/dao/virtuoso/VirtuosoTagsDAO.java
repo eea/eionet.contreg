@@ -11,7 +11,7 @@ import eionet.cr.dto.TagDTO;
  * @author jaanus
  *
  */
-public class VirtuosoTagsDAO extends VirtuosoBaseDAO implements TagsDAO{
+public class VirtuosoTagsDAO extends VirtuosoBaseDAO implements TagsDAO {
 
     /*
      * (non-Javadoc)

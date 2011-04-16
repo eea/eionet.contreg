@@ -77,11 +77,11 @@ public class XmlAnalysis {
         }
         finally{
             try{
-                if (inputStream!=null){
+                if (inputStream != null) {
                     inputStream.close();
                 }
             }
-            catch (IOException e){}
+            catch (IOException e) {}
         }
     }
 
@@ -94,11 +94,11 @@ public class XmlAnalysis {
         }
         finally{
             try{
-                if (inputStream!=null){
+                if (inputStream != null) {
                     inputStream.close();
                 }
             }
-            catch (IOException e){}
+            catch (IOException e) {}
         }
     }
 
@@ -144,9 +144,9 @@ public class XmlAnalysis {
         try{
             reader.parse(new InputSource(inputStream));
         }
-        catch (SAXException e){
+        catch (SAXException e) {
             Exception ee = e.getException();
-            if (ee==null || !(ee instanceof CRException))
+            if (ee == null || !(ee instanceof CRException))
                 throw e;
         }
     }
@@ -155,7 +155,7 @@ public class XmlAnalysis {
      *
      * @return
      */
-    public String getStartElemLocalName(){
+    public String getStartElemLocalName() {
         return handler.getStartElemLocalName();
     }
 
@@ -163,7 +163,7 @@ public class XmlAnalysis {
      *
      * @return
      */
-    public String getStartElemNamespace(){
+    public String getStartElemNamespace() {
         return handler.getStartElemNamespace();
     }
 
@@ -171,7 +171,7 @@ public class XmlAnalysis {
      *
      * @return
      */
-    public String getSchemaLocation(){
+    public String getSchemaLocation() {
         return handler.getSchemaLocation();
     }
 
@@ -179,7 +179,7 @@ public class XmlAnalysis {
      *
      * @return
      */
-    public String getSchemaNamespace(){
+    public String getSchemaNamespace() {
         return handler.getSchemaNamespace();
     }
 
@@ -187,15 +187,15 @@ public class XmlAnalysis {
      *
      * @return
      */
-    public String getStartElemUri(){
+    public String getStartElemUri() {
 
         String startElemNamespace = handler.getStartElemNamespace();
-        if (startElemNamespace==null){
+        if (startElemNamespace == null) {
             startElemNamespace = "";
         }
 
         String startElemLocalName = handler.getStartElemLocalName();
-        if (startElemLocalName==null){
+        if (startElemLocalName == null) {
             startElemLocalName = "";
         }
 
@@ -206,7 +206,7 @@ public class XmlAnalysis {
      *
      * @return
      */
-    public String getSystemDtd(){
+    public String getSystemDtd() {
         return doctypeReader.getDtdSystemId();
     }
 
@@ -214,7 +214,7 @@ public class XmlAnalysis {
      *
      * @return
      */
-    public String getPublicDtd(){
+    public String getPublicDtd() {
         return doctypeReader.getDtdPublicId();
     }
 
@@ -239,31 +239,30 @@ public class XmlAnalysis {
         public void startElement(String uri, String localName, String qName, Attributes attrs) throws SAXException {
 
             this.startElemNamespace = uri;
-            this.startElemLocalName = localName.length()>0 ? localName : qName;
+            this.startElemLocalName = localName.length() > 0 ? localName : qName;
 
-            int attrCount = attrs!=null ? attrs.getLength() : 0;
-            for (int i=0; i<attrCount; i++) {
+            int attrCount = attrs != null ? attrs.getLength() : 0;
+            for (int i = 0; i < attrCount; i++) {
 
                 String attrName =  attrs.getLocalName(i);
                 if (attrName.equalsIgnoreCase("noNamespaceSchemaLocation"))
                     this.schemaLocation = attrs.getValue(i);
-                else if (attrName.equalsIgnoreCase("schemaLocation")){
+                else if (attrName.equalsIgnoreCase("schemaLocation")) {
 
                     String attrValue = attrs.getValue(i);
-                    if (attrValue!=null && attrValue.length()>0){
+                    if (attrValue != null && attrValue.length() > 0) {
 
                         StringTokenizer tokens = new StringTokenizer(attrValue);
-                        if (tokens.countTokens()>=2){
+                        if (tokens.countTokens() >= 2) {
                             this.schemaNamespace = tokens.nextToken();
                             this.schemaLocation = tokens.nextToken();
-                        }
-                        else
+                        } else
                             this.schemaLocation = attrValue;
                     }
                 }
 
                 String attrQName = attrs.getLocalName(i);
-                if (attrQName.startsWith("xmlns:")){
+                if (attrQName.startsWith("xmlns:")) {
                     usedNamespaces.put(attrName, attrs.getValue(i));
                 }
             }
@@ -277,14 +276,14 @@ public class XmlAnalysis {
          * (non-Javadoc)
          * @see org.xml.sax.helpers.DefaultHandler#error(org.xml.sax.SAXParseException)
          */
-        public void error(SAXParseException e){
+        public void error(SAXParseException e) {
         }
 
         /*
          * (non-Javadoc)
          * @see org.xml.sax.helpers.DefaultHandler#fatalError(org.xml.sax.SAXParseException)
          */
-        public void fatalError(SAXParseException e){
+        public void fatalError(SAXParseException e) {
         }
 
         /*
@@ -323,7 +322,7 @@ public class XmlAnalysis {
         }
     }
 
-//  public static void main(String[] args){
+//  public static void main(String[] args) {
 //
 //      XmlAnalysis info = new XmlAnalysis();
 //      try{
@@ -331,7 +330,7 @@ public class XmlAnalysis {
 //          System.out.println(info.getStartElemLocalName());
 //          System.out.println(info.getStartElemNamespace());
 //      }
-//      catch (Throwable t){
+//      catch (Throwable t) {
 //          t.printStackTrace();
 //      }
 //  }

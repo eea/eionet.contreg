@@ -56,7 +56,7 @@ import eionet.cr.web.util.RegisterUrl;
  *
  */
 @UrlBinding("/registerUrl.action")
-public class RegisterURLActionBean extends AbstractActionBean{
+public class RegisterURLActionBean extends AbstractActionBean {
 
     private String url;
     private boolean bookmark = false;
@@ -67,7 +67,7 @@ public class RegisterURLActionBean extends AbstractActionBean{
      * @throws DAOException
      */
     @DefaultHandler
-    public Resolution unspecified(){
+    public Resolution unspecified() {
 
         return new ForwardResolution("/pages/registerUrl.jsp");
     }
@@ -78,7 +78,7 @@ public class RegisterURLActionBean extends AbstractActionBean{
      * @throws DAOException
      * @throws HarvestException
      */
-    public Resolution save() throws DAOException, HarvestException{
+    public Resolution save() throws DAOException, HarvestException {
 
         // register URL
         RegisterUrl.register(url, getUser(), bookmark);
@@ -90,12 +90,12 @@ public class RegisterURLActionBean extends AbstractActionBean{
      *
      */
     @ValidationMethod(on="save")
-    public void validateSave(){
+    public void validateSave() {
 
-        if (StringUtils.isBlank(url) || !URLUtil.isURL(url)){
+        if (StringUtils.isBlank(url) || !URLUtil.isURL(url)) {
             addGlobalValidationError(new SimpleError("Not a valid URL!"));
         }
-        if (getUser()==null){
+        if (getUser() == null) {
             addGlobalValidationError(new SimpleError("You are not logged in!"));
         }
     }

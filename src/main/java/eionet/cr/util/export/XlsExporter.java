@@ -80,15 +80,15 @@ public class XlsExporter extends Exporter implements SubjectExportEvent {
         String uriOrLabelColumn = getUriOrLabel();
 
         columnWidth[0] = uriOrLabelColumn.length();
-        HSSFCell uriOrLabelCell= headers.createCell(0);
+        HSSFCell uriOrLabelCell = headers.createCell(0);
         XlsUtil.setCellValue(uriOrLabelCell, uriOrLabelColumn);
         uriOrLabelCell.setCellStyle(headerStyle);
 
         //output rest of the headers
         int columnNumber= 1;
-        for(Pair<String,String> columnPair : getSelectedColumns()) {
+        for (Pair<String,String> columnPair : getSelectedColumns()) {
             //label is already added to the list of elements
-            if(Predicates.RDFS_LABEL.equals(columnPair.getLeft())) continue;
+            if (Predicates.RDFS_LABEL.equals(columnPair.getLeft())) continue;
 
             String column = columnPair.getRight() != null
             ? columnPair.getRight()
@@ -106,7 +106,7 @@ public class XlsExporter extends Exporter implements SubjectExportEvent {
 
         //set column width
         for (int i = 0; i < getSelectedColumns().size() + 1; i++) {
-            sheet.setColumnWidth(i, Math.min(256 * columnWidth[i], 256*255));
+            sheet.setColumnWidth(i, Math.min(256 * columnWidth[i], 256 * 255));
         }
 
         ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -115,7 +115,7 @@ public class XlsExporter extends Exporter implements SubjectExportEvent {
     }
 
     /**
-     * call-back method
+     * call-back method.
      */
     public void writeSubjectIntoExporterOutput(SubjectDTO subject) throws ExportException {
         HSSFRow row = sheet.createRow(rowNumber++);
@@ -128,9 +128,9 @@ public class XlsExporter extends Exporter implements SubjectExportEvent {
 
         //output other columns
         int columnNumber = 1;
-        for(Pair<String,String> columnPair : getSelectedColumns()) {
+        for (Pair<String,String> columnPair : getSelectedColumns()) {
             //label is already written
-            if(Predicates.RDFS_LABEL.equals(columnPair.getLeft())) continue;
+            if (Predicates.RDFS_LABEL.equals(columnPair.getLeft())) continue;
 
             value = FormatUtils.getObjectValuesForPredicate(columnPair.getLeft(), subject, getLanguages());
             columnWidth[columnNumber] = Math.max(columnWidth[columnNumber], value.length());
@@ -138,16 +138,15 @@ public class XlsExporter extends Exporter implements SubjectExportEvent {
         }
     }
     @Override
-    protected PagingRequest getRowLimitPagingRequest(){
+    protected PagingRequest getRowLimitPagingRequest() {
 
-        if(getRowsLimit()>0){
+        if (getRowsLimit()>0) {
             return PagingRequest.create(1,getRowsLimit());
-        }
-        else{
+        } else {
             return null;
         }
     }
-    public static Integer getRowsLimit(){
+    public static Integer getRowsLimit() {
         return new Integer(GeneralConfig.getRequiredProperty(EXPORT_ROW_LIMIT));
     }
 }

@@ -87,7 +87,7 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
     @DefaultHandler
     public Resolution onEventUnspecified() throws DAOException{
 
-        if (BBOX!=null)
+        if (BBOX != null)
             return doKml();
         else
             return new ForwardResolution("/pages/spatialSearch.jsp");
@@ -105,7 +105,7 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
         logger.debug("KML requested, BBOX = " + BBOX);
 
         String[] ltudes = BBOX.split(",");
-        if (ltudes!=null && ltudes.length==4){
+        if (ltudes != null && ltudes.length == 4) {
 
             longW = Util.toDouble(ltudes[0].trim());
             latS = Util.toDouble(ltudes[1].trim());
@@ -124,7 +124,7 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
         try {
             getContext().getRequest().setCharacterEncoding("UTF-8");
         }
-        catch (UnsupportedEncodingException e){
+        catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e.toString(), e);
         }
         getContext().getResponse().setHeader("Content-Disposition", "attachment; filename=placemarks.kml");
@@ -136,21 +136,21 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
      *
      * @return
      */
-    private Collection<SubjectDTO> filterPlacemarks(Collection<SubjectDTO> placemarks){
+    private Collection<SubjectDTO> filterPlacemarks(Collection<SubjectDTO> placemarks) {
 
-        if (placemarks==null || placemarks.isEmpty())
+        if (placemarks == null || placemarks.isEmpty())
             return placemarks;
 
         double delta = (longE - longW) / 100;
         delta = delta * delta;
 
         Collection<SubjectDTO> result = new ArrayList<SubjectDTO>();
-        for (SubjectDTO subject:placemarks){
+        for (SubjectDTO subject:placemarks) {
 
             String latit = subject.getObjectValue(Predicates.WGS_LAT);
             String longit = subject.getObjectValue(Predicates.WGS_LONG);
-            if (!StringUtils.isBlank(latit) && !StringUtils.isBlank(longit)){
-                if (!isTooClose(Double.parseDouble(latit.trim()), Double.parseDouble(longit.trim()), delta, result)){
+            if (!StringUtils.isBlank(latit) && !StringUtils.isBlank(longit)) {
+                if (!isTooClose(Double.parseDouble(latit.trim()), Double.parseDouble(longit.trim()), delta, result)) {
                     result.add(subject);
                 }
             }
@@ -166,9 +166,9 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
      * @param delta
      * @return
      */
-    private static boolean isTooClose(double latit, double longit, double delta, Collection<SubjectDTO> coll){
+    private static boolean isTooClose(double latit, double longit, double delta, Collection<SubjectDTO> coll) {
 
-        for (SubjectDTO subject:coll){
+        for (SubjectDTO subject:coll) {
 
             double subjLat = getLatitude(subject);
             double subjLong = getLongitude(subject);
@@ -176,7 +176,7 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
             double diff_lat = (subjLat - latit) * (subjLat - latit) ;
             double diff_long = (subjLong - longit) * (subjLong - longit) ;
             double diff = diff_lat + diff_long;
-            if (diff < delta){
+            if (diff < delta) {
                 return true;
             }
         }
@@ -189,7 +189,7 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
      * @param subject
      * @return
      */
-    private static double getLatitude(SubjectDTO subject){
+    private static double getLatitude(SubjectDTO subject) {
         return Double.parseDouble(subject.getObjectValue(Predicates.WGS_LAT).trim());
     }
 
@@ -198,7 +198,7 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
      * @param subject
      * @return
      */
-    private static double getLongitude(SubjectDTO subject){
+    private static double getLongitude(SubjectDTO subject) {
         return Double.parseDouble(subject.getObjectValue(Predicates.WGS_LONG).trim());
     }
 
@@ -206,7 +206,7 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
      *
      * @return
      */
-    public Resolution googleEarthIntro(){
+    public Resolution googleEarthIntro() {
 
         return new ForwardResolution("/pages/googleEarthIntro.jsp");
     }
@@ -219,7 +219,7 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
     public Resolution kmlLinks() throws DAOException {
 
         sources = factory.getDao(HelperDAO.class).getSpatialSources();
-        if (sources.isEmpty()){
+        if (sources.isEmpty()) {
             addSystemMessage("No spatial objects currently found!");
             return new ForwardResolution("/pages/googleEarthIntro.jsp");
         }
@@ -227,7 +227,7 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
             try {
                 getContext().getRequest().setCharacterEncoding("UTF-8");
             }
-            catch (UnsupportedEncodingException e){
+            catch (UnsupportedEncodingException e) {
                 throw new RuntimeException(e.toString(), e);
             }
             getContext().getResponse().setHeader("Content-Disposition", "attachment; filename=kmllinks.kml");
@@ -242,7 +242,7 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
     public Resolution search() throws DAOException {
 
         BBOX bbox = createBBOX();
-        if (!bbox.isUndefined()){
+        if (!bbox.isUndefined()) {
 
             Pair<Integer, List<SubjectDTO>> resultPair =
                 DAOFactory.get().getDao(SearchDAO.class).searchBySpatialBox(
@@ -296,7 +296,7 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
      *
      * @return
      */
-    private BBOX createBBOX(){
+    private BBOX createBBOX() {
 
         BBOX bbox = new BBOX();
         bbox.setLatitudeSouth(latS);
@@ -389,16 +389,16 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
      */
     public String getContextUrl() {
 
-        if (contextUrl==null){
+        if (contextUrl == null) {
             HttpServletRequest request = getContext().getRequest();
 
             StringBuffer buf = new StringBuffer(request.getScheme()).append("://").append(request.getServerName());
             int port = request.getServerPort();
-            if (port>0 && !(port==80 && request.getScheme().equalsIgnoreCase("http"))){
+            if (port > 0 && !(port == 80 && request.getScheme().equalsIgnoreCase("http"))) {
                 buf.append(":").append(port);
             }
             String contextPath = request.getContextPath();
-            if (contextPath!=null){
+            if (contextPath != null) {
                 buf.append(contextPath.trim());
             }
 

@@ -103,7 +103,7 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean<SubjectDTO
     /**
      *
      */
-    public RecentUploadsActionBean(){
+    public RecentUploadsActionBean() {
         this.type = Subjects.ROD_DELIVERY_CLASS; // default type
     }
 
@@ -114,7 +114,7 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean<SubjectDTO
     @DefaultHandler
     public Resolution search() throws DAOException {
 
-        if (!StringUtils.isBlank(type)){
+        if (!StringUtils.isBlank(type)) {
             //String decodedType = Util.urlDecode(type);
                 resultList = DAOFactory.get().getDao(HelperDAO.class).getLatestSubjects(
                         type, MAX_RESULTS);
@@ -143,7 +143,7 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean<SubjectDTO
      *
      * @return List<Map<String, String>>
      */
-    public List<Map<String, String>> getTypes(){
+    public List<Map<String, String>> getTypes() {
         return RecentUploadsActionBean.types;
     }
 
@@ -151,7 +151,7 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean<SubjectDTO
      *
      * @return int
      */
-    public int getMaxResults(){
+    public int getMaxResults() {
         return RecentUploadsActionBean.MAX_RESULTS;
     }
 
@@ -159,8 +159,8 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean<SubjectDTO
      * (non-Javadoc)
      * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
      */
-    public List<SearchResultColumn> getColumns(){
-        if (StringUtils.isEmpty(type)){
+    public List<SearchResultColumn> getColumns() {
+        if (StringUtils.isEmpty(type)) {
             return getDefaultColumns();
         }
         String decodedType = Util.urlDecode(type);

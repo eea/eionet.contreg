@@ -31,7 +31,7 @@ public class VirtuosoHarvesterActionBean extends AbstractActionBean {
      * @return
      */
     @DefaultHandler
-    public Resolution view(){
+    public Resolution view() {
         return new ForwardResolution("/pages/virtuosoHarvester.jsp");
     }
 
@@ -74,16 +74,16 @@ public class VirtuosoHarvesterActionBean extends AbstractActionBean {
             isSuccess = true;
         }
         finally{
-            if (!isSuccess && conn!=null){
-                try{conn.rollback();}catch(RepositoryException e){}
+            if (!isSuccess && conn != null) {
+                try{conn.rollback();}catch(RepositoryException e) {}
             }
 
-            if (conn!=null){
-                try{conn.close();}catch(RepositoryException e){}
+            if (conn != null) {
+                try{conn.close();}catch(RepositoryException e) {}
             }
 
-            if (repository!=null){
-                try{repository.shutDown();}catch(RepositoryException e){}
+            if (repository != null) {
+                try{repository.shutDown();}catch(RepositoryException e) {}
             }
         }
 
