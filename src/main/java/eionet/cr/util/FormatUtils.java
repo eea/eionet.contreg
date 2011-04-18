@@ -37,31 +37,41 @@ import eionet.cr.dto.SubjectDTO;
  * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
 public final class FormatUtils {
-
+    /**
+     * to prevent public instancing.
+     */
     private FormatUtils() {
         //blank
     }
 
-    public static String getObjectValuesForPredicate(String predicateUri, SubjectDTO subjectDTO, Set<String> languages) {
+    /**
+     * Returns object values for the given predicate in given langauges.
+     * @param predicateUri  predicate URI
+     * @param subjectDTO SubjectDTO data object for subject
+     * @param languages Set<String> language codes
+     * @return String
+     */
+    public static String getObjectValuesForPredicate(final String predicateUri, final SubjectDTO subjectDTO,
+            final Set<String> languages) {
         String result = "";
 
-        if (subjectDTO.getPredicateCount()>0) {
+        if (subjectDTO.getPredicateCount() > 0) {
 
             Collection<ObjectDTO> objects = subjectDTO.getObjects(predicateUri);
-            if (objects!=null && !objects.isEmpty()) {
+            if (objects != null && !objects.isEmpty()) {
 
                 LinkedHashSet<ObjectDTO> distinctObjects = new LinkedHashSet<ObjectDTO>(objects);
                 StringBuffer bufLiterals = new StringBuffer();
                 StringBuffer bufNonLiterals = new StringBuffer();
 
                 String resultFromHitSource = null;
-                for (ObjectDTO objectDTO:distinctObjects) {
+                for (ObjectDTO objectDTO : distinctObjects) {
 
                     String objectString = objectDTO.getValue().trim();
 
                     // if the source of the object matches the search-hit source of the subject then
                     // remember the object value and break
-                    if (subjectDTO.getHitSource()>0 && objectDTO.getSourceHashSmart()==subjectDTO.getHitSource()
+                    if (subjectDTO.getHitSource() > 0 && objectDTO.getSourceHashSmart() == subjectDTO.getHitSource()
                             && !StringUtils.isBlank(objectString)
                             && objectDTO.isLiteral()) {
 
@@ -69,15 +79,14 @@ public final class FormatUtils {
                         break;
                     }
 
-                    if (objectString.length()>0) {
+                    if (objectString.length() > 0) {
 
                         if (objectDTO.isLiteral()) {
                             if (languages.isEmpty() || languages.contains(objectDTO.getLanguage())) {
-                                bufLiterals.append(bufLiterals.length()>0 ? ", " : "").append(objectString);
+                                bufLiterals.append(bufLiterals.length() > 0 ? ", " : "").append(objectString);
                             }
-                        }
-                        else{
-                            bufNonLiterals.append(bufNonLiterals.length()>0 ? ", " : "").append(objectString);
+                        } else {
+                            bufNonLiterals.append(bufNonLiterals.length() > 0 ? ", " : "").append(objectString);
                         }
                     }
                 }
@@ -85,9 +94,8 @@ public final class FormatUtils {
                 // if there was a value found that came from search-hit source then prefer that one as the result
                 if (!StringUtils.isBlank(resultFromHitSource)) {
                     result = resultFromHitSource;
-                }
-                else{
-                    result = bufLiterals.length()>0 ? bufLiterals.toString() : bufNonLiterals.toString();
+                } else {
+                    result = bufLiterals.length() > 0 ? bufLiterals.toString() : bufNonLiterals.toString();
                 }
             }
         }

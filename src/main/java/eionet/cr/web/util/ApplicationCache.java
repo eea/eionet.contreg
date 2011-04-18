@@ -38,58 +38,80 @@ import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import eionet.cr.dao.util.UriLabelPair;
 import eionet.cr.dto.TagDTO;
-import eionet.cr.util.Pair;
 import eionet.cr.util.ObjectLabelPair;
+import eionet.cr.util.Pair;
 
 /**
  * A place to hold all application caches.
- * 
+ *
  * @author Aleksandr Ivanov <a
  *         href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
 public class ApplicationCache implements ServletContextListener {
-
+    /**
+     * Application (main) cache  name.
+     */
     public static final String APPLICATION_CACHE = "ApplicationCache";
 
+    /**
+     * Dataflow picklist cache name.
+     */
     private static final String DATAFLOW_SEARCH_PICKLIST_CACHE = "dataflowSearchPicklist";
+    /**
+     * Localities cache name.
+     */
     private static final String LOCALITIES_CACHE = "localitiesCache";
+    /**
+     * Recent resources cache name.
+     */
     private static final String RECENT_RESOURCES_CACHE = "recentResources";
+    /**
+     * Tag cloud cache name.
+     */
     private static final String TAG_CLOUD_CACHE = "tagCloud";
-
+    /**
+     * type cache name.
+     */
     private static final String TYPE_CACHE = "typeCache";
-
+    /**
+     * type columns cache name.
+     */
     private static final String TYPE_COLUMNS_CACHE = "typeColumnsCache";
 
     /**
      * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
      *      {@inheritDoc}
      */
-    public void contextDestroyed(ServletContextEvent arg0) {
+    public void contextDestroyed(final ServletContextEvent arg0) {
         CacheManager.getInstance().shutdown();
     }
 
+    /**
+     * Returnes application cache.
+     * @return Cache  - main application cache
+     */
     private static Cache getCache() {
         return CacheManager.getInstance().getCache(APPLICATION_CACHE);
     }
 
     /**
      * update recent resource cache.
-     * 
-     * @param update
+     *
+     * @param update List<Pair<String, String>> resources to be updated
      */
-    public static void updateRecentResourceCache(List<Pair<String, String>> update) {
+    public static void updateRecentResourceCache(final List<Pair<String, String>> update) {
         getCache().put(new Element(RECENT_RESOURCES_CACHE, update));
     }
 
     /**
      * get recently discovered files.
-     * 
+     *
      * @param limit
      *            - how many files to fetch
-     * @return
+     * @return List<Pair<String, String>>
      */
     @SuppressWarnings("unchecked")
-    public static List<Pair<String, String>> getRecentDiscoveredFiles(int limit) {
+    public static List<Pair<String, String>> getRecentDiscoveredFiles(final int limit) {
         Element element = getCache().get(RECENT_RESOURCES_CACHE);
 
         if (element == null || element.getValue() == null) {
@@ -103,22 +125,22 @@ public class ApplicationCache implements ServletContextListener {
 
     /**
      * update tag cloud.
-     * 
-     * @param update
+     *
+     * @param update List<TagDTO> tags to be updated
      */
-    public static void updateTagCloudCache(List<TagDTO> update) {
+    public static void updateTagCloudCache(final List<TagDTO> update) {
         getCache().put(new Element(TAG_CLOUD_CACHE, update));
     }
 
     /**
      * get tag cloud.
-     * 
+     *
      * @param limit
      *            - how many tags to fetch
-     * @return
+     * @return List<TagDTO>
      */
     @SuppressWarnings("unchecked")
-    public static List<TagDTO> getTagCloud(int limit) {
+    public static List<TagDTO> getTagCloud(final int limit) {
         Element element = getCache().get(TAG_CLOUD_CACHE);
 
         if (element == null || element.getValue() == null) {
@@ -126,22 +148,33 @@ public class ApplicationCache implements ServletContextListener {
         }
 
         List<TagDTO> cache = (List<TagDTO>) element.getValue();
-        limit = limit == 0 ? cache.size() : limit;
+        //retrunable list size
+        int tagCloudListSize = limit == 0 ? cache.size() : limit;
 
-        List<TagDTO> result = new LinkedList<TagDTO>(cache.subList(0, Math.min(cache.size(), limit)));
+        List<TagDTO> result = new LinkedList<TagDTO>(cache.subList(0, Math.min(cache.size(), tagCloudListSize)));
 
         return result;
 
     }
 
-    public static List<TagDTO> getTagCloudSortedByName(int limit) {
+    /**
+     * Returns tag cloud list sorted by tag name.
+     * @param limit returned list size
+     * @return List<TagDTO>
+     */
+
+    public static List<TagDTO> getTagCloudSortedByName(final int limit) {
         List<TagDTO> result = getTagCloud(limit);
         Collections.sort(result, new TagDTO.NameComparatorAsc());
 
         return result;
     }
-
-    public static List<TagDTO> getTagCloudSortedByCount(int limit) {
+    /**
+     * Returns tag cloud list sorted by tag count.
+     * @param limit returned list size
+     * @return List<TagDTO>
+     */
+    public static List<TagDTO> getTagCloudSortedByCount(final int limit) {
         List<TagDTO> result = getTagCloud(limit);
         Collections.sort(result, new TagDTO.CountComparatorDesc());
 
@@ -150,22 +183,22 @@ public class ApplicationCache implements ServletContextListener {
 
     /**
      * Update dataflow picklist cache.
-     * 
+     *
      * @param picklistCache
      *            - picklist cache
      * @param localitiesCache
      *            - localities cache
      */
-    public static void updateDataflowPicklistCache(Map<String, ArrayList<UriLabelPair>> picklistCache,
-            Collection<ObjectLabelPair> localitiesCache) {
+    public static void updateDataflowPicklistCache(final Map<String, ArrayList<UriLabelPair>> picklistCache,
+            final Collection<ObjectLabelPair> localitiesCache) {
         getCache().put(new Element(LOCALITIES_CACHE, localitiesCache));
         getCache().put(new Element(DATAFLOW_SEARCH_PICKLIST_CACHE, picklistCache));
     }
 
     /**
      * fetch cached localities.
-     * 
-     * @return
+     *
+     * @return Collection<ObjectLabelPair>
      */
     @SuppressWarnings("unchecked")
     public static Collection<ObjectLabelPair> getLocalities() {
@@ -177,8 +210,8 @@ public class ApplicationCache implements ServletContextListener {
 
     /**
      * fetch dataflow picklist cache.
-     * 
-     * @return
+     *
+     * @return Map<String, List<UriLabelPair>>
      */
     @SuppressWarnings("unchecked")
     public static Map<String, List<UriLabelPair>> getDataflowPicklist() {
@@ -190,8 +223,8 @@ public class ApplicationCache implements ServletContextListener {
 
     /**
      * fetch cached dataflows.
-     * 
-     * @return
+     *
+     * @return Collection<ObjectLabelPair>
      */
     public static Collection<ObjectLabelPair> getDataflows() {
         SortedSet<ObjectLabelPair> result = new TreeSet<ObjectLabelPair>();
@@ -206,8 +239,8 @@ public class ApplicationCache implements ServletContextListener {
 
     /**
      * fetch cached instruments.
-     * 
-     * @return
+     *
+     * @return Collection
      */
     public static Collection<ObjectLabelPair> getInstruments() {
         Map<String, List<UriLabelPair>> cache = getDataflowPicklist();
@@ -221,8 +254,8 @@ public class ApplicationCache implements ServletContextListener {
 
     /**
      * fetch cached type URIs.
-     * 
-     * @return
+     *
+     * @return Collection
      */
     public static Collection<ObjectLabelPair> getTypeURIs() {
         List<Pair<String, String>> types = getTypes();
@@ -236,8 +269,8 @@ public class ApplicationCache implements ServletContextListener {
 
     /**
      * fetch cached types.
-     * 
-     * @return
+     *
+     * @return List<Pair<String, String>> types
      */
     @SuppressWarnings("unchecked")
     public static List<Pair<String, String>> getTypes() {
@@ -250,10 +283,10 @@ public class ApplicationCache implements ServletContextListener {
 
     /**
      * update type cache.
-     * 
-     * @param update
+     *
+     * @param update List<Pair<String, String>> Types to be updated
      */
-    public static void updateTypes(List<Pair<String, String>> update) {
+    public static void updateTypes(final List<Pair<String, String>> update) {
         getCache().put(new Element(TYPE_CACHE, update));
     }
 
@@ -261,22 +294,26 @@ public class ApplicationCache implements ServletContextListener {
      * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
      *      {@inheritDoc}
      */
-    public void contextInitialized(ServletContextEvent arg0) {
+    public void contextInitialized(final ServletContextEvent arg0) {
         CacheManager cacheManager = CacheManager.getInstance();
         cacheManager.addCache(APPLICATION_CACHE);
     }
 
-    public static void updateTypeColumns(Map<String, Map<String, String>> update) {
+    /**
+     * updates type columns cache.
+     * @param update Map<String, Map<String, String>>  - cache to be updated
+     */
+    public static void updateTypeColumns(final Map<String, Map<String, String>> update) {
         getCache().put(new Element(TYPE_COLUMNS_CACHE, update));
     }
 
     /**
      * fetch cached type columns.
-     * 
-     * @return
+     * @param type String
+     * @return Map<String, String>
      */
     @SuppressWarnings("unchecked")
-    public static Map<String, String> getTypeColumns(String type) {
+    public static Map<String, String> getTypeColumns(final String type) {
         Element element = getCache().get(TYPE_COLUMNS_CACHE);
         if (element == null || element.getValue() == null) {
             return Collections.EMPTY_MAP;

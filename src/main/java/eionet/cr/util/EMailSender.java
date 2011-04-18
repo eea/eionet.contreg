@@ -20,45 +20,52 @@
  */
 package eionet.cr.util;
 
-import java.util.*;
-import java.io.*;
-import javax.mail.*;
-import javax.mail.internet.*;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 
 import eionet.cr.config.GeneralConfig;
 
 /**
- * Sends emails to system administrators
+ * Sends emails to system administrators.
  *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class EMailSender {
+public final class EMailSender {
+
+    /**
+     * to prevent public instancing.
+     */
+    private EMailSender() {
+
+    }
 
     /**
      * Sends the email to system administrators in To: field.
      *
      * @param subject Subject of email
      * @param body Message
-     * @throws AddressException
-     * @throws MessagingException
+     * @throws MessagingException if sending fails
      */
-    public static void sendToSysAdmin(String subject, String body) throws AddressException, MessagingException {
-
+    public static void sendToSysAdmin(final String subject, final String body) throws MessagingException {
         send(getSysAdmins(), subject, body, false);
     }
 
     /**
      * Sends the email - if there is a mail host in the configuration file.
      *
-     * @param to Email recipients
+     * @param to   Email recipients
      * @param subject Subject of email
      * @param body Message
      * @param ccSysAdmin whether to CC system administrators
-     * @throws AddressException
-     * @throws MessagingException
+     * @throws MessagingException if sending fails
      */
-    public static void send(String[] to, String subject, String body, boolean ccSysAdmin) throws AddressException, MessagingException {
+    public static void send(final String[] to, final String subject, final String body, final boolean ccSysAdmin)
+            throws  MessagingException {
 
         // if no mail.host specified in the properties, go no further
         String mailHost = GeneralConfig.getProperty("mail.host");
@@ -78,8 +85,7 @@ public class EMailSender {
                 for (int i = 0; i < sysAdmins.length; i++) {
                     String sysAdmin = sysAdmins[i].trim();
                     if (sysAdmin.length() > 0) {
-                        message.addRecipient(Message.RecipientType.CC,
-                            new InternetAddress(sysAdmin));
+                        message.addRecipient(Message.RecipientType.CC, new InternetAddress(sysAdmin));
                     }
                 }
             }
@@ -91,8 +97,9 @@ public class EMailSender {
     }
 
     /**
+     * Returns syadmins email addresses.
      *
-     * @return
+     * @return String[] list of sysadmin email addresses
      */
     private static String[] getSysAdmins() {
 

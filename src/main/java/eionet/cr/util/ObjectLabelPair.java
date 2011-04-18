@@ -1,15 +1,31 @@
 package eionet.cr.util;
 
+/**
+ * Helper class for displaying objects in sorted order in picklists etc.
+ *
+ * @author kaido
+ *
+ */
 public class ObjectLabelPair extends Pair<String, String> implements Comparable<ObjectLabelPair> {
 
+    /** */
     private static final long serialVersionUID = 8436701057926603287L;
 
-    public ObjectLabelPair(String left, String right) {
+    /**
+     * overrides superclass constructor.
+     * @param left object key
+     * @param right label
+     */
+    public ObjectLabelPair(final String left, final String right) {
         super(left, right);
     }
 
+    /**
+     * @param other the other ObjectLabelPair
+     * @return int @see Comparable.compareTo()
+     */
     @Override
-    public int compareTo(ObjectLabelPair other) {
+    public int compareTo(final ObjectLabelPair other) {
         return getRight().compareTo(other.getRight());
     }
 
