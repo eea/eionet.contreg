@@ -898,12 +898,12 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             append(" AND LAST_HARVEST + INTERVAL '" + days + " days' > current_date").
             append(" GROUP BY DATE(LAST_HARVEST) ORDER BY HARVESTDAY DESC ;");
 
-        List <HarvestedUrlCountDTO> result = new ArrayList();
+        List<HarvestedUrlCountDTO> result = new ArrayList();
         Connection conn = null;
         Statement stmt = null;
         ResultSet rs = null;
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat ("yyyy-MM-dd");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
             conn = getSQLConnection();
             stmt = conn.createStatement();
@@ -933,7 +933,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
      * (non-Javadoc)
      * @see eionet.cr.dao.HelperDAO#getUrgencyOfComingHarvests()
      */
-    public Pair <Integer, List <HarvestUrgencyScoreDTO>> getUrgencyOfComingHarvests(int amount) throws DAOException {
+    public Pair<Integer, List<HarvestUrgencyScoreDTO>> getUrgencyOfComingHarvests(int amount) throws DAOException {
 
 
 
@@ -947,12 +947,12 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
         append(" ORDER BY urgency DESC ").
         append(" LIMIT " + amount + " ");
 
-        List <HarvestUrgencyScoreDTO> result = new ArrayList();
+        List<HarvestUrgencyScoreDTO> result = new ArrayList();
         Connection conn = null;
         Statement stmt = null;
         ResultSet rs = null;
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat ("yyyy-MM-dd hh:mm:ss");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
             conn = getSQLConnection();
             stmt = conn.createStatement();
@@ -1040,12 +1040,12 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
         long startTime = System.currentTimeMillis();
         logger.trace("updateTypeDataCache query is: " + getUpdateTypeData_SQL);
-        executeSQL(getUpdateTypeData_SQL, (SQLResultSetReader)null);
+        executeSQL(getUpdateTypeData_SQL, (SQLResultSetReader) null);
         logger.debug("updateTypeDataCache query took " + Util.durationSince(startTime));
 
         startTime = System.currentTimeMillis();
         logger.trace("updateTypeDataPredicatesCache query is: " + getUpdateTypePredicateData_SQL);
-        executeSQL(getUpdateTypePredicateData_SQL, (SQLResultSetReader)null);
+        executeSQL(getUpdateTypePredicateData_SQL, (SQLResultSetReader) null);
         logger.debug("updateTypeDataPredicatesCache query took " + Util.durationSince(startTime));
     }
 
@@ -1329,7 +1329,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
         Statement stmt = null;
         ResultSet rs = null;
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat ("yyyy-MM-dd'T'hh:mm:ss");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss");
             conn = getSQLConnection();
             stmt = conn.createStatement();
             rs = stmt.executeQuery(dbQuery);

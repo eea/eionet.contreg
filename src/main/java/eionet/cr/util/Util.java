@@ -108,8 +108,8 @@ public class Util {
     public static String[] getStackFrames(String stackTrace) {
         StringTokenizer frames = new StringTokenizer(stackTrace, System.getProperty("line.separator"));
         List list = new LinkedList();
-        for(; frames.hasMoreTokens(); list.add(frames.nextToken()));
-        return (String[])list.toArray(new String[list.size()]);
+        for (; frames.hasMoreTokens(); list.add(frames.nextToken()));
+        return (String[]) list.toArray(new String[list.size()]);
     }
 
     /**
@@ -161,8 +161,7 @@ public class Util {
         SimpleDateFormat formatter = new SimpleDateFormat(datePattern);
         try {
             return formatter.parse(str);
-        }
-        catch (ParseException e) {
+        } catch (ParseException e) {
             throw new CRRuntimeException("Failed to convert the given string to java.util.Date: " + e.toString(), e);
         }
     }
@@ -181,7 +180,7 @@ public class Util {
      * @return
      */
     public static long getSeconds(long milliSeconds) {
-        return (long)(milliSeconds/(long)1000);
+        return (long) (milliSeconds / (long) 1000);
     }
 
     /**
@@ -290,8 +289,7 @@ public class Util {
     public static String urlEncode(String s) {
         try {
             return URLEncoder.encode(s, "UTF-8");
-        }
-        catch (UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException e) {
             throw new CRRuntimeException(e.toString(), e);
         }
     }
@@ -304,8 +302,7 @@ public class Util {
     public static String urlDecode(String s) {
         try {
             return URLDecoder.decode(s, "UTF-8");
-        }
-        catch (UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException e) {
             throw new CRRuntimeException(e.toString(), e);
         }
     }
@@ -369,8 +366,7 @@ public class Util {
         else {
             try {
                 return Double.valueOf(s);
-            }
-            catch (NumberFormatException nfe) {
+            } catch (NumberFormatException nfe) {
                 return null;
             }
         }
@@ -384,8 +380,7 @@ public class Util {
 
         if (httpAcceptedLanguage == null) {
             return httpAcceptedLanguage;
-        }
-        else {
+        } else {
             httpAcceptedLanguage = httpAcceptedLanguage.trim();
         }
 
@@ -418,7 +413,7 @@ public class Util {
         if (httpAcceptedLanguage.contains(";q=")) {
             int j = httpAcceptedLanguage.indexOf(";q=");
 
-            String importanceValue = httpAcceptedLanguage.substring(j+3, httpAcceptedLanguage.length());
+            String importanceValue = httpAcceptedLanguage.substring(j + 3, httpAcceptedLanguage.length());
             try {
                 double returnValue = Double.parseDouble(importanceValue);
                 return returnValue;
@@ -628,7 +623,7 @@ public class Util {
    * @return escaped string
    */
   public static String escapeHtml(String s) {
-      if(!StringUtils.isBlank(s)){
+      if (!StringUtils.isBlank(s)) {
           s = StringEscapeUtils.escapeHtml(s);
           s = s.replaceAll("\n", "<br/>");
       }

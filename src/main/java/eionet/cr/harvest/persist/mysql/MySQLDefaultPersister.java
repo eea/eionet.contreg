@@ -147,7 +147,7 @@ public class MySQLDefaultPersister implements IHarvestPersister {
      * @param conn
      * @throws SQLException
      */
-    private void rollbackUnfinishedHarvest(long sourceUrlHash, long genTime, Connection conn) throws SQLException{
+    private void rollbackUnfinishedHarvest(long sourceUrlHash, long genTime, Connection conn) throws SQLException {
 
         // delete rows of given harvest from SPO
         StringBuffer buf = new StringBuffer("delete from SPO where (SOURCE=");
@@ -170,10 +170,9 @@ public class MySQLDefaultPersister implements IHarvestPersister {
         deleteUnfinishedHarvestFlag(sourceUrlHash, genTime, conn);
 
         // delete all rows from SPO_TEMP and RESOURCE_TEMP
-        try{
+        try {
             clearTemporaries();
-        }
-        catch (Exception e){}
+        } catch (Exception e) {}
     }
 
     /*
@@ -185,28 +184,27 @@ public class MySQLDefaultPersister implements IHarvestPersister {
             boolean litObject, boolean anonObject, long objSourceObject) throws PersisterException {
 
         try {
-            preparedStatementForTriples.setLong  ( 1, subjectHash);
-            preparedStatementForTriples.setLong  ( 2, predicateHash);
-            preparedStatementForTriples.setString( 3, object);
-            preparedStatementForTriples.setLong  ( 4, objectHash);
-            preparedStatementForTriples.setObject( 5, Util.toDouble(object));
-            preparedStatementForTriples.setString( 6, YesNoBoolean.format(anonSubject));
-            preparedStatementForTriples.setString( 7, YesNoBoolean.format(anonObject));
-            preparedStatementForTriples.setString( 8, YesNoBoolean.format(litObject));
-            preparedStatementForTriples.setString( 9, objectLang==null ? "" : objectLang);
-            preparedStatementForTriples.setLong  (10, objSourceObject==0 ? 0 : sourceUrlHash);
-            preparedStatementForTriples.setLong  (11, objSourceObject==0 ? 0 : genTime);
-            preparedStatementForTriples.setLong  (12, objSourceObject);
+            preparedStatementForTriples.setLong(1, subjectHash);
+            preparedStatementForTriples.setLong(2, predicateHash);
+            preparedStatementForTriples.setString(3, object);
+            preparedStatementForTriples.setLong(4, objectHash);
+            preparedStatementForTriples.setObject(5, Util.toDouble(object));
+            preparedStatementForTriples.setString(6, YesNoBoolean.format(anonSubject));
+            preparedStatementForTriples.setString(7, YesNoBoolean.format(anonObject));
+            preparedStatementForTriples.setString(8, YesNoBoolean.format(litObject));
+            preparedStatementForTriples.setString(9, objectLang == null ? "" : objectLang);
+            preparedStatementForTriples.setLong(10, objSourceObject == 0 ? 0 : sourceUrlHash);
+            preparedStatementForTriples.setLong(11, objSourceObject == 0 ? 0 : genTime);
+            preparedStatementForTriples.setLong(12, objSourceObject);
 
             preparedStatementForTriples.addBatch();
             tripleCounter++;
 
             // if at BULK_INSERT_SIZE, execute the batch
-            if (tripleCounter % BULK_INSERT_SIZE == 0){
+            if (tripleCounter % BULK_INSERT_SIZE == 0) {
                 executeBatch();
             }
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             throw new PersisterException(e.getMessage(), e);
         }
     }
@@ -221,8 +219,7 @@ public class MySQLDefaultPersister implements IHarvestPersister {
             preparedStatementForResources.setString(1, uri);
             preparedStatementForResources.setLong(2, uriHash);
             preparedStatementForResources.addBatch();
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             throw new PersisterException(e.getMessage(), e);
         }
     }
@@ -231,7 +228,7 @@ public class MySQLDefaultPersister implements IHarvestPersister {
      * (non-Javadoc)
      * @see eionet.cr.harvest.persist.IHarvestPersister#closeResources()
      */
-    public void closeResources(){
+    public void closeResources() {
 
         SQLUtil.close(preparedStatementForTriples);
         SQLUtil.close(preparedStatementForResources);
@@ -245,7 +242,7 @@ public class MySQLDefaultPersister implements IHarvestPersister {
     public void endOfFile() throws PersisterException {
 
         // if there are any un-executed records left in the batch, execute them
-        if (tripleCounter % BULK_INSERT_SIZE != 0){
+        if (tripleCounter % BULK_INSERT_SIZE != 0) {
             executeBatch();
         }
 
@@ -262,7 +259,7 @@ public class MySQLDefaultPersister implements IHarvestPersister {
             commitResources();
             MySQLDerivationEngine derivEngine = new MySQLDerivationEngine(
                     sourceUrl, sourceUrlHash, genTime, connection);
-            if (config.isDeriveInferredTriples()){
+            if (config.isDeriveInferredTriples()) {
 
                 derivEngine.deriveParentClasses();
                 derivEngine.deriveParentProperties();
@@ -298,7 +295,7 @@ public class MySQLDefaultPersister implements IHarvestPersister {
      * @throws SQLException
      *
      */
-    private void commitTriples() throws SQLException{
+    private void commitTriples() throws SQLException {
 
         /* copy triples from SPO_TEMP into SPO */
 
@@ -316,7 +313,7 @@ public class MySQLDefaultPersister implements IHarvestPersister {
 
         /* clear previous content if required (it is not, for example, required when doing a push-harvest) */
 
-        if (config.isClearPreviousContent()){
+        if (config.isClearPreviousContent()) {
 
             logger.debug("Deleting SPO rows of previous harvests");
 
@@ -340,22 +337,22 @@ public class MySQLDefaultPersister implements IHarvestPersister {
         Statement stmt = null;
         Connection conn = null;
         ArrayList<UnfinishedHarvestDTO> list = new ArrayList<UnfinishedHarvestDTO>();
-        try{
+        try {
             conn = DbConnectionProvider.getConnection();
             stmt = conn.createStatement();
             rs = stmt.executeQuery("select * from UNFINISHED_HARVEST");
-            while (rs!=null && rs.next()){
+            while (rs!=null && rs.next()) {
                 list.add(UnfinishedHarvestDTO.create(rs.getLong("SOURCE"), rs.getLong("GEN_TIME")));
             }
 
-            if (!list.isEmpty()){
+            if (!list.isEmpty()) {
 
                 LogFactory.getLog(RDFHandler.class).debug("Deleting leftovers from unfinished harvests");
 
-                for (UnfinishedHarvestDTO unfinishedHarvestDTO:list){
+                for (UnfinishedHarvestDTO unfinishedHarvestDTO:list) {
 
                     // if the source is not actually being currently harvested, only then roll it back
-                    if (!CurrentHarvests.contains(unfinishedHarvestDTO.getSource())){
+                    if (!CurrentHarvests.contains(unfinishedHarvestDTO.getSource())) {
                         rollbackUnfinishedHarvest(unfinishedHarvestDTO.getSource(),
                                 unfinishedHarvestDTO.getGenTime(), conn);
                     }
@@ -363,8 +360,7 @@ public class MySQLDefaultPersister implements IHarvestPersister {
             }
         } catch (SQLException fatal) {
             throw new PersisterException(fatal.getMessage(), fatal);
-        }
-        finally{
+        } finally {
             SQLUtil.close(rs);
             SQLUtil.close(stmt);
             SQLUtil.close(conn);
@@ -385,11 +381,10 @@ public class MySQLDefaultPersister implements IHarvestPersister {
             preparedStatementForResources.clearParameters();
             System.gc();
 
-            if (tripleCounter % TRIPLE_PROGRESS_INTERVAL == 0){
+            if (tripleCounter % TRIPLE_PROGRESS_INTERVAL == 0) {
                 logger.debug("Progress: " + String.valueOf(tripleCounter) + " triples processed");
             }
-        }
-        catch(SQLException e) {
+        } catch(SQLException e) {
             throw new PersisterException(e.getMessage(), e);
         }
     }
@@ -403,7 +398,7 @@ public class MySQLDefaultPersister implements IHarvestPersister {
             connection = DbConnectionProvider.getConnection();
             // make sure SPO_TEMP and RESOURCE_TEMP are empty, because we do only one scheduled harvest at a time
             // and so any possible leftovers from previous scheduled harvest must be deleted)
-            if (!isInstantHarvest()){
+            if (!isInstantHarvest()) {
                 clearTemporaries();
             }
 
@@ -411,19 +406,18 @@ public class MySQLDefaultPersister implements IHarvestPersister {
             raiseUnfinishedHarvestFlag();
 
             // if instant harvest, then create temporary SPO_TEMP and RESOURCE_TEMP tables
-            if (isInstantHarvest()){
+            if (isInstantHarvest()) {
                 String tempTableSuffix = "_" + instantHarvestUser + "_" + Hashes.md5(sourceUrl + genTime);
                 spoTempTableName = spoTempTableName + tempTableSuffix;
                 resourceTempTableName = resourceTempTableName + tempTableSuffix;
                 String sql1 = "create temporary table " + spoTempTableName + " like SPO_TEMP";
                 String sql2 = "create temporary table " + resourceTempTableName + " like RESOURCE_TEMP";
                 Statement stmt = null;
-                try{
+                try {
                     stmt = getConnection().createStatement();
                     stmt.executeUpdate(sql1);
                     stmt.executeUpdate(sql2);
-                }
-                finally{
+                } finally {
                     SQLUtil.close(stmt);
                 }
             }
@@ -453,12 +447,12 @@ public class MySQLDefaultPersister implements IHarvestPersister {
      *
      * @throws SQLException
      */
-    private void prepareStatementForTriples() throws SQLException{
+    private void prepareStatementForTriples() throws SQLException {
 
-        String s = "insert into " + spoTempTableName +
-                " (SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, OBJECT_DOUBLE," +
-                " ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG, OBJ_DERIV_SOURCE, OBJ_DERIV_SOURCE_GEN_TIME, OBJ_SOURCE_OBJECT)" +
-                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String s = "insert into " + spoTempTableName
+                + " (SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, OBJECT_DOUBLE,"
+                + " ANON_SUBJ, ANON_OBJ, LIT_OBJ, OBJ_LANG, OBJ_DERIV_SOURCE, OBJ_DERIV_SOURCE_GEN_TIME, OBJ_SOURCE_OBJECT)"
+                + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         preparedStatementForTriples = getConnection().prepareStatement(s);
     }
 
@@ -466,7 +460,7 @@ public class MySQLDefaultPersister implements IHarvestPersister {
      *
      * @throws SQLException
      */
-    private void prepareStatementForResources() throws SQLException{
+    private void prepareStatementForResources() throws SQLException {
 
         preparedStatementForResources = getConnection().prepareStatement(
                 "insert into " + resourceTempTableName + " (URI, URI_HASH) VALUES (?, ?)");
@@ -476,7 +470,7 @@ public class MySQLDefaultPersister implements IHarvestPersister {
      *
      * @throws SQLException
      */
-    private void raiseUnfinishedHarvestFlag() throws SQLException{
+    private void raiseUnfinishedHarvestFlag() throws SQLException {
 
         StringBuffer buf = new StringBuffer();
         buf.append("insert into UNFINISHED_HARVEST (SOURCE, GEN_TIME) values (").
@@ -489,7 +483,7 @@ public class MySQLDefaultPersister implements IHarvestPersister {
      *
      * @throws SQLException
      */
-    private void deleteUnfinishedHarvestFlag() throws SQLException{
+    private void deleteUnfinishedHarvestFlag() throws SQLException {
 
         StringBuffer buf = new StringBuffer();
         buf.append("delete from UNFINISHED_HARVEST where SOURCE=").append(sourceUrlHash).append(" and GEN_TIME=").append(genTime);
@@ -501,7 +495,7 @@ public class MySQLDefaultPersister implements IHarvestPersister {
      *
      * @throws SQLException
      */
-    private void deleteUnfinishedHarvestFlag(long sourceUrlHash, long genTime, Connection conn) throws SQLException{
+    private void deleteUnfinishedHarvestFlag(long sourceUrlHash, long genTime, Connection conn) throws SQLException {
 
         StringBuffer buf = new StringBuffer();
         buf.append("delete from UNFINISHED_HARVEST where SOURCE=").append(sourceUrlHash).append(" and GEN_TIME=").append(genTime);
@@ -520,7 +514,7 @@ public class MySQLDefaultPersister implements IHarvestPersister {
      *
      * @throws SQLException
      */
-    private void clearTemporaries() throws SQLException{
+    private void clearTemporaries() throws SQLException {
 
         SQLUtil.executeUpdate("delete from " + spoTempTableName, connection);
         SQLUtil.executeUpdate("delete from " + resourceTempTableName, connection);

@@ -93,14 +93,14 @@ public class PostgreSQLPersister implements IHarvestPersister{
     /**
      *
      */
-    public PostgreSQLPersister(){
+    public PostgreSQLPersister() {
     }
 
     /**
      *
      * @param config
      */
-    public PostgreSQLPersister(PersisterConfig config){
+    public PostgreSQLPersister(PersisterConfig config) {
 
         this.config = config;
         sourceUrl = config.getSourceUrl();
@@ -119,7 +119,7 @@ public class PostgreSQLPersister implements IHarvestPersister{
     public void addTriple(long subjectHash, boolean anonSubject, long predicateHash,
             String object, long objectHash, String objectLang, boolean litObject, boolean anonObject, long objSourceObject) throws PersisterException {
 
-        if (isAddingSourceMetadata){
+        if (isAddingSourceMetadata) {
 
             addSourceMetadataTriple(subjectHash, anonSubject, predicateHash,
                     object, objectHash, objectLang, litObject, anonObject, objSourceObject);
@@ -127,24 +127,24 @@ public class PostgreSQLPersister implements IHarvestPersister{
         }
 
         try {
-            preparedStatementForTriples.setLong  ( 1, subjectHash);
-            preparedStatementForTriples.setLong  ( 2, predicateHash);
-            preparedStatementForTriples.setString( 3, object);
-            preparedStatementForTriples.setLong  ( 4, objectHash);
-            preparedStatementForTriples.setObject( 5, Util.toDouble(object));
-            preparedStatementForTriples.setString( 6, YesNoBoolean.format(anonSubject));
-            preparedStatementForTriples.setString( 7, YesNoBoolean.format(anonObject));
-            preparedStatementForTriples.setString( 8, YesNoBoolean.format(litObject));
-            preparedStatementForTriples.setString( 9, objectLang==null ? "" : objectLang);
-            preparedStatementForTriples.setLong  (10, objSourceObject==0 ? 0 : sourceUrlHash);
-            preparedStatementForTriples.setLong  (11, objSourceObject==0 ? 0 : genTime);
-            preparedStatementForTriples.setLong  (12, objSourceObject);
+            preparedStatementForTriples.setLong(1, subjectHash);
+            preparedStatementForTriples.setLong(2, predicateHash);
+            preparedStatementForTriples.setString(3, object);
+            preparedStatementForTriples.setLong(4, objectHash);
+            preparedStatementForTriples.setObject(5, Util.toDouble(object));
+            preparedStatementForTriples.setString(6, YesNoBoolean.format(anonSubject));
+            preparedStatementForTriples.setString(7, YesNoBoolean.format(anonObject));
+            preparedStatementForTriples.setString(8, YesNoBoolean.format(litObject));
+            preparedStatementForTriples.setString(9, objectLang == null ? "" : objectLang);
+            preparedStatementForTriples.setLong(10, objSourceObject == 0 ? 0 : sourceUrlHash);
+            preparedStatementForTriples.setLong(11, objSourceObject == 0 ? 0 : genTime);
+            preparedStatementForTriples.setLong(12, objSourceObject);
 
             preparedStatementForTriples.addBatch();
             tripleCounter++;
 
             // if at BULK_INSERT_SIZE, execute the batch
-            if (tripleCounter % BULK_INSERT_SIZE == 0){
+            if (tripleCounter % BULK_INSERT_SIZE == 0) {
                 executeBatch();
             }
         }
@@ -170,24 +170,24 @@ public class PostgreSQLPersister implements IHarvestPersister{
             String object, long objectHash, String objectLang, boolean litObject, boolean anonObject, long objSourceObject) throws PersisterException {
 
         try {
-            preparedStatementForSourceMetadata.setLong  ( 1, subjectHash);
-            preparedStatementForSourceMetadata.setLong  ( 2, predicateHash);
-            preparedStatementForSourceMetadata.setString( 3, object);
-            preparedStatementForSourceMetadata.setLong  ( 4, objectHash);
-            preparedStatementForSourceMetadata.setObject( 5, Util.toDouble(object));
-            preparedStatementForSourceMetadata.setString( 6, YesNoBoolean.format(anonSubject));
-            preparedStatementForSourceMetadata.setString( 7, YesNoBoolean.format(anonObject));
-            preparedStatementForSourceMetadata.setString( 8, YesNoBoolean.format(litObject));
-            preparedStatementForSourceMetadata.setString( 9, objectLang==null ? "" : objectLang);
-            preparedStatementForSourceMetadata.setLong  (10, objSourceObject==0 ? 0 : sourceUrlHash);
-            preparedStatementForSourceMetadata.setLong  (11, objSourceObject==0 ? 0 : genTime);
-            preparedStatementForSourceMetadata.setLong  (12, objSourceObject);
+            preparedStatementForSourceMetadata.setLong(1, subjectHash);
+            preparedStatementForSourceMetadata.setLong(2, predicateHash);
+            preparedStatementForSourceMetadata.setString(3, object);
+            preparedStatementForSourceMetadata.setLong(4, objectHash);
+            preparedStatementForSourceMetadata.setObject(5, Util.toDouble(object));
+            preparedStatementForSourceMetadata.setString(6, YesNoBoolean.format(anonSubject));
+            preparedStatementForSourceMetadata.setString(7, YesNoBoolean.format(anonObject));
+            preparedStatementForSourceMetadata.setString(8, YesNoBoolean.format(litObject));
+            preparedStatementForSourceMetadata.setString(9, objectLang == null ? "" : objectLang);
+            preparedStatementForSourceMetadata.setLong(10, objSourceObject == 0 ? 0 : sourceUrlHash);
+            preparedStatementForSourceMetadata.setLong(11, objSourceObject == 0 ? 0 : genTime);
+            preparedStatementForSourceMetadata.setLong(12, objSourceObject);
 
             preparedStatementForSourceMetadata.addBatch();
             tripleCounter++;
 
             // if at BULK_INSERT_SIZE, execute the batch
-            if (tripleCounter % BULK_INSERT_SIZE == 0){
+            if (tripleCounter % BULK_INSERT_SIZE == 0) {
                 executeBatch();
             }
         }
@@ -219,7 +219,7 @@ public class PostgreSQLPersister implements IHarvestPersister{
     public void commit() throws PersisterException {
 
         // if no DB updates were made at all
-        if (connection==null){
+        if (connection == null) {
             return;
         }
 
@@ -228,7 +228,7 @@ public class PostgreSQLPersister implements IHarvestPersister{
             // derive inferred triples
             PostgreSQLDerivationEngine derivEngine = new PostgreSQLDerivationEngine(
                     sourceUrl, sourceUrlHash, genTime, connection);
-            if (config.isDeriveInferredTriples()){
+            if (config.isDeriveInferredTriples()) {
 
                 derivEngine.deriveParentClasses();
                 derivEngine.deriveParentProperties();
@@ -255,7 +255,7 @@ public class PostgreSQLPersister implements IHarvestPersister{
      */
     public void rollback() throws PersisterException {
 
-        if (connection!=null){
+        if (connection != null) {
             try {
                 connection.rollback();
             }
@@ -285,15 +285,15 @@ public class PostgreSQLPersister implements IHarvestPersister{
             System.gc();
 
             int len = tripleCounts.length;
-            for (int i=0; i<len; i++){
+            for (int i=0; i<len; i++) {
                 storedTriplesCount = storedTriplesCount + tripleCounts[i];
             }
             len = sourceMetadataCounts.length;
-            for (int i=0; i<len; i++){
+            for (int i=0; i<len; i++) {
                 storedTriplesCount = storedTriplesCount + sourceMetadataCounts[i];
             }
 
-            if (tripleCounter % TRIPLE_PROGRESS_INTERVAL == 0){
+            if (tripleCounter % TRIPLE_PROGRESS_INTERVAL == 0) {
                 logger.debug("Progress: " + String.valueOf(tripleCounter) + " triples processed");
             }
         }
@@ -309,7 +309,7 @@ public class PostgreSQLPersister implements IHarvestPersister{
     public void endOfFile() throws PersisterException {
 
         // if there are any un-executed records left in the batch, execute them
-        if (tripleCounter % BULK_INSERT_SIZE != 0){
+        if (tripleCounter % BULK_INSERT_SIZE != 0) {
             executeBatch();
         }
 
@@ -340,7 +340,7 @@ public class PostgreSQLPersister implements IHarvestPersister{
             logger.debug("Got first triple");
 
             //
-            if (config.isClearPreviousContent()){
+            if (config.isClearPreviousContent()) {
 
                 logger.debug("Deleting SPO rows of previous harvests");
 
@@ -369,7 +369,7 @@ public class PostgreSQLPersister implements IHarvestPersister{
      * (non-Javadoc)
      * @see eionet.cr.harvest.persist.IHarvestPersister#closeResources()
      */
-    public void closeResources(){
+    public void closeResources() {
 
         SQLUtil.close(preparedStatementForTriples);
         SQLUtil.close(preparedStatementForSourceMetadata);
@@ -481,18 +481,18 @@ public class PostgreSQLPersister implements IHarvestPersister{
             conn = DbConnectionProvider.getConnection();
             stmt = conn.createStatement();
             rs = stmt.executeQuery("select * from UNFINISHED_HARVEST");
-            while (rs!=null && rs.next()){
+            while (rs != null && rs.next()) {
                 list.add(UnfinishedHarvestDTO.create(rs.getLong("SOURCE"), rs.getLong("GEN_TIME")));
             }
 
-            if (!list.isEmpty()){
+            if (!list.isEmpty()) {
 
                 LogFactory.getLog(RDFHandler.class).debug("Deleting leftovers from unfinished harvests");
 
-                for (UnfinishedHarvestDTO unfinishedHarvestDTO:list){
+                for (UnfinishedHarvestDTO unfinishedHarvestDTO:list) {
 
                     // if the source is not actually being currently harvested, only then roll it back
-                    if (!CurrentHarvests.contains(unfinishedHarvestDTO.getSource())){
+                    if (!CurrentHarvests.contains(unfinishedHarvestDTO.getSource())) {
                         rollbackUnfinishedHarvest(unfinishedHarvestDTO.getSource(),
                                 unfinishedHarvestDTO.getGenTime(), conn);
                     }
@@ -550,8 +550,8 @@ public class PostgreSQLPersister implements IHarvestPersister{
 
             conn.commit();
         }
-        catch (SQLException e){
-            try{conn.rollback();}catch (SQLException ee){}
+        catch (SQLException e) {
+            try{conn.rollback();}catch (SQLException ee) {}
             throw e;
         }
     }
@@ -602,7 +602,7 @@ public class PostgreSQLPersister implements IHarvestPersister{
 
             conn.commit();
         }
-        catch (SQLException e){
+        catch (SQLException e) {
             SQLUtil.rollback(conn);
             throw e;
         }
@@ -616,7 +616,7 @@ public class PostgreSQLPersister implements IHarvestPersister{
      * (non-Javadoc)
      * @see eionet.cr.harvest.persist.IHarvestPersister#setAddingSourceMetadata(boolean)
      */
-    public void setAddingSourceMetadata(boolean flag){
+    public void setAddingSourceMetadata(boolean flag) {
 
         isAddingSourceMetadata = flag;
     }
