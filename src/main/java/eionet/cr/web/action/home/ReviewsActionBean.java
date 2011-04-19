@@ -124,7 +124,7 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
         if (splits == null || splits.length < 2) {
             reviewId = 0;
         }
-        else{
+        else {
             String reviewString = splits[1];
             if (reviewString.contains("?")) {
                 reviewString = reviewString.split("?")[0];
@@ -182,7 +182,7 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
     /**
      * @throws DAOException
      */
-    public void deleteReviews() throws DAOException{
+    public void deleteReviews() throws DAOException {
         if (isUserAuthorized()) {
             if (this.getContext().getRequest().getParameter("delete") != null) {
                 if (reviewIds != null && !reviewIds.isEmpty()) {
@@ -207,13 +207,13 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
     /**
      * @throws DAOException
      */
-    public void deleteSingleReview() throws DAOException{
+    public void deleteSingleReview() throws DAOException {
         if (isUserAuthorized()) {
             if (this.getContext().getRequest().getParameter("deleteReview") != null) {
                 try {
                     reviewId = Integer.parseInt(this.getContext().getRequest().getParameter("deleteReview"));
                     DAOFactory.get().getDao(HelperDAO.class).deleteReview(this.getUser(), reviewId, true);
-                    addSystemMessage("Review #"+reviewId+" was deleted.");
+                    addSystemMessage("Review #" + reviewId + " was deleted.");
                     reviewId = 0;
                 } catch (DAOException ex) {
                     logger.error(ex);
@@ -240,7 +240,7 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
                 reviewId, attachment.getFileName());
 
         InputStream attachmentContentStream = null;
-        try{
+        try {
             // save attachment contents into database
             attachmentContentStream = attachment.getInputStream();
             SpoBinaryDTO dto = new SpoBinaryDTO(
@@ -269,16 +269,13 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
 
             // finally, attempt to harvest the uploaded file's contents
             harvestUploadedFile(attachmentUri, attachment, null, getUserName());
-        }
-        catch (DAOException daoe) {
+        } catch (DAOException daoe) {
             logger.error("Error when storing attachment", daoe);
             addSystemMessage("Error when storing attachment");
-        }
-        catch (IOException ioe) {
+        } catch (IOException ioe) {
             logger.error("File could not be successfully uploaded", ioe);
             addSystemMessage("File could not be successfully uploaded");
-        }
-        finally{
+        } finally {
             IOUtils.closeQuietly(attachmentContentStream);
             deleteUploadedFile(attachment);
         }

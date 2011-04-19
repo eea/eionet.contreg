@@ -49,15 +49,15 @@ import eionet.cr.util.sql.SQLUtil;
 public class PostgreSQLSpoBinaryDAO extends PostgreSQLBaseDAO implements SpoBinaryDAO{
 
     /** */
-    private static final String sqlAdd = "insert into SPO_BINARY " +
-            "(SUBJECT,OBJECT,OBJ_LANG,DATATYPE,MUST_EMBED) values (?,?,?,?,?)";
+    private static final String sqlAdd = "insert into SPO_BINARY "
+            + "(SUBJECT,OBJECT,OBJ_LANG,DATATYPE,MUST_EMBED) values (?,?,?,?,?)";
     /*
      * (non-Javadoc)
      * @see eionet.cr.dao.SpoBinaryDAO#add(eionet.cr.dto.SpoBinaryDTO, long)
      */
     public void add(SpoBinaryDTO dto, long contentSize) throws DAOException {
 
-        if (dto==null){
+        if (dto == null) {
             throw new IllegalArgumentException("DTO object must not be null");
         }
 
@@ -65,7 +65,7 @@ public class PostgreSQLSpoBinaryDAO extends PostgreSQLBaseDAO implements SpoBina
         PreparedStatement stmt = null;
         try {
             InputStream contentStream = dto.getContentStream();
-            if (contentStream.available()==0){
+            if (contentStream.available() == 0) {
                 throw new IllegalArgumentException("Content stream must not be null or empty");
             }
 
@@ -83,22 +83,19 @@ public class PostgreSQLSpoBinaryDAO extends PostgreSQLBaseDAO implements SpoBina
             stmt.setBinaryStream(2, contentStream, Util.safeLongToInt(contentSize));
 
             String lang = dto.getLanguage();
-            stmt.setString(3, lang==null ? "" : lang);
+            stmt.setString(3, lang == null ? "" : lang);
 
             String contentType = dto.getContentType();
-            stmt.setString(4, contentType==null? "" : contentType);
+            stmt.setString(4, contentType == null ? "" : contentType);
 
             stmt.setBoolean(5, dto.isMustEmbed());
 
             stmt.executeUpdate();
-        }
-        catch (SQLException sqle){
+        } catch (SQLException sqle) {
             throw new DAOException(sqle.getMessage(), sqle);
-        }
-        catch (IOException ioe){
+        } catch (IOException ioe) {
             throw new DAOException(ioe.getMessage(), ioe);
-        }
-        finally{
+        } finally {
             SQLUtil.close(stmt);
             SQLUtil.close(conn);
         }
@@ -112,19 +109,19 @@ public class PostgreSQLSpoBinaryDAO extends PostgreSQLBaseDAO implements SpoBina
      */
     public SpoBinaryDTO get(String subjectUri) throws DAOException {
 
-        if (StringUtils.isBlank(subjectUri)){
+        if (StringUtils.isBlank(subjectUri)) {
             throw new IllegalArgumentException("Subject uri must not be blank");
         }
 
         ResultSet rs = null;
         PreparedStatement stmt = null;
         Connection conn = null;
-        try{
+        try {
             conn = getSQLConnection();
             stmt = conn.prepareStatement(sqlGet);
             stmt.setLong(1, Hashes.spoHash(subjectUri));
             rs = stmt.executeQuery();
-            if (rs!=null && rs.next()){
+            if (rs != null && rs.next()) {
 
                 SpoBinaryDTO dto = new SpoBinaryDTO(
                         rs.getLong("SUBJECT"), rs.getBinaryStream("OBJECT"));
@@ -134,11 +131,9 @@ public class PostgreSQLSpoBinaryDAO extends PostgreSQLBaseDAO implements SpoBina
 
                 return dto;
             }
-        }
-        catch (SQLException e){
+        } catch (SQLException e) {
             throw new DAOException(e.getMessage(), e);
-        }
-        finally{
+        } finally {
             SQLUtil.close(rs);
             SQLUtil.close(stmt);
             SQLUtil.close(conn);
@@ -155,21 +150,19 @@ public class PostgreSQLSpoBinaryDAO extends PostgreSQLBaseDAO implements SpoBina
      */
     public boolean exists(String subjectUri) throws DAOException {
 
-        if (StringUtils.isBlank(subjectUri)){
+        if (StringUtils.isBlank(subjectUri)) {
             throw new IllegalArgumentException("Subject uri must not be blank");
         }
 
         Connection conn = null;
-        try{
+        try {
             conn = getSQLConnection();
             Object o = SQLUtil.executeSingleReturnValueQuery(sqlExists,
                     Collections.singletonList(Long.valueOf(Hashes.spoHash(subjectUri))), conn);
-            return o!=null && Integer.parseInt(o.toString()) > 0;
-        }
-        catch (SQLException e){
+            return o != null && Integer.parseInt(o.toString()) > 0;
+        } catch (SQLException e) {
             throw new DAOException(e.getMessage(), e);
-        }
-        finally{
+        } finally {
             SQLUtil.close(conn);
         }
     }

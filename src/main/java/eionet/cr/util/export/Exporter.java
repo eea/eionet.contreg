@@ -57,7 +57,7 @@ public abstract class Exporter {
     protected Logger logger = Logger.getLogger(Exporter.class);
 
     private ExportFormat exportFormat;
-    private Map<String,String> selectedFilters;
+    private Map<String, String> selectedFilters;
     private Set<String> languages;
 
     //if true exports Resource uri, label otherwise.
@@ -66,10 +66,10 @@ public abstract class Exporter {
     //List of selected columns Pair.id - column URI, Pair.value - optional column label
     // if label is present - it is used in the output. Otherwise URI is used.
     // URI should be always present
-    private List<Pair<String,String>> selectedColumns;
+    private List<Pair<String, String>> selectedColumns;
 
     /**
-     * exports search result into given fomrat
+     * exports search result into given format.
      * @param customSearch
      * @return
      * @throws IOException
@@ -78,13 +78,13 @@ public abstract class Exporter {
     protected abstract InputStream doExport() throws ExportException, IOException, DAOException;
 
     /**
-     * Creates Exporter object for given export format
+     * Creates Exporter object for given export format.
      * @param exportFormat
      * @return
      */
-    public static Exporter getExporter(ExportFormat exportFormat){
+    public static Exporter getExporter(ExportFormat exportFormat) {
         Exporter exporter = null;
-        switch (exportFormat){
+        switch (exportFormat) {
             case XLS:
                 exporter = new XlsExporter();
                 break;
@@ -107,8 +107,8 @@ public abstract class Exporter {
         long startTime = System.currentTimeMillis();
 
         //add label into selected columns if not exist yet
-        Pair<String,String> labelPredicate = new Pair<String,String>(Predicates.RDFS_LABEL,null);
-        if(!selectedColumns.contains(labelPredicate)){
+        Pair<String, String> labelPredicate = new Pair<String, String>(Predicates.RDFS_LABEL, null);
+        if(!selectedColumns.contains(labelPredicate)) {
             selectedColumns.add(labelPredicate);
         }
 
@@ -119,8 +119,8 @@ public abstract class Exporter {
         return result;
     }
 
-    public void doExportQueryAndWriteDataIntoOutput(ResultSetExportReader reader) throws DAOException{
-        Map<String,String> criteria = new HashMap<String, String>();
+    public void doExportQueryAndWriteDataIntoOutput(ResultSetExportReader reader) throws DAOException {
+        Map<String, String> criteria = new HashMap<String, String>();
         for(Entry<String, String> entry : selectedFilters.entrySet()) {
             criteria.put(StringUtils.trim(entry.getKey()), StringUtils.trim(entry.getValue()));
         }
@@ -134,10 +134,10 @@ public abstract class Exporter {
     }
 
     /**
-     * Returns the label of subject's uri or label depending on exportResourceUri value
+     * Returns the label of subject's uri or label depending on exportResourceUri value.
      * @return
      */
-    protected String getUriOrLabel(){
+    protected String getUriOrLabel() {
         String uriOrLabelElement = isExportResourceUri()
         ? "Uri"
                 : "Label";
@@ -145,28 +145,28 @@ public abstract class Exporter {
         return uriOrLabelElement;
     }
     /**
-     * This method creates the PaginRequest object for limiting the rows in the search results
+     * This method creates the PaginRequest object for limiting the rows in the search results.
      * @return
      */
-    protected PagingRequest getRowLimitPagingRequest(){
+    protected PagingRequest getRowLimitPagingRequest() {
         return null;
     }
 
     /**
-     * Returns the value of subject's uri or label depending on exportResourceUri value
+     * Returns the value of subject's uri or label depending on exportResourceUri value.
      * @return
      */
-    protected String getUriOrLabelValue(SubjectDTO subject){
+    protected String getUriOrLabelValue(SubjectDTO subject) {
         String value = "";
         String uri = subject.getUri();
 
-        if(isExportResourceUri()){
+        if(isExportResourceUri()) {
             value = uri;
-        }else{
+        } else {
             value = FormatUtils.getObjectValuesForPredicate(Predicates.RDFS_LABEL, subject, getLanguages());
             //extract value from uri
-            if (StringUtils.isBlank(value)){
-                value = URIUtil.extractURILabel(uri,uri);
+            if (StringUtils.isBlank(value)) {
+                value = URIUtil.extractURILabel(uri, uri);
             }
 
         }
@@ -247,17 +247,17 @@ public abstract class Exporter {
      * Rerturns the number of rows the exporter output can handle
      * @return
      */
-    public static Integer getRowsLimit(){
+    public static Integer getRowsLimit() {
         return -1;
     }
     /**
      * Returns the list of selected predicates uris
      * @return
      */
-    public List<String> getSelectedColumnsList(){
+    public List<String> getSelectedColumnsList() {
         List<String> list = new ArrayList<String>();
-        if(selectedColumns!=null && !selectedColumns.isEmpty()){
-            for (Pair<String, String> col : selectedColumns){
+        if(selectedColumns != null && !selectedColumns.isEmpty()) {
+            for (Pair<String, String> col : selectedColumns) {
                 list.add(col.getLeft());
             }
         }

@@ -20,14 +20,14 @@ public abstract class SQLBaseDAO {
      *
      * @param conn
      */
-    public void setSQLConnection(Connection conn){
+    public void setSQLConnection(Connection conn) {
     }
 
     /**
      *
      * @return
      */
-    protected Connection getSQLConnection() throws SQLException{
+    protected Connection getSQLConnection() throws SQLException {
 
         return DbConnectionProvider.getConnection();
     }
@@ -49,11 +49,9 @@ public abstract class SQLBaseDAO {
             SQLUtil.executeQuery(sql, params, reader, conn);
             List<T>  list = reader.getResultList();
             return list;
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
-        }
-        finally{
+        } finally {
             SQLUtil.close(conn);
         }
     }
@@ -69,11 +67,9 @@ public abstract class SQLBaseDAO {
         try {
             conn = getSQLConnection();
             SQLUtil.executeQuery(sql, reader, conn);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
-        }
-        finally{
+        } finally {
             SQLUtil.close(conn);
         }
     }
@@ -96,9 +92,9 @@ public abstract class SQLBaseDAO {
             } else {
                 SQLUtil.executeUpdate(sql, conn);
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
-        } finally{
+        } finally {
             SQLUtil.close(conn);
             SQLUtil.close(statement);
         }
@@ -129,14 +125,12 @@ public abstract class SQLBaseDAO {
     protected Object executeSingleReturnValueSQL(String sql) throws DAOException {
 
         Connection conn = null;
-        try{
+        try {
             conn = getSQLConnection();
             return SQLUtil.executeSingleReturnValueQuery(sql, conn);
-        }
-        catch (SQLException e){
+        } catch (SQLException e) {
             throw new DAOException(e.toString(), e);
-        }
-        finally{
+        } finally {
             SQLUtil.close(conn);
         }
     }

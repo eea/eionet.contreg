@@ -124,7 +124,7 @@ public class UploadHarvest extends Harvest {
     /**
      * @param dto
      * @throws HarvestException
-     * 
+     *
      */
     public void createDaoWriter(HarvestSourceDTO dto) throws HarvestException {
 
@@ -150,7 +150,7 @@ public class UploadHarvest extends Harvest {
             XmlAnalysis xmlAnalysis = parse();
 
             // if file is XML
-            if (xmlAnalysis!=null) {
+            if (xmlAnalysis != null) {
 
                 logger.debug("File is XML, trying conversion");
 
@@ -158,7 +158,7 @@ public class UploadHarvest extends Harvest {
                 // otherwise construct it from original file
 
                 convertedFile = convert(xmlAnalysis, fileBean);
-                if (convertedFile!=null && convertedFile.exists()) {
+                if (convertedFile != null && convertedFile.exists()) {
 
                     logger.debug("Converted file will be harvested");
                     inputStream = new FileInputStream(convertedFile);
@@ -183,11 +183,11 @@ public class UploadHarvest extends Harvest {
             throw new HarvestException(e.toString(), e);
         } finally {
 
-            if (inputStream!=null) {
+            if (inputStream != null) {
                 try {inputStream.close();} catch (IOException ioe) {}
             }
 
-            if (convertedFile!=null && convertedFile.exists()) {
+            if (convertedFile != null && convertedFile.exists()) {
                 convertedFile.delete();
             }
 
@@ -212,7 +212,7 @@ public class UploadHarvest extends Harvest {
             parsingException = e;
         }
 
-        if (parsingException!=null) {
+        if (parsingException != null) {
 
             logger.debug("Error when parsing as XML: " + parsingException.toString());
             return null;
@@ -309,7 +309,7 @@ public class UploadHarvest extends Harvest {
 
         // If schema or DTD found, and it's not rdf:DRF, then get its RDF conversion ID,
         // otherwise assume the file is RDF and return.
-        if (schemaOrDtd!=null && schemaOrDtd.length() > 0
+        if (schemaOrDtd != null && schemaOrDtd.length() > 0
                 && !schemaOrDtd.equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#RDF")) {
 
             sourceMetadata.addObject(Predicates.CR_SCHEMA, new ObjectDTO(schemaOrDtd, false));

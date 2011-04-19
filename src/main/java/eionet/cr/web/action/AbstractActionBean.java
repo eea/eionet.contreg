@@ -113,14 +113,14 @@ public abstract class AbstractActionBean implements ActionBean {
      * @return true if user is logged in.
      */
     public final boolean isUserLoggedIn() {
-        return getUser()!=null;
+        return getUser() != null;
     }
 
     /**
      *
      * @return
      */
-    public CRUser getUser(){
+    public CRUser getUser() {
         return getContext().getCRUser();
     }
 
@@ -128,7 +128,7 @@ public abstract class AbstractActionBean implements ActionBean {
      *
      * @param message
      */
-    protected void addSystemMessage(String message){
+    protected void addSystemMessage(String message) {
         getContext().getMessages(SYSTEM_MESSAGES).add(new SimpleMessage(message));
     }
 
@@ -136,7 +136,7 @@ public abstract class AbstractActionBean implements ActionBean {
      *
      * @param message
      */
-    protected void addCautionMessage(String message){
+    protected void addCautionMessage(String message) {
         getContext().getMessages(CAUTION_MESSAGES).add(new SimpleMessage(message));
     }
 
@@ -144,7 +144,7 @@ public abstract class AbstractActionBean implements ActionBean {
      *
      * @param message
      */
-    protected void addWarningMessage(String message){
+    protected void addWarningMessage(String message) {
         getContext().getMessages(WARNING_MESSAGES).add(new SimpleMessage(message));
     }
 
@@ -161,7 +161,7 @@ public abstract class AbstractActionBean implements ActionBean {
      *
      * @return
      */
-    public String getUrlBinding(){
+    public String getUrlBinding() {
         AnnotatedClassActionResolver resolver = new AnnotatedClassActionResolver();
         return resolver.getUrlBinding(this.getClass());
     }
@@ -170,7 +170,7 @@ public abstract class AbstractActionBean implements ActionBean {
      *
      * @return
      */
-    public boolean isPostRequest(){
+    public boolean isPostRequest() {
         return getContext().getRequest().getMethod().equalsIgnoreCase("POST");
     }
 
@@ -178,7 +178,7 @@ public abstract class AbstractActionBean implements ActionBean {
      *
      * @return
      */
-    public boolean isGetRequest(){
+    public boolean isGetRequest() {
         return getContext().getRequest().getMethod().equalsIgnoreCase("GET");
     }
 
@@ -212,7 +212,7 @@ public abstract class AbstractActionBean implements ActionBean {
      * @return
      */
     public boolean hasValidationErrors() {
-        return context.getValidationErrors()!=null && !context.getValidationErrors().isEmpty();
+        return context.getValidationErrors() != null && !context.getValidationErrors().isEmpty();
     }
 
     /**
@@ -235,7 +235,7 @@ public abstract class AbstractActionBean implements ActionBean {
      *
      * @return
      */
-    public Harvest getCurrentQueuedHarvest(){
+    public Harvest getCurrentQueuedHarvest() {
         return currentQueuedHarvest;
     }
 
@@ -243,9 +243,9 @@ public abstract class AbstractActionBean implements ActionBean {
      *
      * @return
      */
-    public HashSet<String> getAcceptedLanguages(){
+    public HashSet<String> getAcceptedLanguages() {
 
-        if (acceptedLanguages==null){
+        if (acceptedLanguages == null) {
             acceptedLanguages = Util.getAcceptedLanguages(getContext().getRequest().getHeader("Accept-Language"));
         }
         return acceptedLanguages;
@@ -255,8 +255,8 @@ public abstract class AbstractActionBean implements ActionBean {
      *
      * @return
      */
-    public List<String> getAcceptedLanguagesByImportance(){
-        if (acceptedLanguagesByImportance == null){
+    public List<String> getAcceptedLanguagesByImportance() {
+        if (acceptedLanguagesByImportance == null) {
             acceptedLanguagesByImportance = Util.getAcceptedLanguagesByImportance(getContext().getRequest().getHeader("Accept-Language"));
         }
         return acceptedLanguagesByImportance;
@@ -274,7 +274,7 @@ public abstract class AbstractActionBean implements ActionBean {
      *
      * @return
      */
-    public String[] excludeFromSortAndPagingUrls(){
+    public String[] excludeFromSortAndPagingUrls() {
         return null;
     }
 
@@ -286,7 +286,7 @@ public abstract class AbstractActionBean implements ActionBean {
         this.homeContext = homeContext;
     }
 
-    public String getBaseUrl(CRActionBeanContext context){
+    public String getBaseUrl(CRActionBeanContext context) {
         String url =  context.getRequest().getRequestURL().toString();
         return url.substring(0, url.lastIndexOf("/pages/"));
     }

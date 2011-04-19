@@ -50,9 +50,9 @@ import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements HarvestSourceDAO {
     // PostgreSQLBaseDAO implements HarvestSourceDAO {
@@ -71,7 +71,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSources(java.lang.String,
      * eionet.cr.util.PagingRequest, eionet.cr.util.SortingRequest)
      */
@@ -84,7 +84,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * eionet.cr.dao.HarvestSourceDAO#getHarvestSourcesFailed(java.lang.String,
      * eionet.cr.util.PagingRequest, eionet.cr.util.SortingRequest)
@@ -98,7 +98,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * eionet.cr.dao.HarvestSourceDAO#getHarvestSourcesUnavailable(java.lang
      * .String, eionet.cr.util.PagingRequest, eionet.cr.util.SortingRequest)
@@ -112,7 +112,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#getPrioritySources(java.lang.String,
      * eionet.cr.util.PagingRequest, eionet.cr.util.SortingRequest)
      */
@@ -125,7 +125,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#getInferenceSources(java.lang.String,
      * eionet.cr.util.PagingRequest, eionet.cr.util.SortingRequest)
      */
@@ -146,7 +146,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
     }
 
     /**
-     * 
+     *
      * @param sql
      * @param searchString
      * @param pagingRequest
@@ -196,7 +196,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#getUrgencySourcesCount()
      */
     public Long getUrgencySourcesCount() throws DAOException {
@@ -220,7 +220,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#addSource(HarvestSourceDTO source)
      */
     public Integer addSource(HarvestSourceDTO source) throws DAOException {
@@ -277,7 +277,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * eionet.cr.dao.HarvestSourceDAO#addSourceIgnoreDuplicate(HarvestSourceDTO
      * source)
@@ -295,7 +295,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#deleteHarvestHistory(int)
      */
     public void deleteHarvestHistory(int neededToRemain) throws DAOException {
@@ -325,7 +325,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#deleteTriplesOfMissingSources()
      */
     public void deleteTriplesOfMissingSources() throws DAOException {
@@ -351,7 +351,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#deleteSourceByUrl(java.lang.String)
      */
 
@@ -379,7 +379,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
     /*
      * (non-Javadoc) helper "temporary" method to be called from Virtuoso API
      * until PostgreSQL is alive
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#deleteSourceByUrl(java.lang.String)
      */
     public void deleteSourceByUrl(String url, Connection conn) throws DAOException {
@@ -435,12 +435,12 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
     }
 
     /** */
-    private static final String editSourceSQL = "update HARVEST_SOURCE set URL=?," + " URL_HASH=?, EMAILS=?, INTERVAL_MINUTES=?,"
+    private static final String EDIT_SOURCE_SQL = "update HARVEST_SOURCE set URL=?," + " URL_HASH=?, EMAILS=?, INTERVAL_MINUTES=?,"
             + " PRIORITY_SOURCE=cast(? as ynboolean), SOURCE_OWNER=? where HARVEST_SOURCE_ID=?";
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * eionet.cr.dao.HarvestSourceDAO#editSource(eionet.cr.dto.HarvestSourceDTO)
      */
@@ -458,7 +458,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
         Connection conn = null;
         try {
             conn = getSQLConnection();
-            SQLUtil.executeUpdate(editSourceSQL, values, conn);
+            SQLUtil.executeUpdate(EDIT_SOURCE_SQL, values, conn);
         } catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
         } finally {
@@ -472,7 +472,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#editRedirectedSource(eionet.cr.dto.
      * HarvestSourceDTO)
      */
@@ -499,7 +499,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * eionet.cr.dao.HarvestSourceDAO#getHarvestSourceById(java.lang.Integer)
      */
@@ -516,7 +516,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * eionet.cr.dao.HarvestSourceDAO#getHarvestSourceByUrl(java.lang.String)
      */
@@ -540,7 +540,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
      * List the next batch of sources to harvest. We calculate how many sources
      * we need to harvest in this round, then find the ones with the highest
      * priority.
-     * 
+     *
      * @see eionet.cr.harvest.scheduled.HarvestingJob#getNextScheduledSources()
      * @see eionet.cr.dao.HarvestSourceDAO#getNextScheduledSources(int)
      */
@@ -553,7 +553,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#getScheduledForDeletion()
      */
     public List<String> getScheduledForDeletion() throws DAOException {
@@ -563,7 +563,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * eionet.cr.dao.HarvestSourceDAO#queueSourcesForDeletion(java.util.List)
      */
@@ -594,7 +594,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#updateHarvestFinished(int,
      * java.lang.Integer, java.lang.Boolean, boolean)
      */
@@ -622,7 +622,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#getUrgencyScore(int)
      */
     @Override
@@ -657,7 +657,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HelperDAO#getSourcesInInferenceRule()
      */
     @Override
@@ -667,7 +667,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#isSourceInInferenceRule()
      */
     @Override
@@ -677,7 +677,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#addSourceIntoInferenceRule()
      */
     @Override
@@ -687,7 +687,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#removeSourceFromInferenceRule()
      */
     @Override
@@ -697,7 +697,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#addSourceToRepository(File, String)
      */
     @Override
@@ -708,7 +708,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#addSourceMetadata(SubjectDTO)
      */
     @Override
@@ -719,7 +719,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#getNewSources(String)
      */
     @Override
@@ -729,7 +729,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#getSourceMetadata(String, String)
      */
     @Override
@@ -739,7 +739,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#insertUpdateSourceMetadata(String,
      * String, String)
      */

@@ -28,16 +28,16 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * 
+ *
  * @author heinljab
- * 
+ *
  */
 public class GeneralConfig {
 
     /** */
     public static final String BUNDLE_NAME = "cr";
     public static final String PROPERTIES_FILE_NAME = "cr.properties";
-    
+
     /** */
     public static final String DEPLOYMENT_HOST = "deployment.host";
 
@@ -144,7 +144,7 @@ public class GeneralConfig {
     }
 
     /**
-     * 
+     *
      * @param name
      * @return
      */
@@ -157,7 +157,7 @@ public class GeneralConfig {
     }
 
     /**
-     * 
+     *
      * @param key
      * @param defaultValue
      * @return
@@ -172,7 +172,7 @@ public class GeneralConfig {
     }
 
     /**
-     * 
+     *
      * @param key
      * @return
      * @throws CRConfigException
@@ -187,7 +187,7 @@ public class GeneralConfig {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public static synchronized Properties getProperties() {
@@ -199,7 +199,7 @@ public class GeneralConfig {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public static synchronized boolean useVirtuoso() {
