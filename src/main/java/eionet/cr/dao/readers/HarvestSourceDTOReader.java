@@ -55,6 +55,7 @@ public class HarvestSourceDTOReader extends SQLResultSetBaseReader<HarvestSource
         harvestSourceDTO.setPrioritySource(YesNoBoolean.parse(rs.getString("PRIORITY_SOURCE")));
         harvestSourceDTO.setOwner(rs.getString("SOURCE_OWNER"));
         harvestSourceDTO.setPermanentError(YesNoBoolean.parse(rs.getString("PERMANENT_ERROR")));
+        harvestSourceDTO.setMediaType(rs.getString("MEDIA_TYPE"));
 
         resultList.add(harvestSourceDTO);
     }

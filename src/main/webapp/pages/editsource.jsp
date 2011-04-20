@@ -33,13 +33,17 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>Is "Schema" source</td>
+                    <td>Media type:</td>
+                    <td><stripes:text name="harvestSource.mediaType" size="100" style="width:100%"/></td>
+                </tr>
+                <tr>
+                    <td>Is "Schema" source:</td>
                     <td>
                         <stripes:checkbox name="schemaSource"/>
                     </td>
                 </tr>
                 <tr>
-                    <td>Is "Priority" source</td>
+                    <td>Is "Priority" source:</td>
                     <td>
                         <stripes:checkbox name="harvestSource.prioritySource"/>
                     </td>

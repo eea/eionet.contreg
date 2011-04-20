@@ -119,17 +119,21 @@ public class VirtuosoPullHarvest extends Harvest {
                     sourceMetadata.setUri(sourceUrlString);
                     logger.setHarvestSourceUrl(sourceUrlString);
                 }
+                
+                // Source that will be harvested
+                HarvestSourceDTO source = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(sourceUrlString);
 
-                // if (isBatchHarvest() && !isUrgentHarvest()) {
+                //if (isBatchHarvest() && !isUrgentHarvest()) {
                 if (isBatchHarvest()) {
                     try {
-                        HarvestSourceDTO source = DAOFactory.get().getDao(HarvestSourceDAO.class)
-                                .getHarvestSourceByUrl(sourceUrlString);
                         if (source != null) {
                             if (source.isPermanentError()) {
                                 daoWriter = null; // we dont't want finishing actions to be done
                                 if (source.isPrioritySource()) {
                                     DAOFactory.get().getDao(HarvestSourceDAO.class).increaseUnavailableCount(source.getSourceId());
+                                    String err = "Source: " + source.getUrl() + " has permanent error. Will not delete the source because it is Priority source";
+                                    logger.debug(err); 
+                                    throw new HarvestException(err, new Throwable()); 
                                 } else {
                                     DAOFactory.get().getDao(HarvestSourceDAO.class)
                                             .queueSourcesForDeletion(Collections.singletonList(sourceUrlString));
@@ -183,21 +187,7 @@ public class VirtuosoPullHarvest extends Harvest {
                         DAOFactory.get().getDao(HarvestSourceDAO.class)
                                 .insertUpdateSourceMetadata(sourceUrlString, Predicates.CR_LAST_REFRESHED, lastRefreshed);
                     }
-
-                    /*
-                     * if (!sourceAvailable) { try { HarvestSourceDTO source = DAOFactory.get().getDao(HarvestSourceDAO.class)
-                     * .getHarvestSourceByUrl(sourceUrlString); if (source != null && source.isPrioritySource()) { // Priority
-                     * sources will not be deleted by system. Instead email will be sent to administrator.
-                     * logger.debug(harvestUrlConnection.getSourceNotExistMessage() +
-                     * ", will not delete the source because it is Priority source"); throw new
-                     * HarvestException(harvestUrlConnection.getSourceNotExistMessage(), new Throwable()); } else { daoWriter =
-                     * null; // we dont't want finishing actions to be done
-                     * logger.debug(harvestUrlConnection.getSourceNotExistMessage() + ", going to delete the source");
-                     * DAOFactory.get().getDao(HarvestSourceDAO.class)
-                     * .queueSourcesForDeletion(Collections.singletonList(sourceUrlString)); } } catch (DAOException e) {
-                     * logger.warn("Failure when deleting the source", e); } return; }
-                     */
-
+                    
                     if (sourceAvailable && needsHarvesting) {
                         // source is available, so continue to extract it's contents and metadata
 
@@ -206,6 +196,12 @@ public class VirtuosoPullHarvest extends Harvest {
 
                         // NOTE: If URL is redirected, content type is null. skip if unsupported content type
                         contentType = sourceMetadata.getObjectValue(Predicates.CR_MEDIA_TYPE);
+                        
+                        // If MEDIA_TYPE in HARVEST_SOURCE table is set then the value from the server is ignored
+                        if (source != null && !StringUtils.isBlank(source.getMediaType())) {
+                            contentType = source.getMediaType();
+                        }
+                        
                         if (contentType != null && !isSupportedContentType(contentType)) {
                             logger.debug("Unsupported response content type: " + contentType);
                         } else {

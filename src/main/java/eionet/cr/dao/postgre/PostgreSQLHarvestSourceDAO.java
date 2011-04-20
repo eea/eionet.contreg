@@ -432,7 +432,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /** */
     private static final String EDIT_SOURCE_SQL = "update HARVEST_SOURCE set URL=?," + " URL_HASH=?, EMAILS=?, INTERVAL_MINUTES=?,"
-            + " PRIORITY_SOURCE=cast(? as ynboolean), SOURCE_OWNER=? where HARVEST_SOURCE_ID=?";
+            + " PRIORITY_SOURCE=cast(? as ynboolean), SOURCE_OWNER=?, MEDIA_TYPE=? where HARVEST_SOURCE_ID=?";
 
     /*
      * (non-Javadoc)
@@ -448,6 +448,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
         values.add(source.getIntervalMinutes());
         values.add(YesNoBoolean.format(source.isPrioritySource()));
         values.add(source.getOwner());
+        values.add(source.getMediaType());
         values.add(source.getSourceId());
 
         Connection conn = null;

@@ -1,0 +1,1 @@
+ALTER TABLE harvest_source ADD COLUMN media_type character varying(255) DEFAULT NULL;

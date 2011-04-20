@@ -32,6 +32,12 @@
                 <th scope="row">Urgency score:</th>
                 <td>${actionBean.urgencyScoreFormatted}</td>
             </tr>
+            <c:if test="${not empty actionBean.harvestSource.mediaType}">
+                <tr>
+                    <th scope="row">Media type:</th>
+                    <td>${actionBean.harvestSource.mediaType}</td>
+                </tr>
+            </c:if>
             <tr>
                 <th scope="row">"Schema" source:</th>
                 <td>${actionBean.schemaSourceDisplay}</td>

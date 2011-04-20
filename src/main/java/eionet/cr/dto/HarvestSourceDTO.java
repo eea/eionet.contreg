@@ -55,6 +55,7 @@ public class HarvestSourceDTO implements Serializable {
     private boolean prioritySource;
     private String owner;
     private boolean permanentError;
+    private String mediaType;
 
     /**
      *
@@ -268,6 +269,14 @@ public class HarvestSourceDTO implements Serializable {
 
     public void setPermanentError(boolean permanentError) {
         this.permanentError = permanentError;
+    }
+
+    public String getMediaType() {
+        return mediaType;
+    }
+
+    public void setMediaType(String mediaType) {
+        this.mediaType = mediaType;
     }
 
 }
