@@ -123,8 +123,7 @@ public class VirtuosoPullHarvest extends Harvest {
                 // Source that will be harvested
                 HarvestSourceDTO source = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(sourceUrlString);
 
-                //if (isBatchHarvest() && !isUrgentHarvest()) {
-                if (isBatchHarvest()) {
+                if (isBatchHarvest() && !isUrgentHarvest()) {
                     try {
                         if (source != null) {
                             if (source.isPermanentError()) {
