@@ -40,8 +40,8 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -74,8 +74,8 @@ import eionet.cr.dto.UserHistoryDTO;
 import eionet.cr.harvest.statistics.dto.HarvestUrgencyScoreDTO;
 import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
 import eionet.cr.util.Hashes;
-import eionet.cr.util.Pair;
 import eionet.cr.util.ObjectLabelPair;
+import eionet.cr.util.Pair;
 import eionet.cr.util.URIUtil;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
@@ -982,38 +982,6 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
     }
 
-    /*
-     * (non-Javadoc)
-     * @see eionet.cr.dao.HelperDAO#isUrlInHarvestSource(java.lang.String)
-     */
-    public boolean isUrlInHarvestSource(String url) throws DAOException {
-
-        StringBuffer buf = new StringBuffer().
-        append("SELECT url FROM harvest_source WHERE url='" + url + "' ");
-
-        Connection conn = null;
-        Statement stmt = null;
-        ResultSet rs = null;
-
-        boolean returnValue = false;
-
-        try {
-            conn = getSQLConnection();
-            stmt = conn.createStatement();
-            rs = stmt.executeQuery(buf.toString());
-            if (rs.next()) {
-                returnValue = true;
-            }
-        } catch (SQLException e) {
-            throw new DAOException(e.toString(), e);
-        } finally {
-            SQLUtil.close(rs);
-            SQLUtil.close(stmt);
-            SQLUtil.close(conn);
-        }
-
-        return returnValue;
-    }
 
     /** */
     private static final String getUpdateTypeData_SQL =

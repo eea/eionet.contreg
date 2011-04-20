@@ -67,9 +67,9 @@ import eionet.cr.util.Util;
 import eionet.cr.web.util.FactsheetObjectId;
 
 /**
- * 
+ * Factsheet.
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 @UrlBinding("/factsheet.action")
 public class FactsheetActionBean extends AbstractActionBean {
@@ -79,16 +79,23 @@ public class FactsheetActionBean extends AbstractActionBean {
 
     /** */
     private String uri;
+    /** Hashed URI. */
     private long uriHash;
+    /** subject dataobject. */
     private SubjectDTO subject;
 
     /** */
     private Map<String, String> predicateLabels;
+    /** Resource sub-properties.*/
     private SubProperties subProperties;
 
     /** */
     private boolean anonymous;
+    /**
+     * property URI.
+     */
     private String propertyUri;
+    /** */
     private String propertyValue;
 
     /** */
@@ -96,8 +103,7 @@ public class FactsheetActionBean extends AbstractActionBean {
 
     /** */
     private boolean noCriteria;
-
-    private boolean urlFoundInHarvestSource;
+    /** */
     private boolean adminLoggedIn;
 
     /** */
@@ -110,9 +116,9 @@ public class FactsheetActionBean extends AbstractActionBean {
     private boolean subjectDownloadable;
 
     /**
-     * 
+     *
      * @return Resolution
-     * @throws DAOException
+     * @throws DAOException if query fails
      *             TODO
      */
     @DefaultHandler
@@ -143,10 +149,6 @@ public class FactsheetActionBean extends AbstractActionBean {
                 }
                 subProperties = helperDAO.getSubProperties(Collections.singleton(subjectHash));
 
-                if (isAdminLoggedIn()) {
-                    urlFoundInHarvestSource = helperDAO.isUrlInHarvestSource(subject.getUrl());
-                }
-
                 logger.debug("Determining if the subject has content stored in database");
 
                 subjectDownloadable = DAOFactory.get().getDao(SpoBinaryDAO.class).exists(uri);
@@ -158,7 +160,7 @@ public class FactsheetActionBean extends AbstractActionBean {
 
     /**
      * Handle for ajax harvesting.
-     * 
+     *
      * @return Resolution
      */
     public Resolution harvestAjax() {
@@ -174,7 +176,7 @@ public class FactsheetActionBean extends AbstractActionBean {
 
     /**
      * Handle for ajax virtuoso harvesting.
-     * 
+     *
      * @return Resolution
      */
     public Resolution harvestAjaxVirtuoso() {
@@ -190,10 +192,10 @@ public class FactsheetActionBean extends AbstractActionBean {
 
     /**
      * Schedules a harvest for resource.
-     * 
+     *
      * @return view resolution
-     * @throws HarvestException
-     * @throws DAOException
+     * @throws HarvestException if harvesting fails
+     * @throws DAOException if query fails
      */
     public Resolution harvest() throws HarvestException, DAOException {
 
@@ -209,10 +211,10 @@ public class FactsheetActionBean extends AbstractActionBean {
 
     /**
      * Schedules a virtuoso harvest for resource.
-     * 
+     *
      * @return view resolution
-     * @throws HarvestException
-     * @throws DAOException
+     * @throws HarvestException if harvesting fails
+     * @throws DAOException if query fails
      */
     public Resolution harvestVirtuoso() throws HarvestException, DAOException {
 
@@ -228,12 +230,12 @@ public class FactsheetActionBean extends AbstractActionBean {
 
     /**
      * helper method to eliminate code duplication.
-     * 
-     * @return
-     * @throws HarvestException
-     * @throws DAOException
+     * @param isVirtuosoHarvest true if harvested by Virtuoso (temporary)
+     * @return Pair<Boolean, String> feedback messages
+     * @throws HarvestException if harvesting fails
+     * @throws DAOException if query fails
      */
-    private Pair<Boolean, String> harvestNow(boolean isVirtuosoHarvest) throws HarvestException, DAOException {
+    private Pair<Boolean, String> harvestNow(final boolean isVirtuosoHarvest) throws HarvestException, DAOException {
 
         String message = null;
         if (isUserLoggedIn()) {
@@ -279,9 +281,9 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return Resolution
-     * @throws DAOException
+     * @throws DAOException if query fails if query fails
      */
     public Resolution edit() throws DAOException {
 
@@ -289,9 +291,9 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return Resolution
-     * @throws DAOException
+     * @throws DAOException if query fails if query fails
      */
     public Resolution addbookmark() throws DAOException {
         if (isUserLoggedIn()) {
@@ -304,9 +306,9 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return Resolution
-     * @throws DAOException
+     * @throws DAOException if query fails
      */
     public Resolution removebookmark() throws DAOException {
         if (isUserLoggedIn()) {
@@ -319,9 +321,9 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return Resolution
-     * @throws DAOException
+     * @throws DAOException if query fails if query fails
      */
     public Resolution save() throws DAOException {
 
@@ -352,9 +354,9 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return Resolution
-     * @throws DAOException
+     * @throws DAOException if query fails
      */
     public Resolution delete() throws DAOException {
 
@@ -388,7 +390,9 @@ public class FactsheetActionBean extends AbstractActionBean {
 
         return new RedirectResolution(this.getClass(), "edit").addParameter("uri", uri);
     }
-
+    /**
+     * Validates if user is logged on and if event property is not empty.
+     */
     @ValidationMethod(on = { "save", "delete", "edit", "harvest" })
     public void validateUserKnown() {
 
@@ -410,7 +414,7 @@ public class FactsheetActionBean extends AbstractActionBean {
      * @param resourceUri
      *            the resourceUri to set
      */
-    public void setUri(String resourceUri) {
+    public void setUri(final String resourceUri) {
         this.uri = resourceUri;
     }
 
@@ -437,7 +441,7 @@ public class FactsheetActionBean extends AbstractActionBean {
 
     /**
      * @return the addibleProperties
-     * @throws DAOException
+     * @throws DAOException if query fails
      */
     public Collection<UriLabelPair> getAddibleProperties() throws DAOException {
 
@@ -487,8 +491,8 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
-     * @return
+     * List of subject hashes.
+     * @return Collection <String> hashes of subject types
      */
     private Collection<String> getSubjectTypesHashes() {
 
@@ -509,7 +513,7 @@ public class FactsheetActionBean extends AbstractActionBean {
      * @param anonymous
      *            the anonymous to set
      */
-    public void setAnonymous(boolean anonymous) {
+    public void setAnonymous(final boolean anonymous) {
         this.anonymous = anonymous;
     }
 
@@ -517,7 +521,7 @@ public class FactsheetActionBean extends AbstractActionBean {
      * @param subject
      *            the subject to set
      */
-    public void setSubject(SubjectDTO subject) {
+    public void setSubject(final SubjectDTO subject) {
         this.subject = subject;
     }
 
@@ -525,7 +529,7 @@ public class FactsheetActionBean extends AbstractActionBean {
      * @param predicateLabels
      *            the predicateLabels to set
      */
-    public void setPredicateLabels(Map<String, String> predicateLabels) {
+    public void setPredicateLabels(final Map<String, String> predicateLabels) {
         this.predicateLabels = predicateLabels;
     }
 
@@ -533,7 +537,7 @@ public class FactsheetActionBean extends AbstractActionBean {
      * @param subProperties
      *            the subProperties to set
      */
-    public void setSubProperties(SubProperties subProperties) {
+    public void setSubProperties(final SubProperties subProperties) {
         this.subProperties = subProperties;
     }
 
@@ -541,7 +545,7 @@ public class FactsheetActionBean extends AbstractActionBean {
      * @param propertyUri
      *            the propertyUri to set
      */
-    public void setPropertyUri(String propertyUri) {
+    public void setPropertyUri(final String propertyUri) {
         this.propertyUri = propertyUri;
     }
 
@@ -549,7 +553,7 @@ public class FactsheetActionBean extends AbstractActionBean {
      * @param propertyValue
      *            the propertyValue to set
      */
-    public void setPropertyValue(String propertyValue) {
+    public void setPropertyValue(final String propertyValue) {
         this.propertyValue = propertyValue;
     }
 
@@ -557,7 +561,7 @@ public class FactsheetActionBean extends AbstractActionBean {
      * @param rowId
      *            the rowId to set
      */
-    public void setRowId(List<String> rowId) {
+    public void setRowId(final List<String> rowId) {
         this.rowId = rowId;
     }
 
@@ -579,38 +583,38 @@ public class FactsheetActionBean extends AbstractActionBean {
      * @param uriHash
      *            the uriHash to set
      */
-    public void setUriHash(long uriHash) {
+    public void setUriHash(final long uriHash) {
         this.uriHash = uriHash;
     }
 
     /**
-     * 
+     *
      * @return String
      */
     public String getUrl() {
         return uri != null && URLUtil.isURL(uri) ? uri : null;
     }
 
-    public boolean isUrlFoundInHarvestSource() {
-        return urlFoundInHarvestSource;
-    }
-
-    public void setUrlFoundInHarvestSource(boolean urlFoundInHarvestSource) {
-        this.urlFoundInHarvestSource = urlFoundInHarvestSource;
-    }
-
+    /**
+     * True if admin is logged in.
+     * @return boolean
+     */
     public boolean isAdminLoggedIn() {
         return adminLoggedIn;
     }
 
-    public void setAdminLoggedIn(boolean adminLoggedIn) {
+    /**
+     * Setter of admin logged in property.
+     * @param adminLoggedIn boolean
+     */
+    public void setAdminLoggedIn(final boolean adminLoggedIn) {
         this.adminLoggedIn = adminLoggedIn;
     }
 
     /**
-     * 
+     *
      * @return boolean
-     * @throws DAOException
+     * @throws DAOException if query fails if query fails
      */
     public boolean getSubjectIsUserBookmark() throws DAOException {
 
@@ -628,7 +632,7 @@ public class FactsheetActionBean extends AbstractActionBean {
 
     /**
      * @return the uriIsHarvestSource
-     * @throws DAOException
+     * @throws DAOException if query fails
      */
     public Boolean getUriIsHarvestSource() throws DAOException {
 
@@ -653,7 +657,7 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return boolean
      */
     public boolean isCurrentlyHarvested() {
@@ -662,7 +666,8 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     * True if the resource can be shown on a map.
+     * The resource has got longitude and latitude predicates
      * @return boolean
      */
     public boolean isMapDisplayable() {
@@ -692,13 +697,19 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return Resolution
      */
     public Resolution showOnMap() {
         return new ForwardResolution("/pages/map.jsp");
     }
 
+    /**
+    * Longitude of the resource if the resouce is map displayable.
+    *
+    * returns null if not set
+    * @return String longitude
+    */
     public String getLongitude() {
         if (subject.getObject(Predicates.WGS_LONG) != null) {
             return subject.getObject(Predicates.WGS_LONG).getValue();
@@ -706,6 +717,11 @@ public class FactsheetActionBean extends AbstractActionBean {
         return null;
     }
 
+    /**
+     * Latitude of the resource if the resouce is map displayable.
+     * returns null if not set
+     * @return String latitude
+     */
     public String getLatitude() {
         if (subject.getObject(Predicates.WGS_LAT) != null) {
             return subject.getObject(Predicates.WGS_LAT).getValue();

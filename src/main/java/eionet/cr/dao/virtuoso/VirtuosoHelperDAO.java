@@ -36,8 +36,8 @@ import eionet.cr.dto.UserHistoryDTO;
 import eionet.cr.harvest.statistics.dto.HarvestUrgencyScoreDTO;
 import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
 import eionet.cr.util.Hashes;
-import eionet.cr.util.Pair;
 import eionet.cr.util.ObjectLabelPair;
+import eionet.cr.util.Pair;
 import eionet.cr.util.Util;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.util.sql.SingleObjectReader;
@@ -457,17 +457,6 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see eionet.cr.dao.HelperDAO#isUrlInHarvestSource(java.lang.String)
-     */
-    @Override
-    public boolean isUrlInHarvestSource(String url) throws DAOException {
-
-        // TODO: implement this method
-        return false;
-    }
 
     /*
      * (non-Javadoc)

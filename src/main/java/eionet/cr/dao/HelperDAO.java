@@ -24,8 +24,8 @@ import eionet.cr.dto.UserBookmarkDTO;
 import eionet.cr.dto.UserHistoryDTO;
 import eionet.cr.harvest.statistics.dto.HarvestUrgencyScoreDTO;
 import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
-import eionet.cr.util.Pair;
 import eionet.cr.util.ObjectLabelPair;
+import eionet.cr.util.Pair;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.web.security.CRUser;
 
@@ -197,14 +197,6 @@ public interface HelperDAO extends DAO {
      */
 
     Pair <Integer, List <HarvestUrgencyScoreDTO>> getUrgencyOfComingHarvests(int amount) throws DAOException;
-
-    /**
-     *
-     * @param amount
-     * @return
-     * @throws DAOException
-     */
-    boolean isUrlInHarvestSource(String url) throws DAOException;
 
     /**
      *
