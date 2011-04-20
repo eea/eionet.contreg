@@ -22,6 +22,7 @@ package eionet.cr.dao;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.List;
 
 import org.openrdf.repository.RepositoryException;
@@ -42,12 +43,10 @@ public interface HarvestSourceDAO extends DAO {
      * @param searchString
      * @param pagingRequest
      * @param sortingRequest
-     * @return list of harvesting sources (excluding unavailable sources and
-     *         tracked files)
+     * @return list of harvesting sources (excluding unavailable sources and tracked files)
      * @throws DAOException
      */
-    Pair<Integer, List<HarvestSourceDTO>> getHarvestSources(
-            String searchString, PagingRequest pagingRequest,
+    Pair<Integer, List<HarvestSourceDTO>> getHarvestSources(String searchString, PagingRequest pagingRequest,
             SortingRequest sortingRequest) throws DAOException;
 
     /**
@@ -57,8 +56,7 @@ public interface HarvestSourceDAO extends DAO {
      * @return list of priority sources
      * @throws DAOException
      */
-    Pair<Integer, List<HarvestSourceDTO>> getPrioritySources(
-            String searchString, PagingRequest pagingRequest,
+    Pair<Integer, List<HarvestSourceDTO>> getPrioritySources(String searchString, PagingRequest pagingRequest,
             SortingRequest sortingRequest) throws DAOException;
 
     /**
@@ -68,8 +66,7 @@ public interface HarvestSourceDAO extends DAO {
      * @return list of unavailable harvest sources
      * @throws DAOException
      */
-    Pair<Integer, List<HarvestSourceDTO>> getHarvestSourcesUnavailable(
-            String searchString, PagingRequest pagingRequest,
+    Pair<Integer, List<HarvestSourceDTO>> getHarvestSourcesUnavailable(String searchString, PagingRequest pagingRequest,
             SortingRequest sortingRequest) throws DAOException;
 
     /**
@@ -79,8 +76,7 @@ public interface HarvestSourceDAO extends DAO {
      * @return Pair<Integer, List<HarvestSourceDTO>>
      * @throws DAOException
      */
-    Pair<Integer, List<HarvestSourceDTO>> getHarvestSourcesFailed(
-            String searchString, PagingRequest pagingRequest,
+    Pair<Integer, List<HarvestSourceDTO>> getHarvestSourcesFailed(String searchString, PagingRequest pagingRequest,
             SortingRequest sortingRequest) throws DAOException;
 
     /**
@@ -88,8 +84,7 @@ public interface HarvestSourceDAO extends DAO {
      * @return harvesting sources
      * @throws DAOException
      */
-    public HarvestSourceDTO getHarvestSourceById(Integer harvestSourceID)
-            throws DAOException;
+    public HarvestSourceDTO getHarvestSourceById(Integer harvestSourceID) throws DAOException;
 
     /**
      * 
@@ -97,8 +92,7 @@ public interface HarvestSourceDAO extends DAO {
      * @return HarvestSourceDTO
      * @throws DAOException
      */
-    public HarvestSourceDTO getHarvestSourceByUrl(String url)
-            throws DAOException;
+    public HarvestSourceDTO getHarvestSourceByUrl(String url) throws DAOException;
 
     /**
      * @return Long
@@ -119,8 +113,7 @@ public interface HarvestSourceDAO extends DAO {
      * @param source
      * @throws DAOException
      */
-    public void addSourceIgnoreDuplicate(HarvestSourceDTO source)
-            throws DAOException;
+    public void addSourceIgnoreDuplicate(HarvestSourceDTO source) throws DAOException;
 
     /**
      * @param source
@@ -140,8 +133,7 @@ public interface HarvestSourceDAO extends DAO {
     /**
      * @return List<String>
      * @throws DAOException
-     *             fetches all scheduled source URLs, which are scheduled for
-     *             removal.
+     *             fetches all scheduled source URLs, which are scheduled for removal.
      */
     List<String> getScheduledForDeletion() throws DAOException;
 
@@ -161,10 +153,12 @@ public interface HarvestSourceDAO extends DAO {
      * @param numResources
      * @param sourceAvailable
      * @param failed
+     * @param permanentError
+     * @param lastHarvest
      * @throws DAOException
      */
-    public void updateHarvestFinished(int sourceId, Integer numStatements,
-            Boolean sourceAvailable, boolean failed) throws DAOException;
+    public void updateHarvestFinished(int sourceId, Integer numStatements, Boolean sourceAvailable, boolean failed,
+            boolean permanentError, Timestamp lastHarvest) throws DAOException;
 
     /**
      * 
@@ -172,12 +166,10 @@ public interface HarvestSourceDAO extends DAO {
      * @return List<HarvestSourceDTO>
      * @throws DAOException
      */
-    public List<HarvestSourceDTO> getNextScheduledSources(int limit)
-            throws DAOException;
+    public List<HarvestSourceDTO> getNextScheduledSources(int limit) throws DAOException;
 
     /**
-     * deletes orphans from SPO table. Orphan is a record inside SPO, which has
-     * an non-existent source in HARVEST_SOURCE.
+     * deletes orphans from SPO table. Orphan is a record inside SPO, which has an non-existent source in HARVEST_SOURCE.
      * 
      * @throws DAOException
      * 
@@ -212,10 +204,8 @@ public interface HarvestSourceDAO extends DAO {
      * @return Pair<Integer, List<HarvestSourceDTO>>
      * @throws DAOException
      */
-    Pair<Integer, List<HarvestSourceDTO>> getInferenceSources(
-            String searchString, PagingRequest pagingRequest,
-            SortingRequest sortingRequest, String sourceUris)
-            throws DAOException;
+    Pair<Integer, List<HarvestSourceDTO>> getInferenceSources(String searchString, PagingRequest pagingRequest,
+            SortingRequest sortingRequest, String sourceUris) throws DAOException;
 
     /**
      * @param url
@@ -239,8 +229,7 @@ public interface HarvestSourceDAO extends DAO {
     boolean removeSourceFromInferenceRule(String url) throws DAOException;
 
     /**
-     * Loads the file into the repository (triple store). File is required to be
-     * RDF.
+     * Loads the file into the repository (triple store). File is required to be RDF.
      * 
      * @param file
      * @param sourceUrlString
@@ -250,15 +239,12 @@ public interface HarvestSourceDAO extends DAO {
      * @throws RDFParseException
      * @throws IOException
      */
-    public int addSourceToRepository(File file, String sourceUrlString)
-            throws DAOException, RepositoryException, RDFParseException,
-            IOException;
+    public int addSourceToRepository(File file, String sourceUrlString) throws DAOException, RepositoryException,
+            RDFParseException, IOException;
 
     /**
-     * Adds the meta information the harvester has collected about the source.
-     * The meta data is considered part of the harvester and not the source.
-     * Therefore the meta data is stored in the harvester's named graph (or
-     * context)
+     * Adds the meta information the harvester has collected about the source. The meta data is considered part of the harvester and
+     * not the source. Therefore the meta data is stored in the harvester's named graph (or context)
      * 
      * @param sourceMetadata
      * @throws DAOException
@@ -266,10 +252,9 @@ public interface HarvestSourceDAO extends DAO {
      * @throws RDFParseException
      * @throws IOException
      */
-    public void addSourceMetadata(SubjectDTO sourceMetadata)
-            throws DAOException, RDFParseException, RepositoryException,
+    public void addSourceMetadata(SubjectDTO sourceMetadata) throws DAOException, RDFParseException, RepositoryException,
             IOException;
-    
+
     /**
      * Returns new harvest sources found by HarvestingJob
      * 
@@ -280,11 +265,8 @@ public interface HarvestSourceDAO extends DAO {
      * @throws RDFParseException
      * @throws IOException
      */
-    public List<String> getNewSources(String sourceUrl)
-            throws DAOException, RDFParseException, RepositoryException,
-            IOException;
-    
-   
+    public List<String> getNewSources(String sourceUrl) throws DAOException, RDFParseException, RepositoryException, IOException;
+
     /**
      * Returns metadata from /harvester context
      * 
@@ -295,7 +277,7 @@ public interface HarvestSourceDAO extends DAO {
      * @throws RepositoryException
      */
     public String getSourceMetadata(String subject, String predicate) throws DAOException, RepositoryException;
-    
+
     /**
      * Inserts given metadata into /harvester context
      * 
@@ -306,11 +288,36 @@ public interface HarvestSourceDAO extends DAO {
      * @throws RepositoryException
      */
     public void insertUpdateSourceMetadata(String subject, String predicate, String value) throws DAOException, RepositoryException;
-    
+
     /**
      * @param source
      * @throws DAOException
      */
     public void editRedirectedSource(HarvestSourceDTO source) throws DAOException;
+
+    /**
+     * Removes all predicates from /harvester context for given subject
+     * 
+     * @param subject
+     * @throws DAOException
+     * @throws RepositoryException
+     */
+    public void removeAllPredicatesFromHarvesterContext(String subject) throws DAOException, RepositoryException;
+
+    /**
+     * Removes all triples for given source. Doesn't remove triples from /harvester context
+     * 
+     * @param url
+     * @throws DAOException
+     */
+    public void deleteSourceTriples(String url) throws DAOException;
+
+    /**
+     * Increases COUNT_UNAVAIL by 1
+     * 
+     * @param sourceId
+     * @throws DAOException
+     */
+    public void increaseUnavailableCount(int sourceId) throws DAOException;
 
 }

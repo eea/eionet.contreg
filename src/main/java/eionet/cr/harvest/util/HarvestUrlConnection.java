@@ -10,13 +10,14 @@ import java.net.UnknownHostException;
 
 import org.apache.commons.lang.StringUtils;
 
+import eionet.cr.util.ConnectionError;
+import eionet.cr.util.ConnectionError.ErrType;
 import eionet.cr.util.UrlRedirectionInfo;
 import eionet.cr.util.URLUtil;
 
 /**
- * Class to open a connection to a remote source or local file. Doesn't have a
- * close method. You have to know how the class works to close the connection
- * via the inputStream field.
+ * Class to open a connection to a remote source or local file. Doesn't have a close method. You have to know how the class works to
+ * close the connection via the inputStream field.
  * 
  * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
  * 
@@ -26,6 +27,8 @@ public class HarvestUrlConnection {
     private URL url;
     private HttpURLConnection urlConnection;
     private URLConnection generalConnection;
+
+    private ConnectionError error;
 
     private int responseCode = 0;
 
@@ -88,25 +91,33 @@ public class HarvestUrlConnection {
         } catch (Exception e) {
             if (e instanceof UnknownHostException) {
                 sourceNotExistMessage = "IP address of the host could not be determined";
+                error = new ConnectionError(ErrType.TEMPORARY, 000, sourceNotExistMessage);
             } else if (httpConnection) {
                 responseCode = urlConnection.getResponseCode();
-                if ((responseCode >= 400 && responseCode <= 499) || responseCode == 501 || responseCode == 505) {
-                    sourceNotExistMessage = "Got HTTP response code " + responseCode;
+                if (responseCode == 400 || (responseCode >= 402 && responseCode <= 407)
+                        || (responseCode >= 409 && responseCode <= 417) || responseCode == 501 || responseCode == 505) {
+                    sourceNotExistMessage = "Permanent error: Got HTTP response code " + responseCode;
+                    error = new ConnectionError(ErrType.PERMANENT, responseCode, sourceNotExistMessage);
+                } else if (responseCode == 401 || responseCode == 408 || responseCode == 500
+                        || (responseCode >= 502 && responseCode <= 504)) {
+                    sourceNotExistMessage = "Temporary error: Got HTTP response code " + responseCode;
+                    error = new ConnectionError(ErrType.TEMPORARY, responseCode, sourceNotExistMessage);
                 }
 
                 // release TCP connection properly when HTTP connection fails
                 if (e instanceof IOException) {
+                    if (error == null) {
+                        error = new ConnectionError(ErrType.TEMPORARY, 000, "Temporary error: \n " + e.getMessage());
+                    }
                     try {
                         inputStream = ((HttpURLConnection) urlConnection).getErrorStream();
-                        // read the response body - use a new buffer at every
-                        // read
+                        // read the response body - use a new buffer at every read.
                         // Hope the GC will run before we run out of memory.
                         if (inputStream != null) {
                             while (inputStream.read(new byte[1024]) >= 0) {
                             }
                         }
-                        // inputstream is closed in VirtuosoPullHarvest final
-                        // block
+                        // inputstream is closed in VirtuosoPullHarvest final block
                     } catch (IOException ioe) {
                         e.printStackTrace();
                     }
@@ -119,12 +130,10 @@ public class HarvestUrlConnection {
     }
 
     /**
-     * Returns the connection. Connections can be stored in two variables:
-     * {@link #generalConnection} and {@link #urlConnection}. It has been
-     * decided to use two fields even though one type (HttpURLConnection) is a
-     * subclass of the other (URLConnection). Uses another two fields to decide
-     * which field is the one to use. No relation to
-     * {@link #getConnection(String)}. Just a confusing name clash.
+     * Returns the connection. Connections can be stored in two variables: {@link #generalConnection} and {@link #urlConnection}. It
+     * has been decided to use two fields even though one type (HttpURLConnection) is a subclass of the other (URLConnection). Uses
+     * another two fields to decide which field is the one to use. No relation to {@link #getConnection(String)}. Just a confusing
+     * name clash.
      * 
      * @return the connection
      */
@@ -229,6 +238,10 @@ public class HarvestUrlConnection {
 
     public void setRedirectionInfo(UrlRedirectionInfo redirectionInfo) {
         this.redirectionInfo = redirectionInfo;
+    }
+
+    public ConnectionError getError() {
+        return error;
     }
 
 }

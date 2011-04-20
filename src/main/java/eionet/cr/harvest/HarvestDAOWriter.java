@@ -20,12 +20,12 @@
  */
 package eionet.cr.harvest;
 
+import java.sql.Timestamp;
 import java.util.Iterator;
 import java.util.List;
 
 import org.openrdf.repository.RepositoryException;
 
-import eionet.cr.common.Predicates;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestDAO;
@@ -89,33 +89,65 @@ public class HarvestDAOWriter {
         boolean failed = harvest.getFatalError() != null || (harvest.getErrors() != null && !harvest.getErrors().isEmpty())
                 || (harvest.getWarnings() != null && !harvest.getWarnings().isEmpty());
 
+        Timestamp lastHarvest = generateLastHarvestDate(harvest);
+
         if (harvest instanceof PullHarvest) {
-            DAOFactory.get().getDao(HarvestSourceDAO.class)
-                    .updateHarvestFinished(sourceId, null, ((PullHarvest) harvest).getSourceAvailable(), failed);
+            DAOFactory
+                    .get()
+                    .getDao(HarvestSourceDAO.class)
+                    .updateHarvestFinished(sourceId, null, ((PullHarvest) harvest).getSourceAvailable(), failed, false, lastHarvest);
         } else if (harvest instanceof VirtuosoPullHarvest) {
             if (harvest.needsHarvesting) {
                 if (harvest.isRedirectedSource) {
                     sourceId = harvest.finalSourceId;
                 }
+
                 DAOFactory
                         .get()
                         .getDao(HarvestSourceDAO.class)
                         .updateHarvestFinished(sourceId, harvest.getStoredTriplesCount(),
-                                ((VirtuosoPullHarvest) harvest).getSourceAvailable(), failed);
+                                ((VirtuosoPullHarvest) harvest).getSourceAvailable(), failed, harvest.permanentError, lastHarvest);
             }
             // Update redirected sources metadata
             if (harvest.isRedirectedSource) {
                 updateRedirectedSourcesMetadata(harvest);
             }
         } else {
-            DAOFactory.get().getDao(HarvestSourceDAO.class).updateHarvestFinished(sourceId, null, null, failed);
+            DAOFactory.get().getDao(HarvestSourceDAO.class).updateHarvestFinished(sourceId, null, null, failed, false, lastHarvest);
         }
     }
 
     /**
-     * Updates metadata for redirected URLs. Updates last_harvest and
-     * last_harvest_failed in HARVEST_SOURCE table, plus #lastRefreshed
-     * predicate in Virtuoso /harvester context
+     * @param harvest
+     * @return String
+     * @throws DAOException
+     */
+    private Timestamp generateLastHarvestDate(Harvest harvest) throws DAOException {
+
+        long lastHarvest = System.currentTimeMillis();
+        // If temporary error
+        // The LAST_HARVEST is not set to current time. Instead it is
+        // increased with 10% of the harvesting period but minimum two hours.
+        if (!((VirtuosoPullHarvest) harvest).getSourceAvailable() && !harvest.permanentError) {
+            HarvestSourceDTO source = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceById(sourceId);
+            if (source != null && source.getLastHarvest() != null) {
+                long prevHarvest = source.getLastHarvest().getTime();
+                int interval = source.getIntervalMinutes();
+
+                int increase = (interval * 10) / 100;
+                if (increase < 120) {
+                    increase = 120;
+                }
+
+                lastHarvest = prevHarvest + (increase * 60 * 1000);
+            }
+        }
+        return new Timestamp(lastHarvest);
+    }
+
+    /**
+     * Updates metadata for redirected URLs. Updates last_harvest and last_harvest_failed in HARVEST_SOURCE table, plus
+     * #lastRefreshed predicate in Virtuoso /harvester context
      * 
      * @param harvest
      * @throws DAOException
@@ -125,8 +157,6 @@ public class HarvestDAOWriter {
 
         HarvestSourceDTO finalSource = DAOFactory.get().getDao(HarvestSourceDAO.class)
                 .getHarvestSourceByUrl(harvest.sourceUrlString);
-        String finalSourceLastRefreshedDate = DAOFactory.get().getDao(HarvestSourceDAO.class)
-                .getSourceMetadata(harvest.sourceUrlString, Predicates.CR_LAST_REFRESHED);
 
         if (harvest.redirectedUrls != null && harvest.redirectedUrls.size() > 0) {
             for (String url : harvest.redirectedUrls) {
@@ -139,35 +169,8 @@ public class HarvestDAOWriter {
                         // Saving the updated source to database.
                         DAOFactory.get().getDao(HarvestSourceDAO.class).editRedirectedSource(redirectedSource);
                     }
-
-                    // Update Virtuoso cr:lastRefreshed metadata. Context
-                    // /harvester
-                    DAOFactory.get().getDao(HarvestSourceDAO.class)
-                            .insertUpdateSourceMetadata(url, Predicates.CR_LAST_REFRESHED, finalSourceLastRefreshedDate);
                 }
             }
-        }
-    }
-
-    /**
-     * 
-     * @param harvest
-     * @param finalSourceId
-     * @param redirectedUrls
-     * @throws DAOException
-     */
-    protected void writeFinishedRedirected(Harvest harvest, int finalSourceId, List<String> redirectedUrls) throws DAOException {
-
-        // harvest failed if it has a fatal error || warnings || errors
-        boolean failed = harvest.getFatalError() != null || (harvest.getErrors() != null && !harvest.getErrors().isEmpty())
-                || (harvest.getWarnings() != null && !harvest.getWarnings().isEmpty());
-
-        if (harvest instanceof VirtuosoPullHarvest) {
-            DAOFactory
-                    .get()
-                    .getDao(HarvestSourceDAO.class)
-                    .updateHarvestFinished(finalSourceId, harvest.getStoredTriplesCount(),
-                            ((VirtuosoPullHarvest) harvest).getSourceAvailable(), failed);
         }
     }
 

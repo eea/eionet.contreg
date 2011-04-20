@@ -45,9 +45,9 @@ import eionet.cr.harvest.util.arp.ARPSource;
 import eionet.cr.util.Hashes;
 
 /**
- *
+ * 
  * @author heinljab
- *
+ * 
  */
 public abstract class Harvest {
 
@@ -68,6 +68,8 @@ public abstract class Harvest {
 
     protected int finalSourceId = 0;
     protected List<String> redirectedUrls;
+
+    protected boolean permanentError = false;
 
     /** */
     protected HarvestDAOWriter daoWriter = null;
@@ -92,6 +94,9 @@ public abstract class Harvest {
     protected boolean needsHarvesting;
     protected boolean isRedirectedSource;
 
+    private boolean isBatchHarvest = false;
+    private boolean isUrgentHarvest = false;
+
     /** */
     protected boolean clearPreviousContent = true;
 
@@ -105,10 +110,10 @@ public abstract class Harvest {
     protected DAOFactory daoFactory = DAOFactory.get();
 
     /** */
-    protected static SimpleDateFormat lastRefreshedDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    protected SimpleDateFormat lastRefreshedDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
     /**
-     *
+     * 
      * @param sourceUrlString
      */
     protected Harvest(String sourceUrlString) {
@@ -125,7 +130,7 @@ public abstract class Harvest {
     }
 
     /**
-     *
+     * 
      * @throws HarvestException
      */
     public void execute() throws HarvestException {
@@ -151,13 +156,13 @@ public abstract class Harvest {
     }
 
     /**
-     *
+     * 
      * @throws HarvestException
      */
     protected abstract void doExecute() throws HarvestException;
 
     /**
-     *
+     * 
      * @param arpSource
      * @throws HarvestException
      */
@@ -166,9 +171,8 @@ public abstract class Harvest {
     }
 
     /**
-     * Harvest the given ARPSource. The caller is responsible for closing the
-     * resources that the given ARPSource uses.
-     *
+     * Harvest the given ARPSource. The caller is responsible for closing the resources that the given ARPSource uses.
+     * 
      * @param arpSource
      * @param ignoreParsingError
      * @throws HarvestException
@@ -270,7 +274,7 @@ public abstract class Harvest {
     }
 
     /**
-     *
+     * 
      * @param sourceUrl
      * @return
      */
@@ -309,9 +313,8 @@ public abstract class Harvest {
     }
 
     /**
-     * Saves the "harvest-finished" status and any harvest error/warning
-     * messages into the database, and sends e-mail notification of those
-     * messages.
+     * Saves the "harvest-finished" status and any harvest error/warning messages into the database, and sends e-mail notification
+     * of those messages.
      */
     protected void doHarvestFinishedActions() {
 
@@ -445,5 +448,21 @@ public abstract class Harvest {
      */
     public boolean isRdfContentFound() {
         return rdfContentFound;
+    }
+
+    public boolean isBatchHarvest() {
+        return isBatchHarvest;
+    }
+
+    public void setBatchHarvest(boolean isBatchHarvest) {
+        this.isBatchHarvest = isBatchHarvest;
+    }
+
+    public boolean isUrgentHarvest() {
+        return isUrgentHarvest;
+    }
+
+    public void setUrgentHarvest(boolean isUrgentHarvest) {
+        this.isUrgentHarvest = isUrgentHarvest;
     }
 }

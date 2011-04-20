@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -427,7 +428,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements
      * Integer)
      */
     public void updateHarvestFinished(int sourceId, Integer numStatements,
-            Boolean sourceAvailable, boolean failed)
+            Boolean sourceAvailable, boolean failed, boolean permanentError, Timestamp lastHarvest)
             throws DAOException {
 
         List<Object> values = new ArrayList<Object>();
@@ -663,6 +664,36 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements
      * eionet.cr.dao.HarvestSourceDAO#editRedirectedSource(eionet.cr.dto.HarvestSourceDTO)
      */
     public void editRedirectedSource(HarvestSourceDTO source) throws DAOException {
+        throw new UnsupportedOperationException("Method not implemented");
+    }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see eionet.cr.dao.HarvestSourceDAO#removeAllPredicatesFromHarvesterContext(String, String)
+     */
+    @Override
+    public void removeAllPredicatesFromHarvesterContext(String subject) throws DAOException, RepositoryException {
+        throw new UnsupportedOperationException("Method not implemented");
+    }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see eionet.cr.dao.HarvestSourceDAO#deleteSourceTriples(String)
+     */
+    @Override
+    public void deleteSourceTriples(String url) throws DAOException {
+        throw new UnsupportedOperationException("Method not implemented");
+    }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see eionet.cr.dao.HarvestSourceDAO#increaseUnavailableCount(int)
+     */
+    @Override
+    public void increaseUnavailableCount(int sourceId) throws DAOException {
         throw new UnsupportedOperationException("Method not implemented");
     }
 }

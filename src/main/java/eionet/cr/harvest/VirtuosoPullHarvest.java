@@ -34,6 +34,8 @@ import eionet.cr.harvest.persist.PersisterFactory;
 import eionet.cr.harvest.util.HarvestMessageType;
 import eionet.cr.harvest.util.HarvestUrlConnection;
 import eionet.cr.harvest.util.MimeTypeConverter;
+import eionet.cr.util.ConnectionError;
+import eionet.cr.util.ConnectionError.ErrType;
 import eionet.cr.util.FileUtil;
 import eionet.cr.util.GZip;
 import eionet.cr.util.Hashes;
@@ -56,8 +58,6 @@ public class VirtuosoPullHarvest extends Harvest {
      *
      */
     public static final int maxRedirectionsAllowed = 4;
-    private boolean fullSetupMode = false;
-    private boolean fullSetupModeUrgent = false;
     private boolean rdfContentFound = false;
 
     /** */
@@ -68,8 +68,7 @@ public class VirtuosoPullHarvest extends Harvest {
     private ConversionsParser convParser;
 
     /**
-     * In case of redirected sources, each redirected source will be harvested
-     * without additional recursive redirection.
+     * In case of redirected sources, each redirected source will be harvested without additional recursive redirection.
      * */
     private boolean recursiveHarvestDisabled = false;
 
@@ -98,8 +97,7 @@ public class VirtuosoPullHarvest extends Harvest {
         needsHarvesting = true;
 
         try {
-            // reuse the file if it exists and the configuration allows to do it
-            // (e.g. for debugging purposes) */
+            // reuse the file if it exists and the configuration allows to do it (e.g. for debugging purposes) */
             if (file.exists()
                     && Boolean.parseBoolean(GeneralConfig.getProperty(GeneralConfig.HARVESTER_USE_DOWNLOADED_FILES, "false"))) {
 
@@ -117,15 +115,42 @@ public class VirtuosoPullHarvest extends Harvest {
                 if (redirectedUrls != null && redirectedUrls.size() > 0) {
                     isRedirectedSource = true;
 
-                    // Change sourceUrlString to the actual source that will be
-                    // harvested
+                    // Change sourceUrlString to the actual source that will be harvested
                     sourceMetadata.setUri(sourceUrlString);
                     logger.setHarvestSourceUrl(sourceUrlString);
                 }
 
-                // Source shouldn't be harvested if it redirects to another
-                // source and the destination source is recently harvested (within its
-                // harvesting minutes)
+                // if (isBatchHarvest() && !isUrgentHarvest()) {
+                if (isBatchHarvest()) {
+                    try {
+                        HarvestSourceDTO source = DAOFactory.get().getDao(HarvestSourceDAO.class)
+                                .getHarvestSourceByUrl(sourceUrlString);
+                        if (source != null) {
+                            if (source.isPermanentError()) {
+                                daoWriter = null; // we dont't want finishing actions to be done
+                                if (source.isPrioritySource()) {
+                                    DAOFactory.get().getDao(HarvestSourceDAO.class).increaseUnavailableCount(source.getSourceId());
+                                } else {
+                                    DAOFactory.get().getDao(HarvestSourceDAO.class)
+                                            .queueSourcesForDeletion(Collections.singletonList(sourceUrlString));
+                                }
+                                return;
+                            } else if (source.getCountUnavail() >= 5) {
+                                if (!source.isPrioritySource()) {
+                                    daoWriter = null; // we dont't want finishing actions to be done
+                                    DAOFactory.get().getDao(HarvestSourceDAO.class)
+                                            .queueSourcesForDeletion(Collections.singletonList(sourceUrlString));
+                                    return;
+                                }
+                            }
+                        }
+                    } catch (DAOException e) {
+                        logger.warn("Failure when deleting the source", e);
+                    }
+                }
+
+                // Source shouldn't be harvested if it redirects to another source and the destination source is recently harvested
+                // (within its harvesting minutes)
                 if (needsHarvesting) {
                     // prepare URL connection
                     harvestUrlConnection = HarvestUrlConnection.getConnection(sourceUrlString);
@@ -141,52 +166,45 @@ public class VirtuosoPullHarvest extends Harvest {
                         logger.warn(e.toString());
                     }
 
-                    // Response codes 502, 503 and 504 don't cause the source to
-                    // be considered unavailable
-                    // See ticket #1992
-                    if (!harvestUrlConnection.isSourceAvailable()
-                            && !(harvestUrlConnection.getResponseCode() >= 502 && harvestUrlConnection.getResponseCode() <= 504)) {
-                        try {
-                            HarvestSourceDTO source = DAOFactory.get().getDao(HarvestSourceDAO.class)
-                                    .getHarvestSourceByUrl(sourceUrlString);
-                            if (source != null && source.isPrioritySource()) {
-                                // Priority sources will not be deleted by
-                                // system.
-                                // Instead email will be sent to administrator.
-                                logger.debug(harvestUrlConnection.getSourceNotExistMessage()
-                                        + ", will not delete the source because it is Priority source");
-                                throw new HarvestException(harvestUrlConnection.getSourceNotExistMessage(), new Throwable());
-                            } else {
-                                daoWriter = null; // we dont't want finishing
-                                                  // actions to be done
-                                logger.debug(harvestUrlConnection.getSourceNotExistMessage() + ", going to delete the source");
-                                DAOFactory.get().getDao(HarvestSourceDAO.class)
-                                        .queueSourcesForDeletion(Collections.singletonList(sourceUrlString));
-                            }
-                        } catch (DAOException e) {
-                            logger.warn("Failure when deleting the source", e);
+                    ConnectionError error = harvestUrlConnection.getError();
+                    if (error != null) {
+                        sourceAvailable = false;
+                        if (error.getType().equals(ErrType.PERMANENT)) {
+                            permanentError = true;
+                            DAOFactory.get().getDao(HarvestSourceDAO.class).deleteSourceTriples(sourceUrlString);
                         }
-                        return;
+
+                        DAOFactory.get().getDao(HarvestSourceDAO.class).removeAllPredicatesFromHarvesterContext(sourceUrlString);
+
+                        DAOFactory.get().getDao(HarvestSourceDAO.class)
+                                .insertUpdateSourceMetadata(sourceUrlString, Predicates.CR_ERROR_MESSAGE, error.getMessage());
+
+                        String lastRefreshed = lastRefreshedDateFormat.format(new Date(System.currentTimeMillis()));
+                        DAOFactory.get().getDao(HarvestSourceDAO.class)
+                                .insertUpdateSourceMetadata(sourceUrlString, Predicates.CR_LAST_REFRESHED, lastRefreshed);
                     }
 
-                    if (harvestUrlConnection.isSourceAvailable() == false) {
-                        // if source not available (i.e. link broken) then just
-                        // set
-                        // the
-                        // last-refreshed metadata
-                        setLastRefreshed(System.currentTimeMillis());
-                    } else if (needsHarvesting) {
-                        // source is available, so continue to extract it's
-                        // contents
-                        // and metadata
+                    /*
+                     * if (!sourceAvailable) { try { HarvestSourceDTO source = DAOFactory.get().getDao(HarvestSourceDAO.class)
+                     * .getHarvestSourceByUrl(sourceUrlString); if (source != null && source.isPrioritySource()) { // Priority
+                     * sources will not be deleted by system. Instead email will be sent to administrator.
+                     * logger.debug(harvestUrlConnection.getSourceNotExistMessage() +
+                     * ", will not delete the source because it is Priority source"); throw new
+                     * HarvestException(harvestUrlConnection.getSourceNotExistMessage(), new Throwable()); } else { daoWriter =
+                     * null; // we dont't want finishing actions to be done
+                     * logger.debug(harvestUrlConnection.getSourceNotExistMessage() + ", going to delete the source");
+                     * DAOFactory.get().getDao(HarvestSourceDAO.class)
+                     * .queueSourcesForDeletion(Collections.singletonList(sourceUrlString)); } } catch (DAOException e) {
+                     * logger.warn("Failure when deleting the source", e); } return; }
+                     */
 
-                        // extract various metadata about this harvest source
-                        // from
-                        // url connection object
+                    if (sourceAvailable && needsHarvesting) {
+                        // source is available, so continue to extract it's contents and metadata
+
+                        // extract various metadata about this harvest source from url connection object
                         setSourceMetadata(harvestUrlConnection.getConnection());
 
-                        // NOTE: If URL is redirected, content type is null.
-                        // skip if unsupported content type
+                        // NOTE: If URL is redirected, content type is null. skip if unsupported content type
                         contentType = sourceMetadata.getObjectValue(Predicates.CR_MEDIA_TYPE);
                         if (contentType != null && !isSupportedContentType(contentType)) {
                             logger.debug("Unsupported response content type: " + contentType);
@@ -202,9 +220,7 @@ public class VirtuosoPullHarvest extends Harvest {
                                 // save the stream to file
                                 totalBytes = FileUtil.streamToFile(harvestUrlConnection.getInputStream(), file);
 
-                                // if content-length for source metadata was
-                                // previously not found, then set it to file
-                                // size
+                                // if content-length for source metadata was previously not found, then set it to file size
                                 if (sourceMetadata.getObject(Predicates.CR_BYTE_SIZE) == null) {
                                     sourceMetadata.addObject(Predicates.CR_BYTE_SIZE, new ObjectDTO(String.valueOf(totalBytes),
                                             true));
@@ -212,14 +228,19 @@ public class VirtuosoPullHarvest extends Harvest {
                             }
                         }
 
+                        // Remove old triples
+                        DAOFactory.get().getDao(HarvestSourceDAO.class).deleteSourceTriples(sourceUrlString);
+
+                        // Remove old predicates from /harvester context
+                        DAOFactory.get().getDao(HarvestSourceDAO.class).removeAllPredicatesFromHarvesterContext(sourceUrlString);
+
                         // Insert auto generated metadata into repository
                         DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceMetadata(sourceMetadata);
 
                     } // if Source is available.
                 } else {
-                    // Harvest source redirects to another source that has
-                    // recently been updated
-                    // therefore we can set these values TRUE
+                    // Harvest source redirects to another source that has recently been updated therefore we can set these values
+                    // TRUE
                     sourceAvailable = Boolean.TRUE;
                     rdfContentFound = Boolean.TRUE;
                 }
@@ -234,13 +255,13 @@ public class VirtuosoPullHarvest extends Harvest {
             }
         }
 
-        if (needsHarvesting) {
+        if (sourceAvailable && needsHarvesting) {
             // perform the harvest
             harvest(file, contentType, totalBytes);
 
             // extract new harvest sources
             extractNewHarvestSources();
-        } else {
+        } else if (!needsHarvesting) {
             logger.debug("Source redirects to another source that has recently been harvested! Will not harvest.");
         }
     }
@@ -255,8 +276,7 @@ public class VirtuosoPullHarvest extends Harvest {
      */
     private void harvest(File file, String contentType, int fileSize) throws HarvestException {
 
-        // remember the file's absolute path, so we can later detect if a new
-        // file was created during the pre-processing.
+        // remember the file's absolute path, so we can later detect if a new file was created during the pre-processing.
         String originalPath = file.getAbsolutePath();
 
         File unGZipped = null;
@@ -295,8 +315,8 @@ public class VirtuosoPullHarvest extends Harvest {
     }
 
     /**
-     * Searches new harvest sources from harvested file. If resource is subclass
-     * of cr:File and doesn't yet exist, then it is considered as new source.
+     * Searches new harvest sources from harvested file. If resource is subclass of cr:File and doesn't yet exist, then it is
+     * considered as new source.
      * 
      * @throws HarvestException
      */
@@ -357,8 +377,7 @@ public class VirtuosoPullHarvest extends Harvest {
         // update lastRefreshed predicate for this source
         PersisterFactory.getPersister().updateLastRefreshed(Hashes.spoHash(sourceUrlString), lastRefreshedDateFormat);
 
-        // copy the harvest's number of triples and resources from previous
-        // harvest
+        // copy the harvest's number of triples and resources from previous harvest
         if (previousHarvest != null) {
             setStoredTriplesCount(previousHarvest.getTotalStatements());
         }
@@ -369,8 +388,8 @@ public class VirtuosoPullHarvest extends Harvest {
     }
 
     /**
-     * Checks if the last_harvested date of final source is so recent that the
-     * harvesting schedule for redirected sources wouldn't have triggered
+     * Checks if the last_harvested date of final source is so recent that the harvesting schedule for redirected sources wouldn't
+     * have triggered
      * 
      * @return boolean
      * @throws DAOException
@@ -396,18 +415,15 @@ public class VirtuosoPullHarvest extends Harvest {
     }
 
     /**
-     * Method deals with redirections. If original source redirects to another
-     * source or there is chain of redirections between original source and
-     * actual file then this method creates new record into HARVEST_SOURCE table
-     * for each redirecting URL. If one already exists, then intervalMinutes is
-     * checked. If redirected source intervalMinutes is larger than
-     * originalSource then latter is used.
+     * Method deals with redirections. If original source redirects to another source or there is chain of redirections between
+     * original source and actual file then this method creates new record into HARVEST_SOURCE table for each redirecting URL. If
+     * one already exists, then intervalMinutes is checked. If redirected source intervalMinutes is larger than originalSource then
+     * latter is used.
      * 
-     * Method also creates new record into HARVEST table for each redirected
-     * source. Also adds info into HARVEST_MESSAGE table about each redirection.
+     * Method also creates new record into HARVEST table for each redirected source. Also adds info into HARVEST_MESSAGE table about
+     * each redirection.
      * 
-     * If number of redirections exceeds
-     * VirtuosoPullHarvest.maxRedirectionsAllowed, then execution is terminated
+     * If number of redirections exceeds VirtuosoPullHarvest.maxRedirectionsAllowed, then execution is terminated
      * 
      * @return List<String>
      * @throws HarvestException
@@ -430,6 +446,14 @@ public class VirtuosoPullHarvest extends Harvest {
                     "URL " + lastUrl.getSourceURL() + " is redirected to " + lastUrl.getTargetURL());
             logger.debug("URL " + lastUrl.getSourceURL() + " is redirected to " + lastUrl.getTargetURL());
 
+            // Remove old predicates from /harvester context for this source
+            DAOFactory.get().getDao(HarvestSourceDAO.class).removeAllPredicatesFromHarvesterContext(lastUrl.getSourceURL());
+
+            // Add last refreshed metadata into Virtuoso /harvester context
+            String lastRefreshed = lastRefreshedDateFormat.format(new Date(System.currentTimeMillis()));
+            DAOFactory.get().getDao(HarvestSourceDAO.class)
+                    .insertUpdateSourceMetadata(lastUrl.getSourceURL(), Predicates.CR_LAST_REFRESHED, lastRefreshed);
+
             // Add redirection metadata into Virtuoso /harvester context
             DAOFactory.get().getDao(HarvestSourceDAO.class)
                     .insertUpdateSourceMetadata(lastUrl.getSourceURL(), Predicates.CR_REDIRECTED_TO, lastUrl.getTargetURL());
@@ -451,8 +475,7 @@ public class VirtuosoPullHarvest extends Harvest {
             ret.add(sourceUrlString);
         }
 
-        // Insert sources that doesn't yet exist into postgre DB or update
-        // interval minutes
+        // Insert sources that doesn't yet exist into postgre DB or update interval minutes
         if (ret != null && ret.size() > 0) {
 
             // Insert redirection harvest message for original URL
@@ -488,20 +511,16 @@ public class VirtuosoPullHarvest extends Harvest {
                         DAOFactory.get().getDao(HarvestSourceDAO.class).editSource(redirectedSource);
                     }
 
-                    // Harvest for original source has already been created by
-                    // DAOWriter.writeStarted() method
+                    // Harvest for original source has already been created by DAOWriter.writeStarted() method
                     if (url.equals(sourceUrlString)) {
 
-                        // Decide whether we should harvest this source
-                        // If source redirects to another source that has
-                        // recently been updated
-                        // then there is no need to harvest it again
+                        // Decide whether we should harvest this source If source redirects to another source that has recently been
+                        // updated then there is no need to harvest it again
                         if (!shouldBeHarvested()) {
                             needsHarvesting = false;
                         }
 
-                        // If final source needs harvesting, create record into
-                        // HARVEST table
+                        // If final source needs harvesting, create record into HARVEST table
                         if (needsHarvesting) {
                             // Insert harvest
                             int harvestId = DAOFactory
@@ -634,16 +653,12 @@ public class VirtuosoPullHarvest extends Harvest {
      */
     private File preProcess(File file, String contentType) throws ParserConfigurationException, SAXException, IOException {
 
-        // if content type declared to be application/rdf+xml, then believe it
-        // and go to parsing
-        // straight away
+        // if content type declared to be application/rdf+xml, then believe it and go to parsing straight away
         if (contentType != null && contentType.startsWith("application/rdf+xml")) {
             return file;
         }
 
-        // if conversion ID not yet detected by caller, detect it here by
-        // parsing the
-        // file as XML
+        // if conversion ID not yet detected by caller, detect it here by parsing the file as XML
         String conversionId = convParser == null ? null : convParser.getRdfConversionId();
         if (StringUtils.isBlank(conversionId)) {
 
@@ -661,9 +676,8 @@ public class VirtuosoPullHarvest extends Harvest {
                 }
             }
 
-            // if no schema or DTD still found, assume the URI of the starting
-            // element
-            // to be the schema by which conversions should be looked for
+            // if no schema or DTD still found, assume the URI of the starting element to be the schema by which conversions should
+            // be looked for
             if (schemaOrDtd == null || schemaOrDtd.length() == 0) {
 
                 schemaOrDtd = xmlAnalysis.getStartElemUri();
@@ -689,9 +703,8 @@ public class VirtuosoPullHarvest extends Harvest {
             }
         }
 
-        // if no conversion found, still return the file for parsing as RDF
-        // (we know that at least it's XML, because otherwise a SAXException
-        // would have been thrown above)
+        // if no conversion found, still return the file for parsing as RDF (we know that at least it's XML, because otherwise a
+        // SAXException would have been thrown above)
         if (StringUtils.isBlank(conversionId)) {
 
             logger.debug("No RDF conversion found, trying to parse as RDF");
@@ -739,8 +752,7 @@ public class VirtuosoPullHarvest extends Harvest {
         long lastRefreshed = System.currentTimeMillis();
         setLastRefreshed(lastRefreshed);
 
-        // detect the last-modified-date from HTTP response, if it's not >0,
-        // then take the value of last-refreshed
+        // detect the last-modified-date from HTTP response, if it's not >0, then take the value of last-refreshed
         sourceLastModified = urlConnection.getLastModified();
         if (sourceLastModified <= 0) {
             sourceLastModified = lastRefreshed;
@@ -849,8 +861,8 @@ public class VirtuosoPullHarvest extends Harvest {
 
         VirtuosoPullHarvest harvest = new VirtuosoPullHarvest(dto.getUrl(), urgent ? null : dto.getLastHarvest());
 
-        harvest.setFullSetupMode(true);
-        harvest.setFullSetupModeUrgent(urgent);
+        harvest.setBatchHarvest(true);
+        harvest.setUrgentHarvest(urgent);
         harvest.setPreviousHarvest(DAOFactory.get().getDao(HarvestDAO.class).getLastHarvestBySourceId(dto.getSourceId().intValue()));
         harvest.setNotificationSender(new HarvestNotificationSender());
 
@@ -865,22 +877,6 @@ public class VirtuosoPullHarvest extends Harvest {
 
     public void setRecursiveHarvestDisabled(boolean recursiveHarvestDisabled) {
         this.recursiveHarvestDisabled = recursiveHarvestDisabled;
-    }
-
-    public boolean isFullSetupMode() {
-        return fullSetupMode;
-    }
-
-    public void setFullSetupMode(boolean fullSetupMode) {
-        this.fullSetupMode = fullSetupMode;
-    }
-
-    public boolean isFullSetupModeUrgent() {
-        return fullSetupModeUrgent;
-    }
-
-    public void setFullSetupModeUrgent(boolean fullSetupModeUrgent) {
-        this.fullSetupModeUrgent = fullSetupModeUrgent;
     }
 
     public boolean isRdfContentFound() {

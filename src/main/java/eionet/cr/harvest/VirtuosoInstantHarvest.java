@@ -14,14 +14,13 @@ import eionet.cr.web.security.CRUser;
 
 public class VirtuosoInstantHarvest extends VirtuosoPullHarvest {
 
-
     /**
-     *
+     * 
      * @param sourceUrlString
      * @param lastHarvest
      * @param userName
      */
-    public VirtuosoInstantHarvest(String sourceUrlString, Date lastHarvest, String userName){
+    public VirtuosoInstantHarvest(String sourceUrlString, Date lastHarvest, String userName) {
 
         super(sourceUrlString, lastHarvest);
 
@@ -32,28 +31,31 @@ public class VirtuosoInstantHarvest extends VirtuosoPullHarvest {
 
     /*
      * (non-Javadoc)
+     * 
      * @see eionet.cr.harvest.Harvest#doHarvestStartedActions()
      */
-    protected void doHarvestStartedActions() throws HarvestException{
+    protected void doHarvestStartedActions() throws HarvestException {
 
         logger.debug("Instant virtuoso harvest started");
         super.doHarvestStartedActions();
     }
 
     /**
-     *
+     * 
      * @param sourceUrl
      * @param userName
      * @return VirtuosoInstantHarvest
      * @throws DAOException
      */
-    public static VirtuosoInstantHarvest createFullSetup(String sourceUrl, String userName) throws DAOException{
+    public static VirtuosoInstantHarvest createFullSetup(String sourceUrl, String userName) throws DAOException {
 
         HarvestSourceDTO dto = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(sourceUrl);
 
         VirtuosoInstantHarvest instantHarvest = new VirtuosoInstantHarvest(sourceUrl, null, userName);
-        instantHarvest.setPreviousHarvest(DAOFactory.get().getDao(HarvestDAO.class).getLastHarvestBySourceId(dto.getSourceId().intValue()));
-        instantHarvest.setDaoWriter(new HarvestDAOWriter(dto.getSourceId().intValue(), Harvest.TYPE_PULL, CRUser.application.getUserName()));
+        instantHarvest.setPreviousHarvest(DAOFactory.get().getDao(HarvestDAO.class)
+                .getLastHarvestBySourceId(dto.getSourceId().intValue()));
+        instantHarvest.setDaoWriter(new HarvestDAOWriter(dto.getSourceId().intValue(), Harvest.TYPE_PULL, CRUser.application
+                .getUserName()));
         instantHarvest.setNotificationSender(new HarvestNotificationSender());
 
         return instantHarvest;

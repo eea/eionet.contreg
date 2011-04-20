@@ -19,7 +19,6 @@ import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
 
-import eionet.cr.common.Predicates;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.postgre.PostgreSQLHarvestSourceDAO;
@@ -89,8 +88,39 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
             }
 
         }
-
     }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see eionet.cr.dao.HarvestSourceDAO#deleteSourceTriples(String)
+     */
+    @Override
+    public void deleteSourceTriples(String url) throws DAOException {
+        String sparql = "CLEAR GRAPH <" + url + ">";
+        boolean isSuccess = false;
+        RepositoryConnection conn = null;
+
+        try {
+
+            conn = SesameUtil.getRepositoryConnection();
+            conn.setAutoCommit(false);
+            executeUpdateSPARQL(sparql, conn);
+
+            conn.commit();
+            isSuccess = true;
+        } catch (Exception e) {
+            throw new DAOException("Error deleting source triples " + url, e);
+        } finally {
+            if (!isSuccess && conn != null) {
+                try {
+                    conn.rollback();
+                } catch (RepositoryException re) {
+                }
+            }
+        }
+    }
+
 
     /*
      * (non-Javadoc)
@@ -275,16 +305,26 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
             logger.debug("Storing auto-generated triples for the source");
             try {
                 conn = SesameUtil.getRepositoryConnection();
+                conn.setAutoCommit(false);
 
                 // The contextURI is always the harvester URI
                 // (which is generated from the deployment hostname).
                 String deploymentHost = GeneralConfig.getRequiredProperty(GeneralConfig.DEPLOYMENT_HOST);
                 URI harvesterContext = conn.getValueFactory().createURI(deploymentHost + "/harvester");
-
-                if (sourceMetadata != null && sourceMetadata.getPredicateCount() > 0) {
+                
+                if (sourceMetadata != null) {
                     URI subject = conn.getValueFactory().createURI(sourceMetadata.getUri());
-                    insertMetadata(sourceMetadata, conn, harvesterContext, subject);
+                    
+                    // Remove old predicates
+                    conn.remove(subject, null, null, harvesterContext);
+                    
+                    if (sourceMetadata.getPredicateCount() > 0) {
+                        insertMetadata(sourceMetadata, conn, harvesterContext, subject);
+                    }
                 }
+                // commit transaction
+                conn.commit();
+                
                 // no transaction rollback needed, when reached this point
                 isSuccess = true;
             } finally {
@@ -318,11 +358,9 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
                 for (ObjectDTO object : objects) {
                     if (object.isLiteral()) {
                         Literal literalObject = conn.getValueFactory().createLiteral(object.toString());
-                        conn.remove(subject, predicate, null, contextURI);
                         conn.add(subject, predicate, literalObject, contextURI);
                     } else {
                         URI resourceObject = conn.getValueFactory().createURI(object.toString());
-                        conn.remove(subject, predicate, null, contextURI);
                         conn.add(subject, predicate, resourceObject, contextURI);
                     }
                 }
@@ -414,6 +452,30 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
 
         } finally {
             SesameUtil.close(conn);
+        }
+    }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see eionet.cr.dao.HarvestSourceDAO#removeAllPredicatesFromHarvesterContext(String, String)
+     */
+    @Override
+    public void removeAllPredicatesFromHarvesterContext(String subject) throws DAOException, RepositoryException {
+        if (!StringUtils.isBlank(subject)) {
+            RepositoryConnection conn = null;
+            try {
+                conn = SesameUtil.getRepositoryConnection();
+    
+                String deploymentHost = GeneralConfig.getRequiredProperty(GeneralConfig.DEPLOYMENT_HOST);
+                URI harvesterContext = conn.getValueFactory().createURI(deploymentHost + "/harvester");
+                URI sub = conn.getValueFactory().createURI(subject);
+                
+                conn.remove(sub, null, null, harvesterContext);
+    
+            } finally {
+                SesameUtil.close(conn);
+            }
         }
     }
 

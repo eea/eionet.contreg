@@ -54,6 +54,7 @@ public class HarvestSourceDTO implements Serializable {
     private Long urlHash;
     private boolean prioritySource;
     private String owner;
+    private boolean permanentError;
 
     /**
      *
@@ -259,6 +260,14 @@ public class HarvestSourceDTO implements Serializable {
 
     public void setOwner(String owner) {
         this.owner = owner;
+    }
+
+    public boolean isPermanentError() {
+        return permanentError;
+    }
+
+    public void setPermanentError(boolean permanentError) {
+        this.permanentError = permanentError;
     }
 
 }
