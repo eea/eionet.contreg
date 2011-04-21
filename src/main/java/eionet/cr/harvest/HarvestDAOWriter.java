@@ -108,6 +108,10 @@ public class HarvestDAOWriter {
                         .updateHarvestFinished(sourceId, harvest.getStoredTriplesCount(),
                                 ((VirtuosoPullHarvest) harvest).getSourceAvailable(), failed, harvest.permanentError, lastHarvest);
             }
+            // Update redirected sources metadata
+            if (harvest.isRedirectedSource) {
+                updateRedirectedSourcesMetadata(harvest);
+            }
         } else {
             DAOFactory.get().getDao(HarvestSourceDAO.class).updateHarvestFinished(sourceId, null, null, failed, false, lastHarvest);
         }
@@ -139,6 +143,35 @@ public class HarvestDAOWriter {
             }
         }
         return new Timestamp(lastHarvest);
+    }
+
+    /**
+     * Updates metadata for redirected URLs. Updates last_harvest and last_harvest_failed in HARVEST_SOURCE table, plus
+     * #lastRefreshed predicate in Virtuoso /harvester context
+     * 
+     * @param harvest
+     * @throws DAOException
+     * @throws RepositoryException
+     */
+    private void updateRedirectedSourcesMetadata(Harvest harvest) throws DAOException, RepositoryException {
+
+        HarvestSourceDTO finalSource = DAOFactory.get().getDao(HarvestSourceDAO.class)
+                .getHarvestSourceByUrl(harvest.sourceUrlString);
+
+        if (harvest.redirectedUrls != null && harvest.redirectedUrls.size() > 0) {
+            for (String url : harvest.redirectedUrls) {
+                if (!url.equals(harvest.sourceUrlString)) {
+                    HarvestSourceDTO redirectedSource = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(url);
+                    // Update SQL metadata
+                    if (redirectedSource != null) {
+                        redirectedSource.setLastHarvest(finalSource.getLastHarvest());
+                        redirectedSource.setLastHarvestFailed(finalSource.isLastHarvestFailed());
+                        // Saving the updated source to database.
+                        DAOFactory.get().getDao(HarvestSourceDAO.class).editRedirectedSource(redirectedSource);
+                    }
+                }
+            }
+        }
     }
 
     /**
