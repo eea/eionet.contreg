@@ -16,6 +16,7 @@ import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang.StringUtils;
+import org.openrdf.model.vocabulary.XMLSchema;
 import org.openrdf.repository.RepositoryException;
 import org.xml.sax.SAXException;
 
@@ -175,16 +176,16 @@ public class VirtuosoPullHarvest extends Harvest {
                         if (error.getType().equals(ErrType.PERMANENT)) {
                             permanentError = true;
                             DAOFactory.get().getDao(HarvestSourceDAO.class).deleteSourceTriples(sourceUrlString);
+                            
+                            DAOFactory.get().getDao(HarvestSourceDAO.class).removeAllPredicatesFromHarvesterContext(sourceUrlString);
                         }
 
-                        DAOFactory.get().getDao(HarvestSourceDAO.class).removeAllPredicatesFromHarvesterContext(sourceUrlString);
-
                         DAOFactory.get().getDao(HarvestSourceDAO.class)
-                                .insertUpdateSourceMetadata(sourceUrlString, Predicates.CR_ERROR_MESSAGE, error.getMessage());
+                                .insertUpdateSourceMetadata(sourceUrlString, Predicates.CR_ERROR_MESSAGE, error.getMessage(), null);
 
                         String lastRefreshed = lastRefreshedDateFormat.format(new Date(System.currentTimeMillis()));
                         DAOFactory.get().getDao(HarvestSourceDAO.class)
-                                .insertUpdateSourceMetadata(sourceUrlString, Predicates.CR_LAST_REFRESHED, lastRefreshed);
+                                .insertUpdateSourceMetadata(sourceUrlString, Predicates.CR_LAST_REFRESHED, lastRefreshed, XMLSchema.DATETIME);
                     }
                     
                     if (sourceAvailable && needsHarvesting) {
@@ -447,11 +448,11 @@ public class VirtuosoPullHarvest extends Harvest {
             // Add last refreshed metadata into Virtuoso /harvester context
             String lastRefreshed = lastRefreshedDateFormat.format(new Date(System.currentTimeMillis()));
             DAOFactory.get().getDao(HarvestSourceDAO.class)
-                    .insertUpdateSourceMetadata(lastUrl.getSourceURL(), Predicates.CR_LAST_REFRESHED, lastRefreshed);
+                    .insertUpdateSourceMetadata(lastUrl.getSourceURL(), Predicates.CR_LAST_REFRESHED, lastRefreshed, XMLSchema.DATETIME);
 
             // Add redirection metadata into Virtuoso /harvester context
             DAOFactory.get().getDao(HarvestSourceDAO.class)
-                    .insertUpdateSourceMetadata(lastUrl.getSourceURL(), Predicates.CR_REDIRECTED_TO, lastUrl.getTargetURL());
+                    .insertUpdateSourceMetadata(lastUrl.getSourceURL(), Predicates.CR_REDIRECTED_TO, lastUrl.getTargetURL(), null);
 
             ret.add(lastUrl.getSourceURL());
             redirectionsFound = ret.size();
@@ -701,22 +702,19 @@ public class VirtuosoPullHarvest extends Harvest {
         // if no conversion found, still return the file for parsing as RDF (we know that at least it's XML, because otherwise a
         // SAXException would have been thrown above)
         if (StringUtils.isBlank(conversionId)) {
-
             logger.debug("No RDF conversion found, trying to parse as RDF");
             return file;
         } else {
             logger.debug("Going to run the found RDF conversion (id = " + conversionId + ")");
 
             // prepare conversion URL
-
             String convertUrl = GeneralConfig.getRequiredProperty(GeneralConfig.XMLCONV_CONVERT_URL);
             Object[] args = new String[2];
-            args[0] = URLEncoder.encode(conversionId);
-            args[1] = URLEncoder.encode(sourceUrlString);
+            args[0] = URLEncoder.encode(conversionId, "UTF-8");
+            args[1] = URLEncoder.encode(sourceUrlString, "UTF-8");
             convertUrl = MessageFormat.format(convertUrl, args);
 
             // run conversion and save the response to file
-
             File convertedFile = new File(file.getAbsolutePath() + ".converted");
             FileUtil.downloadUrlToFile(convertUrl, convertedFile);
 
@@ -729,15 +727,6 @@ public class VirtuosoPullHarvest extends Harvest {
     }
 
     /**
-     * @param lastRefreshedTime
-     */
-    private void setLastRefreshed(long lastRefreshedTime) {
-
-        String lastRefreshed = lastRefreshedDateFormat.format(new Date(lastRefreshedTime));
-        sourceMetadata.addObject(Predicates.CR_LAST_REFRESHED, new ObjectDTO(String.valueOf(lastRefreshed), true));
-    }
-
-    /**
      * 
      * @param urlConnetion
      */
@@ -745,7 +734,8 @@ public class VirtuosoPullHarvest extends Harvest {
 
         // set last-refreshed predicate
         long lastRefreshed = System.currentTimeMillis();
-        setLastRefreshed(lastRefreshed);
+        String lastRefreshedStr = lastRefreshedDateFormat.format(new Date(lastRefreshed));
+        sourceMetadata.addObject(Predicates.CR_LAST_REFRESHED, new ObjectDTO(String.valueOf(lastRefreshedStr), true, XMLSchema.DATETIME));
 
         // detect the last-modified-date from HTTP response, if it's not >0, then take the value of last-refreshed
         sourceLastModified = urlConnection.getLastModified();
@@ -755,11 +745,11 @@ public class VirtuosoPullHarvest extends Harvest {
 
         // set the last-modified predicate
         String s = lastRefreshedDateFormat.format(new Date(sourceLastModified));
-        sourceMetadata.addObject(Predicates.CR_LAST_MODIFIED, new ObjectDTO(s, true));
+        sourceMetadata.addObject(Predicates.CR_LAST_MODIFIED, new ObjectDTO(s, true, XMLSchema.DATETIME));
 
         int contentLength = urlConnection.getContentLength();
         if (contentLength >= 0) {
-            sourceMetadata.addObject(Predicates.CR_BYTE_SIZE, new ObjectDTO(String.valueOf(contentLength), true));
+            sourceMetadata.addObject(Predicates.CR_BYTE_SIZE, new ObjectDTO(String.valueOf(contentLength), true, XMLSchema.INTEGER));
         }
 
         String contentType = urlConnection.getContentType();

@@ -357,7 +357,7 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
                 URI predicate = conn.getValueFactory().createURI(predicateUri);
                 for (ObjectDTO object : objects) {
                     if (object.isLiteral()) {
-                        Literal literalObject = conn.getValueFactory().createLiteral(object.toString());
+                        Literal literalObject = conn.getValueFactory().createLiteral(object.toString(), object.getDatatype());
                         conn.add(subject, predicate, literalObject, contextURI);
                     } else {
                         URI resourceObject = conn.getValueFactory().createURI(object.toString());
@@ -433,10 +433,10 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
      * (non-Javadoc)
      * 
      * @see eionet.cr.dao.HarvestSourceDAO#insertUpdateSourceMetadata(String,
-     * String, String)
+     * String, String, URI)
      */
     @Override
-    public void insertUpdateSourceMetadata(String subject, String predicate, String value) throws DAOException, RepositoryException {
+    public void insertUpdateSourceMetadata(String subject, String predicate, String value, URI datatype) throws DAOException, RepositoryException {
         RepositoryConnection conn = null;
         try {
             conn = SesameUtil.getRepositoryConnection();
@@ -445,7 +445,7 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
             URI harvesterContext = conn.getValueFactory().createURI(deploymentHost + "/harvester");
             URI sub = conn.getValueFactory().createURI(subject);
             URI pred = conn.getValueFactory().createURI(predicate);
-            Literal literalObject = conn.getValueFactory().createLiteral(value);
+            Literal literalObject = conn.getValueFactory().createLiteral(value, datatype);
 
             conn.remove(sub, pred, null, harvesterContext);
             conn.add(sub, pred, literalObject, harvesterContext);

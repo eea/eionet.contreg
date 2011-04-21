@@ -30,6 +30,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.openrdf.model.URI;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFParseException;
 
@@ -52,8 +53,7 @@ import eionet.cr.util.sql.SingleObjectReader;
  * @author altnyris
  * 
  */
-public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements
-        HarvestSourceDAO {
+public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSourceDAO {
 
     MySQLHarvestSourceDAO() {
         // reducing visibility
@@ -65,45 +65,38 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements
     private static final String getHarvestTrackedFiles = "SELECT SQL_CALC_FOUND_ROWS * FROM HARVEST_SOURCE WHERE PRIORITY_SOURCE = 'Y' AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)  ";
     private static final String searchHarvestTrackedFiles = "SELECT SQL_CALC_FOUND_ROWS * FROM HARVEST_SOURCE WHERE PRIORITY_SOURCE = 'Y' and URL like(?) AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
     private static final String getHarvestSourcesUnavailableSQL = "SELECT SQL_CALC_FOUND_ROWS * FROM HARVEST_SOURCE WHERE COUNT_UNAVAIL > "
-            + HarvestSourceDTO.COUNT_UNAVAIL_THRESHOLD
-            + " AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)";
+            + HarvestSourceDTO.COUNT_UNAVAIL_THRESHOLD + " AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)";
     private static final String searchHarvestSourcesUnavailableSQL = "SELECT SQL_CALC_FOUND_ROWS * FROM HARVEST_SOURCE WHERE URL LIKE (?) AND COUNT_UNAVAIL > "
-            + HarvestSourceDTO.COUNT_UNAVAIL_THRESHOLD
-            + " AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)";
+            + HarvestSourceDTO.COUNT_UNAVAIL_THRESHOLD + " AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)";
     private static final String getHarvestSourcesFailedSQL = "SELECT SQL_CALC_FOUND_ROWS * FROM HARVEST_SOURCE WHERE LAST_HARVEST_FAILED = 'Y' AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)";
     private static final String searchHarvestSourcesFailedSQL = "SELECT SQL_CALC_FOUND_ROWS * FROM HARVEST_SOURCE WHERE LAST_HARVEST_FAILED = 'Y' AND URL LIKE(?) AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)";
 
     /*
      * (non-Javadoc)
      * 
-     * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSources(java.lang.String,
-     * eionet.cr.util.PagingRequest, eionet.cr.util.SortingRequest)
+     * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSources(java.lang.String, eionet.cr.util.PagingRequest,
+     * eionet.cr.util.SortingRequest)
      */
-    public Pair<Integer, List<HarvestSourceDTO>> getHarvestSources(
-            String searchString, PagingRequest pagingRequest,
+    public Pair<Integer, List<HarvestSourceDTO>> getHarvestSources(String searchString, PagingRequest pagingRequest,
             SortingRequest sortingRequest) throws DAOException {
 
         if (pagingRequest == null) {
-            throw new IllegalArgumentException(
-                    "Pagination request cannot be null");
+            throw new IllegalArgumentException("Pagination request cannot be null");
         }
 
-        return getSources(StringUtils.isBlank(searchString) ? getSourcesSQL
-                : searchSourcesSQL, searchString, pagingRequest, sortingRequest);
+        return getSources(StringUtils.isBlank(searchString) ? getSourcesSQL : searchSourcesSQL, searchString, pagingRequest,
+                sortingRequest);
     }
 
     /*
      * (non-Javadoc)
      * 
-     * @see eionet.cr.dao.HarvestSourceDAO#getPrioritySources(java.lang.String ,
-     * eionet.cr.util.PagingRequest, eionet.cr.util.SortingRequest)
+     * @see eionet.cr.dao.HarvestSourceDAO#getPrioritySources(java.lang.String , eionet.cr.util.PagingRequest,
+     * eionet.cr.util.SortingRequest)
      */
-    public Pair<Integer, List<HarvestSourceDTO>> getPrioritySources(
-            String searchString, PagingRequest pagingRequest,
+    public Pair<Integer, List<HarvestSourceDTO>> getPrioritySources(String searchString, PagingRequest pagingRequest,
             SortingRequest sortingRequest) throws DAOException {
-        return getSources(
-                StringUtils.isBlank(searchString) ? getHarvestTrackedFiles
-                        : searchHarvestTrackedFiles, searchString,
+        return getSources(StringUtils.isBlank(searchString) ? getHarvestTrackedFiles : searchHarvestTrackedFiles, searchString,
                 pagingRequest, sortingRequest);
     }
 
@@ -112,43 +105,33 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements
      * 
      * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSourcesUnavailable()
      */
-    public Pair<Integer, List<HarvestSourceDTO>> getHarvestSourcesUnavailable(
-            String searchString, PagingRequest pagingRequest,
+    public Pair<Integer, List<HarvestSourceDTO>> getHarvestSourcesUnavailable(String searchString, PagingRequest pagingRequest,
             SortingRequest sortingRequest) throws DAOException {
-        return getSources(
-                StringUtils.isBlank(searchString) ? getHarvestSourcesUnavailableSQL
-                        : searchHarvestSourcesUnavailableSQL, searchString,
-                pagingRequest, sortingRequest);
+        return getSources(StringUtils.isBlank(searchString) ? getHarvestSourcesUnavailableSQL : searchHarvestSourcesUnavailableSQL,
+                searchString, pagingRequest, sortingRequest);
 
     }
 
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * eionet.cr.dao.HarvestSourceDAO#getHarvestSourcesFailed(java.lang.String,
-     * eionet.cr.util.PagingRequest, eionet.cr.util.SortingRequest)
+     * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSourcesFailed(java.lang.String, eionet.cr.util.PagingRequest,
+     * eionet.cr.util.SortingRequest)
      */
-    public Pair<Integer, List<HarvestSourceDTO>> getHarvestSourcesFailed(
-            String searchString, PagingRequest pagingRequest,
+    public Pair<Integer, List<HarvestSourceDTO>> getHarvestSourcesFailed(String searchString, PagingRequest pagingRequest,
             SortingRequest sortingRequest) throws DAOException {
-        return getSources(
-                StringUtils.isBlank(searchString) ? getHarvestSourcesFailedSQL
-                        : searchHarvestSourcesFailedSQL, searchString,
-                pagingRequest, sortingRequest);
+        return getSources(StringUtils.isBlank(searchString) ? getHarvestSourcesFailedSQL : searchHarvestSourcesFailedSQL,
+                searchString, pagingRequest, sortingRequest);
     }
 
-    private Pair<Integer, List<HarvestSourceDTO>> getSources(String sql,
-            String searchString, PagingRequest pagingRequest,
+    private Pair<Integer, List<HarvestSourceDTO>> getSources(String sql, String searchString, PagingRequest pagingRequest,
             SortingRequest sortingRequest) throws DAOException {
         List<Object> searchParams = new LinkedList<Object>();
         if (!StringUtils.isBlank(searchString)) {
             searchParams.add(searchString);
         }
-        if (sortingRequest != null
-                && sortingRequest.getSortingColumnName() != null) {
-            sql += " ORDER BY " + sortingRequest.getSortingColumnName() + " "
-                    + sortingRequest.getSortOrder().toSQL();
+        if (sortingRequest != null && sortingRequest.getSortingColumnName() != null) {
+            sql += " ORDER BY " + sortingRequest.getSortingColumnName() + " " + sortingRequest.getSortOrder().toSQL();
         } else {
             // in case no sorting request is present, use default one.
             sql += " ORDER BY URL ";
@@ -160,8 +143,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements
             searchParams.add(pagingRequest.getItemsPerPage());
         }
 
-        return executeQueryWithRowCount(sql, searchParams,
-                new HarvestSourceDTOReader());
+        return executeQueryWithRowCount(sql, searchParams, new HarvestSourceDTOReader());
     }
 
     /** */
@@ -172,12 +154,10 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements
      * 
      * @see eionet.cr.dao.HarvestSourceDao#getHarvestSourceById()
      */
-    public HarvestSourceDTO getHarvestSourceById(Integer harvestSourceID)
-            throws DAOException {
+    public HarvestSourceDTO getHarvestSourceById(Integer harvestSourceID) throws DAOException {
         List<Object> values = new ArrayList<Object>();
         values.add(harvestSourceID);
-        List<HarvestSourceDTO> list = executeQuery(getSourcesByIdSQL, values,
-                new HarvestSourceDTOReader());
+        List<HarvestSourceDTO> list = executeQuery(getSourcesByIdSQL, values, new HarvestSourceDTOReader());
         return (list != null && !list.isEmpty()) ? list.get(0) : null;
     }
 
@@ -187,15 +167,12 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * eionet.cr.dao.HarvestSourceDAO#getHarvestSourceByUrl(java.lang.String)
+     * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSourceByUrl(java.lang.String)
      */
-    public HarvestSourceDTO getHarvestSourceByUrl(String url)
-            throws DAOException {
+    public HarvestSourceDTO getHarvestSourceByUrl(String url) throws DAOException {
         List<Object> values = new ArrayList<Object>();
         values.add(url);
-        List<HarvestSourceDTO> list = executeQuery(getSourcesByUrlSQL, values,
-                new HarvestSourceDTOReader());
+        List<HarvestSourceDTO> list = executeQuery(getSourcesByUrlSQL, values, new HarvestSourceDTOReader());
         return (list != null && !list.isEmpty()) ? list.get(0) : null;
     }
 
@@ -213,8 +190,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements
 
         Connection conn = null;
         try {
-            Object o = SQLUtil.executeSingleReturnValueQuery(
-                    URGENCY_SOURCES_COUNT, conn);
+            Object o = SQLUtil.executeSingleReturnValueQuery(URGENCY_SOURCES_COUNT, conn);
             return o == null ? new Long(0) : Long.valueOf(o.toString());
         } catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
@@ -239,13 +215,10 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * eionet.cr.dao.HarvestSourceDAO#addSourceIgnoreDuplicate(java.lang.String,
-     * int, boolean, java.lang.String, boolean schema, boolean priority, String
-     * owner)
+     * @see eionet.cr.dao.HarvestSourceDAO#addSourceIgnoreDuplicate(java.lang.String, int, boolean, java.lang.String, boolean
+     * schema, boolean priority, String owner)
      */
-    public void addSourceIgnoreDuplicate(HarvestSourceDTO source)
-            throws DAOException {
+    public void addSourceIgnoreDuplicate(HarvestSourceDTO source) throws DAOException {
         addSource(addSourceIgnoreSQL, source);
     }
 
@@ -255,8 +228,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements
      * @return Integer
      * @throws DAOException
      */
-    private Integer addSource(String sql, HarvestSourceDTO source)
-            throws DAOException {
+    private Integer addSource(String sql, HarvestSourceDTO source) throws DAOException {
 
         if (StringUtils.isBlank(source.getUrl())) {
             throw new IllegalArgumentException("url must not be blank");
@@ -311,15 +283,13 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements
     }
 
     /**
-     * @see eionet.cr.dao.HarvestSourceDAO#queueSourcesForDeletion(java.util.List)
-     *      {@inheritDoc}
+     * @see eionet.cr.dao.HarvestSourceDAO#queueSourcesForDeletion(java.util.List) {@inheritDoc}
      */
     public void queueSourcesForDeletion(List<String> urls) throws DAOException {
         if (urls == null || urls.isEmpty()) {
             return;
         }
-        StringBuffer sql = new StringBuffer(
-                "INSERT INTO REMOVE_SOURCE_QUEUE (URL) VALUES ");
+        StringBuffer sql = new StringBuffer("INSERT INTO REMOVE_SOURCE_QUEUE (URL) VALUES ");
         List<Object> params = new LinkedList<Object>();
         int i = 0;
         for (String url : urls) {
@@ -333,17 +303,14 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements
     }
 
     /**
-     * @see eionet.cr.dao.HarvestSourceDAO#getScheduledForDeletion()
-     *      {@inheritDoc}
+     * @see eionet.cr.dao.HarvestSourceDAO#getScheduledForDeletion() {@inheritDoc}
      */
     public List<String> getScheduledForDeletion() throws DAOException {
-        return executeQuery("select URL from REMOVE_SOURCE_QUEUE", null,
-                new SingleObjectReader<String>());
+        return executeQuery("select URL from REMOVE_SOURCE_QUEUE", null, new SingleObjectReader<String>());
     }
 
     /**
-     * @see eionet.cr.dao.HarvestSourceDAO#deleteSourceByUrl(java.lang.String)
-     *      {@inheritDoc}
+     * @see eionet.cr.dao.HarvestSourceDAO#deleteSourceByUrl(java.lang.String) {@inheritDoc}
      */
     public void deleteSourceByUrl(String url) throws DAOException {
 
@@ -359,57 +326,37 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements
             conn = getConnection();
 
             /*
-             * get harvest source ids, delete harvests and harvest messages by
-             * them
+             * get harvest source ids, delete harvests and harvest messages by them
              */
-            List<Long> sourceIds = executeQuery(
-                    "select HARVEST_SOURCE_ID from HARVEST_SOURCE where URL = ?",
-                    urlHashesList, new SingleObjectReader<Long>());
+            List<Long> sourceIds = executeQuery("select HARVEST_SOURCE_ID from HARVEST_SOURCE where URL = ?", urlHashesList,
+                    new SingleObjectReader<Long>());
             String harvestSourceIdsCSV = Util.toCSV(sourceIds);
 
             if (!StringUtils.isBlank(harvestSourceIdsCSV)) {
 
-                List<Long> harvestIds = executeQuery(
-                        "select HARVEST_ID from HARVEST where HARVEST_SOURCE_ID in ("
-                                + harvestSourceIdsCSV + ")", null,
-                        new SingleObjectReader<Long>());
+                List<Long> harvestIds = executeQuery("select HARVEST_ID from HARVEST where HARVEST_SOURCE_ID in ("
+                        + harvestSourceIdsCSV + ")", null, new SingleObjectReader<Long>());
 
                 String harvestIdsCSV = Util.toCSV(harvestIds);
                 if (harvestIdsCSV.trim().length() > 0) {
-                    SQLUtil.executeUpdate(
-                            "delete from HARVEST_MESSAGE where HARVEST_ID in ("
-                                    + harvestIdsCSV + ")", conn);
+                    SQLUtil.executeUpdate("delete from HARVEST_MESSAGE where HARVEST_ID in (" + harvestIdsCSV + ")", conn);
                 }
-                SQLUtil.executeUpdate(
-                        "delete from HARVEST where HARVEST_SOURCE_ID in ("
-                                + harvestSourceIdsCSV + ")", conn);
+                SQLUtil.executeUpdate("delete from HARVEST where HARVEST_SOURCE_ID in (" + harvestSourceIdsCSV + ")", conn);
             }
 
             /* delete various stuff by harvest source urls or url hashes */
-            SQLUtil.executeUpdate("delete from HARVEST_SOURCE where URL = ?",
-                    urlList, conn);
-            SQLUtil.executeUpdate(
-                    "delete from HARVEST_SOURCE where SOURCE = ?",
-                    urlHashesList, conn);
-            SQLUtil.executeUpdate("delete from SPO where SOURCE = ?",
-                    urlHashesList, conn);
-            SQLUtil.executeUpdate("delete from SPO where OBJ_DERIV_SOURCE = ?",
-                    urlHashesList, conn);
-            SQLUtil.executeUpdate(
-                    "delete from UNFINISHED_HARVEST where SOURCE = ?",
-                    urlHashesList, conn);
-            SQLUtil.executeUpdate(
-                    "delete from URGENT_HARVEST_QUEUE where URL = ?", urlList,
-                    conn);
-            SQLUtil.executeUpdate(
-                    "delete from REMOVE_SOURCE_QUEUE where URL = ?", urlList,
-                    conn);
+            SQLUtil.executeUpdate("delete from HARVEST_SOURCE where URL = ?", urlList, conn);
+            SQLUtil.executeUpdate("delete from HARVEST_SOURCE where SOURCE = ?", urlHashesList, conn);
+            SQLUtil.executeUpdate("delete from SPO where SOURCE = ?", urlHashesList, conn);
+            SQLUtil.executeUpdate("delete from SPO where OBJ_DERIV_SOURCE = ?", urlHashesList, conn);
+            SQLUtil.executeUpdate("delete from UNFINISHED_HARVEST where SOURCE = ?", urlHashesList, conn);
+            SQLUtil.executeUpdate("delete from URGENT_HARVEST_QUEUE where URL = ?", urlList, conn);
+            SQLUtil.executeUpdate("delete from REMOVE_SOURCE_QUEUE where URL = ?", urlList, conn);
 
             // special case: delete source metadata auto-generated by harvester
             ArrayList list = new ArrayList(urlHashesList);
             list.add(Long.valueOf(Hashes.spoHash(Harvest.HARVESTER_URI)));
-            SQLUtil.executeUpdate(
-                    "delete from SPO where SUBJECT=? and SOURCE=?", list, conn);
+            SQLUtil.executeUpdate("delete from SPO where SUBJECT=? and SOURCE=?", list, conn);
         } catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
         } finally {
@@ -424,27 +371,22 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements
     /*
      * (non-Javadoc)
      * 
-     * @see eionet.cr.dao.HarvestSourceDAO#updateHarvestFinished(int, Integer,
-     * Integer)
+     * @see eionet.cr.dao.HarvestSourceDAO#updateHarvestFinished(int, Integer, Integer)
      */
-    public void updateHarvestFinished(int sourceId, Integer numStatements,
-            Boolean sourceAvailable, boolean failed, boolean permanentError, Timestamp lastHarvest)
-            throws DAOException {
+    public void updateHarvestFinished(int sourceId, Integer numStatements, Boolean sourceAvailable, boolean failed,
+            boolean permanentError, Timestamp lastHarvest) throws DAOException {
 
         List<Object> values = new ArrayList<Object>();
         values.add(numStatements);
         if (sourceAvailable != null)
-            values.add(sourceAvailable.booleanValue() == true ? new Integer(1)
-                    : new Integer(0));
+            values.add(sourceAvailable.booleanValue() == true ? new Integer(1) : new Integer(0));
         values.add(YesNoBoolean.format(failed));
         values.add(new Integer(sourceId));
 
         Connection conn = null;
         try {
             conn = getConnection();
-            SQLUtil.executeUpdate(
-                    sourceAvailable != null ? updateHarvestFinishedSQL_avail
-                            : updateHarvestFinishedSQL, values, conn);
+            SQLUtil.executeUpdate(sourceAvailable != null ? updateHarvestFinishedSQL_avail : updateHarvestFinishedSQL, values, conn);
         } catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
         } finally {
@@ -488,19 +430,16 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements
      * 
      * @see eionet.cr.dao.HarvestSourceDAO#getNextScheduledSources(int)
      */
-    public List<HarvestSourceDTO> getNextScheduledSources(int limit)
-            throws DAOException {
+    public List<HarvestSourceDTO> getNextScheduledSources(int limit) throws DAOException {
 
         List<Object> values = new ArrayList<Object>();
         values.add(new Integer(limit));
-        return executeQuery(getNextScheduledSourcesSQL, values,
-                new HarvestSourceDTOReader());
+        return executeQuery(getNextScheduledSourcesSQL, values, new HarvestSourceDTOReader());
     }
 
     /**
      * @throws DAOException
-     * @see eionet.cr.dao.HarvestSourceDAO#deleteTriplesOfMissingSources()
-     *      {@inheritDoc}
+     * @see eionet.cr.dao.HarvestSourceDAO#deleteTriplesOfMissingSources() {@inheritDoc}
      */
     public void deleteTriplesOfMissingSources() throws DAOException {
 
@@ -521,20 +460,16 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements
 
     /**
      * @throws DAOException
-     * @see eionet.cr.dao.HarvestSourceDAO#deleteHarvestHistory(int)
-     *      {@inheritDoc}
+     * @see eionet.cr.dao.HarvestSourceDAO#deleteHarvestHistory(int) {@inheritDoc}
      */
     public void deleteHarvestHistory(int neededToRemain) throws DAOException {
         // fetch the last auto_incremented id;
-        Long id = executeQueryUniqueResult(
-                "select max(HARVEST_ID) from HARVEST", null,
-                new SingleObjectReader<Long>());
+        Long id = executeQueryUniqueResult("select max(HARVEST_ID) from HARVEST", null, new SingleObjectReader<Long>());
         // delete everything, except last needed_to_remain records
         List<Object> params = new LinkedList<Object>();
         params.add(id - neededToRemain);
         execute("delete from HARVEST where HARVEST_ID <= ?", params);
-        execute("delete from HARVEST_MESSAGE where HARVEST_ID not in (select HARVEST_ID from HARVEST)",
-                null);
+        execute("delete from HARVEST_MESSAGE where HARVEST_ID not in (select HARVEST_ID from HARVEST)", null);
     }
 
     /*
@@ -564,10 +499,8 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements
      * @see eionet.cr.dao.HarvestSourceDAO#getInferenceSources()
      */
     @Override
-    public Pair<Integer, List<HarvestSourceDTO>> getInferenceSources(
-            String searchString, PagingRequest pagingRequest,
-            SortingRequest sortingRequest, String sourceUris)
-            throws DAOException {
+    public Pair<Integer, List<HarvestSourceDTO>> getInferenceSources(String searchString, PagingRequest pagingRequest,
+            SortingRequest sortingRequest, String sourceUris) throws DAOException {
         throw new UnsupportedOperationException("Method not implemented");
     }
 
@@ -597,46 +530,42 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements
      * @see eionet.cr.dao.HarvestSourceDAO#removeSourceFromInferenceRule()
      */
     @Override
-    public boolean removeSourceFromInferenceRule(String url)
-            throws DAOException {
+    public boolean removeSourceFromInferenceRule(String url) throws DAOException {
         throw new UnsupportedOperationException("Method not implemented");
     }
-    
+
     /*
      * (non-Javadoc)
      * 
      * @see eionet.cr.dao.HarvestSourceDAO#addSourceToRepository(File, String)
      */
     @Override
-    public int addSourceToRepository(File file, String sourceUrlString)
-            throws DAOException, RepositoryException, RDFParseException,
-            IOException {
+    public int addSourceToRepository(File file, String sourceUrlString) throws DAOException, RepositoryException,
+            RDFParseException, IOException {
         throw new UnsupportedOperationException("Method not implemented");
     }
-    
+
     /*
      * (non-Javadoc)
      * 
      * @see eionet.cr.dao.HarvestSourceDAO#addSourceMetadata(SubjectDTO)
      */
     @Override
-    public void addSourceMetadata(SubjectDTO sourceMetadata)
-            throws DAOException, RDFParseException, RepositoryException, IOException {
+    public void addSourceMetadata(SubjectDTO sourceMetadata) throws DAOException, RDFParseException, RepositoryException,
+            IOException {
         throw new UnsupportedOperationException("Method not implemented");
     }
-    
+
     /*
      * (non-Javadoc)
      * 
      * @see eionet.cr.dao.HarvestSourceDAO#getNewSources(String)
      */
     @Override
-    public List<String> getNewSources(String sourceUrl)
-            throws DAOException, RDFParseException, RepositoryException,
-            IOException {
+    public List<String> getNewSources(String sourceUrl) throws DAOException, RDFParseException, RepositoryException, IOException {
         throw new UnsupportedOperationException("Method not implemented");
     }
-    
+
     /*
      * (non-Javadoc)
      * 
@@ -646,27 +575,27 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements
     public String getSourceMetadata(String subject, String predicate) throws DAOException, RepositoryException {
         throw new UnsupportedOperationException("Method not implemented");
     }
-    
+
     /*
      * (non-Javadoc)
      * 
-     * @see eionet.cr.dao.HarvestSourceDAO#insertUpdateSourceMetadata(String, String, String)
+     * @see eionet.cr.dao.HarvestSourceDAO#insertUpdateSourceMetadata(String, String, String, URI)
      */
     @Override
-    public void insertUpdateSourceMetadata(String subject, String predicate, String value) throws DAOException, RepositoryException {
+    public void insertUpdateSourceMetadata(String subject, String predicate, String value, URI datatype) throws DAOException,
+            RepositoryException {
         throw new UnsupportedOperationException("Method not implemented");
     }
-    
+
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * eionet.cr.dao.HarvestSourceDAO#editRedirectedSource(eionet.cr.dto.HarvestSourceDTO)
+     * @see eionet.cr.dao.HarvestSourceDAO#editRedirectedSource(eionet.cr.dto.HarvestSourceDTO)
      */
     public void editRedirectedSource(HarvestSourceDTO source) throws DAOException {
         throw new UnsupportedOperationException("Method not implemented");
     }
-    
+
     /*
      * (non-Javadoc)
      * 
@@ -676,7 +605,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements
     public void removeAllPredicatesFromHarvesterContext(String subject) throws DAOException, RepositoryException {
         throw new UnsupportedOperationException("Method not implemented");
     }
-    
+
     /*
      * (non-Javadoc)
      * 
@@ -686,7 +615,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements
     public void deleteSourceTriples(String url) throws DAOException {
         throw new UnsupportedOperationException("Method not implemented");
     }
-    
+
     /*
      * (non-Javadoc)
      * 

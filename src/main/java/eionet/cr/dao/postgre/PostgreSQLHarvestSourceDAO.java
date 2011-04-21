@@ -32,6 +32,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.openrdf.model.URI;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFParseException;
 
@@ -379,9 +380,10 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
      * @see eionet.cr.dao.HarvestSourceDAO#deleteSourceByUrl(java.lang.String)
      */
     public void deleteSourceByUrl(String url, Connection conn) throws DAOException {
-        ArrayList hashList = new ArrayList();
+        
+        ArrayList<Long> hashList = new ArrayList<Long>();
         hashList.add(Hashes.spoHash(url));
-        ArrayList urlList = new ArrayList();
+        ArrayList<String> urlList = new ArrayList<String>();
         urlList.add(url);
 
         try {
@@ -755,10 +757,11 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
     /*
      * (non-Javadoc)
      * 
-     * @see eionet.cr.dao.HarvestSourceDAO#insertUpdateSourceMetadata(String, String, String)
+     * @see eionet.cr.dao.HarvestSourceDAO#insertUpdateSourceMetadata(String, String, String, URI)
      */
     @Override
-    public void insertUpdateSourceMetadata(String subject, String predicate, String value) throws DAOException, RepositoryException {
+    public void insertUpdateSourceMetadata(String subject, String predicate, String value, URI datatype) throws DAOException,
+            RepositoryException {
         throw new UnsupportedOperationException("Method not implemented");
     }
 

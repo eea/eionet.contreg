@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.List;
 
+import org.openrdf.model.URI;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFParseException;
 
@@ -284,10 +285,11 @@ public interface HarvestSourceDAO extends DAO {
      * @param subject
      * @param predicate
      * @param value
+     * @param datatype
      * @throws DAOException
      * @throws RepositoryException
      */
-    public void insertUpdateSourceMetadata(String subject, String predicate, String value) throws DAOException, RepositoryException;
+    public void insertUpdateSourceMetadata(String subject, String predicate, String value, URI datatype) throws DAOException, RepositoryException;
 
     /**
      * @param source

@@ -22,8 +22,9 @@ package eionet.cr.dto;
 
 import java.io.Serializable;
 
+import org.openrdf.model.URI;
+
 import eionet.cr.util.Hashes;
-import eionet.cr.util.Util;
 import eionet.cr.web.util.FactsheetObjectId;
 
 /**
@@ -48,7 +49,9 @@ public class ObjectDTO implements Serializable {
     private boolean anonymous;
     private boolean literal;
     private String language;
-
+    // Used for literals
+    private URI datatype;
+    
     private String derivSourceUri;
     private long derivSourceHash;
     private long derivSourceGenTime;
@@ -65,23 +68,46 @@ public class ObjectDTO implements Serializable {
      * @param language
      * @param literal
      * @param anonymous
+     * @param datatype
      */
-    public ObjectDTO(String value, String language, boolean literal, boolean anonymous) {
+    public ObjectDTO(String value, String language, boolean literal, boolean anonymous, URI datatype) {
 
         this.value = value;
         this.language = language;
         this.literal = literal;
         this.anonymous = anonymous;
+        this.datatype = datatype;
         this.hash = Hashes.spoHash(value);
     }
-
+    
+    /**
+    *
+    * @param value
+    * @param language
+    * @param literal
+    * @param anonymous
+    */
+   public ObjectDTO(String value, String language, boolean literal, boolean anonymous) {
+       this(value, language, literal, anonymous, null);
+   }
+    
     /**
      *
      * @param value
      * @param literal
      */
     public ObjectDTO(String value, boolean literal) {
-        this(value, null, literal, false);
+        this(value, null, literal, false, null);
+    }
+
+    /**
+     *
+     * @param value
+     * @param literal
+     * @param datatype
+     */
+    public ObjectDTO(String value, boolean literal, URI datatype) {
+        this(value, null, literal, false, datatype);
     }
 
     /**
@@ -105,7 +131,7 @@ public class ObjectDTO implements Serializable {
      * @param sourceHash
      * @param derivSourceHash
      * @param sourceObjectHash
-     * @return
+     * @return ObjectDTO
      */
     public static ObjectDTO create(long hash, long sourceHash, long derivSourceHash, long sourceObjectHash) {
 
@@ -173,7 +199,7 @@ public class ObjectDTO implements Serializable {
 
     /**
      *
-     * @return
+     * @return long
      */
     public long getHash() {
         return hash;
@@ -187,7 +213,7 @@ public class ObjectDTO implements Serializable {
     }
 
     /**
-     * @param derivSourceUri the derivSourceUri to set
+     * @param derivSource the derivSourceUri to set
      */
     public void setDerivSourceUri(String derivSource) {
         this.derivSourceUri = derivSource;
@@ -201,7 +227,7 @@ public class ObjectDTO implements Serializable {
     }
 
     /**
-     * @param sourceUri the sourceUri to set
+     * @param source the sourceUri to set
      */
     public void setSourceUri(String source) {
         this.sourceUri = source;
@@ -209,7 +235,7 @@ public class ObjectDTO implements Serializable {
 
     /**
      *
-     * @return
+     * @return String
      */
     public String getSourceSmart() {
 
@@ -280,7 +306,7 @@ public class ObjectDTO implements Serializable {
 
     /**
      *
-     * @return
+     * @return long
      */
     public long getSourceHashSmart() {
         return derivSourceHash != 0 ? derivSourceHash : sourceHash;
@@ -295,7 +321,7 @@ public class ObjectDTO implements Serializable {
 
     /**
      *
-     * @return
+     * @return String
      */
     public String getId() {
 
@@ -310,10 +336,18 @@ public class ObjectDTO implements Serializable {
     }
 
     /**
-     * @param derviedLiteralValue the derviedLiteralValue to set
+     * @param sourceObjectValue the derviedLiteralValue to set
      */
     public void setDerviedLiteralValue(String sourceObjectValue) {
         this.derviedLiteralValue = sourceObjectValue;
+    }
+
+    public URI getDatatype() {
+        return datatype;
+    }
+
+    public void setDatatype(URI datatype) {
+        this.datatype = datatype;
     }
 
 }
