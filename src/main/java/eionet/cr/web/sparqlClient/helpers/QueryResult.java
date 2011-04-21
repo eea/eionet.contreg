@@ -30,7 +30,7 @@ public class QueryResult {
      * @param queryResult
      * @throws QueryEvaluationException
      */
-    public QueryResult(TupleQueryResult queryResult) throws QueryEvaluationException{
+    public QueryResult(TupleQueryResult queryResult) throws QueryEvaluationException {
 
         if (queryResult != null && queryResult.hasNext()) {
 
@@ -59,8 +59,7 @@ public class QueryResult {
                 String valueString = Util.escapeHtml(value.stringValue());
                 if (value instanceof Literal) {
                     resultValue = new ResultValue(valueString, true);
-                }
-                else {
+                } else {
                     resultValue = new ResultValue(valueString, false);
                 }
             }

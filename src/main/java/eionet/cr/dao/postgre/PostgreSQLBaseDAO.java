@@ -42,7 +42,7 @@ import eionet.cr.util.sql.SQLUtil;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public abstract class PostgreSQLBaseDAO extends SQLBaseDAO{
+public abstract class PostgreSQLBaseDAO extends SQLBaseDAO {
 
     /** */
     protected Logger logger = Logger.getLogger(PostgreSQLBaseDAO.class);
@@ -76,7 +76,7 @@ public abstract class PostgreSQLBaseDAO extends SQLBaseDAO{
         append("left join RESOURCE as DSRC_RESOURCE on (OBJ_DERIV_SOURCE=DSRC_RESOURCE.URI_HASH) ").
         append("where ").
         append("SUBJECT in (").append(subjectsSubQuery).append(") ").
-        append( predicateHashesCommaSeparated != null && predicateHashesCommaSeparated.length()>0 ?
+        append( predicateHashesCommaSeparated != null && predicateHashesCommaSeparated.length() > 0 ?
                 "AND PREDICATE IN (".concat(predicateHashesCommaSeparated).concat(") ") : "").
         append("order by ").
         append("SUBJECT, PREDICATE, OBJECT");
@@ -90,7 +90,7 @@ public abstract class PostgreSQLBaseDAO extends SQLBaseDAO{
      * @return
      * @throws DAOException
      */
-    protected List<SubjectDTO> getSubjectsData(Map<Long,SubjectDTO> subjectsMap) throws DAOException{
+    protected List<SubjectDTO> getSubjectsData(Map<Long,SubjectDTO> subjectsMap) throws DAOException {
         return getSubjectsData(new SubjectDataReader(subjectsMap));
     }
 
@@ -102,7 +102,7 @@ public abstract class PostgreSQLBaseDAO extends SQLBaseDAO{
      * @return
      * @throws DAOException
      */
-    protected List<SubjectDTO> getSubjectsData(SubjectDataReader reader) throws DAOException{
+    protected List<SubjectDTO> getSubjectsData(SubjectDataReader reader) throws DAOException {
 
         Map<Long,SubjectDTO> subjectsMap = reader.getSubjectsMap();
         String predicateHashes = reader.getPredicateHashesCommaSeparated();
@@ -126,7 +126,7 @@ public abstract class PostgreSQLBaseDAO extends SQLBaseDAO{
             List<Long> list = new ArrayList<Long>(subjectsMap.keySet());
             long startTime = System.currentTimeMillis();
 
-            for (int i=0; i<len; i++) {
+            for (int i = 0; i < len; i++) {
 
                 int from = Math.min(i*max, size);
                 int to = Math.min(from + max, size);
@@ -156,11 +156,9 @@ public abstract class PostgreSQLBaseDAO extends SQLBaseDAO{
             }
 
             logger.debug("getSubjectsData, total query time " + Util.durationSince(startTime));
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
-        }
-        finally {
+        } finally {
             SQLUtil.close(conn);
         }
 
@@ -176,7 +174,7 @@ public abstract class PostgreSQLBaseDAO extends SQLBaseDAO{
      * @return
      * @throws DAOException
      */
-    protected List<SubjectDTO> getSubjectsData(SubjectDataReader reader, String subjectsSubQuery) throws DAOException{
+    protected List<SubjectDTO> getSubjectsData(SubjectDataReader reader, String subjectsSubQuery) throws DAOException {
 
         String predicateHashes = reader.getPredicateHashesCommaSeparated();
         if (subjectsSubQuery == null || subjectsSubQuery.length() == 0)

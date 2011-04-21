@@ -49,7 +49,7 @@ public class ObjectsInSourceActionBean extends AbstractSearchActionBean<SubjectD
      * (non-Javadoc)
      * @see eionet.cr.web.action.AbstractSearchActionBean#search()
      */
-    public Resolution search() throws DAOException{
+    public Resolution search() throws DAOException {
 
         if (resultList == null || resultList.size() == 0) {
             Pair<Integer, List<SubjectDTO>> result =

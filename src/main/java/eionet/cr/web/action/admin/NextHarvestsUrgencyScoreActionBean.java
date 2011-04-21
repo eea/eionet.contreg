@@ -32,7 +32,7 @@ public class NextHarvestsUrgencyScoreActionBean extends AbstractSearchActionBean
     private int resultsFound = 0;
 
     @DefaultHandler
-    public Resolution view() throws DAOException{
+    public Resolution view() throws DAOException {
         if (getUser() != null) {
             if (getUser().isAdministrator()) {
                 setAdminLoggedIn(true);
@@ -86,11 +86,11 @@ public class NextHarvestsUrgencyScoreActionBean extends AbstractSearchActionBean
     }
 
 
-    public Resolution search() throws DAOException{
+    public Resolution search() throws DAOException {
         return view();
     }
 
-    public Resolution filter() throws DAOException, AccessException{
+    public Resolution filter() throws DAOException, AccessException {
         return view();
     }
 

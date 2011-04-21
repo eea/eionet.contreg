@@ -85,7 +85,7 @@ public class EncodingSchemes extends HashMap<String,String[]>{
     public static String getLabel(String id, boolean returnSelfIfNull) {
 
         String[] labels = getLabels(id);
-        return labels != null && labels.length>0 ? labels[0] : (returnSelfIfNull ? id : null);
+        return labels != null && labels.length > 0 ? labels[0] : (returnSelfIfNull ? id : null);
     }
 
     /**

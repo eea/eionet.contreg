@@ -39,7 +39,7 @@ import eionet.cr.util.sql.SQLUtil;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class ObjectHashesFixer extends Thread{
+public class ObjectHashesFixer extends Thread {
 
     /** */
     private static final String URN_UUID_PREFIX = "urn:uuid:";
@@ -55,7 +55,7 @@ public class ObjectHashesFixer extends Thread{
     /**
      *
      */
-    static{
+    static {
         BATCH_SIZE = Integer.valueOf(GeneralConfig.getProperty(prop_batchSize, String.valueOf(BATCH_SIZE)).trim());
 
         String s = GeneralConfig.getProperty(prop_noOfBatchesToRun, String.valueOf(NOOF_BATCHES_TO_RUN)).trim();
@@ -117,7 +117,7 @@ public class ObjectHashesFixer extends Thread{
 
         int ret = BATCH_SIZE;
         int batchesRun = 0;
-        while (ret>0 && batchesRun < NOOF_BATCHES_TO_RUN && !ObjectHashesFixer.isShutdownIssued()) {
+        while (ret > 0 && batchesRun < NOOF_BATCHES_TO_RUN && !ObjectHashesFixer.isShutdownIssued()) {
 
             logger.debug("Executing batch #" + (batchesRun+1));
             ret = runBatch();
@@ -126,7 +126,7 @@ public class ObjectHashesFixer extends Thread{
             batchesRun++;
         }
 
-        if (ret==0)
+        if (ret == 0)
             logger.debug("All done, found no more replacements to perform!");
         else if (batchesRun==NOOF_BATCHES_TO_RUN)
             logger.debug("Exiting because the required number of batches has been run!");
@@ -202,7 +202,7 @@ public class ObjectHashesFixer extends Thread{
                 batchSize++;
             }
 
-            if (batchSize>0) {
+            if (batchSize > 0) {
 
 //              logger.debug("Executing batch for objects");
                 pstmtObjects.executeBatch();
@@ -213,11 +213,9 @@ public class ObjectHashesFixer extends Thread{
 //              logger.debug("Executing batch for resources");
                 pstmtResources.executeBatch();
             }
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e.toString(), e);
-        }
-        finally {
+        } finally {
             SQLUtil.close(rs);
             SQLUtil.close(selectStmt);
             SQLUtil.close(pstmtObjects);
@@ -251,7 +249,7 @@ public class ObjectHashesFixer extends Thread{
      * @param args
      * @throws SQLException
      */
-    public static void main(String[] args) throws SQLException{
+    public static void main(String[] args) throws SQLException {
 
         ObjectHashesFixer fixer = new ObjectHashesFixer();
         Runtime.getRuntime().addShutdownHook(new ShutdownHook(fixer));
@@ -291,8 +289,7 @@ class ShutdownHook extends Thread {
 
                 System.out.println("Fixer finished, shutdown complete!");
             }
-        }
-        catch (InterruptedException e) {
+        } catch (InterruptedException e) {
             System.out.println("InterruptedException received: ");
             e.printStackTrace(System.out);
             return;

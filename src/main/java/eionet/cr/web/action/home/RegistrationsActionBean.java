@@ -34,13 +34,12 @@ public class RegistrationsActionBean extends AbstractHomeActionBean {
         return new ForwardResolution("/pages/home/registrations.jsp");
     }
 
-    public List<TripleDTO> getRegistrations()  throws DAOException{
+    public List<TripleDTO> getRegistrations()  throws DAOException {
 
-        if(this.isUserAuthorized() && this.getUser() != null) {
+        if (this.isUserAuthorized() && this.getUser() != null) {
             registrations = DAOFactory.get().getDao(HelperDAO.class).
             getSampleTriplesInSource(this.getUser().getRegistrationsUri(), null);
-        }
-        else {
+        } else {
             registrations = DAOFactory.get().getDao(HelperDAO.class).
             getSampleTriplesInSource((new CRUser(getAttemptedUserName())).getRegistrationsUri(), null);
         }

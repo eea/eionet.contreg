@@ -64,7 +64,7 @@ import eionet.cr.util.sql.SingleObjectReader;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
+public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO {
 
     /** */
     private static final int EXACT_ROW_COUNT_LIMIT = 5000;
@@ -90,8 +90,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
         try {
             pgQuery = PostgreSQLFullTextQuery.parse(expression);
             logger.trace("Free-text search string parsed for PostgreSQL: " + pgQuery);
-        }
-        catch (ParseException pe) {
+        } catch (ParseException pe) {
             throw new DAOException("Error parsing the search text", pe);
         }
 
@@ -194,7 +193,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
         List<SubjectDTO> subjects = new ArrayList<SubjectDTO>();
 
         // if result list not null and not empty, then get the subjects data and total rowcount
-        if(list != null && !list.isEmpty()) {
+        if (list != null && !list.isEmpty()) {
 
             // create the subjects map that needs to be fed into the subjects data reader
             Map<Long,SubjectDTO> subjectsMap = new LinkedHashMap<Long, SubjectDTO>();
@@ -205,8 +204,8 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
             //restrict the query with specified columns,
             //otherwise if there are over 300 columns the performance is not acceptable
             SubjectDataReader reader = new SubjectDataReader(subjectsMap);
-            if(selectedPredicates != null && !selectedPredicates.isEmpty()) {
-                for(String predicate : selectedPredicates) {
+            if (selectedPredicates != null && !selectedPredicates.isEmpty()) {
+                for (String predicate : selectedPredicates) {
                     reader.addPredicateHash(Hashes.spoHash(predicate));
                 }
             }
@@ -221,8 +220,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
             if (helper.requiresFullTextSearch()) {
                 logger.trace("Search by filters, getting exact row count");
                 totalRowCount = new Integer(getExactRowCount(helper));
-            }
-            else {
+            } else {
                 logger.trace("Search by filters, getting the clever row count");
                 totalRowCount = new Integer(getCleverRowCount(helper));
             }
@@ -264,8 +262,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
 
             // execute the query, with the IN parameters
             list = executeSQL(query, inParams, new SingleObjectReader<Long>());
-        }
-        catch(DAOException e) {
+        } catch(DAOException e) {
             logger.warn("Cache tables are not created yet. Continue with spo table" + e.getMessage());
             helper.setUseCache(false);
             logger.trace("Search by type and filters, executing subject finder query: " + query);
@@ -278,7 +275,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
         List<SubjectDTO> subjects = new ArrayList<SubjectDTO>();
 
         // if result list not null and not empty, then get the subjects data and total rowcount
-        if(list != null && !list.isEmpty()) {
+        if (list != null && !list.isEmpty()) {
 
             // create the subjects map that needs to be fed into the subjects data reader
             Map<Long,SubjectDTO> subjectsMap = new LinkedHashMap<Long, SubjectDTO>();
@@ -289,8 +286,8 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
             //restrict the query with specified columns,
             //otherwise if there are over 300 columns the performance is not acceptable
             SubjectDataReader reader = new SubjectDataReader(subjectsMap);
-            if(selectedPredicates != null && !selectedPredicates.isEmpty()) {
-                for(String predicate : selectedPredicates) {
+            if (selectedPredicates != null && !selectedPredicates.isEmpty()) {
+                for (String predicate : selectedPredicates) {
                     reader.addPredicateHash(Hashes.spoHash(predicate));
                 }
             }
@@ -303,8 +300,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
             if (helper.requiresFullTextSearch()) {
                 logger.trace("Search by type and filters, getting exact row count");
                 totalRowCount = new Integer(getExactRowCount(helper));
-            }
-            else {
+            } else {
                 logger.trace("Search by type and filters, getting the clever row count");
                 totalRowCount = new Integer(getCleverRowCount(helper));
             }
@@ -563,7 +559,7 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
         List<SubjectDTO> subjects = new ArrayList<SubjectDTO>();
 
         // if result list not null and not empty, then get the subjects data and total rowcount
-        if(list != null && !list.isEmpty()) {
+        if (list != null && !list.isEmpty()) {
 
             // create the subjects map that needs to be fed into the subjects data reader
             Map<Long,SubjectDTO> subjectsMap = new LinkedHashMap<Long, SubjectDTO>();
@@ -574,8 +570,8 @@ public class PostgreSQLSearchDAO extends PostgreSQLBaseDAO implements SearchDAO{
             //restrict the query with specified columns,
             //otherwise if there are over 300 columns the performance is not acceptable
             SubjectDataReader reader = new SubjectDataReader(subjectsMap);
-            if(selectedPredicates != null && !selectedPredicates.isEmpty()) {
-                for(String predicate : selectedPredicates) {
+            if (selectedPredicates != null && !selectedPredicates.isEmpty()) {
+                for (String predicate : selectedPredicates) {
                     reader.addPredicateHash(Hashes.spoHash(predicate));
                 }
             }

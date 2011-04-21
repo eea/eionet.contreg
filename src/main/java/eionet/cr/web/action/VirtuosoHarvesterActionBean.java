@@ -40,7 +40,7 @@ public class VirtuosoHarvesterActionBean extends AbstractActionBean {
      * @return
      * @throws DAOException
      */
-    public Resolution harvest() throws OpenRDFException, IOException{
+    public Resolution harvest() throws OpenRDFException, IOException {
 
         String repoUrl = GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_URL);
         String repoUsr = GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_USR);
@@ -72,8 +72,7 @@ public class VirtuosoHarvesterActionBean extends AbstractActionBean {
 
             // no transaction rollback needed, when reached this point
             isSuccess = true;
-        }
-        finally {
+        } finally {
             if (!isSuccess && conn != null) {
                 try {conn.rollback();}catch(RepositoryException e) {}
             }

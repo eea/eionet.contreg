@@ -24,9 +24,9 @@ package eionet.cr.util.export;
  * @author <a href="mailto:enriko.kasper@tieto.com">Enriko Käsper</a>, Tieto Estonia
  */
 
-public class XmlElementMetadata{
+public class XmlElementMetadata {
 
-    public enum Type{STRING, DOUBLE;}
+    public enum Type {STRING, DOUBLE;}
 
     private String name;
     private int maxLength = -1;
@@ -49,7 +49,7 @@ public class XmlElementMetadata{
      * @param length
      */
     public void setMaxLength(int length) {
-        if(this.maxLength < length) {
+        if (this.maxLength < length) {
             this.maxLength = length;
         }
     }
@@ -67,7 +67,7 @@ public class XmlElementMetadata{
      * @param type
      */
     public void setType(Type type) {
-        if(this.type == null || type == Type.STRING) {
+        if (this.type == null || type == Type.STRING) {
             this.type = type;
         }
     }

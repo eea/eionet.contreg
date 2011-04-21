@@ -34,7 +34,7 @@ import eionet.cr.web.util.columns.ReferringPredicatesColumn;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class PostgreReferencesSearchHelper extends AbstractSearchHelper{
+public class PostgreReferencesSearchHelper extends AbstractSearchHelper {
 
     /** */
     private Long subjectHash;
@@ -80,8 +80,7 @@ public class PostgreReferencesSearchHelper extends AbstractSearchHelper{
             subSelect.append(" left join SPO as ORDERING on ").
             append("(SPO.PREDICATE=ORDERING.SUBJECT and ORDERING.PREDICATE=").
             append(Hashes.spoHash(Predicates.RDFS_LABEL)).append(")");
-        }
-        else {
+        } else {
             subSelect.append(" left join SPO as ORDERING on ").
             append("(SPO.SUBJECT=ORDERING.SUBJECT and ORDERING.PREDICATE=").
             append(Hashes.spoHash(sortPredicate)).append(")");

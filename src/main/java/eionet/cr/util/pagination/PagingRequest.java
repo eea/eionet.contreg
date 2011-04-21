@@ -63,7 +63,7 @@ public class PagingRequest {
      */
     public static PagingRequest create(int pageNumber, int itemsPerPage) {
 
-        return itemsPerPage<=0 ? null : new PagingRequest(pageNumber, itemsPerPage);
+        return itemsPerPage <= 0 ? null : new PagingRequest(pageNumber, itemsPerPage);
     }
 
     /**

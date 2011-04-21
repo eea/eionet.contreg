@@ -171,7 +171,7 @@ public class SubjectExportReader extends ResultSetExportReader {
      */
     @Override
     public void endResultSet() {
-        if(currentSubject != null) {
+        if (currentSubject != null) {
             try {
                 exporter.writeSubjectIntoExporterOutput(currentSubject);
             } catch (ExportException e) {

@@ -108,7 +108,7 @@ public abstract class Exporter {
 
         //add label into selected columns if not exist yet
         Pair<String, String> labelPredicate = new Pair<String, String>(Predicates.RDFS_LABEL, null);
-        if(!selectedColumns.contains(labelPredicate)) {
+        if (!selectedColumns.contains(labelPredicate)) {
             selectedColumns.add(labelPredicate);
         }
 
@@ -121,7 +121,7 @@ public abstract class Exporter {
 
     public void doExportQueryAndWriteDataIntoOutput(ResultSetExportReader reader) throws DAOException {
         Map<String, String> criteria = new HashMap<String, String>();
-        for(Entry<String, String> entry : selectedFilters.entrySet()) {
+        for (Entry<String, String> entry : selectedFilters.entrySet()) {
             criteria.put(StringUtils.trim(entry.getKey()), StringUtils.trim(entry.getValue()));
         }
         // do the query and write data rows directly to export file
@@ -160,7 +160,7 @@ public abstract class Exporter {
         String value = "";
         String uri = subject.getUri();
 
-        if(isExportResourceUri()) {
+        if (isExportResourceUri()) {
             value = uri;
         } else {
             value = FormatUtils.getObjectValuesForPredicate(Predicates.RDFS_LABEL, subject, getLanguages());
@@ -256,7 +256,7 @@ public abstract class Exporter {
      */
     public List<String> getSelectedColumnsList() {
         List<String> list = new ArrayList<String>();
-        if(selectedColumns != null && !selectedColumns.isEmpty()) {
+        if (selectedColumns != null && !selectedColumns.isEmpty()) {
             for (Pair<String, String> col : selectedColumns) {
                 list.add(col.getLeft());
             }

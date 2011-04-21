@@ -71,7 +71,7 @@ public class Hashes {
     private static long fnv64(String s, long seed) {
 
         int sLen = s.length();
-        for (int i=0; i<sLen; i++) {
+        for (int i = 0; i < sLen; i++) {
             seed ^= (long)s.charAt(i);
             seed += (seed << 1) + (seed << 4) + (seed << 5) + (seed << 7) + (seed << 8) + (seed << 40);
         }
@@ -102,8 +102,7 @@ public class Hashes {
         MessageDigest md;
         try {
             md = MessageDigest.getInstance(algorithm);
-        }
-        catch (GeneralSecurityException e) {
+        } catch (GeneralSecurityException e) {
             throw new CRRuntimeException(e.toString(), e);
         }
         md.update(srcBytes);
@@ -111,7 +110,7 @@ public class Hashes {
         md.reset();
 
         StringBuffer buf = new StringBuffer();
-        for (int i=0; i<dstBytes.length; i++) {
+        for (int i = 0; i < dstBytes.length; i++) {
             Byte byteWrapper = new Byte(dstBytes[i]);
             int k = byteWrapper.intValue();
             String s = Integer.toHexString(byteWrapper.intValue());

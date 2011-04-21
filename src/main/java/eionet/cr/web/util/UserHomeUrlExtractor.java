@@ -10,7 +10,7 @@ import eionet.cr.web.security.BadUserHomeUrlException;
 
 public class UserHomeUrlExtractor {
 
-    public static String extractUserNameFromHomeUrl(String url) throws BadUserHomeUrlException{
+    public static String extractUserNameFromHomeUrl(String url) throws BadUserHomeUrlException {
         // Just to be sure that there is something before "/home/".
         url = "#"+url;
         String userNamePart;
@@ -26,7 +26,7 @@ public class UserHomeUrlExtractor {
 
     }
 
-    public static String extractSectionFromHomeUrl(String url) throws BadUserHomeUrlException{
+    public static String extractSectionFromHomeUrl(String url) throws BadUserHomeUrlException {
 
         String userName = extractUserNameFromHomeUrl(url);
         String [] urlParts = new String[0];

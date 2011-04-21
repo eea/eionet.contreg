@@ -130,8 +130,7 @@ public class CRActionBeanContext extends ActionBeanContext {
 
         if (this.sourcePageResolution != null) {
             return this.sourcePageResolution;
-        }
-        else {
+        } else {
             return super.getSourcePageResolution();
         }
     }

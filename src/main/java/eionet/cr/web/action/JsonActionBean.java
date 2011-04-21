@@ -42,7 +42,7 @@ import eionet.cr.web.util.ApplicationCache;
  */
 
 @UrlBinding("/json/{$event}")
-public class JsonActionBean extends AbstractActionBean{
+public class JsonActionBean extends AbstractActionBean {
 
     @DefaultHandler
     public Resolution tags()
@@ -52,7 +52,7 @@ public class JsonActionBean extends AbstractActionBean{
 
         List<String> tagNameList = new ArrayList<String>(tagList.size());
         for (TagDTO tagObj : tagList) {
-            if(queryParam == null ||
+            if (queryParam == null ||
                     tagObj.getTag().toLowerCase().startsWith(queryParam.toLowerCase()))
             tagNameList.add(tagObj.getTag());
         }

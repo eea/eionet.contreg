@@ -79,7 +79,7 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean<SubjectDT
      * (non-Javadoc)
      * @see eionet.cr.web.action.AbstractSearchActionBean#search()
      */
-    public Resolution search() throws DAOException{
+    public Resolution search() throws DAOException {
         Pair<Integer, List<SubjectDTO>> customSearch =
             DAOFactory.get().getDao(SearchDAO.class).searchByFilters(
                             buildSearchCriteria(),

@@ -123,8 +123,7 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
         String[] splits = getContext().getRequest().getRequestURL().toString().split("reviews/");
         if (splits == null || splits.length < 2) {
             reviewId = 0;
-        }
-        else {
+        } else {
             String reviewString = splits[1];
             if (reviewString.contains("?")) {
                 reviewString = reviewString.split("?")[0];

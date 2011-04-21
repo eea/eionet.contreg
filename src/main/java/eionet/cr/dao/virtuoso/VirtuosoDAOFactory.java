@@ -16,7 +16,7 @@ import eionet.cr.dao.TagsDAO;
  * @author jaanus
  *
  */
-public class VirtuosoDAOFactory extends DAOFactory{
+public class VirtuosoDAOFactory extends DAOFactory {
 
     /** */
     private static VirtuosoDAOFactory instance;
@@ -47,7 +47,7 @@ public class VirtuosoDAOFactory extends DAOFactory{
      * @return
      */
     public static VirtuosoDAOFactory get() {
-        if(instance == null) {
+        if (instance == null) {
             instance = new VirtuosoDAOFactory();
         }
         return instance;
@@ -65,12 +65,10 @@ public class VirtuosoDAOFactory extends DAOFactory{
             Class implClass = registeredDaos.get(implementedInterface);
             if (implClass == null) {
                 return null;
-            }
-            else {
+            } else {
                 return (T) implClass.newInstance();
             }
-        }
-        catch (Exception fatal) {
+        } catch (Exception fatal) {
             throw new RuntimeException(fatal);
         }
     }

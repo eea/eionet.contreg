@@ -35,7 +35,7 @@ import eionet.cr.util.pagination.PagingRequest;
  * @author <a href="mailto:enriko.kasper@tieto.com">Enriko Käsper</a>
  *
  */
-public class PostgreSearchByTagsHelper extends AbstractSearchHelper{
+public class PostgreSearchByTagsHelper extends AbstractSearchHelper {
 
     private List<String> tags;
 
@@ -83,7 +83,7 @@ public class PostgreSearchByTagsHelper extends AbstractSearchHelper{
         }
 
         // finish the query by adding the above-created "where" part
-        if(whereBuffer.length() > 0) {
+        if (whereBuffer.length() > 0) {
             buf.append(" where ").append(whereBuffer);
         }
 
@@ -125,7 +125,7 @@ public class PostgreSearchByTagsHelper extends AbstractSearchHelper{
         }
 
         // finish the query by adding the above-created "where" part
-        if(whereBuffer.length() > 0) {
+        if (whereBuffer.length() > 0) {
             subSelect.append(" where ").append(whereBuffer);
         }
 

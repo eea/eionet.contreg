@@ -97,8 +97,7 @@ public class UrgentHarvestQueue {
         try {
             DAOFactory.get().getDao(UrgentHarvestQueueDAO.class).addPushHarvest(dto);
             logger.debug("Push harvest added to the urgent queue, url = " + url);
-        }
-        catch (DAOException e) {
+        } catch (DAOException e) {
             throw new HarvestException(e.toString(), e);
         }
     }

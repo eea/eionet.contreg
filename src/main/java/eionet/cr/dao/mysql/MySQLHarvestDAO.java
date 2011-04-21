@@ -64,11 +64,9 @@ public class MySQLHarvestDAO extends MySQLBaseDAO implements HarvestDAO {
             conn = getConnection();
             SQLUtil.executeUpdate(insertStartedHarvestSQL, values, conn);
             return getLastInsertID(conn);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
-        }
-        finally {
+        } finally {
             SQLUtil.close(conn);
         }
     }
@@ -97,11 +95,9 @@ public class MySQLHarvestDAO extends MySQLBaseDAO implements HarvestDAO {
         try {
             conn = getConnection();
             SQLUtil.executeUpdate(updateFinishedHarvestSQL, values, conn);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
-        }
-        finally {
+        } finally {
             SQLUtil.close(conn);
         }
     }
@@ -138,7 +134,7 @@ public class MySQLHarvestDAO extends MySQLBaseDAO implements HarvestDAO {
         List<Object> values = new ArrayList<Object>();
         values.add(harvestId);
         List<HarvestDTO> list = executeQuery(getHarvestByIdSQL, values, new HarvestDTOReader());
-        return list != null && list.size()>0 ? list.get(0) : null;
+        return list != null && list.size() > 0 ? list.get(0) : null;
     }
 
     /** */

@@ -47,7 +47,7 @@ public class HarvestNotificationSender {
      * @param harvest
      * @throws HarvestException
      */
-    protected void notifyMessages(Harvest harvest) throws HarvestException{
+    protected void notifyMessages(Harvest harvest) throws HarvestException {
 
         Throwable fatal = harvest.getFatalError();
         List<Throwable> errors = harvest.getErrors();
@@ -65,11 +65,9 @@ public class HarvestNotificationSender {
 
             try {
                 EMailSender.sendToSysAdmin("Error(s) when harvesting " + harvest.sourceUrlString, buf.toString());
-            }
-            catch (AddressException e) {
+            } catch (AddressException e) {
                 throw new HarvestException(e.toString(), e);
-            }
-            catch (MessagingException e) {
+            } catch (MessagingException e) {
                 throw new HarvestException(e.toString(), e);
             }
         }
@@ -81,7 +79,7 @@ public class HarvestNotificationSender {
      * @param harvest
      * @throws HarvestException
      */
-    protected void notifyMessagesAfterHarvest(List<Throwable> throwables, Harvest harvest) throws HarvestException{
+    protected void notifyMessagesAfterHarvest(List<Throwable> throwables, Harvest harvest) throws HarvestException {
 
         if (throwables == null || throwables.isEmpty())
             return;
@@ -95,11 +93,9 @@ public class HarvestNotificationSender {
 
         try {
             EMailSender.sendToSysAdmin("Error(s) *after* harvesting " + harvest.sourceUrlString, buf.toString());
-        }
-        catch (AddressException e) {
+        } catch (AddressException e) {
             throw new HarvestException(e.toString(), e);
-        }
-        catch (MessagingException e) {
+        } catch (MessagingException e) {
             throw new HarvestException(e.toString(), e);
         }
     }

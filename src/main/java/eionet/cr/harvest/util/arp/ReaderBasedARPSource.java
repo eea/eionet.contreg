@@ -32,7 +32,7 @@ import com.hp.hpl.jena.rdf.arp.ARP;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class ReaderBasedARPSource implements ARPSource{
+public class ReaderBasedARPSource implements ARPSource {
 
     /** */
     private Reader reader;

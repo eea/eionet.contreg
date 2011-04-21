@@ -603,7 +603,7 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
         // validate arguments
         if (StringUtils.isBlank(rdfType))
             throw new IllegalArgumentException("rdfType must not be blank!");
-        if (limit<=0)
+        if (limit <= 0)
             throw new IllegalArgumentException("limit must be greater than 0!");
 
         // build SQL query
@@ -661,7 +661,7 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
         // validate arguments
         if (timestamp == null || timestamp.after(new Date()))
             throw new IllegalArgumentException("timestamp must not be null or after current time!");
-        if (limit<=0)
+        if (limit <= 0)
             throw new IllegalArgumentException("limit must be greater than 0!");
 
         // build SQL query

@@ -66,11 +66,9 @@ public class UploadDTOReader extends SQLResultSetBaseReader<UploadDTO>{
 
         if (predicateHash == labelHash) {
             uploadDTO.setLabel(objectValue);
-        }
-        else if (predicateHash == lastModifiedHash) {
+        } else if (predicateHash == lastModifiedHash) {
             uploadDTO.setDateModified(objectValue);
-        }
-        else if (predicateHash == dcTitleHash) {
+        } else if (predicateHash == dcTitleHash) {
 
             // label not yet set, prefer dc:title as the label
             if (StringUtils.isBlank(uploadDTO.getLabel())) {

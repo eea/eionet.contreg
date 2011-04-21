@@ -68,37 +68,33 @@ public class XmlAnalysis {
      * @throws IOException
      * @throws CRException
      */
-    public void parse(File file) throws ParserConfigurationException, SAXException, IOException{
+    public void parse(File file) throws ParserConfigurationException, SAXException, IOException {
 
         FileInputStream inputStream = null;
         try {
             inputStream = new FileInputStream(file);
             parse(inputStream);
-        }
-        finally {
+        } finally {
             try {
                 if (inputStream != null) {
                     inputStream.close();
                 }
-            }
-            catch (IOException e) {}
+            } catch (IOException e) {}
         }
     }
 
-    public void parse(FileBean fileBean) throws ParserConfigurationException, SAXException, IOException{
+    public void parse(FileBean fileBean) throws ParserConfigurationException, SAXException, IOException {
 
         InputStream inputStream = null;
         try {
             inputStream = fileBean.getInputStream();
             parse(inputStream);
-        }
-        finally {
+        } finally {
             try {
                 if (inputStream != null) {
                     inputStream.close();
                 }
-            }
-            catch (IOException e) {}
+            } catch (IOException e) {}
         }
     }
 
@@ -130,11 +126,9 @@ public class XmlAnalysis {
         doctypeReader = new SAXDoctypeReader();
         try {
             parser.setProperty("http://xml.org/sax/properties/lexical-handler", doctypeReader);
-        }
-        catch (SAXNotRecognizedException e) {
+        } catch (SAXNotRecognizedException e) {
             logger.warn("Installed XML parser does not provide lexical events", e);
-        }
-        catch (SAXNotSupportedException e) {
+        } catch (SAXNotSupportedException e) {
             logger.warn("Cannot turn on comment processing here", e);
         }
 
@@ -143,8 +137,7 @@ public class XmlAnalysis {
         reader.setContentHandler(handler);
         try {
             reader.parse(new InputSource(inputStream));
-        }
-        catch (SAXException e) {
+        } catch (SAXException e) {
             Exception ee = e.getException();
             if (ee == null || !(ee instanceof CRException))
                 throw e;
@@ -223,7 +216,7 @@ public class XmlAnalysis {
      * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
      *
      */
-    private class Handler extends DefaultHandler{
+    private class Handler extends DefaultHandler {
 
         /** */
         private String startElemLocalName = null;

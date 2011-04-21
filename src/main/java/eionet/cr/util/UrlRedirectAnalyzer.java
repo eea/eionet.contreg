@@ -57,17 +57,14 @@ public class UrlRedirectAnalyzer {
                 result.setTargetURL(fullRedirectUrl);
             }
 
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             logger.warn("Ignoring this URL redirection analyze exception: " + e.toString());
-        }
-        finally {
+        } finally {
             try {
                 if (inputStream != null) {
                     inputStream.close();
                 }
-            }
-            catch (IOException e) {}
+            } catch (IOException e) {}
         }
 
         return result;
@@ -84,21 +81,20 @@ public class UrlRedirectAnalyzer {
                                                                     throws MalformedURLException {
         if (relativeUrl == null) {
             return baseUrl;
-        }
-        else {
+        } else {
             return new URL (new URL(baseUrl), relativeUrl).toString();
         }
     }
 
     public static boolean isRedirectionResponseCode(int responseCode) {
-        if ((responseCode == 301)||(responseCode == 302)||(responseCode == 303)||(responseCode == 307)) {
+        if ((responseCode == 301) || (responseCode == 302) || (responseCode == 303) || (responseCode == 307)) {
             return true;
         } else {
             return false;
         }
     }
 
-    public static void main(String[] args) throws URISyntaxException, MalformedURLException{
+    public static void main(String[] args) throws URISyntaxException, MalformedURLException {
 
         URL url = new URL("http://foo.com/hello world");
         URI uri = url.toURI();

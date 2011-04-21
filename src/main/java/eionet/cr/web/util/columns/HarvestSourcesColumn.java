@@ -62,7 +62,7 @@ public class HarvestSourcesColumn extends SearchResultColumn {
                 int i = factsheetUrlBinding.lastIndexOf("/");
                 String hrefName = ((HarvestSourceDTO) object).getUrl();
 
-                StringBuffer href = new StringBuffer(i>=0 ? factsheetUrlBinding.substring(i+1) : factsheetUrlBinding).append("?view=&amp;harvestSource.url=")
+                StringBuffer href = new StringBuffer(i >= 0 ? factsheetUrlBinding.substring(i+1) : factsheetUrlBinding).append("?view=&amp;harvestSource.url=")
                 .append(Util.urlEncode(hrefName));
 
                 return new StringBuffer("<a href=\"").append(href).append("\">").append(StringEscapeUtils.escapeHtml(hrefName)).append("</a>").toString();

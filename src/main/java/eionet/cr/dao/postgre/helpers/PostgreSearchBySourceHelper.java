@@ -38,7 +38,7 @@ import eionet.cr.web.util.columns.ReferringPredicatesColumn;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class PostgreSearchBySourceHelper extends AbstractSearchHelper{
+public class PostgreSearchBySourceHelper extends AbstractSearchHelper {
 
     private String sourceUrl;
     private long sourceHash;

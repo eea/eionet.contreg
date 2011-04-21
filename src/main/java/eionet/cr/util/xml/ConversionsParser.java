@@ -89,7 +89,7 @@ public class ConversionsParser {
         Element rootElem = dom.getDocumentElement();
         if (rootElem != null) {
             NodeList nl = rootElem.getElementsByTagName("conversion");
-            for(int i = 0; nl != null && i < nl.getLength(); i++) {
+            for (int i = 0; nl != null && i < nl.getLength(); i++) {
                 readConversion((Element)nl.item(i));
             }
         }
@@ -105,7 +105,7 @@ public class ConversionsParser {
 
             boolean isRDFConversion = false;
             NodeList nl = conversionElement.getElementsByTagName("result_type");
-            if (nl != null && nl.getLength()>0) {
+            if (nl != null && nl.getLength() > 0) {
                 Element element = (Element)nl.item(0);
                 Text text = (Text)element.getFirstChild();
                 if (text != null) {
@@ -118,7 +118,7 @@ public class ConversionsParser {
             if (isRDFConversion && (rdfConversionId == null || rdfConversionId.length() == 0)) {
 
                 nl = conversionElement.getElementsByTagName("convert_id");
-                if (nl != null && nl.getLength()>0) {
+                if (nl != null && nl.getLength() > 0) {
                     Element element = (Element)nl.item(0);
                     Text text = (Text)element.getFirstChild();
                     if (text != null) {
@@ -127,7 +127,7 @@ public class ConversionsParser {
                 }
 
                 nl = conversionElement.getElementsByTagName("xsl");
-                if (nl != null && nl.getLength()>0) {
+                if (nl != null && nl.getLength() > 0) {
                     Element element = (Element)nl.item(0);
                     Text text = (Text)element.getFirstChild();
                     if (text != null) {
@@ -179,8 +179,7 @@ public class ConversionsParser {
         ConversionsParser convParser = ConversionsParser.parseForSchema(schemaUri);
         if (convParser != null) {
             return convParser.getRdfConversionId();
-        }
-        else {
+        } else {
             return null;
         }
     }

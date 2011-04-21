@@ -42,7 +42,7 @@ public class BookmarksActionBean extends AbstractHomeActionBean {
         if (this.getContext().getRequest().getParameter("deletebookmarks") != null) {
             if (selectedBookmarks != null && !selectedBookmarks.isEmpty()) {
                 try {
-                    for (int i=0; i<selectedBookmarks.size(); i++) {
+                    for (int i = 0; i < selectedBookmarks.size(); i++) {
                         DAOFactory.get().getDao(HelperDAO.class).deleteUserBookmark(getUser(), selectedBookmarks.get(i));
                     }
                     addSystemMessage("Selected bookmarks were deleted from your personal bookmark list.");

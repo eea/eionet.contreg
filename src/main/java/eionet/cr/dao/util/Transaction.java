@@ -62,12 +62,11 @@ public class Transaction {
      * @return
      * @throws DAOException
      */
-    public static Transaction begin() throws DAOException{
+    public static Transaction begin() throws DAOException {
 
         try {
             return new Transaction(DbConnectionProvider.getConnection());
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             throw new DAOException(e.toString(), e);
         }
     }
@@ -79,8 +78,7 @@ public class Transaction {
 
         try {
             conn.commit();
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             logger.error("Transaction commit failed: " + e.toString());
         }
     }
@@ -92,8 +90,7 @@ public class Transaction {
 
         try {
             conn.rollback();
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             logger.error("Transaction rollback failed: " + e.toString());
         }
     }
@@ -132,8 +129,7 @@ public class Transaction {
             transaction = Transaction.begin();
             transaction.getDao(HelperDAO.class).addTriples(null);
             // do some DAO operations here
-        }
-        catch (DAOException e) {
+        } catch (DAOException e) {
             Transaction.rollback(transaction);
         }
     }

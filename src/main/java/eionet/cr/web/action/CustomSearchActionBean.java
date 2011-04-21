@@ -217,7 +217,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
             return null;
         }
         String uri = getAvailableFilters().get(picklistFilter).getUri();
-        if(Predicates.RDF_TYPE.equals(uri)) {
+        if (Predicates.RDF_TYPE.equals(uri)) {
             picklist = ApplicationCache.getTypeURIs();
         } else if (Predicates.ROD_LOCALITY_PROPERTY.equals(uri)) {
             picklist = ApplicationCache.getLocalities();
@@ -430,7 +430,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
             list.add(filter);
 
             availableFilters = new LinkedHashMap<String,CustomSearchFilter>();
-            for (int i=0; i < list.size(); i++)
+            for (int i = 0; i < list.size(); i++)
                 availableFilters.put(String.valueOf(i + 1), list.get(i));
         }
 

@@ -69,11 +69,10 @@ public class FactsheetObjectId {
         }
 
         long[] hashes = new long[4];
-        for (int i=0; i<parts.length; i++) {
+        for (int i = 0; i < parts.length; i++) {
             try {
                 hashes[i] = Long.parseLong(parts[i]);
-            }
-            catch (NumberFormatException e) {
+            } catch (NumberFormatException e) {
                 throw new IllegalArgumentException("Supplied string has wrong format");
             }
         }

@@ -67,7 +67,7 @@ public class MySQLHarvestMessageDAO extends MySQLBaseDAO implements HarvestMessa
         List<Object> values = new ArrayList<Object>();
         values.add(new Integer(messageID));
         List<HarvestMessageDTO> list = executeQuery(q_HarvestMessageByMessageID, values, new HarvestMessageDTOReader());
-        return list != null && list.size()>0 ? list.get(0) : null;
+        return list != null && list.size() > 0 ? list.get(0) : null;
     }
 
     private static final String q_insertHarvestMessage =
@@ -96,11 +96,9 @@ public class MySQLHarvestMessageDAO extends MySQLBaseDAO implements HarvestMessa
             harvestMessageID = getLastInsertID(conn);
 
             return harvestMessageID;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
-        }
-        finally {
+        } finally {
             SQLUtil.close(conn);
         }
     }
@@ -122,11 +120,9 @@ public class MySQLHarvestMessageDAO extends MySQLBaseDAO implements HarvestMessa
         try {
             conn = getConnection();
             SQLUtil.executeUpdate(deleteHarvestMessageSQL, values, conn);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
-        }
-        finally {
+        } finally {
             SQLUtil.close(conn);
         }
     }

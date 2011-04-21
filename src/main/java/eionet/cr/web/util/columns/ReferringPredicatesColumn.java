@@ -39,7 +39,7 @@ import eionet.cr.web.util.JstlFunctions;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class ReferringPredicatesColumn extends SearchResultColumn{
+public class ReferringPredicatesColumn extends SearchResultColumn {
 
     /** */
     private ReferencesActionBean actionBean;
@@ -54,7 +54,7 @@ public class ReferringPredicatesColumn extends SearchResultColumn{
         this.actionBean = actionBean;
 
         referringToHash = actionBean.getAnonHash();
-        if (referringToHash==0 && !StringUtils.isBlank(actionBean.getUri())) {
+        if (referringToHash == 0 && !StringUtils.isBlank(actionBean.getUri())) {
             referringToHash = Hashes.spoHash(actionBean.getUri());
         }
     }
@@ -82,7 +82,7 @@ public class ReferringPredicatesColumn extends SearchResultColumn{
 
                         for (ObjectDTO objectDTO:objects) {
 
-                            if (objectDTO.getSourceObjectHash()==0 && objectDTO.getHash()==referringToHash) {
+                            if (objectDTO.getSourceObjectHash() == 0 && objectDTO.getHash() == referringToHash) {
 
                                 String predicateLabel = JstlFunctions.getPredicateLabel(actionBean.getPredicateLabels(), predicate);
                                 labels.add(predicateLabel);
@@ -95,8 +95,7 @@ public class ReferringPredicatesColumn extends SearchResultColumn{
             /* return the above-found labels as a comma-separated list */
 
             return labels.isEmpty() ? "" : Util.toCSV(labels);
-        }
-        else
+        } else
             return object.toString();
     }
 

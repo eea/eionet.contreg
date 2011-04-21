@@ -27,7 +27,7 @@ import eionet.cr.common.CRRuntimeException;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class RDFLoadingException extends CRRuntimeException{
+public class RDFLoadingException extends CRRuntimeException {
 
     /**
      *

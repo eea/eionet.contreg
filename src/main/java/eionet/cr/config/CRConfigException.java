@@ -27,7 +27,7 @@ import eionet.cr.common.CRRuntimeException;
  * @author heinljab
  *
  */
-public class CRConfigException extends CRRuntimeException{
+public class CRConfigException extends CRRuntimeException {
 
     /**
      *

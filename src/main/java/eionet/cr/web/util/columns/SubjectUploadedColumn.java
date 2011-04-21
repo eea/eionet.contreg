@@ -29,7 +29,7 @@ import eionet.cr.dto.SubjectDTO;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class SubjectUploadedColumn extends SearchResultColumn{
+public class SubjectUploadedColumn extends SearchResultColumn {
 
     /** */
 

@@ -28,7 +28,7 @@ public class RegisterUrl {
      * @throws HarvestException
      */
     public static void register(String url, CRUser user, boolean saveToBookmarks)
-                                                            throws DAOException, HarvestException{
+                                                            throws DAOException, HarvestException {
         // register URL
         DAOFactory.get().getDao(HelperDAO.class).registerUserUrl(user, url, saveToBookmarks);
 

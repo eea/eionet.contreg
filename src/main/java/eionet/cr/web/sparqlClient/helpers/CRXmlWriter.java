@@ -98,8 +98,7 @@ public class CRXmlWriter implements TupleQueryResultWriter {
 
             // Write start of results
             xmlWriter.startTag(RESULT_SET_TAG);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new TupleQueryResultHandlerException(e);
         }
     }
@@ -112,8 +111,7 @@ public class CRXmlWriter implements TupleQueryResultWriter {
             xmlWriter.endTag(ROOT_TAG);
 
             xmlWriter.endDocument();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new TupleQueryResultHandlerException(e);
         }
     }
@@ -136,8 +134,7 @@ public class CRXmlWriter implements TupleQueryResultWriter {
             }
 
             xmlWriter.endTag(RESULT_TAG);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new TupleQueryResultHandlerException(e);
         }
     }
@@ -147,11 +144,9 @@ public class CRXmlWriter implements TupleQueryResultWriter {
     {
         if (value instanceof URI) {
             writeURI((URI)value);
-        }
-        else if (value instanceof BNode) {
+        } else if (value instanceof BNode) {
             writeBNode((BNode)value);
-        }
-        else if (value instanceof Literal) {
+        } else if (value instanceof Literal) {
             writeLiteral((Literal)value);
         }
     }
@@ -173,8 +168,7 @@ public class CRXmlWriter implements TupleQueryResultWriter {
     {
         if (literal.getLanguage() != null) {
             xmlWriter.setAttribute(LITERAL_LANG_ATT, literal.getLanguage());
-        }
-        else if (literal.getDatatype() != null) {
+        } else if (literal.getDatatype() != null) {
             URI datatype = literal.getDatatype();
             xmlWriter.setAttribute(LITERAL_DATATYPE_ATT, datatype.toString());
         }

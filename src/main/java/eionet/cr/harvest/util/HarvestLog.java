@@ -27,7 +27,7 @@ import org.apache.commons.logging.Log;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class HarvestLog implements Log{
+public class HarvestLog implements Log {
 
     /** */
     private Log logger;
@@ -193,7 +193,7 @@ public class HarvestLog implements Log{
 
         StringBuilder sb = new StringBuilder();
         sb.append(obj).append(" [source=").append(harvestSourceUrl);
-        if (harvestGenTime>=0) {
+        if (harvestGenTime >= 0) {
             sb.append(", genTime=").append(harvestGenTime);
         }
         sb.append("]");

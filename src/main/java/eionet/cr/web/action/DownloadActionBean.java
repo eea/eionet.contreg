@@ -39,7 +39,7 @@ public class DownloadActionBean extends AbstractActionBean {
      * @throws Exception
      */
     @DefaultHandler
-    public Resolution download() throws Exception{
+    public Resolution download() throws Exception {
 
         // get the binary content DTO of the requested file
         SpoBinaryDTO dto = DAOFactory.get().getDao(SpoBinaryDAO.class).get(uri);

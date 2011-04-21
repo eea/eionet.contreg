@@ -43,8 +43,8 @@ public enum ExportFormat {
      * @return
      */
     public static ExportFormat fromName(String exportFormat) {
-        for( ExportFormat format: ExportFormat.values()) {
-            if(format.name.equals(exportFormat)) {
+        for ( ExportFormat format: ExportFormat.values()) {
+            if (format.name.equals(exportFormat)) {
                 return format;
             }
         }

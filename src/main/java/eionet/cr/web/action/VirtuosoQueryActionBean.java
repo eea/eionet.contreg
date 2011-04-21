@@ -55,17 +55,14 @@ public class VirtuosoQueryActionBean extends AbstractActionBean {
             String result = reader.getResult();
             if (result == null || result.trim().length() == 0) {
                 result = "The query gave no results!";
-            }
-            else {
+            } else {
                 result = result + "<br/> Done, -- " + execTime + " ms.";
             }
 
             return new StreamingResolution("text/html", result);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new DAOException(e.toString(), e);
-        }
-        finally {
+        } finally {
             SesameUtil.close(conn);
         }
     }
@@ -89,7 +86,7 @@ public class VirtuosoQueryActionBean extends AbstractActionBean {
      * @author jaanus
      *
      */
-    private class ResultReader extends SPARQLResultSetBaseReader{
+    private class ResultReader extends SPARQLResultSetBaseReader {
 
         /** */
         private StringBuffer result = new StringBuffer();
@@ -125,14 +122,13 @@ public class VirtuosoQueryActionBean extends AbstractActionBean {
         @Override
         public void readRow(BindingSet bindingSet) throws ResultSetReaderException {
 
-            if(rowCounter % 2 == 0) {
+            if (rowCounter % 2 == 0) {
                 result.append("<tr class=\"odd\">");
-            }
-            else {
+            } else {
                 result.append("<tr class=\"even\">");
             }
 
-            for(Object bindingName : bindingNames) {
+            for (Object bindingName : bindingNames) {
 
                 Binding binding = bindingSet.getBinding(bindingName.toString());
 
@@ -152,7 +148,7 @@ public class VirtuosoQueryActionBean extends AbstractActionBean {
         @Override
         public void endResultSet() {
 
-            if (rowCounter>0 && result.length()>0) {
+            if (rowCounter > 0 && result.length() > 0) {
 
                 result.append("</tbody>");
                 result.append("</table>");

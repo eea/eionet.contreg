@@ -50,7 +50,7 @@ public abstract class MySQLBaseDAO {
      *
      * @return
      */
-    protected Connection getConnection() throws SQLException{
+    protected Connection getConnection() throws SQLException {
 
         return DbConnectionProvider.getConnection();
     }
@@ -61,7 +61,7 @@ public abstract class MySQLBaseDAO {
      * @throws SQLException
      * @throws DAOException
      */
-    protected Integer getLastInsertID(Connection conn) throws SQLException{
+    protected Integer getLastInsertID(Connection conn) throws SQLException {
         return MySQLUtil.getLastInsertID(conn);
     }
 
@@ -82,11 +82,9 @@ public abstract class MySQLBaseDAO {
             SQLUtil.executeQuery(sql, params, reader, conn);
             List<T>  list = reader.getResultList();
             return list;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
-        }
-        finally {
+        } finally {
             SQLUtil.close(conn);
         }
     }
@@ -103,11 +101,9 @@ public abstract class MySQLBaseDAO {
         try {
             conn = getConnection();
             SQLUtil.executeQuery(sql, reader, conn);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
-        }
-        finally {
+        } finally {
             SQLUtil.close(conn);
         }
     }
@@ -156,11 +152,9 @@ public abstract class MySQLBaseDAO {
             List<T> list = reader.getResultList();
             int rowCount = MySQLUtil.getTotalRowCount(conn);
             return new Pair<Integer,List<T>> (rowCount,list);
-        }
-        catch (Exception fatal) {
+        } catch (Exception fatal) {
             throw new DAOException(fatal.getMessage(), fatal);
-        }
-        finally {
+        } finally {
             SQLUtil.close(conn);
         }
     }

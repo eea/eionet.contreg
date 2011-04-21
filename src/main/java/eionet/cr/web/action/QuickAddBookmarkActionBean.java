@@ -41,7 +41,7 @@ public class QuickAddBookmarkActionBean extends AbstractActionBean {
     }
 
     @HandlesEvent("processForm")
-    public Resolution  addBookmark()  throws DAOException, HarvestException{
+    public Resolution  addBookmark()  throws DAOException, HarvestException {
         String url = resource.getSource();
         RegisterUrl.register(url, getUser(), saveToBookmarks);
         return new ForwardResolution("/pages/bookmarklet/bookmarkAdded.jsp");

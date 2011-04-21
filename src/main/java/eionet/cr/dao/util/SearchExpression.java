@@ -47,8 +47,7 @@ public class SearchExpression {
         try {
             Long.parseLong(expression);
             isHash = true;
-        }
-        catch (NumberFormatException nfe) {}
+        } catch (NumberFormatException nfe) {}
 
         isUri = URIUtil.isSchemedURI(expression);
     }

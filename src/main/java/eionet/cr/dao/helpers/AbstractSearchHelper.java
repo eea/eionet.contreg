@@ -33,7 +33,7 @@ import eionet.cr.util.pagination.PagingRequest;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public abstract class AbstractSearchHelper implements SearchHelper{
+public abstract class AbstractSearchHelper implements SearchHelper {
 
     /** */
     protected PagingRequest pagingRequest;
@@ -74,8 +74,7 @@ public abstract class AbstractSearchHelper implements SearchHelper{
             append(" limit ").append(pagingRequest.getItemsPerPage()).
             append(" offset ").append(pagingRequest.getOffset()).
             toString();
-        }
-        else {
+        } else {
             return query;
         }
     }

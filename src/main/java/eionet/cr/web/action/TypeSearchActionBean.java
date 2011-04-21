@@ -113,7 +113,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
     @DefaultHandler
     public Resolution preparePage() throws Exception {
         Enumeration<String> names = getContext().getRequest().getParameterNames();
-        while(names.hasMoreElements()) {
+        while (names.hasMoreElements()) {
             String next = names.nextElement();
             if (next.startsWith("removeFilter_")) {
                 clearFilter = next.replaceFirst("removeFilter_", "");

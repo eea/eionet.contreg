@@ -52,14 +52,11 @@ public class SPARQLEndpoints extends ArrayList<String>{
             for (Object key : properties.keySet()) {
                 this.add(key.toString());
             }
-        }
-        catch (InvalidPropertiesFormatException e) {
+        } catch (InvalidPropertiesFormatException e) {
             logger.error("Failed to load endpoints from " + FILENAME, e);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             logger.error("Failed to load endpoints from " + FILENAME, e);
-        }
-        finally {
+        } finally {
             IOUtils.closeQuietly(inputStream);
         }
     }

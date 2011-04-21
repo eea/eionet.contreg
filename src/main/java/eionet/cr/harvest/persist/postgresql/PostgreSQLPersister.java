@@ -58,7 +58,7 @@ import eionet.cr.util.sql.SQLUtil;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class PostgreSQLPersister implements IHarvestPersister{
+public class PostgreSQLPersister implements IHarvestPersister {
 
     /** */
     private String spoTempTableName = "SPO_TEMP";
@@ -147,8 +147,7 @@ public class PostgreSQLPersister implements IHarvestPersister{
             if (tripleCounter % BULK_INSERT_SIZE == 0) {
                 executeBatch();
             }
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             throw new PersisterException(e.getMessage(), e);
         }
     }
@@ -190,8 +189,7 @@ public class PostgreSQLPersister implements IHarvestPersister{
             if (tripleCounter % BULK_INSERT_SIZE == 0) {
                 executeBatch();
             }
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             throw new PersisterException(e.getMessage(), e);
         }
     }
@@ -206,8 +204,7 @@ public class PostgreSQLPersister implements IHarvestPersister{
             preparedStatementForResources.setString(1, uri);
             preparedStatementForResources.setLong(2, uriHash);
             preparedStatementForResources.addBatch();
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             throw new PersisterException(e.getMessage(), e);
         }
     }
@@ -243,8 +240,7 @@ public class PostgreSQLPersister implements IHarvestPersister{
 
             // commit all changes made during this harvest
             connection.commit();
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             throw new PersisterException(e.getMessage(), e);
         }
     }
@@ -258,8 +254,7 @@ public class PostgreSQLPersister implements IHarvestPersister{
         if (connection != null) {
             try {
                 connection.rollback();
-            }
-            catch (SQLException e) {
+            } catch (SQLException e) {
                 throw new PersisterException(e.getMessage(), e);
             }
         }
@@ -285,19 +280,18 @@ public class PostgreSQLPersister implements IHarvestPersister{
             System.gc();
 
             int len = tripleCounts.length;
-            for (int i=0; i<len; i++) {
+            for (int i = 0; i < len; i++) {
                 storedTriplesCount = storedTriplesCount + tripleCounts[i];
             }
             len = sourceMetadataCounts.length;
-            for (int i=0; i<len; i++) {
+            for (int i = 0; i < len; i++) {
                 storedTriplesCount = storedTriplesCount + sourceMetadataCounts[i];
             }
 
             if (tripleCounter % TRIPLE_PROGRESS_INTERVAL == 0) {
                 logger.debug("Progress: " + String.valueOf(tripleCounter) + " triples processed");
             }
-        }
-        catch(SQLException e) {
+        } catch(SQLException e) {
             throw new PersisterException(e.getMessage(), e);
         }
     }
@@ -359,8 +353,7 @@ public class PostgreSQLPersister implements IHarvestPersister{
 
                 SQLUtil.executeUpdate(buf.toString(), getConnection());
             }
-        }
-        catch (SQLException fatal) {
+        } catch (SQLException fatal) {
             throw new PersisterException(fatal.getMessage(), fatal);
         }
     }
@@ -381,7 +374,7 @@ public class PostgreSQLPersister implements IHarvestPersister{
      *
      * @throws SQLException
      */
-    private void prepareStatementForTriples() throws SQLException{
+    private void prepareStatementForTriples() throws SQLException {
 
         StringBuffer buf = new StringBuffer().
         append("insert into SPO (SUBJECT,PREDICATE,OBJECT,OBJECT_HASH,OBJECT_DOUBLE").
@@ -397,7 +390,7 @@ public class PostgreSQLPersister implements IHarvestPersister{
      *
      * @throws SQLException
      */
-    private void prepareStatementForSourceMetadata() throws SQLException{
+    private void prepareStatementForSourceMetadata() throws SQLException {
 
         StringBuffer buf = new StringBuffer().
         append("insert into SPO (SUBJECT,PREDICATE,OBJECT,OBJECT_HASH,OBJECT_DOUBLE").
@@ -413,7 +406,7 @@ public class PostgreSQLPersister implements IHarvestPersister{
      *
      * @throws SQLException
      */
-    private void prepareStatementForResources() throws SQLException{
+    private void prepareStatementForResources() throws SQLException {
 
         StringBuffer buf = new StringBuffer().
         append("insert into RESOURCE (URI,URI_HASH,FIRSTSEEN_SOURCE,FIRSTSEEN_TIME,LASTMODIFIED_TIME)").
@@ -427,7 +420,7 @@ public class PostgreSQLPersister implements IHarvestPersister{
      *
      * @throws SQLException
      */
-    private void raiseUnfinishedHarvestFlag() throws SQLException{
+    private void raiseUnfinishedHarvestFlag() throws SQLException {
 
         StringBuffer buf = new StringBuffer();
         buf.append("insert into UNFINISHED_HARVEST (SOURCE, GEN_TIME) values (").
@@ -440,7 +433,7 @@ public class PostgreSQLPersister implements IHarvestPersister{
      *
      * @throws SQLException
      */
-    private void deleteUnfinishedHarvestFlag() throws SQLException{
+    private void deleteUnfinishedHarvestFlag() throws SQLException {
 
         StringBuffer buf = new StringBuffer();
         buf.append("delete from UNFINISHED_HARVEST where SOURCE=").append(sourceUrlHash).append(" and GEN_TIME=").append(genTime);
@@ -452,7 +445,7 @@ public class PostgreSQLPersister implements IHarvestPersister{
      *
      * @throws SQLException
      */
-    private static void deleteUnfinishedHarvestFlag(long sourceUrlHash, long genTime, Connection conn) throws SQLException{
+    private static void deleteUnfinishedHarvestFlag(long sourceUrlHash, long genTime, Connection conn) throws SQLException {
 
         StringBuffer buf = new StringBuffer();
         buf.append("delete from UNFINISHED_HARVEST where SOURCE=").append(sourceUrlHash).append(" and GEN_TIME=").append(genTime);
@@ -498,11 +491,9 @@ public class PostgreSQLPersister implements IHarvestPersister{
                     }
                 }
             }
-        }
-        catch (SQLException fatal) {
+        } catch (SQLException fatal) {
             throw new PersisterException(fatal.getMessage(), fatal);
-        }
-        finally {
+        } finally {
             SQLUtil.close(rs);
             SQLUtil.close(stmt);
             SQLUtil.close(conn);
@@ -517,7 +508,7 @@ public class PostgreSQLPersister implements IHarvestPersister{
      * @throws SQLException
      */
     private static void rollbackUnfinishedHarvest(
-            long sourceUrlHash, long genTime, Connection conn) throws SQLException{
+            long sourceUrlHash, long genTime, Connection conn) throws SQLException {
 
         try {
             // start transaction
@@ -549,8 +540,7 @@ public class PostgreSQLPersister implements IHarvestPersister{
             deleteUnfinishedHarvestFlag(sourceUrlHash, genTime, conn);
 
             conn.commit();
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             try {conn.rollback();}catch (SQLException ee) {}
             throw e;
         }
@@ -601,12 +591,10 @@ public class PostgreSQLPersister implements IHarvestPersister{
             pstmt.execute();
 
             conn.commit();
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             SQLUtil.rollback(conn);
             throw e;
-        }
-        finally {
+        } finally {
             SQLUtil.close(pstmt);
             SQLUtil.close(conn);
         }

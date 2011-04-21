@@ -29,7 +29,7 @@ import eionet.cr.dto.SubjectDTO;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class SubjectLastModifiedColumn extends SearchResultColumn{
+public class SubjectLastModifiedColumn extends SearchResultColumn {
 
     /*
      * (non-Javadoc)
@@ -40,7 +40,7 @@ public class SubjectLastModifiedColumn extends SearchResultColumn{
         String result = "";
         if (object != null && object instanceof SubjectDTO) {
             Date date = ((SubjectDTO)object).getLastModifiedTime();
-            if (date != null && date.getTime()>0) {
+            if (date != null && date.getTime() > 0) {
                 result = SIMPLE_DATE_FORMAT.format(date);
             }
         }

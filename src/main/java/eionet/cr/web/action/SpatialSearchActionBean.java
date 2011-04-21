@@ -85,7 +85,7 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
      * @throws DAOException
      */
     @DefaultHandler
-    public Resolution onEventUnspecified() throws DAOException{
+    public Resolution onEventUnspecified() throws DAOException {
 
         if (BBOX != null)
             return doKml();
@@ -100,7 +100,7 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
      * @return
      * @throws DAOException
      */
-    private Resolution doKml() throws DAOException{
+    private Resolution doKml() throws DAOException {
 
         logger.debug("KML requested, BBOX = " + BBOX);
 
@@ -123,8 +123,7 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
 
         try {
             getContext().getRequest().setCharacterEncoding("UTF-8");
-        }
-        catch (UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e.toString(), e);
         }
         getContext().getResponse().setHeader("Content-Disposition", "attachment; filename=placemarks.kml");
@@ -222,12 +221,10 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
         if (sources.isEmpty()) {
             addSystemMessage("No spatial objects currently found!");
             return new ForwardResolution("/pages/googleEarthIntro.jsp");
-        }
-        else {
+        } else {
             try {
                 getContext().getRequest().setCharacterEncoding("UTF-8");
-            }
-            catch (UnsupportedEncodingException e) {
+            } catch (UnsupportedEncodingException e) {
                 throw new RuntimeException(e.toString(), e);
             }
             getContext().getResponse().setHeader("Content-Disposition", "attachment; filename=kmllinks.kml");

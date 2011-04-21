@@ -26,7 +26,7 @@ package eionet.cr.dto;
  * @author heinljab
  *
  */
-public class HarvestDTO extends HarvestBaseDTO implements java.io.Serializable{
+public class HarvestDTO extends HarvestBaseDTO implements java.io.Serializable {
 
     private Integer harvestId;
     private Integer harvestSourceId;

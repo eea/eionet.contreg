@@ -112,8 +112,7 @@ public class DbConnectionProvider {
         try {
             Class.forName(drv);
             return DriverManager.getConnection(url, usr, pwd);
-        }
-        catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException e) {
             throw new CRRuntimeException("Failed to get connection, driver class not found: " + drv, e);
         }
     }

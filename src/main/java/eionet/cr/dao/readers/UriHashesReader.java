@@ -32,7 +32,7 @@ import eionet.cr.util.sql.SQLResultSetBaseReader;
  *
  */
 @SuppressWarnings("rawtypes")
-public class UriHashesReader extends SQLResultSetBaseReader{
+public class UriHashesReader extends SQLResultSetBaseReader {
 
     /** */
     private Map<Long,String> urisByHashes;

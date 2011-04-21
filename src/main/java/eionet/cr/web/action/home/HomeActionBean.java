@@ -37,7 +37,7 @@ import eionet.cr.web.action.AbstractActionBean;
  */
 
 @UrlBinding("/home/{username}")
-public class HomeActionBean extends AbstractActionBean{
+public class HomeActionBean extends AbstractActionBean {
 
     /**
      *

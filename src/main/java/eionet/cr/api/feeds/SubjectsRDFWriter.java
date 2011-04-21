@@ -92,7 +92,7 @@ public class SubjectsRDFWriter {
     private String getAttributes() {
 
         StringBuffer buf = new StringBuffer("");
-        if (xmlLang != null && xmlLang.trim().length()>0) {
+        if (xmlLang != null && xmlLang.trim().length() > 0) {
             buf.append(" xml:lang=\"").append(xmlLang).append("\"");
         }
 

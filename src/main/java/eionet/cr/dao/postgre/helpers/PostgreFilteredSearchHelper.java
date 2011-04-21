@@ -41,7 +41,7 @@ import eionet.cr.web.util.columns.SubjectLastModifiedColumn;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class PostgreFilteredSearchHelper extends AbstractSearchHelper{
+public class PostgreFilteredSearchHelper extends AbstractSearchHelper {
 
     /** */
     private Map<String, String> filters;
@@ -94,8 +94,7 @@ public class PostgreFilteredSearchHelper extends AbstractSearchHelper{
         if (sortPredicate.equals(SubjectLastModifiedColumn.class.getSimpleName())) {
             subSelect.append(" RESOURCE.LASTMODIFIED_TIME as OBJECT_ORDERED_BY from " + getSpoTableName()+ " as SPO1").
             append(" left join RESOURCE on (SPO1.SUBJECT=RESOURCE.URI_HASH)");
-        }
-        else {
+        } else {
             subSelect.append(" ORDERING.OBJECT as OBJECT_ORDERED_BY from " + getSpoTableName()+ " as SPO1").
             append(" left join SPO as ORDERING").
             append(" on (SPO1.SUBJECT=ORDERING.SUBJECT and ORDERING.PREDICATE=").
@@ -107,7 +106,7 @@ public class PostgreFilteredSearchHelper extends AbstractSearchHelper{
 
         int index = getSpoTableIndex();
         StringBuffer whereBuf = new StringBuffer(getSpoTableCriteria());
-        for(Entry<String,String> entry : filters.entrySet()) {
+        for (Entry<String,String> entry : filters.entrySet()) {
 
             String predicateUri = entry.getKey();
             String objectValue = entry.getValue();
@@ -123,8 +122,7 @@ public class PostgreFilteredSearchHelper extends AbstractSearchHelper{
                 if (!requireFullTextSearch(predicateUri, objectValue)) {
                     whereBuf.append(spoAlias).append(".OBJECT_HASH=").
                     append(Hashes.spoHash(StringUtils.strip(objectValue, "\"")));
-                }
-                else {
+                } else {
                     whereBuf.append("to_tsvector('simple', ").append(spoAlias).
                     append(".OBJECT) @@ to_tsquery('simple', ?)").
                     append(" and ").append(spoAlias).append(".LIT_OBJ='Y'");
@@ -147,7 +145,7 @@ public class PostgreFilteredSearchHelper extends AbstractSearchHelper{
         }
 
         // finish the query by adding the above-created "where" part
-        if(whereBuf.length() > 0) {
+        if (whereBuf.length() > 0) {
             subSelect.append(" where ").append(whereBuf);
         }
 
@@ -175,7 +173,7 @@ public class PostgreFilteredSearchHelper extends AbstractSearchHelper{
 
         int index = getSpoTableIndex();
         StringBuffer whereBuf = new StringBuffer(getSpoTableCriteria());
-        for(Entry<String,String> entry : filters.entrySet()) {
+        for (Entry<String,String> entry : filters.entrySet()) {
 
             String predicateUri = entry.getKey();
             String objectValue = entry.getValue();
@@ -191,8 +189,7 @@ public class PostgreFilteredSearchHelper extends AbstractSearchHelper{
 
                     whereBuf.append(spoAlias).append(".OBJECT_HASH=").
                     append(Hashes.spoHash(StringUtils.strip(objectValue, "\"")));
-                }
-                else {
+                } else {
                     whereBuf.append("to_tsvector('simple', ").append(spoAlias).
                     append(".OBJECT) @@ to_tsquery('simple', ?)").
                     append(" and ").append(spoAlias).append(".LIT_OBJ='Y'");
@@ -215,7 +212,7 @@ public class PostgreFilteredSearchHelper extends AbstractSearchHelper{
         }
 
         // finish the query by adding the above-created "where" part
-        if(whereBuf.length()>0) {
+        if (whereBuf.length() > 0) {
             query.append(" where ").append(whereBuf);
         }
 
@@ -296,7 +293,7 @@ public class PostgreFilteredSearchHelper extends AbstractSearchHelper{
      * @param value
      */
     protected void addFilter(String key, String value) {
-        if(this.filters == null) {
+        if (this.filters == null) {
             this.filters = new HashMap<String, String>();
         }
         filters.put(key, value);
@@ -307,7 +304,7 @@ public class PostgreFilteredSearchHelper extends AbstractSearchHelper{
      * @param key
      */
     protected void removeFilter(String key) {
-        if(this.filters != null && filters.containsKey(key)) {
+        if (this.filters != null && filters.containsKey(key)) {
             filters.remove(key);
         }
     }
@@ -342,7 +339,7 @@ public class PostgreFilteredSearchHelper extends AbstractSearchHelper{
         if (requiresFullTextSearch == null) {
 
             requiresFullTextSearch = Boolean.FALSE;
-            for(Entry<String,String> entry : filters.entrySet()) {
+            for (Entry<String,String> entry : filters.entrySet()) {
 
                 String predicateUri = entry.getKey();
                 String objectValue = entry.getValue();

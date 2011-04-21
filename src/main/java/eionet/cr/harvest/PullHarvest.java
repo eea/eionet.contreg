@@ -121,8 +121,7 @@ public class PullHarvest extends Harvest {
 
                 sourceAvailable = Boolean.TRUE;
                 logger.debug("Harvesting the already downloaded file");
-            }
-            else {
+            } else {
                 // delete the old file, should it exist
                 if (file.exists()) {
                     file.delete();
@@ -137,8 +136,7 @@ public class PullHarvest extends Harvest {
                 try {
                     harvestUrlConnection.openInputStream();
                     sourceAvailable = harvestUrlConnection.isSourceAvailable();
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     logger.warn(e.toString());
                 }
 
@@ -147,8 +145,7 @@ public class PullHarvest extends Harvest {
                     try {
                         daoWriter = null; // we dont't want finishing actions to be done
                         DAOFactory.get().getDao(HarvestSourceDAO.class).queueSourcesForDeletion(Collections.singletonList(sourceUrlString));
-                    }
-                    catch (DAOException e) {
+                    } catch (DAOException e) {
                         logger.warn("Failure when deleting the source", e);
                     }
                     return;
@@ -157,9 +154,8 @@ public class PullHarvest extends Harvest {
                 // if source not available (i.e. link broken) then just set the last-refreshed metadata
                 if (harvestUrlConnection.isSourceAvailable() == false) {
                     setLastRefreshed(harvestUrlConnection.getConnection(), System.currentTimeMillis());
-                }
+                } else {
                 // source is available, so continue to extract it's contents and metadata
-                else {
 
                     // extract various metadata about this harvest source from url connection object
                     setSourceMetadata(harvestUrlConnection.getConnection());
@@ -176,15 +172,13 @@ public class PullHarvest extends Harvest {
                     contentType = sourceMetadata.getObjectValue(Predicates.CR_MEDIA_TYPE);
                     if (contentType != null && !isSupportedContentType(contentType)) {
                         logger.debug("Unsupported response content type: " + contentType);
-                    }
-                    else {
+                    } else {
                         logger.debug("Response content type was " + contentType);
                         if (harvestUrlConnection.isHttpConnection() && harvestUrlConnection.getResponseCode() == HttpURLConnection.HTTP_NOT_MODIFIED) {
 
                             handleSourceNotModified();
                             return;
-                        }
-                        else {
+                        } else {
                             logger.debug("Streaming the content to file " + file);
                             // save the stream to file
                             totalBytes = FileUtil.streamToFile(harvestUrlConnection.getInputStream(), file);
@@ -197,11 +191,9 @@ public class PullHarvest extends Harvest {
                     }
                 } // if Source is available.
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new HarvestException(e.toString(), e);
-        }
-        finally {
+        } finally {
             // close input stream
             try {
                 if (harvestUrlConnection != null && harvestUrlConnection.getInputStream() != null)
@@ -230,15 +222,13 @@ public class PullHarvest extends Harvest {
         if (fileSize == 0) {
             file = null;
             logger.debug("File size = 0");
-        }
-        else {
+        } else {
             // see if file is zipped, and if yes, then unzip
             unGZipped = unCompressGZip(file);
             if (unGZipped != null) {
                 logger.debug("The file was gzipped, going to process unzipped file now");
                 file = unGZipped;
-            }
-            else if (contentType != null && !isXmlContentType(contentType)) {
+            } else if (contentType != null && !isXmlContentType(contentType)) {
                 file = null;
             }
         }
@@ -258,15 +248,13 @@ public class PullHarvest extends Harvest {
                         inputStream = new FileInputStream(file);
                         arpSource = new InputStreamBasedARPSource(inputStream);
                     }
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     throw new HarvestException(e.toString(), e);
                 }
             }
 
             harvest(arpSource);
-        }
-        finally {
+        } finally {
             // close input stream
             if (inputStream != null) {
                 try { inputStream.close(); } catch (Exception e) { logger.error(e.toString(), e);}
@@ -390,8 +378,7 @@ public class PullHarvest extends Harvest {
                     // Saving the updated source to database.
                     DAOFactory.get().getDao(HarvestSourceDAO.class).editSource(directedSource);
                 }
-            }
-            else {
+            } else {
                 directedSource = new HarvestSourceDTO();
                 directedSource.setPrioritySource(true);
                 directedSource.setIntervalMinutes(originalSource.getIntervalMinutes());
@@ -421,8 +408,7 @@ public class PullHarvest extends Harvest {
                 // when initializing the harvest that way. The value for Urgent is also received there.
                 if (this.isFullSetupMode()) {
                     harvest = createFullSetup(directedSource, this.isFullSetupModeUrgent());
-                }
-                else {
+                } else {
                     harvest = new PullHarvest(directedSource.getUrl(), null);
                 }
 
@@ -452,8 +438,7 @@ public class PullHarvest extends Harvest {
                 if (conversionModified != null) {
                     logger.debug("The source's RDF conversion not modified since" + lastHarvest.toString());
                 }
-            }
-            else {
+            } else {
                 logger.debug("The source has an RDF conversion that has been modified since last harvest");
             }
         }
@@ -565,8 +550,7 @@ public class PullHarvest extends Harvest {
                 if (convParser != null) {
                     conversionId = convParser.getRdfConversionId();
                 }
-            }
-            else {
+            } else {
                 logger.debug("No schema or DTD declared");
             }
         }
@@ -578,8 +562,7 @@ public class PullHarvest extends Harvest {
 
             logger.debug("No RDF conversion found, trying to parse as RDF");
             return file;
-        }
-        else {
+        } else {
             logger.debug("Going to run the found RDF conversion (id = " + conversionId + ")");
 
             // prepare conversion URL
@@ -686,8 +669,7 @@ public class PullHarvest extends Harvest {
             if (GeneralConfig.getProperty(GeneralConfig.HARVESTER_DELETE_DOWNLOADED_FILES, "true").equals("true")) {
                 file.delete();
             }
-        }
-        catch (RuntimeException e) {
+        } catch (RuntimeException e) {
             logger.error(e.toString(), e);
         }
     }

@@ -30,13 +30,13 @@ import eionet.cr.dto.SpoBinaryDTO;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class MySQLSpoBinaryDAO extends MySQLBaseDAO implements SpoBinaryDAO{
+public class MySQLSpoBinaryDAO extends MySQLBaseDAO implements SpoBinaryDAO {
 
     /*
      * (non-Javadoc)
      * @see eionet.cr.dao.SpoBinaryDAO#add(eionet.cr.dto.SpoBinaryDTO, long)
      */
-    public void add(SpoBinaryDTO dto, long contentSize) throws DAOException{
+    public void add(SpoBinaryDTO dto, long contentSize) throws DAOException {
         throw new UnsupportedOperationException("Method not implemented");
     }
 

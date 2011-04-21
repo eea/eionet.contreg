@@ -65,10 +65,8 @@ public class UnicodeUtils {
 
                         try {
                             decimal = Integer.parseInt(sDecimal);
-                        }
-                        catch (Exception e) {}
-                    }
-                    else {
+                        } catch (Exception e) {}
+                    } else {
                         // handle entity
                         String ent = str.substring(i + 1, j);
                         decimal = UnicodeUtils.getEntityReferenceDecimal(ent);

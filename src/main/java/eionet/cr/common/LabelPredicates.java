@@ -29,7 +29,7 @@ import eionet.cr.util.Hashes;
  *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  */
-public class LabelPredicates{
+public class LabelPredicates {
 
     /** */
     private static final LabelPredicates instance = new LabelPredicates();
@@ -56,7 +56,7 @@ public class LabelPredicates{
         predicateHashes = new String[predicates.size()];
         for (Iterator<String> iter=predicates.iterator(); iter.hasNext(); i++) {
             predicateHashes[i] = String.valueOf(Hashes.spoHash(iter.next()));
-            if (i>0)
+            if (i > 0)
                 buf.append(",");
             buf.append(predicateHashes[i]);
         }

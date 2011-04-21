@@ -139,7 +139,7 @@ public class SPARQLEndpoint {
                             PrintWriter outWriter = new PrintWriter(out);
                             outWriter.println("<table><tr>");
                             List<String> names = bindings.getBindingNames();
-                            for(String name : names) {
+                            for (String name : names) {
                                 outWriter.println("<th>");
                                 outWriter.println(name);
                                 outWriter.println("</th>");

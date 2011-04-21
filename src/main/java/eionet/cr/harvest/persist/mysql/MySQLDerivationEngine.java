@@ -42,7 +42,7 @@ import eionet.cr.util.sql.SQLUtil;
  * @author Aleksandr Ivanov
  * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
-public class MySQLDerivationEngine implements IDerivationEngine{
+public class MySQLDerivationEngine implements IDerivationEngine {
 
     /** */
     private Log logger;
@@ -71,7 +71,7 @@ public class MySQLDerivationEngine implements IDerivationEngine{
      * (non-Javadoc)
      * @see eionet.cr.harvest.persist.IDerivationEngine#deriveLabels()
      */
-    public void deriveLabels() throws SQLException{
+    public void deriveLabels() throws SQLException {
 
         logger.debug("Deriving labels");
 
@@ -125,7 +125,7 @@ public class MySQLDerivationEngine implements IDerivationEngine{
      * (non-Javadoc)
      * @see eionet.cr.harvest.persist.IDerivationEngine#deriveParentClasses()
      */
-    public void deriveParentClasses() throws SQLException{
+    public void deriveParentClasses() throws SQLException {
 
         logger.debug("Deriving parent-classes");
 
@@ -177,7 +177,7 @@ public class MySQLDerivationEngine implements IDerivationEngine{
      * (non-Javadoc)
      * @see eionet.cr.harvest.persist.IDerivationEngine#deriveParentProperties()
      */
-    public void deriveParentProperties() throws SQLException{
+    public void deriveParentProperties() throws SQLException {
 
         logger.debug("Deriving parent-properties");
 

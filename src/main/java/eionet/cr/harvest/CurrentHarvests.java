@@ -38,7 +38,7 @@ public class CurrentHarvests {
     /**
      *
      */
-    static{
+    static {
         onDemandHarvests = new HashMap<String,String>();
     }
 

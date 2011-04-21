@@ -33,7 +33,7 @@ public class NextHarvestsUrgencyScoreColumn extends SearchResultColumn {
 
             if (columnType == COLUMN.LASTHARVEST) {
                 Date date = harvestUrgencyScore .getLastHarvest();
-                if (date != null && date.getTime()>0) {
+                if (date != null && date.getTime() > 0) {
                     result = SIMPLE_DATE_FORMAT.format(date);
                 }
             }

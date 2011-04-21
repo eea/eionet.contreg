@@ -97,7 +97,7 @@ public class ActionEventInterceptor implements Interceptor {
             //ok, let's start parsing
             Matcher paramMatcher = Pattern.compile(matcher.group(1)+"=([^&]*)").matcher(params);
             //let's find a value to this one
-            if(!paramMatcher.find()) {
+            if (!paramMatcher.find()) {
                 //didn't find a value for this param, cannot substitute anything
                 continue;
             }
@@ -149,11 +149,11 @@ public class ActionEventInterceptor implements Interceptor {
         String parameter = null;
         String[] parameterValues = null;
 
-        while(parameters.hasMoreElements()) {
+        while (parameters.hasMoreElements()) {
             parameter = parameters.nextElement();
             parameterValues = request.getParameterValues(parameter);
 
-            if(parameterValues == null || parameterValues.length == 0) {
+            if (parameterValues == null || parameterValues.length == 0) {
                 sb.append(parameter + "=&");
             } else {
                 for (String parameterValue : parameterValues) {

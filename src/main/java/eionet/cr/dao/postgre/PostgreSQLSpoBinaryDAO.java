@@ -46,7 +46,7 @@ import eionet.cr.util.sql.SQLUtil;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class PostgreSQLSpoBinaryDAO extends PostgreSQLBaseDAO implements SpoBinaryDAO{
+public class PostgreSQLSpoBinaryDAO extends PostgreSQLBaseDAO implements SpoBinaryDAO {
 
     /** */
     private static final String sqlAdd = "insert into SPO_BINARY "

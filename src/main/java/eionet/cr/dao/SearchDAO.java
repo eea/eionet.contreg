@@ -40,7 +40,7 @@ import eionet.cr.util.pagination.PagingRequest;
  * @author Aleksandr Ivanov
  * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
-public interface SearchDAO extends DAO{
+public interface SearchDAO extends DAO {
 
     /**
      * @param expression - search expression to find

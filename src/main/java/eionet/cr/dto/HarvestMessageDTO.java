@@ -25,7 +25,7 @@ package eionet.cr.dto;
  * @author heinljab
  *
  */
-public class HarvestMessageDTO implements java.io.Serializable{
+public class HarvestMessageDTO implements java.io.Serializable {
 
     /** */
     Integer harvestId = null;

@@ -42,7 +42,7 @@ import eionet.cr.dao.UrgentHarvestQueueDAO;
  * @author heinljab, altnyris
  *
  */
-public final class PostgreSQLDAOFactory extends DAOFactory{
+public final class PostgreSQLDAOFactory extends DAOFactory {
 
     /** */
     private static PostgreSQLDAOFactory instance;
@@ -77,7 +77,7 @@ public final class PostgreSQLDAOFactory extends DAOFactory{
      * @return
      */
     public static PostgreSQLDAOFactory get() {
-        if(instance == null) {
+        if (instance == null) {
             instance = new PostgreSQLDAOFactory();
         }
         return instance;
@@ -94,8 +94,7 @@ public final class PostgreSQLDAOFactory extends DAOFactory{
         try {
             Class implClass = registeredDaos.get(implementedInterface);
             return (T) implClass.newInstance();
-        }
-        catch (Exception fatal) {
+        } catch (Exception fatal) {
             throw new RuntimeException(fatal);
         }
     }

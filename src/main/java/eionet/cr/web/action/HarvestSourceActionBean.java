@@ -420,7 +420,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
                 if (harvestSource.getIntervalMinutes().intValue() < 0
                         || intervalMultiplier < 0) {
                     addGlobalValidationError(new SimpleError(
-                            "Harvest interval must be >=0"));
+                            "Harvest interval must be >= 0"));
                 } else {
                     harvestSource.setIntervalMinutes(new Integer(harvestSource
                             .getIntervalMinutes().intValue()

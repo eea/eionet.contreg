@@ -28,7 +28,7 @@ import eionet.cr.dto.SpoBinaryDTO;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public interface SpoBinaryDAO extends DAO{
+public interface SpoBinaryDAO extends DAO {
 
     /**
      *

@@ -37,7 +37,7 @@ import eionet.cr.util.sql.PairReader;
  *
  */
 
-public class PostgreSQLTagsDAO extends PostgreSQLBaseDAO implements TagsDAO{
+public class PostgreSQLTagsDAO extends PostgreSQLBaseDAO implements TagsDAO {
 
     private static final String getTagsWithFrequencies_SQL =
         "select OBJECT as LCOL, count(*) as RCOL from SPO where PREDICATE =? " +
@@ -54,7 +54,7 @@ public class PostgreSQLTagsDAO extends PostgreSQLBaseDAO implements TagsDAO{
         List<Pair<String,Long>> pairList = pairReader.getResultList();
 
         List<TagDTO> resultList = new ArrayList<TagDTO>(pairList.size());
-        int maxTagCount = pairList.size()>0 ? pairList.get(0).getRight().intValue() : 0;
+        int maxTagCount = pairList.size() > 0 ? pairList.get(0).getRight().intValue() : 0;
 
         for (Pair<String, Long> tagPair : pairList) {
             resultList.add(new TagDTO(tagPair.getLeft(), tagPair.getRight().intValue(), maxTagCount));

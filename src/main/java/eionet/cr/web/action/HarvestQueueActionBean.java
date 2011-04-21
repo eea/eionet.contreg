@@ -47,7 +47,7 @@ import eionet.cr.harvest.scheduled.HarvestingJob;
  *
  */
 @UrlBinding("/harvestQueue.action")
-public class HarvestQueueActionBean extends AbstractActionBean{
+public class HarvestQueueActionBean extends AbstractActionBean {
 
     /** */
     private static final String TYPE_BATCH = "batch";
@@ -82,15 +82,14 @@ public class HarvestQueueActionBean extends AbstractActionBean{
      * @throws DAOException
      */
     @DefaultHandler
-    public Resolution view() throws DAOException{
+    public Resolution view() throws DAOException {
 
         if (getQueueType().equals(TYPE_BATCH)) {
             batchQueue = HarvestingJob.getBatchHarvestingQueue();
             if (batchQueue  ==  null || batchQueue.isEmpty()) {
                 batchQueue = HarvestingJob.getNextScheduledSources();
             }
-        }
-        else {
+        } else {
             urgentQueue = factory.getDao(UrgentHarvestQueueDAO.class).getUrgentHarvestQueue();
         }
 

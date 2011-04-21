@@ -27,7 +27,7 @@ import com.hp.hpl.jena.rdf.arp.AResource;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class AResourceImpl implements AResource{
+public class AResourceImpl implements AResource {
 
     /** */
     private String uri;

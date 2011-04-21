@@ -73,7 +73,7 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
      * (non-Javadoc)
      * @see eionet.cr.web.action.AbstractSearchActionBean#search()
      */
-    public Resolution search() throws DAOException{
+    public Resolution search() throws DAOException {
 
         SearchExpression searchExpression = new SearchExpression(this.searchExpression);
         FreeTextSearchHelper.FilterType filterType = FreeTextSearchHelper.FilterType.ANY_OBJECT;
@@ -84,20 +84,15 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 
                 if (simpleFilter.equals("anyObject")) {
                     filterType = FreeTextSearchHelper.FilterType.ANY_OBJECT;
-                }
-                else if (simpleFilter.equals("anyFile")) {
+                } else if (simpleFilter.equals("anyFile")) {
                     filterType = FreeTextSearchHelper.FilterType.ANY_FILE;
-                }
-                else if (simpleFilter.equals("texts")) {
+                } else if (simpleFilter.equals("texts")) {
                     filterType = FreeTextSearchHelper.FilterType.TEXTS;
-                }
-                else if (simpleFilter.equals("datasets")) {
+                } else if (simpleFilter.equals("datasets")) {
                     filterType = FreeTextSearchHelper.FilterType.DATASETS;
-                }
-                else if (simpleFilter.equals("images")) {
+                } else if (simpleFilter.equals("images")) {
                     filterType = FreeTextSearchHelper.FilterType.IMAGES;
-                } 
-                else if (simpleFilter.equals("exactMatch")) {
+                } else if (simpleFilter.equals("exactMatch")) {
                     exactMatch = true;
                 }
             }
@@ -127,7 +122,7 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
                 matchCount = result.getLeft();
 
                 int exactRowCountLimit = DAOFactory.get().getDao(SearchDAO.class).getExactRowCountLimit();
-                exactCount = exactRowCountLimit<=0 || matchCount<=exactRowCountLimit;
+                exactCount = exactRowCountLimit <= 0 || matchCount <= exactRowCountLimit;
             }
         }
 

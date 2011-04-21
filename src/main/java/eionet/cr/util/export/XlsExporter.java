@@ -140,7 +140,7 @@ public class XlsExporter extends Exporter implements SubjectExportEvent {
     @Override
     protected PagingRequest getRowLimitPagingRequest() {
 
-        if (getRowsLimit()>0) {
+        if (getRowsLimit() > 0) {
             return PagingRequest.create(1,getRowsLimit());
         } else {
             return null;

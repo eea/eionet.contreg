@@ -245,7 +245,7 @@ public class SQLUtil {
     public static PreparedStatement prepareStatement(String parameterizedSQL, List<?> values, Connection conn) throws SQLException {
 
         PreparedStatement pstmt= conn.prepareStatement(parameterizedSQL);
-        for (int i=0; values != null && i < values.size(); i++) {
+        for (int i = 0; values != null && i < values.size(); i++) {
             pstmt.setObject(i+1, values.get(i));
         }
         return pstmt;

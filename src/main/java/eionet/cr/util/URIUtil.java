@@ -60,8 +60,7 @@ public class URIUtil {
                 initSchemes();
 
             return schemes.contains(uri.getScheme());
-        }
-        catch (URISyntaxException e) {
+        } catch (URISyntaxException e) {
             return false;
         }
     }
@@ -77,7 +76,7 @@ public class URIUtil {
         if (URLUtil.isURL(uri)) {
 
             int i = Math.max(uri.lastIndexOf('#'), uri.lastIndexOf('/'));
-            if (i>=0) {
+            if (i >= 0) {
                 result = uri.substring(i+1);
                 if (result.trim().length() == 0) {
                     result = null;
@@ -100,7 +99,7 @@ public class URIUtil {
         if (URLUtil.isURL(uri)) {
 
             int i = Math.max(uri.lastIndexOf('#'), uri.lastIndexOf('/'));
-            if (i>=0) {
+            if (i >= 0) {
                 result = uri.substring(i+1);
                 if (result.trim().length() == 0) {
                     result = null;

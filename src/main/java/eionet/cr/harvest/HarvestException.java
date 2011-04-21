@@ -27,7 +27,7 @@ import eionet.cr.common.CRException;
  * @author heinljab
  *
  */
-public class HarvestException extends CRException{
+public class HarvestException extends CRException {
 
     /**
      *

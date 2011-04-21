@@ -11,7 +11,7 @@ import eionet.cr.util.sql.DbConnectionProvider;
  * @author jaanus
  *
  */
-public class MixedDAOFactory extends DAOFactory{
+public class MixedDAOFactory extends DAOFactory {
 
     /** */
     private static MixedDAOFactory instance;
@@ -22,7 +22,7 @@ public class MixedDAOFactory extends DAOFactory{
      */
     public static MixedDAOFactory get() {
 
-        if(instance == null) {
+        if (instance == null) {
             instance = new MixedDAOFactory();
         }
         return instance;

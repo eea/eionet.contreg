@@ -14,7 +14,7 @@ import eionet.cr.web.util.columns.ReferringPredicatesColumn;
  * @author jaanus
  *
  */
-public class VirtuosoReferencesSearchHelper extends AbstractSearchHelper{
+public class VirtuosoReferencesSearchHelper extends AbstractSearchHelper {
 
     /** */
     private String subjectUri;
@@ -104,9 +104,9 @@ public class VirtuosoReferencesSearchHelper extends AbstractSearchHelper{
         append("select * where {graph ?g {?s ?p ?o. ").
         append("filter (?s IN (");
 
-        int i=0;
+        int i = 0;
         for (String subjectUri : subjectUris) {
-            if (i>0) {
+            if (i > 0) {
                 strBuilder.append(", ");
             }
             strBuilder.append("<").append(subjectUri).append(">");

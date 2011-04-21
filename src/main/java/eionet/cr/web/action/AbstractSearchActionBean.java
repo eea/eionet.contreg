@@ -38,7 +38,7 @@ import eionet.cr.web.util.columns.SubjectPredicateColumn;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public abstract class AbstractSearchActionBean<T> extends AbstractActionBean{
+public abstract class AbstractSearchActionBean<T> extends AbstractActionBean {
 
     /** */
     protected Collection<T> resultList;

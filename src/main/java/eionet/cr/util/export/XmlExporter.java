@@ -54,7 +54,7 @@ public class XmlExporter extends Exporter implements SubjectExportEvent {
     protected XMLStreamWriter writer = null;
 
 
-    protected Map<String, XmlElementMetadata> elements=null;
+    protected Map<String, XmlElementMetadata> elements = null;
     protected String[] elementKeys = null;
 
     @Override

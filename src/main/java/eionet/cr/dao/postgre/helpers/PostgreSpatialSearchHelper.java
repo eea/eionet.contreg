@@ -37,7 +37,7 @@ import eionet.cr.util.pagination.PagingRequest;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class PostgreSpatialSearchHelper extends AbstractSearchHelper{
+public class PostgreSpatialSearchHelper extends AbstractSearchHelper {
 
     /** */
     private BBOX box;
@@ -100,8 +100,7 @@ public class PostgreSpatialSearchHelper extends AbstractSearchHelper{
 
             if (box.hasLatitude()) {
                 buf.append(" and SPO_LAT.SUBJECT=SPO_LONG.SUBJECT");
-            }
-            else {
+            } else {
                 buf.append(" and SPO_POINT.SUBJECT=SPO_LONG.SUBJECT");
             }
             buf.append(" and SPO_LONG.PREDICATE=").append(Hashes.spoHash(Predicates.WGS_LONG));
@@ -163,8 +162,7 @@ public class PostgreSpatialSearchHelper extends AbstractSearchHelper{
 
             if (box.hasLatitude()) {
                 subSelect.append(" and SPO_LAT.SUBJECT=SPO_LONG.SUBJECT");
-            }
-            else {
+            } else {
                 subSelect.append(" and SPO_POINT.SUBJECT=SPO_LONG.SUBJECT");
             }
             subSelect.append(" and SPO_LONG.PREDICATE=").append(Hashes.spoHash(Predicates.WGS_LONG));

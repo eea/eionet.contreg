@@ -33,14 +33,14 @@ public class XmlWithSchemaExporter extends XmlExporter {
     protected static final String SCHEMA_NS_PREFIX = "xsd";
 
     @Override
-    protected void writeDocumentStart(XMLStreamWriter writer) throws XMLStreamException{
+    protected void writeDocumentStart(XMLStreamWriter writer) throws XMLStreamException {
         writer.writeStartElement(ROOT_ELEMENT);
         writer.writeNamespace(SCHEMA_NS_PREFIX, SCHEMA_NS_URI);
         writer.writeStartElement(DATA_ROOT_ELEMENT);
     }
 
     @Override
-    protected void writeDocumentEnd(XMLStreamWriter writer) throws XMLStreamException{
+    protected void writeDocumentEnd(XMLStreamWriter writer) throws XMLStreamException {
         //data root element
         writer.writeEndElement();
 
@@ -51,7 +51,7 @@ public class XmlWithSchemaExporter extends XmlExporter {
         writer.writeEndElement();
     }
 
-    protected void writeXmlSchema(XMLStreamWriter writer) throws XMLStreamException{
+    protected void writeXmlSchema(XMLStreamWriter writer) throws XMLStreamException {
         writer.writeStartElement(SCHEMA_NS_URI, "schema");
 
         //data root element definition
@@ -74,11 +74,10 @@ public class XmlWithSchemaExporter extends XmlExporter {
         writer.writeStartElement(SCHEMA_NS_URI, "sequence");
 
         //write elements
-        for(XmlElementMetadata element : getElements().values()) {
-            if(element.getType() == XmlElementMetadata.Type.DOUBLE) {
+        for (XmlElementMetadata element : getElements().values()) {
+            if (element.getType() == XmlElementMetadata.Type.DOUBLE) {
                 writeDoubleElement(writer, element);
-            }
-            else {
+            } else {
                 writeStringElement(writer, element);
             }
         }
@@ -90,14 +89,14 @@ public class XmlWithSchemaExporter extends XmlExporter {
         //end of schema
         writer.writeEndElement();
     }
-    private void writeDoubleElement(XMLStreamWriter writer, XmlElementMetadata element) throws XMLStreamException{
+    private void writeDoubleElement(XMLStreamWriter writer, XmlElementMetadata element) throws XMLStreamException {
         writer.writeEmptyElement(SCHEMA_NS_URI, "element");
         writer.writeAttribute("name", element.getName());
         writer.writeAttribute("minOccurs", "0");
         writer.writeAttribute("type", "xsd:double");
 
     }
-    private void writeStringElement(XMLStreamWriter writer, XmlElementMetadata element) throws XMLStreamException{
+    private void writeStringElement(XMLStreamWriter writer, XmlElementMetadata element) throws XMLStreamException {
         writer.writeStartElement(SCHEMA_NS_URI, "element");
         writer.writeAttribute("name", element.getName());
         writer.writeAttribute("minOccurs", "0");

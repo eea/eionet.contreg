@@ -1406,7 +1406,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
         // Adding content review to DB too.
 
-        if (review.getReviewContent() != null && review.getReviewContent().length()>0) {
+        if (review.getReviewContent() != null && review.getReviewContent().length() > 0) {
 
             String contentType = review.getReviewContentType();
             if (contentType == null) {
@@ -1589,7 +1589,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
             if (deleteAttachments) {
                 List<String> reviewAttachments = this.getReviewAttachmentList(user, reviewId);
-                for (int i=0; i<reviewAttachments.size(); i++) {
+                for (int i = 0; i < reviewAttachments.size(); i++) {
                     SQLUtil.executeUpdate("DELETE FROM spo_binary WHERE subject = " + Hashes.spoHash(reviewAttachments.get(i)), conn);
                 }
             }

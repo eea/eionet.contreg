@@ -46,7 +46,7 @@ public class PostgreFilteredTypeSearchHelper extends PostgreFilteredSearchHelper
 
         String type = null;
 
-        if(filters != null && !filters.isEmpty() && filters.containsKey(Predicates.RDF_TYPE)) {
+        if (filters != null && !filters.isEmpty() && filters.containsKey(Predicates.RDF_TYPE)) {
             type= filters.get(Predicates.RDF_TYPE);
         }
         if (type == null) {
@@ -74,7 +74,7 @@ public class PostgreFilteredTypeSearchHelper extends PostgreFilteredSearchHelper
     }
     public void setUserCache(boolean useCache) {
         super.setUseCache(useCache);
-        if(!useCache) {
+        if (!useCache) {
             addFilter(Predicates.RDF_TYPE, this.type);
         }
     }

@@ -10,7 +10,7 @@ import eionet.cr.util.pagination.PagingRequest;
  * @author jaanus
  *
  */
-public abstract class FreeTextSearchHelper extends AbstractSearchHelper{
+public abstract class FreeTextSearchHelper extends AbstractSearchHelper {
 
     /** */
     public enum FilterType { ANY_OBJECT, ANY_FILE, TEXTS, DATASETS, IMAGES };

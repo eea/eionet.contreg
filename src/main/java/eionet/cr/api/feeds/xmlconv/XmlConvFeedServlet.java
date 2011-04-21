@@ -47,7 +47,7 @@ import eionet.cr.util.Pair;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class XmlConvFeedServlet extends HttpServlet{
+public class XmlConvFeedServlet extends HttpServlet {
 
     /** */
     private static final String SCHEMA_PARAM = "schema";
@@ -59,7 +59,7 @@ public class XmlConvFeedServlet extends HttpServlet{
      * (non-Javadoc)
      * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         String methodName = XmlConvFeedServlet.class.getSimpleName() + ".doGet()";
         logger.debug("Entered " + methodName);
@@ -95,8 +95,7 @@ public class XmlConvFeedServlet extends HttpServlet{
             rdfWriter.addNamespace(Namespace.EPER);
 
             rdfWriter.write(subjects, response.getOutputStream());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             logger.error("Error in " + methodName, e);
             if (!response.isCommitted()) {
                 response.sendError(500);

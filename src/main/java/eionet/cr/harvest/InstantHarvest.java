@@ -33,7 +33,7 @@ import eionet.cr.dto.ObjectDTO;
 import eionet.cr.harvest.persist.PersisterConfig;
 import eionet.cr.web.security.CRUser;
 
-public class InstantHarvest extends PullHarvest{
+public class InstantHarvest extends PullHarvest {
 
     /** */
     private String userName;
@@ -68,7 +68,7 @@ public class InstantHarvest extends PullHarvest{
      * (non-Javadoc)
      * @see eionet.cr.harvest.Harvest#doHarvestStartedActions()
      */
-    protected void doHarvestStartedActions() throws HarvestException{
+    protected void doHarvestStartedActions() throws HarvestException {
 
         logger.debug("Instant harvest started");
         super.doHarvestStartedActions();
@@ -81,7 +81,7 @@ public class InstantHarvest extends PullHarvest{
      * @return InstantHarvest
      * @throws DAOException
      */
-    public static InstantHarvest createFullSetup(String sourceUrl, String userName) throws DAOException{
+    public static InstantHarvest createFullSetup(String sourceUrl, String userName) throws DAOException {
 
         HarvestSourceDTO dto = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(sourceUrl);
         InstantHarvest instantHarvest = new InstantHarvest(sourceUrl, null, userName);

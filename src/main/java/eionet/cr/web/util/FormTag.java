@@ -34,7 +34,7 @@ import net.sourceforge.stripes.exception.StripesJspException;
  * @author Aleksandr Ivanov
  * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
-public class FormTag extends net.sourceforge.stripes.tag.FormTag{
+public class FormTag extends net.sourceforge.stripes.tag.FormTag {
 
     /**
      * @see net.sourceforge.stripes.tag.FormTag#doEndTag()
@@ -63,8 +63,7 @@ public class FormTag extends net.sourceforge.stripes.tag.FormTag{
             }
 
             writeCloseTag(getPageContext().getOut(), "form");
-        }
-        catch (IOException ioe) {
+        } catch (IOException ioe) {
             throw new StripesJspException("IOException in FormTag.doEndTag().", ioe);
         }
 

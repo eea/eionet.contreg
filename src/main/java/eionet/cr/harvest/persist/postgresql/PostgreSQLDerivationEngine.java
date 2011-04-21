@@ -42,7 +42,7 @@ import eionet.cr.util.sql.SQLUtil;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class PostgreSQLDerivationEngine implements IDerivationEngine{
+public class PostgreSQLDerivationEngine implements IDerivationEngine {
 
     /** */
     private Log logger;

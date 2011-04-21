@@ -33,7 +33,7 @@ import eionet.cr.util.Util;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class HarvestSourcesTableDecorator extends TableDecorator{
+public class HarvestSourcesTableDecorator extends TableDecorator {
 
     /** */
     private SimpleDateFormat lastHarvestFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

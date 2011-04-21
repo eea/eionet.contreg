@@ -7,7 +7,7 @@ import eionet.cr.common.CRException;
  * @author jaanus
  *
  */
-public class ResultSetReaderException extends CRException{
+public class ResultSetReaderException extends CRException {
 
     /**
      *

@@ -88,16 +88,14 @@ public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
 
             noCriteria = true;
             addCautionMessage("Resource identifier not specified!");
-        }
-        else {
+        } else {
             Pair<Integer, List<SubjectDTO>> searchResult = null;
             SearchDAO searchDAO = DAOFactory.get().getDao(SearchDAO.class);
 
             if (anonHash == 0) {
                 searchResult = searchDAO.searchReferences(uri, PagingRequest.create(getPageN()),
                                 new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
-            }
-            else {
+            } else {
                 searchResult = searchDAO.searchReferences(anonHash,
                                 PagingRequest.create(getPageN()),
                                 new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
@@ -216,10 +214,9 @@ public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
 
         if (uriIsHarvestSource == null) {
 
-            if ((uri == null && subject == null) || anonHash>0 || (subject != null && subject.isAnonymous())) {
+            if ((uri == null && subject == null) || anonHash > 0 || (subject != null && subject.isAnonymous())) {
                 uriIsHarvestSource = Boolean.FALSE;
-            }
-            else {
+            } else {
                 String s = subject != null ? subject.getUri() : uri;
                 HarvestSourceDTO dto = factory.getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(s);
                 uriIsHarvestSource = dto == null ? Boolean.FALSE : Boolean.TRUE;

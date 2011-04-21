@@ -138,7 +138,7 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO>{
         if (predicateHashes == null) {
             this.predicateHashes = new ArrayList<Long>();
         }
-        if(!predicateHashes.contains(predicateHash)) {
+        if (!predicateHashes.contains(predicateHash)) {
             predicateHashes.add(predicateHash);
         }
     }
@@ -209,18 +209,18 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO>{
         //If current date is after new date, then leave the current date
         Date prevDate = null;
         SubjectDTO subj = subjectsMap.get(subjectHash);
-        if(subj != null) {
+        if (subj != null) {
             prevDate = subj.getLastModifiedTime();
         }
 
         Value t = bindingSet.getValue("t");
-        if(t != null) {
+        if (t != null) {
             String time = t.stringValue();
-            if(StringUtils.isNotEmpty(time)) {
+            if (StringUtils.isNotEmpty(time)) {
                 try {
                     SimpleDateFormat lastModifiedDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
                     Date lastModDate = lastModifiedDateFormat.parse(time);
-                    if(prevDate == null || (prevDate != null && lastModDate != null && lastModDate.after(prevDate))) {
+                    if (prevDate == null || (prevDate != null && lastModDate != null && lastModDate.after(prevDate))) {
                         currentSubject.setLastModifiedTime(lastModDate);
                     }
                 } catch (ParseException e) {

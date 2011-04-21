@@ -76,7 +76,7 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
                 PostgreFreeTextSearchHelper.FilterType filterType,
                 boolean exactMatch,
                 PagingRequest pagingRequest,
-                SortingRequest sortingRequest) throws DAOException{
+                SortingRequest sortingRequest) throws DAOException {
 
         long time = System.currentTimeMillis();
         List<Object> searchParams = new LinkedList<Object>();
@@ -88,8 +88,7 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
         if (sortingRequest  != null && sortingRequest.getSortingColumnName() != null) {
             if (sortingRequest.getSortingColumnName().equals(SubjectLastModifiedColumn.class.getSimpleName())) {
                 selectQuery.append("left join RESOURCE on (SPO.SUBJECT=RESOURCE.URI_HASH) ");
-            }
-            else {
+            } else {
                 selectQuery.append("left join SPO as ORDERING on (SPO.SUBJECT=ORDERING.SUBJECT and ORDERING.PREDICATE=?) ");
                 searchParams.add(Long.valueOf(Hashes.spoHash(sortingRequest.getSortingColumnName())));
             }
@@ -174,8 +173,7 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 
             if (sortingRequest.getSortingColumnName().equals(SubjectLastModifiedColumn.class.getSimpleName())) {
                 buf.append(" left join RESOURCE on (SPO1.SUBJECT=RESOURCE.URI_HASH) ");
-            }
-            else {
+            } else {
                 buf.append(" left join SPO as ORDERING on (SPO1.SUBJECT=ORDERING.SUBJECT and ORDERING.PREDICATE=?) ");
                 parameters.add(Long.valueOf(Hashes.spoHash(sortingRequest.getSortingColumnName())));
             }
@@ -184,7 +182,7 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 
         //building up where and from clause
         int index = 1;
-        for(Entry<String,String> criteria : filters.entrySet()) {
+        for (Entry<String,String> criteria : filters.entrySet()) {
             String spoCurr = "SPO" + index++;
             whereClause.append(whereClause.length() > 0 ? " and " : "");
             whereClause.append(spoCurr).append(".PREDICATE=? and ");
@@ -215,13 +213,12 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
         if (sortingRequest != null && sortingRequest.getSortingColumnName() != null) {
             if (sortingRequest.getSortingColumnName().equals(SubjectLastModifiedColumn.class.getSimpleName())) {
                 buf.append(" order by RESOURCE.LASTMODIFIED_TIME ").append(sortingRequest.getSortOrder().toSQL());
-            }
-            else {
+            } else {
                 buf.append(" order by ORDERING.OBJECT ").append(sortingRequest.getSortOrder().toSQL());
             }
         }
 
-        if (pagingRequest!=null) {
+        if (pagingRequest != null) {
 
             buf.append(" LIMIT ").
             append(pagingRequest.getOffset()).append(',').append(pagingRequest.getItemsPerPage());
@@ -230,7 +227,7 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
         logger.trace(buf.toString());
 
         Pair<Integer,List<Long>> pair = executeQueryWithRowCount(buf.toString(), parameters, new SingleObjectReader<Long>());
-        if(pair == null || pair.getLeft() == 0) {
+        if (pair == null || pair.getLeft() == 0) {
             return new Pair<Integer,List<SubjectDTO>>(0, new LinkedList<SubjectDTO>());
         }
 
@@ -255,8 +252,8 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
             return null;
         }
 
-        String sortPredicate = sortingRequest!=null ? sortingRequest.getSortingColumnName() : null;
-        SortOrder sortOrder  = sortingRequest!=null ? sortingRequest.getSortOrder() : null;
+        String sortPredicate = sortingRequest != null ? sortingRequest.getSortingColumnName() : null;
+        SortOrder sortOrder  = sortingRequest != null ? sortingRequest.getSortOrder() : null;
         boolean doSort = !StringUtils.isBlank(sortPredicate);
 
         // build the "select from" part
@@ -268,8 +265,7 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
                 sqlBuf.append(" left join SPO as ORDERING on ").
                 append("(SPO.PREDICATE=ORDERING.SUBJECT and ORDERING.PREDICATE=").
                 append(Hashes.spoHash(Predicates.RDFS_LABEL)).append(")");
-            }
-            else {
+            } else {
                 sqlBuf.append(" left join SPO as ORDERING on ").
                 append("(SPO.SUBJECT=ORDERING.SUBJECT and ORDERING.PREDICATE=").
                 append(Hashes.spoHash(sortPredicate)).append(")");
@@ -286,7 +282,7 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
         }
 
         // build the "limit" part
-        if (pagingRequest!=null) {
+        if (pagingRequest != null) {
 
             sqlBuf.append(" limit ").
             append(pagingRequest.getOffset()).append(",").append(pagingRequest.getItemsPerPage());
@@ -296,8 +292,7 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
                 new SingleObjectReader<Long>());
         if (pair == null || pair.getLeft() == 0) {
             return new Pair<Integer, List<SubjectDTO>>(0, new LinkedList<SubjectDTO>());
-        }
-        else {
+        } else {
             Map<Long,SubjectDTO> temp = new LinkedHashMap<Long, SubjectDTO>();
             for (Long hash : pair.getRight()) {
                 temp.put(hash, null);
@@ -322,13 +317,13 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
         }
 
         String sortPredicate = sortingRequest!=null ? sortingRequest.getSortingColumnName() : null;
-        SortOrder sortOrder  = sortingRequest!=null ? sortingRequest.getSortOrder() : null;
+        SortOrder sortOrder  = sortingRequest != null ? sortingRequest.getSortOrder() : null;
         boolean doSort = !StringUtils.isBlank(sortPredicate);
 
         StringBuffer sqlBuf = new StringBuffer("select sql_calc_found_rows distinct").
         append(" SPO_POINT.SUBJECT as SUBJECT_HASH from SPO as SPO_POINT");
 
-        if (sortPredicate!=null) {
+        if (sortPredicate != null) {
             sqlBuf.append(" left join SPO as ORDERING on").
             append(" (SPO_POINT.SUBJECT=ORDERING.SUBJECT and ORDERING.PREDICATE=").
             append(Hashes.spoHash(sortPredicate)).append(")");
@@ -352,10 +347,10 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 
             sqlBuf.append(" and SPO_POINT.SUBJECT=SPO_LAT.SUBJECT and SPO_LAT.PREDICATE=").
             append(Hashes.spoHash(Predicates.WGS_LAT));
-            if (box.getLatitudeSouth()!=null) {
+            if (box.getLatitudeSouth() != null) {
                 sqlBuf.append(" and SPO_LAT.OBJECT_DOUBLE>=").append(box.getLatitudeSouth());
             }
-            if (box.getLatitudeNorth()!=null) {
+            if (box.getLatitudeNorth() != null) {
                 sqlBuf.append(" and SPO_LAT.OBJECT_DOUBLE<=").append(box.getLatitudeNorth());
             }
         }
@@ -364,33 +359,31 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 
             if (box.hasLatitude()) {
                 sqlBuf.append(" and SPO_LAT.SUBJECT=SPO_LONG.SUBJECT");
-            }
-            else {
+            } else {
                 sqlBuf.append(" and SPO_POINT.SUBJECT=SPO_LONG.SUBJECT");
             }
             sqlBuf.append(" and SPO_LONG.PREDICATE=").append(Hashes.spoHash(Predicates.WGS_LONG));
 
-            if (box.getLongitudeWest()!=null) {
+            if (box.getLongitudeWest() != null) {
                 sqlBuf.append(" and SPO_LONG.OBJECT_DOUBLE>=").append(box.getLongitudeWest());
             }
-            if (box.getLongitudeEast()!=null) {
+            if (box.getLongitudeEast() != null) {
                 sqlBuf.append(" and SPO_LONG.OBJECT_DOUBLE<=").append(box.getLongitudeEast());
             }
         }
 
-        if (sortPredicate!=null) {
+        if (sortPredicate != null) {
 
             if (sortByObjectHash) {
                 sqlBuf.append(" order by ORDERING.OBJECT_HASH");
-            }
-            else {
+            } else {
                 sqlBuf.append(" order by ORDERING.OBJECT");
             }
             sqlBuf.append(" ").
             append(sortOrder == null ? sortOrder.ASCENDING.toSQL() : sortOrder.toSQL());
         }
 
-        if (pagingRequest!=null) {
+        if (pagingRequest != null) {
 
             sqlBuf.append(" limit ").
             append(pagingRequest.getOffset()).append(",").append(pagingRequest.getItemsPerPage());
@@ -400,8 +393,7 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
                 new SingleObjectReader<Long>());
         if (pair == null || pair.getLeft() == 0) {
             return new Pair<Integer, List<SubjectDTO>>(0, new LinkedList<SubjectDTO>());
-        }
-        else {
+        } else {
             Map<Long,SubjectDTO> subjectsMap = new LinkedHashMap<Long, SubjectDTO>();
             for (Long hash : pair.getRight()) {
                 subjectsMap.put(hash, null);

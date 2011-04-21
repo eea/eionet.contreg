@@ -45,7 +45,7 @@ public class PostgreSQLFullTextQuery {
     private static HashSet<String> booleanOperators;
 
     /** */
-    static{
+    static {
         booleanOperators = new HashSet<String>();
         booleanOperators.add("&");
         booleanOperators.add("|");
@@ -67,7 +67,7 @@ public class PostgreSQLFullTextQuery {
      * @param query
      * @throws ParseException
      */
-    private PostgreSQLFullTextQuery(String query) throws ParseException{
+    private PostgreSQLFullTextQuery(String query) throws ParseException {
         this.query = query;
         parse();
     }
@@ -78,7 +78,7 @@ public class PostgreSQLFullTextQuery {
      * @return
      * @throws ParseException
      */
-    public static PostgreSQLFullTextQuery parse(String query) throws ParseException{
+    public static PostgreSQLFullTextQuery parse(String query) throws ParseException {
 
         return new PostgreSQLFullTextQuery(query);
     }
@@ -89,7 +89,7 @@ public class PostgreSQLFullTextQuery {
      * @return
      * @throws ParseException
      */
-    public static PostgreSQLFullTextQuery parse(SearchExpression searchExpression) throws ParseException{
+    public static PostgreSQLFullTextQuery parse(SearchExpression searchExpression) throws ParseException {
 
         return new PostgreSQLFullTextQuery(searchExpression == null ? "" : searchExpression.toString());
     }
@@ -98,7 +98,7 @@ public class PostgreSQLFullTextQuery {
      * @throws ParseException
      *
      */
-    private void parse() throws ParseException{
+    private void parse() throws ParseException {
 
         if (query == null) {
             return;
@@ -113,7 +113,7 @@ public class PostgreSQLFullTextQuery {
 
         int unclosedQuotes = -1;
         int len = query.length();
-        for (int i=0; i<len; i++) {
+        for (int i = 0; i < len; i++) {
             if (query.charAt(i) == '"') {
                 if (unclosedQuotes != -1) {
                     String phrase = query.substring(unclosedQuotes+1, i);
@@ -123,8 +123,7 @@ public class PostgreSQLFullTextQuery {
                         }
                     }
                     unclosedQuotes = -1;
-                }
-                else {
+                } else {
                     unclosedQuotes = i;
                 }
             }
@@ -155,8 +154,7 @@ public class PostgreSQLFullTextQuery {
                 if (prevToken != null && !isBooleanOperator(prevToken)) {
                     appendThisToken = true;
                 }
-            }
-            else {
+            } else {
                 if (token.length()>=MIN_WORD_LENGTH) {
 
                     appendThisToken = true;
@@ -168,7 +166,7 @@ public class PostgreSQLFullTextQuery {
 
             if (appendThisToken) {
 
-                if (parsedQuery.length()>0) {
+                if (parsedQuery.length() > 0) {
                     parsedQuery.append(" ");
                 }
                 parsedQuery.append(token);
@@ -211,7 +209,7 @@ public class PostgreSQLFullTextQuery {
      * @param args
      * @throws ParseException
      */
-    public static void main(String[] args) throws ParseException{
+    public static void main(String[] args) throws ParseException {
 
 //      String s = "mina \"olen robert\" ja sina oled (paha | kuri)";
         String s = "\"air soil\" \"juku juhan\"";

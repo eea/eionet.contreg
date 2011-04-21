@@ -36,7 +36,7 @@ import org.apache.xmlrpc.webserver.XmlRpcServlet;
  * @author heinljab
  *
  */
-public class CRXmlRpcServlet extends XmlRpcServlet{
+public class CRXmlRpcServlet extends XmlRpcServlet {
 
     /*
      * (non-Javadoc)
@@ -50,8 +50,7 @@ public class CRXmlRpcServlet extends XmlRpcServlet{
         }
         try {
             return newPropertyHandlerMapping(url);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new XmlRpcException("Failed to load resource " + url + ": " + e.getMessage(), e);
         }
     }

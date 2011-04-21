@@ -43,7 +43,7 @@ public class MySQLUtil {
      * @return
      * @throws SQLException
      */
-    public static int insertRow(String tableName, HashMap<String,Object> valueMap, Connection conn) throws SQLException{
+    public static int insertRow(String tableName, HashMap<String,Object> valueMap, Connection conn) throws SQLException {
 
         if (tableName == null || tableName.trim().length() == 0 || valueMap == null || valueMap.size() == 0)
             return -1;
@@ -54,9 +54,9 @@ public class MySQLUtil {
         int i;
         StringBuffer questionMarksBuffer = new StringBuffer();
         Iterator<String> colNamesIter = valueMap.keySet().iterator();
-        for (i=0; colNamesIter.hasNext(); i++) {
+        for (i = 0; colNamesIter.hasNext(); i++) {
             String colName = colNamesIter.next();
-            if (i>0) {
+            if (i > 0) {
                 sqlStringBuffer.append(", ");
                 questionMarksBuffer.append(", ");
             }
@@ -79,7 +79,7 @@ public class MySQLUtil {
      * @throws SQLException
      */
     public static int updateRow(String tableName, HashMap<String,Object> valueMap, HashMap<String,Object> criteriaMap, Connection conn)
-                                                                                                                throws SQLException{
+                                                                                                                throws SQLException {
 
         if (tableName == null || tableName.trim().length() == 0 ||
                 valueMap == null || valueMap.size() == 0 || criteriaMap == null || criteriaMap.size() == 0)
@@ -90,8 +90,8 @@ public class MySQLUtil {
 
         int i;
         Iterator<String> colNamesIter = valueMap.keySet().iterator();
-        for (i=0; colNamesIter.hasNext(); i++) {
-            if (i>0)
+        for (i = 0; colNamesIter.hasNext(); i++) {
+            if (i > 0)
                 sqlStringBuffer.append(", ");
             String colName = colNamesIter.next();
             sqlStringBuffer.append(colName).append("=?");
@@ -99,8 +99,8 @@ public class MySQLUtil {
 
         sqlStringBuffer.append(" where ");
         Iterator<String> criteriaIter = criteriaMap.keySet().iterator();
-        for (i=0; colNamesIter.hasNext(); i++) {
-            if (i>0)
+        for (i = 0; colNamesIter.hasNext(); i++) {
+            if (i > 0)
                 sqlStringBuffer.append(" and ");
             String critName = criteriaIter.next();
             sqlStringBuffer.append(critName).append("=?");
@@ -118,7 +118,7 @@ public class MySQLUtil {
      * @return
      * @throws SQLException
      */
-    public static Integer getLastInsertID(Connection conn) throws SQLException{
+    public static Integer getLastInsertID(Connection conn) throws SQLException {
 
         ResultSet rs = null;
         Statement stmt = null;
@@ -126,13 +126,11 @@ public class MySQLUtil {
             stmt = conn.createStatement();
             rs = stmt.executeQuery("select last_insert_id()");
             return (rs != null && rs.next()) ? new Integer(rs.getInt(1)) : null;
-        }
-        finally {
+        } finally {
             try {
                 if (rs != null) rs.close();
                 if (stmt != null) stmt.close();
-            }
-            catch (SQLException e) {}
+            } catch (SQLException e) {}
         }
     }
 
@@ -142,7 +140,7 @@ public class MySQLUtil {
      * @return
      * @throws SQLException
      */
-    public static Integer getTotalRowCount(Connection conn) throws SQLException{
+    public static Integer getTotalRowCount(Connection conn) throws SQLException {
 
         ResultSet rs = null;
         Statement stmt = null;
@@ -150,13 +148,11 @@ public class MySQLUtil {
             stmt = conn.createStatement();
             rs = stmt.executeQuery("select found_rows()");
             return (rs != null && rs.next()) ? new Integer(rs.getInt(1)) : null;
-        }
-        finally {
+        } finally {
             try {
                 if (rs != null) rs.close();
                 if (stmt != null) stmt.close();
-            }
-            catch (SQLException e) {}
+            } catch (SQLException e) {}
         }
     }
 }

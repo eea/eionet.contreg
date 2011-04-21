@@ -32,7 +32,7 @@ public class HarvestedUrlCountActionBean extends AbstractSearchActionBean<Harves
     private int resultsFound = 0;
 
     @DefaultHandler
-    public Resolution view() throws DAOException{
+    public Resolution view() throws DAOException {
         if (getUser() != null) {
             if (getUser().isAdministrator()) {
                 setAdminLoggedIn(true);
@@ -49,7 +49,7 @@ public class HarvestedUrlCountActionBean extends AbstractSearchActionBean<Harves
         return new ForwardResolution("/pages/admin/harvestedUrlCount.jsp");
     }
 
-    public Resolution search() throws DAOException{
+    public Resolution search() throws DAOException {
         return view();
     }
 
@@ -77,7 +77,7 @@ public class HarvestedUrlCountActionBean extends AbstractSearchActionBean<Harves
     }
 
 
-    public Resolution filter() throws DAOException, AccessException{
+    public Resolution filter() throws DAOException, AccessException {
         return view();
     }
 

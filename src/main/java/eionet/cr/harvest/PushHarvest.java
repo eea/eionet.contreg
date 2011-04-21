@@ -31,7 +31,7 @@ import eionet.cr.harvest.util.arp.ReaderBasedARPSource;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class PushHarvest extends Harvest{
+public class PushHarvest extends Harvest {
 
     /** */
     protected String content = null;
@@ -60,8 +60,7 @@ public class PushHarvest extends Harvest{
             stringReader = new StringReader(content);
             sourceLastModified = System.currentTimeMillis();
             harvest(new ReaderBasedARPSource(stringReader));
-        }
-        finally {
+        } finally {
             if (stringReader != null) {
                 try {stringReader.close();}catch (IOException e) {}
             }
@@ -72,7 +71,7 @@ public class PushHarvest extends Harvest{
      * (non-Javadoc)
      * @see eionet.cr.harvest.Harvest#doHarvestStartedActions()
      */
-    protected void doHarvestStartedActions() throws HarvestException{
+    protected void doHarvestStartedActions() throws HarvestException {
 
         logger.debug("Push harvest started");
         super.doHarvestStartedActions();

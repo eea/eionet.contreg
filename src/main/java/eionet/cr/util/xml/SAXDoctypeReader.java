@@ -54,8 +54,8 @@ import org.xml.sax.ext.LexicalHandler;
 public class SAXDoctypeReader implements LexicalHandler {
 
     /** */
-    private String dtdSystemId=null;
-    private String dtdPublicId=null;
+    private String dtdSystemId = null;
+    private String dtdPublicId = null;
 
     /*
      * (non-Javadoc)

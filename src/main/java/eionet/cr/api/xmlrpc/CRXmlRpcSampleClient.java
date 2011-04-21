@@ -47,7 +47,7 @@ public class CRXmlRpcSampleClient {
      * @throws MalformedURLException
      *
      */
-    public static void sample_getResourcesSinceTimestamp() throws XmlRpcException, MalformedURLException{
+    public static void sample_getResourcesSinceTimestamp() throws XmlRpcException, MalformedURLException {
 
         // set up the XmlRpcClient
         XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
@@ -63,7 +63,7 @@ public class CRXmlRpcSampleClient {
         // loop through the results, do type casting to see if any ClassCastExceptions are thrown
         if (result != null && result.length > 0) {
 
-            for (int i=0; i < result.length; i++) {
+            for (int i = 0; i < result.length; i++) {
                 Map<String,Object[]> map = (Map<String,Object[]>)result[i];
                 if (map != null && !map.isEmpty()) {
                     Iterator<String> keys = map.keySet().iterator();
@@ -71,20 +71,18 @@ public class CRXmlRpcSampleClient {
                         String key = keys.next();
                         Object[] values = map.get(key);
                         StringBuffer buf = new StringBuffer(values == null ? "null array" : "");
-                        for (int j=0; values != null && j < values.length; j++) {
+                        for (int j = 0; values != null && j < values.length; j++) {
                             if (j > 0)
                                 buf.append(", ");
                             buf.append(values[j].toString());
                         }
                         System.out.println(key + " = " + buf.toString());
                     }
-                }
-                else
+                } else
                     System.out.println("map null or empty");
                 System.out.println("====================================================================================");
             }
-        }
-        else
+        } else
             System.out.println("result array null or empty");
 
     }
@@ -94,7 +92,7 @@ public class CRXmlRpcSampleClient {
      * @throws MalformedURLException
      * @throws XmlRpcException
      */
-    public static void sample_dataflowSearch() throws MalformedURLException, XmlRpcException{
+    public static void sample_dataflowSearch() throws MalformedURLException, XmlRpcException {
 
         // set up the XmlRpcClient
         XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
@@ -119,8 +117,7 @@ public class CRXmlRpcSampleClient {
             Object o = result[0];
             DataflowResultDto dto = (DataflowResultDto)o;
             System.out.println(o);
-        }
-        else
+        } else
             System.out.println("result array null or empty");
     }
 
@@ -129,7 +126,7 @@ public class CRXmlRpcSampleClient {
      * @throws XmlRpcException
      * @throws MalformedURLException
      */
-    public static void sample_getXmlFilesBySchema() throws XmlRpcException, MalformedURLException{
+    public static void sample_getXmlFilesBySchema() throws XmlRpcException, MalformedURLException {
 
         // set up the XmlRpcClient
         XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
@@ -144,11 +141,10 @@ public class CRXmlRpcSampleClient {
 
         // loop through the results, do type casting to see if any ClassCastExceptions are thrown
         if (result != null && result.length > 0) {
-            for (int i=0; i < result.length; i++) {
+            for (int i = 0; i < result.length; i++) {
                 System.out.println(result[i].toString());
             }
-        }
-        else {
+        } else {
             System.out.println("result array null or empty");
         }
 
@@ -179,13 +175,11 @@ public class CRXmlRpcSampleClient {
         Object[] result = (Object[])client.execute("ContRegService.getDeliveries", params);
         if (result == null) {
             System.out.println("Call executed, result is null");
-        }
-        else if (result.length == 0) {
+        } else if (result.length == 0) {
             System.out.println("Call executed, result is an empty array");
-        }
-        else {
+        } else {
             System.out.println("Call executed, result is the following array");
-            for (int i=0; i < result.length; i++) {
+            for (int i = 0; i < result.length; i++) {
                 System.out.println(i + ": " + result[i]);
             }
         }
@@ -196,7 +190,7 @@ public class CRXmlRpcSampleClient {
      * @throws XmlRpcException
      * @throws MalformedURLException
      */
-    public static void main(String[] args) throws MalformedURLException, XmlRpcException{
+    public static void main(String[] args) throws MalformedURLException, XmlRpcException {
 
             sample_getDeliveries();
 //          sample_getXmlFilesBySchema();

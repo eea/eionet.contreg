@@ -32,7 +32,7 @@ import eionet.cr.dao.util.PredicateLabels;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class PredicateLabelsReader extends ResultSetMixedReader{
+public class PredicateLabelsReader extends ResultSetMixedReader {
 
     /** */
     private PredicateLabels predicateLabels;

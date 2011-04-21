@@ -35,7 +35,7 @@ import eionet.cr.util.sql.SQLUtil;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class PostgreSQLHarvestMessageDAO extends PostgreSQLBaseDAO implements HarvestMessageDAO{
+public class PostgreSQLHarvestMessageDAO extends PostgreSQLBaseDAO implements HarvestMessageDAO {
 
     /** */
     private static final String q_HarvestMessageByHarvestID = "select * from HARVEST_MESSAGE where HARVEST_ID=?";
@@ -60,7 +60,7 @@ public class PostgreSQLHarvestMessageDAO extends PostgreSQLBaseDAO implements Ha
         List<Object> values = new ArrayList<Object>();
         values.add(new Integer(messageID));
         List<HarvestMessageDTO> list = executeSQL(q_HarvestMessageByMessageID, values, new HarvestMessageDTOReader());
-        return list != null && list.size()>0 ? list.get(0) : null;
+        return list != null && list.size() > 0 ? list.get(0) : null;
     }
 
     /** */
@@ -85,11 +85,9 @@ public class PostgreSQLHarvestMessageDAO extends PostgreSQLBaseDAO implements Ha
         try {
             conn = getSQLConnection();
             return SQLUtil.executeUpdateReturnAutoID(q_insertHarvestMessage, values, conn);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
-        }
-        finally {
+        } finally {
             SQLUtil.close(conn);
         }
     }
@@ -111,11 +109,9 @@ public class PostgreSQLHarvestMessageDAO extends PostgreSQLBaseDAO implements Ha
         try {
             conn = getSQLConnection();
             SQLUtil.executeUpdate(deleteHarvestMessageSQL, values, conn);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
-        }
-        finally {
+        } finally {
             SQLUtil.close(conn);
         }
     }

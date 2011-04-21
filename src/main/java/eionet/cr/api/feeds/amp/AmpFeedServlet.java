@@ -49,7 +49,7 @@ import eionet.cr.util.pagination.PagingRequest;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class AmpFeedServlet extends HttpServlet implements SubjectProcessor{
+public class AmpFeedServlet extends HttpServlet implements SubjectProcessor {
 
     /** */
     public static final String INCLUDE_DERIVED_VALUES = "inclDeriv";
@@ -61,7 +61,7 @@ public class AmpFeedServlet extends HttpServlet implements SubjectProcessor{
      * (non-Javadoc)
      * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         String methodName = new StringBuffer(AmpFeedServlet.class.getSimpleName()).append(".doGet()").toString();
 
@@ -94,8 +94,7 @@ public class AmpFeedServlet extends HttpServlet implements SubjectProcessor{
             rdfWriter.setSubjectProcessor(this);
 
             rdfWriter.write(results.getRight(), response.getOutputStream());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             logger.error("Error in " + methodName, e);
             if (!response.isCommitted()) {
                 response.sendError(500);

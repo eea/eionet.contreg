@@ -31,7 +31,7 @@ import org.quartz.JobListener;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class HarvestingJobListener implements JobListener{
+public class HarvestingJobListener implements JobListener {
 
     public static final String NAME = HarvestingJobListener.class.getClass().getSimpleName();
 

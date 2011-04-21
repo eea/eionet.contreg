@@ -39,7 +39,7 @@ import eionet.cr.util.YesNoBoolean;
  *
  */
 @SuppressWarnings("rawtypes")
-public class RODDeliveryReader extends ResultSetMixedReader{
+public class RODDeliveryReader extends ResultSetMixedReader {
 
     /** */
     private static HashMap<Long,String> predicateUrisByHashes;
@@ -47,7 +47,7 @@ public class RODDeliveryReader extends ResultSetMixedReader{
     /**
      *
      */
-    static{
+    static {
         String[] ss = {Predicates.DC_IDENTIFIER, Predicates.DC_TITLE, Predicates.DC_DATE,
                 Predicates.ROD_PERIOD, Predicates.ROD_LOCALITY_PROPERTY,
                 Predicates.ROD_OBLIGATION_PROPERTY,
@@ -92,8 +92,7 @@ public class RODDeliveryReader extends ResultSetMixedReader{
         boolean isLiteral = YesNoBoolean.parse(rs.getString("LIT_OBJ"));
         if (isLiteral && predicateUri.equals(Predicates.ROD_OBLIGATION_PROPERTY)) {
             return;
-        }
-        else if (!isLiteral && !predicateUri.equals(Predicates.ROD_OBLIGATION_PROPERTY)) {
+        } else if (!isLiteral && !predicateUri.equals(Predicates.ROD_OBLIGATION_PROPERTY)) {
             return;
         }
 

@@ -40,7 +40,7 @@ import eionet.cr.util.sql.VirtuosoFullTextQuery;
  * @author jaanus
  *
  */
-public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
+public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
 
     /* (non-Javadoc)
      * @see eionet.cr.dao.SearchDAO#searchByFreeText(eionet.cr.dao.util.SearchExpression, eionet.cr.dao.postgre.helpers.FreeTextSearchHelper.FilterType, eionet.cr.util.pagination.PagingRequest, eionet.cr.util.SortingRequest)
@@ -61,8 +61,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
         try {
             virtQuery = VirtuosoFullTextQuery.parse(expression);
             logger.trace("Free-text search string parsed for Virtuoso SPARQL: " + virtQuery);
-        }
-        catch (ParseException pe) {
+        } catch (ParseException pe) {
             throw new DAOException("Error parsing the search text", pe);
         }
 
@@ -330,7 +329,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
      * @return
      * @throws DAOException
      */
-    private int getExactRowCount(SearchHelper helper) throws DAOException{
+    private int getExactRowCount(SearchHelper helper) throws DAOException {
 
         String query = helper.getCountQuery(new ArrayList<Object>());
         Object resultObject = executeUniqueResultSPARQL(query, new SingleObjectReader<Long>());

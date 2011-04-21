@@ -30,7 +30,7 @@ import eionet.cr.dto.TagDTO;
  *
  */
 
-public interface TagsDAO extends DAO{
+public interface TagsDAO extends DAO {
 
     public List<TagDTO> getTagCloud() throws DAOException;
 }

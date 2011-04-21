@@ -29,14 +29,14 @@ public class HarvestedUrlCountColumn extends SearchResultColumn {
 
             if (columnType == COLUMN.HARVESTDAY) {
                 Date date = harvestUrgencyScore.getHarvestDay();
-                if (date != null && date.getTime()>0) {
+                if (date != null && date.getTime() > 0) {
                     result = SIMPLE_DATE_FORMAT.format(date);
                 }
             }
 
             if (columnType == COLUMN.HARVESTDAYSTRING) {
                 Date date = harvestUrgencyScore.getHarvestDay();
-                if (date != null && date.getTime()>0) {
+                if (date != null && date.getTime() > 0) {
                     result = DATE_ONLY_FORMAT.format(date);
                 }
             }
