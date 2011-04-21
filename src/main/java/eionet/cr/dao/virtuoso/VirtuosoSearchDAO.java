@@ -91,7 +91,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
         List<String> subjectUris = executeSPARQL(query, matchReader);
 
         //get matching graph URIs
-        List<String> graphUris = getGraphUris(expression, virtQuery, exactMatch);
+        List<String> graphUris = getGraphUris(subjectUris);
 
         logger.debug("Free-text search, find subjects query time " + Util.durationSince(startTime));
 
@@ -129,14 +129,19 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
 
     //Graph URIs are used to get correct cr:contentLastModified for the subject
     //If subject from one graph gave the hit and the same subject in another graph didn't, then only the date of the first graph should be used
-    private List<String> getGraphUris(SearchExpression expression, VirtuosoFullTextQuery virtExpression, boolean exactMatch) throws DAOException {
-        StringBuilder strBuilder = new StringBuilder().
-        append("select distinct(?g) where {graph ?g {?s ?p ?o. ");
-        if (exactMatch){
-            strBuilder.append(" FILTER (?o = '").append(expression.toString()).append("').");
-        } else {
-            strBuilder.append(" FILTER bif:contains(?o, \"").append(virtExpression.getParsedQuery()).append("\").");
+    private List<String> getGraphUris(List<String> subjectUris) throws DAOException {
+        StringBuilder strBuilder = new StringBuilder().append("select distinct(?g) where {graph ?g {?s ?p ?o. ")
+        .append("filter (?s IN (");
+
+        int i = 0;
+        for (String subjectUri : subjectUris) {
+            if (i > 0) {
+                strBuilder.append(", ");
+            }
+            strBuilder.append("<").append(subjectUri).append(">");
+            i++;
         }
+        strBuilder.append(")) ");
         strBuilder.append("}}");
 
         GraphUrisReader<String> reader = new GraphUrisReader<String>();
