@@ -740,7 +740,7 @@ public class PullHarvest extends Harvest {
         harvest.setNotificationSender(new HarvestNotificationSender());
 
         harvest.setDaoWriter(new HarvestDAOWriter(
-                dto.getSourceId().intValue(), Harvest.TYPE_PULL, CRUser.application.getUserName()));
+                dto.getSourceId().intValue(), Harvest.TYPE_PULL, CRUser.APPLICATION.getUserName()));
 
         return harvest;
     }

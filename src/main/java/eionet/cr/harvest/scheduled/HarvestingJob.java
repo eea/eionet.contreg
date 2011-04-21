@@ -305,7 +305,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
 
             Harvest harvest = new PushHarvest(pushedContent, url);
             if (sourceId != null && sourceId.intValue() > 0) {
-                harvest.setDaoWriter(new HarvestDAOWriter(sourceId.intValue(), Harvest.TYPE_PUSH, CRUser.application.getUserName()));
+                harvest.setDaoWriter(new HarvestDAOWriter(sourceId.intValue(), Harvest.TYPE_PUSH, CRUser.APPLICATION.getUserName()));
             }
 
             harvest.setNotificationSender(new HarvestNotificationSender());

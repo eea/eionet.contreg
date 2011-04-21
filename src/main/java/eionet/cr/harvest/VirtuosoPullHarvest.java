@@ -523,7 +523,7 @@ public class VirtuosoPullHarvest extends Harvest {
                                     .get()
                                     .getDao(HarvestDAO.class)
                                     .insertStartedHarvest(redirectedSource.getSourceId(), Harvest.TYPE_PULL,
-                                            CRUser.application.getUserName(), Harvest.STATUS_STARTED);
+                                            CRUser.APPLICATION.getUserName(), Harvest.STATUS_STARTED);
                             // If final source, then update DAO Writer harvestId
                             daoWriter.setHarvestId(harvestId);
                         }
@@ -533,7 +533,7 @@ public class VirtuosoPullHarvest extends Harvest {
                                 .get()
                                 .getDao(HarvestDAO.class)
                                 .insertStartedHarvest(redirectedSource.getSourceId(), Harvest.TYPE_PULL,
-                                        CRUser.application.getUserName(), Harvest.STATUS_FINISHED);
+                                        CRUser.APPLICATION.getUserName(), Harvest.STATUS_FINISHED);
                         // Insert harvest message for redirected URLs
                         msg = redirections.get(redirectedSource.getUrl());
                         if (!StringUtils.isBlank(msg)) {
@@ -851,7 +851,7 @@ public class VirtuosoPullHarvest extends Harvest {
         harvest.setPreviousHarvest(DAOFactory.get().getDao(HarvestDAO.class).getLastHarvestBySourceId(dto.getSourceId().intValue()));
         harvest.setNotificationSender(new HarvestNotificationSender());
 
-        harvest.setDaoWriter(new HarvestDAOWriter(dto.getSourceId().intValue(), Harvest.TYPE_PULL, CRUser.application.getUserName()));
+        harvest.setDaoWriter(new HarvestDAOWriter(dto.getSourceId().intValue(), Harvest.TYPE_PULL, CRUser.APPLICATION.getUserName()));
 
         return harvest;
     }

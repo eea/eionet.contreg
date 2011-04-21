@@ -39,26 +39,26 @@ public interface HelperDAO extends DAO {
     /**
      * fetches recently discovered files.
      * @param limit how many files to fetch
-     * @return
-     * @throws DAOException
+     * @return List<Pair<String, String>>
+     * @throws DAOException if query fails
      */
     List<Pair<String, String>> getLatestFiles(int limit) throws DAOException;
 
     /**
-     *
-     * @param rdfType
-     * @param limit
-     * @return
-     * @throws DAOException
+     * Returns array of data objects of latest subjects.
+     * @param rdfType String
+     * @param limit max size of query result
+     * @return Collection<SubjectDTO>
+     * @throws DAOException if query fails
      */
     Collection<SubjectDTO> getLatestSubjects(String rdfType, int limit) throws DAOException;
 
     /**
-     *
-     * @param timestamp
-     * @param limit
-     * @return
-     * @throws DAOException
+     * Returns subjects newer than given timestamp.
+     * @param timestamp Timestamp since what the subjects are returned
+     * @param limit max size of query
+     * @return List<SubjectDTO>
+     * @throws DAOException if query fails
      */
     List<SubjectDTO> getSubjectsNewerThan(Date timestamp, int limit) throws DAOException;
 
@@ -66,14 +66,14 @@ public interface HelperDAO extends DAO {
      * @param predicateUri
      * @param extractLabels - if true, labels are extracted if label is URL
      * @return
-     * @throws DAOException
+     * @throws DAOException if query fails
      */
     Collection<ObjectLabelPair> getPicklistForPredicate(String predicateUri, boolean extractLabels) throws DAOException;
 
     /**
      *
      * @param subjectDTO
-     * @throws DAOException
+     * @throws DAOException if query fails
      */
     void addTriples(SubjectDTO subjectDTO) throws DAOException;
 
@@ -81,7 +81,7 @@ public interface HelperDAO extends DAO {
      *
      * @param uri
      * @param sourceUri
-     * @throws DAOException
+     * @throws DAOException if query fails
      */
     void addResource(String uri, String sourceUri) throws DAOException;
 
@@ -89,15 +89,15 @@ public interface HelperDAO extends DAO {
      *
      * @param subjectTypes
      * @return
-     * @throws DAOException
+     * @throws DAOException if query fails
      */
-    HashMap<String,String> getAddibleProperties(Collection<String> subjectTypes) throws DAOException;
+    HashMap<String, String> getAddibleProperties(Collection<String> subjectTypes) throws DAOException;
 
     /**
      *
      * @param subjectUri
      * @return
-     * @throws DAOException
+     * @throws DAOException if query fails
      */
     String getSubjectSchemaUri(String subjectUri) throws DAOException;
 
@@ -105,7 +105,7 @@ public interface HelperDAO extends DAO {
      *
      * @param predicateUri
      * @return
-     * @throws DAOException TODO
+     * @throws DAOException if query fails TODO
      */
     boolean isAllowLiteralSearch(String predicateUri) throws DAOException;
 
@@ -113,7 +113,7 @@ public interface HelperDAO extends DAO {
      *
      * @param typeUri
      * @return
-     * @throws DAOException
+     * @throws DAOException if query fails
      */
     List<SubjectDTO> getPredicatesUsedForType(String typeUri) throws DAOException;
 
@@ -121,7 +121,7 @@ public interface HelperDAO extends DAO {
      * Gets sources that have some spatial content.
      *
      * @return
-     * @throws DAOException
+     * @throws DAOException if query fails
      */
     List<String> getSpatialSources() throws DAOException;
 
@@ -129,7 +129,7 @@ public interface HelperDAO extends DAO {
      *
      * @param subjectHash
      * @return
-     * @throws DAOException
+     * @throws DAOException if query fails
      */
     SubjectDTO getSubject(Long subjectHash) throws DAOException;
 
@@ -137,7 +137,7 @@ public interface HelperDAO extends DAO {
      *
      * @param subjectUri
      * @return
-     * @throws DAOException
+     * @throws DAOException if query fails
      */
     SubjectDTO getSubject(String subjectUri) throws DAOException;
 
@@ -145,7 +145,7 @@ public interface HelperDAO extends DAO {
      *
      * @param subjectHashes
      * @return
-     * @throws DAOException
+     * @throws DAOException if query fails
      */
     PredicateLabels getPredicateLabels(Set<Long> subjectHashes) throws DAOException;
 
@@ -153,35 +153,35 @@ public interface HelperDAO extends DAO {
      *
      * @param subjectHashes
      * @return
-     * @throws DAOException
+     * @throws DAOException if query fails
      */
     SubProperties getSubProperties(Set<Long> subjectHashes) throws DAOException;
 
     /**
      *
      * @return
-     * @throws DAOException
+     * @throws DAOException if query fails
      */
     HashMap<String, ArrayList<UriLabelPair>> getDataflowSearchPicklist() throws DAOException;
 
     /**
      *
      * @return
-     * @throws DAOException
+     * @throws DAOException if query fails
      */
-    ArrayList<Pair<String,String>> getDistinctOrderedTypes() throws DAOException;
+    ArrayList<Pair<String, String>> getDistinctOrderedTypes() throws DAOException;
 
     /**
      *
      * @param sourceHash
      * @return
-     * @throws DAOException
+     * @throws DAOException if query fails
      */
     int getSubjectCountInSource(long sourceHash) throws DAOException;
 
     /**
      *
-     * @throws DAOException
+     * @throws DAOException if query fails
      */
     public void updateTypeDataCache() throws DAOException;
 
@@ -190,7 +190,7 @@ public interface HelperDAO extends DAO {
      * @param user TODO
      * @param url
      * @param isBookmark
-     * @throws DAOException
+     * @throws DAOException if query fails
      */
     public void registerUserUrl(CRUser user, String url, boolean isBookmark) throws DAOException;
 
@@ -198,7 +198,7 @@ public interface HelperDAO extends DAO {
      *
      * @param user
      * @param url
-     * @throws DAOException
+     * @throws DAOException if query fails
      */
     public void addUserBookmark(CRUser user, String url) throws DAOException;
 
@@ -206,7 +206,7 @@ public interface HelperDAO extends DAO {
      *
      * @param user
      * @param url
-     * @throws DAOException
+     * @throws DAOException if query fails
      */
     public void deleteUserBookmark(CRUser user, String url) throws DAOException;
 
@@ -215,7 +215,7 @@ public interface HelperDAO extends DAO {
      *
      * @param user
      * @param url
-     * @throws DAOException
+     * @throws DAOException if query fails
      */
     public List<UserBookmarkDTO> getUserBookmarks(CRUser user) throws DAOException;
 
@@ -224,7 +224,7 @@ public interface HelperDAO extends DAO {
      *
      * @param user
      * @param subjectHash
-     * @throws DAOException
+     * @throws DAOException if query fails
      */
     public boolean isSubjectUserBookmark(CRUser user, long subjectHash) throws DAOException;
 
@@ -232,14 +232,14 @@ public interface HelperDAO extends DAO {
      *
      * @param user
      * @param url
-     * @throws DAOException
+     * @throws DAOException if query fails
      */
     public void updateUserHistory(CRUser user, String url) throws DAOException;
 
     /**
      * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
      * @param user
-     * @throws DAOException
+     * @throws DAOException if query fails
      */
     public List<UserHistoryDTO> getUserHistory(CRUser user) throws DAOException;
 
@@ -248,7 +248,7 @@ public interface HelperDAO extends DAO {
      * @param sourceUrl
      * @param pagingRequest
      * @return
-     * @throws DAOException
+     * @throws DAOException if query fails
      */
     public List<TripleDTO> getSampleTriplesInSource(String sourceUrl,
             PagingRequest pagingRequest) throws DAOException;
@@ -258,7 +258,7 @@ public interface HelperDAO extends DAO {
      *
      * @param user
      * @return int
-     * @throws DAOException
+     * @throws DAOException if query fails
      * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
      */
     public int generateNewReviewId(CRUser user) throws DAOException;
@@ -267,7 +267,7 @@ public interface HelperDAO extends DAO {
      *
      * @param user
      * @return int
-     * @throws DAOException
+     * @throws DAOException if query fails
      * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
      */
     public int getLastReviewId(CRUser user)  throws DAOException;
@@ -278,7 +278,7 @@ public interface HelperDAO extends DAO {
      * @param review
      * @param user
      * @return int
-     * @throws DAOException
+     * @throws DAOException if query fails
      * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
      */
     public int addReview(ReviewDTO review, CRUser user)  throws DAOException;
@@ -288,7 +288,7 @@ public interface HelperDAO extends DAO {
      * @param reviewiD
      * @param review
      * @param user
-     * @throws DAOException
+     * @throws DAOException if query fails
      * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
      */
     public void saveReview(int reviewId, ReviewDTO review, CRUser user) throws DAOException;
@@ -297,7 +297,7 @@ public interface HelperDAO extends DAO {
      *
      * @param user
      * @return List<ReviewDTO
-     * @throws DAOException
+     * @throws DAOException if query fails
      * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
      */
     public List<ReviewDTO> getReviewList(CRUser user)  throws DAOException;
@@ -307,7 +307,7 @@ public interface HelperDAO extends DAO {
      * @param user
      * @param reviewId
      * @return List<ReviewDTO
-     * @throws DAOException
+     * @throws DAOException if query fails
      * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
      */
     public ReviewDTO getReview(CRUser user, int reviewId)  throws DAOException;
@@ -317,7 +317,7 @@ public interface HelperDAO extends DAO {
      * @param user
      * @param reviewId
      * @return List<String>
-     * @throws DAOException
+     * @throws DAOException if query fails
      * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
      */
     public List<String> getReviewAttachmentList(CRUser user, int reviewId)  throws DAOException;
@@ -325,10 +325,8 @@ public interface HelperDAO extends DAO {
 
 
     /**
-     *
      * @param reviewSubjectURI
-     * @return void
-     * @throws DAOException
+     * @throws DAOException if query fails
      * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
      */
     public void deleteReview(CRUser user, int reviewId, boolean deleteAttachments)  throws DAOException;
@@ -339,7 +337,7 @@ public interface HelperDAO extends DAO {
      * @param user
      * @param reviewId
      * @param attachmentUri
-     * @throws DAOException
+     * @throws DAOException if query fails
      * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
      */
     public void deleteAttachment(CRUser user, int reviewId, String attachmentUri)  throws DAOException;
@@ -349,7 +347,7 @@ public interface HelperDAO extends DAO {
      *
      * @param attachmentUri
      * @return InputStream
-     * @throws DAOException
+     * @throws DAOException if query fails
      * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
      */
     public  DownloadFileDTO loadAttachment(String attachmentUri) throws DAOException;
@@ -359,14 +357,14 @@ public interface HelperDAO extends DAO {
     /**
      *
      * @param triples
-     * @throws DAOException
+     * @throws DAOException if query fails
      */
     public void deleteTriples(Collection<TripleDTO> triples) throws DAOException;
 
     /**
      *
      * @param sourceHash
-     * @throws DAOException
+     * @throws DAOException if query fails
      */
     public void deleteTriplesOfSource(long sourceHash) throws DAOException;
 
@@ -374,7 +372,7 @@ public interface HelperDAO extends DAO {
      *
      * @param crUser
      * @return
-     * @throws DAOException
+     * @throws DAOException if query fails
      */
     public Collection<UploadDTO> getUserUploads(CRUser crUser) throws DAOException;
 
@@ -382,29 +380,29 @@ public interface HelperDAO extends DAO {
      *
      * @param subjectUri
      * @return
-     * @throws DAOException
+     * @throws DAOException if query fails
      */
     public boolean isExistingSubject(String subjectUri) throws DAOException;
 
     /**
      *
      * @param subjectUris
-     * @throws DAOException
+     * @throws DAOException if query fails
      */
     public void deleteSubjects(List<String> subjectUris) throws DAOException;
 
     /**
      *
      * @param newUrisByOldHashes
-     * @throws DAOException
+     * @throws DAOException if query fails
      */
-    public void renameSubjects(Map<Long,String> newUrisByOldHashes) throws DAOException;
+    public void renameSubjects(Map<Long, String> newUrisByOldHashes) throws DAOException;
 
     /**
      *
      * @param sourceHash
      * @return List<PredicateDTO>
-     * @throws DAOException
+     * @throws DAOException if query fails
      */
     public List<PredicateDTO> readDistinctPredicates(Long sourceHash) throws DAOException;
 
@@ -412,15 +410,13 @@ public interface HelperDAO extends DAO {
      *
      * @param sourceHash
      * @return List<String>
-     * @throws DAOException
+     * @throws DAOException if query fails
      */
     public List<String> readDistinctSubjectUrls(Long sourceHash) throws DAOException;
 
     /**
-     *
-     * @param sourceHash
-     * @return List<PredicateDTO>
-     * @throws DAOException
+     * @param reader RDFExporter
+     * @throws DAOException if query fails
      */
     public void outputSourceTriples(RDFExporter reader) throws DAOException;
 
@@ -429,14 +425,14 @@ public interface HelperDAO extends DAO {
      * @param subjectUri
      * @param predicateUri
      * @param sourceUri
-     * @throws DAOException
+     * @throws DAOException if query fails
      */
     public void deleteTriples(String subjectUri, String predicateUri, String sourceUri) throws DAOException;
 
     /**
-     *
-     * @return long
-     * @throws DAOException
+     * Returns total triples count.
+     * @return long triples count
+     * @throws DAOException if query fails
      */
-    public long getTriplesCount() throws DAOException;
+     public long getTriplesCount() throws DAOException;
 }

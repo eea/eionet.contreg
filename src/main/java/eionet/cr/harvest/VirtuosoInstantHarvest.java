@@ -54,7 +54,7 @@ public class VirtuosoInstantHarvest extends VirtuosoPullHarvest {
         VirtuosoInstantHarvest instantHarvest = new VirtuosoInstantHarvest(sourceUrl, null, userName);
         instantHarvest.setPreviousHarvest(DAOFactory.get().getDao(HarvestDAO.class)
                 .getLastHarvestBySourceId(dto.getSourceId().intValue()));
-        instantHarvest.setDaoWriter(new HarvestDAOWriter(dto.getSourceId().intValue(), Harvest.TYPE_PULL, CRUser.application
+        instantHarvest.setDaoWriter(new HarvestDAOWriter(dto.getSourceId().intValue(), Harvest.TYPE_PULL, CRUser.APPLICATION
                 .getUserName()));
         instantHarvest.setNotificationSender(new HarvestNotificationSender());
 
