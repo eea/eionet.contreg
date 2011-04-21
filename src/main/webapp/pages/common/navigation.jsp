@@ -15,8 +15,9 @@
         <li><a href="sparql" title="Sparql client">Sparql client</a></li>
         <li><a href="sources.action" title="Manage harvest sources">Harvest sources</a></li>
         <li><a href="harvestQueue.action" title="Monitor harvest queue">Harvest queue</a></li>
-        <c:if test='${sessionScope.crUser!=null && crfn:hasPermission(sessionScope.crUser.userName, "/", "u")}'>
+        <c:if test='${crfn:userHasPermission(sessionScope.crUser, "/", "u")}'>
             <li><a href="registerUrl.action" title="URL registration">URL registration</a></li>
+            <li><a href="admin" title="Administrative activities">Admin actions</a></li>
             <li><a href="home/${ actionBean.userName }" title="User Home">My Home</a></li>
         </c:if>
     </ul>

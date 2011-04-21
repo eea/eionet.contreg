@@ -20,11 +20,9 @@
  */
 package eionet.cr.web.action;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.Set;
 
 import javax.servlet.http.HttpSession;
 
@@ -36,16 +34,12 @@ import net.sourceforge.stripes.controller.AnnotatedClassActionResolver;
 import net.sourceforge.stripes.validation.SimpleError;
 import net.sourceforge.stripes.validation.ValidationError;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import eionet.cr.common.CRException;
-import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.harvest.CurrentHarvests;
 import eionet.cr.harvest.Harvest;
-import eionet.cr.harvest.scheduled.HarvestingJob;
 import eionet.cr.util.Util;
 import eionet.cr.web.context.CRActionBeanContext;
 import eionet.cr.web.security.CRUser;
@@ -92,11 +86,12 @@ public abstract class AbstractActionBean implements ActionBean {
         return this.context;
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * Sets ActionBean context.
+     * @param context ActionBeanContext
      * @see net.sourceforge.stripes.action.ActionBean#setContext(net.sourceforge.stripes.action.ActionBeanContext)
      */
-    public void setContext(ActionBeanContext context) {
+    public void setContext(final ActionBeanContext context) {
         this.context = (CRActionBeanContext) context;
     }
 
@@ -117,40 +112,40 @@ public abstract class AbstractActionBean implements ActionBean {
     }
 
     /**
-     *
-     * @return
+     * Current user in servlet context.
+     * @return CRUser
      */
     public CRUser getUser() {
         return getContext().getCRUser();
     }
 
     /**
-     *
-     * @param message
+     * Adds system message.
+     * @param message message text
      */
-    protected void addSystemMessage(String message) {
+    protected void addSystemMessage(final String message) {
         getContext().getMessages(SYSTEM_MESSAGES).add(new SimpleMessage(message));
     }
 
     /**
-     *
-     * @param message
+     * Adds caution message.
+     * @param message Message text
      */
-    protected void addCautionMessage(String message) {
+    protected void addCautionMessage(final String message) {
         getContext().getMessages(CAUTION_MESSAGES).add(new SimpleMessage(message));
     }
 
     /**
-     *
-     * @param message
+     * Adds warning message.
+     * @param message Message text
      */
-    protected void addWarningMessage(String message) {
+    protected void addWarningMessage(final String message) {
         getContext().getMessages(WARNING_MESSAGES).add(new SimpleMessage(message));
     }
 
     /**
-     *
-     * @return
+     * Returns Stripes resource bundle.
+     * @return ResourceBundle resources
      */
     public ResourceBundle getBundle() {
         ResourceBundle bundle = ResourceBundle.getBundle("/StripesResources");

@@ -27,6 +27,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -42,6 +44,8 @@ import eionet.cr.dao.readers.HarvestSourceDTOReader;
 import eionet.cr.dao.virtuoso.VirtuosoBaseDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.SubjectDTO;
+import eionet.cr.harvest.statistics.dto.HarvestUrgencyScoreDTO;
+import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
@@ -783,5 +787,101 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
     @Override
     public void deleteSourceTriples(String url) throws DAOException {
         throw new UnsupportedOperationException("Method not implemented");
+    }
+    
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.dao.HelperDAO#getLatestHarvestedURLs()
+     */
+    public Pair<Integer, List<HarvestedUrlCountDTO>> getLatestHarvestedURLs(int days) throws DAOException {
+
+        StringBuffer buf = new StringBuffer().
+            append(" SELECT DATE(LAST_HARVEST) AS HARVESTDAY, COUNT(HARVEST_SOURCE_ID) AS HARVESTS").
+            append(" FROM HARVEST_SOURCE WHERE LAST_HARVEST IS NOT NULL").
+            append(" AND LAST_HARVEST + INTERVAL '" + days + " days' > current_date").
+            append(" GROUP BY DATE(LAST_HARVEST) ORDER BY HARVESTDAY DESC ;");
+
+        List<HarvestedUrlCountDTO> result = new ArrayList();
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+            conn = getSQLConnection();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(buf.toString());
+            while (rs.next()) {
+                HarvestedUrlCountDTO resultRow = new HarvestedUrlCountDTO();
+                try {
+                    resultRow.setHarvestDay(sdf.parse(rs.getString("HARVESTDAY")));
+                } catch (ParseException ex) {
+                    throw new DAOException(ex.toString(), ex);
+                }
+                resultRow.setHarvestCount(rs.getLong("HARVESTS"));
+                result.add(resultRow);
+            }
+        } catch (SQLException e) {
+            throw new DAOException(e.toString(), e);
+        } finally {
+            SQLUtil.close(rs);
+            SQLUtil.close(stmt);
+            SQLUtil.close(conn);
+        }
+
+        return new Pair<Integer, List<HarvestedUrlCountDTO>>(result.size(), result);
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.dao.HelperDAO#getUrgencyOfComingHarvests()
+     */
+    public Pair<Integer, List<HarvestUrgencyScoreDTO>> getUrgencyOfComingHarvests(int amount) throws DAOException {
+
+
+
+        StringBuffer buf = new StringBuffer().
+        append("SELECT url, last_harvest, interval_minutes, ").
+        append(" EXTRACT (EPOCH FROM NOW()-(coalesce(last_harvest,").
+        append(" (time_created - interval_minutes * interval '1 minute') ").
+        append(" )))/(interval_minutes * 60) AS urgency ").
+        append(" FROM HARVEST_SOURCE ").
+        append(" WHERE interval_minutes > 0 ").
+        append(" ORDER BY urgency DESC ").
+        append(" LIMIT " + amount + " ");
+
+        List<HarvestUrgencyScoreDTO> result = new ArrayList();
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+
+            conn = getSQLConnection();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(buf.toString());
+            while (rs.next()) {
+                HarvestUrgencyScoreDTO resultRow = new HarvestUrgencyScoreDTO();
+                resultRow.setUrl(rs.getString("url"));
+                try {
+                    resultRow.setLastHarvest(sdf.parse(rs.getString("last_harvest") + ""));
+                } catch (ParseException ex) {
+                    resultRow.setLastHarvest(null);
+                    //throw new DAOException(ex.toString(), ex);
+                }
+                resultRow.setIntervalMinutes(rs.getLong("interval_minutes"));
+                resultRow.setUrgency(rs.getDouble("urgency"));
+                result.add(resultRow);
+            }
+        } catch (SQLException e) {
+            throw new DAOException(e.toString(), e);
+        } finally {
+            SQLUtil.close(rs);
+            SQLUtil.close(stmt);
+            SQLUtil.close(conn);
+        }
+
+        return new Pair<Integer, List<HarvestUrgencyScoreDTO>>(result.size(), result);
+
     }
 }

@@ -10,10 +10,9 @@ import net.sourceforge.stripes.action.UrlBinding;
 import eionet.cr.common.AccessException;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
-import eionet.cr.dao.HelperDAO;
+import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.harvest.statistics.dto.HarvestUrgencyScoreDTO;
 import eionet.cr.util.Pair;
-import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.web.action.AbstractSearchActionBean;
 import eionet.cr.web.util.columns.NextHarvestsUrgencyScoreColumn;
 import eionet.cr.web.util.columns.SearchResultColumn;
@@ -37,7 +36,7 @@ public class NextHarvestsUrgencyScoreActionBean extends AbstractSearchActionBean
         if (getUser()!=null){
             if (getUser().isAdministrator()){
                 setAdminLoggedIn(true);
-                Pair<Integer, List<HarvestUrgencyScoreDTO>> result = DAOFactory.get().getDao(HelperDAO.class).getUrgencyOfComingHarvests(urgencyScoreLimit);
+                Pair<Integer, List<HarvestUrgencyScoreDTO>> result = DAOFactory.get().getDao(HarvestSourceDAO.class).getUrgencyOfComingHarvests(urgencyScoreLimit);
                 resultList = result.getRight();
                 matchCount = 0;
                 resultsFound = result.getLeft();

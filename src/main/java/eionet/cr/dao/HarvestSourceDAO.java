@@ -31,6 +31,8 @@ import org.openrdf.rio.RDFParseException;
 
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.SubjectDTO;
+import eionet.cr.harvest.statistics.dto.HarvestUrgencyScoreDTO;
+import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.pagination.PagingRequest;
@@ -140,7 +142,7 @@ public interface HarvestSourceDAO extends DAO {
 
     /**
      * Deletes selected source from the DB.
-     * 
+     *
      * @param url
      *            - source url
      * @throws DAOException
@@ -148,7 +150,7 @@ public interface HarvestSourceDAO extends DAO {
     public void deleteSourceByUrl(String url) throws DAOException;
 
     /**
-     * 
+     *
      * @param sourceId
      * @param numStatements
      * @param numResources
@@ -162,7 +164,7 @@ public interface HarvestSourceDAO extends DAO {
             boolean permanentError, Timestamp lastHarvest) throws DAOException;
 
     /**
-     * 
+     *
      * @param limit
      * @return List<HarvestSourceDTO>
      * @throws DAOException
@@ -171,9 +173,9 @@ public interface HarvestSourceDAO extends DAO {
 
     /**
      * deletes orphans from SPO table. Orphan is a record inside SPO, which has an non-existent source in HARVEST_SOURCE.
-     * 
+     *
      * @throws DAOException
-     * 
+     *
      */
     void deleteTriplesOfMissingSources() throws DAOException;
 
@@ -321,5 +323,22 @@ public interface HarvestSourceDAO extends DAO {
      * @throws DAOException
      */
     public void increaseUnavailableCount(int sourceId) throws DAOException;
+
+    /**
+    * Statistics : count of last harvested URLs.
+    * @param days days from today backwards
+    * @return  Pair<Integer, List<HarvestedUrlCountDTO>>
+    * @throws DAOException if query fails
+    */
+   Pair<Integer, List<HarvestedUrlCountDTO>> getLatestHarvestedURLs(int days) throws DAOException;
+
+   /**
+    * Returns   urgency of coming harvests.
+    * @param amount size of list
+    * @return  Pair <Integer, List <HarvestUrgencyScoreDTO>>
+    * @throws DAOException if query fails
+    */
+
+   Pair<Integer, List<HarvestUrgencyScoreDTO>> getUrgencyOfComingHarvests(int amount) throws DAOException;
 
 }

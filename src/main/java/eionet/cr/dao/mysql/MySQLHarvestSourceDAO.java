@@ -40,6 +40,8 @@ import eionet.cr.dao.readers.HarvestSourceDTOReader;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.Harvest;
+import eionet.cr.harvest.statistics.dto.HarvestUrgencyScoreDTO;
+import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
@@ -625,4 +627,23 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
     public void increaseUnavailableCount(int sourceId) throws DAOException {
         throw new UnsupportedOperationException("Method not implemented");
     }
+    
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.dao.HelperDAO#getLatestHarvestedURLs()
+     */
+    public Pair<Integer, List<HarvestedUrlCountDTO>> getLatestHarvestedURLs(int days) throws DAOException {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Method not implemented");
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.dao.HelperDAO#getUrgencyOfComingHarvests()
+     */
+    public Pair <Integer, List <HarvestUrgencyScoreDTO>> getUrgencyOfComingHarvests(int amount) throws DAOException {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Method not implemented");
+    }
+
 }

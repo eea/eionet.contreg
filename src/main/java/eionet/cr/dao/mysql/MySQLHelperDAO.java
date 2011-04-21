@@ -40,8 +40,6 @@ import eionet.cr.dto.TripleDTO;
 import eionet.cr.dto.UploadDTO;
 import eionet.cr.dto.UserBookmarkDTO;
 import eionet.cr.dto.UserHistoryDTO;
-import eionet.cr.harvest.statistics.dto.HarvestUrgencyScoreDTO;
-import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.ObjectLabelPair;
 import eionet.cr.util.Pair;
@@ -764,24 +762,7 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
     }
 
 
-    /*
-     * (non-Javadoc)
-     * @see eionet.cr.dao.HelperDAO#getLatestHarvestedURLs()
-     */
-    public Pair<Integer, List<HarvestedUrlCountDTO>> getLatestHarvestedURLs(int days) throws DAOException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Method not implemented");
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see eionet.cr.dao.HelperDAO#getUrgencyOfComingHarvests()
-     */
-    public Pair <Integer, List <HarvestUrgencyScoreDTO>> getUrgencyOfComingHarvests(int amount) throws DAOException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Method not implemented");
-    }
-
+  
 
     public void updateTypeDataCache() throws DAOException {
 

@@ -33,8 +33,6 @@ import eionet.cr.dto.TripleDTO;
 import eionet.cr.dto.UploadDTO;
 import eionet.cr.dto.UserBookmarkDTO;
 import eionet.cr.dto.UserHistoryDTO;
-import eionet.cr.harvest.statistics.dto.HarvestUrgencyScoreDTO;
-import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.ObjectLabelPair;
 import eionet.cr.util.Pair;
@@ -438,24 +436,24 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
      * 
      * @see eionet.cr.dao.HelperDAO#getLatestHarvestedURLs(int)
      */
-    @Override
-    public Pair<Integer, List<HarvestedUrlCountDTO>> getLatestHarvestedURLs(
-            int days) throws DAOException {
-        throw new UnsupportedOperationException("Method not implemented");
+//    @Override
+//    public Pair<Integer, List<HarvestedUrlCountDTO>> getLatestHarvestedURLs(
+//            int days) throws DAOException {
+//        throw new UnsupportedOperationException("Method not implemented");
+//
+//    }
 
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see eionet.cr.dao.HelperDAO#getUrgencyOfComingHarvests(int)
-     */
-    @Override
-    public Pair<Integer, List<HarvestUrgencyScoreDTO>> getUrgencyOfComingHarvests(
-            int amount) throws DAOException {
-        throw new UnsupportedOperationException("Method not implemented");
-
-    }
+//    /*
+//     * (non-Javadoc)
+//     * 
+//     * @see eionet.cr.dao.HelperDAO#getUrgencyOfComingHarvests(int)
+//     */
+//    @Override
+//    public Pair<Integer, List<HarvestUrgencyScoreDTO>> getUrgencyOfComingHarvests(
+//            int amount) throws DAOException {
+//        throw new UnsupportedOperationException("Method not implemented");
+//
+//    }
 
 
     /*

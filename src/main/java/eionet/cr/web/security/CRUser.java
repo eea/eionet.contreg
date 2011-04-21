@@ -28,6 +28,7 @@ import com.tee.uit.security.AccessControlListIF;
 import com.tee.uit.security.AccessController;
 import com.tee.uit.security.SignOnException;
 
+import eionet.cr.config.GeneralConfig;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Util;
 
@@ -38,7 +39,12 @@ import eionet.cr.util.Util;
  *
  */
 public class CRUser {
-
+    
+    /** 
+     * ACL anonymous entry name.
+     */
+    private static String aclAnonymousEntryName;
+    
     /** */
     private static Log logger = LogFactory.getLog(CRUser.class);
 
@@ -53,7 +59,11 @@ public class CRUser {
      */
     public CRUser() {
     }
-
+    
+    static {
+        aclAnonymousEntryName = GeneralConfig.getProperty(GeneralConfig.ACL_ANONYMOUS_ACCESS_PROP, null);
+    }
+    
     /**
      *
      * @param userName
@@ -80,45 +90,52 @@ public class CRUser {
      *
      * @return
      */
-    public boolean isAdministrator(){
-
+    public boolean isAdministrator() {
+        
         return hasPermission("/", "u");
     }
 
-    /**
+    
+    public static boolean userHasPermission(CRUser user, String aclPath, String permission) {
+        return hasPermission(user != null ? user.getUserName() : null, aclPath, permission);
+    }
+     /**
      *
      * @param aclPath
      * @param prm
      * @return
      */
-    public boolean hasPermission(String aclPath, String prm){
+    public boolean hasPermission(String aclPath, String prm) {
         return hasPermission(userName, aclPath, prm);
     }
 
     /**
-     *
-     * @param userName
-     * @param aclPath
-     * @param prm
-     * @return
+     * Checks authenticated or anonymous user permission.
+     * @param userName Username or null for anonymous user
+     * @param aclPath Full ACL path
+     * @param prm permission
+     * @return boolean
      */
-    public static boolean hasPermission(String userName, String aclPath, String prm){
+    public static boolean hasPermission(String userName, String aclPath, String prm) {
+
+        //if user not logged in check permission anonymous ACL entry if exists:
+        if (Util.isNullOrEmpty(userName) && !Util.isNullOrEmpty(aclAnonymousEntryName)) {
+            userName = aclAnonymousEntryName;
+        }
 
         if (Util.isNullOrEmpty(userName) || Util.isNullOrEmpty(aclPath) || Util.isNullOrEmpty(prm))
             return false;
 
         boolean result = false;
-        try{
+        try {
             AccessControlListIF acl = AccessController.getAcl(aclPath);
-            if (acl!=null){
+            if (acl != null){
                 result = acl.checkPermission(userName, prm);
-                if (result==false)
+                if (result == false)
                     logger.debug("User " + userName + " does not have permission " + prm + " in acl \"" + aclPath + "\"");
-            }
-            else
+            } else
                 logger.warn("acl \"" + aclPath + "\" not found!");
-        }
-        catch (SignOnException soe){
+        } catch (SignOnException soe){
             logger.error(soe.toString(), soe);
         }
 
