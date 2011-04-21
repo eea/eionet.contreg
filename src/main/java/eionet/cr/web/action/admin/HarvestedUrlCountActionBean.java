@@ -33,8 +33,8 @@ public class HarvestedUrlCountActionBean extends AbstractSearchActionBean<Harves
 
     @DefaultHandler
     public Resolution view() throws DAOException{
-        if (getUser()!=null){
-            if (getUser().isAdministrator()){
+        if (getUser() != null) {
+            if (getUser().isAdministrator()) {
                 setAdminLoggedIn(true);
                 Pair<Integer, List<HarvestedUrlCountDTO>> result = DAOFactory.get().getDao(HarvestSourceDAO.class).getLatestHarvestedURLs(harvestedUrlDays);
                 resultList = result.getRight();
@@ -57,7 +57,7 @@ public class HarvestedUrlCountActionBean extends AbstractSearchActionBean<Harves
      * (non-Javadoc)
      * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
      */
-    public List<SearchResultColumn> getColumns(){
+    public List<SearchResultColumn> getColumns() {
 
         LinkedList<SearchResultColumn> columnList = new LinkedList<SearchResultColumn>();
 

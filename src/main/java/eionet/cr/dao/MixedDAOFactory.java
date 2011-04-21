@@ -20,7 +20,7 @@ public class MixedDAOFactory extends DAOFactory{
      *
      * @return
      */
-    public static MixedDAOFactory get(){
+    public static MixedDAOFactory get() {
 
         if(instance == null) {
             instance = new MixedDAOFactory();
@@ -36,7 +36,7 @@ public class MixedDAOFactory extends DAOFactory{
     public <T extends DAO> T getDao(Class<T> implementedInterface) {
 
         T implementationClass = VirtuosoDAOFactory.get().getDao(implementedInterface);
-        if (GeneralConfig.useVirtuoso()==false || implementationClass==null){
+        if (GeneralConfig.useVirtuoso() == false || implementationClass == null) {
 
             String dbUrl = DbConnectionProvider.getConnectionUrl();
             if (dbUrl.startsWith("jdbc:mysql:"))

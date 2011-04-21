@@ -32,7 +32,7 @@ public abstract class DAOFactory {
      * @return DAOFactory
      * @throws DAOException
      */
-    public static DAOFactory get(){
+    public static DAOFactory get() {
 
         return MixedDAOFactory.get();
     }

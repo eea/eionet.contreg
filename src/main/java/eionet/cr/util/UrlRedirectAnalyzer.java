@@ -61,13 +61,13 @@ public class UrlRedirectAnalyzer {
         catch (IOException e) {
             logger.warn("Ignoring this URL redirection analyze exception: " + e.toString());
         }
-        finally{
-            try{
-                if (inputStream!=null) {
+        finally {
+            try {
+                if (inputStream != null) {
                     inputStream.close();
                 }
             }
-            catch (IOException e){}
+            catch (IOException e) {}
         }
 
         return result;
@@ -82,10 +82,10 @@ public class UrlRedirectAnalyzer {
      */
     public static String constructFullUrl(String baseUrl, String relativeUrl)
                                                                     throws MalformedURLException {
-        if (relativeUrl==null) {
+        if (relativeUrl == null) {
             return baseUrl;
         }
-        else{
+        else {
             return new URL (new URL(baseUrl), relativeUrl).toString();
         }
     }

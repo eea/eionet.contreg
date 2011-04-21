@@ -83,10 +83,10 @@ public abstract class MySQLBaseDAO {
             List<T>  list = reader.getResultList();
             return list;
         }
-        catch (Exception e){
+        catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
         }
-        finally{
+        finally {
             SQLUtil.close(conn);
         }
     }
@@ -104,10 +104,10 @@ public abstract class MySQLBaseDAO {
             conn = getConnection();
             SQLUtil.executeQuery(sql, reader, conn);
         }
-        catch (Exception e){
+        catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
         }
-        finally{
+        finally {
             SQLUtil.close(conn);
         }
     }
@@ -130,9 +130,9 @@ public abstract class MySQLBaseDAO {
             } else {
                 SQLUtil.executeUpdate(sql, conn);
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
-        } finally{
+        } finally {
             SQLUtil.close(conn);
             SQLUtil.close(statement);
         }
@@ -212,7 +212,7 @@ public abstract class MySQLBaseDAO {
      */
     protected String getSubjectsDataQuery(Collection<Long> subjectHashes) {
 
-        if (subjectHashes==null || subjectHashes.isEmpty())
+        if (subjectHashes == null || subjectHashes.isEmpty())
             throw new IllegalArgumentException("The subject hashes collection must not be null or empty!");
 
         StringBuffer buf = new StringBuffer().

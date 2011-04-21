@@ -46,10 +46,10 @@ public class PostgreFilteredTypeSearchHelper extends PostgreFilteredSearchHelper
 
         String type = null;
 
-        if(filters!=null && !filters.isEmpty() && filters.containsKey(Predicates.RDF_TYPE)){
+        if(filters != null && !filters.isEmpty() && filters.containsKey(Predicates.RDF_TYPE)) {
             type= filters.get(Predicates.RDF_TYPE);
         }
-        if (type==null){
+        if (type == null) {
             throw new CRRuntimeException("Type URI can not be empty!");
         }
         setUseCache(true);
@@ -57,28 +57,28 @@ public class PostgreFilteredTypeSearchHelper extends PostgreFilteredSearchHelper
         removeFilter(Predicates.RDF_TYPE);
     }
 
-    public void setType(String type){
+    public void setType(String type) {
         this.type = type;
         this.typeHash = Hashes.spoHash(type);
     }
-    protected String getSpoTableName(){
+    protected String getSpoTableName() {
         return isUseCache() ?
                 "CACHE_SPO_TYPE_SUBJECT":
                     super.getSpoTableName();
     }
 
-    protected String getSpoTableCriteria(){
+    protected String getSpoTableCriteria() {
         return isUseCache() ?
             "SPO1.OBJECT_HASH=" + typeHash :
                 super.getSpoTableCriteria();
     }
-    public void setUserCache(boolean useCache){
+    public void setUserCache(boolean useCache) {
         super.setUseCache(useCache);
-        if(!useCache){
+        if(!useCache) {
             addFilter(Predicates.RDF_TYPE, this.type);
         }
     }
-    protected int getSpoTableIndex(){
+    protected int getSpoTableIndex() {
         return 2;
     }
     public String getUnorderedQueryWithoutDistinct(List<Object> inParams) {

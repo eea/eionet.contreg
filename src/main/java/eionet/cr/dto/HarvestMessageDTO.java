@@ -37,7 +37,7 @@ public class HarvestMessageDTO implements java.io.Serializable{
     /**
      *
      */
-    public HarvestMessageDTO(){
+    public HarvestMessageDTO() {
     }
 
     /**

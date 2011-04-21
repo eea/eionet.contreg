@@ -25,16 +25,16 @@ public class XmlUtil {
      * if the name is not still valid, then replace it with INVALID_ELEMENT_NAME
      *
      */
-    public static String getEscapedElementName(String elementName){
+    public static String getEscapedElementName(String elementName) {
 
-        if(elementName==null || elementName.length()==0)  elementName=INVALID_ELEMENT_NAME;
+        if(elementName == null || elementName.length() == 0)  elementName=INVALID_ELEMENT_NAME;
 
         //replace whitespaces and other reserved characters with underscore
         elementName = elementName.replaceAll("[^A-Za-z0-9_-]", "_");
 
         //add leading unerscore if the name starts with invalid character or if it starts with xml (any case)
         if(!elementName.substring(0,1).matches("[A-Z]|_|[a-z]")||
-                elementName.toLowerCase().startsWith("xml")){
+                elementName.toLowerCase().startsWith("xml")) {
             elementName = "_" + elementName;
         }
 

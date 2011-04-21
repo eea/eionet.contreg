@@ -64,7 +64,7 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO>{
      *
      * @param subjectsMap
      */
-    public SubjectDataReader(Map<Long,SubjectDTO> subjectsMap){
+    public SubjectDataReader(Map<Long,SubjectDTO> subjectsMap) {
 
         this.subjectsMap = subjectsMap;
     }
@@ -74,9 +74,9 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO>{
      *
      * @param subjectUris
      */
-    public SubjectDataReader(List<String> subjectUris){
+    public SubjectDataReader(List<String> subjectUris) {
         subjectsMap = new LinkedHashMap<Long,SubjectDTO>();
-        for (String subjectUri : subjectUris){
+        for (String subjectUri : subjectUris) {
             Long subjectHash = Long.valueOf(Hashes.spoHash(subjectUri));
             subjectsMap.put(subjectHash, null);
         }
@@ -89,8 +89,8 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO>{
     public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
 
         long subjectHash = rs.getLong("SUBJECT_HASH");
-        boolean newSubject = currentSubject==null || subjectHash!=currentSubject.getUriHash();
-        if (newSubject){
+        boolean newSubject = currentSubject == null || subjectHash != currentSubject.getUriHash();
+        if (newSubject) {
             currentSubject = new SubjectDTO(rs.getString("SUBJECT_URI"), YesNoBoolean.parse(rs.getString("ANON_SUBJ")));
             currentSubject.setUriHash(subjectHash);
             currentSubject.setLastModifiedTime(new Date(rs.getLong("SUBJECT_MODIFIED")));
@@ -98,8 +98,8 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO>{
         }
 
         String predicateUri = rs.getString("PREDICATE_URI");
-        boolean newPredicate = newSubject || currentPredicate==null || !currentPredicate.equals(predicateUri);
-        if (newPredicate){
+        boolean newPredicate = newSubject || currentPredicate == null || !currentPredicate.equals(predicateUri);
+        if (newPredicate) {
             currentPredicate = predicateUri;
             currentObjects = new ArrayList<ObjectDTO>();
             currentSubject.getPredicates().put(predicateUri, currentObjects);
@@ -126,19 +126,19 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO>{
      * @param subjectHash
      * @param subjectDTO
      */
-    protected void addNewSubject(long subjectHash, SubjectDTO subjectDTO){
+    protected void addNewSubject(long subjectHash, SubjectDTO subjectDTO) {
         subjectsMap.put(Long.valueOf(subjectHash), currentSubject);
     }
 
     /**
      * @param predicateHash
      */
-    public void addPredicateHash(Long predicateHash){
+    public void addPredicateHash(Long predicateHash) {
 
-        if (predicateHashes==null){
+        if (predicateHashes == null) {
             this.predicateHashes = new ArrayList<Long>();
         }
-        if(!predicateHashes.contains(predicateHash)){
+        if(!predicateHashes.contains(predicateHash)) {
             predicateHashes.add(predicateHash);
         }
     }
@@ -154,21 +154,21 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO>{
         String subjectUri = subjectValue.stringValue();
 
         boolean isAnonSubject = subjectValue instanceof BNode;
-        if (isAnonSubject && blankNodeUriPrefix!=null){
+        if (isAnonSubject && blankNodeUriPrefix != null) {
             subjectUri = blankNodeUriPrefix + subjectUri;
         }
         long subjectHash = Hashes.spoHash(subjectUri);
 
-        boolean newSubject = currentSubject==null || subjectHash!=currentSubject.getUriHash();
-        if (newSubject){
+        boolean newSubject = currentSubject == null || subjectHash != currentSubject.getUriHash();
+        if (newSubject) {
             currentSubject = new SubjectDTO(subjectUri, isAnonSubject);
             currentSubject.setUriHash(subjectHash);
             addNewSubject(subjectHash, currentSubject);
         }
 
         String predicateUri = bindingSet.getValue("p").stringValue();
-        boolean newPredicate = newSubject || currentPredicate==null || !currentPredicate.equals(predicateUri);
-        if (newPredicate){
+        boolean newPredicate = newSubject || currentPredicate == null || !currentPredicate.equals(predicateUri);
+        if (newPredicate) {
             currentPredicate = predicateUri;
             currentObjects = new ArrayList<ObjectDTO>();
             currentSubject.getPredicates().put(predicateUri, currentObjects);
@@ -182,12 +182,12 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO>{
 
         String strObjectValue = objectValue.stringValue();
         boolean isAnonObject = objectValue instanceof BNode;
-        if (!isLiteral && isAnonObject && blankNodeUriPrefix!=null){
+        if (!isLiteral && isAnonObject && blankNodeUriPrefix != null) {
             strObjectValue = blankNodeUriPrefix.concat(strObjectValue);
         }
 
         ObjectDTO object = new ObjectDTO(strObjectValue,
-                objectLang==null ? "" : objectLang,
+                objectLang == null ? "" : objectLang,
                 isLiteral,
                 objectValue instanceof BNode);
 
@@ -209,18 +209,18 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO>{
         //If current date is after new date, then leave the current date
         Date prevDate = null;
         SubjectDTO subj = subjectsMap.get(subjectHash);
-        if(subj != null){
+        if(subj != null) {
             prevDate = subj.getLastModifiedTime();
         }
 
         Value t = bindingSet.getValue("t");
-        if(t != null){
+        if(t != null) {
             String time = t.stringValue();
-            if(StringUtils.isNotEmpty(time)){
+            if(StringUtils.isNotEmpty(time)) {
                 try {
                     SimpleDateFormat lastModifiedDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
                     Date lastModDate = lastModifiedDateFormat.parse(time);
-                    if(prevDate == null || (prevDate != null && lastModDate != null && lastModDate.after(prevDate))){
+                    if(prevDate == null || (prevDate != null && lastModDate != null && lastModDate.after(prevDate))) {
                         currentSubject.setLastModifiedTime(lastModDate);
                     }
                 } catch (ParseException e) {

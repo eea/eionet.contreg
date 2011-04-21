@@ -41,7 +41,7 @@ public class InputStreamBasedARPSource implements ARPSource{
      *
      * @param inputStream
      */
-    public InputStreamBasedARPSource(InputStream inputStream){
+    public InputStreamBasedARPSource(InputStream inputStream) {
         this.inputStream = inputStream;
     }
 

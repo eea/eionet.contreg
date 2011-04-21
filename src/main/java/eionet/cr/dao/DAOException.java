@@ -32,7 +32,7 @@ public class DAOException extends CRException {
     /**
      *
      */
-    public DAOException(){
+    public DAOException() {
         super();
     }
 
@@ -40,7 +40,7 @@ public class DAOException extends CRException {
      *
      * @param message
      */
-    public DAOException(String message){
+    public DAOException(String message) {
         super(message);
     }
 
@@ -49,7 +49,7 @@ public class DAOException extends CRException {
      * @param message
      * @param cause
      */
-    public DAOException(String message, Throwable cause){
+    public DAOException(String message, Throwable cause) {
         super(message, cause);
     }
 }

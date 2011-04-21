@@ -29,10 +29,10 @@ public class XmlElementMetadata{
     public enum Type{STRING, DOUBLE;}
 
     private String name;
-    private int maxLength=-1;
-    private Type type=null;
+    private int maxLength = -1;
+    private Type type = null;
 
-    public XmlElementMetadata(String name){
+    public XmlElementMetadata(String name) {
         this.name=name;
     }
     public String getName() {
@@ -49,7 +49,7 @@ public class XmlElementMetadata{
      * @param length
      */
     public void setMaxLength(int length) {
-        if(this.maxLength<length){
+        if(this.maxLength < length) {
             this.maxLength = length;
         }
     }
@@ -58,7 +58,7 @@ public class XmlElementMetadata{
      * @return
      */
     public Type getType() {
-        return (this.type==null) ? Type.STRING : this.type;
+        return (this.type == null) ? Type.STRING : this.type;
     }
     /**
      * apply new type only if the type is not a string already or the new type is string
@@ -67,7 +67,7 @@ public class XmlElementMetadata{
      * @param type
      */
     public void setType(Type type) {
-        if(this.type == null || type==Type.STRING){
+        if(this.type == null || type == Type.STRING) {
             this.type = type;
         }
     }

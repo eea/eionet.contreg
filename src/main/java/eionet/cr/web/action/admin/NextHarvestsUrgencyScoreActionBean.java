@@ -33,8 +33,8 @@ public class NextHarvestsUrgencyScoreActionBean extends AbstractSearchActionBean
 
     @DefaultHandler
     public Resolution view() throws DAOException{
-        if (getUser()!=null){
-            if (getUser().isAdministrator()){
+        if (getUser() != null) {
+            if (getUser().isAdministrator()) {
                 setAdminLoggedIn(true);
                 Pair<Integer, List<HarvestUrgencyScoreDTO>> result = DAOFactory.get().getDao(HarvestSourceDAO.class).getUrgencyOfComingHarvests(urgencyScoreLimit);
                 resultList = result.getRight();
@@ -53,7 +53,7 @@ public class NextHarvestsUrgencyScoreActionBean extends AbstractSearchActionBean
      * (non-Javadoc)
      * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
      */
-    public List<SearchResultColumn> getColumns(){
+    public List<SearchResultColumn> getColumns() {
 
         LinkedList<SearchResultColumn> columnList = new LinkedList<SearchResultColumn>();
 

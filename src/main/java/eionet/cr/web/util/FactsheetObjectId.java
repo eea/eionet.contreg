@@ -39,9 +39,9 @@ public class FactsheetObjectId {
      * @param object
      * @return
      */
-    public static String format(ObjectDTO object){
+    public static String format(ObjectDTO object) {
 
-        if (object==null){
+        if (object == null) {
             throw new IllegalArgumentException("Supplied object must not be null");
         }
 
@@ -57,23 +57,23 @@ public class FactsheetObjectId {
      * @param s
      * @return
      */
-    public static ObjectDTO parse(String s){
+    public static ObjectDTO parse(String s) {
 
-        if (StringUtils.isBlank(s)){
+        if (StringUtils.isBlank(s)) {
             throw new IllegalArgumentException("Supplied string must not be blank");
         }
 
         String[] parts = StringUtils.split(s, SEPARATOR);
-        if (parts.length!=4){
+        if (parts.length!=4) {
             throw new IllegalArgumentException("Supplied string has wrong format");
         }
 
         long[] hashes = new long[4];
-        for (int i=0; i<parts.length; i++){
-            try{
+        for (int i=0; i<parts.length; i++) {
+            try {
                 hashes[i] = Long.parseLong(parts[i]);
             }
-            catch (NumberFormatException e){
+            catch (NumberFormatException e) {
                 throw new IllegalArgumentException("Supplied string has wrong format");
             }
         }

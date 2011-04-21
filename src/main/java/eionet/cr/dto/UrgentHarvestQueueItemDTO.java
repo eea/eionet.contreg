@@ -37,7 +37,7 @@ public class UrgentHarvestQueueItemDTO implements Serializable{
     /**
      *
      */
-    public UrgentHarvestQueueItemDTO(){
+    public UrgentHarvestQueueItemDTO() {
     }
 
     /**
@@ -86,7 +86,7 @@ public class UrgentHarvestQueueItemDTO implements Serializable{
      *
      * @return
      */
-    public boolean isPushHarvest(){
-        return pushedContent!=null;
+    public boolean isPushHarvest() {
+        return pushedContent != null;
     }
 }

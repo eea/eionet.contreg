@@ -52,18 +52,18 @@ public class PushHarvest extends Harvest{
      */
     protected void doExecute() throws HarvestException {
 
-        if (content==null || content.trim().length()==0)
+        if (content == null || content.trim().length() == 0)
             throw new HarvestException("No content supplied for push-harvesting from url [" + sourceUrlString + "]");
 
         Reader stringReader = null;
-        try{
+        try {
             stringReader = new StringReader(content);
             sourceLastModified = System.currentTimeMillis();
             harvest(new ReaderBasedARPSource(stringReader));
         }
-        finally{
-            if (stringReader!=null){
-                try{stringReader.close();}catch (IOException e){}
+        finally {
+            if (stringReader != null) {
+                try {stringReader.close();}catch (IOException e) {}
             }
         }
     }

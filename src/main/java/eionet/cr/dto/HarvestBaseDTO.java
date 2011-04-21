@@ -76,9 +76,9 @@ public class HarvestBaseDTO {
      * @param dto
      * @param messageType
      */
-    public static final void addMessageType(HarvestBaseDTO dto, String messageType){
+    public static final void addMessageType(HarvestBaseDTO dto, String messageType) {
 
-        if (dto!=null && messageType!=null){
+        if (dto != null && messageType != null) {
             if (messageType.equals(HarvestMessageType.FATAL.toString()))
                 dto.setHasFatals(Boolean.TRUE);
             else if (messageType.equals(HarvestMessageType.ERROR.toString()))

@@ -8,7 +8,7 @@ package eionet.cr.common;
 
 public class AccessException extends Exception {
 
-    public AccessException(){
+    public AccessException() {
 
     }
 
@@ -17,7 +17,7 @@ public class AccessException extends Exception {
      * @param message
      * @param cause
      */
-    public AccessException(String msg, Throwable cause){
+    public AccessException(String msg, Throwable cause) {
         super(msg, cause);
     }
 

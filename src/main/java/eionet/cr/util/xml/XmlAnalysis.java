@@ -71,12 +71,12 @@ public class XmlAnalysis {
     public void parse(File file) throws ParserConfigurationException, SAXException, IOException{
 
         FileInputStream inputStream = null;
-        try{
+        try {
             inputStream = new FileInputStream(file);
             parse(inputStream);
         }
-        finally{
-            try{
+        finally {
+            try {
                 if (inputStream != null) {
                     inputStream.close();
                 }
@@ -88,12 +88,12 @@ public class XmlAnalysis {
     public void parse(FileBean fileBean) throws ParserConfigurationException, SAXException, IOException{
 
         InputStream inputStream = null;
-        try{
+        try {
             inputStream = fileBean.getInputStream();
             parse(inputStream);
         }
-        finally{
-            try{
+        finally {
+            try {
                 if (inputStream != null) {
                     inputStream.close();
                 }
@@ -141,7 +141,7 @@ public class XmlAnalysis {
         // set the handler and do the parsing
         handler = new Handler();
         reader.setContentHandler(handler);
-        try{
+        try {
             reader.parse(new InputSource(inputStream));
         }
         catch (SAXException e) {
@@ -325,7 +325,7 @@ public class XmlAnalysis {
 //  public static void main(String[] args) {
 //
 //      XmlAnalysis info = new XmlAnalysis();
-//      try{
+//      try {
 //          info.parse(new File("C:/temp/MonthlyOzoneExceedances_Sept2010.xml"));
 //          System.out.println(info.getStartElemLocalName());
 //          System.out.println(info.getStartElemNamespace());

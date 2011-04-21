@@ -71,7 +71,7 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean<SubjectDT
      * @return
      */
     @DefaultHandler
-    public Resolution init(){
+    public Resolution init() {
         return new ForwardResolution("/pages/dataflowSearch.jsp");
     }
 
@@ -97,7 +97,7 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean<SubjectDT
      *
      * @return
      */
-    private Map<String, String> buildSearchCriteria(){
+    private Map<String, String> buildSearchCriteria() {
 
         Map<String, String> result = new HashMap<String, String>();
 
@@ -133,11 +133,11 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean<SubjectDT
      */
     public List<String> getYears() {
 
-        if (years==null){
+        if (years == null) {
             years = new ArrayList<String>();
             int curYear = Calendar.getInstance().get(Calendar.YEAR);
             int earliestYear = 1990;
-            for (int i=curYear; i>=earliestYear; i--)
+            for (int i = curYear; i >= earliestYear; i--)
                 years.add(String.valueOf(i));
         }
 
@@ -190,7 +190,7 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean<SubjectDT
      * (non-Javadoc)
      * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
      */
-    public List<SearchResultColumn> getColumns(){
+    public List<SearchResultColumn> getColumns() {
 
         ArrayList<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
 

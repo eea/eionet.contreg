@@ -41,7 +41,7 @@ public class EncodingSchemes extends HashMap<String,String[]>{
     /**
      *
      */
-    private EncodingSchemes(){
+    private EncodingSchemes() {
         super();
     }
 
@@ -49,8 +49,8 @@ public class EncodingSchemes extends HashMap<String,String[]>{
      *
      * @return
      */
-    public static EncodingSchemes getInstance(){
-        if (instance==null)
+    public static EncodingSchemes getInstance() {
+        if (instance == null)
             instance = new EncodingSchemes();
 
         return instance;
@@ -62,9 +62,9 @@ public class EncodingSchemes extends HashMap<String,String[]>{
      * @param servletContext
      * @return
      */
-    public static String[] getLabels(String id){
+    public static String[] getLabels(String id) {
 
-        return (id==null || id.trim().length()==0) ? null : getInstance().get(id);
+        return (id == null || id.trim().length() == 0) ? null : getInstance().get(id);
     }
 
     /**
@@ -72,7 +72,7 @@ public class EncodingSchemes extends HashMap<String,String[]>{
      * @param id
      * @return
      */
-    public static String getLabel(String id){
+    public static String getLabel(String id) {
         return getLabel(id, false);
     }
 
@@ -82,10 +82,10 @@ public class EncodingSchemes extends HashMap<String,String[]>{
      * @param returnSelfIfNull
      * @return
      */
-    public static String getLabel(String id, boolean returnSelfIfNull){
+    public static String getLabel(String id, boolean returnSelfIfNull) {
 
         String[] labels = getLabels(id);
-        return labels!=null && labels.length>0 ? labels[0] : (returnSelfIfNull ? id : null);
+        return labels != null && labels.length>0 ? labels[0] : (returnSelfIfNull ? id : null);
     }
 
     /**
@@ -94,9 +94,9 @@ public class EncodingSchemes extends HashMap<String,String[]>{
      * @param labels
      * @param servletContext
      */
-    public static synchronized void update(String id, String[] labels){
+    public static synchronized void update(String id, String[] labels) {
 
-        if (id==null || id.trim().length()==0 || labels==null || labels.length==0)
+        if (id == null || id.trim().length() == 0 || labels == null || labels.length == 0)
             return;
 
         getInstance().put(id, labels);
@@ -106,7 +106,7 @@ public class EncodingSchemes extends HashMap<String,String[]>{
      *
      * @return
      */
-    public static int getCount(){
+    public static int getCount() {
         return getInstance().size();
     }
 }

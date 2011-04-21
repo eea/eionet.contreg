@@ -32,21 +32,21 @@ public class BookmarksActionBean extends AbstractHomeActionBean {
     @DefaultHandler
     public Resolution view() throws DAOException {
         setEnvironmentParams(this.getContext(), AbstractHomeActionBean.TYPE_BOOKMARK, true);
-        if (isUserAuthorized()){
+        if (isUserAuthorized()) {
             bookmarkActions();
         }
         return new ForwardResolution("/pages/home/bookmark.jsp");
     }
 
-    private void bookmarkActions(){
-        if (this.getContext().getRequest().getParameter("deletebookmarks") != null){
+    private void bookmarkActions() {
+        if (this.getContext().getRequest().getParameter("deletebookmarks") != null) {
             if (selectedBookmarks != null && !selectedBookmarks.isEmpty()) {
                 try {
-                    for (int i=0; i<selectedBookmarks.size(); i++){
+                    for (int i=0; i<selectedBookmarks.size(); i++) {
                         DAOFactory.get().getDao(HelperDAO.class).deleteUserBookmark(getUser(), selectedBookmarks.get(i));
                     }
                     addSystemMessage("Selected bookmarks were deleted from your personal bookmark list.");
-                } catch (DAOException ex){
+                } catch (DAOException ex) {
                     addWarningMessage("Error occured during bookmark deletion.");
                 }
             } else {
@@ -64,12 +64,12 @@ public class BookmarksActionBean extends AbstractHomeActionBean {
 
     public List<UserBookmarkDTO> getBookmarks() {
         try {
-            if (this.isUserAuthorized() && this.getUser()!=null){
+            if (this.isUserAuthorized() && this.getUser() != null) {
                 bookmarks = DAOFactory.get().getDao(HelperDAO.class).getUserBookmarks(this.getUser());
             } else {
                 bookmarks = DAOFactory.get().getDao(HelperDAO.class).getUserBookmarks(new CRUser(this.getAttemptedUserName()));
             }
-        } catch (DAOException ex){
+        } catch (DAOException ex) {
 
         }
         return bookmarks;

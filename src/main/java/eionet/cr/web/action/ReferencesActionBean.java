@@ -84,20 +84,20 @@ public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
      */
     public Resolution search() throws DAOException {
 
-        if (StringUtils.isBlank(uri) && anonHash==0){
+        if (StringUtils.isBlank(uri) && anonHash == 0) {
 
             noCriteria = true;
             addCautionMessage("Resource identifier not specified!");
         }
-        else{
+        else {
             Pair<Integer, List<SubjectDTO>> searchResult = null;
             SearchDAO searchDAO = DAOFactory.get().getDao(SearchDAO.class);
 
-            if (anonHash==0){
+            if (anonHash == 0) {
                 searchResult = searchDAO.searchReferences(uri, PagingRequest.create(getPageN()),
                                 new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
             }
-            else{
+            else {
                 searchResult = searchDAO.searchReferences(anonHash,
                                 PagingRequest.create(getPageN()),
                                 new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
@@ -107,12 +107,12 @@ public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
             matchCount = searchResult.getLeft();
 
             HashSet<Long> subjectHashes = new HashSet<Long>();
-            for (SubjectDTO subject : resultList){
+            for (SubjectDTO subject : resultList) {
                 subjectHashes.add(subject.getUriHash());
             }
 
             PredicateLabels predLabels = DAOFactory.get().getDao(HelperDAO.class).getPredicateLabels(subjectHashes);
-            if (predLabels!=null){
+            if (predLabels != null) {
                 predicateLabels = predLabels.getByLanguages(getAcceptedLanguages());
             }
         }
@@ -203,9 +203,9 @@ public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
      *
      * @return
      */
-    public boolean isUriResolvable(){
+    public boolean isUriResolvable() {
 
-        return uri==null ? false : URLUtil.isURL(uri);
+        return uri == null ? false : URLUtil.isURL(uri);
     }
 
     /**
@@ -214,15 +214,15 @@ public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
      */
     public Boolean getUriIsHarvestSource() throws DAOException {
 
-        if (uriIsHarvestSource==null){
+        if (uriIsHarvestSource == null) {
 
-            if ((uri==null && subject==null) || anonHash>0 || (subject!=null && subject.isAnonymous())){
+            if ((uri == null && subject == null) || anonHash>0 || (subject != null && subject.isAnonymous())) {
                 uriIsHarvestSource = Boolean.FALSE;
             }
-            else{
-                String s = subject!=null ? subject.getUri() : uri;
+            else {
+                String s = subject != null ? subject.getUri() : uri;
                 HarvestSourceDTO dto = factory.getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(s);
-                uriIsHarvestSource = dto==null ? Boolean.FALSE : Boolean.TRUE;
+                uriIsHarvestSource = dto == null ? Boolean.FALSE : Boolean.TRUE;
             }
         }
         return uriIsHarvestSource;

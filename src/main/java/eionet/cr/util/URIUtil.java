@@ -56,7 +56,7 @@ public class URIUtil {
             if (!uri.isAbsolute()) // we consider legal only those URIs that have a scheme part specified
                 return false;
 
-            if (schemes==null)
+            if (schemes == null)
                 initSchemes();
 
             return schemes.contains(uri.getScheme());
@@ -79,7 +79,7 @@ public class URIUtil {
             int i = Math.max(uri.lastIndexOf('#'), uri.lastIndexOf('/'));
             if (i>=0) {
                 result = uri.substring(i+1);
-                if (result.trim().length()==0) {
+                if (result.trim().length() == 0) {
                     result = null;
                 }
             }
@@ -102,13 +102,13 @@ public class URIUtil {
             int i = Math.max(uri.lastIndexOf('#'), uri.lastIndexOf('/'));
             if (i>=0) {
                 result = uri.substring(i+1);
-                if (result.trim().length()==0) {
+                if (result.trim().length() == 0) {
                     result = null;
                 }
             }
         }
 
-        return result==null ? dflt : result;
+        return result == null ? dflt : result;
     }
 
     /**

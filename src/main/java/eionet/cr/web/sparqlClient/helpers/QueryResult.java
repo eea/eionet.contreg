@@ -32,35 +32,35 @@ public class QueryResult {
      */
     public QueryResult(TupleQueryResult queryResult) throws QueryEvaluationException{
 
-        if (queryResult!=null && queryResult.hasNext()){
+        if (queryResult != null && queryResult.hasNext()) {
 
             this.variables = queryResult.getBindingNames();
             addCols();
-            while (queryResult.hasNext()){
+            while (queryResult.hasNext()) {
                 add(queryResult.next());
             }
         }
     }
 
-    private void add(BindingSet bindingSet){
+    private void add(BindingSet bindingSet) {
 
-        if (bindingSet==null || variables==null || variables.isEmpty()){
+        if (bindingSet == null || variables == null || variables.isEmpty()) {
             return;
         }
 
         HashMap<String,ResultValue> map = new HashMap<String, ResultValue>();
-        for (String variable : variables){
+        for (String variable : variables) {
 
             ResultValue resultValue = null;
             Value value = bindingSet.getValue(variable);
 
-            if (value!=null){
+            if (value != null) {
 
                 String valueString = Util.escapeHtml(value.stringValue());
-                if (value instanceof Literal){
+                if (value instanceof Literal) {
                     resultValue = new ResultValue(valueString, true);
                 }
-                else{
+                else {
                     resultValue = new ResultValue(valueString, false);
                 }
             }
@@ -68,7 +68,7 @@ public class QueryResult {
             map.put(variable, resultValue);
         }
 
-        if (rows==null){
+        if (rows == null) {
             rows = new ArrayList<HashMap<String,ResultValue>>();
         }
         rows.add(map);
@@ -77,20 +77,20 @@ public class QueryResult {
     /**
      *
      */
-    private void addCols(){
+    private void addCols() {
 
-        if (variables==null || variables.isEmpty()){
+        if (variables == null || variables.isEmpty()) {
             return;
         }
 
-        for (String variable : variables){
+        for (String variable : variables) {
 
             Map<String, Object> col = new HashMap<String, Object>();
             col.put("property", variable);
             col.put("title", variable);
             col.put("sortable", Boolean.TRUE);
 
-            if (cols == null){
+            if (cols == null) {
                 cols = new ArrayList<Map<String,Object>>();
             }
             cols.add(col);

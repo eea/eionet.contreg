@@ -74,11 +74,11 @@ public class XmlWithSchemaExporter extends XmlExporter {
         writer.writeStartElement(SCHEMA_NS_URI, "sequence");
 
         //write elements
-        for(XmlElementMetadata element : getElements().values()){
-            if(element.getType() == XmlElementMetadata.Type.DOUBLE){
+        for(XmlElementMetadata element : getElements().values()) {
+            if(element.getType() == XmlElementMetadata.Type.DOUBLE) {
                 writeDoubleElement(writer, element);
             }
-            else{
+            else {
                 writeStringElement(writer, element);
             }
         }

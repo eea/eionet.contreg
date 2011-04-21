@@ -24,25 +24,25 @@ public class NextHarvestsUrgencyScoreColumn extends SearchResultColumn {
     public String format(Object object) {
 
         String result = "";
-        if (object!=null){
+        if (object != null) {
             HarvestUrgencyScoreDTO harvestUrgencyScore = (HarvestUrgencyScoreDTO)object;
 
-            if (columnType == COLUMN.URL){
+            if (columnType == COLUMN.URL) {
                 result = harvestUrgencyScore.getUrl();
             }
 
-            if (columnType == COLUMN.LASTHARVEST){
+            if (columnType == COLUMN.LASTHARVEST) {
                 Date date = harvestUrgencyScore .getLastHarvest();
-                if (date!=null && date.getTime()>0){
+                if (date != null && date.getTime()>0) {
                     result = SIMPLE_DATE_FORMAT.format(date);
                 }
             }
 
-            if (columnType == COLUMN.INTERVAL){
+            if (columnType == COLUMN.INTERVAL) {
                 result = harvestUrgencyScore.getIntervalMinutes()+"";
             }
 
-            if (columnType == COLUMN.URGENCY){
+            if (columnType == COLUMN.URGENCY) {
                 NumberFormat formatter = new DecimalFormat("#.000");
                 result = formatter.format(harvestUrgencyScore.getUrgency());
             }

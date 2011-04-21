@@ -32,7 +32,7 @@ public class HarvestException extends CRException{
     /**
      *
      */
-    public HarvestException(){
+    public HarvestException() {
         super();
     }
 
@@ -40,7 +40,7 @@ public class HarvestException extends CRException{
      *
      * @param message
      */
-    public HarvestException(String message){
+    public HarvestException(String message) {
         super(message);
     }
 
@@ -49,7 +49,7 @@ public class HarvestException extends CRException{
      * @param message
      * @param cause
      */
-    public HarvestException(String message, Throwable cause){
+    public HarvestException(String message, Throwable cause) {
         super(message, cause);
     }
 }

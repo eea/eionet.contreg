@@ -32,7 +32,7 @@ public class CRConfigException extends CRRuntimeException{
     /**
      *
      */
-    public CRConfigException(){
+    public CRConfigException() {
         super();
     }
 
@@ -40,7 +40,7 @@ public class CRConfigException extends CRRuntimeException{
      *
      * @param message
      */
-    public CRConfigException(String message){
+    public CRConfigException(String message) {
         super(message);
     }
 
@@ -49,7 +49,7 @@ public class CRConfigException extends CRRuntimeException{
      * @param message
      * @param cause
      */
-    public CRConfigException(String message, Throwable cause){
+    public CRConfigException(String message, Throwable cause) {
         super(message, cause);
     }
 }

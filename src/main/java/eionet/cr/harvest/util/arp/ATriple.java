@@ -43,7 +43,7 @@ public class ATriple {
     /**
      *
      */
-    private ATriple(){
+    private ATriple() {
     }
 
     /**
@@ -54,7 +54,7 @@ public class ATriple {
      * @param litObject
      * @return
      */
-    public static ATriple create(AResource subject, AResource predicate, String object, boolean litObject){
+    public static ATriple create(AResource subject, AResource predicate, String object, boolean litObject) {
 
         ATriple aTriple = new ATriple();
         aTriple.setSubject(subject);

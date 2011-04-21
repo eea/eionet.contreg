@@ -85,7 +85,7 @@ public abstract class AbstractSearchActionBean<T> extends AbstractActionBean{
      *
      * @return
      */
-    public int getMaxResultSetSize(){
+    public int getMaxResultSetSize() {
         return Pagination.pageLength();
     }
 
@@ -93,7 +93,7 @@ public abstract class AbstractSearchActionBean<T> extends AbstractActionBean{
      *
      * @return
      */
-    protected List<SearchResultColumn> getDefaultColumns(){
+    protected List<SearchResultColumn> getDefaultColumns() {
 
         ArrayList<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
 
@@ -178,9 +178,9 @@ public abstract class AbstractSearchActionBean<T> extends AbstractActionBean{
      *
      * @return
      */
-    public Pagination getPagination(){
+    public Pagination getPagination() {
 
-        if (pagination==null){
+        if (pagination == null) {
             pagination = Pagination.createPagination(this);
         }
 

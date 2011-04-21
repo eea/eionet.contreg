@@ -36,7 +36,7 @@ public class AResourceImpl implements AResource{
      *
      * @param uri
      */
-    public AResourceImpl(String uri){
+    public AResourceImpl(String uri) {
         this.uri = uri;
     }
 

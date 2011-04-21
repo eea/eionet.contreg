@@ -126,12 +126,12 @@ public class CRActionBeanContext extends ActionBeanContext {
      * (non-Javadoc)
      * @see net.sourceforge.stripes.action.ActionBeanContext#getSourcePageResolution()
      */
-    public Resolution getSourcePageResolution(){
+    public Resolution getSourcePageResolution() {
 
-        if (this.sourcePageResolution!=null){
+        if (this.sourcePageResolution != null) {
             return this.sourcePageResolution;
         }
-        else{
+        else {
             return super.getSourcePageResolution();
         }
     }
@@ -140,7 +140,7 @@ public class CRActionBeanContext extends ActionBeanContext {
      *
      * @param resolution
      */
-    public void setSourcePageResolution(Resolution resolution){
+    public void setSourcePageResolution(Resolution resolution) {
         this.sourcePageResolution = resolution;
     }
 }

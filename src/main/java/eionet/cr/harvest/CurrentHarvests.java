@@ -63,7 +63,7 @@ public class CurrentHarvests {
      */
     public static synchronized void addOnDemandHarvest(String url, String user) {
 
-        if (url!=null && user!=null){
+        if (url != null && user != null) {
             onDemandHarvests.put(url, user);
         }
     }
@@ -73,7 +73,7 @@ public class CurrentHarvests {
      * @param url
      */
     public static synchronized void removeOnDemandHarvest(String url) {
-        if (url!=null){
+        if (url != null) {
             onDemandHarvests.remove(url);
         }
     }
@@ -84,7 +84,7 @@ public class CurrentHarvests {
      * @return
      */
     public static synchronized boolean contains(String url) {
-        return url==null ? false : (queuedHarvest!=null && url.equals(queuedHarvest.getSourceUrlString())) || onDemandHarvests.containsKey(url);
+        return url == null ? false : (queuedHarvest != null && url.equals(queuedHarvest.getSourceUrlString())) || onDemandHarvests.containsKey(url);
     }
 
     /**
@@ -94,11 +94,11 @@ public class CurrentHarvests {
      */
     public static synchronized boolean contains(long urlHash) {
 
-        if (queuedHarvest!=null && Hashes.spoHash(queuedHarvest.getSourceUrlString())==urlHash)
+        if (queuedHarvest != null && Hashes.spoHash(queuedHarvest.getSourceUrlString()) == urlHash)
             return true;
 
-        for (String url:onDemandHarvests.keySet()){
-            if (Hashes.spoHash(url)==urlHash){
+        for (String url:onDemandHarvests.keySet()) {
+            if (Hashes.spoHash(url) == urlHash) {
                 return true;
             }
         }

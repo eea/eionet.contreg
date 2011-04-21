@@ -56,7 +56,7 @@ public class UploadDTOReader extends SQLResultSetBaseReader<UploadDTO>{
 
         String subjectUri = rs.getString("URI");
         UploadDTO uploadDTO = uploadsMap.get(subjectUri);
-        if (uploadDTO==null){
+        if (uploadDTO == null) {
             uploadDTO = new UploadDTO(subjectUri);
             uploadsMap.put(subjectUri, uploadDTO);
         }
@@ -64,16 +64,16 @@ public class UploadDTOReader extends SQLResultSetBaseReader<UploadDTO>{
         long predicateHash = rs.getLong("PREDICATE");
         String objectValue = rs.getString("OBJECT");
 
-        if (predicateHash==labelHash){
+        if (predicateHash == labelHash) {
             uploadDTO.setLabel(objectValue);
         }
-        else if (predicateHash==lastModifiedHash){
+        else if (predicateHash == lastModifiedHash) {
             uploadDTO.setDateModified(objectValue);
         }
-        else if (predicateHash==dcTitleHash){
+        else if (predicateHash == dcTitleHash) {
 
             // label not yet set, prefer dc:title as the label
-            if (StringUtils.isBlank(uploadDTO.getLabel())){
+            if (StringUtils.isBlank(uploadDTO.getLabel())) {
                 uploadDTO.setLabel(objectValue);
             }
         }
@@ -83,7 +83,7 @@ public class UploadDTOReader extends SQLResultSetBaseReader<UploadDTO>{
      * (non-Javadoc)
      * @see eionet.cr.util.sql.SQLResultSetBaseReader#getResultList()
      */
-    public List<UploadDTO> getResultList(){
+    public List<UploadDTO> getResultList() {
         return new ArrayList<UploadDTO>(uploadsMap.values());
     }
 }

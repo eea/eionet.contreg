@@ -70,7 +70,7 @@ public class TripleDTO {
      * @param predicateHash
      * @param objectHash
      */
-    public TripleDTO(long subjectHash, long predicateHash, long objectHash){
+    public TripleDTO(long subjectHash, long predicateHash, long objectHash) {
 
         this.subjectHash = subjectHash;
         this.predicateHash = predicateHash;
@@ -83,9 +83,9 @@ public class TripleDTO {
      * @param predicateHash
      * @param object
      */
-    public TripleDTO(long subjectHash, long predicateHash, String object){
+    public TripleDTO(long subjectHash, long predicateHash, String object) {
 
-        if (object==null){
+        if (object == null) {
             throw new IllegalArgumentException("object must not be null!");
         }
 

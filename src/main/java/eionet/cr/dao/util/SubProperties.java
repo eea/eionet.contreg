@@ -35,10 +35,10 @@ public class SubProperties extends HashMap<String,HashSet<String>>{
      * @param predicateUri
      * @param parentUri
      */
-    public void add(String predicate, String subProperty){
+    public void add(String predicate, String subProperty) {
 
         HashSet<String> subProperties = get(predicate);
-        if (subProperties==null){
+        if (subProperties == null) {
             subProperties = new HashSet<String>();
             put(predicate, subProperties);
         }

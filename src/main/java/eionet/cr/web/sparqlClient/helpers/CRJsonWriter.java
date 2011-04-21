@@ -149,7 +149,7 @@ public class CRJsonWriter implements TupleQueryResultWriter {
     private void writeValue(Value value)
         throws IOException, TupleQueryResultHandlerException {
         writer.write("{ ");
-        if(value != null){
+        if(value != null) {
             if (value instanceof URI) {
                 writeKeyValue("type", "uri");
                 writer.write(", ");

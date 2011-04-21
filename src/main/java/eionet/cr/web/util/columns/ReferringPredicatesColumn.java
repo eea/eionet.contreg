@@ -49,12 +49,12 @@ public class ReferringPredicatesColumn extends SearchResultColumn{
      *
      * @param actionBean
      */
-    public ReferringPredicatesColumn(ReferencesActionBean actionBean){
+    public ReferringPredicatesColumn(ReferencesActionBean actionBean) {
 
         this.actionBean = actionBean;
 
         referringToHash = actionBean.getAnonHash();
-        if (referringToHash==0 && !StringUtils.isBlank(actionBean.getUri())){
+        if (referringToHash==0 && !StringUtils.isBlank(actionBean.getUri())) {
             referringToHash = Hashes.spoHash(actionBean.getUri());
         }
     }
@@ -65,7 +65,7 @@ public class ReferringPredicatesColumn extends SearchResultColumn{
      */
     public String format(Object object) {
 
-        if (object instanceof SubjectDTO){
+        if (object instanceof SubjectDTO) {
 
             SubjectDTO subjectDTO = (SubjectDTO)object;
 
@@ -73,16 +73,16 @@ public class ReferringPredicatesColumn extends SearchResultColumn{
 
             LinkedHashSet<String> labels = new LinkedHashSet<String>();
             Map<String,Collection<ObjectDTO>> predicatesObjects = subjectDTO.getPredicates();
-            if (predicatesObjects!=null && !predicatesObjects.isEmpty()){
+            if (predicatesObjects != null && !predicatesObjects.isEmpty()) {
 
-                for (String predicate:predicatesObjects.keySet()){
+                for (String predicate:predicatesObjects.keySet()) {
 
                     Collection<ObjectDTO> objects = predicatesObjects.get(predicate);
-                    if (objects!=null && !objects.isEmpty()){
+                    if (objects != null && !objects.isEmpty()) {
 
-                        for (ObjectDTO objectDTO:objects){
+                        for (ObjectDTO objectDTO:objects) {
 
-                            if (objectDTO.getSourceObjectHash()==0 && objectDTO.getHash()==referringToHash){
+                            if (objectDTO.getSourceObjectHash()==0 && objectDTO.getHash()==referringToHash) {
 
                                 String predicateLabel = JstlFunctions.getPredicateLabel(actionBean.getPredicateLabels(), predicate);
                                 labels.add(predicateLabel);

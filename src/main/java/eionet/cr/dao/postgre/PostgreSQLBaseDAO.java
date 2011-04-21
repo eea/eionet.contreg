@@ -76,7 +76,7 @@ public abstract class PostgreSQLBaseDAO extends SQLBaseDAO{
         append("left join RESOURCE as DSRC_RESOURCE on (OBJ_DERIV_SOURCE=DSRC_RESOURCE.URI_HASH) ").
         append("where ").
         append("SUBJECT in (").append(subjectsSubQuery).append(") ").
-        append( predicateHashesCommaSeparated!=null && predicateHashesCommaSeparated.length()>0 ?
+        append( predicateHashesCommaSeparated != null && predicateHashesCommaSeparated.length()>0 ?
                 "AND PREDICATE IN (".concat(predicateHashesCommaSeparated).concat(") ") : "").
         append("order by ").
         append("SUBJECT, PREDICATE, OBJECT");
@@ -106,7 +106,7 @@ public abstract class PostgreSQLBaseDAO extends SQLBaseDAO{
 
         Map<Long,SubjectDTO> subjectsMap = reader.getSubjectsMap();
         String predicateHashes = reader.getPredicateHashesCommaSeparated();
-        if (subjectsMap==null || subjectsMap.isEmpty()){
+        if (subjectsMap == null || subjectsMap.isEmpty()) {
             throw new IllegalArgumentException("Subjects collection must not be null or empty");
         }
 
@@ -117,22 +117,22 @@ public abstract class PostgreSQLBaseDAO extends SQLBaseDAO{
         int size = subjectsMap.size();
         int max = 150;
         int len = size / max;
-        if (size % max > 0){
+        if (size % max > 0) {
             len++;
         }
 
         Connection conn = null;
-        try{
+        try {
             List<Long> list = new ArrayList<Long>(subjectsMap.keySet());
             long startTime = System.currentTimeMillis();
 
-            for (int i=0; i<len; i++){
+            for (int i=0; i<len; i++) {
 
                 int from = Math.min(i*max, size);
                 int to = Math.min(from + max, size);
                 String query = getSubjectsDataQuery(list.subList(from, to), predicateHashes);
 
-                if (conn==null){
+                if (conn == null) {
                     conn = getSQLConnection();
                 }
 
@@ -147,7 +147,7 @@ public abstract class PostgreSQLBaseDAO extends SQLBaseDAO{
             // is null (which might happen if they don't have any triples with the predicates that
             // were asked for), then create them "artificially" now
             Set<Long> unfilledSubjects = Util.getNullValueKeys(subjectsMap);
-            if (unfilledSubjects!=null && !unfilledSubjects.isEmpty()){
+            if (unfilledSubjects != null && !unfilledSubjects.isEmpty()) {
 
                 StringBuffer buf = new StringBuffer().
                 append("select distinct SUBJECT,URI,ANON_SUBJ from SPO,RESOURCE where SUBJECT in (").
@@ -157,10 +157,10 @@ public abstract class PostgreSQLBaseDAO extends SQLBaseDAO{
 
             logger.debug("getSubjectsData, total query time " + Util.durationSince(startTime));
         }
-        catch (Exception e){
+        catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
         }
-        finally{
+        finally {
             SQLUtil.close(conn);
         }
 
@@ -179,7 +179,7 @@ public abstract class PostgreSQLBaseDAO extends SQLBaseDAO{
     protected List<SubjectDTO> getSubjectsData(SubjectDataReader reader, String subjectsSubQuery) throws DAOException{
 
         String predicateHashes = reader.getPredicateHashesCommaSeparated();
-        if (subjectsSubQuery==null || subjectsSubQuery.length()==0)
+        if (subjectsSubQuery == null || subjectsSubQuery.length() == 0)
             throw new IllegalArgumentException("Subjects sub query must not be null or empty");
 
         long startTime = System.currentTimeMillis();

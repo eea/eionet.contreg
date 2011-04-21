@@ -68,7 +68,7 @@ public class HarvestingJobListener implements JobListener{
      */
     public void jobWasExecuted(JobExecutionContext context, JobExecutionException exception) {
 
-        if (exception!=null) {
+        if (exception != null) {
             logger.error("Exception thrown when executing job " + context.getJobDetail().getName() + ": " + exception.toString(), exception);
             return;
         }

@@ -69,7 +69,7 @@ public class XmlConvFeedServlet extends HttpServlet{
         try {
             List<SubjectDTO> subjects = null;
             String xmlSchema = request.getParameter(SCHEMA_PARAM);
-            if (!StringUtils.isBlank(xmlSchema)){
+            if (!StringUtils.isBlank(xmlSchema)) {
 
                 SearchDAO searchDao = DAOFactory.get().getDao(SearchDAO.class);
                 Map<String, String> criteria = new HashMap<String, String>();
@@ -82,12 +82,12 @@ public class XmlConvFeedServlet extends HttpServlet{
                         null,
                         null);
 
-                int subjectCount = results==null ? 0 : (results.getRight()==null ? 0 : results.getRight().size());
+                int subjectCount = results == null ? 0 : (results.getRight() == null ? 0 : results.getRight().size());
                 logger.debug(methodName + ", " + subjectCount + " subjects found in total");
                 subjects = results.getRight();
             }
 
-            SubjectsRDFWriter rdfWriter = new SubjectsRDFWriter(request.getParameter(AmpFeedServlet.INCLUDE_DERIVED_VALUES)!=null);
+            SubjectsRDFWriter rdfWriter = new SubjectsRDFWriter(request.getParameter(AmpFeedServlet.INCLUDE_DERIVED_VALUES) != null);
             rdfWriter.addNamespace(Namespace.CR);
             rdfWriter.addNamespace(Namespace.DC);
             rdfWriter.addNamespace(Namespace.OWL);

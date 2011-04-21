@@ -64,7 +64,7 @@ public class Transaction {
      */
     public static Transaction begin() throws DAOException{
 
-        try{
+        try {
             return new Transaction(DbConnectionProvider.getConnection());
         }
         catch (SQLException e) {
@@ -77,7 +77,7 @@ public class Transaction {
      */
     public void commit() {
 
-        try{
+        try {
             conn.commit();
         }
         catch (SQLException e) {
@@ -90,7 +90,7 @@ public class Transaction {
      */
     public void rollback() {
 
-        try{
+        try {
             conn.rollback();
         }
         catch (SQLException e) {
@@ -103,7 +103,7 @@ public class Transaction {
      */
     public static void rollback(Transaction transaction) {
 
-        if (transaction!=null) {
+        if (transaction != null) {
             transaction.rollback();
         }
     }
@@ -128,7 +128,7 @@ public class Transaction {
     public static void main(String[] args) {
 
         Transaction transaction = null;;
-        try{
+        try {
             transaction = Transaction.begin();
             transaction.getDao(HelperDAO.class).addTriples(null);
             // do some DAO operations here

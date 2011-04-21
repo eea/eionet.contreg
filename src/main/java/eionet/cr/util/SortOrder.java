@@ -88,7 +88,7 @@ public enum SortOrder {
      */
     public static SortOrder parse(String s) {
 
-        if (s==null)
+        if (s == null)
             return null;
         else if (s.equals(ASCENDING.toString()))
             return ASCENDING;

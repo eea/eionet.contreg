@@ -44,7 +44,7 @@ public class HarvestWithMessageTypesReader extends SQLResultSetBaseReader<Harves
      *
      * @param maxDistinctHarvests
      */
-    public HarvestWithMessageTypesReader(int maxDistinctHarvests){
+    public HarvestWithMessageTypesReader(int maxDistinctHarvests) {
         this.maxDistinctHarvests = maxDistinctHarvests;
     }
 
@@ -55,10 +55,10 @@ public class HarvestWithMessageTypesReader extends SQLResultSetBaseReader<Harves
     public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
 
         Integer harvestId = rs.getInt("HARVEST_ID");
-        if (currHarvest==null || currHarvest.getHarvestId().equals(harvestId)==false){ // if first row or new harvest
+        if (currHarvest == null || currHarvest.getHarvestId().equals(harvestId) == false) { // if first row or new harvest
 
             // create new harvest object and add it to the list, but only if the list has not reached it's max allowed size yet
-            if (resultList.size() >= maxDistinctHarvests){
+            if (resultList.size() >= maxDistinctHarvests) {
                 return;
             }
 

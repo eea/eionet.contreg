@@ -31,7 +31,7 @@ public class VirtuosoQueryActionBean extends AbstractActionBean {
      * @return
      */
     @DefaultHandler
-    public Resolution view(){
+    public Resolution view() {
         return new ForwardResolution("/pages/virtuosoQuery.jsp");
     }
 
@@ -53,10 +53,10 @@ public class VirtuosoQueryActionBean extends AbstractActionBean {
             long execTime = System.currentTimeMillis() - startTime;
 
             String result = reader.getResult();
-            if (result==null || result.trim().length()==0){
+            if (result == null || result.trim().length() == 0) {
                 result = "The query gave no results!";
             }
-            else{
+            else {
                 result = result + "<br/> Done, -- " + execTime + " ms.";
             }
 
@@ -65,7 +65,7 @@ public class VirtuosoQueryActionBean extends AbstractActionBean {
         catch (Exception e) {
             throw new DAOException(e.toString(), e);
         }
-        finally{
+        finally {
             SesameUtil.close(conn);
         }
     }
@@ -101,16 +101,16 @@ public class VirtuosoQueryActionBean extends AbstractActionBean {
          * (non-Javadoc)
          * @see eionet.cr.util.sesame.SPARQLResultSetBaseReader#startResultSet()
          */
-        protected void startResultSet(){
+        protected void startResultSet() {
 
-            if (bindingNames==null || bindingNames.isEmpty()){
+            if (bindingNames == null || bindingNames.isEmpty()) {
                 return;
             }
 
             result.append("<table class=\"datatable\">");
             result.append("<thead>");
 
-            for (Object bindingName : bindingNames){
+            for (Object bindingName : bindingNames) {
                 result.append("<th>").append(bindingName).append("</th>");
             }
 
@@ -125,14 +125,14 @@ public class VirtuosoQueryActionBean extends AbstractActionBean {
         @Override
         public void readRow(BindingSet bindingSet) throws ResultSetReaderException {
 
-            if(rowCounter % 2 == 0){
+            if(rowCounter % 2 == 0) {
                 result.append("<tr class=\"odd\">");
             }
-            else{
+            else {
                 result.append("<tr class=\"even\">");
             }
 
-            for(Object bindingName : bindingNames){
+            for(Object bindingName : bindingNames) {
 
                 Binding binding = bindingSet.getBinding(bindingName.toString());
 
@@ -152,7 +152,7 @@ public class VirtuosoQueryActionBean extends AbstractActionBean {
         @Override
         public void endResultSet() {
 
-            if (rowCounter>0 && result.length()>0){
+            if (rowCounter>0 && result.length()>0) {
 
                 result.append("</tbody>");
                 result.append("</table>");

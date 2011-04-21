@@ -60,7 +60,7 @@ public class UnfinishedHarvestDTO {
      * @param genTime
      * @return
      */
-    public static UnfinishedHarvestDTO create(long source, long genTime){
+    public static UnfinishedHarvestDTO create(long source, long genTime) {
         UnfinishedHarvestDTO dto = new UnfinishedHarvestDTO();
         dto.setSource(source);
         dto.setGenTime(genTime);

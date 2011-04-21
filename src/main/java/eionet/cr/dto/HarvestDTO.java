@@ -42,7 +42,7 @@ public class HarvestDTO extends HarvestBaseDTO implements java.io.Serializable{
     /**
      *
      */
-    public HarvestDTO(){
+    public HarvestDTO() {
     }
 
     /**

@@ -130,7 +130,7 @@ public class PostgreFreeTextSearchHelper extends FreeTextSearchHelper{
             subSelect.append(" RESOURCE.LASTMODIFIED_TIME as OBJECT_ORDERED_BY from SPO as F").
             append(" left join RESOURCE on (F.SUBJECT=RESOURCE.URI_HASH)");
         }
-        else{
+        else {
             subSelect.append(" ORDERING.OBJECT as OBJECT_ORDERED_BY from SPO as F").
             append(" left join SPO as ORDERING on").
             append(" (F.SUBJECT=ORDERING.SUBJECT and ORDERING.PREDICATE=").
@@ -176,7 +176,7 @@ public class PostgreFreeTextSearchHelper extends FreeTextSearchHelper{
             inParams.add(expression.isHash() ?
                     Long.valueOf(expression.toString()) : Long.valueOf(Hashes.spoHash(expression.toString())));
         }
-        else{
+        else {
             buf.
             append(" where to_tsvector('simple', F.OBJECT) @@ to_tsquery('simple', ?)").
             append(" and F.LIT_OBJ='Y'");

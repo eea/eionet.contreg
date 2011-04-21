@@ -7,8 +7,8 @@ public class BaseUrl {
     static boolean valueSet = false;
     static String baseUrl = "";
 
-    public static String getBaseUrl(HttpServletRequest request){
-        if (!valueSet){
+    public static String getBaseUrl(HttpServletRequest request) {
+        if (!valueSet) {
             valueSet = true;
             StringBuffer requestUrl = request.getRequestURL();
             String servletPath = request.getServletPath();

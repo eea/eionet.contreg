@@ -20,8 +20,8 @@ public class AdminWelcomeActionBean extends AbstractActionBean {
 
     @DefaultHandler
     public Resolution view() throws DAOException{
-        if (getUser()!=null){
-            if (getUser().isAdministrator()){
+        if (getUser() != null) {
+            if (getUser().isAdministrator()) {
                 setAdminLoggedIn(true);
             } else {
                 setAdminLoggedIn(false);

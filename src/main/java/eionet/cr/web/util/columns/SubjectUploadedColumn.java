@@ -54,11 +54,11 @@ public class SubjectUploadedColumn extends SearchResultColumn{
     public String format(Object object) {
 
         String result = "";
-        if (object!=null && object instanceof SubjectDTO){
+        if (object != null && object instanceof SubjectDTO) {
 
             SubjectDTO subjectDTO = (SubjectDTO)object;
             Date date = ((SubjectDTO)object).getDcDate();
-            if (date!=null){
+            if (date != null) {
                 result = SIMPLE_DATE_FORMAT.format(date);
             }
         }

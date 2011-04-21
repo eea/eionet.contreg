@@ -40,15 +40,15 @@ public class SearchExpression {
      *
      * @param s
      */
-    public SearchExpression(String s){
+    public SearchExpression(String s) {
 
-        expression = s==null ? "" : s.trim();
+        expression = s == null ? "" : s.trim();
 
-        try{
+        try {
             Long.parseLong(expression);
             isHash = true;
         }
-        catch (NumberFormatException nfe){}
+        catch (NumberFormatException nfe) {}
 
         isUri = URIUtil.isSchemedURI(expression);
     }
@@ -57,15 +57,15 @@ public class SearchExpression {
      *
      * @return
      */
-    public boolean isEmpty(){
-        return expression.length()==0;
+    public boolean isEmpty() {
+        return expression.length() == 0;
     }
 
     /*
      * (non-Javadoc)
      * @see java.lang.Object#toString()
      */
-    public String toString(){
+    public String toString() {
         return expression;
     }
 

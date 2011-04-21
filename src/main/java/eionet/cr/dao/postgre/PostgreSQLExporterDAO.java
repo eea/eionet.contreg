@@ -34,9 +34,9 @@ public class PostgreSQLExporterDAO extends PostgreSQLBaseDAO implements Exporter
 
         //limit predicates
         List<Long> predicateHashes = new ArrayList<Long>();
-        if(selectedPredicates!=null && !selectedPredicates.isEmpty()){
-            for(String predicate : selectedPredicates){
-                if(!predicateHashes.contains(predicate)){
+        if(selectedPredicates != null && !selectedPredicates.isEmpty()) {
+            for(String predicate : selectedPredicates) {
+                if(!predicateHashes.contains(predicate)) {
                     predicateHashes.add(Hashes.spoHash(predicate));
                 }
             }
@@ -53,12 +53,12 @@ public class PostgreSQLExporterDAO extends PostgreSQLBaseDAO implements Exporter
     protected void getSubjectsDataAndWriteItIntoExportOutput(ResultSetExportReader reader, String subjectsSubQuery,
             String predicateHashes) throws DAOException{
 
-        if (subjectsSubQuery==null || subjectsSubQuery.length()==0)
+        if (subjectsSubQuery == null || subjectsSubQuery.length() == 0)
             throw new IllegalArgumentException("Subjects sub query must not be null or empty");
 
         Connection conn = null;
-        try{
-            if (conn==null){
+        try {
+            if (conn == null) {
                 conn = getSQLConnection();
             }
 
@@ -84,10 +84,10 @@ public class PostgreSQLExporterDAO extends PostgreSQLBaseDAO implements Exporter
             //drop temporary tables
             SQLUtil.executeUpdate(dropTmpTableQuery, conn);
         }
-        catch (Exception e){
+        catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
         }
-        finally{
+        finally {
             SQLUtil.close(conn);
         }
     }
@@ -106,7 +106,7 @@ public class PostgreSQLExporterDAO extends PostgreSQLBaseDAO implements Exporter
         append("create temp table TMP_SUBJECTS ").
         append("as select SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_OBJ, ANON_SUBJ, LIT_OBJ, OBJ_LANG from SPO where ").
         append("SUBJECT in (").append(subjectsSubQuery).append(") ").
-        append( predicateHashesCommaSeparated!=null && predicateHashesCommaSeparated.length()>0 ?
+        append( predicateHashesCommaSeparated != null && predicateHashesCommaSeparated.length()>0 ?
                 "AND PREDICATE IN (".concat(predicateHashesCommaSeparated).concat(") ") : "").
         append(";").
         append("create temp table TMP_RESOURCES as ").
@@ -137,7 +137,7 @@ public class PostgreSQLExporterDAO extends PostgreSQLBaseDAO implements Exporter
      * Query drops temprary tables
      * @return
      */
-    protected String getDropTempTableQuery(){
+    protected String getDropTempTableQuery() {
         return "drop table if exists TMP_SUBJECTS; drop table if exists TMP_RESOURCES";
     }
 }

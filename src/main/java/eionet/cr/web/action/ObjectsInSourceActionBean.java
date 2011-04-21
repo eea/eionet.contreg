@@ -40,7 +40,7 @@ public class ObjectsInSourceActionBean extends AbstractSearchActionBean<SubjectD
      * @return
      */
     @DefaultHandler
-    public Resolution init(){
+    public Resolution init() {
         return new ForwardResolution("/pages/objectsInSource.jsp");
     }
 
@@ -71,7 +71,7 @@ public class ObjectsInSourceActionBean extends AbstractSearchActionBean<SubjectD
      * (non-Javadoc)
      * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
      */
-    public List<SearchResultColumn> getColumns(){
+    public List<SearchResultColumn> getColumns() {
 
         ArrayList<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
 

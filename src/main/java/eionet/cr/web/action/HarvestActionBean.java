@@ -78,7 +78,7 @@ public class HarvestActionBean extends AbstractActionBean {
         List<HarvestMessageDTO> messageDTOs =
             DAOFactory.get().getDao(HarvestMessageDAO.class).findHarvestMessagesByHarvestID(
                     harvestDTO.getHarvestId());
-        if (messageDTOs!=null){
+        if (messageDTOs != null) {
             loadMessages(HarvestMessageType.FATAL.toString(), messageDTOs, fatals = new ArrayList<HarvestMessageDTO>());
             loadMessages(HarvestMessageType.ERROR.toString(), messageDTOs, errors = new ArrayList<HarvestMessageDTO>());
             loadMessages(HarvestMessageType.WARNING.toString(), messageDTOs, warnings = new ArrayList<HarvestMessageDTO>());
@@ -91,11 +91,11 @@ public class HarvestActionBean extends AbstractActionBean {
      * @param messageDTOs
      * @param type
      */
-    private void loadMessages(String type, List<HarvestMessageDTO> sourceList, List<HarvestMessageDTO> destList){
+    private void loadMessages(String type, List<HarvestMessageDTO> sourceList, List<HarvestMessageDTO> destList) {
 
-        for (int i=0; i<sourceList.size(); i++){
+        for (int i=0; i<sourceList.size(); i++) {
             HarvestMessageDTO messageDTO = sourceList.get(i);
-            if (messageDTO.getType().equals(type)){
+            if (messageDTO.getType().equals(type)) {
                 destList.add(messageDTO);
             }
         }

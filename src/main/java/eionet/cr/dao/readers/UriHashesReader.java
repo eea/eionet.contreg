@@ -41,7 +41,7 @@ public class UriHashesReader extends SQLResultSetBaseReader{
      *
      * @param urisByHashes
      */
-    public UriHashesReader(Map<Long,String> map){
+    public UriHashesReader(Map<Long,String> map) {
         this.urisByHashes = map;
     }
 

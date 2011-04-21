@@ -477,7 +477,7 @@ public class PostgreSQLPersister implements IHarvestPersister{
         Statement stmt = null;
         Connection conn = null;
         ArrayList<UnfinishedHarvestDTO> list = new ArrayList<UnfinishedHarvestDTO>();
-        try{
+        try {
             conn = DbConnectionProvider.getConnection();
             stmt = conn.createStatement();
             rs = stmt.executeQuery("select * from UNFINISHED_HARVEST");
@@ -502,7 +502,7 @@ public class PostgreSQLPersister implements IHarvestPersister{
         catch (SQLException fatal) {
             throw new PersisterException(fatal.getMessage(), fatal);
         }
-        finally{
+        finally {
             SQLUtil.close(rs);
             SQLUtil.close(stmt);
             SQLUtil.close(conn);
@@ -519,7 +519,7 @@ public class PostgreSQLPersister implements IHarvestPersister{
     private static void rollbackUnfinishedHarvest(
             long sourceUrlHash, long genTime, Connection conn) throws SQLException{
 
-        try{
+        try {
             // start transaction
             conn.setAutoCommit(false);
 
@@ -551,7 +551,7 @@ public class PostgreSQLPersister implements IHarvestPersister{
             conn.commit();
         }
         catch (SQLException e) {
-            try{conn.rollback();}catch (SQLException ee) {}
+            try {conn.rollback();}catch (SQLException ee) {}
             throw e;
         }
     }
@@ -584,7 +584,7 @@ public class PostgreSQLPersister implements IHarvestPersister{
 
         Connection conn = null;
         PreparedStatement pstmt = null;
-        try{
+        try {
             conn = DbConnectionProvider.getConnection();
             conn.setAutoCommit(false);
 
@@ -606,7 +606,7 @@ public class PostgreSQLPersister implements IHarvestPersister{
             SQLUtil.rollback(conn);
             throw e;
         }
-        finally{
+        finally {
             SQLUtil.close(pstmt);
             SQLUtil.close(conn);
         }

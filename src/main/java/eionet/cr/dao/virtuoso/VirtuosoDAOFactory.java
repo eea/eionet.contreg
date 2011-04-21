@@ -63,10 +63,10 @@ public class VirtuosoDAOFactory extends DAOFactory{
         // due to synchronization problems we have to create DAOs for each method invocation.
         try {
             Class implClass = registeredDaos.get(implementedInterface);
-            if (implClass==null){
+            if (implClass == null) {
                 return null;
             }
-            else{
+            else {
                 return (T) implClass.newInstance();
             }
         }

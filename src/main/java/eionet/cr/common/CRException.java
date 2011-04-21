@@ -41,7 +41,7 @@ public class CRException extends Exception {
      * @param message
      * @param cause
      */
-    public CRException(String msg, Throwable cause){
+    public CRException(String msg, Throwable cause) {
         super(msg, cause);
     }
 

@@ -63,7 +63,7 @@ public class PostgreSearchByTagsHelper extends AbstractSearchHelper{
 
         int index=2;
         StringBuffer whereBuffer = new StringBuffer();
-        for (String tag : tags){
+        for (String tag : tags) {
             String spoAlias = "SPO" + index;
             whereBuffer.append(whereBuffer.length() > 0 ? " and " : "");
 
@@ -83,7 +83,7 @@ public class PostgreSearchByTagsHelper extends AbstractSearchHelper{
         }
 
         // finish the query by adding the above-created "where" part
-        if(whereBuffer.length() > 0){
+        if(whereBuffer.length() > 0) {
             buf.append(" where ").append(whereBuffer);
         }
 
@@ -106,7 +106,7 @@ public class PostgreSearchByTagsHelper extends AbstractSearchHelper{
 
         int index=2;
         StringBuffer whereBuffer = new StringBuffer();
-        for (String tag : tags){
+        for (String tag : tags) {
             String spoAlias = "SPO" + index;
             whereBuffer.append(whereBuffer.length() > 0 ? " and " : "");
 
@@ -125,7 +125,7 @@ public class PostgreSearchByTagsHelper extends AbstractSearchHelper{
         }
 
         // finish the query by adding the above-created "where" part
-        if(whereBuffer.length() > 0){
+        if(whereBuffer.length() > 0) {
             subSelect.append(" where ").append(whereBuffer);
         }
 

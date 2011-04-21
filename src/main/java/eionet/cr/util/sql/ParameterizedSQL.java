@@ -37,7 +37,7 @@ public class ParameterizedSQL {
      * @param sqlString
      * @param paramNames
      */
-    public ParameterizedSQL(String sqlString, String paramNames){
+    public ParameterizedSQL(String sqlString, String paramNames) {
         this.sqlString = sqlString;
         this.paramNames = paramNames.split(",");
         for (int i=0; i<this.paramNames.length; i++)

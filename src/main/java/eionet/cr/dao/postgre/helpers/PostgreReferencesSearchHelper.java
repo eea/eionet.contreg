@@ -46,7 +46,7 @@ public class PostgreReferencesSearchHelper extends AbstractSearchHelper{
      * @param sortingRequest
      */
     public PostgreReferencesSearchHelper(Long subjectHash,
-            PagingRequest pagingRequest, SortingRequest sortingRequest){
+            PagingRequest pagingRequest, SortingRequest sortingRequest) {
 
         super(pagingRequest, sortingRequest);
         this.subjectHash = subjectHash;
@@ -56,7 +56,7 @@ public class PostgreReferencesSearchHelper extends AbstractSearchHelper{
      * (non-Javadoc)
      * @see eionet.cr.dao.postgre.helpers.AbstractSearchHelper#getUnorderedQuery(java.util.List)
      */
-    public String getUnorderedQuery(List<Object> inParams){
+    public String getUnorderedQuery(List<Object> inParams) {
 
         StringBuffer buf = new StringBuffer().
         append("select SPO.SUBJECT as SUBJECT_HASH from SPO").
@@ -69,19 +69,19 @@ public class PostgreReferencesSearchHelper extends AbstractSearchHelper{
      * (non-Javadoc)
      * @see eionet.cr.dao.postgre.helpers.AbstractSearchHelper#getOrderedQuery(java.util.List)
      */
-    protected String getOrderedQuery(List<Object> inParams){
+    protected String getOrderedQuery(List<Object> inParams) {
 
         StringBuffer subSelect = new StringBuffer().
         append("select SPO.SUBJECT as SUBJECT_HASH,").
         append(" ORDERING.OBJECT as OBJECT_ORDERED_BY from SPO");
 
-        if (sortPredicate.equals(ReferringPredicatesColumn.class.getSimpleName())){
+        if (sortPredicate.equals(ReferringPredicatesColumn.class.getSimpleName())) {
 
             subSelect.append(" left join SPO as ORDERING on ").
             append("(SPO.PREDICATE=ORDERING.SUBJECT and ORDERING.PREDICATE=").
             append(Hashes.spoHash(Predicates.RDFS_LABEL)).append(")");
         }
-        else{
+        else {
             subSelect.append(" left join SPO as ORDERING on ").
             append("(SPO.SUBJECT=ORDERING.SUBJECT and ORDERING.PREDICATE=").
             append(Hashes.spoHash(sortPredicate)).append(")");
@@ -98,7 +98,7 @@ public class PostgreReferencesSearchHelper extends AbstractSearchHelper{
      * (non-Javadoc)
      * @see eionet.cr.dao.postgre.helpers.AbstractSearchHelper#getCountQuery(java.util.List)
      */
-    public String getCountQuery(List<Object> inParams){
+    public String getCountQuery(List<Object> inParams) {
 
         String query = getUnorderedQuery(inParams);
         return new StringBuffer(

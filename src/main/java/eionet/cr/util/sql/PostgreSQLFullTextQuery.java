@@ -91,7 +91,7 @@ public class PostgreSQLFullTextQuery {
      */
     public static PostgreSQLFullTextQuery parse(SearchExpression searchExpression) throws ParseException{
 
-        return new PostgreSQLFullTextQuery(searchExpression==null ? "" : searchExpression.toString());
+        return new PostgreSQLFullTextQuery(searchExpression == null ? "" : searchExpression.toString());
     }
 
     /**
@@ -100,12 +100,12 @@ public class PostgreSQLFullTextQuery {
      */
     private void parse() throws ParseException{
 
-        if (query==null){
+        if (query == null) {
             return;
         }
 
         query = query.trim();
-        if (query.length()==0){
+        if (query.length() == 0) {
             return;
         }
 
@@ -113,31 +113,31 @@ public class PostgreSQLFullTextQuery {
 
         int unclosedQuotes = -1;
         int len = query.length();
-        for (int i=0; i<len; i++){
-            if (query.charAt(i)=='"'){
-                if (unclosedQuotes!=-1){
+        for (int i=0; i<len; i++) {
+            if (query.charAt(i) == '"') {
+                if (unclosedQuotes != -1) {
                     String phrase = query.substring(unclosedQuotes+1, i);
-                    if (phrase.trim().length()>=MIN_WORD_LENGTH){
-                        if (StringUtils.containsAny(phrase, " \t\r\n\f")){
+                    if (phrase.trim().length()>=MIN_WORD_LENGTH) {
+                        if (StringUtils.containsAny(phrase, " \t\r\n\f")) {
                             phrases.add(query.substring(unclosedQuotes+1, i));
                         }
                     }
                     unclosedQuotes = -1;
                 }
-                else{
+                else {
                     unclosedQuotes = i;
                 }
             }
         }
 
         // there must be no unclosed quotes left
-        if (unclosedQuotes!=-1){
+        if (unclosedQuotes != -1) {
             throw new ParseException("Unclosed quotes at index " + unclosedQuotes, unclosedQuotes);
         }
 
         String prevToken = null;
         StringTokenizer st = new StringTokenizer(query, " \t\r\n\f\"");
-        while (st.hasMoreTokens()){
+        while (st.hasMoreTokens()) {
 
             String token = st.nextToken();
 
@@ -151,24 +151,24 @@ public class PostgreSQLFullTextQuery {
 
             boolean appendThisToken = false;
 
-            if (isBooleanOperator(token)){
-                if (prevToken!=null && !isBooleanOperator(prevToken)){
+            if (isBooleanOperator(token)) {
+                if (prevToken != null && !isBooleanOperator(prevToken)) {
                     appendThisToken = true;
                 }
             }
-            else{
-                if (token.length()>=MIN_WORD_LENGTH){
+            else {
+                if (token.length()>=MIN_WORD_LENGTH) {
 
                     appendThisToken = true;
-                    if (prevToken!=null && !isBooleanOperator(prevToken)){
+                    if (prevToken != null && !isBooleanOperator(prevToken)) {
                         parsedQuery.append(" ").append(DEFAULT_BOOLEAN_OPERATOR);
                     }
                 }
             }
 
-            if (appendThisToken){
+            if (appendThisToken) {
 
-                if (parsedQuery.length()>0){
+                if (parsedQuery.length()>0) {
                     parsedQuery.append(" ");
                 }
                 parsedQuery.append(token);
@@ -182,7 +182,7 @@ public class PostgreSQLFullTextQuery {
      * @param s
      * @return
      */
-    private boolean isBooleanOperator(String s){
+    private boolean isBooleanOperator(String s) {
         return booleanOperators.contains(s);
     }
 
@@ -190,12 +190,12 @@ public class PostgreSQLFullTextQuery {
      * (non-Javadoc)
      * @see java.lang.Object#toString()
      */
-    public String toString(){
+    public String toString() {
         return new StringBuffer("parsedQuery=[").
         append(parsedQuery).append("], phrases=").append(phrases).toString();
     }
 
-    public String getParsedQuery(){
+    public String getParsedQuery() {
         return parsedQuery.toString();
     }
 
@@ -224,7 +224,7 @@ public class PostgreSQLFullTextQuery {
 //      System.out.println(Arrays.binarySearch(booleanOperators, "AND"));
 
 //      StringTokenizer st = new StringTokenizer("jaanus kala\"mees", " \"");
-//      while (st.hasMoreTokens()){
+//      while (st.hasMoreTokens()) {
 //          System.out.println(st.nextToken());
 //      }
 
@@ -239,7 +239,7 @@ public class PostgreSQLFullTextQuery {
 //
 //      HashSet<Term> terms = new HashSet<Term>();
 //      query.extractTerms(terms);
-//      for (Term term : terms){
+//      for (Term term : terms) {
 //          System.out.println(term);
 //      }
     }

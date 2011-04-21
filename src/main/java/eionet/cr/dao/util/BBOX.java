@@ -36,7 +36,7 @@ public class BBOX {
     /**
      *
      */
-    public BBOX(){
+    public BBOX() {
     }
 
     /**
@@ -92,23 +92,23 @@ public class BBOX {
      *
      * @return
      */
-    public boolean isUndefined(){
-        return latitudeSouth==null && latitudeNorth==null && longitudeWest==null && longitudeEast==null;
+    public boolean isUndefined() {
+        return latitudeSouth == null && latitudeNorth == null && longitudeWest == null && longitudeEast == null;
     }
 
     /**
      *
      * @return
      */
-    public boolean hasLatitude(){
-        return latitudeSouth!=null || latitudeNorth!=null;
+    public boolean hasLatitude() {
+        return latitudeSouth != null || latitudeNorth != null;
     }
 
     /**
      *
      * @return
      */
-    public boolean hasLongitude(){
-        return longitudeWest!=null || longitudeEast!=null;
+    public boolean hasLongitude() {
+        return longitudeWest != null || longitudeEast != null;
     }
 }

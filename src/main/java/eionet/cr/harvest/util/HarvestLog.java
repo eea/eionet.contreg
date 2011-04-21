@@ -189,11 +189,11 @@ public class HarvestLog implements Log{
      * @param obj
      * @return
      */
-    private String format(Object obj){
+    private String format(Object obj) {
 
         StringBuilder sb = new StringBuilder();
         sb.append(obj).append(" [source=").append(harvestSourceUrl);
-        if (harvestGenTime>=0){
+        if (harvestGenTime>=0) {
             sb.append(", genTime=").append(harvestGenTime);
         }
         sb.append("]");

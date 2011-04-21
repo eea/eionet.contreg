@@ -53,7 +53,7 @@ public class PostgreSpatialSearchHelper extends AbstractSearchHelper{
      * @param sortingRequest
      */
     public PostgreSpatialSearchHelper(BBOX box, String sourceUri,
-            PagingRequest pagingRequest, SortingRequest sortingRequest, boolean sortByObjectHash){
+            PagingRequest pagingRequest, SortingRequest sortingRequest, boolean sortByObjectHash) {
 
         super(pagingRequest, sortingRequest);
         this.box = box;
@@ -65,51 +65,51 @@ public class PostgreSpatialSearchHelper extends AbstractSearchHelper{
      * (non-Javadoc)
      * @see eionet.cr.dao.postgre.helpers.AbstractSearchHelper#getUnorderedQuery(java.util.List)
      */
-    public String getUnorderedQuery(List<Object> inParams){
+    public String getUnorderedQuery(List<Object> inParams) {
 
         StringBuffer buf = new StringBuffer().
         append("select distinct SPO_POINT.SUBJECT as SUBJECT_HASH from SPO as SPO_POINT");
 
-        if (box.hasLatitude()){
+        if (box.hasLatitude()) {
             buf.append(", SPO as SPO_LAT");
         }
-        if (box.hasLongitude()){
+        if (box.hasLongitude()) {
             buf.append(", SPO as SPO_LONG");
         }
 
         buf.append(" where SPO_POINT.PREDICATE=").append(Hashes.spoHash(Predicates.RDF_TYPE)).
         append(" and SPO_POINT.OBJECT_HASH=").append(Hashes.spoHash(Subjects.WGS_POINT));
 
-        if (!StringUtils.isBlank(sourceUri)){
+        if (!StringUtils.isBlank(sourceUri)) {
             buf.append(" and SPO_POINT.SOURCE=").append(Hashes.spoHash(sourceUri));
         }
 
-        if (box.hasLatitude()){
+        if (box.hasLatitude()) {
 
             buf.append(" and SPO_POINT.SUBJECT=SPO_LAT.SUBJECT and SPO_LAT.PREDICATE=").
             append(Hashes.spoHash(Predicates.WGS_LAT));
-            if (box.getLatitudeSouth()!=null){
+            if (box.getLatitudeSouth() != null) {
                 buf.append(" and SPO_LAT.OBJECT_DOUBLE>=").append(box.getLatitudeSouth());
             }
-            if (box.getLatitudeNorth()!=null){
+            if (box.getLatitudeNorth() != null) {
                 buf.append(" and SPO_LAT.OBJECT_DOUBLE<=").append(box.getLatitudeNorth());
             }
         }
 
-        if (box.hasLongitude()){
+        if (box.hasLongitude()) {
 
-            if (box.hasLatitude()){
+            if (box.hasLatitude()) {
                 buf.append(" and SPO_LAT.SUBJECT=SPO_LONG.SUBJECT");
             }
-            else{
+            else {
                 buf.append(" and SPO_POINT.SUBJECT=SPO_LONG.SUBJECT");
             }
             buf.append(" and SPO_LONG.PREDICATE=").append(Hashes.spoHash(Predicates.WGS_LONG));
 
-            if (box.getLongitudeWest()!=null){
+            if (box.getLongitudeWest() != null) {
                 buf.append(" and SPO_LONG.OBJECT_DOUBLE>=").append(box.getLongitudeWest());
             }
-            if (box.getLongitudeEast()!=null){
+            if (box.getLongitudeEast() != null) {
                 buf.append(" and SPO_LONG.OBJECT_DOUBLE<=").append(box.getLongitudeEast());
             }
         }
@@ -121,7 +121,7 @@ public class PostgreSpatialSearchHelper extends AbstractSearchHelper{
      * (non-Javadoc)
      * @see eionet.cr.dao.postgre.helpers.AbstractSearchHelper#getOrderedQuery(java.util.List)
      */
-    protected String getOrderedQuery(List<Object> inParams){
+    protected String getOrderedQuery(List<Object> inParams) {
 
         StringBuffer subSelect = new StringBuffer().
         append("select distinct on (SUBJECT_HASH) SPO_POINT.SUBJECT as SUBJECT_HASH").
@@ -133,46 +133,46 @@ public class PostgreSpatialSearchHelper extends AbstractSearchHelper{
         append(Hashes.spoHash(sortPredicate)).
         append(")");
 
-        if (box.hasLatitude()){
+        if (box.hasLatitude()) {
             subSelect.append(", SPO as SPO_LAT");
         }
-        if (box.hasLongitude()){
+        if (box.hasLongitude()) {
             subSelect.append(", SPO as SPO_LONG");
         }
 
         subSelect.append(" where SPO_POINT.PREDICATE=").append(Hashes.spoHash(Predicates.RDF_TYPE)).
         append(" and SPO_POINT.OBJECT_HASH=").append(Hashes.spoHash(Subjects.WGS_POINT));
 
-        if (!StringUtils.isBlank(sourceUri)){
+        if (!StringUtils.isBlank(sourceUri)) {
             subSelect.append(" and SPO_POINT.SOURCE=").append(Hashes.spoHash(sourceUri));
         }
 
-        if (box.hasLatitude()){
+        if (box.hasLatitude()) {
 
             subSelect.append(" and SPO_POINT.SUBJECT=SPO_LAT.SUBJECT and SPO_LAT.PREDICATE=").
             append(Hashes.spoHash(Predicates.WGS_LAT));
-            if (box.getLatitudeSouth()!=null){
+            if (box.getLatitudeSouth() != null) {
                 subSelect.append(" and SPO_LAT.OBJECT_DOUBLE>=").append(box.getLatitudeSouth());
             }
-            if (box.getLatitudeNorth()!=null){
+            if (box.getLatitudeNorth() != null) {
                 subSelect.append(" and SPO_LAT.OBJECT_DOUBLE<=").append(box.getLatitudeNorth());
             }
         }
 
-        if (box.hasLongitude()){
+        if (box.hasLongitude()) {
 
-            if (box.hasLatitude()){
+            if (box.hasLatitude()) {
                 subSelect.append(" and SPO_LAT.SUBJECT=SPO_LONG.SUBJECT");
             }
-            else{
+            else {
                 subSelect.append(" and SPO_POINT.SUBJECT=SPO_LONG.SUBJECT");
             }
             subSelect.append(" and SPO_LONG.PREDICATE=").append(Hashes.spoHash(Predicates.WGS_LONG));
 
-            if (box.getLongitudeWest()!=null){
+            if (box.getLongitudeWest() != null) {
                 subSelect.append(" and SPO_LONG.OBJECT_DOUBLE>=").append(box.getLongitudeWest());
             }
-            if (box.getLongitudeEast()!=null){
+            if (box.getLongitudeEast() != null) {
                 subSelect.append(" and SPO_LONG.OBJECT_DOUBLE<=").append(box.getLongitudeEast());
             }
         }
@@ -187,7 +187,7 @@ public class PostgreSpatialSearchHelper extends AbstractSearchHelper{
      * (non-Javadoc)
      * @see eionet.cr.dao.postgre.helpers.AbstractSearchHelper#getCountQuery(java.util.List)
      */
-    public String getCountQuery(List<Object> inParams){
+    public String getCountQuery(List<Object> inParams) {
 
         String query = getUnorderedQuery(inParams);
         return new StringBuffer(

@@ -30,7 +30,7 @@ public class CRRuntimeException extends RuntimeException {
     /**
      *
      */
-    public CRRuntimeException(){
+    public CRRuntimeException() {
         super();
     }
 

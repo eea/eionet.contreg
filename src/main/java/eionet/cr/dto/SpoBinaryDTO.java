@@ -43,11 +43,11 @@ public class SpoBinaryDTO {
      * @param subjectHash
      * @param contentStream
      */
-    public SpoBinaryDTO(long subjectHash, InputStream contentStream){
+    public SpoBinaryDTO(long subjectHash, InputStream contentStream) {
 
         this.subjectHash = subjectHash;
 
-        if (contentStream==null){
+        if (contentStream == null) {
             throw new IllegalArgumentException("Content stream must not be null");
         }
         this.contentStream = contentStream;

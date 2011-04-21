@@ -43,21 +43,21 @@ public class DownloadActionBean extends AbstractActionBean {
 
         // get the binary content DTO of the requested file
         SpoBinaryDTO dto = DAOFactory.get().getDao(SpoBinaryDAO.class).get(uri);
-        if (dto==null){
+        if (dto == null) {
             addCautionMessage("Requested file not found.");
             return new ForwardResolution("/pages/empty.jsp");
         }
 
         // get the actual content stream
         InputStream contentStream = dto.getContentStream();
-        if (contentStream==null || contentStream.available()==0){
+        if (contentStream == null || contentStream.available() == 0) {
             addCautionMessage("Requested file content not found.");
             return new ForwardResolution("/pages/empty.jsp");
         }
 
         // prepare name for the file to be streamed to the user
         String filename = StringUtils.substringAfterLast(uri, "/");
-        if (StringUtils.isBlank(filename)){
+        if (StringUtils.isBlank(filename)) {
             filename = String.valueOf(Math.abs(Hashes.spoHash(uri)));
         }
 
@@ -66,9 +66,9 @@ public class DownloadActionBean extends AbstractActionBean {
     }
 
     @ValidationMethod(on={"download"})
-    public void validate(){
+    public void validate() {
 
-        if (StringUtils.isBlank(uri)){
+        if (StringUtils.isBlank(uri)) {
             addGlobalValidationError("Uri must not be blank");
             getContext().setSourcePageResolution(new ForwardResolution("/pages/empty.jsp"));
         }

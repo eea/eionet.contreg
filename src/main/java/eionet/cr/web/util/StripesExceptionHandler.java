@@ -57,7 +57,7 @@ public class StripesExceptionHandler implements ExceptionHandler {
                        HttpServletResponse response) throws ServletException, IOException {
 
         Throwable newThrowable = (t instanceof ServletException) ? getRootCause((ServletException)t) : t;
-        if (newThrowable==null)
+        if (newThrowable == null)
             newThrowable = t;
 
         logger.error(newThrowable.getMessage(), newThrowable);
@@ -70,7 +70,7 @@ public class StripesExceptionHandler implements ExceptionHandler {
      * @param servletException
      * @return
      */
-    private Throwable getRootCause(ServletException servletException){
+    private Throwable getRootCause(ServletException servletException) {
 
         Throwable rootCause = servletException.getRootCause();
         if (rootCause instanceof ServletException)

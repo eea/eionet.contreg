@@ -52,22 +52,22 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
 
 
         // if search expression is null or empty, return empty result
-        if (expression==null || expression.isEmpty()){
+        if (expression == null || expression.isEmpty()) {
             return new Pair<Integer, List<SubjectDTO>>(0, new LinkedList<SubjectDTO>());
         }
 
         // parse search expression for Virtuoso SPARQL
         VirtuosoFullTextQuery virtQuery = null;
-        try{
+        try {
             virtQuery = VirtuosoFullTextQuery.parse(expression);
             logger.trace("Free-text search string parsed for Virtuoso SPARQL: " + virtQuery);
         }
-        catch (ParseException pe){
+        catch (ParseException pe) {
             throw new DAOException("Error parsing the search text", pe);
         }
 
         // if search expression is empty after being parsed for Virtuoso SPARQL, return empty result
-        if (virtQuery.getParsedQuery().length()==0){
+        if (virtQuery.getParsedQuery().length() == 0) {
             return new Pair<Integer, List<SubjectDTO>>(0, new LinkedList<SubjectDTO>());
         }
 
@@ -100,7 +100,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
         List<SubjectDTO> resultList = new ArrayList<SubjectDTO>();
 
         // if result list not empty, do the necessary processing and get total match count
-        if (subjectUris!=null && !subjectUris.isEmpty()) {
+        if (subjectUris != null && !subjectUris.isEmpty()) {
 
             // get the data of all found subjects, provide hit-sources to the reader
             SubjectDataReader dataReader = new SubjectDataReader(subjectUris);
@@ -115,7 +115,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
             resultList = getSubjectsData(subjectUris, neededPredicates, dataReader, graphUris);
 
             // if paging required, get distinct subjects total match count
-            if (pagingRequest!=null){
+            if (pagingRequest != null) {
 
                 logger.trace("Free-text search, getting exact row count");
                 totalMatchCount = new Integer(getExactRowCount(helper));
@@ -153,7 +153,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
             return reader.getResultList();
         } catch (Exception e) {
             throw new DAOException(e.toString(), e);
-        } finally{
+        } finally {
             SesameUtil.close(conn);
         }
     }
@@ -256,7 +256,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
             PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException {
 
         // if source URL to search by is blank, return empty result
-        if (StringUtils.isBlank(sourceUrl)){
+        if (StringUtils.isBlank(sourceUrl)) {
             return new Pair<Integer, List<SubjectDTO>>(0, new LinkedList<SubjectDTO>());
         }
 
@@ -279,7 +279,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
         List<SubjectDTO> resultList = new ArrayList<SubjectDTO>();
 
         // if result list not null and not empty, then get the subjects data and total rowcount
-        if (subjectUris!=null && !subjectUris.isEmpty()){
+        if (subjectUris != null && !subjectUris.isEmpty()) {
 
             logger.trace("Search subjects in sources, getting the data of the found subjects");
 
@@ -289,7 +289,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
             resultList = getSubjectsData(subjectUris, null, dataReader, null);
 
             // if paging required, get the total number of found subjects too
-            if (pagingRequest!=null){
+            if (pagingRequest != null) {
 
                 logger.trace("Search subjects in source, executing rowcount query: " + query);
                 totalMatchCount = new Integer(getExactRowCount(helper));
@@ -372,7 +372,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
         List<SubjectDTO> resultList = new ArrayList<SubjectDTO>();
 
         // if result list not null and not empty, then get the subjects data and total rowcount
-        if (subjectUris!=null && !subjectUris.isEmpty()){
+        if (subjectUris != null && !subjectUris.isEmpty()) {
 
             logger.trace("Search references, getting the data of the found subjects");
 
@@ -381,7 +381,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO{
             resultList = executeSPARQL(predicateQuery, new SubjectDataReader(subjectUris));
 
             // if paging required, get the total number of found subjects too
-            if (pagingRequest!=null){
+            if (pagingRequest != null) {
 
                 logger.trace("Search references, executing rowcount query: " + query);
                 totalMatchCount = new Integer(getExactRowCount(helper));

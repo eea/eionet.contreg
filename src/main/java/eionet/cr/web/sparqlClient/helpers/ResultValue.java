@@ -11,7 +11,7 @@ public class ResultValue {
      * @param value
      * @param isLiteral
      */
-    public ResultValue(String value, boolean isLiteral){
+    public ResultValue(String value, boolean isLiteral) {
 
         this.value = value;
         this.isLiteral = isLiteral;
@@ -46,7 +46,7 @@ public class ResultValue {
      * (non-Javadoc)
      * @see java.lang.Object#toString()
      */
-    public String toString(){
+    public String toString() {
         return value;
     }
 }

@@ -39,7 +39,7 @@ class HourSpan {
      * @param from
      * @param to
      */
-    HourSpan(int from, int to){
+    HourSpan(int from, int to) {
         this.from = from;
         this.to = to;
     }
@@ -59,7 +59,7 @@ class HourSpan {
      *
      * @return
      */
-    public int length(){
+    public int length() {
         return to-from; // we assume the creator has made sure that to>=from
     }
     /**
@@ -67,14 +67,14 @@ class HourSpan {
      * @param hour
      * @return
      */
-    public boolean includes(int hour){
+    public boolean includes(int hour) {
         return hour>=from && hour<=to;
     }
     /*
      * (non-Javadoc)
      * @see java.lang.Object#toString()
      */
-    public String toString(){
+    public String toString() {
         return new StringBuffer().append(from).append("-").append(to).toString();
     }
 }

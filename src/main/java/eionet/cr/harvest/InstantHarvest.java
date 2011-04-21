@@ -44,7 +44,7 @@ public class InstantHarvest extends PullHarvest{
      * @param lastHarvest
      * @param userName
      */
-    public InstantHarvest(String sourceUrlString, Date lastHarvest, String userName){
+    public InstantHarvest(String sourceUrlString, Date lastHarvest, String userName) {
 
         super(sourceUrlString, lastHarvest);
         this.userName = userName;
@@ -58,7 +58,7 @@ public class InstantHarvest extends PullHarvest{
      * (non-Javadoc)
      * @see eionet.cr.harvest.Harvest#createRDFHandler()
      */
-    protected RDFHandler createRDFHandler(PersisterConfig config){
+    protected RDFHandler createRDFHandler(PersisterConfig config) {
         config.setInstantHarvestUser(userName);
         RDFHandler handler = super.createRDFHandler(config);
         return handler;

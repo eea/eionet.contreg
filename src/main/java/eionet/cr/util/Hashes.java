@@ -100,7 +100,7 @@ public class Hashes {
         byte[] dstBytes = new byte[16];
 
         MessageDigest md;
-        try{
+        try {
             md = MessageDigest.getInstance(algorithm);
         }
         catch (GeneralSecurityException e) {

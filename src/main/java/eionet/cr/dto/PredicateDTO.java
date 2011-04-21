@@ -34,7 +34,7 @@ public class PredicateDTO {
      *
      * @param value
      */
-    public PredicateDTO(String value){
+    public PredicateDTO(String value) {
         this.value = value;
     }
 
@@ -49,7 +49,7 @@ public class PredicateDTO {
      * (non-Javadoc)
      * @see java.lang.Object#toString()
      */
-    public String toString(){
+    public String toString() {
         return getValue();
     }
 
@@ -57,9 +57,9 @@ public class PredicateDTO {
      * (non-Javadoc)
      * @see java.lang.Object#equals(java.lang.Object)
      */
-    public boolean equals(Object other){
+    public boolean equals(Object other) {
 
-        if (this==other)
+        if (this == other)
             return true;
 
         if (!(other instanceof PredicateDTO))
@@ -67,15 +67,15 @@ public class PredicateDTO {
 
 
         String otherValue = ((PredicateDTO)other).getValue();
-        return getValue()==null ? otherValue==null : getValue().equals(otherValue);
+        return getValue() == null ? otherValue == null : getValue().equals(otherValue);
     }
 
     /*
      * (non-Javadoc)
      * @see java.lang.Object#hashCode()
      */
-    public int hashCode(){
+    public int hashCode() {
 
-        return getValue()==null ? 0 : getValue().hashCode();
+        return getValue() == null ? 0 : getValue().hashCode();
     }
 }

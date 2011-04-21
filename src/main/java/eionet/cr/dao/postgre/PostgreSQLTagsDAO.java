@@ -56,7 +56,7 @@ public class PostgreSQLTagsDAO extends PostgreSQLBaseDAO implements TagsDAO{
         List<TagDTO> resultList = new ArrayList<TagDTO>(pairList.size());
         int maxTagCount = pairList.size()>0 ? pairList.get(0).getRight().intValue() : 0;
 
-        for (Pair<String, Long> tagPair : pairList){
+        for (Pair<String, Long> tagPair : pairList) {
             resultList.add(new TagDTO(tagPair.getLeft(), tagPair.getRight().intValue(), maxTagCount));
         }
         return resultList;

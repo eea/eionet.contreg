@@ -49,7 +49,7 @@ public class VirtuosoHarvesterActionBean extends AbstractActionBean {
         boolean isSuccess = false;
         Repository repository = null;
         RepositoryConnection conn = null;
-        try{
+        try {
             repository = new VirtuosoRepository(repoUrl,repoUsr,repoPwd);
             repository.initialize();
             conn = repository.getConnection();
@@ -73,17 +73,17 @@ public class VirtuosoHarvesterActionBean extends AbstractActionBean {
             // no transaction rollback needed, when reached this point
             isSuccess = true;
         }
-        finally{
+        finally {
             if (!isSuccess && conn != null) {
-                try{conn.rollback();}catch(RepositoryException e) {}
+                try {conn.rollback();}catch(RepositoryException e) {}
             }
 
             if (conn != null) {
-                try{conn.close();}catch(RepositoryException e) {}
+                try {conn.close();}catch(RepositoryException e) {}
             }
 
             if (repository != null) {
-                try{repository.shutDown();}catch(RepositoryException e) {}
+                try {repository.shutDown();}catch(RepositoryException e) {}
             }
         }
 

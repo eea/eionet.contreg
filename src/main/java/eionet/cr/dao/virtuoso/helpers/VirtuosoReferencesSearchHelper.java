@@ -95,8 +95,8 @@ public class VirtuosoReferencesSearchHelper extends AbstractSearchHelper{
     }
 
     //return sparql query for getting predicates for reference subjects
-    public String getSubjectsDataQuery(Collection<String> subjectUris, String sourceUri){
-        if (subjectUris==null || subjectUris.isEmpty()){
+    public String getSubjectsDataQuery(Collection<String> subjectUris, String sourceUri) {
+        if (subjectUris == null || subjectUris.isEmpty()) {
             throw new IllegalArgumentException("Subjects collection must not be null or empty!");
         }
 
@@ -105,8 +105,8 @@ public class VirtuosoReferencesSearchHelper extends AbstractSearchHelper{
         append("filter (?s IN (");
 
         int i=0;
-        for (String subjectUri : subjectUris){
-            if (i>0){
+        for (String subjectUri : subjectUris) {
+            if (i>0) {
                 strBuilder.append(", ");
             }
             strBuilder.append("<").append(subjectUri).append(">");

@@ -72,7 +72,7 @@ public class HarvestQueueActionBean extends AbstractActionBean{
     /**
      *
      */
-    public HarvestQueueActionBean(){
+    public HarvestQueueActionBean() {
         setQueueType(TYPE_URGENT);
     }
 
@@ -84,13 +84,13 @@ public class HarvestQueueActionBean extends AbstractActionBean{
     @DefaultHandler
     public Resolution view() throws DAOException{
 
-        if (getQueueType().equals(TYPE_BATCH)){
+        if (getQueueType().equals(TYPE_BATCH)) {
             batchQueue = HarvestingJob.getBatchHarvestingQueue();
-            if (batchQueue==null || batchQueue.isEmpty()){
+            if (batchQueue  ==  null || batchQueue.isEmpty()) {
                 batchQueue = HarvestingJob.getNextScheduledSources();
             }
         }
-        else{
+        else {
             urgentQueue = factory.getDao(UrgentHarvestQueueDAO.class).getUrgentHarvestQueue();
         }
 
@@ -103,7 +103,7 @@ public class HarvestQueueActionBean extends AbstractActionBean{
      */
     public String getQueueType() {
 
-        if (queueType==null){
+        if (queueType == null) {
             queueType = TYPE_URGENT;
         }
         return queueType;
@@ -134,9 +134,9 @@ public class HarvestQueueActionBean extends AbstractActionBean{
      *
      * @return
      */
-    public List<Map<String, String>> getQueueTypes(){
+    public List<Map<String, String>> getQueueTypes() {
 
-        if (queueTypes==null){
+        if (queueTypes == null) {
 
             queueTypes = new ArrayList<Map<String,String>>();
 
@@ -158,7 +158,7 @@ public class HarvestQueueActionBean extends AbstractActionBean{
      *
      * @return
      */
-    public boolean isTypeUrgent(){
+    public boolean isTypeUrgent() {
         return getQueueType().equals(TYPE_URGENT);
     }
 
@@ -166,7 +166,7 @@ public class HarvestQueueActionBean extends AbstractActionBean{
      *
      * @return
      */
-    public boolean isTypeBatch(){
+    public boolean isTypeBatch() {
         return getQueueType().equals(TYPE_BATCH);
     }
 
@@ -174,9 +174,9 @@ public class HarvestQueueActionBean extends AbstractActionBean{
      *
      * @return
      */
-    public String getBatchHarvestingHours(){
+    public String getBatchHarvestingHours() {
 
-        if (batchHarvestingHours==null){
+        if (batchHarvestingHours == null) {
 
             String s = GeneralConfig.getProperty(GeneralConfig.HARVESTER_BATCH_HARVESTING_HOURS);
             batchHarvestingHours = StringUtils.isBlank(s) ? "" : s.trim();

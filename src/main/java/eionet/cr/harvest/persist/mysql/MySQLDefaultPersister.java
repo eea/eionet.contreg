@@ -341,7 +341,7 @@ public class MySQLDefaultPersister implements IHarvestPersister {
             conn = DbConnectionProvider.getConnection();
             stmt = conn.createStatement();
             rs = stmt.executeQuery("select * from UNFINISHED_HARVEST");
-            while (rs!=null && rs.next()) {
+            while (rs != null && rs.next()) {
                 list.add(UnfinishedHarvestDTO.create(rs.getLong("SOURCE"), rs.getLong("GEN_TIME")));
             }
 

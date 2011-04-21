@@ -9,11 +9,11 @@ package eionet.cr.web.security;
 
 public class BadUserHomeUrlException extends Exception {
 
-    public BadUserHomeUrlException (String message){
+    public BadUserHomeUrlException (String message) {
         super(message);
     }
 
-    public BadUserHomeUrlException (){
+    public BadUserHomeUrlException () {
         super();
     }
 

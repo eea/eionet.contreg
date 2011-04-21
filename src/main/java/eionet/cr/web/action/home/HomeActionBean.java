@@ -44,10 +44,10 @@ public class HomeActionBean extends AbstractActionBean{
      * @return
      */
     @DefaultHandler
-    public Resolution noEvent(){
+    public Resolution noEvent() {
 
         String username = getContext().getRequest().getParameter("username");
-        if (StringUtils.isBlank(username)){
+        if (StringUtils.isBlank(username)) {
             throw new CRRuntimeException("Could not detect username from request parameters");
         }
 

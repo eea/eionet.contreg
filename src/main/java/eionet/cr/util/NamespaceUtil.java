@@ -16,15 +16,15 @@ public class NamespaceUtil {
      */
     public static String extractNamespace(String url) {
 
-        if (url==null)
+        if (url == null)
             return null;
 
         int i = url.lastIndexOf("#");
-        if (i<0) {
+        if (i < 0) {
             i = url.lastIndexOf("/");
         }
 
-        return i<0 ? null : url.substring(0, i+1);
+        return i < 0 ? null : url.substring(0, i+1);
     }
 
     /**
@@ -33,15 +33,15 @@ public class NamespaceUtil {
      * @return
      */
     public static String extractLocalName(String url) {
-        if (url==null)
+        if (url == null)
             return null;
 
         int i = url.lastIndexOf("#");
-        if (i<0) {
+        if (i < 0) {
             i = url.lastIndexOf("/");
         }
 
-        return i<0 ? null : url.substring(i + 1, url.length());
+        return i < 0 ? null : url.substring(i + 1, url.length());
     }
 
     /**

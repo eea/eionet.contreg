@@ -42,11 +42,11 @@ public class HarvestSourcesTableDecorator extends TableDecorator{
      *
      * @return
      */
-    public String getUrl(){
+    public String getUrl() {
 
         StringBuffer buf = new StringBuffer();
         String url = ((HarvestSourceDTO) getCurrentRowObject()).getUrl();
-        if (url!=null){
+        if (url != null) {
             buf.append("<a class=\"link-plain\" href=\"source.action?view=&amp;harvestSource.url=").
             append(Util.urlEncode(url)).append("\">").append(StringEscapeUtils.escapeXml(url)).append("</a>");
         }
@@ -58,10 +58,10 @@ public class HarvestSourcesTableDecorator extends TableDecorator{
      *
      * @return
      */
-    public String getLastHarvest(){
+    public String getLastHarvest() {
 
         HarvestSourceDTO harvestSource = (HarvestSourceDTO) getCurrentRowObject();
-        if (harvestSource.getLastHarvest()!=null)
+        if (harvestSource.getLastHarvest() != null)
             return lastHarvestFormat.format(harvestSource.getLastHarvest());
         else
             return "&nbsp;";

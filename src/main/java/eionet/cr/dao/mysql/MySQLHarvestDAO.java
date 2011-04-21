@@ -39,7 +39,7 @@ import eionet.cr.util.sql.SQLUtil;
  */
 public class MySQLHarvestDAO extends MySQLBaseDAO implements HarvestDAO {
 
-    MySQLHarvestDAO(){
+    MySQLHarvestDAO() {
         //reducing visibility
     }
 
@@ -60,15 +60,15 @@ public class MySQLHarvestDAO extends MySQLBaseDAO implements HarvestDAO {
         values.add(status);
 
         Connection conn = null;
-        try{
+        try {
             conn = getConnection();
             SQLUtil.executeUpdate(insertStartedHarvestSQL, values, conn);
             return getLastInsertID(conn);
         }
-        catch (Exception e){
+        catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
         }
-        finally{
+        finally {
             SQLUtil.close(conn);
         }
     }
@@ -94,14 +94,14 @@ public class MySQLHarvestDAO extends MySQLBaseDAO implements HarvestDAO {
         values.add(new Integer(harvestId));
 
         Connection conn = null;
-        try{
+        try {
             conn = getConnection();
             SQLUtil.executeUpdate(updateFinishedHarvestSQL, values, conn);
         }
-        catch (Exception e){
+        catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
         }
-        finally{
+        finally {
             SQLUtil.close(conn);
         }
     }
@@ -138,7 +138,7 @@ public class MySQLHarvestDAO extends MySQLBaseDAO implements HarvestDAO {
         List<Object> values = new ArrayList<Object>();
         values.add(harvestId);
         List<HarvestDTO> list = executeQuery(getHarvestByIdSQL, values, new HarvestDTOReader());
-        return list!=null && list.size()>0 ? list.get(0) : null;
+        return list != null && list.size()>0 ? list.get(0) : null;
     }
 
     /** */
@@ -151,6 +151,6 @@ public class MySQLHarvestDAO extends MySQLBaseDAO implements HarvestDAO {
         List<Object> values = new ArrayList<Object>();
         values.add(harvestSourceId);
         List<HarvestDTO> list = executeQuery(getLastHarvestSQL, values, new HarvestDTOReader());
-        return list!=null && !list.isEmpty() ? list.get(0) : null;
+        return list != null && !list.isEmpty() ? list.get(0) : null;
     }
 }

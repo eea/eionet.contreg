@@ -81,10 +81,10 @@ public class AmpFeedServlet extends HttpServlet implements SubjectProcessor{
                     null,
                     null);
 
-            int subjectCount = results==null ? 0 : (results.getRight()==null ? 0 : results.getRight().size());
+            int subjectCount = results == null ? 0 : (results.getRight() == null ? 0 : results.getRight().size());
             logger.debug(methodName + ", " + subjectCount + " subjects found in total");
 
-            SubjectsRDFWriter rdfWriter = new SubjectsRDFWriter(request.getParameter(INCLUDE_DERIVED_VALUES)!=null);
+            SubjectsRDFWriter rdfWriter = new SubjectsRDFWriter(request.getParameter(INCLUDE_DERIVED_VALUES) != null);
             rdfWriter.addNamespace(Namespace.CR);
             rdfWriter.addNamespace(Namespace.DC);
             rdfWriter.addNamespace(Namespace.IMS);
@@ -111,17 +111,17 @@ public class AmpFeedServlet extends HttpServlet implements SubjectProcessor{
      */
     public void process(SubjectDTO subject) {
 
-        if (subject==null){
+        if (subject == null) {
             return;
         }
 
         // add dc:identifier if missing
-        if (subject.getObjectValue(Predicates.DC_IDENTIFIER)==null){
+        if (subject.getObjectValue(Predicates.DC_IDENTIFIER) == null) {
             subject.addObject(Predicates.DC_IDENTIFIER, new ObjectDTO(subject.getUri(), true));
         }
 
         // add dc:date if missing
-        if (subject.getObjectValue(Predicates.DC_DATE)==null && subject.getDcDate()!=null){
+        if (subject.getObjectValue(Predicates.DC_DATE) == null && subject.getDcDate() != null) {
             subject.addObject(Predicates.DC_DATE, new ObjectDTO(subject.getDcDate().toString(), true));
         }
     }

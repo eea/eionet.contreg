@@ -27,12 +27,12 @@ import eionet.cr.dao.readers.ResultSetReaderException;
  * ExporterException
  */
 
-public class ExportException  extends ResultSetReaderException{
+public class ExportException  extends ResultSetReaderException {
 
     /**
      *
      */
-    public ExportException(){
+    public ExportException() {
         super();
     }
 
@@ -40,7 +40,7 @@ public class ExportException  extends ResultSetReaderException{
      *
      * @param message
      */
-    public ExportException(String message){
+    public ExportException(String message) {
         super(message);
     }
 
@@ -49,7 +49,7 @@ public class ExportException  extends ResultSetReaderException{
      * @param message
      * @param cause
      */
-    public ExportException(String message, Throwable cause){
+    public ExportException(String message, Throwable cause) {
         super(message, cause);
     }
 }

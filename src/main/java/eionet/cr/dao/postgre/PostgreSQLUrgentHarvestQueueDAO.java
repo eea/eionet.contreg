@@ -49,26 +49,26 @@ public class PostgreSQLUrgentHarvestQueueDAO extends PostgreSQLBaseDAO implement
         String valueStr = "(?,NOW())";
         List<Object> values = new ArrayList<Object>();
         StringBuffer buf = new StringBuffer("insert into URGENT_HARVEST_QUEUE (URL,TIMESTAMP) VALUES ");
-        for (int i=0; i<queueItems.size(); i++){
+        for (int i=0; i<queueItems.size(); i++) {
             UrgentHarvestQueueItemDTO dto = queueItems.get(i);
             buf.append(i>0 ? "," : "").append(valueStr);
 
             String url = dto.getUrl();
-            if (url!=null){
+            if (url != null) {
                 url = StringUtils.substringBefore(url, "#");
             }
             values.add(url);
         }
 
         Connection conn = null;
-        try{
+        try {
             conn = getSQLConnection();
             SQLUtil.executeUpdate(buf.toString(), values, conn);
         }
-        catch (Exception e){
+        catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
         }
-        finally{
+        finally {
             SQLUtil.close(conn);
         }
     }
@@ -84,21 +84,21 @@ public class PostgreSQLUrgentHarvestQueueDAO extends PostgreSQLBaseDAO implement
         List<Object> values = new ArrayList<Object>();
 
         String url = queueItem.getUrl();
-        if (url!=null){
+        if (url != null) {
             url = StringUtils.substringBefore(url, "#");
         }
         values.add(url);
         values.add(queueItem.getPushedContent());
 
         Connection conn = null;
-        try{
+        try {
             conn = getSQLConnection();
             SQLUtil.executeUpdate(addPushHarvestSQL, values, conn);
         }
-        catch (Exception e){
+        catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
         }
-        finally{
+        finally {
             SQLUtil.close(conn);
         }
     }
@@ -120,18 +120,18 @@ public class PostgreSQLUrgentHarvestQueueDAO extends PostgreSQLBaseDAO implement
     public UrgentHarvestQueueItemDTO poll() throws DAOException {
 
         Connection conn = null;
-        try{
+        try {
             conn = getSQLConnection();
             UrgentHarvestQueueItemDTO queueItem = peek(conn);
-            if (queueItem!=null)
+            if (queueItem != null)
                 deleteQueueItem(queueItem, conn);
 
             return queueItem;
         }
-        catch (Exception e){
+        catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
         }
-        finally{
+        finally {
             SQLUtil.close(conn);
         }
     }
@@ -152,7 +152,7 @@ public class PostgreSQLUrgentHarvestQueueDAO extends PostgreSQLBaseDAO implement
         SQLUtil.executeQuery(peekSQL, values, rsReader, conn);
         List<UrgentHarvestQueueItemDTO> list = rsReader.getResultList();
 
-        return (list!=null && !list.isEmpty()) ? list.get(0) : null;
+        return (list != null && !list.isEmpty()) ? list.get(0) : null;
     }
 
     /** */

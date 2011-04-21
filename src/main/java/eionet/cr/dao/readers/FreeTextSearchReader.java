@@ -46,8 +46,8 @@ public class FreeTextSearchReader<T> extends ResultSetMixedReader<T>{
 
         // expecting the URI of the matching subject to be in column "s"
         String subjectUri = subjectValue.stringValue();
-        if (subjectValue instanceof BNode && blankNodeUriPrefix!=null){
-            if (!subjectUri.startsWith(blankNodeUriPrefix)){
+        if (subjectValue instanceof BNode && blankNodeUriPrefix != null) {
+            if (!subjectUri.startsWith(blankNodeUriPrefix)) {
                 subjectUri = blankNodeUriPrefix + subjectUri;
             }
         }

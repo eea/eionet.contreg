@@ -18,7 +18,7 @@ public class UserHomeUrlExtractor {
         try {
             userNamePart = url.split("/home/")[1];
             userName = userNamePart.split("/")[0];
-        } catch (Exception ex){
+        } catch (Exception ex) {
             throw new BadUserHomeUrlException("Not properly typed user home directory URL");
         }
 
@@ -33,10 +33,10 @@ public class UserHomeUrlExtractor {
         String section = "";
         try {
             urlParts = url.split(userName+"/");
-        } catch (Exception ex){
+        } catch (Exception ex) {
         }
 
-        if (urlParts.length > 1){
+        if (urlParts.length > 1) {
             section = urlParts[1].split("/")[0];
         }
         return section;

@@ -46,7 +46,7 @@ public class LabelPredicates{
     /**
      *
      */
-    private LabelPredicates(){
+    private LabelPredicates() {
 
         load();
 
@@ -54,7 +54,7 @@ public class LabelPredicates{
         StringBuffer buf = new StringBuffer();
 
         predicateHashes = new String[predicates.size()];
-        for (Iterator<String> iter=predicates.iterator(); iter.hasNext(); i++){
+        for (Iterator<String> iter=predicates.iterator(); iter.hasNext(); i++) {
             predicateHashes[i] = String.valueOf(Hashes.spoHash(iter.next()));
             if (i>0)
                 buf.append(",");
@@ -67,7 +67,7 @@ public class LabelPredicates{
     /**
      *
      */
-    private void load(){
+    private void load() {
 
         // TODO - real loading must be done from some configuration
         predicates = new LinkedHashSet<String>();
@@ -80,7 +80,7 @@ public class LabelPredicates{
      *
      * @return
      */
-    public static String getCommaSeparatedHashes(){
+    public static String getCommaSeparatedHashes() {
         return LabelPredicates.instance.commaSeparatedHashes;
     }
 }

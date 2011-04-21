@@ -41,7 +41,7 @@ public class ReaderBasedARPSource implements ARPSource{
      *
      * @param reader
      */
-    public ReaderBasedARPSource(Reader reader){
+    public ReaderBasedARPSource(Reader reader) {
         this.reader = reader;
     }
 

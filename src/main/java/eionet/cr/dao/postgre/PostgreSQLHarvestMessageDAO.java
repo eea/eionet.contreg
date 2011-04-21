@@ -60,7 +60,7 @@ public class PostgreSQLHarvestMessageDAO extends PostgreSQLBaseDAO implements Ha
         List<Object> values = new ArrayList<Object>();
         values.add(new Integer(messageID));
         List<HarvestMessageDTO> list = executeSQL(q_HarvestMessageByMessageID, values, new HarvestMessageDTOReader());
-        return list!=null && list.size()>0 ? list.get(0) : null;
+        return list != null && list.size()>0 ? list.get(0) : null;
     }
 
     /** */
@@ -72,7 +72,7 @@ public class PostgreSQLHarvestMessageDAO extends PostgreSQLBaseDAO implements Ha
      */
     public Integer insertHarvestMessage(HarvestMessageDTO harvestMessageDTO) throws DAOException {
 
-        if (harvestMessageDTO==null)
+        if (harvestMessageDTO == null)
             return null;
 
         List<Object> values = new ArrayList<Object>();
@@ -82,14 +82,14 @@ public class PostgreSQLHarvestMessageDAO extends PostgreSQLBaseDAO implements Ha
         values.add(harvestMessageDTO.getStackTrace());
 
         Connection conn = null;
-        try{
+        try {
             conn = getSQLConnection();
             return SQLUtil.executeUpdateReturnAutoID(q_insertHarvestMessage, values, conn);
         }
-        catch (Exception e){
+        catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
         }
-        finally{
+        finally {
             SQLUtil.close(conn);
         }
     }
@@ -108,14 +108,14 @@ public class PostgreSQLHarvestMessageDAO extends PostgreSQLBaseDAO implements Ha
         values.add(messageId);
 
         Connection conn = null;
-        try{
+        try {
             conn = getSQLConnection();
             SQLUtil.executeUpdate(deleteHarvestMessageSQL, values, conn);
         }
-        catch (Exception e){
+        catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
         }
-        finally{
+        finally {
             SQLUtil.close(conn);
         }
     }

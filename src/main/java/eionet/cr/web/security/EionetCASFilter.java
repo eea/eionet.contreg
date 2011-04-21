@@ -90,7 +90,7 @@ public class EionetCASFilter extends CASFilter {
                 session.setAttribute(USER_SESSION_ATTR, new CRUser(userName));
 
                 String requestURI = httpRequest.getRequestURI();
-                if (requestURI.endsWith("/login")){
+                if (requestURI.endsWith("/login")) {
 
                     String redirectUrl =  httpRequest.getContextPath() + LOGIN_ACTION + "?" + AFTER_LOGIN_EVENT;
                     ((HttpServletResponse)response).sendRedirect(redirectUrl);
@@ -118,7 +118,7 @@ public class EionetCASFilter extends CASFilter {
      * @param forSubscription
      * @return
      */
-    public static String getCASLoginURL(HttpServletRequest req, boolean forSubscription){
+    public static String getCASLoginURL(HttpServletRequest req, boolean forSubscription) {
 
         StringBuffer sb = new StringBuffer(CAS_LOGIN_URL);
         sb.append("?service=");

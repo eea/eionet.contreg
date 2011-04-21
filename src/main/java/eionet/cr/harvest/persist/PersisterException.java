@@ -38,14 +38,14 @@ public class PersisterException extends CRException {
     /**
      *
      */
-    public PersisterException(){
+    public PersisterException() {
     }
 
     /**
      *
      * @param message
      */
-    public PersisterException(String message){
+    public PersisterException(String message) {
         super(message);
     }
 

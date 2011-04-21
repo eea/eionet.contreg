@@ -65,7 +65,7 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
      * @return ForwardResolution
      */
     @DefaultHandler
-    public Resolution init(){
+    public Resolution init() {
         return new ForwardResolution("/pages/simpleSearch.jsp");
     }
 
@@ -80,24 +80,24 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 
         if (!searchExpression.isEmpty()) {
 
-            if (simpleFilter!=null){
+            if (simpleFilter != null) {
 
-                if (simpleFilter.equals("anyObject")){
+                if (simpleFilter.equals("anyObject")) {
                     filterType = FreeTextSearchHelper.FilterType.ANY_OBJECT;
                 }
-                else if (simpleFilter.equals("anyFile")){
+                else if (simpleFilter.equals("anyFile")) {
                     filterType = FreeTextSearchHelper.FilterType.ANY_FILE;
                 }
-                else if (simpleFilter.equals("texts")){
+                else if (simpleFilter.equals("texts")) {
                     filterType = FreeTextSearchHelper.FilterType.TEXTS;
                 }
-                else if (simpleFilter.equals("datasets")){
+                else if (simpleFilter.equals("datasets")) {
                     filterType = FreeTextSearchHelper.FilterType.DATASETS;
                 }
-                else if (simpleFilter.equals("images")){
+                else if (simpleFilter.equals("images")) {
                     filterType = FreeTextSearchHelper.FilterType.IMAGES;
                 } 
-                else if (simpleFilter.equals("exactMatch")){
+                else if (simpleFilter.equals("exactMatch")) {
                     exactMatch = true;
                 }
             }
@@ -107,7 +107,7 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
                 this.isUri = true;
                 SubjectDTO subject = DAOFactory.get().getDao(HelperDAO.class).getSubject(
                         searchExpression.toString());
-                if (subject!=null){
+                if (subject != null) {
                     resultList = Collections.singleton(subject);
                     matchCount = 1;
                 }
@@ -159,7 +159,7 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
      * (non-Javadoc)
      * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
      */
-    public List<SearchResultColumn> getColumns(){
+    public List<SearchResultColumn> getColumns() {
 
         ArrayList<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
 

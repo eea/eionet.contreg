@@ -12,7 +12,7 @@ public class ResultSetReaderException extends CRException{
     /**
      *
      */
-    public ResultSetReaderException(){
+    public ResultSetReaderException() {
         super();
     }
 
@@ -20,7 +20,7 @@ public class ResultSetReaderException extends CRException{
      *
      * @param message
      */
-    public ResultSetReaderException(String message){
+    public ResultSetReaderException(String message) {
         super(message);
     }
 
@@ -29,7 +29,7 @@ public class ResultSetReaderException extends CRException{
      * @param message
      * @param cause
      */
-    public ResultSetReaderException(String message, Throwable cause){
+    public ResultSetReaderException(String message, Throwable cause) {
         super(message, cause);
     }
 }

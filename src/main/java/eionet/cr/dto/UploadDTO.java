@@ -37,9 +37,9 @@ public class UploadDTO {
      *
      * @param subjectUri
      */
-    public UploadDTO(String subjectUri){
+    public UploadDTO(String subjectUri) {
 
-        if (subjectUri==null || subjectUri.trim().length()==0){
+        if (subjectUri == null || subjectUri.trim().length() == 0) {
             throw new IllegalArgumentException("Subject uri must not be null");
         }
         this.subjectUri = subjectUri;

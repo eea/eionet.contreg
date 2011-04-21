@@ -88,14 +88,14 @@ public class ObjectHashesFixer extends Thread{
     /**
      *
      */
-    public ObjectHashesFixer(){
+    public ObjectHashesFixer() {
     }
 
     /**
      *
      * @return
      */
-    public static synchronized boolean isShutdownIssued(){
+    public static synchronized boolean isShutdownIssued() {
         return shutdownIssued;
     }
 
@@ -103,7 +103,7 @@ public class ObjectHashesFixer extends Thread{
      *
      * @param b
      */
-    public static synchronized void setShutdownIssued(boolean b){
+    public static synchronized void setShutdownIssued(boolean b) {
         shutdownIssued = b;
     }
 
@@ -111,13 +111,13 @@ public class ObjectHashesFixer extends Thread{
      * (non-Javadoc)
      * @see java.lang.Thread#run()
      */
-    public void run(){
+    public void run() {
 
         logger.debug(this.getClass().getSimpleName() + " started, batchSize=" + BATCH_SIZE + ", noOfBatchesToRun=" + NOOF_BATCHES_TO_RUN);
 
         int ret = BATCH_SIZE;
         int batchesRun = 0;
-        while (ret>0 && batchesRun < NOOF_BATCHES_TO_RUN && !ObjectHashesFixer.isShutdownIssued()){
+        while (ret>0 && batchesRun < NOOF_BATCHES_TO_RUN && !ObjectHashesFixer.isShutdownIssued()) {
 
             logger.debug("Executing batch #" + (batchesRun+1));
             ret = runBatch();
@@ -140,7 +140,7 @@ public class ObjectHashesFixer extends Thread{
      * @throws SQLException
      *
      */
-    private int runBatch(){
+    private int runBatch() {
 
         int batchSize = 0;
 
@@ -151,7 +151,7 @@ public class ObjectHashesFixer extends Thread{
         PreparedStatement pstmtSourceObjects = null;
         PreparedStatement pstmtResources = null;
         ResultSet rs = null;
-        try{
+        try {
             conn = DbConnectionProvider.getConnection();
 
             selectStmt = conn.prepareStatement(selectSQL);
@@ -163,7 +163,7 @@ public class ObjectHashesFixer extends Thread{
             selectStmt.setInt(1, BATCH_SIZE);
             rs = selectStmt.executeQuery();
 
-            while (rs.next()){
+            while (rs.next()) {
 
                 String object = rs.getString("OBJECT");
                 long source = rs.getLong("SOURCE");
@@ -202,7 +202,7 @@ public class ObjectHashesFixer extends Thread{
                 batchSize++;
             }
 
-            if (batchSize>0){
+            if (batchSize>0) {
 
 //              logger.debug("Executing batch for objects");
                 pstmtObjects.executeBatch();
@@ -214,10 +214,10 @@ public class ObjectHashesFixer extends Thread{
                 pstmtResources.executeBatch();
             }
         }
-        catch (SQLException e){
+        catch (SQLException e) {
             throw new RuntimeException(e.toString(), e);
         }
-        finally{
+        finally {
             SQLUtil.close(rs);
             SQLUtil.close(selectStmt);
             SQLUtil.close(pstmtObjects);
@@ -236,11 +236,11 @@ public class ObjectHashesFixer extends Thread{
      * @param genTime
      * @return
      */
-    private static String createUuidNamePrefix(String source, String genTime){
+    private static String createUuidNamePrefix(String source, String genTime) {
         return new StringBuilder(source).append(":").append(genTime).append(":").toString();
     }
 
-    private static String generateUUID(String uuidNamePrefix, String object){
+    private static String generateUUID(String uuidNamePrefix, String object) {
 
         String uuid = UUID.nameUUIDFromBytes(new StringBuilder(uuidNamePrefix).append(object).toString().getBytes()).toString();
         return new StringBuilder(URN_UUID_PREFIX).append(uuid).toString();
@@ -268,7 +268,7 @@ class ShutdownHook extends Thread {
      *
      * @param fixer
      */
-    public ShutdownHook(ObjectHashesFixer fixer){
+    public ShutdownHook(ObjectHashesFixer fixer) {
         this.fixer = fixer;
     }
 
@@ -278,14 +278,14 @@ class ShutdownHook extends Thread {
      */
     public void run() {
 
-        try{
+        try {
             sleep(1000);
-            if (fixer.isAlive()){
+            if (fixer.isAlive()) {
 
                 ObjectHashesFixer.setShutdownIssued(true);
                 System.out.println("Shutdown issued, waiting for the fixer to finish...");
 
-                while (fixer.isAlive()){
+                while (fixer.isAlive()) {
                     sleep(1000);
                 }
 

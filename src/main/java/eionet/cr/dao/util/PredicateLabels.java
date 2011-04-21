@@ -42,17 +42,17 @@ public class PredicateLabels extends HashMap<String,HashMap<String,HashSet<Strin
      * @param label
      * @param language
      */
-    public void add(String predicate, String label, String language){
+    public void add(String predicate, String label, String language) {
 
         HashMap<String,HashSet<String>> labels = get(predicate);
-        if (labels==null){
+        if (labels == null) {
             labels = new HashMap<String,HashSet<String>>();
             put(predicate, labels);
         }
 
         String parsedLanguage = Util.normalizeHTTPAcceptedLanguage(language);
         HashSet<String> labelsOfLang = labels.get(parsedLanguage);
-        if (labelsOfLang==null){
+        if (labelsOfLang == null) {
             labelsOfLang = new HashSet<String>();
             labels.put(parsedLanguage, labelsOfLang);
         }
@@ -65,23 +65,23 @@ public class PredicateLabels extends HashMap<String,HashMap<String,HashSet<Strin
      * @param languages
      * @return
      */
-    public Map<String,String> getByLanguages(HashSet<String> languages){
+    public Map<String,String> getByLanguages(HashSet<String> languages) {
 
         Map<String,String> result = new HashMap<String,String>();
-        if (languages!=null && !languages.isEmpty()){
+        if (languages != null && !languages.isEmpty()) {
 
-            if (!isEmpty()){
+            if (!isEmpty()) {
 
-                for (String predicate:keySet()){
+                for (String predicate:keySet()) {
 
                     HashMap<String,HashSet<String>> labels = get(predicate);
 
                     HashSet<String> labelsInRequestedLanguages = null;
-                    for (String language:languages){
+                    for (String language:languages) {
                         labelsInRequestedLanguages = labels.get(language);
                     }
 
-                    if (labelsInRequestedLanguages!=null && !labelsInRequestedLanguages.isEmpty()){
+                    if (labelsInRequestedLanguages != null && !labelsInRequestedLanguages.isEmpty()) {
                         result.put(predicate, labelsInRequestedLanguages.iterator().next());
                     }
                 }

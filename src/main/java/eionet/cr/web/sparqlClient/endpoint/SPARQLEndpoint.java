@@ -114,32 +114,32 @@ public class SPARQLEndpoint {
 
     private void runQuery(String query, String format, OutputStream out) {
 
-        if (!StringUtils.isBlank(query)){
+        if (!StringUtils.isBlank(query)) {
             String url = GeneralConfig.getProperty("virtuoso.db.url");
             String username = GeneralConfig.getProperty("virtuoso.db.usr");
             String password = GeneralConfig.getProperty("virtuoso.db.pwd");
 
-            try{
+            try {
 
                 Repository myRepository = new VirtuosoRepository(url,username,password);
                 myRepository.initialize();
                 RepositoryConnection con = myRepository.getConnection();
-                try{
+                try {
                     TupleQuery resultsTable = con.prepareTupleQuery(QueryLanguage.SPARQL, query);
 
-                    if (format != null && format.equals(FORMAT_XML)){
+                    if (format != null && format.equals(FORMAT_XML)) {
                         SPARQLResultsXMLWriter sparqlWriter = new SPARQLResultsXMLWriter(out);
                         resultsTable.evaluate(sparqlWriter);
-                    } else if (format != null && format.equals(FORMAT_JSON)){
+                    } else if (format != null && format.equals(FORMAT_JSON)) {
                         SPARQLResultsJSONWriter sparqlWriter = new SPARQLResultsJSONWriter(out);
                         resultsTable.evaluate(sparqlWriter);
-                    } else if (format != null && format.equals(FORMAT_HTML)){
+                    } else if (format != null && format.equals(FORMAT_HTML)) {
                         TupleQueryResult bindings = resultsTable.evaluate();
-                        if (bindings != null){
+                        if (bindings != null) {
                             PrintWriter outWriter = new PrintWriter(out);
                             outWriter.println("<table><tr>");
                             List<String> names = bindings.getBindingNames();
-                            for(String name : names){
+                            for(String name : names) {
                                 outWriter.println("<th>");
                                 outWriter.println(name);
                                 outWriter.println("</th>");

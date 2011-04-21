@@ -50,7 +50,7 @@ public class PagingRequest {
      * @param pageNumber
      * @return
      */
-    public static PagingRequest create(int pageNumber){
+    public static PagingRequest create(int pageNumber) {
 
         return create(pageNumber, Pagination.DEFAULT_ITEMS_PER_PAGE);
     }
@@ -61,7 +61,7 @@ public class PagingRequest {
      * @param itemsPerPage
      * @return
      */
-    public static PagingRequest create(int pageNumber, int itemsPerPage){
+    public static PagingRequest create(int pageNumber, int itemsPerPage) {
 
         return itemsPerPage<=0 ? null : new PagingRequest(pageNumber, itemsPerPage);
     }
@@ -84,7 +84,7 @@ public class PagingRequest {
      *
      * @return
      */
-    public int getOffset(){
+    public int getOffset() {
         return offset;
     }
 
@@ -92,7 +92,7 @@ public class PagingRequest {
      * (non-Javadoc)
      * @see java.lang.Object#toString()
      */
-    public String toString(){
+    public String toString() {
         return new StringBuffer().append("pageNumber=").append(pageNumber).
         append(",itemsPerPage=").append(itemsPerPage).toString();
     }

@@ -64,7 +64,7 @@ public class FrontpageActionBean extends AbstractActionBean {
         return tagCloud;
     }
 
-    private void initTagCloud(){
+    private void initTagCloud() {
         tagCloud = ApplicationCache.getTagCloudSortedByName(Integer.parseInt(GeneralConfig.getProperty(GeneralConfig.TAGCLOUD_FRONTPAGE_SIZE)));
     }
 

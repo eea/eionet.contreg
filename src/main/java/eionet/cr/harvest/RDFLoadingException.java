@@ -32,7 +32,7 @@ public class RDFLoadingException extends CRRuntimeException{
     /**
      *
      */
-    public RDFLoadingException(){
+    public RDFLoadingException() {
         super();
     }
 
@@ -40,7 +40,7 @@ public class RDFLoadingException extends CRRuntimeException{
      *
      * @param message
      */
-    public RDFLoadingException(String message){
+    public RDFLoadingException(String message) {
         super(message);
     }
 
@@ -49,7 +49,7 @@ public class RDFLoadingException extends CRRuntimeException{
      * @param message
      * @param cause
      */
-    public RDFLoadingException(String message, Throwable cause){
+    public RDFLoadingException(String message, Throwable cause) {
         super(message, cause);
     }
 }

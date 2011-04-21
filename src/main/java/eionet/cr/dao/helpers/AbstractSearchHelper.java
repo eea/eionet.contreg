@@ -48,11 +48,11 @@ public abstract class AbstractSearchHelper implements SearchHelper{
      * @param pagingRequest
      * @param sortingRequest
      */
-    protected AbstractSearchHelper(PagingRequest pagingRequest, SortingRequest sortingRequest){
+    protected AbstractSearchHelper(PagingRequest pagingRequest, SortingRequest sortingRequest) {
 
         this.pagingRequest = pagingRequest;
         this.sortingRequest = sortingRequest;
-        if (sortingRequest!=null){
+        if (sortingRequest != null) {
             sortPredicate = sortingRequest.getSortingColumnName();
             sortOrder = sortingRequest.getSortOrder() == null  ? SortOrder.ASCENDING.toSQL()
                     : sortingRequest.getSortOrder().toSQL();
@@ -64,18 +64,18 @@ public abstract class AbstractSearchHelper implements SearchHelper{
      * @param inParams
      * @return
      */
-    public String getQuery(List<Object> inParams){
+    public String getQuery(List<Object> inParams) {
 
         String query = StringUtils.isBlank(sortPredicate) ?
                 getUnorderedQuery(inParams) : getOrderedQuery(inParams);
 
-        if (pagingRequest!=null){
+        if (pagingRequest != null) {
             return new StringBuffer(query).
             append(" limit ").append(pagingRequest.getItemsPerPage()).
             append(" offset ").append(pagingRequest.getOffset()).
             toString();
         }
-        else{
+        else {
             return query;
         }
     }

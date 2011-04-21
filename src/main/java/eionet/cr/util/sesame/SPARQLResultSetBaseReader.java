@@ -20,7 +20,7 @@ public abstract class SPARQLResultSetBaseReader<T> implements SPARQLResultSetRea
      * (non-Javadoc)
      * @see eionet.cr.util.sesame.SPARQLResultSetReader#startResultSet(java.util.List)
      */
-    public void startResultSet(List<String> bindingNames){
+    public void startResultSet(List<String> bindingNames) {
 
         this.bindingNames = bindingNames;
         startResultSet();
@@ -29,7 +29,7 @@ public abstract class SPARQLResultSetBaseReader<T> implements SPARQLResultSetRea
     /**
      *
      */
-    protected void startResultSet(){
+    protected void startResultSet() {
     }
 
     /* (non-Javadoc)

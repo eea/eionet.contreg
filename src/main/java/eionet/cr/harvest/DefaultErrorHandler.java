@@ -91,20 +91,20 @@ public class DefaultErrorHandler implements ErrorHandler {
      * @param e
      * @return
      */
-    private SAXParseException sanitizeSAXParseException(SAXParseException e){
+    private SAXParseException sanitizeSAXParseException(SAXParseException e) {
 
         String message = e.getMessage();
-        if (message==null){
+        if (message == null) {
             message = "";
         }
 
         String erroneousEntityPublicId = e.getPublicId();
-        if (erroneousEntityPublicId==null){
+        if (erroneousEntityPublicId == null) {
             erroneousEntityPublicId = "";
         }
 
         String erroneousEntitySystemId = e.getSystemId();
-        if (erroneousEntitySystemId==null){
+        if (erroneousEntitySystemId == null) {
             erroneousEntitySystemId= "";
         }
 

@@ -36,7 +36,7 @@ public enum HarvestMessageType {
      *
      * @param value1
      */
-    HarvestMessageType(String value){
+    HarvestMessageType(String value) {
         this.value = value;
     }
 
@@ -44,7 +44,7 @@ public enum HarvestMessageType {
      * (non-Javadoc)
      * @see java.lang.Enum#toString()
      */
-    public String toString(){
+    public String toString() {
         return value;
     }
 }

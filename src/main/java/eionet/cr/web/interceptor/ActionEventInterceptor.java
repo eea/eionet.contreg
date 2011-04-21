@@ -69,7 +69,7 @@ public class ActionEventInterceptor implements Interceptor {
             HttpServletRequest request = context.getActionBean().getContext().getRequest();
             String actionEventURL = null;
 
-            if (actionBean instanceof AbstractHomeActionBean){
+            if (actionBean instanceof AbstractHomeActionBean) {
                 actionEventURL = "/home/"+UserHomeUrlExtractor.extractUserNameFromHomeUrl(request.getRequestURI());
             } else {
                 actionEventURL = getActionName(actionBean.getClass()) + "?" +

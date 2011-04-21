@@ -41,9 +41,9 @@ public class PredicateLabelsReader extends ResultSetMixedReader{
      *
      * @param predicateLabels
      */
-    public PredicateLabelsReader(PredicateLabels predicateLabels){
+    public PredicateLabelsReader(PredicateLabels predicateLabels) {
 
-        if (predicateLabels==null)
+        if (predicateLabels == null)
             throw new IllegalArgumentException();
 
         this.predicateLabels = predicateLabels;

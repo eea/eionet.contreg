@@ -54,10 +54,10 @@ public class VirtuosoSearchBySourceHelper extends AbstractSearchHelper{
         .append("ORDER BY ");
         if(sortOrder != null)
             strBuilder.append(sortOrder);
-        if(sortPredicate != null && sortPredicate.equals(Predicates.RDFS_LABEL)){
+        if(sortPredicate != null && sortPredicate.equals(Predicates.RDFS_LABEL)) {
           //If Label is not null then use Label. Otherwise use subject where we replace all / with # and then get the string after last #.
             strBuilder.append("(bif:lcase(bif:either(bif:isnull(?ord), (bif:subseq (bif:replace (?s, '/', '#'), bif:strrchr (bif:replace (?s, '/', '#'), '#')+1)), ?ord)))");
-        } else if(sortPredicate != null && sortPredicate.equals(Predicates.RDF_TYPE)){
+        } else if(sortPredicate != null && sortPredicate.equals(Predicates.RDF_TYPE)) {
             //Replace all / with # and then get the string after last #
             strBuilder.append("(bif:lcase(bif:subseq (bif:replace (?ord, '/', '#'), bif:strrchr (bif:replace (?ord, '/', '#'), '#')+1)))");
         } else {

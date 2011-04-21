@@ -34,7 +34,7 @@ public class Colors {
      * @param hash
      * @return
      */
-    public static String colorByModulus(long hash){
+    public static String colorByModulus(long hash) {
 
         int index = Math.abs((int)(hash % (long)colors.length));
         index = Math.max(0, index);
@@ -47,7 +47,7 @@ public class Colors {
      * @param rgbColor
      * @return
      */
-    public static String toKML(String rgbColor, boolean transparent){
+    public static String toKML(String rgbColor, boolean transparent) {
         return new StringBuffer(transparent ? "00" : "ff").
             append(rgbColor.substring(4,6)).append(rgbColor.substring(2,4)).append(rgbColor.substring(0,2)).toString();
     }
@@ -56,7 +56,7 @@ public class Colors {
      *
      * @param args
      */
-    public static void main(String[] args){
+    public static void main(String[] args) {
         System.out.println(Colors.colorByModulus(Hashes.spoHash("http://cdr.eionet.europa.eu/de/eper/colpofz1w/envr49rta/EPER_2004_DE.xml")));
     }
 

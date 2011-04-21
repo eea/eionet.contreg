@@ -38,7 +38,7 @@ public abstract class PersisterFactory {
      *
      * @return
      */
-    public static IHarvestPersister getPersister(PersisterConfig config){
+    public static IHarvestPersister getPersister(PersisterConfig config) {
 
         //String dbUrl = GeneralConfig.getRequiredProperty(GeneralConfig.DB_URL);
         String dbUrl = DbConnectionProvider.getConnectionUrl();
@@ -54,7 +54,7 @@ public abstract class PersisterFactory {
      *
      * @return
      */
-    public static IHarvestPersister getPersister(){
+    public static IHarvestPersister getPersister() {
 
         String dbUrl = GeneralConfig.getRequiredProperty(GeneralConfig.DB_URL);
         if (dbUrl.startsWith("jdbc:mysql:"))

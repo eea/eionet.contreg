@@ -148,7 +148,7 @@ public class CRXmlRpcSampleClient {
                 System.out.println(result[i].toString());
             }
         }
-        else{
+        else {
             System.out.println("result array null or empty");
         }
 
@@ -183,7 +183,7 @@ public class CRXmlRpcSampleClient {
         else if (result.length == 0) {
             System.out.println("Call executed, result is an empty array");
         }
-        else{
+        else {
             System.out.println("Call executed, result is the following array");
             for (int i=0; i < result.length; i++) {
                 System.out.println(i + ": " + result[i]);

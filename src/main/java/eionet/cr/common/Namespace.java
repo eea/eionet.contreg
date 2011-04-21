@@ -46,7 +46,7 @@ public enum Namespace {
     /**
      *
      */
-    private Namespace(String uri, String prefix){
+    private Namespace(String uri, String prefix) {
         this.uri = uri;
         this.prefix = prefix;
     }
