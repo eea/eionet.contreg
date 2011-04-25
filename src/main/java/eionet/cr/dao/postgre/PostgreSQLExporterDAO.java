@@ -13,7 +13,11 @@ import eionet.cr.util.Hashes;
 import eionet.cr.util.Util;
 import eionet.cr.util.sql.SQLUtil;
 
-public class PostgreSQLExporterDAO extends PostgreSQLBaseDAO implements ExporterDAO {
+/**
+*
+* @author Enriko Käsper
+*
+*/public class PostgreSQLExporterDAO extends PostgreSQLBaseDAO implements ExporterDAO {
 
     /**
      *
@@ -21,7 +25,7 @@ public class PostgreSQLExporterDAO extends PostgreSQLBaseDAO implements Exporter
     public void exportByTypeAndFilters(
             Map<String, String> filters,
             List<String> selectedPredicates,
-            ResultSetExportReader reader) throws DAOException {
+            ResultSetExportReader<Object> reader) throws DAOException {
 
         // create query helper
         PostgreFilteredTypeSearchHelper helper = new PostgreFilteredTypeSearchHelper(filters, null,
@@ -35,10 +39,8 @@ public class PostgreSQLExporterDAO extends PostgreSQLBaseDAO implements Exporter
         //limit predicates
         List<Long> predicateHashes = new ArrayList<Long>();
         if (selectedPredicates != null && !selectedPredicates.isEmpty()) {
-            for (String predicate : selectedPredicates) {
-                if (!predicateHashes.contains(predicate)) {
-                    predicateHashes.add(Hashes.spoHash(predicate));
-                }
+            for (String selectedPredicateUri : selectedPredicates) {
+                predicateHashes.add(Long.valueOf(Hashes.spoHash(selectedPredicateUri)));
             }
         }
         String predicateHashesCommaSeparated = Util.toCSV(predicateHashes);
@@ -50,7 +52,7 @@ public class PostgreSQLExporterDAO extends PostgreSQLBaseDAO implements Exporter
 
     }
 
-    protected void getSubjectsDataAndWriteItIntoExportOutput(ResultSetExportReader reader, String subjectsSubQuery,
+    protected void getSubjectsDataAndWriteItIntoExportOutput(ResultSetExportReader<Object> reader, String subjectsSubQuery,
             String predicateHashes) throws DAOException {
 
         if (subjectsSubQuery == null || subjectsSubQuery.length() == 0)
@@ -91,11 +93,11 @@ public class PostgreSQLExporterDAO extends PostgreSQLBaseDAO implements Exporter
     }
 
     /**
-     * Creates temporary tables for selected subjects and corresponding resources
+     * Creates temporary tables for selected subjects and corresponding resources.
      *
      * @param subjectsSubQuery
      * @param predicateHashesCommaSeparated
-     * @return
+     * @return set of SQL queries
      */
     protected String getCreateTempSubjectsTablesQuery(String subjectsSubQuery, String predicateHashesCommaSeparated) {
 
@@ -104,7 +106,7 @@ public class PostgreSQLExporterDAO extends PostgreSQLBaseDAO implements Exporter
         append("create temp table TMP_SUBJECTS ").
         append("as select SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_OBJ, ANON_SUBJ, LIT_OBJ, OBJ_LANG from SPO where ").
         append("SUBJECT in (").append(subjectsSubQuery).append(") ").
-        append( predicateHashesCommaSeparated != null && predicateHashesCommaSeparated.length() > 0 ?
+        append(predicateHashesCommaSeparated != null && predicateHashesCommaSeparated.length() > 0 ?
                 "AND PREDICATE IN (".concat(predicateHashesCommaSeparated).concat(") ") : "").
         append(";").
         append("create temp table TMP_RESOURCES as ").
@@ -114,8 +116,8 @@ public class PostgreSQLExporterDAO extends PostgreSQLBaseDAO implements Exporter
         return buf.toString();
     }
     /**
-     * Query creates the actual query joining temporary subjects and resources tables instead of joining SPO and RESOURCE
-     * @return
+     * Query creates the actual query joining temporary subjects and resources tables instead of joining SPO and RESOURCE.
+     * @return SQL select query
      */
     protected String getSubjectsDataFromTmpTablesQuery() {
 
@@ -132,8 +134,8 @@ public class PostgreSQLExporterDAO extends PostgreSQLBaseDAO implements Exporter
         return buf.toString();
     }
     /**
-     * Query drops temprary tables
-     * @return
+     * Query drops temprary tables.
+     * @return SQL drop query
      */
     protected String getDropTempTableQuery() {
         return "drop table if exists TMP_SUBJECTS; drop table if exists TMP_RESOURCES";

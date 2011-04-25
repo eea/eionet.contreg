@@ -25,7 +25,7 @@ public class VirtuosoExporterDAO extends VirtuosoBaseDAO implements ExporterDAO 
      */
     @Override
     public void exportByTypeAndFilters(Map<String, String> filters,
-            List<String> selectedPredicates, ResultSetExportReader reader) throws DAOException {
+            List<String> selectedPredicates, ResultSetExportReader<Object> reader) throws DAOException {
 
         // create query helper
         VirtuosoFilteredSearchHelper helper = new VirtuosoFilteredSearchHelper(filters, null,

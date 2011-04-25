@@ -20,10 +20,7 @@
 * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.harvest.util.arp;
 
-import com.hp.hpl.jena.rdf.arp.ALiteral;
 import com.hp.hpl.jena.rdf.arp.AResource;
-
-import eionet.cr.harvest.RDFHandler;
 
 /**
  *

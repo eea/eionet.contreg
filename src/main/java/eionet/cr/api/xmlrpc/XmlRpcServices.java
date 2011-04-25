@@ -66,6 +66,7 @@ public class XmlRpcServices implements Services {
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.api.xmlrpc.Services#getResourcesSinceTimestamp(java.util.Date)
      */
     public List getResourcesSinceTimestamp(Date timestamp) throws CRException {
@@ -74,7 +75,7 @@ public class XmlRpcServices implements Services {
             logger.info("Entered " + Thread.currentThread().getStackTrace()[1].getMethodName());
         }
 
-        List<Map<String,String[]>> result = new ArrayList<Map<String, String[]>>();
+        List<Map<String, String[]>> result = new ArrayList<Map<String, String[]>>();
         if (timestamp != null) {
 
             // given timestamp must be less than current time (in seconds)
@@ -84,14 +85,15 @@ public class XmlRpcServices implements Services {
 
                 try {
                     Collection<SubjectDTO> subjects =
-                        DAOFactory.get().getDao(HelperDAO.class).getSubjectsNewerThan(
-                            timestamp, MAX_RESULTS);
+                            DAOFactory.get().getDao(HelperDAO.class).getSubjectsNewerThan(
+                                    timestamp, MAX_RESULTS);
 
-                    for (Iterator<SubjectDTO> subjectsIter=subjects.iterator(); subjectsIter.hasNext();) {
+                    for (Iterator<SubjectDTO> subjectsIter = subjects.iterator(); subjectsIter.hasNext();) {
 
                         SubjectDTO subjectDTO = subjectsIter.next();
-                        HashMap<String,String[]> map = new HashMap<String,String[]>();
-                        for (Iterator<String> predicatesIter = subjectDTO.getPredicates().keySet().iterator(); predicatesIter.hasNext();) {
+                        HashMap<String, String[]> map = new HashMap<String, String[]>();
+                        for (Iterator<String> predicatesIter = subjectDTO.getPredicates().keySet().iterator(); predicatesIter
+                                .hasNext();) {
 
                             String predicate = predicatesIter.next();
                             map.put(predicate, toStringArray(subjectDTO.getObjects(predicate)));
@@ -112,7 +114,7 @@ public class XmlRpcServices implements Services {
                 } catch (Throwable t) {
                     t.printStackTrace();
                     if (t instanceof CRException)
-                        throw (CRException)t;
+                        throw (CRException) t;
                     else
                         throw new CRException(t.toString(), t);
                 }
@@ -125,16 +127,17 @@ public class XmlRpcServices implements Services {
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.api.xmlrpc.Services#dataflowSearch(java.util.Map)
      */
-    public List dataflowSearch(Map<String,String> criteria) throws CRException {
+    public List dataflowSearch(Map<String, String> criteria) throws CRException {
 
         if (logger.isInfoEnabled()) {
             logger.info("Entered " + Thread.currentThread().getStackTrace()[1].getMethodName());
         }
 
         if (criteria == null)
-            criteria = new HashMap<String,String>();
+            criteria = new HashMap<String, String>();
 
         if (!criteria.containsKey(Predicates.RDF_TYPE))
             criteria.put(Predicates.RDF_TYPE, Subjects.ROD_DELIVERY_CLASS);
@@ -142,7 +145,7 @@ public class XmlRpcServices implements Services {
         List<DataflowResultDto> result = new ArrayList<DataflowResultDto>();
         try {
             Pair<Integer, List<SubjectDTO>> search =
-                DAOFactory.get().getDao(SearchDAO.class).searchByFilters(
+                    DAOFactory.get().getDao(SearchDAO.class).searchByFilters(
                             criteria,
                             null,
                             PagingRequest.create(1, MAX_RESULTS),
@@ -171,7 +174,7 @@ public class XmlRpcServices implements Services {
         } catch (Throwable t) {
             t.printStackTrace();
             if (t instanceof CRException)
-                throw (CRException)t;
+                throw (CRException) t;
             else
                 throw new CRException(t.toString(), t);
         }
@@ -181,6 +184,7 @@ public class XmlRpcServices implements Services {
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.api.xmlrpc.Services#pushContent(java.lang.String)
      */
     public String pushContent(String content, String sourceUrl) throws CRException {
@@ -205,23 +209,21 @@ public class XmlRpcServices implements Services {
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.api.xmlrpc.Services#getEntries(java.util.Hashtable)
      *
-     * This method implements what getEntries did in the old Content Registry.
-     * It is called by ROD, though it can be used by any other application as well.
+     * This method implements what getEntries did in the old Content Registry. It is called by ROD, though it can be used by any
+     * other application as well.
      *
-     * The purpose is to return all metadata of all resources that match the given
-     * criteria. The criteria is given as a <code>java.util.Hashtable</code>, where keys represent metadata
-     * attribute names and values represent their values. Data type of both keys and
-     * values is <code>java.lang.String</code>.
+     * The purpose is to return all metadata of all resources that match the given criteria. The criteria is given as a
+     * <code>java.util.Hashtable</code>, where keys represent metadata attribute names and values represent their values. Data type
+     * of both keys and values is <code>java.lang.String</code>.
      *
-     * The method returns a <code>java.util.Vector</code> of type <code>java.util.Hashtable</code>.
-     * Every such hashtable represents one resource that contains exactly 1 key that is a String that
-     * represents the resource's URI. The value is another <code>java.lang.Hashtable</code> where the
-     * data type of keys is <code>java.lang.String</code> and the data type of values is <code>java.util.Vector</code>.
-     * They keys represent URIs of the resource's attributes and the value-vectors represent values
+     * The method returns a <code>java.util.Vector</code> of type <code>java.util.Hashtable</code>. Every such hashtable represents
+     * one resource that contains exactly 1 key that is a String that represents the resource's URI. The value is another
+     * <code>java.lang.Hashtable</code> where the data type of keys is <code>java.lang.String</code> and the data type of values is
+     * <code>java.util.Vector</code>. They keys represent URIs of the resource's attributes and the value-vectors represent values
      * of attributes. These values are of type <code>java.lang.String</code>.
-     *
      */
     public Vector getEntries(Hashtable criteria) throws CRException {
 
@@ -231,12 +233,12 @@ public class XmlRpcServices implements Services {
 
         Vector result = new Vector();
         try {
-            Pair<Integer,List<SubjectDTO>> search = DAOFactory.get()
+            Pair<Integer, List<SubjectDTO>> search = DAOFactory.get()
                     .getDao(SearchDAO.class)
                     .searchByFilters(
                             criteria,
                             null,
-                            PagingRequest.create(1,MAX_RESULTS),
+                            PagingRequest.create(1, MAX_RESULTS),
                             null,
                             null);
             Collection<SubjectDTO> subjects = search.getRight();
@@ -244,7 +246,7 @@ public class XmlRpcServices implements Services {
                 for (Iterator<SubjectDTO> iter = subjects.iterator(); iter.hasNext();) {
 
                     SubjectDTO subjectDTO = iter.next();
-                    Hashtable<String,Vector<String>> predicatesTable = new Hashtable<String,Vector<String>>();
+                    Hashtable<String, Vector<String>> predicatesTable = new Hashtable<String, Vector<String>>();
                     for (Iterator<String> predicatesIter = subjectDTO.getPredicates().keySet().iterator(); predicatesIter.hasNext();) {
 
                         String predicate = predicatesIter.next();
@@ -252,7 +254,7 @@ public class XmlRpcServices implements Services {
                     }
 
                     if (!predicatesTable.isEmpty()) {
-                        Hashtable<String,Hashtable> subjectTable = new Hashtable<String,Hashtable>();
+                        Hashtable<String, Hashtable> subjectTable = new Hashtable<String, Hashtable>();
                         subjectTable.put(subjectDTO.getUri(), predicatesTable);
                         result.add(subjectTable);
                     }
@@ -261,7 +263,7 @@ public class XmlRpcServices implements Services {
         } catch (Throwable t) {
             t.printStackTrace();
             if (t instanceof CRException)
-                throw (CRException)t;
+                throw (CRException) t;
             else
                 throw new CRException(t.toString(), t);
         }
@@ -271,6 +273,7 @@ public class XmlRpcServices implements Services {
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.api.xmlrpc.Services#getDeliveries(java.lang.Integer, java.lang.Integer, java.lang.Integer)
      */
     public Vector getDeliveries(Integer pageNum, Integer pageSize) throws CRException {
@@ -287,11 +290,11 @@ public class XmlRpcServices implements Services {
 
         try {
             result = DAOFactory.get().getDao(SearchDAO.class).searchDeliveriesForROD(
-                    PagingRequest.create(pageNum,pageSize));
+                    PagingRequest.create(pageNum, pageSize));
         } catch (Throwable t) {
             t.printStackTrace();
             if (t instanceof CRException)
-                throw (CRException)t;
+                throw (CRException) t;
             else
                 throw new CRException(t.toString(), t);
         }
@@ -344,7 +347,7 @@ public class XmlRpcServices implements Services {
 
         int i = 0;
         String[] result = new String[objects.size()];
-        for (Iterator<ObjectDTO> iter = objects.iterator(); iter.hasNext();i++) {
+        for (Iterator<ObjectDTO> iter = objects.iterator(); iter.hasNext(); i++) {
             result[i] = iter.next().getValue();
         }
 
@@ -353,6 +356,7 @@ public class XmlRpcServices implements Services {
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.api.xmlrpc.Services#getXmlFilesBySchema(java.lang.String)
      */
     public Vector getXmlFilesBySchema(String schemaIdentifier) throws CRException {
@@ -400,7 +404,7 @@ public class XmlRpcServices implements Services {
         } catch (Throwable t) {
             t.printStackTrace();
             if (t instanceof CRException)
-                throw (CRException)t;
+                throw (CRException) t;
             else
                 throw new CRException(t.toString(), t);
         }

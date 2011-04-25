@@ -20,7 +20,6 @@
  */
 package eionet.cr.util.pagination;
 
-import java.util.List;
 
 
 /**
