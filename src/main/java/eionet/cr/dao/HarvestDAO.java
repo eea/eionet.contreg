@@ -33,12 +33,22 @@ public interface HarvestDAO extends DAO {
 
     /**
      *
-     * @param harvestDTO
+     * @param harvestSourceId
+     * @param harvestType
+     * @param user
+     * @param status
+     * @return int
+     * @throws DAOException
      */
     public int insertStartedHarvest(int harvestSourceId, String harvestType, String user, String status) throws DAOException;
 
     /**
      *
+     * @param harvestId 
+     * @param status 
+     * @param totStatements 
+     * @param litStatements 
+     * @param encSchemes 
      * @param harvestDTO
      * @throws DAOException
      */
@@ -48,13 +58,15 @@ public interface HarvestDAO extends DAO {
     /**
      *
      * @param harvestSourceId
+     * @return List<HarvestDTO>
+     * @throws DAOException 
      */
     public List<HarvestDTO> getHarvestsBySourceId(Integer harvestSourceId) throws DAOException;
 
     /**
      *
      * @param harvestId
-     * @return
+     * @return HarvestDTO
      * @throws DAOException
      */
     public HarvestDTO getHarvestById(Integer harvestId) throws DAOException;
@@ -62,7 +74,7 @@ public interface HarvestDAO extends DAO {
     /**
      *
      * @param harvestSourceId
-     * @return
+     * @return HarvestDTO
      * @throws DAOException
      */
     public HarvestDTO getLastHarvestBySourceId(Integer harvestSourceId) throws DAOException;

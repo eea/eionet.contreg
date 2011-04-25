@@ -34,7 +34,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.openrdf.model.URI;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFParseException;
 
@@ -43,6 +42,7 @@ import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.readers.HarvestSourceDTOReader;
 import eionet.cr.dao.virtuoso.VirtuosoBaseDAO;
 import eionet.cr.dto.HarvestSourceDTO;
+import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.statistics.dto.HarvestUrgencyScoreDTO;
 import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
@@ -761,10 +761,10 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
     /*
      * (non-Javadoc)
      * 
-     * @see eionet.cr.dao.HarvestSourceDAO#insertUpdateSourceMetadata(String, String, String, URI)
+     * @see eionet.cr.dao.HarvestSourceDAO#insertUpdateSourceMetadata(String, String, ObjectDTO)
      */
     @Override
-    public void insertUpdateSourceMetadata(String subject, String predicate, String value, URI datatype) throws DAOException,
+    public void insertUpdateSourceMetadata(String subject, String predicate, ObjectDTO object) throws DAOException,
             RepositoryException {
         throw new UnsupportedOperationException("Method not implemented");
     }
@@ -801,7 +801,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
             append(" AND LAST_HARVEST + INTERVAL '" + days + " days' > current_date").
             append(" GROUP BY DATE(LAST_HARVEST) ORDER BY HARVESTDAY DESC ;");
 
-        List<HarvestedUrlCountDTO> result = new ArrayList();
+        List<HarvestedUrlCountDTO> result = new ArrayList<HarvestedUrlCountDTO>();
         Connection conn = null;
         Statement stmt = null;
         ResultSet rs = null;
@@ -850,7 +850,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
         append(" ORDER BY urgency DESC ").
         append(" LIMIT " + amount + " ");
 
-        List<HarvestUrgencyScoreDTO> result = new ArrayList();
+        List<HarvestUrgencyScoreDTO> result = new ArrayList<HarvestUrgencyScoreDTO>();
         Connection conn = null;
         Statement stmt = null;
         ResultSet rs = null;

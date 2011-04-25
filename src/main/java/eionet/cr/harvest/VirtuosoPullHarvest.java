@@ -180,12 +180,14 @@ public class VirtuosoPullHarvest extends Harvest {
                             DAOFactory.get().getDao(HarvestSourceDAO.class).removeAllPredicatesFromHarvesterContext(sourceUrlString);
                         }
 
+                        ObjectDTO errorObject = new ObjectDTO(error.getMessage(), true);
                         DAOFactory.get().getDao(HarvestSourceDAO.class)
-                                .insertUpdateSourceMetadata(sourceUrlString, Predicates.CR_ERROR_MESSAGE, error.getMessage(), null);
+                                .insertUpdateSourceMetadata(sourceUrlString, Predicates.CR_ERROR_MESSAGE, errorObject);
 
                         String lastRefreshed = lastRefreshedDateFormat.format(new Date(System.currentTimeMillis()));
+                        ObjectDTO lastRefreshedObject = new ObjectDTO(lastRefreshed, true, XMLSchema.DATETIME);
                         DAOFactory.get().getDao(HarvestSourceDAO.class)
-                                .insertUpdateSourceMetadata(sourceUrlString, Predicates.CR_LAST_REFRESHED, lastRefreshed, XMLSchema.DATETIME);
+                                .insertUpdateSourceMetadata(sourceUrlString, Predicates.CR_LAST_REFRESHED, lastRefreshedObject);
                     }
                     
                     if (sourceAvailable && needsHarvesting) {
@@ -447,12 +449,14 @@ public class VirtuosoPullHarvest extends Harvest {
 
             // Add last refreshed metadata into Virtuoso /harvester context
             String lastRefreshed = lastRefreshedDateFormat.format(new Date(System.currentTimeMillis()));
+            ObjectDTO lastRefreshedObject = new ObjectDTO(lastRefreshed, true, XMLSchema.DATETIME);
             DAOFactory.get().getDao(HarvestSourceDAO.class)
-                    .insertUpdateSourceMetadata(lastUrl.getSourceURL(), Predicates.CR_LAST_REFRESHED, lastRefreshed, XMLSchema.DATETIME);
+                    .insertUpdateSourceMetadata(lastUrl.getSourceURL(), Predicates.CR_LAST_REFRESHED, lastRefreshedObject);
 
             // Add redirection metadata into Virtuoso /harvester context
+            ObjectDTO redirectObject = new ObjectDTO(lastUrl.getTargetURL(), false);
             DAOFactory.get().getDao(HarvestSourceDAO.class)
-                    .insertUpdateSourceMetadata(lastUrl.getSourceURL(), Predicates.CR_REDIRECTED_TO, lastUrl.getTargetURL(), null);
+                    .insertUpdateSourceMetadata(lastUrl.getSourceURL(), Predicates.CR_REDIRECTED_TO, redirectObject);
 
             ret.add(lastUrl.getSourceURL());
             redirectionsFound = ret.size();

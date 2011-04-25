@@ -62,7 +62,7 @@ public abstract class AbstractSearchHelper implements SearchHelper {
     /**
      *
      * @param inParams
-     * @return
+     * @return String
      */
     public String getQuery(List<Object> inParams) {
 
@@ -89,21 +89,21 @@ public abstract class AbstractSearchHelper implements SearchHelper {
     /**
      *
      * @param inParams
-     * @return
+     * @return String
      */
     public abstract String getUnorderedQuery(List<Object> inParams);
 
     /**
      *
      * @param inParams
-     * @return
+     * @return String
      */
     public abstract String getCountQuery(List<Object> inParams);
 
     /**
      *
      * @param inParams
-     * @return
+     * @return String
      */
     public abstract String getMinMaxHashQuery(List<Object> inParams);
 }

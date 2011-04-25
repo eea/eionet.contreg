@@ -33,14 +33,16 @@ public interface HarvestMessageDAO extends DAO {
 
     /**
      *
-     * @return
+     * @param harvestID 
+     * @return List<HarvestMessageDTO>
      * @throws DAOException
      */
     public List<HarvestMessageDTO> findHarvestMessagesByHarvestID(int harvestID) throws DAOException;
 
     /**
      *
-     * @return
+     * @param messageID 
+     * @return HarvestMessageDTO
      * @throws DAOException
      */
     public HarvestMessageDTO findHarvestMessageByMessageID(int messageID) throws DAOException;
@@ -48,6 +50,7 @@ public interface HarvestMessageDAO extends DAO {
     /**
      *
      * @param harvestMessageDTO
+     * @return Integer
      * @throws DAOException
      */
     public Integer insertHarvestMessage(HarvestMessageDTO harvestMessageDTO) throws DAOException;

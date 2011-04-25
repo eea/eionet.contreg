@@ -30,7 +30,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.openrdf.model.URI;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFParseException;
 
@@ -38,6 +37,7 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.readers.HarvestSourceDTOReader;
 import eionet.cr.dto.HarvestSourceDTO;
+import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.Harvest;
 import eionet.cr.harvest.statistics.dto.HarvestUrgencyScoreDTO;
@@ -581,10 +581,10 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
     /*
      * (non-Javadoc)
      * 
-     * @see eionet.cr.dao.HarvestSourceDAO#insertUpdateSourceMetadata(String, String, String, URI)
+     * @see eionet.cr.dao.HarvestSourceDAO#insertUpdateSourceMetadata(String, String, ObjectDTO)
      */
     @Override
-    public void insertUpdateSourceMetadata(String subject, String predicate, String value, URI datatype) throws DAOException,
+    public void insertUpdateSourceMetadata(String subject, String predicate, ObjectDTO object) throws DAOException,
             RepositoryException {
         throw new UnsupportedOperationException("Method not implemented");
     }

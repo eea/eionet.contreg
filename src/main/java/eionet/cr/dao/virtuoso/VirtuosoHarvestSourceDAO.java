@@ -89,7 +89,7 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
 
         }
     }
-    
+
     /*
      * (non-Javadoc)
      * 
@@ -120,7 +120,6 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
             }
         }
     }
-
 
     /*
      * (non-Javadoc)
@@ -311,20 +310,20 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
                 // (which is generated from the deployment hostname).
                 String deploymentHost = GeneralConfig.getRequiredProperty(GeneralConfig.DEPLOYMENT_HOST);
                 URI harvesterContext = conn.getValueFactory().createURI(deploymentHost + "/harvester");
-                
+
                 if (sourceMetadata != null) {
                     URI subject = conn.getValueFactory().createURI(sourceMetadata.getUri());
-                    
+
                     // Remove old predicates
                     conn.remove(subject, null, null, harvesterContext);
-                    
+
                     if (sourceMetadata.getPredicateCount() > 0) {
                         insertMetadata(sourceMetadata, conn, harvesterContext, subject);
                     }
                 }
                 // commit transaction
                 conn.commit();
-                
+
                 // no transaction rollback needed, when reached this point
                 isSuccess = true;
             } finally {
@@ -432,11 +431,11 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
     /*
      * (non-Javadoc)
      * 
-     * @see eionet.cr.dao.HarvestSourceDAO#insertUpdateSourceMetadata(String,
-     * String, String, URI)
+     * @see eionet.cr.dao.HarvestSourceDAO#insertUpdateSourceMetadata(String, String, ObjectDTO)
      */
     @Override
-    public void insertUpdateSourceMetadata(String subject, String predicate, String value, URI datatype) throws DAOException, RepositoryException {
+    public void insertUpdateSourceMetadata(String subject, String predicate, ObjectDTO object) throws DAOException,
+            RepositoryException {
         RepositoryConnection conn = null;
         try {
             conn = SesameUtil.getRepositoryConnection();
@@ -445,16 +444,21 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
             URI harvesterContext = conn.getValueFactory().createURI(deploymentHost + "/harvester");
             URI sub = conn.getValueFactory().createURI(subject);
             URI pred = conn.getValueFactory().createURI(predicate);
-            Literal literalObject = conn.getValueFactory().createLiteral(value, datatype);
 
             conn.remove(sub, pred, null, harvesterContext);
-            conn.add(sub, pred, literalObject, harvesterContext);
+            if (object.isLiteral()) {
+                Literal literalObject = conn.getValueFactory().createLiteral(object.toString(), object.getDatatype());
+                conn.add(sub, pred, literalObject, harvesterContext);
+            } else {
+                URI resourceObject = conn.getValueFactory().createURI(object.toString());
+                conn.add(sub, pred, resourceObject, harvesterContext);
+            }
 
         } finally {
             SesameUtil.close(conn);
         }
     }
-    
+
     /*
      * (non-Javadoc)
      * 
@@ -466,13 +470,13 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
             RepositoryConnection conn = null;
             try {
                 conn = SesameUtil.getRepositoryConnection();
-    
+
                 String deploymentHost = GeneralConfig.getRequiredProperty(GeneralConfig.DEPLOYMENT_HOST);
                 URI harvesterContext = conn.getValueFactory().createURI(deploymentHost + "/harvester");
                 URI sub = conn.getValueFactory().createURI(subject);
-                
+
                 conn.remove(sub, null, null, harvesterContext);
-    
+
             } finally {
                 SesameUtil.close(conn);
             }
