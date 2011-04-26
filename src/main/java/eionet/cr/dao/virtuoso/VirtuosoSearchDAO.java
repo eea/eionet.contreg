@@ -90,7 +90,10 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
         List<String> subjectUris = executeSPARQL(query, matchReader);
 
         //get matching graph URIs
-        List<String> graphUris = getGraphUris(subjectUris);
+        List<String> graphUris = new ArrayList<String>();
+        if (subjectUris != null && subjectUris.size() > 0) {
+            graphUris = getGraphUris(subjectUris);
+        }
 
         logger.debug("Free-text search, find subjects query time " + Util.durationSince(startTime));
 
