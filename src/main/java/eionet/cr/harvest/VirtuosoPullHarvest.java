@@ -6,6 +6,7 @@ import java.net.HttpURLConnection;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -428,7 +429,7 @@ public class VirtuosoPullHarvest extends Harvest {
      * @throws DAOException
      * @throws RepositoryException
      */
-    private List<String> resolveRedirects() throws HarvestException, DAOException, RepositoryException {
+    private List<String> resolveRedirects() throws HarvestException, DAOException, RepositoryException, IOException {
 
         List<String> ret = new ArrayList<String>();
         int redirectionsFound = -1;
@@ -494,7 +495,6 @@ public class VirtuosoPullHarvest extends Harvest {
                         redirectedSource = new HarvestSourceDTO();
                         redirectedSource.setPrioritySource(originalSource.isPrioritySource());
                         redirectedSource.setIntervalMinutes(originalSource.getIntervalMinutes());
-                        redirectedSource.setLastHarvest(new Date());
                         redirectedSource.setUrl(url);
                         redirectedSource.setUrlHash(Hashes.spoHash(url));
                         redirectedSource.setOwner(originalSource.getOwner());
@@ -510,7 +510,7 @@ public class VirtuosoPullHarvest extends Harvest {
                         // Saving the updated source to database.
                         DAOFactory.get().getDao(HarvestSourceDAO.class).editSource(redirectedSource);
                     }
-
+                    
                     // Harvest for original source has already been created by DAOWriter.writeStarted() method
                     if (url.equals(sourceUrlString)) {
 
@@ -548,6 +548,8 @@ public class VirtuosoPullHarvest extends Harvest {
                                 .updateFinishedHarvest(harvestId, Harvest.STATUS_FINISHED, 0, 0, 0);
                     }
                 }
+                // Update last_harvest for URL's
+                DAOFactory.get().getDao(HarvestSourceDAO.class).updateLastHarvest(url, new Timestamp(System.currentTimeMillis()));
             }
         }
 

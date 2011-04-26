@@ -437,7 +437,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
     }
 
     /** */
-    private static final String EDIT_SOURCE_SQL = "update HARVEST_SOURCE set URL=?," + " URL_HASH=?, EMAILS=?, INTERVAL_MINUTES=?,"
+    private static final String EDIT_SOURCE_SQL = "update HARVEST_SOURCE set URL=?, URL_HASH=?, EMAILS=?, INTERVAL_MINUTES=?,"
             + " PRIORITY_SOURCE=cast(? as ynboolean), SOURCE_OWNER=?, MEDIA_TYPE=? where HARVEST_SOURCE_ID=?";
 
     /*
@@ -470,19 +470,19 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /** */
     private static final String editRedirectedSourceSQL = "update HARVEST_SOURCE set LAST_HARVEST=?,"
-            + " LAST_HARVEST_FAILED=cast(? as ynboolean) where HARVEST_SOURCE_ID=?";
+            + " LAST_HARVEST_FAILED=cast(? as ynboolean) where URL=?";
 
     /*
      * (non-Javadoc)
      * 
-     * @see eionet.cr.dao.HarvestSourceDAO#editRedirectedSource(eionet.cr.dto. HarvestSourceDTO)
+     * @see eionet.cr.dao.HarvestSourceDAO#editRedirectedSource(String, Timestamp, boolean)
      */
-    public void editRedirectedSource(HarvestSourceDTO source) throws DAOException {
+    public void editRedirectedSource(String url, Timestamp lastHarvest, boolean failed) throws DAOException {
 
         List<Object> values = new ArrayList<Object>();
-        values.add(source.getLastHarvest());
-        values.add(YesNoBoolean.format(source.isLastHarvestFailed()));
-        values.add(source.getSourceId());
+        values.add(lastHarvest);
+        values.add(YesNoBoolean.format(failed));
+        values.add(url);
 
         Connection conn = null;
         try {
@@ -583,7 +583,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
     }
 
     /** */
-    private static final String UPDATE_HARVEST_FINISHED_SQL = "update HARVEST_SOURCE set STATEMENTS=?, RESOURCES=?,"
+    private static final String UPDATE_HARVEST_FINISHED_SQL = "update HARVEST_SOURCE set STATEMENTS=?,"
             + " LAST_HARVEST_FAILED=cast(? as ynboolean),"
             + " LAST_HARVEST=?, PERMANENT_ERROR=cast(? as ynboolean) where HARVEST_SOURCE_ID=?";
 
@@ -754,7 +754,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
      * @see eionet.cr.dao.HarvestSourceDAO#getSourceMetadata(String, String)
      */
     @Override
-    public String getSourceMetadata(String subject, String predicate) throws DAOException, RepositoryException {
+    public String getSourceMetadata(String subject, String predicate) throws DAOException, RepositoryException, IOException {
         throw new UnsupportedOperationException("Method not implemented");
     }
 
@@ -765,7 +765,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
      */
     @Override
     public void insertUpdateSourceMetadata(String subject, String predicate, ObjectDTO object) throws DAOException,
-            RepositoryException {
+            RepositoryException, IOException {
         throw new UnsupportedOperationException("Method not implemented");
     }
 
@@ -775,7 +775,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
      * @see eionet.cr.dao.HarvestSourceDAO#removeAllPredicatesFromHarvesterContext(String, String)
      */
     @Override
-    public void removeAllPredicatesFromHarvesterContext(String subject) throws DAOException, RepositoryException {
+    public void removeAllPredicatesFromHarvesterContext(String subject) throws DAOException, RepositoryException, IOException {
         throw new UnsupportedOperationException("Method not implemented");
     }
 
@@ -883,5 +883,30 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
         return new Pair<Integer, List<HarvestUrgencyScoreDTO>>(result.size(), result);
 
+    }
+    
+    /** */
+    private static final String updateLastHarvestSQL = "update HARVEST_SOURCE set LAST_HARVEST=? where URL=?";
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see eionet.cr.dao.HarvestSourceDAO#updateLastHarvest(String, Timestamp)
+     */
+    public void updateLastHarvest(String sourceUrl, Timestamp lastHarvest) throws DAOException {
+
+        List<Object> values = new ArrayList<Object>();
+        values.add(lastHarvest);
+        values.add(sourceUrl);
+
+        Connection conn = null;
+        try {
+            conn = getSQLConnection();
+            SQLUtil.executeUpdate(updateLastHarvestSQL, values, conn);
+        } catch (Exception e) {
+            throw new DAOException(e.getMessage(), e);
+        } finally {
+            SQLUtil.close(conn);
+        }
     }
 }

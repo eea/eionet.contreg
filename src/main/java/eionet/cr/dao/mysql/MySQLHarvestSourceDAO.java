@@ -592,9 +592,9 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
     /*
      * (non-Javadoc)
      * 
-     * @see eionet.cr.dao.HarvestSourceDAO#editRedirectedSource(eionet.cr.dto.HarvestSourceDTO)
+     * @see eionet.cr.dao.HarvestSourceDAO#editRedirectedSource(String, Timestamp, boolean)
      */
-    public void editRedirectedSource(HarvestSourceDTO source) throws DAOException {
+    public void editRedirectedSource(String url, Timestamp lastHarvest, boolean failed) throws DAOException {
         throw new UnsupportedOperationException("Method not implemented");
     }
 
@@ -633,7 +633,6 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
      * @see eionet.cr.dao.HelperDAO#getLatestHarvestedURLs()
      */
     public Pair<Integer, List<HarvestedUrlCountDTO>> getLatestHarvestedURLs(int days) throws DAOException {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Method not implemented");
     }
 
@@ -642,7 +641,15 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
      * @see eionet.cr.dao.HelperDAO#getUrgencyOfComingHarvests()
      */
     public Pair <Integer, List <HarvestUrgencyScoreDTO>> getUrgencyOfComingHarvests(int amount) throws DAOException {
-        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Method not implemented");
+    }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see eionet.cr.dao.HarvestSourceDAO#updateLastHarvest(String, Timestamp)
+     */
+    public void updateLastHarvest(String sourceUrl, Timestamp lastHarvest) throws DAOException {
         throw new UnsupportedOperationException("Method not implemented");
     }
 

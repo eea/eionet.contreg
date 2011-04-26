@@ -40,13 +40,14 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
 
     @Override
     public void deleteSourceByUrl(String url) throws DAOException {
-        String sparql = "CLEAR GRAPH <" + url + ">";
+        
         boolean isSuccess = false;
         RepositoryConnection conn = null;
 
         Connection sqlConn = null;
 
         try {
+            String sparql = "CLEAR GRAPH <" + url + ">";
 
             // TODO remove PostgreSQL calls when PostgreSQL time is over
             // 2 updates brought here together to handle rollbacks correctly in
@@ -97,11 +98,12 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
      */
     @Override
     public void deleteSourceTriples(String url) throws DAOException {
-        String sparql = "CLEAR GRAPH <" + url + ">";
+        
         boolean isSuccess = false;
         RepositoryConnection conn = null;
 
         try {
+            String sparql = "CLEAR GRAPH <" + url + ">";
 
             conn = SesameUtil.getRepositoryConnection();
             conn.setAutoCommit(false);
@@ -381,6 +383,7 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
 
             RepositoryConnection conn = null;
             try {
+               
                 conn = SesameUtil.getRepositoryConnection();
 
                 String deploymentHost = GeneralConfig.getRequiredProperty(GeneralConfig.DEPLOYMENT_HOST);
@@ -410,11 +413,12 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
      * @see eionet.cr.dao.HarvestSourceDAO#getSourceMetadata(String, String)
      */
     @Override
-    public String getSourceMetadata(String subject, String predicate) throws DAOException, RepositoryException {
+    public String getSourceMetadata(String subject, String predicate) throws DAOException, RepositoryException, IOException {
 
         String ret = null;
         RepositoryConnection conn = null;
         try {
+            
             String deploymentHost = GeneralConfig.getRequiredProperty(GeneralConfig.DEPLOYMENT_HOST);
 
             StringBuffer sqlBuf = new StringBuffer().append("select ?o where {graph ?g { ").append("<").append(subject)
@@ -435,9 +439,10 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
      */
     @Override
     public void insertUpdateSourceMetadata(String subject, String predicate, ObjectDTO object) throws DAOException,
-            RepositoryException {
+            RepositoryException, IOException {
         RepositoryConnection conn = null;
         try {
+            
             conn = SesameUtil.getRepositoryConnection();
 
             String deploymentHost = GeneralConfig.getRequiredProperty(GeneralConfig.DEPLOYMENT_HOST);
@@ -465,10 +470,11 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
      * @see eionet.cr.dao.HarvestSourceDAO#removeAllPredicatesFromHarvesterContext(String, String)
      */
     @Override
-    public void removeAllPredicatesFromHarvesterContext(String subject) throws DAOException, RepositoryException {
+    public void removeAllPredicatesFromHarvesterContext(String subject) throws DAOException, RepositoryException, IOException {
         if (!StringUtils.isBlank(subject)) {
             RepositoryConnection conn = null;
             try {
+                
                 conn = SesameUtil.getRepositoryConnection();
 
                 String deploymentHost = GeneralConfig.getRequiredProperty(GeneralConfig.DEPLOYMENT_HOST);

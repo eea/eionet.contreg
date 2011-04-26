@@ -32,7 +32,6 @@ import java.text.MessageFormat;
 import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.config.GeneralConfig;
-import eionet.cr.harvest.PullHarvest;
 
 /**
  *
@@ -44,7 +43,7 @@ public class URLUtil {
     /**
      *
      * @param s
-     * @return
+     * @return boolean
      */
     public static boolean isURL(String s) {
 
@@ -74,7 +73,7 @@ public class URLUtil {
 
     /**
      * Connect to the URL and check if it is modified since the timestamp argument.
-     *
+     * @param urlString 
      * @param timestamp
      * @return true if it is modified.
      */
@@ -118,7 +117,7 @@ public class URLUtil {
      * Connect to the URL and check if it exists at the remote end.
      * Local ids are removed (the part after the '#') before connecting.
      *
-     * @param uri the URL to check.
+     * @param urlStr the URL to check.
      * @return true is the URL does <b>NOT</b> exist.
      */
     public static boolean isNotExisting(String urlStr) {
@@ -154,7 +153,7 @@ public class URLUtil {
      *
      * @param uri
      * @param dflt
-     * @return
+     * @return String
      */
     public static String extractUrlHost(String uri) {
 
@@ -177,11 +176,22 @@ public class URLUtil {
     /**
      *
      * @param url
-     * @return
+     * @return URL
      * @throws MalformedURLException
      */
     public static URL replaceURLSpaces(URL url) throws MalformedURLException {
-
-        return url == null ? null : new URL(StringUtils.replace(url.toString(), " ", "%20"));
+        
+        return url == null ? null : new URL(replaceURLSpaces(url.toString()));
     }
+    
+    /**
+    *
+    * @param url
+    * @return URL
+    * @throws MalformedURLException
+    */
+   public static String replaceURLSpaces(String url) throws MalformedURLException {
+       
+       return url == null ? null : StringUtils.replace(url.toString(), " ", "%20");
+   }
 }

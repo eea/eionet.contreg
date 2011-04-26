@@ -278,8 +278,9 @@ public interface HarvestSourceDAO extends DAO {
      * @return String
      * @throws DAOException
      * @throws RepositoryException
+     * @throws IOException
      */
-    public String getSourceMetadata(String subject, String predicate) throws DAOException, RepositoryException;
+    public String getSourceMetadata(String subject, String predicate) throws DAOException, RepositoryException, IOException;
 
     /**
      * Inserts given metadata into /harvester context
@@ -289,14 +290,17 @@ public interface HarvestSourceDAO extends DAO {
      * @param object
      * @throws DAOException
      * @throws RepositoryException
+     * @throws IOException
      */
-    public void insertUpdateSourceMetadata(String subject, String predicate, ObjectDTO object) throws DAOException, RepositoryException;
+    public void insertUpdateSourceMetadata(String subject, String predicate, ObjectDTO object) throws DAOException, RepositoryException, IOException;
 
     /**
-     * @param source
+     * @param url 
+     * @param lastHarvest 
+     * @param failed 
      * @throws DAOException
      */
-    public void editRedirectedSource(HarvestSourceDTO source) throws DAOException;
+    public void editRedirectedSource(String url, Timestamp lastHarvest, boolean failed) throws DAOException;
 
     /**
      * Removes all predicates from /harvester context for given subject
@@ -304,8 +308,9 @@ public interface HarvestSourceDAO extends DAO {
      * @param subject
      * @throws DAOException
      * @throws RepositoryException
+     * @throws IOException
      */
-    public void removeAllPredicatesFromHarvesterContext(String subject) throws DAOException, RepositoryException;
+    public void removeAllPredicatesFromHarvesterContext(String subject) throws DAOException, RepositoryException, IOException;
 
     /**
      * Removes all triples for given source. Doesn't remove triples from /harvester context
@@ -339,5 +344,13 @@ public interface HarvestSourceDAO extends DAO {
     */
 
    Pair<Integer, List<HarvestUrgencyScoreDTO>> getUrgencyOfComingHarvests(int amount) throws DAOException;
+   
+   /**
+    * Updates source LAST_HARVEST date
+    * @param sourceUrl
+    * @param lastHarvest
+    * @throws DAOException
+    */
+   public void updateLastHarvest(String sourceUrl, Timestamp lastHarvest) throws DAOException;
 
 }
