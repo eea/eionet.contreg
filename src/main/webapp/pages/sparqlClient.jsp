@@ -43,6 +43,13 @@ SELECT DISTINCT ?class ?label WHERE {
                     <div style="position: absolute; top:5px; right:0px;">
                         <stripes:submit name="execute" value="Execute" id="executeButton"/>
                     </div>
+                    <div style="position: absolute; top:5px; left:600px;">
+                        <label for="input" class="question">Input mode:</label>
+                        <stripes:select name="inputMode" id="input">
+                            <stripes:option value="SELECT" label="SELECT"/>
+                            <stripes:option value="ASK" label="ASK"/>
+                        </stripes:select>
+                    </div>
                 </div>
 
                 <div>
@@ -56,6 +63,10 @@ SELECT DISTINCT ?class ?label WHERE {
                                 </c:forEach>
                               </display:table>
                               <br/>Done. -- ${actionBean.executionTime} ms.
+                        </c:when>
+                        <c:when test="${not empty actionBean.inputMode && actionBean.inputMode == 'ASK'}">
+                            <br/>
+                            ${actionBean.resultAsk}
                         </c:when>
                         <c:otherwise>
                             <div class="system-msg">The query gave no results!</div>
