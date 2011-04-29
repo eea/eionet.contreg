@@ -86,7 +86,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     public Resolution execute() throws OpenRDFException {
 
         String acceptHeader = getContext().getRequest().getHeader("accept");
-        String[] accept = null;
+        String[] accept = {null};
         if (acceptHeader != null && acceptHeader.length() > 0) {
             accept = acceptHeader.split(",");
             if (accept != null && accept.length > 0) {
