@@ -19,9 +19,9 @@ import eionet.cr.web.util.columns.SearchResultColumn;
 import eionet.cr.web.util.columns.NextHarvestsUrgencyScoreColumn.COLUMN;
 
 /**
+ * Urgency score for the next X (default 20) harvests.
  *
  * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
- *
  */
 
 @UrlBinding("/admin/nhus")
@@ -73,7 +73,7 @@ public class NextHarvestsUrgencyScoreActionBean extends AbstractSearchActionBean
         NextHarvestsUrgencyScoreColumn intervalColumn= new NextHarvestsUrgencyScoreColumn();
         intervalColumn.setColumnType(COLUMN.INTERVAL);
         intervalColumn.setSortable(false);
-        intervalColumn.setTitle("Interval(min)");
+        intervalColumn.setTitle("Interval (min)");
         columnList.add(intervalColumn);
 
         NextHarvestsUrgencyScoreColumn urgencyColumn= new NextHarvestsUrgencyScoreColumn ();

@@ -49,12 +49,12 @@
                                             <c:otherwise><th>&nbsp;</th></c:otherwise>
                                         </c:choose>
                                     </c:if>
-                                    <th scope="row" class="scope-row" title="${predicate.key}" style="white-space:nowrap">
+                                    <th scope="row" class="scope-row" style="white-space:nowrap">
                                         <c:choose>
                                             <c:when test="${not predicateLabelDisplayed}">
                                                 <c:out value="${crfn:getPredicateLabel(actionBean.predicateLabels, predicate.key)}"/>
                                                 <c:set var="predicateLabelDisplayed" value="${true}"/>
-                                                <stripes:link  href="/factsheet.action">
+                                                <stripes:link  href="/factsheet.action" title="${predicate.key}">
                                                     <stripes:param name="uri" value="${predicate.key}"/>
                                                     <img src="${pageContext.request.contextPath}/images/view2.gif" alt="Definition"/>
                                                 </stripes:link>
@@ -70,7 +70,8 @@
                                             <c:otherwise>&nbsp;</c:otherwise>
                                         </c:choose>
                                     </td>
-                                    <td title="${crfn:rawModeTitle(object, predicate.value)}">
+                                    <td>
+                                    <span title="${crfn:rawModeTitle(object, predicate.value)}">
                                         <c:choose>
                                             <c:when test="${!object.literal}">
                                                 <c:choose>
@@ -95,6 +96,7 @@
                                                 <c:out value="${object.value}"/>
                                             </c:otherwise>
                                         </c:choose>
+                                    </span>
                                     </td>
                                     <td class="center">
                                         <c:choose>

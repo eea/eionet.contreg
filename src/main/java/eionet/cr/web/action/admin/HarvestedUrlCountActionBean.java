@@ -19,15 +19,15 @@ import eionet.cr.web.util.columns.SearchResultColumn;
 import eionet.cr.web.util.columns.HarvestedUrlCountColumn.COLUMN;
 
 /**
+ * Harvested URL count per day for the last X (default 42) days.
  *
  * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
- *
  */
 
 @UrlBinding("/admin/harvestedurl")
 public class HarvestedUrlCountActionBean extends AbstractSearchActionBean<HarvestedUrlCountDTO> {
 
-    private int harvestedUrlDays = 30;
+    private int harvestedUrlDays = 42; // matches the default number of days between harvests.
     private boolean adminLoggedIn = false;
     private int resultsFound = 0;
 
