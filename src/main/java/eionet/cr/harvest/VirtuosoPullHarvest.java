@@ -255,11 +255,11 @@ public class VirtuosoPullHarvest extends Harvest {
         }
 
         if (sourceAvailable && needsHarvesting) {
-            // perform the harvest
-            harvest(file, contentType, totalBytes);
-
-            // extract new harvest sources
-            extractNewHarvestSources();
+            // Perform the harvest. Only extract sources if we got some triples.
+            // Otherwise it is a waste of time.
+            if (harvest(file, contentType, totalBytes) > 0) {
+                extractNewHarvestSources();
+            }
         } else if (!needsHarvesting) {
             logger.debug("Source redirects to another source that has recently been harvested! Will not harvest.");
         }
@@ -268,13 +268,15 @@ public class VirtuosoPullHarvest extends Harvest {
     /**
      * Harvest the given file.
      * 
-     * @param file
+     * @param file - file on filesystem containig the data.
      * @param contentType
      * @param fileSize
+     * @return the number of triples in source
      * @throws HarvestException
      */
-    private void harvest(File file, String contentType, int fileSize) throws HarvestException {
+    private int harvest(File file, String contentType, int fileSize) throws HarvestException {
 
+        int tripleCount = 0;
         // remember the file's absolute path, so we can later detect if a new file was created during the pre-processing.
         String originalPath = file.getAbsolutePath();
 
@@ -300,7 +302,7 @@ public class VirtuosoPullHarvest extends Harvest {
             try {
                 file = preProcess(file, contentType);
                 if (file != null) {
-                    int tripleCount = DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceToRepository(file, sourceUrlString);
+                    tripleCount = DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceToRepository(file, sourceUrlString);
                     setStoredTriplesCount(tripleCount);
                 }
             } catch (Exception e) {
@@ -311,6 +313,7 @@ public class VirtuosoPullHarvest extends Harvest {
                 deleteDownloadedFile(unGZipped);
             }
         }
+        return tripleCount;
     }
 
     /**
