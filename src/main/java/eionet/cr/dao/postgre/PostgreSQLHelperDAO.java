@@ -2045,5 +2045,5 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
         return (val == null) ? 0 : Long.valueOf(val.toString());
 
     }
-    
+
 }

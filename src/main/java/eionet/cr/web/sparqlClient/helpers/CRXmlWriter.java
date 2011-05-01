@@ -126,9 +126,9 @@ public class CRXmlWriter implements TupleQueryResultWriter {
                 if (binding.getValue() != null) {
                     xmlWriter.setAttribute(BINDING_NAME_ATT, binding.getName());
                     xmlWriter.startTag(BINDING_TAG);
-    
+
                     writeValue(binding.getValue());
-    
+
                     xmlWriter.endTag(BINDING_TAG);
                 }
             }

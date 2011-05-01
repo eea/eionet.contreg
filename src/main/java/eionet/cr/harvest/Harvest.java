@@ -45,9 +45,9 @@ import eionet.cr.harvest.util.arp.ARPSource;
 import eionet.cr.util.Hashes;
 
 /**
- * 
+ *
  * @author heinljab
- * 
+ *
  */
 public abstract class Harvest {
 
@@ -113,7 +113,7 @@ public abstract class Harvest {
     protected SimpleDateFormat lastRefreshedDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
     /**
-     * 
+     *
      * @param sourceUrlString
      */
     protected Harvest(String sourceUrlString) {
@@ -130,7 +130,7 @@ public abstract class Harvest {
     }
 
     /**
-     * 
+     *
      * @throws HarvestException
      */
     public void execute() throws HarvestException {
@@ -156,13 +156,13 @@ public abstract class Harvest {
     }
 
     /**
-     * 
+     *
      * @throws HarvestException
      */
     protected abstract void doExecute() throws HarvestException;
 
     /**
-     * 
+     *
      * @param arpSource
      * @throws HarvestException
      */
@@ -172,7 +172,7 @@ public abstract class Harvest {
 
     /**
      * Harvest the given ARPSource. The caller is responsible for closing the resources that the given ARPSource uses.
-     * 
+     *
      * @param arpSource
      * @param ignoreParsingError
      * @throws HarvestException
@@ -274,7 +274,7 @@ public abstract class Harvest {
     }
 
     /**
-     * 
+     *
      * @param sourceUrl
      * @return
      */

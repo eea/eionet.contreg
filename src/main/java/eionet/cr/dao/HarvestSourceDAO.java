@@ -39,7 +39,7 @@ import eionet.cr.util.pagination.PagingRequest;
 
 /**
  * @author altnyris
- * 
+ *
  */
 public interface HarvestSourceDAO extends DAO {
     /**
@@ -90,7 +90,7 @@ public interface HarvestSourceDAO extends DAO {
     public HarvestSourceDTO getHarvestSourceById(Integer harvestSourceID) throws DAOException;
 
     /**
-     * 
+     *
      * @param url
      * @return HarvestSourceDTO
      * @throws DAOException
@@ -104,7 +104,7 @@ public interface HarvestSourceDAO extends DAO {
     public Long getUrgencySourcesCount() throws DAOException;
 
     /**
-     * 
+     *
      * @param source
      * @return Integer
      * @throws DAOException
@@ -112,7 +112,7 @@ public interface HarvestSourceDAO extends DAO {
     public Integer addSource(HarvestSourceDTO source) throws DAOException;
 
     /**
-     * 
+     *
      * @param source
      * @throws DAOException
      */
@@ -126,7 +126,7 @@ public interface HarvestSourceDAO extends DAO {
 
     /**
      * adds references to sources into queue for removal.
-     * 
+     *
      * @param urls
      *            - urls to add
      * @throws DAOException
@@ -186,7 +186,7 @@ public interface HarvestSourceDAO extends DAO {
     void deleteHarvestHistory(int neededToRemain) throws DAOException;
 
     /**
-     * 
+     *
      * @param harvestSourceId
      * @return urgencyScore
      * @throws DAOException
@@ -233,7 +233,7 @@ public interface HarvestSourceDAO extends DAO {
 
     /**
      * Loads the file into the repository (triple store). File is required to be RDF.
-     * 
+     *
      * @param file
      * @param sourceUrlString
      * @return int
@@ -248,7 +248,7 @@ public interface HarvestSourceDAO extends DAO {
     /**
      * Adds the meta information the harvester has collected about the source. The meta data is considered part of the harvester and
      * not the source. Therefore the meta data is stored in the harvester's named graph (or context)
-     * 
+     *
      * @param sourceMetadata
      * @throws DAOException
      * @throws RepositoryException
@@ -259,8 +259,8 @@ public interface HarvestSourceDAO extends DAO {
             IOException;
 
     /**
-     * Returns new harvest sources found by HarvestingJob
-     * 
+     * Returns new harvest sources found by HarvestingJob.
+     *
      * @param sourceUrl
      * @return List<String>
      * @throws DAOException
@@ -271,8 +271,8 @@ public interface HarvestSourceDAO extends DAO {
     public List<String> getNewSources(String sourceUrl) throws DAOException, RDFParseException, RepositoryException, IOException;
 
     /**
-     * Returns metadata from /harvester context
-     * 
+     * Returns metadata from /harvester context.
+     *
      * @param subject
      * @param predicate
      * @return String
@@ -283,8 +283,8 @@ public interface HarvestSourceDAO extends DAO {
     public String getSourceMetadata(String subject, String predicate) throws DAOException, RepositoryException, IOException;
 
     /**
-     * Inserts given metadata into /harvester context
-     * 
+     * Inserts given metadata into /harvester context.
+     *
      * @param subject
      * @param predicate
      * @param object
@@ -295,16 +295,16 @@ public interface HarvestSourceDAO extends DAO {
     public void insertUpdateSourceMetadata(String subject, String predicate, ObjectDTO object) throws DAOException, RepositoryException, IOException;
 
     /**
-     * @param url 
-     * @param lastHarvest 
-     * @param failed 
+     * @param url
+     * @param lastHarvest
+     * @param failed
      * @throws DAOException
      */
     public void editRedirectedSource(String url, Timestamp lastHarvest, boolean failed) throws DAOException;
 
     /**
-     * Removes all predicates from /harvester context for given subject
-     * 
+     * Removes all predicates from /harvester context for given subject.
+     *
      * @param subject
      * @throws DAOException
      * @throws RepositoryException
@@ -313,8 +313,8 @@ public interface HarvestSourceDAO extends DAO {
     public void removeAllPredicatesFromHarvesterContext(String subject) throws DAOException, RepositoryException, IOException;
 
     /**
-     * Removes all triples for given source. Doesn't remove triples from /harvester context
-     * 
+     * Removes all triples for given source. Doesn't remove triples from /harvester context.
+     *
      * @param url
      * @throws DAOException
      */
@@ -322,7 +322,7 @@ public interface HarvestSourceDAO extends DAO {
 
     /**
      * Increases COUNT_UNAVAIL by 1
-     * 
+     *
      * @param sourceId
      * @throws DAOException
      */
@@ -344,9 +344,9 @@ public interface HarvestSourceDAO extends DAO {
     */
 
    Pair<Integer, List<HarvestUrgencyScoreDTO>> getUrgencyOfComingHarvests(int amount) throws DAOException;
-   
+
    /**
-    * Updates source LAST_HARVEST date
+    * Updates source LAST_HARVEST date.
     * @param sourceUrl
     * @param lastHarvest
     * @throws DAOException

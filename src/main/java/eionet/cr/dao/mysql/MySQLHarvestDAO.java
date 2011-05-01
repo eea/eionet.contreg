@@ -80,7 +80,7 @@ public class MySQLHarvestDAO extends MySQLBaseDAO implements HarvestDAO {
      * (non-Javadoc)
      * @see eionet.cr.dao.HarvestDAO#updateFinishedHarvest(int, int, int, int, java.lang.String)
      */
-    public void updateFinishedHarvest(int harvestId, String status, int totStatements, 
+    public void updateFinishedHarvest(int harvestId, String status, int totStatements,
             int litStatements, int encSchemes) throws DAOException {
 
         List<Object> values = new ArrayList<Object>();

@@ -47,7 +47,7 @@ public class VirtuosoSearchBySourceHelper extends AbstractSearchHelper {
      */
     @Override
     protected String getOrderedQuery(List<Object> inParams) {
-        
+
         StringBuilder strBuilder = new StringBuilder()
         .append("select distinct ?s from <").append(sourceUrl).append("> where {?s ?p ?o .")
         .append("optional {?s <").append(sortPredicate).append("> ?ord} } ")
@@ -63,7 +63,7 @@ public class VirtuosoSearchBySourceHelper extends AbstractSearchHelper {
         } else {
             strBuilder.append("(?ord)");
         }
-        
+
         return strBuilder.toString();
     }
 

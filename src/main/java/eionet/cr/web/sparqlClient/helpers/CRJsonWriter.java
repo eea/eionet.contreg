@@ -106,7 +106,7 @@ public class CRJsonWriter implements TupleQueryResultWriter {
             Iterator<Binding> bindingIter = bindingSet.iterator();
             while (bindingIter.hasNext()) {
                 Binding binding = bindingIter.next();
-                
+
                 writeKeyValue(binding.getName(), binding.getValue());
 
                 if (bindingIter.hasNext()) {
@@ -160,7 +160,7 @@ public class CRJsonWriter implements TupleQueryResultWriter {
                 writeKeyValue("value", ((BNode)value).getID());
             } else if (value instanceof Literal) {
                 Literal lit = (Literal)value;
-    
+
                 if (lit.getDatatype() != null) {
                     writeKeyValue("type", "typed-literal");
                     writer.write(", ");
@@ -172,7 +172,7 @@ public class CRJsonWriter implements TupleQueryResultWriter {
                         writeKeyValue("xml:lang", lit.getLanguage());
                     }
                 }
-    
+
                 writer.write(", ");
                 writeKeyValue("value", lit.getLabel());
             } else {

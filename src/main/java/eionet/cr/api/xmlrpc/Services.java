@@ -75,7 +75,7 @@ public interface Services {
     /**
      * This service implements what getEntries did in the old Content Registry.
      * It used to be called by ROD, but is now deprecated and replaced by
-     * {@link #getDeliveries(Integer, Integer)}. 
+     * {@link #getDeliveries(Integer, Integer)}.
      *
      * The purpose is to return all metadata of all resources that match the
      * given criteria. The criteria is given as a <code>java.util.Hashtable</code>,

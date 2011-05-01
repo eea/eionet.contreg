@@ -30,9 +30,9 @@ import org.openrdf.query.BindingSet;
 
 
 /**
- * 
+ *
  * @author altnyris
- * 
+ *
  */
 public class SubjectReader extends ResultSetMixedReader<String> {
 
@@ -41,7 +41,7 @@ public class SubjectReader extends ResultSetMixedReader<String> {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.util.sql.ResultSetListReader#getResultList()
      */
     public List<String> getResultList() {
@@ -50,7 +50,7 @@ public class SubjectReader extends ResultSetMixedReader<String> {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
      */
     public void readRow(ResultSet rs) throws SQLException,
@@ -59,7 +59,7 @@ public class SubjectReader extends ResultSetMixedReader<String> {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query
      * .BindingSet)
@@ -69,7 +69,7 @@ public class SubjectReader extends ResultSetMixedReader<String> {
         if (bindingSet != null && bindingSet.size() > 0) {
             Value subject = bindingSet.getValue("s");
             boolean isAnonSubject = subject instanceof BNode;
-            
+
             String strSubj = "";
             if (subject != null && !isAnonSubject) {
                 strSubj = subject.stringValue();

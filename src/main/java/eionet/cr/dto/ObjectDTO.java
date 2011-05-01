@@ -51,7 +51,7 @@ public class ObjectDTO implements Serializable {
     private String language;
     // Used for literals
     private URI datatype;
-    
+
     private String derivSourceUri;
     private long derivSourceHash;
     private long derivSourceGenTime;
@@ -79,7 +79,7 @@ public class ObjectDTO implements Serializable {
         this.datatype = datatype;
         this.hash = Hashes.spoHash(value);
     }
-    
+
     /**
     *
     * @param value
@@ -90,7 +90,7 @@ public class ObjectDTO implements Serializable {
    public ObjectDTO(String value, String language, boolean literal, boolean anonymous) {
        this(value, language, literal, anonymous, null);
    }
-    
+
     /**
      *
      * @param value

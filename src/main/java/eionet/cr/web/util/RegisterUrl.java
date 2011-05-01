@@ -44,7 +44,7 @@ public class RegisterUrl {
         source.setUrl(urlWithoutFragment);
         source.setIntervalMinutes(intervalMinutes);
         source.setPrioritySource(true);
-        
+
         DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(source);
         // schedule urgent harvest of this URL
         UrgentHarvestQueue.addPullHarvest(urlWithoutFragment);

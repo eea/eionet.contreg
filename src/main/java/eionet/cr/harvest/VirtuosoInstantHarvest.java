@@ -15,7 +15,7 @@ import eionet.cr.web.security.CRUser;
 public class VirtuosoInstantHarvest extends VirtuosoPullHarvest {
 
     /**
-     * 
+     *
      * @param sourceUrlString
      * @param lastHarvest
      * @param userName
@@ -31,7 +31,7 @@ public class VirtuosoInstantHarvest extends VirtuosoPullHarvest {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.harvest.Harvest#doHarvestStartedActions()
      */
     protected void doHarvestStartedActions() throws HarvestException {
@@ -41,7 +41,7 @@ public class VirtuosoInstantHarvest extends VirtuosoPullHarvest {
     }
 
     /**
-     * 
+     *
      * @param sourceUrl
      * @param userName
      * @return VirtuosoInstantHarvest

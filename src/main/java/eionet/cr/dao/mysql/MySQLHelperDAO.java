@@ -762,7 +762,7 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
     }
 
 
-  
+
 
     public void updateTypeDataCache() throws DAOException {
 

@@ -50,9 +50,9 @@ import eionet.cr.util.xml.XmlAnalysis;
 import eionet.cr.web.security.CRUser;
 
 /**
- * 
+ *
  * @author altnyris, heinljab
- * 
+ *
  */
 public class VirtuosoPullHarvest extends Harvest {
 
@@ -75,7 +75,7 @@ public class VirtuosoPullHarvest extends Harvest {
     private boolean recursiveHarvestDisabled = false;
 
     /**
-     * 
+     *
      * @param sourceUrlString
      * @param lastHarvest
      */
@@ -86,7 +86,7 @@ public class VirtuosoPullHarvest extends Harvest {
 
     /**
      * @throws HarvestException
-     * 
+     *
      */
     protected void doExecute() throws HarvestException {
 
@@ -121,7 +121,7 @@ public class VirtuosoPullHarvest extends Harvest {
                     sourceMetadata.setUri(sourceUrlString);
                     logger.setHarvestSourceUrl(sourceUrlString);
                 }
-                
+
                 // Source that will be harvested
                 HarvestSourceDTO source = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(sourceUrlString);
 
@@ -133,8 +133,8 @@ public class VirtuosoPullHarvest extends Harvest {
                                 if (source.isPrioritySource()) {
                                     DAOFactory.get().getDao(HarvestSourceDAO.class).increaseUnavailableCount(source.getSourceId());
                                     String err = "Source: " + source.getUrl() + " has permanent error. Will not delete the source because it is Priority source";
-                                    logger.debug(err); 
-                                    throw new HarvestException(err, new Throwable()); 
+                                    logger.debug(err);
+                                    throw new HarvestException(err, new Throwable());
                                 } else {
                                     DAOFactory.get().getDao(HarvestSourceDAO.class)
                                             .queueSourcesForDeletion(Collections.singletonList(sourceUrlString));
@@ -177,7 +177,7 @@ public class VirtuosoPullHarvest extends Harvest {
                         if (error.getType().equals(ErrType.PERMANENT)) {
                             permanentError = true;
                             DAOFactory.get().getDao(HarvestSourceDAO.class).deleteSourceTriples(sourceUrlString);
-                            
+
                             DAOFactory.get().getDao(HarvestSourceDAO.class).removeAllPredicatesFromHarvesterContext(sourceUrlString);
                         }
 
@@ -190,7 +190,7 @@ public class VirtuosoPullHarvest extends Harvest {
                         DAOFactory.get().getDao(HarvestSourceDAO.class)
                                 .insertUpdateSourceMetadata(sourceUrlString, Predicates.CR_LAST_REFRESHED, lastRefreshedObject);
                     }
-                    
+
                     if (sourceAvailable && needsHarvesting) {
                         // source is available, so continue to extract it's contents and metadata
 
@@ -199,12 +199,12 @@ public class VirtuosoPullHarvest extends Harvest {
 
                         // NOTE: If URL is redirected, content type is null. skip if unsupported content type
                         contentType = sourceMetadata.getObjectValue(Predicates.CR_MEDIA_TYPE);
-                        
+
                         // If MEDIA_TYPE in HARVEST_SOURCE table is set then the value from the server is ignored
                         if (source != null && !StringUtils.isBlank(source.getMediaType())) {
                             contentType = source.getMediaType();
                         }
-                        
+
                         if (contentType != null && !isSupportedContentType(contentType)) {
                             logger.debug("Unsupported response content type: " + contentType);
                         } else {
@@ -267,7 +267,7 @@ public class VirtuosoPullHarvest extends Harvest {
 
     /**
      * Harvest the given file.
-     * 
+     *
      * @param file - file on filesystem containig the data.
      * @param contentType
      * @param fileSize
@@ -319,7 +319,7 @@ public class VirtuosoPullHarvest extends Harvest {
     /**
      * Searches new harvest sources from harvested file. If resource is subclass of cr:File and doesn't yet exist, then it is
      * considered as new source.
-     * 
+     *
      * @throws HarvestException
      */
     private void extractNewHarvestSources() throws HarvestException {
@@ -347,7 +347,7 @@ public class VirtuosoPullHarvest extends Harvest {
 
     /**
      * Check if the content-type is one that is supported.
-     * 
+     *
      * @param contentType
      * @return true if content-type is supported
      */
@@ -360,7 +360,7 @@ public class VirtuosoPullHarvest extends Harvest {
 
     /**
      * Check if the content-type is one of the XML types.
-     * 
+     *
      * @param contentType
      * @return true if content-type is XML
      */
@@ -372,7 +372,7 @@ public class VirtuosoPullHarvest extends Harvest {
 
     /**
      * @throws SQLException
-     * 
+     *
      */
     private void handleSourceNotModified() throws SQLException {
 
@@ -392,7 +392,7 @@ public class VirtuosoPullHarvest extends Harvest {
     /**
      * Checks if the last_harvested date of final source is so recent that the harvesting schedule for redirected sources wouldn't
      * have triggered
-     * 
+     *
      * @return boolean
      * @throws DAOException
      */
@@ -421,12 +421,12 @@ public class VirtuosoPullHarvest extends Harvest {
      * original source and actual file then this method creates new record into HARVEST_SOURCE table for each redirecting URL. If
      * one already exists, then intervalMinutes is checked. If redirected source intervalMinutes is larger than originalSource then
      * latter is used.
-     * 
+     *
      * Method also creates new record into HARVEST table for each redirected source. Also adds info into HARVEST_MESSAGE table about
      * each redirection.
-     * 
+     *
      * If number of redirections exceeds VirtuosoPullHarvest.maxRedirectionsAllowed, then execution is terminated
-     * 
+     *
      * @return List<String>
      * @throws HarvestException
      * @throws DAOException
@@ -513,7 +513,7 @@ public class VirtuosoPullHarvest extends Harvest {
                         // Saving the updated source to database.
                         DAOFactory.get().getDao(HarvestSourceDAO.class).editSource(redirectedSource);
                     }
-                    
+
                     // Harvest for original source has already been created by DAOWriter.writeStarted() method
                     if (url.equals(sourceUrlString)) {
 
@@ -574,7 +574,7 @@ public class VirtuosoPullHarvest extends Harvest {
     }
 
     /**
-     * 
+     *
      * @throws ParserConfigurationException
      * @throws SAXException
      * @throws IOException
@@ -600,7 +600,7 @@ public class VirtuosoPullHarvest extends Harvest {
     }
 
     /**
-     * 
+     *
      * @return
      * @throws ParserConfigurationException
      * @throws SAXException
@@ -649,7 +649,7 @@ public class VirtuosoPullHarvest extends Harvest {
     }
 
     /**
-     * 
+     *
      * @param file
      * @param contentType
      * @throws IOException
@@ -736,7 +736,7 @@ public class VirtuosoPullHarvest extends Harvest {
     }
 
     /**
-     * 
+     *
      * @param urlConnetion
      */
     private void setSourceMetadata(URLConnection urlConnection) {
@@ -788,7 +788,7 @@ public class VirtuosoPullHarvest extends Harvest {
     }
 
     /**
-     * 
+     *
      * @param path
      */
     private void deleteDownloadedFile(String path) {
@@ -796,7 +796,7 @@ public class VirtuosoPullHarvest extends Harvest {
     }
 
     /**
-     * 
+     *
      * @param file
      */
     private void deleteDownloadedFile(File file) {
@@ -823,7 +823,7 @@ public class VirtuosoPullHarvest extends Harvest {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.harvest.Harvest#doHarvestStartedActions()
      */
     protected void doHarvestStartedActions() throws HarvestException {
@@ -833,7 +833,7 @@ public class VirtuosoPullHarvest extends Harvest {
     }
 
     /**
-     * 
+     *
      * @param sourceUrl
      * @param urgent
      * @return VirtuosoPullHarvest
@@ -845,7 +845,7 @@ public class VirtuosoPullHarvest extends Harvest {
     }
 
     /**
-     * 
+     *
      * @param dto
      * @param urgent
      * @return VirtuosoPullHarvest

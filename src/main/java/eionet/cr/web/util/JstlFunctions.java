@@ -111,11 +111,11 @@ public class JstlFunctions {
     public static boolean hasPermission(java.lang.String userName, java.lang.String aclName, java.lang.String permission) {
         return CRUser.hasPermission(userName, aclName, permission);
     }
-    
+
     public static boolean userHasPermission(CRUser user, java.lang.String aclName, java.lang.String permission) {
         return CRUser.userHasPermission(user, aclName, permission);
     }
-    
+
     /**
      * Returns a string that is constructed by concatenating the given bean request's getRequestURI() + "?" +
      * the given bean request's getQueryString(), and replacing the sort predicate with the given one.

@@ -31,7 +31,7 @@ import eionet.cr.util.sql.SingleObjectReader;
 
 /**
  * Harvester methods in Virtuoso
- * 
+ *
  * @author kaido
  */
 
@@ -40,7 +40,7 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
 
     @Override
     public void deleteSourceByUrl(String url) throws DAOException {
-        
+
         boolean isSuccess = false;
         RepositoryConnection conn = null;
 
@@ -93,12 +93,12 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#deleteSourceTriples(String)
      */
     @Override
     public void deleteSourceTriples(String url) throws DAOException {
-        
+
         boolean isSuccess = false;
         RepositoryConnection conn = null;
 
@@ -125,7 +125,7 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#getSourcesInInferenceRules()
      */
     @Override
@@ -163,7 +163,7 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#isSourceInInferenceRule()
      */
     @Override
@@ -190,7 +190,7 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#addSourceIntoInferenceRule()
      */
     @Override
@@ -215,7 +215,7 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#removeSourceFromInferenceRule()
      */
     @Override
@@ -240,7 +240,7 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#addSourceToRepository(File, String)
      */
     @Override
@@ -291,7 +291,7 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#addSourceMetadata(SubjectDTO)
      */
     @Override
@@ -371,7 +371,7 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#getNewSources(String)
      */
     @Override
@@ -383,7 +383,7 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
 
             RepositoryConnection conn = null;
             try {
-               
+
                 conn = SesameUtil.getRepositoryConnection();
 
                 String deploymentHost = GeneralConfig.getRequiredProperty(GeneralConfig.DEPLOYMENT_HOST);
@@ -409,7 +409,7 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#getSourceMetadata(String, String)
      */
     @Override
@@ -418,7 +418,7 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
         String ret = null;
         RepositoryConnection conn = null;
         try {
-            
+
             String deploymentHost = GeneralConfig.getRequiredProperty(GeneralConfig.DEPLOYMENT_HOST);
 
             StringBuffer sqlBuf = new StringBuffer().append("select ?o where {graph ?g { ").append("<").append(subject)
@@ -434,7 +434,7 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#insertUpdateSourceMetadata(String, String, ObjectDTO)
      */
     @Override
@@ -442,7 +442,7 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
             RepositoryException, IOException {
         RepositoryConnection conn = null;
         try {
-            
+
             conn = SesameUtil.getRepositoryConnection();
 
             String deploymentHost = GeneralConfig.getRequiredProperty(GeneralConfig.DEPLOYMENT_HOST);
@@ -466,7 +466,7 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#removeAllPredicatesFromHarvesterContext(String, String)
      */
     @Override
@@ -474,7 +474,7 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
         if (!StringUtils.isBlank(subject)) {
             RepositoryConnection conn = null;
             try {
-                
+
                 conn = SesameUtil.getRepositoryConnection();
 
                 String deploymentHost = GeneralConfig.getRequiredProperty(GeneralConfig.DEPLOYMENT_HOST);

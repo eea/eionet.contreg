@@ -33,9 +33,9 @@ import eionet.cr.harvest.util.HarvestMessageType;
 import eionet.cr.util.sql.SQLUtil;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class PostgreSQLHarvestDAO extends PostgreSQLBaseDAO implements
         HarvestDAO {
@@ -45,7 +45,7 @@ public class PostgreSQLHarvestDAO extends PostgreSQLBaseDAO implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestDAO#getHarvestById(java.lang.Integer)
      */
     public HarvestDTO getHarvestById(Integer harvestId) throws DAOException {
@@ -73,7 +73,7 @@ public class PostgreSQLHarvestDAO extends PostgreSQLBaseDAO implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestDAO#getHarvestsBySourceId()
      */
     public List<HarvestDTO> getHarvestsBySourceId(Integer harvestSourceId)
@@ -94,7 +94,7 @@ public class PostgreSQLHarvestDAO extends PostgreSQLBaseDAO implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestDAO#getLastHarvest(java.lang.Integer)
      */
     public HarvestDTO getLastHarvestBySourceId(Integer harvestSourceId)
@@ -112,7 +112,7 @@ public class PostgreSQLHarvestDAO extends PostgreSQLBaseDAO implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestDAO#insertHarvest(int, java.lang.String,
      * java.lang.String, java.lang.String)
      */
@@ -143,7 +143,7 @@ public class PostgreSQLHarvestDAO extends PostgreSQLBaseDAO implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestDAO#updateFinishedHarvest(int, int, int, int,
      * java.lang.String)
      */

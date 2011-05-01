@@ -48,7 +48,7 @@ import eionet.cr.web.util.columns.SearchResultColumn;
 
 /**
  * @author altnyris
- * 
+ *
  */
 @UrlBinding("/sources.action")
 public class HarvestSourcesActionBean extends
@@ -176,7 +176,7 @@ public class HarvestSourcesActionBean extends
     }
 
     /**
-     * 
+     *
      * @return Resolution
      * @throws DAOException
      */
@@ -269,7 +269,7 @@ public class HarvestSourcesActionBean extends
     }
 
     /**
-     * 
+     *
      * @return List<Pair<String, String>>
      */
     public List<Pair<String, String>> getSourceTypes() {
@@ -300,7 +300,7 @@ public class HarvestSourcesActionBean extends
     }
 
     /**
-     * 
+     *
      * @return String
      */
     public String getPagingUrl() {
@@ -331,7 +331,7 @@ public class HarvestSourcesActionBean extends
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
      */
     public List<SearchResultColumn> getColumns() throws DAOException {

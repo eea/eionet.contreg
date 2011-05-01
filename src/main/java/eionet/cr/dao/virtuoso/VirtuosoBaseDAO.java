@@ -17,9 +17,9 @@ import eionet.cr.util.sesame.SPARQLResultSetReader;
 import eionet.cr.util.sesame.SesameUtil;
 
 /**
- * 
+ *
  * @author jaanus
- * 
+ *
  */
 public abstract class VirtuosoBaseDAO extends SQLBaseDAO {
 
@@ -31,7 +31,7 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO {
     protected Logger logger = Logger.getLogger(VirtuosoBaseDAO.class);
 
     /**
-     * 
+     *
      * @param <T>
      * @param query
      * @param reader
@@ -63,7 +63,7 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO {
     }
 
     /**
-     * 
+     *
      * @param <T>
      * @param sql
      * @param params
@@ -94,7 +94,7 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO {
     }
 
     /**
-     * 
+     *
      * @param subjectUris
      * @param predicateUris
      * @param createMissingSubjects
@@ -136,7 +136,7 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO {
     }
 
     /**
-     * 
+     *
      * @param predicateUris
      * @param reader
      * @return

@@ -39,7 +39,7 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper {
         this.virtExpression = virtExpression;
         this.exactMatch = exactMatch;
     }
-    
+
     //If relevant subject is found from multiple graphs, then query returns only the record where the cr:contentLastModified is latest.
     //That is why query includes such hokus-pokus as max(), group by and subquery.
 
@@ -49,7 +49,7 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper {
     @Override
     protected String getOrderedQuery(List<Object> inParams) {
         StringBuilder strBuilder = new StringBuilder();
-        
+
         if (sortPredicate.equals(SubjectLastModifiedColumn.class.getSimpleName())) {
             strBuilder.append("select ?s where { graph ?g {")
             .append("select ?s max(?time) AS ?order where {")
@@ -65,7 +65,7 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper {
                 strBuilder.append(sortOrder);
             strBuilder.append("(?order)");
         } else {
-            
+
             strBuilder.append("select distinct ?s where {?s ?p ?o . ").append(addFilterParams());
             if (exactMatch) {
                 strBuilder.append("FILTER (?o = '").append(expression.toString()).append("'). ");
@@ -84,13 +84,13 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper {
                 strBuilder.append("(bif:lcase(bif:subseq (bif:replace (?ord, '/', '#'), bif:strrchr (bif:replace (?ord, '/', '#'), '#')+1)))");
             } else {
                 strBuilder.append("(?ord)");
-            }                
-            
+            }
+
         }
 
         return strBuilder.toString();
     }
-    
+
 
     /* (non-Javadoc)
      * @see eionet.cr.dao.helpers.AbstractSearchHelper#getUnorderedQuery(java.util.List)
@@ -127,14 +127,14 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper {
 
         return strBuilder.toString();
     }
-    
+
     private String addFilterParams() {
 
         StringBuffer buf = new StringBuffer();
         buf.append(" ");
 
         if (filter != FilterType.ANY_OBJECT) {
-            
+
             buf.append("?s <").append(Predicates.RDF_TYPE).append("> ");
             if (filter == FilterType.ANY_FILE) {
                 buf.append("<").append(Subjects.CR_FILE).append(">");
@@ -150,7 +150,7 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper {
         }
         return buf.toString();
     }
-    
+
     /* (non-Javadoc)
      * @see eionet.cr.dao.helpers.AbstractSearchHelper#getMinMaxHashQuery(java.util.List)
      */

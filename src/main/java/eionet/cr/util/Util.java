@@ -616,7 +616,7 @@ public class Util {
    public static boolean isSurroundedWithQuotes(String s) {
        return s.startsWith("\"") && s.endsWith("\"");
    }
-   
+
    /**
    *
    * @param s

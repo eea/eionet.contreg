@@ -44,11 +44,11 @@ public interface HarvestDAO extends DAO {
 
     /**
      *
-     * @param harvestId 
-     * @param status 
-     * @param totStatements 
-     * @param litStatements 
-     * @param encSchemes 
+     * @param harvestId
+     * @param status
+     * @param totStatements
+     * @param litStatements
+     * @param encSchemes
      * @param harvestDTO
      * @throws DAOException
      */
@@ -59,7 +59,7 @@ public interface HarvestDAO extends DAO {
      *
      * @param harvestSourceId
      * @return List<HarvestDTO>
-     * @throws DAOException 
+     * @throws DAOException
      */
     public List<HarvestDTO> getHarvestsBySourceId(Integer harvestSourceId) throws DAOException;
 

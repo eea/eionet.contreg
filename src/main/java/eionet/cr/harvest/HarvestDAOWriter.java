@@ -37,9 +37,9 @@ import eionet.cr.harvest.util.HarvestMessageType;
 import eionet.cr.util.Util;
 
 /**
- * 
+ *
  * @author heinljab
- * 
+ *
  */
 public class HarvestDAOWriter {
 
@@ -64,7 +64,7 @@ public class HarvestDAOWriter {
     }
 
     /**
-     * 
+     *
      * @throws DAOException
      */
     protected void writeStarted(Harvest harvest) throws DAOException {
@@ -74,7 +74,7 @@ public class HarvestDAOWriter {
     }
 
     /**
-     * 
+     *
      * @param harvest
      * @throws DAOException
      */
@@ -142,7 +142,7 @@ public class HarvestDAOWriter {
     }
 
     /**
-     * 
+     *
      * @param harvest
      * @throws DAOException
      */
@@ -171,7 +171,7 @@ public class HarvestDAOWriter {
     }
 
     /**
-     * 
+     *
      * @param throwable
      * @param type
      * @throws DAOException
@@ -190,7 +190,7 @@ public class HarvestDAOWriter {
     }
 
     /**
-     * 
+     *
      * @param throwables
      * @param type
      * @throws DAOException

@@ -24,9 +24,9 @@ import org.apache.commons.lang.StringUtils;
 import eionet.cr.common.CRRuntimeException;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class InstantHarvester extends Thread {
 
@@ -57,7 +57,7 @@ public class InstantHarvester extends Thread {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Thread#run()
      */
     public void run() {
@@ -98,7 +98,7 @@ public class InstantHarvester extends Thread {
     }
 
     /**
-     * 
+     *
      * @return
      */
     private boolean wasException() {
@@ -106,7 +106,7 @@ public class InstantHarvester extends Thread {
     }
 
     /**
-     * 
+     *
      * @param sourceUrl
      * @param userName
      * @param isVirtuosoHarvest

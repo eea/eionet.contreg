@@ -96,7 +96,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return HarvestSourceDTO
      */
     public HarvestSourceDTO getHarvestSource() {
@@ -104,7 +104,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @param harvestSource
      */
     public void setHarvestSource(HarvestSourceDTO harvestSource) {
@@ -112,7 +112,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return List<HarvestDTO>
      */
     public List<HarvestDTO> getHarvests() {
@@ -120,7 +120,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return String
      * @throws DAOException
      */
@@ -137,7 +137,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return Resolution
      * @throws DAOException
      */
@@ -208,7 +208,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return Resolution
      * @throws DAOException
      * @throws SchedulerException
@@ -260,7 +260,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return Resolution
      * @throws DAOException
      * @throws SchedulerException
@@ -312,7 +312,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return Resolution
      * @throws DAOException
      * @throws HarvestException
@@ -337,7 +337,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return Resolution
      */
     public Resolution export() {
@@ -378,7 +378,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return Resolution
      */
     public Resolution goToEdit() {
@@ -391,7 +391,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return boolean
      */
     public boolean validateAddEdit() {
@@ -450,7 +450,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return Map<Integer,String>
      */
     public Map<Integer, String> getIntervalMultipliers() {
@@ -467,7 +467,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return int
      */
     public int getSelectedIntervalMultiplier() {
@@ -475,7 +475,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return String
      */
     public String getIntervalMinutesDisplay() {
@@ -492,7 +492,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return String
      */
     public String getPrioritySourceDisplay() {
@@ -509,7 +509,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return String
      */
     public String getSchemaSourceDisplay() {
@@ -524,7 +524,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @param minutes
      * @return
      */

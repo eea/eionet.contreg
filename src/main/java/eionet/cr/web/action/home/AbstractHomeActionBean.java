@@ -24,9 +24,9 @@ import eionet.cr.web.util.columns.SearchResultColumn;
 import eionet.cr.web.util.columns.SubjectPredicateColumn;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
- * 
+ *
  */
 
 public abstract class AbstractHomeActionBean extends AbstractActionBean {
@@ -259,7 +259,7 @@ public abstract class AbstractHomeActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @param sourceUrl
      * @param uploadedFile
      * @param dcTitle
@@ -305,7 +305,7 @@ public abstract class AbstractHomeActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @param uploadedFile
      */
     protected void deleteUploadedFile(FileBean uploadedFile) {

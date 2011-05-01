@@ -17,9 +17,9 @@ import eionet.cr.util.Util;
 import eionet.cr.util.pagination.PagingRequest;
 
 /**
- * 
+ *
  * @author Enriko Käsper
- * 
+ *
  */
 public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
 
@@ -166,7 +166,7 @@ public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
     }
 
     /**
-     * 
+     *
      * @param predicateUri
      * @param objectValue
      * @return
@@ -179,7 +179,7 @@ public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public boolean requiresFullTextSearch() {
@@ -203,7 +203,7 @@ public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
     }
 
     /**
-     * 
+     *
      * @param s
      * @return
      */
@@ -212,7 +212,7 @@ public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
     }
 
     /**
-     * 
+     *
      * @param key
      */
     protected void removeFilter(String key) {

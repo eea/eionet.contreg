@@ -28,7 +28,7 @@ import java.util.Date;
 
 /**
  * @author altnyris
- * 
+ *
  */
 public class HarvestSourceDTO implements Serializable {
 
@@ -169,7 +169,7 @@ public class HarvestSourceDTO implements Serializable {
     }
 
     /**
-     * 
+     *
      * @return boolean
      */
     public boolean isUnavailable() {
@@ -209,7 +209,7 @@ public class HarvestSourceDTO implements Serializable {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#toString()
      */
     public String toString() {

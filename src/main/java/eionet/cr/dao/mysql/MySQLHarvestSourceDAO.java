@@ -53,7 +53,7 @@ import eionet.cr.util.sql.SingleObjectReader;
 
 /**
  * @author altnyris
- * 
+ *
  */
 public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSourceDAO {
 
@@ -75,7 +75,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSources(java.lang.String, eionet.cr.util.PagingRequest,
      * eionet.cr.util.SortingRequest)
      */
@@ -92,7 +92,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#getPrioritySources(java.lang.String , eionet.cr.util.PagingRequest,
      * eionet.cr.util.SortingRequest)
      */
@@ -104,7 +104,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSourcesUnavailable()
      */
     public Pair<Integer, List<HarvestSourceDTO>> getHarvestSourcesUnavailable(String searchString, PagingRequest pagingRequest,
@@ -116,7 +116,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSourcesFailed(java.lang.String, eionet.cr.util.PagingRequest,
      * eionet.cr.util.SortingRequest)
      */
@@ -153,7 +153,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDao#getHarvestSourceById()
      */
     public HarvestSourceDTO getHarvestSourceById(Integer harvestSourceID) throws DAOException {
@@ -168,7 +168,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSourceByUrl(java.lang.String)
      */
     public HarvestSourceDTO getHarvestSourceByUrl(String url) throws DAOException {
@@ -185,7 +185,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#getUrgencySourcesCount()
      */
     public Long getUrgencySourcesCount() throws DAOException {
@@ -207,7 +207,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#addSource(HarvestSourceDTO source)
      */
     public Integer addSource(HarvestSourceDTO source) throws DAOException {
@@ -216,7 +216,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#addSourceIgnoreDuplicate(java.lang.String, int, boolean, java.lang.String, boolean
      * schema, boolean priority, String owner)
      */
@@ -225,7 +225,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
     }
 
     /**
-     * 
+     *
      * @param source
      * @return Integer
      * @throws DAOException
@@ -262,7 +262,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDao#editSource()
      */
     public void editSource(HarvestSourceDTO source) throws DAOException {
@@ -372,7 +372,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#updateHarvestFinished(int, Integer, Integer)
      */
     public void updateHarvestFinished(int sourceId, Integer numStatements, Boolean sourceAvailable, boolean failed,
@@ -401,7 +401,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#updateHarvestStarted(int)
      */
     public void updateHarvestStarted(int sourceId) throws DAOException {
@@ -429,7 +429,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#getNextScheduledSources(int)
      */
     public List<HarvestSourceDTO> getNextScheduledSources(int limit) throws DAOException {
@@ -476,7 +476,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#getUrgencyScore(int)
      */
     @Override
@@ -487,7 +487,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#getSourcesInInferenceRule()
      */
     @Override
@@ -497,7 +497,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#getInferenceSources()
      */
     @Override
@@ -508,7 +508,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#isSourceInInferenceRule()
      */
     @Override
@@ -518,7 +518,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#addSourceIntoInferenceRule()
      */
     @Override
@@ -528,7 +528,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#removeSourceFromInferenceRule()
      */
     @Override
@@ -538,7 +538,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#addSourceToRepository(File, String)
      */
     @Override
@@ -549,7 +549,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#addSourceMetadata(SubjectDTO)
      */
     @Override
@@ -560,7 +560,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#getNewSources(String)
      */
     @Override
@@ -570,7 +570,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#getSourceMetadata(String, String)
      */
     @Override
@@ -580,7 +580,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#insertUpdateSourceMetadata(String, String, ObjectDTO)
      */
     @Override
@@ -591,7 +591,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#editRedirectedSource(String, Timestamp, boolean)
      */
     public void editRedirectedSource(String url, Timestamp lastHarvest, boolean failed) throws DAOException {
@@ -600,7 +600,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#removeAllPredicatesFromHarvesterContext(String, String)
      */
     @Override
@@ -610,7 +610,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#deleteSourceTriples(String)
      */
     @Override
@@ -620,14 +620,14 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#increaseUnavailableCount(int)
      */
     @Override
     public void increaseUnavailableCount(int sourceId) throws DAOException {
         throw new UnsupportedOperationException("Method not implemented");
     }
-    
+
     /*
      * (non-Javadoc)
      * @see eionet.cr.dao.HelperDAO#getLatestHarvestedURLs()
@@ -643,10 +643,10 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
     public Pair <Integer, List <HarvestUrgencyScoreDTO>> getUrgencyOfComingHarvests(int amount) throws DAOException {
         throw new UnsupportedOperationException("Method not implemented");
     }
-    
+
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#updateLastHarvest(String, Timestamp)
      */
     public void updateLastHarvest(String sourceUrl, Timestamp lastHarvest) throws DAOException {

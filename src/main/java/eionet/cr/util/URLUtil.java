@@ -73,7 +73,7 @@ public class URLUtil {
 
     /**
      * Connect to the URL and check if it is modified since the timestamp argument.
-     * @param urlString 
+     * @param urlString
      * @param timestamp
      * @return true if it is modified.
      */
@@ -143,7 +143,7 @@ public class URLUtil {
         return    ioe instanceof MalformedURLException
                || ioe instanceof UnknownHostException
                || (responseCode >= 400 && responseCode <= 499)
-               || responseCode == HttpURLConnection.HTTP_NOT_IMPLEMENTED 
+               || responseCode == HttpURLConnection.HTTP_NOT_IMPLEMENTED
                || responseCode == HttpURLConnection.HTTP_VERSION;
     }
 
@@ -180,10 +180,10 @@ public class URLUtil {
      * @throws MalformedURLException
      */
     public static URL replaceURLSpaces(URL url) throws MalformedURLException {
-        
+
         return url == null ? null : new URL(replaceURLSpaces(url.toString()));
     }
-    
+
     /**
     *
     * @param url
@@ -191,7 +191,7 @@ public class URLUtil {
     * @throws MalformedURLException
     */
    public static String replaceURLSpaces(String url) throws MalformedURLException {
-       
+
        return url == null ? null : StringUtils.replace(url.toString(), " ", "%20");
    }
 }

@@ -18,9 +18,9 @@ import eionet.cr.util.URLUtil;
 /**
  * Class to open a connection to a remote source or local file. Doesn't have a close method. You have to know how the class works to
  * close the connection via the inputStream field.
- * 
+ *
  * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
- * 
+ *
  */
 public class HarvestUrlConnection {
 
@@ -42,7 +42,7 @@ public class HarvestUrlConnection {
 
     /**
      * Behaves almost as a constructor, but isn't called HarvestUrlConnection.
-     * 
+     *
      * @param sourceUrlString
      * @return HarvestUrlConnection
      * @throws IOException
@@ -72,7 +72,7 @@ public class HarvestUrlConnection {
 
     /**
      * Opens the source and stores the file descriptor in inputStream.
-     * 
+     *
      * @return true if the source is available.
      * @throws Exception
      */
@@ -134,7 +134,7 @@ public class HarvestUrlConnection {
      * has been decided to use two fields even though one type (HttpURLConnection) is a subclass of the other (URLConnection). Uses
      * another two fields to decide which field is the one to use. No relation to {@link #getConnection(String)}. Just a confusing
      * name clash.
-     * 
+     *
      * @return the connection
      */
     public URLConnection getConnection() {

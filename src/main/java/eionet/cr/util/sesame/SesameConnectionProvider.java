@@ -14,9 +14,9 @@ import eionet.cr.common.CRRuntimeException;
 import eionet.cr.config.GeneralConfig;
 
 /**
- * 
+ *
  * @author jaanus
- * 
+ *
  */
 public class SesameConnectionProvider {
 
@@ -47,7 +47,7 @@ public class SesameConnectionProvider {
     }
 
     /**
-     * 
+     *
      * @return RepositoryConnection
      * @throws RepositoryException
      */
@@ -69,7 +69,7 @@ public class SesameConnectionProvider {
     }
 
     /**
-     * 
+     *
      * @return Connection
      * @throws SQLException
      */

@@ -33,7 +33,7 @@ public interface HarvestMessageDAO extends DAO {
 
     /**
      *
-     * @param harvestID 
+     * @param harvestID
      * @return List<HarvestMessageDTO>
      * @throws DAOException
      */
@@ -41,7 +41,7 @@ public interface HarvestMessageDAO extends DAO {
 
     /**
      *
-     * @param messageID 
+     * @param messageID
      * @return HarvestMessageDTO
      * @throws DAOException
      */

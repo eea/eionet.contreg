@@ -18,14 +18,14 @@ import org.openrdf.repository.RepositoryException;
 import eionet.cr.dao.readers.ResultSetReaderException;
 
 /**
- * 
+ *
  * @author jaanus
- * 
+ *
  */
 public class SesameUtil {
 
     /**
-     * 
+     *
      * @return RepositoryConnection
      * @throws RepositoryException
      */
@@ -36,7 +36,7 @@ public class SesameUtil {
     }
 
     /**
-     * 
+     *
      * @return Connection
      * @throws SQLException
      */
@@ -46,7 +46,7 @@ public class SesameUtil {
     }
 
     /**
-     * 
+     *
      * @param <T>
      * @param sparql
      * @param reader
@@ -87,7 +87,7 @@ public class SesameUtil {
      * @throws RepositoryException
      * @throws QueryEvaluationException
      * @throws MalformedQueryException
-     * 
+     *
      *             Executes SPARQL query that changes RDF data. Rollback is NOT
      *             made if query does not succeed
      */
@@ -102,7 +102,7 @@ public class SesameUtil {
     }
 
     /**
-     * 
+     *
      * @param queryResult
      */
     public static void close(TupleQueryResult queryResult) {
@@ -116,7 +116,7 @@ public class SesameUtil {
     }
 
     /**
-     * 
+     *
      * @param queryResult
      */
     public static void close(GraphQueryResult queryResult) {
@@ -130,7 +130,7 @@ public class SesameUtil {
     }
 
     /**
-     * 
+     *
      * @param repo
      */
     public static void shutdown(Repository repo) {
@@ -144,7 +144,7 @@ public class SesameUtil {
     }
 
     /**
-     * 
+     *
      * @param conn
      */
     public static void close(RepositoryConnection conn) {

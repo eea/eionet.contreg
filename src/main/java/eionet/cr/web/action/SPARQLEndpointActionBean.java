@@ -36,9 +36,9 @@ import eionet.cr.web.sparqlClient.helpers.CRXmlWriter;
 import eionet.cr.web.sparqlClient.helpers.QueryResult;
 
 /**
- * 
+ *
  * @author altnyris
- * 
+ *
  */
 @UrlBinding("/sparql")
 public class SPARQLEndpointActionBean extends AbstractActionBean {
@@ -78,7 +78,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     private String resultAsk;
 
     /**
-     * 
+     *
      * @return Resolution
      * @throws OpenRDFException
      */
