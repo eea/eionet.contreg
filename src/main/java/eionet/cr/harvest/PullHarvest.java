@@ -309,7 +309,7 @@ public class PullHarvest extends Harvest {
                     setStoredTriplesCount(tripleCount);
                 }
             } catch (Exception e) {
-                throw new HarvestException(e.toString(), e);
+                e.printStackTrace();
             } finally {
                 deleteDownloadedFile(file);
                 deleteDownloadedFile(originalPath);
@@ -716,7 +716,8 @@ public class PullHarvest extends Harvest {
         // if no conversion found, still return the file for parsing as RDF (we know that at least it's XML, because otherwise a
         // SAXException would have been thrown above)
         if (StringUtils.isBlank(conversionId)) {
-            logger.debug("No RDF conversion found, trying to parse as RDF");
+            logger.debug("No RDF conversion found!");
+            rdfContentFound = false;
             return file;
         } else {
             logger.debug("Going to run the found RDF conversion (id = " + conversionId + ")");

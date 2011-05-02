@@ -231,7 +231,7 @@ public class FactsheetActionBean extends AbstractActionBean {
                 else if (resolution.equals(InstantHarvester.Resolution.SOURCE_UNAVAILABLE))
                     message = "The resource was not available!";
                 else if (resolution.equals(InstantHarvester.Resolution.NO_STRUCTURED_DATA))
-                    message = "The resource contained no structured data!";
+                    message = "The resource contained no RDF data!";
                 else if (resolution.equals(InstantHarvester.Resolution.RECENTLY_HARVESTED))
                     message = "Source redirects to another source that has recently been harvested! Will not harvest.";
                 else
