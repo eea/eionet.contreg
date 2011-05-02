@@ -249,7 +249,7 @@ public class FactsheetActionBean extends AbstractActionBean {
                 dto.setEmails("");
                 dto.setIntervalMinutes(Integer.valueOf(GeneralConfig.getProperty(GeneralConfig.HARVESTER_REFERRALS_INTERVAL,
                         String.valueOf(HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL))));
-                dto.setPrioritySource(true);
+                dto.setPrioritySource(false);
                 dto.setOwner(null);
                 dao.addSourceIgnoreDuplicate(dto);
 
