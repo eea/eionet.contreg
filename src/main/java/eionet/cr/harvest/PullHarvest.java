@@ -67,6 +67,7 @@ import eionet.cr.util.xml.XmlAnalysis;
 import eionet.cr.web.security.CRUser;
 
 /**
+ * Perform a pull-harvest.
  *
  * @author heinljab
  *
@@ -74,7 +75,7 @@ import eionet.cr.web.security.CRUser;
 public class PullHarvest extends Harvest {
 
     /**
-     *
+     * Max number of redirections. Also declared in super class.
      */
     public static final int maxRedirectionsAllowed = 4;
     private boolean fullSetupMode = false;
@@ -82,6 +83,9 @@ public class PullHarvest extends Harvest {
 
     /** */
     private Boolean sourceAvailable = null;
+    /**
+     * Last harvest of source as stored in database.
+     */
     private Date lastHarvest = null;
 
     /** */
@@ -198,7 +202,8 @@ public class PullHarvest extends Harvest {
             try {
                 if (harvestUrlConnection != null && harvestUrlConnection.getInputStream() != null)
                     harvestUrlConnection.getInputStream().close();
-            } catch (IOException e) {}
+            } catch (IOException e) {
+            }
         }
 
         // perform the harvest
@@ -257,7 +262,10 @@ public class PullHarvest extends Harvest {
         } finally {
             // close input stream
             if (inputStream != null) {
-                try { inputStream.close(); } catch (Exception e) { logger.error(e.toString(), e);}
+                try { inputStream.close();
+                } catch (Exception e) {
+                    logger.error(e.toString(), e);
+                }
             }
 
             // delete the file we harvested and the original one (in case a new file was created during the pre-processing)
@@ -320,6 +328,7 @@ public class PullHarvest extends Harvest {
     /**
      * Performs the harvesting for redirected harvests.
      *
+     * @param harvestUrlConnection
      * @throws DAOException
      * @throws HarvestException
      * @throws MalformedURLException
@@ -354,9 +363,9 @@ public class PullHarvest extends Harvest {
             redirectionsFound = redirectedUrls.size();
 
             // Checking the count of redirects.
-            if (redirectionsFound>PullHarvest.maxRedirectionsAllowed) {
+            if (redirectionsFound > PullHarvest.maxRedirectionsAllowed) {
                 throw new HarvestException("Too many redirections for url: " + sourceUrlString
-                        +". Found "+ redirectionsFound+", allowed "+PullHarvest.maxRedirectionsAllowed);
+                        + ". Found " + redirectionsFound + ", allowed " + PullHarvest.maxRedirectionsAllowed);
             }
         }
 
@@ -380,7 +389,8 @@ public class PullHarvest extends Harvest {
                 }
             } else {
                 directedSource = new HarvestSourceDTO();
-                directedSource.setPrioritySource(true);
+                //FIXME: Use the priority of the original source.
+                directedSource.setPrioritySource(false);
                 directedSource.setIntervalMinutes(originalSource.getIntervalMinutes());
                 directedSource.setUrl(current.getSourceURL());
 
@@ -393,14 +403,14 @@ public class PullHarvest extends Harvest {
             long lastHarvestTime =
                 directedSource.getLastHarvest() == null ? 0 : directedSource.getLastHarvest().getTime();
             long sinceLastHarvest = now - lastHarvestTime;
-            long harvestIntervalMillis = directedSource.getIntervalMinutes() == null ? 0L :
-                directedSource.getIntervalMinutes().longValue() * 60L * 1000L;
+            long harvestIntervalMillis = directedSource.getIntervalMinutes() == null ? 0L
+                : directedSource.getIntervalMinutes().longValue() * 60L * 1000L;
 
             // The conditions applies to current url only.
             // If "current" is not harvested, the one following the "current" is still attempted.
 
-            if (lastHarvestTime == 0 ||  this instanceof InstantHarvest ||
-                    (lastHarvestTime > 0 && sinceLastHarvest > harvestIntervalMillis)) {
+            if (lastHarvestTime == 0 || this instanceof InstantHarvest
+                    || (lastHarvestTime > 0 && sinceLastHarvest > harvestIntervalMillis)) {
 
                 PullHarvest harvest = null;
 
@@ -422,7 +432,7 @@ public class PullHarvest extends Harvest {
 
     /**
      *
-     * @throws ParserConfigurationException
+     * @throws ParserConfigurationException if the general config file is unparsable.
      * @throws SAXException
      * @throws IOException
      * @throws DAOException
@@ -447,9 +457,10 @@ public class PullHarvest extends Harvest {
 
 
     /**
+     * Checks if the conversion script is modified since last harvest. Uses the instance variable 'sourceUrlString'.
+     * @return true if conversion script is modified. Can return null, and the caller must decide what that means.
      *
-     * @return
-     * @throws ParserConfigurationException
+     * @throws ParserConfigurationException if the general config file is unparsable.
      * @throws SAXException
      * @throws IOException
      * @throws DAOException
@@ -499,7 +510,7 @@ public class PullHarvest extends Harvest {
      * @param file
      * @throws IOException
      * @throws SAXException
-     * @throws ParserConfigurationException
+     * @throws ParserConfigurationException if the general config file is unparsable.
      */
     private File preProcess(File file, String contentType) throws ParserConfigurationException, SAXException, IOException {
 

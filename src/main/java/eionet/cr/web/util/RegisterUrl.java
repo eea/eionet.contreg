@@ -20,10 +20,10 @@ import eionet.cr.web.security.CRUser;
 public class RegisterUrl {
 
     /**
-     *
-     * @param url
-     * @param user
-     * @param saveToBookmarks
+     * Register a URL.
+     * @param url - URL to register
+     * @param user - Authentication object
+     * @param saveToBookmarks - a flag to say whether to also create a bookmark in user's bookmarks
      * @throws DAOException
      * @throws HarvestException
      */
@@ -43,7 +43,8 @@ public class RegisterUrl {
         HarvestSourceDTO source = new HarvestSourceDTO();
         source.setUrl(urlWithoutFragment);
         source.setIntervalMinutes(intervalMinutes);
-        source.setPrioritySource(true);
+        source.setPrioritySource(false);
+        //FIXME: setOwner missing
 
         DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(source);
         // schedule urgent harvest of this URL
