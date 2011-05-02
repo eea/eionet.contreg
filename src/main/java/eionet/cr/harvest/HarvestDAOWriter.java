@@ -80,7 +80,7 @@ public class HarvestDAOWriter {
      */
     protected void writeFinished(Harvest harvest) throws DAOException, RepositoryException {
 
-        if (!(harvest instanceof VirtuosoPullHarvest) || (harvest instanceof VirtuosoPullHarvest && harvest.needsHarvesting)) {
+        if (!(harvest instanceof PullHarvest) || (harvest instanceof PullHarvest && harvest.needsHarvesting)) {
             DAOFactory.get().getDao(HarvestDAO.class)
                     .updateFinishedHarvest(harvestId, Harvest.STATUS_FINISHED, harvest.getStoredTriplesCount(), 0, 0);
         }
@@ -92,11 +92,6 @@ public class HarvestDAOWriter {
         Timestamp lastHarvest = generateLastHarvestDate(harvest);
 
         if (harvest instanceof PullHarvest) {
-            DAOFactory
-                    .get()
-                    .getDao(HarvestSourceDAO.class)
-                    .updateHarvestFinished(sourceId, null, ((PullHarvest) harvest).getSourceAvailable(), failed, false, lastHarvest);
-        } else if (harvest instanceof VirtuosoPullHarvest) {
             if (harvest.needsHarvesting) {
                 if (harvest.isRedirectedSource) {
                     sourceId = harvest.finalSourceId;
@@ -106,7 +101,7 @@ public class HarvestDAOWriter {
                         .get()
                         .getDao(HarvestSourceDAO.class)
                         .updateHarvestFinished(sourceId, harvest.getStoredTriplesCount(),
-                                ((VirtuosoPullHarvest) harvest).getSourceAvailable(), failed, harvest.permanentError, lastHarvest);
+                                ((PullHarvest) harvest).getSourceAvailable(), failed, harvest.permanentError, lastHarvest);
             }
         } else {
             DAOFactory.get().getDao(HarvestSourceDAO.class).updateHarvestFinished(sourceId, null, null, failed, false, lastHarvest);
@@ -124,7 +119,7 @@ public class HarvestDAOWriter {
         // If temporary error
         // The LAST_HARVEST is not set to current time. Instead it is
         // increased with 10% of the harvesting period but minimum two hours.
-        if (!((VirtuosoPullHarvest) harvest).getSourceAvailable() && !harvest.permanentError) {
+        if (!((PullHarvest) harvest).getSourceAvailable() && !harvest.permanentError) {
             HarvestSourceDTO source = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceById(sourceId);
             if (source != null && source.getLastHarvest() != null) {
                 long prevHarvest = source.getLastHarvest().getTime();

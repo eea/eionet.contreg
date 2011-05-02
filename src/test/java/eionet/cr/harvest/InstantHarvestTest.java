@@ -21,18 +21,11 @@
 package eionet.cr.harvest;
 
 import java.net.URL;
-import java.sql.Connection;
 
-import org.dbunit.DatabaseTestCase;
-import org.dbunit.database.DatabaseConnection;
-import org.dbunit.database.IDatabaseConnection;
 import org.dbunit.dataset.IDataSet;
-import org.dbunit.dataset.xml.FlatXmlDataSet;
-import org.dbunit.operation.DatabaseOperation;
 import org.junit.Test;
 
 import eionet.cr.test.helpers.CRDatabaseTestCase;
-import eionet.cr.util.sql.DbConnectionProvider;
 
 /**
  *

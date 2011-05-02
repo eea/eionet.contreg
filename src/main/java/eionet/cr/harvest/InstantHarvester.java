@@ -38,7 +38,6 @@ public class InstantHarvester extends Thread {
     /** */
     private String sourceUrl;
     private String userName;
-    private boolean isVirtuosoHarvest;
 
     /** */
     private HarvestException harvestException = null;
@@ -48,11 +47,10 @@ public class InstantHarvester extends Thread {
     private boolean sourceAvailable = false;
     private boolean needsHarvesting = true;
 
-    private InstantHarvester(String sourceUrl, String userName, boolean isVirtuosoHarvest) {
+    private InstantHarvester(String sourceUrl, String userName) {
 
         this.sourceUrl = sourceUrl;
         this.userName = userName;
-        this.isVirtuosoHarvest = isVirtuosoHarvest;
     }
 
     /*
@@ -63,15 +61,9 @@ public class InstantHarvester extends Thread {
     public void run() {
 
         InstantHarvest instantHarvest = null;
-        VirtuosoInstantHarvest virtInstantHarvest = null;
         try {
-            if (!isVirtuosoHarvest) {
-                instantHarvest = InstantHarvest.createFullSetup(sourceUrl, userName);
-                instantHarvest.execute();
-            } else {
-                virtInstantHarvest = VirtuosoInstantHarvest.createFullSetup(sourceUrl, userName);
-                virtInstantHarvest.execute();
-            }
+            instantHarvest = InstantHarvest.createFullSetup(sourceUrl, userName);
+            instantHarvest.execute();
         } catch (HarvestException e) {
             harvestException = e;
         } catch (Throwable e) {
@@ -83,15 +75,11 @@ public class InstantHarvester extends Thread {
         } finally {
             if (instantHarvest != null) {
                 rdfContentFound = instantHarvest.isRdfContentFound();
-                sourceAvailable = instantHarvest.getSourceAvailable() != null && instantHarvest.getSourceAvailable().booleanValue();
-            }
-            if (virtInstantHarvest != null) {
-                rdfContentFound = virtInstantHarvest.isRdfContentFound();
-                sourceAvailable = virtInstantHarvest.getSourceAvailable() != null
-                        && virtInstantHarvest.getSourceAvailable().booleanValue();
+                sourceAvailable = instantHarvest.getSourceAvailable() != null
+                        && instantHarvest.getSourceAvailable().booleanValue();
                 // Check if source is redirected and destination
                 // source has been recently updated
-                needsHarvesting = virtInstantHarvest.needsHarvesting;
+                needsHarvesting = instantHarvest.needsHarvesting;
             }
             CurrentHarvests.removeOnDemandHarvest(sourceUrl);
         }
@@ -109,11 +97,10 @@ public class InstantHarvester extends Thread {
      *
      * @param sourceUrl
      * @param userName
-     * @param isVirtuosoHarvest
      * @return Resolution
      * @throws HarvestException
      */
-    public static Resolution harvest(String sourceUrl, String userName, boolean isVirtuosoHarvest) throws HarvestException {
+    public static Resolution harvest(String sourceUrl, String userName) throws HarvestException {
 
         if (StringUtils.isBlank(sourceUrl))
             throw new IllegalArgumentException("Source URL must not be null or blank!");
@@ -128,7 +115,7 @@ public class InstantHarvester extends Thread {
 
         InstantHarvester instantHarvester = null;
         try {
-            instantHarvester = new InstantHarvester(sourceUrl, userName, isVirtuosoHarvest);
+            instantHarvester = new InstantHarvester(sourceUrl, userName);
             instantHarvester.start();
 
             for (int loopCount = 0; instantHarvester.isAlive() && loopCount < 15; loopCount++) {

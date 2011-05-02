@@ -89,13 +89,13 @@
                                         </c:if>
                                         <c:if test="${subjectUrl!=null && actionBean.currentlyHarvested==false}">
                                             <li>
-                                                <stripes:url value="${actionBean.urlBinding}" event="harvestAjaxVirtuoso"  var="urlVirt">
+                                                <stripes:url value="${actionBean.urlBinding}" event="harvestAjax" var="url">
                                                         <stripes:param name="uri" value="${actionBean.uri}"/>
                                                 </stripes:url>
-                                                <stripes:url value="${actionBean.urlBinding}" event="harvestVirtuoso"  var="oldUrlVirt">
+                                                <stripes:url value="${actionBean.urlBinding}" event="harvest" var="oldUrl">
                                                         <stripes:param name="uri" value="${actionBean.uri}"/>
                                                 </stripes:url>
-                                                <a id="wait_link" href="${oldUrlVirt}" onclick="javascript:loadAndWait('The resource is being harvested. Please wait ...', '${urlVirt}', '${pageContext.request.contextPath}'); return false;">Harvest</a>
+                                                <a id="wait_link" href="${oldUrl}" onclick="javascript:loadAndWait('The resource is being harvested. Please wait ...', '${url}', '${pageContext.request.contextPath}'); return false;">Harvest</a>
                                             </li>
                                         </c:if>
                                     
@@ -212,13 +212,13 @@
                                                 <ul>
                                                     <c:if test="${actionBean.currentlyHarvested==false}">
                                                         <li>
-                                                            <stripes:url value="${actionBean.urlBinding}" event="harvestAjaxVirtuoso"  var="urlVirt">
+                                                            <stripes:url value="${actionBean.urlBinding}" event="harvestAjax"  var="url">
                                                                     <stripes:param name="uri" value="${actionBean.uri}"/>
                                                             </stripes:url>
-                                                            <stripes:url value="${actionBean.urlBinding}" event="harvestVirtuoso"  var="oldUrlVirt">
+                                                            <stripes:url value="${actionBean.urlBinding}" event="harvest"  var="oldUrl">
                                                                     <stripes:param name="uri" value="${actionBean.uri}"/>
                                                             </stripes:url>
-                                                            <a id="wait_link" href="${oldUrlVirt}" onclick="javascript:loadAndWait('The resource is being harvested. Please wait ...', '${urlVirt}', '${pageContext.request.contextPath}'); return false;">Harvest</a>
+                                                            <a id="wait_link" href="${oldUrl}" onclick="javascript:loadAndWait('The resource is being harvested. Please wait ...', '${url}', '${pageContext.request.contextPath}'); return false;">Harvest</a>
                                                         </li>
                                                     </c:if>
                                                 </ul>
