@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.openrdf.repository.RepositoryConnection;
 
 import eionet.cr.common.Predicates;
+import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.SQLBaseDAO;
 import eionet.cr.dao.readers.SubjectDataReader;
@@ -31,12 +32,12 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO {
     protected Logger logger = Logger.getLogger(VirtuosoBaseDAO.class);
 
     /**
-     *
+     * Executes SPARQL and returns result list of the given bindingset reader.
      * @param <T>
      * @param query
      * @param reader
      * @return
-     * @throws DAOException
+     * @throws DAOException if SPARQL execution fails
      */
     protected <T> List<T> executeSPARQL(String sparql,
             SPARQLResultSetReader<T> reader) throws DAOException {
@@ -53,8 +54,13 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO {
         }
     }
 
-    protected void executeUpdateSPARQL(String sparql, RepositoryConnection conn)
-            throws DAOException {
+    /**
+     * Executes SPARQL that updates data.
+     * @param sparql SPARQL
+     * @param conn Virtuoso repository connection
+     * @throws DAOException if update fails
+     */
+    protected void executeUpdateSPARQL(final String sparql, final RepositoryConnection conn) throws DAOException {
         try {
             SesameUtil.executeUpdateQuery(sparql, conn);
         } catch (Exception e) {
@@ -63,13 +69,13 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO {
     }
 
     /**
-     *
+     * Executes SPARQL that is expected to have only one result and returns the unique value.
      * @param <T>
      * @param sql
      * @param params
      * @param reader
      * @return
-     * @throws DAOException
+     * @throws DAOException if query fails
      */
     protected <T> T executeUniqueResultSPARQL(String sql,
             SPARQLResultSetReader<T> reader) throws DAOException {
@@ -86,26 +92,26 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO {
      *             Default call of getSubjectsData() - SubjectDTO are created if
      *             not existing
      */
-    protected List<SubjectDTO> getSubjectsData(Collection<String> subjectUris,
-            String[] predicateUris, SubjectDataReader reader,
-            Collection<String> graphUris) throws DAOException {
+    protected List<SubjectDTO> getSubjectsData(final Collection<String> subjectUris,
+            final String[] predicateUris, SubjectDataReader reader,
+            final Collection<String> graphUris) throws DAOException {
         return getSubjectsData(subjectUris, predicateUris, reader, graphUris,
                 true);
     }
 
     /**
-     *
-     * @param subjectUris
-     * @param predicateUris
-     * @param createMissingSubjects
-     *            - indicates if to create a SubjectDTO object if it does not
-     *            exist
-     * @return
-     * @throws DAOException
+     * Returns list of Data objects of given subjects for given predicates.
+     * @param subjectUris list of subject URIs
+     * @param predicateUris array of predicates which data is requested
+     * @param reader bindingset reader
+     * @param graphUris Graphs which data is requested
+     * @param createMissingDTOs  indicates if to create a SubjectDTO object if it does not exist
+     * @return List<SubjectDTO> list of Subject data objects
+     * @throws DAOException if query fails
      */
-    protected List<SubjectDTO> getSubjectsData(Collection<String> subjectUris,
-            String[] predicateUris, SubjectDataReader reader,
-            Collection<String> graphUris, boolean createMissingDTOs)
+    protected List<SubjectDTO> getSubjectsData(final Collection<String> subjectUris,
+            final String[] predicateUris, final SubjectDataReader reader,
+            final Collection<String> graphUris, final boolean createMissingDTOs)
             throws DAOException {
 
         if (subjectUris == null || subjectUris.isEmpty()) {
@@ -136,14 +142,13 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO {
     }
 
     /**
-     *
-     * @param predicateUris
-     * @param reader
-     * @return
-     * @throws DAOException
+     * @param subjectUris - List of subjects the data is be queried
+     * @param predicateUris - String [] list of predicates
+     * @param graphUris - list of graphs where the data is queried (optional)
+     * @return String SPARQL query
      */
-    private String getSubjectsDataQuery(Collection<String> subjectUris,
-            String[] predicateUris, Collection<String> graphUris) {
+    private String getSubjectsDataQuery(final Collection<String> subjectUris,
+            final String[] predicateUris, final Collection<String> graphUris) {
 
         if (subjectUris == null || subjectUris.isEmpty()) {
             throw new IllegalArgumentException(
@@ -151,7 +156,9 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO {
         }
 
         StringBuilder strBuilder = new StringBuilder().append(
-                "select * where {graph ?g {?s ?p ?o. ").append(
+                //TODO - put it back if issue with inferencing is clear
+                "define input:inference '").append(GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME)).append(
+                "' select * where {graph ?g {?s ?p ?o. ").append(
                 "filter (?s IN (");
 
         int i = 0;
@@ -196,7 +203,7 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO {
 
         strBuilder.append("OPTIONAL { ?g <").append(Predicates.CR_LAST_MODIFIED).append("> ?t } ");
 
-        strBuilder.append("}} ORDER BY ?s");
+        strBuilder.append("}} ORDER BY ?s ?p ?o");
         return strBuilder.toString();
     }
 }

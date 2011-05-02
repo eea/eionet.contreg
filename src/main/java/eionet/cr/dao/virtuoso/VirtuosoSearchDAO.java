@@ -2,6 +2,7 @@ package eionet.cr.dao.virtuoso;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,8 +16,8 @@ import org.openrdf.repository.RepositoryConnection;
 import eionet.cr.common.Predicates;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.SearchDAO;
-import eionet.cr.dao.helpers.FreeTextSearchHelper.FilterType;
 import eionet.cr.dao.helpers.SearchHelper;
+import eionet.cr.dao.helpers.FreeTextSearchHelper.FilterType;
 import eionet.cr.dao.readers.FreeTextSearchReader;
 import eionet.cr.dao.readers.GraphUrisReader;
 import eionet.cr.dao.readers.SubjectDataReader;
@@ -36,19 +37,18 @@ import eionet.cr.util.sql.SingleObjectReader;
 import eionet.cr.util.sql.VirtuosoFullTextQuery;
 
 /**
- *
+ * DAO methods for search in Virtuoso.
  * @author jaanus
- *
  */
 public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
 
-    /* (non-Javadoc)
+    /** Free text search implementation in Virtuoso.
      * @see eionet.cr.dao.SearchDAO#searchByFreeText(eionet.cr.dao.util.SearchExpression, eionet.cr.dao.postgre.helpers.FreeTextSearchHelper.FilterType, eionet.cr.util.pagination.PagingRequest, eionet.cr.util.SortingRequest)
      */
     @Override
     public Pair<Integer, List<SubjectDTO>> searchByFreeText(
-            SearchExpression expression, FilterType filterType, boolean exactMatch,
-            PagingRequest pagingRequest,SortingRequest sortingRequest) throws DAOException {
+            final SearchExpression expression, final FilterType filterType, final boolean exactMatch,
+            final PagingRequest pagingRequest, final SortingRequest sortingRequest) throws DAOException {
 
 
         // if search expression is null or empty, return empty result
@@ -129,8 +129,14 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
         return new Pair<Integer, List<SubjectDTO>>(totalMatchCount, resultList);
     }
 
-    //Graph URIs are used to get correct cr:contentLastModified for the subject
-    //If subject from one graph gave the hit and the same subject in another graph didn't, then only the date of the first graph should be used
+    /**
+     * Graph URIs are used to get correct cr:contentLastModified for the subject.
+     * If subject from one graph gave the hit and the same subject in another
+     * graph didn't, then only the date of the first graph should be used
+     * @param subjectUris
+     * @return List<String>
+     * @throws DAOException
+     */
     private List<String> getGraphUris(List<String> subjectUris) throws DAOException {
         StringBuilder strBuilder = new StringBuilder().append("select distinct(?g) where {graph ?g {?s ?p ?o. ")
         .append("filter (?s IN (");
@@ -194,11 +200,11 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
         if (subjectUris != null && !subjectUris.isEmpty()) {
 
             // only these predicates will be queried for
-            String[] neededPredicates = null;
-            if (literalPredicates != null && literalPredicates.size() > 0) {
-                neededPredicates = literalPredicates.toArray(neededPredicates);
-            }
+            String[] neededPredicates = new String[]{};
 
+            if (selectedPredicates != null && selectedPredicates.size() > 0) {
+                neededPredicates = selectedPredicates.toArray(neededPredicates);
+            }
             // get the data of all found subjects
             logger.trace("Search by filters, getting the data of the found subjects");
             resultList = getSubjectsData(subjectUris, neededPredicates, new SubjectDataReader(subjectUris), null);
@@ -298,11 +304,11 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
             }
         }
 
-        logger.debug("Search subjects in source, total query time " +
-                Util.durationSince(startTime));
+        logger.debug("Search subjects in source, total query time "
+               + Util.durationSince(startTime));
 
         // the result Pair contains total number of subjects and the requested sub-list
-        return new Pair<Integer,List<SubjectDTO>>(totalMatchCount, resultList);
+        return new Pair<Integer, List<SubjectDTO>>(totalMatchCount, resultList);
     }
 
     /* (non-Javadoc)
@@ -315,17 +321,50 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
 
     }
 
-    /* (non-Javadoc)
+    /**
+     * Search by tags implementation in Virtuoso.
      * @see eionet.cr.dao.SearchDAO#searchByTags(java.util.List, eionet.cr.util.pagination.PagingRequest, eionet.cr.util.SortingRequest, java.util.List)
+     * @param tags List<String> - tag names
+     * @param selectedPredicates List<String> - predicates to be shown
+     * @param pagingRequest sortingRequest PagingRequest
+     * @param sortingRequest pagingRequest SortingRequest
+     * @return Pair <Integer, List<SubjectDTO>>
+     * @throws DAOException if query fails
      */
     @Override
-    public Pair<Integer, List<SubjectDTO>> searchByTags(List<String> tags,
-            PagingRequest pagingRequest, SortingRequest sortingRequest,
-            List<String> selectedPredicates) throws DAOException {
-        throw new UnsupportedOperationException("Method not implemented");
+    public Pair<Integer, List<SubjectDTO>> searchByTags(final List<String> tags, final PagingRequest pagingRequest,
+             final SortingRequest sortingRequest, final List<String> selectedPredicates) throws DAOException {
+
+        Map<String, String> filters = buildTagsInputParameter(tags);
+
+        //TODO - remove this "hack" if Virtuoso potential bug issue gets clear:
+        //currently Virtuoso inferencing does not work if multiple parameters
+        //find manually all subProperties of cr#tag and add to filter
+
+        List<String> selectedAndTagPredicates = new ArrayList<String>(selectedPredicates);
+        String sparql = "select  ?s    WHERE { ?s <" + Predicates.RDFS_SUBPROPERTY_OF + ">  <" + Predicates.CR_TAG + ">  }";
+        SingleObjectReader<String> reader = new SingleObjectReader<String>();
+        executeSPARQL(sparql, reader);
+        selectedAndTagPredicates.addAll(reader.getResultList());
+        //<--
+
+        // return searchByFilters(filters, null, pagingRequest, sortingRequest, selectedPredicates);
+        return searchByFilters(filters, null, pagingRequest, sortingRequest, selectedAndTagPredicates);
+
 
     }
-
+    /**
+     * Helper method to convert array of tag to a map required by search method.
+     * @param tags List<String> tag names
+     * @return Map<String, String> in format [tag predicate: tag name]
+     */
+    private Map<String, String> buildTagsInputParameter(final List<String> tags) {
+        Map<String, String> tagFilters = new HashMap<String, String>();
+        for (String tag : tags) {
+            tagFilters.put(Predicates.CR_TAG, tag);
+        }
+        return tagFilters;
+    }
     /**
      *
      * @param helper
@@ -390,10 +429,10 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
             }
         }
 
-        logger.debug("Search references, total query time " +
-                Util.durationSince(startTime));
+        logger.debug("Search references, total query time "
+                + Util.durationSince(startTime));
 
         // the result Pair contains total number of subjects and the requested sub-list
-        return new Pair<Integer,List<SubjectDTO>>(totalMatchCount, resultList);
+        return new Pair<Integer, List<SubjectDTO>>(totalMatchCount, resultList);
     }
 }
