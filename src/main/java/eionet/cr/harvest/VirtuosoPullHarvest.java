@@ -57,13 +57,16 @@ import eionet.cr.web.security.CRUser;
 public class VirtuosoPullHarvest extends Harvest {
 
     /**
-     *
+     * Max number of redirections. Also declared in super class.
      */
     public static final int maxRedirectionsAllowed = 4;
     private boolean rdfContentFound = false;
 
     /** */
     private Boolean sourceAvailable = null;
+    /**
+     * Last harvest of source as stored in database.
+     */
     private Date lastHarvest = null;
 
     /** */
@@ -268,7 +271,7 @@ public class VirtuosoPullHarvest extends Harvest {
     /**
      * Harvest the given file.
      *
-     * @param file - file on filesystem containig the data.
+     * @param file - file on filesystem containing the data.
      * @param contentType
      * @param fileSize
      * @return the number of triples in source
@@ -575,7 +578,7 @@ public class VirtuosoPullHarvest extends Harvest {
 
     /**
      *
-     * @throws ParserConfigurationException
+     * @throws ParserConfigurationException if the general config file is unparsable.
      * @throws SAXException
      * @throws IOException
      * @throws DAOException
@@ -600,9 +603,11 @@ public class VirtuosoPullHarvest extends Harvest {
     }
 
     /**
+     * Checks if the conversion script is modified since last harvest. Uses the instance variable 'sourceUrlString'
+     * and 'lastHarvest'.
      *
-     * @return
-     * @throws ParserConfigurationException
+     * @return true if conversion script is modified. Can return null, and the caller must decide what that means.
+     * @throws ParserConfigurationException if the general config file is unparsable.
      * @throws SAXException
      * @throws IOException
      * @throws DAOException
@@ -654,7 +659,7 @@ public class VirtuosoPullHarvest extends Harvest {
      * @param contentType
      * @throws IOException
      * @throws SAXException
-     * @throws ParserConfigurationException
+     * @throws ParserConfigurationException if the general config file is unparsable.
      */
     private File preProcess(File file, String contentType) throws ParserConfigurationException, SAXException, IOException {
 
