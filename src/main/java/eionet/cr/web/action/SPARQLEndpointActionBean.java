@@ -86,7 +86,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     public Resolution execute() throws OpenRDFException {
 
         String acceptHeader = getContext().getRequest().getHeader("accept");
-        String[] accept = {null};
+        String[] accept = {""};
         if (acceptHeader != null && acceptHeader.length() > 0) {
             accept = acceptHeader.split(",");
             if (accept != null && accept.length > 0) {
@@ -95,12 +95,12 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         }
 
         // Check if ASK query
-        if ((accept != null && accept[0].equals("text/boolean")) || (inputMode != null && inputMode.equals("ASK"))) {
+        if (accept[0].equals("text/boolean") || (inputMode != null && inputMode.equals("ASK"))) {
             isAskQuery = true;
         }
 
         // Check if CONSTRUCT query
-        if ((accept != null && accept[0].equals("application/x-trig"))
+        if (accept[0].equals("application/x-trig")
                 || (query != null && (query.contains("construct") || query.contains("CONSTRUCT")))) {
             isConstructQuery = true;
             setInputMode("CONSTRUCT");
@@ -135,13 +135,13 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                     runQuery(newQuery, FORMAT_XML, response.getOutputStream());
                 }
             };
-        } else if (accept != null && xmlFormats.contains(accept[0])) {
+        } else if (xmlFormats.contains(accept[0])) {
             return new StreamingResolution("application/sparql-results+xml") {
                 public void stream(HttpServletResponse response) throws Exception {
                     runQuery(newQuery, FORMAT_XML, response.getOutputStream());
                 }
             };
-        } else if (accept != null && accept[0].equals("application/sparql-results+json")) {
+        } else if (accept[0].equals("application/sparql-results+json")) {
             return new StreamingResolution("application/sparql-results+json") {
                 public void stream(HttpServletResponse response) throws Exception {
                     runQuery(newQuery, FORMAT_JSON, response.getOutputStream());
