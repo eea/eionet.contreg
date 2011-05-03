@@ -309,7 +309,7 @@ public class PullHarvest extends Harvest {
                     setStoredTriplesCount(tripleCount);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                // We try to harvest XML files also, but if it fails, we do not throw an error.
             } finally {
                 deleteDownloadedFile(file);
                 deleteDownloadedFile(originalPath);
