@@ -25,14 +25,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Types;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-import javax.servlet.jsp.jstl.sql.SQLExecutionTag;
-
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -44,8 +40,6 @@ import eionet.cr.harvest.RDFHandler;
 import eionet.cr.harvest.persist.IHarvestPersister;
 import eionet.cr.harvest.persist.PersisterConfig;
 import eionet.cr.harvest.persist.PersisterException;
-import eionet.cr.harvest.persist.mysql.MySQLDerivationEngine;
-import eionet.cr.harvest.scheduled.HarvestingJob;
 import eionet.cr.harvest.util.HarvestLog;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Util;
@@ -61,8 +55,6 @@ import eionet.cr.util.sql.SQLUtil;
 public class PostgreSQLPersister implements IHarvestPersister {
 
     /** */
-    private String spoTempTableName = "SPO_TEMP";
-    private String resourceTempTableName = "RESOURCE_TEMP";
     private static final int TRIPLE_PROGRESS_INTERVAL = 50000;
     private static final int BULK_INSERT_SIZE = 50000;
 
@@ -72,8 +64,7 @@ public class PostgreSQLPersister implements IHarvestPersister {
     //fields initialized through PersisterConfig object
     private long sourceUrlHash;
     private long genTime;
-    private String instantHarvestUser;
-    private String sourceUrl;
+        private String sourceUrl;
 
     private Connection connection;
 
@@ -106,7 +97,6 @@ public class PostgreSQLPersister implements IHarvestPersister {
         sourceUrl = config.getSourceUrl();
         genTime = config.getGenTime();
         sourceUrlHash = config.getSourceUrlHash();
-        instantHarvestUser = config.getInstantHarvestUser();
 
         logger = new HarvestLog(config.getSourceUrl(), config.getGenTime(), LogFactory.getLog(this.getClass()));
     }

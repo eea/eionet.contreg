@@ -335,6 +335,9 @@ public class PullHarvest extends Harvest {
             List<String> newSources = DAOFactory.get().getDao(HarvestSourceDAO.class).getNewSources(sourceUrlString);
 
             for (String sourceUrl : newSources) {
+                // escape spaces in URLs
+                sourceUrl = URLUtil.replaceURLSpaces(sourceUrl);
+                
                 HarvestSourceDTO source = new HarvestSourceDTO();
                 source.setUrl(sourceUrl);
                 source.setUrlHash(Hashes.spoHash(sourceUrl));

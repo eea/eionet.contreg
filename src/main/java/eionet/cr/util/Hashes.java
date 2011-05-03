@@ -24,8 +24,6 @@ import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 
 import eionet.cr.common.CRRuntimeException;
-import eionet.cr.common.Predicates;
-import eionet.cr.common.Subjects;
 
 /**
  *
@@ -39,7 +37,7 @@ public class Hashes {
     /**
      *
      * @param s
-     * @return
+     * @return long
      */
     public static long spoHash(String s) {
         return Hashes.fnv64(s);
@@ -48,7 +46,8 @@ public class Hashes {
     /**
      *
      * @param s
-     * @return
+     * @param seed
+     * @return long
      */
     public static long spoHash(String s, long seed) {
         return Hashes.fnv64(s, seed);
@@ -82,7 +81,7 @@ public class Hashes {
     /**
      *
      * @param s
-     * @return
+     * @return String
      */
     public static String md5(String s) {
         return Hashes.digest(s, "md5");
@@ -92,7 +91,7 @@ public class Hashes {
      *
      * @param src
      * @param algorithm
-     * @return
+     * @return String
      */
     public static String digest(String src, String algorithm) {
 
@@ -112,7 +111,6 @@ public class Hashes {
         StringBuffer buf = new StringBuffer();
         for (int i = 0; i < dstBytes.length; i++) {
             Byte byteWrapper = new Byte(dstBytes[i]);
-            int k = byteWrapper.intValue();
             String s = Integer.toHexString(byteWrapper.intValue());
             if (s.length() == 1) s = "0" + s;
             buf.append(s.substring(s.length() - 2));

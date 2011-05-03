@@ -20,7 +20,10 @@
  */
 package eionet.cr.dao.util;
 
+import java.net.MalformedURLException;
+
 import eionet.cr.util.URIUtil;
+import eionet.cr.util.URLUtil;
 
 /**
  *
@@ -48,13 +51,24 @@ public class SearchExpression {
             Long.parseLong(expression);
             isHash = true;
         } catch (NumberFormatException nfe) {}
+        
+        // Escape spaces
+        String escapedExpression = null;
+        try {
+            escapedExpression = URLUtil.replaceURLSpaces(expression);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
 
-        isUri = URIUtil.isSchemedURI(expression);
+        isUri = URIUtil.isSchemedURI(escapedExpression);
+        if (isUri) {
+            expression = escapedExpression;
+        }
     }
 
     /**
      *
-     * @return
+     * @return boolean
      */
     public boolean isEmpty() {
         return expression.length() == 0;

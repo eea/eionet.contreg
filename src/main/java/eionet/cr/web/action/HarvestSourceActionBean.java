@@ -20,6 +20,7 @@
  */
 package eionet.cr.web.action;
 
+import java.net.MalformedURLException;
 import java.text.DecimalFormat;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -213,9 +214,10 @@ public class HarvestSourceActionBean extends AbstractActionBean {
      * @throws DAOException
      * @throws SchedulerException
      * @throws HarvestException
+     * @throws MalformedURLException
      */
     public Resolution add() throws DAOException, SchedulerException,
-            HarvestException {
+            HarvestException, MalformedURLException {
 
         Resolution resolution = new ForwardResolution("/pages/addsource.jsp");
         if (isUserLoggedIn()) {
@@ -226,6 +228,11 @@ public class HarvestSourceActionBean extends AbstractActionBean {
                     // create new harvest source
                     HarvestSourceDTO hSourceDTO = getHarvestSource();
                     if (hSourceDTO != null) {
+                        // escape spaces in URLs
+                        if (hSourceDTO.getUrl() != null) {
+                            hSourceDTO.setUrl(URLUtil.replaceURLSpaces(hSourceDTO.getUrl()));
+                        }
+                        
                         hSourceDTO.setOwner(getUserName());
                         // All Schema sources are also Priority sources
                         if (schemaSource) {

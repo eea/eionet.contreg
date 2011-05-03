@@ -25,6 +25,7 @@ import eionet.cr.dao.postgre.PostgreSQLHarvestSourceDAO;
 import eionet.cr.dao.readers.SubjectReader;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
+import eionet.cr.util.URLUtil;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
@@ -47,7 +48,7 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
         Connection sqlConn = null;
 
         try {
-            String sparql = "CLEAR GRAPH <" + url + ">";
+            String sparql = "CLEAR GRAPH <" + URLUtil.replaceURLSpaces(url) + ">";
 
             // TODO remove PostgreSQL calls when PostgreSQL time is over
             // 2 updates brought here together to handle rollbacks correctly in
@@ -64,7 +65,7 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
             // remove source metadata from http://cr.eionet.europa.eu/harvetser
             // graph
             ValueFactory fac = conn.getValueFactory();
-            URI subject = fac.createURI(url);
+            URI subject = fac.createURI(URLUtil.replaceURLSpaces(url));
             String deploymentHost = GeneralConfig.getRequiredProperty(GeneralConfig.DEPLOYMENT_HOST);
             URI context = fac.createURI(deploymentHost + "/harvester");
             conn.remove(subject, null, null, (Resource) context);

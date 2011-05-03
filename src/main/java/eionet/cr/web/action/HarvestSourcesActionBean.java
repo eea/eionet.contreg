@@ -20,6 +20,7 @@
  */
 package eionet.cr.web.action;
 
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -40,6 +41,7 @@ import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortOrder;
 import eionet.cr.util.SortingRequest;
+import eionet.cr.util.URLUtil;
 import eionet.cr.util.pagination.Pagination;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.web.util.columns.GenericColumn;
@@ -121,6 +123,11 @@ public class HarvestSourcesActionBean extends
         try {
             String filterString = null;
             if (!StringUtils.isEmpty(this.searchString)) {
+                try {
+                    this.searchString = URLUtil.replaceURLSpaces(this.searchString);
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                }
                 filterString = "%"
                         + StringEscapeUtils.escapeSql(this.searchString) + "%";
             }

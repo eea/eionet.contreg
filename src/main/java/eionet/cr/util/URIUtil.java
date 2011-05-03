@@ -32,7 +32,7 @@ import java.util.HashSet;
 public class URIUtil {
 
     /** */
-    private static HashSet schemes;
+    private static HashSet<String> schemes;
 
     /**
      * Returns true if the following conditions are all met:
@@ -44,7 +44,7 @@ public class URIUtil {
      * Otherwise returns false.
      *
      * @param str
-     * @return
+     * @return boolean
      */
     public static boolean isSchemedURI(String str) {
 
@@ -68,7 +68,7 @@ public class URIUtil {
     /**
      *
      * @param uri
-     * @return
+     * @return String
      */
     public static String extractURILabel(String uri) {
 
@@ -91,7 +91,7 @@ public class URIUtil {
      *
      * @param uri
      * @param dflt
-     * @return
+     * @return String
      */
     public static String extractURILabel(String uri, String dflt) {
 
@@ -115,7 +115,7 @@ public class URIUtil {
      */
     private static synchronized void initSchemes() {
 
-        schemes = new HashSet();
+        schemes = new HashSet<String>();
 
         // schemes as specified by [RFC4395] (see http://www.iana.org/assignments/uri-schemes.html)
         schemes.add("aaa");
