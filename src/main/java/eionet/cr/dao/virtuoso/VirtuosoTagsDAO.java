@@ -19,7 +19,7 @@ public class VirtuosoTagsDAO extends VirtuosoBaseDAO implements TagsDAO {
      */
     public static final String GET_TAGS_WITH_FREQUENCIES_SPARQL = "define input:inference '"
             + GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME)
-            + "' SELECT ?o (count(distinct ?o) as ?c) WHERE { ?s <" + Predicates.CR_TAG + "> ?o "
+            + "' SELECT ?o (count(?o) as ?c) WHERE { ?s <" + Predicates.CR_TAG + "> ?o "
             + "} ORDER BY DESC(?c)";
 
     /**

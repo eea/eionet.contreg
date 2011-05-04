@@ -8,7 +8,6 @@ import org.apache.log4j.Logger;
 import org.openrdf.repository.RepositoryConnection;
 
 import eionet.cr.common.Predicates;
-import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.SQLBaseDAO;
 import eionet.cr.dao.readers.SubjectDataReader;
@@ -156,9 +155,8 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO {
         }
 
         StringBuilder strBuilder = new StringBuilder().append(
-                //TODO - put it back if issue with inferencing is clear
-                "define input:inference '").append(GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME)).append(
-                "' select * where {graph ?g {?s ?p ?o. ").append(
+                //"define input:inference '").append(GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME)).append(
+                "select * where {graph ?g {?s ?p ?o. ").append(
                 "filter (?s IN (");
 
         int i = 0;
