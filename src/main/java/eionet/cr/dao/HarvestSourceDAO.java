@@ -98,7 +98,12 @@ public interface HarvestSourceDAO extends DAO {
     public HarvestSourceDTO getHarvestSourceByUrl(String url) throws DAOException;
 
     /**
-     * @return Long
+     * Calculate the number of sources that need harvesting. Harvesting is done on a priority basis.
+     * The priority score is calculated based on how many minutes ago the source was last harvested
+     * divided by how often it must be harvested. Any source with a priority score of 1.0 or above 
+     * needs to be harvested.
+     *
+     * @return number of sources to be harvested.
      * @throws DAOException
      */
     public Long getUrgencySourcesCount() throws DAOException;
