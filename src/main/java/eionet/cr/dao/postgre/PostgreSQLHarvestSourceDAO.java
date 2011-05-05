@@ -539,9 +539,8 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
             + " order by extract(epoch from now()-(coalesce(LAST_HARVEST,"
             + "(TIME_CREATED - INTERVAL_MINUTES * interval '1 minute')))) / (INTERVAL_MINUTES*60)" + " desc limit ?";
 
-    /**
-     * List the next batch of sources to harvest. We calculate how many sources we need to harvest in this round, then find the ones
-     * with the highest priority.
+    /*
+     * (non-Javadoc)
      *
      * @see eionet.cr.harvest.scheduled.HarvestingJob#getNextScheduledSources()
      * @see eionet.cr.dao.HarvestSourceDAO#getNextScheduledSources(int)

@@ -47,7 +47,7 @@ public interface HarvestSourceDAO extends DAO {
      * @param pagingRequest
      * @param sortingRequest
      * @return list of harvesting sources (excluding unavailable sources and tracked files)
-     * @throws DAOException
+     * @throws DAOException if relational database is unavailable.
      */
     Pair<Integer, List<HarvestSourceDTO>> getHarvestSources(String searchString, PagingRequest pagingRequest,
             SortingRequest sortingRequest) throws DAOException;
@@ -57,7 +57,7 @@ public interface HarvestSourceDAO extends DAO {
      * @param pagingRequest
      * @param sortingRequest
      * @return list of priority sources
-     * @throws DAOException
+     * @throws DAOException if relational database is unavailable.
      */
     Pair<Integer, List<HarvestSourceDTO>> getPrioritySources(String searchString, PagingRequest pagingRequest,
             SortingRequest sortingRequest) throws DAOException;
@@ -67,7 +67,7 @@ public interface HarvestSourceDAO extends DAO {
      * @param pagingRequest
      * @param sortingRequest
      * @return list of unavailable harvest sources
-     * @throws DAOException
+     * @throws DAOException if relational database is unavailable.
      */
     Pair<Integer, List<HarvestSourceDTO>> getHarvestSourcesUnavailable(String searchString, PagingRequest pagingRequest,
             SortingRequest sortingRequest) throws DAOException;
@@ -77,7 +77,7 @@ public interface HarvestSourceDAO extends DAO {
      * @param pagingRequest
      * @param sortingRequest
      * @return Pair<Integer, List<HarvestSourceDTO>>
-     * @throws DAOException
+     * @throws DAOException if relational database is unavailable.
      */
     Pair<Integer, List<HarvestSourceDTO>> getHarvestSourcesFailed(String searchString, PagingRequest pagingRequest,
             SortingRequest sortingRequest) throws DAOException;
@@ -85,7 +85,7 @@ public interface HarvestSourceDAO extends DAO {
     /**
      * @param harvestSourceID
      * @return harvesting sources
-     * @throws DAOException
+     * @throws DAOException if relational database is unavailable.
      */
     public HarvestSourceDTO getHarvestSourceById(Integer harvestSourceID) throws DAOException;
 
@@ -93,18 +93,18 @@ public interface HarvestSourceDAO extends DAO {
      *
      * @param url
      * @return HarvestSourceDTO
-     * @throws DAOException
+     * @throws DAOException if relational database is unavailable.
      */
     public HarvestSourceDTO getHarvestSourceByUrl(String url) throws DAOException;
 
     /**
      * Calculate the number of sources that need harvesting. Harvesting is done on a priority basis.
      * The priority score is calculated based on how many minutes ago the source was last harvested
-     * divided by how often it must be harvested. Any source with a priority score of 1.0 or above 
+     * divided by how often it must be harvested. Any source with a priority score of 1.0 or above
      * needs to be harvested.
      *
      * @return number of sources to be harvested.
-     * @throws DAOException
+     * @throws DAOException if relational database is unavailable.
      */
     public Long getUrgencySourcesCount() throws DAOException;
 
@@ -112,20 +112,20 @@ public interface HarvestSourceDAO extends DAO {
      *
      * @param source
      * @return Integer
-     * @throws DAOException
+     * @throws DAOException if relational database is unavailable.
      */
     public Integer addSource(HarvestSourceDTO source) throws DAOException;
 
     /**
      *
      * @param source
-     * @throws DAOException
+     * @throws DAOException if relational database is unavailable.
      */
     public void addSourceIgnoreDuplicate(HarvestSourceDTO source) throws DAOException;
 
     /**
      * @param source
-     * @throws DAOException
+     * @throws DAOException if relational database is unavailable.
      */
     public void editSource(HarvestSourceDTO source) throws DAOException;
 
@@ -134,13 +134,13 @@ public interface HarvestSourceDAO extends DAO {
      *
      * @param urls
      *            - urls to add
-     * @throws DAOException
+     * @throws DAOException if relational database is unavailable.
      */
     public void queueSourcesForDeletion(List<String> urls) throws DAOException;
 
     /**
      * @return List<String>
-     * @throws DAOException
+     * @throws DAOException if relational database is unavailable.
      *             fetches all scheduled source URLs, which are scheduled for removal.
      */
     List<String> getScheduledForDeletion() throws DAOException;
@@ -150,7 +150,7 @@ public interface HarvestSourceDAO extends DAO {
      *
      * @param url
      *            - source url
-     * @throws DAOException
+     * @throws DAOException if relational database is unavailable.
      */
     public void deleteSourceByUrl(String url) throws DAOException;
 
@@ -163,44 +163,46 @@ public interface HarvestSourceDAO extends DAO {
      * @param failed
      * @param permanentError
      * @param lastHarvest
-     * @throws DAOException
+     * @throws DAOException if relational database is unavailable.
      */
     public void updateHarvestFinished(int sourceId, Integer numStatements, Boolean sourceAvailable, boolean failed,
             boolean permanentError, Timestamp lastHarvest) throws DAOException;
 
     /**
+     * Get a list of sources to harvest in the next harvesting round. The result is ordered with highest priority first.
      *
-     * @param limit
+     * @param limit - max number of sources to return.
      * @return List<HarvestSourceDTO>
-     * @throws DAOException
+     * @throws DAOException if relational database is unavailable.
      */
     public List<HarvestSourceDTO> getNextScheduledSources(int limit) throws DAOException;
 
     /**
-     * deletes orphans from SPO table. Orphan is a record inside SPO, which has an non-existent source in HARVEST_SOURCE.
+     * Deletes orphans from SPO table. Orphan is a record inside SPO, which has an non-existent source in HARVEST_SOURCE.
      *
-     * @throws DAOException
+     * @throws DAOException if relational database is unavailable.
      *
      */
     void deleteTriplesOfMissingSources() throws DAOException;
 
     /**
      * @param neededToRemain
-     * @throws DAOException
+     * @throws DAOException if relational database is unavailable.
      */
     void deleteHarvestHistory(int neededToRemain) throws DAOException;
 
     /**
+     * Calculate the urgency score for one source.
      *
-     * @param harvestSourceId
-     * @return urgencyScore
-     * @throws DAOException
+     * @param harvestSourceId - primary key in table.
+     * @return urgencyScore - Urgency score. If over 1.0, then the source is due to be harvested.
+     * @throws DAOException if relational database is unavailable.
      */
     public double getUrgencyScore(int harvestSourceId) throws DAOException;
 
     /**
      * @return String
-     * @throws DAOException
+     * @throws DAOException if relational database is unavailable.
      */
     String getSourcesInInferenceRules() throws DAOException;
 
@@ -210,7 +212,7 @@ public interface HarvestSourceDAO extends DAO {
      * @param sortingRequest
      * @param sourceUris
      * @return Pair<Integer, List<HarvestSourceDTO>>
-     * @throws DAOException
+     * @throws DAOException if relational database is unavailable.
      */
     Pair<Integer, List<HarvestSourceDTO>> getInferenceSources(String searchString, PagingRequest pagingRequest,
             SortingRequest sortingRequest, String sourceUris) throws DAOException;
@@ -218,21 +220,25 @@ public interface HarvestSourceDAO extends DAO {
     /**
      * @param url
      * @return boolean
-     * @throws DAOException
+     * @throws DAOException if relational database is unavailable.
      */
     boolean isSourceInInferenceRule(String url) throws DAOException;
 
     /**
+     * Add a source to the default inference rule. The name of the default is read from the config file.
+     *
      * @param url
      * @return boolean
-     * @throws DAOException
+     * @throws DAOException if relational database is unavailable.
      */
     boolean addSourceIntoInferenceRule(String url) throws DAOException;
 
     /**
+     * Remove a source from the default inference rule. The name of the default is read from the config file.
+     *
      * @param url
      * @return boolean
-     * @throws DAOException
+     * @throws DAOException if relational database is unavailable.
      */
     boolean removeSourceFromInferenceRule(String url) throws DAOException;
 
@@ -242,8 +248,8 @@ public interface HarvestSourceDAO extends DAO {
      * @param file
      * @param sourceUrlString
      * @return int
-     * @throws DAOException
-     * @throws RepositoryException
+     * @throws DAOException if relational database is unavailable.
+     * @throws RepositoryException if data repository is unavailable.
      * @throws RDFParseException
      * @throws IOException
      */
@@ -251,12 +257,12 @@ public interface HarvestSourceDAO extends DAO {
             RDFParseException, IOException;
 
     /**
-     * Adds the meta information the harvester has collected about the source. The meta data is considered part of the harvester and
-     * not the source. Therefore the meta data is stored in the harvester's named graph (or context)
+     * Adds the meta information the harvester has collected about the source. The meta data is considered part of the
+     * harvester and not the source. Therefore the meta data is stored in the harvester's named graph (or context).
      *
      * @param sourceMetadata
-     * @throws DAOException
-     * @throws RepositoryException
+     * @throws DAOException if relational database is unavailable.
+     * @throws RepositoryException if data repository is unavailable.
      * @throws RDFParseException
      * @throws IOException
      */
@@ -266,10 +272,10 @@ public interface HarvestSourceDAO extends DAO {
     /**
      * Returns new harvest sources found by HarvestingJob.
      *
-     * @param sourceUrl
-     * @return List<String>
-     * @throws DAOException
-     * @throws RepositoryException
+     * @param sourceUrl - The newly harvested source, which can contain new resources of cr:File type.
+     * @return List<String> - List of new sources in form of URLs.
+     * @throws DAOException if relational database is unavailable.
+     * @throws RepositoryException if data repository is unavailable.
      * @throws RDFParseException
      * @throws IOException
      */
@@ -281,8 +287,8 @@ public interface HarvestSourceDAO extends DAO {
      * @param subject
      * @param predicate
      * @return String
-     * @throws DAOException
-     * @throws RepositoryException
+     * @throws DAOException if relational database is unavailable.
+     * @throws RepositoryException if data repository is unavailable.
      * @throws IOException
      */
     public String getSourceMetadata(String subject, String predicate) throws DAOException, RepositoryException, IOException;
@@ -290,20 +296,21 @@ public interface HarvestSourceDAO extends DAO {
     /**
      * Inserts given metadata into /harvester context.
      *
-     * @param subject
-     * @param predicate
-     * @param object
-     * @throws DAOException
-     * @throws RepositoryException
+     * @param subject URL of the source.
+     * @param predicate URL of property.
+     * @param object value to  insert.
+     * @throws DAOException if relational database is unavailable.
+     * @throws RepositoryException if data repository is unavailable.
      * @throws IOException
      */
-    public void insertUpdateSourceMetadata(String subject, String predicate, ObjectDTO object) throws DAOException, RepositoryException, IOException;
+    public void insertUpdateSourceMetadata(String subject, String predicate, ObjectDTO object)
+            throws DAOException, RepositoryException, IOException;
 
     /**
      * @param url
      * @param lastHarvest
      * @param failed
-     * @throws DAOException
+     * @throws DAOException if relational database is unavailable.
      */
     public void editRedirectedSource(String url, Timestamp lastHarvest, boolean failed) throws DAOException;
 
@@ -311,8 +318,8 @@ public interface HarvestSourceDAO extends DAO {
      * Removes all predicates from /harvester context for given subject.
      *
      * @param subject
-     * @throws DAOException
-     * @throws RepositoryException
+     * @throws DAOException if relational database is unavailable.
+     * @throws RepositoryException if data repository is unavailable.
      * @throws IOException
      */
     public void removeAllPredicatesFromHarvesterContext(String subject) throws DAOException, RepositoryException, IOException;
@@ -321,15 +328,15 @@ public interface HarvestSourceDAO extends DAO {
      * Removes all triples for given source. Doesn't remove triples from /harvester context.
      *
      * @param url
-     * @throws DAOException
+     * @throws DAOException if relational database is unavailable.
      */
     public void deleteSourceTriples(String url) throws DAOException;
 
     /**
-     * Increases COUNT_UNAVAIL by 1
+     * Increases COUNT_UNAVAIL by 1.
      *
      * @param sourceId
-     * @throws DAOException
+     * @throws DAOException if relational database is unavailable.
      */
     public void increaseUnavailableCount(int sourceId) throws DAOException;
 
@@ -354,7 +361,7 @@ public interface HarvestSourceDAO extends DAO {
     * Updates source LAST_HARVEST date.
     * @param sourceUrl
     * @param lastHarvest
-    * @throws DAOException
+    * @throws DAOException if relational database is unavailable.
     */
    public void updateLastHarvest(String sourceUrl, Timestamp lastHarvest) throws DAOException;
 
