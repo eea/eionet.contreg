@@ -178,10 +178,13 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
         return (list != null && !list.isEmpty()) ? list.get(0) : null;
     }
 
-    /** */
+    /**
+     * Calculation of number of sources needed to be harvested in MySQL syntax.
+     * (Current query is in PostgreSQL syntax.)
+     */
     private static final String URGENCY_SOURCES_COUNT = "select count(*) from HARVEST_SOURCE where"
             + " INTERVAL_MINUTES>0 AND (extract(epoch from now()-(coalesce(LAST_HARVEST,(TIME_CREATED -"
-            + " INTERVAL_MINUTES * interval '1 minute')))) / (INTERVAL_MINUTES*60)) > 1.0";
+            + " INTERVAL_MINUTES * interval '1 minute')))) / (INTERVAL_MINUTES*60)) >= 1.0";
 
     /*
      * (non-Javadoc)

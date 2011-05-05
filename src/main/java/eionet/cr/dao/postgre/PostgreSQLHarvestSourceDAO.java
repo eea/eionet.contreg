@@ -193,10 +193,12 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
         return new Pair<Integer, List<HarvestSourceDTO>>(rowCount, list);
     }
 
-    /** */
+    /**
+     * Calculation of number of sources needed to be harvested in PostgreSQL syntax. 
+     */
     private static final String URGENCY_SOURCES_COUNT = "select count(*) from HARVEST_SOURCE where"
             + " INTERVAL_MINUTES>0 AND (extract(epoch from now()-(coalesce(LAST_HARVEST,(TIME_CREATED -"
-            + " INTERVAL_MINUTES * interval '1 minute')))) / (INTERVAL_MINUTES*60)) > 1.0";
+            + " INTERVAL_MINUTES * interval '1 minute')))) / (INTERVAL_MINUTES*60)) >= 1.0";
 
     /*
      * (non-Javadoc)
@@ -217,7 +219,9 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
         }
     }
 
-    /** */
+    /**
+     * Insert a record into the the table of harvest sources in PostgreSQL syntax.
+     */
     private static final String ADD_SOURCE_SQL = "insert into HARVEST_SOURCE"
             + " (URL,URL_HASH,EMAILS,TIME_CREATED,INTERVAL_MINUTES,PRIORITY_SOURCE,SOURCE_OWNER)"
             + " VALUES (?,?,?,NOW(),?,cast(? as ynboolean),?)";
