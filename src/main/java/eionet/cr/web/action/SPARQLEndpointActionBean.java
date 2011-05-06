@@ -6,6 +6,7 @@ import java.io.OutputStreamWriter;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -65,7 +66,6 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     private String query;
     private String newQuery;
     private String format;
-    private String inputMode;
     private int nrOfHits;
     private long executionTime;
 
@@ -95,15 +95,13 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         }
 
         // Check if ASK query
-        if (accept[0].equals("text/boolean") || (inputMode != null && inputMode.equals("ASK"))) {
+        if (accept[0].equals("text/boolean") || isQuery("ASK")) {
             isAskQuery = true;
         }
 
         // Check if CONSTRUCT query
-        if (accept[0].equals("application/x-trig")
-                || (query != null && (query.contains("construct") || query.contains("CONSTRUCT")))) {
+        if (accept[0].equals("application/x-trig") || isQuery("CONSTRUCT")) {
             isConstructQuery = true;
-            setInputMode("CONSTRUCT");
         }
 
         // If CONSTRUCT query, but output format is HTML then evaluate as simple SELECT query
@@ -153,6 +151,19 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             }
             return new ForwardResolution(FORM_PAGE);
         }
+    }
+    
+    private boolean isQuery(String type) {
+        if (!StringUtils.isBlank(type) && !StringUtils.isBlank(query)) {
+            StringTokenizer st = new StringTokenizer(query);
+            while (st.hasMoreElements()) {
+                String token = st.nextToken();
+                if (token.toLowerCase().startsWith(type.toLowerCase())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private void runQuery(String query, String format, OutputStream out) {
@@ -295,20 +306,16 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         this.useInferencing = useInferencing;
     }
 
-    public String getInputMode() {
-        return inputMode;
-    }
-
-    public void setInputMode(String inputMode) {
-        this.inputMode = inputMode;
-    }
-
     public String getResultAsk() {
         return resultAsk;
     }
 
     public void setResultAsk(String resultAsk) {
         this.resultAsk = resultAsk;
+    }
+
+    public boolean isAskQuery() {
+        return isAskQuery;
     }
 
 }
