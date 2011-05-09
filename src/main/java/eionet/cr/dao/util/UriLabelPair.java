@@ -68,12 +68,15 @@ public class UriLabelPair implements Comparable {
         // throw ClassCastException if (o instanceof UriLabelPair) == false
         UriLabelPair otherOption = (UriLabelPair)o;
 
-        if (otherOption == null)
+        if (otherOption == null){
             return 1;
-        else if (label == null)
+        }
+        else if (label == null){
             return otherOption.getLabel() == null ? 0 : -1;
-        else
-            return label.compareTo(otherOption.getLabel());
+        }
+        else{
+            return label.compareToIgnoreCase(otherOption.getLabel());
+        }
     }
 
     /*

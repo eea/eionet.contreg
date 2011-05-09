@@ -24,6 +24,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.openrdf.model.Value;
+import org.openrdf.query.BindingSet;
+
+import eionet.cr.dao.readers.ResultSetMixedReader;
 import eionet.cr.dao.readers.ResultSetReaderException;
 import eionet.cr.util.Pair;
 
@@ -31,10 +35,15 @@ import eionet.cr.util.Pair;
  * @author Aleksandr Ivanov
  * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
-public class PairReader<T, T1> extends SQLResultSetBaseReader<Pair<T, T1>> {
+public class PairReader<T, T1> extends ResultSetMixedReader<Pair<T, T1>> {
 
-    /** */
+    /**
+     * Field name for left column in query.
+     */
     public static final String LEFTCOL = "LCOL";
+    /**
+     * Field name for right column in query.
+     */
     public static final String RIGHTCOL = "RCOL";
 
     /**
@@ -54,6 +63,31 @@ public class PairReader<T, T1> extends SQLResultSetBaseReader<Pair<T, T1>> {
     @SuppressWarnings("unchecked")
     public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
         resultList.add(new Pair<T, T1>((T)rs.getObject(LEFTCOL), (T1)rs.getObject(RIGHTCOL)));
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see
+     * eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public void readRow(BindingSet bindingSet) {
+        if (bindingSet != null && bindingSet.size() > 0) {
+            Value lcol = bindingSet.getValue(LEFTCOL);
+            Value rcol = bindingSet.getValue(RIGHTCOL);
+            String strLcol = "", strRCol = "";
+            if (lcol != null) {
+                strLcol = lcol.stringValue();
+            }
+            if (rcol != null) {
+                strRCol = rcol.stringValue();
+            }
+
+            resultList.add(new Pair<T, T1>((T)strLcol, (T1)strRCol));
+        }
+
     }
 
 }

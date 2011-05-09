@@ -12,6 +12,7 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 
+import eionet.cr.common.Namespace;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.dao.DAOException;
@@ -189,8 +190,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     /*
      * (non-Javadoc)
      *
-     * @see eionet.cr.dao.HelperDAO#addResource(java.lang.String,
-     * java.lang.String)
+     * @see eionet.cr.dao.HelperDAO#addResource(java.lang.String, java.lang.String)
      */
     @Override
     public void addResource(String uri, String sourceUri) throws DAOException {
@@ -198,15 +198,48 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
     }
 
-    /*
-     * (non-Javadoc)
+    /**
      *
-     * @see eionet.cr.dao.HelperDAO#getAddibleProperties(java.util.Collection)
+     * @param subjectTypes
+     * @return the list of properties that can be added by user.
+     * @throws DAOException
      */
-    @Override
-    public HashMap<String, String> getAddibleProperties(
-            Collection<String> subjectTypes) throws DAOException {
-        throw new UnsupportedOperationException("Method not implemented");
+    public HashMap<String, String> getAddibleProperties(Collection<String> subjectTypes)
+                                                                        throws DAOException {
+
+        HashMap<String, String> result = new HashMap<String, String>();
+
+        StringBuilder strBuilder = new StringBuilder();
+        strBuilder
+                .append("PREFIX rdf: <")
+                .append(Namespace.RDF.getUri())
+                .append("> PREFIX rdfs: <")
+                .append(Namespace.RDFS.getUri())
+                .append("> select distinct ?object ?label where {?object rdfs:label ?label . ?object rdf:type rdf:Property . ?object rdfs:isDefinedBy <")
+                .append(Subjects.DUBLIN_CORE_SOURCE_URL).append(">}");
+
+        ObjectLabelReader reader = new ObjectLabelReader(true);
+        executeSPARQL(strBuilder.toString(), reader);
+
+        /* get the properties for given subject types */
+        if (subjectTypes != null && !subjectTypes.isEmpty()) {
+
+            strBuilder = new StringBuilder();
+            strBuilder
+                    .append("PREFIX rdfs: <")
+                    .append(Namespace.RDFS.getUri())
+                    .append("> select distinct ?object ?label WHERE { ?object rdfs:label ?label . ?object rdfs:domain ?o . FILTER (?o IN (")
+                    .append(Util.sparqlUrisToCsv(subjectTypes)).append("))}");
+
+            executeSPARQL(strBuilder.toString(), reader);
+        }
+
+        if (reader != null && reader.getResultList() != null) {
+            for (ObjectLabelPair objectLabelPair : reader.getResultList()) {
+                result.put(objectLabelPair.getLeft(), objectLabelPair.getRight());
+            }
+        }
+        return result;
 
     }
 
@@ -454,25 +487,24 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
      *
      * @see eionet.cr.dao.HelperDAO#getLatestHarvestedURLs(int)
      */
-//    @Override
-//    public Pair<Integer, List<HarvestedUrlCountDTO>> getLatestHarvestedURLs(
-//            int days) throws DAOException {
-//        throw new UnsupportedOperationException("Method not implemented");
-//
-//    }
+    // @Override
+    // public Pair<Integer, List<HarvestedUrlCountDTO>> getLatestHarvestedURLs(
+    // int days) throws DAOException {
+    // throw new UnsupportedOperationException("Method not implemented");
+    //
+    // }
 
-//    /*
-//     * (non-Javadoc)
-//     *
-//     * @see eionet.cr.dao.HelperDAO#getUrgencyOfComingHarvests(int)
-//     */
-//    @Override
-//    public Pair<Integer, List<HarvestUrgencyScoreDTO>> getUrgencyOfComingHarvests(
-//            int amount) throws DAOException {
-//        throw new UnsupportedOperationException("Method not implemented");
-//
-//    }
-
+    // /*
+    // * (non-Javadoc)
+    // *
+    // * @see eionet.cr.dao.HelperDAO#getUrgencyOfComingHarvests(int)
+    // */
+    // @Override
+    // public Pair<Integer, List<HarvestUrgencyScoreDTO>> getUrgencyOfComingHarvests(
+    // int amount) throws DAOException {
+    // throw new UnsupportedOperationException("Method not implemented");
+    //
+    // }
 
     /*
      * (non-Javadoc)
@@ -488,9 +520,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     /*
      * (non-Javadoc)
      *
-     * @see
-     * eionet.cr.dao.HelperDAO#registerUserUrl(eionet.cr.web.security.CRUser,
-     * java.lang.String, boolean)
+     * @see eionet.cr.dao.HelperDAO#registerUserUrl(eionet.cr.web.security.CRUser, java.lang.String, boolean)
      */
     @Override
     public void registerUserUrl(CRUser user, String url, boolean isBookmark)
@@ -502,9 +532,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     /*
      * (non-Javadoc)
      *
-     * @see
-     * eionet.cr.dao.HelperDAO#addUserBookmark(eionet.cr.web.security.CRUser,
-     * java.lang.String)
+     * @see eionet.cr.dao.HelperDAO#addUserBookmark(eionet.cr.web.security.CRUser, java.lang.String)
      */
     @Override
     public void addUserBookmark(CRUser user, String url) throws DAOException {
@@ -515,9 +543,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     /*
      * (non-Javadoc)
      *
-     * @see
-     * eionet.cr.dao.HelperDAO#deleteUserBookmark(eionet.cr.web.security.CRUser,
-     * java.lang.String)
+     * @see eionet.cr.dao.HelperDAO#deleteUserBookmark(eionet.cr.web.security.CRUser, java.lang.String)
      */
     @Override
     public void deleteUserBookmark(CRUser user, String url) throws DAOException {
@@ -528,8 +554,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     /*
      * (non-Javadoc)
      *
-     * @see
-     * eionet.cr.dao.HelperDAO#getUserBookmarks(eionet.cr.web.security.CRUser)
+     * @see eionet.cr.dao.HelperDAO#getUserBookmarks(eionet.cr.web.security.CRUser)
      */
     @Override
     public List<UserBookmarkDTO> getUserBookmarks(CRUser user)
@@ -541,9 +566,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     /*
      * (non-Javadoc)
      *
-     * @see
-     * eionet.cr.dao.HelperDAO#isSubjectUserBookmark(eionet.cr.web.security.
-     * CRUser, long)
+     * @see eionet.cr.dao.HelperDAO#isSubjectUserBookmark(eionet.cr.web.security. CRUser, long)
      */
     @Override
     public boolean isSubjectUserBookmark(CRUser user, long subjectHash)
@@ -557,9 +580,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     /*
      * (non-Javadoc)
      *
-     * @see
-     * eionet.cr.dao.HelperDAO#updateUserHistory(eionet.cr.web.security.CRUser,
-     * java.lang.String)
+     * @see eionet.cr.dao.HelperDAO#updateUserHistory(eionet.cr.web.security.CRUser, java.lang.String)
      */
     @Override
     public void updateUserHistory(CRUser user, String url) throws DAOException {
@@ -570,8 +591,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     /*
      * (non-Javadoc)
      *
-     * @see
-     * eionet.cr.dao.HelperDAO#getUserHistory(eionet.cr.web.security.CRUser)
+     * @see eionet.cr.dao.HelperDAO#getUserHistory(eionet.cr.web.security.CRUser)
      */
     @Override
     public List<UserHistoryDTO> getUserHistory(CRUser user) throws DAOException {
@@ -582,8 +602,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     /*
      * (non-Javadoc)
      *
-     * @see eionet.cr.dao.HelperDAO#getSampleTriplesInSource(java.lang.String,
-     * eionet.cr.util.pagination.PagingRequest)
+     * @see eionet.cr.dao.HelperDAO#getSampleTriplesInSource(java.lang.String, eionet.cr.util.pagination.PagingRequest)
      */
     @Override
     public List<TripleDTO> getSampleTriplesInSource(String sourceUrl,
@@ -601,9 +620,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     /*
      * (non-Javadoc)
      *
-     * @see
-     * eionet.cr.dao.HelperDAO#generateNewReviewId(eionet.cr.web.security.CRUser
-     * )
+     * @see eionet.cr.dao.HelperDAO#generateNewReviewId(eionet.cr.web.security.CRUser )
      */
     @Override
     public int generateNewReviewId(CRUser user) throws DAOException {
@@ -614,8 +631,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     /*
      * (non-Javadoc)
      *
-     * @see
-     * eionet.cr.dao.HelperDAO#getLastReviewId(eionet.cr.web.security.CRUser)
+     * @see eionet.cr.dao.HelperDAO#getLastReviewId(eionet.cr.web.security.CRUser)
      */
     @Override
     public int getLastReviewId(CRUser user) throws DAOException {
@@ -626,8 +642,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     /*
      * (non-Javadoc)
      *
-     * @see eionet.cr.dao.HelperDAO#addReview(eionet.cr.dto.ReviewDTO,
-     * eionet.cr.web.security.CRUser)
+     * @see eionet.cr.dao.HelperDAO#addReview(eionet.cr.dto.ReviewDTO, eionet.cr.web.security.CRUser)
      */
     @Override
     public int addReview(ReviewDTO review, CRUser user) throws DAOException {
@@ -638,8 +653,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     /*
      * (non-Javadoc)
      *
-     * @see eionet.cr.dao.HelperDAO#saveReview(int, eionet.cr.dto.ReviewDTO,
-     * eionet.cr.web.security.CRUser)
+     * @see eionet.cr.dao.HelperDAO#saveReview(int, eionet.cr.dto.ReviewDTO, eionet.cr.web.security.CRUser)
      */
     @Override
     public void saveReview(int reviewId, ReviewDTO review, CRUser user)
@@ -662,8 +676,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     /*
      * (non-Javadoc)
      *
-     * @see eionet.cr.dao.HelperDAO#getReview(eionet.cr.web.security.CRUser,
-     * int)
+     * @see eionet.cr.dao.HelperDAO#getReview(eionet.cr.web.security.CRUser, int)
      */
     @Override
     public ReviewDTO getReview(CRUser user, int reviewId) throws DAOException {
@@ -674,9 +687,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     /*
      * (non-Javadoc)
      *
-     * @see
-     * eionet.cr.dao.HelperDAO#getReviewAttachmentList(eionet.cr.web.security
-     * .CRUser, int)
+     * @see eionet.cr.dao.HelperDAO#getReviewAttachmentList(eionet.cr.web.security .CRUser, int)
      */
     @Override
     public List<String> getReviewAttachmentList(CRUser user, int reviewId)
@@ -688,8 +699,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     /*
      * (non-Javadoc)
      *
-     * @see eionet.cr.dao.HelperDAO#deleteReview(eionet.cr.web.security.CRUser,
-     * int, boolean)
+     * @see eionet.cr.dao.HelperDAO#deleteReview(eionet.cr.web.security.CRUser, int, boolean)
      */
     @Override
     public void deleteReview(CRUser user, int reviewId,
@@ -701,9 +711,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     /*
      * (non-Javadoc)
      *
-     * @see
-     * eionet.cr.dao.HelperDAO#deleteAttachment(eionet.cr.web.security.CRUser,
-     * int, java.lang.String)
+     * @see eionet.cr.dao.HelperDAO#deleteAttachment(eionet.cr.web.security.CRUser, int, java.lang.String)
      */
     @Override
     public void deleteAttachment(CRUser user, int reviewId, String attachmentUri)
@@ -750,8 +758,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     /*
      * (non-Javadoc)
      *
-     * @see
-     * eionet.cr.dao.HelperDAO#getUserUploads(eionet.cr.web.security.CRUser)
+     * @see eionet.cr.dao.HelperDAO#getUserUploads(eionet.cr.web.security.CRUser)
      */
     @Override
     public Collection<UploadDTO> getUserUploads(CRUser crUser)
@@ -821,9 +828,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     /*
      * (non-Javadoc)
      *
-     * @see
-     * eionet.cr.dao.HelperDAO#outputSourceTriples(eionet.cr.dao.readers.RDFExporter
-     * )
+     * @see eionet.cr.dao.HelperDAO#outputSourceTriples(eionet.cr.dao.readers.RDFExporter )
      */
     @Override
     public void outputSourceTriples(RDFExporter reader) throws DAOException {
@@ -834,8 +839,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     /*
      * (non-Javadoc)
      *
-     * @see eionet.cr.dao.HelperDAO#deleteTriples(java.lang.String,
-     * java.lang.String, java.lang.String)
+     * @see eionet.cr.dao.HelperDAO#deleteTriples(java.lang.String, java.lang.String, java.lang.String)
      */
     @Override
     public void deleteTriples(String subjectUri, String predicateUri,

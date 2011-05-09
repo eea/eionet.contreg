@@ -355,6 +355,30 @@ public class Util {
     }
 
     /**
+    * Create a comma-separated list of tag enclosed URIs. The result can be used in sparql queries.
+    * eg.: [uri1,uri2,uri3] is transformed to <uri1>,<uri2>,<uri3>.
+    *
+    * @param uriList list of URIs
+    * @return comma separated list of tag enclosed URIs
+    */
+   public static String sparqlUrisToCsv(Collection<String> uriList) {
+
+       StringBuilder strBuilder = new StringBuilder();
+       if (uriList != null) {
+           for (String uri :  uriList) {
+
+               if (strBuilder.length() > 0) {
+                   strBuilder.append(",");
+               }
+               strBuilder.append("<");
+               strBuilder.append(uri);
+               strBuilder.append(">");
+           }
+       }
+       return strBuilder.toString();
+   }
+
+   /**
      *
      * @param s
      * @return
