@@ -53,7 +53,6 @@ import eionet.cr.dao.readers.DataflowPicklistReader;
 import eionet.cr.dao.readers.PredicateLabelsReader;
 import eionet.cr.dao.readers.RDFExporter;
 import eionet.cr.dao.readers.ResultSetReaderException;
-import eionet.cr.dao.readers.SubPropertiesReader;
 import eionet.cr.dao.readers.SubjectDataReader;
 import eionet.cr.dao.readers.TriplesReader;
 import eionet.cr.dao.readers.UploadDTOReader;
@@ -657,8 +656,9 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
      *
      * @see eionet.cr.dao.HelperDAO#getSubProperties(java.util.Set)
      */
-    public SubProperties getSubProperties(Set<Long> subjectHashes) throws DAOException {
-
+    public SubProperties getSubProperties(Collection<String> subjects) throws DAOException {
+        throw new DAOException("method not implemented.");
+        /*
         SubProperties subProperties = new SubProperties();
         if (subjectHashes != null && !subjectHashes.isEmpty()) {
 
@@ -674,6 +674,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
         }
 
         return subProperties;
+       */
     }
 
     /*
