@@ -146,7 +146,7 @@ public class FactsheetActionBean extends AbstractActionBean {
                 if (predLabels != null) {
                     predicateLabels = predLabels.getByLanguages(getAcceptedLanguages());
                 }
-                subProperties = helperDAO.getSubProperties(Collections.singleton(subjectHash));
+                subProperties = helperDAO.getSubProperties(subject.getPredicates().keySet());
 
                 logger.debug("Determining if the subject has content stored in database");
 

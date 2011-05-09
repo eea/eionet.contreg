@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.openrdf.repository.RepositoryConnection;
 
 import eionet.cr.common.Predicates;
+import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.SQLBaseDAO;
 import eionet.cr.dao.readers.SubjectDataReader;
@@ -84,18 +85,20 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO {
     }
 
     /**
-     * @param subjectUris
-     * @param predicateUris
-     * @return
+     * @param subjectUris subject URIs
+     * @param predicateUris array of needed predicate URIs
+     * @param reader subject reader
+     * @param graphUris set of graphs
+     * @return List<SubjectDTO> list of Subject data objects
      * @throws DAOException
      *             Default call of getSubjectsData() - SubjectDTO are created if
      *             not existing
      */
     protected List<SubjectDTO> getSubjectsData(final Collection<String> subjectUris,
-            final String[] predicateUris, SubjectDataReader reader,
+            final String[] predicateUris, final SubjectDataReader reader,
             final Collection<String> graphUris) throws DAOException {
         return getSubjectsData(subjectUris, predicateUris, reader, graphUris,
-                true);
+                true, false);
     }
 
     /**
@@ -105,12 +108,13 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO {
      * @param reader bindingset reader
      * @param graphUris Graphs which data is requested
      * @param createMissingDTOs  indicates if to create a SubjectDTO object if it does not exist
+     * @param useInferencing true if to use inferencing - (temporary until Virtuoso is fixed)
      * @return List<SubjectDTO> list of Subject data objects
      * @throws DAOException if query fails
      */
     protected List<SubjectDTO> getSubjectsData(final Collection<String> subjectUris,
             final String[] predicateUris, final SubjectDataReader reader,
-            final Collection<String> graphUris, final boolean createMissingDTOs)
+            final Collection<String> graphUris, final boolean createMissingDTOs, final boolean useInferencing)
             throws DAOException {
 
         if (subjectUris == null || subjectUris.isEmpty()) {
@@ -119,7 +123,7 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO {
         }
 
         String query = getSubjectsDataQuery(subjectUris, predicateUris,
-                graphUris);
+                graphUris, useInferencing);
         executeSPARQL(query, reader);
 
         Map<Long, SubjectDTO> subjectsMap = reader.getSubjectsMap();
@@ -144,19 +148,23 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO {
      * @param subjectUris - List of subjects the data is be queried
      * @param predicateUris - String [] list of predicates
      * @param graphUris - list of graphs where the data is queried (optional)
+     * @param useInferencing - if to use inferencing in the query
      * @return String SPARQL query
      */
     private String getSubjectsDataQuery(final Collection<String> subjectUris,
-            final String[] predicateUris, final Collection<String> graphUris) {
+            final String[] predicateUris, final Collection<String> graphUris, final boolean useInferencing) {
 
         if (subjectUris == null || subjectUris.isEmpty()) {
             throw new IllegalArgumentException(
                     "Subjects collection must not be null or empty!");
         }
 
-        StringBuilder strBuilder = new StringBuilder().append(
-                //"define input:inference '").append(GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME)).append(
-                "select * where {graph ?g {?s ?p ?o. ").append(
+        StringBuilder strBuilder = new StringBuilder();
+                if (useInferencing) {
+                    strBuilder.append("define input:inference '")
+                    .append(GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME)).append("' ");
+                }
+                strBuilder.append("select * where {graph ?g {?s ?p ?o. ").append(
                 "filter (?s IN (");
 
         int i = 0;

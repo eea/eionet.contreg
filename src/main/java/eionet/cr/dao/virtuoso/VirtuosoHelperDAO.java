@@ -20,6 +20,7 @@ import eionet.cr.dao.readers.DataflowPicklistReader;
 import eionet.cr.dao.readers.ObjectLabelReader;
 import eionet.cr.dao.readers.RDFExporter;
 import eionet.cr.dao.readers.RecentUploadsReader;
+import eionet.cr.dao.readers.SubPropertiesReader;
 import eionet.cr.dao.readers.SubjectDataReader;
 import eionet.cr.dao.readers.TriplesReader;
 import eionet.cr.dao.util.PredicateLabels;
@@ -104,13 +105,13 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
             String[] neededPredicates = null;
             if (rdfType.equals(Subjects.ROD_OBLIGATION_CLASS)) {
                 // properties for obligations
-                String[] neededPredicatesObl = { Predicates.RDFS_LABEL,
+                String[] neededPredicatesObl = {Predicates.RDFS_LABEL,
                         Predicates.ROD_ISSUE_PROPERTY,
                         Predicates.ROD_INSTRUMENT_PROPERTY };
                 neededPredicates = neededPredicatesObl;
             } else if (rdfType.equals(Subjects.ROD_DELIVERY_CLASS)) {
                 // properties for deliveries
-                String[] neededPredicatesDeliveries = { Predicates.RDFS_LABEL,
+                String[] neededPredicatesDeliveries = {Predicates.RDFS_LABEL,
                         Predicates.ROD_OBLIGATION_PROPERTY,
                         Predicates.ROD_LOCALITY_PROPERTY };
                 neededPredicates = neededPredicatesDeliveries;
@@ -270,7 +271,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         if (predicateUris != null && !predicateUris.isEmpty()) {
 
             // only these predicates will be queried for
-            String[] neededPredicates = { Predicates.RDF_TYPE,
+            String[] neededPredicates = {Predicates.RDF_TYPE,
                     Predicates.RDFS_LABEL };
 
             // get the data of all found subjects
@@ -335,7 +336,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
         List<SubjectDTO> subjects = getSubjectsData(
                 Collections.singletonList(subjectUri), null, reader, null,
-                false);
+                false, false);
         return subjects == null || subjects.isEmpty() ? null : subjects.get(0);
     }
 
@@ -363,18 +364,34 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.dao.HelperDAO#getSubProperties(java.util.Set)
+    /**
+     * Finds SubProperties of given subject list.
+     * @param subjects Collection<String> subject URIs
+     * @return SubProperties
+     * @throws DAOException if query fails
      */
     @Override
-    public SubProperties getSubProperties(Set<Long> subjectHashes)
-            throws DAOException {
-        // TODO: implement this method
-        return null;
-    }
+    public SubProperties getSubProperties(final Collection<String> subjects) throws DAOException {
 
+        StringBuilder sparql = new StringBuilder();
+        sparql.append("select ?p ?s    WHERE { ?p <").append(Predicates.RDFS_SUBPROPERTY_OF).append(
+                ">  ?s ");
+        sparql.append("FILTER (?s IN ( ");
+        int i = 0;
+        for (String subject : subjects) {
+            if (i > 0) {
+                sparql.append(", ");
+            }
+            sparql.append("<").append(subject).append("> ");
+            i++;
+        }
+        sparql.append(") ) }");
+        SubProperties subProperties = new SubProperties();
+        SubPropertiesReader reader = new SubPropertiesReader(subProperties);
+        executeSPARQL(sparql.toString(), reader);
+
+        return subProperties;
+    }
     /*
      * (non-Javadoc)
      *
@@ -398,7 +415,8 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
                 + strBuilder.toString());
 
         // TODO types
-        DataflowPicklistReader<HashMap<String, ArrayList<UriLabelPair>>> reader = new DataflowPicklistReader<HashMap<String, ArrayList<UriLabelPair>>>();
+        DataflowPicklistReader<HashMap<String, ArrayList<UriLabelPair>>>
+            reader = new DataflowPicklistReader<HashMap<String, ArrayList<UriLabelPair>>>();
         executeSPARQL(strBuilder.toString(), reader);
 
         logger.trace("getDataflowSearchPicklist query took "

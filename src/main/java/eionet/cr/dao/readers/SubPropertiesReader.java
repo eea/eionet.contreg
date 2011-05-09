@@ -23,6 +23,7 @@ package eionet.cr.dao.readers;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.openrdf.model.Value;
 import org.openrdf.query.BindingSet;
 
 import eionet.cr.dao.util.SubProperties;
@@ -58,13 +59,16 @@ public class SubPropertiesReader extends ResultSetMixedReader {
         subProperties.add(rs.getString("PREDICATE"), rs.getString("SUB_PROPERTY"));
     }
 
-    /*
-     * (non-Javadoc)
-     * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
+    /**
+     * Reads row from SPARQL bindingset and creates an elemnt in Subproperties hash.
+     * @param bindingSet SPARQL query result
      */
     @Override
-    public void readRow(BindingSet bindingSet) {
-
-        // TODO Auto-generated method stub
+    public void readRow(final BindingSet bindingSet) {
+        if (bindingSet != null && bindingSet.size() > 0) {
+            Value subProp  = bindingSet.getValue("p");
+            Value prop = bindingSet.getValue("s");
+            subProperties.add(prop.stringValue(), subProp.stringValue());
+        }
     }
 }

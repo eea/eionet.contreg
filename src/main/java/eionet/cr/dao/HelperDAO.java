@@ -150,12 +150,11 @@ public interface HelperDAO extends DAO {
     PredicateLabels getPredicateLabels(Set<Long> subjectHashes) throws DAOException;
 
     /**
-     *
-     * @param subjectHashes
-     * @return
+     * @param subjects Collection<String> set of subject URIs
+     * @return SubProperties subproperties of the given URIs
      * @throws DAOException if query fails
      */
-    SubProperties getSubProperties(Set<Long> subjectHashes) throws DAOException;
+    SubProperties getSubProperties(Collection<String> subjects) throws DAOException;
 
     /**
      *

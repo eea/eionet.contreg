@@ -348,8 +348,56 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
         selectedAndTagPredicates.addAll(reader.getResultList());
         //<--
 
-        // return searchByFilters(filters, null, pagingRequest, sortingRequest, selectedPredicates);
-        return searchByFilters(filters, null, pagingRequest, sortingRequest, selectedAndTagPredicates);
+        //TODO - remove copypaste and replace with searchByFilters() when Virtuosos potential bug issue is solved:
+        //return searchByFilters(filters, null, pagingRequest, sortingRequest, selectedAndTagPredicates);
+        
+        
+        // create query helper
+        VirtuosoFilteredSearchHelper helper = new VirtuosoFilteredSearchHelper(filters, null,
+                pagingRequest, sortingRequest);
+
+        // create the list of IN parameters of the query
+        ArrayList<Object> inParams = new ArrayList<Object>();
+
+        // let the helper create the query and fill IN parameters
+        String query = helper.getQuery(inParams);
+
+        long startTime = System.currentTimeMillis();
+        logger.trace("Search by filters, executing subject finder query: " + query);
+
+        // execute the query, with the IN parameters
+        List<String> subjectUris = executeSPARQL(query, new SingleObjectReader<String>());
+
+        logger.debug("Search by tags, find subjects query time " + Util.durationSince(startTime));
+
+        int totalRowCount = 0;
+        List<SubjectDTO> resultList = new ArrayList<SubjectDTO>();
+
+        // if result list not null and not empty, then get the subjects data and
+        // total rowcount
+        if (subjectUris != null && !subjectUris.isEmpty()) {
+
+            // only these predicates will be queried for
+            String[] neededPredicates = new String[]{};
+
+            if (selectedAndTagPredicates != null && selectedAndTagPredicates.size() > 0) {
+                neededPredicates = selectedAndTagPredicates.toArray(neededPredicates);
+            }
+            // get the data of all found subjects
+            logger.trace("Search by tags, getting the data of the found subjects");
+            resultList = getSubjectsData(subjectUris, neededPredicates, new SubjectDataReader(subjectUris), null ,false, true );
+        }
+        // if paging required, get the total number of found subjects too
+        if (pagingRequest != null) {
+            logger.trace("Search by filters, getting exact row count");
+            totalRowCount = new Integer(getExactRowCount(helper));
+        }
+
+        // return new Pair<Integer,List<SubjectDTO>>(0, new LinkedList<SubjectDTO>());
+        logger.debug("Search by filters, total query time " + Util.durationSince(startTime));
+
+        // the result Pair contains total number of subjects and the requested sub-list
+        return new Pair<Integer, List<SubjectDTO>>(totalRowCount, resultList);
 
 
     }

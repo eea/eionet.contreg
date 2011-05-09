@@ -26,7 +26,6 @@ import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.readers.DataflowPicklistReader;
 import eionet.cr.dao.readers.PredicateLabelsReader;
 import eionet.cr.dao.readers.RDFExporter;
-import eionet.cr.dao.readers.SubPropertiesReader;
 import eionet.cr.dao.readers.SubjectDataReader;
 import eionet.cr.dao.util.PredicateLabels;
 import eionet.cr.dao.util.SubProperties;
@@ -575,8 +574,9 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
      * (non-Javadoc)
      * @see eionet.cr.dao.HelperDAO#getSubProperties(java.util.Set)
      */
-    public SubProperties getSubProperties(Set<Long> subjectHashes) throws DAOException {
-
+    public SubProperties getSubProperties(Collection<String> subjectHashes) throws DAOException {
+        throw new DAOException("Method not implemented");
+        /*
         SubProperties subProperties = new SubProperties();
         if (subjectHashes != null && !subjectHashes.isEmpty()) {
 
@@ -592,6 +592,7 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
         }
 
         return subProperties;
+        */
     }
 
     /*
