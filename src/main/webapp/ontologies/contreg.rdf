@@ -232,5 +232,8 @@
 	<rdf:Description rdf:about="http://purl.org/dc/dcmitype/Dataset">
 		<rdfs:subClassOf rdf:resource="#File"/>
 	</rdf:Description>
+	<rdf:Description rdf:about="http://dd.eionet.europa.eu/schema.rdf#TableSchema">
+		<rdfs:subClassOf rdf:resource="#File"/>
+	</rdf:Description>
 
 </rdf:RDF>
