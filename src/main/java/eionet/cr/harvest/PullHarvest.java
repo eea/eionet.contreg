@@ -183,12 +183,20 @@ public class PullHarvest extends Harvest {
 
                             DAOFactory.get().getDao(HarvestSourceDAO.class).removeAllPredicatesFromHarvesterContext(sourceUrlString);
                         }
-
+                        
+                        // Add cr:firstSeen metadata predicate into harvester context
+                        if (source != null && source.getTimeCreated() != null) {
+                            String firstSeen = dateFormat.format(source.getTimeCreated());
+                            ObjectDTO firstSeenObject = new ObjectDTO(firstSeen, true, XMLSchema.DATETIME);
+                            DAOFactory.get().getDao(HarvestSourceDAO.class)
+                                    .insertUpdateSourceMetadata(sourceUrlString, Predicates.CR_FIRST_SEEN, firstSeenObject);
+                        }
+                        
                         ObjectDTO errorObject = new ObjectDTO(error.getMessage(), true);
                         DAOFactory.get().getDao(HarvestSourceDAO.class)
                                 .insertUpdateSourceMetadata(sourceUrlString, Predicates.CR_ERROR_MESSAGE, errorObject);
 
-                        String lastRefreshed = lastRefreshedDateFormat.format(new Date(System.currentTimeMillis()));
+                        String lastRefreshed = dateFormat.format(new Date(System.currentTimeMillis()));
                         ObjectDTO lastRefreshedObject = new ObjectDTO(lastRefreshed, true, XMLSchema.DATETIME);
                         DAOFactory.get().getDao(HarvestSourceDAO.class)
                                 .insertUpdateSourceMetadata(sourceUrlString, Predicates.CR_LAST_REFRESHED, lastRefreshedObject);
@@ -198,7 +206,7 @@ public class PullHarvest extends Harvest {
                         // source is available, so continue to extract it's contents and metadata
 
                         // extract various metadata about this harvest source from url connection object
-                        setSourceMetadata(harvestUrlConnection.getConnection());
+                        setSourceMetadata(harvestUrlConnection.getConnection(), source);
 
                         // NOTE: If URL is redirected, content type is null. skip if unsupported content type
                         contentType = sourceMetadata.getObjectValue(Predicates.CR_MEDIA_TYPE);
@@ -383,7 +391,7 @@ public class PullHarvest extends Harvest {
     private void handleSourceNotModified() throws SQLException {
 
         // update lastRefreshed predicate for this source
-        PersisterFactory.getPersister().updateLastRefreshed(Hashes.spoHash(sourceUrlString), lastRefreshedDateFormat);
+        PersisterFactory.getPersister().updateLastRefreshed(Hashes.spoHash(sourceUrlString), dateFormat);
 
         // copy the harvest's number of triples and resources from previous harvest
         if (previousHarvest != null) {
@@ -458,7 +466,7 @@ public class PullHarvest extends Harvest {
             DAOFactory.get().getDao(HarvestSourceDAO.class).removeAllPredicatesFromHarvesterContext(lastUrl.getSourceURL());
 
             // Add last refreshed metadata into Virtuoso /harvester context
-            String lastRefreshed = lastRefreshedDateFormat.format(new Date(System.currentTimeMillis()));
+            String lastRefreshed = dateFormat.format(new Date(System.currentTimeMillis()));
             ObjectDTO lastRefreshedObject = new ObjectDTO(lastRefreshed, true, XMLSchema.DATETIME);
             DAOFactory.get().getDao(HarvestSourceDAO.class)
                     .insertUpdateSourceMetadata(lastUrl.getSourceURL(), Predicates.CR_LAST_REFRESHED, lastRefreshedObject);
@@ -559,6 +567,15 @@ public class PullHarvest extends Harvest {
                 }
                 // Update last_harvest for URL's
                 DAOFactory.get().getDao(HarvestSourceDAO.class).updateLastHarvest(url, new Timestamp(System.currentTimeMillis()));
+                
+                // Add cr:firstSeen metadata predicate for redirected sources
+                HarvestSourceDTO redirectedSource = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(url);
+                if (redirectedSource != null && redirectedSource.getTimeCreated() != null) {
+                    String firstSeen = dateFormat.format(redirectedSource.getTimeCreated());
+                    ObjectDTO firstSeenObject = new ObjectDTO(firstSeen, true, XMLSchema.DATETIME);
+                    DAOFactory.get().getDao(HarvestSourceDAO.class)
+                            .insertUpdateSourceMetadata(url, Predicates.CR_FIRST_SEEN, firstSeenObject);
+                }
             }
         }
 
@@ -748,11 +765,11 @@ public class PullHarvest extends Harvest {
      *
      * @param urlConnetion
      */
-    private void setSourceMetadata(URLConnection urlConnection) {
+    private void setSourceMetadata(URLConnection urlConnection, HarvestSourceDTO source) {
 
         // set last-refreshed predicate
         long lastRefreshed = System.currentTimeMillis();
-        String lastRefreshedStr = lastRefreshedDateFormat.format(new Date(lastRefreshed));
+        String lastRefreshedStr = dateFormat.format(new Date(lastRefreshed));
         sourceMetadata.addObject(Predicates.CR_LAST_REFRESHED, new ObjectDTO(String.valueOf(lastRefreshedStr), true, XMLSchema.DATETIME));
 
         // detect the last-modified-date from HTTP response, if it's not >0, then take the value of last-refreshed
@@ -762,12 +779,18 @@ public class PullHarvest extends Harvest {
         }
 
         // set the last-modified predicate
-        String s = lastRefreshedDateFormat.format(new Date(sourceLastModified));
+        String s = dateFormat.format(new Date(sourceLastModified));
         sourceMetadata.addObject(Predicates.CR_LAST_MODIFIED, new ObjectDTO(s, true, XMLSchema.DATETIME));
 
         int contentLength = urlConnection.getContentLength();
         if (contentLength >= 0) {
             sourceMetadata.addObject(Predicates.CR_BYTE_SIZE, new ObjectDTO(String.valueOf(contentLength), true, XMLSchema.INTEGER));
+        }
+        
+        // set the firstSeen predicate
+        if (source != null && source.getTimeCreated() != null) {
+            String firstSeen = dateFormat.format(source.getTimeCreated());
+            sourceMetadata.addObject(Predicates.CR_FIRST_SEEN, new ObjectDTO(firstSeen, true, XMLSchema.DATETIME));
         }
 
         String contentType = urlConnection.getContentType();

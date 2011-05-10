@@ -110,7 +110,7 @@ public abstract class Harvest {
     protected DAOFactory daoFactory = DAOFactory.get();
 
     /** */
-    protected SimpleDateFormat lastRefreshedDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    protected SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
     /**
      *

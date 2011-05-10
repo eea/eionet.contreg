@@ -114,7 +114,7 @@ public class UploadHarvest extends Harvest {
         }
 
         sourceMetadata.addObject(Predicates.CR_LAST_MODIFIED, new ObjectDTO(
-                lastRefreshedDateFormat.format(new Date()), true));
+                dateFormat.format(new Date()), true));
 
         if (!StringUtils.isBlank(dcTitle)) {
             sourceMetadata.addObject(Predicates.DC_TITLE, new ObjectDTO(dcTitle, true));
