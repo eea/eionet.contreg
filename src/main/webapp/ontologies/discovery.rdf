@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	 xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+	 xmlns:owl="http://www.w3.org/2002/07/owl#"
+	 xmlns:dct="http://purl.org/dc/terms/">
+
+	<owl:Ontology rdf:about="">
+		<dct:title>Schema for Content Registry discovery of sources</dct:title>
+		<dct:creator>Søren Roug</dct:creator>
+		<dct:description>This schema is used by the content registry to help with its business logic.</dct:description>
+                <owl:versionInfo>$Id: contreg.rdf 9738 2011-05-10 09:38:12Z heinlja $</owl:versionInfo>
+	</owl:Ontology>
+
+	<!-- These classes are tracked
+          -->
+        <!-- We don't know if rdfs:domain is understood by the inference logic -->
+	<rdf:Description rdf:about="http://cr.eionet.europa.eu/ontologies/contreg.rdf#xmlSchema">
+		<rdfs:domain rdf:resource="#File"/>
+        </rdf:Description>
+
+	<rdf:Description rdf:about="http://cr.eionet.europa.eu/ontologies/contreg.rdf#Feedback">
+		<rdfs:subClassOf rdf:resource="http://cr.eionet.europa.eu/ontologies/contreg.rdf#File"/>
+	</rdf:Description>
+
+	<rdf:Description rdf:about="http://cr.eionet.europa.eu/ontologies/contreg.rdf#FeedbackAttachment">
+		<rdfs:subClassOf rdf:resource="http://cr.eionet.europa.eu/ontologies/contreg.rdf#File"/>
+	</rdf:Description>
+
+	<rdf:Description rdf:about="http://qaw.eionet.europa.eu/schema.rdf#QawResource">
+		<rdfs:subClassOf rdf:resource="http://cr.eionet.europa.eu/ontologies/contreg.rdf#File"/>
+	</rdf:Description>
+
+	<rdf:Description rdf:about="http://qaw.eionet.europa.eu/schema.rdf#QaReport">
+		<rdfs:subClassOf rdf:resource="http://cr.eionet.europa.eu/ontologies/contreg.rdf#File"/>
+	</rdf:Description>
+
+	<rdf:Description rdf:about="http://rod.eionet.europa.eu/schema.rdf#Delivery">
+		<rdfs:subClassOf rdf:resource="http://cr.eionet.europa.eu/ontologies/contreg.rdf#File"/>
+	</rdf:Description>
+
+	<rdf:Description rdf:about="http://rod.eionet.europa.eu/schema.rdf#File">
+		<rdfs:subClassOf rdf:resource="http://cr.eionet.europa.eu/ontologies/contreg.rdf#File"/>
+	</rdf:Description>
+
+	<rdf:Description rdf:about="http://purl.org/dc/dcmitype/Dataset">
+		<rdfs:subClassOf rdf:resource="http://cr.eionet.europa.eu/ontologies/contreg.rdf#File"/>
+	</rdf:Description>
+
+	<rdf:Description rdf:about="http://dd.eionet.europa.eu/schema.rdf#TableSchema">
+		<rdfs:subClassOf rdf:resource="http://cr.eionet.europa.eu/ontologies/contreg.rdf#File"/>
+	</rdf:Description>
+
+</rdf:RDF>

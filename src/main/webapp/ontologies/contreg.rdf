@@ -2,12 +2,15 @@
 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 	 xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
 	 xmlns:owl="http://www.w3.org/2002/07/owl#"
-	 xmlns:dc="http://purl.org/dc/elements/1.1/">
+	 xmlns:dct="http://purl.org/dc/terms/">
 
 	<owl:Ontology rdf:about="">
-		<dc:title>Schema for content registry housekeeping</dc:title>
-		<dc:creator>Søren Roug</dc:creator>
-		<dc:description>This schema is used by the content registry to help with its business logic.</dc:description>
+		<dct:title>Schema for Content Registry housekeeping</dct:title>
+		<dct:creator>Søren Roug</dct:creator>
+		<dct:creator rdf:resource="http://www.eionet.europa.eu/users/roug"/>
+		<dct:contributor rdf:resource="http://www.eionet.europa.eu/users/heinlja"/>
+		<dct:contributor>Jaanus Heinlaid</dct:contributor>
+		<dct:description>This schema is used by the content registry to help with its business logic.</dct:description>
                 <owl:versionInfo>$Id$</owl:versionInfo>
 	</owl:Ontology>
 
@@ -112,14 +115,10 @@
 		a URL. The identifier could also be determined from the suffix of the file. E.g
 		.xlf is an XLIFF file.
 		</rdfs:comment>
-<!-- The way we have implemented rdfs:subClassOf means that for all the file types we wish to track,
-     we automatically create cr:xmlSchema as required properties. -->
-<!--		<rdfs:domain rdf:resource="#File"/> -->
 	</rdf:Property>
 
 	<rdfs:Class rdf:ID="Feedback">
 		<rdfs:label>Feedback</rdfs:label>
-		<rdfs:subClassOf rdf:resource="#File"/>
 	</rdfs:Class>
 
 	<owl:ObjectProperty rdf:ID="hasFeedback">
@@ -138,7 +137,6 @@
 
 	<rdfs:Class rdf:ID="FeedbackAttachment">
 		<rdfs:label>Feedback attachment</rdfs:label>
-		<rdfs:subClassOf rdf:resource="#File"/>
 	</rdfs:Class>
 
 	<owl:ObjectProperty rdf:ID="hasAttachment">
@@ -173,7 +171,7 @@
 	</rdf:Property>
 
 	<rdf:Property rdf:ID="hasSource"> <!-- deprecated -->
-<!--		<rdfs:domain rdf:resource="#File"/> -->
+		<rdfs:label>Has source</rdfs:label>
 	</rdf:Property>
 
 	<rdf:Property rdf:ID="userSaveTime">
@@ -212,28 +210,6 @@
 	</rdf:Description>
 	<rdf:Description rdf:about="http://purl.org/rss/1.0/title">
 		<rdfs:subPropertyOf rdf:resource="http://www.w3.org/2000/01/rdf-schema#label"/>
-	</rdf:Description>
-
-	<!-- These classes are tracked
-             Note: these lines don't belong here.
-          -->
-	<rdf:Description rdf:about="http://qaw.eionet.europa.eu/schema.rdf#QawResource">
-		<rdfs:subClassOf rdf:resource="#File"/>
-	</rdf:Description>
-	<rdf:Description rdf:about="http://qaw.eionet.europa.eu/schema.rdf#QaReport">
-		<rdfs:subClassOf rdf:resource="#File"/>
-	</rdf:Description>
-	<rdf:Description rdf:about="http://rod.eionet.europa.eu/schema.rdf#Delivery">
-		<rdfs:subClassOf rdf:resource="#File"/>
-	</rdf:Description>
-	<rdf:Description rdf:about="http://rod.eionet.europa.eu/schema.rdf#File">
-		<rdfs:subClassOf rdf:resource="#File"/>
-	</rdf:Description>
-	<rdf:Description rdf:about="http://purl.org/dc/dcmitype/Dataset">
-		<rdfs:subClassOf rdf:resource="#File"/>
-	</rdf:Description>
-	<rdf:Description rdf:about="http://dd.eionet.europa.eu/schema.rdf#TableSchema">
-		<rdfs:subClassOf rdf:resource="#File"/>
 	</rdf:Description>
 
 </rdf:RDF>
