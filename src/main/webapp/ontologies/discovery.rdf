@@ -7,6 +7,9 @@
 	<owl:Ontology rdf:about="">
 		<dct:title>Schema for Content Registry discovery of sources</dct:title>
 		<dct:creator>Søren Roug</dct:creator>
+		<dct:creator rdf:resource="http://www.eionet.europa.eu/users/roug"/>
+		<dct:contributor>Jaanus Heinlaid</dct:contributor>
+		<dct:contributor rdf:resource="http://www.eionet.europa.eu/users/heinlja"/>
 		<dct:description>This schema is used by the content registry to help with its business logic.</dct:description>
                 <owl:versionInfo>$Id: contreg.rdf 9738 2011-05-10 09:38:12Z heinlja $</owl:versionInfo>
 	</owl:Ontology>
