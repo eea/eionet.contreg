@@ -37,7 +37,9 @@ import com.hp.hpl.jena.rdf.arp.ARP;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.HarvestDTO;
+import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.persist.PersisterConfig;
 import eionet.cr.harvest.util.HarvestLog;
@@ -216,7 +218,11 @@ public abstract class Harvest {
 
             if (sourceMetadata.getPredicateCount() > 0) {
                 logger.debug("Storing auto-generated triples for the source");
-                rdfHandler.addSourceMetadata(sourceMetadata);
+				int triplesAdded = rdfHandler.addSourceMetadata(sourceMetadata);
+				if (triplesAdded>0){
+					DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(
+							HarvestSourceDTO.create(HARVESTER_URI, true, 0, null));
+				}
             }
 
             rdfHandler.endOfFile();

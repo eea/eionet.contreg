@@ -15,8 +15,10 @@ import net.sourceforge.stripes.action.UrlBinding;
 import eionet.cr.common.Predicates;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.SpoBinaryDAO;
+import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.ReviewDTO;
 import eionet.cr.dto.SpoBinaryDTO;
@@ -266,8 +268,14 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
             helperDAO.addResource(attachmentUri, attachmentUri);
             helperDAO.addResource(Predicates.CR_HAS_ATTACHMENT, reviewUri);
 
+			// since the review URI was used above as triple source, add it to HARVEST_SOURCE too
+			// (but set interval minutes to 0, to avoid it being background-harvested)
+			DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(
+					HarvestSourceDTO.create(reviewUri, true, 0, getUser().getUserName()));
+			
             // finally, attempt to harvest the uploaded file's contents
             harvestUploadedFile(attachmentUri, attachment, null, getUserName());
+            
         } catch (DAOException daoe) {
             logger.error("Error when storing attachment", daoe);
             addSystemMessage("Error when storing attachment");

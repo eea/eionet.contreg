@@ -30,6 +30,7 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.SpoBinaryDAO;
+import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SpoBinaryDTO;
 import eionet.cr.dto.SubjectDTO;
@@ -251,6 +252,12 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
                 }
                 DAOFactory.get().getDao(HelperDAO.class).addTriples(fileSubjectDTO);
             }
+            
+			// since user's home URI was used above as triple source, add it to HARVEST_SOURCE too
+			// (but set interval minutes to 0, to avoid it being background-harvested)
+			DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(
+					HarvestSourceDTO.create(getUser().getHomeUri(), true, 0, getUserName()));
+			
         } catch (DAOException e) {
             saveAndHarvestException = e;
             return;

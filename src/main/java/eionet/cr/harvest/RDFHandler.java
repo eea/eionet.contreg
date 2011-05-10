@@ -134,14 +134,14 @@ public class RDFHandler implements StatementHandler {
      * @param subjectDTO
      * @throws PersisterException
      */
-    public void addSourceMetadata(SubjectDTO subjectDTO) throws PersisterException {
+    public int addSourceMetadata(SubjectDTO subjectDTO) throws PersisterException {
 
         persister.setAddingSourceMetadata(true);
 
         try {
+        	int statementsAdded = 0;
             if (subjectDTO != null && subjectDTO.getPredicateCount() > 0) {
 
-                int statementsAdded = 0;
                 AResource subject = new AResourceImpl(subjectDTO.getUri());
                 for (String predicateUri : subjectDTO.getPredicates().keySet()) {
 
@@ -162,7 +162,10 @@ public class RDFHandler implements StatementHandler {
                     addResource(Harvest.HARVESTER_URI, Hashes.spoHash(Harvest.HARVESTER_URI), true);
                 }
             }
-        } finally {
+            
+            return statementsAdded;
+        }
+        finally {
             persister.setAddingSourceMetadata(false);
         }
 

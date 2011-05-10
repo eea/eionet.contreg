@@ -324,6 +324,11 @@ public class FactsheetActionBean extends AbstractActionBean {
         helperDao.addResource(getUser().getRegistrationsUri(), getUser().getRegistrationsUri());
         helperDao.updateUserHistory(getUser(), uri);
 
+		// since user registrations URI was used as triple source, add it to HARVEST_SOURCE too
+		// (but set interval minutes to 0, to avoid it being background-harvested)
+		DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(
+				HarvestSourceDTO.create(getUser().getRegistrationsUri(), true, 0, getUser().getUserName()));
+		
         return new RedirectResolution(this.getClass(), "edit").addParameter("uri", uri);
     }
 

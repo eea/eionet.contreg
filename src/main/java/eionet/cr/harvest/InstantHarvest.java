@@ -23,10 +23,6 @@ public class InstantHarvest extends PullHarvest {
     public InstantHarvest(String sourceUrlString, Date lastHarvest, String userName) {
 
         super(sourceUrlString, lastHarvest);
-
-        ObjectDTO objectDTO = new ObjectDTO(Subjects.CR_FILE, false);
-        objectDTO.setSourceUri(CRUser.registrationsUri(userName));
-        sourceMetadata.addObject(Predicates.RDF_TYPE, objectDTO);
     }
 
     /*

@@ -48,6 +48,8 @@ import org.apache.commons.lang.StringUtils;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.dao.DAOException;
+import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.readers.DataflowPicklistReader;
 import eionet.cr.dao.readers.PredicateLabelsReader;
@@ -61,6 +63,7 @@ import eionet.cr.dao.util.PredicateLabels;
 import eionet.cr.dao.util.SubProperties;
 import eionet.cr.dao.util.UriLabelPair;
 import eionet.cr.dto.DownloadFileDTO;
+import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.PredicateDTO;
 import eionet.cr.dto.ReviewDTO;
@@ -996,6 +999,12 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             addResource(Predicates.CR_SAVETIME, user.getHistoryUri());
             addResource(Predicates.CR_HISTORY, user.getHistoryUri());
             addResource(user.getHistoryUri(), user.getHistoryUri());
+            
+            // since user registrations and history URIs were used as triple source, add them to
+			// HARVEST_SOURCE (set interval minutes to 0, to avoid it being background-harvested)
+			HarvestSourceDAO harvestSourceDao = DAOFactory.get().getDao(HarvestSourceDAO.class);
+			harvestSourceDao.addSourceIgnoreDuplicate(HarvestSourceDTO.create(user.getRegistrationsUri(), true, 0, user.getUserName()));
+			harvestSourceDao.addSourceIgnoreDuplicate(HarvestSourceDTO.create(user.getHistoryUri(), true, 0, user.getUserName()));
         }
 
         if (isBookmark) {
@@ -1032,6 +1041,12 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
         // store the user's bookmarks URI into RESOURCE table
         addResource(user.getBookmarksUri(), user.getBookmarksUri());
+        
+        // since user's bookmarks URI was used above as triple source, add it to HARVEST_SOURCE too
+		// (but set harvest interval minutes to 0, since we don't really want it to be harvested )
+		// by background harvester)
+		DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(
+				HarvestSourceDTO.create(user.getBookmarksUri(), true, 0, user.getUserName()));
     }
 
     /*
@@ -1192,6 +1207,11 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
         addResource(Predicates.CR_SAVETIME, user.getHistoryUri());
         addResource(Predicates.CR_HISTORY, user.getHistoryUri());
         addResource(user.getHistoryUri(), user.getHistoryUri());
+        
+        // since the user history URI was used as triple source, add it to HARVEST_SOURCE too
+		// (but set interval minutes to 0, to avoid it being background-harvested)
+		DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(
+				HarvestSourceDTO.create(user.getHistoryUri(), true, 0, user.getUserName()));
     }
 
     /*
@@ -1352,6 +1372,11 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
         addResource(Predicates.CR_USER_REVIEW_LAST_NUMBER, user.getHomeUri());
         addResource(user.getHomeUri(), user.getHomeUri());
+        
+		// since user's home URI was used above as triple source, add it to HARVEST_SOURCE too
+		// (but set interval minutes to 0, to avoid it being background-harvested)
+		DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(
+				HarvestSourceDTO.create(user.getHomeUri(), true, 0, user.getUserName()));
 
         return newId;
 
@@ -1426,6 +1451,11 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
         addResource(Predicates.CR_HAS_FEEDBACK, userReviewUri);
         addResource(review.getObjectUrl(), userReviewUri);
+        
+		// since the review URI was used above as triple source, add it to HARVEST_SOURCE too
+		// (but set interval minutes to 0, to avoid it being background-harvested)
+		DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(
+				HarvestSourceDTO.create(userReviewUri, true, 0, user.getUserName()));
 
         // Adding content review to DB too.
 
@@ -2088,5 +2118,4 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
         return (val == null) ? 0 : Long.valueOf(val.toString());
 
     }
-
 }

@@ -279,4 +279,20 @@ public class HarvestSourceDTO implements Serializable {
         this.mediaType = mediaType;
     }
 
+    /**
+     * 
+     * @param url
+     * @param prioritySource
+     * @param intervalMinutes
+     * @return
+     */
+    public static HarvestSourceDTO create(String url, boolean prioritySource, int intervalMinutes, String owner){
+    	
+    	HarvestSourceDTO result = new HarvestSourceDTO();
+    	result.setUrl(url);
+    	result.setPrioritySource(prioritySource);
+    	result.setIntervalMinutes(intervalMinutes);
+    	result.setOwner(owner);
+    	return result;
+    }
 }
