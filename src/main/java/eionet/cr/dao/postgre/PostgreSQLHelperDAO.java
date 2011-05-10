@@ -1528,65 +1528,69 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
      *
      * @see eionet.cr.dao.HelperDAO#getReview(eionet.cr.web.security.CRUser, int)
      */
-    public ReviewDTO getReview(CRUser user, int reviewId) throws DAOException {
+	public ReviewDTO getReview(CRUser user, int reviewId)  throws DAOException{
+		
+		String userUri = user.getReviewUri(reviewId);
+		
+		String dbQuery = "SELECT " +
+				"uri" +
+				", spoTitle.object AS title" +
+				", spoObject.object AS object" +
+				", spo_binary.object AS reviewcontent" +
+				", spo_binary.datatype AS datatype " +
+				" FROM spo AS spo1, spo AS spo2," +
+				" spo AS spoTitle, resource, spo AS spoObject LEFT OUTER JOIN spo_binary ON (spoObject.subject=spo_binary.subject AND spo_binary.must_embed = TRUE) " +
+				"WHERE " +
+				"(spo1.subject = " + Hashes.spoHash(userUri) + ") AND " +
+				"(spo1.subject = spo2.subject) AND (spo1.subject = spoTitle.subject) AND (spo1.subject = spoObject.subject) AND " +
+				"spoObject.Predicate="+ Hashes.spoHash(Predicates.CR_FEEDBACK_FOR) + "AND " +
+				"spoTitle.Predicate="+ Hashes.spoHash(Predicates.DC_TITLE) + "AND " +
+				"spo1.subject=resource.uri_hash AND " +
+				"(spo1.predicate = " + Hashes.spoHash(Predicates.CR_USER) + ") AND "+
+				"(spo1.object_hash = " + Hashes.spoHash(user.getHomeUri()) +") AND " +
+				"(spo2.predicate = " + Hashes.spoHash(Predicates.RDF_TYPE) +") AND " +
+				"(spo2.object_hash = " + Hashes.spoHash(Subjects.CR_FEEDBACK) +") AND " +
+				"(spoObject.lit_obj = 'N') " +
+				"ORDER BY uri ASC"
+				;
 
-        String userUri = user.getReviewUri(reviewId);
-
-        String dbQuery = "SELECT "
-                + "uri"
-                + ", spoTitle.object AS title"
-                + ", spoObject.object AS object"
-                + ", spo_binary.object AS reviewcontent"
-                + ", spo_binary.datatype AS datatype "
-                + " FROM spo AS spo1, spo AS spo2,"
-                + " spo AS spoTitle, resource, spo AS spoObject LEFT OUTER JOIN spo_binary ON (spoObject.subject=spo_binary.subject AND spo_binary.must_embed = TRUE) "
-                + "WHERE "
-                + "(spo1.subject = "
-                + Hashes.spoHash(userUri) + ") AND "
-                + "(spo1.subject = spo2.subject) AND (spo1.subject = spoTitle.subject) AND (spo1.subject = spoObject.subject) AND "
-                + "spoObject.Predicate=" + Hashes.spoHash(Predicates.CR_FEEDBACK_FOR) + "AND "
-                + "spoTitle.Predicate=" + Hashes.spoHash(Predicates.DC_TITLE) + "AND "
-                + "spo1.subject=resource.uri_hash AND "
-                + "(spo1.predicate = " + Hashes.spoHash(Predicates.CR_USER) + ") AND "
-                + "(spo1.object_hash = " + Hashes.spoHash(user.getHomeUri()) + ") AND "
-                + "(spo2.predicate = " + Hashes.spoHash(Predicates.RDF_TYPE) + ") AND "
-                + "(spo2.object_hash = " + Hashes.spoHash(Subjects.CR_FEEDBACK) + ") AND "
-                + "(spoObject.lit_obj = 'N') "
-                + "ORDER BY uri ASC";
-
-        ReviewDTO returnItem = new ReviewDTO();
-
-        Connection conn = null;
-        Statement stmt = null;
-        ResultSet rs = null;
-        try {
-            conn = getSQLConnection();
-            stmt = conn.createStatement();
-            rs = stmt.executeQuery(dbQuery);
-            if (rs.next()) {
-                returnItem = new ReviewDTO();
-                returnItem.setReviewSubjectUri(rs.getString("uri"));
-                returnItem.setTitle(rs.getString("title"));
-                returnItem.setObjectUrl(rs.getString("object"));
-                returnItem.setReviewID(reviewId);
-
-                byte[] bytes = rs.getBytes("reviewcontent");
-                try {
-                    returnItem.setReviewContent(new String(bytes, "UTF-8"));
-                } catch (UnsupportedEncodingException ex) {
-                }
-                returnItem.setReviewContentType(rs.getString("datatype"));
-            }
-        } catch (SQLException e) {
-            throw new DAOException(e.toString(), e);
-        } finally {
-            SQLUtil.close(rs);
-            SQLUtil.close(stmt);
-            SQLUtil.close(conn);
-        }
-
-        return returnItem;
-    }
+		ReviewDTO result = new ReviewDTO();
+		
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		try{
+			conn = getSQLConnection();
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(dbQuery);
+			if (rs.next()){
+				result = new ReviewDTO();
+				result.setReviewSubjectUri(rs.getString("uri"));
+				result.setTitle(rs.getString("title"));
+				result.setObjectUrl(rs.getString("object"));
+				result.setReviewID(reviewId);
+				result.setReviewContentType(rs.getString("datatype"));
+				
+				byte [] bytes = rs.getBytes("reviewcontent");
+				if (bytes!=null && bytes.length>0){
+					result.setReviewContent(new String(bytes, "UTF-8"));
+				}
+			}
+		}
+		catch (SQLException e){
+			throw new DAOException(e.toString(), e);
+		}
+		catch (UnsupportedEncodingException e){
+			throw new DAOException("Unsupported encoding when fetching review content", e);
+		}
+		finally{
+			SQLUtil.close(rs);
+			SQLUtil.close(stmt);
+			SQLUtil.close(conn);
+		}
+		
+		return result;
+	}
 
     private static String sqlDeleteReviewContent = "DELETE FROM spo_binary WHERE subject=?";
 
