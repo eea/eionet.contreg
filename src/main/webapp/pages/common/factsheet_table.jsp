@@ -44,6 +44,9 @@
                                             <c:when test="${sessionScope.crUser.registrationsUri==object.sourceSmart}">
                                                 <th>
                                                     <input type="checkbox" name="rowId" value="${crfn:spoHash(predicate.key)}_${object.id}"/>
+                                                    <stripes:hidden name="pred_${crfn:spoHash(predicate.key)}" value="${predicate.key}" />
+                                                    <stripes:hidden name="obj_${object.id}" value="${object.value}"/>
+                                                    <stripes:hidden name="source_${object.id}" value="${object.sourceUri}"/>
                                                 </th>
                                             </c:when>
                                             <c:otherwise><th>&nbsp;</th></c:otherwise>

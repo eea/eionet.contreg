@@ -64,7 +64,6 @@ import eionet.cr.util.Pair;
 import eionet.cr.util.SubjectDTOOptimizer;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
-import eionet.cr.web.util.FactsheetObjectId;
 
 /**
  * Factsheet.
@@ -320,15 +319,13 @@ public class FactsheetActionBean extends AbstractActionBean {
 
         HelperDAO helperDao = factory.getDao(HelperDAO.class);
         helperDao.addTriples(subjectDTO);
-        helperDao.addResource(propertyUri, getUser().getRegistrationsUri());
-        helperDao.addResource(getUser().getRegistrationsUri(), getUser().getRegistrationsUri());
         helperDao.updateUserHistory(getUser(), uri);
 
-		// since user registrations URI was used as triple source, add it to HARVEST_SOURCE too
-		// (but set interval minutes to 0, to avoid it being background-harvested)
-		DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(
-				HarvestSourceDTO.create(getUser().getRegistrationsUri(), true, 0, getUser().getUserName()));
-		
+        // since user registrations URI was used as triple source, add it to HARVEST_SOURCE too
+        // (but set interval minutes to 0, to avoid it being background-harvested)
+        DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(
+                HarvestSourceDTO.create(getUser().getRegistrationsUri(), true, 0, getUser().getUserName()));
+
         return new RedirectResolution(this.getClass(), "edit").addParameter("uri", uri);
     }
 
@@ -342,23 +339,23 @@ public class FactsheetActionBean extends AbstractActionBean {
 
         if (rowId != null && !rowId.isEmpty()) {
 
-            long subjectHash = Hashes.spoHash(uri);
             ArrayList<TripleDTO> triples = new ArrayList<TripleDTO>();
 
             for (String row : rowId) {
-
                 int i = row.indexOf("_");
                 if (i <= 0 || i == (row.length() - 1)) {
                     throw new IllegalArgumentException("Illegal rowId: " + row);
                 }
 
-                long predicateHash = Long.parseLong(row.substring(0, i));
-                ObjectDTO object = FactsheetObjectId.parse(row.substring(i + 1));
+                String predicateHash = row.substring(0, i);
+                String predicate = getContext().getRequestParameter("pred_".concat(predicateHash));
 
-                TripleDTO triple = new TripleDTO(subjectHash, predicateHash, object.getHash());
-                triple.setSourceHash(Long.valueOf(object.getSourceHash()));
-                triple.setObjectDerivSourceHash(Long.valueOf(object.getDerivSourceHash()));
-                triple.setObjectSourceObjectHash(Long.valueOf(object.getSourceObjectHash()));
+                String objectHash = row.substring(i + 1);
+                String objectValue = getContext().getRequest().getParameter("obj_".concat(objectHash));
+                String sourceUri = getContext().getRequest().getParameter("source_".concat(objectHash));
+
+                TripleDTO triple = new TripleDTO(uri, predicate , objectValue);
+                triple.setSourceUri(sourceUri);
 
                 triples.add(triple);
             }
@@ -430,6 +427,7 @@ public class FactsheetActionBean extends AbstractActionBean {
         /* get the addible properties from session */
 
         HttpSession session = getContext().getRequest().getSession();
+        @SuppressWarnings("unchecked")
         ArrayList<UriLabelPair> result = (ArrayList<UriLabelPair>) session.getAttribute(ADDIBLE_PROPERTIES_SESSION_ATTR);
 
         // if not in session, create them and add to session
