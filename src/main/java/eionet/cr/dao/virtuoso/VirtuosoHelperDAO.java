@@ -15,11 +15,13 @@ import org.apache.commons.lang.StringUtils;
 import eionet.cr.common.Namespace;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
+import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.readers.DataflowPicklistReader;
 import eionet.cr.dao.readers.ObjectLabelReader;
 import eionet.cr.dao.readers.RDFExporter;
+import eionet.cr.dao.readers.RecentFilesReader;
 import eionet.cr.dao.readers.RecentUploadsReader;
 import eionet.cr.dao.readers.SubPropertiesReader;
 import eionet.cr.dao.readers.SubjectDataReader;
@@ -50,15 +52,30 @@ import eionet.cr.web.security.CRUser;
  */
 public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
-    /*
-     * (non-Javadoc)
-     *
+    /**
+     * Returns latest harvested files (type=cr:File) in descending order (cr:firstSeen).
+     * @param limit count of latest files
+     * @return List of Pair containing URL and date
      * @see eionet.cr.dao.HelperDAO#getLatestFiles(int)
+     * @throws DAOException if query fails
      */
     @Override
-    public List<Pair<String, String>> getLatestFiles(int limit)
-            throws DAOException {
-        throw new UnsupportedOperationException("Method not implemented");
+    public List<Pair<String, String>> getLatestFiles(final int limit) throws DAOException {
+
+        StringBuilder strBuilder = new StringBuilder();
+        strBuilder.append("define input:inference '").append(
+                GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME)).append("' ").append(
+                "SELECT DISTINCT ?s ?l ?d WHERE ").append("{?s a <").append(Predicates.CR_FILE).append("> ").append(
+                ". OPTIONAL { ?s <").append(Predicates.CR_FIRST_SEEN).append("> ?d } ") .append(
+                        ". OPTIONAL { ?s <").append(Predicates.RDFS_LABEL).append("> ?l } ").append(
+                "} ORDER BY DESC(?d) LIMIT ")
+                .append(limit);
+
+        RecentFilesReader reader = new RecentFilesReader();
+        reader.setBlankNodeUriPrefix(VirtuosoBaseDAO.BNODE_URI_PREFIX);
+
+        return executeSPARQL(strBuilder.toString(), reader);
+
     }
 
     /*
