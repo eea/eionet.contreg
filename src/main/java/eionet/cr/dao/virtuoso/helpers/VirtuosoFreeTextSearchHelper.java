@@ -55,7 +55,11 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper {
             .append("select ?s max(?time) AS ?order where {")
             .append("?s ?p ?o .").append(addFilterParams());
             if (exactMatch) {
-                strBuilder.append(" FILTER (?o = '").append(expression.toString()).append("').");
+                if (expression.isUri()) {
+                    strBuilder.append(" FILTER (?o = <").append(expression.toString()).append(">).");
+                } else {
+                    strBuilder.append(" FILTER (?o = '").append(expression.toString()).append("').");
+                }
             } else {
                 strBuilder.append(" FILTER bif:contains(?o, \"").append(virtExpression.getParsedQuery()).append("\").");
             }
@@ -68,7 +72,11 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper {
 
             strBuilder.append("select distinct ?s where {?s ?p ?o . ").append(addFilterParams());
             if (exactMatch) {
-                strBuilder.append("FILTER (?o = '").append(expression.toString()).append("'). ");
+                if (expression.isUri()) {
+                    strBuilder.append("FILTER (?o = <").append(expression.toString()).append(">).");
+                } else {
+                    strBuilder.append("FILTER (?o = '").append(expression.toString()).append("'). ");
+                }
             } else {
                 strBuilder.append("FILTER bif:contains(?o, \"").append(virtExpression.getParsedQuery()).append("\"). ");
             }
@@ -101,7 +109,11 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper {
         StringBuilder strBuilder = new StringBuilder();
         strBuilder.append("select distinct ?s where { ?s ?p ?o . ").append(addFilterParams());
         if (exactMatch) {
-            strBuilder.append(" FILTER (?o = '").append(expression.toString()).append("').");
+            if (expression.isUri()) {
+                strBuilder.append(" FILTER (?o = <").append(expression.toString()).append(">).");
+            } else {
+                strBuilder.append(" FILTER (?o = '").append(expression.toString()).append("').");
+            }
         } else {
             strBuilder.append(" FILTER bif:contains(?o, \"").append(virtExpression.getParsedQuery()).append("\"). ");
         }
@@ -119,7 +131,11 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper {
         StringBuilder strBuilder = new StringBuilder();
         strBuilder.append("select count(distinct ?s) where { ?s ?p ?o . ").append(addFilterParams());
         if (exactMatch) {
-            strBuilder.append(" FILTER (?o = '").append(expression.toString()).append("').");
+            if (expression.isUri()) {
+                strBuilder.append(" FILTER (?o = <").append(expression.toString()).append(">).");
+            } else {
+                strBuilder.append(" FILTER (?o = '").append(expression.toString()).append("').");
+            }
         } else {
             strBuilder.append(" FILTER bif:contains(?o, \"").append(virtExpression.getParsedQuery()).append("\"). ");
         }
