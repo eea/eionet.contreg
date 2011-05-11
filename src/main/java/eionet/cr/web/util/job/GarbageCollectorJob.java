@@ -93,6 +93,15 @@ public class GarbageCollectorJob implements StatefulJob {
             harvestSourceDAO.deleteHarvestHistory(NEEDED_TO_REMAIN);
             LOGGER.debug("History of old harvests deleted with " + Util.durationSince(start));
 
+			// TODO harvest history cannot be deleted with the below implementation of
+			// HarvestSourceDAO.deleteHarvestHistory(), because the latter has a bug:
+			// it deletes all harvests where HARVEST_ID<=max(HARVEST_ID)-10. But this
+			// should be done source-by-source.
+//			logger.debug("Garbage collector going to delete history of old harvests");
+//			start = System.currentTimeMillis();
+//			harvestSourceDAO.deleteHarvestHistory(NEEDED_TO_REMAIN);
+//			logger.debug("History of old harvests deleted with " + Util.durationSince(start));
+            
             LOGGER.debug("Garbage collector finished");
         } catch (Exception ignored) {
             LOGGER.error("error in garbage collector", ignored);
