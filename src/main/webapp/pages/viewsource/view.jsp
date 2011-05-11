@@ -6,13 +6,15 @@
         <stripes:hidden name="harvestSource.sourceId" />
         <stripes:hidden name="harvestSource.url" />
         <table class="datatable">
-            <tr>
-                <th scope="row">URL:</th>
-                <td><a
-                    href="${pageContext.request.contextPath}/factsheet.action?uri=${crfn:urlEncode(actionBean.harvestSource.url)}"><c:out
-                    value="${actionBean.harvestSource.url}" /></a></td>
-            </tr>
-            <tr>
+			<tr>
+				<td>URL:</td>
+				<td>
+					<stripes:link href="/factsheet.action">
+						<c:out value="${actionBean.harvestSource.url}"/>
+						<stripes:param name="uri" value="${actionBean.harvestSource.url}"/>
+					</stripes:link>
+				</td>
+			</tr>            <tr>
                 <th scope="row">E-mails:</th>
                 <td><c:out value="${actionBean.harvestSource.emails}" /></td>
             </tr>
