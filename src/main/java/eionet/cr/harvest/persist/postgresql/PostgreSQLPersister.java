@@ -574,7 +574,7 @@ public class PostgreSQLPersister implements IHarvestPersister {
             pstmt.setString(3, dateString);
             pstmt.setLong(4, Hashes.spoHash(dateString));
             pstmt.setString(5, YesNoBoolean.format(true));
-            pstmt.setLong(6, subjectHash);
+            pstmt.setLong(6, Hashes.spoHash(Harvest.HARVESTER_URI));
             pstmt.setLong(7, time);
 
             SQLUtil.executeUpdate(deleteSQL.toString(), conn);
