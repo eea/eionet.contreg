@@ -454,7 +454,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
 
             String sql = "delete from SPO where SOURCE not in (select URL_HASH from HARVEST_SOURCE)";
             SQLUtil.executeUpdate(sql, conn);
-            sql = "delete from SPO where OBJ_DERIV_SOURCE not in (select URL_HASH from HARVEST_SOURCE)";
+            sql = "delete from SPO where OBJ_DERIV_SOURCE<>0 and OBJ_DERIV_SOURCE not in (select URL_HASH from HARVEST_SOURCE)";
             SQLUtil.executeUpdate(sql, conn);
         } catch (SQLException e) {
             throw new DAOException(e.toString(), e);
