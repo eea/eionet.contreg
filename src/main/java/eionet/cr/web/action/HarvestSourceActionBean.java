@@ -126,14 +126,8 @@ public class HarvestSourceActionBean extends AbstractActionBean {
      */
     public String getUrgencyScoreFormatted() throws DAOException {
 
-        double urgency = factory.getDao(HarvestSourceDAO.class)
-                .getUrgencyScore(harvestSource.getSourceId());
-        DecimalFormat df = new DecimalFormat("#.####");
-        if (urgency >= 0) {
-            return df.format(urgency);
-        } else {
-            return "<i>Cannot be calculated</i>";
-        }
+    	double urgencyScore = harvestSource!=null ? harvestSource.getHarvestUrgencyScore() : 0.0d;
+		return urgencyScore<=0 ? "N/A" : new DecimalFormat("#.####").format(urgencyScore);
     }
 
     /**

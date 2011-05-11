@@ -24,7 +24,10 @@
             </tr>
             <tr>
                 <th scope="row">Harvest interval:</th>
-                <td><c:out value="${actionBean.intervalMinutesDisplay}" /></td>
+                <td>
+					<c:out value="${actionBean.intervalMinutesDisplay}"/>
+					<c:if test="${actionBean.intervalMinutesDisplay}=='0'">&nbsp;(i.e not to be batch-harvested)</c:if>
+				</td>
             </tr>
             <tr>
                 <th scope="row">Last harvest:</th>

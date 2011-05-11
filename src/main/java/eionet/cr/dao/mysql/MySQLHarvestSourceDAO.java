@@ -480,17 +480,6 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
     /*
      * (non-Javadoc)
      *
-     * @see eionet.cr.dao.HarvestSourceDAO#getUrgencyScore(int)
-     */
-    @Override
-    public double getUrgencyScore(int harvestSourceId) throws DAOException {
-
-        throw new UnsupportedOperationException("Method not implemented");
-    }
-
-    /*
-     * (non-Javadoc)
-     *
      * @see eionet.cr.dao.HarvestSourceDAO#getSourcesInInferenceRule()
      */
     @Override

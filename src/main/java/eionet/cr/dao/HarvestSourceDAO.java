@@ -192,15 +192,6 @@ public interface HarvestSourceDAO extends DAO {
     void deleteHarvestHistory(int neededToRemain) throws DAOException;
 
     /**
-     * Calculate the urgency score for one source.
-     *
-     * @param harvestSourceId - primary key in table.
-     * @return urgencyScore - Urgency score. If over 1.0, then the source is due to be harvested.
-     * @throws DAOException if relational database is unavailable.
-     */
-    public double getUrgencyScore(int harvestSourceId) throws DAOException;
-
-    /**
      * @return String
      * @throws DAOException if relational database is unavailable.
      */
