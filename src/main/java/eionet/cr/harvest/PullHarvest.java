@@ -45,6 +45,7 @@ import eionet.cr.util.URLUtil;
 import eionet.cr.util.UrlRedirectAnalyzer;
 import eionet.cr.util.UrlRedirectionInfo;
 import eionet.cr.util.Util;
+import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.xml.ConversionsParser;
 import eionet.cr.util.xml.XmlAnalysis;
 import eionet.cr.web.security.CRUser;
@@ -173,9 +174,18 @@ public class PullHarvest extends Harvest {
                     } catch (Exception e) {
                         logger.warn(e.toString());
                     }
+                    
+                    // Check if Virtuoso is up and running. If not consider it as temporary error
+                    boolean virtuosoAvailable = true;
+                    try {
+                        SesameUtil.getRepositoryConnection();
+                    } catch (RepositoryException e) {
+                        sourceAvailable = false;
+                        virtuosoAvailable = false;
+                    }
 
                     ConnectionError error = harvestUrlConnection.getError();
-                    if (error != null) {
+                    if (error != null && virtuosoAvailable) {
                         sourceAvailable = false;
                         if (error.getType().equals(ErrType.PERMANENT)) {
                             permanentError = true;
