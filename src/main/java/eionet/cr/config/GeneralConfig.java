@@ -81,6 +81,7 @@ public class GeneralConfig {
     /** */
     public static final String APPLICATION_VERSION = "application.version";
     public static final String APPLICATION_USERAGENT = "application.userAgent";
+    public static final String APPLICATION_HOME_URL = "application.homeURL";
 
     /** */
     public static final String SUBJECT_SELECT_MODE = "subjectSelectMode";

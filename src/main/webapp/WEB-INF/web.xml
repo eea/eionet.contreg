@@ -8,6 +8,16 @@
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!--              filters                   -->
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+	<filter>
+		<filter-name>HomeContentTypeFilter</filter-name>
+		<filter-class>eionet.cr.web.filters.HomeContentTypeFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>HomeContentTypeFilter</filter-name>
+		<url-pattern>/home/*</url-pattern>
+	</filter-mapping>
+	
     <filter>
         <description>
             Provides essential configuration and request processing services

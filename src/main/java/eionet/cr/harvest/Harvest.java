@@ -59,7 +59,7 @@ public abstract class Harvest {
     public static final String STATUS_FINISHED = "finished";
     public static final String TYPE_PULL = "pull";
     public static final String TYPE_PUSH = "push";
-    public static final String HARVESTER_URI = "http://cr.eionet.europa.eu/harvester";
+	public static final String HARVESTER_URI = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL) + "/harvester";
 
     /** */
     protected String sourceUrlString = null;
