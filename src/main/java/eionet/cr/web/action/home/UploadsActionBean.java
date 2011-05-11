@@ -238,6 +238,10 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
             // make sure file subject URI is present in RESOURCE
             DAOFactory.get().getDao(HelperDAO.class).addResource(
                     getUploadedFileSubjectUri(), getUser().getHomeUri());
+            
+			// make sure user home URI is present in RESOURCE
+			DAOFactory.get().getDao(HelperDAO.class).addResource(
+					getUser().getHomeUri(), getUser().getHomeUri());
 
             // persist the prepared cr:hasFile and dc:title predicates
             DAOFactory.get().getDao(HelperDAO.class).addTriples(homeSubjectDTO);
