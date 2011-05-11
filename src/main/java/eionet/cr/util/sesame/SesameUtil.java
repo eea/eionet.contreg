@@ -5,6 +5,7 @@ import java.sql.SQLException;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.query.BooleanQuery;
+import org.openrdf.query.GraphQuery;
 import org.openrdf.query.GraphQueryResult;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
@@ -14,6 +15,8 @@ import org.openrdf.query.TupleQueryResult;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.rio.RDFHandler;
+import org.openrdf.rio.RDFHandlerException;
 
 import eionet.cr.dao.readers.ResultSetReaderException;
 
@@ -102,16 +105,31 @@ public class SesameUtil {
     }
 
     /**
-     *
-     * @param queryResult
+     * Executes SPARQL Query producing RDF and exports to the passed RDF handler.
+     * @param sparql SPARQL for (CONSTRUCT) query
+     * @param rdfHandler RDF handler for output RDF format
+     * @param conn RepositoryConnection
+     * @throws QueryEvaluationException if query evaluation fails
+     * @throws RDFHandlerException if RDF handler fails
+     * @throws MalformedQueryException if query is not formed correctly
+     * @throws RepositoryException if Repository API call fails
      */
-    public static void close(TupleQueryResult queryResult) {
+    public static void exportGraphQuery(final String sparql, final RDFHandler rdfHandler, final RepositoryConnection conn)
+        throws QueryEvaluationException, RDFHandlerException, MalformedQueryException, RepositoryException  {
+
+        GraphQuery graphQuery = conn.prepareGraphQuery(QueryLanguage.SPARQL, sparql);
+        graphQuery.evaluate(rdfHandler);
+    }
+    /**
+     *
+     * @param queryResult Query Result
+     */
+    public static void close(final TupleQueryResult queryResult) {
 
         if (queryResult != null) {
             try {
                 queryResult.close();
-            } catch (QueryEvaluationException e) {
-            }
+            } catch (QueryEvaluationException e) {}
         }
     }
 

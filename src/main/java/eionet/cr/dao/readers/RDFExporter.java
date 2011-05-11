@@ -23,7 +23,7 @@ import eionet.cr.util.URLUtil;
 import eionet.cr.util.YesNoBoolean;
 
 /**
- *
+ * @deprecated
  */
 public class RDFExporter extends ResultSetMixedReader {
 

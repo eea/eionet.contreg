@@ -46,16 +46,15 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
-import eionet.cr.dao.readers.RDFExporter;
 import eionet.cr.dto.HarvestDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.TripleDTO;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
-import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.pagination.PagingRequest;
+import eionet.cr.web.util.RDFGenerator;
 
 /**
  * @author altnyris
@@ -366,8 +365,8 @@ public class HarvestSourceActionBean extends AbstractActionBean {
 
                         public void stream(HttpServletResponse response)
                                 throws Exception {
-                            RDFExporter.export(
-                                    Hashes.spoHash(harvestSource.getUrl()),
+                            RDFGenerator.generate(
+                                    harvestSource.getUrl(),
                                     response.getOutputStream());
                         }
                     }.setFilename("rdf.xml");
