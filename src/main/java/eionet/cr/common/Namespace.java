@@ -33,9 +33,9 @@ public enum Namespace {
     DC("http://purl.org/dc/elements/1.1/", "dc"),
     CR("http://cr.eionet.europa.eu/ontologies/contreg.rdf#", "cr"),
     IMS("http://rdfdata.eionet.europa.eu/ims/ontology/", "ims"),
-    AMP_OLD("http://rdfdata.eionet.europa.eu/amp/ontology/", "ampold"),
-    AMP("http://moonefish.eea.europa.eu:81/AMP-schema.rdf#", "amp"),
-    ROD("http://rod.eionet.europa.eu/schema.rdf#", "rod"),
+	AMP("http://rdfdata.eionet.europa.eu/amp/ontology/", "amp"),
+	AMP_IGN("http://moonefish.eea.europa.eu:81/AMP-schema.rdf#", "ampign"), // Phased out
+	ROD("http://rod.eionet.europa.eu/schema.rdf#", "rod"),
     ROD_OLD("http://rod.eionet.eu.int/schema.rdf#", "rodold"),
     EPER("http://rdfdata.eionet.europa.eu/eper/dataflow", "eper");
 

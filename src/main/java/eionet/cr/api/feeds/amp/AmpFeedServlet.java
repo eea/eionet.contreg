@@ -45,6 +45,9 @@ import eionet.cr.util.Pair;
 import eionet.cr.util.pagination.PagingRequest;
 
 /**
+ * The AmpFeedServlet searches for objects of rdf:type
+ * "http://rdfdata.eionet.europa.eu/amp/ontology/Output". It then outputs the
+ * predicates for which there are XML namespace declarations.
  *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
@@ -72,7 +75,7 @@ public class AmpFeedServlet extends HttpServlet implements SubjectProcessor {
         try {
             SearchDAO searchDao = DAOFactory.get().getDao(SearchDAO.class);
             Map<String, String> criteria = new HashMap<String, String>();
-            criteria.put(Predicates.RDF_TYPE, Subjects.AMP_PRODUCT);
+            criteria.put(Predicates.RDF_TYPE, Subjects.AMP_OUTPUT);
 
             Pair<Integer, List<SubjectDTO>> results = searchDao.searchByFilters(
                     criteria,
@@ -84,12 +87,13 @@ public class AmpFeedServlet extends HttpServlet implements SubjectProcessor {
             int subjectCount = results == null ? 0 : (results.getRight() == null ? 0 : results.getRight().size());
             logger.debug(methodName + ", " + subjectCount + " subjects found in total");
 
-            SubjectsRDFWriter rdfWriter = new SubjectsRDFWriter(request.getParameter(INCLUDE_DERIVED_VALUES) != null);
+            // Always include derived (inferred) values. Anything else is useless
+            SubjectsRDFWriter rdfWriter = new SubjectsRDFWriter(true);
             rdfWriter.addNamespace(Namespace.CR);
             rdfWriter.addNamespace(Namespace.DC);
             rdfWriter.addNamespace(Namespace.IMS);
-            rdfWriter.addNamespace(Namespace.AMP_OLD);
             rdfWriter.addNamespace(Namespace.AMP);
+            //rdfWriter.addNamespace(Namespace.AMP_IGN);
             rdfWriter.addNamespace(Namespace.OWL);
             rdfWriter.setSubjectProcessor(this);
 
@@ -115,9 +119,9 @@ public class AmpFeedServlet extends HttpServlet implements SubjectProcessor {
         }
 
         // add dc:identifier if missing
-        if (subject.getObjectValue(Predicates.DC_IDENTIFIER) == null) {
-            subject.addObject(Predicates.DC_IDENTIFIER, new ObjectDTO(subject.getUri(), true));
-        }
+//        if (subject.getObjectValue(Predicates.DC_IDENTIFIER) == null) {
+//            subject.addObject(Predicates.DC_IDENTIFIER, new ObjectDTO(subject.getUri(), true));
+//        }
 
         // add dc:date if missing
         if (subject.getObjectValue(Predicates.DC_DATE) == null && subject.getDcDate() != null) {
