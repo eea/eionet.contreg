@@ -86,8 +86,7 @@ CREATE TABLE harvest (
     tot_statements integer,
     lit_statements integer,
     res_statements integer,
-    enc_schemes integer,
-    tot_resources integer
+    enc_schemes integer
 );
 
 
@@ -122,7 +121,7 @@ CREATE TABLE harvest_message (
     harvest_message_id integer NOT NULL,
     harvest_id integer NOT NULL,
     type character varying(3) DEFAULT ''::character varying NOT NULL,
-    message character varying(1024) DEFAULT ''::character varying NOT NULL,
+    message text DEFAULT ''::character varying NOT NULL,
     stack_trace text
 );
 
@@ -158,7 +157,6 @@ CREATE TABLE harvest_source (
     harvest_source_id integer NOT NULL,
     url_hash bigint NOT NULL,
     url character varying(1024) NOT NULL,
-    tracked_file ynboolean DEFAULT 'N'::ynboolean NOT NULL,
     emails character varying(255) DEFAULT NULL::character varying,
     time_created timestamp without time zone NOT NULL,
     statements integer,
@@ -168,7 +166,11 @@ CREATE TABLE harvest_source (
     interval_minutes integer DEFAULT 0 NOT NULL,
     source bigint DEFAULT (0)::bigint NOT NULL,
     gen_time bigint DEFAULT (0)::bigint NOT NULL,
-    last_harvest_failed ynboolean DEFAULT 'N'::ynboolean NOT NULL
+    last_harvest_failed ynboolean DEFAULT 'N'::ynboolean NOT NULL,
+    priority_source ynboolean DEFAULT 'N'::ynboolean NOT NULL,
+    source_owner character varying(20) DEFAULT 'harvester'::character varying NOT NULL,
+    permanent_error ynboolean DEFAULT 'N'::ynboolean NOT NULL,
+    media_type character varying(255) DEFAULT NULL::character varying
 );
 
 
