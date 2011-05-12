@@ -32,12 +32,12 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO {
     protected Logger logger = Logger.getLogger(VirtuosoBaseDAO.class);
 
     /**
-     * Executes SPARQL and returns result list of the given bindingset reader.
+     * 
      * @param <T>
-     * @param query
+     * @param sparql
      * @param reader
      * @return
-     * @throws DAOException if SPARQL execution fails
+     * @throws DAOException
      */
     protected <T> List<T> executeSPARQL(String sparql,
             SPARQLResultSetReader<T> reader) throws DAOException {
