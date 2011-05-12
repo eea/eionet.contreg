@@ -15,7 +15,6 @@ import org.openrdf.query.BindingSet;
  *
  * @author Enriko Käsper
  *
- * @param <T>
  */
 public class MapReader extends ResultSetMixedReader<Map<String, String>> {
 

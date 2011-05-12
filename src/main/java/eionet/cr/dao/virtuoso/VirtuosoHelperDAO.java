@@ -219,17 +219,22 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
             for (String predicateUri : subjectDTO.getPredicateUris()) {
                 URI pred = conn.getValueFactory().createURI(predicateUri);
-                ObjectDTO object = subjectDTO.getObject(predicateUri);
 
-                String sourceUri = object.getSourceUri();
-                URI source = conn.getValueFactory().createURI(sourceUri);
+                Collection<ObjectDTO> objects = subjectDTO.getObjects(predicateUri);
+                if (objects != null && !objects.isEmpty()) {
+                    for (ObjectDTO object : objects) {
 
-                if (object.isLiteral()) {
-                    Literal literalObject = conn.getValueFactory().createLiteral(object.toString(), object.getDatatype());
-                    conn.add(sub, pred, literalObject, source);
-                } else {
-                    URI resourceObject = conn.getValueFactory().createURI(object.toString());
-                    conn.add(sub, pred, resourceObject, source);
+                        String sourceUri = object.getSourceUri();
+                        URI source = conn.getValueFactory().createURI(sourceUri);
+
+                        if (object.isLiteral()) {
+                            Literal literalObject = conn.getValueFactory().createLiteral(object.toString(), object.getDatatype());
+                            conn.add(sub, pred, literalObject, source);
+                        } else {
+                            URI resourceObject = conn.getValueFactory().createURI(object.toString());
+                            conn.add(sub, pred, resourceObject, source);
+                        }
+                    }
                 }
             }
         } catch (RepositoryException e) {
@@ -857,7 +862,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
                 String strObject = triple.getObject();
                 Literal literalObject = null;
                 if (strObject != null) {
-                    conn.getValueFactory().createLiteral(strObject);
+                    literalObject = conn.getValueFactory().createLiteral(strObject);
                 }
 
                 conn.remove(sub, pred, literalObject, source);

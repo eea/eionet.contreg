@@ -26,7 +26,11 @@
             <script type="text/javascript" src="<c:url value="/scripts/jquery-1.5.1.min.js"/>"></script>
             <script type="text/javascript" src="<c:url value="/scripts/jquery-timers.js"/>"></script>
             <script type="text/javascript" src="<c:url value="/scripts/jquery.autocomplete.js"/>"></script>
+            <%--
+            //remove conflicting javascript library
+            //TODO check if jquery-ui-min.js is needed on maps.js, when the functionality uses sparql
             <script type="text/javascript" src="<c:url value="/scripts/jquery-ui.min.js"/>"></script>
+             --%>
             <script type="text/javascript" src="<c:url value="/scripts/util.js"/>"></script>
             <script type="text/javascript" src="<c:url value="/scripts/pageops.js"/>"></script>
             <script type="text/javascript" src="<c:url value="/scripts/prototype.js"/>"></script>
