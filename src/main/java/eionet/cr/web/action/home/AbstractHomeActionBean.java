@@ -178,82 +178,135 @@ public abstract class AbstractHomeActionBean extends AbstractActionBean {
         return tabType;
     }
 
+    /**
+     * @return
+     */
     public String getAttemptedUserName() {
         return attemptedUserName;
     }
 
+    /**
+     * @param attemptedUserName
+     */
     public void setAttemptedUserName(String attemptedUserName) {
         this.attemptedUserName = attemptedUserName;
     }
 
+    /**
+     * @return
+     */
     public String getSection() {
         return section;
     }
 
+    /**
+     * @param section
+     */
     public void setSection(String section) {
         this.section = section;
     }
 
+    /**
+     * @return
+     */
     public boolean isUserAuthorized() {
         return userAuthorized;
     }
 
-    public void setUserAuthorized(boolean userAuthorized) {
-        this.userAuthorized = userAuthorized;
-    }
-
+    /**
+     * @return
+     */
     public String getAuthenticationMessage() {
         return authenticationMessage;
     }
 
+    /**
+     * @param authenticationMessage
+     */
     public void setAuthenticationMessage(String authenticationMessage) {
         this.authenticationMessage = authenticationMessage;
     }
 
+    /**
+     * @param tabType
+     */
     public void setTabType(String tabType) {
         this.tabType = tabType;
     }
 
+    /**
+     * @return
+     */
     public List<Map<String, String>> getTabs() {
         return tabs;
     }
 
+    /**
+     * @param tabs
+     */
     public void setTabs(List<Map<String, String>> tabs) {
         AbstractHomeActionBean.tabs = tabs;
     }
 
+    /**
+     * @return
+     */
     public Map<String, List<SearchResultColumn>> getTypescolumns() {
         return typesColumns;
     }
 
+    /**
+     * @return
+     */
     public String getBaseHomeUrl() {
         return baseHomeUrl;
     }
 
+    /**
+     * @param baseHomeUrl
+     */
     public void setBaseHomeUrl(String baseHomeUrl) {
         this.baseHomeUrl = baseHomeUrl;
     }
 
+    /**
+     * @return
+     */
     public String getAuthenticatedUserName() {
         return authenticatedUserName;
     }
 
+    /**
+     * @param authenticatedUserName
+     */
     public void setAuthenticatedUserName(String authenticatedUserName) {
         this.authenticatedUserName = authenticatedUserName;
     }
 
+    /**
+     * @return
+     */
     public boolean isShowPublic() {
         return showPublic;
     }
 
+    /**
+     * @param showPublic
+     */
     public void setShowPublic(boolean showPublic) {
         this.showPublic = showPublic;
     }
 
+    /**
+     * @return
+     */
     public String getShowpublicYes() {
         return SHOWPUBLIC_YES;
     }
 
+    /**
+     * @return
+     */
     public String getShowpublicNo() {
         return SHOWPUBLIC_NO;
     }
