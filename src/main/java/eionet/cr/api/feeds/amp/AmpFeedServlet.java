@@ -21,6 +21,7 @@
 package eionet.cr.api.feeds.amp;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.openrdf.repository.RepositoryConnection;
 
 import eionet.cr.api.feeds.SubjectsRDFWriter;
 import eionet.cr.common.Namespace;
@@ -43,6 +45,7 @@ import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Pair;
 import eionet.cr.util.pagination.PagingRequest;
+import eionet.cr.util.sesame.SesameUtil;
 
 /**
  * The AmpFeedServlet searches for objects of rdf:type
@@ -52,52 +55,59 @@ import eionet.cr.util.pagination.PagingRequest;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class AmpFeedServlet extends HttpServlet implements SubjectProcessor {
-
-    /** */
-    public static final String INCLUDE_DERIVED_VALUES = "inclDeriv";
+public class AmpFeedServlet extends HttpServlet {
 
     /** */
     private static final Logger logger = Logger.getLogger(AmpFeedServlet.class);
+
+    /** */
+    public static final String sparqlQuery =
+        "DEFINE input:inference 'CRInferenceRule'" +
+    	" select ?s ?p ?o where {?s ?p ?o." +
+    	" { select distinct ?s where {?s <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://rdfdata.eionet.europa.eu/amp/ontology/Output> }}}" +
+    	" order by ?s ?p ?o";
 
     /*
      * (non-Javadoc)
      * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
+    @SuppressWarnings("unchecked")
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         String methodName = new StringBuffer(AmpFeedServlet.class.getSimpleName()).append(".doGet()").toString();
-
         logger.debug("Entered " + methodName);
-
         response.setContentType("text/xml");
 
+        RepositoryConnection conn = null;
+        OutputStream outputStream = null;
         try {
-            SearchDAO searchDao = DAOFactory.get().getDao(SearchDAO.class);
-            Map<String, String> criteria = new HashMap<String, String>();
-            criteria.put(Predicates.RDF_TYPE, Subjects.AMP_OUTPUT);
+            conn = SesameUtil.getRepositoryConnection();
+            outputStream = response.getOutputStream();
+            
+            AmpFeedWriter feedWriter = new AmpFeedWriter(outputStream);
+            feedWriter.addNamespace(Namespace.CR);
+            feedWriter.addNamespace(Namespace.DC);
+            feedWriter.addNamespace(Namespace.IMS);
+            feedWriter.addNamespace(Namespace.AMP);
+            feedWriter.addNamespace(Namespace.OWL);
+            
+            SesameUtil.executeQuery(AmpFeedServlet.sparqlQuery, feedWriter, conn);
+            
+            int rowCount = feedWriter.getRowCount();
+            if (rowCount==0){
+                feedWriter.writeEmptyHeader();
+            }
+            else{
+                feedWriter.closeRDF();
+            }
+            
+            // do a final flush for just in case
+            outputStream.flush();
 
-            Pair<Integer, List<SubjectDTO>> results = searchDao.searchByFilters(
-                    criteria,
-                    null,
-                    null,
-                    null,
-                    null);
-
-            int subjectCount = results == null ? 0 : (results.getRight() == null ? 0 : results.getRight().size());
-            logger.debug(methodName + ", " + subjectCount + " subjects found in total");
-
-            // Always include derived (inferred) values. Anything else is useless
-            SubjectsRDFWriter rdfWriter = new SubjectsRDFWriter(true);
-            rdfWriter.addNamespace(Namespace.CR);
-            rdfWriter.addNamespace(Namespace.DC);
-            rdfWriter.addNamespace(Namespace.IMS);
-            rdfWriter.addNamespace(Namespace.AMP);
-            //rdfWriter.addNamespace(Namespace.AMP_IGN);
-            rdfWriter.addNamespace(Namespace.OWL);
-            rdfWriter.setSubjectProcessor(this);
-
-            rdfWriter.write(results.getRight(), response.getOutputStream());
+            logger.debug("Number of rows that the query returned: " + rowCount);
+            logger.debug("Written triples count: " + feedWriter.getWrittenTriplesCount());
+            logger.debug("Written subjects count: " + feedWriter.getWrittenSubjectsCount());
+            
         } catch (Exception e) {
             logger.error("Error in " + methodName, e);
             if (!response.isCommitted()) {
@@ -106,26 +116,5 @@ public class AmpFeedServlet extends HttpServlet implements SubjectProcessor {
         }
 
         response.getOutputStream().flush();
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see eionet.cr.common.SubjectProcessor#process(eionet.cr.dto.SubjectDTO)
-     */
-    public void process(SubjectDTO subject) {
-
-        if (subject == null) {
-            return;
-        }
-
-        // add dc:identifier if missing
-//        if (subject.getObjectValue(Predicates.DC_IDENTIFIER) == null) {
-//            subject.addObject(Predicates.DC_IDENTIFIER, new ObjectDTO(subject.getUri(), true));
-//        }
-
-        // add dc:date if missing
-        if (subject.getObjectValue(Predicates.DC_DATE) == null && subject.getDcDate() != null) {
-            subject.addObject(Predicates.DC_DATE, new ObjectDTO(subject.getDcDate().toString(), true));
-        }
     }
 }

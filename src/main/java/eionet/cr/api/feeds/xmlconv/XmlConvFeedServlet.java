@@ -34,7 +34,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import eionet.cr.api.feeds.SubjectsRDFWriter;
-import eionet.cr.api.feeds.amp.AmpFeedServlet;
 import eionet.cr.common.Namespace;
 import eionet.cr.common.Predicates;
 import eionet.cr.dao.DAOFactory;
@@ -54,6 +53,9 @@ public class XmlConvFeedServlet extends HttpServlet {
 
     /** */
     private static final Logger logger = Logger.getLogger(XmlConvFeedServlet.class);
+
+    /** */
+    public static final String INCLUDE_DERIVED_VALUES = "inclDeriv";
 
     /*
      * (non-Javadoc)
@@ -87,7 +89,7 @@ public class XmlConvFeedServlet extends HttpServlet {
                 subjects = results.getRight();
             }
 
-            SubjectsRDFWriter rdfWriter = new SubjectsRDFWriter(request.getParameter(AmpFeedServlet.INCLUDE_DERIVED_VALUES) != null);
+            SubjectsRDFWriter rdfWriter = new SubjectsRDFWriter(request.getParameter(XmlConvFeedServlet.INCLUDE_DERIVED_VALUES) != null);
             rdfWriter.addNamespace(Namespace.CR);
             rdfWriter.addNamespace(Namespace.DC);
             rdfWriter.addNamespace(Namespace.OWL);
