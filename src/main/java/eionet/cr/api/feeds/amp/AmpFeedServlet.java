@@ -62,10 +62,10 @@ public class AmpFeedServlet extends HttpServlet {
 
     /** */
     public static final String sparqlQuery =
-        "DEFINE input:inference 'CRInferenceRule'" +
-    	" select ?s ?p ?o where {?s ?p ?o." +
-    	" { select distinct ?s where {?s <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://rdfdata.eionet.europa.eu/amp/ontology/Output> }}}" +
-    	" order by ?s ?p ?o";
+        "DEFINE input:inference 'CRInferenceRule'"
+        + " select ?s ?p ?o where {?s ?p ?o."
+        + " { select distinct ?s where {?s <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://rdfdata.eionet.europa.eu/amp/ontology/Output> }}}"
+        + " order by ?s ?p ?o";
 
     /*
      * (non-Javadoc)
@@ -83,31 +83,30 @@ public class AmpFeedServlet extends HttpServlet {
         try {
             conn = SesameUtil.getRepositoryConnection();
             outputStream = response.getOutputStream();
-            
+
             AmpFeedWriter feedWriter = new AmpFeedWriter(outputStream);
             feedWriter.addNamespace(Namespace.CR);
             feedWriter.addNamespace(Namespace.DC);
             feedWriter.addNamespace(Namespace.IMS);
             feedWriter.addNamespace(Namespace.AMP);
             feedWriter.addNamespace(Namespace.OWL);
-            
+
             SesameUtil.executeQuery(AmpFeedServlet.sparqlQuery, feedWriter, conn);
-            
+
             int rowCount = feedWriter.getRowCount();
-            if (rowCount==0){
+            if (rowCount==0) {
                 feedWriter.writeEmptyHeader();
-            }
-            else{
+            } else {
                 feedWriter.closeRDF();
             }
-            
+
             // do a final flush for just in case
             outputStream.flush();
 
             logger.debug("Number of rows that the query returned: " + rowCount);
             logger.debug("Written triples count: " + feedWriter.getWrittenTriplesCount());
             logger.debug("Written subjects count: " + feedWriter.getWrittenSubjectsCount());
-            
+
         } catch (Exception e) {
             logger.error("Error in " + methodName, e);
             if (!response.isCommitted()) {

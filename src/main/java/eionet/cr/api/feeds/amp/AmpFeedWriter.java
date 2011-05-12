@@ -48,245 +48,243 @@ import eionet.cr.util.sesame.SPARQLResultSetReader;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class AmpFeedWriter implements SPARQLResultSetReader{
-	
-	/** */
-	private OutputStream outputStream;
-	
-	/** */
-	private int rowCount;
-	
-	/** */
-	private HashMap<String,String> namespaces = new HashMap<String, String>();
-	
-	/** */
-	private String xmlLang;
-	
-	/** */
-	private String currSubjUri;
-	private String currPredUri;
-	
-	/** */
-	private StringBuilder currSubjBuf;
-	
-	/** */
-	private HashSet<String> currPredWrittenObjects;
-	
-	/** */
-	private int writtenTriplesCount = 0;
-	private int writtenSubjectsCount = 0;
+public class AmpFeedWriter implements SPARQLResultSetReader {
 
-	/**
-	 * 
-	 * @param outputStream
-	 */
-	public AmpFeedWriter(OutputStream outputStream){
-		
-		this.outputStream = outputStream;
-		
-		addNamespace(Namespace.RDF);
-		addNamespace(Namespace.RDFS);
-	}
+    /** */
+    private OutputStream outputStream;
+    
+    /** */
+    private int rowCount;
+    
+    /** */
+    private HashMap<String,String> namespaces = new HashMap<String, String>();
+    
+    /** */
+    private String xmlLang;
+    
+    /** */
+    private String currSubjUri;
+    private String currPredUri;
+    
+    /** */
+    private StringBuilder currSubjBuf;
+    
+    /** */
+    private HashSet<String> currPredWrittenObjects;
+    
+    /** */
+    private int writtenTriplesCount = 0;
+    private int writtenSubjectsCount = 0;
 
-	/*
-	 * (non-Javadoc)
-	 * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
-	 */
-	@Override
-	public void readRow(BindingSet bindingSet) throws ResultSetReaderException {
-		
-		rowCount++;
-		try{
-			if (rowCount==1){
-				// write RDF header
-				outputStream.write("<?xml version=\"1.0\"?>".getBytes());
-				outputStream.write(("\n<rdf:RDF" + getHeaderAttributes() + ">").getBytes());
-				outputStream.flush();
-			}
-			
-			Value subjectValue = bindingSet.getValue("s");
-	        String subjUri = subjectValue.stringValue();
-			if (currSubjUri==null || !currSubjUri.equals(subjUri)){
+    /**
+     * 
+     * @param outputStream
+     */
+    public AmpFeedWriter(OutputStream outputStream) {
+        
+        this.outputStream = outputStream;
+        
+        addNamespace(Namespace.RDF);
+        addNamespace(Namespace.RDFS);
+    }
 
-				// new subject, so close previous one, unless it's the first time
-				if (rowCount>1){
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
+     */
+    @Override
+    public void readRow(BindingSet bindingSet) throws ResultSetReaderException {
+        
+        rowCount++;
+        try {
+            if (rowCount == 1) {
+                // write RDF header
+                outputStream.write("<?xml version=\"1.0\"?>".getBytes());
+                outputStream.write(("\n<rdf:RDF" + getHeaderAttributes() + ">").getBytes());
+                outputStream.flush();
+            }
+            
+            Value subjectValue = bindingSet.getValue("s");
+            String subjUri = subjectValue.stringValue();
+            if (currSubjUri == null || !currSubjUri.equals(subjUri)) {
 
-					// close the subject
-					currSubjBuf.append("\n\t</rdf:Description>");
-					outputStream.write(currSubjBuf.toString().getBytes());
-					outputStream.flush();
-				}
+                // new subject, so close previous one, unless it's the first time
+                if (rowCount > 1) {
 
-				// start new subject
-				currSubjBuf = new StringBuilder("\n\t<rdf:Description rdf:about=\"");
-				currSubjBuf.append(StringEscapeUtils.escapeXml(subjUri)).append("\">");
-				
-				// set current subject to the new one
-				currSubjUri = subjUri;
-				
-				writtenSubjectsCount++;
-			}
-			
-			Value predicateValue = bindingSet.getValue("p");
-			String predUri = predicateValue.stringValue();
+                    // close the subject
+                    currSubjBuf.append("\n\t</rdf:Description>");
+                    outputStream.write(currSubjBuf.toString().getBytes());
+                    outputStream.flush();
+                }
 
-			// if new predicate, clear the set of already written objects
-			if (currPredUri==null || !currPredUri.equals(predUri)){
-				
-				currPredWrittenObjects = new HashSet<String>();
-				currPredUri = predUri;
-			}
+                // start new subject
+                currSubjBuf = new StringBuilder("\n\t<rdf:Description rdf:about=\"");
+                currSubjBuf.append(StringEscapeUtils.escapeXml(subjUri)).append("\">");
+                
+                // set current subject to the new one
+                currSubjUri = subjUri;
+                
+                writtenSubjectsCount++;
+            }
+            
+            Value predicateValue = bindingSet.getValue("p");
+            String predUri = predicateValue.stringValue();
 
-	         Value objectValueObject = bindingSet.getValue("o");
-	         boolean isLitObject = objectValueObject instanceof Literal;
+            // if new predicate, clear the set of already written objects
+            if (currPredUri == null || !currPredUri.equals(predUri)) {
+                
+                currPredWrittenObjects = new HashSet<String>();
+                currPredUri = predUri;
+            }
 
-			// skip literal values of rdf:type
-			if (predUri.equals(Predicates.RDF_TYPE) && isLitObject){
-				return;
-			}
-			
-			String objValue = objectValueObject.stringValue();
-			boolean objAlreadyWritten = currPredWrittenObjects.contains(objValue);
+             Value objectValueObject = bindingSet.getValue("o");
+             boolean isLitObject = objectValueObject instanceof Literal;
 
-			// skip if object value is blank, or object has already been written
-			if (StringUtils.isBlank(objValue) || objAlreadyWritten){
-				return;
-			}
-			
-			// get namespace URI for this predicate
-			String predNsUri = NamespaceUtil.extractNamespace(predUri);
-			if (StringUtils.isBlank(predNsUri)){
-				throw new CRRuntimeException("Could not extract namespace URL from " +predUri);
-			}
-			
-			// include only predicates from supplied namespaces
-			if (namespaces.containsKey(predNsUri)){
-				
-				// extract predicate's local name
-				String predLocalName = StringUtils.substringAfterLast(
-						predUri, predNsUri);
-				if (StringUtils.isBlank(predLocalName)){
-					throw new CRRuntimeException("Could not extract local name from " +predUri);
-				}
+            // skip literal values of rdf:type
+            if (predUri.equals(Predicates.RDF_TYPE) && isLitObject) {
+                return;
+            }
+            
+            String objValue = objectValueObject.stringValue();
+            boolean objAlreadyWritten = currPredWrittenObjects.contains(objValue);
 
-				// start predicate tag
-				currSubjBuf.append("\n\t\t<").
-				append(namespaces.get(predNsUri)).append(":").append(predLocalName);
-				
-				// prepare escaped-for-XML object value
-				String objValueEscaped = StringEscapeUtils.escapeXml(objValue);
-				
-				// write object value, depending on whether it is literal or not
-				// (and close the predicate tag too!)
-				if (!isLitObject && URLUtil.isURL(objValue)){
-					
-					currSubjBuf.append(" rdf:resource=\"").append(objValueEscaped).append("\"/>");
-				}
-				else{
-					currSubjBuf.append(">").append(objValueEscaped).append("</").
-					append(namespaces.get(predNsUri)).append(":").append(predLocalName).append(">");
-				}
-				
-				writtenTriplesCount++;
-				currPredWrittenObjects.add(objValue);
-			}
-		}
-		catch (IOException e){
-			throw new ExportException(e.toString(), e);
-		}
-	}
+            // skip if object value is blank, or object has already been written
+            if (StringUtils.isBlank(objValue) || objAlreadyWritten) {
+                return;
+            }
+            
+            // get namespace URI for this predicate
+            String predNsUri = NamespaceUtil.extractNamespace(predUri);
+            if (StringUtils.isBlank(predNsUri)) {
+                throw new CRRuntimeException("Could not extract namespace URL from " +predUri);
+            }
+            
+            // include only predicates from supplied namespaces
+            if (namespaces.containsKey(predNsUri)) {
+                
+                // extract predicate's local name
+                String predLocalName = StringUtils.substringAfterLast(
+                        predUri, predNsUri);
+                if (StringUtils.isBlank(predLocalName)) {
+                    throw new CRRuntimeException("Could not extract local name from " +predUri);
+                }
 
-	/**
-	 * @throws IOException 
-	 * 
-	 */
-	public void closeRDF() throws IOException{
-		
-		currSubjBuf.append("\n\t</rdf:Description>");
-		outputStream.write(currSubjBuf.toString().getBytes());
-		outputStream.write("</rdf:RDF>\n".getBytes());
-		outputStream.flush();
-	}
-	
-	/**
-	 * @throws IOException 
-	 * 
-	 */
-	public void writeEmptyHeader() throws IOException{
-		outputStream.write("<rdf:RDF/>".getBytes());
-		outputStream.flush();
-	}
+                // start predicate tag
+                currSubjBuf.append("\n\t\t<").
+                append(namespaces.get(predNsUri)).append(":").append(predLocalName);
+                
+                // prepare escaped-for-XML object value
+                String objValueEscaped = StringEscapeUtils.escapeXml(objValue);
+                
+                // write object value, depending on whether it is literal or not
+                // (and close the predicate tag too!)
+                if (!isLitObject && URLUtil.isURL(objValue)) {
+                    
+                    currSubjBuf.append(" rdf:resource=\"").append(objValueEscaped).append("\"/>");
+                } else {
+                    currSubjBuf.append(">").append(objValueEscaped).append("</").
+                    append(namespaces.get(predNsUri)).append(":").append(predLocalName).append(">");
+                }
+                
+                writtenTriplesCount++;
+                currPredWrittenObjects.add(objValue);
+            }
+        } catch (IOException e) {
+            throw new ExportException(e.toString(), e);
+        }
+    }
 
-	/**
-	 * 
-	 * @return
-	 */
-	public int getRowCount() {
-		return rowCount;
-	}
+    /**
+     * @throws IOException 
+     * 
+     */
+    public void closeRDF() throws IOException {
+        
+        currSubjBuf.append("\n\t</rdf:Description>");
+        outputStream.write(currSubjBuf.toString().getBytes());
+        outputStream.write("</rdf:RDF>\n".getBytes());
+        outputStream.flush();
+    }
+    
+    /**
+     * @throws IOException 
+     * 
+     */
+    public void writeEmptyHeader() throws IOException {
+        outputStream.write("<rdf:RDF/>".getBytes());
+        outputStream.flush();
+    }
 
-	/**
-	 * 
-	 * @param namespace
-	 */
-	public void addNamespace(Namespace namespace){
-		namespaces.put(namespace.getUri(), namespace.getPrefix());
-	}
+    /**
+     * 
+     * @return
+     */
+    public int getRowCount() {
+        return rowCount;
+    }
 
-	/**
-	 * 
-	 * @param xmlLang
-	 */
-	public void setXmlLang(String xmlLang) {
-		this.xmlLang = xmlLang;
-	}
+    /**
+     * 
+     * @param namespace
+     */
+    public void addNamespace(Namespace namespace) {
+        namespaces.put(namespace.getUri(), namespace.getPrefix());
+    }
 
-	/**
-	 * 
-	 * @return
-	 */
-	private String getHeaderAttributes(){
-		
-		StringBuffer buf = new StringBuffer("");
-		if (xmlLang!=null && xmlLang.trim().length()>0){
-			buf.append(" xml:lang=\"").append(xmlLang).append("\"");
-		}
-		
-		if (!namespaces.isEmpty()){
-			for (Entry<String, String> entry : namespaces.entrySet()){
-				buf.append("\n   xmlns:").append(entry.getValue()).append("=\"").append(entry.getKey()).append("\"");
-			}
-		}
-		
-		return buf.toString();
-	}
+    /**
+     * 
+     * @param xmlLang
+     */
+    public void setXmlLang(String xmlLang) {
+        this.xmlLang = xmlLang;
+    }
 
-	/**
-	 * 
-	 * @return
-	 */
-	public int getWrittenTriplesCount() {
-		return writtenTriplesCount;
-	}
+    /**
+     * 
+     * @return
+     */
+    private String getHeaderAttributes() {
+        
+        StringBuffer buf = new StringBuffer("");
+        if (xmlLang != null && xmlLang.trim().length() > 0) {
+            buf.append(" xml:lang=\"").append(xmlLang).append("\"");
+        }
+        
+        if (!namespaces.isEmpty()) {
+            for (Entry<String, String> entry : namespaces.entrySet()) {
+                buf.append("\n   xmlns:").append(entry.getValue()).append("=\"").append(entry.getKey()).append("\"");
+            }
+        }
+        
+        return buf.toString();
+    }
 
-	/**
-	 * 
-	 * @return
-	 */
-	public int getWrittenSubjectsCount() {
-		return writtenSubjectsCount;
-	}
+    /**
+     * 
+     * @return
+     */
+    public int getWrittenTriplesCount() {
+        return writtenTriplesCount;
+    }
 
-	@Override
-	public List getResultList() {
-		return null;
-	}
+    /**
+     * 
+     * @return
+     */
+    public int getWrittenSubjectsCount() {
+        return writtenSubjectsCount;
+    }
 
-	@Override
-	public void endResultSet() {
-	}
+    @Override
+    public List getResultList() {
+        return null;
+    }
 
-	@Override
-	public void startResultSet(List bindingNames) {
-	}
+    @Override
+    public void endResultSet() {
+    }
+
+    @Override
+    public void startResultSet(List bindingNames) {
+    }
 }
