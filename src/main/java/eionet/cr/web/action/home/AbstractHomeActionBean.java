@@ -135,9 +135,11 @@ public abstract class AbstractHomeActionBean extends AbstractActionBean {
         attemptedUserName = context.getRequest().getParameter("username");
         section = activeSection;
         setDefaultSection();
-        if (this.isUserLoggedIn()) {
-            if (attemptedUserName.toLowerCase().equals(
-                    this.getUser().getUserName().toLowerCase())) {
+        if (isUserLoggedIn()) {
+            
+            // be case-sensitive about user name in session and user name in URL
+            String loggedInUserName = getUserName();
+            if (attemptedUserName.toLowerCase().equals(loggedInUserName.toLowerCase())) {
                 userAuthorized = true;
                 authenticatedUserName = attemptedUserName;
             } else {

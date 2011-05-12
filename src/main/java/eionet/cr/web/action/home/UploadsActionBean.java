@@ -485,11 +485,16 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
 
         if (uploads == null || uploads.isEmpty()) {
 
-            CRUser crUser = getUser();
-            if (this.isUserAuthorized() && crUser != null) {
-                uploads = DAOFactory.get().getDao(HelperDAO.class).getUserUploads(getUser());
-            } else {
-                uploads = DAOFactory.get().getDao(HelperDAO.class).getUserUploads(new CRUser(this.getAttemptedUserName()));
+            CRUser user = getUser();
+            if (user==null || !isUserAuthorized()){
+                String attemptedUserName = getAttemptedUserName();
+                if (StringUtils.isBlank(attemptedUserName)){
+                    user = new CRUser(getAttemptedUserName());
+                }
+            }
+            
+            if (user!=null){
+                uploads = DAOFactory.get().getDao(HelperDAO.class).getUserUploads(user);
             }
         }
 
