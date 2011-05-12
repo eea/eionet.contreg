@@ -84,6 +84,11 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      */
     @DefaultHandler
     public Resolution execute() throws OpenRDFException {
+        
+        // if no query specified at all, just forward to the form page
+        if (StringUtils.isBlank(query)){
+            return new ForwardResolution(FORM_PAGE);
+        }
 
         String acceptHeader = getContext().getRequest().getHeader("accept");
         String[] accept = {""};
