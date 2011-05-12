@@ -49,8 +49,13 @@ import eionet.cr.harvest.scheduled.HarvestingJob;
 @UrlBinding("/harvestQueue.action")
 public class HarvestQueueActionBean extends AbstractActionBean {
 
-    /** */
+    /**
+     * Name of the batch queue
+     */
     private static final String TYPE_BATCH = "batch";
+    /**
+     * Name of the urgent queue
+     */
     private static final String TYPE_URGENT = "urgent";
 
     /** */
@@ -79,7 +84,7 @@ public class HarvestQueueActionBean extends AbstractActionBean {
     /**
      *
      * @return
-     * @throws DAOException
+     * @throws DAOException if relational database is unavailable.
      */
     @DefaultHandler
     public Resolution view() throws DAOException {
@@ -98,6 +103,9 @@ public class HarvestQueueActionBean extends AbstractActionBean {
 
 
     /**
+     * Get queue type.
+     * This is not the queueType variable used in {@link #getQueueTypes()}.
+     *
      * @return the queueType
      */
     public String getQueueType() {
@@ -109,6 +117,9 @@ public class HarvestQueueActionBean extends AbstractActionBean {
     }
 
     /**
+     * Set queue type.
+     * This is not the queueType variable used in {@link #getQueueTypes()}.
+     *
      * @param queueType the queueType to set
      */
     public void setQueueType(String queueType) {
@@ -130,32 +141,36 @@ public class HarvestQueueActionBean extends AbstractActionBean {
     }
 
     /**
+     * Get a list of queue types - urgent and batch - for the tabs.
      *
-     * @return
+     * @return list of queue types.
      */
     public List<Map<String, String>> getQueueTypes() {
 
         if (queueTypes == null) {
 
-            queueTypes = new ArrayList<Map<String,String>>();
+            // Use a temporary variable while we construct the list elements.
+            // Otherwise it is not thread-safe.
+            List<Map<String, String>> qtBuildUp = new ArrayList<Map<String, String>>();
 
-            Map<String,String> queueType = new HashMap<String,String>();
+            Map<String, String> queueType = new HashMap<String, String>();
             queueType.put("title", "Urgent queue");
             queueType.put("queueType", TYPE_URGENT);
-            queueTypes.add(queueType);
+            qtBuildUp.add(queueType);
 
-            queueType = new HashMap<String,String>();
+            queueType = new HashMap<String, String>();
             queueType.put("title", "Batch queue");
             queueType.put("queueType", TYPE_BATCH);
-            queueTypes.add(queueType);
-        }
+            qtBuildUp.add(queueType);
 
+            queueTypes = qtBuildUp;
+        }
         return queueTypes;
     }
 
     /**
      *
-     * @return
+     * @return true if the queue is the urgent queue.
      */
     public boolean isTypeUrgent() {
         return getQueueType().equals(TYPE_URGENT);
@@ -163,7 +178,7 @@ public class HarvestQueueActionBean extends AbstractActionBean {
 
     /**
      *
-     * @return
+     * @return true if the queue is the batch queue.
      */
     public boolean isTypeBatch() {
         return getQueueType().equals(TYPE_BATCH);
