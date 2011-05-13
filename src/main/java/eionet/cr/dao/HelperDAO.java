@@ -220,12 +220,13 @@ public interface HelperDAO extends DAO {
 
 
     /**
-     *
-     * @param user
-     * @param subjectHash
+     * Checks if subject is listed as user bookmark.
+     * @param user Current user
+     * @param subject Subject URI
+     * @return boolean
      * @throws DAOException if query fails
      */
-    public boolean isSubjectUserBookmark(CRUser user, long subjectHash) throws DAOException;
+    public boolean isSubjectUserBookmark(CRUser user, String subject) throws DAOException;
 
     /**
      *

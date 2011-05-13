@@ -1008,7 +1008,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
         }
 
         if (isBookmark) {
-            if (!isSubjectUserBookmark(user, Hashes.spoHash(url))) {
+            if (!isSubjectUserBookmark(user, url)) {
                 addUserBookmark(user, url);
             }
         }
@@ -1106,8 +1106,10 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
      *
      * @see eionet.cr.dao.HelperDAO#isSubjectUserBookmark(eionet.cr.web.security.CRUser, long)
      */
-    public boolean isSubjectUserBookmark(CRUser user, long subjectHash) throws DAOException {
-
+    public boolean isSubjectUserBookmark(CRUser user, String  subject ) throws DAOException {
+        
+        throw new UnsupportedOperationException("Method not supported");
+        /*
         if (user == null) {
             throw new IllegalArgumentException("User object must not be null");
         }
@@ -1141,6 +1143,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
         } else {
             return true;
         }
+        */
     }
 
     /** */

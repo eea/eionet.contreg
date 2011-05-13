@@ -607,8 +607,7 @@ public class FactsheetActionBean extends AbstractActionBean {
         }
 
         if (subjectIsUserBookmark == null) {
-            long subjectHash = StringUtils.isBlank(uri) ? uriHash : Hashes.spoHash(uri);
-            subjectIsUserBookmark = Boolean.valueOf(factory.getDao(HelperDAO.class).isSubjectUserBookmark(getUser(), subjectHash));
+            subjectIsUserBookmark = Boolean.valueOf(factory.getDao(HelperDAO.class).isSubjectUserBookmark(getUser(), uri));
         }
 
         return subjectIsUserBookmark.booleanValue();
@@ -656,7 +655,7 @@ public class FactsheetActionBean extends AbstractActionBean {
      * @return boolean
      */
     public boolean isMapDisplayable() {
-
+        //TODO subproperties handling
         if (subject != null) {
             Collection<ObjectDTO> objects = subject.getObjects(Predicates.RDF_TYPE, ObjectDTO.Type.RESOURCE);
             if (objects != null) {
@@ -697,6 +696,7 @@ public class FactsheetActionBean extends AbstractActionBean {
      * @return String longitude
      */
     public String getLongitude() {
+        //TODO subproperties handling
         if (subject.getObject(Predicates.WGS_LONG) != null) {
             return subject.getObject(Predicates.WGS_LONG).getValue();
         }
@@ -709,6 +709,7 @@ public class FactsheetActionBean extends AbstractActionBean {
      * @return String latitude
      */
     public String getLatitude() {
+        //TODO subproperties handling
         if (subject.getObject(Predicates.WGS_LAT) != null) {
             return subject.getObject(Predicates.WGS_LAT).getValue();
         }
