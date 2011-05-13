@@ -27,6 +27,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.openrdf.model.Value;
+import org.openrdf.query.BindingSet;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.dto.UploadDTO;
@@ -38,7 +40,7 @@ import eionet.cr.util.sql.SQLResultSetBaseReader;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class UploadDTOReader extends SQLResultSetBaseReader<UploadDTO>{
+public class UploadDTOReader extends ResultSetMixedReader<UploadDTO>{
 
     /** */
     private static final long labelHash = Hashes.spoHash(Predicates.RDFS_LABEL);
@@ -50,7 +52,7 @@ public class UploadDTOReader extends SQLResultSetBaseReader<UploadDTO>{
 
     /*
      * (non-Javadoc)
-     * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
+     * @see eionet.cr.util.sql.SQLResultSetReader#readRow(java.sql.ResultSet)
      */
     public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
 
@@ -79,9 +81,44 @@ public class UploadDTOReader extends SQLResultSetBaseReader<UploadDTO>{
 
     /*
      * (non-Javadoc)
-     * @see eionet.cr.util.sql.SQLResultSetBaseReader#getResultList()
+     * @see eionet.cr.dao.readers.ResultSetMixedReader#getResultList()
      */
     public List<UploadDTO> getResultList() {
         return new ArrayList<UploadDTO>(uploadsMap.values());
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
+     */
+    @Override
+    public void readRow(BindingSet bindingSet) throws ResultSetReaderException {
+        
+        Value subjectValue = bindingSet.getValue("s");
+        String subjectUri = subjectValue.stringValue();
+        Value predicateValue = bindingSet.getValue("p");
+        String predicateUri = predicateValue.stringValue();
+        Value objectValue = bindingSet.getValue("o");
+        String objectString = objectValue.stringValue();
+
+        UploadDTO uploadDTO = uploadsMap.get(subjectUri);
+        if (uploadDTO == null) {
+            uploadDTO = new UploadDTO(subjectUri);
+            uploadsMap.put(subjectUri, uploadDTO);
+        }
+
+        if (predicateUri.equals(Predicates.RDFS_LABEL)) {
+            uploadDTO.setLabel(objectString);
+            
+        } else if (predicateUri.equals(Predicates.CR_LAST_MODIFIED)) {
+            uploadDTO.setDateModified(objectString);
+            
+        } else if (predicateUri.equals(Predicates.DC_TITLE)) {
+
+            // label not yet set, prefer dc:title as the label
+            if (StringUtils.isBlank(uploadDTO.getLabel())) {
+                uploadDTO.setLabel(objectString);
+            }
+        }
     }
 }

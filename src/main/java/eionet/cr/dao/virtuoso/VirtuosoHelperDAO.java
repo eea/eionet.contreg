@@ -1,5 +1,7 @@
 package eionet.cr.dao.virtuoso;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -11,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.openrdf.OpenRDFException;
 import org.openrdf.model.Literal;
 import org.openrdf.model.URI;
 import org.openrdf.model.vocabulary.XMLSchema;
@@ -29,9 +32,11 @@ import eionet.cr.dao.readers.ObjectLabelReader;
 import eionet.cr.dao.readers.RDFExporter;
 import eionet.cr.dao.readers.RecentFilesReader;
 import eionet.cr.dao.readers.RecentUploadsReader;
+import eionet.cr.dao.readers.ResultSetReaderException;
 import eionet.cr.dao.readers.SubPropertiesReader;
 import eionet.cr.dao.readers.SubjectDataReader;
 import eionet.cr.dao.readers.TriplesReader;
+import eionet.cr.dao.readers.UploadDTOReader;
 import eionet.cr.dao.util.PredicateLabels;
 import eionet.cr.dao.util.SubProperties;
 import eionet.cr.dao.util.UriLabelPair;
@@ -47,9 +52,11 @@ import eionet.cr.dto.UserHistoryDTO;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.ObjectLabelPair;
 import eionet.cr.util.Pair;
+import eionet.cr.util.URIUtil;
 import eionet.cr.util.Util;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.util.sesame.SesameUtil;
+import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
 import eionet.cr.web.security.CRUser;
 
@@ -892,9 +899,71 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
      * @see eionet.cr.dao.HelperDAO#getUserUploads(eionet.cr.web.security.CRUser)
      */
     @Override
-    public Collection<UploadDTO> getUserUploads(CRUser crUser)
-            throws DAOException {
-        throw new UnsupportedOperationException("Method not implemented");
+    public Collection<UploadDTO> getUserUploads(CRUser crUser) throws DAOException {
+        
+        if (crUser == null) {
+            throw new IllegalArgumentException("User object must not be null");
+        }
+
+        if (StringUtils.isBlank(crUser.getUserName())) {
+            throw new IllegalArgumentException("User name must not be blank");
+        }
+
+        StringBuilder strBuilder = new StringBuilder().
+        append("select ?s ?p ?o where").
+        append(" { ?s ?p ?o.").
+        append(" { select distinct ?s where { <").append(crUser.getHomeUri()).
+        append("> <").append(Predicates.CR_HAS_FILE).append(">").append(" ?s }}}").
+        append(" order by ?s ?p ?o");
+
+        UploadDTOReader reader = new UploadDTOReader();
+        RepositoryConnection conn = null;
+        try {
+            conn = SesameUtil.getRepositoryConnection();
+            SesameUtil.executeQuery(strBuilder.toString(), reader, conn);
+
+            // loop through all the found uploads and make sure they all have the label set
+            Collection<UploadDTO> uploads = reader.getResultList();
+            for (UploadDTO uploadDTO : uploads) {
+
+                String currentLabel = uploadDTO.getLabel();
+                String subjectUri = uploadDTO.getSubjectUri();
+                String uriLabel = URIUtil.extractURILabel(subjectUri, SubjectDTO.NO_LABEL);
+
+                if (StringUtils.isBlank(currentLabel) && !StringUtils.isBlank(uriLabel))
+                    uploadDTO.setLabel(uriLabel);
+                else
+                    uploadDTO.setLabel(uriLabel + " (" + currentLabel + ")");
+            }
+
+            return uploads;
+            
+        } catch (ResultSetReaderException e) {
+            throw new DAOException(e.toString(), e);
+        } catch (OpenRDFException e) {
+            throw new DAOException(e.toString(), e); 
+        } finally {
+            SesameUtil.close(conn);
+        }
+
+//        StringBuilder strBuilder = new StringBuilder();
+//        strBuilder.append("PREFIX cr: <").append(Namespace.CR.getUri()).append("> select ?url ?time FROM <")
+//                .append(user.getHistoryUri())
+//                .append("> WHERE {?s cr:userHistory ?url . ?s cr:userSaveTime ?time} order by desc(?time)");
+//
+//        List<UserHistoryDTO> returnHistory = new ArrayList<UserHistoryDTO>();
+//        MapReader reader = new MapReader();
+//        executeSPARQL(strBuilder.toString(), reader);
+//
+//        if (reader.getResultList() != null && reader.getResultList().size() > 0) {
+//            for (Map<String, String> resultItem : reader.getResultList()) {
+//                UserHistoryDTO historyItem = new UserHistoryDTO();
+//                historyItem.setUrl(resultItem.get("url"));
+//                historyItem.setLastOperation(resultItem.get("time"));
+//                returnHistory.add(historyItem);
+//            }
+//        }
+//        return returnHistory;
 
     }
 
