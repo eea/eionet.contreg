@@ -1,25 +1,38 @@
 package eionet.cr.dto;
 
-import java.io.Serializable;
-
 import org.apache.commons.lang.StringEscapeUtils;
 
-public class UserBookmarkDTO implements Serializable {
+/**
+ * 
+ * @author jaanus
+ *
+ */
+public class UserBookmarkDTO{
 
+    /** */
     private String bookmarkUrl;
 
+    /**
+     * 
+     * @return
+     */
     public String getBookmarkUrl() {
         return bookmarkUrl;
     }
 
+    /**
+     * 
+     * @param bookmarkUrl
+     */
     public void setBookmarkUrl(String bookmarkUrl) {
         this.bookmarkUrl = bookmarkUrl;
     }
 
+    /**
+     * 
+     * @return
+     */
     public String getBookmarkUrlHtmlFormatted() {
         return StringEscapeUtils.escapeHtml(bookmarkUrl);
     }
-
-
-
 }

@@ -1,7 +1,9 @@
 package eionet.cr.dao.virtuoso;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -16,7 +18,13 @@ import org.apache.commons.lang.StringUtils;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Literal;
 import org.openrdf.model.URI;
+import org.openrdf.model.Value;
 import org.openrdf.model.vocabulary.XMLSchema;
+import org.openrdf.query.BindingSet;
+import org.openrdf.query.QueryEvaluationException;
+import org.openrdf.query.QueryLanguage;
+import org.openrdf.query.TupleQuery;
+import org.openrdf.query.TupleQueryResult;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 
@@ -629,10 +637,40 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
      * @see eionet.cr.dao.HelperDAO#getUserBookmarks(eionet.cr.web.security.CRUser)
      */
     @Override
-    public List<UserBookmarkDTO> getUserBookmarks(CRUser user)
-            throws DAOException {
-        throw new UnsupportedOperationException("Method not implemented");
+    public List<UserBookmarkDTO> getUserBookmarks(CRUser user) throws DAOException {
+        
+        StringBuilder query = new StringBuilder("select distinct ?bookmarkUrl").
+        append(" from <").append(user.getBookmarksUri()).append(">").
+        append(" where { ?subject <").append(Predicates.CR_BOOKMARK).append("> ?bookmarkUrl }").
+        append("order by ?bookmarkUrl");
 
+        RepositoryConnection conn = null;
+        TupleQueryResult queryResult = null;
+        List<UserBookmarkDTO> resultList = new ArrayList<UserBookmarkDTO>();
+        try {
+            conn = SesameUtil.getRepositoryConnection();
+            TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query.toString());
+            queryResult = tupleQuery.evaluate();
+            
+            while (queryResult.hasNext()) {
+                
+                BindingSet bindingSet = queryResult.next();
+                Value objectValue = bindingSet.getValue("bookmarkUrl");
+                if (objectValue!=null){
+                    UserBookmarkDTO bookmark = new UserBookmarkDTO();
+                    bookmark.setBookmarkUrl(objectValue.stringValue());
+                    resultList.add(bookmark);
+                }
+
+            }
+        } catch (OpenRDFException e) {
+            throw new DAOException(e.toString(), e);
+        } finally {
+            SesameUtil.close(queryResult);
+            SesameUtil.close(conn);
+        }
+
+        return resultList;
     }
 
     /*

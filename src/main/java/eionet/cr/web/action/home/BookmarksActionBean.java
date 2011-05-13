@@ -2,6 +2,9 @@ package eionet.cr.web.action.home;
 
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HelperDAO;
@@ -62,16 +65,29 @@ public class BookmarksActionBean extends AbstractHomeActionBean {
         selectedBookmarks = bookmarkUrl;
     }
 
-    public List<UserBookmarkDTO> getBookmarks() {
-        try {
-            if (this.isUserAuthorized() && this.getUser() != null) {
-                bookmarks = DAOFactory.get().getDao(HelperDAO.class).getUserBookmarks(this.getUser());
-            } else {
-                bookmarks = DAOFactory.get().getDao(HelperDAO.class).getUserBookmarks(new CRUser(this.getAttemptedUserName()));
+    /**
+     * 
+     * @return
+     * @throws DAOException
+     */
+    public List<UserBookmarkDTO> getBookmarks() throws DAOException {
+        
+        if (CollectionUtils.isEmpty(bookmarks)){
+            
+            CRUser user = getUser();
+            if (user==null || !isUserAuthorized()){
+                
+                String attemptedUserName = getAttemptedUserName();
+                if (StringUtils.isBlank(attemptedUserName)){
+                    user = new CRUser(getAttemptedUserName());
+                }
             }
-        } catch (DAOException ex) {
-
+            
+            if (user!=null){
+                bookmarks = DAOFactory.get().getDao(HelperDAO.class).getUserBookmarks(user);
+            }
         }
+        
         return bookmarks;
     }
 
