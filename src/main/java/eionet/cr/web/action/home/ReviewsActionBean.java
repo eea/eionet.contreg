@@ -5,7 +5,9 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.FileBean;
@@ -27,9 +29,9 @@ import eionet.cr.util.Hashes;
 import eionet.cr.web.security.CRUser;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
- *
+ * 
  */
 
 @UrlBinding("/home/{username}/reviews")
@@ -50,7 +52,7 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
     private FileBean attachment;
 
     /**
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -108,7 +110,6 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
                 addWarningMessage("User must be logged in to delete attachments.");
             }
         }
-
 
         return new ForwardResolution("/pages/home/reviews.jsp");
     }
@@ -237,15 +238,13 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
         }
 
         // construct attachment uri
-        String attachmentUri = getUser().getReviewAttachmentUri(
-                reviewId, attachment.getFileName());
+        String attachmentUri = getUser().getReviewAttachmentUri(reviewId, attachment.getFileName());
 
         InputStream attachmentContentStream = null;
         try {
             // save attachment contents into database
             attachmentContentStream = attachment.getInputStream();
-            SpoBinaryDTO dto = new SpoBinaryDTO(
-                    Hashes.spoHash(attachmentUri), attachmentContentStream);
+            SpoBinaryDTO dto = new SpoBinaryDTO(Hashes.spoHash(attachmentUri), attachmentContentStream);
             DAOFactory.get().getDao(SpoBinaryDAO.class).add(dto, attachment.getSize());
 
             // construct review uri
@@ -264,18 +263,21 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
             // persist review SubjectDTO
             helperDAO.addTriples(subjectDTO);
 
-            // make sure both attachment uri and cr:hasAttachment are present in RESOURCE table
+            // make sure both attachment uri and cr:hasAttachment are present in
+            // RESOURCE table
             helperDAO.addResource(attachmentUri, attachmentUri);
             helperDAO.addResource(Predicates.CR_HAS_ATTACHMENT, reviewUri);
 
-			// since the review URI was used above as triple source, add it to HARVEST_SOURCE too
-			// (but set interval minutes to 0, to avoid it being background-harvested)
-			DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(
-					HarvestSourceDTO.create(reviewUri, true, 0, getUser().getUserName()));
-			
+            // since the review URI was used above as triple source, add it to
+            // HARVEST_SOURCE too
+            // (but set interval minutes to 0, to avoid it being
+            // background-harvested)
+            DAOFactory.get().getDao(HarvestSourceDAO.class)
+                    .addSourceIgnoreDuplicate(HarvestSourceDTO.create(reviewUri, true, 0, getUser().getUserName()));
+
             // finally, attempt to harvest the uploaded file's contents
             harvestUploadedFile(attachmentUri, attachment, null, getUserName());
-            
+
         } catch (DAOException daoe) {
             logger.error("Error when storing attachment", daoe);
             addSystemMessage("Error when storing attachment");
@@ -334,8 +336,10 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
                     addCautionMessage("Review with this ID is not found.");
                     review = null;
                 } else {
-                    // Load attachments list only when it is needed - viewing a review.
-                    review.setAttachments(DAOFactory.get().getDao(HelperDAO.class).getReviewAttachmentList(new CRUser(getAttemptedUserName()), reviewId));
+                    // Load attachments list only when it is needed - viewing a
+                    // review.
+                    review.setAttachments(DAOFactory.get().getDao(HelperDAO.class)
+                            .getReviewAttachmentList(new CRUser(getAttemptedUserName()), reviewId));
                 }
             } catch (DAOException ex) {
                 logger.error("Error when getting review", ex);
@@ -350,7 +354,8 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
      */
     public String getReviewContentHTML() {
         if (review.getReviewContent() != null) {
-            return review.getReviewContent().replace("&", "&amp;").replace("<", "&lt;").replace("\r\n", "<br/>").replace("\n", "<br/>");
+            return review.getReviewContent().replace("&", "&amp;").replace("<", "&lt;").replace("\r\n", "<br/>")
+                    .replace("\n", "<br/>");
         } else {
             return "";
         }
@@ -406,17 +411,27 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
 
     /**
      * @return
+     * @throws DAOException
      */
-    public List<ReviewDTO> getReviews() {
-        try {
-            if (this.isUserAuthorized() && this.getUser() != null) {
-                return DAOFactory.get().getDao(HelperDAO.class).getReviewList(this.getUser());
-            } else {
-                return DAOFactory.get().getDao(HelperDAO.class).getReviewList(new CRUser(this.getAttemptedUserName()));
+    public List<ReviewDTO> getReviews() throws DAOException {
+
+        if (CollectionUtils.isEmpty(reviews)) {
+
+            CRUser user = getUser();
+            if (user == null || !isUserAuthorized()) {
+
+                String attemptedUserName = getAttemptedUserName();
+                if (StringUtils.isBlank(attemptedUserName)) {
+                    user = new CRUser(getAttemptedUserName());
+                }
             }
-        } catch (Exception ex) {
-            return null;
+
+            if (user != null) {
+                reviews = DAOFactory.get().getDao(HelperDAO.class).getReviewList(user);
+            }
         }
+
+        return reviews;
     }
 
     /**

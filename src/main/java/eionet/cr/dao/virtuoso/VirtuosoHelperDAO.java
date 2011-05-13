@@ -909,8 +909,52 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
      */
     @Override
     public List<ReviewDTO> getReviewList(CRUser user) throws DAOException {
-        throw new UnsupportedOperationException("Method not implemented");
-
+        
+        StringBuilder strBuilder = new StringBuilder().
+        append("select ?s ?p ?o where { ?s ?p ?o.").
+        append(" { select distinct ?s where { ?s <").append(Predicates.RDF_TYPE).append("> <").append(Subjects.CR_FEEDBACK).append(">.").
+        append(" ?s <").append(Predicates.CR_USER).append("> <").append(user.getHomeUri()).append("> }}}").
+        append("order by ?s ?p ?o");
+        
+        RepositoryConnection conn = null;
+        List<ReviewDTO> resultList = new ArrayList<ReviewDTO>();
+        TupleQueryResult queryResult = null;
+        try {
+            conn = SesameUtil.getRepositoryConnection();
+            TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, strBuilder.toString());
+            queryResult = tupleQuery.evaluate();
+            
+            ReviewDTO reviewDTO = null;
+            while (queryResult.hasNext()) {
+                
+                BindingSet bindingSet = queryResult.next();
+                
+                String reviewUri = bindingSet.getValue("s").stringValue();
+                if (reviewDTO==null || !reviewUri.equals(reviewDTO.getReviewSubjectUri())){
+                    reviewDTO = new ReviewDTO();
+                    reviewDTO.setReviewSubjectUri(reviewUri);
+                    resultList.add(reviewDTO);
+                }
+                
+                String predicateUri = bindingSet.getValue("p").stringValue();
+                if (predicateUri.equals(Predicates.DC_TITLE)){
+                    reviewDTO.setTitle(bindingSet.getValue("o").stringValue());
+                }
+                
+                if (predicateUri.equals(Predicates.CR_FEEDBACK_FOR)){
+                    reviewDTO.setObjectUrl(bindingSet.getValue("o").stringValue());
+                }
+            }
+        }
+        catch (OpenRDFException e){
+            throw new DAOException(e.toString(), e);
+        }
+        finally{
+            SesameUtil.close(queryResult);
+            SesameUtil.close(conn);
+        }
+        
+        return resultList;
     }
 
     /*
@@ -920,8 +964,66 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
      */
     @Override
     public ReviewDTO getReview(CRUser user, int reviewId) throws DAOException {
+        
         throw new UnsupportedOperationException("Method not implemented");
-
+//        String reviewUri = user.getReviewUri(reviewId);
+//        ReviewDTO reviewDTO = getReviewDTO(reviewUri);
+//        
+//        if (reviewDTO!=null){
+//            
+//        }
+//        
+//        return reviewDTO;
+    }
+    
+    /**
+     * @param reviewUri
+     * @return
+     * @throws DAOException
+     */
+    private ReviewDTO getReviewDTO(String reviewUri) throws DAOException {
+        StringBuilder query = new StringBuilder().
+        append("select ?p ?o where { <").append(reviewUri).append("> ?p ?o }");
+        
+        ReviewDTO reviewDTO = null;
+        RepositoryConnection conn = null;
+        List<ReviewDTO> resultList = new ArrayList<ReviewDTO>();
+        TupleQueryResult queryResult = null;
+        
+        try {
+            conn = SesameUtil.getRepositoryConnection();
+            TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query.toString());
+            queryResult = tupleQuery.evaluate();
+            
+            while (queryResult.hasNext()) {
+                
+                BindingSet bindingSet = queryResult.next();
+                
+                if (reviewDTO==null){
+                    reviewDTO = new ReviewDTO();
+                    reviewDTO.setReviewSubjectUri(reviewUri);
+                }
+                
+                String predicateUri = bindingSet.getValue("p").stringValue();
+                String objectString = bindingSet.getValue("o").stringValue();
+                
+                if (predicateUri.equals(Predicates.DC_TITLE)){
+                    reviewDTO.setTitle(bindingSet.getValue("o").stringValue());
+                }
+                if (predicateUri.equals(Predicates.CR_FEEDBACK_FOR)){
+                    reviewDTO.setObjectUrl(bindingSet.getValue("o").stringValue());
+                }
+            }
+        }
+        catch (OpenRDFException e){
+            throw new DAOException(e.toString(), e);
+        }
+        finally{
+            SesameUtil.close(queryResult);
+            SesameUtil.close(conn);
+        }
+        
+        return reviewDTO;
     }
 
     /*

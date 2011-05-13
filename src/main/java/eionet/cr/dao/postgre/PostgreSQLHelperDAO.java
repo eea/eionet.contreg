@@ -1538,11 +1538,6 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
                 tempReviewDTO.setObjectUrl(rs.getString("object"));
                 tempReviewDTO.setReviewContent(rs.getString("reviewcontent"));
                 tempReviewDTO.setReviewContentType(rs.getString("datatype"));
-                try {
-                    tempReviewDTO.setReviewID(Integer.parseInt(tempReviewDTO.getReviewSubjectUri().split("reviews/")[1]));
-                } catch (Exception ex) {
-                    tempReviewDTO.setReviewID(0);
-                }
                 returnList.add(tempReviewDTO);
             }
         } catch (SQLException e) {
@@ -1597,11 +1592,9 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(dbQuery);
 			if (rs.next()){
-				result = new ReviewDTO();
 				result.setReviewSubjectUri(rs.getString("uri"));
 				result.setTitle(rs.getString("title"));
 				result.setObjectUrl(rs.getString("object"));
-				result.setReviewID(reviewId);
 				result.setReviewContentType(rs.getString("datatype"));
 				
 				byte [] bytes = rs.getBytes("reviewcontent");
