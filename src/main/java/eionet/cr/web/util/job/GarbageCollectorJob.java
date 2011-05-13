@@ -61,7 +61,6 @@ public class GarbageCollectorJob implements StatefulJob {
      * @throws JobExecutionException
      *             if execution fails.
      */
-    @SuppressWarnings("unchecked")
     public void execute(final JobExecutionContext context) throws JobExecutionException {
         try {
             LOGGER.debug("Executing garbage collector (pauses other jobs and waits for them to finish");

@@ -15,7 +15,6 @@ public class GraphUrisReader<T> extends ResultSetMixedReader<T>{
      * (non-Javadoc)
      * @see eionet.cr.util.sql.SQLResultSetReader#readRow(java.sql.ResultSet)
      */
-    @SuppressWarnings("unchecked")
     @Override
     public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
     }

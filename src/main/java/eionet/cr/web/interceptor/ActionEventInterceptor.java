@@ -55,7 +55,6 @@ public class ActionEventInterceptor implements Interceptor {
     /* (non-Javadoc)
      * @see net.sourceforge.stripes.controller.Interceptor#intercept(net.sourceforge.stripes.controller.ExecutionContext)
      */
-    @SuppressWarnings("unchecked")
     public Resolution intercept(ExecutionContext context) throws Exception {
         Resolution resolution = null;
 
