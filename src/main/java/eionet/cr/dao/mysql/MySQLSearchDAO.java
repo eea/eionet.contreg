@@ -278,7 +278,7 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
         // build the "order by" part
         if (doSort) {
             sqlBuf.append(" order by ORDERING.OBJECT ").
-            append(sortOrder == null ? sortOrder.ASCENDING.toSQL() : sortOrder.toSQL());
+            append(sortOrder == null ? SortOrder.ASCENDING.toSQL() : sortOrder.toSQL());
         }
 
         // build the "limit" part
@@ -380,7 +380,7 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
                 sqlBuf.append(" order by ORDERING.OBJECT");
             }
             sqlBuf.append(" ").
-            append(sortOrder == null ? sortOrder.ASCENDING.toSQL() : sortOrder.toSQL());
+            append(sortOrder == null ? SortOrder.ASCENDING.toSQL() : sortOrder.toSQL());
         }
 
         if (pagingRequest != null) {
