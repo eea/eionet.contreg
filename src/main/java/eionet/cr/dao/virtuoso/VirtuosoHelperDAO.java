@@ -378,7 +378,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         if (predicateUris != null && !predicateUris.isEmpty()) {
 
             // only these predicates will be queried for
-            String[] neededPredicates = { Predicates.RDF_TYPE,
+            String[] neededPredicates = {Predicates.RDF_TYPE,
                     Predicates.RDFS_LABEL };
 
             // get the data of all found subjects
@@ -671,7 +671,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         if (user == null || StringUtils.isBlank(user.getUserName())) {
             throw new IllegalArgumentException("user must not be null and must have user name");
         }
-        if (!URLUtil.isURL(url) ) {
+        if (!URLUtil.isURL(url)) {
             throw new IllegalArgumentException("url must not be null and must be valid URL");
         }
 
@@ -701,7 +701,8 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
                 Predicates.CR_BOOKMARK, url);
 
         triple.setSourceUri(user.getBookmarksUri());
-
+        triple.setLiteralObject(false);
+        
         deleteTriples(Collections.singletonList(triple));
 
     }
@@ -1091,14 +1092,22 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
                 URI sub = conn.getValueFactory().createURI(triple.getSubjectUri());
                 URI pred = conn.getValueFactory().createURI(triple.getPredicateUri());
                 URI source = conn.getValueFactory().createURI(triple.getSourceUri());
-
                 String strObject = triple.getObject();
-                Literal literalObject = null;
-                if (strObject != null) {
-                    literalObject = conn.getValueFactory().createLiteral(strObject);
+                
+                if (triple.isLiteralObject()) {
+                    Literal literalObject = null;
+                    if (strObject != null) {
+                        literalObject = conn.getValueFactory().createLiteral(strObject);
+                    }
+                    conn.remove(sub, pred, literalObject, source);
+                } else {
+                    URI object =  null;
+                    if (strObject != null) {
+                        object = conn.getValueFactory().createURI(triple.getObject());
+                    }
+                    conn.remove(sub, pred, object, source);
                 }
 
-                conn.remove(sub, pred, literalObject, source);
             }
         } catch (RepositoryException e) {
             throw new DAOException(e.toString(), e);
@@ -1288,5 +1297,4 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         return Long.valueOf(resultObject.toString());
 
     }
-
 }

@@ -355,6 +355,8 @@ public class FactsheetActionBean extends AbstractActionBean {
                 String sourceUri = getContext().getRequest().getParameter("source_".concat(objectHash));
 
                 TripleDTO triple = new TripleDTO(uri, predicate , objectValue);
+                //FIXME - find a better way to determine   if the object is literal or not, URIs may be literals also 
+                triple.setLiteralObject(!URLUtil.isURL(objectValue));
                 triple.setSourceUri(sourceUri);
 
                 triples.add(triple);
