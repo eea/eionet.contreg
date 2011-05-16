@@ -31,44 +31,62 @@ public class TripleDTO {
 
     /** */
     private long subjectHash;
+    /** Local variable.*/
     private long predicateHash;
+    /** Local variable.*/
     private long objectHash;
 
     /** */
     private Long sourceHash;
+    /** Local variable.*/
     private Long objectDerivSourceHash;
+    /** Local variable.*/
     private Long objectSourceObjectHash;
 
     /** */
     private boolean isAnonymousSubject;
+    /** */
     private boolean isAnonymousObject;
+    /** */
     private boolean isLiteralObject;
 
     /** */
     private String object;
+    /** */
     private String objectLanguage;
+    /** */
     private Double objectDouble;
 
     /** */
     private Long genTime;
+    /** */
     private Long objectDerivGenTime;
 
     /** */
     private String subjectUri;
+    /** Local holder of predicateUri. */
     private String predicateUri;
+    /** Local holder of sourceUri. */
     private String sourceUri;
+    /** Local holder of object derivation source uri. */
     private String objectDerivSourceUri;
 
+    /**
+     * Creates a new TripleDTO object.
+     * @param subjectUri subject URI
+     * @param predicateUri predicate Uri
+     * @param object Object value
+     */
     public TripleDTO(String subjectUri, String predicateUri, String object) {
         this.subjectUri = subjectUri;
         this.predicateUri = predicateUri;
         this.object = object;
     }
     /**
-     *
-     * @param subjectHash
-     * @param predicateHash
-     * @param objectHash
+     * Constructor of a new TripleDTO object.
+     * @param subjectHash Hashed subject
+     * @param predicateHash hashed predicate
+     * @param objectHash hashed object
      */
     public TripleDTO(long subjectHash, long predicateHash, long objectHash) {
 
@@ -78,10 +96,10 @@ public class TripleDTO {
     }
 
     /**
-     *
-     * @param subjectHash
-     * @param predicateHash
-     * @param object
+     * Constructor of a new TripleDTO object.
+     * @param subjectHash hashed subject
+     * @param predicateHash hashed predicate of the triple
+     * @param object Object of the triple
      */
     public TripleDTO(long subjectHash, long predicateHash, String object) {
 
