@@ -7,18 +7,13 @@
     <stripes:layout-component name="contents">
 
         <h1>SPARQL endpoint</h1>
-
-        <p>
-            Type a SPARQL SELECT query, select output format and press Execute.
-        </p>
-
         <div style="margin-top:15px">
             <stripes:form action="/sparql" method="get">
                 <div>
                     <label for="queryText" class="question">Query:</label>
                     <textarea name="query" id="queryText" rows="8" cols="80" style="display:block; width:100%"><c:if test="${empty actionBean.query}">PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
 
-SELECT DISTINCT ?class ?label WHERE {
+SELECT DISTINCT * WHERE {
   _:subj a ?class .
   OPTIONAL { ?class rdfs:label ?label }
 } LIMIT 50</c:if>${actionBean.query}</textarea>
@@ -70,12 +65,12 @@ SELECT DISTINCT ?class ?label WHERE {
                     <h2>Useful namespaces</h2>
                     <pre>
 PREFIX rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;
-PREFIX rdfs:  &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
-PREFIX dc:  &lt;http://purl.org/dc/elements/1.1/&gt;
-PREFIX dcterms:  &lt;http://purl.org/dc/terms/&gt;
-PREFIX xsd:     &lt;http://www.w3.org/2001/XMLSchema#&gt;
-PREFIX foaf:  &lt;http://xmlns.com/foaf/0.1/&gt;
-PREFIX vcard: &lt;http://www.w3.org/2001/vcard-rdf/3.0#&gt;
+PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
+PREFIX xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt;
+PREFIX owl: &lt;http://www.w3.org/2002/07/owl#&gt;
+PREFIX dc: &lt;http://purl.org/dc/elements/1.1/&gt;
+PREFIX dcterms: &lt;http://purl.org/dc/terms/&gt;
+PREFIX foaf: &lt;http://xmlns.com/foaf/0.1/&gt;
 PREFIX geo: &lt;http://www.w3.org/2003/01/geo/wgs84_pos#&gt;
 PREFIX cr: &lt;http://cr.eionet.europa.eu/ontologies/contreg.rdf#&gt;
 PREFIX rod: &lt;http://rod.eionet.europa.eu/schema.rdf#&gt;
