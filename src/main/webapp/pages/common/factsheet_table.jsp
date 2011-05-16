@@ -74,7 +74,7 @@
                                         </c:choose>
                                     </td>
                                     <td>
-                                    <span title="${crfn:rawModeTitle(object, predicate.value)}">
+                                    <span title="[Datatype: ${object.dataTypeLabel}]">
                                         <c:choose>
                                             <c:when test="${!object.literal}">
                                                 <c:choose>

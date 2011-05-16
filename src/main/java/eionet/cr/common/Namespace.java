@@ -37,7 +37,8 @@ public enum Namespace {
 	AMP_IGN("http://moonefish.eea.europa.eu:81/AMP-schema.rdf#", "ampign"), // Phased out
 	ROD("http://rod.eionet.europa.eu/schema.rdf#", "rod"),
     ROD_OLD("http://rod.eionet.eu.int/schema.rdf#", "rodold"),
-    EPER("http://rdfdata.eionet.europa.eu/eper/dataflow", "eper");
+    EPER("http://rdfdata.eionet.europa.eu/eper/dataflow", "eper"),
+    XSD("http://www.w3.org/2001/XMLSchema#", "xsd");
 
     /** */
     private final String uri;

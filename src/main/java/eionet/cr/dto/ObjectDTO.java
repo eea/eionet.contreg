@@ -25,6 +25,7 @@ import java.io.Serializable;
 import org.openrdf.model.URI;
 
 import eionet.cr.util.Hashes;
+import eionet.cr.util.NamespaceUtil;
 import eionet.cr.web.util.FactsheetObjectId;
 
 /**
@@ -344,6 +345,24 @@ public class ObjectDTO implements Serializable {
 
     public URI getDatatype() {
         return datatype;
+    }
+    /**
+     * Returns datatype label to display.
+     * If the namespace is known replaces it with the prefix defined in Namespace
+     * otherwise returns URL with full namespace
+     * @return String datatype label
+     */
+    public String getDataTypeLabel() {
+        if (datatype == null) {
+            return "Not specified";
+        }
+        //if datatype is from XSD schema, replace http://www.w3.org/2001/XMLSchema with xsd
+        String ns = datatype.getNamespace();
+        if (NamespaceUtil.getKnownNamespace(datatype.getNamespace()) != null) {
+            ns = NamespaceUtil.getKnownNamespace(datatype.getNamespace()) + ":";
+        }
+        String local = datatype.getLocalName();
+        return ns + local;
     }
 
     public void setDatatype(URI datatype) {

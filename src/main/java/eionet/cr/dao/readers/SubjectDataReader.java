@@ -35,6 +35,7 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.openrdf.model.BNode;
 import org.openrdf.model.Literal;
+import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.query.BindingSet;
 
@@ -179,6 +180,7 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO>{
         Value objectValue = bindingSet.getValue("o");
         boolean isLiteral = objectValue instanceof Literal;
         String objectLang = isLiteral ? ((Literal)objectValue).getLanguage() : null;
+        URI dataType = isLiteral ? ((Literal)objectValue).getDatatype() : null;
 
         String strObjectValue = objectValue.stringValue();
         boolean isAnonObject = objectValue instanceof BNode;
@@ -189,7 +191,8 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO>{
         ObjectDTO object = new ObjectDTO(strObjectValue,
                 objectLang == null ? "" : objectLang,
                 isLiteral,
-                objectValue instanceof BNode);
+                objectValue instanceof BNode,
+                dataType);
 
         object.setHash(Hashes.spoHash(strObjectValue));
 
