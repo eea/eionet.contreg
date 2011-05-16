@@ -3,7 +3,36 @@
 <%@ include file="/pages/common/taglibs.jsp"%>
 
 <stripes:layout-render name="/pages/common/template.jsp" pageTitle="SPARQL endpoint">
+    <stripes:layout-component name="head">
+		<script type="text/javascript">
+			var last_format = 1;
+			function format_select(query_obg) {
+				var query = query_obg.value;
+				var format = query_obg.form.format;
 
+				if ((query.match(/\bconstruct\b/i) || query.match(/\bdescribe\b/i)) && last_format == 1) {
+					for ( var i = format.options.length; i > 0; i--){}
+					    format.options[i] = null;
+					}
+			        format.options[1] = new Option('HTML', 'text/html');
+					format.options[2] = new Option('RDF/XML', 'application/rdf+xml');
+					format.selectedIndex = 1;
+					last_format = 2;
+				}
+
+				if (!(query.match(/\bconstruct\b/i) || query.match(/\bdescribe\b/i)) && last_format == 2) {
+					for ( var i = format.options.length; i > 0; i--){}
+						format.options[i] = null;
+					}
+					format.options[1] = new Option('HTML', 'text/html');
+					format.options[2] = new Option('XML', 'application/sparql-results+xml');
+					format.options[3] = new Option('JSON', 'application/sparql-results+json');
+					format.selectedIndex = 1;
+					last_format = 1;
+				}
+			}
+		</script>
+	</stripes:layout-component>
     <stripes:layout-component name="contents">
 
         <h1>SPARQL endpoint</h1>
@@ -11,7 +40,7 @@
             <stripes:form action="/sparql" method="get">
                 <div>
                     <label for="queryText" class="question">Query:</label>
-                    <textarea name="query" id="queryText" rows="8" cols="80" style="display:block; width:100%"><c:if test="${empty actionBean.query}">PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
+                    <textarea name="query" id="queryText" rows="8" cols="80" style="display:block; width:100%" onchange="format_select(this)" onkeyup="format_select(this)"><c:if test="${empty actionBean.query}">PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
 
 SELECT DISTINCT * WHERE {
   _:subj a ?class .
