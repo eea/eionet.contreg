@@ -44,6 +44,10 @@ import eionet.cr.web.sparqlClient.helpers.QueryResult;
 @UrlBinding("/sparql")
 public class SPARQLEndpointActionBean extends AbstractActionBean {
 
+    /** */
+    private static final int DEFAULT_NUMBER_OF_HITS = 20;
+    
+    /** */
     private static final String FORMAT_XML = "xml";
     private static final String FORMAT_JSON = "json";
     private static final String FORMAT_HTML = "html";
@@ -116,10 +120,6 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
         if (!StringUtils.isBlank(format)) {
             accept[0] = format;
-        }
-
-        if (nrOfHits == 0) {
-            nrOfHits = 20;
         }
 
         // If user has marked CR Inferencing checkbox,
@@ -296,6 +296,10 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     public int getNrOfHits() {
+        
+        if (nrOfHits==0){
+            nrOfHits = DEFAULT_NUMBER_OF_HITS;
+        }
         return nrOfHits;
     }
 
