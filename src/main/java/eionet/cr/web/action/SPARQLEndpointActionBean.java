@@ -4,10 +4,14 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 
 import java.io.OutputStream;
+import java.net.URI;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
+import javax.activation.MimeType;
 import javax.servlet.http.HttpServletResponse;
 
 import net.sourceforge.stripes.action.DefaultHandler;
@@ -18,7 +22,9 @@ import net.sourceforge.stripes.action.UrlBinding;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.entity.mime.MIME;
 import org.openrdf.OpenRDFException;
+import org.openrdf.model.vocabulary.XMLSchema;
 import org.openrdf.query.BooleanQuery;
 import org.openrdf.query.GraphQuery;
 import org.openrdf.query.QueryLanguage;
@@ -31,22 +37,32 @@ import org.openrdf.rio.rdfxml.RDFXMLWriter;
 
 import virtuoso.sesame2.driver.VirtuosoRepository;
 
+import eionet.cr.common.Predicates;
+import eionet.cr.common.Subjects;
 import eionet.cr.config.GeneralConfig;
+import eionet.cr.dao.DAOException;
+import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.HelperDAO;
+import eionet.cr.dto.ObjectDTO;
+import eionet.cr.dto.SubjectDTO;
+import eionet.cr.util.Hashes;
+import eionet.cr.util.Util;
+import eionet.cr.web.security.CRUser;
 import eionet.cr.web.sparqlClient.helpers.CRJsonWriter;
 import eionet.cr.web.sparqlClient.helpers.CRXmlWriter;
 import eionet.cr.web.sparqlClient.helpers.QueryResult;
 
 /**
- *
+ * 
  * @author altnyris
- *
+ * 
  */
 @UrlBinding("/sparql")
 public class SPARQLEndpointActionBean extends AbstractActionBean {
 
     /** */
     private static final int DEFAULT_NUMBER_OF_HITS = 20;
-    
+
     /** */
     private static final String FORMAT_XML = "xml";
     private static final String FORMAT_JSON = "json";
@@ -55,8 +71,12 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     /** */
     private static final String FORM_PAGE = "/pages/sparqlClient.jsp";
 
+    /** */
     private static List<String> xmlFormats = new ArrayList<String>();
 
+    /**
+     * 
+     */
     static {
         xmlFormats.add("application/sparql-results+xml");
         xmlFormats.add("application/rdf+xml");
@@ -73,6 +93,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     private int nrOfHits;
     private long executionTime;
 
+    /** */
     private boolean useInferencing;
     boolean isAskQuery = false;
     boolean isConstructQuery = false;
@@ -82,20 +103,153 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     private String resultAsk;
 
     /**
-     *
+     * URI of the bookmarked query to fill the bean's properties from. Camel-case ignored, to keep the corresponding request
+     * parameter lower-case.
+     */
+    private String fillfrom;
+
+    /**
+     * URI of the bookmarked query to fill the bean's properties from. Camel-case ignored, to keep the corresponding request
+     * parameter lower-case. NB! The difference from "fillfrom" is that if "fillfrom" is specified, the properties are filled from
+     * the bookmarked query, but the query is not executed! If "queryfrom" is specified, the properties are filled, and the query
+     * executed!
+     */
+    private String queryfrom;
+
+    /** Name of the query to bookmark. */
+    private String bookmarkName;
+
+    /**
+     * Ordered map of URIs of bookmarked queries. Relevant only when user is known.
+     */
+    private LinkedHashMap<URI, String> bookmarkedQueries;
+
+    /**
+     * 
+     * @return
+     * @throws OpenRDFException
+     * @throws DAOException
+     */
+    @DefaultHandler
+    public Resolution noEvent() throws OpenRDFException, DAOException {
+
+        // If fillfrom is specified then fill the bean's properties from the
+        // bookmarked query and forward to form page without executing the
+        // query.
+        // If queryfrom is specified then fill the bean's properties from the
+        // bookmarked query and execute the query.
+        // In other cases just execute the query.
+
+        if (!StringUtils.isBlank(fillfrom)) {
+
+            fillFromBookmark(fillfrom);
+            addSystemMessage("Query filled from " + fillfrom);
+            return new ForwardResolution(FORM_PAGE);
+
+        } else {
+
+            if (!StringUtils.isBlank(queryfrom)) {
+                fillFromBookmark(queryfrom);
+            }
+            return execute();
+        }
+    }
+
+    /**
+     * Fills the bean's following properties from the bookmarked query: - the query itself - output format - hits per page - whether
+     * to use inference.
+     * 
+     * @throws DAOException
+     */
+    private void fillFromBookmark(String bookmarkedQueryUri) throws DAOException {
+
+        SubjectDTO subjectDTO = DAOFactory.get().getDao(HelperDAO.class).getSubject(bookmarkedQueryUri);
+        if (subjectDTO == null) {
+            throw new DAOException("Could not find a subject with this URI: " + bookmarkedQueryUri);
+        }
+
+        this.query = subjectDTO.getObjectValue(Predicates.CR_SPARQL_QUERY);
+        this.format = subjectDTO.getObjectValue(Predicates.DC_FORMAT);
+        String flagString = subjectDTO.getObjectValue(Predicates.CR_USE_INFERENCE);
+        this.useInferencing = Util.toBooolean(flagString);
+    }
+
+    /**
+     * 
+     * @return
+     * @throws DAOException
+     */
+    public Resolution bookmark() throws DAOException {
+
+        CRUser user = getUser();
+        if (user == null) {
+            addWarningMessage("Cannot bookmark for anonymous user!");
+        } else if (StringUtils.isBlank(bookmarkName)) {
+            addGlobalValidationError("Bookmark name is missing!");
+        } else if (StringUtils.isBlank(query)) {
+            addGlobalValidationError("Query is missing!");
+        } else {
+
+            // prepare bookmark subject
+
+            String bookmarksUri = user.getBookmarksUri();
+            String bookmarkUri = buildBookmarkUri(user, bookmarkName);
+
+            SubjectDTO subjectDTO = new SubjectDTO(bookmarkUri, false);
+            ObjectDTO objectDTO = new ObjectDTO(Subjects.CR_SPARQL_BOOKMARK, false);
+            objectDTO.setSourceUri(bookmarksUri);
+            subjectDTO.addObject(Predicates.RDF_TYPE, objectDTO);
+
+            objectDTO = new ObjectDTO(query, true, XMLSchema.STRING);
+            objectDTO.setSourceUri(bookmarksUri);
+            subjectDTO.addObject(Predicates.CR_SPARQL_QUERY, objectDTO);
+
+            String formatToUse = StringUtils.isBlank(format) ? "text/html" : format;
+            objectDTO = new ObjectDTO(formatToUse, true, XMLSchema.STRING);
+            objectDTO.setSourceUri(bookmarksUri);
+            subjectDTO.addObject(Predicates.DC_FORMAT, objectDTO);
+
+            objectDTO = new ObjectDTO(Boolean.toString(useInferencing), true, XMLSchema.BOOLEAN);
+            objectDTO.setSourceUri(bookmarksUri);
+            subjectDTO.addObject(Predicates.CR_USE_INFERENCE, objectDTO);
+
+            objectDTO = new ObjectDTO(bookmarkName, true, XMLSchema.STRING);
+            objectDTO.setSourceUri(bookmarksUri);
+            subjectDTO.addObject(Predicates.RDFS_LABEL, objectDTO);
+
+            // save the bookmark subject + register its URI in user's bookmarks
+            HelperDAO dao = DAOFactory.get().getDao(HelperDAO.class);
+            dao.addTriples(subjectDTO);
+            dao.addUserBookmark(user, bookmarkUri);
+
+            // log and display message about successful operation
+            logger.debug("Query bookmarked with URI: " + bookmarksUri);
+            addSystemMessage("Query bookmarked with name: " + bookmarkName);
+        }
+
+        return new ForwardResolution(FORM_PAGE);
+    }
+
+    /**
+     * 
      * @return Resolution
      * @throws OpenRDFException
      */
-    @DefaultHandler
     public Resolution execute() throws OpenRDFException {
         
-        // if no query specified at all, just forward to the form page
-        if (StringUtils.isBlank(query)){
-            return new ForwardResolution(FORM_PAGE);
+        // if query is blank and there's also no such request parameter as query at all,
+        // then assume user clicked the SPARQL client menu choice, and forward to the form page
+        if (StringUtils.isBlank(query)) {
+
+            Map paramsMap = getContext().getRequest().getParameterMap();
+            boolean paramExists = paramsMap != null && paramsMap.containsKey("query");
+            if (!paramExists) {
+                return new ForwardResolution(FORM_PAGE);
+            }
         }
 
         String acceptHeader = getContext().getRequest().getHeader("accept");
-        String[] accept = {""};
+        String[] accept = { "" };
         if (acceptHeader != null && acceptHeader.length() > 0) {
             accept = acceptHeader.split(",");
             if (accept != null && accept.length > 0) {
@@ -113,7 +267,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             isConstructQuery = true;
         }
 
-        // If CONSTRUCT query, but output format is HTML then evaluate as simple SELECT query
+        // If CONSTRUCT query, but output format is HTML then evaluate as simple
+        // SELECT query
         if (isConstructQuery && format != null && format.equals("text/html")) {
             isConstructQuery = false;
         }
@@ -129,7 +284,11 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         if (useInferencing && !StringUtils.isBlank(query)) {
             String infCommand = "DEFINE input:inference '" + GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME)
                     + "'";
-            newQuery = infCommand + "\n" + newQuery;
+
+            // if inference command not yet present in the query, add it
+            if (query.indexOf(infCommand) == -1) {
+                newQuery = infCommand + "\n" + newQuery;
+            }
         }
 
         if (isConstructQuery) {
@@ -157,7 +316,12 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             return new ForwardResolution(FORM_PAGE);
         }
     }
-    
+
+    /**
+     * 
+     * @param type
+     * @return
+     */
     private boolean isQuery(String type) {
         if (!StringUtils.isBlank(type) && !StringUtils.isBlank(query)) {
             StringTokenizer st = new StringTokenizer(query);
@@ -171,6 +335,12 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         return false;
     }
 
+    /**
+     * 
+     * @param query
+     * @param format
+     * @param out
+     */
     private void runQuery(String query, String format, OutputStream out) {
 
         if (!StringUtils.isBlank(query)) {
@@ -283,48 +453,134 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         return result;
     }
 
+    /**
+     * 
+     * @return
+     */
     public long getExecutionTime() {
         return executionTime;
     }
 
+    /**
+     * @return
+     */
     public String getFormat() {
         return format;
     }
 
+    /**
+     * @param format
+     */
     public void setFormat(String format) {
         this.format = format;
     }
 
+    /**
+     * @return
+     */
     public int getNrOfHits() {
-        
-        if (nrOfHits==0){
+
+        if (nrOfHits == 0) {
             nrOfHits = DEFAULT_NUMBER_OF_HITS;
         }
         return nrOfHits;
     }
 
+    /**
+     * @param nrOfHits
+     */
     public void setNrOfHits(int nrOfHits) {
         this.nrOfHits = nrOfHits;
     }
 
+    /**
+     * @return
+     */
     public boolean isUseInferencing() {
         return useInferencing;
     }
 
+    /**
+     * @param useInferencing
+     */
     public void setUseInferencing(boolean useInferencing) {
         this.useInferencing = useInferencing;
     }
 
+    /**
+     * @return
+     */
     public String getResultAsk() {
         return resultAsk;
     }
 
+    /**
+     * @param resultAsk
+     */
     public void setResultAsk(String resultAsk) {
         this.resultAsk = resultAsk;
     }
 
+    /**
+     * @return
+     */
     public boolean isAskQuery() {
         return isAskQuery;
     }
 
+    /**
+     * @return the fillfrom
+     */
+    public String getFillfrom() {
+        return fillfrom;
+    }
+
+    /**
+     * @param fillfrom
+     *            the fillfrom to set
+     */
+    public void setFillfrom(String fillfrom) {
+        this.fillfrom = fillfrom;
+    }
+
+    /**
+     * @param queryfrom
+     *            the queryfrom to set
+     */
+    public void setQueryfrom(String queryfrom) {
+        this.queryfrom = queryfrom;
+    }
+
+    /**
+     * @param bookmarkName
+     *            the bookmarkName to set
+     */
+    public void setBookmarkName(String bookmarkName) {
+        this.bookmarkName = bookmarkName;
+    }
+
+    /**
+     * @return the bookmarkedQueries
+     * @throws DAOException
+     */
+    public LinkedHashMap<URI, String> getBookmarkedQueries() throws DAOException {
+
+        if (getUser() == null) {
+            return null;
+        } else if (bookmarkedQueries == null) {
+            bookmarkedQueries = DAOFactory.get().getDao(HelperDAO.class).getSparqlBookmarks(getUser());
+        }
+        return bookmarkedQueries;
+    }
+
+    /**
+     * 
+     * @param user
+     * @param bookmarkName
+     * @return
+     */
+    private static final String buildBookmarkUri(CRUser user, String bookmarkName) {
+
+        return new StringBuilder(user.getBookmarksUri()).append("/").append(Hashes.spoHash(bookmarkName)).toString();
+    }
 }

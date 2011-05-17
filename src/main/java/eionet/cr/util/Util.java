@@ -50,16 +50,15 @@ import org.quartz.CronExpression;
 
 import eionet.cr.common.CRRuntimeException;
 
-
 /**
- *
+ * 
  * @author heinljab
- *
+ * 
  */
 public class Util {
 
     /**
-     *
+     * 
      * @param t
      * @return
      */
@@ -72,7 +71,7 @@ public class Util {
     }
 
     /**
-     *
+     * 
      * @param t
      * @return
      */
@@ -82,7 +81,7 @@ public class Util {
     }
 
     /**
-     *
+     * 
      * @param stackTrace
      * @return
      */
@@ -101,19 +100,20 @@ public class Util {
     }
 
     /**
-     *
+     * 
      * @param stackTrace
      * @return
      */
     public static String[] getStackFrames(String stackTrace) {
         StringTokenizer frames = new StringTokenizer(stackTrace, System.getProperty("line.separator"));
         List list = new LinkedList();
-        for (; frames.hasMoreTokens(); list.add(frames.nextToken()));
+        for (; frames.hasMoreTokens(); list.add(frames.nextToken()))
+            ;
         return (String[]) list.toArray(new String[list.size()]);
     }
 
     /**
-     *
+     * 
      * @param array
      * @param separator
      * @return
@@ -133,7 +133,7 @@ public class Util {
     }
 
     /**
-     *
+     * 
      * @param date
      * @param datePattern
      * @return
@@ -148,7 +148,7 @@ public class Util {
     }
 
     /**
-     *
+     * 
      * @param str
      * @param datePattern
      * @return
@@ -167,15 +167,15 @@ public class Util {
     }
 
     /**
-     *
+     * 
      * @return
      */
     public static long currentTimeSeconds() {
-        return (long)(System.currentTimeMillis() / (long)1000);
+        return (long) (System.currentTimeMillis() / (long) 1000);
     }
 
     /**
-     *
+     * 
      * @param milliSeconds
      * @return
      */
@@ -184,7 +184,7 @@ public class Util {
     }
 
     /**
-     *
+     * 
      * @param str
      * @return
      */
@@ -193,7 +193,9 @@ public class Util {
     }
 
     /**
-     * Returns true if the given string has any whitespace in it, including the leading and trailing whitespace.
+     * Returns true if the given string has any whitespace in it, including the
+     * leading and trailing whitespace.
+     * 
      * @param s
      * @return
      */
@@ -211,7 +213,7 @@ public class Util {
     }
 
     /**
-     *
+     * 
      * @param array
      * @return
      */
@@ -220,7 +222,7 @@ public class Util {
     }
 
     /**
-     *
+     * 
      * @param array
      * @return
      */
@@ -229,7 +231,7 @@ public class Util {
     }
 
     /**
-     *
+     * 
      * @param array
      * @return
      */
@@ -256,7 +258,7 @@ public class Util {
     }
 
     /**
-     *
+     * 
      * @param pageContext
      * @param objectClass
      * @return
@@ -266,11 +268,12 @@ public class Util {
         if (pageContext == null || objectClass == null)
             return null;
 
-        int[] scopes = {PageContext.APPLICATION_SCOPE, PageContext.PAGE_SCOPE, PageContext.REQUEST_SCOPE, PageContext.SESSION_SCOPE};
+        int[] scopes = { PageContext.APPLICATION_SCOPE, PageContext.PAGE_SCOPE, PageContext.REQUEST_SCOPE,
+                PageContext.SESSION_SCOPE };
         for (int i = 0; i < scopes.length; i++) {
             Enumeration attrs = pageContext.getAttributeNamesInScope(scopes[i]);
             while (attrs != null && attrs.hasMoreElements()) {
-                String name = (String)attrs.nextElement();
+                String name = (String) attrs.nextElement();
                 Object o = pageContext.getAttribute(name, scopes[i]);
                 if (o != null && objectClass.isInstance(o)) {
                     return o;
@@ -283,6 +286,7 @@ public class Util {
 
     /**
      * Convenience method for URL-encoding the given string.
+     * 
      * @param s
      * @return
      */
@@ -296,6 +300,7 @@ public class Util {
 
     /**
      * Convenience method for URL-decoding the given string.
+     * 
      * @param s
      * @return
      */
@@ -308,7 +313,7 @@ public class Util {
     }
 
     /**
-     *
+     * 
      * @param o
      * @return
      */
@@ -323,7 +328,7 @@ public class Util {
     }
 
     /**
-     *
+     * 
      * @param expression
      */
     public static boolean isValidQuartzCronExpression(String expression) {
@@ -335,7 +340,7 @@ public class Util {
     }
 
     /**
-     *
+     * 
      * @param coll
      * @return
      */
@@ -355,31 +360,33 @@ public class Util {
     }
 
     /**
-    * Create a comma-separated list of tag enclosed URIs. The result can be used in sparql queries.
-    * eg.: [uri1,uri2,uri3] is transformed to <uri1>,<uri2>,<uri3>.
-    *
-    * @param uriList list of URIs
-    * @return comma separated list of tag enclosed URIs
-    */
-   public static String sparqlUrisToCsv(Collection<String> uriList) {
+     * Create a comma-separated list of tag enclosed URIs. The result can be
+     * used in sparql queries. eg.: [uri1,uri2,uri3] is transformed to
+     * <uri1>,<uri2>,<uri3>.
+     * 
+     * @param uriList
+     *            list of URIs
+     * @return comma separated list of tag enclosed URIs
+     */
+    public static String sparqlUrisToCsv(Collection<String> uriList) {
 
-       StringBuilder strBuilder = new StringBuilder();
-       if (uriList != null) {
-           for (String uri :  uriList) {
+        StringBuilder strBuilder = new StringBuilder();
+        if (uriList != null) {
+            for (String uri : uriList) {
 
-               if (strBuilder.length() > 0) {
-                   strBuilder.append(",");
-               }
-               strBuilder.append("<");
-               strBuilder.append(uri);
-               strBuilder.append(">");
-           }
-       }
-       return strBuilder.toString();
-   }
+                if (strBuilder.length() > 0) {
+                    strBuilder.append(",");
+                }
+                strBuilder.append("<");
+                strBuilder.append(uri);
+                strBuilder.append(">");
+            }
+        }
+        return strBuilder.toString();
+    }
 
-   /**
-     *
+    /**
+     * 
      * @param s
      * @return
      */
@@ -397,7 +404,7 @@ public class Util {
     }
 
     /**
-     *
+     * 
      * @param language
      */
     public static String normalizeHTTPAcceptedLanguage(String httpAcceptedLanguage) {
@@ -416,7 +423,10 @@ public class Util {
         if (j != -1)
             result = result.substring(0, j);
 
-        /* ignore language refinement (e.g. en-US, en_UK) which is separated either by '-' or '_' */
+        /*
+         * ignore language refinement (e.g. en-US, en_UK) which is separated
+         * either by '-' or '_'
+         */
 
         j = result.indexOf("-");
         if (j < 0) {
@@ -430,7 +440,7 @@ public class Util {
     }
 
     /**
-     *
+     * 
      * @param language
      */
     public static double getHTTPAcceptedLanguageImportance(String httpAcceptedLanguage) {
@@ -450,7 +460,7 @@ public class Util {
     }
 
     /**
-     *
+     * 
      * @return
      */
     public static HashSet<String> getAcceptedLanguages(String acceptLanguageHeader) {
@@ -475,7 +485,7 @@ public class Util {
     }
 
     /**
-     *
+     * 
      * @return
      */
     public static List<String> getAcceptedLanguagesByImportance(String acceptLanguageHeader) {
@@ -511,26 +521,24 @@ public class Util {
         return returnValues;
     }
 
-
-
     /**
-     *
+     * 
      * @param startTime
      * @return
      */
     public static String durationSince(long startTime) {
 
-        return duration(Math.max(0, System.currentTimeMillis()-startTime));
+        return duration(Math.max(0, System.currentTimeMillis() - startTime));
     }
 
     /**
-     *
+     * 
      * @param duration
      * @return
      */
     protected static String duration(long duration) {
 
-        int minutes = (int)((duration / 1000) / 60);
+        int minutes = (int) ((duration / 1000) / 60);
         int seconds = (int) ((duration / 1000) % 60);
         int milliseconds = (int) (duration % 1000);
         StringBuffer buf = new StringBuffer();
@@ -548,7 +556,7 @@ public class Util {
 
     /**
      * //algorithm calculates the estimated number of hashes
-     *
+     * 
      * @param minHash
      * @param maxHash
      * @return
@@ -566,7 +574,7 @@ public class Util {
     }
 
     /**
-     *
+     * 
      * @param subjectString
      * @return
      */
@@ -591,17 +599,17 @@ public class Util {
     }
 
     /**
-     *
+     * 
      * @param <K>
      * @param <V>
      * @param map
      * @return
      */
-    public static <K,V> Set<K> getNullValueKeys(Map<K,V> map) {
+    public static <K, V> Set<K> getNullValueKeys(Map<K, V> map) {
 
         HashSet<K> result = new HashSet<K>();
         if (map != null && !map.isEmpty()) {
-            for (Map.Entry<K,V> entry : map.entrySet()) {
+            for (Map.Entry<K, V> entry : map.entrySet()) {
                 if (entry.getValue() == null) {
                     result.add(entry.getKey());
                 }
@@ -612,45 +620,101 @@ public class Util {
     }
 
     /**
-     *
+     * 
      * @param l
      * @return
      */
     public static int safeLongToInt(long l) {
 
         if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE) {
-            throw new IllegalArgumentException
-                (l + " cannot be cast to int without changing its value");
+            throw new IllegalArgumentException(l + " cannot be cast to int without changing its value");
         }
-        return (int)l;
+        return (int) l;
     }
 
     /**
-     *
+     * 
      * @param args
      */
     public static void main(String[] args) {
     }
 
     /**
-    *
-    * @param s
-    * @return
-    */
-   public static boolean isSurroundedWithQuotes(String s) {
-       return s.startsWith("\"") && s.endsWith("\"");
-   }
+     * 
+     * @param s
+     * @return
+     */
+    public static boolean isSurroundedWithQuotes(String s) {
+        return s.startsWith("\"") && s.endsWith("\"");
+    }
 
-   /**
-   *
-   * @param s
-   * @return escaped string
-   */
-  public static String escapeHtml(String s) {
-      if (!StringUtils.isBlank(s)) {
-          s = StringEscapeUtils.escapeHtml(s);
-          s = s.replaceAll("\n", "<br/>");
-      }
-      return s;
-  }
+    /**
+     * 
+     * @param s
+     * @return escaped string
+     */
+    public static String escapeHtml(String s) {
+        if (!StringUtils.isBlank(s)) {
+            s = StringEscapeUtils.escapeHtml(s);
+            s = s.replaceAll("\n", "<br/>");
+        }
+        return s;
+    }
+    
+    /**
+     * Converts given string into boolean. The following inputs are covered (case-insensitively):
+     * - null string returns false
+     * - "true" returns true
+     * - "false" return false
+     * - "yes" and "y" return true
+     * - "no" and "n" return false
+     * - "0", "-1", "-2", etc return false
+     * - "1", "2", "3", etc return true
+     * - any other string, including an empty one, returns false
+     * 
+     * @param s
+     * @return
+     */
+    public static boolean toBooolean(String s){
+        
+        if (s==null){
+            return false;
+        }
+        else if (s.equalsIgnoreCase("true")){
+            return true;
+        }
+        else if (s.equalsIgnoreCase("false")){
+            return false;
+        }
+        else if (s.equalsIgnoreCase("yes") || s.equalsIgnoreCase("y")){
+            return true;
+        }
+        else if (s.equalsIgnoreCase("no") || s.equalsIgnoreCase("n")){
+            return false;
+        }
+        else{
+            try{
+                return Util.toBooolean(Integer.parseInt(s));
+            }
+            catch (NumberFormatException e){
+                return false;
+            }
+        }
+    }
+
+    /**
+     * Returns true if the given integer is >0, otherwise returns false.
+     * 
+     * @param i
+     * @return
+     */
+    public static boolean toBooolean(int i){
+        
+        if (i<=0){
+            return false;
+        }
+        else{
+            return true;
+        }
+    }
 }

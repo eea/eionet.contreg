@@ -1,5 +1,6 @@
 package eionet.cr.dao.virtuoso;
 
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -1293,5 +1294,53 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
                 new SingleObjectReader<Long>());
         return Long.valueOf(resultObject.toString());
 
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.dao.HelperDAO#getSparqlBookmarks()
+     */
+    @Override
+    public LinkedHashMap<java.net.URI, String> getSparqlBookmarks(CRUser user) throws DAOException {
+        
+        // use linked hash map to ensure later that entries are retrieved in the same order they were put
+        LinkedHashMap<java.net.URI, String> resultMap = new LinkedHashMap<java.net.URI, String>();
+        
+        StringBuilder query = new StringBuilder().
+        append("select ?s ?o from <").append(user.getBookmarksUri()).append(">").
+        append(" where { ?s ?p ?o.").
+        append(" ?s <").append(Predicates.RDF_TYPE).append("> <").append(Subjects.CR_SPARQL_BOOKMARK).append(">.").
+        append(" ?s <").append(Predicates.RDFS_LABEL).append("> ?o } order by ?o");
+
+        RepositoryConnection conn = null;
+        TupleQueryResult queryResult = null;
+        try {
+            conn = SesameUtil.getRepositoryConnection();
+            TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query.toString());
+            queryResult = tupleQuery.evaluate();
+
+            while (queryResult.hasNext()) {
+                
+                BindingSet bindingSet = queryResult.next();
+                java.net.URI uri = new java.net.URI(bindingSet.getValue("s").stringValue());
+                String label = bindingSet.getValue("o").stringValue();
+                
+                if (!resultMap.containsKey(uri)){
+                    if (StringUtils.isBlank(label)){
+                        label = uri.toString();
+                    }
+                    resultMap.put(uri, label);
+                }
+            }
+        } catch (OpenRDFException e) {
+            throw new DAOException(e.toString(), e);
+        } catch (URISyntaxException e) {
+            throw new DAOException("Found resource with invalid URI in triple store", e);
+        } finally {
+            SesameUtil.close(queryResult);
+            SesameUtil.close(conn);
+        }
+
+        return resultMap;
     }
 }

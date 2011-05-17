@@ -53,4 +53,7 @@
 		<rdfs:subClassOf rdf:resource="http://cr.eionet.europa.eu/ontologies/contreg.rdf#File"/>
 	</rdf:Description>
 
+        <rdf:Description rdf:about="http://cr.eionet.europa.eu/ontologies/contreg.rdf#SparqlBookmark">
+		<rdfs:subClassOf rdf:resource="http://cr.eionet.europa.eu/ontologies/contreg.rdf#Bookmark"/>
+	</rdf:Description>
 </rdf:RDF>

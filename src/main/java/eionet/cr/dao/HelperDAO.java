@@ -2,10 +2,12 @@
 
 package eionet.cr.dao;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -435,4 +437,12 @@ public interface HelperDAO extends DAO {
      * @throws DAOException if query fails
      */
      public long getTriplesCount() throws DAOException;
+     
+     /**
+      * 
+      * @param user TODO
+     * @return
+      * @throws DAOException
+      */
+     public LinkedHashMap<URI, String> getSparqlBookmarks(CRUser user) throws DAOException;
 }
