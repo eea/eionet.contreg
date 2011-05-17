@@ -12,29 +12,29 @@
                 var format = query_obg.form.format;
 
                 if ((query.match(/\bconstruct\b/i) || query.match(/\bdescribe\b/i)) && last_format == 1) {
-                    for ( var i = format.options.length; i > 0; i--){}
+                    for ( var i = format.options.length; i > 0; i--){
                         format.options[i] = null;
                     }
-                    format.options[1] = new Option('HTML', 'text/html');
-                    format.options[2] = new Option('RDF/XML', 'application/rdf+xml');
+                    format.options[0] = new Option('HTML', 'text/html');
+                    format.options[1] = new Option('RDF/XML', 'application/rdf+xml');
                     format.selectedIndex = 1;
                     last_format = 2;
                 }
 
                 if (!(query.match(/\bconstruct\b/i) || query.match(/\bdescribe\b/i)) && last_format == 2) {
-                    for ( var i = format.options.length; i > 0; i--){}
+                    for ( var i = format.options.length; i > 0; i--){
                         format.options[i] = null;
                     }
-                    format.options[1] = new Option('HTML', 'text/html');
-                    format.options[2] = new Option('XML', 'application/sparql-results+xml');
-                    format.options[3] = new Option('JSON', 'application/sparql-results+json');
+                    format.options[0] = new Option('HTML', 'text/html');
+                    format.options[1] = new Option('XML', 'application/sparql-results+xml');
+                    format.options[2] = new Option('JSON', 'application/sparql-results+json');
                     format.selectedIndex = 1;
                     last_format = 1;
                 }
             }
         </script>
     </stripes:layout-component>
-    
+
     <stripes:layout-component name="contents">
 
         <h1>SPARQL endpoint</h1>
@@ -82,18 +82,18 @@ SELECT DISTINCT * WHERE {
 								<stripes:option value="application/sparql-results+xml" label="XML" />
 	                        </stripes:select>
 	                </div>
-                    <div style="position: absolute; top: 5px; left: 180px;">
+                    <div style="position: absolute; top: 5px; left: 200px;">
                         <stripes:label for="nrOfHits" class="question">Hits per page</stripes:label>
                         <stripes:text name="nrOfHits" size="2" id="nrOfHits" />
                     </div>
-                    <div style="position: absolute; top: 5px; left: 340px;">
+                    <div style="position: absolute; top: 5px; left: 360px;">
                         <stripes:label for="inferencing" class="question">Use CR inferencing</stripes:label>
                         <stripes:checkbox name="useInferencing" id="inferencing" />
                     </div>
-                    
+
                     <c:choose>
                         <c:when test="${actionBean.user != null}">
-                            <div style="position: absolute; top: 5px; left: 520px;">
+                            <div style="position: absolute; top: 5px; left: 540px;">
 	                            <stripes:submit name="execute" value="Execute" id="executeButton" />
 	                            <stripes:submit name="bookmark" value="Bookmark with name:" id="bookmarkButton" />
 	                            <stripes:text name="bookmarkName" size="20" id="bookmarkName" />
@@ -106,7 +106,7 @@ SELECT DISTINCT * WHERE {
                         </c:otherwise>
                     </c:choose>
 		        </div>
-		            
+
                 <div>
 	                <c:if test="${not empty actionBean.query && empty param.bookmark && empty param.fillfrom}">
 	                    <c:choose>
@@ -132,7 +132,7 @@ SELECT DISTINCT * WHERE {
 	                        </c:otherwise>
 	                    </c:choose>
 	                </c:if>
-	                
+
 	                <c:if test="${empty actionBean.result || empty actionBean.result.rows}">
 	                    <div>
 	                        <h2>Useful namespaces</h2>
