@@ -40,7 +40,7 @@
         <h1>SPARQL endpoint</h1>
 
         <div>
-            <stripes:form name="bookmarksForm" action="/sparql" method="get">
+            <crfn:form name="bookmarksForm" action="/sparql" method="get">
                 <p>
                     <c:if test="${empty actionBean.bookmarkedQueries}">
                         Type a SPARQL query, select output format and other options, and press Execute.
@@ -56,11 +56,11 @@
                         <noscript><stripes:submit name="" value="Go" id="goButton" /></noscript>
                     </c:if>
                 </p>
-            </stripes:form>
+            </crfn:form>
         </div>
 
         <div style="margin-top: 15px">
-            <stripes:form name="mainForm" action="/sparql" method="get">
+            <crfn:form name="mainForm" action="/sparql" method="get">
                 <div>
                     <label for="queryText" class="question">Query:</label>
                     <textarea name="query" id="queryText" rows="8" cols="80" style="display: block; width: 100%" onchange="format_select(this)" onkeyup="format_select(this)">
@@ -151,7 +151,7 @@ PREFIX rod: &lt;http://rod.eionet.europa.eu/schema.rdf#&gt;
 	                    </div>
 	                </c:if>
                 </div>
-            </stripes:form>
+            </crfn:form>
         </div>
     </stripes:layout-component>
 </stripes:layout-render>
