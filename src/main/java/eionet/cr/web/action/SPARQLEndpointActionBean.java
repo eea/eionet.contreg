@@ -1,17 +1,16 @@
 package eionet.cr.web.action;
 
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import javax.activation.MimeType;
 import javax.servlet.http.HttpServletResponse;
 
 import net.sourceforge.stripes.action.DefaultHandler;
@@ -22,7 +21,6 @@ import net.sourceforge.stripes.action.UrlBinding;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.http.entity.mime.MIME;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.vocabulary.XMLSchema;
 import org.openrdf.query.BooleanQuery;
@@ -36,7 +34,6 @@ import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.rdfxml.RDFXMLWriter;
 
 import virtuoso.sesame2.driver.VirtuosoRepository;
-
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.config.GeneralConfig;
@@ -224,7 +221,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
             // log and display message about successful operation
             logger.debug("Query bookmarked with URI: " + bookmarksUri);
-            addSystemMessage("Query bookmarked with name: " + bookmarkName);
+            addSystemMessage("Successfully bookmarked query: <a href=\"factsheet.action?uri="
+                    + URLEncoder.encode(bookmarkUri) + "\">" + bookmarkUri + "</a>");
         }
 
         return new ForwardResolution(FORM_PAGE);
@@ -236,7 +234,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      * @throws OpenRDFException
      */
     public Resolution execute() throws OpenRDFException {
-        
+
         // if query is blank and there's also no such request parameter as query at all,
         // then assume user clicked the SPARQL client menu choice, and forward to the form page
         if (StringUtils.isBlank(query)) {
