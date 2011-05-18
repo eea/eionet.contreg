@@ -88,6 +88,9 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
                 } catch (SQLException e) {
                 }
             }
+            
+            SQLUtil.close(sqlConn);
+            SesameUtil.close(conn);
 
         }
     }
@@ -121,6 +124,7 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
                 } catch (RepositoryException re) {
                 }
             }
+            SesameUtil.close(conn);
         }
     }
 

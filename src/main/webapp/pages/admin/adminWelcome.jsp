@@ -13,6 +13,7 @@
             <ul>
             <li><stripes:link href="/admin/harvestedurl">Harvested Urls</stripes:link></li>
             <li><stripes:link href="/admin/nhus">Next Harvest Urgency Score </stripes:link></li>
+            <li><stripes:link href="/admin/bulkharvest">Bulk Add/Delete Sources</stripes:link></li>
             </ul>
         </c:when>
         <c:otherwise>
