@@ -217,7 +217,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             // save the bookmark subject + register its URI in user's bookmarks
             HelperDAO dao = DAOFactory.get().getDao(HelperDAO.class);
             dao.addTriples(subjectDTO);
-            dao.addUserBookmark(user, bookmarkUri);
+            //no need to bookmark bookmarks :)
+            //dao.addUserBookmark(user, bookmarkUri);
 
             // log and display message about successful operation
             logger.debug("Query bookmarked with URI: " + bookmarksUri);

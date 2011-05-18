@@ -2,6 +2,11 @@ package eionet.cr.web.action.home;
 
 import java.util.List;
 
+import net.sourceforge.stripes.action.DefaultHandler;
+import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.action.UrlBinding;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
@@ -10,10 +15,6 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dto.UserBookmarkDTO;
 import eionet.cr.web.security.CRUser;
-import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.action.UrlBinding;
 
 /**
  *
@@ -66,28 +67,22 @@ public class BookmarksActionBean extends AbstractHomeActionBean {
     }
 
     /**
-     * 
-     * @return
-     * @throws DAOException
+     * Returns list of user bookmarks whose username is in the url.
+     * @return List<UserBookmarkDTO>
+     * @throws DAOException if query fails
      */
     public List<UserBookmarkDTO> getBookmarks() throws DAOException {
-        
-        if (CollectionUtils.isEmpty(bookmarks)){
-            
-            CRUser user = getUser();
-            if (user==null || !isUserAuthorized()){
-                
+
+        if (CollectionUtils.isEmpty(bookmarks)) {
                 String attemptedUserName = getAttemptedUserName();
-                if (StringUtils.isBlank(attemptedUserName)){
-                    user = new CRUser(getAttemptedUserName());
+                if (StringUtils.isNotBlank(attemptedUserName)) {
+                    CRUser user = new CRUser(getAttemptedUserName());
+                    if (user != null) {
+                        bookmarks = DAOFactory.get().getDao(HelperDAO.class).getUserBookmarks(user);
+                    }
                 }
-            }
-            
-            if (user!=null){
-                bookmarks = DAOFactory.get().getDao(HelperDAO.class).getUserBookmarks(user);
-            }
         }
-        
+
         return bookmarks;
     }
 
