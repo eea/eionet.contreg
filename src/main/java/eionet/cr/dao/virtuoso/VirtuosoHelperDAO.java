@@ -686,6 +686,10 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         userHomeItemSubject.addObject(Predicates.CR_BOOKMARK, objectDTO);
 
         addTriples(userHomeItemSubject);
+
+        if(!user.isHomeFolderRegistered()){
+            registerUserFolderInCrHomeContext(user);
+        }
         // since user's bookmarks URI was used above as triple source, add it to HARVEST_SOURCE too
         // (but set harvest interval minutes to 0, since we don't really want it to be harvested )
         // by background harvester)
@@ -1252,21 +1256,21 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
      */
     @Override
     public boolean isExistingSubject(String subjectUri) throws DAOException {
-        
+
         if (StringUtils.isBlank(subjectUri)) {
             throw new IllegalArgumentException("Subject uri must not be empty");
         }
-        
+
         StringBuilder query = new StringBuilder("select count(*)").
         append(" where {<").append(subjectUri).append("> ?p ?o}");
-        
+
         Object resultObject = executeUniqueResultSPARQL(query.toString(),
                 new SingleObjectReader<Long>());
-        
+
         if (resultObject==null){
             return false;
         }
-        
+
         int resultInt = Integer.parseInt(resultObject.toString());
         return resultInt>0;
     }
@@ -1336,7 +1340,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
      */
     @Override
     public void deleteTriples(String subjectUri, String predicateUri, String sourceUri) throws DAOException {
-        
+
         RepositoryConnection conn = null;
         try {
 
