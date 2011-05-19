@@ -33,7 +33,6 @@ import org.openrdf.query.BindingSet;
 import eionet.cr.common.Predicates;
 import eionet.cr.dto.UploadDTO;
 import eionet.cr.util.Hashes;
-import eionet.cr.util.sql.SQLResultSetBaseReader;
 
 /**
  *

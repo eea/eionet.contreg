@@ -15,8 +15,8 @@ import eionet.cr.harvest.statistics.dto.HarvestUrgencyScoreDTO;
 import eionet.cr.util.Pair;
 import eionet.cr.web.action.AbstractSearchActionBean;
 import eionet.cr.web.util.columns.NextHarvestsUrgencyScoreColumn;
-import eionet.cr.web.util.columns.SearchResultColumn;
 import eionet.cr.web.util.columns.NextHarvestsUrgencyScoreColumn.COLUMN;
+import eionet.cr.web.util.columns.SearchResultColumn;
 
 /**
  * Urgency score for the next X (default 20) harvests.

@@ -5,8 +5,6 @@ import java.util.List;
 
 import org.apache.commons.lang.StringEscapeUtils;
 
-import eionet.cr.common.CRRuntimeException;
-
 /**
  *
  * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>

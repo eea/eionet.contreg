@@ -20,8 +20,8 @@
 
 package eionet.cr.util.sesame;
 
-import eionet.cr.common.Namespace;
 import junit.framework.TestCase;
+import eionet.cr.common.Namespace;
 
 /**
  * Test SPARQLQueryUtil methods.

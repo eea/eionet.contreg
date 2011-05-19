@@ -23,8 +23,6 @@ package eionet.cr.dao;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import org.dbunit.dataset.IDataSet;
-
 import junit.framework.TestCase;
 import eionet.cr.common.Predicates;
 import eionet.cr.util.Hashes;

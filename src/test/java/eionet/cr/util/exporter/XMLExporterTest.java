@@ -5,7 +5,6 @@ package eionet.cr.util.exporter;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,7 +18,6 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
 
 import junit.framework.TestCase;
 
@@ -27,7 +25,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import eionet.cr.common.Predicates;
-import eionet.cr.dao.DAOException;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Pair;

@@ -20,7 +20,6 @@
  */
 package eionet.cr.util;
 
-import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;

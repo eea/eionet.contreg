@@ -1,10 +1,6 @@
 package eionet.cr.web.action;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-
-import javax.servlet.http.HttpServletResponse;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
@@ -17,7 +13,6 @@ import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.SpoBinaryDAO;
-import eionet.cr.dao.readers.RDFExporter;
 import eionet.cr.dto.SpoBinaryDTO;
 import eionet.cr.util.Hashes;
 

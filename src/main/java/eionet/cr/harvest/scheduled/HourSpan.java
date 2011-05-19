@@ -20,8 +20,6 @@
 * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.harvest.scheduled;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 
 /**
  *

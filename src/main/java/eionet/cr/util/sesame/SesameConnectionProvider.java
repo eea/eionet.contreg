@@ -9,7 +9,6 @@ import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 
 import virtuoso.sesame2.driver.VirtuosoRepository;
-
 import eionet.cr.common.CRRuntimeException;
 import eionet.cr.config.GeneralConfig;
 

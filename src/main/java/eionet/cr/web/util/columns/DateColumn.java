@@ -3,7 +3,6 @@ package eionet.cr.web.util.columns;
 import java.util.Date;
 
 import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
-import eionet.cr.web.util.columns.HarvestedUrlCountColumn.COLUMN;
 
 public class DateColumn extends SearchResultColumn {
 

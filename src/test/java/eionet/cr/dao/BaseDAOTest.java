@@ -33,7 +33,6 @@ import eionet.cr.dao.postgre.PostgreSQLBaseDAO;
 import eionet.cr.dao.readers.SubjectDataReader;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
-import eionet.cr.util.sql.SQLUtil;
 
 /**
  * The class tests different methods in PostgreSQLBaseDAO class

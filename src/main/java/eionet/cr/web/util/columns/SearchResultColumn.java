@@ -20,8 +20,6 @@
  */
 package eionet.cr.web.util.columns;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 
 import eionet.cr.web.action.AbstractActionBean;

@@ -4,6 +4,7 @@ import java.net.URLEncoder;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+
 import org.displaytag.decorator.TableDecorator;
 
 public class SparqlClientColumnDecorator extends TableDecorator {

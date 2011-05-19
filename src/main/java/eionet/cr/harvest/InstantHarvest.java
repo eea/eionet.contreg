@@ -2,14 +2,11 @@ package eionet.cr.harvest;
 
 import java.util.Date;
 
-import eionet.cr.common.Predicates;
-import eionet.cr.common.Subjects;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.HarvestSourceDTO;
-import eionet.cr.dto.ObjectDTO;
 import eionet.cr.web.security.CRUser;
 
 public class InstantHarvest extends PullHarvest {

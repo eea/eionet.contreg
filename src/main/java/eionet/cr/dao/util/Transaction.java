@@ -28,8 +28,6 @@ import org.apache.log4j.Logger;
 import eionet.cr.dao.DAO;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
-import eionet.cr.dao.HarvestDAO;
-import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.util.sql.DbConnectionProvider;
 

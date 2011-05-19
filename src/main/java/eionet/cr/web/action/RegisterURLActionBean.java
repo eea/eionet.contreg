@@ -20,8 +20,6 @@
 * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.web.action;
 
-import java.util.Date;
-
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.RedirectResolution;
@@ -32,22 +30,9 @@ import net.sourceforge.stripes.validation.ValidationMethod;
 
 import org.apache.commons.lang.StringUtils;
 
-import eionet.cr.common.Predicates;
-import eionet.cr.common.Subjects;
-import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
-import eionet.cr.dao.DAOFactory;
-import eionet.cr.dao.HarvestSourceDAO;
-import eionet.cr.dao.HelperDAO;
-import eionet.cr.dto.HarvestSourceDTO;
-import eionet.cr.dto.ObjectDTO;
-import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.HarvestException;
-import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
-import eionet.cr.util.Hashes;
 import eionet.cr.util.URLUtil;
-import eionet.cr.util.Util;
-import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.RegisterUrl;
 
 /**

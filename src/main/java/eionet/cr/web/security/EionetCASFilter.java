@@ -25,8 +25,6 @@ import static eionet.cr.web.util.WebConstants.LOGIN_ACTION;
 import static eionet.cr.web.util.WebConstants.USER_SESSION_ATTR;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 

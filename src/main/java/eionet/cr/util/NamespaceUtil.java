@@ -1,11 +1,8 @@
 package eionet.cr.util;
 
 import java.util.HashMap;
-import java.util.List;
 
 import eionet.cr.common.Namespace;
-import eionet.cr.dao.DAOException;
-import eionet.cr.dto.PredicateDTO;
 
 public class NamespaceUtil {
 

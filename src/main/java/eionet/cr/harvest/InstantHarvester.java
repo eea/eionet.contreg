@@ -21,6 +21,7 @@
 package eionet.cr.harvest;
 
 import org.apache.commons.lang.StringUtils;
+
 import eionet.cr.common.CRRuntimeException;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;

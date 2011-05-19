@@ -1,12 +1,7 @@
 package eionet.cr.harvest;
 
 import org.dbunit.dataset.IDataSet;
-import org.junit.Test;
 
-import eionet.cr.dao.DAOException;
-import eionet.cr.dao.DAOFactory;
-import eionet.cr.dao.HarvestSourceDAO;
-import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 
 /**

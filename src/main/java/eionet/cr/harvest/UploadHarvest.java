@@ -51,8 +51,6 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
-import eionet.cr.harvest.util.arp.ARPSource;
-import eionet.cr.harvest.util.arp.InputStreamBasedARPSource;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.xml.ConversionsParser;
 import eionet.cr.util.xml.XmlAnalysis;

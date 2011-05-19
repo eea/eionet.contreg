@@ -20,6 +20,7 @@
  */
 package eionet.cr.test;
 import java.net.URL;
+
 import junit.framework.TestCase;
 
 /**

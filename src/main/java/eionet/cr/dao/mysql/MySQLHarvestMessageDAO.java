@@ -28,7 +28,6 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HarvestMessageDAO;
 import eionet.cr.dao.readers.HarvestMessageDTOReader;
 import eionet.cr.dto.HarvestMessageDTO;
-import eionet.cr.util.sql.DbConnectionProvider;
 import eionet.cr.util.sql.SQLUtil;
 
 /**

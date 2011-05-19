@@ -22,9 +22,6 @@ package eionet.cr.api.feeds.amp;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -34,17 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.openrdf.repository.RepositoryConnection;
 
-import eionet.cr.api.feeds.SubjectsRDFWriter;
 import eionet.cr.common.Namespace;
-import eionet.cr.common.Predicates;
-import eionet.cr.common.SubjectProcessor;
-import eionet.cr.common.Subjects;
-import eionet.cr.dao.DAOFactory;
-import eionet.cr.dao.SearchDAO;
-import eionet.cr.dto.ObjectDTO;
-import eionet.cr.dto.SubjectDTO;
-import eionet.cr.util.Pair;
-import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.util.sesame.SesameUtil;
 
 /**

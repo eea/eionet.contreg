@@ -5,7 +5,6 @@ import junit.framework.TestCase;
 import org.junit.Test;
 
 import eionet.cr.util.export.XmlUtil;
-import eionet.cr.util.exporter.XMLExporterTest.MockXmlExporter;
 
 public class XmlUtilTest  extends TestCase {
 

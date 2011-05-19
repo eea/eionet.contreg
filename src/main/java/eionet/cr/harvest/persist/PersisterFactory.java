@@ -21,8 +21,6 @@
 package eionet.cr.harvest.persist;
 
 import eionet.cr.config.GeneralConfig;
-import eionet.cr.dao.DAOFactory;
-import eionet.cr.dao.postgre.PostgreSQLDAOFactory;
 import eionet.cr.harvest.persist.mysql.MySQLDefaultPersister;
 import eionet.cr.harvest.persist.postgresql.PostgreSQLPersister;
 import eionet.cr.util.sql.DbConnectionProvider;

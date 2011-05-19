@@ -14,12 +14,11 @@ import static eionet.cr.web.sparqlClient.helpers.SPARQLResultsXMLConstants.ROOT_
 import static eionet.cr.web.sparqlClient.helpers.SPARQLResultsXMLConstants.URI_TAG;
 import static eionet.cr.web.sparqlClient.helpers.SPARQLResultsXMLConstants.VAR_NAME_ATT;
 import static eionet.cr.web.sparqlClient.helpers.SPARQLResultsXMLConstants.VAR_TAG;
+import info.aduna.xml.XMLWriter;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
-
-import info.aduna.xml.XMLWriter;
 
 import org.openrdf.model.BNode;
 import org.openrdf.model.Literal;

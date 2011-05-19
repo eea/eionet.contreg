@@ -20,25 +20,18 @@
 * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.dao.postgre;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.lf5.util.StreamUtils;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.SpoBinaryDAO;
 import eionet.cr.dto.SpoBinaryDTO;
 import eionet.cr.util.Hashes;
-import eionet.cr.util.Util;
 import eionet.cr.util.sql.SQLUtil;
 
 /**

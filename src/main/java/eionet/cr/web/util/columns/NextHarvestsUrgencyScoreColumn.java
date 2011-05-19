@@ -3,6 +3,7 @@ package eionet.cr.web.util.columns;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Date;
+
 import eionet.cr.harvest.statistics.dto.HarvestUrgencyScoreDTO;
 
 /**

@@ -31,7 +31,6 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.UrgentHarvestQueueDAO;
 import eionet.cr.dao.readers.HarvestQueueItemDTOReader;
 import eionet.cr.dto.UrgentHarvestQueueItemDTO;
-import eionet.cr.util.sql.DbConnectionProvider;
 import eionet.cr.util.sql.SQLUtil;
 
 /**

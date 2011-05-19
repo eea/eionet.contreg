@@ -33,7 +33,6 @@ import eionet.cr.util.Pair;
 import eionet.cr.util.Util;
 import eionet.cr.util.sql.DbConnectionProvider;
 import eionet.cr.util.sql.MySQLUtil;
-import eionet.cr.util.sql.SQLResultSetBaseReader;
 import eionet.cr.util.sql.SQLResultSetReader;
 import eionet.cr.util.sql.SQLUtil;
 

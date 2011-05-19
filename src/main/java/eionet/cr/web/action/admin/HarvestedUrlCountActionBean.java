@@ -15,8 +15,8 @@ import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
 import eionet.cr.util.Pair;
 import eionet.cr.web.action.AbstractSearchActionBean;
 import eionet.cr.web.util.columns.HarvestedUrlCountColumn;
-import eionet.cr.web.util.columns.SearchResultColumn;
 import eionet.cr.web.util.columns.HarvestedUrlCountColumn.COLUMN;
+import eionet.cr.web.util.columns.SearchResultColumn;
 
 /**
  * Harvested URL count per day for the last X (default 42) days.

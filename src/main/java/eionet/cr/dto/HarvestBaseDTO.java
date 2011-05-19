@@ -20,7 +20,6 @@
  */
 package eionet.cr.dto;
 
-import eionet.cr.harvest.Harvest;
 import eionet.cr.harvest.util.HarvestMessageType;
 
 /**

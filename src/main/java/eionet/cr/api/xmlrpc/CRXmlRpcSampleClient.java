@@ -30,8 +30,6 @@ import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 
-import eionet.cr.common.Predicates;
-import eionet.cr.common.Subjects;
 import eionet.cr.util.Util;
 import eionet.qawcommons.DataflowResultDto;
 

@@ -21,8 +21,8 @@
 package eionet.cr.config;
 
 import java.io.IOException;
-import java.util.Properties;
 import java.util.Map.Entry;
+import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

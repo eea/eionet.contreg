@@ -25,11 +25,9 @@ import net.sourceforge.stripes.mock.MockRoundtrip;
 import net.sourceforge.stripes.mock.MockServletContext;
 
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import eionet.cr.test.helpers.AbstractStripesMvcTestHelper;
-import eionet.cr.util.sql.DbConnectionProvider;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.WebConstants;
 

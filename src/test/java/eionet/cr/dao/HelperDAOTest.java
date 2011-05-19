@@ -27,8 +27,8 @@ import java.util.List;
 import org.dbunit.dataset.IDataSet;
 import org.junit.Test;
 
-import eionet.cr.dto.TripleDTO;
 import eionet.cr.dto.SubjectDTO;
+import eionet.cr.dto.TripleDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.util.pagination.PagingRequest;
 

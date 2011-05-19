@@ -2,6 +2,7 @@ package eionet.cr.dao.readers;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
 import org.openrdf.model.Value;
 import org.openrdf.query.BindingSet;
 

@@ -20,9 +20,6 @@
 * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.dto;
 
-import java.io.InputStream;
-
-import eionet.cr.util.Hashes;
 
 /**
  *

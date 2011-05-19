@@ -20,18 +20,12 @@
 * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.dao.postgre.helpers;
 
-import java.util.HashSet;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
-
-import eionet.cr.common.Predicates;
 import eionet.cr.dao.helpers.AbstractSearchHelper;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.pagination.PagingRequest;
-import eionet.cr.util.sql.PairReader;
-import eionet.cr.web.util.columns.ReferringPredicatesColumn;
 
 /**
  *

@@ -1,6 +1,5 @@
 package eionet.cr.dto;
 
-import java.util.Date;
 
 public class UserHistoryDTO {
 
