@@ -7,7 +7,7 @@
         <stripes:hidden name="harvestSource.url" />
         <table class="datatable">
 			<tr>
-				<td>URL:</td>
+				<th scope="row">URL</th>
 				<td>
 					<stripes:link href="/factsheet.action">
 						<c:out value="${actionBean.harvestSource.url}"/>
@@ -15,40 +15,40 @@
 					</stripes:link>
 				</td>
 			</tr>            <tr>
-                <th scope="row">E-mails:</th>
+                <th scope="row">E-mails</th>
                 <td><c:out value="${actionBean.harvestSource.emails}" /></td>
             </tr>
             <tr>
-                <th scope="row">Date created:</th>
+                <th scope="row">Date created</th>
                 <td><c:out value="${actionBean.harvestSource.timeCreated}" /></td>
             </tr>
             <tr>
-                <th scope="row">Harvest interval:</th>
+                <th scope="row">Harvest interval</th>
                 <td>
 					<c:out value="${actionBean.intervalMinutesDisplay}"/>
 					<c:if test="${actionBean.intervalMinutesDisplay}=='0'">&nbsp;(i.e not to be batch-harvested)</c:if>
 				</td>
             </tr>
             <tr>
-                <th scope="row">Last harvest:</th>
+                <th scope="row">Last harvest</th>
                 <td><c:out value="${actionBean.harvestSource.lastHarvest}" /></td>
             </tr>
             <tr>
-                <th scope="row">Urgency score:</th>
+                <th scope="row">Urgency score</th>
                 <td>${actionBean.urgencyScoreFormatted}</td>
             </tr>
             <c:if test="${not empty actionBean.harvestSource.mediaType}">
                 <tr>
-                    <th scope="row">Media type:</th>
+                    <th scope="row">Media type</th>
                     <td>${actionBean.harvestSource.mediaType}</td>
                 </tr>
             </c:if>
             <tr>
-                <th scope="row">"Schema" source:</th>
+                <th scope="row">"Schema" source</th>
                 <td>${actionBean.schemaSourceDisplay}</td>
             </tr>
             <tr>
-                <th scope="row">"Priority" source:</th>
+                <th scope="row">"Priority" source</th>
                 <td>${actionBean.prioritySourceDisplay}</td>
             </tr>
             <c:if test="${actionBean.harvestSource.unavailable}">

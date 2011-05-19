@@ -70,8 +70,7 @@ SELECT DISTINCT * WHERE {
   _:subj a ?class .
   OPTIONAL { ?class rdfs:label ?label }
 } LIMIT 50
-</c:if>${actionBean.query}
-                    </textarea>
+</c:if>${actionBean.query}</textarea>
                 </div>
 	            <div style="position: relative; margin-bottom: 30px">
 		            <div style="position: absolute; top: 5px; left: 0px;">

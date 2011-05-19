@@ -11,7 +11,7 @@
         <crfn:form action="/source.action" focus="">
             <stripes:hidden name="harvestSource.sourceId"/>
             <table>
-						    <col style="width:9em"/>
+						    <col style="width:10em"/>
 								<col/>
                 <tr>
                     <td>URL:</td>
@@ -37,15 +37,15 @@
                     <td><stripes:text name="harvestSource.mediaType" size="100" style="width:100%"/></td>
                 </tr>
                 <tr>
-                    <td>Is "Schema" source:</td>
+                    <td><label class="question" for="schema">Is "Schema" source:</label></td>
                     <td>
-                        <stripes:checkbox name="schemaSource"/>
+                        <stripes:checkbox name="schemaSource" id="schema"/>
                     </td>
                 </tr>
                 <tr>
-                    <td>Is "Priority" source:</td>
+                    <td><label class="question" for="priority">Is "Priority" source:</label></td>
                     <td>
-                        <stripes:checkbox name="harvestSource.prioritySource"/>
+                        <stripes:checkbox name="harvestSource.prioritySource" id="priority"/>
                     </td>
                 </tr>
                 <tr>
