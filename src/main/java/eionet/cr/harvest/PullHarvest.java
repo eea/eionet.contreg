@@ -32,12 +32,10 @@ import eionet.cr.dao.HelperDAO;
 import eionet.cr.dto.HarvestMessageDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
-import eionet.cr.harvest.persist.PersisterFactory;
 import eionet.cr.harvest.util.HarvestMessageType;
 import eionet.cr.harvest.util.HarvestUrlConnection;
 import eionet.cr.harvest.util.MimeTypeConverter;
 import eionet.cr.util.ConnectionError;
-import eionet.cr.util.ConnectionError.ErrType;
 import eionet.cr.util.FileUtil;
 import eionet.cr.util.GZip;
 import eionet.cr.util.Hashes;
@@ -45,6 +43,7 @@ import eionet.cr.util.URLUtil;
 import eionet.cr.util.UrlRedirectAnalyzer;
 import eionet.cr.util.UrlRedirectionInfo;
 import eionet.cr.util.Util;
+import eionet.cr.util.ConnectionError.ErrType;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.xml.ConversionsParser;
 import eionet.cr.util.xml.XmlAnalysis;
@@ -383,8 +382,15 @@ public class PullHarvest extends Harvest {
     private void handleSourceNotModified() throws SQLException {
 
         // update lastRefreshed predicate for this source
-        PersisterFactory.getPersister().updateLastRefreshed(Hashes.spoHash(sourceUrlString), dateFormat);
-
+        //PersisterFactory.getPersister().updateLastRefreshed(Hashes.spoHash(sourceUrlString), dateFormat);
+        
+        //KL190511 probably not necessary as LastRefreshed is set anyway i nmetadata:
+        if (!sourceMetadata.hasPredicate(Predicates.CR_LAST_REFRESHED)) {
+            String lastRefreshed = dateFormat.format(new Date());
+            ObjectDTO firstSeenObject = new ObjectDTO(lastRefreshed, true, XMLSchema.DATETIME);
+            sourceMetadata.addObject(Predicates.CR_LAST_REFRESHED, firstSeenObject);
+        }
+        
         // copy the harvest's number of triples and resources from previous harvest
         if (previousHarvest != null) {
             setStoredTriplesCount(previousHarvest.getTotalStatements());
