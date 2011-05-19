@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -32,6 +31,7 @@ import eionet.cr.dao.HelperDAO;
 import eionet.cr.dto.HarvestMessageDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
+import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.util.HarvestMessageType;
 import eionet.cr.harvest.util.HarvestUrlConnection;
 import eionet.cr.harvest.util.MimeTypeConverter;
@@ -376,21 +376,26 @@ public class PullHarvest extends Harvest {
     }
 
     /**
-     * @throws SQLException
+     * Stores metadata if URL content is not modified and source is not harvested.
+     * @throws DAOException if updating in Virtuoso fails.
      *
      */
-    private void handleSourceNotModified() throws SQLException {
+    private void handleSourceNotModified() throws DAOException {
+
+        SubjectDTO failedHarvestSourceMetadata = new SubjectDTO(sourceUrlString, false);
+        //only cr:lastRefresh has to be stored in case of failure if source is not modified
+        String lastRefreshed = dateFormat.format(new Date());
+        ObjectDTO lastRefreshDate = new ObjectDTO(lastRefreshed, true, XMLSchema.DATETIME);
 
         // update lastRefreshed predicate for this source
-        //PersisterFactory.getPersister().updateLastRefreshed(Hashes.spoHash(sourceUrlString), dateFormat);
-        
-        //KL190511 probably not necessary as LastRefreshed is set anyway i nmetadata:
-        if (!sourceMetadata.hasPredicate(Predicates.CR_LAST_REFRESHED)) {
-            String lastRefreshed = dateFormat.format(new Date());
-            ObjectDTO firstSeenObject = new ObjectDTO(lastRefreshed, true, XMLSchema.DATETIME);
-            sourceMetadata.addObject(Predicates.CR_LAST_REFRESHED, firstSeenObject);
+        failedHarvestSourceMetadata.addObject(Predicates.CR_LAST_REFRESHED, lastRefreshDate);
+
+        try {
+            DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceMetadata(failedHarvestSourceMetadata);
+        } catch (Exception e) {
+            throw new DAOException("Updating failed harvest source metadata failed: " + e);
         }
-        
+
         // copy the harvest's number of triples and resources from previous harvest
         if (previousHarvest != null) {
             setStoredTriplesCount(previousHarvest.getTotalStatements());
@@ -906,4 +911,5 @@ public class PullHarvest extends Harvest {
     public boolean isRdfContentFound() {
         return rdfContentFound;
     }
+    
 }
