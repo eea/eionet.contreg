@@ -159,7 +159,6 @@ public class SubjectDTO implements Serializable {
 
         Collection<ObjectDTO> result = new ArrayList<ObjectDTO>();
         Collection<ObjectDTO> fromHitSources = new ArrayList<ObjectDTO>();
-        boolean existLanguagePreferences = languages != null && !languages.isEmpty();
 
         Collection<ObjectDTO> objects = getObjects(predicateUri);
         if (objects != null && !objects.isEmpty()) {

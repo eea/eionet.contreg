@@ -7,7 +7,6 @@ import net.sourceforge.stripes.action.StreamingResolution;
 import net.sourceforge.stripes.action.UrlBinding;
 
 import org.openrdf.model.Value;
-import org.openrdf.query.Binding;
 import org.openrdf.query.BindingSet;
 import org.openrdf.repository.RepositoryConnection;
 
@@ -130,10 +129,7 @@ public class VirtuosoQueryActionBean extends AbstractActionBean {
 
             for (Object bindingName : bindingNames) {
 
-                Binding binding = bindingSet.getBinding(bindingName.toString());
-
                 Value value = bindingSet.getValue(bindingName.toString());
-
                 result.append("<td>").append(value.stringValue()).append("</td>");
             }
 

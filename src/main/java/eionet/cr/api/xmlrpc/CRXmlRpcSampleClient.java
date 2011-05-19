@@ -114,7 +114,7 @@ public class CRXmlRpcSampleClient {
 
             Object o = result[0];
             DataflowResultDto dto = (DataflowResultDto)o;
-            System.out.println(o);
+            System.out.println(dto);
         } else
             System.out.println("result array null or empty");
     }

@@ -21,7 +21,6 @@
 package eionet.cr.dao.postgre;
 
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.sql.Connection;
@@ -29,7 +28,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -145,8 +143,6 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
         if (subjectDTO == null || subjectDTO.getPredicateCount() == 0)
             return;
-
-        long firstSeenTime = System.currentTimeMillis();
 
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -1205,7 +1201,6 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
         Statement stmt = null;
         ResultSet rs = null;
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss");
             conn = getSQLConnection();
             stmt = conn.createStatement();
             rs = stmt.executeQuery(dbQuery);
@@ -1270,9 +1265,8 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
     @Override
     public int getLastReviewId(CRUser user) throws DAOException {
+        
         String subjectUrl = user.getHomeUri();
-
-        SubjectDTO subject = new SubjectDTO(subjectUrl, false);
 
         String dbQuery = "select OBJECT as lastid from SPO " + "where " + "PREDICATE="
                 + Hashes.spoHash(Predicates.CR_USER_REVIEW_LAST_NUMBER) + " and " + "SUBJECT=" + Hashes.spoHash(subjectUrl) + "";
@@ -1680,7 +1674,6 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
         DownloadFileDTO returnFileDTO = new DownloadFileDTO();
 
         Connection conn = null;
-        InputStream result = null;
         try {
             conn = getSQLConnection();
             PreparedStatement ps = conn.prepareStatement("SELECT object, datatype FROM spo_binary WHERE subject = ?");

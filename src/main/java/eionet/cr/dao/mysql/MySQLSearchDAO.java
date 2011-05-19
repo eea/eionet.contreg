@@ -318,7 +318,6 @@ public class MySQLSearchDAO extends MySQLBaseDAO implements SearchDAO {
 
         String sortPredicate = sortingRequest!=null ? sortingRequest.getSortingColumnName() : null;
         SortOrder sortOrder  = sortingRequest != null ? sortingRequest.getSortOrder() : null;
-        boolean doSort = !StringUtils.isBlank(sortPredicate);
 
         StringBuffer sqlBuf = new StringBuffer("select sql_calc_found_rows distinct").
         append(" SPO_POINT.SUBJECT as SUBJECT_HASH from SPO as SPO_POINT");

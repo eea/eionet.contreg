@@ -52,7 +52,7 @@ public class URLUtil {
 
         try {
             URL url = new URL(s);
-            return true;
+            return url!=null;
         } catch (MalformedURLException e) {
             return false;
         }

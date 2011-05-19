@@ -172,8 +172,6 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
         if (subjectDTO == null || subjectDTO.getPredicateCount() == 0)
             return;
 
-        long firstSeenTime = System.currentTimeMillis();
-
         Connection conn = null;
         PreparedStatement pstmt = null;
         try {

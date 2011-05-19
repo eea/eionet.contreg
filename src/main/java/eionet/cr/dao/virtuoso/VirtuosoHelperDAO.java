@@ -1036,7 +1036,6 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
         ReviewDTO reviewDTO = null;
         RepositoryConnection conn = null;
-        List<ReviewDTO> resultList = new ArrayList<ReviewDTO>();
         TupleQueryResult queryResult = null;
 
         try {
@@ -1054,8 +1053,6 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
                 }
 
                 String predicateUri = bindingSet.getValue("p").stringValue();
-                String objectString = bindingSet.getValue("o").stringValue();
-
                 if (predicateUri.equals(Predicates.DC_TITLE)) {
                     reviewDTO.setTitle(bindingSet.getValue("o").stringValue());
                 }

@@ -1,7 +1,5 @@
 package eionet.cr.util.sql;
 
-import java.util.List;
-
 import org.dbunit.dataset.IDataSet;
 import org.junit.Test;
 
@@ -121,7 +119,8 @@ public class UserReviewTest extends CRDatabaseTestCase {
         lastReviewId = DAOFactory.get().getDao(HelperDAO.class).addReview(testReview2, user);
         assertEquals(2, lastReviewId);
 
-        List<ReviewDTO> reviews = DAOFactory.get().getDao(HelperDAO.class).getReviewList(user);
+        // just issue this call without using the return value
+        DAOFactory.get().getDao(HelperDAO.class).getReviewList(user);
     }
 
     @Test
