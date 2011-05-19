@@ -21,7 +21,7 @@ import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.util.URLUtil;
 import eionet.cr.web.action.AbstractActionBean;
 /**
- * ACtion bean for bulk add/delete harvest sources page.
+ * Action bean for bulk add/delete harvest sources page.
  * @author kaido
  *
  */
@@ -178,12 +178,26 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
 
     /**
      * Adds sources to removal queue.
+     * Those ones that already are in the delete queue are not added
      */
     private void bulkDeleteSources() {
             try {
                 HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
-                dao.queueSourcesForDeletion(sourceUrls);
-                addSystemMessage(sourceUrls.size() + " source(s) were scheduled for removal.");
+                List<String> sourcesInDeleteQue = dao.getScheduledForDeletion();
+                List<String> sourcesForRemoval = new ArrayList<String>();
+
+                for (String url : sourceUrls) {
+                    //if the source is already in the delete queue, do not try to add it twice
+                    if (!sourcesInDeleteQue.contains(url)) {
+                        sourcesForRemoval.add(url);
+                    }
+                }
+                dao.queueSourcesForDeletion(sourcesForRemoval);
+                addSystemMessage(sourcesForRemoval.size() + " source(s) were scheduled for removal.");
+                if (sourceUrls.size() - sourcesForRemoval.size() > 0) {
+                    addSystemMessage((sourceUrls.size() - sourcesForRemoval.size())
+                            + " source(s) were already in the delete queue.");
+                }
             } catch (DAOException e) {
                 warnings.append("Adding sources to delete queue failed, reason: ").
                     append(e.toString()).append("<BR/>");
