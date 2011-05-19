@@ -12,7 +12,7 @@
         <li><a href="spatialSearch.action?googleEarthIntro">Google Earth link</a></li>
         <li><a href="tagSearch.action">Tag search</a></li>
         <li><a href="recentUploads.action">Recent uploads</a></li>
-        <li><a href="sparql">SPARQL client</a></li>
+        <li><a href="sparql">SPARQL endpoint</a></li>
         <li><a href="sources.action">Harvesting sources</a></li>
         <li><a href="harvestQueue.action">Harvest queue</a></li>
         <li><a href="home">User folders</a></li>
