@@ -1,7 +1,9 @@
 package eionet.cr.dao.virtuoso;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,6 +12,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.openrdf.OpenRDFException;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
@@ -249,9 +252,31 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
      * @see eionet.cr.dao.HarvestSourceDAO#addSourceToRepository(File, String)
      */
     @Override
-    public int addSourceToRepository(File file, String sourceUrlString) throws DAOException, RepositoryException,
-            RDFParseException, IOException {
+    public int addSourceToRepository(File file, String sourceUrlString) throws IOException, OpenRDFException {
 
+        InputStream inputStream = null;
+        try{
+            inputStream = new FileInputStream(file);
+            return addSourceToRepository(inputStream, sourceUrlString);
+        }
+        finally{
+            if (inputStream!=null){
+                try{
+                    inputStream.close();
+                }
+                catch (IOException e){
+                }
+            }
+        }
+    }
+    
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.dao.postgre.PostgreSQLHarvestSourceDAO#addSourceToRepository(java.io.InputStream, java.lang.String)
+     */
+    @Override
+    public int addSourceToRepository(InputStream inputStream, String sourceUrlString) throws IOException, OpenRDFException {
+        
         int storedTriplesCount = 0;
         boolean isSuccess = false;
         RepositoryConnection conn = null;
@@ -270,7 +295,7 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
             conn.clear(context);
 
             // add the file's contents into repository and under this context
-            conn.add(file, sourceUrlString, RDFFormat.RDFXML, context);
+            conn.add(inputStream, sourceUrlString, RDFFormat.RDFXML, context);
 
             long tripleCount = conn.size(context);
 
@@ -291,6 +316,7 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
             }
             SesameUtil.close(conn);
         }
+        
         return storedTriplesCount;
     }
 
@@ -308,7 +334,6 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
             boolean isSuccess = false;
             RepositoryConnection conn = null;
 
-            logger.debug("Storing auto-generated triples for the source");
             try {
                 conn = SesameUtil.getRepositoryConnection();
                 conn.setAutoCommit(false);

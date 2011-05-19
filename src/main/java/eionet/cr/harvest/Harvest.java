@@ -45,6 +45,7 @@ import eionet.cr.harvest.persist.PersisterConfig;
 import eionet.cr.harvest.util.HarvestLog;
 import eionet.cr.harvest.util.arp.ARPSource;
 import eionet.cr.util.Hashes;
+import eionet.cr.util.URLUtil;
 
 /**
  *
@@ -372,6 +373,38 @@ public abstract class Harvest {
         }
 
         logger.debug("Harvest finished");
+    }
+    
+    /**
+     * Searches new harvest sources from harvested file. If resource is subclass of cr:File and doesn't yet exist, then it is
+     * considered as new source.
+     *
+     * @throws HarvestException
+     */
+    protected void extractNewHarvestSources() throws HarvestException {
+
+        try {
+            // calculate harvest interval for tracked files
+            Integer interval = Integer.valueOf(GeneralConfig.getProperty(GeneralConfig.HARVESTER_REFERRALS_INTERVAL,
+                    String.valueOf(HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL)));
+
+            List<String> newSources = DAOFactory.get().getDao(HarvestSourceDAO.class).getNewSources(sourceUrlString);
+
+            for (String sourceUrl : newSources) {
+                // escape spaces in URLs
+                sourceUrl = URLUtil.replaceURLSpaces(sourceUrl);
+                
+                HarvestSourceDTO source = new HarvestSourceDTO();
+                source.setUrl(sourceUrl);
+                source.setUrlHash(Hashes.spoHash(sourceUrl));
+                source.setIntervalMinutes(interval);
+
+                DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(source);
+            }
+
+        } catch (Exception e) {
+            throw new HarvestException(e.toString(), e);
+        }
     }
 
     /**

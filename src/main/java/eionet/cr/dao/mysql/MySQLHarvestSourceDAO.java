@@ -22,6 +22,7 @@ package eionet.cr.dao.mysql;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -30,6 +31,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.openrdf.OpenRDFException;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFParseException;
 
@@ -534,8 +536,7 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
      * @see eionet.cr.dao.HarvestSourceDAO#addSourceToRepository(File, String)
      */
     @Override
-    public int addSourceToRepository(File file, String sourceUrlString) throws DAOException, RepositoryException,
-            RDFParseException, IOException {
+    public int addSourceToRepository(File file, String sourceUrlString) throws IOException, OpenRDFException {
         throw new UnsupportedOperationException("Method not implemented");
     }
 
@@ -642,6 +643,15 @@ public class MySQLHarvestSourceDAO extends MySQLBaseDAO implements HarvestSource
      * @see eionet.cr.dao.HarvestSourceDAO#updateLastHarvest(String, Timestamp)
      */
     public void updateLastHarvest(String sourceUrl, Timestamp lastHarvest) throws DAOException {
+        throw new UnsupportedOperationException("Method not implemented");
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.dao.HarvestSourceDAO#addSourceToRepository(java.io.InputStream, java.lang.String)
+     */
+    @Override
+    public int addSourceToRepository(InputStream inputStream, String sourceUrlString) throws IOException, OpenRDFException {
         throw new UnsupportedOperationException("Method not implemented");
     }
 

@@ -115,25 +115,36 @@ public class HarvestDAOWriter {
      */
     private Timestamp generateLastHarvestDate(Harvest harvest) throws DAOException {
 
-        long lastHarvest = System.currentTimeMillis();
-        // If temporary error
-        // The LAST_HARVEST is not set to current time. Instead it is
-        // increased with 10% of the harvesting period but minimum two hours.
-        if (!((PullHarvest) harvest).getSourceAvailable() && !harvest.permanentError) {
-            HarvestSourceDTO source = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceById(sourceId);
-            if (source != null && source.getLastHarvest() != null) {
-                long prevHarvest = source.getLastHarvest().getTime();
-                int interval = source.getIntervalMinutes();
+        long result = System.currentTimeMillis();
+        
+        // If there was a "temporary" harvesting error (i.e. source was not available, but
+        // the harvest's permanent error flag is down), the last harvest time is not actually
+        // set to current time, but instead it is increased with 10% of the harvesting period
+        // but minimum two hours. This is relevant only for PullHarvest.
 
-                int increase = (interval * 10) / 100;
-                if (increase < 120) {
-                    increase = 120;
+        if (harvest instanceof PullHarvest){
+            
+            PullHarvest pullHarvest = (PullHarvest)harvest;
+            boolean wasTemporaryError = !pullHarvest.getSourceAvailable() && !harvest.permanentError;
+            if (wasTemporaryError) {
+                
+                HarvestSourceDTO source = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceById(sourceId);
+                if (source != null && source.getLastHarvest() != null) {
+                    
+                    long prevHarvest = source.getLastHarvest().getTime();
+                    int interval = source.getIntervalMinutes();
+
+                    int increase = (interval * 10) / 100;
+                    if (increase < 120) {
+                        increase = 120;
+                    }
+
+                    result = prevHarvest + (increase * 60 * 1000);
                 }
-
-                lastHarvest = prevHarvest + (increase * 60 * 1000);
             }
         }
-        return new Timestamp(lastHarvest);
+        
+        return new Timestamp(result);
     }
 
     /**

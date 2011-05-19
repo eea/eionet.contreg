@@ -16,6 +16,7 @@ import org.openrdf.OpenRDFException;
 import org.openrdf.model.Literal;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
+import org.openrdf.model.ValueFactory;
 import org.openrdf.model.vocabulary.XMLSchema;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.QueryLanguage;
@@ -1254,8 +1255,23 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
      */
     @Override
     public boolean isExistingSubject(String subjectUri) throws DAOException {
-        throw new UnsupportedOperationException("Method not implemented");
-
+        
+        if (StringUtils.isBlank(subjectUri)) {
+            throw new IllegalArgumentException("Subject uri must not be empty");
+        }
+        
+        StringBuilder query = new StringBuilder("select count(*)").
+        append(" where {<").append(subjectUri).append("> ?p ?o}");
+        
+        Object resultObject = executeUniqueResultSPARQL(query.toString(),
+                new SingleObjectReader<Long>());
+        
+        if (resultObject==null){
+            return false;
+        }
+        
+        int resultInt = Integer.parseInt(resultObject.toString());
+        return resultInt>0;
     }
 
     /*
@@ -1322,10 +1338,19 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
      * @see eionet.cr.dao.HelperDAO#deleteTriples(java.lang.String, java.lang.String, java.lang.String)
      */
     @Override
-    public void deleteTriples(String subjectUri, String predicateUri,
-            String sourceUri) throws DAOException {
-        throw new UnsupportedOperationException("Method not implemented");
+    public void deleteTriples(String subjectUri, String predicateUri, String sourceUri) throws DAOException {
+        
+        RepositoryConnection conn = null;
+        try {
 
+            conn = SesameUtil.getRepositoryConnection();
+            ValueFactory factory = conn.getValueFactory();
+            conn.remove(factory.createURI(subjectUri), factory.createURI(predicateUri), null, factory.createURI(sourceUri));
+        } catch (RepositoryException e) {
+            throw new DAOException(e.toString(), e);
+        } finally {
+            SesameUtil.close(conn);
+        }
     }
 
     /*

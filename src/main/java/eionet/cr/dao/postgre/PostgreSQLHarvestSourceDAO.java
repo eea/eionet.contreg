@@ -22,6 +22,7 @@ package eionet.cr.dao.postgre;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -34,6 +35,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.openrdf.OpenRDFException;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFParseException;
 
@@ -690,8 +692,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
      * @see eionet.cr.dao.HarvestSourceDAO#addSourceToRepository(File, String)
      */
     @Override
-    public int addSourceToRepository(File file, String sourceUrlString) throws DAOException, RepositoryException,
-            RDFParseException, IOException {
+    public int addSourceToRepository(File file, String sourceUrlString) throws IOException, OpenRDFException {
         throw new UnsupportedOperationException("Method not implemented");
     }
 
@@ -876,5 +877,14 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
         } finally {
             SQLUtil.close(conn);
         }
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.dao.HarvestSourceDAO#addSourceToRepository(java.io.InputStream, java.lang.String)
+     */
+    @Override
+    public int addSourceToRepository(InputStream inputStream, String sourceUrlString) throws IOException, OpenRDFException {
+        throw new UnsupportedOperationException("Method not implemented");
     }
 }

@@ -248,13 +248,18 @@ public class PullHarvest extends Harvest {
                             }
                         }
 
-                        // Remove old triples
+                        // remove old triples
+                        // FIXME: JH180511 - should it really be necessary here? Because
+                        // the graph is cleared from old triples by HarvestSourceDAO.addSourceToRepository(...)
+                        // anyway below.
                         DAOFactory.get().getDao(HarvestSourceDAO.class).deleteSourceTriples(sourceUrlString);
 
-                        // Remove old predicates from /harvester context
+                        // remove old auto-generated metadata (i.e. the onw that's in harvster's context)
+                        logger.debug("Removing old auto-generated triples about the source");
                         DAOFactory.get().getDao(HarvestSourceDAO.class).removeAllPredicatesFromHarvesterContext(sourceUrlString);
 
-                        // Insert auto generated metadata into repository
+                        // Iinsert new auto generated metadata
+                        logger.debug("Storing new auto-generated triples about the source");
                         DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceMetadata(sourceMetadata);
 
                     } // if Source is available.
@@ -276,9 +281,13 @@ public class PullHarvest extends Harvest {
         }
 
         if (sourceAvailable && needsHarvesting) {
+            
+            int harvestedTriples = harvest(file, contentType, totalBytes);
+            
             // Perform the harvest. Only extract sources if we got some triples.
             // Otherwise it is a waste of time.
-            if (harvest(file, contentType, totalBytes) > 0) {
+            if (harvestedTriples > 0) {
+                logger.debug("Extracting new harvest sources after fresh harvest");
                 extractNewHarvestSources();
             }
         } else if (!needsHarvesting) {
@@ -323,7 +332,12 @@ public class PullHarvest extends Harvest {
             try {
                 file = preProcess(file, contentType);
                 if (file != null) {
+                    
+                    logger.debug("Loading the file contents into the triple store");
+                    
                     tripleCount = DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceToRepository(file, sourceUrlString);
+                    
+                    logger.debug(tripleCount + " triples stored by the triple store");
                     setStoredTriplesCount(tripleCount);
                 }
             } catch (Exception e) {
@@ -335,38 +349,6 @@ public class PullHarvest extends Harvest {
             }
         }
         return tripleCount;
-    }
-
-    /**
-     * Searches new harvest sources from harvested file. If resource is subclass of cr:File and doesn't yet exist, then it is
-     * considered as new source.
-     *
-     * @throws HarvestException
-     */
-    private void extractNewHarvestSources() throws HarvestException {
-
-        try {
-            // calculate harvest interval for tracked files
-            Integer interval = Integer.valueOf(GeneralConfig.getProperty(GeneralConfig.HARVESTER_REFERRALS_INTERVAL,
-                    String.valueOf(HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL)));
-
-            List<String> newSources = DAOFactory.get().getDao(HarvestSourceDAO.class).getNewSources(sourceUrlString);
-
-            for (String sourceUrl : newSources) {
-                // escape spaces in URLs
-                sourceUrl = URLUtil.replaceURLSpaces(sourceUrl);
-                
-                HarvestSourceDTO source = new HarvestSourceDTO();
-                source.setUrl(sourceUrl);
-                source.setUrlHash(Hashes.spoHash(sourceUrl));
-                source.setIntervalMinutes(interval);
-
-                DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(source);
-            }
-
-        } catch (Exception e) {
-            throw new HarvestException(e.toString(), e);
-        }
     }
 
     /**

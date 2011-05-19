@@ -50,7 +50,7 @@ public class PostgreSQLSpoBinaryDAO extends PostgreSQLBaseDAO implements SpoBina
 
     /** */
     private static final String sqlAdd = "insert into SPO_BINARY "
-            + "(SUBJECT,OBJECT,OBJ_LANG,DATATYPE,MUST_EMBED) values (?,?,?,?,?)";
+            + "(SUBJECT,OBJ_LANG,DATATYPE,MUST_EMBED) values (?,?,?,?)";
     /*
      * (non-Javadoc)
      * @see eionet.cr.dao.SpoBinaryDAO#add(eionet.cr.dto.SpoBinaryDTO, long)
@@ -64,37 +64,22 @@ public class PostgreSQLSpoBinaryDAO extends PostgreSQLBaseDAO implements SpoBina
         Connection conn = null;
         PreparedStatement stmt = null;
         try {
-            InputStream contentStream = dto.getContentStream();
-            if (contentStream.available() == 0) {
-                throw new IllegalArgumentException("Content stream must not be null or empty");
-            }
-
             conn = getSQLConnection();
             stmt = conn.prepareStatement(sqlAdd);
 
             stmt.setLong(1, dto.getSubjectHash());
 
-            // Note that we're not calling setBinaryStream(int, InputStream, long).
-            // Instead we convert long to int, and call setBinaryStream(int, InputStream, int).
-            // This is because of a bug in Tomcat's Database Connection Pool implementation which
-            // causes setBinaryStream(int, InputStream, long) to fail with
-            // java.lang.AbstractMethodError. See more here:
-            // http://techtuxwords.blogspot.com/2010/03/storing-binary-stuff-in-database-with.html
-            stmt.setBinaryStream(2, contentStream, Util.safeLongToInt(contentSize));
-
             String lang = dto.getLanguage();
-            stmt.setString(3, lang == null ? "" : lang);
+            stmt.setString(2, lang == null ? "" : lang);
 
             String contentType = dto.getContentType();
-            stmt.setString(4, contentType == null ? "" : contentType);
+            stmt.setString(3, contentType == null ? "" : contentType);
 
-            stmt.setBoolean(5, dto.isMustEmbed());
+            stmt.setBoolean(4, dto.isMustEmbed());
 
             stmt.executeUpdate();
         } catch (SQLException sqle) {
             throw new DAOException(sqle.getMessage(), sqle);
-        } catch (IOException ioe) {
-            throw new DAOException(ioe.getMessage(), ioe);
         } finally {
             SQLUtil.close(stmt);
             SQLUtil.close(conn);
@@ -124,7 +109,7 @@ public class PostgreSQLSpoBinaryDAO extends PostgreSQLBaseDAO implements SpoBina
             if (rs != null && rs.next()) {
 
                 SpoBinaryDTO dto = new SpoBinaryDTO(
-                        rs.getLong("SUBJECT"), rs.getBinaryStream("OBJECT"));
+                        rs.getLong("SUBJECT"));
                 dto.setContentType(rs.getString("DATATYPE"));
                 dto.setLanguage(rs.getString("OBJ_LANG"));
                 dto.setMustEmbed(rs.getBoolean("MUST_EMBED"));

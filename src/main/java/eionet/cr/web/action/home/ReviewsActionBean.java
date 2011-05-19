@@ -244,7 +244,7 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
         try {
             // save attachment contents into database
             attachmentContentStream = attachment.getInputStream();
-            SpoBinaryDTO dto = new SpoBinaryDTO(Hashes.spoHash(attachmentUri), attachmentContentStream);
+            SpoBinaryDTO dto = new SpoBinaryDTO(Hashes.spoHash(attachmentUri));
             DAOFactory.get().getDao(SpoBinaryDAO.class).add(dto, attachment.getSize());
 
             // construct review uri

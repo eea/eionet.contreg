@@ -116,6 +116,9 @@ public class GeneralConfig {
      * ruleset.
      * */
     public static final String VIRTUOSO_CR_RULESET_NAME = "virtuoso.cr.ruleset.name";
+    
+    /** */
+    public static final String FILESTORE_PATH = "filestore.path";
 
     /** */
     public static final int SEVERITY_INFO = 1;

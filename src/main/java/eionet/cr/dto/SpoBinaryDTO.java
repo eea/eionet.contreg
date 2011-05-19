@@ -33,7 +33,6 @@ public class SpoBinaryDTO {
 
     /** */
     private long subjectHash;
-    private InputStream contentStream;
     private String contentType;
     private String language;
     private boolean mustEmbed;
@@ -41,16 +40,10 @@ public class SpoBinaryDTO {
     /**
      *
      * @param subjectHash
-     * @param contentStream
      */
-    public SpoBinaryDTO(long subjectHash, InputStream contentStream) {
+    public SpoBinaryDTO(long subjectHash) {
 
         this.subjectHash = subjectHash;
-
-        if (contentStream == null) {
-            throw new IllegalArgumentException("Content stream must not be null");
-        }
-        this.contentStream = contentStream;
     }
 
     /**
@@ -88,13 +81,6 @@ public class SpoBinaryDTO {
      */
     public void setMustEmbed(boolean mustEmbed) {
         this.mustEmbed = mustEmbed;
-    }
-
-    /**
-     * @return the contentStream
-     */
-    public InputStream getContentStream() {
-        return contentStream;
     }
 
     /**

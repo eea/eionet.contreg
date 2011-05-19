@@ -49,7 +49,7 @@ public class DownloadActionBean extends AbstractActionBean {
         }
 
         // get the actual content stream
-        InputStream contentStream = dto.getContentStream();
+        InputStream contentStream = null; // FIXME: get the actual content stream
         if (contentStream == null || contentStream.available() == 0) {
             addCautionMessage("Requested file content not found.");
             return new ForwardResolution("/pages/empty.jsp");

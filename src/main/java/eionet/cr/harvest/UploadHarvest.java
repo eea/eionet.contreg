@@ -1,23 +1,23 @@
 /*
-* The contents of this file are subject to the Mozilla Public
-*
-* License Version 1.1 (the "License"); you may not use this file
-* except in compliance with the License. You may obtain a copy of
-* the License at http://www.mozilla.org/MPL/
-*
-* Software distributed under the License is distributed on an "AS
-* IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
-* implied. See the License for the specific language governing
-* rights and limitations under the License.
-*
-* The Original Code is Content Registry 2.0.
-*
-* The Initial Owner of the Original Code is European Environment
-* Agency. Portions created by Tieto Eesti are Copyright
-* (C) European Environment Agency. All Rights Reserved.
-*
-* Contributor(s):
-* Jaanus Heinlaid, Tieto Eesti*/
+ * The contents of this file are subject to the Mozilla Public
+ *
+ * License Version 1.1 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of
+ * the License at http://www.mozilla.org/MPL/
+ *
+ * Software distributed under the License is distributed on an "AS
+ * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ * The Original Code is Content Registry 2.0.
+ *
+ * The Initial Owner of the Original Code is European Environment
+ * Agency. Portions created by Tieto Eesti are Copyright
+ * (C) European Environment Agency. All Rights Reserved.
+ *
+ * Contributor(s):
+ * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.harvest;
 
 import java.io.File;
@@ -40,10 +40,15 @@ import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.openrdf.OpenRDFException;
+import org.openrdf.rio.RDFParseException;
 import org.xml.sax.SAXException;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.config.GeneralConfig;
+import eionet.cr.dao.DAOException;
+import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.harvest.util.arp.ARPSource;
@@ -53,9 +58,9 @@ import eionet.cr.util.xml.ConversionsParser;
 import eionet.cr.util.xml.XmlAnalysis;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 public class UploadHarvest extends Harvest {
 
@@ -66,7 +71,7 @@ public class UploadHarvest extends Harvest {
     private String userName;
 
     /**
-     *
+     * 
      * @param dto
      * @param fileBean
      * @param dcTitle
@@ -77,12 +82,11 @@ public class UploadHarvest extends Harvest {
         this(dto.getUrl(), fileBean, dcTitle, userName);
 
         // set harvest log writer
-        setDaoWriter(new HarvestDAOWriter(
-                dto.getSourceId(), Harvest.TYPE_PUSH, userName));
+        setDaoWriter(new HarvestDAOWriter(dto.getSourceId(), Harvest.TYPE_PUSH, userName));
     }
 
     /**
-     *
+     * 
      * @param sourceUrlString
      * @param fileBean
      * @param dcTitle
@@ -104,17 +108,14 @@ public class UploadHarvest extends Harvest {
 
         // set auto-generated triples already detectable for this source
 
-        sourceMetadata.addObject(Predicates.CR_BYTE_SIZE,
-                new ObjectDTO(String.valueOf(fileBean.getSize()), true));
+        sourceMetadata.addObject(Predicates.CR_BYTE_SIZE, new ObjectDTO(String.valueOf(fileBean.getSize()), true));
 
         String contentType = fileBean.getContentType();
         if (!StringUtils.isBlank(contentType)) {
-            sourceMetadata.addObject(Predicates.CR_MEDIA_TYPE,
-                    new ObjectDTO(fileBean.getContentType(), true));
+            sourceMetadata.addObject(Predicates.CR_MEDIA_TYPE, new ObjectDTO(fileBean.getContentType(), true));
         }
 
-        sourceMetadata.addObject(Predicates.CR_LAST_MODIFIED, new ObjectDTO(
-                dateFormat.format(new Date()), true));
+        sourceMetadata.addObject(Predicates.CR_LAST_MODIFIED, new ObjectDTO(dateFormat.format(new Date()), true));
 
         if (!StringUtils.isBlank(dcTitle)) {
             sourceMetadata.addObject(Predicates.DC_TITLE, new ObjectDTO(dcTitle, true));
@@ -124,16 +125,16 @@ public class UploadHarvest extends Harvest {
     /**
      * @param dto
      * @throws HarvestException
-     *
+     * 
      */
     public void createDaoWriter(HarvestSourceDTO dto) throws HarvestException {
 
-        setDaoWriter(new HarvestDAOWriter(
-                dto.getSourceId(), Harvest.TYPE_PUSH, userName));
+        setDaoWriter(new HarvestDAOWriter(dto.getSourceId(), Harvest.TYPE_PUSH, userName));
     }
 
     /*
      * (non-Javadoc)
+     * 
      * @see eionet.cr.harvest.Harvest#doExecute()
      */
     protected void doExecute() throws HarvestException {
@@ -144,9 +145,7 @@ public class UploadHarvest extends Harvest {
 
         File convertedFile = null;
         InputStream inputStream = null;
-
         try {
-            ARPSource arpSource = null;
             XmlAnalysis xmlAnalysis = parse();
 
             // if file is XML
@@ -166,25 +165,58 @@ public class UploadHarvest extends Harvest {
                     logger.debug("No conversion made, will harvest the file as it is");
                     inputStream = fileBean.getInputStream();
                 }
-
-                // create ARP source from input stream
-                arpSource = new InputStreamBasedARPSource(inputStream);
             } else {
                 logger.debug("File is not XML");
             }
 
-            // harvest ARP source (which in the case of non-XML files is null)
-            harvest(arpSource, true);
+            HarvestSourceDAO harvestSourceDAO = DAOFactory.get().getDao(HarvestSourceDAO.class);
+
+            // remove old auto-generated metadata (i.e. the onw that's in harvster's context)
+            logger.debug("Removing old auto-generated triples about the source");
+            harvestSourceDAO.removeAllPredicatesFromHarvesterContext(sourceUrlString);
+
+            // insert new auto generated metadata
+            logger.debug("Storing new auto-generated triples about the source");
+            harvestSourceDAO.addSourceMetadata(sourceMetadata);
+            
+            if (inputStream!=null){
+
+                // try to harvest the stream
+                logger.debug("Loading the file contents into the triple store");
+                int triplesCount = harvestSourceDAO.addSourceToRepository(inputStream, sourceUrlString);
+                logger.debug(triplesCount + " triples stored by the triple store");
+                
+                if (triplesCount>0){
+                    logger.debug("Extracting new harvest sources after fresh harvest");
+                    extractNewHarvestSources();
+                }
+            }
+            
         } catch (ParserConfigurationException e) {
             throw new HarvestException(e.toString(), e);
         } catch (IOException e) {
             throw new HarvestException(e.toString(), e);
         } catch (SAXException e) {
             throw new HarvestException(e.toString(), e);
+        } catch (OpenRDFException e) {
+            
+            // when harvesting an uploaded-file, RDF parse exceptions must be ignored,
+            // because its only something that CR attempts to do, but doesn't have to be successful
+            if (e instanceof RDFParseException){
+                logger.info("Following exception happened when parsing uploaded file as RDF", e);
+            }
+            else{
+                throw new HarvestException(e.toString(), e); 
+            }
+        } catch (DAOException e) {
+            throw new HarvestException(e.toString(), e);
         } finally {
 
             if (inputStream != null) {
-                try {inputStream.close();} catch (IOException ioe) {}
+                try {
+                    inputStream.close();
+                } catch (IOException ioe) {
+                }
             }
 
             if (convertedFile != null && convertedFile.exists()) {
@@ -196,7 +228,7 @@ public class UploadHarvest extends Harvest {
     }
 
     /**
-     *
+     * 
      * @return
      * @throws ParserConfigurationException
      */
@@ -222,7 +254,7 @@ public class UploadHarvest extends Harvest {
     }
 
     /**
-     *
+     * 
      * @param xmlAnalysis
      * @param fileBean
      * @return
@@ -254,8 +286,7 @@ public class UploadHarvest extends Harvest {
         multipartEntity.addPart("convert_id", new StringBody(conversionId));
         multipartEntity.addPart("convert_file", new FileBody(renamedFile));
 
-        HttpPost httpPost = new HttpPost(
-                GeneralConfig.getRequiredProperty(GeneralConfig.XMLCONV_CONVERT_PUSH_URL));
+        HttpPost httpPost = new HttpPost(GeneralConfig.getRequiredProperty(GeneralConfig.XMLCONV_CONVERT_PUSH_URL));
         httpPost.setEntity(multipartEntity);
 
         HttpResponse response = new DefaultHttpClient().execute(httpPost);
@@ -280,15 +311,14 @@ public class UploadHarvest extends Harvest {
     }
 
     /**
-     *
+     * 
      * @param xmlAnalysis
      * @return
      * @throws IOException
      * @throws SAXException
      * @throws ParserConfigurationException
      */
-    private String getConversionId(
-            XmlAnalysis xmlAnalysis) throws IOException,SAXException, ParserConfigurationException {
+    private String getConversionId(XmlAnalysis xmlAnalysis) throws IOException, SAXException, ParserConfigurationException {
 
         String result = null;
 

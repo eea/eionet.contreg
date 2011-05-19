@@ -22,9 +22,11 @@ package eionet.cr.dao;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.List;
 
+import org.openrdf.OpenRDFException;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFParseException;
 
@@ -239,14 +241,21 @@ public interface HarvestSourceDAO extends DAO {
      * @param file
      * @param sourceUrlString
      * @return int
-     * @throws DAOException if relational database is unavailable.
-     * @throws RepositoryException if data repository is unavailable.
-     * @throws RDFParseException
      * @throws IOException
+     * @throws OpenRDFException
      */
-    public int addSourceToRepository(File file, String sourceUrlString) throws DAOException, RepositoryException,
-            RDFParseException, IOException;
+    public int addSourceToRepository(File file, String sourceUrlString) throws IOException, OpenRDFException;
 
+    /**
+     * 
+     * @param inputStream
+     * @param sourceUrlString
+     * @return
+     * @throws IOException
+     * @throws OpenRDFException
+     */
+    public int addSourceToRepository(InputStream inputStream, String sourceUrlString) throws IOException, OpenRDFException;
+    
     /**
      * Adds the meta information the harvester has collected about the source. The meta data is considered part of the
      * harvester and not the source. Therefore the meta data is stored in the harvester's named graph (or context).
