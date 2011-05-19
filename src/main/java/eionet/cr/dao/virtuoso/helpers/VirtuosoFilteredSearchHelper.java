@@ -9,12 +9,12 @@ import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.common.CRRuntimeException;
 import eionet.cr.common.Predicates;
-import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.helpers.AbstractSearchHelper;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.URIUtil;
 import eionet.cr.util.Util;
 import eionet.cr.util.pagination.PagingRequest;
+import eionet.cr.util.sesame.SPARQLQueryUtil;
 
 /**
  *
@@ -26,8 +26,6 @@ public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
     private Map<String, String> filters;
     private Set<String> literalPredicates;
     private Boolean requiresFullTextSearch = null;
-
-    private static final String inferenceDef = "DEFINE input:inference";
 
     public VirtuosoFilteredSearchHelper(Map<String, String> filters,
             Set<String> literalPredicates, PagingRequest pagingRequest,
@@ -59,11 +57,8 @@ public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
 
     @Override
     protected String getOrderedQuery(List<Object> inParams) {
-        StringBuilder strBuilder = new StringBuilder();
-        strBuilder.append(inferenceDef).append("'").append(
-                GeneralConfig
-                        .getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME))
-                .append("' ");
+
+        StringBuilder strBuilder = new StringBuilder(SPARQLQueryUtil.getCrInferenceDefinition());
         strBuilder.append("select distinct ?s where { ?s ?p ?o ");
         strBuilder.append(getQueryParameters(inParams));
         strBuilder.append("} ORDER BY ");
@@ -82,11 +77,8 @@ public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
 
     @Override
     public String getUnorderedQuery(List<Object> inParams) {
-        StringBuilder strBuilder = new StringBuilder();
-        strBuilder.append(inferenceDef).append("'").append(
-                GeneralConfig
-                        .getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME))
-                .append("' ");
+
+        StringBuilder strBuilder = new StringBuilder(SPARQLQueryUtil.getCrInferenceDefinition());
         strBuilder.append("select distinct ?s where { ?s ?p ?o ");
         strBuilder.append(getQueryParameters(inParams));
         strBuilder.append("}");

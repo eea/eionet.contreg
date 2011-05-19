@@ -34,7 +34,9 @@ import net.sourceforge.stripes.action.HandlesEvent;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
+import eionet.cr.dao.DAOException;
 import eionet.cr.web.interceptor.annotation.DontSaveLastActionEvent;
+import eionet.cr.web.security.CRUser;
 
 /**
  * Action bean that deals with user login/logout.
@@ -63,10 +65,16 @@ public class LoginActionBean extends AbstractActionBean {
      * Method redirects to last event occurred before logging in.
      *
      * @return redirect resolution to last event occurred before logging in.
+     * @throws DAOException
      */
     @HandlesEvent(AFTER_LOGIN_EVENT)
     @DontSaveLastActionEvent
-    public Resolution afterLogin() {
+    public Resolution afterLogin() throws DAOException {
+        CRUser user = getContext().getCRUser();
+        if(user != null){
+            user.loadUserProperties();
+        }
+
         String lastActionEventUrl = getContext().getLastActionEventUrl();
         lastActionEventUrl = lastActionEventUrl == null ? MAIN_PAGE_ACTION : lastActionEventUrl;
         //getContext().getCRUser().setLocalId(this.userService.addUserIfrequired(getUserName()));

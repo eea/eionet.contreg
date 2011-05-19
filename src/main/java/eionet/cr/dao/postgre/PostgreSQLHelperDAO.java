@@ -88,9 +88,9 @@ import eionet.cr.util.sql.SingleObjectReader;
 import eionet.cr.web.security.CRUser;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO {
 
@@ -99,7 +99,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.SpoHelperDao#addResource(java.lang.String,
      * java.lang.String)
      */
@@ -138,7 +138,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.SpoHelperDao#addTriples(eionet.cr.dto.SubjectDTO)
      */
     public void addTriples(SubjectDTO subjectDTO) throws DAOException {
@@ -206,7 +206,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HelperDAO#deleteTriples2(java.util.Collection)
      */
     public void deleteTriples(Collection<TripleDTO> triples) throws DAOException {
@@ -256,7 +256,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             + " and OBJECT_HASH=" + Hashes.spoHash(Subjects.RDF_PROPERTY);
 
     /**
-     * 
+     *
      * @param subjectTypes
      * @return the list of properties that can be added by user.
      * @throws DAOException
@@ -314,7 +314,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
     }
 
     /**
-     * 
+     *
      * @param subjectHashes
      * @param conn
      * @return
@@ -357,7 +357,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HelperDAO#getLatestFiles(int)
      */
     public List<Pair<String, String>> getLatestFiles(int limit) throws DAOException {
@@ -432,14 +432,14 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HelperDAO#getPicklistForPredicate(java.lang.String)
      */
     public Collection<ObjectLabelPair> getPicklistForPredicate(String predicateUri, boolean extractLabels) throws DAOException {
         /*
          * if (StringUtils.isBlank(predicateUri)) { return
          * Collections.emptyList(); }
-         * 
+         *
          * List<String> resultList = executeSQL( sqlPicklist,
          * Collections.singletonList((Object)Hashes.spoHash(predicateUri)), new
          * SingleObjectReader<String>());
@@ -449,7 +449,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HelperDAO#isAllowLiteralSearch(java.lang.String)
      */
     public boolean isAllowLiteralSearch(String predicateUri) throws DAOException {
@@ -464,7 +464,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HelperDAO#getPredicatesUsedForType(java.lang.String)
      */
     public List<SubjectDTO> getPredicatesUsedForType(String typeUri) throws DAOException {
@@ -541,7 +541,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
     }
 
     /**
-     * 
+     *
      * @param resourceHashes
      * @return
      * @throws DAOException
@@ -578,7 +578,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HelperDAO#getSpatialSources()
      */
     public List<String> getSpatialSources() throws DAOException {
@@ -595,7 +595,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HelperDAO#getSubject(java.lang.String)
      */
     @Override
@@ -606,7 +606,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HelperDAO#getSubject(java.lang.String)
      */
     public SubjectDTO getSubject(Long subjectHash) throws DAOException {
@@ -624,7 +624,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HelperDAO#getPredicateLabels(java.util.Set)
      */
     public PredicateLabels getPredicateLabels(Set<Long> subjectHashes) throws DAOException {
@@ -646,7 +646,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HelperDAO#getSubProperties(java.util.Set)
      */
     public SubProperties getSubProperties(Collection<String> subjects) throws DAOException {
@@ -654,7 +654,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
         /*
          * SubProperties subProperties = new SubProperties(); if (subjectHashes
          * != null && !subjectHashes.isEmpty()) {
-         * 
+         *
          * StringBuffer sqlBuf = new StringBuffer(). append(
          * "select distinct SPO.OBJECT as PREDICATE, RESOURCE.URI as SUB_PROPERTY"
          * ). append(" from SPO, RESOURCE").
@@ -664,17 +664,17 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
          * ).append(Hashes.spoHash(Predicates.RDFS_SUBPROPERTY_OF)).
          * append(" and SPO.LIT_OBJ='N' and SPO.ANON_OBJ='N'").
          * append(" and SPO.SUBJECT=RESOURCE.URI_HASH");
-         * 
+         *
          * executeSQL(sqlBuf.toString(), new
          * SubPropertiesReader(subProperties)); }
-         * 
+         *
          * return subProperties;
          */
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HelperDAO#getLatestSubjects(int)
      */
     public Collection<SubjectDTO> getLatestSubjects(String rdfType, int limit) throws DAOException {
@@ -746,7 +746,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HelperDAO#getSubjectsNewerThan(java.util.Date, int)
      */
     public List<SubjectDTO> getSubjectsNewerThan(Date timestamp, int limit) throws DAOException {
@@ -795,7 +795,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HelperDAO#getSubjectSchemaUri(java.lang.String)
      */
     public String getSubjectSchemaUri(String subjectUri) throws DAOException {
@@ -838,7 +838,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HelperDAO#getDataflowSearchPicklist()
      */
     public HashMap<String, ArrayList<UriLabelPair>> getDataflowSearchPicklist() throws DAOException {
@@ -852,7 +852,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HelperDAO#getDistinctOrderedTypes()
      */
     public ArrayList<Pair<String, String>> getDistinctOrderedTypes() throws DAOException {
@@ -863,7 +863,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HelperDAO#getSubjectCountInSource(long)
      */
     public int getSubjectCountInSource(long sourceHash) throws DAOException {
@@ -911,7 +911,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * eionet.cr.dao.HelperDAO#registerUserUrl(eionet.cr.web.security.CRUser,
      * java.lang.String, boolean)
@@ -996,7 +996,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * eionet.cr.dao.HelperDAO#addUserBookmark(eionet.cr.web.security.CRUser,
      * java.lang.String)
@@ -1035,7 +1035,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * eionet.cr.dao.HelperDAO#deleteUserBookmark(eionet.cr.web.security.CRUser,
      * java.lang.String)
@@ -1087,7 +1087,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * eionet.cr.dao.HelperDAO#isSubjectUserBookmark(eionet.cr.web.security.
      * CRUser, long)
@@ -1098,13 +1098,13 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
         /*
          * if (user == null) { throw new
          * IllegalArgumentException("User object must not be null"); }
-         * 
+         *
          * String dbQuery = "select count(*) as cnt from SPO " +
          * "where OBJECT_HASH=" + subjectHash + " and " + "LIT_OBJ='N' and " +
          * "PREDICATE=" + Hashes.spoHash(Predicates.CR_BOOKMARK) + " and " +
          * "SOURCE=" + Hashes.spoHash(CRUser.bookmarksUri(user.getUserName())) +
          * "";
-         * 
+         *
          * int count = 0; Connection conn = null; Statement stmt = null;
          * ResultSet rs = null; try { conn = getSQLConnection(); stmt =
          * conn.createStatement(); rs = stmt.executeQuery(dbQuery); while
@@ -1123,7 +1123,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * eionet.cr.dao.HelperDAO#updateUserSaveTime(eionet.cr.web.security.CRUser,
      * java.lang.String)
@@ -1229,7 +1229,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HelperDAO#getTriplesFor(java.lang.String,
      * eionet.cr.util.pagination.PagingRequest)
      */
@@ -1347,7 +1347,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HelperDAO#addReview(eionet.cr.dto.ReviewDTO,
      * eionet.cr.web.security.CRUser)
      */
@@ -1359,7 +1359,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HelperDAO#saveReview(int, eionet.cr.dto.ReviewDTO,
      * eionet.cr.web.security.CRUser)
      */
@@ -1372,7 +1372,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
     private static String insertReviewContentQuery = "INSERT INTO spo_binary (SUBJECT, OBJECT, DATATYPE, MUST_EMBED) VALUES (?,?,?, TRUE);";
 
     /**
-     * 
+     *
      * @param review
      * @param user
      * @param reviewId
@@ -1513,7 +1513,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HelperDAO#getReview(eionet.cr.web.security.CRUser,
      * int)
      */
@@ -1589,7 +1589,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HelperDAO#deleteReview(java.lang.String)
      */
     public void deleteReview(CRUser user, int reviewId, boolean deleteAttachments) throws DAOException {
@@ -1703,7 +1703,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HelperDAO#deleteTriplesOfSource(long)
      */
     public void deleteTriplesOfSource(long sourceHash) throws DAOException {
@@ -1727,7 +1727,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * eionet.cr.dao.HelperDAO#getUserUploads(eionet.cr.web.security.CRUser)
      */
@@ -1780,7 +1780,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HelperDAO#isExistingSubject(long)
      */
     public boolean isExistingSubject(String subjectUri) throws DAOException {
@@ -1804,7 +1804,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HelperDAO#deleteSubjects(java.util.List)
      */
     public void deleteSubjects(List<String> subjectUris) throws DAOException {
@@ -1847,7 +1847,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HelperDAO#renameSubjects(java.util.Map)
      */
     public void renameSubjects(Map<Long, String> newUrisByOldHashes) throws DAOException {
@@ -1953,7 +1953,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HelperDAO#readDistinctPredicates(Long)
      */
     public List<PredicateDTO> readDistinctPredicates(Long sourceHash) throws DAOException {
@@ -2034,7 +2034,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HelperDAO#deleteTriples(java.lang.String,
      * java.lang.String, java.lang.String)
      */
@@ -2058,7 +2058,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HelperDAO#getTriplesCount()
      */
     @Override
@@ -2082,6 +2082,14 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
     @Override
     public LinkedHashMap<URI, String> getSparqlBookmarks(CRUser user) throws DAOException {
+        throw new UnsupportedOperationException("Method not implemented");
+    }
+
+    /* (non-Javadoc)
+     * @see eionet.cr.dao.HelperDAO#registerUserFolderInCrHomeContext(eionet.cr.web.security.CRUser)
+     */
+    @Override
+    public void registerUserFolderInCrHomeContext(CRUser user) throws DAOException {
         throw new UnsupportedOperationException("Method not implemented");
     }
 }

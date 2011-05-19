@@ -15,6 +15,7 @@
         <li><a href="sparql">SPARQL client</a></li>
         <li><a href="sources.action">Harvesting sources</a></li>
         <li><a href="harvestQueue.action">Harvest queue</a></li>
+        <li><a href="home">User folders</a></li>
         <c:if test='${crfn:userHasPermission(sessionScope.crUser, "/", "u")}'>
             <li><a href="registerUrl.action">URL registration</a></li>
             <li><a href="admin" title="Administrative activities">Admin actions</a></li>

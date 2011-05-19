@@ -1,5 +1,6 @@
 package eionet.cr.dao.virtuoso;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -11,11 +12,13 @@ import eionet.cr.common.Predicates;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.SQLBaseDAO;
+import eionet.cr.dao.helpers.SearchHelper;
 import eionet.cr.dao.readers.SubjectDataReader;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.sesame.SPARQLResultSetReader;
 import eionet.cr.util.sesame.SesameUtil;
+import eionet.cr.util.sql.SingleObjectReader;
 
 /**
  *
@@ -32,7 +35,7 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO {
     protected Logger logger = Logger.getLogger(VirtuosoBaseDAO.class);
 
     /**
-     * 
+     *
      * @param <T>
      * @param sparql
      * @param reader
@@ -212,4 +215,17 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO {
         strBuilder.append("}} ORDER BY ?s ?p ?o");
         return strBuilder.toString();
     }
+    /**
+    * Count the total number of rows retrieved by the query constructed in SearchHelper.
+    *
+    * @param helper SearchHelper object.
+    * @return number of rows
+    * @throws DAOException
+    */
+   protected int getExactRowCount(SearchHelper helper) throws DAOException {
+
+       String query = helper.getCountQuery(new ArrayList<Object>());
+       Object resultObject = executeUniqueResultSPARQL(query, new SingleObjectReader<Long>());
+       return Integer.valueOf(resultObject.toString());
+   }
 }

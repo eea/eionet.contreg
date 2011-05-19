@@ -59,7 +59,7 @@ public class SubjectDTO implements Serializable {
     private String uri;
     private long uriHash;
     private boolean anonymous;
-    private Map<String,Collection<ObjectDTO>> predicates;
+    private Map<String, Collection<ObjectDTO>> predicates;
     private Date dcDate;
     private Date lastModifiedTime;
 
@@ -81,13 +81,13 @@ public class SubjectDTO implements Serializable {
         this.anonymous = anonymous;
 
         uriHash = Hashes.spoHash(uri);
-        predicates = new HashMap<String,Collection<ObjectDTO>>();
+        predicates = new HashMap<String, Collection<ObjectDTO>>();
     }
 
     /*
      * (non-Javadoc)
-     * @see java.lang.Object#toString()
-     * This toString is used in the Unit-tests.
+     *
+     * @see java.lang.Object#toString() This toString is used in the Unit-tests.
      */
     @Override
     public String toString() {
@@ -125,7 +125,7 @@ public class SubjectDTO implements Serializable {
      *
      * @return
      */
-    public Map<String,Collection<ObjectDTO>> getPredicates() {
+    public Map<String, Collection<ObjectDTO>> getPredicates() {
         return predicates;
     }
 
@@ -165,7 +165,7 @@ public class SubjectDTO implements Serializable {
         if (objects != null && !objects.isEmpty()) {
 
             // remember the values of literals which have been derived from resource objects
-            HashMap<Long,String> derivedLiterals = new HashMap<Long,String>();
+            HashMap<Long, String> derivedLiterals = new HashMap<Long, String>();
             for (ObjectDTO object : objects) {
 
                 if (object.isLiteral() && object.getSourceObjectHash() != 0) {
@@ -230,7 +230,8 @@ public class SubjectDTO implements Serializable {
                 if (objectType.equals(ObjectDTO.Type.LITERAL) && objectDTO.isLiteral())
                     result.add(objectDTO);
                 else if (objectType.equals(ObjectDTO.Type.RESOURCE) && !objectDTO.isLiteral())
-                    result.add(objectDTO);;
+                    result.add(objectDTO);
+                ;
             }
         }
 
@@ -269,6 +270,26 @@ public class SubjectDTO implements Serializable {
     }
 
     /**
+     * Create the list of object values.
+     *
+     * @param predicate
+     *            URL
+     * @return the list of object values.
+     */
+    public Collection<String> getObjectValues(String predicate) {
+
+        Collection<String> objectValues = new ArrayList<String>();
+        Collection<ObjectDTO> objects = getObjects(predicate);
+        if (objects != null && !objects.isEmpty()) {
+
+            for (ObjectDTO object : objects) {
+                objectValues.add(object.getValue());
+            }
+        }
+        return objectValues;
+    }
+
+    /**
      *
      * @param predicate
      * @return
@@ -304,6 +325,7 @@ public class SubjectDTO implements Serializable {
 
     /*
      * (non-Javadoc)
+     *
      * @see java.lang.Object#equals(java.lang.Object)
      */
     public boolean equals(Object other) {
@@ -314,13 +336,13 @@ public class SubjectDTO implements Serializable {
         if (!(other instanceof SubjectDTO))
             return false;
 
-
-        String otherUri = ((SubjectDTO)other).getUri();
+        String otherUri = ((SubjectDTO) other).getUri();
         return getUri() == null ? otherUri == null : getUri().equals(otherUri);
     }
 
     /*
      * (non-Javadoc)
+     *
      * @see java.lang.Object#hashCode()
      */
     public int hashCode() {
@@ -373,7 +395,6 @@ public class SubjectDTO implements Serializable {
         return result;
     }
 
-
     /**
      * @return the uriHash
      */
@@ -382,7 +403,8 @@ public class SubjectDTO implements Serializable {
     }
 
     /**
-     * @param uriHash the uriHash to set
+     * @param uriHash
+     *            the uriHash to set
      */
     public void setUriHash(long uriHash) {
         this.uriHash = uriHash;
@@ -399,7 +421,7 @@ public class SubjectDTO implements Serializable {
 
         Collection<ObjectDTO> objects = getObjects(predicate);
         if (objects != null && !objects.isEmpty()) {
-            for (ObjectDTO objectDTO:objects) {
+            for (ObjectDTO objectDTO : objects) {
                 if (objectDTO.getValue().equals(objectValue)) {
                     if (objectDTO.getSourceUri().equals(sourceUri)) {
                         return true;
@@ -419,7 +441,8 @@ public class SubjectDTO implements Serializable {
     }
 
     /**
-     * @param hitSource the hitSource to set
+     * @param hitSource
+     *            the hitSource to set
      */
     public void setHitSource(long hitSource) {
         this.hitSource = hitSource;
@@ -433,7 +456,8 @@ public class SubjectDTO implements Serializable {
     }
 
     /**
-     * @param lastModifiedTime the lastModifiedTime to set
+     * @param lastModifiedTime
+     *            the lastModifiedTime to set
      */
     public void setLastModifiedTime(Date lastModifiedTime) {
         this.lastModifiedTime = lastModifiedTime;
@@ -446,7 +470,7 @@ public class SubjectDTO implements Serializable {
     public String getLabel() {
 
         ObjectDTO object = getObject(Predicates.RDFS_LABEL, ObjectDTO.Type.LITERAL);
-        String label = object.getValue();
+        String label = object != null ? object.getValue() : null;
         if (label != null && label.trim().length() > 0)
             return label;
         else if (isAnonymous())

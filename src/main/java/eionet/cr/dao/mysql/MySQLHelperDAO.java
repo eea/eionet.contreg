@@ -15,8 +15,8 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -68,7 +68,7 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
         //reducing visibility
     }
 
-    /*
+    /**
      * (non-Javadoc)
      * @see eionet.cr.dao.HelperDAO#getLatestFiles(int)
      */
@@ -967,6 +967,14 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
 
     @Override
     public LinkedHashMap<URI, String> getSparqlBookmarks(CRUser user) throws DAOException {
+        throw new UnsupportedOperationException("Method not implemented");
+    }
+
+    /* (non-Javadoc)
+     * @see eionet.cr.dao.HelperDAO#registerUserFolderInCrHomeContext(eionet.cr.web.security.CRUser)
+     */
+    @Override
+    public void registerUserFolderInCrHomeContext(CRUser user) throws DAOException {
         throw new UnsupportedOperationException("Method not implemented");
     }
 }

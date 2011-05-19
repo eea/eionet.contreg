@@ -29,6 +29,9 @@ import com.tee.uit.security.AccessController;
 import com.tee.uit.security.SignOnException;
 
 import eionet.cr.config.GeneralConfig;
+import eionet.cr.dao.DAOException;
+import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.UserHomeDAO;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Util;
 
@@ -54,6 +57,10 @@ public class CRUser {
     /** */
     private String userName;
 
+    /**
+     * Is user home folder registered under CR root home.
+     */
+    private boolean homeFolderRegistered;
     /**
      *
      */
@@ -148,13 +155,13 @@ public class CRUser {
 
         return result;
     }
-    
+
     /**
-     * 
+     * Returns the CR application URL defined in cr.proprties eg. http://cr.eionet.europa.eu.
      * @return
      */
 	private static String appHomeURL(){
-		
+
 		return GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL);
 	}
 
@@ -217,6 +224,15 @@ public class CRUser {
     }
 
     /**
+     * ROOT Home URI for all user fodlers.
+     * @return String
+     */
+    public static String rootHomeUri() {
+
+        return new StringBuilder(appHomeURL()).append("/home").toString();
+    }
+
+    /**
      * Home URI of the user.
      * @param userName user name
      * @return String
@@ -226,7 +242,7 @@ public class CRUser {
         if (StringUtils.isBlank(userName)) {
             throw new IllegalArgumentException("userName must not be blank");
         } else {
-        	return new StringBuilder(appHomeURL()).append("/home/").append(userName).toString();
+        	return new StringBuilder(rootHomeUri()).append("/").append(userName).toString();
         }
     }
 
@@ -273,5 +289,19 @@ public class CRUser {
     public static String historyUri(String userName) {
 
         return CRUser.homeUri(userName) + "/history";
+    }
+
+    public boolean isHomeFolderRegistered() {
+        return homeFolderRegistered;
+    }
+
+    public void setHomeFolderRegistered(boolean homeFolderRegistered) {
+        this.homeFolderRegistered = homeFolderRegistered;
+    }
+
+    public void loadUserProperties() throws DAOException{
+        UserHomeDAO userHomeDAO = DAOFactory.get().getDao(UserHomeDAO.class);
+        boolean isUserHomeFolderREgistered = userHomeDAO.isUserFolderRegisteredInCrHomeContext(this);
+        setHomeFolderRegistered(isUserHomeFolderREgistered);
     }
 }

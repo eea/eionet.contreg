@@ -437,12 +437,19 @@ public interface HelperDAO extends DAO {
      * @throws DAOException if query fails
      */
      public long getTriplesCount() throws DAOException;
-     
+
      /**
-      * 
+      *
       * @param user TODO
      * @return
       * @throws DAOException
       */
      public LinkedHashMap<URI, String> getSparqlBookmarks(CRUser user) throws DAOException;
+
+     /**
+      * Stores the user folder in CR home context.
+      * @param user loggedin user
+      * @throws DAOException
+      */
+     public void registerUserFolderInCrHomeContext(CRUser user) throws DAOException;
 }

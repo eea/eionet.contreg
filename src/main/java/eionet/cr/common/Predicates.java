@@ -89,6 +89,8 @@ public interface Predicates {
     public static final String CR_FIRST_SEEN = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#firstSeen";
     public static final String CR_SPARQL_QUERY = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#sparqlQuery";
     public static final String CR_USE_INFERENCE = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#useInference";
+    public static final String CR_HAS_FOLDER = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#hasFolder";
+    public static final String CR_ALLOW_SUBOBJECT_TYPE = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#allowSubObjectType";
 
     public static final String WGS_LAT = "http://www.w3.org/2003/01/geo/wgs84_pos#lat";
     public static final String WGS_LONG = "http://www.w3.org/2003/01/geo/wgs84_pos#long";

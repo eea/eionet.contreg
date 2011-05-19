@@ -129,6 +129,7 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper {
     public String getCountQuery(List<Object> inParams) {
 
         StringBuilder strBuilder = new StringBuilder();
+        //TODO shouldn't it use inferencing?
         strBuilder.append("select count(distinct ?s) where { ?s ?p ?o . ").append(addFilterParams());
         if (exactMatch) {
             if (expression.isUri()) {

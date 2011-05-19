@@ -50,9 +50,9 @@ import eionet.cr.web.sparqlClient.helpers.CRXmlWriter;
 import eionet.cr.web.sparqlClient.helpers.QueryResult;
 
 /**
- * 
+ *
  * @author altnyris
- * 
+ *
  */
 @UrlBinding("/sparql")
 public class SPARQLEndpointActionBean extends AbstractActionBean {
@@ -72,7 +72,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     private static List<String> xmlFormats = new ArrayList<String>();
 
     /**
-     * 
+     *
      */
     static {
         xmlFormats.add("application/sparql-results+xml");
@@ -122,7 +122,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     private LinkedHashMap<URI, String> bookmarkedQueries;
 
     /**
-     * 
+     *
      * @return
      * @throws OpenRDFException
      * @throws DAOException
@@ -155,7 +155,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     /**
      * Fills the bean's following properties from the bookmarked query: - the query itself - output format - hits per page - whether
      * to use inference.
-     * 
+     *
      * @throws DAOException
      */
     private void fillFromBookmark(String bookmarkedQueryUri) throws DAOException {
@@ -172,7 +172,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return
      * @throws DAOException
      */
@@ -220,6 +220,11 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             //no need to bookmark bookmarks :)
             //dao.addUserBookmark(user, bookmarkUri);
 
+            // store user folder in CR root home context
+            if(!user.isHomeFolderRegistered()){
+                dao.registerUserFolderInCrHomeContext(user);
+            }
+
             // log and display message about successful operation
             logger.debug("Query bookmarked with URI: " + bookmarksUri);
             addSystemMessage("Successfully bookmarked query: <a href=\"factsheet.action?uri="
@@ -230,7 +235,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return Resolution
      * @throws OpenRDFException
      */
@@ -317,7 +322,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @param type
      * @return
      */
@@ -335,7 +340,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @param query
      * @param format
      * @param out
@@ -453,7 +458,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public long getExecutionTime() {
@@ -573,7 +578,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @param user
      * @param bookmarkName
      * @return

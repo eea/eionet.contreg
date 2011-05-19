@@ -10,6 +10,7 @@ import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.TagsDAO;
+import eionet.cr.dao.UserHomeDAO;
 
 /**
  *
@@ -40,6 +41,7 @@ public class VirtuosoDAOFactory extends DAOFactory {
         registeredDaos.put(HelperDAO.class, VirtuosoHelperDAO.class);
         registeredDaos.put(SearchDAO.class, VirtuosoSearchDAO.class);
         registeredDaos.put(TagsDAO.class, VirtuosoTagsDAO.class);
+        registeredDaos.put(UserHomeDAO.class, VirtuosoUserHomeDAO.class);
     }
 
     /**

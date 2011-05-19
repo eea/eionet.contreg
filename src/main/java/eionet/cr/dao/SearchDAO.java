@@ -37,17 +37,19 @@ import eionet.cr.util.pagination.PagingRequest;
 /**
  * Interface to define search related dao methods.
  *
- * @author Aleksandr Ivanov
- * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
+ * @author Aleksandr Ivanov <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
 public interface SearchDAO extends DAO {
 
     /**
-     * @param expression - search expression to find
+     * @param expression
+     *            - search expression to find
      * @param filterType
      * @param exactMatch
-     * @param pagingRequest - page request
-     * @param sortingRequest - sorting request to set
+     * @param pagingRequest
+     *            - page request
+     * @param sortingRequest
+     *            - sorting request to set
      * @return Pair<Integer, List<SubjectDTO>>
      * @throws DAOException
      */
@@ -59,16 +61,21 @@ public interface SearchDAO extends DAO {
                 SortingRequest sortingRequest) throws DAOException;
 
     /**
-     * @param filters - search filters.
-     * @param literalPredicates - set of literal predicates
-     * @param pagingRequest - page request
-     * @param sortingRequest - sorting request
-     * @param selectedPredicates - predicates filter
+     * @param filters
+     *            - search filters.
+     * @param literalPredicates
+     *            - set of literal predicates
+     * @param pagingRequest
+     *            - page request
+     * @param sortingRequest
+     *            - sorting request
+     * @param selectedPredicates
+     *            - predicates filter
      * @return Pair<Integer, List<SubjectDTO>>
      * @throws DAOException
      */
     Pair<Integer, List<SubjectDTO>> searchByFilters(
-            Map<String,String> filters,
+            Map<String, String> filters,
             Set<String> literalPredicates,
             PagingRequest pagingRequest,
             SortingRequest sortingRequest,
@@ -142,8 +149,8 @@ public interface SearchDAO extends DAO {
      * @return Vector<Hashtable<String,Vector<String>>>
      * @throws DAOException
      */
-    public Vector<Hashtable<String,Vector<String>>> searchDeliveriesForROD(
-            PagingRequest pagingRequest)throws DAOException;
+    public Vector<Hashtable<String, Vector<String>>> searchDeliveriesForROD(
+            PagingRequest pagingRequest) throws DAOException;
 
     /**
      *
@@ -170,4 +177,5 @@ public interface SearchDAO extends DAO {
      */
     public Pair<Integer, List<SubjectDTO>> searchReferences(String subjectUri,
             PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException;
+
 }

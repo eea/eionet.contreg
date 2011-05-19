@@ -5,10 +5,10 @@
 
     <c:choose>
         <c:when test="${actionBean.userAuthorized}" >
-            <H1>My registrations</H1>
+            <h1>My registrations</h1>
         </c:when>
         <c:otherwise>
-            <H1>${actionBean.attemptedUserName}'s registrations</H1>
+            <h1>${actionBean.attemptedUserName}'s registrations</h1>
         </c:otherwise>
     </c:choose>
         <c:choose>
