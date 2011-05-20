@@ -23,6 +23,8 @@ package eionet.cr.util.sql;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.openrdf.model.BNode;
+import org.openrdf.model.Value;
 import org.openrdf.query.Binding;
 import org.openrdf.query.BindingSet;
 
@@ -47,20 +49,30 @@ public class SingleObjectReader<T> extends ResultSetMixedReader<T> {
         resultList.add((T) rs.getObject(1));
     }
 
-    /*
-     * (non-Javadoc)
-     * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
+    /**
+     * Reads row from the bindingset that contains only one column.
+     * @param bindingSet - Query result bindingset
      */
     @SuppressWarnings("unchecked")
     @Override
     public void readRow(BindingSet bindingSet) {
 
         if (bindingSet != null && bindingSet.size() > 0) {
-
+            String strValue = null;
             Binding binding = bindingSet.iterator().next();
             if (binding != null) {
-
-                resultList.add((T)binding.getValue().stringValue());
+                Value bindingValue = binding.getValue();
+                strValue = bindingValue.stringValue();
+                if (bindingValue instanceof BNode && blankNodeUriPrefix != null) {
+                    if (strValue != null && !strValue.startsWith(blankNodeUriPrefix)) {
+                        strValue = blankNodeUriPrefix + strValue;
+                    }
+                }
+                if (strValue != null) {
+                    //this casting is done because of the generilization in the interface
+                    //only Strings can be read from Sesame Bindingset today
+                    resultList.add((T) strValue);
+                }
             }
         }
     }

@@ -71,6 +71,7 @@ public class SubjectReader extends ResultSetMixedReader<String> {
             boolean isAnonSubject = subject instanceof BNode;
 
             String strSubj = "";
+            //FIXME -blank nodes should be added also to the resultset? 
             if (subject != null && !isAnonSubject) {
                 strSubj = subject.stringValue();
                 resultList.add(strSubj);

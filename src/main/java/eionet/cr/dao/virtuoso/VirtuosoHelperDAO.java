@@ -774,13 +774,13 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
                 .append("filter( isIRI(?o)) ").append("filter (?o = <").append(subject).append("> ) ").append("filter (?g = <")
                 .append(CRUser.bookmarksUri(user.getUserName())).append("> ) } }");
 
-        SingleObjectReader<Integer> reader = new SingleObjectReader<Integer>();
+        //this reader works only with Strings
+        SingleObjectReader<String> reader = new SingleObjectReader<String>();
         executeSPARQL(sparql.toString(), reader);
-        // resultlist contains 1 row including count of bookmark matches
 
-        // TODO check if SingleSubjectreader works to avoid this casting
-        Object urlCount = reader.getResultList().get(0);
-        return Integer.valueOf((String) urlCount) > 0;
+        // resultlist contains 1 row including count of bookmark matches
+        String urlCount = reader.getResultList().get(0);
+        return Integer.valueOf(urlCount) > 0;
     }
 
     /*
