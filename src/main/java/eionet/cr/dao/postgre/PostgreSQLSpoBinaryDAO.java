@@ -24,7 +24,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -32,6 +34,7 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.SpoBinaryDAO;
 import eionet.cr.dto.SpoBinaryDTO;
 import eionet.cr.util.Hashes;
+import eionet.cr.util.Util;
 import eionet.cr.util.sql.SQLUtil;
 
 /**
@@ -141,6 +144,46 @@ public class PostgreSQLSpoBinaryDAO extends PostgreSQLBaseDAO implements SpoBina
         } catch (SQLException e) {
             throw new DAOException(e.getMessage(), e);
         } finally {
+            SQLUtil.close(conn);
+        }
+    }
+    
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.dao.SpoBinaryDAO#delete(java.util.List)
+     */
+    @Override
+    public void delete(List<String> subjectUris) throws DAOException {
+        
+        // make sure the list is not null or empty
+        if (subjectUris == null || subjectUris.isEmpty()) {
+            return;
+        }
+
+        // convert URIs to hashes
+        ArrayList<Long> hashes = new ArrayList<Long>();
+        for (String uri : subjectUris) {
+            hashes.add(Long.valueOf(Hashes.spoHash(uri)));
+        }
+
+        // prepare connection and the hashes comma-separated
+        Connection conn = null;
+        String hashesStr = "(" + Util.toCSV(hashes) + ")";
+
+        try {
+            // do it in a transaction
+            conn = getSQLConnection();
+            conn.setAutoCommit(false);
+
+            // delete references from SPO_BINARY
+            SQLUtil.executeUpdate("delete from SPO_BINARY where SUBJECT in " + hashesStr, conn);
+
+            // commit the transaction
+            conn.commit();
+        } catch (SQLException e) {
+            throw new DAOException(e.getMessage(), e);
+        } finally {
+            SQLUtil.rollback(conn);
             SQLUtil.close(conn);
         }
     }

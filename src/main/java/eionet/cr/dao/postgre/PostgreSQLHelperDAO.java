@@ -1754,6 +1754,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
                 String currentLabel = uploadDTO.getLabel();
                 String subjectUri = uploadDTO.getSubjectUri();
                 String uriLabel = URIUtil.extractURILabel(subjectUri, SubjectDTO.NO_LABEL);
+                uriLabel = StringUtils.replace(uriLabel, "%20", " ");
 
                 if (StringUtils.isBlank(currentLabel) && !StringUtils.isBlank(uriLabel))
                     uploadDTO.setLabel(uriLabel);
@@ -1800,7 +1801,7 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
      *
      * @see eionet.cr.dao.HelperDAO#deleteSubjects(java.util.List)
      */
-    public void deleteSubjects(List<String> subjectUris) throws DAOException {
+    public void deleteUserUploads(String userName, List<String> subjectUris) throws DAOException {
 
         // make sure the list is not null or empty
         if (subjectUris == null || subjectUris.isEmpty()) {
@@ -1843,9 +1844,9 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
      *
      * @see eionet.cr.dao.HelperDAO#renameSubjects(java.util.Map)
      */
-    public void renameSubjects(Map<Long, String> newUrisByOldHashes) throws DAOException {
+    public void renameUserUploads(Map<String, String> renamings) throws DAOException {
 
-        if (newUrisByOldHashes == null || newUrisByOldHashes.isEmpty()) {
+        if (renamings == null || renamings.isEmpty()) {
             throw new IllegalArgumentException("Supplied map must not be null or empty!");
         }
 
@@ -1874,9 +1875,10 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
             stmt_RESOURCE = conn
                     .prepareStatement("insert into RESOURCE (URI, URI_HASH, FIRSTSEEN_SOURCE, FIRSTSEEN_TIME, LASTMODIFIED_TIME) values (?,?,?,?,?)");
 
-            for (Map.Entry<Long, String> entry : newUrisByOldHashes.entrySet()) {
+            for (Map.Entry<String, String> entry : renamings.entrySet()) {
 
-                long oldHash = entry.getKey().longValue();
+                String oldUri = entry.getKey();
+                long oldHash = Hashes.spoHash(oldUri);
                 String newUri = entry.getValue();
                 long newHash = Hashes.spoHash(newUri);
 

@@ -21,6 +21,8 @@
 package eionet.cr.dao.mysql;
 
 
+import java.util.List;
+
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.SpoBinaryDAO;
 import eionet.cr.dto.SpoBinaryDTO;
@@ -53,6 +55,15 @@ public class MySQLSpoBinaryDAO extends MySQLBaseDAO implements SpoBinaryDAO {
      * @see eionet.cr.dao.SpoBinaryDAO#exists(java.lang.String)
      */
     public boolean exists(String subjectUri) throws DAOException {
+        throw new UnsupportedOperationException("Method not implemented");
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.dao.SpoBinaryDAO#delete(java.util.List)
+     */
+    @Override
+    public void delete(List<String> subjectUris) throws DAOException {
         throw new UnsupportedOperationException("Method not implemented");
     }
 }

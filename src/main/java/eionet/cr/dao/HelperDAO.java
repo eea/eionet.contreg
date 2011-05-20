@@ -388,17 +388,18 @@ public interface HelperDAO extends DAO {
 
     /**
      *
+     * @param userName TODO
      * @param subjectUris
      * @throws DAOException if query fails
      */
-    public void deleteSubjects(List<String> subjectUris) throws DAOException;
+    public void deleteUserUploads(String userName, List<String> subjectUris) throws DAOException;
 
     /**
      *
-     * @param newUrisByOldHashes
+     * @param renamings TODO
      * @throws DAOException if query fails
      */
-    public void renameSubjects(Map<Long, String> newUrisByOldHashes) throws DAOException;
+    public void renameUserUploads(Map<String, String> renamings) throws DAOException;
 
     /**
      *

@@ -21,6 +21,8 @@
 package eionet.cr.dao;
 
 
+import java.util.List;
+
 import eionet.cr.dto.SpoBinaryDTO;
 
 /**
@@ -53,4 +55,11 @@ public interface SpoBinaryDAO extends DAO {
      * @throws DAOException
      */
     boolean exists(String subjectUri) throws DAOException;
+    
+    /**
+     * 
+     * @param subjectUris
+     * @throws DAOException
+     */
+    void delete(List<String> subjectUris) throws DAOException;
 }

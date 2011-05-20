@@ -13,7 +13,7 @@
             <table>
                 <c:forEach var="subjectUri" items="${actionBean.subjectUris}">
                     <tr>
-                        <td style="padding-right:20px">${fn:substringAfter(subjectUri, actionBean.uriPrefix)}</td>
+                        <td style="padding-right:20px">${fn:replace(fn:substringAfter(subjectUri, actionBean.uriPrefix), "%20", " ")}</td>
                         <td>to:&nbsp;<stripes:text name="${actionBean.fileNameParamPrefix}${crfn:spoHash(subjectUri)}" size="40"/></td>
                     </tr>
                 </c:forEach>
@@ -21,7 +21,7 @@
 
             <fieldset style="display:hidden">
                 <c:forEach var="subjectUri" items="${actionBean.subjectUris}">
-                    <input type="hidden" name="subjectUri" value="${subjectUri}"/>
+                    <input type="hidden" name="subjectUris" value="${subjectUri}"/>
                 </c:forEach>
             </fieldset>
 

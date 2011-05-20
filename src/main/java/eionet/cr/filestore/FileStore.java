@@ -5,12 +5,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 
 import eionet.cr.config.GeneralConfig;
-import eionet.cr.util.Hashes;
 
 /**
  * 
@@ -18,12 +19,17 @@ import eionet.cr.util.Hashes;
  * 
  */
 public class FileStore {
+    
+    /** */
+    private static final Logger logger = Logger.getLogger(FileStore.class);
 
     /** */
     public static final String PATH = GeneralConfig.getRequiredProperty(GeneralConfig.FILESTORE_PATH);
 
     /** */
     private String userName;
+
+    private File userDir;
 
     /**
      * 
@@ -36,6 +42,7 @@ public class FileStore {
         }
 
         this.userName = userName;
+        userDir = new File(FileStore.PATH, userName);
     }
     
     /**
@@ -49,15 +56,15 @@ public class FileStore {
 
     /**
      * 
-     * @param subjectUri
+     * @param fileName
      * @param overwrite
      * @param inputStream
      * @return
      * @throws IOException
      */
-    public File add(String subjectUri, boolean overwrite, InputStream inputStream) throws IOException {
+    public File add(String fileName, boolean overwrite, InputStream inputStream) throws IOException {
 
-        File filePath = prepareFileWrite(subjectUri, overwrite);
+        File filePath = prepareFileWrite(fileName, overwrite);
         FileOutputStream outputStream = null;
         try {
             outputStream = new FileOutputStream(filePath);
@@ -71,15 +78,15 @@ public class FileStore {
 
     /**
      * 
-     * @param subjectUri
+     * @param fileName
      * @param overwrite
      * @param reader
      * @return
      * @throws IOException
      */
-    public File add(String subjectUri, boolean overwrite, Reader reader) throws IOException {
+    public File add(String fileName, boolean overwrite, Reader reader) throws IOException {
 
-        File filePath = prepareFileWrite(subjectUri, overwrite);
+        File filePath = prepareFileWrite(fileName, overwrite);
         FileOutputStream outputStream = null;
         try {
             outputStream = new FileOutputStream(filePath);
@@ -93,14 +100,12 @@ public class FileStore {
 
     /**
      * 
-     * @param subjectUri
+     * @param fileName
      * @param overwrite
      * @throws FileAlreadyExistsException
      */
-    protected File prepareFileWrite(String subjectUri, boolean overwrite) throws FileAlreadyExistsException {
+    protected File prepareFileWrite(String fileName, boolean overwrite) throws FileAlreadyExistsException {
 
-        String fileName = String.valueOf(Hashes.spoHash(subjectUri));
-        File userDir = new File(FileStore.PATH, userName);
         if (!userDir.exists() || !userDir.isDirectory()) {
             // creates the directory, including any necessary but nonexistent parent directories
             userDir.mkdirs();
@@ -117,6 +122,44 @@ public class FileStore {
         }
 
         return filePath;
+    }
+    
+    /**
+     * 
+     * @param fileName
+     */
+    public void delete(String fileName){
+        
+        File file = new File(userDir, fileName);
+        if (file.exists() && file.isFile()) {
+            file.delete();
+        }
+    }
+    
+    /**
+     * 
+     * @param renamings
+     */
+    public void rename(Map<String,String> renamings){
+
+        int renamedCount = 0;
+        if (renamings!=null){
+            
+            for (Map.Entry<String,String> entry : renamings.entrySet()){
+                
+                String oldName = entry.getKey();
+                String newName = entry.getValue();
+                
+                File file = new File(userDir, oldName);
+                if (file.exists() && file.isFile()) {
+                    
+                    file.renameTo(new File(userDir, newName));
+                    renamedCount++;
+                }
+            }
+        }
+        
+        logger.debug("Total of " + renamedCount + " files renamed in the file store");
     }
 
 //    /**

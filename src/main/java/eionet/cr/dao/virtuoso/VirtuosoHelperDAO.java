@@ -1,6 +1,8 @@
 package eionet.cr.dao.virtuoso;
 
 import java.net.URISyntaxException;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -14,6 +16,7 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Literal;
+import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
@@ -24,6 +27,7 @@ import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.RepositoryResult;
 
 import eionet.cr.common.Namespace;
 import eionet.cr.common.Predicates;
@@ -47,6 +51,7 @@ import eionet.cr.dao.readers.UploadDTOReader;
 import eionet.cr.dao.util.PredicateLabels;
 import eionet.cr.dao.util.SubProperties;
 import eionet.cr.dao.util.UriLabelPair;
+import eionet.cr.dao.virtuoso.helpers.ResourceRenameHandler;
 import eionet.cr.dto.DownloadFileDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
@@ -57,6 +62,7 @@ import eionet.cr.dto.TripleDTO;
 import eionet.cr.dto.UploadDTO;
 import eionet.cr.dto.UserBookmarkDTO;
 import eionet.cr.dto.UserHistoryDTO;
+import eionet.cr.harvest.Harvest;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.ObjectLabelPair;
 import eionet.cr.util.Pair;
@@ -65,19 +71,20 @@ import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.util.sesame.SesameUtil;
+import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
 import eionet.cr.web.security.CRUser;
 
 /**
- *
+ * 
  * @author jaanus
- *
+ * 
  */
 public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
     /**
      * Returns latest harvested files (type=cr:File) in descending order (cr:firstSeen).
-     *
+     * 
      * @param limit
      *            count of latest files
      * @return List of Pair containing URL and date
@@ -89,13 +96,10 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     public List<Pair<String, String>> getLatestFiles(final int limit) throws DAOException {
 
         StringBuilder strBuilder = new StringBuilder();
-        strBuilder.append("define input:inference '").append(
-                GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME)).append("' ").append(
-                "SELECT DISTINCT ?s ?l ?d WHERE ").append("{?s a <").append(Predicates.CR_FILE).append("> ").append(
-                ". OPTIONAL { ?s <").append(Predicates.CR_FIRST_SEEN).append("> ?d } ").append(
-                        ". OPTIONAL { ?s <").append(Predicates.RDFS_LABEL).append("> ?l } ").append(
-                "} ORDER BY DESC(?d) LIMIT ")
-                .append(limit);
+        strBuilder.append("define input:inference '").append(GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME))
+                .append("' ").append("SELECT DISTINCT ?s ?l ?d WHERE ").append("{?s a <").append(Predicates.CR_FILE).append("> ")
+                .append(". OPTIONAL { ?s <").append(Predicates.CR_FIRST_SEEN).append("> ?d } ").append(". OPTIONAL { ?s <")
+                .append(Predicates.RDFS_LABEL).append("> ?l } ").append("} ORDER BY DESC(?d) LIMIT ").append(limit);
 
         RecentFilesReader reader = new RecentFilesReader();
         reader.setBlankNodeUriPrefix(VirtuosoBaseDAO.BNODE_URI_PREFIX);
@@ -106,7 +110,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#getLatestSubjects(java.lang.String, int)
      */
     @Override
@@ -118,15 +122,11 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         if (limit <= 0)
             throw new IllegalArgumentException("limit must be greater than 0!");
 
-        StringBuffer sqlBuf = new StringBuffer()
-                .append("prefix dc: <http://purl.org/dc/elements/1.1/> ")
-                .append("select distinct ?s ?d where { ").append("?s a <")
-                .append(rdfType).append("> . ")
-                .append("OPTIONAL { ?s dc:date ?d } ")
-                .append("} ORDER BY DESC(?d) LIMIT " + limit);
+        StringBuffer sqlBuf = new StringBuffer().append("prefix dc: <http://purl.org/dc/elements/1.1/> ")
+                .append("select distinct ?s ?d where { ").append("?s a <").append(rdfType).append("> . ")
+                .append("OPTIONAL { ?s dc:date ?d } ").append("} ORDER BY DESC(?d) LIMIT " + limit);
 
-        logger.trace("Recent uploads search, executing subject finder query: "
-                + sqlBuf.toString());
+        logger.trace("Recent uploads search, executing subject finder query: " + sqlBuf.toString());
 
         RecentUploadsReader<String> matchReader = new RecentUploadsReader<String>();
         matchReader.setBlankNodeUriPrefix(VirtuosoBaseDAO.BNODE_URI_PREFIX);
@@ -148,21 +148,18 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
             String[] neededPredicates = null;
             if (rdfType.equals(Subjects.ROD_OBLIGATION_CLASS)) {
                 // properties for obligations
-                String[] neededPredicatesObl = { Predicates.RDFS_LABEL,
-                        Predicates.ROD_ISSUE_PROPERTY,
+                String[] neededPredicatesObl = { Predicates.RDFS_LABEL, Predicates.ROD_ISSUE_PROPERTY,
                         Predicates.ROD_INSTRUMENT_PROPERTY };
                 neededPredicates = neededPredicatesObl;
             } else if (rdfType.equals(Subjects.ROD_DELIVERY_CLASS)) {
                 // properties for deliveries
-                String[] neededPredicatesDeliveries = { Predicates.RDFS_LABEL,
-                        Predicates.ROD_OBLIGATION_PROPERTY,
+                String[] neededPredicatesDeliveries = { Predicates.RDFS_LABEL, Predicates.ROD_OBLIGATION_PROPERTY,
                         Predicates.ROD_LOCALITY_PROPERTY };
                 neededPredicates = neededPredicatesDeliveries;
             }
 
             // get the subjects data
-            resultList = getSubjectsData(subjectUris, neededPredicates,
-                    dataReader, null);
+            resultList = getSubjectsData(subjectUris, neededPredicates, dataReader, null);
 
             // set dublin core date of found subjects
             if (pairMap != null) {
@@ -176,33 +173,29 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#getSubjectsNewerThan(java.util.Date, int)
      */
     @Override
-    public List<SubjectDTO> getSubjectsNewerThan(Date timestamp, int limit)
-            throws DAOException {
+    public List<SubjectDTO> getSubjectsNewerThan(Date timestamp, int limit) throws DAOException {
         throw new UnsupportedOperationException("Method not implemented");
 
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#getPicklistForPredicate(java.lang.String)
      */
     @Override
-    public Collection<ObjectLabelPair> getPicklistForPredicate(
-            String predicateUri, boolean extractLabels) throws DAOException {
+    public Collection<ObjectLabelPair> getPicklistForPredicate(String predicateUri, boolean extractLabels) throws DAOException {
         if (StringUtils.isBlank(predicateUri)) {
             return Collections.emptyList();
         }
         // TODO use CustomSearch instead?
         StringBuilder strBuilder = new StringBuilder();
-        strBuilder.append("SELECT DISTINCT ?label ?object WHERE { ?s <")
-                .append(predicateUri).append("> ?object ")
-                .append("OPTIONAL {?object <").append(Predicates.RDFS_LABEL)
-                .append("> ?label }} ORDER BY ?label");
+        strBuilder.append("SELECT DISTINCT ?label ?object WHERE { ?s <").append(predicateUri).append("> ?object ")
+                .append("OPTIONAL {?object <").append(Predicates.RDFS_LABEL).append("> ?label }} ORDER BY ?label");
 
         long startTime = System.currentTimeMillis();
         logger.trace("getPicklistForPredicate query: " + strBuilder.toString());
@@ -211,8 +204,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         // execute the query, with the IN parameters
         executeSPARQL(strBuilder.toString(), reader);
 
-        logger.trace("getPicklistForPredicate query took "
-                + Util.durationSince(startTime));
+        logger.trace("getPicklistForPredicate query took " + Util.durationSince(startTime));
 
         return reader.getResultList();
 
@@ -220,7 +212,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#addTriples(eionet.cr.dto.SubjectDTO)
      */
     @Override
@@ -261,7 +253,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#addResource(java.lang.String, java.lang.String)
      */
     @Override
@@ -272,26 +264,21 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
     /**
      * Search for predicates that is allowed to edit on factsheet page.
-     *
+     * 
      * @param subjectTypes
      * @return the list of properties that can be added by user.
      * @throws DAOException
      *             if query fails
      */
-    public HashMap<String, String> getAddibleProperties(Collection<String> subjectTypes)
-                                                                        throws DAOException {
+    public HashMap<String, String> getAddibleProperties(Collection<String> subjectTypes) throws DAOException {
 
         HashMap<String, String> result = new HashMap<String, String>();
 
         StringBuilder strBuilder = new StringBuilder();
-        strBuilder
-                .append("PREFIX rdf: <")
-                .append(Namespace.RDF.getUri())
-                .append("> PREFIX rdfs: <")
-                .append(Namespace.RDFS.getUri())
-                .append("> select distinct ?object ?label where {?object rdfs:label ?label ")
-                .append(". ?object rdf:type rdf:Property . ?object rdfs:isDefinedBy <")
-                .append(Subjects.DUBLIN_CORE_SOURCE_URL).append(">}");
+        strBuilder.append("PREFIX rdf: <").append(Namespace.RDF.getUri()).append("> PREFIX rdfs: <")
+                .append(Namespace.RDFS.getUri()).append("> select distinct ?object ?label where {?object rdfs:label ?label ")
+                .append(". ?object rdf:type rdf:Property . ?object rdfs:isDefinedBy <").append(Subjects.DUBLIN_CORE_SOURCE_URL)
+                .append(">}");
 
         ObjectLabelReader reader = new ObjectLabelReader(true);
         executeSPARQL(strBuilder.toString(), reader);
@@ -300,12 +287,9 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         if (subjectTypes != null && !subjectTypes.isEmpty()) {
 
             strBuilder = new StringBuilder();
-            strBuilder
-                    .append("PREFIX rdfs: <")
-                    .append(Namespace.RDFS.getUri())
+            strBuilder.append("PREFIX rdfs: <").append(Namespace.RDFS.getUri())
                     .append("> select distinct ?object ?label WHERE { ?object rdfs:label ?label ")
-                    .append(". ?object rdfs:domain ?o . FILTER (?o IN (")
-                    .append(Util.sparqlUrisToCsv(subjectTypes)).append("))}");
+                    .append(". ?object rdfs:domain ?o . FILTER (?o IN (").append(Util.sparqlUrisToCsv(subjectTypes)).append("))}");
 
             executeSPARQL(strBuilder.toString(), reader);
         }
@@ -321,7 +305,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#getSubjectSchemaUri(java.lang.String)
      */
     @Override
@@ -331,62 +315,52 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
             return null;
         }
         StringBuilder strBuilder = new StringBuilder();
-        strBuilder.append("select distinct ?o where { ").append("<")
-                .append(subjectUri).append("> <").append(Predicates.CR_SCHEMA)
+        strBuilder.append("select distinct ?o where { ").append("<").append(subjectUri).append("> <").append(Predicates.CR_SCHEMA)
                 .append("> ?o ").append("} limit 1");
 
-        List<String> objectUri = executeSPARQL(strBuilder.toString(),
-                new SingleObjectReader<String>());
+        List<String> objectUri = executeSPARQL(strBuilder.toString(), new SingleObjectReader<String>());
 
-        return (objectUri != null && objectUri.size() > 0) ? objectUri.get(0)
-                : null;
+        return (objectUri != null && objectUri.size() > 0) ? objectUri.get(0) : null;
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#isAllowLiteralSearch(java.lang.String)
      */
     @Override
-    public boolean isAllowLiteralSearch(String predicateUri)
-            throws DAOException {
+    public boolean isAllowLiteralSearch(String predicateUri) throws DAOException {
         return false;
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#getPredicatesUsedForType(java.lang.String)
      */
     @Override
-    public List<SubjectDTO> getPredicatesUsedForType(String typeUri)
-            throws DAOException {
+    public List<SubjectDTO> getPredicatesUsedForType(String typeUri) throws DAOException {
         StringBuilder strBuilder = new StringBuilder();
-        strBuilder.append("SELECT distinct ?p WHERE { ?s ?p ?o . ?s <").append(
-                Predicates.RDF_TYPE);
+        strBuilder.append("SELECT distinct ?p WHERE { ?s ?p ?o . ?s <").append(Predicates.RDF_TYPE);
         strBuilder.append("> <").append(typeUri).append("> }");
 
         long startTime = System.currentTimeMillis();
         logger.trace("usedPredicatesForType query: " + strBuilder.toString());
 
         // execute the query, with the IN parameters
-        List<String> predicateUris = executeSPARQL(strBuilder.toString(),
-                new SingleObjectReader<String>());
+        List<String> predicateUris = executeSPARQL(strBuilder.toString(), new SingleObjectReader<String>());
 
-        logger.trace("usedPredicatesForType query took "
-                + Util.durationSince(startTime));
+        logger.trace("usedPredicatesForType query took " + Util.durationSince(startTime));
 
         List<SubjectDTO> resultList = new ArrayList<SubjectDTO>();
         if (predicateUris != null && !predicateUris.isEmpty()) {
 
             // only these predicates will be queried for
-            String[] neededPredicates = { Predicates.RDF_TYPE,
-                    Predicates.RDFS_LABEL };
+            String[] neededPredicates = { Predicates.RDF_TYPE, Predicates.RDFS_LABEL };
 
             // get the data of all found subjects
             logger.trace("Search by filters, getting the data of the found subjects");
-            resultList = getSubjectsData(predicateUris, neededPredicates,
-                    new SubjectDataReader(predicateUris), null);
+            resultList = getSubjectsData(predicateUris, neededPredicates, new SubjectDataReader(predicateUris), null);
 
             // since a used predicate may not appear as a subject in SPO,
             // there might unfound SubjectDTO objects
@@ -416,7 +390,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#getSpatialSources()
      */
     @Override
@@ -427,7 +401,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#getSubject(java.lang.String)
      */
     @Override
@@ -443,15 +417,13 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         SubjectDataReader reader = new SubjectDataReader(map);
         reader.setBlankNodeUriPrefix(VirtuosoBaseDAO.BNODE_URI_PREFIX);
 
-        List<SubjectDTO> subjects = getSubjectsData(
-                Collections.singletonList(subjectUri), null, reader, null,
-                false, false);
+        List<SubjectDTO> subjects = getSubjectsData(Collections.singletonList(subjectUri), null, reader, null, false, false);
         return subjects == null || subjects.isEmpty() ? null : subjects.get(0);
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#getSubject(java.lang.Long)
      */
     @Override
@@ -462,12 +434,11 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#getPredicateLabels(java.util.Set)
      */
     @Override
-    public PredicateLabels getPredicateLabels(Set<Long> subjectHashes)
-            throws DAOException {
+    public PredicateLabels getPredicateLabels(Set<Long> subjectHashes) throws DAOException {
 
         // TODO: implement this method
         return null;
@@ -475,7 +446,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
     /**
      * Finds SubProperties of given subject list.
-     *
+     * 
      * @param subjects
      *            Collection<String> subject URIs
      * @return SubProperties
@@ -486,8 +457,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     public SubProperties getSubProperties(final Collection<String> subjects) throws DAOException {
 
         StringBuilder sparql = new StringBuilder();
-        sparql.append("select ?p ?s    WHERE { ?p <").append(Predicates.RDFS_SUBPROPERTY_OF).append(
-                ">  ?s ");
+        sparql.append("select ?p ?s    WHERE { ?p <").append(Predicates.RDFS_SUBPROPERTY_OF).append(">  ?s ");
         sparql.append("FILTER (?s IN ( ");
         int i = 0;
         for (String subject : subjects) {
@@ -507,33 +477,26 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#getDataflowSearchPicklist()
      */
     @Override
-    public HashMap<String, ArrayList<UriLabelPair>> getDataflowSearchPicklist()
-            throws DAOException {
+    public HashMap<String, ArrayList<UriLabelPair>> getDataflowSearchPicklist() throws DAOException {
         // throw new UnsupportedOperationException("Method not implemented");
         StringBuilder strBuilder = new StringBuilder();
-        strBuilder.append("SELECT ?li_title ?ro_title ?ro_uri  WHERE { ")
-                .append("?ro_uri <").append(Predicates.ROD_INSTRUMENT_PROPERTY)
-                .append("> ?li_uri . ").append("?li_uri <")
-                .append(Predicates.DCTERMS_ALTERNATIVE)
-                .append("> ?li_title . ").append("?ro_uri <")
-                .append(Predicates.DCTERMS_TITLE).append("> ?ro_title ")
-                .append("} ORDER BY ?li_title ?ro_title");
+        strBuilder.append("SELECT ?li_title ?ro_title ?ro_uri  WHERE { ").append("?ro_uri <")
+                .append(Predicates.ROD_INSTRUMENT_PROPERTY).append("> ?li_uri . ").append("?li_uri <")
+                .append(Predicates.DCTERMS_ALTERNATIVE).append("> ?li_title . ").append("?ro_uri <")
+                .append(Predicates.DCTERMS_TITLE).append("> ?ro_title ").append("} ORDER BY ?li_title ?ro_title");
 
         long startTime = System.currentTimeMillis();
-        logger.trace("getDataflowSearchPicklist query: "
-                + strBuilder.toString());
+        logger.trace("getDataflowSearchPicklist query: " + strBuilder.toString());
 
         // TODO types
-        DataflowPicklistReader<HashMap<String, ArrayList<UriLabelPair>>> reader =
-                new DataflowPicklistReader<HashMap<String, ArrayList<UriLabelPair>>>();
+        DataflowPicklistReader<HashMap<String, ArrayList<UriLabelPair>>> reader = new DataflowPicklistReader<HashMap<String, ArrayList<UriLabelPair>>>();
         executeSPARQL(strBuilder.toString(), reader);
 
-        logger.trace("getDataflowSearchPicklist query took "
-                + Util.durationSince(startTime));
+        logger.trace("getDataflowSearchPicklist query took " + Util.durationSince(startTime));
 
         // FIXME
         return reader.getResultMap();
@@ -542,19 +505,18 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#getDistinctOrderedTypes()
      */
     @Override
-    public ArrayList<Pair<String, String>> getDistinctOrderedTypes()
-            throws DAOException {
+    public ArrayList<Pair<String, String>> getDistinctOrderedTypes() throws DAOException {
         throw new UnsupportedOperationException("Method not implemented");
 
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#getSubjectCountInSource(long)
      */
     @Override
@@ -564,7 +526,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#getLatestHarvestedURLs(int)
      */
     // @Override
@@ -588,7 +550,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#updateTypeDataCache()
      */
     @Override
@@ -599,12 +561,11 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#registerUserUrl(eionet.cr.web.security.CRUser, java.lang.String, boolean)
      */
     @Override
-    public void registerUserUrl(CRUser user, String url, boolean isBookmark)
-            throws DAOException {
+    public void registerUserUrl(CRUser user, String url, boolean isBookmark) throws DAOException {
 
         // input arguments sanity checking
         if (user == null || StringUtils.isBlank(user.getUserName())) {
@@ -643,7 +604,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
             addTriples(userHomeItemSubject);
 
             // store user folder in CR root home context
-            if(!user.isHomeFolderRegistered()){
+            if (!user.isHomeFolderRegistered()) {
                 registerUserFolderInCrHomeContext(user);
             }
 
@@ -651,8 +612,8 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
             // since user registrations and history URIs were used as triple source, add them to
             // HARVEST_SOURCE (set interval minutes to 0, to avoid it being background-harvested)
             HarvestSourceDAO harvestSourceDao = DAOFactory.get().getDao(HarvestSourceDAO.class);
-            harvestSourceDao.addSourceIgnoreDuplicate(HarvestSourceDTO.create(
-                        user.getRegistrationsUri(), true, 0, user.getUserName()));
+            harvestSourceDao.addSourceIgnoreDuplicate(HarvestSourceDTO.create(user.getRegistrationsUri(), true, 0,
+                    user.getUserName()));
             harvestSourceDao.addSourceIgnoreDuplicate(HarvestSourceDTO.create(user.getHistoryUri(), true, 0, user.getUserName()));
         }
 
@@ -668,7 +629,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#addUserBookmark(eionet.cr.web.security.CRUser, java.lang.String)
      */
     @Override
@@ -693,13 +654,13 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         // since user's bookmarks URI was used above as triple source, add it to HARVEST_SOURCE too
         // (but set harvest interval minutes to 0, since we don't really want it to be harvested )
         // by background harvester)
-        DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(
-                HarvestSourceDTO.create(user.getBookmarksUri(), true, 0, user.getUserName()));
+        DAOFactory.get().getDao(HarvestSourceDAO.class)
+                .addSourceIgnoreDuplicate(HarvestSourceDTO.create(user.getBookmarksUri(), true, 0, user.getUserName()));
 
     }
 
     /**
-     *
+     * 
      * @param user
      * @throws DAOException
      */
@@ -739,20 +700,19 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         // since user's CR root home URI was used above as triple source, add it to HARVEST_SOURCE too
         // (but set harvest interval minutes to 0, since we don't really want it to be harvested )
         // by background harvester)
-        DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(
-                HarvestSourceDTO.create(CRUser.rootHomeUri(), true, 0, null));
+        DAOFactory.get().getDao(HarvestSourceDAO.class)
+                .addSourceIgnoreDuplicate(HarvestSourceDTO.create(CRUser.rootHomeUri(), true, 0, null));
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#deleteUserBookmark(eionet.cr.web.security.CRUser, java.lang.String)
      */
     @Override
     public void deleteUserBookmark(CRUser user, String url) throws DAOException {
 
-        TripleDTO triple = new TripleDTO(user.getHomeItemUri(url),
-                Predicates.CR_BOOKMARK, url);
+        TripleDTO triple = new TripleDTO(user.getHomeItemUri(url), Predicates.CR_BOOKMARK, url);
 
         triple.setSourceUri(user.getBookmarksUri());
         triple.setLiteralObject(false);
@@ -763,16 +723,15 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#getUserBookmarks(eionet.cr.web.security.CRUser)
      */
     @Override
     public List<UserBookmarkDTO> getUserBookmarks(CRUser user) throws DAOException {
 
-        StringBuilder query = new StringBuilder("select distinct ?bookmarkUrl").
-                append(" from <").append(user.getBookmarksUri()).append(">").
-                append(" where { ?subject <").append(Predicates.CR_BOOKMARK).append("> ?bookmarkUrl }").
-                append("order by ?bookmarkUrl");
+        StringBuilder query = new StringBuilder("select distinct ?bookmarkUrl").append(" from <").append(user.getBookmarksUri())
+                .append(">").append(" where { ?subject <").append(Predicates.CR_BOOKMARK).append("> ?bookmarkUrl }")
+                .append("order by ?bookmarkUrl");
 
         RepositoryConnection conn = null;
         TupleQueryResult queryResult = null;
@@ -804,19 +763,16 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#isSubjectUserBookmark(eionet.cr.web.security. CRUser, long)
      */
     @Override
-    public boolean isSubjectUserBookmark(CRUser user, String subject)
-            throws DAOException {
+    public boolean isSubjectUserBookmark(CRUser user, String subject) throws DAOException {
 
         StringBuilder sparql = new StringBuilder();
-        sparql.append("select count(1)  where { ").append(
-                "graph ?g {?s <").append(Predicates.CR_BOOKMARK).append("> ?o . ").append(
-                "filter( isIRI(?o)) ").append(
-                "filter (?o = <").append(subject).append("> ) ").append(
-                "filter (?g = <").append(CRUser.bookmarksUri(user.getUserName())).append("> ) } }");
+        sparql.append("select count(1)  where { ").append("graph ?g {?s <").append(Predicates.CR_BOOKMARK).append("> ?o . ")
+                .append("filter( isIRI(?o)) ").append("filter (?o = <").append(subject).append("> ) ").append("filter (?g = <")
+                .append(CRUser.bookmarksUri(user.getUserName())).append("> ) } }");
 
         SingleObjectReader<Integer> reader = new SingleObjectReader<Integer>();
         executeSPARQL(sparql.toString(), reader);
@@ -829,7 +785,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#updateUserHistory(eionet.cr.web.security.CRUser, java.lang.String)
      */
     /**
@@ -856,8 +812,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
         // now add new save-time
         userHomeItemSubject = new SubjectDTO(user.getHomeItemUri(url), false);
-        objectDTO = new ObjectDTO(
-                Util.dateToString(new Date(), "yyyy-MM-dd'T'HH:mm:ss"), true, XMLSchema.DATETIME);
+        objectDTO = new ObjectDTO(Util.dateToString(new Date(), "yyyy-MM-dd'T'HH:mm:ss"), true, XMLSchema.DATETIME);
         objectDTO.setSourceUri(user.getHistoryUri());
         userHomeItemSubject.addObject(Predicates.CR_SAVETIME, objectDTO);
 
@@ -867,7 +822,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#getUserHistory(eionet.cr.web.security.CRUser)
      */
     @Override
@@ -895,16 +850,14 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#getSampleTriplesInSource(java.lang.String, eionet.cr.util.pagination.PagingRequest)
      */
     @Override
-    public List<TripleDTO> getSampleTriplesInSource(String sourceUrl,
-            PagingRequest pagingRequest) throws DAOException {
+    public List<TripleDTO> getSampleTriplesInSource(String sourceUrl, PagingRequest pagingRequest) throws DAOException {
 
         StringBuilder strBuilder = new StringBuilder();
-        strBuilder.append("SELECT ?s ?p ?o FROM <").append(sourceUrl)
-                .append("> WHERE {?s ?p ?o} LIMIT 100");
+        strBuilder.append("SELECT ?s ?p ?o FROM <").append(sourceUrl).append("> WHERE {?s ?p ?o} LIMIT 100");
 
         TriplesReader reader = new TriplesReader();
         return executeSPARQL(strBuilder.toString(), reader);
@@ -913,7 +866,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#generateNewReviewId(eionet.cr.web.security.CRUser )
      */
     @Override
@@ -924,7 +877,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#getLastReviewId(eionet.cr.web.security.CRUser)
      */
     @Override
@@ -935,7 +888,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#addReview(eionet.cr.dto.ReviewDTO, eionet.cr.web.security.CRUser)
      */
     @Override
@@ -946,30 +899,27 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#saveReview(int, eionet.cr.dto.ReviewDTO, eionet.cr.web.security.CRUser)
      */
     @Override
-    public void saveReview(int reviewId, ReviewDTO review, CRUser user)
-            throws DAOException {
+    public void saveReview(int reviewId, ReviewDTO review, CRUser user) throws DAOException {
         throw new UnsupportedOperationException("Method not implemented");
 
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#getReviewList(eionet.cr.web.security.CRUser)
      */
     @Override
     public List<ReviewDTO> getReviewList(CRUser user) throws DAOException {
 
-        StringBuilder strBuilder = new StringBuilder().
-                append("select ?s ?p ?o where { ?s ?p ?o.").
-                append(" { select distinct ?s where { ?s <").append(Predicates.RDF_TYPE).append("> <").
-                append(Subjects.CR_FEEDBACK).append(">.").
-                append(" ?s <").append(Predicates.CR_USER).append("> <").append(user.getHomeUri()).append("> }}}").
-                append("order by ?s ?p ?o");
+        StringBuilder strBuilder = new StringBuilder().append("select ?s ?p ?o where { ?s ?p ?o.")
+                .append(" { select distinct ?s where { ?s <").append(Predicates.RDF_TYPE).append("> <")
+                .append(Subjects.CR_FEEDBACK).append(">.").append(" ?s <").append(Predicates.CR_USER).append("> <")
+                .append(user.getHomeUri()).append("> }}}").append("order by ?s ?p ?o");
 
         RepositoryConnection conn = null;
         List<ReviewDTO> resultList = new ArrayList<ReviewDTO>();
@@ -1012,7 +962,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#getReview(eionet.cr.web.security.CRUser, int)
      */
     @Override
@@ -1035,8 +985,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
      * @throws DAOException
      */
     private ReviewDTO getReviewDTO(String reviewUri) throws DAOException {
-        StringBuilder query = new StringBuilder().
-                append("select ?p ?o where { <").append(reviewUri).append("> ?p ?o }");
+        StringBuilder query = new StringBuilder().append("select ?p ?o where { <").append(reviewUri).append("> ?p ?o }");
 
         ReviewDTO reviewDTO = null;
         RepositoryConnection conn = null;
@@ -1076,55 +1025,51 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#getReviewAttachmentList(eionet.cr.web.security .CRUser, int)
      */
     @Override
-    public List<String> getReviewAttachmentList(CRUser user, int reviewId)
-            throws DAOException {
+    public List<String> getReviewAttachmentList(CRUser user, int reviewId) throws DAOException {
         throw new UnsupportedOperationException("Method not implemented");
 
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#deleteReview(eionet.cr.web.security.CRUser, int, boolean)
      */
     @Override
-    public void deleteReview(CRUser user, int reviewId,
-            boolean deleteAttachments) throws DAOException {
+    public void deleteReview(CRUser user, int reviewId, boolean deleteAttachments) throws DAOException {
         throw new UnsupportedOperationException("Method not implemented");
 
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#deleteAttachment(eionet.cr.web.security.CRUser, int, java.lang.String)
      */
     @Override
-    public void deleteAttachment(CRUser user, int reviewId, String attachmentUri)
-            throws DAOException {
+    public void deleteAttachment(CRUser user, int reviewId, String attachmentUri) throws DAOException {
         throw new UnsupportedOperationException("Method not implemented");
 
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#loadAttachment(java.lang.String)
      */
     @Override
-    public DownloadFileDTO loadAttachment(String attachmentUri)
-            throws DAOException {
+    public DownloadFileDTO loadAttachment(String attachmentUri) throws DAOException {
         throw new UnsupportedOperationException("Method not implemented");
 
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#deleteTriples(java.util.Collection)
      */
     @Override
@@ -1166,7 +1111,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#deleteTriplesOfSource(long)
      */
     @Override
@@ -1177,7 +1122,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#getUserUploads(eionet.cr.web.security.CRUser)
      */
     @Override
@@ -1191,12 +1136,9 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
             throw new IllegalArgumentException("User name must not be blank");
         }
 
-        StringBuilder strBuilder = new StringBuilder().
-                append("select ?s ?p ?o where").
-                append(" { ?s ?p ?o.").
-                append(" { select distinct ?s where { <").append(crUser.getHomeUri()).
-                append("> <").append(Predicates.CR_HAS_FILE).append(">").append(" ?s }}}").
-                append(" order by ?s ?p ?o");
+        StringBuilder strBuilder = new StringBuilder().append("select ?s ?p ?o where").append(" { ?s ?p ?o.")
+                .append(" { select distinct ?s where { <").append(crUser.getHomeUri()).append("> <").append(Predicates.CR_HAS_FILE)
+                .append(">").append(" ?s }}}").append(" order by ?s ?p ?o");
 
         UploadDTOReader reader = new UploadDTOReader();
         RepositoryConnection conn = null;
@@ -1211,6 +1153,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
                 String currentLabel = uploadDTO.getLabel();
                 String subjectUri = uploadDTO.getSubjectUri();
                 String uriLabel = URIUtil.extractURILabel(subjectUri, SubjectDTO.NO_LABEL);
+                uriLabel = StringUtils.replace(uriLabel, "%20", " ");
 
                 if (StringUtils.isBlank(currentLabel) && !StringUtils.isBlank(uriLabel))
                     uploadDTO.setLabel(uriLabel);
@@ -1251,80 +1194,149 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#isExistingSubject(java.lang.String)
      */
     @Override
     public boolean isExistingSubject(String subjectUri) throws DAOException {
-
+        
         if (StringUtils.isBlank(subjectUri)) {
             throw new IllegalArgumentException("Subject uri must not be empty");
         }
 
-        StringBuilder query = new StringBuilder("select count(*)").
-        append(" where {<").append(subjectUri).append("> ?p ?o}");
-
-        Object resultObject = executeUniqueResultSPARQL(query.toString(),
-                new SingleObjectReader<Long>());
-
-        if (resultObject==null){
-            return false;
+        RepositoryConnection conn = null;
+        try {
+            conn = SesameUtil.getRepositoryConnection();
+            RepositoryResult<Statement> result = conn.getStatements(conn.getValueFactory().createURI(subjectUri), null, null, true);
+            return result != null && result.hasNext();
+        } catch (RepositoryException e) {
+            throw new DAOException(e.toString(), e);
+        } finally {
+            SesameUtil.close(conn);
         }
-
-        int resultInt = Integer.parseInt(resultObject.toString());
-        return resultInt>0;
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#deleteSubjects(java.util.List)
      */
     @Override
-    public void deleteSubjects(List<String> subjectUris) throws DAOException {
-        throw new UnsupportedOperationException("Method not implemented");
+    public void deleteUserUploads(String userName, List<String> subjectUris) throws DAOException {
+        
+        if (StringUtils.isBlank(userName) || subjectUris==null || subjectUris.isEmpty()){
+            return;
+        }
+        
+        Connection sqlConn = null;
+        RepositoryConnection repoConn = null;
+        try{
+            repoConn = SesameUtil.getRepositoryConnection();
+            ValueFactory valueFactory = repoConn.getValueFactory();
+            
+            StringBuilder strBuilder = new StringBuilder();
+            for (String subjectUri : subjectUris){
+                
+                URI subjectResource = valueFactory.createURI(subjectUri);
+                URI userHomeContext = valueFactory.createURI(CRUser.homeUri(userName));
+                URI harvesterContext = valueFactory.createURI(Harvest.HARVESTER_URI);
+                
+                // JH190511: although Sesame API claims that in RepositoryConnection.remove(...)
+                // the context is optional, Virtuoso requires the context (i.e. the graph) always
+                // to be specified in triple removal commands. Virtuoso Sesame driver seems to
+                // silently ignore the whole command, if no context specified.
+                repoConn.remove(subjectResource, null, null, userHomeContext, harvesterContext);
+                repoConn.remove(null, null, (Value)subjectResource, userHomeContext, harvesterContext);
+                
+                if (strBuilder.length()>0){
+                    strBuilder.append(",");
+                }
+                strBuilder.append(Hashes.spoHash(subjectUri));
+            }
+            
+            sqlConn = getSQLConnection();
+            SQLUtil.executeUpdate("delete from SPO_BINARY where SUBJECT in (" + strBuilder + ")", sqlConn);
+            
+        } catch (RepositoryException e) {
+            throw new DAOException(e.toString(), e);
+        } catch (SQLException e) {
+            throw new DAOException(e.toString(), e);
+        }
+        finally{
+            SesameUtil.close(repoConn);
+            SQLUtil.close(sqlConn);
+        }
 
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#renameSubjects(java.util.Map)
      */
     @Override
-    public void renameSubjects(Map<Long, String> newUrisByOldHashes)
-            throws DAOException {
-        throw new UnsupportedOperationException("Method not implemented");
-
+    public void renameUserUploads(Map<String, String> renamings) throws DAOException {
+        
+        if (renamings==null || renamings.isEmpty()){
+            return;
+        }
+        
+        RepositoryConnection repoConn = null;
+        try{
+            repoConn = SesameUtil.getRepositoryConnection();
+            ResourceRenameHandler handler = new ResourceRenameHandler(repoConn, renamings);
+            
+            ValueFactory valueFactory = repoConn.getValueFactory();
+            for (Map.Entry<String,String> entry : renamings.entrySet()){
+                
+                String oldUriString = entry.getKey();
+                URI oldUri = valueFactory.createURI(oldUriString);
+                
+                logger.debug("Exporting statements with old URI " + oldUri);
+                
+                // export statements where the old URI is present in subject field
+                repoConn.exportStatements(oldUri, null, (Value)null, true, handler);
+                
+                // export statements where the old URI is present in object field
+                repoConn.exportStatements(null, null, oldUri, true, handler);
+            }
+            
+            logger.debug("Total count of exported statments: " + handler.getHandledStatementCount());
+            handler.execute();
+            
+        } catch (OpenRDFException e) {
+            throw new DAOException(e.toString(), e);
+        }
+        finally{
+            SesameUtil.close(repoConn);
+        }
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#readDistinctPredicates(java.lang.Long)
      */
     @Override
-    public List<PredicateDTO> readDistinctPredicates(Long sourceHash)
-            throws DAOException {
+    public List<PredicateDTO> readDistinctPredicates(Long sourceHash) throws DAOException {
         throw new UnsupportedOperationException("Method not implemented");
 
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#readDistinctSubjectUrls(java.lang.Long)
      */
     @Override
-    public List<String> readDistinctSubjectUrls(Long sourceHash)
-            throws DAOException {
+    public List<String> readDistinctSubjectUrls(Long sourceHash) throws DAOException {
         throw new UnsupportedOperationException("Method not implemented");
 
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#outputSourceTriples(eionet.cr.dao.readers.RDFExporter )
      */
     @Override
@@ -1335,7 +1347,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#deleteTriples(java.lang.String, java.lang.String, java.lang.String)
      */
     @Override
@@ -1356,22 +1368,21 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#getTriplesCount()
      */
     @Override
     public long getTriplesCount() throws DAOException {
 
         String query = "SELECT count(*) WHERE {?s ?p ?o}";
-        Object resultObject = executeUniqueResultSPARQL(query,
-                new SingleObjectReader<Long>());
+        Object resultObject = executeUniqueResultSPARQL(query, new SingleObjectReader<Long>());
         return Long.valueOf(resultObject.toString());
 
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#getSparqlBookmarks()
      */
     @Override
@@ -1380,11 +1391,10 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         // use linked hash map to ensure later that entries are retrieved in the same order they were put
         LinkedHashMap<java.net.URI, String> resultMap = new LinkedHashMap<java.net.URI, String>();
 
-        StringBuilder query = new StringBuilder().
-                append("select ?s ?o from <").append(user.getBookmarksUri()).append(">").
-                append(" where { ?s ?p ?o.").
-                append(" ?s <").append(Predicates.RDF_TYPE).append("> <").append(Subjects.CR_SPARQL_BOOKMARK).append(">.").
-                append(" ?s <").append(Predicates.RDFS_LABEL).append("> ?o } order by ?o");
+        StringBuilder query = new StringBuilder().append("select ?s ?o from <").append(user.getBookmarksUri()).append(">")
+                .append(" where { ?s ?p ?o.").append(" ?s <").append(Predicates.RDF_TYPE).append("> <")
+                .append(Subjects.CR_SPARQL_BOOKMARK).append(">.").append(" ?s <").append(Predicates.RDFS_LABEL)
+                .append("> ?o } order by ?o");
 
         RepositoryConnection conn = null;
         TupleQueryResult queryResult = null;

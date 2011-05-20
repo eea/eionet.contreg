@@ -3,7 +3,6 @@ package eionet.cr.web.action.home;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 
@@ -239,6 +238,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
             String titleToStore = title;
             if (StringUtils.isBlank(titleToStore)) {
                 titleToStore = URIUtil.extractURILabel(getUploadedFileSubjectUri(), SubjectDTO.NO_LABEL);
+                titleToStore = StringUtils.replace(titleToStore, "%20", " ");
             }
 
             objectDTO = new ObjectDTO(titleToStore, true);
@@ -307,7 +307,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
         try {
             DAOFactory.get().getDao(SpoBinaryDAO.class).add(dto, uploadedFile.getSize());
             contentStream = uploadedFile.getInputStream();
-            FileStore.getInstance(getUserName()).add(getUploadedFileSubjectUri(), replaceExisting, contentStream);
+            FileStore.getInstance(getUserName()).add(uploadedFile.getFileName(), replaceExisting, contentStream);
         } finally {
             IOUtils.closeQuietly(contentStream);
         }
@@ -322,7 +322,15 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
 
         if (subjectUris != null && !subjectUris.isEmpty()) {
 
-            DAOFactory.get().getDao(HelperDAO.class).deleteSubjects(subjectUris);
+            DAOFactory.get().getDao(HelperDAO.class).deleteUserUploads(getUserName(), subjectUris);
+            
+            FileStore fileStore = FileStore.getInstance(getUserName());
+            for (String subjectUri : subjectUris){
+                String fileName = StringUtils.substringAfterLast(subjectUri, "/");
+                fileName = StringUtils.replace(fileName, "%20", " ");
+                fileStore.delete(fileName);
+            }
+            
             DAOFactory.get().getDao(HarvestSourceDAO.class).queueSourcesForDeletion(subjectUris);
         }
 
@@ -339,29 +347,39 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
         Resolution resolution = new ForwardResolution("/pages/home/renameUploads.jsp");
         if (isPostRequest()) {
 
-            HashMap<Long, String> newUris = new HashMap<Long, String>();
-            String uriPrefix = getUriPrefix();
-
-            ServletRequest request = getContext().getRequest();
-            Enumeration paramNames = request.getParameterNames();
-            while (paramNames.hasMoreElements()) {
-
-                String paramName = (String) paramNames.nextElement();
-                if (paramName.startsWith(FNAME_PARAM_PREFIX)) {
-
-                    String newName = request.getParameter(paramName);
-                    if (StringUtils.isBlank(newName) == false) {
-
-                        String oldHash = StringUtils.substringAfter(paramName, FNAME_PARAM_PREFIX);
-                        String newUri = uriPrefix + newName;
-                        newUris.put(Long.valueOf(oldHash), newUri);
+            HashMap<String,String> fileRenamings = new HashMap<String, String>();
+            HashMap<String,String> uriRenamings = new HashMap<String, String>();
+            
+            if (subjectUris!=null && !subjectUris.isEmpty()){
+                
+                ServletRequest request = getContext().getRequest();
+                for (String curSubjectUri : subjectUris){
+                    
+                    long subjectHash = Hashes.spoHash(curSubjectUri);
+                    String newFileName = request.getParameter(FNAME_PARAM_PREFIX + subjectHash);
+                    if (!StringUtils.isBlank(newFileName)){
+                        
+                        String newSubjectUri = getUriPrefix() + StringUtils.replace(newFileName, " ", "%20");
+                        uriRenamings.put(curSubjectUri, newSubjectUri);
+                        
+                        String curFileName = StringUtils.substringAfterLast(curSubjectUri, "/");
+                        curFileName = StringUtils.replace(curFileName, "%20", " ");
+                        fileRenamings.put(curFileName, newFileName);
+                        
+                        logger.debug("<" + curSubjectUri + "> will be renamed to <" + newSubjectUri + ">");
+                        logger.debug("<" + curFileName + "> will be renamed to <" + newFileName + ">");
                     }
                 }
             }
-
-            if (!newUris.isEmpty()) {
-
-                DAOFactory.get().getDao(HelperDAO.class).renameSubjects(newUris);
+            
+            if (uriRenamings.size()>0 && uriRenamings.size()==fileRenamings.size()){
+                
+                logger.debug("Calling renamings on DAO");
+                DAOFactory.get().getDao(HelperDAO.class).renameUserUploads(uriRenamings);
+                
+                logger.debug("Calling renamings on file store");
+                FileStore.getInstance(getUserName()).rename(fileRenamings);
+                
                 addSystemMessage("Files renamed successfully!");
                 resolution = new RedirectResolution(StringUtils.replace(getUrlBinding(), "{username}", getUserName()));
             }
@@ -502,7 +520,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
 
         if (StringUtils.isBlank(uploadedFileSubjectUri)) {
             if (uploadedFile != null && getUser() != null) {
-                uploadedFileSubjectUri = getUriPrefix() + uploadedFile.getFileName();
+                uploadedFileSubjectUri = getUriPrefix() + StringUtils.replace(uploadedFile.getFileName(), " ", "%20");
             }
         }
 

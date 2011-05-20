@@ -27,6 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.openrdf.model.Value;
 import org.openrdf.query.BindingSet;
 
@@ -40,6 +41,9 @@ import eionet.cr.util.Hashes;
  *
  */
 public class UploadDTOReader extends ResultSetMixedReader<UploadDTO>{
+    
+    /** */
+    private static final Logger logger = Logger.getLogger(UploadDTOReader.class);
 
     /** */
     private static final long labelHash = Hashes.spoHash(Predicates.RDFS_LABEL);
@@ -104,6 +108,7 @@ public class UploadDTOReader extends ResultSetMixedReader<UploadDTO>{
         if (uploadDTO == null) {
             uploadDTO = new UploadDTO(subjectUri);
             uploadsMap.put(subjectUri, uploadDTO);
+            logger.debug("The following user-upload has been read: " + subjectUri);
         }
 
         if (predicateUri.equals(Predicates.RDFS_LABEL)) {

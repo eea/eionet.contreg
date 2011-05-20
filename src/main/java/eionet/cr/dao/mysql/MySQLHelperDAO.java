@@ -909,7 +909,7 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
      * (non-Javadoc)
      * @see eionet.cr.dao.HelperDAO#deleteSubjects(java.util.List)
      */
-    public void deleteSubjects(List<String> subjectUris) throws DAOException {
+    public void deleteUserUploads(String userName, List<String> subjectUris) throws DAOException {
         throw new UnsupportedOperationException("Method not implemented");
     }
 
@@ -917,7 +917,7 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
      * (non-Javadoc)
      * @see eionet.cr.dao.HelperDAO#renameSubjects(java.util.Map)
      */
-    public void renameSubjects(Map<Long, String> newUrisByOldHashes) throws DAOException {
+    public void renameUserUploads(Map<String, String> renamings) throws DAOException {
         throw new UnsupportedOperationException("Method not implemented");
     }
 
