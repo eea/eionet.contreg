@@ -11,7 +11,7 @@
             <div style="margin-top:15px">
                 <stripes:form action="/admin/bulkharvest" method="post">
                     <div>
-                        <label for="harvestSources" class="question">Harvest Sources to add/delete:</label>
+                        <label for="strHarvestSources" class="question">Harvest Sources to add/delete:</label>
                         <textarea name="strHarvestSources" id="strHarvestSources" rows="20" cols="80" style="display:block; width:100%">
 ${actionBean.strHarvestSources}</textarea>
                     </div>
