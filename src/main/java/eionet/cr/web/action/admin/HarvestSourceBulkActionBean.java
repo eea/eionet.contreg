@@ -140,7 +140,7 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
                 harvestSources.add(HarvestSourceDTO.create(url, false, HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL, getUserName()));
                 sourceUrls.add(url);
             } else {
-                warnings.append("Entered URL \"").append(url).append("\" is not a valid URL.<BR/>");
+                warnings.append("Entered URL \"").append(url).append("\" is not a valid URL.<br/>");
             }
 
         }
@@ -164,10 +164,10 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
             } catch (DAOException e) {
                 //if adding fails, proceed with adding the other sources and show error message
                 warnings.append("Adding source \"").append(source.getUrl()).append("\" failed, reason: ").
-                    append(e.toString()).append("<BR/>");
+                    append(e.toString()).append("<br/>");
             } catch (HarvestException he) {
                 warnings.append("Adding source \"").append(source.getUrl()).append("\" to the harvest queue failed, reason: ").
-                append(he.toString()).append("<BR/>");
+                append(he.toString()).append("<br/>");
             }
         }
         addSystemMessage("Adding sources finished. Successfully added " + counter + " sources for urgent harvesting.");
@@ -178,7 +178,7 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
 
     /**
      * Adds sources to removal queue.
-     * Those ones that already are in the delete queue are not added
+     * Those ones that already are in the delete queue are not added.
      */
     private void bulkDeleteSources() {
             try {
@@ -190,6 +190,7 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
                     //if the source is already in the delete queue, do not try to add it twice
                     if (!sourcesInDeleteQue.contains(url)) {
                         sourcesForRemoval.add(url);
+                        sourcesInDeleteQue.add(url);
                     }
                 }
                 dao.queueSourcesForDeletion(sourcesForRemoval);
@@ -200,7 +201,7 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
                 }
             } catch (DAOException e) {
                 warnings.append("Adding sources to delete queue failed, reason: ").
-                    append(e.toString()).append("<BR/>");
+                    append(e.toString()).append("<br/>");
             }
         if (StringUtils.isNotEmpty(warnings.toString())) {
             addSystemMessage(warnings.toString());
