@@ -51,14 +51,15 @@ import org.quartz.CronExpression;
 import eionet.cr.common.CRRuntimeException;
 
 /**
- * 
+ * Utility methods.
+ *
  * @author heinljab
- * 
+ *
  */
 public class Util {
 
     /**
-     * 
+     *
      * @param t
      * @return
      */
@@ -71,7 +72,7 @@ public class Util {
     }
 
     /**
-     * 
+     *
      * @param t
      * @return
      */
@@ -81,9 +82,11 @@ public class Util {
     }
 
     /**
-     * 
+     * Escape HTML, line ends and tabs in stack trace messages.
+     *
      * @param stackTrace
-     * @return
+     *            Java stack trace as one String.
+     * @return escaped stack trace message
      */
     public static String processStackTraceForHTML(String stackTrace) {
 
@@ -93,14 +96,14 @@ public class Util {
         StringBuffer buf = new StringBuffer();
         String[] stackFrames = getStackFrames(stackTrace);
         for (int i = 0; stackFrames != null && i < stackFrames.length; i++) {
-            buf.append(stackFrames[i].replaceFirst("\t", "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")).append("<br/>");
+            buf.append(Util.escapeHtml(stackFrames[i]).replaceFirst("\t", "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")).append("<br/>");
         }
 
         return buf.length() > 0 ? buf.toString() : stackTrace;
     }
 
     /**
-     * 
+     *
      * @param stackTrace
      * @return
      */
@@ -113,7 +116,7 @@ public class Util {
     }
 
     /**
-     * 
+     *
      * @param array
      * @param separator
      * @return
@@ -133,7 +136,7 @@ public class Util {
     }
 
     /**
-     * 
+     *
      * @param date
      * @param datePattern
      * @return
@@ -148,7 +151,7 @@ public class Util {
     }
 
     /**
-     * 
+     *
      * @param str
      * @param datePattern
      * @return
@@ -167,7 +170,7 @@ public class Util {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public static long currentTimeSeconds() {
@@ -175,7 +178,7 @@ public class Util {
     }
 
     /**
-     * 
+     *
      * @param milliSeconds
      * @return
      */
@@ -184,7 +187,7 @@ public class Util {
     }
 
     /**
-     * 
+     *
      * @param str
      * @return
      */
@@ -193,9 +196,8 @@ public class Util {
     }
 
     /**
-     * Returns true if the given string has any whitespace in it, including the
-     * leading and trailing whitespace.
-     * 
+     * Returns true if the given string has any whitespace in it, including the leading and trailing whitespace.
+     *
      * @param s
      * @return
      */
@@ -213,7 +215,7 @@ public class Util {
     }
 
     /**
-     * 
+     *
      * @param array
      * @return
      */
@@ -222,7 +224,7 @@ public class Util {
     }
 
     /**
-     * 
+     *
      * @param array
      * @return
      */
@@ -231,7 +233,7 @@ public class Util {
     }
 
     /**
-     * 
+     *
      * @param array
      * @return
      */
@@ -258,7 +260,7 @@ public class Util {
     }
 
     /**
-     * 
+     *
      * @param pageContext
      * @param objectClass
      * @return
@@ -286,7 +288,7 @@ public class Util {
 
     /**
      * Convenience method for URL-encoding the given string.
-     * 
+     *
      * @param s
      * @return
      */
@@ -300,7 +302,7 @@ public class Util {
 
     /**
      * Convenience method for URL-decoding the given string.
-     * 
+     *
      * @param s
      * @return
      */
@@ -313,7 +315,7 @@ public class Util {
     }
 
     /**
-     * 
+     *
      * @param o
      * @return
      */
@@ -328,7 +330,7 @@ public class Util {
     }
 
     /**
-     * 
+     *
      * @param expression
      */
     public static boolean isValidQuartzCronExpression(String expression) {
@@ -340,7 +342,7 @@ public class Util {
     }
 
     /**
-     * 
+     *
      * @param coll
      * @return
      */
@@ -360,10 +362,9 @@ public class Util {
     }
 
     /**
-     * Create a comma-separated list of tag enclosed URIs. The result can be
-     * used in sparql queries. eg.: [uri1,uri2,uri3] is transformed to
-     * <uri1>,<uri2>,<uri3>.
-     * 
+     * Create a comma-separated list of tag enclosed URIs. The result can be used in sparql queries. eg.: [uri1,uri2,uri3] is
+     * transformed to <uri1>,<uri2>,<uri3>.
+     *
      * @param uriList
      *            list of URIs
      * @return comma separated list of tag enclosed URIs
@@ -386,7 +387,7 @@ public class Util {
     }
 
     /**
-     * 
+     *
      * @param s
      * @return
      */
@@ -404,7 +405,7 @@ public class Util {
     }
 
     /**
-     * 
+     *
      * @param language
      */
     public static String normalizeHTTPAcceptedLanguage(String httpAcceptedLanguage) {
@@ -424,8 +425,7 @@ public class Util {
             result = result.substring(0, j);
 
         /*
-         * ignore language refinement (e.g. en-US, en_UK) which is separated
-         * either by '-' or '_'
+         * ignore language refinement (e.g. en-US, en_UK) which is separated either by '-' or '_'
          */
 
         j = result.indexOf("-");
@@ -440,7 +440,7 @@ public class Util {
     }
 
     /**
-     * 
+     *
      * @param language
      */
     public static double getHTTPAcceptedLanguageImportance(String httpAcceptedLanguage) {
@@ -460,7 +460,7 @@ public class Util {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public static HashSet<String> getAcceptedLanguages(String acceptLanguageHeader) {
@@ -485,7 +485,7 @@ public class Util {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public static List<String> getAcceptedLanguagesByImportance(String acceptLanguageHeader) {
@@ -522,7 +522,7 @@ public class Util {
     }
 
     /**
-     * 
+     *
      * @param startTime
      * @return
      */
@@ -532,7 +532,7 @@ public class Util {
     }
 
     /**
-     * 
+     *
      * @param duration
      * @return
      */
@@ -556,7 +556,7 @@ public class Util {
 
     /**
      * //algorithm calculates the estimated number of hashes
-     * 
+     *
      * @param minHash
      * @param maxHash
      * @return
@@ -574,7 +574,7 @@ public class Util {
     }
 
     /**
-     * 
+     *
      * @param subjectString
      * @return
      */
@@ -599,7 +599,7 @@ public class Util {
     }
 
     /**
-     * 
+     *
      * @param <K>
      * @param <V>
      * @param map
@@ -620,7 +620,7 @@ public class Util {
     }
 
     /**
-     * 
+     *
      * @param l
      * @return
      */
@@ -633,14 +633,14 @@ public class Util {
     }
 
     /**
-     * 
+     *
      * @param args
      */
     public static void main(String[] args) {
     }
 
     /**
-     * 
+     *
      * @param s
      * @return
      */
@@ -649,7 +649,8 @@ public class Util {
     }
 
     /**
-     * 
+     * Escape HTML characters and replace new lines with HTML brake tag.
+     *
      * @param s
      * @return escaped string
      */
@@ -660,43 +661,31 @@ public class Util {
         }
         return s;
     }
-    
+
     /**
-     * Converts given string into boolean. The following inputs are covered (case-insensitively):
-     * - null string returns false
-     * - "true" returns true
-     * - "false" return false
-     * - "yes" and "y" return true
-     * - "no" and "n" return false
-     * - "0", "-1", "-2", etc return false
-     * - "1", "2", "3", etc return true
-     * - any other string, including an empty one, returns false
-     * 
+     * Converts given string into boolean. The following inputs are covered (case-insensitively): - null string returns false -
+     * "true" returns true - "false" return false - "yes" and "y" return true - "no" and "n" return false - "0", "-1", "-2", etc
+     * return false - "1", "2", "3", etc return true - any other string, including an empty one, returns false
+     *
      * @param s
      * @return
      */
-    public static boolean toBooolean(String s){
-        
-        if (s==null){
+    public static boolean toBooolean(String s) {
+
+        if (s == null) {
             return false;
-        }
-        else if (s.equalsIgnoreCase("true")){
+        } else if (s.equalsIgnoreCase("true")) {
             return true;
-        }
-        else if (s.equalsIgnoreCase("false")){
+        } else if (s.equalsIgnoreCase("false")) {
             return false;
-        }
-        else if (s.equalsIgnoreCase("yes") || s.equalsIgnoreCase("y")){
+        } else if (s.equalsIgnoreCase("yes") || s.equalsIgnoreCase("y")) {
             return true;
-        }
-        else if (s.equalsIgnoreCase("no") || s.equalsIgnoreCase("n")){
+        } else if (s.equalsIgnoreCase("no") || s.equalsIgnoreCase("n")) {
             return false;
-        }
-        else{
-            try{
+        } else {
+            try {
                 return Util.toBooolean(Integer.parseInt(s));
-            }
-            catch (NumberFormatException e){
+            } catch (NumberFormatException e) {
                 return false;
             }
         }
@@ -704,16 +693,15 @@ public class Util {
 
     /**
      * Returns true if the given integer is >0, otherwise returns false.
-     * 
+     *
      * @param i
      * @return
      */
-    public static boolean toBooolean(int i){
-        
-        if (i<=0){
+    public static boolean toBooolean(int i) {
+
+        if (i <= 0) {
             return false;
-        }
-        else{
+        } else {
             return true;
         }
     }

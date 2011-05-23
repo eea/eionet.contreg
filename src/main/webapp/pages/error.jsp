@@ -11,7 +11,7 @@
         if(exception != null){
             %>
             <h4>message:</h4>
-            <p><%=exception.toString()%></p>
+            <p><%=Util.escapeHtml(exception.toString())%></p>
             <h4>stack trace:</h4>
             <p><%=Util.getStackTraceForHTML(exception)%></p>
             <%
