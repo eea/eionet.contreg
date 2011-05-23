@@ -120,24 +120,30 @@ public abstract class AbstractActionBean implements ActionBean {
     }
 
     /**
-     * Adds system message.
-     * @param message message text
+     * Adds system message. The message will be shown in a simple rectangle and is to
+     * provide information on <i>successful</i> actions.
+     *
+     * @param message Message text in HTML format.
      */
     protected void addSystemMessage(final String message) {
         getContext().getMessages(SYSTEM_MESSAGES).add(new SimpleMessage(message));
     }
 
     /**
-     * Adds caution message.
-     * @param message Message text
+     * Adds caution message. The message will be shown wrapped in the &lt;div class="caution-msg"&lt; element.
+     * A caution is less severe than a warning. It can e.g. be used when the application has to say to the user
+     * that it has ignored some input.
+     *
+     * @param message Message text in HTML format.
      */
     protected void addCautionMessage(final String message) {
         getContext().getMessages(CAUTION_MESSAGES).add(new SimpleMessage(message));
     }
 
     /**
-     * Adds warning message.
-     * @param message Message text
+     * Adds warning message. The message will be shown wrapped in the &lt;div class="warning-msg"&lt; element.
+     *
+     * @param message Message text in HTML format.
      */
     protected void addWarningMessage(final String message) {
         getContext().getMessages(WARNING_MESSAGES).add(new SimpleMessage(message));
@@ -235,8 +241,9 @@ public abstract class AbstractActionBean implements ActionBean {
     }
 
     /**
+     * Get the user's preferred languages from the browser's accept-language header.
      *
-     * @return
+     * @return an unsorted HashSet of languages.
      */
     public HashSet<String> getAcceptedLanguages() {
 
@@ -247,8 +254,9 @@ public abstract class AbstractActionBean implements ActionBean {
     }
 
     /**
+     * Get the user's preferred languages from the browser's accept-language header ordered by priority.
      *
-     * @return
+     * @return a sorted list of languages.
      */
     public List<String> getAcceptedLanguagesByImportance() {
         if (acceptedLanguagesByImportance == null) {
