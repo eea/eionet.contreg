@@ -221,7 +221,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             //dao.addUserBookmark(user, bookmarkUri);
 
             // store user folder in CR root home context
-            if(!user.isHomeFolderRegistered()){
+            if (!user.isHomeFolderRegistered()) {
                 dao.registerUserFolderInCrHomeContext(user);
             }
 

@@ -26,7 +26,7 @@ import sparql
 
 def hashcode(s):
     newhash = hashlib.new('md5')
-    newhash.update(s)
+    newhash.update(str(s))
     return newhash.hexdigest()
 
 def localpart(s):
@@ -95,13 +95,13 @@ FILTER ( ?subject = <%s> && isLITERAL(?object) && (LANG(?object) = 'en' || LANG(
         result = self.server.query(q)
         object_dict = {}
         currentsubj = None
-        for row in result.values():
+        for row in result.fetchone():
 #           if str(row[3])[:2] not in ('en',''): continue # Only English
             hashsubj = hashcode(row[0])
-            if currentsubj != row[0]:
+            if currentsubj != str(row[0]):
                 self.writeout('''S%s [label="%s|''' % (hashsubj, shorten_url(row[0])))
-                currentsubj = row[0]
-            self.writeout('''%s:%s\\l''' % (localpart(row[1]), wrap_literal(row[2])))
+                currentsubj = str(row[0])
+            self.writeout('''%s:%s\\l''' % (localpart(str(row[1])), wrap_literal(str(row[2]))))
         if currentsubj is None:
             self.drawemptynode(startsubj)
         else:
@@ -126,12 +126,12 @@ WHERE {
 } LIMIT 50""" % startsubj
 #       print q
         result = self.server.query(q)
-        for row in result.values():
+        for row in result.fetchone():
             hashsubj = hashcode(row[0])
             self.must_draw(row[0])
             self.must_draw(row[2])
             hashobj = hashcode(row[2])
-            self.writeout('''S%s -> S%s [label="%s"];\n''' % (hashsubj, hashobj, localpart(row[1])))
+            self.writeout('''S%s -> S%s [label="%s"];\n''' % (hashsubj, hashobj, localpart(str(row[1]))))
 
         for o,seen in self.subjects.items():
             if not seen:

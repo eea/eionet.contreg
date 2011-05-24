@@ -1,6 +1,26 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-'''Sparql HTTP client
+# The contents of this file are subject to the Mozilla Public
+# License Version 1.1 (the "License"); you may not use this file
+# except in compliance with the License. You may obtain a copy of
+# the License at http://www.mozilla.org/MPL/
+#
+# Software distributed under the License is distributed on an "AS
+# IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+# implied. See the License for the specific language governing
+# rights and limitations under the License.
+#
+# The Original Code is SPARQL client version 1.0.
+#
+# The Initial Owner of the Original Code is European Environment
+# Agency (EEA).  Portions created by Eau de Web for EEA are
+# Copyright (C) European Environment Agency.  All
+# Rights Reserved.
+#
+# Contributor(s):
+# Søren Roug, EEA
+
+'''Sparql HTTP API and client
 
 Performs SELECT and ASK queries on an endpoint which implements the HTTP (GET or POST) 
 bindings of the SPARQL Protocol.
@@ -8,10 +28,7 @@ bindings of the SPARQL Protocol.
 API based on SPARQL JavaScript Library by Lee Feigenbaum and Elias Torres
 http://www.thefigtrees.net/lee/sw/sparql.js
 
-Required: Python 2.4
-Recommended: isodate <http://www.mnot.net/python/isodate.py>
-Recommended: rdflib <http://rdflib.net/>
-
+Heavy influence from Juan Manuel Caicedo's SPARQL library
 
 USAGE
     sparql.py [-i] endpoint
@@ -22,72 +39,20 @@ USAGE
 
     Otherwise, the query is read from standard input.
 
-
-TODO: 
-- Process CONSTRUCT queries
-- Handle HTTP persistent connections
-- Add docstrings
 '''
 
-__version__ = 0.4
-__copyright__ = "Copyright 2006, Juan Manuel Caicedo"
-__author__ = "Juan Manuel Caicedo <http://cavorite.com>"
-__contributors__ = ["Lee Feigenbaum ( lee AT thefigtrees DOT net )",
-                    "Elias Torres   ( elias AT torrez DOT us )",
-                    "Luis Miguel Morillas"]
-
-__license__ = """
-Copyright (c) 2006, Juan Manuel Caicedo <juan AT cavorite com>
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-"""
+__version__ = 0.5
 
 import copy
 
-from urllib2 import urlopen
-from urllib2 import Request
+import urllib2
 from urllib import urlencode
-
-import xml.sax
+from base64 import encodestring
+from string import replace
 
 from xml.dom import pulldom
 
-
-# If rdflib is present, cast the URI literals as URIRef objects, otherwise 
-# treat them as unicode string
-try:
-    from rdflib import URIRef
-    _castUri = lambda u: URIRef(u)
-except:
-    _castUri = unicode
-
-
-#If isodate is present parse the date strings
-try:
-    from isodate import parse_datetime
-    _parseDateTime = parse_datetime
-except:
-    _parseDateTime = unicode
-
-
-
-USER_AGENT =  "pySparql/%s +http://labs.cavorite.com/python/sparql/" % __version__
+USER_AGENT =  "pySparql/%s +http://www.eionet.europa.eu/software/pysparql/" % __version__
 
 CONTENT_TYPE = {
                  'turtle' : "application/turtle" ,
@@ -103,21 +68,159 @@ RESULTS_TYPES = {
                  'json' : "application/sparql-results+json" 
                  }
 
+# The purpose of this construction is to use shared strings when
+# they have the same value. This way comparisons can happen on the
+# memory address rather than looping through the content.
+XSD_STRING = 'http://www.w3.org/2001/XMLSchema#string'
+XSD_INTEGER = 'http://www.w3.org/2001/XMLSchema#integer'
+XSD_LONG = 'http://www.w3.org/2001/XMLSchema#long'
+XSD_DOUBLE = 'http://www.w3.org/2001/XMLSchema#double'
+XSD_FLOAT = 'http://www.w3.org/2001/XMLSchema#float'
+XSD_DECIMAL = 'http://www.w3.org/2001/XMLSchema#decimal'
+XSD_DATETIME = 'http://www.w3.org/2001/XMLSchema#dateTime'
+XSD_DATE = 'http://www.w3.org/2001/XMLSchema#date'
+XSD_TIME = 'http://www.w3.org/2001/XMLSchema#time'
+XSD_BOOLEAN = 'http://www.w3.org/2001/XMLSchema#boolean'
 
+datatype_dict = {
+                 '': '',
+                 XSD_STRING : XSD_STRING,
+                 XSD_INTEGER : XSD_INTEGER,
+                 XSD_LONG : XSD_LONG,
+                 XSD_DOUBLE : XSD_DOUBLE,
+                 XSD_FLOAT : XSD_FLOAT,
+                 XSD_DECIMAL : XSD_DECIMAL,
+                 XSD_DATETIME : XSD_DATETIME,
+                 XSD_DATE : XSD_DATE,
+                 XSD_TIME : XSD_TIME,
+                 XSD_BOOLEAN : XSD_BOOLEAN
+                 }
+
+def Datatype(value):
+    """
+    Replace the string with a shared string.
+    intern() only works for plain strings - not unicode.
+    We make it look like a class, because it conceptually could be.
+    """
+    if value==None:
+        r = None
+    elif datatype_dict.has_key(value):
+        r = datatype_dict[value]
+    else:
+        r = datatype_dict[value] = value
+    return r
+
+class RDFTerm(object):
+    """
+    Super class containing methods to override.
+    The term RDFTerm is taken from the SPARQL specification.
+    """
+    def __str__(self):
+        return str(self.value)
+
+    def __unicode__(self):
+        return self.value
+
+    def n3(self):
+        """
+        To override
+        See N-Triples syntax: http://www.w3.org/TR/rdf-testcases/#ntriples
+        """
+    def __repr__(self):
+        return self.n3()
+
+class IRI(RDFTerm):
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+       return self.value.encode("unicode-escape")
+
+    def __eq__(self, other):
+       if self.value == other.value: return True
+       return False
+
+    def n3(self):
+        return '<%s>' % self.value
+
+class Literal(RDFTerm):
+    """
+    Plain literals. These can take a language code
+    """
+    def __init__(self, value, lang):
+        self.value = value
+        self.lang = lang
+
+    def __eq__(self, other):
+       if type(self) != type(other):
+           return False
+       if self.value == other.value and self.lang == other.lang:
+           return True
+       return False
+
+    def n3(self):
+        return '"%s"@%s' % (self.value, self.lang)
+
+class TypedLiteral(RDFTerm):
+    """
+    Typed literals.
+    """
+    def __init__(self, value, datatype):
+        self.value = value
+        self.datatype = datatype
+
+    def __eq__(self, other):
+       if type(self) != type(other):
+           return False
+       if self.value == other.value and self.datatype == other.datatype:
+           return True
+       return False
+
+    def n3(self):
+        return '"%s"^^%s' % (self.value, self.datatype)
+
+class BlankNode(RDFTerm):
+    """
+    Blank nodes
+    """
+    def __init__(self, value):
+        self.value = value
+
+    def __eq__(self, other):
+       if type(self) != type(other):
+           return False
+       if self.value == other.value:
+           return True
+       return False
+
+    def n3(self):
+        return '_:%s' % self.value
+
+#########################################
+#
+# _ServiceMixin
+#
+#########################################
 class _ServiceMixin:
-
     def __init__(self, endpoint):
-        self.method = 'GET'
+        self._method = "POST"
         self.endpoint = endpoint
         self._default_graphs = []
         self._named_graphs = []
         self._prefix_map = {}
 
         self._headers_map = {}
-        #TODO Handle other results types
         self._headers_map['Accept'] = RESULTS_TYPES['xml']
         self._headers_map['User-Agent'] = USER_AGENT
 
+    def _setMethod(self, method):
+        if method in ("GET", "POST"):
+            self._method = method
+
+    def _getMethod(self):
+        return self._method
+
+    method = property(_getMethod, _setMethod)
 
     def addDefaultGraph(self, g):
         self._default_graphs.append(g)
@@ -140,15 +243,24 @@ class _ServiceMixin:
     def headers(self):
         return self._headers_map
 
-
+#########################################
+#
+# Service
+#
+#########################################
 
 class Service(_ServiceMixin):
-    def __init__(self, endpoint):
+    """
+    This is the main entry to the library.
+    The user creates a Service, then sends a query to it.
+    If we want to have persistent connections, then open them here.
+    """
+    def __init__(self, endpoint, qs_encoding = "utf-8"):
         _ServiceMixin.__init__(self, endpoint)
-
+        self.qs_encoding = qs_encoding
 
     def createQuery(self):
-        q = Query(self)
+        q = _Query(self)
         q._default_graphs = copy.deepcopy(self._default_graphs)
         q._headers_map = copy.deepcopy(self._headers_map)
         q._named_graphs = copy.deepcopy(self._named_graphs)
@@ -159,95 +271,84 @@ class Service(_ServiceMixin):
         q = self.createQuery()
         return q.query(query)
 
+    def authenticate(self, username, password):
+        self._headers_map['Authorization'] = "Basic %s" % replace(
+                encodestring("%s:%s" % (username, password)), "\012", "")
 
-    def ask(self, query):
-        q = self.createQuery()
-        return q.ask(query)
-
-
-
-
-#Date parsing functions
-def _parseDate(val):
-    return _parseDateTime(val + 'T00:00:0Z')
+def _parseBoolean(val):
+    if val.lower() in ('true', '1'):
+        return True
+    else: return False
 
 
 #XMLSchema types and cast functions
 _types = {
-    'http://www.w3.org/2001/XMLSchema#string': unicode,
-    'http://www.w3.org/2001/XMLSchema#integer': int,
-    'http://www.w3.org/2001/XMLSchema#long': float, 
-    'http://www.w3.org/2001/XMLSchema#double': float,
-    'http://www.w3.org/2001/XMLSchema#float': float,
-    'http://www.w3.org/2001/XMLSchema#decimal': int,
-    'http://www.w3.org/2001/XMLSchema#dateTime': _parseDateTime,
-    'http://www.w3.org/2001/XMLSchema#date': _parseDate,
-    'http://www.w3.org/2001/XMLSchema#time': _parseDateTime
+    '': unicode,
+#   XSD_STRING: unicode,
+    XSD_INTEGER: int,
+    XSD_LONG: float, 
+    XSD_DOUBLE: float,
+    XSD_FLOAT: float,
+    XSD_DECIMAL: int,
+    XSD_BOOLEAN: _parseBoolean,
+    XSD_DATETIME: None,
+    XSD_DATE: None,
+    XSD_TIME: None
 }
 
-
 def _castLiteral(value, schemaType):
-    '''
-    Casts a typed literal using the right cast function or unicode
-    '''
-    f = _types.get(schemaType) or unicode
+    """
+    Casts a typed literal using the right cast function.
+    """
+    f = _types.get(schemaType)
+    if f is None:
+        return TypedLiteral(value, schemaType)
     return f(value)
 
+def set_converter(datatype, func):
+    """
+    Allows users to set a new conversion function for a type.
+    """
+    _types[datatype] = func
 
-class ResultsParser:
-    '''
-    Abstract query results parser
-    '''
+#########################################
+#
+# _Query
+#
+#########################################
+class _Query(_ServiceMixin):
 
-    def __init__(self, fp):
-        self.__fp = fp
-
-
-class DataReader(ResultsParser):
-    '''
-    A dump parser. Reads the response data to a string
-    '''
-    def __init__(self, fp):
-        self.data = fp.read()
-
-    def __str__(self):
-        return self.data
-
-    def __repr__(self):
-        return self.data
-
-class Query(_ServiceMixin):
-
-    def __init__(self, service, resultsParser = None):
+    def __init__(self, service):
         _ServiceMixin.__init__(self, service.endpoint)
-        self.resultsParser = resultsParser  or _PulldomResultsParser
 
     def _request(self, query):
+        """
+        Builds the query string, then opens a connection to the endpoint
+        and returns the file descriptor.
+        """
         resultsType = 'xml'
 
         query = self._queryString(query)
-        request = Request(self.endpoint, query, self.headers())
+        if self.method == "GET":
+            request = urllib2.Request(self.endpoint + "?" + query, None, self.headers())
+        else:
+            request = urllib2.Request(self.endpoint, query, self.headers())
 
         #TODO Handle exceptions
-        return urlopen(request)
+        # You can expect urllib2.URLError errors. This should be encapsulated
+        return urllib2.urlopen(request)
 
     def query(self, query):
 
         response = self._request(query)
-
-        #TODO Return a boolean or a single value according to the query type
-        return self.resultsParser(response.fp)
-
-
-    def ask(self, query):
-        response = self._request(query)
-        parser = _XmlAskParser()
-        xml.sax.parse(response.fp, parser)
-        return parser.value
+        return _ResultsParser(response.fp)
 
     def _queryString(self, query):
+        """
+        Creates the REST query string from the query and graphs.
+        """
         args = []
-        query = query.replace("\n", " ").encode('latin-1')
+        query = query.replace("\n", " ").encode('utf-8')
 
         pref = ' '.join(["PREFIX %s: <%s> " % (p, self._prefix_map[p]) for p in self._prefix_map])
 
@@ -264,74 +365,117 @@ class Query(_ServiceMixin):
         return urlencode(args)
 
 
-class _XmlAskParser(xml.sax.handler.ContentHandler):
-    '''
-    XML ASK query results parser
-    '''
-    value = False
-    _bool = False
-
-    def startElement(self, name, attrs):
-        self._bool = name == 'boolean'
-
-    def endElement(self, name):
-        self._bool = False
-
-    def characters(self, content):
-        if self._bool:
-            self.value = content == 'true'
-
-
-class _PulldomResultsParser:
-    '''
-    Improved parser, using pulldown api and generators
-    '''
+class _ResultsParser:
+    """
+    Parse the XML result.
+    """
 
     def __init__(self, fp):
         self.__fp = fp
         self._vals = []
+        self._hasResult = None
         self.variables = []
+        self._fetchhead()
 
-    def __iter__(self):
-        return self.values()
+    def _fetchhead(self):
+        """
+        Fetches the head information. If there are no variables in the
+        <head>, then we also fetch the boolean result.
+        """
+        self.events = pulldom.parse(self.__fp)
 
-    def values(self):
-        events = pulldom.parse(self.__fp)
-
-        idx = -1
-
-        for (event, node) in events:
+        for (event, node) in self.events:
             if event == pulldom.START_ELEMENT:
-
                 if node.tagName == 'variable':
                     self.variables.append(node.attributes['name'].value)
+                elif node.tagName == 'boolean':
+                    self.events.expandNode(node)
+                    self._hasResult = (node.firstChild.data == 'true')
                 elif node.tagName == 'result':
+                    return # We should not arrive here
+            elif event == pulldom.END_ELEMENT:
+                if node.tagName == 'head' and self.variables:
+                    return
+                elif node.tagName == 'sparql':
+                    return
+
+    def hasresult(self):
+        """
+        ASK queries are used to test if a query would have a result.
+        If the query is an ASK query there won't be an actual result, and
+        fetchone() will return nothing. Instead, this method can be called
+        to check the result from the ASK query.
+
+        If the query is a SELECT statement, then the return value of hasresult()
+        is None, as the XML result format doesn't tell you if there are any
+        rows in the result until you have read the first one.
+        """
+        return self._hasResult
+
+    def __iter__(self):
+        return self.fetchone()
+
+    def fetchone(self):
+        """ Fetches the next set of rows of a query result, returning a list.
+            An empty list is returned when no more rows are available.
+            If the query was an ASK request, then an empty list is returned as
+            there are no rows available.
+        """
+        idx = -1
+
+        for (event, node) in self.events:
+            if event == pulldom.START_ELEMENT:
+                if node.tagName == 'result':
                     self._vals = [None] *  len(self.variables)
                 elif node.tagName == 'binding':
                     idx = self.variables.index(node.attributes['name'].value)
                 elif node.tagName == 'uri':
-                    events.expandNode(node)
-                    self._vals[idx] = _castUri(node.firstChild.data)
+                    self.events.expandNode(node)
+                    self._vals[idx] = IRI(node.firstChild.data)
                 elif node.tagName == 'literal':
-                    events.expandNode(node)
-                    type = node.attributes.get('datatype', 'http:://www.w3.org/2001/XMLSchema#string')
-                    self._vals[idx] = _castLiteral(node.firstChild.data, type)
+                    self.events.expandNode(node)
+                    if node.hasChildNodes():
+                        data = node.firstChild.data
+                    else:
+                        data = ''
+                    lang = node.getAttribute('xml:lang')
+                    if lang != '':
+                        self._vals[idx] = Literal(data, lang)
+                    datatype = Datatype(node.getAttribute('datatype'))
+                    self._vals[idx] = _castLiteral(data, datatype)
+                elif node.tagName == 'bnode':
+                    self.events.expandNode(node)
+                    self._vals[idx] = BlankNode(node.firstChild.data)
 
             elif event == pulldom.END_ELEMENT:
                 if node.tagName == 'result':
                     #print "rtn:", len(self._vals), self._vals
                     yield tuple(self._vals)
 
+    def fetchall(self):
+        """ Loop through the result to build up a list of all rows
+            Patterned after DB-API 2.0.
+        """
+        result = []
+        for row in self.fetchone():
+            result.append(row)
+        return result
+
+    def fetchmany(self, num):
+        result = []
+        for row in self.fetchone():
+            result.append(row)
+            num -= 1
+            if num <= 0: return result
+        return result
 
 def query(endpoint, query):
-    '''
-    Convenient method to execute a query
-    '''
+    """ Convenient method to execute a query
+    """
     s = Service(endpoint)
     return s.query(query)
 
-
-def __interactive(endpoint):
+def _interactive(endpoint):
     while True:
         try:
             lines = []
@@ -343,11 +487,11 @@ def __interactive(endpoint):
                     lines.append(next)
 
             if lines:
-                sys.stdout.write("Quering...")
+                sys.stdout.write("Querying...")
                 result = query(endpoint, " ".join(lines))
                 sys.stdout.write("  done\n")
 
-                for row in result.values():
+                for row in result.fetchone():
                     print "\t".join(map(unicode,row))
 
                 print
@@ -378,14 +522,16 @@ if __name__ == '__main__':
     (options, args) = parser.parse_args()
 
     if len(args) != 1:
-        parser.error("Endoint must be specified")
+        parser.error("Endpoint must be specified")
 
-    endpoint = sys.argv[1]
+    endpoint = args[0]
 
     if options.interactive:
-        __interactive(endoint)
+        _interactive(endpoint)
 
     q = sys.stdin.read()
     result = query(endpoint, q)
-    for row in result.values():
+    print result.variables
+    for row in result.fetchone():
         print "\t".join(map(unicode,row))
+        print row

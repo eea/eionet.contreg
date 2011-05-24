@@ -39,46 +39,46 @@ import org.apache.log4j.Logger;
  */
 public class HomeContentTypeFilter implements Filter{
 
-	/** */
-	private static final Logger logger = Logger.getLogger(HomeContentTypeFilter.class);
-	
-	/*
-	 * (non-Javadoc)
-	 * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
-	 */
-	@Override
-	public void init(FilterConfig arg0) throws ServletException {
-		// do nothing in this overridden method
-	}
+    /** */
+    private static final Logger logger = Logger.getLogger(HomeContentTypeFilter.class);
+    
+    /*
+     * (non-Javadoc)
+     * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
+     */
+    @Override
+    public void init(FilterConfig arg0) throws ServletException {
+        // do nothing in this overridden method
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse, javax.servlet.FilterChain)
-	 */
-	@Override
-	public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse,
-								FilterChain filterChain) throws IOException, ServletException {
+    /*
+     * (non-Javadoc)
+     * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse, javax.servlet.FilterChain)
+     */
+    @Override
+    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse,
+                                FilterChain filterChain) throws IOException, ServletException {
 
-		// pass on if not a HTTP request
-		if (!(servletRequest instanceof HttpServletRequest)){
-			filterChain.doFilter(servletRequest, servletResponse);
-			return;
-		}
-		
-		HttpServletRequest httpRequest = (HttpServletRequest)servletRequest;
-		
-		logger.debug("httpRequest.getRequestURI() = " + httpRequest.getRequestURI());
-		logger.debug("httpRequest.getServletPath() = " + httpRequest.getServletPath());
-		
-		filterChain.doFilter(servletRequest, servletResponse);
-	}
+        // pass on if not a HTTP request
+        if (!(servletRequest instanceof HttpServletRequest)){
+            filterChain.doFilter(servletRequest, servletResponse);
+            return;
+        }
+        
+        HttpServletRequest httpRequest = (HttpServletRequest)servletRequest;
+        
+        logger.debug("httpRequest.getRequestURI() = " + httpRequest.getRequestURI());
+        logger.debug("httpRequest.getServletPath() = " + httpRequest.getServletPath());
+        
+        filterChain.doFilter(servletRequest, servletResponse);
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * @see javax.servlet.Filter#destroy()
-	 */
-	@Override
-	public void destroy() {
-		// do nothing in this overridden method
-	}
+    /*
+     * (non-Javadoc)
+     * @see javax.servlet.Filter#destroy()
+     */
+    @Override
+    public void destroy() {
+        // do nothing in this overridden method
+    }
 }

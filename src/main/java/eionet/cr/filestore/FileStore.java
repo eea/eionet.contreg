@@ -14,12 +14,12 @@ import org.apache.log4j.Logger;
 import eionet.cr.config.GeneralConfig;
 
 /**
- * 
+ *
  * @author jaanus
- * 
+ *
  */
 public class FileStore {
-    
+
     /** */
     private static final Logger logger = Logger.getLogger(FileStore.class);
 
@@ -32,7 +32,7 @@ public class FileStore {
     private File userDir;
 
     /**
-     * 
+     *
      * @param userName
      */
     private FileStore(String userName) {
@@ -44,18 +44,18 @@ public class FileStore {
         this.userName = userName;
         userDir = new File(FileStore.PATH, userName);
     }
-    
+
     /**
-     * 
+     *
      * @param userName
      * @return
      */
-    public static FileStore getInstance(String userName){
+    public static FileStore getInstance(String userName) {
         return new FileStore(userName);
     }
 
     /**
-     * 
+     *
      * @param fileName
      * @param overwrite
      * @param inputStream
@@ -77,7 +77,7 @@ public class FileStore {
     }
 
     /**
-     * 
+     *
      * @param fileName
      * @param overwrite
      * @param reader
@@ -99,7 +99,7 @@ public class FileStore {
     }
 
     /**
-     * 
+     *
      * @param fileName
      * @param overwrite
      * @throws FileAlreadyExistsException
@@ -123,47 +123,47 @@ public class FileStore {
 
         return filePath;
     }
-    
+
     /**
-     * 
+     *
      * @param fileName
      */
-    public void delete(String fileName){
-        
+    public void delete(String fileName) {
+
         File file = new File(userDir, fileName);
         if (file.exists() && file.isFile()) {
             file.delete();
         }
     }
-    
+
     /**
-     * 
+     *
      * @param renamings
      */
-    public void rename(Map<String,String> renamings){
+    public void rename(Map<String,String> renamings) {
 
         int renamedCount = 0;
-        if (renamings!=null){
-            
-            for (Map.Entry<String,String> entry : renamings.entrySet()){
-                
+        if (renamings != null) {
+
+            for (Map.Entry<String,String> entry : renamings.entrySet()) {
+
                 String oldName = entry.getKey();
                 String newName = entry.getValue();
-                
+
                 File file = new File(userDir, oldName);
                 if (file.exists() && file.isFile()) {
-                    
+
                     file.renameTo(new File(userDir, newName));
                     renamedCount++;
                 }
             }
         }
-        
+
         logger.debug("Total of " + renamedCount + " files renamed in the file store");
     }
 
 //    /**
-//     * 
+//     *
 //     * @param fileSubjectUri
 //     * @param fileName
 //     * @return

@@ -76,7 +76,7 @@ public class JstlFunctions {
 
         if (firstLongToken != null) {
             int i = str.indexOf(firstLongToken);
-            StringBuffer buf = new StringBuffer(str.substring(0, i+cutAtLength));
+            StringBuffer buf = new StringBuffer(str.substring(0, i + cutAtLength));
             return buf.append("...").toString();
         } else
             return str;
@@ -104,14 +104,21 @@ public class JstlFunctions {
     /**
      *
      * @param userName
-     * @param aclName
-     * @param permission
-     * @return
+     * @param aclName - path to the object, such as "/".
+     * @param permission - name of the permission.
+     * @return true if the user has the requested permission.
      */
     public static boolean hasPermission(java.lang.String userName, java.lang.String aclName, java.lang.String permission) {
         return CRUser.hasPermission(userName, aclName, permission);
     }
 
+    /**
+     *
+     * @param user
+     * @param aclName - path to the object, such as "/".
+     * @param permission - name of the permission.
+     * @return true if the user has the requested permission.
+     */
     public static boolean userHasPermission(CRUser user, java.lang.String aclName, java.lang.String permission) {
         return CRUser.userHasPermission(user, aclName, permission);
     }
@@ -184,7 +191,7 @@ public class JstlFunctions {
         if (StringUtils.isBlank(label)) {
             int last = Math.max(Math.max(predicate.lastIndexOf('#'), predicate.lastIndexOf('/')), predicate.lastIndexOf(':'));
             if (last >= 0) {
-                label = predicate.substring(last+1);
+                label = predicate.substring(last + 1);
             }
         }
 
@@ -205,7 +212,7 @@ public class JstlFunctions {
         if (predicates == null)
             return result;
 
-        for (Iterator i=predicates.iterator(); i.hasNext();) {
+        for (Iterator i = predicates.iterator(); i.hasNext();) {
             if (subjectDTO.hasPredicateObject(i.next().toString(), object)) {
                 result = true;
                 break;
@@ -225,7 +232,7 @@ public class JstlFunctions {
 
         boolean result = false;
         for (Iterator i=objects.iterator(); i.hasNext();) {
-            ObjectDTO objectDTO = (ObjectDTO)i.next();
+            ObjectDTO objectDTO = (ObjectDTO) i.next();
             if (objectHash == objectDTO.getSourceObjectHash()) {
                 result = true;
                 break;
@@ -332,8 +339,8 @@ public class JstlFunctions {
 
         String result = String.valueOf(hash);
         if (hash != 0 && objects != null && !objects.isEmpty()) {
-            for (Object o:objects) {
-                ObjectDTO object = (ObjectDTO)o;
+            for (Object o : objects) {
+                ObjectDTO object = (ObjectDTO) o;
                 if (object.getHash() == hash) {
                     result = object.getValue();
                     break;
@@ -355,8 +362,8 @@ public class JstlFunctions {
         boolean result = false;
         if (predicate != null) {
 
-            String previousPredicate = (String)pageContext.getAttribute("prevPredicate");
-            HashSet<String> objectValues = (HashSet<String>)pageContext.getAttribute("displayedObjectValues");
+            String previousPredicate = (String) pageContext.getAttribute("prevPredicate");
+            HashSet<String> objectValues = (HashSet<String>) pageContext.getAttribute("displayedObjectValues");
             if (objectValues == null || previousPredicate == null || !predicate.equals(previousPredicate)) {
                 objectValues = new HashSet<String>();
                 pageContext.setAttribute("displayedObjectValues", objectValues);

@@ -35,18 +35,17 @@ public class ReviewDTO  implements Serializable {
         
         int reviewID = -1;
         int i = reviewSubjectUri.lastIndexOf('/');
-        if (i!=-1){
-            try{
-                reviewID = Integer.parseInt(reviewSubjectUri.substring(i+1));
+        if (i != -1) {
+            try {
+                reviewID = Integer.parseInt(reviewSubjectUri.substring(i + 1));
+            } catch (IndexOutOfBoundsException e) {
+            } catch (NumberFormatException e) {
             }
-            catch (IndexOutOfBoundsException e){}
-            catch (NumberFormatException e){}
         }
         
-        if (reviewID==-1){
+        if (reviewID == -1) {
             throw new IllegalArgumentException("Malformed review URI: " + reviewSubjectUri);
-        }
-        else{
+        } else {
             this.reviewSubjectUri = reviewSubjectUri;
             this.reviewID = reviewID;
         }

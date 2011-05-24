@@ -37,14 +37,14 @@ import eionet.cr.util.sql.SQLUtil;
 
         long startTime = System.currentTimeMillis();
 
-		// limit predicates 
-		LinkedHashSet<Long> predicateHashes = new LinkedHashSet<Long>();
-		if(selectedPredicates!=null && !selectedPredicates.isEmpty()){
-			for(String selectedPredicateUri : selectedPredicates){
-				predicateHashes.add(Long.valueOf(Hashes.spoHash(selectedPredicateUri)));
-			}
-		}
-		String predicateHashesCommaSeparated = Util.toCSV(predicateHashes);
+        // limit predicates 
+        LinkedHashSet<Long> predicateHashes = new LinkedHashSet<Long>();
+        if (selectedPredicates!=null && !selectedPredicates.isEmpty()){
+            for (String selectedPredicateUri : selectedPredicates){
+                predicateHashes.add(Long.valueOf(Hashes.spoHash(selectedPredicateUri)));
+            }
+        }
+        String predicateHashesCommaSeparated = Util.toCSV(predicateHashes);
 
         getSubjectsDataAndWriteItIntoExportOutput(reader, helper.getUnorderedQueryWithoutDistinct(inParams),
                 predicateHashesCommaSeparated);

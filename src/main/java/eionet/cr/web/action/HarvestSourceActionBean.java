@@ -126,8 +126,8 @@ public class HarvestSourceActionBean extends AbstractActionBean {
      */
     public String getUrgencyScoreFormatted() throws DAOException {
 
-    	double urgencyScore = harvestSource!=null ? harvestSource.getHarvestUrgencyScore() : 0.0d;
-		return urgencyScore<=0 ? "N/A" : new DecimalFormat("#.####").format(urgencyScore);
+        double urgencyScore = harvestSource!=null ? harvestSource.getHarvestUrgencyScore() : 0.0d;
+        return urgencyScore <= 0 ? "N/A" : new DecimalFormat("#.####").format(urgencyScore);
     }
 
     /**

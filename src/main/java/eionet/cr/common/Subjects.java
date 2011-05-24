@@ -32,8 +32,8 @@ public interface Subjects {
     public static final String FULL_REPORT_CLASS = "http://reports.eea.europa.eu/reports_rdf#FullReport";
     public static final String DCTYPE_DATASET_CLASS = "http://purl.org/dc/dcmitype/Dataset";
 
-    public static final String QAW_RESOURCE_CLASS = "http://qaw.eionet.europa.eu/schema.rdf#QawResource";
-    public static final String QA_REPORT_CLASS = "http://qaw.eionet.europa.eu/schema.rdf#QaReport";
+    public static final String QAW_RESOURCE_CLASS = "http://qaw.eionet.europa.eu/schema.rdf#QawResource"; //deprecated
+    public static final String QA_REPORT_CLASS = "http://qaw.eionet.europa.eu/schema.rdf#QaReport"; //deprecated
 
     public static final String RDF_RDF = "http://www.w3.org/1999/02/22-rdf-syntax-ns#RDF";
 
@@ -55,6 +55,6 @@ public interface Subjects {
     public static final String WGS_SPATIAL_THING = "http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing";
 
     public static final String DUBLIN_CORE_SOURCE_URL = "http://purl.org/dc/elements/1.1/";
-	public static final String AMP_OUTPUT = "http://rdfdata.eionet.europa.eu/amp/ontology/Output";
-	public static final String AMPOLD_PRODUCT = "http://moonefish.eea.europa.eu:81/AMP-schema.rdf#Product"; // Phased out
+    public static final String AMP_OUTPUT = "http://rdfdata.eionet.europa.eu/amp/ontology/Output";
+    public static final String AMPOLD_PRODUCT = "http://moonefish.eea.europa.eu:81/AMP-schema.rdf#Product"; // Phased out
 }

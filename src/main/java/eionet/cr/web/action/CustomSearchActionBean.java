@@ -79,7 +79,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
     private static final String ASSOCIATED_JSP = "/pages/customSearch.jsp";
 
     /** */
-    private static Map<String,CustomSearchFilter> availableFilters;
+    private static Map<String, CustomSearchFilter> availableFilters;
     private String addedFilter;
     private String picklistFilter;
     private String removedFilter;
@@ -157,7 +157,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
      * @see eionet.cr.web.action.AbstractSearchActionBean#getResultList()
      */
     public Collection<SubjectDTO> getResultList() {
-        return (Collection<SubjectDTO>)getContext().getRequest().getSession().getAttribute(RESULT_LIST_SESSION_ATTR_NAME);
+        return (Collection<SubjectDTO>) getContext().getRequest().getSession().getAttribute(RESULT_LIST_SESSION_ATTR_NAME);
     }
 
     /*
@@ -165,7 +165,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
      * @see eionet.cr.web.action.AbstractSearchActionBean#getPagination()
      */
     public Pagination getPagination() {
-        return (Pagination)getContext().getRequest().getSession().getAttribute(PAGINATION_SESSION_ATTR_NAME);
+        return (Pagination) getContext().getRequest().getSession().getAttribute(PAGINATION_SESSION_ATTR_NAME);
     }
 
     /*
@@ -173,7 +173,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
      * @see eionet.cr.web.action.AbstractSearchActionBean#getMatchCount()
      */
     public int getMatchCount() {
-        Integer i = (Integer)getContext().getRequest().getSession().getAttribute(MATCH_COUNT_SESSION_ATTR_NAME);
+        Integer i = (Integer) getContext().getRequest().getSession().getAttribute(MATCH_COUNT_SESSION_ATTR_NAME);
         return i == null ? super.getMatchCount() : i.intValue();
     }
 
@@ -270,9 +270,9 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 
         HttpSession session = getContext().getRequest().getSession();
         Map<String,String> selectedFilters =
-            (Map<String,String>)session.getAttribute(SELECTED_FILTERS_SESSION_ATTR_NAME);
+            (Map<String,String>) session.getAttribute(SELECTED_FILTERS_SESSION_ATTR_NAME);
         if (selectedFilters == null && create == true) {
-            selectedFilters = new LinkedHashMap<String,String>();
+            selectedFilters = new LinkedHashMap<String, String>();
             session.setAttribute(SELECTED_FILTERS_SESSION_ATTR_NAME, selectedFilters);
         }
 
@@ -286,7 +286,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
     private HashSet<String> getLiteralEnabledFilters() {
 
         HttpSession session = getContext().getRequest().getSession();
-        HashSet<String> set = (HashSet<String>)session.getAttribute(LITERAL_SEARCH_ENABLED_FILTERS);
+        HashSet<String> set = (HashSet<String>) session.getAttribute(LITERAL_SEARCH_ENABLED_FILTERS);
         if (set == null) {
             set = new HashSet<String>();
             session.setAttribute(LITERAL_SEARCH_ENABLED_FILTERS, set);
@@ -304,7 +304,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
         if (!selected.isEmpty()) {
             Enumeration paramNames = this.getContext().getRequest().getParameterNames();
             while (paramNames != null && paramNames.hasMoreElements()) {
-                String paramName = (String)paramNames.nextElement();
+                String paramName = (String) paramNames.nextElement();
                 if (paramName.startsWith(SELECTED_VALUE_PREFIX)) {
                     String key = paramName.substring(SELECTED_VALUE_PREFIX.length());
                     if (key.length() > 0 && selected.containsKey(key))
@@ -445,7 +445,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
             picklistFilter = "";
             Enumeration paramNames = this.getContext().getRequest().getParameterNames();
             while (paramNames != null && paramNames.hasMoreElements()) {
-                String paramName = (String)paramNames.nextElement();
+                String paramName = (String) paramNames.nextElement();
                 if (paramName.startsWith(SHOW_PICKLIST_VALUE_PREFIX)) {
                     int i = paramName.indexOf('.') < 0 ? paramName.length() : paramName.indexOf('.');
                     String key = paramName.substring(SHOW_PICKLIST_VALUE_PREFIX.length(), i);
@@ -469,7 +469,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
             removedFilter = "";
             Enumeration paramNames = this.getContext().getRequest().getParameterNames();
             while (paramNames != null && paramNames.hasMoreElements()) {
-                String paramName = (String)paramNames.nextElement();
+                String paramName = (String) paramNames.nextElement();
                 if (paramName.startsWith(REMOVE_FILTER_VALUE_PREFIX)) {
                     int i = paramName.indexOf('.') < 0 ? paramName.length() : paramName.indexOf('.');
                     String key = paramName.substring(REMOVE_FILTER_VALUE_PREFIX.length(), i);
@@ -509,7 +509,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
         Map<String,String> result = new HashMap<String,String>();
 
         Map<String,String> selected = getSelectedFilters();
-        for (Iterator<String> keys=selected.keySet().iterator(); keys.hasNext();) {
+        for (Iterator<String> keys = selected.keySet().iterator(); keys.hasNext();) {
             String key = keys.next();
             String value = selected.get(key);
             if (value != null && value.trim().length() > 0) {

@@ -287,47 +287,47 @@ public class HarvestSourceDTO implements Serializable {
      * @param intervalMinutes
      * @return
      */
-    public static HarvestSourceDTO create(String url, boolean prioritySource, int intervalMinutes, String owner){
-    	
-    	HarvestSourceDTO result = new HarvestSourceDTO();
-    	result.setUrl(url);
-    	result.setPrioritySource(prioritySource);
-    	result.setIntervalMinutes(intervalMinutes);
-    	result.setOwner(owner);
-    	return result;
+    public static HarvestSourceDTO create(String url, boolean prioritySource, int intervalMinutes, String owner) {
+        
+        HarvestSourceDTO result = new HarvestSourceDTO();
+        result.setUrl(url);
+        result.setPrioritySource(prioritySource);
+        result.setIntervalMinutes(intervalMinutes);
+        result.setOwner(owner);
+        return result;
     }
     
     /**
      * 
      * @return
      */
-    public double getHarvestUrgencyScore(){
-		
-		// if harvest interval is set to 0, then so is its urgency score
-		if (intervalMinutes==null || intervalMinutes.intValue()<=0){
-			return 0.0d;
-		}
-		
-		// urgency score can only be calculated if at least last harvest
-		// or creation time is known (and interval is >0, as already assured above)
-		if (lastHarvest==null && timeCreated==null){
-			return 0.0d;
-		}
-		
-		Date lastTime = lastHarvest==null ? null : new Date(lastHarvest.getTime());
-		if (lastTime==null){
+    public double getHarvestUrgencyScore() {
+        
+        // if harvest interval is set to 0, then so is its urgency score
+        if (intervalMinutes == null || intervalMinutes.intValue() <= 0) {
+            return 0.0d;
+        }
+        
+        // urgency score can only be calculated if at least last harvest
+        // or creation time is known (and interval is >0, as already assured above)
+        if (lastHarvest == null && timeCreated == null) {
+            return 0.0d;
+        }
+        
+        Date lastTime = lastHarvest == null ? null : new Date(lastHarvest.getTime());
+        if (lastTime == null) {
 
-			// if last time is not known, then last time to pseudo-value
-			// which is (creation time - harvest interval) 
-			
-			Calendar calendar = Calendar.getInstance();
-			calendar.setTime(timeCreated);
-			calendar.add(Calendar.MINUTE, -1 * intervalMinutes.intValue());
-			lastTime = calendar.getTime();
-		}
-		
-		long millisecondsSinceLastTime = System.currentTimeMillis() - lastTime.getTime();
-		long intervalMilliseconds = intervalMinutes.longValue() * 60L * 1000L;
-		return ((double)millisecondsSinceLastTime)/((double)intervalMilliseconds);
-	}
+            // if last time is not known, then last time to pseudo-value
+            // which is (creation time - harvest interval) 
+            
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(timeCreated);
+            calendar.add(Calendar.MINUTE, -1 * intervalMinutes.intValue());
+            lastTime = calendar.getTime();
+        }
+        
+        long millisecondsSinceLastTime = System.currentTimeMillis() - lastTime.getTime();
+        long intervalMilliseconds = intervalMinutes.longValue() * 60L * 1000L;
+        return ((double) millisecondsSinceLastTime)/((double) intervalMilliseconds);
+    }
 }

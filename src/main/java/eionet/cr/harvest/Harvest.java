@@ -60,7 +60,7 @@ public abstract class Harvest {
     public static final String STATUS_FINISHED = "finished";
     public static final String TYPE_PULL = "pull";
     public static final String TYPE_PUSH = "push";
-	public static final String HARVESTER_URI = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL) + "/harvester";
+    public static final String HARVESTER_URI = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL) + "/harvester";
 
     /** */
     protected String sourceUrlString = null;
@@ -219,11 +219,11 @@ public abstract class Harvest {
 
             if (sourceMetadata.getPredicateCount() > 0) {
                 logger.debug("Storing auto-generated triples for the source");
-				int triplesAdded = rdfHandler.addSourceMetadata(sourceMetadata);
-				if (triplesAdded>0){
-					DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(
-							HarvestSourceDTO.create(HARVESTER_URI, true, 0, null));
-				}
+                int triplesAdded = rdfHandler.addSourceMetadata(sourceMetadata);
+                if (triplesAdded > 0){
+                    DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(
+                            HarvestSourceDTO.create(HARVESTER_URI, true, 0, null));
+                }
             }
 
             rdfHandler.endOfFile();

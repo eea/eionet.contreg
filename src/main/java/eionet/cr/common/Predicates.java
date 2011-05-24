@@ -22,6 +22,7 @@ package eionet.cr.common;
 
 public interface Predicates {
 
+    //TODO: The DC 1.1 elements have had "deprecated" status since 2007. We should change to DCTERMS.
     public static final String DC_TITLE = "http://purl.org/dc/elements/1.1/title";
     public static final String DC_DATE = "http://purl.org/dc/elements/1.1/date";
     public static final String DC_COVERAGE = "http://purl.org/dc/elements/1.1/coverage";

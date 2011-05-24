@@ -69,11 +69,11 @@ public class RDFHandler implements StatementHandler {
     private static final String EMPTY_STRING = "";
 
     /** */
-    private Pair<HashSet<Long>,HashSet<Long>> resources =
-        new Pair<HashSet<Long>,HashSet<Long>>(new HashSet<Long>(), new HashSet<Long>());
+    private Pair<HashSet<Long>, HashSet<Long>> resources =
+        new Pair<HashSet<Long>, HashSet<Long>>(new HashSet<Long>(), new HashSet<Long>());
 
     /** */
-    private Map<String, List<Pair<String,String>>> rdfValues = new HashMap<String, List<Pair<String,String>>>();
+    private Map<String, List<Pair<String, String>>> rdfValues = new HashMap<String, List<Pair<String, String>>>();
 
     /** */
     private boolean rdfContentFound = false;
@@ -139,7 +139,7 @@ public class RDFHandler implements StatementHandler {
         persister.setAddingSourceMetadata(true);
 
         try {
-        	int statementsAdded = 0;
+            int statementsAdded = 0;
             if (subjectDTO != null && subjectDTO.getPredicateCount() > 0) {
 
                 AResource subject = new AResourceImpl(subjectDTO.getUri());
@@ -162,10 +162,9 @@ public class RDFHandler implements StatementHandler {
                     addResource(Harvest.HARVESTER_URI, Hashes.spoHash(Harvest.HARVESTER_URI), true);
                 }
             }
-            
+
             return statementsAdded;
-        }
-        finally {
+        } finally {
             persister.setAddingSourceMetadata(false);
         }
 
@@ -222,12 +221,12 @@ public class RDFHandler implements StatementHandler {
 
             // we remember rdfValues
             if (anonSubject && predicate.getURI().equals(Predicates.RDF_VALUE)) {
-                List<Pair<String,String>> subjectRdfValues = rdfValues.get(subject.getAnonymousID());
+                List<Pair<String, String>> subjectRdfValues = rdfValues.get(subject.getAnonymousID());
                 if (subjectRdfValues == null) {
-                    subjectRdfValues = new ArrayList<Pair<String,String>>();
+                    subjectRdfValues = new ArrayList<Pair<String, String>>();
                     rdfValues.put(subjectUri, subjectRdfValues);
                 }
-                subjectRdfValues.add(new Pair<String,String>(object, objectLang));
+                subjectRdfValues.add(new Pair<String, String>(object, objectLang));
             }
 
             // add the triple to the SQL insert batch
@@ -235,11 +234,11 @@ public class RDFHandler implements StatementHandler {
 
             // if the object represents an anonymous subject, lookup the rdf:value(s) of the latter and insert it(them) as derived
             if (anonObject && !litObject) {
-                List<Pair<String,String>> objectRdfValues = rdfValues.get(object);
+                List<Pair<String, String>> objectRdfValues = rdfValues.get(object);
                 if (objectRdfValues != null) {
-                    for (Pair<String,String> objectLangPair : objectRdfValues) {
-                        addTriple(subjectHash, anonSubject, predicateHash, objectLangPair.getLeft(), objectHash, objectLangPair.getRight(),
-                                true, false, Hashes.spoHash(object));
+                    for (Pair<String, String> objectLangPair : objectRdfValues) {
+                        addTriple(subjectHash, anonSubject, predicateHash, objectLangPair.getLeft(), objectHash,
+                                objectLangPair.getRight(), true, false, Hashes.spoHash(object));
                     }
                 }
             }

@@ -157,13 +157,13 @@ public class CRUser {
     }
 
     /**
-     * Returns the CR application URL defined in cr.proprties eg. http://cr.eionet.europa.eu.
-     * @return
+     * Returns the CR application URL defined in cr.proprties, such as http://cr.eionet.europa.eu.
+     * @return the URL.
      */
-	private static String appHomeURL(){
+    private static String appHomeURL() {
 
-		return GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL);
-	}
+        return GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL);
+    }
 
     /**
      * Returns home URL of the user.
@@ -242,7 +242,7 @@ public class CRUser {
         if (StringUtils.isBlank(userName)) {
             throw new IllegalArgumentException("userName must not be blank");
         } else {
-        	return new StringBuilder(rootHomeUri()).append("/").append(userName).toString();
+            return new StringBuilder(rootHomeUri()).append("/").append(userName).toString();
         }
     }
 
@@ -257,7 +257,7 @@ public class CRUser {
         if (StringUtils.isBlank(userName) || StringUtils.isBlank(uri)) {
             throw new IllegalArgumentException("userName and uri must not be blank");
         } else {
-        	return new StringBuilder(homeUri(userName)).append("/").append(Hashes.spoHash(uri)).toString();
+            return new StringBuilder(homeUri(userName)).append("/").append(Hashes.spoHash(uri)).toString();
         }
     }
 

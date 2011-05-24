@@ -74,19 +74,19 @@ public class InstantHarvester extends Thread {
         try {
             instantHarvest = InstantHarvest.createFullSetup(sourceUrl, userName);
             instantHarvest.execute();
+
+            // add triple stating that this source is marked as cr:File by this user
+            ObjectDTO objectDTO = new ObjectDTO(Subjects.CR_FILE, false);
+            objectDTO.setSourceUri(CRUser.registrationsUri(userName));
+            SubjectDTO subjectDTO = new SubjectDTO(sourceUrl, false);
+            subjectDTO.addObject(Predicates.RDF_TYPE, objectDTO);
+            DAOFactory.get().getDao(HelperDAO.class).addTriples(subjectDTO);
             
-			// add triple stating that this source is marked as cr:File by this user
-			ObjectDTO objectDTO = new ObjectDTO(Subjects.CR_FILE, false);
-			objectDTO.setSourceUri(CRUser.registrationsUri(userName));
-			SubjectDTO subjectDTO = new SubjectDTO(sourceUrl, false);
-			subjectDTO.addObject(Predicates.RDF_TYPE, objectDTO);
-			DAOFactory.get().getDao(HelperDAO.class).addTriples(subjectDTO);
-			
-			// since user registrations URI was used as triple source, add it to HARVEST_SOURCE too
-			// (but set interval minutes to 0, to avoid it being background-harvested)
-			DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(
-					HarvestSourceDTO.create(CRUser.registrationsUri(userName), true, 0, userName));
-			
+            // since user registrations URI was used as triple source, add it to HARVEST_SOURCE too
+            // (but set interval minutes to 0, to avoid it being background-harvested)
+            DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(
+                    HarvestSourceDTO.create(CRUser.registrationsUri(userName), true, 0, userName));
+            
         } catch (HarvestException e) {
             harvestException = e;
         } catch (Throwable e) {

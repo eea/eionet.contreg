@@ -39,7 +39,8 @@ public interface HelperDAO extends DAO {
 
 
     /**
-     * fetches recently discovered files.
+     * Fetches recently discovered files.
+     *
      * @param limit how many files to fetch
      * @return List<Pair<String, String>>
      * @throws DAOException if query fails
@@ -48,6 +49,7 @@ public interface HelperDAO extends DAO {
 
     /**
      * Returns array of data objects of latest subjects.
+     *
      * @param rdfType String
      * @param limit max size of query result
      * @return Collection<SubjectDTO>
@@ -57,6 +59,7 @@ public interface HelperDAO extends DAO {
 
     /**
      * Returns subjects newer than given timestamp.
+     *
      * @param timestamp Timestamp since what the subjects are returned
      * @param limit max size of query
      * @return List<SubjectDTO>
@@ -258,99 +261,98 @@ public interface HelperDAO extends DAO {
 
     /**
      *
+     * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
      * @param user
      * @return int
      * @throws DAOException if query fails
-     * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
      */
     public int generateNewReviewId(CRUser user) throws DAOException;
 
     /**
      *
+     * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
      * @param user
      * @return int
      * @throws DAOException if query fails
-     * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
      */
     public int getLastReviewId(CRUser user)  throws DAOException;
 
 
     /**
      *
+     * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
      * @param review
      * @param user
      * @return int
      * @throws DAOException if query fails
-     * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
      */
     public int addReview(ReviewDTO review, CRUser user)  throws DAOException;
 
     /**
      *
+     * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
      * @param reviewiD
      * @param review
      * @param user
      * @throws DAOException if query fails
-     * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
      */
     public void saveReview(int reviewId, ReviewDTO review, CRUser user) throws DAOException;
 
     /**
      *
+     * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
      * @param user
      * @return List<ReviewDTO
      * @throws DAOException if query fails
-     * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
      */
     public List<ReviewDTO> getReviewList(CRUser user)  throws DAOException;
 
     /**
      *
+     * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
      * @param user
      * @param reviewId
      * @return List<ReviewDTO
      * @throws DAOException if query fails
-     * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
      */
     public ReviewDTO getReview(CRUser user, int reviewId)  throws DAOException;
 
     /**
      *
+     * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
      * @param user
      * @param reviewId
      * @return List<String>
      * @throws DAOException if query fails
-     * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
      */
     public List<String> getReviewAttachmentList(CRUser user, int reviewId)  throws DAOException;
 
 
 
     /**
+     * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
      * @param reviewSubjectURI
      * @throws DAOException if query fails
-     * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
      */
     public void deleteReview(CRUser user, int reviewId, boolean deleteAttachments)  throws DAOException;
 
     /**
      *
      *
+     * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
      * @param user
      * @param reviewId
      * @param attachmentUri
      * @throws DAOException if query fails
-     * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
      */
     public void deleteAttachment(CRUser user, int reviewId, String attachmentUri)  throws DAOException;
 
     /**
      *
-     *
+     * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
      * @param attachmentUri
      * @return InputStream
      * @throws DAOException if query fails
-     * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
      */
     public  DownloadFileDTO loadAttachment(String attachmentUri) throws DAOException;
 

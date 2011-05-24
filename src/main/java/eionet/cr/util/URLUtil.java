@@ -52,7 +52,7 @@ public class URLUtil {
 
         try {
             URL url = new URL(s);
-            return url!=null;
+            return url != null;
         } catch (MalformedURLException e) {
             return false;
         }
@@ -93,7 +93,7 @@ public class URLUtil {
             urlConnection.setIfModifiedSince(timestamp);
             inputStream = urlConnection.getInputStream();
 
-            int responseCode = ((HttpURLConnection)urlConnection).getResponseCode();
+            int responseCode = ((HttpURLConnection) urlConnection).getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_NOT_MODIFIED) {
                 //TODO: At the top of the method the simpler "false" is returned.
                 //Here we use a class member.
