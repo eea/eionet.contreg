@@ -34,6 +34,7 @@ import eionet.cr.web.security.CRUser;
  *
  * @author Aleksandr Ivanov
  * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
+ * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
  */
 public interface HelperDAO extends DAO {
 
@@ -218,7 +219,6 @@ public interface HelperDAO extends DAO {
     /**
      *
      * @param user
-     * @param url
      * @throws DAOException if query fails
      */
     public List<UserBookmarkDTO> getUserBookmarks(CRUser user) throws DAOException;
@@ -242,7 +242,6 @@ public interface HelperDAO extends DAO {
     public void updateUserHistory(CRUser user, String url) throws DAOException;
 
     /**
-     * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
      * @param user
      * @throws DAOException if query fails
      */
@@ -261,7 +260,6 @@ public interface HelperDAO extends DAO {
 
     /**
      *
-     * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
      * @param user
      * @return int
      * @throws DAOException if query fails
@@ -270,7 +268,6 @@ public interface HelperDAO extends DAO {
 
     /**
      *
-     * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
      * @param user
      * @return int
      * @throws DAOException if query fails
@@ -280,7 +277,6 @@ public interface HelperDAO extends DAO {
 
     /**
      *
-     * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
      * @param review
      * @param user
      * @return int
@@ -290,7 +286,6 @@ public interface HelperDAO extends DAO {
 
     /**
      *
-     * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
      * @param reviewiD
      * @param review
      * @param user
@@ -300,7 +295,6 @@ public interface HelperDAO extends DAO {
 
     /**
      *
-     * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
      * @param user
      * @return List<ReviewDTO
      * @throws DAOException if query fails
@@ -309,7 +303,6 @@ public interface HelperDAO extends DAO {
 
     /**
      *
-     * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
      * @param user
      * @param reviewId
      * @return List<ReviewDTO
@@ -319,7 +312,6 @@ public interface HelperDAO extends DAO {
 
     /**
      *
-     * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
      * @param user
      * @param reviewId
      * @return List<String>
@@ -330,7 +322,6 @@ public interface HelperDAO extends DAO {
 
 
     /**
-     * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
      * @param reviewSubjectURI
      * @throws DAOException if query fails
      */
@@ -339,7 +330,6 @@ public interface HelperDAO extends DAO {
     /**
      *
      *
-     * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
      * @param user
      * @param reviewId
      * @param attachmentUri
@@ -349,7 +339,6 @@ public interface HelperDAO extends DAO {
 
     /**
      *
-     * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
      * @param attachmentUri
      * @return InputStream
      * @throws DAOException if query fails

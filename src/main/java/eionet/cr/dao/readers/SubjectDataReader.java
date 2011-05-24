@@ -242,7 +242,7 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO>{
     }
 
     /**
-     * @see eionet.cr.util.sql.ResultSetListReader#getResultList()
+     * @see eionet.cr.dao.readers.ResultSetMixedReader#getResultList()
      */
     @Override
     public List<SubjectDTO> getResultList() {
