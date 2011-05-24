@@ -39,9 +39,9 @@ import eionet.cr.util.URIUtil;
 import eionet.cr.web.security.CRUser;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
- * 
+ *
  */
 
 @UrlBinding("/home/{username}/uploads")
@@ -66,17 +66,17 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
     /** URI assigned to the uploaded file as a subject. */
     private String uploadedFileSubjectUri;
 
-    /** URIs of subjects that were selected on submit event */
+    /** URIs of subjects that were selected on submit event. */
     private List<String> subjectUris;
 
-    /** The part of the uploaded file's URI which precedes the filename */
+    /** The part of the uploaded file's URI which precedes the filename. */
     private String uriPrefix;
 
     /** */
     private boolean fileExists;
 
     /**
-     * 
+     *
      * @return
      */
     @DefaultHandler
@@ -86,7 +86,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
     }
 
     /**
-     * 
+     *
      * @return
      * @throws DAOException
      * @throws IOException
@@ -101,7 +101,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
     }
 
     /**
-     * 
+     *
      * @return
      * @throws DAOException
      * @throws IOException
@@ -125,7 +125,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
                 fileExists = DAOFactory.get().getDao(HelperDAO.class).isExistingSubject(getUploadedFileSubjectUri());
 
                 // if file exists and replace not requested, report a warning
-                if (replaceExisting == false && fileExists) {
+                if (!replaceExisting && fileExists) {
                     addWarningMessage("A file with such a name already exists!"
                             + " Use \"replace existing\" checkbox to overwrite.");
                     return resolution;
@@ -146,7 +146,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
     /**
      * @throws IOException
      * @throws DAOException
-     * 
+     *
      */
     private void saveAndHarvest() throws IOException, DAOException {
 
@@ -190,21 +190,20 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
 
     /*
      * (non-Javadoc)
+     *
      * @see java.lang.Runnable#run()
      */
     public void run() {
-       
-        try{
+
+        try {
             runBody();
-        }
-        catch (RuntimeException e){
-            if (saveAndHarvestException==null){
+        } catch (RuntimeException e) {
+            if (saveAndHarvestException == null) {
                 saveAndHarvestException = e;
             }
             throw e;
-        }
-        catch (Error e){
-            if (saveAndHarvestException==null){
+        } catch (Error e) {
+            if (saveAndHarvestException == null) {
                 saveAndHarvestException = new CRRuntimeException(e);
             }
             throw e;
@@ -212,7 +211,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
     }
 
     /**
-     * 
+     *
      */
     private void runBody() {
 
@@ -290,7 +289,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
     }
 
     /**
-     * 
+     *
      * @throws DAOException
      * @throws IOException
      */
@@ -302,7 +301,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
         dto.setContentType(uploadedFile.getContentType());
         dto.setLanguage("");
         dto.setMustEmbed(false);
-        
+
         InputStream contentStream = null;
         try {
             DAOFactory.get().getDao(SpoBinaryDAO.class).add(dto, uploadedFile.getSize());
@@ -314,7 +313,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
     }
 
     /**
-     * 
+     *
      * @return
      * @throws DAOException
      */
@@ -323,14 +322,14 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
         if (subjectUris != null && !subjectUris.isEmpty()) {
 
             DAOFactory.get().getDao(HelperDAO.class).deleteUserUploads(getUserName(), subjectUris);
-            
+
             FileStore fileStore = FileStore.getInstance(getUserName());
-            for (String subjectUri : subjectUris){
+            for (String subjectUri : subjectUris) {
                 String fileName = StringUtils.substringAfterLast(subjectUri, "/");
                 fileName = StringUtils.replace(fileName, "%20", " ");
                 fileStore.delete(fileName);
             }
-            
+
             DAOFactory.get().getDao(HarvestSourceDAO.class).queueSourcesForDeletion(subjectUris);
         }
 
@@ -338,7 +337,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
     }
 
     /**
-     * 
+     *
      * @return
      * @throws DAOException
      */
@@ -347,39 +346,39 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
         Resolution resolution = new ForwardResolution("/pages/home/renameUploads.jsp");
         if (isPostRequest()) {
 
-            HashMap<String,String> fileRenamings = new HashMap<String, String>();
-            HashMap<String,String> uriRenamings = new HashMap<String, String>();
-            
-            if (subjectUris!=null && !subjectUris.isEmpty()){
-                
+            HashMap<String, String> fileRenamings = new HashMap<String, String>();
+            HashMap<String, String> uriRenamings = new HashMap<String, String>();
+
+            if (subjectUris != null && !subjectUris.isEmpty()) {
+
                 ServletRequest request = getContext().getRequest();
-                for (String curSubjectUri : subjectUris){
-                    
+                for (String curSubjectUri : subjectUris) {
+
                     long subjectHash = Hashes.spoHash(curSubjectUri);
                     String newFileName = request.getParameter(FNAME_PARAM_PREFIX + subjectHash);
-                    if (!StringUtils.isBlank(newFileName)){
-                        
+                    if (!StringUtils.isBlank(newFileName)) {
+
                         String newSubjectUri = getUriPrefix() + StringUtils.replace(newFileName, " ", "%20");
                         uriRenamings.put(curSubjectUri, newSubjectUri);
-                        
+
                         String curFileName = StringUtils.substringAfterLast(curSubjectUri, "/");
                         curFileName = StringUtils.replace(curFileName, "%20", " ");
                         fileRenamings.put(curFileName, newFileName);
-                        
+
                         logger.debug("<" + curSubjectUri + "> will be renamed to <" + newSubjectUri + ">");
                         logger.debug("<" + curFileName + "> will be renamed to <" + newFileName + ">");
                     }
                 }
             }
-            
-            if (uriRenamings.size()>0 && uriRenamings.size()==fileRenamings.size()){
-                
+
+            if (uriRenamings.size() > 0 && uriRenamings.size() == fileRenamings.size()) {
+
                 logger.debug("Calling renamings on DAO");
                 DAOFactory.get().getDao(HelperDAO.class).renameUserUploads(uriRenamings);
-                
+
                 logger.debug("Calling renamings on file store");
                 FileStore.getInstance(getUserName()).rename(fileRenamings);
-                
+
                 addSystemMessage("Files renamed successfully!");
                 resolution = new RedirectResolution(StringUtils.replace(getUrlBinding(), "{username}", getUserName()));
             }
@@ -389,7 +388,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
     }
 
     /**
-     * 
+     *
      * @return
      */
     public Resolution cancel() {
@@ -399,7 +398,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
 
     /**
      * @throws DAOException
-     * 
+     *
      */
     @ValidationMethod(on = { "add", "rename", "delete" })
     public void validatePostEvent() throws DAOException {
@@ -554,7 +553,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
     }
 
     /**
-     * 
+     *
      * @return
      */
     public String getFileNameParamPrefix() {

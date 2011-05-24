@@ -41,27 +41,26 @@ import eionet.cr.web.util.columns.SearchResultColumn;
 
 /**
  * Stripes action generating the list of user home folders. Potentially have search capabilities.
- * 
+ *
  * @author Enriko Käsper
- * 
+ *
  */
 
 @UrlBinding("/home")
 public class HomesActionBean extends AbstractSearchActionBean<UserFolderDTO> {
 
+    /** Path to JSP. */
     private static final String HOMES_PATH = "/pages/home/homes.jsp";
-    /**
-     * Columns displayed in search result.
-     */
-    private final static ArrayList<SearchResultColumn> columns;
+    /** Columns displayed in search result. */
+    private static final ArrayList<SearchResultColumn> COLUMNS;
 
     static {
-        columns = new ArrayList<SearchResultColumn>();
+        COLUMNS = new ArrayList<SearchResultColumn>();
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.web.action.AbstractSearchActionBean#search()
      */
     @Override
@@ -81,11 +80,11 @@ public class HomesActionBean extends AbstractSearchActionBean<UserFolderDTO> {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
      */
     @Override
     public List<SearchResultColumn> getColumns() throws DAOException {
-        return columns;
+        return COLUMNS;
     }
 }
