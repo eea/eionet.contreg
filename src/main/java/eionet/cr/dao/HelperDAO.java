@@ -417,11 +417,11 @@ public interface HelperDAO extends DAO {
     /**
      *
      * @param subjectUri
-     * @param predicateUri
+     * @param predicateUris
      * @param sourceUri
      * @throws DAOException if query fails
      */
-    public void deleteTriples(String subjectUri, String predicateUri, String sourceUri) throws DAOException;
+    public void deleteTriples(String subjectUri, Collection<String> predicateUris, String sourceUri) throws DAOException;
 
     /**
      * Returns total triples count.
@@ -437,6 +437,14 @@ public interface HelperDAO extends DAO {
       * @throws DAOException
       */
      public LinkedHashMap<URI, String> getSparqlBookmarks(CRUser user) throws DAOException;
+     
+     /**
+      * 
+      * @param user
+      * @return
+      * @throws DAOException
+      */
+     public List<Map<String,String>> getSparqlBookmarks_new(CRUser user) throws DAOException;
 
      /**
       * Stores the user folder in CR home context.

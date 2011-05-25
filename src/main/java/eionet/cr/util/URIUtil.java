@@ -33,7 +33,7 @@ public class URIUtil {
 
     /** */
     private static HashSet<String> schemes;
-
+    
     /**
      * Returns true if the following conditions are all met:
      * - the given string is not null nor empty

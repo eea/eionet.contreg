@@ -3,6 +3,7 @@ package eionet.cr.web.action.home;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -190,7 +191,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see java.lang.Runnable#run()
      */
     public void run() {
@@ -256,8 +257,11 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
 
                 // delete previous value of dc:title if new one set
                 if (fileExists && fileSubjectDTO.hasPredicate(Predicates.DC_TITLE)) {
-                    DAOFactory.get().getDao(HelperDAO.class)
-                            .deleteTriples(fileSubjectDTO.getUri(), Predicates.DC_TITLE, getUser().getHomeUri());
+                    DAOFactory
+                            .get()
+                            .getDao(HelperDAO.class)
+                            .deleteTriples(fileSubjectDTO.getUri(), Collections.singletonList(Predicates.DC_TITLE),
+                                    getUser().getHomeUri());
                 }
                 DAOFactory.get().getDao(HelperDAO.class).addTriples(fileSubjectDTO);
             }

@@ -2033,11 +2033,28 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
      * @see eionet.cr.dao.HelperDAO#deleteTriples(java.lang.String,
      * java.lang.String, java.lang.String)
      */
-    public void deleteTriples(String subjectUri, String predicateUri, String sourceUri) throws DAOException {
+    public void deleteTriples(String subjectUri, Collection<String> predicateUris, String sourceUri) throws DAOException {
 
+        StringBuilder strBuilder = new StringBuilder("delete from SPO where SUBJECT=?");
         ArrayList values = new ArrayList();
         values.add(Long.valueOf(Hashes.spoHash(subjectUri)));
-        values.add(Long.valueOf(Hashes.spoHash(predicateUri)));
+        
+        if (predicateUris!=null && !predicateUris.isEmpty()){
+            
+            int i = 0;
+            strBuilder.append(" and PREDICATE in (");
+            for (String predicateUri : predicateUris){
+                if (i>0){
+                    strBuilder.append(",");
+                }
+                strBuilder.append("?");
+                
+                values.add(Long.valueOf(Hashes.spoHash(predicateUri)));
+                i++;
+            }
+            strBuilder.append(")");
+        }
+        strBuilder.append(" and SOURCE=?");
         values.add(Long.valueOf(Hashes.spoHash(sourceUri)));
 
         Connection conn = null;
@@ -2085,6 +2102,15 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
      */
     @Override
     public void registerUserFolderInCrHomeContext(CRUser user) throws DAOException {
+        throw new UnsupportedOperationException("Method not implemented");
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.dao.HelperDAO#getSparqlBookmarks_new(eionet.cr.web.security.CRUser)
+     */
+    @Override
+    public List<Map<String, String>> getSparqlBookmarks_new(CRUser user) throws DAOException {
         throw new UnsupportedOperationException("Method not implemented");
     }
 }

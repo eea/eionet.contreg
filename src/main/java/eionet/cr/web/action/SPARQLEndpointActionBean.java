@@ -3,10 +3,8 @@ package eionet.cr.web.action;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.net.URI;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -67,6 +65,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
     /** */
     private static final String FORM_PAGE = "/pages/sparqlClient.jsp";
+    private static final String BOOKMARKED_QUERIES_PAGE = "/pages/bookmarkedQueries.jsp";
 
     /** */
     private static List<String> xmlFormats = new ArrayList<String>();
@@ -117,9 +116,12 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     private String bookmarkName;
 
     /**
-     * Ordered map of URIs of bookmarked queries. Relevant only when user is known.
+     * List of bookmarked queries, each represented by a Map. Relevant only when user is known.
      */
-    private LinkedHashMap<URI, String> bookmarkedQueries;
+    private List<Map<String, String>> bookmarkedQueries;
+    
+    /** */
+    private List<String> deleteQueries;
 
     /**
      *
@@ -214,11 +216,19 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             objectDTO.setSourceUri(bookmarksUri);
             subjectDTO.addObject(Predicates.RDFS_LABEL, objectDTO);
 
-            // save the bookmark subject + register its URI in user's bookmarks
+            // first remove previous triples of this bookmark (i.e. always overwrite bookmark with the same name)
+            ArrayList<String> predicateUris = new ArrayList<String>();
+            predicateUris.add(Predicates.RDF_TYPE);
+            predicateUris.add(Predicates.CR_SPARQL_QUERY);
+            predicateUris.add(Predicates.DC_FORMAT);
+            predicateUris.add(Predicates.CR_USE_INFERENCE);
+            predicateUris.add(Predicates.RDFS_LABEL);
             HelperDAO dao = DAOFactory.get().getDao(HelperDAO.class);
+            dao.deleteTriples(bookmarkUri, predicateUris, bookmarksUri);
+            
+            
+            // now save the bookmark subject
             dao.addTriples(subjectDTO);
-            //no need to bookmark bookmarks :)
-            //dao.addUserBookmark(user, bookmarkUri);
 
             // store user folder in CR root home context
             if (!user.isHomeFolderRegistered()) {
@@ -434,6 +444,21 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             }
         }
     }
+    
+    /**
+     * 
+     * @return
+     * @throws DAOException
+     */
+    public Resolution delete() throws DAOException {
+        
+        Resolution resolution = new ForwardResolution(BOOKMARKED_QUERIES_PAGE);
+        if (deleteQueries!=null && !deleteQueries.isEmpty()){
+            
+            System.out.println(deleteQueries);
+        }
+        return resolution;
+    }
 
     /**
      * @return the query
@@ -567,12 +592,12 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      * @return the bookmarkedQueries
      * @throws DAOException
      */
-    public LinkedHashMap<URI, String> getBookmarkedQueries() throws DAOException {
+    public List<Map<String, String>> getBookmarkedQueries() throws DAOException {
 
         if (getUser() == null) {
             return null;
         } else if (bookmarkedQueries == null) {
-            bookmarkedQueries = DAOFactory.get().getDao(HelperDAO.class).getSparqlBookmarks(getUser());
+            bookmarkedQueries = DAOFactory.get().getDao(HelperDAO.class).getSparqlBookmarks_new(getUser());
         }
         return bookmarkedQueries;
     }
@@ -586,5 +611,12 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     private static final String buildBookmarkUri(CRUser user, String bookmarkName) {
 
         return new StringBuilder(user.getBookmarksUri()).append("/").append(Hashes.spoHash(bookmarkName)).toString();
+    }
+
+    /**
+     * @param deleteQueries the deleteQueries to set
+     */
+    public void setDeleteQueries(List<String> deleteQueries) {
+        this.deleteQueries = deleteQueries;
     }
 }

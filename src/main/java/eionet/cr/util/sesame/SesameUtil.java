@@ -19,6 +19,7 @@ import org.openrdf.rio.RDFHandler;
 import org.openrdf.rio.RDFHandlerException;
 
 import eionet.cr.dao.readers.ResultSetReaderException;
+import eionet.cr.util.Bindings;
 
 /**
  *
@@ -49,22 +50,27 @@ public class SesameUtil {
     }
 
     /**
-     *
+     * 
      * @param <T>
      * @param sparql
+     * @param bindings
      * @param reader
      * @param conn
      * @throws OpenRDFException
      * @throws ResultSetReaderException
      */
-    public static <T> void executeQuery(String sparql,
+    public static <T> void executeQuery(String sparql, Bindings bindings,
             SPARQLResultSetReader<T> reader, RepositoryConnection conn)
             throws OpenRDFException, ResultSetReaderException {
 
         TupleQueryResult queryResult = null;
         try {
-            TupleQuery tupleQuery = conn.prepareTupleQuery(
-                    QueryLanguage.SPARQL, sparql);
+            TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, sparql);
+            
+            if (bindings!=null){
+                bindings.applyTo(tupleQuery, conn.getValueFactory());
+            }
+            
             queryResult = tupleQuery.evaluate();
             if (queryResult != null) {
 
@@ -82,6 +88,22 @@ public class SesameUtil {
         } finally {
             SesameUtil.close(queryResult);
         }
+    }
+
+    /**
+     * 
+     * @param <T>
+     * @param sparql
+     * @param reader
+     * @param conn
+     * @throws OpenRDFException
+     * @throws ResultSetReaderException
+     */
+    public static <T> void executeQuery(String sparql,
+            SPARQLResultSetReader<T> reader, RepositoryConnection conn)
+            throws OpenRDFException, ResultSetReaderException {
+        
+        executeQuery(sparql, null, reader, conn);
     }
 
     /**

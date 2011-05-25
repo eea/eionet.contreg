@@ -63,6 +63,7 @@ import eionet.cr.dto.UploadDTO;
 import eionet.cr.dto.UserBookmarkDTO;
 import eionet.cr.dto.UserHistoryDTO;
 import eionet.cr.harvest.Harvest;
+import eionet.cr.util.Bindings;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.ObjectLabelPair;
 import eionet.cr.util.Pair;
@@ -1353,14 +1354,26 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
      * @see eionet.cr.dao.HelperDAO#deleteTriples(java.lang.String, java.lang.String, java.lang.String)
      */
     @Override
-    public void deleteTriples(String subjectUri, String predicateUri, String sourceUri) throws DAOException {
+    public void deleteTriples(String subjectUri, Collection<String> predicateUris, String sourceUri) throws DAOException {
 
         RepositoryConnection conn = null;
         try {
 
             conn = SesameUtil.getRepositoryConnection();
             ValueFactory factory = conn.getValueFactory();
-            conn.remove(factory.createURI(subjectUri), factory.createURI(predicateUri), null, factory.createURI(sourceUri));
+            
+            URI subject = subjectUri==null ? null : factory.createURI(subjectUri);
+            URI source = sourceUri==null ? null : factory.createURI(sourceUri);
+            
+            if (predicateUris==null || predicateUris.isEmpty()){
+                conn.remove(subject, null, null, source);
+            }
+            else{
+                for (String predicateUri : predicateUris){
+                    URI predicate = predicateUri==null ? null : factory.createURI(predicateUri);
+                    conn.remove(subject, predicate, null, source);
+                }
+            }
         } catch (RepositoryException e) {
             throw new DAOException(e.toString(), e);
         } finally {
@@ -1380,6 +1393,34 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         Object resultObject = executeUniqueResultSPARQL(query, new SingleObjectReader<Long>());
         return Long.valueOf(resultObject.toString());
 
+    }
+
+    /** */
+    private static final String sparqlBookmarks_SPARQL =
+        "select ?subj ?label ?queryString " +
+        "from ?bookmarksHome " +
+        "where {" +
+        "?subj ?rdfType ?sparqlBookmark" +
+        ". ?subj ?rdfsLabel ?label" +
+        ". ?subj ?sparqlQuery ?queryString" +
+        "} order by ?label";
+
+    /**
+     * 
+     * @param user
+     * @return
+     * @throws DAOException
+     */
+    public List<Map<String,String>> getSparqlBookmarks_new(CRUser user) throws DAOException {
+
+        Bindings bindings = new Bindings();
+        bindings.setURI("bookmarksHome", user.getBookmarksUri());
+        bindings.setURI("rdfType", Predicates.RDF_TYPE);
+        bindings.setURI("sparqlBookmark", Subjects.CR_SPARQL_BOOKMARK);
+        bindings.setURI("rdfsLabel", Predicates.RDFS_LABEL);
+        bindings.setURI("sparqlQuery", Predicates.CR_SPARQL_QUERY);
+
+        return executeSPARQL(sparqlBookmarks_SPARQL, bindings, new MapReader());
     }
 
     /*
@@ -1428,5 +1469,42 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         }
 
         return resultMap;
+    }
+    
+    public static void main(String[] args) throws DAOException{
+        
+        VirtuosoHelperDAO dao = new VirtuosoHelperDAO();
+        dao.getSparqlBookmarks_new(new CRUser("heinlja"));
+        
+        boolean f = true;
+        boolean[] ff = {true};
+        for (int i=0; i<ff.length; i++){
+            f |= ff[i];
+        }
+        
+        System.out.println(f);
+        
+        StringBuilder query = new StringBuilder();
+        query.append("select ?subj ?label ?query");
+        query.append(" from ");
+        query.append("?bookmarksNamespace");
+        query.append(" ");
+        query.append(" where");
+        query.append(" { ");
+        query.append(" ?subj <");
+        query.append(Predicates.RDF_TYPE);
+        query.append("> <");
+        query.append(Subjects.CR_SPARQL_BOOKMARK);
+        query.append(">.");
+        query.append(" ?subj <");
+        query.append(Predicates.RDFS_LABEL);
+        query.append("> ?label.");
+        query.append(" ?subj <");
+        query.append(Predicates.CR_SPARQL_QUERY);
+        query.append("> ?query");
+        query.append(" }");
+        query.append(" order by ?subj ?label ?query");
+        
+        System.out.println(query);
     }
 }

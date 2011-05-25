@@ -46,11 +46,11 @@
                         Type a SPARQL query, select output format and other options, and press Execute.
                     </c:if>
                     <c:if test="${not empty actionBean.bookmarkedQueries}">
-                        Type a SPARQL query, or select one from bookmarks:
+                        Type a SPARQL query, or select one from bookmarks:<br/>
                         <stripes:select name="fillfrom" onchange="document.bookmarksForm.submit()" style="width:500px">
                              <stripes:option value="" label="-- Select a bookmarked SPARQL query --" />
                                  <c:forEach items="${actionBean.bookmarkedQueries}" var="bookmarkedQuery">
-                                     <stripes:option value="${bookmarkedQuery.key}" label="${bookmarkedQuery.value}" />
+                                     <stripes:option value="${bookmarkedQuery.subj}" label="${bookmarkedQuery.label}" />
                                  </c:forEach>
                         </stripes:select>
                         <noscript><stripes:submit name="" value="Go" id="goButton" /></noscript>
@@ -72,15 +72,15 @@ SELECT DISTINCT * WHERE {
 } LIMIT 50
 </c:if>${actionBean.query}</textarea>
                 </div>
-	            <div style="position: relative; margin-bottom: 30px">
-		            <div style="position: absolute; top: 5px; left: 0px;">
-	                    <label for="format" class="question">Output format:</label>
-	                        <stripes:select name="format" id="format">
-		                        <stripes:option value="text/html" label="HTML" />
-								<stripes:option value="application/sparql-results+json" label="JSON" />
-								<stripes:option value="application/sparql-results+xml" label="XML" />
-	                        </stripes:select>
-	                </div>
+                <div style="position: relative; margin-bottom: 30px">
+                    <div style="position: absolute; top: 5px; left: 0px;">
+                        <label for="format" class="question">Output format:</label>
+                            <stripes:select name="format" id="format">
+                                <stripes:option value="text/html" label="HTML" />
+                                <stripes:option value="application/sparql-results+json" label="JSON" />
+                                <stripes:option value="application/sparql-results+xml" label="XML" />
+                            </stripes:select>
+                    </div>
                     <div style="position: absolute; top: 5px; left: 200px;">
                         <stripes:label for="nrOfHits" class="question">Hits per page</stripes:label>
                         <stripes:text name="nrOfHits" size="2" id="nrOfHits" />
@@ -93,9 +93,10 @@ SELECT DISTINCT * WHERE {
                     <c:choose>
                         <c:when test="${actionBean.user != null}">
                             <div style="position: absolute; top: 5px; left: 540px;">
-	                            <stripes:submit name="execute" value="Execute" id="executeButton" />
-	                            <stripes:submit name="bookmark" value="Bookmark with name:" id="bookmarkButton" />
-	                            <stripes:text name="bookmarkName" size="20" id="bookmarkName" />
+                                <stripes:submit name="execute" value="Execute" id="executeButton" />
+                                <stripes:submit name="bookmark" value="Bookmark with name:" id="bookmarkButton" />
+                                <stripes:text name="bookmarkName" size="20" id="bookmarkName" />
+                                <span style="position:absolute;right:0px;font-size:0.7em">Hint: use existing query's name to overwrite it</span>
                             </div>
                         </c:when>
                         <c:otherwise>
@@ -104,38 +105,38 @@ SELECT DISTINCT * WHERE {
                             </div>
                         </c:otherwise>
                     </c:choose>
-		        </div>
+                </div>
 
-                <div>
-	                <c:if test="${not empty actionBean.query && empty param.bookmark && empty param.fillfrom}">
-	                    <c:choose>
-	                        <c:when test="${not empty actionBean.result && not empty actionBean.result.rows}">
-	                            <br />
-		                        <display:table name="${actionBean.result.rows}" class="datatable"
-		                            pagesize="${actionBean.nrOfHits}" sort="list" id="listItem"
-		                            htmlId="listItem" requestURI="/sparql"
-		                            decorator="eionet.cr.web.sparqlClient.helpers.SparqlClientColumnDecorator">
-		                            <c:forEach var="cl" items="${actionBean.result.cols}">
-		                                <display:column property="map(${cl.property})"
-		                                    title="${cl.title}" sortable="${cl.sortable}" />
-		                            </c:forEach>
-		                        </display:table>
-		                        <br />Done. -- ${actionBean.executionTime} ms.
-	                        </c:when>
-	                        <c:when test="${actionBean.askQuery == 'true'}">
-	                            <br />
-	                            ${actionBean.resultAsk}
-	                        </c:when>
-	                        <c:otherwise>
-	                            <div class="system-msg">The query gave no results!</div>
-	                        </c:otherwise>
-	                    </c:choose>
-	                </c:if>
+                <div style="clear:both">
+                    <c:if test="${not empty actionBean.query && empty param.bookmark && empty param.fillfrom}">
+                        <c:choose>
+                            <c:when test="${not empty actionBean.result && not empty actionBean.result.rows}">
+                                <br />
+                                <display:table name="${actionBean.result.rows}" class="datatable"
+                                    pagesize="${actionBean.nrOfHits}" sort="list" id="listItem"
+                                    htmlId="listItem" requestURI="/sparql"
+                                    decorator="eionet.cr.web.sparqlClient.helpers.SparqlClientColumnDecorator">
+                                    <c:forEach var="cl" items="${actionBean.result.cols}">
+                                        <display:column property="map(${cl.property})"
+                                            title="${cl.title}" sortable="${cl.sortable}" />
+                                    </c:forEach>
+                                </display:table>
+                                <br />Done. -- ${actionBean.executionTime} ms.
+                            </c:when>
+                            <c:when test="${actionBean.askQuery == 'true'}">
+                                <br />
+                                ${actionBean.resultAsk}
+                            </c:when>
+                            <c:otherwise>
+                                <div class="system-msg">The query gave no results!</div>
+                            </c:otherwise>
+                        </c:choose>
+                    </c:if>
 
-	                <c:if test="${empty actionBean.result || empty actionBean.result.rows}">
-	                    <div>
-	                        <h2>Useful namespaces</h2>
-	                        <pre>
+                    <c:if test="${empty actionBean.result || empty actionBean.result.rows}">
+                        <div>
+                            <h2>Useful namespaces</h2>
+                            <pre>
 PREFIX rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;
 PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
 PREFIX xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt;
@@ -146,9 +147,9 @@ PREFIX foaf: &lt;http://xmlns.com/foaf/0.1/&gt;
 PREFIX geo: &lt;http://www.w3.org/2003/01/geo/wgs84_pos#&gt;
 PREFIX cr: &lt;http://cr.eionet.europa.eu/ontologies/contreg.rdf#&gt;
 PREFIX rod: &lt;http://rod.eionet.europa.eu/schema.rdf#&gt;
-			                </pre>
-	                    </div>
-	                </c:if>
+                            </pre>
+                        </div>
+                    </c:if>
                 </div>
             </crfn:form>
         </div>

@@ -15,6 +15,7 @@ import eionet.cr.dao.SQLBaseDAO;
 import eionet.cr.dao.helpers.SearchHelper;
 import eionet.cr.dao.readers.SubjectDataReader;
 import eionet.cr.dto.SubjectDTO;
+import eionet.cr.util.Bindings;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.sesame.SPARQLResultSetReader;
 import eionet.cr.util.sesame.SesameUtil;
@@ -35,7 +36,31 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO {
     protected Logger logger = Logger.getLogger(VirtuosoBaseDAO.class);
 
     /**
-     *
+     * 
+     * @param <T>
+     * @param sparql
+     * @param bindings
+     * @param reader
+     * @return
+     * @throws DAOException
+     */
+    protected <T> List<T> executeSPARQL(String sparql, Bindings bindings,
+            SPARQLResultSetReader<T> reader) throws DAOException {
+        
+        RepositoryConnection conn = null;
+        try {
+            conn = SesameUtil.getRepositoryConnection();
+            SesameUtil.executeQuery(sparql, bindings, reader, conn);
+            return reader.getResultList();
+        } catch (Exception e) {
+            throw new DAOException(e.toString(), e);
+        } finally {
+            SesameUtil.close(conn);
+        }
+    }
+
+    /**
+     * 
      * @param <T>
      * @param sparql
      * @param reader
@@ -44,17 +69,8 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO {
      */
     protected <T> List<T> executeSPARQL(String sparql,
             SPARQLResultSetReader<T> reader) throws DAOException {
-
-        RepositoryConnection conn = null;
-        try {
-            conn = SesameUtil.getRepositoryConnection();
-            SesameUtil.executeQuery(sparql, reader, conn);
-            return reader.getResultList();
-        } catch (Exception e) {
-            throw new DAOException(e.toString(), e);
-        } finally {
-            SesameUtil.close(conn);
-        }
+        
+        return executeSPARQL(sparql, null, reader);
     }
 
     /**

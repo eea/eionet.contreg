@@ -949,7 +949,7 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
      * (non-Javadoc)
      * @see eionet.cr.dao.HelperDAO#deleteTriples(java.lang.String, java.lang.String, java.lang.String)
      */
-    public void deleteTriples(String subjectUri, String predicateUri, String sourceUri) throws DAOException {
+    public void deleteTriples(String subjectUri, Collection<String> predicateUris, String sourceUri) throws DAOException {
         throw new UnsupportedOperationException("Method not implemented");
     }
 
@@ -973,6 +973,15 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
      */
     @Override
     public void registerUserFolderInCrHomeContext(CRUser user) throws DAOException {
+        throw new UnsupportedOperationException("Method not implemented");
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.dao.HelperDAO#getSparqlBookmarks_new(eionet.cr.web.security.CRUser)
+     */
+    @Override
+    public List<Map<String, String>> getSparqlBookmarks_new(CRUser user) throws DAOException {
         throw new UnsupportedOperationException("Method not implemented");
     }
 }
