@@ -1,6 +1,5 @@
 package eionet.cr.dao.virtuoso;
 
-import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -1411,7 +1410,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
      * @return
      * @throws DAOException
      */
-    public List<Map<String,String>> getSparqlBookmarks_new(CRUser user) throws DAOException {
+    public List<Map<String,String>> getSparqlBookmarks(CRUser user) throws DAOException {
 
         Bindings bindings = new Bindings();
         bindings.setURI("bookmarksHome", user.getBookmarksUri());
@@ -1423,58 +1422,10 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         return executeSPARQL(sparqlBookmarks_SPARQL, bindings, new MapReader());
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.dao.HelperDAO#getSparqlBookmarks()
-     */
-    @Override
-    public LinkedHashMap<java.net.URI, String> getSparqlBookmarks(CRUser user) throws DAOException {
-
-        // use linked hash map to ensure later that entries are retrieved in the same order they were put
-        LinkedHashMap<java.net.URI, String> resultMap = new LinkedHashMap<java.net.URI, String>();
-
-        StringBuilder query = new StringBuilder().append("select ?s ?o from <").append(user.getBookmarksUri()).append(">")
-                .append(" where { ?s ?p ?o.").append(" ?s <").append(Predicates.RDF_TYPE).append("> <")
-                .append(Subjects.CR_SPARQL_BOOKMARK).append(">.").append(" ?s <").append(Predicates.RDFS_LABEL)
-                .append("> ?o } order by ?o");
-
-        RepositoryConnection conn = null;
-        TupleQueryResult queryResult = null;
-        try {
-            conn = SesameUtil.getRepositoryConnection();
-            TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query.toString());
-            queryResult = tupleQuery.evaluate();
-
-            while (queryResult.hasNext()) {
-
-                BindingSet bindingSet = queryResult.next();
-                java.net.URI uri = new java.net.URI(bindingSet.getValue("s").stringValue());
-                String label = bindingSet.getValue("o").stringValue();
-
-                if (!resultMap.containsKey(uri)) {
-                    if (StringUtils.isBlank(label)) {
-                        label = uri.toString();
-                    }
-                    resultMap.put(uri, label);
-                }
-            }
-        } catch (OpenRDFException e) {
-            throw new DAOException(e.toString(), e);
-        } catch (URISyntaxException e) {
-            throw new DAOException("Found resource with invalid URI in triple store", e);
-        } finally {
-            SesameUtil.close(queryResult);
-            SesameUtil.close(conn);
-        }
-
-        return resultMap;
-    }
-    
     public static void main(String[] args) throws DAOException{
         
         VirtuosoHelperDAO dao = new VirtuosoHelperDAO();
-        dao.getSparqlBookmarks_new(new CRUser("heinlja"));
+        dao.getSparqlBookmarks(new CRUser("heinlja"));
         
         boolean f = true;
         boolean[] ff = {true};

@@ -1,6 +1,5 @@
 package eionet.cr.dao.mysql;
 
-import java.net.URI;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -963,11 +962,6 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
         throw new UnsupportedOperationException("Method not implemented");
     }
 
-    @Override
-    public LinkedHashMap<URI, String> getSparqlBookmarks(CRUser user) throws DAOException {
-        throw new UnsupportedOperationException("Method not implemented");
-    }
-
     /* (non-Javadoc)
      * @see eionet.cr.dao.HelperDAO#registerUserFolderInCrHomeContext(eionet.cr.web.security.CRUser)
      */
@@ -981,7 +975,7 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
      * @see eionet.cr.dao.HelperDAO#getSparqlBookmarks_new(eionet.cr.web.security.CRUser)
      */
     @Override
-    public List<Map<String, String>> getSparqlBookmarks_new(CRUser user) throws DAOException {
+    public List<Map<String, String>> getSparqlBookmarks(CRUser user) throws DAOException {
         throw new UnsupportedOperationException("Method not implemented");
     }
 }

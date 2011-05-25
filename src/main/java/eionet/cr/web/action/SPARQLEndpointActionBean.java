@@ -597,7 +597,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         if (getUser() == null) {
             return null;
         } else if (bookmarkedQueries == null) {
-            bookmarkedQueries = DAOFactory.get().getDao(HelperDAO.class).getSparqlBookmarks_new(getUser());
+            bookmarkedQueries = DAOFactory.get().getDao(HelperDAO.class).getSparqlBookmarks(getUser());
         }
         return bookmarkedQueries;
     }
