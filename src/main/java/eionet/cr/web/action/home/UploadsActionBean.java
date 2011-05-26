@@ -40,9 +40,9 @@ import eionet.cr.util.URIUtil;
 import eionet.cr.web.security.CRUser;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
- *
+ * 
  */
 
 @UrlBinding("/home/{username}/uploads")
@@ -77,7 +77,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
     private boolean fileExists;
 
     /**
-     *
+     * 
      * @return
      */
     @DefaultHandler
@@ -87,7 +87,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
     }
 
     /**
-     *
+     * 
      * @return
      * @throws DAOException
      * @throws IOException
@@ -102,7 +102,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
     }
 
     /**
-     *
+     * 
      * @return
      * @throws DAOException
      * @throws IOException
@@ -147,7 +147,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
     /**
      * @throws IOException
      * @throws DAOException
-     *
+     * 
      */
     private void saveAndHarvest() throws IOException, DAOException {
 
@@ -257,15 +257,12 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
 
                 // delete previous value of dc:title if new one set
                 if (fileExists && fileSubjectDTO.hasPredicate(Predicates.DC_TITLE)) {
-                    
+
                     List<String> subjectUris = Collections.singletonList(fileSubjectDTO.getUri());
                     List<String> predicateUris = Collections.singletonList(Predicates.DC_TITLE);
                     List<String> sourceUris = Collections.singletonList(getUser().getHomeUri());
-                    
-                    DAOFactory
-                            .get()
-                            .getDao(HelperDAO.class)
-                            .deleteSubjectPredicates(subjectUris, predicateUris, sourceUris);
+
+                    DAOFactory.get().getDao(HelperDAO.class).deleteSubjectPredicates(subjectUris, predicateUris, sourceUris);
                 }
                 DAOFactory.get().getDao(HelperDAO.class).addTriples(fileSubjectDTO);
             }
@@ -297,7 +294,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
     }
 
     /**
-     *
+     * 
      * @throws DAOException
      * @throws IOException
      */
@@ -321,7 +318,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
     }
 
     /**
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -345,7 +342,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
     }
 
     /**
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -396,7 +393,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
     }
 
     /**
-     *
+     * 
      * @return
      */
     public Resolution cancel() {
@@ -406,7 +403,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
 
     /**
      * @throws DAOException
-     *
+     * 
      */
     @ValidationMethod(on = { "add", "rename", "delete" })
     public void validatePostEvent() throws DAOException {
@@ -561,7 +558,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
     }
 
     /**
-     *
+     * 
      * @return
      */
     public String getFileNameParamPrefix() {

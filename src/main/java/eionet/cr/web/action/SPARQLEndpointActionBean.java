@@ -49,9 +49,9 @@ import eionet.cr.web.sparqlClient.helpers.CRXmlWriter;
 import eionet.cr.web.sparqlClient.helpers.QueryResult;
 
 /**
- *
+ * 
  * @author altnyris
- *
+ * 
  */
 @UrlBinding("/sparql")
 public class SPARQLEndpointActionBean extends AbstractActionBean {
@@ -120,12 +120,12 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      * List of bookmarked queries, each represented by a Map. Relevant only when user is known.
      */
     private List<Map<String, String>> bookmarkedQueries;
-    
+
     /** */
     private List<String> deleteQueries;
 
     /**
-     *
+     * 
      * @return
      * @throws OpenRDFException
      * @throws DAOException
@@ -158,7 +158,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     /**
      * Fills the bean's following properties from the bookmarked query: - the query itself - output format - hits per page - whether
      * to use inference.
-     *
+     * 
      * @throws DAOException
      */
     private void fillFromBookmark(String bookmarkedQueryUri) throws DAOException {
@@ -175,7 +175,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -224,14 +224,13 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             predicateUris.add(Predicates.DC_FORMAT);
             predicateUris.add(Predicates.CR_USE_INFERENCE);
             predicateUris.add(Predicates.RDFS_LABEL);
-            
+
             List<String> subjectUris = Collections.singletonList(bookmarkUri);
             List<String> sourceUris = Collections.singletonList(bookmarksUri);
-            
+
             HelperDAO dao = DAOFactory.get().getDao(HelperDAO.class);
             dao.deleteSubjectPredicates(subjectUris, predicateUris, sourceUris);
-            
-            
+
             // now save the bookmark subject
             dao.addTriples(subjectDTO);
 
@@ -242,15 +241,15 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
             // log and display message about successful operation
             logger.debug("Query bookmarked with URI: " + bookmarksUri);
-            addSystemMessage("Successfully bookmarked query: <a href=\"factsheet.action?uri="
-                    + URLEncoder.encode(bookmarkUri) + "\">" + bookmarkUri + "</a>");
+            addSystemMessage("Successfully bookmarked query: <a href=\"factsheet.action?uri=" + URLEncoder.encode(bookmarkUri)
+                    + "\">" + bookmarkUri + "</a>");
         }
 
         return new ForwardResolution(FORM_PAGE);
     }
 
     /**
-     *
+     * 
      * @return Resolution
      * @throws OpenRDFException
      */
@@ -337,7 +336,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @param type
      * @return
      */
@@ -355,7 +354,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @param query
      * @param format
      * @param out
@@ -449,29 +448,29 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             }
         }
     }
-    
+
     /**
      * 
      * @return
      * @throws DAOException
      */
     public Resolution deleteBookmarked() throws DAOException {
-        
+
         CRUser user = getUser();
         if (user == null) {
             addWarningMessage("Operation now allowed for anonymous users!");
             return new ForwardResolution(FORM_PAGE);
         }
-        
+
         Resolution resolution = new ForwardResolution(BOOKMARKED_QUERIES_PAGE);
-        if (deleteQueries!=null && !deleteQueries.isEmpty()){
-            
+        if (deleteQueries != null && !deleteQueries.isEmpty()) {
+
             logger.debug("Deleting these bookmarked queries: " + deleteQueries);
-            
+
             List<String> sourceUris = Collections.singletonList(user.getBookmarksUri());
             DAOFactory.get().getDao(HelperDAO.class).deleteSubjectPredicates(deleteQueries, null, sourceUris);
         }
-        
+
         return resolution;
     }
 
@@ -498,7 +497,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @return
      */
     public long getExecutionTime() {
@@ -618,7 +617,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @param user
      * @param bookmarkName
      * @return
@@ -629,7 +628,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param deleteQueries the deleteQueries to set
+     * @param deleteQueries
+     *            the deleteQueries to set
      */
     public void setDeleteQueries(List<String> deleteQueries) {
         this.deleteQueries = deleteQueries;
