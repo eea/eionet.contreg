@@ -99,7 +99,7 @@ SELECT DISTINCT * WHERE {
                                 <stripes:submit name="execute" value="Execute" id="executeButton" />
                                 <stripes:submit name="bookmark" value="Bookmark with name:" id="bookmarkButton" />
                                 <stripes:text name="bookmarkName" size="20" id="bookmarkName" />
-                                <span style="position:absolute;right:0px;font-size:0.7em">Hint: use existing query's name to overwrite it</span>
+                                <div style="position:absolute;right:0px;font-size:0.7em;width:140px">Hint: use existing query's name to overwrite it</div>
                             </div>
                         </c:when>
                         <c:otherwise>
