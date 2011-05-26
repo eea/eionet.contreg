@@ -67,6 +67,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     /** */
     private static final String FORM_PAGE = "/pages/sparqlClient.jsp";
     private static final String BOOKMARKED_QUERIES_PAGE = "/pages/bookmarkedQueries.jsp";
+    private static final String BOOKMARK_PAGE = "/pages/bookmarkQuery.jsp";
 
     /** */
     private static List<String> xmlFormats = new ArrayList<String>();
@@ -182,12 +183,16 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     public Resolution bookmark() throws DAOException {
 
         CRUser user = getUser();
+        String requestMethod = getContext().getRequest().getMethod();
+
         if (user == null) {
             addWarningMessage("Cannot bookmark for anonymous user!");
-        } else if (StringUtils.isBlank(bookmarkName)) {
-            addGlobalValidationError("Bookmark name is missing!");
         } else if (StringUtils.isBlank(query)) {
             addGlobalValidationError("Query is missing!");
+        } else if (requestMethod.equalsIgnoreCase("get")){
+            return new ForwardResolution(BOOKMARK_PAGE);
+        } else if (StringUtils.isBlank(bookmarkName)) {
+            addGlobalValidationError("Bookmark name is missing!");
         } else {
 
             // prepare bookmark subject

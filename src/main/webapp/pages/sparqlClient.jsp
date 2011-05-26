@@ -73,7 +73,7 @@ SELECT DISTINCT * WHERE {
   _:subj a ?class .
   OPTIONAL { ?class rdfs:label ?label }
 } LIMIT 50
-</c:if>${actionBean.query}</textarea>
+</c:if><c:out value="${actionBean.query}"/></textarea>
                 </div>
                 <div style="position: relative; margin-bottom: 30px">
                     <div style="position: absolute; top: 5px; left: 0px;">
@@ -97,9 +97,7 @@ SELECT DISTINCT * WHERE {
                         <c:when test="${actionBean.user != null}">
                             <div style="position: absolute; top: 5px; left: 540px;">
                                 <stripes:submit name="execute" value="Execute" id="executeButton" />
-                                <stripes:submit name="bookmark" value="Bookmark with name:" id="bookmarkButton" />
-                                <stripes:text name="bookmarkName" size="20" id="bookmarkName" />
-                                <div style="position:absolute;right:0px;font-size:0.7em;width:140px">Hint: use existing query's name to overwrite it</div>
+                                <stripes:submit name="bookmark" value="Bookmark" id="bookmarkButton" />
                             </div>
                         </c:when>
                         <c:otherwise>
