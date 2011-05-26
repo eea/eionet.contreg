@@ -8,7 +8,7 @@ import java.util.List;
 import org.openrdf.model.Statement;
 import org.openrdf.model.Value;
 import org.openrdf.query.BindingSet;
-import org.openrdf.query.algebra.evaluation.QueryBindingSet;
+import org.openrdf.query.impl.MapBindingSet;
 import org.openrdf.rio.RDFHandler;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFParseException;
@@ -37,7 +37,7 @@ public class MockVirtuosoBaseDAOTest extends VirtuosoBaseDAO {
     /**
      * Fake list of bindingSet.
      */
-    private ArrayList<QueryBindingSet> bindingSet;
+    private ArrayList<MapBindingSet> bindingSet;
     /** custom RDF handler. */
     private MockRDFHandler rdfHandler = new MockRDFHandler();
     /** binding names araylist.*/
@@ -49,7 +49,7 @@ public class MockVirtuosoBaseDAOTest extends VirtuosoBaseDAO {
      * @param fileName Test data file name in test-resources.
      */
     public MockVirtuosoBaseDAOTest(String fileName) {
-        bindingSet = new ArrayList<QueryBindingSet>();
+        bindingSet = new ArrayList<MapBindingSet>();
         // TODO study why RDF reader is not working properly
         // RDFParserFactory factory = new
         // RDFParserRegistry().get(RDFFormat.forFileName(fileName));
@@ -93,7 +93,7 @@ public class MockVirtuosoBaseDAOTest extends VirtuosoBaseDAO {
     class MockRDFHandler implements RDFHandler {
         private boolean bindingsAlreadyAdded = false;
 
-        private QueryBindingSet currentBinding;
+        private MapBindingSet currentBinding;
         private String currentVarName;
 
         @Override
@@ -126,7 +126,7 @@ public class MockVirtuosoBaseDAOTest extends VirtuosoBaseDAO {
                 } else {
                     bindingSet.add(currentBinding);
                 }
-                currentBinding = new QueryBindingSet();
+                currentBinding = new MapBindingSet();
             }
             // its a binding name
             if (statement.getPredicate() != null && statement.getPredicate().stringValue().equals(RESULTVARIABLE_NAME)) {
