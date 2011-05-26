@@ -109,7 +109,7 @@
                                         </c:if>
                                         <c:if test="${actionBean.subjectDownloadable}">
                                             <li>
-                                                <stripes:link class="link-plain" href="/download.action?uri=${subjectUri}">Download</stripes:link>
+                                                <stripes:link class="link-plain" href="/download?uri=${subjectUri}">Download</stripes:link>
                                             </li>
                                         </c:if>
                                         <c:if test="${!actionBean.subjectIsUserBookmark}">

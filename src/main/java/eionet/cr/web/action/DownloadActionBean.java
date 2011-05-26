@@ -17,19 +17,18 @@ import eionet.cr.dto.SpoBinaryDTO;
 import eionet.cr.util.Hashes;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaak.kapten@tietoenator.com">Jaak Kapten</a>
- *
+ * 
  */
-@UrlBinding("/download.action")
-
+@UrlBinding("/download")
 public class DownloadActionBean extends AbstractActionBean {
 
     /** */
     private String uri = "";
 
     /**
-     *
+     * 
      * @return
      * @throws Exception
      */
@@ -60,7 +59,10 @@ public class DownloadActionBean extends AbstractActionBean {
         return new StreamingResolution(dto.getContentType(), contentStream).setFilename(filename);
     }
 
-    @ValidationMethod(on={"download"})
+    /*
+     * 
+     */
+    @ValidationMethod(on = { "download" })
     public void validate() {
 
         if (StringUtils.isBlank(uri)) {
@@ -77,7 +79,8 @@ public class DownloadActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param uri the uri to set
+     * @param uri
+     *            the uri to set
      */
     public void setUri(String uri) {
         this.uri = uri;

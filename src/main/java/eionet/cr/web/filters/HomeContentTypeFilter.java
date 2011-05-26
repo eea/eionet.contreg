@@ -33,9 +33,15 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 
 /**
+ * Purpose of this filter is to enable RESTful download of files stored at CR.
+ * Since it is assumed that all these will have a URL pointing to some user
+ * home directory of CR, then this filter is relevant and should be applied
+ * to only URL with pattern /home/*.
+ * 
+ * See https://svn.eionet.europa.eu/projects/Reportnet/ticket/2464 for more
+ * background.
  * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
  */
 public class HomeContentTypeFilter implements Filter{
 

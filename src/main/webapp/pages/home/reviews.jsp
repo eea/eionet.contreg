@@ -142,7 +142,7 @@
                                         <c:forEach var="attachment" items="${actionBean.review.attachments}">
                                             <tr>
                                                 <td><input type="checkbox" value="${ attachment }" name='attachmentList'></input>&nbsp;
-                                                <stripes:link href="/download.action?uri=${ attachment }">
+                                                <stripes:link href="/download?uri=${ attachment }">
                                                 ${ attachment }
                                                 </stripes:link></td>
                                             </tr>
@@ -170,7 +170,7 @@
                                         </thead>
                                         <c:forEach var="attachment" items="${actionBean.review.attachments}">
                                             <tr>
-                                                <td><stripes:link href="/download.action?uri=${ attachment }">
+                                                <td><stripes:link href="/download?uri=${ attachment }">
                                                 ${ attachment }
                                                 </stripes:link></td>
                                             </tr>
