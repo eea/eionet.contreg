@@ -948,7 +948,7 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
      * (non-Javadoc)
      * @see eionet.cr.dao.HelperDAO#deleteTriples(java.lang.String, java.lang.String, java.lang.String)
      */
-    public void deleteTriples(String subjectUri, Collection<String> predicateUris, String sourceUri) throws DAOException {
+    public void deleteSubjectPredicates(Collection<String> subjectUris, Collection<String> predicateUris, Collection<String> sourceUris) throws DAOException {
         throw new UnsupportedOperationException("Method not implemented");
     }
 

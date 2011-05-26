@@ -6,6 +6,7 @@
 
     <stripes:layout-component name="head">
         <script type="text/javascript">
+            <![CDATA[
             var last_format = 1;
             function format_select(query_obg) {
                 var query = query_obg.value;
@@ -32,6 +33,7 @@
                     last_format = 1;
                 }
             }
+            ]]>
         </script>
     </stripes:layout-component>
 
@@ -41,21 +43,22 @@
 
         <div>
             <crfn:form name="bookmarksForm" action="/sparql" method="get">
-                <p>
-                    <c:if test="${empty actionBean.bookmarkedQueries}">
-                        Type a SPARQL query, select output format and other options, and press Execute.
-                    </c:if>
-                    <c:if test="${not empty actionBean.bookmarkedQueries}">
-                        Type a SPARQL query, or select one from bookmarks:<br/>
-                        <stripes:select name="fillfrom" onchange="document.bookmarksForm.submit()" style="width:500px">
-                             <stripes:option value="" label="-- Select a bookmarked SPARQL query --" />
-                                 <c:forEach items="${actionBean.bookmarkedQueries}" var="bookmarkedQuery">
-                                     <stripes:option value="${bookmarkedQuery.subj}" label="${bookmarkedQuery.label}" />
-                                 </c:forEach>
-                        </stripes:select>
-                        <noscript><stripes:submit name="" value="Go" id="goButton" /></noscript>
-                    </c:if>
-                </p>
+	            <c:if test="${empty actionBean.bookmarkedQueries}">
+	                <p>Type a SPARQL query, select output format and other options, and press Execute.</p>
+	            </c:if>
+	            <c:if test="${not empty actionBean.bookmarkedQueries}">
+	                <p>Type a SPARQL query, or select one from bookmarks:</p>
+	                <div>
+		                <stripes:select name="fillfrom" onchange="document.bookmarksForm.submit()" style="width:500px">
+		                     <stripes:option value="" label="-- Select a bookmarked SPARQL query --" />
+		                         <c:forEach items="${actionBean.bookmarkedQueries}" var="bookmarkedQuery">
+		                             <stripes:option value="${bookmarkedQuery.subj}" label="${bookmarkedQuery.label}" />
+		                         </c:forEach>
+		                </stripes:select>
+		                <noscript><div><stripes:submit name="" value="Go" id="goButton" /></div></noscript>
+		                <br/><a href="sparql?deleteBookmarked=">Delete bookmarked queries ...</a>
+	                </div>
+	            </c:if>
             </crfn:form>
         </div>
 
@@ -121,11 +124,10 @@ SELECT DISTINCT * WHERE {
                                             title="${cl.title}" sortable="${cl.sortable}" />
                                     </c:forEach>
                                 </display:table>
-                                <br />Done. -- ${actionBean.executionTime} ms.
+                                <br/>Done. -- ${actionBean.executionTime} ms.
                             </c:when>
                             <c:when test="${actionBean.askQuery == 'true'}">
-                                <br />
-                                ${actionBean.resultAsk}
+                                <br/><c:out value="${actionBean.resultAsk}"/>
                             </c:when>
                             <c:otherwise>
                                 <div class="system-msg">The query gave no results!</div>

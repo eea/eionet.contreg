@@ -1353,24 +1353,46 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
      * @see eionet.cr.dao.HelperDAO#deleteTriples(java.lang.String, java.lang.String, java.lang.String)
      */
     @Override
-    public void deleteTriples(String subjectUri, Collection<String> predicateUris, String sourceUri) throws DAOException {
+    public void deleteSubjectPredicates(Collection<String> subjectUris, Collection<String> predicateUris, Collection<String> sourceUris) throws DAOException {
 
+        // If no subjects specified, then nothing to do here. Same applies to specified sources,
+        // because Virtuoso requires the graph (i.e. context i.e. source) to be specified. Otherwise
+        // it simply seems to ignore Sesame's triple removal API.
+        if (subjectUris==null || subjectUris.isEmpty() || sourceUris==null || sourceUris.isEmpty()){
+            return;
+        }
+        
         RepositoryConnection conn = null;
         try {
 
             conn = SesameUtil.getRepositoryConnection();
             ValueFactory factory = conn.getValueFactory();
-            
-            URI subject = subjectUri==null ? null : factory.createURI(subjectUri);
-            URI source = sourceUri==null ? null : factory.createURI(sourceUri);
-            
+
             if (predicateUris==null || predicateUris.isEmpty()){
-                conn.remove(subject, null, null, source);
+                
+                for (String subjectUri:subjectUris){
+                    for (String sourceUri:sourceUris){
+                        // no null-pointer checking, because we don't want to allow nulls here anyway
+                        URI subject = factory.createURI(subjectUri);
+                        URI source = factory.createURI(sourceUri);
+                        conn.remove(subject, null, null, source);
+                    }
+                }
             }
             else{
-                for (String predicateUri : predicateUris){
-                    URI predicate = predicateUri==null ? null : factory.createURI(predicateUri);
-                    conn.remove(subject, predicate, null, source);
+                for (String subjectUri:subjectUris){
+                    for (String predicateUri:predicateUris){
+                        for (String sourceUri:sourceUris){
+                            
+                            URI predicate = predicateUri==null ? null : factory.createURI(predicateUri);
+                            
+                            // no null-pointer checking, because we don't want to allow nulls here anyway
+                            URI subject = factory.createURI(subjectUri);
+                            URI source = factory.createURI(sourceUri);
+                            
+                            conn.remove(subject, predicate, null, source);
+                        }
+                    }
                 }
             }
         } catch (RepositoryException e) {
@@ -1422,40 +1444,50 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         return executeSPARQL(sparqlBookmarks_SPARQL, bindings, new MapReader());
     }
 
-    public static void main(String[] args) throws DAOException{
-        
-        VirtuosoHelperDAO dao = new VirtuosoHelperDAO();
-        dao.getSparqlBookmarks(new CRUser("heinlja"));
-        
-        boolean f = true;
-        boolean[] ff = {true};
-        for (int i=0; i<ff.length; i++){
-            f |= ff[i];
+    public static void main(String[] args) throws Exception{
+
+        RepositoryConnection conn = null;
+        try{
+            conn = SesameUtil.getRepositoryConnection();
+            ValueFactory vf = conn.getValueFactory();
+            vf.createURI(null);
+        }
+        finally{
+            SesameUtil.close(conn);
         }
         
-        System.out.println(f);
-        
-        StringBuilder query = new StringBuilder();
-        query.append("select ?subj ?label ?query");
-        query.append(" from ");
-        query.append("?bookmarksNamespace");
-        query.append(" ");
-        query.append(" where");
-        query.append(" { ");
-        query.append(" ?subj <");
-        query.append(Predicates.RDF_TYPE);
-        query.append("> <");
-        query.append(Subjects.CR_SPARQL_BOOKMARK);
-        query.append(">.");
-        query.append(" ?subj <");
-        query.append(Predicates.RDFS_LABEL);
-        query.append("> ?label.");
-        query.append(" ?subj <");
-        query.append(Predicates.CR_SPARQL_QUERY);
-        query.append("> ?query");
-        query.append(" }");
-        query.append(" order by ?subj ?label ?query");
-        
-        System.out.println(query);
+//        VirtuosoHelperDAO dao = new VirtuosoHelperDAO();
+//        dao.getSparqlBookmarks(new CRUser("heinlja"));
+//        
+//        boolean f = true;
+//        boolean[] ff = {true};
+//        for (int i=0; i<ff.length; i++){
+//            f |= ff[i];
+//        }
+//        
+//        System.out.println(f);
+//        
+//        StringBuilder query = new StringBuilder();
+//        query.append("select ?subj ?label ?query");
+//        query.append(" from ");
+//        query.append("?bookmarksNamespace");
+//        query.append(" ");
+//        query.append(" where");
+//        query.append(" { ");
+//        query.append(" ?subj <");
+//        query.append(Predicates.RDF_TYPE);
+//        query.append("> <");
+//        query.append(Subjects.CR_SPARQL_BOOKMARK);
+//        query.append(">.");
+//        query.append(" ?subj <");
+//        query.append(Predicates.RDFS_LABEL);
+//        query.append("> ?label.");
+//        query.append(" ?subj <");
+//        query.append(Predicates.CR_SPARQL_QUERY);
+//        query.append("> ?query");
+//        query.append(" }");
+//        query.append(" order by ?subj ?label ?query");
+//        
+//        System.out.println(query);
     }
 }

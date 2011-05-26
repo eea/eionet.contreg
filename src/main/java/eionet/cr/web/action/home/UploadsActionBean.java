@@ -257,11 +257,15 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
 
                 // delete previous value of dc:title if new one set
                 if (fileExists && fileSubjectDTO.hasPredicate(Predicates.DC_TITLE)) {
+                    
+                    List<String> subjectUris = Collections.singletonList(fileSubjectDTO.getUri());
+                    List<String> predicateUris = Collections.singletonList(Predicates.DC_TITLE);
+                    List<String> sourceUris = Collections.singletonList(getUser().getHomeUri());
+                    
                     DAOFactory
                             .get()
                             .getDao(HelperDAO.class)
-                            .deleteTriples(fileSubjectDTO.getUri(), Collections.singletonList(Predicates.DC_TITLE),
-                                    getUser().getHomeUri());
+                            .deleteSubjectPredicates(subjectUris, predicateUris, sourceUris);
                 }
                 DAOFactory.get().getDao(HelperDAO.class).addTriples(fileSubjectDTO);
             }

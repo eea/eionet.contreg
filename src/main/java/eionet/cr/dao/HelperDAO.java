@@ -414,12 +414,12 @@ public interface HelperDAO extends DAO {
 
     /**
      *
-     * @param subjectUri
+     * @param subjectUris
      * @param predicateUris
-     * @param sourceUri
+     * @param sourceUris
      * @throws DAOException if query fails
      */
-    public void deleteTriples(String subjectUri, Collection<String> predicateUris, String sourceUri) throws DAOException;
+    public void deleteSubjectPredicates(Collection<String> subjectUris, Collection<String> predicateUris, Collection<String> sourceUris) throws DAOException;
 
     /**
      * Returns total triples count.

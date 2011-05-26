@@ -362,6 +362,26 @@ public class Util {
     }
 
     /**
+     * 
+     * @param coll
+     * @return
+     */
+    public static String toCSVHashes(Collection coll) {
+
+        StringBuffer buf = new StringBuffer();
+        if (coll != null) {
+            for (Iterator it = coll.iterator(); it.hasNext();) {
+
+                if (buf.length() > 0) {
+                    buf.append(",");
+                }
+                buf.append(Hashes.spoHash(it.next().toString()));
+            }
+        }
+        return buf.toString();
+    }
+
+    /**
      * Create a comma-separated list of tag enclosed URIs. The result can be used in sparql queries. eg.: [uri1,uri2,uri3] is
      * transformed to <uri1>,<uri2>,<uri3>.
      *

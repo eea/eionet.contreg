@@ -2023,43 +2023,34 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
 
     }
 
-    /** */
-    private static final String deleteTriplesOfPredicate = "delete from SPO where SUBJECT=? and PREDICATE=? and SOURCE=?";
-
     /*
      * (non-Javadoc)
      *
      * @see eionet.cr.dao.HelperDAO#deleteTriples(java.lang.String,
      * java.lang.String, java.lang.String)
      */
-    public void deleteTriples(String subjectUri, Collection<String> predicateUris, String sourceUri) throws DAOException {
+    public void deleteSubjectPredicates(Collection<String> subjectUris, Collection<String> predicateUris, Collection<String> sourceUris) throws DAOException {
 
-        StringBuilder strBuilder = new StringBuilder("delete from SPO where SUBJECT=?");
-        ArrayList values = new ArrayList();
-        values.add(Long.valueOf(Hashes.spoHash(subjectUri)));
-        
-        if (predicateUris!=null && !predicateUris.isEmpty()){
-            
-            int i = 0;
-            strBuilder.append(" and PREDICATE in (");
-            for (String predicateUri : predicateUris){
-                if (i>0){
-                    strBuilder.append(",");
-                }
-                strBuilder.append("?");
-                
-                values.add(Long.valueOf(Hashes.spoHash(predicateUri)));
-                i++;
-            }
-            strBuilder.append(")");
+        // If no subjects specified, then nothing to do here.
+        if (subjectUris==null || subjectUris.isEmpty()){
+            return;
         }
-        strBuilder.append(" and SOURCE=?");
-        values.add(Long.valueOf(Hashes.spoHash(sourceUri)));
+
+        // Not using prepared statement, because type safety and SQL injection prevention
+        // is issued by the URIs all being converted into integer hashes. In this case,
+        // it is better readable this way.
+        String sql = "delete from SPO where SUBJECT in (" + Util.toCSVHashes(subjectUris) + ")";
+        if (predicateUris!=null && !predicateUris.isEmpty()){
+            sql = sql + " and PREDICATE in (" + Util.toCSVHashes(predicateUris) + ")";
+        }
+        if (sourceUris!=null && !sourceUris.isEmpty()){
+            sql = sql + " and SOURCE in (" + Util.toCSVHashes(sourceUris) + ")";
+        }
 
         Connection conn = null;
         try {
             conn = getSQLConnection();
-            SQLUtil.executeUpdate(deleteTriplesOfPredicate, values, conn);
+            SQLUtil.executeUpdate(sql, conn);
         } catch (SQLException e) {
             throw new DAOException(e.getMessage(), e);
         } finally {

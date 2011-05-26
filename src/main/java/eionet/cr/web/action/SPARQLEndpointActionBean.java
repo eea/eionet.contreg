@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -223,8 +224,12 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             predicateUris.add(Predicates.DC_FORMAT);
             predicateUris.add(Predicates.CR_USE_INFERENCE);
             predicateUris.add(Predicates.RDFS_LABEL);
+            
+            List<String> subjectUris = Collections.singletonList(bookmarkUri);
+            List<String> sourceUris = Collections.singletonList(bookmarksUri);
+            
             HelperDAO dao = DAOFactory.get().getDao(HelperDAO.class);
-            dao.deleteTriples(bookmarkUri, predicateUris, bookmarksUri);
+            dao.deleteSubjectPredicates(subjectUris, predicateUris, sourceUris);
             
             
             // now save the bookmark subject
@@ -450,13 +455,23 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      * @return
      * @throws DAOException
      */
-    public Resolution delete() throws DAOException {
+    public Resolution deleteBookmarked() throws DAOException {
+        
+        CRUser user = getUser();
+        if (user == null) {
+            addWarningMessage("Operation now allowed for anonymous users!");
+            return new ForwardResolution(FORM_PAGE);
+        }
         
         Resolution resolution = new ForwardResolution(BOOKMARKED_QUERIES_PAGE);
         if (deleteQueries!=null && !deleteQueries.isEmpty()){
             
-            System.out.println(deleteQueries);
+            logger.debug("Deleting these bookmarked queries: " + deleteQueries);
+            
+            List<String> sourceUris = Collections.singletonList(user.getBookmarksUri());
+            DAOFactory.get().getDao(HelperDAO.class).deleteSubjectPredicates(deleteQueries, null, sourceUris);
         }
+        
         return resolution;
     }
 
