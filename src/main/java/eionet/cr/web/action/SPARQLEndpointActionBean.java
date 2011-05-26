@@ -189,7 +189,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             addWarningMessage("Cannot bookmark for anonymous user!");
         } else if (StringUtils.isBlank(query)) {
             addGlobalValidationError("Query is missing!");
-        } else if (requestMethod.equalsIgnoreCase("get")){
+        } else if (requestMethod.equalsIgnoreCase("get")) {
             return new ForwardResolution(BOOKMARK_PAGE);
         } else if (StringUtils.isBlank(bookmarkName)) {
             addGlobalValidationError("Bookmark name is missing!");
@@ -474,6 +474,12 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
             List<String> sourceUris = Collections.singletonList(user.getBookmarksUri());
             DAOFactory.get().getDao(HelperDAO.class).deleteSubjectPredicates(deleteQueries, null, sourceUris);
+
+            if (deleteQueries.size() == 1) {
+                addSystemMessage("Selected query was successfully deleted!");
+            } else {
+                addSystemMessage("Selected queries were successfully deleted!");
+            }
         }
 
         return resolution;
