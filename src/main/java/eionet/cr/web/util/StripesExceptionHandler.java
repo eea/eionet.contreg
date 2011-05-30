@@ -39,6 +39,10 @@ import org.apache.commons.logging.LogFactory;
 public class StripesExceptionHandler implements ExceptionHandler {
 
     /** */
+    public static final String ERROR_PAGE = "/pages/error.jsp";
+    public static final String EXCEPTION_ATTR = "exception";
+    
+    /** */
     private static Log logger = LogFactory.getLog(StripesExceptionHandler.class);
 
     /*
@@ -61,8 +65,8 @@ public class StripesExceptionHandler implements ExceptionHandler {
             newThrowable = t;
 
         logger.error(newThrowable.getMessage(), newThrowable);
-        request.setAttribute("exception", newThrowable);
-        request.getRequestDispatcher("/pages/error.jsp").forward(request, response);
+        request.setAttribute(EXCEPTION_ATTR, newThrowable);
+        request.getRequestDispatcher(ERROR_PAGE).forward(request, response);
     }
 
     /**

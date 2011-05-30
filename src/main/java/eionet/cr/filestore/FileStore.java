@@ -5,18 +5,22 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
+import eionet.cr.common.CRRuntimeException;
 import eionet.cr.config.GeneralConfig;
+import eionet.cr.web.security.CRUser;
 
 /**
- *
+ * 
  * @author jaanus
- *
+ * 
  */
 public class FileStore {
 
@@ -32,7 +36,7 @@ public class FileStore {
     private File userDir;
 
     /**
-     *
+     * 
      * @param userName
      */
     private FileStore(String userName) {
@@ -46,7 +50,7 @@ public class FileStore {
     }
 
     /**
-     *
+     * 
      * @param userName
      * @return
      */
@@ -55,7 +59,7 @@ public class FileStore {
     }
 
     /**
-     *
+     * 
      * @param fileName
      * @param overwrite
      * @param inputStream
@@ -77,7 +81,7 @@ public class FileStore {
     }
 
     /**
-     *
+     * 
      * @param fileName
      * @param overwrite
      * @param reader
@@ -99,7 +103,7 @@ public class FileStore {
     }
 
     /**
-     *
+     * 
      * @param fileName
      * @param overwrite
      * @throws FileAlreadyExistsException
@@ -125,7 +129,7 @@ public class FileStore {
     }
 
     /**
-     *
+     * 
      * @param fileName
      */
     public void delete(String fileName) {
@@ -137,15 +141,15 @@ public class FileStore {
     }
 
     /**
-     *
+     * 
      * @param renamings
      */
-    public void rename(Map<String,String> renamings) {
+    public void rename(Map<String, String> renamings) {
 
         int renamedCount = 0;
         if (renamings != null) {
 
-            for (Map.Entry<String,String> entry : renamings.entrySet()) {
+            for (Map.Entry<String, String> entry : renamings.entrySet()) {
 
                 String oldName = entry.getKey();
                 String newName = entry.getValue();
@@ -162,31 +166,51 @@ public class FileStore {
         logger.debug("Total of " + renamedCount + " files renamed in the file store");
     }
 
-//    /**
-//     *
-//     * @param fileSubjectUri
-//     * @param fileName
-//     * @return
-//     */
-//    private static final String generateFileName(String fileSubjectUri, String fileName) {
-//
-//        StringBuilder result = new StringBuilder();
-//        if (!StringUtils.isBlank(fileSubjectUri)) {
-//            result.append(fileSubjectUri);
-//        }
-//
-//        if (result.length() > 0) {
-//            result.append(".");
-//        }
-//
-//        if (!StringUtils.isBlank(fileName)) {
-//            result.append(fileName);
-//        }
-//
-//        if (result.length() == 0) {
-//            result.append(System.currentTimeMillis());
-//        }
-//
-//        return result.toString();
-//    }
+    /**
+     * 
+     * @param fileName
+     * @return
+     */
+    public File get(String fileName) {
+
+        File file = new File(userDir, fileName);
+        if (!file.exists() || !file.isFile()) {
+            return null;
+        } else {
+            return file;
+        }
+    }
+    
+    /**
+     * 
+     * @param uriString
+     * @return
+     */
+    public static File getByUri(String uriString){
+       
+        if (CRUser.isHomeUri(uriString)){
+            
+            String userName = CRUser.getUserNameFromUri(uriString);
+            if (userName!=null && userName.trim().length()>0){
+                
+                // by now assume that URI is correct and file name is everything after last '/'
+                String fileName = StringUtils.substringAfterLast(uriString, "/");
+                try {
+                    fileName = URLDecoder.decode(fileName, "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    throw new CRRuntimeException(e);
+                }
+                
+                return FileStore.getInstance(userName).get(fileName);
+            }
+            else{
+                logger.info("Could not extract user name from this URI: " + uriString);
+            }
+        }
+        else{
+            logger.info("Not a home URI: " + uriString);
+        }
+        
+        return null;
+    }
 }

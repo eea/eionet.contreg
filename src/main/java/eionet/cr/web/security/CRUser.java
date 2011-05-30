@@ -291,17 +291,63 @@ public class CRUser {
         return CRUser.homeUri(userName) + "/history";
     }
 
+    /**
+     * @return
+     */
     public boolean isHomeFolderRegistered() {
         return homeFolderRegistered;
     }
 
+    /**
+     * @param homeFolderRegistered
+     */
     public void setHomeFolderRegistered(boolean homeFolderRegistered) {
         this.homeFolderRegistered = homeFolderRegistered;
     }
 
+    /**
+     * @throws DAOException
+     */
     public void loadUserProperties() throws DAOException{
         UserHomeDAO userHomeDAO = DAOFactory.get().getDao(UserHomeDAO.class);
         boolean isUserHomeFolderREgistered = userHomeDAO.isUserFolderRegisteredInCrHomeContext(this);
         setHomeFolderRegistered(isUserHomeFolderREgistered);
     }
+    
+    /**
+     * 
+     * @param uriString
+     * @return
+     */
+    public static boolean isHomeUri(String uriString){
+        
+        return uriString!=null && uriString.startsWith(CRUser.rootHomeUri());
+    }
+    
+    /**
+     * 
+     * @param uriString
+     * @return
+     */
+    public static String getUserNameFromUri(String uriString){
+        
+        String userHomesPath = CRUser.rootHomeUri();
+        if (!userHomesPath.endsWith("/")) {
+            userHomesPath = userHomesPath + "/";
+        }
+        int userHomesPathLength = userHomesPath.length();
+
+        String userName = null;
+
+        if (uriString.startsWith(userHomesPath) && uriString.length() > userHomesPathLength) {
+
+            int i = uriString.indexOf('/', userHomesPathLength);
+            if (i > userHomesPathLength) {
+                userName = uriString.substring(userHomesPathLength, i);
+            }
+        }
+
+        return userName;
+    }
+
 }

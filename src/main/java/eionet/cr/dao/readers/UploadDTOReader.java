@@ -108,7 +108,6 @@ public class UploadDTOReader extends ResultSetMixedReader<UploadDTO>{
         if (uploadDTO == null) {
             uploadDTO = new UploadDTO(subjectUri);
             uploadsMap.put(subjectUri, uploadDTO);
-            logger.debug("The following user-upload has been read: " + subjectUri);
         }
 
         if (predicateUri.equals(Predicates.RDFS_LABEL)) {
