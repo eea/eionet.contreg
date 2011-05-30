@@ -28,9 +28,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- *
+ * 
  * @author heinljab
- *
+ * 
  */
 public class GeneralConfig {
 
@@ -87,8 +87,7 @@ public class GeneralConfig {
     public static final String SUBJECT_SELECT_MODE = "subjectSelectMode";
 
     /**
-     * Constant to get dataflow picklist cache update interval (in
-     * milliseconds).
+     * Constant to get dataflow picklist cache update interval (in milliseconds).
      */
     public static final String DATAFLOW_PICKLIST_CACHE_UPDATE_INTERVAL = "dataflowPicklistCacheUpdateInterval";
     public static final String RECENT_DISCOVERED_FILES_CACHE_UPDATE_INTERVAL = "recentDiscoveredFilesCacheUpdateInterval";
@@ -112,11 +111,10 @@ public class GeneralConfig {
     public static final String VIRTUOSO_DB_ROUSR = "virtuoso.db.rousr";
     public static final String VIRTUOSO_DB_ROPWD = "virtuoso.db.ropwd";
     /**
-     * General ruleSet name for inferencing. Schema sources are added into that
-     * ruleset.
+     * General ruleSet name for inferencing. Schema sources are added into that ruleset.
      * */
     public static final String VIRTUOSO_CR_RULESET_NAME = "virtuoso.cr.ruleset.name";
-    
+
     /** */
     public static final String FILESTORE_PATH = "filestore.path";
 
@@ -135,8 +133,7 @@ public class GeneralConfig {
     private static void init() {
         properties = new Properties();
         try {
-            properties.load(GeneralConfig.class.getClassLoader()
-                    .getResourceAsStream(PROPERTIES_FILE_NAME));
+            properties.load(GeneralConfig.class.getClassLoader().getResourceAsStream(PROPERTIES_FILE_NAME));
 
             // trim all the values (i.e. we don't allow preceding or trailing
             // white space in property values)
@@ -145,13 +142,12 @@ public class GeneralConfig {
             }
 
         } catch (IOException e) {
-            logger.fatal("Failed to load properties from "
-                    + PROPERTIES_FILE_NAME, e);
+            logger.fatal("Failed to load properties from " + PROPERTIES_FILE_NAME, e);
         }
     }
 
     /**
-     *
+     * 
      * @param name
      * @return
      */
@@ -164,13 +160,12 @@ public class GeneralConfig {
     }
 
     /**
-     *
+     * 
      * @param key
      * @param defaultValue
      * @return
      */
-    public static synchronized String getProperty(String key,
-            String defaultValue) {
+    public static synchronized String getProperty(String key, String defaultValue) {
 
         if (properties == null)
             init();
@@ -179,7 +174,7 @@ public class GeneralConfig {
     }
 
     /**
-     *
+     * 
      * @param key
      * @return
      * @throws CRConfigException
@@ -194,7 +189,7 @@ public class GeneralConfig {
     }
 
     /**
-     *
+     * 
      * @return
      */
     public static synchronized Properties getProperties() {
@@ -206,7 +201,7 @@ public class GeneralConfig {
     }
 
     /**
-     *
+     * 
      * @return
      */
     public static synchronized boolean useVirtuoso() {
