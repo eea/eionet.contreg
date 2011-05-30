@@ -19,11 +19,11 @@
                 </c:forEach>
             </table>
 
-            <fieldset style="display:hidden">
+            <div>
                 <c:forEach var="subjectUri" items="${actionBean.subjectUris}">
                     <input type="hidden" name="subjectUris" value="${subjectUri}"/>
                 </c:forEach>
-            </fieldset>
+            </div>
 
             <div>
                 <stripes:submit name="rename" value="OK"/>
