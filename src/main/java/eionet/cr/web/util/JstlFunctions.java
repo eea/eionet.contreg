@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.servlet.jsp.PageContext;
 
 import org.apache.commons.lang.StringUtils;
@@ -102,25 +103,16 @@ public class JstlFunctions {
     }
 
     /**
-     *
-     * @param userName
-     * @param aclName - path to the object, such as "/".
-     * @param permission - name of the permission.
-     * @return true if the user has the requested permission.
+     * Returns the value of {@link CRUser#hasPermission(HttpSession, String, String)},
+     * using the given inputs.
+     * 
+     * @param session
+     * @param aclPath
+     * @param permission
+     * @return
      */
-    public static boolean hasPermission(java.lang.String userName, java.lang.String aclName, java.lang.String permission) {
-        return CRUser.hasPermission(userName, aclName, permission);
-    }
-
-    /**
-     *
-     * @param user
-     * @param aclName - path to the object, such as "/".
-     * @param permission - name of the permission.
-     * @return true if the user has the requested permission.
-     */
-    public static boolean userHasPermission(CRUser user, java.lang.String aclName, java.lang.String permission) {
-        return CRUser.userHasPermission(user, aclName, permission);
+    public static boolean userHasPermission(HttpSession session, java.lang.String aclPath, java.lang.String permission) {
+        return CRUser.hasPermission(session, aclPath, permission);
     }
 
     /**

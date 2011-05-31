@@ -66,7 +66,7 @@
 
 
             <stripes:submit name="search" value="Search" />
-            <c:if test='${sessionScope.crUser!=null && crfn:hasPermission(sessionScope.crUser.userName, "/", "u")}'>
+            <c:if test='${crfn:userHasPermission(pageContext.session, "/", "u")}'>
                 &nbsp;<stripes:submit name="introspect" value="Introspect"/>
             </c:if>
         </crfn:form>

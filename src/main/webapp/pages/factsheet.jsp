@@ -204,7 +204,7 @@
                     <c:otherwise>
                         <c:choose>
                             <c:when test="${not empty actionBean.uri}">
-                                <c:if test='${sessionScope.crUser!=null && crfn:hasPermission(sessionScope.crUser.userName, "/", "u")}'>
+                                <c:if test='${crfn:userHasPermission(pageContext.session, "/", "u")}'>
                                     <c:if test="${not empty actionBean.url}">
                                         <ul id="dropdown-operations">
                                             <li>

@@ -41,11 +41,6 @@ public class GeneralConfig {
     /** */
     public static final String DEPLOYMENT_HOST = "deployment.host";
 
-    /**
-     * ACL anonymous entry name property.
-     */
-    public static final String ACL_ANONYMOUS_ACCESS_PROP = "acl.anonymous.access";
-
     /** */
     public static final String DB_URL = "db.url";
     public static final String DB_DRV = "db.drv";

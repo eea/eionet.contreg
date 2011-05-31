@@ -157,7 +157,7 @@
          </description>
         <name>userHasPermission</name>
         <function-class>eionet.cr.web.util.JstlFunctions</function-class>
-        <function-signature>boolean userHasPermission(eionet.cr.web.security.CRUser, java.lang.String, java.lang.String)</function-signature>
+        <function-signature>boolean userHasPermission(javax.servlet.http.HttpSession, java.lang.String, java.lang.String)</function-signature>
         <example>
             ${hasPermission(sessionScope.crUser, "/", "u")}
         </example>

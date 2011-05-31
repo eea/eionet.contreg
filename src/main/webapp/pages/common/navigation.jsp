@@ -16,10 +16,17 @@
         <li><a href="sources.action">Harvesting sources</a></li>
         <li><a href="harvestQueue.action">Harvest queue</a></li>
         <li><a href="home">User homes</a></li>
-        <c:if test='${crfn:userHasPermission(sessionScope.crUser, "/", "u")}'>
+        <c:if test='${crfn:userHasPermission(pageContext.session, "/", "u")}'>
+        
             <li><a href="registerUrl.action">URL registration</a></li>
             <li><a href="admin" title="Administrative activities">Admin actions</a></li>
-            <li><a href="home/${ actionBean.userName }">My home</a></li>
+            
+            <%-- We can be in this if-block even if no user in session, because a missing user --%>
+            <%-- is considered anonymous, and anonymous can still have some permissions.       --%>
+            <%-- So double check user existence before displaying link to his home.            --%>
+            <c:if test="${not empty sessionScope.crUser && not empty sessionScope.crUser.userName}">
+                <li><a href="home/${sessionScope.crUser.userName}">My home</a></li>
+            </c:if>
         </c:if>
     </ul>
 </div>

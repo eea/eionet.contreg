@@ -20,6 +20,8 @@
  */
 package eionet.cr.web.security;
 
+import javax.servlet.http.HttpSession;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,6 +36,7 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.UserHomeDAO;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Util;
+import eionet.cr.web.util.WebConstants;
 
 /**
  * Class represents authenticated user.
@@ -42,11 +45,6 @@ import eionet.cr.util.Util;
  *
  */
 public class CRUser {
-
-    /**
-     * ACL anonymous entry name.
-     */
-    private static String aclAnonymousEntryName;
 
     /** */
     private static Log logger = LogFactory.getLog(CRUser.class);
@@ -61,16 +59,7 @@ public class CRUser {
      * Is user home folder registered under CR root home.
      */
     private boolean homeFolderRegistered;
-    /**
-     *
-     */
-    public CRUser() {
-    }
-
-    static {
-        aclAnonymousEntryName = GeneralConfig.getProperty(GeneralConfig.ACL_ANONYMOUS_ACCESS_PROP, null);
-    }
-
+    
     /**
      * Creates CRUser.
      * @param userName username
@@ -100,56 +89,87 @@ public class CRUser {
     public boolean isAdministrator() {
         return hasPermission("/", "u");
     }
-
+    
     /**
-     * Checks if authenticated user or anonymous user has got this permission to the ACL.
-     * @param user CRUser in the HTTP Session
-     * @param aclPath full ACL path
-     * @param permission permission to be checked
-     * @return boolean
+     * Returns the value of {@link #hasPermission(String, String, String)}, using the given ACL path,
+     * the given permission, and the name of this user.
+     * 
+     * @param aclPath
+     * @param permission
+     * @return
      */
-    public static boolean userHasPermission(CRUser user, String aclPath, String permission) {
-        return hasPermission(user != null ? user.getUserName() : null, aclPath, permission);
-    }
-     /**
-     * Checks if current user as the given permission to the specified ACL.
-     * @param aclPath full ACL path
-     * @param prm permission
-     * @return boolean
-     */
-    public boolean hasPermission(final String aclPath, final String prm) {
-        return hasPermission(userName, aclPath, prm);
+    public boolean hasPermission(String aclPath, String permission){
+        return CRUser.hasPermission(userName, aclPath, permission);
     }
 
     /**
-     * Checks authenticated or anonymous user permission.
-     * @param userName Username or null for anonymous user
-     * @param aclPath Full ACL path
-     * @param prm permission
-     * @return boolean
+     * Returns the value of {@link #hasPermission(String, String, String)}, using the given ACL path,
+     * the given permission, and the name of the user found in the given session. If no user found
+     * in session, the method will be called with user name set to null.
+     * 
+     * @param session
+     * @param aclPath
+     * @param permission
+     * @return
      */
-    public static boolean hasPermission(String userName, final String aclPath, final String prm) {
+    public static boolean hasPermission(HttpSession session, String aclPath, String permission) {
 
-        //if user not logged in check permission anonymous ACL entry if exists:
-        if (Util.isNullOrEmpty(userName) && !Util.isNullOrEmpty(aclAnonymousEntryName)) {
-            userName = aclAnonymousEntryName;
+        // if no session given, simply return false
+        if (session==null){
+            return false;
         }
 
-        if (Util.isNullOrEmpty(userName) || Util.isNullOrEmpty(aclPath) || Util.isNullOrEmpty(prm))
-            return false;
+        // get user object from session
+        CRUser crUser = (CRUser)session.getAttribute(WebConstants.USER_SESSION_ATTR);
+        
+        // get user name from user object, or set to null if user object null
+        String userName = crUser==null ? null : crUser.getUserName();
+        
+        // check if user with this name has this permission in this ACL
+        return CRUser.hasPermission(userName, aclPath, permission);
+    }
 
+    /**
+     * Looks up an ACL with the given path, and checks if the given user has the given
+     * permission in it. If no such ACL is found, the method returns false. If the ACL
+     * is found, and it has the given permission for the given user, the method returns
+     * true, otherwise false.
+     * 
+     * Situation where user name is null, is handled by the ACL library (it is treated as
+     * anonymous user).
+     * 
+     * If the ACL library throws an exception, it is not thrown onwards, but still logged
+     * at error level.
+     * 
+     * @param userName
+     * @param aclPath
+     * @param permission
+     * @return
+     */
+    public static boolean hasPermission(String userName, String aclPath, String permission){
+        
+        // consider missing ACL path or permission to be a programming error
+        if (Util.isNullOrEmpty(aclPath) || Util.isNullOrEmpty(permission)){
+            throw new IllegalArgumentException("ACL path and permission must not be blank!");
+        }
+        
         boolean result = false;
         try {
+            // get the ACL by the supplied path
             AccessControlListIF acl = AccessController.getAcl(aclPath);
+            
+            // if ACL found, check its permissions
             if (acl != null) {
-                result = acl.checkPermission(userName, prm);
+                
+                result = acl.checkPermission(userName, permission);
                 if (!result) {
-                    logger.debug("User " + userName + " does not have permission " + prm + " in acl \"" + aclPath + "\"");
+                    logger.debug("User " + userName + " does not have permission " + permission + " in acl \"" + aclPath + "\"");
                 }
             } else {
                 logger.warn("acl \"" + aclPath + "\" not found!");
             }
         } catch (SignOnException soe) {
+            // don't throw, but certainly log
             logger.error(soe.toString(), soe);
         }
 
