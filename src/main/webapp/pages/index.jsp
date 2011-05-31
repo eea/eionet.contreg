@@ -8,7 +8,7 @@
 <div style="float:right; background-color:white; width: 20em; padding-left: 1em;">
     <div class="action-box">
         <c:choose>
-            <c:when test='${sessionScope.crUser!=null}'>
+            <c:when test='${crfn:userHasPermission(pageContext.session, "/registrations", "u")}'>
                 <stripes:link href="/registerUrl.action" style="font-weight:bold">Suggest a URL!</stripes:link>
             </c:when>
             <c:otherwise>

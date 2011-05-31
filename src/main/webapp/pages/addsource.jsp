@@ -12,7 +12,7 @@
                     <td><label class="question required" for="harvesturl">URL</label></td>
                     <td><stripes:text id="harvesturl" name="harvestSource.url" size="80"/></td>
                 </tr>
-                <c:if test='${crfn:userHasPermission(pageContext.session, "/", "u")}'>
+                <c:if test='${crfn:userHasPermission(pageContext.session, "/registrations", "u")}'>
                     <tr>
                         <td><label class="question" for="emails">E-mails</label></td>
                         <td><stripes:text id="emails" name="harvestSource.emails" size="80"/></td>

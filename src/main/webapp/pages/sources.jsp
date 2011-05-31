@@ -6,7 +6,7 @@
 
     <stripes:layout-component name="contents">
 
-            <c:if test='${sessionScope.crUser!=null}'>
+            <c:if test='${crfn:userHasPermission(pageContext.session, "/registrations", "u")}'>
                 <div id="operations">
                     <ul>
                         <li>

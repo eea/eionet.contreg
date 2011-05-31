@@ -62,7 +62,7 @@
     </crfn:form>
     <c:choose>
         <c:when test="${not empty param.search}">
-            <c:if test="${empty actionBean.resultList and actionBean.uri and (not empty sessionScope.crUser)}">
+            <c:if test='${empty actionBean.resultList and actionBean.uri and crfn:userHasPermission(pageContext.session, "/registrations", "u")}'>
                 <stripes:link href="/registerUrl.action"> Register this URL
                     <stripes:param name="url" value="${actionBean.searchExpression}" />
                 </stripes:link>
