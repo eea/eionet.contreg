@@ -759,23 +759,28 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
         return resultList;
     }
+    /**
+     * SPARQL for checking if the URI is listed in user bookmarks.
+     */
+    private static final String SUBJECT_BOOKMARK_CHECK_QUERY = "select count(1)  where "
+        + "{ graph ?g {?s ?userBookmark ?o . filter( isIRI(?o)) filter (?o = ?subjectValue) "
+        + "filter (?g = ?userBookmarksFolder ) } }";
 
-    /*
-     * (non-Javadoc)
-     *
+    /**
+     * Checks if given subject is bookmarked in user bookmarks.
+     * @return boolean
      * @see eionet.cr.dao.HelperDAO#isSubjectUserBookmark(eionet.cr.web.security. CRUser, long)
      */
     @Override
     public boolean isSubjectUserBookmark(CRUser user, String subject) throws DAOException {
+        Bindings bindings = new Bindings();
+        bindings.setURI("userBookmark", Predicates.CR_BOOKMARK);
+        bindings.setURI("subjectValue", subject);
+        bindings.setURI("userBookmarksFolder", CRUser.bookmarksUri(user.getUserName()));
 
-        StringBuilder sparql = new StringBuilder();
-        sparql.append("select count(1)  where { ").append("graph ?g {?s <").append(Predicates.CR_BOOKMARK).append("> ?o . ")
-                .append("filter( isIRI(?o)) ").append("filter (?o = <").append(subject).append("> ) ").append("filter (?g = <")
-                .append(CRUser.bookmarksUri(user.getUserName())).append("> ) } }");
-
-        // this reader works only with Strings
+        //reader works only with Strings with Sesame/Virtuoso
         SingleObjectReader<String> reader = new SingleObjectReader<String>();
-        executeSPARQL(sparql.toString(), reader);
+        executeSPARQL(SUBJECT_BOOKMARK_CHECK_QUERY, bindings, reader);
 
         // resultlist contains 1 row including count of bookmark matches
         String urlCount = reader.getResultList().get(0);
