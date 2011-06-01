@@ -247,10 +247,17 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
             fileSubjectDTO.addObject(Predicates.DC_TITLE, objectDTO);
         }
 
-        logger.debug("Creating the cr:hasFile predicate");
         try {
-            // persist the prepared cr:hasFile and dc:title predicates
-            DAOFactory.get().getDao(HelperDAO.class).addTriples(homeSubjectDTO);
+            HelperDAO helperDao = DAOFactory.get().getDao(HelperDAO.class);
+
+            // persist the prepared "userHome cr:hasFile fileSubject" triple
+            logger.debug("Creating the cr:hasFile predicate");
+            helperDao.addTriples(homeSubjectDTO);
+            
+            // make sure that user home is now also registered in CR home context
+            if (!getUser().isHomeFolderRegistered()){
+                helperDao.registerUserFolderInCrHomeContext(getUser());
+            }
 
             // store file subject DTO if it has been initialized
             if (fileSubjectDTO != null) {
@@ -262,9 +269,9 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
                     List<String> predicateUris = Collections.singletonList(Predicates.DC_TITLE);
                     List<String> sourceUris = Collections.singletonList(getUser().getHomeUri());
 
-                    DAOFactory.get().getDao(HelperDAO.class).deleteSubjectPredicates(subjectUris, predicateUris, sourceUris);
+                    helperDao.deleteSubjectPredicates(subjectUris, predicateUris, sourceUris);
                 }
-                DAOFactory.get().getDao(HelperDAO.class).addTriples(fileSubjectDTO);
+                helperDao.addTriples(fileSubjectDTO);
             }
 
             // since user's home URI was used above as triple source, add it to HARVEST_SOURCE too
