@@ -9,7 +9,6 @@ import eionet.cr.dao.util.SearchExpression;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.util.sql.VirtuosoFullTextQuery;
-import eionet.cr.web.util.columns.SubjectLastModifiedColumn;
 
 /**
  *
@@ -50,7 +49,8 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper {
     protected String getOrderedQuery(List<Object> inParams) {
         StringBuilder strBuilder = new StringBuilder();
 
-        if (sortPredicate.equals(SubjectLastModifiedColumn.class.getSimpleName())) {
+        //if (sortPredicate.equals(SubjectLastModifiedColumn.class.getSimpleName())) {
+        if (sortPredicate.equals(Predicates.CR_LAST_MODIFIED)) {
             strBuilder.append("select ?s where { graph ?g {")
             .append("select ?s max(?time) AS ?order where {")
             .append("?s ?p ?o .").append(addFilterParams());

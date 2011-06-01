@@ -86,9 +86,8 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO {
             throw new DAOException(e.toString(), e);
         }
     }
-
     /**
-     * Executes SPARQL that is expected to have only one result and returns the unique value.
+     * Executes SPARQL with no bindings that is expected to have only one result and returns the unique value.
      * @param <T>
      * @param sql
      * @param params
@@ -98,8 +97,24 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO {
      */
     protected <T> T executeUniqueResultSPARQL(String sql,
             SPARQLResultSetReader<T> reader) throws DAOException {
+        
+        return executeUniqueResultSPARQL(sql, null, reader);
+    }
+    /**
+     * Executes SPARQL that is expected to have only one result and returns the unique value.
+     * @param <T>
+     * @param sql
+     * @param bindings Binding values for the prepared SPARQL
+     * @param params
+     * @param reader
+     * @return
+     * @throws DAOException if query fails
+     */
+    protected <T> T executeUniqueResultSPARQL(String sql, Bindings bindings,
+            SPARQLResultSetReader<T> reader) throws DAOException {
 
-        List<T> result = executeSPARQL(sql, reader);
+        
+        List<T> result = executeSPARQL(sql, bindings, reader);
         return (result == null || result.isEmpty()) ? null : result.get(0);
     }
 
@@ -147,7 +162,6 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO {
 
         Map<Long, SubjectDTO> subjectsMap = reader.getSubjectsMap();
         if (subjectsMap != null && !subjectsMap.isEmpty()) {
-
             for (String subjectUri : subjectUris) {
 
                 Long subjectHash = Long.valueOf(Hashes.spoHash(subjectUri));
@@ -228,7 +242,7 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO {
 
         strBuilder.append("OPTIONAL { ?g <").append(Predicates.CR_LAST_MODIFIED).append("> ?t } ");
 
-        strBuilder.append("}} ORDER BY ?s ?p ?o");
+        strBuilder.append("}} ORDER BY ?s ?p");
         return strBuilder.toString();
     }
     /**
@@ -241,7 +255,8 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO {
    protected int getExactRowCount(SearchHelper helper) throws DAOException {
 
        String query = helper.getCountQuery(new ArrayList<Object>());
-       Object resultObject = executeUniqueResultSPARQL(query, new SingleObjectReader<Long>());
+       Bindings bindings = helper.getQueryBindings();
+       Object resultObject = executeUniqueResultSPARQL(query, bindings, new SingleObjectReader<Long>());
        return Integer.valueOf(resultObject.toString());
    }
 }

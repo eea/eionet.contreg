@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
+import eionet.cr.util.Bindings;
 import eionet.cr.util.SortOrder;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.pagination.PagingRequest;
@@ -108,4 +109,18 @@ public abstract class AbstractSearchHelper implements SearchHelper {
      * @return String
      */
     public abstract String getMinMaxHashQuery(List<Object> inParams);
+
+
+    /** 
+    * Default implementation of getQueryBindings.
+    * Returns null if not specified in the helper implementation.
+    * @return prepared query bindings
+    */
+    @Override
+    public Bindings getQueryBindings() {
+        return null;
+    }
+    
+    
+    
 }

@@ -665,7 +665,7 @@ public class Util {
      * @return
      */
     public static boolean isSurroundedWithQuotes(String s) {
-        return s.startsWith("\"") && s.endsWith("\"");
+        return s.startsWith("\"") && s.endsWith("\"") && s.length()>1;
     }
 
     /**
@@ -724,5 +724,12 @@ public class Util {
         } else {
             return true;
         }
+    }
+    
+    public static String removeSurroundingQuotes(String s) {
+        if (!isSurroundedWithQuotes(s) ) {
+            return s;
+        }
+        return s.substring(1, s.indexOf("\"", 1) );
     }
 }

@@ -87,4 +87,41 @@ public class UtilTest extends TestCase{
         assertEquals("tag1", resultList.get(0));
 
     }
+    @Test
+    public void testSurrendedWithQuotes() {
+        //"
+        String s = "\"";
+        assertFalse(Util.isSurroundedWithQuotes(s));
+        //""
+        s = "\"\"";
+        assertTrue(Util.isSurroundedWithQuotes(s));
+        //"Fish"
+        s = "\"Fish\"";
+        assertTrue(Util.isSurroundedWithQuotes(s));
+        //""Cheese"
+        s = "\"\"Cheese\"";
+        assertTrue(Util.isSurroundedWithQuotes(s));
+        //Boo"
+        s  = "Boo\"";
+        assertFalse(Util.isSurroundedWithQuotes(s));
+    }
+    
+    @Test
+    public void testRemoveQuotes() {
+        //
+        String s = "";
+        assertEquals(Util.removeSurroundingQuotes(s), "");
+        //"
+        s = "\"";
+        assertEquals(Util.removeSurroundingQuotes(s), s);
+        s = "\"\"";
+        assertEquals(Util.removeSurroundingQuotes(s), "");
+        s = "fish";
+        assertEquals(Util.removeSurroundingQuotes(s), "fish");
+        s = "Home\"";
+        assertEquals(Util.removeSurroundingQuotes(s), s);
+        s = "\"Dataflow\"";
+        assertEquals(Util.removeSurroundingQuotes(s), "Dataflow");
+        
+    }
 }

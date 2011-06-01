@@ -22,6 +22,7 @@ package eionet.cr.web.util.columns;
 
 import java.util.Date;
 
+import eionet.cr.common.Predicates;
 import eionet.cr.dto.SubjectDTO;
 
 /**
@@ -53,7 +54,8 @@ public class SubjectLastModifiedColumn extends SearchResultColumn {
      * @see eionet.cr.web.util.columns.SearchResultColumn#getSortParamValue()
      */
     public String getSortParamValue() {
-        return getClass().getSimpleName();
+        return Predicates.CR_LAST_MODIFIED;
+//        return getClass().getSimpleName();
     }
 
 }

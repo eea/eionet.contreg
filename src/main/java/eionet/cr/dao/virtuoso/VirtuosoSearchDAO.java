@@ -27,6 +27,7 @@ import eionet.cr.dao.virtuoso.helpers.VirtuosoFreeTextSearchHelper;
 import eionet.cr.dao.virtuoso.helpers.VirtuosoReferencesSearchHelper;
 import eionet.cr.dao.virtuoso.helpers.VirtuosoSearchBySourceHelper;
 import eionet.cr.dto.SubjectDTO;
+import eionet.cr.util.Bindings;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.Util;
@@ -185,16 +186,18 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
                 pagingRequest, sortingRequest);
 
         // create the list of IN parameters of the query
-        ArrayList<Object> inParams = new ArrayList<Object>();
 
         // let the helper create the query and fill IN parameters
+        //TODO get rid of inParams
+        ArrayList<Object> inParams = new ArrayList<Object>();
         String query = helper.getQuery(inParams);
+        Bindings bindings = helper.getQueryBindings();
 
         long startTime = System.currentTimeMillis();
         logger.trace("Search by filters, executing subject finder query: " + query);
 
         // execute the query, with the IN parameters
-        List<String> subjectUris = executeSPARQL(query, new SingleObjectReader<String>());
+        List<String> subjectUris = executeSPARQL(query, bindings, new SingleObjectReader<String>());
 
         logger.debug("Search by filters, find subjects query time " + Util.durationSince(startTime));
 
@@ -341,6 +344,8 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
 
     }
 
+    private static final String CRTAG_SUBPROPS_SPARQL = "SELECT ?s WHERE { ?s ?subPropertyOf  ?crTagPredicate  }";
+    
     /**
      * Search by tags implementation in Virtuoso.
      *
@@ -369,9 +374,13 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
         // find manually all subProperties of cr#tag and add to filter
 
         List<String> selectedAndTagPredicates = new ArrayList<String>(selectedPredicates);
-        String sparql = "select  ?s    WHERE { ?s <" + Predicates.RDFS_SUBPROPERTY_OF + ">  <" + Predicates.CR_TAG + ">  }";
+
+        Bindings bindings = new Bindings();
+        bindings.setURI("subPropertyOf", Predicates.RDFS_SUBPROPERTY_OF);
+        bindings.setURI("crTagPredicate", Predicates.CR_TAG);
         SingleObjectReader<String> reader = new SingleObjectReader<String>();
-        executeSPARQL(sparql, reader);
+
+        executeSPARQL(CRTAG_SUBPROPS_SPARQL, bindings, reader);
         selectedAndTagPredicates.addAll(reader.getResultList());
         // <--
 
@@ -387,12 +396,12 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
 
         // let the helper create the query and fill IN parameters
         String query = helper.getQuery(inParams);
-
+        
         long startTime = System.currentTimeMillis();
         logger.trace("Search by filters, executing subject finder query: " + query);
 
         // execute the query, with the IN parameters
-        List<String> subjectUris = executeSPARQL(query, new SingleObjectReader<String>());
+        List<String> subjectUris = executeSPARQL(query, helper.getQueryBindings(),  new SingleObjectReader<String>());
 
         logger.debug("Search by tags, find subjects query time " + Util.durationSince(startTime));
 
@@ -508,4 +517,5 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
         // the result Pair contains total number of subjects and the requested sub-list
         return new Pair<Integer, List<SubjectDTO>>(totalMatchCount, resultList);
     }
+   
 }

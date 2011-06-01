@@ -22,6 +22,8 @@ package eionet.cr.dao.helpers;
 
 import java.util.List;
 
+import eionet.cr.util.Bindings;
+
 /**
  *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
@@ -49,4 +51,10 @@ public interface SearchHelper {
      * @return
      */
     public abstract String getMinMaxHashQuery(List<Object> inParams);
+
+    /**
+     * Bindings of the search query.
+     * @return filled query bindings for the query to be used in the PreparedStatement
+     */
+    public abstract Bindings getQueryBindings();
 }

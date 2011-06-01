@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -16,9 +17,9 @@ import org.openrdf.query.Query;
 import eionet.cr.common.CRRuntimeException;
 
 /**
- * 
+ *
  * @author jaanus
- * 
+ *
  */
 public class Bindings {
 
@@ -36,7 +37,7 @@ public class Bindings {
     }
 
     /**
-     * 
+     *
      * @param name
      * @param value
      */
@@ -45,7 +46,7 @@ public class Bindings {
     }
 
     /**
-     * 
+     *
      * @param name
      * @param value
      */
@@ -54,7 +55,7 @@ public class Bindings {
     }
 
     /**
-     * 
+     *
      * @param name
      * @param value
      */
@@ -63,7 +64,7 @@ public class Bindings {
     }
 
     /**
-     * 
+     *
      * @param name
      * @param value
      */
@@ -72,7 +73,7 @@ public class Bindings {
     }
 
     /**
-     * 
+     *
      * @param name
      * @param value
      */
@@ -81,7 +82,7 @@ public class Bindings {
     }
 
     /**
-     * 
+     *
      * @param name
      * @param value
      */
@@ -90,7 +91,7 @@ public class Bindings {
     }
 
     /**
-     * 
+     *
      * @param name
      * @param value
      */
@@ -99,7 +100,7 @@ public class Bindings {
     }
 
     /**
-     * 
+     *
      * @param name
      * @param value
      */
@@ -108,7 +109,7 @@ public class Bindings {
     }
 
     /**
-     * 
+     *
      * @param name
      * @param value
      */
@@ -117,7 +118,7 @@ public class Bindings {
     }
 
     /**
-     * 
+     *
      * @param name
      * @param value
      */
@@ -126,7 +127,7 @@ public class Bindings {
     }
 
     /**
-     * 
+     *
      * @param name
      * @param value
      */
@@ -140,7 +141,7 @@ public class Bindings {
     }
 
     /**
-     * 
+     *
      * @param query
      * @param valueFactory
      */
@@ -183,5 +184,20 @@ public class Bindings {
                 throw new IllegalArgumentException("Unsupported type is bound to name " + name);
             }
         }
+    }
+
+    /**
+     * Textual representation of predicates and values.
+     * @return key value (Object.toString()) pairs separated by equal sign.
+     */
+    public String toString() {
+        StringBuilder s = new StringBuilder();
+        for (Iterator<String> i = this.bindings.keySet().iterator(); i.hasNext();) {
+            String k  = i.next();
+            Object o = this.bindings.get(k);
+            s.append(k).append("=").append(o).append("\r\n");
+        }
+
+        return s.toString();
     }
 }
