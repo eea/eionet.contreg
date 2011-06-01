@@ -15,6 +15,7 @@ import org.openrdf.model.ValueFactory;
 import org.openrdf.query.Query;
 
 import eionet.cr.common.CRRuntimeException;
+import eionet.cr.dao.virtuoso.VirtuosoBaseDAO;
 
 /**
  *
@@ -132,11 +133,15 @@ public class Bindings {
      * @param value
      */
     public void setURI(String name, String value) {
-
-        try {
-            bindings.put(name, new URI(value));
-        } catch (URISyntaxException e) {
-            throw new IllegalArgumentException(e);
+        if (!value.startsWith(VirtuosoBaseDAO.BNODE_URI_PREFIX)) {
+            try {
+                bindings.put(name, new URI(value));
+            } catch (URISyntaxException e) {
+                throw new IllegalArgumentException(e);
+            }
+        //Blank nods are URI's as well
+        } else {
+            bindings.put(name, new BlankNode(value));
         }
     }
 
@@ -180,6 +185,8 @@ public class Bindings {
                 GregorianCalendar calendar = new GregorianCalendar();
                 calendar.setTime((Date) value);
                 query.setBinding(name, valueFactory.createLiteral(datatypeFactory.newXMLGregorianCalendar(calendar)));
+            } else if (value instanceof BlankNode) {
+                query.setBinding(name, valueFactory.createBNode(((BlankNode)value).getId()));
             } else {
                 throw new IllegalArgumentException("Unsupported type is bound to name " + name);
             }
@@ -199,5 +206,19 @@ public class Bindings {
         }
 
         return s.toString();
+    }
+    
+    /**
+     * Private wrapper for blanknode binding.
+     */
+    private static class BlankNode {
+        String id;
+        BlankNode (String id) {
+            this.id = id.substring(VirtuosoBaseDAO.BNODE_URI_PREFIX.length());
+        }
+        
+        public String getId() {
+            return id;
+        }
     }
 }
