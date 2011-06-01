@@ -50,11 +50,10 @@ import eionet.cr.web.util.columns.SearchResultColumn;
 
 /**
  * @author altnyris
- *
+ * 
  */
 @UrlBinding("/sources.action")
-public class HarvestSourcesActionBean extends
-        AbstractSearchActionBean<HarvestSourceDTO> {
+public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSourceDTO> {
 
     /** */
     private static final String UNAVAILABLE_TYPE = "unavail";
@@ -63,8 +62,7 @@ public class HarvestSourcesActionBean extends
     private static final String SCHEMAS = "schemas";
 
     /** */
-    private static final String[] EXCLUDE_FROM_SORT_AND_PAGING_URLS = {
-            "harvest", "delete", "sourceUrl" };
+    private static final String[] EXCLUDE_FROM_SORT_AND_PAGING_URLS = { "harvest", "delete", "sourceUrl" };
 
     /** */
     public static final List<Pair<String, String>> sourceTypes;
@@ -89,10 +87,8 @@ public class HarvestSourcesActionBean extends
         sourceTypes.add(new Pair<String, String>(null, "Tracked files"));
         sourceTypes.add(new Pair<String, String>(PRIORITY, "Priority"));
         sourceTypes.add(new Pair<String, String>(SCHEMAS, "Schemas"));
-        sourceTypes.add(new Pair<String, String>(FAILED_HARVESTS,
-                "Failed harvests"));
-        sourceTypes.add(new Pair<String, String>(UNAVAILABLE_TYPE,
-                "Unavaliable"));
+        sourceTypes.add(new Pair<String, String>(FAILED_HARVESTS, "Failed harvests"));
+        sourceTypes.add(new Pair<String, String>(UNAVAILABLE_TYPE, "Unavaliable"));
 
         columnList = new LinkedList<SearchResultColumn>();
         GenericColumn checkbox = new GenericColumn();
@@ -128,39 +124,28 @@ public class HarvestSourcesActionBean extends
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
                 }
-                filterString = "%"
-                        + StringEscapeUtils.escapeSql(this.searchString) + "%";
+                filterString = "%" + StringEscapeUtils.escapeSql(this.searchString) + "%";
             }
 
             PagingRequest pagingRequest = PagingRequest.create(getPageN());
-            SortingRequest sortingRequest = new SortingRequest(sortP,
-                    SortOrder.parse(sortO));
+            SortingRequest sortingRequest = new SortingRequest(sortP, SortOrder.parse(sortO));
 
             Pair<Integer, List<HarvestSourceDTO>> pair = null;
             if (StringUtils.isBlank(type)) {
-                pair = factory.getDao(HarvestSourceDAO.class)
-                        .getHarvestSources(filterString, pagingRequest,
-                                sortingRequest);
+                pair = factory.getDao(HarvestSourceDAO.class).getHarvestSources(filterString, pagingRequest, sortingRequest);
             } else if (PRIORITY.equals(type)) {
-                pair = factory.getDao(HarvestSourceDAO.class)
-                        .getPrioritySources(filterString, pagingRequest,
-                                sortingRequest);
+                pair = factory.getDao(HarvestSourceDAO.class).getPrioritySources(filterString, pagingRequest, sortingRequest);
             } else if (UNAVAILABLE_TYPE.equals(type)) {
-                pair = factory.getDao(HarvestSourceDAO.class)
-                        .getHarvestSourcesUnavailable(filterString,
-                                pagingRequest, sortingRequest);
+                pair = factory.getDao(HarvestSourceDAO.class).getHarvestSourcesUnavailable(filterString, pagingRequest,
+                        sortingRequest);
             } else if (FAILED_HARVESTS.equals(type)) {
-                pair = factory.getDao(HarvestSourceDAO.class)
-                        .getHarvestSourcesFailed(filterString, pagingRequest,
-                                sortingRequest);
+                pair = factory.getDao(HarvestSourceDAO.class).getHarvestSourcesFailed(filterString, pagingRequest, sortingRequest);
             } else if (SCHEMAS.equals(type)) {
                 // Get comma separated sources that are included into
                 // inferencing ruleset
-                String sourceUris = factory.getDao(HarvestSourceDAO.class)
-                        .getSourcesInInferenceRules();
-                pair = factory.getDao(HarvestSourceDAO.class)
-                        .getInferenceSources(filterString, pagingRequest,
-                                sortingRequest, sourceUris);
+                String sourceUris = factory.getDao(HarvestSourceDAO.class).getSourcesInInferenceRules();
+                pair = factory.getDao(HarvestSourceDAO.class).getInferenceSources(filterString, pagingRequest, sortingRequest,
+                        sourceUris);
             }
 
             if (pair != null) {
@@ -173,8 +158,7 @@ public class HarvestSourcesActionBean extends
                 matchCount = 0;
             }
 
-            setPagination(Pagination.createPagination(matchCount,
-                    pagingRequest.getPageNumber(), this));
+            setPagination(Pagination.createPagination(matchCount, pagingRequest.getPageNumber(), this));
 
             return new ForwardResolution("/pages/sources.jsp");
         } catch (DAOException exception) {
@@ -183,7 +167,7 @@ public class HarvestSourcesActionBean extends
     }
 
     /**
-     *
+     * 
      * @return Resolution
      * @throws DAOException
      */
@@ -196,19 +180,20 @@ public class HarvestSourcesActionBean extends
                 // administrator can delete any source.
                 // A priority source can not be deleted. The administrator must
                 // first change it to a non-priority source, then delete it.
+
                 List<String> sourcesToBeDeleted = new ArrayList<String>();
                 List<String> notOwner = new ArrayList<String>();
                 List<String> prioritySources = new ArrayList<String>();
 
                 for (String uri : sourceUrl) {
-                    HarvestSourceDTO source = factory.getDao(
-                            HarvestSourceDAO.class).getHarvestSourceByUrl(uri);
+
+                    HarvestSourceDTO source = factory.getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(uri);
                     if (source != null) {
+
+                        String sourceOwner = source.getOwner();
                         if (source.isPrioritySource()) {
                             prioritySources.add(uri);
-                        } else if (getUser().isAdministrator()
-                                || (source.getOwner() != null && source
-                                        .getOwner().equals(getUserName()))) {
+                        } else if (getUser().isAdministrator() || (sourceOwner != null && sourceOwner.equals(getUserName()))) {
                             sourcesToBeDeleted.add(uri);
                         } else {
                             notOwner.add(uri);
@@ -216,8 +201,7 @@ public class HarvestSourcesActionBean extends
                     }
                 }
 
-                factory.getDao(HarvestSourceDAO.class).queueSourcesForDeletion(
-                        sourcesToBeDeleted);
+                factory.getDao(HarvestSourceDAO.class).queueSourcesForDeletion(sourcesToBeDeleted);
 
                 if (sourcesToBeDeleted != null && !sourcesToBeDeleted.isEmpty()) {
                     StringBuffer msg = new StringBuffer();
@@ -276,7 +260,7 @@ public class HarvestSourcesActionBean extends
     }
 
     /**
-     *
+     * 
      * @return List<Pair<String, String>>
      */
     public List<Pair<String, String>> getSourceTypes() {
@@ -307,7 +291,7 @@ public class HarvestSourcesActionBean extends
     }
 
     /**
-     *
+     * 
      * @return String
      */
     public String getPagingUrl() {
@@ -338,7 +322,7 @@ public class HarvestSourcesActionBean extends
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
      */
     public List<SearchResultColumn> getColumns() throws DAOException {

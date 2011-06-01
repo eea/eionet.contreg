@@ -87,7 +87,7 @@ public class CRUser {
      * @return boolean
      */
     public boolean isAdministrator() {
-        return hasPermission("/", "u");
+        return hasPermission("/admin", "a");
     }
     
     /**
