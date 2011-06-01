@@ -28,6 +28,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.tee.uit.security.AccessControlListIF;
 import com.tee.uit.security.AccessController;
+import com.tee.uit.security.AclNotFoundException;
 import com.tee.uit.security.SignOnException;
 
 import eionet.cr.config.GeneralConfig;
@@ -40,9 +41,9 @@ import eionet.cr.web.util.WebConstants;
 
 /**
  * Class represents authenticated user.
- *
+ * 
  * @author altnyris
- *
+ * 
  */
 public class CRUser {
 
@@ -59,10 +60,12 @@ public class CRUser {
      * Is user home folder registered under CR root home.
      */
     private boolean homeFolderRegistered;
-    
+
     /**
      * Creates CRUser.
-     * @param userName username
+     * 
+     * @param userName
+     *            username
      */
     public CRUser(final String userName) {
         this.userName = userName;
@@ -76,7 +79,8 @@ public class CRUser {
     }
 
     /**
-     * @param username the userName to set
+     * @param username
+     *            the userName to set
      */
     public void setUserName(final String username) {
         this.userName = username;
@@ -84,28 +88,29 @@ public class CRUser {
 
     /**
      * True if user is listed as administrator in ACL.
+     * 
      * @return boolean
      */
     public boolean isAdministrator() {
         return hasPermission("/admin", "a");
     }
-    
+
     /**
-     * Returns the value of {@link #hasPermission(String, String, String)}, using the given ACL path,
-     * the given permission, and the name of this user.
+     * Returns the value of {@link #hasPermission(String, String, String)}, using the given ACL path, the given permission, and the
+     * name of this user.
      * 
      * @param aclPath
      * @param permission
      * @return
      */
-    public boolean hasPermission(String aclPath, String permission){
+    public boolean hasPermission(String aclPath, String permission) {
         return CRUser.hasPermission(userName, aclPath, permission);
     }
 
     /**
-     * Returns the value of {@link #hasPermission(String, String, String)}, using the given ACL path,
-     * the given permission, and the name of the user found in the given session. If no user found
-     * in session, the method will be called with user name set to null.
+     * Returns the value of {@link #hasPermission(String, String, String)}, using the given ACL path, the given permission, and the
+     * name of the user found in the given session. If no user found in session, the method will be called with user name set to
+     * null.
      * 
      * @param session
      * @param aclPath
@@ -115,62 +120,62 @@ public class CRUser {
     public static boolean hasPermission(HttpSession session, String aclPath, String permission) {
 
         // if no session given, simply return false
-        if (session==null){
+        if (session == null) {
             return false;
         }
 
         // get user object from session
-        CRUser crUser = (CRUser)session.getAttribute(WebConstants.USER_SESSION_ATTR);
-        
+        CRUser crUser = (CRUser) session.getAttribute(WebConstants.USER_SESSION_ATTR);
+
         // get user name from user object, or set to null if user object null
-        String userName = crUser==null ? null : crUser.getUserName();
-        
+        String userName = crUser == null ? null : crUser.getUserName();
+
         // check if user with this name has this permission in this ACL
         return CRUser.hasPermission(userName, aclPath, permission);
     }
 
     /**
-     * Looks up an ACL with the given path, and checks if the given user has the given
-     * permission in it. If no such ACL is found, the method returns false. If the ACL
-     * is found, and it has the given permission for the given user, the method returns
-     * true, otherwise false.
+     * Looks up an ACL with the given path, and checks if the given user has the given permission in it. If no such ACL is found,
+     * the method returns false. If the ACL is found, and it has the given permission for the given user, the method returns true,
+     * otherwise false.
      * 
-     * Situation where user name is null, is handled by the ACL library (it is treated as
-     * anonymous user).
+     * Situation where user name is null, is handled by the ACL library (it is treated as anonymous user).
      * 
-     * If the ACL library throws an exception, it is not thrown onwards, but still logged
-     * at error level.
+     * If the ACL library throws an exception, it is not thrown onwards, but still logged at error level.
      * 
      * @param userName
      * @param aclPath
      * @param permission
      * @return
      */
-    public static boolean hasPermission(String userName, String aclPath, String permission){
-        
+    public static boolean hasPermission(String userName, String aclPath, String permission) {
+
         // consider missing ACL path or permission to be a programming error
-        if (Util.isNullOrEmpty(aclPath) || Util.isNullOrEmpty(permission)){
+        if (Util.isNullOrEmpty(aclPath) || Util.isNullOrEmpty(permission)) {
             throw new IllegalArgumentException("ACL path and permission must not be blank!");
         }
-        
+
         boolean result = false;
         try {
             // get the ACL by the supplied path
             AccessControlListIF acl = AccessController.getAcl(aclPath);
-            
+
             // if ACL found, check its permissions
             if (acl != null) {
-                
+
                 result = acl.checkPermission(userName, permission);
                 if (!result) {
-                    logger.debug("User " + userName + " does not have permission " + permission + " in acl \"" + aclPath + "\"");
+                    logger.debug("User " + userName + " does not have permission " + permission + " in ACL \"" + aclPath + "\"");
                 }
             } else {
-                logger.warn("acl \"" + aclPath + "\" not found!");
+                logger.warn("ACL \"" + aclPath + "\" not found!");
             }
         } catch (SignOnException soe) {
-            // don't throw, but certainly log
-            logger.error(soe.toString(), soe);
+            if (soe instanceof AclNotFoundException) {
+                logger.warn("ACL \"" + aclPath + "\" not found!");
+            } else {
+                logger.error(soe.toString(), soe);
+            }
         }
 
         return result;
@@ -178,6 +183,7 @@ public class CRUser {
 
     /**
      * Returns the CR application URL defined in cr.proprties, such as http://cr.eionet.europa.eu.
+     * 
      * @return the URL.
      */
     private static String appHomeURL() {
@@ -187,6 +193,7 @@ public class CRUser {
 
     /**
      * Returns home URL of the user.
+     * 
      * @return String
      */
     public String getHomeUri() {
@@ -195,7 +202,9 @@ public class CRUser {
 
     /**
      * Returns review URL of the user.
-     * @param reviewId Id of review
+     * 
+     * @param reviewId
+     *            Id of review
      * @return String review URL
      */
     public String getReviewUri(final int reviewId) {
@@ -203,7 +212,7 @@ public class CRUser {
     }
 
     /**
-     *
+     * 
      * @return
      */
     public String getReviewAttachmentUri(int reviewId, String attachmentFileName) {
@@ -212,6 +221,7 @@ public class CRUser {
 
     /**
      * Registrations uri.
+     * 
      * @return String URI
      */
     public String getRegistrationsUri() {
@@ -220,6 +230,7 @@ public class CRUser {
 
     /**
      * Bookmarks URI of the user.
+     * 
      * @return String URL
      */
     public String getBookmarksUri() {
@@ -228,6 +239,7 @@ public class CRUser {
 
     /**
      * History URI of the user.
+     * 
      * @return String URI
      */
     public String getHistoryUri() {
@@ -236,7 +248,9 @@ public class CRUser {
 
     /**
      * Home Item URI.
-     * @param uri String
+     * 
+     * @param uri
+     *            String
      * @return String
      */
     public String getHomeItemUri(String uri) {
@@ -245,6 +259,7 @@ public class CRUser {
 
     /**
      * ROOT Home URI for all user fodlers.
+     * 
      * @return String
      */
     public static String rootHomeUri() {
@@ -254,7 +269,9 @@ public class CRUser {
 
     /**
      * Home URI of the user.
-     * @param userName user name
+     * 
+     * @param userName
+     *            user name
      * @return String
      */
     public static String homeUri(String userName) {
@@ -267,7 +284,7 @@ public class CRUser {
     }
 
     /**
-     *
+     * 
      * @param userName
      * @param uri
      * @return
@@ -282,7 +299,7 @@ public class CRUser {
     }
 
     /**
-     *
+     * 
      * @param userName
      * @return
      */
@@ -292,7 +309,7 @@ public class CRUser {
     }
 
     /**
-     *
+     * 
      * @param userName
      * @return
      */
@@ -302,7 +319,7 @@ public class CRUser {
     }
 
     /**
-     *
+     * 
      * @param userName
      * @return
      */
@@ -328,29 +345,29 @@ public class CRUser {
     /**
      * @throws DAOException
      */
-    public void loadUserProperties() throws DAOException{
+    public void loadUserProperties() throws DAOException {
         UserHomeDAO userHomeDAO = DAOFactory.get().getDao(UserHomeDAO.class);
         boolean isUserHomeFolderREgistered = userHomeDAO.isUserFolderRegisteredInCrHomeContext(this);
         setHomeFolderRegistered(isUserHomeFolderREgistered);
     }
-    
+
     /**
      * 
      * @param uriString
      * @return
      */
-    public static boolean isHomeUri(String uriString){
-        
-        return uriString!=null && uriString.startsWith(CRUser.rootHomeUri());
+    public static boolean isHomeUri(String uriString) {
+
+        return uriString != null && uriString.startsWith(CRUser.rootHomeUri());
     }
-    
+
     /**
      * 
      * @param uriString
      * @return
      */
-    public static String getUserNameFromUri(String uriString){
-        
+    public static String getUserNameFromUri(String uriString) {
+
         String userHomesPath = CRUser.rootHomeUri();
         if (!userHomesPath.endsWith("/")) {
             userHomesPath = userHomesPath + "/";

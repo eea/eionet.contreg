@@ -62,12 +62,11 @@
                 <td colspan="2" style="padding-top: 10px">
                     <c:if test='${crfn:userHasPermission(pageContext.session, "/registrations", "u")}'>
                         <stripes:submit name="goToEdit" value="Edit" title="Edit this harvest source"/>
+                        <stripes:submit name="scheduleUrgentHarvest" value="Schedule urgent harvest" />
                     </c:if>
-                    <stripes:submit name="scheduleUrgentHarvest" value="Schedule urgent harvest" />
                     <stripes:submit name="export" value="Export triples" />
                 </td>
             </tr>
-
 
         </table>
     </crfn:form>

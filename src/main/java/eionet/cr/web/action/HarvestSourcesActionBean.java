@@ -44,6 +44,7 @@ import eionet.cr.util.SortingRequest;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.pagination.Pagination;
 import eionet.cr.util.pagination.PagingRequest;
+import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.columns.GenericColumn;
 import eionet.cr.web.util.columns.HarvestSourcesColumn;
 import eionet.cr.web.util.columns.SearchResultColumn;
@@ -66,7 +67,11 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
 
     /** */
     public static final List<Pair<String, String>> sourceTypes;
-    private static final List<SearchResultColumn> columnList;
+    
+    /** */
+    private static final GenericColumn checkboxColumn;
+    private static final HarvestSourcesColumn urlColumn;
+    private static final HarvestSourcesColumn dateColumn;
 
     /**
      * the string to be searched
@@ -80,9 +85,13 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
 
     /** */
     private List<String> sourceUrl;
+    
+    /** */
+    private List<SearchResultColumn> columnList;
 
     /** */
     static {
+        // initialize the tabs of the harvest sources page
         sourceTypes = new LinkedList<Pair<String, String>>();
         sourceTypes.add(new Pair<String, String>(null, "Tracked files"));
         sourceTypes.add(new Pair<String, String>(PRIORITY, "Priority"));
@@ -90,24 +99,21 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
         sourceTypes.add(new Pair<String, String>(FAILED_HARVESTS, "Failed harvests"));
         sourceTypes.add(new Pair<String, String>(UNAVAILABLE_TYPE, "Unavaliable"));
 
-        columnList = new LinkedList<SearchResultColumn>();
-        GenericColumn checkbox = new GenericColumn();
-        checkbox.setTitle("");
-        checkbox.setSortable(false);
-        checkbox.setEscapeXml(false);
-        columnList.add(checkbox);
+        // initialize column objects that will be used as columns in the harvest sources page
+        
+        checkboxColumn = new GenericColumn();
+        checkboxColumn.setTitle("");
+        checkboxColumn.setSortable(false);
+        checkboxColumn.setEscapeXml(false);
 
-        HarvestSourcesColumn urlColumn = new HarvestSourcesColumn(false);
+        urlColumn = new HarvestSourcesColumn(false);
         urlColumn.setSortable(true);
         urlColumn.setTitle("URL");
         urlColumn.setEscapeXml(false);
-        columnList.add(urlColumn);
 
-        HarvestSourcesColumn dateColumn = new HarvestSourcesColumn(true);
+        dateColumn = new HarvestSourcesColumn(true);
         dateColumn.setSortable(true);
         dateColumn.setTitle("Last harvest");
-        columnList.add(dateColumn);
-
     }
 
     /**
@@ -326,6 +332,18 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
      * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
      */
     public List<SearchResultColumn> getColumns() throws DAOException {
+        
+        if (columnList==null){
+            
+            columnList = new ArrayList<SearchResultColumn>();
+            // display checkbox only when current session allows update rights in registrations ACL
+            if (CRUser.hasPermission(getContext().getRequest().getSession(), "/registrations", "u")){
+                columnList.add(checkboxColumn);
+            }
+            columnList.add(urlColumn);
+            columnList.add(dateColumn);
+        }
+        
         return columnList;
     }
 

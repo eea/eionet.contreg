@@ -67,27 +67,31 @@
 
                         <c:set var="subjectUrl" value="${actionBean.subject.url}"/>
                         <c:set var="subjectUri" value="${actionBean.subject.uri}"/>
-                        <c:set var="allowEdit" value="false"/>
+                        
+                        <c:set var="registrationsAllowed" value='${crfn:userHasPermission(pageContext.session, "/registrations", "u")}'/>
+                        
+                        <c:set var="editAllowed" value="${registrationsAllowed && !subject.anonymous}"/>
+                        <c:set var="harvestAllowed" value="${editAllowed && subjectUrl!=null && !actionBean.currentlyHarvested}"/>
+                        <c:set var="sourceReadActionsAllowed" value="${actionBean.uriIsHarvestSource}"/>
+                        <c:set var="downloadAllowed" value="${actionBean.subjectDownloadable}"/>
+                        <c:set var="addBookmarkAllowed" value="${registrationsAllowed && !actionBean.subjectIsUserBookmark}"/>
+                        <c:set var="removeBookmarkAllowed" value="${actionBean.subjectIsUserBookmark}"/>
+                        <c:set var="addReviewAllowed" value="${registrationsAllowed && subjectUrl!=null}"/>
+                        
+                        <c:set var="displayOperations" value="${editAllowed || harvestAllowed || sourceReadActionsAllowed || downloadAllowed || addBookmarkAllowed || removeBookmarkAllowed || addReviewAllowed}"/>
 
-                        <c:if test='${actionBean.adminLoggedIn}'>
-                            <c:set var="displayOperations" value="true"/>
-                            <c:if test="${!subject.anonymous}">
-                                <c:set var="allowEdit" value="true"/>
-                            </c:if>
-                        </c:if>
-
-                         <c:if test="${displayOperations}">
+                        <c:if test="${displayOperations}">
                             <ul id="dropdown-operations">
                                 <li><a href="#">Operations</a>
                                     <ul>
-                                        <c:if test="${allowEdit}">
+                                        <c:if test="${editAllowed}">
                                             <li>
                                                 <stripes:link class="link-plain" href="/factsheet.action" event="${actionBean.context.eventName=='edit' ? 'view' : 'edit'}">${actionBean.context.eventName=='edit' ? 'View' : 'Edit'}
                                                     <stripes:param name="uri" value="${subjectUri}"/>
                                                 </stripes:link>
                                             </li>
                                         </c:if>
-                                        <c:if test="${subjectUrl!=null && actionBean.currentlyHarvested==false}">
+                                        <c:if test="${harvestAllowed}">
                                             <li>
                                                 <stripes:url value="${actionBean.urlBinding}" event="harvestAjax" var="url">
                                                         <stripes:param name="uri" value="${actionBean.uri}"/>
@@ -99,7 +103,7 @@
                                             </li>
                                         </c:if>
                                     
-                                        <c:if test="${actionBean.uriIsHarvestSource}">
+                                        <c:if test="${sourceReadActionsAllowed}">
                                             <li>
                                             <stripes:link class="link-plain" href="/source.action?view=&harvestSource.url=${ subjectUrl }">Source details</stripes:link>
                                             </li>
@@ -107,12 +111,12 @@
                                             <stripes:link class="link-plain" href="/source.action?export=&harvestSource.url=${subjectUrl}">Export triples</stripes:link>
                                             </li>
                                         </c:if>
-                                        <c:if test="${actionBean.subjectDownloadable}">
+                                        <c:if test="${downloadAllowed}">
                                             <li>
                                                 <stripes:link class="link-plain" href="/download?uri=${subjectUri}">Download</stripes:link>
                                             </li>
                                         </c:if>
-                                        <c:if test="${!actionBean.subjectIsUserBookmark}">
+                                        <c:if test="${addBookmarkAllowed}">
                                             <li>
                                             <stripes:link class="link-plain" href="/factsheet.action">Add bookmark
                                             <stripes:param name="addbookmark" value="" />
@@ -120,7 +124,7 @@
                                             </stripes:link>
                                             </li>
                                         </c:if>
-                                        <c:if test="${actionBean.subjectIsUserBookmark}">
+                                        <c:if test="${removeBookmarkAllowed}">
                                             <li>
                                             <stripes:link class="link-plain" href="/factsheet.action">Remove bookmark
                                             <stripes:param name="removebookmark" value="" />
@@ -129,7 +133,7 @@
 
                                             </li>
                                         </c:if>
-                                        <c:if test="${subjectUrl!=null}">
+                                        <c:if test="${addReviewAllowed}">
                                             <li>
                                                 <stripes:link class="link-plain" href="/home/${actionBean.userName}/reviews?add=Add&addUrl=${ subjectUrl }">Add review</stripes:link>
                                             </li>
@@ -164,7 +168,7 @@
 
                             <crfn:form action="/factsheet.action" method="post">
 
-                                <c:if test="${actionBean.context.eventName=='edit' && allowEdit}">
+                                <c:if test="${actionBean.context.eventName=='edit' && editAllowed}">
                                         <table>
                                             <tr>
                                                 <td><stripes:label for="propertySelect">Property:</stripes:label></td>
@@ -192,7 +196,7 @@
                                 </c:if>
 
                                 <stripes:layout-render name="/pages/common/factsheet_table.jsp"
-                                            subjectUrl="${subjectUrl}" subjectUri="${subjectUri}" displayCheckboxes="${actionBean.context.eventName=='edit' && allowEdit}"/>
+                                            subjectUrl="${subjectUrl}" subjectUri="${subjectUri}" displayCheckboxes="${actionBean.context.eventName=='edit' && editAllowed}"/>
 
                             </crfn:form>
                         </div>
@@ -204,7 +208,7 @@
                     <c:otherwise>
                         <c:choose>
                             <c:when test="${not empty actionBean.uri}">
-                                <c:if test='${crfn:userHasPermission(pageContext.session, "/", "u")}'>
+                                <c:if test='${crfn:userHasPermission(pageContext.session, "/registrations", "u")}'>
                                     <c:if test="${not empty actionBean.url}">
                                         <ul id="dropdown-operations">
                                             <li>
