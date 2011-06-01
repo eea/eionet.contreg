@@ -42,7 +42,6 @@ import eionet.cr.dao.readers.ObjectLabelReader;
 import eionet.cr.dao.readers.RDFExporter;
 import eionet.cr.dao.readers.RecentFilesReader;
 import eionet.cr.dao.readers.RecentUploadsReader;
-import eionet.cr.dao.readers.ResultSetReaderException;
 import eionet.cr.dao.readers.SubPropertiesReader;
 import eionet.cr.dao.readers.SubjectDataReader;
 import eionet.cr.dao.readers.TriplesReader;
@@ -1132,8 +1131,13 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * SPARQL for user uploaded files.
+     */
+    private static final String USER_UPLOADS_QUERY = "select ?s ?p ?o where { ?s ?p ?o. "
+        + "{ select distinct ?s where { ?userBookmarksFolder ?hasFile ?s }}} order by ?s ?p ?o";
+    /**
+     * User uploaded files.
      *
      * @see eionet.cr.dao.HelperDAO#getUserUploads(eionet.cr.web.security.CRUser)
      */
@@ -1147,41 +1151,30 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         if (StringUtils.isBlank(crUser.getUserName())) {
             throw new IllegalArgumentException("User name must not be blank");
         }
-
-        StringBuilder strBuilder = new StringBuilder().append("select ?s ?p ?o where").append(" { ?s ?p ?o.")
-                .append(" { select distinct ?s where { <").append(crUser.getHomeUri()).append("> <").append(Predicates.CR_HAS_FILE)
-                .append(">").append(" ?s }}}").append(" order by ?s ?p ?o");
+        Bindings bindings = new Bindings();
+        bindings.setURI("userBookmarksFolder", crUser.getHomeUri());
+        bindings.setURI("hasFile", Predicates.CR_HAS_FILE);
 
         UploadDTOReader reader = new UploadDTOReader();
-        RepositoryConnection conn = null;
-        try {
-            conn = SesameUtil.getRepositoryConnection();
-            SesameUtil.executeQuery(strBuilder.toString(), reader, conn);
+        executeSPARQL(USER_UPLOADS_QUERY, bindings, reader);
 
-            // loop through all the found uploads and make sure they all have the label set
-            Collection<UploadDTO> uploads = reader.getResultList();
-            for (UploadDTO uploadDTO : uploads) {
+        // loop through all the found uploads and make sure they all have the
+        // label set
+        Collection<UploadDTO> uploads = reader.getResultList();
+        for (UploadDTO uploadDTO : uploads) {
 
-                String currentLabel = uploadDTO.getLabel();
-                String subjectUri = uploadDTO.getSubjectUri();
-                String uriLabel = URIUtil.extractURILabel(subjectUri, SubjectDTO.NO_LABEL);
-                uriLabel = StringUtils.replace(uriLabel, "%20", " ");
+            String currentLabel = uploadDTO.getLabel();
+            String subjectUri = uploadDTO.getSubjectUri();
+            String uriLabel = URIUtil.extractURILabel(subjectUri, SubjectDTO.NO_LABEL);
+            uriLabel = StringUtils.replace(uriLabel, "%20", " ");
 
-                if (StringUtils.isBlank(currentLabel) && !StringUtils.isBlank(uriLabel))
-                    uploadDTO.setLabel(uriLabel);
-                else
-                    uploadDTO.setLabel(uriLabel + " (" + currentLabel + ")");
-            }
-
-            return uploads;
-
-        } catch (ResultSetReaderException e) {
-            throw new DAOException(e.toString(), e);
-        } catch (OpenRDFException e) {
-            throw new DAOException(e.toString(), e);
-        } finally {
-            SesameUtil.close(conn);
+            if (StringUtils.isBlank(currentLabel) && !StringUtils.isBlank(uriLabel))
+                uploadDTO.setLabel(uriLabel);
+            else
+                uploadDTO.setLabel(uriLabel + " (" + currentLabel + ")");
         }
+
+        return uploads;
 
         // StringBuilder strBuilder = new StringBuilder();
         // strBuilder.append("PREFIX cr: <").append(Namespace.CR.getUri()).append("> select ?url ?time FROM <")
