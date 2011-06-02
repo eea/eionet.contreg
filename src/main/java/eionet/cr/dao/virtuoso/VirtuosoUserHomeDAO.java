@@ -67,7 +67,7 @@ public class VirtuosoUserHomeDAO extends VirtuosoBaseDAO implements UserHomeDAO 
         logger.trace("Search folder contents, executing subject finder query: " + query);
 
         // execute the query, with the IN parameters
-        List<String> subjectUris = executeSPARQL(query, new SingleObjectReader<String>());
+        List<String> subjectUris = executeSPARQL(query, helper.getQueryBindings(), new SingleObjectReader<String>());
 
         logger.debug("Search folder contents, find subjects query time " + Util.durationSince(startTime));
 
