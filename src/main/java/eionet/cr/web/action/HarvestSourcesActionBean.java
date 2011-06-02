@@ -67,7 +67,7 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
 
     /** */
     public static final List<Pair<String, String>> sourceTypes;
-    
+
     /** */
     private static final GenericColumn checkboxColumn;
     private static final HarvestSourcesColumn urlColumn;
@@ -85,7 +85,7 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
 
     /** */
     private List<String> sourceUrl;
-    
+
     /** */
     private List<SearchResultColumn> columnList;
 
@@ -100,7 +100,7 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
         sourceTypes.add(new Pair<String, String>(UNAVAILABLE_TYPE, "Unavaliable"));
 
         // initialize column objects that will be used as columns in the harvest sources page
-        
+
         checkboxColumn = new GenericColumn();
         checkboxColumn.setTitle("");
         checkboxColumn.setSortable(false);
@@ -174,7 +174,36 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
 
     /**
      * 
-     * @return Resolution
+     * @param harvestSourceDTO
+     * @return
+     */
+    public boolean userCanDelete(HarvestSourceDTO harvestSourceDTO) {
+
+        boolean result = false;
+
+        // only non-priority sources can be deleted
+        // (a priority source must be first turned into non-priority to delete it)
+        if (harvestSourceDTO != null && !harvestSourceDTO.isPrioritySource()) {
+
+            String sourceOwner = harvestSourceDTO.getOwner();
+            CRUser user = getUser();
+
+            // should the source's owner be unspecified, any authenticated user can delete it
+            if (StringUtils.isBlank(sourceOwner) && user != null) {
+                result = true;
+            }
+            // otherwise an authenticated user can delete if he is an administrator or the source's owner
+            else if (user != null && (user.isAdministrator() || user.getUserName().equals(sourceOwner))) {
+                result = true;
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * 
+     * @return
      * @throws DAOException
      */
     public Resolution delete() throws DAOException {
@@ -196,12 +225,11 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
                     HarvestSourceDTO source = factory.getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(uri);
                     if (source != null) {
 
-                        String sourceOwner = source.getOwner();
-                        if (source.isPrioritySource()) {
-                            prioritySources.add(uri);
-                        } else if (getUser().isAdministrator() || (sourceOwner != null && sourceOwner.equals(getUserName()))) {
+                        if (userCanDelete(source)) {
                             sourcesToBeDeleted.add(uri);
-                        } else {
+                        } else if (source.isPrioritySource()) {
+                            prioritySources.add(uri);
+                        } else if (!getUserName().equals(source.getOwner())) {
                             notOwner.add(uri);
                         }
                     }
@@ -332,18 +360,18 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
      * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
      */
     public List<SearchResultColumn> getColumns() throws DAOException {
-        
-        if (columnList==null){
-            
+
+        if (columnList == null) {
+
             columnList = new ArrayList<SearchResultColumn>();
             // display checkbox only when current session allows update rights in registrations ACL
-            if (CRUser.hasPermission(getContext().getRequest().getSession(), "/registrations", "u")){
+            if (CRUser.hasPermission(getContext().getRequest().getSession(), "/registrations", "u")) {
                 columnList.add(checkboxColumn);
             }
             columnList.add(urlColumn);
             columnList.add(dateColumn);
         }
-        
+
         return columnList;
     }
 

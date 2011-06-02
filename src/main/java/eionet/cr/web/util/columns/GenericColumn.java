@@ -23,6 +23,7 @@ package eionet.cr.web.util.columns;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import eionet.cr.dto.HarvestSourceDTO;
+import eionet.cr.web.action.HarvestSourcesActionBean;
 
 /**
  * Basic implementation of {@link SearchResultColumn}.
@@ -38,7 +39,9 @@ public class GenericColumn extends SearchResultColumn {
      */
     @Override
     public String format(Object object) {
-        if (object instanceof HarvestSourceDTO) {
+        
+        if (object instanceof HarvestSourceDTO && actionBean instanceof HarvestSourcesActionBean) {
+            
             return "<input type='checkbox' value='"
                     + StringEscapeUtils.escapeHtml(((HarvestSourceDTO) object).getUrl())
                     + "' name='sourceUrl'/>";
