@@ -10,7 +10,7 @@
             <display:table name="${actionBean.resultList}" class="sortable"
                 pagesize="20" sort="list" id="folder" htmlId="resultList"
                 requestURI="${actionBean.urlBinding}" style="width:100%">
-                    <display:column title="User home folders" sortable="false">
+                    <display:column title="User home folders" sortable="true">
                         <stripes:link href="${folder.url}">
                            ${folder.label}
                         </stripes:link>  (${fn:length(folder.subFiles)} files, ${fn:length(folder.subFolders)} folders),

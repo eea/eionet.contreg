@@ -80,8 +80,7 @@ public class VirtuosoUserFolderSearchHelper extends AbstractSearchHelper {
         StringBuilder strBuilder = SPARQLQueryUtil.getSparqlQueryHeader(true, Namespace.CR, Namespace.RDF);
         strBuilder.append("select distinct ?s where { ?s ?p ?o ");
         strBuilder.append(getQueryParameters(inParams));
-        //TODO if ordering will be functional, maybe remove this by default ordering:
-        strBuilder.append("} ORDER BY ?s");
+        strBuilder.append("}");
         return strBuilder.toString();
     }
 
