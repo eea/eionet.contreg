@@ -830,6 +830,12 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
     }
 
+    /**
+     * SPARQL for user history items.
+     */
+    private static final String USER_HISTORY_QUERY = "PREFIX cr: <" + Namespace.CR.getUri() + "> "
+        + "select ?url ?time FROM ?userHistoryGraph "
+        + "WHERE {?s cr:userHistory ?url . ?s cr:userSaveTime ?time} order by desc(?time)";
     /*
      * (non-Javadoc)
      *
@@ -837,15 +843,12 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
      */
     @Override
     public List<UserHistoryDTO> getUserHistory(CRUser user) throws DAOException {
-
-        StringBuilder strBuilder = new StringBuilder();
-        strBuilder.append("PREFIX cr: <").append(Namespace.CR.getUri()).append("> select ?url ?time FROM <")
-                .append(user.getHistoryUri())
-                .append("> WHERE {?s cr:userHistory ?url . ?s cr:userSaveTime ?time} order by desc(?time)");
-
+        Bindings bindings = new Bindings();
+        bindings.setURI("userHistoryGraph", user.getHistoryUri());
         List<UserHistoryDTO> returnHistory = new ArrayList<UserHistoryDTO>();
         MapReader reader = new MapReader();
-        executeSPARQL(strBuilder.toString(), reader);
+
+        executeSPARQL(USER_HISTORY_QUERY, bindings, reader);
 
         if (reader.getResultList() != null && reader.getResultList().size() > 0) {
             for (Map<String, String> resultItem : reader.getResultList()) {
