@@ -28,6 +28,7 @@ import eionet.cr.dao.postgre.PostgreSQLHarvestSourceDAO;
 import eionet.cr.dao.readers.SubjectReader;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
+import eionet.cr.util.Bindings;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SQLUtil;
@@ -398,7 +399,12 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
             }
         }
     }
-
+    /**
+     * SPARQL for getting new sources based on the given source.
+     */
+    private static final String NEW_SOURCES_SPARQL = "DEFINE input:inference 'CRInferenceRule' PREFIX cr: "
+        +  "<http://cr.eionet.europa.eu/ontologies/contreg.rdf#> SELECT ?s FROM ?sourceUrl FROM ?deploymentHost WHERE "
+        + "{ ?s a cr:File . OPTIONAL { ?s cr:lastRefreshed ?refreshed } FILTER( !BOUND(?refreshed)) }";
     /*
      * (non-Javadoc)
      *
@@ -410,29 +416,16 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
         List<String> ret = null;
 
         if (!StringUtils.isBlank(sourceUrl)) {
+            String deploymentHost = GeneralConfig.getRequiredProperty(GeneralConfig.DEPLOYMENT_HOST);
 
-            RepositoryConnection conn = null;
-            try {
+            Bindings bindings = new Bindings();
+            bindings.setURI("sourceUrl", sourceUrl);
+            bindings.setURI("deploymentHost", deploymentHost);
 
-                conn = SesameUtil.getRepositoryConnection();
+            SubjectReader matchReader = new SubjectReader();
+            matchReader.setBlankNodeUriPrefix(VirtuosoBaseDAO.BNODE_URI_PREFIX);
+            ret = executeSPARQL(NEW_SOURCES_SPARQL, bindings, matchReader);
 
-                String deploymentHost = GeneralConfig.getRequiredProperty(GeneralConfig.DEPLOYMENT_HOST);
-
-                String crInfRuleName = GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME);
-
-                StringBuffer sqlBuf = new StringBuffer().append("DEFINE input:inference '").append(crInfRuleName).append("' ")
-                        .append("PREFIX cr: <http://cr.eionet.europa.eu/ontologies/contreg.rdf#> ").append("SELECT ?s ")
-                        .append("FROM <").append(sourceUrl).append("> ").append("FROM <").append(deploymentHost)
-                        .append("/harvester> ").append("WHERE { ").append("?s a cr:File . ")
-                        .append("OPTIONAL { ?s cr:lastRefreshed ?refreshed } ").append("FILTER( !BOUND(?refreshed)) }");
-
-                SubjectReader matchReader = new SubjectReader();
-                matchReader.setBlankNodeUriPrefix(VirtuosoBaseDAO.BNODE_URI_PREFIX);
-                ret = executeSPARQL(sqlBuf.toString(), matchReader);
-
-            } finally {
-                SesameUtil.close(conn);
-            }
         }
         return ret;
     }
