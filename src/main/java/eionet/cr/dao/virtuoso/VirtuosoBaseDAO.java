@@ -259,4 +259,32 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO {
        Object resultObject = executeUniqueResultSPARQL(query, bindings, new SingleObjectReader<Long>());
        return Integer.valueOf(resultObject.toString());
    }
+   
+   /**
+    * Returns comma-separated subject value aliases list that matches to the URIs count.
+    * example: subjectValue1, subjectValue2, subjectValue3
+    * Puts the values to the given Bindings with same names
+    * @param uriList
+    * @param bindings
+    * @return String to be used in SPARQL, for example in IN()
+    */
+    protected String urisToCSV(Collection<String> uriList, Bindings bindings) {
+        StringBuilder strBuilder = new StringBuilder();
+        if (uriList != null) {
+            int i = 1;
+            for (String uri : uriList) {
+                String alias = "subjectValue" + i;
+                if (strBuilder.length() > 0) {
+                    strBuilder.append(",");
+                }
+                // strBuilder.append("<");
+                // strBuilder.append(uri);
+                // strBuilder.append(">");
+                strBuilder.append("?" + alias);
+                bindings.setURI(alias, uri);
+                i++;
+            }
+        }
+        return strBuilder.toString();
+    }
 }

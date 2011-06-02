@@ -261,9 +261,15 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     }
 
     /**
+     * SPARQL for properties defined by Dublin Core.
+     */
+    private static final String PROPS_DUBLINCORE_QUERY = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
+        + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> select distinct ?object ?label where "
+        + "{?object rdfs:label ?label . ?object rdf:type rdf:Property . ?object rdfs:isDefinedBy ?dublinCore}";
+    /**
      * Search for predicates that is allowed to edit on factsheet page.
      *
-     * @param subjectTypes
+     * @param subjectTypes rdf:type resources of the subject
      * @return the list of properties that can be added by user.
      * @throws DAOException
      *             if query fails
@@ -271,25 +277,25 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     public HashMap<String, String> getAddibleProperties(Collection<String> subjectTypes) throws DAOException {
 
         HashMap<String, String> result = new HashMap<String, String>();
+        Bindings bindings = new Bindings();
+        bindings.setURI("dublinCore", Subjects.DUBLIN_CORE_SOURCE_URL);
 
         StringBuilder strBuilder = new StringBuilder();
-        strBuilder.append("PREFIX rdf: <").append(Namespace.RDF.getUri()).append("> PREFIX rdfs: <")
-                .append(Namespace.RDFS.getUri()).append("> select distinct ?object ?label where {?object rdfs:label ?label ")
-                .append(". ?object rdf:type rdf:Property . ?object rdfs:isDefinedBy <").append(Subjects.DUBLIN_CORE_SOURCE_URL)
-                .append(">}");
-
         ObjectLabelReader reader = new ObjectLabelReader(true);
-        executeSPARQL(strBuilder.toString(), reader);
+        executeSPARQL(PROPS_DUBLINCORE_QUERY, bindings, reader);
 
         /* get the properties for given subject types */
         if (subjectTypes != null && !subjectTypes.isEmpty()) {
-
+            bindings = new Bindings();
             strBuilder = new StringBuilder();
             strBuilder.append("PREFIX rdfs: <").append(Namespace.RDFS.getUri())
-                    .append("> select distinct ?object ?label WHERE { ?object rdfs:label ?label ")
-                    .append(". ?object rdfs:domain ?o . FILTER (?o IN (").append(Util.sparqlUrisToCsv(subjectTypes)).append("))}");
+                .append("> select distinct ?object ?label WHERE { ?object rdfs:label ?label ")
+                .append(". ?object rdfs:domain ?o . FILTER (?o IN (").append(urisToCSV(subjectTypes, bindings)).append("))}");
 
-            executeSPARQL(strBuilder.toString(), reader);
+            //PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> select distinct ?object ?label WHERE
+            //{ ?object rdfs:label ?label . ?object rdfs:domain ?o .
+            //FILTER (?o IN (<http://www.eea.europa.eu/portal_types/Article#Article>))}
+            executeSPARQL(strBuilder.toString(), bindings, reader);
         }
 
         if (reader != null && reader.getResultList() != null) {

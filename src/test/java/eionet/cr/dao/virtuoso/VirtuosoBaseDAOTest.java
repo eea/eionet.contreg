@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -14,6 +15,7 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.MockVirtuosoBaseDAOTest;
 import eionet.cr.dao.readers.SubjectDataReader;
 import eionet.cr.dto.SubjectDTO;
+import eionet.cr.util.Bindings;
 
 public class VirtuosoBaseDAOTest extends MockVirtuosoBaseDAOTest {
 
@@ -70,12 +72,18 @@ public class VirtuosoBaseDAOTest extends MockVirtuosoBaseDAOTest {
         assertNotNull(resultList);
 //        assertTrue(resultList.contains(arg0))
         assertEquals(dataReader.getSubjectsMap().size(), 15);
+  
+    }
+    @Test
+    public void testUrisToCSV() {
+        ArrayList<String> uris = new ArrayList<String>();
+        uris.add("http://uri1.somewhere.nonono.com");
+        uris.add("http://uri2.somewhere.nonono.com");
+        VirtuosoSearchDAO dao = new VirtuosoSearchDAO();
+        Bindings bindings = new Bindings();
+        String s = dao.urisToCSV(uris, bindings);
         
-        
-        
-        
-        
-        
-        
+        assertEquals("?subjectValue1,?subjectValue2", s);
+        assertTrue(bindings.toString().indexOf("subjectValue1=http://uri1.somewhere.nonono.com") != -1);
     }
 }
