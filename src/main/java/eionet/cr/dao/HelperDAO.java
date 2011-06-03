@@ -74,7 +74,7 @@ public interface HelperDAO extends DAO {
      * @param predicateUri
      * @param extractLabels
      *            - if true, labels are extracted if label is URL
-     * @return
+     * @return Collection<ObjectLabelPair>
      * @throws DAOException
      *             if query fails
      */
@@ -100,7 +100,7 @@ public interface HelperDAO extends DAO {
     /**
      * 
      * @param subjectTypes
-     * @return
+     * @return HashMap<String, String>
      * @throws DAOException
      *             if query fails
      */
@@ -109,7 +109,7 @@ public interface HelperDAO extends DAO {
     /**
      * 
      * @param subjectUri
-     * @return
+     * @return String
      * @throws DAOException
      *             if query fails
      */
@@ -118,7 +118,7 @@ public interface HelperDAO extends DAO {
     /**
      * 
      * @param predicateUri
-     * @return
+     * @return boolean
      * @throws DAOException
      *             if query fails TODO
      */
@@ -127,7 +127,7 @@ public interface HelperDAO extends DAO {
     /**
      * 
      * @param typeUri
-     * @return
+     * @return List<SubjectDTO>
      * @throws DAOException
      *             if query fails
      */
@@ -136,7 +136,7 @@ public interface HelperDAO extends DAO {
     /**
      * Gets sources that have some spatial content.
      * 
-     * @return
+     * @return List<String>
      * @throws DAOException
      *             if query fails
      */
@@ -145,7 +145,7 @@ public interface HelperDAO extends DAO {
     /**
      * 
      * @param subjectHash
-     * @return
+     * @return SubjectDTO
      * @throws DAOException
      *             if query fails
      */
@@ -154,7 +154,7 @@ public interface HelperDAO extends DAO {
     /**
      * 
      * @param subjectUri
-     * @return
+     * @return SubjectDTO
      * @throws DAOException
      *             if query fails
      */
@@ -163,7 +163,7 @@ public interface HelperDAO extends DAO {
     /**
      * 
      * @param subjectHashes
-     * @return
+     * @return PredicateLabels
      * @throws DAOException
      *             if query fails
      */
@@ -180,7 +180,7 @@ public interface HelperDAO extends DAO {
 
     /**
      * 
-     * @return
+     * @return HashMap<String, ArrayList<UriLabelPair>>
      * @throws DAOException
      *             if query fails
      */
@@ -188,7 +188,7 @@ public interface HelperDAO extends DAO {
 
     /**
      * 
-     * @return
+     * @return ArrayList<Pair<String, String>>
      * @throws DAOException
      *             if query fails
      */
@@ -197,7 +197,7 @@ public interface HelperDAO extends DAO {
     /**
      * 
      * @param sourceHash
-     * @return
+     * @return int
      * @throws DAOException
      *             if query fails
      */
@@ -242,6 +242,7 @@ public interface HelperDAO extends DAO {
     /**
      * 
      * @param user
+     * @return List<UserBookmarkDTO>
      * @throws DAOException
      *             if query fails
      */
@@ -271,6 +272,7 @@ public interface HelperDAO extends DAO {
 
     /**
      * @param user
+     * @return List<UserHistoryDTO>
      * @throws DAOException
      *             if query fails
      */
@@ -280,7 +282,7 @@ public interface HelperDAO extends DAO {
      * 
      * @param sourceUrl
      * @param pagingRequest
-     * @return
+     * @return List<TripleDTO>
      * @throws DAOException
      *             if query fails
      */
@@ -316,7 +318,7 @@ public interface HelperDAO extends DAO {
 
     /**
      * 
-     * @param reviewiD
+     * @param reviewId
      * @param review
      * @param user
      * @throws DAOException
@@ -354,7 +356,9 @@ public interface HelperDAO extends DAO {
     public List<String> getReviewAttachmentList(CRUser user, int reviewId) throws DAOException;
 
     /**
-     * @param reviewSubjectURI
+     * @param user 
+     * @param reviewId 
+     * @param deleteAttachments 
      * @throws DAOException
      *             if query fails
      */
@@ -399,7 +403,7 @@ public interface HelperDAO extends DAO {
     /**
      * 
      * @param crUser
-     * @return
+     * @return Collection<UploadDTO>
      * @throws DAOException
      *             if query fails
      */
@@ -408,7 +412,7 @@ public interface HelperDAO extends DAO {
     /**
      * 
      * @param subjectUri
-     * @return
+     * @return boolean
      * @throws DAOException
      *             if query fails
      */
@@ -482,7 +486,7 @@ public interface HelperDAO extends DAO {
     /**
      * 
      * @param user
-     * @return
+     * @return List<Map<String, String>>
      * @throws DAOException
      */
     public List<Map<String, String>> getSparqlBookmarks(CRUser user) throws DAOException;
@@ -495,4 +499,20 @@ public interface HelperDAO extends DAO {
      * @throws DAOException
      */
     public void registerUserFolderInCrHomeContext(CRUser user) throws DAOException;
+    
+    /**
+     * Returns triples of an harvest source.
+     * @param sourceUrl harvest source url
+     * @throws DAOException if query fails.
+     * @return list of TripleDTO objects.
+     */
+    public List<TripleDTO> getTriplesInSource(String sourceUrl) throws DAOException;
+    
+    /**
+     * Returns full SPO objects of an harvest source.
+     * @param sourceUrl harvest source url
+     * @throws DAOException if query fails.
+     * @return list of SubjectDTO objects.
+     */
+    public List<SubjectDTO> getSPOsInSource(String sourceUrl) throws DAOException;
 }

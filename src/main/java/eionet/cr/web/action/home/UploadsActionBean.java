@@ -78,7 +78,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
 
     /**
      * 
-     * @return
+     * @return Resolution
      */
     @DefaultHandler
     public Resolution view() {
@@ -88,7 +88,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
 
     /**
      * 
-     * @return
+     * @return Resolution
      * @throws DAOException
      * @throws IOException
      */
@@ -103,7 +103,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
 
     /**
      * 
-     * @return
+     * @return Resolution
      * @throws DAOException
      * @throws IOException
      */
@@ -277,7 +277,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
             // since user's home URI was used above as triple source, add it to HARVEST_SOURCE too
             // (but set interval minutes to 0, to avoid it being background-harvested)
             DAOFactory.get().getDao(HarvestSourceDAO.class)
-                    .addSourceIgnoreDuplicate(HarvestSourceDTO.create(getUser().getHomeUri(), true, 0, getUserName()));
+                    .addSourceIgnoreDuplicate(HarvestSourceDTO.create(getUser().getHomeUri(), false, 0, getUserName()));
 
         } catch (DAOException e) {
             saveAndHarvestException = e;
@@ -326,7 +326,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
 
     /**
      * 
-     * @return
+     * @return Resolution
      * @throws DAOException
      */
     public Resolution delete() throws DAOException {
@@ -350,7 +350,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
 
     /**
      * 
-     * @return
+     * @return Resolution
      * @throws DAOException
      */
     public Resolution rename() throws DAOException {
@@ -401,7 +401,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
 
     /**
      * 
-     * @return
+     * @return Resolution
      */
     public Resolution cancel() {
 
@@ -566,7 +566,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
 
     /**
      * 
-     * @return
+     * @return String
      */
     public String getFileNameParamPrefix() {
         return FNAME_PARAM_PREFIX;

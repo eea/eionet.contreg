@@ -106,7 +106,7 @@ public class DownloadServlet extends HttpServlet {
 
         // Get the file object from the file store
         File file = FileStore.getByUri(requestedUri);
-
+        
         // If file was not found, send 404.
         if (file == null) {
             handleFileNotFound("Could not find file by the following URI: " + requestedUri, request, response);

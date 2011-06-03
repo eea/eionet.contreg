@@ -38,19 +38,33 @@ import eionet.cr.web.action.AbstractActionBean;
 
 @UrlBinding("/home/{username}")
 public class HomeActionBean extends AbstractActionBean {
+    
+    private String username;
 
     /**
      *
-     * @return
+     * @return Resolution
      */
     @DefaultHandler
     public Resolution noEvent() {
-
-        String username = getContext().getRequest().getParameter("username");
-        if (StringUtils.isBlank(username)) {
-            throw new CRRuntimeException("Could not detect username from request parameters");
+        
+        try {
+            if (StringUtils.isBlank(username)) {
+                throw new CRRuntimeException("Could not detect username from request parameters");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new CRRuntimeException(e.getMessage());
         }
 
         return new RedirectResolution("/home/" + username + "/uploads");
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 }

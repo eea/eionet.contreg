@@ -30,9 +30,6 @@ public class FileStore {
     /** */
     public static final String PATH = GeneralConfig.getRequiredProperty(GeneralConfig.FILESTORE_PATH);
 
-    /** */
-    private String userName;
-
     private File userDir;
 
     /**
@@ -45,14 +42,13 @@ public class FileStore {
             throw new IllegalArgumentException("userName must not be null or blank");
         }
 
-        this.userName = userName;
         userDir = new File(FileStore.PATH, userName);
     }
 
     /**
      * 
      * @param userName
-     * @return
+     * @return FileStore
      */
     public static FileStore getInstance(String userName) {
         return new FileStore(userName);
@@ -63,7 +59,7 @@ public class FileStore {
      * @param fileName
      * @param overwrite
      * @param inputStream
-     * @return
+     * @return File
      * @throws IOException
      */
     public File add(String fileName, boolean overwrite, InputStream inputStream) throws IOException {
@@ -77,7 +73,7 @@ public class FileStore {
             IOUtils.closeQuietly(outputStream);
         }
 
-        return null;
+        return filePath;
     }
 
     /**
@@ -85,7 +81,7 @@ public class FileStore {
      * @param fileName
      * @param overwrite
      * @param reader
-     * @return
+     * @return File
      * @throws IOException
      */
     public File add(String fileName, boolean overwrite, Reader reader) throws IOException {
@@ -169,7 +165,7 @@ public class FileStore {
     /**
      * 
      * @param fileName
-     * @return
+     * @return File
      */
     public File get(String fileName) {
 
@@ -180,19 +176,19 @@ public class FileStore {
             return file;
         }
     }
-    
+
     /**
      * 
      * @param uriString
-     * @return
+     * @return File
      */
-    public static File getByUri(String uriString){
-       
-        if (CRUser.isHomeUri(uriString)){
-            
+    public static File getByUri(String uriString) {
+
+        if (CRUser.isHomeUri(uriString)) {
+
             String userName = CRUser.getUserNameFromUri(uriString);
-            if (userName!=null && userName.trim().length()>0){
-                
+            if (userName != null && userName.trim().length() > 0) {
+
                 // by now assume that URI is correct and file name is everything after last '/'
                 String fileName = StringUtils.substringAfterLast(uriString, "/");
                 try {
@@ -200,17 +196,15 @@ public class FileStore {
                 } catch (UnsupportedEncodingException e) {
                     throw new CRRuntimeException(e);
                 }
-                
+
                 return FileStore.getInstance(userName).get(fileName);
-            }
-            else{
+            } else {
                 logger.info("Could not extract user name from this URI: " + uriString);
             }
-        }
-        else{
+        } else {
             logger.info("Not a home URI: " + uriString);
         }
-        
+
         return null;
     }
 }

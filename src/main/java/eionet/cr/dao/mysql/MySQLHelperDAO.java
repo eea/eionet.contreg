@@ -979,4 +979,14 @@ public class MySQLHelperDAO extends MySQLBaseDAO implements HelperDAO {
     public List<Map<String, String>> getSparqlBookmarks(CRUser user) throws DAOException {
         throw new UnsupportedOperationException("Method not implemented");
     }
+    
+    @Override
+    public List<TripleDTO> getTriplesInSource(String sourceUrl) throws DAOException {
+        throw new UnsupportedOperationException("Method not implemented");
+    }
+    
+    @Override
+    public List<SubjectDTO> getSPOsInSource(String sourceUrl) throws DAOException {
+        throw new UnsupportedOperationException("Method not implemented");
+    }
 }
