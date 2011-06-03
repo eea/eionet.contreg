@@ -38,6 +38,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import eionet.cr.common.CRRuntimeException;
@@ -48,7 +49,6 @@ import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.dto.TripleDTO;
 import eionet.cr.filestore.FileStore;
 
 /**
@@ -111,6 +111,14 @@ public class HomeContentTypeFilter implements Filter {
 
                 String userName = pathInfo.substring(1, i);
                 String fileName = pathInfo.substring(i + 1);
+                String id = "";
+                if (!StringUtils.isBlank(fileName)) {
+                    int z = fileName.indexOf("/");
+                    if (z != -1 && fileName.length() > (z + 1)) {
+                        id = fileName.substring(z + 1);
+                        fileName = fileName.substring(0, z);
+                    }
+                }
 
                 if (FileStore.getInstance(userName).get(fileName) != null) {
 
@@ -127,13 +135,19 @@ public class HomeContentTypeFilter implements Filter {
                         String type = DAOFactory.get().getDao(HarvestSourceDAO.class)
                                 .getSourceMetadata(fileUri, Predicates.CR_MEDIA_TYPE);
                         if (type != null && (type.equals("csv") || type.equals("tsv"))) {
+                            List<SubjectDTO> triples = null;
+                            if (!StringUtils.isBlank(id)) {
+                                String subjectUri = fileUri + "/" + id;
+                                triples = DAOFactory.get().getDao(HelperDAO.class).getSPOsInSubject(fileUri, subjectUri);
+                                fileUri = subjectUri;
+                            } else {
+                                triples = DAOFactory.get().getDao(HelperDAO.class).getSPOsInSource(fileUri);
+                            }
                             // if accept-header is "application/rdf+xml" then return RDF, otherwise return HTML
                             if (accept != null && accept.length > 0 && accept[0].equals("application/rdf+xml")) {
-                                List<SubjectDTO> triples = DAOFactory.get().getDao(HelperDAO.class).getSPOsInSource(fileUri);
                                 httpResponse.setContentType("application/rdf+xml;charset=utf-8");
                                 triplesToRdf(httpResponse.getOutputStream(), triples, fileUri);
                             } else {
-                                List<TripleDTO> triples = DAOFactory.get().getDao(HelperDAO.class).getTriplesInSource(fileUri);
                                 httpResponse.setContentType("text/html;charset=utf-8");
                                 triplesToHtml(httpResponse.getOutputStream(), triples, fileUri);
                             }
@@ -156,7 +170,7 @@ public class HomeContentTypeFilter implements Filter {
         filterChain.doFilter(servletRequest, servletResponse);
     }
 
-    private void triplesToHtml(OutputStream out, List<TripleDTO> triples, String fileUri) {
+    private void triplesToHtml(OutputStream out, List<SubjectDTO> triples, String fileUri) {
         OutputStreamWriter writer = new OutputStreamWriter(out);
         try {
             writer.append("<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en-gb\">");
@@ -171,14 +185,39 @@ public class HomeContentTypeFilter implements Filter {
             writer.append("<h1>").append(fileUri).append("</h1>");
             writer.append("<table>");
             writer.append("<tr><th>Subject</th><th>Predicate</th><th>Value</th></tr>");
+
             if (triples != null) {
-                for (TripleDTO triple : triples) {
-                    writer.append("<tr>");
-                    writer.append("<td>").append(triple.getSubjectUri()).append("</td>");
-                    writer.append("<td>").append(triple.getPredicateUri()).append("</td>");
-                    writer.append("<td>").append(triple.getObject()).append("</td>");
-                    writer.append("</tr>");
+                for (SubjectDTO subject : triples) {
+                    String subjectUri = subject.getUri();
+                    Map<String, Collection<ObjectDTO>> predicates = subject.getPredicates();
+                    if (predicates != null) {
+                        for (String predicateUri : predicates.keySet()) {
+                            Collection<ObjectDTO> objects = predicates.get(predicateUri);
+                            if (objects != null) {
+                                for (ObjectDTO object : objects) {
+                                    writer.append("<tr>");
+                                    writer.append("<td>").append(subjectUri).append("</td>");
+                                    writer.append("<td>").append(predicateUri).append("</td>");
+                                    writer.append("<td>");
+                                    if (object.isLiteral()) {
+                                        object.getValue();
+                                    } else {
+                                        writer.append("<a href=\"").append(object.getValue()).append("\">")
+                                                .append(object.getValue()).append("</a>");
+                                    }
+                                    writer.append("</td>");
+                                    writer.append("</tr>");
+                                }
+                            }
+                        }
+                    }
                 }
+                /*
+                 * for (TripleDTO triple : triples) { writer.append("<tr>");
+                 * writer.append("<td>").append(triple.getSubjectUri()).append("</td>");
+                 * writer.append("<td>").append(triple.getPredicateUri()).append("</td>");
+                 * writer.append("<td>").append(triple.getObject()).append("</td>"); writer.append("</tr>"); }
+                 */
             }
             writer.append("</table>");
             writer.append("</body>");
@@ -199,44 +238,46 @@ public class HomeContentTypeFilter implements Filter {
     private void triplesToRdf(OutputStream out, List<SubjectDTO> triples, String fileUri) {
         OutputStreamWriter writer = new OutputStreamWriter(out);
         try {
-            writer.append(rdfHeader);
-            writer.append("<rdf:RDF xmlns=\"").append(fileUri + "#").append("\" xmlns:rdf=\"").append(rdfNameSpace).append("\" ")
-                    .append("xmlns:rdfs=\"").append(rdfSNameSpace).append("\">");
-            for (SubjectDTO subject : triples) {
-                String subjectUri = subject.getUri();
-                writer.append("<rdf:Description rdf:about=\"").append(StringEscapeUtils.escapeXml(subjectUri)).append("\">");
-                Map<String, Collection<ObjectDTO>> predicates = subject.getPredicates();
-                if (predicates != null) {
-                    for (String predicateUri : predicates.keySet()) {
-                        Collection<ObjectDTO> objects = predicates.get(predicateUri);
+            if (triples != null) {
+                writer.append(rdfHeader);
+                writer.append("<rdf:RDF xmlns=\"").append(fileUri + "#").append("\" xmlns:rdf=\"").append(rdfNameSpace)
+                        .append("\" ").append("xmlns:rdfs=\"").append(rdfSNameSpace).append("\">");
+                for (SubjectDTO subject : triples) {
+                    String subjectUri = subject.getUri();
+                    writer.append("<rdf:Description rdf:about=\"").append(StringEscapeUtils.escapeXml(subjectUri)).append("\">");
+                    Map<String, Collection<ObjectDTO>> predicates = subject.getPredicates();
+                    if (predicates != null) {
+                        for (String predicateUri : predicates.keySet()) {
+                            Collection<ObjectDTO> objects = predicates.get(predicateUri);
 
-                        // Shorten predicate URIs
-                        if (predicateUri.startsWith(rdfNameSpace)) {
-                            predicateUri = predicateUri.replace(rdfNameSpace, "rdf:");
-                        } else if (predicateUri.startsWith(rdfSNameSpace)) {
-                            predicateUri = predicateUri.replace(rdfSNameSpace, "rdfs:");
-                        } else if (predicateUri.startsWith(fileUri)) {
-                            predicateUri = predicateUri.replace(fileUri + "#", "");
-                        }
+                            // Shorten predicate URIs
+                            if (predicateUri.startsWith(rdfNameSpace)) {
+                                predicateUri = predicateUri.replace(rdfNameSpace, "rdf:");
+                            } else if (predicateUri.startsWith(rdfSNameSpace)) {
+                                predicateUri = predicateUri.replace(rdfSNameSpace, "rdfs:");
+                            } else if (predicateUri.startsWith(fileUri)) {
+                                predicateUri = predicateUri.replace(fileUri + "#", "");
+                            }
 
-                        if (objects != null) {
-                            for (ObjectDTO object : objects) {
-                                if (object.isLiteral()) {
-                                    writer.append("<").append(predicateUri).append(">")
-                                            .append(StringEscapeUtils.escapeXml(object.getValue())).append("</")
-                                            .append(predicateUri).append(">");
-                                } else {
-                                    writer.append("<").append(predicateUri).append(" rdf:resource=\"")
-                                            .append(StringEscapeUtils.escapeXml(object.getValue())).append("\"/>");
+                            if (objects != null) {
+                                for (ObjectDTO object : objects) {
+                                    if (object.isLiteral()) {
+                                        writer.append("<").append(predicateUri).append(">")
+                                                .append(StringEscapeUtils.escapeXml(object.getValue())).append("</")
+                                                .append(predicateUri).append(">");
+                                    } else {
+                                        writer.append("<").append(predicateUri).append(" rdf:resource=\"")
+                                                .append(StringEscapeUtils.escapeXml(object.getValue())).append("\"/>");
+                                    }
                                 }
                             }
                         }
                     }
+                    writer.append("</rdf:Description>");
                 }
-                writer.append("</rdf:Description>");
+                writer.append("</rdf:RDF>");
+                writer.flush();
             }
-            writer.append("</rdf:RDF>");
-            writer.flush();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

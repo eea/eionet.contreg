@@ -2078,4 +2078,9 @@ public class PostgreSQLHelperDAO extends PostgreSQLBaseDAO implements HelperDAO 
     public List<SubjectDTO> getSPOsInSource(String sourceUrl) throws DAOException {
         throw new UnsupportedOperationException("Method not implemented");
     }
+    
+    @Override
+    public List<SubjectDTO> getSPOsInSubject(String sourceUrl, String subject) throws DAOException {
+        throw new UnsupportedOperationException("Method not implemented");
+    }
 }

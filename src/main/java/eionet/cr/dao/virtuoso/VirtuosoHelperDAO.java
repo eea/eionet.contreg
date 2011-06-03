@@ -874,9 +874,12 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     /**
      * Returns 100 sample triples of an harvest source in random order.
      * 
-     * @param sourceUrl harvest source url
-     * @param pagingRequest PAging request of the UI
-     * @throws DAOException if query fails.
+     * @param sourceUrl
+     *            harvest source url
+     * @param pagingRequest
+     *            PAging request of the UI
+     * @throws DAOException
+     *             if query fails.
      * @return list of TripleDTO objects.
      */
     @Override
@@ -898,8 +901,10 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     /**
      * Returns triples of an harvest source.
      * 
-     * @param sourceUrl harvest source url
-     * @throws DAOException if query fails.
+     * @param sourceUrl
+     *            harvest source url
+     * @throws DAOException
+     *             if query fails.
      * @return list of TripleDTO objects.
      */
     @Override
@@ -916,8 +921,10 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     /**
      * Returns full SPO objects of an harvest source.
      * 
-     * @param sourceUrl harvest source url
-     * @throws DAOException if query fails.
+     * @param sourceUrl
+     *            harvest source url
+     * @throws DAOException
+     *             if query fails.
      * @return list of SubjectDTO objects.
      */
     @Override
@@ -928,6 +935,33 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
         SPOReader reader = new SPOReader();
         return executeSPARQL(SOURCE_TRIPLES_QUERY, bindings, reader);
+
+    }
+
+    /**
+     * SPARQL returning triples of a subject.
+     */
+    public static final String SUBJECT_TRIPLES_QUERY = "SELECT ?s ?p ?o FROM ?source WHERE {?s ?p ?o . filter (?s = <?subject>)}";
+
+    /**
+     * Returns full SPO objects of given subject.
+     * 
+     * @param sourceUrl
+     *            harvest source url
+     * @param subject
+     * @throws DAOException
+     *             if query fails.
+     * @return list of SubjectDTO objects.
+     */
+    @Override
+    public List<SubjectDTO> getSPOsInSubject(String sourceUrl, String subject) throws DAOException {
+
+        Bindings bindings = new Bindings();
+        bindings.setURI("source", sourceUrl);
+        bindings.setURI("subject", subject);
+
+        SPOReader reader = new SPOReader();
+        return executeSPARQL(SUBJECT_TRIPLES_QUERY, bindings, reader);
 
     }
 
