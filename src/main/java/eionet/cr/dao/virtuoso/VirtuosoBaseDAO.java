@@ -1,6 +1,7 @@
 package eionet.cr.dao.virtuoso;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -9,7 +10,6 @@ import org.apache.log4j.Logger;
 import org.openrdf.repository.RepositoryConnection;
 
 import eionet.cr.common.Predicates;
-import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.SQLBaseDAO;
 import eionet.cr.dao.helpers.SearchHelper;
@@ -17,6 +17,7 @@ import eionet.cr.dao.readers.SubjectDataReader;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Bindings;
 import eionet.cr.util.Hashes;
+import eionet.cr.util.sesame.SPARQLQueryUtil;
 import eionet.cr.util.sesame.SPARQLResultSetReader;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SingleObjectReader;
@@ -34,6 +35,8 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO {
 
     /** */
     protected Logger logger = Logger.getLogger(VirtuosoBaseDAO.class);
+    
+    private Bindings bindings;
 
     /**
      * 
@@ -158,7 +161,7 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO {
 
         String query = getSubjectsDataQuery(subjectUris, predicateUris,
                 graphUris, useInferencing);
-        executeSPARQL(query, reader);
+        executeSPARQL(query, bindings, reader);
 
         Map<Long, SubjectDTO> subjectsMap = reader.getSubjectsMap();
         if (subjectsMap != null && !subjectsMap.isEmpty()) {
@@ -184,67 +187,43 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO {
      * @param useInferencing - if to use inferencing in the query
      * @return String SPARQL query
      */
-    private String getSubjectsDataQuery(final Collection<String> subjectUris,
-            final String[] predicateUris, final Collection<String> graphUris, final boolean useInferencing) {
-
+    private String getSubjectsDataQuery(final Collection<String> subjectUris, final String[] predicateUris,
+            final Collection<String> graphUris, final boolean useInferencing) {
+        String sparql = "";
+        // initiate this class bindings to prevent initiating it when it is not
+        // actually used
+        this.bindings = new Bindings();
         if (subjectUris == null || subjectUris.isEmpty()) {
-            throw new IllegalArgumentException(
-                    "Subjects collection must not be null or empty!");
+            throw new IllegalArgumentException("Subjects collection must not be null or empty!");
         }
 
-        StringBuilder strBuilder = new StringBuilder();
-                if (useInferencing) {
-                    strBuilder.append("define input:inference '")
-                    .append(GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME)).append("' ");
-                }
-                strBuilder.append("select * where {graph ?g {?s ?p ?o. ").append(
-                "filter (?s IN (");
-
-        int i = 0;
-        for (String subjectUri : subjectUris) {
-            if (i > 0) {
-                strBuilder.append(", ");
-            }
-            strBuilder.append("<").append(subjectUri).append(">");
-            i++;
+        if (useInferencing) {
+            sparql = SPARQLQueryUtil.getCrInferenceDefinition().toString();
         }
-        strBuilder.append(")) ");
+        // select * where {graph ?g {?s ?p ?o. filter (?s IN
+        // (<http://rod.eionet.europa.eu/obligations/130>,
+        // <http://rod.eionet.europa.eu/obligations/143>)
+        sparql += "select * where {graph ?g {?s ?p ?o. filter (?s IN (" + urisToCSV(subjectUris, bindings) + ")) ";
 
         // if only certain predicates needed, add relevant filter
         if (predicateUris != null && predicateUris.length > 0) {
+            sparql += "filter ("
+                    + SPARQLQueryUtil.getSparqlOrConditions("p", "predicateValue", Arrays.asList(predicateUris),
+                            bindings) + ") ";
 
-            i = 0;
-            strBuilder.append("filter (");
-            for (String predicateUri : predicateUris) {
-                if (i > 0) {
-                    strBuilder.append(" || ");
-                }
-                strBuilder.append("?p = <").append(predicateUri).append(">");
-                i++;
-            }
-
-            strBuilder.append(") ");
         }
 
         // if only certain graphs needed, add relevant filter
-        int z = 0;
         if (graphUris != null && graphUris.size() > 0) {
-            strBuilder.append("filter (");
-            for (String graphUri : graphUris) {
-                if (z > 0) {
-                    strBuilder.append(" || ");
-                }
-                strBuilder.append("?g = <").append(graphUri).append(">");
-                z++;
-            }
-            strBuilder.append(") ");
+            sparql += "filter (" + SPARQLQueryUtil.getSparqlOrConditions("g", "graphValue", graphUris, bindings) + ") ";
         }
+        sparql += "OPTIONAL { ?g ?crLastModified ?t } ";
+        bindings.setURI("crLastModified", Predicates.CR_LAST_MODIFIED);
 
-        strBuilder.append("OPTIONAL { ?g <").append(Predicates.CR_LAST_MODIFIED).append("> ?t } ");
-
-        strBuilder.append("}} ORDER BY ?s ?p");
-        return strBuilder.toString();
+        sparql += "}} ORDER BY ?s ?p";
+        return sparql;
     }
+
     /**
     * Count the total number of rows retrieved by the query constructed in SearchHelper.
     *
@@ -262,13 +241,14 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO {
    
    /**
     * Returns comma-separated subject value aliases list that matches to the URIs count.
-    * example: subjectValue1, subjectValue2, subjectValue3
+    * example: "subjectValue1,subjectValue2,subjectValue3" if there are 3 URIs
     * Puts the values to the given Bindings with same names
     * @param uriList
     * @param bindings
     * @return String to be used in SPARQL, for example in IN()
     */
-    protected String urisToCSV(Collection<String> uriList, Bindings bindings) {
+   //TODO move this method to SPARQLQueryutils?, add optional aliasValue
+   protected String urisToCSV(Collection<String> uriList, Bindings bindings) {
         StringBuilder strBuilder = new StringBuilder();
         if (uriList != null) {
             int i = 1;
@@ -277,9 +257,6 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO {
                 if (strBuilder.length() > 0) {
                     strBuilder.append(",");
                 }
-                // strBuilder.append("<");
-                // strBuilder.append(uri);
-                // strBuilder.append(">");
                 strBuilder.append("?" + alias);
                 bindings.setURI(alias, uri);
                 i++;

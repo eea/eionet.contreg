@@ -20,8 +20,11 @@
 
 package eionet.cr.util.sesame;
 
+import java.util.Collection;
+
 import eionet.cr.common.Namespace;
 import eionet.cr.config.GeneralConfig;
+import eionet.cr.util.Bindings;
 
 /**
  * Utility methods for building SPARQL queries.
@@ -80,6 +83,35 @@ public class SPARQLQueryUtil {
             strBuilder.append(getPrefixes(namespaces));
         }
         return strBuilder;
+    }
+
+    /**
+     * Builds an OR condition  of list of values.
+     * Also adds the bindings into the bindings class
+     * @param variableName constant variable name in the condition to be used, for example "p" (without question mark)
+     * @param valueAliasName Name for binding alias prefix, for example predicateValue (without question mark,
+     * example: predicateValue)
+     * @param bindings Query bindings that are filled with given values
+     * Bindings will be filled : predicateValue1=http://www.w3.org/1999/02/22-rdf-syntax-ns#type,
+     * predicateValue2=http://www.w3.org/2000/01/rdf-schema#label
+     * @return SPARQL to be used in the query, for example: ?p = ?predicateValue1 || ?p = ?predicateValue2
+     */
+    public static String getSparqlOrConditions(String variableName, String valueAliasName, Collection<String> uriList, Bindings bindings) {
+        String orSeparator = " || ";
+        StringBuilder strBuilder = new StringBuilder();
+        if (uriList != null) {
+            int i = 1;
+            for (String uri : uriList) {
+                String alias = valueAliasName + i;
+                if (strBuilder.length() > 0) {
+                    strBuilder.append(orSeparator);
+                }
+                strBuilder.append("?" + variableName + " = ?" + alias );
+                bindings.setURI(alias, uri);
+                i++;
+            }
+        }
+        return strBuilder.toString();
     }
 
 }

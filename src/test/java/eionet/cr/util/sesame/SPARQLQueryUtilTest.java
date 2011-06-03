@@ -20,8 +20,12 @@
 
 package eionet.cr.util.sesame;
 
+import java.util.Arrays;
+import java.util.List;
+
 import junit.framework.TestCase;
 import eionet.cr.common.Namespace;
+import eionet.cr.util.Bindings;
 
 /**
  * Test SPARQLQueryUtil methods.
@@ -66,5 +70,19 @@ public class SPARQLQueryUtilTest extends TestCase {
                 SPARQLQueryUtil.getSparqlQueryHeader(true, Namespace.CR, Namespace.RDF, Namespace.RDFS).toString());
         assertEquals(CR_NAMESPACE_DEF.concat(RDF_NAMESPACE_DEF).concat(RDFS_NAMESPACE_DEF),
                 SPARQLQueryUtil.getSparqlQueryHeader(false, Namespace.CR, Namespace.RDF, Namespace.RDFS).toString());
+    }
+    
+    
+    public static void testOrCondition() {
+        String graphs[] = {"http://rdfdata.eionet.europa.eu/eper/send_all", "http://rod.eionet.europa.eu/obligations", "http://rod.eionet.europa.eu/obligations.rdf", "http://rod.eionet.europa.eu/instruments.rdf"};
+        
+        List<String> graphUris = Arrays.asList(graphs);
+        Bindings bindings = new Bindings();
+        String orCondtion = SPARQLQueryUtil.getSparqlOrConditions("g", "graphValue", graphUris, bindings);
+        
+        assertEquals("?g = ?graphValue1 || ?g = ?graphValue2 || ?g = ?graphValue3 || ?g = ?graphValue4", orCondtion);
+        assertTrue(bindings.toString().indexOf("graphValue2=http://rod.eionet.europa.eu/obligations") != -1);
+        
+        
     }
 }

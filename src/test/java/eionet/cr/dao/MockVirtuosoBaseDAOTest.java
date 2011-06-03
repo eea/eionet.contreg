@@ -17,6 +17,7 @@ import org.openrdf.rio.n3.N3ParserFactory;
 
 import eionet.cr.dao.readers.ResultSetReaderException;
 import eionet.cr.dao.virtuoso.VirtuosoBaseDAO;
+import eionet.cr.util.Bindings;
 import eionet.cr.util.sesame.SPARQLResultSetReader;
 
 /**
@@ -33,6 +34,12 @@ public class MockVirtuosoBaseDAOTest extends VirtuosoBaseDAO {
     private static final String VALUE_NAME = "http://www.w3.org/2005/sparql-results#value";
     /** Tag name in N3.*/
     private static final String SOLUTION_NAME = "http://www.w3.org/2005/sparql-results#solution";
+    
+    /**
+     * to catch SPARQL.
+     */
+    private String sparql;
+    private Bindings bindings;
 
     /**
      * Fake list of bindingSet.
@@ -73,8 +80,16 @@ public class MockVirtuosoBaseDAOTest extends VirtuosoBaseDAO {
         }
     }
 
+    
     @Override
     protected <T> List<T> executeSPARQL(String sparql, SPARQLResultSetReader<T> reader) throws DAOException {
+        // TODO Auto-generated method stub
+        return executeSPARQL(sparql, null, reader);
+    }
+
+
+    @Override
+    protected <T> List<T> executeSPARQL(String sparql, Bindings bindings, SPARQLResultSetReader<T> reader) throws DAOException {
 
         for (BindingSet binding : bindingSet) {
             try {
@@ -83,6 +98,9 @@ public class MockVirtuosoBaseDAOTest extends VirtuosoBaseDAO {
                 e.printStackTrace();
             }
         }
+        
+        this.sparql = sparql;
+        this.bindings = bindings;
         return reader.getResultList();
     }
 
@@ -148,6 +166,12 @@ public class MockVirtuosoBaseDAOTest extends VirtuosoBaseDAO {
         public void startRDF() throws RDFHandlerException {
         }
     }
-
-
+    
+    public String getSPARQL() {
+        return sparql;
+    }
+    
+    public Bindings getBindings() {
+        return bindings;
+    }
 }
