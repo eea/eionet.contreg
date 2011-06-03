@@ -200,7 +200,7 @@ public class HomeContentTypeFilter implements Filter {
                                     writer.append("<td>").append(predicateUri).append("</td>");
                                     writer.append("<td>");
                                     if (object.isLiteral()) {
-                                        object.getValue();
+                                        writer.append(object.getValue());
                                     } else {
                                         writer.append("<a href=\"").append(object.getValue()).append("\">")
                                                 .append(object.getValue()).append("</a>");
