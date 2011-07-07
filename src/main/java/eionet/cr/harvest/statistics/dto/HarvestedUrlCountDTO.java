@@ -16,12 +16,15 @@ public class HarvestedUrlCountDTO {
     public Date getHarvestDay() {
         return harvestDay;
     }
+
     public void setHarvestDay(Date harvestDay) {
         this.harvestDay = harvestDay;
     }
+
     public long getHarvestCount() {
         return harvestCount;
     }
+
     public void setHarvestCount(long harvestCount) {
         this.harvestCount = harvestCount;
     }

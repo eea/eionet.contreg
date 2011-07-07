@@ -15,13 +15,14 @@ import org.openrdf.query.BindingSet;
  *
  * @param <T>
  */
-public class FreeTextSearchReader<T> extends ResultSetMixedReader<T>{
+public class FreeTextSearchReader<T> extends ResultSetMixedReader<T> {
 
     /** */
     private List<String> graphUris = new ArrayList<String>();
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.util.sql.SQLResultSetReader#readRow(java.sql.ResultSet)
      */
     @SuppressWarnings("unchecked")
@@ -30,12 +31,13 @@ public class FreeTextSearchReader<T> extends ResultSetMixedReader<T>{
 
         // expecting the hash of the matching subject URI to be in the 1st column
         Long subjectHash = Long.valueOf(rs.getLong(1));
-        resultList.add((T)subjectHash);
+        resultList.add((T) subjectHash);
 
     }
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
      */
     @SuppressWarnings("unchecked")
@@ -51,7 +53,7 @@ public class FreeTextSearchReader<T> extends ResultSetMixedReader<T>{
                 subjectUri = blankNodeUriPrefix + subjectUri;
             }
         }
-        resultList.add((T)subjectUri);
+        resultList.add((T) subjectUri);
 
     }
 

@@ -45,24 +45,22 @@ import eionet.cr.web.util.ApplicationCache;
 public class JsonActionBean extends AbstractActionBean {
 
     @DefaultHandler
-    public Resolution tags()
-    {
+    public Resolution tags() {
         List<TagDTO> tagList = ApplicationCache.getTagCloudSortedByName(0);
         String queryParam = this.getContext().getRequestParameter("query");
 
         List<String> tagNameList = new ArrayList<String>(tagList.size());
         for (TagDTO tagObj : tagList) {
-            if (queryParam == null ||
-                    tagObj.getTag().toLowerCase().startsWith(queryParam.toLowerCase()))
-            tagNameList.add(tagObj.getTag());
+            if (queryParam == null || tagObj.getTag().toLowerCase().startsWith(queryParam.toLowerCase()))
+                tagNameList.add(tagObj.getTag());
         }
-        JSONArray jsonArray = JSONArray.fromObject( tagNameList );
+        JSONArray jsonArray = JSONArray.fromObject(tagNameList);
 
-        Map<String,Object> resultMap = new HashMap<String, Object>();
+        Map<String, Object> resultMap = new HashMap<String, Object>();
         resultMap.put("query", queryParam == null ? "" : queryParam);
         resultMap.put("suggestions", jsonArray);
 
-        JSONObject jsonObject = JSONObject.fromObject( resultMap );
+        JSONObject jsonObject = JSONObject.fromObject(resultMap);
 
         return new StreamingResolution("text", new StringReader(jsonObject.toString()));
     }

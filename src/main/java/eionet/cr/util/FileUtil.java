@@ -33,15 +33,17 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * File operation utilities.
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  */
 public final class FileUtil {
     /** To prevent public instancing. */
-    private FileUtil() { }
+    private FileUtil() {
+    }
 
     /**
-    * class internal logger.
-    */
+     * class internal logger.
+     */
     private static Log logger = LogFactory.getLog(FileUtil.class);
 
     /**
@@ -52,37 +54,46 @@ public final class FileUtil {
     /**
      * Downloads the contents of the given URL into the given file and closes the file.
      *
-     * @param urlString downloadable url
-     * @param toFile output file location
-     * @throws IOException if input of output fails
+     * @param urlString
+     *            downloadable url
+     * @param toFile
+     *            output file location
+     * @throws IOException
+     *             if input of output fails
      */
     public static void downloadUrlToFile(final String urlString, final File toFile) throws IOException {
 
+        URLConnection urlConnection = null;
         InputStream inputStream = null;
         try {
             URL url = new URL(urlString == null ? urlString : StringUtils.replace(urlString, " ", "%20"));
-            URLConnection httpConn = url.openConnection();
-            inputStream = httpConn.getInputStream();
+            urlConnection = url.openConnection();
+            urlConnection.setRequestProperty("Connection", "close");
+            inputStream = urlConnection.getInputStream();
             FileUtil.streamToFile(inputStream, toFile);
         } finally {
             try {
-                   if (inputStream != null) {
+                if (inputStream != null) {
                     inputStream.close();
                 }
             } catch (IOException e) {
                 logger.error("Failed to close URLConnection's input stream: " + e.toString(), e);
             }
+            URLUtil.disconnect(urlConnection);
         }
     }
 
     /**
-     * Writes the content of the given InputStream into the given file and closes the file.
-     * The caller is responsible for closing the InputStream!
+     * Writes the content of the given InputStream into the given file and closes the file. The caller is responsible for closing
+     * the InputStream!
      *
-     * @param inputStream InputSream
-     * @param toFile File output file
+     * @param inputStream
+     *            InputSream
+     * @param toFile
+     *            File output file
      * @return total bytes count
-     * @throws IOException if streaming fails
+     * @throws IOException
+     *             if streaming fails
      */
     public static int streamToFile(final InputStream inputStream, final File toFile) throws IOException {
 
@@ -103,9 +114,11 @@ public final class FileUtil {
             }
 
             return totalBytes;
-        }  finally {
+        } finally {
             try {
-                if (fos != null) { fos.close(); }
+                if (fos != null) {
+                    fos.close();
+                }
             } catch (IOException e) {
                 logger.error("Failed to close file output stream: " + e.toString(), e);
             }

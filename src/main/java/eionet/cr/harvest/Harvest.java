@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.LogFactory;
+import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -46,6 +47,7 @@ import eionet.cr.harvest.util.HarvestLog;
 import eionet.cr.harvest.util.arp.ARPSource;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.URLUtil;
+import eionet.cr.util.sesame.SesameUtil;
 
 /**
  *
@@ -60,7 +62,8 @@ public abstract class Harvest {
     public static final String STATUS_FINISHED = "finished";
     public static final String TYPE_PULL = "pull";
     public static final String TYPE_PUSH = "push";
-    public static final String HARVESTER_URI = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL) + "/harvester";
+    public static final String HARVESTER_URI = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL)
+    + "/harvester";
 
     /** */
     protected String sourceUrlString = null;
@@ -116,6 +119,12 @@ public abstract class Harvest {
     protected SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
     /**
+     * The repository connection that should be used through-out this harvest for any operations with the repository. It should only
+     * be retrieved via lazy loading.
+     */
+    private RepositoryConnection repositoryConnection;
+
+    /**
      *
      * @param sourceUrlString
      */
@@ -154,6 +163,7 @@ public abstract class Harvest {
             else
                 throw new HarvestException(e.toString(), e);
         } finally {
+            SesameUtil.close(repositoryConnection);
             doHarvestFinishedActions();
         }
     }
@@ -185,8 +195,9 @@ public abstract class Harvest {
         RDFHandler rdfHandler = null;
         try {
 
-            PersisterConfig config = new PersisterConfig(deriveInferredTriples, clearPreviousContent, sourceLastModified,
-                    sourceUrlString, System.currentTimeMillis(), Hashes.spoHash(sourceUrlString), null);
+            PersisterConfig config =
+                new PersisterConfig(deriveInferredTriples, clearPreviousContent, sourceLastModified, sourceUrlString,
+                        System.currentTimeMillis(), Hashes.spoHash(sourceUrlString), null);
             rdfHandler = createRDFHandler(config);
             DefaultErrorHandler errorHandler = new DefaultErrorHandler();
             if (arpSource != null) {
@@ -220,9 +231,9 @@ public abstract class Harvest {
             if (sourceMetadata.getPredicateCount() > 0) {
                 logger.debug("Storing auto-generated triples for the source");
                 int triplesAdded = rdfHandler.addSourceMetadata(sourceMetadata);
-                if (triplesAdded > 0){
-                    DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(
-                            HarvestSourceDTO.create(HARVESTER_URI, true, 0, null));
+                if (triplesAdded > 0) {
+                    DAOFactory.get().getDao(HarvestSourceDAO.class)
+                    .addSourceIgnoreDuplicate(HarvestSourceDTO.create(HARVESTER_URI, true, 0, null));
                 }
             }
 
@@ -292,8 +303,9 @@ public abstract class Harvest {
         }
 
         String folder = GeneralConfig.getRequiredProperty(GeneralConfig.HARVESTER_FILES_LOCATION);
-        String fileName = new StringBuilder(Hashes.md5(sourceUrl)).append("_").append(System.currentTimeMillis())
-                .append(HARVEST_FILE_NAME_EXTENSION).toString();
+        String fileName =
+            new StringBuilder(Hashes.md5(sourceUrl)).append("_").append(System.currentTimeMillis())
+            .append(HARVEST_FILE_NAME_EXTENSION).toString();
 
         return new File(folder, fileName);
     }
@@ -374,7 +386,7 @@ public abstract class Harvest {
 
         logger.debug("Harvest finished");
     }
-    
+
     /**
      * Searches new harvest sources from harvested file. If resource is subclass of cr:File and doesn't yet exist, then it is
      * considered as new source.
@@ -385,15 +397,16 @@ public abstract class Harvest {
 
         try {
             // calculate harvest interval for tracked files
-            Integer interval = Integer.valueOf(GeneralConfig.getProperty(GeneralConfig.HARVESTER_REFERRALS_INTERVAL,
-                    String.valueOf(HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL)));
+            Integer interval =
+                Integer.valueOf(GeneralConfig.getProperty(GeneralConfig.HARVESTER_REFERRALS_INTERVAL,
+                        String.valueOf(HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL)));
 
             List<String> newSources = DAOFactory.get().getDao(HarvestSourceDAO.class).getNewSources(sourceUrlString);
 
             for (String sourceUrl : newSources) {
                 // escape spaces in URLs
                 sourceUrl = URLUtil.replaceURLSpaces(sourceUrl);
-                
+
                 HarvestSourceDTO source = new HarvestSourceDTO();
                 source.setUrl(sourceUrl);
                 source.setUrlHash(Hashes.spoHash(sourceUrl));
@@ -489,19 +502,43 @@ public abstract class Harvest {
         return rdfContentFound;
     }
 
+    /**
+     * @return
+     */
     public boolean isBatchHarvest() {
         return isBatchHarvest;
     }
 
+    /**
+     * @param isBatchHarvest
+     */
     public void setBatchHarvest(boolean isBatchHarvest) {
         this.isBatchHarvest = isBatchHarvest;
     }
 
+    /**
+     * @return
+     */
     public boolean isUrgentHarvest() {
         return isUrgentHarvest;
     }
 
+    /**
+     * @param isUrgentHarvest
+     */
     public void setUrgentHarvest(boolean isUrgentHarvest) {
         this.isUrgentHarvest = isUrgentHarvest;
+    }
+
+    /**
+     * @throws RepositoryException
+     *
+     */
+    public RepositoryConnection getRepositoryConnection() throws RepositoryException {
+
+        if (repositoryConnection == null) {
+            repositoryConnection = SesameUtil.getRepositoryConnection();
+        }
+        return repositoryConnection;
     }
 }

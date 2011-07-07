@@ -67,7 +67,7 @@ public abstract class AbstractActionBean implements ActionBean {
     private CRActionBeanContext context;
 
     /** */
-    private Harvest currentQueuedHarvest = CurrentHarvests.getQueuedHarvest();
+    private final Harvest currentQueuedHarvest = CurrentHarvests.getQueuedHarvest();
 
     /** */
     protected DAOFactory factory = DAOFactory.get();
@@ -80,17 +80,22 @@ public abstract class AbstractActionBean implements ActionBean {
 
     /*
      * (non-Javadoc)
+     *
      * @see net.sourceforge.stripes.action.ActionBean#getContext()
      */
+    @Override
     public CRActionBeanContext getContext() {
         return this.context;
     }
 
     /**
      * Sets ActionBean context.
-     * @param context ActionBeanContext
+     *
+     * @param context
+     *            ActionBeanContext
      * @see net.sourceforge.stripes.action.ActionBean#setContext(net.sourceforge.stripes.action.ActionBeanContext)
      */
+    @Override
     public void setContext(final ActionBeanContext context) {
         this.context = (CRActionBeanContext) context;
     }
@@ -113,6 +118,7 @@ public abstract class AbstractActionBean implements ActionBean {
 
     /**
      * Current user in servlet context.
+     *
      * @return CRUser
      */
     public CRUser getUser() {
@@ -120,21 +126,22 @@ public abstract class AbstractActionBean implements ActionBean {
     }
 
     /**
-     * Adds system message. The message will be shown in a simple rectangle and is to
-     * provide information on <i>successful</i> actions.
+     * Adds system message. The message will be shown in a simple rectangle and is to provide information on <i>successful</i>
+     * actions.
      *
-     * @param message Message text in HTML format.
+     * @param message
+     *            Message text in HTML format.
      */
     protected void addSystemMessage(final String message) {
         getContext().getMessages(SYSTEM_MESSAGES).add(new SimpleMessage(message));
     }
 
     /**
-     * Adds caution message. The message will be shown wrapped in the &lt;div class="caution-msg"&lt; element.
-     * A caution is less severe than a warning. It can e.g. be used when the application has to say to the user
-     * that it has ignored some input.
+     * Adds caution message. The message will be shown wrapped in the &lt;div class="caution-msg"&lt; element. A caution is less
+     * severe than a warning. It can e.g. be used when the application has to say to the user that it has ignored some input.
      *
-     * @param message Message text in HTML format.
+     * @param message
+     *            Message text in HTML format.
      */
     protected void addCautionMessage(final String message) {
         getContext().getMessages(CAUTION_MESSAGES).add(new SimpleMessage(message));
@@ -143,7 +150,8 @@ public abstract class AbstractActionBean implements ActionBean {
     /**
      * Adds warning message. The message will be shown wrapped in the &lt;div class="warning-msg"&lt; element.
      *
-     * @param message Message text in HTML format.
+     * @param message
+     *            Message text in HTML format.
      */
     protected void addWarningMessage(final String message) {
         getContext().getMessages(WARNING_MESSAGES).add(new SimpleMessage(message));
@@ -151,6 +159,7 @@ public abstract class AbstractActionBean implements ActionBean {
 
     /**
      * Returns Stripes resource bundle.
+     *
      * @return ResourceBundle resources
      */
     public ResourceBundle getBundle() {
@@ -260,11 +269,11 @@ public abstract class AbstractActionBean implements ActionBean {
      */
     public List<String> getAcceptedLanguagesByImportance() {
         if (acceptedLanguagesByImportance == null) {
-            acceptedLanguagesByImportance = Util.getAcceptedLanguagesByImportance(getContext().getRequest().getHeader("Accept-Language"));
+            acceptedLanguagesByImportance =
+                Util.getAcceptedLanguagesByImportance(getContext().getRequest().getHeader("Accept-Language"));
         }
         return acceptedLanguagesByImportance;
     }
-
 
     /**
      * @return session associated with current request
@@ -290,7 +299,7 @@ public abstract class AbstractActionBean implements ActionBean {
     }
 
     public String getBaseUrl(CRActionBeanContext context) {
-        String url =  context.getRequest().getRequestURL().toString();
+        String url = context.getRequest().getRequestURL().toString();
         return url.substring(0, url.lastIndexOf("/pages/"));
     }
 }

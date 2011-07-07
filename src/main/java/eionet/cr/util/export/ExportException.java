@@ -23,11 +23,10 @@ package eionet.cr.util.export;
 import eionet.cr.dao.readers.ResultSetReaderException;
 
 /**
- * @author Enriko Käsper, TietoEnator Estonia AS
- * ExporterException
+ * @author Enriko Käsper, TietoEnator Estonia AS ExporterException
  */
 
-public class ExportException  extends ResultSetReaderException {
+public class ExportException extends ResultSetReaderException {
 
     /**
      *

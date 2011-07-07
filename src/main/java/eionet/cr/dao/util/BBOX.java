@@ -45,44 +45,55 @@ public class BBOX {
     public Double getLatitudeSouth() {
         return latitudeSouth;
     }
+
     /**
-     * @param latitudeSouth the latitudeSouth to set
+     * @param latitudeSouth
+     *            the latitudeSouth to set
      */
     public void setLatitudeSouth(Double lowerLat) {
         this.latitudeSouth = lowerLat;
     }
+
     /**
      * @return the latitudeNorth
      */
     public Double getLatitudeNorth() {
         return latitudeNorth;
     }
+
     /**
-     * @param latitudeNorth the latitudeNorth to set
+     * @param latitudeNorth
+     *            the latitudeNorth to set
      */
     public void setLatitudeNorth(Double upperLat) {
         this.latitudeNorth = upperLat;
     }
+
     /**
      * @return the longitudeWest
      */
     public Double getLongitudeWest() {
         return longitudeWest;
     }
+
     /**
-     * @param longitudeWest the longitudeWest to set
+     * @param longitudeWest
+     *            the longitudeWest to set
      */
     public void setLongitudeWest(Double lowerLong) {
         this.longitudeWest = lowerLong;
     }
+
     /**
      * @return the longitudeEast
      */
     public Double getLongitudeEast() {
         return longitudeEast;
     }
+
     /**
-     * @param longitudeEast the longitudeEast to set
+     * @param longitudeEast
+     *            the longitudeEast to set
      */
     public void setLongitudeEast(Double upperLong) {
         this.longitudeEast = upperLong;

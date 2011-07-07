@@ -53,7 +53,7 @@ public class SubjectPredicateRefsColumn extends SearchResultColumn {
      *
      */
     public SubjectPredicateRefsColumn() {
-        //blank
+        // blank
     }
 
     /**
@@ -87,8 +87,10 @@ public class SubjectPredicateRefsColumn extends SearchResultColumn {
     public String getPredicateUri() {
         return predicateUri;
     }
+
     /**
-     * @param predicateUri the predicateUri to set
+     * @param predicateUri
+     *            the predicateUri to set
      */
     public void setPredicateUri(String predicateUri) {
         this.predicateUri = predicateUri;
@@ -96,21 +98,20 @@ public class SubjectPredicateRefsColumn extends SearchResultColumn {
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.web.util.columns.SearchResultColumn#format(java.lang.Object)
      *
-     * Gets the collection of objects matching to the given predicate in the given subject.
-     * Formats the given collection to comma-separated string. For literal objects, simply the
-     * value of the literal will be used. For resource objects, clickable factsheet links will
-     * be created.
+     * Gets the collection of objects matching to the given predicate in the given subject. Formats the given collection to
+     * comma-separated string. For literal objects, simply the value of the literal will be used. For resource objects, clickable
+     * factsheet links will be created.
      */
     public String format(Object object) {
 
         String result = null;
         if (object != null && object instanceof SubjectDTO && predicateUri != null) {
 
-            SubjectDTO subjectDTO = (SubjectDTO)object;
-            Collection<ObjectDTO> objects = subjectDTO.getObjectsForSearchResultsDisplay(
-                    predicateUri, getLanguages());
+            SubjectDTO subjectDTO = (SubjectDTO) object;
+            Collection<ObjectDTO> objects = subjectDTO.getObjectsForSearchResultsDisplay(predicateUri, getLanguages());
 
             if (predicateUri.equals(Predicates.RDFS_LABEL)) {
 
@@ -170,20 +171,18 @@ public class SubjectPredicateRefsColumn extends SearchResultColumn {
      */
     private String buildFactsheetLink(String uri, String label) {
 
-        String factsheetUrlBinding =
-            FactsheetActionBean.class.getAnnotation(UrlBinding.class).value();
+        String factsheetUrlBinding = FactsheetActionBean.class.getAnnotation(UrlBinding.class).value();
         int i = factsheetUrlBinding.lastIndexOf("/");
 
-        StringBuffer href = new StringBuffer(
-                i >= 0 ? factsheetUrlBinding.substring(i + 1) : factsheetUrlBinding).append("?");
+        StringBuffer href = new StringBuffer(i >= 0 ? factsheetUrlBinding.substring(i + 1) : factsheetUrlBinding).append("?");
         href.append("uri=").append(Util.urlEncode(uri));
 
-        return new StringBuffer("<a href=\"").append(href).append("\">").append(label).
-           append("</a>").toString();
+        return new StringBuffer("<a href=\"").append(href).append("\">").append(label).append("</a>").toString();
     }
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.web.util.search.SearchResultColumn#getSortParamValue()
      */
     public String getSortParamValue() {

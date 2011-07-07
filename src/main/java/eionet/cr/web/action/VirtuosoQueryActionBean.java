@@ -95,6 +95,7 @@ public class VirtuosoQueryActionBean extends AbstractActionBean {
 
         /*
          * (non-Javadoc)
+         *
          * @see eionet.cr.util.sesame.SPARQLResultSetBaseReader#startResultSet()
          */
         protected void startResultSet() {
@@ -116,6 +117,7 @@ public class VirtuosoQueryActionBean extends AbstractActionBean {
 
         /*
          * (non-Javadoc)
+         *
          * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
          */
         @Override
@@ -139,6 +141,7 @@ public class VirtuosoQueryActionBean extends AbstractActionBean {
 
         /*
          * (non-Javadoc)
+         *
          * @see eionet.cr.util.sesame.SPARQLResultSetBaseReader#endResultSet()
          */
         @Override

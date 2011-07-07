@@ -8,7 +8,7 @@ import java.util.List;
  * @author jaanus
  *
  */
-public abstract class SPARQLResultSetBaseReader<T> implements SPARQLResultSetReader<T>{
+public abstract class SPARQLResultSetBaseReader<T> implements SPARQLResultSetReader<T> {
 
     /** */
     protected List<T> resultList = new ArrayList<T>();
@@ -18,6 +18,7 @@ public abstract class SPARQLResultSetBaseReader<T> implements SPARQLResultSetRea
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.util.sesame.SPARQLResultSetReader#startResultSet(java.util.List)
      */
     public void startResultSet(List<String> bindingNames) {
@@ -32,7 +33,9 @@ public abstract class SPARQLResultSetBaseReader<T> implements SPARQLResultSetRea
     protected void startResultSet() {
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see eionet.cr.dao.readers.ResultSetReader#endResultSet()
      */
     @Override
@@ -41,7 +44,9 @@ public abstract class SPARQLResultSetBaseReader<T> implements SPARQLResultSetRea
         // default implementation, which does nothing, implementors can override
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see eionet.cr.dao.readers.ResultSetReader#getResultList()
      */
     @Override

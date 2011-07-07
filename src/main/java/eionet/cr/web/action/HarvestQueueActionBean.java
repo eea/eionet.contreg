@@ -84,14 +84,15 @@ public class HarvestQueueActionBean extends AbstractActionBean {
     /**
      *
      * @return
-     * @throws DAOException if relational database is unavailable.
+     * @throws DAOException
+     *             if relational database is unavailable.
      */
     @DefaultHandler
     public Resolution view() throws DAOException {
 
         if (getQueueType().equals(TYPE_BATCH)) {
             batchQueue = HarvestingJob.getBatchHarvestingQueue();
-            if (batchQueue  ==  null || batchQueue.isEmpty()) {
+            if (batchQueue == null || batchQueue.isEmpty()) {
                 batchQueue = HarvestingJob.getNextScheduledSources();
             }
         } else {
@@ -101,10 +102,8 @@ public class HarvestQueueActionBean extends AbstractActionBean {
         return new ForwardResolution("/pages/harvestQueue.jsp");
     }
 
-
     /**
-     * Get queue type.
-     * This is not the queueType variable used in {@link #getQueueTypes()}.
+     * Get queue type. This is not the queueType variable used in {@link #getQueueTypes()}.
      *
      * @return the queueType
      */
@@ -117,10 +116,10 @@ public class HarvestQueueActionBean extends AbstractActionBean {
     }
 
     /**
-     * Set queue type.
-     * This is not the queueType variable used in {@link #getQueueTypes()}.
+     * Set queue type. This is not the queueType variable used in {@link #getQueueTypes()}.
      *
-     * @param queueType the queueType to set
+     * @param queueType
+     *            the queueType to set
      */
     public void setQueueType(String queueType) {
         this.queueType = queueType;

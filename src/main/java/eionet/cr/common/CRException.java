@@ -30,7 +30,8 @@ public class CRException extends Exception {
     }
 
     /**
-     * @param msg the detail message.
+     * @param msg
+     *            the detail message.
      */
     public CRException(String msg) {
         super(msg);

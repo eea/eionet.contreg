@@ -29,8 +29,7 @@ import java.util.Set;
 import javax.servlet.ServletRequest;
 
 /**
- * Class that manages query parameters as a set. Extends HashMap.
- * A parameter can have more than one value.
+ * Class that manages query parameters as a set. Extends HashMap. A parameter can have more than one value.
  *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
@@ -46,7 +45,9 @@ public class QueryString extends HashMap<String, Set<String>> {
 
     /**
      * Build the hashmap content from the parameters in the request.
-     * @param request HTTP Request
+     *
+     * @param request
+     *            HTTP Request
      * @param excludeParameters
      */
     private QueryString(ServletRequest request) {
@@ -65,6 +66,7 @@ public class QueryString extends HashMap<String, Set<String>> {
 
     /**
      * Add parameter value.
+     *
      * @param parName
      * @param parValue
      */
@@ -102,6 +104,7 @@ public class QueryString extends HashMap<String, Set<String>> {
 
     /**
      * Remove all values for a parameter.
+     *
      * @param parName
      */
     public QueryString removeParameter(String parName) {
@@ -111,6 +114,7 @@ public class QueryString extends HashMap<String, Set<String>> {
 
     /**
      * Remove all values for several parameters.
+     *
      * @param parName
      */
     public QueryString removeParameters(String[] parNames) {
@@ -126,6 +130,7 @@ public class QueryString extends HashMap<String, Set<String>> {
 
     /**
      * Remove all values for a parameter and set a new value.
+     *
      * @param parName
      */
     public QueryString setParameterValue(String parName, String parValue) {
@@ -134,8 +139,9 @@ public class QueryString extends HashMap<String, Set<String>> {
     }
 
     /**
-     * Constructs the query string from the parameters in the hashmap.
-     * The string doesn't start with '?' and '&amp;'-signs are HTML escaped.
+     * Constructs the query string from the parameters in the hashmap. The string doesn't start with '?' and '&amp;'-signs are HTML
+     * escaped.
+     *
      * @return the query string
      */
     public String toURLFormat() {

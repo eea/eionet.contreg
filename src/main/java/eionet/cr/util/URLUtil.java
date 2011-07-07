@@ -21,7 +21,6 @@
 package eionet.cr.util;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -30,6 +29,7 @@ import java.net.UnknownHostException;
 import java.text.MessageFormat;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 
 import eionet.cr.config.GeneralConfig;
 
@@ -39,6 +39,9 @@ import eionet.cr.config.GeneralConfig;
  *
  */
 public class URLUtil {
+
+    /** */
+    private static final Logger LOGGER = Logger.getLogger(URLUtil.class);
 
     /**
      *
@@ -72,81 +75,77 @@ public class URLUtil {
     }
 
     /**
-     * Connect to the URL and check if it is modified since the timestamp argument.
+     * Connect to the URL and check if it is modified since the timestamp argument. Returns null, if it cannot be determined for
+     * sure.
+     *
      * @param urlString
      * @param timestamp
      * @return true if it is modified.
      */
     public static Boolean isModifiedSince(String urlString, long timestamp) {
 
-        if (!URLUtil.isURL(urlString))
-            return false;
+        if (!URLUtil.isURL(urlString)) {
+            return Boolean.FALSE;
+        }
 
-        if (timestamp == 0)
-            return true;
+        if (timestamp == 0) {
+            return Boolean.TRUE;
+        }
 
-        InputStream inputStream = null;
+        URLConnection urlConnection = null;
         try {
             URL url = new URL(StringUtils.substringBefore(urlString, "#"));
-            URLConnection urlConnection = replaceURLSpaces(url).openConnection();
+            urlConnection = replaceURLSpaces(url).openConnection();
+            urlConnection.setRequestProperty("Connection", "close");
             urlConnection.setRequestProperty("User-Agent", userAgentHeader());
             urlConnection.setIfModifiedSince(timestamp);
-            inputStream = urlConnection.getInputStream();
 
             int responseCode = ((HttpURLConnection) urlConnection).getResponseCode();
+            System.out.println(responseCode);
             if (responseCode == HttpURLConnection.HTTP_NOT_MODIFIED) {
-                //TODO: At the top of the method the simpler "false" is returned.
-                //Here we use a class member.
                 return Boolean.FALSE;
             } else if (responseCode == HttpURLConnection.HTTP_OK) {
                 return Boolean.TRUE;
             } else {
-                //TODO: Is that a "false"?
+                // Return null to indicate if it's unclear whether the source has
+                // been modified or not.
                 return null;
             }
         } catch (IOException ioe) {
             return null;
         } finally {
-            if (inputStream != null) {
-                try { inputStream.close(); } catch (IOException ioe) {}
-            }
+            URLUtil.disconnect(urlConnection);
         }
     }
 
     /**
-     * Connect to the URL and check if it exists at the remote end.
-     * Local ids are removed (the part after the '#') before connecting.
+     * Connect to the URL and check if it exists at the remote end. Local ids are removed (the part after the '#') before
+     * connecting.
      *
-     * @param urlStr the URL to check.
+     * @param urlStr
+     *            the URL to check.
      * @return true is the URL does <b>NOT</b> exist.
      */
     public static boolean isNotExisting(String urlStr) {
 
         int responseCode = -1;
         IOException ioe = null;
-        InputStream inputStream = null;
+        URLConnection urlConnection = null;
         try {
             URL url = new URL(StringUtils.substringBefore(urlStr, "#"));
-            URLConnection urlConnection = replaceURLSpaces(url).openConnection();
-            inputStream = urlConnection.getInputStream();
-            responseCode = ((HttpURLConnection)urlConnection).getResponseCode();
+            urlConnection = replaceURLSpaces(url).openConnection();
+            urlConnection.setRequestProperty("Connection", "close");
+            responseCode = ((HttpURLConnection) urlConnection).getResponseCode();
         } catch (IOException e) {
             ioe = e;
         } finally {
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (IOException e) {}
-            }
+            URLUtil.disconnect(urlConnection);
         }
 
-        return    ioe instanceof MalformedURLException
-               || ioe instanceof UnknownHostException
-               || (responseCode >= 400 && responseCode <= 499)
-               || responseCode == HttpURLConnection.HTTP_NOT_IMPLEMENTED
-               || responseCode == HttpURLConnection.HTTP_VERSION;
+        return ioe instanceof MalformedURLException || ioe instanceof UnknownHostException
+        || (responseCode >= 400 && responseCode <= 499) || responseCode == HttpURLConnection.HTTP_NOT_IMPLEMENTED
+        || responseCode == HttpURLConnection.HTTP_VERSION;
     }
-
 
     /**
      * A cross-the-stream-to-get-water replacement for {@link java.net.URL#getHost()}.
@@ -185,13 +184,28 @@ public class URLUtil {
     }
 
     /**
-    *
-    * @param url
-    * @return URL
-    * @throws MalformedURLException
-    */
-   public static String replaceURLSpaces(String url) throws MalformedURLException {
+     *
+     * @param url
+     * @return URL
+     * @throws MalformedURLException
+     */
+    public static String replaceURLSpaces(String url) throws MalformedURLException {
 
-       return url == null ? null : StringUtils.replace(url.toString(), " ", "%20");
-   }
+        return url == null ? null : StringUtils.replace(url.toString(), " ", "%20");
+    }
+
+    /**
+     *
+     * @param urlConnection
+     */
+    public static void disconnect(URLConnection urlConnection) {
+
+        if (urlConnection != null && urlConnection instanceof HttpURLConnection) {
+            try {
+                ((HttpURLConnection) urlConnection).disconnect();
+            } catch (Exception e) {
+                LOGGER.warn("Error when disconnection from " + urlConnection.getURL() + ": " + e.toString());
+            }
+        }
+    }
 }

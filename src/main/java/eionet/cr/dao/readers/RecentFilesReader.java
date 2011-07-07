@@ -12,14 +12,18 @@ import eionet.cr.util.Util;
 
 /**
  * Reader for recent files shown in the front page.
+ *
  * @author kaido
  */
 public class RecentFilesReader extends ResultSetMixedReader<Pair<String, String>> {
 
     /**
      * Reads row from Bindingset to resultList.
-     * @param bindingSet SPARQL result
-     * @throws ResultSetReaderException if reading fails
+     *
+     * @param bindingSet
+     *            SPARQL result
+     * @throws ResultSetReaderException
+     *             if reading fails
      */
     @Override
     public void readRow(final BindingSet bindingSet) throws ResultSetReaderException {
@@ -36,18 +40,23 @@ public class RecentFilesReader extends ResultSetMixedReader<Pair<String, String>
 
         // expecting the column "l" to contain the label
         Value labelValue = bindingSet.getValue("l");
-        if (labelValue != null  && !Util.isNullOrEmpty(labelValue.stringValue())) {
+        if (labelValue != null && !Util.isNullOrEmpty(labelValue.stringValue())) {
             label = labelValue.stringValue();
         }
         resultList.add(new Pair<String, String>(subjectUri, label));
 
     }
+
     /**
      * Reads row from SQL resultset to resultList.
+     *
      * @deprecated
-     * @param rs SQL resultSet
-     * @throws ResultSetReaderException if reading fails
-     * @throws SQLException if database query fails
+     * @param rs
+     *            SQL resultSet
+     * @throws ResultSetReaderException
+     *             if reading fails
+     * @throws SQLException
+     *             if database query fails
      */
     @Override
     public void readRow(final ResultSet rs) throws SQLException, ResultSetReaderException {

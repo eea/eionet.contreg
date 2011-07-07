@@ -53,6 +53,7 @@ public class SubPropertiesReader extends ResultSetMixedReader {
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
      */
     public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
@@ -61,12 +62,14 @@ public class SubPropertiesReader extends ResultSetMixedReader {
 
     /**
      * Reads row from SPARQL bindingset and creates an elemnt in Subproperties hash.
-     * @param bindingSet SPARQL query result
+     *
+     * @param bindingSet
+     *            SPARQL query result
      */
     @Override
     public void readRow(final BindingSet bindingSet) {
         if (bindingSet != null && bindingSet.size() > 0) {
-            Value subProp  = bindingSet.getValue("p");
+            Value subProp = bindingSet.getValue("p");
             Value prop = bindingSet.getValue("s");
             subProperties.add(prop.stringValue(), subProp.stringValue());
         }

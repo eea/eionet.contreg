@@ -35,6 +35,7 @@ public class HarvestDTOReader extends SQLResultSetBaseReader<HarvestDTO> {
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
      */
     public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {

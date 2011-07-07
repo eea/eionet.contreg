@@ -24,8 +24,7 @@ package eionet.cr.harvest.persist;
  *
  * Configuration object. Used to configure persister implementation.
  *
- * @author Aleksandr Ivanov
- * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
+ * @author Aleksandr Ivanov <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
 public class PersisterConfig {
 
@@ -45,8 +44,8 @@ public class PersisterConfig {
      * @param genTime
      * @param sourceUrlHash
      */
-    public PersisterConfig(boolean deriveInferredTriples, boolean clearPreviousContent, long sourceLastModified,
-                    String sourceUrl, long genTime, long sourceUrlHash, String instantHarvestUser) {
+    public PersisterConfig(boolean deriveInferredTriples, boolean clearPreviousContent, long sourceLastModified, String sourceUrl,
+            long genTime, long sourceUrlHash, String instantHarvestUser) {
         this.deriveInferredTriples = deriveInferredTriples;
         this.clearPreviousContent = clearPreviousContent;
         this.sourceLastModified = sourceLastModified;
@@ -56,39 +55,46 @@ public class PersisterConfig {
         this.instantHarvestUser = instantHarvestUser;
     }
 
-
     /**
      * @return the deriveInferredTriples
      */
     public boolean isDeriveInferredTriples() {
         return deriveInferredTriples;
     }
+
     /**
-     * @param deriveInferredTriples the deriveInferredTriples to set
+     * @param deriveInferredTriples
+     *            the deriveInferredTriples to set
      */
     public void setDeriveInferredTriples(boolean deriveInferredTriples) {
         this.deriveInferredTriples = deriveInferredTriples;
     }
+
     /**
      * @return the clearPreviousContent
      */
     public boolean isClearPreviousContent() {
         return clearPreviousContent;
     }
+
     /**
-     * @param clearPreviousContent the clearPreviousContent to set
+     * @param clearPreviousContent
+     *            the clearPreviousContent to set
      */
     public void setClearPreviousContent(boolean clearPreviousContent) {
         this.clearPreviousContent = clearPreviousContent;
     }
+
     /**
      * @return the sourceLastModified
      */
     public long getSourceLastModified() {
         return sourceLastModified;
     }
+
     /**
-     * @param sourceLastModified the sourceLastModified to set
+     * @param sourceLastModified
+     *            the sourceLastModified to set
      */
     public void setSourceLastModified(long sourceLastModified) {
         this.sourceLastModified = sourceLastModified;
@@ -102,7 +108,8 @@ public class PersisterConfig {
     }
 
     /**
-     * @param sourceUrl the sourceUrl to set
+     * @param sourceUrl
+     *            the sourceUrl to set
      */
     public void setSourceUrl(String sourceUrl) {
         this.sourceUrl = sourceUrl;
@@ -116,7 +123,8 @@ public class PersisterConfig {
     }
 
     /**
-     * @param genTime the genTime to set
+     * @param genTime
+     *            the genTime to set
      */
     public void setGenTime(long genTime) {
         this.genTime = genTime;
@@ -130,12 +138,12 @@ public class PersisterConfig {
     }
 
     /**
-     * @param sourceUrlHash the sourceUrlHash to set
+     * @param sourceUrlHash
+     *            the sourceUrlHash to set
      */
     public void setSourceUrlHash(long sourceUrlHash) {
         this.sourceUrlHash = sourceUrlHash;
     }
-
 
     /**
      * @return the instantHarvestUser
@@ -144,9 +152,9 @@ public class PersisterConfig {
         return instantHarvestUser;
     }
 
-
     /**
-     * @param instantHarvestUser the instantHarvestUser to set
+     * @param instantHarvestUser
+     *            the instantHarvestUser to set
      */
     public void setInstantHarvestUser(String instantHarvestUser) {
         this.instantHarvestUser = instantHarvestUser;

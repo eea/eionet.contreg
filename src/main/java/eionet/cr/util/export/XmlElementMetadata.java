@@ -26,26 +26,33 @@ package eionet.cr.util.export;
 
 public class XmlElementMetadata {
 
-    public enum Type {STRING, DOUBLE;}
+    public enum Type {
+        STRING, DOUBLE;
+    }
 
     private String name;
     private int maxLength = -1;
     private Type type = null;
 
     public XmlElementMetadata(String name) {
-        this.name=name;
+        this.name = name;
     }
+
     public String getName() {
         return name;
     }
+
     public void setName(String name) {
         this.name = name;
     }
+
     public int getMaxLength() {
         return maxLength;
     }
+
     /**
      * Apply new length only if it is bigger than exisiting
+     *
      * @param length
      */
     public void setMaxLength(int length) {
@@ -53,16 +60,19 @@ public class XmlElementMetadata {
             this.maxLength = length;
         }
     }
+
     /**
      * Get type value. If no value defined, then it is a STRING
+     *
      * @return
      */
     public Type getType() {
         return (this.type == null) ? Type.STRING : this.type;
     }
+
     /**
-     * apply new type only if the type is not a string already or the new type is string
-     * It is impossible to change the type numeric, if it is STRING already
+     * apply new type only if the type is not a string already or the new type is string It is impossible to change the type
+     * numeric, if it is STRING already
      *
      * @param type
      */
@@ -71,8 +81,10 @@ public class XmlElementMetadata {
             this.type = type;
         }
     }
+
     /**
      * Try to guess the element data type from the given value
+     *
      * @param value
      */
     public void setType(String stringValue) {
@@ -83,6 +95,7 @@ public class XmlElementMetadata {
             setType(Type.STRING);
         }
     }
+
     @Override
     public String toString() {
         return "XmlElementMetadata [name=" + name + ", maxLength=" + maxLength + ", type=" + type + "]";

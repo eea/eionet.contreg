@@ -20,7 +20,6 @@
  */
 package eionet.cr.util.sql;
 
-
 /**
  *
  * @author heinljab

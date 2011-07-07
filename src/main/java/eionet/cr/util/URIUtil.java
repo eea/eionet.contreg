@@ -33,13 +33,12 @@ public class URIUtil {
 
     /** */
     private static HashSet<String> schemes;
-    
+
     /**
-     * Returns true if the following conditions are all met:
-     * - the given string is not null nor empty
-     * - the given string passes <code>new java.net.URI(str)</code> without the <code>java.net.URISyntaxException</code> being thrown
-     * - the given string is an <strong>absolute</strong> URI, meaning it has a scheme part specified
-     * - URI scheme in the given string matches one of those specified by [RFC4395] (see http://www.iana.org/assignments/uri-schemes.html)
+     * Returns true if the following conditions are all met: - the given string is not null nor empty - the given string passes
+     * <code>new java.net.URI(str)</code> without the <code>java.net.URISyntaxException</code> being thrown - the given string is an
+     * <strong>absolute</strong> URI, meaning it has a scheme part specified - URI scheme in the given string matches one of those
+     * specified by [RFC4395] (see http://www.iana.org/assignments/uri-schemes.html)
      *
      * Otherwise returns false.
      *
@@ -77,7 +76,7 @@ public class URIUtil {
 
             int i = Math.max(uri.lastIndexOf('#'), uri.lastIndexOf('/'));
             if (i >= 0) {
-                result = uri.substring(i+1);
+                result = uri.substring(i + 1);
                 if (result.trim().length() == 0) {
                     result = null;
                 }
@@ -100,7 +99,7 @@ public class URIUtil {
 
             int i = Math.max(uri.lastIndexOf('#'), uri.lastIndexOf('/'));
             if (i >= 0) {
-                result = uri.substring(i+1);
+                result = uri.substring(i + 1);
                 if (result.trim().length() == 0) {
                     result = null;
                 }

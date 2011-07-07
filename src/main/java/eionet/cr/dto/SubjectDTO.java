@@ -154,8 +154,7 @@ public class SubjectDTO implements Serializable {
      * @param preferHitSource
      * @return
      */
-    public Collection<ObjectDTO> getObjectsForSearchResultsDisplay(
-            String predicateUri, Set<String> languages) {
+    public Collection<ObjectDTO> getObjectsForSearchResultsDisplay(String predicateUri, Set<String> languages) {
 
         Collection<ObjectDTO> result = new ArrayList<ObjectDTO>();
         Collection<ObjectDTO> fromHitSources = new ArrayList<ObjectDTO>();
@@ -185,9 +184,7 @@ public class SubjectDTO implements Serializable {
 
                     // skip literals which have a language that is not present in the
                     // language preferences
-                    if (object.isLiteral()
-                            && languages != null && !languages.isEmpty()
-                            && object.getLanguage() != null
+                    if (object.isLiteral() && languages != null && !languages.isEmpty() && object.getLanguage() != null
                             && !languages.contains(object.getLanguage())) {
                         continue;
                     }
@@ -202,8 +199,7 @@ public class SubjectDTO implements Serializable {
                     // if resource object, set its derived literal
                     // (will be set to null if no derived literals found)
                     if (!object.isLiteral()) {
-                        object.setDerviedLiteralValue(derivedLiterals.get(
-                                Long.valueOf(Hashes.spoHash(objectValue))));
+                        object.setDerviedLiteralValue(derivedLiterals.get(Long.valueOf(Hashes.spoHash(objectValue))));
                     }
                 }
             }
@@ -226,11 +222,11 @@ public class SubjectDTO implements Serializable {
         if (coll != null && !coll.isEmpty()) {
             for (Iterator<ObjectDTO> iter = coll.iterator(); iter.hasNext();) {
                 ObjectDTO objectDTO = iter.next();
-                if (objectType.equals(ObjectDTO.Type.LITERAL) && objectDTO.isLiteral())
+                if (objectType.equals(ObjectDTO.Type.LITERAL) && objectDTO.isLiteral()) {
                     result.add(objectDTO);
-                else if (objectType.equals(ObjectDTO.Type.RESOURCE) && !objectDTO.isLiteral())
+                } else if (objectType.equals(ObjectDTO.Type.RESOURCE) && !objectDTO.isLiteral()) {
                     result.add(objectDTO);
-                ;
+                }
             }
         }
 
@@ -485,8 +481,7 @@ public class SubjectDTO implements Serializable {
      */
     public boolean isRegisteredBy(CRUser user) {
 
-        return existsPredicateObjectSource(
-                Predicates.RDF_TYPE, Subjects.CR_FILE, user.getRegistrationsUri());
+        return existsPredicateObjectSource(Predicates.RDF_TYPE, Subjects.CR_FILE, user.getRegistrationsUri());
     }
 
     public Date getDcDate() {

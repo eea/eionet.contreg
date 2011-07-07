@@ -28,9 +28,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * 
+ *
  * @author heinljab
- * 
+ *
  */
 public class GeneralConfig {
 
@@ -103,8 +103,15 @@ public class GeneralConfig {
     public static final String VIRTUOSO_DB_USR = "virtuoso.db.usr";
     public static final String VIRTUOSO_DB_PWD = "virtuoso.db.pwd";
 
+    /** */
     public static final String VIRTUOSO_DB_ROUSR = "virtuoso.db.rousr";
     public static final String VIRTUOSO_DB_ROPWD = "virtuoso.db.ropwd";
+
+    /** */
+    public static final String VIRTUOSO_UNITTEST_DB_URL = "virtuoso.unittest.db.url";
+    public static final String VIRTUOSO_UNITTEST_DB_USR = "virtuoso.unittest.db.usr";
+    public static final String VIRTUOSO_UNITTEST_DB_PWD = "virtuoso.unittest.db.pwd";
+
     /**
      * General ruleSet name for inferencing. Schema sources are added into that ruleset.
      * */
@@ -112,6 +119,11 @@ public class GeneralConfig {
 
     /** */
     public static final String FILESTORE_PATH = "filestore.path";
+
+    /**
+     * Property name for property indicating how many rows SPARQL endpoint returns in HTML.
+     */
+    public static final String SPARQLENDPOINT_MAX_ROWS_COUNT = "sparql.max.rows";
 
     /** */
     public static final int SEVERITY_INFO = 1;
@@ -142,7 +154,7 @@ public class GeneralConfig {
     }
 
     /**
-     * 
+     *
      * @param name
      * @return
      */
@@ -155,7 +167,7 @@ public class GeneralConfig {
     }
 
     /**
-     * 
+     *
      * @param key
      * @param defaultValue
      * @return
@@ -169,7 +181,34 @@ public class GeneralConfig {
     }
 
     /**
-     * 
+     * Returns integer property.
+     *
+     * @param key
+     *            property key in the properties file
+     * @param defaultValue
+     *            default value that is returned if not specified or in incorrect format
+     * @return property value or default if not specified correctly
+     */
+    public static synchronized int getIntProperty(final String key, final int defaultValue) {
+
+        if (properties == null) {
+            init();
+        }
+        String propValue = properties.getProperty(key);
+        int value = defaultValue;
+        if (propValue != null) {
+            try {
+                value = Integer.valueOf(propValue);
+            } catch (Exception e) {
+                logger.warn("Property " + key + " is defined incorrectly in props file: '" + propValue + "', returning default.");
+            }
+        }
+
+        return value;
+    }
+
+    /**
+     *
      * @param key
      * @return
      * @throws CRConfigException
@@ -184,7 +223,7 @@ public class GeneralConfig {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public static synchronized Properties getProperties() {
@@ -196,7 +235,7 @@ public class GeneralConfig {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public static synchronized boolean useVirtuoso() {

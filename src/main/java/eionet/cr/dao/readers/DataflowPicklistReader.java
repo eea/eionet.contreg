@@ -40,42 +40,41 @@ import eionet.cr.dao.util.UriLabelPair;
 public class DataflowPicklistReader<T> extends ResultSetMixedReader<T> {
 
     /** */
+    // KL 170611 - why does it not return resultList as the rest of readers?
+    /** */
+    // private LinkedHashMap<String, ArrayList<UriLabelPair>> resultMap = new LinkedHashMap<String, ArrayList<UriLabelPair>>();
+    private LinkedHashMap<UriLabelPair, ArrayList<UriLabelPair>> resultMap =
+            new LinkedHashMap<UriLabelPair, ArrayList<UriLabelPair>>();
 
     /** */
-    private LinkedHashMap<String, ArrayList<UriLabelPair>> resultMap = new LinkedHashMap<String, ArrayList<UriLabelPair>>();
-
-    /** */
-    private String currentInstrument = null;
+    private String currentInstrumentUri = null;
     private ArrayList<UriLabelPair> currentObligations = null;
 
     /**
      * @return the resultMap
      */
-    public HashMap<String, ArrayList<UriLabelPair>> getResultMap() {
-
+    public HashMap<UriLabelPair, ArrayList<UriLabelPair>> getResultMap() {
         return resultMap;
     }
 
     /*
      * (non-Javadoc)
      *
-     * @see
-     * eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query
-     * .BindingSet)
+     * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query .BindingSet)
      */
     @Override
     public void readRow(BindingSet bindingSet) {
-        Value instrument = bindingSet.getValue("li_title");
+        Value instrument = bindingSet.getValue("li_uri");
+        String instrumentUri = instrument.stringValue();
+        String instrumentTitle = bindingSet.getValue("li_title").stringValue();
 
-        String instrumentTitle = instrument.stringValue();
-
-        if (currentInstrument == null || !currentInstrument.equals(instrumentTitle)) {
+        if (currentInstrumentUri == null || !currentInstrumentUri.equals(instrumentUri)) {
             currentObligations = new ArrayList<UriLabelPair>();
-            currentInstrument = instrumentTitle;
-            resultMap.put(currentInstrument, currentObligations);
+            currentInstrumentUri = instrumentUri;
+            resultMap.put(UriLabelPair.create(currentInstrumentUri, instrumentTitle), currentObligations);
         }
-        currentObligations.add(UriLabelPair.create(bindingSet.getValue("ro_uri").stringValue(), bindingSet.getValue(
-                "ro_title").stringValue()));
+        currentObligations.add(UriLabelPair.create(bindingSet.getValue("ro_uri").stringValue(), bindingSet.getValue("ro_title")
+                .stringValue()));
 
     }
 

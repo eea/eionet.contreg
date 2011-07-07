@@ -67,7 +67,6 @@ public class TagDTO implements Serializable {
         this.scale = scale;
     }
 
-
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -92,7 +91,7 @@ public class TagDTO implements Serializable {
     /**
      * Compares two tags by name in ascending order
      */
-    static public class NameComparatorAsc implements Comparator<TagDTO> {
+    public static class NameComparatorAsc implements Comparator<TagDTO> {
         public int compare(TagDTO tag1, TagDTO tag2) {
             return tag1.getTag().compareToIgnoreCase(tag2.getTag());
         }
@@ -101,7 +100,7 @@ public class TagDTO implements Serializable {
     /**
      * Compares two tags by count in ascending order
      */
-    static public class CountComparatorDesc implements Comparator<TagDTO> {
+    public static class CountComparatorDesc implements Comparator<TagDTO> {
 
         public int compare(TagDTO tag1, TagDTO tag2) {
             int countComparison = tag2.getCount() - tag1.getCount();

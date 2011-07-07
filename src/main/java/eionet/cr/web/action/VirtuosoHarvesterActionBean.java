@@ -16,7 +16,6 @@ import org.openrdf.rio.RDFFormat;
 
 import virtuoso.sesame2.driver.VirtuosoRepository;
 import eionet.cr.config.GeneralConfig;
-import eionet.cr.dao.DAOException;
 
 /**
  *
@@ -39,7 +38,8 @@ public class VirtuosoHarvesterActionBean extends AbstractActionBean {
     /**
      *
      * @return
-     * @throws DAOException
+     * @throws OpenRDFException
+     * @throws IOException
      */
     public Resolution harvest() throws OpenRDFException, IOException {
 
@@ -51,7 +51,7 @@ public class VirtuosoHarvesterActionBean extends AbstractActionBean {
         Repository repository = null;
         RepositoryConnection conn = null;
         try {
-            repository = new VirtuosoRepository(repoUrl,repoUsr,repoPwd);
+            repository = new VirtuosoRepository(repoUrl, repoUsr, repoPwd);
             repository.initialize();
             conn = repository.getConnection();
 
@@ -75,15 +75,24 @@ public class VirtuosoHarvesterActionBean extends AbstractActionBean {
             isSuccess = true;
         } finally {
             if (!isSuccess && conn != null) {
-                try {conn.rollback();}catch(RepositoryException e) {}
+                try {
+                    conn.rollback();
+                } catch (RepositoryException e) {
+                }
             }
 
             if (conn != null) {
-                try {conn.close();}catch(RepositoryException e) {}
+                try {
+                    conn.close();
+                } catch (RepositoryException e) {
+                }
             }
 
             if (repository != null) {
-                try {repository.shutDown();}catch(RepositoryException e) {}
+                try {
+                    repository.shutDown();
+                } catch (RepositoryException e) {
+                }
             }
         }
 
@@ -106,7 +115,5 @@ public class VirtuosoHarvesterActionBean extends AbstractActionBean {
     public void setSourceUrl(String sourceUrl) {
         this.sourceUrl = sourceUrl;
     }
-
-
 
 }

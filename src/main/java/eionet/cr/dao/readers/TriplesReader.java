@@ -58,11 +58,9 @@ public class TriplesReader extends ResultSetMixedReader<TripleDTO> {
      *
      * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
      */
-    public void readRow(ResultSet rs) throws SQLException,
-            ResultSetReaderException {
+    public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
 
-        TripleDTO dto = new TripleDTO(rs.getLong("SUBJECT"), rs
-                .getLong("PREDICATE"), rs.getString("OBJECT"));
+        TripleDTO dto = new TripleDTO(rs.getLong("SUBJECT"), rs.getLong("PREDICATE"), rs.getString("OBJECT"));
         dto.setObjectDerivSourceHash(rs.getLong("OBJ_DERIV_SOURCE"));
 
         resultList.add(dto);
@@ -84,9 +82,7 @@ public class TriplesReader extends ResultSetMixedReader<TripleDTO> {
     /*
      * (non-Javadoc)
      *
-     * @see
-     * eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query
-     * .BindingSet)
+     * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query .BindingSet)
      */
     @Override
     public void readRow(BindingSet bindingSet) {

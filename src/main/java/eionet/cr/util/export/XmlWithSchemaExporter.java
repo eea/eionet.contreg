@@ -41,7 +41,7 @@ public class XmlWithSchemaExporter extends XmlExporter {
 
     @Override
     protected void writeDocumentEnd(XMLStreamWriter writer) throws XMLStreamException {
-        //data root element
+        // data root element
         writer.writeEndElement();
 
         // write XML schema
@@ -54,7 +54,7 @@ public class XmlWithSchemaExporter extends XmlExporter {
     protected void writeXmlSchema(XMLStreamWriter writer) throws XMLStreamException {
         writer.writeStartElement(SCHEMA_NS_URI, "schema");
 
-        //data root element definition
+        // data root element definition
         writer.writeStartElement(SCHEMA_NS_URI, "element");
         writer.writeAttribute("name", DATA_ROOT_ELEMENT);
         writer.writeStartElement(SCHEMA_NS_URI, "complexType");
@@ -63,17 +63,17 @@ public class XmlWithSchemaExporter extends XmlExporter {
         writer.writeAttribute("ref", ROW_ELEMENT);
         writer.writeAttribute("minOccurs", "0");
         writer.writeAttribute("maxOccurs", "unbounded");
-        writer.writeEndElement(); //sequence
-        writer.writeEndElement(); //complexType
-        writer.writeEndElement(); //element
+        writer.writeEndElement(); // sequence
+        writer.writeEndElement(); // complexType
+        writer.writeEndElement(); // element
 
-        //table element definition
+        // table element definition
         writer.writeStartElement(SCHEMA_NS_URI, "element");
         writer.writeAttribute("name", ROW_ELEMENT);
         writer.writeStartElement(SCHEMA_NS_URI, "complexType");
         writer.writeStartElement(SCHEMA_NS_URI, "sequence");
 
-        //write elements
+        // write elements
         for (XmlElementMetadata element : getElements().values()) {
             if (element.getType() == XmlElementMetadata.Type.DOUBLE) {
                 writeDoubleElement(writer, element);
@@ -81,14 +81,15 @@ public class XmlWithSchemaExporter extends XmlExporter {
                 writeStringElement(writer, element);
             }
         }
-        //end of table element definition
-        writer.writeEndElement(); //sequence
-        writer.writeEndElement(); //complexType
-        writer.writeEndElement(); //element
+        // end of table element definition
+        writer.writeEndElement(); // sequence
+        writer.writeEndElement(); // complexType
+        writer.writeEndElement(); // element
 
-        //end of schema
+        // end of schema
         writer.writeEndElement();
     }
+
     private void writeDoubleElement(XMLStreamWriter writer, XmlElementMetadata element) throws XMLStreamException {
         writer.writeEmptyElement(SCHEMA_NS_URI, "element");
         writer.writeAttribute("name", element.getName());
@@ -96,18 +97,19 @@ public class XmlWithSchemaExporter extends XmlExporter {
         writer.writeAttribute("type", "xsd:double");
 
     }
+
     private void writeStringElement(XMLStreamWriter writer, XmlElementMetadata element) throws XMLStreamException {
         writer.writeStartElement(SCHEMA_NS_URI, "element");
         writer.writeAttribute("name", element.getName());
         writer.writeAttribute("minOccurs", "0");
-        //write simple Type info
+        // write simple Type info
         writer.writeStartElement(SCHEMA_NS_URI, "simpleType");
         writer.writeStartElement(SCHEMA_NS_URI, "restriction");
         writer.writeAttribute("base", "xsd:string");
         writer.writeEmptyElement(SCHEMA_NS_URI, "maxLength");
-        writer.writeAttribute("value", String.valueOf((element.getMaxLength()>255)?element.getMaxLength():255));
-        writer.writeEndElement();//restriction
-        writer.writeEndElement();//simpleType
-        writer.writeEndElement();//element
+        writer.writeAttribute("value", String.valueOf((element.getMaxLength() > 255) ? element.getMaxLength() : 255));
+        writer.writeEndElement(); // restriction
+        writer.writeEndElement(); // simpleType
+        writer.writeEndElement(); // element
     }
 }

@@ -20,11 +20,8 @@
  */
 package eionet.cr.util.pagination;
 
-
-
 /**
- * @author Aleksandr Ivanov
- * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
+ * @author Aleksandr Ivanov <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
 public class PagingRequest {
 
@@ -41,7 +38,7 @@ public class PagingRequest {
 
         this.pageNumber = Math.max(1, pageNumber);
         this.itemsPerPage = Math.max(1, itemsPerPage);
-        this.offset = (this.pageNumber-1) * this.itemsPerPage;
+        this.offset = (this.pageNumber - 1) * this.itemsPerPage;
     }
 
     /**
@@ -89,10 +86,11 @@ public class PagingRequest {
 
     /*
      * (non-Javadoc)
+     *
      * @see java.lang.Object#toString()
      */
     public String toString() {
-        return new StringBuffer().append("pageNumber=").append(pageNumber).
-        append(",itemsPerPage=").append(itemsPerPage).toString();
+        return new StringBuffer().append("pageNumber=").append(pageNumber).append(",itemsPerPage=").append(itemsPerPage)
+                .toString();
     }
 }

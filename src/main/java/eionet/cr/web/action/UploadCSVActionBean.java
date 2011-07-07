@@ -23,12 +23,23 @@ package eionet.cr.web.action;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import net.sourceforge.stripes.action.DefaultHandler;
+import net.sourceforge.stripes.action.FileBean;
+import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.RedirectResolution;
+import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.action.UrlBinding;
+import net.sourceforge.stripes.validation.ValidationMethod;
 
+import org.apache.commons.lang.StringUtils;
+import org.openrdf.model.vocabulary.XMLSchema;
+
+import au.com.bytecode.opencsv.CSVReader;
 import eionet.cr.common.Predicates;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
@@ -39,16 +50,7 @@ import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.filestore.FileStore;
-
-import au.com.bytecode.opencsv.CSVReader;
-
-import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.FileBean;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.RedirectResolution;
-import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.action.UrlBinding;
-import net.sourceforge.stripes.validation.ValidationMethod;
+import eionet.cr.web.util.CharsetToolkit;
 
 /**
  * 
@@ -137,10 +139,13 @@ public class UploadCSVActionBean extends AbstractActionBean {
                 delimeter = '\t';
             }
 
+            File file = new File(filePath);
+            Charset guessedCharset = CharsetToolkit.guessEncoding(file, 4096, Charset.forName("UTF-8"));
+
             String graphName = appUrl + "/home/" + getUserName() + "/" + StringUtils.replace(fileName, " ", "%20");
             String type = graphName + "/" + objectType;
 
-            CSVReader reader = new CSVReader(new InputStreamReader(new FileInputStream(filePath), "UTF-8"), delimeter);
+            CSVReader reader = new CSVReader(new InputStreamReader(new FileInputStream(file), guessedCharset), delimeter);
             // First line contains column names
             String[] nextLine = reader.readNext();
             while ((nextLine = reader.readNext()) != null) {
@@ -151,7 +156,9 @@ public class UploadCSVActionBean extends AbstractActionBean {
                         if (id.length() > 0) {
                             id = id + "_";
                         }
-                        id = id + nextLine[colIndex];
+                        if (nextLine.length > colIndex) {
+                            id = id + nextLine[colIndex];
+                        }
                     }
                 }
 
@@ -175,9 +182,40 @@ public class UploadCSVActionBean extends AbstractActionBean {
                 // Add all other values found from file
                 int idx = 0;
                 for (String col : columns) {
-                    if (idx != labelColumn) {
+                    if (idx != labelColumn && nextLine.length > idx) {
                         String value = nextLine[idx];
-                        ObjectDTO obj = new ObjectDTO(value, true);
+                        ObjectDTO obj = null;
+                        if (col.equalsIgnoreCase("url") || col.equalsIgnoreCase("uri")) {
+                            obj = new ObjectDTO(value, false);
+                        } else {
+                            if (col.equalsIgnoreCase("date")) {
+                                obj = new ObjectDTO(value, true, XMLSchema.DATE);
+                            }
+                            if (col.equalsIgnoreCase("datetime")) {
+                                obj = new ObjectDTO(value, true, XMLSchema.DATETIME);
+                            } else if (col.equalsIgnoreCase("boolean")) {
+                                obj = new ObjectDTO(value.equalsIgnoreCase("true") ? "true" : "false", true, XMLSchema.BOOLEAN);
+                            } else if (col.equalsIgnoreCase("number")) {
+                                try {
+                                    Integer.parseInt(value);
+                                    obj = new ObjectDTO(value, true, XMLSchema.INTEGER);
+                                } catch (NumberFormatException nfe1) {
+                                    try {
+                                        Long.parseLong(value);
+                                        obj = new ObjectDTO(value, true, XMLSchema.LONG);
+                                    } catch (NumberFormatException nfe2) {
+                                        try {
+                                            Double.parseDouble(value);
+                                            obj = new ObjectDTO(value, true, XMLSchema.DOUBLE);
+                                        } catch (NumberFormatException nfe3) {
+                                            // Don't do anything
+                                        }
+                                    }
+                                }
+                            } else {
+                                obj = new ObjectDTO(value, true);
+                            }
+                        }
                         obj.setSourceUri(graphName);
                         subject.addObject(graphName + "#" + col, obj);
                     }
@@ -190,7 +228,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
 
         } catch (Exception e) {
             System.out.println("Exception while reading csv file: " + e);
-            addWarningMessage(e.getMessage());
+            addWarningMessage(e.toString());
             return resolution;
         }
 
@@ -203,7 +241,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
     /**
      * @throws DAOException
      */
-    @ValidationMethod(on = { "upload", "insert" })
+    @ValidationMethod(on = {"upload", "insert"})
     public void validatePostEvent() throws DAOException {
 
         // the below validation is relevant only when the event is requested through POST method
@@ -259,7 +297,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
             // since user's home URI was used above as triple source, add it to HARVEST_SOURCE too
             // (but set interval minutes to 0, to avoid it being background-harvested)
             DAOFactory.get().getDao(HarvestSourceDAO.class)
-                    .addSourceIgnoreDuplicate(HarvestSourceDTO.create(getUser().getHomeUri(), false, 0, getUserName()));
+            .addSourceIgnoreDuplicate(HarvestSourceDTO.create(getUser().getHomeUri(), false, 0, getUserName()));
 
         } catch (DAOException e) {
             e.printStackTrace();
@@ -270,22 +308,22 @@ public class UploadCSVActionBean extends AbstractActionBean {
     private void addSource(String subjectUri) throws Exception {
 
         DAOFactory.get().getDao(HarvestSourceDAO.class)
-                .addSourceIgnoreDuplicate(HarvestSourceDTO.create(subjectUri, false, 0, getUserName()));
+        .addSourceIgnoreDuplicate(HarvestSourceDTO.create(subjectUri, false, 0, getUserName()));
 
         DAOFactory
-                .get()
-                .getDao(HarvestSourceDAO.class)
-                .insertUpdateSourceMetadata(subjectUri, Predicates.CR_BYTE_SIZE,
-                        new ObjectDTO(String.valueOf(file.getSize()), true));
+        .get()
+        .getDao(HarvestSourceDAO.class)
+        .insertUpdateSourceMetadata(subjectUri, Predicates.CR_BYTE_SIZE,
+                new ObjectDTO(String.valueOf(file.getSize()), true));
 
         DAOFactory.get().getDao(HarvestSourceDAO.class)
-                .insertUpdateSourceMetadata(subjectUri, Predicates.CR_MEDIA_TYPE, new ObjectDTO(String.valueOf(type), true));
+        .insertUpdateSourceMetadata(subjectUri, Predicates.CR_MEDIA_TYPE, new ObjectDTO(String.valueOf(type), true));
 
         DAOFactory
-                .get()
-                .getDao(HarvestSourceDAO.class)
-                .insertUpdateSourceMetadata(subjectUri, Predicates.CR_LAST_MODIFIED,
-                        new ObjectDTO(dateFormat.format(new Date()), true));
+        .get()
+        .getDao(HarvestSourceDAO.class)
+        .insertUpdateSourceMetadata(subjectUri, Predicates.CR_LAST_MODIFIED,
+                new ObjectDTO(dateFormat.format(new Date()), true));
 
     }
 

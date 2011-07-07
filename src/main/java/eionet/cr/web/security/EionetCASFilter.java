@@ -48,26 +48,29 @@ import eionet.cr.web.util.CrCasFilterConfig;
 public class EionetCASFilter extends CASFilter {
 
     /** */
-    private static String CAS_LOGIN_URL = null;
-    private static String SERVER_NAME = null;
+    private static String casLoginUrl = null;
+    private static String serverName = null;
 
     /*
      * (non-Javadoc)
+     *
      * @see edu.yale.its.tp.cas.client.filter.CASFilter#init(javax.servlet.FilterConfig)
      */
     public void init(FilterConfig config) throws ServletException {
 
         CrCasFilterConfig filterConfig = CrCasFilterConfig.getInstance(config);
 
-        CAS_LOGIN_URL = filterConfig.getInitParameter(LOGIN_INIT_PARAM);
-        SERVER_NAME = filterConfig.getInitParameter(SERVERNAME_INIT_PARAM);
+        casLoginUrl = filterConfig.getInitParameter(LOGIN_INIT_PARAM);
+        serverName = filterConfig.getInitParameter(SERVERNAME_INIT_PARAM);
 
         super.init(filterConfig);
     }
 
     /*
      * (non-Javadoc)
-     * @see edu.yale.its.tp.cas.client.filter.CASFilter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse, javax.servlet.FilterChain)
+     *
+     * @see edu.yale.its.tp.cas.client.filter.CASFilter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse,
+     * javax.servlet.FilterChain)
      */
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain fc) throws ServletException, IOException {
 
@@ -80,7 +83,7 @@ public class EionetCASFilter extends CASFilter {
         super.doFilter(request, response, chain);
         if (chain.isDoNext()) {
 
-            HttpServletRequest httpRequest = (HttpServletRequest)request;
+            HttpServletRequest httpRequest = (HttpServletRequest) request;
             HttpSession session = httpRequest.getSession();
             if (session != null) {
 
@@ -90,8 +93,8 @@ public class EionetCASFilter extends CASFilter {
                 String requestURI = httpRequest.getRequestURI();
                 if (requestURI.endsWith("/login")) {
 
-                    String redirectUrl =  httpRequest.getContextPath() + LOGIN_ACTION + "?" + AFTER_LOGIN_EVENT;
-                    ((HttpServletResponse)response).sendRedirect(redirectUrl);
+                    String redirectUrl = httpRequest.getContextPath() + LOGIN_ACTION + "?" + AFTER_LOGIN_EVENT;
+                    ((HttpServletResponse) response).sendRedirect(redirectUrl);
                     return;
                 }
             }
@@ -107,7 +110,7 @@ public class EionetCASFilter extends CASFilter {
      * @return
      */
     public static String getCASLoginURL(HttpServletRequest request) {
-        return CAS_LOGIN_URL + "?service=" + request.getScheme() + "://" + SERVER_NAME + request.getContextPath() + "/login";
+        return casLoginUrl + "?service=" + request.getScheme() + "://" + serverName + request.getContextPath() + "/login";
     }
 
     /**
@@ -118,11 +121,11 @@ public class EionetCASFilter extends CASFilter {
      */
     public static String getCASLoginURL(HttpServletRequest req, boolean forSubscription) {
 
-        StringBuffer sb = new StringBuffer(CAS_LOGIN_URL);
+        StringBuffer sb = new StringBuffer(casLoginUrl);
         sb.append("?service=");
         sb.append(req.getScheme());
         sb.append("://");
-        sb.append(SERVER_NAME);
+        sb.append(serverName);
         if (!req.getContextPath().equals("")) {
             sb.append(req.getContextPath());
         }
@@ -139,8 +142,7 @@ public class EionetCASFilter extends CASFilter {
      * @return
      */
     public static String getCASLogoutURL(HttpServletRequest request) {
-        return CAS_LOGIN_URL.replaceFirst("/login", "/logout") + "?url="
-                + request.getScheme() + "://" + SERVER_NAME
+        return casLoginUrl.replaceFirst("/login", "/logout") + "?url=" + request.getScheme() + "://" + serverName
                 + request.getContextPath();
     }
 
@@ -150,8 +152,7 @@ public class EionetCASFilter extends CASFilter {
      * @return
      */
     public static boolean isCasLoggedUser(HttpServletRequest request) {
-        return (request.getSession() != null && request.getSession()
-                .getAttribute(CAS_FILTER_USER) != null);
+        return (request.getSession() != null && request.getSession().getAttribute(CAS_FILTER_USER) != null);
     }
 
     /**
@@ -162,8 +163,7 @@ public class EionetCASFilter extends CASFilter {
     public static String forRegex(String aRegexFragment) {
         final StringBuffer result = new StringBuffer();
 
-        final StringCharacterIterator iterator = new StringCharacterIterator(
-                aRegexFragment);
+        final StringCharacterIterator iterator = new StringCharacterIterator(aRegexFragment);
         char character = iterator.current();
         while (character != CharacterIterator.DONE) {
             /*
@@ -200,8 +200,8 @@ public class EionetCASFilter extends CASFilter {
             } else if (character == '$') {
                 result.append("\\$");
             } else {
-                //the char is not a special one
-                //add it to the result as is
+                // the char is not a special one
+                // add it to the result as is
                 result.append(character);
             }
             character = iterator.next();

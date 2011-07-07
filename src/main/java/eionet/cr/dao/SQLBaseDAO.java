@@ -33,12 +33,16 @@ public abstract class SQLBaseDAO {
     }
 
     /**
-     * helper method to execute sql queries.
-     * Handles connection init, close. Wraps Exceptions into {@link DAOException}
-     * @param <T> - type of the returned object
-     * @param sql - sql string
-     * @param params - parameters to insert into sql string
-     * @param reader - reader, to convert resultset
+     * helper method to execute sql queries. Handles connection init, close. Wraps Exceptions into {@link DAOException}
+     *
+     * @param <T>
+     *            - type of the returned object
+     * @param sql
+     *            - sql string
+     * @param params
+     *            - parameters to insert into sql string
+     * @param reader
+     *            - reader, to convert resultset
      * @return result of the sql query
      * @throws DAOException
      */
@@ -47,7 +51,7 @@ public abstract class SQLBaseDAO {
         try {
             conn = getSQLConnection();
             SQLUtil.executeQuery(sql, params, reader, conn);
-            List<T>  list = reader.getResultList();
+            List<T> list = reader.getResultList();
             return list;
         } catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
@@ -77,8 +81,10 @@ public abstract class SQLBaseDAO {
     /**
      * executes insert or update with given sql and parameters.
      *
-     * @param sql - sql string to execute
-     * @param params - sql params
+     * @param sql
+     *            - sql string to execute
+     * @param params
+     *            - sql params
      * @throws DAOException
      */
     protected void executeSQL(String sql, List<?> params) throws DAOException {
@@ -87,7 +93,7 @@ public abstract class SQLBaseDAO {
         try {
             conn = getSQLConnection();
             if (params != null && !params.isEmpty()) {
-                statement  = SQLUtil.prepareStatement(sql, params, conn);
+                statement = SQLUtil.prepareStatement(sql, params, conn);
                 statement.execute();
             } else {
                 SQLUtil.executeUpdate(sql, conn);
@@ -111,9 +117,7 @@ public abstract class SQLBaseDAO {
      */
     protected <T> T executeUniqueResultSQL(String sql, List<?> params, SQLResultSetReader<T> reader) throws DAOException {
         List<T> result = executeSQL(sql, params, reader);
-        return result == null || result.isEmpty()
-                ? null
-                : result.get(0);
+        return result == null || result.isEmpty() ? null : result.get(0);
     }
 
     /**

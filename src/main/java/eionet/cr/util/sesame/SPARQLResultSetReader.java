@@ -12,7 +12,7 @@ import eionet.cr.dao.readers.ResultSetReaderException;
  * @author jaanus
  *
  */
-public interface SPARQLResultSetReader<T> extends ResultSetReader<T>{
+public interface SPARQLResultSetReader<T> extends ResultSetReader<T> {
 
     /**
      *

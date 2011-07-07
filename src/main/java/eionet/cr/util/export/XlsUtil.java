@@ -8,13 +8,12 @@ public class XlsUtil {
         Double value = null;
         try {
             value = new Double(stringValue);
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
         if (value != null) {
             cell.setCellValue(value);
         } else {
-            cell.setCellValue(stringValue == null
-                    ? ""
-                    : stringValue);
+            cell.setCellValue(stringValue == null ? "" : stringValue);
         }
     }
 

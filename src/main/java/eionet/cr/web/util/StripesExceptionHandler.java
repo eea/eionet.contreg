@@ -41,12 +41,13 @@ public class StripesExceptionHandler implements ExceptionHandler {
     /** */
     public static final String ERROR_PAGE = "/pages/error.jsp";
     public static final String EXCEPTION_ATTR = "exception";
-    
+
     /** */
     private static Log logger = LogFactory.getLog(StripesExceptionHandler.class);
 
     /*
      * (non-Javadoc)
+     *
      * @see net.sourceforge.stripes.config.ConfigurableComponent#init(net.sourceforge.stripes.config.Configuration)
      */
     public void init(Configuration configuration) throws Exception {
@@ -54,13 +55,13 @@ public class StripesExceptionHandler implements ExceptionHandler {
 
     /*
      * (non-Javadoc)
-     * @see net.sourceforge.stripes.exception.ExceptionHandler#handle(java.lang.Throwable, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     *
+     * @see net.sourceforge.stripes.exception.ExceptionHandler#handle(java.lang.Throwable, javax.servlet.http.HttpServletRequest,
+     * javax.servlet.http.HttpServletResponse)
      */
-    public void handle(Throwable t,
-                       HttpServletRequest request,
-                       HttpServletResponse response) throws ServletException, IOException {
+    public void handle(Throwable t, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        Throwable newThrowable = (t instanceof ServletException) ? getRootCause((ServletException)t) : t;
+        Throwable newThrowable = (t instanceof ServletException) ? getRootCause((ServletException) t) : t;
         if (newThrowable == null)
             newThrowable = t;
 
@@ -78,7 +79,7 @@ public class StripesExceptionHandler implements ExceptionHandler {
 
         Throwable rootCause = servletException.getRootCause();
         if (rootCause instanceof ServletException)
-            return getRootCause((ServletException)rootCause);
+            return getRootCause((ServletException) rootCause);
         else
             return rootCause;
     }

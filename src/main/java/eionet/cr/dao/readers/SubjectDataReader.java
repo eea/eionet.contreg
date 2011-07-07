@@ -50,10 +50,10 @@ import eionet.cr.util.YesNoBoolean;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO>{
+public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO> {
 
     /** */
-    private Map<Long,SubjectDTO> subjectsMap;
+    private Map<Long, SubjectDTO> subjectsMap;
 
     /** */
     private SubjectDTO currentSubject = null;
@@ -65,18 +65,17 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO>{
      *
      * @param subjectsMap
      */
-    public SubjectDataReader(Map<Long,SubjectDTO> subjectsMap) {
+    public SubjectDataReader(Map<Long, SubjectDTO> subjectsMap) {
 
         this.subjectsMap = subjectsMap;
     }
-
 
     /**
      *
      * @param subjectUris
      */
     public SubjectDataReader(List<String> subjectUris) {
-        subjectsMap = new LinkedHashMap<Long,SubjectDTO>();
+        subjectsMap = new LinkedHashMap<Long, SubjectDTO>();
         for (String subjectUri : subjectUris) {
             Long subjectHash = Long.valueOf(Hashes.spoHash(subjectUri));
             subjectsMap.put(subjectHash, null);
@@ -85,6 +84,7 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO>{
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
      */
     public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
@@ -108,10 +108,9 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO>{
 
         addPredicateHash(rs.getLong("PREDICATE_HASH"));
 
-        ObjectDTO object = new ObjectDTO(rs.getString("OBJECT"),
-                                            rs.getString("OBJ_LANG"),
-                                            YesNoBoolean.parse(rs.getString("LIT_OBJ")),
-                                            YesNoBoolean.parse(rs.getString("ANON_OBJ")));
+        ObjectDTO object =
+                new ObjectDTO(rs.getString("OBJECT"), rs.getString("OBJ_LANG"), YesNoBoolean.parse(rs.getString("LIT_OBJ")),
+                        YesNoBoolean.parse(rs.getString("ANON_OBJ")));
         object.setHash(rs.getLong("OBJECT_HASH"));
         object.setSourceUri(rs.getString("SOURCE_URI"));
         object.setSourceHash(rs.getLong("SOURCE"));
@@ -146,6 +145,7 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO>{
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
      */
     @Override
@@ -179,8 +179,8 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO>{
 
         Value objectValue = bindingSet.getValue("o");
         boolean isLiteral = objectValue instanceof Literal;
-        String objectLang = isLiteral ? ((Literal)objectValue).getLanguage() : null;
-        URI dataType = isLiteral ? ((Literal)objectValue).getDatatype() : null;
+        String objectLang = isLiteral ? ((Literal) objectValue).getLanguage() : null;
+        URI dataType = isLiteral ? ((Literal) objectValue).getDatatype() : null;
 
         String strObjectValue = objectValue.stringValue();
         boolean isAnonObject = objectValue instanceof BNode;
@@ -188,11 +188,9 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO>{
             strObjectValue = blankNodeUriPrefix.concat(strObjectValue);
         }
 
-        ObjectDTO object = new ObjectDTO(strObjectValue,
-                objectLang == null ? "" : objectLang,
-                isLiteral,
-                objectValue instanceof BNode,
-                dataType);
+        ObjectDTO object =
+                new ObjectDTO(strObjectValue, objectLang == null ? "" : objectLang, isLiteral, objectValue instanceof BNode,
+                        dataType);
 
         object.setHash(Hashes.spoHash(strObjectValue));
 
@@ -209,7 +207,7 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO>{
 
         currentObjects.add(object);
 
-        //If current date is after new date, then leave the current date
+        // If current date is after new date, then leave the current date
         Date prevDate = null;
         SubjectDTO subj = subjectsMap.get(subjectHash);
         if (subj != null) {
@@ -246,7 +244,7 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO>{
      */
     @Override
     public List<SubjectDTO> getResultList() {
-        return new LinkedList<SubjectDTO>( subjectsMap.values());
+        return new LinkedList<SubjectDTO>(subjectsMap.values());
     }
 
     /**

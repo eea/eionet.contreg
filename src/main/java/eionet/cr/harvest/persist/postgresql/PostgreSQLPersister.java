@@ -1,23 +1,23 @@
 /*
-* The contents of this file are subject to the Mozilla Public
-*
-* License Version 1.1 (the "License"); you may not use this file
-* except in compliance with the License. You may obtain a copy of
-* the License at http://www.mozilla.org/MPL/
-*
-* Software distributed under the License is distributed on an "AS
-* IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
-* implied. See the License for the specific language governing
-* rights and limitations under the License.
-*
-* The Original Code is Content Registry 2.0.
-*
-* The Initial Owner of the Original Code is European Environment
-* Agency. Portions created by Tieto Eesti are Copyright
-* (C) European Environment Agency. All Rights Reserved.
-*
-* Contributor(s):
-* Jaanus Heinlaid, Tieto Eesti*/
+ * The contents of this file are subject to the Mozilla Public
+ *
+ * License Version 1.1 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of
+ * the License at http://www.mozilla.org/MPL/
+ *
+ * Software distributed under the License is distributed on an "AS
+ * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ * The Original Code is Content Registry 2.0.
+ *
+ * The Initial Owner of the Original Code is European Environment
+ * Agency. Portions created by Tieto Eesti are Copyright
+ * (C) European Environment Agency. All Rights Reserved.
+ *
+ * Contributor(s):
+ * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.harvest.persist.postgresql;
 
 import java.sql.Connection;
@@ -61,10 +61,10 @@ public class PostgreSQLPersister implements IHarvestPersister {
     /** */
     private Log logger;
 
-    //fields initialized through PersisterConfig object
+    // fields initialized through PersisterConfig object
     private long sourceUrlHash;
     private long genTime;
-        private String sourceUrl;
+    private String sourceUrl;
 
     private Connection connection;
 
@@ -103,16 +103,18 @@ public class PostgreSQLPersister implements IHarvestPersister {
 
     /*
      * (non-Javadoc)
-     * @see eionet.cr.harvest.persist.IHarvestPersister#addTriple(long, boolean, long, java.lang.String, long, java.lang.String, boolean, boolean, long)
+     *
+     * @see eionet.cr.harvest.persist.IHarvestPersister#addTriple(long, boolean, long, java.lang.String, long, java.lang.String,
+     * boolean, boolean, long)
      */
     // TODO this method has got way too many arguments, the whole approach needs refactoring
-    public void addTriple(long subjectHash, boolean anonSubject, long predicateHash,
-            String object, long objectHash, String objectLang, boolean litObject, boolean anonObject, long objSourceObject) throws PersisterException {
+    public void addTriple(long subjectHash, boolean anonSubject, long predicateHash, String object, long objectHash,
+            String objectLang, boolean litObject, boolean anonObject, long objSourceObject) throws PersisterException {
 
         if (isAddingSourceMetadata) {
 
-            addSourceMetadataTriple(subjectHash, anonSubject, predicateHash,
-                    object, objectHash, objectLang, litObject, anonObject, objSourceObject);
+            addSourceMetadataTriple(subjectHash, anonSubject, predicateHash, object, objectHash, objectLang, litObject,
+                    anonObject, objSourceObject);
             return;
         }
 
@@ -155,8 +157,9 @@ public class PostgreSQLPersister implements IHarvestPersister {
      * @param objSourceObject
      * @throws PersisterException
      */
-    private void addSourceMetadataTriple(long subjectHash, boolean anonSubject, long predicateHash,
-            String object, long objectHash, String objectLang, boolean litObject, boolean anonObject, long objSourceObject) throws PersisterException {
+    private void addSourceMetadataTriple(long subjectHash, boolean anonSubject, long predicateHash, String object,
+            long objectHash, String objectLang, boolean litObject, boolean anonObject, long objSourceObject)
+            throws PersisterException {
 
         try {
             preparedStatementForSourceMetadata.setLong(1, subjectHash);
@@ -186,6 +189,7 @@ public class PostgreSQLPersister implements IHarvestPersister {
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.harvest.persist.IHarvestPersister#addResource(java.lang.String, long)
      */
     public void addResource(String uri, long uriHash) throws PersisterException {
@@ -201,6 +205,7 @@ public class PostgreSQLPersister implements IHarvestPersister {
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.harvest.persist.IHarvestPersister#commit()
      */
     public void commit() throws PersisterException {
@@ -213,8 +218,7 @@ public class PostgreSQLPersister implements IHarvestPersister {
         try {
 
             // derive inferred triples
-            PostgreSQLDerivationEngine derivEngine = new PostgreSQLDerivationEngine(
-                    sourceUrl, sourceUrlHash, genTime, connection);
+            PostgreSQLDerivationEngine derivEngine = new PostgreSQLDerivationEngine(sourceUrl, sourceUrlHash, genTime, connection);
             if (config.isDeriveInferredTriples()) {
 
                 derivEngine.deriveParentClasses();
@@ -237,6 +241,7 @@ public class PostgreSQLPersister implements IHarvestPersister {
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.harvest.persist.IHarvestPersister#rollback()
      */
     public void rollback() throws PersisterException {
@@ -281,13 +286,14 @@ public class PostgreSQLPersister implements IHarvestPersister {
             if (tripleCounter % TRIPLE_PROGRESS_INTERVAL == 0) {
                 logger.debug("Progress: " + String.valueOf(tripleCounter) + " triples processed");
             }
-        } catch(SQLException e) {
+        } catch (SQLException e) {
             throw new PersisterException(e.getMessage(), e);
         }
     }
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.harvest.persist.IHarvestPersister#endOfFile()
      */
     public void endOfFile() throws PersisterException {
@@ -302,6 +308,7 @@ public class PostgreSQLPersister implements IHarvestPersister {
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.harvest.persist.IHarvestPersister#openResources()
      */
     public void openResources() throws PersisterException {
@@ -338,8 +345,7 @@ public class PostgreSQLPersister implements IHarvestPersister {
 
                 // delete also source metadata that was previously auto-generated by harvester
                 buf = new StringBuffer("delete from SPO where SUBJECT=");
-                buf.append(sourceUrlHash).append(" and SOURCE=").
-                append(Hashes.spoHash(Harvest.HARVESTER_URI));
+                buf.append(sourceUrlHash).append(" and SOURCE=").append(Hashes.spoHash(Harvest.HARVESTER_URI));
 
                 SQLUtil.executeUpdate(buf.toString(), getConnection());
             }
@@ -350,6 +356,7 @@ public class PostgreSQLPersister implements IHarvestPersister {
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.harvest.persist.IHarvestPersister#closeResources()
      */
     public void closeResources() {
@@ -366,12 +373,12 @@ public class PostgreSQLPersister implements IHarvestPersister {
      */
     private void prepareStatementForTriples() throws SQLException {
 
-        StringBuffer buf = new StringBuffer().
-        append("insert into SPO (SUBJECT,PREDICATE,OBJECT,OBJECT_HASH,OBJECT_DOUBLE").
-        append(",ANON_SUBJ,ANON_OBJ,LIT_OBJ,OBJ_LANG").
-        append(",OBJ_DERIV_SOURCE,OBJ_DERIV_SOURCE_GEN_TIME,OBJ_SOURCE_OBJECT,SOURCE,GEN_TIME)").
-        append(" values (?,?,?,?,?,cast(? as ynboolean),cast(? as ynboolean),cast(? as ynboolean),?,?,?,?,").
-        append(sourceUrlHash).append(",").append(genTime).append(")");
+        StringBuffer buf =
+                new StringBuffer().append("insert into SPO (SUBJECT,PREDICATE,OBJECT,OBJECT_HASH,OBJECT_DOUBLE")
+                        .append(",ANON_SUBJ,ANON_OBJ,LIT_OBJ,OBJ_LANG")
+                        .append(",OBJ_DERIV_SOURCE,OBJ_DERIV_SOURCE_GEN_TIME,OBJ_SOURCE_OBJECT,SOURCE,GEN_TIME)")
+                        .append(" values (?,?,?,?,?,cast(? as ynboolean),cast(? as ynboolean),cast(? as ynboolean),?,?,?,?,")
+                        .append(sourceUrlHash).append(",").append(genTime).append(")");
 
         preparedStatementForTriples = getConnection().prepareStatement(buf.toString());
     }
@@ -382,12 +389,12 @@ public class PostgreSQLPersister implements IHarvestPersister {
      */
     private void prepareStatementForSourceMetadata() throws SQLException {
 
-        StringBuffer buf = new StringBuffer().
-        append("insert into SPO (SUBJECT,PREDICATE,OBJECT,OBJECT_HASH,OBJECT_DOUBLE").
-        append(",ANON_SUBJ,ANON_OBJ,LIT_OBJ,OBJ_LANG").
-        append(",OBJ_DERIV_SOURCE,OBJ_DERIV_SOURCE_GEN_TIME,OBJ_SOURCE_OBJECT,SOURCE,GEN_TIME)").
-        append(" values (?,?,?,?,?,cast(? as ynboolean),cast(? as ynboolean),cast(? as ynboolean),?,?,?,?,").
-        append(Hashes.spoHash(Harvest.HARVESTER_URI)).append(",").append(genTime).append(")");
+        StringBuffer buf =
+                new StringBuffer().append("insert into SPO (SUBJECT,PREDICATE,OBJECT,OBJECT_HASH,OBJECT_DOUBLE")
+                        .append(",ANON_SUBJ,ANON_OBJ,LIT_OBJ,OBJ_LANG")
+                        .append(",OBJ_DERIV_SOURCE,OBJ_DERIV_SOURCE_GEN_TIME,OBJ_SOURCE_OBJECT,SOURCE,GEN_TIME)")
+                        .append(" values (?,?,?,?,?,cast(? as ynboolean),cast(? as ynboolean),cast(? as ynboolean),?,?,?,?,")
+                        .append(Hashes.spoHash(Harvest.HARVESTER_URI)).append(",").append(genTime).append(")");
 
         preparedStatementForSourceMetadata = getConnection().prepareStatement(buf.toString());
     }
@@ -398,10 +405,10 @@ public class PostgreSQLPersister implements IHarvestPersister {
      */
     private void prepareStatementForResources() throws SQLException {
 
-        StringBuffer buf = new StringBuffer().
-        append("insert into RESOURCE (URI,URI_HASH,FIRSTSEEN_SOURCE,FIRSTSEEN_TIME,LASTMODIFIED_TIME)").
-        append(" values (?,?,").append(sourceUrlHash).append(",").append(genTime).
-        append(",").append(genTime).append(")");
+        StringBuffer buf =
+                new StringBuffer().append("insert into RESOURCE (URI,URI_HASH,FIRSTSEEN_SOURCE,FIRSTSEEN_TIME,LASTMODIFIED_TIME)")
+                        .append(" values (?,?,").append(sourceUrlHash).append(",").append(genTime).append(",").append(genTime)
+                        .append(")");
 
         preparedStatementForResources = getConnection().prepareStatement(buf.toString());
     }
@@ -413,8 +420,8 @@ public class PostgreSQLPersister implements IHarvestPersister {
     private void raiseUnfinishedHarvestFlag() throws SQLException {
 
         StringBuffer buf = new StringBuffer();
-        buf.append("insert into UNFINISHED_HARVEST (SOURCE, GEN_TIME) values (").
-        append(sourceUrlHash).append(", ").append(genTime).append(")");
+        buf.append("insert into UNFINISHED_HARVEST (SOURCE, GEN_TIME) values (").append(sourceUrlHash).append(", ")
+                .append(genTime).append(")");
 
         SQLUtil.executeUpdate(buf.toString(), getConnection());
     }
@@ -452,6 +459,7 @@ public class PostgreSQLPersister implements IHarvestPersister {
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.harvest.persist.IHarvestPersister#rollbackUnfinishedHarvests()
      */
     public void rollbackUnfinishedHarvests() throws PersisterException {
@@ -472,12 +480,11 @@ public class PostgreSQLPersister implements IHarvestPersister {
 
                 LogFactory.getLog(RDFHandler.class).debug("Deleting leftovers from unfinished harvests");
 
-                for (UnfinishedHarvestDTO unfinishedHarvestDTO:list) {
+                for (UnfinishedHarvestDTO unfinishedHarvestDTO : list) {
 
                     // if the source is not actually being currently harvested, only then roll it back
                     if (!CurrentHarvests.contains(unfinishedHarvestDTO.getSource())) {
-                        rollbackUnfinishedHarvest(unfinishedHarvestDTO.getSource(),
-                                unfinishedHarvestDTO.getGenTime(), conn);
+                        rollbackUnfinishedHarvest(unfinishedHarvestDTO.getSource(), unfinishedHarvestDTO.getGenTime(), conn);
                     }
                 }
             }
@@ -497,8 +504,7 @@ public class PostgreSQLPersister implements IHarvestPersister {
      * @param conn
      * @throws SQLException
      */
-    private static void rollbackUnfinishedHarvest(
-            long sourceUrlHash, long genTime, Connection conn) throws SQLException {
+    private static void rollbackUnfinishedHarvest(long sourceUrlHash, long genTime, Connection conn) throws SQLException {
 
         try {
             // start transaction
@@ -506,15 +512,14 @@ public class PostgreSQLPersister implements IHarvestPersister {
 
             // delete rows of given harvest from SPO
             StringBuffer buf = new StringBuffer("delete from SPO where (SOURCE=");
-            buf.append(sourceUrlHash).append(" and GEN_TIME=").append(genTime).
-            append(") or (OBJ_DERIV_SOURCE=").append(sourceUrlHash).
-            append(" and OBJ_DERIV_SOURCE_GEN_TIME=").append(genTime).append(")");
+            buf.append(sourceUrlHash).append(" and GEN_TIME=").append(genTime).append(") or (OBJ_DERIV_SOURCE=")
+                    .append(sourceUrlHash).append(" and OBJ_DERIV_SOURCE_GEN_TIME=").append(genTime).append(")");
             SQLUtil.executeUpdate(buf.toString(), conn);
 
             // delete rows that represent the source metadata that harvester auto-generated
-            buf = new StringBuffer("delete from SPO where SUBJECT=").append(sourceUrlHash).
-            append(" and SOURCE=").append(Hashes.spoHash(Harvest.HARVESTER_URI)).
-            append(" and GEN_TIME=").append(genTime);
+            buf =
+                    new StringBuffer("delete from SPO where SUBJECT=").append(sourceUrlHash).append(" and SOURCE=")
+                            .append(Hashes.spoHash(Harvest.HARVESTER_URI)).append(" and GEN_TIME=").append(genTime);
             SQLUtil.executeUpdate(buf.toString(), conn);
 
             // delete rows of given harvest from RESOURCE
@@ -523,21 +528,26 @@ public class PostgreSQLPersister implements IHarvestPersister {
             SQLUtil.executeUpdate(buf.toString(), conn);
 
             // delete new sources extracted from the given harvest
-            buf = new StringBuffer("delete from HARVEST_SOURCE where SOURCE=").append(sourceUrlHash).
-            append(" and GEN_TIME=").append(genTime);
+            buf =
+                    new StringBuffer("delete from HARVEST_SOURCE where SOURCE=").append(sourceUrlHash).append(" and GEN_TIME=")
+                            .append(genTime);
 
             //
             deleteUnfinishedHarvestFlag(sourceUrlHash, genTime, conn);
 
             conn.commit();
         } catch (SQLException e) {
-            try {conn.rollback();}catch (SQLException ee) {}
+            try {
+                conn.rollback();
+            } catch (SQLException ee) {
+            }
             throw e;
         }
     }
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.harvest.persist.IHarvestPersister#getStoredTriplesCount()
      */
     public int getStoredTriplesCount() {
@@ -545,11 +555,13 @@ public class PostgreSQLPersister implements IHarvestPersister {
     }
 
     /** */
-    private static String sql_insertLastRefreshed =
-        "insert into SPO (SUBJECT,PREDICATE,OBJECT,OBJECT_HASH,LIT_OBJ,SOURCE,GEN_TIME)" +
-            " values (?,?,?,?,cast(? as ynboolean),?,?)";
+    private static String sqlInsertLastRefreshed =
+            "insert into SPO (SUBJECT,PREDICATE,OBJECT,OBJECT_HASH,LIT_OBJ,SOURCE,GEN_TIME)"
+                    + " values (?,?,?,?,cast(? as ynboolean),?,?)";
+
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.harvest.persist.IHarvestPersister#updateLastRefreshed()
      */
     public void updateLastRefreshed(long subjectHash, DateFormat dateFormat) throws SQLException {
@@ -559,8 +571,9 @@ public class PostgreSQLPersister implements IHarvestPersister {
 
         long predicateHash = Hashes.spoHash(Predicates.CR_LAST_REFRESHED);
 
-        StringBuffer deleteSQL = new StringBuffer("delete from SPO where SUBJECT=").
-        append(subjectHash).append(" and PREDICATE=").append(predicateHash);
+        StringBuffer deleteSQL =
+                new StringBuffer("delete from SPO where SUBJECT=").append(subjectHash).append(" and PREDICATE=")
+                        .append(predicateHash);
 
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -568,7 +581,7 @@ public class PostgreSQLPersister implements IHarvestPersister {
             conn = DbConnectionProvider.getConnection();
             conn.setAutoCommit(false);
 
-            pstmt = conn.prepareStatement(sql_insertLastRefreshed);
+            pstmt = conn.prepareStatement(sqlInsertLastRefreshed);
             pstmt.setLong(1, subjectHash);
             pstmt.setLong(2, predicateHash);
             pstmt.setString(3, dateString);
@@ -592,6 +605,7 @@ public class PostgreSQLPersister implements IHarvestPersister {
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.harvest.persist.IHarvestPersister#setAddingSourceMetadata(boolean)
      */
     public void setAddingSourceMetadata(boolean flag) {

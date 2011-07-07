@@ -48,11 +48,9 @@ import eionet.cr.util.pagination.PagingRequest;
 /**
  * Utility class to handle export procedure.
  *
- * @author Aleksandr Ivanov
- * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
+ * @author Aleksandr Ivanov <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
 public abstract class Exporter {
-
 
     protected Logger logger = Logger.getLogger(Exporter.class);
 
@@ -60,16 +58,17 @@ public abstract class Exporter {
     private Map<String, String> selectedFilters;
     private Set<String> languages;
 
-    //if true exports Resource uri, label otherwise.
+    // if true exports Resource uri, label otherwise.
     private boolean exportResourceUri;
 
-    //List of selected columns Pair.id - column URI, Pair.value - optional column label
+    // List of selected columns Pair.id - column URI, Pair.value - optional column label
     // if label is present - it is used in the output. Otherwise URI is used.
     // URI should be always present
     private List<Pair<String, String>> selectedColumns;
 
     /**
      * exports search result into given format.
+     *
      * @param customSearch
      * @return
      * @throws IOException
@@ -79,6 +78,7 @@ public abstract class Exporter {
 
     /**
      * Creates Exporter object for given export format.
+     *
      * @param exportFormat
      * @return
      */
@@ -106,7 +106,7 @@ public abstract class Exporter {
 
         long startTime = System.currentTimeMillis();
 
-        //add label into selected columns if not exist yet
+        // add label into selected columns if not exist yet
         Pair<String, String> labelPredicate = new Pair<String, String>(Predicates.RDFS_LABEL, null);
         if (!selectedColumns.contains(labelPredicate)) {
             selectedColumns.add(labelPredicate);
@@ -125,27 +125,24 @@ public abstract class Exporter {
             criteria.put(StringUtils.trim(entry.getKey()), StringUtils.trim(entry.getValue()));
         }
         // do the query and write data rows directly to export file
-        DAOFactory.get().getDao(ExporterDAO.class)
-            .exportByTypeAndFilters(
-                criteria,
-                getSelectedColumnsList(),
-                reader);
+        DAOFactory.get().getDao(ExporterDAO.class).exportByTypeAndFilters(criteria, getSelectedColumnsList(), reader);
 
     }
 
     /**
      * Returns the label of subject's uri or label depending on exportResourceUri value.
+     *
      * @return
      */
     protected String getUriOrLabel() {
-        String uriOrLabelElement = isExportResourceUri()
-        ? "Uri"
-                : "Label";
+        String uriOrLabelElement = isExportResourceUri() ? "Uri" : "Label";
 
         return uriOrLabelElement;
     }
+
     /**
      * This method creates the PaginRequest object for limiting the rows in the search results.
+     *
      * @return
      */
     protected PagingRequest getRowLimitPagingRequest() {
@@ -154,6 +151,7 @@ public abstract class Exporter {
 
     /**
      * Returns the value of subject's uri or label depending on exportResourceUri value.
+     *
      * @return
      */
     protected String getUriOrLabelValue(SubjectDTO subject) {
@@ -164,7 +162,7 @@ public abstract class Exporter {
             value = uri;
         } else {
             value = FormatUtils.getObjectValuesForPredicate(Predicates.RDFS_LABEL, subject, getLanguages());
-            //extract value from uri
+            // extract value from uri
             if (StringUtils.isBlank(value)) {
                 value = URIUtil.extractURILabel(uri, uri);
             }
@@ -182,7 +180,8 @@ public abstract class Exporter {
     }
 
     /**
-     * @param exportFormat the exportFormat to set
+     * @param exportFormat
+     *            the exportFormat to set
      */
     public void setExportFormat(ExportFormat exportFormat) {
         this.exportFormat = exportFormat;
@@ -196,7 +195,8 @@ public abstract class Exporter {
     }
 
     /**
-     * @param selectedFilters the selectedFilters to set
+     * @param selectedFilters
+     *            the selectedFilters to set
      */
     public void setSelectedFilters(Map<String, String> selectedFilters) {
         this.selectedFilters = selectedFilters;
@@ -210,7 +210,8 @@ public abstract class Exporter {
     }
 
     /**
-     * @param selectedColumns the selectedColumns to set
+     * @param selectedColumns
+     *            the selectedColumns to set
      */
     public void setSelectedColumns(List<Pair<String, String>> selectedColumns) {
         this.selectedColumns = selectedColumns;
@@ -224,7 +225,8 @@ public abstract class Exporter {
     }
 
     /**
-     * @param set the languages to set
+     * @param set
+     *            the languages to set
      */
     public void setLanguages(Set<String> set) {
         this.languages = set;
@@ -238,20 +240,25 @@ public abstract class Exporter {
     }
 
     /**
-     * @param exportResourceUri the exportResourceUri to set
+     * @param exportResourceUri
+     *            the exportResourceUri to set
      */
     public void setExportResourceUri(boolean exportResourceUri) {
         this.exportResourceUri = exportResourceUri;
     }
+
     /**
      * Rerturns the number of rows the exporter output can handle
+     *
      * @return
      */
     public static Integer getRowsLimit() {
         return -1;
     }
+
     /**
      * Returns the list of selected predicates uris
+     *
      * @return
      */
     public List<String> getSelectedColumnsList() {

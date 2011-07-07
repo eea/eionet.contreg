@@ -24,6 +24,7 @@ import org.openrdf.query.resultio.TupleQueryResultWriter;
 
 /**
  * JSON writer.
+ *
  * @author altnyris
  *
  */
@@ -54,8 +55,7 @@ public class CRJsonWriter implements TupleQueryResultWriter {
         return TupleQueryResultFormat.JSON;
     }
 
-    public void startQueryResult(List<String> columnHeaders)
-        throws TupleQueryResultHandlerException {
+    public void startQueryResult(List<String> columnHeaders) throws TupleQueryResultHandlerException {
         try {
             openBraces();
 
@@ -80,8 +80,7 @@ public class CRJsonWriter implements TupleQueryResultWriter {
         }
     }
 
-    public void endQueryResult()
-        throws TupleQueryResultHandlerException {
+    public void endQueryResult() throws TupleQueryResultHandlerException {
         try {
             closeArray(); // bindings array
             closeBraces(); // results braces
@@ -92,8 +91,7 @@ public class CRJsonWriter implements TupleQueryResultWriter {
         }
     }
 
-    public void handleSolution(BindingSet bindingSet)
-        throws TupleQueryResultHandlerException {
+    public void handleSolution(BindingSet bindingSet) throws TupleQueryResultHandlerException {
         try {
             if (firstTupleWritten) {
                 writeComma();
@@ -122,44 +120,39 @@ public class CRJsonWriter implements TupleQueryResultWriter {
         }
     }
 
-    private void writeKeyValue(String key, String value)
-        throws IOException {
+    private void writeKeyValue(String key, String value) throws IOException {
         writeKey(key);
         writeString(value);
     }
 
-    private void writeKeyValue(String key, Value value)
-        throws IOException, TupleQueryResultHandlerException {
+    private void writeKeyValue(String key, Value value) throws IOException, TupleQueryResultHandlerException {
         writeKey(key);
         writeValue(value);
     }
 
-    private void writeKeyValue(String key, Iterable<String> array)
-        throws IOException {
+    private void writeKeyValue(String key, Iterable<String> array) throws IOException {
         writeKey(key);
         writeArray(array);
     }
 
-    private void writeKey(String key)
-        throws IOException {
+    private void writeKey(String key) throws IOException {
         writeString(key);
         writer.write(": ");
     }
 
-    private void writeValue(Value value)
-        throws IOException, TupleQueryResultHandlerException {
+    private void writeValue(Value value) throws IOException, TupleQueryResultHandlerException {
         writer.write("{ ");
         if (value != null) {
             if (value instanceof URI) {
                 writeKeyValue("type", "uri");
                 writer.write(", ");
-                writeKeyValue("value", ((URI)value).toString());
+                writeKeyValue("value", ((URI) value).toString());
             } else if (value instanceof BNode) {
                 writeKeyValue("type", "bnode");
                 writer.write(", ");
-                writeKeyValue("value", ((BNode)value).getID());
+                writeKeyValue("value", ((BNode) value).getID());
             } else if (value instanceof Literal) {
-                Literal lit = (Literal)value;
+                Literal lit = (Literal) value;
 
                 if (lit.getDatatype() != null) {
                     writeKeyValue("type", "typed-literal");
@@ -183,8 +176,7 @@ public class CRJsonWriter implements TupleQueryResultWriter {
         writer.write(" }");
     }
 
-    private void writeString(String value)
-        throws IOException {
+    private void writeString(String value) throws IOException {
         // Escape special characters
         value = StringUtil.gsub("\\", "\\\\", value);
         value = StringUtil.gsub("\"", "\\\"", value);
@@ -200,8 +192,7 @@ public class CRJsonWriter implements TupleQueryResultWriter {
         writer.write("\"");
     }
 
-    private void writeArray(Iterable<String> array)
-        throws IOException {
+    private void writeArray(Iterable<String> array) throws IOException {
         writer.write("[ ");
 
         Iterator<String> iter = array.iterator();
@@ -218,36 +209,31 @@ public class CRJsonWriter implements TupleQueryResultWriter {
         writer.write(" ]");
     }
 
-    private void openArray()
-        throws IOException {
+    private void openArray() throws IOException {
         writer.write("[");
         writer.writeEOL();
         writer.increaseIndentation();
     }
 
-    private void closeArray()
-        throws IOException {
+    private void closeArray() throws IOException {
         writer.writeEOL();
         writer.decreaseIndentation();
         writer.write("]");
     }
 
-    private void openBraces()
-        throws IOException {
+    private void openBraces() throws IOException {
         writer.write("{");
         writer.writeEOL();
         writer.increaseIndentation();
     }
 
-    private void closeBraces()
-        throws IOException {
+    private void closeBraces() throws IOException {
         writer.writeEOL();
         writer.decreaseIndentation();
         writer.write("}");
     }
 
-    private void writeComma()
-        throws IOException {
+    private void writeComma() throws IOException {
         writer.write(", ");
         writer.writeEOL();
     }

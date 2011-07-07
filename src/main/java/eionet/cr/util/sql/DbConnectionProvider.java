@@ -34,7 +34,7 @@ import org.apache.log4j.Logger;
 
 import eionet.cr.common.CRRuntimeException;
 import eionet.cr.config.GeneralConfig;
-import eionet.cr.util.Util;
+import eionet.cr.util.IsJUnitRuntime;
 
 /**
  *
@@ -53,12 +53,10 @@ public class DbConnectionProvider {
     private static DataSource dataSource = null;
     private static String connectionUrl = null;
     private static Boolean isJNDIDataSource = null;
-    private static Boolean isJUnitRuntime = null;
 
     /** Lock objects */
     private static Object connectionUrlLock = new Object();
     private static Object isJNDIDataSourceLock = new Object();
-    private static Object isJUnitRuntimeLock = new Object();
 
     /**
      *
@@ -70,7 +68,7 @@ public class DbConnectionProvider {
         if (isJNDIDataSource()) {
             return dataSource.getConnection();
         } else {
-            return getSimpleConnection(isJUnitRuntime());
+            return getSimpleConnection(IsJUnitRuntime.VALUE);
         }
     }
 
@@ -140,7 +138,10 @@ public class DbConnectionProvider {
                         throw new CRRuntimeException("Failed to look up database url!", sqle);
                     } finally {
                         if (conn != null) {
-                            try { conn.close(); } catch (Exception e) {}
+                            try {
+                                conn.close();
+                            } catch (Exception e) {
+                            }
                         }
                     }
                 }
@@ -166,7 +167,7 @@ public class DbConnectionProvider {
                     try {
                         Context initContext = new InitialContext();
                         Context context = (Context) initContext.lookup("java:comp/env");
-                        dataSource = (javax.sql.DataSource)context.lookup(DATASOURCE_NAME);
+                        dataSource = (javax.sql.DataSource) context.lookup(DATASOURCE_NAME);
 
                         isJNDIDataSource = Boolean.TRUE;
                         logger.info("Found and initialized JNDI data source named " + DATASOURCE_NAME);
@@ -180,30 +181,4 @@ public class DbConnectionProvider {
 
         return isJNDIDataSource.booleanValue();
     }
-
-    /**
-     *
-     * @return
-     */
-    private static boolean isJUnitRuntime() {
-
-        if (isJUnitRuntime == null) {
-
-            synchronized (isJUnitRuntimeLock) {
-
-                // double-checked locking pattern
-                // (http://www.ibm.com/developerworks/java/library/j-dcl.html)
-                if (isJUnitRuntime == null) {
-
-                    String stackTrace = Util.getStackTrace(new Throwable());
-                    isJUnitRuntime = Boolean.valueOf(stackTrace.indexOf("at junit.framework.TestCase.run") > 0);
-
-                    logger.info("Detected that the code is running in JUnit runtime");
-                }
-            }
-        }
-
-        return isJUnitRuntime.booleanValue();
-    }
-
 }

@@ -68,7 +68,8 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
     private static final String RESULT_LIST_SESSION_ATTR_NAME = CustomSearchActionBean.class.getName() + ".resultList";
     private static final String MATCH_COUNT_SESSION_ATTR_NAME = CustomSearchActionBean.class.getName() + ".matchCount";
     private static final String PAGINATION_SESSION_ATTR_NAME = CustomSearchActionBean.class.getName() + ".pagination";
-    private static final String LITERAL_SEARCH_ENABLED_FILTERS = CustomSearchActionBean.class.getName() + ".literalSearchEnabledFilters";
+    private static final String LITERAL_SEARCH_ENABLED_FILTERS = CustomSearchActionBean.class.getName()
+            + ".literalSearchEnabledFilters";
 
     /** */
     private static final String SELECTED_VALUE_PREFIX = "value_";
@@ -83,8 +84,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
     private String addedFilter;
     private String picklistFilter;
     private String removedFilter;
-    //private Collection<String> picklist;
-
+    // private Collection<String> picklist;
 
     private Collection<ObjectLabelPair> picklist;
 
@@ -123,20 +123,19 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.web.action.AbstractSearchActionBean#search()
      */
     public Resolution search() throws DAOException {
 
         populateSelectedFilters();
         long startTime = System.currentTimeMillis();
-        Pair<Integer, List<SubjectDTO>> result = DAOFactory.get().getDao(SearchDAO.class)
-                    .searchByFilters(
-                            buildSearchCriteria(),
-                            getLiteralEnabledFilters(),
-                            PagingRequest.create(getPageN()),
-                            new SortingRequest(
-                                    getSortP(),
-                                    SortOrder.parse(getSortO())), null);
+        Pair<Integer, List<SubjectDTO>> result =
+                DAOFactory
+                        .get()
+                        .getDao(SearchDAO.class)
+                        .searchByFilters(buildSearchCriteria(), getLiteralEnabledFilters(), PagingRequest.create(getPageN()),
+                                new SortingRequest(getSortP(), SortOrder.parse(getSortO())), null, true);
 
         logger.debug("It took " + (System.currentTimeMillis() - startTime) + " ms to execute custom search");
 
@@ -154,6 +153,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.web.action.AbstractSearchActionBean#getResultList()
      */
     public Collection<SubjectDTO> getResultList() {
@@ -162,6 +162,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.web.action.AbstractSearchActionBean#getPagination()
      */
     public Pagination getPagination() {
@@ -170,13 +171,13 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.web.action.AbstractSearchActionBean#getMatchCount()
      */
     public int getMatchCount() {
         Integer i = (Integer) getContext().getRequest().getSession().getAttribute(MATCH_COUNT_SESSION_ATTR_NAME);
         return i == null ? super.getMatchCount() : i.intValue();
     }
-
 
     /**
      *
@@ -225,15 +226,16 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
         } else if (Predicates.ROD_INSTRUMENT_PROPERTY.equals(uri)) {
             picklist = ApplicationCache.getInstruments();
         } else if (Predicates.CR_SCHEMA.equals(uri)) {
-            picklist = factory.getDao(HelperDAO.class).getPicklistForPredicate(
-                    getAvailableFilters().get(picklistFilter).getUri(), false);
+            picklist =
+                    factory.getDao(HelperDAO.class).getPicklistForPredicate(getAvailableFilters().get(picklistFilter).getUri(),
+                            false);
         }
 
         if (picklist == null) {
-            picklist = factory.getDao(HelperDAO.class).getPicklistForPredicate(
-                    getAvailableFilters().get(picklistFilter).getUri(), true);
+            picklist =
+                    factory.getDao(HelperDAO.class).getPicklistForPredicate(getAvailableFilters().get(picklistFilter).getUri(),
+                            true);
         }
-
 
         return picklist;
     }
@@ -246,7 +248,8 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
     }
 
     /**
-     * @param selectedFilter the selectedFilter to set
+     * @param selectedFilter
+     *            the selectedFilter to set
      */
     public void setAddedFilter(String selectedFilter) {
         this.addedFilter = selectedFilter;
@@ -256,7 +259,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
      *
      * @return
      */
-    public Map<String,String> getSelectedFilters() {
+    public Map<String, String> getSelectedFilters() {
 
         return getSelectedFilters(true);
     }
@@ -266,11 +269,10 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
      * @param create
      * @return
      */
-    private Map<String,String> getSelectedFilters(boolean create) {
+    private Map<String, String> getSelectedFilters(boolean create) {
 
         HttpSession session = getContext().getRequest().getSession();
-        Map<String,String> selectedFilters =
-            (Map<String,String>) session.getAttribute(SELECTED_FILTERS_SESSION_ATTR_NAME);
+        Map<String, String> selectedFilters = (Map<String, String>) session.getAttribute(SELECTED_FILTERS_SESSION_ATTR_NAME);
         if (selectedFilters == null && create == true) {
             selectedFilters = new LinkedHashMap<String, String>();
             session.setAttribute(SELECTED_FILTERS_SESSION_ATTR_NAME, selectedFilters);
@@ -300,7 +302,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
      */
     private void populateSelectedFilters() {
 
-        Map<String,String> selected = getSelectedFilters();
+        Map<String, String> selected = getSelectedFilters();
         if (!selected.isEmpty()) {
             Enumeration paramNames = this.getContext().getRequest().getParameterNames();
             while (paramNames != null && paramNames.hasMoreElements()) {
@@ -317,7 +319,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
     /**
      * @return the availableFilters
      */
-    public Map<String,CustomSearchFilter> getAvailableFilters() {
+    public Map<String, CustomSearchFilter> getAvailableFilters() {
 
         if (availableFilters == null) {
 
@@ -428,7 +430,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
             filter.setProvideValues(true);
             list.add(filter);
 
-            availableFilters = new LinkedHashMap<String,CustomSearchFilter>();
+            availableFilters = new LinkedHashMap<String, CustomSearchFilter>();
             for (int i = 0; i < list.size(); i++)
                 availableFilters.put(String.valueOf(i + 1), list.get(i));
         }
@@ -504,11 +506,11 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
      *
      * @return
      */
-    private Map<String,String> buildSearchCriteria() {
+    private Map<String, String> buildSearchCriteria() {
 
-        Map<String,String> result = new HashMap<String,String>();
+        Map<String, String> result = new HashMap<String, String>();
 
-        Map<String,String> selected = getSelectedFilters();
+        Map<String, String> selected = getSelectedFilters();
         for (Iterator<String> keys = selected.keySet().iterator(); keys.hasNext();) {
             String key = keys.next();
             String value = selected.get(key);
@@ -524,6 +526,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
      */
     public List<SearchResultColumn> getColumns() {

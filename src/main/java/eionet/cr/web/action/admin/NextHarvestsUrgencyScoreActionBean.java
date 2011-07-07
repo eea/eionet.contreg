@@ -36,7 +36,8 @@ public class NextHarvestsUrgencyScoreActionBean extends AbstractSearchActionBean
         if (getUser() != null) {
             if (getUser().isAdministrator()) {
                 setAdminLoggedIn(true);
-                Pair<Integer, List<HarvestUrgencyScoreDTO>> result = DAOFactory.get().getDao(HarvestSourceDAO.class).getUrgencyOfComingHarvests(urgencyScoreLimit);
+                Pair<Integer, List<HarvestUrgencyScoreDTO>> result =
+                        DAOFactory.get().getDao(HarvestSourceDAO.class).getUrgencyOfComingHarvests(urgencyScoreLimit);
                 resultList = result.getRight();
                 matchCount = 0;
                 resultsFound = result.getLeft();
@@ -51,6 +52,7 @@ public class NextHarvestsUrgencyScoreActionBean extends AbstractSearchActionBean
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
      */
     public List<SearchResultColumn> getColumns() {
@@ -64,19 +66,19 @@ public class NextHarvestsUrgencyScoreActionBean extends AbstractSearchActionBean
         urlColumn.setEscapeXml(false);
         columnList.add(urlColumn);
 
-        NextHarvestsUrgencyScoreColumn dateColumn= new NextHarvestsUrgencyScoreColumn();
+        NextHarvestsUrgencyScoreColumn dateColumn = new NextHarvestsUrgencyScoreColumn();
         dateColumn.setColumnType(COLUMN.LASTHARVEST);
         dateColumn.setSortable(false);
         dateColumn.setTitle("Last harvest");
         columnList.add(dateColumn);
 
-        NextHarvestsUrgencyScoreColumn intervalColumn= new NextHarvestsUrgencyScoreColumn();
+        NextHarvestsUrgencyScoreColumn intervalColumn = new NextHarvestsUrgencyScoreColumn();
         intervalColumn.setColumnType(COLUMN.INTERVAL);
         intervalColumn.setSortable(false);
         intervalColumn.setTitle("Interval (min)");
         columnList.add(intervalColumn);
 
-        NextHarvestsUrgencyScoreColumn urgencyColumn= new NextHarvestsUrgencyScoreColumn ();
+        NextHarvestsUrgencyScoreColumn urgencyColumn = new NextHarvestsUrgencyScoreColumn();
         urgencyColumn.setColumnType(COLUMN.URGENCY);
         urgencyColumn.setSortable(false);
         urgencyColumn.setTitle("Urgency");
@@ -84,7 +86,6 @@ public class NextHarvestsUrgencyScoreActionBean extends AbstractSearchActionBean
 
         return columnList;
     }
-
 
     public Resolution search() throws DAOException {
         return view();

@@ -47,9 +47,12 @@ public final class EMailSender {
     /**
      * Sends the email to system administrators in To: field.
      *
-     * @param subject Subject of email
-     * @param body Message
-     * @throws MessagingException if sending fails
+     * @param subject
+     *            Subject of email
+     * @param body
+     *            Message
+     * @throws MessagingException
+     *             if sending fails
      */
     public static void sendToSysAdmin(final String subject, final String body) throws MessagingException {
         send(getSysAdmins(), subject, body, false);
@@ -58,14 +61,19 @@ public final class EMailSender {
     /**
      * Sends the email - if there is a mail host in the configuration file.
      *
-     * @param to   Email recipients
-     * @param subject Subject of email
-     * @param body Message
-     * @param ccSysAdmin whether to CC system administrators
-     * @throws MessagingException if sending fails
+     * @param to
+     *            Email recipients
+     * @param subject
+     *            Subject of email
+     * @param body
+     *            Message
+     * @param ccSysAdmin
+     *            whether to CC system administrators
+     * @throws MessagingException
+     *             if sending fails
      */
     public static void send(final String[] to, final String subject, final String body, final boolean ccSysAdmin)
-            throws  MessagingException {
+            throws MessagingException {
 
         // if no mail.host specified in the properties, go no further
         String mailHost = GeneralConfig.getProperty("mail.host");

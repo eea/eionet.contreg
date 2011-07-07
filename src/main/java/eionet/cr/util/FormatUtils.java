@@ -33,22 +33,25 @@ import eionet.cr.dto.SubjectDTO;
  *
  * Utility class to hold handy functions for formatting.
  *
- * @author Aleksandr Ivanov
- * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
+ * @author Aleksandr Ivanov <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
 public final class FormatUtils {
     /**
      * to prevent public instancing.
      */
     private FormatUtils() {
-        //blank
+        // blank
     }
 
     /**
      * Returns object values for the given predicate in given langauges.
-     * @param predicateUri  predicate URI
-     * @param subjectDTO SubjectDTO data object for subject
-     * @param languages Set<String> language codes
+     *
+     * @param predicateUri
+     *            predicate URI
+     * @param subjectDTO
+     *            SubjectDTO data object for subject
+     * @param languages
+     *            Set<String> language codes
      * @return String
      */
     public static String getObjectValuesForPredicate(final String predicateUri, final SubjectDTO subjectDTO,
@@ -72,8 +75,7 @@ public final class FormatUtils {
                     // if the source of the object matches the search-hit source of the subject then
                     // remember the object value and break
                     if (subjectDTO.getHitSource() > 0 && objectDTO.getSourceHashSmart() == subjectDTO.getHitSource()
-                            && !StringUtils.isBlank(objectString)
-                            && objectDTO.isLiteral()) {
+                            && !StringUtils.isBlank(objectString) && objectDTO.isLiteral()) {
 
                         resultFromHitSource = objectString;
                         break;

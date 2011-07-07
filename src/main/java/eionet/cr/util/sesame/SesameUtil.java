@@ -33,8 +33,7 @@ public class SesameUtil {
      * @return RepositoryConnection
      * @throws RepositoryException
      */
-    public static RepositoryConnection getRepositoryConnection()
-            throws RepositoryException {
+    public static RepositoryConnection getRepositoryConnection() throws RepositoryException {
 
         return SesameConnectionProvider.getRepositoryConnection();
     }
@@ -44,13 +43,13 @@ public class SesameUtil {
      * @return Connection
      * @throws SQLException
      */
-    public static Connection getConnection() throws SQLException {
+    public static Connection getSQLConnection() throws SQLException {
 
-        return SesameConnectionProvider.getSimpleConnection();
+        return SesameConnectionProvider.getSQLConnection();
     }
 
     /**
-     * 
+     *
      * @param <T>
      * @param sparql
      * @param bindings
@@ -59,18 +58,17 @@ public class SesameUtil {
      * @throws OpenRDFException
      * @throws ResultSetReaderException
      */
-    public static <T> void executeQuery(String sparql, Bindings bindings,
-            SPARQLResultSetReader<T> reader, RepositoryConnection conn)
-            throws OpenRDFException, ResultSetReaderException {
+    public static <T> void executeQuery(String sparql, Bindings bindings, SPARQLResultSetReader<T> reader,
+            RepositoryConnection conn) throws OpenRDFException, ResultSetReaderException {
 
         TupleQueryResult queryResult = null;
         try {
             TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, sparql);
-            
-            if (bindings!=null){
+
+            if (bindings != null) {
                 bindings.applyTo(tupleQuery, conn.getValueFactory());
             }
-            
+
             queryResult = tupleQuery.evaluate();
             if (queryResult != null) {
 
@@ -91,7 +89,7 @@ public class SesameUtil {
     }
 
     /**
-     * 
+     *
      * @param <T>
      * @param sparql
      * @param reader
@@ -99,59 +97,77 @@ public class SesameUtil {
      * @throws OpenRDFException
      * @throws ResultSetReaderException
      */
-    public static <T> void executeQuery(String sparql,
-            SPARQLResultSetReader<T> reader, RepositoryConnection conn)
+    public static <T> void executeQuery(String sparql, SPARQLResultSetReader<T> reader, RepositoryConnection conn)
             throws OpenRDFException, ResultSetReaderException {
-        
+
         executeQuery(sparql, null, reader, conn);
     }
 
     /**
+     * Executes Query that performs modifications in data.
      * @param sparql
-     * @param conn
+     * @param conn repository connection
+     * @param bindings Query bindings
      * @throws RepositoryException
      * @throws QueryEvaluationException
      * @throws MalformedQueryException
      *
-     *             Executes SPARQL query that changes RDF data. Rollback is NOT
-     *             made if query does not succeed
+     *             Executes SPARQL query that changes RDF data. Rollback is NOT made if query does not succeed
      */
-    public static void executeUpdateQuery(String sparql,
-            RepositoryConnection conn) throws RepositoryException,
+    public static void executeUpdateQuery(String sparql, RepositoryConnection conn, Bindings bindings) throws RepositoryException,
             QueryEvaluationException, MalformedQueryException {
 
-        BooleanQuery query = conn.prepareBooleanQuery(QueryLanguage.SPARQL,
-                sparql);
+        BooleanQuery query = conn.prepareBooleanQuery(QueryLanguage.SPARQL, sparql);
+        if (bindings != null) {
+            bindings.applyTo(query, conn.getValueFactory());
+        }
         query.evaluate();
 
     }
 
     /**
      * Executes SPARQL Query producing RDF and exports to the passed RDF handler.
-     * @param sparql SPARQL for (CONSTRUCT) query
-     * @param rdfHandler RDF handler for output RDF format
-     * @param conn RepositoryConnection
-     * @throws QueryEvaluationException if query evaluation fails
-     * @throws RDFHandlerException if RDF handler fails
-     * @throws MalformedQueryException if query is not formed correctly
-     * @throws RepositoryException if Repository API call fails
+     *
+     * @param sparql
+     *            SPARQL for (CONSTRUCT) query
+     * @param rdfHandler
+     *            RDF handler for output RDF format
+     * @param conn
+     *            RepositoryConnection
+     * @param bindings Query Bindings
+     * @throws QueryEvaluationException
+     *             if query evaluation fails
+     * @throws RDFHandlerException
+     *             if RDF handler fails
+     * @throws MalformedQueryException
+     *             if query is not formed correctly
+     * @throws RepositoryException
+     *             if Repository API call fails
      */
-    public static void exportGraphQuery(final String sparql, final RDFHandler rdfHandler, final RepositoryConnection conn)
-        throws QueryEvaluationException, RDFHandlerException, MalformedQueryException, RepositoryException  {
+    public static void exportGraphQuery(final String sparql, final RDFHandler rdfHandler, final RepositoryConnection conn,
+            final Bindings bindings)
+            throws QueryEvaluationException, RDFHandlerException, MalformedQueryException, RepositoryException {
 
         GraphQuery graphQuery = conn.prepareGraphQuery(QueryLanguage.SPARQL, sparql);
+        if (bindings != null) {
+            bindings.applyTo(graphQuery, conn.getValueFactory());
+        }
+
         graphQuery.evaluate(rdfHandler);
     }
+
     /**
      *
-     * @param queryResult Query Result
+     * @param queryResult
+     *            Query Result
      */
     public static void close(final TupleQueryResult queryResult) {
 
         if (queryResult != null) {
             try {
                 queryResult.close();
-            } catch (QueryEvaluationException e) {}
+            } catch (QueryEvaluationException e) {
+            }
         }
     }
 

@@ -21,6 +21,4 @@ public class TriplesRDFWriter extends SubjectsRDFWriter {
         out.write("</rdf:RDF>\n".getBytes());
     }
 
-
-
 }

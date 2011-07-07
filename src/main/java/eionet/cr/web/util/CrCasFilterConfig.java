@@ -46,7 +46,8 @@ public class CrCasFilterConfig implements FilterConfig {
 
     /**
      *
-     * @param defaultConfig {@link FilterConfig} from web context.
+     * @param defaultConfig
+     *            {@link FilterConfig} from web context.
      */
     @SuppressWarnings("unchecked")
     private CrCasFilterConfig(FilterConfig defaultConfig) {
@@ -65,6 +66,7 @@ public class CrCasFilterConfig implements FilterConfig {
 
     /*
      * (non-Javadoc)
+     *
      * @see javax.servlet.FilterConfig#getFilterName()
      */
     public String getFilterName() {
@@ -73,6 +75,7 @@ public class CrCasFilterConfig implements FilterConfig {
 
     /*
      * (non-Javadoc)
+     *
      * @see javax.servlet.FilterConfig#getInitParameter(java.lang.String)
      */
     public String getInitParameter(String parameterKey) {
@@ -81,6 +84,7 @@ public class CrCasFilterConfig implements FilterConfig {
 
     /*
      * (non-Javadoc)
+     *
      * @see javax.servlet.FilterConfig#getInitParameterNames()
      */
     public Enumeration<String> getInitParameterNames() {
@@ -89,6 +93,7 @@ public class CrCasFilterConfig implements FilterConfig {
 
     /*
      * (non-Javadoc)
+     *
      * @see javax.servlet.FilterConfig#getServletContext()
      */
     public ServletContext getServletContext() {
@@ -97,7 +102,8 @@ public class CrCasFilterConfig implements FilterConfig {
 
     /**
      *
-     * @param defaultConfig defaultConfig {@link FilterConfig} from web context.
+     * @param defaultConfig
+     *            defaultConfig {@link FilterConfig} from web context.
      * @return an instance of {@link CrCasFilterConfig}.
      */
     public static CrCasFilterConfig getInstance(FilterConfig defaultConfig) {
@@ -118,8 +124,7 @@ public class CrCasFilterConfig implements FilterConfig {
         ResourceBundle resourceBundle = ResourceBundle.getBundle(GeneralConfig.BUNDLE_NAME);
 
         for (CRInitParameterKey initParameterKey : CRInitParameterKey.values()) {
-            crInitParamsMap.put(initParameterKey.getParameterKey(),
-                    resourceBundle.getString(initParameterKey.getParameterKey()));
+            crInitParamsMap.put(initParameterKey.getParameterKey(), resourceBundle.getString(initParameterKey.getParameterKey()));
         }
     }
 

@@ -14,33 +14,36 @@ import eionet.cr.harvest.statistics.dto.HarvestUrgencyScoreDTO;
 
 public class NextHarvestsUrgencyScoreColumn extends SearchResultColumn {
 
-    public enum COLUMN {URL, LASTHARVEST, INTERVAL, URGENCY};
+    public enum COLUMN {
+        URL, LASTHARVEST, INTERVAL, URGENCY
+    };
 
     private COLUMN columnType;
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.web.util.columns.SearchResultColumn#format(java.lang.Object)
      */
     public String format(Object object) {
 
         String result = "";
         if (object != null) {
-            HarvestUrgencyScoreDTO harvestUrgencyScore = (HarvestUrgencyScoreDTO)object;
+            HarvestUrgencyScoreDTO harvestUrgencyScore = (HarvestUrgencyScoreDTO) object;
 
             if (columnType == COLUMN.URL) {
                 result = harvestUrgencyScore.getUrl();
             }
 
             if (columnType == COLUMN.LASTHARVEST) {
-                Date date = harvestUrgencyScore .getLastHarvest();
+                Date date = harvestUrgencyScore.getLastHarvest();
                 if (date != null && date.getTime() > 0) {
                     result = SIMPLE_DATE_FORMAT.format(date);
                 }
             }
 
             if (columnType == COLUMN.INTERVAL) {
-                result = harvestUrgencyScore.getIntervalMinutes()+"";
+                result = harvestUrgencyScore.getIntervalMinutes() + "";
             }
 
             if (columnType == COLUMN.URGENCY) {
@@ -54,6 +57,7 @@ public class NextHarvestsUrgencyScoreColumn extends SearchResultColumn {
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.web.util.columns.SearchResultColumn#getSortParamValue()
      */
     public String getSortParamValue() {

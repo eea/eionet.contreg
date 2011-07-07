@@ -54,7 +54,7 @@ public class LabelPredicates {
         StringBuffer buf = new StringBuffer();
 
         predicateHashes = new String[predicates.size()];
-        for (Iterator<String> iter=predicates.iterator(); iter.hasNext(); i++) {
+        for (Iterator<String> iter = predicates.iterator(); iter.hasNext(); i++) {
             predicateHashes[i] = String.valueOf(Hashes.spoHash(iter.next()));
             if (i > 0)
                 buf.append(",");

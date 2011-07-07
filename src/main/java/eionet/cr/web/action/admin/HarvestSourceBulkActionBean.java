@@ -20,8 +20,10 @@ import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.util.URLUtil;
 import eionet.cr.web.action.AbstractActionBean;
+
 /**
  * Action bean for bulk add/delete harvest sources page.
+ *
  * @author kaido
  *
  */
@@ -31,7 +33,7 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
     /** harvest sources entered by user. */
     private String strHarvestSources;
 
-    /** is admin logged in.*/
+    /** is admin logged in. */
     private boolean adminLoggedIn = false;
 
     /** parsed sources from user input. */
@@ -48,6 +50,7 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
 
     /**
      * View sources bulk management page.
+     *
      * @return Resolution
      */
     @DefaultHandler
@@ -61,8 +64,8 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
     }
 
     /**
-     * Parse input string and adds sources to the table.
-     * Sources are entered one per line
+     * Parse input string and adds sources to the table. Sources are entered one per line
+     *
      * @return Resolution
      */
     public Resolution add() {
@@ -79,8 +82,8 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
     }
 
     /**
-     * Deletes sources added by the user.
-     * Harvest sources are separated by carriage return in the textarea
+     * Deletes sources added by the user. Harvest sources are separated by carriage return in the textarea
+     *
      * @return Resolution
      */
     public Resolution delete() {
@@ -95,20 +98,28 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
         return new ForwardResolution(BULK_HARVEST_PAGE);
     }
 
-    /** Sources : user entered input text.
+    /**
+     * Sources : user entered input text.
+     *
      * @return String
      */
     public String getStrHarvestSources() {
         return strHarvestSources;
     }
 
-    /** omits value to input String.
-     * @param harvestSources String
+    /**
+     * omits value to input String.
+     *
+     * @param harvestSources
+     *            String
      */
     public void setStrHarvestSources(final String harvestSources) {
         this.strHarvestSources = harvestSources;
     }
-    /** True if the user is authenticated.
+
+    /**
+     * True if the user is authenticated.
+     *
      * @return boolean
      */
     public boolean isAdminLoggedIn() {
@@ -116,7 +127,8 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param adminLoggedIn boolean
+     * @param adminLoggedIn
+     *            boolean
      */
     public void setAdminLoggedIn(final boolean adminLoggedIn) {
         this.adminLoggedIn = adminLoggedIn;
@@ -124,7 +136,9 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
 
     /**
      * parses input String to harvest source DTO objects.
-     * @param strSources user input in UI
+     *
+     * @param strSources
+     *            user input in UI
      */
     private void parseHarvestSources(final String strSources) {
         harvestSources = new ArrayList<HarvestSourceDTO>();
@@ -133,11 +147,12 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
         String trimmedStrSources = strSources.trim();
 
         StringTokenizer urls = new StringTokenizer(trimmedStrSources);
-//        List<HarvestSourceDTO> sources = new ArrayList<HarvestSourceDTO>();
+        // List<HarvestSourceDTO> sources = new ArrayList<HarvestSourceDTO>();
         while (urls.hasMoreElements()) {
             String url = urls.nextToken();
             if (URLUtil.isURL(url)) {
-                harvestSources.add(HarvestSourceDTO.create(url, false, HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL, getUserName()));
+                harvestSources
+                        .add(HarvestSourceDTO.create(url, false, HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL, getUserName()));
                 sourceUrls.add(url);
             } else {
                 warnings.append("Entered URL \"").append(url).append("\" is not a valid URL.<br/>");
@@ -157,17 +172,17 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
         int counter = 0;
         for (HarvestSourceDTO source : harvestSources) {
             try {
-                //checking of duplicate sources is made by the unique index in the DB
+                // checking of duplicate sources is made by the unique index in the DB
                 dao.addSource(source);
                 UrgentHarvestQueue.addPullHarvest(source.getUrl());
                 counter++;
             } catch (DAOException e) {
-                //if adding fails, proceed with adding the other sources and show error message
-                warnings.append("Adding source \"").append(source.getUrl()).append("\" failed, reason: ").
-                    append(e.toString()).append("<br/>");
+                // if adding fails, proceed with adding the other sources and show error message
+                warnings.append("Adding source \"").append(source.getUrl()).append("\" failed, reason: ").append(e.toString())
+                        .append("<br/>");
             } catch (HarvestException he) {
-                warnings.append("Adding source \"").append(source.getUrl()).append("\" to the harvest queue failed, reason: ").
-                append(he.toString()).append("<br/>");
+                warnings.append("Adding source \"").append(source.getUrl()).append("\" to the harvest queue failed, reason: ")
+                        .append(he.toString()).append("<br/>");
             }
         }
         addSystemMessage("Adding sources finished. Successfully added " + counter + " sources for urgent harvesting.");
@@ -177,32 +192,29 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
     }
 
     /**
-     * Adds sources to removal queue.
-     * Those ones that already are in the delete queue are not added.
+     * Adds sources to removal queue. Those ones that already are in the delete queue are not added.
      */
     private void bulkDeleteSources() {
-            try {
-                HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
-                List<String> sourcesInDeleteQue = dao.getScheduledForDeletion();
-                List<String> sourcesForRemoval = new ArrayList<String>();
+        try {
+            HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
+            List<String> sourcesInDeleteQue = dao.getScheduledForDeletion();
+            List<String> sourcesForRemoval = new ArrayList<String>();
 
-                for (String url : sourceUrls) {
-                    //if the source is already in the delete queue, do not try to add it twice
-                    if (!sourcesInDeleteQue.contains(url)) {
-                        sourcesForRemoval.add(url);
-                        sourcesInDeleteQue.add(url);
-                    }
+            for (String url : sourceUrls) {
+                // if the source is already in the delete queue, do not try to add it twice
+                if (!sourcesInDeleteQue.contains(url)) {
+                    sourcesForRemoval.add(url);
+                    sourcesInDeleteQue.add(url);
                 }
-                dao.queueSourcesForDeletion(sourcesForRemoval);
-                addSystemMessage(sourcesForRemoval.size() + " source(s) were scheduled for removal.");
-                if (sourceUrls.size() - sourcesForRemoval.size() > 0) {
-                    addSystemMessage((sourceUrls.size() - sourcesForRemoval.size())
-                            + " source(s) were already in the delete queue.");
-                }
-            } catch (DAOException e) {
-                warnings.append("Adding sources to delete queue failed, reason: ").
-                    append(e.toString()).append("<br/>");
             }
+            dao.queueSourcesForDeletion(sourcesForRemoval);
+            addSystemMessage(sourcesForRemoval.size() + " source(s) were scheduled for removal.");
+            if (sourceUrls.size() - sourcesForRemoval.size() > 0) {
+                addSystemMessage((sourceUrls.size() - sourcesForRemoval.size()) + " source(s) were already in the delete queue.");
+            }
+        } catch (DAOException e) {
+            warnings.append("Adding sources to delete queue failed, reason: ").append(e.toString()).append("<br/>");
+        }
         if (StringUtils.isNotEmpty(warnings.toString())) {
             addSystemMessage(warnings.toString());
         }

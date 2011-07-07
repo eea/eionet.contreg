@@ -29,7 +29,7 @@ package eionet.cr.common;
  */
 public enum Namespace {
 
-    //TODO: When we remove the AmpFeedServlet and XmlConvFeedServlet we can get rid of DC, AMP, EPER and IMS.
+    // TODO: When we remove the AmpFeedServlet and XmlConvFeedServlet we can get rid of DC, AMP, EPER and IMS.
     // The rest can be turned into constants.
 
     /** RDF base prefix. */

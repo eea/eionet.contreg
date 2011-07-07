@@ -81,12 +81,12 @@ public class InstantHarvester extends Thread {
             SubjectDTO subjectDTO = new SubjectDTO(sourceUrl, false);
             subjectDTO.addObject(Predicates.RDF_TYPE, objectDTO);
             DAOFactory.get().getDao(HelperDAO.class).addTriples(subjectDTO);
-            
+
             // since user registrations URI was used as triple source, add it to HARVEST_SOURCE too
             // (but set interval minutes to 0, to avoid it being background-harvested)
-            DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(
-                    HarvestSourceDTO.create(CRUser.registrationsUri(userName), true, 0, userName));
-            
+            DAOFactory.get().getDao(HarvestSourceDAO.class)
+                    .addSourceIgnoreDuplicate(HarvestSourceDTO.create(CRUser.registrationsUri(userName), true, 0, userName));
+
         } catch (HarvestException e) {
             harvestException = e;
         } catch (Throwable e) {
@@ -98,8 +98,8 @@ public class InstantHarvester extends Thread {
         } finally {
             if (instantHarvest != null) {
                 rdfContentFound = instantHarvest.isRdfContentFound();
-                sourceAvailable = instantHarvest.getSourceAvailable() != null
-                        && instantHarvest.getSourceAvailable().booleanValue();
+                sourceAvailable =
+                        instantHarvest.getSourceAvailable() != null && instantHarvest.getSourceAvailable().booleanValue();
                 // Check if source is redirected and destination
                 // source has been recently updated
                 needsHarvesting = instantHarvest.needsHarvesting;

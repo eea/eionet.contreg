@@ -21,9 +21,8 @@
 package eionet.cr.util.export;
 
 public enum ExportFormat {
-    XLS (".xls", "application/xls", "Exported_data.xls"),
-    XML (".xml", "text/xml;charset=utf-8", "Exported_data.xml"),
-    XML_WITH_SCHEMA (".xml (with XML Schema)", "text/xml;charset=utf-8", "Exported_data.xml");
+    XLS(".xls", "application/xls", "Exported_data.xls"), XML(".xml", "text/xml;charset=utf-8", "Exported_data.xml"),
+    XML_WITH_SCHEMA(".xml (with XML Schema)", "text/xml;charset=utf-8", "Exported_data.xml");
 
     private String name;
     private String contentType;
@@ -43,7 +42,7 @@ public enum ExportFormat {
      * @return
      */
     public static ExportFormat fromName(String exportFormat) {
-        for ( ExportFormat format: ExportFormat.values()) {
+        for (ExportFormat format : ExportFormat.values()) {
             if (format.name.equals(exportFormat)) {
                 return format;
             }
@@ -57,6 +56,7 @@ public enum ExportFormat {
     public String getName() {
         return name;
     }
+
     /**
      * @return the contentType
      */

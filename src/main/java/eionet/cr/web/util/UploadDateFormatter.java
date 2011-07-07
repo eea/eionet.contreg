@@ -35,13 +35,14 @@ public class UploadDateFormatter implements Formatter {
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.web.util.Formatter#format(java.lang.Object)
      */
     public String format(Object object) {
 
         String result = "";
         if (object != null && object instanceof Date) {
-            result = simpleDateFormat.format((Date)object);
+            result = simpleDateFormat.format((Date) object);
         }
         return result;
     }

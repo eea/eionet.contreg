@@ -22,7 +22,7 @@ package eionet.cr.common;
 
 public interface Predicates {
 
-    //TODO: The DC 1.1 elements have had "deprecated" status since 2007. We should change to DCTERMS.
+    // TODO: The DC 1.1 elements have had "deprecated" status since 2007. We should change to DCTERMS.
     public static final String DC_TITLE = "http://purl.org/dc/elements/1.1/title";
     public static final String DC_DATE = "http://purl.org/dc/elements/1.1/date";
     public static final String DC_COVERAGE = "http://purl.org/dc/elements/1.1/coverage";
@@ -81,7 +81,8 @@ public interface Predicates {
     public static final String CR_HAS_FEEDBACK = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#hasFeedback";
     public static final String CR_FEEDBACK_FOR = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#feedbackFor";
     public static final String CR_USER = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#user";
-    public static final String CR_USER_REVIEW_LAST_NUMBER = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#userReviewLastNumber";
+    public static final String CR_USER_REVIEW_LAST_NUMBER =
+            "http://cr.eionet.europa.eu/ontologies/contreg.rdf#userReviewLastNumber";
     public static final String CR_HAS_ATTACHMENT = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#hasAttachment";
     public static final String CR_HAS_FILE = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#hasFile";
     public static final String CR_FILE = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#File";

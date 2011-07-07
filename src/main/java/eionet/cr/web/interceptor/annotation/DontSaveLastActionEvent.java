@@ -25,11 +25,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import eionet.cr.web.interceptor.ActionEventInterceptor;
-
 /**
- * When method is annotated with this annotation {@link ActionEventInterceptor}
- * will not save in session this event as last event.
+ * When method is annotated with this annotation {@link eionet.cr.web.interceptor.ActionEventInterceptor} will not save in session this event as last event.
  *
  * @author gerasvad
  *

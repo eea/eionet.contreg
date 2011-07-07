@@ -37,9 +37,9 @@ import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Hashes;
 
 /**
- * 
+ *
  * @author altnyris
- * 
+ *
  */
 public class SPOReader extends ResultSetMixedReader<SubjectDTO> {
 
@@ -51,7 +51,7 @@ public class SPOReader extends ResultSetMixedReader<SubjectDTO> {
     private List<SubjectDTO> resultlist = null;
 
     /**
-     * 
+     *
      * @param subjectsMap
      */
     public SPOReader() {
@@ -60,14 +60,14 @@ public class SPOReader extends ResultSetMixedReader<SubjectDTO> {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
      */
     public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
     }
 
     /**
-     * 
+     *
      * @param subjectHash
      * @param subjectDTO
      */
@@ -77,7 +77,7 @@ public class SPOReader extends ResultSetMixedReader<SubjectDTO> {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
      */
     @Override
@@ -118,8 +118,9 @@ public class SPOReader extends ResultSetMixedReader<SubjectDTO> {
             strObjectValue = blankNodeUriPrefix.concat(strObjectValue);
         }
 
-        ObjectDTO object = new ObjectDTO(strObjectValue, objectLang == null ? "" : objectLang, isLiteral,
-                objectValue instanceof BNode, dataType);
+        ObjectDTO object =
+                new ObjectDTO(strObjectValue, objectLang == null ? "" : objectLang, isLiteral, objectValue instanceof BNode,
+                        dataType);
 
         object.setHash(Hashes.spoHash(strObjectValue));
         currentObjects.add(object);

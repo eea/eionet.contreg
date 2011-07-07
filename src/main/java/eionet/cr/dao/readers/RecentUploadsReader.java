@@ -12,7 +12,6 @@ import org.openrdf.model.BNode;
 import org.openrdf.model.Value;
 import org.openrdf.query.BindingSet;
 
-
 /**
  *
  * @author risto
@@ -21,7 +20,7 @@ import org.openrdf.query.BindingSet;
  */
 public class RecentUploadsReader<T> extends ResultSetMixedReader<T> {
 
-    private Map<String,Date> resultMap;
+    private Map<String, Date> resultMap;
 
     public RecentUploadsReader() {
         resultMap = new HashMap<String, Date>();
@@ -29,6 +28,7 @@ public class RecentUploadsReader<T> extends ResultSetMixedReader<T> {
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.util.sql.SQLResultSetReader#readRow(java.sql.ResultSet)
      */
     @Override
@@ -38,6 +38,7 @@ public class RecentUploadsReader<T> extends ResultSetMixedReader<T> {
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
      */
     @SuppressWarnings("unchecked")
@@ -53,7 +54,7 @@ public class RecentUploadsReader<T> extends ResultSetMixedReader<T> {
                 subjectUri = blankNodeUriPrefix + subjectUri;
             }
         }
-        resultList.add((T)subjectUri);
+        resultList.add((T) subjectUri);
 
         // expecting the column "d" to contain the date
         Value dateValue = bindingSet.getValue("d");

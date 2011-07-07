@@ -1,23 +1,23 @@
 /*
-* The contents of this file are subject to the Mozilla Public
-*
-* License Version 1.1 (the "License"); you may not use this file
-* except in compliance with the License. You may obtain a copy of
-* the License at http://www.mozilla.org/MPL/
-*
-* Software distributed under the License is distributed on an "AS
-* IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
-* implied. See the License for the specific language governing
-* rights and limitations under the License.
-*
-* The Original Code is Content Registry 2.0.
-*
-* The Initial Owner of the Original Code is European Environment
-* Agency. Portions created by Tieto Eesti are Copyright
-* (C) European Environment Agency. All Rights Reserved.
-*
-* Contributor(s):
-* Jaanus Heinlaid, Tieto Eesti*/
+ * The contents of this file are subject to the Mozilla Public
+ *
+ * License Version 1.1 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of
+ * the License at http://www.mozilla.org/MPL/
+ *
+ * Software distributed under the License is distributed on an "AS
+ * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ * The Original Code is Content Registry 2.0.
+ *
+ * The Initial Owner of the Original Code is European Environment
+ * Agency. Portions created by Tieto Eesti are Copyright
+ * (C) European Environment Agency. All Rights Reserved.
+ *
+ * Contributor(s):
+ * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.dao.postgre;
 
 import java.sql.Connection;
@@ -39,8 +39,10 @@ public class PostgreSQLHarvestMessageDAO extends PostgreSQLBaseDAO implements Ha
 
     /** */
     private static final String q_HarvestMessageByHarvestID = "select * from HARVEST_MESSAGE where HARVEST_ID=?";
+
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HarvestMessageDAO#findHarvestMessagesByHarvestID(java.lang.String)
      */
     public List<HarvestMessageDTO> findHarvestMessagesByHarvestID(int harvestID) throws DAOException {
@@ -54,6 +56,7 @@ public class PostgreSQLHarvestMessageDAO extends PostgreSQLBaseDAO implements Ha
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HarvestMessageDAO#findHarvestMessageByMessageID(java.lang.String)
      */
     public HarvestMessageDTO findHarvestMessageByMessageID(int messageID) throws DAOException {
@@ -65,9 +68,11 @@ public class PostgreSQLHarvestMessageDAO extends PostgreSQLBaseDAO implements Ha
 
     /** */
     private static final String q_insertHarvestMessage =
-        "insert into HARVEST_MESSAGE (HARVEST_ID, TYPE, MESSAGE, STACK_TRACE) values (?, ?, ?, ?)";
+            "insert into HARVEST_MESSAGE (HARVEST_ID, TYPE, MESSAGE, STACK_TRACE) values (?, ?, ?, ?)";
+
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HarvestMessageDAO#insertHarvestMessage(eionet.cr.dto.HarvestMessageDTO)
      */
     public Integer insertHarvestMessage(HarvestMessageDTO harvestMessageDTO) throws DAOException {

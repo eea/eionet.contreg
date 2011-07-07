@@ -51,7 +51,7 @@ import eionet.cr.web.util.columns.SearchResultColumn;
 
 /**
  * @author altnyris
- * 
+ *
  */
 @UrlBinding("/sources.action")
 public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSourceDTO> {
@@ -119,6 +119,7 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
     /**
      * @see eionet.cr.web.action.AbstractSearchActionBean#search()
      */
+    @Override
     @DefaultHandler
     public Resolution search() throws DAOException {
 
@@ -142,16 +143,18 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
             } else if (PRIORITY.equals(type)) {
                 pair = factory.getDao(HarvestSourceDAO.class).getPrioritySources(filterString, pagingRequest, sortingRequest);
             } else if (UNAVAILABLE_TYPE.equals(type)) {
-                pair = factory.getDao(HarvestSourceDAO.class).getHarvestSourcesUnavailable(filterString, pagingRequest,
-                        sortingRequest);
+                pair =
+                    factory.getDao(HarvestSourceDAO.class).getHarvestSourcesUnavailable(filterString, pagingRequest,
+                            sortingRequest);
             } else if (FAILED_HARVESTS.equals(type)) {
                 pair = factory.getDao(HarvestSourceDAO.class).getHarvestSourcesFailed(filterString, pagingRequest, sortingRequest);
             } else if (SCHEMAS.equals(type)) {
                 // Get comma separated sources that are included into
                 // inferencing ruleset
                 String sourceUris = factory.getDao(HarvestSourceDAO.class).getSourcesInInferenceRules();
-                pair = factory.getDao(HarvestSourceDAO.class).getInferenceSources(filterString, pagingRequest, sortingRequest,
-                        sourceUris);
+                pair =
+                    factory.getDao(HarvestSourceDAO.class).getInferenceSources(filterString, pagingRequest, sortingRequest,
+                            sourceUris);
             }
 
             if (pair != null) {
@@ -173,7 +176,7 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
     }
 
     /**
-     * 
+     *
      * @param harvestSourceDTO
      * @return
      */
@@ -188,12 +191,11 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
             String sourceOwner = harvestSourceDTO.getOwner();
             CRUser user = getUser();
 
-            // should the source's owner be unspecified, any authenticated user can delete it
+            // should the source's owner be unspecified, any authenticated user can delete it,
+            // otherwise an authenticated user can delete if he is an administrator or the source's owner
             if (StringUtils.isBlank(sourceOwner) && user != null) {
                 result = true;
-            }
-            // otherwise an authenticated user can delete if he is an administrator or the source's owner
-            else if (user != null && (user.isAdministrator() || user.getUserName().equals(sourceOwner))) {
+            } else if (user != null && (user.isAdministrator() || user.getUserName().equals(sourceOwner))) {
                 result = true;
             }
         }
@@ -202,7 +204,7 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
     }
 
     /**
-     * 
+     *
      * @return
      * @throws DAOException
      */
@@ -282,19 +284,21 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
         if (isUserLoggedIn()) {
             if (sourceUrl != null && !sourceUrl.isEmpty()) {
                 UrgentHarvestQueue.addPullHarvests(sourceUrl);
-                if (sourceUrl.size() == 1)
+                if (sourceUrl.size() == 1) {
                     addSystemMessage("The source has been scheduled for urgent harvest!");
-                else
+                } else {
                     addSystemMessage("The sources have been scheduled for urgent harvest!");
+                }
             }
-        } else
+        } else {
             addWarningMessage(getBundle().getString("not.logged.in"));
+        }
 
         return search();
     }
 
     /**
-     * 
+     *
      * @return List<Pair<String, String>>
      */
     public List<Pair<String, String>> getSourceTypes() {
@@ -325,7 +329,7 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
     }
 
     /**
-     * 
+     *
      * @return String
      */
     public String getPagingUrl() {
@@ -356,16 +360,16 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
 
     /*
      * (non-Javadoc)
-     * 
      * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
      */
+    @Override
     public List<SearchResultColumn> getColumns() throws DAOException {
 
         if (columnList == null) {
 
             columnList = new ArrayList<SearchResultColumn>();
             // display checkbox only when current session allows update rights in registrations ACL
-            if (CRUser.hasPermission(getContext().getRequest().getSession(), "/registrations", "u")) {
+            if (getUser() != null && CRUser.hasPermission(getContext().getRequest().getSession(), "/registrations", "u")) {
                 columnList.add(checkboxColumn);
             }
             columnList.add(urlColumn);
@@ -378,6 +382,7 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
     /**
      *
      */
+    @Override
     public String[] excludeFromSortAndPagingUrls() {
         return EXCLUDE_FROM_SORT_AND_PAGING_URLS;
     }

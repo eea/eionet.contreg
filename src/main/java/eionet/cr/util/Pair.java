@@ -26,13 +26,12 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 /**
- * @author Aleksandr Ivanov
- * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
+ * @author Aleksandr Ivanov <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
-public class Pair<L,R> implements Serializable {
+public class Pair<L, R> implements Serializable {
 
     /** */
-    private static final String[] excludeFromEquals = new String[]{"right"};
+    private static final String[] excludeFromEquals = new String[] {"right"};
 
     /**
      * serial.
@@ -58,28 +57,32 @@ public class Pair<L,R> implements Serializable {
     public L getLeft() {
         return left;
     }
+
     /**
-     * @param left the left to set
+     * @param left
+     *            the left to set
      */
     public void setLeft(L id) {
         this.left = id;
     }
+
     /**
      * @return the right
      */
     public R getRight() {
         return right;
     }
+
     /**
-     * @param right the right to set
+     * @param right
+     *            the right to set
      */
     public void setRight(R value) {
         this.right = value;
     }
 
     /**
-     * @see java.lang.Object#hashCode()
-     * {@inheritDoc}
+     * @see java.lang.Object#hashCode() {@inheritDoc}
      */
     @Override
     public int hashCode() {
@@ -87,8 +90,7 @@ public class Pair<L,R> implements Serializable {
     }
 
     /**
-     * @see java.lang.Object#equals(java.lang.Object)
-     * {@inheritDoc}
+     * @see java.lang.Object#equals(java.lang.Object) {@inheritDoc}
      */
     @Override
     public boolean equals(Object obj) {

@@ -12,6 +12,7 @@ import eionet.cr.util.Bindings;
 
 /**
  * Queries for handling tags.
+ *
  * @author jaanus
  */
 public class VirtuosoTagsDAO extends VirtuosoBaseDAO implements TagsDAO {
@@ -20,14 +21,15 @@ public class VirtuosoTagsDAO extends VirtuosoBaseDAO implements TagsDAO {
      */
     public static final String GET_TAGS_WITH_FREQUENCIES_SPARQL = "define input:inference '"
             + GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME) + "' "
-            + "SELECT ?o (count(?o) as ?c) WHERE { ?s ?crTagPredicate ?o } "
-            + "ORDER BY DESC(?c)";
+            + "SELECT ?o (count(?o) as ?c) WHERE { ?s ?crTagPredicate ?o } " + "ORDER BY DESC(?c)";
 
     /**
      * Returns tag cloud.
+     *
      * @see eionet.cr.dao.TagsDAO#getTagCloud()
      * @return List<TagDTO>
-     * @throws DAOException if query fails
+     * @throws DAOException
+     *             if query fails
      */
     @Override
     public List<TagDTO> getTagCloud() throws DAOException {

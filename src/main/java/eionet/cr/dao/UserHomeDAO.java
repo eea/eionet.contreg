@@ -48,12 +48,13 @@ public interface UserHomeDAO extends DAO {
      * @throws DAOException
      */
     public Pair<Integer, List<UserFolderDTO>> getFolderContents(String parentFolder, Map<String, String> filters,
-            PagingRequest pagingRequest, SortingRequest sortingRequest,
-            List<String> selectedPredicates) throws DAOException;
+            PagingRequest pagingRequest, SortingRequest sortingRequest, List<String> selectedPredicates) throws DAOException;
 
     /**
      * Check if the user folder is already registered in CR home root
-     * @param user loggedin user
+     *
+     * @param user
+     *            loggedin user
      * @return true if user folder is already registered
      * @throws DAOException
      */

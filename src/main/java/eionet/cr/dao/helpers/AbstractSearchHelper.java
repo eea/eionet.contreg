@@ -56,8 +56,8 @@ public abstract class AbstractSearchHelper implements SearchHelper {
         this.sortingRequest = sortingRequest;
         if (sortingRequest != null) {
             sortPredicate = sortingRequest.getSortingColumnName();
-            sortOrder = sortingRequest.getSortOrder() == null ? SortOrder.ASCENDING.toSQL()
-                    : sortingRequest.getSortOrder().toSQL();
+            sortOrder =
+                    sortingRequest.getSortOrder() == null ? SortOrder.ASCENDING.toSQL() : sortingRequest.getSortOrder().toSQL();
         }
     }
 
@@ -68,19 +68,15 @@ public abstract class AbstractSearchHelper implements SearchHelper {
      */
     public String getQuery(List<Object> inParams) {
 
-        String query = StringUtils.isBlank(sortPredicate) ?
-                getUnorderedQuery(inParams) : getOrderedQuery(inParams);
+        String query = StringUtils.isBlank(sortPredicate) ? getUnorderedQuery(inParams) : getOrderedQuery(inParams);
 
         if (pagingRequest != null) {
-            return new StringBuffer(query).
-                    append(" limit ").append(pagingRequest.getItemsPerPage()).
-                    append(" offset ").append(pagingRequest.getOffset()).
-                    toString();
+            return new StringBuffer(query).append(" limit ").append(pagingRequest.getItemsPerPage()).append(" offset ")
+                    .append(pagingRequest.getOffset()).toString();
         } else {
             return query;
         }
     }
-
 
     /**
      *
@@ -110,17 +106,14 @@ public abstract class AbstractSearchHelper implements SearchHelper {
      */
     public abstract String getMinMaxHashQuery(List<Object> inParams);
 
-
-    /** 
-    * Default implementation of getQueryBindings.
-    * Returns null if not specified in the helper implementation.
-    * @return prepared query bindings
-    */
+    /**
+     * Default implementation of getQueryBindings. Returns null if not specified in the helper implementation.
+     *
+     * @return prepared query bindings
+     */
     @Override
     public Bindings getQueryBindings() {
         return null;
     }
-    
-    
-    
+
 }

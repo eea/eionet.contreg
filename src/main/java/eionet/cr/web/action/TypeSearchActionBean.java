@@ -181,21 +181,13 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
         ExportFormat format = ExportFormat.fromName(exportFormat);
         Exporter exporter = Exporter.getExporter(format);
 
-        exporter.setLanguages(
-                getAcceptedLanguages() != null
-                        ? getAcceptedLanguages()
-                        : Collections.EMPTY_SET);
+        exporter.setLanguages(getAcceptedLanguages() != null ? getAcceptedLanguages() : Collections.EMPTY_SET);
         List<Pair<String, String>> columnPairs = new LinkedList<Pair<String, String>>();
 
         exporter.setExportResourceUri(uriResourceIdentifier);
-        selectedColumns = exportColumns == null || exportColumns.isEmpty()
-                ? selectedColumns
-                : exportColumns;
+        selectedColumns = exportColumns == null || exportColumns.isEmpty() ? selectedColumns : exportColumns;
         for (String selectedColumn : selectedColumns) {
-            columnPairs.add(
-                    new Pair<String, String>(
-                            selectedColumn,
-                            getAvailableColumns().get(selectedColumn)));
+            columnPairs.add(new Pair<String, String>(selectedColumn, getAvailableColumns().get(selectedColumn)));
         }
         exporter.setSelectedColumns(columnPairs);
         Map<String, String> filters = new HashMap<String, String>();
@@ -227,8 +219,8 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
     @SuppressWarnings("unchecked")
     public Resolution addFilter() {
 
-        Map<String, Map<String, String>> cache = (Map<String, Map<String, String>>) getSession().getAttribute(
-                SELECTED_FILTERS_CACHE);
+        Map<String, Map<String, String>> cache =
+                (Map<String, Map<String, String>>) getSession().getAttribute(SELECTED_FILTERS_CACHE);
         if (cache == null) {
             cache = new HashMap<String, Map<String, String>>();
         }
@@ -249,10 +241,9 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
     @SuppressWarnings("unchecked")
     public Resolution removeFilter() {
 
-        Map<String, Map<String, String>> cache = (Map<String, Map<String, String>>) getSession().getAttribute(
-                SELECTED_FILTERS_CACHE);
-        if (cache != null && cache.containsKey(type) && cache.get(type) != null
-                && cache.get(type).containsKey(clearFilter)) {
+        Map<String, Map<String, String>> cache =
+                (Map<String, Map<String, String>>) getSession().getAttribute(SELECTED_FILTERS_CACHE);
+        if (cache != null && cache.containsKey(type) && cache.get(type) != null && cache.get(type).containsKey(clearFilter)) {
             cache.get(type).remove(clearFilter);
         }
         getSession().setAttribute(LAST_ACTION, LastAction.REMOVE_FILTER);
@@ -267,8 +258,8 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
     public Resolution applyFilters() throws DAOException {
         if (selectedFilters != null && !selectedFilters.isEmpty()) {
             // save selected filters for future use
-            Map<String, Map<String, String>> cache = (Map<String, Map<String, String>>) getSession().getAttribute(
-                    SELECTED_FILTERS_CACHE);
+            Map<String, Map<String, String>> cache =
+                    (Map<String, Map<String, String>>) getSession().getAttribute(SELECTED_FILTERS_CACHE);
             if (cache != null && cache.containsKey(type)) {
                 cache.get(type).putAll(selectedFilters);
             }
@@ -305,12 +296,11 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
                     }
                 }
                 Pair<Integer, List<SubjectDTO>> searchResult =
-                        DAOFactory.get().getDao(SearchDAO.class).searchByTypeAndFilters(
-                                    criteria,
-                                    null,
-                                    PagingRequest.create(getPageN()),
-                                    new SortingRequest(getSortP(), SortOrder.parse(getSortO())),
-                                    selectedColumns);
+                        DAOFactory
+                                .get()
+                                .getDao(SearchDAO.class)
+                                .searchByTypeAndFilters(criteria, null, PagingRequest.create(getPageN()),
+                                        new SortingRequest(getSortP(), SortOrder.parse(getSortO())), selectedColumns);
 
                 resultList = searchResult.getRight();
                 matchCount = searchResult.getLeft();
@@ -369,23 +359,22 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
         String previousType = (String) getSession().getAttribute(PREVIOUS_TYPE);
         getSession().setAttribute(PREVIOUS_TYPE, type);
         if (!type.equals(previousType)) {
-            Map<String, Map<String, String>> filterCache = (Map<String, Map<String, String>>) getSession().getAttribute(
-                    SELECTED_FILTERS_CACHE);
+            Map<String, Map<String, String>> filterCache =
+                    (Map<String, Map<String, String>>) getSession().getAttribute(SELECTED_FILTERS_CACHE);
             if (filterCache != null && filterCache.containsKey(type)) {
                 filterCache.remove(type);
             }
         } else {
             // check for selected filters and add labels to them
-            Map<String, Map<String, String>> filterCache = (Map<String, Map<String, String>>) getSession().getAttribute(
-                    SELECTED_FILTERS_CACHE);
+            Map<String, Map<String, String>> filterCache =
+                    (Map<String, Map<String, String>>) getSession().getAttribute(SELECTED_FILTERS_CACHE);
             if (filterCache != null && filterCache.containsKey(type)) {
                 selectedFilters = filterCache.get(type);
                 displayFilters = new HashMap<String, Pair<String, String>>();
                 Map<String, String> availableColumns = getAvailableColumns();
                 for (Entry<String, String> entry : selectedFilters.entrySet()) {
                     if (availableColumns.containsKey(entry.getKey())) {
-                        displayFilters.put(
-                                availableColumns.get(entry.getKey()),
+                        displayFilters.put(availableColumns.get(entry.getKey()),
                                 new Pair<String, String>(entry.getKey(), entry.getValue()));
                     }
                 }
@@ -408,8 +397,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
             if (!selectedColumns.contains(Predicates.RDFS_LABEL)) {
                 selectedColumns.add(0, Predicates.RDFS_LABEL);
             }
-            selectedColumns = new LinkedList<String>(
-                    selectedColumns.subList(0, selectedColumns.size()));
+            selectedColumns = new LinkedList<String>(selectedColumns.subList(0, selectedColumns.size()));
         }
         cache.put(type, selectedColumns);
         getSession().setAttribute(SELECTED_COLUMNS_CACHE, cache);
@@ -419,9 +407,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 
     private List<String> getSelectedColumnsFromCache() {
         Map<String, List<String>> cache = (Map<String, List<String>>) getSession().getAttribute(SELECTED_COLUMNS_CACHE);
-        return cache == null
-                ? selectedColumns
-                : cache.get(type);
+        return cache == null ? selectedColumns : cache.get(type);
     }
 
     /*
@@ -578,8 +564,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 
             Map<String, String> result = new LinkedHashMap<String, String>();
 
-            List<SubjectDTO> usedPredicates = DAOFactory.get().getDao(
-                    HelperDAO.class).getPredicatesUsedForType(type);
+            List<SubjectDTO> usedPredicates = DAOFactory.get().getDao(HelperDAO.class).getPredicatesUsedForType(type);
 
             result.put(Predicates.RDFS_LABEL, "Title");
             if (usedPredicates != null && !usedPredicates.isEmpty()) {

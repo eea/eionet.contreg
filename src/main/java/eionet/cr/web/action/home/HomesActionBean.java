@@ -68,9 +68,9 @@ public class HomesActionBean extends AbstractSearchActionBean<UserFolderDTO> {
     public Resolution search() throws DAOException {
 
         UserHomeDAO userHomeDAO = DAOFactory.get().getDao(UserHomeDAO.class);
-        Pair<Integer, List<UserFolderDTO>> folders = userHomeDAO
-                .getFolderContents(CRUser.rootHomeUri(), null, PagingRequest.create(getPageN()),
-                        new SortingRequest(getSortP(), SortOrder.parse(getSortO())), null);
+        Pair<Integer, List<UserFolderDTO>> folders =
+                userHomeDAO.getFolderContents(CRUser.rootHomeUri(), null, PagingRequest.create(getPageN()), new SortingRequest(
+                        getSortP(), SortOrder.parse(getSortO())), null);
 
         resultList = folders.getRight();
         matchCount = folders.getLeft();

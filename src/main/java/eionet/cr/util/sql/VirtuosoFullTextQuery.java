@@ -1,23 +1,23 @@
 /*
-* The contents of this file are subject to the Mozilla Public
-*
-* License Version 1.1 (the "License"); you may not use this file
-* except in compliance with the License. You may obtain a copy of
-* the License at http://www.mozilla.org/MPL/
-*
-* Software distributed under the License is distributed on an "AS
-* IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
-* implied. See the License for the specific language governing
-* rights and limitations under the License.
-*
-* The Original Code is Content Registry 2.0.
-*
-* The Initial Owner of the Original Code is European Environment
-* Agency. Portions created by Tieto Eesti are Copyright
-* (C) European Environment Agency. All Rights Reserved.
-*
-* Contributor(s):
-* Jaanus Heinlaid, Tieto Eesti*/
+ * The contents of this file are subject to the Mozilla Public
+ *
+ * License Version 1.1 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of
+ * the License at http://www.mozilla.org/MPL/
+ *
+ * Software distributed under the License is distributed on an "AS
+ * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ * The Original Code is Content Registry 2.0.
+ *
+ * The Initial Owner of the Original Code is European Environment
+ * Agency. Portions created by Tieto Eesti are Copyright
+ * (C) European Environment Agency. All Rights Reserved.
+ *
+ * Contributor(s):
+ * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.util.sql;
 
 import java.text.ParseException;
@@ -132,7 +132,7 @@ public class VirtuosoFullTextQuery {
             }
         }
 
-        //remove phrases from expression
+        // remove phrases from expression
         if (phrases != null) {
             for (String phrase : phrases) {
                 query = query.replaceAll("\"" + phrase + "\"", "");
@@ -146,15 +146,17 @@ public class VirtuosoFullTextQuery {
 
         String prevToken = null;
         StringTokenizer st = new StringTokenizer(query, " \t\r\n\f\"");
-        //remove any redundant logical operands and too short words from the beginning of query
+        // remove any redundant logical operands and too short words from the beginning of query
         query = removeOperands(st);
         st = new StringTokenizer(query, " \t\r\n\f\"");
         while (st.hasMoreTokens()) {
 
             String token = st.nextToken();
 
-            if (token.equals("&")) token = "AND";
-            if (token.equals("|")) token = "OR";
+            if (token.equals("&"))
+                token = "AND";
+            if (token.equals("|"))
+                token = "OR";
 
             // If this token is a PostgreSQL full-text query's boolean operator
             // then append it to the parsed query only if the previous token
@@ -195,7 +197,7 @@ public class VirtuosoFullTextQuery {
             }
         }
 
-        //add phrases to query
+        // add phrases to query
         if (phrases != null && phrases.size() > 0) {
             for (String phrase : phrases) {
                 if (parsedQuery != null && parsedQuery.length() > 0)
@@ -236,6 +238,7 @@ public class VirtuosoFullTextQuery {
 
     /**
      * Check if the string is a boolean operator.
+     *
      * @param s
      * @return true if the string is in the list of boolean operators
      */
@@ -245,11 +248,11 @@ public class VirtuosoFullTextQuery {
 
     /*
      * (non-Javadoc)
+     *
      * @see java.lang.Object#toString()
      */
     public String toString() {
-        return new StringBuffer("parsedQuery=[").
-        append(parsedQuery).append("], phrases=").append(phrases).toString();
+        return new StringBuffer("parsedQuery=[").append(parsedQuery).append("], phrases=").append(phrases).toString();
     }
 
     public String getParsedQuery() {
@@ -262,44 +265,4 @@ public class VirtuosoFullTextQuery {
     public HashSet<String> getPhrases() {
         return phrases;
     }
-
-    /**
-     *
-     * @param args
-     * @throws ParseException
-     */
-    public static void main(String[] args) throws ParseException {
-
-//      String s = "mina \"olen robert\" ja sina oled (paha | kuri)";
-        String s = "kukaj OR puke";
-
-        VirtuosoFullTextQuery query = VirtuosoFullTextQuery.parse(s);
-
-        System.out.println(">" + query.toString() + "<");
-        System.out.println(query.getPhrases());
-
-//      System.out.println(Arrays.binarySearch(booleanOperators, "AND"));
-
-//      StringTokenizer st = new StringTokenizer("jaanus kala\"mees", " \"");
-//      while (st.hasMoreTokens()) {
-//          System.out.println(st.nextToken());
-//      }
-
-//      PostgreSQLFullTextQuery query = PostgreSQLFullTextQuery.parse("\"jaanus \"");
-//      System.out.println(query.phrases);
-
-//      System.out.println(StringUtils.containsAny("jaanus", "\t\r\n "));
-
-//      QueryParser parser = new QueryParser("", new StandardAnalyzer());
-//      Query query = parser.parse("\"jaanus juhan\"");
-//      System.out.println(query.getClass().getSimpleName() + ": " + query);
-//
-//      HashSet<Term> terms = new HashSet<Term>();
-//      query.extractTerms(terms);
-//      for (Term term : terms) {
-//          System.out.println(term);
-//      }
-    }
-
-
 }

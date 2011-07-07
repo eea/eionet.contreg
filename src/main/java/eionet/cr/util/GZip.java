@@ -18,16 +18,20 @@ public final class GZip {
     /**
      * Buffer size for unpacking.
      */
-    private static final int BUFFER_SIZE  = 8192;
+    private static final int BUFFER_SIZE = 8192;
+
     /**
      * no public instancing.
      */
     private GZip() {
 
     }
+
     /**
      * Determines if the given file is in GZip format.
-     * @param file File
+     *
+     * @param file
+     *            File
      * @return boolean
      */
     public static boolean isFileGZip(final File file) {
@@ -47,12 +51,17 @@ public final class GZip {
             return false;
         }
     }
+
     /**
      * Unpacks the given file.
-     * @param sourceFile File
+     *
+     * @param sourceFile
+     *            File
      * @return File
-     * @throws IOException if unpacking fails
-     * @throws DataFormatException if data is not in correct format
+     * @throws IOException
+     *             if unpacking fails
+     * @throws DataFormatException
+     *             if data is not in correct format
      */
     public static File unPack(final File sourceFile) throws IOException, DataFormatException {
 
@@ -60,14 +69,14 @@ public final class GZip {
         GZIPInputStream packedInputStream = new GZIPInputStream(inputStream);
         File targetFile = new File(sourceFile.getAbsolutePath() + ".unpacked");
 
-//        int bufferSize = 8192;
+        // int bufferSize = 8192;
 
-        byte [] buffer = new byte[BUFFER_SIZE];
+        byte[] buffer = new byte[BUFFER_SIZE];
         FileOutputStream out = new FileOutputStream(targetFile);
 
         int length;
         while ((length = packedInputStream.read(buffer, 0, BUFFER_SIZE)) != -1) {
-          out.write(buffer, 0, length);
+            out.write(buffer, 0, length);
         }
         out.close();
         packedInputStream.close();

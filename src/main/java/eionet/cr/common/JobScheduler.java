@@ -43,7 +43,6 @@ import eionet.cr.web.util.job.DataflowSearchPicklistCacheUpdater;
 import eionet.cr.web.util.job.GarbageCollectorJob;
 import eionet.cr.web.util.job.RecentResourcesCacheUpdater;
 import eionet.cr.web.util.job.TagCloudCacheUpdater;
-import eionet.cr.web.util.job.TypeCacheTablesUpdaterJob;
 import eionet.cr.web.util.job.TypeCacheUpdater;
 
 /**
@@ -64,47 +63,23 @@ public class JobScheduler implements ServletContextListener {
     private static final Pair<String, JobDetail>[] cronJobs;
 
     static {
-        intervalJobs = new Pair[]{
-                new Pair(
-                        GeneralConfig.DATAFLOW_PICKLIST_CACHE_UPDATE_INTERVAL,
-                        new JobDetail(
-                                DataflowSearchPicklistCacheUpdater.class.getSimpleName(),
-                                JobScheduler.class.getName(),
+        intervalJobs =
+                new Pair[] {
+                        new Pair(GeneralConfig.DATAFLOW_PICKLIST_CACHE_UPDATE_INTERVAL, new JobDetail(
+                                DataflowSearchPicklistCacheUpdater.class.getSimpleName(), JobScheduler.class.getName(),
                                 DataflowSearchPicklistCacheUpdater.class)),
-                new Pair(
-                        GeneralConfig.RECENT_DISCOVERED_FILES_CACHE_UPDATE_INTERVAL,
-                        new JobDetail(
-                                RecentResourcesCacheUpdater.class.getSimpleName(),
-                                JobScheduler.class.getName(),
+                        new Pair(GeneralConfig.RECENT_DISCOVERED_FILES_CACHE_UPDATE_INTERVAL, new JobDetail(
+                                RecentResourcesCacheUpdater.class.getSimpleName(), JobScheduler.class.getName(),
                                 RecentResourcesCacheUpdater.class)),
-                new Pair(
-                        GeneralConfig.TAG_CLOUD_CACHE_UPDATE_INTERVAL,
-                        new JobDetail(
-                                TagCloudCacheUpdater.class.getSimpleName(),
-                                JobScheduler.class.getName(),
+                        new Pair(GeneralConfig.TAG_CLOUD_CACHE_UPDATE_INTERVAL, new JobDetail(
+                                TagCloudCacheUpdater.class.getSimpleName(), JobScheduler.class.getName(),
                                 TagCloudCacheUpdater.class)),
-                new Pair(
-                        GeneralConfig.TYPE_CACHE_UPDATE_INTERVAL,
-                        new JobDetail(
-                                TypeCacheUpdater.class.getSimpleName(),
-                                JobScheduler.class.getName(),
-                                TypeCacheUpdater.class))
-        };
+                        new Pair(GeneralConfig.TYPE_CACHE_UPDATE_INTERVAL, new JobDetail(TypeCacheUpdater.class.getSimpleName(),
+                                JobScheduler.class.getName(), TypeCacheUpdater.class))};
 
-        cronJobs = new Pair[]{
-                new Pair(
-                        GeneralConfig.GARBAGE_COLLECTOR_CRON_JOB,
-                        new JobDetail(
-                                GarbageCollectorJob.class.getSimpleName(),
-                                JobScheduler.class.getName(),
-                                GarbageCollectorJob.class)),
-                new Pair(
-                        GeneralConfig.TYPE_CACHE_UPDATER_CRON_JOB,
-                        new JobDetail(
-                                TypeCacheTablesUpdaterJob.class.getSimpleName(),
-                                JobScheduler.class.getName(),
-                                TypeCacheTablesUpdaterJob.class))
-        };
+        cronJobs =
+                new Pair[] {new Pair(GeneralConfig.GARBAGE_COLLECTOR_CRON_JOB, new JobDetail(
+                        GarbageCollectorJob.class.getSimpleName(), JobScheduler.class.getName(), GarbageCollectorJob.class))};
 
     }
 
@@ -127,7 +102,8 @@ public class JobScheduler implements ServletContextListener {
      * @throws SchedulerException
      * @throws ParseException
      */
-    public static synchronized void scheduleCronJob(String cronExpression, JobDetail jobDetails) throws SchedulerException, ParseException {
+    public static synchronized void scheduleCronJob(String cronExpression, JobDetail jobDetails) throws SchedulerException,
+            ParseException {
 
         CronTrigger trigger = new CronTrigger(jobDetails.getName(), jobDetails.getGroup());
         trigger.setCronExpression(cronExpression);
@@ -145,7 +121,8 @@ public class JobScheduler implements ServletContextListener {
      * @throws SchedulerException
      * @throws ParseException
      */
-    public static synchronized void scheduleIntervalJob(long repeatInterval, JobDetail jobDetails) throws SchedulerException, ParseException {
+    public static synchronized void scheduleIntervalJob(long repeatInterval, JobDetail jobDetails) throws SchedulerException,
+            ParseException {
 
         SimpleTrigger trigger = new SimpleTrigger(jobDetails.getName(), jobDetails.getGroup());
         trigger.setRepeatInterval(repeatInterval);
@@ -175,6 +152,7 @@ public class JobScheduler implements ServletContextListener {
 
     /*
      * (non-Javadoc)
+     *
      * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
      */
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
@@ -188,8 +166,7 @@ public class JobScheduler implements ServletContextListener {
     }
 
     /**
-     * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
-     * {@inheritDoc}
+     * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent) {@inheritDoc}
      */
     public void contextInitialized(ServletContextEvent sce) {
 
@@ -214,7 +191,7 @@ public class JobScheduler implements ServletContextListener {
 
         // schedule cron jobs
 
-        for (Pair<String, JobDetail> job: cronJobs) {
+        for (Pair<String, JobDetail> job : cronJobs) {
             try {
                 String cronString = GeneralConfig.getProperty(job.getLeft());
 

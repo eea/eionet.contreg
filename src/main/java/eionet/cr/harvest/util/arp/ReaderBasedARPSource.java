@@ -47,6 +47,7 @@ public class ReaderBasedARPSource implements ARPSource {
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.harvest.util.ARPSource#load(com.hp.hpl.jena.rdf.arp.ARP, java.lang.String)
      */
     public void load(ARP arp, String sourceUrlString) throws SAXException, IOException {

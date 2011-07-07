@@ -40,6 +40,7 @@ public class CRXmlRpcServlet extends XmlRpcServlet {
 
     /*
      * (non-Javadoc)
+     *
      * @see org.apache.xmlrpc.webserver.XmlRpcServlet#newXmlRpcHandlerMapping()
      */
     protected XmlRpcHandlerMapping newXmlRpcHandlerMapping() throws XmlRpcException {
@@ -57,7 +58,9 @@ public class CRXmlRpcServlet extends XmlRpcServlet {
 
     /*
      * (non-Javadoc)
-     * @see org.apache.xmlrpc.webserver.XmlRpcServlet#doPost(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     *
+     * @see org.apache.xmlrpc.webserver.XmlRpcServlet#doPost(javax.servlet.http.HttpServletRequest,
+     * javax.servlet.http.HttpServletResponse)
      */
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 

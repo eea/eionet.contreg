@@ -51,6 +51,7 @@ public class UriLabelPair implements Comparable {
     public String getUri() {
         return uri;
     }
+
     /**
      * @return the label
      */
@@ -60,27 +61,27 @@ public class UriLabelPair implements Comparable {
 
     /*
      * (non-Javadoc)
+     *
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
     public int compareTo(Object o) {
 
         // the following assignment can be done even if o == null and it will
         // throw ClassCastException if (o instanceof UriLabelPair) == false
-        UriLabelPair otherOption = (UriLabelPair)o;
+        UriLabelPair otherOption = (UriLabelPair) o;
 
-        if (otherOption == null){
+        if (otherOption == null) {
             return 1;
-        }
-        else if (label == null){
+        } else if (label == null) {
             return otherOption.getLabel() == null ? 0 : -1;
-        }
-        else{
+        } else {
             return label.compareToIgnoreCase(otherOption.getLabel());
         }
     }
 
     /*
      * (non-Javadoc)
+     *
      * @see java.lang.Object#equals(java.lang.Object)
      */
     public boolean equals(Object o) {
@@ -88,14 +89,16 @@ public class UriLabelPair implements Comparable {
     }
 
     /**
-     * @param uri the uri to set
+     * @param uri
+     *            the uri to set
      */
     public void setUri(String uri) {
         this.uri = uri;
     }
 
     /**
-     * @param label the label to set
+     * @param label
+     *            the label to set
      */
     public void setLabel(String label) {
         this.label = label;
@@ -103,6 +106,7 @@ public class UriLabelPair implements Comparable {
 
     /*
      * (non-Javadoc)
+     *
      * @see java.lang.Object#toString()
      */
     public String toString() {

@@ -33,6 +33,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.io.IOUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -40,6 +41,7 @@ import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 
 import eionet.cr.config.GeneralConfig;
+import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
 
 /**
@@ -68,8 +70,10 @@ public class ConversionsParser {
             parse(inputStream);
         } finally {
             try {
-                if (inputStream != null) inputStream.close();
-            } catch (IOException e) {}
+                if (inputStream != null)
+                    inputStream.close();
+            } catch (IOException e) {
+            }
         }
     }
 
@@ -90,7 +94,7 @@ public class ConversionsParser {
         if (rootElem != null) {
             NodeList nl = rootElem.getElementsByTagName("conversion");
             for (int i = 0; nl != null && i < nl.getLength(); i++) {
-                readConversion((Element)nl.item(i));
+                readConversion((Element) nl.item(i));
             }
         }
     }
@@ -106,8 +110,8 @@ public class ConversionsParser {
             boolean isRDFConversion = false;
             NodeList nl = conversionElement.getElementsByTagName("result_type");
             if (nl != null && nl.getLength() > 0) {
-                Element element = (Element)nl.item(0);
-                Text text = (Text)element.getFirstChild();
+                Element element = (Element) nl.item(0);
+                Text text = (Text) element.getFirstChild();
                 if (text != null) {
                     String resultType = text.getData();
                     if (resultType != null && resultType.equals("RDF"))
@@ -119,8 +123,8 @@ public class ConversionsParser {
 
                 nl = conversionElement.getElementsByTagName("convert_id");
                 if (nl != null && nl.getLength() > 0) {
-                    Element element = (Element)nl.item(0);
-                    Text text = (Text)element.getFirstChild();
+                    Element element = (Element) nl.item(0);
+                    Text text = (Text) element.getFirstChild();
                     if (text != null) {
                         this.rdfConversionId = text.getData();
                     }
@@ -128,8 +132,8 @@ public class ConversionsParser {
 
                 nl = conversionElement.getElementsByTagName("xsl");
                 if (nl != null && nl.getLength() > 0) {
-                    Element element = (Element)nl.item(0);
-                    Text text = (Text)element.getFirstChild();
+                    Element element = (Element) nl.item(0);
+                    Text text = (Text) element.getFirstChild();
                     if (text != null) {
                         this.rdfConversionXslFileName = text.getData();
                     }
@@ -146,23 +150,25 @@ public class ConversionsParser {
      * @throws ParserConfigurationException
      * @throws SAXException
      */
-    public static ConversionsParser parseForSchema(String schemaUri) throws IOException, SAXException, ParserConfigurationException {
+    public static ConversionsParser parseForSchema(String schemaUri) throws IOException, SAXException,
+    ParserConfigurationException {
 
         String listConversionsUrl = GeneralConfig.getRequiredProperty(GeneralConfig.XMLCONV_LIST_CONVERSIONS_URL);
         listConversionsUrl = MessageFormat.format(listConversionsUrl, Util.toArray(URLEncoder.encode(schemaUri)));
 
         URL url = new URL(listConversionsUrl);
-        URLConnection httpConn = url.openConnection();
+        URLConnection urlConnection = url.openConnection();
         InputStream inputStream = null;
         try {
-            inputStream = httpConn.getInputStream();
+            // avoid keep-alive by setting "Connection: close" header
+            urlConnection.setRequestProperty("Connection", "close");
+            inputStream = urlConnection.getInputStream();
             ConversionsParser conversionsParser = new ConversionsParser();
             conversionsParser.parse(inputStream);
             return conversionsParser;
         } finally {
-            if (inputStream != null) {
-                try {inputStream.close();} catch (IOException e) {}
-            }
+            IOUtils.closeQuietly(inputStream);
+            URLUtil.disconnect(urlConnection);
         }
     }
 
@@ -183,7 +189,6 @@ public class ConversionsParser {
             return null;
         }
     }
-
 
     /**
      * @return the rdfConversionId

@@ -19,7 +19,6 @@ import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.web.util.columns.SearchResultColumn;
 import eionet.cr.web.util.columns.SubjectPredicateColumn;
 
-
 /**
  *
  * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
@@ -34,7 +33,6 @@ public class ObjectsInSourceActionBean extends AbstractSearchActionBean<SubjectD
     private long anonHash;
     private boolean noCriteria;
 
-
     /**
      *
      * @return
@@ -44,20 +42,20 @@ public class ObjectsInSourceActionBean extends AbstractSearchActionBean<SubjectD
         return new ForwardResolution("/pages/objectsInSource.jsp");
     }
 
-
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.web.action.AbstractSearchActionBean#search()
      */
     public Resolution search() throws DAOException {
 
         if (resultList == null || resultList.size() == 0) {
             Pair<Integer, List<SubjectDTO>> result =
-                DAOFactory.get().getDao(SearchDAO.class)
-                .searchBySource(
-                        uri,
-                        PagingRequest.create(getPageN()),
-                        new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
+                    DAOFactory
+                            .get()
+                            .getDao(SearchDAO.class)
+                            .searchBySource(uri, PagingRequest.create(getPageN()),
+                                    new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
 
             resultList = result.getRight();
             matchCount = result.getLeft();
@@ -66,9 +64,9 @@ public class ObjectsInSourceActionBean extends AbstractSearchActionBean<SubjectD
         return new ForwardResolution("/pages/objectsInSource.jsp");
     }
 
-
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
      */
     public List<SearchResultColumn> getColumns() {
@@ -90,21 +88,17 @@ public class ObjectsInSourceActionBean extends AbstractSearchActionBean<SubjectD
         return list;
     }
 
-
     public String getUri() {
         return uri;
     }
-
 
     public void setUri(String uri) {
         this.uri = uri;
     }
 
-
     public long getUriHash() {
         return uriHash;
     }
-
 
     public void setUriHash(long uriHash) {
         this.uriHash = uriHash;
@@ -114,16 +108,13 @@ public class ObjectsInSourceActionBean extends AbstractSearchActionBean<SubjectD
         return anonHash;
     }
 
-
     public void setAnonHash(long anonHash) {
         this.anonHash = anonHash;
     }
 
-
     public boolean isNoCriteria() {
         return noCriteria;
     }
-
 
     public void setNoCriteria(boolean noCriteria) {
         this.noCriteria = noCriteria;

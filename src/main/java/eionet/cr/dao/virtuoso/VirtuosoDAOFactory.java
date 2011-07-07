@@ -57,6 +57,7 @@ public class VirtuosoDAOFactory extends DAOFactory {
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.DAOFactory#getDao(java.lang.Class)
      */
     @SuppressWarnings("unchecked")

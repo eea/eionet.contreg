@@ -31,8 +31,7 @@ import eionet.cr.util.Util;
 import eionet.cr.web.action.HarvestSourceActionBean;
 
 /**
- * @author Aleksandr Ivanov
- * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
+ * @author Aleksandr Ivanov <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
 public class HarvestSourcesColumn extends SearchResultColumn {
 
@@ -46,40 +45,36 @@ public class HarvestSourcesColumn extends SearchResultColumn {
     }
 
     /**
-     * @see eionet.cr.web.util.columns.SearchResultColumn#format(java.lang.Object)
-     * {@inheritDoc}
+     * @see eionet.cr.web.util.columns.SearchResultColumn#format(java.lang.Object) {@inheritDoc}
      */
     @Override
     public String format(Object object) {
         if (object instanceof HarvestSourceDTO) {
             if (dateFormat) {
-                Date date =  ((HarvestSourceDTO) object).getLastHarvest();
-                return date != null
-                        ? SIMPLE_DATE_FORMAT.format(date)
-                        : "";
+                Date date = ((HarvestSourceDTO) object).getLastHarvest();
+                return date != null ? SIMPLE_DATE_FORMAT.format(date) : "";
             } else {
                 String factsheetUrlBinding = HarvestSourceActionBean.class.getAnnotation(UrlBinding.class).value();
                 int i = factsheetUrlBinding.lastIndexOf("/");
                 String hrefName = ((HarvestSourceDTO) object).getUrl();
 
-                StringBuffer href = new StringBuffer(i >= 0 ? factsheetUrlBinding.substring(i+1) : factsheetUrlBinding).append("?view=&amp;harvestSource.url=")
-                .append(Util.urlEncode(hrefName));
+                StringBuffer href =
+                        new StringBuffer(i >= 0 ? factsheetUrlBinding.substring(i + 1) : factsheetUrlBinding).append(
+                                "?view=&amp;harvestSource.url=").append(Util.urlEncode(hrefName));
 
-                return new StringBuffer("<a href=\"").append(href).append("\">").append(StringEscapeUtils.escapeHtml(hrefName)).append("</a>").toString();
+                return new StringBuffer("<a href=\"").append(href).append("\">").append(StringEscapeUtils.escapeHtml(hrefName))
+                        .append("</a>").toString();
             }
         }
         return "";
     }
 
     /**
-     * @see eionet.cr.web.util.columns.SearchResultColumn#getSortParamValue()
-     * {@inheritDoc}
+     * @see eionet.cr.web.util.columns.SearchResultColumn#getSortParamValue() {@inheritDoc}
      */
     @Override
     public String getSortParamValue() {
-        return dateFormat
-                ? "LAST_HARVEST"
-                : "URL";
+        return dateFormat ? "LAST_HARVEST" : "URL";
     }
 
 }

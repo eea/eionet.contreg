@@ -25,8 +25,7 @@ import eionet.cr.common.CRException;
 /**
  * Thrown by implementations of {@link IHarvestPersister}
  *
- * @author Aleksandr Ivanov
- * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
+ * @author Aleksandr Ivanov <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
 public class PersisterException extends CRException {
 

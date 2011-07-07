@@ -41,6 +41,7 @@ public class SingleObjectReader<T> extends ResultSetMixedReader<T> {
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.util.sql.SQLResultSetReader#readRow(java.sql.ResultSet)
      */
     @Override
@@ -51,7 +52,9 @@ public class SingleObjectReader<T> extends ResultSetMixedReader<T> {
 
     /**
      * Reads row from the bindingset that contains only one column.
-     * @param bindingSet - Query result bindingset
+     *
+     * @param bindingSet
+     *            - Query result bindingset
      */
     @SuppressWarnings("unchecked")
     @Override
@@ -69,8 +72,8 @@ public class SingleObjectReader<T> extends ResultSetMixedReader<T> {
                     }
                 }
                 if (strValue != null) {
-                    //this casting is done because of the generilization in the interface
-                    //only Strings can be read from Sesame Bindingset today
+                    // this casting is done because of the generilization in the interface
+                    // only Strings can be read from Sesame Bindingset today
                     resultList.add((T) strValue);
                 }
             }

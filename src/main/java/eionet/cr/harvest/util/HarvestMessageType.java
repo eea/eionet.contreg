@@ -42,6 +42,7 @@ public enum HarvestMessageType {
 
     /*
      * (non-Javadoc)
+     *
      * @see java.lang.Enum#toString()
      */
     public String toString() {

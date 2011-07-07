@@ -50,8 +50,9 @@ public class SearchExpression {
         try {
             Long.parseLong(expression);
             isHash = true;
-        } catch (NumberFormatException nfe) {}
-        
+        } catch (NumberFormatException nfe) {
+        }
+
         // Escape spaces
         String escapedExpression = null;
         try {
@@ -76,6 +77,7 @@ public class SearchExpression {
 
     /*
      * (non-Javadoc)
+     *
      * @see java.lang.Object#toString()
      */
     public String toString() {

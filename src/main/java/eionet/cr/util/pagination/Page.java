@@ -38,24 +38,30 @@ public class Page {
     public int getNumber() {
         return number;
     }
+
     /**
-     * @param number the number to set
+     * @param number
+     *            the number to set
      */
     public void setNumber(int number) {
         this.number = number;
     }
+
     /**
      * @return the selected
      */
     public boolean isSelected() {
         return selected;
     }
+
     /**
-     * @param selected the selected to set
+     * @param selected
+     *            the selected to set
      */
     public void setSelected(boolean selected) {
         this.selected = selected;
     }
+
     /**
      * @return the href
      */
@@ -77,7 +83,7 @@ public class Page {
     public String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append(number).append(selected ? "!" : "");
-//      append(", ").append(selected).append(", ").append(href);
+        // append(", ").append(selected).append(", ").append(href);
         return buf.toString();
     }
 }

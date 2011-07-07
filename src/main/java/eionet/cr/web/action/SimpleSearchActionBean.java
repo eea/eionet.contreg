@@ -71,6 +71,7 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.web.action.AbstractSearchActionBean#search()
      */
     public Resolution search() throws DAOException {
@@ -100,8 +101,7 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
             if (searchExpression.isUri()) {
 
                 this.isUri = true;
-                SubjectDTO subject = DAOFactory.get().getDao(HelperDAO.class).getSubject(
-                        searchExpression.toString());
+                SubjectDTO subject = DAOFactory.get().getDao(HelperDAO.class).getSubject(searchExpression.toString());
                 if (subject != null) {
                     resultList = Collections.singleton(subject);
                     matchCount = 1;
@@ -110,13 +110,11 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 
             if (resultList == null || resultList.size() == 0) {
                 Pair<Integer, List<SubjectDTO>> result =
-                    DAOFactory.get().getDao(SearchDAO.class)
-                    .searchByFreeText(
-                            searchExpression,
-                            filterType,
-                            exactMatch,
-                            PagingRequest.create(getPageN()),
-                            new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
+                        DAOFactory
+                                .get()
+                                .getDao(SearchDAO.class)
+                                .searchByFreeText(searchExpression, filterType, exactMatch, PagingRequest.create(getPageN()),
+                                        new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
 
                 resultList = result.getRight();
                 matchCount = result.getLeft();
@@ -129,7 +127,7 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
         return new ForwardResolution("/pages/simpleSearch.jsp");
     }
 
-    @ValidationMethod(on="search")
+    @ValidationMethod(on = "search")
     public void validateSearch(ValidationErrors errors) {
         if (this.searchExpression == null || this.searchExpression.equals("")) {
             addCautionMessage(getBundle().getString("search.field.empty"));
@@ -144,7 +142,8 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
     }
 
     /**
-     * @param searchExpression the searchExpression to set
+     * @param searchExpression
+     *            the searchExpression to set
      */
     public void setSearchExpression(String searchExpression) {
         this.searchExpression = searchExpression;
@@ -152,6 +151,7 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
      */
     public List<SearchResultColumn> getColumns() {
@@ -186,7 +186,8 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
     }
 
     /**
-     * @param isUri the isUri to set
+     * @param isUri
+     *            the isUri to set
      */
     public void setUri(boolean isUri) {
         this.isUri = isUri;

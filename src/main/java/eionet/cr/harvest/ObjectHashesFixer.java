@@ -1,23 +1,23 @@
 /*
-* The contents of this file are subject to the Mozilla Public
-*
-* License Version 1.1 (the "License"); you may not use this file
-* except in compliance with the License. You may obtain a copy of
-* the License at http://www.mozilla.org/MPL/
-*
-* Software distributed under the License is distributed on an "AS
-* IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
-* implied. See the License for the specific language governing
-* rights and limitations under the License.
-*
-* The Original Code is Content Registry 2.0.
-*
-* The Initial Owner of the Original Code is European Environment
-* Agency. Portions created by Tieto Eesti are Copyright
-* (C) European Environment Agency. All Rights Reserved.
-*
-* Contributor(s):
-* Jaanus Heinlaid, Tieto Eesti*/
+ * The contents of this file are subject to the Mozilla Public
+ *
+ * License Version 1.1 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of
+ * the License at http://www.mozilla.org/MPL/
+ *
+ * Software distributed under the License is distributed on an "AS
+ * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ * The Original Code is Content Registry 2.0.
+ *
+ * The Initial Owner of the Original Code is European Environment
+ * Agency. Portions created by Tieto Eesti are Copyright
+ * (C) European Environment Agency. All Rights Reserved.
+ *
+ * Contributor(s):
+ * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.harvest;
 
 import java.sql.Connection;
@@ -49,17 +49,17 @@ public class ObjectHashesFixer extends Thread {
     private static final String prop_noOfBatchesToRun = ObjectHashesFixer.class.getSimpleName() + ".noOfBatchesToRun";
 
     /** */
-    private static int BATCH_SIZE = 1000;
-    private static int NOOF_BATCHES_TO_RUN = 1;
+    private static int batchSize = 1000;
+    private static int numberOfBatchesToRun = 1;
 
     /**
      *
      */
     static {
-        BATCH_SIZE = Integer.valueOf(GeneralConfig.getProperty(prop_batchSize, String.valueOf(BATCH_SIZE)).trim());
+        batchSize = Integer.valueOf(GeneralConfig.getProperty(prop_batchSize, String.valueOf(batchSize)).trim());
 
-        String s = GeneralConfig.getProperty(prop_noOfBatchesToRun, String.valueOf(NOOF_BATCHES_TO_RUN)).trim();
-        NOOF_BATCHES_TO_RUN = s.equals("unlimited") ? Integer.MAX_VALUE : Integer.valueOf(s);
+        String s = GeneralConfig.getProperty(prop_noOfBatchesToRun, String.valueOf(numberOfBatchesToRun)).trim();
+        numberOfBatchesToRun = s.equals("unlimited") ? Integer.MAX_VALUE : Integer.valueOf(s);
     }
 
     /** */
@@ -82,8 +82,8 @@ public class ObjectHashesFixer extends Thread {
     private static final String updateSourceObjectsSQL = "update SPO set OBJ_SOURCE_OBJECT=? where OBJ_SOURCE_OBJECT=?";
 
     /** */
-    private static final String updateResourcesSQL = "insert ignore into RESOURCE" +
-            " (URI, URI_HASH, FIRSTSEEN_SOURCE, FIRSTSEEN_TIME) values (?, ?, ?, ?)";
+    private static final String updateResourcesSQL = "insert ignore into RESOURCE"
+        + " (URI, URI_HASH, FIRSTSEEN_SOURCE, FIRSTSEEN_TIME) values (?, ?, ?, ?)";
 
     /**
      *
@@ -109,17 +109,19 @@ public class ObjectHashesFixer extends Thread {
 
     /*
      * (non-Javadoc)
+     *
      * @see java.lang.Thread#run()
      */
     public void run() {
 
-        logger.debug(this.getClass().getSimpleName() + " started, batchSize=" + BATCH_SIZE + ", noOfBatchesToRun=" + NOOF_BATCHES_TO_RUN);
+        logger.debug(this.getClass().getSimpleName() + " started, batchSize=" + batchSize + ", noOfBatchesToRun="
+                + numberOfBatchesToRun);
 
-        int ret = BATCH_SIZE;
+        int ret = batchSize;
         int batchesRun = 0;
-        while (ret > 0 && batchesRun < NOOF_BATCHES_TO_RUN && !ObjectHashesFixer.isShutdownIssued()) {
+        while (ret > 0 && batchesRun < numberOfBatchesToRun && !ObjectHashesFixer.isShutdownIssued()) {
 
-            logger.debug("Executing batch #" + (batchesRun+1));
+            logger.debug("Executing batch #" + (batchesRun + 1));
             ret = runBatch();
             logger.debug("Batch done, number of necessary replacements found and performed: " + ret);
 
@@ -128,7 +130,7 @@ public class ObjectHashesFixer extends Thread {
 
         if (ret == 0)
             logger.debug("All done, found no more replacements to perform!");
-        else if (batchesRun==NOOF_BATCHES_TO_RUN)
+        else if (batchesRun == numberOfBatchesToRun)
             logger.debug("Exiting because the required number of batches has been run!");
         else if (ObjectHashesFixer.isShutdownIssued())
             logger.debug("Exiting because a shutdown was issued from outside. The number of batches that was run:" + batchesRun);
@@ -160,7 +162,7 @@ public class ObjectHashesFixer extends Thread {
             pstmtSourceObjects = conn.prepareStatement(updateSourceObjectsSQL);
             pstmtResources = conn.prepareStatement(updateResourcesSQL);
 
-            selectStmt.setInt(1, BATCH_SIZE);
+            selectStmt.setInt(1, batchSize);
             rs = selectStmt.executeQuery();
 
             while (rs.next()) {
@@ -174,7 +176,7 @@ public class ObjectHashesFixer extends Thread {
                 long newHash = Hashes.spoHash(uuidUri);
                 long oldHash = rs.getLong("OBJECT_HASH");
 
-//              logger.debug("Old " + object + " = " + oldHash + ", new " + uuidUri + " = " + newHash);
+                // logger.debug("Old " + object + " = " + oldHash + ", new " + uuidUri + " = " + newHash);
 
                 // update objects
                 pstmtObjects.setString(1, uuidUri);
@@ -204,13 +206,13 @@ public class ObjectHashesFixer extends Thread {
 
             if (batchSize > 0) {
 
-//              logger.debug("Executing batch for objects");
+                // logger.debug("Executing batch for objects");
                 pstmtObjects.executeBatch();
-//              logger.debug("Executing batch for subjects");
+                // logger.debug("Executing batch for subjects");
                 pstmtSubjects.executeBatch();
-//              logger.debug("Executing batch for source-objects");
+                // logger.debug("Executing batch for source-objects");
                 pstmtSourceObjects.executeBatch();
-//              logger.debug("Executing batch for resources");
+                // logger.debug("Executing batch for resources");
                 pstmtResources.executeBatch();
             }
         } catch (SQLException e) {
@@ -244,17 +246,18 @@ public class ObjectHashesFixer extends Thread {
         return new StringBuilder(URN_UUID_PREFIX).append(uuid).toString();
     }
 
-    /**
-     *
-     * @param args
-     * @throws SQLException
-     */
-    public static void main(String[] args) throws SQLException {
-
-        ObjectHashesFixer fixer = new ObjectHashesFixer();
-        Runtime.getRuntime().addShutdownHook(new ShutdownHook(fixer));
-        fixer.start();
-    }
+    //    /**
+    //     * This is the main method for executing this class a stand-alone program.
+    //     *
+    //     * @param args No input arguments are actually used.
+    //     * @throws SQLException Thrown is there is an SQLException during the classe's execution.
+    //     */
+    //    public static void main(String[] args) throws SQLException {
+    //
+    //        ObjectHashesFixer fixer = new ObjectHashesFixer();
+    //        Runtime.getRuntime().addShutdownHook(new ShutdownHook(fixer));
+    //        fixer.start();
+    //    }
 }
 
 class ShutdownHook extends Thread {
@@ -272,6 +275,7 @@ class ShutdownHook extends Thread {
 
     /*
      * (non-Javadoc)
+     *
      * @see java.lang.Thread#run()
      */
     public void run() {
@@ -296,4 +300,3 @@ class ShutdownHook extends Thread {
         }
     }
 }
-

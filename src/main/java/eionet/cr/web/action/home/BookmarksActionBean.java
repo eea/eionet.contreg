@@ -25,12 +25,12 @@ import eionet.cr.web.security.CRUser;
 @UrlBinding("/home/{username}/bookmark")
 public class BookmarksActionBean extends AbstractHomeActionBean {
 
-
     private List<UserBookmarkDTO> bookmarks;
     List<String> selectedBookmarks;
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.web.action.AbstractSearchActionBean#search()
      */
     @DefaultHandler
@@ -60,7 +60,8 @@ public class BookmarksActionBean extends AbstractHomeActionBean {
     }
 
     /**
-     * @param sourceUrl the sourceUrl to set
+     * @param sourceUrl
+     *            the sourceUrl to set
      */
     public void setBookmarkUrl(List<String> bookmarkUrl) {
         selectedBookmarks = bookmarkUrl;
@@ -68,19 +69,21 @@ public class BookmarksActionBean extends AbstractHomeActionBean {
 
     /**
      * Returns list of user bookmarks whose username is in the url.
+     *
      * @return List<UserBookmarkDTO>
-     * @throws DAOException if query fails
+     * @throws DAOException
+     *             if query fails
      */
     public List<UserBookmarkDTO> getBookmarks() throws DAOException {
 
         if (CollectionUtils.isEmpty(bookmarks)) {
-                String attemptedUserName = getAttemptedUserName();
-                if (StringUtils.isNotBlank(attemptedUserName)) {
-                    CRUser user = new CRUser(getAttemptedUserName());
-                    if (user != null) {
-                        bookmarks = DAOFactory.get().getDao(HelperDAO.class).getUserBookmarks(user);
-                    }
+            String attemptedUserName = getAttemptedUserName();
+            if (StringUtils.isNotBlank(attemptedUserName)) {
+                CRUser user = new CRUser(getAttemptedUserName());
+                if (user != null) {
+                    bookmarks = DAOFactory.get().getDao(HelperDAO.class).getUserBookmarks(user);
                 }
+            }
         }
 
         return bookmarks;

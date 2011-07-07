@@ -51,12 +51,10 @@ import eionet.cr.web.util.columns.SearchResultColumn;
 public class JstlFunctions {
 
     /**
-     * Parses the given string with a whitespace tokenizer and looks up the first
-     * token whose length exceeds <tt>cutAtLength</tt>. If such a token is found, returns
-     * the given string's <code>substring(0, i + cutAtLength) + "..."</code>, where <code>i</code>
-     * is the start index of the found token.
-     * If no tokens are found that exceed the length of <tt>cutAtLength</tt>, then this method
-     * simply return the given string.
+     * Parses the given string with a whitespace tokenizer and looks up the first token whose length exceeds <tt>cutAtLength</tt>.
+     * If such a token is found, returns the given string's <code>substring(0, i + cutAtLength) + "..."</code>, where <code>i</code>
+     * is the start index of the found token. If no tokens are found that exceed the length of <tt>cutAtLength</tt>, then this
+     * method simply return the given string.
      *
      * @return
      */
@@ -84,9 +82,8 @@ public class JstlFunctions {
     }
 
     /**
-     * Checks if the given string (after being trimmed first) contains any whitespace. If yes, returns
-     * the given string surrounded by quotes. Otherwise returns the given string.
-     * If the given string is <code>null</code>, returns null.
+     * Checks if the given string (after being trimmed first) contains any whitespace. If yes, returns the given string surrounded
+     * by quotes. Otherwise returns the given string. If the given string is <code>null</code>, returns null.
      *
      * @param str
      * @return
@@ -103,9 +100,8 @@ public class JstlFunctions {
     }
 
     /**
-     * Returns the value of {@link CRUser#hasPermission(HttpSession, String, String)},
-     * using the given inputs.
-     * 
+     * Returns the value of {@link CRUser#hasPermission(HttpSession, String, String)}, using the given inputs.
+     *
      * @param session
      * @param aclPath
      * @param permission
@@ -116,9 +112,9 @@ public class JstlFunctions {
     }
 
     /**
-     * Returns a string that is constructed by concatenating the given bean request's getRequestURI() + "?" +
-     * the given bean request's getQueryString(), and replacing the sort predicate with the given one.
-     * The present sort order is replaced by the opposite.
+     * Returns a string that is constructed by concatenating the given bean request's getRequestURI() + "?" + the given bean
+     * request's getQueryString(), and replacing the sort predicate with the given one. The present sort order is replaced by the
+     * opposite.
      *
      * @param request
      * @param sortP
@@ -149,15 +145,18 @@ public class JstlFunctions {
 
         String curValue = request.getParameter("sortP");
         if (curValue != null && buf.indexOf("sortP=") > 0) {
-            buf = new StringBuffer(
-                    StringUtils.replace(buf.toString(), "sortP=" + Util.urlEncode(curValue), "sortP=" + Util.urlEncode(sortParamValue)));
+            buf =
+                    new StringBuffer(StringUtils.replace(buf.toString(), "sortP=" + Util.urlEncode(curValue),
+                            "sortP=" + Util.urlEncode(sortParamValue)));
         } else {
             buf.append("&amp;sortP=").append(Util.urlEncode(sortParamValue));
         }
 
         curValue = request.getParameter("sortO");
         if (curValue != null && buf.indexOf("sortO=") > 0) {
-            buf = new StringBuffer(StringUtils.replace(buf.toString(), "sortO=" + curValue, "sortO=" + SortOrder.oppositeSortOrder(curValue)));
+            buf =
+                    new StringBuffer(StringUtils.replace(buf.toString(), "sortO=" + curValue,
+                            "sortO=" + SortOrder.oppositeSortOrder(curValue)));
         } else {
             buf.append("&amp;sortO=").append(SortOrder.oppositeSortOrder(curValue));
         }
@@ -167,9 +166,8 @@ public class JstlFunctions {
     }
 
     /**
-     * Finds the label for the given predicate in the given predicate-label map.
-     * If there is no match, then looks for the last occurrence of '#' or '/' or ':' in the predicate.
-     * If such an occurrence is found, returns everything after that occurrence.
+     * Finds the label for the given predicate in the given predicate-label map. If there is no match, then looks for the last
+     * occurrence of '#' or '/' or ':' in the predicate. If such an occurrence is found, returns everything after that occurrence.
      * Otherwise returns the predicate as it was given.
      *
      * @param predicateLabels
@@ -223,7 +221,7 @@ public class JstlFunctions {
     public static boolean isSourceToAny(long objectHash, Collection objects) {
 
         boolean result = false;
-        for (Iterator i=objects.iterator(); i.hasNext();) {
+        for (Iterator i = objects.iterator(); i.hasNext();) {
             ObjectDTO objectDTO = (ObjectDTO) i.next();
             if (objectHash == objectDTO.getSourceObjectHash()) {
                 result = true;
@@ -235,8 +233,7 @@ public class JstlFunctions {
     }
 
     /**
-     * Returns a color for the given source by supplying the source's hash to the
-     * <code>Colors.colorByModulus(long)</code>.
+     * Returns a color for the given source by supplying the source's hash to the <code>Colors.colorByModulus(long)</code>.
      *
      * @param source
      * @return
@@ -313,9 +310,11 @@ public class JstlFunctions {
         StringBuffer buf = new StringBuffer();
         if (object != null) {
 
-            buf.append("[Type: ").append(object.isLiteral() ? "Literal" : object.isAnonymous() ? "Anonymous resource" : "Resource");
+            buf.append("[Type: ")
+                    .append(object.isLiteral() ? "Literal" : object.isAnonymous() ? "Anonymous resource" : "Resource");
             buf.append("]   [Inferred from object: ").append(getMatchingObjectValue(object.getSourceObjectHash(), allObjects));
-            buf.append("]   [Inferred from source: ").append(StringUtils.isBlank(object.getDerivSourceUri()) ? object.getDerivSourceHash() : object.getDerivSourceUri());
+            buf.append("]   [Inferred from source: ").append(
+                    StringUtils.isBlank(object.getDerivSourceUri()) ? object.getDerivSourceHash() : object.getDerivSourceUri());
             buf.append("]");
         }
         return buf.toString();

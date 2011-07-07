@@ -139,7 +139,7 @@ public class Bindings {
             } catch (URISyntaxException e) {
                 throw new IllegalArgumentException(e);
             }
-        //Blank nods are URI's as well
+            // Blank nods are URI's as well
         } else {
             bindings.put(name, new BlankNode(value));
         }
@@ -186,7 +186,7 @@ public class Bindings {
                 calendar.setTime((Date) value);
                 query.setBinding(name, valueFactory.createLiteral(datatypeFactory.newXMLGregorianCalendar(calendar)));
             } else if (value instanceof BlankNode) {
-                query.setBinding(name, valueFactory.createBNode(((BlankNode)value).getId()));
+                query.setBinding(name, valueFactory.createBNode(((BlankNode) value).getId()));
             } else {
                 throw new IllegalArgumentException("Unsupported type is bound to name " + name);
             }
@@ -195,28 +195,30 @@ public class Bindings {
 
     /**
      * Textual representation of predicates and values.
+     *
      * @return key value (Object.toString()) pairs separated by equal sign.
      */
     public String toString() {
         StringBuilder s = new StringBuilder();
         for (Iterator<String> i = this.bindings.keySet().iterator(); i.hasNext();) {
-            String k  = i.next();
+            String k = i.next();
             Object o = this.bindings.get(k);
             s.append(k).append("=").append(o).append("\r\n");
         }
 
         return s.toString();
     }
-    
+
     /**
      * Private wrapper for blanknode binding.
      */
     private static class BlankNode {
         String id;
-        BlankNode (String id) {
+
+        BlankNode(String id) {
             this.id = id.substring(VirtuosoBaseDAO.BNODE_URI_PREFIX.length());
         }
-        
+
         public String getId() {
             return id;
         }

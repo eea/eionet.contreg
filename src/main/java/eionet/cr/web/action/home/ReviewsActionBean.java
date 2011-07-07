@@ -29,9 +29,9 @@ import eionet.cr.util.Hashes;
 import eionet.cr.web.security.CRUser;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
- * 
+ *
  */
 
 @UrlBinding("/home/{username}/reviews")
@@ -52,7 +52,7 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
     private FileBean attachment;
 
     /**
-     * 
+     *
      * @return
      * @throws DAOException
      */
@@ -273,7 +273,7 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
             // (but set interval minutes to 0, to avoid it being
             // background-harvested)
             DAOFactory.get().getDao(HarvestSourceDAO.class)
-                    .addSourceIgnoreDuplicate(HarvestSourceDTO.create(reviewUri, true, 0, getUser().getUserName()));
+            .addSourceIgnoreDuplicate(HarvestSourceDTO.create(reviewUri, true, 0, getUser().getUserName()));
 
             // finally, attempt to harvest the uploaded file's contents
             harvestUploadedFile(attachmentUri, attachment, null, getUserName());
@@ -355,7 +355,7 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
     public String getReviewContentHTML() {
         if (review.getReviewContent() != null) {
             return review.getReviewContent().replace("&", "&amp;").replace("<", "&lt;").replace("\r\n", "<br/>")
-                    .replace("\n", "<br/>");
+            .replace("\n", "<br/>");
         } else {
             return "";
         }
@@ -376,12 +376,9 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
      * @return
      */
     public boolean isReviewContentPresent() {
+
         if (review.getReviewContent() != null && review.getReviewContent().length() > 0) {
-            if (review.getReviewContent().replace(" ", "").length() > 0) {
-                return true;
-            } else {
-                return false;
-            }
+            return review.getReviewContent().replace(" ", "").length() > 0;
         } else {
             return false;
         }
@@ -421,7 +418,7 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
             if (user == null || !isUserAuthorized()) {
 
                 String attemptedUserName = getAttemptedUserName();
-                if (StringUtils.isBlank(attemptedUserName)) {
+                if (!StringUtils.isBlank(attemptedUserName)) {
                     user = new CRUser(getAttemptedUserName());
                 }
             }

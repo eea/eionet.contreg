@@ -9,23 +9,24 @@ import eionet.cr.dao.DAOException;
 @UrlBinding("/about.action")
 public class AboutActionBean extends AbstractActionBean {
 
-//   private long triplesCount;
+    // private long triplesCount;
 
     /**
      *
      * @return
-     * @throws DAOException TODO
+     * @throws DAOException
+     *             TODO
      */
     @DefaultHandler
     public Resolution view() throws DAOException {
 
-//      triplesCount = DAOFactory.get().getDao(HelperDAO.class).getTriplesCount();
+        // triplesCount = DAOFactory.get().getDao(HelperDAO.class).getTriplesCount();
         return new ForwardResolution("/pages/about.jsp");
 
     }
 
-//  public long getTriplesCount() {
-//      return triplesCount;
-//  }
+    // public long getTriplesCount() {
+    // return triplesCount;
+    // }
 
 }

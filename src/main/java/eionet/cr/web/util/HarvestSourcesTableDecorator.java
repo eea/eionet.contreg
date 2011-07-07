@@ -47,8 +47,8 @@ public class HarvestSourcesTableDecorator extends TableDecorator {
         StringBuffer buf = new StringBuffer();
         String url = ((HarvestSourceDTO) getCurrentRowObject()).getUrl();
         if (url != null) {
-            buf.append("<a class=\"link-plain\" href=\"source.action?view=&amp;harvestSource.url=").
-            append(Util.urlEncode(url)).append("\">").append(StringEscapeUtils.escapeXml(url)).append("</a>");
+            buf.append("<a class=\"link-plain\" href=\"source.action?view=&amp;harvestSource.url=").append(Util.urlEncode(url))
+                    .append("\">").append(StringEscapeUtils.escapeXml(url)).append("</a>");
         }
 
         return buf.toString();

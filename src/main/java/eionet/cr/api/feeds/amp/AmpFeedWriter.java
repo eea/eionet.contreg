@@ -1,23 +1,23 @@
 /*
-* The contents of this file are subject to the Mozilla Public
-* 
-* License Version 1.1 (the "License"); you may not use this file
-* except in compliance with the License. You may obtain a copy of
-* the License at http://www.mozilla.org/MPL/
-* 
-* Software distributed under the License is distributed on an "AS
-* IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
-* implied. See the License for the specific language governing
-* rights and limitations under the License.
-* 
-* The Original Code is Content Registry 2.0.
-* 
-* The Initial Owner of the Original Code is European Environment
-* Agency. Portions created by Tieto Eesti are Copyright
-* (C) European Environment Agency. All Rights Reserved.
-* 
-* Contributor(s):
-* Jaanus Heinlaid, Tieto Eesti*/
+ * The contents of this file are subject to the Mozilla Public
+ *
+ * License Version 1.1 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of
+ * the License at http://www.mozilla.org/MPL/
+ *
+ * Software distributed under the License is distributed on an "AS
+ * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ * The Original Code is Content Registry 2.0.
+ *
+ * The Initial Owner of the Original Code is European Environment
+ * Agency. Portions created by Tieto Eesti are Copyright
+ * (C) European Environment Agency. All Rights Reserved.
+ *
+ * Contributor(s):
+ * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.api.feeds.amp;
 
 import java.io.IOException;
@@ -43,7 +43,7 @@ import eionet.cr.util.export.ExportException;
 import eionet.cr.util.sesame.SPARQLResultSetReader;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
@@ -51,49 +51,50 @@ public class AmpFeedWriter implements SPARQLResultSetReader {
 
     /** */
     private OutputStream outputStream;
-    
+
     /** */
     private int rowCount;
-    
+
     /** */
-    private HashMap<String,String> namespaces = new HashMap<String, String>();
-    
+    private HashMap<String, String> namespaces = new HashMap<String, String>();
+
     /** */
     private String xmlLang;
-    
+
     /** */
     private String currSubjUri;
     private String currPredUri;
-    
+
     /** */
     private StringBuilder currSubjBuf;
-    
+
     /** */
     private HashSet<String> currPredWrittenObjects;
-    
+
     /** */
     private int writtenTriplesCount = 0;
     private int writtenSubjectsCount = 0;
 
     /**
-     * 
+     *
      * @param outputStream
      */
     public AmpFeedWriter(OutputStream outputStream) {
-        
+
         this.outputStream = outputStream;
-        
+
         addNamespace(Namespace.RDF);
         addNamespace(Namespace.RDFS);
     }
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
      */
     @Override
     public void readRow(BindingSet bindingSet) throws ResultSetReaderException {
-        
+
         rowCount++;
         try {
             if (rowCount == 1) {
@@ -102,7 +103,7 @@ public class AmpFeedWriter implements SPARQLResultSetReader {
                 outputStream.write(("\n<rdf:RDF" + getHeaderAttributes() + ">").getBytes());
                 outputStream.flush();
             }
-            
+
             Value subjectValue = bindingSet.getValue("s");
             String subjUri = subjectValue.stringValue();
             if (currSubjUri == null || !currSubjUri.equals(subjUri)) {
@@ -119,31 +120,31 @@ public class AmpFeedWriter implements SPARQLResultSetReader {
                 // start new subject
                 currSubjBuf = new StringBuilder("\n\t<rdf:Description rdf:about=\"");
                 currSubjBuf.append(StringEscapeUtils.escapeXml(subjUri)).append("\">");
-                
+
                 // set current subject to the new one
                 currSubjUri = subjUri;
-                
+
                 writtenSubjectsCount++;
             }
-            
+
             Value predicateValue = bindingSet.getValue("p");
             String predUri = predicateValue.stringValue();
 
             // if new predicate, clear the set of already written objects
             if (currPredUri == null || !currPredUri.equals(predUri)) {
-                
+
                 currPredWrittenObjects = new HashSet<String>();
                 currPredUri = predUri;
             }
 
-             Value objectValueObject = bindingSet.getValue("o");
-             boolean isLitObject = objectValueObject instanceof Literal;
+            Value objectValueObject = bindingSet.getValue("o");
+            boolean isLitObject = objectValueObject instanceof Literal;
 
             // skip literal values of rdf:type
             if (predUri.equals(Predicates.RDF_TYPE) && isLitObject) {
                 return;
             }
-            
+
             String objValue = objectValueObject.stringValue();
             boolean objAlreadyWritten = currPredWrittenObjects.contains(objValue);
 
@@ -151,40 +152,38 @@ public class AmpFeedWriter implements SPARQLResultSetReader {
             if (StringUtils.isBlank(objValue) || objAlreadyWritten) {
                 return;
             }
-            
+
             // get namespace URI for this predicate
             String predNsUri = NamespaceUtil.extractNamespace(predUri);
             if (StringUtils.isBlank(predNsUri)) {
-                throw new CRRuntimeException("Could not extract namespace URL from " +predUri);
+                throw new CRRuntimeException("Could not extract namespace URL from " + predUri);
             }
-            
+
             // include only predicates from supplied namespaces
             if (namespaces.containsKey(predNsUri)) {
-                
+
                 // extract predicate's local name
-                String predLocalName = StringUtils.substringAfterLast(
-                        predUri, predNsUri);
+                String predLocalName = StringUtils.substringAfterLast(predUri, predNsUri);
                 if (StringUtils.isBlank(predLocalName)) {
-                    throw new CRRuntimeException("Could not extract local name from " +predUri);
+                    throw new CRRuntimeException("Could not extract local name from " + predUri);
                 }
 
                 // start predicate tag
-                currSubjBuf.append("\n\t\t<").
-                append(namespaces.get(predNsUri)).append(":").append(predLocalName);
-                
+                currSubjBuf.append("\n\t\t<").append(namespaces.get(predNsUri)).append(":").append(predLocalName);
+
                 // prepare escaped-for-XML object value
                 String objValueEscaped = StringEscapeUtils.escapeXml(objValue);
-                
+
                 // write object value, depending on whether it is literal or not
                 // (and close the predicate tag too!)
                 if (!isLitObject && URLUtil.isURL(objValue)) {
-                    
+
                     currSubjBuf.append(" rdf:resource=\"").append(objValueEscaped).append("\"/>");
                 } else {
-                    currSubjBuf.append(">").append(objValueEscaped).append("</").
-                    append(namespaces.get(predNsUri)).append(":").append(predLocalName).append(">");
+                    currSubjBuf.append(">").append(objValueEscaped).append("</").append(namespaces.get(predNsUri)).append(":")
+                            .append(predLocalName).append(">");
                 }
-                
+
                 writtenTriplesCount++;
                 currPredWrittenObjects.add(objValue);
             }
@@ -194,20 +193,20 @@ public class AmpFeedWriter implements SPARQLResultSetReader {
     }
 
     /**
-     * @throws IOException 
-     * 
+     * @throws IOException
+     *
      */
     public void closeRDF() throws IOException {
-        
+
         currSubjBuf.append("\n\t</rdf:Description>");
         outputStream.write(currSubjBuf.toString().getBytes());
         outputStream.write("</rdf:RDF>\n".getBytes());
         outputStream.flush();
     }
-    
+
     /**
-     * @throws IOException 
-     * 
+     * @throws IOException
+     *
      */
     public void writeEmptyHeader() throws IOException {
         outputStream.write("<rdf:RDF/>".getBytes());
@@ -215,7 +214,7 @@ public class AmpFeedWriter implements SPARQLResultSetReader {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public int getRowCount() {
@@ -223,7 +222,7 @@ public class AmpFeedWriter implements SPARQLResultSetReader {
     }
 
     /**
-     * 
+     *
      * @param namespace
      */
     public void addNamespace(Namespace namespace) {
@@ -231,7 +230,7 @@ public class AmpFeedWriter implements SPARQLResultSetReader {
     }
 
     /**
-     * 
+     *
      * @param xmlLang
      */
     public void setXmlLang(String xmlLang) {
@@ -239,27 +238,27 @@ public class AmpFeedWriter implements SPARQLResultSetReader {
     }
 
     /**
-     * 
+     *
      * @return
      */
     private String getHeaderAttributes() {
-        
+
         StringBuffer buf = new StringBuffer("");
         if (xmlLang != null && xmlLang.trim().length() > 0) {
             buf.append(" xml:lang=\"").append(xmlLang).append("\"");
         }
-        
+
         if (!namespaces.isEmpty()) {
             for (Entry<String, String> entry : namespaces.entrySet()) {
                 buf.append("\n   xmlns:").append(entry.getValue()).append("=\"").append(entry.getKey()).append("\"");
             }
         }
-        
+
         return buf.toString();
     }
 
     /**
-     * 
+     *
      * @return
      */
     public int getWrittenTriplesCount() {
@@ -267,7 +266,7 @@ public class AmpFeedWriter implements SPARQLResultSetReader {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public int getWrittenSubjectsCount() {

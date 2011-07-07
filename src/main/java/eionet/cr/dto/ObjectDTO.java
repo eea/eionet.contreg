@@ -41,7 +41,9 @@ public class ObjectDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /** */
-    public enum Type { LITERAL, RESOURCE; }
+    public enum Type {
+        LITERAL, RESOURCE;
+    }
 
     /** */
     private String value;
@@ -82,15 +84,15 @@ public class ObjectDTO implements Serializable {
     }
 
     /**
-    *
-    * @param value
-    * @param language
-    * @param literal
-    * @param anonymous
-    */
-   public ObjectDTO(String value, String language, boolean literal, boolean anonymous) {
-       this(value, language, literal, anonymous, null);
-   }
+     *
+     * @param value
+     * @param language
+     * @param literal
+     * @param anonymous
+     */
+    public ObjectDTO(String value, String language, boolean literal, boolean anonymous) {
+        this(value, language, literal, anonymous, null);
+    }
 
     /**
      *
@@ -145,6 +147,7 @@ public class ObjectDTO implements Serializable {
     public String getValue() {
         return value;
     }
+
     /**
      * @return the language
      */
@@ -158,6 +161,7 @@ public class ObjectDTO implements Serializable {
     public boolean isLiteral() {
         return literal;
     }
+
     /**
      * @return the anonymous
      */
@@ -167,6 +171,7 @@ public class ObjectDTO implements Serializable {
 
     /*
      * (non-Javadoc)
+     *
      * @see java.lang.Object#toString()
      */
     public String toString() {
@@ -175,6 +180,7 @@ public class ObjectDTO implements Serializable {
 
     /*
      * (non-Javadoc)
+     *
      * @see java.lang.Object#equals(java.lang.Object)
      */
     public boolean equals(Object other) {
@@ -185,13 +191,13 @@ public class ObjectDTO implements Serializable {
         if (!(other instanceof ObjectDTO))
             return false;
 
-
-        String otherValue = ((ObjectDTO)other).getValue();
+        String otherValue = ((ObjectDTO) other).getValue();
         return getValue() == null ? otherValue == null : getValue().equals(otherValue);
     }
 
     /*
      * (non-Javadoc)
+     *
      * @see java.lang.Object#hashCode()
      */
     public int hashCode() {
@@ -214,7 +220,8 @@ public class ObjectDTO implements Serializable {
     }
 
     /**
-     * @param derivSource the derivSourceUri to set
+     * @param derivSource
+     *            the derivSourceUri to set
      */
     public void setDerivSourceUri(String derivSource) {
         this.derivSourceUri = derivSource;
@@ -228,7 +235,8 @@ public class ObjectDTO implements Serializable {
     }
 
     /**
-     * @param source the sourceUri to set
+     * @param source
+     *            the sourceUri to set
      */
     public void setSourceUri(String source) {
         this.sourceUri = source;
@@ -256,7 +264,8 @@ public class ObjectDTO implements Serializable {
     }
 
     /**
-     * @param sourceObjectHash the sourceObjectHash to set
+     * @param sourceObjectHash
+     *            the sourceObjectHash to set
      */
     public void setSourceObjectHash(long sourceObjectHash) {
         this.sourceObjectHash = sourceObjectHash;
@@ -278,7 +287,8 @@ public class ObjectDTO implements Serializable {
     }
 
     /**
-     * @param derivSourceGenTime the derivSourceGenTime to set
+     * @param derivSourceGenTime
+     *            the derivSourceGenTime to set
      */
     public void setDerivSourceGenTime(long derivSourceGenTime) {
         this.derivSourceGenTime = derivSourceGenTime;
@@ -292,7 +302,8 @@ public class ObjectDTO implements Serializable {
     }
 
     /**
-     * @param derivSourceHash the derivSourceHash to set
+     * @param derivSourceHash
+     *            the derivSourceHash to set
      */
     public void setDerivSourceHash(long derivSourceHash) {
         this.derivSourceHash = derivSourceHash;
@@ -314,7 +325,8 @@ public class ObjectDTO implements Serializable {
     }
 
     /**
-     * @param sourceHash the sourceHash to set
+     * @param sourceHash
+     *            the sourceHash to set
      */
     public void setSourceHash(long sourceHash) {
         this.sourceHash = sourceHash;
@@ -337,7 +349,8 @@ public class ObjectDTO implements Serializable {
     }
 
     /**
-     * @param sourceObjectValue the derviedLiteralValue to set
+     * @param sourceObjectValue
+     *            the derviedLiteralValue to set
      */
     public void setDerviedLiteralValue(String sourceObjectValue) {
         this.derviedLiteralValue = sourceObjectValue;
@@ -346,17 +359,18 @@ public class ObjectDTO implements Serializable {
     public URI getDatatype() {
         return datatype;
     }
+
     /**
-     * Returns datatype label to display.
-     * If the namespace is known replaces it with the prefix defined in Namespace
-     * otherwise returns URL with full namespace
+     * Returns datatype label to display. If the namespace is known replaces it with the prefix defined in Namespace otherwise
+     * returns URL with full namespace
+     *
      * @return String datatype label
      */
     public String getDataTypeLabel() {
         if (datatype == null) {
             return "Not specified";
         }
-        //if datatype is from XSD schema, replace http://www.w3.org/2001/XMLSchema with xsd
+        // if datatype is from XSD schema, replace http://www.w3.org/2001/XMLSchema with xsd
         String ns = datatype.getNamespace();
         if (NamespaceUtil.getKnownNamespace(datatype.getNamespace()) != null) {
             ns = NamespaceUtil.getKnownNamespace(datatype.getNamespace()) + ":";

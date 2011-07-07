@@ -5,8 +5,10 @@ import java.util.List;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.dao.helpers.AbstractSearchHelper;
+import eionet.cr.util.Bindings;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.pagination.PagingRequest;
+import eionet.cr.util.sesame.SPARQLQueryUtil;
 import eionet.cr.web.util.columns.ReferringPredicatesColumn;
 
 /**
@@ -19,107 +21,131 @@ public class VirtuosoReferencesSearchHelper extends AbstractSearchHelper {
     /** */
     private String subjectUri;
 
+    /** */
+    private Bindings bindings;
+
+    /** */
+    private Bindings subjectDataBindings;
+
     /**
+     * Creates a new helper object.
      *
      * @param subjectUri
+     *            resource subject URI.
      * @param pagingRequest
+     *            paging request from the UI
      * @param sortingRequest
+     *            sorting request for theresults table
      */
-    public VirtuosoReferencesSearchHelper(String subjectUri,
-            PagingRequest pagingRequest, SortingRequest sortingRequest) {
+    public VirtuosoReferencesSearchHelper(String subjectUri, PagingRequest pagingRequest, SortingRequest sortingRequest) {
 
         super(pagingRequest, sortingRequest);
         this.subjectUri = subjectUri;
+
+        bindings = new Bindings();
+        bindings.setURI("subjectUri", subjectUri);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see eionet.cr.dao.helpers.AbstractSearchHelper#getOrderedQuery(java.util.List)
      */
     @Override
     protected String getOrderedQuery(List<Object> inParams) {
-        StringBuilder strBuilder = new StringBuilder().
-        append("select ?s where {?s ?p ?o. filter(isURI(?o) && ?o=<").
-        append(subjectUri).append(">)");
+        String sparql = "select distinct ?s where {?s ?p ?o. filter(isURI(?o) && ?o=?subjectUri)";
 
         if (sortPredicate != null && (Predicates.RDFS_LABEL.equals(sortPredicate) || Predicates.RDF_TYPE.equals(sortPredicate))) {
-            strBuilder.append(" . OPTIONAL {?s <").append(sortPredicate).append("> ?oorderby }");
+            sparql += " . OPTIONAL {?s ?sortPredicate ?oorderby }";
+            bindings.setURI("sortPredicate", sortPredicate);
         }
-        strBuilder.append("} ORDER BY ");
+        sparql += "} ORDER BY ";
 
         if (sortOrder != null) {
-            strBuilder.append(sortOrder);
+            sparql += sortOrder;
         }
         if (Predicates.RDFS_LABEL.equals(sortPredicate)) {
-            strBuilder
-                    .append("(bif:either( bif:isnull(?oorderby) , (bif:lcase(bif:subseq (bif:replace (?s, '/', '#'), bif:strrchr (bif:replace (?s, '/', '#'), '#')+1))) , bif:lcase(?oorderby)))");
+            sparql +=
+                    "(bif:either( bif:isnull(?oorderby) , "
+                            + "(bif:lcase(bif:subseq (bif:replace (?s, '/', '#'), bif:strrchr (bif:replace (?s, '/', '#'), '#')+1))) , "
+                            + "bif:lcase(?oorderby)))";
+            // kind of hack - ReferringPredicatesColumn class name is neither a predicate or URI.
+            // It is not used in sparql so we can love with it for a while
         } else if (ReferringPredicatesColumn.class.getSimpleName().equals(sortPredicate)) {
-            strBuilder.append("(bif:lcase(?o))");
+            sparql += "(bif:lcase(?o))";
         } else {
-            strBuilder.append("(bif:lcase(?oorderby))");
+            sparql += "(bif:lcase(?oorderby))";
         }
-        return strBuilder.toString();
+
+        return sparql;
     }
 
-    /* (non-Javadoc)
-     * @see eionet.cr.dao.helpers.AbstractSearchHelper#getUnorderedQuery(java.util.List)
+    /**
+     * SPARQL for unordered references of the subject.
      */
+    private static final String REFERENCES_UNORDERED_SPARQL = "select distinct ?s where "
+            + "{?s ?p ?o. filter(isURI(?o) && ?o=?subjectUri)}";
+
     @Override
     public String getUnorderedQuery(List<Object> inParams) {
-
-        StringBuilder strBuilder = new StringBuilder().
-        append("select ?s where {?s ?p ?o. filter(isURI(?o) && ?o=<").
-        append(subjectUri).append(">)}");
-
-        return strBuilder.toString();
+        return REFERENCES_UNORDERED_SPARQL;
     }
 
-    /* (non-Javadoc)
-     * @see eionet.cr.dao.helpers.AbstractSearchHelper#getCountQuery(java.util.List)
+    /**
+     * SPARQL for counting subject references.
      */
+
+    private static final String REFERENCES_COUNT_SPARQL = "select count(distinct ?s) "
+            + "where {?s ?p ?o. filter(isURI(?o) && ?o=?subjectUri)}";
+
     @Override
     public String getCountQuery(List<Object> inParams) {
-
-        StringBuilder strBuilder = new StringBuilder().
-        append("select count(?s) where {?s ?p ?o. filter(isURI(?o) && ?o=<").
-        append(subjectUri).append(">)}");
-
-        return strBuilder.toString();
+        // subjectUri is set in the constructor
+        return REFERENCES_COUNT_SPARQL;
     }
 
-    /* (non-Javadoc)
-     * @see eionet.cr.dao.helpers.AbstractSearchHelper#getMinMaxHashQuery(java.util.List)
-     */
     @Override
     public String getMinMaxHashQuery(List<Object> inParams) {
         throw new UnsupportedOperationException("Method not implemented");
     }
 
-    //return sparql query for getting predicates for reference subjects
+    /**
+     * returns sparql query for getting predicates for reference subjects.
+     *
+     * @param subjectUris
+     *            subject uris of the references
+     * @param sourceUri
+     *            resource subject URI.
+     * @return SPARQL query for getting subjects data.
+     */
     public String getSubjectsDataQuery(Collection<String> subjectUris, String sourceUri) {
         if (subjectUris == null || subjectUris.isEmpty()) {
             throw new IllegalArgumentException("Subjects collection must not be null or empty!");
         }
+        subjectDataBindings = new Bindings();
+        subjectDataBindings.setURI("sourceUri", sourceUri);
+        // TODO can't it be optimized?
+        String subjectUrisCSV = SPARQLQueryUtil.urisToCSV(subjectUris, "subjectUriValue", subjectDataBindings);
+        String sparql =
+                "select * where {graph ?g {?s ?p ?o. filter (?s IN (" + subjectUrisCSV + ")) " + ". filter(?p = <"
+                        + Predicates.RDF_TYPE + "> || (isURI(?o) && ?o=?sourceUri))" + ". OPTIONAL {?g <"
+                        + Predicates.CR_LAST_MODIFIED + "> ?t} }} ORDER BY ?s";
 
-        StringBuilder strBuilder = new StringBuilder().
-        append("select * where {graph ?g {?s ?p ?o. ").
-        append("filter (?s IN (");
-
-        int i = 0;
-        for (String subjectUri : subjectUris) {
-            if (i > 0) {
-                strBuilder.append(", ");
-            }
-            strBuilder.append("<").append(subjectUri).append(">");
-            i++;
-        }
-        strBuilder.append(")) ");
-
-        strBuilder.append(". filter(?p IN (<").append(Predicates.RDF_TYPE).append(">, <").append(Predicates.RDF_TYPE)
-        .append(">) || (isURI(?o) && ?o=<").append(sourceUri).append(">))");
-
-        strBuilder.append(". OPTIONAL {?g <").append(Predicates.CR_LAST_MODIFIED).append("> ?t} ");
-        strBuilder.append("}} ORDER BY ?s");
-
-        return strBuilder.toString();
+        return sparql;
     }
+
+    @Override
+    public Bindings getQueryBindings() {
+        return bindings;
+    }
+
+    /**
+     * Bindings to be used in subjects data query. For safety are kept separately from main query bindings
+     *
+     * @return bindings for subject data query
+     */
+    public Bindings getSubjectDataBindings() {
+        return subjectDataBindings;
+    }
+
 }

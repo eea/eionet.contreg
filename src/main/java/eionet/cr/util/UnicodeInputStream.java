@@ -24,17 +24,12 @@ import java.io.InputStream;
 import java.io.PushbackInputStream;
 
 /**
- * This inputstream will recognize unicode BOM marks and will skip bytes if
- * getEncoding() method is called before any of the read(...) methods.
- * 
- * Usage pattern: 
- * String enc = "ISO-8859-1"; // or NULL to use systemdefault
- * FileInputStream fis = new FileInputStream(file); 
- * UnicodeInputStream uin = new UnicodeInputStream(fis, enc); 
- * enc = uin.getEncoding(); // check and skip
- * possible BOM bytes 
- * InputStreamReader in; if (enc == null) in = new
- * InputStreamReader(uin); else in = new InputStreamReader(uin, enc);
+ * This inputstream will recognize unicode BOM marks and will skip bytes if getEncoding() method is called before any of the
+ * read(...) methods.
+ *
+ * Usage pattern: String enc = "ISO-8859-1"; // or NULL to use systemdefault FileInputStream fis = new FileInputStream(file);
+ * UnicodeInputStream uin = new UnicodeInputStream(fis, enc); enc = uin.getEncoding(); // check and skip possible BOM bytes
+ * InputStreamReader in; if (enc == null) in = new InputStreamReader(uin); else in = new InputStreamReader(uin, enc);
  */
 public class UnicodeInputStream extends InputStream {
     PushbackInputStream internalIn;
@@ -58,8 +53,7 @@ public class UnicodeInputStream extends InputStream {
             try {
                 init();
             } catch (IOException ex) {
-                IllegalStateException ise = new IllegalStateException(
-                        "Init method failed.");
+                IllegalStateException ise = new IllegalStateException("Init method failed.");
                 ise.initCause(ise);
                 throw ise;
             }
@@ -68,27 +62,23 @@ public class UnicodeInputStream extends InputStream {
     }
 
     /**
-     * Read-ahead four bytes and check for BOM marks. Extra bytes are unread
-     * back to the stream, only BOM bytes are skipped.
+     * Read-ahead four bytes and check for BOM marks. Extra bytes are unread back to the stream, only BOM bytes are skipped.
      */
     protected void init() throws IOException {
         if (isInited)
             return;
 
-        byte bom[] = new byte[BOM_SIZE];
+        byte[] bom = new byte[BOM_SIZE];
         int n, unread;
         n = internalIn.read(bom, 0, bom.length);
 
-        if ((bom[0] == (byte) 0x00) && (bom[1] == (byte) 0x00)
-                && (bom[2] == (byte) 0xFE) && (bom[3] == (byte) 0xFF)) {
+        if ((bom[0] == (byte) 0x00) && (bom[1] == (byte) 0x00) && (bom[2] == (byte) 0xFE) && (bom[3] == (byte) 0xFF)) {
             encoding = "UTF-32BE";
             unread = n - 4;
-        } else if ((bom[0] == (byte) 0xFF) && (bom[1] == (byte) 0xFE)
-                && (bom[2] == (byte) 0x00) && (bom[3] == (byte) 0x00)) {
+        } else if ((bom[0] == (byte) 0xFF) && (bom[1] == (byte) 0xFE) && (bom[2] == (byte) 0x00) && (bom[3] == (byte) 0x00)) {
             encoding = "UTF-32LE";
             unread = n - 4;
-        } else if ((bom[0] == (byte) 0xEF) && (bom[1] == (byte) 0xBB)
-                && (bom[2] == (byte) 0xBF)) {
+        } else if ((bom[0] == (byte) 0xEF) && (bom[1] == (byte) 0xBB) && (bom[2] == (byte) 0xBF)) {
             encoding = "UTF-8";
             unread = n - 3;
         } else if ((bom[0] == (byte) 0xFE) && (bom[1] == (byte) 0xFF)) {

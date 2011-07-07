@@ -24,6 +24,7 @@ import java.util.Collection;
 
 /**
  * Object representing User home folder.
+ *
  * @author Enriko Käsper
  */
 public class UserFolderDTO {
@@ -52,30 +53,39 @@ public class UserFolderDTO {
     public String getUrl() {
         return url;
     }
+
     public void setUrl(String url) {
         this.url = url;
     }
+
     public Collection<String> getSubFolders() {
         return subFolders;
     }
+
     public void setSubFolders(Collection<String> subFolders) {
         this.subFolders = subFolders;
     }
+
     public Collection<String> getSubFiles() {
         return subFiles;
     }
+
     public void setSubFiles(Collection<String> subFiles) {
         this.subFiles = subFiles;
     }
+
     public String getParentFolderUrl() {
         return parentFolderUrl;
     }
+
     public void setParentFolderUrl(String parentFolderUrl) {
         this.parentFolderUrl = parentFolderUrl;
     }
+
     public String getLabel() {
         return label;
     }
+
     public void setLabel(String label) {
         this.label = label;
     }

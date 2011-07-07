@@ -3,12 +3,12 @@ package eionet.cr.harvest.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 
 import eionet.cr.util.ConnectionError;
 import eionet.cr.util.ConnectionError.ErrType;
@@ -23,6 +23,9 @@ import eionet.cr.util.UrlRedirectionInfo;
  *
  */
 public class HarvestUrlConnection {
+
+    /** */
+    private static final Logger LOGGER = Logger.getLogger(HarvestUrlConnection.class);
 
     private URL url;
     private HttpURLConnection urlConnection;
@@ -46,9 +49,8 @@ public class HarvestUrlConnection {
      * @param sourceUrlString
      * @return HarvestUrlConnection
      * @throws IOException
-     * @throws MalformedURLException
      */
-    public static HarvestUrlConnection getConnection(String sourceUrlString) throws IOException, MalformedURLException {
+    public static HarvestUrlConnection getConnection(String sourceUrlString) throws IOException {
 
         HarvestUrlConnection result = new HarvestUrlConnection();
         result.url = new URL(StringUtils.substringBefore(sourceUrlString, "#"));
@@ -59,12 +61,14 @@ public class HarvestUrlConnection {
             result.urlConnection = (HttpURLConnection) normalizedURL.openConnection();
             result.urlConnection.setRequestProperty("Accept", "application/rdf+xml, text/xml, */*;q=0.6");
             result.urlConnection.setRequestProperty("User-Agent", URLUtil.userAgentHeader());
+            result.urlConnection.setRequestProperty("Connection", "close");
             result.urlConnection.setInstanceFollowRedirects(true);
         } else {
             result.fileConnection = true;
-            result.generalConnection = (URLConnection) normalizedURL.openConnection();
+            result.generalConnection = normalizedURL.openConnection();
             result.generalConnection.setRequestProperty("Accept", "application/rdf+xml, text/xml, */*;q=0.6");
             result.generalConnection.setRequestProperty("User-Agent", URLUtil.userAgentHeader());
+            result.urlConnection.setRequestProperty("Connection", "close");
         }
 
         return result;
@@ -110,7 +114,7 @@ public class HarvestUrlConnection {
                         error = new ConnectionError(ErrType.TEMPORARY, 000, "Temporary error: \n " + e.getMessage());
                     }
                     try {
-                        inputStream = ((HttpURLConnection) urlConnection).getErrorStream();
+                        inputStream = (urlConnection).getErrorStream();
                         // read the response body - use a new buffer at every read.
                         // Hope the GC will run before we run out of memory.
                         if (inputStream != null) {
@@ -139,10 +143,10 @@ public class HarvestUrlConnection {
      */
     public URLConnection getConnection() {
         if (fileConnection) {
-            return (URLConnection) generalConnection;
+            return generalConnection;
         }
         if (httpConnection) {
-            return (URLConnection) urlConnection;
+            return urlConnection;
         }
         return null;
     }
@@ -156,8 +160,10 @@ public class HarvestUrlConnection {
                 inputStream.close();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Failed to close HTTP connection stream: " + e.toString());
         }
+        URLUtil.disconnect(urlConnection);
+        URLUtil.disconnect(generalConnection);
     }
 
     public InputStream getInputStream() {

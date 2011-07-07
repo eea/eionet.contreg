@@ -40,6 +40,7 @@ public class HarvestingJobListener implements JobListener {
 
     /*
      * (non-Javadoc)
+     *
      * @see org.quartz.JobListener#getName()
      */
     public String getName() {
@@ -48,6 +49,7 @@ public class HarvestingJobListener implements JobListener {
 
     /*
      * (non-Javadoc)
+     *
      * @see org.quartz.JobListener#jobExecutionVetoed(org.quartz.JobExecutionContext)
      */
     public void jobExecutionVetoed(JobExecutionContext context) {
@@ -56,23 +58,26 @@ public class HarvestingJobListener implements JobListener {
 
     /*
      * (non-Javadoc)
+     *
      * @see org.quartz.JobListener#jobToBeExecuted(org.quartz.JobExecutionContext)
      */
     public void jobToBeExecuted(JobExecutionContext context) {
-//      logger.debug("Going to execute job " + context.getJobDetail().getName());
+        // logger.debug("Going to execute job " + context.getJobDetail().getName());
     }
 
     /*
      * (non-Javadoc)
+     *
      * @see org.quartz.JobListener#jobWasExecuted(org.quartz.JobExecutionContext, org.quartz.JobExecutionException)
      */
     public void jobWasExecuted(JobExecutionContext context, JobExecutionException exception) {
 
         if (exception != null) {
-            logger.error("Exception thrown when executing job " + context.getJobDetail().getName() + ": " + exception.toString(), exception);
+            logger.error("Exception thrown when executing job " + context.getJobDetail().getName() + ": " + exception.toString(),
+                    exception);
             return;
         }
 
-//      logger.debug("Executed job " + context.getJobDetail().getName());
+        // logger.debug("Executed job " + context.getJobDetail().getName());
     }
 }

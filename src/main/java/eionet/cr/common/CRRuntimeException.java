@@ -37,8 +37,7 @@ public class CRRuntimeException extends RuntimeException {
     /**
      * @param s
      */
-    public CRRuntimeException(String s)
-    {
+    public CRRuntimeException(String s) {
         super(s);
     }
 
@@ -46,16 +45,14 @@ public class CRRuntimeException extends RuntimeException {
      * @param s
      * @param throwable
      */
-    public CRRuntimeException(String s, Throwable throwable)
-    {
+    public CRRuntimeException(String s, Throwable throwable) {
         super(s, throwable);
     }
 
     /**
      * @param throwable
      */
-    public CRRuntimeException(Throwable throwable)
-    {
+    public CRRuntimeException(Throwable throwable) {
         super(throwable);
     }
 

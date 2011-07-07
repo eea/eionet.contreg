@@ -23,10 +23,8 @@ package eionet.cr.harvest.persist;
 import java.sql.SQLException;
 import java.text.DateFormat;
 
-
 /**
- * @author Aleksandr Ivanov
- * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
+ * @author Aleksandr Ivanov <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
 public interface IHarvestPersister {
 
@@ -44,8 +42,8 @@ public interface IHarvestPersister {
      * @throws PersisterException
      */
     // TODO this method has got way too many arguments, the whole approach needs refactoring
-    void addTriple(long subjectHash, boolean anonSubject, long predicateHash,
-            String object, long objectHash, String objectLang, boolean litObject, boolean anonObject, long objSourceObject) throws PersisterException;
+    void addTriple(long subjectHash, boolean anonSubject, long predicateHash, String object, long objectHash, String objectLang,
+            boolean litObject, boolean anonObject, long objSourceObject) throws PersisterException;
 
     /**
      *
@@ -104,8 +102,10 @@ public interface IHarvestPersister {
     int getStoredTriplesCount();
 
     /**
-     * @param subjectHash TODO
-     * @param dateFormat TODO
+     * @param subjectHash
+     *            TODO
+     * @param dateFormat
+     *            TODO
      * @throws SQLException
      *
      */

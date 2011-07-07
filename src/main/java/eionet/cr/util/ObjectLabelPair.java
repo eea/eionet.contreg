@@ -13,15 +13,19 @@ public class ObjectLabelPair extends Pair<String, String> implements Comparable<
 
     /**
      * overrides superclass constructor.
-     * @param left object key
-     * @param right label
+     *
+     * @param left
+     *            object key
+     * @param right
+     *            label
      */
     public ObjectLabelPair(final String left, final String right) {
         super(left, right);
     }
 
     /**
-     * @param other the other ObjectLabelPair
+     * @param other
+     *            the other ObjectLabelPair
      * @return int @see Comparable.compareTo()
      */
     @Override

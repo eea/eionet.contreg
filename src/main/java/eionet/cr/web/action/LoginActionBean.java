@@ -71,16 +71,14 @@ public class LoginActionBean extends AbstractActionBean {
     @DontSaveLastActionEvent
     public Resolution afterLogin() throws DAOException {
         CRUser user = getContext().getCRUser();
-        if(user != null){
+        if (user != null) {
             user.loadUserProperties();
         }
 
         String lastActionEventUrl = getContext().getLastActionEventUrl();
         lastActionEventUrl = lastActionEventUrl == null ? MAIN_PAGE_ACTION : lastActionEventUrl;
-        //getContext().getCRUser().setLocalId(this.userService.addUserIfrequired(getUserName()));
-        return new RedirectResolution(
-                lastActionEventUrl,
-                !lastActionEventUrl.toLowerCase().startsWith("http://"));
+        // getContext().getCRUser().setLocalId(this.userService.addUserIfrequired(getUserName()));
+        return new RedirectResolution(lastActionEventUrl, !lastActionEventUrl.toLowerCase().startsWith("http://"));
     }
 
     /**

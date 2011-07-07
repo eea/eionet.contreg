@@ -39,9 +39,8 @@ public class UnicodeUtils {
     }
 
     /**
-     * Parses the given string, replaces all occurrences of Unicode entity
-     * references with corresponding Java characters (primitive type char)
-     * and returns the resulting string.
+     * Parses the given string, replaces all occurrences of Unicode entity references with corresponding Java characters (primitive
+     * type char) and returns the resulting string.
      *
      * @param literal
      * @return
@@ -65,7 +64,8 @@ public class UnicodeUtils {
 
                         try {
                             decimal = Integer.parseInt(sDecimal);
-                        } catch (Exception e) {}
+                        } catch (Exception e) {
+                        }
                     } else {
                         // handle entity
                         String ent = str.substring(i + 1, j);

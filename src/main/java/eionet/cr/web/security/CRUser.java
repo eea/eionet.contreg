@@ -41,9 +41,9 @@ import eionet.cr.web.util.WebConstants;
 
 /**
  * Class represents authenticated user.
- * 
+ *
  * @author altnyris
- * 
+ *
  */
 public class CRUser {
 
@@ -63,7 +63,7 @@ public class CRUser {
 
     /**
      * Creates CRUser.
-     * 
+     *
      * @param userName
      *            username
      */
@@ -88,7 +88,7 @@ public class CRUser {
 
     /**
      * True if user is listed as administrator in ACL.
-     * 
+     *
      * @return boolean
      */
     public boolean isAdministrator() {
@@ -98,7 +98,7 @@ public class CRUser {
     /**
      * Returns the value of {@link #hasPermission(String, String, String)}, using the given ACL path, the given permission, and the
      * name of this user.
-     * 
+     *
      * @param aclPath
      * @param permission
      * @return
@@ -111,7 +111,7 @@ public class CRUser {
      * Returns the value of {@link #hasPermission(String, String, String)}, using the given ACL path, the given permission, and the
      * name of the user found in the given session. If no user found in session, the method will be called with user name set to
      * null.
-     * 
+     *
      * @param session
      * @param aclPath
      * @param permission
@@ -138,11 +138,11 @@ public class CRUser {
      * Looks up an ACL with the given path, and checks if the given user has the given permission in it. If no such ACL is found,
      * the method returns false. If the ACL is found, and it has the given permission for the given user, the method returns true,
      * otherwise false.
-     * 
+     *
      * Situation where user name is null, is handled by the ACL library (it is treated as anonymous user).
-     * 
+     *
      * If the ACL library throws an exception, it is not thrown onwards, but still logged at error level.
-     * 
+     *
      * @param userName
      * @param aclPath
      * @param permission
@@ -183,7 +183,7 @@ public class CRUser {
 
     /**
      * Returns the CR application URL defined in cr.proprties, such as http://cr.eionet.europa.eu.
-     * 
+     *
      * @return the URL.
      */
     private static String appHomeURL() {
@@ -193,7 +193,7 @@ public class CRUser {
 
     /**
      * Returns home URL of the user.
-     * 
+     *
      * @return String
      */
     public String getHomeUri() {
@@ -202,7 +202,7 @@ public class CRUser {
 
     /**
      * Returns review URL of the user.
-     * 
+     *
      * @param reviewId
      *            Id of review
      * @return String review URL
@@ -212,7 +212,7 @@ public class CRUser {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public String getReviewAttachmentUri(int reviewId, String attachmentFileName) {
@@ -221,7 +221,7 @@ public class CRUser {
 
     /**
      * Registrations uri.
-     * 
+     *
      * @return String URI
      */
     public String getRegistrationsUri() {
@@ -230,7 +230,7 @@ public class CRUser {
 
     /**
      * Bookmarks URI of the user.
-     * 
+     *
      * @return String URL
      */
     public String getBookmarksUri() {
@@ -239,7 +239,7 @@ public class CRUser {
 
     /**
      * History URI of the user.
-     * 
+     *
      * @return String URI
      */
     public String getHistoryUri() {
@@ -248,7 +248,7 @@ public class CRUser {
 
     /**
      * Home Item URI.
-     * 
+     *
      * @param uri
      *            String
      * @return String
@@ -259,7 +259,7 @@ public class CRUser {
 
     /**
      * ROOT Home URI for all user fodlers.
-     * 
+     *
      * @return String
      */
     public static String rootHomeUri() {
@@ -269,7 +269,7 @@ public class CRUser {
 
     /**
      * Home URI of the user.
-     * 
+     *
      * @param userName
      *            user name
      * @return String
@@ -284,7 +284,7 @@ public class CRUser {
     }
 
     /**
-     * 
+     *
      * @param userName
      * @param uri
      * @return
@@ -299,7 +299,7 @@ public class CRUser {
     }
 
     /**
-     * 
+     *
      * @param userName
      * @return
      */
@@ -309,7 +309,7 @@ public class CRUser {
     }
 
     /**
-     * 
+     *
      * @param userName
      * @return
      */
@@ -319,7 +319,7 @@ public class CRUser {
     }
 
     /**
-     * 
+     *
      * @param userName
      * @return
      */
@@ -352,7 +352,7 @@ public class CRUser {
     }
 
     /**
-     * 
+     *
      * @param uriString
      * @return
      */
@@ -362,7 +362,7 @@ public class CRUser {
     }
 
     /**
-     * 
+     *
      * @param uriString
      * @return
      */

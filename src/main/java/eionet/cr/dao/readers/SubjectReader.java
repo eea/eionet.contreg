@@ -28,7 +28,6 @@ import org.openrdf.model.BNode;
 import org.openrdf.model.Value;
 import org.openrdf.query.BindingSet;
 
-
 /**
  *
  * @author altnyris
@@ -53,16 +52,13 @@ public class SubjectReader extends ResultSetMixedReader<String> {
      *
      * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
      */
-    public void readRow(ResultSet rs) throws SQLException,
-            ResultSetReaderException {
+    public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
     }
 
     /*
      * (non-Javadoc)
      *
-     * @see
-     * eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query
-     * .BindingSet)
+     * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query .BindingSet)
      */
     @Override
     public void readRow(BindingSet bindingSet) {
@@ -71,7 +67,7 @@ public class SubjectReader extends ResultSetMixedReader<String> {
             boolean isAnonSubject = subject instanceof BNode;
 
             String strSubj = "";
-            //FIXME -blank nodes should be added also to the resultset? 
+            // FIXME -blank nodes should be added also to the resultset?
             if (subject != null && !isAnonSubject) {
                 strSubj = subject.stringValue();
                 resultList.add(strSubj);

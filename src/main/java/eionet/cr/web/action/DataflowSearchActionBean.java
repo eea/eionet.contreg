@@ -56,7 +56,7 @@ import eionet.cr.web.util.columns.SubjectPredicateColumn;
  *
  */
 @UrlBinding("/dataflowSearch.action")
-public class DataflowSearchActionBean extends AbstractSearchActionBean<SubjectDTO>{
+public class DataflowSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 
     /** */
     private List<String> years;
@@ -77,16 +77,16 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean<SubjectDT
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.web.action.AbstractSearchActionBean#search()
      */
     public Resolution search() throws DAOException {
         Pair<Integer, List<SubjectDTO>> customSearch =
-            DAOFactory.get().getDao(SearchDAO.class).searchByFilters(
-                            buildSearchCriteria(),
-                            null,
-                            PagingRequest.create(getPageN()),
-                            new SortingRequest(getSortP(), SortOrder.parse(getSortO())),
-                            null);
+                DAOFactory
+                        .get()
+                        .getDao(SearchDAO.class)
+                        .searchByFilters(buildSearchCriteria(), null, PagingRequest.create(getPageN()),
+                                new SortingRequest(getSortP(), SortOrder.parse(getSortO())), null, false);
         resultList = customSearch.getRight();
         matchCount = customSearch.getLeft();
 
@@ -117,7 +117,7 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean<SubjectDT
     /**
      * @return the instrumentsObligations
      */
-    public Map<String,List<UriLabelPair>> getInstrumentsObligations() {
+    public Map<UriLabelPair, List<UriLabelPair>> getInstrumentsObligations() {
         return ApplicationCache.getDataflowPicklist();
     }
 
@@ -166,21 +166,24 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean<SubjectDT
     }
 
     /**
-     * @param dataflow the dataflow to set
+     * @param dataflow
+     *            the dataflow to set
      */
     public void setDataflow(String dataflow) {
         this.dataflow = dataflow;
     }
 
     /**
-     * @param locality the locality to set
+     * @param locality
+     *            the locality to set
      */
     public void setLocality(String locality) {
         this.locality = locality;
     }
 
     /**
-     * @param year the year to set
+     * @param year
+     *            the year to set
      */
     public void setYear(String year) {
         this.year = year;
@@ -188,6 +191,7 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean<SubjectDT
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
      */
     public List<SearchResultColumn> getColumns() {
@@ -200,11 +204,11 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean<SubjectDT
         col.setSortable(true);
         list.add(col);
 
-//      col = new SubjectPredicateColumn();
-//      col.setPredicateUri(Predicates.ROD_OBLIGATION_PROPERTY);
-//      col.setTitle("Dataflow");
-//      col.setSortable(true);
-//      list.add(col);
+        // col = new SubjectPredicateColumn();
+        // col.setPredicateUri(Predicates.ROD_OBLIGATION_PROPERTY);
+        // col.setTitle("Dataflow");
+        // col.setSortable(true);
+        // list.add(col);
 
         col = new SubjectPredicateColumn();
         col.setPredicateUri(Predicates.ROD_HAS_FILE);

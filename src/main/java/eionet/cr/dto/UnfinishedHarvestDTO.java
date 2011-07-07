@@ -29,26 +29,32 @@ public class UnfinishedHarvestDTO {
 
     private long source;
     private long genTime;
+
     /**
      * @return the source
      */
     public long getSource() {
         return source;
     }
+
     /**
-     * @param source the source to set
+     * @param source
+     *            the source to set
      */
     public void setSource(long source) {
         this.source = source;
     }
+
     /**
      * @return the genTime
      */
     public long getGenTime() {
         return genTime;
     }
+
     /**
-     * @param genTime the genTime to set
+     * @param genTime
+     *            the genTime to set
      */
     public void setGenTime(long genTime) {
         this.genTime = genTime;

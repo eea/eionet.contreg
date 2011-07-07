@@ -3,17 +3,17 @@ package eionet.cr.dto;
 import org.apache.commons.lang.StringEscapeUtils;
 
 /**
- * 
+ *
  * @author jaanus
  *
  */
-public class UserBookmarkDTO{
+public class UserBookmarkDTO {
 
     /** */
     private String bookmarkUrl;
 
     /**
-     * 
+     *
      * @return
      */
     public String getBookmarkUrl() {
@@ -21,7 +21,7 @@ public class UserBookmarkDTO{
     }
 
     /**
-     * 
+     *
      * @param bookmarkUrl
      */
     public void setBookmarkUrl(String bookmarkUrl) {
@@ -29,7 +29,7 @@ public class UserBookmarkDTO{
     }
 
     /**
-     * 
+     *
      * @return
      */
     public String getBookmarkUrlHtmlFormatted() {

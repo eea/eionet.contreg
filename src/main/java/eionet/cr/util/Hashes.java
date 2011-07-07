@@ -71,7 +71,7 @@ public class Hashes {
 
         int sLen = s.length();
         for (int i = 0; i < sLen; i++) {
-            seed ^= (long)s.charAt(i);
+            seed ^= s.charAt(i);
             seed += (seed << 1) + (seed << 4) + (seed << 5) + (seed << 7) + (seed << 8) + (seed << 40);
         }
 
@@ -112,24 +112,25 @@ public class Hashes {
         for (int i = 0; i < dstBytes.length; i++) {
             Byte byteWrapper = new Byte(dstBytes[i]);
             String s = Integer.toHexString(byteWrapper.intValue());
-            if (s.length() == 1) s = "0" + s;
+            if (s.length() == 1)
+                s = "0" + s;
             buf.append(s.substring(s.length() - 2));
         }
 
         return buf.toString();
     }
 
-    /**
-     *
-     * @param args
-     */
-    public static void main(String[] args) {
-        if (args.length != 0) {
-            for (String s:args) {
-                System.out.println(s + " = " + Hashes.spoHash(s));
-            }
-        } else {
-            System.out.println(spoHash("http://www.gutenberg.org/feeds/catalog.rdf"));
-        }
-    }
+    //    /**
+    //     *
+    //     * @param args
+    //     */
+    //    public static void main(String[] args) {
+    //        if (args.length != 0) {
+    //            for (String s : args) {
+    //                System.out.println(s + " = " + Hashes.spoHash(s));
+    //            }
+    //        } else {
+    //            System.out.println(spoHash("http://www.gutenberg.org/feeds/catalog.rdf"));
+    //        }
+    //    }
 }

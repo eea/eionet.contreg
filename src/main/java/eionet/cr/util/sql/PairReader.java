@@ -32,8 +32,7 @@ import eionet.cr.dao.readers.ResultSetReaderException;
 import eionet.cr.util.Pair;
 
 /**
- * @author Aleksandr Ivanov
- * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
+ * @author Aleksandr Ivanov <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
 public class PairReader<T, T1> extends ResultSetMixedReader<Pair<T, T1>> {
 
@@ -47,8 +46,7 @@ public class PairReader<T, T1> extends ResultSetMixedReader<Pair<T, T1>> {
     public static final String RIGHTCOL = "RCOL";
 
     /**
-     * @see eionet.cr.util.sql.ResultSetListReader#getResultList()
-     * {@inheritDoc}
+     * @see eionet.cr.util.sql.ResultSetListReader#getResultList() {@inheritDoc}
      */
     @Override
     public List<Pair<T, T1>> getResultList() {
@@ -56,20 +54,18 @@ public class PairReader<T, T1> extends ResultSetMixedReader<Pair<T, T1>> {
     }
 
     /**
-     * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
-     * {@inheritDoc}
+     * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet) {@inheritDoc}
      */
     @Override
     @SuppressWarnings("unchecked")
     public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
-        resultList.add(new Pair<T, T1>((T)rs.getObject(LEFTCOL), (T1)rs.getObject(RIGHTCOL)));
+        resultList.add(new Pair<T, T1>((T) rs.getObject(LEFTCOL), (T1) rs.getObject(RIGHTCOL)));
     }
 
     /*
      * (non-Javadoc)
      *
-     * @see
-     * eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
+     * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -85,7 +81,7 @@ public class PairReader<T, T1> extends ResultSetMixedReader<Pair<T, T1>> {
                 strRCol = rcol.stringValue();
             }
 
-            resultList.add(new Pair<T, T1>((T)strLcol, (T1)strRCol));
+            resultList.add(new Pair<T, T1>((T) strLcol, (T1) strRCol));
         }
 
     }

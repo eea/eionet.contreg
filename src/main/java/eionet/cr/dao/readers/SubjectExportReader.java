@@ -95,10 +95,9 @@ public class SubjectExportReader extends ResultSetExportReader {
             currentSubject.getPredicates().put(predicateUri, currentObjects);
         }
 
-        ObjectDTO object = new ObjectDTO(rs.getString("OBJECT"),
-                rs.getString("OBJ_LANG"),
-                YesNoBoolean.parse(rs.getString("LIT_OBJ")),
-                YesNoBoolean.parse(rs.getString("ANON_OBJ")));
+        ObjectDTO object =
+                new ObjectDTO(rs.getString("OBJECT"), rs.getString("OBJ_LANG"), YesNoBoolean.parse(rs.getString("LIT_OBJ")),
+                        YesNoBoolean.parse(rs.getString("ANON_OBJ")));
         object.setHash(rs.getLong("OBJECT_HASH"));
         // object.setSourceUri(rs.getString("SOURCE_URI"));
         // object.setSourceHash(rs.getLong("SOURCE"));
@@ -145,20 +144,19 @@ public class SubjectExportReader extends ResultSetExportReader {
         boolean isLiteral = objectValue instanceof Literal;
         String objectLang = isLiteral ? ((Literal) objectValue).getLanguage() : null;
 
-        ObjectDTO object = new ObjectDTO(objectValue.stringValue(),
-                objectLang == null ? "" : objectLang,
-                isLiteral,
-                objectValue instanceof BNode);
+        ObjectDTO object =
+                new ObjectDTO(objectValue.stringValue(), objectLang == null ? "" : objectLang, isLiteral,
+                        objectValue instanceof BNode);
 
         object.setHash(Hashes.spoHash(objectValue.stringValue()));
 
-        //String sourceUri = bindingSet.getValue("g").stringValue();
-        //long sourceHash = Hashes.spoHash(sourceUri);
+        // String sourceUri = bindingSet.getValue("g").stringValue();
+        // long sourceHash = Hashes.spoHash(sourceUri);
 
-        //object.setSourceUri(sourceUri);
-        //object.setSourceHash(sourceHash);
-        //object.setDerivSourceUri(sourceUri);
-        //object.setDerivSourceHash(sourceHash);
+        // object.setSourceUri(sourceUri);
+        // object.setSourceHash(sourceHash);
+        // object.setDerivSourceUri(sourceUri);
+        // object.setDerivSourceHash(sourceHash);
 
         // TODO: what about object's source object
         // object.setSourceObjectHash(rs.getLong("OBJ_SOURCE_OBJECT"));
@@ -166,7 +164,10 @@ public class SubjectExportReader extends ResultSetExportReader {
         currentObjects.add(object);
 
     }
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     *
      * @see eionet.cr.dao.readers.ResultSetReader#endResultSet()
      */
     @Override

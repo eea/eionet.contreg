@@ -69,8 +69,9 @@ public class HarvestDAOWriter {
      */
     protected void writeStarted(Harvest harvest) throws DAOException {
 
-        harvestId = DAOFactory.get().getDao(HarvestDAO.class)
-                .insertStartedHarvest(sourceId, harvestType, userName, Harvest.STATUS_STARTED);
+        harvestId =
+                DAOFactory.get().getDao(HarvestDAO.class)
+                        .insertStartedHarvest(sourceId, harvestType, userName, Harvest.STATUS_STARTED);
     }
 
     /**
@@ -86,8 +87,9 @@ public class HarvestDAOWriter {
         }
 
         // harvest failed if it has a fatal error || warnings || errors
-        boolean failed = harvest.getFatalError() != null || (harvest.getErrors() != null && !harvest.getErrors().isEmpty())
-                || (harvest.getWarnings() != null && !harvest.getWarnings().isEmpty());
+        boolean failed =
+                harvest.getFatalError() != null || (harvest.getErrors() != null && !harvest.getErrors().isEmpty())
+                        || (harvest.getWarnings() != null && !harvest.getWarnings().isEmpty());
 
         Timestamp lastHarvest = generateLastHarvestDate(harvest);
 
@@ -104,7 +106,8 @@ public class HarvestDAOWriter {
                                 ((PullHarvest) harvest).getSourceAvailable(), failed, harvest.permanentError, lastHarvest);
             }
         } else {
-            DAOFactory.get().getDao(HarvestSourceDAO.class).updateHarvestFinished(sourceId, null, null, failed, false, lastHarvest);
+            DAOFactory.get().getDao(HarvestSourceDAO.class)
+                    .updateHarvestFinished(sourceId, null, null, failed, false, lastHarvest);
         }
     }
 
@@ -116,21 +119,21 @@ public class HarvestDAOWriter {
     private Timestamp generateLastHarvestDate(Harvest harvest) throws DAOException {
 
         long result = System.currentTimeMillis();
-        
+
         // If there was a "temporary" harvesting error (i.e. source was not available, but
         // the harvest's permanent error flag is down), the last harvest time is not actually
         // set to current time, but instead it is increased with 10% of the harvesting period
         // but minimum two hours. This is relevant only for PullHarvest.
 
-        if (harvest instanceof PullHarvest){
-            
-            PullHarvest pullHarvest = (PullHarvest)harvest;
+        if (harvest instanceof PullHarvest) {
+
+            PullHarvest pullHarvest = (PullHarvest) harvest;
             boolean wasTemporaryError = !pullHarvest.getSourceAvailable() && !harvest.permanentError;
             if (wasTemporaryError) {
-                
+
                 HarvestSourceDTO source = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceById(sourceId);
                 if (source != null && source.getLastHarvest() != null) {
-                    
+
                     long prevHarvest = source.getLastHarvest().getTime();
                     int interval = source.getIntervalMinutes();
 
@@ -143,7 +146,7 @@ public class HarvestDAOWriter {
                 }
             }
         }
-        
+
         return new Timestamp(result);
     }
 

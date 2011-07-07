@@ -48,6 +48,7 @@ public class PushHarvest extends Harvest {
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.harvest.Harvest#doExecute()
      */
     protected void doExecute() throws HarvestException {
@@ -62,13 +63,17 @@ public class PushHarvest extends Harvest {
             harvest(new ReaderBasedARPSource(stringReader));
         } finally {
             if (stringReader != null) {
-                try {stringReader.close();}catch (IOException e) {}
+                try {
+                    stringReader.close();
+                } catch (IOException e) {
+                }
             }
         }
     }
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.harvest.Harvest#doHarvestStartedActions()
      */
     protected void doHarvestStartedActions() throws HarvestException {

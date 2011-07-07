@@ -32,6 +32,7 @@ import eionet.cr.dao.readers.SubjectDataReader;
 import eionet.cr.dao.virtuoso.helpers.VirtuosoUserFolderSearchHelper;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.dto.UserFolderDTO;
+import eionet.cr.util.Bindings;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.Util;
@@ -54,8 +55,7 @@ public class VirtuosoUserHomeDAO extends VirtuosoBaseDAO implements UserHomeDAO 
      */
     @Override
     public Pair<Integer, List<UserFolderDTO>> getFolderContents(String parentFolder, Map<String, String> filters,
-            PagingRequest pagingRequest, SortingRequest sortingRequest,
-            List<String> selectedPredicates) throws DAOException {
+            PagingRequest pagingRequest, SortingRequest sortingRequest, List<String> selectedPredicates) throws DAOException {
 
         // create query helper
         VirtuosoUserFolderSearchHelper helper = new VirtuosoUserFolderSearchHelper(parentFolder, pagingRequest, sortingRequest);
@@ -78,8 +78,8 @@ public class VirtuosoUserHomeDAO extends VirtuosoBaseDAO implements UserHomeDAO 
         if (subjectUris != null && !subjectUris.isEmpty()) {
 
             // only these predicates will be queried for
-            String[] neededPredicates = { Predicates.RDFS_LABEL, Predicates.RDF_TYPE, Predicates.CR_HAS_FILE,
-                    Predicates.CR_HAS_FOLDER };
+            String[] neededPredicates =
+            {Predicates.RDFS_LABEL, Predicates.RDF_TYPE, Predicates.CR_HAS_FILE, Predicates.CR_HAS_FOLDER};
 
             if (selectedPredicates != null && selectedPredicates.size() > 0) {
                 neededPredicates = selectedPredicates.toArray(neededPredicates);
@@ -111,6 +111,13 @@ public class VirtuosoUserHomeDAO extends VirtuosoBaseDAO implements UserHomeDAO 
         return new Pair<Integer, List<UserFolderDTO>>(totalRowCount, returnFolders);
     }
 
+    /**
+     * SPARQL for checking if user folder is registered.
+     */
+    private static final String USER_FOLDER_REGISTERED_SPARQL = SPARQLQueryUtil.getPrefixes(Namespace.CR).toString()
+        + " SELECT ?folder WHERE {?rootHomeUri <" + Predicates.CR_HAS_FOLDER + "> ?folder . "
+        + "FILTER (?folder = ?userHomeUri) . ?folder a cr:UserFolder}";
+
     /*
      * (non-Javadoc)
      *
@@ -119,15 +126,11 @@ public class VirtuosoUserHomeDAO extends VirtuosoBaseDAO implements UserHomeDAO 
     @Override
     public boolean isUserFolderRegisteredInCrHomeContext(CRUser user) throws DAOException {
 
-        StringBuilder strBuilder = SPARQLQueryUtil.getPrefixes(Namespace.CR);
-        strBuilder.append("SELECT ?folder WHERE {<").append(CRUser.rootHomeUri()).append("> <").append(Predicates.CR_HAS_FOLDER)
-                .append("> ?folder . FILTER (?folder = <").append(user.getHomeUri()).append(">) . ?folder a cr:UserFolder}");
+        Bindings bindings = new Bindings();
+        bindings.setURI("rootHomeUri", CRUser.rootHomeUri());
+        bindings.setURI("userHomeUri", user.getHomeUri());
 
-        Object resultObject = executeUniqueResultSPARQL(strBuilder.toString(), new SingleObjectReader<String>());
-        if (resultObject != null && resultObject.toString().equals(user.getHomeUri())) {
-            return true;
-        } else {
-            return false;
-        }
+        Object resultObject = executeUniqueResultSPARQL(USER_FOLDER_REGISTERED_SPARQL, bindings, new SingleObjectReader<String>());
+        return resultObject != null && resultObject.toString().equals(user.getHomeUri());
     }
 }

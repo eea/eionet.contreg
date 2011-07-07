@@ -47,7 +47,7 @@ public abstract class AbstractSearchActionBean<T> extends AbstractActionBean {
     protected String sortO = SortOrder.ASCENDING.toString();
     protected String sortP = null;
     protected int matchCount = 0;
-    protected boolean exactCount=true;
+    protected boolean exactCount = true;
 
     /** */
     private Pagination pagination;
@@ -55,7 +55,8 @@ public abstract class AbstractSearchActionBean<T> extends AbstractActionBean {
     /**
      *
      * @return
-     * @throws DAOException TODO
+     * @throws DAOException
+     *             TODO
      */
     public abstract Resolution search() throws DAOException;
 
@@ -74,7 +75,8 @@ public abstract class AbstractSearchActionBean<T> extends AbstractActionBean {
     }
 
     /**
-     * @param resultList the resultList to set
+     * @param resultList
+     *            the resultList to set
      */
     public void setResultList(List<T> resultList) {
         this.resultList = resultList;
@@ -125,10 +127,11 @@ public abstract class AbstractSearchActionBean<T> extends AbstractActionBean {
     }
 
     /**
-     * @param pageN the pageN to set
+     * @param pageN
+     *            the pageN to set
      */
     public void setPageN(int pageNumber) {
-        this.pageN = pageNumber<1 ? 1 : pageNumber;
+        this.pageN = pageNumber < 1 ? 1 : pageNumber;
     }
 
     /**
@@ -139,7 +142,8 @@ public abstract class AbstractSearchActionBean<T> extends AbstractActionBean {
     }
 
     /**
-     * @param sortO the sortO to set
+     * @param sortO
+     *            the sortO to set
      */
     public void setSortO(String sortOrder) {
         this.sortO = sortOrder;
@@ -153,7 +157,8 @@ public abstract class AbstractSearchActionBean<T> extends AbstractActionBean {
     }
 
     /**
-     * @param sortP the sortP to set
+     * @param sortP
+     *            the sortP to set
      */
     public void setSortP(String sortPredicate) {
         this.sortP = sortPredicate;

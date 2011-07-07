@@ -25,6 +25,7 @@ public class HistoryActionBean extends AbstractHomeActionBean {
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.web.action.AbstractSearchActionBean#search()
      */
     @DefaultHandler

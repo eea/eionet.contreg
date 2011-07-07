@@ -31,9 +31,8 @@ import org.openrdf.query.resultio.TupleQueryResultFormat;
 import org.openrdf.query.resultio.TupleQueryResultWriter;
 
 /**
- * A {@link TupleQueryResultWriter} that writes tuple query results in the <a
- * href="http://www.w3.org/TR/rdf-sparql-XMLres/">SPARQL Query Results XML
- * Format</a>.
+ * A {@link TupleQueryResultWriter} that writes tuple query results in the <a href="http://www.w3.org/TR/rdf-sparql-XMLres/">SPARQL
+ * Query Results XML Format</a>.
  */
 public class CRXmlWriter implements TupleQueryResultWriter {
 
@@ -68,19 +67,15 @@ public class CRXmlWriter implements TupleQueryResultWriter {
     }
 
     /**
-     * Enables/disables addition of indentation characters and newlines in the
-     * XML document. By default, pretty-printing is set to <tt>true</tt>. If
-     * set to <tt>false</tt>, no indentation and newlines are added to the XML
-     * document. This method has to be used before writing starts (that is,
-     * before {@link #startQueryResult(List)} is called).
+     * Enables/disables addition of indentation characters and newlines in the XML document. By default, pretty-printing is set to
+     * <tt>true</tt>. If set to <tt>false</tt>, no indentation and newlines are added to the XML document. This method has to be
+     * used before writing starts (that is, before {@link #startQueryResult(List)} is called).
      */
     public void setPrettyPrint(boolean prettyPrint) {
         xmlWriter.setPrettyPrint(prettyPrint);
     }
 
-    public void startQueryResult(List<String> bindingNames)
-        throws TupleQueryResultHandlerException
-    {
+    public void startQueryResult(List<String> bindingNames) throws TupleQueryResultHandlerException {
         try {
             xmlWriter.startDocument();
 
@@ -102,9 +97,7 @@ public class CRXmlWriter implements TupleQueryResultWriter {
         }
     }
 
-    public void endQueryResult()
-        throws TupleQueryResultHandlerException
-    {
+    public void endQueryResult() throws TupleQueryResultHandlerException {
         try {
             xmlWriter.endTag(RESULT_SET_TAG);
             xmlWriter.endTag(ROOT_TAG);
@@ -115,9 +108,7 @@ public class CRXmlWriter implements TupleQueryResultWriter {
         }
     }
 
-    public void handleSolution(BindingSet bindingSet)
-        throws TupleQueryResultHandlerException
-    {
+    public void handleSolution(BindingSet bindingSet) throws TupleQueryResultHandlerException {
         try {
             xmlWriter.startTag(RESULT_TAG);
 
@@ -138,33 +129,25 @@ public class CRXmlWriter implements TupleQueryResultWriter {
         }
     }
 
-    private void writeValue(Value value)
-        throws IOException
-    {
+    private void writeValue(Value value) throws IOException {
         if (value instanceof URI) {
-            writeURI((URI)value);
+            writeURI((URI) value);
         } else if (value instanceof BNode) {
-            writeBNode((BNode)value);
+            writeBNode((BNode) value);
         } else if (value instanceof Literal) {
-            writeLiteral((Literal)value);
+            writeLiteral((Literal) value);
         }
     }
 
-    private void writeURI(URI uri)
-        throws IOException
-    {
+    private void writeURI(URI uri) throws IOException {
         xmlWriter.textElement(URI_TAG, uri.toString());
     }
 
-    private void writeBNode(BNode bNode)
-        throws IOException
-    {
+    private void writeBNode(BNode bNode) throws IOException {
         xmlWriter.textElement(BNODE_TAG, bNode.getID());
     }
 
-    private void writeLiteral(Literal literal)
-        throws IOException
-    {
+    private void writeLiteral(Literal literal) throws IOException {
         if (literal.getLanguage() != null) {
             xmlWriter.setAttribute(LITERAL_LANG_ATT, literal.getLanguage());
         } else if (literal.getDatatype() != null) {

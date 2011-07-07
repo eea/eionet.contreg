@@ -1,23 +1,23 @@
 /*
-* The contents of this file are subject to the Mozilla Public
-*
-* License Version 1.1 (the "License"); you may not use this file
-* except in compliance with the License. You may obtain a copy of
-* the License at http://www.mozilla.org/MPL/
-*
-* Software distributed under the License is distributed on an "AS
-* IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
-* implied. See the License for the specific language governing
-* rights and limitations under the License.
-*
-* The Original Code is Content Registry 2.0.
-*
-* The Initial Owner of the Original Code is European Environment
-* Agency. Portions created by Tieto Eesti are Copyright
-* (C) European Environment Agency. All Rights Reserved.
-*
-* Contributor(s):
-* Jaanus Heinlaid, Tieto Eesti*/
+ * The contents of this file are subject to the Mozilla Public
+ *
+ * License Version 1.1 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of
+ * the License at http://www.mozilla.org/MPL/
+ *
+ * Software distributed under the License is distributed on an "AS
+ * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ * The Original Code is Content Registry 2.0.
+ *
+ * The Initial Owner of the Original Code is European Environment
+ * Agency. Portions created by Tieto Eesti are Copyright
+ * (C) European Environment Agency. All Rights Reserved.
+ *
+ * Contributor(s):
+ * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.api.feeds.amp;
 
 import java.io.IOException;
@@ -35,8 +35,7 @@ import eionet.cr.common.Namespace;
 import eionet.cr.util.sesame.SesameUtil;
 
 /**
- * The AmpFeedServlet searches for objects of rdf:type
- * "http://rdfdata.eionet.europa.eu/amp/ontology/Output". It then outputs the
+ * The AmpFeedServlet searches for objects of rdf:type "http://rdfdata.eionet.europa.eu/amp/ontology/Output". It then outputs the
  * predicates for which there are XML namespace declarations.
  *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
@@ -45,24 +44,26 @@ import eionet.cr.util.sesame.SesameUtil;
 public class AmpFeedServlet extends HttpServlet {
 
     /** */
-    private static final Logger logger = Logger.getLogger(AmpFeedServlet.class);
+    private static final Logger LOGGER = Logger.getLogger(AmpFeedServlet.class);
 
     /** */
-    public static final String sparqlQuery =
+    public static final String SPARQL_QUERY =
         "DEFINE input:inference 'CRInferenceRule'"
         + " select ?s ?p ?o where {?s ?p ?o."
-        + " { select distinct ?s where {?s <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://rdfdata.eionet.europa.eu/amp/ontology/Output> }}}"
+        + " { select distinct ?s where {?s <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> "
+        + " <http://rdfdata.eionet.europa.eu/amp/ontology/Output> }}}"
         + " order by ?s ?p ?o";
 
     /*
      * (non-Javadoc)
      * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
+    @Override
     @SuppressWarnings("unchecked")
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         String methodName = new StringBuffer(AmpFeedServlet.class.getSimpleName()).append(".doGet()").toString();
-        logger.debug("Entered " + methodName);
+        LOGGER.debug("Entered " + methodName);
         response.setContentType("text/xml");
 
         RepositoryConnection conn = null;
@@ -78,10 +79,10 @@ public class AmpFeedServlet extends HttpServlet {
             feedWriter.addNamespace(Namespace.AMP);
             feedWriter.addNamespace(Namespace.OWL);
 
-            SesameUtil.executeQuery(AmpFeedServlet.sparqlQuery, feedWriter, conn);
+            SesameUtil.executeQuery(AmpFeedServlet.SPARQL_QUERY, feedWriter, conn);
 
             int rowCount = feedWriter.getRowCount();
-            if (rowCount==0) {
+            if (rowCount == 0) {
                 feedWriter.writeEmptyHeader();
             } else {
                 feedWriter.closeRDF();
@@ -90,12 +91,12 @@ public class AmpFeedServlet extends HttpServlet {
             // do a final flush for just in case
             outputStream.flush();
 
-            logger.debug("Number of rows that the query returned: " + rowCount);
-            logger.debug("Written triples count: " + feedWriter.getWrittenTriplesCount());
-            logger.debug("Written subjects count: " + feedWriter.getWrittenSubjectsCount());
+            LOGGER.debug("Number of rows that the query returned: " + rowCount);
+            LOGGER.debug("Written triples count: " + feedWriter.getWrittenTriplesCount());
+            LOGGER.debug("Written subjects count: " + feedWriter.getWrittenSubjectsCount());
 
         } catch (Exception e) {
-            logger.error("Error in " + methodName, e);
+            LOGGER.error("Error in " + methodName, e);
             if (!response.isCommitted()) {
                 response.sendError(500);
             }

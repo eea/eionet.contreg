@@ -40,9 +40,9 @@ import eionet.cr.util.URIUtil;
 import eionet.cr.web.security.CRUser;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
- * 
+ *
  */
 
 @UrlBinding("/home/{username}/uploads")
@@ -77,7 +77,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
     private boolean fileExists;
 
     /**
-     * 
+     *
      * @return Resolution
      */
     @DefaultHandler
@@ -87,7 +87,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
     }
 
     /**
-     * 
+     *
      * @return Resolution
      * @throws DAOException
      * @throws IOException
@@ -102,7 +102,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
     }
 
     /**
-     * 
+     *
      * @return Resolution
      * @throws DAOException
      * @throws IOException
@@ -147,7 +147,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
     /**
      * @throws IOException
      * @throws DAOException
-     * 
+     *
      */
     private void saveAndHarvest() throws IOException, DAOException {
 
@@ -191,9 +191,10 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Runnable#run()
      */
+    @Override
     public void run() {
 
         try {
@@ -253,9 +254,9 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
             // persist the prepared "userHome cr:hasFile fileSubject" triple
             logger.debug("Creating the cr:hasFile predicate");
             helperDao.addTriples(homeSubjectDTO);
-            
+
             // make sure that user home is now also registered in CR home context
-            if (!getUser().isHomeFolderRegistered()){
+            if (!getUser().isHomeFolderRegistered()) {
                 helperDao.registerUserFolderInCrHomeContext(getUser());
             }
 
@@ -277,7 +278,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
             // since user's home URI was used above as triple source, add it to HARVEST_SOURCE too
             // (but set interval minutes to 0, to avoid it being background-harvested)
             DAOFactory.get().getDao(HarvestSourceDAO.class)
-                    .addSourceIgnoreDuplicate(HarvestSourceDTO.create(getUser().getHomeUri(), false, 0, getUserName()));
+            .addSourceIgnoreDuplicate(HarvestSourceDTO.create(getUser().getHomeUri(), false, 0, getUserName()));
 
         } catch (DAOException e) {
             saveAndHarvestException = e;
@@ -301,7 +302,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
     }
 
     /**
-     * 
+     *
      * @throws DAOException
      * @throws IOException
      */
@@ -325,7 +326,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
     }
 
     /**
-     * 
+     *
      * @return Resolution
      * @throws DAOException
      */
@@ -349,7 +350,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
     }
 
     /**
-     * 
+     *
      * @return Resolution
      * @throws DAOException
      */
@@ -400,7 +401,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
     }
 
     /**
-     * 
+     *
      * @return Resolution
      */
     public Resolution cancel() {
@@ -410,7 +411,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
 
     /**
      * @throws DAOException
-     * 
+     *
      */
     @ValidationMethod(on = { "add", "rename", "delete" })
     public void validatePostEvent() throws DAOException {
@@ -419,11 +420,14 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
         if (!isPostRequest()) {
             return;
         }
-
-        // for all the above POST events, user must be authorized
-        if (!isUserAuthorized() || getUser() == null) {
+        // for all the above POST events, user must be logged in
+        if (getUser() == null) {
             addGlobalValidationError("User not logged in!");
             return;
+        }
+        // for all the above POST events, user must be authorized
+        if (!isUserAuthorized()) {
+            addGlobalValidationError("User is not authorised to make changes in this folder!");
         }
 
         // if add event, make sure the file bean is not null
@@ -511,7 +515,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
             CRUser user = getUser();
             if (user == null || !isUserAuthorized()) {
                 String attemptedUserName = getAttemptedUserName();
-                if (StringUtils.isBlank(attemptedUserName)) {
+                if (!StringUtils.isBlank(attemptedUserName)) {
                     user = new CRUser(getAttemptedUserName());
                 }
             }
@@ -565,7 +569,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
     }
 
     /**
-     * 
+     *
      * @return String
      */
     public String getFileNameParamPrefix() {

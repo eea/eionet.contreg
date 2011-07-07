@@ -59,6 +59,7 @@ public class SAXDoctypeReader implements LexicalHandler {
 
     /*
      * (non-Javadoc)
+     *
      * @see org.xml.sax.ext.LexicalHandler#startDTD(java.lang.String, java.lang.String, java.lang.String)
      */
     public void startDTD(String name, String publicId, String systemId) throws SAXException {
@@ -66,32 +67,52 @@ public class SAXDoctypeReader implements LexicalHandler {
         this.dtdPublicId = publicId;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see org.xml.sax.ext.LexicalHandler#endDTD()
      */
-    public void endDTD() throws SAXException {}
-    /* (non-Javadoc)
-     * @see org.xml.sax.ext.LexicalHandler#startEntity(java.lang.String)
-     */
-    public void startEntity(String name) throws SAXException {}
-    /* (non-Javadoc)
-     * @see org.xml.sax.ext.LexicalHandler#endEntity(java.lang.String)
-     */
-    public void endEntity(String name) throws SAXException {}
-    /* (non-Javadoc)
-     * @see org.xml.sax.ext.LexicalHandler#startCDATA()
-     */
-    public void startCDATA() throws SAXException {}
-    /* (non-Javadoc)
-     * @see org.xml.sax.ext.LexicalHandler#endCDATA()
-     */
-    public void endCDATA() throws SAXException {}
+    public void endDTD() throws SAXException {
+    }
 
     /*
      * (non-Javadoc)
+     *
+     * @see org.xml.sax.ext.LexicalHandler#startEntity(java.lang.String)
+     */
+    public void startEntity(String name) throws SAXException {
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.xml.sax.ext.LexicalHandler#endEntity(java.lang.String)
+     */
+    public void endEntity(String name) throws SAXException {
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.xml.sax.ext.LexicalHandler#startCDATA()
+     */
+    public void startCDATA() throws SAXException {
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.xml.sax.ext.LexicalHandler#endCDATA()
+     */
+    public void endCDATA() throws SAXException {
+    }
+
+    /*
+     * (non-Javadoc)
+     *
      * @see org.xml.sax.ext.LexicalHandler#comment(char[], int, int)
      */
-    public void comment (char[] text, int start, int length) throws SAXException {
+    public void comment(char[] text, int start, int length) throws SAXException {
     }
 
     /**

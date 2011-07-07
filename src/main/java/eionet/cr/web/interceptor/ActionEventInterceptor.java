@@ -22,7 +22,9 @@ package eionet.cr.web.interceptor;
 
 import static eionet.cr.web.util.WebConstants.LAST_ACTION_URL_SESSION_ATTR;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
+import java.net.URLEncoder;
 import java.util.Enumeration;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -38,6 +40,9 @@ import net.sourceforge.stripes.controller.ExecutionContext;
 import net.sourceforge.stripes.controller.Interceptor;
 import net.sourceforge.stripes.controller.Intercepts;
 import net.sourceforge.stripes.controller.LifecycleStage;
+
+import org.apache.log4j.Logger;
+
 import eionet.cr.util.Util;
 import eionet.cr.web.action.home.AbstractHomeActionBean;
 import eionet.cr.web.interceptor.annotation.DontSaveLastActionEvent;
@@ -46,13 +51,20 @@ import eionet.cr.web.util.UserHomeUrlExtractor;
 /**
  * Interceptor that saves to the session last action except login action.
  * <p>
+ *
  * @author gerasvad
  *
  */
-@Intercepts(value=LifecycleStage.EventHandling)
+@Intercepts(value = LifecycleStage.EventHandling)
 public class ActionEventInterceptor implements Interceptor {
+    /**
+     * Class internal logger.
+     */
+    private static final Logger LOGGER = Logger.getLogger(ActionEventInterceptor.class);
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see net.sourceforge.stripes.controller.Interceptor#intercept(net.sourceforge.stripes.controller.ExecutionContext)
      */
     public Resolution intercept(ExecutionContext context) throws Exception {
@@ -69,13 +81,14 @@ public class ActionEventInterceptor implements Interceptor {
             String actionEventURL = null;
 
             if (actionBean instanceof AbstractHomeActionBean) {
-                actionEventURL = "/home/"+UserHomeUrlExtractor.extractUserNameFromHomeUrl(request.getRequestURI());
+                actionEventURL = "/home/" + UserHomeUrlExtractor.extractUserNameFromHomeUrl(request.getRequestURI());
             } else {
-                actionEventURL = getActionName(actionBean.getClass()) + "?" +
-                ((getEventName(eventMethod) != null) ? getEventName(eventMethod) + "=&" : "") +
-                getRequestParameters(request);
+                actionEventURL =
+                        getActionName(actionBean.getClass()) + "?"
+                                + ((getEventName(eventMethod) != null) ? getEventName(eventMethod) + "=&" : "")
+                                + getRequestParameters(request);
 
-                //this will handle pretty url integration
+                // this will handle pretty url integration
                 actionEventURL = postProcess(actionEventURL);
             }
             request.getSession().setAttribute(LAST_ACTION_URL_SESSION_ATTR, actionEventURL);
@@ -87,37 +100,37 @@ public class ActionEventInterceptor implements Interceptor {
 
     private static String postProcess(String actionEventURL) {
         StringBuilder sb = new StringBuilder(actionEventURL);
-        //first, let's split the string into 2 parts
+        // first, let's split the string into 2 parts
         int actionEndPosition = actionEventURL.indexOf("?");
         String action = actionEventURL.substring(0, actionEndPosition);
         String params = actionEventURL.substring(actionEndPosition + 1);
         Matcher matcher = Pattern.compile("\\{([^\\{]*)\\}").matcher(action);
         while (matcher.find()) {
-            //ok, let's start parsing
-            Matcher paramMatcher = Pattern.compile(matcher.group(1)+"=([^&]*)").matcher(params);
-            //let's find a value to this one
+            // ok, let's start parsing
+            Matcher paramMatcher = Pattern.compile(matcher.group(1) + "=([^&]*)").matcher(params);
+            // let's find a value to this one
             if (!paramMatcher.find()) {
-                //didn't find a value for this param, cannot substitute anything
+                // didn't find a value for this param, cannot substitute anything
                 continue;
             }
             String paramValue = paramMatcher.group(1);
             int insertPoint = sb.indexOf(matcher.group(0));
-            //replace the {xxx} stuff with paramValue
-            sb.delete(insertPoint, insertPoint + matcher.group(0).length()).insert(insertPoint,paramValue);
+            // replace the {xxx} stuff with paramValue
+            sb.delete(insertPoint, insertPoint + matcher.group(0).length()).insert(insertPoint, paramValue);
             insertPoint = sb.indexOf(paramMatcher.group(0));
-            //delete the parameter
-            sb.delete(insertPoint,insertPoint +  paramMatcher.group(0).length());
+            // delete the parameter
+            sb.delete(insertPoint, insertPoint + paramMatcher.group(0).length());
         }
-        //if we have a "?" at the end of the string, delete it
-        if (sb.charAt(sb.length()-1) == '?') {
-            sb.deleteCharAt(sb.length()-1);
+        // if we have a "?" at the end of the string, delete it
+        if (sb.charAt(sb.length() - 1) == '?') {
+            sb.deleteCharAt(sb.length() - 1);
         }
 
-        return  sb.toString();
+        return sb.toString();
     }
 
     private static String getActionName(Class<?> actionBeanClass) {
-        String result =  "/" + actionBeanClass.getName() + ".action";
+        String result = "/" + actionBeanClass.getName() + ".action";
 
         if (actionBeanClass.isAnnotationPresent(UrlBinding.class)) {
             UrlBinding urlBinding = actionBeanClass.getAnnotation(UrlBinding.class);
@@ -156,13 +169,17 @@ public class ActionEventInterceptor implements Interceptor {
                 sb.append(parameter + "=&");
             } else {
                 for (String parameterValue : parameterValues) {
-                    sb.append(parameter + "=" +
-                            (Util.isNullOrEmpty(parameterValue) ? "" : parameterValue) +  "&");
+                    String encodedParameterValue = parameterValue;
+                    try {
+                        encodedParameterValue = URLEncoder.encode(parameterValue, "utf-8");
+                    } catch (UnsupportedEncodingException ue) {
+                        LOGGER.error(ue.toString());
+                    }
+                    sb.append(parameter + "=" + (Util.isNullOrEmpty(parameterValue) ? "" : encodedParameterValue) + "&");
                 }
             }
         }
 
         return sb.length() > 0 ? sb.substring(0, sb.length() - 1) : sb.toString();
     }
-
 }

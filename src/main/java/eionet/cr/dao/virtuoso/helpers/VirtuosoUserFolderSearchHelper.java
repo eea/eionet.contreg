@@ -42,13 +42,11 @@ public class VirtuosoUserFolderSearchHelper extends AbstractSearchHelper {
     private String parentFolderUri;
     private Bindings bindings;
 
-    public VirtuosoUserFolderSearchHelper(String parentFolderUri, PagingRequest pagingRequest,
-            SortingRequest sortingRequest) {
+    public VirtuosoUserFolderSearchHelper(String parentFolderUri, PagingRequest pagingRequest, SortingRequest sortingRequest) {
         super(pagingRequest, sortingRequest);
         // check the validity of filters
         if (parentFolderUri == null || !URLUtil.isURL(parentFolderUri)) {
-            throw new CRRuntimeException(
-                    "Parent folder has to be defined!");
+            throw new CRRuntimeException("Parent folder has to be defined!");
         }
         this.parentFolderUri = parentFolderUri;
         bindings = new Bindings();
@@ -119,7 +117,7 @@ public class VirtuosoUserFolderSearchHelper extends AbstractSearchHelper {
             bindings.setURI("sortPredicateValue", sortPredicate);
         }
 
-        return s; //strBuilder.toString();
+        return s; // strBuilder.toString();
     }
 
     @Override

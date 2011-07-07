@@ -6,11 +6,11 @@
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
  * of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
  * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License along with this library.
  * If not, see <http://www.gnu.org/licenses/>.
  */
@@ -42,9 +42,9 @@ import eionet.cr.filestore.FileStore;
 import eionet.cr.web.util.StripesExceptionHandler;
 
 /**
- * 
+ *
  * @author jaanus
- * 
+ *
  */
 public class DownloadServlet extends HttpServlet {
 
@@ -63,7 +63,7 @@ public class DownloadServlet extends HttpServlet {
 
     /**
      * Process HEAD request. This returns the same headers as GET request, but without content.
-     * 
+     *
      * @see HttpServlet#doHead(HttpServletRequest, HttpServletResponse).
      */
     protected void doHead(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -73,7 +73,7 @@ public class DownloadServlet extends HttpServlet {
 
     /**
      * Process GET request.
-     * 
+     *
      * @see HttpServlet#doGet(HttpServletRequest, HttpServletResponse).
      */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -83,7 +83,7 @@ public class DownloadServlet extends HttpServlet {
 
     /**
      * Process the actual request.
-     * 
+     *
      * @param request
      *            The request to be processed.
      * @param response
@@ -106,7 +106,7 @@ public class DownloadServlet extends HttpServlet {
 
         // Get the file object from the file store
         File file = FileStore.getByUri(requestedUri);
-        
+
         // If file was not found, send 404.
         if (file == null) {
             handleFileNotFound("Could not find file by the following URI: " + requestedUri, request, response);
@@ -229,15 +229,13 @@ public class DownloadServlet extends HttpServlet {
 
         // If content type is text, then determine whether GZIP content encoding is supported by
         // the browser and expand content type with the one and right character encoding.
+        // Else, expect for images, determine content disposition. If content type is supported by
+        // the browser, then set to inline, else attachment which will pop a 'save as' dialogue.
         if (contentType.startsWith("text")) {
             String acceptEncoding = request.getHeader("Accept-Encoding");
             acceptsGzip = acceptEncoding != null && accepts(acceptEncoding, "gzip");
             contentType += ";charset=UTF-8";
-        }
-
-        // Else, expect for images, determine content disposition. If content type is supported by
-        // the browser, then set to inline, else attachment which will pop a 'save as' dialogue.
-        else if (!contentType.startsWith("image")) {
+        } else if (!contentType.startsWith("image")) {
             String accept = request.getHeader("Accept");
             disposition = accept != null && accepts(accept, contentType) ? "inline" : "attachment";
         }
@@ -333,7 +331,7 @@ public class DownloadServlet extends HttpServlet {
     }
 
     /**
-     * 
+     *
      * @param message
      * @param request
      * @param response
@@ -374,7 +372,7 @@ public class DownloadServlet extends HttpServlet {
 
     /**
      * Returns true if the given accept header accepts the given value.
-     * 
+     *
      * @param acceptHeader
      *            The accept header.
      * @param toAccept
@@ -391,7 +389,7 @@ public class DownloadServlet extends HttpServlet {
 
     /**
      * Returns true if the given match header matches the given value.
-     * 
+     *
      * @param matchHeader
      *            The match header.
      * @param toMatch
@@ -407,7 +405,7 @@ public class DownloadServlet extends HttpServlet {
     /**
      * Returns a substring of the given string value from the given begin index to the given end index as a long. If the substring
      * is empty, then -1 will be returned
-     * 
+     *
      * @param value
      *            The string value to return a substring as long for.
      * @param beginIndex
@@ -423,7 +421,7 @@ public class DownloadServlet extends HttpServlet {
 
     /**
      * Copy the given byte range of the given input to the given output.
-     * 
+     *
      * @param input
      *            The input to copy the given range to the given output for.
      * @param output
@@ -462,7 +460,7 @@ public class DownloadServlet extends HttpServlet {
 
     /**
      * Close the given resource.
-     * 
+     *
      * @param resource
      *            The resource to be closed.
      */
@@ -490,7 +488,7 @@ public class DownloadServlet extends HttpServlet {
 
         /**
          * Construct a byte range.
-         * 
+         *
          * @param start
          *            Start of the byte range.
          * @param end

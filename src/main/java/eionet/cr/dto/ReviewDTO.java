@@ -11,7 +11,7 @@ import org.apache.commons.lang.StringEscapeUtils;
  *
  */
 
-public class ReviewDTO  implements Serializable {
+public class ReviewDTO implements Serializable {
 
     /** */
     private String reviewSubjectUri;
@@ -28,11 +28,12 @@ public class ReviewDTO  implements Serializable {
     public String getReviewSubjectUri() {
         return reviewSubjectUri;
     }
+
     /**
      * @param reviewSubjectUri
      */
     public void setReviewSubjectUri(String reviewSubjectUri) {
-        
+
         int reviewID = -1;
         int i = reviewSubjectUri.lastIndexOf('/');
         if (i != -1) {
@@ -42,7 +43,7 @@ public class ReviewDTO  implements Serializable {
             } catch (NumberFormatException e) {
             }
         }
-        
+
         if (reviewID == -1) {
             throw new IllegalArgumentException("Malformed review URI: " + reviewSubjectUri);
         } else {
@@ -57,12 +58,14 @@ public class ReviewDTO  implements Serializable {
     public String getTitle() {
         return title;
     }
+
     /**
      * @param title
      */
     public void setTitle(String title) {
         this.title = title;
     }
+
     /**
      * @return
      */
@@ -83,12 +86,14 @@ public class ReviewDTO  implements Serializable {
     public void setObjectUrl(String objectUrl) {
         this.objectUrl = objectUrl;
     }
+
     /**
      * @return
      */
     public String getReviewContent() {
         return reviewContent;
     }
+
     /**
      * @param reviewContent
      */
@@ -102,18 +107,21 @@ public class ReviewDTO  implements Serializable {
     public String getReviewSubjectHtmlFormatted() {
         return StringEscapeUtils.escapeHtml(reviewSubjectUri);
     }
+
     /**
      * @return
      */
     public int getReviewID() {
         return reviewID;
     }
+
     /**
      * @return
      */
     public List<String> getAttachments() {
         return attachments;
     }
+
     /**
      * @param attachments
      */
@@ -127,6 +135,7 @@ public class ReviewDTO  implements Serializable {
     public String getReviewContentType() {
         return reviewContentType;
     }
+
     /**
      * @param reviewContentType
      */

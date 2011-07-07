@@ -44,6 +44,7 @@ public enum SortOrder {
 
     /*
      * (non-Javadoc)
+     *
      * @see java.lang.Enum#toString()
      */
     public String toString() {

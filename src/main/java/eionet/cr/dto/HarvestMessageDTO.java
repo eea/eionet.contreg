@@ -46,44 +46,55 @@ public class HarvestMessageDTO implements java.io.Serializable {
     public Integer getHarvestId() {
         return harvestId;
     }
+
     /**
-     * @param harvestID the harvestID to set
+     * @param harvestID
+     *            the harvestID to set
      */
     public void setHarvestId(Integer harvestID) {
         this.harvestId = harvestID;
     }
+
     /**
      * @return the type
      */
     public String getType() {
         return type;
     }
+
     /**
-     * @param type the type to set
+     * @param type
+     *            the type to set
      */
     public void setType(String type) {
         this.type = type;
     }
+
     /**
      * @return the message
      */
     public String getMessage() {
         return message;
     }
+
     /**
-     * @param message the message to set
+     * @param message
+     *            the message to set
      */
     public void setMessage(String message) {
         this.message = message;
     }
+
     /**
      * @return the stackTrace
      */
     public String getStackTrace() {
         return stackTrace;
     }
+
     /**
-     * @param stackTrace the stackTrace to set
+     * @param stackTrace
+     *            the stackTrace to set
      */
     public void setStackTrace(String stackTrace) {
         this.stackTrace = stackTrace;

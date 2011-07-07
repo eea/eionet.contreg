@@ -24,7 +24,6 @@ import java.text.SimpleDateFormat;
 
 import eionet.cr.web.action.AbstractActionBean;
 
-
 /**
  *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
@@ -50,7 +49,7 @@ public abstract class SearchResultColumn {
      *
      */
     public SearchResultColumn() {
-        //blank constructor
+        // blank constructor
     }
 
     /**
@@ -89,20 +88,25 @@ public abstract class SearchResultColumn {
     public String getTitle() {
         return title;
     }
+
     /**
-     * @param title the title to set
+     * @param title
+     *            the title to set
      */
     public void setTitle(String title) {
         this.title = title;
     }
+
     /**
      * @return the isSortable
      */
     public boolean isSortable() {
         return isSortable;
     }
+
     /**
-     * @param isSortable the isSortable to set
+     * @param isSortable
+     *            the isSortable to set
      */
     public void setSortable(boolean isSortable) {
         this.isSortable = isSortable;
@@ -116,7 +120,8 @@ public abstract class SearchResultColumn {
     }
 
     /**
-     * @param actionRequestParameter the actionRequestParameter to set
+     * @param actionRequestParameter
+     *            the actionRequestParameter to set
      */
     public void setActionRequestParameter(String actionRequestParameter) {
         this.actionRequestParameter = actionRequestParameter;
@@ -130,7 +135,8 @@ public abstract class SearchResultColumn {
     }
 
     /**
-     * @param actionBean the actionBean to set
+     * @param actionBean
+     *            the actionBean to set
      */
     public void setActionBean(AbstractActionBean actionBean) {
         this.actionBean = actionBean;

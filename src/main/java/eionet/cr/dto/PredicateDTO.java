@@ -47,6 +47,7 @@ public class PredicateDTO {
 
     /*
      * (non-Javadoc)
+     *
      * @see java.lang.Object#toString()
      */
     public String toString() {
@@ -55,6 +56,7 @@ public class PredicateDTO {
 
     /*
      * (non-Javadoc)
+     *
      * @see java.lang.Object#equals(java.lang.Object)
      */
     public boolean equals(Object other) {
@@ -65,13 +67,13 @@ public class PredicateDTO {
         if (!(other instanceof PredicateDTO))
             return false;
 
-
-        String otherValue = ((PredicateDTO)other).getValue();
+        String otherValue = ((PredicateDTO) other).getValue();
         return getValue() == null ? otherValue == null : getValue().equals(otherValue);
     }
 
     /*
      * (non-Javadoc)
+     *
      * @see java.lang.Object#hashCode()
      */
     public int hashCode() {

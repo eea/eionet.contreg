@@ -1,6 +1,5 @@
 package eionet.cr.web.action;
 
-
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.HandlesEvent;
@@ -19,8 +18,8 @@ import eionet.cr.web.util.RegisterUrl;
 
 /**
  * Bookmarklet backend action bean.
- * @author Aleksandr Ivanov
- * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
+ *
+ * @author Aleksandr Ivanov <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a> (modified for CR)
  */
 @UrlBinding("/quickAddBookmark.action")
@@ -41,17 +40,16 @@ public class QuickAddBookmarkActionBean extends AbstractActionBean {
     }
 
     @HandlesEvent("processForm")
-    public Resolution  addBookmark()  throws DAOException, HarvestException {
+    public Resolution addBookmark() throws DAOException, HarvestException {
         String url = resource.getSource();
         RegisterUrl.register(url, getUser(), saveToBookmarks);
         return new ForwardResolution("/pages/bookmarklet/bookmarkAdded.jsp");
     }
 
-
     /**
      *
      */
-    @ValidationMethod(on="processForm")
+    @ValidationMethod(on = "processForm")
     public void validateSave() {
 
         if (StringUtils.isBlank(resource.getSource()) || !URLUtil.isURL(resource.getSource())) {
@@ -66,7 +64,6 @@ public class QuickAddBookmarkActionBean extends AbstractActionBean {
     public Resolution installation() {
         return new ForwardResolution("/pages/bookmarklet/bookmarkletInstaller.jsp");
     }
-
 
     /**
      * @return bookmarklet script
@@ -94,8 +91,6 @@ public class QuickAddBookmarkActionBean extends AbstractActionBean {
                 + ", 'Add bookmark to Content Registry', 'left=20,top=20,width=700,height=500')}; go();";
     }
 
-
-
     /**
      * @return the resource
      */
@@ -104,13 +99,12 @@ public class QuickAddBookmarkActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param resource the resource to set
+     * @param resource
+     *            the resource to set
      */
     public void setResource(BookmarkFormDTO resource) {
         this.resource = resource;
     }
-
-
 
     /**
      * @return the originalPageUrl
@@ -120,7 +114,8 @@ public class QuickAddBookmarkActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param originalPageUrl the originalPageUrl to set
+     * @param originalPageUrl
+     *            the originalPageUrl to set
      */
     public void setOriginalPageUrl(String originalPageUrl) {
         this.originalPageUrl = originalPageUrl;

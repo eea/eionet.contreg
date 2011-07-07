@@ -51,7 +51,7 @@ import eionet.cr.web.util.columns.SubjectPredicateColumn;
  */
 
 @UrlBinding("/tagSearch.action")
-public class TagSearchActionBean  extends AbstractSearchActionBean<SubjectDTO> {
+public class TagSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 
     private static final String TAG_SEARCH_PATH = "/pages/tagSearch.jsp";
     private static final String SELECTED_TAGS_CACHE = TypeSearchActionBean.class.getName() + ".selectedTagsCache";
@@ -59,10 +59,10 @@ public class TagSearchActionBean  extends AbstractSearchActionBean<SubjectDTO> {
     private List<TagDTO> tagCloud;
     private String cloudSorted = "name";
     private String searchTag;
-    //selected tags
+    // selected tags
     private List<String> selectedTags;
-    //columns
-    private final static ArrayList<SearchResultColumn> columns;
+    // columns
+    private static final ArrayList<SearchResultColumn> columns;
 
     private int tagCloudSize = Integer.parseInt(GeneralConfig.getProperty(GeneralConfig.TAGCOLUD_TAGSEARCH_SIZE));
 
@@ -87,21 +87,24 @@ public class TagSearchActionBean  extends AbstractSearchActionBean<SubjectDTO> {
         col.setSortable(false);
         columns.add(col);
     }
+
     /**
      * @return
      * @throws Exception
      */
     @DefaultHandler
-    public Resolution preparePage () throws Exception {
+    public Resolution preparePage() throws Exception {
         tagCloud = ApplicationCache.getTagCloudSortedByName(tagCloudSize);
         return new ForwardResolution(TAG_SEARCH_PATH);
     }
-    public Resolution sortByName () throws Exception {
+
+    public Resolution sortByName() throws Exception {
         tagCloud = ApplicationCache.getTagCloudSortedByName(tagCloudSize);
         cloudSorted = "name";
         return new ForwardResolution(TAG_SEARCH_PATH);
     }
-    public Resolution sortByCount () throws Exception {
+
+    public Resolution sortByCount() throws Exception {
         tagCloud = ApplicationCache.getTagCloudSortedByCount(tagCloudSize);
         cloudSorted = "count";
         return new ForwardResolution(TAG_SEARCH_PATH);
@@ -110,8 +113,7 @@ public class TagSearchActionBean  extends AbstractSearchActionBean<SubjectDTO> {
     @Override
     public Resolution search() throws DAOException {
 
-        if ((searchTag == null || searchTag.isEmpty()) &&
-                (selectedTags == null || selectedTags.isEmpty())) {
+        if ((searchTag == null || searchTag.isEmpty()) && (selectedTags == null || selectedTags.isEmpty())) {
             return new ForwardResolution(TAG_SEARCH_PATH);
         }
         if (selectedTags == null) {
@@ -122,15 +124,14 @@ public class TagSearchActionBean  extends AbstractSearchActionBean<SubjectDTO> {
             selectedTags.add(getSearchTag().trim());
         }
 
-        List<String> predicates = Arrays.asList(
-                new String[]{Predicates.RDF_TYPE, Predicates.RDFS_LABEL, Predicates.CR_TAG});
+        List<String> predicates = Arrays.asList(new String[] {Predicates.RDF_TYPE, Predicates.RDFS_LABEL, Predicates.CR_TAG});
 
         Pair<Integer, List<SubjectDTO>> customSearch =
-            DAOFactory.get().getDao(SearchDAO.class).searchByTags(
-                            selectedTags,
-                            PagingRequest.create(getPageN()),
-                            new SortingRequest(getSortP(), SortOrder.parse(getSortO())),
-                            predicates);
+                DAOFactory
+                        .get()
+                        .getDao(SearchDAO.class)
+                        .searchByTags(selectedTags, PagingRequest.create(getPageN()),
+                                new SortingRequest(getSortP(), SortOrder.parse(getSortO())), predicates);
         resultList = customSearch.getRight();
         matchCount = customSearch.getLeft();
         this.getContext().getRequest().setAttribute("searchTag", "");
@@ -139,18 +140,20 @@ public class TagSearchActionBean  extends AbstractSearchActionBean<SubjectDTO> {
 
         return new ForwardResolution(TAG_SEARCH_PATH).addParameter("searchTag", "");
     }
+
     /*
      * reads the selected tag list from session
      */
     @SuppressWarnings("unchecked")
     public Resolution addTag() throws DAOException {
-        selectedTags = (List<String>)getSession().getAttribute(SELECTED_TAGS_CACHE);
+        selectedTags = (List<String>) getSession().getAttribute(SELECTED_TAGS_CACHE);
 
         return search();
     }
+
     @SuppressWarnings("unchecked")
     public Resolution removeTag() throws Exception {
-        selectedTags = (List<String>)getSession().getAttribute(SELECTED_TAGS_CACHE);
+        selectedTags = (List<String>) getSession().getAttribute(SELECTED_TAGS_CACHE);
         if (selectedTags != null && !selectedTags.isEmpty()) {
             selectedTags.remove(searchTag);
         }
@@ -163,10 +166,11 @@ public class TagSearchActionBean  extends AbstractSearchActionBean<SubjectDTO> {
             result = search();
         }
         if (result instanceof ForwardResolution) {
-            ((ForwardResolution)result).addParameter("searchTag", "");
+            ((ForwardResolution) result).addParameter("searchTag", "");
         }
         return result;
     }
+
     public List<TagDTO> getTagCloud() {
         return tagCloud;
     }
@@ -175,7 +179,6 @@ public class TagSearchActionBean  extends AbstractSearchActionBean<SubjectDTO> {
         this.tagCloud = tagCloud;
     }
 
-
     public String getCloudSorted() {
         return cloudSorted;
     }
@@ -183,15 +186,19 @@ public class TagSearchActionBean  extends AbstractSearchActionBean<SubjectDTO> {
     public String getSearchTag() {
         return searchTag;
     }
+
     public void setSearchTag(String searchTag) {
         this.searchTag = searchTag;
     }
+
     public List<String> getSelectedTags() {
         return selectedTags;
     }
+
     public void setSelectedTags(List<String> selectedTags) {
         this.selectedTags = selectedTags;
     }
+
     @Override
     public List<SearchResultColumn> getColumns() throws DAOException {
 

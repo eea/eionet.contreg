@@ -36,7 +36,8 @@ public class HarvestedUrlCountActionBean extends AbstractSearchActionBean<Harves
         if (getUser() != null) {
             if (getUser().isAdministrator()) {
                 setAdminLoggedIn(true);
-                Pair<Integer, List<HarvestedUrlCountDTO>> result = DAOFactory.get().getDao(HarvestSourceDAO.class).getLatestHarvestedURLs(harvestedUrlDays);
+                Pair<Integer, List<HarvestedUrlCountDTO>> result =
+                        DAOFactory.get().getDao(HarvestSourceDAO.class).getLatestHarvestedURLs(harvestedUrlDays);
                 resultList = result.getRight();
                 matchCount = 0;
                 resultsFound = result.getLeft();
@@ -55,19 +56,20 @@ public class HarvestedUrlCountActionBean extends AbstractSearchActionBean<Harves
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
      */
     public List<SearchResultColumn> getColumns() {
 
         LinkedList<SearchResultColumn> columnList = new LinkedList<SearchResultColumn>();
 
-        HarvestedUrlCountColumn dateColumn= new HarvestedUrlCountColumn();
+        HarvestedUrlCountColumn dateColumn = new HarvestedUrlCountColumn();
         dateColumn.setColumnType(COLUMN.HARVESTDAYSTRING);
         dateColumn.setSortable(false);
         dateColumn.setTitle("Harvest day");
         columnList.add(dateColumn);
 
-        HarvestedUrlCountColumn intervalColumn= new HarvestedUrlCountColumn();
+        HarvestedUrlCountColumn intervalColumn = new HarvestedUrlCountColumn();
         intervalColumn.setColumnType(COLUMN.HARVESTCOUNT);
         intervalColumn.setSortable(false);
         intervalColumn.setTitle("Harvest count");
@@ -75,7 +77,6 @@ public class HarvestedUrlCountActionBean extends AbstractSearchActionBean<Harves
 
         return columnList;
     }
-
 
     public Resolution filter() throws DAOException, AccessException {
         return view();

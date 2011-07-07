@@ -79,7 +79,8 @@ public class XmlAnalysis {
                 if (inputStream != null) {
                     inputStream.close();
                 }
-            } catch (IOException e) {}
+            } catch (IOException e) {
+            }
         }
     }
 
@@ -94,7 +95,8 @@ public class XmlAnalysis {
                 if (inputStream != null) {
                     inputStream.close();
                 }
-            } catch (IOException e) {}
+            } catch (IOException e) {
+            }
         }
     }
 
@@ -223,11 +225,13 @@ public class XmlAnalysis {
         private String startElemNamespace = null;
         private String schemaLocation = null;
         private String schemaNamespace = null;
-        private HashMap<String,String> usedNamespaces = new HashMap<String,String>();
+        private HashMap<String, String> usedNamespaces = new HashMap<String, String>();
 
         /*
          * (non-Javadoc)
-         * @see org.xml.sax.helpers.DefaultHandler#startElement(java.lang.String, java.lang.String, java.lang.String, org.xml.sax.Attributes)
+         *
+         * @see org.xml.sax.helpers.DefaultHandler#startElement(java.lang.String, java.lang.String, java.lang.String,
+         * org.xml.sax.Attributes)
          */
         public void startElement(String uri, String localName, String qName, Attributes attrs) throws SAXException {
 
@@ -237,7 +241,7 @@ public class XmlAnalysis {
             int attrCount = attrs != null ? attrs.getLength() : 0;
             for (int i = 0; i < attrCount; i++) {
 
-                String attrName =  attrs.getLocalName(i);
+                String attrName = attrs.getLocalName(i);
                 if (attrName.equalsIgnoreCase("noNamespaceSchemaLocation"))
                     this.schemaLocation = attrs.getValue(i);
                 else if (attrName.equalsIgnoreCase("schemaLocation")) {
@@ -267,6 +271,7 @@ public class XmlAnalysis {
 
         /*
          * (non-Javadoc)
+         *
          * @see org.xml.sax.helpers.DefaultHandler#error(org.xml.sax.SAXParseException)
          */
         public void error(SAXParseException e) {
@@ -274,6 +279,7 @@ public class XmlAnalysis {
 
         /*
          * (non-Javadoc)
+         *
          * @see org.xml.sax.helpers.DefaultHandler#fatalError(org.xml.sax.SAXParseException)
          */
         public void fatalError(SAXParseException e) {
@@ -281,9 +287,10 @@ public class XmlAnalysis {
 
         /*
          * (non-Javadoc)
+         *
          * @see org.xml.sax.helpers.DefaultHandler#warning(org.xml.sax.SAXParseException)
          */
-        public void warning (SAXParseException e) throws SAXException {
+        public void warning(SAXParseException e) throws SAXException {
         }
 
         /**
@@ -315,16 +322,16 @@ public class XmlAnalysis {
         }
     }
 
-//  public static void main(String[] args) {
-//
-//      XmlAnalysis info = new XmlAnalysis();
-//      try {
-//          info.parse(new File("C:/temp/MonthlyOzoneExceedances_Sept2010.xml"));
-//          System.out.println(info.getStartElemLocalName());
-//          System.out.println(info.getStartElemNamespace());
-//      }
-//      catch (Throwable t) {
-//          t.printStackTrace();
-//      }
-//  }
+    // public static void main(String[] args) {
+    //
+    // XmlAnalysis info = new XmlAnalysis();
+    // try {
+    // info.parse(new File("C:/temp/MonthlyOzoneExceedances_Sept2010.xml"));
+    // System.out.println(info.getStartElemLocalName());
+    // System.out.println(info.getStartElemNamespace());
+    // }
+    // catch (Throwable t) {
+    // t.printStackTrace();
+    // }
+    // }
 }

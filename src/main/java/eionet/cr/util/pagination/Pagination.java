@@ -66,7 +66,7 @@ public class Pagination {
         this.numOfPages = numOfPages;
         this.curPageNum = curPageNum;
         this.urlPath = urlPath;
-        this.queryString = queryString == null ? QueryString.createQueryString() :  queryString;
+        this.queryString = queryString == null ? QueryString.createQueryString() : queryString;
 
         constructPages();
     }
@@ -101,14 +101,14 @@ public class Pagination {
      * @param actionBean
      * @return
      */
-    public static Pagination createPagination(int matchCount, int pageNumber,
-            AbstractActionBean actionBean) {
+    public static Pagination createPagination(int matchCount, int pageNumber, AbstractActionBean actionBean) {
 
-        return createPagination(matchCount,
+        return createPagination(
+                matchCount,
                 pageNumber,
                 actionBean.getUrlBinding(),
-                QueryString.createQueryString(actionBean.getContext().getRequest()).
-                removeParameters(actionBean.excludeFromSortAndPagingUrls()));
+                QueryString.createQueryString(actionBean.getContext().getRequest()).removeParameters(
+                        actionBean.excludeFromSortAndPagingUrls()));
     }
 
     /**
@@ -118,8 +118,12 @@ public class Pagination {
      */
     public static Pagination createPagination(AbstractSearchActionBean actionBean) {
 
-        return Pagination.createPagination(actionBean.getMatchCount(), actionBean.getPageN(), actionBean.getUrlBinding(),
-                QueryString.createQueryString(actionBean.getContext().getRequest()).removeParameters(actionBean.excludeFromSortAndPagingUrls()));
+        return Pagination.createPagination(
+                actionBean.getMatchCount(),
+                actionBean.getPageN(),
+                actionBean.getUrlBinding(),
+                QueryString.createQueryString(actionBean.getContext().getRequest()).removeParameters(
+                        actionBean.excludeFromSortAndPagingUrls()));
     }
 
     /**
@@ -155,7 +159,8 @@ public class Pagination {
     private String getPageHref(int pageNum) {
 
         StringBuffer buf = new StringBuffer(urlPath);
-        return buf.append("?").append(queryString.setParameterValue(PAGE_NUM_PARAM, String.valueOf(pageNum)).toURLFormat()).toString();
+        return buf.append("?").append(queryString.setParameterValue(PAGE_NUM_PARAM, String.valueOf(pageNum)).toURLFormat())
+                .toString();
     }
 
     /**

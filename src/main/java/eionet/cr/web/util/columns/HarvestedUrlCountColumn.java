@@ -12,12 +12,15 @@ import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
 
 public class HarvestedUrlCountColumn extends SearchResultColumn {
 
-    public enum COLUMN {HARVESTDAY, HARVESTCOUNT, HARVESTDAYSTRING};
+    public enum COLUMN {
+        HARVESTDAY, HARVESTCOUNT, HARVESTDAYSTRING
+    };
 
     private COLUMN columnType;
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.web.util.columns.SearchResultColumn#format(java.lang.Object)
      */
     public String format(Object object) {
@@ -25,8 +28,7 @@ public class HarvestedUrlCountColumn extends SearchResultColumn {
         String result = "";
         if (object != null) {
 
-            HarvestedUrlCountDTO harvestUrgencyScore = (HarvestedUrlCountDTO)object;
-
+            HarvestedUrlCountDTO harvestUrgencyScore = (HarvestedUrlCountDTO) object;
 
             if (columnType == COLUMN.HARVESTDAY) {
                 Date date = harvestUrgencyScore.getHarvestDay();
@@ -43,7 +45,7 @@ public class HarvestedUrlCountColumn extends SearchResultColumn {
             }
 
             if (columnType == COLUMN.HARVESTCOUNT) {
-                result = harvestUrgencyScore.getHarvestCount()+"";
+                result = harvestUrgencyScore.getHarvestCount() + "";
             }
 
         }
@@ -53,6 +55,7 @@ public class HarvestedUrlCountColumn extends SearchResultColumn {
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.web.util.columns.SearchResultColumn#getSortParamValue()
      */
     public String getSortParamValue() {

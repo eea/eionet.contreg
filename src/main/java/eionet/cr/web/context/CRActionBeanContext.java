@@ -25,14 +25,8 @@ package eionet.cr.web.context;
 
 import static eionet.cr.web.util.WebConstants.LAST_ACTION_URL_SESSION_ATTR;
 import static eionet.cr.web.util.WebConstants.USER_SESSION_ATTR;
-
-import javax.servlet.ServletRequest;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
 import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.action.Resolution;
-import eionet.cr.dto.ObjectDTO;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.security.EionetCASFilter;
 
@@ -51,22 +45,27 @@ public class CRActionBeanContext extends ActionBeanContext {
     private Resolution sourcePageResolution;
 
     /**
-     * Wrapper method for {@link ServletRequest#getParameter(String)}.
+     * Wrapper method for {@link javax.servlet.ServletRequest.ServletRequest#getParameter(String)}.
      * <p>
-     * The wrapper allows to avoid direct usage of {@link HttpServletRequest}.
-     * @param parameterName parameter name.
-     * @return corresponding parameter value from {@link HttpServletRequest}.
+     * The wrapper allows to avoid direct usage of {@link javax.servlet.http.HttpServletRequest}.
+     *
+     * @param parameterName
+     *            parameter name.
+     * @return corresponding parameter value from {@link javax.servlet.http.HttpServletRequest}.
      */
     public String getRequestParameter(String parameterName) {
         return getRequest().getParameter(parameterName);
     }
 
     /**
-     * Wrapper method for {@link HttpSession#setAttribute(String, ObjectDTO)}.
+     * Wrapper method for {@link javax.servlet.http.HttpSession#setAttribute(String, eionet.cr.dto.ObjectDTO)}.
      * <p>
-     * The wrapper allows to avoid direct usage of {@link HttpSession}.
-     * @param name session attribute name.
-     * @param value session attribute value.
+     * The wrapper allows to avoid direct usage of {@link javax.servlet.http.HttpSession}.
+     *
+     * @param name
+     *            session attribute name.
+     * @param value
+     *            session attribute value.
      */
     public void setSessionAttribute(String name, Object value) {
         getRequest().getSession().setAttribute(name, value);
@@ -79,7 +78,7 @@ public class CRActionBeanContext extends ActionBeanContext {
      */
     public CRUser getCRUser() {
 
-        return (CRUser)getRequest().getSession().getAttribute(USER_SESSION_ATTR);
+        return (CRUser) getRequest().getSession().getAttribute(USER_SESSION_ATTR);
     }
 
     /**
@@ -124,6 +123,7 @@ public class CRActionBeanContext extends ActionBeanContext {
 
     /*
      * (non-Javadoc)
+     *
      * @see net.sourceforge.stripes.action.ActionBeanContext#getSourcePageResolution()
      */
     public Resolution getSourcePageResolution() {

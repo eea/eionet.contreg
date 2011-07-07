@@ -26,8 +26,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 /**
- * @author Aleksandr Ivanov
- * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
+ * @author Aleksandr Ivanov <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
 public class DefaultErrorHandler implements ErrorHandler {
 
@@ -37,32 +36,27 @@ public class DefaultErrorHandler implements ErrorHandler {
     private SAXParseException saxWarning;
 
     /**
-     * @see eionet.cr.harvest.IRDFHandler#error(org.xml.sax.SAXParseException)
-     * {@inheritDoc}
+     * @see eionet.cr.harvest.IRDFHandler#error(org.xml.sax.SAXParseException) {@inheritDoc}
      */
     public void error(SAXParseException e) throws SAXException {
 
-        logger.warn(e.toString() +
-                " (line=" + e.getLineNumber() + ", col=" + e.getColumnNumber() + ")");
+        logger.warn(e.toString() + " (line=" + e.getLineNumber() + ", col=" + e.getColumnNumber() + ")");
 
         saxError = sanitizeSAXParseException(e);
     }
 
     /**
-     * @see eionet.cr.harvest.IRDFHandler#warning(org.xml.sax.SAXParseException)
-     * {@inheritDoc}
+     * @see eionet.cr.harvest.IRDFHandler#warning(org.xml.sax.SAXParseException) {@inheritDoc}
      */
     public void warning(SAXParseException e) throws SAXException {
 
-        logger.warn(e.toString() +
-                " (line=" + e.getLineNumber() + ", col=" + e.getColumnNumber() + ")");
+        logger.warn(e.toString() + " (line=" + e.getLineNumber() + ", col=" + e.getColumnNumber() + ")");
 
         saxWarning = sanitizeSAXParseException(e);
     }
 
     /**
-     * @see eionet.cr.harvest.IRDFHandler#fatalError(org.xml.sax.SAXParseException)
-     * {@inheritDoc}
+     * @see eionet.cr.harvest.IRDFHandler#fatalError(org.xml.sax.SAXParseException) {@inheritDoc}
      */
     public void fatalError(SAXParseException e) throws SAXException {
         throw new RDFLoadingException(e.toString(), e);
@@ -83,10 +77,8 @@ public class DefaultErrorHandler implements ErrorHandler {
     }
 
     /**
-     * This method returns a copy of the input SAXParseException where the
-     * message, publicId and systemId have been replaced with an empty string
-     * if they were null. This is to prevent NullPointerException in the later
-     * usage of the exception.
+     * This method returns a copy of the input SAXParseException where the message, publicId and systemId have been replaced with an
+     * empty string if they were null. This is to prevent NullPointerException in the later usage of the exception.
      *
      * @param e
      * @return
@@ -105,13 +97,10 @@ public class DefaultErrorHandler implements ErrorHandler {
 
         String erroneousEntitySystemId = e.getSystemId();
         if (erroneousEntitySystemId == null) {
-            erroneousEntitySystemId= "";
+            erroneousEntitySystemId = "";
         }
 
-        return new SAXParseException(message,
-                erroneousEntityPublicId,
-                erroneousEntitySystemId,
-                e.getLineNumber(),
+        return new SAXParseException(message, erroneousEntityPublicId, erroneousEntitySystemId, e.getLineNumber(),
                 e.getColumnNumber());
     }
 }

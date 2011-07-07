@@ -18,9 +18,9 @@ import eionet.cr.config.GeneralConfig;
 import eionet.cr.web.security.CRUser;
 
 /**
- * 
+ *
  * @author jaanus
- * 
+ *
  */
 public class FileStore {
 
@@ -33,7 +33,7 @@ public class FileStore {
     private File userDir;
 
     /**
-     * 
+     *
      * @param userName
      */
     private FileStore(String userName) {
@@ -46,7 +46,7 @@ public class FileStore {
     }
 
     /**
-     * 
+     *
      * @param userName
      * @return FileStore
      */
@@ -55,7 +55,7 @@ public class FileStore {
     }
 
     /**
-     * 
+     *
      * @param fileName
      * @param overwrite
      * @param inputStream
@@ -77,7 +77,7 @@ public class FileStore {
     }
 
     /**
-     * 
+     *
      * @param fileName
      * @param overwrite
      * @param reader
@@ -99,7 +99,7 @@ public class FileStore {
     }
 
     /**
-     * 
+     *
      * @param fileName
      * @param overwrite
      * @throws FileAlreadyExistsException
@@ -125,7 +125,7 @@ public class FileStore {
     }
 
     /**
-     * 
+     *
      * @param fileName
      */
     public void delete(String fileName) {
@@ -137,7 +137,7 @@ public class FileStore {
     }
 
     /**
-     * 
+     *
      * @param renamings
      */
     public void rename(Map<String, String> renamings) {
@@ -163,7 +163,7 @@ public class FileStore {
     }
 
     /**
-     * 
+     *
      * @param fileName
      * @return File
      */
@@ -178,7 +178,7 @@ public class FileStore {
     }
 
     /**
-     * 
+     *
      * @param uriString
      * @return File
      */

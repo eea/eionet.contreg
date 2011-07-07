@@ -47,7 +47,8 @@ public class UrgentHarvestQueue {
     /**
      * Adds a pull-harvest to the urgent queue.
      *
-     * @param url URL to put on the queue
+     * @param url
+     *            URL to put on the queue
      * @throws HarvestException
      */
     public static synchronized void addPullHarvest(String url) throws HarvestException {
@@ -81,11 +82,11 @@ public class UrgentHarvestQueue {
     }
 
     /**
-     * Adds a push-harvest to the urgent queue. Since it is pushed, the content
-     * is already provided.
+     * Adds a push-harvest to the urgent queue. Since it is pushed, the content is already provided.
      *
      * @param pushContent
-     * @param url URL to register it on
+     * @param url
+     *            URL to register it on
      * @throws HarvestException
      */
     public static synchronized void addPushHarvest(String pushContent, String url) throws HarvestException {

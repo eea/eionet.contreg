@@ -70,16 +70,17 @@ public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
     private boolean noCriteria;
 
     /** */
-    private HashMap<String,List<String>> referringPredicates;
+    private HashMap<String, List<String>> referringPredicates;
 
     /** */
-    private Map<String,String> predicateLabels;
+    private Map<String, String> predicateLabels;
 
     /** */
     private Boolean uriIsHarvestSource;
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.web.action.AbstractSearchActionBean#search()
      */
     public Resolution search() throws DAOException {
@@ -93,12 +94,13 @@ public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
             SearchDAO searchDAO = DAOFactory.get().getDao(SearchDAO.class);
 
             if (anonHash == 0) {
-                searchResult = searchDAO.searchReferences(uri, PagingRequest.create(getPageN()),
+                searchResult =
+                        searchDAO.searchReferences(uri, PagingRequest.create(getPageN()),
                                 new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
             } else {
-                searchResult = searchDAO.searchReferences(anonHash,
-                                PagingRequest.create(getPageN()),
-                                new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
+                searchResult =
+                        searchDAO.searchReferences(anonHash, PagingRequest.create(getPageN()), new SortingRequest(getSortP(),
+                                SortOrder.parse(getSortO())));
             }
 
             resultList = searchResult.getRight();
@@ -120,6 +122,7 @@ public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
      */
     public List<SearchResultColumn> getColumns() throws DAOException {
@@ -163,7 +166,8 @@ public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
     }
 
     /**
-     * @param uri the uri to set
+     * @param uri
+     *            the uri to set
      */
     public void setUri(String uri) {
         this.uri = uri;
@@ -177,7 +181,8 @@ public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
     }
 
     /**
-     * @param anonHash the anonHash to set
+     * @param anonHash
+     *            the anonHash to set
      */
     public void setAnonHash(long hash) {
         this.anonHash = hash;

@@ -6,6 +6,7 @@ import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.dao.helpers.FreeTextSearchHelper;
 import eionet.cr.dao.util.SearchExpression;
+import eionet.cr.util.Bindings;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.util.sql.VirtuosoFullTextQuery;
@@ -19,77 +20,79 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper {
 
     /** */
     private SearchExpression expression;
+    /** */
     private VirtuosoFullTextQuery virtExpression;
+    /** */
     private boolean exactMatch;
+    /** Query bindings . */
+    private Bindings bindings;
 
     /**
+     * Creates a new helper object.
      *
      * @param expression
+     *            search expression based on the query is built
      * @param virtExpression
+     *            Helper object to parse Virtuoso query
      * @param exactMatch
+     *            indicates if exact match is searched
      * @param pagingRequest
+     *            paging request from the UI
      * @param sortingRequest
+     *            sorting request from the UI
      */
-    public VirtuosoFreeTextSearchHelper(SearchExpression expression,
-            VirtuosoFullTextQuery virtExpression, boolean exactMatch, PagingRequest pagingRequest, SortingRequest sortingRequest) {
+    public VirtuosoFreeTextSearchHelper(SearchExpression expression, VirtuosoFullTextQuery virtExpression, boolean exactMatch,
+            PagingRequest pagingRequest, SortingRequest sortingRequest) {
 
         super(pagingRequest, sortingRequest);
         this.expression = expression;
         this.virtExpression = virtExpression;
         this.exactMatch = exactMatch;
+
+        bindings = new Bindings();
     }
 
-    //If relevant subject is found from multiple graphs, then query returns only the record where the cr:contentLastModified is latest.
-    //That is why query includes such hokus-pokus as max(), group by and subquery.
+    // If relevant subject is found from multiple graphs, then query returns only the record where
+    // the cr:contentLastModified is latest.
+    // That is why query includes such hokus-pokus as max(), group by and subquery.
 
-    /* (non-Javadoc)
-     * @see eionet.cr.dao.helpers.AbstractSearchHelper#getOrderedQuery(java.util.List)
-     */
     @Override
     protected String getOrderedQuery(List<Object> inParams) {
         StringBuilder strBuilder = new StringBuilder();
 
-        //if (sortPredicate.equals(SubjectLastModifiedColumn.class.getSimpleName())) {
+        // if (sortPredicate.equals(SubjectLastModifiedColumn.class.getSimpleName())) {
         if (sortPredicate.equals(Predicates.CR_LAST_MODIFIED)) {
-            strBuilder.append("select ?s where { graph ?g {")
-            .append("select ?s max(?time) AS ?order where {")
-            .append("?s ?p ?o .").append(addFilterParams());
-            if (exactMatch) {
-                if (expression.isUri()) {
-                    strBuilder.append(" FILTER (?o = <").append(expression.toString()).append(">).");
-                } else {
-                    strBuilder.append(" FILTER (?o = '").append(expression.toString()).append("').");
-                }
-            } else {
-                strBuilder.append(" FILTER bif:contains(?o, \"").append(virtExpression.getParsedQuery()).append("\").");
-            }
+            strBuilder.append("select ?s where { graph ?g {").append("select ?s max(?time) AS ?order where {?s ?p ?o .")
+                    .append(addTypeFilterParams());
+
+            strBuilder.append(addTextFilterClause());
+
             strBuilder.append(" optional {?g <").append(Predicates.CR_LAST_MODIFIED).append("> ?time} ").append("} ")
-            .append("GROUP BY ?s }} ORDER BY ");
-            if (sortOrder != null)
+                    .append("GROUP BY ?s }} ORDER BY ");
+            if (sortOrder != null) {
                 strBuilder.append(sortOrder);
+            }
             strBuilder.append("(?order)");
         } else {
 
-            strBuilder.append("select distinct ?s where {?s ?p ?o . ").append(addFilterParams());
-            if (exactMatch) {
-                if (expression.isUri()) {
-                    strBuilder.append("FILTER (?o = <").append(expression.toString()).append(">).");
-                } else {
-                    strBuilder.append("FILTER (?o = '").append(expression.toString()).append("'). ");
-                }
-            } else {
-                strBuilder.append("FILTER bif:contains(?o, \"").append(virtExpression.getParsedQuery()).append("\"). ");
-            }
-            strBuilder.append("optional {?s <").append(sortPredicate).append("> ?ord} }");
+            strBuilder.append("select distinct ?s where {?s ?p ?o . ").append(addTypeFilterParams());
+            strBuilder.append(addTextFilterClause());
+
+            strBuilder.append("optional {?s ?sortPredicate ?ord} }");
+            bindings.setURI("sortPredicate", sortPredicate);
+
             strBuilder.append("ORDER BY ");
             if (sortOrder != null)
                 strBuilder.append(sortOrder);
             if (sortPredicate != null && sortPredicate.equals(Predicates.RDFS_LABEL)) {
-              //If Label is not null then use Label. Otherwise use subject where we replace all / with # and then get the string after last #.
-                strBuilder.append("(bif:lcase(bif:either(bif:isnull(?ord), (bif:subseq (bif:replace (?s, '/', '#'), bif:strrchr (bif:replace (?s, '/', '#'), '#')+1)), ?ord)))");
+                // If Label is not null then use Label. Otherwise use subject where we replace all / with # and then get
+                // the string after last #.
+                strBuilder
+                        .append("(bif:lcase(bif:either(bif:isnull(?ord), (bif:subseq (bif:replace (?s, '/', '#'), bif:strrchr (bif:replace (?s, '/', '#'), '#')+1)), ?ord)))");
             } else if (sortPredicate != null && sortPredicate.equals(Predicates.RDF_TYPE)) {
-                //Replace all / with # and then get the string after last #
-                strBuilder.append("(bif:lcase(bif:subseq (bif:replace (?ord, '/', '#'), bif:strrchr (bif:replace (?ord, '/', '#'), '#')+1)))");
+                // Replace all / with # and then get the string after last #
+                strBuilder
+                        .append("(bif:lcase(bif:subseq (bif:replace (?ord, '/', '#'), bif:strrchr (bif:replace (?ord, '/', '#'), '#')+1)))");
             } else {
                 strBuilder.append("(?ord)");
             }
@@ -99,68 +102,63 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper {
         return strBuilder.toString();
     }
 
-
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see eionet.cr.dao.helpers.AbstractSearchHelper#getUnorderedQuery(java.util.List)
      */
     @Override
     public String getUnorderedQuery(List<Object> inParams) {
 
         StringBuilder strBuilder = new StringBuilder();
-        strBuilder.append("select distinct ?s where { ?s ?p ?o . ").append(addFilterParams());
-        if (exactMatch) {
-            if (expression.isUri()) {
-                strBuilder.append(" FILTER (?o = <").append(expression.toString()).append(">).");
-            } else {
-                strBuilder.append(" FILTER (?o = '").append(expression.toString()).append("').");
-            }
-        } else {
-            strBuilder.append(" FILTER bif:contains(?o, \"").append(virtExpression.getParsedQuery()).append("\"). ");
-        }
+        strBuilder.append("select distinct ?s where { ?s ?p ?o . ").append(addTypeFilterParams());
+        strBuilder.append(addTextFilterClause());
+
         strBuilder.append("}");
 
         return strBuilder.toString();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see eionet.cr.dao.helpers.AbstractSearchHelper#getCountQuery(java.util.List)
      */
     @Override
     public String getCountQuery(List<Object> inParams) {
 
         StringBuilder strBuilder = new StringBuilder();
-        //TODO shouldn't it use inferencing?
-        strBuilder.append("select count(distinct ?s) where { ?s ?p ?o . ").append(addFilterParams());
-        if (exactMatch) {
-            if (expression.isUri()) {
-                strBuilder.append(" FILTER (?o = <").append(expression.toString()).append(">).");
-            } else {
-                strBuilder.append(" FILTER (?o = '").append(expression.toString()).append("').");
-            }
-        } else {
-            strBuilder.append(" FILTER bif:contains(?o, \"").append(virtExpression.getParsedQuery()).append("\"). ");
-        }
+        // TODO shouldn't it use inferencing?
+        strBuilder.append("select count(distinct ?s) where { ?s ?p ?o . ").append(addTypeFilterParams());
+
+        strBuilder.append(addTextFilterClause());
         strBuilder.append("}");
 
         return strBuilder.toString();
     }
 
-    private String addFilterParams() {
+    /**
+     * Adds Type Search filter parameteres to the query if type is not any object. Bindings is filled with relevant value.
+     *
+     * @return filter part for the SPARQL query
+     */
+    private String addTypeFilterParams() {
 
         StringBuffer buf = new StringBuffer();
         buf.append(" ");
 
         if (filter != FilterType.ANY_OBJECT) {
 
-            buf.append("?s <").append(Predicates.RDF_TYPE).append("> ");
+            buf.append("?s a ?subjectType");
+
             if (filter == FilterType.ANY_FILE) {
-                buf.append("<").append(Subjects.CR_FILE).append(">");
+                bindings.setURI("subjectType", Subjects.CR_FILE);
             } else if (filter == FilterType.DATASETS) {
-                buf.append("<").append(Predicates.DC_MITYPE_DATASET).append(">");
+                bindings.setURI("subjectType", Predicates.DC_MITYPE_DATASET);
             } else if (filter == FilterType.IMAGES) {
-                buf.append("<").append(Predicates.DC_MITYPE_IMAGE).append(">");
+                bindings.setURI("subjectType", Predicates.DC_MITYPE_IMAGE);
             } else if (filter == FilterType.TEXTS) {
-                buf.append("<").append(Predicates.DC_MITYPE_TEXT).append(">");
+                bindings.setURI("subjectType", Predicates.DC_MITYPE_TEXT);
             }
 
             buf.append(" . ");
@@ -168,7 +166,9 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper {
         return buf.toString();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see eionet.cr.dao.helpers.AbstractSearchHelper#getMinMaxHashQuery(java.util.List)
      */
     @Override
@@ -176,4 +176,32 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper {
         throw new UnsupportedOperationException("Method not implemented");
     }
 
+    /**
+     * Builds relevant FILTER conditions based on the SearchExpression.
+     *
+     * @return FILTER that can will be added to the query
+     */
+    private String addTextFilterClause() {
+        StringBuilder strBuilder = new StringBuilder();
+        if (exactMatch) {
+            if (expression.isUri()) {
+                strBuilder.append(" FILTER (?o = ?objectValueUri || ?o = ?objectValueLit).");
+                bindings.setURI("objectValueUri", expression.toString());
+                bindings.setString("objectValueLit", expression.toString());
+            } else {
+                strBuilder.append(" FILTER (?o = ?objectValue).");
+                bindings.setString("objectValue", expression.toString());
+            }
+        } else {
+            strBuilder.append(" FILTER bif:contains(?o, ?objectValue). ");
+            bindings.setString("objectValue", virtExpression.getParsedQuery());
+        }
+
+        return strBuilder.toString();
+    }
+
+    @Override
+    public Bindings getQueryBindings() {
+        return bindings;
+    }
 }

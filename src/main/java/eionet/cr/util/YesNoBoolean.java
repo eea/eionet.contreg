@@ -27,7 +27,7 @@ package eionet.cr.util;
  */
 public enum YesNoBoolean {
 
-    Y,N;
+    Y, N;
 
     /**
      *
@@ -35,7 +35,7 @@ public enum YesNoBoolean {
      * @return
      */
     public static String format(boolean b) {
-        return b==true ? Y.toString() : N.toString();
+        return b == true ? Y.toString() : N.toString();
     }
 
     /**

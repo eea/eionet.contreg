@@ -28,7 +28,7 @@ import java.util.HashSet;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class SubProperties extends HashMap<String,HashSet<String>>{
+public class SubProperties extends HashMap<String, HashSet<String>> {
 
     /**
      *

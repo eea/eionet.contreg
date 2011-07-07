@@ -6,11 +6,15 @@ import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
 
 public class DateColumn extends SearchResultColumn {
 
-    public enum COLUMN_TYPE {DATE_AND_TIME};
+    public enum COLUMN_TYPE {
+        DATE_AND_TIME
+    };
+
     private COLUMN_TYPE columnType;
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.web.util.columns.SearchResultColumn#format(java.lang.Object)
      */
     public String format(Object object) {
@@ -18,8 +22,7 @@ public class DateColumn extends SearchResultColumn {
         String result = "";
         if (object != null) {
 
-            HarvestedUrlCountDTO harvestUrgencyScore = (HarvestedUrlCountDTO)object;
-
+            HarvestedUrlCountDTO harvestUrgencyScore = (HarvestedUrlCountDTO) object;
 
             if (columnType == COLUMN_TYPE.DATE_AND_TIME) {
                 Date date = harvestUrgencyScore.getHarvestDay();

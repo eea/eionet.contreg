@@ -63,23 +63,22 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean<SubjectDTO
     private String type;
 
     /** */
-    private static final List<Map<String,String>> types;
-    private static final Map<String,List<SearchResultColumn>> typesColumns;
-
+    private static final List<Map<String, String>> types;
+    private static final Map<String, List<SearchResultColumn>> typesColumns;
 
     static {
-        types = new LinkedList<Map<String,String>>();
-        Map<String,String> typeMap = new HashMap<String,String>();
+        types = new LinkedList<Map<String, String>>();
+        Map<String, String> typeMap = new HashMap<String, String>();
         typeMap.put("title", "Deliveries");
         typeMap.put("uri", Subjects.ROD_DELIVERY_CLASS);
         RecentUploadsActionBean.types.add(typeMap);
 
-        typeMap = new HashMap<String,String>();
+        typeMap = new HashMap<String, String>();
         typeMap.put("title", "Obligations");
         typeMap.put("uri", Subjects.ROD_OBLIGATION_CLASS);
         RecentUploadsActionBean.types.add(typeMap);
 
-        typesColumns = new HashMap<String,List<SearchResultColumn>>();
+        typesColumns = new HashMap<String, List<SearchResultColumn>>();
         SubjectUploadedColumn uploaded = new SubjectUploadedColumn("Date", false);
 
         /* columns for deliveries */
@@ -99,7 +98,6 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean<SubjectDTO
         typesColumns.put(Subjects.ROD_OBLIGATION_CLASS, list);
     }
 
-
     /**
      *
      */
@@ -109,15 +107,15 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean<SubjectDTO
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.web.action.AbstractSearchActionBean#search()
      */
     @DefaultHandler
     public Resolution search() throws DAOException {
 
         if (!StringUtils.isBlank(type)) {
-            //String decodedType = Util.urlDecode(type);
-                resultList = DAOFactory.get().getDao(HelperDAO.class).getLatestSubjects(
-                        type, MAX_RESULTS);
+            // String decodedType = Util.urlDecode(type);
+            resultList = DAOFactory.get().getDao(HelperDAO.class).getLatestSubjects(type, MAX_RESULTS);
         }
 
         return new ForwardResolution("/pages/recent.jsp");
@@ -157,6 +155,7 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean<SubjectDTO
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
      */
     public List<SearchResultColumn> getColumns() {
@@ -164,8 +163,6 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean<SubjectDTO
             return getDefaultColumns();
         }
         String decodedType = Util.urlDecode(type);
-        return StringUtils.isEmpty(decodedType)
-                ? null
-                : typesColumns.get(decodedType);
+        return StringUtils.isEmpty(decodedType) ? null : typesColumns.get(decodedType);
     }
 }

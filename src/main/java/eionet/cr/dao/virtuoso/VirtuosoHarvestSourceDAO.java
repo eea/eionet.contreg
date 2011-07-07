@@ -35,14 +35,17 @@ import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
 
 /**
- * Harvester methods in Virtuoso
+ * Harvester methods in Virtuoso.
  *
  * @author kaido
  */
 
 // TODO remove extending when all the methods have been copied to VirtuosoDAO
 public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
-
+    /**
+     * SPARQL for deleting graph data.
+     */
+    private static final String CLEAR_GRAPH_SPARQL = "CLEAR GRAPH ?graph";
     @Override
     public void deleteSourceByUrl(String url) throws DAOException {
 
@@ -52,7 +55,8 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
         Connection sqlConn = null;
 
         try {
-            String sparql = "CLEAR GRAPH <" + URLUtil.replaceURLSpaces(url) + ">";
+            Bindings bindings = new Bindings();
+            bindings.setURI("graph", URLUtil.replaceURLSpaces(url));
 
             // TODO remove PostgreSQL calls when PostgreSQL time is over
             // 2 updates brought here together to handle rollbacks correctly in
@@ -64,7 +68,7 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
 
             conn = SesameUtil.getRepositoryConnection();
             conn.setAutoCommit(false);
-            executeUpdateSPARQL(sparql, conn);
+            executeUpdateSPARQL(CLEAR_GRAPH_SPARQL, conn, bindings);
 
             // remove source metadata from http://cr.eionet.europa.eu/harvetser
             // graph
@@ -92,7 +96,7 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
                 } catch (SQLException e) {
                 }
             }
-            
+
             SQLUtil.close(sqlConn);
             SesameUtil.close(conn);
 
@@ -111,11 +115,13 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
         RepositoryConnection conn = null;
 
         try {
-            String sparql = "CLEAR GRAPH <" + url + ">";
+
+            Bindings bindings = new Bindings();
+            bindings.setURI("graph", URLUtil.replaceURLSpaces(url));
 
             conn = SesameUtil.getRepositoryConnection();
             conn.setAutoCommit(false);
-            executeUpdateSPARQL(sparql, conn);
+            executeUpdateSPARQL(CLEAR_GRAPH_SPARQL, conn, bindings);
 
             conn.commit();
             isSuccess = true;
@@ -141,12 +147,15 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
     public String getSourcesInInferenceRules() throws DAOException {
 
         Connection conn = null;
+        ResultSet rs = null;
         String ret = "";
+        PreparedStatement stmt = null;
         try {
-            conn = SesameUtil.getConnection();
-            PreparedStatement stmt = conn.prepareStatement("SELECT RS_URI FROM sys_rdf_schema where RS_NAME = ?");
+            conn = SesameUtil.getSQLConnection();
+            stmt = conn.prepareStatement("SELECT RS_URI FROM sys_rdf_schema where RS_NAME = ?");
             stmt.setString(1, GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME));
-            ResultSet rs = stmt.executeQuery();
+            rs = stmt.executeQuery();
+
             StringBuffer sb = new StringBuffer();
             while (rs.next()) {
                 String graphUri = rs.getString("RS_URI");
@@ -165,6 +174,8 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
             throw new DAOException(e.getMessage(), e);
         } finally {
             SQLUtil.close(conn);
+            SQLUtil.close(rs);
+            SQLUtil.close(stmt);
         }
 
         return ret;
@@ -179,13 +190,16 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
     public boolean isSourceInInferenceRule(String url) throws DAOException {
 
         Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
         boolean ret = false;
         try {
-            conn = SesameUtil.getConnection();
-            PreparedStatement stmt = conn.prepareStatement("SELECT RS_NAME FROM sys_rdf_schema where RS_NAME = ? AND RS_URI = ?");
+            conn = SesameUtil.getSQLConnection();
+            stmt = conn.prepareStatement("SELECT RS_NAME FROM sys_rdf_schema where RS_NAME = ? AND RS_URI = ?");
             stmt.setString(1, GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME));
             stmt.setString(2, url);
-            ResultSet rs = stmt.executeQuery();
+            rs = stmt.executeQuery();
             while (rs.next()) {
                 ret = true;
             }
@@ -193,6 +207,8 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
             throw new DAOException(e.getMessage(), e);
         } finally {
             SQLUtil.close(conn);
+            SQLUtil.close(rs);
+            SQLUtil.close(stmt);
         }
         return ret;
     }
@@ -206,18 +222,21 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
     public boolean addSourceIntoInferenceRule(String url) throws DAOException {
 
         Connection conn = null;
+        PreparedStatement stmt = null;
         boolean ret = false;
 
         try {
-            conn = SesameUtil.getConnection();
-            PreparedStatement stmt = conn.prepareStatement("rdfs_rule_set (?, ?)");
+            conn = SesameUtil.getSQLConnection();
+            stmt = conn.prepareStatement("rdfs_rule_set (?, ?)");
             stmt.setString(1, GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME));
             stmt.setString(2, url);
             ret = stmt.execute();
+
         } catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
         } finally {
             SQLUtil.close(conn);
+            SQLUtil.close(stmt);
         }
         return ret;
     }
@@ -231,11 +250,12 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
     public boolean removeSourceFromInferenceRule(String url) throws DAOException {
 
         Connection conn = null;
+        PreparedStatement stmt = null;
         boolean ret = false;
 
         try {
-            conn = SesameUtil.getConnection();
-            PreparedStatement stmt = conn.prepareStatement("rdfs_rule_set (?, ?, 1)");
+            conn = SesameUtil.getSQLConnection();
+            stmt = conn.prepareStatement("rdfs_rule_set (?, ?, 1)");
             stmt.setString(1, GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME));
             stmt.setString(2, url);
             ret = stmt.execute();
@@ -243,6 +263,7 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
             throw new DAOException(e.getMessage(), e);
         } finally {
             SQLUtil.close(conn);
+            SQLUtil.close(stmt);
         }
         return ret;
     }
@@ -256,28 +277,27 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
     public int addSourceToRepository(File file, String sourceUrlString) throws IOException, OpenRDFException {
 
         InputStream inputStream = null;
-        try{
+        try {
             inputStream = new FileInputStream(file);
             return addSourceToRepository(inputStream, sourceUrlString);
-        }
-        finally{
-            if (inputStream!=null){
-                try{
+        } finally {
+            if (inputStream != null) {
+                try {
                     inputStream.close();
-                }
-                catch (IOException e){
+                } catch (IOException e) {
                 }
             }
         }
     }
-    
+
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.postgre.PostgreSQLHarvestSourceDAO#addSourceToRepository(java.io.InputStream, java.lang.String)
      */
     @Override
     public int addSourceToRepository(InputStream inputStream, String sourceUrlString) throws IOException, OpenRDFException {
-        
+
         int storedTriplesCount = 0;
         boolean isSuccess = false;
         RepositoryConnection conn = null;
@@ -317,7 +337,7 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
             }
             SesameUtil.close(conn);
         }
-        
+
         return storedTriplesCount;
     }
 
@@ -399,12 +419,14 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
             }
         }
     }
+
     /**
      * SPARQL for getting new sources based on the given source.
      */
     private static final String NEW_SOURCES_SPARQL = "DEFINE input:inference 'CRInferenceRule' PREFIX cr: "
-        +  "<http://cr.eionet.europa.eu/ontologies/contreg.rdf#> SELECT ?s FROM ?sourceUrl FROM ?deploymentHost WHERE "
-        + "{ ?s a cr:File . OPTIONAL { ?s cr:lastRefreshed ?refreshed } FILTER( !BOUND(?refreshed)) }";
+            + "<http://cr.eionet.europa.eu/ontologies/contreg.rdf#> SELECT ?s FROM ?sourceUrl FROM ?deploymentHost WHERE "
+            + "{ ?s a cr:File . OPTIONAL { ?s cr:lastRefreshed ?refreshed } FILTER( !BOUND(?refreshed)) }";
+
     /*
      * (non-Javadoc)
      *
@@ -429,7 +451,11 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
         }
         return ret;
     }
-
+    /**
+     * SPARQL for getting source metadata.
+     */
+    private static final String SOURCE_METADATA_SPARQL = "select ?o where {graph ?g { ?subject ?predicate ?o . "
+        + "filter (?g = ?deploymentHost)}}";
     /*
      * (non-Javadoc)
      *
@@ -442,12 +468,13 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
         RepositoryConnection conn = null;
         try {
 
-            String deploymentHost = GeneralConfig.getRequiredProperty(GeneralConfig.DEPLOYMENT_HOST);
+            String deploymentHost = GeneralConfig.getRequiredProperty(GeneralConfig.DEPLOYMENT_HOST) + "/harvester";
+            Bindings bindings = new Bindings();
+            bindings.setURI("deploymentHost", deploymentHost);
+            bindings.setURI("subject", subject);
+            bindings.setURI("predicate", predicate);
 
-            StringBuffer sqlBuf = new StringBuffer().append("select ?o where {graph ?g { ").append("<").append(subject)
-                    .append("> <").append(predicate).append("> ?o .").append("filter (?g = <").append(deploymentHost)
-                    .append("/harvester>) ").append("}}");
-            Object resultObject = executeUniqueResultSPARQL(sqlBuf.toString(), new SingleObjectReader<Long>());
+            Object resultObject = executeUniqueResultSPARQL(SOURCE_METADATA_SPARQL, bindings, new SingleObjectReader<Long>());
             ret = (String) resultObject;
         } finally {
             SesameUtil.close(conn);

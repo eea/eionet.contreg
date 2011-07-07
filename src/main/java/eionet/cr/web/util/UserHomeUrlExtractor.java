@@ -12,7 +12,7 @@ public class UserHomeUrlExtractor {
 
     public static String extractUserNameFromHomeUrl(String url) throws BadUserHomeUrlException {
         // Just to be sure that there is something before "/home/".
-        url = "#"+url;
+        url = "#" + url;
         String userNamePart;
         String userName;
         try {
@@ -29,10 +29,10 @@ public class UserHomeUrlExtractor {
     public static String extractSectionFromHomeUrl(String url) throws BadUserHomeUrlException {
 
         String userName = extractUserNameFromHomeUrl(url);
-        String [] urlParts = new String[0];
+        String[] urlParts = new String[0];
         String section = "";
         try {
-            urlParts = url.split(userName+"/");
+            urlParts = url.split(userName + "/");
         } catch (Exception ex) {
         }
 

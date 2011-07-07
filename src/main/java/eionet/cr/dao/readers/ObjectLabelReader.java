@@ -11,14 +11,12 @@ import eionet.cr.util.URIUtil;
 import eionet.cr.util.sesame.SPARQLResultSetBaseReader;
 
 /**
- * Reads resultset containing objects and labels from variables "label" and
- * "object" in the BindingSet.
+ * Reads resultset containing objects and labels from variables "label" and "object" in the BindingSet.
  *
  * @author kaido
  *
  */
-public class ObjectLabelReader extends
-        SPARQLResultSetBaseReader<ObjectLabelPair> {
+public class ObjectLabelReader extends SPARQLResultSetBaseReader<ObjectLabelPair> {
 
     public ObjectLabelReader(boolean extractLabels) {
         this.extractLabels = extractLabels;
@@ -36,14 +34,11 @@ public class ObjectLabelReader extends
             Value label = bindingSet.getValue("label");
             Value obj = bindingSet.getValue("object");
             String labelStr = "";
-            String objStr = ((obj == null || obj.stringValue() == null) ? ""
-                    : obj.stringValue());
+            String objStr = ((obj == null || obj.stringValue() == null) ? "" : obj.stringValue());
             if (label != null && StringUtils.isNotBlank(label.stringValue())) {
                 labelStr = label.stringValue();
                 // labels must not be extracted from URI or object is not URI:
-            } else if (!extractLabels
-                    || (obj != null && StringUtils.isNotBlank(objStr) && !URIUtil
-                            .isSchemedURI(objStr))) {
+            } else if (!extractLabels || (obj != null && StringUtils.isNotBlank(objStr) && !URIUtil.isSchemedURI(objStr))) {
                 labelStr = objStr;
 
             } else {

@@ -10,10 +10,11 @@ import org.openrdf.query.BindingSet;
  *
  * @author risto
  */
-public class GraphUrisReader<T> extends ResultSetMixedReader<T>{
+public class GraphUrisReader<T> extends ResultSetMixedReader<T> {
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.util.sql.SQLResultSetReader#readRow(java.sql.ResultSet)
      */
     @Override
@@ -22,6 +23,7 @@ public class GraphUrisReader<T> extends ResultSetMixedReader<T>{
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
      */
     @SuppressWarnings("unchecked")
@@ -32,7 +34,7 @@ public class GraphUrisReader<T> extends ResultSetMixedReader<T>{
         if (graphValue != null) {
             // expecting the URI of the matching graph to be in column "g"
             String graphUri = graphValue.stringValue();
-            resultList.add((T)graphUri);
+            resultList.add((T) graphUri);
         }
     }
 

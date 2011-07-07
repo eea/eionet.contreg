@@ -25,16 +25,10 @@ import java.util.Map;
 
 import eionet.cr.dao.DAO;
 import eionet.cr.dao.DAOFactory;
-import eionet.cr.dao.ExporterDAO;
 import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dao.HarvestMessageDAO;
-import eionet.cr.dao.HelperDAO;
-import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.SpoBinaryDAO;
-import eionet.cr.dao.TagsDAO;
 import eionet.cr.dao.UrgentHarvestQueueDAO;
-
-
 
 /**
  *
@@ -61,13 +55,7 @@ public final class PostgreSQLDAOFactory extends DAOFactory {
         registeredDaos = new HashMap<Class<? extends DAO>, Class<? extends PostgreSQLBaseDAO>>();
         registeredDaos.put(HarvestDAO.class, PostgreSQLHarvestDAO.class);
         registeredDaos.put(HarvestMessageDAO.class, PostgreSQLHarvestMessageDAO.class);
-
-        //registeredDaos.put(HarvestSourceDAO.class, PostgreSQLHarvestSourceDAO.class);
-        registeredDaos.put(HelperDAO.class, PostgreSQLHelperDAO.class);
-        registeredDaos.put(SearchDAO.class, PostgreSQLSearchDAO.class);
         registeredDaos.put(UrgentHarvestQueueDAO.class, PostgreSQLUrgentHarvestQueueDAO.class);
-        registeredDaos.put(ExporterDAO.class, PostgreSQLExporterDAO.class);
-        registeredDaos.put(TagsDAO.class, PostgreSQLTagsDAO.class);
         registeredDaos.put(SpoBinaryDAO.class, PostgreSQLSpoBinaryDAO.class);
     }
 
@@ -84,12 +72,13 @@ public final class PostgreSQLDAOFactory extends DAOFactory {
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.DAOFactory#getDao(java.lang.Class)
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public <T extends DAO> T getDao(Class<T> implementedInterface) {
 
-        //due to synchronization problems we have to create DAOs for each method invocation.
+        // due to synchronization problems we have to create DAOs for each method invocation.
         try {
             Class implClass = registeredDaos.get(implementedInterface);
             return (T) implClass.newInstance();

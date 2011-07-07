@@ -12,7 +12,7 @@ import eionet.cr.dao.readers.ResultSetReaderException;
  * @author jaanus
  *
  */
-public interface SQLResultSetReader<T> extends ResultSetReader<T>{
+public interface SQLResultSetReader<T> extends ResultSetReader<T> {
 
     /**
      *
@@ -24,7 +24,8 @@ public interface SQLResultSetReader<T> extends ResultSetReader<T>{
      *
      * @param rs
      * @throws SQLException
-     * @throws ResultSetReaderException TODO
+     * @throws ResultSetReaderException
+     *             TODO
      */
     public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException;
 }

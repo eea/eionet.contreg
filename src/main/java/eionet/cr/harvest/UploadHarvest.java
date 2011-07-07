@@ -56,9 +56,9 @@ import eionet.cr.util.xml.ConversionsParser;
 import eionet.cr.util.xml.XmlAnalysis;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class UploadHarvest extends Harvest {
 
@@ -69,7 +69,7 @@ public class UploadHarvest extends Harvest {
     private String userName;
 
     /**
-     * 
+     *
      * @param dto
      * @param fileBean
      * @param dcTitle
@@ -84,7 +84,7 @@ public class UploadHarvest extends Harvest {
     }
 
     /**
-     * 
+     *
      * @param sourceUrlString
      * @param fileBean
      * @param dcTitle
@@ -123,7 +123,7 @@ public class UploadHarvest extends Harvest {
     /**
      * @param dto
      * @throws HarvestException
-     * 
+     *
      */
     public void createDaoWriter(HarvestSourceDTO dto) throws HarvestException {
 
@@ -132,7 +132,7 @@ public class UploadHarvest extends Harvest {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.harvest.Harvest#doExecute()
      */
     protected void doExecute() throws HarvestException {
@@ -176,20 +176,20 @@ public class UploadHarvest extends Harvest {
             // insert new auto generated metadata
             logger.debug("Storing new auto-generated triples about the source");
             harvestSourceDAO.addSourceMetadata(sourceMetadata);
-            
-            if (inputStream!=null){
+
+            if (inputStream != null) {
 
                 // try to harvest the stream
                 logger.debug("Loading the file contents into the triple store");
                 int triplesCount = harvestSourceDAO.addSourceToRepository(inputStream, sourceUrlString);
                 logger.debug(triplesCount + " triples stored by the triple store");
-                
-                if (triplesCount>0){
+
+                if (triplesCount > 0) {
                     logger.debug("Extracting new harvest sources after fresh harvest");
                     extractNewHarvestSources();
                 }
             }
-            
+
         } catch (ParserConfigurationException e) {
             throw new HarvestException(e.toString(), e);
         } catch (IOException e) {
@@ -197,14 +197,13 @@ public class UploadHarvest extends Harvest {
         } catch (SAXException e) {
             throw new HarvestException(e.toString(), e);
         } catch (OpenRDFException e) {
-            
+
             // when harvesting an uploaded-file, RDF parse exceptions must be ignored,
             // because its only something that CR attempts to do, but doesn't have to be successful
-            if (e instanceof RDFParseException){
+            if (e instanceof RDFParseException) {
                 logger.info("Following exception happened when parsing uploaded file as RDF", e);
-            }
-            else{
-                throw new HarvestException(e.toString(), e); 
+            } else {
+                throw new HarvestException(e.toString(), e);
             }
         } catch (DAOException e) {
             throw new HarvestException(e.toString(), e);
@@ -226,7 +225,7 @@ public class UploadHarvest extends Harvest {
     }
 
     /**
-     * 
+     *
      * @return
      * @throws ParserConfigurationException
      */
@@ -252,7 +251,7 @@ public class UploadHarvest extends Harvest {
     }
 
     /**
-     * 
+     *
      * @param xmlAnalysis
      * @param fileBean
      * @return
@@ -260,7 +259,8 @@ public class UploadHarvest extends Harvest {
      * @throws SAXException
      * @throws IOException
      */
-    private File convert(XmlAnalysis xmlAnalysis, FileBean fileBean) throws IOException, SAXException, ParserConfigurationException {
+    private File convert(XmlAnalysis xmlAnalysis, FileBean fileBean) throws IOException, SAXException,
+            ParserConfigurationException {
 
         // detect conversion id, if it's blank then return null, as no point in going further
         String conversionId = getConversionId(xmlAnalysis);
@@ -309,7 +309,7 @@ public class UploadHarvest extends Harvest {
     }
 
     /**
-     * 
+     *
      * @param xmlAnalysis
      * @return
      * @throws IOException

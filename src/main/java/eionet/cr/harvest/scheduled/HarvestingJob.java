@@ -199,7 +199,8 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
         int limit = getSourcesLimitForInterval();
         batchHarvestingQueue = DAOFactory.get().getDao(HarvestSourceDAO.class).getNextScheduledSources(limit);
 
-        logger.debug(batchHarvestingQueue.size() + " sources added to batch harvesting queue (numOfSegments=" + numOfSegments + ")");
+        logger.debug(batchHarvestingQueue.size() + " sources added to batch harvesting queue (numOfSegments=" + numOfSegments
+                + ")");
     }
 
     /**
@@ -210,8 +211,8 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
         if (isBatchHarvestingEnabled()) {
 
             try {
-                nextScheduledSources = DAOFactory.get().getDao(HarvestSourceDAO.class)
-                        .getNextScheduledSources(getSourcesLimitForInterval());
+                nextScheduledSources =
+                        DAOFactory.get().getDao(HarvestSourceDAO.class).getNextScheduledSources(getSourcesLimitForInterval());
             } catch (DAOException e) {
                 logger.error("Error loading next scheduled sources: " + e.toString(), e);
             }

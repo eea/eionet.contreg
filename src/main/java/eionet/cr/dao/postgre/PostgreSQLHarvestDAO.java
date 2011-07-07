@@ -37,8 +37,7 @@ import eionet.cr.util.sql.SQLUtil;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class PostgreSQLHarvestDAO extends PostgreSQLBaseDAO implements
-        HarvestDAO {
+public class PostgreSQLHarvestDAO extends PostgreSQLBaseDAO implements HarvestDAO {
 
     /** */
     private static final String getHarvestByIdSQL = "select *, USERNAME as USER from HARVEST where HARVEST_ID=?";
@@ -51,23 +50,16 @@ public class PostgreSQLHarvestDAO extends PostgreSQLBaseDAO implements
     public HarvestDTO getHarvestById(Integer harvestId) throws DAOException {
         List<Object> values = new ArrayList<Object>();
         values.add(harvestId);
-        List<HarvestDTO> list = executeSQL(getHarvestByIdSQL, values,
-                new HarvestDTOReader());
+        List<HarvestDTO> list = executeSQL(getHarvestByIdSQL, values, new HarvestDTOReader());
         return list != null && list.size() > 0 ? list.get(0) : null;
     }
 
     /** */
     private static final String getHarvestsBySourceIdSQL = "select distinct HARVEST.HARVEST_ID as HARVEST_ID,"
-            + " HARVEST.HARVEST_SOURCE_ID as SOURCE_ID,"
-            + " HARVEST.TYPE as HARVEST_TYPE,"
-            + " HARVEST.USERNAME as HARVEST_USER,"
-            + " HARVEST.STATUS as STATUS,"
-            + " HARVEST.STARTED as STARTED,"
-            + " HARVEST.FINISHED as FINISHED,"
-            + " HARVEST.ENC_SCHEMES as ENC_SCHEMES,"
-            + " HARVEST.TOT_STATEMENTS as TOT_STATEMENTS,"
-            + " HARVEST.LIT_STATEMENTS as LIT_STATEMENTS,"
-            + " HARVEST_MESSAGE.TYPE as MESSAGE_TYPE"
+            + " HARVEST.HARVEST_SOURCE_ID as SOURCE_ID," + " HARVEST.TYPE as HARVEST_TYPE," + " HARVEST.USERNAME as HARVEST_USER,"
+            + " HARVEST.STATUS as STATUS," + " HARVEST.STARTED as STARTED," + " HARVEST.FINISHED as FINISHED,"
+            + " HARVEST.ENC_SCHEMES as ENC_SCHEMES," + " HARVEST.TOT_STATEMENTS as TOT_STATEMENTS,"
+            + " HARVEST.LIT_STATEMENTS as LIT_STATEMENTS," + " HARVEST_MESSAGE.TYPE as MESSAGE_TYPE"
             + " from HARVEST left join HARVEST_MESSAGE on HARVEST.HARVEST_ID=HARVEST_MESSAGE.HARVEST_ID"
             + " where HARVEST.HARVEST_SOURCE_ID=? order by HARVEST.STARTED desc limit ?";
 
@@ -76,16 +68,14 @@ public class PostgreSQLHarvestDAO extends PostgreSQLBaseDAO implements
      *
      * @see eionet.cr.dao.HarvestDAO#getHarvestsBySourceId()
      */
-    public List<HarvestDTO> getHarvestsBySourceId(Integer harvestSourceId)
-            throws DAOException {
+    public List<HarvestDTO> getHarvestsBySourceId(Integer harvestSourceId) throws DAOException {
 
         int maxDistinctHarvests = 10;
 
         List<Object> values = new ArrayList<Object>();
         values.add(harvestSourceId);
         values.add(HarvestMessageType.values().length * maxDistinctHarvests);
-        return executeSQL(getHarvestsBySourceIdSQL, values,
-                new HarvestWithMessageTypesReader(maxDistinctHarvests));
+        return executeSQL(getHarvestsBySourceIdSQL, values, new HarvestWithMessageTypesReader(maxDistinctHarvests));
     }
 
     /** */
@@ -97,27 +87,24 @@ public class PostgreSQLHarvestDAO extends PostgreSQLBaseDAO implements
      *
      * @see eionet.cr.dao.HarvestDAO#getLastHarvest(java.lang.Integer)
      */
-    public HarvestDTO getLastHarvestBySourceId(Integer harvestSourceId)
-            throws DAOException {
+    public HarvestDTO getLastHarvestBySourceId(Integer harvestSourceId) throws DAOException {
 
         List<Object> values = new ArrayList<Object>();
         values.add(harvestSourceId);
-        List<HarvestDTO> list = executeSQL(getLastHarvestBySourceIdSQL, values,
-                new HarvestDTOReader());
+        List<HarvestDTO> list = executeSQL(getLastHarvestBySourceIdSQL, values, new HarvestDTOReader());
         return list != null && !list.isEmpty() ? list.get(0) : null;
     }
 
     /** */
-    private static final String insertStartedHarvestSQL = "insert into HARVEST (HARVEST_SOURCE_ID, TYPE, USERNAME, STATUS, STARTED) values (?, ?, ?, ?, now())";
+    private static final String insertStartedHarvestSQL =
+            "insert into HARVEST (HARVEST_SOURCE_ID, TYPE, USERNAME, STATUS, STARTED) values (?, ?, ?, ?, now())";
 
     /*
      * (non-Javadoc)
      *
-     * @see eionet.cr.dao.HarvestDAO#insertHarvest(int, java.lang.String,
-     * java.lang.String, java.lang.String)
+     * @see eionet.cr.dao.HarvestDAO#insertHarvest(int, java.lang.String, java.lang.String, java.lang.String)
      */
-    public int insertStartedHarvest(int harvestSourceId, String harvestType,
-            String user, String status) throws DAOException {
+    public int insertStartedHarvest(int harvestSourceId, String harvestType, String user, String status) throws DAOException {
 
         List<Object> values = new ArrayList<Object>();
         values.add(new Integer(harvestSourceId));
@@ -128,8 +115,7 @@ public class PostgreSQLHarvestDAO extends PostgreSQLBaseDAO implements
         Connection conn = null;
         try {
             conn = getSQLConnection();
-            return SQLUtil.executeUpdateReturnAutoID(insertStartedHarvestSQL,
-                    values, conn);
+            return SQLUtil.executeUpdateReturnAutoID(insertStartedHarvestSQL, values, conn);
         } catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
         } finally {
@@ -138,17 +124,16 @@ public class PostgreSQLHarvestDAO extends PostgreSQLBaseDAO implements
     }
 
     /** */
-    private static final String updateFinishedHarvestSQL = "update HARVEST set STATUS=?, FINISHED=now(), TOT_STATEMENTS=?, LIT_STATEMENTS=?, RES_STATEMENTS=?, ENC_SCHEMES=? "
-            + "where HARVEST_ID=?";
+    private static final String updateFinishedHarvestSQL =
+            "update HARVEST set STATUS=?, FINISHED=now(), TOT_STATEMENTS=?, LIT_STATEMENTS=?, RES_STATEMENTS=?, ENC_SCHEMES=? "
+                    + "where HARVEST_ID=?";
 
     /*
      * (non-Javadoc)
      *
-     * @see eionet.cr.dao.HarvestDAO#updateFinishedHarvest(int, int, int, int,
-     * java.lang.String)
+     * @see eionet.cr.dao.HarvestDAO#updateFinishedHarvest(int, int, int, int, java.lang.String)
      */
-    public void updateFinishedHarvest(int harvestId, String status,
-            int totStatements, int litStatements, int encSchemes)
+    public void updateFinishedHarvest(int harvestId, String status, int totStatements, int litStatements, int encSchemes)
             throws DAOException {
 
         List<Object> values = new ArrayList<Object>();

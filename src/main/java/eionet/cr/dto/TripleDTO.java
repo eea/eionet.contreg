@@ -31,16 +31,16 @@ public class TripleDTO {
 
     /** */
     private long subjectHash;
-    /** Local variable.*/
+    /** Local variable. */
     private long predicateHash;
-    /** Local variable.*/
+    /** Local variable. */
     private long objectHash;
 
     /** */
     private Long sourceHash;
-    /** Local variable.*/
+    /** Local variable. */
     private Long objectDerivSourceHash;
-    /** Local variable.*/
+    /** Local variable. */
     private Long objectSourceObjectHash;
 
     /** */
@@ -73,20 +73,29 @@ public class TripleDTO {
 
     /**
      * Creates a new TripleDTO object.
-     * @param subjectUri subject URI
-     * @param predicateUri predicate Uri
-     * @param object Object value
+     *
+     * @param subjectUri
+     *            subject URI
+     * @param predicateUri
+     *            predicate Uri
+     * @param object
+     *            Object value
      */
     public TripleDTO(String subjectUri, String predicateUri, String object) {
         this.subjectUri = subjectUri;
         this.predicateUri = predicateUri;
         this.object = object;
     }
+
     /**
      * Constructor of a new TripleDTO object.
-     * @param subjectHash Hashed subject
-     * @param predicateHash hashed predicate
-     * @param objectHash hashed object
+     *
+     * @param subjectHash
+     *            Hashed subject
+     * @param predicateHash
+     *            hashed predicate
+     * @param objectHash
+     *            hashed object
      */
     public TripleDTO(long subjectHash, long predicateHash, long objectHash) {
 
@@ -97,9 +106,13 @@ public class TripleDTO {
 
     /**
      * Constructor of a new TripleDTO object.
-     * @param subjectHash hashed subject
-     * @param predicateHash hashed predicate of the triple
-     * @param object Object of the triple
+     *
+     * @param subjectHash
+     *            hashed subject
+     * @param predicateHash
+     *            hashed predicate of the triple
+     * @param object
+     *            Object of the triple
      */
     public TripleDTO(long subjectHash, long predicateHash, String object) {
 
@@ -119,128 +132,158 @@ public class TripleDTO {
     public long getSubjectHash() {
         return subjectHash;
     }
+
     /**
      * @return the predicateHash
      */
     public long getPredicateHash() {
         return predicateHash;
     }
+
     /**
      * @return the objectHash
      */
     public long getObjectHash() {
         return objectHash;
     }
+
     /**
      * @return the subjectUri
      */
     public String getSubjectUri() {
         return subjectUri;
     }
+
     /**
-     * @param subjectUri the subjectUri to set
+     * @param subjectUri
+     *            the subjectUri to set
      */
     public void setSubjectUri(String subjectUri) {
         this.subjectUri = subjectUri;
     }
+
     /**
      * @return the predicateUri
      */
     public String getPredicateUri() {
         return predicateUri;
     }
+
     /**
-     * @param predicateUri the predicateUri to set
+     * @param predicateUri
+     *            the predicateUri to set
      */
     public void setPredicateUri(String predicateUri) {
         this.predicateUri = predicateUri;
     }
+
     /**
      * @return the sourceUri
      */
     public String getSourceUri() {
         return sourceUri;
     }
+
     /**
-     * @param sourceUri the sourceUri to set
+     * @param sourceUri
+     *            the sourceUri to set
      */
     public void setSourceUri(String sourceUri) {
         this.sourceUri = sourceUri;
     }
+
     /**
      * @return the objectDerivSourceUri
      */
     public String getObjectDerivSourceUri() {
         return objectDerivSourceUri;
     }
+
     /**
-     * @param objectDerivSourceUri the objectDerivSourceUri to set
+     * @param objectDerivSourceUri
+     *            the objectDerivSourceUri to set
      */
     public void setObjectDerivSourceUri(String objectDerivSourceUri) {
         this.objectDerivSourceUri = objectDerivSourceUri;
     }
+
     /**
      * @return the isAnonymousSubject
      */
     public boolean isAnonymousSubject() {
         return isAnonymousSubject;
     }
+
     /**
-     * @param isAnonymousSubject the isAnonymousSubject to set
+     * @param isAnonymousSubject
+     *            the isAnonymousSubject to set
      */
     public void setAnonymousSubject(boolean isAnonymousSubject) {
         this.isAnonymousSubject = isAnonymousSubject;
     }
+
     /**
      * @return the isAnonymousObject
      */
     public boolean isAnonymousObject() {
         return isAnonymousObject;
     }
+
     /**
-     * @param isAnonymousObject the isAnonymousObject to set
+     * @param isAnonymousObject
+     *            the isAnonymousObject to set
      */
     public void setAnonymousObject(boolean isAnonymousObject) {
         this.isAnonymousObject = isAnonymousObject;
     }
+
     /**
      * @return the isLiteralObject
      */
     public boolean isLiteralObject() {
         return isLiteralObject;
     }
+
     /**
-     * @param isLiteralObject the isLiteralObject to set
+     * @param isLiteralObject
+     *            the isLiteralObject to set
      */
     public void setLiteralObject(boolean isLiteralObject) {
         this.isLiteralObject = isLiteralObject;
     }
+
     /**
      * @return the object
      */
     public String getObject() {
         return object;
     }
+
     /**
      * @return the objectLanguage
      */
     public String getObjectLanguage() {
         return objectLanguage;
     }
+
     /**
-     * @param objectLanguage the objectLanguage to set
+     * @param objectLanguage
+     *            the objectLanguage to set
      */
     public void setObjectLanguage(String objectLanguage) {
         this.objectLanguage = objectLanguage;
     }
+
     /**
      * @return the objectDouble
      */
     public Double getObjectDouble() {
         return objectDouble;
     }
+
     /**
-     * @param objectDouble the objectDouble to set
+     * @param objectDouble
+     *            the objectDouble to set
      */
     public void setObjectDouble(Double objectDouble) {
         this.objectDouble = objectDouble;
@@ -254,7 +297,8 @@ public class TripleDTO {
     }
 
     /**
-     * @param sourceHash the sourceHash to set
+     * @param sourceHash
+     *            the sourceHash to set
      */
     public void setSourceHash(Long sourceHash) {
         this.sourceHash = sourceHash;
@@ -268,7 +312,8 @@ public class TripleDTO {
     }
 
     /**
-     * @param objectDerivSourceHash the objectDerivSourceHash to set
+     * @param objectDerivSourceHash
+     *            the objectDerivSourceHash to set
      */
     public void setObjectDerivSourceHash(Long objectDerivSourceHash) {
         this.objectDerivSourceHash = objectDerivSourceHash;
@@ -282,7 +327,8 @@ public class TripleDTO {
     }
 
     /**
-     * @param objectSourceObjectHash the objectSourceObjectHash to set
+     * @param objectSourceObjectHash
+     *            the objectSourceObjectHash to set
      */
     public void setObjectSourceObjectHash(Long objectSourceObjectHash) {
         this.objectSourceObjectHash = objectSourceObjectHash;
@@ -296,7 +342,8 @@ public class TripleDTO {
     }
 
     /**
-     * @param genTime the genTime to set
+     * @param genTime
+     *            the genTime to set
      */
     public void setGenTime(Long genTime) {
         this.genTime = genTime;
@@ -310,7 +357,8 @@ public class TripleDTO {
     }
 
     /**
-     * @param objectDerivGenTime the objectDerivGenTime to set
+     * @param objectDerivGenTime
+     *            the objectDerivGenTime to set
      */
     public void setObjectDerivGenTime(Long objectDerivGenTime) {
         this.objectDerivGenTime = objectDerivGenTime;

@@ -68,8 +68,8 @@ public class SQLUtil {
      * @return Object
      * @throws SQLException
      */
-    public static Object executeSingleReturnValueQuery(
-            String parameterizedSQL, List<?> values, Connection conn) throws SQLException {
+    public static Object executeSingleReturnValueQuery(String parameterizedSQL, List<?> values, Connection conn)
+            throws SQLException {
 
         ResultSet rs = null;
         PreparedStatement pstmt = null;
@@ -93,8 +93,8 @@ public class SQLUtil {
      * @throws ResultSetReaderException
      */
     @SuppressWarnings("rawtypes")
-    public static void executeQuery(String parameterizedSQL, List<?> values,
-            SQLResultSetReader rsReader, Connection conn) throws SQLException, ResultSetReaderException {
+    public static void executeQuery(String parameterizedSQL, List<?> values, SQLResultSetReader rsReader, Connection conn)
+            throws SQLException, ResultSetReaderException {
 
         ResultSet rs = null;
         PreparedStatement pstmt = null;
@@ -105,15 +105,19 @@ public class SQLUtil {
                 ResultSetMetaData rsMd = rs.getMetaData();
                 if (rsMd != null && rsMd.getColumnCount() > 0) {
                     rsReader.startResultSet(rsMd);
-                    while (rs.next())
+                    while (rs.next()) {
                         rsReader.readRow(rs);
+                    }
                 }
             }
         } finally {
             try {
-                if (rs != null) rs.close();
-                if (pstmt != null) pstmt.close();
-            } catch (SQLException e) {}
+                if (rs != null)
+                    rs.close();
+                if (pstmt != null)
+                    pstmt.close();
+            } catch (SQLException e) {
+            }
         }
 
     }
@@ -126,7 +130,8 @@ public class SQLUtil {
      * @throws SQLException
      * @throws ResultSetReaderException
      */
-    public static List<Map<String,SQLValue>> executeQuery(String sql, Connection conn) throws SQLException, ResultSetReaderException {
+    public static List<Map<String, SQLValue>> executeQuery(String sql, Connection conn) throws SQLException,
+            ResultSetReaderException {
 
         SQLValueReader sqlValueReader = new SQLValueReader();
         executeQuery(sql, sqlValueReader, conn);
@@ -139,10 +144,12 @@ public class SQLUtil {
      * @param rsReader
      * @param conn
      * @throws SQLException
-     * @throws ResultSetReaderException TODO
+     * @throws ResultSetReaderException
+     *             TODO
      */
     @SuppressWarnings("rawtypes")
-    public static void executeQuery(String sql, SQLResultSetReader rsReader, Connection conn) throws SQLException, ResultSetReaderException {
+    public static void executeQuery(String sql, SQLResultSetReader rsReader, Connection conn) throws SQLException,
+            ResultSetReaderException {
 
         ResultSet rs = null;
         Statement stmt = null;
@@ -160,9 +167,12 @@ public class SQLUtil {
             }
         } finally {
             try {
-                if (rs != null) rs.close();
-                if (stmt != null) stmt.close();
-            } catch (SQLException e) {}
+                if (rs != null)
+                    rs.close();
+                if (stmt != null)
+                    stmt.close();
+            } catch (SQLException e) {
+            }
         }
     }
 
@@ -182,8 +192,10 @@ public class SQLUtil {
             return pstmt.executeUpdate();
         } finally {
             try {
-                if (pstmt != null) pstmt.close();
-            } catch (SQLException e) {}
+                if (pstmt != null)
+                    pstmt.close();
+            } catch (SQLException e) {
+            }
         }
     }
 
@@ -195,8 +207,7 @@ public class SQLUtil {
      * @return int
      * @throws CRException
      */
-    public static int executeUpdateReturnAutoID(String parameterizedSQL,
-            List<?> values, Connection conn) throws CRException {
+    public static int executeUpdateReturnAutoID(String parameterizedSQL, List<?> values, Connection conn) throws CRException {
 
         PreparedStatement pstmt = null;
         try {
@@ -211,8 +222,10 @@ public class SQLUtil {
             throw new CRException(sqle.toString(), sqle);
         } finally {
             try {
-                if (pstmt != null) pstmt.close();
-            } catch (SQLException e) {}
+                if (pstmt != null)
+                    pstmt.close();
+            } catch (SQLException e) {
+            }
         }
     }
 
@@ -244,9 +257,9 @@ public class SQLUtil {
      */
     public static PreparedStatement prepareStatement(String parameterizedSQL, List<?> values, Connection conn) throws SQLException {
 
-        PreparedStatement pstmt= conn.prepareStatement(parameterizedSQL);
+        PreparedStatement pstmt = conn.prepareStatement(parameterizedSQL);
         for (int i = 0; values != null && i < values.size(); i++) {
-            pstmt.setObject(i+1, values.get(i));
+            pstmt.setObject(i + 1, values.get(i));
         }
         return pstmt;
     }
@@ -260,13 +273,14 @@ public class SQLUtil {
      * @return PreparedStatement
      * @throws SQLException
      */
-    public static PreparedStatement prepareStatement(String parameterizedSQL,
-            List<?> values, Connection conn, boolean autoGeneratedKeys) throws SQLException {
+    public static PreparedStatement prepareStatement(String parameterizedSQL, List<?> values, Connection conn,
+            boolean autoGeneratedKeys) throws SQLException {
 
-        PreparedStatement pstmt = conn.prepareStatement(parameterizedSQL,
-                autoGeneratedKeys ? Statement.RETURN_GENERATED_KEYS : Statement.NO_GENERATED_KEYS);
+        PreparedStatement pstmt =
+                conn.prepareStatement(parameterizedSQL, autoGeneratedKeys ? Statement.RETURN_GENERATED_KEYS
+                        : Statement.NO_GENERATED_KEYS);
         for (int i = 0; values != null && i < values.size(); i++) {
-            pstmt.setObject(i+1, values.get(i));
+            pstmt.setObject(i + 1, values.get(i));
         }
         return pstmt;
     }
@@ -279,7 +293,8 @@ public class SQLUtil {
         if (conn != null) {
             try {
                 conn.close();
-            } catch (SQLException e) {}
+            } catch (SQLException e) {
+            }
         }
     }
 
@@ -291,7 +306,8 @@ public class SQLUtil {
         if (stmt != null) {
             try {
                 stmt.close();
-            } catch (SQLException e) {}
+            } catch (SQLException e) {
+            }
         }
     }
 
@@ -303,7 +319,8 @@ public class SQLUtil {
         if (rs != null) {
             try {
                 rs.close();
-            } catch (SQLException e) {}
+            } catch (SQLException e) {
+            }
         }
     }
 
@@ -316,7 +333,8 @@ public class SQLUtil {
         if (conn != null) {
             try {
                 conn.rollback();
-            } catch (SQLException e) {}
+            } catch (SQLException e) {
+            }
         }
     }
 }

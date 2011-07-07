@@ -52,8 +52,8 @@ public interface HarvestDAO extends DAO {
      * @param harvestDTO
      * @throws DAOException
      */
-    public void updateFinishedHarvest(int harvestId, String status, int totStatements,
-            int litStatements, int encSchemes) throws DAOException;
+    public void updateFinishedHarvest(int harvestId, String status, int totStatements, int litStatements, int encSchemes)
+            throws DAOException;
 
     /**
      *

@@ -17,6 +17,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang.StringUtils;
 import org.openrdf.model.vocabulary.XMLSchema;
+import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.xml.sax.SAXException;
 
@@ -36,6 +37,7 @@ import eionet.cr.harvest.util.HarvestMessageType;
 import eionet.cr.harvest.util.HarvestUrlConnection;
 import eionet.cr.harvest.util.MimeTypeConverter;
 import eionet.cr.util.ConnectionError;
+import eionet.cr.util.ConnectionError.ErrType;
 import eionet.cr.util.FileUtil;
 import eionet.cr.util.GZip;
 import eionet.cr.util.Hashes;
@@ -43,7 +45,6 @@ import eionet.cr.util.URLUtil;
 import eionet.cr.util.UrlRedirectAnalyzer;
 import eionet.cr.util.UrlRedirectionInfo;
 import eionet.cr.util.Util;
-import eionet.cr.util.ConnectionError.ErrType;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.xml.ConversionsParser;
 import eionet.cr.util.xml.XmlAnalysis;
@@ -80,7 +81,8 @@ public class PullHarvest extends Harvest {
     /**
      *
      * @param sourceUrlString
-     * @param lastHarvest - date to set as last harvest.
+     * @param lastHarvest
+     *            - date to set as last harvest.
      */
     public PullHarvest(String sourceUrlString, Date lastHarvest) {
         super(sourceUrlString);
@@ -135,19 +137,22 @@ public class PullHarvest extends Harvest {
                                 daoWriter = null; // we dont't want finishing actions to be done
                                 if (source.isPrioritySource()) {
                                     DAOFactory.get().getDao(HarvestSourceDAO.class).increaseUnavailableCount(source.getSourceId());
-                                    String err = "Source: " + source.getUrl() + " has permanent error. Will not delete the source because it is Priority source";
+                                    String err =
+                                        "Source: "
+                                        + source.getUrl()
+                                        + " has permanent error. Will not delete the source because it is Priority source";
                                     logger.debug(err);
                                     throw new HarvestException(err, new Throwable());
                                 } else {
                                     DAOFactory.get().getDao(HarvestSourceDAO.class)
-                                            .queueSourcesForDeletion(Collections.singletonList(sourceUrlString));
+                                    .queueSourcesForDeletion(Collections.singletonList(sourceUrlString));
                                 }
                                 return;
                             } else if (source.getCountUnavail() >= 5) {
                                 if (!source.isPrioritySource()) {
                                     daoWriter = null; // we dont't want finishing actions to be done
                                     DAOFactory.get().getDao(HarvestSourceDAO.class)
-                                            .queueSourcesForDeletion(Collections.singletonList(sourceUrlString));
+                                    .queueSourcesForDeletion(Collections.singletonList(sourceUrlString));
                                     return;
                                 }
                             }
@@ -176,11 +181,14 @@ public class PullHarvest extends Harvest {
 
                     // Check if Virtuoso is up and running. If not consider it as temporary error
                     boolean virtuosoAvailable = true;
+                    RepositoryConnection repoConn = null;
                     try {
-                        SesameUtil.getRepositoryConnection();
+                        repoConn = SesameUtil.getRepositoryConnection();
                     } catch (RepositoryException e) {
                         sourceAvailable = false;
                         virtuosoAvailable = false;
+                    } finally {
+                        SesameUtil.close(repoConn);
                     }
 
                     ConnectionError error = harvestUrlConnection.getError();
@@ -190,7 +198,8 @@ public class PullHarvest extends Harvest {
                             permanentError = true;
                             DAOFactory.get().getDao(HarvestSourceDAO.class).deleteSourceTriples(sourceUrlString);
 
-                            DAOFactory.get().getDao(HarvestSourceDAO.class).removeAllPredicatesFromHarvesterContext(sourceUrlString);
+                            DAOFactory.get().getDao(HarvestSourceDAO.class)
+                            .removeAllPredicatesFromHarvesterContext(sourceUrlString);
                         }
 
                         // Add cr:firstSeen metadata predicate into harvester context
@@ -198,17 +207,17 @@ public class PullHarvest extends Harvest {
                             String firstSeen = dateFormat.format(source.getTimeCreated());
                             ObjectDTO firstSeenObject = new ObjectDTO(firstSeen, true, XMLSchema.DATETIME);
                             DAOFactory.get().getDao(HarvestSourceDAO.class)
-                                    .insertUpdateSourceMetadata(sourceUrlString, Predicates.CR_FIRST_SEEN, firstSeenObject);
+                            .insertUpdateSourceMetadata(sourceUrlString, Predicates.CR_FIRST_SEEN, firstSeenObject);
                         }
 
                         ObjectDTO errorObject = new ObjectDTO(error.getMessage(), true);
                         DAOFactory.get().getDao(HarvestSourceDAO.class)
-                                .insertUpdateSourceMetadata(sourceUrlString, Predicates.CR_ERROR_MESSAGE, errorObject);
+                        .insertUpdateSourceMetadata(sourceUrlString, Predicates.CR_ERROR_MESSAGE, errorObject);
 
                         String lastRefreshed = dateFormat.format(new Date(System.currentTimeMillis()));
                         ObjectDTO lastRefreshedObject = new ObjectDTO(lastRefreshed, true, XMLSchema.DATETIME);
                         DAOFactory.get().getDao(HarvestSourceDAO.class)
-                                .insertUpdateSourceMetadata(sourceUrlString, Predicates.CR_LAST_REFRESHED, lastRefreshedObject);
+                        .insertUpdateSourceMetadata(sourceUrlString, Predicates.CR_LAST_REFRESHED, lastRefreshedObject);
                     }
 
                     if (sourceAvailable && needsHarvesting) {
@@ -297,9 +306,11 @@ public class PullHarvest extends Harvest {
     /**
      * Harvest the given file.
      *
-     * @param file - file on filesystem containing the data.
+     * @param file
+     *            - file on filesystem containing the data.
      * @param contentType
-     * @param fileSize - Don't do any harvest if file size is zero.
+     * @param fileSize
+     *            - Don't do any harvest if file size is zero.
      * @return the number of triples in source
      * @throws HarvestException
      */
@@ -353,14 +364,15 @@ public class PullHarvest extends Harvest {
     /**
      * Check if the content-type is one that is supported.
      *
-     * @param contentType - value to check.
+     * @param contentType
+     *            - value to check.
      * @return true if content-type is supported
      */
     private boolean isSupportedContentType(String contentType) {
 
         return contentType.startsWith("text/xml") || contentType.startsWith("application/xml")
-                || contentType.startsWith("application/rdf+xml") || contentType.startsWith("application/atom+xml")
-                || contentType.startsWith("application/octet-stream") || contentType.startsWith("application/x-gzip");
+        || contentType.startsWith("application/rdf+xml") || contentType.startsWith("application/atom+xml")
+        || contentType.startsWith("application/octet-stream") || contentType.startsWith("application/x-gzip");
     }
 
     /**
@@ -372,18 +384,20 @@ public class PullHarvest extends Harvest {
     private boolean isXmlContentType(String contentType) {
 
         return contentType.startsWith("text/xml") || contentType.startsWith("application/xml")
-                || contentType.startsWith("application/rdf+xml") || contentType.startsWith("application/atom+xml");
+        || contentType.startsWith("application/rdf+xml") || contentType.startsWith("application/atom+xml");
     }
 
     /**
      * Stores metadata if URL content is not modified and source is not harvested.
-     * @throws DAOException if updating in Virtuoso fails.
+     *
+     * @throws DAOException
+     *             if updating in Virtuoso fails.
      *
      */
     private void handleSourceNotModified() throws DAOException {
 
         SubjectDTO failedHarvestSourceMetadata = new SubjectDTO(sourceUrlString, false);
-        //only cr:lastRefresh has to be stored in case of failure if source is not modified
+        // only cr:lastRefresh has to be stored in case of failure if source is not modified
         String lastRefreshed = dateFormat.format(new Date());
         ObjectDTO lastRefreshDate = new ObjectDTO(lastRefreshed, true, XMLSchema.DATETIME);
 
@@ -411,7 +425,8 @@ public class PullHarvest extends Harvest {
      * have triggered
      *
      * @return boolean
-     * @throws DAOException if database query fails.
+     * @throws DAOException
+     *             if database query fails.
      */
     private boolean shouldBeHarvested() throws DAOException {
 
@@ -423,8 +438,8 @@ public class PullHarvest extends Harvest {
         long now = System.currentTimeMillis();
         long lastHarvestTime = finalSource.getLastHarvest() == null ? 0 : finalSource.getLastHarvest().getTime();
         long sinceLastHarvest = now - lastHarvestTime;
-        long harvestIntervalMillis = finalSource.getIntervalMinutes() == null ? 0L
-                : finalSource.getIntervalMinutes().longValue() * 60L * 1000L;
+        long harvestIntervalMillis =
+            finalSource.getIntervalMinutes() == null ? 0L : finalSource.getIntervalMinutes().longValue() * 60L * 1000L;
 
         if (lastHarvestTime == 0 || (lastHarvestTime > 0 && sinceLastHarvest > harvestIntervalMillis)) {
             ret = true;
@@ -446,7 +461,8 @@ public class PullHarvest extends Harvest {
      *
      * @return List<String>
      * @throws HarvestException
-     * @throws DAOException if database query fails.
+     * @throws DAOException
+     *             if database query fails.
      * @throws RepositoryException
      */
     private List<String> resolveRedirects() throws HarvestException, DAOException, RepositoryException, IOException {
@@ -472,12 +488,12 @@ public class PullHarvest extends Harvest {
             String lastRefreshed = dateFormat.format(new Date(System.currentTimeMillis()));
             ObjectDTO lastRefreshedObject = new ObjectDTO(lastRefreshed, true, XMLSchema.DATETIME);
             DAOFactory.get().getDao(HarvestSourceDAO.class)
-                    .insertUpdateSourceMetadata(lastUrl.getSourceURL(), Predicates.CR_LAST_REFRESHED, lastRefreshedObject);
+            .insertUpdateSourceMetadata(lastUrl.getSourceURL(), Predicates.CR_LAST_REFRESHED, lastRefreshedObject);
 
             // Add redirection metadata into Virtuoso /harvester context
             ObjectDTO redirectObject = new ObjectDTO(lastUrl.getTargetURL(), false);
             DAOFactory.get().getDao(HarvestSourceDAO.class)
-                    .insertUpdateSourceMetadata(lastUrl.getSourceURL(), Predicates.CR_REDIRECTED_TO, redirectObject);
+            .insertUpdateSourceMetadata(lastUrl.getSourceURL(), Predicates.CR_REDIRECTED_TO, redirectObject);
 
             ret.add(lastUrl.getSourceURL());
             redirectionsFound = ret.size();
@@ -506,7 +522,7 @@ public class PullHarvest extends Harvest {
             }
             // Finish original redirection harvest
             DAOFactory.get().getDao(HarvestDAO.class)
-                    .updateFinishedHarvest(daoWriter.getHarvestId(), Harvest.STATUS_FINISHED, 0, 0, 0);
+            .updateFinishedHarvest(daoWriter.getHarvestId(), Harvest.STATUS_FINISHED, 0, 0, 0);
 
             for (String url : ret) {
                 if (!url.equals(originalSource.getUrl())) {
@@ -543,21 +559,23 @@ public class PullHarvest extends Harvest {
                         // If final source needs harvesting, create record into HARVEST table
                         if (needsHarvesting) {
                             // Insert harvest
-                            int harvestId = DAOFactory
-                                    .get()
-                                    .getDao(HarvestDAO.class)
-                                    .insertStartedHarvest(redirectedSource.getSourceId(), Harvest.TYPE_PULL,
-                                            CRUser.APPLICATION.getUserName(), Harvest.STATUS_STARTED);
+                            int harvestId =
+                                DAOFactory
+                                .get()
+                                .getDao(HarvestDAO.class)
+                                .insertStartedHarvest(redirectedSource.getSourceId(), Harvest.TYPE_PULL,
+                                        CRUser.APPLICATION.getUserName(), Harvest.STATUS_STARTED);
                             // If final source, then update DAO Writer harvestId
                             daoWriter.setHarvestId(harvestId);
                         }
                     } else {
                         // Insert harvest
-                        int harvestId = DAOFactory
-                                .get()
-                                .getDao(HarvestDAO.class)
-                                .insertStartedHarvest(redirectedSource.getSourceId(), Harvest.TYPE_PULL,
-                                        CRUser.APPLICATION.getUserName(), Harvest.STATUS_FINISHED);
+                        int harvestId =
+                            DAOFactory
+                            .get()
+                            .getDao(HarvestDAO.class)
+                            .insertStartedHarvest(redirectedSource.getSourceId(), Harvest.TYPE_PULL,
+                                    CRUser.APPLICATION.getUserName(), Harvest.STATUS_FINISHED);
                         // Insert harvest message for redirected URLs
                         msg = redirections.get(redirectedSource.getUrl());
                         if (!StringUtils.isBlank(msg)) {
@@ -565,7 +583,7 @@ public class PullHarvest extends Harvest {
                         }
                         // Finish harvest for redirected URLs
                         DAOFactory.get().getDao(HarvestDAO.class)
-                                .updateFinishedHarvest(harvestId, Harvest.STATUS_FINISHED, 0, 0, 0);
+                        .updateFinishedHarvest(harvestId, Harvest.STATUS_FINISHED, 0, 0, 0);
                     }
                 }
                 // Update last_harvest for URL's
@@ -577,7 +595,7 @@ public class PullHarvest extends Harvest {
                     String firstSeen = dateFormat.format(redirectedSource.getTimeCreated());
                     ObjectDTO firstSeenObject = new ObjectDTO(firstSeen, true, XMLSchema.DATETIME);
                     DAOFactory.get().getDao(HarvestSourceDAO.class)
-                            .insertUpdateSourceMetadata(url, Predicates.CR_FIRST_SEEN, firstSeenObject);
+                    .insertUpdateSourceMetadata(url, Predicates.CR_FIRST_SEEN, firstSeenObject);
                 }
             }
         }
@@ -588,7 +606,8 @@ public class PullHarvest extends Harvest {
     /**
      * @param message
      * @param harvestId
-     * @throws DAOException if database query fails.
+     * @throws DAOException
+     *             if database query fails.
      */
     private void insertHarvestMessage(String message, int harvestId) throws DAOException {
         HarvestMessageDTO harvestMessageDTO = new HarvestMessageDTO();
@@ -601,14 +620,17 @@ public class PullHarvest extends Harvest {
 
     /**
      *
-     * @throws ParserConfigurationException if the general config file is unparsable.
-     * @throws SAXException if the XML isn't well-formed.
+     * @throws ParserConfigurationException
+     *             if the general config file is unparsable.
+     * @throws SAXException
+     *             if the XML isn't well-formed.
      * @throws IOException
-     * @throws DAOException if database query fails.
+     * @throws DAOException
+     *             if database query fails.
      */
 
     private void setConversionModified(HttpURLConnection urlConnection) throws DAOException, IOException,
-            ParserConfigurationException, SAXException {
+    ParserConfigurationException, SAXException {
 
         if (lastHarvest != null) {
             Boolean conversionModified = isConversionModifiedSinceLastHarvest();
@@ -626,17 +648,20 @@ public class PullHarvest extends Harvest {
     }
 
     /**
-     * Checks if the conversion script is modified since last harvest. Uses the instance variable 'sourceUrlString'
-     * and 'lastHarvest'.
+     * Checks if the conversion script is modified since last harvest. Uses the instance variable 'sourceUrlString' and
+     * 'lastHarvest'.
      *
      * @return true if conversion script is modified. Can return null, and the caller must decide what that means.
-     * @throws ParserConfigurationException if the general config file is unparsable.
-     * @throws SAXException if the XML isn't well-formed.
+     * @throws ParserConfigurationException
+     *             if the general config file is unparsable.
+     * @throws SAXException
+     *             if the XML isn't well-formed.
      * @throws IOException
-     * @throws DAOException if database query fails.
+     * @throws DAOException
+     *             if database query fails.
      */
     private Boolean isConversionModifiedSinceLastHarvest() throws IOException, SAXException, ParserConfigurationException,
-            DAOException {
+    DAOException {
 
         Boolean result = null;
 
@@ -681,8 +706,10 @@ public class PullHarvest extends Harvest {
      * @param file
      * @param contentType
      * @throws IOException
-     * @throws SAXException if the XML isn't well-formed.
-     * @throws ParserConfigurationException if the general config file is unparsable.
+     * @throws SAXException
+     *             if the XML isn't well-formed.
+     * @throws ParserConfigurationException
+     *             if the general config file is unparsable.
      */
     private File preProcess(File file, String contentType) throws ParserConfigurationException, SAXException, IOException {
 
@@ -773,7 +800,8 @@ public class PullHarvest extends Harvest {
         // set last-refreshed predicate
         long lastRefreshed = System.currentTimeMillis();
         String lastRefreshedStr = dateFormat.format(new Date(lastRefreshed));
-        sourceMetadata.addObject(Predicates.CR_LAST_REFRESHED, new ObjectDTO(String.valueOf(lastRefreshedStr), true, XMLSchema.DATETIME));
+        sourceMetadata.addObject(Predicates.CR_LAST_REFRESHED, new ObjectDTO(String.valueOf(lastRefreshedStr), true,
+                XMLSchema.DATETIME));
 
         // detect the last-modified-date from HTTP response, if it's not >0, then take the value of last-refreshed
         sourceLastModified = urlConnection.getLastModified();
@@ -787,7 +815,8 @@ public class PullHarvest extends Harvest {
 
         int contentLength = urlConnection.getContentLength();
         if (contentLength >= 0) {
-            sourceMetadata.addObject(Predicates.CR_BYTE_SIZE, new ObjectDTO(String.valueOf(contentLength), true, XMLSchema.INTEGER));
+            sourceMetadata.addObject(Predicates.CR_BYTE_SIZE,
+                    new ObjectDTO(String.valueOf(contentLength), true, XMLSchema.INTEGER));
         }
 
         // set the firstSeen predicate
@@ -872,7 +901,8 @@ public class PullHarvest extends Harvest {
      * @param sourceUrl
      * @param urgent
      * @return VirtuosoPullHarvest
-     * @throws DAOException if database query fails.
+     * @throws DAOException
+     *             if database query fails.
      */
     public static PullHarvest createFullSetup(String sourceUrl, boolean urgent) throws DAOException {
 
@@ -880,11 +910,11 @@ public class PullHarvest extends Harvest {
     }
 
     /**
-     *
      * @param dto
      * @param urgent
      * @return VirtuosoPullHarvest
-     * @throws DAOException if database query fails.
+     * @throws DAOException
+     *             if database query fails.
      */
     public static PullHarvest createFullSetup(HarvestSourceDTO dto, boolean urgent) throws DAOException {
 
@@ -892,10 +922,12 @@ public class PullHarvest extends Harvest {
 
         harvest.setBatchHarvest(true);
         harvest.setUrgentHarvest(urgent);
-        harvest.setPreviousHarvest(DAOFactory.get().getDao(HarvestDAO.class).getLastHarvestBySourceId(dto.getSourceId().intValue()));
+        harvest.setPreviousHarvest(DAOFactory.get().getDao(HarvestDAO.class)
+                .getLastHarvestBySourceId(dto.getSourceId().intValue()));
         harvest.setNotificationSender(new HarvestNotificationSender());
 
-        harvest.setDaoWriter(new HarvestDAOWriter(dto.getSourceId().intValue(), Harvest.TYPE_PULL, CRUser.APPLICATION.getUserName()));
+        harvest.setDaoWriter(new HarvestDAOWriter(dto.getSourceId().intValue(), Harvest.TYPE_PULL, CRUser.APPLICATION
+                .getUserName()));
 
         return harvest;
     }

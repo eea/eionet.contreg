@@ -12,7 +12,7 @@ public class BaseUrl {
             valueSet = true;
             StringBuffer requestUrl = request.getRequestURL();
             String servletPath = request.getServletPath();
-            baseUrl = requestUrl.substring(0, requestUrl.length() - servletPath.length())+"/";
+            baseUrl = requestUrl.substring(0, requestUrl.length() - servletPath.length()) + "/";
         }
         return baseUrl;
     }

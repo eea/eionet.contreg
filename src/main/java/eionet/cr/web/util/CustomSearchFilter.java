@@ -39,44 +39,55 @@ public class CustomSearchFilter {
     public String getUri() {
         return uri;
     }
+
     /**
-     * @param uri the uri to set
+     * @param uri
+     *            the uri to set
      */
     public void setUri(String uri) {
         this.uri = uri;
     }
+
     /**
      * @return the title
      */
     public String getTitle() {
         return title;
     }
+
     /**
-     * @param title the title to set
+     * @param title
+     *            the title to set
      */
     public void setTitle(String title) {
         this.title = title;
     }
+
     /**
      * @return the description
      */
     public String getDescription() {
         return description;
     }
+
     /**
-     * @param description the description to set
+     * @param description
+     *            the description to set
      */
     public void setDescription(String description) {
         this.description = description;
     }
+
     /**
      * @return the provideValues
      */
     public boolean isProvideValues() {
         return provideValues;
     }
+
     /**
-     * @param provideValues the provideValues to set
+     * @param provideValues
+     *            the provideValues to set
      */
     public void setProvideValues(boolean provideValues) {
         this.provideValues = provideValues;

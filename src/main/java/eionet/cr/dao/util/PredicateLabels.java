@@ -31,7 +31,7 @@ import eionet.cr.util.Util;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class PredicateLabels extends HashMap<String,HashMap<String,HashSet<String>>>{
+public class PredicateLabels extends HashMap<String, HashMap<String, HashSet<String>>> {
 
     /**
      *
@@ -41,9 +41,9 @@ public class PredicateLabels extends HashMap<String,HashMap<String,HashSet<Strin
      */
     public void add(String predicate, String label, String language) {
 
-        HashMap<String,HashSet<String>> labels = get(predicate);
+        HashMap<String, HashSet<String>> labels = get(predicate);
         if (labels == null) {
-            labels = new HashMap<String,HashSet<String>>();
+            labels = new HashMap<String, HashSet<String>>();
             put(predicate, labels);
         }
 
@@ -62,19 +62,19 @@ public class PredicateLabels extends HashMap<String,HashMap<String,HashSet<Strin
      * @param languages
      * @return
      */
-    public Map<String,String> getByLanguages(HashSet<String> languages) {
+    public Map<String, String> getByLanguages(HashSet<String> languages) {
 
-        Map<String,String> result = new HashMap<String,String>();
+        Map<String, String> result = new HashMap<String, String>();
         if (languages != null && !languages.isEmpty()) {
 
             if (!isEmpty()) {
 
-                for (String predicate:keySet()) {
+                for (String predicate : keySet()) {
 
-                    HashMap<String,HashSet<String>> labels = get(predicate);
+                    HashMap<String, HashSet<String>> labels = get(predicate);
 
                     HashSet<String> labelsInRequestedLanguages = null;
-                    for (String language:languages) {
+                    for (String language : languages) {
                         labelsInRequestedLanguages = labels.get(language);
                     }
 

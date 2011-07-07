@@ -17,24 +17,31 @@ public class HarvestUrgencyScoreDTO {
     public String getUrl() {
         return url;
     }
+
     public void setUrl(String url) {
         this.url = url;
     }
+
     public Date getLastHarvest() {
         return lastHarvest;
     }
+
     public void setLastHarvest(Date lastHarvest) {
         this.lastHarvest = lastHarvest;
     }
+
     public long getIntervalMinutes() {
         return intervalMinutes;
     }
+
     public void setIntervalMinutes(long intervalMinutes) {
         this.intervalMinutes = intervalMinutes;
     }
+
     public double getUrgency() {
         return urgency;
     }
+
     public void setUrgency(double urgency) {
         this.urgency = urgency;
     }

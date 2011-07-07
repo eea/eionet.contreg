@@ -42,13 +42,12 @@ import eionet.cr.util.Pair;
 import eionet.cr.util.pagination.PagingRequest;
 
 /**
- * @author Enriko Käsper, TietoEnator Estonia AS
- * XlsExporter
+ * @author Enriko Käsper, TietoEnator Estonia AS XlsExporter
  */
 
 public class XlsExporter extends Exporter implements SubjectExportEvent {
 
-    //config param in cr.properties
+    // config param in cr.properties
     private static final String EXPORT_ROW_LIMIT = "exporter.xls.row.limit";
     private HSSFSheet sheet;
     int rowNumber = 1;
@@ -66,17 +65,17 @@ public class XlsExporter extends Exporter implements SubjectExportEvent {
         HSSFWorkbook workbook = new HSSFWorkbook();
         sheet = workbook.createSheet("exported data");
 
-        //some pretty print with headers
+        // some pretty print with headers
         CellStyle headerStyle = workbook.createCellStyle();
         Font headerFont = workbook.createFont();
         headerFont.setBoldweight(Font.BOLDWEIGHT_BOLD);
         headerStyle.setFont(headerFont);
 
-        //output headers
+        // output headers
         HSSFRow headers = sheet.createRow(0);
-        //store width of each column +1 for Uri or Label column
+        // store width of each column +1 for Uri or Label column
         columnWidth = new int[getSelectedColumns().size() + 1];
-        //output Uri or Label column
+        // output Uri or Label column
         String uriOrLabelColumn = getUriOrLabel();
 
         columnWidth[0] = uriOrLabelColumn.length();
@@ -84,15 +83,14 @@ public class XlsExporter extends Exporter implements SubjectExportEvent {
         XlsUtil.setCellValue(uriOrLabelCell, uriOrLabelColumn);
         uriOrLabelCell.setCellStyle(headerStyle);
 
-        //output rest of the headers
-        int columnNumber= 1;
-        for (Pair<String,String> columnPair : getSelectedColumns()) {
-            //label is already added to the list of elements
-            if (Predicates.RDFS_LABEL.equals(columnPair.getLeft())) continue;
+        // output rest of the headers
+        int columnNumber = 1;
+        for (Pair<String, String> columnPair : getSelectedColumns()) {
+            // label is already added to the list of elements
+            if (Predicates.RDFS_LABEL.equals(columnPair.getLeft()))
+                continue;
 
-            String column = columnPair.getRight() != null
-            ? columnPair.getRight()
-                    : columnPair.getLeft();
+            String column = columnPair.getRight() != null ? columnPair.getRight() : columnPair.getLeft();
             columnWidth[columnNumber] = column.length();
             HSSFCell cell = headers.createCell(columnNumber++);
             XlsUtil.setCellValue(cell, column);
@@ -100,11 +98,11 @@ public class XlsExporter extends Exporter implements SubjectExportEvent {
         }
         sheet.createFreezePane(0, 1);
 
-        //output serarch results
+        // output serarch results
         SubjectExportReader reader = new SubjectExportReader(this);
         doExportQueryAndWriteDataIntoOutput(reader);
 
-        //set column width
+        // set column width
         for (int i = 0; i < getSelectedColumns().size() + 1; i++) {
             sheet.setColumnWidth(i, Math.min(256 * columnWidth[i], 256 * 255));
         }
@@ -120,32 +118,35 @@ public class XlsExporter extends Exporter implements SubjectExportEvent {
     public void writeSubjectIntoExporterOutput(SubjectDTO subject) throws ExportException {
         HSSFRow row = sheet.createRow(rowNumber++);
 
-        //output uri or label column value
+        // output uri or label column value
         String value = getUriOrLabelValue(subject);
 
         columnWidth[0] = Math.max(columnWidth[0], value.length());
         XlsUtil.setCellValue(row.createCell(0), value);
 
-        //output other columns
+        // output other columns
         int columnNumber = 1;
-        for (Pair<String,String> columnPair : getSelectedColumns()) {
-            //label is already written
-            if (Predicates.RDFS_LABEL.equals(columnPair.getLeft())) continue;
+        for (Pair<String, String> columnPair : getSelectedColumns()) {
+            // label is already written
+            if (Predicates.RDFS_LABEL.equals(columnPair.getLeft()))
+                continue;
 
             value = FormatUtils.getObjectValuesForPredicate(columnPair.getLeft(), subject, getLanguages());
             columnWidth[columnNumber] = Math.max(columnWidth[columnNumber], value.length());
             XlsUtil.setCellValue(row.createCell(columnNumber++), value);
         }
     }
+
     @Override
     protected PagingRequest getRowLimitPagingRequest() {
 
         if (getRowsLimit() > 0) {
-            return PagingRequest.create(1,getRowsLimit());
+            return PagingRequest.create(1, getRowsLimit());
         } else {
             return null;
         }
     }
+
     public static Integer getRowsLimit() {
         return new Integer(GeneralConfig.getRequiredProperty(EXPORT_ROW_LIMIT));
     }

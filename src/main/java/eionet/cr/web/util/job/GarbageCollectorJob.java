@@ -33,10 +33,9 @@ import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.util.Util;
 
 /**
- * background job to perform garbage collection on the database. Pauses all
- * other jobs
- * @author Aleksandr Ivanov <a
- *         href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
+ * background job to perform garbage collection on the database. Pauses all other jobs
+ *
+ * @author Aleksandr Ivanov <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
 public class GarbageCollectorJob implements StatefulJob {
     /**
@@ -96,11 +95,11 @@ public class GarbageCollectorJob implements StatefulJob {
             // HarvestSourceDAO.deleteHarvestHistory(), because the latter has a bug:
             // it deletes all harvests where HARVEST_ID<=max(HARVEST_ID)-10. But this
             // should be done source-by-source.
-//          logger.debug("Garbage collector going to delete history of old harvests");
-//          start = System.currentTimeMillis();
-//          harvestSourceDAO.deleteHarvestHistory(NEEDED_TO_REMAIN);
-//          logger.debug("History of old harvests deleted with " + Util.durationSince(start));
-            
+            // logger.debug("Garbage collector going to delete history of old harvests");
+            // start = System.currentTimeMillis();
+            // harvestSourceDAO.deleteHarvestHistory(NEEDED_TO_REMAIN);
+            // logger.debug("History of old harvests deleted with " + Util.durationSince(start));
+
             LOGGER.debug("Garbage collector finished");
         } catch (Exception ignored) {
             LOGGER.error("error in garbage collector", ignored);

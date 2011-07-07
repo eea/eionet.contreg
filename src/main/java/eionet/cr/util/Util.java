@@ -34,7 +34,6 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -52,14 +51,20 @@ import eionet.cr.common.CRRuntimeException;
 
 /**
  * Utility methods.
- * 
+ *
  * @author heinljab
- * 
+ *
  */
 public class Util {
 
     /**
-     * 
+     * Private constructor to prevent public initiation.
+     */
+    private Util() {
+
+    }
+    /**
+     *
      * @param t
      * @return
      */
@@ -72,7 +77,7 @@ public class Util {
     }
 
     /**
-     * 
+     *
      * @param t
      * @return
      */
@@ -83,7 +88,7 @@ public class Util {
 
     /**
      * Escape HTML, line ends and tabs in stack trace messages.
-     * 
+     *
      * @param stackTrace
      *            Java stack trace as one String.
      * @return escaped stack trace message
@@ -103,20 +108,25 @@ public class Util {
     }
 
     /**
-     * 
+     *
      * @param stackTrace
      * @return
      */
     public static String[] getStackFrames(String stackTrace) {
+
+        List list = new ArrayList();
         StringTokenizer frames = new StringTokenizer(stackTrace, System.getProperty("line.separator"));
-        List list = new LinkedList();
-        for (; frames.hasMoreTokens(); list.add(frames.nextToken()))
-            ;
+        if (frames != null) {
+            while (frames.hasMoreElements()) {
+                list.add(frames.nextToken());
+            }
+        }
+
         return (String[]) list.toArray(new String[list.size()]);
     }
 
     /**
-     * 
+     *
      * @param array
      * @param separator
      * @return
@@ -136,7 +146,7 @@ public class Util {
     }
 
     /**
-     * 
+     *
      * @param date
      * @param datePattern
      * @return
@@ -151,7 +161,7 @@ public class Util {
     }
 
     /**
-     * 
+     *
      * @param str
      * @param datePattern
      * @return
@@ -168,36 +178,39 @@ public class Util {
             throw new CRRuntimeException("Failed to convert the given string to java.util.Date: " + e.toString(), e);
         }
     }
-
     /**
-     * 
-     * @return
+     * Constant equals to 1000.
+     */
+    private static final int MILLISECONDS_COUNT_IN_SECOND = 1000;
+    /**
+     * Current time in seconds.
+     * @return current time in seconds.
      */
     public static long currentTimeSeconds() {
-        return (long) (System.currentTimeMillis() / (long) 1000);
+        return (System.currentTimeMillis() / MILLISECONDS_COUNT_IN_SECOND);
     }
 
     /**
-     * 
-     * @param milliSeconds
-     * @return
+     * Converts milliseconds to seconds.
+     * @param milliSeconds milliseconds
+     * @return seconds
      */
-    public static long getSeconds(long milliSeconds) {
-        return (long) (milliSeconds / (long) 1000);
+    public static long getSeconds(final long milliSeconds) {
+        return (milliSeconds / MILLISECONDS_COUNT_IN_SECOND);
     }
 
     /**
-     * 
-     * @param str
-     * @return
+     * Returns true if given String is null or empty.
+     * @param str String
+     * @return boolean if String is empty or null.
      */
-    public static boolean isNullOrEmpty(String str) {
+    public static boolean isNullOrEmpty(final String str) {
         return str == null || str.length() == 0 || str.trim().length() == 0;
     }
 
     /**
      * Returns true if the given string has any whitespace in it, including the leading and trailing whitespace.
-     * 
+     *
      * @param s
      * @return
      */
@@ -215,7 +228,7 @@ public class Util {
     }
 
     /**
-     * 
+     *
      * @param array
      * @return
      */
@@ -224,7 +237,7 @@ public class Util {
     }
 
     /**
-     * 
+     *
      * @param array
      * @return
      */
@@ -233,7 +246,7 @@ public class Util {
     }
 
     /**
-     * 
+     *
      * @param array
      * @return
      */
@@ -260,7 +273,7 @@ public class Util {
     }
 
     /**
-     * 
+     *
      * @param pageContext
      * @param objectClass
      * @return
@@ -270,8 +283,8 @@ public class Util {
         if (pageContext == null || objectClass == null)
             return null;
 
-        int[] scopes = { PageContext.APPLICATION_SCOPE, PageContext.PAGE_SCOPE, PageContext.REQUEST_SCOPE,
-                PageContext.SESSION_SCOPE };
+        int[] scopes =
+        {PageContext.APPLICATION_SCOPE, PageContext.PAGE_SCOPE, PageContext.REQUEST_SCOPE, PageContext.SESSION_SCOPE};
         for (int i = 0; i < scopes.length; i++) {
             Enumeration attrs = pageContext.getAttributeNamesInScope(scopes[i]);
             while (attrs != null && attrs.hasMoreElements()) {
@@ -288,7 +301,7 @@ public class Util {
 
     /**
      * Convenience method for URL-encoding the given string.
-     * 
+     *
      * @param s
      * @return
      */
@@ -302,7 +315,7 @@ public class Util {
 
     /**
      * Convenience method for URL-decoding the given string.
-     * 
+     *
      * @param s
      * @return
      */
@@ -315,7 +328,7 @@ public class Util {
     }
 
     /**
-     * 
+     *
      * @param o
      * @return
      */
@@ -330,7 +343,7 @@ public class Util {
     }
 
     /**
-     * 
+     *
      * @param expression
      */
     public static boolean isValidQuartzCronExpression(String expression) {
@@ -342,7 +355,7 @@ public class Util {
     }
 
     /**
-     * 
+     *
      * @param coll
      * @return
      */
@@ -362,7 +375,7 @@ public class Util {
     }
 
     /**
-     * 
+     *
      * @param coll
      * @return
      */
@@ -384,12 +397,12 @@ public class Util {
     /**
      * Create a comma-separated list of tag enclosed URIs. The result can be used in sparql queries. eg.: [uri1,uri2,uri3] is
      * transformed to <uri1>,<uri2>,<uri3>.
-     * 
+     * @deprecated queries should be parametrized by using bindings instead.
      * @param uriList
      *            list of URIs
      * @return comma separated list of tag enclosed URIs
      */
-    public static String sparqlUrisToCsv(Collection<String> uriList) {
+    public static String sparqlUrisToCsv(final Collection<String> uriList) {
 
         StringBuilder strBuilder = new StringBuilder();
         if (uriList != null) {
@@ -407,15 +420,15 @@ public class Util {
     }
 
     /**
-     * 
-     * @param s
-     * @return
+     * Converts string to double.
+     * @param s String to convert.
+     * @return Double
      */
-    public static Double toDouble(String s) {
+    public static Double toDouble(final String s) {
 
-        if (s == null || s.trim().length() == 0)
+        if (s == null || s.trim().length() == 0) {
             return null;
-        else {
+        } else {
             try {
                 return Double.valueOf(s);
             } catch (NumberFormatException nfe) {
@@ -425,7 +438,7 @@ public class Util {
     }
 
     /**
-     * 
+     *
      * @param language
      */
     public static String normalizeHTTPAcceptedLanguage(String httpAcceptedLanguage) {
@@ -460,7 +473,7 @@ public class Util {
     }
 
     /**
-     * 
+     *
      * @param language
      */
     public static double getHTTPAcceptedLanguageImportance(String httpAcceptedLanguage) {
@@ -480,7 +493,7 @@ public class Util {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public static HashSet<String> getAcceptedLanguages(String acceptLanguageHeader) {
@@ -505,7 +518,7 @@ public class Util {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public static List<String> getAcceptedLanguagesByImportance(String acceptLanguageHeader) {
@@ -542,7 +555,7 @@ public class Util {
     }
 
     /**
-     * 
+     *
      * @param startTime
      * @return
      */
@@ -552,7 +565,7 @@ public class Util {
     }
 
     /**
-     * 
+     *
      * @param duration
      * @return
      */
@@ -575,8 +588,8 @@ public class Util {
     }
 
     /**
-     * //algorithm calculates the estimated number of hashes
-     * 
+     * Algorithm calculates the estimated number of hashes.
+     *
      * @param minHash
      * @param maxHash
      * @return
@@ -594,7 +607,7 @@ public class Util {
     }
 
     /**
-     * 
+     *
      * @param subjectString
      * @return
      */
@@ -619,7 +632,7 @@ public class Util {
     }
 
     /**
-     * 
+     *
      * @param <K>
      * @param <V>
      * @param map
@@ -640,7 +653,7 @@ public class Util {
     }
 
     /**
-     * 
+     *
      * @param l
      * @return
      */
@@ -653,24 +666,17 @@ public class Util {
     }
 
     /**
-     * 
-     * @param args
-     */
-    public static void main(String[] args) {
-    }
-
-    /**
-     * 
+     *
      * @param s
      * @return
      */
     public static boolean isSurroundedWithQuotes(String s) {
-        return s.startsWith("\"") && s.endsWith("\"") && s.length()>1;
+        return s.startsWith("\"") && s.endsWith("\"") && s.length() > 1;
     }
 
     /**
      * Escape HTML characters and replace new lines with HTML brake tag.
-     * 
+     *
      * @param s
      * @return escaped string
      */
@@ -686,11 +692,11 @@ public class Util {
      * Converts given string into boolean. The following inputs are covered (case-insensitively): - null string returns false -
      * "true" returns true - "false" return false - "yes" and "y" return true - "no" and "n" return false - "0", "-1", "-2", etc
      * return false - "1", "2", "3", etc return true - any other string, including an empty one, returns false
-     * 
-     * @param s
-     * @return
+     *
+     * @param s String to represent boolean.
+     * @return boolean
      */
-    public static boolean toBooolean(String s) {
+    public static boolean toBooolean(final String s) {
 
         if (s == null) {
             return false;
@@ -713,23 +719,25 @@ public class Util {
 
     /**
      * Returns true if the given integer is >0, otherwise returns false.
-     * 
-     * @param i
-     * @return
+     *
+     * @param i int
+     * @return boolean
      */
-    public static boolean toBooolean(int i) {
+    public static boolean toBooolean(final int i) {
 
-        if (i <= 0) {
-            return false;
-        } else {
-            return true;
-        }
+        return i > 0;
     }
-    
-    public static String removeSurroundingQuotes(String s) {
-        if (!isSurroundedWithQuotes(s) ) {
+    /**
+     * Removes surrounding quotes of the given String.
+     *
+     * @param s String to remove quotes from
+     * @return Given String without surrounding quotes. If the method parameter is not surrounded with quotes the
+     *         original String is returned.
+     */
+    public static String removeSurroundingQuotes(final String s) {
+        if (!isSurroundedWithQuotes(s)) {
             return s;
         }
-        return s.substring(1, s.indexOf("\"", 1) );
+        return s.substring(1, s.indexOf("\"", 1));
     }
 }

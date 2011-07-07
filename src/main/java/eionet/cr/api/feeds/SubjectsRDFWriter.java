@@ -1,23 +1,23 @@
 /*
-* The contents of this file are subject to the Mozilla Public
-*
-* License Version 1.1 (the "License"); you may not use this file
-* except in compliance with the License. You may obtain a copy of
-* the License at http://www.mozilla.org/MPL/
-*
-* Software distributed under the License is distributed on an "AS
-* IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
-* implied. See the License for the specific language governing
-* rights and limitations under the License.
-*
-* The Original Code is Content Registry 2.0.
-*
-* The Initial Owner of the Original Code is European Environment
-* Agency. Portions created by Tieto Eesti are Copyright
-* (C) European Environment Agency. All Rights Reserved.
-*
-* Contributor(s):
-* Jaanus Heinlaid, Tieto Eesti*/
+ * The contents of this file are subject to the Mozilla Public
+ *
+ * License Version 1.1 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of
+ * the License at http://www.mozilla.org/MPL/
+ *
+ * Software distributed under the License is distributed on an "AS
+ * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ * The Original Code is Content Registry 2.0.
+ *
+ * The Initial Owner of the Original Code is European Environment
+ * Agency. Portions created by Tieto Eesti are Copyright
+ * (C) European Environment Agency. All Rights Reserved.
+ *
+ * Contributor(s):
+ * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.api.feeds;
 
 import java.io.IOException;
@@ -46,12 +46,12 @@ import eionet.cr.util.URLUtil;
  *
  */
 public class SubjectsRDFWriter {
-    
+
     /** */
     private static final Logger logger = Logger.getLogger(SubjectsRDFWriter.class);
 
     /** */
-    private HashMap<String,String> namespaces = new HashMap<String, String>();
+    private HashMap<String, String> namespaces = new HashMap<String, String>();
 
     /** */
     private String xmlLang;
@@ -118,7 +118,8 @@ public class SubjectsRDFWriter {
     }
 
     /**
-     * @param xmlLang the xmlLang to set
+     * @param xmlLang
+     *            the xmlLang to set
      */
     public void setXmlLang(String xmlLang) {
         this.xmlLang = xmlLang;
@@ -142,7 +143,7 @@ public class SubjectsRDFWriter {
         out.write(("<rdf:RDF" + getAttributes() + ">").getBytes());
 
         // loop over subjects
-        for (SubjectDTO subject:subjects) {
+        for (SubjectDTO subject : subjects) {
 
             // initialize subject processor if not initialized yet
             if (subjectProcessor != null) {
@@ -153,18 +154,17 @@ public class SubjectsRDFWriter {
             if (subject.getPredicateCount() > 0) {
 
                 String subjectUri = subject.getUri();
-                if (StringUtils.isBlank(subjectUri)){
-                    logger.error("Subject URI must not be blank (subject hash = " +
-                            subject.getUriHash() + ")");
+                if (StringUtils.isBlank(subjectUri)) {
+                    logger.error("Subject URI must not be blank (subject hash = " + subject.getUriHash() + ")");
                     continue;
                 }
-                
+
                 // start rdf:Description tag
                 StringBuffer buf = new StringBuffer("\n\t<rdf:Description rdf:about=\"");
                 buf.append(StringEscapeUtils.escapeXml(subjectUri)).append("\">");
 
                 // loop over this subject's predicates
-                for (Entry<String,Collection<ObjectDTO>> entry : subject.getPredicates().entrySet()) {
+                for (Entry<String, Collection<ObjectDTO>> entry : subject.getPredicates().entrySet()) {
 
                     String predicate = entry.getKey();
                     Collection<ObjectDTO> objects = entry.getValue();
@@ -203,13 +203,11 @@ public class SubjectsRDFWriter {
 
                                 // include only non-blank and non-derived objects
                                 // that have not been written yet
-                                if (!StringUtils.isBlank(objectValue)
-                                        && !alreadyWritten.contains(objectValue)
+                                if (!StringUtils.isBlank(objectValue) && !alreadyWritten.contains(objectValue)
                                         && (includeDerivedValues || !isDerivedObject)) {
 
                                     // start predicate tag
-                                    buf.append("\n\t\t<").
-                                    append(namespaces.get(nsUrl)).append(":").append(localName);
+                                    buf.append("\n\t\t<").append(namespaces.get(nsUrl)).append(":").append(localName);
 
                                     // prepare escaped-for-XML object value
                                     String escapedValue = StringEscapeUtils.escapeXml(objectValue);
@@ -220,9 +218,8 @@ public class SubjectsRDFWriter {
 
                                         buf.append(" rdf:resource=\"").append(escapedValue).append("\"/>");
                                     } else {
-                                        buf.append(">").append(escapedValue).append("</").
-                                        append(namespaces.get(nsUrl)).
-                                        append(":").append(localName).append(">");
+                                        buf.append(">").append(escapedValue).append("</").append(namespaces.get(nsUrl))
+                                                .append(":").append(localName).append(">");
                                     }
 
                                     alreadyWritten.add(objectValue);
@@ -260,7 +257,8 @@ public class SubjectsRDFWriter {
     }
 
     /**
-     * @param subjectProcessor the subjectProcessor to set
+     * @param subjectProcessor
+     *            the subjectProcessor to set
      */
     public void setSubjectProcessor(SubjectProcessor subjectProcessor) {
         this.subjectProcessor = subjectProcessor;

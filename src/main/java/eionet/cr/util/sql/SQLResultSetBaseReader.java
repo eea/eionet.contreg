@@ -4,7 +4,7 @@ import java.sql.ResultSetMetaData;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class SQLResultSetBaseReader<T> implements SQLResultSetReader<T>{
+public abstract class SQLResultSetBaseReader<T> implements SQLResultSetReader<T> {
 
     /** */
     protected List<T> resultList = new ArrayList<T>();
@@ -12,7 +12,9 @@ public abstract class SQLResultSetBaseReader<T> implements SQLResultSetReader<T>
     /** */
     protected ResultSetMetaData resultSetMetaData;
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see eionet.cr.util.sql.SQLResultSetReader#startResultSet(java.sql.ResultSetMetaData)
      */
     @Override
@@ -20,7 +22,9 @@ public abstract class SQLResultSetBaseReader<T> implements SQLResultSetReader<T>
         this.resultSetMetaData = resultSetMetaData;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see eionet.cr.dao.readers.ResultSetReader#endResultSet()
      */
     @Override
@@ -29,7 +33,9 @@ public abstract class SQLResultSetBaseReader<T> implements SQLResultSetReader<T>
         // default implementation, which does nothing, implementors can override
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see eionet.cr.dao.readers.ResultSetReader#getResultList()
      */
     @Override

@@ -43,7 +43,7 @@ public class MySQLUtil {
      * @return
      * @throws SQLException
      */
-    public static int insertRow(String tableName, HashMap<String,Object> valueMap, Connection conn) throws SQLException {
+    public static int insertRow(String tableName, HashMap<String, Object> valueMap, Connection conn) throws SQLException {
 
         if (tableName == null || tableName.trim().length() == 0 || valueMap == null || valueMap.size() == 0)
             return -1;
@@ -78,11 +78,11 @@ public class MySQLUtil {
      * @return
      * @throws SQLException
      */
-    public static int updateRow(String tableName, HashMap<String,Object> valueMap, HashMap<String,Object> criteriaMap, Connection conn)
-                                                                                                                throws SQLException {
+    public static int updateRow(String tableName, HashMap<String, Object> valueMap, HashMap<String, Object> criteriaMap,
+            Connection conn) throws SQLException {
 
-        if (tableName == null || tableName.trim().length() == 0 ||
-                valueMap == null || valueMap.size() == 0 || criteriaMap == null || criteriaMap.size() == 0)
+        if (tableName == null || tableName.trim().length() == 0 || valueMap == null || valueMap.size() == 0 || criteriaMap == null
+                || criteriaMap.size() == 0)
             return -1;
 
         StringBuffer sqlStringBuffer = new StringBuffer("update ");
@@ -128,9 +128,12 @@ public class MySQLUtil {
             return (rs != null && rs.next()) ? new Integer(rs.getInt(1)) : null;
         } finally {
             try {
-                if (rs != null) rs.close();
-                if (stmt != null) stmt.close();
-            } catch (SQLException e) {}
+                if (rs != null)
+                    rs.close();
+                if (stmt != null)
+                    stmt.close();
+            } catch (SQLException e) {
+            }
         }
     }
 
@@ -150,9 +153,12 @@ public class MySQLUtil {
             return (rs != null && rs.next()) ? new Integer(rs.getInt(1)) : null;
         } finally {
             try {
-                if (rs != null) rs.close();
-                if (stmt != null) stmt.close();
-            } catch (SQLException e) {}
+                if (rs != null)
+                    rs.close();
+                if (stmt != null)
+                    stmt.close();
+            } catch (SQLException e) {
+            }
         }
     }
 }

@@ -323,7 +323,10 @@ public class FactsheetActionBean extends AbstractActionBean {
 
         // since user registrations URI was used as triple source, add it to HARVEST_SOURCE too
         // (but set interval minutes to 0, to avoid it being background-harvested)
-        DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(
+        DAOFactory
+        .get()
+        .getDao(HarvestSourceDAO.class)
+        .addSourceIgnoreDuplicate(
                 HarvestSourceDTO.create(getUser().getRegistrationsUri(), true, 0, getUser().getUserName()));
 
         return new RedirectResolution(this.getClass(), "edit").addParameter("uri", uri);
@@ -354,8 +357,8 @@ public class FactsheetActionBean extends AbstractActionBean {
                 String objectValue = getContext().getRequest().getParameter("obj_".concat(objectHash));
                 String sourceUri = getContext().getRequest().getParameter("source_".concat(objectHash));
 
-                TripleDTO triple = new TripleDTO(uri, predicate , objectValue);
-                //FIXME - find a better way to determine   if the object is literal or not, URIs may be literals also 
+                TripleDTO triple = new TripleDTO(uri, predicate, objectValue);
+                // FIXME - find a better way to determine if the object is literal or not, URIs may be literals also
                 triple.setLiteralObject(!URLUtil.isURL(objectValue));
                 triple.setSourceUri(sourceUri);
 
@@ -446,7 +449,7 @@ public class FactsheetActionBean extends AbstractActionBean {
             props.put(Predicates.RDFS_LABEL, "Title");
             props.put(Predicates.CR_TAG, "Tag");
             props.put(Predicates.RDFS_COMMENT, "Other comments"); // Don't use
-                                                                  // CR_COMMENT
+            // CR_COMMENT
             props.put(Predicates.DC_DESCRIPTION, "Description");
             props.put(Predicates.CR_HAS_SOURCE, "hasSource");
             props.put(Predicates.ROD_PRODUCT_OF, "productOf");
@@ -657,7 +660,7 @@ public class FactsheetActionBean extends AbstractActionBean {
      * @return boolean
      */
     public boolean isMapDisplayable() {
-        //TODO subproperties handling
+        // TODO subproperties handling
         if (subject != null) {
             Collection<ObjectDTO> objects = subject.getObjects(Predicates.RDF_TYPE, ObjectDTO.Type.RESOURCE);
             if (objects != null) {
@@ -698,7 +701,7 @@ public class FactsheetActionBean extends AbstractActionBean {
      * @return String longitude
      */
     public String getLongitude() {
-        //TODO subproperties handling
+        // TODO subproperties handling
         if (subject.getObject(Predicates.WGS_LONG) != null) {
             return subject.getObject(Predicates.WGS_LONG).getValue();
         }
@@ -711,7 +714,7 @@ public class FactsheetActionBean extends AbstractActionBean {
      * @return String latitude
      */
     public String getLatitude() {
-        //TODO subproperties handling
+        // TODO subproperties handling
         if (subject.getObject(Predicates.WGS_LAT) != null) {
             return subject.getObject(Predicates.WGS_LAT).getValue();
         }

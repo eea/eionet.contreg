@@ -27,12 +27,10 @@ import org.openrdf.query.GraphQuery;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
-import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.rdfxml.RDFXMLWriter;
 
-import virtuoso.sesame2.driver.VirtuosoRepository;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.config.GeneralConfig;
@@ -43,15 +41,17 @@ import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Util;
+import eionet.cr.util.sesame.SesameConnectionProvider;
+import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.sparqlClient.helpers.CRJsonWriter;
 import eionet.cr.web.sparqlClient.helpers.CRXmlWriter;
 import eionet.cr.web.sparqlClient.helpers.QueryResult;
 
 /**
- * 
+ *
  * @author altnyris
- * 
+ *
  */
 @UrlBinding("/sparql")
 public class SPARQLEndpointActionBean extends AbstractActionBean {
@@ -126,7 +126,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     private List<String> deleteQueries;
 
     /**
-     * 
+     *
      * @return
      * @throws OpenRDFException
      * @throws DAOException
@@ -159,7 +159,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     /**
      * Fills the bean's following properties from the bookmarked query: - the query itself - output format - hits per page - whether
      * to use inference.
-     * 
+     *
      * @throws DAOException
      */
     private void fillFromBookmark(String bookmarkedQueryUri) throws DAOException {
@@ -173,10 +173,11 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         this.format = subjectDTO.getObjectValue(Predicates.DC_FORMAT);
         String flagString = subjectDTO.getObjectValue(Predicates.CR_USE_INFERENCE);
         this.useInferencing = Util.toBooolean(flagString);
+        this.bookmarkName = subjectDTO.getObjectValue(Predicates.RDFS_LABEL);
     }
 
     /**
-     * 
+     *
      * @return
      * @throws DAOException
      */
@@ -254,7 +255,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return Resolution
      * @throws OpenRDFException
      */
@@ -272,7 +273,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         }
 
         String acceptHeader = getContext().getRequest().getHeader("accept");
-        String[] accept = { "" };
+        String[] accept = {""};
         if (acceptHeader != null && acceptHeader.length() > 0) {
             accept = acceptHeader.split(",");
             if (accept != null && accept.length > 0) {
@@ -305,8 +306,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         newQuery = query;
         query = StringEscapeUtils.escapeHtml(query);
         if (useInferencing && !StringUtils.isBlank(query)) {
-            String infCommand = "DEFINE input:inference '" + GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME)
-                    + "'";
+            String infCommand =
+                "DEFINE input:inference '" + GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME) + "'";
 
             // if inference command not yet present in the query, add it
             if (query.indexOf(infCommand) == -1) {
@@ -341,7 +342,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @param type
      * @return
      */
@@ -359,7 +360,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @param query
      * @param format
      * @param out
@@ -367,16 +368,11 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     private void runQuery(String query, String format, OutputStream out) {
 
         if (!StringUtils.isBlank(query)) {
-            String url = GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_DB_URL);
-            String username = GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_DB_ROUSR);
-            String password = GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_DB_ROPWD);
-
+            RepositoryConnection con = null;
             try {
+                con = SesameConnectionProvider.getReadOnlyRepositoryConnection();
 
-                Repository myRepository = new VirtuosoRepository(url, username, password);
-                myRepository.initialize();
-                RepositoryConnection con = myRepository.getConnection();
-
+                TupleQueryResult queryResult = null;
                 try {
                     // Evaluate ASK query
                     if (isAskQuery) {
@@ -425,15 +421,16 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                             // Returns HTML format
                         } else if (format != null && format.equals(FORMAT_HTML)) {
                             long startTime = System.currentTimeMillis();
-                            TupleQueryResult bindings = resultsTable.evaluate();
+                            queryResult = resultsTable.evaluate();
+
                             executionTime = System.currentTimeMillis() - startTime;
-                            if (bindings != null) {
-                                result = new QueryResult(bindings);
+                            if (queryResult != null) {
+                                result = new QueryResult(queryResult);
                             }
                         }
                     }
                 } finally {
-                    con.close();
+                    SesameUtil.close(queryResult);
                 }
             } catch (RepositoryException rex) {
                 rex.printStackTrace();
@@ -445,8 +442,11 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                 // throw new RuntimeException(e.toString(), e);
             } finally {
                 try {
-                    if (out != null)
+                    if (out != null) {
                         out.close();
+                    }
+                    SesameUtil.close(con);
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -455,7 +455,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return
      * @throws DAOException
      */
@@ -508,7 +508,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public long getExecutionTime() {
@@ -628,7 +628,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @param user
      * @param bookmarkName
      * @return
@@ -644,5 +644,12 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      */
     public void setDeleteQueries(List<String> deleteQueries) {
         this.deleteQueries = deleteQueries;
+    }
+
+    /**
+     * @return the bookmarkName
+     */
+    public String getBookmarkName() {
+        return bookmarkName;
     }
 }

@@ -66,13 +66,13 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
     public static final String NO_KMLLINKS = "no_kmllinks";
 
     /** */
-    private String BBOX;
+    private String bbox;
 
     /** */
     private String source;
 
     /** */
-    private Double latS,latN,longW,longE;
+    private Double latS, latN, longW, longE;
 
     private List<String> sources;
 
@@ -87,7 +87,7 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
     @DefaultHandler
     public Resolution onEventUnspecified() throws DAOException {
 
-        if (BBOX != null)
+        if (this.bbox != null)
             return doKml();
         else
             return new ForwardResolution("/pages/spatialSearch.jsp");
@@ -95,16 +95,14 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
 
     /**
      *
-     * @param bbox
-     * @param source
      * @return
      * @throws DAOException
      */
     private Resolution doKml() throws DAOException {
 
-        logger.debug("KML requested, BBOX = " + BBOX);
+        logger.debug("KML requested, BBOX = " + this.bbox);
 
-        String[] ltudes = BBOX.split(",");
+        String[] ltudes = this.bbox.split(",");
         if (ltudes != null && ltudes.length == 4) {
 
             longW = Util.toDouble(ltudes[0].trim());
@@ -112,12 +110,11 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
             longE = Util.toDouble(ltudes[2].trim());
             latN = Util.toDouble(ltudes[3].trim());
 
-            SortingRequest sortingRequest = new SortingRequest(Predicates.RDFS_LABEL,
-                    SortOrder.ASCENDING);
+            SortingRequest sortingRequest = new SortingRequest(Predicates.RDFS_LABEL, SortOrder.ASCENDING);
             sortingRequest.setSortByPredicateObjectHash(true);
             Pair<Integer, List<SubjectDTO>> resultPair =
-                DAOFactory.get().getDao(SearchDAO.class).searchBySpatialBox(
-                        createBBOX(), source, PagingRequest.create(1,25), sortingRequest, true);
+                DAOFactory.get().getDao(SearchDAO.class)
+                .searchBySpatialBox(createBBOX(), source, PagingRequest.create(1, 25), sortingRequest, true);
             resultList = resultPair.getRight();
         }
 
@@ -144,7 +141,7 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
         delta = delta * delta;
 
         Collection<SubjectDTO> result = new ArrayList<SubjectDTO>();
-        for (SubjectDTO subject:placemarks) {
+        for (SubjectDTO subject : placemarks) {
 
             String latit = subject.getObjectValue(Predicates.WGS_LAT);
             String longit = subject.getObjectValue(Predicates.WGS_LONG);
@@ -167,14 +164,14 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
      */
     private static boolean isTooClose(double latit, double longit, double delta, Collection<SubjectDTO> coll) {
 
-        for (SubjectDTO subject:coll) {
+        for (SubjectDTO subject : coll) {
 
             double subjLat = getLatitude(subject);
             double subjLong = getLongitude(subject);
 
-            double diff_lat = (subjLat - latit) * (subjLat - latit) ;
-            double diff_long = (subjLong - longit) * (subjLong - longit) ;
-            double diff = diff_lat + diff_long;
+            double diffLat = (subjLat - latit) * (subjLat - latit);
+            double diffLong = (subjLong - longit) * (subjLong - longit);
+            double diff = diffLat + diffLong;
             if (diff < delta) {
                 return true;
             }
@@ -234,6 +231,7 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.web.action.AbstractSearchActionBean#search()
      */
     public Resolution search() throws DAOException {
@@ -242,10 +240,10 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
         if (!bbox.isUndefined()) {
 
             Pair<Integer, List<SubjectDTO>> resultPair =
-                DAOFactory.get().getDao(SearchDAO.class).searchBySpatialBox(
-                        createBBOX(),
-                        source,
-                        PagingRequest.create(getPageN()),
+                DAOFactory
+                .get()
+                .getDao(SearchDAO.class)
+                .searchBySpatialBox(createBBOX(), source, PagingRequest.create(getPageN()),
                         new SortingRequest(getSortP(), SortOrder.parse(getSortO())), false);
             resultList = resultPair.getRight();
             matchCount = resultPair.getLeft();
@@ -256,6 +254,7 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
      */
     public List<SearchResultColumn> getColumns() throws DAOException {
@@ -312,7 +311,8 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
     }
 
     /**
-     * @param latS the latS to set
+     * @param latS
+     *            the latS to set
      */
     public void setLatS(Double lat1) {
         this.latS = lat1;
@@ -326,7 +326,8 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
     }
 
     /**
-     * @param latN the latN to set
+     * @param latN
+     *            the latN to set
      */
     public void setLatN(Double lat2) {
         this.latN = lat2;
@@ -340,7 +341,8 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
     }
 
     /**
-     * @param longW the longW to set
+     * @param longW
+     *            the longW to set
      */
     public void setLongW(Double long1) {
         this.longW = long1;
@@ -354,17 +356,19 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
     }
 
     /**
-     * @param longE the longE to set
+     * @param longE
+     *            the longE to set
      */
     public void setLongE(Double long2) {
         this.longE = long2;
     }
 
     /**
-     * @param bbox the bBOX to set
+     *
+     * @param bbox
      */
     public void setBBOX(String bbox) {
-        BBOX = bbox;
+        this.bbox = bbox;
     }
 
     /**
@@ -375,7 +379,8 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
     }
 
     /**
-     * @param source the source to set
+     * @param source
+     *            the source to set
      */
     public void setSource(String source) {
         this.source = source;

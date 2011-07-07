@@ -10,6 +10,7 @@ import eionet.cr.dto.TagDTO;
 
 /**
  * Reads tag names and counts from Resultset.
+ *
  * @author kaido
  *
  */
@@ -26,8 +27,11 @@ public class TagCloudReader extends ResultSetMixedReader<TagDTO> {
 
     /**
      * converts Bindingset row to TagDTO.
-     * @param bindingSet BindingSet
-     * @throws ResultSetReaderException if error in reading
+     *
+     * @param bindingSet
+     *            BindingSet
+     * @throws ResultSetReaderException
+     *             if error in reading
      */
     @Override
     public void readRow(final BindingSet bindingSet) throws ResultSetReaderException {
@@ -42,9 +46,9 @@ public class TagCloudReader extends ResultSetMixedReader<TagDTO> {
             }
             if (count != null) {
                 tagCount = Integer.valueOf(count.stringValue());
-                //max tag count from 1st row
+                // max tag count from 1st row
                 if (!maxTagCountUpdated) {
-                    maxTagCountUpdated  = true;
+                    maxTagCountUpdated = true;
                     maxTagCount = tagCount;
                 }
             }

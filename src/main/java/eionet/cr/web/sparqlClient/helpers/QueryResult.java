@@ -5,12 +5,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Value;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.TupleQueryResult;
 
+import eionet.cr.config.GeneralConfig;
 import eionet.cr.util.Util;
 
 /**
@@ -22,8 +25,26 @@ public class QueryResult {
 
     /** */
     private List<String> variables;
-    private ArrayList<HashMap<String,ResultValue>> rows;
-    private ArrayList<Map<String,Object>> cols;
+    private ArrayList<HashMap<String, ResultValue>> rows;
+    private ArrayList<Map<String, Object>> cols;
+    /**
+     * If max rows count is not defined in properties, this constant value is used.
+     */
+    private static final int DEFAULT_MAX_ROWS_COUNT = 2000;
+
+    /**
+     * Maximum Rows count that is returned in HTML.
+     */
+    private static final int MAX_ROWS_COUNT =
+            GeneralConfig.getIntProperty(GeneralConfig.SPARQLENDPOINT_MAX_ROWS_COUNT, DEFAULT_MAX_ROWS_COUNT);
+
+    /** */
+    private boolean allRowsReturned = true;
+
+    /**
+     * Local logger.
+     */
+    private static final Log LOGGER = LogFactory.getLog(QueryResult.class);
 
     /**
      *
@@ -36,8 +57,16 @@ public class QueryResult {
 
             this.variables = queryResult.getBindingNames();
             addCols();
+            int counter = 0;
             while (queryResult.hasNext()) {
                 add(queryResult.next());
+                counter++;
+                //if query result exceeds max rows count, return the resultset
+                if (counter == MAX_ROWS_COUNT) {
+                    LOGGER.debug("Maximum rows count exceeded, returning first rows");
+                    allRowsReturned = false;
+                    break;
+                }
             }
         }
     }
@@ -48,7 +77,7 @@ public class QueryResult {
             return;
         }
 
-        HashMap<String,ResultValue> map = new HashMap<String, ResultValue>();
+        HashMap<String, ResultValue> map = new HashMap<String, ResultValue>();
         for (String variable : variables) {
 
             ResultValue resultValue = null;
@@ -68,7 +97,7 @@ public class QueryResult {
         }
 
         if (rows == null) {
-            rows = new ArrayList<HashMap<String,ResultValue>>();
+            rows = new ArrayList<HashMap<String, ResultValue>>();
         }
         rows.add(map);
     }
@@ -90,7 +119,7 @@ public class QueryResult {
             col.put("sortable", Boolean.TRUE);
 
             if (cols == null) {
-                cols = new ArrayList<Map<String,Object>>();
+                cols = new ArrayList<Map<String, Object>>();
             }
             cols.add(col);
         }
@@ -116,4 +145,24 @@ public class QueryResult {
     public ArrayList<Map<String, Object>> getCols() {
         return cols;
     }
+
+    /**
+     * Shows if all rows were returned (did not exceed maximum rowcount.
+     *
+     * @return boolean
+     */
+    public boolean isAllRowsReturned() {
+        return allRowsReturned;
+    }
+
+    /**
+     * Setter of allRowsReturned.
+     *
+     * @param allRowsReturned
+     *            to indicate if full query is returned.
+     */
+    public void setAllRowsReturned(final boolean allRowsReturned) {
+        this.allRowsReturned = allRowsReturned;
+    }
+
 }

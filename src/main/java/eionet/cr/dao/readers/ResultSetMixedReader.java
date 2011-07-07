@@ -26,7 +26,9 @@ public abstract class ResultSetMixedReader<T> implements SQLResultSetReader<T>, 
     /** */
     protected String blankNodeUriPrefix;
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see eionet.cr.util.sql.SQLResultSetReader#startResultSet(java.sql.ResultSetMetaData)
      */
     @Override
@@ -42,7 +44,9 @@ public abstract class ResultSetMixedReader<T> implements SQLResultSetReader<T>, 
         this.bindingNames = bindingNames;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see eionet.cr.dao.readers.ResultSetReader#endResultSet()
      */
     @Override
@@ -51,7 +55,9 @@ public abstract class ResultSetMixedReader<T> implements SQLResultSetReader<T>, 
         // default implementation, which does nothing, implementors can override
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see eionet.cr.dao.readers.ResultSetReader#getResultList()
      */
     @Override
@@ -60,7 +66,8 @@ public abstract class ResultSetMixedReader<T> implements SQLResultSetReader<T>, 
     }
 
     /**
-     * @param blnakNodeUriPrefix the blnakNodeUriPrefix to set
+     * @param blnakNodeUriPrefix
+     *            the blnakNodeUriPrefix to set
      */
     public void setBlankNodeUriPrefix(String blankNodeUriPrefix) {
         this.blankNodeUriPrefix = blankNodeUriPrefix;

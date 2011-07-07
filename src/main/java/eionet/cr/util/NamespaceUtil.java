@@ -21,7 +21,7 @@ public class NamespaceUtil {
             i = url.lastIndexOf("/");
         }
 
-        return i < 0 ? null : url.substring(0, i+1);
+        return i < 0 ? null : url.substring(0, i + 1);
     }
 
     /**
@@ -57,9 +57,9 @@ public class NamespaceUtil {
      */
     public static String getKnownNamespace(String namespace) {
 
-        Namespace knownNamespaces[] = Namespace.values();
+        Namespace[] knownNamespaces = Namespace.values();
 
-        for (Namespace singleNamespace:knownNamespaces) {
+        for (Namespace singleNamespace : knownNamespaces) {
             if (singleNamespace.getUri().equals(namespace)) {
                 return singleNamespace.getPrefix();
             }
