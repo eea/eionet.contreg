@@ -31,7 +31,6 @@ import eionet.cr.test.helpers.AbstractStripesMvcTestHelper;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.WebConstants;
 
-
 /**
  * JUnit test tests AbstractQawActionBean functionality.
  *
@@ -50,8 +49,7 @@ public class AbstractCrActionBeanTest extends AbstractStripesMvcTestHelper {
         MockServletContext context = getMockServletContext();
 
         MockRoundtrip trip = new MockRoundtrip(context, LoginActionBean.class);
-        trip.getRequest().getSession().setAttribute(
-                WebConstants.USER_SESSION_ATTR, new CRUser("smithbob"));
+        trip.getRequest().getSession().setAttribute(WebConstants.USER_SESSION_ATTR, new CRUser("smithbob"));
         trip.execute();
 
         LoginActionBean actionBean = trip.getActionBean(LoginActionBean.class);
@@ -69,8 +67,7 @@ public class AbstractCrActionBeanTest extends AbstractStripesMvcTestHelper {
         MockServletContext context = getMockServletContext();
 
         MockRoundtrip trip = new MockRoundtrip(context, LoginActionBean.class);
-        trip.getRequest().getSession().setAttribute(
-                WebConstants.USER_SESSION_ATTR, new CRUser("smithbob"));
+        trip.getRequest().getSession().setAttribute(WebConstants.USER_SESSION_ATTR, new CRUser("smithbob"));
         trip.execute();
 
         LoginActionBean actionBean = trip.getActionBean(LoginActionBean.class);

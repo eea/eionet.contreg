@@ -47,10 +47,8 @@ public class DbHelper {
         }
     }
 
-    public static IDataSet getXmlDataSet(String fileName) throws DataSetException,
-            IOException {
-        return new FlatXmlDataSetBuilder().build(
-                CRDatabaseTestCase.class.getClassLoader().getResourceAsStream(fileName));
+    public static IDataSet getXmlDataSet(String fileName) throws DataSetException, IOException {
+        return new FlatXmlDataSetBuilder().build(CRDatabaseTestCase.class.getClassLoader().getResourceAsStream(fileName));
     }
 
     public static IDatabaseConnection getConnection() throws Exception {
@@ -60,15 +58,13 @@ public class DbHelper {
     /**
      *
      */
-    public static void createConnectionPropertiesInSystem(){
+    public static void createConnectionPropertiesInSystem() {
 
         String drv = GeneralConfig.getProperty(GeneralConfig.DB_DRV);
-        System.setProperty(
-                PropertiesBasedJdbcDatabaseTester.DBUNIT_DRIVER_CLASS, drv);
+        System.setProperty(PropertiesBasedJdbcDatabaseTester.DBUNIT_DRIVER_CLASS, drv);
 
         String url = GeneralConfig.getProperty(GeneralConfig.DB_URL);
-        System.setProperty(
-                PropertiesBasedJdbcDatabaseTester.DBUNIT_CONNECTION_URL, url);
+        System.setProperty(PropertiesBasedJdbcDatabaseTester.DBUNIT_CONNECTION_URL, url);
 
         String usr = GeneralConfig.getProperty(GeneralConfig.DB_USR);
         System.setProperty(PropertiesBasedJdbcDatabaseTester.DBUNIT_USERNAME, usr);

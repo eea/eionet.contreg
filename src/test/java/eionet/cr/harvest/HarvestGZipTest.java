@@ -17,6 +17,7 @@ import eionet.cr.test.helpers.CRDatabaseTestCase;
 public class HarvestGZipTest extends CRDatabaseTestCase {
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.test.helpers.CRDatabaseTestCase#getDataSet()
      */
     protected IDataSet getDataSet() throws Exception {
@@ -24,16 +25,15 @@ public class HarvestGZipTest extends CRDatabaseTestCase {
     }
 
     @Test
-    public void testGzipHarvest(){
+    public void testGzipHarvest() {
 
-        try{
+        try {
             URL url = getClass().getClassLoader().getResource("test-rdf.xml.gz");
             Harvest harvest = new PullHarvest(url.toString(), null);
             harvest.execute();
 
-            assertEquals((int)49, harvest.getStoredTriplesCount());
-        }
-        catch (Throwable e) {
+            assertEquals((int) 49, harvest.getStoredTriplesCount());
+        } catch (Throwable e) {
             e.printStackTrace();
             fail("Was not expecting this exception: " + e.toString());
         }

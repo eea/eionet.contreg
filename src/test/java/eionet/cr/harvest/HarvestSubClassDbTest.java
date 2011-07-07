@@ -43,6 +43,7 @@ public class HarvestSubClassDbTest extends CRDatabaseTestCase {
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.test.helpers.CRDatabaseTestCase#getDataSet()
      */
     @Override
@@ -59,8 +60,7 @@ public class HarvestSubClassDbTest extends CRDatabaseTestCase {
             harvest.execute();
 
             compareDatasets("subclass-db.xml", false);
-        }
-        catch (Throwable e) {
+        } catch (Throwable e) {
             e.printStackTrace();
             fail("Was not expecting this exception: " + e.toString());
         }
@@ -80,8 +80,7 @@ public class HarvestSubClassDbTest extends CRDatabaseTestCase {
             harvest.execute();
 
             compareDatasets("subclass-db.xml", false);
-        }
-        catch (Throwable e) {
+        } catch (Throwable e) {
             e.printStackTrace();
             fail("Was not expecting this exception: " + e.toString());
         }
@@ -98,12 +97,11 @@ public class HarvestSubClassDbTest extends CRDatabaseTestCase {
 
         // Fetch database data after executing your code.
         QueryDataSet queryDataSet = new QueryDataSet(getConnection());
-        queryDataSet.addTable("SPO",
-                    "SELECT DISTINCT SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ,"
-                    + " LIT_OBJ, OBJ_LANG, OBJ_SOURCE_OBJECT FROM SPO"
-                    + " WHERE PREDICATE NOT IN ( 8639511163630871821, 3296918264710147612, -2213704056277764256, 333311624525447614 )"
+        queryDataSet.addTable("SPO", "SELECT DISTINCT SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ,"
+                + " LIT_OBJ, OBJ_LANG, OBJ_SOURCE_OBJECT FROM SPO"
+                + " WHERE PREDICATE NOT IN ( 8639511163630871821, 3296918264710147612, -2213704056277764256, 333311624525447614 )"
 
-                    + " ORDER BY SUBJECT, PREDICATE, OBJECT");
+                + " ORDER BY SUBJECT, PREDICATE, OBJECT");
         ITable actSPOTable = queryDataSet.getTable("SPO");
 
         queryDataSet = new QueryDataSet(getConnection());
@@ -111,10 +109,9 @@ public class HarvestSubClassDbTest extends CRDatabaseTestCase {
                 + "WHERE URI NOT LIKE 'file:%' ORDER BY URI, URI_HASH");
         ITable actResTable = queryDataSet.getTable("RESOURCE");
 
-        if (dumpIt){
+        if (dumpIt) {
             FlatXmlDataSet.write(queryDataSet, new FileOutputStream(testData));
-        }
-        else{
+        } else {
             // Load expected data from an XML dataset
             IDataSet expectedDataSet = getXmlDataSet(testData);
             ITable expSpoTable = expectedDataSet.getTable("SPO");

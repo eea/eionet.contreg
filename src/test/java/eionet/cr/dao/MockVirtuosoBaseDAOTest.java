@@ -21,20 +21,19 @@ import eionet.cr.util.Bindings;
 import eionet.cr.util.sesame.SPARQLResultSetReader;
 
 /**
- * Mock for testing queries. Working only for testing readers. Each
- * implementing class must have a corresponding file in N3 format that can be
- * exported from SPARQL endpoint.
+ * Mock for testing queries. Working only for testing readers. Each implementing class must have a corresponding file in N3 format
+ * that can be exported from SPARQL endpoint.
  */
 public class MockVirtuosoBaseDAOTest extends VirtuosoBaseDAO {
-    /** Tag name in N3.*/
+    /** Tag name in N3. */
     private static final String RESULTVARIABLE_NAME = "http://www.w3.org/2005/sparql-results#resultVariable";
-    /** Tag name in N3.*/
+    /** Tag name in N3. */
     private static final String VARIABLE_NAME = "http://www.w3.org/2005/sparql-results#variable";
-    /** Tag name in N3.*/
+    /** Tag name in N3. */
     private static final String VALUE_NAME = "http://www.w3.org/2005/sparql-results#value";
-    /** Tag name in N3.*/
+    /** Tag name in N3. */
     private static final String SOLUTION_NAME = "http://www.w3.org/2005/sparql-results#solution";
-    
+
     /**
      * to catch SPARQL.
      */
@@ -47,13 +46,15 @@ public class MockVirtuosoBaseDAOTest extends VirtuosoBaseDAO {
     private ArrayList<MapBindingSet> bindingSet;
     /** custom RDF handler. */
     private MockRDFHandler rdfHandler = new MockRDFHandler();
-    /** binding names araylist.*/
+    /** binding names araylist. */
     private List<String> bindingNames = new ArrayList<String>();
 
     /**
-     * Default construtor. File name with test data is given as the parameter.
-     * Supports files in N3 format exported from SPARQL endpoint.
-     * @param fileName Test data file name in test-resources.
+     * Default construtor. File name with test data is given as the parameter. Supports files in N3 format exported from SPARQL
+     * endpoint.
+     *
+     * @param fileName
+     *            Test data file name in test-resources.
      */
     public MockVirtuosoBaseDAOTest(String fileName) {
         bindingSet = new ArrayList<MapBindingSet>();
@@ -80,13 +81,11 @@ public class MockVirtuosoBaseDAOTest extends VirtuosoBaseDAO {
         }
     }
 
-    
     @Override
     protected <T> List<T> executeSPARQL(String sparql, SPARQLResultSetReader<T> reader) throws DAOException {
         // TODO Auto-generated method stub
         return executeSPARQL(sparql, null, reader);
     }
-
 
     @Override
     protected <T> List<T> executeSPARQL(String sparql, Bindings bindings, SPARQLResultSetReader<T> reader) throws DAOException {
@@ -98,12 +97,11 @@ public class MockVirtuosoBaseDAOTest extends VirtuosoBaseDAO {
                 e.printStackTrace();
             }
         }
-        
+
         this.sparql = sparql;
         this.bindings = bindings;
         return reader.getResultList();
     }
-
 
     /**
      * internal RDF handler for creating fake bindingset objects.
@@ -166,11 +164,11 @@ public class MockVirtuosoBaseDAOTest extends VirtuosoBaseDAO {
         public void startRDF() throws RDFHandlerException {
         }
     }
-    
+
     public String getSPARQL() {
         return sparql;
     }
-    
+
     public Bindings getBindings() {
         return bindings;
     }

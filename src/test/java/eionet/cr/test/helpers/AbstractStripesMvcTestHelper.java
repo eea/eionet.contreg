@@ -59,7 +59,7 @@ public abstract class AbstractStripesMvcTestHelper extends AbstractActionBean {
         mockServletContext = new MockServletContext("test");
 
         // Add the Stripes Filter
-        Map<String,String> filterParams = new HashMap<String,String>();
+        Map<String, String> filterParams = new HashMap<String, String>();
 
         // JH280210 - the following two lines are out-commented, because
         // we have upgraded to Stripes 1.5, and "ActionResolver.Packages" should be

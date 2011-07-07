@@ -32,10 +32,11 @@ import eionet.cr.test.helpers.CRDatabaseTestCase;
  * @author heinljab
  *
  */
-public class HarvestTest extends CRDatabaseTestCase{
+public class HarvestTest extends CRDatabaseTestCase {
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.test.helpers.CRDatabaseTestCase#getDataSet()
      */
     protected IDataSet getDataSet() throws Exception {
@@ -43,23 +44,22 @@ public class HarvestTest extends CRDatabaseTestCase{
     }
 
     @Test
-    public void testHarvestFile(){
+    public void testHarvestFile() {
 
         try {
             URL o = getClass().getClassLoader().getResource("test-rdf.xml");
             Harvest harvest = new PullHarvest(o.toString(), null);
             harvest.execute();
 
-            assertEquals((int)49, harvest.getStoredTriplesCount());
-        }
-        catch (Throwable e) {
+            assertEquals((int) 49, harvest.getStoredTriplesCount());
+        } catch (Throwable e) {
             e.printStackTrace();
             fail("Was not expecting this exception: " + e.toString());
         }
     }
 
     @Test
-    public void testHarvestNonExistingURL(){
+    public void testHarvestNonExistingURL() {
 
         try {
             PullHarvest harvest = new PullHarvest("http://www.jaanusheinlaid.tw", null);
@@ -67,25 +67,24 @@ public class HarvestTest extends CRDatabaseTestCase{
 
             assertNotNull(harvest.getSourceAvailable());
             assertFalse(harvest.getSourceAvailable().booleanValue());
-        }
-        catch (HarvestException e) {
+        } catch (HarvestException e) {
             e.printStackTrace();
             fail("Was not expecting this exception: " + e.toString());
         }
     }
 
     @Test
-    public void testHarvestExistingURL(){
+    public void testHarvestExistingURL() {
 
         try {
-            PullHarvest harvest = new PullHarvest("https://svn.eionet.europa.eu/repositories/Reportnet/cr2/trunk/test-rdf/test-rdf.xml", null);
+            PullHarvest harvest =
+                    new PullHarvest("https://svn.eionet.europa.eu/repositories/Reportnet/cr2/trunk/test-rdf/test-rdf.xml", null);
             harvest.execute();
 
             assertNotNull(harvest.getSourceAvailable());
             assertTrue(harvest.getSourceAvailable().booleanValue());
-            assertEquals((int)49, harvest.getStoredTriplesCount());
-        }
-        catch (HarvestException e) {
+            assertEquals((int) 49, harvest.getStoredTriplesCount());
+        } catch (HarvestException e) {
             e.printStackTrace();
             fail("Was not expecting this exception: " + e.toString());
         }

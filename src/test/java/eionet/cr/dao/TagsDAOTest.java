@@ -35,7 +35,7 @@ import eionet.cr.test.helpers.DbHelper;
  * @author <a href="mailto:enriko.kasper@tieto.com">Enriko Käsper</a>
  *
  */
-public class TagsDAOTest{
+public class TagsDAOTest {
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
@@ -43,9 +43,8 @@ public class TagsDAOTest{
     }
 
     @Test
-    public void testTagCloudFrequencies()throws Exception{
-        List<TagDTO> result =
-            DAOFactory.get().getDao(TagsDAO.class).getTagCloud();
+    public void testTagCloudFrequencies() throws Exception {
+        List<TagDTO> result = DAOFactory.get().getDao(TagsDAO.class).getTagCloud();
 
         assertTrue(result.contains(new TagDTO("tag1", 1, 4)));
         assertTrue(result.contains(new TagDTO("tag2", 2, 4)));

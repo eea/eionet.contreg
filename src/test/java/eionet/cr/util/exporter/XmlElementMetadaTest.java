@@ -31,12 +31,12 @@ import eionet.cr.util.export.XmlElementMetadata.Type;
  * @author <a href="mailto:enriko.kasper@tieto.com">Enriko Käsper</a>, Tieto Estonia
  */
 
-public class XmlElementMetadaTest extends TestCase{
+public class XmlElementMetadaTest extends TestCase {
 
     @Test
-    public void testXmlElementMetada(){
+    public void testXmlElementMetada() {
         XmlElementMetadata elem = new XmlElementMetadata("nameValue");
-        //get default type
+        // get default type
         assertEquals(elem.getType(), XmlElementMetadata.Type.STRING);
 
         elem.setMaxLength(100);
@@ -55,7 +55,7 @@ public class XmlElementMetadaTest extends TestCase{
         elem.setType(Type.STRING);
         assertEquals(elem.getType(), XmlElementMetadata.Type.STRING);
 
-        //if element is already a string data type, then it's impossible to change it to numeric
+        // if element is already a string data type, then it's impossible to change it to numeric
         elem.setType(Type.DOUBLE);
         assertEquals(elem.getType(), XmlElementMetadata.Type.STRING);
 

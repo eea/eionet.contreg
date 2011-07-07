@@ -40,7 +40,7 @@ import eionet.cr.web.util.ApplicationCache;
  *
  */
 
-public class JsonActionBeanTest extends AbstractStripesMvcTestHelper{
+public class JsonActionBeanTest extends AbstractStripesMvcTestHelper {
 
     /**
      *
@@ -56,14 +56,11 @@ public class JsonActionBeanTest extends AbstractStripesMvcTestHelper{
         MockServletContext context = getMockServletContext();
 
         MockRoundtrip trip = new MockRoundtrip(context, JsonActionBean.class);
-        trip.setParameter(
-                "query", "tag");
+        trip.setParameter("query", "tag");
         trip.execute();
 
-        assertEquals("{\"query\":\"tag\"," +
-                "\"suggestions\":[\"tag1\",\"tag2\",\"tag3\",\"tag4\"]}",
-                trip.getResponse().getOutputString());
-
+        assertEquals("{\"query\":\"tag\"," + "\"suggestions\":[\"tag1\",\"tag2\",\"tag3\",\"tag4\"]}", trip.getResponse()
+                .getOutputString());
 
     }
 

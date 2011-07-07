@@ -15,16 +15,10 @@ import org.junit.Test;
 public class UnGZipTest extends TestCase {
 
     @Test
-    public void testUnGZipDetect(){
-        assertEquals(
-                false,
-                GZip.isFileGZip(new File(getClass().getClassLoader().getResource("test-rdf.xml").getFile()))
-        );
+    public void testUnGZipDetect() {
+        assertEquals(false, GZip.isFileGZip(new File(getClass().getClassLoader().getResource("test-rdf.xml").getFile())));
 
-        assertEquals(
-                true,
-                GZip.isFileGZip(new File(getClass().getClassLoader().getResource("test-rdf.xml.gz").getFile()))
-        );
+        assertEquals(true, GZip.isFileGZip(new File(getClass().getClassLoader().getResource("test-rdf.xml.gz").getFile())));
     }
 
 }

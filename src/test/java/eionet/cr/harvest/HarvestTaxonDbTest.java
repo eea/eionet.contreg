@@ -41,6 +41,7 @@ public class HarvestTaxonDbTest extends CRDatabaseTestCase {
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.test.helpers.CRDatabaseTestCase#getDataSet()
      */
     protected IDataSet getDataSet() throws Exception {
@@ -51,8 +52,9 @@ public class HarvestTaxonDbTest extends CRDatabaseTestCase {
     public void testTaxonUnderRdf() {
 
         try {
-            URL url = new URL("http://svn.eionet.europa.eu/repositories" +
-                    "/Reportnet/cr2/trunk/src/test/resources/taxon-under-rdf.xml");
+            URL url =
+                    new URL("http://svn.eionet.europa.eu/repositories"
+                            + "/Reportnet/cr2/trunk/src/test/resources/taxon-under-rdf.xml");
 
             Harvest harvest = new PullHarvest(url.toString(), null);
             harvest.setDeriveInferredTriples(false);
@@ -61,8 +63,7 @@ public class HarvestTaxonDbTest extends CRDatabaseTestCase {
             assertEquals((int) 23, harvest.getStoredTriplesCount());
 
             compareDatasets("taxon-db.xml", true);
-        }
-        catch (Throwable e) {
+        } catch (Throwable e) {
             e.printStackTrace();
             fail("Was not expecting this exception: " + e.toString());
         }
@@ -72,8 +73,9 @@ public class HarvestTaxonDbTest extends CRDatabaseTestCase {
     public void testTaxonOverRdf() {
 
         try {
-            URL url = new URL("http://svn.eionet.europa.eu/repositories" +
-                    "/Reportnet/cr2/trunk/src/test/resources/taxon-over-rdf.xml");
+            URL url =
+                    new URL("http://svn.eionet.europa.eu/repositories"
+                            + "/Reportnet/cr2/trunk/src/test/resources/taxon-over-rdf.xml");
 
             Harvest harvest = new PullHarvest(url.toString(), null);
             harvest.setDeriveInferredTriples(false);
@@ -82,8 +84,7 @@ public class HarvestTaxonDbTest extends CRDatabaseTestCase {
             assertEquals((int) 23, harvest.getStoredTriplesCount());
 
             compareDatasets("taxon-db.xml", false);
-        }
-        catch (Throwable e) {
+        } catch (Throwable e) {
             e.printStackTrace();
             fail("Was not expecting this exception: " + e.toString());
         }
@@ -99,22 +100,20 @@ public class HarvestTaxonDbTest extends CRDatabaseTestCase {
 
         // Fetch database data after executing your code
         QueryDataSet queryDataSet = new QueryDataSet(getConnection());
-        queryDataSet.addTable("SPO",
-                    "SELECT DISTINCT SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ,"
-                    + " LIT_OBJ, OBJ_LANG, OBJ_DERIV_SOURCE, OBJ_DERIV_SOURCE_GEN_TIME, OBJ_SOURCE_OBJECT FROM SPO"
-                    + " WHERE PREDICATE NOT IN ( 8639511163630871821, 3296918264710147612, -2213704056277764256, 333311624525447614 )"
-                    + " ORDER BY SUBJECT, PREDICATE, OBJECT");
+        queryDataSet.addTable("SPO", "SELECT DISTINCT SUBJECT, PREDICATE, OBJECT, OBJECT_HASH, ANON_SUBJ, ANON_OBJ,"
+                + " LIT_OBJ, OBJ_LANG, OBJ_DERIV_SOURCE, OBJ_DERIV_SOURCE_GEN_TIME, OBJ_SOURCE_OBJECT FROM SPO"
+                + " WHERE PREDICATE NOT IN ( 8639511163630871821, 3296918264710147612, -2213704056277764256, 333311624525447614 )"
+                + " ORDER BY SUBJECT, PREDICATE, OBJECT");
         ITable actSPOTable = queryDataSet.getTable("SPO");
 
         queryDataSet = new QueryDataSet(getConnection());
         queryDataSet.addTable("RESOURCE",
-                    "SELECT URI,URI_HASH FROM RESOURCE WHERE URI NOT LIKE 'http://svn.eionet%' ORDER BY URI, URI_HASH");
+                "SELECT URI,URI_HASH FROM RESOURCE WHERE URI NOT LIKE 'http://svn.eionet%' ORDER BY URI, URI_HASH");
         ITable actResTable = queryDataSet.getTable("RESOURCE");
 
-        if (dumpIt){
+        if (dumpIt) {
             FlatXmlDataSet.write(queryDataSet, new FileOutputStream(testData));
-        }
-        else{
+        } else {
             // Load expected data from an XML dataset
             IDataSet expectedDataSet = getXmlDataSet(testData);
             ITable expSpoTable = expectedDataSet.getTable("SPO");

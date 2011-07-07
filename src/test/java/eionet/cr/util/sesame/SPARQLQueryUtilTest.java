@@ -20,8 +20,7 @@
 
 package eionet.cr.util.sesame;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.ArrayList;
 
 import junit.framework.TestCase;
 import eionet.cr.common.Namespace;
@@ -64,25 +63,44 @@ public class SPARQLQueryUtilTest extends TestCase {
 
         assertEquals("", SPARQLQueryUtil.getSparqlQueryHeader(false).toString());
         assertEquals(CR_INFERENCE_DEF, SPARQLQueryUtil.getSparqlQueryHeader(true).toString());
-        assertEquals(CR_INFERENCE_DEF.concat(CR_NAMESPACE_DEF), SPARQLQueryUtil.getSparqlQueryHeader(true, Namespace.CR).toString());
+        assertEquals(CR_INFERENCE_DEF.concat(CR_NAMESPACE_DEF), SPARQLQueryUtil.getSparqlQueryHeader(true, Namespace.CR)
+                .toString());
         assertEquals(CR_NAMESPACE_DEF, SPARQLQueryUtil.getSparqlQueryHeader(false, Namespace.CR).toString());
         assertEquals(CR_INFERENCE_DEF.concat(CR_NAMESPACE_DEF).concat(RDF_NAMESPACE_DEF).concat(RDFS_NAMESPACE_DEF),
                 SPARQLQueryUtil.getSparqlQueryHeader(true, Namespace.CR, Namespace.RDF, Namespace.RDFS).toString());
         assertEquals(CR_NAMESPACE_DEF.concat(RDF_NAMESPACE_DEF).concat(RDFS_NAMESPACE_DEF),
                 SPARQLQueryUtil.getSparqlQueryHeader(false, Namespace.CR, Namespace.RDF, Namespace.RDFS).toString());
     }
-    
-    
-    public static void testOrCondition() {
-        String graphs[] = {"http://rdfdata.eionet.europa.eu/eper/send_all", "http://rod.eionet.europa.eu/obligations", "http://rod.eionet.europa.eu/obligations.rdf", "http://rod.eionet.europa.eu/instruments.rdf"};
-        
-        List<String> graphUris = Arrays.asList(graphs);
+
+    public void testUrisToCSV() {
+        ArrayList<String> uris = new ArrayList<String>();
+        uris.add("http://uri1.somewhere.nonono.com");
+        uris.add("http://uri2.somewhere.nonono.com");
         Bindings bindings = new Bindings();
-        String orCondtion = SPARQLQueryUtil.getSparqlOrConditions("g", "graphValue", graphUris, bindings);
-        
-        assertEquals("?g = ?graphValue1 || ?g = ?graphValue2 || ?g = ?graphValue3 || ?g = ?graphValue4", orCondtion);
-        assertTrue(bindings.toString().indexOf("graphValue2=http://rod.eionet.europa.eu/obligations") != -1);
-        
-        
+        String s = SPARQLQueryUtil.urisToCSV(uris, "subjectValue", bindings);
+
+        assertEquals("?subjectValue1,?subjectValue2", s);
+        assertTrue(bindings.toString().indexOf("subjectValue1=http://uri1.somewhere.nonono.com") != -1);
+    }
+
+    public void testUrisWithSpaceToCSV() {
+        ArrayList<String> uris = new ArrayList<String>();
+        uris.add("http://uri1.somewhere.nonono.com");
+        uris.add("tel:+123 456 789");
+        uris.add("http://uri2.somewhere.nonono.com");
+        Bindings bindings = new Bindings();
+        String s = SPARQLQueryUtil.urisToCSV(uris, "subjectValue", bindings);
+
+        assertEquals("?subjectValue1,IRI(?subjectValue2),?subjectValue3", s);
+        assertTrue(bindings.toString().indexOf("subjectValue1=http://uri1.somewhere.nonono.com") != -1);
+        assertTrue(bindings.toString().indexOf("subjectValue2=tel:+123 456 789") != -1);
+    }
+
+    public void testOrderByClause() {
+        String orderBy = SPARQLQueryUtil.getOrderByClause("oorderby", "asc");
+
+        assertEquals(
+                "ORDER BY asc(bif:either( bif:isnull(?oorderby) , (bif:lcase(bif:subseq (bif:replace (?s, '/', '#'), bif:strrchr (bif:replace (?s, '/', '#'), '#')+1))) , bif:lcase(?oorderby)))",
+                orderBy);
     }
 }

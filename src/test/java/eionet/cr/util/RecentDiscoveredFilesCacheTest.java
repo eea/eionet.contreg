@@ -32,8 +32,7 @@ import org.junit.Test;
 import eionet.cr.web.util.ApplicationCache;
 
 /**
- * @author Aleksandr Ivanov
- * <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
+ * @author Aleksandr Ivanov <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
 public class RecentDiscoveredFilesCacheTest extends TestCase {
 
@@ -42,6 +41,7 @@ public class RecentDiscoveredFilesCacheTest extends TestCase {
         super.setUp();
         new ApplicationCache().contextInitialized(null);
     }
+
     @After
     protected void tearDown() throws Exception {
         super.tearDown();
@@ -49,9 +49,9 @@ public class RecentDiscoveredFilesCacheTest extends TestCase {
     }
 
     @Test
-    public void testCache(){
+    public void testCache() {
 
-        for(int i = 0; i < 100; i++){
+        for (int i = 0; i < 100; i++) {
             ApplicationCache.updateRecentResourceCache(getTestData(11));
             assertEquals(10, ApplicationCache.getRecentDiscoveredFiles(10).size());
         }
@@ -65,8 +65,8 @@ public class RecentDiscoveredFilesCacheTest extends TestCase {
      * @return
      */
     private List<Pair<String, String>> getTestData(int size) {
-        List<Pair<String,String>> result = new LinkedList<Pair<String,String>>();
-        for(int i=0; i< size; i++) {
+        List<Pair<String, String>> result = new LinkedList<Pair<String, String>>();
+        for (int i = 0; i < size; i++) {
             result.add(new Pair<String, String>(i + "", "value"));
         }
         return result;

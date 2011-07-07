@@ -19,6 +19,7 @@ public class UserReviewIdGeneratorTest extends CRDatabaseTestCase {
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.test.helpers.CRDatabaseTestCase#getDataSet()
      */
     protected IDataSet getDataSet() throws Exception {
@@ -26,7 +27,7 @@ public class UserReviewIdGeneratorTest extends CRDatabaseTestCase {
     }
 
     @Test
-    public void testReadLastReviewId() throws DAOException{
+    public void testReadLastReviewId() throws DAOException {
 
         CRUser user = new CRUser("kaptejaa");
         int lastReviewId = DAOFactory.get().getDao(HelperDAO.class).getLastReviewId(user);
@@ -41,7 +42,6 @@ public class UserReviewIdGeneratorTest extends CRDatabaseTestCase {
 
         lastReviewId = DAOFactory.get().getDao(HelperDAO.class).getLastReviewId(user);
         assertEquals(3, lastReviewId);
-
 
         user = new CRUser("someoneelse");
 
