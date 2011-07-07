@@ -13,10 +13,10 @@
         <c:when test="${not empty actionBean.history}">
             <display:table name="${actionBean.history}" class="sortable"
                 pagesize="20" sort="list" id="history" htmlId="historylist"
-                requestURI="${actionBean.urlBinding}" style="width:100%">
-                <display:column title="Date" sortable="false" style="width:150px;">${history.lastOperation}
+                requestURI="${actionBean.parsedUrlBinding}" style="width:100%">
+                <display:column title="Date" sortable="true" style="width:150px;">${history.lastOperation}
                                     </display:column>
-                <display:column title="URL" sortable="false">
+                <display:column title="URL" sortable="true">
                     <stripes:link href="/factsheet.action">${history.url}
                                             <stripes:param name="uri" value="${history.url}" />
                     </stripes:link>

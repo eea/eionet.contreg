@@ -15,4 +15,28 @@
                 url="${db.host}">
     </Resource>
 
+    <Resource name="jdbc/readWriteRepo"
+                auth="Container"
+                type="javax.sql.DataSource"
+                maxActive="100"
+                maxIdle="30"
+                maxWait="10000"
+                username="${virtuoso.db.usr}"
+                password="${virtuoso.db.pwd}"
+                driverClassName="${virtuoso.db.drv}"
+                url="${virtuoso.db.url}">
+    </Resource>
+
+    <Resource name="jdbc/readOnlyRepo"
+                auth="Container"
+                type="javax.sql.DataSource"
+                maxActive="100"
+                maxIdle="30"
+                maxWait="10000"
+                username="${virtuoso.db.rousr}"
+                password="${virtuoso.db.ropwd}"
+                driverClassName="${virtuoso.db.drv}"
+                url="${virtuoso.db.url}">
+    </Resource>
+
 </Context>

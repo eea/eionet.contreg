@@ -27,18 +27,18 @@
 
             <display:table name="${actionBean.uploads}" class="sortable"
                             pagesize="20" sort="list" id="uploadDTO" htmlId="uploads"
-                            requestURI="${actionBean.urlBinding}" style="width:100%">
+                            requestURI="${actionBean.parsedUrlBinding}" style="width:100%">
 
-                <display:column title="" sortable="false" style="width:1em">
+                <display:column title="" sortable="true" style="width:1em">
                     <input type="checkbox" value="${uploadDTO.subjectUri}" name="subjectUris" />
                 </display:column>
-                <display:column title="Title" sortable="false">
+                <display:column title="Title" sortable="true">
                     <stripes:link href="/factsheet.action">
                         ${uploadDTO.label}
                         <stripes:param name="uri" value="${uploadDTO.subjectUri}"/>
                     </stripes:link>
                 </display:column>
-                <display:column title="Modified" sortable="false" style="width:10em">
+                <display:column title="Modified" sortable="true" style="width:10em">
                     ${uploadDTO.dateModified}
                 </display:column>
 
@@ -57,13 +57,13 @@
         <display:table name="${actionBean.uploads}" class="sortable"
                             pagesize="20" sort="list" id="uploadDTO" htmlId="uploads"
                             requestURI="${actionBean.urlBinding}" style="width:100%">
-            <display:column title="Title" sortable="false">
+            <display:column title="Title" sortable="true">
                 <stripes:link href="/factsheet.action">
                     ${uploadDTO.label}
                     <stripes:param name="uri" value="${uploadDTO.subjectUri}"/>
                 </stripes:link>
             </display:column>
-            <display:column title="Modified" sortable="false" style="width:10em">
+            <display:column title="Modified" sortable="true" style="width:10em">
                 ${uploadDTO.dateModified}
             </display:column>
         </display:table>

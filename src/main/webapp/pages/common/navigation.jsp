@@ -19,7 +19,7 @@
         <c:if test="${not empty sessionScope.crUser && sessionScope.crUser.administrator}">
             <li><a href="admin" title="Administrative activities">Admin actions</a></li>
         </c:if>
-        <c:if test='${crfn:userHasPermission(pageContext.session, "/registrations", "u")}'>
+        <c:if test='${not empty sessionScope.crUser && crfn:userHasPermission(pageContext.session, "/registrations", "u")}'>
             <li><a href="registerUrl.action">URL registration</a></li>
             <%-- We're sure that session has user, because we assume anonymous users --%>
             <%-- don't have permissions in "/registrations" ACL.                     --%>

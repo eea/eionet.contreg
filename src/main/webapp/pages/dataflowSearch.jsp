@@ -21,7 +21,7 @@
                 <label for="dataflowSelect" class="question" style="margin-bottom:3px">Obligation:</label>
                 <stripes:select name="dataflow" id="dataflowSelect" size="15" style="width:100%">
                     <c:forEach var="instr" items="${dataflowSearchActionBean.instrumentsObligations}">
-                        <optgroup label="${instr.key}">
+                        <optgroup label="${instr.key.label}">
                             <c:forEach var="oblig" items="${instr.value}">
                                 <stripes:option value="${oblig.uri}" label="${oblig.label}"/>
                             </c:forEach>

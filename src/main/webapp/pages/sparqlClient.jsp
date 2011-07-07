@@ -43,22 +43,22 @@
 
         <div>
             <crfn:form name="bookmarksForm" action="/sparql" method="get">
-	            <c:if test="${empty actionBean.bookmarkedQueries}">
-	                <p>Type a SPARQL query, select output format and other options, and press Execute.</p>
-	            </c:if>
-	            <c:if test="${not empty actionBean.bookmarkedQueries}">
-	                <p>Type a SPARQL query, or select one from bookmarks:</p>
-	                <div>
-		                <stripes:select name="fillfrom" onchange="document.bookmarksForm.submit()" style="width:500px">
-		                     <stripes:option value="" label="-- Select a bookmarked SPARQL query --" />
-		                         <c:forEach items="${actionBean.bookmarkedQueries}" var="bookmarkedQuery">
-		                             <stripes:option value="${bookmarkedQuery.subj}" label="${bookmarkedQuery.label}" />
-		                         </c:forEach>
-		                </stripes:select>
-		                <noscript><div><stripes:submit name="" value="Go" id="goButton" /></div></noscript>
-		                <br/><a href="sparql?deleteBookmarked=">Delete bookmarked queries ...</a>
-	                </div>
-	            </c:if>
+              <c:if test="${empty actionBean.bookmarkedQueries}">
+                  <p>Type a SPARQL query, select output format and other options, and press Execute.</p>
+              </c:if>
+              <c:if test="${not empty actionBean.bookmarkedQueries}">
+                  <p>Type a SPARQL query, or select one from bookmarks:</p>
+                  <div>
+                    <stripes:select name="fillfrom" onchange="document.bookmarksForm.submit()" style="width:500px">
+                         <stripes:option value="" label="-- Select a bookmarked SPARQL query --" />
+                             <c:forEach items="${actionBean.bookmarkedQueries}" var="bookmarkedQuery">
+                                 <stripes:option value="${bookmarkedQuery.subj}" label="${bookmarkedQuery.label}" />
+                             </c:forEach>
+                    </stripes:select>
+                    <noscript><div><stripes:submit name="" value="Go" id="goButton" /></div></noscript>
+                    <br/><a href="sparql?deleteBookmarked=">Delete bookmarked queries ...</a>
+                  </div>
+              </c:if>
             </crfn:form>
         </div>
 
@@ -98,6 +98,7 @@ SELECT DISTINCT * WHERE {
                             <div style="position: absolute; top: 5px; left: 540px;">
                                 <stripes:submit name="execute" value="Execute" id="executeButton" />
                                 <stripes:submit name="bookmark" value="Bookmark" id="bookmarkButton" />
+                                <stripes:hidden name="bookmarkName" value="${actionBean.bookmarkName}"/>
                             </div>
                         </c:when>
                         <c:otherwise>
@@ -110,6 +111,9 @@ SELECT DISTINCT * WHERE {
 
                 <div style="clear:both">
                     <c:if test="${not empty actionBean.query && empty param.bookmark && empty param.fillfrom}">
+                        <c:if test="${actionBean.result.allRowsReturned == 'false'}">
+                            <div class="important-msg">The query result exceeded maximum allowed row count. Displaying only first rows. Please run a more detailed query.</div>
+                        </c:if>
                         <c:choose>
                             <c:when test="${not empty actionBean.result && not empty actionBean.result.rows}">
                                 <br />

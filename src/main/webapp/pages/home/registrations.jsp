@@ -15,18 +15,18 @@
         <c:when test="${not empty actionBean.registrations}">
             <display:table name="${actionBean.registrations}" class="datatable"
                 pagesize="20" sort="list" id="registrations" htmlId="registratioinslist"
-                requestURI="${actionBean.urlBinding}" style="width:100%">
-                    <display:column title="Subject" sortable="false">
+                requestURI="${actionBean.parsedUrlBinding}" style="width:100%">
+                    <display:column title="Subject" sortable="true">
                         <stripes:link href="/factsheet.action">${registrations.subjectUri}
                             <stripes:param name="uri" value="${registrations.subjectUri}" />
                         </stripes:link>
                     </display:column>
-                    <display:column title="Predicate" sortable="false">
+                    <display:column title="Predicate" sortable="true">
                         <stripes:link href="/factsheet.action">${registrations.predicateUri}
                             <stripes:param name="uri" value="${registrations.predicateUri}" />
                         </stripes:link>
                     </display:column>
-                    <display:column title="Object" sortable="false">
+                    <display:column title="Object" sortable="true">
                         ${registrations.object}
                     </display:column>
             </display:table>

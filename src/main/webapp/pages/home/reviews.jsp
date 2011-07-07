@@ -243,9 +243,9 @@
                         method="post">
                             <display:table name="${actionBean.reviews}" class="sortable"
                                 pagesize="20" sort="list" id="review" htmlId="reviews"
-                                requestURI="${actionBean.urlBinding}" style="width:100%">
-                                <c:if test="${ actionBean.userAuthorized}">
-                                    <display:column title="" sortable="false" style="width:50px;">
+                                requestURI="${actionBean.parsedUrlBinding}" style="width:100%">
+                                <c:if test="${actionBean.userAuthorized}">
+                                    <display:column title="" sortable="true" style="width:50px;">
                                         <input type="checkbox"
                                             value="${review.reviewID}" name='reviewIds'></input>
                                     </display:column>

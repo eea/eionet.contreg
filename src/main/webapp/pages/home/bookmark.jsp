@@ -15,14 +15,14 @@
                     method="post">
                     <display:table name="${actionBean.bookmarks}" class="sortable"
                         pagesize="20" sort="list" id="bookmark" htmlId="bookmarks"
-                        requestURI="${actionBean.urlBinding}" style="width:100%">
+                        requestURI="${actionBean.parsedUrlBinding}" style="width:100%">
                         <c:if test="${ actionBean.userAuthorized}">
                             <display:column title="" sortable="false" style="width:50px;">
                             <input type="checkbox"
                                     value="${ bookmark.bookmarkUrlHtmlFormatted }" name='bookmarkUrl'></input>
                             </display:column>
                         </c:if>
-                        <display:column title="URL" sortable="false">
+                        <display:column title="URL" sortable="true">
                             <stripes:link href="/factsheet.action">${bookmark.bookmarkUrl}
                                 <stripes:param name="uri" value="${bookmark.bookmarkUrl}" />
                             </stripes:link>
