@@ -436,10 +436,10 @@ public class PullHarvest extends Harvest {
         HarvestSourceDTO finalSource = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(sourceUrlString);
 
         long now = System.currentTimeMillis();
-        long lastHarvestTime = finalSource.getLastHarvest() == null ? 0 : finalSource.getLastHarvest().getTime();
+        long lastHarvestTime = finalSource==null || finalSource.getLastHarvest() == null ? 0 : finalSource.getLastHarvest().getTime();
         long sinceLastHarvest = now - lastHarvestTime;
         long harvestIntervalMillis =
-            finalSource.getIntervalMinutes() == null ? 0L : finalSource.getIntervalMinutes().longValue() * 60L * 1000L;
+            finalSource==null || finalSource.getIntervalMinutes() == null ? 0L : finalSource.getIntervalMinutes().longValue() * 60L * 1000L;
 
         if (lastHarvestTime == 0 || (lastHarvestTime > 0 && sinceLastHarvest > harvestIntervalMillis)) {
             ret = true;

@@ -128,21 +128,24 @@ public class HarvestDAOWriter {
         if (harvest instanceof PullHarvest) {
 
             PullHarvest pullHarvest = (PullHarvest) harvest;
-            boolean wasTemporaryError = !pullHarvest.getSourceAvailable() && !harvest.permanentError;
-            if (wasTemporaryError) {
+            if (pullHarvest != null){
+                Boolean isSourceAvailable = pullHarvest.getSourceAvailable();
+                boolean wasTemporaryError = (isSourceAvailable!=null && isSourceAvailable.booleanValue()==false) && !pullHarvest.permanentError;
+                if (wasTemporaryError) {
 
-                HarvestSourceDTO source = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceById(sourceId);
-                if (source != null && source.getLastHarvest() != null) {
+                    HarvestSourceDTO source = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceById(sourceId);
+                    if (source != null && source.getLastHarvest() != null) {
 
-                    long prevHarvest = source.getLastHarvest().getTime();
-                    int interval = source.getIntervalMinutes();
+                        long prevHarvest = source.getLastHarvest().getTime();
+                        int interval = source.getIntervalMinutes();
 
-                    int increase = (interval * 10) / 100;
-                    if (increase < 120) {
-                        increase = 120;
+                        int increase = (interval * 10) / 100;
+                        if (increase < 120) {
+                            increase = 120;
+                        }
+
+                        result = prevHarvest + (increase * 60 * 1000);
                     }
-
-                    result = prevHarvest + (increase * 60 * 1000);
                 }
             }
         }

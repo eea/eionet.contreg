@@ -402,6 +402,7 @@ public abstract class Harvest {
                         String.valueOf(HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL)));
 
             List<String> newSources = DAOFactory.get().getDao(HarvestSourceDAO.class).getNewSources(sourceUrlString);
+            logger.debug((newSources==null ? 0 : newSources.size()) + " new harvest sources found");
 
             for (String sourceUrl : newSources) {
                 // escape spaces in URLs

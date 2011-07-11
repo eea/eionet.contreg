@@ -1,0 +1,85 @@
+package eionet.cr.dao.virtuoso;
+
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import org.junit.Test;
+
+import eionet.cr.dao.DAOException;
+import eionet.cr.dao.readers.SubjectExportReader;
+import eionet.cr.util.Bindings;
+import eionet.cr.util.export.XmlExporter;
+import eionet.cr.util.sesame.SPARQLResultSetReader;
+
+/**
+ * Mock for exporterDAO.
+ */
+public class ExporterDAOTest extends VirtuosoExporterDAO {
+
+    /**
+     * SPARQL is stored here.
+     */
+    private String sparql;
+    /**
+     * Query bindings.
+     */
+    private Bindings bindings;
+
+    /**
+     * test building query.
+     */
+    @Test
+    public void testGetQuery() {
+        HashMap<String, String> filters = new HashMap<String, String>();
+        filters.put("http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://rod.eionet.europa.eu/schema.rdf#Obligation");
+        filters.put("http://www.w3.org/2000/01/rdf-schema#label", "CLRTAP");
+        List<String> selectedPredicates = new ArrayList<String>();
+        selectedPredicates.add("http://www.w3.org/2000/01/rdf-schema#label");
+        selectedPredicates.add("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
+        selectedPredicates.add("http://purl.org/dc/terms/title");
+        selectedPredicates.add("http://purl.org/dc/terms/abstract");
+        selectedPredicates.add("http://rod.eionet.europa.eu/schema.rdf#terminated");
+
+        // VirtuosoFilteredSearchHelper helper = new VirtuosoFilteredSearchHelper(filters, null,
+        // null, null);
+        XmlExporter exporter = new XmlExporter();
+        SubjectExportReader reader = new SubjectExportReader(exporter);
+
+        try {
+            exportByTypeAndFilters(filters, selectedPredicates, reader);
+        } catch (DAOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        assertEquals(
+                "DEFINE input:inference'CRInferenceRule' select distinct * where {?s ?p ?o  . {{?s ?p1 ?o1 . ?s ?predicateValue1 ?o1} "
+                        + ". { ?s ?p1 ?o1 . FILTER (?o1 = ?objectValue1Uri || ?o1 = ?objectValue1Lit)}} . "
+                        + "{{?s ?p2 ?o2 . ?s ?predicateValue2 ?o2} . { ?s ?p2 ?o2 . FILTER bif:contains(?o2, ?objectValue2)}} . "
+                        + "filter (?p IN (?exportPredicateValue1,?exportPredicateValue2,?exportPredicateValue3,?exportPredicateValue4,?exportPredicateValue5))} "
+                        + "ORDER BY ?s", sparql);
+
+        assertTrue(bindings.toString().indexOf("objectValue1Uri=http://rod.eionet.europa.eu/schema.rdf#Obligation") != -1);
+        assertTrue(bindings.toString().indexOf("exportPredicateValue1=http://www.w3.org/2000/01/rdf-schema#label") != -1);
+        assertTrue(bindings.toString().indexOf("exportPredicateValue4=http://purl.org/dc/terms/abstract") != -1);
+    }
+
+    @Override
+    protected <T> List<T> executeSPARQL(String sparql, Bindings bindings, SPARQLResultSetReader<T> reader) throws DAOException {
+        // TODO Auto-generated method stub
+        this.sparql = sparql;
+        this.bindings = bindings;
+
+        return null;
+    }
+
+    @Override
+    protected <T> List<T> executeSPARQL(String sparql, SPARQLResultSetReader<T> reader) throws DAOException {
+        // TODO Auto-generated method stub
+        return executeSPARQL(sparql, null, reader);
+    }
+}

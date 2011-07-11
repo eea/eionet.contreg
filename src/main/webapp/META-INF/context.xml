@@ -15,7 +15,7 @@
                 url="${db.host}">
     </Resource>
 
-    <Resource name="jdbc/readWriteRepo"
+<!--    <Resource name="jdbc/readWriteRepo"
                 auth="Container"
                 type="javax.sql.DataSource"
                 maxActive="100"
@@ -37,6 +37,6 @@
                 password="${virtuoso.db.ropwd}"
                 driverClassName="${virtuoso.db.drv}"
                 url="${virtuoso.db.url}">
-    </Resource>
+    </Resource> -->
 
 </Context>

@@ -74,6 +74,7 @@
                                         </c:choose>
                                     </td>
                                     <td>
+                                        <span title="[Datatype: ${object.dataTypeLabel}]">
                                         <c:choose>
                                             <c:when test="${!object.literal}">
                                                 <c:choose>
@@ -95,9 +96,10 @@
                                                 </stripes:link>
                                             </c:when>
                                             <c:otherwise>
-                                                <span title="[Datatype: ${object.dataTypeLabel}]" style="white-space:pre-wrap"><c:out value="${object.value}"/></span>
+                                                <c:out value="${object.value}"/>
                                             </c:otherwise>
                                         </c:choose>
+                                        </span>
                                     </td>
                                     <td class="center">
                                         <c:choose>

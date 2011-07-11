@@ -145,7 +145,7 @@ public class SesameConnectionProvider {
 
             LOGGER.info(MessageFormat.format("Found no data source with name {0}, going to create a direct connection",
                     READWRITE_DATASOURCE_NAME));
-            return readWriteRepository.getConnection();
+            return getReadWriteRepository().getConnection();
         } else {
             try {
                 return new VirtuosoRepositoryConnection((VirtuosoRepository)getReadWriteRepository(), dataSource.getConnection());
