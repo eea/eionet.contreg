@@ -2,7 +2,7 @@
 
 <%@ include file="/pages/common/taglibs.jsp"%>
 
-<stripes:layout-render name="/pages/common/template.jsp" pageTitle="Content Registry">
+<stripes:layout-render name="/pages/common/template.jsp" pageTitle="">
 
     <stripes:layout-component name="contents">
 <div style="float:right; background-color:white; width: 20em; padding-left: 1em;">

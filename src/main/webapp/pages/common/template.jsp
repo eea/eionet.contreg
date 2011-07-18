@@ -10,13 +10,17 @@
     <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
         <head>
             <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-						<meta name="viewport" content="initial-scale=1.0" />
+            <meta name="viewport" content="initial-scale=1.0" />
             <meta name="Publisher" content="EEA, The European Environment Agency" />
-            <meta name="Rights" content="Copyright EEA Copenhagen 2003-2011" />
             <base href="<%= BaseUrl.getBaseUrl(request) %>"/>
-
-            <title>Content Registry - ${pageTitle}</title>
-
+            <c:choose>
+                <c:when test="${empty pageTitle}">
+                    <title>Content Registry</title>
+                </c:when>
+                <c:otherwise>
+                    <title>Content Registry - ${pageTitle}</title>
+                </c:otherwise>
+            </c:choose>
             <link rel="stylesheet" type="text/css" href="http://www.eionet.europa.eu/styles/eionet2007/print.css" media="print" />
             <link rel="stylesheet" type="text/css" href="http://www.eionet.europa.eu/styles/eionet2007/handheld.css" media="handheld" />
             <link rel="stylesheet" type="text/css" href="http://www.eionet.europa.eu/styles/eionet2007/screen.css" media="screen" title="Eionet 2007 style" />
