@@ -123,51 +123,24 @@ public class PullHarvest extends Harvest {
             // Get DTO of source that will be harvested.
             HarvestSourceDTO source = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(sourceUrlString);
 
-            // Block specific to batch-harvesting (aka scheduled harvesting)
+            // if batch harvesting and broken source, perform necessary actions
             if (source != null && isBatchHarvest() && !isUrgentHarvest()) {
 
                 boolean increaseUnavailableCount = source.isPermanentError() && source.isPrioritySource();
                 Integer countUnavail = source.getCountUnavail();
                 boolean deleteSource = countUnavail != null && countUnavail.intValue() >= 5 && !source.isPrioritySource();
 
-                if (increaseUnavailableCount || deleteSource){
+                if (increaseUnavailableCount || deleteSource) {
 
-                    try {
-                        if (increaseUnavailableCount) {
-
-                            // Don't want any finishing actions to be done here.
-                            // TODO: sure this is right?
-                            daoWriter = null;
-
-                            // log intentions
-                            logger.warn("This priority source has permanent error, increasing its unavailability count and exiting!");
-
-                            // increase unavailable count and exit
-                            DAOFactory.get().getDao(HarvestSourceDAO.class).increaseUnavailableCount(source.getSourceId());
-                            return;
-                        }
-                        else if (deleteSource) {
-
-                            // Don't want any finishing actions to be done here.
-                            // TODO: sure this is right?
-                            daoWriter = null;
-
-                            // log intentions
-                            logger.warn("This non-priority source has unavailability count >=5, queing it for deletion and exiting!");
-
-                            // queue source for deletion and exit
-                            DAOFactory.get().getDao(HarvestSourceDAO.class).queueSourcesForDeletion(Collections.singletonList(sourceUrlString));
-                            return;
-                        }
-                    } catch (DAOException e) {
-                        throw new HarvestException(e.toString(), e);
-                    }
+                    handleBrokenSource(source, increaseUnavailableCount, deleteSource);
+                    return;
                 }
             }
 
             // Source shouldn't be harvested if it redirects to another source and the destination source is recently harvested
             // (within its harvesting minutes)
             if (needsHarvesting) {
+
                 // prepare URL connection
                 harvestUrlConnection = HarvestUrlConnection.getConnection(sourceUrlString);
 
@@ -300,6 +273,40 @@ public class PullHarvest extends Harvest {
             }
         } else if (!needsHarvesting) {
             logger.debug("Source redirects to another source that has recently been harvested! Will not harvest.");
+        }
+    }
+
+    /**
+     * @param source
+     * @param increaseUnavailableCount
+     * @param deleteSource
+     * @throws DAOException
+     */
+    private void handleBrokenSource(HarvestSourceDTO source,
+            boolean increaseUnavailableCount, boolean deleteSource) throws DAOException {
+
+        if (increaseUnavailableCount) {
+
+            // Don't want any finishing actions to be done here.
+            // TODO: sure this is right?
+            daoWriter = null;
+
+            // log intentions
+            logger.warn("This priority source has permanent error, increasing its unavailability count and exiting!");
+
+            // increase unavailable count and exit
+            DAOFactory.get().getDao(HarvestSourceDAO.class).increaseUnavailableCount(source.getSourceId());
+        } else if (deleteSource) {
+
+            // Don't want any finishing actions to be done here.
+            // TODO: sure this is right?
+            daoWriter = null;
+
+            // log intentions
+            logger.warn("This non-priority source has unavailability count >=5, queing it for deletion and exiting!");
+
+            // queue source for deletion and exit
+            DAOFactory.get().getDao(HarvestSourceDAO.class).queueSourcesForDeletion(Collections.singletonList(sourceUrlString));
         }
     }
 
