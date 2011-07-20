@@ -105,51 +105,63 @@ public class PullHarvest extends Harvest {
         needsHarvesting = true;
 
         try {
-            // make sure old temporary file is deleted
+            // Make sure old temporary file is deleted.
             deleteDownloadedFile(downloadedFile);
 
             // Resolve redirections
             redirectedUrls = resolveRedirects();
 
-            if (redirectedUrls != null && redirectedUrls.size() > 0) {
+            if (redirectedUrls != null && !redirectedUrls.isEmpty()) {
+
                 isRedirectedSource = true;
 
-                // Change sourceUrlString to the actual source that will be harvested
+                // Change sourceUrlString to the actual source that will be harvested.
                 sourceMetadata.setUri(sourceUrlString);
                 logger.setHarvestSourceUrl(sourceUrlString);
             }
 
-            // Source that will be harvested
+            // Get DTO of source that will be harvested.
             HarvestSourceDTO source = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(sourceUrlString);
 
-            if (isBatchHarvest() && !isUrgentHarvest()) {
-                try {
-                    if (source != null) {
-                        if (source.isPermanentError()) {
-                            daoWriter = null; // we dont't want finishing actions to be done
-                            if (source.isPrioritySource()) {
-                                DAOFactory.get().getDao(HarvestSourceDAO.class).increaseUnavailableCount(source.getSourceId());
-                                String err =
-                                    "Source: " + source.getUrl()
-                                    + " has permanent error. Will not delete the source because it is Priority source";
-                                logger.debug(err);
-                                throw new HarvestException(err, new Throwable());
-                            } else {
-                                DAOFactory.get().getDao(HarvestSourceDAO.class)
-                                .queueSourcesForDeletion(Collections.singletonList(sourceUrlString));
-                            }
+            // Block specific to batch-harvesting (aka scheduled harvesting)
+            if (source != null && isBatchHarvest() && !isUrgentHarvest()) {
+
+                boolean increaseUnavailableCount = source.isPermanentError() && source.isPrioritySource();
+                Integer countUnavail = source.getCountUnavail();
+                boolean deleteSource = countUnavail != null && countUnavail.intValue() >= 5 && !source.isPrioritySource();
+
+                if (increaseUnavailableCount || deleteSource){
+
+                    try {
+                        if (increaseUnavailableCount) {
+
+                            // Don't want any finishing actions to be done here.
+                            // TODO: sure this is right?
+                            daoWriter = null;
+
+                            // log intentions
+                            logger.warn("This priority source has permanent error, increasing its unavailability count and exiting!");
+
+                            // increase unavailable count and exit
+                            DAOFactory.get().getDao(HarvestSourceDAO.class).increaseUnavailableCount(source.getSourceId());
                             return;
-                        } else if (source.getCountUnavail() >= 5) {
-                            if (!source.isPrioritySource()) {
-                                daoWriter = null; // we dont't want finishing actions to be done
-                                DAOFactory.get().getDao(HarvestSourceDAO.class)
-                                .queueSourcesForDeletion(Collections.singletonList(sourceUrlString));
-                                return;
-                            }
                         }
+                        else if (deleteSource) {
+
+                            // Don't want any finishing actions to be done here.
+                            // TODO: sure this is right?
+                            daoWriter = null;
+
+                            // log intentions
+                            logger.warn("This non-priority source has unavailability count >=5, queing it for deletion and exiting!");
+
+                            // queue source for deletion and exit
+                            DAOFactory.get().getDao(HarvestSourceDAO.class).queueSourcesForDeletion(Collections.singletonList(sourceUrlString));
+                            return;
+                        }
+                    } catch (DAOException e) {
+                        throw new HarvestException(e.toString(), e);
                     }
-                } catch (DAOException e) {
-                    logger.warn("Failure when deleting the source", e);
                 }
             }
 
@@ -850,11 +862,9 @@ public class PullHarvest extends Harvest {
     }
 
     /**
-     * Deletes given file. If the given file is null, or does not exist or is not a file,
-     * the method does nothing.
+     * Deletes given file. If the given file is null, or does not exist or is not a file, the method does nothing.
      *
-     * The deletion is done by calling {@link File#delete()}. If the latter returns false,
-     * the method logs informative error.
+     * The deletion is done by calling {@link File#delete()}. If the latter returns false, the method logs informative error.
      *
      * @param file
      */
