@@ -2,7 +2,7 @@
 
 <%@ include file="/pages/common/taglibs.jsp"%>
 
-<stripes:layout-render name="/pages/common/template.jsp" pageTitle="">
+<stripes:layout-render name="/pages/common/template.jsp" pageTitle="${initParam.appDispName}">
 
     <stripes:layout-component name="contents">
 <div style="float:right; background-color:white; width: 20em; padding-left: 1em;">
@@ -53,9 +53,9 @@
         </c:choose>
     </div>
 </div>
-        <h1>What is Content Registry?</h1>
+        <h1>What is ${initParam.appDispName}?</h1>
     <p>
-        Content Registry (CR) is an object-oriented search engine where you can search for the content of data in Eionet.
+        ${initParam.appDispName} is an object-oriented search engine where you can search for the content of data in Eionet.
         Being object-oriented means it understands what e.g. a measuring station is and can show what measurements
         it has made.
         Not all of the Eionet services are included, only those that have been specified by the administrators of this site.
@@ -122,7 +122,7 @@
 
         <h2>Support</h2>
         <p>
-        If you experience any problem using Content Registry, please let the Eionet Helpdesk know immediately.
+        If you experience any problem using ${initParam.appDispName}, please let the Eionet Helpdesk know immediately.
         The Helpdesk can be reached by phone on +37 2 508 4992 from Monday through Friday 9:00 to 17:00 CET.
         You can also email the helpdesk at any time: <a href="mailto:helpdesk@eionet.europa.eu">helpdesk@eionet.europa.eu</a>.
         Do not hesitate, we are here to help.

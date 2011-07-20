@@ -67,9 +67,9 @@
 
                         <c:set var="subjectUrl" value="${actionBean.subject.url}"/>
                         <c:set var="subjectUri" value="${actionBean.subject.uri}"/>
-                        
+
                         <c:set var="registrationsAllowed" value='${crfn:userHasPermission(pageContext.session, "/registrations", "u")}'/>
-                        
+
                         <c:set var="editAllowed" value="${registrationsAllowed && !subject.anonymous}"/>
                         <c:set var="harvestAllowed" value="${editAllowed && subjectUrl!=null && !actionBean.currentlyHarvested}"/>
                         <c:set var="sourceReadActionsAllowed" value="${actionBean.uriIsHarvestSource}"/>
@@ -77,7 +77,7 @@
                         <c:set var="addBookmarkAllowed" value="${registrationsAllowed && !actionBean.subjectIsUserBookmark}"/>
                         <c:set var="removeBookmarkAllowed" value="${actionBean.subjectIsUserBookmark}"/>
                         <c:set var="addReviewAllowed" value="${registrationsAllowed && subjectUrl!=null}"/>
-                        
+
                         <c:set var="displayOperations" value="${editAllowed || harvestAllowed || sourceReadActionsAllowed || downloadAllowed || addBookmarkAllowed || removeBookmarkAllowed || addReviewAllowed}"/>
 
                         <c:if test="${displayOperations}">
@@ -102,7 +102,7 @@
                                                 <a id="wait_link" href="${oldUrl}" onclick="javascript:loadAndWait('The resource is being harvested. Please wait ...', '${url}', '${pageContext.request.contextPath}'); return false;">Harvest</a>
                                             </li>
                                         </c:if>
-                                    
+
                                         <c:if test="${sourceReadActionsAllowed}">
                                             <li>
                                             <stripes:link class="link-plain" href="/source.action?view=&harvestSource.url=${ subjectUrl }">Source details</stripes:link>
@@ -232,7 +232,7 @@
                                 </c:if>
                                 <div style="margin-top:20px" class="note-msg" id="wait_container">
                                     <strong>Unknown</strong>
-                                    <p>Nothing is known about
+                                    <p>The application has no information about
                                         <c:choose>
                                             <c:when test="${not empty actionBean.url}">
                                                 <a class="link-external" href="${actionBean.url}">${actionBean.url}</a>
@@ -241,13 +241,13 @@
                                                 ${actionBean.uri}
                                             </c:otherwise>
                                         </c:choose>
-                                    in Content Registry</p>
+                                    </p>
                                 </div>
                             </c:when>
                             <c:when test="${actionBean.uriHash!=0}">
                                 <div style="margin-top:20px" class="note-msg">
                                 <strong>Unknown</strong>
-                                    <p>Nothing is known about this anonymous resource in Content Registry</p>
+                                    <p>The application has no information about this anonymous resource</p>
                                 </div>
                             </c:when>
                             <c:otherwise>

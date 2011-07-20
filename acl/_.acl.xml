@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<acl description="Content Registry's root level ACL">
+<acl description="Root level ACL">
     <entries>
         <entry type="object">
             <principal id="cr_admin" type="localgroup"/>

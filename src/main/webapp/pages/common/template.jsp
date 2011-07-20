@@ -6,21 +6,16 @@
     <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 
     <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-    
+
     <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
         <head>
             <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
             <meta name="viewport" content="initial-scale=1.0" />
             <meta name="Publisher" content="EEA, The European Environment Agency" />
             <base href="<%= BaseUrl.getBaseUrl(request) %>"/>
-            <c:choose>
-                <c:when test="${empty pageTitle}">
-                    <title>Content Registry</title>
-                </c:when>
-                <c:otherwise>
-                    <title>Content Registry - ${pageTitle}</title>
-                </c:otherwise>
-            </c:choose>
+
+            <title>${initParam.appDispName} - ${pageTitle}</title>
+
             <link rel="stylesheet" type="text/css" href="http://www.eionet.europa.eu/styles/eionet2007/print.css" media="print" />
             <link rel="stylesheet" type="text/css" href="http://www.eionet.europa.eu/styles/eionet2007/handheld.css" media="handheld" />
             <link rel="stylesheet" type="text/css" href="http://www.eionet.europa.eu/styles/eionet2007/screen.css" media="screen" title="Eionet 2007 style" />
@@ -60,7 +55,7 @@
                         </c:choose>
                         <a id="printlink" title="Print this page" href="javascript:this.print();"><span>Print</span></a>
                         <a id="fullscreenlink" href="javascript:toggleFullScreenMode()" title="Switch to/from full screen mode"><span>Switch to/from full screen mode</span></a>
-                        <a id="acronymlink" href="about.action" title="About Content Registry"><span>About</span></a>
+                        <a id="acronymlink" href="about.action" title="About ${initParam.appDispName}"><span>About</span></a>
                         <form action="http://search.eionet.europa.eu/search.jsp" method="get">
                             <div id="freesrchform"><label for="freesrchfld">Search</label>
                                 <input type="text" id="freesrchfld" name="query"/>
@@ -74,7 +69,7 @@
                 <div id="pagehead">
                     <a href="/"><img src="images/eea-print-logo.gif" alt="Logo" id="logo" /></a>
                     <div id="networktitle">Eionet</div>
-                    <div id="sitetitle">Content Registry</div>
+                    <div id="sitetitle">${initParam.appDispName}</div>
                     <div id="sitetagline">This service is part of Reportnet</div>
                 </div> <!-- pagehead -->
 
@@ -89,10 +84,10 @@
                     </div>
                     <c:choose>
                         <c:when test="${empty pageTitle}">
-                            <div class="breadcrumbitemlast">Content Registry</div>
+                            <div class="breadcrumbitemlast">${initParam.appDispName}</div>
                         </c:when>
                         <c:otherwise>
-                            <div class="breadcrumbitem"><a href="${pageContext.request.contextPath}/">Content Registry</a></div>
+                            <div class="breadcrumbitem"><a href="${pageContext.request.contextPath}/">${initParam.appDispName}</a></div>
                              <div class="breadcrumbitemlast"><c:out value="${pageTitle}"/></div>
                         </c:otherwise>
                     </c:choose>
@@ -174,7 +169,7 @@
 
                 </div>
                 <div id="pagefoot" style="max-width: none;">
-                    <p><a href="mailto:cr@eionet.europa.eu">E-mail</a> | <a href="mailto:helpdesk@eionet.europa.eu?subject=Feedback from the Content Registry website">Feedback</a></p>
+                    <p><a href="mailto:cr@eionet.europa.eu">E-mail</a> | <a href="mailto:helpdesk@eionet.europa.eu?subject=Feedback from the ${initParam.appDispName} website">Feedback</a></p>
                     <p><a href="http://www.eea.europa.eu/"><b>European Environment Agency</b></a>
                     <br/>Kgs. Nytorv 6, DK-1050 Copenhagen K, Denmark - Phone: +45 3336 7100</p>
                 </div>

@@ -6,6 +6,17 @@
          version="2.4">
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <!--            context parameters          -->
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+    <display-name>${application.displayName}</display-name>
+
+    <context-param>
+        <param-name>appDispName</param-name>
+        <param-value>${application.displayName}</param-value>
+    </context-param>
+
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!--              filters                   -->
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
@@ -56,7 +67,7 @@
             <param-name>FileUpload.MaximumPostSize</param-name>
             <param-value>35000000</param-value>
         </init-param>
-        
+
     </filter>
 
     <filter-mapping>

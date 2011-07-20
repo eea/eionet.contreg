@@ -9,7 +9,7 @@
 
     <c:choose>
         <c:when test="${actionBean.adminLoggedIn}">
-            <h1>Content Registry Administration</h1>
+            <h1>Administration pages</h1>
             <ul>
             <li><stripes:link href="/admin/harvestedurl">Harvested Urls</stripes:link></li>
             <li><stripes:link href="/admin/nhus">Next Harvest Urgency Score </stripes:link></li>

@@ -3,7 +3,7 @@
 
 <%@ include file="/pages/common/taglibs.jsp"%>
 
-<stripes:layout-render name="/pages/common/popuptemplate.jsp" siteTitle="Content Registry bookmarklet installer">
+<stripes:layout-render name="/pages/common/popuptemplate.jsp" siteTitle="${initParam.appDispName} bookmarklet installer">
 
     <stripes:layout-component name="contents">
 

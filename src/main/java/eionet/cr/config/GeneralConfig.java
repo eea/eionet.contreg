@@ -125,6 +125,8 @@ public class GeneralConfig {
      */
     public static final String SPARQLENDPOINT_MAX_ROWS_COUNT = "sparql.max.rows";
 
+    public static final String APPLICATION_DISPLAY_NAME = "application.displayName";
+
     /** */
     public static final int SEVERITY_INFO = 1;
     public static final int SEVERITY_CAUTION = 2;

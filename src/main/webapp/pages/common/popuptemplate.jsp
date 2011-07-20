@@ -13,7 +13,7 @@
             <meta name="Rights" content="Copyright EEA Copenhagen 2003-2008" />
             <base href="<%= BaseUrl.getBaseUrl(request) %>"/>
 
-            <title>Content Registry - ${pageTitle}</title>
+            <title>${initParam.appDispName} - ${pageTitle}</title>
 
             <link rel="stylesheet" type="text/css" href="http://www.eionet.europa.eu/styles/eionet2007/print.css" media="print" />
             <link rel="stylesheet" type="text/css" href="http://www.eionet.europa.eu/styles/eionet2007/handheld.css" media="handheld" />
