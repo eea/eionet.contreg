@@ -21,6 +21,7 @@ import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.xml.sax.SAXException;
 
+import eionet.cr.common.CRRuntimeException;
 import eionet.cr.common.Predicates;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
@@ -95,7 +96,7 @@ public class PullHarvest extends Harvest {
      */
     protected void doExecute() throws HarvestException {
 
-        File file = fullFilePathForSourceUrl(sourceUrlString);
+        File downloadedFile = fullFilePathForSourceUrl(sourceUrlString);
 
         String contentType = null;
         int totalBytes = 0;
@@ -104,179 +105,166 @@ public class PullHarvest extends Harvest {
         needsHarvesting = true;
 
         try {
-            // reuse the file if it exists and the configuration allows to do it (e.g. for debugging purposes) */
-            if (file.exists()
-                    && Boolean.parseBoolean(GeneralConfig.getProperty(GeneralConfig.HARVESTER_USE_DOWNLOADED_FILES, "false"))) {
+            // make sure old temporary file is deleted
+            deleteDownloadedFile(downloadedFile);
 
-                sourceAvailable = Boolean.TRUE;
-                logger.debug("Harvesting the already downloaded file");
-            } else {
-                // delete the old file, should it exist
-                if (file.exists()) {
-                    file.delete();
-                }
+            // Resolve redirections
+            redirectedUrls = resolveRedirects();
 
-                // Resolve redirections
-                redirectedUrls = resolveRedirects();
+            if (redirectedUrls != null && redirectedUrls.size() > 0) {
+                isRedirectedSource = true;
 
-                if (redirectedUrls != null && redirectedUrls.size() > 0) {
-                    isRedirectedSource = true;
+                // Change sourceUrlString to the actual source that will be harvested
+                sourceMetadata.setUri(sourceUrlString);
+                logger.setHarvestSourceUrl(sourceUrlString);
+            }
 
-                    // Change sourceUrlString to the actual source that will be harvested
-                    sourceMetadata.setUri(sourceUrlString);
-                    logger.setHarvestSourceUrl(sourceUrlString);
-                }
+            // Source that will be harvested
+            HarvestSourceDTO source = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(sourceUrlString);
 
-                // Source that will be harvested
-                HarvestSourceDTO source = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(sourceUrlString);
-
-                if (isBatchHarvest() && !isUrgentHarvest()) {
-                    try {
-                        if (source != null) {
-                            if (source.isPermanentError()) {
-                                daoWriter = null; // we dont't want finishing actions to be done
-                                if (source.isPrioritySource()) {
-                                    DAOFactory.get().getDao(HarvestSourceDAO.class).increaseUnavailableCount(source.getSourceId());
-                                    String err =
-                                        "Source: "
-                                        + source.getUrl()
-                                        + " has permanent error. Will not delete the source because it is Priority source";
-                                    logger.debug(err);
-                                    throw new HarvestException(err, new Throwable());
-                                } else {
-                                    DAOFactory.get().getDao(HarvestSourceDAO.class)
-                                    .queueSourcesForDeletion(Collections.singletonList(sourceUrlString));
-                                }
-                                return;
-                            } else if (source.getCountUnavail() >= 5) {
-                                if (!source.isPrioritySource()) {
-                                    daoWriter = null; // we dont't want finishing actions to be done
-                                    DAOFactory.get().getDao(HarvestSourceDAO.class)
-                                    .queueSourcesForDeletion(Collections.singletonList(sourceUrlString));
-                                    return;
-                                }
-                            }
-                        }
-                    } catch (DAOException e) {
-                        logger.warn("Failure when deleting the source", e);
-                    }
-                }
-
-                // Source shouldn't be harvested if it redirects to another source and the destination source is recently harvested
-                // (within its harvesting minutes)
-                if (needsHarvesting) {
-                    // prepare URL connection
-                    harvestUrlConnection = HarvestUrlConnection.getConnection(sourceUrlString);
-
-                    setConversionModified(harvestUrlConnection.getUrlConnection());
-
-                    // open connection stream
-                    logger.debug("Downloading");
-                    try {
-                        harvestUrlConnection.openInputStream();
-                        sourceAvailable = harvestUrlConnection.isSourceAvailable();
-                    } catch (Exception e) {
-                        logger.warn(e.toString());
-                    }
-
-                    // Check if Virtuoso is up and running. If not consider it as temporary error
-                    boolean virtuosoAvailable = true;
-                    RepositoryConnection repoConn = null;
-                    try {
-                        repoConn = SesameUtil.getRepositoryConnection();
-                    } catch (RepositoryException e) {
-                        sourceAvailable = false;
-                        virtuosoAvailable = false;
-                    } finally {
-                        SesameUtil.close(repoConn);
-                    }
-
-                    ConnectionError error = harvestUrlConnection.getError();
-                    if (error != null && virtuosoAvailable) {
-                        sourceAvailable = false;
-                        if (error.getType().equals(ErrType.PERMANENT)) {
-                            permanentError = true;
-                            DAOFactory.get().getDao(HarvestSourceDAO.class).deleteSourceTriples(sourceUrlString);
-
-                            DAOFactory.get().getDao(HarvestSourceDAO.class)
-                            .removeAllPredicatesFromHarvesterContext(sourceUrlString);
-                        }
-
-                        // Add cr:firstSeen metadata predicate into harvester context
-                        if (source != null && source.getTimeCreated() != null) {
-                            String firstSeen = dateFormat.format(source.getTimeCreated());
-                            ObjectDTO firstSeenObject = new ObjectDTO(firstSeen, true, XMLSchema.DATETIME);
-                            DAOFactory.get().getDao(HarvestSourceDAO.class)
-                            .insertUpdateSourceMetadata(sourceUrlString, Predicates.CR_FIRST_SEEN, firstSeenObject);
-                        }
-
-                        ObjectDTO errorObject = new ObjectDTO(error.getMessage(), true);
-                        DAOFactory.get().getDao(HarvestSourceDAO.class)
-                        .insertUpdateSourceMetadata(sourceUrlString, Predicates.CR_ERROR_MESSAGE, errorObject);
-
-                        String lastRefreshed = dateFormat.format(new Date(System.currentTimeMillis()));
-                        ObjectDTO lastRefreshedObject = new ObjectDTO(lastRefreshed, true, XMLSchema.DATETIME);
-                        DAOFactory.get().getDao(HarvestSourceDAO.class)
-                        .insertUpdateSourceMetadata(sourceUrlString, Predicates.CR_LAST_REFRESHED, lastRefreshedObject);
-                    }
-
-                    if (sourceAvailable && needsHarvesting) {
-                        // source is available, so continue to extract it's contents and metadata
-
-                        // extract various metadata about this harvest source from url connection object
-                        setSourceMetadata(harvestUrlConnection.getConnection(), source);
-
-                        // NOTE: If URL is redirected, content type is null. skip if unsupported content type
-                        contentType = sourceMetadata.getObjectValue(Predicates.CR_MEDIA_TYPE);
-
-                        // If MEDIA_TYPE in HARVEST_SOURCE table is set then the value from the server is ignored
-                        if (source != null && !StringUtils.isBlank(source.getMediaType())) {
-                            contentType = source.getMediaType();
-                        }
-
-                        if (contentType != null && !isSupportedContentType(contentType)) {
-                            logger.debug("Unsupported response content type: " + contentType);
-                        } else {
-                            logger.debug("Response content type was " + contentType);
-                            if (harvestUrlConnection.isHttpConnection()
-                                    && harvestUrlConnection.getResponseCode() == HttpURLConnection.HTTP_NOT_MODIFIED) {
-
-                                handleSourceNotModified();
-                                return;
+            if (isBatchHarvest() && !isUrgentHarvest()) {
+                try {
+                    if (source != null) {
+                        if (source.isPermanentError()) {
+                            daoWriter = null; // we dont't want finishing actions to be done
+                            if (source.isPrioritySource()) {
+                                DAOFactory.get().getDao(HarvestSourceDAO.class).increaseUnavailableCount(source.getSourceId());
+                                String err =
+                                    "Source: " + source.getUrl()
+                                    + " has permanent error. Will not delete the source because it is Priority source";
+                                logger.debug(err);
+                                throw new HarvestException(err, new Throwable());
                             } else {
-                                logger.debug("Streaming the content to file " + file);
-                                // save the stream to file
-                                totalBytes = FileUtil.streamToFile(harvestUrlConnection.getInputStream(), file);
-
-                                // if content-length for source metadata was previously not found, then set it to file size
-                                if (sourceMetadata.getObject(Predicates.CR_BYTE_SIZE) == null) {
-                                    sourceMetadata.addObject(Predicates.CR_BYTE_SIZE, new ObjectDTO(String.valueOf(totalBytes),
-                                            true));
-                                }
+                                DAOFactory.get().getDao(HarvestSourceDAO.class)
+                                .queueSourcesForDeletion(Collections.singletonList(sourceUrlString));
+                            }
+                            return;
+                        } else if (source.getCountUnavail() >= 5) {
+                            if (!source.isPrioritySource()) {
+                                daoWriter = null; // we dont't want finishing actions to be done
+                                DAOFactory.get().getDao(HarvestSourceDAO.class)
+                                .queueSourcesForDeletion(Collections.singletonList(sourceUrlString));
+                                return;
                             }
                         }
+                    }
+                } catch (DAOException e) {
+                    logger.warn("Failure when deleting the source", e);
+                }
+            }
 
-                        // remove old triples
-                        // FIXME: JH180511 - should it really be necessary here? Because
-                        // the graph is cleared from old triples by HarvestSourceDAO.addSourceToRepository(...)
-                        // anyway below.
+            // Source shouldn't be harvested if it redirects to another source and the destination source is recently harvested
+            // (within its harvesting minutes)
+            if (needsHarvesting) {
+                // prepare URL connection
+                harvestUrlConnection = HarvestUrlConnection.getConnection(sourceUrlString);
+
+                setConversionModified(harvestUrlConnection.getUrlConnection());
+
+                // open connection stream
+                logger.debug("Downloading");
+                try {
+                    harvestUrlConnection.openInputStream();
+                    sourceAvailable = harvestUrlConnection.isSourceAvailable();
+                } catch (Exception e) {
+                    logger.warn(e.toString());
+                }
+
+                // Check if Virtuoso is up and running. If not consider it as temporary error
+                boolean virtuosoAvailable = true;
+                RepositoryConnection repoConn = null;
+                try {
+                    repoConn = SesameUtil.getRepositoryConnection();
+                } catch (RepositoryException e) {
+                    sourceAvailable = false;
+                    virtuosoAvailable = false;
+                } finally {
+                    SesameUtil.close(repoConn);
+                }
+
+                ConnectionError error = harvestUrlConnection.getError();
+                if (error != null && virtuosoAvailable) {
+                    sourceAvailable = false;
+                    if (error.getType().equals(ErrType.PERMANENT)) {
+                        permanentError = true;
                         DAOFactory.get().getDao(HarvestSourceDAO.class).deleteSourceTriples(sourceUrlString);
 
-                        // remove old auto-generated metadata (i.e. the onw that's in harvster's context)
-                        logger.debug("Removing old auto-generated triples about the source");
                         DAOFactory.get().getDao(HarvestSourceDAO.class).removeAllPredicatesFromHarvesterContext(sourceUrlString);
+                    }
 
-                        // Iinsert new auto generated metadata
-                        logger.debug("Storing new auto-generated triples about the source");
-                        DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceMetadata(sourceMetadata);
+                    // Add cr:firstSeen metadata predicate into harvester context
+                    if (source != null && source.getTimeCreated() != null) {
+                        String firstSeen = dateFormat.format(source.getTimeCreated());
+                        ObjectDTO firstSeenObject = new ObjectDTO(firstSeen, true, XMLSchema.DATETIME);
+                        DAOFactory.get().getDao(HarvestSourceDAO.class)
+                        .insertUpdateSourceMetadata(sourceUrlString, Predicates.CR_FIRST_SEEN, firstSeenObject);
+                    }
 
-                    } // if Source is available.
-                } else {
-                    // Harvest source redirects to another source that has recently been updated therefore we can set these values
-                    // TRUE
-                    sourceAvailable = Boolean.TRUE;
-                    rdfContentFound = Boolean.TRUE;
+                    ObjectDTO errorObject = new ObjectDTO(error.getMessage(), true);
+                    DAOFactory.get().getDao(HarvestSourceDAO.class)
+                    .insertUpdateSourceMetadata(sourceUrlString, Predicates.CR_ERROR_MESSAGE, errorObject);
+
+                    String lastRefreshed = dateFormat.format(new Date(System.currentTimeMillis()));
+                    ObjectDTO lastRefreshedObject = new ObjectDTO(lastRefreshed, true, XMLSchema.DATETIME);
+                    DAOFactory.get().getDao(HarvestSourceDAO.class)
+                    .insertUpdateSourceMetadata(sourceUrlString, Predicates.CR_LAST_REFRESHED, lastRefreshedObject);
                 }
+
+                if (sourceAvailable && needsHarvesting) {
+                    // source is available, so continue to extract it's contents and metadata
+
+                    // extract various metadata about this harvest source from url connection object
+                    setSourceMetadata(harvestUrlConnection.getConnection(), source);
+
+                    // NOTE: If URL is redirected, content type is null. skip if unsupported content type
+                    contentType = sourceMetadata.getObjectValue(Predicates.CR_MEDIA_TYPE);
+
+                    // If MEDIA_TYPE in HARVEST_SOURCE table is set then the value from the server is ignored
+                    if (source != null && !StringUtils.isBlank(source.getMediaType())) {
+                        contentType = source.getMediaType();
+                    }
+
+                    if (contentType != null && !isSupportedContentType(contentType)) {
+                        logger.debug("Unsupported response content type: " + contentType);
+                    } else {
+                        logger.debug("Response content type was " + contentType);
+                        if (harvestUrlConnection.isHttpConnection()
+                                && harvestUrlConnection.getResponseCode() == HttpURLConnection.HTTP_NOT_MODIFIED) {
+
+                            handleSourceNotModified();
+                            return;
+                        } else {
+                            logger.debug("Streaming the content to file " + downloadedFile);
+                            // save the stream to file
+                            totalBytes = FileUtil.streamToFile(harvestUrlConnection.getInputStream(), downloadedFile);
+
+                            // if content-length for source metadata was previously not found, then set it to file size
+                            if (sourceMetadata.getObject(Predicates.CR_BYTE_SIZE) == null) {
+                                sourceMetadata.addObject(Predicates.CR_BYTE_SIZE, new ObjectDTO(String.valueOf(totalBytes), true));
+                            }
+                        }
+                    }
+
+                    // remove old triples
+                    // FIXME: JH180511 - should it really be necessary here? Because
+                    // the graph is cleared from old triples by HarvestSourceDAO.addSourceToRepository(...)
+                    // anyway below.
+                    DAOFactory.get().getDao(HarvestSourceDAO.class).deleteSourceTriples(sourceUrlString);
+
+                    // remove old auto-generated metadata (i.e. the onw that's in harvster's context)
+                    logger.debug("Removing old auto-generated triples about the source");
+                    DAOFactory.get().getDao(HarvestSourceDAO.class).removeAllPredicatesFromHarvesterContext(sourceUrlString);
+
+                    // Iinsert new auto generated metadata
+                    logger.debug("Storing new auto-generated triples about the source");
+                    DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceMetadata(sourceMetadata);
+
+                } // if Source is available.
+            } else {
+                // Harvest source redirects to another source that has recently been updated therefore we can set these values
+                // TRUE
+                sourceAvailable = Boolean.TRUE;
+                rdfContentFound = Boolean.TRUE;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -290,7 +278,7 @@ public class PullHarvest extends Harvest {
 
         if (sourceAvailable && needsHarvesting) {
 
-            int harvestedTriples = harvest(file, contentType, totalBytes);
+            int harvestedTriples = harvest(downloadedFile, contentType, totalBytes);
 
             // Perform the harvest. Only extract sources if we got some triples.
             // Otherwise it is a waste of time.
@@ -436,10 +424,12 @@ public class PullHarvest extends Harvest {
         HarvestSourceDTO finalSource = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(sourceUrlString);
 
         long now = System.currentTimeMillis();
-        long lastHarvestTime = finalSource==null || finalSource.getLastHarvest() == null ? 0 : finalSource.getLastHarvest().getTime();
+        long lastHarvestTime =
+            finalSource == null || finalSource.getLastHarvest() == null ? 0 : finalSource.getLastHarvest().getTime();
         long sinceLastHarvest = now - lastHarvestTime;
         long harvestIntervalMillis =
-            finalSource==null || finalSource.getIntervalMinutes() == null ? 0L : finalSource.getIntervalMinutes().longValue() * 60L * 1000L;
+            finalSource == null || finalSource.getIntervalMinutes() == null ? 0L : finalSource.getIntervalMinutes()
+                    .longValue() * 60L * 1000L;
 
         if (lastHarvestTime == 0 || (lastHarvestTime > 0 && sinceLastHarvest > harvestIntervalMillis)) {
             ret = true;
@@ -860,18 +850,24 @@ public class PullHarvest extends Harvest {
     }
 
     /**
+     * Deletes given file. If the given file is null, or does not exist or is not a file,
+     * the method does nothing.
+     *
+     * The deletion is done by calling {@link File#delete()}. If the latter returns false,
+     * the method logs informative error.
      *
      * @param file
      */
     private void deleteDownloadedFile(File file) {
 
-        if (file == null || !file.exists())
+        if (file == null || !file.exists() || !file.isFile()) {
             return;
+        }
 
         try {
-            // delete unless the configuration requires otherwise
-            if (GeneralConfig.getProperty(GeneralConfig.HARVESTER_DELETE_DOWNLOADED_FILES, "true").equals("true")) {
-                file.delete();
+            boolean success = file.delete();
+            if (success == false) {
+                throw new CRRuntimeException("File deletion did not succeed, no exceptions thrown (" + file + ")");
             }
         } catch (RuntimeException e) {
             logger.error(e.toString(), e);

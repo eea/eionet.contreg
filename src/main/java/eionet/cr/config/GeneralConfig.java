@@ -70,10 +70,6 @@ public class GeneralConfig {
     public static final String MAIL_SYSADMINS = "mail.sysAdmins";
 
     /** */
-    public static final String HARVESTER_USE_DOWNLOADED_FILES = "harvest.debug.useDownloadedFiles";
-    public static final String HARVESTER_DELETE_DOWNLOADED_FILES = "harvest.debug.deleteDownloadedFiles";
-
-    /** */
     public static final String APPLICATION_VERSION = "application.version";
     public static final String APPLICATION_USERAGENT = "application.userAgent";
     public static final String APPLICATION_HOME_URL = "application.homeURL";
