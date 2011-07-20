@@ -143,7 +143,7 @@ public class SesameConnectionProvider {
         DataSource dataSource = getReadWriteDataSource();
         if (dataSource == null) {
 
-            LOGGER.info(MessageFormat.format("Found no data source with name {0}, going to create a direct connection",
+            LOGGER.debug(MessageFormat.format("Found no data source with name {0}, going to create a direct connection",
                     READWRITE_DATASOURCE_NAME));
             return getReadWriteRepository().getConnection();
         } else {
@@ -166,7 +166,7 @@ public class SesameConnectionProvider {
         DataSource dataSource = getReadOnlyDataSource();
         if (dataSource == null) {
 
-            LOGGER.info(MessageFormat.format("Found no data source with name {0}, going to create a direct connection",
+            LOGGER.debug(MessageFormat.format("Found no data source with name {0}, going to create a direct connection",
                     READONLY_DATASOURCE_NAME));
             return getReadOnlyRepository().getConnection();
         } else {
@@ -193,7 +193,7 @@ public class SesameConnectionProvider {
         if (dataSource != null) {
             return dataSource.getConnection();
         } else {
-            LOGGER.info(MessageFormat.format(
+            LOGGER.debug(MessageFormat.format(
                     "Found no data source with name {0}, going to create a connection through DriverManager",
                     READWRITE_DATASOURCE_NAME));
         }
