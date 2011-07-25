@@ -45,6 +45,7 @@ import org.openrdf.rio.RDFParseException;
 import org.xml.sax.SAXException;
 
 import eionet.cr.common.Predicates;
+import eionet.cr.common.TempFilePathGenerator;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
@@ -260,7 +261,7 @@ public class UploadHarvest extends Harvest {
      * @throws IOException
      */
     private File convert(XmlAnalysis xmlAnalysis, FileBean fileBean) throws IOException, SAXException,
-            ParserConfigurationException {
+    ParserConfigurationException {
 
         // detect conversion id, if it's blank then return null, as no point in going further
         String conversionId = getConversionId(xmlAnalysis);
@@ -273,7 +274,7 @@ public class UploadHarvest extends Harvest {
         // because Stripes' FileBean has no API for getting the location of the file
         // on the file system, we use its API to rename it to a location we want to
         // (FileBean.save(File toFile) does a simple rename if toFile is on the same file system)
-        File renamedFile = fullFilePathForSourceUrl(sourceUrlString);
+        File renamedFile = TempFilePathGenerator.generate();
         fileBean.save(renamedFile);
 
         logger.debug("File bean renamed to " + renamedFile + ", calling conversion service");

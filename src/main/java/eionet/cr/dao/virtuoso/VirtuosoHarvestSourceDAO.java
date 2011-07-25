@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Literal;
@@ -280,13 +281,9 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
         try {
             inputStream = new FileInputStream(file);
             return addSourceToRepository(inputStream, sourceUrlString);
+
         } finally {
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                }
-            }
+            IOUtils.closeQuietly(inputStream);
         }
     }
 
@@ -348,7 +345,7 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
      */
     @Override
     public void addSourceMetadata(SubjectDTO sourceMetadata) throws DAOException, RDFParseException, RepositoryException,
-            IOException {
+    IOException {
 
         if (sourceMetadata.getPredicateCount() > 0) {
 
@@ -399,7 +396,7 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
      * @throws RepositoryException
      */
     private void insertMetadata(SubjectDTO subjectDTO, RepositoryConnection conn, URI contextURI, URI subject)
-            throws RepositoryException {
+    throws RepositoryException {
 
         for (String predicateUri : subjectDTO.getPredicates().keySet()) {
 
@@ -424,8 +421,8 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
      * SPARQL for getting new sources based on the given source.
      */
     private static final String NEW_SOURCES_SPARQL = "DEFINE input:inference 'CRInferenceRule' PREFIX cr: "
-            + "<http://cr.eionet.europa.eu/ontologies/contreg.rdf#> SELECT ?s FROM ?sourceUrl FROM ?deploymentHost WHERE "
-            + "{ ?s a cr:File . OPTIONAL { ?s cr:lastRefreshed ?refreshed } FILTER( !BOUND(?refreshed)) }";
+        + "<http://cr.eionet.europa.eu/ontologies/contreg.rdf#> SELECT ?s FROM ?sourceUrl FROM ?deploymentHost WHERE "
+        + "{ ?s a cr:File . OPTIONAL { ?s cr:lastRefreshed ?refreshed } FILTER( !BOUND(?refreshed)) }";
 
     /*
      * (non-Javadoc)
@@ -489,7 +486,7 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
      */
     @Override
     public void insertUpdateSourceMetadata(String subject, String predicate, ObjectDTO object) throws DAOException,
-            RepositoryException, IOException {
+    RepositoryException, IOException {
         RepositoryConnection conn = null;
         try {
 

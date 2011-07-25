@@ -727,6 +727,7 @@ public class Util {
 
         return i > 0;
     }
+
     /**
      * Removes surrounding quotes of the given String.
      *

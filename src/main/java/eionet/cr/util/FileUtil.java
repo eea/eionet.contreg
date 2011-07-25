@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -72,13 +73,7 @@ public final class FileUtil {
             inputStream = urlConnection.getInputStream();
             FileUtil.streamToFile(inputStream, toFile);
         } finally {
-            try {
-                if (inputStream != null) {
-                    inputStream.close();
-                }
-            } catch (IOException e) {
-                logger.error("Failed to close URLConnection's input stream: " + e.toString(), e);
-            }
+            IOUtils.closeQuietly(inputStream);
             URLUtil.disconnect(urlConnection);
         }
     }
@@ -97,7 +92,7 @@ public final class FileUtil {
      */
     public static int streamToFile(final InputStream inputStream, final File toFile) throws IOException {
 
-        FileOutputStream fos = null;
+        FileOutputStream outputStream = null;
         try {
 
             String enc = "UTF-8";
@@ -107,21 +102,15 @@ public final class FileUtil {
             int i = -1;
             int totalBytes = 0;
             byte[] bytes = new byte[INPUTSTREAM_BUFFERSIZE];
-            fos = new FileOutputStream(toFile);
+            outputStream = new FileOutputStream(toFile);
             while ((i = uin.read(bytes, 0, bytes.length)) != -1) {
-                fos.write(bytes, 0, i);
+                outputStream.write(bytes, 0, i);
                 totalBytes = totalBytes + i;
             }
 
             return totalBytes;
         } finally {
-            try {
-                if (fos != null) {
-                    fos.close();
-                }
-            } catch (IOException e) {
-                logger.error("Failed to close file output stream: " + e.toString(), e);
-            }
+            IOUtils.closeQuietly(outputStream);
         }
     }
 }

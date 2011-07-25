@@ -116,6 +116,9 @@ public class GeneralConfig {
     /** */
     public static final String FILESTORE_PATH = "filestore.path";
 
+    /** */
+    public static final String FILE_DELETION_JOB_INTERVAL = "tempFileDeletionJob.interval";
+
     /**
      * Property name for property indicating how many rows SPARQL endpoint returns in HTML.
      */

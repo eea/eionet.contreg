@@ -24,9 +24,9 @@ import java.io.File;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.LogFactory;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
@@ -45,6 +45,7 @@ import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.persist.PersisterConfig;
 import eionet.cr.harvest.util.HarvestLog;
 import eionet.cr.harvest.util.arp.ARPSource;
+import eionet.cr.util.FileDeletionJob;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.sesame.SesameUtil;
@@ -124,6 +125,9 @@ public abstract class Harvest {
      */
     private RepositoryConnection repositoryConnection;
 
+    /** List of temporary files created in the course of this harvest, and requiring deletion in the end */
+    protected HashSet<File> temporaryFiles = new HashSet<File>();
+
     /**
      *
      * @param sourceUrlString
@@ -164,6 +168,7 @@ public abstract class Harvest {
                 throw new HarvestException(e.toString(), e);
         } finally {
             SesameUtil.close(repositoryConnection);
+            deleteTemporaryFiles();
             doHarvestFinishedActions();
         }
     }
@@ -289,25 +294,6 @@ public abstract class Harvest {
      */
     protected RDFHandler createRDFHandler(PersisterConfig config) {
         return new RDFHandler(config);
-    }
-
-    /**
-     *
-     * @param sourceUrl
-     * @return
-     */
-    protected static File fullFilePathForSourceUrl(String sourceUrl) {
-
-        if (StringUtils.isBlank(sourceUrl)) {
-            return null;
-        }
-
-        String folder = GeneralConfig.getRequiredProperty(GeneralConfig.HARVESTER_FILES_LOCATION);
-        String fileName =
-            new StringBuilder(Hashes.md5(sourceUrl)).append("_").append(System.currentTimeMillis())
-            .append(HARVEST_FILE_NAME_EXTENSION).toString();
-
-        return new File(folder, fileName);
     }
 
     /**
@@ -541,5 +527,54 @@ public abstract class Harvest {
             repositoryConnection = SesameUtil.getRepositoryConnection();
         }
         return repositoryConnection;
+    }
+
+    /**
+     * Deletes given file. If the given file is null, or does not exist or is not a file, the method does nothing.
+     *
+     * The deletion is done by calling {@link File#delete()}. If the latter returns false, the method logs informative error.
+     *
+     * @param file
+     */
+    protected void deleteFileSafely(File file) {
+
+        if (file == null || !file.exists() || !file.isFile()) {
+            return;
+        }
+
+        try {
+
+            // Try file deletion 4 times, with 2500ms intervals.
+            // This is because sometimes Java holds file handle for too long,
+            // at least on Windows.
+            boolean success = false;
+            for (int i=1; i<=8 && success==false; i++){
+                success = file.delete();
+                if (success==false){
+                    Thread.sleep(2500);
+                }
+            }
+
+            if (success == false) {
+                logger.warn("File deletion did not succeed, no exceptions thrown (" + file + ")");
+            }
+        } catch (SecurityException e) {
+            logger.error("Security exception when trying to delete " + file, e);
+        } catch (RuntimeException e) {
+            logger.error(e.toString(), e);
+        } catch (InterruptedException e) {
+            logger.warn("Waiting for file deletion (" + file + ") interrupted: " + e.getMessage());
+        }
+    }
+
+    /**
+     *
+     */
+    private void deleteTemporaryFiles(){
+
+        for (File file : temporaryFiles){
+            logger.debug("Registering file for deletion: " + file);
+            FileDeletionJob.register(file);
+        }
     }
 }

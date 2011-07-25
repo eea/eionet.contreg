@@ -43,6 +43,10 @@ public class SesameConnectionProvider {
     private static Repository readOnlyRepository;
     private static DataSource readOnlyDataSource;
 
+    /** */
+    private static boolean readWriteDataSourceMissingLogged = false;
+    private static boolean readOnlyDataSourceMissingLogged = false;
+
     /**
      * @return the readWriteRepository
      */
@@ -143,8 +147,11 @@ public class SesameConnectionProvider {
         DataSource dataSource = getReadWriteDataSource();
         if (dataSource == null) {
 
-            LOGGER.debug(MessageFormat.format("Found no data source with name {0}, going to create a direct connection",
-                    READWRITE_DATASOURCE_NAME));
+            if (!isReadWriteDataSourceMissingLogged()){
+                LOGGER.debug(MessageFormat.format("Found no data source with name {0}, going to create a direct connection",
+                        READWRITE_DATASOURCE_NAME));
+                SesameConnectionProvider.readWriteDataSourceMissingLogged = true;
+            }
             return getReadWriteRepository().getConnection();
         } else {
             try {
@@ -166,8 +173,11 @@ public class SesameConnectionProvider {
         DataSource dataSource = getReadOnlyDataSource();
         if (dataSource == null) {
 
-            LOGGER.debug(MessageFormat.format("Found no data source with name {0}, going to create a direct connection",
-                    READONLY_DATASOURCE_NAME));
+            if (!isReadOnlyDataSourceMissingLogged()){
+                LOGGER.debug(MessageFormat.format("Found no data source with name {0}, going to create a direct connection",
+                        READONLY_DATASOURCE_NAME));
+                SesameConnectionProvider.readOnlyDataSourceMissingLogged = true;
+            }
             return getReadOnlyRepository().getConnection();
         } else {
             try {
@@ -231,5 +241,19 @@ public class SesameConnectionProvider {
         } catch (ClassNotFoundException e) {
             throw new CRRuntimeException("Failed to get connection, driver class not found: " + drv, e);
         }
+    }
+
+    /**
+     * @return the readWriteDataSourceMissingLogged
+     */
+    private static synchronized boolean isReadWriteDataSourceMissingLogged() {
+        return readWriteDataSourceMissingLogged;
+    }
+
+    /**
+     * @return the readOnlyDataSourceMissingLogged
+     */
+    private static synchronized boolean isReadOnlyDataSourceMissingLogged() {
+        return readOnlyDataSourceMissingLogged;
     }
 }

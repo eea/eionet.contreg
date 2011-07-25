@@ -1,6 +1,8 @@
 package eionet.cr.harvest;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URLConnection;
@@ -12,17 +14,20 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.zip.GZIPInputStream;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.openrdf.OpenRDFException;
 import org.openrdf.model.vocabulary.XMLSchema;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.xml.sax.SAXException;
 
-import eionet.cr.common.CRRuntimeException;
 import eionet.cr.common.Predicates;
+import eionet.cr.common.TempFilePathGenerator;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
@@ -40,7 +45,6 @@ import eionet.cr.harvest.util.MimeTypeConverter;
 import eionet.cr.util.ConnectionError;
 import eionet.cr.util.ConnectionError.ErrType;
 import eionet.cr.util.FileUtil;
-import eionet.cr.util.GZip;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.UrlRedirectAnalyzer;
@@ -96,7 +100,7 @@ public class PullHarvest extends Harvest {
      */
     protected void doExecute() throws HarvestException {
 
-        File downloadedFile = fullFilePathForSourceUrl(sourceUrlString);
+        File downloadedFile = TempFilePathGenerator.generate();
 
         String contentType = null;
         int totalBytes = 0;
@@ -106,7 +110,7 @@ public class PullHarvest extends Harvest {
 
         try {
             // Make sure old temporary file is deleted.
-            deleteDownloadedFile(downloadedFile);
+            deleteFileSafely(downloadedFile);
 
             // Resolve redirections
             redirectedUrls = resolveRedirects();
@@ -123,13 +127,14 @@ public class PullHarvest extends Harvest {
             // Get DTO of source that will be harvested.
             HarvestSourceDTO source = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(sourceUrlString);
 
-            // if batch harvesting and broken source, perform necessary actions
+            // If batch harvesting and broken source, perform necessary actions.
             if (source != null && isBatchHarvest() && !isUrgentHarvest()) {
 
                 boolean increaseUnavailableCount = source.isPermanentError() && source.isPrioritySource();
                 Integer countUnavail = source.getCountUnavail();
                 boolean deleteSource = countUnavail != null && countUnavail.intValue() >= 5 && !source.isPrioritySource();
 
+                // This is considered broken source.
                 if (increaseUnavailableCount || deleteSource) {
 
                     handleBrokenSource(source, increaseUnavailableCount, deleteSource);
@@ -137,8 +142,8 @@ public class PullHarvest extends Harvest {
                 }
             }
 
-            // Source shouldn't be harvested if it redirects to another source and the destination source is recently harvested
-            // (within its harvesting minutes)
+            // Source shouldn't be harvested if it redirects to another source
+            // and the destination source is recently harvested (within its harvesting minutes)
             if (needsHarvesting) {
 
                 // prepare URL connection
@@ -220,8 +225,11 @@ public class PullHarvest extends Harvest {
                             return;
                         } else {
                             logger.debug("Streaming the content to file " + downloadedFile);
-                            // save the stream to file
+
+                            // Save the stream to temporary file.
                             totalBytes = FileUtil.streamToFile(harvestUrlConnection.getInputStream(), downloadedFile);
+                            logger.debug("Total bytes downloaded: " + totalBytes);
+                            temporaryFiles.add(downloadedFile);
 
                             // if content-length for source metadata was previously not found, then set it to file size
                             if (sourceMetadata.getObject(Predicates.CR_BYTE_SIZE) == null) {
@@ -261,13 +269,13 @@ public class PullHarvest extends Harvest {
             }
         }
 
-        if (sourceAvailable && needsHarvesting) {
+        if (sourceAvailable && needsHarvesting && totalBytes > 0) {
 
-            int harvestedTriples = harvest(downloadedFile, contentType, totalBytes);
+            int tripleCount = harvest(downloadedFile, contentType);
 
             // Perform the harvest. Only extract sources if we got some triples.
             // Otherwise it is a waste of time.
-            if (harvestedTriples > 0) {
+            if (tripleCount > 0) {
                 logger.debug("Extracting new harvest sources after fresh harvest");
                 extractNewHarvestSources();
             }
@@ -282,8 +290,8 @@ public class PullHarvest extends Harvest {
      * @param deleteSource
      * @throws DAOException
      */
-    private void handleBrokenSource(HarvestSourceDTO source,
-            boolean increaseUnavailableCount, boolean deleteSource) throws DAOException {
+    private void handleBrokenSource(HarvestSourceDTO source, boolean increaseUnavailableCount, boolean deleteSource)
+    throws DAOException {
 
         if (increaseUnavailableCount) {
 
@@ -311,61 +319,95 @@ public class PullHarvest extends Harvest {
     }
 
     /**
-     * Harvest the given file.
      *
-     * @param file
-     *            - file on filesystem containing the data.
+     * @param downloadedFile
      * @param contentType
-     * @param fileSize
-     *            - Don't do any harvest if file size is zero.
-     * @return the number of triples in source
+     * @return
      * @throws HarvestException
      */
-    private int harvest(File file, String contentType, int fileSize) throws HarvestException {
+    private int harvest(File downloadedFile, String contentType) throws HarvestException {
 
         int tripleCount = 0;
-        // remember the file's absolute path, so we can later detect if a new file was created during the pre-processing.
-        String originalPath = file.getAbsolutePath();
 
-        File unGZipped = null;
-        if (fileSize == 0) {
-            file = null;
-            logger.debug("File size = 0");
+        if (downloadedFile == null || !downloadedFile.exists() || !downloadedFile.isFile()) {
+            return tripleCount;
+        }
+
+        File unzippedFile = unzip(downloadedFile);
+        if (unzippedFile == null) {
+
+            // The file was not zipped, and if it's not XML-formatted either, then nothing to do here.
+            if (contentType != null && !isXmlContentType(contentType)) {
+                return tripleCount;
+            }
         } else {
-            // see if file is zipped, and if yes, then unzip
-            unGZipped = unCompressGZip(file);
-            if (unGZipped != null) {
-                logger.debug("The file was gzipped, going to process unzipped file now");
-                file = unGZipped;
-            } else if (contentType != null && !isXmlContentType(contentType)) {
-                file = null;
+            logger.debug("The file was gzipped, going to process unzipped file");
+            temporaryFiles.add(unzippedFile);
+        }
+
+        Exception exception = null;
+        try {
+            File processedFile = preProcess(unzippedFile == null ? downloadedFile : unzippedFile, contentType);
+            if (processedFile != null) {
+
+                temporaryFiles.add(processedFile);
+                logger.debug("Loading the file contents into the triple store");
+                tripleCount =
+                    DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceToRepository(processedFile, sourceUrlString);
+                logger.debug(tripleCount + " triples stored");
+                setStoredTriplesCount(tripleCount);
+            }
+        } catch (IOException e) {
+            exception = e;
+        } catch (ParserConfigurationException e) {
+            exception = e;
+        } catch (SAXException e) {
+            exception = e;
+        }
+        catch (OpenRDFException e) {
+            exception = e;
+        }
+
+        if (exception!=null){
+            if (this.rdfContentFound){
+                throw new HarvestException(exception.toString(), exception);
+            }
+            else{
+                logger.info("Ignoring this exception, because no RDF content found: " + exception.toString());
             }
         }
 
-        if (file != null && file.exists()) {
-
-            rdfContentFound = true;
-
-            try {
-                file = preProcess(file, contentType);
-                if (file != null) {
-
-                    logger.debug("Loading the file contents into the triple store");
-
-                    tripleCount = DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceToRepository(file, sourceUrlString);
-
-                    logger.debug(tripleCount + " triples stored by the triple store");
-                    setStoredTriplesCount(tripleCount);
-                }
-            } catch (Exception e) {
-                // We try to harvest XML files also, but if it fails, we do not throw an error.
-            } finally {
-                deleteDownloadedFile(file);
-                deleteDownloadedFile(originalPath);
-                deleteDownloadedFile(unGZipped);
-            }
-        }
         return tripleCount;
+    }
+
+    /**
+     *
+     * @param sourceFile
+     * @return
+     */
+    private File unzip(File sourceFile) {
+
+        if (sourceFile == null) {
+            return null;
+        }
+
+        File targetFile = new File(sourceFile.getAbsolutePath() + ".unzipped");
+
+        GZIPInputStream inputStream = null;
+        FileOutputStream outputStream = null;
+        try {
+            inputStream = new GZIPInputStream(new FileInputStream(sourceFile));
+            outputStream = new FileOutputStream(targetFile);
+            IOUtils.copy(inputStream, outputStream);
+            return targetFile;
+
+        } catch (IOException e) {
+            logger.debug("Assuming the file is not GZipped, exception when trying unzip: " + e.toString());
+            return null;
+        } finally {
+            IOUtils.closeQuietly(inputStream);
+            IOUtils.closeQuietly(outputStream);
+        }
     }
 
     /**
@@ -695,21 +737,6 @@ public class PullHarvest extends Harvest {
         return result;
     }
 
-    private File unCompressGZip(File file) {
-
-        File unPackedFile = null;
-
-        // Testing whether the input file is GZip or not.
-        if (GZip.isFileGZip(file)) {
-            try {
-                unPackedFile = GZip.unPack(file);
-            } catch (Exception ex) {
-                System.out.println(ex.getMessage());
-            }
-        }
-        return unPackedFile;
-    }
-
     /**
      *
      * @param file
@@ -724,6 +751,7 @@ public class PullHarvest extends Harvest {
 
         // if content type declared to be application/rdf+xml, then believe it and go to parsing straight away
         if (contentType != null && contentType.startsWith("application/rdf+xml")) {
+            this.rdfContentFound = true;
             return file;
         }
 
@@ -776,7 +804,6 @@ public class PullHarvest extends Harvest {
         // SAXException would have been thrown above)
         if (StringUtils.isBlank(conversionId)) {
             logger.debug("No RDF conversion found!");
-            rdfContentFound = false;
             return file;
         } else {
             logger.debug("Going to run the found RDF conversion (id = " + conversionId + ")");
@@ -791,9 +818,10 @@ public class PullHarvest extends Harvest {
             // run conversion and save the response to file
             File convertedFile = new File(file.getAbsolutePath() + ".converted");
             FileUtil.downloadUrlToFile(convertUrl, convertedFile);
+            this.rdfContentFound = true;
 
             // delete the original file
-            deleteDownloadedFile(file);
+            deleteFileSafely(file);
 
             // return converted file
             return convertedFile;
@@ -857,37 +885,6 @@ public class PullHarvest extends Harvest {
             if (charset != null && charset.length() > 0) {
                 sourceMetadata.addObject(Predicates.CR_CHARSET, new ObjectDTO(String.valueOf(charset), true));
             }
-        }
-    }
-
-    /**
-     *
-     * @param path
-     */
-    private void deleteDownloadedFile(String path) {
-        deleteDownloadedFile(new File(path));
-    }
-
-    /**
-     * Deletes given file. If the given file is null, or does not exist or is not a file, the method does nothing.
-     *
-     * The deletion is done by calling {@link File#delete()}. If the latter returns false, the method logs informative error.
-     *
-     * @param file
-     */
-    private void deleteDownloadedFile(File file) {
-
-        if (file == null || !file.exists() || !file.isFile()) {
-            return;
-        }
-
-        try {
-            boolean success = file.delete();
-            if (success == false) {
-                throw new CRRuntimeException("File deletion did not succeed, no exceptions thrown (" + file + ")");
-            }
-        } catch (RuntimeException e) {
-            logger.error(e.toString(), e);
         }
     }
 

@@ -102,8 +102,11 @@
     <listener>
         <listener-class>eionet.cr.common.JobScheduler</listener-class>
     </listener>
-      <listener>
+    <listener>
         <listener-class>eionet.cr.harvest.scheduled.HarvestingJob</listener-class>
+    </listener>
+    <listener>
+        <listener-class>eionet.cr.util.FileDeletionJob</listener-class>
     </listener>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
