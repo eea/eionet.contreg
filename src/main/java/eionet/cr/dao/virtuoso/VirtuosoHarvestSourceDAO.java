@@ -29,6 +29,7 @@ import eionet.cr.dao.postgre.PostgreSQLHarvestSourceDAO;
 import eionet.cr.dao.readers.SubjectReader;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
+import eionet.cr.harvest.Harvest;
 import eionet.cr.util.Bindings;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.sesame.SesameUtil;
@@ -71,13 +72,11 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
             conn.setAutoCommit(false);
             executeUpdateSPARQL(CLEAR_GRAPH_SPARQL, conn, bindings);
 
-            // remove source metadata from http://cr.eionet.europa.eu/harvetser
-            // graph
-            ValueFactory fac = conn.getValueFactory();
-            URI subject = fac.createURI(URLUtil.replaceURLSpaces(url));
-            String deploymentHost = GeneralConfig.getRequiredProperty(GeneralConfig.DEPLOYMENT_HOST);
-            URI context = fac.createURI(deploymentHost + "/harvester");
-            conn.remove(subject, null, null, (Resource) context);
+            // remove source metadata from http://cr.eionet.europa.eu/harvetser graph
+            ValueFactory valueFactory = conn.getValueFactory();
+            URI subject = valueFactory.createURI(URLUtil.replaceURLSpaces(url));
+            URI context = valueFactory.createURI(Harvest.HARVESTER_URI);
+            conn.remove(subject, null, null, (Resource)context);
 
             sqlConn.commit();
             conn.commit();
@@ -357,9 +356,7 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
                 conn.setAutoCommit(false);
 
                 // The contextURI is always the harvester URI
-                // (which is generated from the deployment hostname).
-                String deploymentHost = GeneralConfig.getRequiredProperty(GeneralConfig.DEPLOYMENT_HOST);
-                URI harvesterContext = conn.getValueFactory().createURI(deploymentHost + "/harvester");
+                URI harvesterContext = conn.getValueFactory().createURI(Harvest.HARVESTER_URI);
 
                 if (sourceMetadata != null) {
                     URI subject = conn.getValueFactory().createURI(sourceMetadata.getUri());
@@ -435,7 +432,7 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
         List<String> ret = null;
 
         if (!StringUtils.isBlank(sourceUrl)) {
-            String deploymentHost = GeneralConfig.getRequiredProperty(GeneralConfig.DEPLOYMENT_HOST);
+            String deploymentHost = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL);
 
             Bindings bindings = new Bindings();
             bindings.setURI("sourceUrl", sourceUrl);
@@ -459,17 +456,16 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
      * @see eionet.cr.dao.HarvestSourceDAO#getSourceMetadata(String, String)
      */
     @Override
-    public String getSourceMetadata(String subject, String predicate) throws DAOException, RepositoryException, IOException {
+    public String getHarvestSourceMetadata(String harvestSourceUri, String predicateUri) throws DAOException, RepositoryException, IOException {
 
         String ret = null;
         RepositoryConnection conn = null;
         try {
 
-            String deploymentHost = GeneralConfig.getRequiredProperty(GeneralConfig.DEPLOYMENT_HOST) + "/harvester";
             Bindings bindings = new Bindings();
-            bindings.setURI("deploymentHost", deploymentHost);
-            bindings.setURI("subject", subject);
-            bindings.setURI("predicate", predicate);
+            bindings.setURI("deploymentHost", Harvest.HARVESTER_URI);
+            bindings.setURI("subject", harvestSourceUri);
+            bindings.setURI("predicate", predicateUri);
 
             Object resultObject = executeUniqueResultSPARQL(SOURCE_METADATA_SPARQL, bindings, new SingleObjectReader<Long>());
             ret = (String) resultObject;
@@ -492,8 +488,8 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
 
             conn = SesameUtil.getRepositoryConnection();
 
-            String deploymentHost = GeneralConfig.getRequiredProperty(GeneralConfig.DEPLOYMENT_HOST);
-            URI harvesterContext = conn.getValueFactory().createURI(deploymentHost + "/harvester");
+            String deploymentHost = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL);
+            URI harvesterContext = conn.getValueFactory().createURI(Harvest.HARVESTER_URI);
             URI sub = conn.getValueFactory().createURI(subject);
             URI pred = conn.getValueFactory().createURI(predicate);
 
@@ -517,18 +513,15 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
      * @see eionet.cr.dao.HarvestSourceDAO#removeAllPredicatesFromHarvesterContext(String, String)
      */
     @Override
-    public void removeAllPredicatesFromHarvesterContext(String subject) throws DAOException, RepositoryException, IOException {
-        if (!StringUtils.isBlank(subject)) {
+    public void deleteSubjectTriplesInSource(String subjectUri, String sourceUri) throws DAOException, RepositoryException, IOException {
+
+        if (!StringUtils.isBlank(subjectUri)) {
             RepositoryConnection conn = null;
             try {
 
                 conn = SesameUtil.getRepositoryConnection();
-
-                String deploymentHost = GeneralConfig.getRequiredProperty(GeneralConfig.DEPLOYMENT_HOST);
-                URI harvesterContext = conn.getValueFactory().createURI(deploymentHost + "/harvester");
-                URI sub = conn.getValueFactory().createURI(subject);
-
-                conn.remove(sub, null, null, harvesterContext);
+                ValueFactory valueFactory = conn.getValueFactory();
+                conn.remove(valueFactory.createURI(subjectUri), null, null, valueFactory.createURI(sourceUri));
 
             } finally {
                 SesameUtil.close(conn);

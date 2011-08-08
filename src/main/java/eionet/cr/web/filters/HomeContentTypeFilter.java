@@ -135,7 +135,7 @@ public class HomeContentTypeFilter implements Filter {
                         // Check if file is CSV or TSV (imported by user)
                         String type =
                             DAOFactory.get().getDao(HarvestSourceDAO.class)
-                            .getSourceMetadata(fileUri, Predicates.CR_MEDIA_TYPE);
+                            .getHarvestSourceMetadata(fileUri, Predicates.CR_MEDIA_TYPE);
 
                         if (type != null && (type.equals("csv") || type.equals("tsv"))) {
 

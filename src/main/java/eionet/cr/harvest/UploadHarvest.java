@@ -172,7 +172,7 @@ public class UploadHarvest extends Harvest {
 
             // remove old auto-generated metadata (i.e. the onw that's in harvster's context)
             logger.debug("Removing old auto-generated triples about the source");
-            harvestSourceDAO.removeAllPredicatesFromHarvesterContext(sourceUrlString);
+            harvestSourceDAO.deleteSubjectTriplesInSource(sourceUrlString, Harvest.HARVESTER_URI);
 
             // insert new auto generated metadata
             logger.debug("Storing new auto-generated triples about the source");

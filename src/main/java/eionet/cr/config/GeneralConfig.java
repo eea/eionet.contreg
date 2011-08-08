@@ -39,9 +39,6 @@ public class GeneralConfig {
     public static final String PROPERTIES_FILE_NAME = "cr.properties";
 
     /** */
-    public static final String DEPLOYMENT_HOST = "deployment.host";
-
-    /** */
     public static final String DB_URL = "db.url";
     public static final String DB_DRV = "db.drv";
     public static final String DB_USR = "db.usr";

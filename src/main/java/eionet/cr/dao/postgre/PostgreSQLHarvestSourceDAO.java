@@ -729,7 +729,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
      * @see eionet.cr.dao.HarvestSourceDAO#getSourceMetadata(String, String)
      */
     @Override
-    public String getSourceMetadata(String subject, String predicate) throws DAOException, RepositoryException, IOException {
+    public String getHarvestSourceMetadata(String harvestSourceUri, String predicateUri) throws DAOException, RepositoryException, IOException {
         throw new UnsupportedOperationException("Method not implemented");
     }
 
@@ -748,7 +748,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
      * @see eionet.cr.dao.HarvestSourceDAO#removeAllPredicatesFromHarvesterContext(String, String)
      */
     @Override
-    public void removeAllPredicatesFromHarvesterContext(String subject) throws DAOException, RepositoryException, IOException {
+    public void deleteSubjectTriplesInSource(String subjectUri, String sourceUri) throws DAOException, RepositoryException, IOException {
         throw new UnsupportedOperationException("Method not implemented");
     }
 

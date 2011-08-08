@@ -290,7 +290,7 @@ public interface HarvestSourceDAO extends DAO {
      * @throws IOException
      */
     public void addSourceMetadata(SubjectDTO sourceMetadata) throws DAOException, RDFParseException, RepositoryException,
-            IOException;
+    IOException;
 
     /**
      * Returns new harvest sources found by HarvestingJob.
@@ -310,8 +310,8 @@ public interface HarvestSourceDAO extends DAO {
     /**
      * Returns metadata from /harvester context.
      *
-     * @param subject
-     * @param predicate
+     * @param harvestSourceUri
+     * @param predicateUri
      * @return String
      * @throws DAOException
      *             if relational database is unavailable.
@@ -319,7 +319,7 @@ public interface HarvestSourceDAO extends DAO {
      *             if data repository is unavailable.
      * @throws IOException
      */
-    public String getSourceMetadata(String subject, String predicate) throws DAOException, RepositoryException, IOException;
+    public String getHarvestSourceMetadata(String harvestSourceUri, String predicateUri) throws DAOException, RepositoryException, IOException;
 
     /**
      * Inserts given metadata into /harvester context.
@@ -337,7 +337,7 @@ public interface HarvestSourceDAO extends DAO {
      * @throws IOException
      */
     public void insertUpdateSourceMetadata(String subject, String predicate, ObjectDTO object) throws DAOException,
-            RepositoryException, IOException;
+    RepositoryException, IOException;
 
     /**
      * @param url
@@ -351,14 +351,15 @@ public interface HarvestSourceDAO extends DAO {
     /**
      * Removes all predicates from /harvester context for given subject.
      *
-     * @param subject
+     * @param subjectUri
+     * @param sourceUri TODO
      * @throws DAOException
      *             if relational database is unavailable.
      * @throws RepositoryException
      *             if data repository is unavailable.
      * @throws IOException
      */
-    public void removeAllPredicatesFromHarvesterContext(String subject) throws DAOException, RepositoryException, IOException;
+    public void deleteSubjectTriplesInSource(String subjectUri, String sourceUri) throws DAOException, RepositoryException, IOException;
 
     /**
      * Removes all triples for given source. Doesn't remove triples from /harvester context.

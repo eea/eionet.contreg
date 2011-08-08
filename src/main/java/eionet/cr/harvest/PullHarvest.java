@@ -178,8 +178,7 @@ public class PullHarvest extends Harvest {
                     if (error.getType().equals(ErrType.PERMANENT)) {
                         permanentError = true;
                         DAOFactory.get().getDao(HarvestSourceDAO.class).deleteSourceTriples(sourceUrlString);
-
-                        DAOFactory.get().getDao(HarvestSourceDAO.class).removeAllPredicatesFromHarvesterContext(sourceUrlString);
+                        DAOFactory.get().getDao(HarvestSourceDAO.class).deleteSubjectTriplesInSource(sourceUrlString, Harvest.HARVESTER_URI);
                     }
 
                     // Add cr:firstSeen metadata predicate into harvester context
@@ -246,7 +245,7 @@ public class PullHarvest extends Harvest {
 
                     // remove old auto-generated metadata (i.e. the onw that's in harvster's context)
                     logger.debug("Removing old auto-generated triples about the source");
-                    DAOFactory.get().getDao(HarvestSourceDAO.class).removeAllPredicatesFromHarvesterContext(sourceUrlString);
+                    DAOFactory.get().getDao(HarvestSourceDAO.class).deleteSubjectTriplesInSource(sourceUrlString, Harvest.HARVESTER_URI);
 
                     // Iinsert new auto generated metadata
                     logger.debug("Storing new auto-generated triples about the source");
@@ -533,7 +532,7 @@ public class PullHarvest extends Harvest {
             logger.debug("URL " + lastUrl.getSourceURL() + " is redirected to " + lastUrl.getTargetURL());
 
             // Remove old predicates from /harvester context for this source
-            DAOFactory.get().getDao(HarvestSourceDAO.class).removeAllPredicatesFromHarvesterContext(lastUrl.getSourceURL());
+            DAOFactory.get().getDao(HarvestSourceDAO.class).deleteSubjectTriplesInSource(lastUrl.getSourceURL(), Harvest.HARVESTER_URI);
 
             // Add last refreshed metadata into Virtuoso /harvester context
             String lastRefreshed = dateFormat.format(new Date(System.currentTimeMillis()));
