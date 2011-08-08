@@ -42,13 +42,12 @@ import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.util.HarvestMessageType;
 import eionet.cr.harvest.util.HarvestUrlConnection;
 import eionet.cr.harvest.util.MimeTypeConverter;
+import eionet.cr.harvest.util.RedirectionInfo;
 import eionet.cr.util.ConnectionError;
 import eionet.cr.util.ConnectionError.ErrType;
 import eionet.cr.util.FileUtil;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.URLUtil;
-import eionet.cr.util.UrlRedirectAnalyzer;
-import eionet.cr.util.UrlRedirectionInfo;
 import eionet.cr.util.Util;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.xml.ConversionsParser;
@@ -517,140 +516,146 @@ public class PullHarvest extends Harvest {
      */
     private List<String> resolveRedirects() throws HarvestException, DAOException, RepositoryException, IOException {
 
-        List<String> ret = new ArrayList<String>();
-        int redirectionsFound = -1;
-        HashMap<String, String> redirections = new HashMap<String, String>();
+        List<String> redirectingUrls = new ArrayList<String>();
+        HashMap<String, String> redirectionMessages = new HashMap<String, String>();
 
-        HarvestSourceDTO originalSource = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(sourceUrlString);
+        HarvestSourceDAO harvestSourceDAO = DAOFactory.get().getDao(HarvestSourceDAO.class);
+        HarvestSourceDTO originalSourceDTO = harvestSourceDAO.getHarvestSourceByUrl(sourceUrlString);
 
-        UrlRedirectionInfo lastUrl = UrlRedirectAnalyzer.analyzeUrlRedirection(sourceUrlString);
-        while (lastUrl.isRedirected() == true) {
+        String urlRedirectedTo = null;
+        RedirectionInfo redirInfo = RedirectionInfo.parse(sourceUrlString);
+        for (; redirInfo.isRedirected(); redirInfo = RedirectionInfo.parse(urlRedirectedTo)) {
 
-            // Add harvest messages about redirections
-            redirections.put(lastUrl.getSourceURL(),
-                    "URL " + lastUrl.getSourceURL() + " is redirected to " + lastUrl.getTargetURL());
-            logger.debug("URL " + lastUrl.getSourceURL() + " is redirected to " + lastUrl.getTargetURL());
+            String redirectingUrl = redirInfo.getSourceURL();
+            urlRedirectedTo = redirInfo.getTargetURL();
+            String message = "URL " + redirectingUrl + " is redirected to " + urlRedirectedTo;
 
-            // Remove old predicates from /harvester context for this source
-            DAOFactory.get().getDao(HarvestSourceDAO.class).deleteSubjectTriplesInSource(lastUrl.getSourceURL(), Harvest.HARVESTER_URI);
+            // Add harvest message about redirection.
+            redirectionMessages.put(redirectingUrl, message);
+            logger.debug(message);
 
-            // Add last refreshed metadata into Virtuoso /harvester context
+            // Remove old triples from /harvester context for this harvest source.
+            harvestSourceDAO.deleteSubjectTriplesInSource(redirectingUrl, Harvest.HARVESTER_URI);
+
+            // Add last refreshed metadata into Virtuoso /harvester context.
             String lastRefreshed = dateFormat.format(new Date(System.currentTimeMillis()));
-            ObjectDTO lastRefreshedObject = new ObjectDTO(lastRefreshed, true, XMLSchema.DATETIME);
-            DAOFactory.get().getDao(HarvestSourceDAO.class)
-            .insertUpdateSourceMetadata(lastUrl.getSourceURL(), Predicates.CR_LAST_REFRESHED, lastRefreshedObject);
+            ObjectDTO objectDTO = new ObjectDTO(lastRefreshed, true, XMLSchema.DATETIME);
+            harvestSourceDAO.insertUpdateSourceMetadata(redirectingUrl, Predicates.CR_LAST_REFRESHED, objectDTO);
 
-            // Add redirection metadata into Virtuoso /harvester context
-            ObjectDTO redirectObject = new ObjectDTO(lastUrl.getTargetURL(), false);
-            DAOFactory.get().getDao(HarvestSourceDAO.class)
-            .insertUpdateSourceMetadata(lastUrl.getSourceURL(), Predicates.CR_REDIRECTED_TO, redirectObject);
+            // Add redirection metadata into Virtuoso /harvester context.
+            objectDTO = new ObjectDTO(urlRedirectedTo, false);
+            harvestSourceDAO.insertUpdateSourceMetadata(redirectingUrl, Predicates.CR_REDIRECTED_TO, objectDTO);
 
-            ret.add(lastUrl.getSourceURL());
-            redirectionsFound = ret.size();
+            redirectingUrls.add(redirectingUrl);
+
             // Checking the count of redirects.
-            if (redirectionsFound > PullHarvest.maxRedirectionsAllowed) {
-                throw new HarvestException("Too many redirections for url: " + sourceUrlString + ". Found " + redirectionsFound
-                        + ", allowed " + PullHarvest.maxRedirectionsAllowed);
+            int noOfRedirects = redirectingUrls.size();
+            int maxAllowed = PullHarvest.maxRedirectionsAllowed;
+            if (noOfRedirects > maxAllowed) {
+                throw new HarvestException(noOfRedirects + " redirections found, but maximum allowed is " + maxAllowed);
             }
-            sourceUrlString = lastUrl.getTargetURL();
-
-            lastUrl = UrlRedirectAnalyzer.analyzeUrlRedirection(lastUrl.getTargetURL());
+            this.sourceUrlString = urlRedirectedTo;
         }
 
-        // The code below will be only executed if source is redirected
-        if (ret != null && ret.size() > 0) {
-            ret.add(sourceUrlString);
+        // If no redirections, nothing to do here any more.
+        if (redirectingUrls.isEmpty()) {
+            return redirectingUrls;
+        }
+        else{
+            redirectingUrls.add(sourceUrlString);
         }
 
-        // Insert sources that doesn't yet exist into postgre DB or update interval minutes
-        if (ret != null && ret.size() > 0) {
+        // Insert redirection harvest message for the original URL.
+        String msg = redirectionMessages.get(originalSourceDTO.getUrl());
+        if (!StringUtils.isBlank(msg)) {
+            insertHarvestMessage(msg, daoWriter.getHarvestId());
+        }
 
-            // Insert redirection harvest message for original URL
-            String msg = redirections.get(originalSource.getUrl());
-            if (!StringUtils.isBlank(msg)) {
-                insertHarvestMessage(msg, daoWriter.getHarvestId());
-            }
-            // Finish original redirection harvest
-            DAOFactory.get().getDao(HarvestDAO.class)
-            .updateFinishedHarvest(daoWriter.getHarvestId(), Harvest.STATUS_FINISHED, 0, 0, 0);
+        // Finish original redirection harvest.
+        HarvestDAO harvestDAO = DAOFactory.get().getDao(HarvestDAO.class);
+        harvestDAO.updateFinishedHarvest(daoWriter.getHarvestId(), Harvest.STATUS_FINISHED, 0, 0, 0);
 
-            for (String url : ret) {
-                if (!url.equals(originalSource.getUrl())) {
-                    HarvestSourceDTO redirectedSource = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(url);
-                    if (redirectedSource == null) {
-                        redirectedSource = new HarvestSourceDTO();
-                        redirectedSource.setPrioritySource(originalSource.isPrioritySource());
-                        redirectedSource.setIntervalMinutes(originalSource.getIntervalMinutes());
-                        redirectedSource.setUrl(url);
-                        redirectedSource.setUrlHash(Hashes.spoHash(url));
-                        redirectedSource.setOwner(originalSource.getOwner());
-                        Integer sourceId = DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(redirectedSource);
-                        redirectedSource.setSourceId(sourceId.intValue());
-                        // Set final source ID
-                        if (url.equals(sourceUrlString)) {
-                            finalSourceId = sourceId;
-                        }
-                    } else if (redirectedSource.getIntervalMinutes() > originalSource.getIntervalMinutes()) {
-                        redirectedSource.setIntervalMinutes(originalSource.getIntervalMinutes());
+        // Loop through all above-found urls, create new harvest source for each, or if such a source exists,
+        // update its interval minutes.
+        for (String redirectingUrl : redirectingUrls) {
 
-                        // Saving the updated source to database.
-                        DAOFactory.get().getDao(HarvestSourceDAO.class).editSource(redirectedSource);
+            if (!redirectingUrl.equals(originalSourceDTO.getUrl())) {
+
+                HarvestSourceDTO redirectedToSource = harvestSourceDAO.getHarvestSourceByUrl(redirectingUrl);
+
+                // If no such harvest source existing yet, create new.
+                if (redirectedToSource == null) {
+
+                    // Prepare the new harvest source's DTO object.
+                    redirectedToSource = new HarvestSourceDTO();
+                    redirectedToSource.setPrioritySource(originalSourceDTO.isPrioritySource());
+                    redirectedToSource.setIntervalMinutes(originalSourceDTO.getIntervalMinutes());
+                    redirectedToSource.setUrl(redirectingUrl);
+                    redirectedToSource.setUrlHash(Hashes.spoHash(redirectingUrl));
+                    redirectedToSource.setOwner(originalSourceDTO.getOwner());
+
+                    // Create new harvest source in database.
+                    Integer sourceId = harvestSourceDAO.addSource(redirectedToSource);
+                    redirectedToSource.setSourceId(sourceId.intValue());
+
+                    // Set "final" source ID.
+                    if (redirectingUrl.equals(sourceUrlString)) {
+                        finalSourceId = sourceId;
                     }
 
-                    // Harvest for original source has already been created by DAOWriter.writeStarted() method
-                    if (url.equals(sourceUrlString)) {
+                } else if (redirectedToSource.getIntervalMinutes() > originalSourceDTO.getIntervalMinutes()) {
 
-                        // Decide whether we should harvest this source If source redirects to another source that has recently been
-                        // updated then there is no need to harvest it again
-                        if (!shouldBeHarvested()) {
-                            needsHarvesting = false;
-                        }
+                    // Harvest source already existing, so update its interval minutes, and save to database.
+                    redirectedToSource.setIntervalMinutes(originalSourceDTO.getIntervalMinutes());
+                    harvestSourceDAO.editSource(redirectedToSource);
+                }
 
-                        // If final source needs harvesting, create record into HARVEST table
-                        if (needsHarvesting) {
-                            // Insert harvest
-                            int harvestId =
-                                DAOFactory
-                                .get()
-                                .getDao(HarvestDAO.class)
-                                .insertStartedHarvest(redirectedSource.getSourceId(), Harvest.TYPE_PULL,
-                                        CRUser.APPLICATION.getUserName(), Harvest.STATUS_STARTED);
-                            // If final source, then update DAO Writer harvestId
-                            daoWriter.setHarvestId(harvestId);
-                        }
-                    } else {
-                        // Insert harvest
-                        int harvestId =
-                            DAOFactory
-                            .get()
-                            .getDao(HarvestDAO.class)
-                            .insertStartedHarvest(redirectedSource.getSourceId(), Harvest.TYPE_PULL,
-                                    CRUser.APPLICATION.getUserName(), Harvest.STATUS_FINISHED);
-                        // Insert harvest message for redirected URLs
-                        msg = redirections.get(redirectedSource.getUrl());
-                        if (!StringUtils.isBlank(msg)) {
-                            insertHarvestMessage(msg, harvestId);
-                        }
-                        // Finish harvest for redirected URLs
-                        DAOFactory.get().getDao(HarvestDAO.class)
-                        .updateFinishedHarvest(harvestId, Harvest.STATUS_FINISHED, 0, 0, 0);
+                // Harvest for original source has already been created by DAOWriter.writeStarted() method.
+                if (redirectingUrl.equals(sourceUrlString)) {
+
+                    // Decide whether we should harvest this source. If source redirects to another source
+                    // that has recently been updated then there is no need to harvest it again
+                    if (!shouldBeHarvested()) {
+                        needsHarvesting = false;
                     }
-                }
-                // Update last_harvest for URL's
-                DAOFactory.get().getDao(HarvestSourceDAO.class).updateLastHarvest(url, new Timestamp(System.currentTimeMillis()));
 
-                // Add cr:firstSeen metadata predicate for redirected sources
-                HarvestSourceDTO redirectedSource = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(url);
-                if (redirectedSource != null && redirectedSource.getTimeCreated() != null) {
-                    String firstSeen = dateFormat.format(redirectedSource.getTimeCreated());
-                    ObjectDTO firstSeenObject = new ObjectDTO(firstSeen, true, XMLSchema.DATETIME);
-                    DAOFactory.get().getDao(HarvestSourceDAO.class)
-                    .insertUpdateSourceMetadata(url, Predicates.CR_FIRST_SEEN, firstSeenObject);
+                    // If final source needs harvesting, create record into HARVEST table.
+                    if (needsHarvesting) {
+                        int harvestId = harvestDAO.insertStartedHarvest(redirectedToSource.getSourceId(),
+                                Harvest.TYPE_PULL, CRUser.APPLICATION.getUserName(), Harvest.STATUS_STARTED);
+                        daoWriter.setHarvestId(harvestId);
+                    }
+                } else {
+                    // The current redirecting URL is not the original one where it all started from.
+                    // Create new harvest record in the database.
+                    int harvestId = harvestDAO.insertStartedHarvest(redirectedToSource.getSourceId(),
+                            Harvest.TYPE_PULL, CRUser.APPLICATION.getUserName(), Harvest.STATUS_FINISHED);
+
+                    // For the newly created harvest, insert message about redirection.
+                    msg = redirectionMessages.get(redirectedToSource.getUrl());
+                    if (!StringUtils.isBlank(msg)) {
+                        insertHarvestMessage(msg, harvestId);
+                    }
+
+                    // Make the newly created harvest finished.
+                    harvestDAO.updateFinishedHarvest(harvestId, Harvest.STATUS_FINISHED, 0, 0, 0);
                 }
+            }
+
+            // Update last harvest timestamp for the current redirecting URL.
+            harvestSourceDAO.updateLastHarvest(redirectingUrl, new Timestamp(System.currentTimeMillis()));
+
+            // Add cr:firstSeen metadata predicate for the current redirecting URL
+            HarvestSourceDTO sourceDTO = harvestSourceDAO.getHarvestSourceByUrl(redirectingUrl);
+            if (sourceDTO != null && sourceDTO.getTimeCreated() != null) {
+
+                String firstSeen = dateFormat.format(sourceDTO.getTimeCreated());
+                ObjectDTO objectDTO = new ObjectDTO(firstSeen, true, XMLSchema.DATETIME);
+                harvestSourceDAO.insertUpdateSourceMetadata(redirectingUrl, Predicates.CR_FIRST_SEEN, objectDTO);
             }
         }
 
-        return ret;
+        return redirectingUrls;
     }
 
     /**

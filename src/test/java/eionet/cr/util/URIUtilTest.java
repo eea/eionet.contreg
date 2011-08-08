@@ -20,8 +20,6 @@
  * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.util;
 
-import java.net.MalformedURLException;
-
 import junit.framework.TestCase;
 
 /**
@@ -53,16 +51,6 @@ public class URIUtilTest extends TestCase {
      */
     public void testFixRelativeUrl() {
         assertEquals("http://sws.geonames.org", URLUtil.extractUrlHost("http://sws.geonames.org/6255148/"));
-        try {
-            assertEquals("http://rod.eionet.europa.eu/clients.rdf",
-                    UrlRedirectAnalyzer.constructFullUrl("http://rod.eionet.europa.eu/clients/10", "/clients.rdf"));
-            assertEquals("http://rod.eionet.europa.eu/clients/clients.rdf",
-                    UrlRedirectAnalyzer.constructFullUrl("http://rod.eionet.europa.eu/clients/10", "clients.rdf"));
-            assertEquals("http://rod.eionet.europa.eu/clients/clients.rdf",
-                    UrlRedirectAnalyzer.constructFullUrl("http://rod.eionet.europa.eu/clients/", "clients.rdf"));
-        } catch (MalformedURLException ex) {
-            fail("Did not expect this exception: " + ex.toString());
-        }
     }
 
 }

@@ -13,7 +13,6 @@ import org.apache.log4j.Logger;
 import eionet.cr.util.ConnectionError;
 import eionet.cr.util.ConnectionError.ErrType;
 import eionet.cr.util.URLUtil;
-import eionet.cr.util.UrlRedirectionInfo;
 
 /**
  * Class to open a connection to a remote source or local file. Doesn't have a close method. You have to know how the class works to
@@ -34,8 +33,6 @@ public class HarvestUrlConnection {
     private ConnectionError error;
 
     private int responseCode = 0;
-
-    private UrlRedirectionInfo redirectionInfo = new UrlRedirectionInfo();
 
     InputStream inputStream = null;
     private boolean sourceAvailable = false;
@@ -236,14 +233,6 @@ public class HarvestUrlConnection {
 
     public void setHttpConnection(boolean httpConnection) {
         this.httpConnection = httpConnection;
-    }
-
-    public UrlRedirectionInfo getRedirectionInfo() {
-        return redirectionInfo;
-    }
-
-    public void setRedirectionInfo(UrlRedirectionInfo redirectionInfo) {
-        this.redirectionInfo = redirectionInfo;
     }
 
     public ConnectionError getError() {
