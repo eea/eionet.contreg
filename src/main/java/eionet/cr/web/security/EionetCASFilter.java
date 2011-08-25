@@ -87,7 +87,7 @@ public class EionetCASFilter extends CASFilter {
             HttpSession session = httpRequest.getSession();
             if (session != null) {
 
-                String userName = (String) session.getAttribute(CAS_FILTER_USER);
+                String userName = ((String) session.getAttribute(CAS_FILTER_USER)).toLowerCase();
                 session.setAttribute(USER_SESSION_ATTR, new CRUser(userName));
 
                 String requestURI = httpRequest.getRequestURI();
