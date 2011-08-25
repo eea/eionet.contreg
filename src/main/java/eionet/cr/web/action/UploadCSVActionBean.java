@@ -182,6 +182,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
                 // Add all other values found from file
                 int idx = 0;
                 for (String col : columns) {
+                    col = col.replace(" ", "_");
                     if (idx != labelColumn && nextLine.length > idx) {
                         String value = nextLine[idx];
                         ObjectDTO obj = null;
