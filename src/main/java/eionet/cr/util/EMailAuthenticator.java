@@ -19,35 +19,38 @@
  *		Jaanus Heinlaid
  */
 
-package eionet.cr.harvest;
+package eionet.cr.util;
 
+import javax.mail.Authenticator;
+import javax.mail.PasswordAuthentication;
 
 /**
  *
  * @author Jaanus Heinlaid
  */
-public interface Harvest {
+public class EMailAuthenticator extends Authenticator {
+
+    /** */
+    private String user;
+    private String password;
 
     /**
      *
-     * @throws HarvestException
+     * @param username
+     * @param password
      */
-    void execute() throws HarvestException;
+    public EMailAuthenticator(String username, String password){
+        super();
+        this.user = username;
+        this.password = password;
+    }
 
     /**
-     *
-     * @param harvestUser
+     * @see javax.mail.Authenticator#getPasswordAuthentication()
      */
-    void setHarvestUser(String harvestUser);
+    @Override
+    public PasswordAuthentication getPasswordAuthentication(){
 
-    /**
-     *
-     */
-    String getContextUrl();
-
-    /**
-     *
-     * @return
-     */
-    int getStoredTriplesCount();
+        return new PasswordAuthentication(user, password);
+    }
 }

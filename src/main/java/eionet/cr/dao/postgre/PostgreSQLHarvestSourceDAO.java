@@ -86,6 +86,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSources(java.lang.String, eionet.cr.util.PagingRequest,
      * eionet.cr.util.SortingRequest)
      */
@@ -99,6 +100,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSourcesFailed(java.lang.String, eionet.cr.util.PagingRequest,
      * eionet.cr.util.SortingRequest)
      */
@@ -112,6 +114,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSourcesUnavailable(java.lang .String, eionet.cr.util.PagingRequest,
      * eionet.cr.util.SortingRequest)
      */
@@ -126,6 +129,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#getPrioritySources(java.lang.String, eionet.cr.util.PagingRequest,
      * eionet.cr.util.SortingRequest)
      */
@@ -139,6 +143,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#getInferenceSources(java.lang.String, eionet.cr.util.PagingRequest,
      * eionet.cr.util.SortingRequest)
      */
@@ -153,7 +158,8 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
         String query =
             "SELECT * FROM HARVEST_SOURCE WHERE URL IN (<sources>) AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
         if (!StringUtils.isBlank(searchString)) {
-            query = "SELECT * FROM HARVEST_SOURCE WHERE URL like (?) AND URL IN (<sources>) AND "
+            query =
+                "SELECT * FROM HARVEST_SOURCE WHERE URL like (?) AND URL IN (<sources>) AND "
                 + " URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
         }
         query = query.replace("<sources>", sourceUris);
@@ -215,6 +221,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#getUrgencySourcesCount()
      */
     @Override
@@ -241,6 +248,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#addSource(HarvestSourceDTO source)
      */
     @Override
@@ -299,6 +307,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#addSourceIgnoreDuplicate(HarvestSourceDTO source)
      */
     @Override
@@ -315,6 +324,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#deleteHarvestHistory(int)
      */
     @Override
@@ -346,6 +356,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#deleteTriplesOfMissingSources()
      */
     @Override
@@ -372,6 +383,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#deleteSourceByUrl(java.lang.String)
      */
 
@@ -399,6 +411,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc) helper "temporary" method to be called from Virtuoso API until PostgreSQL is alive
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#deleteSourceByUrl(java.lang.String)
      */
     public void deleteSourceByUrl(String url, Connection conn) throws DAOException {
@@ -462,6 +475,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#editSource(eionet.cr.dto.HarvestSourceDTO)
      */
     @Override
@@ -492,34 +506,12 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
     private static final String editRedirectedSourceSQL = "update HARVEST_SOURCE set LAST_HARVEST=?,"
         + " LAST_HARVEST_FAILED=cast(? as ynboolean) where URL=?";
 
-    /*
-     * (non-Javadoc)
-     * @see eionet.cr.dao.HarvestSourceDAO#editRedirectedSource(String, Timestamp, boolean)
-     */
-    @Override
-    public void editRedirectedSource(String url, Timestamp lastHarvest, boolean failed) throws DAOException {
-
-        List<Object> values = new ArrayList<Object>();
-        values.add(lastHarvest);
-        values.add(YesNoBoolean.format(failed));
-        values.add(url);
-
-        Connection conn = null;
-        try {
-            conn = getSQLConnection();
-            SQLUtil.executeUpdate(editRedirectedSourceSQL, values, conn);
-        } catch (Exception e) {
-            throw new DAOException(e.getMessage(), e);
-        } finally {
-            SQLUtil.close(conn);
-        }
-    }
-
     /** */
     private static final String getSourcesByIdSQL = "select * from HARVEST_SOURCE where HARVEST_SOURCE_ID=?";
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSourceById(java.lang.Integer)
      */
     @Override
@@ -532,17 +524,18 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
     }
 
     /** */
-    private static final String getSourcesByUrlSQL = "select * from HARVEST_SOURCE where URL=?";
+    private static final String getSourcesByUrlSQL = "select * from HARVEST_SOURCE where URL_HASH=?";
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSourceByUrl(java.lang.String)
      */
     @Override
     public HarvestSourceDTO getHarvestSourceByUrl(String url) throws DAOException {
 
         List<Object> values = new ArrayList<Object>();
-        values.add(url);
+        values.add(Long.valueOf(Hashes.spoHash(url)));
         List<HarvestSourceDTO> list = executeSQL(getSourcesByUrlSQL, values, new HarvestSourceDTOReader());
         return (list != null && !list.isEmpty()) ? list.get(0) : null;
     }
@@ -550,14 +543,17 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
     /** */
     private static final String GET_NEXT_SCHEDULED_SOURCES_SQL =
 
-        "select * from HARVEST_SOURCE where INTERVAL_MINUTES>0" + " and extract(epoch from now()-(coalesce(LAST_HARVEST,"
+        "select * from HARVEST_SOURCE where PERMANENT_ERROR='N' and COUNT_UNAVAIL<5 and INTERVAL_MINUTES>0"
+        + " and extract(epoch from now()-(coalesce(LAST_HARVEST,"
         + "(TIME_CREATED - INTERVAL_MINUTES * interval '1 minute')))) >= (INTERVAL_MINUTES*60)"
         + " order by extract(epoch from now()-(coalesce(LAST_HARVEST,"
         + "(TIME_CREATED - INTERVAL_MINUTES * interval '1 minute')))) / (INTERVAL_MINUTES*60)" + " desc limit ?";
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.harvest.scheduled.HarvestingJob#getNextScheduledSources()
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#getNextScheduledSources(int)
      */
     @Override
@@ -570,6 +566,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#getScheduledForDeletion()
      */
     @Override
@@ -580,6 +577,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#queueSourcesForDeletion(java.util.List)
      */
     @Override
@@ -601,49 +599,9 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
         executeSQL(sql.toString(), params);
     }
 
-    /** */
-    private static final String UPDATE_HARVEST_FINISHED_SQL = "update HARVEST_SOURCE set STATEMENTS=?,"
-        + " LAST_HARVEST_FAILED=cast(? as ynboolean),"
-        + " LAST_HARVEST=?, PERMANENT_ERROR=cast(? as ynboolean) where HARVEST_SOURCE_ID=?";
-
-    private static final String UPDATE_HARVEST_FINISHED_SQL_AVAIL = "update HARVEST_SOURCE set STATEMENTS=?,"
-        + " COUNT_UNAVAIL=(case when ?=1 then 0 else (COUNT_UNAVAIL+1) end),"
-        + " LAST_HARVEST_FAILED=cast(? as ynboolean), LAST_HARVEST=?, PERMANENT_ERROR=cast(? as ynboolean)"
-        + " where HARVEST_SOURCE_ID=?";
-
     /*
      * (non-Javadoc)
-     * @see eionet.cr.dao.HarvestSourceDAO#updateHarvestFinished(int, java.lang.Integer, java.lang.Boolean, boolean, boolean,
-     * Timestamp)
-     */
-    @Override
-    public void updateHarvestFinished(int sourceId, Integer numStatements, Boolean sourceAvailable, boolean failed,
-            boolean permanentError, Timestamp lastHarvest) throws DAOException {
-
-        List<Object> values = new ArrayList<Object>();
-        values.add(numStatements);
-        if (sourceAvailable != null) {
-            values.add(sourceAvailable.booleanValue() == true ? new Integer(1) : new Integer(0));
-        }
-        values.add(YesNoBoolean.format(failed));
-        values.add(lastHarvest);
-        values.add(YesNoBoolean.format(permanentError));
-        values.add(new Integer(sourceId));
-
-        Connection conn = null;
-        try {
-            conn = getSQLConnection();
-            SQLUtil.executeUpdate(sourceAvailable != null ? UPDATE_HARVEST_FINISHED_SQL_AVAIL : UPDATE_HARVEST_FINISHED_SQL,
-                    values, conn);
-        } catch (Exception e) {
-            throw new DAOException(e.getMessage(), e);
-        } finally {
-            SQLUtil.close(conn);
-        }
-    }
-
-    /*
-     * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#increaseUnavailableCount(int)
      */
     @Override
@@ -662,6 +620,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HelperDAO#getSourcesInInferenceRule()
      */
     @Override
@@ -671,6 +630,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#isSourceInInferenceRule()
      */
     @Override
@@ -680,6 +640,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#addSourceIntoInferenceRule()
      */
     @Override
@@ -689,6 +650,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#removeSourceFromInferenceRule()
      */
     @Override
@@ -698,15 +660,17 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#addSourceToRepository(File, String)
      */
     @Override
-    public int addSourceToRepository(File file, String sourceUrlString) throws IOException, OpenRDFException {
+    public int loadIntoRepository(File file, String graphUrl, boolean clearPreviousGraphContent) throws IOException, OpenRDFException {
         throw new UnsupportedOperationException("Method not implemented");
     }
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#addSourceMetadata(SubjectDTO)
      */
     @Override
@@ -715,26 +679,28 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
         throw new UnsupportedOperationException("Method not implemented");
     }
 
-    /*
-     * (non-Javadoc)
-     * @see eionet.cr.dao.HarvestSourceDAO#getNewSources(String)
+    /**
+     * @see eionet.cr.dao.HarvestSourceDAO#getNewSources(java.lang.String)
      */
     @Override
-    public List<String> getNewSources(String sourceUrl) throws DAOException, RDFParseException, RepositoryException, IOException {
+    public List<String> getNewSources(String sourceUrl) throws DAOException {
         throw new UnsupportedOperationException("Method not implemented");
     }
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#getSourceMetadata(String, String)
      */
     @Override
-    public String getHarvestSourceMetadata(String harvestSourceUri, String predicateUri) throws DAOException, RepositoryException, IOException {
+    public String getHarvestSourceMetadata(String harvestSourceUri, String predicateUri) throws DAOException, RepositoryException,
+    IOException {
         throw new UnsupportedOperationException("Method not implemented");
     }
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#insertUpdateSourceMetadata(String, String, ObjectDTO)
      */
     @Override
@@ -743,17 +709,17 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
         throw new UnsupportedOperationException("Method not implemented");
     }
 
-    /*
-     * (non-Javadoc)
-     * @see eionet.cr.dao.HarvestSourceDAO#removeAllPredicatesFromHarvesterContext(String, String)
+    /**
+     *
      */
     @Override
-    public void deleteSubjectTriplesInSource(String subjectUri, String sourceUri) throws DAOException, RepositoryException, IOException {
+    public void deleteSubjectTriplesInSource(String subjectUri, String sourceUri) throws DAOException {
         throw new UnsupportedOperationException("Method not implemented");
     }
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#deleteSourceTriples(String)
      */
     @Override
@@ -763,6 +729,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HelperDAO#getLatestHarvestedURLs()
      */
     @Override
@@ -807,6 +774,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HelperDAO#getUrgencyOfComingHarvests()
      */
     @Override
@@ -854,24 +822,49 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
 
     }
 
-    /** */
-    private static final String updateLastHarvestSQL = "update HARVEST_SOURCE set LAST_HARVEST=? where URL=?";
-
     /*
      * (non-Javadoc)
-     * @see eionet.cr.dao.HarvestSourceDAO#updateLastHarvest(String, Timestamp)
+     *
+     * @see eionet.cr.dao.HarvestSourceDAO#addSourceToRepository(java.io.InputStream, java.lang.String)
      */
     @Override
-    public void updateLastHarvest(String sourceUrl, Timestamp lastHarvest) throws DAOException {
+    public int loadIntoRepository(InputStream inputStream, String graphUrl, boolean clearPreviousGraphContent) throws IOException, OpenRDFException {
+        throw new UnsupportedOperationException("Method not implemented");
+    }
 
-        List<Object> values = new ArrayList<Object>();
-        values.add(lastHarvest);
-        values.add(sourceUrl);
+    /** */
+    private static final String UPDATE_SOURCE_HARVEST_FINISHED_SQL =
+        "update HARVEST_SOURCE set EMAILS=?, STATEMENTS=?, COUNT_UNAVAIL=?, LAST_HARVEST=?, INTERVAL_MINUTES=?," +
+        " LAST_HARVEST_FAILED=cast(? as ynboolean), PRIORITY_SOURCE=cast(? as ynboolean), SOURCE_OWNER=?," +
+        " PERMANENT_ERROR=cast(? as ynboolean) where URL_HASH=?";
+    /**
+     *
+     */
+    @Override
+    public void updateSourceHarvestFinished(HarvestSourceDTO sourceDTO) throws DAOException {
+
+        if (sourceDTO == null) {
+            throw new IllegalArgumentException("Source DTO must not be null!");
+        } else if (sourceDTO.getUrl() == null) {
+            throw new IllegalArgumentException("Source URL must not be null!");
+        }
+
+        ArrayList<Object> values = new ArrayList<Object>();
+        values.add(sourceDTO.getEmails());
+        values.add(sourceDTO.getStatements() == null ? (int) 0 : sourceDTO.getStatements());
+        values.add(sourceDTO.getCountUnavail() == null ? (int) 0 : sourceDTO.getCountUnavail());
+        values.add(sourceDTO.getLastHarvest() == null ? null : new Timestamp(sourceDTO.getLastHarvest().getTime()));
+        values.add(sourceDTO.getIntervalMinutes() == null ? (int) 0 : sourceDTO.getIntervalMinutes());
+        values.add(YesNoBoolean.format(sourceDTO.isLastHarvestFailed()));
+        values.add(YesNoBoolean.format(sourceDTO.isPrioritySource()));
+        values.add(sourceDTO.getOwner());
+        values.add(YesNoBoolean.format(sourceDTO.isPermanentError()));
+        values.add(Hashes.spoHash(sourceDTO.getUrl()));
 
         Connection conn = null;
         try {
             conn = getSQLConnection();
-            SQLUtil.executeUpdate(updateLastHarvestSQL, values, conn);
+            SQLUtil.executeUpdate(UPDATE_SOURCE_HARVEST_FINISHED_SQL, values, conn);
         } catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
         } finally {
@@ -879,12 +872,24 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see eionet.cr.dao.HarvestSourceDAO#addSourceToRepository(java.io.InputStream, java.lang.String)
+    /** */
+    private static final String DELETE_NONPRIORITY_UNAVAIL_SOURCES = "insert into REMOVE_SOURCE_QUEUE (URL)"
+        + " select URL from HARVEST_SOURCE where PRIORITY_SOURCE='N' and COUNT_UNAVAIL>=5";
+    /**
+     * @see eionet.cr.dao.HarvestSourceDAO#queueNonPriorityUnavailableSourcesForDeletion()
      */
     @Override
-    public int addSourceToRepository(InputStream inputStream, String sourceUrlString) throws IOException, OpenRDFException {
-        throw new UnsupportedOperationException("Method not implemented");
+    public int queueNonPriorityUnavailableSourcesForDeletion() throws DAOException {
+
+        Connection conn = null;
+        try {
+            conn = getSQLConnection();
+            return SQLUtil.executeUpdate(DELETE_NONPRIORITY_UNAVAIL_SOURCES, conn);
+        } catch (Exception e) {
+            throw new DAOException(e.getMessage(), e);
+        } finally {
+            SQLUtil.close(conn);
+        }
+
     }
 }

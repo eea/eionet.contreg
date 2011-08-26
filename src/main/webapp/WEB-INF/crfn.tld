@@ -305,4 +305,26 @@
         </example>
     </function>
 
+    <function>
+        <description>
+        </description>
+        <name>getStackTrace</name>
+        <function-class>eionet.cr.web.util.JstlFunctions</function-class>
+        <function-signature>java.lang.String getStackTrace(java.lang.Throwable)</function-signature>
+        <example>
+            ${getStackTrace(throwable)}
+        </example>
+    </function>
+
+    <function>
+        <description>
+        </description>
+        <name>formatStackTrace</name>
+        <function-class>eionet.cr.web.util.JstlFunctions</function-class>
+        <function-signature>java.lang.String formatStackTrace(java.lang.String)</function-signature>
+        <example>
+            ${formatStackTrace(stackTrace)}
+        </example>
+    </function>
+
 </taglib>

@@ -29,7 +29,7 @@ public class HarvestGZipTest extends CRDatabaseTestCase {
 
         try {
             URL url = getClass().getClassLoader().getResource("test-rdf.xml.gz");
-            Harvest harvest = new PullHarvest(url.toString(), null);
+            Harvest harvest = new PullHarvest(url.toString());
             harvest.execute();
 
             assertEquals((int) 49, harvest.getStoredTriplesCount());

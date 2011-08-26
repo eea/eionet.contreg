@@ -58,7 +58,7 @@ import eionet.cr.dto.SubjectDTO;
 import eionet.cr.dto.TripleDTO;
 import eionet.cr.harvest.CurrentHarvests;
 import eionet.cr.harvest.HarvestException;
-import eionet.cr.harvest.InstantHarvester;
+import eionet.cr.harvest.OnDemandHarvester;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SubjectDTOOptimizer;
@@ -224,22 +224,22 @@ public class FactsheetActionBean extends AbstractActionBean {
 
                 /* issue an instant harvest of this url */
 
-                InstantHarvester.Resolution resolution = InstantHarvester.harvest(dto.getUrl(), getUserName());
+                OnDemandHarvester.Resolution resolution = OnDemandHarvester.harvest(dto.getUrl(), getUserName());
 
                 /* give feedback to the user */
 
-                if (resolution.equals(InstantHarvester.Resolution.ALREADY_HARVESTING))
-                    message = "The source is currently being harvested by another user or background harvester!";
-                else if (resolution.equals(InstantHarvester.Resolution.UNCOMPLETE))
+                if (resolution.equals(OnDemandHarvester.Resolution.ALREADY_HARVESTING))
+                    message = "The resource is currently being harvested by another user or background harvester!";
+                else if (resolution.equals(OnDemandHarvester.Resolution.UNCOMPLETE))
                     message = "The harvest hasn't finished yet, but continues in the background!";
-                else if (resolution.equals(InstantHarvester.Resolution.COMPLETE))
+                else if (resolution.equals(OnDemandHarvester.Resolution.COMPLETE))
                     message = "The harvest has been completed!";
-                else if (resolution.equals(InstantHarvester.Resolution.SOURCE_UNAVAILABLE))
+                else if (resolution.equals(OnDemandHarvester.Resolution.SOURCE_UNAVAILABLE))
                     message = "The resource was not available!";
-                else if (resolution.equals(InstantHarvester.Resolution.NO_STRUCTURED_DATA))
+                else if (resolution.equals(OnDemandHarvester.Resolution.NO_STRUCTURED_DATA))
                     message = "The resource contained no RDF data!";
-                else if (resolution.equals(InstantHarvester.Resolution.RECENTLY_HARVESTED))
-                    message = "Source redirects to another source that has recently been harvested! Will not harvest.";
+                //                else if (resolution.equals(InstantHarvester.Resolution.RECENTLY_HARVESTED))
+                //                    message = "Source redirects to another source that has recently been harvested! Will not harvest.";
                 else
                     message = "No feedback given from harvest!";
             }

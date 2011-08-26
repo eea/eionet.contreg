@@ -129,6 +129,9 @@ public class GeneralConfig {
     public static final int SEVERITY_WARNING = 3;
 
     /** */
+    public static final String HARVESTER_URI = getRequiredProperty(APPLICATION_HOME_URL) + "/harvester";
+
+    /** */
     private static Log logger = LogFactory.getLog(GeneralConfig.class);
 
     /** */

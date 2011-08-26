@@ -379,8 +379,40 @@ public class ObjectDTO implements Serializable {
         return ns + local;
     }
 
+    /**
+     *
+     * @param datatype
+     */
     public void setDatatype(URI datatype) {
         this.datatype = datatype;
+    }
+
+    /**
+     *
+     * @param value
+     * @return
+     */
+    public static ObjectDTO createLiteral(String value){
+        return new ObjectDTO(value, true);
+    }
+
+    /**
+     *
+     * @param value
+     * @param datatype
+     * @return
+     */
+    public static ObjectDTO createLiteral(String value, URI datatype){
+        return new ObjectDTO(value, true, datatype);
+    }
+
+    /**
+     *
+     * @param uri
+     * @return
+     */
+    public static ObjectDTO createResource(String uri){
+        return new ObjectDTO(uri, false);
     }
 
 }

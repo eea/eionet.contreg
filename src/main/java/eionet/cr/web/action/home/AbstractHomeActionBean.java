@@ -16,6 +16,7 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.HarvestSourceDTO;
+import eionet.cr.harvest.CurrentHarvests;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.UploadHarvest;
 import eionet.cr.web.action.AbstractActionBean;
@@ -334,7 +335,13 @@ public abstract class AbstractHomeActionBean extends AbstractActionBean {
         try {
             if (harvestSourceDTO != null) {
                 UploadHarvest uploadHarvest = new UploadHarvest(harvestSourceDTO, uploadedFile, dcTitle, userName);
-                uploadHarvest.execute();
+                CurrentHarvests.addOnDemandHarvest(harvestSourceDTO.getUrl(), userName);
+                try{
+                    uploadHarvest.execute();
+                }
+                finally{
+                    CurrentHarvests.removeOnDemandHarvest(harvestSourceDTO.getUrl());
+                }
             } else {
                 logger.debug("Harvest source was not created, so skipping harvest");
             }

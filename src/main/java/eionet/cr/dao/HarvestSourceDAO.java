@@ -23,7 +23,6 @@ package eionet.cr.dao;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.Timestamp;
 import java.util.List;
 
 import org.openrdf.OpenRDFException;
@@ -168,21 +167,6 @@ public interface HarvestSourceDAO extends DAO {
     public void deleteSourceByUrl(String url) throws DAOException;
 
     /**
-     *
-     * @param sourceId
-     * @param numStatements
-     * @param numResources
-     * @param sourceAvailable
-     * @param failed
-     * @param permanentError
-     * @param lastHarvest
-     * @throws DAOException
-     *             if relational database is unavailable.
-     */
-    public void updateHarvestFinished(int sourceId, Integer numStatements, Boolean sourceAvailable, boolean failed,
-            boolean permanentError, Timestamp lastHarvest) throws DAOException;
-
-    /**
      * Get a list of sources to harvest in the next harvesting round. The result is ordered with highest priority first.
      *
      * @param limit
@@ -257,25 +241,30 @@ public interface HarvestSourceDAO extends DAO {
     boolean removeSourceFromInferenceRule(String url) throws DAOException;
 
     /**
-     * Loads the file into the repository (triple store). File is required to be RDF.
+     * Loads the given file into the triple store (i.e. repository).
+     * File format must be supported by the triple store.
      *
      * @param file
-     * @param sourceUrlString
-     * @return int
-     * @throws IOException
-     * @throws OpenRDFException
-     */
-    public int addSourceToRepository(File file, String sourceUrlString) throws IOException, OpenRDFException;
-
-    /**
-     *
-     * @param inputStream
-     * @param sourceUrlString
+     * @param graphUrl
+     * @param clearPreviousGraphContent
      * @return
      * @throws IOException
      * @throws OpenRDFException
      */
-    public int addSourceToRepository(InputStream inputStream, String sourceUrlString) throws IOException, OpenRDFException;
+    public int loadIntoRepository(File file, String graphUrl, boolean clearPreviousGraphContent) throws IOException, OpenRDFException;
+
+    /**
+     * Loads the given input stream into the triple store (i.e. repository).
+     * The stream must be formatted by a format supported by the triple store.
+     *
+     * @param inputStream
+     * @param graphUrl
+     * @param clearPreviousGraphContent
+     * @return
+     * @throws IOException
+     * @throws OpenRDFException
+     */
+    public int loadIntoRepository(InputStream inputStream, String graphUrl, boolean clearPreviousGraphContent) throws IOException, OpenRDFException;
 
     /**
      * Adds the meta information the harvester has collected about the source. The meta data is considered part of the harvester and
@@ -293,19 +282,13 @@ public interface HarvestSourceDAO extends DAO {
     IOException;
 
     /**
-     * Returns new harvest sources found by HarvestingJob.
+     * Derives new harvest source URLs from content in the graph represented by the given harvest source URL.
      *
-     * @param sourceUrl
-     *            - The newly harvested source, which can contain new resources of cr:File type.
-     * @return List<String> - List of new sources in form of URLs.
-     * @throws DAOException
-     *             if relational database is unavailable.
-     * @throws RepositoryException
-     *             if data repository is unavailable.
-     * @throws RDFParseException
-     * @throws IOException
+     * @param sourceUrl - The given harvest source URL.
+     * @return List<String> List of derived URLs.
+     * @throws DAOException - If any kind of database access error occurs.
      */
-    public List<String> getNewSources(String sourceUrl) throws DAOException, RDFParseException, RepositoryException, IOException;
+    public List<String> getNewSources(String sourceUrl) throws DAOException;
 
     /**
      * Returns metadata from /harvester context.
@@ -319,7 +302,8 @@ public interface HarvestSourceDAO extends DAO {
      *             if data repository is unavailable.
      * @throws IOException
      */
-    public String getHarvestSourceMetadata(String harvestSourceUri, String predicateUri) throws DAOException, RepositoryException, IOException;
+    public String getHarvestSourceMetadata(String harvestSourceUri, String predicateUri) throws DAOException, RepositoryException,
+    IOException;
 
     /**
      * Inserts given metadata into /harvester context.
@@ -340,26 +324,12 @@ public interface HarvestSourceDAO extends DAO {
     RepositoryException, IOException;
 
     /**
-     * @param url
-     * @param lastHarvest
-     * @param failed
-     * @throws DAOException
-     *             if relational database is unavailable.
-     */
-    public void editRedirectedSource(String url, Timestamp lastHarvest, boolean failed) throws DAOException;
-
-    /**
-     * Removes all predicates from /harvester context for given subject.
      *
      * @param subjectUri
-     * @param sourceUri TODO
+     * @param sourceUri
      * @throws DAOException
-     *             if relational database is unavailable.
-     * @throws RepositoryException
-     *             if data repository is unavailable.
-     * @throws IOException
      */
-    public void deleteSubjectTriplesInSource(String subjectUri, String sourceUri) throws DAOException, RepositoryException, IOException;
+    public void deleteSubjectTriplesInSource(String subjectUri, String sourceUri) throws DAOException;
 
     /**
      * Removes all triples for given source. Doesn't remove triples from /harvester context.
@@ -399,17 +369,19 @@ public interface HarvestSourceDAO extends DAO {
      * @throws DAOException
      *             if query fails
      */
-
     Pair<Integer, List<HarvestUrgencyScoreDTO>> getUrgencyOfComingHarvests(int amount) throws DAOException;
 
     /**
-     * Updates source LAST_HARVEST date.
      *
-     * @param sourceUrl
-     * @param lastHarvest
+     * @param sourceDTO
      * @throws DAOException
-     *             if relational database is unavailable.
      */
-    public void updateLastHarvest(String sourceUrl, Timestamp lastHarvest) throws DAOException;
+    public void updateSourceHarvestFinished(HarvestSourceDTO sourceDTO) throws DAOException;
 
+    /**
+     *
+     * @return TODO
+     * @throws DAOException
+     */
+    public int queueNonPriorityUnavailableSourcesForDeletion() throws DAOException;
 }

@@ -29,7 +29,6 @@ import eionet.cr.dao.postgre.PostgreSQLHarvestSourceDAO;
 import eionet.cr.dao.readers.SubjectReader;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.harvest.Harvest;
 import eionet.cr.util.Bindings;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.sesame.SesameUtil;
@@ -75,7 +74,7 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
             // remove source metadata from http://cr.eionet.europa.eu/harvetser graph
             ValueFactory valueFactory = conn.getValueFactory();
             URI subject = valueFactory.createURI(URLUtil.replaceURLSpaces(url));
-            URI context = valueFactory.createURI(Harvest.HARVESTER_URI);
+            URI context = valueFactory.createURI(GeneralConfig.HARVESTER_URI);
             conn.remove(subject, null, null, (Resource)context);
 
             sqlConn.commit();
@@ -268,31 +267,27 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
         return ret;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.dao.HarvestSourceDAO#addSourceToRepository(File, String)
+    /**
+     * @see eionet.cr.dao.postgre.PostgreSQLHarvestSourceDAO#loadIntoRepository(java.io.File, java.lang.String, boolean)
      */
     @Override
-    public int addSourceToRepository(File file, String sourceUrlString) throws IOException, OpenRDFException {
+    public int loadIntoRepository(File file, String graphUrl, boolean clearPreviousGraphContent) throws IOException, OpenRDFException {
 
         InputStream inputStream = null;
         try {
             inputStream = new FileInputStream(file);
-            return addSourceToRepository(inputStream, sourceUrlString);
+            return loadIntoRepository(inputStream, graphUrl, clearPreviousGraphContent);
 
         } finally {
             IOUtils.closeQuietly(inputStream);
         }
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.dao.postgre.PostgreSQLHarvestSourceDAO#addSourceToRepository(java.io.InputStream, java.lang.String)
+    /**
+     * @see eionet.cr.dao.postgre.PostgreSQLHarvestSourceDAO#loadIntoRepository(java.io.InputStream, java.lang.String, boolean)
      */
     @Override
-    public int addSourceToRepository(InputStream inputStream, String sourceUrlString) throws IOException, OpenRDFException {
+    public int loadIntoRepository(InputStream inputStream, String graphUrl, boolean clearPreviousGraphContent) throws IOException, OpenRDFException {
 
         int storedTriplesCount = 0;
         boolean isSuccess = false;
@@ -301,20 +296,21 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
 
             conn = SesameUtil.getRepositoryConnection();
 
-            // see http://www.openrdf.org/doc/sesame2/users/ch08.html#d0e1218
-            // for what's a context
-            org.openrdf.model.URI context = conn.getValueFactory().createURI(sourceUrlString);
+            // convert graph URL into OpenRDF Resource
+            org.openrdf.model.Resource graphResource = conn.getValueFactory().createURI(graphUrl);
 
             // start transaction
             conn.setAutoCommit(false);
 
-            // clear previous triples of this context
-            conn.clear(context);
+            // if required, clear previous triples of this graph
+            if (clearPreviousGraphContent){
+                conn.clear(graphResource);
+            }
 
-            // add the file's contents into repository and under this context
-            conn.add(inputStream, sourceUrlString, RDFFormat.RDFXML, context);
+            // add the stream content into repository under the given graph
+            conn.add(inputStream, graphUrl, RDFFormat.RDFXML, graphResource);
 
-            long tripleCount = conn.size(context);
+            long tripleCount = conn.size(graphResource);
 
             // commit transaction
             conn.commit();
@@ -325,11 +321,8 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
             // no transaction rollback needed, when reached this point
             isSuccess = true;
         } finally {
-            if (!isSuccess && conn != null) {
-                try {
-                    conn.rollback();
-                } catch (RepositoryException e) {
-                }
+            if (!isSuccess) {
+                SesameUtil.rollback(conn);
             }
             SesameUtil.close(conn);
         }
@@ -356,7 +349,7 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
                 conn.setAutoCommit(false);
 
                 // The contextURI is always the harvester URI
-                URI harvesterContext = conn.getValueFactory().createURI(Harvest.HARVESTER_URI);
+                URI harvesterContext = conn.getValueFactory().createURI(GeneralConfig.HARVESTER_URI);
 
                 if (sourceMetadata != null) {
                     URI subject = conn.getValueFactory().createURI(sourceMetadata.getUri());
@@ -421,15 +414,11 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
         + "<http://cr.eionet.europa.eu/ontologies/contreg.rdf#> SELECT ?s FROM ?sourceUrl FROM ?deploymentHost WHERE "
         + "{ ?s a cr:File . OPTIONAL { ?s cr:lastRefreshed ?refreshed } FILTER( !BOUND(?refreshed)) }";
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.dao.HarvestSourceDAO#getNewSources(String)
+    /**
+     * @see eionet.cr.dao.postgre.PostgreSQLHarvestSourceDAO#getNewSources(java.lang.String)
      */
     @Override
-    public List<String> getNewSources(String sourceUrl) throws DAOException, RDFParseException, RepositoryException, IOException {
-
-        List<String> ret = null;
+    public List<String> getNewSources(String sourceUrl) throws DAOException{
 
         if (!StringUtils.isBlank(sourceUrl)) {
             String deploymentHost = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL);
@@ -440,10 +429,11 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
 
             SubjectReader matchReader = new SubjectReader();
             matchReader.setBlankNodeUriPrefix(VirtuosoBaseDAO.BNODE_URI_PREFIX);
-            ret = executeSPARQL(NEW_SOURCES_SPARQL, bindings, matchReader);
+            return executeSPARQL(NEW_SOURCES_SPARQL, bindings, matchReader);
 
         }
-        return ret;
+
+        return null;
     }
     /**
      * SPARQL for getting source metadata.
@@ -463,7 +453,7 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
         try {
 
             Bindings bindings = new Bindings();
-            bindings.setURI("deploymentHost", Harvest.HARVESTER_URI);
+            bindings.setURI("deploymentHost", GeneralConfig.HARVESTER_URI);
             bindings.setURI("subject", harvestSourceUri);
             bindings.setURI("predicate", predicateUri);
 
@@ -488,8 +478,7 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
 
             conn = SesameUtil.getRepositoryConnection();
 
-            String deploymentHost = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL);
-            URI harvesterContext = conn.getValueFactory().createURI(Harvest.HARVESTER_URI);
+            URI harvesterContext = conn.getValueFactory().createURI(GeneralConfig.HARVESTER_URI);
             URI sub = conn.getValueFactory().createURI(subject);
             URI pred = conn.getValueFactory().createURI(predicate);
 
@@ -507,13 +496,11 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
         }
     }
 
-    /*
-     * (non-Javadoc)
+    /**
      *
-     * @see eionet.cr.dao.HarvestSourceDAO#removeAllPredicatesFromHarvesterContext(String, String)
      */
     @Override
-    public void deleteSubjectTriplesInSource(String subjectUri, String sourceUri) throws DAOException, RepositoryException, IOException {
+    public void deleteSubjectTriplesInSource(String subjectUri, String sourceUri) throws DAOException {
 
         if (!StringUtils.isBlank(subjectUri)) {
             RepositoryConnection conn = null;
@@ -523,6 +510,8 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
                 ValueFactory valueFactory = conn.getValueFactory();
                 conn.remove(valueFactory.createURI(subjectUri), null, null, valueFactory.createURI(sourceUri));
 
+            } catch (RepositoryException e) {
+                throw new DAOException(e.getMessage(), e);
             } finally {
                 SesameUtil.close(conn);
             }

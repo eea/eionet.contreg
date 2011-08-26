@@ -76,7 +76,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
 
         // create query helper
         VirtuosoFreeTextSearchHelper helper =
-                new VirtuosoFreeTextSearchHelper(expression, virtQuery, exactMatch, pagingRequest, sortingRequest);
+            new VirtuosoFreeTextSearchHelper(expression, virtQuery, exactMatch, pagingRequest, sortingRequest);
 
         // Set Filter
         helper.setFilter(filterType);
@@ -145,7 +145,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
      */
     private List<String> getGraphUris(List<String> subjectUris) throws DAOException {
         StringBuilder strBuilder =
-                new StringBuilder().append("select distinct(?g) where {graph ?g {?s ?p ?o. ").append("filter (?s IN (");
+            new StringBuilder().append("select distinct(?g) where {graph ?g {?s ?p ?o. ").append("filter (?s IN (");
 
         int i = 0;
         Bindings bindings = new Bindings();
@@ -180,7 +180,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
             PagingRequest pagingRequest, SortingRequest sortingRequest, List<String> selectedPredicates, boolean useInferencing) throws DAOException {
         // create query helper
         VirtuosoFilteredSearchHelper helper =
-                new VirtuosoFilteredSearchHelper(filters, literalPredicates, pagingRequest, sortingRequest, useInferencing);
+            new VirtuosoFilteredSearchHelper(filters, literalPredicates, pagingRequest, sortingRequest, useInferencing);
 
         // create the list of IN parameters of the query
 
@@ -583,15 +583,16 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
     /**
      * SPARQL for Type cache entries.
      */
-    private static final String TYPES_CACHE_SPARQL = "SELECT DISTINCT ?o WHERE {?s a ?o} ORDER BY ?o ";
+    private static final String TYPES_CACHE_SPARQL = "SELECT DISTINCT ?o WHERE {?s a ?o . filter isURI(?o)} ORDER BY ?o ";
 
     @Override
     public List<SubjectDTO> getTypes() throws DAOException {
-        List<String> typeSubjectUris = executeSPARQL(TYPES_CACHE_SPARQL, new SingleObjectReader<String>());
+
+        List<String> typeUris = executeSPARQL(TYPES_CACHE_SPARQL, new SingleObjectReader<String>());
         String[] neededPredicates = {Predicates.RDFS_LABEL};
 
         List<SubjectDTO> resultList =
-                getSubjectsData(typeSubjectUris, neededPredicates, new SubjectDataReader(typeSubjectUris), null);
+            getSubjectsData(typeUris, neededPredicates, new SubjectDataReader(typeUris), null);
         return resultList;
     }
 

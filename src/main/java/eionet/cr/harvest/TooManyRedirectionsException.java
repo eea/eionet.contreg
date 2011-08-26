@@ -21,33 +21,26 @@
 
 package eionet.cr.harvest;
 
+import eionet.cr.harvest.HarvestException;
 
 /**
  *
  * @author Jaanus Heinlaid
  */
-public interface Harvest {
-
-    /**
-     *
-     * @throws HarvestException
-     */
-    void execute() throws HarvestException;
-
-    /**
-     *
-     * @param harvestUser
-     */
-    void setHarvestUser(String harvestUser);
+public class TooManyRedirectionsException extends HarvestException{
 
     /**
      *
      */
-    String getContextUrl();
+    public TooManyRedirectionsException() {
+        super();
+    }
 
     /**
      *
-     * @return
+     * @param message
      */
-    int getStoredTriplesCount();
+    public TooManyRedirectionsException(String message) {
+        super(message);
+    }
 }

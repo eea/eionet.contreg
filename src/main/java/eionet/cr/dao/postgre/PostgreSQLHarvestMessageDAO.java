@@ -68,7 +68,7 @@ public class PostgreSQLHarvestMessageDAO extends PostgreSQLBaseDAO implements Ha
 
     /** */
     private static final String q_insertHarvestMessage =
-            "insert into HARVEST_MESSAGE (HARVEST_ID, TYPE, MESSAGE, STACK_TRACE) values (?, ?, ?, ?)";
+        "insert into HARVEST_MESSAGE (HARVEST_ID, TYPE, MESSAGE, STACK_TRACE) values (?, ?, ?, ?)";
 
     /*
      * (non-Javadoc)

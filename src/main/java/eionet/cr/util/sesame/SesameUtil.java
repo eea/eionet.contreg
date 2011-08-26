@@ -98,16 +98,19 @@ public class SesameUtil {
      * @throws ResultSetReaderException
      */
     public static <T> void executeQuery(String sparql, SPARQLResultSetReader<T> reader, RepositoryConnection conn)
-            throws OpenRDFException, ResultSetReaderException {
+    throws OpenRDFException, ResultSetReaderException {
 
         executeQuery(sparql, null, reader, conn);
     }
 
     /**
      * Executes Query that performs modifications in data.
+     *
      * @param sparql
-     * @param conn repository connection
-     * @param bindings Query bindings
+     * @param conn
+     *            repository connection
+     * @param bindings
+     *            Query bindings
      * @throws RepositoryException
      * @throws QueryEvaluationException
      * @throws MalformedQueryException
@@ -115,7 +118,7 @@ public class SesameUtil {
      *             Executes SPARQL query that changes RDF data. Rollback is NOT made if query does not succeed
      */
     public static void executeUpdateQuery(String sparql, RepositoryConnection conn, Bindings bindings) throws RepositoryException,
-            QueryEvaluationException, MalformedQueryException {
+    QueryEvaluationException, MalformedQueryException {
 
         BooleanQuery query = conn.prepareBooleanQuery(QueryLanguage.SPARQL, sparql);
         if (bindings != null) {
@@ -134,7 +137,8 @@ public class SesameUtil {
      *            RDF handler for output RDF format
      * @param conn
      *            RepositoryConnection
-     * @param bindings Query Bindings
+     * @param bindings
+     *            Query Bindings
      * @throws QueryEvaluationException
      *             if query evaluation fails
      * @throws RDFHandlerException
@@ -145,8 +149,8 @@ public class SesameUtil {
      *             if Repository API call fails
      */
     public static void exportGraphQuery(final String sparql, final RDFHandler rdfHandler, final RepositoryConnection conn,
-            final Bindings bindings)
-            throws QueryEvaluationException, RDFHandlerException, MalformedQueryException, RepositoryException {
+            final Bindings bindings) throws QueryEvaluationException, RDFHandlerException, MalformedQueryException,
+            RepositoryException {
 
         GraphQuery graphQuery = conn.prepareGraphQuery(QueryLanguage.SPARQL, sparql);
         if (bindings != null) {
@@ -209,8 +213,23 @@ public class SesameUtil {
             try {
                 conn.close();
             } catch (RepositoryException e) {
+                // ignoring repository closing exceptions
             }
         }
     }
 
+    /**
+     *
+     * @param conn
+     */
+    public static void rollback(RepositoryConnection conn) {
+
+        if (conn != null) {
+            try {
+                conn.rollback();
+            } catch (RepositoryException e) {
+                // ignoring rollback exceptions
+            }
+        }
+    }
 }

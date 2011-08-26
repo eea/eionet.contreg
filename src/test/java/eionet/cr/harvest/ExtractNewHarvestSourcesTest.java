@@ -54,11 +54,11 @@ public class ExtractNewHarvestSourcesTest extends CRDatabaseTestCase {
 
         try {
             URL url = getClass().getClassLoader().getResource("extract-new-sources.xml");
-            Harvest harvest = new PullHarvest(url.toString(), null);
+            Harvest harvest = new PullHarvest(url.toString());
             harvest.execute();
 
             Pair<Integer, List<HarvestSourceDTO>> resultPair =
-                    DAOFactory.get().getDao(HarvestSourceDAO.class).getPrioritySources(null, null, null);
+                DAOFactory.get().getDao(HarvestSourceDAO.class).getPrioritySources(null, null, null);
             assertNotNull(resultPair);
             assertNotNull(resultPair.getLeft());
             assertNotNull(resultPair.getRight());

@@ -48,8 +48,9 @@ public class InstantHarvestTest extends CRDatabaseTestCase {
 
         try {
             URL url = getClass().getClassLoader().getResource("taxon-over-rdf.xml");
-            InstantHarvest instantHarvest = new InstantHarvest(url.toString(), null, "guest");
-            instantHarvest.execute();
+            PullHarvest pullHarvest = new PullHarvest(url.toString());
+            pullHarvest.setHarvestUser("guest");
+            pullHarvest.execute();
         } catch (Throwable e) {
             e.printStackTrace();
             fail("Was not expecting this exception: " + e.toString());

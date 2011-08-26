@@ -187,9 +187,8 @@ public class URLUtil {
      *
      * @param url
      * @return URL
-     * @throws MalformedURLException
      */
-    public static String replaceURLSpaces(String url) throws MalformedURLException {
+    public static String replaceURLSpaces(String url){
 
         return url == null ? null : StringUtils.replace(url.toString(), " ", "%20");
     }

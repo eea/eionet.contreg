@@ -61,7 +61,6 @@ import eionet.cr.dto.TripleDTO;
 import eionet.cr.dto.UploadDTO;
 import eionet.cr.dto.UserBookmarkDTO;
 import eionet.cr.dto.UserHistoryDTO;
-import eionet.cr.harvest.Harvest;
 import eionet.cr.util.Bindings;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.ObjectLabelPair;
@@ -1548,7 +1547,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
                 URI subjectResource = valueFactory.createURI(subjectUri);
                 URI userHomeContext = valueFactory.createURI(CRUser.homeUri(userName));
-                URI harvesterContext = valueFactory.createURI(Harvest.HARVESTER_URI);
+                URI harvesterContext = valueFactory.createURI(GeneralConfig.HARVESTER_URI);
 
                 // JH190511: although Sesame API claims that in RepositoryConnection.remove(...)
                 // the context is optional, Virtuoso requires the context (i.e. the graph) always

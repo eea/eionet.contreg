@@ -9,30 +9,30 @@
  * implied. See the License for the specific language governing
  * rights and limitations under the License.
  *
- * The Original Code is Content Registry 2.0.
+ * The Original Code is Content Registry 3
  *
  * The Initial Owner of the Original Code is European Environment
- * Agency.  Portions created by Tieto Eesti are Copyright
+ * Agency. Portions created by Zero Technologies are Copyright
  * (C) European Environment Agency.  All Rights Reserved.
  *
  * Contributor(s):
- * Jaanus Heinlaid, Tieto Eesti
+ *		Jaanus Heinlaid
  */
+
 package eionet.cr.harvest;
 
-import eionet.cr.common.CRRuntimeException;
+import eionet.cr.harvest.HarvestException;
 
 /**
  *
- * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * @author Jaanus Heinlaid
  */
-public class RDFLoadingException extends CRRuntimeException {
+public class NoRedirectLocationException extends HarvestException{
 
     /**
      *
      */
-    public RDFLoadingException() {
+    public NoRedirectLocationException() {
         super();
     }
 
@@ -40,16 +40,7 @@ public class RDFLoadingException extends CRRuntimeException {
      *
      * @param message
      */
-    public RDFLoadingException(String message) {
+    public NoRedirectLocationException(String message) {
         super(message);
-    }
-
-    /**
-     *
-     * @param message
-     * @param cause
-     */
-    public RDFLoadingException(String message, Throwable cause) {
-        super(message, cause);
     }
 }

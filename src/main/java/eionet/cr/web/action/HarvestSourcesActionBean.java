@@ -20,7 +20,6 @@
  */
 package eionet.cr.web.action;
 
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -126,11 +125,7 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
         try {
             String filterString = null;
             if (!StringUtils.isEmpty(this.searchString)) {
-                try {
-                    this.searchString = URLUtil.replaceURLSpaces(this.searchString);
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                }
+                this.searchString = URLUtil.replaceURLSpaces(this.searchString);
                 filterString = "%" + StringEscapeUtils.escapeSql(this.searchString) + "%";
             }
 

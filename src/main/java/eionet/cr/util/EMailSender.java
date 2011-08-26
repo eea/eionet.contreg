@@ -20,6 +20,7 @@
  */
 package eionet.cr.util;
 
+import javax.mail.Authenticator;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -73,7 +74,7 @@ public final class EMailSender {
      *             if sending fails
      */
     public static void send(final String[] to, final String subject, final String body, final boolean ccSysAdmin)
-            throws MessagingException {
+    throws MessagingException {
 
         // if no mail.host specified in the properties, go no further
         String mailHost = GeneralConfig.getProperty("mail.host");
@@ -81,7 +82,13 @@ public final class EMailSender {
             return;
         }
 
-        Session session = Session.getDefaultInstance(GeneralConfig.getProperties(), null);
+        Authenticator authenticator = null;
+        if (GeneralConfig.getProperty("mail.smtp.auth")!=null && GeneralConfig.getProperty("mail.smtp.auth").equals("true")){
+            String user = GeneralConfig.getProperty("mail.user");
+            String password = GeneralConfig.getProperty("mail.password");
+            authenticator = new EMailAuthenticator(user, password);
+        }
+        Session session = Session.getDefaultInstance(GeneralConfig.getProperties(), authenticator);
         MimeMessage message = new MimeMessage(session);
         for (int i = 0; i < to.length; i++) {
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(to[i]));

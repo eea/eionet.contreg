@@ -85,7 +85,7 @@ public class CurrentHarvests {
      * @return
      */
     public static synchronized boolean contains(String url) {
-        return url == null ? false : (queuedHarvest != null && url.equals(queuedHarvest.getSourceUrlString()))
+        return url == null ? false : (queuedHarvest != null && url.equals(queuedHarvest.getContextUrl()))
                 || onDemandHarvests.containsKey(url);
     }
 
@@ -96,7 +96,7 @@ public class CurrentHarvests {
      */
     public static synchronized boolean contains(long urlHash) {
 
-        if (queuedHarvest != null && Hashes.spoHash(queuedHarvest.getSourceUrlString()) == urlHash)
+        if (queuedHarvest != null && Hashes.spoHash(queuedHarvest.getContextUrl()) == urlHash)
             return true;
 
         for (String url : onDemandHarvests.keySet()) {

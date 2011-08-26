@@ -22,6 +22,8 @@ package eionet.cr.util.sesame;
 
 import java.util.Collection;
 
+import org.apache.log4j.Logger;
+
 import eionet.cr.common.Namespace;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.util.Bindings;
@@ -32,6 +34,9 @@ import eionet.cr.util.Bindings;
  * @author Enriko Käsper
  */
 public class SPARQLQueryUtil {
+
+    /** */
+    private static final Logger LOGGER = Logger.getLogger(SPARQLQueryUtil.class);
 
     /**
      * Inference definition in SPARQL.
@@ -46,7 +51,7 @@ public class SPARQLQueryUtil {
     public static StringBuilder getCrInferenceDefinition() {
         StringBuilder strBuilder = new StringBuilder();
         strBuilder.append(inferenceDef).append("'").append(GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME))
-                .append("' ");
+        .append("' ");
         return strBuilder;
     }
 
@@ -145,7 +150,7 @@ public class SPARQLQueryUtil {
      */
     public static String getOrderByClause(final String aliasName, final String sortOrder) {
         return "ORDER BY " + sortOrder + "(bif:either( bif:isnull(?" + aliasName + ") , "
-                + "(bif:lcase(bif:subseq (bif:replace (?s, '/', '#'), bif:strrchr (bif:replace (?s, '/', '#'), '#')+1))) , "
-                + "bif:lcase(?" + aliasName + ")))";
+        + "(bif:lcase(bif:subseq (bif:replace (?s, '/', '#'), bif:strrchr (bif:replace (?s, '/', '#'), '#')+1))) , "
+        + "bif:lcase(?" + aliasName + ")))";
     }
 }

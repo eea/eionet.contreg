@@ -20,6 +20,8 @@
  */
 package eionet.cr.dto;
 
+import eionet.cr.harvest.util.HarvestMessageType;
+
 /**
  *
  * @author heinljab
@@ -41,18 +43,18 @@ public class HarvestMessageDTO implements java.io.Serializable {
     }
 
     /**
-     * @return the harvestID
+     * @return the harvestId
      */
     public Integer getHarvestId() {
         return harvestId;
     }
 
     /**
-     * @param harvestID
-     *            the harvestID to set
+     * @param harvestId
+     *            the harvestId to set
      */
-    public void setHarvestId(Integer harvestID) {
-        this.harvestId = harvestID;
+    public void setHarvestId(Integer harvestId) {
+        this.harvestId = harvestId;
     }
 
     /**
@@ -100,11 +102,33 @@ public class HarvestMessageDTO implements java.io.Serializable {
         this.stackTrace = stackTrace;
     }
 
+    /**
+     * @return
+     */
     public Integer getHarvestMessageId() {
         return harvestMessageId;
     }
 
+    /**
+     * @param harvestMessageId
+     */
     public void setHarvestMessageId(Integer harvestMessageId) {
         this.harvestMessageId = harvestMessageId;
+    }
+
+    /**
+     *
+     * @param message
+     * @param messageType
+     * @param stackTrace
+     * @return
+     */
+    public static HarvestMessageDTO create(String message, HarvestMessageType messageType, String stackTrace){
+
+        HarvestMessageDTO dto = new HarvestMessageDTO();
+        dto.setMessage(message);
+        dto.setType(messageType==null ? null : messageType.toString());
+        dto.setStackTrace(stackTrace);
+        return dto;
     }
 }

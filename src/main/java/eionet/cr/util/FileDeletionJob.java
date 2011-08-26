@@ -130,7 +130,9 @@ public class FileDeletionJob implements ServletContextListener, StatefulJob {
      */
     public static synchronized void register(File file) {
 
-        queuedFiles.add(file);
+        if (file!=null){
+            queuedFiles.add(file);
+        }
     }
 
     /*

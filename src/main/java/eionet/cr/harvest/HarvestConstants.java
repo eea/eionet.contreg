@@ -21,33 +21,17 @@
 
 package eionet.cr.harvest;
 
-
 /**
  *
  * @author Jaanus Heinlaid
  */
-public interface Harvest {
+public class HarvestConstants {
 
-    /**
-     *
-     * @throws HarvestException
-     */
-    void execute() throws HarvestException;
+    /** */
+    private static final String HARVEST_FILE_NAME_EXTENSION = ".xml";
+    public static final String STATUS_STARTED = "started";
+    public static final String STATUS_FINISHED = "finished";
+    public static final String TYPE_PULL = "pull";
+    public static final String TYPE_PUSH = "push";
 
-    /**
-     *
-     * @param harvestUser
-     */
-    void setHarvestUser(String harvestUser);
-
-    /**
-     *
-     */
-    String getContextUrl();
-
-    /**
-     *
-     * @return
-     */
-    int getStoredTriplesCount();
 }

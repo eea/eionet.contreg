@@ -56,7 +56,7 @@ public class HarvestSubClassDbTest extends CRDatabaseTestCase {
 
         try {
             URL url = getClass().getClassLoader().getResource("subclass-rdf.xml");
-            Harvest harvest = new PullHarvest(url.toString(), null);
+            Harvest harvest = new PullHarvest(url.toString());
             harvest.execute();
 
             compareDatasets("subclass-db.xml", false);
@@ -72,11 +72,11 @@ public class HarvestSubClassDbTest extends CRDatabaseTestCase {
 
         try {
             URL url = getClass().getClassLoader().getResource("subclass-s1-rdf.xml");
-            Harvest harvest = new PullHarvest(url.toString(), null);
+            Harvest harvest = new PullHarvest(url.toString());
             harvest.execute();
 
             url = getClass().getClassLoader().getResource("subclass-s2-rdf.xml");
-            harvest = new PullHarvest(url.toString(), null);
+            harvest = new PullHarvest(url.toString());
             harvest.execute();
 
             compareDatasets("subclass-db.xml", false);

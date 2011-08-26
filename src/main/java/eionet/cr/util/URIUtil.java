@@ -47,8 +47,9 @@ public class URIUtil {
      */
     public static boolean isSchemedURI(String str) {
 
-        if (Util.isNullOrEmpty(str))
+        if (Util.isNullOrEmpty(str)){
             return false;
+        }
 
         try {
             URI uri = new URI(str);
@@ -59,6 +60,25 @@ public class URIUtil {
                 initSchemes();
 
             return schemes.contains(uri.getScheme());
+        } catch (URISyntaxException e) {
+            return false;
+        }
+    }
+
+    /**
+     *
+     * @param str
+     * @return
+     */
+    public static boolean isURI(String str) {
+
+        if (Util.isNullOrEmpty(str)){
+            return false;
+        }
+
+        try {
+            URI uri = new URI(str);
+            return uri!=null;
         } catch (URISyntaxException e) {
             return false;
         }

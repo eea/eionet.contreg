@@ -48,10 +48,10 @@ public class HarvestTest extends CRDatabaseTestCase {
 
         try {
             URL o = getClass().getClassLoader().getResource("test-rdf.xml");
-            Harvest harvest = new PullHarvest(o.toString(), null);
+            Harvest harvest = new PullHarvest(o.toString());
             harvest.execute();
 
-            assertEquals((int) 49, harvest.getStoredTriplesCount());
+            assertEquals(49, harvest.getStoredTriplesCount());
         } catch (Throwable e) {
             e.printStackTrace();
             fail("Was not expecting this exception: " + e.toString());
@@ -62,11 +62,9 @@ public class HarvestTest extends CRDatabaseTestCase {
     public void testHarvestNonExistingURL() {
 
         try {
-            PullHarvest harvest = new PullHarvest("http://www.jaanusheinlaid.tw", null);
+            PullHarvest harvest = new PullHarvest("http://www.jaanusheinlaid.tw");
             harvest.execute();
-
-            assertNotNull(harvest.getSourceAvailable());
-            assertFalse(harvest.getSourceAvailable().booleanValue());
+            assertFalse(harvest.isSourceAvailable());
         } catch (HarvestException e) {
             e.printStackTrace();
             fail("Was not expecting this exception: " + e.toString());
@@ -78,12 +76,10 @@ public class HarvestTest extends CRDatabaseTestCase {
 
         try {
             PullHarvest harvest =
-                    new PullHarvest("https://svn.eionet.europa.eu/repositories/Reportnet/cr2/trunk/test-rdf/test-rdf.xml", null);
+                new PullHarvest("https://svn.eionet.europa.eu/repositories/Reportnet/cr2/trunk/test-rdf/test-rdf.xml");
             harvest.execute();
-
-            assertNotNull(harvest.getSourceAvailable());
-            assertTrue(harvest.getSourceAvailable().booleanValue());
-            assertEquals((int) 49, harvest.getStoredTriplesCount());
+            assertTrue(harvest.isSourceAvailable());
+            assertEquals(49, harvest.getStoredTriplesCount());
         } catch (HarvestException e) {
             e.printStackTrace();
             fail("Was not expecting this exception: " + e.toString());

@@ -44,6 +44,10 @@ import eionet.cr.web.security.CRUser;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
+/**
+ *
+ * @author Jaanus Heinlaid
+ */
 public class SubjectDTO implements Serializable {
 
     /**
@@ -484,15 +488,32 @@ public class SubjectDTO implements Serializable {
         return existsPredicateObjectSource(Predicates.RDF_TYPE, Subjects.CR_FILE, user.getRegistrationsUri());
     }
 
+    /**
+     * @return
+     */
     public Date getDcDate() {
         return dcDate;
     }
 
+    /**
+     * @param dcDate
+     */
     public void setDcDate(Date dcDate) {
         this.dcDate = dcDate;
     }
 
-    public void setUri(String uri) {
-        this.uri = uri;
+    /**
+     *
+     * @return
+     */
+    public int getTripleCount(){
+
+        int result = 0;
+        for (Collection<ObjectDTO> objects : predicates.values()){
+            if (objects!=null){
+                result = result + objects.size();
+            }
+        }
+        return result;
     }
 }

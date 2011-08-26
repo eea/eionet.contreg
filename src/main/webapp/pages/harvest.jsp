@@ -64,7 +64,7 @@
                             <c:forEach items="${actionBean.fatals}" var="msg" varStatus="loop">
                                 <tr>
                                     <td><c:out value="${msg.message}"/></td>
-                                    <td><c:out value="${msg.stackTrace}"/></td>
+                                    <td>${crfn:formatStackTrace(fn:escapeXml(msg.stackTrace))}</td>
                                 </tr>
                             </c:forEach>
                         </tbody>
@@ -83,7 +83,7 @@
                             <c:forEach items="${actionBean.errors}" var="msg" varStatus="loop">
                                 <tr>
                                     <td><c:out value="${msg.message}"/></td>
-                                    <td><c:out value="${msg.stackTrace}"/></td>
+                                    <td>${crfn:formatStackTrace(fn:escapeXml(msg.stackTrace))}</td>
                                 </tr>
                             </c:forEach>
                         </tbody>
@@ -102,7 +102,7 @@
                             <c:forEach items="${actionBean.warnings}" var="msg" varStatus="loop">
                                 <tr>
                                     <td><c:out value="${msg.message}"/></td>
-                                    <td><c:out value="${msg.stackTrace}"/></td>
+                                    <td>${crfn:formatStackTrace(fn:escapeXml(msg.stackTrace))}</td>
                                 </tr>
                             </c:forEach>
                         </tbody>

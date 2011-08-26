@@ -20,65 +20,64 @@
  */
 package eionet.cr.harvest;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 
-import eionet.cr.harvest.util.arp.ReaderBasedARPSource;
+import org.apache.commons.lang.StringUtils;
+import org.openrdf.OpenRDFException;
 
 /**
  *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class PushHarvest extends Harvest {
+public class PushHarvest extends BaseHarvest {
 
     /** */
-    protected String content = null;
+    protected String pushedContent = null;
 
     /**
      *
-     * @param sourceUri
+     * @param contextUrl
+     * @throws HarvestException
      */
-    public PushHarvest(String content, String sourceUri) {
-        super(sourceUri);
-        this.content = content;
-        this.clearPreviousContent = false;
+    public PushHarvest(String contextUrl, String pushedContent) throws HarvestException {
+
+        super(contextUrl);
+        this.pushedContent = pushedContent;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.harvest.Harvest#doExecute()
+    /**
+     * @see eionet.cr.harvest.temp.BaseHarvest#doHarvest()
      */
-    protected void doExecute() throws HarvestException {
+    @Override
+    protected void doHarvest() throws HarvestException {
 
-        if (content == null || content.trim().length() == 0)
-            throw new HarvestException("No content supplied for push-harvesting from url [" + sourceUrlString + "]");
+        if (StringUtils.isEmpty(pushedContent)){
+            throw new HarvestException("Pushed content must not be empty!");
+        }
 
-        Reader stringReader = null;
+        InputStream inputStream = null;
         try {
-            stringReader = new StringReader(content);
-            sourceLastModified = System.currentTimeMillis();
-            harvest(new ReaderBasedARPSource(stringReader));
-        } finally {
-            if (stringReader != null) {
-                try {
-                    stringReader.close();
-                } catch (IOException e) {
-                }
-            }
+            inputStream = new ByteArrayInputStream(pushedContent.getBytes("UTF-8"));
+            int noOfTriples = getHarvestSourceDAO().loadIntoRepository(inputStream, getContextUrl(), false);
+            setStoredTriplesCount(noOfTriples);
+        } catch (UnsupportedEncodingException e) {
+            throw new HarvestException(e.getMessage(), e);
+        } catch (IOException e) {
+            throw new HarvestException(e.getMessage(), e);
+        } catch (OpenRDFException e) {
+            throw new HarvestException(e.getMessage(), e);
         }
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.harvest.Harvest#doHarvestStartedActions()
+    /**
+     * @see eionet.cr.harvest.BaseHarvest#getHarvestType()
      */
-    protected void doHarvestStartedActions() throws HarvestException {
+    protected String getHarvestType(){
 
-        logger.debug("Push harvest started");
-        super.doHarvestStartedActions();
+        return HarvestConstants.TYPE_PUSH;
     }
 }

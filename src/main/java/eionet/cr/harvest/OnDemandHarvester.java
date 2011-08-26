@@ -38,7 +38,7 @@ import eionet.cr.web.security.CRUser;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class InstantHarvester extends Thread {
+public class OnDemandHarvester extends Thread {
 
     /** */
     public enum Resolution {
@@ -55,9 +55,9 @@ public class InstantHarvester extends Thread {
     /** */
     private boolean rdfContentFound = false;
     private boolean sourceAvailable = false;
-    private boolean needsHarvesting = true;
+    //    private boolean needsHarvesting = true;
 
-    private InstantHarvester(String sourceUrl, String userName) {
+    private OnDemandHarvester(String sourceUrl, String userName) {
 
         this.sourceUrl = sourceUrl;
         this.userName = userName;
@@ -70,10 +70,12 @@ public class InstantHarvester extends Thread {
      */
     public void run() {
 
-        InstantHarvest instantHarvest = null;
+        PullHarvest pullHarvest = null;
         try {
-            instantHarvest = InstantHarvest.createFullSetup(sourceUrl, userName);
-            instantHarvest.execute();
+            pullHarvest = new PullHarvest(sourceUrl);
+            pullHarvest.setOnDemandHarvest(true);
+            pullHarvest.setHarvestUser(userName);
+            pullHarvest.execute();
 
             // add triple stating that this source is marked as cr:File by this user
             ObjectDTO objectDTO = new ObjectDTO(Subjects.CR_FILE, false);
@@ -85,7 +87,7 @@ public class InstantHarvester extends Thread {
             // since user registrations URI was used as triple source, add it to HARVEST_SOURCE too
             // (but set interval minutes to 0, to avoid it being background-harvested)
             DAOFactory.get().getDao(HarvestSourceDAO.class)
-                    .addSourceIgnoreDuplicate(HarvestSourceDTO.create(CRUser.registrationsUri(userName), true, 0, userName));
+            .addSourceIgnoreDuplicate(HarvestSourceDTO.create(CRUser.registrationsUri(userName), true, 0, userName));
 
         } catch (HarvestException e) {
             harvestException = e;
@@ -96,13 +98,12 @@ public class InstantHarvester extends Thread {
                 harvestException = new HarvestException(e.toString(), e);
             }
         } finally {
-            if (instantHarvest != null) {
-                rdfContentFound = instantHarvest.isRdfContentFound();
-                sourceAvailable =
-                        instantHarvest.getSourceAvailable() != null && instantHarvest.getSourceAvailable().booleanValue();
-                // Check if source is redirected and destination
-                // source has been recently updated
-                needsHarvesting = instantHarvest.needsHarvesting;
+            if (pullHarvest != null) {
+                rdfContentFound = pullHarvest.getStoredTriplesCount()>0;
+                sourceAvailable = pullHarvest.isSourceAvailable();
+
+                // TODO - check if source is redirected and destination source has been recently updated
+                // needsHarvesting = true;//instantHarvest.needsHarvesting;
             }
             CurrentHarvests.removeOnDemandHarvest(sourceUrl);
         }
@@ -136,9 +137,9 @@ public class InstantHarvester extends Thread {
 
         CurrentHarvests.addOnDemandHarvest(sourceUrl, userName);
 
-        InstantHarvester instantHarvester = null;
+        OnDemandHarvester instantHarvester = null;
         try {
-            instantHarvester = new InstantHarvester(sourceUrl, userName);
+            instantHarvester = new OnDemandHarvester(sourceUrl, userName);
             instantHarvester.start();
 
             for (int loopCount = 0; instantHarvester.isAlive() && loopCount < 15; loopCount++) {
@@ -159,8 +160,8 @@ public class InstantHarvester extends Thread {
                         return Resolution.SOURCE_UNAVAILABLE;
                     else if (!instantHarvester.isRdfContentFound())
                         return Resolution.NO_STRUCTURED_DATA;
-                    else if (!instantHarvester.isNeedsHarvesting())
-                        return Resolution.RECENTLY_HARVESTED;
+                    //                    else if (!instantHarvester.isNeedsHarvesting())
+                    //                        return Resolution.RECENTLY_HARVESTED;
                     else
                         return Resolution.COMPLETE;
                 }
@@ -194,11 +195,11 @@ public class InstantHarvester extends Thread {
     public boolean isSourceAvailable() {
         return sourceAvailable;
     }
-
-    /**
-     * @return the needsHarvesting
-     */
-    public boolean isNeedsHarvesting() {
-        return needsHarvesting;
-    }
+    //
+    //    /**
+    //     * @return the needsHarvesting
+    //     */
+    //    public boolean isNeedsHarvesting() {
+    //        return needsHarvesting;
+    //    }
 }

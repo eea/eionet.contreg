@@ -20,6 +20,8 @@
  */
 package eionet.cr.harvest.util;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
@@ -34,18 +36,39 @@ public enum HarvestMessageType {
 
     /**
      *
-     * @param value1
+     * @param value
      */
-    HarvestMessageType(String value) {
+    private HarvestMessageType(String value) {
         this.value = value;
     }
 
-    /*
-     * (non-Javadoc)
-     *
+    /**
      * @see java.lang.Enum#toString()
      */
+    @Override
     public String toString() {
         return value;
+    }
+
+    /**
+     *
+     * @param str
+     * @return
+     */
+    public static HarvestMessageType parseFrom(String str){
+
+        if (StringUtils.isBlank(str)){
+            return null;
+        }
+        else{
+            for (HarvestMessageType messageType : HarvestMessageType.values()){
+
+                if (str.equals(messageType.toString())){
+                    return messageType;
+                }
+            }
+        }
+
+        return null;
     }
 }

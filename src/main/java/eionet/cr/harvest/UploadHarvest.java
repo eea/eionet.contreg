@@ -40,19 +40,24 @@ import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.log4j.Logger;
 import org.openrdf.OpenRDFException;
+import org.openrdf.model.vocabulary.XMLSchema;
 import org.openrdf.rio.RDFParseException;
 import org.xml.sax.SAXException;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.common.TempFilePathGenerator;
 import eionet.cr.config.GeneralConfig;
-import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
+import eionet.cr.harvest.util.HarvestMessageType;
+import eionet.cr.util.FileDeletionJob;
+import eionet.cr.util.URIUtil;
 import eionet.cr.util.URLUtil;
+import eionet.cr.util.Util;
 import eionet.cr.util.xml.ConversionsParser;
 import eionet.cr.util.xml.XmlAnalysis;
 
@@ -61,7 +66,10 @@ import eionet.cr.util.xml.XmlAnalysis;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class UploadHarvest extends Harvest {
+public class UploadHarvest extends BaseHarvest {
+
+    /** */
+    private static final Logger LOGGER = Logger.getLogger(UploadHarvest.class);
 
     /** */
     private FileBean fileBean;
@@ -71,30 +79,15 @@ public class UploadHarvest extends Harvest {
 
     /**
      *
-     * @param dto
+     * @param contextSourceDTO
      * @param fileBean
-     * @param dcTitle
+     * @param fileTitle
      * @param userName
      */
-    public UploadHarvest(HarvestSourceDTO dto, FileBean fileBean, String dcTitle, String userName) {
-
-        this(dto.getUrl(), fileBean, dcTitle, userName);
-
-        // set harvest log writer
-        setDaoWriter(new HarvestDAOWriter(dto.getSourceId(), Harvest.TYPE_PUSH, userName));
-    }
-
-    /**
-     *
-     * @param sourceUrlString
-     * @param fileBean
-     * @param dcTitle
-     * @param userName
-     */
-    public UploadHarvest(String sourceUrlString, FileBean fileBean, String dcTitle, String userName) {
+    public UploadHarvest(HarvestSourceDTO contextSourceDTO, FileBean fileBean, String fileTitle, String userName) {
 
         // call super-class constructor
-        super(sourceUrlString);
+        super(contextSourceDTO);
 
         // make sure file bean is not null
         if (fileBean == null) {
@@ -105,52 +98,39 @@ public class UploadHarvest extends Harvest {
         this.fileBean = fileBean;
         this.userName = userName;
 
-        // set auto-generated triples already detectable for this source
-
-        sourceMetadata.addObject(Predicates.CR_BYTE_SIZE, new ObjectDTO(String.valueOf(fileBean.getSize()), true));
-
+        // set source metadata already detectable right now
+        addSourceMetadata(Predicates.CR_BYTE_SIZE, ObjectDTO.createLiteral(String.valueOf(fileBean.getSize())));
+        addSourceMetadata(Predicates.CR_LAST_MODIFIED, ObjectDTO.createLiteral(formatDate(new Date()), XMLSchema.DATETIME));
         String contentType = fileBean.getContentType();
         if (!StringUtils.isBlank(contentType)) {
-            sourceMetadata.addObject(Predicates.CR_MEDIA_TYPE, new ObjectDTO(fileBean.getContentType(), true));
+            addSourceMetadata(Predicates.CR_MEDIA_TYPE, ObjectDTO.createLiteral(contentType));
+        }
+        if (!StringUtils.isBlank(fileTitle)) {
+            addSourceMetadata(Predicates.DC_TITLE, ObjectDTO.createLiteral(fileTitle));
         }
 
-        sourceMetadata.addObject(Predicates.CR_LAST_MODIFIED, new ObjectDTO(dateFormat.format(new Date()), true));
-
-        if (!StringUtils.isBlank(dcTitle)) {
-            sourceMetadata.addObject(Predicates.DC_TITLE, new ObjectDTO(dcTitle, true));
-        }
+        // upload harvest should remove the source's previous metadata
+        setCleanAllPreviousSourceMetadata(true);
     }
 
     /**
-     * @param dto
-     * @throws HarvestException
-     *
+     * @see eionet.cr.harvest.temp.BaseHarvest#doHarvest()
      */
-    public void createDaoWriter(HarvestSourceDTO dto) throws HarvestException {
+    @Override
+    protected void doHarvest() throws HarvestException {
 
-        setDaoWriter(new HarvestDAOWriter(dto.getSourceId(), Harvest.TYPE_PUSH, userName));
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.harvest.Harvest#doExecute()
-     */
-    protected void doExecute() throws HarvestException {
-
-        CurrentHarvests.addOnDemandHarvest(sourceUrlString, userName);
-
-        logger.debug("Execution started");
-
+        int noOfTriples = 0;
         File convertedFile = null;
         InputStream inputStream = null;
         try {
+            LOGGER.debug("Pre-parsing the file");
+
             XmlAnalysis xmlAnalysis = parse();
 
             // if file is XML
             if (xmlAnalysis != null) {
 
-                logger.debug("File is XML, trying conversion");
+                LOGGER.debug("File is XML, trying conversion");
 
                 // convert file to RDF, if success then construct input stream from converted file,
                 // otherwise construct it from original file
@@ -158,70 +138,103 @@ public class UploadHarvest extends Harvest {
                 convertedFile = convert(xmlAnalysis, fileBean);
                 if (convertedFile != null && convertedFile.exists()) {
 
-                    logger.debug("Converted file will be harvested");
+                    LOGGER.debug("Converted file will be harvested");
                     inputStream = new FileInputStream(convertedFile);
                 } else {
-                    logger.debug("No conversion made, will harvest the file as it is");
+                    LOGGER.debug("No conversion made, will harvest the file as it is");
                     inputStream = fileBean.getInputStream();
                 }
             } else {
-                logger.debug("File is not XML");
+                LOGGER.debug("File does not seem to be XML");
             }
 
             HarvestSourceDAO harvestSourceDAO = DAOFactory.get().getDao(HarvestSourceDAO.class);
 
-            // remove old auto-generated metadata (i.e. the onw that's in harvster's context)
-            logger.debug("Removing old auto-generated triples about the source");
-            harvestSourceDAO.deleteSubjectTriplesInSource(sourceUrlString, Harvest.HARVESTER_URI);
-
-            // insert new auto generated metadata
-            logger.debug("Storing new auto-generated triples about the source");
-            harvestSourceDAO.addSourceMetadata(sourceMetadata);
-
             if (inputStream != null) {
 
-                // try to harvest the stream
-                logger.debug("Loading the file contents into the triple store");
-                int triplesCount = harvestSourceDAO.addSourceToRepository(inputStream, sourceUrlString);
-                logger.debug(triplesCount + " triples stored by the triple store");
-
-                if (triplesCount > 0) {
-                    logger.debug("Extracting new harvest sources after fresh harvest");
-                    extractNewHarvestSources();
-                }
+                // try to load the stream
+                LOGGER.debug("Loading the file contents into the triple store");
+                noOfTriples = harvestSourceDAO.loadIntoRepository(inputStream, getContextUrl(), true);
+                setStoredTriplesCount(noOfTriples);
+                LOGGER.debug(noOfTriples + " triples stored by the triple store");
             }
 
+            finishWithOK(noOfTriples);
+
         } catch (ParserConfigurationException e) {
+            finishWithError(e, noOfTriples);
             throw new HarvestException(e.toString(), e);
         } catch (IOException e) {
+            finishWithError(e, noOfTriples);
             throw new HarvestException(e.toString(), e);
         } catch (SAXException e) {
+            finishWithError(e, noOfTriples);
             throw new HarvestException(e.toString(), e);
         } catch (OpenRDFException e) {
 
+            finishWithError(e, noOfTriples);
             // when harvesting an uploaded-file, RDF parse exceptions must be ignored,
-            // because its only something that CR attempts to do, but doesn't have to be successful
+            // because its only something that CR attempts to do, but doesn't have to be successful at
             if (e instanceof RDFParseException) {
-                logger.info("Following exception happened when parsing uploaded file as RDF", e);
+                LOGGER.info("Following exception happened when parsing uploaded file as RDF", e);
             } else {
                 throw new HarvestException(e.toString(), e);
             }
-        } catch (DAOException e) {
-            throw new HarvestException(e.toString(), e);
         } finally {
 
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (IOException ioe) {
-                }
-            }
+            IOUtils.closeQuietly(inputStream);
+            FileDeletionJob.register(convertedFile);
+        }
+    }
 
-            if (convertedFile != null && convertedFile.exists()) {
-                convertedFile.delete();
-            }
+    /**
+     *
+     * @param noOfTriples
+     */
+    private void finishWithOK(int noOfTriples){
 
-            CurrentHarvests.removeOnDemandHarvest(sourceUrlString);
+        // update context source DTO with the results of this harvest
+        getContextSourceDTO().setStatements(noOfTriples);
+        getContextSourceDTO().setLastHarvest(new Date());
+        getContextSourceDTO().setLastHarvestFailed(false);
+
+        // add source metadata resulting from this harvest
+        String firstSeen = formatDate(getContextSourceDTO().getTimeCreated());
+        String lastRefreshed = formatDate(new Date());
+
+        addSourceMetadata(Predicates.CR_FIRST_SEEN, ObjectDTO.createLiteral(firstSeen, XMLSchema.DATETIME));
+        addSourceMetadata(Predicates.CR_LAST_REFRESHED, ObjectDTO.createLiteral(lastRefreshed, XMLSchema.DATETIME));
+    }
+
+    /**
+     *
+     * @param error
+     * @param noOfTriples
+     */
+    private void finishWithError(Throwable error, int noOfTriples){
+
+        // update context source DTO with the results of this harvest
+        getContextSourceDTO().setStatements(noOfTriples);
+        getContextSourceDTO().setLastHarvest(new Date());
+        getContextSourceDTO().setLastHarvestFailed(error!=null);
+
+        // add harvest message about the given error if it's not null
+        if (error != null) {
+            String message = error.getMessage() == null ? error.toString() : error.getMessage();
+            String stackTrace = Util.getStackTrace(error);
+            stackTrace = StringUtils.replace(stackTrace, "\r", "");
+            addHarvestMessage(message, HarvestMessageType.ERROR, stackTrace);
+        }
+
+        // add source metadata resulting from this harvest
+        String firstSeen = formatDate(getContextSourceDTO().getTimeCreated());
+        String lastRefreshed = formatDate(new Date());
+
+        addSourceMetadata(Predicates.CR_FIRST_SEEN, ObjectDTO.createLiteral(firstSeen, XMLSchema.DATETIME));
+        addSourceMetadata(Predicates.CR_LAST_REFRESHED, ObjectDTO.createLiteral(lastRefreshed, XMLSchema.DATETIME));
+
+        if (error != null) {
+            addSourceMetadata(Predicates.CR_ERROR_MESSAGE, ObjectDTO.createLiteral(error.toString()));
         }
     }
 
@@ -244,7 +257,7 @@ public class UploadHarvest extends Harvest {
 
         if (parsingException != null) {
 
-            logger.debug("Error when parsing as XML: " + parsingException.toString());
+            LOGGER.debug("Error when parsing as XML: " + parsingException.toString());
             return null;
         }
 
@@ -269,7 +282,7 @@ public class UploadHarvest extends Harvest {
             return null;
         }
 
-        logger.debug("Found conversion with ID = " + conversionId);
+        LOGGER.debug("Found conversion with ID = " + conversionId);
 
         // because Stripes' FileBean has no API for getting the location of the file
         // on the file system, we use its API to rename it to a location we want to
@@ -277,7 +290,7 @@ public class UploadHarvest extends Harvest {
         File renamedFile = TempFilePathGenerator.generate();
         fileBean.save(renamedFile);
 
-        logger.debug("File bean renamed to " + renamedFile + ", calling conversion service");
+        LOGGER.debug("File bean renamed to " + renamedFile + ", calling conversion service");
 
         // do the conversion using the conversion service's POST request API
 
@@ -290,13 +303,13 @@ public class UploadHarvest extends Harvest {
 
         HttpResponse response = new DefaultHttpClient().execute(httpPost);
 
-        logger.debug("Conversion service response code: " + response.getStatusLine());
+        LOGGER.debug("Conversion service response code: " + response.getStatusLine());
 
         InputStream inputStream = null;
         OutputStream outputStream = null;
         File convertedFile = new File(renamedFile.getAbsolutePath() + ".converted");
         try {
-            logger.debug("Storing conversion response to " + convertedFile);
+            LOGGER.debug("Storing conversion response to " + convertedFile);
 
             inputStream = response.getEntity().getContent();
             outputStream = new FileOutputStream(convertedFile);
@@ -341,10 +354,21 @@ public class UploadHarvest extends Harvest {
         if (schemaOrDtd != null && schemaOrDtd.length() > 0
                 && !schemaOrDtd.equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#RDF")) {
 
-            sourceMetadata.addObject(Predicates.CR_SCHEMA, new ObjectDTO(schemaOrDtd, false));
+            boolean isURI = URIUtil.isSchemedURI(schemaOrDtd);
+            ObjectDTO objectDTO = isURI ? new ObjectDTO(schemaOrDtd, false) : new ObjectDTO(schemaOrDtd, true);
+            addSourceMetadata(Predicates.CR_SCHEMA, objectDTO);
             result = ConversionsParser.getRdfConversionId(schemaOrDtd);
         }
 
         return result;
     }
+
+    /**
+     * @see eionet.cr.harvest.BaseHarvest#getHarvestType()
+     */
+    protected String getHarvestType(){
+
+        return HarvestConstants.TYPE_PUSH;
+    }
+
 }

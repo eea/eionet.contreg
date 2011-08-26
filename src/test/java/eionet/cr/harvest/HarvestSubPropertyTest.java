@@ -57,9 +57,9 @@ public class HarvestSubPropertyTest extends CRDatabaseTestCase {
 
         try {
             URL url =
-                    new URL("http://svn.eionet.europa.eu/repositories"
-                            + "/Reportnet/cr2/trunk/src/test/resources/subproperty-rdf.xml");
-            Harvest harvest = new PullHarvest(url.toString(), null);
+                new URL("http://svn.eionet.europa.eu/repositories"
+                        + "/Reportnet/cr2/trunk/src/test/resources/subproperty-rdf.xml");
+            Harvest harvest = new PullHarvest(url.toString());
             harvest.execute();
 
             // Change to true if you want to dump the result into an XML file
@@ -76,9 +76,9 @@ public class HarvestSubPropertyTest extends CRDatabaseTestCase {
 
         try {
             URL url =
-                    new URL("http://svn.eionet.europa.eu/repositories"
-                            + "/Reportnet/cr2/trunk/src/test/resources/subproperty2-rdf.xml");
-            Harvest harvest = new PullHarvest(url.toString(), null);
+                new URL("http://svn.eionet.europa.eu/repositories"
+                        + "/Reportnet/cr2/trunk/src/test/resources/subproperty2-rdf.xml");
+            Harvest harvest = new PullHarvest(url.toString());
             harvest.execute();
 
             compareDatasets("subproperty2-db.xml", false);

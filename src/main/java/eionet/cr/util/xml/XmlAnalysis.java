@@ -33,6 +33,8 @@ import javax.xml.parsers.SAXParserFactory;
 
 import net.sourceforge.stripes.action.FileBean;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xml.sax.Attributes;
@@ -75,12 +77,7 @@ public class XmlAnalysis {
             inputStream = new FileInputStream(file);
             parse(inputStream);
         } finally {
-            try {
-                if (inputStream != null) {
-                    inputStream.close();
-                }
-            } catch (IOException e) {
-            }
+            IOUtils.closeQuietly(inputStream);
         }
     }
 
@@ -144,6 +141,24 @@ public class XmlAnalysis {
             if (ee == null || !(ee instanceof CRException))
                 throw e;
         }
+    }
+
+    /**
+     *
+     * @return
+     */
+    public String getSchemaOrDtd(){
+
+        // get schema uri, if it's not found then fall back to dtd
+        String schemaOrDtd = getSchemaLocation();
+        if (StringUtils.isBlank(schemaOrDtd)) {
+            schemaOrDtd = getSystemDtd();
+            if (StringUtils.isBlank(schemaOrDtd)) {
+                schemaOrDtd = getPublicDtd();
+            }
+        }
+
+        return schemaOrDtd;
     }
 
     /**
@@ -322,16 +337,16 @@ public class XmlAnalysis {
         }
     }
 
-    // public static void main(String[] args) {
-    //
-    // XmlAnalysis info = new XmlAnalysis();
-    // try {
-    // info.parse(new File("C:/temp/MonthlyOzoneExceedances_Sept2010.xml"));
-    // System.out.println(info.getStartElemLocalName());
-    // System.out.println(info.getStartElemNamespace());
-    // }
-    // catch (Throwable t) {
-    // t.printStackTrace();
-    // }
-    // }
+    public static void main(String[] args) {
+
+        XmlAnalysis info = new XmlAnalysis();
+        try {
+            info.parse(new File("D:/temp/kala.xml"));
+            System.out.println(info.getStartElemLocalName());
+            System.out.println(info.getStartElemNamespace());
+        }
+        catch (Throwable t) {
+            t.printStackTrace();
+        }
+    }
 }

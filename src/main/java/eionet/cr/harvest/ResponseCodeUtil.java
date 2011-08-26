@@ -21,33 +21,55 @@
 
 package eionet.cr.harvest;
 
-
 /**
  *
  * @author Jaanus Heinlaid
  */
-public interface Harvest {
+public class ResponseCodeUtil {
 
     /**
      *
-     * @throws HarvestException
-     */
-    void execute() throws HarvestException;
-
-    /**
-     *
-     * @param harvestUser
-     */
-    void setHarvestUser(String harvestUser);
-
-    /**
-     *
-     */
-    String getContextUrl();
-
-    /**
-     *
+     * @param code
      * @return
      */
-    int getStoredTriplesCount();
+    public static boolean isRedirect(int code){
+        return code == 301 || code == 302 || code == 303 || code == 307;
+    }
+
+    /**
+     *
+     * @param code
+     * @return
+     */
+    public static boolean isPermanentError(int code){
+        return code == 400 || (code >= 402 && code <= 407) || (code >= 409 && code <= 417) || code == 501 || code == 505;
+    }
+
+    /**
+     *
+     * @param code
+     * @return
+     */
+    public static boolean isTemporaryError(int code) {
+        return code == 401 || code == 408 || code == 500 || (code >= 502 && code <= 504);
+    }
+
+    /**
+     *
+     * @param code
+     * @return
+     */
+    public static boolean isError(int code){
+        return isTemporaryError(code) || isPermanentError(code);
+    }
+
+    /**
+     *
+     * @param code
+     * @return
+     */
+    public static boolean isNotModified(int code){
+        return code == 304;
+    }
+
 }

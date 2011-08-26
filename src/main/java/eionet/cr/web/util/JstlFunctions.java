@@ -146,8 +146,8 @@ public class JstlFunctions {
         String curValue = request.getParameter("sortP");
         if (curValue != null && buf.indexOf("sortP=") > 0) {
             buf =
-                    new StringBuffer(StringUtils.replace(buf.toString(), "sortP=" + Util.urlEncode(curValue),
-                            "sortP=" + Util.urlEncode(sortParamValue)));
+                new StringBuffer(StringUtils.replace(buf.toString(), "sortP=" + Util.urlEncode(curValue),
+                        "sortP=" + Util.urlEncode(sortParamValue)));
         } else {
             buf.append("&amp;sortP=").append(Util.urlEncode(sortParamValue));
         }
@@ -155,8 +155,8 @@ public class JstlFunctions {
         curValue = request.getParameter("sortO");
         if (curValue != null && buf.indexOf("sortO=") > 0) {
             buf =
-                    new StringBuffer(StringUtils.replace(buf.toString(), "sortO=" + curValue,
-                            "sortO=" + SortOrder.oppositeSortOrder(curValue)));
+                new StringBuffer(StringUtils.replace(buf.toString(), "sortO=" + curValue,
+                        "sortO=" + SortOrder.oppositeSortOrder(curValue)));
         } else {
             buf.append("&amp;sortO=").append(SortOrder.oppositeSortOrder(curValue));
         }
@@ -311,7 +311,7 @@ public class JstlFunctions {
         if (object != null) {
 
             buf.append("[Type: ")
-                    .append(object.isLiteral() ? "Literal" : object.isAnonymous() ? "Anonymous resource" : "Resource");
+            .append(object.isLiteral() ? "Literal" : object.isAnonymous() ? "Anonymous resource" : "Resource");
             buf.append("]   [Inferred from object: ").append(getMatchingObjectValue(object.getSourceObjectHash(), allObjects));
             buf.append("]   [Inferred from source: ").append(
                     StringUtils.isBlank(object.getDerivSourceUri()) ? object.getDerivSourceHash() : object.getDerivSourceUri());
@@ -366,5 +366,36 @@ public class JstlFunctions {
         }
 
         return result;
+    }
+
+    /**
+     *
+     * @param throwable
+     * @return
+     */
+    public static String getStackTrace(Throwable throwable){
+        return Util.getStackTrace(throwable);
+    }
+
+    /**
+     *
+     * @param stackTrace
+     * @return
+     */
+    public static String formatStackTrace(String stackTrace){
+
+        if (stackTrace==null || stackTrace.trim().length()==0){
+            return stackTrace;
+        }
+
+        StringBuilder buf = new StringBuilder();
+        StringTokenizer lines = new StringTokenizer(stackTrace, "\r\n");
+        while (lines!=null && lines.hasMoreElements()) {
+            String line = lines.nextToken();
+            line = StringUtils.replaceOnce(line, "\t", "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+            buf.append(line).append("<br/>");
+        }
+
+        return buf.length()==0 ? stackTrace : buf.toString();
     }
 }

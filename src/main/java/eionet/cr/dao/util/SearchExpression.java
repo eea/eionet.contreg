@@ -20,8 +20,6 @@
  */
 package eionet.cr.dao.util;
 
-import java.net.MalformedURLException;
-
 import eionet.cr.util.URIUtil;
 import eionet.cr.util.URLUtil;
 
@@ -54,12 +52,7 @@ public class SearchExpression {
         }
 
         // Escape spaces
-        String escapedExpression = null;
-        try {
-            escapedExpression = URLUtil.replaceURLSpaces(expression);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
+        String escapedExpression = URLUtil.replaceURLSpaces(expression);
 
         isUri = URIUtil.isSchemedURI(escapedExpression);
         if (isUri) {

@@ -48,7 +48,6 @@ public class HarvestSourceDTOReader extends SQLResultSetBaseReader<HarvestSource
         harvestSourceDTO.setEmails(rs.getString("EMAILS"));
         harvestSourceDTO.setTimeCreated(rs.getTimestamp("TIME_CREATED"));
         harvestSourceDTO.setStatements(new Integer(rs.getInt("STATEMENTS")));
-        harvestSourceDTO.setResources(new Integer(rs.getInt("RESOURCES")));
         harvestSourceDTO.setCountUnavail(new Integer(rs.getInt("COUNT_UNAVAIL")));
         harvestSourceDTO.setLastHarvest(rs.getTimestamp("LAST_HARVEST"));
         harvestSourceDTO.setIntervalMinutes(rs.getInt("INTERVAL_MINUTES"));

@@ -31,7 +31,7 @@ import java.util.Date;
  * @author altnyris
  *
  */
-public class HarvestSourceDTO implements Serializable {
+public class HarvestSourceDTO implements Serializable, Cloneable {
 
     /**
      * serial.
@@ -47,7 +47,6 @@ public class HarvestSourceDTO implements Serializable {
     private String emails;
     private Date timeCreated;
     private Integer statements;
-    private Integer resources;
     private Integer countUnavail;
     private Date lastHarvest;
     private boolean lastHarvestFailed;
@@ -137,21 +136,6 @@ public class HarvestSourceDTO implements Serializable {
      */
     public void setStatements(Integer statements) {
         this.statements = statements;
-    }
-
-    /**
-     * @return the resources
-     */
-    public Integer getResources() {
-        return resources;
-    }
-
-    /**
-     * @param resources
-     *            the resources to set
-     */
-    public void setResources(Integer resources) {
-        this.resources = resources;
     }
 
     /**
@@ -306,7 +290,7 @@ public class HarvestSourceDTO implements Serializable {
             return 0.0d;
         }
 
-        // urgency score can only be calculated if at least last harvest
+        // urgency score can only be calculated if at least the last harvest
         // or creation time is known (and interval is >0, as already assured above)
         if (lastHarvest == null && timeCreated == null) {
             return 0.0d;
@@ -327,5 +311,17 @@ public class HarvestSourceDTO implements Serializable {
         long millisecondsSinceLastTime = System.currentTimeMillis() - lastTime.getTime();
         long intervalMilliseconds = intervalMinutes.longValue() * 60L * 1000L;
         return ((double) millisecondsSinceLastTime) / ((double) intervalMilliseconds);
+    }
+
+    /**
+     * @see java.lang.Object#clone()
+     */
+    @Override
+    public HarvestSourceDTO clone(){
+        try {
+            return (HarvestSourceDTO) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException("Clone not supported");
+        }
     }
 }

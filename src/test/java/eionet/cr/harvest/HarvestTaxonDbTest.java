@@ -53,14 +53,13 @@ public class HarvestTaxonDbTest extends CRDatabaseTestCase {
 
         try {
             URL url =
-                    new URL("http://svn.eionet.europa.eu/repositories"
-                            + "/Reportnet/cr2/trunk/src/test/resources/taxon-under-rdf.xml");
+                new URL("http://svn.eionet.europa.eu/repositories"
+                        + "/Reportnet/cr2/trunk/src/test/resources/taxon-under-rdf.xml");
 
-            Harvest harvest = new PullHarvest(url.toString(), null);
-            harvest.setDeriveInferredTriples(false);
+            Harvest harvest = new PullHarvest(url.toString());
             harvest.execute();
 
-            assertEquals((int) 23, harvest.getStoredTriplesCount());
+            assertEquals(23, harvest.getStoredTriplesCount());
 
             compareDatasets("taxon-db.xml", true);
         } catch (Throwable e) {
@@ -74,14 +73,13 @@ public class HarvestTaxonDbTest extends CRDatabaseTestCase {
 
         try {
             URL url =
-                    new URL("http://svn.eionet.europa.eu/repositories"
-                            + "/Reportnet/cr2/trunk/src/test/resources/taxon-over-rdf.xml");
+                new URL("http://svn.eionet.europa.eu/repositories"
+                        + "/Reportnet/cr2/trunk/src/test/resources/taxon-over-rdf.xml");
 
-            Harvest harvest = new PullHarvest(url.toString(), null);
-            harvest.setDeriveInferredTriples(false);
+            Harvest harvest = new PullHarvest(url.toString());
             harvest.execute();
 
-            assertEquals((int) 23, harvest.getStoredTriplesCount());
+            assertEquals(23, harvest.getStoredTriplesCount());
 
             compareDatasets("taxon-db.xml", false);
         } catch (Throwable e) {
@@ -108,7 +106,7 @@ public class HarvestTaxonDbTest extends CRDatabaseTestCase {
 
         queryDataSet = new QueryDataSet(getConnection());
         queryDataSet.addTable("RESOURCE",
-                "SELECT URI,URI_HASH FROM RESOURCE WHERE URI NOT LIKE 'http://svn.eionet%' ORDER BY URI, URI_HASH");
+        "SELECT URI,URI_HASH FROM RESOURCE WHERE URI NOT LIKE 'http://svn.eionet%' ORDER BY URI, URI_HASH");
         ITable actResTable = queryDataSet.getTable("RESOURCE");
 
         if (dumpIt) {

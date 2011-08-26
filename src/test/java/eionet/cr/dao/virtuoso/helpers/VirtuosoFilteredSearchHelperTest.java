@@ -123,8 +123,6 @@ public class VirtuosoFilteredSearchHelperTest {
                 + "FILTER (?o2 = ?objectValue2Uri || ?o2 = ?objectValue2Lit)}} . "
                 + "{{?s ?p3 ?o3 . ?s ?predicateValue3 ?o3} . { ?s ?p3 ?o3 . FILTER bif:contains(?o3, ?objectValue3)}}", paramStr);
 
-        String query = helper.getUnorderedQuery(inParams);
-
         //checkQuery(query, helper.getQueryBindings());
 
         //

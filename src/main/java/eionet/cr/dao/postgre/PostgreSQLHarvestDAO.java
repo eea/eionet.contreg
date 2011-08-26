@@ -29,6 +29,7 @@ import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dao.readers.HarvestDTOReader;
 import eionet.cr.dao.readers.HarvestWithMessageTypesReader;
 import eionet.cr.dto.HarvestDTO;
+import eionet.cr.harvest.HarvestConstants;
 import eionet.cr.harvest.util.HarvestMessageType;
 import eionet.cr.util.sql.SQLUtil;
 
@@ -56,12 +57,12 @@ public class PostgreSQLHarvestDAO extends PostgreSQLBaseDAO implements HarvestDA
 
     /** */
     private static final String getHarvestsBySourceIdSQL = "select distinct HARVEST.HARVEST_ID as HARVEST_ID,"
-            + " HARVEST.HARVEST_SOURCE_ID as SOURCE_ID," + " HARVEST.TYPE as HARVEST_TYPE," + " HARVEST.USERNAME as HARVEST_USER,"
-            + " HARVEST.STATUS as STATUS," + " HARVEST.STARTED as STARTED," + " HARVEST.FINISHED as FINISHED,"
-            + " HARVEST.ENC_SCHEMES as ENC_SCHEMES," + " HARVEST.TOT_STATEMENTS as TOT_STATEMENTS,"
-            + " HARVEST.LIT_STATEMENTS as LIT_STATEMENTS," + " HARVEST_MESSAGE.TYPE as MESSAGE_TYPE"
-            + " from HARVEST left join HARVEST_MESSAGE on HARVEST.HARVEST_ID=HARVEST_MESSAGE.HARVEST_ID"
-            + " where HARVEST.HARVEST_SOURCE_ID=? order by HARVEST.STARTED desc limit ?";
+        + " HARVEST.HARVEST_SOURCE_ID as SOURCE_ID," + " HARVEST.TYPE as HARVEST_TYPE," + " HARVEST.USERNAME as HARVEST_USER,"
+        + " HARVEST.STATUS as STATUS," + " HARVEST.STARTED as STARTED," + " HARVEST.FINISHED as FINISHED,"
+        + " HARVEST.ENC_SCHEMES as ENC_SCHEMES," + " HARVEST.TOT_STATEMENTS as TOT_STATEMENTS,"
+        + " HARVEST.LIT_STATEMENTS as LIT_STATEMENTS," + " HARVEST_MESSAGE.TYPE as MESSAGE_TYPE"
+        + " from HARVEST left join HARVEST_MESSAGE on HARVEST.HARVEST_ID=HARVEST_MESSAGE.HARVEST_ID"
+        + " where HARVEST.HARVEST_SOURCE_ID=? order by HARVEST.STARTED desc limit ?";
 
     /*
      * (non-Javadoc)
@@ -80,7 +81,7 @@ public class PostgreSQLHarvestDAO extends PostgreSQLBaseDAO implements HarvestDA
 
     /** */
     private static final String getLastHarvestBySourceIdSQL = "select *, USERNAME as USER"
-            + " from HARVEST where HARVEST_SOURCE_ID=? order by HARVEST.STARTED desc limit 1";
+        + " from HARVEST where HARVEST_SOURCE_ID=? order by HARVEST.STARTED desc limit 1";
 
     /*
      * (non-Javadoc)
@@ -97,7 +98,7 @@ public class PostgreSQLHarvestDAO extends PostgreSQLBaseDAO implements HarvestDA
 
     /** */
     private static final String insertStartedHarvestSQL =
-            "insert into HARVEST (HARVEST_SOURCE_ID, TYPE, USERNAME, STATUS, STARTED) values (?, ?, ?, ?, now())";
+        "insert into HARVEST (HARVEST_SOURCE_ID, TYPE, USERNAME, STATUS, STARTED) values (?, ?, ?, ?, now())";
 
     /*
      * (non-Javadoc)
@@ -125,23 +126,17 @@ public class PostgreSQLHarvestDAO extends PostgreSQLBaseDAO implements HarvestDA
 
     /** */
     private static final String updateFinishedHarvestSQL =
-            "update HARVEST set STATUS=?, FINISHED=now(), TOT_STATEMENTS=?, LIT_STATEMENTS=?, RES_STATEMENTS=?, ENC_SCHEMES=? "
-                    + "where HARVEST_ID=?";
+        "update HARVEST set STATUS=?, FINISHED=now(), TOT_STATEMENTS=? where HARVEST_ID=?";
 
-    /*
-     * (non-Javadoc)
+    /**
      *
-     * @see eionet.cr.dao.HarvestDAO#updateFinishedHarvest(int, int, int, int, java.lang.String)
      */
-    public void updateFinishedHarvest(int harvestId, String status, int totStatements, int litStatements, int encSchemes)
-            throws DAOException {
+    @Override
+    public void updateFinishedHarvest(int harvestId, int noOfTriples) throws DAOException {
 
         List<Object> values = new ArrayList<Object>();
-        values.add(status);
-        values.add(new Integer(totStatements));
-        values.add(new Integer(litStatements));
-        values.add(new Integer(totStatements - litStatements));
-        values.add(new Integer(encSchemes));
+        values.add(HarvestConstants.STATUS_FINISHED);
+        values.add(new Integer(noOfTriples));
         values.add(new Integer(harvestId));
 
         Connection conn = null;

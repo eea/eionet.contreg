@@ -56,8 +56,8 @@ public class HarvestSimpleDbTest extends CRDatabaseTestCase {
 
         try {
             URL url =
-                    new URL("http://svn.eionet.europa.eu/repositories" + "/Reportnet/cr2/trunk/src/test/resources/simple-rdf.xml");
-            Harvest harvest = new PullHarvest(url.toString(), null);
+                new URL("http://svn.eionet.europa.eu/repositories" + "/Reportnet/cr2/trunk/src/test/resources/simple-rdf.xml");
+            Harvest harvest = new PullHarvest(url.toString());
             harvest.execute();
 
             compareDatasets("simple-db.xml", false);
@@ -73,10 +73,10 @@ public class HarvestSimpleDbTest extends CRDatabaseTestCase {
 
         try {
             URL url =
-                    new URL("http://svn.eionet.europa.eu/repositories"
-                            + "/Reportnet/cr2/trunk/src/test/resources/encoding-scheme-rdf.xml");
+                new URL("http://svn.eionet.europa.eu/repositories"
+                        + "/Reportnet/cr2/trunk/src/test/resources/encoding-scheme-rdf.xml");
 
-            Harvest harvest = new PullHarvest(url.toString(), null);
+            Harvest harvest = new PullHarvest(url.toString());
             harvest.execute();
 
             // Fetch database data after executing your code.
@@ -108,8 +108,8 @@ public class HarvestSimpleDbTest extends CRDatabaseTestCase {
 
         try {
             URL url =
-                    new URL("http://svn.eionet.europa.eu/repositories" + "/Reportnet/cr2/trunk/src/test/resources/inline-rdf.xml");
-            Harvest harvest = new PullHarvest(url.toString(), null);
+                new URL("http://svn.eionet.europa.eu/repositories" + "/Reportnet/cr2/trunk/src/test/resources/inline-rdf.xml");
+            Harvest harvest = new PullHarvest(url.toString());
             harvest.execute();
 
             compareDatasets("inline-db.xml", false);

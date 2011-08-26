@@ -78,55 +78,6 @@ public class Util {
 
     /**
      *
-     * @param t
-     * @return
-     */
-    public static String getStackTraceForHTML(Throwable t) {
-
-        return processStackTraceForHTML(getStackTrace(t));
-    }
-
-    /**
-     * Escape HTML, line ends and tabs in stack trace messages.
-     *
-     * @param stackTrace
-     *            Java stack trace as one String.
-     * @return escaped stack trace message
-     */
-    public static String processStackTraceForHTML(String stackTrace) {
-
-        if (stackTrace == null || stackTrace.trim().length() == 0)
-            return stackTrace;
-
-        StringBuffer buf = new StringBuffer();
-        String[] stackFrames = getStackFrames(stackTrace);
-        for (int i = 0; stackFrames != null && i < stackFrames.length; i++) {
-            buf.append(Util.escapeHtml(stackFrames[i]).replaceFirst("\t", "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")).append("<br/>");
-        }
-
-        return buf.length() > 0 ? buf.toString() : stackTrace;
-    }
-
-    /**
-     *
-     * @param stackTrace
-     * @return
-     */
-    public static String[] getStackFrames(String stackTrace) {
-
-        List list = new ArrayList();
-        StringTokenizer frames = new StringTokenizer(stackTrace, System.getProperty("line.separator"));
-        if (frames != null) {
-            while (frames.hasMoreElements()) {
-                list.add(frames.nextToken());
-            }
-        }
-
-        return (String[]) list.toArray(new String[list.size()]);
-    }
-
-    /**
-     *
      * @param array
      * @param separator
      * @return
@@ -681,6 +632,7 @@ public class Util {
      * @return escaped string
      */
     public static String escapeHtml(String s) {
+
         if (!StringUtils.isBlank(s)) {
             s = StringEscapeUtils.escapeHtml(s);
             s = s.replaceAll("\n", "<br/>");
