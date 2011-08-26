@@ -222,13 +222,13 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO {
         // (<http://rod.eionet.europa.eu/obligations/130>,
         // <http://rod.eionet.europa.eu/obligations/143>)
         sparql +=
-                "select * where {graph ?g {?s ?p ?o. filter (?s IN ("
-                        + SPARQLQueryUtil.urisToCSV(subjectUris, "subjectValue", bindings) + ")) ";
+            "select * where {graph ?g {?s ?p ?o. filter (?s IN ("
+            + SPARQLQueryUtil.urisToCSV(subjectUris, "subjectValue", bindings) + ")) ";
 
         // if only certain predicates needed, add relevant filter
         if (predicateUris != null && predicateUris.length > 0) {
             sparql +=
-                    "filter (?p IN(" + SPARQLQueryUtil.urisToCSV(Arrays.asList(predicateUris), "predicateValue", bindings) + ")) ";
+                "filter (?p IN(" + SPARQLQueryUtil.urisToCSV(Arrays.asList(predicateUris), "predicateValue", bindings) + ")) ";
 
         }
 

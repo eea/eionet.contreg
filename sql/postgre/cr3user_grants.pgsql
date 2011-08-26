@@ -5,7 +5,7 @@ GRANT CREATE, CONNECT, TEMPORARY, TEMP
 GRANT SELECT, INSERT, UPDATE, DELETE
      ON harvest, harvest_message, harvest_message, harvest_source,
         remove_source_queue, resource, resource_temp,
-        spo, spo_temp, unfinished_harvest, urgent_harvest_queue, spo_binary
+        spo, spo_temp, unfinished_harvest, urgent_harvest_queue, spo_binary, documentation
      TO cr3user;
 GRANT ALL
      ON SEQUENCE harvest_message_harvest_message_id_seq,

@@ -25,6 +25,7 @@ import java.util.Map;
 
 import eionet.cr.dao.DAO;
 import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.DocumentationDAO;
 import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dao.HarvestMessageDAO;
 import eionet.cr.dao.SpoBinaryDAO;
@@ -57,6 +58,7 @@ public final class PostgreSQLDAOFactory extends DAOFactory {
         registeredDaos.put(HarvestMessageDAO.class, PostgreSQLHarvestMessageDAO.class);
         registeredDaos.put(UrgentHarvestQueueDAO.class, PostgreSQLUrgentHarvestQueueDAO.class);
         registeredDaos.put(SpoBinaryDAO.class, PostgreSQLSpoBinaryDAO.class);
+        registeredDaos.put(DocumentationDAO.class, PostgreSQLDocumentationDAO.class);
     }
 
     /**
