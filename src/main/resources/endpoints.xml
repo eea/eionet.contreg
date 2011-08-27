@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
-    <entry key="http://cr3.eionet.europa.eu/sparql"/>
+        <entry key="http://cr.eionet.europa.eu/sparql"/>
+<!--
+        <entry key="http://semantic.eea.europa.eu/sparql"/>
+-->
+	<entry key="http://156.35.31.156/sparql"/> <!-- EuroVoc -->
 	<entry key="http://dbpedia.org/sparql"/>
-	<entry key="http://services.data.gov.uk/analytics/sparql"/>
-	<entry key="http://semantic.data.gov/sparql"/>
 	<entry key="http://services.data.gov.uk/environment/sparql"/>
+	<entry key="http://services.data.gov.uk/education/sparql"/>
+<!--
+	<entry key="http://services.data.gov.uk/analytics/sparql"/>
 	<entry key="http://services.data.gov.uk/transport/sparql"/>
 	<entry key="http://services.data.gov.uk/finance/sparql"/>
-	<entry key="http://services.data.gov.uk/education/sparql"/>
-	<!--
-    <entry key="http://localhost:8890/sparql"/>
-    -->
+-->
 </properties>

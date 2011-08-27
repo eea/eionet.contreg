@@ -63,10 +63,11 @@
         </div>
 
         <div style="margin-top: 15px">
+                    <div style="float:right"><a href="documentation/sparqlfunctions">SPARQL Functions</a></div>
             <crfn:form name="mainForm" action="/sparql" method="get">
                 <div>
                     <label for="queryText" class="question">Query:</label>
-                    <textarea name="query" id="queryText" rows="8" cols="80" style="display: block; width: 100%" onchange="format_select(this)" onkeyup="format_select(this)">
+                    <textarea name="query" id="queryText" rows="8" cols="80" style="clear:right; display: block; width: 100%" onchange="format_select(this)" onkeyup="format_select(this)">
 <c:if test="${empty actionBean.query}">PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
 
 SELECT DISTINCT * WHERE {
