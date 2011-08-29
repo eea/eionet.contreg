@@ -34,16 +34,16 @@ public class MimeTypeConverterTest extends TestCase {
      */
     public void testFewSampleConversions() {
 
-        assertEquals("http://purl.org/dc/dcmitype/StillImage", MimeTypeConverter.getRdfTypeFor("image/png"));
+        assertEquals("http://purl.org/dc/dcmitype/StillImage", MediaTypeToDcmiTypeConverter.getDcmiTypeFor("image/png"));
 
-        assertEquals("http://purl.org/dc/dcmitype/Sound", MimeTypeConverter.getRdfTypeFor("audio/ogg"));
+        assertEquals("http://purl.org/dc/dcmitype/Sound", MediaTypeToDcmiTypeConverter.getDcmiTypeFor("audio/ogg"));
 
-        assertEquals("http://purl.org/dc/dcmitype/MovingImage", MimeTypeConverter.getRdfTypeFor("video/mpeg"));
+        assertEquals("http://purl.org/dc/dcmitype/MovingImage", MediaTypeToDcmiTypeConverter.getDcmiTypeFor("video/mpeg"));
 
-        assertEquals("http://purl.org/dc/dcmitype/Text", MimeTypeConverter.getRdfTypeFor("application/msword"));
+        assertEquals("http://purl.org/dc/dcmitype/Text", MediaTypeToDcmiTypeConverter.getDcmiTypeFor("application/msword"));
 
-        assertEquals("http://purl.org/dc/dcmitype/Dataset", MimeTypeConverter.getRdfTypeFor("text/xml;charset=UTF-8"));
+        assertEquals("http://purl.org/dc/dcmitype/Dataset", MediaTypeToDcmiTypeConverter.getDcmiTypeFor("text/xml;charset=UTF-8"));
 
-        assertEquals(null, MimeTypeConverter.getRdfTypeFor("application/x-tar"));
+        assertEquals(null, MediaTypeToDcmiTypeConverter.getDcmiTypeFor("application/x-tar"));
     }
 }

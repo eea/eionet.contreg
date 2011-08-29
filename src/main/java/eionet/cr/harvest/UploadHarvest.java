@@ -43,6 +43,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.log4j.Logger;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.vocabulary.XMLSchema;
+import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
 import org.xml.sax.SAXException;
 
@@ -54,6 +55,7 @@ import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.harvest.util.HarvestMessageType;
+import eionet.cr.harvest.util.RDFMediaTypes;
 import eionet.cr.util.FileDeletionJob;
 import eionet.cr.util.URIUtil;
 import eionet.cr.util.URLUtil;
@@ -154,7 +156,8 @@ public class UploadHarvest extends BaseHarvest {
 
                 // try to load the stream
                 LOGGER.debug("Loading the file contents into the triple store");
-                noOfTriples = harvestSourceDAO.loadIntoRepository(inputStream, getContextUrl(), true);
+                RDFFormat rdfFormat = RDFMediaTypes.toRdfFormat(fileBean.getContentType());
+                noOfTriples = harvestSourceDAO.loadIntoRepository(inputStream, rdfFormat, getContextUrl(), true);
                 setStoredTriplesCount(noOfTriples);
                 LOGGER.debug(noOfTriples + " triples stored by the triple store");
             }

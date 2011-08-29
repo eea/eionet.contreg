@@ -268,15 +268,15 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
     }
 
     /**
-     * @see eionet.cr.dao.postgre.PostgreSQLHarvestSourceDAO#loadIntoRepository(java.io.File, java.lang.String, boolean)
+     * @see eionet.cr.dao.postgre.PostgreSQLHarvestSourceDAO#loadIntoRepository(java.io.File, RDFFormat, java.lang.String, boolean)
      */
     @Override
-    public int loadIntoRepository(File file, String graphUrl, boolean clearPreviousGraphContent) throws IOException, OpenRDFException {
+    public int loadIntoRepository(File file, RDFFormat rdfFormat, String graphUrl, boolean clearPreviousGraphContent) throws IOException, OpenRDFException {
 
         InputStream inputStream = null;
         try {
             inputStream = new FileInputStream(file);
-            return loadIntoRepository(inputStream, graphUrl, clearPreviousGraphContent);
+            return loadIntoRepository(inputStream, rdfFormat, graphUrl, clearPreviousGraphContent);
 
         } finally {
             IOUtils.closeQuietly(inputStream);
@@ -284,10 +284,10 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
     }
 
     /**
-     * @see eionet.cr.dao.postgre.PostgreSQLHarvestSourceDAO#loadIntoRepository(java.io.InputStream, java.lang.String, boolean)
+     * @see eionet.cr.dao.postgre.PostgreSQLHarvestSourceDAO#loadIntoRepository(java.io.InputStream, RDFFormat, java.lang.String, boolean)
      */
     @Override
-    public int loadIntoRepository(InputStream inputStream, String graphUrl, boolean clearPreviousGraphContent) throws IOException, OpenRDFException {
+    public int loadIntoRepository(InputStream inputStream, RDFFormat rdfFormat, String graphUrl, boolean clearPreviousGraphContent) throws IOException, OpenRDFException {
 
         int storedTriplesCount = 0;
         boolean isSuccess = false;
@@ -308,7 +308,7 @@ public class VirtuosoHarvestSourceDAO extends PostgreSQLHarvestSourceDAO {
             }
 
             // add the stream content into repository under the given graph
-            conn.add(inputStream, graphUrl, RDFFormat.RDFXML, graphResource);
+            conn.add(inputStream, graphUrl, rdfFormat==null ? RDFFormat.RDFXML : rdfFormat, graphResource);
 
             long tripleCount = conn.size(graphResource);
 

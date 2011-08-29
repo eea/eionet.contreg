@@ -37,6 +37,7 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.openrdf.OpenRDFException;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
 
 import eionet.cr.dao.DAOException;
@@ -664,7 +665,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
      * @see eionet.cr.dao.HarvestSourceDAO#addSourceToRepository(File, String)
      */
     @Override
-    public int loadIntoRepository(File file, String graphUrl, boolean clearPreviousGraphContent) throws IOException, OpenRDFException {
+    public int loadIntoRepository(File file, RDFFormat rdfFormat, String graphUrl, boolean clearPreviousGraphContent) throws IOException, OpenRDFException {
         throw new UnsupportedOperationException("Method not implemented");
     }
 
@@ -828,7 +829,7 @@ public class PostgreSQLHarvestSourceDAO extends VirtuosoBaseDAO implements Harve
      * @see eionet.cr.dao.HarvestSourceDAO#addSourceToRepository(java.io.InputStream, java.lang.String)
      */
     @Override
-    public int loadIntoRepository(InputStream inputStream, String graphUrl, boolean clearPreviousGraphContent) throws IOException, OpenRDFException {
+    public int loadIntoRepository(InputStream inputStream, RDFFormat rdfFormat, String graphUrl, boolean clearPreviousGraphContent) throws IOException, OpenRDFException {
         throw new UnsupportedOperationException("Method not implemented");
     }
 

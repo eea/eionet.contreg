@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
 
 import eionet.cr.dto.HarvestSourceDTO;
@@ -245,26 +246,28 @@ public interface HarvestSourceDAO extends DAO {
      * File format must be supported by the triple store.
      *
      * @param file
+     * @param rdfFormat TODO
      * @param graphUrl
      * @param clearPreviousGraphContent
      * @return
      * @throws IOException
      * @throws OpenRDFException
      */
-    public int loadIntoRepository(File file, String graphUrl, boolean clearPreviousGraphContent) throws IOException, OpenRDFException;
+    public int loadIntoRepository(File file, RDFFormat rdfFormat, String graphUrl, boolean clearPreviousGraphContent) throws IOException, OpenRDFException;
 
     /**
      * Loads the given input stream into the triple store (i.e. repository).
      * The stream must be formatted by a format supported by the triple store.
      *
      * @param inputStream
+     * @param rdfFormat TODO
      * @param graphUrl
      * @param clearPreviousGraphContent
      * @return
      * @throws IOException
      * @throws OpenRDFException
      */
-    public int loadIntoRepository(InputStream inputStream, String graphUrl, boolean clearPreviousGraphContent) throws IOException, OpenRDFException;
+    public int loadIntoRepository(InputStream inputStream, RDFFormat rdfFormat, String graphUrl, boolean clearPreviousGraphContent) throws IOException, OpenRDFException;
 
     /**
      * Adds the meta information the harvester has collected about the source. The meta data is considered part of the harvester and

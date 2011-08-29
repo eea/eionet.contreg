@@ -28,26 +28,25 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 /**
  *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class MimeTypeConverter {
+public class MediaTypeToDcmiTypeConverter {
 
     /**
      * File containing mimetypes in properties format.
      */
-    private static final String MAPPINGS_FILENAME = "mimeTypeToRdfType.xml";
+    private static final String MAPPINGS_FILENAME = "mediaTypeToDcmiType.xml";
 
     /** */
-    private static Log logger = LogFactory.getLog(MimeTypeConverter.class);
+    private static final Logger LOGGER = Logger.getLogger(MediaTypeToDcmiTypeConverter.class);
 
     /** */
-    private static LinkedHashMap<String, String> mimeToRdfMap;
+    private static LinkedHashMap<String, String> mappings;
 
     /** */
     private static Object initializationLock = new Object();
@@ -57,15 +56,15 @@ public class MimeTypeConverter {
      */
     private static void initialize() {
 
-        mimeToRdfMap = new LinkedHashMap<String, String>();
+        mappings = new LinkedHashMap<String, String>();
 
         InputStream inputStream = null;
         Properties properties = new Properties();
         try {
-            inputStream = MimeTypeConverter.class.getClassLoader().getResourceAsStream(MAPPINGS_FILENAME);
+            inputStream = MediaTypeToDcmiTypeConverter.class.getClassLoader().getResourceAsStream(MAPPINGS_FILENAME);
             properties.loadFromXML(inputStream);
         } catch (IOException e) {
-            logger.error("Failed to load XML-formatted properties from " + MAPPINGS_FILENAME, e);
+            LOGGER.error("Failed to load XML-formatted properties from " + MAPPINGS_FILENAME, e);
         } finally {
             if (inputStream != null) {
                 try {
@@ -88,7 +87,7 @@ public class MimeTypeConverter {
 
                         if (!StringUtils.isBlank(mediaTypes[i])) {
 
-                            mimeToRdfMap.put(mediaTypes[i].trim(), rdfType.trim());
+                            mappings.put(mediaTypes[i].trim(), rdfType.trim());
                         }
                     }
                 }
@@ -103,12 +102,12 @@ public class MimeTypeConverter {
      *            the media type to look up
      * @return String containing the rdf:type
      */
-    public static String getRdfTypeFor(String mimeType) {
+    public static String getDcmiTypeFor(String mimeType) {
 
-        if (mimeToRdfMap == null) {
+        if (mappings == null) {
 
             synchronized (initializationLock) {
-                if (mimeToRdfMap == null) {
+                if (mappings == null) {
                     initialize();
                 }
             }
@@ -118,10 +117,10 @@ public class MimeTypeConverter {
         // If no exact match found, loop through all entries
         // and do starts-with matching for each.
 
-        String result = mimeToRdfMap.get(mimeType);
+        String result = mappings.get(mimeType);
         if (StringUtils.isBlank(result)) {
 
-            for (Map.Entry<String, String> entry : mimeToRdfMap.entrySet()) {
+            for (Map.Entry<String, String> entry : mappings.entrySet()) {
 
                 if (mimeType.startsWith(entry.getKey())) {
                     result = entry.getValue();
@@ -131,36 +130,4 @@ public class MimeTypeConverter {
 
         return StringUtils.isBlank(result) ? null : result.trim();
     }
-
-    // /**
-    // *
-    // * @param args
-    // */
-    // public static void main(String[] args) {
-    //
-    // initialize();
-    //
-    // String sql =
-    // "insert into spo"
-    // + " (subject, predicate, object, object_hash, object_double, anon_subj,"
-    // + " anon_obj, lit_obj, obj_lang, obj_deriv_source, obj_deriv_source_gen_time, obj_source_object, source, gen_time)"
-    // + " select subject, -5251507576730213845, '?', ?, null, anon_subj, 'N', 'N', '', 0, 0, 0, source, gen_time"
-    // + " from SPO where PREDICATE=333311624525447614 and OBJECT_HASH=?;";
-    //
-    // for (Map.Entry<String, String> entry : mimeToRdfMap.entrySet()) {
-    //
-    // String key = entry.getKey();
-    // String value = entry.getValue();
-    // if (!key.trim().endsWith(".+")) {
-    //
-    // String s = new String(sql);
-    // s = StringUtils.replace(s, "?", value.trim(), 1);
-    // s = StringUtils.replace(s, "?", String.valueOf(Hashes.spoHash(value.trim())), 1);
-    // s = StringUtils.replace(s, "?", String.valueOf(Hashes.spoHash(key.trim())), 1);
-    // // s = StringUtils.replace(s, "?", key.trim(), 1);
-    //
-    // System.out.println(s + " > " + key.trim());
-    // }
-    // }
-    // }
 }

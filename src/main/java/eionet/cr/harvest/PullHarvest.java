@@ -45,6 +45,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.vocabulary.XMLSchema;
+import org.openrdf.rio.RDFFormat;
 import org.xml.sax.SAXException;
 
 import eionet.cr.common.Predicates;
@@ -56,7 +57,8 @@ import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.util.HarvestMessageType;
-import eionet.cr.harvest.util.MimeTypeConverter;
+import eionet.cr.harvest.util.MediaTypeToDcmiTypeConverter;
+import eionet.cr.harvest.util.RDFMediaTypes;
 import eionet.cr.util.FileDeletionJob;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.URLUtil;
@@ -77,6 +79,9 @@ public class PullHarvest extends BaseHarvest {
 
     /** */
     private static final int MAX_REDIRECTIONS = 4;
+
+    /** */
+    private static final String ACCEPT_HEADER = StringUtils.join(RDFMediaTypes.collection(), ',') + ",text/xml,*/*;q=0.6";
 
     /** */
     private boolean isSourceAvailable;
@@ -214,7 +219,6 @@ public class PullHarvest extends BaseHarvest {
         finishWithOK(urlConn, 0);
     }
 
-
     /**
      * @param responseCode
      * @param exception
@@ -317,7 +321,7 @@ public class PullHarvest extends BaseHarvest {
                 // DublinCore type mappings
                 if (!contentType.toLowerCase().startsWith("application/rdf+xml")) {
 
-                    String rdfType = MimeTypeConverter.getRdfTypeFor(contentType);
+                    String rdfType = MediaTypeToDcmiTypeConverter.getDcmiTypeFor(contentType);
                     if (rdfType != null) {
                         addSourceMetadata(Predicates.RDF_TYPE, ObjectDTO.createResource(rdfType));
                     }
@@ -357,8 +361,9 @@ public class PullHarvest extends BaseHarvest {
             // otherwise process the file to see if it's zipped, or it's an XML with RDF conversion,
             // or actually an RDF file
 
-            if (isRdfContentType(getSourceContentType(urlConn))) {
-                return loadFile(downloadedFile);
+            RDFFormat rdfFormat = contentTypeToRdfFormat(getSourceContentType(urlConn));
+            if (rdfFormat!=null) {
+                return loadFile(downloadedFile, rdfFormat);
             } else {
                 File processedFile = null;
                 try {
@@ -366,7 +371,7 @@ public class PullHarvest extends BaseHarvest {
                     processedFile = new FileProcessor(downloadedFile, getContextUrl()).process();
                     if (processedFile != null) {
                         LOGGER.debug(loggerMsg("File processed into loadable format"));
-                        return loadFile(processedFile);
+                        return loadFile(processedFile, null);
                     } else {
                         LOGGER.debug(loggerMsg("File couldn't be processed into loadable format"));
                         return 0;
@@ -460,15 +465,16 @@ public class PullHarvest extends BaseHarvest {
 
     /**
      * @param file
+     * @param rdfFormat
      * @return
      * @throws OpenRDFException
      * @throws IOException
      */
-    private int loadFile(File file) throws IOException, OpenRDFException {
+    private int loadFile(File file, RDFFormat rdfFormat) throws IOException, OpenRDFException {
 
         LOGGER.debug(loggerMsg("Loading file into triple store"));
 
-        int tripleCount = getHarvestSourceDAO().loadIntoRepository(file, getContextUrl(), true);
+        int tripleCount = getHarvestSourceDAO().loadIntoRepository(file, rdfFormat, getContextUrl(), true);
         return tripleCount;
     }
 
@@ -519,7 +525,7 @@ public class PullHarvest extends BaseHarvest {
         sanitizedUrl = StringUtils.replace(sanitizedUrl, " ", "%20");
 
         HttpURLConnection connection = (HttpURLConnection) new URL(sanitizedUrl).openConnection();
-        connection.setRequestProperty("Accept", "application/rdf+xml, text/xml, */*;q=0.6");
+        connection.setRequestProperty("Accept", ACCEPT_HEADER);
         connection.setRequestProperty("User-Agent", URLUtil.userAgentHeader());
         connection.setRequestProperty("Connection", "close");
         connection.setInstanceFollowRedirects(false);
@@ -631,15 +637,9 @@ public class PullHarvest extends BaseHarvest {
      * @param contentType
      * @return
      */
-    private boolean isRdfContentType(String contentType) {
+    private RDFFormat contentTypeToRdfFormat(String contentType) {
 
-        if (contentType == null) {
-            return false;
-        }
-
-        String lowerCase = contentType.toLowerCase();
-        return lowerCase.startsWith("application/rdf+xml") || lowerCase.startsWith("application/x-turtle")
-        || lowerCase.startsWith("text/turtle") || lowerCase.startsWith("text/rdf+n3");
+        return contentType!=null ? RDFMediaTypes.toRdfFormat(contentType) : null;
     }
 
     /**
@@ -688,5 +688,22 @@ public class PullHarvest extends BaseHarvest {
      */
     public void setOnDemandHarvest(boolean isOnDemandHarvest) {
         this.isOnDemandHarvest = isOnDemandHarvest;
+    }
+
+    /**
+     *
+     * @param args
+     */
+    public static void main(String[] args) {
+
+        String s = " application/rdf+xml, text/turtle, text/n3, application/x-turtle, text/rdf+n3,,";
+        String[] ss = s.trim().split("\\s*,\\s*");
+        for (String sss : ss) {
+            System.out.println("_" + sss + "_");
+        }
+
+        System.out.println("**********");
+        System.out.println(StringUtils.join(ss, ","));
+        System.out.println("**********");
     }
 }
