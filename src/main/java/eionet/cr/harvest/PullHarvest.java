@@ -689,21 +689,4 @@ public class PullHarvest extends BaseHarvest {
     public void setOnDemandHarvest(boolean isOnDemandHarvest) {
         this.isOnDemandHarvest = isOnDemandHarvest;
     }
-
-    /**
-     *
-     * @param args
-     */
-    public static void main(String[] args) {
-
-        String s = " application/rdf+xml, text/turtle, text/n3, application/x-turtle, text/rdf+n3,,";
-        String[] ss = s.trim().split("\\s*,\\s*");
-        for (String sss : ss) {
-            System.out.println("_" + sss + "_");
-        }
-
-        System.out.println("**********");
-        System.out.println(StringUtils.join(ss, ","));
-        System.out.println("**********");
-    }
 }

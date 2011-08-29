@@ -33,7 +33,7 @@
                 <c:choose>
                     <c:when test="${fn:endsWith(currentHarvest.class.name, 'PushHarvest')}">Currently push-harvesting:&nbsp;</c:when>
                     <c:otherwise>Currently pull-harvesting:&nbsp;</c:otherwise>
-                </c:choose><span title="${actionBean.currentQueuedHarvest.sourceUrlString}"><c:out value="${crfn:cutAtFirstLongToken(actionBean.currentQueuedHarvest.sourceUrlString,55)}"/></span>
+                </c:choose><span title="${actionBean.currentQueuedHarvest.contextUrl}"><c:out value="${crfn:cutAtFirstLongToken(actionBean.currentQueuedHarvest.contextUrl,55)}"/></span>
             </div>
         </c:if>
 

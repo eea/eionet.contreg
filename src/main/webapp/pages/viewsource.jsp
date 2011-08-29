@@ -9,7 +9,7 @@
         <c:choose>
             <c:when test="${actionBean.harvestSource!=null}">
 
-                <c:if test="${not empty actionBean.currentQueuedHarvest && (actionBean.currentQueuedHarvest.sourceUrlString==actionBean.harvestSource.url)}">
+                <c:if test="${not empty actionBean.currentQueuedHarvest && (actionBean.currentQueuedHarvest.contextUrl==actionBean.harvestSource.url)}">
                     <div class="important-msg" style="margin-bottom:10px">This source is being harvested right now!</div>
                 </c:if>
                 <div id="tabbedmenu">
