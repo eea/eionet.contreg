@@ -14,7 +14,7 @@
 		</p>
 
 		<div style="margin-top:15px">
-			<stripes:form action="/sparqlSystems.action" method="get">
+			<stripes:form action="/sparqlclient" method="get">
 				<div>
 							<label for="endpointSelect" class="question">SPARQL endpoint:</label>
 							<stripes:select name="endpoint" id="endpointSelect">
@@ -56,7 +56,7 @@ SELECT DISTINCT ?class ?label WHERE {
 																	<c:out value="${resultRow[variable].value}"/>
 																</c:when>
 																<c:otherwise>
-																	<stripes:link href="/sparqlSystems.action"><c:out value="${resultRow[variable].value}"/>
+																	<stripes:link href="/sparqlclient"><c:out value="${resultRow[variable].value}"/>
 																		<stripes:param name="explore" value="${fn:escapeXml(resultRow[variable].value)}"/>
 																		<stripes:param name="endpoint" value="${actionBean.endpoint}"/>
 																		<c:if test="${not empty actionBean.query}">

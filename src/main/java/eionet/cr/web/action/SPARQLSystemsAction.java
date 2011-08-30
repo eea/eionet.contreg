@@ -39,7 +39,7 @@ import eionet.cr.web.sparqlClient.helpers.SPARQLEndpoints;
  * 
  * @author Juhan Voolaid
  */
-@UrlBinding("/sparqlSystems.action")
+@UrlBinding("/sparqlclient")
 public class SPARQLSystemsAction extends AbstractActionBean {
 
     /** SPARQL client form page. */
