@@ -214,6 +214,11 @@
         <url-pattern>/download</url-pattern>
     </servlet-mapping>
 
+    <!-- For login duration -->
+    <session-config>
+        <session-timeout>120</session-timeout> <!-- minutes -->
+    </session-config>
+
     <!-- welcome file list -->
 
     <welcome-file-list>
