@@ -95,7 +95,7 @@ public class DownloadServlet extends HttpServlet {
      * @throws ServletException
      */
     private void processRequest(HttpServletRequest request, HttpServletResponse response, boolean content) throws IOException,
-            ServletException {
+    ServletException {
 
         // Get requested file URI from request parameters, send 404 if its missing
         String requestedUri = request.getParameter("uri");
@@ -339,7 +339,7 @@ public class DownloadServlet extends HttpServlet {
      * @throws ServletException
      */
     private void handleFileNotFound(String message, HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    throws ServletException, IOException {
 
         logger.info(message);
         boolean isWebBrowser = false;
@@ -383,8 +383,8 @@ public class DownloadServlet extends HttpServlet {
         String[] acceptValues = acceptHeader.split("\\s*(,|;)\\s*");
         Arrays.sort(acceptValues);
         return Arrays.binarySearch(acceptValues, toAccept) > -1
-                || Arrays.binarySearch(acceptValues, toAccept.replaceAll("/.*$", "/*")) > -1
-                || Arrays.binarySearch(acceptValues, "*/*") > -1;
+        || Arrays.binarySearch(acceptValues, toAccept.replaceAll("/.*$", "/*")) > -1
+        || Arrays.binarySearch(acceptValues, "*/*") > -1;
     }
 
     /**

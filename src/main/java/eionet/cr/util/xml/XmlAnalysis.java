@@ -144,21 +144,32 @@ public class XmlAnalysis {
     }
 
     /**
+     * Method returns an URI by which conversions for the analyzed file should be looked for.
+     * If the file has a declared schema, it is returned. If not, then the method falls back
+     * to system DTD. If that one is not found either, the method falls back to public DTD.
+     * And should that one be missing too, the method returns fully qualified URI of the
+     * file's start element.
      *
-     * @return
+     * @return the result
      */
-    public String getSchemaOrDtd(){
+    public String getConversionSchema(){
 
-        // get schema uri, if it's not found then fall back to dtd
-        String schemaOrDtd = getSchemaLocation();
-        if (StringUtils.isBlank(schemaOrDtd)) {
-            schemaOrDtd = getSystemDtd();
-            if (StringUtils.isBlank(schemaOrDtd)) {
-                schemaOrDtd = getPublicDtd();
+        // get schema URI, if it's not found then fall back to system DTD,
+        // if it's not found then fall back to public DTD, and if still not
+        // found, fall back to the start element's URI
+
+        String result = getSchemaLocation();
+        if (StringUtils.isBlank(result)) {
+            result = getSystemDtd();
+            if (StringUtils.isBlank(result)) {
+                result = getPublicDtd();
+                if (StringUtils.isBlank(result)){
+                    result = getStartElemUri();
+                }
             }
         }
 
-        return schemaOrDtd;
+        return result;
     }
 
     /**

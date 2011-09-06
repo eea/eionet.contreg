@@ -114,12 +114,12 @@ public class FileProcessor {
                     LOGGER.debug(loggerMsg("Seems to be XML file with rdf:RDF start element"));
                     resultFile = unzippedFile;
                 } else {
-                    // the file's start element was not RDF, so get its schema or DTD:
+                    // the file's start element was not RDF, so get its conversion schema:
                     // if it is not null or blank, the result will be an attempted RDF conversion
-                    String schemaOrDtd = xmlAnalysis.getSchemaOrDtd();
-                    if (!StringUtils.isBlank(schemaOrDtd)) {
-                        LOGGER.debug(loggerMsg("Seems to be XML file with a schema or DTD, attempting RDF conversion"));
-                        resultFile = attemptRdfConversion(unzippedFile, schemaOrDtd, contextUrl);
+                    String conversionSchema = xmlAnalysis.getConversionSchema();
+                    if (!StringUtils.isBlank(conversionSchema)) {
+                        LOGGER.debug(loggerMsg("Seems to be XML file, attempting RDF conversion"));
+                        resultFile = attemptRdfConversion(unzippedFile, conversionSchema, contextUrl);
                     }
                 }
             }
@@ -198,16 +198,16 @@ public class FileProcessor {
 
     /**
      *
-     * @param schemaOrDtd
+     * @param conversionSchema
      * @return
      * @throws SAXException
      * @throws IOException
      */
-    private File attemptRdfConversion(File file, String schemaOrDtd, String contextUrl) throws IOException, SAXException{
+    private File attemptRdfConversion(File file, String conversionSchema, String contextUrl) throws IOException, SAXException{
 
         String conversionId = null;
         try {
-            conversionId = ConversionsParser.parseForSchema(schemaOrDtd).getRdfConversionId();
+            conversionId = ConversionsParser.parseForSchema(conversionSchema).getRdfConversionId();
         } catch (ParserConfigurationException e) {
             throw new CRRuntimeException("SAX parser configuration error");
         }

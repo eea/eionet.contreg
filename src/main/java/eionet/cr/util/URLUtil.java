@@ -21,14 +21,24 @@
 package eionet.cr.util;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.List;
+import java.util.StringTokenizer;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.log4j.Logger;
 
 import eionet.cr.config.GeneralConfig;
@@ -42,6 +52,12 @@ public class URLUtil {
 
     /** */
     private static final Logger LOGGER = Logger.getLogger(URLUtil.class);
+
+    /** */
+    private static final String DEFAULT_CHARACTAER_ENCODING = "UTF-8";
+
+    /** */
+    private static final List<String> sessionIdentifiers = Arrays.asList("JSESSIONID", "PHPSESSID", "ASPSESSIONID");
 
     /**
      *
@@ -188,7 +204,7 @@ public class URLUtil {
      * @param url
      * @return URL
      */
-    public static String replaceURLSpaces(String url){
+    public static String replaceURLSpaces(String url) {
 
         return url == null ? null : StringUtils.replace(url.toString(), " ", "%20");
     }
@@ -206,5 +222,196 @@ public class URLUtil {
                 LOGGER.warn("Error when disconnection from " + urlConnection.getURL() + ": " + e.toString());
             }
         }
+    }
+
+    /**
+     *
+     * @param urlString
+     * @return
+     * @throws UnsupportedEncodingException
+     */
+    public static String normalizeURL(String urlString) throws UnsupportedEncodingException {
+
+        // if given URL string is null, return it as it is
+        if (urlString == null) {
+            return urlString;
+        }
+
+        // we're going to need both the URL and URI wrappers
+        URL url = null;
+        URI uri = null;
+        try {
+            url = new URL(urlString.trim());
+            uri = url.toURI();
+        } catch (MalformedURLException e) {
+            return urlString;
+        } catch (URISyntaxException e) {
+            return urlString;
+        }
+
+        String protocol = url.getProtocol();
+        String userInfo = url.getUserInfo();
+        String host = url.getHost();
+        int port = url.getPort();
+        String path = url.getPath();
+        String query = url.getQuery();
+        String reference = url.getRef();
+
+        StringBuilder result = new StringBuilder();
+        if (!StringUtils.isEmpty(protocol)){
+            result.append(decodeEncode(protocol.toLowerCase())).append("://");
+        }
+
+        if (!StringUtils.isEmpty(userInfo)){
+            result.append(decodeEncode(userInfo, ":")).append("@");
+        }
+
+        if (!StringUtils.isEmpty(host)){
+            result.append(decodeEncode(host.toLowerCase()));
+        }
+
+        if (port!=-1 && port!=80){
+            result.append(":").append(port);
+        }
+
+        if (!StringUtils.isEmpty(path)){
+            result.append(normalizePath(path));
+        }
+
+        if (!StringUtils.isEmpty(query)){
+            String normalizedQuery = normalizeQueryString(uri);
+            if (!StringUtils.isBlank(normalizedQuery)){
+                result.append("?").append(normalizedQuery);
+            }
+        }
+
+        if (!StringUtils.isEmpty(reference)){
+            result.append("#").append(decodeEncode(reference));
+        }
+
+        return result.toString();
+    }
+
+    /**
+     *
+     * @param str
+     * @return
+     * @throws UnsupportedEncodingException
+     */
+    private static String decodeEncode(String str) throws UnsupportedEncodingException {
+
+        if (StringUtils.isEmpty(str)) {
+            return str;
+        } else {
+            String decoded = URLDecoder.decode(str, DEFAULT_CHARACTAER_ENCODING);
+            return URLEncoder.encode(decoded, DEFAULT_CHARACTAER_ENCODING);
+        }
+    }
+
+    /**
+     *
+     * @param str
+     * @param exceptions
+     * @return
+     * @throws UnsupportedEncodingException
+     */
+    private static String decodeEncode(String str, String exceptions) throws UnsupportedEncodingException{
+
+        if (StringUtils.isEmpty(str)){
+            return str;
+        }
+        else if (StringUtils.isEmpty(exceptions)){
+            return decodeEncode(str);
+        }
+
+        StringBuilder result = new StringBuilder();
+        StringTokenizer tokenizer = new StringTokenizer(str, exceptions, true);
+        while (tokenizer.hasMoreTokens()){
+
+            String token = tokenizer.nextToken();
+            if (!token.isEmpty() && exceptions.contains(token)){
+                result.append(token);
+            }
+            else{
+                result.append(decodeEncode(token));
+            }
+        }
+
+        return result.toString();
+    }
+
+    /**
+     *
+     * @param uri
+     * @return
+     * @throws UnsupportedEncodingException
+     */
+    private static String normalizeQueryString(URI uri) throws UnsupportedEncodingException {
+
+        StringBuilder result = new StringBuilder();
+        List<NameValuePair> paramPairs = URLEncodedUtils.parse(uri, DEFAULT_CHARACTAER_ENCODING);
+        for (NameValuePair paramPair : paramPairs) {
+
+            String name = paramPair.getName();
+            String value = paramPair.getValue();
+            String normalizedName = decodeEncode(name);
+            if (!isSessionId(normalizedName)){
+
+                if (result.length() > 0){
+                    result.append("&");
+                }
+                result.append(normalizedName);
+                if (value != null) {
+                    result.append("=").append(decodeEncode(value));
+                }
+            }
+        }
+
+        return result.toString();
+    }
+
+    /**
+     *
+     * @param str
+     * @return
+     */
+    private static boolean isSessionId(String str){
+
+        if (str==null){
+            return false;
+        }
+
+        return sessionIdentifiers.contains(str.toUpperCase());
+    }
+
+    /**
+     *
+     * @param path
+     * @return
+     * @throws UnsupportedEncodingException
+     */
+    private static String normalizePath(String path) throws UnsupportedEncodingException{
+
+        for (String sessionId : sessionIdentifiers){
+
+            int i = path.indexOf(";" + sessionId + "=");
+            if (i>=0){
+                path = path.substring(0, i);
+            }
+        }
+
+        return decodeEncode(path, "/;");
+    }
+
+    /**
+     *
+     * @param args
+     * @throws Exception
+     */
+    public static void main(String[] args) throws Exception {
+
+        String urlString = "http://usern%68me:password@d%69main:123/path;ASPSESSIONID=93AE727EADF5D5351219360F1952051F?jaanus=onu&phpsessid=999#fragment_%69d";
+        System.out.println(urlString);
+        System.out.println(normalizeURL(urlString));
     }
 }
