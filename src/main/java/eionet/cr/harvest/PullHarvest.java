@@ -118,9 +118,15 @@ public class PullHarvest extends BaseHarvest {
         int noOfRedirections = 0;
 
         try {
+            String connectUrl = getContextUrl();
             do {
-                LOGGER.debug(loggerMsg("Opening URL connection"));
-                urlConn = openUrlConnection();
+                String message = "Opening URL connection";
+                if (!connectUrl.equals(getContextUrl())){
+                    message = message + " to " + connectUrl;
+                }
+                LOGGER.debug(loggerMsg(message));
+
+                urlConn = openUrlConnection(connectUrl);
                 try {
                     responseCode = urlConn.getResponseCode();
                 } catch (IOException ioe) {
@@ -141,19 +147,30 @@ public class PullHarvest extends BaseHarvest {
                                 + initialContextUrl);
                     }
 
+                    // get redirected-to-url, throw exception if it's missing
                     String redirectedToUrl = getRedirectUrl(urlConn);
                     if (StringUtils.isBlank(redirectedToUrl)) {
                         throw new NoRedirectLocationException("Redirection response code wihtout \"Location\" header!");
-                    } else {
-                        LOGGER.debug(loggerMsg(getContextUrl() + " redirects to " + redirectedToUrl));
+                    }
+                    LOGGER.debug(loggerMsg(connectUrl + " redirects to " + redirectedToUrl));
+
+                    // treat this as a redirection only if the context URL and the redirected-to-URL
+                    // are not essentially the same
+                    if (URLUtil.equalUrls(getContextUrl(), redirectedToUrl)==false){
+
                         finishRedirectedHarvest(redirectedToUrl);
                         LOGGER.debug(loggerMsg("Redirection details saved"));
                         startWithNewContext(redirectedToUrl);
                     }
+                    else{
+                        LOGGER.debug(loggerMsg("Ignoring this redirection, as it is essentially to the same URL"));
+                    }
+
+                    connectUrl = redirectedToUrl;
                 }
             } while (isRedirect(responseCode));
 
-            // if context URL returned no errors and its content has been modified since last harvest,
+            // if URL connection returned no errors and its content has been modified since last harvest,
             // proceed to downloading
             if (!isError(responseCode) && !isNotModified(responseCode)) {
 
@@ -511,6 +528,7 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
+     * @param connectUrl TODO
      * @return
      * @throws MalformedURLException
      * @throws IOException
@@ -518,10 +536,10 @@ public class PullHarvest extends BaseHarvest {
      * @throws SAXException
      * @throws ParserConfigurationException
      */
-    private HttpURLConnection openUrlConnection() throws MalformedURLException, IOException, DAOException, SAXException,
+    private HttpURLConnection openUrlConnection(String connectUrl) throws MalformedURLException, IOException, DAOException, SAXException,
     ParserConfigurationException {
 
-        String sanitizedUrl = StringUtils.substringBefore(getContextUrl(), "#");
+        String sanitizedUrl = StringUtils.substringBefore(connectUrl, "#");
         sanitizedUrl = StringUtils.replace(sanitizedUrl, " ", "%20");
 
         HttpURLConnection connection = (HttpURLConnection) new URL(sanitizedUrl).openConnection();

@@ -41,6 +41,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.log4j.Logger;
 
+import eionet.cr.common.CRRuntimeException;
 import eionet.cr.config.GeneralConfig;
 
 /**
@@ -226,11 +227,21 @@ public class URLUtil {
 
     /**
      *
+     * @param url1
+     * @param url2
+     * @return
+     */
+    public static boolean equalUrls(String url1, String url2){
+
+        return normalizeUrl(url1).equals(normalizeUrl(url2));
+    }
+
+    /**
+     *
      * @param urlString
      * @return
-     * @throws UnsupportedEncodingException
      */
-    public static String normalizeURL(String urlString) throws UnsupportedEncodingException {
+    public static String normalizeUrl(String urlString){
 
         // if given URL string is null, return it as it is
         if (urlString == null) {
@@ -249,6 +260,7 @@ public class URLUtil {
             return urlString;
         }
 
+        // get all the various parts of this URL
         String protocol = url.getProtocol();
         String userInfo = url.getUserInfo();
         String host = url.getHost();
@@ -257,36 +269,44 @@ public class URLUtil {
         String query = url.getQuery();
         String reference = url.getRef();
 
+        // start building the result, processing each of the above-found URL parts
+
         StringBuilder result = new StringBuilder();
-        if (!StringUtils.isEmpty(protocol)){
-            result.append(decodeEncode(protocol.toLowerCase())).append("://");
-        }
 
-        if (!StringUtils.isEmpty(userInfo)){
-            result.append(decodeEncode(userInfo, ":")).append("@");
-        }
+        try{
+            if (!StringUtils.isEmpty(protocol)){
+                result.append(decodeEncode(protocol.toLowerCase())).append("://");
+            }
 
-        if (!StringUtils.isEmpty(host)){
-            result.append(decodeEncode(host.toLowerCase()));
-        }
+            if (!StringUtils.isEmpty(userInfo)){
+                result.append(decodeEncode(userInfo, ":")).append("@");
+            }
 
-        if (port!=-1 && port!=80){
-            result.append(":").append(port);
-        }
+            if (!StringUtils.isEmpty(host)){
+                result.append(decodeEncode(host.toLowerCase()));
+            }
 
-        if (!StringUtils.isEmpty(path)){
-            result.append(normalizePath(path));
-        }
+            if (port!=-1 && port!=80){
+                result.append(":").append(port);
+            }
 
-        if (!StringUtils.isEmpty(query)){
-            String normalizedQuery = normalizeQueryString(uri);
-            if (!StringUtils.isBlank(normalizedQuery)){
-                result.append("?").append(normalizedQuery);
+            if (!StringUtils.isEmpty(path)){
+                result.append(normalizePath(path));
+            }
+
+            if (!StringUtils.isEmpty(query)){
+                String normalizedQuery = normalizeQueryString(uri);
+                if (!StringUtils.isBlank(normalizedQuery)){
+                    result.append("?").append(normalizedQuery);
+                }
+            }
+
+            if (!StringUtils.isEmpty(reference)){
+                result.append("#").append(decodeEncode(reference));
             }
         }
-
-        if (!StringUtils.isEmpty(reference)){
-            result.append("#").append(decodeEncode(reference));
+        catch (UnsupportedEncodingException e){
+            throw new CRRuntimeException("Unsupported encoding: " + e.getMessage(), e);
         }
 
         return result.toString();
@@ -412,6 +432,6 @@ public class URLUtil {
 
         String urlString = "http://usern%68me:password@d%69main:123/path;ASPSESSIONID=93AE727EADF5D5351219360F1952051F?jaanus=onu&phpsessid=999#fragment_%69d";
         System.out.println(urlString);
-        System.out.println(normalizeURL(urlString));
+        System.out.println(normalizeUrl(urlString));
     }
 }
