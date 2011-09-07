@@ -21,7 +21,6 @@
 package eionet.cr.web.action;
 
 import java.net.MalformedURLException;
-import java.text.DecimalFormat;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -117,17 +116,6 @@ public class HarvestSourceActionBean extends AbstractActionBean {
      */
     public List<HarvestDTO> getHarvests() {
         return harvests;
-    }
-
-    /**
-     *
-     * @return String
-     * @throws DAOException
-     */
-    public String getUrgencyScoreFormatted() throws DAOException {
-
-        double urgencyScore = harvestSource != null ? harvestSource.getHarvestUrgencyScore() : 0.0d;
-        return urgencyScore <= 0 ? "N/A" : new DecimalFormat("#.####").format(urgencyScore);
     }
 
     /**
@@ -446,42 +434,10 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     public String getIntervalMinutesDisplay() {
 
         String result = "";
-        if (this.harvestSource != null && this.harvestSource.getIntervalMinutes() != null) {
-            result = HarvestSourceActionBean.getMinutesDisplay(this.harvestSource.getIntervalMinutes().intValue());
+        if (harvestSource != null && harvestSource.getIntervalMinutes() != null) {
+            result = getMinutesDisplay(harvestSource.getIntervalMinutes().intValue());
         }
 
-        return result;
-    }
-
-    /**
-     *
-     * @return String
-     */
-    public String getPrioritySourceDisplay() {
-
-        String result = "";
-        if (this.harvestSource != null) {
-            if (harvestSource.isPrioritySource()) {
-                result = "yes";
-            } else {
-                result = "no";
-            }
-        }
-        return result;
-    }
-
-    /**
-     *
-     * @return String
-     */
-    public String getSchemaSourceDisplay() {
-
-        String result = "";
-        if (schemaSource) {
-            result = "yes";
-        } else {
-            result = "no";
-        }
         return result;
     }
 
