@@ -464,7 +464,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     public List<HarvestSourceDTO> getNextScheduledSources(int limit) throws DAOException {
 
         List<Object> values = new ArrayList<Object>();
-        String query = GET_NEXT_SCHEDULED_SOURCES_SQL.replace("<limParam>", new Integer(limit).toString());
+        String query = GET_NEXT_SCHEDULED_SOURCES_SQL.replace("<limParam>", " TOP " + new Integer(limit).toString());
         return executeSQL(query, values, new HarvestSourceDTOReader());
     }
 
