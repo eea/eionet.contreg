@@ -2,8 +2,8 @@ package eionet.cr.dao.virtuoso.helpers;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -67,7 +67,7 @@ public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
     @Override
     protected String getOrderedQuery(List<Object> inParams) {
         // sorting by date needs including the graph into query: sorting is done by graph's cr:contentLastmodified
-//        StringBuilder strBuilder = new StringBuilder(SPARQLQueryUtil.getCrInferenceDefinition());
+        //        StringBuilder strBuilder = new StringBuilder(SPARQLQueryUtil.getCrInferenceDefinition());
         StringBuilder strBuilder = initQueryStringBuilder();
         if (Predicates.CR_LAST_MODIFIED.equals(sortPredicate)) {
             strBuilder.append("select distinct ?s max(?time) AS ?oorderby where {graph ?g { ?s ?p ?o ");
@@ -85,11 +85,11 @@ public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
         // if we do not have real labels / types in the query sort by last part of URI
         if (Predicates.RDFS_LABEL.equals(sortPredicate)) {
             strBuilder.append("(bif:either( bif:isnull(?oorderby) , (bif:lcase(bif:subseq (bif:replace (?s, '/', '#'), ").append(
-                    "bif:strrchr (bif:replace (?s, '/', '#'), '#')+1))) , bif:lcase(?oorderby)))");
+            "bif:strrchr (bif:replace (?s, '/', '#'), '#')+1))) , bif:lcase(?oorderby)))");
         } else if (Predicates.RDF_TYPE.equals(sortPredicate)) {
             // Replace all / with # and then get the string after last #
             strBuilder.append("(bif:lcase(bif:subseq (bif:replace (?oorderby, '/', '#'), bif:strrchr (bif:replace ").append(
-                    "(?oorderby, '/', '#'), '#')+1)))");
+            "(?oorderby, '/', '#'), '#')+1)))");
             // sort by date
         } else if (sortPredicate.equals(Predicates.CR_LAST_MODIFIED)) {
             strBuilder.append("(?oorderby)");
@@ -103,7 +103,7 @@ public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
     @Override
     public String getUnorderedQuery(List<Object> inParams) {
 
-//        StringBuilder strBuilder = new StringBuilder(SPARQLQueryUtil.getCrInferenceDefinition());
+        //        StringBuilder strBuilder = new StringBuilder(SPARQLQueryUtil.getCrInferenceDefinition());
         StringBuilder strBuilder = initQueryStringBuilder();
         strBuilder.append("select distinct ?s where { ?s ?p ?o ");
         strBuilder.append(getQueryParameters(inParams));
@@ -114,18 +114,13 @@ public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
 
     @Override
     public String getCountQuery(List<Object> inParams) {
-//        StringBuilder strBuilder = new StringBuilder(SPARQLQueryUtil.getCrInferenceDefinition());
+        //        StringBuilder strBuilder = new StringBuilder(SPARQLQueryUtil.getCrInferenceDefinition());
         StringBuilder strBuilder = initQueryStringBuilder();
         strBuilder.append("select count(distinct ?s) where { ?s ?p ?o ");
         strBuilder.append(getQueryParameters(inParams));
         strBuilder.append("}");
 
         return strBuilder.toString();
-    }
-
-    @Override
-    public String getMinMaxHashQuery(List<Object> inParams) {
-        throw new UnsupportedOperationException("Method not implemented");
     }
 
     /**

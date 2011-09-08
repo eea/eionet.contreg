@@ -14,6 +14,12 @@
 						</td>
 					</tr>
 					<tr>
+						<td><stripes:label class="question" for="page_title">Page title</stripes:label></td>
+						<td>
+							<stripes:text id="page_title" name="title" size="40"/>
+						</td>
+					</tr>
+					<tr>
 						<td><stripes:label class="question required" for="content_type">Content type</stripes:label></td>
 						<td>
 							<stripes:text id="content_type" name="contentType" size="40"/>
@@ -22,6 +28,12 @@
 					<tr>
 						<td><stripes:label class="question required" for="file">File</stripes:label></td>
 						<td><stripes:file name="file" id="file" size="30" /></td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							<stripes:checkbox name="overwrite" id="overwrite"/>
+		            		<stripes:label for="overwrite">Overwrite if file with the same name already exists</stripes:label>
+		            	</td>
 					</tr>
 					<tr>
 						<td colspan="2" align="right">

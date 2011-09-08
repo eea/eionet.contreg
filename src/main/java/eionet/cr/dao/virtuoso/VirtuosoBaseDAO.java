@@ -1,5 +1,8 @@
 package eionet.cr.dao.virtuoso;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -11,7 +14,6 @@ import org.openrdf.repository.RepositoryConnection;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.dao.DAOException;
-import eionet.cr.dao.SQLBaseDAO;
 import eionet.cr.dao.helpers.SearchHelper;
 import eionet.cr.dao.readers.SubjectDataReader;
 import eionet.cr.dto.SubjectDTO;
@@ -20,6 +22,8 @@ import eionet.cr.util.Hashes;
 import eionet.cr.util.sesame.SPARQLQueryUtil;
 import eionet.cr.util.sesame.SPARQLResultSetReader;
 import eionet.cr.util.sesame.SesameUtil;
+import eionet.cr.util.sql.SQLResultSetReader;
+import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
 
 /**
@@ -27,7 +31,7 @@ import eionet.cr.util.sql.SingleObjectReader;
  * @author jaanus
  *
  */
-public abstract class VirtuosoBaseDAO extends SQLBaseDAO {
+public abstract class VirtuosoBaseDAO {
 
     /** */
     // public static final String BNODE_URI_PREFIX = "nodeID://";
@@ -37,6 +41,15 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO {
     protected Logger logger = Logger.getLogger(VirtuosoBaseDAO.class);
 
     private Bindings bindings;
+
+    /**
+     *
+     * @return
+     */
+    protected Connection getSQLConnection() throws SQLException {
+
+        return SesameUtil.getSQLConnection();
+    }
 
     /**
      *
@@ -257,5 +270,69 @@ public abstract class VirtuosoBaseDAO extends SQLBaseDAO {
         Bindings bindings = helper.getQueryBindings();
         Object resultObject = executeUniqueResultSPARQL(query, bindings, new SingleObjectReader<Long>());
         return Integer.valueOf(resultObject.toString());
+    }
+
+    /**
+     * helper method to execute sql queries. Handles connection init, close. Wraps Exceptions into {@link DAOException}
+     *
+     * @param <T> - type of the returned object
+     * @param sql - sql string
+     * @param params - parameters to insert into sql string
+     * @param reader - reader, to convert resultset
+     * @return result of the sql query
+     * @throws DAOException
+     */
+    protected <T> List<T> executeSQL(String sql, List<?> params, SQLResultSetReader<T> reader) throws DAOException {
+        Connection conn = null;
+        try {
+            conn = getSQLConnection();
+            SQLUtil.executeQuery(sql, params, reader, conn);
+            List<T> list = reader.getResultList();
+            return list;
+        } catch (Exception e) {
+            throw new DAOException(e.getMessage(), e);
+        } finally {
+            SQLUtil.close(conn);
+        }
+    }
+
+    /**
+     * executes insert or update with given sql and parameters.
+     *
+     * @param sql - sql string to execute
+     * @param params - sql params
+     * @throws DAOException
+     */
+    protected void executeSQL(String sql, List<?> params) throws DAOException {
+        Connection conn = null;
+        PreparedStatement statement = null;
+        try {
+            conn = getSQLConnection();
+            if (params != null && !params.isEmpty()) {
+                statement = SQLUtil.prepareStatement(sql, params, conn);
+                statement.execute();
+            } else {
+                SQLUtil.executeUpdate(sql, conn);
+            }
+        } catch (Exception e) {
+            throw new DAOException(e.getMessage(), e);
+        } finally {
+            SQLUtil.close(conn);
+            SQLUtil.close(statement);
+        }
+    }
+
+    /**
+     *
+     * @param <T>
+     * @param sql
+     * @param params
+     * @param reader
+     * @return
+     * @throws DAOException
+     */
+    protected <T> T executeUniqueResultSQL(String sql, List<?> params, SQLResultSetReader<T> reader) throws DAOException {
+        List<T> result = executeSQL(sql, params, reader);
+        return result == null || result.isEmpty() ? null : result.get(0);
     }
 }

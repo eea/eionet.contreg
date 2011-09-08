@@ -58,7 +58,7 @@ public class SearchDAOTest extends CRDatabaseTestCase {
         //
         // Pair<Integer, List<SubjectDTO>> result =
         // DAOFactory.get().getDao(SearchDAO.class).searchByFreeText(
-        // new SearchExpression("KESKKONNAPOLIITIKA"), PostgreFreeTextSearchHelper.FilterType.ANY_OBJECT, false, pagingRequest,
+        // new SearchExpression("KESKKONNAPOLIITIKA"), FreeTextSearchHelper.FilterType.ANY_OBJECT, false, pagingRequest,
         // null);
         //
         //
@@ -81,8 +81,8 @@ public class SearchDAOTest extends CRDatabaseTestCase {
         List<String> selectedPredicates = null;
 
         Pair<Integer, List<SubjectDTO>> result =
-                DAOFactory.get().getDao(SearchDAO.class)
-                        .searchByTypeAndFilters(filters, null, pagingRequest, null, selectedPredicates);
+            DAOFactory.get().getDao(SearchDAO.class)
+            .searchByTypeAndFilters(filters, null, pagingRequest, null, selectedPredicates);
 
         assertEquals(1, result.getLeft().intValue());
         assertTrue(result.getLeft() > 0);

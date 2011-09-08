@@ -3,7 +3,7 @@
 
 <stripes:layout-render name="/pages/common/template.jsp" pageTitle="Documentation">
     <stripes:layout-component name="contents">
-    	<h1>Documentation</h1>
+    	<h1>${actionBean.title}</h1>
 		${actionBean.content}
 	</stripes:layout-component>
 </stripes:layout-render>

@@ -45,7 +45,7 @@ public class QueryExecutor {
             repo.initialize();
 
             conn = repo.getConnection();
-            
+
             TupleQuery q = conn.prepareTupleQuery(QueryLanguage.SPARQL, query);
             TupleQueryResult bindings = q.evaluate();
 
@@ -66,47 +66,47 @@ public class QueryExecutor {
             }
         }
     }
-    
+
     /**
-    *
-    * @param endpoint
-    * @param query
+     *
+     * @param endpoint
+     * @param query
      * @return boolean
-    */
-   public boolean executeASKQuery(String endpoint, String query) {
+     */
+    public boolean executeASKQuery(String endpoint, String query) {
 
-       RepositoryConnection conn = null;
-       boolean ret = false;
-       try {
-           SPARQLRepository repo = new SPARQLRepository(endpoint);
-           repo.initialize();
+        RepositoryConnection conn = null;
+        boolean ret = false;
+        try {
+            SPARQLRepository repo = new SPARQLRepository(endpoint);
+            repo.initialize();
 
-           conn = repo.getConnection();
-           
-           BooleanQuery resultsTableBoolean = conn.prepareBooleanQuery(QueryLanguage.SPARQL, query);
-           Boolean result = resultsTableBoolean.evaluate();
-           
-           ret = result.booleanValue();
-           
-       } catch (Exception e) {
-           e.printStackTrace();
-       } finally {
-           if (conn != null) {
-               try {
-                   conn.close();
-               } catch (Exception e) {
-                   logger.info("Failed to close RepositoryConnection object: " + e.toString());
-               }
-           }
-       }
-       
-       return ret;
-   }
+            conn = repo.getConnection();
+
+            BooleanQuery resultsTableBoolean = conn.prepareBooleanQuery(QueryLanguage.SPARQL, query);
+            Boolean result = resultsTableBoolean.evaluate();
+
+            ret = result.booleanValue();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (Exception e) {
+                    logger.info("Failed to close RepositoryConnection object: " + e.toString());
+                }
+            }
+        }
+
+        return ret;
+    }
 
     /** */
     private static final String EXPLORE_QUERY_TEMPL = "SELECT DISTINCT ?subj ?pred ?obj WHERE {\n"
-            + " {?subj ?pred ?obj . FILTER (?subj = <@exploreSubject@>) . }\n"
-            + " UNION {?subj ?pred ?obj . FILTER (?obj = <@exploreSubject@> ) . }\n} LIMIT 50";
+        + " {?subj ?pred ?obj . FILTER (?subj = <@exploreSubject@>) . }\n"
+        + " UNION {?subj ?pred ?obj . FILTER (?obj = <@exploreSubject@> ) . }\n} LIMIT 50";
     /**
      *
      * @param endpoint

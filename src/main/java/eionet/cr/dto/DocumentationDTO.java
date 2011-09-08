@@ -18,7 +18,8 @@ public class DocumentationDTO implements Serializable {
 
     private String pageId;
     private String contentType;
-    private byte[] content;
+    private String content;
+    private String title;
 
     public String getPageId() {
         return pageId;
@@ -32,11 +33,17 @@ public class DocumentationDTO implements Serializable {
     public void setContentType(String contentType) {
         this.contentType = contentType;
     }
-    public byte[] getContent() {
+    public String getContent() {
         return content;
     }
-    public void setContent(byte[] content) {
+    public void setContent(String content) {
         this.content = content;
+    }
+    public String getTitle() {
+        return title;
+    }
+    public void setTitle(String title) {
+        this.title = title;
     }
 
 }

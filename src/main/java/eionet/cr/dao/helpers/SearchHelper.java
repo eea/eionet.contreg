@@ -46,13 +46,6 @@ public interface SearchHelper {
     public abstract String getCountQuery(List<Object> inParams);
 
     /**
-     *
-     * @param inParams
-     * @return
-     */
-    public abstract String getMinMaxHashQuery(List<Object> inParams);
-
-    /**
      * Bindings of the search query.
      *
      * @return filled query bindings for the query to be used in the PreparedStatement

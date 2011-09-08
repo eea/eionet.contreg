@@ -18,7 +18,7 @@
  *
  * Contributor(s):
  * Jaanus Heinlaid, Tieto Eesti*/
-package eionet.cr.dao.postgre;
+package eionet.cr.dao.virtuoso;
 
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ import eionet.cr.util.sql.SQLUtil;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class PostgreSQLHarvestMessageDAO extends PostgreSQLBaseDAO implements HarvestMessageDAO {
+public class VirtuosoHarvestMessageDAO extends VirtuosoBaseDAO implements HarvestMessageDAO {
 
     /** */
     private static final String q_HarvestMessageByHarvestID = "select * from HARVEST_MESSAGE where HARVEST_ID=?";

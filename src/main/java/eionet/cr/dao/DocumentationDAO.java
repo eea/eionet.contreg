@@ -3,7 +3,8 @@
  */
 package eionet.cr.dao;
 
-import net.sourceforge.stripes.action.FileBean;
+import java.util.List;
+
 import eionet.cr.dto.DocumentationDTO;
 
 /**
@@ -20,12 +21,20 @@ public interface DocumentationDAO extends DAO {
     public DocumentationDTO getDocObject(String pageId) throws DAOException;
 
     /**
-     * @param pageId
-     * @param contentType
-     * @param file
+     * Return all object from documentation table where content_type is text/html
+     * @return List<DocumentationDTO>
      * @throws DAOException
      */
-    public void insertFile(String pageId, String contentType, FileBean file) throws DAOException;
+    public List<DocumentationDTO> getHtmlDocObjects() throws DAOException;
+
+    /**
+     * @param pageId
+     * @param contentType
+     * @param fileName
+     * @param title
+     * @throws DAOException
+     */
+    public void insertFile(String pageId, String contentType, String fileName, String title) throws DAOException;
 
     /**
      * Checks if such page_id already exists in database

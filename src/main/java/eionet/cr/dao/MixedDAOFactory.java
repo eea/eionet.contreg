@@ -1,9 +1,6 @@
 package eionet.cr.dao;
 
-import eionet.cr.config.GeneralConfig;
-import eionet.cr.dao.postgre.PostgreSQLDAOFactory;
 import eionet.cr.dao.virtuoso.VirtuosoDAOFactory;
-import eionet.cr.util.sql.DbConnectionProvider;
 
 /**
  *
@@ -36,14 +33,6 @@ public class MixedDAOFactory extends DAOFactory {
     public <T extends DAO> T getDao(Class<T> implementedInterface) {
 
         T implementationClass = VirtuosoDAOFactory.get().getDao(implementedInterface);
-        if (GeneralConfig.useVirtuoso() == false || implementationClass == null) {
-
-            String dbUrl = DbConnectionProvider.getConnectionUrl();
-            if (dbUrl.startsWith("jdbc:postgresql:")) {
-                return implementationClass = PostgreSQLDAOFactory.get().getDao(implementedInterface);
-            }
-        }
-
         return implementationClass;
     }
 }

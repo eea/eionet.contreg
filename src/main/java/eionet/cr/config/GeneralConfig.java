@@ -45,12 +45,6 @@ public class GeneralConfig {
     public static final String DB_PWD = "db.pwd";
 
     /** */
-    public static final String DB_UNITTEST_DRV = "db.unitest.drv";
-    public static final String DB_UNITTEST_URL = "db.unitest.url";
-    public static final String DB_UNITTEST_USR = "db.unitest.usr";
-    public static final String DB_UNITTEST_PWD = "db.unitest.pwd";
-
-    /** */
     public static final String HARVESTER_FILES_LOCATION = "harvester.tempFileDir";
     public static final String HARVESTER_BATCH_HARVESTING_HOURS = "harvester.batchHarvestingHours";
     public static final String HARVESTER_JOB_INTERVAL_SECONDS = "harvester.batchHarvestingIntervalSeconds";
@@ -81,7 +75,6 @@ public class GeneralConfig {
     public static final String RECENT_DISCOVERED_FILES_CACHE_UPDATE_INTERVAL = "recentDiscoveredFilesCacheUpdateInterval";
     public static final String TYPE_CACHE_UPDATE_INTERVAL = "typeCacheUpdateInterval";
     public static final String TAG_CLOUD_CACHE_UPDATE_INTERVAL = "tagCloudCacheUpdateInterval";
-    public static final String GARBAGE_COLLECTOR_CRON_JOB = "garbageCollectorCronJob";
     public static final String TYPE_CACHE_UPDATER_CRON_JOB = "typeCacheTablesUpdateCronJob";
 
     /*
@@ -101,7 +94,6 @@ public class GeneralConfig {
     public static final String VIRTUOSO_DB_ROPWD = "virtuoso.db.ropwd";
 
     /** */
-    public static final String VIRTUOSO_UNITTEST_DB_URL = "virtuoso.unittest.db.url";
     public static final String VIRTUOSO_UNITTEST_DB_USR = "virtuoso.unittest.db.usr";
     public static final String VIRTUOSO_UNITTEST_DB_PWD = "virtuoso.unittest.db.pwd";
 

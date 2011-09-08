@@ -54,7 +54,7 @@ public class SesameConnectionProvider {
 
         if (readWriteRepository == null) {
 
-            String urlProperty = IsJUnitRuntime.VALUE ? GeneralConfig.VIRTUOSO_UNITTEST_DB_URL : GeneralConfig.VIRTUOSO_DB_URL;
+            String urlProperty = GeneralConfig.VIRTUOSO_DB_URL;
             String usrProperty = IsJUnitRuntime.VALUE ? GeneralConfig.VIRTUOSO_UNITTEST_DB_USR : GeneralConfig.VIRTUOSO_DB_USR;
             String pwdProperty = IsJUnitRuntime.VALUE ? GeneralConfig.VIRTUOSO_UNITTEST_DB_PWD : GeneralConfig.VIRTUOSO_DB_PWD;
 
@@ -210,7 +210,7 @@ public class SesameConnectionProvider {
 
         // no data source was found above, so create the connection through DriverManager
 
-        String urlProperty = IsJUnitRuntime.VALUE ? GeneralConfig.VIRTUOSO_UNITTEST_DB_URL : GeneralConfig.VIRTUOSO_DB_URL;
+        String urlProperty = GeneralConfig.VIRTUOSO_DB_URL;
         String usrProperty = IsJUnitRuntime.VALUE ? GeneralConfig.VIRTUOSO_UNITTEST_DB_USR : GeneralConfig.VIRTUOSO_DB_USR;
         String pwdProperty = IsJUnitRuntime.VALUE ? GeneralConfig.VIRTUOSO_UNITTEST_DB_PWD : GeneralConfig.VIRTUOSO_DB_PWD;
 

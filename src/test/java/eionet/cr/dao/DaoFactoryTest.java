@@ -24,33 +24,34 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
-import eionet.cr.dao.postgre.PostgreSQLDAOFactory;
-import eionet.cr.dao.postgre.PostgreSQLHarvestDAO;
-import eionet.cr.dao.postgre.PostgreSQLHarvestMessageDAO;
-import eionet.cr.dao.postgre.PostgreSQLUrgentHarvestQueueDAO;
+import eionet.cr.dao.virtuoso.VirtuosoDocumentationDAO;
+import eionet.cr.dao.virtuoso.VirtuosoHarvestDAO;
+import eionet.cr.dao.virtuoso.VirtuosoHarvestMessageDAO;
 import eionet.cr.dao.virtuoso.VirtuosoHarvestSourceDAO;
+import eionet.cr.dao.virtuoso.VirtuosoSpoBinaryDAO;
 import eionet.cr.dao.virtuoso.VirtuosoTagsDAO;
+import eionet.cr.dao.virtuoso.VirtuosoUrgentHarvestQueueDAO;
 import eionet.cr.dao.virtuoso.VirtuosoUserHomeDAO;
 
 /**
  * Tests the factory getDao methods.
  *
- * @author Aleksandr Ivanov <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
+ * @author altnyris
  */
 public class DaoFactoryTest extends TestCase {
 
     @Test
     public void testFactory() {
 
-        DAOFactory factory = PostgreSQLDAOFactory.get();
-        assertTrue(factory.getDao(HarvestDAO.class) instanceof PostgreSQLHarvestDAO);
-        assertTrue(factory.getDao(HarvestMessageDAO.class) instanceof PostgreSQLHarvestMessageDAO);
-        assertTrue(factory.getDao(UrgentHarvestQueueDAO.class) instanceof PostgreSQLUrgentHarvestQueueDAO);
-
-        factory = DAOFactory.get();
+        DAOFactory factory = DAOFactory.get();
         assertTrue(factory.getDao(HarvestSourceDAO.class) instanceof VirtuosoHarvestSourceDAO);
+        assertTrue(factory.getDao(HarvestDAO.class) instanceof VirtuosoHarvestDAO);
+        assertTrue(factory.getDao(HarvestMessageDAO.class) instanceof VirtuosoHarvestMessageDAO);
         assertTrue(factory.getDao(TagsDAO.class) instanceof VirtuosoTagsDAO);
         assertTrue(factory.getDao(UserHomeDAO.class) instanceof VirtuosoUserHomeDAO);
+        assertTrue(factory.getDao(DocumentationDAO.class) instanceof VirtuosoDocumentationDAO);
+        assertTrue(factory.getDao(UrgentHarvestQueueDAO.class) instanceof VirtuosoUrgentHarvestQueueDAO);
+        assertTrue(factory.getDao(SpoBinaryDAO.class) instanceof VirtuosoSpoBinaryDAO);
 
     }
 }

@@ -57,7 +57,7 @@ public abstract class AbstractSearchHelper implements SearchHelper {
         if (sortingRequest != null) {
             sortPredicate = sortingRequest.getSortingColumnName();
             sortOrder =
-                    sortingRequest.getSortOrder() == null ? SortOrder.ASCENDING.toSQL() : sortingRequest.getSortOrder().toSQL();
+                sortingRequest.getSortOrder() == null ? SortOrder.ASCENDING.toSQL() : sortingRequest.getSortOrder().toSQL();
         }
     }
 
@@ -72,7 +72,7 @@ public abstract class AbstractSearchHelper implements SearchHelper {
 
         if (pagingRequest != null) {
             return new StringBuffer(query).append(" limit ").append(pagingRequest.getItemsPerPage()).append(" offset ")
-                    .append(pagingRequest.getOffset()).toString();
+            .append(pagingRequest.getOffset()).toString();
         } else {
             return query;
         }
@@ -98,13 +98,6 @@ public abstract class AbstractSearchHelper implements SearchHelper {
      * @return String
      */
     public abstract String getCountQuery(List<Object> inParams);
-
-    /**
-     *
-     * @param inParams
-     * @return String
-     */
-    public abstract String getMinMaxHashQuery(List<Object> inParams);
 
     /**
      * Default implementation of getQueryBindings. Returns null if not specified in the helper implementation.

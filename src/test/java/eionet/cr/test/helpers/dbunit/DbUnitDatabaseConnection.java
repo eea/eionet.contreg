@@ -25,8 +25,7 @@ import java.util.Properties;
 import org.dbunit.database.DatabaseConnection;
 import org.dbunit.database.IDatabaseConnection;
 
-import eionet.cr.config.GeneralConfig;
-import eionet.cr.util.sql.DbConnectionProvider;
+import eionet.cr.util.sesame.SesameUtil;
 
 /**
  *
@@ -42,7 +41,7 @@ public abstract class DbUnitDatabaseConnection {
      */
     public static IDatabaseConnection get() throws Exception {
 
-        DatabaseConnection dbConn = new DatabaseConnection(DbConnectionProvider.getConnection());
+        DatabaseConnection dbConn = new DatabaseConnection(SesameUtil.getSQLConnection());
         dbConn.getConfig().setPropertiesByString(getConfigProperties());
         return dbConn;
     }
@@ -52,24 +51,6 @@ public abstract class DbUnitDatabaseConnection {
      * @return
      */
     private static Properties getConfigProperties() {
-
-        String dbUrl = GeneralConfig.getRequiredProperty(GeneralConfig.DB_URL);
-        if (dbUrl.startsWith("jdbc:postgresql:"))
-            return getPostgreConfigProperties();
-        else
-            return new Properties();
-
-    }
-
-    /**
-     *
-     * @return
-     */
-    private static Properties getPostgreConfigProperties() {
-
-        Properties properties = new Properties();
-        properties.setProperty("http://www.dbunit.org/properties/datatypeFactory",
-                "eionet.cr.test.helpers.dbunit.DbUnitPostgreDataTypeFactory");
-        return properties;
+        return new Properties();
     }
 }

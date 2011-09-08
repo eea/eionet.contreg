@@ -25,7 +25,7 @@ import org.dbunit.dataset.IDataSet;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 
 /**
- * The class tests different methods in PostgreSQLBaseDAO class
+ * The class tests different methods in VirtuosoBaseDAO class
  *
  * @author <a href="mailto:enriko.kasper@tieto.com">Enriko Käsper</a>, Tieto Estonia
  */

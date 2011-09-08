@@ -18,7 +18,7 @@
  *
  * Contributor(s):
  * Jaanus Heinlaid, Tieto Eesti*/
-package eionet.cr.dao.postgre;
+package eionet.cr.dao.virtuoso;
 
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -38,10 +38,10 @@ import eionet.cr.util.sql.SQLUtil;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class PostgreSQLHarvestDAO extends PostgreSQLBaseDAO implements HarvestDAO {
+public class VirtuosoHarvestDAO extends VirtuosoBaseDAO implements HarvestDAO {
 
     /** */
-    private static final String getHarvestByIdSQL = "select *, USERNAME as USER from HARVEST where HARVEST_ID=?";
+    private static final String getHarvestByIdSQL = "select *, USERNAME as \"USER\" from HARVEST where HARVEST_ID=?";
 
     /*
      * (non-Javadoc)
@@ -55,15 +55,6 @@ public class PostgreSQLHarvestDAO extends PostgreSQLBaseDAO implements HarvestDA
         return list != null && list.size() > 0 ? list.get(0) : null;
     }
 
-    /** */
-    private static final String getHarvestsBySourceIdSQL = "select distinct HARVEST.HARVEST_ID as HARVEST_ID,"
-        + " HARVEST.HARVEST_SOURCE_ID as SOURCE_ID," + " HARVEST.TYPE as HARVEST_TYPE," + " HARVEST.USERNAME as HARVEST_USER,"
-        + " HARVEST.STATUS as STATUS," + " HARVEST.STARTED as STARTED," + " HARVEST.FINISHED as FINISHED,"
-        + " HARVEST.ENC_SCHEMES as ENC_SCHEMES," + " HARVEST.TOT_STATEMENTS as TOT_STATEMENTS,"
-        + " HARVEST.LIT_STATEMENTS as LIT_STATEMENTS," + " HARVEST_MESSAGE.TYPE as MESSAGE_TYPE"
-        + " from HARVEST left join HARVEST_MESSAGE on HARVEST.HARVEST_ID=HARVEST_MESSAGE.HARVEST_ID"
-        + " where HARVEST.HARVEST_SOURCE_ID=? order by HARVEST.STARTED desc limit ?";
-
     /*
      * (non-Javadoc)
      *
@@ -73,15 +64,24 @@ public class PostgreSQLHarvestDAO extends PostgreSQLBaseDAO implements HarvestDA
 
         int maxDistinctHarvests = 10;
 
+        String getHarvestsBySourceIdSQL = "select distinct top "
+            + HarvestMessageType.values().length * maxDistinctHarvests
+            + " H.HARVEST_ID as HARVEST_ID,"
+            + " H.HARVEST_SOURCE_ID as SOURCE_ID, H.TYPE as HARVEST_TYPE, H.USERNAME as HARVEST_USER,"
+            + " H.STATUS as STATUS, H.STARTED as STARTED, H.FINISHED as FINISHED,"
+            + " H.ENC_SCHEMES as ENC_SCHEMES, H.TOT_STATEMENTS as TOT_STATEMENTS,"
+            + " H.LIT_STATEMENTS as LIT_STATEMENTS, M.TYPE as MESSAGE_TYPE"
+            + " from HARVEST AS H left join HARVEST_MESSAGE AS M on H.HARVEST_ID=M.HARVEST_ID"
+            + " where H.HARVEST_SOURCE_ID=? order by H.STARTED desc";
+
         List<Object> values = new ArrayList<Object>();
         values.add(harvestSourceId);
-        values.add(HarvestMessageType.values().length * maxDistinctHarvests);
         return executeSQL(getHarvestsBySourceIdSQL, values, new HarvestWithMessageTypesReader(maxDistinctHarvests));
     }
 
     /** */
-    private static final String getLastHarvestBySourceIdSQL = "select *, USERNAME as USER"
-        + " from HARVEST where HARVEST_SOURCE_ID=? order by HARVEST.STARTED desc limit 1";
+    private static final String getLastHarvestBySourceIdSQL = "select top 1 *, USERNAME as \"USER\""
+        + " from HARVEST where HARVEST_SOURCE_ID=? order by HARVEST.STARTED desc";
 
     /*
      * (non-Javadoc)

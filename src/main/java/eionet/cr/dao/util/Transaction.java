@@ -28,7 +28,7 @@ import org.apache.log4j.Logger;
 import eionet.cr.dao.DAO;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
-import eionet.cr.util.sql.DbConnectionProvider;
+import eionet.cr.util.sesame.SesameUtil;
 
 /**
  *
@@ -62,7 +62,7 @@ public class Transaction {
     public static Transaction begin() throws DAOException {
 
         try {
-            return new Transaction(DbConnectionProvider.getConnection());
+            return new Transaction(SesameUtil.getSQLConnection());
         } catch (SQLException e) {
             throw new DAOException(e.toString(), e);
         }

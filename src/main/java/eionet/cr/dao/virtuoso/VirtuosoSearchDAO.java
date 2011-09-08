@@ -45,7 +45,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
      * Free text search implementation in Virtuoso.
      *
      * @see eionet.cr.dao.SearchDAO#searchByFreeText(eionet.cr.dao.util.SearchExpression,
-     *      eionet.cr.dao.postgre.helpers.FreeTextSearchHelper.FilterType, eionet.cr.util.pagination.PagingRequest,
+     *      eionet.cr.dao.helpers.FreeTextSearchHelper.FilterType, eionet.cr.util.pagination.PagingRequest,
      *      eionet.cr.util.SortingRequest)
      * @param exactMatch indicates if only exact amtch of String is searched
      * @return Pair whre left member is results count and right member is list of matching subjects

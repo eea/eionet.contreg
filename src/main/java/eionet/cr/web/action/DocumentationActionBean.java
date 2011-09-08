@@ -20,7 +20,9 @@
  */
 package eionet.cr.web.action;
 
-import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.List;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.FileBean;
@@ -40,6 +42,7 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.DocumentationDAO;
 import eionet.cr.dto.DocumentationDTO;
+import eionet.cr.filestore.FileStore;
 
 /**
  * 
@@ -53,6 +56,11 @@ public class DocumentationActionBean extends AbstractActionBean {
     private String pageId;
     private String content;
 
+    /** */
+    public static final String PATH = GeneralConfig.getRequiredProperty(GeneralConfig.FILESTORE_PATH);
+
+    public static final String APP_URL = GeneralConfig.getProperty(GeneralConfig.APPLICATION_HOME_URL);
+
     /**
      * Properties for documentation upload page
      */
@@ -62,6 +70,8 @@ public class DocumentationActionBean extends AbstractActionBean {
     private FileBean file;
     @Validate(required=true, on="uploadFile")
     private String contentType;
+    private String title;
+    private boolean overwrite;
 
     /**
      *
@@ -69,20 +79,34 @@ public class DocumentationActionBean extends AbstractActionBean {
      * @throws DAOException if query fails
      */
     @DefaultHandler
-    public Resolution view() throws DAOException {
+    public Resolution view() throws Exception {
 
-        if (StringUtils.isBlank(pageId)) {
-            pageId = "index";
-        }
         DocumentationDAO docDAO = DAOFactory.get().getDao(DocumentationDAO.class);
-        DocumentationDTO doc = docDAO.getDocObject(pageId);
-        if (doc == null) {
-            addCautionMessage("Such page ID doesn't exist in database: " + pageId);
+        if (StringUtils.isBlank(pageId)) {
+            List<DocumentationDTO> docs = docDAO.getHtmlDocObjects();
+            if (docs != null) {
+                StringBuffer buf = new StringBuffer();
+                buf.append("<ul>");
+                for (DocumentationDTO doc : docs) {
+                    String url = APP_URL + "/documentation/" + doc.getPageId();
+                    buf.append("<li><a href=\"").append(url).append("\">").append(doc.getTitle()).append("</a></li>");
+                }
+                buf.append("</ul>");
+                content = buf.toString();
+                title = "Documentation";
+            }
         } else {
-            if (doc.getContentType().equals("text/html")) {
-                content = new String(doc.getContent());
+            DocumentationDTO doc = docDAO.getDocObject(pageId);
+            if (doc == null) {
+                addCautionMessage("Such page ID doesn't exist in database: " + pageId);
             } else {
-                return new StreamingResolution(doc.getContentType(), new ByteArrayInputStream(doc.getContent()));
+                if (doc.getContentType().equals("text/html")) {
+                    content = new String(doc.getContent());
+                    title = doc.getTitle();
+                } else {
+                    File f = FileStore.getInstance("documentation").get(doc.getContent());
+                    return new StreamingResolution(doc.getContentType(), new FileInputStream(f));
+                }
             }
         }
         return new ForwardResolution("/pages/documentation.jsp");
@@ -102,14 +126,19 @@ public class DocumentationActionBean extends AbstractActionBean {
      * @return Resolution
      * @throws DAOException
      */
-    public Resolution uploadFile() throws DAOException {
+    public Resolution uploadFile() throws Exception {
 
         if (isUserLoggedIn()) {
-            DocumentationDAO dao = DAOFactory.get().getDao(DocumentationDAO.class);
-            dao.insertFile(pid, contentType, file);
-            String appUrl = GeneralConfig.getProperty(GeneralConfig.APPLICATION_HOME_URL);
-            String url = appUrl + "/documentation/" + pid;
-            addSystemMessage("File successfully uploaded! File URL is: <a href=\"" + url + "\">" + url + "</a>");
+            File name = FileStore.getInstance("documentation").get(file.getFileName());
+            if (name != null && !overwrite) {
+                addWarningMessage("File with the same name already exists!");
+            } else {
+                FileStore.getInstance("documentation").add(file.getFileName(), true, file.getInputStream());
+                DocumentationDAO dao = DAOFactory.get().getDao(DocumentationDAO.class);
+                dao.insertFile(pid, contentType, file.getFileName(), title);
+                String url = APP_URL + "/documentation/" + pid;
+                addSystemMessage("File successfully uploaded! File URL is: <a href=\"" + url + "\">" + url + "</a>");
+            }
         } else {
             addWarningMessage(getBundle().getString("not.logged.in"));
         }
@@ -164,6 +193,22 @@ public class DocumentationActionBean extends AbstractActionBean {
 
     public void setContentType(String contentType) {
         this.contentType = contentType;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public boolean isOverwrite() {
+        return overwrite;
+    }
+
+    public void setOverwrite(boolean overwrite) {
+        this.overwrite = overwrite;
     }
 
 }

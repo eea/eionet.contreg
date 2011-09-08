@@ -18,7 +18,7 @@
  *
  * Contributor(s):
  * Jaanus Heinlaid, Tieto Eesti*/
-package eionet.cr.dao.postgre;
+package eionet.cr.dao.virtuoso;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -38,7 +38,7 @@ import eionet.cr.util.sql.SQLUtil;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class PostgreSQLUrgentHarvestQueueDAO extends PostgreSQLBaseDAO implements UrgentHarvestQueueDAO {
+public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements UrgentHarvestQueueDAO {
 
     /*
      * (non-Javadoc)
@@ -49,7 +49,7 @@ public class PostgreSQLUrgentHarvestQueueDAO extends PostgreSQLBaseDAO implement
 
         String valueStr = "(?,NOW())";
         List<Object> values = new ArrayList<Object>();
-        StringBuffer buf = new StringBuffer("insert into URGENT_HARVEST_QUEUE (URL,TIMESTAMP) VALUES ");
+        StringBuffer buf = new StringBuffer("insert into URGENT_HARVEST_QUEUE (URL,\"TIMESTAMP\") VALUES ");
         for (int i = 0; i < queueItems.size(); i++) {
             UrgentHarvestQueueItemDTO dto = queueItems.get(i);
             buf.append(i > 0 ? "," : "").append(valueStr);
@@ -74,7 +74,7 @@ public class PostgreSQLUrgentHarvestQueueDAO extends PostgreSQLBaseDAO implement
 
     /** */
     private static final String addPushHarvestSQL =
-            "insert into URGENT_HARVEST_QUEUE (URL,TIMESTAMP,PUSHED_CONTENT) VALUES (?,NOW(),?)";
+        "insert into URGENT_HARVEST_QUEUE (URL,\"TIMESTAMP\",PUSHED_CONTENT) VALUES (?,NOW(),?)";
 
     /*
      * (non-Javadoc)
@@ -104,7 +104,7 @@ public class PostgreSQLUrgentHarvestQueueDAO extends PostgreSQLBaseDAO implement
     }
 
     /** */
-    private static final String getUrgentHarvestQueueSQL = "select * from URGENT_HARVEST_QUEUE order by TIMESTAMP asc";
+    private static final String getUrgentHarvestQueueSQL = "select * from URGENT_HARVEST_QUEUE order by \"TIMESTAMP\" asc";
 
     /*
      * (non-Javadoc)
@@ -138,7 +138,7 @@ public class PostgreSQLUrgentHarvestQueueDAO extends PostgreSQLBaseDAO implement
     }
 
     /** */
-    private static final String peekSQL = "select * from URGENT_HARVEST_QUEUE order by TIMESTAMP asc limit 1";
+    private static final String peekSQL = "select top 1 * from URGENT_HARVEST_QUEUE order by \"TIMESTAMP\" asc";
 
     /**
      *
@@ -158,7 +158,7 @@ public class PostgreSQLUrgentHarvestQueueDAO extends PostgreSQLBaseDAO implement
     }
 
     /** */
-    private static final String deleteQueueItemSQL = "delete from URGENT_HARVEST_QUEUE where URL=? and TIMESTAMP=?";
+    private static final String deleteQueueItemSQL = "delete from URGENT_HARVEST_QUEUE where URL=? and \"TIMESTAMP\"=?";
 
     /**
      *

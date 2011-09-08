@@ -49,7 +49,6 @@ import eionet.cr.harvest.Harvest;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.PullHarvest;
 import eionet.cr.harvest.PushHarvest;
-import eionet.cr.harvest.persist.PersisterFactory;
 import eionet.cr.util.EMailSender;
 import eionet.cr.util.Util;
 import eionet.cr.web.security.CRUser;
@@ -109,7 +108,6 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
 
         try {
             // perform various clean-up functions
-            PersisterFactory.getPersister().rollbackUnfinishedHarvests();
             deleteSourcesQueuedForRemoval();
             queueNonPriorityUnavailableSourcesForDeletion();
 

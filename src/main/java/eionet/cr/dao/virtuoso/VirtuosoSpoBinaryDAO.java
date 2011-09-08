@@ -18,7 +18,7 @@
  *
  * Contributor(s):
  * Jaanus Heinlaid, Tieto Eesti*/
-package eionet.cr.dao.postgre;
+package eionet.cr.dao.virtuoso;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -35,6 +35,7 @@ import eionet.cr.dao.SpoBinaryDAO;
 import eionet.cr.dto.SpoBinaryDTO;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Util;
+import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.sql.SQLUtil;
 
 /**
@@ -42,10 +43,10 @@ import eionet.cr.util.sql.SQLUtil;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class PostgreSQLSpoBinaryDAO extends PostgreSQLBaseDAO implements SpoBinaryDAO {
+public class VirtuosoSpoBinaryDAO extends VirtuosoBaseDAO implements SpoBinaryDAO {
 
     /** */
-    private static final String sqlAdd = "insert into SPO_BINARY " + "(SUBJECT,OBJ_LANG,DATATYPE,MUST_EMBED) values (?,?,?,?)";
+    private static final String sqlAdd = "insert soft SPO_BINARY (SUBJECT,OBJ_LANG,DATATYPE,MUST_EMBED) values (?,?,?,?)";
 
     /*
      * (non-Javadoc)
@@ -72,7 +73,7 @@ public class PostgreSQLSpoBinaryDAO extends PostgreSQLBaseDAO implements SpoBina
             String contentType = dto.getContentType();
             stmt.setString(3, contentType == null ? "" : contentType);
 
-            stmt.setBoolean(4, dto.isMustEmbed());
+            stmt.setString(4, dto.isMustEmbed() ? "Y" : "N");
 
             stmt.executeUpdate();
         } catch (SQLException sqle) {
@@ -110,7 +111,7 @@ public class PostgreSQLSpoBinaryDAO extends PostgreSQLBaseDAO implements SpoBina
                 SpoBinaryDTO dto = new SpoBinaryDTO(rs.getLong("SUBJECT"));
                 dto.setContentType(rs.getString("DATATYPE"));
                 dto.setLanguage(rs.getString("OBJ_LANG"));
-                dto.setMustEmbed(rs.getBoolean("MUST_EMBED"));
+                dto.setMustEmbed(YesNoBoolean.parse(rs.getString("MUST_EMBED")));
 
                 return dto;
             }
@@ -143,8 +144,8 @@ public class PostgreSQLSpoBinaryDAO extends PostgreSQLBaseDAO implements SpoBina
         try {
             conn = getSQLConnection();
             Object o =
-                    SQLUtil.executeSingleReturnValueQuery(sqlExists,
-                            Collections.singletonList(Long.valueOf(Hashes.spoHash(subjectUri))), conn);
+                SQLUtil.executeSingleReturnValueQuery(sqlExists,
+                        Collections.singletonList(Long.valueOf(Hashes.spoHash(subjectUri))), conn);
             return o != null && Integer.parseInt(o.toString()) > 0;
         } catch (SQLException e) {
             throw new DAOException(e.getMessage(), e);

@@ -5,11 +5,16 @@ import java.util.Map;
 
 import eionet.cr.dao.DAO;
 import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.DocumentationDAO;
 import eionet.cr.dao.ExporterDAO;
+import eionet.cr.dao.HarvestDAO;
+import eionet.cr.dao.HarvestMessageDAO;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.SearchDAO;
+import eionet.cr.dao.SpoBinaryDAO;
 import eionet.cr.dao.TagsDAO;
+import eionet.cr.dao.UrgentHarvestQueueDAO;
 import eionet.cr.dao.UserHomeDAO;
 
 /**
@@ -37,11 +42,16 @@ public class VirtuosoDAOFactory extends DAOFactory {
 
         registeredDaos = new HashMap<Class<? extends DAO>, Class<? extends VirtuosoBaseDAO>>();
         registeredDaos.put(ExporterDAO.class, VirtuosoExporterDAO.class);
+        registeredDaos.put(HarvestDAO.class, VirtuosoHarvestDAO.class);
         registeredDaos.put(HarvestSourceDAO.class, VirtuosoHarvestSourceDAO.class);
+        registeredDaos.put(HarvestMessageDAO.class, VirtuosoHarvestMessageDAO.class);
         registeredDaos.put(HelperDAO.class, VirtuosoHelperDAO.class);
         registeredDaos.put(SearchDAO.class, VirtuosoSearchDAO.class);
         registeredDaos.put(TagsDAO.class, VirtuosoTagsDAO.class);
         registeredDaos.put(UserHomeDAO.class, VirtuosoUserHomeDAO.class);
+        registeredDaos.put(DocumentationDAO.class, VirtuosoDocumentationDAO.class);
+        registeredDaos.put(UrgentHarvestQueueDAO.class, VirtuosoUrgentHarvestQueueDAO.class);
+        registeredDaos.put(SpoBinaryDAO.class, VirtuosoSpoBinaryDAO.class);
     }
 
     /**
@@ -65,7 +75,7 @@ public class VirtuosoDAOFactory extends DAOFactory {
 
         // due to synchronization problems we have to create DAOs for each method invocation.
         try {
-            Class implClass = registeredDaos.get(implementedInterface);
+            Class<?> implClass = registeredDaos.get(implementedInterface);
             if (implClass == null) {
                 return null;
             } else {

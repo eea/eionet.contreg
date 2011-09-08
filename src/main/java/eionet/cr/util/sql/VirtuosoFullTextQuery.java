@@ -158,11 +158,11 @@ public class VirtuosoFullTextQuery {
             if (token.equals("|"))
                 token = "OR";
 
-            // If this token is a PostgreSQL full-text query's boolean operator
+            // If this token is a VirtuosoSQL full-text query's boolean operator
             // then append it to the parsed query only if the previous token
             // was not null and wasn't already a boolean operator itself.
             //
-            // However, if this token is NOT a a PostgreSQL full-text query's boolean operator,
+            // However, if this token is NOT a a VirtuosoSQL full-text query's boolean operator,
             // then append it to the parsed query, but first make sure that the previous
             // token was a boolean operator. If it wasn't then append the default operator.
 

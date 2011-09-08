@@ -15,8 +15,6 @@ import eionet.cr.util.pagination.PagingRequest;
  */
 public class VirtuosoSearchBySourceHelper extends AbstractSearchHelper {
 
-    /** */
-    private String sourceUrl;
     /** Query bindings. */
     private Bindings bindings;
 
@@ -29,7 +27,6 @@ public class VirtuosoSearchBySourceHelper extends AbstractSearchHelper {
     public VirtuosoSearchBySourceHelper(String sourceUrl, PagingRequest pagingRequest, SortingRequest sortingRequest) {
 
         super(pagingRequest, sortingRequest);
-        this.sourceUrl = sourceUrl;
         bindings = new Bindings();
         // this binding is used in all SPARQL's
         bindings.setURI("sourceUrl", sourceUrl);
@@ -64,8 +61,8 @@ public class VirtuosoSearchBySourceHelper extends AbstractSearchHelper {
             // If Label is not null then use Label. Otherwise use subject where we replace all / with #
             // and then get the string after last #.
             sparql +=
-                    "(bif:lcase(bif:either(bif:isnull(?ord), "
-                            + "(bif:subseq (bif:replace (?s, '/', '#'), bif:strrchr (bif:replace (?s, '/', '#'), '#')+1)), ?ord)))";
+                "(bif:lcase(bif:either(bif:isnull(?ord), "
+                + "(bif:subseq (bif:replace (?s, '/', '#'), bif:strrchr (bif:replace (?s, '/', '#'), '#')+1)), ?ord)))";
         } else if (sortPredicate != null && sortPredicate.equals(Predicates.RDF_TYPE)) {
             // Replace all / with # and then get the string after last #
             sparql += "(bif:lcase(bif:subseq (bif:replace (?ord, '/', '#'), bif:strrchr (bif:replace (?ord, '/', '#'), '#')+1)))";
@@ -83,16 +80,6 @@ public class VirtuosoSearchBySourceHelper extends AbstractSearchHelper {
     @Override
     public String getCountQuery(List<Object> inParams) {
         return SOURCE_SUBJECTS_COUNT_SPARQL;
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.dao.helpers.AbstractSearchHelper#getMinMaxHashQuery(java.util.List)
-     */
-    @Override
-    public String getMinMaxHashQuery(List<Object> inParams) {
-        throw new UnsupportedOperationException("Method not implemented");
     }
 
     @Override
