@@ -155,25 +155,6 @@ public class VirtuosoFilteredSearchHelperTest {
     }
 
     @Test
-    public void testDateSorting() {
-        PagingRequest pagingRequest = PagingRequest.create(1);
-        SortingRequest sortingRequest =
-            new SortingRequest("http://cr.eionet.europa.eu/ontologies/contreg.rdf#contentLastModified",
-                    SortOrder.parse(SortOrder.DESCENDING.toString()));
-
-        Map<String, String> filters = new HashMap<String, String>();
-        filters.put("http://www.w3.org/2000/01/rdf-schema#label", "CLRTAP");
-        VirtuosoFilteredSearchHelper helper = new VirtuosoFilteredSearchHelper(filters, null, pagingRequest, sortingRequest, true);
-
-        ArrayList<Object> inParams = new ArrayList<Object>();
-
-        String query = helper.getOrderedQuery(inParams);
-        assertEquals(
-                "DEFINE input:inference'CRInferenceRule' select distinct ?s max(?time) AS ?oorderby where {graph ?g { ?s ?p ?o  . {{?s ?p1 ?o1 . ?s ?predicateValue1 ?o1} . { ?s ?p1 ?o1 . FILTER bif:contains(?o1, ?objectValue1)}} . OPTIONAL {?g ?sortPredicateValue ?time}}} ORDER BY desc(?oorderby)",
-                query);
-    }
-
-    @Test
     public void testOrderedQueryIncludingLabel() {
         PagingRequest pagingRequest = PagingRequest.create(1);
         SortingRequest sortingRequest =

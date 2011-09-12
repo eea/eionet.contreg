@@ -17,7 +17,6 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.helpers.FreeTextSearchHelper.FilterType;
 import eionet.cr.dao.readers.FreeTextSearchReader;
-import eionet.cr.dao.readers.GraphUrisReader;
 import eionet.cr.dao.readers.SubjectDataReader;
 import eionet.cr.dao.util.BBOX;
 import eionet.cr.dao.util.SearchExpression;
@@ -93,12 +92,6 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
         matchReader.setBlankNodeUriPrefix(VirtuosoBaseDAO.BNODE_URI_PREFIX);
         List<String> subjectUris = executeSPARQL(query, helper.getQueryBindings(), matchReader);
 
-        // get matching graph URIs
-        List<String> graphUris = new ArrayList<String>();
-        if (subjectUris != null && subjectUris.size() > 0) {
-            graphUris = getGraphUris(subjectUris);
-        }
-
         logger.debug("Free-text search, find subjects query time " + Util.durationSince(startTime));
 
         // initialize total match count and resultList
@@ -118,7 +111,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
             logger.trace("Free-text search, getting the data of the found subjects");
 
             // get the subjects data
-            resultList = getSubjectsData(subjectUris, neededPredicates, dataReader, graphUris);
+            resultList = getSubjectsData(subjectUris, neededPredicates, dataReader, null);
 
             // if paging required, get distinct subjects total match count
             if (pagingRequest != null) {
@@ -131,42 +124,6 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
 
         // the result Pair contains total number of subjects and the requested sub-list
         return new Pair<Integer, List<SubjectDTO>>(totalMatchCount, resultList);
-    }
-
-    /**
-     * Graph URIs are used to get correct cr:contentLastModified for the subject. If subject from one graph gave the hit and the
-     * same subject in another graph didn't, then only the date of the first graph should be used
-     *
-     * @param subjectUris
-     *            Arry of subkjectUris that may contain both URIs and blanknodes
-     * @return List<String> List of graph uris
-     * @throws DAOException
-     *             if query fails
-     */
-    private List<String> getGraphUris(List<String> subjectUris) throws DAOException {
-        StringBuilder strBuilder =
-            new StringBuilder().append("select distinct(?g) where {graph ?g {?s ?p ?o. ").append("filter (?s IN (");
-
-        int i = 0;
-        Bindings bindings = new Bindings();
-        for (String subjectUri : subjectUris) {
-            String subjectValueAlias = "subjectUriValue" + i;
-            if (i > 0) {
-                strBuilder.append(", ");
-            }
-            // strBuilder.append("<").append(subjectUri).append(">");
-            strBuilder.append("?" + subjectValueAlias);
-            bindings.setURI(subjectValueAlias, subjectUri);
-
-            i++;
-        }
-        strBuilder.append(")) ");
-        strBuilder.append("}}");
-
-        GraphUrisReader<String> reader = new GraphUrisReader<String>();
-        executeSPARQL(strBuilder.toString(), bindings, reader);
-
-        return reader.getResultList();
     }
 
     /*
@@ -185,7 +142,6 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
         // create the list of IN parameters of the query
 
         // let the helper create the query and fill IN parameters
-        // TODO get rid of inParams
         ArrayList<Object> inParams = new ArrayList<Object>();
         String query = helper.getQuery(inParams);
         Bindings bindings = helper.getQueryBindings();
@@ -595,5 +551,4 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
             getSubjectsData(typeUris, neededPredicates, new SubjectDataReader(typeUris), null);
         return resultList;
     }
-
 }

@@ -3,7 +3,6 @@ package eionet.cr.dao.virtuoso.helpers;
 import java.text.ParseException;
 
 import junit.framework.TestCase;
-import eionet.cr.common.Predicates;
 import eionet.cr.dao.helpers.FreeTextSearchHelper.FilterType;
 import eionet.cr.dao.util.SearchExpression;
 import eionet.cr.util.SortOrder;
@@ -33,7 +32,7 @@ public class VirtuosoFreetextSearchHelperTest extends TestCase {
         }
 
         VirtuosoFreeTextSearchHelper helper =
-                new VirtuosoFreeTextSearchHelper(expression, virtExpression, exactMatch, pagingRequest, sortingRequest);
+            new VirtuosoFreeTextSearchHelper(expression, virtExpression, exactMatch, pagingRequest, sortingRequest);
         helper.setFilter(FilterType.ANY_OBJECT);
         String sparql = helper.getQuery(null);
 
@@ -58,7 +57,7 @@ public class VirtuosoFreetextSearchHelperTest extends TestCase {
         }
 
         VirtuosoFreeTextSearchHelper helper =
-                new VirtuosoFreeTextSearchHelper(expression, virtExpression, exactMatch, pagingRequest, sortingRequest);
+            new VirtuosoFreeTextSearchHelper(expression, virtExpression, exactMatch, pagingRequest, sortingRequest);
         helper.setFilter(FilterType.ANY_OBJECT);
         String sparql = helper.getQuery(null);
         assertEquals("select distinct ?s where { ?s ?p ?o .   FILTER (?o = ?objectValue).} limit 15 offset 15", sparql);
@@ -82,7 +81,7 @@ public class VirtuosoFreetextSearchHelperTest extends TestCase {
         }
 
         VirtuosoFreeTextSearchHelper helper =
-                new VirtuosoFreeTextSearchHelper(expression, virtExpression, exactMatch, pagingRequest, sortingRequest);
+            new VirtuosoFreeTextSearchHelper(expression, virtExpression, exactMatch, pagingRequest, sortingRequest);
         helper.setFilter(FilterType.ANY_FILE);
         String sparql = helper.getQuery(null);
 
@@ -103,7 +102,7 @@ public class VirtuosoFreetextSearchHelperTest extends TestCase {
     public static void testSortedQueryLabel() {
         PagingRequest pagingRequest = PagingRequest.create(1);
         SortingRequest sortingRequest =
-                new SortingRequest("http://www.w3.org/2000/01/rdf-schema#label", SortOrder.parse(SortOrder.ASCENDING.toString()));
+            new SortingRequest("http://www.w3.org/2000/01/rdf-schema#label", SortOrder.parse(SortOrder.ASCENDING.toString()));
         boolean exactMatch = false;
         SearchExpression expression = new SearchExpression("ippc");
         VirtuosoFullTextQuery virtExpression = null;
@@ -115,7 +114,7 @@ public class VirtuosoFreetextSearchHelperTest extends TestCase {
         }
 
         VirtuosoFreeTextSearchHelper helper =
-                new VirtuosoFreeTextSearchHelper(expression, virtExpression, exactMatch, pagingRequest, sortingRequest);
+            new VirtuosoFreeTextSearchHelper(expression, virtExpression, exactMatch, pagingRequest, sortingRequest);
         helper.setFilter(FilterType.ANY_OBJECT);
         String sparql = helper.getQuery(null);
 
@@ -129,39 +128,6 @@ public class VirtuosoFreetextSearchHelperTest extends TestCase {
                 + "bif:strrchr (bif:replace (?s, '/', '#'), '#')+1)), ?ord))) limit 15 offset 0", sparql);
         assertTrue(helper.getQueryBindings().toString().indexOf("objectValue='ippc'") != -1);
         assertTrue(helper.getQueryBindings().toString().indexOf("sortPredicate=http://www.w3.org/2000/01/rdf-schema#label") != -1);
-    }
-
-    /**
-     * test if sort by last modified works.
-     */
-    public static void testSortedLastModified() {
-        PagingRequest pagingRequest = PagingRequest.create(0);
-        SortingRequest sortingRequest =
-                new SortingRequest(Predicates.CR_LAST_MODIFIED, SortOrder.parse(SortOrder.DESCENDING.toString()));
-        boolean exactMatch = true;
-        SearchExpression expression = new SearchExpression("ippc");
-        VirtuosoFullTextQuery virtExpression = null;
-        try {
-            virtExpression = VirtuosoFullTextQuery.parse(expression);
-        } catch (ParseException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-        VirtuosoFreeTextSearchHelper helper =
-                new VirtuosoFreeTextSearchHelper(expression, virtExpression, exactMatch, pagingRequest, sortingRequest);
-        helper.setFilter(FilterType.ANY_OBJECT);
-        String sparql = helper.getQuery(null);
-
-        // assertEquals("select ?s where { graph ?g {select ?s max(?time) AS ?order where
-        // {?s ?p ?o . FILTER (?o = 'ippc'). optional
-        // {?g <http://cr.eionet.europa.eu/ontologies/contreg.rdf#contentLastModified> ?time} } GROUP BY ?s }}
-        // ORDER BY desc(?order) limit 15 offset 0", sparql);
-        assertEquals("select ?s where { graph ?g {select ?s max(?time) AS ?order where {?s ?p ?o ."
-                + "  FILTER (?o = ?objectValue). optional {?g "
-                + "<http://cr.eionet.europa.eu/ontologies/contreg.rdf#contentLastModified> ?time} } GROUP BY ?s }} "
-                + "ORDER BY desc(?order) limit 15 offset 0", sparql);
-        assertTrue(helper.getQueryBindings().toString().indexOf("objectValue=ippc") != -1);
     }
 
     /**
@@ -181,7 +147,7 @@ public class VirtuosoFreetextSearchHelperTest extends TestCase {
         }
 
         VirtuosoFreeTextSearchHelper helper =
-                new VirtuosoFreeTextSearchHelper(expression, virtExpression, exactMatch, pagingRequest, sortingRequest);
+            new VirtuosoFreeTextSearchHelper(expression, virtExpression, exactMatch, pagingRequest, sortingRequest);
         helper.setFilter(FilterType.ANY_OBJECT);
         String sparql = helper.getQuery(null);
         // assertEquals("select distinct ?s where { ?s ?p ?o . FILTER (?o = <http://uri.com> || ?o = 'http://uri.com').}

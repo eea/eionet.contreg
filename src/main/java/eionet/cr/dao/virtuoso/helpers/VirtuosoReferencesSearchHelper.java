@@ -115,12 +115,10 @@ public class VirtuosoReferencesSearchHelper extends AbstractSearchHelper {
         }
         subjectDataBindings = new Bindings();
         subjectDataBindings.setURI("sourceUri", sourceUri);
-        // TODO can't it be optimized?
         String subjectUrisCSV = SPARQLQueryUtil.urisToCSV(subjectUris, "subjectUriValue", subjectDataBindings);
         String sparql =
             "select * where {graph ?g {?s ?p ?o. filter (?s IN (" + subjectUrisCSV + ")) " + ". filter(?p = <"
-            + Predicates.RDF_TYPE + "> || (isURI(?o) && ?o=?sourceUri))" + ". OPTIONAL {?g <"
-            + Predicates.CR_LAST_MODIFIED + "> ?t} }} ORDER BY ?s";
+            + Predicates.RDF_TYPE + "> || (isURI(?o) && ?o=?sourceUri))}} ORDER BY ?s";
 
         return sparql;
     }

@@ -12,7 +12,6 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.openrdf.repository.RepositoryConnection;
 
-import eionet.cr.common.Predicates;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.helpers.SearchHelper;
 import eionet.cr.dao.readers.SubjectDataReader;
@@ -249,8 +248,6 @@ public abstract class VirtuosoBaseDAO {
         if (graphUris != null && graphUris.size() > 0) {
             sparql += "filter (?g IN(" + SPARQLQueryUtil.urisToCSV(graphUris, "graphValue", bindings) + ")) ";
         }
-        sparql += "OPTIONAL { ?g ?crLastModified ?t } ";
-        bindings.setURI("crLastModified", Predicates.CR_LAST_MODIFIED);
 
         sparql += "}} ORDER BY ?s ?p";
         return sparql;

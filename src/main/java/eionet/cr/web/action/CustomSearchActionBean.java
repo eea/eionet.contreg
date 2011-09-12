@@ -69,7 +69,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
     private static final String MATCH_COUNT_SESSION_ATTR_NAME = CustomSearchActionBean.class.getName() + ".matchCount";
     private static final String PAGINATION_SESSION_ATTR_NAME = CustomSearchActionBean.class.getName() + ".pagination";
     private static final String LITERAL_SEARCH_ENABLED_FILTERS = CustomSearchActionBean.class.getName()
-            + ".literalSearchEnabledFilters";
+    + ".literalSearchEnabledFilters";
 
     /** */
     private static final String SELECTED_VALUE_PREFIX = "value_";
@@ -131,18 +131,21 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
         populateSelectedFilters();
         long startTime = System.currentTimeMillis();
         Pair<Integer, List<SubjectDTO>> result =
-                DAOFactory
-                        .get()
-                        .getDao(SearchDAO.class)
-                        .searchByFilters(buildSearchCriteria(), getLiteralEnabledFilters(), PagingRequest.create(getPageN()),
-                                new SortingRequest(getSortP(), SortOrder.parse(getSortO())), null, true);
+            DAOFactory
+            .get()
+            .getDao(SearchDAO.class)
+            .searchByFilters(buildSearchCriteria(), getLiteralEnabledFilters(), PagingRequest.create(getPageN()),
+                    new SortingRequest(getSortP(), SortOrder.parse(getSortO())), null, true);
 
         logger.debug("It took " + (System.currentTimeMillis() - startTime) + " ms to execute custom search");
+
+        List<SubjectDTO> resultList = result.getRight();
+        SimpleSearchActionBean.setLastModifiedDates(resultList);
 
         // we put the search result list into session and override getResultList() to retrieve the list from session
         // (look for the override in this class)
         HttpSession session = getContext().getRequest().getSession();
-        session.setAttribute(RESULT_LIST_SESSION_ATTR_NAME, result.getRight());
+        session.setAttribute(RESULT_LIST_SESSION_ATTR_NAME, resultList);
 
         // we do the same for matchCount and pagination as well
         session.setAttribute(MATCH_COUNT_SESSION_ATTR_NAME, result.getLeft());
@@ -227,14 +230,14 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
             picklist = ApplicationCache.getInstruments();
         } else if (Predicates.CR_SCHEMA.equals(uri)) {
             picklist =
-                    factory.getDao(HelperDAO.class).getPicklistForPredicate(getAvailableFilters().get(picklistFilter).getUri(),
-                            false);
+                factory.getDao(HelperDAO.class).getPicklistForPredicate(getAvailableFilters().get(picklistFilter).getUri(),
+                        false);
         }
 
         if (picklist == null) {
             picklist =
-                    factory.getDao(HelperDAO.class).getPicklistForPredicate(getAvailableFilters().get(picklistFilter).getUri(),
-                            true);
+                factory.getDao(HelperDAO.class).getPicklistForPredicate(getAvailableFilters().get(picklistFilter).getUri(),
+                        true);
         }
 
         return picklist;
@@ -547,7 +550,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 
         SubjectLastModifiedColumn col2 = new SubjectLastModifiedColumn();
         col2.setTitle("Date");
-        col2.setSortable(true);
+        col2.setSortable(false);
         list.add(col2);
 
         return list;

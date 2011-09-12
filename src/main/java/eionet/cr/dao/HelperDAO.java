@@ -465,4 +465,11 @@ public interface HelperDAO extends DAO {
      * @return list of SubjectDTO objects.
      */
     public List<SubjectDTO> getSPOsInSubject(String sourceUrl, String subject) throws DAOException;
+
+    /**
+     * @param resourceUris
+     * @return
+     * @throws DAOException
+     */
+    public Map<String, Date> getSourceLastModifiedDates(Set<String> resourceUris) throws DAOException;
 }

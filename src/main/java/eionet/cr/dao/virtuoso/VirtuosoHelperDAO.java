@@ -2,6 +2,7 @@ package eionet.cr.dao.virtuoso;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -61,6 +62,7 @@ import eionet.cr.dto.TripleDTO;
 import eionet.cr.dto.UploadDTO;
 import eionet.cr.dto.UserBookmarkDTO;
 import eionet.cr.dto.UserHistoryDTO;
+import eionet.cr.harvest.BaseHarvest;
 import eionet.cr.util.Bindings;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.ObjectLabelPair;
@@ -1743,5 +1745,45 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         bindings.setURI("sparqlQuery", Predicates.CR_SPARQL_QUERY);
 
         return executeSPARQL(SPARQL_BOOKMARKS_SPARQL, bindings, new MapReader());
+    }
+
+    /**
+     * @throws DAOException
+     * @see eionet.cr.dao.HelperDAO#getSourceLastModifiedDates(Set)
+     */
+    @Override
+    public Map<String, Date> getSourceLastModifiedDates(Set<String> resourceUris) throws DAOException {
+
+        Bindings bindings = new Bindings();
+
+        StringBuilder query = new StringBuilder();
+        query.append("select distinct ?s ?date where {graph ?g {?s ?p ?o}. filter (?s in (").
+        append(SPARQLQueryUtil.urisToCSV(resourceUris, "sValue", bindings)).
+        append(")). ?g <").append(Predicates.CR_LAST_MODIFIED).append("> ?date}");
+
+        HashMap<String, Date> result = new HashMap<String, Date>();
+        MapReader reader = new MapReader();
+        List<Map<String, String>> list = executeSPARQL(query.toString(), bindings, reader);
+        if (list!=null){
+            for (Map<String, String> map : list) {
+
+                Date date = null;
+                try {
+                    date = BaseHarvest.DATE_FORMATTER.parse(map.get("date"));
+                } catch (ParseException e) {
+                    date = null;
+                }
+
+                if (date!=null){
+                    String resourceUri = map.get("s");
+                    Date currentDate = result.get(resourceUri);
+                    if (currentDate==null || (date.compareTo(currentDate)>0)){
+                        result.put(resourceUri, date);
+                    }
+                }
+            }
+        }
+
+        return result;
     }
 }

@@ -202,10 +202,11 @@ public class SesameConnectionProvider {
         DataSource dataSource = getReadWriteDataSource();
         if (dataSource != null) {
             return dataSource.getConnection();
-        } else {
+        } else if (!isReadWriteDataSourceMissingLogged()){
             LOGGER.debug(MessageFormat.format(
                     "Found no data source with name {0}, going to create a connection through DriverManager",
                     READWRITE_DATASOURCE_NAME));
+            SesameConnectionProvider.readWriteDataSourceMissingLogged = true;
         }
 
         // no data source was found above, so create the connection through DriverManager

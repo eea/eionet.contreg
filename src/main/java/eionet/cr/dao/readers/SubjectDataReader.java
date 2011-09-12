@@ -22,8 +22,6 @@ package eionet.cr.dao.readers;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -32,7 +30,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
 import org.openrdf.model.BNode;
 import org.openrdf.model.Literal;
 import org.openrdf.model.URI;
@@ -94,7 +91,7 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO> {
         if (newSubject) {
             currentSubject = new SubjectDTO(rs.getString("SUBJECT_URI"), YesNoBoolean.parse(rs.getString("ANON_SUBJ")));
             currentSubject.setUriHash(subjectHash);
-            currentSubject.setLastModifiedTime(new Date(rs.getLong("SUBJECT_MODIFIED")));
+            currentSubject.setLastModifiedDate(new Date(rs.getLong("SUBJECT_MODIFIED")));
             addNewSubject(subjectHash, currentSubject);
         }
 
@@ -109,8 +106,8 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO> {
         addPredicateHash(rs.getLong("PREDICATE_HASH"));
 
         ObjectDTO object =
-                new ObjectDTO(rs.getString("OBJECT"), rs.getString("OBJ_LANG"), YesNoBoolean.parse(rs.getString("LIT_OBJ")),
-                        YesNoBoolean.parse(rs.getString("ANON_OBJ")));
+            new ObjectDTO(rs.getString("OBJECT"), rs.getString("OBJ_LANG"), YesNoBoolean.parse(rs.getString("LIT_OBJ")),
+                    YesNoBoolean.parse(rs.getString("ANON_OBJ")));
         object.setHash(rs.getLong("OBJECT_HASH"));
         object.setSourceUri(rs.getString("SOURCE_URI"));
         object.setSourceHash(rs.getLong("SOURCE"));
@@ -189,8 +186,8 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO> {
         }
 
         ObjectDTO object =
-                new ObjectDTO(strObjectValue, objectLang == null ? "" : objectLang, isLiteral, objectValue instanceof BNode,
-                        dataType);
+            new ObjectDTO(strObjectValue, objectLang == null ? "" : objectLang, isLiteral, objectValue instanceof BNode,
+                    dataType);
 
         object.setHash(Hashes.spoHash(strObjectValue));
 
@@ -206,29 +203,6 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO> {
         // object.setSourceObjectHash(rs.getLong("OBJ_SOURCE_OBJECT"));
 
         currentObjects.add(object);
-
-        // If current date is after new date, then leave the current date
-        Date prevDate = null;
-        SubjectDTO subj = subjectsMap.get(subjectHash);
-        if (subj != null) {
-            prevDate = subj.getLastModifiedTime();
-        }
-
-        Value t = bindingSet.getValue("t");
-        if (t != null) {
-            String time = t.stringValue();
-            if (StringUtils.isNotEmpty(time)) {
-                try {
-                    SimpleDateFormat lastModifiedDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-                    Date lastModDate = lastModifiedDateFormat.parse(time);
-                    if (prevDate == null || (prevDate != null && lastModDate != null && lastModDate.after(prevDate))) {
-                        currentSubject.setLastModifiedTime(lastModDate);
-                    }
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
     }
 
     /**

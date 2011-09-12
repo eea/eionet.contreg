@@ -59,7 +59,7 @@ import eionet.cr.web.security.CRUser;
 public abstract class BaseHarvest implements Harvest {
 
     /** */
-    private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    public static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
     /** */
     private static final Logger LOGGER = Logger.getLogger(BaseHarvest.class);

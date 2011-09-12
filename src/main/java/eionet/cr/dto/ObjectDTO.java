@@ -21,9 +21,12 @@
 package eionet.cr.dto;
 
 import java.io.Serializable;
+import java.text.ParseException;
+import java.util.Date;
 
 import org.openrdf.model.URI;
 
+import eionet.cr.harvest.BaseHarvest;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.NamespaceUtil;
 import eionet.cr.web.util.FactsheetObjectId;
@@ -413,6 +416,18 @@ public class ObjectDTO implements Serializable {
      */
     public static ObjectDTO createResource(String uri){
         return new ObjectDTO(uri, false);
+    }
+
+    /**
+     * @return
+     */
+    public Date getDateValue() {
+
+        try {
+            return BaseHarvest.DATE_FORMATTER.parse(getValue());
+        } catch (ParseException e) {
+            return null;
+        }
     }
 
 }

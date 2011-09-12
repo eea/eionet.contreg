@@ -21,8 +21,12 @@
 package eionet.cr.web.action;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
@@ -110,11 +114,11 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 
             if (resultList == null || resultList.size() == 0) {
                 Pair<Integer, List<SubjectDTO>> result =
-                        DAOFactory
-                                .get()
-                                .getDao(SearchDAO.class)
-                                .searchByFreeText(searchExpression, filterType, exactMatch, PagingRequest.create(getPageN()),
-                                        new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
+                    DAOFactory
+                    .get()
+                    .getDao(SearchDAO.class)
+                    .searchByFreeText(searchExpression, filterType, exactMatch, PagingRequest.create(getPageN()),
+                            new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
 
                 resultList = result.getRight();
                 matchCount = result.getLeft();
@@ -122,11 +126,48 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
                 int exactRowCountLimit = DAOFactory.get().getDao(SearchDAO.class).getExactRowCountLimit();
                 exactCount = exactRowCountLimit <= 0 || matchCount <= exactRowCountLimit;
             }
+
+            setLastModifiedDates(resultList);
         }
 
         return new ForwardResolution("/pages/simpleSearch.jsp");
     }
 
+    /**
+     * @throws DAOException
+     *
+     */
+    protected static void setLastModifiedDates(Collection<SubjectDTO> subjects) throws DAOException {
+
+        if (subjects == null || subjects.isEmpty()) {
+            return;
+        }
+
+        logger.debug("Preparing last-modified dates ...");
+        long startTime = System.currentTimeMillis();
+
+        HashSet<String> subjectUris = new HashSet<String>();
+        for (SubjectDTO subjectDTO : subjects){
+            subjectUris.add(subjectDTO.getUri());
+        }
+
+        Map<String, Date> dates = DAOFactory.get().getDao(HelperDAO.class).getSourceLastModifiedDates(subjectUris);
+        if (!dates.isEmpty()) {
+
+            logger.debug("Last-modified-dates found for " + dates.size() + " subjects");
+
+            for (SubjectDTO subjectDTO : subjects) {
+                subjectDTO.setLastModifiedDate(dates.get(subjectDTO.getUri()));
+            }
+        }
+
+        logger.debug("Last-modified dates prepared in " + (System.currentTimeMillis() - startTime) + " ms");
+    }
+
+    /**
+     *
+     * @param errors
+     */
     @ValidationMethod(on = "search")
     public void validateSearch(ValidationErrors errors) {
         if (this.searchExpression == null || this.searchExpression.equals("")) {
@@ -172,7 +213,7 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 
         SubjectLastModifiedColumn col2 = new SubjectLastModifiedColumn();
         col2.setTitle("Date");
-        col2.setSortable(true);
+        col2.setSortable(false);
         list.add(col2);
 
         return list;

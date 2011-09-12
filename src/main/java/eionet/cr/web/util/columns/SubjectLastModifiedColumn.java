@@ -22,7 +22,6 @@ package eionet.cr.web.util.columns;
 
 import java.util.Date;
 
-import eionet.cr.common.Predicates;
 import eionet.cr.dto.SubjectDTO;
 
 /**
@@ -41,7 +40,8 @@ public class SubjectLastModifiedColumn extends SearchResultColumn {
 
         String result = "";
         if (object != null && object instanceof SubjectDTO) {
-            Date date = ((SubjectDTO) object).getLastModifiedTime();
+
+            Date date = ((SubjectDTO) object).getLastModifiedDate();
             if (date != null && date.getTime() > 0) {
                 result = SIMPLE_DATE_FORMAT.format(date);
             }
@@ -56,8 +56,7 @@ public class SubjectLastModifiedColumn extends SearchResultColumn {
      * @see eionet.cr.web.util.columns.SearchResultColumn#getSortParamValue()
      */
     public String getSortParamValue() {
-        return Predicates.CR_LAST_MODIFIED;
-        // return getClass().getSimpleName();
+        return getClass().getSimpleName();
     }
 
 }

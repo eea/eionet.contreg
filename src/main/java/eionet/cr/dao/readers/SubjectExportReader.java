@@ -82,8 +82,6 @@ public class SubjectExportReader extends ResultSetExportReader {
             }
             currentSubject = new SubjectDTO(rs.getString("SUBJECT_URI"), YesNoBoolean.parse(rs.getString("ANON_SUBJ")));
             currentSubject.setUriHash(subjectHash);
-            // currentSubject.setLastModifiedTime(new
-            // Date(rs.getLong("SUBJECT_MODIFIED")));
         }
 
         String predicateUri = rs.getString("PREDICATE_URI");
@@ -96,8 +94,8 @@ public class SubjectExportReader extends ResultSetExportReader {
         }
 
         ObjectDTO object =
-                new ObjectDTO(rs.getString("OBJECT"), rs.getString("OBJ_LANG"), YesNoBoolean.parse(rs.getString("LIT_OBJ")),
-                        YesNoBoolean.parse(rs.getString("ANON_OBJ")));
+            new ObjectDTO(rs.getString("OBJECT"), rs.getString("OBJ_LANG"), YesNoBoolean.parse(rs.getString("LIT_OBJ")),
+                    YesNoBoolean.parse(rs.getString("ANON_OBJ")));
         object.setHash(rs.getLong("OBJECT_HASH"));
         // object.setSourceUri(rs.getString("SOURCE_URI"));
         // object.setSourceHash(rs.getLong("SOURCE"));
@@ -145,8 +143,8 @@ public class SubjectExportReader extends ResultSetExportReader {
         String objectLang = isLiteral ? ((Literal) objectValue).getLanguage() : null;
 
         ObjectDTO object =
-                new ObjectDTO(objectValue.stringValue(), objectLang == null ? "" : objectLang, isLiteral,
-                        objectValue instanceof BNode);
+            new ObjectDTO(objectValue.stringValue(), objectLang == null ? "" : objectLang, isLiteral,
+                    objectValue instanceof BNode);
 
         object.setHash(Hashes.spoHash(objectValue.stringValue()));
 

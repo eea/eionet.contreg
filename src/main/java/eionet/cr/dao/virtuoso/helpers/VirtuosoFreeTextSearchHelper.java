@@ -52,51 +52,33 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper {
         bindings = new Bindings();
     }
 
-    // If relevant subject is found from multiple graphs, then query returns only the record where
-    // the cr:contentLastModified is latest.
-    // That is why query includes such hokus-pokus as max(), group by and subquery.
-
+    /**
+     *
+     */
     @Override
     protected String getOrderedQuery(List<Object> inParams) {
+
         StringBuilder strBuilder = new StringBuilder();
+        strBuilder.append("select distinct ?s where {?s ?p ?o . ").append(addTypeFilterParams());
+        strBuilder.append(addTextFilterClause());
 
-        // if (sortPredicate.equals(SubjectLastModifiedColumn.class.getSimpleName())) {
-        if (sortPredicate.equals(Predicates.CR_LAST_MODIFIED)) {
-            strBuilder.append("select ?s where { graph ?g {").append("select ?s max(?time) AS ?order where {?s ?p ?o .")
-                    .append(addTypeFilterParams());
+        strBuilder.append("optional {?s ?sortPredicate ?ord} }");
+        bindings.setURI("sortPredicate", sortPredicate);
 
-            strBuilder.append(addTextFilterClause());
-
-            strBuilder.append(" optional {?g <").append(Predicates.CR_LAST_MODIFIED).append("> ?time} ").append("} ")
-                    .append("GROUP BY ?s }} ORDER BY ");
-            if (sortOrder != null) {
-                strBuilder.append(sortOrder);
-            }
-            strBuilder.append("(?order)");
+        strBuilder.append("ORDER BY ");
+        if (sortOrder != null)
+            strBuilder.append(sortOrder);
+        if (sortPredicate != null && sortPredicate.equals(Predicates.RDFS_LABEL)) {
+            // If Label is not null then use Label. Otherwise use subject where we replace all / with # and then get
+            // the string after last #.
+            strBuilder
+            .append("(bif:lcase(bif:either(bif:isnull(?ord), (bif:subseq (bif:replace (?s, '/', '#'), bif:strrchr (bif:replace (?s, '/', '#'), '#')+1)), ?ord)))");
+        } else if (sortPredicate != null && sortPredicate.equals(Predicates.RDF_TYPE)) {
+            // Replace all / with # and then get the string after last #
+            strBuilder
+            .append("(bif:lcase(bif:subseq (bif:replace (?ord, '/', '#'), bif:strrchr (bif:replace (?ord, '/', '#'), '#')+1)))");
         } else {
-
-            strBuilder.append("select distinct ?s where {?s ?p ?o . ").append(addTypeFilterParams());
-            strBuilder.append(addTextFilterClause());
-
-            strBuilder.append("optional {?s ?sortPredicate ?ord} }");
-            bindings.setURI("sortPredicate", sortPredicate);
-
-            strBuilder.append("ORDER BY ");
-            if (sortOrder != null)
-                strBuilder.append(sortOrder);
-            if (sortPredicate != null && sortPredicate.equals(Predicates.RDFS_LABEL)) {
-                // If Label is not null then use Label. Otherwise use subject where we replace all / with # and then get
-                // the string after last #.
-                strBuilder
-                        .append("(bif:lcase(bif:either(bif:isnull(?ord), (bif:subseq (bif:replace (?s, '/', '#'), bif:strrchr (bif:replace (?s, '/', '#'), '#')+1)), ?ord)))");
-            } else if (sortPredicate != null && sortPredicate.equals(Predicates.RDF_TYPE)) {
-                // Replace all / with # and then get the string after last #
-                strBuilder
-                        .append("(bif:lcase(bif:subseq (bif:replace (?ord, '/', '#'), bif:strrchr (bif:replace (?ord, '/', '#'), '#')+1)))");
-            } else {
-                strBuilder.append("(?ord)");
-            }
-
+            strBuilder.append("(?ord)");
         }
 
         return strBuilder.toString();

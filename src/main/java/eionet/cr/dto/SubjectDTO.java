@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -65,7 +66,7 @@ public class SubjectDTO implements Serializable {
     private boolean anonymous;
     private Map<String, Collection<ObjectDTO>> predicates;
     private Date dcDate;
-    private Date lastModifiedTime;
+    private Date lastModifiedDate;
 
     /** */
     private long hitSource;
@@ -450,16 +451,16 @@ public class SubjectDTO implements Serializable {
     /**
      * @return the lastModifiedTime
      */
-    public Date getLastModifiedTime() {
-        return lastModifiedTime;
+    public Date getLastModifiedDate() {
+        return lastModifiedDate;
     }
 
     /**
-     * @param lastModifiedTime
+     * @param lastModifiedDate
      *            the lastModifiedTime to set
      */
-    public void setLastModifiedTime(Date lastModifiedTime) {
-        this.lastModifiedTime = lastModifiedTime;
+    public void setLastModifiedDate(Date lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
     }
 
     /**
@@ -514,6 +515,32 @@ public class SubjectDTO implements Serializable {
                 result = result + objects.size();
             }
         }
+        return result;
+    }
+
+    /**
+     * Returns a set of URIs of all distinct harvest sources in the triples of this subject.
+     *
+     * @return Set of distinct harvest source URIs.
+     */
+    public Set<String> getSources(){
+
+        HashSet<String> result = new HashSet<String>();
+        if (predicates!=null && !predicates.isEmpty()){
+
+            Collection<Collection<ObjectDTO>> objectCollections = predicates.values();
+            for (Collection<ObjectDTO> collection : objectCollections) {
+
+                if (collection!=null){
+                    for (ObjectDTO objectDTO : collection) {
+                        if (!StringUtils.isEmpty(objectDTO.getSourceUri())){
+                            result.add(objectDTO.getSourceUri());
+                        }
+                    }
+                }
+            }
+        }
+
         return result;
     }
 }

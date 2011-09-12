@@ -64,24 +64,21 @@ public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
         bindings = new Bindings();
     }
 
+    /**
+     *
+     */
     @Override
     protected String getOrderedQuery(List<Object> inParams) {
-        // sorting by date needs including the graph into query: sorting is done by graph's cr:contentLastmodified
-        //        StringBuilder strBuilder = new StringBuilder(SPARQLQueryUtil.getCrInferenceDefinition());
+
         StringBuilder strBuilder = initQueryStringBuilder();
-        if (Predicates.CR_LAST_MODIFIED.equals(sortPredicate)) {
-            strBuilder.append("select distinct ?s max(?time) AS ?oorderby where {graph ?g { ?s ?p ?o ");
-        } else {
-            strBuilder.append("select distinct ?s where { ?s ?p ?o ");
-        }
+        strBuilder.append("select distinct ?s where { ?s ?p ?o ");
         strBuilder.append(getQueryParameters(inParams));
-        if (Predicates.CR_LAST_MODIFIED.equals(sortPredicate)) {
-            strBuilder.append("}");
-        }
         strBuilder.append("} ORDER BY ");
+
         if (sortOrder != null) {
             strBuilder.append(sortOrder);
         }
+
         // if we do not have real labels / types in the query sort by last part of URI
         if (Predicates.RDFS_LABEL.equals(sortPredicate)) {
             strBuilder.append("(bif:either( bif:isnull(?oorderby) , (bif:lcase(bif:subseq (bif:replace (?s, '/', '#'), ").append(
@@ -91,8 +88,6 @@ public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
             strBuilder.append("(bif:lcase(bif:subseq (bif:replace (?oorderby, '/', '#'), bif:strrchr (bif:replace ").append(
             "(?oorderby, '/', '#'), '#')+1)))");
             // sort by date
-        } else if (sortPredicate.equals(Predicates.CR_LAST_MODIFIED)) {
-            strBuilder.append("(?oorderby)");
         } else {
             strBuilder.append("(bif:lcase(?oorderby))");
         }
@@ -124,15 +119,15 @@ public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
     }
 
     /**
-     * Builds query parameter String bsaed on given filters.
+     * Builds query parameter String based on given filters.
      *
      * @param inParams
      *            useless parameter was used for SQL preparedstatemenst
      * @return Query parameter string for SPARQL
      */
     public String getQueryParameters(List<Object> inParams) {
+
         String s = "";
-        // TODO remove inParams that were used for SQL prepared statement handling
         int i = 1;
 
         // shows if sorting predicate is in the filter
@@ -194,11 +189,7 @@ public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
             }
         }
         if (!hasSortingPredicate && sortPredicate != null) {
-            if (Predicates.CR_LAST_MODIFIED.equals(sortPredicate)) {
-                s += " . OPTIONAL {?g ?sortPredicateValue ?time}";
-            } else {
-                s += " . OPTIONAL {?s ?sortPredicateValue ?oorderby}";
-            }
+            s += " . OPTIONAL {?s ?sortPredicateValue ?oorderby}";
             bindings.setURI(SORTPREDICATE_VALUE_ALIAS, sortPredicate);
         }
         return s;
