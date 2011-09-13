@@ -35,6 +35,7 @@ import net.sourceforge.stripes.validation.Validate;
 import net.sourceforge.stripes.validation.ValidationErrors;
 import net.sourceforge.stripes.validation.ValidationMethod;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.config.GeneralConfig;
@@ -103,6 +104,10 @@ public class DocumentationActionBean extends AbstractActionBean {
                 if (doc.getContentType().equals("text/html")) {
                     content = new String(doc.getContent());
                     title = doc.getTitle();
+                } else if (doc.getContentType().equals("uploaded_text/html")) {
+                    File f = FileStore.getInstance("documentation").get(doc.getContent());
+                    content = FileUtils.readFileToString(f);
+                    title = doc.getTitle();
                 } else {
                     File f = FileStore.getInstance("documentation").get(doc.getContent());
                     return new StreamingResolution(doc.getContentType(), new FileInputStream(f));
@@ -135,7 +140,11 @@ public class DocumentationActionBean extends AbstractActionBean {
             } else {
                 FileStore.getInstance("documentation").add(file.getFileName(), true, file.getInputStream());
                 DocumentationDAO dao = DAOFactory.get().getDao(DocumentationDAO.class);
-                dao.insertFile(pid, contentType, file.getFileName(), title);
+                String ct = contentType;
+                if (contentType != null && contentType.equalsIgnoreCase("text/html")) {
+                    ct = "uploaded_" + contentType;
+                }
+                dao.insertFile(pid, ct, file.getFileName(), title);
                 String url = APP_URL + "/documentation/" + pid;
                 addSystemMessage("File successfully uploaded! File URL is: <a href=\"" + url + "\">" + url + "</a>");
             }

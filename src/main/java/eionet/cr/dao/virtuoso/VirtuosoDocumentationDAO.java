@@ -62,7 +62,8 @@ public class VirtuosoDocumentationDAO extends VirtuosoBaseDAO implements Documen
     @Override
     public List<DocumentationDTO> getHtmlDocObjects() throws DAOException {
 
-        String docObjectSQL = "select page_id, content_type, content, title from documentation where content_type='text/html'";
+        String docObjectSQL = "select page_id, content_type, content, title from documentation where "
+            + "content_type='text/html' OR content_type='uploaded_text/html'";
 
         List<DocumentationDTO> ret = new ArrayList<DocumentationDTO>();
         Connection conn = null;
