@@ -142,4 +142,14 @@ public class CRActionBeanContext extends ActionBeanContext {
     public void setSourcePageResolution(Resolution resolution) {
         this.sourcePageResolution = resolution;
     }
+
+    /**
+     * Gets application init parameter.
+     *
+     * @param key
+     * @return String
+     */
+    public String getInitParameter(String key) {
+        return getServletContext().getInitParameter(key);
+    }
 }

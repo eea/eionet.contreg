@@ -34,6 +34,7 @@ import net.sourceforge.stripes.controller.AnnotatedClassActionResolver;
 import net.sourceforge.stripes.validation.SimpleError;
 import net.sourceforge.stripes.validation.ValidationError;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -301,5 +302,14 @@ public abstract class AbstractActionBean implements ActionBean {
     public String getBaseUrl(CRActionBeanContext context) {
         String url = context.getRequest().getRequestURL().toString();
         return url.substring(0, url.lastIndexOf("/pages/"));
+    }
+
+    public boolean isEeaTemplate() {
+        boolean ret = false;
+        String use = getContext().getInitParameter("useEeaTemplate");
+        if (!StringUtils.isBlank(use)) {
+            ret = new Boolean(use).booleanValue();
+        }
+        return ret;
     }
 }

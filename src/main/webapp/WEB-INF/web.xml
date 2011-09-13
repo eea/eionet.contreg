@@ -15,6 +15,16 @@
         <param-name>appDispName</param-name>
         <param-value>${application.displayName}</param-value>
     </context-param>
+    
+    <context-param>
+        <param-name>useEeaTemplate</param-name>
+        <param-value>true</param-value>
+    </context-param>
+    
+    <context-param>
+	<param-name>templateCacheFolder</param-name>
+	<param-value>${application.eea.template.folder}</param-value>
+    </context-param>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!--              filters                   -->
@@ -190,6 +200,18 @@
         <servlet-name>AmpServlet</servlet-name>
         <url-pattern>/ampService</url-pattern>
     </servlet-mapping>
+    
+    <!--  Update template servlet -->
+
+    <servlet>
+        <servlet-name>RefreshTemplateServlet</servlet-name>
+        <servlet-class>eea.template.RefreshTemplateServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>RefreshTemplateServlet</servlet-name>
+        <url-pattern>/refreshtemplate</url-pattern>
+    </servlet-mapping>
+    
 
     <!-- XmlConvServlet -->
 
