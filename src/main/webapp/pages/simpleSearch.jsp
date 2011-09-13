@@ -55,8 +55,8 @@
                 </td>
                 <td class="exactMatch">
                     <stripes:checkbox name="exactMatch" id="exactMatch"/>
-		            <stripes:label for="exactMatch">Exact match</stripes:label>
-		        </td>
+                    <stripes:label for="exactMatch">Exact match</stripes:label>
+                </td>
             </tr>
         </table>
     </crfn:form>

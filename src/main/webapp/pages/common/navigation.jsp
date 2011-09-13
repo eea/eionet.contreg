@@ -17,7 +17,7 @@
         <li><a href="harvestQueue.action">Harvest queue</a></li>
         <li><a href="home">User homes</a></li>
         <c:if test='${not empty sessionScope.crUser && crfn:userHasPermission(pageContext.session, "/sparqlclient", "v")}'>
-        	<li><a href="sparqlclient">Other SPARQL systems</a></li>
+            <li><a href="sparqlclient">Other SPARQL systems</a></li>
         </c:if>
         <c:if test="${not empty sessionScope.crUser && sessionScope.crUser.administrator}">
             <li><a href="admin" title="Administrative activities">Admin actions</a></li>

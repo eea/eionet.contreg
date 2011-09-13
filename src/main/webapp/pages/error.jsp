@@ -8,9 +8,9 @@
         <c:choose>
             <c:when test="${not empty requestScope.exception}">
                 <h4>message:</h4>
-	            <p><c:out value="${requestScope.exception}"/></p>
-	            <h4>stack trace:</h4>
-	            <p>${crfn:formatStackTrace(fn:escapeXml(crfn:getStackTrace(requestScope.exception)))}</p>
+                <p><c:out value="${requestScope.exception}"/></p>
+                <h4>stack trace:</h4>
+                <p>${crfn:formatStackTrace(fn:escapeXml(crfn:getStackTrace(requestScope.exception)))}</p>
             </c:when>
             <c:otherwise>
                 <p>But no error message found!</p>

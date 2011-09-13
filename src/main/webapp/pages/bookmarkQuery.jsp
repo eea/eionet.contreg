@@ -9,10 +9,10 @@
 
         <div style="margin-top:20px">
 
-	         <strong>Query:</strong><pre><c:out value="${actionBean.query}"/></pre>
-	         <span><strong>Output format:&nbsp;</strong><c:out value="${actionBean.format}"/></span>
-	         <span style="padding-left:20px"><strong>Use inferencing:&nbsp;</strong><c:out value="${actionBean.useInferencing}"/></span>
-	         <span style="padding-left:20px"><strong>Hits per page:&nbsp;</strong><c:out value="${actionBean.nrOfHits}"/></span>
+             <strong>Query:</strong><pre><c:out value="${actionBean.query}"/></pre>
+             <span><strong>Output format:&nbsp;</strong><c:out value="${actionBean.format}"/></span>
+             <span style="padding-left:20px"><strong>Use inferencing:&nbsp;</strong><c:out value="${actionBean.useInferencing}"/></span>
+             <span style="padding-left:20px"><strong>Hits per page:&nbsp;</strong><c:out value="${actionBean.nrOfHits}"/></span>
         </div>
 
         <crfn:form id="bookmarkQueryForm" action="/sparql" method="post">

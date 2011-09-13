@@ -58,11 +58,11 @@
                     <stripes:layout-render name="/pages/common/subjectsResultList.jsp" tableClass="sortable"/>
                 </div>
                 <c:if test='${crfn:userHasPermission(pageContext.session, "/registrations", "u")}'>
-	                <div>
-	                    <stripes:submit name="delete" value="Delete" title="Delete selecetd sources"/>
-	                    <stripes:submit name="harvest" value="Schedule urgent harvest" title="Schedule urgent harvest of selecetd sources"/>
-	                    <input type="button" name="selectAll" value="Select all" onclick="toggleSelectAll('resultSetForm');return false"/>
-	                </div>
+                    <div>
+                        <stripes:submit name="delete" value="Delete" title="Delete selecetd sources"/>
+                        <stripes:submit name="harvest" value="Schedule urgent harvest" title="Schedule urgent harvest of selecetd sources"/>
+                        <input type="button" name="selectAll" value="Select all" onclick="toggleSelectAll('resultSetForm');return false"/>
+                    </div>
                 </c:if>
             </crfn:form>
     </stripes:layout-component>

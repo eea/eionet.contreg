@@ -151,7 +151,7 @@
                                 <c:when test="${subjectUrl!=null}">
                                     <p>Resource URL: <a class="link-external" href="${fn:escapeXml(subjectUrl)}"><c:out value="${subjectUrl}"/></a>
                                         <c:choose>
-                                            <c:when	test ="${actionBean.subjectIsUserBookmark}">(Bookmarked)</c:when>
+                                            <c:when    test ="${actionBean.subjectIsUserBookmark}">(Bookmarked)</c:when>
                                         </c:choose>
                                     </p>
                                     <c:if test="${actionBean.currentlyHarvested}">

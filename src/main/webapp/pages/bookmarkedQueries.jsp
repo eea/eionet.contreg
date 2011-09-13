@@ -6,7 +6,7 @@
     <stripes:layout-component name="contents">
 
         <h1>Delete bookmarked SPARQL queries</h1>
-        
+
         <c:if test="${not empty actionBean.bookmarkedQueries}">
             <div style="margin-top: 15px">
                 <crfn:form id="bookmarkedQueriesForm" action="/sparql" method="post">
