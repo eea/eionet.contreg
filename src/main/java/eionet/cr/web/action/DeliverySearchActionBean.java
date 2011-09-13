@@ -55,14 +55,14 @@ import eionet.cr.web.util.columns.SubjectPredicateColumn;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-@UrlBinding("/dataflowSearch.action")
-public class DataflowSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
+@UrlBinding("/deliverySearch.action")
+public class DeliverySearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 
     /** */
     private List<String> years;
 
     /** */
-    private String dataflow;
+    private String obligation;
     private String locality;
     private String year;
 
@@ -72,7 +72,7 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean<SubjectDT
      */
     @DefaultHandler
     public Resolution init() {
-        return new ForwardResolution("/pages/dataflowSearch.jsp");
+        return new ForwardResolution("/pages/deliverySearch.jsp");
     }
 
     /*
@@ -81,16 +81,17 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean<SubjectDT
      * @see eionet.cr.web.action.AbstractSearchActionBean#search()
      */
     public Resolution search() throws DAOException {
+
         Pair<Integer, List<SubjectDTO>> customSearch =
-                DAOFactory
-                        .get()
-                        .getDao(SearchDAO.class)
-                        .searchByFilters(buildSearchCriteria(), null, PagingRequest.create(getPageN()),
-                                new SortingRequest(getSortP(), SortOrder.parse(getSortO())), null, false);
+            DAOFactory
+            .get()
+            .getDao(SearchDAO.class)
+            .searchByFilters(buildSearchCriteria(), false, PagingRequest.create(getPageN()),
+                    new SortingRequest(getSortP(), SortOrder.parse(getSortO())), null, false);
         resultList = customSearch.getRight();
         matchCount = customSearch.getLeft();
 
-        return new ForwardResolution("/pages/dataflowSearch.jsp");
+        return new ForwardResolution("/pages/deliverySearch.jsp");
     }
 
     /**
@@ -102,8 +103,8 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean<SubjectDT
         Map<String, String> result = new HashMap<String, String>();
 
         result.put(Predicates.RDF_TYPE, Subjects.ROD_DELIVERY_CLASS);
-        if (!StringUtils.isBlank(dataflow))
-            result.put(Predicates.ROD_OBLIGATION_PROPERTY, dataflow);
+        if (!StringUtils.isBlank(obligation))
+            result.put(Predicates.ROD_OBLIGATION_PROPERTY, obligation);
 
         if (!StringUtils.isBlank(locality))
             result.put(Predicates.ROD_LOCALITY_PROPERTY, locality);
@@ -118,7 +119,7 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean<SubjectDT
      * @return the instrumentsObligations
      */
     public Map<UriLabelPair, List<UriLabelPair>> getInstrumentsObligations() {
-        return ApplicationCache.getDataflowPicklist();
+        return ApplicationCache.getDeliverySearchPicklist();
     }
 
     /**
@@ -145,10 +146,10 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean<SubjectDT
     }
 
     /**
-     * @return the dataflow
+     * @return the obligation
      */
-    public String getDataflow() {
-        return dataflow;
+    public String getObligation() {
+        return obligation;
     }
 
     /**
@@ -166,11 +167,11 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean<SubjectDT
     }
 
     /**
-     * @param dataflow
-     *            the dataflow to set
+     * @param obligation
+     *            the obligation to set
      */
-    public void setDataflow(String dataflow) {
-        this.dataflow = dataflow;
+    public void setObligation(String obligation) {
+        this.obligation = obligation;
     }
 
     /**
@@ -203,12 +204,6 @@ public class DataflowSearchActionBean extends AbstractSearchActionBean<SubjectDT
         col.setTitle("Title");
         col.setSortable(true);
         list.add(col);
-
-        // col = new SubjectPredicateColumn();
-        // col.setPredicateUri(Predicates.ROD_OBLIGATION_PROPERTY);
-        // col.setTitle("Dataflow");
-        // col.setSortable(true);
-        // list.add(col);
 
         col = new SubjectPredicateColumn();
         col.setPredicateUri(Predicates.ROD_HAS_FILE);

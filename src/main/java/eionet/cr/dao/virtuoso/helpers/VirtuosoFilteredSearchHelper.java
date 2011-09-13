@@ -25,7 +25,7 @@ import eionet.cr.util.sesame.SPARQLQueryUtil;
 public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
 
     private Map<String, String> filters;
-    private Set<String> literalPredicates;
+    private Set<String> literalRangeFilters;
     private Boolean requiresFullTextSearch = null;
     private Bindings bindings;
 
@@ -37,7 +37,7 @@ public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
 
     private static final String SORTPREDICATE_VALUE_ALIAS = "sortPredicateValue";
 
-    public VirtuosoFilteredSearchHelper(Map<String, String> filters, Set<String> literalPredicates, PagingRequest pagingRequest,
+    public VirtuosoFilteredSearchHelper(Map<String, String> filters, Set<String> literalRangeFilters, PagingRequest pagingRequest,
             SortingRequest sortingRequest, boolean useInferencing) {
         super(pagingRequest, sortingRequest);
         setUseInferencing(useInferencing);
@@ -60,7 +60,7 @@ public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
         }
 
         this.filters = filters;
-        this.literalPredicates = literalPredicates;
+        this.literalRangeFilters = literalRangeFilters;
         bindings = new Bindings();
     }
 
@@ -237,7 +237,7 @@ public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
      * @return
      */
     private boolean isLiteralPredicate(String s) {
-        return literalPredicates != null && literalPredicates.contains(s);
+        return literalRangeFilters != null && literalRangeFilters.contains(s);
     }
 
     /**

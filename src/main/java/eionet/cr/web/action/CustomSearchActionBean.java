@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -68,8 +67,6 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
     private static final String RESULT_LIST_SESSION_ATTR_NAME = CustomSearchActionBean.class.getName() + ".resultList";
     private static final String MATCH_COUNT_SESSION_ATTR_NAME = CustomSearchActionBean.class.getName() + ".matchCount";
     private static final String PAGINATION_SESSION_ATTR_NAME = CustomSearchActionBean.class.getName() + ".pagination";
-    private static final String LITERAL_SEARCH_ENABLED_FILTERS = CustomSearchActionBean.class.getName()
-    + ".literalSearchEnabledFilters";
 
     /** */
     private static final String SELECTED_VALUE_PREFIX = "value_";
@@ -118,7 +115,6 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
         session.removeAttribute(MATCH_COUNT_SESSION_ATTR_NAME);
         session.removeAttribute(PAGINATION_SESSION_ATTR_NAME);
         session.removeAttribute(SELECTED_FILTERS_SESSION_ATTR_NAME);
-        session.removeAttribute(LITERAL_SEARCH_ENABLED_FILTERS);
     }
 
     /*
@@ -134,7 +130,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
             DAOFactory
             .get()
             .getDao(SearchDAO.class)
-            .searchByFilters(buildSearchCriteria(), getLiteralEnabledFilters(), PagingRequest.create(getPageN()),
+            .searchByFilters(buildSearchCriteria(), true, PagingRequest.create(getPageN()),
                     new SortingRequest(getSortP(), SortOrder.parse(getSortO())), null, true);
 
         logger.debug("It took " + (System.currentTimeMillis() - startTime) + " ms to execute custom search");
@@ -194,14 +190,6 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
         if (addedFilter != null) {
 
             getSelectedFilters().put(addedFilter, "");
-
-            String predicateUri = getAvailableFilters().get(addedFilter).getUri();
-
-            boolean literalsEnabled = factory.getDao(HelperDAO.class).isAllowLiteralSearch(predicateUri);
-            if (literalsEnabled)
-                getLiteralEnabledFilters().add(predicateUri);
-            else
-                getLiteralEnabledFilters().remove(predicateUri);
         }
 
         return new ForwardResolution(ASSOCIATED_JSP);
@@ -225,7 +213,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
         } else if (Predicates.ROD_LOCALITY_PROPERTY.equals(uri)) {
             picklist = ApplicationCache.getLocalities();
         } else if (Predicates.ROD_OBLIGATION_PROPERTY.equals(uri)) {
-            picklist = ApplicationCache.getDataflows();
+            picklist = ApplicationCache.getObligations();
         } else if (Predicates.ROD_INSTRUMENT_PROPERTY.equals(uri)) {
             picklist = ApplicationCache.getInstruments();
         } else if (Predicates.CR_SCHEMA.equals(uri)) {
@@ -286,22 +274,6 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 
     /**
      *
-     * @return
-     */
-    private HashSet<String> getLiteralEnabledFilters() {
-
-        HttpSession session = getContext().getRequest().getSession();
-        HashSet<String> set = (HashSet<String>) session.getAttribute(LITERAL_SEARCH_ENABLED_FILTERS);
-        if (set == null) {
-            set = new HashSet<String>();
-            session.setAttribute(LITERAL_SEARCH_ENABLED_FILTERS, set);
-        }
-
-        return set;
-    }
-
-    /**
-     *
      */
     private void populateSelectedFilters() {
 
@@ -358,7 +330,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 
             filter = new CustomSearchFilter();
             filter.setUri(Predicates.ROD_OBLIGATION_PROPERTY);
-            filter.setTitle("Dataflow");
+            filter.setTitle("Reporting obligation");
             filter.setDescription("");
             filter.setProvideValues(true);
             list.add(filter);

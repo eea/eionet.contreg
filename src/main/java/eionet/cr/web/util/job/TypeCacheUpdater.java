@@ -54,7 +54,9 @@ public class TypeCacheUpdater implements StatefulJob {
 
         try {
             List<Pair<String, String>> types = new LinkedList<Pair<String, String>>();
-            // TODO change back to use original filtered search if Virtuoso inferencing issue is clear
+
+            // TODO change back to use original filtered search if Virtuoso inferencing issue is clarified
+
             // Map<String, String> criteria = new HashMap<String, String>();
             // criteria.put(Predicates.RDF_TYPE, Subjects.RDFS_CLASS);
             //
@@ -73,6 +75,7 @@ public class TypeCacheUpdater implements StatefulJob {
             // if (customSearch != null) {
             //
             // List<SubjectDTO> subjects = customSearch.getRight();
+
             List<SubjectDTO> subjects = DAOFactory.get().getDao(SearchDAO.class).getTypes();
 
             if (subjects != null && !subjects.isEmpty()) {

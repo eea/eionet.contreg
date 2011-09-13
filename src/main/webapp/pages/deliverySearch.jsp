@@ -2,9 +2,9 @@
 
 <%@ include file="/pages/common/taglibs.jsp"%>
 
-<stripes:layout-render name="/pages/common/template.jsp" pageTitle="Dataflow search">
+<stripes:layout-render name="/pages/common/template.jsp" pageTitle="Delivery search">
 
-    <stripes:useActionBean beanclass="eionet.cr.web.action.DataflowSearchActionBean" id="dataflowSearchActionBean"/>
+    <stripes:useActionBean beanclass="eionet.cr.web.action.DeliverySearchActionBean" id="deliverySearchActionBean"/>
 
     <stripes:layout-component name="contents">
 
@@ -16,11 +16,11 @@
                 </p>
 
         <div style="margin-top:15px">
-            <crfn:form action="/dataflowSearch.action" method="get">
+            <crfn:form action="/deliverySearch.action" method="get">
 
-                <label for="dataflowSelect" class="question" style="margin-bottom:3px">Obligation:</label>
-                <stripes:select name="dataflow" id="dataflowSelect" size="15" style="width:100%">
-                    <c:forEach var="instr" items="${dataflowSearchActionBean.instrumentsObligations}">
+                <label for="obligationSelect" class="question" style="margin-bottom:3px">Obligation:</label>
+                <stripes:select name="obligation" id="obligationSelect" size="15" style="width:100%">
+                    <c:forEach var="instr" items="${deliverySearchActionBean.instrumentsObligations}">
                         <optgroup label="${instr.key.label}">
                             <c:forEach var="oblig" items="${instr.value}">
                                 <stripes:option value="${oblig.uri}" label="${oblig.label}"/>
@@ -34,14 +34,14 @@
                 <label for="localitySelect" class="question">Locality:</label>
                 <stripes:select name="locality" id="localitySelect" style="max-width:200px">
                     <stripes:option value="" label="-- All --"/>
-                    <c:forEach var="loclty" items="${dataflowSearchActionBean.localities}">
+                    <c:forEach var="loclty" items="${deliverySearchActionBean.localities}">
                         <stripes:option value="${crfn:addQuotesIfWhitespaceInside(loclty.left)}" label="${loclty.right}"/>
                     </c:forEach>
                 </stripes:select>
                 <label for="yearSelect" class="question" style="display:inline;margin-left:20px">Coverage year:</label>
                 <stripes:select name="year" id="yearSelect">
                     <stripes:option value="" label="-- All --"/>
-                    <c:forEach var="y" items="${dataflowSearchActionBean.years}">
+                    <c:forEach var="y" items="${deliverySearchActionBean.years}">
                         <stripes:option value="${y}" label="${y}"/>
                     </c:forEach>
                 </stripes:select><stripes:submit name="search" value="Search" id="searchButton" style="display:inline;margin-left:60px"/>

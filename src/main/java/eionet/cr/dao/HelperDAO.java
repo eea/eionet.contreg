@@ -112,14 +112,6 @@ public interface HelperDAO extends DAO {
     String getSubjectSchemaUri(String subjectUri) throws DAOException;
 
     /**
-     * @param predicateUri
-     * @return boolean
-     * @throws DAOException
-     *             if query fails TODO
-     */
-    boolean isAllowLiteralSearch(String predicateUri) throws DAOException;
-
-    /**
      * @param typeUri
      * @return List<SubjectDTO>
      * @throws DAOException
@@ -166,7 +158,7 @@ public interface HelperDAO extends DAO {
      * @throws DAOException
      *             if query fails
      */
-    HashMap<UriLabelPair, ArrayList<UriLabelPair>> getDataflowSearchPicklist() throws DAOException;
+    HashMap<UriLabelPair, ArrayList<UriLabelPair>> getDeliverySearchPicklist() throws DAOException;
 
     /**
      * @param user
@@ -472,4 +464,12 @@ public interface HelperDAO extends DAO {
      * @throws DAOException
      */
     public Map<String, Date> getSourceLastModifiedDates(Set<String> resourceUris) throws DAOException;
+
+    /**
+     *
+     * @param subjectsToCheck
+     * @return
+     * @throws DAOException
+     */
+    public Set<String> getLiteralRangeSubjects(Set<String> subjectsToCheck) throws DAOException;
 }

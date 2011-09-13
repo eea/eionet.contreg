@@ -16,7 +16,7 @@
  * (C) European Environment Agency.  All Rights Reserved.
  *
  * Contributor(s):
- *		Jaanus Heinlaid
+ *        Jaanus Heinlaid
  */
 
 package eionet.cr.common;
@@ -29,8 +29,6 @@ import java.util.UUID;
 import eionet.cr.config.GeneralConfig;
 
 /**
- * Type definition ...
- *
  * @author Jaanus Heinlaid
  */
 public class TempFilePathGenerator {

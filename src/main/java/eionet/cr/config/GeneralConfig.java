@@ -68,10 +68,8 @@ public class GeneralConfig {
     /** */
     public static final String SUBJECT_SELECT_MODE = "subjectSelectMode";
 
-    /**
-     * Constant to get dataflow picklist cache update interval (in milliseconds).
-     */
-    public static final String DATAFLOW_PICKLIST_CACHE_UPDATE_INTERVAL = "dataflowPicklistCacheUpdateInterval";
+    /** Cache-related constants */
+    public static final String DELIVERY_SEARCH_PICKLIST_CACHE_UPDATE_INTERVAL = "deliverySearchPicklistCacheUpdateInterval";
     public static final String RECENT_DISCOVERED_FILES_CACHE_UPDATE_INTERVAL = "recentDiscoveredFilesCacheUpdateInterval";
     public static final String TYPE_CACHE_UPDATE_INTERVAL = "typeCacheUpdateInterval";
     public static final String TAG_CLOUD_CACHE_UPDATE_INTERVAL = "tagCloudCacheUpdateInterval";

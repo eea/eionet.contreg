@@ -37,7 +37,7 @@ import eionet.cr.dao.util.UriLabelPair;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class DataflowPicklistReader<T> extends ResultSetMixedReader<T> {
+public class DeliverySearchPicklistReader<T> extends ResultSetMixedReader<T> {
 
     /** */
     // KL 170611 - why does it not return resultList as the rest of readers?

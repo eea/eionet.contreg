@@ -23,7 +23,6 @@ package eionet.cr.dao;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Vector;
 
 import eionet.cr.dao.helpers.FreeTextSearchHelper;
@@ -59,20 +58,20 @@ public interface SearchDAO extends DAO {
     /**
      * @param filters
      *            - search filters.
-     * @param literalPredicates
+     * @param checkFiltersRange
      *            - set of literal predicates
      * @param pagingRequest
      *            - page request
      * @param sortingRequest
      *            - sorting request
-     * @param selectedPredicates
+     * @param selectPredicates
      *            - predicates filter
-     * @param useInferencing if query uses inferencing. If inferencing is not needed it is reasoneable to switch it off
+     * @param useInference if query uses inferencing. If inferencing is not needed it is reasoneable to switch it off
      * @return Pair<Integer, List<SubjectDTO>>
      * @throws DAOException
      */
-    Pair<Integer, List<SubjectDTO>> searchByFilters(Map<String, String> filters, Set<String> literalPredicates,
-            PagingRequest pagingRequest, SortingRequest sortingRequest, List<String> selectedPredicates, boolean useInferencing) throws DAOException;
+    Pair<Integer, List<SubjectDTO>> searchByFilters(Map<String, String> filters, boolean checkFiltersRange,
+            PagingRequest pagingRequest, SortingRequest sortingRequest, List<String> selectPredicates, boolean useInference) throws DAOException;
 
     /**
      *
@@ -107,15 +106,15 @@ public interface SearchDAO extends DAO {
     /**
      *
      * @param filters
-     * @param literalPredicates
+     * @param checkFiltersRange
      * @param pagingRequest
      * @param sortingRequest
-     * @param selectedPredicates
+     * @param selectPredicates
      * @return Pair<Integer, List<SubjectDTO>>
      * @throws DAOException
      */
-    public Pair<Integer, List<SubjectDTO>> searchByTypeAndFilters(Map<String, String> filters, Set<String> literalPredicates,
-            PagingRequest pagingRequest, SortingRequest sortingRequest, List<String> selectedPredicates) throws DAOException;
+    public Pair<Integer, List<SubjectDTO>> searchByTypeAndFilters(Map<String, String> filters, boolean checkFiltersRange,
+            PagingRequest pagingRequest, SortingRequest sortingRequest, List<String> selectPredicates) throws DAOException;
 
     /**
      *

@@ -39,7 +39,7 @@ import org.quartz.impl.StdSchedulerFactory;
 
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.util.Pair;
-import eionet.cr.web.util.job.DataflowSearchPicklistCacheUpdater;
+import eionet.cr.web.util.job.DeliverySearchPicklistCacheUpdater;
 import eionet.cr.web.util.job.RecentResourcesCacheUpdater;
 import eionet.cr.web.util.job.TagCloudCacheUpdater;
 import eionet.cr.web.util.job.TypeCacheUpdater;
@@ -63,9 +63,9 @@ public class JobScheduler implements ServletContextListener {
     static {
         intervalJobs =
             new Pair[] {
-                new Pair(GeneralConfig.DATAFLOW_PICKLIST_CACHE_UPDATE_INTERVAL, new JobDetail(
-                        DataflowSearchPicklistCacheUpdater.class.getSimpleName(), JobScheduler.class.getName(),
-                        DataflowSearchPicklistCacheUpdater.class)),
+                new Pair(GeneralConfig.DELIVERY_SEARCH_PICKLIST_CACHE_UPDATE_INTERVAL, new JobDetail(
+                        DeliverySearchPicklistCacheUpdater.class.getSimpleName(), JobScheduler.class.getName(),
+                        DeliverySearchPicklistCacheUpdater.class)),
                         new Pair(GeneralConfig.RECENT_DISCOVERED_FILES_CACHE_UPDATE_INTERVAL, new JobDetail(
                                 RecentResourcesCacheUpdater.class.getSimpleName(), JobScheduler.class.getName(),
                                 RecentResourcesCacheUpdater.class)),

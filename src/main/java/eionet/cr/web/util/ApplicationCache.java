@@ -52,10 +52,9 @@ public class ApplicationCache implements ServletContextListener {
      */
     public static final String APPLICATION_CACHE = "ApplicationCache";
 
-    /**
-     * Dataflow picklist cache name.
-     */
-    private static final String DATAFLOW_SEARCH_PICKLIST_CACHE = "dataflowSearchPicklist";
+    /** Delivery search picklist cache name. */
+    private static final String DELIVERY_SEARCH_PICKLIST_CACHE = "deliverySearchPicklist";
+
     /**
      * Localities cache name.
      */
@@ -188,17 +187,17 @@ public class ApplicationCache implements ServletContextListener {
     }
 
     /**
-     * Update dataflow picklist cache.
+     * Update delivery search picklist cache.
      *
      * @param picklistCache
      *            - picklist cache
      * @param localitiesCache
      *            - localities cache
      */
-    public static void updateDataflowPicklistCache(final Map<UriLabelPair, ArrayList<UriLabelPair>> picklistCache,
+    public static void updateDeliverySearchPicklistCache(final Map<UriLabelPair, ArrayList<UriLabelPair>> picklistCache,
             final Collection<ObjectLabelPair> localitiesCache) {
         getCache().put(new Element(LOCALITIES_CACHE, localitiesCache));
-        getCache().put(new Element(DATAFLOW_SEARCH_PICKLIST_CACHE, picklistCache));
+        getCache().put(new Element(DELIVERY_SEARCH_PICKLIST_CACHE, picklistCache));
     }
 
     /**
@@ -215,26 +214,26 @@ public class ApplicationCache implements ServletContextListener {
     }
 
     /**
-     * fetch dataflow picklist cache.
+     * Fetch delivery search picklist cache.
      *
      * @return Map<String, List<UriLabelPair>>
      */
     @SuppressWarnings("unchecked")
-    public static Map<UriLabelPair, List<UriLabelPair>> getDataflowPicklist() {
-        Element element = getCache().get(DATAFLOW_SEARCH_PICKLIST_CACHE);
+    public static Map<UriLabelPair, List<UriLabelPair>> getDeliverySearchPicklist() {
+        Element element = getCache().get(DELIVERY_SEARCH_PICKLIST_CACHE);
 
         return element == null || element.getValue() == null ? Collections.EMPTY_MAP
-                : (Map<UriLabelPair, List<UriLabelPair>>) getCache().get(DATAFLOW_SEARCH_PICKLIST_CACHE).getValue();
+                : (Map<UriLabelPair, List<UriLabelPair>>) getCache().get(DELIVERY_SEARCH_PICKLIST_CACHE).getValue();
     }
 
     /**
-     * fetch cached dataflows.
+     * Fetch cached obligations.
      *
      * @return Collection<ObjectLabelPair>
      */
-    public static Collection<ObjectLabelPair> getDataflows() {
+    public static Collection<ObjectLabelPair> getObligations() {
         SortedSet<ObjectLabelPair> result = new TreeSet<ObjectLabelPair>();
-        Map<UriLabelPair, List<UriLabelPair>> cache = getDataflowPicklist();
+        Map<UriLabelPair, List<UriLabelPair>> cache = getDeliverySearchPicklist();
         for (Entry<UriLabelPair, List<UriLabelPair>> entry : cache.entrySet()) {
             for (UriLabelPair pair : entry.getValue()) {
                 result.add(new ObjectLabelPair(pair.getUri(), pair.getLabel()));
@@ -249,7 +248,7 @@ public class ApplicationCache implements ServletContextListener {
      * @return Collection
      */
     public static Collection<ObjectLabelPair> getInstruments() {
-        Map<UriLabelPair, List<UriLabelPair>> cache = getDataflowPicklist();
+        Map<UriLabelPair, List<UriLabelPair>> cache = getDeliverySearchPicklist();
         List<ObjectLabelPair> result = new LinkedList<ObjectLabelPair>();
         for (UriLabelPair instrument : cache.keySet()) {
             result.add(new ObjectLabelPair(instrument.getUri(), instrument.getLabel()));
@@ -328,6 +327,6 @@ public class ApplicationCache implements ServletContextListener {
         if (element == null || element.getValue() == null) {
             return Collections.EMPTY_MAP;
         }
-        return (Map<String, String>) ((Map<String, Map<String, String>>) element.getValue()).get(type);
+        return ((Map<String, Map<String, String>>) element.getValue()).get(type);
     }
 }

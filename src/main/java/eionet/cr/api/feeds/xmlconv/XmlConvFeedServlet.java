@@ -78,7 +78,7 @@ public class XmlConvFeedServlet extends HttpServlet {
                 Map<String, String> criteria = new HashMap<String, String>();
                 criteria.put(Predicates.CR_SCHEMA, xmlSchema);
 
-                Pair<Integer, List<SubjectDTO>> results = searchDao.searchByFilters(criteria, null, null, null, null, true);
+                Pair<Integer, List<SubjectDTO>> results = searchDao.searchByFilters(criteria, false, null, null, null, true);
 
                 int subjectCount = results == null ? 0 : (results.getRight() == null ? 0 : results.getRight().size());
                 logger.debug(methodName + ", " + subjectCount + " subjects found in total");
@@ -86,7 +86,7 @@ public class XmlConvFeedServlet extends HttpServlet {
             }
 
             SubjectsRDFWriter rdfWriter =
-                    new SubjectsRDFWriter(request.getParameter(XmlConvFeedServlet.INCLUDE_DERIVED_VALUES) != null);
+                new SubjectsRDFWriter(request.getParameter(XmlConvFeedServlet.INCLUDE_DERIVED_VALUES) != null);
             rdfWriter.addNamespace(Namespace.CR);
             rdfWriter.addNamespace(Namespace.DC);
             rdfWriter.addNamespace(Namespace.OWL);

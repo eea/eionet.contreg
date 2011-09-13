@@ -14,6 +14,8 @@ import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.dao.DAOException;
+import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.helpers.FreeTextSearchHelper.FilterType;
 import eionet.cr.dao.readers.FreeTextSearchReader;
@@ -46,9 +48,11 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
      * @see eionet.cr.dao.SearchDAO#searchByFreeText(eionet.cr.dao.util.SearchExpression,
      *      eionet.cr.dao.helpers.FreeTextSearchHelper.FilterType, eionet.cr.util.pagination.PagingRequest,
      *      eionet.cr.util.SortingRequest)
-     * @param exactMatch indicates if only exact amtch of String is searched
+     * @param exactMatch
+     *            indicates if only exact amtch of String is searched
      * @return Pair whre left member is results count and right member is list of matching subjects
-     * @throws DAOException if query fails.
+     * @throws DAOException
+     *             if query fails.
      */
     @Override
     public Pair<Integer, List<SubjectDTO>> searchByFreeText(final SearchExpression expression, final FilterType filterType,
@@ -133,11 +137,17 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
      * eionet.cr.util.SortingRequest, java.util.List)
      */
     @Override
-    public Pair<Integer, List<SubjectDTO>> searchByFilters(Map<String, String> filters, Set<String> literalPredicates,
-            PagingRequest pagingRequest, SortingRequest sortingRequest, List<String> selectedPredicates, boolean useInferencing) throws DAOException {
+    public Pair<Integer, List<SubjectDTO>> searchByFilters(Map<String, String> filters, boolean checkFiltersRange,
+            PagingRequest pagingRequest, SortingRequest sortingRequest, List<String> selectPredicates, boolean useInference)
+            throws DAOException {
+
         // create query helper
+        Set<String> literalRangeFilters = null;
+        if (checkFiltersRange){
+            literalRangeFilters = DAOFactory.get().getDao(HelperDAO.class).getLiteralRangeSubjects(filters.keySet());
+        }
         VirtuosoFilteredSearchHelper helper =
-            new VirtuosoFilteredSearchHelper(filters, literalPredicates, pagingRequest, sortingRequest, useInferencing);
+            new VirtuosoFilteredSearchHelper(filters, literalRangeFilters, pagingRequest, sortingRequest, useInference);
 
         // create the list of IN parameters of the query
 
@@ -164,8 +174,8 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
             // only these predicates will be queried for
             String[] neededPredicates = new String[] {};
 
-            if (selectedPredicates != null && selectedPredicates.size() > 0) {
-                neededPredicates = selectedPredicates.toArray(neededPredicates);
+            if (selectPredicates != null && selectPredicates.size() > 0) {
+                neededPredicates = selectPredicates.toArray(neededPredicates);
             }
             // get the data of all found subjects
             logger.trace("Search by filters, getting the data of the found subjects");
@@ -269,10 +279,10 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
      * eionet.cr.util.SortingRequest, java.util.List)
      */
     @Override
-    public Pair<Integer, List<SubjectDTO>> searchByTypeAndFilters(Map<String, String> filters, Set<String> literalPredicates,
-            PagingRequest pagingRequest, SortingRequest sortingRequest, List<String> selectedPredicates) throws DAOException {
+    public Pair<Integer, List<SubjectDTO>> searchByTypeAndFilters(Map<String, String> filters, boolean checkFiltersRange,
+            PagingRequest pagingRequest, SortingRequest sortingRequest, List<String> selectPredicates) throws DAOException {
 
-        return searchByFilters(filters, literalPredicates, pagingRequest, sortingRequest, selectedPredicates, true);
+        return searchByFilters(filters, checkFiltersRange, pagingRequest, sortingRequest, selectPredicates, true);
     }
 
     /*
@@ -547,8 +557,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
         List<String> typeUris = executeSPARQL(TYPES_CACHE_SPARQL, new SingleObjectReader<String>());
         String[] neededPredicates = {Predicates.RDFS_LABEL};
 
-        List<SubjectDTO> resultList =
-            getSubjectsData(typeUris, neededPredicates, new SubjectDataReader(typeUris), null);
+        List<SubjectDTO> resultList = getSubjectsData(typeUris, neededPredicates, new SubjectDataReader(typeUris), null);
         return resultList;
     }
 }

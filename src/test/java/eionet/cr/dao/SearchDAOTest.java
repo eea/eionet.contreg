@@ -82,7 +82,7 @@ public class SearchDAOTest extends CRDatabaseTestCase {
 
         Pair<Integer, List<SubjectDTO>> result =
             DAOFactory.get().getDao(SearchDAO.class)
-            .searchByTypeAndFilters(filters, null, pagingRequest, null, selectedPredicates);
+            .searchByTypeAndFilters(filters, false, pagingRequest, null, selectedPredicates);
 
         assertEquals(1, result.getLeft().intValue());
         assertTrue(result.getLeft() > 0);

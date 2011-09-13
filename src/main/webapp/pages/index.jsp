@@ -103,7 +103,7 @@
             is the same quick-find search that is also displayed above.
         </li>
         <li>
-            <a href="dataflowSearch.action">Search Reportnet deliveries</a><br/>
+            <a href="deliverySearch.action">Search Reportnet deliveries</a><br/>
             is meant for dataflow managers to observe specific dataflows in the dimensions of country and year.
         </li>
         <li>

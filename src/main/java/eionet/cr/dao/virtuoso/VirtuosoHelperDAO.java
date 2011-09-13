@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +38,7 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
-import eionet.cr.dao.readers.DataflowPicklistReader;
+import eionet.cr.dao.readers.DeliverySearchPicklistReader;
 import eionet.cr.dao.readers.MapReader;
 import eionet.cr.dao.readers.ObjectLabelReader;
 import eionet.cr.dao.readers.RDFExporter;
@@ -323,11 +324,6 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         return (objectUri != null && objectUri.size() > 0) ? objectUri.get(0) : null;
     }
 
-    @Override
-    public boolean isAllowLiteralSearch(String predicateUri) throws DAOException {
-        return false;
-    }
-
     /**
      * SPARQL for getting predicates used for type.
      */
@@ -454,29 +450,29 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     /**
      * Self-explanatory constant name.
      */
-    private static final String DATAFLOW_PICKLIST_SPARQL = "SELECT DISTINCT ?li_uri ?li_title ?ro_title ?ro_uri  WHERE "
+    private static final String DELIVERY_SEARCH_PICKLIST_SPARQL = "SELECT DISTINCT ?li_uri ?li_title ?ro_title ?ro_uri  WHERE "
         + "{?ro_uri <" + Predicates.ROD_INSTRUMENT_PROPERTY + "> ?li_uri " + ". ?li_uri <" + Predicates.DCTERMS_ALTERNATIVE
         + "> ?li_title " + ". ?ro_uri <" + Predicates.DCTERMS_TITLE + "> ?ro_title } ORDER BY ?li_title ?ro_title";
 
     /**
-     * Fills picklist for dataflows.
+     * Returns picklist for delivery search.
      *
-     * @return List of dataflows for search filter.
+     * @return The picklist.
      * @throws DAOException
      *             if query fails.
      */
     @Override
-    public HashMap<UriLabelPair, ArrayList<UriLabelPair>> getDataflowSearchPicklist() throws DAOException {
+    public HashMap<UriLabelPair, ArrayList<UriLabelPair>> getDeliverySearchPicklist() throws DAOException {
 
         long startTime = System.currentTimeMillis();
-        logger.trace("getDataflowSearchPicklist query: " + DATAFLOW_PICKLIST_SPARQL);
+        logger.trace("Delivery search picklist query: " + DELIVERY_SEARCH_PICKLIST_SPARQL);
 
         // TODO types
-        DataflowPicklistReader<HashMap<String, ArrayList<UriLabelPair>>> reader =
-            new DataflowPicklistReader<HashMap<String, ArrayList<UriLabelPair>>>();
-        executeSPARQL(DATAFLOW_PICKLIST_SPARQL, reader);
+        DeliverySearchPicklistReader<HashMap<String, ArrayList<UriLabelPair>>> reader =
+            new DeliverySearchPicklistReader<HashMap<String, ArrayList<UriLabelPair>>>();
+        executeSPARQL(DELIVERY_SEARCH_PICKLIST_SPARQL, reader);
 
-        logger.trace("getDataflowSearchPicklist query took " + Util.durationSince(startTime));
+        logger.trace("Delivery search picklist query took " + Util.durationSince(startTime));
 
         // FIXME
         return reader.getResultMap();
@@ -1785,5 +1781,14 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         }
 
         return result;
+    }
+
+    /**
+     * @see eionet.cr.dao.HelperDAO#getLiteralRangeSubjects(java.util.Set)
+     */
+    @Override
+    public Set<String> getLiteralRangeSubjects(Set<String> subjectsToCheck) throws DAOException {
+        // TODO Auto-generated method stub
+        return new HashSet<String>();
     }
 }
