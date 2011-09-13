@@ -26,7 +26,7 @@ public class TemplateTag extends TagSupport {
             if (file != null && file.length() > 0){
                 String folderPath = pageContext.getServletContext().getInitParameter("templateCacheFolder");
                 File f = new File(folderPath, file);
-                String content = FileUtils.readFileToString(f);
+                String content = FileUtils.readFileToString(f, "UTF-8");
                 pageContext.getOut().print(content);
             }
         } catch (Exception e) {
