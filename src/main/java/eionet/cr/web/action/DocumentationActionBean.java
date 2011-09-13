@@ -136,7 +136,10 @@ public class DocumentationActionBean extends AbstractActionBean {
         if (isUserLoggedIn()) {
             String fileExtension = "";
             if (file != null && file.getFileName() != null) {
-                fileExtension = file.getFileName().substring(file.getFileName().lastIndexOf("."));
+                int idx = file.getFileName().lastIndexOf(".");
+                if (idx != -1) {
+                    fileExtension = file.getFileName().substring(idx);
+                }
             }
             String fileName = pid + fileExtension;
             FileStore.getInstance("documentation").add(fileName, true, file.getInputStream());
