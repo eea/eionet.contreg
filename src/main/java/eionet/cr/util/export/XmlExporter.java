@@ -38,6 +38,7 @@ import eionet.cr.dao.readers.SubjectExportReader;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.FormatUtils;
 import eionet.cr.util.Pair;
+import eionet.cr.util.Util;
 
 /**
  * @author Enriko Käsper, TietoEnator Estonia AS XmlExporter
@@ -148,7 +149,7 @@ public class XmlExporter extends Exporter implements SubjectExportEvent {
                 continue;
 
             String element = columnPair.getRight() != null ? columnPair.getRight() : columnPair.getLeft();
-            String elemName = getUniqueElementName(XmlUtil.getEscapedElementName(element));
+            String elemName = Util.getUniqueElementName((XmlUtil.getEscapedElementName(element)), elements.keySet());
             elements.put(elemName.toLowerCase(), new XmlElementMetadata(elemName));
         }
     }
@@ -180,38 +181,6 @@ public class XmlExporter extends Exporter implements SubjectExportEvent {
      */
     public Map<String, XmlElementMetadata> getElements() {
         return elements;
-    }
-
-    /**
-     * If the given element name already exists (case insensitive) in the list of element names, then append a trailing unique
-     * number.
-     *
-     * @param elementName
-     * @return
-     */
-    protected String getUniqueElementName(String elementName) {
-
-        if (elementName == null || elementName.length() == 0)
-            elementName = XmlUtil.INVALID_ELEMENT_NAME;
-
-        if (getElements() != null) {
-            while (getElements().containsKey(elementName.toLowerCase())) {
-                int dashPos = elementName.lastIndexOf("_");
-                if (dashPos > 1 && dashPos < elementName.length() - 1) {
-                    String snum = elementName.substring(dashPos + 1);
-                    try {
-                        int inum = Integer.parseInt(snum);
-                        elementName = elementName.substring(0, dashPos) + "_" + (inum + 1);
-                    } catch (Exception e) {
-                        elementName = elementName + "_1";
-                    }
-                } else {
-                    elementName = elementName + "_1";
-                }
-            }
-        }
-        return elementName;
-
     }
 
 }

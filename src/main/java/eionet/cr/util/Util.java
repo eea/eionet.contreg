@@ -48,6 +48,7 @@ import org.apache.commons.lang.StringUtils;
 import org.quartz.CronExpression;
 
 import eionet.cr.common.CRRuntimeException;
+import eionet.cr.util.export.XmlUtil;
 
 /**
  * Utility methods.
@@ -692,5 +693,38 @@ public class Util {
             return s;
         }
         return s.substring(1, s.indexOf("\"", 1));
+    }
+
+    /**
+     * If the given element name already exists (case insensitive) in the list of element names, then append a trailing unique
+     * number.
+     *
+     * @param element
+     * @param elements elements must be all in lower case
+     * @return
+     */
+    public static String getUniqueElementName(String element, Collection<String> elements) {
+
+        if (element == null || element.length() == 0)
+            element = XmlUtil.INVALID_ELEMENT_NAME;
+
+        if (elements != null) {
+            while (elements.contains(element.toLowerCase())) {
+                int dashPos = element.lastIndexOf("_");
+                if (dashPos > 1 && dashPos < element.length() - 1) {
+                    String snum = element.substring(dashPos + 1);
+                    try {
+                        int inum = Integer.parseInt(snum);
+                        element = element.substring(0, dashPos) + "_" + (inum + 1);
+                    } catch (Exception e) {
+                        element = element + "_1";
+                    }
+                } else {
+                    element = element + "_1";
+                }
+            }
+        }
+        return element;
+
     }
 }

@@ -16,8 +16,10 @@ import org.openrdf.query.TupleQueryResultHandlerException;
 import org.openrdf.query.resultio.TupleQueryResultFormat;
 import org.openrdf.query.resultio.TupleQueryResultWriter;
 
+import eionet.cr.util.Util;
 import eionet.cr.util.export.SchemaHelper;
 import eionet.cr.util.export.XmlElementMetadata;
+import eionet.cr.util.export.XmlUtil;
 
 /**
  * A {@link TupleQueryResultWriter} that writes tuple query results in the XML with Schema (Microsoft Office format).
@@ -53,7 +55,9 @@ public class CRXmlSchemaWriter implements TupleQueryResultWriter {
     public void startQueryResult(List<String> bindingNames) throws TupleQueryResultHandlerException {
         try {
             for (String bindingName : bindingNames) {
-                elements.put(bindingName, new XmlElementMetadata(bindingName));
+
+                String name = Util.getUniqueElementName((XmlUtil.getEscapedElementName(bindingName)), elements.keySet());
+                elements.put(name.toLowerCase(), new XmlElementMetadata(name));
             }
 
             writer.writeStartDocument(ENCODING, "1.0");

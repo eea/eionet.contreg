@@ -26,6 +26,7 @@ import eionet.cr.common.Predicates;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Pair;
+import eionet.cr.util.Util;
 import eionet.cr.util.export.ExportException;
 import eionet.cr.util.export.XmlElementMetadata;
 import eionet.cr.util.export.XmlWithSchemaExporter;
@@ -133,7 +134,7 @@ public class XmlWithSchemaExporterTest extends TestCase {
         }
 
         public String getUniqueElementNameTest(String elementName) {
-            return super.getUniqueElementName(elementName);
+            return Util.getUniqueElementName(elementName, elements.keySet());
         }
 
         public InputStream writeSubjectIntoExporterOutputTest(SubjectDTO subject) throws ExportException {
