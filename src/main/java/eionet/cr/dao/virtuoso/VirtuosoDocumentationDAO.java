@@ -102,7 +102,7 @@ public class VirtuosoDocumentationDAO extends VirtuosoBaseDAO implements Documen
         PreparedStatement ps = null;
         try {
             conn = getSQLConnection();
-            ps = conn.prepareStatement("INSERT INTO documentation VALUES (?, ?, ?, ?)");
+            ps = conn.prepareStatement("INSERT REPLACING documentation VALUES (?, ?, ?, ?)");
             ps.setString(1, pageId);
             ps.setString(2, contentType);
             ps.setString(3, fileName);

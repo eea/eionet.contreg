@@ -134,20 +134,20 @@ public class DocumentationActionBean extends AbstractActionBean {
     public Resolution uploadFile() throws Exception {
 
         if (isUserLoggedIn()) {
-            File name = FileStore.getInstance("documentation").get(file.getFileName());
-            if (name != null && !overwrite) {
-                addWarningMessage("File with the same name already exists!");
-            } else {
-                FileStore.getInstance("documentation").add(file.getFileName(), true, file.getInputStream());
-                DocumentationDAO dao = DAOFactory.get().getDao(DocumentationDAO.class);
-                String ct = contentType;
-                if (contentType != null && contentType.equalsIgnoreCase("text/html")) {
-                    ct = "uploaded_" + contentType;
-                }
-                dao.insertFile(pid, ct, file.getFileName(), title);
-                String url = APP_URL + "/documentation/" + pid;
-                addSystemMessage("File successfully uploaded! File URL is: <a href=\"" + url + "\">" + url + "</a>");
+            String fileExtension = "";
+            if (file != null && file.getFileName() != null) {
+                fileExtension = file.getFileName().substring(file.getFileName().lastIndexOf("."));
             }
+            String fileName = pid + fileExtension;
+            FileStore.getInstance("documentation").add(fileName, true, file.getInputStream());
+            DocumentationDAO dao = DAOFactory.get().getDao(DocumentationDAO.class);
+            String ct = contentType;
+            if (contentType != null && contentType.equalsIgnoreCase("text/html")) {
+                ct = "uploaded_" + contentType;
+            }
+            dao.insertFile(pid, ct, fileName, title);
+            String url = APP_URL + "/documentation/" + pid;
+            addSystemMessage("File successfully uploaded! File URL is: <a href=\"" + url + "\">" + url + "</a>");
         } else {
             addWarningMessage(getBundle().getString("not.logged.in"));
         }
@@ -156,7 +156,7 @@ public class DocumentationActionBean extends AbstractActionBean {
 
     @ValidationMethod(on = { "uploadFile" })
     public void validatePageId(ValidationErrors errors) throws Exception {
-        if (!StringUtils.isBlank(pid)) {
+        if (!StringUtils.isBlank(pid) && !overwrite) {
             boolean exists = DAOFactory.get().getDao(DocumentationDAO.class).idExists(pid);
             if (exists) {
                 errors.add("pid", new SimpleError("Such Page ID already exists!"));
