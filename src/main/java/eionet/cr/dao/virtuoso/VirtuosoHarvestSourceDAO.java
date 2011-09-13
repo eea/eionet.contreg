@@ -580,7 +580,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             .append(" (-datediff('second', now(), coalesce(LAST_HARVEST, dateadd('minute', -INTERVAL_MINUTES, TIME_CREATED)))")
             .append(" / (INTERVAL_MINUTES*60)) AS urgency")
             .append(" from CR.cr3user.HARVEST_SOURCE")
-            .append(" where interval_minutes > 0 ORDER BY urgency DESC");
+            .append(" where PERMANENT_ERROR = 'N' and INTERVAL_MINUTES > 0 ORDER BY urgency DESC");
 
         List<HarvestUrgencyScoreDTO> result = new ArrayList<HarvestUrgencyScoreDTO>();
         Connection conn = null;
