@@ -20,6 +20,7 @@ import net.sourceforge.stripes.action.UrlBinding;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.vocabulary.XMLSchema;
 import org.openrdf.query.BooleanQuery;
@@ -41,10 +42,12 @@ import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Util;
+import eionet.cr.util.export.ExportFormat;
 import eionet.cr.util.sesame.SesameConnectionProvider;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.sparqlClient.helpers.CRJsonWriter;
+import eionet.cr.web.sparqlClient.helpers.CRXmlSchemaWriter;
 import eionet.cr.web.sparqlClient.helpers.CRXmlWriter;
 import eionet.cr.web.sparqlClient.helpers.QueryResult;
 
@@ -56,11 +59,15 @@ import eionet.cr.web.sparqlClient.helpers.QueryResult;
 @UrlBinding("/sparql")
 public class SPARQLEndpointActionBean extends AbstractActionBean {
 
+    /** Logger. */
+    private static final Logger LOGGER = Logger.getLogger(SPARQLEndpointActionBean.class);
+
     /** */
     private static final int DEFAULT_NUMBER_OF_HITS = 20;
 
     /** */
     private static final String FORMAT_XML = "xml";
+    private static final String FORMAT_XML_SCHEMA = "xml_schema";
     private static final String FORMAT_JSON = "json";
     private static final String FORMAT_HTML = "html";
 
@@ -307,7 +314,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         query = StringEscapeUtils.escapeHtml(query);
         if (useInferencing && !StringUtils.isBlank(query)) {
             String infCommand =
-                "DEFINE input:inference '" + GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME) + "'";
+                    "DEFINE input:inference '" + GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME) + "'";
 
             // if inference command not yet present in the query, add it
             if (query.indexOf(infCommand) == -1) {
@@ -325,6 +332,12 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             return new StreamingResolution("application/sparql-results+xml") {
                 public void stream(HttpServletResponse response) throws Exception {
                     runQuery(newQuery, FORMAT_XML, response.getOutputStream());
+                }
+            };
+        } else if (accept[0].equals("application/sparql-results+xml_schema")) {
+            return new StreamingResolution("application/sparql-results+xml_schema") {
+                public void stream(HttpServletResponse response) throws Exception {
+                    runQuery(newQuery, FORMAT_XML_SCHEMA, response.getOutputStream());
                 }
             };
         } else if (accept[0].equals("application/sparql-results+json")) {
@@ -390,6 +403,16 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                             writer.write("</boolean>");
                             writer.write("</sparql>");
                             writer.flush();
+                        } else if (format != null && format.equals(FORMAT_XML_SCHEMA)) {
+                            OutputStreamWriter writer = new OutputStreamWriter(out);
+                            writer.write("<?xml version=\"1.0\"?>");
+                            writer.write("<sparql xmlns=\"http://www.w3.org/2005/sparql-results#\">");
+                            writer.write("<head></head>");
+                            writer.write("<boolean>");
+                            writer.write(result.toString());
+                            writer.write("</boolean>");
+                            writer.write("</sparql>");
+                            writer.flush();
                             // ASK query in JSON format
                         } else if (format != null && format.equals(FORMAT_JSON)) {
                             OutputStreamWriter writer = new OutputStreamWriter(out);
@@ -413,6 +436,10 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                         // Returns XML format
                         if (format != null && format.equals(FORMAT_XML)) {
                             CRXmlWriter sparqlWriter = new CRXmlWriter(out);
+                            resultsTable.evaluate(sparqlWriter);
+                            // Returns XML format
+                        } else if (format != null && format.equals(FORMAT_XML_SCHEMA)) {
+                            CRXmlSchemaWriter sparqlWriter = new CRXmlSchemaWriter(out);
                             resultsTable.evaluate(sparqlWriter);
                             // Returns JSON format
                         } else if (format != null && format.equals(FORMAT_JSON)) {
@@ -652,4 +679,12 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     public String getBookmarkName() {
         return bookmarkName;
     }
+
+    /**
+     * @return a list of export formats.
+     */
+    public ExportFormat[] getExportFormats() {
+        return ExportFormat.values();
+    }
+
 }

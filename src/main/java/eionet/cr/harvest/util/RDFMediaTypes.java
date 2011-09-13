@@ -16,7 +16,7 @@
  * (C) European Environment Agency.  All Rights Reserved.
  *
  * Contributor(s):
- *		Jaanus Heinlaid
+ *        Jaanus Heinlaid
  */
 
 package eionet.cr.harvest.util;

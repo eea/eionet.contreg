@@ -53,9 +53,9 @@ import eionet.cr.filestore.FileStore;
 import eionet.cr.web.util.CharsetToolkit;
 
 /**
- * 
+ *
  * @author Risto Alt
- * 
+ *
  */
 @UrlBinding("/uploadCSV.action")
 public class UploadCSVActionBean extends AbstractActionBean {
@@ -76,7 +76,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
     protected SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
     /**
-     * 
+     *
      * @return ForwardResolution
      */
     @DefaultHandler
@@ -86,7 +86,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
 
     /**
      * Upload CSV/TSV file to /username/files folder.
-     * 
+     *
      * @return ForwardResolution
      */
     public Resolution upload() {
@@ -126,7 +126,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
 
     /**
      * Insert content found from CSV/TSV file into Virtuoso triplestore.
-     * 
+     *
      * @return ForwardResolution
      */
     public Resolution insert() {
