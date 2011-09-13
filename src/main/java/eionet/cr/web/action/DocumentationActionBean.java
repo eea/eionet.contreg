@@ -106,7 +106,7 @@ public class DocumentationActionBean extends AbstractActionBean {
                     title = doc.getTitle();
                 } else if (doc.getContentType().equals("uploaded_text/html")) {
                     File f = FileStore.getInstance("documentation").get(doc.getContent());
-                    content = FileUtils.readFileToString(f);
+                    content = FileUtils.readFileToString(f, "UTF-8");
                     title = doc.getTitle();
                 } else {
                     File f = FileStore.getInstance("documentation").get(doc.getContent());
