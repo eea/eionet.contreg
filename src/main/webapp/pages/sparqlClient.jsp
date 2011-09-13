@@ -6,7 +6,6 @@
 
     <stripes:layout-component name="head">
         <script type="text/javascript">
-            <![CDATA[
             var last_format = 1;
             function format_select(query_obg) {
                 var query = query_obg.value;
@@ -33,8 +32,8 @@
                     last_format = 1;
                 }
             }
-            ]]>
-        </script>
+
+            </script>
     </stripes:layout-component>
 
     <stripes:layout-component name="contents">
@@ -78,25 +77,26 @@ SELECT DISTINCT * WHERE {
                 </div>
                 <div style="position: relative; margin-bottom: 30px">
                     <div style="position: absolute; top: 5px; left: 0px;">
-                        <label for="format" class="question">Output format:</label>
+                        <label for="format" class="question" style="width: 200px;">Output format:</label>
                             <stripes:select name="format" id="format">
                                 <stripes:option value="text/html" label="HTML" />
                                 <stripes:option value="application/sparql-results+json" label="JSON" />
                                 <stripes:option value="application/sparql-results+xml" label="XML" />
+                                <stripes:option value="application/sparql-results+xml_schema" label="XML with Schema" />
                             </stripes:select>
                     </div>
-                    <div style="position: absolute; top: 5px; left: 200px;">
+                    <div style="position: absolute; top: 5px; left: 250px;">
                         <stripes:label for="nrOfHits" class="question">Hits per page</stripes:label>
                         <stripes:text name="nrOfHits" size="2" id="nrOfHits" />
                     </div>
-                    <div style="position: absolute; top: 5px; left: 360px;">
+                    <div style="position: absolute; top: 5px; left: 410px;">
                         <stripes:label for="inferencing" class="question">Use CR inferencing</stripes:label>
                         <stripes:checkbox name="useInferencing" id="inferencing" />
                     </div>
 
                     <c:choose>
                         <c:when test="${actionBean.user != null}">
-                            <div style="position: absolute; top: 5px; left: 540px;">
+                            <div style="position: absolute; top: 5px; left: 590px;">
                                 <stripes:submit name="execute" value="Execute" id="executeButton" />
                                 <stripes:submit name="bookmark" value="Bookmark" id="bookmarkButton" />
                                 <stripes:hidden name="bookmarkName" value="${actionBean.bookmarkName}"/>

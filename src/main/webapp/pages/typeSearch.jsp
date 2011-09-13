@@ -6,9 +6,9 @@
 
     <stripes:layout-component name="contents">
         <c:if test="${not empty actionBean.resultList}">
-            <div id="operations" class="export_div" style="display:none;">
+            <div id="operations" class="export_div">
                 <ul>
-                    <li><a href="#">Export</a></li>
+                    <li><a href="#" id="eport_link">Export</a></li>
                 </ul>
             </div>
         </c:if>
@@ -37,6 +37,33 @@
                 }
 
                 hidediv();
+
+                ( function($) {
+                    $(document).ready(
+                        function(){
+
+                            // Open dialog
+                            $("#eport_link").click(function() {
+                                $('#dialog').dialog('open');
+                                return false;
+                            });
+
+                            // Dialog setup
+                            $('#dialog').dialog({
+                                autoOpen: false,
+                                width: 500
+                            });
+
+                            // Close dialog
+                            $("#export_form_submit").click(function() {
+                                $('#dialog').dialog("close");
+                                return true;
+                            });
+
+                        });
+                } ) ( jQuery );
+
+
                 </script>
                    <stripes:select name="type">
                    <c:forEach var="groups" items="${actionBean.availableTypes}">
@@ -74,35 +101,37 @@
             <br/>
             <c:if test="${not empty actionBean.type}">
 
-            <div id="export_form_noscript">
-                <fieldset>
-                <legend>Export options</legend>
+            <div id="dialog" title="Export opetions">
                 <crfn:form action="/typeSearch.action" method="post">
                     <stripes:hidden name="type" value="${actionBean.type }"/>
-                    <label for="export_resource">Resource identifier</label>
-                    <stripes:select id="export_resource" name="uriResourceIdentifier">
-                        <stripes:option value="true">Uri</stripes:option>
-                        <stripes:option value="false">Label</stripes:option>
-                    </stripes:select>
-                    &nbsp;
-                    <label for="export_format">Export format</label>
-                    <c:set var="XLS"><%=eionet.cr.util.export.ExportFormat.XLS.getName()%></c:set>
-                    <stripes:select id="export_format" name="exportFormat">
-                        <c:forEach items="${ actionBean.exportFormats}" var="format">
-                            <c:if test="${ (format.name eq XLS and actionBean.showExcelExport) or format.name ne XLS}">
-                                <stripes:option value="${format.name}">${format.name}</stripes:option>
-                            </c:if>
-                        </c:forEach>
-                    </stripes:select> <br/>
-                    <label for="export_columns">Select columns to be exported</label><br/>
-                    <stripes:select name="exportColumns" multiple="multiple" size="5" style="min-width:250px; width:250px;">
-                        <c:forEach items="${actionBean.availableColumns }" var="column">
-                            <stripes:option value="${column.key}">${column.value}</stripes:option>
-                        </c:forEach>
-                    </stripes:select>
-                    <stripes:submit name="export" value="Export" id="export_form_submit" />
+                    <fieldset style="border: 0px;">
+                        <label for="export_resource" style="width: 200px; float: left;">Resource identifier</label>
+                        <stripes:select id="export_resource" name="uriResourceIdentifier">
+                            <stripes:option value="true">Uri</stripes:option>
+                            <stripes:option value="false">Label</stripes:option>
+                        </stripes:select>
+                    </fieldset>
+                    <fieldset style="border: 0px;">
+                        <label for="export_format" style="width: 200px; float: left;">Export format</label>
+                        <c:set var="XLS"><%=eionet.cr.util.export.ExportFormat.XLS.getName()%></c:set>
+                        <stripes:select id="export_format" name="exportFormat">
+                            <c:forEach items="${ actionBean.exportFormats}" var="format">
+                                <c:if test="${ (format.name eq XLS and actionBean.showExcelExport) or format.name ne XLS}">
+                                    <stripes:option value="${format.name}">${format.name}</stripes:option>
+                                </c:if>
+                            </c:forEach>
+                        </stripes:select>
+                    </fieldset>
+                    <fieldset style="border: 0px;">
+                        <label for="export_columns" style="width: 200px; float: left;">Select columns to be exported</label><br/>
+                        <stripes:select id="export_columns" name="exportColumns" multiple="multiple" size="5" style="min-width:250px; width:250px;">
+                            <c:forEach items="${actionBean.availableColumns }" var="column">
+                                <stripes:option value="${column.key}">${column.value}</stripes:option>
+                            </c:forEach>
+                        </stripes:select>
+                    </fieldset>
+                    <stripes:submit name="export" value="Export" id="export_form_submit" style="float: right;"/>
                 </crfn:form>
-                </fieldset>
             </div>
             <div id="select_filters" style="margin-bottom:10px; float:right;  min-width:400px; width:50%;">
                 <fieldset>
