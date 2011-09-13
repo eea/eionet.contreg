@@ -16,7 +16,7 @@
  * (C) European Environment Agency.  All Rights Reserved.
  *
  * Contributor(s):
- *		${user}
+ *        ${user}
  */
 </template><template autoinsert="false" context="constructorcomment_context" deleted="false" description="Comment for created constructors" enabled="true" id="org.eclipse.jdt.ui.text.codetemplates.constructorcomment" name="constructorcomment">/**
  * Class constructor.
