@@ -240,7 +240,7 @@ public abstract class VirtuosoBaseDAO {
         // if only certain predicates needed, add relevant filter
         if (predicateUris != null && predicateUris.length > 0) {
             sparql +=
-                "filter (?p IN(" + SPARQLQueryUtil.urisToCSV(Arrays.asList(predicateUris), "predicateValue", bindings) + ")) ";
+                "filter (?p IN (" + SPARQLQueryUtil.urisToCSV(Arrays.asList(predicateUris), "predicateValue", bindings) + ")) ";
 
         }
 
