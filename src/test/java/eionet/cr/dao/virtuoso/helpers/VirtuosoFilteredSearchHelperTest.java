@@ -114,8 +114,7 @@ public class VirtuosoFilteredSearchHelperTest {
         filters.put("http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://rod.eionet.europa.eu/schema.rdf#Delivery");
         VirtuosoFilteredSearchHelper helper = new VirtuosoFilteredSearchHelper(filters, null, pagingRequest, sortingRequest, true);
 
-        ArrayList<Object> inParams = new ArrayList<Object>();
-        String paramStr = helper.getQueryParameters(inParams);
+        String paramStr = helper.getWhereContents();
 
         assertEquals(" . {{?s ?p1 ?o1 . ?s ?predicateValue1 ?o1} . { ?s ?p1 ?o1 . "
                 + "FILTER (?o1 = ?objectValue1Uri || ?o1 = ?objectValue1Lit)}} "
@@ -190,7 +189,6 @@ public class VirtuosoFilteredSearchHelperTest {
         Map<String, String> filters = new HashMap<String, String>();
         filters.put("http://www.w3.org/2000/01/rdf-schema#label", "ippc");
         VirtuosoFilteredSearchHelper helper = new VirtuosoFilteredSearchHelper(filters, null, pagingRequest, sortingRequest, false);
-        helper.setUseInferencing(false);
         ArrayList<Object> inParams = new ArrayList<Object>();
 
         String query = helper.getOrderedQuery(inParams);

@@ -2,6 +2,8 @@ package eionet.cr.dao.virtuoso.helpers;
 
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
+
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.dao.helpers.FreeTextSearchHelper;
@@ -17,6 +19,9 @@ import eionet.cr.util.sql.VirtuosoFullTextQuery;
  *
  */
 public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper {
+
+    /** */
+    private static final String SUBJECT_TYPE_VARIABLE = "subjType";
 
     /** */
     private SearchExpression expression;
@@ -52,38 +57,6 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper {
         bindings = new Bindings();
     }
 
-    /**
-     *
-     */
-    @Override
-    protected String getOrderedQuery(List<Object> inParams) {
-
-        StringBuilder strBuilder = new StringBuilder();
-        strBuilder.append("select distinct ?s where {?s ?p ?o . ").append(addTypeFilterParams());
-        strBuilder.append(addTextFilterClause());
-
-        strBuilder.append("optional {?s ?sortPredicate ?ord} }");
-        bindings.setURI("sortPredicate", sortPredicate);
-
-        strBuilder.append("ORDER BY ");
-        if (sortOrder != null)
-            strBuilder.append(sortOrder);
-        if (sortPredicate != null && sortPredicate.equals(Predicates.RDFS_LABEL)) {
-            // If Label is not null then use Label. Otherwise use subject where we replace all / with # and then get
-            // the string after last #.
-            strBuilder
-            .append("(bif:lcase(bif:either(bif:isnull(?ord), (bif:subseq (bif:replace (?s, '/', '#'), bif:strrchr (bif:replace (?s, '/', '#'), '#')+1)), ?ord)))");
-        } else if (sortPredicate != null && sortPredicate.equals(Predicates.RDF_TYPE)) {
-            // Replace all / with # and then get the string after last #
-            strBuilder
-            .append("(bif:lcase(bif:subseq (bif:replace (?ord, '/', '#'), bif:strrchr (bif:replace (?ord, '/', '#'), '#')+1)))");
-        } else {
-            strBuilder.append("(?ord)");
-        }
-
-        return strBuilder.toString();
-    }
-
     /*
      * (non-Javadoc)
      *
@@ -92,13 +65,49 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper {
     @Override
     public String getUnorderedQuery(List<Object> inParams) {
 
-        StringBuilder strBuilder = new StringBuilder();
-        strBuilder.append("select distinct ?s where { ?s ?p ?o . ").append(addTypeFilterParams());
-        strBuilder.append(addTextFilterClause());
+        StringBuilder buf = new StringBuilder();
+        buf.append("select distinct ?s where {?s ?p ?o");
 
-        strBuilder.append("}");
+        String typeFilterPart = buildTypeFilterPart();
+        if (!StringUtils.isBlank(typeFilterPart)){
+            buf.append(". ").append(typeFilterPart);
+        }
+        buf.append(". ").append(buildTextFilterPart()).append("}");
 
-        return strBuilder.toString();
+        return buf.toString();
+    }
+
+    /**
+     *
+     */
+    @Override
+    protected String getOrderedQuery(List<Object> inParams) {
+
+        StringBuilder buf = new StringBuilder();
+        buf.append("select distinct ?s where {?s ?p ?o");
+
+        String typeFilterPart = buildTypeFilterPart();
+        if (!StringUtils.isBlank(typeFilterPart)){
+            buf.append(". ").append(typeFilterPart);
+        }
+        buf.append(". ").append(buildTextFilterPart()).append(". optional {?s ?sortPredicate ?ord}} ORDER BY ");
+
+        bindings.setURI("sortPredicate", sortPredicate);
+        if (sortOrder != null) {
+            buf.append(sortOrder);
+        }
+
+        // If sorting is done by either rdfs:label or rdf:type, and a particular subject doesn't have
+        // those predicates, then the last part of subject URI must be used instead.
+        if (StringUtils.equals(sortPredicate, Predicates.RDFS_LABEL)) {
+            buf.append("(bif:lcase(bif:either(bif:isnull(?ord), (bif:subseq (bif:replace (?s, '/', '#'), bif:strrchr (bif:replace (?s, '/', '#'), '#')+1)), ?ord)))");
+        } else if (StringUtils.equals(sortPredicate, Predicates.RDF_TYPE)) {
+            buf.append("(bif:lcase(bif:subseq (bif:replace (?ord, '/', '#'), bif:strrchr (bif:replace (?ord, '/', '#'), '#')+1)))");
+        } else {
+            buf.append("(?ord)");
+        }
+
+        return buf.toString();
     }
 
     /*
@@ -109,81 +118,70 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper {
     @Override
     public String getCountQuery(List<Object> inParams) {
 
-        StringBuilder strBuilder = new StringBuilder();
-        // TODO shouldn't it use inferencing?
-        strBuilder.append("select count(distinct ?s) where { ?s ?p ?o . ").append(addTypeFilterParams());
+        StringBuilder buf = new StringBuilder();
+        buf.append("select count(distinct ?s) where {?s ?p ?o");
 
-        strBuilder.append(addTextFilterClause());
-        strBuilder.append("}");
-
-        return strBuilder.toString();
-    }
-
-    /**
-     * Adds Type Search filter parameteres to the query if type is not any object. Bindings is filled with relevant value.
-     *
-     * @return filter part for the SPARQL query
-     */
-    private String addTypeFilterParams() {
-
-        StringBuffer buf = new StringBuffer();
-        buf.append(" ");
-
-        if (filter != FilterType.ANY_OBJECT) {
-
-            buf.append("?s a ?subjectType");
-
-            if (filter == FilterType.ANY_FILE) {
-                bindings.setURI("subjectType", Subjects.CR_FILE);
-            } else if (filter == FilterType.DATASETS) {
-                bindings.setURI("subjectType", Predicates.DC_MITYPE_DATASET);
-            } else if (filter == FilterType.IMAGES) {
-                bindings.setURI("subjectType", Predicates.DC_MITYPE_IMAGE);
-            } else if (filter == FilterType.TEXTS) {
-                bindings.setURI("subjectType", Predicates.DC_MITYPE_TEXT);
-            }
-
-            buf.append(" . ");
+        String typeFilterPart = buildTypeFilterPart();
+        if (!StringUtils.isBlank(typeFilterPart)){
+            buf.append(". ").append(typeFilterPart);
         }
+        buf.append(". ").append(buildTextFilterPart()).append("}");
+
         return buf.toString();
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.dao.helpers.AbstractSearchHelper#getMinMaxHashQuery(java.util.List)
-     */
-    @Override
-    public String getMinMaxHashQuery(List<Object> inParams) {
-        throw new UnsupportedOperationException("Method not implemented");
-    }
-
-    /**
-     * Builds relevant FILTER conditions based on the SearchExpression.
-     *
-     * @return FILTER that can will be added to the query
-     */
-    private String addTextFilterClause() {
-        StringBuilder strBuilder = new StringBuilder();
-        if (exactMatch) {
-            if (expression.isUri()) {
-                strBuilder.append(" FILTER (?o = ?objectValueUri || ?o = ?objectValueLit).");
-                bindings.setURI("objectValueUri", expression.toString());
-                bindings.setString("objectValueLit", expression.toString());
-            } else {
-                strBuilder.append(" FILTER (?o = ?objectValue).");
-                bindings.setString("objectValue", expression.toString());
-            }
-        } else {
-            strBuilder.append(" FILTER bif:contains(?o, ?objectValue). ");
-            bindings.setString("objectValue", virtExpression.getParsedQuery());
-        }
-
-        return strBuilder.toString();
     }
 
     @Override
     public Bindings getQueryBindings() {
         return bindings;
+    }
+
+    /**
+     * Builds the part of the the WHERE clause that constitutes the type filter (user can set the type of resources where he is
+     * searching for his free text).
+     *
+     * @return The built part of the WHERE clause.
+     */
+    private String buildTypeFilterPart() {
+
+        StringBuilder buf = new StringBuilder();
+        if (filter != FilterType.ANY_OBJECT) {
+
+            buf.append("?s a ?").append(SUBJECT_TYPE_VARIABLE);
+
+            if (filter == FilterType.ANY_FILE) {
+                bindings.setURI(SUBJECT_TYPE_VARIABLE, Subjects.CR_FILE);
+            } else if (filter == FilterType.DATASETS) {
+                bindings.setURI(SUBJECT_TYPE_VARIABLE, Predicates.DC_MITYPE_DATASET);
+            } else if (filter == FilterType.IMAGES) {
+                bindings.setURI(SUBJECT_TYPE_VARIABLE, Predicates.DC_MITYPE_IMAGE);
+            } else if (filter == FilterType.TEXTS) {
+                bindings.setURI(SUBJECT_TYPE_VARIABLE, Predicates.DC_MITYPE_TEXT);
+            }
+        }
+        return buf.toString();
+    }
+
+    /**
+     * Builds the part of the the WHERE clause that constitutes the free-text filter.
+     *
+     * @return The built part of the WHERE clause.
+     */
+    private String buildTextFilterPart() {
+
+        StringBuilder buf = new StringBuilder();
+        if (exactMatch) {
+
+            buf.append("filter (?o = ?objectVal)");
+            if (expression.isUri()) {
+                bindings.setURI("objectVal", expression.toString());
+            } else {
+                bindings.setString("objectVal", expression.toString());
+            }
+        } else {
+            buf.append("filter bif:contains(?o, ?objectVal)");
+            bindings.setString("objectVal", virtExpression.getParsedQuery());
+        }
+
+        return buf.toString();
     }
 }

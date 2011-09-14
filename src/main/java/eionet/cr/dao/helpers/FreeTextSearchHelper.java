@@ -63,11 +63,4 @@ public abstract class FreeTextSearchHelper extends AbstractSearchHelper {
      * @see eionet.cr.dao.helpers.AbstractSearchHelper#getCountQuery(java.util.List)
      */
     public abstract String getCountQuery(List<Object> inParams);
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.dao.helpers.AbstractSearchHelper#getMinMaxHashQuery(java.util.List)
-     */
-    public abstract String getMinMaxHashQuery(List<Object> inParams);
 }

@@ -29,12 +29,16 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
+
+import org.apache.commons.lang.StringUtils;
+
 import eionet.cr.common.Predicates;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
@@ -45,7 +49,6 @@ import eionet.cr.util.ObjectLabelPair;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortOrder;
 import eionet.cr.util.SortingRequest;
-import eionet.cr.util.Util;
 import eionet.cr.util.pagination.Pagination;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.web.util.ApplicationCache;
@@ -88,20 +91,25 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
     /**
      *
      * @return
+     * @throws DAOException
      */
     @DefaultHandler
-    public Resolution unspecifiedEvent() {
-        if (isShowPicklist())
+    public Resolution unspecifiedEvent() throws DAOException {
+
+        if (isShowPicklist()) {
             populateSelectedFilters();
-        else if (isRemoveFilter()) {
+        } else if (isRemoveFilter()) {
             populateSelectedFilters();
 
             Map selectedFilters = getSelectedFilters(false);
             if (selectedFilters != null) {
                 selectedFilters.remove(getRemovedFilter());
             }
-        } else
+        } else if (isAddFilter()) {
+            return addFilter();
+        } else {
             clearSessionAttributes();
+        }
 
         return new ForwardResolution(ASSOCIATED_JSP);
     }
@@ -277,17 +285,30 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
      */
     private void populateSelectedFilters() {
 
-        Map<String, String> selected = getSelectedFilters();
-        if (!selected.isEmpty()) {
-            Enumeration paramNames = this.getContext().getRequest().getParameterNames();
+        Map<String, String> selectedFilters = getSelectedFilters();
+        if (!selectedFilters.isEmpty()) {
+
+            System.out.println("*******************************************");
+
+            HttpServletRequest request = getContext().getRequest();
+            Enumeration paramNames = request.getParameterNames();
             while (paramNames != null && paramNames.hasMoreElements()) {
+
                 String paramName = (String) paramNames.nextElement();
+                String paramValue = request.getParameter(paramName);
+
+                System.out.println("Request parameter " + paramName + " = " + paramValue);
+
                 if (paramName.startsWith(SELECTED_VALUE_PREFIX)) {
-                    String key = paramName.substring(SELECTED_VALUE_PREFIX.length());
-                    if (key.length() > 0 && selected.containsKey(key))
-                        selected.put(key, getContext().getRequest().getParameter(paramName));
+
+                    String filterKey = paramName.substring(SELECTED_VALUE_PREFIX.length());
+                    if (filterKey != null && filterKey.length() > 0 && selectedFilters.containsKey(filterKey)) {
+                        selectedFilters.put(filterKey, paramValue);
+                    }
                 }
             }
+
+            System.out.println("*******************************************");
         }
     }
 
@@ -466,7 +487,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
      * @return
      */
     public boolean isShowPicklist() {
-        return !Util.isNullOrEmpty(getPicklistFilter());
+        return !StringUtils.isBlank(getPicklistFilter());
     }
 
     /**
@@ -474,7 +495,15 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
      * @return
      */
     public boolean isRemoveFilter() {
-        return !Util.isNullOrEmpty(getRemovedFilter());
+        return !StringUtils.isBlank(getRemovedFilter());
+    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean isAddFilter() {
+        return !StringUtils.isBlank(addedFilter);
     }
 
     /**

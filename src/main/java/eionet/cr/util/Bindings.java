@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -25,7 +26,7 @@ import eionet.cr.dao.virtuoso.VirtuosoBaseDAO;
 public class Bindings {
 
     /** */
-    private HashMap<String, Object> bindings = new HashMap<String, Object>();
+    private HashMap<String, Object> bindings = new LinkedHashMap<String, Object>();
 
     /** */
     private static DatatypeFactory datatypeFactory;

@@ -1,6 +1,5 @@
 package eionet.cr.dao.virtuoso;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +33,7 @@ public class VirtuosoExporterDAO extends VirtuosoBaseDAO implements ExporterDAO 
         VirtuosoFilteredSearchHelper helper = new VirtuosoFilteredSearchHelper(filters, null, null, null, true);
 
         String query =
-                getSubjectsDataQuery(helper.getQueryParameters(new ArrayList<Object>()), selectedPredicates,
+                getSubjectsDataQuery(helper.getWhereContents(), selectedPredicates,
                         helper.getQueryBindings());
         long startTime = System.currentTimeMillis();
         logger.debug("Start exporting type search results: " + query);
