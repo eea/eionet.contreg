@@ -15,8 +15,7 @@
 
 		<title>${initParam.appDispName} - ${pageTitle}</title>
 		
-		<link rel="stylesheet" type="text/css" href="<c:url value="/css/eionet2007.css"/>" media="screen" title="Eionet 2007 style"/>
-		<link rel="stylesheet" type="text/css" href="<c:url value="/css/application.css"/>" media="screen" title="application style sheet"/>
+		<link rel="stylesheet" type="text/css" href="<c:url value="/css/application.css"/>" media="screen"/>
 		<link rel="shortcut icon" href="<c:url value="/favicon.ico"/>" type="image/x-icon" />
 
 		<script type="text/javascript" src="<c:url value="/scripts/jquery-1.5.1.min.js"/>"></script>
