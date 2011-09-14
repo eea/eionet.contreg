@@ -27,8 +27,10 @@ import java.util.List;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dao.readers.HarvestDTOReader;
+import eionet.cr.dao.readers.HarvestStatReader;
 import eionet.cr.dao.readers.HarvestWithMessageTypesReader;
 import eionet.cr.dto.HarvestDTO;
+import eionet.cr.dto.HarvestStatDTO;
 import eionet.cr.harvest.HarvestConstants;
 import eionet.cr.harvest.util.HarvestMessageType;
 import eionet.cr.util.sql.SQLUtil;
@@ -77,6 +79,21 @@ public class VirtuosoHarvestDAO extends VirtuosoBaseDAO implements HarvestDAO {
         List<Object> values = new ArrayList<Object>();
         values.add(harvestSourceId);
         return executeSQL(getHarvestsBySourceIdSQL, values, new HarvestWithMessageTypesReader(maxDistinctHarvests));
+    }
+
+    @Override
+    public List<HarvestStatDTO> getLastHarvestStats(Integer limit) throws DAOException {
+
+        String getHarvestStatsSQL = "SELECT TOP "
+            + limit
+            + " h.harvest_id, h.started, h.tot_statements, DATEDIFF('millisecond', h.started, h.finished) AS duration, hs.url"
+            + " FROM HARVEST AS h"
+            + " LEFT JOIN HARVEST_SOURCE AS hs ON h.harvest_source_id = hs.harvest_source_id"
+            + " WHERE h.status = ? ORDER BY h.finished DESC";
+
+        List<Object> values = new ArrayList<Object>();
+        values.add(HarvestConstants.STATUS_FINISHED);
+        return executeSQL(getHarvestStatsSQL, values, new HarvestStatReader());
     }
 
     /** */
@@ -149,4 +166,5 @@ public class VirtuosoHarvestDAO extends VirtuosoBaseDAO implements HarvestDAO {
             SQLUtil.close(conn);
         }
     }
+
 }

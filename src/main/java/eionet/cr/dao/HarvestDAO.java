@@ -23,6 +23,7 @@ package eionet.cr.dao;
 import java.util.List;
 
 import eionet.cr.dto.HarvestDTO;
+import eionet.cr.dto.HarvestStatDTO;
 
 /**
  *
@@ -57,6 +58,16 @@ public interface HarvestDAO extends DAO {
      * @throws DAOException
      */
     public List<HarvestDTO> getHarvestsBySourceId(Integer harvestSourceId) throws DAOException;
+
+    /**
+     * Returns list of the last harvests statistics.
+     *
+     * @param limit
+     *            how many harvests
+     * @return List<HarvestStatDTO>
+     * @throws DAOException
+     */
+    public List<HarvestStatDTO> getLastHarvestStats(Integer limit) throws DAOException;
 
     /**
      *
