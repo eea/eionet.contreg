@@ -21,6 +21,7 @@
 package eionet.cr.dao.virtuoso;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,28 +48,27 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
      */
     public void addPullHarvests(List<UrgentHarvestQueueItemDTO> queueItems) throws DAOException {
 
-        String valueStr = "(?,NOW())";
-        List<Object> values = new ArrayList<Object>();
-        StringBuffer buf = new StringBuffer("insert into URGENT_HARVEST_QUEUE (URL,\"TIMESTAMP\") VALUES ");
-        for (int i = 0; i < queueItems.size(); i++) {
-            UrgentHarvestQueueItemDTO dto = queueItems.get(i);
-            buf.append(i > 0 ? "," : "").append(valueStr);
-
-            String url = dto.getUrl();
-            if (url != null) {
-                url = StringUtils.substringBefore(url, "#");
-            }
-            values.add(url);
-        }
-
+        String sql = "insert into URGENT_HARVEST_QUEUE (URL,\"TIMESTAMP\") VALUES (?,NOW())";
+        PreparedStatement ps = null;
         Connection conn = null;
         try {
             conn = getSQLConnection();
-            SQLUtil.executeUpdate(buf.toString(), values, conn);
+            ps = conn.prepareStatement(sql);
+            for (int i = 0; i < queueItems.size(); i++) {
+                UrgentHarvestQueueItemDTO dto = queueItems.get(i);
+                String url = dto.getUrl();
+                if (url != null) {
+                    url = StringUtils.substringBefore(url, "#");
+                }
+                ps.setString(1, url);
+                ps.addBatch();
+            }
+            ps.executeBatch();
         } catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
         } finally {
             SQLUtil.close(conn);
+            SQLUtil.close(ps);
         }
     }
 
