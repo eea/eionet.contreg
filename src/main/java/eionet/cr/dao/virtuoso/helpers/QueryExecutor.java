@@ -52,7 +52,7 @@ public class QueryExecutor {
             if (bindings == null || !bindings.hasNext()) {
                 logger.info("The query gave no results");
             } else {
-                results = new QueryResult(bindings);
+                results = new QueryResult(bindings, false);
             }
         } catch (Exception e) {
             e.printStackTrace();

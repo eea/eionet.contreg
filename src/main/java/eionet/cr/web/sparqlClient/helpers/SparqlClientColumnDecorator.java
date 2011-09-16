@@ -5,6 +5,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.displaytag.decorator.TableDecorator;
 
 public class SparqlClientColumnDecorator extends TableDecorator {
@@ -18,7 +19,7 @@ public class SparqlClientColumnDecorator extends TableDecorator {
             return "";
         } else {
             if (obj.isLiteral()) {
-                return obj.getValue();
+                return StringEscapeUtils.escapeXml(obj.getValue());
             } else {
                 /* NOTE: Probably don't need the context path. Could use relative links */
                 HttpServletRequest req = (HttpServletRequest) getPageContext().getRequest();

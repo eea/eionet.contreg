@@ -27,6 +27,10 @@ public class QueryResult {
     private List<String> variables;
     private ArrayList<HashMap<String, ResultValue>> rows;
     private ArrayList<Map<String, Object>> cols;
+
+    /** When true, literal objects have language and type added at the end of the value. */
+    private boolean virtuosoFormat;
+
     /**
      * If max rows count is not defined in properties, this constant value is used.
      */
@@ -35,8 +39,8 @@ public class QueryResult {
     /**
      * Maximum Rows count that is returned in HTML.
      */
-    private static final int MAX_ROWS_COUNT =
-            GeneralConfig.getIntProperty(GeneralConfig.SPARQLENDPOINT_MAX_ROWS_COUNT, DEFAULT_MAX_ROWS_COUNT);
+    private static final int MAX_ROWS_COUNT = GeneralConfig.getIntProperty(GeneralConfig.SPARQLENDPOINT_MAX_ROWS_COUNT,
+            DEFAULT_MAX_ROWS_COUNT);
 
     /** */
     private boolean allRowsReturned = true;
@@ -51,7 +55,8 @@ public class QueryResult {
      * @param queryResult
      * @throws QueryEvaluationException
      */
-    public QueryResult(TupleQueryResult queryResult) throws QueryEvaluationException {
+    public QueryResult(TupleQueryResult queryResult, boolean virtuosoFormat) throws QueryEvaluationException {
+        this.virtuosoFormat = virtuosoFormat;
 
         if (queryResult != null && queryResult.hasNext()) {
 
@@ -61,7 +66,7 @@ public class QueryResult {
             while (queryResult.hasNext()) {
                 add(queryResult.next());
                 counter++;
-                //if query result exceeds max rows count, return the resultset
+                // if query result exceeds max rows count, return the resultset
                 if (counter == MAX_ROWS_COUNT) {
                     LOGGER.debug("Maximum rows count exceeded, returning first rows");
                     allRowsReturned = false;
@@ -87,6 +92,14 @@ public class QueryResult {
 
                 String valueString = Util.escapeHtml(value.stringValue());
                 if (value instanceof Literal) {
+                    if (virtuosoFormat) {
+                        if (((Literal) value).getLanguage() != null) {
+                            valueString = "\"" + valueString +"\"@" + ((Literal) value).getLanguage();
+                        }
+                        if (((Literal) value).getDatatype() != null) {
+                            valueString = "\"" + valueString +"\"^^<" + ((Literal) value).getDatatype() + ">";
+                        }
+                    }
                     resultValue = new ResultValue(valueString, true);
                 } else {
                     resultValue = new ResultValue(valueString, false);

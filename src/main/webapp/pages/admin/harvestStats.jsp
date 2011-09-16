@@ -21,9 +21,27 @@
                 <display:column title="Harvest start" sortable="true">
                     <fmt:formatDate value="${item.datetimeStarted}" pattern="yyyy-MM-dd HH:mm:ss"/>
                 </display:column>
-                <display:column property="duration" title="Duration (ms)" sortable="true" />
+                <display:column title="Duration (ms)" sortable="true" sortProperty="duration">
+                    <c:choose>
+                        <c:when test="${item.duration == '0'}">
+                            <c:out value="< 1 s" />
+                        </c:when>
+                        <c:otherwise>
+                            ${item.duration}
+                        </c:otherwise>
+                    </c:choose>
+                </display:column>
                 <display:column property="totalStatements" title="Statements" sortable="true" />
-                <display:column property="statementDuration" title="Statement duration (ms)" sortable="true" />
+                <display:column title="Duration/statement (ms)" sortable="true" sortProperty="statementDuration">
+                    <c:choose>
+                        <c:when test="${item.statementDuration == '0'}">
+                            <c:out value="< 1 s" />
+                        </c:when>
+                        <c:otherwise>
+                            ${item.statementDuration}
+                        </c:otherwise>
+                    </c:choose>
+                </display:column>
             </display:table>
         </c:when>
         <c:otherwise>

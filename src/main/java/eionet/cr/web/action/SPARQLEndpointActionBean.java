@@ -70,6 +70,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     private static final String FORMAT_XML_SCHEMA = "xml_schema";
     private static final String FORMAT_JSON = "json";
     private static final String FORMAT_HTML = "html";
+    private static final String FORMAT_HTML_PLUS = "html+";
 
     /** */
     private static final String FORM_PAGE = "/pages/sparqlClient.jsp";
@@ -312,6 +313,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         // then add inferencing command to the query
         newQuery = query;
         query = StringEscapeUtils.escapeHtml(query);
+        Resolution resolution = null;
         if (useInferencing && !StringUtils.isBlank(query)) {
             String infCommand =
                     "DEFINE input:inference '" + GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME) + "'";
@@ -323,35 +325,47 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         }
 
         if (isConstructQuery) {
-            return new StreamingResolution("application/rdf+xml") {
+            resolution = new StreamingResolution("application/rdf+xml") {
                 public void stream(HttpServletResponse response) throws Exception {
                     runQuery(newQuery, FORMAT_XML, response.getOutputStream());
                 }
             };
+            ((StreamingResolution) resolution).setFilename("sparql-result.xml");
         } else if (xmlFormats.contains(accept[0])) {
-            return new StreamingResolution("application/sparql-results+xml") {
+            resolution = new StreamingResolution("application/sparql-results+xml") {
                 public void stream(HttpServletResponse response) throws Exception {
+                    response.setHeader("filename", "sparql-result.xml");
                     runQuery(newQuery, FORMAT_XML, response.getOutputStream());
                 }
             };
-        } else if (accept[0].equals("application/sparql-results+xml_schema")) {
-            return new StreamingResolution("application/sparql-results+xml_schema") {
+            ((StreamingResolution) resolution).setFilename("sparql-result.xml");
+        } else if (accept[0].equals("application/x-ms-access-export+xml")) {
+            resolution = new StreamingResolution("application/x-ms-access-export+xml") {
                 public void stream(HttpServletResponse response) throws Exception {
                     runQuery(newQuery, FORMAT_XML_SCHEMA, response.getOutputStream());
                 }
             };
+            ((StreamingResolution) resolution).setFilename("sparql-result.xml");
         } else if (accept[0].equals("application/sparql-results+json")) {
-            return new StreamingResolution("application/sparql-results+json") {
+            resolution = new StreamingResolution("application/sparql-results+json") {
                 public void stream(HttpServletResponse response) throws Exception {
                     runQuery(newQuery, FORMAT_JSON, response.getOutputStream());
                 }
             };
+            ((StreamingResolution) resolution).setFilename("sparql-result.json");
+        } else if (accept[0].equals("text/html+")) {
+            if (!StringUtils.isBlank(query)) {
+                runQuery(newQuery, FORMAT_HTML_PLUS, null);
+            }
+            resolution = new ForwardResolution(FORM_PAGE);
         } else {
             if (!StringUtils.isBlank(query)) {
                 runQuery(newQuery, FORMAT_HTML, null);
             }
-            return new ForwardResolution(FORM_PAGE);
+            resolution = new ForwardResolution(FORM_PAGE);
         }
+
+        return resolution;
     }
 
     /**
@@ -452,7 +466,16 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
                             executionTime = System.currentTimeMillis() - startTime;
                             if (queryResult != null) {
-                                result = new QueryResult(queryResult);
+                                result = new QueryResult(queryResult, false);
+                            }
+                            // Returns HTML format
+                        } else if (format != null && format.equals(FORMAT_HTML_PLUS)) {
+                            long startTime = System.currentTimeMillis();
+                            queryResult = resultsTable.evaluate();
+
+                            executionTime = System.currentTimeMillis() - startTime;
+                            if (queryResult != null) {
+                                result = new QueryResult(queryResult, true);
                             }
                         }
                     }

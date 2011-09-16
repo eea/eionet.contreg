@@ -80,9 +80,10 @@ SELECT DISTINCT * WHERE {
                         <label for="format" class="question" style="width: 200px;">Output format:</label>
                             <stripes:select name="format" id="format">
                                 <stripes:option value="text/html" label="HTML" />
+                                <stripes:option value="text/html+" label="HTML+" />
                                 <stripes:option value="application/sparql-results+json" label="JSON" />
                                 <stripes:option value="application/sparql-results+xml" label="XML" />
-                                <stripes:option value="application/sparql-results+xml_schema" label="XML with Schema" />
+                                <stripes:option value="application/x-ms-access-export+xml" label="XML with Schema" />
                             </stripes:select>
                     </div>
                     <div style="position: absolute; top: 5px; left: 250px;">
