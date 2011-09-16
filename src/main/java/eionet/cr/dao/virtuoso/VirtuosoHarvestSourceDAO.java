@@ -446,7 +446,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /** */
     private static final String GET_NEXT_SCHEDULED_SOURCES_SQL =
-
+        //FIXME: ticket:2729 - don't ignore sources with PERMANENT_ERROR = 'Y'
         "select<limParam> * from CR.cr3user.HARVEST_SOURCE where"
         + " PERMANENT_ERROR = 'N' and COUNT_UNAVAIL < 5 and INTERVAL_MINUTES > 0"
         + " AND -datediff('second', now(), coalesce(LAST_HARVEST, dateadd('minute', -INTERVAL_MINUTES, TIME_CREATED)))"
@@ -575,6 +575,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     @Override
     public Pair<Integer, List<HarvestUrgencyScoreDTO>> getUrgencyOfComingHarvests(int amount) throws DAOException {
 
+        //FIXME: Only use PERMANENT_ERROR = 'N' until ticket:2729 is done.
         StringBuffer buf =
             new StringBuffer().append("select top " + amount + " url, last_harvest, interval_minutes,")
             .append(" (-datediff('second', now(), coalesce(LAST_HARVEST, dateadd('minute', -INTERVAL_MINUTES, TIME_CREATED)))")
