@@ -97,7 +97,9 @@ public class QueryResult {
                             valueString = "\"" + valueString +"\"@" + ((Literal) value).getLanguage();
                         }
                         if (((Literal) value).getDatatype() != null) {
-                            valueString = "\"" + valueString +"\"^^<" + ((Literal) value).getDatatype() + ">";
+                            String type = ((Literal) value).getDatatype().stringValue();
+                            type = type.replaceFirst("http://www.w3.org/2001/XMLSchema#", "xsd:");
+                            valueString = "\"" + valueString +"\"^^<" + type + ">";
                         }
                     }
                     resultValue = new ResultValue(valueString, true);
