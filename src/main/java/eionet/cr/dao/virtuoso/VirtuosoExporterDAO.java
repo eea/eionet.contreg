@@ -32,9 +32,13 @@ public class VirtuosoExporterDAO extends VirtuosoBaseDAO implements ExporterDAO 
         // create query helper
         VirtuosoFilteredSearchHelper helper = new VirtuosoFilteredSearchHelper(filters, null, null, null, true);
 
+        String whereContents = helper.getWhereContents();
+        if (whereContents!=null && !whereContents.trim().startsWith(".")){
+            whereContents = "." + whereContents;
+        }
         String query =
-                getSubjectsDataQuery(helper.getWhereContents(), selectedPredicates,
-                        helper.getQueryBindings());
+            getSubjectsDataQuery(whereContents, selectedPredicates,
+                    helper.getQueryBindings());
         long startTime = System.currentTimeMillis();
         logger.debug("Start exporting type search results: " + query);
 
@@ -46,16 +50,16 @@ public class VirtuosoExporterDAO extends VirtuosoBaseDAO implements ExporterDAO 
 
     /** */
     private String getSubjectsDataQuery(String subjectsSubQuery, Collection<String> predicateUris, Bindings bindings)
-            throws DAOException {
+    throws DAOException {
         if (subjectsSubQuery == null || subjectsSubQuery.length() == 0) {
             throw new IllegalArgumentException("Subjects sub query must not be null or empty");
         }
 
         // TODO does not work with multiple predicates and inferencing - check if Virtuoso issue is solved
         String sparql =
-                SPARQLQueryUtil.getCrInferenceDefinitionStr() + "select distinct * where {?s ?p ?o " + subjectsSubQuery
-                        + " . filter (?p IN (" + SPARQLQueryUtil.urisToCSV(predicateUris, "exportPredicateValue", bindings)
-                        + "))} ORDER BY ?s";
+            SPARQLQueryUtil.getCrInferenceDefinitionStr() + "select distinct * where {?s ?p ?o " + subjectsSubQuery
+            + " . filter (?p IN (" + SPARQLQueryUtil.urisToCSV(predicateUris, "exportPredicateValue", bindings)
+            + "))} ORDER BY ?s";
         return sparql;
     }
 }
