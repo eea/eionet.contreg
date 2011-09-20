@@ -10,6 +10,7 @@
 
         <crfn:form action="/source.action" focus="">
             <stripes:hidden name="harvestSource.sourceId"/>
+            <stripes:hidden name="urlBefore" value="${fn:escapeXml(actionBean.harvestSource.url)}"/>
             <table>
                             <col style="width:10em"/>
                                 <col/>

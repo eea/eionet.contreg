@@ -91,7 +91,7 @@ public class HarvestQueueActionBean extends AbstractActionBean {
     public Resolution view() throws DAOException {
 
         if (getQueueType().equals(TYPE_BATCH)) {
-            batchQueue = HarvestingJob.getBatchHarvestingQueue();
+            batchQueue = HarvestingJob.getBatchQueue();
             if (batchQueue == null || batchQueue.isEmpty()) {
                 batchQueue = HarvestingJob.getNextScheduledSources();
             }

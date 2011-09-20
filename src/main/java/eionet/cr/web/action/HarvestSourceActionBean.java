@@ -21,6 +21,7 @@
 package eionet.cr.web.action;
 
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -75,6 +76,9 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     /** */
     private static final List<Pair<String, String>> tabs;
     private String selectedTab = "view";
+
+    /** */
+    private String urlBefore;
 
     /** */
     private enum ExportType {
@@ -253,11 +257,11 @@ public class HarvestSourceActionBean extends AbstractActionBean {
                     HarvestSourceDTO source = getHarvestSource();
                     if (source != null) {
                         source.setOwner(getUserName());
-                        // All Schema sources are also Priority sources
+                        // All Schema sources are also Priority sources.
                         if (schemaSource) {
                             source.setPrioritySource(true);
                         }
-                        // Add/remove source into/from inferencing ruleset
+                        // Add/remove source into/from inferencing ruleset.
                         manageRuleset(source.getUrl());
                     }
                     factory.getDao(HarvestSourceDAO.class).editSource(source);
@@ -267,12 +271,18 @@ public class HarvestSourceActionBean extends AbstractActionBean {
                 harvestSource = factory.getDao(HarvestSourceDAO.class).getHarvestSourceById(harvestSource.getSourceId());
                 schemaSource = factory.getDao(HarvestSourceDAO.class).isSourceInInferenceRule(harvestSource.getUrl());
             }
-        } else
+        } else{
             addWarningMessage(getBundle().getString("not.logged.in"));
+        }
 
         return resolution;
     }
 
+    /**
+     *
+     * @param url
+     * @throws DAOException
+     */
     private void manageRuleset(String url) throws DAOException {
 
         boolean isAlreadyInRuleset = factory.getDao(HarvestSourceDAO.class).isSourceInInferenceRule(url);
@@ -360,28 +370,36 @@ public class HarvestSourceActionBean extends AbstractActionBean {
 
         if (isPostRequest()) {
 
-            if (harvestSource.getUrl() == null || harvestSource.getUrl().trim().length() == 0
-                    || !URLUtil.isURL(harvestSource.getUrl())) {
-                addGlobalValidationError(new SimpleError("Invalid URL!"));
+            String urlString = harvestSource.getUrl();
+            if (StringUtils.isBlank(urlString)){
+                addGlobalValidationError(new SimpleError("URL missing!"));
             }
+            else{
+                try {
+                    URL url = new URL(urlString);
+                    if (url.getRef()!=null){
+                        addGlobalValidationError(new SimpleError("URL with a fragment part not allowed!"));
+                    }
 
-            if (harvestSource.getUrl() != null && harvestSource.getUrl().indexOf("#") >= 0) {
-                addGlobalValidationError(new SimpleError("URL with a fragment part not allowed!"));
-            }
+                    if (!StringUtils.equals(urlBefore, urlString) && URLUtil.isNotExisting(urlString)){
+                        addGlobalValidationError(new SimpleError("There is no resource existing behind this URL!"));
+                    }
 
-            if (harvestSource.getUrl() != null && URLUtil.isNotExisting(harvestSource.getUrl())) {
-                addGlobalValidationError(new SimpleError("There is no resource existing behind this URL!"));
-            }
-
-            if (harvestSource.getIntervalMinutes() != null) {
-                if (harvestSource.getIntervalMinutes().intValue() < 0 || intervalMultiplier < 0) {
-                    addGlobalValidationError(new SimpleError("Harvest interval must be >= 0"));
-                } else {
-                    harvestSource.setIntervalMinutes(new Integer(harvestSource.getIntervalMinutes().intValue()
-                            * intervalMultiplier));
+                    Integer intervalMinutes = harvestSource.getIntervalMinutes();
+                    if (intervalMinutes != null) {
+                        if (intervalMinutes.intValue() < 0 || intervalMultiplier < 0) {
+                            addGlobalValidationError(new SimpleError("Harvest interval must be >= 0"));
+                        } else {
+                            harvestSource.setIntervalMinutes(Integer.valueOf(intervalMinutes.intValue()
+                                    * intervalMultiplier));
+                        }
+                    } else{
+                        harvestSource.setIntervalMinutes(Integer.valueOf(0));
+                    }
+                } catch (MalformedURLException e) {
+                    addGlobalValidationError(new SimpleError("Invalid URL!"));
                 }
-            } else
-                harvestSource.setIntervalMinutes(new Integer(0));
+            }
         }
 
         return getContext().getValidationErrors() == null || getContext().getValidationErrors().isEmpty();
@@ -510,5 +528,12 @@ public class HarvestSourceActionBean extends AbstractActionBean {
 
     public void setSchemaSource(boolean schemaSource) {
         this.schemaSource = schemaSource;
+    }
+
+    /**
+     * @param urlBefore the urlBefore to set
+     */
+    public void setUrlBefore(String urlBefore) {
+        this.urlBefore = urlBefore;
     }
 }

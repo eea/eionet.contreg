@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import org.openrdf.OpenRDFException;
+import org.openrdf.model.URI;
+import org.openrdf.model.ValueFactory;
 import org.openrdf.query.BooleanQuery;
 import org.openrdf.query.GraphQuery;
 import org.openrdf.query.GraphQueryResult;
@@ -230,6 +232,22 @@ public class SesameUtil {
             } catch (RepositoryException e) {
                 // ignoring rollback exceptions
             }
+        }
+    }
+
+    public static void main(String[] args) throws RepositoryException {
+
+        RepositoryConnection conn = null;
+        try {
+            conn = SesameUtil.getRepositoryConnection();
+            ValueFactory valueFactory = conn.getValueFactory();
+            System.out.println("Starting");
+            long time = System.currentTimeMillis();
+            URI graphUri = valueFactory.createURI("http://www.dbis.informatik.uni-goettingen.de/Mondial/Mondial-RDF/mondial.rdf");
+            conn.clear(graphUri);
+            System.out.println((System.currentTimeMillis() - time) + " ms");
+        } finally {
+            SesameUtil.close(conn);
         }
     }
 }

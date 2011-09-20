@@ -71,7 +71,7 @@ public class HarvestSourceDAOTest extends CRDatabaseTestCase {
     public void testGetHarvestSourceByUrl() throws Exception {
 
         HarvestSourceDTO dto =
-                DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl("http://www.eionet.europa.eu/seris/rdf");
+            DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl("http://www.eionet.europa.eu/seris/rdf");
         assertNotNull(dto);
     }
 
@@ -79,7 +79,7 @@ public class HarvestSourceDAOTest extends CRDatabaseTestCase {
     public void testGetHarvestSources() throws Exception {
 
         Pair<Integer, List<HarvestSourceDTO>> result =
-                DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSources("", PagingRequest.create(1, 100), null);
+            DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSources("", PagingRequest.create(1, 100), null);
         assertNotNull(result);
         assertNotNull(result.getRight());
         assertEquals(42, result.getRight().size());
@@ -102,22 +102,5 @@ public class HarvestSourceDAOTest extends CRDatabaseTestCase {
 
         // get the source by new URL, it must not be null
         assertNotNull(dao.getHarvestSourceByUrl("http://www.eionet.europa.eu/seris/rdf-dummy"));
-    }
-
-    @Test
-    public void testDeleteSource() throws Exception {
-
-        // get the source's ID
-        HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
-        HarvestSourceDTO dto = dao.getHarvestSourceByUrl("http://localhost:8080/cr/pages/test.xml");
-        assertNotNull(dto);
-        assertNotNull(dto.getSourceId());
-
-        // delete the source
-        dao.deleteSourceByUrl("http://localhost:8080/cr/pages/test.xml");
-
-        // now get the source by ID- it must be null now
-        dto = dao.getHarvestSourceById(dto.getSourceId());
-        assertNull(dto);
     }
 }

@@ -280,7 +280,7 @@ public class PullHarvest extends BaseHarvest {
         if (isPermanentError(responseCode)) {
             setCleanAllPreviousSourceMetadata(true);
             try {
-                getHarvestSourceDAO().deleteSourceTriples(getContextUrl());
+                getHarvestSourceDAO().clearGraph(getContextUrl());
             } catch (DAOException e) {
                 LOGGER.error("Failed to delete previous content after permanent error", e);
             }

@@ -22,7 +22,7 @@ package eionet.cr.harvest;
 
 import java.util.HashMap;
 
-import eionet.cr.util.Hashes;
+import org.apache.commons.lang.StringUtils;
 
 /**
  *
@@ -85,24 +85,17 @@ public class CurrentHarvests {
      * @return
      */
     public static synchronized boolean contains(String url) {
-        return url == null ? false : (queuedHarvest != null && url.equals(queuedHarvest.getContextUrl()))
-                || onDemandHarvests.containsKey(url);
-    }
 
-    /**
-     *
-     * @param urlHash
-     * @return
-     */
-    public static synchronized boolean contains(long urlHash) {
+        if (url==null){
+            return false;
+        }
 
-        if (queuedHarvest != null && Hashes.spoHash(queuedHarvest.getContextUrl()) == urlHash)
+        if (queuedHarvest!=null && StringUtils.equals(url, queuedHarvest.getContextUrl())){
             return true;
+        }
 
-        for (String url : onDemandHarvests.keySet()) {
-            if (Hashes.spoHash(url) == urlHash) {
-                return true;
-            }
+        if (onDemandHarvests.containsKey(url)){
+            return true;
         }
 
         return false;

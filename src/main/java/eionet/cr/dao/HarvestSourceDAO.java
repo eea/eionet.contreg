@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Set;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.repository.RepositoryException;
@@ -156,16 +157,6 @@ public interface HarvestSourceDAO extends DAO {
      *             if relational database is unavailable. fetches all scheduled source URLs, which are scheduled for removal.
      */
     List<String> getScheduledForDeletion() throws DAOException;
-
-    /**
-     * Deletes selected source from the DB.
-     *
-     * @param url
-     *            - source url
-     * @throws DAOException
-     *             if relational database is unavailable.
-     */
-    public void deleteSourceByUrl(String url) throws DAOException;
 
     /**
      * Get a list of sources to harvest in the next harvesting round. The result is ordered with highest priority first.
@@ -326,22 +317,21 @@ public interface HarvestSourceDAO extends DAO {
     public void deleteSubjectTriplesInSource(String subjectUri, String sourceUri) throws DAOException;
 
     /**
-     * Removes all triples for given source. Doesn't remove triples from /harvester context.
+     * Clear the given graph.
      *
-     * @param url
+     * @param graphUri
      * @throws DAOException
-     *             if relational database is unavailable.
      */
-    public void deleteSourceTriples(String url) throws DAOException;
+    public void clearGraph(String graphUri) throws DAOException;
 
     /**
      * Increases COUNT_UNAVAIL by 1.
      *
-     * @param sourceId
+     * @param sourceUrl
      * @throws DAOException
      *             if relational database is unavailable.
      */
-    public void increaseUnavailableCount(int sourceId) throws DAOException;
+    public void increaseUnavailableCount(String sourceUrl) throws DAOException;
 
     /**
      * Statistics : count of last harvested URLs.
@@ -378,4 +368,11 @@ public interface HarvestSourceDAO extends DAO {
      * @throws DAOException
      */
     public int queueNonPriorityUnavailableSourcesForDeletion() throws DAOException;
+
+    /**
+     *
+     * @param sourceUrls
+     * @throws DAOException
+     */
+    public void removeHarvestSources(Set<String> sourceUrls) throws DAOException;
 }

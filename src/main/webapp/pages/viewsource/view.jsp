@@ -6,6 +6,10 @@
     <c:if test="${actionBean.harvestSource.permanentError}">
         <div class="warning-msg"><c:out value="The source is marked with permanent error!"/></div>
     </c:if>
+    <c:if test="${actionBean.harvestSource.unavailable}">
+        <div class="warning-msg"><c:out value="The source has been unavailable for too many times!"/></div>
+    </c:if>
+
 
     <crfn:form action="/source.action" focus="">
         <stripes:hidden name="harvestSource.sourceId" />
@@ -110,13 +114,6 @@
                     </c:choose>
                 </td>
             </tr>
-            <c:if test="${actionBean.harvestSource.unavailable}">
-                <tr>
-                    <td colspan="2" class="warning-msg" style="color: #E6E6E6">
-                        <c:out value="The source has been unavailable for too many times!"/>
-                    </td>
-                </tr>
-            </c:if>
 
             <tr>
                 <td colspan="2" style="padding-top: 10px">

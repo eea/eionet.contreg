@@ -21,6 +21,7 @@
 package eionet.cr.web.action;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -35,6 +36,7 @@ import org.apache.commons.lang.StringUtils;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.HarvestSourceDTO;
+import eionet.cr.harvest.CurrentHarvests;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.util.Pair;
@@ -213,31 +215,38 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
                 // A priority source can not be deleted. The administrator must
                 // first change it to a non-priority source, then delete it.
 
-                List<String> sourcesToBeDeleted = new ArrayList<String>();
-                List<String> notOwner = new ArrayList<String>();
-                List<String> prioritySources = new ArrayList<String>();
+                LinkedHashSet<String> sourcesToDelete = new LinkedHashSet<String>();
+                LinkedHashSet<String> notOwnedSources = new LinkedHashSet<String>();
+                LinkedHashSet<String> prioritySources = new LinkedHashSet<String>();
+                LinkedHashSet<String> currentlyHarvested = new LinkedHashSet<String>();
 
-                for (String uri : sourceUrl) {
+                for (String url : sourceUrl) {
 
-                    HarvestSourceDTO source = factory.getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(uri);
+                    HarvestSourceDTO source = factory.getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(url);
                     if (source != null) {
 
-                        if (userCanDelete(source)) {
-                            sourcesToBeDeleted.add(uri);
-                        } else if (source.isPrioritySource()) {
-                            prioritySources.add(uri);
-                        } else if (!getUserName().equals(source.getOwner())) {
-                            notOwner.add(uri);
+                        if (CurrentHarvests.contains(url)){
+                            currentlyHarvested.add(url);
+                        }
+                        else{
+                            if (userCanDelete(source)) {
+                                sourcesToDelete.add(url);
+                            } else if (source.isPrioritySource()) {
+                                prioritySources.add(url);
+                            } else if (!getUserName().equals(source.getOwner())) {
+                                notOwnedSources.add(url);
+                            }
                         }
                     }
                 }
 
-                factory.getDao(HarvestSourceDAO.class).queueSourcesForDeletion(sourcesToBeDeleted);
+                logger.debug("Deleting the following sources: " + sourcesToDelete);
+                factory.getDao(HarvestSourceDAO.class).removeHarvestSources(sourcesToDelete);
 
-                if (sourcesToBeDeleted != null && !sourcesToBeDeleted.isEmpty()) {
+                if (!sourcesToDelete.isEmpty()) {
                     StringBuffer msg = new StringBuffer();
-                    msg.append("Following source(s) were sheduled for removal: <ul>");
-                    for (String uri : sourcesToBeDeleted) {
+                    msg.append("The following sources were successfully removed from the system: <ul>");
+                    for (String uri : sourcesToDelete) {
                         msg.append("<li>").append(uri).append("</li>");
                     }
                     msg.append("</ul>");
@@ -245,20 +254,28 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
                 }
 
                 StringBuffer warnings = new StringBuffer();
-                if (prioritySources != null && !prioritySources.isEmpty()) {
-                    warnings.append("Following source(s) could not be deleted because they are Priority sources: <ul>");
-                    for (String uri : prioritySources) {
-                        warnings.append("<li>").append(uri).append("</li>");
+                if (!prioritySources.isEmpty()) {
+                    warnings.append("The following sources could not be deleted, because they are priority sources: <ul>");
+                    for (String url : prioritySources) {
+                        warnings.append("<li>").append(url).append("</li>");
                     }
                     warnings.append("</ul>");
                 }
-                if (notOwner != null && !notOwner.isEmpty()) {
-                    warnings.append("Following source(s) could not be deleted because you are not the owner of these sources: <ul>");
-                    for (String uri : notOwner) {
-                        warnings.append("<li>").append(uri).append("</li>");
+                if (!notOwnedSources.isEmpty()) {
+                    warnings.append("The following sources could not be deleted, because you are not their owner: <ul>");
+                    for (String url : notOwnedSources) {
+                        warnings.append("<li>").append(url).append("</li>");
                     }
                     warnings.append("</ul>");
                 }
+                if (!currentlyHarvested.isEmpty()){
+                    warnings.append("The following sources could not be deleted, because they are curently being harvested");
+                    for (String url : currentlyHarvested) {
+                        warnings.append("<li>").append(url).append("</li>");
+                    }
+                    warnings.append("</ul>");
+                }
+
                 if (warnings.length() > 0) {
                     addWarningMessage(warnings.toString());
                 }

@@ -22,6 +22,7 @@ package eionet.cr.util;
 
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
+import java.util.HashSet;
 
 import eionet.cr.common.CRRuntimeException;
 
@@ -120,17 +121,26 @@ public class Hashes {
         return buf.toString();
     }
 
-    //    /**
-    //     *
-    //     * @param args
-    //     */
-    //    public static void main(String[] args) {
-    //        if (args.length != 0) {
-    //            for (String s : args) {
-    //                System.out.println(s + " = " + Hashes.spoHash(s));
-    //            }
-    //        } else {
-    //            System.out.println(spoHash("http://www.gutenberg.org/feeds/catalog.rdf"));
-    //        }
-    //    }
+    /**
+     *
+     * @param args
+     */
+    public static void main(String[] args) {
+
+        HashSet<String> urls = new HashSet<String>();
+
+        urls.add("http://cdr.eionet.europa.eu/no/ospar/Offshore%20installations/envqynzuq");
+
+        for (String url : urls) {
+            System.out.println("delete from HARVEST_SOURCE where URL='" + url + "' and URL_HASH<>" + spoHash(url) +";");
+        }
+
+        //        if (args.length != 0) {
+        //            for (String s : args) {
+        //                System.out.println(s + " = " + Hashes.spoHash(s));
+        //            }
+        //        } else {
+        //            System.out.println(spoHash("http://www.gutenberg.org/feeds/catalog.rdf"));
+        //        }
+    }
 }

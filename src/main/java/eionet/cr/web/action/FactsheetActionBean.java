@@ -149,8 +149,6 @@ public class FactsheetActionBean extends AbstractActionBean {
                 }
                 subProperties = helperDAO.getSubProperties(subject.getPredicates().keySet());
 
-                logger.debug("Determining if the subject has content stored in database");
-
                 subjectDownloadable = DAOFactory.get().getDao(SpoBinaryDAO.class).exists(uri);
             }
         }

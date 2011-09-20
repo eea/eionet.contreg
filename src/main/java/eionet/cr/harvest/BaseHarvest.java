@@ -118,7 +118,7 @@ public abstract class BaseHarvest implements Harvest {
      *
      */
     @Override
-    public void execute() throws HarvestException {
+    public final void execute() throws HarvestException {
 
         startHarvest();
 
