@@ -700,7 +700,7 @@ public class Util {
      * number.
      *
      * @param element
-     * @param elements elements must be all in lower case
+     * @param elements elements
      * @return
      */
     public static String getUniqueElementName(String element, Collection<String> elements) {
@@ -709,7 +709,7 @@ public class Util {
             element = XmlUtil.INVALID_ELEMENT_NAME;
 
         if (elements != null) {
-            while (elements.contains(element.toLowerCase())) {
+            while (elements.contains(element)) {
                 int dashPos = element.lastIndexOf("_");
                 if (dashPos > 1 && dashPos < element.length() - 1) {
                     String snum = element.substring(dashPos + 1);
