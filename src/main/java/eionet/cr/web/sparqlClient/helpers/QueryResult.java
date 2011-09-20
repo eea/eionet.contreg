@@ -14,7 +14,6 @@ import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.TupleQueryResult;
 
 import eionet.cr.config.GeneralConfig;
-import eionet.cr.util.Util;
 
 /**
  *
@@ -90,7 +89,7 @@ public class QueryResult {
 
             if (value != null) {
 
-                String valueString = Util.escapeHtml(value.stringValue());
+                String valueString = value.stringValue();
                 if (value instanceof Literal) {
                     if (virtuosoFormat) {
                         if (((Literal) value).getLanguage() != null) {
