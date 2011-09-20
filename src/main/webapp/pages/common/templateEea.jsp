@@ -137,12 +137,22 @@
                 <!-- start of the left (by default at least) column -->
                 <div id="portal-column-one">
                     <div class="visualPadding">
+<dl class="portlet" id="portlet-navigation-tree">
+  <dt class="portletHeader">
+    <span class="portletTopLeft"></span>
+    <a href="/" class="tile">Semantic Data Service</a>
+    <span class="portletTopRight"></span>
+  </dt>
+
+  <dd class="portletItem lastItem">
                     	<jsp:include page="/pages/common/navigation.jsp"/>
                     	<ul>
                     		<li>
                     			<stripes:link id="loginlink" title="Login" href="/login.action" event="login">Login</stripes:link>
                     		</li>
                     	</ul>
+</dd>
+</dl>
                     </div>
                 </div>
                 <!-- end of the left (by default at least) column -->
