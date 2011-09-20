@@ -1,6 +1,7 @@
 package eionet.cr.web.action.admin;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -16,6 +17,7 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.HarvestSourceDTO;
+import eionet.cr.harvest.CurrentHarvests;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.util.URLUtil;
@@ -82,15 +84,16 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
     }
 
     /**
-     * Deletes sources added by the user. Harvest sources are separated by carriage return in the textarea
+     * Deletes sources added by the user.
+     * Harvest sources are separated by carriage return in the textarea.
      *
      * @return Resolution
      */
     public Resolution delete() {
-        logger.debug("HarvestSourceBulkActionBean.delete() ");
+
         strHarvestSources = StringEscapeUtils.escapeHtml(strHarvestSources);
         if (getUser() != null) {
-            parseHarvestSources(getStrHarvestSources());
+            parseHarvestSources(strHarvestSources);
             bulkDeleteSources();
             setAdminLoggedIn(true);
         }
@@ -152,7 +155,7 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
             String url = urls.nextToken();
             if (URLUtil.isURL(url)) {
                 harvestSources
-                        .add(HarvestSourceDTO.create(url, false, HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL, getUserName()));
+                .add(HarvestSourceDTO.create(url, false, HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL, getUserName()));
                 sourceUrls.add(url);
             } else {
                 warnings.append("Entered URL \"").append(url).append("\" is not a valid URL.<br/>");
@@ -179,10 +182,10 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
             } catch (DAOException e) {
                 // if adding fails, proceed with adding the other sources and show error message
                 warnings.append("Adding source \"").append(source.getUrl()).append("\" failed, reason: ").append(e.toString())
-                        .append("<br/>");
+                .append("<br/>");
             } catch (HarvestException he) {
                 warnings.append("Adding source \"").append(source.getUrl()).append("\" to the harvest queue failed, reason: ")
-                        .append(he.toString()).append("<br/>");
+                .append(he.toString()).append("<br/>");
             }
         }
         addSystemMessage("Adding sources finished. Successfully added " + counter + " sources for urgent harvesting.");
@@ -195,22 +198,34 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
      * Adds sources to removal queue. Those ones that already are in the delete queue are not added.
      */
     private void bulkDeleteSources() {
+
         try {
             HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
-            List<String> sourcesInDeleteQue = dao.getScheduledForDeletion();
-            List<String> sourcesForRemoval = new ArrayList<String>();
+            LinkedHashSet<String> sourcesToDelete = new LinkedHashSet<String>();
+            LinkedHashSet<String> currentlyHarvested = new LinkedHashSet<String>();
 
             for (String url : sourceUrls) {
-                // if the source is already in the delete queue, do not try to add it twice
-                if (!sourcesInDeleteQue.contains(url)) {
-                    sourcesForRemoval.add(url);
-                    sourcesInDeleteQue.add(url);
+
+                if (CurrentHarvests.contains(url)){
+                    currentlyHarvested.add(url);
+                }
+                else{
+                    sourcesToDelete.add(url);
                 }
             }
-            dao.queueSourcesForDeletion(sourcesForRemoval);
-            addSystemMessage(sourcesForRemoval.size() + " source(s) were scheduled for removal.");
-            if (sourceUrls.size() - sourcesForRemoval.size() > 0) {
-                addSystemMessage((sourceUrls.size() - sourcesForRemoval.size()) + " source(s) were already in the delete queue.");
+
+            dao.removeHarvestSources(sourcesToDelete);
+
+            addSystemMessage(sourcesToDelete.size() + " sources were successfully removed from the system.");
+
+            if (!currentlyHarvested.isEmpty()){
+                StringBuilder warnings = new StringBuilder();
+                warnings.append("The following sources could not be deleted, because they are curently being harvested: <ul>");
+                for (String url : currentlyHarvested) {
+                    warnings.append("<li>").append(url).append("</li>");
+                }
+                warnings.append("</ul>");
+                addWarningMessage(warnings.toString());
             }
         } catch (DAOException e) {
             warnings.append("Adding sources to delete queue failed, reason: ").append(e.toString()).append("<br/>");

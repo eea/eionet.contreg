@@ -23,8 +23,8 @@ package eionet.cr.dao;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.repository.RepositoryException;
@@ -140,16 +140,6 @@ public interface HarvestSourceDAO extends DAO {
      *             if relational database is unavailable.
      */
     public void editSource(HarvestSourceDTO source) throws DAOException;
-
-    /**
-     * adds references to sources into queue for removal.
-     *
-     * @param urls
-     *            - urls to add
-     * @throws DAOException
-     *             if relational database is unavailable.
-     */
-    public void queueSourcesForDeletion(List<String> urls) throws DAOException;
 
     /**
      * @return List<String>
@@ -364,15 +354,8 @@ public interface HarvestSourceDAO extends DAO {
 
     /**
      *
-     * @return TODO
-     * @throws DAOException
-     */
-    public int queueNonPriorityUnavailableSourcesForDeletion() throws DAOException;
-
-    /**
-     *
      * @param sourceUrls
      * @throws DAOException
      */
-    public void removeHarvestSources(Set<String> sourceUrls) throws DAOException;
+    public void removeHarvestSources(Collection<String> sourceUrls) throws DAOException;
 }

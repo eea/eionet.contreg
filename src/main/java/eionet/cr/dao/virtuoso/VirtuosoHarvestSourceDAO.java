@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -51,12 +50,11 @@ import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
 
 /**
- * Harvester methods in Virtuoso.
+ * Methods operating with harvest sources. Implementation for Virtuoso.
  *
  * @author kaido
  */
 
-// TODO remove extending when all the methods have been copied to VirtuosoDAO
 public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements HarvestSourceDAO {
 
     private static final String GET_SOURCES_SQL =
@@ -348,7 +346,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      * @param conn
      * @throws SQLException
      */
-    private void removeHarvestSources(Set<String> sourceUrls, Connection conn) throws SQLException{
+    private void removeHarvestSources(Collection<String> sourceUrls, Connection conn) throws SQLException{
 
         // We need to clear all references in:
         // - harvest messages table
@@ -408,7 +406,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      * @param conn
      * @throws RepositoryException
      */
-    private void removeHarvestSources(Set<String> sourceUrls, RepositoryConnection conn) throws RepositoryException{
+    private void removeHarvestSources(Collection<String> sourceUrls, RepositoryConnection conn) throws RepositoryException{
 
         ValueFactory valueFactory = conn.getValueFactory();
         Resource harvesterContext = valueFactory.createURI(GeneralConfig.HARVESTER_URI);
@@ -517,30 +515,6 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     public List<String> getScheduledForDeletion() throws DAOException {
 
         return executeSQL("select URL from REMOVE_SOURCE_QUEUE", null, new SingleObjectReader<String>());
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.dao.HarvestSourceDAO#queueSourcesForDeletion(java.util.List)
-     */
-    @Override
-    public void queueSourcesForDeletion(List<String> urls) throws DAOException {
-
-        if (urls == null || urls.isEmpty()) {
-            return;
-        }
-        StringBuffer sql = new StringBuffer("INSERT SOFT REMOVE_SOURCE_QUEUE (URL) VALUES ");
-        List<Object> params = new LinkedList<Object>();
-        int i = 0;
-        for (String url : urls) {
-            sql.append("(?)");
-            if (++i < urls.size()) {
-                sql.append(',');
-            }
-            params.add(url);
-        }
-        executeSQL(sql.toString(), params);
     }
 
     /** */
@@ -700,33 +674,11 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
         }
     }
 
-    /** */
-    private static final String DELETE_NONPRIORITY_UNAVAIL_SOURCES = "insert soft REMOVE_SOURCE_QUEUE (URL)"
-        + " select URL from HARVEST_SOURCE where PRIORITY_SOURCE='N' and COUNT_UNAVAIL>=5";
-
     /**
-     * @see eionet.cr.dao.HarvestSourceDAO#queueNonPriorityUnavailableSourcesForDeletion()
+     * @see eionet.cr.dao.HarvestSourceDAO#removeHarvestSources(Collection)
      */
     @Override
-    public int queueNonPriorityUnavailableSourcesForDeletion() throws DAOException {
-
-        Connection conn = null;
-        try {
-            conn = getSQLConnection();
-            return SQLUtil.executeUpdate(DELETE_NONPRIORITY_UNAVAIL_SOURCES, conn);
-        } catch (Exception e) {
-            throw new DAOException(e.getMessage(), e);
-        } finally {
-            SQLUtil.close(conn);
-        }
-
-    }
-
-    /**
-     * @see eionet.cr.dao.HarvestSourceDAO#removeHarvestSources(java.util.Set)
-     */
-    @Override
-    public void removeHarvestSources(Set<String> sourceUrls) throws DAOException {
+    public void removeHarvestSources(Collection<String> sourceUrls) throws DAOException {
 
         if (sourceUrls == null || sourceUrls.isEmpty()) {
             return;

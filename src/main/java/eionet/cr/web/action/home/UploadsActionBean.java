@@ -343,7 +343,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
                 fileStore.delete(fileName);
             }
 
-            DAOFactory.get().getDao(HarvestSourceDAO.class).queueSourcesForDeletion(subjectUris);
+            DAOFactory.get().getDao(HarvestSourceDAO.class).removeHarvestSources(subjectUris);
         }
 
         return new ForwardResolution("/pages/home/uploads.jsp");

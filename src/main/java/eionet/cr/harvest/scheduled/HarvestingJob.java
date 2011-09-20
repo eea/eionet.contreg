@@ -111,19 +111,17 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
      *
      */
     private void handleUrgentQueue() {
-    
-        LOGGER.trace("Handling urgent queue...");
-    
+
         try {
             int counter = 0;
             UrgentHarvestQueueItemDTO queueItem = null;
             for (queueItem = UrgentHarvestQueue.poll(); queueItem != null; queueItem = UrgentHarvestQueue.poll()) {
-    
+
                 counter++;
-    
+
                 String url = queueItem.getUrl();
                 if (!StringUtils.isBlank(url)) {
-    
+
                     if (queueItem.isPushHarvest()) {
                         pushHarvest(url, queueItem.getPushedContent());
                     } else {
@@ -380,13 +378,13 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
      * @param pushedContent
      */
     private void pushHarvest(String url, String pushedContent) {
-    
+
         // if the source is currently being harvested then return
         if (url != null && CurrentHarvests.contains(url)) {
             LOGGER.debug("The source is currently being harvested, so skipping it");
             return;
         }
-    
+
         try {
             HarvestSourceDAO harvestSourceDAO = DAOFactory.get().getDao(HarvestSourceDAO.class);
             HarvestSourceDTO harvestSource = harvestSourceDAO.getHarvestSourceByUrl(url);
@@ -395,7 +393,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
                 harvestSource.setUrl(url);
                 harvestSourceDAO.addSource(harvestSource);
             }
-    
+
             Harvest harvest = new PushHarvest(pushedContent, url);
             harvest.setHarvestUser(CRUser.APPLICATION.getUserName());
             executeHarvest(harvest);
@@ -412,15 +410,15 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
      * @throws DAOException
      */
     private void pullHarvest(HarvestSourceDTO harvestSource, boolean isUrgentHarvest) throws DAOException {
-    
+
         if (harvestSource != null) {
-    
+
             // if the source is currently being harvested then return
             if (CurrentHarvests.contains(harvestSource.getUrl())) {
                 LOGGER.debug("The source is currently being harvested, so skipping it");
                 return;
             }
-    
+
             PullHarvest harvest = new PullHarvest(harvestSource);
             harvest.setOnDemandHarvest(isUrgentHarvest);
             executeHarvest(harvest);
@@ -432,7 +430,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
      * @param harvest
      */
     private void executeHarvest(Harvest harvest) {
-    
+
         if (harvest != null) {
             CurrentHarvests.setQueuedHarvest(harvest);
             try {
@@ -519,16 +517,16 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
      * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet .ServletContextEvent)
      */
     public void contextInitialized(ServletContextEvent servletContextEvent) {
-    
+
         try {
             JobDetail jobDetails = new JobDetail(HarvestingJob.NAME, JobScheduler.class.getName(), HarvestingJob.class);
-    
+
             HarvestingJobListener listener = new HarvestingJobListener();
             jobDetails.addJobListener(listener.getName());
             JobScheduler.registerJobListener(listener);
-    
+
             JobScheduler.scheduleIntervalJob((long) getIntervalSeconds().intValue() * (long) 1000, jobDetails);
-    
+
             LOGGER.debug(getClass().getSimpleName() + " scheduled with interval seconds " + getIntervalSeconds()
                     + ", batch harvesting hours = " + getBatchHarvestingHours());
         } catch (Exception e) {

@@ -269,7 +269,7 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
                     warnings.append("</ul>");
                 }
                 if (!currentlyHarvested.isEmpty()){
-                    warnings.append("The following sources could not be deleted, because they are curently being harvested");
+                    warnings.append("The following sources could not be deleted, because they are curently being harvested: <ul>");
                     for (String url : currentlyHarvested) {
                         warnings.append("<li>").append(url).append("</li>");
                     }
