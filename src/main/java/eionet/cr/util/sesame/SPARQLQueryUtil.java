@@ -94,7 +94,8 @@ public class SPARQLQueryUtil {
     }
 
     /**
-     * Builds a comma-separated String of SPARQL aliases the given parameter values. Fills bindings with correct values. Example:
+     * Builds a comma-separated String of SPARQL aliases the given parameter values.
+     * Fills bindings with correct values. Example:
      * urisToCSV(List{<http://uri1.notexist.com>, <http://uri2.notexist.com>}, "subjectValue")= ?subjectValue1,subjectValue2.
      * bindings are filled: subjectValue1=http://uri1.notexist.com, subjectValue2=http://uri2.notexist.com
      *
@@ -107,6 +108,7 @@ public class SPARQLQueryUtil {
      * @return comma separated String for Sparql
      */
     public static String urisToCSV(Collection<String> uriList, String variableAliasName, Bindings bindings) {
+
         StringBuilder strBuilder = new StringBuilder();
         if (uriList != null) {
             int i = 1;
@@ -118,10 +120,14 @@ public class SPARQLQueryUtil {
                 // if URI contains spaces - use IRI() function that makes an IRI from URI and seems to work with spaces as well
                 if (uri.indexOf(' ') == -1) {
                     strBuilder.append("?" + alias);
-                    bindings.setURI(alias, uri);
+                    if (bindings!=null){
+                        bindings.setURI(alias, uri);
+                    }
                 } else {
                     strBuilder.append("IRI(?" + alias + ")");
-                    bindings.setString(alias, uri);
+                    if (bindings!=null){
+                        bindings.setString(alias, uri);
+                    }
                 }
                 i++;
             }

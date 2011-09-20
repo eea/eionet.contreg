@@ -115,7 +115,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
             logger.trace("Free-text search, getting the data of the found subjects");
 
             // get the subjects data
-            resultList = getSubjectsData(subjectUris, neededPredicates, dataReader, null);
+            resultList = getSubjectsData(subjectUris, neededPredicates, dataReader);
 
             // if paging required, get distinct subjects total match count
             if (pagingRequest != null) {
@@ -179,7 +179,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
             }
             // get the data of all found subjects
             logger.trace("Search by filters, getting the data of the found subjects");
-            resultList = getSubjectsData(subjectUris, neededPredicates, new SubjectDataReader(subjectUris), null);
+            resultList = getSubjectsData(subjectUris, neededPredicates, new SubjectDataReader(subjectUris));
         }
         // if paging required, get the total number of found subjects too
         if (pagingRequest != null) {
@@ -325,7 +325,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
             // get the data of all found subjects
             SubjectDataReader dataReader = new SubjectDataReader(subjectUris);
             dataReader.setBlankNodeUriPrefix(VirtuosoBaseDAO.BNODE_URI_PREFIX);
-            resultList = getSubjectsData(subjectUris, null, dataReader, null);
+            resultList = getSubjectsData(subjectUris, null, dataReader);
 
             // if paging required, get the total number of found subjects too
             if (pagingRequest != null) {
@@ -448,7 +448,9 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
             }
             // get the data of all found subjects
             logger.trace("Search by tags, getting the data of the found subjects");
-            resultList = getSubjectsData(subjectUris, neededPredicates, new SubjectDataReader(subjectUris), null, false, true);
+
+            SubjectDataReader subjectDataReader = new SubjectDataReader(subjectUris);
+            resultList = getSubjectsData(subjectUris, neededPredicates, subjectDataReader, false);
         }
         // if paging required, get the total number of found subjects too
         if (pagingRequest != null) {
@@ -557,7 +559,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
         List<String> typeUris = executeSPARQL(TYPES_CACHE_SPARQL, new SingleObjectReader<String>());
         String[] neededPredicates = {Predicates.RDFS_LABEL};
 
-        List<SubjectDTO> resultList = getSubjectsData(typeUris, neededPredicates, new SubjectDataReader(typeUris), null);
+        List<SubjectDTO> resultList = getSubjectsData(typeUris, neededPredicates, new SubjectDataReader(typeUris));
         return resultList;
     }
 }

@@ -86,7 +86,7 @@ public class VirtuosoUserHomeDAO extends VirtuosoBaseDAO implements UserHomeDAO 
             }
             // get the data of all found subjects
             logger.trace("Search folder contents, getting the data of the found subjects");
-            resultList = getSubjectsData(subjectUris, neededPredicates, new SubjectDataReader(subjectUris), null);
+            resultList = getSubjectsData(subjectUris, neededPredicates, new SubjectDataReader(subjectUris));
         }
         // if paging required, get the total number of found subjects too
         if (pagingRequest != null) {

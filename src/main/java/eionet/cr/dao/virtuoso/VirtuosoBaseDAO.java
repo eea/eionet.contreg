@@ -39,8 +39,6 @@ public abstract class VirtuosoBaseDAO {
     /** */
     protected Logger logger = Logger.getLogger(VirtuosoBaseDAO.class);
 
-    private Bindings bindings;
-
     /**
      *
      * @return
@@ -94,11 +92,13 @@ public abstract class VirtuosoBaseDAO {
      *            SPARQL
      * @param conn
      *            Virtuoso repository connection
-     * @param bindings Query bindings, if no bindings, null is accepted as the value
+     * @param bindings
+     *            Query bindings, if no bindings, null is accepted as the value
      * @throws DAOException
      *             if update fails
      */
-    protected void executeUpdateSPARQL(final String sparql, final RepositoryConnection conn, final Bindings bindings) throws DAOException {
+    protected void executeUpdateSPARQL(final String sparql, final RepositoryConnection conn, final Bindings bindings)
+    throws DAOException {
         try {
             SesameUtil.executeUpdateQuery(sparql, conn, bindings);
         } catch (Exception e) {
@@ -148,15 +148,15 @@ public abstract class VirtuosoBaseDAO {
      *            array of needed predicate URIs
      * @param reader
      *            subject reader
-     * @param graphUris
-     *            set of graphs
      * @return List<SubjectDTO> list of Subject data objects
      * @throws DAOException
      *             Default call of getSubjectsData() - SubjectDTO are created if not existing
      */
-    protected List<SubjectDTO> getSubjectsData(final Collection<String> subjectUris, final String[] predicateUris,
-            final SubjectDataReader reader, final Collection<String> graphUris) throws DAOException {
-        return getSubjectsData(subjectUris, predicateUris, reader, graphUris, true, false);
+    protected List<SubjectDTO> getSubjectsData(Collection<String> subjectUris, String[] predicateUris,
+            SubjectDataReader reader) throws DAOException {
+
+        boolean createMissingDTOs = true;
+        return getSubjectsData(subjectUris, predicateUris, reader, createMissingDTOs);
     }
 
     /**
@@ -168,25 +168,21 @@ public abstract class VirtuosoBaseDAO {
      *            array of predicates which data is requested
      * @param reader
      *            bindingset reader
-     * @param graphUris
-     *            Graphs which data is requested
      * @param createMissingDTOs
      *            indicates if to create a SubjectDTO object if it does not exist
-     * @param useInferencing
-     *            true if to use inferencing - (temporary until Virtuoso is fixed)
      * @return List<SubjectDTO> list of Subject data objects
      * @throws DAOException
      *             if query fails
      */
-    protected List<SubjectDTO> getSubjectsData(final Collection<String> subjectUris, final String[] predicateUris,
-            final SubjectDataReader reader, final Collection<String> graphUris, final boolean createMissingDTOs,
-            final boolean useInferencing) throws DAOException {
+    protected List<SubjectDTO> getSubjectsData(Collection<String> subjectUris, String[] predicateUris,
+            SubjectDataReader reader, boolean createMissingDTOs) throws DAOException {
 
         if (subjectUris == null || subjectUris.isEmpty()) {
             throw new IllegalArgumentException("Subjects collection must not be null or empty!");
         }
 
-        String query = getSubjectsDataQuery(subjectUris, predicateUris, graphUris, useInferencing);
+        Bindings bindings = new Bindings();
+        String query = getSubjectsDataQuery(subjectUris, predicateUris, bindings);
         executeSPARQL(query, bindings, reader);
 
         Map<Long, SubjectDTO> subjectsMap = reader.getSubjectsMap();
@@ -207,50 +203,34 @@ public abstract class VirtuosoBaseDAO {
     }
 
     /**
+     * Returns a SPARQL query that will retrieve the given subjects' given predicates.
+     * Predicates and graphs are optional.
+     *
      * @param subjectUris
-     *            - List of subjects the data is be queried
+     *            - collection of subjects whose data is being queried
      * @param predicateUris
-     *            - String [] list of predicates
-     * @param graphUris
-     *            - list of graphs where the data is queried (optional)
-     * @param useInferencing
-     *            - if to use inferencing in the query
-     * @return String SPARQL query
+     *            - array of predicates that are queried (if null or empty, no predicate filter is applied)
+     * @param bindings
+     *            - SPARQL variable bindings to fill when building the returned query
+     * @return String the SPARQL query
      */
-    private String getSubjectsDataQuery(final Collection<String> subjectUris, final String[] predicateUris,
-            final Collection<String> graphUris, final boolean useInferencing) {
-        String sparql = "";
-        // initiate this class bindings to prevent initiating it when it is not
-        // actually used
-        this.bindings = new Bindings();
+    private String getSubjectsDataQuery(Collection<String> subjectUris, String[] predicateUris, Bindings bindings) {
+
         if (subjectUris == null || subjectUris.isEmpty()) {
             throw new IllegalArgumentException("Subjects collection must not be null or empty!");
         }
 
-        if (useInferencing) {
-            sparql = SPARQLQueryUtil.getCrInferenceDefinition().toString();
-        }
-        // select * where {graph ?g {?s ?p ?o. filter (?s IN
-        // (<http://rod.eionet.europa.eu/obligations/130>,
-        // <http://rod.eionet.europa.eu/obligations/143>)
-        sparql +=
-            "select * where {graph ?g {?s ?p ?o. filter (?s IN ("
-            + SPARQLQueryUtil.urisToCSV(subjectUris, "subjectValue", bindings) + ")) ";
+        String commaSeparatedSubjects = SPARQLQueryUtil.urisToCSV(subjectUris, "subjectValue", bindings);
+        String query = "select * where {graph ?g {?s ?p ?o. filter (?s IN (" + commaSeparatedSubjects + ")) ";
 
         // if only certain predicates needed, add relevant filter
         if (predicateUris != null && predicateUris.length > 0) {
-            sparql +=
-                "filter (?p IN (" + SPARQLQueryUtil.urisToCSV(Arrays.asList(predicateUris), "predicateValue", bindings) + ")) ";
-
+            String commaSeparatedPredicates = SPARQLQueryUtil.urisToCSV(Arrays.asList(predicateUris), "predicateValue", bindings);
+            query += "filter (?p IN (" + commaSeparatedPredicates + ")) ";
         }
 
-        // if only certain graphs needed, add relevant filter
-        if (graphUris != null && graphUris.size() > 0) {
-            sparql += "filter (?g IN(" + SPARQLQueryUtil.urisToCSV(graphUris, "graphValue", bindings) + ")) ";
-        }
-
-        sparql += "}} ORDER BY ?s ?p";
-        return sparql;
+        query += "}} ORDER BY ?s ?p";
+        return query;
     }
 
     /**
@@ -272,10 +252,14 @@ public abstract class VirtuosoBaseDAO {
     /**
      * helper method to execute sql queries. Handles connection init, close. Wraps Exceptions into {@link DAOException}
      *
-     * @param <T> - type of the returned object
-     * @param sql - sql string
-     * @param params - parameters to insert into sql string
-     * @param reader - reader, to convert resultset
+     * @param <T>
+     *            - type of the returned object
+     * @param sql
+     *            - sql string
+     * @param params
+     *            - parameters to insert into sql string
+     * @param reader
+     *            - reader, to convert resultset
      * @return result of the sql query
      * @throws DAOException
      */
@@ -296,8 +280,10 @@ public abstract class VirtuosoBaseDAO {
     /**
      * executes insert or update with given sql and parameters.
      *
-     * @param sql - sql string to execute
-     * @param params - sql params
+     * @param sql
+     *            - sql string to execute
+     * @param params
+     *            - sql params
      * @throws DAOException
      */
     protected void executeSQL(String sql, List<?> params) throws DAOException {
