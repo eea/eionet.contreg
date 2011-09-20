@@ -105,11 +105,20 @@ public class UrgentHarvestQueue {
 
     /**
      *
-     * @return
+     * @return UrgentHarvestQueueItemDTO
      * @throws DAOException
      */
     public static synchronized UrgentHarvestQueueItemDTO poll() throws DAOException {
 
         return DAOFactory.get().getDao(UrgentHarvestQueueDAO.class).poll();
+    }
+
+    /**
+     *
+     * @return boolean
+     * @throws DAOException
+     */
+    public static synchronized boolean isInQueue(String url) {
+        return DAOFactory.get().getDao(UrgentHarvestQueueDAO.class).isInQueue(url);
     }
 }

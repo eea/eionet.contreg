@@ -22,6 +22,7 @@ package eionet.cr.dao.virtuoso;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -172,5 +173,35 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
         values.add(queueItem.getTimeAdded());
 
         SQLUtil.executeUpdate(deleteQueueItemSQL, values, conn);
+    }
+
+    /**
+     *
+     * @param url
+     * @throws DAOException
+     */
+    public boolean isInQueue(String url) {
+
+        boolean ret = false;
+        String sql = "select top 1 * from URGENT_HARVEST_QUEUE where URL = ?";
+        PreparedStatement ps = null;
+        Connection conn = null;
+        ResultSet rs = null;
+        try {
+            conn = getSQLConnection();
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, url);
+            rs = ps.executeQuery();
+            while(rs.next()) {
+                ret = true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            SQLUtil.close(conn);
+            SQLUtil.close(ps);
+        }
+        return ret;
     }
 }

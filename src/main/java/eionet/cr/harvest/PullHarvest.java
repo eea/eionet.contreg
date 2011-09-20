@@ -149,6 +149,7 @@ public class PullHarvest extends BaseHarvest {
 
                     // get redirected-to-url, throw exception if it's missing
                     String redirectedToUrl = getRedirectUrl(urlConn);
+                    addRedirectionUrl(connectUrl);
                     if (StringUtils.isBlank(redirectedToUrl)) {
                         throw new NoRedirectLocationException("Redirection response code wihtout \"Location\" header!");
                     }
@@ -201,6 +202,7 @@ public class PullHarvest extends BaseHarvest {
                 throw new HarvestException(e.getMessage(), e);
             }
         }
+        clearRedirections();
     }
 
     /**
@@ -604,7 +606,7 @@ public class PullHarvest extends BaseHarvest {
     /**
      *
      * @param url
-     * @return
+     * @return long
      * @throws DAOException
      */
     private long getLastHarvestTimestamp(String url) throws DAOException {
@@ -706,5 +708,18 @@ public class PullHarvest extends BaseHarvest {
      */
     public void setOnDemandHarvest(boolean isOnDemandHarvest) {
         this.isOnDemandHarvest = isOnDemandHarvest;
+    }
+
+    /**
+     * @see eionet.cr.harvest.BaseHarvest#isBeingHarvested(java.lang.String)
+     */
+    public boolean isBeingHarvested(String url) {
+        boolean ret = false;
+        if (url != null) {
+            if (url.equals(getContextUrl()) || (getRedirectedHarvests() != null && getRedirectedHarvests().contains(url))) {
+                ret = true;
+            }
+        }
+        return ret;
     }
 }

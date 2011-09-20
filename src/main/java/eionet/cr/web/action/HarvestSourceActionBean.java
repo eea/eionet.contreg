@@ -49,6 +49,7 @@ import eionet.cr.dao.HelperDAO;
 import eionet.cr.dto.HarvestDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.TripleDTO;
+import eionet.cr.harvest.CurrentHarvests;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.util.Pair;
@@ -531,9 +532,11 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param urlBefore the urlBefore to set
+     *
+     * @return boolean
      */
-    public void setUrlBefore(String urlBefore) {
-        this.urlBefore = urlBefore;
+    public boolean isCurrentlyHarvested() {
+        String uri = harvestSource == null ? null : harvestSource.getUrl();
+        return uri == null ? false : (CurrentHarvests.contains(uri) || UrgentHarvestQueue.isInQueue(uri));
     }
 }

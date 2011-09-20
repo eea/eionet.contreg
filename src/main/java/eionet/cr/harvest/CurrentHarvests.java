@@ -22,8 +22,6 @@ package eionet.cr.harvest;
 
 import java.util.HashMap;
 
-import org.apache.commons.lang.StringUtils;
-
 /**
  *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
@@ -90,7 +88,7 @@ public class CurrentHarvests {
             return false;
         }
 
-        if (queuedHarvest!=null && StringUtils.equals(url, queuedHarvest.getContextUrl())){
+        if (queuedHarvest != null && queuedHarvest.isBeingHarvested(url)){
             return true;
         }
 

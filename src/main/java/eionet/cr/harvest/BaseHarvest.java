@@ -90,6 +90,9 @@ public abstract class BaseHarvest implements Harvest {
     /** */
     private String harvestUser;
 
+    /** */
+    private List<String> redirectedHarvests;
+
     /**
      *
      * Class constructor.
@@ -547,5 +550,29 @@ public abstract class BaseHarvest implements Harvest {
      */
     protected void setStoredTriplesCount(int storedTriplesCount) {
         this.storedTriplesCount = storedTriplesCount;
+    }
+
+    /**
+     *
+     * @param url
+     */
+    protected void addRedirectionUrl(String url){
+        if (redirectedHarvests == null) {
+            redirectedHarvests = new ArrayList<String>();
+        }
+        redirectedHarvests.add(url);
+    }
+
+    /**
+     *
+     */
+    protected void clearRedirections(){
+        if (redirectedHarvests != null) {
+            redirectedHarvests.clear();
+        }
+    }
+
+    protected List<String> getRedirectedHarvests() {
+        return redirectedHarvests;
     }
 }

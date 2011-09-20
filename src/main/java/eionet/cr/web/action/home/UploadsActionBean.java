@@ -35,6 +35,8 @@ import eionet.cr.dto.SpoBinaryDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.dto.UploadDTO;
 import eionet.cr.filestore.FileStore;
+import eionet.cr.harvest.CurrentHarvests;
+import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.URIUtil;
 import eionet.cr.web.security.CRUser;
@@ -122,13 +124,19 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
                     return resolution;
                 }
 
+                String uri = getUploadedFileSubjectUri();
+
                 // check if the file exists
-                fileExists = DAOFactory.get().getDao(HelperDAO.class).isExistingSubject(getUploadedFileSubjectUri());
+                fileExists = DAOFactory.get().getDao(HelperDAO.class).isExistingSubject(uri);
 
                 // if file exists and replace not requested, report a warning
                 if (!replaceExisting && fileExists) {
-                    addWarningMessage("A file with such a name already exists!"
-                            + " Use \"replace existing\" checkbox to overwrite.");
+                    addWarningMessage("A file with such a name already exists! Use \"replace existing\" checkbox to overwrite.");
+                    return resolution;
+                }
+
+                if (uri != null && (CurrentHarvests.contains(uri) || UrgentHarvestQueue.isInQueue(uri))) {
+                    addWarningMessage("A file with such name is currently being harvested!");
                     return resolution;
                 }
 

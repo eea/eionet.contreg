@@ -50,4 +50,10 @@ public interface Harvest {
      * @return
      */
     int getStoredTriplesCount();
+
+    /**
+     * @param url
+     * @return boolean
+     */
+    boolean isBeingHarvested(String url);
 }

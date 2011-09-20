@@ -76,9 +76,6 @@ public class UploadHarvest extends BaseHarvest {
     /** */
     private FileBean fileBean;
 
-    /** */
-    private String userName;
-
     /**
      *
      * @param contextSourceDTO
@@ -98,7 +95,6 @@ public class UploadHarvest extends BaseHarvest {
 
         // assign fields
         this.fileBean = fileBean;
-        this.userName = userName;
 
         // set source metadata already detectable right now
         addSourceMetadata(Predicates.CR_BYTE_SIZE, ObjectDTO.createLiteral(String.valueOf(fileBean.getSize())));
@@ -372,6 +368,19 @@ public class UploadHarvest extends BaseHarvest {
     protected String getHarvestType(){
 
         return HarvestConstants.TYPE_PUSH;
+    }
+
+    /**
+     * @see eionet.cr.harvest.BaseHarvest#isBeingHarvested()
+     */
+    public boolean isBeingHarvested(String url) {
+        boolean ret = false;
+        if (url != null) {
+            if (url.equals(getContextUrl())) {
+                ret = true;
+            }
+        }
+        return ret;
     }
 
 }

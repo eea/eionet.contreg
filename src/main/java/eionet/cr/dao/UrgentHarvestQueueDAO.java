@@ -56,4 +56,10 @@ public interface UrgentHarvestQueueDAO extends DAO {
      * @throws DAOException
      */
     public abstract UrgentHarvestQueueItemDTO poll() throws DAOException;
+
+    /**
+     *
+     * @param url
+     */
+    public boolean isInQueue(String url);
 }

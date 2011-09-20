@@ -59,6 +59,7 @@ import eionet.cr.dto.TripleDTO;
 import eionet.cr.harvest.CurrentHarvests;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.OnDemandHarvester;
+import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SubjectDTOOptimizer;
@@ -649,7 +650,7 @@ public class FactsheetActionBean extends AbstractActionBean {
      */
     public boolean isCurrentlyHarvested() {
 
-        return uri == null ? false : CurrentHarvests.contains(uri);
+        return uri == null ? false : (CurrentHarvests.contains(uri) || UrgentHarvestQueue.isInQueue(uri));
     }
 
     /**
