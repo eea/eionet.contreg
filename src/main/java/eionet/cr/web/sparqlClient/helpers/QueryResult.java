@@ -99,7 +99,11 @@ public class QueryResult {
                         if (((Literal) value).getDatatype() != null) {
                             String type = ((Literal) value).getDatatype().stringValue();
                             type = type.replaceFirst("http://www.w3.org/2001/XMLSchema#", "xsd:");
-                            valueString = "\"" + valueString +"\"^^<" + type + ">";
+                            if (!type.startsWith("xsd:")) {
+                                type = "<" + type + ">";
+                            }
+
+                            valueString = "\"" + valueString +"\"^^" + type;
                         }
                     }
                     resultValue = new ResultValue(valueString, true);
