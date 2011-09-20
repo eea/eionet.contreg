@@ -24,8 +24,10 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLOutputFactory;
@@ -55,6 +57,7 @@ public class XmlExporter extends Exporter implements SubjectExportEvent {
 
     protected Map<String, XmlElementMetadata> elements = null;
     protected String[] elementKeys = null;
+    private Set<String> validNames = null;
 
     @Override
     protected InputStream doExport() throws ExportException, IOException, DAOException {
@@ -139,8 +142,10 @@ public class XmlExporter extends Exporter implements SubjectExportEvent {
 
         // create the elements map, where the key is element name in lowercase and the value is escaped element value
         elements = new LinkedHashMap<String, XmlElementMetadata>();
+        validNames = new HashSet<String>();
         // set Uri or Label element
-        elements.put(getUriOrLabel().toLowerCase(), new XmlElementMetadata(getUriOrLabel()));
+        elements.put(getUriOrLabel(), new XmlElementMetadata(getUriOrLabel()));
+        validNames.add(getUriOrLabel());
 
         // set other element names
         for (Pair<String, String> columnPair : getSelectedColumns()) {
@@ -149,8 +154,9 @@ public class XmlExporter extends Exporter implements SubjectExportEvent {
                 continue;
 
             String element = columnPair.getRight() != null ? columnPair.getRight() : columnPair.getLeft();
-            String elemName = Util.getUniqueElementName((XmlUtil.getEscapedElementName(element)), elements.keySet());
-            elements.put(elemName.toLowerCase(), new XmlElementMetadata(elemName));
+            String elemName = Util.getUniqueElementName((XmlUtil.getEscapedElementName(element)), validNames);
+            elements.put(elemName, new XmlElementMetadata(elemName));
+            validNames.add(elemName);
         }
     }
 
