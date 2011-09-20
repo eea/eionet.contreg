@@ -1,9 +1,11 @@
 package eionet.cr.web.sparqlClient.helpers;
 
 import java.io.OutputStream;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLOutputFactory;
@@ -37,6 +39,7 @@ public class CRXmlSchemaWriter implements TupleQueryResultWriter {
     protected static final String ROW_ELEMENT = "resources";
 
     private Map<String, XmlElementMetadata> elements = null;
+    private Set<String> validNames = null;
 
     /**
      * XMLWriter to write XML to.
@@ -46,6 +49,7 @@ public class CRXmlSchemaWriter implements TupleQueryResultWriter {
     public CRXmlSchemaWriter(OutputStream out) throws XMLStreamException, FactoryConfigurationError {
         writer = XMLOutputFactory.newInstance().createXMLStreamWriter(out, ENCODING);
         elements = new LinkedHashMap<String, XmlElementMetadata>();
+        validNames = new HashSet<String>();
     }
 
     public final TupleQueryResultFormat getTupleQueryResultFormat() {
@@ -56,8 +60,9 @@ public class CRXmlSchemaWriter implements TupleQueryResultWriter {
         try {
             for (String bindingName : bindingNames) {
 
-                String name = Util.getUniqueElementName((XmlUtil.getEscapedElementName(bindingName)), elements.keySet());
-                elements.put(name.toLowerCase(), new XmlElementMetadata(name));
+                String name = Util.getUniqueElementName((XmlUtil.getEscapedElementName(bindingName)), validNames);
+                validNames.add(name);
+                elements.put(bindingName, new XmlElementMetadata(name));
             }
 
             writer.writeStartDocument(ENCODING, "1.0");
@@ -91,7 +96,7 @@ public class CRXmlSchemaWriter implements TupleQueryResultWriter {
                     meta.setType(binding.getValue().stringValue());
                     meta.setMaxLength(binding.getValue().stringValue().length());
 
-                    writer.writeStartElement(binding.getName());
+                    writer.writeStartElement(meta.getName());
                     writer.writeCharacters(binding.getValue().stringValue());
                     writer.writeEndElement();
                 }
