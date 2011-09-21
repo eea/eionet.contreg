@@ -4,12 +4,15 @@
 
 <div id="leftcolumn" class="localnav">
     <ul>
+        <li><a href="documentation">Help and documentation</a></li>
         <li><a href="simpleSearch.action">Simple search</a></li>
         <li><a href="deliverySearch.action">Search deliveries</a></li>
         <li><a href="customSearch.action">Custom search</a></li>
         <li><a href="typeSearch.action">Type search</a></li>
+<!--
         <li><a href="spatialSearch.action">Spatial search</a></li>
         <li><a href="spatialSearch.action?googleEarthIntro">Google Earth link</a></li>
+-->
         <li><a href="tagSearch.action">Tag search</a></li>
         <li><a href="recentUploads.action">Recent uploads</a></li>
         <li><a href="sparql">SPARQL endpoint</a></li>

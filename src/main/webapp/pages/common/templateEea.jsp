@@ -148,7 +148,14 @@
                     	<jsp:include page="/pages/common/navigation.jsp"/>
                     	<ul>
                     		<li>
-                    			<stripes:link id="loginlink" title="Login" href="/login.action" event="login">Login</stripes:link>
+                                       <c:choose>
+                                            <c:when test="${empty crUser}">
+                                                <stripes:link id="loginlink" title="Login" href="/login.action" event="login">Login</stripes:link>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <stripes:link id="logoutlink" title="Logout" href="/login.action" event="logout">Logout ${crUser.userName}</stripes:link>
+                                            </c:otherwise>
+                                        </c:choose>
                     		</li>
                     	</ul>
 </dd>
