@@ -61,4 +61,5 @@ public interface HarvestMessageDAO extends DAO {
      * @throws DAOException
      */
     public void deleteMessage(Integer messageId) throws DAOException;
+
 }

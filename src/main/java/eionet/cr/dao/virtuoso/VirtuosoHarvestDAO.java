@@ -45,11 +45,10 @@ public class VirtuosoHarvestDAO extends VirtuosoBaseDAO implements HarvestDAO {
     /** */
     private static final String getHarvestByIdSQL = "select *, USERNAME as \"USER\" from HARVEST where HARVEST_ID=?";
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.dao.HarvestDAO#getHarvestById(java.lang.Integer)
+    /**
+     * {@inheritDoc}
      */
+    @Override
     public HarvestDTO getHarvestById(Integer harvestId) throws DAOException {
         List<Object> values = new ArrayList<Object>();
         values.add(harvestId);
@@ -57,11 +56,10 @@ public class VirtuosoHarvestDAO extends VirtuosoBaseDAO implements HarvestDAO {
         return list != null && list.size() > 0 ? list.get(0) : null;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.dao.HarvestDAO#getHarvestsBySourceId()
+    /**
+     * {@inheritDoc}
      */
+    @Override
     public List<HarvestDTO> getHarvestsBySourceId(Integer harvestSourceId) throws DAOException {
 
         int maxDistinctHarvests = 10;
@@ -81,6 +79,9 @@ public class VirtuosoHarvestDAO extends VirtuosoBaseDAO implements HarvestDAO {
         return executeSQL(getHarvestsBySourceIdSQL, values, new HarvestWithMessageTypesReader(maxDistinctHarvests));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<HarvestStatDTO> getLastHarvestStats(Integer limit) throws DAOException {
 
@@ -100,11 +101,10 @@ public class VirtuosoHarvestDAO extends VirtuosoBaseDAO implements HarvestDAO {
     private static final String getLastHarvestBySourceIdSQL = "select top 1 *, USERNAME as \"USER\""
         + " from HARVEST where HARVEST_SOURCE_ID=? order by HARVEST.STARTED desc";
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.dao.HarvestDAO#getLastHarvest(java.lang.Integer)
+    /**
+     * {@inheritDoc}
      */
+    @Override
     public HarvestDTO getLastHarvestBySourceId(Integer harvestSourceId) throws DAOException {
 
         List<Object> values = new ArrayList<Object>();
@@ -117,11 +117,10 @@ public class VirtuosoHarvestDAO extends VirtuosoBaseDAO implements HarvestDAO {
     private static final String insertStartedHarvestSQL =
         "insert into HARVEST (HARVEST_SOURCE_ID, TYPE, USERNAME, STATUS, STARTED) values (?, ?, ?, ?, now())";
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.dao.HarvestDAO#insertHarvest(int, java.lang.String, java.lang.String, java.lang.String)
+    /**
+     * {@inheritDoc}
      */
+    @Override
     public int insertStartedHarvest(int harvestSourceId, String harvestType, String user, String status) throws DAOException {
 
         List<Object> values = new ArrayList<Object>();
@@ -146,7 +145,7 @@ public class VirtuosoHarvestDAO extends VirtuosoBaseDAO implements HarvestDAO {
         "update HARVEST set STATUS=?, FINISHED=now(), TOT_STATEMENTS=? where HARVEST_ID=?";
 
     /**
-     *
+     * {@inheritDoc}
      */
     @Override
     public void updateFinishedHarvest(int harvestId, int noOfTriples) throws DAOException {
@@ -167,4 +166,12 @@ public class VirtuosoHarvestDAO extends VirtuosoBaseDAO implements HarvestDAO {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void deleteOldHarvests(int harvestId, int preserveRecent) throws DAOException {
+        // TODO Auto-generated method stub
+
+    }
 }

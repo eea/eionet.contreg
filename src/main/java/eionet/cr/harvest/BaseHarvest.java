@@ -198,6 +198,7 @@ public abstract class BaseHarvest implements Harvest {
             getHarvestSourceDAO().updateSourceHarvestFinished(getContextSourceDTO());
 
             // close harvest record, persist harvest messages
+            // TODO: delete sources messages, except last 10
             LOGGER.debug(loggerMsg("Updating harvest record, saving harvest messages"));
             getHarvestDAO().updateFinishedHarvest(harvestId, storedTriplesCount);
             for (HarvestMessageDTO messageDTO : harvestMessages){

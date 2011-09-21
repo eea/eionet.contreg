@@ -40,11 +40,10 @@ public class VirtuosoHarvestMessageDAO extends VirtuosoBaseDAO implements Harves
     /** */
     private static final String q_HarvestMessageByHarvestID = "select * from HARVEST_MESSAGE where HARVEST_ID=?";
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.dao.HarvestMessageDAO#findHarvestMessagesByHarvestID(java.lang.String)
+    /**
+     * {@inheritDoc}
      */
+    @Override
     public List<HarvestMessageDTO> findHarvestMessagesByHarvestID(int harvestID) throws DAOException {
         List<Object> values = new ArrayList<Object>();
         values.add(new Integer(harvestID));
@@ -54,11 +53,10 @@ public class VirtuosoHarvestMessageDAO extends VirtuosoBaseDAO implements Harves
     /** */
     private static final String q_HarvestMessageByMessageID = "select * from HARVEST_MESSAGE where HARVEST_MESSAGE_ID=?";
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.dao.HarvestMessageDAO#findHarvestMessageByMessageID(java.lang.String)
+    /**
+     * {@inheritDoc}
      */
+    @Override
     public HarvestMessageDTO findHarvestMessageByMessageID(int messageID) throws DAOException {
         List<Object> values = new ArrayList<Object>();
         values.add(new Integer(messageID));
@@ -70,11 +68,10 @@ public class VirtuosoHarvestMessageDAO extends VirtuosoBaseDAO implements Harves
     private static final String q_insertHarvestMessage =
         "insert into HARVEST_MESSAGE (HARVEST_ID, TYPE, MESSAGE, STACK_TRACE) values (?, ?, ?, ?)";
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.dao.HarvestMessageDAO#insertHarvestMessage(eionet.cr.dto.HarvestMessageDTO)
+    /**
+     * {@inheritDoc}
      */
+    @Override
     public Integer insertHarvestMessage(HarvestMessageDTO harvestMessageDTO) throws DAOException {
 
         if (harvestMessageDTO == null)
@@ -100,11 +97,10 @@ public class VirtuosoHarvestMessageDAO extends VirtuosoBaseDAO implements Harves
     /** */
     private static final String deleteHarvestMessageSQL = "delete from HARVEST_MESSAGE where HARVEST_MESSAGE_ID=?";
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.dao.HarvestMessageDao#deleteMessage()
+    /**
+     * {@inheritDoc}
      */
+    @Override
     public void deleteMessage(Integer messageId) throws DAOException {
 
         List<Object> values = new ArrayList<Object>();
@@ -120,4 +116,5 @@ public class VirtuosoHarvestMessageDAO extends VirtuosoBaseDAO implements Harves
             SQLUtil.close(conn);
         }
     }
+
 }

@@ -295,44 +295,6 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
         addSource(source);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.dao.HarvestSourceDAO#deleteHarvestHistory(int)
-     */
-    @Override
-    public void deleteHarvestHistory(int neededToRemain) throws DAOException {
-
-        Connection conn = null;
-        try {
-            conn = getSQLConnection();
-            conn.setAutoCommit(false);
-
-            Object o = SQLUtil.executeSingleReturnValueQuery("select max(HARVEST_ID) from HARVEST", conn);
-            Long maxId = o == null || StringUtils.isBlank(o.toString()) ? 0L : Long.valueOf(o.toString());
-
-            if (maxId > neededToRemain) {
-                SQLUtil.executeUpdate("delete from HARVEST where HARVEST_ID<=" + (maxId - neededToRemain), conn);
-            }
-
-            SQLUtil.executeUpdate("delete from HARVEST_MESSAGE where HARVEST_ID not in (select HARVEST_ID from HARVEST)", conn);
-
-            conn.commit();
-        } catch (SQLException e) {
-            SQLUtil.rollback(conn);
-            throw new DAOException(e.toString(), e);
-        } finally {
-            SQLUtil.close(conn);
-        }
-    }
-
-    /** */
-    private static final String DELETE_HARVEST_MESSAGES =  "delete from HARVEST_MESSAGE where HARVEST_ID in (" +
-    "select HARVEST_ID from HARVEST where HARVEST_SOURCE_ID in (" +
-    "select HARVEST_SOURCE_ID from HARVEST_SOURCE where URL_HASH=?))";
-    /** */
-    private static final String DELETE_HARVESTS =  "delete from HARVEST where HARVEST_SOURCE_ID in (" +
-    "select HARVEST_SOURCE_ID from HARVEST_SOURCE where URL_HASH=?)";
     /** */
     private static final String DELETE_HARVEST_SOURCES = "delete from HARVEST_SOURCE where URL_HASH=?";
     /** */
@@ -349,20 +311,16 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     private void removeHarvestSources(Collection<String> sourceUrls, Connection conn) throws SQLException{
 
         // We need to clear all references in:
-        // - harvest messages table
-        // - harvests table
+        // - harvest messages table (cascade deleted)
+        // - harvests table (cascade deleted)
         // - harvest sources table
         // - urgent harvest queue
         // - inference rule-set
 
-        PreparedStatement messagesDeleteStatement = null;
-        PreparedStatement harvestsDeleteStatement = null;
         PreparedStatement sourcesDeleteStatement = null;
         PreparedStatement urgentQueueDeleteStatement = null;
         PreparedStatement rulesetDeleteStatement = null;
         try{
-            messagesDeleteStatement = conn.prepareStatement(DELETE_HARVEST_MESSAGES);
-            harvestsDeleteStatement = conn.prepareStatement(DELETE_HARVESTS);
             sourcesDeleteStatement = conn.prepareStatement(DELETE_HARVEST_SOURCES);
             urgentQueueDeleteStatement = conn.prepareStatement(DELETE_FROM_URGENT_HARVEST_QUEUE);
             rulesetDeleteStatement = conn.prepareStatement(DELETE_FROM_RULESET);
@@ -371,29 +329,21 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
                 long urlHash = Hashes.spoHash(sourceUrl);
 
-                messagesDeleteStatement.setLong(1, urlHash);
-                harvestsDeleteStatement.setLong(1, urlHash);
                 sourcesDeleteStatement.setLong(1, urlHash);
                 urgentQueueDeleteStatement.setString(1, sourceUrl);
                 rulesetDeleteStatement.setString(1, GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME));
                 rulesetDeleteStatement.setString(2, sourceUrl);
 
-                messagesDeleteStatement.addBatch();
-                harvestsDeleteStatement.addBatch();
                 sourcesDeleteStatement.addBatch();
                 urgentQueueDeleteStatement.addBatch();
                 rulesetDeleteStatement.addBatch();
             }
 
-            messagesDeleteStatement.executeBatch();
-            harvestsDeleteStatement.executeBatch();
             sourcesDeleteStatement.executeBatch();
             urgentQueueDeleteStatement.executeBatch();
             rulesetDeleteStatement.executeBatch();
         }
         finally{
-            SQLUtil.close(messagesDeleteStatement);
-            SQLUtil.close(harvestsDeleteStatement);
             SQLUtil.close(sourcesDeleteStatement);
             SQLUtil.close(urgentQueueDeleteStatement);
             SQLUtil.close(rulesetDeleteStatement);

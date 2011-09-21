@@ -84,4 +84,15 @@ public interface HarvestDAO extends DAO {
      * @throws DAOException
      */
     public HarvestDTO getLastHarvestBySourceId(Integer harvestSourceId) throws DAOException;
+
+    /**
+     * Deletes all the old harvest of the current harvest's harvest source, except the most recent.
+     *
+     * @param harvestId
+     *            current harvest's id
+     * @param preserveRecent
+     *            nr of most recent messages to preserve
+     * @throws DAOException
+     */
+    public void deleteOldHarvests(int harvestId, int preserveRecent) throws DAOException;
 }

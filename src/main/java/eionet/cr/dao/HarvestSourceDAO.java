@@ -160,13 +160,6 @@ public interface HarvestSourceDAO extends DAO {
     public List<HarvestSourceDTO> getNextScheduledSources(int limit) throws DAOException;
 
     /**
-     * @param neededToRemain
-     * @throws DAOException
-     *             if relational database is unavailable.
-     */
-    void deleteHarvestHistory(int neededToRemain) throws DAOException;
-
-    /**
      * @return String
      * @throws DAOException
      *             if relational database is unavailable.
