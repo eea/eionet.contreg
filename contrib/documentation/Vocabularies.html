@@ -1,0 +1,135 @@
+<p>
+The Semantic Web establishes foreign key relationships automatically, 
+but you have to tell the system what vocabulary a given code
+is part of. The convention is to make the code into a URL by prefixing 
+it with a fixed string. Best practice is then to place a description of
+the code at the URL location to ensure the URL isn't used for something 
+else.
+</p>
+<p>
+The prefix must always end with a slash (/) or a hash (#). Then the 
+code. In the latter case (#), the code can't start with a number. The 
+RDF specification disallows it.
+</p>
+<h2 id="Vocabularies">Vocabularies</h2>
+<table class="datatable">
+<tbody>
+<tr>
+  <th scope="col">Vocabulary</th><th scope="col">Example</th><th scope="col">Label of example</th><th scope="col">Object type</th>
+</tr>
+
+<tr>
+<td style="text-align: left;">Airbase stations </td>
+  <td> <a href="factsheet.action?uri=http://rdfdata.eionet.europa.eu/airbase/stations/FR12028">http://rdfdata.eionet.europa.eu/airbase/stations/FR12028</a> </td>
+  <td> AVIGNONET-LAURAGAIS </td>
+  <td></td>
+</tr>
+<tr>
+<td style="text-align: left;">Biogeographical regions </td>
+  <td> <a href="factsheet.action?uri=http://rdfdata.eionet.europa.eu/eea/biogeographic-regions/ALP">http://rdfdata.eionet.europa.eu/eea/biogeographic-regions/ALP</a> </td>
+  <td> Alpine </td>
+  <td></td>
+</tr>
+<tr>
+<td style="text-align: left;">CAS codes </td>
+  <td> <a href="factsheet.action?uri=http://rdfdata.eionet.europa.eu/cas/1333-74-0">http://rdfdata.eionet.europa.eu/cas/1333-74-0</a> </td>
+  <td> Hydrogen </td>
+  <td></td>
+</tr>
+<tr>
+<td style="text-align: left;">Countries </td>
+  <td> <a href="factsheet.action?uri=http://rdfdata.eionet.europa.eu/eea/countries/DE">http://rdfdata.eionet.europa.eu/eea/countries/DE</a> </td>
+  <td> Germany </td>
+  <td><a href="references.action?search=&amp;uri=http://rdfdata.eionet.europa.eu/eea/ontology/Country">Country</a>
+  or <a href="references.action?search=&amp;uri=http://rdfdata.eionet.europa.eu/eea/ontology/CountryGroup">CountryGroup</a>
+  </td>
+</tr>
+<tr>
+  <td>EUNIS sites (incl. Natura 2000)</td>
+  <td><a href="factsheet.action?uri=http://eunis.eea.europa.eu/sites/SE0810333">http://eunis.eea.europa.eu/sites/SE0810333</a></td>
+  <td> Åmträskberget </td>
+  <td></td>
+</tr>
+<tr>
+<td style="text-align: left;">EUNIS species </td>
+  <td> <a href="factsheet.action?uri=http://eunis.eea.europa.eu/species/1367">http://eunis.eea.europa.eu/species/1367</a> </td>
+  <td>Canis lupus </td>
+  <td></td>
+</tr>
+<tr>
+<td style="text-align: left;">Eurostat country codes </td>
+  <td> <a href="factsheet.action?uri=http://ec.europa.eu/eurostat/ramon/rdfdata/countries/EL">http://ec.europa.eu/eurostat/ramon/rdfdata/countries/EL</a> </td>
+  <td> Greece </td>
+  <td><a href="references.action?search=&amp;uri=http://ec.europa.eu/eurostat/ramon/ontologies/geographic.rdf%23Country">Country</a>
+  or <a href="references.action?search=&amp;uri=http://ec.europa.eu/eurostat/ramon/ontologies/geographic.rdf%23CountryGroup">CountryGroup</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">GEMET concepts </td>
+  <td> <a href="factsheet.action?uri=http://www.eionet.europa.eu/gemet/concept/9151">http://www.eionet.europa.eu/gemet/concept/9151</a> </td>
+  <td> water body </td>
+  <td><a href="references.action?search=&amp;uri=http://www.w3.org/2004/02/skos/core%23Concept">Concept</a></td>
+</tr>
+<tr>
+  <td>Groundwater bodies (WISE)</td>
+  <td> <a href="factsheet.action?uri=http://rdfdata.eionet.europa.eu/wise/groundwaterbodies/BE_GW_BE120">http://rdfdata.eionet.europa.eu/wise/groundwaterbodies/BE_GW_BE120</a> </td>
+  <td> Calcaires et Grès de la Sambre </td>
+  <td></td>
+</tr>
+<tr>
+<td style="text-align: left;">IMS Indicator </td>
+  <td> <a href="factsheet.action?uri=http://www.eea.europa.eu/data-and-maps/indicators/eea32-persistent-organic-pollutant-pop-emissions-1">http://www.eea.europa.eu/data-and-maps/indicators/eea32-persistent-organic-pollutant-pop-emissions-1</a> </td>
+  <td> Persistent organic pollutant (POP) emissions (APE 006)
+  <td></td>
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">ISO-3166 country codes </td>
+  <td> <a href="factsheet.action?uri=http://rdfdata.eionet.europa.eu/iso3166/countries/GR">http://rdfdata.eionet.europa.eu/iso3166/countries/GR</a> </td>
+  <td> Greece </td>
+  <td></td>
+</tr>
+<tr>
+<td style="text-align: left;">NACE Rev. 2 codes </td>
+  <td> <a href="factsheet.action?uri=http://ec.europa.eu/eurostat/ramon/rdfdata/nace_r2/45.32">http://ec.europa.eu/eurostat/ramon/rdfdata/nace_r2/45.32</a> </td>
+  <td> Retail trade of motor vehicle parts and accessories </td>
+  <td></td>
+</tr>
+<tr>
+  <td>Eurostat NUTS 2008 edition</td>
+  <td> <a href="factsheet.action?uri=http://ec.europa.eu/eurostat/ramon/rdfdata/nuts2008/BG424">http://ec.europa.eu/eurostat/ramon/rdfdata/nuts2008/BG424</a> </td>
+  <td>Smolyan </td>
+  <td></td>
+</tr>
+<tr>
+  <td>NUTS Regions 2003 edition</td>
+  <td> <a href="factsheet.action?uri=http://rdfdata.eionet.europa.eu/ramon/nuts2003/AT125">http://rdfdata.eionet.europa.eu/ramon/nuts2003/AT125</a> </td>
+  <td>Weinviertel </td>
+  <td></td>
+</tr>
+<tr>
+  <td>NUTS Regions 2008 edition</td>
+  <td> <a href="factsheet.action?uri=http://rdfdata.eionet.europa.eu/ramon/nuts2008/BG424">http://rdfdata.eionet.europa.eu/ramon/nuts2008/BG424</a> </td>
+  <td>Smolyan </td>
+  <td></td>
+</tr>
+<tr>
+<td style="text-align: left;">Reporting obligations </td>
+  <td> <a href="factsheet.action?uri=http://rod.eionet.europa.eu/obligations/366">http://rod.eionet.europa.eu/obligations/366</a> </td>
+  <td> Report on major roads, railways, airports and agglomerations </td>
+  <td></td>
+</tr>
+<tr>
+  <td>River basin districts (WISE)</td>
+  <td> <a href="factsheet.action?uri=http://rdfdata.eionet.europa.eu/wise/rbd/NO5103">http://rdfdata.eionet.europa.eu/wise/rbd/NO5103</a> </td>
+  <td>South West </td>
+  <td><a href="references.action?search=&amp;uri=http://rdfdata.eionet.europa.eu/wise/ontology/RBD">RBD</a></td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="Note">Note</h2>
+<p>
+The vocabularies located at rdfdata.eionet.europa.eu are placed there 
+only because the owner does not have a proper location for them, or is 
+unable to participate in the Semantic Web.
+</p>
