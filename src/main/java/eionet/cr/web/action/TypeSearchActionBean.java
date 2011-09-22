@@ -181,7 +181,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
         ExportFormat format = ExportFormat.fromName(exportFormat);
         Exporter exporter = Exporter.getExporter(format);
 
-        exporter.setLanguages(getAcceptedLanguages() != null ? getAcceptedLanguages() : Collections.EMPTY_SET);
+        exporter.setLanguages(getAcceptedLanguages() != null ? getAcceptedLanguages() : Collections.EMPTY_LIST);
         List<Pair<String, String>> columnPairs = new LinkedList<Pair<String, String>>();
 
         exporter.setExportResourceUri(uriResourceIdentifier);

@@ -29,11 +29,15 @@ import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -45,6 +49,7 @@ import javax.servlet.jsp.PageContext;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.quartz.CronExpression;
 
 import eionet.cr.common.CRRuntimeException;
@@ -426,84 +431,45 @@ public class Util {
 
     /**
      *
-     * @param language
-     */
-    public static double getHTTPAcceptedLanguageImportance(String httpAcceptedLanguage) {
-        if (httpAcceptedLanguage.contains(";q=")) {
-            int j = httpAcceptedLanguage.indexOf(";q=");
-
-            String importanceValue = httpAcceptedLanguage.substring(j + 3, httpAcceptedLanguage.length());
-            try {
-                double returnValue = Double.parseDouble(importanceValue);
-                return returnValue;
-            } catch (Exception ex) {
-                return 0;
-            }
-        } else {
-            return 1;
-        }
-    }
-
-    /**
-     *
+     * @param acceptLanguageHeader
      * @return
      */
-    public static HashSet<String> getAcceptedLanguages(String acceptLanguageHeader) {
+    public static List<String> getAcceptedLanguages(String acceptLanguageHeader) {
 
-        HashSet<String> acceptedLanguages = null;
+        final HashMap<String,Double> languageMap = new LinkedHashMap<String,Double>();
+        if (!StringUtils.isBlank(acceptLanguageHeader)){
 
-        if (acceptedLanguages == null) {
+            String[] languageStrings = StringUtils.split(acceptLanguageHeader, ',');
+            for (int i = 0; i < languageStrings.length; i++) {
 
-            acceptedLanguages = new HashSet<String>();
+                String languageString = languageStrings[i].trim();
+                String languageCode = StringUtils.substringBefore(languageString, ";").trim();
+                if (!StringUtils.isEmpty(languageCode)){
 
-            if (!StringUtils.isBlank(acceptLanguageHeader)) {
-                String[] languages = StringUtils.split(acceptLanguageHeader, ',');
-                for (int i = 0; i < languages.length; i++) {
-                    acceptedLanguages.add(Util.normalizeHTTPAcceptedLanguage(languages[i]));
+                    String languageCodeUnrefined = StringUtils.split(languageCode, "-_")[0];
+                    String qualityString = StringUtils.substringAfter(languageString, ";").trim();
+                    double qualityValue = NumberUtils.toDouble(StringUtils.substringAfter(qualityString, "="), 1.0d);
+
+                    Double existingQualityValue = languageMap.get(languageCodeUnrefined);
+                    if (existingQualityValue==null || qualityValue > existingQualityValue){
+                        languageMap.put(languageCodeUnrefined, Double.valueOf(qualityValue));
+                    }
                 }
             }
-            acceptedLanguages.add("en");
-            acceptedLanguages.add("");
         }
 
-        return acceptedLanguages;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public static List<String> getAcceptedLanguagesByImportance(String acceptLanguageHeader) {
-
-        List<String> returnValues = new ArrayList<String>();
-
-        List<LanguagePrioritySorter> acceptedLanguagesByPriority = null;
-
-        if (acceptedLanguagesByPriority == null) {
-
-            acceptedLanguagesByPriority = new ArrayList<LanguagePrioritySorter>();
-
-            if (!StringUtils.isBlank(acceptLanguageHeader)) {
-                String[] languages = StringUtils.split(acceptLanguageHeader, ',');
-                for (int i = 0; i < languages.length; i++) {
-                    LanguagePrioritySorter languagePriority = new LanguagePrioritySorter();
-                    languagePriority.setPriority(Util.getHTTPAcceptedLanguageImportance(languages[i]));
-                    languagePriority.setLanguageValue(Util.normalizeHTTPAcceptedLanguage(languages[i]));
-                    acceptedLanguagesByPriority.add(languagePriority);
-                }
+        ArrayList<String> result = new ArrayList<String>(languageMap.keySet());
+        Collections.sort(result, new Comparator() {
+            public int compare(Object o1, Object o2) {
+                return (-1)*languageMap.get(o1).compareTo(languageMap.get(o2));
             }
+        });
 
-            Collections.sort(acceptedLanguagesByPriority);
-
-            for (int a = 0; a < acceptedLanguagesByPriority.size(); a++) {
-                returnValues.add(acceptedLanguagesByPriority.get(a).getLanguageValue());
-            }
-
-            returnValues.add("en");
-            returnValues.add("");
+        if (!result.contains("en")){
+            result.add("en");
         }
-
-        return returnValues;
+        result.add("");
+        return result;
     }
 
     /**
@@ -725,6 +691,13 @@ public class Util {
             }
         }
         return element;
+    }
 
+    public static void main(String[] args) {
+
+        System.out.println(Arrays.toString(StringUtils.split("jaanus", ";")));
+        System.out.println(StringUtils.substringBefore(";kala", ";"));
+        System.out.println(StringUtils.substringAfter("jaanuskala", ";"));
+        System.out.println(Double.valueOf(" 0.7 "));
     }
 }

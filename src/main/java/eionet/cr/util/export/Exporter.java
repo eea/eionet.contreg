@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -56,7 +55,7 @@ public abstract class Exporter {
 
     private ExportFormat exportFormat;
     private Map<String, String> selectedFilters;
-    private Set<String> languages;
+    private List<String> languages;
 
     // if true exports Resource uri, label otherwise.
     private boolean exportResourceUri;
@@ -220,16 +219,16 @@ public abstract class Exporter {
     /**
      * @return the languages
      */
-    public Set<String> getLanguages() {
+    public List<String> getLanguages() {
         return languages;
     }
 
     /**
-     * @param set
+     * @param languages
      *            the languages to set
      */
-    public void setLanguages(Set<String> set) {
-        this.languages = set;
+    public void setLanguages(List<String> languages) {
+        this.languages = languages;
     }
 
     /**

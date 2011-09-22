@@ -141,7 +141,7 @@ public class FactsheetActionBean extends AbstractActionBean {
             if (subject != null) {
 
                 if (getContext().getRequest().getParameter("nofilter") == null) {
-                    subject = SubjectDTOOptimizer.optimizeSubjectDTOFactsheetView(subject, getAcceptedLanguagesByImportance());
+                    subject = SubjectDTOOptimizer.optimizeSubjectDTOFactsheetView(subject, getAcceptedLanguages());
                 }
 
                 uri = subject.getUri();
@@ -510,14 +510,6 @@ public class FactsheetActionBean extends AbstractActionBean {
      */
     public void setSubject(final SubjectDTO subject) {
         this.subject = subject;
-    }
-
-    /**
-     * @param predicateLabels
-     *            the predicateLabels to set
-     */
-    public void setPredicateLabels(final Map<String, String> predicateLabels) {
-        this.predicateLabels = predicateLabels;
     }
 
     /**

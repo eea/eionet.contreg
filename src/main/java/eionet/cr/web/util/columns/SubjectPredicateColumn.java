@@ -21,7 +21,7 @@
 package eionet.cr.web.util.columns;
 
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.List;
 
 import net.sourceforge.stripes.action.UrlBinding;
 
@@ -45,7 +45,7 @@ public class SubjectPredicateColumn extends SearchResultColumn {
     private String predicateUri;
 
     /** */
-    private HashSet<String> languages;
+    private List<String> languages;
 
     /**
      *
@@ -189,14 +189,11 @@ public class SubjectPredicateColumn extends SearchResultColumn {
      *
      * @return
      */
-    private HashSet<String> getLanguages() {
+    private List<String> getLanguages() {
 
         if (languages == null) {
             if (actionBean != null) {
                 languages = actionBean.getAcceptedLanguages();
-            }
-            if (languages == null) {
-                languages = new HashSet<String>();
             }
         }
 

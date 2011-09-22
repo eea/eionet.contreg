@@ -22,7 +22,7 @@ package eionet.cr.util;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -54,8 +54,7 @@ public final class FormatUtils {
      *            Set<String> language codes
      * @return String
      */
-    public static String getObjectValuesForPredicate(final String predicateUri, final SubjectDTO subjectDTO,
-            final Set<String> languages) {
+    public static String getObjectValuesForPredicate(String predicateUri, SubjectDTO subjectDTO, List<String> languages) {
         String result = "";
 
         if (subjectDTO.getPredicateCount() > 0) {

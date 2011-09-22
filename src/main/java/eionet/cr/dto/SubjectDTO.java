@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -159,7 +160,7 @@ public class SubjectDTO implements Serializable {
      * @param preferHitSource
      * @return
      */
-    public Collection<ObjectDTO> getObjectsForSearchResultsDisplay(String predicateUri, Set<String> languages) {
+    public Collection<ObjectDTO> getObjectsForSearchResultsDisplay(String predicateUri, List<String> languages) {
 
         Collection<ObjectDTO> result = new ArrayList<ObjectDTO>();
         Collection<ObjectDTO> fromHitSources = new ArrayList<ObjectDTO>();

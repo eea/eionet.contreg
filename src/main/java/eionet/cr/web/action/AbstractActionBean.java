@@ -20,7 +20,6 @@
  */
 package eionet.cr.web.action;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -74,10 +73,10 @@ public abstract class AbstractActionBean implements ActionBean {
     protected DAOFactory factory = DAOFactory.get();
 
     /** */
-    private HashSet<String> acceptedLanguages;
-    private List<String> acceptedLanguagesByImportance;
+    private List<String> acceptedLanguages;
 
-    protected boolean homeContext;
+    /** */
+    protected boolean isHomeContext;
 
     /*
      * (non-Javadoc)
@@ -255,25 +254,12 @@ public abstract class AbstractActionBean implements ActionBean {
      *
      * @return an unsorted HashSet of languages.
      */
-    public HashSet<String> getAcceptedLanguages() {
+    public List<String> getAcceptedLanguages() {
 
         if (acceptedLanguages == null) {
             acceptedLanguages = Util.getAcceptedLanguages(getContext().getRequest().getHeader("Accept-Language"));
         }
         return acceptedLanguages;
-    }
-
-    /**
-     * Get the user's preferred languages from the browser's accept-language header ordered by priority.
-     *
-     * @return a sorted list of languages.
-     */
-    public List<String> getAcceptedLanguagesByImportance() {
-        if (acceptedLanguagesByImportance == null) {
-            acceptedLanguagesByImportance =
-                Util.getAcceptedLanguagesByImportance(getContext().getRequest().getHeader("Accept-Language"));
-        }
-        return acceptedLanguagesByImportance;
     }
 
     /**
@@ -291,12 +277,20 @@ public abstract class AbstractActionBean implements ActionBean {
         return null;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isHomeContext() {
-        return homeContext;
+        return isHomeContext;
     }
 
-    public void setHomeContext(boolean homeContext) {
-        this.homeContext = homeContext;
+    /**
+     *
+     * @param isHomeContext
+     */
+    public void setHomeContext(boolean isHomeContext) {
+        this.isHomeContext = isHomeContext;
     }
 
     public String getBaseUrl(CRActionBeanContext context) {

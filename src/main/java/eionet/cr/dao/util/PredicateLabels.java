@@ -22,6 +22,7 @@ package eionet.cr.dao.util;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
 import eionet.cr.util.Util;
@@ -62,7 +63,7 @@ public class PredicateLabels extends HashMap<String, HashMap<String, HashSet<Str
      * @param languages
      * @return
      */
-    public Map<String, String> getByLanguages(HashSet<String> languages) {
+    public Map<String, String> getByLanguages(List<String> languages) {
 
         Map<String, String> result = new HashMap<String, String>();
         if (languages != null && !languages.isEmpty()) {
