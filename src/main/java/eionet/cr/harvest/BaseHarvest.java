@@ -64,6 +64,8 @@ public abstract class BaseHarvest implements Harvest {
     /** */
     private static final Logger LOGGER = Logger.getLogger(BaseHarvest.class);
 
+    protected static final int PRESERVED_HARVEST_COUNT = 10;
+
     /** */
     private HelperDAO helperDAO = DAOFactory.get().getDao(HelperDAO.class);
     private HarvestDAO harvestDAO = DAOFactory.get().getDao(HarvestDAO.class);
@@ -198,7 +200,6 @@ public abstract class BaseHarvest implements Harvest {
             getHarvestSourceDAO().updateSourceHarvestFinished(getContextSourceDTO());
 
             // close harvest record, persist harvest messages
-            // TODO: delete sources messages, except last 10
             LOGGER.debug(loggerMsg("Updating harvest record, saving harvest messages"));
             getHarvestDAO().updateFinishedHarvest(harvestId, storedTriplesCount);
             for (HarvestMessageDTO messageDTO : harvestMessages){
@@ -232,6 +233,10 @@ public abstract class BaseHarvest implements Harvest {
                 LOGGER.debug(loggerMsg("Deriving new harvest sources"));
                 deriveNewHarvestSources();
             }
+
+            // delete old harvests history
+            LOGGER.debug(loggerMsg("Deleting old harvests history"));
+            getHarvestDAO().deleteOldHarvests(harvestId, PRESERVED_HARVEST_COUNT);
         }
         catch (DAOException e){
 

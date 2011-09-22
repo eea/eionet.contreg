@@ -450,6 +450,10 @@ public class PullHarvest extends BaseHarvest {
             // persist the redirected-to source
             getHarvestSourceDAO().addSource(redirectedToSourceDTO);
         }
+
+        // delete old harvests history
+        LOGGER.debug(loggerMsg("Deleting old redirected harvests history"));
+        getHarvestDAO().deleteOldHarvests(getHarvestId(), PRESERVED_HARVEST_COUNT);
     }
 
     /**
