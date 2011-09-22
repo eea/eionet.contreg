@@ -116,6 +116,9 @@ public class FactsheetActionBean extends AbstractActionBean {
     /** */
     private boolean subjectDownloadable;
 
+    /** */
+    private String bookmarkLabel;
+
     /**
      *
      * @return Resolution
@@ -267,7 +270,7 @@ public class FactsheetActionBean extends AbstractActionBean {
      */
     public Resolution addbookmark() throws DAOException {
         if (isUserLoggedIn()) {
-            DAOFactory.get().getDao(HelperDAO.class).addUserBookmark(getUser(), getUrl());
+            DAOFactory.get().getDao(HelperDAO.class).addUserBookmark(getUser(), getUrl(), bookmarkLabel);
             addSystemMessage("Succesfully bookmarked this source.");
         } else {
             addSystemMessage("Only logged in users can bookmark sources.");
@@ -718,6 +721,14 @@ public class FactsheetActionBean extends AbstractActionBean {
             return subject.getObject(Predicates.WGS_LAT).getValue();
         }
         return null;
+    }
+
+    public String getBookmarkLabel() {
+        return bookmarkLabel;
+    }
+
+    public void setBookmarkLabel(String bookmarkLabel) {
+        this.bookmarkLabel = bookmarkLabel;
     }
 
 }

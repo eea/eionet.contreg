@@ -294,7 +294,7 @@ public class CRUser {
         if (StringUtils.isBlank(userName) || StringUtils.isBlank(uri)) {
             throw new IllegalArgumentException("userName and uri must not be blank");
         } else {
-            return new StringBuilder(homeUri(userName)).append("/").append(Hashes.spoHash(uri)).toString();
+            return new StringBuilder(homeUri(userName)).append("/bookmarks/").append(Hashes.spoHash(uri)).toString();
         }
     }
 

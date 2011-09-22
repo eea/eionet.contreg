@@ -483,10 +483,10 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     /*
      * (non-Javadoc)
      *
-     * @see eionet.cr.dao.HelperDAO#registerUserUrl(eionet.cr.web.security.CRUser, java.lang.String, boolean)
+     * @see eionet.cr.dao.HelperDAO#registerUserUrl(eionet.cr.web.security.CRUser, java.lang.String, boolean, java.lang.String)
      */
     @Override
-    public void registerUserUrl(CRUser user, String url, boolean isBookmark) throws DAOException {
+    public void registerUserUrl(CRUser user, String url, boolean isBookmark, String label) throws DAOException {
 
         // input arguments sanity checking
         if (user == null || StringUtils.isBlank(user.getUserName())) {
@@ -540,7 +540,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
         if (isBookmark) {
             if (!isSubjectUserBookmark(user, url)) {
-                addUserBookmark(user, url);
+                addUserBookmark(user, url, label);
             }
         }
     }
@@ -548,10 +548,10 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     /*
      * (non-Javadoc)
      *
-     * @see eionet.cr.dao.HelperDAO#addUserBookmark(eionet.cr.web.security.CRUser, java.lang.String)
+     * @see eionet.cr.dao.HelperDAO#addUserBookmark(eionet.cr.web.security.CRUser, java.lang.String, java.lang.String)
      */
     @Override
-    public void addUserBookmark(CRUser user, String url) throws DAOException {
+    public void addUserBookmark(CRUser user, String url, String label) throws DAOException {
         if (user == null || StringUtils.isBlank(user.getUserName())) {
             throw new IllegalArgumentException("user must not be null and must have user name");
         }
@@ -560,9 +560,20 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         }
 
         SubjectDTO userHomeItemSubject = new SubjectDTO(user.getHomeItemUri(url), false);
+
         ObjectDTO objectDTO = new ObjectDTO(url, false);
         objectDTO.setSourceUri(user.getBookmarksUri());
         userHomeItemSubject.addObject(Predicates.CR_BOOKMARK, objectDTO);
+
+        ObjectDTO typeObjectDTO = new ObjectDTO(Predicates.CR_BOOKMARK_TYPE, false);
+        typeObjectDTO.setSourceUri(user.getBookmarksUri());
+        userHomeItemSubject.addObject(Predicates.RDF_TYPE, typeObjectDTO);
+
+        if (!StringUtils.isBlank(label)) {
+            ObjectDTO labelObjectDTO = new ObjectDTO(label, true);
+            labelObjectDTO.setSourceUri(user.getBookmarksUri());
+            userHomeItemSubject.addObject(Predicates.RDFS_LABEL, labelObjectDTO);
+        }
 
         addTriples(userHomeItemSubject);
 
@@ -578,10 +589,8 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     }
 
     /**
-     * @param user
-     *            CR user
-     * @throws DAOException
-     *             if query fails.
+     * @param user CR user
+     * @throws DAOException if query fails.
      */
     public void registerUserFolderInCrHomeContext(CRUser user) throws DAOException {
 
@@ -631,17 +640,14 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     @Override
     public void deleteUserBookmark(CRUser user, String url) throws DAOException {
 
-        TripleDTO triple = new TripleDTO(user.getHomeItemUri(url), Predicates.CR_BOOKMARK, url);
-
+        TripleDTO triple = new TripleDTO(user.getHomeItemUri(url), null, null);
         triple.setSourceUri(user.getBookmarksUri());
-        triple.setLiteralObject(false);
-
         deleteTriples(Collections.singletonList(triple));
 
     }
 
-    private static final String USER_BOOKMARKS_SPARQL = "select distinct ?bookmarkUrl from ?userBookmarksUri where { ?subject <"
-        + Predicates.CR_BOOKMARK + "> ?bookmarkUrl } order by ?bookmarkUrl";
+    private static final String USER_BOOKMARKS_SPARQL = "select distinct ?bookmarkUrl ?bookmarkLabel from ?userBookmarksUri where { ?subject <"
+        + Predicates.CR_BOOKMARK + "> ?bookmarkUrl . OPTIONAL {?subject <" + Predicates.RDFS_LABEL + "> ?bookmarkLabel }} order by ?bookmarkUrl";
 
     /*
      * (non-Javadoc)
@@ -665,10 +671,14 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
             while (queryResult.hasNext()) {
                 BindingSet bindingSet = queryResult.next();
-                Value objectValue = bindingSet.getValue("bookmarkUrl");
-                if (objectValue != null) {
+                Value urlValue = bindingSet.getValue("bookmarkUrl");
+                Value labelValue = bindingSet.getValue("bookmarkLabel");
+                if (urlValue != null) {
                     UserBookmarkDTO bookmark = new UserBookmarkDTO();
-                    bookmark.setBookmarkUrl(objectValue.stringValue());
+                    bookmark.setBookmarkUrl(urlValue.stringValue());
+                    if (labelValue != null) {
+                        bookmark.setBookmarkLabel(labelValue.stringValue());
+                    }
                     resultList.add(bookmark);
                 }
 
@@ -1408,7 +1418,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
             for (TripleDTO triple : triples) {
                 URI sub = conn.getValueFactory().createURI(triple.getSubjectUri());
-                URI pred = conn.getValueFactory().createURI(triple.getPredicateUri());
+                URI pred = triple.getPredicateUri() == null ? null : conn.getValueFactory().createURI(triple.getPredicateUri());
                 URI source = conn.getValueFactory().createURI(triple.getSourceUri());
                 String strObject = triple.getObject();
 

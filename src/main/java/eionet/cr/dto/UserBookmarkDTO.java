@@ -1,6 +1,7 @@
 package eionet.cr.dto;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 
 /**
  *
@@ -11,6 +12,9 @@ public class UserBookmarkDTO {
 
     /** */
     private String bookmarkUrl;
+
+    /** */
+    private String bookmarkLabel;
 
     /**
      *
@@ -34,5 +38,25 @@ public class UserBookmarkDTO {
      */
     public String getBookmarkUrlHtmlFormatted() {
         return StringEscapeUtils.escapeHtml(bookmarkUrl);
+    }
+
+    public String getBookmarkLabel() {
+        return bookmarkLabel;
+    }
+
+    public void setBookmarkLabel(String bookmarkLabel) {
+        this.bookmarkLabel = bookmarkLabel;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public String getBookmarkTitle() {
+        String ret = StringEscapeUtils.escapeXml(getBookmarkLabel());
+        if (StringUtils.isBlank(ret)) {
+            ret = getBookmarkUrl();
+        }
+        return ret;
     }
 }

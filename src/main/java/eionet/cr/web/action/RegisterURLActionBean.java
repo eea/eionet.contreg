@@ -44,6 +44,7 @@ import eionet.cr.web.util.RegisterUrl;
 public class RegisterURLActionBean extends AbstractActionBean {
 
     private String url;
+    private String label;
     private boolean bookmark = false;
 
     /**
@@ -66,7 +67,7 @@ public class RegisterURLActionBean extends AbstractActionBean {
     public Resolution save() throws DAOException, HarvestException {
 
         // register URL
-        RegisterUrl.register(url, getUser(), bookmark);
+        RegisterUrl.register(url, getUser(), bookmark, label);
         // go to factsheet in edit mode
         return new RedirectResolution(FactsheetActionBean.class, "edit").addParameter("uri", url);
     }
@@ -99,5 +100,9 @@ public class RegisterURLActionBean extends AbstractActionBean {
      */
     public void setBookmark(boolean bookmark) {
         this.bookmark = bookmark;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
     }
 }

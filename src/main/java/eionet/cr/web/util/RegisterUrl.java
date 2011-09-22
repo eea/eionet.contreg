@@ -22,26 +22,24 @@ public class RegisterUrl {
     /**
      * Register a URL.
      *
-     * @param url
-     *            - URL to register
-     * @param user
-     *            - Authentication object
-     * @param saveToBookmarks
-     *            - a flag to say whether to also create a bookmark in user's bookmarks
+     * @param url - URL to register
+     * @param user - Authentication object
+     * @param saveToBookmarks - a flag to say whether to also create a bookmark in user's bookmarks
+     * @param label - bookmark label
      * @throws DAOException
      * @throws HarvestException
      */
-    public static void register(String url, CRUser user, boolean saveToBookmarks) throws DAOException, HarvestException {
+    public static void register(String url, CRUser user, boolean saveToBookmarks, String label) throws DAOException, HarvestException {
         // register URL
-        DAOFactory.get().getDao(HelperDAO.class).registerUserUrl(user, url, saveToBookmarks);
+        DAOFactory.get().getDao(HelperDAO.class).registerUserUrl(user, url, saveToBookmarks, label);
 
         // add the URL into HARVEST_SOURCE
         // (the dao is responsible for handling if HARVEST_SOURCE already has such a URL)
 
         String urlWithoutFragment = StringUtils.substringBefore(url, "#");
         Integer intervalMinutes =
-                Integer.valueOf(GeneralConfig.getProperty(GeneralConfig.HARVESTER_REFERRALS_INTERVAL,
-                        String.valueOf(HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL)));
+            Integer.valueOf(GeneralConfig.getProperty(GeneralConfig.HARVESTER_REFERRALS_INTERVAL,
+                    String.valueOf(HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL)));
 
         HarvestSourceDTO source = new HarvestSourceDTO();
         source.setUrl(urlWithoutFragment);

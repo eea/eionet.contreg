@@ -162,21 +162,20 @@ public interface HelperDAO extends DAO {
 
     /**
      * @param user
-     *            TODO
      * @param url
      * @param isBookmark
-     * @throws DAOException
-     *             if query fails
+     * @param label
+     * @throws DAOException if query fails
      */
-    public void registerUserUrl(CRUser user, String url, boolean isBookmark) throws DAOException;
+    public void registerUserUrl(CRUser user, String url, boolean isBookmark, String label) throws DAOException;
 
     /**
      * @param user
      * @param url
-     * @throws DAOException
-     *             if query fails
+     * @param label
+     * @throws DAOException if query fails
      */
-    public void addUserBookmark(CRUser user, String url) throws DAOException;
+    public void addUserBookmark(CRUser user, String url, String label) throws DAOException;
 
     /**
      * @param user
