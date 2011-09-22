@@ -101,7 +101,7 @@
             <br/>
             <c:if test="${not empty actionBean.type}">
 
-            <div id="dialog" title="Export opetions">
+            <div id="dialog" title="Export options">
                 <crfn:form action="/typeSearch.action" method="post">
                     <stripes:hidden name="type" value="${actionBean.type }"/>
                     <fieldset style="border: 0px;">

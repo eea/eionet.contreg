@@ -5,7 +5,30 @@
 <stripes:layout-render name="/pages/common/template.jsp" pageTitle="Resource properties">
 
     <stripes:layout-component name="contents">
+		<script language="javascript">
+			( function($) {
+				$(document).ready(
+					function(){
+						// Open dialog
+						$("#add_bookmark").click(function() {
+							$('#bookmark_dialog').dialog('open');
+							return false;
+						});
 
+						// Dialog setup
+                        $('#bookmark_dialog').dialog({
+							autoOpen: false,
+							width: 500
+						});
+
+						// Close dialog
+						$("#bookmark_form_submit").click(function() {
+							$('#bookmark_dialog').dialog("close");
+							return true;
+						});
+					});
+			} ) ( jQuery );
+		</script>
         <c:choose>
             <c:when test="${!actionBean.noCriteria}">
 
@@ -105,10 +128,10 @@
 
                                         <c:if test="${sourceReadActionsAllowed}">
                                             <li>
-                                            <stripes:link class="link-plain" href="/source.action?view=&harvestSource.url=${ subjectUrl }">Source details</stripes:link>
+                                            	<stripes:link class="link-plain" href="/source.action?view=&harvestSource.url=${ subjectUrl }">Source details</stripes:link>
                                             </li>
                                             <li>
-                                            <stripes:link class="link-plain" href="/source.action?export=&harvestSource.url=${subjectUrl}">Export triples</stripes:link>
+                                            	<stripes:link class="link-plain" href="/source.action?export=&harvestSource.url=${subjectUrl}">Export triples</stripes:link>
                                             </li>
                                         </c:if>
                                         <c:if test="${downloadAllowed}">
@@ -118,19 +141,15 @@
                                         </c:if>
                                         <c:if test="${addBookmarkAllowed}">
                                             <li>
-                                            <stripes:link class="link-plain" href="/factsheet.action">Add bookmark
-                                            <stripes:param name="addbookmark" value="" />
-                                            <stripes:param name="uri" value="${ subjectUrl }" />
-                                            </stripes:link>
+	                                            <a href="#" id="add_bookmark">Add bookmark</a>
                                             </li>
                                         </c:if>
                                         <c:if test="${removeBookmarkAllowed}">
                                             <li>
-                                            <stripes:link class="link-plain" href="/factsheet.action">Remove bookmark
-                                            <stripes:param name="removebookmark" value="" />
-                                            <stripes:param name="uri" value="${ subjectUrl }" />
-                                            </stripes:link>
-
+	                                            <stripes:link class="link-plain" href="/factsheet.action">Remove bookmark
+	                                            	<stripes:param name="removebookmark" value="" />
+	                                            	<stripes:param name="uri" value="${ subjectUrl }" />
+                                            	</stripes:link>
                                             </li>
                                         </c:if>
                                         <c:if test="${addReviewAllowed}">
@@ -200,6 +219,16 @@
 
                             </crfn:form>
                         </div>
+                        <div id="bookmark_dialog" title="Add bookmark">
+			                <crfn:form action="/factsheet.action" method="post">
+			                    <stripes:hidden name="uri" value="${subjectUrl}"/>
+			                    <fieldset style="border: 0px;">
+			                        <label for="label" style="width: 200px; float: left;">Label</label>
+			                        <stripes:text name="bookmarkLabel" id="label" size="40"/>
+			                    </fieldset>
+			                    <stripes:submit name="addbookmark" value="Add bookmark" id="bookmark_form_submit" style="float: right;"/>
+			                </crfn:form>
+			            </div>
                     </c:when>
 
                     <%-- The section that is displayed if the subject does not yet exist in the database, --%>
