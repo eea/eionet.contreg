@@ -23,6 +23,7 @@ package eionet.cr.dao.readers;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 
 import eionet.cr.dto.HarvestStatDTO;
 import eionet.cr.util.sql.SQLResultSetBaseReader;
@@ -43,9 +44,15 @@ public class HarvestStatReader extends SQLResultSetBaseReader<HarvestStatDTO> {
 
         harvestStat.setHarvestId(harvestId);
         harvestStat.setSourceUrl(rs.getString("url"));
-        harvestStat.setDatetimeStarted(rs.getTimestamp("started"));
         harvestStat.setTotalStatements(new Integer(rs.getInt("tot_statements")));
-        harvestStat.setDuration(new Long(rs.getLong("duration")));
+
+        Timestamp started = rs.getTimestamp("started");
+        Timestamp finished = rs.getTimestamp("finished");
+        harvestStat.setDatetimeStarted(started);
+        if (started != null && finished != null) {
+            long duration = finished.getTime() - started.getTime();
+            harvestStat.setDuration(duration);
+        }
 
         if (harvestStat.getTotalStatements() > 0) {
             Long statementDuration = harvestStat.getDuration() / harvestStat.getTotalStatements();

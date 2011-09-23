@@ -135,6 +135,17 @@ public class Util {
             throw new CRRuntimeException("Failed to convert the given string to java.util.Date: " + e.toString(), e);
         }
     }
+
+    /**
+     *
+     * @return String
+     */
+    public static String currentDateAsString() {
+        SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        return sf.format(new java.util.Date());
+    }
+
+
     /**
      * Constant equals to 1000.
      */
