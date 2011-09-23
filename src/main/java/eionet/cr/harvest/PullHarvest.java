@@ -46,6 +46,7 @@ import org.apache.log4j.Logger;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.vocabulary.XMLSchema;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFParseException;
 import org.xml.sax.SAXException;
 
 import eionet.cr.common.Predicates;
@@ -244,8 +245,9 @@ public class PullHarvest extends BaseHarvest {
      */
     private void finishWithError(int responseCode, Exception exception) {
 
-        // source was not available if response could not be obtained, or it was an error code
-        boolean sourceNotAvailable = responseCode == NO_RESPONSE || isError(responseCode);
+        // source is unavailable if there was no response, or it was an error code, or the exception cause is RDFParseException
+        boolean isRDFParseException = exception!=null && (exception.getCause() instanceof  RDFParseException);
+        boolean sourceNotAvailable = responseCode == NO_RESPONSE || isError(responseCode) || isRDFParseException;
 
         // if source was not available, the new unavailability-count is increased by one, otherwise reset
         int countUnavail = sourceNotAvailable ? getContextSourceDTO().getCountUnavail() + 1 : 0;
@@ -376,7 +378,7 @@ public class PullHarvest extends BaseHarvest {
         try {
             downloadedFile = downloadFile(urlConn);
 
-            // if response content type is on of RDF, then proceed straight to loading,
+            // if response content type is one of RDF, then proceed straight to loading,
             // otherwise process the file to see if it's zipped, or it's an XML with RDF conversion,
             // or actually an RDF file
 
