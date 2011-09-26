@@ -116,6 +116,7 @@ public class PullHarvest extends BaseHarvest {
         String initialContextUrl = getContextUrl();
         HttpURLConnection urlConn = null;
         int responseCode = NO_RESPONSE;
+        String responseMessage = null;
         int noOfRedirections = 0;
 
         try {
@@ -130,11 +131,12 @@ public class PullHarvest extends BaseHarvest {
                 urlConn = openUrlConnection(connectUrl);
                 try {
                     responseCode = urlConn.getResponseCode();
+                    responseMessage = urlConn.getResponseMessage();
                 } catch (IOException ioe) {
                     // an error when connecting to server is considered a temporary error-
                     // don't throw it, but log in the database and exit
                     LOGGER.debug("Error when connecting to server: " + ioe);
-                    finishWithError(NO_RESPONSE, ioe);
+                    finishWithError(NO_RESPONSE, null, ioe);
                     return;
                 }
 
@@ -187,13 +189,13 @@ public class PullHarvest extends BaseHarvest {
 
             } else if (isError(responseCode)) {
                 LOGGER.debug(loggerMsg("Server returned error code " + responseCode));
-                finishWithError(responseCode, null);
+                finishWithError(responseCode, responseMessage, null);
             }
         } catch (Exception e) {
 
             LOGGER.debug(loggerMsg("Exception occurred (will be further logged by caller below): " + e.toString()));
             try {
-                finishWithError(responseCode, e);
+                finishWithError(responseCode, responseMessage, e);
             } catch (RuntimeException finishingException) {
                 LOGGER.error("Error when finishing up: ", finishingException);
             }
@@ -221,7 +223,7 @@ public class PullHarvest extends BaseHarvest {
         getContextSourceDTO().setCountUnavail(0);
 
         // add source metadata resulting from this harvest
-        addSourceMetadata(urlConn, 0, null);
+        addSourceMetadata(urlConn, 0, null, null);
 
         // since the harvest went OK, clean previously harvested metadata of this source
         setCleanAllPreviousSourceMetadata(true);
@@ -243,7 +245,7 @@ public class PullHarvest extends BaseHarvest {
      * @param responseCode
      * @param exception
      */
-    private void finishWithError(int responseCode, Exception exception) {
+    private void finishWithError(int responseCode, String responseMessage, Exception exception) {
 
         // source is unavailable if there was no response, or it was an error code, or the exception cause is RDFParseException
         boolean isRDFParseException = exception!=null && (exception.getCause() instanceof  RDFParseException);
@@ -273,11 +275,15 @@ public class PullHarvest extends BaseHarvest {
         // add harvest message about the given response code, if it's an error code (because it could also be
         // a "no response" code, meaning an exception was raised before the response code could be obtained)
         if (isError(responseCode)) {
-            addHarvestMessage("Server returned error code " + responseCode, HarvestMessageType.ERROR);
+            if (responseMessage == null) {
+                responseMessage = "";
+            }
+            addHarvestMessage("Server returned error: " + responseMessage + " (HTTP response code: " + responseCode + ")",
+                    HarvestMessageType.ERROR);
         }
 
         // add source metadata resulting from this harvest
-        addSourceMetadata(null, responseCode, exception);
+        addSourceMetadata(null, responseCode, responseMessage, exception);
 
         // if permanent error, clean previously harvested metadata of this source,
         // and also clean all previously harvested content of this source
@@ -315,7 +321,7 @@ public class PullHarvest extends BaseHarvest {
      * @param exception
      * @throws DAOException
      */
-    private void addSourceMetadata(HttpURLConnection urlConn, int responseCode, Exception exception) {
+    private void addSourceMetadata(HttpURLConnection urlConn, int responseCode, String responseMessage, Exception exception) {
 
         String firstSeen = formatDate(getContextSourceDTO().getTimeCreated());
         String lastRefreshed = formatDate(new Date());
@@ -324,8 +330,12 @@ public class PullHarvest extends BaseHarvest {
         addSourceMetadata(Predicates.CR_LAST_REFRESHED, ObjectDTO.createLiteral(lastRefreshed, XMLSchema.DATETIME));
 
         if (isError(responseCode)) {
+            if (responseMessage == null) {
+                responseMessage = "";
+            }
             addSourceMetadata(Predicates.CR_ERROR_MESSAGE,
-                    ObjectDTO.createLiteral("Server returned the following error code: " + responseCode));
+                    ObjectDTO.createLiteral("Server returned error: " + responseMessage + " (HTTP response code: "
+                            + responseCode + ")"));
         } else if (exception != null) {
             addSourceMetadata(Predicates.CR_ERROR_MESSAGE, ObjectDTO.createLiteral(exception.toString()));
         }

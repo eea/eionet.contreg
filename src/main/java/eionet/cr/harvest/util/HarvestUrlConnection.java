@@ -33,6 +33,7 @@ public class HarvestUrlConnection {
     private ConnectionError error;
 
     private int responseCode = 0;
+    private String responseMessage;
 
     InputStream inputStream = null;
     private boolean sourceAvailable = false;
@@ -94,14 +95,15 @@ public class HarvestUrlConnection {
                 sourceNotExistMessage = "IP address of the host could not be determined";
                 error = new ConnectionError(ErrType.TEMPORARY, 000, sourceNotExistMessage);
             } else if (httpConnection) {
+                responseMessage = urlConnection.getResponseMessage();
                 responseCode = urlConnection.getResponseCode();
                 if (responseCode == 400 || (responseCode >= 402 && responseCode <= 407)
                         || (responseCode >= 409 && responseCode <= 417) || responseCode == 501 || responseCode == 505) {
-                    sourceNotExistMessage = "Permanent error: Got HTTP response code " + responseCode;
+                    sourceNotExistMessage = "Permanent error: " + responseMessage + " (HTTP response code " + responseCode + ")";
                     error = new ConnectionError(ErrType.PERMANENT, responseCode, sourceNotExistMessage);
                 } else if (responseCode == 401 || responseCode == 408 || responseCode == 500
                         || (responseCode >= 502 && responseCode <= 504)) {
-                    sourceNotExistMessage = "Temporary error: Got HTTP response code " + responseCode;
+                    sourceNotExistMessage = "Temporary error: " + responseMessage + " (HTTP response code " + responseCode + ")";
                     error = new ConnectionError(ErrType.TEMPORARY, responseCode, sourceNotExistMessage);
                 }
 
@@ -237,6 +239,10 @@ public class HarvestUrlConnection {
 
     public ConnectionError getError() {
         return error;
+    }
+
+    public String getResponseMessage() {
+        return responseMessage;
     }
 
 }
