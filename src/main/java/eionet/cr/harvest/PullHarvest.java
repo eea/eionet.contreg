@@ -205,6 +205,9 @@ public class PullHarvest extends BaseHarvest {
                 throw new HarvestException(e.getMessage(), e);
             }
         }
+        finally{
+            URLUtil.disconnect(urlConn);
+        }
         clearRedirections();
     }
 
@@ -540,6 +543,7 @@ public class PullHarvest extends BaseHarvest {
         } finally {
             IOUtils.closeQuietly(inputStream);
             IOUtils.closeQuietly(outputStream);
+            URLUtil.disconnect(urlConn);
         }
 
         return file;
