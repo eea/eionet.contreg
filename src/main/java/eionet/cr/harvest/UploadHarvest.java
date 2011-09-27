@@ -369,18 +369,4 @@ public class UploadHarvest extends BaseHarvest {
 
         return HarvestConstants.TYPE_PUSH;
     }
-
-    /**
-     * @see eionet.cr.harvest.BaseHarvest#isBeingHarvested()
-     */
-    public boolean isBeingHarvested(String url) {
-        boolean ret = false;
-        if (url != null) {
-            if (url.equals(getContextUrl())) {
-                ret = true;
-            }
-        }
-        return ret;
-    }
-
 }

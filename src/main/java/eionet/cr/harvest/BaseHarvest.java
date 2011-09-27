@@ -92,9 +92,6 @@ public abstract class BaseHarvest implements Harvest {
     /** */
     private String harvestUser;
 
-    /** */
-    private List<String> redirectedHarvests;
-
     /**
      *
      * Class constructor.
@@ -558,27 +555,13 @@ public abstract class BaseHarvest implements Harvest {
         this.storedTriplesCount = storedTriplesCount;
     }
 
-    /**
-     *
-     * @param url
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.harvest.Harvest#isBeingHarvested(java.lang.String)
      */
-    protected void addRedirectionUrl(String url){
-        if (redirectedHarvests == null) {
-            redirectedHarvests = new ArrayList<String>();
-        }
-        redirectedHarvests.add(url);
-    }
+    @Override
+    public boolean isBeingHarvested(String url){
 
-    /**
-     *
-     */
-    protected void clearRedirections(){
-        if (redirectedHarvests != null) {
-            redirectedHarvests.clear();
-        }
-    }
-
-    protected List<String> getRedirectedHarvests() {
-        return redirectedHarvests;
+        return url!=null && StringUtils.equals(url, contextUrl);
     }
 }

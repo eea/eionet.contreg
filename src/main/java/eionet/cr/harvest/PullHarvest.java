@@ -36,7 +36,9 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -89,6 +91,9 @@ public class PullHarvest extends BaseHarvest {
 
     /** */
     private boolean isOnDemandHarvest;
+
+    /** */
+    private List<String> redirectedFromUrls = new ArrayList<String>();
 
     /**
      * @param contextUrl
@@ -152,7 +157,7 @@ public class PullHarvest extends BaseHarvest {
 
                     // get redirected-to-url, throw exception if it's missing
                     String redirectedToUrl = getRedirectUrl(urlConn);
-                    addRedirectionUrl(connectUrl);
+                    redirectedFromUrls.add(connectUrl);
                     if (StringUtils.isBlank(redirectedToUrl)) {
                         throw new NoRedirectLocationException("Redirection response code wihtout \"Location\" header!");
                     }
@@ -208,7 +213,6 @@ public class PullHarvest extends BaseHarvest {
         finally{
             URLUtil.disconnect(urlConn);
         }
-        clearRedirections();
     }
 
     /**
@@ -733,13 +737,10 @@ public class PullHarvest extends BaseHarvest {
     /**
      * @see eionet.cr.harvest.BaseHarvest#isBeingHarvested(java.lang.String)
      */
+    @Override
     public boolean isBeingHarvested(String url) {
-        boolean ret = false;
-        if (url != null) {
-            if (url.equals(getContextUrl()) || (getRedirectedHarvests() != null && getRedirectedHarvests().contains(url))) {
-                ret = true;
-            }
-        }
-        return ret;
+
+        boolean result = super.isBeingHarvested(url);
+        return result==true ? result : redirectedFromUrls.contains(url);
     }
 }
