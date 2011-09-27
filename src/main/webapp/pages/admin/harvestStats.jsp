@@ -24,7 +24,7 @@
                 <display:column title="Duration (ms)" sortable="true" sortProperty="duration">
                     <c:choose>
                         <c:when test="${item.duration == '0'}">
-                            <c:out value="< 1 s" />
+                            <c:out value="< 1000" />
                         </c:when>
                         <c:otherwise>
                             ${item.duration}
@@ -35,7 +35,7 @@
                 <display:column title="Duration/statement (ms)" sortable="true" sortProperty="statementDuration">
                     <c:choose>
                         <c:when test="${item.statementDuration == '0'}">
-                            <c:out value="< 1 s" />
+                            <c:out value="< 1000" />
                         </c:when>
                         <c:otherwise>
                             ${item.statementDuration}
