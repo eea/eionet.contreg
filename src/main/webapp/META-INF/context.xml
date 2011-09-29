@@ -3,7 +3,7 @@
 
     <Logger className="org.apache.catalina.logger.FileLogger" timestamp="true" suffix=".txt" prefix="cr3." />
 
-    <Resource name="jdbc/readWriteRepo"
+    <!--Resource name="jdbc/readWriteRepo"
                 auth="Container"
                 type="javax.sql.DataSource"
                 maxActive="100"
@@ -25,6 +25,6 @@
                 password="${virtuoso.db.ropwd}"
                 driverClassName="${virtuoso.db.drv}"
                 url="${virtuoso.db.url}">
-    </Resource>
+    </Resource-->
 
 </Context>
