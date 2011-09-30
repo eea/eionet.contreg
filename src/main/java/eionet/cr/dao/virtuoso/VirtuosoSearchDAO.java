@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.Vector;
 
 import org.apache.commons.lang.StringUtils;
+import org.displaytag.properties.SortOrderEnum;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.dao.DAOException;
@@ -18,22 +19,27 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.helpers.FreeTextSearchHelper.FilterType;
+import eionet.cr.dao.readers.DeliverySearchReader;
 import eionet.cr.dao.readers.FreeTextSearchReader;
 import eionet.cr.dao.readers.SubjectDataReader;
 import eionet.cr.dao.util.BBOX;
 import eionet.cr.dao.util.SearchExpression;
+import eionet.cr.dao.virtuoso.helpers.VirtuosoDeliveriesSearchHelper;
 import eionet.cr.dao.virtuoso.helpers.VirtuosoFilteredSearchHelper;
 import eionet.cr.dao.virtuoso.helpers.VirtuosoFreeTextSearchHelper;
 import eionet.cr.dao.virtuoso.helpers.VirtuosoReferencesSearchHelper;
 import eionet.cr.dao.virtuoso.helpers.VirtuosoSearchBySourceHelper;
+import eionet.cr.dto.DeliveryDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Bindings;
 import eionet.cr.util.Pair;
+import eionet.cr.util.SortOrder;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.Util;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.util.sql.SingleObjectReader;
 import eionet.cr.util.sql.VirtuosoFullTextQuery;
+import eionet.cr.web.util.CustomPaginatedList;
 
 /**
  * DAO methods for search in Virtuoso.
@@ -192,6 +198,49 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
 
         // the result Pair contains total number of subjects and the requested sub-list
         return new Pair<Integer, List<SubjectDTO>>(totalRowCount, resultList);
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see eionet.cr.dao.SearchDAO#searchDeliveries(java.lang.String, java.lang.String, java.lang.String,
+     * eionet.cr.util.pagination.PagingRequest, eionet.cr.util.SortingRequest)
+     */
+    @Override
+    public CustomPaginatedList<DeliveryDTO> searchDeliveries(String obligation, String locality, String year, String sortCol,
+            PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException {
+
+        CustomPaginatedList<DeliveryDTO> ret = new CustomPaginatedList<DeliveryDTO>();
+
+        VirtuosoDeliveriesSearchHelper helper =
+            new VirtuosoDeliveriesSearchHelper(obligation, locality, year, pagingRequest, sortingRequest);
+
+        // let the helper create the query and fill IN parameters
+        ArrayList<Object> inParams = new ArrayList<Object>();
+        String query = helper.getQuery(inParams);
+
+        List<String> subjectUris = executeSPARQL(query, new SingleObjectReader<String>());
+
+        String valuesQuery = helper.getValuesQuery(subjectUris);
+
+        DeliverySearchReader reader = new DeliverySearchReader();
+        if (!StringUtils.isBlank(valuesQuery)) {
+            executeSPARQL(valuesQuery, reader);
+        }
+        Map<String, DeliveryDTO> resultMap = reader.getMap();
+
+        ret.setList(getOrderedList(subjectUris, resultMap));
+        ret.setFullListSize(getExactRowCount(helper));
+        ret.setPageNumber(pagingRequest.getPageNumber());
+        ret.setSortCriterion(sortCol);
+        ret.setObjectsPerPage(pagingRequest.getItemsPerPage());
+        if (sortingRequest.getSortOrder().equals(SortOrder.ASCENDING)) {
+            ret.setSortDirection(SortOrderEnum.ASCENDING);
+        } else if (sortingRequest.getSortOrder().equals(SortOrder.DESCENDING)) {
+            ret.setSortDirection(SortOrderEnum.DESCENDING);
+        }
+
+        return ret;
     }
 
     /*

@@ -48,9 +48,15 @@
 
             </crfn:form>
         </div>
-
+		<br/>
         <c:if test="${not empty param.search}">
-            <stripes:layout-render name="/pages/common/subjectsResultList.jsp" tableClass="sortable"/>
+        	<display:table name="${actionBean.deliveries}" class="sortable" sort="external" id="listItem" htmlId="resourcesResultList" requestURI="/deliverySearch.action" decorator="eionet.cr.web.util.DeliverySearchTableDecorator">
+				<display:column property="title" title="Title" sortable="true"/>
+				<display:column property="fileCnt" title="Files"/>
+				<display:column property="period" title="Period" sortable="true"/>
+				<display:column property="locality" title="Locality"/>
+				<display:column property="date" title="Date" sortable="true"/>
+			</display:table>
         </c:if>
 
     </stripes:layout-component>

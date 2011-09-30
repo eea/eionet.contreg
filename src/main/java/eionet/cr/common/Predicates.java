@@ -63,6 +63,7 @@ public interface Predicates {
     public static final String ROD_HAS_FILE = "http://rod.eionet.europa.eu/schema.rdf#hasFile";
     public static final String ROD_PRODUCT_OF = "http://rod.eionet.europa.eu/schema.rdf#productOf";
     public static final String ROD_PERIOD = "http://rod.eionet.europa.eu/schema.rdf#period";
+    public static final String ROD_RELEASED = "http://rod.eionet.europa.eu/schema.rdf#released";
 
     public static final String CR_FIRSTSEEN_TIME = "urn:eionet:contreg:firstseen-time";
     public static final String CR_URL = "urn:eionet:contreg:url";

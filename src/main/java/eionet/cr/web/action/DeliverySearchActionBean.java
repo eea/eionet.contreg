@@ -31,32 +31,26 @@ import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
-
-import org.apache.commons.lang.StringUtils;
-
 import eionet.cr.common.Predicates;
-import eionet.cr.common.Subjects;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.util.UriLabelPair;
-import eionet.cr.dto.SubjectDTO;
+import eionet.cr.dto.DeliveryDTO;
 import eionet.cr.util.ObjectLabelPair;
-import eionet.cr.util.Pair;
 import eionet.cr.util.SortOrder;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.web.util.ApplicationCache;
-import eionet.cr.web.util.columns.SearchResultColumn;
-import eionet.cr.web.util.columns.SubjectPredicateColumn;
+import eionet.cr.web.util.CustomPaginatedList;
 
 /**
  *
- * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
+ * @author altnyris
  *
  */
 @UrlBinding("/deliverySearch.action")
-public class DeliverySearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
+public class DeliverySearchActionBean extends DisplaytagSearchActionBean {
 
     /** */
     private List<String> years;
@@ -65,6 +59,15 @@ public class DeliverySearchActionBean extends AbstractSearchActionBean<SubjectDT
     private String obligation;
     private String locality;
     private String year;
+
+    private CustomPaginatedList<DeliveryDTO> deliveries;
+
+    private static final Map<String, String> columns = new HashMap<String, String>();
+    static {
+        columns.put("title", Predicates.RDFS_LABEL);
+        columns.put("period", Predicates.ROD_PERIOD);
+        columns.put("date", Predicates.ROD_RELEASED);
+    }
 
     /**
      *
@@ -82,37 +85,15 @@ public class DeliverySearchActionBean extends AbstractSearchActionBean<SubjectDT
      */
     public Resolution search() throws DAOException {
 
-        Pair<Integer, List<SubjectDTO>> customSearch =
-            DAOFactory
-            .get()
-            .getDao(SearchDAO.class)
-            .searchByFilters(buildSearchCriteria(), false, PagingRequest.create(getPageN()),
-                    new SortingRequest(getSortP(), SortOrder.parse(getSortO())), null, false);
-        resultList = customSearch.getRight();
-        matchCount = customSearch.getLeft();
+        deliveries = DAOFactory.get().getDao(SearchDAO.class).searchDeliveries(
+                obligation,
+                locality,
+                year,
+                sort,
+                PagingRequest.create(page),
+                new SortingRequest(columns.get(sort), SortOrder.parse(dir)));
 
         return new ForwardResolution("/pages/deliverySearch.jsp");
-    }
-
-    /**
-     *
-     * @return
-     */
-    private Map<String, String> buildSearchCriteria() {
-
-        Map<String, String> result = new HashMap<String, String>();
-
-        result.put(Predicates.RDF_TYPE, Subjects.ROD_DELIVERY_CLASS);
-        if (!StringUtils.isBlank(obligation))
-            result.put(Predicates.ROD_OBLIGATION_PROPERTY, obligation);
-
-        if (!StringUtils.isBlank(locality))
-            result.put(Predicates.ROD_LOCALITY_PROPERTY, locality);
-
-        if (!StringUtils.isBlank(year))
-            result.put(Predicates.DC_COVERAGE, year);
-
-        return result;
     }
 
     /**
@@ -190,45 +171,7 @@ public class DeliverySearchActionBean extends AbstractSearchActionBean<SubjectDT
         this.year = year;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
-     */
-    public List<SearchResultColumn> getColumns() {
-
-        ArrayList<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
-
-        SubjectPredicateColumn col = new SubjectPredicateColumn();
-        col.setPredicateUri(Predicates.RDFS_LABEL);
-        col.setTitle("Title");
-        col.setSortable(true);
-        list.add(col);
-
-        col = new SubjectPredicateColumn();
-        col.setPredicateUri(Predicates.ROD_HAS_FILE);
-        col.setTitle("File");
-        col.setSortable(true);
-        list.add(col);
-
-        col = new SubjectPredicateColumn();
-        col.setPredicateUri(Predicates.CR_HAS_FEEDBACK);
-        col.setTitle("Feedback");
-        col.setSortable(true);
-        list.add(col);
-
-        col = new SubjectPredicateColumn();
-        col.setPredicateUri(Predicates.ROD_LOCALITY_PROPERTY);
-        col.setTitle("Locality");
-        col.setSortable(true);
-        list.add(col);
-
-        col = new SubjectPredicateColumn();
-        col.setPredicateUri(Predicates.DC_DATE);
-        col.setTitle("Date");
-        col.setSortable(true);
-        list.add(col);
-
-        return list;
+    public CustomPaginatedList<DeliveryDTO> getDeliveries() {
+        return deliveries;
     }
 }

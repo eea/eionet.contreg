@@ -28,10 +28,12 @@ import java.util.Vector;
 import eionet.cr.dao.helpers.FreeTextSearchHelper;
 import eionet.cr.dao.util.BBOX;
 import eionet.cr.dao.util.SearchExpression;
+import eionet.cr.dto.DeliveryDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.pagination.PagingRequest;
+import eionet.cr.web.util.CustomPaginatedList;
 
 /**
  * Interface to define search related dao methods.
@@ -72,6 +74,20 @@ public interface SearchDAO extends DAO {
      */
     Pair<Integer, List<SubjectDTO>> searchByFilters(Map<String, String> filters, boolean checkFiltersRange,
             PagingRequest pagingRequest, SortingRequest sortingRequest, List<String> selectPredicates, boolean useInference) throws DAOException;
+
+    /**
+     *
+     * @param obligation
+     * @param locality
+     * @param year
+     * @param sortCol
+     * @param pagingRequest
+     * @param sortingRequest
+     * @return CustomPaginatedList<DeliveryDTO>
+     * @throws DAOException
+     */
+    CustomPaginatedList<DeliveryDTO> searchDeliveries(String obligation, String locality, String year, String sortCol,
+            PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException;
 
     /**
      *

@@ -22,8 +22,6 @@ package eionet.cr.util.sesame;
 
 import java.util.Collection;
 
-import org.apache.log4j.Logger;
-
 import eionet.cr.common.Namespace;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.util.Bindings;
@@ -34,9 +32,6 @@ import eionet.cr.util.Bindings;
  * @author Enriko Käsper
  */
 public class SPARQLQueryUtil {
-
-    /** */
-    private static final Logger LOGGER = Logger.getLogger(SPARQLQueryUtil.class);
 
     /**
      * Inference definition in SPARQL.
@@ -133,6 +128,27 @@ public class SPARQLQueryUtil {
             }
         }
         return strBuilder.toString();
+    }
+
+    /**
+     * Builds a comma-separated String of SPARQL aliases the given parameter values.
+     *
+     * @param uriList uris to be used as SPARQL parameters
+     * @return comma separated String for Sparql
+     */
+    public static String urisToCSV(Collection<String> uriList) {
+        StringBuffer sb = new StringBuffer();
+        if (uriList != null) {
+            int idx = 0;
+            for (String uri : uriList) {
+                if (idx != 0) {
+                    sb.append(",");
+                }
+                sb.append("<").append(uri).append(">");
+                idx++;
+            }
+        }
+        return sb.toString();
     }
 
     /**

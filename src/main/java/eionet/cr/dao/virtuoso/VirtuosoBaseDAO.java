@@ -250,6 +250,20 @@ public abstract class VirtuosoBaseDAO {
     }
 
     /**
+     * Count the total number of rows retrieved by the query constructed in SearchHelper.
+     *
+     * @param helper SearchHelper object.
+     * @param inParams
+     * @return number of rows
+     * @throws DAOException
+     */
+    protected int getExactRowCount(SearchHelper helper, List<Object> inParams) throws DAOException {
+        String query = helper.getCountQuery(inParams);
+        Object resultObject = executeUniqueResultSPARQL(query, new SingleObjectReader<Long>());
+        return Integer.valueOf(resultObject.toString());
+    }
+
+    /**
      * helper method to execute sql queries. Handles connection init, close. Wraps Exceptions into {@link DAOException}
      *
      * @param <T>
@@ -317,5 +331,26 @@ public abstract class VirtuosoBaseDAO {
     protected <T> T executeUniqueResultSQL(String sql, List<?> params, SQLResultSetReader<T> reader) throws DAOException {
         List<T> result = executeSQL(sql, params, reader);
         return result == null || result.isEmpty() ? null : result.get(0);
+    }
+
+    /**
+     * Orders the map the same way as subjectUris list is ordered. Returns new list.
+     * 
+     * @param <T>
+     * @param subjectUris
+     * @param map
+     * @return List<T>
+     * @throws DAOException
+     */
+    protected <T> List<T> getOrderedList(List<String> subjectUris, Map<String, T> map) throws DAOException {
+        List<T> resultList = new ArrayList<T>();
+        if (subjectUris != null && map != null) {
+            for (String subjectUri : subjectUris) {
+                if (map.containsKey(subjectUri)) {
+                    resultList.add(map.get(subjectUri));
+                }
+            }
+        }
+        return resultList;
     }
 }
