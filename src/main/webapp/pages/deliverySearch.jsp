@@ -53,7 +53,7 @@
         	<display:table name="${actionBean.deliveries}" class="sortable" sort="external" id="listItem" htmlId="resourcesResultList" requestURI="/deliverySearch.action" decorator="eionet.cr.web.util.DeliverySearchTableDecorator">
 				<display:column property="title" title="Title" sortable="true"/>
 				<display:column property="fileCnt" title="Files"/>
-				<display:column property="period" title="Period" sortable="true"/>
+				<display:column property="periodValue" title="Period" sortable="true" sortProperty="period"/>
 				<display:column property="locality" title="Locality"/>
 				<display:column property="date" title="Date" sortable="true"/>
 			</display:table>

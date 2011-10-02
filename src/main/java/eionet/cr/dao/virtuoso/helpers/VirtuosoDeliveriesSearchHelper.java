@@ -47,12 +47,14 @@ public class VirtuosoDeliveriesSearchHelper extends AbstractSearchHelper {
         StringBuffer sparql = new StringBuffer();
         if (subjectUris != null && subjectUris.size() > 0) {
             String commaSeparatedSubjects = SPARQLQueryUtil.urisToCSV(subjectUris);
-            sparql.append("select distinct ?s ?p ?o ?cname where { ");
+            sparql.append("select distinct ?s ?p ?o ?cname bif:period_end_year(?period) as ?end_year where { ");
             sparql.append("?s ?p ?o .");
             sparql.append("filter (?s IN (").append(commaSeparatedSubjects).append(")) ");
             sparql.append("OPTIONAL { ");
             sparql.append("?s <").append(Predicates.ROD_LOCALITY_PROPERTY).append("> ?loc . ");
             sparql.append("?loc <").append(Predicates.RDFS_LABEL).append("> ?cname ");
+            sparql.append("} OPTIONAL { ");
+            sparql.append("?s <").append(Predicates.ROD_PERIOD).append("> ?period . ");
             sparql.append("}}");
         }
 
@@ -105,6 +107,7 @@ public class VirtuosoDeliveriesSearchHelper extends AbstractSearchHelper {
 
     private StringBuffer getQuery(boolean isCount) {
         StringBuffer sparql = new StringBuffer();
+        sparql.append("PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> ");
         if (isCount) {
             sparql.append("select count(distinct ?s) where {?s ?p ?o . ");
         } else {
@@ -118,8 +121,10 @@ public class VirtuosoDeliveriesSearchHelper extends AbstractSearchHelper {
             sparql.append("?s <").append(Predicates.ROD_LOCALITY_PROPERTY).append("> <").append(locality).append("> .");
         }
         if (!StringUtils.isBlank(year)) {
-            sparql.append("?s <").append(Predicates.ROD_PERIOD).append("> ?period .");
-            sparql.append("filter (bif:substring(?period, 1 , 4) = '").append(year).append("')");
+            sparql.append("?s <").append(Predicates.ROD_PERIOD).append("> ?period . ");
+            sparql.append("filter (bif:substring(?period, 1 , 4) = '").append(year).append("'");
+            sparql.append(" OR (xsd:int(bif:substring(?period, 1 , 4)) <= ").append(year);
+            sparql.append(" AND bif:period_end_year(?period) >= ").append(year).append("))");
         }
         return sparql;
     }

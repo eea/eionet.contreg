@@ -38,6 +38,8 @@ public class DeliveryDTO extends HarvestBaseDTO implements java.io.Serializable 
     private String subjectUri;
     private int fileCnt;
     private String period;
+    private String startYear;
+    private String endYear;
     private String locality;
     private String date;
 
@@ -98,5 +100,21 @@ public class DeliveryDTO extends HarvestBaseDTO implements java.io.Serializable 
 
     public void setSubjectUri(String subjectUri) {
         this.subjectUri = subjectUri;
+    }
+
+    public String getStartYear() {
+        return startYear;
+    }
+
+    public void setStartYear(String startYear) {
+        this.startYear = startYear;
+    }
+
+    public String getEndYear() {
+        return endYear;
+    }
+
+    public void setEndYear(String endYear) {
+        this.endYear = endYear;
     }
 }

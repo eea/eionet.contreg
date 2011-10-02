@@ -53,6 +53,14 @@ public class DeliverySearchReader extends ResultSetMixedReader<DeliveryDTO> {
                 }
                 if (predicateUri != null && predicateUri.equals(Predicates.ROD_PERIOD)) {
                     delivery.setPeriod(object);
+                    if (object != null && object.length() > 4) {
+                        delivery.setStartYear(object.substring(0, 4));
+                    }
+                    Value eyear = bindingSet.getValue("end_year");
+                    if (eyear != null) {
+                        String eyearValue = eyear.stringValue();
+                        delivery.setEndYear(eyearValue);
+                    }
                 }
                 if (predicateUri != null && predicateUri.equals(Predicates.ROD_LOCALITY_PROPERTY)) {
                     Value cname = bindingSet.getValue("cname");
