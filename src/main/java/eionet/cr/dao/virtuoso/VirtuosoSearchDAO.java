@@ -29,6 +29,7 @@ import eionet.cr.dao.virtuoso.helpers.VirtuosoFilteredSearchHelper;
 import eionet.cr.dao.virtuoso.helpers.VirtuosoFreeTextSearchHelper;
 import eionet.cr.dao.virtuoso.helpers.VirtuosoReferencesSearchHelper;
 import eionet.cr.dao.virtuoso.helpers.VirtuosoSearchBySourceHelper;
+import eionet.cr.dao.virtuoso.helpers.VirtuosoTagSearchHelper;
 import eionet.cr.dto.DeliveryDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Bindings;
@@ -466,7 +467,8 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
         // return searchByFilters(filters, null, pagingRequest, sortingRequest, selectedAndTagPredicates);
 
         // create query helper
-        VirtuosoFilteredSearchHelper helper = new VirtuosoFilteredSearchHelper(filters, null, pagingRequest, sortingRequest, true);
+        VirtuosoTagSearchHelper helper = new VirtuosoTagSearchHelper(filters, null, pagingRequest, sortingRequest, true);
+        helper.setTags(tags);
 
         // create the list of IN parameters of the query
         ArrayList<Object> inParams = new ArrayList<Object>();
