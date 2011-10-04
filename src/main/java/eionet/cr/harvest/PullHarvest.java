@@ -86,6 +86,15 @@ public class PullHarvest extends BaseHarvest {
     /** */
     private static final String ACCEPT_HEADER = StringUtils.join(RDFMediaTypes.collection(), ',') + ",text/xml,*/*;q=0.6";
 
+    /** Text/plain content type. */
+    private static final String CONTENT_TYPE_TEXT = "text/plain";
+
+    /** Turtle file extension. */
+    private static final String EXT_TTL = "ttl";
+
+    /** N3 file extension. */
+    private static final String EXT_N3 = "n3";
+
     /** */
     private boolean isSourceAvailable;
 
@@ -128,7 +137,7 @@ public class PullHarvest extends BaseHarvest {
             String connectUrl = getContextUrl();
             do {
                 String message = "Opening URL connection";
-                if (!connectUrl.equals(getContextUrl())){
+                if (!connectUrl.equals(getContextUrl())) {
                     message = message + " to " + connectUrl;
                 }
                 LOGGER.debug(loggerMsg(message));
@@ -165,13 +174,12 @@ public class PullHarvest extends BaseHarvest {
 
                     // treat this as a redirection only if the context URL and the redirected-to-URL
                     // are not essentially the same
-                    if (URLUtil.equalUrls(getContextUrl(), redirectedToUrl)==false){
+                    if (URLUtil.equalUrls(getContextUrl(), redirectedToUrl) == false) {
 
                         finishRedirectedHarvest(redirectedToUrl);
                         LOGGER.debug(loggerMsg("Redirection details saved"));
                         startWithNewContext(redirectedToUrl);
-                    }
-                    else{
+                    } else {
                         LOGGER.debug(loggerMsg("Ignoring this redirection, as it is essentially to the same URL"));
                     }
 
@@ -209,8 +217,7 @@ public class PullHarvest extends BaseHarvest {
             } else {
                 throw new HarvestException(e.getMessage(), e);
             }
-        }
-        finally{
+        } finally {
             URLUtil.disconnect(urlConn);
         }
     }
@@ -255,7 +262,7 @@ public class PullHarvest extends BaseHarvest {
     private void finishWithError(int responseCode, String responseMessage, Exception exception) {
 
         // source is unavailable if there was no response, or it was an error code, or the exception cause is RDFParseException
-        boolean isRDFParseException = exception!=null && (exception.getCause() instanceof  RDFParseException);
+        boolean isRDFParseException = exception != null && (exception.getCause() instanceof RDFParseException);
         boolean sourceNotAvailable = responseCode == NO_RESPONSE || isError(responseCode) || isRDFParseException;
 
         // if source was not available, the new unavailability-count is increased by one, otherwise reset
@@ -340,9 +347,10 @@ public class PullHarvest extends BaseHarvest {
             if (responseMessage == null) {
                 responseMessage = "";
             }
-            addSourceMetadata(Predicates.CR_ERROR_MESSAGE,
-                    ObjectDTO.createLiteral("Server returned error: " + responseMessage + " (HTTP response code: "
-                            + responseCode + ")"));
+            addSourceMetadata(
+                    Predicates.CR_ERROR_MESSAGE,
+                    ObjectDTO.createLiteral("Server returned error: " + responseMessage + " (HTTP response code: " + responseCode
+                            + ")"));
         } else if (exception != null) {
             addSourceMetadata(Predicates.CR_ERROR_MESSAGE, ObjectDTO.createLiteral(exception.toString()));
         }
@@ -399,8 +407,8 @@ public class PullHarvest extends BaseHarvest {
             // otherwise process the file to see if it's zipped, or it's an XML with RDF conversion,
             // or actually an RDF file
 
-            RDFFormat rdfFormat = contentTypeToRdfFormat(getSourceContentType(urlConn));
-            if (rdfFormat!=null) {
+            RDFFormat rdfFormat = getRdfFormat(urlConn);
+            if (rdfFormat != null) {
                 return loadFile(downloadedFile, rdfFormat);
             } else {
                 File processedFile = null;
@@ -554,7 +562,8 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     * @param connectUrl TODO
+     * @param connectUrl
+     *            TODO
      * @return
      * @throws MalformedURLException
      * @throws IOException
@@ -562,8 +571,8 @@ public class PullHarvest extends BaseHarvest {
      * @throws SAXException
      * @throws ParserConfigurationException
      */
-    private HttpURLConnection openUrlConnection(String connectUrl) throws MalformedURLException, IOException, DAOException, SAXException,
-    ParserConfigurationException {
+    private HttpURLConnection openUrlConnection(String connectUrl) throws MalformedURLException, IOException, DAOException,
+            SAXException, ParserConfigurationException {
 
         String sanitizedUrl = StringUtils.substringBefore(connectUrl, "#");
         sanitizedUrl = StringUtils.replace(sanitizedUrl, " ", "%20");
@@ -658,7 +667,7 @@ public class PullHarvest extends BaseHarvest {
      * @throws IOException
      */
     private String getConversionStylesheetUrl(String harvestSourceUrl) throws DAOException, IOException, SAXException,
-    ParserConfigurationException {
+            ParserConfigurationException {
 
         String result = null;
 
@@ -677,13 +686,35 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
+     * Returns RDF format from url connection.
      *
      * @param contentType
      * @return
      */
-    private RDFFormat contentTypeToRdfFormat(String contentType) {
+    private RDFFormat getRdfFormat(HttpURLConnection urlConn) {
+        String contentType = getSourceContentType(urlConn);
 
-        return contentType!=null ? RDFMediaTypes.toRdfFormat(contentType) : null;
+        if (contentType == null) {
+            return null;
+        }
+
+        if (contentType.equals(CONTENT_TYPE_TEXT)) {
+            String path = urlConn.getURL().getPath();
+            String[] arr = path.split("\\.");
+            if (arr.length > 0) {
+                String ext = arr[arr.length - 1];
+                if (StringUtils.isNotEmpty(ext)) {
+                    if (ext.equalsIgnoreCase(EXT_TTL)) {
+                        return RDFFormat.TURTLE;
+                    }
+                    if (ext.equalsIgnoreCase(EXT_N3)) {
+                        return RDFFormat.N3;
+                    }
+                }
+            }
+        }
+
+        return RDFMediaTypes.toRdfFormat(contentType);
     }
 
     /**
@@ -741,6 +772,6 @@ public class PullHarvest extends BaseHarvest {
     public boolean isBeingHarvested(String url) {
 
         boolean result = super.isBeingHarvested(url);
-        return result==true ? result : redirectedFromUrls.contains(url);
+        return result == true ? result : redirectedFromUrls.contains(url);
     }
 }
