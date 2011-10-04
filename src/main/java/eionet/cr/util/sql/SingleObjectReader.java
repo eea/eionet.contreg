@@ -61,9 +61,11 @@ public class SingleObjectReader<T> extends ResultSetMixedReader<T> {
     public void readRow(BindingSet bindingSet) {
 
         if (bindingSet != null && bindingSet.size() > 0) {
+
             String strValue = null;
             Binding binding = bindingSet.iterator().next();
             if (binding != null) {
+
                 Value bindingValue = binding.getValue();
                 strValue = bindingValue.stringValue();
                 if (bindingValue instanceof BNode && blankNodeUriPrefix != null) {

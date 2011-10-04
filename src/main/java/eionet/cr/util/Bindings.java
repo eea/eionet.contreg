@@ -181,7 +181,12 @@ public class Bindings {
             } else if (value instanceof String) {
                 query.setBinding(name, valueFactory.createLiteral(value.toString()));
             } else if (value instanceof URI) {
-                query.setBinding(name, valueFactory.createURI(value.toString()));
+                try{
+                    query.setBinding(name, valueFactory.createURI(value.toString()));
+                }
+                catch (IllegalArgumentException e){
+                    query.setBinding(name, valueFactory.createBNode(value.toString()));
+                }
             } else if (value instanceof Date) {
                 GregorianCalendar calendar = new GregorianCalendar();
                 calendar.setTime((Date) value);

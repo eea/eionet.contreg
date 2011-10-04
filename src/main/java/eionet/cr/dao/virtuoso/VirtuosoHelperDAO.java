@@ -39,8 +39,10 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.readers.DeliverySearchPicklistReader;
+import eionet.cr.dao.readers.FactsheetReader;
 import eionet.cr.dao.readers.MapReader;
 import eionet.cr.dao.readers.ObjectLabelReader;
+import eionet.cr.dao.readers.PredicateLabelsReader;
 import eionet.cr.dao.readers.RDFExporter;
 import eionet.cr.dao.readers.RecentFilesReader;
 import eionet.cr.dao.readers.RecentUploadsReader;
@@ -54,6 +56,7 @@ import eionet.cr.dao.util.SubProperties;
 import eionet.cr.dao.util.UriLabelPair;
 import eionet.cr.dao.virtuoso.helpers.ResourceRenameHandler;
 import eionet.cr.dto.DownloadFileDTO;
+import eionet.cr.dto.FactsheetDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.PredicateDTO;
@@ -265,25 +268,30 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     /**
      * Search for predicates that is allowed to edit on factsheet page.
      *
-     * @param subjectTypes
+     * @param subjectUri
      *            rdf:type resources of the subject
      * @return the list of properties that can be added by user.
      * @throws DAOException
      *             if query fails
      */
     @Override
-    public HashMap<String, String> getAddibleProperties(Collection<String> subjectTypes) throws DAOException {
+    public HashMap<String, String> getAddibleProperties(String subjectUri) throws DAOException {
 
         HashMap<String, String> result = new HashMap<String, String>();
+
+        Bindings bindings = new Bindings();
+        bindings.setURI("subjectUri", subjectUri);
+        List<String> subjectTypes = executeSPARQL(
+                "select distinct ?type where {?subjectUri a ?type}", new SingleObjectReader<String>());
 
         ObjectLabelReader reader = new ObjectLabelReader(true);
         executeSPARQL(PROPS_DUBLINCORE_QUERY, reader);
 
         /* get the properties for given subject types */
         // TODO - actually it is a static set based on DC properties
-        if (subjectTypes != null && !subjectTypes.isEmpty()) {
+        if (subjectUri != null && !subjectUri.isEmpty()) {
 
-            Bindings bindings = new Bindings();
+            bindings = new Bindings();
             String subjectTypesCSV = SPARQLQueryUtil.urisToCSV(subjectTypes, "subjectValue", bindings);
             String sparql =
                 "PREFIX rdfs: <" + Namespace.RDFS.getUri() + "> "
@@ -589,8 +597,10 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     }
 
     /**
-     * @param user CR user
-     * @throws DAOException if query fails.
+     * @param user
+     *            CR user
+     * @throws DAOException
+     *             if query fails.
      */
     public void registerUserFolderInCrHomeContext(CRUser user) throws DAOException {
 
@@ -646,8 +656,10 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
     }
 
-    private static final String USER_BOOKMARKS_SPARQL = "select distinct ?bookmarkUrl ?bookmarkLabel from ?userBookmarksUri where { ?subject <"
-        + Predicates.CR_BOOKMARK + "> ?bookmarkUrl . OPTIONAL {?subject <" + Predicates.RDFS_LABEL + "> ?bookmarkLabel }} order by ?bookmarkUrl";
+    private static final String USER_BOOKMARKS_SPARQL =
+        "select distinct ?bookmarkUrl ?bookmarkLabel from ?userBookmarksUri where { ?subject <" + Predicates.CR_BOOKMARK
+        + "> ?bookmarkUrl . OPTIONAL {?subject <" + Predicates.RDFS_LABEL
+        + "> ?bookmarkLabel }} order by ?bookmarkUrl";
 
     /*
      * (non-Javadoc)
@@ -1764,14 +1776,14 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         Bindings bindings = new Bindings();
 
         StringBuilder query = new StringBuilder();
-        query.append("select distinct ?s ?date where {graph ?g {?s ?p ?o}. filter (?s in (").
-        append(SPARQLQueryUtil.urisToCSV(resourceUris, "sValue", bindings)).
-        append(")). ?g <").append(Predicates.CR_LAST_MODIFIED).append("> ?date}");
+        query.append("select distinct ?s ?date where {graph ?g {?s ?p ?o}. filter (?s in (")
+        .append(SPARQLQueryUtil.urisToCSV(resourceUris, "sValue", bindings)).append(")). ?g <")
+        .append(Predicates.CR_LAST_MODIFIED).append("> ?date}");
 
         HashMap<String, Date> result = new HashMap<String, Date>();
         MapReader reader = new MapReader();
         List<Map<String, String>> list = executeSPARQL(query.toString(), bindings, reader);
-        if (list!=null){
+        if (list != null) {
             for (Map<String, String> map : list) {
 
                 Date date = null;
@@ -1781,10 +1793,10 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
                     date = null;
                 }
 
-                if (date!=null){
+                if (date != null) {
                     String resourceUri = map.get("s");
                     Date currentDate = result.get(resourceUri);
-                    if (currentDate==null || (date.compareTo(currentDate)>0)){
+                    if (currentDate == null || (date.compareTo(currentDate) > 0)) {
                         result.put(resourceUri, date);
                     }
                 }
@@ -1801,5 +1813,86 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     public Set<String> getLiteralRangeSubjects(Set<String> subjectsToCheck) throws DAOException {
         // TODO Auto-generated method stub
         return new HashSet<String>();
+    }
+
+    /** */
+    private static final String GET_FACTSHEET_ROWS =
+        "select ?pred min(isBlank(?s)) as ?anonSubj "
+        + "min(bif:either(isLiteral(?o),"
+        + "bif:concat(str(?o),'<|>',lang(?o),'<|>',str(datatype(?o)),'<|><|>0<|>',str(?g)),"
+        + "bif:concat(bif:coalesce(str(?oLabel),str(?o)),'<|>',lang(?oLabel),'<|>',str(datatype(?oLabel)),'<|>',str(?o),'<|>',str(isBlank(?o)),'<|>',str(?g))"
+        + ")) as ?objData " + "count(distinct ?o) as ?objCount " + "where {" + "graph ?g {"
+        + "?s ?pred ?o. filter(?s=?subjectUri)}" + ". optional {?o <" + Predicates.RDFS_LABEL + "> ?oLabel}"
+        + "} group by ?pred";
+    // "select ?pred " +
+    // "min(isBlank(?s)) as ?anonSubj " +
+    // "min(bif:either(isLiteral(?o),?o,bif:concat(?oLabel, '" + FactsheetRowReader.OBJECT_DATA_SPLITTER +
+    // "', str(?o)))) as ?objData " +
+    // "count(?o) as ?objCount " +
+    // "where {?s ?pred ?o. filter(?s=?subjectUri)" +
+    // ". optional {?pred <http://www.w3.org/2000/01/rdf-schema#label> ?pLabel}" +
+    // ". optional {?o <http://www.w3.org/2000/01/rdf-schema#label> ?oLabel}} " +
+    // "group by ?pred";
+
+    /** */
+    private static final String GET_PREDICATE_LABELS = "select distinct ?pred ?label where " + "{" + "?pred <"
+    + Predicates.RDFS_LABEL + "> ?label" + ". {select distinct ?pred where {?subjectUri ?pred ?o}}"
+    + "} order by ?pred ?label";
+
+    /** */
+    private static final String GET_PREDICATE_OBJECTS = "select ?obj ?objLabel ?g " + "where {graph ?g {"
+    + "?subjectUri ?predicateUri ?obj}" + ". optional {?obj <" + Predicates.RDFS_LABEL + "> ?objLabel}"
+    + "} order by str(bif:either(isLiteral(?obj),?obj,bif:coalesce(?objLabel,str(?obj)))) " + "limit "
+    + PredicateObjectsReader.PREDICATE_PAGE_SIZE + " offset ";
+
+    /**
+     * @see eionet.cr.dao.HelperDAO#getFactsheet(java.lang.String, List, Map)
+     */
+    @Override
+    public FactsheetDTO getFactsheet(String subjectUri, List<String> acceptedLanguages, Map<String, Integer> predicatePages)
+    throws DAOException {
+
+        if (StringUtils.isBlank(subjectUri)) {
+            throw new IllegalArgumentException("Subject uri must not be blank!");
+        }
+
+        Bindings bindings = new Bindings();
+        bindings.setURI("subjectUri", subjectUri);
+
+        FactsheetReader factsheetReader = new FactsheetReader(subjectUri);
+
+        if (logger.isTraceEnabled()) {
+            logger.trace("Executing factsheet query: "
+                    + StringUtils.replace(GET_FACTSHEET_ROWS, "?subjectUri", "<" + subjectUri + ">"));
+        }
+
+        executeSPARQL(GET_FACTSHEET_ROWS, bindings, factsheetReader);
+        FactsheetDTO factsheetDTO = factsheetReader.getFactsheetDTO();
+        if (factsheetDTO != null) {
+
+            PredicateLabelsReader predicateLabelsReader = new PredicateLabelsReader(acceptedLanguages);
+            executeSPARQL(GET_PREDICATE_LABELS, bindings, predicateLabelsReader);
+            predicateLabelsReader.fillPredicateLabels(factsheetDTO);
+
+            if (predicatePages != null) {
+                for (Map.Entry<String, Integer> entry : predicatePages.entrySet()) {
+
+                    String predicateUri = entry.getKey();
+                    int pageNum = entry.getValue() == null ? 0 : entry.getValue().intValue();
+                    if (!StringUtils.isBlank(predicateUri) && pageNum > 0) {
+
+                        int offset = PagingRequest.create(pageNum, PredicateObjectsReader.PREDICATE_PAGE_SIZE).getOffset();
+                        bindings.setURI("predicateUri", predicateUri);
+                        PredicateObjectsReader predicateObjectsReader = new PredicateObjectsReader(acceptedLanguages);
+                        List<ObjectDTO> objects = executeSPARQL(GET_PREDICATE_OBJECTS + offset, bindings, predicateObjectsReader);
+                        if (objects != null && !objects.isEmpty()) {
+                            factsheetDTO.setObjects(predicateUri, objects);
+                        }
+                    }
+                }
+            }
+        }
+
+        return factsheetDTO;
     }
 }

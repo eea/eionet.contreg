@@ -111,16 +111,16 @@
         <!-- End: Standard HTML attributes -->
         <dynamic-attributes>false</dynamic-attributes>
     </tag>
-    
+
     <tag>
-    	<name>template</name>
-    	<tag-class>eionet.cr.web.util.TemplateTag</tag-class>
-    	<body-content>JSP</body-content>
-    	<attribute>
-      		<name>file</name>
-      		<type>java.lang.String</type>
-    	</attribute>
-  	</tag>
+        <name>template</name>
+        <tag-class>eionet.cr.web.util.TemplateTag</tag-class>
+        <body-content>JSP</body-content>
+        <attribute>
+              <name>file</name>
+              <type>java.lang.String</type>
+        </attribute>
+      </tag>
 
     <function>
         <description>Cuts the given string at the first word whose length exceeds that of the given integer.</description>
@@ -334,6 +334,39 @@
         <function-signature>java.lang.String formatStackTrace(java.lang.String)</function-signature>
         <example>
             ${formatStackTrace(stackTrace)}
+        </example>
+    </function>
+
+    <function>
+        <description>
+        </description>
+        <name>predicateExpandLink</name>
+        <function-class>eionet.cr.web.util.JstlFunctions</function-class>
+        <function-signature>java.lang.String predicateExpandLink(eionet.cr.web.action.FactsheetActionBean, java.lang.String, int)</function-signature>
+        <example>
+            ${predicateExpandLink(factsheetActionBean, predicateUri, pageNumber)}
+        </example>
+    </function>
+
+    <function>
+        <description>
+        </description>
+        <name>predicateCollapseLink</name>
+        <function-class>eionet.cr.web.util.JstlFunctions</function-class>
+        <function-signature>java.lang.String predicateCollapseLink(eionet.cr.web.action.FactsheetActionBean, java.lang.String)</function-signature>
+        <example>
+            ${predicateCollapseLink(factsheetActionBean, predicateUri)}
+        </example>
+    </function>
+
+    <function>
+        <description>
+        </description>
+        <name>numberOfPages</name>
+        <function-class>eionet.cr.web.util.JstlFunctions</function-class>
+        <function-signature>int numberOfPages(int, int)</function-signature>
+        <example>
+            ${numberOfPages(matchCount, pageSize)}
         </example>
     </function>
 

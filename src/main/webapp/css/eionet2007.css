@@ -19,7 +19,7 @@ th.order2 a {
 }
 
 .exactMatch {
-	background-color: #D9EDF2;
+    background-color: #D9EDF2;
 }
 
 div.errorHeader {
@@ -47,16 +47,15 @@ table#resourcesResultList {
 }
 
 span.langcode {
-    display:block;
     min-width: 1.5em;
     text-align:center;
     color: #455b6b;
     text-decoration: none;
-/*    text-transform: uppercase; */
-    font-size: 70%;
+    font-size: 75%;
     background-color: transparent;
     padding: 2px;
     border: 1px solid #0c506f;
+    margin-left: 10px;
 }
 
 /* source.action */
@@ -274,4 +273,14 @@ table.datatable tr.odd {
 
 table.datatable tr.even {
     background: #FFFFFF;
+}
+
+td.factsheetValueBrowse {
+    text-align:right;
+    color:#78a555
+}
+
+a.factsheetValueBrowse {
+    color:#78A555;
+    font-size:0.7em;
 }

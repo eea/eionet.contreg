@@ -29,7 +29,6 @@ import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -365,7 +364,6 @@ public class Util {
     /**
      * Create a comma-separated list of tag enclosed URIs. The result can be used in sparql queries. eg.: [uri1,uri2,uri3] is
      * transformed to <uri1>,<uri2>,<uri3>.
-     * @deprecated queries should be parametrized by using bindings instead.
      * @param uriList
      *            list of URIs
      * @return comma separated list of tag enclosed URIs
@@ -702,13 +700,5 @@ public class Util {
             }
         }
         return element;
-    }
-
-    public static void main(String[] args) {
-
-        System.out.println(Arrays.toString(StringUtils.split("jaanus", ";")));
-        System.out.println(StringUtils.substringBefore(";kala", ";"));
-        System.out.println(StringUtils.substringAfter("jaanuskala", ";"));
-        System.out.println(Double.valueOf(" 0.7 "));
     }
 }

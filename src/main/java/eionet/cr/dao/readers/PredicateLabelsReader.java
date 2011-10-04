@@ -20,52 +20,91 @@
  */
 package eionet.cr.dao.readers;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
+import org.openrdf.model.Literal;
+import org.openrdf.model.Value;
 import org.openrdf.query.BindingSet;
 
-import eionet.cr.dao.util.PredicateLabels;
+import eionet.cr.dto.FactsheetDTO;
+import eionet.cr.util.URIUtil;
+import eionet.cr.util.sesame.SPARQLResultSetBaseReader;
 
 /**
  *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class PredicateLabelsReader extends ResultSetMixedReader {
+public class PredicateLabelsReader extends SPARQLResultSetBaseReader {
 
     /** */
-    private PredicateLabels predicateLabels;
+    private List<String> acceptedLanguages;
+
+    /** */
+    private Map<String, Literal> predicateLiterals = new HashMap<String, Literal>();
 
     /**
-     *
-     * @param predicateLabels
+     * @param acceptedLanguages
      */
-    public PredicateLabelsReader(PredicateLabels predicateLabels) {
-
-        if (predicateLabels == null)
-            throw new IllegalArgumentException();
-
-        this.predicateLabels = predicateLabels;
+    public PredicateLabelsReader(List<String> acceptedLanguages) {
+        this.acceptedLanguages = acceptedLanguages;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
-     */
-    public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
-        predicateLabels.add(rs.getString("PREDICATE_URI"), rs.getString("LABEL"), rs.getString("LANG"));
-    }
-
-    /*
-     * (non-Javadoc)
-     *
+    /**
      * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
      */
     @Override
     public void readRow(BindingSet bindingSet) {
 
-        // TODO Auto-generated method stub
+        String predicateUri = getStringValue(bindingSet, "pred");
+
+        Value value = bindingSet.getValue("label");
+        if (value instanceof Literal) {
+
+            Literal literal = (Literal) value;
+            if (acceptedLanguages == null || acceptedLanguages.isEmpty()) {
+                predicateLiterals.put(predicateUri, literal);
+            } else {
+                String language = unrefineLanguage(literal.getLanguage());
+                int languageIndex = acceptedLanguages.indexOf(language);
+                if (languageIndex >= 0) {
+                    Literal currentLiteral = predicateLiterals.get(predicateUri);
+                    if (currentLiteral == null || languageIndex < acceptedLanguages.indexOf(currentLiteral.getLanguage())) {
+                        predicateLiterals.put(predicateUri, literal);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Un-refines the given language code (i.e. "en-GB" becomes "en", "en_us" becomes "en", etc).
+     *
+     * @param literal
+     * @return
+     */
+    private String unrefineLanguage(String language) {
+
+        return language == null ? "" : StringUtils.split(language, "-_")[0];
+    }
+
+    /**
+     *
+     * @param factsheetDTO
+     */
+    public void fillPredicateLabels(FactsheetDTO factsheetDTO){
+
+        for (String predicateUri : factsheetDTO.getPredicateUris()){
+
+            Literal literal = predicateLiterals.get(predicateUri);
+            String label = literal==null ? null : literal.getLabel();
+            if (StringUtils.isBlank(label)){
+                label = URIUtil.extractURILabel(predicateUri, predicateUri);
+            }
+            factsheetDTO.addPredicateLabel(predicateUri, label);
+        }
     }
 }

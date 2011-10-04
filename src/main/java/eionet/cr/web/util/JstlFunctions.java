@@ -20,6 +20,8 @@
  */
 package eionet.cr.web.util;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -31,8 +33,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.servlet.jsp.PageContext;
 
+import net.sourceforge.stripes.action.UrlBinding;
+
 import org.apache.commons.lang.StringUtils;
 
+import eionet.cr.common.CRRuntimeException;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Hashes;
@@ -40,6 +45,7 @@ import eionet.cr.util.QueryString;
 import eionet.cr.util.SortOrder;
 import eionet.cr.util.Util;
 import eionet.cr.web.action.AbstractActionBean;
+import eionet.cr.web.action.FactsheetActionBean;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.columns.SearchResultColumn;
 
@@ -373,7 +379,7 @@ public class JstlFunctions {
      * @param throwable
      * @return
      */
-    public static String getStackTrace(Throwable throwable){
+    public static String getStackTrace(Throwable throwable) {
         return Util.getStackTrace(throwable);
     }
 
@@ -382,20 +388,102 @@ public class JstlFunctions {
      * @param stackTrace
      * @return
      */
-    public static String formatStackTrace(String stackTrace){
+    public static String formatStackTrace(String stackTrace) {
 
-        if (stackTrace==null || stackTrace.trim().length()==0){
+        if (stackTrace == null || stackTrace.trim().length() == 0) {
             return stackTrace;
         }
 
         StringBuilder buf = new StringBuilder();
         StringTokenizer lines = new StringTokenizer(stackTrace, "\r\n");
-        while (lines!=null && lines.hasMoreElements()) {
+        while (lines != null && lines.hasMoreElements()) {
             String line = lines.nextToken();
             line = StringUtils.replaceOnce(line, "\t", "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
             buf.append(line).append("<br/>");
         }
 
-        return buf.length()==0 ? stackTrace : buf.toString();
+        return buf.length() == 0 ? stackTrace : buf.toString();
+    }
+
+    /**
+     *
+     * @param factsheetActionBean
+     * @param predicateUri
+     * @param pageNumber
+     * @return
+     */
+    public static String predicateExpandLink(FactsheetActionBean factsheetActionBean, String predicateUri, int pageNumber) {
+
+        StringBuilder link = new StringBuilder(predicateCollapseLink(factsheetActionBean, predicateUri));
+        if (pageNumber > 0) {
+
+            try {
+                link.append("&").append(FactsheetActionBean.PAGE_PARAM_PREFIX).
+                append(pageNumber).append("=").append(URLEncoder.encode(predicateUri, "UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+                throw new CRRuntimeException("Unsupported encoding", e);
+            }
+        }
+        return link.toString();
+    }
+
+    /**
+     *
+     * @param factsheetActionBean
+     * @param predicateUri
+     * @return
+     */
+    public static String predicateCollapseLink(FactsheetActionBean factsheetActionBean, String predicateUri) {
+
+        StringBuilder link = new StringBuilder();
+        link.append(FactsheetActionBean.class.getAnnotation(UrlBinding.class).value()).append("?");
+
+        HttpServletRequest request = factsheetActionBean.getContext().getRequest();
+        Map<String, String[]> paramsMap = request.getParameterMap();
+        if (paramsMap != null && !paramsMap.isEmpty()) {
+
+            for (Map.Entry<String, String[]> entry : paramsMap.entrySet()) {
+
+                String paramName = entry.getKey();
+                String[] paramValues = entry.getValue();
+                if (paramValues == null || paramValues.length == 0) {
+                    try {
+                        link.append(URLEncoder.encode(paramName, "UTF-8")).append("&");
+                    } catch (UnsupportedEncodingException e) {
+                        throw new CRRuntimeException("Unsupported encoding", e);
+                    }
+                } else {
+                    boolean isPageParam = factsheetActionBean.isPredicatePageParam(paramName);
+                    for (String paramValue : paramValues) {
+                        if (!isPageParam || !paramValue.equals(predicateUri)) {
+                            try {
+                                link.append(URLEncoder.encode(paramName, "UTF-8")).append("=")
+                                .append(URLEncoder.encode(paramValue, "UTF-8")).append("&");
+                            } catch (UnsupportedEncodingException e) {
+                                throw new CRRuntimeException("Unsupported encoding", e);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return StringUtils.removeEnd(link.toString(), "&");
+    }
+
+    /**
+     *
+     * @param matchCount
+     * @param pageSize
+     * @return
+     */
+    public static int numberOfPages(int matchCount, int pageSize){
+
+        int result = matchCount / pageSize;
+        if (matchCount % pageSize != 0){
+            result = result + 1;
+        }
+
+        return result;
     }
 }

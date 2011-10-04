@@ -65,7 +65,7 @@ public class SubjectDTO implements Serializable {
     private String uri;
     private long uriHash;
     private boolean anonymous;
-    private Map<String, Collection<ObjectDTO>> predicates;
+    private Map<String, Collection<ObjectDTO>> predicates = new HashMap<String, Collection<ObjectDTO>>();
     private Date dcDate;
     private Date lastModifiedDate;
 
@@ -87,7 +87,6 @@ public class SubjectDTO implements Serializable {
         this.anonymous = anonymous;
 
         uriHash = Hashes.spoHash(uri);
-        predicates = new HashMap<String, Collection<ObjectDTO>>();
     }
 
     /*
@@ -124,6 +123,16 @@ public class SubjectDTO implements Serializable {
 
         Collection<ObjectDTO> objects = new ArrayList<ObjectDTO>();
         objects.add(object);
+        predicates.put(predicate, objects);
+    }
+
+    /**
+     *
+     * @param predicate
+     * @param objects
+     */
+    public void setObjects(String predicate, Collection<ObjectDTO> objects) {
+
         predicates.put(predicate, objects);
     }
 

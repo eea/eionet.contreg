@@ -13,6 +13,7 @@ import eionet.cr.dao.util.PredicateLabels;
 import eionet.cr.dao.util.SubProperties;
 import eionet.cr.dao.util.UriLabelPair;
 import eionet.cr.dto.DownloadFileDTO;
+import eionet.cr.dto.FactsheetDTO;
 import eionet.cr.dto.PredicateDTO;
 import eionet.cr.dto.ReviewDTO;
 import eionet.cr.dto.SubjectDTO;
@@ -96,12 +97,12 @@ public interface HelperDAO extends DAO {
     void addResource(String uri, String sourceUri) throws DAOException;
 
     /**
-     * @param subjectTypes
+     * @param subjectUri
      * @return HashMap<String, String>
      * @throws DAOException
      *             if query fails
      */
-    HashMap<String, String> getAddibleProperties(Collection<String> subjectTypes) throws DAOException;
+    HashMap<String, String> getAddibleProperties(String subjectUri) throws DAOException;
 
     /**
      * @param subjectUri
@@ -471,4 +472,14 @@ public interface HelperDAO extends DAO {
      * @throws DAOException
      */
     public Set<String> getLiteralRangeSubjects(Set<String> subjectsToCheck) throws DAOException;
+
+    /**
+     *
+     * @param subjectUri
+     * @param acceptedLanguages TODO
+     * @param predicatePages TODO
+     * @return
+     * @throws DAOException
+     */
+    public FactsheetDTO getFactsheet(String subjectUri, List<String> acceptedLanguages, Map<String, Integer> predicatePages) throws DAOException;
 }

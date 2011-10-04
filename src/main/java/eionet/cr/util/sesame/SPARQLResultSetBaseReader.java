@@ -3,6 +3,9 @@ package eionet.cr.util.sesame;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.openrdf.model.Value;
+import org.openrdf.query.BindingSet;
+
 /**
  *
  * @author jaanus
@@ -52,5 +55,17 @@ public abstract class SPARQLResultSetBaseReader<T> implements SPARQLResultSetRea
     @Override
     public List<T> getResultList() {
         return resultList;
+    }
+
+    /**
+     *
+     * @param bindingSet
+     * @param bindingName
+     * @return
+     */
+    protected final String getStringValue(BindingSet bindingSet, String bindingName){
+
+        Value value = bindingSet.getValue(bindingName);
+        return value==null ? null : value.stringValue();
     }
 }

@@ -24,6 +24,7 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.util.Date;
 
+import org.apache.commons.lang.StringUtils;
 import org.openrdf.model.URI;
 
 import eionet.cr.harvest.BaseHarvest;
@@ -67,6 +68,8 @@ public class ObjectDTO implements Serializable {
 
     private String sourceUri;
     private long sourceHash;
+
+    private ObjectDTO labelObject;
 
     /**
      *
@@ -155,7 +158,13 @@ public class ObjectDTO implements Serializable {
      * @return the language
      */
     public String getLanguage() {
-        return language;
+
+        if (isLiteral()){
+            return language;
+        }
+        else{
+            return labelObject!=null ? labelObject.getLanguage() : null;
+        }
     }
 
     /**
@@ -348,7 +357,7 @@ public class ObjectDTO implements Serializable {
      * @return the derviedLiteralValue
      */
     public String getDerviedLiteralValue() {
-        return derviedLiteralValue;
+        return labelObject==null ? derviedLiteralValue : labelObject.getValue();
     }
 
     /**
@@ -430,4 +439,25 @@ public class ObjectDTO implements Serializable {
         }
     }
 
+    /**
+     *
+     * @return
+     */
+    public String getDisplayValue(){
+
+        if (isLiteral()){
+            return value;
+        }
+        else{
+            String displayValue = getDerviedLiteralValue();
+            return StringUtils.isBlank(displayValue) ? value : displayValue;
+        }
+    }
+
+    /**
+     * @param labelObject the labelObject to set
+     */
+    public void setLabelObject(ObjectDTO labelObject) {
+        this.labelObject = labelObject;
+    }
 }

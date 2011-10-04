@@ -24,10 +24,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import net.sourceforge.stripes.action.DefaultHandler;
@@ -40,18 +40,17 @@ import net.sourceforge.stripes.validation.SimpleError;
 import net.sourceforge.stripes.validation.ValidationMethod;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 
 import eionet.cr.common.Predicates;
-import eionet.cr.common.Subjects;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.SpoBinaryDAO;
-import eionet.cr.dao.util.PredicateLabels;
-import eionet.cr.dao.util.SubProperties;
 import eionet.cr.dao.util.UriLabelPair;
+import eionet.cr.dao.virtuoso.PredicateObjectsReader;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
@@ -60,9 +59,7 @@ import eionet.cr.harvest.CurrentHarvests;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.OnDemandHarvester;
 import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
-import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
-import eionet.cr.util.SubjectDTOOptimizer;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
 
@@ -75,49 +72,50 @@ import eionet.cr.util.Util;
 @UrlBinding("/factsheet.action")
 public class FactsheetActionBean extends AbstractActionBean {
 
+    /**  */
+    public static final String PAGE_PARAM_PREFIX = "page";
+
     /** */
     private static final String ADDIBLE_PROPERTIES_SESSION_ATTR = FactsheetActionBean.class.getName() + ".addibleProperties";
 
-    /** */
+    /** URI by which the factsheet has been requested. */
     private String uri;
-    /** Hashed URI. */
+
+    /** URI hash by which the factsheet has been requested. Ignored when factsheet requested by URI. */
     private long uriHash;
-    /** subject dataobject. */
+
+    /** The subject data object found by the requestd URI or URI hash. */
     private SubjectDTO subject;
 
-    /** */
-    private Map<String, String> predicateLabels;
-    /** Resource sub-properties. */
-    private SubProperties subProperties;
+    /** Used in factsheet edit mode only, where it indicates if the subject is anonymous. */
+    private boolean anonymous;
 
     /** */
-    private boolean anonymous;
-    /**
-     * property URI.
-     */
     private String propertyUri;
     /** */
     private String propertyValue;
 
-    /** */
+    /** List of identifiers of property-value rows submitted from factsheet edit form. */
     private List<String> rowId;
 
-    /** */
-    private boolean noCriteria;
-    /** */
+    /** True if the session bears a user and it happens to be an administrator. Otherwise false. */
     private boolean adminLoggedIn;
 
-    /** */
+    /** True if the found subject is a bookmark of the logged-in user. In all other cases false. */
     private Boolean subjectIsUserBookmark;
 
-    /** */
+    /** True if a harvest source by the requested URI exists. Otherwise false. */
     private Boolean uriIsHarvestSource;
 
-    /** */
-    private boolean subjectDownloadable;
+    /** True if the found subject has downloadable content in filestore. */
+    private Boolean subjectDownloadable;
 
     /** */
     private String bookmarkLabel;
+
+    /** */
+    private Map<String, Integer> predicatePageNumbers;
+    private Map<String, Integer> predicatePageCounts;
 
     /**
      *
@@ -128,33 +126,14 @@ public class FactsheetActionBean extends AbstractActionBean {
     @DefaultHandler
     public Resolution view() throws DAOException {
 
-        if (StringUtils.isBlank(uri) && uriHash == 0) {
-            noCriteria = true;
-            addCautionMessage("Resource identifier not specified!");
+        if (isNoCriteria()) {
+            addCautionMessage("No request criteria specified!");
         } else {
-            Long subjectHash = uriHash == 0 ? Hashes.spoHash(uri) : uriHash;
             HelperDAO helperDAO = DAOFactory.get().getDao(HelperDAO.class);
 
             setAdminLoggedIn(getUser() != null && getUser().isAdministrator());
 
-            subject = helperDAO.getSubject(uri);
-            if (subject != null) {
-
-                if (getContext().getRequest().getParameter("nofilter") == null) {
-                    subject = SubjectDTOOptimizer.optimizeSubjectDTOFactsheetView(subject, getAcceptedLanguages());
-                }
-
-                uri = subject.getUri();
-                uriHash = subject.getUriHash();
-
-                PredicateLabels predLabels = helperDAO.getPredicateLabels(Collections.singleton(subjectHash));
-                if (predLabels != null) {
-                    predicateLabels = predLabels.getByLanguages(getAcceptedLanguages());
-                }
-                subProperties = helperDAO.getSubProperties(subject.getPredicates().keySet());
-
-                subjectDownloadable = DAOFactory.get().getDao(SpoBinaryDAO.class).exists(uri);
-            }
+            subject = helperDAO.getFactsheet(uri, null, getPredicatePageNumbers());
         }
 
         return new ForwardResolution("/pages/factsheet.jsp");
@@ -240,8 +219,8 @@ public class FactsheetActionBean extends AbstractActionBean {
                     message = "The resource was not available!";
                 else if (resolution.equals(OnDemandHarvester.Resolution.NO_STRUCTURED_DATA))
                     message = "The resource contained no RDF data!";
-                //                else if (resolution.equals(InstantHarvester.Resolution.RECENTLY_HARVESTED))
-                //                    message = "Source redirects to another source that has recently been harvested! Will not harvest.";
+                // else if (resolution.equals(InstantHarvester.Resolution.RECENTLY_HARVESTED))
+                // message = "Source redirects to another source that has recently been harvested! Will not harvest.";
                 else
                     message = "No feedback given from harvest!";
             }
@@ -378,7 +357,7 @@ public class FactsheetActionBean extends AbstractActionBean {
     /**
      * Validates if user is logged on and if event property is not empty.
      */
-    @ValidationMethod(on = { "save", "delete", "edit", "harvest" })
+    @ValidationMethod(on = {"save", "delete", "edit", "harvest"})
     public void validateUserKnown() {
 
         if (getUser() == null) {
@@ -411,27 +390,13 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     * @return the predicateLabels
-     */
-    public Map<String, String> getPredicateLabels() {
-        return predicateLabels;
-    }
-
-    /**
-     * @return the subProperties
-     */
-    public SubProperties getSubProperties() {
-        return subProperties;
-    }
-
-    /**
      * @return the addibleProperties
      * @throws DAOException
      *             if query fails
      */
     public Collection<UriLabelPair> getAddibleProperties() throws DAOException {
 
-        /* get the addible properties from session */
+        // get the addible properties from session
 
         HttpSession session = getContext().getRequest().getSession();
         @SuppressWarnings("unchecked")
@@ -440,25 +405,20 @@ public class FactsheetActionBean extends AbstractActionBean {
         // if not in session, create them and add to session
         if (result == null || result.isEmpty()) {
 
-            /* get addible properties from database */
+            // get addible properties from database
 
             HelperDAO helperDAO = factory.getDao(HelperDAO.class);
-            HashMap<String, String> props = helperDAO.getAddibleProperties(getSubjectTypes());
+            HashMap<String, String> props = helperDAO.getAddibleProperties(uri);
 
-            // add some hard-coded properties, HashMap assures there won't be
-            // duplicates
-            // props.put(Predicates.RDF_TYPE, "Type");
+            // add some hard-coded properties, HashMap assures there won't be duplicates
             props.put(Predicates.RDFS_LABEL, "Title");
             props.put(Predicates.CR_TAG, "Tag");
             props.put(Predicates.RDFS_COMMENT, "Other comments"); // Don't use
-            // CR_COMMENT
             props.put(Predicates.DC_DESCRIPTION, "Description");
             props.put(Predicates.CR_HAS_SOURCE, "hasSource");
             props.put(Predicates.ROD_PRODUCT_OF, "productOf");
 
-            /*
-             * create the result object from the found and hard-coded properties, sort it
-             */
+            // create the result object from the found and hard-coded properties, sort it
 
             result = new ArrayList<UriLabelPair>();
             if (props != null && !props.isEmpty()) {
@@ -471,26 +431,6 @@ public class FactsheetActionBean extends AbstractActionBean {
 
             // put into session
             session.setAttribute(ADDIBLE_PROPERTIES_SESSION_ATTR, result);
-        }
-
-        return result;
-    }
-
-    /**
-     * List of subject hashes.
-     *
-     * @return Collection <String> hashes of subject types
-     */
-    private Collection<String> getSubjectTypes() {
-
-        HashSet<String> result = new HashSet<String>();
-        Collection<ObjectDTO> typeObjects = subject.getObjects(Predicates.RDF_TYPE, ObjectDTO.Type.RESOURCE);
-        if (typeObjects != null && !typeObjects.isEmpty()) {
-
-            for (ObjectDTO object : typeObjects) {
-
-                result.add(object.getValue());
-            }
         }
 
         return result;
@@ -510,14 +450,6 @@ public class FactsheetActionBean extends AbstractActionBean {
      */
     public void setSubject(final SubjectDTO subject) {
         this.subject = subject;
-    }
-
-    /**
-     * @param subProperties
-     *            the subProperties to set
-     */
-    public void setSubProperties(final SubProperties subProperties) {
-        this.subProperties = subProperties;
     }
 
     /**
@@ -548,7 +480,7 @@ public class FactsheetActionBean extends AbstractActionBean {
      * @return the noCriteria
      */
     public boolean isNoCriteria() {
-        return noCriteria;
+        return StringUtils.isBlank(uri);
     }
 
     /**
@@ -634,9 +566,14 @@ public class FactsheetActionBean extends AbstractActionBean {
 
     /**
      * @return the subjectDownloadable
+     * @throws DAOException
      */
-    public boolean isSubjectDownloadable() {
-        return subjectDownloadable;
+    public boolean isSubjectDownloadable() throws DAOException {
+
+        if (subjectDownloadable==null){
+            subjectDownloadable = Boolean.valueOf(DAOFactory.get().getDao(SpoBinaryDAO.class).exists(uri));
+        }
+        return subjectDownloadable.booleanValue();
     }
 
     /**
@@ -649,34 +586,20 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     * True if the resource can be shown on a map. The resource has got longitude and latitude predicates
+     * True if the resource can be shown on a map (i.e. it's got longitude and latitude predicates).
      *
      * @return boolean
      */
     public boolean isMapDisplayable() {
+
         // TODO subproperties handling
+
         if (subject != null) {
-            Collection<ObjectDTO> objects = subject.getObjects(Predicates.RDF_TYPE, ObjectDTO.Type.RESOURCE);
-            if (objects != null) {
-                boolean isWgsPoint = false;
-                for (ObjectDTO objectDTO : objects) {
-                    if (objectDTO.getValue() != null && objectDTO.getValue().equals(Subjects.WGS_POINT)) {
-                        isWgsPoint = true;
-                        break;
-                    }
-                }
-
-                if (isWgsPoint) {
-                    logger.debug("FactSheetActionBean() isWgsPoint=true");
-                    if (subject.getObject(Predicates.WGS_LAT) != null && subject.getObject(Predicates.WGS_LONG) != null) {
-                        logger.debug("FactSheetActionBean() has coordinates");
-                        return true;
-                    }
-                }
-            }
+            return subject.getObject(Predicates.WGS_LAT) != null && subject.getObject(Predicates.WGS_LONG) != null;
         }
-
-        return false;
+        else{
+            return false;
+        }
     }
 
     /**
@@ -695,11 +618,10 @@ public class FactsheetActionBean extends AbstractActionBean {
      * @return String longitude
      */
     public String getLongitude() {
+
         // TODO subproperties handling
-        if (subject.getObject(Predicates.WGS_LONG) != null) {
-            return subject.getObject(Predicates.WGS_LONG).getValue();
-        }
-        return null;
+        ObjectDTO longitudeObject = subject.getObject(Predicates.WGS_LONG);
+        return longitudeObject==null ? null : longitudeObject.getValue();
     }
 
     /**
@@ -708,19 +630,85 @@ public class FactsheetActionBean extends AbstractActionBean {
      * @return String latitude
      */
     public String getLatitude() {
+
         // TODO subproperties handling
-        if (subject.getObject(Predicates.WGS_LAT) != null) {
-            return subject.getObject(Predicates.WGS_LAT).getValue();
-        }
-        return null;
+        ObjectDTO latitudeObject = subject.getObject(Predicates.WGS_LAT);
+        return latitudeObject==null ? null : latitudeObject.getValue();
     }
 
+    /**
+     *
+     * @return
+     */
     public String getBookmarkLabel() {
         return bookmarkLabel;
     }
 
+    /**
+     *
+     * @param bookmarkLabel
+     */
     public void setBookmarkLabel(String bookmarkLabel) {
         this.bookmarkLabel = bookmarkLabel;
     }
 
+    /**
+     * @return the predicatePages
+     */
+    public Map<String, Integer> getPredicatePageNumbers() {
+
+        if (predicatePageNumbers == null) {
+
+            predicatePageNumbers = new HashMap<String, Integer>();
+            HttpServletRequest request = getContext().getRequest();
+            Map<String,String[]> paramsMap = request.getParameterMap();
+
+            if (paramsMap!=null && !paramsMap.isEmpty()){
+
+                for (Map.Entry<String,String[]> entry : paramsMap.entrySet()){
+
+                    String paramName = entry.getKey();
+                    if (isPredicatePageParam(paramName)) {
+
+                        int pageNumber = NumberUtils.toInt(paramName.substring(PAGE_PARAM_PREFIX.length()));
+                        if (pageNumber > 0) {
+
+                            String[] predicateUris = entry.getValue();
+                            if (predicateUris!=null){
+                                for (String predicateUri : predicateUris){
+                                    predicatePageNumbers.put(predicateUri, pageNumber);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return predicatePageNumbers;
+    }
+
+    /**
+     *
+     * @param paramName
+     * @return
+     */
+    public boolean isPredicatePageParam(String paramName){
+
+        if (paramName.startsWith(PAGE_PARAM_PREFIX) && paramName.length() > PAGE_PARAM_PREFIX.length()) {
+            return StringUtils.isNumeric(paramName.substring(PAGE_PARAM_PREFIX.length()));
+        }
+        else{
+            return false;
+        }
+    }
+
+    /**
+     *
+     * @return
+     */
+    public int getPredicatePageSize(){
+
+        return PredicateObjectsReader.PREDICATE_PAGE_SIZE;
+    }
 }
