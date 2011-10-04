@@ -66,7 +66,7 @@ public class DeliverySearchTableDecorator extends TableDecorator {
         StringBuffer buf = new StringBuffer();
         String start = ((DeliveryDTO) getCurrentRowObject()).getStartYear();
         String end = ((DeliveryDTO) getCurrentRowObject()).getEndYear();
-        if (StringUtils.isBlank(end)) {
+        if (StringUtils.isBlank(end) || end.equals("0")) {
             buf.append(start);
         } else {
             buf.append("From ").append(start).append(" to ").append(end);
