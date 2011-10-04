@@ -539,4 +539,11 @@ public class HarvestSourceActionBean extends AbstractActionBean {
         String uri = harvestSource == null ? null : harvestSource.getUrl();
         return uri == null ? false : (CurrentHarvests.contains(uri) || UrgentHarvestQueue.isInQueue(uri));
     }
+
+    /**
+     * @param urlBefore the urlBefore to set
+     */
+    public void setUrlBefore(String urlBefore) {
+        this.urlBefore = urlBefore;
+    }
 }
