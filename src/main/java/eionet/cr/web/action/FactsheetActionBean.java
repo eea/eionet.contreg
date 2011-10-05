@@ -43,6 +43,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 
 import eionet.cr.common.Predicates;
+import eionet.cr.common.Subjects;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
@@ -79,13 +80,13 @@ public class FactsheetActionBean extends AbstractActionBean {
     private static final String ADDIBLE_PROPERTIES_SESSION_ATTR = FactsheetActionBean.class.getName() + ".addibleProperties";
 
     /** URI by which the factsheet has been requested. */
-    private String uri;
+    protected String uri;
 
     /** URI hash by which the factsheet has been requested. Ignored when factsheet requested by URI. */
     private long uriHash;
 
     /** The subject data object found by the requestd URI or URI hash. */
-    private SubjectDTO subject;
+    protected SubjectDTO subject;
 
     /** Used in factsheet edit mode only, where it indicates if the subject is anonymous. */
     private boolean anonymous;
@@ -125,6 +126,7 @@ public class FactsheetActionBean extends AbstractActionBean {
      */
     @DefaultHandler
     public Resolution view() throws DAOException {
+        // ObjectDTO oo = subject.getObject(Predicates.CR_SPARQL_QUERY);oo.getValue()
 
         if (isNoCriteria()) {
             addCautionMessage("No request criteria specified!");
@@ -305,10 +307,10 @@ public class FactsheetActionBean extends AbstractActionBean {
         // since user registrations URI was used as triple source, add it to HARVEST_SOURCE too
         // (but set interval minutes to 0, to avoid it being background-harvested)
         DAOFactory
-        .get()
-        .getDao(HarvestSourceDAO.class)
-        .addSourceIgnoreDuplicate(
-                HarvestSourceDTO.create(getUser().getRegistrationsUri(), true, 0, getUser().getUserName()));
+                .get()
+                .getDao(HarvestSourceDAO.class)
+                .addSourceIgnoreDuplicate(
+                        HarvestSourceDTO.create(getUser().getRegistrationsUri(), true, 0, getUser().getUserName()));
 
         return new RedirectResolution(this.getClass(), "edit").addParameter("uri", uri);
     }
@@ -365,6 +367,15 @@ public class FactsheetActionBean extends AbstractActionBean {
         } else if (getContext().getEventName().equals("save") && StringUtils.isBlank(propertyValue)) {
             addGlobalValidationError(new SimpleError("Property value must not be blank"));
         }
+    }
+
+    /**
+     * True, if subject's rdf:type is Subjects.CR_SPARQL_BOOKMARK.
+     *
+     * @return
+     */
+    public boolean isSparqlBookmarkType() {
+        return Subjects.CR_SPARQL_BOOKMARK.equals(subject.getObject(Predicates.RDF_TYPE).getValue());
     }
 
     /**
@@ -570,7 +581,7 @@ public class FactsheetActionBean extends AbstractActionBean {
      */
     public boolean isSubjectDownloadable() throws DAOException {
 
-        if (subjectDownloadable==null){
+        if (subjectDownloadable == null) {
             subjectDownloadable = Boolean.valueOf(DAOFactory.get().getDao(SpoBinaryDAO.class).exists(uri));
         }
         return subjectDownloadable.booleanValue();
@@ -596,8 +607,7 @@ public class FactsheetActionBean extends AbstractActionBean {
 
         if (subject != null) {
             return subject.getObject(Predicates.WGS_LAT) != null && subject.getObject(Predicates.WGS_LONG) != null;
-        }
-        else{
+        } else {
             return false;
         }
     }
@@ -621,7 +631,7 @@ public class FactsheetActionBean extends AbstractActionBean {
 
         // TODO subproperties handling
         ObjectDTO longitudeObject = subject.getObject(Predicates.WGS_LONG);
-        return longitudeObject==null ? null : longitudeObject.getValue();
+        return longitudeObject == null ? null : longitudeObject.getValue();
     }
 
     /**
@@ -633,7 +643,7 @@ public class FactsheetActionBean extends AbstractActionBean {
 
         // TODO subproperties handling
         ObjectDTO latitudeObject = subject.getObject(Predicates.WGS_LAT);
-        return latitudeObject==null ? null : latitudeObject.getValue();
+        return latitudeObject == null ? null : latitudeObject.getValue();
     }
 
     /**
@@ -661,11 +671,11 @@ public class FactsheetActionBean extends AbstractActionBean {
 
             predicatePageNumbers = new HashMap<String, Integer>();
             HttpServletRequest request = getContext().getRequest();
-            Map<String,String[]> paramsMap = request.getParameterMap();
+            Map<String, String[]> paramsMap = request.getParameterMap();
 
-            if (paramsMap!=null && !paramsMap.isEmpty()){
+            if (paramsMap != null && !paramsMap.isEmpty()) {
 
-                for (Map.Entry<String,String[]> entry : paramsMap.entrySet()){
+                for (Map.Entry<String, String[]> entry : paramsMap.entrySet()) {
 
                     String paramName = entry.getKey();
                     if (isPredicatePageParam(paramName)) {
@@ -674,8 +684,8 @@ public class FactsheetActionBean extends AbstractActionBean {
                         if (pageNumber > 0) {
 
                             String[] predicateUris = entry.getValue();
-                            if (predicateUris!=null){
-                                for (String predicateUri : predicateUris){
+                            if (predicateUris != null) {
+                                for (String predicateUri : predicateUris) {
                                     predicatePageNumbers.put(predicateUri, pageNumber);
                                 }
                             }
@@ -693,12 +703,11 @@ public class FactsheetActionBean extends AbstractActionBean {
      * @param paramName
      * @return
      */
-    public boolean isPredicatePageParam(String paramName){
+    public boolean isPredicatePageParam(String paramName) {
 
         if (paramName.startsWith(PAGE_PARAM_PREFIX) && paramName.length() > PAGE_PARAM_PREFIX.length()) {
             return StringUtils.isNumeric(paramName.substring(PAGE_PARAM_PREFIX.length()));
-        }
-        else{
+        } else {
             return false;
         }
     }
@@ -707,7 +716,7 @@ public class FactsheetActionBean extends AbstractActionBean {
      *
      * @return
      */
-    public int getPredicatePageSize(){
+    public int getPredicatePageSize() {
 
         return PredicateObjectsReader.PREDICATE_PAGE_SIZE;
     }

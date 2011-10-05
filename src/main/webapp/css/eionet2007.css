@@ -1,3 +1,10 @@
+div.databox {
+    color: #666666;
+    background-color: #F6F6F6;
+    border: 1px solid #666666;
+    padding: 20px;
+}
+
 th.sorted a,th.sortable a {
     background-repeat: no-repeat;
     background-position: right;
