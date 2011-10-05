@@ -94,11 +94,18 @@ public class VirtuosoTagSearchHelper extends VirtuosoFilteredSearchHelper {
      * @return Query parameter string for SPARQL
      */
     public String getWhereContents() {
+        String tagPredicate = "tagPredicate";
+        bindings.setString(tagPredicate, Predicates.CR_TAG);
+
         StringBuilder sb = new StringBuilder();
-        for (String tag : tags) {
+
+        for (int i = 0; i < tags.size(); i++) {
+            String tagLiteral = "tagLiteral" + i;
+            bindings.setString(tagLiteral, tags.get(i));
+
             sb.append("?s ");
-            sb.append("<" + Predicates.CR_TAG + ">");
-            sb.append(" '" + tag + "' .");
+            sb.append("?" + tagPredicate);
+            sb.append("?" + tagLiteral + " .");
         }
         return sb.toString();
     }
