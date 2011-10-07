@@ -96,6 +96,8 @@ public interface Predicates {
     public static final String CR_HAS_FOLDER = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#hasFolder";
     public static final String CR_ALLOW_SUBOBJECT_TYPE = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#allowSubObjectType";
     public static final String CR_HARVESTED_STATEMENTS = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#harvestedStatements";
+    public static final String CR_COMPILED_DATASET = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#CompiledDataset";
+    public static final String CR_GENERATED_FROM = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#generatedFrom";
 
     public static final String WGS_LAT = "http://www.w3.org/2003/01/geo/wgs84_pos#lat";
     public static final String WGS_LONG = "http://www.w3.org/2003/01/geo/wgs84_pos#long";

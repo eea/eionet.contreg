@@ -73,4 +73,5 @@ public class DeliverySearchTableDecorator extends TableDecorator {
         }
         return buf.toString();
     }
+
 }

@@ -1477,11 +1477,9 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     /**
      * User uploaded files.
      *
-     * @param crUser
-     *            CR user
+     * @param crUser CR user
      * @see eionet.cr.dao.HelperDAO#getUserUploads(eionet.cr.web.security.CRUser)
-     * @throws DAOException
-     *             if query fails.
+     * @throws DAOException if query fails.
      * @return List of user upload items.
      */
     @Override
