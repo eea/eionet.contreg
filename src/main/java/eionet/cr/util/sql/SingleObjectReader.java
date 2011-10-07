@@ -23,6 +23,7 @@ package eionet.cr.util.sql;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.apache.commons.lang.StringUtils;
 import org.openrdf.model.BNode;
 import org.openrdf.model.Value;
 import org.openrdf.query.Binding;
@@ -62,23 +63,26 @@ public class SingleObjectReader<T> extends ResultSetMixedReader<T> {
 
         if (bindingSet != null && bindingSet.size() > 0) {
 
-            String strValue = null;
             Binding binding = bindingSet.iterator().next();
             if (binding != null) {
 
-                Value bindingValue = binding.getValue();
-                strValue = bindingValue.stringValue();
-                if (bindingValue instanceof BNode && blankNodeUriPrefix != null) {
-                    if (strValue != null && !strValue.startsWith(blankNodeUriPrefix)) {
-                        strValue = blankNodeUriPrefix + strValue;
+                Value value = binding.getValue();
+                String stringValue = value.stringValue();
+                if (!StringUtils.isBlank(stringValue)){
+
+                    if (value instanceof BNode){
+                        if (blankNodeUriPrefix != null && !stringValue.startsWith(blankNodeUriPrefix)) {
+                            stringValue = blankNodeUriPrefix + stringValue;
+                        }
                     }
-                }
-                if (strValue != null) {
-                    // this casting is done because of the generilization in the interface
-                    // only Strings can be read from Sesame Bindingset today
-                    resultList.add((T) strValue);
+
+                    if (stringValue != null) {
+                        // this casting is done because of the generilization in the interface
+                        resultList.add((T) stringValue);
+                    }
                 }
             }
         }
     }
 }
+

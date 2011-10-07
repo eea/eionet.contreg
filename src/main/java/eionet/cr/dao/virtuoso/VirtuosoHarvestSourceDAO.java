@@ -14,6 +14,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -1075,6 +1076,24 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
                 SesameUtil.close(conn);
             }
         }
+    }
+
+    /** */
+    private static final String FILTER_BY_SUBSTRING_SQL =
+        "select URL from HARVEST_SOURCE where URL like (?) order by URL asc";
+    /**
+     * @see eionet.cr.dao.HarvestSourceDAO#filter(java.lang.String)
+     */
+    @Override
+    public List<String> filter(String substring) throws DAOException {
+
+        if (StringUtils.isBlank(substring)){
+            return Collections.emptyList();
+        }
+
+        ArrayList<String> values = new ArrayList<String>();
+        values.add("%" + substring + "%");
+        return executeSQL(FILTER_BY_SUBSTRING_SQL, values, new SingleObjectReader<String>());
     }
 
 }

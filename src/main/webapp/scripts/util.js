@@ -59,6 +59,20 @@
                     noCache: true
                 });
             }
+            //Harvest source filter auto-complete
+            if ($("#harvestSource").length > 0){
+                $('#harvestSource').autocomplete({
+                    serviceUrl:'json/harvestSources.action',
+                    minChars:4,
+                    delimiter: /(,|;)\s*/,
+                    maxHeight:400,
+                    width:300,
+                    zIndex: 9999,
+                    deferRequestBy: 0,
+                    noCache: true
+                });
+            }
+
         });
 } ) ( jQuery );
 /**

@@ -343,12 +343,20 @@ public interface HarvestSourceDAO extends DAO {
      * @param sourceDTO
      * @throws DAOException
      */
-    public void updateSourceHarvestFinished(HarvestSourceDTO sourceDTO) throws DAOException;
+    void updateSourceHarvestFinished(HarvestSourceDTO sourceDTO) throws DAOException;
 
     /**
      *
      * @param sourceUrls
      * @throws DAOException
      */
-    public void removeHarvestSources(Collection<String> sourceUrls) throws DAOException;
+    void removeHarvestSources(Collection<String> sourceUrls) throws DAOException;
+
+    /**
+     *
+     * @param substring
+     * @return
+     * @throws DAOException
+     */
+    List<String> filter(String substring) throws DAOException;
 }

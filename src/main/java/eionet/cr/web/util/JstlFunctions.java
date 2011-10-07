@@ -486,4 +486,17 @@ public class JstlFunctions {
 
         return result;
     }
+
+    /**
+     *
+     * @param condition
+     * @param ifTrue
+     * @param ifFalse
+     * @return
+     */
+    public static Object conditional(boolean condition, Object ifTrue, Object ifFalse){
+
+        return condition==true ? ifTrue : ifFalse;
+    }
+
 }

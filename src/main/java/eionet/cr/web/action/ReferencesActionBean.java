@@ -39,7 +39,6 @@ import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.util.PredicateLabels;
-import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortOrder;
@@ -96,12 +95,12 @@ public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
 
             if (anonHash == 0) {
                 searchResult =
-                        searchDAO.searchReferences(uri, PagingRequest.create(getPageN()),
-                                new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
+                    searchDAO.searchReferences(uri, PagingRequest.create(getPageN()),
+                            new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
             } else {
                 searchResult =
-                        searchDAO.searchReferences(anonHash, PagingRequest.create(getPageN()), new SortingRequest(getSortP(),
-                                SortOrder.parse(getSortO())));
+                    searchDAO.searchReferences(anonHash, PagingRequest.create(getPageN()), new SortingRequest(getSortP(),
+                            SortOrder.parse(getSortO())));
             }
 
             resultList = searchResult.getRight();

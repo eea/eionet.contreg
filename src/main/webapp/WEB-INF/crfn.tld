@@ -370,4 +370,15 @@
         </example>
     </function>
 
+    <function>
+        <description>
+        </description>
+        <name>conditional</name>
+        <function-class>eionet.cr.web.util.JstlFunctions</function-class>
+        <function-signature>java.lang.Object conditional(boolean, java.lang.Object, java.lang.Object)</function-signature>
+        <example>
+            ${conditional(condition, ifTrue, ifFalse)}
+        </example>
+    </function>
+
 </taglib>

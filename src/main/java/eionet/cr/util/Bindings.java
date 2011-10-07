@@ -134,6 +134,7 @@ public class Bindings {
      * @param value
      */
     public void setURI(String name, String value) {
+
         if (!value.startsWith(VirtuosoBaseDAO.BNODE_URI_PREFIX)) {
             try {
                 bindings.put(name, new URI(value));

@@ -32,6 +32,10 @@ import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.StreamingResolution;
 import net.sourceforge.stripes.action.UrlBinding;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+
 import eionet.cr.dto.TagDTO;
 import eionet.cr.web.util.ApplicationCache;
 
@@ -41,23 +45,77 @@ import eionet.cr.web.util.ApplicationCache;
  *
  */
 
-@UrlBinding("/json/{$event}")
+@UrlBinding("/json/{$event}.action")
 public class JsonActionBean extends AbstractActionBean {
 
-    @DefaultHandler
-    public Resolution tags() {
-        List<TagDTO> tagList = ApplicationCache.getTagCloudSortedByName(0);
-        String queryParam = this.getContext().getRequestParameter("query");
+    /** */
+    private static final Logger LOGGER = Logger.getLogger(JsonActionBean.class);
 
-        List<String> tagNameList = new ArrayList<String>(tagList.size());
-        for (TagDTO tagObj : tagList) {
-            if (queryParam == null || tagObj.getTag().toLowerCase().startsWith(queryParam.toLowerCase()))
-                tagNameList.add(tagObj.getTag());
+    /**
+     *
+     * @return
+     */
+    @DefaultHandler
+    public Resolution defaultHandler(){
+
+        return createSuggestionsResolution(new ArrayList<String>(), "");
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Resolution tags() {
+
+        List<TagDTO> tagList = ApplicationCache.getTagCloudSortedByName(0);
+        String query = getContext().getRequestParameter("query");
+
+        List<String> matchingTags = new ArrayList<String>(tagList.size());
+        for (TagDTO tagDTO : tagList) {
+
+            String tag = tagDTO.getTag();
+            if (StringUtils.isBlank(query) || StringUtils.startsWithIgnoreCase(tag, query)){
+                matchingTags.add(tag);
+            }
         }
-        JSONArray jsonArray = JSONArray.fromObject(tagNameList);
+
+        return createSuggestionsResolution(matchingTags, query);
+    }
+
+    //    /**
+    //     *
+    //     * @return
+    //     * @throws DAOException
+    //     */
+    //    public Resolution harvestSources() throws DAOException {
+    //
+    //        if (LOGGER.isTraceEnabled()){
+    //            LOGGER.trace("Getting harvest source suggestions ...");
+    //        }
+    //
+    //        long startTime = System.currentTimeMillis();
+    //        String query = getContext().getRequestParameter("query");
+    //        List<String> sourceUrls = DAOFactory.get().getDao(HarvestSourceDAO.class).filter(query);
+    //
+    //        if (LOGGER.isTraceEnabled()){
+    //            LOGGER.trace("Harvest source suggestions retrieved in " + (System.currentTimeMillis() - startTime) + " ms");
+    //        }
+    //
+    //        return createSuggestionsResolution(sourceUrls, query);
+    //    }
+
+    /**
+     *
+     * @param suggestions
+     * @param query
+     * @return
+     */
+    private StreamingResolution createSuggestionsResolution(List<String> suggestions, String query){
+
+        JSONArray jsonArray = JSONArray.fromObject(suggestions);
 
         Map<String, Object> resultMap = new HashMap<String, Object>();
-        resultMap.put("query", queryParam == null ? "" : queryParam);
+        resultMap.put("query", query == null ? "" : query);
         resultMap.put("suggestions", jsonArray);
 
         JSONObject jsonObject = JSONObject.fromObject(resultMap);

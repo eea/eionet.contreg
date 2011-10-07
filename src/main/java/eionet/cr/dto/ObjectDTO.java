@@ -26,7 +26,6 @@ import java.util.Date;
 
 import org.apache.commons.lang.StringUtils;
 import org.openrdf.model.URI;
-import org.openrdf.model.vocabulary.XMLSchema;
 
 import eionet.cr.harvest.BaseHarvest;
 import eionet.cr.util.Hashes;
