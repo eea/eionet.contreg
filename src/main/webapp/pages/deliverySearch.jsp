@@ -15,8 +15,8 @@
                 Deliveries are tagged with the obligation, spatial coverage (locality) and temporal coverage (year).
                 </p>
 
-        <div style="margin-top:15px">
-            <crfn:form action="/deliverySearch.action" method="get">
+		<crfn:form action="/deliverySearch.action" method="get">
+        	<div style="margin-top:15px">
 
                 <label for="obligationSelect" class="question" style="margin-bottom:3px">Obligation:</label>
                 <stripes:select name="obligation" id="obligationSelect" size="15" style="width:100%">
@@ -45,18 +45,40 @@
                         <stripes:option value="${y}" label="${y}"/>
                     </c:forEach>
                 </stripes:select><stripes:submit name="search" value="Search" id="searchButton" style="display:inline;margin-left:60px"/>
-
-            </crfn:form>
-        </div>
+	        </div>
+	    </crfn:form>   
 		<br/>
         <c:if test="${not empty param.search}">
-        	<display:table name="${actionBean.deliveries}" class="sortable" sort="external" id="listItem" htmlId="resourcesResultList" requestURI="/deliverySearch.action" decorator="eionet.cr.web.util.DeliverySearchTableDecorator">
-				<display:column property="title" title="Title" sortable="true"/>
-				<display:column property="fileCnt" title="Files"/>
-				<display:column property="periodValue" title="Period" sortable="true" sortProperty="period"/>
-				<display:column property="locality" title="Locality"/>
-				<display:column property="date" title="Date" sortable="true"/>
-			</display:table>
+        	<c:choose>
+				<c:when test='${crfn:userHasPermission(pageContext.session, "/registrations", "u")}'>
+		        	<crfn:form action="/saveFiles.action" method="post">
+			        	<display:table name="${actionBean.deliveries}" class="sortable" sort="external" id="listItem" 
+			        				htmlId="resourcesResultList" requestURI="/deliverySearch.action" 
+			        				decorator="eionet.cr.web.util.DeliverySearchTableDecorator">
+			        		<display:column title="">
+			        			<stripes:checkbox name="selectedDeliveries" value="${listItem.subjectUri}"/>
+			        		</display:column>
+							<display:column property="title" title="Title" sortable="true"/>
+							<display:column property="fileCnt" title="Files"/>
+							<display:column property="periodValue" title="Period" sortable="true" sortProperty="period"/>
+							<display:column property="locality" title="Locality"/>
+							<display:column property="date" title="Date" sortable="true"/>
+						</display:table>
+						<stripes:submit name="getFiles" value="Save files into dataset"/>
+					</crfn:form>
+				</c:when>
+				<c:otherwise>
+					<display:table name="${actionBean.deliveries}" class="sortable" sort="external" id="listItem" 
+		        					htmlId="resourcesResultList" requestURI="/deliverySearch.action" 
+		        					decorator="eionet.cr.web.util.DeliverySearchTableDecorator">
+						<display:column property="title" title="Title" sortable="true"/>
+						<display:column property="fileCnt" title="Files"/>
+						<display:column property="periodValue" title="Period" sortable="true" sortProperty="period"/>
+						<display:column property="locality" title="Locality"/>
+						<display:column property="date" title="Date" sortable="true"/>
+					</display:table>
+				</c:otherwise>
+			</c:choose>
         </c:if>
 
     </stripes:layout-component>
