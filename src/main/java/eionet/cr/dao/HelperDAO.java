@@ -166,7 +166,8 @@ public interface HelperDAO extends DAO {
      * @param url
      * @param isBookmark
      * @param label
-     * @throws DAOException if query fails
+     * @throws DAOException
+     *             if query fails
      */
     public void registerUserUrl(CRUser user, String url, boolean isBookmark, String label) throws DAOException;
 
@@ -174,7 +175,8 @@ public interface HelperDAO extends DAO {
      * @param user
      * @param url
      * @param label
-     * @throws DAOException if query fails
+     * @throws DAOException
+     *             if query fails
      */
     public void addUserBookmark(CRUser user, String url, String label) throws DAOException;
 
@@ -476,10 +478,22 @@ public interface HelperDAO extends DAO {
     /**
      *
      * @param subjectUri
-     * @param acceptedLanguages TODO
-     * @param predicatePages TODO
+     * @param acceptedLanguages
+     *            TODO
+     * @param predicatePages
+     *            TODO
      * @return
      * @throws DAOException
      */
-    public FactsheetDTO getFactsheet(String subjectUri, List<String> acceptedLanguages, Map<String, Integer> predicatePages) throws DAOException;
+    public FactsheetDTO getFactsheet(String subjectUri, List<String> acceptedLanguages, Map<String, Integer> predicatePages)
+            throws DAOException;
+
+    /**
+     * Returns number of harvested triples from the harvest source.
+     *
+     * @param sourceUri
+     * @return
+     * @throws DAOException
+     */
+    public int getHarvestedStatements(String sourceUri) throws DAOException;
 }

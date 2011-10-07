@@ -33,7 +33,9 @@ import javax.mail.internet.AddressException;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.openrdf.model.vocabulary.XMLSchema;
 
+import eionet.cr.common.Predicates;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
@@ -203,27 +205,34 @@ public abstract class BaseHarvest implements Harvest {
                 getHarvestMessageDAO().insertHarvestMessage(messageDTO);
             }
 
-            // save source metadata
-            if (sourceMetadata != null && sourceMetadata.getPredicateCount() > 0) {
-
-                String msg = "Saving " + sourceMetadata.getTripleCount() + " triples of harvest source metadata";
-                if (cleanAllPreviousSourceMetadata){
-                    msg = msg + ", cleaning all previous metadata first";
-                }
-                LOGGER.debug(loggerMsg(msg));
-
-                // if all previous metadata should be deleted, then do so,
-                if (cleanAllPreviousSourceMetadata) {
-                    getHarvestSourceDAO().deleteSubjectTriplesInSource(getContextUrl(), GeneralConfig.HARVESTER_URI);
-                } else {
-                    // delete those metadata we're about to save (i.e. we're doing a replace)
-                    List<String> subjectUris = Collections.singletonList(getContextUrl());
-                    Set<String> predicateUris = sourceMetadata.getPredicateUris();
-                    List<String> sourceUris = Collections.singletonList(GeneralConfig.HARVESTER_URI);
-                    getHelperDAO().deleteSubjectPredicates(subjectUris, predicateUris, sourceUris);
-                }
-                getHelperDAO().addTriples(sourceMetadata);
+            if (sourceMetadata == null) {
+                sourceMetadata = new SubjectDTO(getContextUrl(), false);
             }
+
+            // add harvest statements
+            int harvestedStatements = getHelperDAO().getHarvestedStatements(getContextUrl());
+            ObjectDTO harvestedStatementsObject = new ObjectDTO(Integer.toString(harvestedStatements), null, true, false, XMLSchema.INTEGER);
+            harvestedStatementsObject.setSourceUri(GeneralConfig.HARVESTER_URI);
+            sourceMetadata.addObject(Predicates.CR_HARVESTED_STATEMENTS, harvestedStatementsObject);
+
+            // save source metadata
+            String msg = "Saving " + sourceMetadata.getTripleCount() + " triples of harvest source metadata";
+            if (cleanAllPreviousSourceMetadata){
+                msg = msg + ", cleaning all previous metadata first";
+            }
+            LOGGER.debug(loggerMsg(msg));
+
+            // if all previous metadata should be deleted, then do so,
+            if (cleanAllPreviousSourceMetadata) {
+                getHarvestSourceDAO().deleteSubjectTriplesInSource(getContextUrl(), GeneralConfig.HARVESTER_URI);
+            } else {
+                // delete those metadata we're about to save (i.e. we're doing a replace)
+                List<String> subjectUris = Collections.singletonList(getContextUrl());
+                Set<String> predicateUris = sourceMetadata.getPredicateUris();
+                List<String> sourceUris = Collections.singletonList(GeneralConfig.HARVESTER_URI);
+                getHelperDAO().deleteSubjectPredicates(subjectUris, predicateUris, sourceUris);
+            }
+            getHelperDAO().addTriples(sourceMetadata);
 
             // derive new harvest sources from stored content, unless no content was stored
             if (storedTriplesCount>0){

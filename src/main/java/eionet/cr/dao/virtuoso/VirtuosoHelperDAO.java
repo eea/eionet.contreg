@@ -1895,4 +1895,16 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
         return factsheetDTO;
     }
+
+    @Override
+    public int getHarvestedStatements(String sourceUri) throws DAOException {
+
+        StringBuilder sparql = new StringBuilder();
+        sparql.append("SELECT COUNT(*)");
+        sparql.append("FROM <" + sourceUri + "> ");
+        sparql.append("WHERE {?s ?p ?o}");
+
+        String result = executeUniqueResultSPARQL(sparql.toString(), null, new SingleObjectReader<String>());
+        return Integer.parseInt(result);
+    }
 }
