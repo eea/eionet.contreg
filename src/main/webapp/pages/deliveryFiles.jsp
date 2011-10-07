@@ -3,17 +3,17 @@
 <%@ include file="/pages/common/taglibs.jsp"%>
 
 <stripes:layout-render name="/pages/common/template.jsp" pageTitle="Save files into dataset">
-   
+
    	<stripes:layout-component name="head">
 		<script type="text/javascript">
 			( function($) {
 				$(document).ready(function(){
-					var ds_val = $('select#selDataset').val();					
+					var ds_val = $('select#selDataset').val();
 					//Hide div w/id extra
 					if(ds_val != "new_dataset") {
 						$("#newFile").css("display","none");
 					}
-					
+
 					// Add onclick handler to checkbox w/id checkme
 					$("#selDataset").change(function(){
 						if($(this).val() != "new_dataset") {
@@ -36,7 +36,7 @@
 					The list will only show files that contain at least one triple. If the file you are
 					looking for isn't in the list then it is probably not harvested yet or it isn't XML or RDF file.
 				</p>
-		
+
 				<c:if test="${not empty actionBean.deliveryFiles}">
 					<stripes:form action="/saveFiles.action" method="post">
 			        	<table border="0" width="100%" class="datatable">
@@ -61,7 +61,7 @@
 						<table border="0" width="500">
 							<tr>
 								<td width="120">
-									<stripes:label for="selDataset" class="question">Exiting datasets</stripes:label>
+									<stripes:label for="selDataset" class="question">Existing datasets</stripes:label>
 								</td>
 								<td>
 									<stripes:select name="dataset" style="width: 370px;" id="selDataset">
@@ -99,7 +99,7 @@
 									<stripes:submit name="save" value="Save dataset"/>
 								</td>
 							</tr>
-						</table>		
+						</table>
 		        	</stripes:form>
 		        </c:if>
         	</c:when>
