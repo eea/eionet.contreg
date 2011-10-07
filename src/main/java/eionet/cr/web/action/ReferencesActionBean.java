@@ -50,6 +50,8 @@ import eionet.cr.web.util.columns.ReferringPredicatesColumn;
 import eionet.cr.web.util.columns.SearchResultColumn;
 import eionet.cr.web.util.columns.SubjectPredicateColumn;
 import eionet.cr.web.util.columns.SubjectPredicateRefsColumn;
+import eionet.cr.web.util.tabs.FactsheetTabMenuHelper;
+import eionet.cr.web.util.tabs.TabElement;
 
 /**
  *
@@ -75,8 +77,7 @@ public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
     /** */
     private Map<String, String> predicateLabels;
 
-    /** */
-    private Boolean uriIsHarvestSource;
+    private List<TabElement> tabs;
 
     /*
      * (non-Javadoc)
@@ -115,6 +116,12 @@ public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
             if (predLabels != null) {
                 predicateLabels = predLabels.getByLanguages(getAcceptedLanguages());
             }
+
+            HelperDAO helperDAO = DAOFactory.get().getDao(HelperDAO.class);
+            subject = helperDAO.getFactsheet(uri, null, null);
+
+            FactsheetTabMenuHelper helper = new FactsheetTabMenuHelper(subject, factory.getDao(HarvestSourceDAO.class));
+            tabs = helper.getTabs(FactsheetTabMenuHelper.TabTitle.RESOURCE_REFERENCES);
         }
 
         return new ForwardResolution("/pages/references.jsp");
@@ -212,21 +219,10 @@ public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
     }
 
     /**
-     * @return the uriIsHarvestSource
-     * @throws DAOException
+     * @return the tabs
      */
-    public Boolean getUriIsHarvestSource() throws DAOException {
-
-        if (uriIsHarvestSource == null) {
-
-            if ((uri == null && subject == null) || anonHash > 0 || (subject != null && subject.isAnonymous())) {
-                uriIsHarvestSource = Boolean.FALSE;
-            } else {
-                String s = subject != null ? subject.getUri() : uri;
-                HarvestSourceDTO dto = factory.getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(s);
-                uriIsHarvestSource = dto == null ? Boolean.FALSE : Boolean.TRUE;
-            }
-        }
-        return uriIsHarvestSource;
+    public List<TabElement> getTabs() {
+        return tabs;
     }
+
 }

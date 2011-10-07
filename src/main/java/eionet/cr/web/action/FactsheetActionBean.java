@@ -63,6 +63,8 @@ import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.util.Pair;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
+import eionet.cr.web.util.tabs.FactsheetTabMenuHelper;
+import eionet.cr.web.util.tabs.TabElement;
 
 /**
  * Factsheet.
@@ -80,13 +82,13 @@ public class FactsheetActionBean extends AbstractActionBean {
     private static final String ADDIBLE_PROPERTIES_SESSION_ATTR = FactsheetActionBean.class.getName() + ".addibleProperties";
 
     /** URI by which the factsheet has been requested. */
-    protected String uri;
+    private String uri;
 
     /** URI hash by which the factsheet has been requested. Ignored when factsheet requested by URI. */
     private long uriHash;
 
     /** The subject data object found by the requestd URI or URI hash. */
-    protected SubjectDTO subject;
+    private SubjectDTO subject;
 
     /** Used in factsheet edit mode only, where it indicates if the subject is anonymous. */
     private boolean anonymous;
@@ -105,11 +107,11 @@ public class FactsheetActionBean extends AbstractActionBean {
     /** True if the found subject is a bookmark of the logged-in user. In all other cases false. */
     private Boolean subjectIsUserBookmark;
 
-    /** True if a harvest source by the requested URI exists. Otherwise false. */
-    private Boolean uriIsHarvestSource;
-
     /** True if the found subject has downloadable content in filestore. */
     private Boolean subjectDownloadable;
+
+    /** True, if URI is harvest source. */
+    private boolean uriIsHarvestSource;
 
     /** */
     private String bookmarkLabel;
@@ -117,6 +119,8 @@ public class FactsheetActionBean extends AbstractActionBean {
     /** */
     private Map<String, Integer> predicatePageNumbers;
     private Map<String, Integer> predicatePageCounts;
+
+    private List<TabElement> tabs;
 
     /**
      *
@@ -126,7 +130,7 @@ public class FactsheetActionBean extends AbstractActionBean {
      */
     @DefaultHandler
     public Resolution view() throws DAOException {
-        // ObjectDTO oo = subject.getObject(Predicates.CR_SPARQL_QUERY);oo.getValue()
+
 
         if (isNoCriteria()) {
             addCautionMessage("No request criteria specified!");
@@ -136,6 +140,10 @@ public class FactsheetActionBean extends AbstractActionBean {
             setAdminLoggedIn(getUser() != null && getUser().isAdministrator());
 
             subject = helperDAO.getFactsheet(uri, null, getPredicatePageNumbers());
+
+            FactsheetTabMenuHelper helper = new FactsheetTabMenuHelper(subject, factory.getDao(HarvestSourceDAO.class));
+            tabs = helper.getTabs(FactsheetTabMenuHelper.TabTitle.RESOURCE_PROPERTIES);
+            uriIsHarvestSource = helper.isUriIsHarvestSource();
         }
 
         return new ForwardResolution("/pages/factsheet.jsp");
@@ -370,15 +378,6 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     * True, if subject's rdf:type is Subjects.CR_SPARQL_BOOKMARK.
-     *
-     * @return
-     */
-    public boolean isSparqlBookmarkType() {
-        return Subjects.CR_SPARQL_BOOKMARK.equals(subject.getObject(Predicates.RDF_TYPE).getValue());
-    }
-
-    /**
      * @return the resourceUri
      */
     public String getUri() {
@@ -556,26 +555,6 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     * @return the uriIsHarvestSource
-     * @throws DAOException
-     *             if query fails
-     */
-    public Boolean getUriIsHarvestSource() throws DAOException {
-
-        if (uriIsHarvestSource == null) {
-
-            if ((uri == null && subject == null) || (subject != null && subject.isAnonymous())) {
-                uriIsHarvestSource = Boolean.FALSE;
-            } else {
-                String s = subject != null ? subject.getUri() : uri;
-                HarvestSourceDTO dto = factory.getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(s);
-                uriIsHarvestSource = dto == null ? Boolean.FALSE : Boolean.TRUE;
-            }
-        }
-        return uriIsHarvestSource;
-    }
-
-    /**
      * @return the subjectDownloadable
      * @throws DAOException
      */
@@ -597,53 +576,22 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     * True if the resource can be shown on a map (i.e. it's got longitude and latitude predicates).
-     *
-     * @return boolean
-     */
-    public boolean isMapDisplayable() {
-
-        // TODO subproperties handling
-
-        if (subject != null) {
-            return subject.getObject(Predicates.WGS_LAT) != null && subject.getObject(Predicates.WGS_LONG) != null;
-        } else {
-            return false;
-        }
-    }
-
-    /**
      *
      * @return Resolution
+     * @throws DAOException
      */
-    public Resolution showOnMap() {
+    public Resolution showOnMap() throws DAOException {
+        HelperDAO helperDAO = DAOFactory.get().getDao(HelperDAO.class);
+        subject = helperDAO.getFactsheet(uri, null, null);
+
+        FactsheetTabMenuHelper helper = new FactsheetTabMenuHelper(subject, factory.getDao(HarvestSourceDAO.class));
+        tabs = helper.getTabs(FactsheetTabMenuHelper.TabTitle.SHOW_ON_MAP);
         return new ForwardResolution("/pages/map.jsp");
     }
 
-    /**
-     * Longitude of the resource if the resouce is map displayable.
-     *
-     * returns null if not set
-     *
-     * @return String longitude
-     */
-    public String getLongitude() {
 
-        // TODO subproperties handling
-        ObjectDTO longitudeObject = subject.getObject(Predicates.WGS_LONG);
-        return longitudeObject == null ? null : longitudeObject.getValue();
-    }
-
-    /**
-     * Latitude of the resource if the resouce is map displayable. returns null if not set
-     *
-     * @return String latitude
-     */
-    public String getLatitude() {
-
-        // TODO subproperties handling
-        ObjectDTO latitudeObject = subject.getObject(Predicates.WGS_LAT);
-        return latitudeObject == null ? null : latitudeObject.getValue();
+    public boolean isUriIsHarvestSource() {
+        return uriIsHarvestSource;
     }
 
     /**
@@ -720,4 +668,12 @@ public class FactsheetActionBean extends AbstractActionBean {
 
         return PredicateObjectsReader.PREDICATE_PAGE_SIZE;
     }
+
+    /**
+     * @return the tabs
+     */
+    public List<TabElement> getTabs() {
+        return tabs;
+    }
+
 }

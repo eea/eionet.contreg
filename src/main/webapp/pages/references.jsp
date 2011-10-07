@@ -9,41 +9,8 @@
         <c:choose>
             <c:when test="${!actionBean.noCriteria}">
 
-                <div id="tabbedmenu">
-                    <ul>
-                        <li>
-                            <c:choose>
-                                <c:when test="${not empty actionBean.uri}">
-                                    <stripes:link href="/factsheet.action">Resource properties
-                                        <stripes:param name="uri" value="${actionBean.uri}"/>
-                                    </stripes:link>
-                                </c:when>
-                                <c:otherwise>
-                                    <stripes:link href="/factsheet.action">Resource properties
-                                        <stripes:param name="uriHash" value="${actionBean.anonHash}"/>
-                                    </stripes:link>
-                                </c:otherwise>
-                            </c:choose>
-                        </li>
-                        <li id="currenttab">
-                            <span>Resource references</span>
-                        </li>
-                        <c:if test="${actionBean.uriIsHarvestSource}">
-                            <li>
-                                <stripes:link href="/objectsInSource.action"  event="search">Objects in Source
-                                    <c:choose>
-                                        <c:when test="${not empty actionBean.uri}">
-                                                <stripes:param name="uri" value="${actionBean.uri}"/>
-                                        </c:when>
-                                        <c:otherwise>
-                                                <stripes:param name="uriHash" value="${actionBean.anonHash}"/>
-                                        </c:otherwise>
-                                    </c:choose>
-                                </stripes:link>
-                            </li>
-                        </c:if>
-                    </ul>
-                </div>
+                <cr:tabMenu tabs="${actionBean.tabs}" />
+
                 <br style="clear:left" />
                 <div style="margin-top:20px">
                     <p>

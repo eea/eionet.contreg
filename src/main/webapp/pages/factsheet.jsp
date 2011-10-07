@@ -32,63 +32,8 @@
         <c:choose>
             <c:when test="${!actionBean.noCriteria}">
 
-                <div id="tabbedmenu">
-                    <ul>
-                    <li id="currenttab"><span>Resource properties</span></li>
-                    <li>
-                        <c:choose>
-                            <c:when test="${not empty actionBean.subject && not empty actionBean.subject.uri && !actionBean.subject.anonymous}">
-                                <stripes:link href="/references.action" event="search">Resource references
-                                    <stripes:param name="uri" value="${actionBean.subject.uri}"/>
-                                </stripes:link>
-                            </c:when>
-                            <c:when test="${not empty actionBean.uri}">
-                                <stripes:link href="/references.action" event="search">Resource references
-                                    <stripes:param name="uri" value="${actionBean.uri}"/>
-                                </stripes:link>
-                            </c:when>
-                            <c:otherwise>
-                                <stripes:link href="/references.action" event="search">Resource references
-                                    <stripes:param name="anonHash" value="${actionBean.uriHash}"/>
-                                </stripes:link>
-                            </c:otherwise>
-                        </c:choose>
-                    </li>
-                    <c:if test="${actionBean.uriIsHarvestSource}">
-                        <li>
-                            <stripes:link href="/objectsInSource.action" event="search">Objects in Source
-                            <c:choose>
-                                <c:when test="${not empty actionBean.subject && not empty actionBean.subject.uri && !actionBean.subject.anonymous}">
-                                    <stripes:param name="uri" value="${actionBean.subject.uri}"/>
-                                </c:when>
-                                <c:when test="${not empty actionBean.uri}">
-                                    <stripes:param name="uri" value="${actionBean.uri}"/>
-                                </c:when>
-                                <c:otherwise>
-                                    <stripes:param name="anonHash" value="${actionBean.uriHash}"/>
-                                </c:otherwise>
-                            </c:choose>
-                            </stripes:link>
-                        </li>
-                    </c:if>
-                    <c:if test="${actionBean.mapDisplayable}">
-                           <li>
-                            <stripes:link class="link-plain" href="/factsheet.action" event="showOnMap">Show on Map
-                            <stripes:param name="uri" value="${actionBean.subject.uri}"/>
-                            <stripes:param name="latitude" value="${actionBean.latitude}" />
-                            <stripes:param name="longitude" value="${actionBean.longitude}" />
-                            </stripes:link>
-                           </li>
-                    </c:if>
-                    <c:if test="${actionBean.sparqlBookmarkType}">
-                        <li>
-                            <stripes:link href="/sparqlBookmark.action">Bookmarked SPARQL
-                                <stripes:param name="uri" value="${actionBean.uri}"/>
-                            </stripes:link>
-                        </li>
-                    </c:if>
-                    </ul>
-                </div>
+                <cr:tabMenu tabs="${actionBean.tabs}" />
+
                 <br style="clear:left" />
 
                 <c:choose>
