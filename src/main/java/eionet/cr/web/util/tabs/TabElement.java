@@ -31,26 +31,49 @@ import java.util.Map;
  */
 public class TabElement {
 
+    /** Title. */
     private String title;
 
+    /** Link's url whithout context root. */
     private String href;
 
+    /** Stripes event. */
     private String event;
 
+    /** Request parameters. */
     private Map<String, Object> params = new HashMap<String, Object>();
 
+    /** True, if current tab element is selected. */
     private boolean selected;
 
+    /**
+     * Class constructor.
+     *
+     * @param title
+     * @param href
+     * @param selectedTitle
+     */
     public TabElement(String title, String href, String selectedTitle) {
         this.title = title;
         this.href = href;
         selected = title.equals(selectedTitle);
     }
 
+    /**
+     * Adds request parameter.
+     *
+     * @param key
+     * @param value
+     */
     public void addParam(String key, Object value) {
         params.put(key, value);
     }
 
+    /**
+     * Returns url without context root, but with Stripes event and request parameters.
+     *
+     * @return
+     */
     public String getUrl() {
         StringBuilder sb = new StringBuilder();
         sb.append(href);
