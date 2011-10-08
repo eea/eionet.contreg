@@ -49,6 +49,10 @@ public class DeliveryFilesReader extends ResultSetMixedReader<DeliveryFilesDTO> 
                     if (!StringUtils.isBlank(title)) {
                         file.setTitle(title);
                     }
+                    String triplesCnt = bindingSet.getValue("triplesCnt") != null ? bindingSet.getValue("triplesCnt").stringValue() : null;
+                    if (!StringUtils.isBlank(triplesCnt)) {
+                        file.setTriplesCnt(new Integer(triplesCnt).intValue());
+                    }
                     List<FileDTO> files = del.getFiles();
                     if (!files.contains(file)) {
                         files.add(file);

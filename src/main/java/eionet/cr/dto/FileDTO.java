@@ -37,6 +37,7 @@ public class FileDTO implements java.io.Serializable {
 
     private String title;
     private String uri;
+    private int triplesCnt;
 
     /**
      *
@@ -88,5 +89,13 @@ public class FileDTO implements java.io.Serializable {
         } else if (!uri.equals(other.uri))
             return false;
         return true;
+    }
+
+    public int getTriplesCnt() {
+        return triplesCnt;
+    }
+
+    public void setTriplesCnt(int triplesCnt) {
+        this.triplesCnt = triplesCnt;
     }
 }

@@ -40,10 +40,15 @@
 				<c:if test="${not empty actionBean.deliveryFiles}">
 					<stripes:form action="/saveFiles.action" method="post">
 			        	<table border="0" width="100%" class="datatable">
-				        	<c:forEach items="${actionBean.deliveryFiles}" var="delivery">
+				        	<c:forEach items="${actionBean.deliveryFiles}" var="delivery" varStatus="cnt">
 				        		<tr>
 				        			<td colspan="2">
 				        				<b><c:out value="${delivery.uri}"/></b>
+				        			</td>
+				        			<td>
+				        				<c:if test="${cnt.index == 0}">
+				        					<b>Statements</b>
+				        				</c:if>
 				        			</td>
 				        		</tr>
 				        		<c:forEach items="${delivery.files}" var="file" varStatus="loop">
@@ -53,6 +58,11 @@
 				        				</td>
 				        				<td>
 				        					<c:out value="${file.title}"/>
+				        				</td>
+				        				<td>
+				        					<c:if test="${file.triplesCnt > 0}">
+				        						<c:out value="${file.triplesCnt}"/>
+				        					</c:if>
 				        				</td>
 				        			</tr>
 				        		</c:forEach>
