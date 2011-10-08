@@ -103,6 +103,11 @@ public class FactsheetReader extends SPARQLResultSetBaseReader<FactsheetDTO> {
 
         ObjectDTO objectDTO = null;
         if (isLiteral){
+            // For some XML files there can be cases where label is null.
+            // Just ignoring NullPointer in this case - needs further investigation
+            if (label == null) {
+                label = "";
+            }
             objectDTO = new ObjectDTO(label, language, true, false, datatype);
         }
         else{
