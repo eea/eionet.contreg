@@ -448,7 +448,7 @@ table#resourcesResultList {
 }
 
 span.langcode {
-    display:block;
+    display:inline-block;
     min-width: 1.5em;
     text-align:center;
     color: #455b6b;
