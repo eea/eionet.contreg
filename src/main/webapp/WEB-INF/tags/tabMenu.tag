@@ -10,8 +10,16 @@
                 <li id="currenttab"><span><c:out value="${tab.title}" /></span></li>
             </c:when>
             <c:otherwise>
-                <c:url value="${tab.url}" var="url" />
-                <li><a href="${url}"><c:out value="${tab.title}" /></a></li>
+                <li>
+                    <stripes:link href="${tab.href}"><c:out value="${tab.title}" />
+                        <c:if test="${not empty tab.event}">
+                            <stripes:param name="${tab.event}" />
+                        </c:if>
+                        <c:forEach var="item" items="${tab.params}">
+                            <stripes:param name="${item.key}" value="${item.value}" />
+                        </c:forEach>
+                    </stripes:link>
+                </li>
             </c:otherwise>
         </c:choose>
     </c:forEach>

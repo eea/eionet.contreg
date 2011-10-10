@@ -140,7 +140,8 @@ public class FactsheetActionBean extends AbstractActionBean {
 
             subject = helperDAO.getFactsheet(uri, null, getPredicatePageNumbers());
 
-            FactsheetTabMenuHelper helper = new FactsheetTabMenuHelper(subject, factory.getDao(HarvestSourceDAO.class));
+            FactsheetTabMenuHelper helper = new FactsheetTabMenuHelper(uri, subject, factory.getDao(HarvestSourceDAO.class));
+
             tabs = helper.getTabs(FactsheetTabMenuHelper.TabTitle.RESOURCE_PROPERTIES);
             uriIsHarvestSource = helper.isUriIsHarvestSource();
         }
@@ -583,7 +584,7 @@ public class FactsheetActionBean extends AbstractActionBean {
         HelperDAO helperDAO = DAOFactory.get().getDao(HelperDAO.class);
         subject = helperDAO.getFactsheet(uri, null, null);
 
-        FactsheetTabMenuHelper helper = new FactsheetTabMenuHelper(subject, factory.getDao(HarvestSourceDAO.class));
+        FactsheetTabMenuHelper helper = new FactsheetTabMenuHelper(uri, subject, factory.getDao(HarvestSourceDAO.class));
         tabs = helper.getTabs(FactsheetTabMenuHelper.TabTitle.SHOW_ON_MAP);
         return new ForwardResolution("/pages/map.jsp");
     }

@@ -49,7 +49,7 @@ public class ObjectsInSourceActionBean extends AbstractSearchActionBean<SubjectD
         HelperDAO helperDAO = DAOFactory.get().getDao(HelperDAO.class);
         SubjectDTO subject = helperDAO.getFactsheet(uri, null, null);
 
-        FactsheetTabMenuHelper helper = new FactsheetTabMenuHelper(subject, factory.getDao(HarvestSourceDAO.class));
+        FactsheetTabMenuHelper helper = new FactsheetTabMenuHelper(uri, subject, factory.getDao(HarvestSourceDAO.class));
         tabs = helper.getTabs(FactsheetTabMenuHelper.TabTitle.OBJECTS_IN_SOURCE);
         return new ForwardResolution("/pages/objectsInSource.jsp");
     }
@@ -76,7 +76,7 @@ public class ObjectsInSourceActionBean extends AbstractSearchActionBean<SubjectD
         HelperDAO helperDAO = DAOFactory.get().getDao(HelperDAO.class);
         SubjectDTO subject = helperDAO.getFactsheet(uri, null, null);
 
-        FactsheetTabMenuHelper helper = new FactsheetTabMenuHelper(subject, factory.getDao(HarvestSourceDAO.class));
+        FactsheetTabMenuHelper helper = new FactsheetTabMenuHelper(uri, subject, factory.getDao(HarvestSourceDAO.class));
         tabs = helper.getTabs(FactsheetTabMenuHelper.TabTitle.OBJECTS_IN_SOURCE);
 
         return new ForwardResolution("/pages/objectsInSource.jsp");

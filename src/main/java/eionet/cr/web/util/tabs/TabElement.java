@@ -70,37 +70,6 @@ public class TabElement {
     }
 
     /**
-     * Returns url without context root, but with Stripes event and request parameters.
-     *
-     * @return
-     */
-    public String getUrl() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(href);
-        int count = 0;
-        if (event != null) {
-            sb.append("?");
-            sb.append(event);
-            sb.append("=");
-        } else {
-            if (params.size() > 0) {
-                sb.append("?");
-            }
-        }
-        for (String key : params.keySet()) {
-            if (count > 0 || event != null) {
-                sb.append("&");
-            }
-            sb.append(key);
-            sb.append("=");
-            sb.append(params.get(key));
-            count++;
-        }
-
-        return sb.toString();
-    }
-
-    /**
      * @return the title
      */
     public String getTitle() {

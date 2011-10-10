@@ -119,7 +119,7 @@ public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
             HelperDAO helperDAO = DAOFactory.get().getDao(HelperDAO.class);
             subject = helperDAO.getFactsheet(uri, null, null);
 
-            FactsheetTabMenuHelper helper = new FactsheetTabMenuHelper(subject, factory.getDao(HarvestSourceDAO.class));
+            FactsheetTabMenuHelper helper = new FactsheetTabMenuHelper(uri, subject, factory.getDao(HarvestSourceDAO.class));
             tabs = helper.getTabs(FactsheetTabMenuHelper.TabTitle.RESOURCE_REFERENCES);
         }
 
