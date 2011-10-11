@@ -50,6 +50,7 @@ public interface Subjects {
     public static final String CR_SPARQL_BOOKMARK = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#SparqlBookmark";
     public static final String CR_FOLDER = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#Folder";
     public static final String CR_USER_FOLDER = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#UserFolder";
+    public static final String CR_COMPILED_DATASET = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#CompiledDataset";
 
     public static final String WGS_POINT = "http://www.w3.org/2003/01/geo/wgs84_pos#Point";
     public static final String WGS_SPATIAL_THING = "http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing";

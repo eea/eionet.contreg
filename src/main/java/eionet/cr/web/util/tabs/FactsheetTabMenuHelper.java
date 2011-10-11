@@ -51,6 +51,7 @@ public class FactsheetTabMenuHelper {
     private boolean uriIsHarvestSource;
     private boolean mapDisplayable;
     private boolean sparqlBookmarkType;
+    private boolean compiledDatasetType;
 
     private String latitude;
     private String longitude;
@@ -73,6 +74,10 @@ public class FactsheetTabMenuHelper {
 
         if (subject.getObject(Predicates.RDF_TYPE) != null) {
             sparqlBookmarkType = Subjects.CR_SPARQL_BOOKMARK.equals(subject.getObject(Predicates.RDF_TYPE).getValue());
+        }
+
+        if (subject.getObject(Predicates.RDF_TYPE) != null) {
+            compiledDatasetType = Subjects.CR_COMPILED_DATASET.equals(subject.getObject(Predicates.RDF_TYPE).getValue());
         }
     }
 
@@ -118,6 +123,12 @@ public class FactsheetTabMenuHelper {
             result.add(te5);
         }
 
+        if (compiledDatasetType) {
+            TabElement te6 = new TabElement(TabTitle.COMPILED_DATASET, "/compiledDataset.action", selected);
+            te6.addParam("uri", subject.getUri());
+            result.add(te6);
+        }
+
         return result;
     }
 
@@ -136,5 +147,6 @@ public class FactsheetTabMenuHelper {
         public static final String OBJECTS_IN_SOURCE = "Objects in source";
         public static final String SHOW_ON_MAP = "Show on map";
         public static final String BOOKMARKED_SPARQL = "Bookmarked SPARQL";
+        public static final String COMPILED_DATASET = "Compiled dataset";
     }
 }

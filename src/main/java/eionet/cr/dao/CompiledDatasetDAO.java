@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.List;
 
 import eionet.cr.dto.DeliveryFilesDTO;
+import eionet.cr.dto.SubjectDTO;
 import eionet.cr.dto.UploadDTO;
 import eionet.cr.web.security.CRUser;
 
@@ -60,6 +61,15 @@ public interface CompiledDatasetDAO extends DAO {
     List<String> getDatasetFiles(String dataset) throws DAOException;
 
     /**
+     * Returns list of compiled dataset source files. Only uri and lastModifiedDate properties are populated.
+     *
+     * @param dataset
+     * @return
+     * @throws DAOException
+     */
+    List<SubjectDTO> getDetailedDatasetFiles(String dataset) throws DAOException;
+
+    /**
      *
      * @param selectedFiles
      * @param fileName
@@ -68,14 +78,17 @@ public interface CompiledDatasetDAO extends DAO {
      * @return File
      * @throws DAOException
      */
-    File saveConstructedDataset(List<String> selectedFiles, String fileName, String userName, boolean overwrite) throws DAOException;
+    File saveConstructedDataset(List<String> selectedFiles, String fileName, String userName, boolean overwrite)
+            throws DAOException;
 
     /**
      * User compiled datasets.
      *
-     * @param crUser CR user
+     * @param crUser
+     *            CR user
      * @see eionet.cr.dao.HelperDAO#getUserCompiledDatasets(eionet.cr.web.security.CRUser)
-     * @throws DAOException if query fails.
+     * @throws DAOException
+     *             if query fails.
      * @return List of user compiled datasets.
      */
     Collection<UploadDTO> getUserCompiledDatasets(CRUser crUser) throws DAOException;

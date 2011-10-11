@@ -1,0 +1,45 @@
+<%@page contentType="text/html;charset=UTF-8"%>
+
+<%@ include file="/pages/common/taglibs.jsp"%>
+
+<stripes:layout-render name="/pages/common/template.jsp" pageTitle="Resource properties">
+
+    <stripes:layout-component name="contents">
+
+        <cr:tabMenu tabs="${actionBean.tabs}" />
+
+        <c:if test="${actionBean.usersDataset}">
+            <ul id="dropdown-operations">
+                <li><a href="#">Operations</a>
+                    <ul>
+                        <li>
+                            <stripes:link class="link-plain" href="/compiledDataset.action" event="reload">
+                                <stripes:param name="uri" value="${actionBean.uri}" />
+                                Reload
+                            </stripes:link>
+                        </li>
+                    </ul>
+                 </li>
+             </ul>
+         </c:if>
+
+        <br style="clear:left" />
+        <br />
+
+        <h1>Compiled dataset sources</h1>
+
+        <display:table name="${actionBean.sources}" class="sortable" id="item" sort="list" requestURI="${actionBean.urlBinding}">
+            <display:column title="URL" sortable="true">
+                <stripes:link href="/factsheet.action">
+                    <stripes:param name="uri" value="${item.uri}" />
+                    <c:out value="${item.uri}" />
+                </stripes:link>
+            </display:column>
+            <display:column title="Last modified" sortable="true">
+                <fmt:formatDate value="${item.lastModifiedDate}" pattern="yyyy-MM-dd"/>T<fmt:formatDate value="${item.lastModifiedDate}" pattern="HH:mm:ss"/>
+            </display:column>
+        </display:table>
+
+    </stripes:layout-component>
+
+</stripes:layout-render>

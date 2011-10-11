@@ -30,7 +30,7 @@ import net.sourceforge.stripes.action.UrlBinding;
 
 import org.apache.commons.lang.StringUtils;
 
-import eionet.cr.common.Predicates;
+import eionet.cr.dao.CompiledDatasetDAO;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
@@ -40,53 +40,88 @@ import eionet.cr.web.util.tabs.FactsheetTabMenuHelper;
 import eionet.cr.web.util.tabs.TabElement;
 
 /**
- * Sparql bookmark tab controller.
+ * Compiled dataset tab controller.
  *
  * @author Juhan Voolaid
  */
-@UrlBinding("/sparqlBookmark.action")
-public class SparqlBookmarkActionBean extends AbstractActionBean {
+@UrlBinding("/compiledDataset.action")
+public class CompiledDatasetActionBean extends AbstractActionBean {
 
     /** URI by which the factsheet has been requested. */
     private String uri;
 
-    /** The subject data object found by the requested URI. */
-    private SubjectDTO subject;
+    /** Compiled dataset sources. */
+    private List<SubjectDTO> sources;
 
     private List<TabElement> tabs;
 
+    /**
+     * Action event for displaying dataset sources.
+     *
+     * @return
+     * @throws DAOException
+     */
     @DefaultHandler
     public Resolution view() throws DAOException {
+
         if (StringUtils.isEmpty(uri)) {
             addCautionMessage("No request criteria specified!");
         } else {
             HelperDAO helperDAO = DAOFactory.get().getDao(HelperDAO.class);
-            subject = helperDAO.getFactsheet(uri, null, null);
+            SubjectDTO subject = helperDAO.getFactsheet(uri, null, null);
+            sources = factory.getDao(CompiledDatasetDAO.class).getDetailedDatasetFiles(uri);
 
             FactsheetTabMenuHelper helper = new FactsheetTabMenuHelper(uri, subject, factory.getDao(HarvestSourceDAO.class));
-            tabs = helper.getTabs(FactsheetTabMenuHelper.TabTitle.BOOKMARKED_SPARQL);
+            tabs = helper.getTabs(FactsheetTabMenuHelper.TabTitle.COMPILED_DATASET);
         }
-        return new ForwardResolution("/pages/sparqlBookmark.jsp");
-    }
 
-    public String getSpqrqlQuery() {
-        return subject.getObject(Predicates.CR_SPARQL_QUERY).getValue();
+        return new ForwardResolution("/pages/compiledDataset.jsp");
     }
 
     /**
-    *
-    * @return boolean
-    * @throws DAOException
-    *             if query fails if query fails
-    */
-   public boolean getSubjectIsUserBookmark() throws DAOException {
+     * Action event for reloading dataset.
+     *
+     * @return
+     * @throws DAOException
+     */
+    public Resolution reload() throws DAOException {
+        boolean success = false;
+        if (getUser() != null) {
+            if (isUsersDataset()) {
+                // TODO: call reaload service
+                logger.info("test: " + uri);
+                success = true;
+            } else {
+                addCautionMessage("User must be the owner of the compiled dataset!");
+            }
+        } else {
+            addCautionMessage("User must be logged in!");
+        }
 
-       if (!isUserLoggedIn()) {
-           return false;
-       }
+        if (success) {
+            addSystemMessage("Compiled dataset reloaded successfully");
+        }
+        return view();
+    }
 
-       return Boolean.valueOf(factory.getDao(HelperDAO.class).isSubjectUserBookmark(getUser(), uri));
-   }
+    /**
+     * True, if the dataset with given uri belongs to the currently logged in user.
+     *
+     * @return
+     */
+    public boolean isUsersDataset() {
+        if (getUser() == null) {
+            return false;
+        }
+        return uri.contains("/home/" + getUserName());
+    }
+
+    /**
+     * @return the tabs
+     */
+    public List<TabElement> getTabs() {
+        return tabs;
+    }
 
     /**
      * @return the uri
@@ -104,25 +139,10 @@ public class SparqlBookmarkActionBean extends AbstractActionBean {
     }
 
     /**
-     * @return the subject
+     * @return the sources
      */
-    public SubjectDTO getSubject() {
-        return subject;
-    }
-
-    /**
-     * @param subject
-     *            the subject to set
-     */
-    public void setSubject(SubjectDTO subject) {
-        this.subject = subject;
-    }
-
-    /**
-     * @return the tabs
-     */
-    public List<TabElement> getTabs() {
-        return tabs;
+    public List<SubjectDTO> getSources() {
+        return sources;
     }
 
 }

@@ -4,11 +4,14 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.openrdf.query.BindingSet;
 import org.openrdf.query.GraphQuery;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.repository.RepositoryConnection;
@@ -18,14 +21,17 @@ import eionet.cr.common.Predicates;
 import eionet.cr.dao.CompiledDatasetDAO;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.readers.DeliveryFilesReader;
+import eionet.cr.dao.readers.ResultSetReaderException;
 import eionet.cr.dao.readers.UploadDTOReader;
 import eionet.cr.dto.DeliveryFilesDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.dto.UploadDTO;
 import eionet.cr.filestore.FileStore;
+import eionet.cr.harvest.BaseHarvest;
 import eionet.cr.util.Bindings;
 import eionet.cr.util.URIUtil;
 import eionet.cr.util.sesame.SPARQLQueryUtil;
+import eionet.cr.util.sesame.SPARQLResultSetBaseReader;
 import eionet.cr.util.sesame.SesameConnectionProvider;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SingleObjectReader;
@@ -38,10 +44,8 @@ import eionet.cr.web.security.CRUser;
  */
 public class VirtuosoCompiledDatasetDAO extends VirtuosoBaseDAO implements CompiledDatasetDAO {
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.dao.CompiledDatasetDAO#getDeliveryFiles(java.util.List)
+    /**
+     * {@inheritDoc}
      */
     @Override
     public List<DeliveryFilesDTO> getDeliveryFiles(List<String> deliveryUris) throws DAOException {
@@ -67,10 +71,8 @@ public class VirtuosoCompiledDatasetDAO extends VirtuosoBaseDAO implements Compi
         return ret;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.dao.CompiledDatasetDAO#getCompiledDatasets(java.lang.String)
+    /**
+     * {@inheritDoc}
      */
     @Override
     public List<String> getCompiledDatasets(String homeFolder) throws DAOException {
@@ -88,10 +90,8 @@ public class VirtuosoCompiledDatasetDAO extends VirtuosoBaseDAO implements Compi
         return ret;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.dao.CompiledDatasetDAO#getDatasetFiles(java.lang.String)
+    /**
+     * {@inheritDoc}
      */
     @Override
     public List<String> getDatasetFiles(String dataset) throws DAOException {
@@ -107,10 +107,47 @@ public class VirtuosoCompiledDatasetDAO extends VirtuosoBaseDAO implements Compi
         return ret;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.dao.CompiledDatasetDAO#getDatasetFiles(java.lang.String)
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<SubjectDTO> getDetailedDatasetFiles(String dataset) throws DAOException {
+        List<SubjectDTO> ret = new ArrayList<SubjectDTO>();
+        if (!StringUtils.isBlank(dataset)) {
+            StringBuffer query = new StringBuffer();
+            query.append("select ?source, ?lastModified where {");
+            query.append("<").append(dataset).append("> <").append(Predicates.CR_GENERATED_FROM).append("> ?source . ");
+            query.append("?source").append("<" + Predicates.CR_LAST_MODIFIED + ">").append(" ?lastModified");
+            query.append("}");
+
+
+            SPARQLResultSetBaseReader<SubjectDTO> reader = new SPARQLResultSetBaseReader<SubjectDTO>() {
+                @Override
+                public void readRow(BindingSet bindingSet) throws ResultSetReaderException {
+                    if (bindingSet != null && bindingSet.size() > 0) {
+                        String sourceUri = bindingSet.getValue("source").stringValue();
+                        String lastModifiedDate = bindingSet.getValue("lastModified").stringValue();
+                        Date lastModified = null;
+                        try {
+                            lastModified = BaseHarvest.DATE_FORMATTER.parse(lastModifiedDate);
+                        } catch (ParseException e) {
+                            logger.warn("Failed to parse date", e);
+                        }
+
+                        SubjectDTO dto = new SubjectDTO(sourceUri, false);
+                        dto.setLastModifiedDate(lastModified);
+                        resultList.add(dto);
+                    }
+                }
+            };
+
+            ret = executeSPARQL(query.toString(), reader);
+        }
+        return ret;
+    }
+
+    /**
+     * {@inheritDoc}
      */
     @Override
     public File saveConstructedDataset(List<String> selectedFiles, String fileName, String userName, boolean overwrite) throws DAOException {
@@ -202,4 +239,5 @@ public class VirtuosoCompiledDatasetDAO extends VirtuosoBaseDAO implements Compi
 
         return datasets;
     }
+
 }
