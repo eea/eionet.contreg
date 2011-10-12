@@ -51,6 +51,13 @@ border-bottom: 3px solid #cedc32;
 
 #tabbedmenuend { clear: left; }
 
+div.databox {
+    color: #666666;
+    background-color: #F6F6F6;
+    border: 1px solid #666666;
+    padding: 20px;
+}
+
 
 .question {
 	vertical-align: top;
