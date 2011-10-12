@@ -88,7 +88,7 @@ public class CompiledDatasetActionBean extends AbstractActionBean {
         boolean success = false;
         if (getUser() != null) {
             if (isUsersDataset()) {
-                // TODO: call reaload service
+                // TODO: implement reload
                 logger.info("test: " + uri);
                 success = true;
             } else {
@@ -110,10 +110,14 @@ public class CompiledDatasetActionBean extends AbstractActionBean {
      * @return
      */
     public boolean isUsersDataset() {
+        //FIXME: demporary removed
+        return false;
+        /*
         if (getUser() == null) {
             return false;
         }
         return uri.contains("/home/" + getUserName());
+        */
     }
 
     /**
