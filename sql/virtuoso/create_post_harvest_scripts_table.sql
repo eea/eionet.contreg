@@ -2,13 +2,16 @@
 create table CR.cr3user.post_harvest_script
 (
     post_harvest_script_id integer NOT NULL IDENTITY,
-    harvest_source_url varchar(1024) DEFAULT NULL,
-    rdf_type_uri varchar(1024) DEFAULT NULL,
-    query long varchar NOT NULL,
-    position_index integer not null,
+    target_source_url varchar(1024) DEFAULT NULL,
+    target_type_url varchar(1024) DEFAULT NULL,
+    title varchar(255) NOT NULL,
+    script long varchar NOT NULL,
+    position_number integer not null,
+    active character NOT NULL DEFAULT 'N',
     PRIMARY KEY (post_harvest_script_id),
-    UNIQUE (harvest_source_url,rdf_type_uri,position_index),
-    CHECK ((harvest_source_url is not null and rdf_type_uri is null) or (harvest_source_url is null and rdf_type_uri is not null))
+    UNIQUE (target_source_url,target_type_url,title),
+    UNIQUE (target_source_url,target_type_url,position_number),
+    CHECK (target_source_url is null or target_type_url is null)
 );
-CREATE INDEX post_harvest_script_source_url ON CR.cr3user.post_harvest_script (harvest_source_url);
-CREATE INDEX post_harvest_script_type_uri ON CR.cr3user.post_harvest_script (rdf_type_uri);
+CREATE INDEX post_harvest_script_source_url ON CR.cr3user.post_harvest_script (target_source_url);
+CREATE INDEX post_harvest_script_type_uri ON CR.cr3user.post_harvest_script (target_type_url);

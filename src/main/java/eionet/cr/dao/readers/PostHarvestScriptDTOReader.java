@@ -26,9 +26,9 @@ import java.sql.SQLException;
 
 import org.apache.commons.lang.StringUtils;
 
-import eionet.cr.common.CRRuntimeException;
 import eionet.cr.dto.PostHarvestScriptDTO;
-import eionet.cr.dto.PostHarvestScriptDTO.Type;
+import eionet.cr.dto.PostHarvestScriptDTO.TargetType;
+import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.sql.SQLResultSetBaseReader;
 
 /**
@@ -37,37 +37,36 @@ import eionet.cr.util.sql.SQLResultSetBaseReader;
  */
 public class PostHarvestScriptDTOReader extends SQLResultSetBaseReader<PostHarvestScriptDTO>{
 
-    /** */
-    private PostHarvestScriptDTO dto;
-
-    /** */
-    private Type targetType;
-
-    /**
-     *
-     * @param targetType
-     */
-    public PostHarvestScriptDTOReader(Type targetType){
-        this.targetType = targetType;
-    }
-
     /**
      * @see eionet.cr.util.sql.SQLResultSetReader#readRow(java.sql.ResultSet)
      */
     @Override
     public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
 
-        String uri = rs.getString("URI");
-        if (StringUtils.isBlank(uri)){
-            throw new CRRuntimeException("URI cannot be blank here!");
+        String targetSourceUrl = rs.getString("TARGET_SOURCE_URL");
+        String targetTypeUrl = rs.getString("TARGET_TYPE_URL");
+
+        TargetType targetType = null;
+        String targetUrl = null;
+        if (!StringUtils.isBlank(targetSourceUrl)){
+            targetType = TargetType.SOURCE;
+            targetUrl = targetSourceUrl;
+        }
+        else if (!StringUtils.isBlank(targetTypeUrl)){
+            targetType = TargetType.TYPE;
+            targetUrl = targetTypeUrl;
         }
 
-        if (dto==null || !dto.getUri().equals(uri)){
+        PostHarvestScriptDTO dto = new PostHarvestScriptDTO();
+        dto.setId(rs.getInt("POST_HARVEST_SCRIPT_ID"));
+        dto.setTargetType(targetType);
+        dto.setTargetUrl(targetUrl);
+        dto.setTitle(rs.getString("TITLE"));
+        dto.setScript(rs.getString("SCRIPT"));
+        dto.setPosition(rs.getInt("POSITION_NUMBER"));
+        dto.setActive(YesNoBoolean.parse(rs.getString("ACTIVE")));
 
-            dto = PostHarvestScriptDTO.create(targetType, uri);
-            resultList.add(dto);
-        }
-
-        dto.addQuery(rs.getString("QUERY"));
+        resultList.add(dto);
     }
+
 }

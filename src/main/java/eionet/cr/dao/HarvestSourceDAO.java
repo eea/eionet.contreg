@@ -355,8 +355,10 @@ public interface HarvestSourceDAO extends DAO {
     /**
      *
      * @param substring
+     * @param limit TODO
+     * @param offset TODO
      * @return
      * @throws DAOException
      */
-    List<String> filter(String substring) throws DAOException;
+    List<String> filter(String substring, int limit, int offset) throws DAOException;
 }

@@ -669,11 +669,7 @@ public class FactsheetActionBean extends AbstractActionBean {
         return PredicateObjectsReader.PREDICATE_PAGE_SIZE;
     }
 
-    /**
-     * @return the tabs
-     */
     public List<TabElement> getTabs() {
         return tabs;
     }
-
 }

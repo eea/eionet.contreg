@@ -66,9 +66,22 @@
                     minChars:4,
                     delimiter: /(,|;)\s*/,
                     maxHeight:400,
-                    width:300,
+                    width:600,
                     zIndex: 9999,
-                    deferRequestBy: 0,
+                    deferRequestBy: 300,
+                    noCache: true
+                });
+            }
+            //RDF type filter auto-complete
+            if ($("#rdfType").length > 0){
+                $('#rdfType').autocomplete({
+                    serviceUrl:'json/rdfTypes.action',
+                    minChars:4,
+                    delimiter: /(,|;)\s*/,
+                    maxHeight:400,
+                    width:600,
+                    zIndex: 9999,
+                    deferRequestBy: 300,
                     noCache: true
                 });
             }

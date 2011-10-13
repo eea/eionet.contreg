@@ -21,7 +21,11 @@
 
 package eionet.cr.dao;
 
+import java.util.List;
+
 import eionet.cr.dto.PostHarvestScriptDTO;
+import eionet.cr.dto.PostHarvestScriptDTO.TargetType;
+import eionet.cr.util.Pair;
 
 /**
  *
@@ -32,23 +36,61 @@ public interface PostHarvestScriptDAO extends DAO{
     /**
      *
      * @param targetType
-     * @param uri
-     * @return TODO
+     * @param targetUrl
+     * @return
      * @throws DAOException
      */
-    PostHarvestScriptDTO get(PostHarvestScriptDTO.Type targetType, String uri) throws DAOException;
+    List<PostHarvestScriptDTO> list(PostHarvestScriptDTO.TargetType targetType, String targetUrl) throws DAOException;
 
     /**
      *
-     * @param dto
+     * @param id
+     * @return
      * @throws DAOException
      */
-    void save(PostHarvestScriptDTO dto) throws DAOException;
+    PostHarvestScriptDTO fetch(int id) throws DAOException;
 
     /**
      *
-     * @param dto
+     * @param targetType
+     * @param targetUrl
+     * @param title
+     * @param script
+     * @param active
+     * @return
      * @throws DAOException
      */
-    void delete(PostHarvestScriptDTO dto) throws DAOException;
+    int insert(TargetType targetType, String targetUrl, String title, String script, boolean active) throws DAOException;
+
+    /**
+     *
+     * @param id
+     * @param title
+     * @param script
+     * @param active
+     * @throws DAOException
+     */
+    void save(int id, String title, String script, boolean active) throws DAOException;
+
+    /**
+     *
+     * @param ids
+     * @throws DAOException
+     */
+    void delete(List<Integer> ids) throws DAOException;
+
+    /**
+     *
+     * @param ids
+     * @throws DAOException
+     */
+    void activateDeactivate(List<Integer> ids) throws DAOException;
+
+    /**
+     *
+     * @param targetType
+     * @return
+     * @throws DAOException
+     */
+    List<Pair<String,Integer>> listTargets(TargetType targetType) throws DAOException;
 }

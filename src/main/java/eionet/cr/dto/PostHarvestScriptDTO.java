@@ -21,94 +21,120 @@
 
 package eionet.cr.dto;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.lang.StringUtils;
 
 /**
  *
  * @author Jaanus Heinlaid
  */
-public abstract class PostHarvestScriptDTO {
+public class PostHarvestScriptDTO {
 
     /** */
-    public enum Type {
-        HARVEST_SOURCE, RDF_TYPE
-    }
+    public enum TargetType{SOURCE,TYPE};
 
     /** */
-    private String uri;
-
-    /** */
-    private List<String> queries = new ArrayList<String>();
+    private TargetType targetType;
+    private String targetUrl;
+    private String title;
+    private String script;
+    private int position;
+    private boolean active;
+    private int id;
 
     /**
-     *
-     * @param uri
+     * @return the active
      */
-    public PostHarvestScriptDTO(String uri){
-
-        if (StringUtils.isBlank(uri)){
-            throw new IllegalArgumentException("URI must not be blank!");
-        }
-        this.uri = uri;
+    public boolean isActive() {
+        return active;
     }
 
     /**
-     *
-     * @param query
+     * @param active the active to set
      */
-    public void addQuery(String query){
-
-        if (StringUtils.isBlank(query)){
-            throw new IllegalArgumentException("The query must not be blank!");
-        }
-        queries.add(query);
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
     /**
-     *
-     * @param queries
+     * @return the targetType
      */
-    public void addQueries(List<String> queries){
-
-        if (queries!=null && !queries.isEmpty()){
-            this.queries.addAll(queries);
-        }
-    }
-
-
-    /**
-     * @return the queries
-     */
-    public List<String> getQueries() {
-        return queries;
+    public TargetType getTargetType() {
+        return targetType;
     }
 
     /**
-     * @return the uri
+     * @return the targetUrl
      */
-    public String getUri() {
-        return uri;
+    public String getTargetUrl() {
+        return targetUrl;
     }
 
     /**
-     *
-     * @return
+     * @return the title
      */
-    public int getNumberOfQueries(){
-        return queries.size();
+    public String getTitle() {
+        return title;
     }
 
     /**
-     *
-     * @param type
-     * @param uri
-     * @return
+     * @return the script
      */
-    public static PostHarvestScriptDTO create(Type type, String uri){
+    public String getScript() {
+        return script;
+    }
 
-        return type.equals(Type.HARVEST_SOURCE) ? new SourcePostHarvestScriptDTO(uri) : new TypePostHarvestScriptDTO(uri);
+    /**
+     * @return the position
+     */
+    public int getPosition() {
+        return position;
+    }
+
+    /**
+     * @return the id
+     */
+    public int getId() {
+        return id;
+    }
+
+    /**
+     * @param id the id to set
+     */
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    /**
+     * @param targetType the targetType to set
+     */
+    public void setTargetType(TargetType targetType) {
+        this.targetType = targetType;
+    }
+
+    /**
+     * @param targetUrl the targetUrl to set
+     */
+    public void setTargetUrl(String targetUrl) {
+        this.targetUrl = targetUrl;
+    }
+
+    /**
+     * @param title the title to set
+     */
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    /**
+     * @param script the script to set
+     */
+    public void setScript(String script) {
+        this.script = script;
+    }
+
+    /**
+     * @param position the position to set
+     */
+    public void setPosition(int position) {
+        this.position = position;
     }
 }

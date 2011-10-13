@@ -21,28 +21,26 @@
 
 package eionet.cr.web.action.admin;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
+import net.sourceforge.stripes.validation.ValidationMethod;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
+import org.openrdf.query.MalformedQueryException;
+import org.openrdf.query.parser.sparql.SPARQLParser;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.PostHarvestScriptDAO;
 import eionet.cr.dto.PostHarvestScriptDTO;
-import eionet.cr.dto.PostHarvestScriptDTO.Type;
+import eionet.cr.dto.PostHarvestScriptDTO.TargetType;
 import eionet.cr.web.action.AbstractActionBean;
+import eionet.cr.web.util.ApplicationCache;
 
 /**
  *
@@ -52,34 +50,29 @@ import eionet.cr.web.action.AbstractActionBean;
 public class PostHarvestScriptActionBean extends AbstractActionBean {
 
     /** */
-    private static final String SCRIPT_JSP = "/pages/admin/postHarvestScript.jsp";
+    private static final String SCRIPT_JSP = "/pages/admin/postHarvestScripts/script.jsp";
 
     /** */
-    private static final String QUERY_PARAM = "query";
+    private int id;
+    private String title;
+    private String script;
+    private String targetUrl;
+    private TargetType targetType;
+    private String testSourceUrl;
+    private boolean active;
+    private boolean ignoreMalformedSparql;
 
-    /** */
-    public Type targetType = Type.HARVEST_SOURCE;
-
-    /** */
-    private PostHarvestScriptDTO scriptDTO;
-
-    /** */
-    private String uri;
-    private List<String> queries;
-
-    /**
-     *
-     * @return
-     * @throws DAOException
-     */
     @DefaultHandler
-    public Resolution view() throws DAOException {
+    public Resolution defaultHandler() throws DAOException {
 
-        if (!StringUtils.isBlank(uri)){
-
-            PostHarvestScriptDTO dto = DAOFactory.get().getDao(PostHarvestScriptDAO.class).get(targetType, uri);
-            if (dto!=null){
-                queries = dto.getQueries();
+        if (id > 0) {
+            PostHarvestScriptDTO dto = DAOFactory.get().getDao(PostHarvestScriptDAO.class).fetch(id);
+            if (dto != null) {
+                title = dto.getTitle();
+                script = dto.getScript();
+                targetUrl = dto.getTargetUrl();
+                targetType = dto.getTargetType();
+                active = dto.isActive();
             }
         }
 
@@ -93,18 +86,165 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
      */
     public Resolution save() throws DAOException {
 
-        PostHarvestScriptDTO dto = PostHarvestScriptDTO.create(targetType, uri);
-        dto.addQueries(getQueries());
+        if (ignoreMalformedSparql == false) {
+            try {
+                new SPARQLParser().parseQuery(script, null);
+            } catch (MalformedQueryException e) {
+                ignoreMalformedSparql = true;
+                addWarningMessage("Script does not seem to be valid SPARQL: " + e.getMessage()
+                        + ".<br/><strong>Save again to ignore this warning!</strong>");
+                return new ForwardResolution(SCRIPT_JSP);
+            }
+        } else {
+            ignoreMalformedSparql = false;
+        }
 
-        DAOFactory.get().getDao(PostHarvestScriptDAO.class).save(dto);
+        if (id > 0) {
+            DAOFactory.get().getDao(PostHarvestScriptDAO.class).save(id, title, script, active);
+        } else {
+            id = DAOFactory.get().getDao(PostHarvestScriptDAO.class).insert(targetType, targetUrl, title, script, active);
+        }
 
+        addSystemMessage("Script successfully saved!");
+        if (getContext().getRequestParameter("save").equalsIgnoreCase("Save & close")) {
+            if (logger.isTraceEnabled()) {
+                logger.trace("Redirecting after save & close");
+            }
+            return resolutionToScripts();
+        } else {
+            return new RedirectResolution(PostHarvestScriptActionBean.class).addParameter("id", id);
+        }
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Resolution test() {
+
+        if (logger.isTraceEnabled()) {
+            logger.trace("Handling test event");
+        }
         return new ForwardResolution(SCRIPT_JSP);
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Resolution cancel() {
+
+        if (logger.isTraceEnabled()) {
+            logger.trace("Handling cancel event");
+        }
+        return resolutionToScripts();
+    }
+
+    /**
+     *
+     * @return
+     */
+    private RedirectResolution resolutionToScripts() {
+
+        RedirectResolution redirectResolution = new RedirectResolution(PostHarvestScriptsActionBean.class);
+        if (targetType != null) {
+            redirectResolution = redirectResolution.addParameter("targetType", targetType);
+        }
+        if (!StringUtils.isBlank(targetUrl)) {
+            redirectResolution = redirectResolution.addParameter("targetUrl", targetUrl);
+        }
+        return redirectResolution;
+    }
+
+    /**
+     *
+     * @throws DAOException
+     */
+    @ValidationMethod(on = {"save"})
+    public void validateSave() throws DAOException {
+
+        if (getUser() == null || !getUser().isAdministrator()) {
+            addGlobalValidationError("You are not authorized for this operation!");
+            return;
+        }
+
+        if (StringUtils.isBlank(title)) {
+            addGlobalValidationError("Title must not be blank!");
+        } else if (title.length() > 255) {
+            addGlobalValidationError("Title must be no longer than 255 characters!");
+        }
+
+        if (StringUtils.isBlank(script)) {
+            addGlobalValidationError("Script must not be blank!");
+        }
+
+        getContext().setSourcePageResolution(new ForwardResolution(SCRIPT_JSP));
+    }
+
+    /**
+     * @return the id
+     */
+    public int getId() {
+        return id;
+    }
+
+    /**
+     * @param id
+     *            the id to set
+     */
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    /**
+     * @return the title
+     */
+    public String getTitle() {
+        return title;
+    }
+
+    /**
+     * @param title
+     *            the title to set
+     */
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    /**
+     * @return the script
+     */
+    public String getScript() {
+        return script;
+    }
+
+    /**
+     * @param script
+     *            the script to set
+     */
+    public void setScript(String script) {
+        this.script = script;
+    }
+
+    /**
+     * @return the targetUrl
+     */
+    public String getTargetUrl() {
+        return targetUrl;
+    }
+
+    /**
+     * @param targetUrl
+     *            the targetUrl to set
+     */
+    public void setTargetUrl(String targetUrl) {
+        this.targetUrl = targetUrl;
     }
 
     /**
      * @return the targetType
      */
-    public Type getTargetType() {
+    public TargetType getTargetType() {
         return targetType;
     }
 
@@ -112,66 +252,60 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
      * @param targetType
      *            the targetType to set
      */
-    public void setTargetType(Type targetType) {
+    public void setTargetType(TargetType targetType) {
         this.targetType = targetType;
     }
 
     /**
-     * @return the uri
+     * @return the testSourceUrl
      */
-    public String getUri() {
-        return uri;
+    public String getTestSourceUrl() {
+        return testSourceUrl;
     }
 
     /**
-     * @param uri
-     *            the uri to set
+     * @param testSourceUrl
+     *            the testSourceUrl to set
      */
-    public void setUri(String uri) {
-        this.uri = uri;
+    public void setTestSourceUrl(String testSourceUrl) {
+        this.testSourceUrl = testSourceUrl;
     }
 
     /**
-     * @return the queries
+     *
+     * @return
      */
-    public List<String> getQueries() {
+    public List<String> getTypeUris() {
+        return ApplicationCache.getTypeUris();
+    }
 
-        if (queries == null) {
+    /**
+     * @return the active
+     */
+    public boolean isActive() {
+        return active;
+    }
 
-            queries = new ArrayList<String>();
-            HashMap<Integer, String> queryMap = new HashMap<Integer, String>();
-            HttpServletRequest request = getContext().getRequest();
-            Map<String, String[]> paramsMap = request.getParameterMap();
+    /**
+     * @param active
+     *            the active to set
+     */
+    public void setActive(boolean active) {
+        this.active = active;
+    }
 
-            if (paramsMap != null && !paramsMap.isEmpty()) {
+    /**
+     * @return the ignoreMalformedSparql
+     */
+    public boolean isIgnoreMalformedSparql() {
+        return ignoreMalformedSparql;
+    }
 
-                for (Map.Entry<String, String[]> entry : paramsMap.entrySet()) {
-
-                    String paramName = entry.getKey();
-                    if (paramName.startsWith(QUERY_PARAM)) {
-
-                        int queryIndex = NumberUtils.toInt(paramName.substring(QUERY_PARAM.length()));
-                        if (queryIndex > 0) {
-
-                            String query = entry.getValue()[0];
-                            if (!StringUtils.isBlank(query)) {
-                                queryMap.put(queryIndex, query);
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (!queryMap.isEmpty()) {
-
-                ArrayList<Integer> queryIndexes = new ArrayList<Integer>(queryMap.keySet());
-                Collections.sort(queryIndexes);
-                for (Integer queryIndex : queryIndexes) {
-                    queries.add(queryMap.get(queryIndex));
-                }
-            }
-        }
-
-        return queries;
+    /**
+     * @param ignoreMalformedSparql
+     *            the ignoreMalformedSparql to set
+     */
+    public void setIgnoreMalformedSparql(boolean ignoreMalformedSparql) {
+        this.ignoreMalformedSparql = ignoreMalformedSparql;
     }
 }

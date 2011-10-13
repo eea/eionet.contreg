@@ -22,6 +22,7 @@ package eionet.cr.web.action;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -217,7 +218,13 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
         }
         String uri = getAvailableFilters().get(picklistFilter).getUri();
         if (Predicates.RDF_TYPE.equals(uri)) {
-            picklist = ApplicationCache.getTypeURIs();
+
+            List<Pair<String, String>> typePairs = ApplicationCache.getTypes();
+            picklist = new ArrayList<ObjectLabelPair>();
+            for (Pair<String, String> typePair : typePairs) {
+                picklist.add(new ObjectLabelPair(typePair.getLeft(), typePair.getLeft()));
+            }
+            Collections.sort((List<ObjectLabelPair>) picklist);
         } else if (Predicates.ROD_LOCALITY_PROPERTY.equals(uri)) {
             picklist = ApplicationCache.getLocalities();
         } else if (Predicates.ROD_OBLIGATION_PROPERTY.equals(uri)) {

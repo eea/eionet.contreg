@@ -1080,20 +1080,23 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /** */
     private static final String FILTER_BY_SUBSTRING_SQL =
-        "select URL from HARVEST_SOURCE where URL like (?) order by URL asc";
+        "select top(@offset,@limit) URL from HARVEST_SOURCE where URL like (?) order by URL asc";
     /**
-     * @see eionet.cr.dao.HarvestSourceDAO#filter(java.lang.String)
+     * @see eionet.cr.dao.HarvestSourceDAO#filter(java.lang.String, int, int)
      */
     @Override
-    public List<String> filter(String substring) throws DAOException {
+    public List<String> filter(String substring, int limit, int offset) throws DAOException {
 
-        if (StringUtils.isBlank(substring)){
+        if (StringUtils.isBlank(substring) || limit<=0){
             return Collections.emptyList();
         }
 
+        offset = Math.max(offset, 0);
+
+        String sql = StringUtils.replace(FILTER_BY_SUBSTRING_SQL, "@offset", String.valueOf(offset));
+        sql = StringUtils.replace(sql, "@limit", String.valueOf(limit));
         ArrayList<String> values = new ArrayList<String>();
         values.add("%" + substring + "%");
-        return executeSQL(FILTER_BY_SUBSTRING_SQL, values, new SingleObjectReader<String>());
+        return executeSQL(sql, values, new SingleObjectReader<String>());
     }
-
 }

@@ -28,10 +28,15 @@ import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
+
+import org.apache.commons.lang.StringUtils;
+
+import eionet.cr.dao.DAOException;
+import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.PostHarvestScriptDAO;
 import eionet.cr.dto.PostHarvestScriptDTO;
-import eionet.cr.dto.PostHarvestScriptDTO.Type;
-import eionet.cr.dto.SourcePostHarvestScriptDTO;
-import eionet.cr.util.SortOrder;
+import eionet.cr.dto.PostHarvestScriptDTO.TargetType;
+import eionet.cr.util.Pair;
 import eionet.cr.web.action.AbstractActionBean;
 
 /**
@@ -39,51 +44,93 @@ import eionet.cr.web.action.AbstractActionBean;
  * @author Jaanus Heinlaid
  */
 @UrlBinding("/admin/postHarvestScripts")
-public class PostHarvestScriptsActionBean extends AbstractActionBean{
+public class PostHarvestScriptsActionBean extends AbstractActionBean {
 
     /** */
-    private static final String LIST_JSP = "/pages/admin/postHarvestScripts.jsp";
+    private static final String TARGETS_JSP = "/pages/admin/postHarvestScripts/targets.jsp";
+    private static final String SCRIPTS_JSP = "/pages/admin/postHarvestScripts/scripts.jsp";
 
     /** */
+    private TargetType targetType;
+    private String targetUrl;
+
+    /** */
+    private List<Pair<String, Integer>> targets;
     private List<PostHarvestScriptDTO> scripts;
+    private List<Tab> tabs;
 
     /** */
-    protected int page = 1;
-    protected String dir = SortOrder.ASCENDING.toString();
-
-    /** */
-    private Type targetType = Type.HARVEST_SOURCE;
+    private List<Integer> selectedIds;
 
     /**
      *
      * @return
+     * @throws DAOException
      */
     @DefaultHandler
-    public Resolution list(){
+    public Resolution list() throws DAOException {
 
-        scripts = new ArrayList<PostHarvestScriptDTO>();
-
-        // TODO - generating dummy data here, fix later for real data
-        if (getTargetType().equals(Type.HARVEST_SOURCE)){
-            for (int i=0; i<23; i++){
-                PostHarvestScriptDTO dto = new SourcePostHarvestScriptDTO("http://source" + i + ".ee");
-                for (int j=0; j<(i+1); j++){
-                    dto.addQuery("query" + (j+1));
-                }
-                scripts.add(dto);
-            }
+        if (targetType != null && StringUtils.isBlank(targetUrl)) {
+            targets = DAOFactory.get().getDao(PostHarvestScriptDAO.class).listTargets(targetType);
+            return new ForwardResolution(TARGETS_JSP);
+        } else {
+            scripts = DAOFactory.get().getDao(PostHarvestScriptDAO.class).list(targetType, targetUrl);
+            return new ForwardResolution(SCRIPTS_JSP);
         }
-        else{
-            for (int i=0; i<23; i++){
-                PostHarvestScriptDTO dto = new SourcePostHarvestScriptDTO("http://type" + i + ".ee");
-                for (int j=0; j<(i+1); j++){
-                    dto.addQuery("query" + (j+1));
-                }
-                scripts.add(dto);
-            }
+    }
+
+    /**
+     *
+     * @return
+     * @throws DAOException
+     */
+    public Resolution delete() throws DAOException {
+
+        if (selectedIds!=null && !selectedIds.isEmpty()){
+            DAOFactory.get().getDao(PostHarvestScriptDAO.class).delete(selectedIds);
+            addSystemMessage("Selected script(s) successfully deleted!");
         }
 
-        return new ForwardResolution(LIST_JSP);
+        return list();
+    }
+
+    /**
+     *
+     * @return
+     * @throws DAOException
+     */
+    public Resolution activateDeactivate() throws DAOException {
+
+        if (selectedIds!=null && !selectedIds.isEmpty()){
+            DAOFactory.get().getDao(PostHarvestScriptDAO.class).activateDeactivate(selectedIds);
+            addSystemMessage("Selected script(s) successfully activated/deactivated!");
+        }
+
+        return list();
+    }
+
+    /**
+     * @return the targetType
+     */
+    public TargetType getTargetType() {
+        return targetType;
+    }
+
+    /**
+     * @param targetType
+     *            the targetType to set
+     */
+    public void setTargetType(TargetType targetType) {
+        this.targetType = targetType;
+    }
+
+    /**
+     * @return the targets
+     * @throws DAOException
+     */
+    public List<Pair<String, Integer>> getTargets() throws DAOException {
+
+        return targets;
     }
 
     /**
@@ -93,45 +140,98 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean{
         return scripts;
     }
 
+
     /**
-     * @return the page
+     * @return the tabs
      */
-    public int getPage() {
-        return page;
+    public List<Tab> getTabs() {
+
+        if (tabs == null) {
+
+            tabs = new ArrayList<Tab>();
+            tabs.add(new Tab("All-source scripts", getUrlBinding(), "Scripts to run for all sources", targetType == null));
+            tabs.add(new Tab("Source-specific scripts", getUrlBinding() + "?targetType=" + TargetType.SOURCE,
+                    "Scripts to run for specific sources", targetType != null && targetType.equals(TargetType.SOURCE)));
+            tabs.add(new Tab("Type-specific scripts", getUrlBinding() + "?targetType=" + TargetType.TYPE,
+                    "Scripts to run for specific types", targetType != null && targetType.equals(TargetType.TYPE)));
+        }
+
+        return tabs;
+    }
+
+
+    /**
+     * @return the targetUrl
+     */
+    public String getTargetUrl() {
+        return targetUrl;
     }
 
     /**
-     * @param page the page to set
+     * @param targetUrl the targetUrl to set
      */
-    public void setPage(int page) {
-        this.page = page;
+    public void setTargetUrl(String targetUrl) {
+        this.targetUrl = targetUrl;
+    }
+
+
+    /**
+     * @param selectedIds the selectedIds to set
+     */
+    public void setSelectedIds(List<Integer> selectedIds) {
+        this.selectedIds = selectedIds;
     }
 
     /**
-     * @return the dir
+     * @author Jaanus Heinlaid
      */
-    public String getDir() {
-        return dir;
-    }
+    public class Tab {
 
-    /**
-     * @param dir the dir to set
-     */
-    public void setDir(String dir) {
-        this.dir = dir;
-    }
+        /** */
+        private String title;
+        private String href;
+        private String hint;
+        private boolean selected;
 
-    /**
-     * @return the targetType
-     */
-    public Type getTargetType() {
-        return targetType;
-    }
+        /**
+         * @param title
+         * @param href
+         * @param hint
+         * @param selected
+         */
+        public Tab(String title, String href, String hint, boolean selected) {
+            this.title = title;
+            this.href = href;
+            this.hint = hint;
+            this.selected = selected;
+        }
 
-    /**
-     * @param targetType the targetType to set
-     */
-    public void setTargetType(Type targetType) {
-        this.targetType = targetType;
+        /**
+         * @return the title
+         */
+        public String getTitle() {
+            return title;
+        }
+
+        /**
+         * @return the href
+         */
+        public String getHref() {
+            return href;
+        }
+
+        /**
+         * @return the hint
+         */
+        public String getHint() {
+            return hint;
+        }
+
+        /**
+         * @return the selected
+         */
+        public boolean isSelected() {
+            return selected;
+        }
     }
 }

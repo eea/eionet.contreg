@@ -71,6 +71,8 @@ public class ApplicationCache implements ServletContextListener {
      * type cache name.
      */
     private static final String TYPE_CACHE = "typeCache";
+    private static final String TYPE_URIS_CACHE = "typeUrisCache";
+
     /**
      * type columns cache name.
      */
@@ -258,18 +260,17 @@ public class ApplicationCache implements ServletContextListener {
     }
 
     /**
-     * fetch cached type URIs.
+     * Fetch the URIs of cached types.
      *
      * @return Collection
      */
-    public static Collection<ObjectLabelPair> getTypeURIs() {
-        List<Pair<String, String>> types = getTypes();
-        List<ObjectLabelPair> typeUris = new LinkedList<ObjectLabelPair>();
-        for (Pair<String, String> type : types) {
-            typeUris.add(new ObjectLabelPair(type.getLeft(), type.getLeft()));
+    public static List<String> getTypeUris() {
+
+        Element element = getCache().get(TYPE_URIS_CACHE);
+        if (element == null || element.getValue() == null) {
+            return Collections.EMPTY_LIST;
         }
-        Collections.sort(typeUris);
-        return typeUris;
+        return (List<String>) element.getValue();
     }
 
     /**
@@ -289,11 +290,19 @@ public class ApplicationCache implements ServletContextListener {
     /**
      * update type cache.
      *
-     * @param update
+     * @param types
      *            List<Pair<String, String>> Types to be updated
      */
-    public static void updateTypes(final List<Pair<String, String>> update) {
-        getCache().put(new Element(TYPE_CACHE, update));
+    public static void updateTypes(final List<Pair<String, String>> types) {
+
+        getCache().put(new Element(TYPE_CACHE, types));
+
+        ArrayList<String> uris = new ArrayList<String>();
+        for (Pair<String,String> pair : types){
+            uris.add(pair.getLeft());
+        }
+        Collections.sort(uris);
+        getCache().put(new Element(TYPE_URIS_CACHE, uris));
     }
 
     /**

@@ -36,6 +36,9 @@ import net.sourceforge.stripes.action.UrlBinding;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
+import eionet.cr.dao.DAOException;
+import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.TagDTO;
 import eionet.cr.web.util.ApplicationCache;
 
@@ -82,27 +85,66 @@ public class JsonActionBean extends AbstractActionBean {
         return createSuggestionsResolution(matchingTags, query);
     }
 
-    //    /**
-    //     *
-    //     * @return
-    //     * @throws DAOException
-    //     */
-    //    public Resolution harvestSources() throws DAOException {
-    //
-    //        if (LOGGER.isTraceEnabled()){
-    //            LOGGER.trace("Getting harvest source suggestions ...");
-    //        }
-    //
-    //        long startTime = System.currentTimeMillis();
-    //        String query = getContext().getRequestParameter("query");
-    //        List<String> sourceUrls = DAOFactory.get().getDao(HarvestSourceDAO.class).filter(query);
-    //
-    //        if (LOGGER.isTraceEnabled()){
-    //            LOGGER.trace("Harvest source suggestions retrieved in " + (System.currentTimeMillis() - startTime) + " ms");
-    //        }
-    //
-    //        return createSuggestionsResolution(sourceUrls, query);
-    //    }
+    /**
+     *
+     * @return
+     * @throws DAOException
+     */
+    public Resolution harvestSources() throws DAOException {
+
+        if (LOGGER.isTraceEnabled()){
+            LOGGER.trace("Getting harvest source suggestions ...");
+        }
+
+        long startTime = System.currentTimeMillis();
+        String query = getContext().getRequestParameter("query");
+        List<String> sourceUrls = DAOFactory.get().getDao(HarvestSourceDAO.class).filter(query, 101, 0);
+        if (sourceUrls.size()==101){
+            sourceUrls.set(100, "Narrow your search for more ...");
+        }
+        else if (sourceUrls.isEmpty()){
+            sourceUrls.add("No suggestions found!");
+        }
+
+        if (LOGGER.isTraceEnabled()){
+            LOGGER.trace("Harvest source suggestions retrieved in " + (System.currentTimeMillis() - startTime) + " ms");
+        }
+
+        return createSuggestionsResolution(sourceUrls, query);
+    }
+
+    /**
+     *
+     * @return
+     * @throws DAOException
+     */
+    public Resolution rdfTypes() throws DAOException {
+
+        if (LOGGER.isTraceEnabled()){
+            LOGGER.trace("Getting type suggestions ...");
+        }
+
+        long startTime = System.currentTimeMillis();
+        List<String> typeUris = ApplicationCache.getTypeUris();
+
+        String query = getContext().getRequestParameter("query");
+
+        List<String> resultList = new ArrayList<String>();
+        for (String typeUri : typeUris){
+            if (typeUri.toLowerCase().contains(query.toLowerCase())){
+                resultList.add(typeUri);
+            }
+        }
+
+        if (resultList.isEmpty()){
+            resultList.add("No suggestions found!");
+        }
+
+        if (LOGGER.isTraceEnabled()){
+            LOGGER.trace("Type suggestions retrieved in " + (System.currentTimeMillis() - startTime) + " ms");
+        }
+        return createSuggestionsResolution(resultList, query);
+    }
 
     /**
      *
