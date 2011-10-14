@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.sourceforge.stripes.action.DefaultHandler;
@@ -92,12 +93,18 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         xmlFormats.add("text/boolean"); // For ASK query
     }
 
+    private static final String DEFAULT_GRAPH_URI = "default-graph-uri";
+
+    private static final String NAMED_GRAPH_URI = "named-graph-uri";
+
     /** */
     private String query;
     private String newQuery;
     private String format;
     private int nrOfHits;
     private long executionTime;
+    private String defaultGraphUri;
+    private String namedGraphUri;
 
     /** */
     private boolean useInferencing;
@@ -141,7 +148,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      */
     @DefaultHandler
     public Resolution noEvent() throws OpenRDFException, DAOException {
-
+        setGraphUri();
         // If fillfrom is specified then fill the bean's properties from the
         // bookmarked query and forward to form page without executing the
         // query.
@@ -268,7 +275,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      * @throws OpenRDFException
      */
     public Resolution execute() throws OpenRDFException {
-
+        setGraphUri();
         // if query is blank and there's also no such request parameter as query at all,
         // then assume user clicked the SPARQL client menu choice, and forward to the form page
         if (StringUtils.isBlank(query)) {
@@ -311,7 +318,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
         // If user has marked CR Inferencing checkbox,
         // then add inferencing command to the query
-        newQuery = query;
+        newQuery = processGraphUriParameters();
         query = StringEscapeUtils.escapeHtml(query);
         Resolution resolution = null;
         if (useInferencing && !StringUtils.isBlank(query)) {
@@ -366,6 +373,56 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         }
 
         return resolution;
+    }
+
+    private void setGraphUri() {
+        HttpServletRequest r = getContext().getRequest();
+        defaultGraphUri = getContext().getRequest().getParameter(DEFAULT_GRAPH_URI);
+        namedGraphUri = getContext().getRequest().getParameter(NAMED_GRAPH_URI);
+    }
+
+    private String processGraphUriParameters() {
+
+        LOGGER.info("Default graph: " + defaultGraphUri);
+        LOGGER.info("Named graph: " + namedGraphUri);
+
+        if (StringUtils.isNotEmpty(defaultGraphUri) || StringUtils.isNotEmpty(namedGraphUri)) {
+            if (StringUtils.isNotEmpty(query)) {
+                try {
+                    String q = query.toLowerCase().replaceAll("(\\r|\\n)", " ");
+                    boolean includesFrom = q.toLowerCase().matches("^.*(from)(?!(\\s)+named).*$");
+                    boolean includesFromNamed = q.toLowerCase().matches("^.*(from)(\\s)+(named).*$");
+
+                    int index = query.toLowerCase().indexOf("where");
+                    String q1 = query.substring(0, index - 1);
+                    String q2 = query.substring(index);
+
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(q1);
+                    if (StringUtils.isNotEmpty(defaultGraphUri) && !includesFrom) {
+                        sb.append(" FROM <" + defaultGraphUri + "> ");
+                    }
+                    if (StringUtils.isNotEmpty(namedGraphUri) && !includesFromNamed) {
+                        sb.append(" FROM NAMED <" + namedGraphUri + "> ");
+                    }
+                    sb.append(q2);
+
+//                    LOGGER.info("Q1: " + q1);
+//                    LOGGER.info("Q2: " + q2);
+//                    LOGGER.info("Query: " + sb.toString());
+
+                    return sb.toString();
+                } catch (Exception e) {
+                    LOGGER.error("Problems with default graph uri: " + e);
+                    addCautionMessage("Problems with processing named / default graph URI parameters. Executing query without these parameters.");
+                    return query;
+                }
+            } else {
+                return query;
+            }
+        } else {
+            return query;
+        }
     }
 
     /**
@@ -708,6 +765,20 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      */
     public ExportFormat[] getExportFormats() {
         return ExportFormat.values();
+    }
+
+    /**
+     * @return the defaultGraphUri
+     */
+    public String getDefaultGraphUri() {
+        return defaultGraphUri;
+    }
+
+    /**
+     * @return the namedGraphUri
+     */
+    public String getNamedGraphUri() {
+        return namedGraphUri;
     }
 
 }

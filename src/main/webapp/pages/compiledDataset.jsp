@@ -8,23 +8,29 @@
 
         <cr:tabMenu tabs="${actionBean.tabs}" />
 
-        <c:if test="${actionBean.usersDataset}">
-            <ul id="dropdown-operations">
-                <li><a href="#">Operations</a>
-                    <ul>
-                        <li>
-                            <stripes:link class="link-plain" href="/compiledDataset.action" event="reload">
-                                <stripes:param name="uri" value="${actionBean.uri}" />
-                                Reload
-                            </stripes:link>
-                        </li>
-                    </ul>
-                 </li>
-             </ul>
-         </c:if>
-
         <br style="clear:left" />
         <br />
+
+        <ul id="dropdown-operations">
+            <li><a href="#">Operations</a>
+                <ul>
+                    <c:if test="${actionBean.usersDataset}">
+                    <li>
+                        <stripes:link class="link-plain" href="/compiledDataset.action" event="reload">
+                            <stripes:param name="uri" value="${actionBean.uri}" />
+                            Reload
+                        </stripes:link>
+                    </li>
+                    </c:if>
+                    <li>
+                        <stripes:link class="link-plain" href="/sparql">
+                            <stripes:param name="default-graph-uri" value="${actionBean.uri}" />
+                            SPARQL endpoint
+                        </stripes:link>
+                    </li>
+                </ul>
+             </li>
+         </ul>
 
         <h1>Compiled dataset sources</h1>
 

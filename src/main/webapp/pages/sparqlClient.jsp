@@ -64,6 +64,9 @@
         <div style="margin-top: 15px">
                     <div style="float:right"><a href="documentation/sparqlfunctions">SPARQL Functions</a></div>
             <crfn:form name="mainForm" action="/sparql" method="get">
+                <c:if test="${not empty actionBean.defaultGraphUri}">
+                    <input type="hidden" name="default-graph-uri" value="${actionBean.defaultGraphUri}" />
+                </c:if>
                 <div>
                     <label for="queryText" class="question">Query:</label>
                     <textarea name="query" id="queryText" rows="8" cols="80" style="clear:right; display: block; width: 100%" onchange="format_select(this)" onkeyup="format_select(this)">
