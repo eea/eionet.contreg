@@ -53,6 +53,12 @@
                 </div>
             </c:if>
 
+            <c:if test="${not empty actionBean.scripts && fn:length(actionBean.scripts)>1}">
+                <div class="advice-msg" style="clear:both;width:75%;margin-top:1em;">
+                    Note: scripts are executed in the order they appear below. Use "Move up/down" buttons to change the order.
+                </div>
+            </c:if>
+
             <div style="float:left;width:100%;padding-top:1.2em;">
 	            <crfn:form id="scriptsForm" action="/admin/postHarvestScripts" method="post">
 
@@ -82,6 +88,10 @@
 		                <div>
 	                        <stripes:submit name="delete" value="Delete" title="Delete selected scripts"/>
 	                        <stripes:submit name="activateDeactivate" value="Activate/deactivate" title="Activate/deactivate (i.e. turn on/off) selected scripts"/>
+	                        <c:if test="${not empty actionBean.scripts && fn:length(actionBean.scripts)>1}">
+	                           <stripes:submit name="moveUp" value="Move up" title="Move selected scripts up"/>
+	                           <stripes:submit name="moveDown" value="Move down" title="Move selected scripts down"/>
+	                        </c:if>
                             <input type="button" onclick="toggleSelectAll('scriptsForm');return false" value="Select all" name="selectAll">
 		                </div>
 	                </c:if>

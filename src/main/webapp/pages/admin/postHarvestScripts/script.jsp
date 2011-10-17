@@ -8,8 +8,29 @@
 
 <stripes:layout-component name="head">
 
-    <style type="text/css">
-    </style>
+    <script type="text/javascript">
+
+            ( function($) {
+                $(document).ready(function(){
+
+                    if ($("#harvestSource").length > 0){
+
+                        $('#harvestSource').click(function(){
+                            if (this.value='Type at least 4 characters for suggestions ...'){
+                                this.value='';
+                            }
+                        });
+                        $('#harvestSource').focus(function(){
+                            if (this.value='Type at least 4 characters for suggestions ...'){
+                                this.value='';
+                            }
+                        });
+                    }
+
+                });
+            } ) ( jQuery );
+
+    </script>
 
 </stripes:layout-component>
 
@@ -100,6 +121,7 @@
                         <stripes:checkbox name="active" id="activeCheckbox"/>
                     </td>
                 </tr>
+<%--
                 <c:if test="${empty actionBean.targetType || actionBean.targetType=='TYPE'}">
                     <tr>
 	                    <td style="vertical-align:top;padding-right:0.3em;text-align:right">
@@ -110,12 +132,13 @@
 	                    </td>
                     </tr>
                 </c:if>
+--%>
                 <tr>
                     <td>&nbsp;</td>
                     <td>
                         <stripes:submit name="save" value="Save"/>
                         <stripes:submit name="save" value="Save & close"/>
-                        <stripes:submit name="test" value="Test"/>
+<%--                        <stripes:submit name="test" value="Test"/> --%>
                         <stripes:submit name="cancel" value="Cancel"/>
                     </td>
                 </tr>

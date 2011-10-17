@@ -22,12 +22,14 @@
 package eionet.cr.web.action.admin;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
+import net.sourceforge.stripes.validation.ValidationMethod;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -107,6 +109,47 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
         }
 
         return list();
+    }
+
+    /**
+     *
+     * @return
+     * @throws DAOException
+     */
+    public Resolution moveUp() throws DAOException{
+
+        DAOFactory.get().getDao(PostHarvestScriptDAO.class).move2(targetType, targetUrl, new HashSet(selectedIds), -1);
+        return list();
+    }
+
+    /**
+     *
+     * @return
+     * @throws DAOException
+     */
+    public Resolution moveDown() throws DAOException{
+
+        DAOFactory.get().getDao(PostHarvestScriptDAO.class).move2(targetType, targetUrl, new HashSet(selectedIds), 1);
+        return list();
+    }
+
+    /**
+     *
+     * @throws DAOException
+     */
+    @ValidationMethod(on = {"delete","activateDeactivate","moveUp","moveDown"})
+    public void validateMove() throws DAOException {
+
+        if (getUser() == null || !getUser().isAdministrator()) {
+            addGlobalValidationError("You are not authorized for this operation!");
+            return;
+        }
+
+        if (selectedIds==null || selectedIds.isEmpty()) {
+            addGlobalValidationError("At least one script must be selected!");
+        }
+
+        getContext().setSourcePageResolution(list());
     }
 
     /**

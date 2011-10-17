@@ -34,6 +34,10 @@ import javax.mail.internet.AddressException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.openrdf.model.vocabulary.XMLSchema;
+import org.openrdf.query.MalformedQueryException;
+import org.openrdf.query.QueryEvaluationException;
+import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryException;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.config.GeneralConfig;
@@ -43,15 +47,19 @@ import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dao.HarvestMessageDAO;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
+import eionet.cr.dao.PostHarvestScriptDAO;
 import eionet.cr.dto.HarvestMessageDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
+import eionet.cr.dto.PostHarvestScriptDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.util.HarvestMessageType;
 import eionet.cr.util.EMailSender;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
+import eionet.cr.util.sesame.SesameUtil;
+import eionet.cr.util.sql.SingleObjectReader;
 import eionet.cr.web.security.CRUser;
 
 /**
@@ -180,11 +188,10 @@ public abstract class BaseHarvest implements Harvest {
     private void finishHarvest(boolean dontThrowException) throws HarvestException{
 
         try{
-            if (isSendNotifications() && !harvestMessages.isEmpty()){
-                LOGGER.debug(loggerMsg("Sending harvest messages"));
-                sendHarvestMessages();
-            }
+            // send harvest messages
+            sendHarvestMessages();
 
+            // double-check that we're not closing a harvest whose id we don't know
             if (harvestId == 0) {
                 if (dontThrowException){
                     return;
@@ -195,54 +202,22 @@ public abstract class BaseHarvest implements Harvest {
             }
 
             // update harvest source dto
-            LOGGER.debug(loggerMsg("Updating harvest source record"));
-            getHarvestSourceDAO().updateSourceHarvestFinished(getContextSourceDTO());
+            updateHarvestSourceFinished();
 
             // close harvest record, persist harvest messages
-            LOGGER.debug(loggerMsg("Updating harvest record, saving harvest messages"));
-            getHarvestDAO().updateFinishedHarvest(harvestId, storedTriplesCount);
-            for (HarvestMessageDTO messageDTO : harvestMessages){
-                getHarvestMessageDAO().insertHarvestMessage(messageDTO);
-            }
+            updateHarvestAndMessagesClosed();
 
-            if (sourceMetadata == null) {
-                sourceMetadata = new SubjectDTO(getContextUrl(), false);
-            }
+            // save source meta-data
+            finishSourceMetadata();
 
-            // add harvest statements
-            int harvestedStatements = getHelperDAO().getHarvestedStatements(getContextUrl());
-            ObjectDTO harvestedStatementsObject = new ObjectDTO(Integer.toString(harvestedStatements), null, true, false, XMLSchema.INTEGER);
-            harvestedStatementsObject.setSourceUri(GeneralConfig.HARVESTER_URI);
-            sourceMetadata.addObject(Predicates.CR_HARVESTED_STATEMENTS, harvestedStatementsObject);
+            // derive new harvest sources from stored content
+            deriveNewHarvestSources();
 
-            // save source metadata
-            String msg = "Saving " + sourceMetadata.getTripleCount() + " triples of harvest source metadata";
-            if (cleanAllPreviousSourceMetadata){
-                msg = msg + ", cleaning all previous metadata first";
-            }
-            LOGGER.debug(loggerMsg(msg));
-
-            // if all previous metadata should be deleted, then do so,
-            if (cleanAllPreviousSourceMetadata) {
-                getHarvestSourceDAO().deleteSubjectTriplesInSource(getContextUrl(), GeneralConfig.HARVESTER_URI);
-            } else {
-                // delete those metadata we're about to save (i.e. we're doing a replace)
-                List<String> subjectUris = Collections.singletonList(getContextUrl());
-                Set<String> predicateUris = sourceMetadata.getPredicateUris();
-                List<String> sourceUris = Collections.singletonList(GeneralConfig.HARVESTER_URI);
-                getHelperDAO().deleteSubjectPredicates(subjectUris, predicateUris, sourceUris);
-            }
-            getHelperDAO().addTriples(sourceMetadata);
-
-            // derive new harvest sources from stored content, unless no content was stored
-            if (storedTriplesCount>0){
-                LOGGER.debug(loggerMsg("Deriving new harvest sources"));
-                deriveNewHarvestSources();
-            }
+            // run post-harvest scripts (TODO not to be run yet, as the scripts functionality is not entirely finished)
+            // runPostHarvestScripts();
 
             // delete old harvests history
-            LOGGER.debug(loggerMsg("Deleting old harvests history"));
-            getHarvestDAO().deleteOldHarvests(harvestId, PRESERVED_HARVEST_COUNT);
+            housekeepOldHarvests();
         }
         catch (DAOException e){
 
@@ -261,6 +236,129 @@ public abstract class BaseHarvest implements Harvest {
             LOGGER.debug(loggerMsg("Harvest finished"));
             LOGGER.debug("                                                                   ");
         }
+    }
+
+    /**
+     * @throws DAOException
+     * @throws MalformedQueryException
+     * @throws QueryEvaluationException
+     * @throws RepositoryException
+     *
+     */
+    private void runPostHarvestScripts() throws DAOException {
+
+        RepositoryConnection conn = null;
+        try {
+            conn = SesameUtil.getRepositoryConnection();
+            conn.setAutoCommit(false);
+            PostHarvestScriptDAO dao = DAOFactory.get().getDao(PostHarvestScriptDAO.class);
+
+            // run scripts meant for all sources (i.e. all-source scripts)
+            runScripts(dao.listActive(null, null), conn);
+
+            // run scripts meant for this source only
+            runScripts(dao.listActive(PostHarvestScriptDTO.TargetType.SOURCE, getContextUrl()), conn);
+
+            // run scripts meant for the types found in the freshly harvested content of this source
+            SingleObjectReader<String> reader = new SingleObjectReader<String>();
+            SesameUtil.executeQuery("select distinct ?type from <" + getContextUrl() + "> where {?s a ?type}", reader, conn);
+            List<String> distinctTypes = reader.getResultList();
+            if (distinctTypes!=null && !distinctTypes.isEmpty()){
+                runScripts(dao.listActiveForTypes(distinctTypes), conn);
+            }
+
+            // commit changes
+            conn.commit();
+        }
+        catch (DAOException e){
+            SesameUtil.rollback(conn);
+            throw e;
+        }
+        catch (Exception e){
+            SesameUtil.rollback(conn);
+            throw new DAOException(e.getMessage(), e);
+        }
+        finally {
+            SesameUtil.close(conn);
+        }
+    }
+
+    /**
+     *
+     * @param scriptDtos
+     * @param conn
+     * @throws MalformedQueryException
+     * @throws QueryEvaluationException
+     * @throws RepositoryException
+     */
+    private void runScripts(List<PostHarvestScriptDTO> scriptDtos, RepositoryConnection conn) throws RepositoryException, QueryEvaluationException, MalformedQueryException{
+
+        if (scriptDtos!=null && !scriptDtos.isEmpty()){
+            for (PostHarvestScriptDTO scriptDto : scriptDtos){
+                SesameUtil.executeUpdateQuery(scriptDto.getScript(), conn, null);
+            }
+        }
+    }
+
+    /**
+     * @throws DAOException
+     */
+    private void housekeepOldHarvests() throws DAOException {
+        LOGGER.debug(loggerMsg("Deleting old harvests history"));
+        getHarvestDAO().deleteOldHarvests(harvestId, PRESERVED_HARVEST_COUNT);
+    }
+
+    /**
+     * @throws DAOException
+     */
+    private void finishSourceMetadata() throws DAOException {
+        if (sourceMetadata == null) {
+            sourceMetadata = new SubjectDTO(getContextUrl(), false);
+        }
+
+        // add harvest statements
+        int harvestedStatements = getHelperDAO().getHarvestedStatements(getContextUrl());
+        ObjectDTO harvestedStatementsObject = new ObjectDTO(Integer.toString(harvestedStatements), null, true, false, XMLSchema.INTEGER);
+        harvestedStatementsObject.setSourceUri(GeneralConfig.HARVESTER_URI);
+        sourceMetadata.addObject(Predicates.CR_HARVESTED_STATEMENTS, harvestedStatementsObject);
+
+        // save source metadata
+        String msg = "Saving " + sourceMetadata.getTripleCount() + " triples of harvest source metadata";
+        if (cleanAllPreviousSourceMetadata){
+            msg = msg + ", cleaning all previous metadata first";
+        }
+        LOGGER.debug(loggerMsg(msg));
+
+        // if all previous metadata should be deleted, then do so,
+        if (cleanAllPreviousSourceMetadata) {
+            getHarvestSourceDAO().deleteSubjectTriplesInSource(getContextUrl(), GeneralConfig.HARVESTER_URI);
+        } else {
+            // delete those metadata we're about to save (i.e. we're doing a replace)
+            List<String> subjectUris = Collections.singletonList(getContextUrl());
+            Set<String> predicateUris = sourceMetadata.getPredicateUris();
+            List<String> sourceUris = Collections.singletonList(GeneralConfig.HARVESTER_URI);
+            getHelperDAO().deleteSubjectPredicates(subjectUris, predicateUris, sourceUris);
+        }
+        getHelperDAO().addTriples(sourceMetadata);
+    }
+
+    /**
+     * @throws DAOException
+     */
+    private void updateHarvestAndMessagesClosed() throws DAOException {
+        LOGGER.debug(loggerMsg("Updating harvest record, saving harvest messages"));
+        getHarvestDAO().updateFinishedHarvest(harvestId, storedTriplesCount);
+        for (HarvestMessageDTO messageDTO : harvestMessages){
+            getHarvestMessageDAO().insertHarvestMessage(messageDTO);
+        }
+    }
+
+    /**
+     * @throws DAOException
+     */
+    private void updateHarvestSourceFinished() throws DAOException {
+        LOGGER.debug(loggerMsg("Updating harvest source record"));
+        getHarvestSourceDAO().updateSourceHarvestFinished(getContextSourceDTO());
     }
 
     /**
@@ -429,6 +527,12 @@ public abstract class BaseHarvest implements Harvest {
      */
     private void deriveNewHarvestSources() throws DAOException{
 
+        if (storedTriplesCount<=0){
+            return;
+        }
+        LOGGER.debug(loggerMsg("Deriving new harvest sources"));
+
+
         // get the default harvest interval minutes
         int defaultHarvestIntervalMinutes =
             Integer.parseInt(GeneralConfig.getProperty(GeneralConfig.HARVESTER_REFERRALS_INTERVAL,
@@ -507,6 +611,11 @@ public abstract class BaseHarvest implements Harvest {
      *
      */
     private void sendHarvestMessages(){
+
+        if (!isSendNotifications() || harvestMessages.isEmpty()){
+            return;
+        }
+        LOGGER.debug(loggerMsg("Sending harvest messages"));
 
         StringBuilder messageBody = null;
 

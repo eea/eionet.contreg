@@ -59,7 +59,10 @@ public class PairReader<T, T1> extends ResultSetMixedReader<Pair<T, T1>> {
     @Override
     @SuppressWarnings("unchecked")
     public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
-        resultList.add(new Pair<T, T1>((T) rs.getObject(LEFTCOL), (T1) rs.getObject(RIGHTCOL)));
+
+        T left = (T) rs.getObject(LEFTCOL);
+        T1 right = (T1) rs.getObject(RIGHTCOL);
+        resultList.add(new Pair<T, T1>(left, right));
     }
 
     /*
