@@ -32,12 +32,8 @@ import net.sourceforge.stripes.validation.ValidationMethod;
 
 import org.apache.commons.lang.StringUtils;
 import org.openrdf.query.MalformedQueryException;
-import org.openrdf.query.algebra.UpdateExpr;
-import org.openrdf.query.algebra.helpers.QueryModelVisitorBase;
-import org.openrdf.query.parser.ParsedUpdate;
 import org.openrdf.query.parser.sparql.SPARQLParser;
 
-import eionet.cr.common.CRException;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.PostHarvestScriptDAO;
@@ -311,31 +307,5 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
      */
     public void setIgnoreMalformedSparql(boolean ignoreMalformedSparql) {
         this.ignoreMalformedSparql = ignoreMalformedSparql;
-    }
-
-    public static void main(String[] args) throws MalformedQueryException, CRException {
-
-        ParsedUpdate pUpd = new SPARQLParser().parseUpdate("PREFIX dc:  <http://purl.org/dc/elements/1.1/> PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> INSERT  { GRAPH <http://example/bookStore2> { ?book ?p ?v } } WHERE  { GRAPH  <http://example/bookStore> { ?book dc:date ?date . FILTER ( ?date > \"1970-01-01T00:00:00-02:00\"^^xsd:dateTime ) ?book ?p ?v} }", null);
-        List<UpdateExpr> updExprs = pUpd.getUpdateExprs();
-        for (UpdateExpr updExpr : updExprs){
-            updExpr.visitChildren(new PostHarvestScriptActionBean.Visitor());
-        }
-        System.out.println("Done!");
-    }
-
-    public static class Visitor extends QueryModelVisitorBase<CRException>{
-
-        public Visitor(){
-            super();
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see org.openrdf.query.algebra.helpers.QueryModelVisitorBase#meet(org.openrdf.query.algebra.UpdateExpr)
-         */
-        public void meet(UpdateExpr updExpr) {
-
-            System.out.println(updExpr);
-        }
     }
 }
