@@ -119,7 +119,7 @@ public abstract class BaseHarvest implements Harvest {
      */
     protected BaseHarvest(HarvestSourceDTO contextSourceDTO) {
 
-        if (contextSourceDTO==null || StringUtils.isEmpty(contextSourceDTO.getUrl())) {
+        if (contextSourceDTO == null || StringUtils.isEmpty(contextSourceDTO.getUrl())) {
             throw new IllegalArgumentException("Context source and its URL must not be null or empty!");
         }
         this.contextSourceDTO = contextSourceDTO;
@@ -135,18 +135,15 @@ public abstract class BaseHarvest implements Harvest {
         startHarvest();
 
         boolean wasHarvestException = false;
-        try{
+        try {
             doHarvest();
-        }
-        catch (HarvestException e){
+        } catch (HarvestException e){
             wasHarvestException = true;
             throw e;
-        }
-        catch (RuntimeException e){
+        } catch (RuntimeException e){
             wasHarvestException = true;
             throw e;
-        }
-        finally {
+        } finally {
             finishHarvest(wasHarvestException);
         }
     }
@@ -164,7 +161,7 @@ public abstract class BaseHarvest implements Harvest {
         int sourceId = contextSourceDTO.getSourceId();
 
         // fall back to default user name, if harvest user has not been set
-        String user = harvestUser==null ? CRUser.APPLICATION.getUserName() : harvestUser;
+        String user = harvestUser == null ? CRUser.APPLICATION.getUserName() : harvestUser;
 
         // create harvest record in the database
         try {
@@ -185,9 +182,9 @@ public abstract class BaseHarvest implements Harvest {
      * @param dontThrowException
      * @throws HarvestException
      */
-    private void finishHarvest(boolean dontThrowException) throws HarvestException{
+    private void finishHarvest(boolean dontThrowException) throws HarvestException {
 
-        try{
+        try {
             // send harvest messages
             sendHarvestMessages();
 
@@ -195,8 +192,7 @@ public abstract class BaseHarvest implements Harvest {
             if (harvestId == 0) {
                 if (dontThrowException){
                     return;
-                }
-                else{
+                } else {
                     throw new HarvestException("Cannot close an un-started harvest: missing harvest id");
                 }
             }
@@ -223,8 +219,7 @@ public abstract class BaseHarvest implements Harvest {
 
             if (dontThrowException){
                 LOGGER.error("Error when finishing harvest: ", e);
-            }
-            else{
+            } else {
                 if (isSendNotifications()){
                     LOGGER.debug(loggerMsg("Sending message about harvest finishing error"));
                     sendFinishingError(e);
@@ -232,7 +227,7 @@ public abstract class BaseHarvest implements Harvest {
                 throw new HarvestException(e.getMessage(), e);
             }
         }
-        finally{
+        finally {
             LOGGER.debug(loggerMsg("Harvest finished"));
             LOGGER.debug("                                                                   ");
         }
@@ -263,7 +258,7 @@ public abstract class BaseHarvest implements Harvest {
             SingleObjectReader<String> reader = new SingleObjectReader<String>();
             SesameUtil.executeQuery("select distinct ?type from <" + getContextUrl() + "> where {?s a ?type}", reader, conn);
             List<String> distinctTypes = reader.getResultList();
-            if (distinctTypes!=null && !distinctTypes.isEmpty()){
+            if (distinctTypes != null && !distinctTypes.isEmpty()){
                 runScripts(dao.listActiveForTypes(distinctTypes), conn);
             }
 
@@ -291,9 +286,9 @@ public abstract class BaseHarvest implements Harvest {
      * @throws QueryEvaluationException
      * @throws RepositoryException
      */
-    private void runScripts(List<PostHarvestScriptDTO> scriptDtos, RepositoryConnection conn) throws RepositoryException, QueryEvaluationException, MalformedQueryException{
+    private void runScripts(List<PostHarvestScriptDTO> scriptDtos, RepositoryConnection conn) throws RepositoryException, QueryEvaluationException, MalformedQueryException {
 
-        if (scriptDtos!=null && !scriptDtos.isEmpty()){
+        if (scriptDtos != null && !scriptDtos.isEmpty()){
             for (PostHarvestScriptDTO scriptDto : scriptDtos){
                 SesameUtil.executeUpdateQuery(scriptDto.getScript(), conn, null);
             }
@@ -449,7 +444,7 @@ public abstract class BaseHarvest implements Harvest {
             throw new HarvestException(e.getMessage(), e);
         }
 
-        if (this.contextSourceDTO==null){
+        if (this.contextSourceDTO == null){
             throw new HarvestException("Context source must exist in the database!");
         }
     }
@@ -460,7 +455,7 @@ public abstract class BaseHarvest implements Harvest {
      * @throws HarvestException
      * @throws DAOException
      */
-    protected void startWithNewContext(String contextUrl) throws HarvestException, DAOException{
+    protected void startWithNewContext(String contextUrl) throws HarvestException, DAOException {
 
         changeContext(contextUrl);
         startHarvest();
@@ -511,7 +506,7 @@ public abstract class BaseHarvest implements Harvest {
      */
     protected void addHarvestMessage(String message, HarvestMessageType messageType, String stackTrace){
 
-        if (harvestMessages==null){
+        if (harvestMessages == null){
             harvestMessages = new ArrayList<HarvestMessageDTO>();
         }
 
@@ -525,7 +520,7 @@ public abstract class BaseHarvest implements Harvest {
      *
      * @throws DAOException
      */
-    private void deriveNewHarvestSources() throws DAOException{
+    private void deriveNewHarvestSources() throws DAOException {
 
         if (storedTriplesCount<=0){
             return;
@@ -540,7 +535,7 @@ public abstract class BaseHarvest implements Harvest {
 
         // derive URLs of new harvest sources from content in this context
         List<String> newSources = getHarvestSourceDAO().getNewSources(getContextUrl());
-        LOGGER.debug((newSources==null ? 0 : newSources.size()) + " new harvest sources found");
+        LOGGER.debug((newSources == null ? 0 : newSources.size()) + " new harvest sources found");
 
         // loop over derived URIs, create new harvest source for each one
         for (String sourceUrl : newSources) {
@@ -597,7 +592,7 @@ public abstract class BaseHarvest implements Harvest {
      */
     private void sendFinishingError(Throwable throwable){
 
-        if (throwable!=null){
+        if (throwable != null){
 
             StringBuilder messageBody = new StringBuilder("The following error happened while finishing the harvest of\n");
             messageBody.append(contextUrl);
@@ -627,9 +622,9 @@ public abstract class BaseHarvest implements Harvest {
                 HarvestMessageType harvestMessageType = HarvestMessageType.parseFrom(messageType);
 
                 // only error-messages will be notified, i.e. the message type must not be INFO
-                if (harvestMessageType!=null && !harvestMessageType.equals(HarvestMessageType.INFO)){
+                if (harvestMessageType != null && !harvestMessageType.equals(HarvestMessageType.INFO)){
 
-                    if (messageBody==null){
+                    if (messageBody == null){
                         messageBody = new StringBuilder("The following error(s) happened while harvesting\n").append(contextUrl);
                     }
                     messageBody.append("\n\n---\n\n").append(messageDTO.getStackTrace());
@@ -637,7 +632,7 @@ public abstract class BaseHarvest implements Harvest {
             }
         }
 
-        if (messageBody!=null){
+        if (messageBody != null){
             sendErrorMessage(messageBody.toString());
         }
 
@@ -680,6 +675,6 @@ public abstract class BaseHarvest implements Harvest {
     @Override
     public boolean isBeingHarvested(String url){
 
-        return url!=null && StringUtils.equals(url, contextUrl);
+        return url != null && StringUtils.equals(url, contextUrl);
     }
 }

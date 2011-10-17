@@ -80,8 +80,8 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
         "update POST_HARVEST_SCRIPT set POSITION_NUMBER=? where POST_HARVEST_SCRIPT_ID=?";
     /** */
     private static final String INCREASE_POSITIONS_SQL =
-        "update POST_HARVEST_SCRIPT set POSITION_NUMBER=POSITION_NUMBER+? " +
-        "where coalesce(TARGET_SOURCE_URL,'')=? and coalesce(TARGET_TYPE_URL,'')=?";
+        "update POST_HARVEST_SCRIPT set POSITION_NUMBER=POSITION_NUMBER+? "
+        + "where coalesce(TARGET_SOURCE_URL,'')=? and coalesce(TARGET_TYPE_URL,'')=?";
 
     /**
      * @see eionet.cr.dao.PostHarvestScriptDAO#list(eionet.cr.dto.PostHarvestScriptDTO.TargetType, java.lang.String)
@@ -122,13 +122,13 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
     @Override
     public List<PostHarvestScriptDTO> listActiveForTypes(List<String> types) throws DAOException {
 
-        if (types==null || types.isEmpty()){
+        if (types == null || types.isEmpty()) {
             throw new IllegalArgumentException("Types must not be null or empty!");
         }
 
         StringBuilder questionMarks = new StringBuilder();
-        for (int i=0; i<types.size(); i++){
-            questionMarks.append(questionMarks.length()==0 ? "" : ",").append("?");
+        for (int i=0; i < types.size(); i++) {
+            questionMarks.append(questionMarks.length() == 0 ? "" : ",").append("?");
         }
 
         return executeSQL(LIST_ACTIVE_FOR_TYPES_SQL, types, new PostHarvestScriptDTOReader());
@@ -426,7 +426,7 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
             for (PostHarvestScriptDTO script : scripts) {
 
                 // we do this check only for scripts that have been selected
-                if (ids.contains(script.getId())){
+                if (ids.contains(script.getId())) {
                     int position = script.getPosition();
                     if ((direction < 0 && position == 1) || (direction > 0 && position == scripts.size())) {
                         isMovingPossible = false;
@@ -459,10 +459,10 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
             values.add(0, Integer.valueOf(scripts.size()));
             SQLUtil.executeUpdate(INCREASE_POSITIONS_SQL, values, conn);
 
-            for (int i=0; i<scripts.size(); i++){
+            for (int i = 0; i < scripts.size(); i++) {
 
                 values = new ArrayList<Object>();
-                values.add(i+1);
+                values.add(i + 1);
                 values.add(Integer.valueOf(scripts.get(i).getId()));
                 SQLUtil.executeUpdate(UPDATE_POSITION_SQL, values, conn);
             }
