@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.sourceforge.stripes.action.DefaultHandler;
@@ -21,6 +20,7 @@ import net.sourceforge.stripes.action.UrlBinding;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.log4j.Logger;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.vocabulary.XMLSchema;
@@ -103,8 +103,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     private String format;
     private int nrOfHits;
     private long executionTime;
-    private String defaultGraphUri;
-    private String namedGraphUri;
+    private String[] defaultGraphUris;
+    private String[] namedGraphUris;
 
     /** */
     private boolean useInferencing;
@@ -376,17 +376,16 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     private void setGraphUri() {
-        HttpServletRequest r = getContext().getRequest();
-        defaultGraphUri = getContext().getRequest().getParameter(DEFAULT_GRAPH_URI);
-        namedGraphUri = getContext().getRequest().getParameter(NAMED_GRAPH_URI);
+        defaultGraphUris = getContext().getRequest().getParameterValues(DEFAULT_GRAPH_URI);
+        namedGraphUris = getContext().getRequest().getParameterValues(NAMED_GRAPH_URI);
     }
 
     private String processGraphUriParameters() {
 
-        LOGGER.info("Default graph: " + defaultGraphUri);
-        LOGGER.info("Named graph: " + namedGraphUri);
+        LOGGER.info("Default graph: " + ReflectionToStringBuilder.toString(defaultGraphUris));
+        LOGGER.info("Named graph: " + ReflectionToStringBuilder.toString(namedGraphUris));
 
-        if (StringUtils.isNotEmpty(defaultGraphUri) || StringUtils.isNotEmpty(namedGraphUri)) {
+        if (defaultGraphUris != null || namedGraphUris != null) {
             if (StringUtils.isNotEmpty(query)) {
                 try {
                     String q = query.toLowerCase().replaceAll("(\\r|\\n)", " ");
@@ -399,17 +398,21 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
                     StringBuilder sb = new StringBuilder();
                     sb.append(q1);
-                    if (StringUtils.isNotEmpty(defaultGraphUri) && !includesFrom) {
-                        sb.append(" FROM <" + defaultGraphUri + "> ");
+                    if (defaultGraphUris != null && !includesFrom) {
+                        for (String uri : defaultGraphUris) {
+                            sb.append(" FROM <" + uri + "> ");
+                        }
                     }
-                    if (StringUtils.isNotEmpty(namedGraphUri) && !includesFromNamed) {
-                        sb.append(" FROM NAMED <" + namedGraphUri + "> ");
+                    if (namedGraphUris != null && !includesFromNamed) {
+                        for (String uri : namedGraphUris) {
+                            sb.append(" FROM NAMED <" + uri + "> ");
+                        }
                     }
                     sb.append(q2);
 
-//                    LOGGER.info("Q1: " + q1);
-//                    LOGGER.info("Q2: " + q2);
-//                    LOGGER.info("Query: " + sb.toString());
+                    //                    LOGGER.info("Q1: " + q1);
+                    //                    LOGGER.info("Q2: " + q2);
+                    //                    LOGGER.info("Query: " + sb.toString());
 
                     return sb.toString();
                 } catch (Exception e) {
@@ -770,15 +773,15 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     /**
      * @return the defaultGraphUri
      */
-    public String getDefaultGraphUri() {
-        return defaultGraphUri;
+    public String[] getDefaultGraphUris() {
+        return defaultGraphUris;
     }
 
     /**
      * @return the namedGraphUri
      */
-    public String getNamedGraphUri() {
-        return namedGraphUri;
+    public String[] getNamedGraphUris() {
+        return namedGraphUris;
     }
 
 }

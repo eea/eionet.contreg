@@ -21,8 +21,6 @@
 
 package eionet.cr.web.util.tabs;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +32,6 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.util.URLUtil;
 
 /**
  * Helper for creating factsheet tab menu.
@@ -46,10 +43,10 @@ public class FactsheetTabMenuHelper {
     private static final Logger LOGGER = Logger.getLogger(FactsheetTabMenuHelper.class);
 
     /** The subject data object found by the requestd URI or URI hash. */
-    private SubjectDTO subject;
+    private final SubjectDTO subject;
 
-    private boolean uriIsHarvestSource;
-    private boolean mapDisplayable;
+    private final boolean uriIsHarvestSource;
+    private final boolean mapDisplayable;
     private boolean sparqlBookmarkType;
     private boolean compiledDatasetType;
 

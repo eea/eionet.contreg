@@ -64,8 +64,15 @@
         <div style="margin-top: 15px">
                     <div style="float:right"><a href="documentation/sparqlfunctions">SPARQL Functions</a></div>
             <crfn:form name="mainForm" action="/sparql" method="get">
-                <c:if test="${not empty actionBean.defaultGraphUri}">
-                    <input type="hidden" name="default-graph-uri" value="${actionBean.defaultGraphUri}" />
+                <c:if test="${not empty actionBean.defaultGraphUris}">
+                    <c:forEach var="defaultGraphUri" items="${actionBean.defaultGraphUris}">
+                        <input type="hidden" name="default-graph-uri" value="${defaultGraphUri}" />
+                    </c:forEach>
+                </c:if>
+                <c:if test="${not empty actionBean.namedGraphUris}">
+                    <c:forEach var="namedGraphUri" items="${actionBean.namedGraphUris}">
+                        <input type="hidden" name="named-graph-uri" value="${namedGraphUri}" />
+                    </c:forEach>
                 </c:if>
                 <div>
                     <label for="queryText" class="question">Query:</label>
