@@ -13,7 +13,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 
 import org.openrdf.model.ValueFactory;
-import org.openrdf.query.Query;
+import org.openrdf.query.Operation;
 
 import eionet.cr.common.CRRuntimeException;
 import eionet.cr.dao.virtuoso.VirtuosoBaseDAO;
@@ -149,10 +149,10 @@ public class Bindings {
 
     /**
      *
-     * @param query
+     * @param operation
      * @param valueFactory
      */
-    public void applyTo(Query query, ValueFactory valueFactory) {
+    public void applyTo(Operation operation, ValueFactory valueFactory) {
 
         if (bindings.isEmpty()) {
             return;
@@ -166,34 +166,34 @@ public class Bindings {
             if (value == null) {
                 continue;
             } else if (value instanceof Byte) {
-                query.setBinding(name, valueFactory.createLiteral(((Byte) value).byteValue()));
+                operation.setBinding(name, valueFactory.createLiteral(((Byte) value).byteValue()));
             } else if (value instanceof Short) {
-                query.setBinding(name, valueFactory.createLiteral(((Short) value).shortValue()));
+                operation.setBinding(name, valueFactory.createLiteral(((Short) value).shortValue()));
             } else if (value instanceof Integer) {
-                query.setBinding(name, valueFactory.createLiteral(((Integer) value).intValue()));
+                operation.setBinding(name, valueFactory.createLiteral(((Integer) value).intValue()));
             } else if (value instanceof Long) {
-                query.setBinding(name, valueFactory.createLiteral(((Long) value).longValue()));
+                operation.setBinding(name, valueFactory.createLiteral(((Long) value).longValue()));
             } else if (value instanceof Float) {
-                query.setBinding(name, valueFactory.createLiteral(((Float) value).floatValue()));
+                operation.setBinding(name, valueFactory.createLiteral(((Float) value).floatValue()));
             } else if (value instanceof Double) {
-                query.setBinding(name, valueFactory.createLiteral(((Double) value).doubleValue()));
+                operation.setBinding(name, valueFactory.createLiteral(((Double) value).doubleValue()));
             } else if (value instanceof Boolean) {
-                query.setBinding(name, valueFactory.createLiteral(((Boolean) value).booleanValue()));
+                operation.setBinding(name, valueFactory.createLiteral(((Boolean) value).booleanValue()));
             } else if (value instanceof String) {
-                query.setBinding(name, valueFactory.createLiteral(value.toString()));
+                operation.setBinding(name, valueFactory.createLiteral(value.toString()));
             } else if (value instanceof URI) {
                 try{
-                    query.setBinding(name, valueFactory.createURI(value.toString()));
+                    operation.setBinding(name, valueFactory.createURI(value.toString()));
                 }
                 catch (IllegalArgumentException e){
-                    query.setBinding(name, valueFactory.createBNode(value.toString()));
+                    operation.setBinding(name, valueFactory.createBNode(value.toString()));
                 }
             } else if (value instanceof Date) {
                 GregorianCalendar calendar = new GregorianCalendar();
                 calendar.setTime((Date) value);
-                query.setBinding(name, valueFactory.createLiteral(datatypeFactory.newXMLGregorianCalendar(calendar)));
+                operation.setBinding(name, valueFactory.createLiteral(datatypeFactory.newXMLGregorianCalendar(calendar)));
             } else if (value instanceof BlankNode) {
-                query.setBinding(name, valueFactory.createBNode(((BlankNode) value).getId()));
+                operation.setBinding(name, valueFactory.createBNode(((BlankNode) value).getId()));
             } else {
                 throw new IllegalArgumentException("Unsupported type is bound to name " + name);
             }

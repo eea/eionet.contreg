@@ -701,4 +701,49 @@ public class Util {
         }
         return element;
     }
+
+    /**
+     *
+     * @param str
+     * @param token
+     * @return
+     */
+    public static boolean containsToken(String str, String token){
+        return containsToken(str, token, false);
+    }
+
+    /**
+     *
+     * @param str
+     * @param token
+     * @return
+     */
+    public static boolean containsTokenIgnoreCase(String str, String token){
+        return containsToken(str, token, true);
+    }
+
+    /**
+     *
+     * @param str
+     * @param token
+     * @param ignoreCase
+     * @return
+     */
+    private static boolean containsToken(String str, String token, boolean ignoreCase){
+
+        if (str==null || str.trim().length()==0){
+            return false;
+        }
+
+        StringTokenizer st = new StringTokenizer(str);
+        while (st.hasMoreTokens()){
+
+            String nextToken = st.nextToken();
+            if (ignoreCase ? nextToken.equalsIgnoreCase(token) : nextToken.equals(token)){
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

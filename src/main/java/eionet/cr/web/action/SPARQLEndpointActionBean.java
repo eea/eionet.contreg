@@ -323,7 +323,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         Resolution resolution = null;
         if (useInferencing && !StringUtils.isBlank(query)) {
             String infCommand =
-                    "DEFINE input:inference '" + GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME) + "'";
+                "DEFINE input:inference '" + GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME) + "'";
 
             // if inference command not yet present in the query, add it
             if (query.indexOf(infCommand) == -1) {
@@ -528,7 +528,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                             if (queryResult != null) {
                                 result = new QueryResult(queryResult, false);
                             }
-                            // Returns HTML format
+                            // Returns HTML+ format
                         } else if (format != null && format.equals(FORMAT_HTML_PLUS)) {
                             long startTime = System.currentTimeMillis();
                             queryResult = resultsTable.evaluate();

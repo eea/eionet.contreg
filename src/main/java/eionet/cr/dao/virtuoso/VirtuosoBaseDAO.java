@@ -90,17 +90,17 @@ public abstract class VirtuosoBaseDAO {
      *
      * @param sparql
      *            SPARQL
-     * @param conn
-     *            Virtuoso repository connection
      * @param bindings
      *            Query bindings, if no bindings, null is accepted as the value
+     * @param conn
+     *            Virtuoso repository connection
      * @throws DAOException
      *             if update fails
      */
-    protected void executeUpdateSPARQL(final String sparql, final RepositoryConnection conn, final Bindings bindings)
+    protected void executeUpdateSPARQL(String sparql, Bindings bindings, RepositoryConnection conn)
     throws DAOException {
         try {
-            SesameUtil.executeUpdateQuery(sparql, conn, bindings);
+            SesameUtil.executeUpdate(sparql, bindings, conn);
         } catch (Exception e) {
             throw new DAOException(e.toString(), e);
         }
@@ -335,7 +335,7 @@ public abstract class VirtuosoBaseDAO {
 
     /**
      * Orders the map the same way as subjectUris list is ordered. Returns new list.
-     * 
+     *
      * @param <T>
      * @param subjectUris
      * @param map

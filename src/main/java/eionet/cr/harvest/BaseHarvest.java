@@ -21,6 +21,7 @@
 
 package eionet.cr.harvest;
 
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,6 +34,7 @@ import javax.mail.internet.AddressException;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.openrdf.OpenRDFException;
 import org.openrdf.model.vocabulary.XMLSchema;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
@@ -105,6 +107,7 @@ public abstract class BaseHarvest implements Harvest {
     /**
      *
      * Class constructor.
+     *
      * @param contextUrl
      * @throws HarvestException
      */
@@ -137,10 +140,10 @@ public abstract class BaseHarvest implements Harvest {
         boolean wasHarvestException = false;
         try {
             doHarvest();
-        } catch (HarvestException e){
+        } catch (HarvestException e) {
             wasHarvestException = true;
             throw e;
-        } catch (RuntimeException e){
+        } catch (RuntimeException e) {
             wasHarvestException = true;
             throw e;
         } finally {
@@ -185,12 +188,15 @@ public abstract class BaseHarvest implements Harvest {
     private void finishHarvest(boolean dontThrowException) throws HarvestException {
 
         try {
+            // run post-harvest scripts (TODO not to be run yet, as the scripts functionality is not entirely finished)
+            // runPostHarvestScripts();
+
             // send harvest messages
             sendHarvestMessages();
 
             // double-check that we're not closing a harvest whose id we don't know
             if (harvestId == 0) {
-                if (dontThrowException){
+                if (dontThrowException) {
                     return;
                 } else {
                     throw new HarvestException("Cannot close an un-started harvest: missing harvest id");
@@ -209,38 +215,34 @@ public abstract class BaseHarvest implements Harvest {
             // derive new harvest sources from stored content
             deriveNewHarvestSources();
 
-            // run post-harvest scripts (TODO not to be run yet, as the scripts functionality is not entirely finished)
-            // runPostHarvestScripts();
-
             // delete old harvests history
             housekeepOldHarvests();
-        }
-        catch (DAOException e){
+        } catch (DAOException e) {
 
-            if (dontThrowException){
+            if (dontThrowException) {
                 LOGGER.error("Error when finishing harvest: ", e);
             } else {
-                if (isSendNotifications()){
+                if (isSendNotifications()) {
                     LOGGER.debug(loggerMsg("Sending message about harvest finishing error"));
                     sendFinishingError(e);
                 }
                 throw new HarvestException(e.getMessage(), e);
             }
-        }
-        finally {
+        } finally {
             LOGGER.debug(loggerMsg("Harvest finished"));
             LOGGER.debug("                                                                   ");
         }
     }
 
     /**
-     * @throws DAOException
      * @throws MalformedQueryException
      * @throws QueryEvaluationException
      * @throws RepositoryException
      *
      */
-    private void runPostHarvestScripts() throws DAOException {
+    private void runPostHarvestScripts() {
+
+        LOGGER.debug("Running post-harvest scripts ...");
 
         RepositoryConnection conn = null;
         try {
@@ -258,22 +260,18 @@ public abstract class BaseHarvest implements Harvest {
             SingleObjectReader<String> reader = new SingleObjectReader<String>();
             SesameUtil.executeQuery("select distinct ?type from <" + getContextUrl() + "> where {?s a ?type}", reader, conn);
             List<String> distinctTypes = reader.getResultList();
-            if (distinctTypes != null && !distinctTypes.isEmpty()){
+            if (distinctTypes != null && !distinctTypes.isEmpty()) {
                 runScripts(dao.listActiveForTypes(distinctTypes), conn);
             }
 
             // commit changes
             conn.commit();
-        }
-        catch (DAOException e){
+        } catch (Exception e) {
             SesameUtil.rollback(conn);
-            throw e;
-        }
-        catch (Exception e){
-            SesameUtil.rollback(conn);
-            throw new DAOException(e.getMessage(), e);
-        }
-        finally {
+            addHarvestMessage("Error when running post-harvest scripts: " + e.getMessage(), HarvestMessageType.ERROR,
+                    Util.getStackTrace(e));
+            LOGGER.error(loggerMsg("Error when running post-harvest scripts: " + e.getMessage()), e);
+        } finally {
             SesameUtil.close(conn);
         }
     }
@@ -282,15 +280,21 @@ public abstract class BaseHarvest implements Harvest {
      *
      * @param scriptDtos
      * @param conn
-     * @throws MalformedQueryException
-     * @throws QueryEvaluationException
-     * @throws RepositoryException
+     * @throws OpenRDFException
      */
-    private void runScripts(List<PostHarvestScriptDTO> scriptDtos, RepositoryConnection conn) throws RepositoryException, QueryEvaluationException, MalformedQueryException {
+    private void runScripts(List<PostHarvestScriptDTO> scriptDtos, RepositoryConnection conn) throws OpenRDFException {
 
-        if (scriptDtos != null && !scriptDtos.isEmpty()){
-            for (PostHarvestScriptDTO scriptDto : scriptDtos){
-                SesameUtil.executeUpdateQuery(scriptDto.getScript(), conn, null);
+        if (scriptDtos != null && !scriptDtos.isEmpty()) {
+            for (PostHarvestScriptDTO scriptDto : scriptDtos) {
+
+                String scriptType =
+                    scriptDto.getTargetType() == null ? "all-source" : scriptDto.getTargetType().toString().toLowerCase()
+                            + "-specific";
+                LOGGER.debug(MessageFormat.format("Executing {0} post-harvest script with title: {1}", scriptType,
+                        scriptDto.getTitle()));
+
+                String updateSparql = "WITH <" + getContextUrl() + "> " + scriptDto.getScript();
+                SesameUtil.executeUpdate(updateSparql, null, conn);
             }
         }
     }
@@ -313,13 +317,14 @@ public abstract class BaseHarvest implements Harvest {
 
         // add harvest statements
         int harvestedStatements = getHelperDAO().getHarvestedStatements(getContextUrl());
-        ObjectDTO harvestedStatementsObject = new ObjectDTO(Integer.toString(harvestedStatements), null, true, false, XMLSchema.INTEGER);
+        ObjectDTO harvestedStatementsObject =
+            new ObjectDTO(Integer.toString(harvestedStatements), null, true, false, XMLSchema.INTEGER);
         harvestedStatementsObject.setSourceUri(GeneralConfig.HARVESTER_URI);
         sourceMetadata.addObject(Predicates.CR_HARVESTED_STATEMENTS, harvestedStatementsObject);
 
         // save source metadata
         String msg = "Saving " + sourceMetadata.getTripleCount() + " triples of harvest source metadata";
-        if (cleanAllPreviousSourceMetadata){
+        if (cleanAllPreviousSourceMetadata) {
             msg = msg + ", cleaning all previous metadata first";
         }
         LOGGER.debug(loggerMsg(msg));
@@ -343,7 +348,7 @@ public abstract class BaseHarvest implements Harvest {
     private void updateHarvestAndMessagesClosed() throws DAOException {
         LOGGER.debug(loggerMsg("Updating harvest record, saving harvest messages"));
         getHarvestDAO().updateFinishedHarvest(harvestId, storedTriplesCount);
-        for (HarvestMessageDTO messageDTO : harvestMessages){
+        for (HarvestMessageDTO messageDTO : harvestMessages) {
             getHarvestMessageDAO().insertHarvestMessage(messageDTO);
         }
     }
@@ -444,7 +449,7 @@ public abstract class BaseHarvest implements Harvest {
             throw new HarvestException(e.getMessage(), e);
         }
 
-        if (this.contextSourceDTO == null){
+        if (this.contextSourceDTO == null) {
             throw new HarvestException("Context source must exist in the database!");
         }
     }
@@ -494,7 +499,7 @@ public abstract class BaseHarvest implements Harvest {
      * @param message
      * @param messageType
      */
-    protected void addHarvestMessage(String message, HarvestMessageType messageType){
+    protected void addHarvestMessage(String message, HarvestMessageType messageType) {
         addHarvestMessage(message, messageType, null);
     }
 
@@ -504,9 +509,9 @@ public abstract class BaseHarvest implements Harvest {
      * @param messageType
      * @param stackTrace
      */
-    protected void addHarvestMessage(String message, HarvestMessageType messageType, String stackTrace){
+    protected void addHarvestMessage(String message, HarvestMessageType messageType, String stackTrace) {
 
-        if (harvestMessages == null){
+        if (harvestMessages == null) {
             harvestMessages = new ArrayList<HarvestMessageDTO>();
         }
 
@@ -522,11 +527,10 @@ public abstract class BaseHarvest implements Harvest {
      */
     private void deriveNewHarvestSources() throws DAOException {
 
-        if (storedTriplesCount<=0){
+        if (storedTriplesCount <= 0) {
             return;
         }
         LOGGER.debug(loggerMsg("Deriving new harvest sources"));
-
 
         // get the default harvest interval minutes
         int defaultHarvestIntervalMinutes =
@@ -564,7 +568,8 @@ public abstract class BaseHarvest implements Harvest {
     }
 
     /**
-     * @param cleanAllPreviousSourceMetadata the cleanAllPreviousSourceMetadata to set
+     * @param cleanAllPreviousSourceMetadata
+     *            the cleanAllPreviousSourceMetadata to set
      */
     protected void setCleanAllPreviousSourceMetadata(boolean cleanAllPreviousSourceMetadata) {
         this.cleanAllPreviousSourceMetadata = cleanAllPreviousSourceMetadata;
@@ -574,7 +579,7 @@ public abstract class BaseHarvest implements Harvest {
      * @see eionet.cr.harvest.Harvest#setHarvestUser(java.lang.String)
      */
     @Override
-    public void setHarvestUser(String harvestUser){
+    public void setHarvestUser(String harvestUser) {
         this.harvestUser = harvestUser;
     }
 
@@ -590,9 +595,9 @@ public abstract class BaseHarvest implements Harvest {
      * @param message
      * @param throwable
      */
-    private void sendFinishingError(Throwable throwable){
+    private void sendFinishingError(Throwable throwable) {
 
-        if (throwable != null){
+        if (throwable != null) {
 
             StringBuilder messageBody = new StringBuilder("The following error happened while finishing the harvest of\n");
             messageBody.append(contextUrl);
@@ -605,26 +610,26 @@ public abstract class BaseHarvest implements Harvest {
     /**
      *
      */
-    private void sendHarvestMessages(){
+    private void sendHarvestMessages() {
 
-        if (!isSendNotifications() || harvestMessages.isEmpty()){
+        if (!isSendNotifications() || harvestMessages.isEmpty()) {
             return;
         }
         LOGGER.debug(loggerMsg("Sending harvest messages"));
 
         StringBuilder messageBody = null;
 
-        for (HarvestMessageDTO messageDTO : harvestMessages){
+        for (HarvestMessageDTO messageDTO : harvestMessages) {
 
             String messageType = messageDTO.getType();
-            if (messageType != null){
+            if (messageType != null) {
 
                 HarvestMessageType harvestMessageType = HarvestMessageType.parseFrom(messageType);
 
                 // only error-messages will be notified, i.e. the message type must not be INFO
-                if (harvestMessageType != null && !harvestMessageType.equals(HarvestMessageType.INFO)){
+                if (harvestMessageType != null && !harvestMessageType.equals(HarvestMessageType.INFO)) {
 
-                    if (messageBody == null){
+                    if (messageBody == null) {
                         messageBody = new StringBuilder("The following error(s) happened while harvesting\n").append(contextUrl);
                     }
                     messageBody.append("\n\n---\n\n").append(messageDTO.getStackTrace());
@@ -632,7 +637,7 @@ public abstract class BaseHarvest implements Harvest {
             }
         }
 
-        if (messageBody != null){
+        if (messageBody != null) {
             sendErrorMessage(messageBody.toString());
         }
 
@@ -642,7 +647,7 @@ public abstract class BaseHarvest implements Harvest {
      *
      * @param messageBody
      */
-    private void sendErrorMessage(String messageBody){
+    private void sendErrorMessage(String messageBody) {
 
         try {
             EMailSender.sendToSysAdmin("Error(s) when harvesting " + contextUrl, messageBody);
@@ -657,12 +662,13 @@ public abstract class BaseHarvest implements Harvest {
      *
      * @return
      */
-    protected boolean isSendNotifications(){
+    protected boolean isSendNotifications() {
         return false;
     }
 
     /**
-     * @param storedTriplesCount the storedTriplesCount to set
+     * @param storedTriplesCount
+     *            the storedTriplesCount to set
      */
     protected void setStoredTriplesCount(int storedTriplesCount) {
         this.storedTriplesCount = storedTriplesCount;
@@ -670,10 +676,11 @@ public abstract class BaseHarvest implements Harvest {
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.harvest.Harvest#isBeingHarvested(java.lang.String)
      */
     @Override
-    public boolean isBeingHarvested(String url){
+    public boolean isBeingHarvested(String url) {
 
         return url != null && StringUtils.equals(url, contextUrl);
     }
