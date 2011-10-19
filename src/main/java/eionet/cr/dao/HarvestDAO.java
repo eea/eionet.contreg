@@ -95,4 +95,5 @@ public interface HarvestDAO extends DAO {
      * @throws DAOException
      */
     public void deleteOldHarvests(int harvestId, int preserveRecent) throws DAOException;
+
 }

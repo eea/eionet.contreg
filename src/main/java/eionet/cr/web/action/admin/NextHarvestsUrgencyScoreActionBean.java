@@ -1,5 +1,6 @@
 package eionet.cr.web.action.admin;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -30,6 +31,7 @@ public class NextHarvestsUrgencyScoreActionBean extends AbstractSearchActionBean
     private int urgencyScoreLimit = 20;
     private boolean adminLoggedIn = false;
     private int resultsFound = 0;
+    private int nrOfUrgentSources;
 
     @DefaultHandler
     public Resolution view() throws DAOException {
@@ -41,6 +43,7 @@ public class NextHarvestsUrgencyScoreActionBean extends AbstractSearchActionBean
                 resultList = result.getRight();
                 matchCount = 0;
                 resultsFound = result.getLeft();
+                nrOfUrgentSources = getNumberOfUrgentSources(resultList, 1d);
             } else {
                 setAdminLoggedIn(false);
             }
@@ -48,6 +51,25 @@ public class NextHarvestsUrgencyScoreActionBean extends AbstractSearchActionBean
             setAdminLoggedIn(false);
         }
         return new ForwardResolution("/pages/admin/nextHarvestsUrgencyScore.jsp");
+    }
+
+    /**
+     * Returns the number of elements in the resultList, that have higher urgency parameter than the provided urgencyScore.
+     *
+     * @param resultList
+     * @param urgancyScore
+     * @return
+     */
+    private int getNumberOfUrgentSources(Collection<HarvestUrgencyScoreDTO> resultList, double urgancyScore) {
+
+        int result = 0;
+
+        for (HarvestUrgencyScoreDTO dto : resultList) {
+            if (dto.getUrgency() > urgancyScore) {
+                result++;
+            }
+        }
+        return result;
     }
 
     /*
@@ -117,6 +139,13 @@ public class NextHarvestsUrgencyScoreActionBean extends AbstractSearchActionBean
 
     public void setResultsFound(int resultsFound) {
         this.resultsFound = resultsFound;
+    }
+
+    /**
+     * @return the nrOfUrgentSources
+     */
+    public int getNrOfUrgentSources() {
+        return nrOfUrgentSources;
     }
 
 }

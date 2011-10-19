@@ -402,15 +402,6 @@ public interface HelperDAO extends DAO {
             Collection<String> sourceUris) throws DAOException;
 
     /**
-     * Returns total triples count.
-     *
-     * @return long triples count
-     * @throws DAOException
-     *             if query fails
-     */
-    public long getTriplesCount() throws DAOException;
-
-    /**
      * @param user
      * @return List<Map<String, String>>
      * @throws DAOException

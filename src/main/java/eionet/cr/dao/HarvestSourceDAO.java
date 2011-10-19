@@ -207,32 +207,36 @@ public interface HarvestSourceDAO extends DAO {
     boolean removeSourceFromInferenceRule(String url) throws DAOException;
 
     /**
-     * Loads the given file into the triple store (i.e. repository).
-     * File format must be supported by the triple store.
+     * Loads the given file into the triple store (i.e. repository). File format must be supported by the triple store.
      *
      * @param file
-     * @param rdfFormat TODO
+     * @param rdfFormat
+     *            TODO
      * @param graphUrl
      * @param clearPreviousGraphContent
      * @return
      * @throws IOException
      * @throws OpenRDFException
      */
-    public int loadIntoRepository(File file, RDFFormat rdfFormat, String graphUrl, boolean clearPreviousGraphContent) throws IOException, OpenRDFException;
+    public int loadIntoRepository(File file, RDFFormat rdfFormat, String graphUrl, boolean clearPreviousGraphContent)
+            throws IOException, OpenRDFException;
 
     /**
-     * Loads the given input stream into the triple store (i.e. repository).
-     * The stream must be formatted by a format supported by the triple store.
+     * Loads the given input stream into the triple store (i.e. repository). The stream must be formatted by a format supported by
+     * the triple store.
      *
      * @param inputStream
-     * @param rdfFormat TODO
+     * @param rdfFormat
+     *            TODO
      * @param graphUrl
      * @param clearPreviousGraphContent
      * @return
      * @throws IOException
      * @throws OpenRDFException
      */
-    public int loadIntoRepository(InputStream inputStream, RDFFormat rdfFormat, String graphUrl, boolean clearPreviousGraphContent) throws IOException, OpenRDFException;
+    public int
+    loadIntoRepository(InputStream inputStream, RDFFormat rdfFormat, String graphUrl, boolean clearPreviousGraphContent)
+            throws IOException, OpenRDFException;
 
     /**
      * Adds the meta information the harvester has collected about the source. The meta data is considered part of the harvester and
@@ -252,9 +256,11 @@ public interface HarvestSourceDAO extends DAO {
     /**
      * Derives new harvest source URLs from content in the graph represented by the given harvest source URL.
      *
-     * @param sourceUrl - The given harvest source URL.
+     * @param sourceUrl
+     *            - The given harvest source URL.
      * @return List<String> List of derived URLs.
-     * @throws DAOException - If any kind of database access error occurs.
+     * @throws DAOException
+     *             - If any kind of database access error occurs.
      */
     public List<String> getNewSources(String sourceUrl) throws DAOException;
 
@@ -355,10 +361,20 @@ public interface HarvestSourceDAO extends DAO {
     /**
      *
      * @param substring
-     * @param limit TODO
-     * @param offset TODO
+     * @param limit
+     *            TODO
+     * @param offset
+     *            TODO
      * @return
      * @throws DAOException
      */
     List<String> filter(String substring, int limit, int offset) throws DAOException;
+
+    /**
+     * Returns the number of total statements (triples).
+     *
+     * @return
+     * @throws DAOException
+     */
+    int getTotalStatementsCount() throws DAOException;
 }

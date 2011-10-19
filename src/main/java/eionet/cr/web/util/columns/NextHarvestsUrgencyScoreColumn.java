@@ -47,7 +47,7 @@ public class NextHarvestsUrgencyScoreColumn extends SearchResultColumn {
             }
 
             if (columnType == COLUMN.URGENCY) {
-                NumberFormat formatter = new DecimalFormat("#.000");
+                NumberFormat formatter = new DecimalFormat("0.000");
                 result = formatter.format(harvestUrgencyScore.getUrgency());
             }
         }

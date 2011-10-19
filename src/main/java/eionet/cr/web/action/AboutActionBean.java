@@ -5,28 +5,36 @@ import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import eionet.cr.dao.DAOException;
+import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.HarvestSourceDAO;
 
+/**
+ * About page controller.
+ *
+ * @author Juhan Voolaid
+ */
 @UrlBinding("/about.action")
 public class AboutActionBean extends AbstractActionBean {
 
-    // private long triplesCount;
-
     /**
+     * Handles view page.
      *
      * @return
-     * @throws DAOException
-     *             TODO
      */
     @DefaultHandler
-    public Resolution view() throws DAOException {
-
-        // triplesCount = DAOFactory.get().getDao(HelperDAO.class).getTriplesCount();
+    public Resolution view() {
         return new ForwardResolution("/pages/about.jsp");
 
     }
 
-    // public long getTriplesCount() {
-    // return triplesCount;
-    // }
+    /**
+     * Returns triple count.
+     *
+     * @return
+     * @throws DAOException
+     */
+    public long getTriplesCount() throws DAOException {
+        return DAOFactory.get().getDao(HarvestSourceDAO.class).getTotalStatementsCount();
+    }
 
 }

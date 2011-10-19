@@ -24,8 +24,10 @@
             </p>
             </crfn:form>
             <div class="advice-msg">
-            Results found: ${actionBean.resultsFound}
+            Results found: ${actionBean.resultsFound} <br />
+            Number of sources with higher than 1,0 urgency score: ${actionBean.nrOfUrgentSources}
             </div>
+
             <stripes:layout-render name="/pages/common/subjectsResultList.jsp" tableClass="datatable"/>
         </c:when>
         <c:otherwise>

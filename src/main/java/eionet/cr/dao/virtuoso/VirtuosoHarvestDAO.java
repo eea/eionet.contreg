@@ -67,13 +67,13 @@ public class VirtuosoHarvestDAO extends VirtuosoBaseDAO implements HarvestDAO {
         int maxDistinctHarvests = 10;
 
         String getHarvestsBySourceIdSQL =
-            "select distinct top " + HarvestMessageType.values().length * maxDistinctHarvests + " H.HARVEST_ID as HARVEST_ID,"
-            + " H.HARVEST_SOURCE_ID as SOURCE_ID, H.TYPE as HARVEST_TYPE, H.USERNAME as HARVEST_USER,"
-            + " H.STATUS as STATUS, H.STARTED as STARTED, H.FINISHED as FINISHED,"
-            + " H.ENC_SCHEMES as ENC_SCHEMES, H.TOT_STATEMENTS as TOT_STATEMENTS,"
-            + " H.LIT_STATEMENTS as LIT_STATEMENTS, M.TYPE as MESSAGE_TYPE"
-            + " from HARVEST AS H left join HARVEST_MESSAGE AS M on H.HARVEST_ID=M.HARVEST_ID"
-            + " where H.HARVEST_SOURCE_ID=? order by H.STARTED desc";
+                "select distinct top " + HarvestMessageType.values().length * maxDistinctHarvests + " H.HARVEST_ID as HARVEST_ID,"
+                        + " H.HARVEST_SOURCE_ID as SOURCE_ID, H.TYPE as HARVEST_TYPE, H.USERNAME as HARVEST_USER,"
+                        + " H.STATUS as STATUS, H.STARTED as STARTED, H.FINISHED as FINISHED,"
+                        + " H.ENC_SCHEMES as ENC_SCHEMES, H.TOT_STATEMENTS as TOT_STATEMENTS,"
+                        + " H.LIT_STATEMENTS as LIT_STATEMENTS, M.TYPE as MESSAGE_TYPE"
+                        + " from HARVEST AS H left join HARVEST_MESSAGE AS M on H.HARVEST_ID=M.HARVEST_ID"
+                        + " where H.HARVEST_SOURCE_ID=? order by H.STARTED desc";
 
         List<Object> values = new ArrayList<Object>();
         values.add(harvestSourceId);
@@ -87,11 +87,11 @@ public class VirtuosoHarvestDAO extends VirtuosoBaseDAO implements HarvestDAO {
     public List<HarvestStatDTO> getLastHarvestStats(Integer limit) throws DAOException {
 
         String getHarvestStatsSQL =
-            "SELECT TOP "
-            + limit
-            + " h.harvest_id, h.started, h.finished, h.tot_statements, hs.url"
-            + " FROM HARVEST AS h LEFT JOIN HARVEST_SOURCE AS hs ON h.harvest_source_id = hs.harvest_source_id"
-            + " WHERE h.status = ? ORDER BY h.finished DESC";
+                "SELECT TOP "
+                        + limit
+                        + " h.harvest_id, h.started, h.finished, h.tot_statements, hs.url"
+                        + " FROM HARVEST AS h LEFT JOIN HARVEST_SOURCE AS hs ON h.harvest_source_id = hs.harvest_source_id"
+                        + " WHERE h.status = ? ORDER BY h.finished DESC";
 
         List<Object> values = new ArrayList<Object>();
         values.add(HarvestConstants.STATUS_FINISHED);
@@ -100,7 +100,7 @@ public class VirtuosoHarvestDAO extends VirtuosoBaseDAO implements HarvestDAO {
 
     /** */
     private static final String getLastHarvestBySourceIdSQL = "select top 1 *, USERNAME as \"USER\""
-        + " from HARVEST where HARVEST_SOURCE_ID=? order by HARVEST.STARTED desc";
+            + " from HARVEST where HARVEST_SOURCE_ID=? order by HARVEST.STARTED desc";
 
     /**
      * {@inheritDoc}
@@ -116,7 +116,7 @@ public class VirtuosoHarvestDAO extends VirtuosoBaseDAO implements HarvestDAO {
 
     /** */
     private static final String insertStartedHarvestSQL =
-        "insert into HARVEST (HARVEST_SOURCE_ID, TYPE, USERNAME, STATUS, STARTED) values (?, ?, ?, ?, ?)";
+            "insert into HARVEST (HARVEST_SOURCE_ID, TYPE, USERNAME, STATUS, STARTED) values (?, ?, ?, ?, ?)";
 
     /**
      * {@inheritDoc}
@@ -144,7 +144,7 @@ public class VirtuosoHarvestDAO extends VirtuosoBaseDAO implements HarvestDAO {
 
     /** */
     private static final String updateFinishedHarvestSQL =
-        "update HARVEST set STATUS=?, FINISHED=?, TOT_STATEMENTS=? where HARVEST_ID=?";
+            "update HARVEST set STATUS=?, FINISHED=?, TOT_STATEMENTS=? where HARVEST_ID=?";
 
     /**
      * {@inheritDoc}
@@ -206,4 +206,5 @@ public class VirtuosoHarvestDAO extends VirtuosoBaseDAO implements HarvestDAO {
 
         executeSQL(deleteSql.toString(), deleteParams);
     }
+
 }
