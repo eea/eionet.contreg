@@ -65,7 +65,7 @@
                                                 </stripes:link>
                                             </li>
                                         </c:if>
-                                        <c:if test="${harvestAllowed}">
+                                        <c:if test="${harvestAllowed && !actionBean.compiledDataset}">
                                             <li>
                                                 <stripes:url value="${actionBean.urlBinding}" event="harvestAjax" var="url">
                                                         <stripes:param name="uri" value="${actionBean.uri}"/>

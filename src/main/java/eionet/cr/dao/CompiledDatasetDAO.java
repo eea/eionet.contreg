@@ -20,7 +20,6 @@
  */
 package eionet.cr.dao;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.List;
 
@@ -70,26 +69,41 @@ public interface CompiledDatasetDAO extends DAO {
     List<SubjectDTO> getDetailedDatasetFiles(String dataset) throws DAOException;
 
     /**
+     * Saves compiled dataset into new graph
      *
-     * @param selectedFiles
-     * @param fileName
-     * @param userName
-     * @param overwrite
-     * @return File
-     * @throws DAOException
+     * @param selectedFiles.
+     * @param datasetUri.
+     * @param overwrite.
+     * @throws DAOException.
      */
-    File saveConstructedDataset(List<String> selectedFiles, String fileName, String userName, boolean overwrite)
-            throws DAOException;
+    void saveDataset(List<String> selectedFiles, String datasetUri, boolean overwrite) throws DAOException;
 
     /**
      * User compiled datasets.
      *
-     * @param crUser
-     *            CR user
+     * @param crUser CR user
      * @see eionet.cr.dao.HelperDAO#getUserCompiledDatasets(eionet.cr.web.security.CRUser)
-     * @throws DAOException
-     *             if query fails.
+     * @throws DAOException if query fails.
      * @return List of user compiled datasets.
      */
     Collection<UploadDTO> getUserCompiledDatasets(CRUser crUser) throws DAOException;
+
+    /**
+     * Check if compiled dataset exists.
+     *
+     * @param uri dataset URI.
+     * @throws DAOException.
+     * @return boolean.
+     */
+    boolean datasetExists(String uri) throws DAOException;
+
+    /**
+     * Check if user owns the compiled dataset.
+     *
+     * @param dataset.
+     * @param userHome.
+     * @throws DAOException.
+     * @return boolean.
+     */
+    boolean isUsersDataset(String dataset, String userHome) throws DAOException;
 }

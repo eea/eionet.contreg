@@ -21,6 +21,8 @@
 
 package eionet.cr.web.action;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import net.sourceforge.stripes.action.DefaultHandler;
@@ -29,12 +31,22 @@ import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 
 import org.apache.commons.lang.StringUtils;
+import org.openrdf.model.vocabulary.XMLSchema;
+import org.quartz.JobDetail;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerFactory;
+import org.quartz.SimpleTrigger;
 
+import eionet.cr.common.Predicates;
 import eionet.cr.dao.CompiledDatasetDAO;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
+import eionet.cr.dataset.CurrentCompiledDatasets;
+import eionet.cr.dataset.ReloadDatasetJob;
+import eionet.cr.dataset.ReloadDatasetJobListener;
+import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.web.util.tabs.FactsheetTabMenuHelper;
 import eionet.cr.web.util.tabs.TabElement;
@@ -54,6 +66,8 @@ public class CompiledDatasetActionBean extends AbstractActionBean {
     private List<SubjectDTO> sources;
 
     private List<TabElement> tabs;
+
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
     /**
      * Action event for displaying dataset sources.
@@ -88,9 +102,39 @@ public class CompiledDatasetActionBean extends AbstractActionBean {
         boolean success = false;
         if (getUser() != null) {
             if (isUsersDataset()) {
-                // TODO: implement reload
-                logger.info("test: " + uri);
-                success = true;
+                if (!StringUtils.isBlank(uri)) {
+                    try {
+                        // Raise the flag that dataset is being reloaded
+                        CurrentCompiledDatasets.addCompiledDataset(uri, getUserName());
+
+                        // Start dataset reload job
+                        SchedulerFactory schedFact = new org.quartz.impl.StdSchedulerFactory();
+                        Scheduler sched = schedFact.getScheduler();
+                        sched.start();
+
+                        JobDetail jobDetail = new JobDetail("ReloadDatasetJob", null, ReloadDatasetJob.class);
+                        jobDetail.getJobDataMap().put("datasetUri", uri);
+
+                        ReloadDatasetJobListener listener = new ReloadDatasetJobListener();
+                        jobDetail.addJobListener(listener.getName());
+                        sched.addJobListener(listener);
+
+                        SimpleTrigger trigger = new SimpleTrigger(jobDetail.getName(), null, new Date(), null, 0, 0L);
+                        sched.scheduleJob(jobDetail, trigger);
+
+                        // Update source last modified date
+                        DAOFactory.get().getDao(HarvestSourceDAO.class).insertUpdateSourceMetadata(uri, Predicates.CR_LAST_MODIFIED,
+                                ObjectDTO.createLiteral(dateFormat.format(new Date()), XMLSchema.DATETIME));
+
+                        success = true;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        addCautionMessage("Error occured while executing compiled dataset reload process!");
+
+                        // Remove the flag that dataset is being reloaded
+                        CurrentCompiledDatasets.removeCompiledDataset(uri);
+                    }
+                }
             } else {
                 addCautionMessage("User must be the owner of the compiled dataset!");
             }
@@ -99,7 +143,11 @@ public class CompiledDatasetActionBean extends AbstractActionBean {
         }
 
         if (success) {
-            addSystemMessage("Compiled dataset reloaded successfully");
+            if (!CurrentCompiledDatasets.contains(uri)) {
+                addSystemMessage("Reloaded successfully");
+            } else {
+                addSystemMessage("Reload started in the background.");
+            }
         }
         return view();
     }
@@ -110,14 +158,24 @@ public class CompiledDatasetActionBean extends AbstractActionBean {
      * @return
      */
     public boolean isUsersDataset() {
-        //FIXME: demporary removed
-        return false;
-        /*
-        if (getUser() == null) {
-            return false;
+        boolean ret = false;
+        try {
+            if (getUser() != null) {
+                ret = factory.getDao(CompiledDatasetDAO.class).isUsersDataset(uri, getUser().getHomeUri());
+            }
+        } catch (DAOException e) {
+            e.printStackTrace();
         }
-        return uri.contains("/home/" + getUserName());
-        */
+        return ret;
+    }
+
+    /**
+     *
+     * @return boolean
+     */
+    public boolean isCurrentlyReloaded() {
+
+        return uri == null ? false : CurrentCompiledDatasets.contains(uri);
     }
 
     /**

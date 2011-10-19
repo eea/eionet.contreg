@@ -1,9 +1,5 @@
 package eionet.cr.dao.virtuoso;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,10 +8,9 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.openrdf.query.BindingSet;
-import org.openrdf.query.GraphQuery;
+import org.openrdf.query.BooleanQuery;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.rio.rdfxml.RDFXMLWriter;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.dao.CompiledDatasetDAO;
@@ -26,7 +21,6 @@ import eionet.cr.dao.readers.UploadDTOReader;
 import eionet.cr.dto.DeliveryFilesDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.dto.UploadDTO;
-import eionet.cr.filestore.FileStore;
 import eionet.cr.harvest.BaseHarvest;
 import eionet.cr.util.Bindings;
 import eionet.cr.util.URIUtil;
@@ -150,41 +144,32 @@ public class VirtuosoCompiledDatasetDAO extends VirtuosoBaseDAO implements Compi
      * {@inheritDoc}
      */
     @Override
-    public File saveConstructedDataset(List<String> selectedFiles, String fileName, String userName, boolean overwrite) throws DAOException {
+    public void saveDataset(List<String> selectedFiles, String datasetUri, boolean overwrite) throws DAOException {
 
-        File file = null;
-        ByteArrayOutputStream out = null;
         RepositoryConnection con = null;
-
         try {
+            con = SesameConnectionProvider.getRepositoryConnection();
+
+            if (overwrite) {
+                clearGraph(datasetUri);
+            }
+
             StringBuffer query = new StringBuffer();
-            query.append("CONSTRUCT { ?s ?p ?o } where { graph ?g {");
-            query.append("?s ?p ?o . ");
+            query.append("INSERT INTO GRAPH ?graphUri { ?s ?p ?o } ");
+            query.append("WHERE {graph ?g { ?s ?p ?o . ");
             query.append("filter (?g IN (").append(SPARQLQueryUtil.urisToCSV(selectedFiles)).append("))");
             query.append("}}");
 
-            out = new ByteArrayOutputStream();
-            con = SesameConnectionProvider.getReadOnlyRepositoryConnection();
-            GraphQuery resultsTable = con.prepareGraphQuery(QueryLanguage.SPARQL, query.toString());
-            RDFXMLWriter writer = new RDFXMLWriter(out);
-            resultsTable.evaluate(writer);
-            if (out != null && out.size() > 0) {
-                file = FileStore.getInstance(userName).add(fileName, overwrite, new ByteArrayInputStream(out.toByteArray()));
-            }
+            Bindings bindings = new Bindings();
+            bindings.setURI("graphUri", datasetUri);
+            executeUpdateQuerySPARQL(query.toString(), bindings, con);
+
         } catch (Exception e) {
             e.printStackTrace();
             throw new DAOException(e.getMessage(), e);
         } finally {
-            try {
-                if (out != null) {
-                    out.close();
-                }
-                SesameUtil.close(con);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            SesameUtil.close(con);
         }
-        return file;
     }
 
     /**
@@ -239,5 +224,97 @@ public class VirtuosoCompiledDatasetDAO extends VirtuosoBaseDAO implements Compi
 
         return datasets;
     }
+
+    /**
+     * SPARQL for detecting if dataset exists.
+     */
+    private static final String DATASET_EXISTS_QUERY = "ASK {?graphUri a ?datasetType}";
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean datasetExists(String uri) throws DAOException {
+
+        boolean ret = false;
+
+        if (uri == null) {
+            throw new IllegalArgumentException("Dataset URI must not be null");
+        }
+
+        RepositoryConnection con = null;
+
+        try {
+            con = SesameConnectionProvider.getReadOnlyRepositoryConnection();
+
+            Bindings bindings = new Bindings();
+            bindings.setURI("graphUri", uri);
+            bindings.setURI("datasetType", Predicates.CR_COMPILED_DATASET);
+
+            BooleanQuery booleanQuery = con.prepareBooleanQuery(QueryLanguage.SPARQL, DATASET_EXISTS_QUERY);
+            bindings.applyTo(booleanQuery, con.getValueFactory());
+            Boolean result = booleanQuery.evaluate();
+            if (result != null) {
+                ret = result.booleanValue();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new DAOException(e.getMessage(), e);
+        } finally {
+            SesameUtil.close(con);
+        }
+
+        return ret;
+    }
+
+    /**
+     * SPARQL for detecting if user owns the dataset
+     */
+    private static final String IS_USER_DATASET_QUERY = "ASK { ?userHome ?pred ?dataset }";
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isUsersDataset(String dataset, String userHome) throws DAOException {
+
+        boolean ret = false;
+
+        if (dataset == null) {
+            throw new IllegalArgumentException("Dataset URI must not be null");
+        }
+
+        if (userHome == null) {
+            throw new IllegalArgumentException("User home URI must not be null");
+        }
+
+        RepositoryConnection con = null;
+
+        try {
+            con = SesameConnectionProvider.getReadOnlyRepositoryConnection();
+
+            Bindings bindings = new Bindings();
+            bindings.setURI("userHome", userHome);
+            bindings.setURI("pred", Predicates.CR_HAS_FILE);
+            bindings.setURI("dataset", dataset);
+
+            BooleanQuery booleanQuery = con.prepareBooleanQuery(QueryLanguage.SPARQL, IS_USER_DATASET_QUERY);
+            bindings.applyTo(booleanQuery, con.getValueFactory());
+            Boolean result = booleanQuery.evaluate();
+            if (result != null) {
+                ret = result.booleanValue();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new DAOException(e.getMessage(), e);
+        } finally {
+            SesameUtil.close(con);
+        }
+
+        return ret;
+    }
+
 
 }

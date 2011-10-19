@@ -5,6 +5,7 @@ import java.sql.SQLException;
 
 import org.apache.commons.lang.StringUtils;
 import org.openrdf.OpenRDFException;
+import org.openrdf.query.BooleanQuery;
 import org.openrdf.query.GraphQuery;
 import org.openrdf.query.GraphQueryResult;
 import org.openrdf.query.MalformedQueryException;
@@ -123,6 +124,27 @@ public class SesameUtil {
             bindings.applyTo(preparedUpdate, conn.getValueFactory());
         }
         preparedUpdate.execute();
+    }
+
+    /**
+     * Executes SPARQL query that changes RDF data. Rollback is NOT made if query does not succeed
+     *
+     * @param sparql
+     * @param conn repository connection
+     * @param bindings Query bindings
+     * @throws RepositoryException
+     * @throws QueryEvaluationException
+     * @throws MalformedQueryException
+     */
+    public static void executeUpdateQuery(String sparql, Bindings bindings, RepositoryConnection conn) throws RepositoryException,
+    QueryEvaluationException, MalformedQueryException {
+
+        BooleanQuery query = conn.prepareBooleanQuery(QueryLanguage.SPARQL, sparql);
+        if (bindings != null) {
+            bindings.applyTo(query, conn.getValueFactory());
+        }
+        query.evaluate();
+
     }
 
     /**

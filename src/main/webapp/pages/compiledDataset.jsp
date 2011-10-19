@@ -15,12 +15,12 @@
             <li><a href="#">Operations</a>
                 <ul>
                     <c:if test="${actionBean.usersDataset}">
-                    <li>
-                        <stripes:link class="link-plain" href="/compiledDataset.action" event="reload">
-                            <stripes:param name="uri" value="${actionBean.uri}" />
-                            Reload
-                        </stripes:link>
-                    </li>
+	                    <li>
+	                        <stripes:link class="link-plain" href="/compiledDataset.action" event="reload">
+	                            <stripes:param name="uri" value="${actionBean.uri}" />
+	                            Reload
+	                        </stripes:link>
+	                    </li>
                     </c:if>
                     <li>
                         <stripes:link class="link-plain" href="/sparql">
@@ -33,6 +33,10 @@
          </ul>
 
         <h1>Compiled dataset sources</h1>
+        
+        <c:if test="${actionBean.currentlyReloaded}">
+            <div class="advice-msg">Compiled dataset is currently being reloaded!</div>
+        </c:if>
 
         <display:table name="${actionBean.sources}" class="sortable" id="item" sort="list" requestURI="${actionBean.urlBinding}">
             <display:column title="URL" sortable="true">

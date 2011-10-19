@@ -20,8 +20,6 @@
  */
 package eionet.cr.web.action;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -29,12 +27,17 @@ import java.util.List;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.validation.ValidationMethod;
 
 import org.apache.commons.lang.StringUtils;
-import org.openrdf.rio.RDFFormat;
+import org.openrdf.model.vocabulary.XMLSchema;
+import org.quartz.JobDetail;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerFactory;
+import org.quartz.SimpleTrigger;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.dao.CompiledDatasetDAO;
@@ -42,11 +45,13 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
+import eionet.cr.dataset.CompileDatasetJob;
+import eionet.cr.dataset.CompileDatasetJobListener;
+import eionet.cr.dataset.CurrentCompiledDatasets;
 import eionet.cr.dto.DeliveryFilesDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.filestore.FileStore;
 
 /**
  *
@@ -65,7 +70,7 @@ public class SaveFilesActionBean extends DisplaytagSearchActionBean {
     private boolean overwrite;
     private String dataset;
 
-    protected SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
     @DefaultHandler
     public Resolution getFiles() throws DAOException {
@@ -83,55 +88,63 @@ public class SaveFilesActionBean extends DisplaytagSearchActionBean {
     }
 
     public Resolution save() throws DAOException {
+
         if (selectedFiles != null && selectedFiles.size() > 0) {
             try {
-                // If files are to be stored under existing dataset, add dataset files to selected files and set overwrite to true
-                if (dataset != null && !dataset.equals("new_dataset")) {
-                    List<String> datasetFiles = DAOFactory.get().getDao(CompiledDatasetDAO.class).getDatasetFiles(dataset);
-                    if (datasetFiles != null) {
-                        selectedFiles.addAll(datasetFiles);
-                    }
-                    overwrite = true;
-                    // Get fileName from existing dataset uri
-                    if (dataset.contains("/")){
-                        int idx = dataset.lastIndexOf("/");
-                        if (dataset.length() > idx) {
-                            fileName = dataset.substring(idx + 1);
-                        }
-                    }
+                // Get existing dataset uri
+                if (!StringUtils.isBlank(dataset) && dataset.equals("new_dataset")) {
+                    dataset = getUser().getHomeUri() + "/" + StringUtils.replace(fileName, " ", "%20");
                 }
 
-                // Save compiled dataset
-                File file = DAOFactory.get().getDao(CompiledDatasetDAO.class).saveConstructedDataset(
-                        selectedFiles, fileName, getUserName(), overwrite);
+                // Store file as new source, but don't harvest it
+                addSource(dataset);
 
-                if (file != null) {
-                    String subjectUri = getUser().getHomeUri() + "/" + StringUtils.replace(fileName, " ", "%20");
+                // Add metadata
+                addMetadata(dataset);
 
-                    //Harvest the file
-                    DAOFactory.get().getDao(HarvestSourceDAO.class).loadIntoRepository(
-                            new FileInputStream(file), RDFFormat.RDFXML, subjectUri, true);
+                // Raise the flag that dataset is being compiled
+                CurrentCompiledDatasets.addCompiledDataset(dataset, getUserName());
 
-                    // Store file as new source, but don't harvest it
-                    addSource(subjectUri, file.length());
+                // Start dataset compiling job
+                SchedulerFactory schedFact = new org.quartz.impl.StdSchedulerFactory();
+                Scheduler sched = schedFact.getScheduler();
+                sched.start();
 
-                    // Add metadata
-                    addMetadata(subjectUri);
-                }
+                JobDetail jobDetail = new JobDetail("CompileDatasetJob", null, CompileDatasetJob.class);
+                jobDetail.getJobDataMap().put("selectedFiles", selectedFiles);
+                jobDetail.getJobDataMap().put("datasetUri", dataset);
+                jobDetail.getJobDataMap().put("overwrite", overwrite);
+
+                CompileDatasetJobListener listener = new CompileDatasetJobListener();
+                jobDetail.addJobListener(listener.getName());
+                sched.addJobListener(listener);
+
+                SimpleTrigger trigger = new SimpleTrigger(jobDetail.getName(), null, new Date(), null, 0, 0L);
+                sched.scheduleJob(jobDetail, trigger);
+
             } catch (Exception e) {
                 e.printStackTrace();
+
+                // Remove the flag that dataset is being compiled
+                CurrentCompiledDatasets.removeCompiledDataset(dataset);
+
                 throw new DAOException(e.getMessage(), e);
             }
         }
-        init();
-        addSystemMessage("Successfully saved under \"Compiled datasets\" in your " +
-                "<a href=\"" + getUser().getHomeUri() + "/compiledDatasets\">home-folder</a>");
-        return new ForwardResolution("/pages/deliveryFiles.jsp");
+
+        return new RedirectResolution(FactsheetActionBean.class).addParameter("uri", dataset);
     }
 
     private void addMetadata(String subjectUri) {
 
         try {
+            // prepare cr:hasFile predicate
+            ObjectDTO objectDTO = new ObjectDTO(subjectUri, false);
+            objectDTO.setSourceUri(getUser().getHomeUri());
+            SubjectDTO homeSubjectDTO = new SubjectDTO(getUser().getHomeUri(), false);
+            homeSubjectDTO.addObject(Predicates.CR_HAS_FILE, objectDTO);
+            DAOFactory.get().getDao(HelperDAO.class).addTriples(homeSubjectDTO);
+
             // store rdf:type predicate
             ObjectDTO typeObjectDTO = new ObjectDTO(Predicates.CR_COMPILED_DATASET, false);
             typeObjectDTO.setSourceUri(getUser().getHomeUri());
@@ -150,8 +163,8 @@ public class SaveFilesActionBean extends DisplaytagSearchActionBean {
 
             // since user's home URI was used above as triple source, add it to HARVEST_SOURCE too
             // (but set interval minutes to 0, to avoid it being background-harvested)
-            DAOFactory.get().getDao(HarvestSourceDAO.class)
-            .addSourceIgnoreDuplicate(HarvestSourceDTO.create(getUser().getHomeUri(), false, 0, getUserName()));
+            DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(
+                    HarvestSourceDTO.create(getUser().getHomeUri(), false, 0, getUserName()));
 
         } catch (DAOException e) {
             e.printStackTrace();
@@ -159,23 +172,13 @@ public class SaveFilesActionBean extends DisplaytagSearchActionBean {
         }
     }
 
-    private void addSource(String subjectUri, long fileSize) throws Exception {
+    private void addSource(String subjectUri) throws Exception {
 
-        DAOFactory.get().getDao(HarvestSourceDAO.class)
-        .addSourceIgnoreDuplicate(HarvestSourceDTO.create(subjectUri, false, 0, getUserName()));
+        DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(
+                HarvestSourceDTO.create(subjectUri, false, 0, getUserName()));
 
-        DAOFactory
-        .get()
-        .getDao(HarvestSourceDAO.class)
-        .insertUpdateSourceMetadata(subjectUri, Predicates.CR_BYTE_SIZE,
-                new ObjectDTO(String.valueOf(fileSize), true));
-
-        DAOFactory
-        .get()
-        .getDao(HarvestSourceDAO.class)
-        .insertUpdateSourceMetadata(subjectUri, Predicates.CR_LAST_MODIFIED,
-                new ObjectDTO(dateFormat.format(new Date()), true));
-
+        DAOFactory.get().getDao(HarvestSourceDAO.class).insertUpdateSourceMetadata(subjectUri, Predicates.CR_LAST_MODIFIED,
+                ObjectDTO.createLiteral(dateFormat.format(new Date()), XMLSchema.DATETIME));
     }
 
     /**
@@ -198,18 +201,21 @@ public class SaveFilesActionBean extends DisplaytagSearchActionBean {
         // Check if any files were selected
         if (selectedFiles == null || selectedFiles.size() == 0) {
             addGlobalValidationError("No files were selected!");
+            return;
         }
 
         // Check if file name is not empty
         if (dataset != null && dataset.equals("new_dataset") && StringUtils.isBlank(fileName)) {
             addGlobalValidationError("File name is mandatory!");
+            return;
         }
 
         // Check if file already exists
         if (!overwrite && dataset != null && dataset.equals("new_dataset") && !StringUtils.isBlank(fileName)) {
-            File f = FileStore.getInstance(getUserName()).get(fileName);
-            if ( f!= null) {
-                addGlobalValidationError("File already exists: " + fileName);
+            String datasetUri = getUser().getHomeUri() + "/" + StringUtils.replace(fileName, " ", "%20");
+            boolean exists = DAOFactory.get().getDao(CompiledDatasetDAO.class).datasetExists(datasetUri);
+            if (exists) {
+                addGlobalValidationError("Dataset named \""+fileName+"\" already exists!");
             }
         }
 

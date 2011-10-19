@@ -37,7 +37,6 @@ public abstract class AbstractHomeActionBean extends AbstractActionBean {
     protected static final String TYPE_UPLOADS = "uploads";
     protected static final String TYPE_REGISTRATIONS = "registrations";
     protected static final String TYPE_REVIEWS = "reviews";
-    protected static final String TYPE_COMPILED_DATASETS = "compiledDatasets";
 
     protected static final String SHOWPUBLIC_YES = "Y";
     protected static final String SHOWPUBLIC_NO = "N";
@@ -94,12 +93,6 @@ public abstract class AbstractHomeActionBean extends AbstractActionBean {
         tabType = new HashMap<String, String>();
         tabType.put("title", "Reviews");
         tabType.put("tabType", "reviews");
-        tabType.put("showPublic", SHOWPUBLIC_YES);
-        tabs.add(tabType);
-
-        tabType = new HashMap<String, String>();
-        tabType.put("title", "Compiled datasets");
-        tabType.put("tabType", "compiledDatasets");
         tabType.put("showPublic", SHOWPUBLIC_YES);
         tabs.add(tabType);
 
@@ -160,8 +153,7 @@ public abstract class AbstractHomeActionBean extends AbstractActionBean {
     private void setDefaultSection() {
         if (section == null
                 || (!section.equals(TYPE_BOOKMARK) && !section.equals(TYPE_UPLOADS) && !section.equals(TYPE_HISTORY)
-                        && !section.equals(TYPE_REGISTRATIONS) && !section.equals(TYPE_REVIEWS))
-                        && !section.equals(TYPE_COMPILED_DATASETS)) {
+                        && !section.equals(TYPE_REGISTRATIONS) && !section.equals(TYPE_REVIEWS))) {
             section = TYPE_UPLOADS;
         }
     }

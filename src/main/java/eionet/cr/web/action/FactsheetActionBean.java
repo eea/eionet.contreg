@@ -44,6 +44,7 @@ import org.apache.commons.lang.math.NumberUtils;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.config.GeneralConfig;
+import eionet.cr.dao.CompiledDatasetDAO;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
@@ -51,6 +52,7 @@ import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.SpoBinaryDAO;
 import eionet.cr.dao.util.UriLabelPair;
 import eionet.cr.dao.virtuoso.PredicateObjectsReader;
+import eionet.cr.dataset.CurrentCompiledDatasets;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
@@ -572,7 +574,25 @@ public class FactsheetActionBean extends AbstractActionBean {
      */
     public boolean isCurrentlyHarvested() {
 
-        return uri == null ? false : (CurrentHarvests.contains(uri) || UrgentHarvestQueue.isInQueue(uri));
+        return uri == null ? false : (CurrentHarvests.contains(uri) || UrgentHarvestQueue.isInQueue(uri)
+                || CurrentCompiledDatasets.contains(uri));
+    }
+
+    /**
+     *
+     * @return boolean
+     */
+    public boolean isCompiledDataset() {
+
+        boolean ret = false;
+        try {
+            if (uri != null) {
+                ret = DAOFactory.get().getDao(CompiledDatasetDAO.class).datasetExists(uri);
+            }
+        } catch (DAOException e) {
+            e.printStackTrace();
+        }
+        return ret;
     }
 
     /**

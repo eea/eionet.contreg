@@ -50,6 +50,28 @@ public abstract class VirtuosoBaseDAO {
 
     /**
      *
+     * @param graphUri
+     * @throws DAOException
+     */
+    protected void clearGraph(String graphUri) throws DAOException {
+
+        RepositoryConnection conn = null;
+        try {
+            conn = SesameUtil.getRepositoryConnection();
+
+            String query = "CLEAR GRAPH ?graphUri";
+            Bindings bindings = new Bindings();
+            bindings.setURI("graphUri", graphUri);
+            executeUpdateQuerySPARQL(query, bindings, conn);
+        } catch (Exception e) {
+            throw new DAOException(e.toString(), e);
+        } finally {
+            SesameUtil.close(conn);
+        }
+    }
+
+    /**
+     *
      * @param <T>
      * @param sparql
      * @param bindings
@@ -86,21 +108,34 @@ public abstract class VirtuosoBaseDAO {
     }
 
     /**
-     * Executes SPARQL that updates data.
+     * Executes SPARQL that updates data (uses old Sesame).
      *
-     * @param sparql
-     *            SPARQL
-     * @param bindings
-     *            Query bindings, if no bindings, null is accepted as the value
-     * @param conn
-     *            Virtuoso repository connection
-     * @throws DAOException
-     *             if update fails
+     * @param sparql SPARQL
+     * @param bindings Query bindings, if no bindings, null is accepted as the value
+     * @param conn Virtuoso repository connection
+     * @throws DAOException if update fails
      */
     protected void executeUpdateSPARQL(String sparql, Bindings bindings, RepositoryConnection conn)
     throws DAOException {
         try {
             SesameUtil.executeUpdate(sparql, bindings, conn);
+        } catch (Exception e) {
+            throw new DAOException(e.toString(), e);
+        }
+    }
+
+    /**
+     * Executes SPARQL query that updates data.
+     *
+     * @param sparql SPARQL
+     * @param bindings Query bindings, if no bindings, null is accepted as the value
+     * @param conn Virtuoso repository connection
+     * @throws DAOException if update fails
+     */
+    protected void executeUpdateQuerySPARQL(String sparql, Bindings bindings, RepositoryConnection conn)
+    throws DAOException {
+        try {
+            SesameUtil.executeUpdateQuery(sparql, bindings, conn);
         } catch (Exception e) {
             throw new DAOException(e.toString(), e);
         }
@@ -353,4 +388,5 @@ public abstract class VirtuosoBaseDAO {
         }
         return resultList;
     }
+
 }
