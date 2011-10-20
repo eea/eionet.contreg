@@ -79,10 +79,10 @@ public abstract class BaseHarvest implements Harvest {
     protected static final int PRESERVED_HARVEST_COUNT = 10;
 
     /** */
-    private HelperDAO helperDAO = DAOFactory.get().getDao(HelperDAO.class);
-    private HarvestDAO harvestDAO = DAOFactory.get().getDao(HarvestDAO.class);
-    private HarvestSourceDAO harvestSourceDAO = DAOFactory.get().getDao(HarvestSourceDAO.class);
-    private HarvestMessageDAO harvestMessageDAO = DAOFactory.get().getDao(HarvestMessageDAO.class);
+    private final HelperDAO helperDAO = DAOFactory.get().getDao(HelperDAO.class);
+    private final HarvestDAO harvestDAO = DAOFactory.get().getDao(HarvestDAO.class);
+    private final HarvestSourceDAO harvestSourceDAO = DAOFactory.get().getDao(HarvestSourceDAO.class);
+    private final HarvestMessageDAO harvestMessageDAO = DAOFactory.get().getDao(HarvestMessageDAO.class);
 
     /** */
     private String contextUrl;
@@ -217,6 +217,9 @@ public abstract class BaseHarvest implements Harvest {
 
             // delete old harvests history
             housekeepOldHarvests();
+
+            // add source into inference if it is schema source
+            addIntoInferenceRule();
         } catch (DAOException e) {
 
             if (dontThrowException) {
@@ -288,8 +291,8 @@ public abstract class BaseHarvest implements Harvest {
             for (PostHarvestScriptDTO scriptDto : scriptDtos) {
 
                 String scriptType =
-                    scriptDto.getTargetType() == null ? "all-source" : scriptDto.getTargetType().toString().toLowerCase()
-                            + "-specific";
+                        scriptDto.getTargetType() == null ? "all-source" : scriptDto.getTargetType().toString().toLowerCase()
+                                + "-specific";
                 LOGGER.debug(MessageFormat.format("Executing {0} post-harvest script with title: {1}", scriptType,
                         scriptDto.getTitle()));
 
@@ -308,6 +311,19 @@ public abstract class BaseHarvest implements Harvest {
     }
 
     /**
+     * Adds source int inference rule, if source is inference rule.
+     * (It is done because rule set must be updated after the harvest is done)
+     *
+     * @throws DAOException
+     */
+    private void addIntoInferenceRule() throws DAOException {
+        if (getHarvestSourceDAO().isSourceInInferenceRule(getContextUrl())) {
+            LOGGER.debug(loggerMsg("Adding source into inference rule"));
+            getHarvestSourceDAO().addSourceIntoInferenceRule(getContextUrl());
+        }
+    }
+
+    /**
      * @throws DAOException
      */
     private void finishSourceMetadata() throws DAOException {
@@ -318,7 +334,7 @@ public abstract class BaseHarvest implements Harvest {
         // add harvest statements
         int harvestedStatements = getHelperDAO().getHarvestedStatements(getContextUrl());
         ObjectDTO harvestedStatementsObject =
-            new ObjectDTO(Integer.toString(harvestedStatements), null, true, false, XMLSchema.INTEGER);
+                new ObjectDTO(Integer.toString(harvestedStatements), null, true, false, XMLSchema.INTEGER);
         harvestedStatementsObject.setSourceUri(GeneralConfig.HARVESTER_URI);
         sourceMetadata.addObject(Predicates.CR_HARVESTED_STATEMENTS, harvestedStatementsObject);
 
@@ -534,8 +550,8 @@ public abstract class BaseHarvest implements Harvest {
 
         // get the default harvest interval minutes
         int defaultHarvestIntervalMinutes =
-            Integer.parseInt(GeneralConfig.getProperty(GeneralConfig.HARVESTER_REFERRALS_INTERVAL,
-                    String.valueOf(HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL)));
+                Integer.parseInt(GeneralConfig.getProperty(GeneralConfig.HARVESTER_REFERRALS_INTERVAL,
+                        String.valueOf(HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL)));
 
         // derive URLs of new harvest sources from content in this context
         List<String> newSources = getHarvestSourceDAO().getNewSources(getContextUrl());
