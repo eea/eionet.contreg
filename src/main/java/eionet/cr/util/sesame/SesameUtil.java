@@ -13,7 +13,6 @@ import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
-import org.openrdf.query.Update;
 import org.openrdf.query.parser.sparql.SPARQLParser;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
@@ -119,11 +118,13 @@ public class SesameUtil {
      */
     public static void executeUpdate(String sparql, Bindings bindings, RepositoryConnection conn) throws OpenRDFException {
 
-        Update preparedUpdate = conn.prepareUpdate(QueryLanguage.SPARQL, sparql);
-        if (bindings != null) {
-            bindings.applyTo(preparedUpdate, conn.getValueFactory());
-        }
-        preparedUpdate.execute();
+        throw new UnsupportedOperationException("Method not implemented!");
+        //
+        //        Update preparedUpdate = conn.prepareUpdate(QueryLanguage.SPARQL, sparql);
+        //        if (bindings != null) {
+        //            bindings.applyTo(preparedUpdate, conn.getValueFactory());
+        //        }
+        //        preparedUpdate.execute();
     }
 
     /**
