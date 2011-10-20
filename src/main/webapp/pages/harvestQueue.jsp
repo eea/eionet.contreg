@@ -31,9 +31,13 @@
         <c:if test="${not empty actionBean.currentQueuedHarvest}">
             <div class="advise-msg" style="margin-bottom:10px">
                 <c:choose>
-                    <c:when test="${fn:endsWith(currentHarvest.class.name, 'PushHarvest')}">Currently push-harvesting:&nbsp;</c:when>
-                    <c:otherwise>Currently pull-harvesting:&nbsp;</c:otherwise>
-                </c:choose><span title="${actionBean.currentQueuedHarvest.contextUrl}"><c:out value="${crfn:cutAtFirstLongToken(actionBean.currentQueuedHarvest.contextUrl,55)}"/></span>
+                    <c:when test="${fn:endsWith(currentHarvest.class.name, 'PushHarvest')}">Currently push-harvesting:</c:when>
+                    <c:otherwise>Currently pull-harvesting:</c:otherwise>
+                </c:choose><stripes:link href="/source.action" title="${actionBean.currentQueuedHarvest.contextUrl}">
+<c:out value="${crfn:cutAtFirstLongToken(actionBean.currentQueuedHarvest.contextUrl,55)}"/>
+<stripes:param name="view" value=""/>
+<stripes:param name="harvestSource.url" value="${actionBean.currentQueuedHarvest.contextUrl}"/>
+</stripes:link>
             </div>
         </c:if>
 
