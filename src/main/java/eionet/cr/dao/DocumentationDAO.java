@@ -21,11 +21,12 @@ public interface DocumentationDAO extends DAO {
     public DocumentationDTO getDocObject(String pageId) throws DAOException;
 
     /**
-     * Return all object from documentation table where content_type is text/html
+     * Return object from documentation table
+     * @param boolean whether or not to show only html objects
      * @return List<DocumentationDTO>
      * @throws DAOException
      */
-    public List<DocumentationDTO> getHtmlDocObjects() throws DAOException;
+    public List<DocumentationDTO> getDocObjects(boolean htmlOnly) throws DAOException;
 
     /**
      * @param pageId
@@ -34,7 +35,7 @@ public interface DocumentationDAO extends DAO {
      * @param title
      * @throws DAOException
      */
-    public void insertFile(String pageId, String contentType, String fileName, String title) throws DAOException;
+    public void insertContent(String pageId, String contentType, String fileName, String title) throws DAOException;
 
     /**
      * Checks if such page_id already exists in database

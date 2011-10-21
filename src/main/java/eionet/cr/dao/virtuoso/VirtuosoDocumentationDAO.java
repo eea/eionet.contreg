@@ -57,13 +57,15 @@ public class VirtuosoDocumentationDAO extends VirtuosoBaseDAO implements Documen
     }
 
     /**
-     * @see eionet.cr.dao.DocumentationDAO#getHtmlDocObjects()
+     * @see eionet.cr.dao.DocumentationDAO#getDocObjects()
      */
     @Override
-    public List<DocumentationDTO> getHtmlDocObjects() throws DAOException {
+    public List<DocumentationDTO> getDocObjects(boolean htmlOnly) throws DAOException {
 
-        String docObjectSQL = "select page_id, content_type, content, title from documentation where "
-            + "content_type='text/html' OR content_type='uploaded_text/html'";
+        String docObjectSQL = "select page_id, content_type, content, title from documentation";
+        if (htmlOnly) {
+            docObjectSQL = docObjectSQL + " where content_type='text/html' OR content_type='uploaded_text/html'";
+        }
 
         List<DocumentationDTO> ret = new ArrayList<DocumentationDTO>();
         Connection conn = null;
@@ -93,10 +95,10 @@ public class VirtuosoDocumentationDAO extends VirtuosoBaseDAO implements Documen
     }
 
     /**
-     * @see eionet.cr.dao.DocumentationDAO#insertFile(java.lang.String, java.lang.String, java.lang.String)
+     * @see eionet.cr.dao.DocumentationDAO#insertContent(java.lang.String, java.lang.String, java.lang.String)
      */
     @Override
-    public void insertFile(String pageId, String contentType, String fileName, String title) throws DAOException {
+    public void insertContent(String pageId, String contentType, String fileName, String title) throws DAOException {
 
         Connection conn = null;
         PreparedStatement ps = null;

@@ -27,15 +27,16 @@ import java.util.List;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.FileBean;
 import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.StreamingResolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.validation.SimpleError;
-import net.sourceforge.stripes.validation.Validate;
 import net.sourceforge.stripes.validation.ValidationErrors;
 import net.sourceforge.stripes.validation.ValidationMethod;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.config.GeneralConfig;
@@ -50,29 +51,31 @@ import eionet.cr.filestore.FileStore;
  * @author Risto Alt
  *
  */
-@UrlBinding("/documentation/{pageId}")
+@UrlBinding("/documentation/{pageId}/{event}")
 public class DocumentationActionBean extends AbstractActionBean {
 
     /** */
     private String pageId;
+    private String event;
     private String content;
+
 
     /** */
     public static final String PATH = GeneralConfig.getRequiredProperty(GeneralConfig.FILESTORE_PATH);
 
+    /** */
     public static final String APP_URL = GeneralConfig.getProperty(GeneralConfig.APPLICATION_HOME_URL);
 
     /**
-     * Properties for documentation upload page
+     * Properties for documentation add page
      */
-    @Validate(required=true, on="uploadFile", label="Page ID")
     private String pid;
-    @Validate(required=true, on="uploadFile")
     private FileBean file;
-    @Validate(required=true, on="uploadFile")
     private String contentType;
     private String title;
     private boolean overwrite;
+
+    private boolean editableContent;
 
     /**
      *
@@ -82,15 +85,22 @@ public class DocumentationActionBean extends AbstractActionBean {
     @DefaultHandler
     public Resolution view() throws Exception {
 
+        String forward = "/pages/documentation.jsp";
         DocumentationDAO docDAO = DAOFactory.get().getDao(DocumentationDAO.class);
-        if (StringUtils.isBlank(pageId)) {
-            List<DocumentationDTO> docs = docDAO.getHtmlDocObjects();
+        if (StringUtils.isBlank(pageId) || (pageId != null && pageId.equals("allobjects"))) {
+            List<DocumentationDTO> docs = null;
+            if (pageId != null && pageId.equals("allobjects")) {
+                docs = docDAO.getDocObjects(false);
+            } else {
+                docs = docDAO.getDocObjects(true);
+            }
             if (docs != null) {
                 StringBuffer buf = new StringBuffer();
                 buf.append("<ul>");
                 for (DocumentationDTO doc : docs) {
                     String url = APP_URL + "/documentation/" + doc.getPageId();
-                    buf.append("<li><a href=\"").append(url).append("\">").append(doc.getTitle()).append("</a></li>");
+                    String title = (StringUtils.isBlank(doc.getTitle())) ? doc.getPageId() : doc.getTitle();
+                    buf.append("<li><a href=\"").append(url).append("\">").append(title).append("</a></li>");
                 }
                 buf.append("</ul>");
                 content = buf.toString();
@@ -101,70 +111,148 @@ public class DocumentationActionBean extends AbstractActionBean {
             if (doc == null) {
                 addCautionMessage("Such page ID doesn't exist in database: " + pageId);
             } else {
-                if (doc.getContentType().equals("text/html")) {
-                    content = new String(doc.getContent());
+                if (!StringUtils.isBlank(event) && event.equals("edit")) {
+                    if (doc.getContentType().startsWith("text/")) {
+                        content = new String(doc.getContent());
+                        editableContent = true;
+                    }
                     title = doc.getTitle();
-                } else if (doc.getContentType().equals("uploaded_text/html")) {
-                    File f = FileStore.getInstance("documentation").get(doc.getContent());
-                    content = FileUtils.readFileToString(f, "UTF-8");
-                    title = doc.getTitle();
+                    contentType = doc.getContentType();
+                    forward = "/pages/documentationEdit.jsp";
                 } else {
-                    File f = FileStore.getInstance("documentation").get(doc.getContent());
-                    return new StreamingResolution(doc.getContentType(), new FileInputStream(f));
+                    if (doc.getContentType().startsWith("text/")) {
+                        content = new String(doc.getContent());
+                        title = doc.getTitle();
+                    } else if (doc.getContentType().equals("uploaded_text/html")) {
+                        // Initially the content of files with content-type text/html were stored in file rather than database
+                        // Now it is stored in database, but for old files we still need this hack
+                        File f = FileStore.getInstance("documentation").get(doc.getContent());
+                        content = FileUtils.readFileToString(f, "UTF-8");
+                        title = doc.getTitle();
+                    } else {
+                        File f = FileStore.getInstance("documentation").get(doc.getContent());
+                        return new StreamingResolution(doc.getContentType(), new FileInputStream(f));
+                    }
                 }
             }
         }
-        return new ForwardResolution("/pages/documentation.jsp");
+        return new ForwardResolution(forward);
     }
 
     /**
-     * Simply forwards to upload file page
+     * Simply forwards to add documentation page
      * @return Resolution
      * @throws Exception
      */
-    public Resolution upload() throws Exception {
-        return new ForwardResolution("/pages/documentationUpload.jsp");
+    public Resolution add() throws Exception {
+        return new ForwardResolution("/pages/documentationAdd.jsp");
     }
 
     /**
-     * Adds uploaded file into documentation table
+     * Edit page
+     * @return Resolution
+     * @throws Exception
+     */
+    public Resolution editContent() throws Exception {
+        if (title == null) {
+            title = "";
+        }
+        insertContent();
+        addSystemMessage("Successfully saved!");
+        return new RedirectResolution("/documentation/"+pid+"/edit");
+    }
+
+    /**
+     * Adds content into documentation table
      * @return Resolution
      * @throws DAOException
      */
-    public Resolution uploadFile() throws Exception {
+    public Resolution addContent() throws Exception {
+
+        // The page title is not mandatory. If it is not filled in, then it takes the value of the page_id.
+        if (StringUtils.isBlank(title)) {
+            title = pid;
+        }
+        insertContent();
+
+        return new RedirectResolution("/documentation/"+pid+"/edit");
+    }
+
+    /**
+     * Insert content into database
+     * @throws Exception
+     */
+    private void insertContent() throws Exception {
 
         if (isUserLoggedIn()) {
-            String fileExtension = "";
-            if (file != null && file.getFileName() != null) {
-                int idx = file.getFileName().lastIndexOf(".");
-                if (idx != -1) {
-                    fileExtension = file.getFileName().substring(idx);
+            if (isPostRequest()) {
+                // Extract file name and extension.
+                String fileName = "";
+                if (file != null && file.getFileName() != null) {
+                    if (StringUtils.isBlank(pid)) {
+                        pid = file.getFileName();
+                        fileName = file.getFileName();
+                        // If title is still empty, then set it to file name
+                        if (StringUtils.isBlank(title)) {
+                            title = file.getFileName();
+                        }
+                    } else {
+                        String fileExtension = "";
+                        int idx = file.getFileName().lastIndexOf(".");
+                        if (idx != -1) {
+                            fileExtension = file.getFileName().substring(idx);
+                        }
+                        fileName = pid + fileExtension;
+                    }
                 }
+
+                // If content type is not filled in, then it takes the content-type of the file.
+                // If that's not available, then it is application/octet-stream.
+                // If file is null the the content-type is "text/html"
+                if (StringUtils.isBlank(contentType)) {
+                    if (file != null) {
+                        contentType = file.getContentType();
+                        if (StringUtils.isBlank(contentType)) {
+                            contentType = "application/octet-stream";
+                        }
+                    } else {
+                        contentType = "text/html";
+                    }
+                }
+
+                // If the file is not null then store the file into filesystem, otherwise just get the content from file
+                if (file != null) {
+                    if (!contentType.startsWith("text/")) {
+                        FileStore.getInstance("documentation").add(fileName, true, file.getInputStream());
+                        content = fileName;
+                    } else {
+                        content = IOUtils.toString(file.getInputStream(), "UTF-8");
+                    }
+                }
+                if (content == null) {
+                    content = "";
+                }
+                DocumentationDAO dao = DAOFactory.get().getDao(DocumentationDAO.class);
+                dao.insertContent(pid, contentType, content, title);
             }
-            String fileName = pid + fileExtension;
-            FileStore.getInstance("documentation").add(fileName, true, file.getInputStream());
-            DocumentationDAO dao = DAOFactory.get().getDao(DocumentationDAO.class);
-            String ct = contentType;
-            if (contentType != null && contentType.equalsIgnoreCase("text/html")) {
-                ct = "uploaded_" + contentType;
-            }
-            dao.insertFile(pid, ct, fileName, title);
-            String url = APP_URL + "/documentation/" + pid;
-            addSystemMessage("File successfully uploaded! File URL is: <a href=\"" + url + "\">" + url + "</a>");
         } else {
             addWarningMessage(getBundle().getString("not.logged.in"));
         }
-        return new ForwardResolution("/pages/documentationUpload.jsp");
     }
 
-    @ValidationMethod(on = { "uploadFile" })
+    @ValidationMethod(on = { "addContent" })
     public void validatePageId(ValidationErrors errors) throws Exception {
+        // If overwrite = false, then check if page id already exists
         if (!StringUtils.isBlank(pid) && !overwrite) {
             boolean exists = DAOFactory.get().getDao(DocumentationDAO.class).idExists(pid);
             if (exists) {
                 errors.add("pid", new SimpleError("Such Page ID already exists!"));
                 getContext().setValidationErrors(errors);
             }
+        }
+        if (file == null && StringUtils.isBlank(pid)) {
+            errors.add("pid", new SimpleError("If no file is chosen, then page id is mandatory!"));
+            getContext().setValidationErrors(errors);
         }
     }
 
@@ -221,6 +309,22 @@ public class DocumentationActionBean extends AbstractActionBean {
 
     public void setOverwrite(boolean overwrite) {
         this.overwrite = overwrite;
+    }
+
+    public String getEvent() {
+        return event;
+    }
+
+    public void setEvent(String event) {
+        this.event = event;
+    }
+
+    public boolean isEditableContent() {
+        return editableContent;
+    }
+
+    public void setEditableContent(boolean editableContent) {
+        this.editableContent = editableContent;
     }
 
 }
