@@ -15,12 +15,12 @@
         <param-name>appDispName</param-name>
         <param-value>${application.displayName}</param-value>
     </context-param>
-    
+
     <context-param>
         <param-name>useEeaTemplate</param-name>
         <param-value>false</param-value>
     </context-param>
-    
+
     <context-param>
 	<param-name>templateCacheFolder</param-name>
 	<param-value>${application.eea.template.folder}</param-value>
@@ -200,7 +200,7 @@
         <servlet-name>AmpServlet</servlet-name>
         <url-pattern>/ampService</url-pattern>
     </servlet-mapping>
-    
+
     <!--  Update template servlet -->
 
     <servlet>
@@ -211,7 +211,7 @@
         <servlet-name>RefreshTemplateServlet</servlet-name>
         <url-pattern>/refreshtemplate</url-pattern>
     </servlet-mapping>
-    
+
 
     <!-- XmlConvServlet -->
 
@@ -234,6 +234,17 @@
     <servlet-mapping>
         <servlet-name>DownloadServlet</servlet-name>
         <url-pattern>/download</url-pattern>
+    </servlet-mapping>
+
+    <!-- Tabular data servlet -->
+
+    <servlet>
+        <servlet-name>TabularDataServlet</servlet-name>
+        <servlet-class>eionet.cr.web.action.TabularDataServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>TabularDataServlet</servlet-name>
+        <url-pattern>/tabularData</url-pattern>
     </servlet-mapping>
 
     <!-- For login duration -->

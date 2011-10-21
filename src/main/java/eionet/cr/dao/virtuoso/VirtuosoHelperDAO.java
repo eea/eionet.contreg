@@ -89,9 +89,9 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
      * SPARQL for last harvested files cache.
      */
     private static final String LATEST_FILES_SPARQL = "define input:inference '"
-            + GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME) + "' SELECT DISTINCT ?s ?l ?d WHERE {?s a <"
-            + Predicates.CR_FILE + "> " + ". OPTIONAL { ?s <" + Predicates.CR_FIRST_SEEN + "> ?d } . OPTIONAL { ?s <"
-            + Predicates.RDFS_LABEL + "> ?l } } " + "ORDER BY DESC(?d) LIMIT ?filesCount";
+        + GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME) + "' SELECT DISTINCT ?s ?l ?d WHERE {?s a <"
+        + Predicates.CR_FILE + "> " + ". OPTIONAL { ?s <" + Predicates.CR_FIRST_SEEN + "> ?d } . OPTIONAL { ?s <"
+        + Predicates.RDFS_LABEL + "> ?l } } " + "ORDER BY DESC(?d) LIMIT ?filesCount";
 
     /**
      * Returns latest harvested files (type=cr:File) in descending order (cr:firstSeen).
@@ -119,7 +119,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
      * SPARQL for filling the latest subjects cache.
      */
     private static final String LATEST_SUBJECTS_SPARQL = "prefix dc:<" + Subjects.DUBLIN_CORE_SOURCE_URL + "> "
-            + "select distinct ?s ?d where {?s a ?rdfType . " + "OPTIONAL { ?s dc:date ?d }} ORDER BY DESC(?d) LIMIT ?queryLimit";
+    + "select distinct ?s ?d where {?s a ?rdfType . " + "OPTIONAL { ?s dc:date ?d }} ORDER BY DESC(?d) LIMIT ?queryLimit";
 
     @Override
     public Collection<SubjectDTO> getLatestSubjects(String rdfType, int limit) throws DAOException {
@@ -158,12 +158,12 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
             if (rdfType.equals(Subjects.ROD_OBLIGATION_CLASS)) {
                 // properties for obligations
                 String[] neededPredicatesObl =
-                    {Predicates.RDFS_LABEL, Predicates.ROD_ISSUE_PROPERTY, Predicates.ROD_INSTRUMENT_PROPERTY};
+                {Predicates.RDFS_LABEL, Predicates.ROD_ISSUE_PROPERTY, Predicates.ROD_INSTRUMENT_PROPERTY};
                 neededPredicates = neededPredicatesObl;
             } else if (rdfType.equals(Subjects.ROD_DELIVERY_CLASS)) {
                 // properties for deliveries
                 String[] neededPredicatesDeliveries =
-                    {Predicates.RDFS_LABEL, Predicates.ROD_OBLIGATION_PROPERTY, Predicates.ROD_LOCALITY_PROPERTY};
+                {Predicates.RDFS_LABEL, Predicates.ROD_OBLIGATION_PROPERTY, Predicates.ROD_LOCALITY_PROPERTY};
                 neededPredicates = neededPredicatesDeliveries;
             }
 
@@ -190,7 +190,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
      * SPARQL for picklist cache of the given predicate.
      */
     private static final String PREDICATE_PICKLIST_SPARQL = "SELECT DISTINCT ?label ?object WHERE { ?s ?predicateUri ?object "
-            + "OPTIONAL {?object <" + Predicates.RDFS_LABEL + "> ?label }} ORDER BY ?label";
+        + "OPTIONAL {?object <" + Predicates.RDFS_LABEL + "> ?label }} ORDER BY ?label";
 
     @Override
     public Collection<ObjectLabelPair> getPicklistForPredicate(String predicateUri, boolean extractLabels) throws DAOException {
@@ -261,9 +261,9 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
      * SPARQL for properties defined by Dublin Core.
      */
     private static final String PROPS_DUBLINCORE_QUERY = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
-            + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " + "select distinct ?object ?label where "
-            + "{?object rdfs:label ?label . ?object rdf:type rdf:Property " + ". ?object rdfs:isDefinedBy <"
-            + Subjects.DUBLIN_CORE_SOURCE_URL + ">}";
+        + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " + "select distinct ?object ?label where "
+        + "{?object rdfs:label ?label . ?object rdf:type rdf:Property " + ". ?object rdfs:isDefinedBy <"
+        + Subjects.DUBLIN_CORE_SOURCE_URL + ">}";
 
     /**
      * Search for predicates that is allowed to edit on factsheet page.
@@ -294,9 +294,9 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
             bindings = new Bindings();
             String subjectTypesCSV = SPARQLQueryUtil.urisToCSV(subjectTypes, "subjectValue", bindings);
             String sparql =
-                    "PREFIX rdfs: <" + Namespace.RDFS.getUri() + "> "
-                            + "select distinct ?object ?label WHERE { ?object rdfs:label ?label . ?object rdfs:domain ?o "
-                            + ". FILTER (?o IN (" + subjectTypesCSV + "))}";
+                "PREFIX rdfs: <" + Namespace.RDFS.getUri() + "> "
+                + "select distinct ?object ?label WHERE { ?object rdfs:label ?label . ?object rdfs:domain ?o "
+                + ". FILTER (?o IN (" + subjectTypesCSV + "))}";
 
             // PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> select
             // distinct ?object ?label WHERE { ?object rdfs:label ?label . ?object rdfs:domain ?o .
@@ -316,7 +316,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
      * SPARQL for getting schema URI of the subject.
      */
     private static final String SUBJECT_SCHEMA_SPARQL = "select distinct ?o " + "where { ?subjectUri <" + Predicates.CR_SCHEMA
-            + "> ?o } limit 1";
+    + "> ?o } limit 1";
 
     @Override
     public String getSubjectSchemaUri(String subjectUri) throws DAOException {
@@ -446,8 +446,8 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     public SubProperties getSubProperties(final Collection<String> subjects) throws DAOException {
         Bindings bindings = new Bindings();
         String sparql =
-                "select ?p ?s    WHERE { ?p <" + Predicates.RDFS_SUBPROPERTY_OF + ">  ?s " + "FILTER (?s IN ("
-                        + SPARQLQueryUtil.urisToCSV(subjects, "subjectValue", bindings) + ") ) }";
+            "select ?p ?s    WHERE { ?p <" + Predicates.RDFS_SUBPROPERTY_OF + ">  ?s " + "FILTER (?s IN ("
+            + SPARQLQueryUtil.urisToCSV(subjects, "subjectValue", bindings) + ") ) }";
 
         SubProperties subProperties = new SubProperties();
         SubPropertiesReader reader = new SubPropertiesReader(subProperties);
@@ -460,8 +460,8 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
      * Self-explanatory constant name.
      */
     private static final String DELIVERY_SEARCH_PICKLIST_SPARQL = "SELECT DISTINCT ?li_uri ?li_title ?ro_title ?ro_uri  WHERE "
-            + "{?ro_uri <" + Predicates.ROD_INSTRUMENT_PROPERTY + "> ?li_uri " + ". ?li_uri <" + Predicates.DCTERMS_ALTERNATIVE
-            + "> ?li_title " + ". ?ro_uri <" + Predicates.DCTERMS_TITLE + "> ?ro_title } ORDER BY ?li_title ?ro_title";
+        + "{?ro_uri <" + Predicates.ROD_INSTRUMENT_PROPERTY + "> ?li_uri " + ". ?li_uri <" + Predicates.DCTERMS_ALTERNATIVE
+        + "> ?li_title " + ". ?ro_uri <" + Predicates.DCTERMS_TITLE + "> ?ro_title } ORDER BY ?li_title ?ro_title";
 
     /**
      * Returns picklist for delivery search.
@@ -478,7 +478,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
         // TODO types
         DeliverySearchPicklistReader<HashMap<String, ArrayList<UriLabelPair>>> reader =
-                new DeliverySearchPicklistReader<HashMap<String, ArrayList<UriLabelPair>>>();
+            new DeliverySearchPicklistReader<HashMap<String, ArrayList<UriLabelPair>>>();
         executeSPARQL(DELIVERY_SEARCH_PICKLIST_SPARQL, reader);
 
         logger.trace("Delivery search picklist query took " + Util.durationSince(startTime));
@@ -657,9 +657,9 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     }
 
     private static final String USER_BOOKMARKS_SPARQL =
-            "select distinct ?bookmarkUrl ?bookmarkLabel from ?userBookmarksUri where { ?subject <" + Predicates.CR_BOOKMARK
-            + "> ?bookmarkUrl . OPTIONAL {?subject <" + Predicates.RDFS_LABEL
-            + "> ?bookmarkLabel }} order by ?bookmarkUrl";
+        "select distinct ?bookmarkUrl ?bookmarkLabel from ?userBookmarksUri where { ?subject <" + Predicates.CR_BOOKMARK
+        + "> ?bookmarkUrl . OPTIONAL {?subject <" + Predicates.RDFS_LABEL
+        + "> ?bookmarkLabel }} order by ?bookmarkUrl";
 
     /*
      * (non-Javadoc)
@@ -709,8 +709,8 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
      * SPARQL for checking if the URI is listed in user bookmarks.
      */
     private static final String SUBJECT_BOOKMARK_CHECK_QUERY = "select count(1)  where "
-            + "{ graph ?g {?s ?userBookmark ?o . filter( isIRI(?o)) filter (?o = ?subjectValue) "
-            + "filter (?g = ?userBookmarksFolder ) } }";
+        + "{ graph ?g {?s ?userBookmark ?o . filter( isIRI(?o)) filter (?o = ?subjectValue) "
+        + "filter (?g = ?userBookmarksFolder ) } }";
 
     /**
      * Checks if given subject is bookmarked in user bookmarks.
@@ -783,8 +783,8 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
      * SPARQL for user history items.
      */
     private static final String USER_HISTORY_QUERY = "PREFIX cr: <" + Namespace.CR.getUri() + "> "
-            + "select ?url ?time FROM ?userHistoryGraph "
-            + "WHERE {?s cr:userHistory ?url . ?s cr:userSaveTime ?time} order by desc(?time)";
+    + "select ?url ?time FROM ?userHistoryGraph "
+    + "WHERE {?s cr:userHistory ?url . ?s cr:userSaveTime ?time} order by desc(?time)";
 
     /*
      * (non-Javadoc)
@@ -886,33 +886,27 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     /**
      * SPARQL returning triples of a subject.
      */
-    public static final String SUBJECT_TRIPLES_QUERY = "SELECT ?s ?p ?o FROM ?source WHERE {?s ?p ?o . filter (?s = ?subject)}";
+    public static final String SUBJECT_TRIPLES_QUERY = "SELECT ?s ?p ?o WHERE {?s ?p ?o . filter (?s = ?subject)}";
 
     /**
      * Returns full SPO objects of given subject.
-     *
-     * @param sourceUrl
-     *            harvest source url
-     * @param subject
+     * @param subjectUri
      *            subject URI
+     *
      * @throws DAOException
      *             if query fails.
      * @return list of SubjectDTO objects.
      */
     @Override
-    public List<SubjectDTO> getSPOsInSubject(String sourceUrl, String subject) throws DAOException {
+    public List<SubjectDTO> getSPOsInSubject(String subjectUri) throws DAOException {
 
-        if (!StringUtils.isBlank(subject) && !StringUtils.isBlank(sourceUrl)) {
-            Bindings bindings = new Bindings();
-            bindings.setURI("source", sourceUrl);
-            bindings.setURI("subject", subject);
-
-            SPOReader reader = new SPOReader();
-            return executeSPARQL(SUBJECT_TRIPLES_QUERY, bindings, reader);
-        } else {
-            return null;
+        if (StringUtils.isBlank(subjectUri)){
+            throw new IllegalArgumentException("Subject URI must not be blank!");
         }
 
+        Bindings bindings = new Bindings();
+        bindings.setURI("subject", subjectUri);
+        return executeSPARQL(SUBJECT_TRIPLES_QUERY, bindings, new SPOReader());
     }
 
     /*
@@ -1087,8 +1081,8 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     }
 
     private static final String USER_REVIEWS_SPARQL = "select ?s ?p ?o where { ?s ?p ?o." + " { select distinct ?s where { ?s <"
-            + Predicates.RDF_TYPE + "> <" + Subjects.CR_FEEDBACK + ">" + ". ?s <" + Predicates.CR_USER
-            + "> ?userHomeUri }}} order by ?s ?p ?o";
+    + Predicates.RDF_TYPE + "> <" + Subjects.CR_FEEDBACK + ">" + ". ?s <" + Predicates.CR_USER
+    + "> ?userHomeUri }}} order by ?s ?p ?o";
 
     /*
      * (non-Javadoc)
@@ -1472,7 +1466,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
      * SPARQL for user uploaded files.
      */
     private static final String USER_UPLOADS_QUERY = "select ?s ?p ?o where { ?s ?p ?o. "
-            + "{ select distinct ?s where { ?userBookmarksFolder ?hasFile ?s }}} order by ?s ?p ?o";
+        + "{ select distinct ?s where { ?userBookmarksFolder ?hasFile ?s }}} order by ?s ?p ?o";
 
     /**
      * User uploaded files.
@@ -1534,7 +1528,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         try {
             conn = SesameUtil.getRepositoryConnection();
             RepositoryResult<Statement> result =
-                    conn.getStatements(conn.getValueFactory().createURI(subjectUri), null, null, true);
+                conn.getStatements(conn.getValueFactory().createURI(subjectUri), null, null, true);
             return result != null && result.hasNext();
         } catch (RepositoryException e) {
             throw new DAOException(e.toString(), e);
@@ -1727,8 +1721,8 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
     /** */
     private static final String SPARQL_BOOKMARKS_SPARQL = "select ?subj ?label ?queryString " + "from ?bookmarksHome " + "where {"
-            + "?subj ?rdfType ?sparqlBookmark" + ". ?subj ?rdfsLabel ?label" + ". ?subj ?sparqlQuery ?queryString"
-            + "} order by ?label";
+    + "?subj ?rdfType ?sparqlBookmark" + ". ?subj ?rdfsLabel ?label" + ". ?subj ?sparqlQuery ?queryString"
+    + "} order by ?label";
 
     /**
      * Returns SPARQL bookmarks of the user.
@@ -1802,13 +1796,13 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
     /** */
     private static final String GET_FACTSHEET_ROWS =
-            "select ?pred min(isBlank(?s)) as ?anonSubj "
-                    + "min(bif:either(isLiteral(?o),"
-                    + "bif:concat(str(?o),'<|>',lang(?o),'<|>',str(datatype(?o)),'<|><|>0<|>',str(?g)),"
-                    + "bif:concat(bif:coalesce(str(?oLabel),str(?o)),'<|>',lang(?oLabel),'<|>',str(datatype(?oLabel)),'<|>',str(?o),'<|>',str(isBlank(?o)),'<|>',str(?g))"
-                    + ")) as ?objData " + "count(distinct ?o) as ?objCount " + "where {" + "graph ?g {"
-                    + "?s ?pred ?o. filter(?s=?subjectUri)}" + ". optional {?o <" + Predicates.RDFS_LABEL + "> ?oLabel}"
-                    + "} group by ?pred";
+        "select ?pred min(isBlank(?s)) as ?anonSubj "
+        + "min(bif:either(isLiteral(?o),"
+        + "bif:concat(str(?o),'<|>',lang(?o),'<|>',str(datatype(?o)),'<|><|>0<|>',str(?g)),"
+        + "bif:concat(bif:coalesce(str(?oLabel),str(?o)),'<|>',lang(?oLabel),'<|>',str(datatype(?oLabel)),'<|>',str(?o),'<|>',str(isBlank(?o)),'<|>',str(?g))"
+        + ")) as ?objData " + "count(distinct ?o) as ?objCount " + "where {" + "graph ?g {"
+        + "?s ?pred ?o. filter(?s=?subjectUri)}" + ". optional {?o <" + Predicates.RDFS_LABEL + "> ?oLabel}"
+        + "} group by ?pred";
     // "select ?pred " +
     // "min(isBlank(?s)) as ?anonSubj " +
     // "min(bif:either(isLiteral(?o),?o,bif:concat(?oLabel, '" + FactsheetRowReader.OBJECT_DATA_SPLITTER +
@@ -1821,21 +1815,21 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
     /** */
     private static final String GET_PREDICATE_LABELS = "select distinct ?pred ?label where " + "{" + "?pred <"
-            + Predicates.RDFS_LABEL + "> ?label" + ". {select distinct ?pred where {?subjectUri ?pred ?o}}"
-            + "} order by ?pred ?label";
+    + Predicates.RDFS_LABEL + "> ?label" + ". {select distinct ?pred where {?subjectUri ?pred ?o}}"
+    + "} order by ?pred ?label";
 
     /** */
     private static final String GET_PREDICATE_OBJECTS = "select ?obj ?objLabel ?g " + "where {graph ?g {"
-            + "?subjectUri ?predicateUri ?obj}" + ". optional {?obj <" + Predicates.RDFS_LABEL + "> ?objLabel}"
-            + "} order by str(bif:either(isLiteral(?obj),?obj,bif:coalesce(?objLabel,str(?obj)))) " + "limit "
-            + PredicateObjectsReader.PREDICATE_PAGE_SIZE + " offset ";
+    + "?subjectUri ?predicateUri ?obj}" + ". optional {?obj <" + Predicates.RDFS_LABEL + "> ?objLabel}"
+    + "} order by str(bif:either(isLiteral(?obj),?obj,bif:coalesce(?objLabel,str(?obj)))) " + "limit "
+    + PredicateObjectsReader.PREDICATE_PAGE_SIZE + " offset ";
 
     /**
      * @see eionet.cr.dao.HelperDAO#getFactsheet(java.lang.String, List, Map)
      */
     @Override
     public FactsheetDTO getFactsheet(String subjectUri, List<String> acceptedLanguages, Map<String, Integer> predicatePages)
-            throws DAOException {
+    throws DAOException {
 
         if (StringUtils.isBlank(subjectUri)) {
             throw new IllegalArgumentException("Subject uri must not be blank!");

@@ -441,15 +441,13 @@ public interface HelperDAO extends DAO {
 
     /**
      * Returns full SPO objects of given subject.
+     * @param subjectUri
      *
-     * @param sourceUrl
-     *            harvest source url
-     * @param subject
      * @throws DAOException
      *             if query fails.
      * @return list of SubjectDTO objects.
      */
-    public List<SubjectDTO> getSPOsInSubject(String sourceUrl, String subject) throws DAOException;
+    public List<SubjectDTO> getSPOsInSubject(String subjectUri) throws DAOException;
 
     /**
      * @param resourceUris

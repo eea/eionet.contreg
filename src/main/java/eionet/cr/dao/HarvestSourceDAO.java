@@ -272,12 +272,8 @@ public interface HarvestSourceDAO extends DAO {
      * @return String
      * @throws DAOException
      *             if relational database is unavailable.
-     * @throws RepositoryException
-     *             if data repository is unavailable.
-     * @throws IOException
      */
-    public String getHarvestSourceMetadata(String harvestSourceUri, String predicateUri) throws DAOException, RepositoryException,
-    IOException;
+    public String getHarvestSourceMetadata(String harvestSourceUri, String predicateUri) throws DAOException;
 
     /**
      * Inserts given metadata into /harvester context.

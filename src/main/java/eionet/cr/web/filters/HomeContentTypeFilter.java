@@ -21,12 +21,7 @@
 package eionet.cr.web.filters;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.net.URLEncoder;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -37,25 +32,17 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
-import eionet.cr.common.CRRuntimeException;
-import eionet.cr.common.Predicates;
-import eionet.cr.config.GeneralConfig;
-import eionet.cr.dao.DAOFactory;
-import eionet.cr.dao.HarvestSourceDAO;
-import eionet.cr.dao.HelperDAO;
-import eionet.cr.dto.ObjectDTO;
-import eionet.cr.dto.SubjectDTO;
+import eionet.cr.dao.DAOException;
 import eionet.cr.filestore.FileStore;
+import eionet.cr.web.action.TabularDataServlet;
 
 /**
- * Purpose of this filter is to enable RESTful download of files stored at CR.
- * Since it is assumed that all these will have a URL pointing to some user home directory of CR,
- * then this filter is relevant (and should be applied to) only URLs with pattern /home/*.
+ * Purpose of this filter is to enable RESTful download of files stored at CR. Since it is assumed that all these will have a URL
+ * pointing to some user home directory of CR, then this filter is relevant (and should be applied to) only URLs with pattern
+ * /home/*.
  *
  * See https://svn.eionet.europa.eu/projects/Reportnet/ticket/2464 for more background.
  *
@@ -65,10 +52,6 @@ public class HomeContentTypeFilter implements Filter {
 
     /** */
     private static final Logger LOGGER = Logger.getLogger(HomeContentTypeFilter.class);
-
-    protected static final String rdfHeader = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
-    protected static final String rdfNameSpace = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
-    protected static final String rdfSNameSpace = "http://www.w3.org/2000/01/rdf-schema#";
 
     /**
      * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
@@ -96,7 +79,7 @@ public class HomeContentTypeFilter implements Filter {
         HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
         String requestURL = httpRequest.getRequestURL().toString();
 
-        if (LOGGER.isTraceEnabled()){
+        if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("httpRequest.getRequestURL() = " + requestURL);
             LOGGER.trace("httpRequest.getRequestURI() = " + httpRequest.getRequestURI());
             LOGGER.trace("httpRequest.getContextPath() = " + httpRequest.getContextPath());
@@ -115,6 +98,9 @@ public class HomeContentTypeFilter implements Filter {
                 // Extract user name and file name from the path info.
                 String userName = pathInfo.substring(1, i);
                 String fileName = pathInfo.substring(i + 1);
+                String fileUri = new String(requestURL);
+
+                // if is tabular data and (idInFile!=null || rdf not accepted)
 
                 // Extract id of a resource/object/tag/code/... inside the file.
                 // For example if http://cr.eionet.europa.eu/home/userName/fileName identifies
@@ -127,198 +113,38 @@ public class HomeContentTypeFilter implements Filter {
                     if (z != -1 && fileName.length() > (z + 1)) {
                         idInFile = fileName.substring(z + 1);
                         fileName = fileName.substring(0, z);
+                        fileUri = StringUtils.substringBeforeLast(requestURL, "/" + idInFile);
                     }
                 }
 
-                if (FileStore.getInstance(userName).get(fileName) != null) {
+                try{
+                    if (TabularDataServlet.willHandle(fileUri, idInFile, httpRequest)){
 
-                    // Get the content types that the requester accepts.
-                    String acceptHeader = httpRequest.getHeader("Accept");
-                    String[] acceptedContentTypes = null;
-                    if (acceptHeader != null && acceptHeader.length() > 0) {
-                        acceptedContentTypes = acceptHeader.split(",");
-                    }
-
-                    try {
-                        String fileUri =
-                            GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL) + "/home/" + userName + "/"
-                            + fileName;
-
-                        // Check if file is CSV or TSV (imported by user)
-                        String fileType =
-                            DAOFactory.get().getDao(HarvestSourceDAO.class)
-                            .getHarvestSourceMetadata(fileUri, Predicates.CR_MEDIA_TYPE);
-                        if (fileType != null && (fileType.equals("csv") || fileType.equals("tsv"))) {
-
-                            List<SubjectDTO> triplesInFile = null;
-                            if (!StringUtils.isBlank(idInFile)) {
-                                String subjectUri = fileUri + "/" + idInFile;
-                                triplesInFile = DAOFactory.get().getDao(HelperDAO.class).getSPOsInSubject(fileUri, subjectUri);
-                            } else {
-                                triplesInFile = DAOFactory.get().getDao(HelperDAO.class).getSPOsInSource(fileUri);
-                            }
-
-                            // If "application/rdf+xml" accepted then return RDF, otherwise return HTML.
-                            if (ArrayUtils.contains(acceptedContentTypes, "application/rdf+xml")) {
-
-                                httpResponse.setContentType("application/rdf+xml;charset=utf-8");
-                                triplesToRdf(httpResponse.getOutputStream(), triplesInFile, fileUri);
-                                return;
-                            } else if (!StringUtils.isBlank(idInFile)) {
-                                triplesToHtml(httpResponse.getOutputStream(), triplesInFile, fileUri, idInFile);
-                                return;
-                            }
+                        String redirectPath =
+                            httpRequest.getContextPath() + "/tabularData?fileUri=" + URLEncoder.encode(fileUri, "UTF-8");
+                        if (!StringUtils.isBlank(fileName)){
+                            redirectPath = redirectPath + "&idInFile=" + URLEncoder.encode(idInFile, "UTF-8");
                         }
+                        LOGGER.debug("URL points to tabular data, so redirecting to: " + redirectPath);
+                        httpResponse.sendRedirect(redirectPath);
+                        return;
+                    }
+                    else if (FileStore.getInstance(userName).get(fileName) != null) {
 
                         String redirectPath =
                             httpRequest.getContextPath() + "/download?uri=" + URLEncoder.encode(requestURL, "UTF-8");
                         LOGGER.debug("URL points to stored file, so redirecting to: " + redirectPath);
                         httpResponse.sendRedirect(redirectPath);
                         return;
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        throw new CRRuntimeException(e.getMessage());
                     }
+                }
+                catch (DAOException e){
+                    throw new ServletException(e.getMessage(), e);
                 }
             }
         }
 
         filterChain.doFilter(servletRequest, servletResponse);
-    }
-
-    /**
-     *
-     * @param out
-     * @param triples
-     * @param fileUri
-     * @param id
-     */
-    private void triplesToHtml(OutputStream out, List<SubjectDTO> triples, String fileUri, String id) {
-
-        OutputStreamWriter writer = new OutputStreamWriter(out);
-        try {
-            if (!StringUtils.isBlank(id)) {
-                fileUri = fileUri + "/" + id;
-            }
-            writer.append("<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en-gb\">");
-            writer.append("<head>");
-            writer.append("<title>").append(fileUri).append("</title>");
-            writer.append("<link rel=\"alternate\" type=\"application/rdf+xml\" href=\"").append(fileUri).append("\" />");
-            writer.append("<style type=\"text/css\">" + "/*<![CDATA[*/ "
-                    + "table { border: 1px solid black; border-collapse:collapse; } "
-                    + "td, th { border: 1px solid black; padding: 0.3em; } " + "/*]]>*/" + "</style>");
-            writer.append("</head>");
-            writer.append("<body>");
-            writer.append("<h1>").append(fileUri).append("</h1>");
-            writer.append("<table>");
-            writer.append("<tr><th>Subject</th><th>Predicate</th><th>Value</th></tr>");
-
-            if (triples != null) {
-                for (SubjectDTO subject : triples) {
-                    String subjectUri = subject.getUri();
-                    Map<String, Collection<ObjectDTO>> predicates = subject.getPredicates();
-                    if (predicates != null) {
-                        for (String predicateUri : predicates.keySet()) {
-                            Collection<ObjectDTO> objects = predicates.get(predicateUri);
-                            if (objects != null) {
-                                for (ObjectDTO object : objects) {
-                                    writer.append("<tr>");
-                                    writer.append("<td>");
-                                    writer.append("<a href=\"").append(subjectUri).append("\">");
-                                    writer.append(subjectUri);
-                                    writer.append("</a>");
-                                    writer.append("</td>");
-                                    writer.append("<td>").append(predicateUri).append("</td>");
-                                    writer.append("<td>");
-                                    if (object.isLiteral()) {
-                                        writer.append(object.getValue());
-                                    } else {
-                                        writer.append("<a href=\"").append(object.getValue()).append("\">")
-                                        .append(object.getValue()).append("</a>");
-                                    }
-                                    writer.append("</td>");
-                                    writer.append("</tr>");
-                                }
-                            }
-                        }
-                    }
-                }
-                /*
-                 * for (TripleDTO triple : triples) { writer.append("<tr>");
-                 * writer.append("<td>").append(triple.getSubjectUri()).append("</td>");
-                 * writer.append("<td>").append(triple.getPredicateUri()).append("</td>");
-                 * writer.append("<td>").append(triple.getObject()).append("</td>"); writer.append("</tr>"); }
-                 */
-            }
-            writer.append("</table>");
-            writer.append("</body>");
-            writer.append("</html>");
-            writer.flush();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                writer.close();
-                out.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private void triplesToRdf(OutputStream out, List<SubjectDTO> triples, String fileUri) {
-        OutputStreamWriter writer = new OutputStreamWriter(out);
-        try {
-            if (triples != null) {
-                writer.append(rdfHeader);
-                writer.append("<rdf:RDF xmlns=\"").append(fileUri + "#").append("\" xmlns:rdf=\"").append(rdfNameSpace)
-                .append("\" ").append("xmlns:rdfs=\"").append(rdfSNameSpace).append("\">");
-                for (SubjectDTO subject : triples) {
-                    String subjectUri = subject.getUri();
-                    writer.append("<rdf:Description rdf:about=\"").append(StringEscapeUtils.escapeXml(subjectUri)).append("\">");
-                    Map<String, Collection<ObjectDTO>> predicates = subject.getPredicates();
-                    if (predicates != null) {
-                        for (String predicateUri : predicates.keySet()) {
-                            Collection<ObjectDTO> objects = predicates.get(predicateUri);
-
-                            // Shorten predicate URIs
-                            if (predicateUri.startsWith(rdfNameSpace)) {
-                                predicateUri = predicateUri.replace(rdfNameSpace, "rdf:");
-                            } else if (predicateUri.startsWith(rdfSNameSpace)) {
-                                predicateUri = predicateUri.replace(rdfSNameSpace, "rdfs:");
-                            } else if (predicateUri.startsWith(fileUri)) {
-                                predicateUri = predicateUri.replace(fileUri + "#", "");
-                            }
-
-                            if (objects != null) {
-                                for (ObjectDTO object : objects) {
-                                    if (object.isLiteral()) {
-                                        writer.append("<").append(predicateUri).append(">")
-                                        .append(StringEscapeUtils.escapeXml(object.getValue())).append("</")
-                                        .append(predicateUri).append(">");
-                                    } else {
-                                        writer.append("<").append(predicateUri).append(" rdf:resource=\"")
-                                        .append(StringEscapeUtils.escapeXml(object.getValue())).append("\"/>");
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    writer.append("</rdf:Description>");
-                }
-                writer.append("</rdf:RDF>");
-                writer.flush();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                writer.close();
-                out.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     /*
