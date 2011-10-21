@@ -37,6 +37,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -52,8 +53,9 @@ import eionet.cr.dto.SubjectDTO;
 import eionet.cr.filestore.FileStore;
 
 /**
- * Purpose of this filter is to enable RESTful download of files stored at CR. Since it is assumed that all these will have a URL
- * pointing to some user home directory of CR, then this filter is relevant and should be applied to only URL with pattern /home/*.
+ * Purpose of this filter is to enable RESTful download of files stored at CR.
+ * Since it is assumed that all these will have a URL pointing to some user home directory of CR,
+ * then this filter is relevant (and should be applied to) only URLs with pattern /home/*.
  *
  * See https://svn.eionet.europa.eu/projects/Reportnet/ticket/2464 for more background.
  *
@@ -62,104 +64,115 @@ import eionet.cr.filestore.FileStore;
 public class HomeContentTypeFilter implements Filter {
 
     /** */
-    private static final Logger logger = Logger.getLogger(HomeContentTypeFilter.class);
+    private static final Logger LOGGER = Logger.getLogger(HomeContentTypeFilter.class);
 
     protected static final String rdfHeader = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
     protected static final String rdfNameSpace = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
     protected static final String rdfSNameSpace = "http://www.w3.org/2000/01/rdf-schema#";
 
-    /*
-     * (non-Javadoc)
-     *
+    /**
      * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
      */
     @Override
     public void init(FilterConfig arg0) throws ServletException {
-        // do nothing in this overridden method
+        // no initialization actions required
     }
 
-    /*
-     * (non-Javadoc)
-     *
+    /**
      * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse, javax.servlet.FilterChain)
      */
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
     throws IOException, ServletException {
 
-        // pass on if not a HTTP request
+        // Pass on if not a HTTP request.
         if (!(servletRequest instanceof HttpServletRequest)) {
             filterChain.doFilter(servletRequest, servletResponse);
             return;
         }
 
+        // Instantiate local variables for HTTP request, response and request-URL
         HttpServletRequest httpRequest = (HttpServletRequest) servletRequest;
         HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
         String requestURL = httpRequest.getRequestURL().toString();
 
-        // logger.debug("httpRequest.getRequestURL() = " + requestURL);
-        // logger.debug("httpRequest.getRequestURI() = " + httpRequest.getRequestURI());
-        // logger.debug("httpRequest.getContextPath() = " + httpRequest.getContextPath());
-        // logger.debug("httpRequest.getServletPath() = " + httpRequest.getServletPath());
-        // logger.debug("httpRequest.getPathInfo() = " + httpRequest.getPathInfo());
+        if (LOGGER.isTraceEnabled()){
+            LOGGER.trace("httpRequest.getRequestURL() = " + requestURL);
+            LOGGER.trace("httpRequest.getRequestURI() = " + httpRequest.getRequestURI());
+            LOGGER.trace("httpRequest.getContextPath() = " + httpRequest.getContextPath());
+            LOGGER.trace("httpRequest.getServletPath() = " + httpRequest.getServletPath());
+            LOGGER.trace("httpRequest.getPathInfo() = " + httpRequest.getPathInfo());
+        }
 
+        // Parse path info if it is not null and its length is greater than 1
+        // (because if its equal to 1, then it is "/", meaning the application's root URI).
         String pathInfo = httpRequest.getPathInfo();
         if (pathInfo != null && pathInfo.length() > 1) {
 
             int i = pathInfo.indexOf('/', 1);
             if (i != -1 && pathInfo.length() > (i + 1)) {
 
+                // Extract user name and file name from the path info.
                 String userName = pathInfo.substring(1, i);
                 String fileName = pathInfo.substring(i + 1);
-                String id = "";
+
+                // Extract id of a resource/object/tag/code/... inside the file.
+                // For example if http://cr.eionet.europa.eu/home/userName/fileName identifies
+                // a file that contains a code-list (e.g. country-codes), then
+                // http://cr.eionet.europa.eu/home/userName/fileName/AT identifies code "AT"
+                // inside that file.
+                String idInFile = "";
                 if (!StringUtils.isBlank(fileName)) {
                     int z = fileName.indexOf("/");
                     if (z != -1 && fileName.length() > (z + 1)) {
-                        id = fileName.substring(z + 1);
+                        idInFile = fileName.substring(z + 1);
                         fileName = fileName.substring(0, z);
                     }
                 }
 
                 if (FileStore.getInstance(userName).get(fileName) != null) {
 
-                    String acceptHeader = httpRequest.getHeader("accept");
-                    String[] accept = null;
+                    // Get the content types that the requester accepts.
+                    String acceptHeader = httpRequest.getHeader("Accept");
+                    String[] acceptedContentTypes = null;
                     if (acceptHeader != null && acceptHeader.length() > 0) {
-                        accept = acceptHeader.split(",");
+                        acceptedContentTypes = acceptHeader.split(",");
                     }
 
                     try {
                         String fileUri =
                             GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL) + "/home/" + userName + "/"
                             + fileName;
+
                         // Check if file is CSV or TSV (imported by user)
-                        String type =
+                        String fileType =
                             DAOFactory.get().getDao(HarvestSourceDAO.class)
                             .getHarvestSourceMetadata(fileUri, Predicates.CR_MEDIA_TYPE);
+                        if (fileType != null && (fileType.equals("csv") || fileType.equals("tsv"))) {
 
-                        if (type != null && (type.equals("csv") || type.equals("tsv"))) {
-
-                            List<SubjectDTO> triples = null;
-                            if (!StringUtils.isBlank(id)) {
-                                String subjectUri = fileUri + "/" + id;
-                                triples = DAOFactory.get().getDao(HelperDAO.class).getSPOsInSubject(fileUri, subjectUri);
+                            List<SubjectDTO> triplesInFile = null;
+                            if (!StringUtils.isBlank(idInFile)) {
+                                String subjectUri = fileUri + "/" + idInFile;
+                                triplesInFile = DAOFactory.get().getDao(HelperDAO.class).getSPOsInSubject(fileUri, subjectUri);
                             } else {
-                                triples = DAOFactory.get().getDao(HelperDAO.class).getSPOsInSource(fileUri);
+                                triplesInFile = DAOFactory.get().getDao(HelperDAO.class).getSPOsInSource(fileUri);
                             }
 
-                            // if accept-header is "application/rdf+xml" then return RDF, otherwise return HTML
-                            if (accept != null && accept.length > 0 && accept[0].equals("application/rdf+xml")) {
+                            // If "application/rdf+xml" accepted then return RDF, otherwise return HTML.
+                            if (ArrayUtils.contains(acceptedContentTypes, "application/rdf+xml")) {
+
                                 httpResponse.setContentType("application/rdf+xml;charset=utf-8");
-                                triplesToRdf(httpResponse.getOutputStream(), triples, fileUri);
+                                triplesToRdf(httpResponse.getOutputStream(), triplesInFile, fileUri);
                                 return;
-                            } else if (!StringUtils.isBlank(id)) {
-                                triplesToHtml(httpResponse.getOutputStream(), triples, fileUri, id);
+                            } else if (!StringUtils.isBlank(idInFile)) {
+                                triplesToHtml(httpResponse.getOutputStream(), triplesInFile, fileUri, idInFile);
                                 return;
                             }
                         }
+
                         String redirectPath =
                             httpRequest.getContextPath() + "/download?uri=" + URLEncoder.encode(requestURL, "UTF-8");
-                        logger.debug("URL points to stored file, so redirecting to: " + redirectPath);
+                        LOGGER.debug("URL points to stored file, so redirecting to: " + redirectPath);
                         httpResponse.sendRedirect(redirectPath);
                         return;
                     } catch (Exception e) {
@@ -173,7 +186,15 @@ public class HomeContentTypeFilter implements Filter {
         filterChain.doFilter(servletRequest, servletResponse);
     }
 
+    /**
+     *
+     * @param out
+     * @param triples
+     * @param fileUri
+     * @param id
+     */
     private void triplesToHtml(OutputStream out, List<SubjectDTO> triples, String fileUri, String id) {
+
         OutputStreamWriter writer = new OutputStreamWriter(out);
         try {
             if (!StringUtils.isBlank(id)) {
