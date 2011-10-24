@@ -47,9 +47,9 @@ import eionet.cr.dto.DocumentationDTO;
 import eionet.cr.filestore.FileStore;
 
 /**
- *
+ * 
  * @author Risto Alt
- *
+ * 
  */
 @UrlBinding("/documentation/{pageId}/{event}")
 public class DocumentationActionBean extends AbstractActionBean {
@@ -77,7 +77,7 @@ public class DocumentationActionBean extends AbstractActionBean {
     private boolean editableContent;
 
     /**
-     *
+     * 
      * @return Resolution
      * @throws DAOException
      *             if query fails
@@ -112,23 +112,28 @@ public class DocumentationActionBean extends AbstractActionBean {
                 addCautionMessage("Such page ID doesn't exist in database: " + pageId);
             } else {
                 if (!StringUtils.isBlank(event) && event.equals("edit")) {
-                    if (doc.getContentType().startsWith("text/")) {
-                        content = new String(doc.getContent());
+                    contentType = doc.getContentType();
+                    title = doc.getTitle();
+                    if (doc.getContentType().startsWith("text/") || doc.getContentType().equals("uploaded_text/html")) {
+                        if (doc.getContentType().startsWith("text/")) {
+                            content = new String(doc.getContent());
+                        } else if (doc.getContentType().equals("uploaded_text/html")) {
+                            File f = FileStore.getInstance("documentation").get(doc.getContent());
+                            content = FileUtils.readFileToString(f, "UTF-8");
+                            contentType = "text/html";
+                        }
                         editableContent = true;
                     }
-                    title = doc.getTitle();
-                    contentType = doc.getContentType();
                     forward = "/pages/documentationEdit.jsp";
                 } else {
+                    title = doc.getTitle();
                     if (doc.getContentType().startsWith("text/")) {
                         content = new String(doc.getContent());
-                        title = doc.getTitle();
                     } else if (doc.getContentType().equals("uploaded_text/html")) {
                         // Initially the content of files with content-type text/html were stored in file rather than database
                         // Now it is stored in database, but for old files we still need this hack
                         File f = FileStore.getInstance("documentation").get(doc.getContent());
                         content = FileUtils.readFileToString(f, "UTF-8");
-                        title = doc.getTitle();
                     } else {
                         File f = FileStore.getInstance("documentation").get(doc.getContent());
                         return new StreamingResolution(doc.getContentType(), new FileInputStream(f));
@@ -141,7 +146,7 @@ public class DocumentationActionBean extends AbstractActionBean {
 
     /**
      * Simply forwards to add documentation page
-     *
+     * 
      * @return Resolution
      * @throws Exception
      */
@@ -151,7 +156,7 @@ public class DocumentationActionBean extends AbstractActionBean {
 
     /**
      * Edit page
-     *
+     * 
      * @return Resolution
      * @throws Exception
      */
@@ -166,7 +171,7 @@ public class DocumentationActionBean extends AbstractActionBean {
 
     /**
      * Adds content into documentation table
-     *
+     * 
      * @return Resolution
      * @throws DAOException
      */
@@ -183,7 +188,7 @@ public class DocumentationActionBean extends AbstractActionBean {
 
     /**
      * Insert content into database
-     *
+     * 
      * @throws Exception
      */
     private void insertContent() throws Exception {

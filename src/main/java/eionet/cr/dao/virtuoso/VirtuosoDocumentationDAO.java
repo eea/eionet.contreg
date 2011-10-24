@@ -3,6 +3,7 @@
  */
 package eionet.cr.dao.virtuoso;
 
+import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,7 +19,7 @@ import eionet.cr.util.sql.SQLUtil;
 
 /**
  * @author Risto Alt
- *
+ * 
  */
 public class VirtuosoDocumentationDAO extends VirtuosoBaseDAO implements DocumentationDAO {
 
@@ -28,21 +29,26 @@ public class VirtuosoDocumentationDAO extends VirtuosoBaseDAO implements Documen
     @Override
     public DocumentationDTO getDocObject(String pageId) throws DAOException {
 
-        String docObjectSQL = "select content_type, content, title from documentation where page_id='" + pageId + "'";
+        String docObjectSQL = "select content_type, content, title from documentation where page_id = ?";
 
         DocumentationDTO ret = null;
         Connection conn = null;
-        Statement stmt = null;
+        PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
             conn = getSQLConnection();
-            stmt = conn.createStatement();
-            rs = stmt.executeQuery(docObjectSQL);
+            stmt = conn.prepareStatement(docObjectSQL);
+            stmt.setString(1, pageId);
+            rs = stmt.executeQuery();
             while (rs.next()) {
                 ret = new DocumentationDTO();
                 ret.setPageId(pageId);
                 ret.setContentType(rs.getString("content_type"));
-                ret.setContent(rs.getString("content"));
+                Blob blobcontent = rs.getBlob("content");
+                if (blobcontent != null) {
+                    String content = new String(blobcontent.getBytes(1l, (int) blobcontent.length()));
+                    ret.setContent(content);
+                }
                 ret.setTitle(rs.getString("title"));
             }
         } catch (SQLException e) {
@@ -123,16 +129,17 @@ public class VirtuosoDocumentationDAO extends VirtuosoBaseDAO implements Documen
     @Override
     public boolean idExists(String pageId) throws DAOException {
 
-        String docObjectSQL = "select page_id from documentation where page_id='" + pageId + "'";
+        String docObjectSQL = "select page_id from documentation where page_id = ?";
 
         boolean ret = false;
         Connection conn = null;
-        Statement stmt = null;
+        PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
             conn = getSQLConnection();
-            stmt = conn.createStatement();
-            rs = stmt.executeQuery(docObjectSQL);
+            stmt = conn.prepareStatement(docObjectSQL);
+            stmt.setString(1, pageId);
+            rs = stmt.executeQuery();
             while (rs.next()) {
                 ret = true;
             }
