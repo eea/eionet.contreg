@@ -343,6 +343,14 @@ public interface HelperDAO extends DAO {
     public Collection<UploadDTO> getUserUploads(CRUser crUser) throws DAOException;
 
     /**
+     * Returns all the uploads that are rdf source files.
+     *
+     * @return
+     * @throws DAOException
+     */
+    public List<UploadDTO> getAllRdfUploads() throws DAOException;
+
+    /**
      * @param subjectUri
      * @return boolean
      * @throws DAOException

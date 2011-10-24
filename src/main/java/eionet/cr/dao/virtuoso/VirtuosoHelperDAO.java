@@ -46,6 +46,7 @@ import eionet.cr.dao.readers.PredicateLabelsReader;
 import eionet.cr.dao.readers.RDFExporter;
 import eionet.cr.dao.readers.RecentFilesReader;
 import eionet.cr.dao.readers.RecentUploadsReader;
+import eionet.cr.dao.readers.ResultSetReaderException;
 import eionet.cr.dao.readers.SPOReader;
 import eionet.cr.dao.readers.SubPropertiesReader;
 import eionet.cr.dao.readers.SubjectDataReader;
@@ -76,6 +77,7 @@ import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.util.sesame.SPARQLQueryUtil;
+import eionet.cr.util.sesame.SPARQLResultSetReader;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
@@ -1512,6 +1514,53 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         return uploads;
     }
 
+    @Override
+    public List<UploadDTO> getAllRdfUploads() throws DAOException {
+        StringBuilder sb = new StringBuilder();
+        sb.append("PREFIX cr: <http://cr.eionet.europa.eu/ontologies/contreg.rdf#> ");
+        sb.append("PREFIX dc: <http://purl.org/dc/elements/1.1/> ");
+        sb.append("select ?file, ?title, ?lastModified where { ");
+        sb.append("?s cr:hasFile ?file . ");
+        sb.append("?file dc:title ?title . ");
+        sb.append("?file cr:harvestedStatements ?statements. ");
+        sb.append("?file cr:contentLastModified ?lastModified ");
+        sb.append("FILTER (?statements > 0) }");
+
+        SPARQLResultSetReader<UploadDTO> reader = new SPARQLResultSetReader<UploadDTO>() {
+
+            List<UploadDTO> result = new ArrayList<UploadDTO>();
+
+            @Override
+            public List<UploadDTO> getResultList() {
+                return result;
+            }
+
+            @Override
+            public void endResultSet() {
+            }
+
+            @Override
+            public void startResultSet(List<String> bindingNames) {
+            }
+
+            @Override
+            public void readRow(BindingSet bindingSet) throws ResultSetReaderException {
+                Value fileValue = bindingSet.getValue("file");
+                Value titleValue = bindingSet.getValue("title");
+                Value lastModifiedValue = bindingSet.getValue("lastModified");
+
+                UploadDTO uploadDTO = new UploadDTO(fileValue.stringValue());
+                uploadDTO.setLabel(titleValue.stringValue());
+                uploadDTO.setDateModified(lastModifiedValue.stringValue());
+
+                result.add(uploadDTO);
+            }
+
+        };
+        executeSPARQL(sb.toString(), null, reader);
+        return reader.getResultList();
+    }
+
     /*
      * (non-Javadoc)
      *
@@ -1886,4 +1935,5 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         String result = executeUniqueResultSPARQL(sparql.toString(), null, new SingleObjectReader<String>());
         return Integer.parseInt(result);
     }
+
 }

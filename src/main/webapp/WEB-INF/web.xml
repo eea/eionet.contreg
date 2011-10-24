@@ -22,22 +22,22 @@
     </context-param>
 
     <context-param>
-	<param-name>templateCacheFolder</param-name>
-	<param-value>${application.eea.template.folder}</param-value>
+    <param-name>templateCacheFolder</param-name>
+    <param-value>${application.eea.template.folder}</param-value>
     </context-param>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!--              filters                   -->
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
-	<filter>
-		<filter-name>HomeContentTypeFilter</filter-name>
-		<filter-class>eionet.cr.web.filters.HomeContentTypeFilter</filter-class>
-	</filter>
-	<filter-mapping>
-		<filter-name>HomeContentTypeFilter</filter-name>
-		<url-pattern>/home/*</url-pattern>
-	</filter-mapping>
+    <filter>
+        <filter-name>HomeContentTypeFilter</filter-name>
+        <filter-class>eionet.cr.web.filters.HomeContentTypeFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>HomeContentTypeFilter</filter-name>
+        <url-pattern>/home/*</url-pattern>
+    </filter-mapping>
 
     <filter>
         <description>
@@ -173,6 +173,10 @@
     <servlet-mapping>
         <servlet-name>StripesDispatcher</servlet-name>
         <url-pattern>/documentation/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>StripesDispatcher</servlet-name>
+        <url-pattern>/sitemap.xml</url-pattern>
     </servlet-mapping>
 
     <!--  XmlRpcServlet (for XML-RPC 3) -->

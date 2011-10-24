@@ -86,7 +86,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
 
         // create query helper
         VirtuosoFreeTextSearchHelper helper =
-            new VirtuosoFreeTextSearchHelper(expression, virtQuery, exactMatch, pagingRequest, sortingRequest);
+                new VirtuosoFreeTextSearchHelper(expression, virtQuery, exactMatch, pagingRequest, sortingRequest);
 
         // Set Filter
         helper.setFilter(filterType);
@@ -146,7 +146,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
     @Override
     public Pair<Integer, List<SubjectDTO>> searchByFilters(Map<String, String> filters, boolean checkFiltersRange,
             PagingRequest pagingRequest, SortingRequest sortingRequest, List<String> selectPredicates, boolean useInference)
-            throws DAOException {
+                    throws DAOException {
 
         // create query helper
         Set<String> literalRangeFilters = null;
@@ -154,7 +154,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
             literalRangeFilters = DAOFactory.get().getDao(HelperDAO.class).getLiteralRangeSubjects(filters.keySet());
         }
         VirtuosoFilteredSearchHelper helper =
-            new VirtuosoFilteredSearchHelper(filters, literalRangeFilters, pagingRequest, sortingRequest, useInference);
+                new VirtuosoFilteredSearchHelper(filters, literalRangeFilters, pagingRequest, sortingRequest, useInference);
 
         // create the list of IN parameters of the query
 
@@ -214,7 +214,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
         CustomPaginatedList<DeliveryDTO> ret = new CustomPaginatedList<DeliveryDTO>();
 
         VirtuosoDeliveriesSearchHelper helper =
-            new VirtuosoDeliveriesSearchHelper(obligation, locality, year, pagingRequest, sortingRequest);
+                new VirtuosoDeliveriesSearchHelper(obligation, locality, year, pagingRequest, sortingRequest);
 
         // let the helper create the query and fill IN parameters
         ArrayList<Object> inParams = new ArrayList<Object>();
