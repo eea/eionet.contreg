@@ -23,7 +23,6 @@ package eionet.cr.dao.readers;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 import eionet.cr.util.export.SubjectExportEvent;
@@ -34,12 +33,6 @@ import eionet.cr.util.export.SubjectExportEvent;
  *
  */
 public abstract class ResultSetExportReader<T> extends ResultSetMixedReader<T> {
-
-    /** */
-    protected List<T> resultList = new ArrayList<T>();
-
-    /** */
-    protected ResultSetMetaData resultSetMetaData;
 
     /** */
     protected SubjectExportEvent exporter = null;

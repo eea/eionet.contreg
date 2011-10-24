@@ -73,7 +73,6 @@ public class CopyPostgreSQLTablesToVirtuoso {
                 if (rs.getRow() % 10000 == 0) {
                     stmt2.executeBatch();
                     stmt2.clearBatch();
-                    System.gc();
                 }
                 stmt2.setInt(1, rs.getInt("harvest_source_id"));
                 stmt2.setLong(2, rs.getLong("url_hash"));
@@ -127,7 +126,6 @@ public class CopyPostgreSQLTablesToVirtuoso {
                 if (rs.getRow() % 10000 == 0) {
                     stmt2.executeBatch();
                     stmt2.clearBatch();
-                    System.gc();
                 }
                 stmt2.setInt(1, rs.getInt("harvest_message_id"));
                 stmt2.setInt(2, rs.getInt("harvest_id"));
@@ -170,7 +168,6 @@ public class CopyPostgreSQLTablesToVirtuoso {
                 if (rs.getRow() % 10000 == 0) {
                     stmt2.executeBatch();
                     stmt2.clearBatch();
-                    System.gc();
                 }
                 stmt2.setInt(1, rs.getInt("harvest_id"));
                 stmt2.setInt(2, rs.getInt("harvest_source_id"));
@@ -219,7 +216,6 @@ public class CopyPostgreSQLTablesToVirtuoso {
                 if (rs.getRow() % 10000 == 0) {
                     stmt2.executeBatch();
                     stmt2.clearBatch();
-                    System.gc();
                 }
                 stmt2.setString(1, rs.getString("page_id"));
                 stmt2.setString(2, rs.getString("content_type"));
@@ -261,7 +257,6 @@ public class CopyPostgreSQLTablesToVirtuoso {
                 if (rs.getRow() % 10000 == 0) {
                     stmt2.executeBatch();
                     stmt2.clearBatch();
-                    System.gc();
                 }
                 stmt2.setString(1, rs.getString("url"));
                 stmt2.setTimestamp(2, rs.getTimestamp("timestamp"));
@@ -302,7 +297,6 @@ public class CopyPostgreSQLTablesToVirtuoso {
                 if (rs.getRow() % 10000 == 0) {
                     stmt2.executeBatch();
                     stmt2.clearBatch();
-                    System.gc();
                 }
                 stmt2.setLong(1, rs.getLong("subject"));
                 stmt2.setString(2, rs.getString("obj_lang"));

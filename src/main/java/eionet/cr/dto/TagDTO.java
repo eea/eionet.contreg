@@ -67,7 +67,10 @@ public class TagDTO implements Serializable {
         this.scale = scale;
     }
 
-    @Override
+    /*
+     * (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
@@ -112,5 +115,18 @@ public class TagDTO implements Serializable {
                 return countComparison;
             }
         }
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + count;
+        result = prime * result + scale;
+        result = prime * result + ((tag == null) ? 0 : tag.hashCode());
+        return result;
     }
 }

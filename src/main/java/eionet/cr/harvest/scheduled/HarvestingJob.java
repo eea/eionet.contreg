@@ -257,7 +257,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
      *
      * @return list containing the activeHours
      */
-    public static List<HourSpan> getBatchHarvestingHours() {
+    public static synchronized List<HourSpan> getBatchHarvestingHours() {
 
         if (batchHarvestingHours == null) {
 

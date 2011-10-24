@@ -79,13 +79,25 @@ public class UriLabelPair implements Comparable {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     *
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((label == null) ? 0 : label.hashCode());
+        result = prime * result + ((uri == null) ? 0 : uri.hashCode());
+        return result;
+    }
+
+    /* (non-Javadoc)
      * @see java.lang.Object#equals(java.lang.Object)
      */
-    public boolean equals(Object o) {
-        return compareTo(o) == 0;
+    @Override
+    public boolean equals(Object obj) {
+
+        return compareTo(obj) == 0;
     }
 
     /**

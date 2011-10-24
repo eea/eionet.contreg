@@ -234,13 +234,6 @@ public abstract class AbstractHomeActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param tabs
-     */
-    public void setTabs(List<Map<String, String>> tabs) {
-        AbstractHomeActionBean.tabs = tabs;
-    }
-
-    /**
      * @return
      */
     public Map<String, List<SearchResultColumn>> getTypescolumns() {

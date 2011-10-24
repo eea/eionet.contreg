@@ -136,11 +136,11 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
         populateSelectedFilters();
         long startTime = System.currentTimeMillis();
         Pair<Integer, List<SubjectDTO>> result =
-                DAOFactory
-                        .get()
-                        .getDao(SearchDAO.class)
-                        .searchByFilters(buildSearchCriteria(), true, PagingRequest.create(getPageN()),
-                                new SortingRequest(getSortP(), SortOrder.parse(getSortO())), null, true);
+            DAOFactory
+            .get()
+            .getDao(SearchDAO.class)
+            .searchByFilters(buildSearchCriteria(), true, PagingRequest.create(getPageN()),
+                    new SortingRequest(getSortP(), SortOrder.parse(getSortO())), null, true);
 
         logger.debug("It took " + (System.currentTimeMillis() - startTime) + " ms to execute custom search");
 
@@ -233,14 +233,14 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
             picklist = ApplicationCache.getInstruments();
         } else if (Predicates.CR_SCHEMA.equals(uri)) {
             picklist =
-                    factory.getDao(HelperDAO.class).getPicklistForPredicate(getAvailableFilters().get(picklistFilter).getUri(),
-                            false);
+                factory.getDao(HelperDAO.class).getPicklistForPredicate(getAvailableFilters().get(picklistFilter).getUri(),
+                        false);
         }
 
         if (picklist == null) {
             picklist =
-                    factory.getDao(HelperDAO.class).getPicklistForPredicate(getAvailableFilters().get(picklistFilter).getUri(),
-                            true);
+                factory.getDao(HelperDAO.class).getPicklistForPredicate(getAvailableFilters().get(picklistFilter).getUri(),
+                        true);
         }
 
         return picklist;
@@ -322,7 +322,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
     /**
      * @return the availableFilters
      */
-    public Map<String, CustomSearchFilter> getAvailableFilters() {
+    public synchronized Map<String, CustomSearchFilter> getAvailableFilters() {
 
         if (availableFilters == null) {
 

@@ -129,7 +129,7 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
         } else {
             String reviewString = splits[1];
             if (reviewString.contains("?")) {
-                reviewString = reviewString.split("?")[0];
+                reviewString = StringUtils.substringBefore(reviewString, "?");
             }
 
             try {
@@ -273,7 +273,7 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
             // (but set interval minutes to 0, to avoid it being
             // background-harvested)
             DAOFactory.get().getDao(HarvestSourceDAO.class)
-                    .addSourceIgnoreDuplicate(HarvestSourceDTO.create(reviewUri, true, 0, getUser().getUserName()));
+            .addSourceIgnoreDuplicate(HarvestSourceDTO.create(reviewUri, true, 0, getUser().getUserName()));
 
             // finally, attempt to harvest the uploaded file's contents
             harvestUploadedFile(attachmentUri, attachment, null, getUserName());
@@ -355,7 +355,7 @@ public class ReviewsActionBean extends AbstractHomeActionBean {
     public String getReviewContentHTML() {
         if (review.getReviewContent() != null) {
             return review.getReviewContent().replace("&", "&amp;").replace("<", "&lt;").replace("\r\n", "<br/>")
-                    .replace("\n", "<br/>");
+            .replace("\n", "<br/>");
         } else {
             return "";
         }

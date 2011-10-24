@@ -291,8 +291,8 @@ public abstract class BaseHarvest implements Harvest {
             for (PostHarvestScriptDTO scriptDto : scriptDtos) {
 
                 String scriptType =
-                        scriptDto.getTargetType() == null ? "all-source" : scriptDto.getTargetType().toString().toLowerCase()
-                                + "-specific";
+                    scriptDto.getTargetType() == null ? "all-source" : scriptDto.getTargetType().toString().toLowerCase()
+                            + "-specific";
                 LOGGER.debug(MessageFormat.format("Executing {0} post-harvest script with title: {1}", scriptType,
                         scriptDto.getTitle()));
 
@@ -334,7 +334,7 @@ public abstract class BaseHarvest implements Harvest {
         // add harvest statements
         int harvestedStatements = getHelperDAO().getHarvestedStatements(getContextUrl());
         ObjectDTO harvestedStatementsObject =
-                new ObjectDTO(Integer.toString(harvestedStatements), null, true, false, XMLSchema.INTEGER);
+            new ObjectDTO(Integer.toString(harvestedStatements), null, true, false, XMLSchema.INTEGER);
         harvestedStatementsObject.setSourceUri(GeneralConfig.HARVESTER_URI);
         sourceMetadata.addObject(Predicates.CR_HARVESTED_STATEMENTS, harvestedStatementsObject);
 
@@ -550,28 +550,30 @@ public abstract class BaseHarvest implements Harvest {
 
         // get the default harvest interval minutes
         int defaultHarvestIntervalMinutes =
-                Integer.parseInt(GeneralConfig.getProperty(GeneralConfig.HARVESTER_REFERRALS_INTERVAL,
-                        String.valueOf(HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL)));
+            Integer.parseInt(GeneralConfig.getProperty(GeneralConfig.HARVESTER_REFERRALS_INTERVAL,
+                    String.valueOf(HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL)));
 
         // derive URLs of new harvest sources from content in this context
         List<String> newSources = getHarvestSourceDAO().getNewSources(getContextUrl());
         LOGGER.debug((newSources == null ? 0 : newSources.size()) + " new harvest sources found");
 
         // loop over derived URIs, create new harvest source for each one
-        for (String sourceUrl : newSources) {
+        if (newSources!=null){
+            for (String sourceUrl : newSources) {
 
-            // sanitize URL by removing fragment part and escaping spaces
-            sourceUrl = StringUtils.substringBefore(sourceUrl, "#");
-            sourceUrl = URLUtil.replaceURLSpaces(sourceUrl);
+                // sanitize URL by removing fragment part and escaping spaces
+                sourceUrl = StringUtils.substringBefore(sourceUrl, "#");
+                sourceUrl = URLUtil.replaceURLSpaces(sourceUrl);
 
-            // create new source DTO
-            HarvestSourceDTO sourceDTO = new HarvestSourceDTO();
-            sourceDTO.setUrl(sourceUrl);
-            sourceDTO.setUrlHash(Hashes.spoHash(sourceUrl));
-            sourceDTO.setIntervalMinutes(defaultHarvestIntervalMinutes);
+                // create new source DTO
+                HarvestSourceDTO sourceDTO = new HarvestSourceDTO();
+                sourceDTO.setUrl(sourceUrl);
+                sourceDTO.setUrlHash(Hashes.spoHash(sourceUrl));
+                sourceDTO.setIntervalMinutes(defaultHarvestIntervalMinutes);
 
-            // persist the new harvest source DTO
-            getHarvestSourceDAO().addSource(sourceDTO);
+                // persist the new harvest source DTO
+                getHarvestSourceDAO().addSource(sourceDTO);
+            }
         }
     }
 

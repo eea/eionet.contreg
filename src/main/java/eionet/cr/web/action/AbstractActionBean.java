@@ -61,7 +61,7 @@ public abstract class AbstractActionBean implements ActionBean {
     private static final String WARNING_MESSAGES = "warningMessages";
 
     /** */
-    protected static Log logger = LogFactory.getLog(AbstractActionBean.class);
+    protected static final Log logger = LogFactory.getLog(AbstractActionBean.class);
 
     /** */
     private CRActionBeanContext context;
@@ -97,7 +97,13 @@ public abstract class AbstractActionBean implements ActionBean {
      */
     @Override
     public void setContext(final ActionBeanContext context) {
-        this.context = (CRActionBeanContext) context;
+
+        if (context instanceof CRActionBeanContext){
+            this.context = (CRActionBeanContext) context;
+        }
+        else{
+            throw new IllegalArgumentException("Context must be that of " + CRActionBeanContext.class.getSimpleName());
+        }
     }
 
     /**
@@ -302,7 +308,7 @@ public abstract class AbstractActionBean implements ActionBean {
         boolean ret = false;
         String use = getContext().getInitParameter("useEeaTemplate");
         if (!StringUtils.isBlank(use)) {
-            ret = new Boolean(use).booleanValue();
+            ret = Boolean.valueOf(use).booleanValue();
         }
         return ret;
     }

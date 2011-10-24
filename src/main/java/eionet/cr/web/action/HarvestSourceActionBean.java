@@ -97,6 +97,12 @@ public class HarvestSourceActionBean extends AbstractActionBean {
         tabs.add(new Pair<String, String>("view", "View"));
         tabs.add(new Pair<String, String>("sampleTriples", "Sample triples"));
         tabs.add(new Pair<String, String>("history", "History"));
+
+        intervalMultipliers = new LinkedHashMap<Integer, String>();
+        intervalMultipliers.put(new Integer(1), "minutes");
+        intervalMultipliers.put(new Integer(60), "hours");
+        intervalMultipliers.put(new Integer(1440), "days");
+        intervalMultipliers.put(new Integer(10080), "weeks");
     }
 
     /**
@@ -169,8 +175,8 @@ public class HarvestSourceActionBean extends AbstractActionBean {
             prepareDTO();
             // populate sample triples
             sampleTriples =
-                    DAOFactory.get().getDao(HelperDAO.class)
-                            .getSampleTriplesInSource(harvestSource.getUrl(), PagingRequest.create(1, 10));
+                DAOFactory.get().getDao(HelperDAO.class)
+                .getSampleTriplesInSource(harvestSource.getUrl(), PagingRequest.create(1, 10));
         }
 
         return new ForwardResolution("/pages/viewsource.jsp");
@@ -424,14 +430,6 @@ public class HarvestSourceActionBean extends AbstractActionBean {
      * @return Map<Integer,String>
      */
     public Map<Integer, String> getIntervalMultipliers() {
-
-        if (intervalMultipliers == null) {
-            intervalMultipliers = new LinkedHashMap<Integer, String>();
-            intervalMultipliers.put(new Integer(1), "minutes");
-            intervalMultipliers.put(new Integer(60), "hours");
-            intervalMultipliers.put(new Integer(1440), "days");
-            intervalMultipliers.put(new Integer(10080), "weeks");
-        }
 
         return intervalMultipliers;
     }

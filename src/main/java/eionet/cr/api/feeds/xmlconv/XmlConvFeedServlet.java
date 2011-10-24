@@ -21,6 +21,7 @@
 package eionet.cr.api.feeds.xmlconv;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,7 +71,7 @@ public class XmlConvFeedServlet extends HttpServlet {
         response.setContentType("text/xml");
 
         try {
-            List<SubjectDTO> subjects = null;
+            List<SubjectDTO> subjects = new ArrayList<SubjectDTO>();
             String xmlSchema = request.getParameter(SCHEMA_PARAM);
             if (!StringUtils.isBlank(xmlSchema)) {
 
@@ -86,7 +87,7 @@ public class XmlConvFeedServlet extends HttpServlet {
             }
 
             SubjectsRDFWriter rdfWriter =
-                    new SubjectsRDFWriter(request.getParameter(XmlConvFeedServlet.INCLUDE_DERIVED_VALUES) != null);
+                new SubjectsRDFWriter(request.getParameter(XmlConvFeedServlet.INCLUDE_DERIVED_VALUES) != null);
             rdfWriter.addNamespace(Namespace.CR);
             rdfWriter.addNamespace(Namespace.DC);
             rdfWriter.addNamespace(Namespace.OWL);
