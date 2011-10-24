@@ -18,14 +18,13 @@ public interface SQLResultSetReader<T> extends ResultSetReader<T> {
      *
      * @param resultSetMetaData
      */
-    public void startResultSet(ResultSetMetaData resultSetMetaData);
+    void startResultSet(ResultSetMetaData resultSetMetaData);
 
     /**
      *
      * @param rs
      * @throws SQLException
      * @throws ResultSetReaderException
-     *             TODO
      */
-    public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException;
+    void readRow(ResultSet rs) throws SQLException, ResultSetReaderException;
 }

@@ -18,11 +18,11 @@ public interface SPARQLResultSetReader<T> extends ResultSetReader<T> {
      *
      * @param bindingNames
      */
-    public void startResultSet(List<String> bindingNames);
+    void startResultSet(List<String> bindingNames);
 
     /**
      *
      * @param bindingSet
      */
-    public void readRow(BindingSet bindingSet) throws ResultSetReaderException;
+    void readRow(BindingSet bindingSet) throws ResultSetReaderException;
 }

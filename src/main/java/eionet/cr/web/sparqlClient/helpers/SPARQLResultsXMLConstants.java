@@ -13,39 +13,39 @@ package eionet.cr.web.sparqlClient.helpers;
  */
 interface SPARQLResultsXMLConstants {
 
-    public static final String NAMESPACE = "http://www.w3.org/2005/sparql-results#";
+    String NAMESPACE = "http://www.w3.org/2005/sparql-results#";
 
-    public static final String ROOT_TAG = "sparql";
+    String ROOT_TAG = "sparql";
 
-    public static final String HEAD_TAG = "head";
+    String HEAD_TAG = "head";
 
-    public static final String VAR_TAG = "variable";
+    String VAR_TAG = "variable";
 
-    public static final String VAR_NAME_ATT = "name";
+    String VAR_NAME_ATT = "name";
 
-    public static final String BOOLEAN_TAG = "boolean";
+    String BOOLEAN_TAG = "boolean";
 
-    public static final String BOOLEAN_TRUE = "true";
+    String BOOLEAN_TRUE = "true";
 
-    public static final String BOOLEAN_FALSE = "false";
+    String BOOLEAN_FALSE = "false";
 
-    public static final String RESULT_SET_TAG = "results";
+    String RESULT_SET_TAG = "results";
 
-    public static final String RESULT_TAG = "result";
+    String RESULT_TAG = "result";
 
-    public static final String BINDING_TAG = "binding";
+    String BINDING_TAG = "binding";
 
-    public static final String BINDING_NAME_ATT = "name";
+    String BINDING_NAME_ATT = "name";
 
-    public static final String URI_TAG = "uri";
+    String URI_TAG = "uri";
 
-    public static final String BNODE_TAG = "bnode";
+    String BNODE_TAG = "bnode";
 
-    public static final String LITERAL_TAG = "literal";
+    String LITERAL_TAG = "literal";
 
-    public static final String LITERAL_LANG_ATT = "xml:lang";
+    String LITERAL_LANG_ATT = "xml:lang";
 
-    public static final String LITERAL_DATATYPE_ATT = "datatype";
+    String LITERAL_DATATYPE_ATT = "datatype";
 
-    public static final String UNBOUND_TAG = "unbound";
+    String UNBOUND_TAG = "unbound";
 }

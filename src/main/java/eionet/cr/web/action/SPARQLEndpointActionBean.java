@@ -323,7 +323,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         Resolution resolution = null;
         if (useInferencing && !StringUtils.isBlank(query)) {
             String infCommand =
-                    "DEFINE input:inference '" + GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME) + "'";
+                "DEFINE input:inference '" + GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME) + "'";
 
             // if inference command not yet present in the query, add it
             if (query.indexOf(infCommand) == -1) {
@@ -743,7 +743,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      * @param bookmarkName
      * @return
      */
-    private static final String buildBookmarkUri(CRUser user, String bookmarkName) {
+    private static String buildBookmarkUri(CRUser user, String bookmarkName) {
 
         return new StringBuilder(user.getBookmarksUri()).append("/").append(Hashes.spoHash(bookmarkName)).toString();
     }

@@ -28,21 +28,21 @@ package eionet.cr.web.util;
 public interface WebConstants {
 
     /** CR user session attribute name. */
-    public static final String USER_SESSION_ATTR = "crUser";
+    String USER_SESSION_ATTR = "crUser";
 
     /** Specifies login action constant value. */
-    public static final String LOGIN_ACTION = "/login.action";
+    String LOGIN_ACTION = "/login.action";
 
-    public static final String MAIN_PAGE_ACTION = "/";
+    String MAIN_PAGE_ACTION = "/";
 
     /** Specifies login event name. */
-    public static final String LOGIN_EVENT = "login";
+    String LOGIN_EVENT = "login";
 
     /** Specifies logout event name. */
-    public static final String LOGOUT_EVENT = "logout";
+    String LOGOUT_EVENT = "logout";
 
     /** Specifies presentation value for not logged in user. */
-    public static final String ANONYMOUS_USER_NAME = "anononymous";
+    String ANONYMOUS_USER_NAME = "anononymous";
 
     /** Specifies session attribute name where last action URL is kept. */
     String LAST_ACTION_URL_SESSION_ATTR = "ActionEventInterceptor#lastActionUrl";

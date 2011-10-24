@@ -32,5 +32,5 @@ public interface Formatter {
      * @param object
      * @return
      */
-    public String format(Object object);
+    String format(Object object);
 }
