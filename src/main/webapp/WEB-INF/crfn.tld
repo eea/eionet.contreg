@@ -20,7 +20,7 @@
         </description>
         <display-name>form</display-name>
         <name>form</name>
-        <tag-class>eionet.cr.web.util.FormTag</tag-class>
+        <tag-class>eionet.cr.web.util.CRFormTag</tag-class>
         <body-content>JSP</body-content>
 
         <attribute>
