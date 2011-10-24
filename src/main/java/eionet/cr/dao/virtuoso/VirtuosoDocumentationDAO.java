@@ -3,7 +3,7 @@
  */
 package eionet.cr.dao.virtuoso;
 
-import java.sql.Blob;
+import java.io.Reader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,6 +11,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.io.IOUtils;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DocumentationDAO;
@@ -44,14 +46,13 @@ public class VirtuosoDocumentationDAO extends VirtuosoBaseDAO implements Documen
                 ret = new DocumentationDTO();
                 ret.setPageId(pageId);
                 ret.setContentType(rs.getString("content_type"));
-                Blob blobcontent = rs.getBlob("content");
-                if (blobcontent != null) {
-                    String content = new String(blobcontent.getBytes(1l, (int) blobcontent.length()));
-                    ret.setContent(content);
+                Reader reader = rs.getCharacterStream("content");
+                if (reader != null) {
+                    ret.setContent(IOUtils.toString(reader));
                 }
                 ret.setTitle(rs.getString("title"));
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
             throw new DAOException(e.toString(), e);
         } finally {
             SQLUtil.close(rs);
