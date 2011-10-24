@@ -47,7 +47,7 @@ public interface UserHomeDAO extends DAO {
      * @return
      * @throws DAOException
      */
-    public Pair<Integer, List<UserFolderDTO>> getFolderContents(String parentFolder, Map<String, String> filters,
+    Pair<Integer, List<UserFolderDTO>> getFolderContents(String parentFolder, Map<String, String> filters,
             PagingRequest pagingRequest, SortingRequest sortingRequest, List<String> selectedPredicates) throws DAOException;
 
     /**
@@ -58,5 +58,5 @@ public interface UserHomeDAO extends DAO {
      * @return true if user folder is already registered
      * @throws DAOException
      */
-    public boolean isUserFolderRegisteredInCrHomeContext(CRUser user) throws DAOException;
+    boolean isUserFolderRegisteredInCrHomeContext(CRUser user) throws DAOException;
 }

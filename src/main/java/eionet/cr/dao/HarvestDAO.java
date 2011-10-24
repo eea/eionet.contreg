@@ -41,7 +41,7 @@ public interface HarvestDAO extends DAO {
      * @return int
      * @throws DAOException
      */
-    public int insertStartedHarvest(int harvestSourceId, String harvestType, String user, String status) throws DAOException;
+    int insertStartedHarvest(int harvestSourceId, String harvestType, String user, String status) throws DAOException;
 
     /**
      *
@@ -49,7 +49,7 @@ public interface HarvestDAO extends DAO {
      * @param noOfTriples
      * @throws DAOException
      */
-    public void updateFinishedHarvest(int harvestId, int noOfTriples) throws DAOException;
+    void updateFinishedHarvest(int harvestId, int noOfTriples) throws DAOException;
 
     /**
      *
@@ -57,7 +57,7 @@ public interface HarvestDAO extends DAO {
      * @return List<HarvestDTO>
      * @throws DAOException
      */
-    public List<HarvestDTO> getHarvestsBySourceId(Integer harvestSourceId) throws DAOException;
+    List<HarvestDTO> getHarvestsBySourceId(Integer harvestSourceId) throws DAOException;
 
     /**
      * Returns list of the last harvests statistics.
@@ -67,7 +67,7 @@ public interface HarvestDAO extends DAO {
      * @return List<HarvestStatDTO>
      * @throws DAOException
      */
-    public List<HarvestStatDTO> getLastHarvestStats(Integer limit) throws DAOException;
+    List<HarvestStatDTO> getLastHarvestStats(Integer limit) throws DAOException;
 
     /**
      *
@@ -75,7 +75,7 @@ public interface HarvestDAO extends DAO {
      * @return HarvestDTO
      * @throws DAOException
      */
-    public HarvestDTO getHarvestById(Integer harvestId) throws DAOException;
+    HarvestDTO getHarvestById(Integer harvestId) throws DAOException;
 
     /**
      *
@@ -83,7 +83,7 @@ public interface HarvestDAO extends DAO {
      * @return HarvestDTO
      * @throws DAOException
      */
-    public HarvestDTO getLastHarvestBySourceId(Integer harvestSourceId) throws DAOException;
+    HarvestDTO getLastHarvestBySourceId(Integer harvestSourceId) throws DAOException;
 
     /**
      * Deletes all the old harvest of the current harvest's harvest source, except the most recent.
@@ -94,6 +94,6 @@ public interface HarvestDAO extends DAO {
      *            nr of most recent messages to preserve
      * @throws DAOException
      */
-    public void deleteOldHarvests(int harvestId, int preserveRecent) throws DAOException;
+    void deleteOldHarvests(int harvestId, int preserveRecent) throws DAOException;
 
 }

@@ -35,31 +35,31 @@ public interface UrgentHarvestQueueDAO extends DAO {
      *
      * @throws DAOException
      */
-    public abstract void addPullHarvests(List<UrgentHarvestQueueItemDTO> queueItems) throws DAOException;
+    void addPullHarvests(List<UrgentHarvestQueueItemDTO> queueItems) throws DAOException;
 
     /**
      *
      * @param queueItem
      * @throws DAOException
      */
-    public abstract void addPushHarvest(UrgentHarvestQueueItemDTO queueItem) throws DAOException;
+    void addPushHarvest(UrgentHarvestQueueItemDTO queueItem) throws DAOException;
 
     /**
      *
      * @return
      */
-    public abstract List<UrgentHarvestQueueItemDTO> getUrgentHarvestQueue() throws DAOException;
+    List<UrgentHarvestQueueItemDTO> getUrgentHarvestQueue() throws DAOException;
 
     /**
      *
      * @return
      * @throws DAOException
      */
-    public abstract UrgentHarvestQueueItemDTO poll() throws DAOException;
+    UrgentHarvestQueueItemDTO poll() throws DAOException;
 
     /**
      *
      * @param url
      */
-    public boolean isInQueue(String url);
+    boolean isInQueue(String url);
 }

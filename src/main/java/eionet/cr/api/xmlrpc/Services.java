@@ -36,7 +36,7 @@ import eionet.cr.common.CRException;
 public interface Services {
 
     /** */
-    public static final String OK_RETURN_STRING = "OK";
+    String OK_RETURN_STRING = "OK";
 
     /**
      * This service returns metadata of all resources whose rdf:type is http://cr.eionet.europa.eu/ontologies/contreg.rdf#File and
@@ -46,7 +46,7 @@ public interface Services {
      * @return
      * @throws CRException
      */
-    public abstract List getResourcesSinceTimestamp(Date timestamp) throws CRException;
+    List getResourcesSinceTimestamp(Date timestamp) throws CRException;
 
     /**
      * Returns an array of eionet.qawcommons.DataflowResultDto objects, where each represents a resource that matches the given
@@ -57,7 +57,7 @@ public interface Services {
      * @return
      * @throws CRException
      */
-    public abstract List dataflowSearch(Map<String, String> criteria) throws CRException;
+    List dataflowSearch(Map<String, String> criteria) throws CRException;
 
     /**
      * This method enables to push RDF content under particular harvest source in CR.
@@ -67,7 +67,7 @@ public interface Services {
      * @return
      * @throws CRException
      */
-    public abstract String pushContent(String content, String sourceUri) throws CRException;
+    String pushContent(String content, String sourceUri) throws CRException;
 
     /**
      * This service implements what getEntries did in the old Content Registry. It used to be called by ROD, but is now deprecated
@@ -87,7 +87,7 @@ public interface Services {
      * @return
      * @throws CRException
      */
-    public abstract Vector getEntries(Hashtable criteria) throws CRException;
+    Vector getEntries(Hashtable criteria) throws CRException;
 
     /**
      * Returns metadata of resources which have a triple where the predicate is
@@ -104,7 +104,7 @@ public interface Services {
      * @return
      * @throws CRException
      */
-    public Vector getXmlFilesBySchema(String schemaIdentifier) throws CRException;
+    Vector getXmlFilesBySchema(String schemaIdentifier) throws CRException;
 
     /**
      * This service is currently used by ROD to get the list of deliveries registered in CR. ROD uses this to keep itself up to date
@@ -117,5 +117,5 @@ public interface Services {
      * @return
      * @throws CRException
      */
-    public Vector getDeliveries(Integer pageNum, Integer pageSize) throws CRException;
+    Vector getDeliveries(Integer pageNum, Integer pageSize) throws CRException;
 }

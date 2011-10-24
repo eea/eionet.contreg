@@ -29,8 +29,12 @@ import eionet.cr.dto.TagDTO;
  * @author <a href="mailto:enriko.kasper@tieto.com">Enriko Käsper</a>
  *
  */
-
 public interface TagsDAO extends DAO {
 
-    public List<TagDTO> getTagCloud() throws DAOException;
+    /**
+     *
+     * @return
+     * @throws DAOException
+     */
+    List<TagDTO> getTagCloud() throws DAOException;
 }

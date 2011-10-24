@@ -18,7 +18,7 @@ public interface DocumentationDAO extends DAO {
      * @return DocumentationDTO
      * @throws DAOException
      */
-    public DocumentationDTO getDocObject(String pageId) throws DAOException;
+    DocumentationDTO getDocObject(String pageId) throws DAOException;
 
     /**
      * Return object from documentation table
@@ -27,7 +27,7 @@ public interface DocumentationDAO extends DAO {
      * @return List<DocumentationDTO>
      * @throws DAOException
      */
-    public List<DocumentationDTO> getDocObjects(boolean htmlOnly) throws DAOException;
+    List<DocumentationDTO> getDocObjects(boolean htmlOnly) throws DAOException;
 
     /**
      * @param pageId
@@ -36,7 +36,7 @@ public interface DocumentationDAO extends DAO {
      * @param title
      * @throws DAOException
      */
-    public void insertContent(String pageId, String contentType, String fileName, String title) throws DAOException;
+    void insertContent(String pageId, String contentType, String fileName, String title) throws DAOException;
 
     /**
      * Checks if such page_id already exists in database
@@ -45,6 +45,5 @@ public interface DocumentationDAO extends DAO {
      * @return boolean
      * @throws DAOException
      */
-    public boolean idExists(String pageId) throws DAOException;
-
+    boolean idExists(String pageId) throws DAOException;
 }
