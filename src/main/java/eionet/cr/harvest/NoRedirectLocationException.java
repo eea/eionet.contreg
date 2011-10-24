@@ -21,8 +21,6 @@
 
 package eionet.cr.harvest;
 
-import eionet.cr.harvest.HarvestException;
-
 /**
  *
  * @author Jaanus Heinlaid
