@@ -14,10 +14,10 @@ public interface ResultSetReader<T> {
      *
      * @return
      */
-    public List<T> getResultList();
+    List<T> getResultList();
 
     /**
      *
      */
-    public void endResultSet();
+    void endResultSet();
 }

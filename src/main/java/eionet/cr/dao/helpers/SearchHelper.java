@@ -36,19 +36,19 @@ public interface SearchHelper {
      * @param inParams
      * @return
      */
-    public abstract String getQuery(List<Object> inParams);
+    String getQuery(List<Object> inParams);
 
     /**
      *
      * @param inParams
      * @return
      */
-    public abstract String getCountQuery(List<Object> inParams);
+    String getCountQuery(List<Object> inParams);
 
     /**
      * Bindings of the search query.
      *
      * @return filled query bindings for the query to be used in the PreparedStatement
      */
-    public abstract Bindings getQueryBindings();
+    Bindings getQueryBindings();
 }

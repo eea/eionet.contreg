@@ -40,5 +40,5 @@ public interface ARPSource {
      * @throws IOException
      * @throws SAXException
      */
-    public void load(ARP arp, String sourceUrlString) throws SAXException, IOException;
+    void load(ARP arp, String sourceUrlString) throws SAXException, IOException;
 }
