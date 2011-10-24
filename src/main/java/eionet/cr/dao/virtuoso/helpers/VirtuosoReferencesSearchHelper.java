@@ -62,9 +62,9 @@ public class VirtuosoReferencesSearchHelper extends AbstractSearchHelper {
         }
         if (Predicates.RDFS_LABEL.equals(sortPredicate)) {
             sparql +=
-                "(bif:either( bif:isnull(?oorderby) , "
-                + "(bif:lcase(bif:subseq (bif:replace (?s, '/', '#'), bif:strrchr (bif:replace (?s, '/', '#'), '#')+1))) , "
-                + "bif:lcase(?oorderby)))";
+                    "(bif:either( bif:isnull(?oorderby) , "
+                            + "(bif:lcase(bif:subseq (bif:replace (?s, '/', '#'), bif:strrchr (bif:replace (?s, '/', '#'), '#')+1))) , "
+                            + "bif:lcase(?oorderby)))";
             // kind of hack - ReferringPredicatesColumn class name is neither a predicate or URI.
             // It is not used in sparql so we can love with it for a while
         } else if (ReferringPredicatesColumn.class.getSimpleName().equals(sortPredicate)) {
@@ -80,7 +80,7 @@ public class VirtuosoReferencesSearchHelper extends AbstractSearchHelper {
      * SPARQL for unordered references of the subject.
      */
     private static final String REFERENCES_UNORDERED_SPARQL = "select distinct ?s where "
-        + "{?s ?p ?o. filter(isURI(?o) && ?o=?subjectUri)}";
+            + "{?s ?p ?o. filter(isURI(?o) && ?o=?subjectUri)}";
 
     @Override
     public String getUnorderedQuery(List<Object> inParams) {
@@ -92,7 +92,7 @@ public class VirtuosoReferencesSearchHelper extends AbstractSearchHelper {
      */
 
     private static final String REFERENCES_COUNT_SPARQL = "select count(distinct ?s) "
-        + "where {?s ?p ?o. filter(isURI(?o) && ?o=?subjectUri)}";
+            + "where {?s ?p ?o. filter(isURI(?o) && ?o=?subjectUri)}";
 
     @Override
     public String getCountQuery(List<Object> inParams) {
@@ -117,8 +117,8 @@ public class VirtuosoReferencesSearchHelper extends AbstractSearchHelper {
         subjectDataBindings.setURI("sourceUri", sourceUri);
         String subjectUrisCSV = SPARQLQueryUtil.urisToCSV(subjectUris, "subjectUriValue", subjectDataBindings);
         String sparql =
-            "select * where {graph ?g {?s ?p ?o. filter (?s IN (" + subjectUrisCSV + ")) " + ". filter(?p = <"
-            + Predicates.RDF_TYPE + "> || (isURI(?o) && ?o=?sourceUri))}} ORDER BY ?s";
+                "select * where {graph ?g {?s ?p ?o. filter (?s IN (" + subjectUrisCSV + ")) " + ". filter(?p = <"
+                        + Predicates.RDF_TYPE + "> || (isURI(?o) && ?o=?sourceUri))}} ORDER BY ?s";
 
         return sparql;
     }

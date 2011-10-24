@@ -85,13 +85,12 @@ public class DeliverySearchActionBean extends DisplaytagSearchActionBean {
      */
     public Resolution search() throws DAOException {
 
-        deliveries = DAOFactory.get().getDao(SearchDAO.class).searchDeliveries(
-                obligation,
-                locality,
-                year,
-                sort,
-                PagingRequest.create(page),
-                new SortingRequest(columns.get(sort), SortOrder.parse(dir)));
+        deliveries =
+                DAOFactory
+                        .get()
+                        .getDao(SearchDAO.class)
+                        .searchDeliveries(obligation, locality, year, sort, PagingRequest.create(page),
+                                new SortingRequest(columns.get(sort), SortOrder.parse(dir)));
 
         return new ForwardResolution("/pages/deliverySearch.jsp");
     }

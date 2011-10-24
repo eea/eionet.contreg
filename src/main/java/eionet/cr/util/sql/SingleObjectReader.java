@@ -68,9 +68,9 @@ public class SingleObjectReader<T> extends ResultSetMixedReader<T> {
 
                 Value value = binding.getValue();
                 String stringValue = value.stringValue();
-                if (!StringUtils.isBlank(stringValue)){
+                if (!StringUtils.isBlank(stringValue)) {
 
-                    if (value instanceof BNode){
+                    if (value instanceof BNode) {
                         if (blankNodeUriPrefix != null && !stringValue.startsWith(blankNodeUriPrefix)) {
                             stringValue = blankNodeUriPrefix + stringValue;
                         }
@@ -85,4 +85,3 @@ public class SingleObjectReader<T> extends ResultSetMixedReader<T> {
         }
     }
 }
-

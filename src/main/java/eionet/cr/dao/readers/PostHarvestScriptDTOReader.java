@@ -35,7 +35,7 @@ import eionet.cr.util.sql.SQLResultSetBaseReader;
  *
  * @author Jaanus Heinlaid
  */
-public class PostHarvestScriptDTOReader extends SQLResultSetBaseReader<PostHarvestScriptDTO>{
+public class PostHarvestScriptDTOReader extends SQLResultSetBaseReader<PostHarvestScriptDTO> {
 
     /**
      * @see eionet.cr.util.sql.SQLResultSetReader#readRow(java.sql.ResultSet)
@@ -48,11 +48,10 @@ public class PostHarvestScriptDTOReader extends SQLResultSetBaseReader<PostHarve
 
         TargetType targetType = null;
         String targetUrl = null;
-        if (!StringUtils.isBlank(targetSourceUrl)){
+        if (!StringUtils.isBlank(targetSourceUrl)) {
             targetType = TargetType.SOURCE;
             targetUrl = targetSourceUrl;
-        }
-        else if (!StringUtils.isBlank(targetTypeUrl)){
+        } else if (!StringUtils.isBlank(targetTypeUrl)) {
             targetType = TargetType.TYPE;
             targetUrl = targetTypeUrl;
         }

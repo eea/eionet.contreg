@@ -102,17 +102,16 @@ public class FactsheetReader extends SPARQLResultSetBaseReader<FactsheetDTO> {
         String graphUri = StringUtils.isBlank(split[5]) ? null : split[5].trim();
 
         ObjectDTO objectDTO = null;
-        if (isLiteral){
+        if (isLiteral) {
             // For some XML files there can be cases where label is null.
             // Just ignoring NullPointer in this case - needs further investigation
             if (label == null) {
                 label = "";
             }
             objectDTO = new ObjectDTO(label, language, true, false, datatype);
-        }
-        else{
+        } else {
             objectDTO = new ObjectDTO(objectUri, null, false, isAnonymous);
-            if (!StringUtils.isBlank(label) && !label.equals(objectUri)){
+            if (!StringUtils.isBlank(label) && !label.equals(objectUri)) {
                 ObjectDTO labelObjectDTO = new ObjectDTO(label, language, true, false, datatype);
                 objectDTO.setLabelObject(labelObjectDTO);
             }

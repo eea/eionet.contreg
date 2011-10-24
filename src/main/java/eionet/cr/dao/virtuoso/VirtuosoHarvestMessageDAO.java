@@ -66,7 +66,7 @@ public class VirtuosoHarvestMessageDAO extends VirtuosoBaseDAO implements Harves
 
     /** */
     private static final String q_insertHarvestMessage =
-        "insert into HARVEST_MESSAGE (HARVEST_ID, TYPE, MESSAGE, STACK_TRACE) values (?, ?, ?, ?)";
+            "insert into HARVEST_MESSAGE (HARVEST_ID, TYPE, MESSAGE, STACK_TRACE) values (?, ?, ?, ?)";
 
     /**
      * {@inheritDoc}

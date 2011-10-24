@@ -64,7 +64,7 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
     private static final String SCHEMAS = "schemas";
 
     /** */
-    private static final String[] EXCLUDE_FROM_SORT_AND_PAGING_URLS = { "harvest", "delete", "sourceUrl" };
+    private static final String[] EXCLUDE_FROM_SORT_AND_PAGING_URLS = {"harvest", "delete", "sourceUrl"};
 
     /** */
     public static final List<Pair<String, String>> sourceTypes;
@@ -141,8 +141,8 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
                 pair = factory.getDao(HarvestSourceDAO.class).getPrioritySources(filterString, pagingRequest, sortingRequest);
             } else if (UNAVAILABLE_TYPE.equals(type)) {
                 pair =
-                    factory.getDao(HarvestSourceDAO.class).getHarvestSourcesUnavailable(filterString, pagingRequest,
-                            sortingRequest);
+                        factory.getDao(HarvestSourceDAO.class).getHarvestSourcesUnavailable(filterString, pagingRequest,
+                                sortingRequest);
             } else if (FAILED_HARVESTS.equals(type)) {
                 pair = factory.getDao(HarvestSourceDAO.class).getHarvestSourcesFailed(filterString, pagingRequest, sortingRequest);
             } else if (SCHEMAS.equals(type)) {
@@ -150,8 +150,8 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
                 // inferencing ruleset
                 String sourceUris = factory.getDao(HarvestSourceDAO.class).getSourcesInInferenceRules();
                 pair =
-                    factory.getDao(HarvestSourceDAO.class).getInferenceSources(filterString, pagingRequest, sortingRequest,
-                            sourceUris);
+                        factory.getDao(HarvestSourceDAO.class).getInferenceSources(filterString, pagingRequest, sortingRequest,
+                                sourceUris);
             }
 
             if (pair != null) {
@@ -225,10 +225,9 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
                     HarvestSourceDTO source = factory.getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(url);
                     if (source != null) {
 
-                        if (CurrentHarvests.contains(url)){
+                        if (CurrentHarvests.contains(url)) {
                             currentlyHarvested.add(url);
-                        }
-                        else{
+                        } else {
                             if (userCanDelete(source)) {
                                 sourcesToDelete.add(url);
                             } else if (source.isPrioritySource()) {
@@ -268,7 +267,7 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
                     }
                     warnings.append("</ul>");
                 }
-                if (!currentlyHarvested.isEmpty()){
+                if (!currentlyHarvested.isEmpty()) {
                     warnings.append("The following sources could not be deleted, because they are curently being harvested: <ul>");
                     for (String url : currentlyHarvested) {
                         warnings.append("<li>").append(url).append("</li>");
@@ -372,6 +371,7 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
      */
     @Override

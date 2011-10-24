@@ -38,13 +38,13 @@ import org.apache.commons.lang.StringUtils;
 public class FactsheetDTO extends SubjectDTO {
 
     /** */
-    private HashMap<String,Integer> predicateObjectCounts = new HashMap<String,Integer>();
+    private HashMap<String, Integer> predicateObjectCounts = new HashMap<String, Integer>();
 
     /** */
-    //private Map<String,Integer> predicatePages;
+    // private Map<String,Integer> predicatePages;
 
     /** */
-    private Map<String,String> predicateLabels = new HashMap<String,String>();
+    private Map<String, String> predicateLabels = new HashMap<String, String>();
 
     /**
      * @param uri
@@ -59,7 +59,7 @@ public class FactsheetDTO extends SubjectDTO {
      * @param predicateUri
      * @param objectCount
      */
-    public void setObjectCount(String predicateUri, int objectCount){
+    public void setObjectCount(String predicateUri, int objectCount) {
         predicateObjectCounts.put(predicateUri, objectCount);
     }
 
@@ -68,7 +68,7 @@ public class FactsheetDTO extends SubjectDTO {
      * @param predicateUri
      * @param objectPage
      */
-    public void setObjectPage(String predicateUri, int objectPage){
+    public void setObjectPage(String predicateUri, int objectPage) {
         predicateObjectCounts.put(predicateUri, objectPage);
     }
 
@@ -91,7 +91,7 @@ public class FactsheetDTO extends SubjectDTO {
      * @param predicateUri
      * @param label
      */
-    public void addPredicateLabel(String predicateUri, String label){
+    public void addPredicateLabel(String predicateUri, String label) {
         predicateLabels.put(predicateUri, label);
     }
 
@@ -99,13 +99,13 @@ public class FactsheetDTO extends SubjectDTO {
      *
      * @return
      */
-    public LinkedHashMap<String, Collection<ObjectDTO>> getSortedPredicates(){
+    public LinkedHashMap<String, Collection<ObjectDTO>> getSortedPredicates() {
 
         ArrayList<String> predicateUris = new ArrayList<String>(getPredicates().keySet());
         Collections.sort(predicateUris, new PredicateComparator());
 
         LinkedHashMap<String, Collection<ObjectDTO>> result = new LinkedHashMap<String, Collection<ObjectDTO>>();
-        for (String predicateUri : predicateUris){
+        for (String predicateUri : predicateUris) {
             result.put(predicateUri, getObjects(predicateUri));
         }
         return result;
@@ -114,7 +114,7 @@ public class FactsheetDTO extends SubjectDTO {
     /**
      * @author Jaanus Heinlaid
      */
-    class PredicateComparator implements Comparator<String>{
+    class PredicateComparator implements Comparator<String> {
 
         /**
          * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
@@ -123,11 +123,11 @@ public class FactsheetDTO extends SubjectDTO {
         public int compare(String predicateUri1, String predicateUri2) {
 
             String label1 = predicateLabels.get(predicateUri1);
-            if (StringUtils.isBlank(label1)){
+            if (StringUtils.isBlank(label1)) {
                 label1 = predicateUri1;
             }
             String label2 = predicateLabels.get(predicateUri2);
-            if (StringUtils.isBlank(label2)){
+            if (StringUtils.isBlank(label2)) {
                 label2 = predicateUri2;
             }
 

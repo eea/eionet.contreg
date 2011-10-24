@@ -144,15 +144,13 @@ public class XmlAnalysis {
     }
 
     /**
-     * Method returns an URI by which conversions for the analyzed file should be looked for.
-     * If the file has a declared schema, it is returned. If not, then the method falls back
-     * to system DTD. If that one is not found either, the method falls back to public DTD.
-     * And should that one be missing too, the method returns fully qualified URI of the
-     * file's start element.
+     * Method returns an URI by which conversions for the analyzed file should be looked for. If the file has a declared schema, it
+     * is returned. If not, then the method falls back to system DTD. If that one is not found either, the method falls back to
+     * public DTD. And should that one be missing too, the method returns fully qualified URI of the file's start element.
      *
      * @return the result
      */
-    public String getConversionSchema(){
+    public String getConversionSchema() {
 
         // get schema URI, if it's not found then fall back to system DTD,
         // if it's not found then fall back to public DTD, and if still not
@@ -163,7 +161,7 @@ public class XmlAnalysis {
             result = getSystemDtd();
             if (StringUtils.isBlank(result)) {
                 result = getPublicDtd();
-                if (StringUtils.isBlank(result)){
+                if (StringUtils.isBlank(result)) {
                     result = getStartElemUri();
                 }
             }
@@ -355,8 +353,7 @@ public class XmlAnalysis {
             info.parse(new File("D:/temp/kala.xml"));
             System.out.println(info.getStartElemLocalName());
             System.out.println(info.getStartElemNamespace());
-        }
-        catch (Throwable t) {
+        } catch (Throwable t) {
             t.printStackTrace();
         }
     }

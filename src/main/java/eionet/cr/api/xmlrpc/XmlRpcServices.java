@@ -84,14 +84,14 @@ public class XmlRpcServices implements Services {
 
                 try {
                     Collection<SubjectDTO> subjects =
-                        DAOFactory.get().getDao(HelperDAO.class).getSubjectsNewerThan(timestamp, MAX_RESULTS);
+                            DAOFactory.get().getDao(HelperDAO.class).getSubjectsNewerThan(timestamp, MAX_RESULTS);
 
                     for (Iterator<SubjectDTO> subjectsIter = subjects.iterator(); subjectsIter.hasNext();) {
 
                         SubjectDTO subjectDTO = subjectsIter.next();
                         HashMap<String, String[]> map = new HashMap<String, String[]>();
                         for (Iterator<String> predicatesIter = subjectDTO.getPredicates().keySet().iterator(); predicatesIter
-                        .hasNext();) {
+                                .hasNext();) {
 
                             String predicate = predicatesIter.next();
                             map.put(predicate, toStringArray(subjectDTO.getObjects(predicate)));
@@ -143,8 +143,8 @@ public class XmlRpcServices implements Services {
         List<DataflowResultDto> result = new ArrayList<DataflowResultDto>();
         try {
             Pair<Integer, List<SubjectDTO>> search =
-                DAOFactory.get().getDao(SearchDAO.class)
-                .searchByFilters(criteria, false, PagingRequest.create(1, MAX_RESULTS), null, null, false);
+                    DAOFactory.get().getDao(SearchDAO.class)
+                            .searchByFilters(criteria, false, PagingRequest.create(1, MAX_RESULTS), null, null, false);
 
             String[] strArray = {};
             Collection<SubjectDTO> subjects = search.getRight();
@@ -228,8 +228,8 @@ public class XmlRpcServices implements Services {
         Vector result = new Vector();
         try {
             Pair<Integer, List<SubjectDTO>> search =
-                DAOFactory.get().getDao(SearchDAO.class)
-                .searchByFilters(criteria, false, PagingRequest.create(1, MAX_RESULTS), null, null, true);
+                    DAOFactory.get().getDao(SearchDAO.class)
+                            .searchByFilters(criteria, false, PagingRequest.create(1, MAX_RESULTS), null, null, true);
             Collection<SubjectDTO> subjects = search.getRight();
             if (subjects != null) {
                 for (Iterator<SubjectDTO> iter = subjects.iterator(); iter.hasNext();) {
@@ -237,7 +237,7 @@ public class XmlRpcServices implements Services {
                     SubjectDTO subjectDTO = iter.next();
                     Hashtable<String, Vector<String>> predicatesTable = new Hashtable<String, Vector<String>>();
                     for (Iterator<String> predicatesIter = subjectDTO.getPredicates().keySet().iterator(); predicatesIter
-                    .hasNext();) {
+                            .hasNext();) {
 
                         String predicate = predicatesIter.next();
                         predicatesTable.put(predicate, new Vector<String>(getLiteralValues(subjectDTO, predicate)));

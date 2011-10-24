@@ -88,7 +88,7 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
      */
     public Resolution delete() throws DAOException {
 
-        if (selectedIds!=null && !selectedIds.isEmpty()){
+        if (selectedIds != null && !selectedIds.isEmpty()) {
             DAOFactory.get().getDao(PostHarvestScriptDAO.class).delete(selectedIds);
             addSystemMessage("Selected script(s) successfully deleted!");
         }
@@ -103,7 +103,7 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
      */
     public Resolution activateDeactivate() throws DAOException {
 
-        if (selectedIds!=null && !selectedIds.isEmpty()){
+        if (selectedIds != null && !selectedIds.isEmpty()) {
             DAOFactory.get().getDao(PostHarvestScriptDAO.class).activateDeactivate(selectedIds);
             addSystemMessage("Selected script(s) successfully activated/deactivated!");
         }
@@ -116,7 +116,7 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
      * @return
      * @throws DAOException
      */
-    public Resolution moveUp() throws DAOException{
+    public Resolution moveUp() throws DAOException {
 
         DAOFactory.get().getDao(PostHarvestScriptDAO.class).move2(targetType, targetUrl, new HashSet(selectedIds), -1);
         return list();
@@ -127,7 +127,7 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
      * @return
      * @throws DAOException
      */
-    public Resolution moveDown() throws DAOException{
+    public Resolution moveDown() throws DAOException {
 
         DAOFactory.get().getDao(PostHarvestScriptDAO.class).move2(targetType, targetUrl, new HashSet(selectedIds), 1);
         return list();
@@ -137,7 +137,7 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
      *
      * @throws DAOException
      */
-    @ValidationMethod(on = {"delete","activateDeactivate","moveUp","moveDown"})
+    @ValidationMethod(on = {"delete", "activateDeactivate", "moveUp", "moveDown"})
     public void validateMove() throws DAOException {
 
         if (getUser() == null || !getUser().isAdministrator()) {
@@ -145,7 +145,7 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
             return;
         }
 
-        if (selectedIds==null || selectedIds.isEmpty()) {
+        if (selectedIds == null || selectedIds.isEmpty()) {
             addGlobalValidationError("At least one script must be selected!");
         }
 
@@ -183,7 +183,6 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
         return scripts;
     }
 
-
     /**
      * @return the tabs
      */
@@ -202,7 +201,6 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
         return tabs;
     }
 
-
     /**
      * @return the targetUrl
      */
@@ -211,15 +209,16 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param targetUrl the targetUrl to set
+     * @param targetUrl
+     *            the targetUrl to set
      */
     public void setTargetUrl(String targetUrl) {
         this.targetUrl = targetUrl;
     }
 
-
     /**
-     * @param selectedIds the selectedIds to set
+     * @param selectedIds
+     *            the selectedIds to set
      */
     public void setSelectedIds(List<Integer> selectedIds) {
         this.selectedIds = selectedIds;

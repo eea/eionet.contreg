@@ -68,12 +68,14 @@ public interface SearchDAO extends DAO {
      *            - sorting request
      * @param selectPredicates
      *            - predicates filter
-     * @param useInference if query uses inferencing. If inferencing is not needed it is reasoneable to switch it off
+     * @param useInference
+     *            if query uses inferencing. If inferencing is not needed it is reasoneable to switch it off
      * @return Pair<Integer, List<SubjectDTO>>
      * @throws DAOException
      */
     Pair<Integer, List<SubjectDTO>> searchByFilters(Map<String, String> filters, boolean checkFiltersRange,
-            PagingRequest pagingRequest, SortingRequest sortingRequest, List<String> selectPredicates, boolean useInference) throws DAOException;
+            PagingRequest pagingRequest, SortingRequest sortingRequest, List<String> selectPredicates, boolean useInference)
+            throws DAOException;
 
     /**
      *
@@ -98,7 +100,7 @@ public interface SearchDAO extends DAO {
      * @throws DAOException
      */
     Pair<Integer, List<SubjectDTO>> searchReferences(Long subjectHash, PagingRequest pagingRequest, SortingRequest sortingRequest)
-    throws DAOException;
+            throws DAOException;
 
     /**
      *

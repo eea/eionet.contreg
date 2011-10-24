@@ -517,11 +517,11 @@ public class SubjectDTO implements Serializable {
      *
      * @return
      */
-    public int getTripleCount(){
+    public int getTripleCount() {
 
         int result = 0;
-        for (Collection<ObjectDTO> objects : predicates.values()){
-            if (objects!=null){
+        for (Collection<ObjectDTO> objects : predicates.values()) {
+            if (objects != null) {
                 result = result + objects.size();
             }
         }
@@ -533,17 +533,17 @@ public class SubjectDTO implements Serializable {
      *
      * @return Set of distinct harvest source URIs.
      */
-    public Set<String> getSources(){
+    public Set<String> getSources() {
 
         HashSet<String> result = new HashSet<String>();
-        if (predicates!=null && !predicates.isEmpty()){
+        if (predicates != null && !predicates.isEmpty()) {
 
             Collection<Collection<ObjectDTO>> objectCollections = predicates.values();
             for (Collection<ObjectDTO> collection : objectCollections) {
 
-                if (collection!=null){
+                if (collection != null) {
                     for (ObjectDTO objectDTO : collection) {
-                        if (!StringUtils.isEmpty(objectDTO.getSourceUri())){
+                        if (!StringUtils.isEmpty(objectDTO.getSourceUri())) {
                             result.add(objectDTO.getSourceUri());
                         }
                     }

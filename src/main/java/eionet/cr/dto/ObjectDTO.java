@@ -159,11 +159,10 @@ public class ObjectDTO implements Serializable {
      */
     public String getLanguage() {
 
-        if (isLiteral()){
+        if (isLiteral()) {
             return language;
-        }
-        else{
-            return labelObject!=null ? labelObject.getLanguage() : null;
+        } else {
+            return labelObject != null ? labelObject.getLanguage() : null;
         }
     }
 
@@ -357,7 +356,7 @@ public class ObjectDTO implements Serializable {
      * @return the derviedLiteralValue
      */
     public String getDerviedLiteralValue() {
-        return labelObject==null ? derviedLiteralValue : labelObject.getValue();
+        return labelObject == null ? derviedLiteralValue : labelObject.getValue();
     }
 
     /**
@@ -404,7 +403,7 @@ public class ObjectDTO implements Serializable {
      * @param value
      * @return
      */
-    public static ObjectDTO createLiteral(String value){
+    public static ObjectDTO createLiteral(String value) {
         return new ObjectDTO(value, true);
     }
 
@@ -414,7 +413,7 @@ public class ObjectDTO implements Serializable {
      * @param datatype
      * @return
      */
-    public static ObjectDTO createLiteral(String value, URI datatype){
+    public static ObjectDTO createLiteral(String value, URI datatype) {
         return new ObjectDTO(value, true, datatype);
     }
 
@@ -423,7 +422,7 @@ public class ObjectDTO implements Serializable {
      * @param uri
      * @return
      */
-    public static ObjectDTO createResource(String uri){
+    public static ObjectDTO createResource(String uri) {
         return new ObjectDTO(uri, false);
     }
 
@@ -443,19 +442,19 @@ public class ObjectDTO implements Serializable {
      *
      * @return
      */
-    public String getDisplayValue(){
+    public String getDisplayValue() {
 
-        if (isLiteral()){
+        if (isLiteral()) {
             return value;
-        }
-        else{
+        } else {
             String displayValue = getDerviedLiteralValue();
             return StringUtils.isBlank(displayValue) ? value : displayValue;
         }
     }
 
     /**
-     * @param labelObject the labelObject to set
+     * @param labelObject
+     *            the labelObject to set
      */
     public void setLabelObject(ObjectDTO labelObject) {
         this.labelObject = labelObject;

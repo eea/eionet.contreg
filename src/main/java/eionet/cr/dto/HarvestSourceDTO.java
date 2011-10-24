@@ -317,7 +317,7 @@ public class HarvestSourceDTO implements Serializable, Cloneable {
      * @see java.lang.Object#clone()
      */
     @Override
-    public HarvestSourceDTO clone(){
+    public HarvestSourceDTO clone() {
         try {
             return (HarvestSourceDTO) super.clone();
         } catch (CloneNotSupportedException e) {

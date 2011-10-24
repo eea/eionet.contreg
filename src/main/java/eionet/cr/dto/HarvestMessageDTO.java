@@ -123,11 +123,11 @@ public class HarvestMessageDTO implements java.io.Serializable {
      * @param stackTrace
      * @return
      */
-    public static HarvestMessageDTO create(String message, HarvestMessageType messageType, String stackTrace){
+    public static HarvestMessageDTO create(String message, HarvestMessageType messageType, String stackTrace) {
 
         HarvestMessageDTO dto = new HarvestMessageDTO();
         dto.setMessage(message);
-        dto.setType(messageType==null ? null : messageType.toString());
+        dto.setType(messageType == null ? null : messageType.toString());
         dto.setStackTrace(stackTrace);
         return dto;
     }

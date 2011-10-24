@@ -298,7 +298,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
             // since user's home URI was used above as triple source, add it to HARVEST_SOURCE too
             // (but set interval minutes to 0, to avoid it being background-harvested)
             DAOFactory.get().getDao(HarvestSourceDAO.class)
-            .addSourceIgnoreDuplicate(HarvestSourceDTO.create(getUser().getHomeUri(), false, 0, getUserName()));
+                    .addSourceIgnoreDuplicate(HarvestSourceDTO.create(getUser().getHomeUri(), false, 0, getUserName()));
 
         } catch (DAOException e) {
             e.printStackTrace();
@@ -309,22 +309,22 @@ public class UploadCSVActionBean extends AbstractActionBean {
     private void addSource(String subjectUri) throws Exception {
 
         DAOFactory.get().getDao(HarvestSourceDAO.class)
-        .addSourceIgnoreDuplicate(HarvestSourceDTO.create(subjectUri, false, 0, getUserName()));
+                .addSourceIgnoreDuplicate(HarvestSourceDTO.create(subjectUri, false, 0, getUserName()));
 
         DAOFactory
-        .get()
-        .getDao(HarvestSourceDAO.class)
-        .insertUpdateSourceMetadata(subjectUri, Predicates.CR_BYTE_SIZE,
-                new ObjectDTO(String.valueOf(file.getSize()), true));
+                .get()
+                .getDao(HarvestSourceDAO.class)
+                .insertUpdateSourceMetadata(subjectUri, Predicates.CR_BYTE_SIZE,
+                        new ObjectDTO(String.valueOf(file.getSize()), true));
 
         DAOFactory.get().getDao(HarvestSourceDAO.class)
-        .insertUpdateSourceMetadata(subjectUri, Predicates.CR_MEDIA_TYPE, new ObjectDTO(String.valueOf(type), true));
+                .insertUpdateSourceMetadata(subjectUri, Predicates.CR_MEDIA_TYPE, new ObjectDTO(String.valueOf(type), true));
 
         DAOFactory
-        .get()
-        .getDao(HarvestSourceDAO.class)
-        .insertUpdateSourceMetadata(subjectUri, Predicates.CR_LAST_MODIFIED,
-                new ObjectDTO(dateFormat.format(new Date()), true));
+                .get()
+                .getDao(HarvestSourceDAO.class)
+                .insertUpdateSourceMetadata(subjectUri, Predicates.CR_LAST_MODIFIED,
+                        new ObjectDTO(dateFormat.format(new Date()), true));
 
     }
 

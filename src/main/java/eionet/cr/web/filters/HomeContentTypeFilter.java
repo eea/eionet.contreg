@@ -66,7 +66,7 @@ public class HomeContentTypeFilter implements Filter {
      */
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
-    throws IOException, ServletException {
+            throws IOException, ServletException {
 
         // Pass on if not a HTTP request.
         if (!(servletRequest instanceof HttpServletRequest)) {
@@ -117,28 +117,26 @@ public class HomeContentTypeFilter implements Filter {
                     }
                 }
 
-                try{
-                    if (TabularDataServlet.willHandle(fileUri, idInFile, httpRequest)){
+                try {
+                    if (TabularDataServlet.willHandle(fileUri, idInFile, httpRequest)) {
 
                         String redirectPath =
-                            httpRequest.getContextPath() + "/tabularData?fileUri=" + URLEncoder.encode(fileUri, "UTF-8");
-                        if (!StringUtils.isBlank(fileName)){
+                                httpRequest.getContextPath() + "/tabularData?fileUri=" + URLEncoder.encode(fileUri, "UTF-8");
+                        if (!StringUtils.isBlank(fileName)) {
                             redirectPath = redirectPath + "&idInFile=" + URLEncoder.encode(idInFile, "UTF-8");
                         }
                         LOGGER.debug("URL points to tabular data, so redirecting to: " + redirectPath);
                         httpResponse.sendRedirect(redirectPath);
                         return;
-                    }
-                    else if (FileStore.getInstance(userName).get(fileName) != null) {
+                    } else if (FileStore.getInstance(userName).get(fileName) != null) {
 
                         String redirectPath =
-                            httpRequest.getContextPath() + "/download?uri=" + URLEncoder.encode(requestURL, "UTF-8");
+                                httpRequest.getContextPath() + "/download?uri=" + URLEncoder.encode(requestURL, "UTF-8");
                         LOGGER.debug("URL points to stored file, so redirecting to: " + redirectPath);
                         httpResponse.sendRedirect(redirectPath);
                         return;
                     }
-                }
-                catch (DAOException e){
+                } catch (DAOException e) {
                     throw new ServletException(e.getMessage(), e);
                 }
             }

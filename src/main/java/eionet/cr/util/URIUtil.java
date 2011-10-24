@@ -47,7 +47,7 @@ public class URIUtil {
      */
     public static boolean isSchemedURI(String str) {
 
-        if (Util.isNullOrEmpty(str)){
+        if (Util.isNullOrEmpty(str)) {
             return false;
         }
 
@@ -72,13 +72,13 @@ public class URIUtil {
      */
     public static boolean isURI(String str) {
 
-        if (Util.isNullOrEmpty(str)){
+        if (Util.isNullOrEmpty(str)) {
             return false;
         }
 
         try {
             URI uri = new URI(str);
-            return uri!=null;
+            return uri != null;
         } catch (URISyntaxException e) {
             return false;
         }

@@ -27,7 +27,7 @@ import eionet.cr.harvest.HarvestException;
  *
  * @author Jaanus Heinlaid
  */
-public class NoRedirectLocationException extends HarvestException{
+public class NoRedirectLocationException extends HarvestException {
 
     /**
      *

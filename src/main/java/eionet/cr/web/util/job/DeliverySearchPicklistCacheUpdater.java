@@ -59,10 +59,10 @@ public class DeliverySearchPicklistCacheUpdater implements StatefulJob {
 
         try {
             Collection<ObjectLabelPair> localities =
-                DAOFactory.get().getDao(HelperDAO.class).getPicklistForPredicate(Predicates.ROD_LOCALITY_PROPERTY, true);
+                    DAOFactory.get().getDao(HelperDAO.class).getPicklistForPredicate(Predicates.ROD_LOCALITY_PROPERTY, true);
 
-            ApplicationCache.updateDeliverySearchPicklistCache(DAOFactory.get().getDao(HelperDAO.class).getDeliverySearchPicklist(),
-                    localities);
+            ApplicationCache.updateDeliverySearchPicklistCache(DAOFactory.get().getDao(HelperDAO.class)
+                    .getDeliverySearchPicklist(), localities);
             logger.debug("Delivery search picklist cache updated");
         } catch (Exception e) {
             logger.error("Error when updating delivery search picklist cache: ", e);

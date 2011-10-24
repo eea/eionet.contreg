@@ -62,7 +62,9 @@ public class HomeActionBean extends AbstractActionBean {
 
     /**
      * Sets username request parameter.
-     * @param username request parameter
+     *
+     * @param username
+     *            request parameter
      */
     public void setUsername(String username) {
         this.username = username;

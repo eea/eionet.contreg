@@ -272,7 +272,7 @@ public class CharsetToolkit {
     }
 
     public static Charset guessEncoding(File f, int bufferLength, Charset defaultCharset) throws FileNotFoundException,
-    IOException {
+            IOException {
         FileInputStream fis = new FileInputStream(f);
         byte[] buffer = new byte[bufferLength];
         fis.read(buffer);

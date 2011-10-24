@@ -169,8 +169,8 @@ public class HarvestSourceActionBean extends AbstractActionBean {
             prepareDTO();
             // populate sample triples
             sampleTriples =
-                DAOFactory.get().getDao(HelperDAO.class)
-                .getSampleTriplesInSource(harvestSource.getUrl(), PagingRequest.create(1, 10));
+                    DAOFactory.get().getDao(HelperDAO.class)
+                            .getSampleTriplesInSource(harvestSource.getUrl(), PagingRequest.create(1, 10));
         }
 
         return new ForwardResolution("/pages/viewsource.jsp");
@@ -272,7 +272,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
                 harvestSource = factory.getDao(HarvestSourceDAO.class).getHarvestSourceById(harvestSource.getSourceId());
                 schemaSource = factory.getDao(HarvestSourceDAO.class).isSourceInInferenceRule(harvestSource.getUrl());
             }
-        } else{
+        } else {
             addWarningMessage(getBundle().getString("not.logged.in"));
         }
 
@@ -372,17 +372,16 @@ public class HarvestSourceActionBean extends AbstractActionBean {
         if (isPostRequest()) {
 
             String urlString = harvestSource.getUrl();
-            if (StringUtils.isBlank(urlString)){
+            if (StringUtils.isBlank(urlString)) {
                 addGlobalValidationError(new SimpleError("URL missing!"));
-            }
-            else{
+            } else {
                 try {
                     URL url = new URL(urlString);
-                    if (url.getRef()!=null){
+                    if (url.getRef() != null) {
                         addGlobalValidationError(new SimpleError("URL with a fragment part not allowed!"));
                     }
 
-                    if (!StringUtils.equals(urlBefore, urlString) && URLUtil.isNotExisting(urlString)){
+                    if (!StringUtils.equals(urlBefore, urlString) && URLUtil.isNotExisting(urlString)) {
                         addGlobalValidationError(new SimpleError("There is no resource existing behind this URL!"));
                     }
 
@@ -391,10 +390,9 @@ public class HarvestSourceActionBean extends AbstractActionBean {
                         if (intervalMinutes.intValue() < 0 || intervalMultiplier < 0) {
                             addGlobalValidationError(new SimpleError("Harvest interval must be >= 0"));
                         } else {
-                            harvestSource.setIntervalMinutes(Integer.valueOf(intervalMinutes.intValue()
-                                    * intervalMultiplier));
+                            harvestSource.setIntervalMinutes(Integer.valueOf(intervalMinutes.intValue() * intervalMultiplier));
                         }
-                    } else{
+                    } else {
                         harvestSource.setIntervalMinutes(Integer.valueOf(0));
                     }
                 } catch (MalformedURLException e) {
@@ -541,7 +539,8 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param urlBefore the urlBefore to set
+     * @param urlBefore
+     *            the urlBefore to set
      */
     public void setUrlBefore(String urlBefore) {
         this.urlBefore = urlBefore;

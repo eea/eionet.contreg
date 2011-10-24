@@ -150,7 +150,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
 
         // create query helper
         Set<String> literalRangeFilters = null;
-        if (checkFiltersRange){
+        if (checkFiltersRange) {
             literalRangeFilters = DAOFactory.get().getDao(HelperDAO.class).getLiteralRangeSubjects(filters.keySet());
         }
         VirtuosoFilteredSearchHelper helper =

@@ -235,8 +235,8 @@ public interface HarvestSourceDAO extends DAO {
      * @throws OpenRDFException
      */
     public int
-    loadIntoRepository(InputStream inputStream, RDFFormat rdfFormat, String graphUrl, boolean clearPreviousGraphContent)
-            throws IOException, OpenRDFException;
+            loadIntoRepository(InputStream inputStream, RDFFormat rdfFormat, String graphUrl, boolean clearPreviousGraphContent)
+                    throws IOException, OpenRDFException;
 
     /**
      * Adds the meta information the harvester has collected about the source. The meta data is considered part of the harvester and
@@ -251,7 +251,7 @@ public interface HarvestSourceDAO extends DAO {
      * @throws IOException
      */
     public void addSourceMetadata(SubjectDTO sourceMetadata) throws DAOException, RDFParseException, RepositoryException,
-    IOException;
+            IOException;
 
     /**
      * Derives new harvest source URLs from content in the graph represented by the given harvest source URL.
@@ -291,7 +291,7 @@ public interface HarvestSourceDAO extends DAO {
      * @throws IOException
      */
     public void insertUpdateSourceMetadata(String subject, String predicate, ObjectDTO object) throws DAOException,
-    RepositoryException, IOException;
+            RepositoryException, IOException;
 
     /**
      *

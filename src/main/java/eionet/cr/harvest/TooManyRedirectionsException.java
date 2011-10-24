@@ -27,7 +27,7 @@ import eionet.cr.harvest.HarvestException;
  *
  * @author Jaanus Heinlaid
  */
-public class TooManyRedirectionsException extends HarvestException{
+public class TooManyRedirectionsException extends HarvestException {
 
     /**
      *

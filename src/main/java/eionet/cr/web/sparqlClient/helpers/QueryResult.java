@@ -93,7 +93,7 @@ public class QueryResult {
                 if (value instanceof Literal) {
                     if (virtuosoFormat) {
                         if (((Literal) value).getLanguage() != null) {
-                            valueString = "\"" + valueString +"\"@" + ((Literal) value).getLanguage();
+                            valueString = "\"" + valueString + "\"@" + ((Literal) value).getLanguage();
                         }
                         if (((Literal) value).getDatatype() != null) {
                             String type = ((Literal) value).getDatatype().stringValue();
@@ -102,7 +102,7 @@ public class QueryResult {
                                 type = "<" + type + ">";
                             }
 
-                            valueString = "\"" + valueString +"\"^^" + type;
+                            valueString = "\"" + valueString + "\"^^" + type;
                         }
                     }
                     resultValue = new ResultValue(valueString, true);

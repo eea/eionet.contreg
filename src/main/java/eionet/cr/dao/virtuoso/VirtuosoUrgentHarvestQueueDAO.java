@@ -75,7 +75,7 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
 
     /** */
     private static final String addPushHarvestSQL =
-        "insert into URGENT_HARVEST_QUEUE (URL,\"TIMESTAMP\",PUSHED_CONTENT) VALUES (?,NOW(),?)";
+            "insert into URGENT_HARVEST_QUEUE (URL,\"TIMESTAMP\",PUSHED_CONTENT) VALUES (?,NOW(),?)";
 
     /*
      * (non-Javadoc)
@@ -192,7 +192,7 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
             ps = conn.prepareStatement(sql);
             ps.setString(1, url);
             rs = ps.executeQuery();
-            while(rs.next()) {
+            while (rs.next()) {
                 ret = true;
             }
         } catch (Exception e) {

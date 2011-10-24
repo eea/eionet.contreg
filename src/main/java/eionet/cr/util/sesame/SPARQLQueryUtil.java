@@ -46,7 +46,7 @@ public class SPARQLQueryUtil {
     public static StringBuilder getCrInferenceDefinition() {
         StringBuilder strBuilder = new StringBuilder();
         strBuilder.append(inferenceDef).append("'").append(GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME))
-        .append("' ");
+                .append("' ");
         return strBuilder;
     }
 
@@ -89,8 +89,7 @@ public class SPARQLQueryUtil {
     }
 
     /**
-     * Builds a comma-separated String of SPARQL aliases the given parameter values.
-     * Fills bindings with correct values. Example:
+     * Builds a comma-separated String of SPARQL aliases the given parameter values. Fills bindings with correct values. Example:
      * urisToCSV(List{<http://uri1.notexist.com>, <http://uri2.notexist.com>}, "subjectValue")= ?subjectValue1,subjectValue2.
      * bindings are filled: subjectValue1=http://uri1.notexist.com, subjectValue2=http://uri2.notexist.com
      *
@@ -115,12 +114,12 @@ public class SPARQLQueryUtil {
                 // if URI contains spaces - use IRI() function that makes an IRI from URI and seems to work with spaces as well
                 if (uri.indexOf(' ') == -1) {
                     strBuilder.append("?" + alias);
-                    if (bindings!=null){
+                    if (bindings != null) {
                         bindings.setURI(alias, uri);
                     }
                 } else {
                     strBuilder.append("IRI(?" + alias + ")");
-                    if (bindings!=null){
+                    if (bindings != null) {
                         bindings.setString(alias, uri);
                     }
                 }
@@ -133,7 +132,8 @@ public class SPARQLQueryUtil {
     /**
      * Builds a comma-separated String of SPARQL aliases the given parameter values.
      *
-     * @param uriList uris to be used as SPARQL parameters
+     * @param uriList
+     *            uris to be used as SPARQL parameters
      * @return comma separated String for Sparql
      */
     public static String urisToCSV(Collection<String> uriList) {
@@ -172,7 +172,7 @@ public class SPARQLQueryUtil {
      */
     public static String getOrderByClause(final String aliasName, final String sortOrder) {
         return "ORDER BY " + sortOrder + "(bif:either( bif:isnull(?" + aliasName + ") , "
-        + "(bif:lcase(bif:subseq (bif:replace (?s, '/', '#'), bif:strrchr (bif:replace (?s, '/', '#'), '#')+1))) , "
-        + "bif:lcase(?" + aliasName + ")))";
+                + "(bif:lcase(bif:subseq (bif:replace (?s, '/', '#'), bif:strrchr (bif:replace (?s, '/', '#'), '#')+1))) , "
+                + "bif:lcase(?" + aliasName + ")))";
     }
 }

@@ -32,7 +32,7 @@ public class ResponseCodeUtil {
      * @param code
      * @return
      */
-    public static boolean isRedirect(int code){
+    public static boolean isRedirect(int code) {
         return code == 301 || code == 302 || code == 303 || code == 307;
     }
 
@@ -41,7 +41,7 @@ public class ResponseCodeUtil {
      * @param code
      * @return
      */
-    public static boolean isPermanentError(int code){
+    public static boolean isPermanentError(int code) {
         return code == 400 || (code >= 402 && code <= 407) || (code >= 409 && code <= 417) || code == 501 || code == 505;
     }
 
@@ -59,7 +59,7 @@ public class ResponseCodeUtil {
      * @param code
      * @return
      */
-    public static boolean isError(int code){
+    public static boolean isError(int code) {
         return isTemporaryError(code) || isPermanentError(code);
     }
 
@@ -68,7 +68,7 @@ public class ResponseCodeUtil {
      * @param code
      * @return
      */
-    public static boolean isNotModified(int code){
+    public static boolean isNotModified(int code) {
         return code == 304;
     }
 

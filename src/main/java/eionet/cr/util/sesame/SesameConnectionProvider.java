@@ -59,8 +59,8 @@ public class SesameConnectionProvider {
             String pwdProperty = IsJUnitRuntime.VALUE ? GeneralConfig.VIRTUOSO_UNITTEST_DB_PWD : GeneralConfig.VIRTUOSO_DB_PWD;
 
             readWriteRepository =
-                createRepository(GeneralConfig.getRequiredProperty(urlProperty),
-                        GeneralConfig.getRequiredProperty(usrProperty), GeneralConfig.getRequiredProperty(pwdProperty));
+                    createRepository(GeneralConfig.getRequiredProperty(urlProperty),
+                            GeneralConfig.getRequiredProperty(usrProperty), GeneralConfig.getRequiredProperty(pwdProperty));
         }
         return readWriteRepository;
     }
@@ -72,9 +72,9 @@ public class SesameConnectionProvider {
 
         if (readOnlyRepository == null) {
             readOnlyRepository =
-                createRepository(GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_URL),
-                        GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_ROUSR),
-                        GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_ROPWD));
+                    createRepository(GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_URL),
+                            GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_ROUSR),
+                            GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_ROPWD));
         }
         return readOnlyRepository;
     }
@@ -147,7 +147,7 @@ public class SesameConnectionProvider {
         DataSource dataSource = getReadWriteDataSource();
         if (dataSource == null) {
 
-            if (!isReadWriteDataSourceMissingLogged()){
+            if (!isReadWriteDataSourceMissingLogged()) {
                 LOGGER.debug(MessageFormat.format("Found no data source with name {0}, going to create a direct connection",
                         READWRITE_DATASOURCE_NAME));
                 SesameConnectionProvider.readWriteDataSourceMissingLogged = true;
@@ -155,7 +155,7 @@ public class SesameConnectionProvider {
             return getReadWriteRepository().getConnection();
         } else {
             try {
-                return new VirtuosoRepositoryConnection((VirtuosoRepository)getReadWriteRepository(), dataSource.getConnection());
+                return new VirtuosoRepositoryConnection((VirtuosoRepository) getReadWriteRepository(), dataSource.getConnection());
             } catch (SQLException e) {
                 throw new RepositoryException("Could not create repository connection from the given SQL connection", e);
             }
@@ -173,7 +173,7 @@ public class SesameConnectionProvider {
         DataSource dataSource = getReadOnlyDataSource();
         if (dataSource == null) {
 
-            if (!isReadOnlyDataSourceMissingLogged()){
+            if (!isReadOnlyDataSourceMissingLogged()) {
                 LOGGER.debug(MessageFormat.format("Found no data source with name {0}, going to create a direct connection",
                         READONLY_DATASOURCE_NAME));
                 SesameConnectionProvider.readOnlyDataSourceMissingLogged = true;
@@ -202,7 +202,7 @@ public class SesameConnectionProvider {
         DataSource dataSource = getReadWriteDataSource();
         if (dataSource != null) {
             return dataSource.getConnection();
-        } else if (!isReadWriteDataSourceMissingLogged()){
+        } else if (!isReadWriteDataSourceMissingLogged()) {
             LOGGER.debug(MessageFormat.format(
                     "Found no data source with name {0}, going to create a connection through DriverManager",
                     READWRITE_DATASOURCE_NAME));

@@ -94,7 +94,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
             handleUrgentQueue();
 
             // harvest batch queue
-            if (isBatchHarvestingEnabled()){
+            if (isBatchHarvestingEnabled()) {
                 handleBatchQueue();
             }
         } catch (Exception e) {
@@ -143,7 +143,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
      *
      * @throws DAOException
      */
-    private void handleBatchQueue() throws DAOException{
+    private void handleBatchQueue() throws DAOException {
 
         LOGGER.trace("Handling batch queue...");
 
@@ -161,30 +161,27 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
         LOGGER.trace(nextScheduledSources.size() + " next scheduled sources found");
 
         // Loop over next scheduled sources.
-        for (HarvestSourceDTO sourceDTO : nextScheduledSources){
+        for (HarvestSourceDTO sourceDTO : nextScheduledSources) {
 
             // If source is marked with permanent error then increase its unavailability count if it's a
             // priority source, or simply delete it if it's not a priority source.
             // If source not marked with permanent and its unavailability count is >=5 and it's a
             // non-priority source then delete it.
             // In all other cases, add the harvest source to the batch-harvest queue.
-            if (sourceDTO.isPermanentError()){
-                if (sourceDTO.isPrioritySource()){
+            if (sourceDTO.isPermanentError()) {
+                if (sourceDTO.isPrioritySource()) {
                     LOGGER.trace("Increasing unavailability count of permanent-error priority source " + sourceDTO.getUrl());
                     sourceDao.increaseUnavailableCount(sourceDTO.getUrl());
-                }
-                else{
+                } else {
                     LOGGER.trace(sourceDTO.getUrl() + "  will be deleted as a non-priority source with permanent error");
                     sourcesToDelete.add(sourceDTO.getUrl());
                 }
-            }
-            else if (sourceDTO.getCountUnavail()>=5){
-                if (!sourceDTO.isPrioritySource()){
+            } else if (sourceDTO.getCountUnavail() >= 5) {
+                if (!sourceDTO.isPrioritySource()) {
                     LOGGER.trace(sourceDTO.getUrl() + "  will be deleted as a non-priority source with unavailability >= 5");
                     sourcesToDelete.add(sourceDTO.getUrl());
                 }
-            }
-            else{
+            } else {
                 batchQueue.add(sourceDTO);
             }
         }
@@ -208,13 +205,13 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
         }
 
         // Delete sources that were found necessary to delete (if any).
-        if (!sourcesToDelete.isEmpty()){
+        if (!sourcesToDelete.isEmpty()) {
 
             LOGGER.trace("Deleting " + sourcesToDelete.size() + " sources found above");
-            for (Iterator iter = sourcesToDelete.iterator(); iter.hasNext();){
+            for (Iterator iter = sourcesToDelete.iterator(); iter.hasNext();) {
 
                 String sourceUrl = iter.next().toString();
-                if (CurrentHarvests.contains(sourceUrl)){
+                if (CurrentHarvests.contains(sourceUrl)) {
                     iter.remove();
                     LOGGER.trace("Skipping deletion of " + sourceUrl + " because it is currently being harvested");
                 }
@@ -230,35 +227,32 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
      */
     public static List<HarvestSourceDTO> getNextScheduledSources() throws DAOException {
 
-        if (isBatchHarvestingEnabled()){
+        if (isBatchHarvestingEnabled()) {
             return DAOFactory.get().getDao(HarvestSourceDAO.class).getNextScheduledSources(getSourcesLimitForInterval());
-        }
-        else{
+        } else {
             return new ArrayList<HarvestSourceDTO>();
         }
     }
 
     /**
-     * This method should be used classes other than {@link HarvestingJob} itself.
-     * It returns list of harvest source currently in batch queue. The method returns
-     * clone of the original queue, to prevent clients from corrupting the original.
+     * This method should be used classes other than {@link HarvestingJob} itself. It returns list of harvest source currently in
+     * batch queue. The method returns clone of the original queue, to prevent clients from corrupting the original.
      *
      * @return List<HarvestSourceDTO>
      */
     public static List<HarvestSourceDTO> getBatchQueue() {
 
         ArrayList<HarvestSourceDTO> clone = new ArrayList<HarvestSourceDTO>();
-        if (batchQueue!=null){
+        if (batchQueue != null) {
             clone.addAll(batchQueue);
         }
         return clone;
     }
 
     /**
-     * Returns hours when the harvester is allowed to do batch harvesting. The clock hours when batch
-     * harvesting should be active, are given as comma separated from-to spans (e.g 10-15, 19-23) in the
-     * configuration file. In every span both "from" and "to" are inclusive, and "from" must be sooner than
-     * "to". So, to say from 18.00 to 9.00, the configuration value must be 18-23,0-8.
+     * Returns hours when the harvester is allowed to do batch harvesting. The clock hours when batch harvesting should be active,
+     * are given as comma separated from-to spans (e.g 10-15, 19-23) in the configuration file. In every span both "from" and "to"
+     * are inclusive, and "from" must be sooner than "to". So, to say from 18.00 to 9.00, the configuration value must be 18-23,0-8.
      * (leave the field completely empty to disable batch harvesting)
      *
      * @return list containing the activeHours
@@ -297,9 +291,8 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     }
 
     /**
-     * Returns the interval in seconds where the harvester checks for checks for new urgent or scheduled tasks.
-     * The interval can't be more than 3600 seconds or less than 5 seconds. The value is retrieved from the
-     * general configuration file.
+     * Returns the interval in seconds where the harvester checks for checks for new urgent or scheduled tasks. The interval can't
+     * be more than 3600 seconds or less than 5 seconds. The value is retrieved from the general configuration file.
      *
      * @return the interval in seconds
      */
@@ -318,8 +311,8 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     }
 
     /**
-     * Returns the upper limit on the number of sources that are harvested in each interval.
-     * The value is retrieved from the general configuration file.
+     * Returns the upper limit on the number of sources that are harvested in each interval. The value is retrieved from the general
+     * configuration file.
      *
      * @return the upper limit
      */
@@ -338,8 +331,8 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     }
 
     /**
-     * Returns the interval in minutes where the harvester checks for checks for new urgent or scheduled tasks.
-     * Value can be less than 1.0.
+     * Returns the interval in minutes where the harvester checks for checks for new urgent or scheduled tasks. Value can be less
+     * than 1.0.
      *
      * @return interval in minutes
      */
@@ -349,8 +342,8 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     }
 
     /**
-     * Calculates how many minutes a day the batch harvester is active.
-     * If the batch harvesting is from 5-6, then the return value is 120.
+     * Calculates how many minutes a day the batch harvester is active. If the batch harvesting is from 5-6, then the return value
+     * is 120.
      *
      * @return the dailyActiveMinutes
      */
@@ -444,8 +437,8 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     }
 
     /**
-     * Calculates how many harvesting segments there is in a day. If the harvester is active 120 minutes
-     * and the interval is 15 seconds (i.e. 1/4 minute, then there are 480 harvesting segments in the day.
+     * Calculates how many harvesting segments there is in a day. If the harvester is active 120 minutes and the interval is 15
+     * seconds (i.e. 1/4 minute, then there are 480 harvesting segments in the day.
      *
      * @return the number of harvesting segments
      */
@@ -455,11 +448,11 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     }
 
     /**
-     * Calculates how many sources we need to harvest in this round, but if the amount is over the limit
-     * we lower it to the limit. The purpose is to avoid tsunamis of harvesting.
+     * Calculates how many sources we need to harvest in this round, but if the amount is over the limit we lower it to the limit.
+     * The purpose is to avoid tsunamis of harvesting.
      * <p>
-     * Example: If there are 4320 time segments, and there are 216 sources with a score of 1.0 or above,
-     * the number of sources to harvest in this round is 216 / 4320 = 0.05. This we then round up to one.
+     * Example: If there are 4320 time segments, and there are 216 sources with a score of 1.0 or above, the number of sources to
+     * harvest in this round is 216 / 4320 = 0.05. This we then round up to one.
      *
      * @return the limit of sources returned
      */
@@ -483,8 +476,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     }
 
     /**
-     * Returns true if batch the current hour is a batch harvesting hour.
-     * Otherwise returns false.
+     * Returns true if batch the current hour is a batch harvesting hour. Otherwise returns false.
      *
      * @return
      */

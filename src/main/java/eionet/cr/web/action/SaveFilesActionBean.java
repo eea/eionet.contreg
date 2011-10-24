@@ -163,8 +163,8 @@ public class SaveFilesActionBean extends DisplaytagSearchActionBean {
 
             // since user's home URI was used above as triple source, add it to HARVEST_SOURCE too
             // (but set interval minutes to 0, to avoid it being background-harvested)
-            DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(
-                    HarvestSourceDTO.create(getUser().getHomeUri(), false, 0, getUserName()));
+            DAOFactory.get().getDao(HarvestSourceDAO.class)
+                    .addSourceIgnoreDuplicate(HarvestSourceDTO.create(getUser().getHomeUri(), false, 0, getUserName()));
 
         } catch (DAOException e) {
             e.printStackTrace();
@@ -174,11 +174,14 @@ public class SaveFilesActionBean extends DisplaytagSearchActionBean {
 
     private void addSource(String subjectUri) throws Exception {
 
-        DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(
-                HarvestSourceDTO.create(subjectUri, false, 0, getUserName()));
+        DAOFactory.get().getDao(HarvestSourceDAO.class)
+                .addSourceIgnoreDuplicate(HarvestSourceDTO.create(subjectUri, false, 0, getUserName()));
 
-        DAOFactory.get().getDao(HarvestSourceDAO.class).insertUpdateSourceMetadata(subjectUri, Predicates.CR_LAST_MODIFIED,
-                ObjectDTO.createLiteral(dateFormat.format(new Date()), XMLSchema.DATETIME));
+        DAOFactory
+                .get()
+                .getDao(HarvestSourceDAO.class)
+                .insertUpdateSourceMetadata(subjectUri, Predicates.CR_LAST_MODIFIED,
+                        ObjectDTO.createLiteral(dateFormat.format(new Date()), XMLSchema.DATETIME));
     }
 
     /**
@@ -215,7 +218,7 @@ public class SaveFilesActionBean extends DisplaytagSearchActionBean {
             String datasetUri = getUser().getHomeUri() + "/" + StringUtils.replace(fileName, " ", "%20");
             boolean exists = DAOFactory.get().getDao(CompiledDatasetDAO.class).datasetExists(datasetUri);
             if (exists) {
-                addGlobalValidationError("Dataset named \""+fileName+"\" already exists!");
+                addGlobalValidationError("Dataset named \"" + fileName + "\" already exists!");
             }
         }
 
@@ -234,7 +237,7 @@ public class SaveFilesActionBean extends DisplaytagSearchActionBean {
                 StringBuffer sb = new StringBuffer();
                 sb.append("The dataset already contains some of the selected files:");
                 sb.append("<ul>");
-                for(String file : existFiles) {
+                for (String file : existFiles) {
                     sb.append("<li>").append(file).append("</li>");
                 }
                 sb.append("</ul>");
@@ -242,7 +245,7 @@ public class SaveFilesActionBean extends DisplaytagSearchActionBean {
             }
         }
 
-        //Init lists
+        // Init lists
         init();
 
         // if any validation errors were set above, make sure the right resolution is returned
@@ -251,7 +254,6 @@ public class SaveFilesActionBean extends DisplaytagSearchActionBean {
             getContext().setSourcePageResolution(resolution);
         }
     }
-
 
     public List<String> getSelectedFiles() {
         return selectedFiles;

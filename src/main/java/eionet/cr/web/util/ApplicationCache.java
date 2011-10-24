@@ -298,7 +298,7 @@ public class ApplicationCache implements ServletContextListener {
         getCache().put(new Element(TYPE_CACHE, types));
 
         ArrayList<String> uris = new ArrayList<String>();
-        for (Pair<String,String> pair : types){
+        for (Pair<String, String> pair : types) {
             uris.add(pair.getLeft());
         }
         Collections.sort(uris);

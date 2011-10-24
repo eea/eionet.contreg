@@ -23,7 +23,6 @@ package eionet.cr.dto;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  *
  * @author altnyris
@@ -32,7 +31,7 @@ import java.util.List;
 public class DeliveryFilesDTO extends HarvestBaseDTO implements java.io.Serializable {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
 

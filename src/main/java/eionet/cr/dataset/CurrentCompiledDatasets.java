@@ -68,11 +68,11 @@ public class CurrentCompiledDatasets {
      */
     public static synchronized boolean contains(String url) {
 
-        if (url==null){
+        if (url == null) {
             return false;
         }
 
-        if (compiledDatasets.containsKey(url)){
+        if (compiledDatasets.containsKey(url)) {
             return true;
         }
 

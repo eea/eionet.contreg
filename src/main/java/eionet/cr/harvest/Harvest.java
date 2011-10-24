@@ -21,7 +21,6 @@
 
 package eionet.cr.harvest;
 
-
 /**
  *
  * @author Jaanus Heinlaid

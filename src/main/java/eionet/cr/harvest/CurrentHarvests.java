@@ -84,15 +84,15 @@ public class CurrentHarvests {
      */
     public static synchronized boolean contains(String url) {
 
-        if (url==null){
+        if (url == null) {
             return false;
         }
 
-        if (queuedHarvest != null && queuedHarvest.isBeingHarvested(url)){
+        if (queuedHarvest != null && queuedHarvest.isBeingHarvested(url)) {
             return true;
         }
 
-        if (onDemandHarvests.containsKey(url)){
+        if (onDemandHarvests.containsKey(url)) {
             return true;
         }
 

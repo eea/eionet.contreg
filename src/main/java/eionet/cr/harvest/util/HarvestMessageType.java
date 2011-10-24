@@ -55,15 +55,14 @@ public enum HarvestMessageType {
      * @param str
      * @return
      */
-    public static HarvestMessageType parseFrom(String str){
+    public static HarvestMessageType parseFrom(String str) {
 
-        if (StringUtils.isBlank(str)){
+        if (StringUtils.isBlank(str)) {
             return null;
-        }
-        else{
-            for (HarvestMessageType messageType : HarvestMessageType.values()){
+        } else {
+            for (HarvestMessageType messageType : HarvestMessageType.values()) {
 
-                if (str.equals(messageType.toString())){
+                if (str.equals(messageType.toString())) {
                     return messageType;
                 }
             }

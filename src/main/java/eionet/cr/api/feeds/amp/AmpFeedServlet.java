@@ -47,15 +47,13 @@ public class AmpFeedServlet extends HttpServlet {
     private static final Logger LOGGER = Logger.getLogger(AmpFeedServlet.class);
 
     /** */
-    public static final String SPARQL_QUERY =
-        "DEFINE input:inference 'CRInferenceRule'"
-        + " select ?s ?p ?o where {?s ?p ?o."
-        + " { select distinct ?s where {?s <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> "
-        + " <http://rdfdata.eionet.europa.eu/amp/ontology/Output> }}}"
-        + " order by ?s ?p ?o";
+    public static final String SPARQL_QUERY = "DEFINE input:inference 'CRInferenceRule'" + " select ?s ?p ?o where {?s ?p ?o."
+    + " { select distinct ?s where {?s <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> "
+    + " <http://rdfdata.eionet.europa.eu/amp/ontology/Output> }}}" + " order by ?s ?p ?o";
 
     /*
      * (non-Javadoc)
+     *
      * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
     @Override

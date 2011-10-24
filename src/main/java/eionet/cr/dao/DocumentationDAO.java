@@ -23,6 +23,7 @@ public interface DocumentationDAO extends DAO {
     /**
      * Return object from documentation table
      * @param boolean whether or not to show only html objects
+     *
      * @return List<DocumentationDTO>
      * @throws DAOException
      */
@@ -39,6 +40,7 @@ public interface DocumentationDAO extends DAO {
 
     /**
      * Checks if such page_id already exists in database
+     *
      * @param pageId
      * @return boolean
      * @throws DAOException

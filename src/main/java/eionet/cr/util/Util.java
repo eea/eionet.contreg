@@ -68,6 +68,7 @@ public class Util {
     private Util() {
 
     }
+
     /**
      *
      * @param t
@@ -144,13 +145,14 @@ public class Util {
         return sf.format(new java.util.Date());
     }
 
-
     /**
      * Constant equals to 1000.
      */
     private static final int MILLISECONDS_COUNT_IN_SECOND = 1000;
+
     /**
      * Current time in seconds.
+     *
      * @return current time in seconds.
      */
     public static long currentTimeSeconds() {
@@ -159,7 +161,9 @@ public class Util {
 
     /**
      * Converts milliseconds to seconds.
-     * @param milliSeconds milliseconds
+     *
+     * @param milliSeconds
+     *            milliseconds
      * @return seconds
      */
     public static long getSeconds(final long milliSeconds) {
@@ -168,7 +172,9 @@ public class Util {
 
     /**
      * Returns true if given String is null or empty.
-     * @param str String
+     *
+     * @param str
+     *            String
      * @return boolean if String is empty or null.
      */
     public static boolean isNullOrEmpty(final String str) {
@@ -251,7 +257,7 @@ public class Util {
             return null;
 
         int[] scopes =
-        {PageContext.APPLICATION_SCOPE, PageContext.PAGE_SCOPE, PageContext.REQUEST_SCOPE, PageContext.SESSION_SCOPE};
+                {PageContext.APPLICATION_SCOPE, PageContext.PAGE_SCOPE, PageContext.REQUEST_SCOPE, PageContext.SESSION_SCOPE};
         for (int i = 0; i < scopes.length; i++) {
             Enumeration attrs = pageContext.getAttributeNamesInScope(scopes[i]);
             while (attrs != null && attrs.hasMoreElements()) {
@@ -364,6 +370,7 @@ public class Util {
     /**
      * Create a comma-separated list of tag enclosed URIs. The result can be used in sparql queries. eg.: [uri1,uri2,uri3] is
      * transformed to <uri1>,<uri2>,<uri3>.
+     *
      * @param uriList
      *            list of URIs
      * @return comma separated list of tag enclosed URIs
@@ -387,7 +394,9 @@ public class Util {
 
     /**
      * Converts string to double.
-     * @param s String to convert.
+     *
+     * @param s
+     *            String to convert.
      * @return Double
      */
     public static Double toDouble(final String s) {
@@ -445,22 +454,22 @@ public class Util {
      */
     public static List<String> getAcceptedLanguages(String acceptLanguageHeader) {
 
-        final HashMap<String,Double> languageMap = new LinkedHashMap<String,Double>();
-        if (!StringUtils.isBlank(acceptLanguageHeader)){
+        final HashMap<String, Double> languageMap = new LinkedHashMap<String, Double>();
+        if (!StringUtils.isBlank(acceptLanguageHeader)) {
 
             String[] languageStrings = StringUtils.split(acceptLanguageHeader, ',');
             for (int i = 0; i < languageStrings.length; i++) {
 
                 String languageString = languageStrings[i].trim();
                 String languageCode = StringUtils.substringBefore(languageString, ";").trim();
-                if (!StringUtils.isEmpty(languageCode)){
+                if (!StringUtils.isEmpty(languageCode)) {
 
                     String languageCodeUnrefined = StringUtils.split(languageCode, "-_")[0];
                     String qualityString = StringUtils.substringAfter(languageString, ";").trim();
                     double qualityValue = NumberUtils.toDouble(StringUtils.substringAfter(qualityString, "="), 1.0d);
 
                     Double existingQualityValue = languageMap.get(languageCodeUnrefined);
-                    if (existingQualityValue==null || qualityValue > existingQualityValue){
+                    if (existingQualityValue == null || qualityValue > existingQualityValue) {
                         languageMap.put(languageCodeUnrefined, Double.valueOf(qualityValue));
                     }
                 }
@@ -470,11 +479,11 @@ public class Util {
         ArrayList<String> result = new ArrayList<String>(languageMap.keySet());
         Collections.sort(result, new Comparator() {
             public int compare(Object o1, Object o2) {
-                return (-1)*languageMap.get(o1).compareTo(languageMap.get(o2));
+                return (-1) * languageMap.get(o1).compareTo(languageMap.get(o2));
             }
         });
 
-        if (!result.contains("en")){
+        if (!result.contains("en")) {
             result.add("en");
         }
         result.add("");
@@ -621,7 +630,8 @@ public class Util {
      * "true" returns true - "false" return false - "yes" and "y" return true - "no" and "n" return false - "0", "-1", "-2", etc
      * return false - "1", "2", "3", etc return true - any other string, including an empty one, returns false
      *
-     * @param s String to represent boolean.
+     * @param s
+     *            String to represent boolean.
      * @return boolean
      */
     public static boolean toBooolean(final String s) {
@@ -648,7 +658,8 @@ public class Util {
     /**
      * Returns true if the given integer is >0, otherwise returns false.
      *
-     * @param i int
+     * @param i
+     *            int
      * @return boolean
      */
     public static boolean toBooolean(final int i) {
@@ -659,9 +670,10 @@ public class Util {
     /**
      * Removes surrounding quotes of the given String.
      *
-     * @param s String to remove quotes from
-     * @return Given String without surrounding quotes. If the method parameter is not surrounded with quotes the
-     *         original String is returned.
+     * @param s
+     *            String to remove quotes from
+     * @return Given String without surrounding quotes. If the method parameter is not surrounded with quotes the original String is
+     *         returned.
      */
     public static String removeSurroundingQuotes(final String s) {
         if (!isSurroundedWithQuotes(s)) {
@@ -675,7 +687,8 @@ public class Util {
      * number.
      *
      * @param element
-     * @param elements elements
+     * @param elements
+     *            elements
      * @return
      */
     public static String getUniqueElementName(String element, Collection<String> elements) {
@@ -708,7 +721,7 @@ public class Util {
      * @param token
      * @return
      */
-    public static boolean containsToken(String str, String token){
+    public static boolean containsToken(String str, String token) {
         return containsToken(str, token, false);
     }
 
@@ -718,7 +731,7 @@ public class Util {
      * @param token
      * @return
      */
-    public static boolean containsTokenIgnoreCase(String str, String token){
+    public static boolean containsTokenIgnoreCase(String str, String token) {
         return containsToken(str, token, true);
     }
 
@@ -729,17 +742,17 @@ public class Util {
      * @param ignoreCase
      * @return
      */
-    private static boolean containsToken(String str, String token, boolean ignoreCase){
+    private static boolean containsToken(String str, String token, boolean ignoreCase) {
 
-        if (str==null || str.trim().length()==0){
+        if (str == null || str.trim().length() == 0) {
             return false;
         }
 
         StringTokenizer st = new StringTokenizer(str);
-        while (st.hasMoreTokens()){
+        while (st.hasMoreTokens()) {
 
             String nextToken = st.nextToken();
-            if (ignoreCase ? nextToken.equalsIgnoreCase(token) : nextToken.equals(token)){
+            if (ignoreCase ? nextToken.equalsIgnoreCase(token) : nextToken.equals(token)) {
                 return true;
             }
         }

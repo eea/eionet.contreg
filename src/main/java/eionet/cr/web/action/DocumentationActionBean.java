@@ -59,7 +59,6 @@ public class DocumentationActionBean extends AbstractActionBean {
     private String event;
     private String content;
 
-
     /** */
     public static final String PATH = GeneralConfig.getRequiredProperty(GeneralConfig.FILESTORE_PATH);
 
@@ -80,7 +79,8 @@ public class DocumentationActionBean extends AbstractActionBean {
     /**
      *
      * @return Resolution
-     * @throws DAOException if query fails
+     * @throws DAOException
+     *             if query fails
      */
     @DefaultHandler
     public Resolution view() throws Exception {
@@ -141,6 +141,7 @@ public class DocumentationActionBean extends AbstractActionBean {
 
     /**
      * Simply forwards to add documentation page
+     *
      * @return Resolution
      * @throws Exception
      */
@@ -150,6 +151,7 @@ public class DocumentationActionBean extends AbstractActionBean {
 
     /**
      * Edit page
+     *
      * @return Resolution
      * @throws Exception
      */
@@ -159,11 +161,12 @@ public class DocumentationActionBean extends AbstractActionBean {
         }
         insertContent();
         addSystemMessage("Successfully saved!");
-        return new RedirectResolution("/documentation/"+pid+"/edit");
+        return new RedirectResolution("/documentation/" + pid + "/edit");
     }
 
     /**
      * Adds content into documentation table
+     *
      * @return Resolution
      * @throws DAOException
      */
@@ -175,11 +178,12 @@ public class DocumentationActionBean extends AbstractActionBean {
         }
         insertContent();
 
-        return new RedirectResolution("/documentation/"+pid+"/edit");
+        return new RedirectResolution("/documentation/" + pid + "/edit");
     }
 
     /**
      * Insert content into database
+     *
      * @throws Exception
      */
     private void insertContent() throws Exception {
@@ -240,7 +244,7 @@ public class DocumentationActionBean extends AbstractActionBean {
         }
     }
 
-    @ValidationMethod(on = { "addContent" })
+    @ValidationMethod(on = {"addContent"})
     public void validatePageId(ValidationErrors errors) throws Exception {
         // If overwrite = false, then check if page id already exists
         if (!StringUtils.isBlank(pid) && !overwrite) {
@@ -259,6 +263,7 @@ public class DocumentationActionBean extends AbstractActionBean {
     public String getPageId() {
         return pageId;
     }
+
     public void setPageId(String pageId) {
         this.pageId = pageId;
     }

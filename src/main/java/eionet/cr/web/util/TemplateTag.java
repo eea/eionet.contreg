@@ -23,7 +23,7 @@ public class TemplateTag extends TagSupport {
 
     public int doEndTag() throws JspException {
         try {
-            if (file != null && file.length() > 0){
+            if (file != null && file.length() > 0) {
                 String folderPath = pageContext.getServletContext().getInitParameter("templateCacheFolder");
                 File f = new File(folderPath, file);
                 String content = FileUtils.readFileToString(f, "UTF-8");

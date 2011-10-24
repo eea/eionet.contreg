@@ -190,7 +190,7 @@ public class UploadHarvest extends BaseHarvest {
      *
      * @param noOfTriples
      */
-    private void finishWithOK(int noOfTriples){
+    private void finishWithOK(int noOfTriples) {
 
         // update context source DTO with the results of this harvest
         getContextSourceDTO().setStatements(noOfTriples);
@@ -210,12 +210,12 @@ public class UploadHarvest extends BaseHarvest {
      * @param error
      * @param noOfTriples
      */
-    private void finishWithError(Throwable error, int noOfTriples){
+    private void finishWithError(Throwable error, int noOfTriples) {
 
         // update context source DTO with the results of this harvest
         getContextSourceDTO().setStatements(noOfTriples);
         getContextSourceDTO().setLastHarvest(new Date());
-        getContextSourceDTO().setLastHarvestFailed(error!=null);
+        getContextSourceDTO().setLastHarvestFailed(error != null);
 
         // add harvest message about the given error if it's not null
         if (error != null) {
@@ -273,7 +273,7 @@ public class UploadHarvest extends BaseHarvest {
      * @throws IOException
      */
     private File convert(XmlAnalysis xmlAnalysis, FileBean fileBean) throws IOException, SAXException,
-    ParserConfigurationException {
+            ParserConfigurationException {
 
         // detect conversion id, if it's blank then return null, as no point in going further
         String conversionId = getConversionId(xmlAnalysis);
@@ -365,7 +365,7 @@ public class UploadHarvest extends BaseHarvest {
     /**
      * @see eionet.cr.harvest.BaseHarvest#getHarvestType()
      */
-    protected String getHarvestType(){
+    protected String getHarvestType() {
 
         return HarvestConstants.TYPE_PUSH;
     }

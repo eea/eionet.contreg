@@ -123,8 +123,11 @@ public class CompiledDatasetActionBean extends AbstractActionBean {
                         sched.scheduleJob(jobDetail, trigger);
 
                         // Update source last modified date
-                        DAOFactory.get().getDao(HarvestSourceDAO.class).insertUpdateSourceMetadata(uri, Predicates.CR_LAST_MODIFIED,
-                                ObjectDTO.createLiteral(dateFormat.format(new Date()), XMLSchema.DATETIME));
+                        DAOFactory
+                                .get()
+                                .getDao(HarvestSourceDAO.class)
+                                .insertUpdateSourceMetadata(uri, Predicates.CR_LAST_MODIFIED,
+                                        ObjectDTO.createLiteral(dateFormat.format(new Date()), XMLSchema.DATETIME));
 
                         success = true;
                     } catch (Exception e) {

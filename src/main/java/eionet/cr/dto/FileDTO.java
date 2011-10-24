@@ -22,7 +22,6 @@ package eionet.cr.dto;
 
 import eionet.cr.util.URIUtil;
 
-
 /**
  *
  * @author altnyris
@@ -31,7 +30,7 @@ import eionet.cr.util.URIUtil;
 public class FileDTO implements java.io.Serializable {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
 

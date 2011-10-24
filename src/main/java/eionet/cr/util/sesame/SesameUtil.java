@@ -101,7 +101,7 @@ public class SesameUtil {
      * @throws ResultSetReaderException
      */
     public static <T> void executeQuery(String sparql, SPARQLResultSetReader<T> reader, RepositoryConnection conn)
-    throws OpenRDFException, ResultSetReaderException {
+            throws OpenRDFException, ResultSetReaderException {
 
         executeQuery(sparql, null, reader, conn);
     }
@@ -120,25 +120,27 @@ public class SesameUtil {
 
         throw new UnsupportedOperationException("Method not implemented!");
         //
-        //        Update preparedUpdate = conn.prepareUpdate(QueryLanguage.SPARQL, sparql);
-        //        if (bindings != null) {
-        //            bindings.applyTo(preparedUpdate, conn.getValueFactory());
-        //        }
-        //        preparedUpdate.execute();
+        // Update preparedUpdate = conn.prepareUpdate(QueryLanguage.SPARQL, sparql);
+        // if (bindings != null) {
+        // bindings.applyTo(preparedUpdate, conn.getValueFactory());
+        // }
+        // preparedUpdate.execute();
     }
 
     /**
      * Executes SPARQL query that changes RDF data. Rollback is NOT made if query does not succeed
      *
      * @param sparql
-     * @param conn repository connection
-     * @param bindings Query bindings
+     * @param conn
+     *            repository connection
+     * @param bindings
+     *            Query bindings
      * @throws RepositoryException
      * @throws QueryEvaluationException
      * @throws MalformedQueryException
      */
     public static void executeUpdateQuery(String sparql, Bindings bindings, RepositoryConnection conn) throws RepositoryException,
-    QueryEvaluationException, MalformedQueryException {
+            QueryEvaluationException, MalformedQueryException {
 
         BooleanQuery query = conn.prepareBooleanQuery(QueryLanguage.SPARQL, sparql);
         if (bindings != null) {
@@ -258,9 +260,9 @@ public class SesameUtil {
      * @param sparulQuery
      * @return
      */
-    public static boolean isWellFormedSPARUL(String sparulQuery){
+    public static boolean isWellFormedSPARUL(String sparulQuery) {
 
-        if (StringUtils.isBlank(sparulQuery)){
+        if (StringUtils.isBlank(sparulQuery)) {
             return false;
         }
 
@@ -277,9 +279,9 @@ public class SesameUtil {
      * @param sparqlQuery
      * @return
      */
-    public static boolean isWellFormedSPARQL(String sparqlQuery){
+    public static boolean isWellFormedSPARQL(String sparqlQuery) {
 
-        if (StringUtils.isBlank(sparqlQuery)){
+        if (StringUtils.isBlank(sparqlQuery)) {
             return false;
         }
 
@@ -296,7 +298,7 @@ public class SesameUtil {
      * @param query
      * @return
      */
-    public static boolean isSelectQuery(String query){
+    public static boolean isSelectQuery(String query) {
 
         return isWellFormedSPARQL(query) && Util.containsTokenIgnoreCase(query, "SELECT");
     }
@@ -306,7 +308,7 @@ public class SesameUtil {
      * @param query
      * @return
      */
-    public static boolean isConstructQuery(String query){
+    public static boolean isConstructQuery(String query) {
 
         return isWellFormedSPARQL(query) && Util.containsTokenIgnoreCase(query, "CONSTRUCT");
     }
@@ -316,7 +318,7 @@ public class SesameUtil {
      * @param query
      * @return
      */
-    public static boolean isDescribeQuery(String query){
+    public static boolean isDescribeQuery(String query) {
 
         return isWellFormedSPARQL(query) && Util.containsTokenIgnoreCase(query, "DESCRIBE");
     }
@@ -326,7 +328,7 @@ public class SesameUtil {
      * @param query
      * @return
      */
-    public static boolean isaSKQuery(String query){
+    public static boolean isaSKQuery(String query) {
 
         return isWellFormedSPARQL(query) && Util.containsTokenIgnoreCase(query, "ASK");
     }

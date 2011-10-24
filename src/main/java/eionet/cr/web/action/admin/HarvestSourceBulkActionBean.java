@@ -84,8 +84,7 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
     }
 
     /**
-     * Deletes sources added by the user.
-     * Harvest sources are separated by carriage return in the textarea.
+     * Deletes sources added by the user. Harvest sources are separated by carriage return in the textarea.
      *
      * @return Resolution
      */
@@ -155,7 +154,7 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
             String url = urls.nextToken();
             if (URLUtil.isURL(url)) {
                 harvestSources
-                .add(HarvestSourceDTO.create(url, false, HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL, getUserName()));
+                        .add(HarvestSourceDTO.create(url, false, HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL, getUserName()));
                 sourceUrls.add(url);
             } else {
                 warnings.append("Entered URL \"").append(url).append("\" is not a valid URL.<br/>");
@@ -182,10 +181,10 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
             } catch (DAOException e) {
                 // if adding fails, proceed with adding the other sources and show error message
                 warnings.append("Adding source \"").append(source.getUrl()).append("\" failed, reason: ").append(e.toString())
-                .append("<br/>");
+                        .append("<br/>");
             } catch (HarvestException he) {
                 warnings.append("Adding source \"").append(source.getUrl()).append("\" to the harvest queue failed, reason: ")
-                .append(he.toString()).append("<br/>");
+                        .append(he.toString()).append("<br/>");
             }
         }
         addSystemMessage("Adding sources finished. Successfully added " + counter + " sources for urgent harvesting.");
@@ -206,10 +205,9 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
 
             for (String url : sourceUrls) {
 
-                if (CurrentHarvests.contains(url)){
+                if (CurrentHarvests.contains(url)) {
                     currentlyHarvested.add(url);
-                }
-                else{
+                } else {
                     sourcesToDelete.add(url);
                 }
             }
@@ -218,7 +216,7 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
 
             addSystemMessage(sourcesToDelete.size() + " sources were successfully removed from the system.");
 
-            if (!currentlyHarvested.isEmpty()){
+            if (!currentlyHarvested.isEmpty()) {
                 StringBuilder warnings = new StringBuilder();
                 warnings.append("The following sources could not be deleted, because they are curently being harvested: <ul>");
                 for (String url : currentlyHarvested) {

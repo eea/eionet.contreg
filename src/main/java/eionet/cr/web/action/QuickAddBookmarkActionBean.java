@@ -74,24 +74,24 @@ public class QuickAddBookmarkActionBean extends AbstractActionBean {
         String appDispName = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_DISPLAY_NAME);
 
         return "javascript: function go() {"
-        + "u=location.href;"
-        + "a=false;"
-        + "x=window;"
-        + "e=x.encodeURIComponent;"
-        + "d=document;"
-        + "if((s=d.selection)"
-        + "?t=s.createRange().text"
-        + ":t=x.getSelection()+'')"
-        + "(r=/^http:\\/\\/\\S+$/.exec(t))"
-        + "?u=t"
-        + ":a=true;"
-        + "a"
-        + "?alert('Please highlight a full URL, or deselect text to add this page.')"
-        + ":window.open("
-        + "'"
-        + getBaseUrl(this.getContext())
-        + "/quickAddBookmark.action?resource.source='+e(u)+'&amp;resource.title='+e(d.title)+'&amp;originalPageUrl='+e(location.href)"
-        + ", 'Add bookmark to " + appDispName + "', 'left=20,top=20,width=700,height=500')}; go();";
+                + "u=location.href;"
+                + "a=false;"
+                + "x=window;"
+                + "e=x.encodeURIComponent;"
+                + "d=document;"
+                + "if((s=d.selection)"
+                + "?t=s.createRange().text"
+                + ":t=x.getSelection()+'')"
+                + "(r=/^http:\\/\\/\\S+$/.exec(t))"
+                + "?u=t"
+                + ":a=true;"
+                + "a"
+                + "?alert('Please highlight a full URL, or deselect text to add this page.')"
+                + ":window.open("
+                + "'"
+                + getBaseUrl(this.getContext())
+                + "/quickAddBookmark.action?resource.source='+e(u)+'&amp;resource.title='+e(d.title)+'&amp;originalPageUrl='+e(location.href)"
+                + ", 'Add bookmark to " + appDispName + "', 'left=20,top=20,width=700,height=500')}; go();";
     }
 
     /**

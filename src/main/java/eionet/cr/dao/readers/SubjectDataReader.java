@@ -106,8 +106,8 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO> {
         addPredicateHash(rs.getLong("PREDICATE_HASH"));
 
         ObjectDTO object =
-            new ObjectDTO(rs.getString("OBJECT"), rs.getString("OBJ_LANG"), YesNoBoolean.parse(rs.getString("LIT_OBJ")),
-                    YesNoBoolean.parse(rs.getString("ANON_OBJ")));
+                new ObjectDTO(rs.getString("OBJECT"), rs.getString("OBJ_LANG"), YesNoBoolean.parse(rs.getString("LIT_OBJ")),
+                        YesNoBoolean.parse(rs.getString("ANON_OBJ")));
         object.setHash(rs.getLong("OBJECT_HASH"));
         object.setSourceUri(rs.getString("SOURCE_URI"));
         object.setSourceHash(rs.getLong("SOURCE"));
@@ -186,8 +186,8 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO> {
         }
 
         ObjectDTO object =
-            new ObjectDTO(strObjectValue, objectLang == null ? "" : objectLang, isLiteral, objectValue instanceof BNode,
-                    dataType);
+                new ObjectDTO(strObjectValue, objectLang == null ? "" : objectLang, isLiteral, objectValue instanceof BNode,
+                        dataType);
 
         object.setHash(Hashes.spoHash(strObjectValue));
 

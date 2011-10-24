@@ -130,7 +130,7 @@ public class FileDeletionJob implements ServletContextListener, StatefulJob {
      */
     public static synchronized void register(File file) {
 
-        if (file!=null){
+        if (file != null) {
             queuedFiles.add(file);
         }
     }
@@ -172,7 +172,9 @@ public class FileDeletionJob implements ServletContextListener, StatefulJob {
      */
     static class TempFileFilter implements FileFilter {
 
-        /* (non-Javadoc)
+        /*
+         * (non-Javadoc)
+         *
          * @see java.io.FileFilter#accept(java.io.File)
          */
         @Override

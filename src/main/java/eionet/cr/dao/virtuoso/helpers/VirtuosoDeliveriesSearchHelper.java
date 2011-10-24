@@ -29,11 +29,7 @@ public class VirtuosoDeliveriesSearchHelper extends AbstractSearchHelper {
      * @param pagingRequest
      * @param sortingRequest
      */
-    public VirtuosoDeliveriesSearchHelper(
-            String obligation,
-            String locality,
-            String year,
-            PagingRequest pagingRequest,
+    public VirtuosoDeliveriesSearchHelper(String obligation, String locality, String year, PagingRequest pagingRequest,
             SortingRequest sortingRequest) {
 
         super(pagingRequest, sortingRequest);

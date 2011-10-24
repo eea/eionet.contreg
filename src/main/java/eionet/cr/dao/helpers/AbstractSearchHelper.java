@@ -57,7 +57,7 @@ public abstract class AbstractSearchHelper implements SearchHelper {
         if (sortingRequest != null) {
             sortPredicate = sortingRequest.getSortingColumnName();
             sortOrder =
-                sortingRequest.getSortOrder() == null ? SortOrder.ASCENDING.toSQL() : sortingRequest.getSortOrder().toSQL();
+                    sortingRequest.getSortOrder() == null ? SortOrder.ASCENDING.toSQL() : sortingRequest.getSortOrder().toSQL();
         }
     }
 
@@ -72,7 +72,7 @@ public abstract class AbstractSearchHelper implements SearchHelper {
 
         if (pagingRequest != null) {
             return new StringBuffer(query).append(" limit ").append(pagingRequest.getItemsPerPage()).append(" offset ")
-            .append(pagingRequest.getOffset()).toString();
+                    .append(pagingRequest.getOffset()).toString();
         } else {
             return query;
         }

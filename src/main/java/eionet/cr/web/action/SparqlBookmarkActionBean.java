@@ -74,19 +74,19 @@ public class SparqlBookmarkActionBean extends AbstractActionBean {
     }
 
     /**
-    *
-    * @return boolean
-    * @throws DAOException
-    *             if query fails if query fails
-    */
-   public boolean getSubjectIsUserBookmark() throws DAOException {
+     *
+     * @return boolean
+     * @throws DAOException
+     *             if query fails if query fails
+     */
+    public boolean getSubjectIsUserBookmark() throws DAOException {
 
-       if (!isUserLoggedIn()) {
-           return false;
-       }
+        if (!isUserLoggedIn()) {
+            return false;
+        }
 
-       return Boolean.valueOf(factory.getDao(HelperDAO.class).isSubjectUserBookmark(getUser(), uri));
-   }
+        return Boolean.valueOf(factory.getDao(HelperDAO.class).isSubjectUserBookmark(getUser(), uri));
+    }
 
     /**
      * @return the uri

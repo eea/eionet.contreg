@@ -286,7 +286,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
             // since user's home URI was used above as triple source, add it to HARVEST_SOURCE too
             // (but set interval minutes to 0, to avoid it being background-harvested)
             DAOFactory.get().getDao(HarvestSourceDAO.class)
-            .addSourceIgnoreDuplicate(HarvestSourceDTO.create(getUser().getHomeUri(), false, 0, getUserName()));
+                    .addSourceIgnoreDuplicate(HarvestSourceDTO.create(getUser().getHomeUri(), false, 0, getUserName()));
 
         } catch (DAOException e) {
             saveAndHarvestException = e;
@@ -421,7 +421,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
      * @throws DAOException
      *
      */
-    @ValidationMethod(on = { "add", "rename", "delete" })
+    @ValidationMethod(on = {"add", "rename", "delete"})
     public void validatePostEvent() throws DAOException {
 
         // the below validation is relevant only when the event is requested through POST method

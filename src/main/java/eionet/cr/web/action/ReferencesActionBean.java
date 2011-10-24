@@ -95,12 +95,12 @@ public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
 
             if (anonHash == 0) {
                 searchResult =
-                    searchDAO.searchReferences(uri, PagingRequest.create(getPageN()),
-                            new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
+                        searchDAO.searchReferences(uri, PagingRequest.create(getPageN()),
+                                new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
             } else {
                 searchResult =
-                    searchDAO.searchReferences(anonHash, PagingRequest.create(getPageN()), new SortingRequest(getSortP(),
-                            SortOrder.parse(getSortO())));
+                        searchDAO.searchReferences(anonHash, PagingRequest.create(getPageN()), new SortingRequest(getSortP(),
+                                SortOrder.parse(getSortO())));
             }
 
             resultList = searchResult.getRight();

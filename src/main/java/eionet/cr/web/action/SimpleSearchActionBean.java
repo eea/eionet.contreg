@@ -114,11 +114,11 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 
             if (resultList == null || resultList.size() == 0) {
                 Pair<Integer, List<SubjectDTO>> result =
-                    DAOFactory
-                    .get()
-                    .getDao(SearchDAO.class)
-                    .searchByFreeText(searchExpression, filterType, exactMatch, PagingRequest.create(getPageN()),
-                            new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
+                        DAOFactory
+                                .get()
+                                .getDao(SearchDAO.class)
+                                .searchByFreeText(searchExpression, filterType, exactMatch, PagingRequest.create(getPageN()),
+                                        new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
 
                 resultList = result.getRight();
                 matchCount = result.getLeft();
@@ -147,7 +147,7 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
         long startTime = System.currentTimeMillis();
 
         HashSet<String> subjectUris = new HashSet<String>();
-        for (SubjectDTO subjectDTO : subjects){
+        for (SubjectDTO subjectDTO : subjects) {
             subjectUris.add(subjectDTO.getUri());
         }
 

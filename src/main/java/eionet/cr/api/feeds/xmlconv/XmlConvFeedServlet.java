@@ -86,7 +86,7 @@ public class XmlConvFeedServlet extends HttpServlet {
             }
 
             SubjectsRDFWriter rdfWriter =
-                new SubjectsRDFWriter(request.getParameter(XmlConvFeedServlet.INCLUDE_DERIVED_VALUES) != null);
+                    new SubjectsRDFWriter(request.getParameter(XmlConvFeedServlet.INCLUDE_DERIVED_VALUES) != null);
             rdfWriter.addNamespace(Namespace.CR);
             rdfWriter.addNamespace(Namespace.DC);
             rdfWriter.addNamespace(Namespace.OWL);

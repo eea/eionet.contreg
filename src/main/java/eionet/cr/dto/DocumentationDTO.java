@@ -24,24 +24,31 @@ public class DocumentationDTO implements Serializable {
     public String getPageId() {
         return pageId;
     }
+
     public void setPageId(String pageId) {
         this.pageId = pageId;
     }
+
     public String getContentType() {
         return contentType;
     }
+
     public void setContentType(String contentType) {
         this.contentType = contentType;
     }
+
     public String getContent() {
         return content;
     }
+
     public void setContent(String content) {
         this.content = content;
     }
+
     public String getTitle() {
         return title;
     }
+
     public void setTitle(String title) {
         this.title = title;
     }

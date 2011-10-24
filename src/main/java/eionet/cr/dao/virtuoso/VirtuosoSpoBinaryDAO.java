@@ -144,8 +144,8 @@ public class VirtuosoSpoBinaryDAO extends VirtuosoBaseDAO implements SpoBinaryDA
         try {
             conn = getSQLConnection();
             Object o =
-                SQLUtil.executeSingleReturnValueQuery(sqlExists,
-                        Collections.singletonList(Long.valueOf(Hashes.spoHash(subjectUri))), conn);
+                    SQLUtil.executeSingleReturnValueQuery(sqlExists,
+                            Collections.singletonList(Long.valueOf(Hashes.spoHash(subjectUri))), conn);
             return o != null && Integer.parseInt(o.toString()) > 0;
         } catch (SQLException e) {
             throw new DAOException(e.getMessage(), e);

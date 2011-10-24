@@ -95,13 +95,13 @@ public class PredicateLabelsReader extends SPARQLResultSetBaseReader {
      *
      * @param factsheetDTO
      */
-    public void fillPredicateLabels(FactsheetDTO factsheetDTO){
+    public void fillPredicateLabels(FactsheetDTO factsheetDTO) {
 
-        for (String predicateUri : factsheetDTO.getPredicateUris()){
+        for (String predicateUri : factsheetDTO.getPredicateUris()) {
 
             Literal literal = predicateLiterals.get(predicateUri);
-            String label = literal==null ? null : literal.getLabel();
-            if (StringUtils.isBlank(label)){
+            String label = literal == null ? null : literal.getLabel();
+            if (StringUtils.isBlank(label)) {
                 label = URIUtil.extractURILabel(predicateUri, predicateUri);
             }
             factsheetDTO.addPredicateLabel(predicateUri, label);

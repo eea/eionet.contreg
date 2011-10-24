@@ -59,7 +59,7 @@ public class JsonActionBean extends AbstractActionBean {
      * @return
      */
     @DefaultHandler
-    public Resolution defaultHandler(){
+    public Resolution defaultHandler() {
 
         return createSuggestionsResolution(new ArrayList<String>(), "");
     }
@@ -77,7 +77,7 @@ public class JsonActionBean extends AbstractActionBean {
         for (TagDTO tagDTO : tagList) {
 
             String tag = tagDTO.getTag();
-            if (StringUtils.isBlank(query) || StringUtils.startsWithIgnoreCase(tag, query)){
+            if (StringUtils.isBlank(query) || StringUtils.startsWithIgnoreCase(tag, query)) {
                 matchingTags.add(tag);
             }
         }
@@ -92,21 +92,20 @@ public class JsonActionBean extends AbstractActionBean {
      */
     public Resolution harvestSources() throws DAOException {
 
-        if (LOGGER.isTraceEnabled()){
+        if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("Getting harvest source suggestions ...");
         }
 
         long startTime = System.currentTimeMillis();
         String query = getContext().getRequestParameter("query");
         List<String> sourceUrls = DAOFactory.get().getDao(HarvestSourceDAO.class).filter(query, 101, 0);
-        if (sourceUrls.size()==101){
+        if (sourceUrls.size() == 101) {
             sourceUrls.set(100, "Narrow your search for more ...");
-        }
-        else if (sourceUrls.isEmpty()){
+        } else if (sourceUrls.isEmpty()) {
             sourceUrls.add("No suggestions found!");
         }
 
-        if (LOGGER.isTraceEnabled()){
+        if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("Harvest source suggestions retrieved in " + (System.currentTimeMillis() - startTime) + " ms");
         }
 
@@ -120,7 +119,7 @@ public class JsonActionBean extends AbstractActionBean {
      */
     public Resolution rdfTypes() throws DAOException {
 
-        if (LOGGER.isTraceEnabled()){
+        if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("Getting type suggestions ...");
         }
 
@@ -130,17 +129,17 @@ public class JsonActionBean extends AbstractActionBean {
         String query = getContext().getRequestParameter("query");
 
         List<String> resultList = new ArrayList<String>();
-        for (String typeUri : typeUris){
-            if (typeUri.toLowerCase().contains(query.toLowerCase())){
+        for (String typeUri : typeUris) {
+            if (typeUri.toLowerCase().contains(query.toLowerCase())) {
                 resultList.add(typeUri);
             }
         }
 
-        if (resultList.isEmpty()){
+        if (resultList.isEmpty()) {
             resultList.add("No suggestions found!");
         }
 
-        if (LOGGER.isTraceEnabled()){
+        if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("Type suggestions retrieved in " + (System.currentTimeMillis() - startTime) + " ms");
         }
         return createSuggestionsResolution(resultList, query);
@@ -152,7 +151,7 @@ public class JsonActionBean extends AbstractActionBean {
      * @param query
      * @return
      */
-    private StreamingResolution createSuggestionsResolution(List<String> suggestions, String query){
+    private StreamingResolution createSuggestionsResolution(List<String> suggestions, String query) {
 
         JSONArray jsonArray = JSONArray.fromObject(suggestions);
 

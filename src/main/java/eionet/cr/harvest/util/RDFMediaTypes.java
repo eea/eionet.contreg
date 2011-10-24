@@ -35,14 +35,14 @@ import org.openrdf.rio.RDFFormat;
 public class RDFMediaTypes {
 
     /** */
-    private static final LinkedHashMap<String,RDFFormat> mappings = init();
+    private static final LinkedHashMap<String, RDFFormat> mappings = init();
 
     /**
      * @return
      */
     private static LinkedHashMap<String, RDFFormat> init() {
 
-        LinkedHashMap<String,RDFFormat> result = new LinkedHashMap<String,RDFFormat>();
+        LinkedHashMap<String, RDFFormat> result = new LinkedHashMap<String, RDFFormat>();
         result.put("application/rdf+xml", RDFFormat.RDFXML);
         result.put("text/turtle", RDFFormat.TURTLE);
         result.put("text/n3", RDFFormat.N3);
@@ -56,13 +56,13 @@ public class RDFMediaTypes {
      * @param httpResponseContentType
      * @return
      */
-    public static RDFFormat toRdfFormat(String httpResponseContentType){
+    public static RDFFormat toRdfFormat(String httpResponseContentType) {
 
-        if (httpResponseContentType!=null){
+        if (httpResponseContentType != null) {
             String lowerCase = httpResponseContentType.toLowerCase();
-            for (Map.Entry<String, RDFFormat> entry : mappings.entrySet()){
+            for (Map.Entry<String, RDFFormat> entry : mappings.entrySet()) {
 
-                if (lowerCase.startsWith(entry.getKey())){
+                if (lowerCase.startsWith(entry.getKey())) {
                     return entry.getValue();
                 }
             }
@@ -75,7 +75,7 @@ public class RDFMediaTypes {
      *
      * @return
      */
-    public static Collection<String> collection(){
+    public static Collection<String> collection() {
 
         return Collections.unmodifiableSet(mappings.keySet());
     }

@@ -87,9 +87,7 @@ public class VirtuosoHarvestDAO extends VirtuosoBaseDAO implements HarvestDAO {
     public List<HarvestStatDTO> getLastHarvestStats(Integer limit) throws DAOException {
 
         String getHarvestStatsSQL =
-                "SELECT TOP "
-                        + limit
-                        + " h.harvest_id, h.started, h.finished, h.tot_statements, hs.url"
+                "SELECT TOP " + limit + " h.harvest_id, h.started, h.finished, h.tot_statements, hs.url"
                         + " FROM HARVEST AS h LEFT JOIN HARVEST_SOURCE AS hs ON h.harvest_source_id = hs.harvest_source_id"
                         + " WHERE h.status = ? ORDER BY h.finished DESC";
 

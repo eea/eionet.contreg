@@ -220,7 +220,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
     public Resolution addFilter() {
 
         Map<String, Map<String, String>> cache =
-            (Map<String, Map<String, String>>) getSession().getAttribute(SELECTED_FILTERS_CACHE);
+                (Map<String, Map<String, String>>) getSession().getAttribute(SELECTED_FILTERS_CACHE);
         if (cache == null) {
             cache = new HashMap<String, Map<String, String>>();
         }
@@ -242,7 +242,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
     public Resolution removeFilter() {
 
         Map<String, Map<String, String>> cache =
-            (Map<String, Map<String, String>>) getSession().getAttribute(SELECTED_FILTERS_CACHE);
+                (Map<String, Map<String, String>>) getSession().getAttribute(SELECTED_FILTERS_CACHE);
         if (cache != null && cache.containsKey(type) && cache.get(type) != null && cache.get(type).containsKey(clearFilter)) {
             cache.get(type).remove(clearFilter);
         }
@@ -259,7 +259,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
         if (selectedFilters != null && !selectedFilters.isEmpty()) {
             // save selected filters for future use
             Map<String, Map<String, String>> cache =
-                (Map<String, Map<String, String>>) getSession().getAttribute(SELECTED_FILTERS_CACHE);
+                    (Map<String, Map<String, String>>) getSession().getAttribute(SELECTED_FILTERS_CACHE);
             if (cache != null && cache.containsKey(type)) {
                 cache.get(type).putAll(selectedFilters);
             }
@@ -296,11 +296,11 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
                     }
                 }
                 Pair<Integer, List<SubjectDTO>> searchResult =
-                    DAOFactory
-                    .get()
-                    .getDao(SearchDAO.class)
-                    .searchByTypeAndFilters(criteria, false, PagingRequest.create(getPageN()),
-                            new SortingRequest(getSortP(), SortOrder.parse(getSortO())), selectedColumns);
+                        DAOFactory
+                                .get()
+                                .getDao(SearchDAO.class)
+                                .searchByTypeAndFilters(criteria, false, PagingRequest.create(getPageN()),
+                                        new SortingRequest(getSortP(), SortOrder.parse(getSortO())), selectedColumns);
 
                 resultList = searchResult.getRight();
                 matchCount = searchResult.getLeft();
@@ -360,14 +360,14 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
         getSession().setAttribute(PREVIOUS_TYPE, type);
         if (!type.equals(previousType)) {
             Map<String, Map<String, String>> filterCache =
-                (Map<String, Map<String, String>>) getSession().getAttribute(SELECTED_FILTERS_CACHE);
+                    (Map<String, Map<String, String>>) getSession().getAttribute(SELECTED_FILTERS_CACHE);
             if (filterCache != null && filterCache.containsKey(type)) {
                 filterCache.remove(type);
             }
         } else {
             // check for selected filters and add labels to them
             Map<String, Map<String, String>> filterCache =
-                (Map<String, Map<String, String>>) getSession().getAttribute(SELECTED_FILTERS_CACHE);
+                    (Map<String, Map<String, String>>) getSession().getAttribute(SELECTED_FILTERS_CACHE);
             if (filterCache != null && filterCache.containsKey(type)) {
                 selectedFilters = filterCache.get(type);
                 displayFilters = new HashMap<String, Pair<String, String>>();
@@ -556,7 +556,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
     public Map<String, String> getAvailableColumns() throws DAOException {
 
         Map<String, Map<String, String>> cache =
-            (Map<String, Map<String, String>>) getSession().getAttribute(AVAILABLE_COLUMNS_CACHE);
+                (Map<String, Map<String, String>>) getSession().getAttribute(AVAILABLE_COLUMNS_CACHE);
         if (cache == null) {
             cache = new HashMap<String, Map<String, String>>();
         }

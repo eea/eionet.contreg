@@ -25,8 +25,10 @@ public class DeliverySearchReader extends ResultSetMixedReader<DeliveryDTO> {
     /**
      * converts Bindingset row to DeliveryDTO.
      *
-     * @param bindingSet BindingSet
-     * @throws ResultSetReaderException if error in reading
+     * @param bindingSet
+     *            BindingSet
+     * @throws ResultSetReaderException
+     *             if error in reading
      */
     @Override
     public void readRow(final BindingSet bindingSet) throws ResultSetReaderException {

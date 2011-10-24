@@ -449,6 +449,7 @@ public interface HelperDAO extends DAO {
 
     /**
      * Returns full SPO objects of given subject.
+     *
      * @param subjectUri
      *
      * @throws DAOException

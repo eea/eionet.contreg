@@ -55,7 +55,8 @@ public class OnDemandHarvester extends Thread {
     /** */
     private boolean rdfContentFound = false;
     private boolean sourceAvailable = false;
-    //    private boolean needsHarvesting = true;
+
+    // private boolean needsHarvesting = true;
 
     private OnDemandHarvester(String sourceUrl, String userName) {
 
@@ -87,7 +88,7 @@ public class OnDemandHarvester extends Thread {
             // since user registrations URI was used as triple source, add it to HARVEST_SOURCE too
             // (but set interval minutes to 0, to avoid it being background-harvested)
             DAOFactory.get().getDao(HarvestSourceDAO.class)
-            .addSourceIgnoreDuplicate(HarvestSourceDTO.create(CRUser.registrationsUri(userName), true, 0, userName));
+                    .addSourceIgnoreDuplicate(HarvestSourceDTO.create(CRUser.registrationsUri(userName), true, 0, userName));
 
         } catch (HarvestException e) {
             harvestException = e;
@@ -99,7 +100,7 @@ public class OnDemandHarvester extends Thread {
             }
         } finally {
             if (pullHarvest != null) {
-                rdfContentFound = pullHarvest.getStoredTriplesCount()>0;
+                rdfContentFound = pullHarvest.getStoredTriplesCount() > 0;
                 sourceAvailable = pullHarvest.isSourceAvailable();
 
                 // TODO - check if source is redirected and destination source has been recently updated
@@ -160,8 +161,8 @@ public class OnDemandHarvester extends Thread {
                         return Resolution.SOURCE_UNAVAILABLE;
                     else if (!instantHarvester.isRdfContentFound())
                         return Resolution.NO_STRUCTURED_DATA;
-                    //                    else if (!instantHarvester.isNeedsHarvesting())
-                    //                        return Resolution.RECENTLY_HARVESTED;
+                    // else if (!instantHarvester.isNeedsHarvesting())
+                    // return Resolution.RECENTLY_HARVESTED;
                     else
                         return Resolution.COMPLETE;
                 }
@@ -196,10 +197,10 @@ public class OnDemandHarvester extends Thread {
         return sourceAvailable;
     }
     //
-    //    /**
-    //     * @return the needsHarvesting
-    //     */
-    //    public boolean isNeedsHarvesting() {
-    //        return needsHarvesting;
-    //    }
+    // /**
+    // * @return the needsHarvesting
+    // */
+    // public boolean isNeedsHarvesting() {
+    // return needsHarvesting;
+    // }
 }

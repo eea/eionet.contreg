@@ -151,7 +151,7 @@ public class ConversionsParser {
      * @throws SAXException
      */
     public static ConversionsParser parseForSchema(String schemaUri) throws IOException, SAXException,
-    ParserConfigurationException {
+            ParserConfigurationException {
 
         String listConversionsUrl = GeneralConfig.getRequiredProperty(GeneralConfig.XMLCONV_LIST_CONVERSIONS_URL);
         listConversionsUrl = MessageFormat.format(listConversionsUrl, Util.toArray(URLEncoder.encode(schemaUri)));

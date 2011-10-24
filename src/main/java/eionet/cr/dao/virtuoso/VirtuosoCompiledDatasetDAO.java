@@ -114,7 +114,6 @@ public class VirtuosoCompiledDatasetDAO extends VirtuosoBaseDAO implements Compi
             query.append("?source").append("<" + Predicates.CR_LAST_MODIFIED + ">").append(" ?lastModified");
             query.append("}");
 
-
             SPARQLResultSetBaseReader<SubjectDTO> reader = new SPARQLResultSetBaseReader<SubjectDTO>() {
                 @Override
                 public void readRow(BindingSet bindingSet) throws ResultSetReaderException {
@@ -176,18 +175,17 @@ public class VirtuosoCompiledDatasetDAO extends VirtuosoBaseDAO implements Compi
      * SPARQL for user compiled datasets.
      */
     private static final String USER_COMPILED_DATASETS_QUERY = "select ?s ?p ?o where { ?s ?p ?o. { "
-        + "select distinct ?s where { "
-        + "graph ?g { "
-        + "?s a ?compDataset . "
-        + "filter (?g = ?useFolder) "
-        + "}}}} order by ?s ?p ?o";
+            + "select distinct ?s where { " + "graph ?g { " + "?s a ?compDataset . " + "filter (?g = ?useFolder) "
+            + "}}}} order by ?s ?p ?o";
 
     /**
      * User compiled datasets.
      *
-     * @param crUser CR user
+     * @param crUser
+     *            CR user
      * @see eionet.cr.dao.CompiledDatasetDAOgetUserCompiledDatasets(eionet.cr.web.security.CRUser)
-     * @throws DAOException if query fails.
+     * @throws DAOException
+     *             if query fails.
      * @return List of user compiled datasets.
      */
     @Override
@@ -315,6 +313,5 @@ public class VirtuosoCompiledDatasetDAO extends VirtuosoBaseDAO implements Compi
 
         return ret;
     }
-
 
 }

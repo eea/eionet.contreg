@@ -55,7 +55,7 @@ public class PushHarvest extends BaseHarvest {
     @Override
     protected void doHarvest() throws HarvestException {
 
-        if (StringUtils.isEmpty(pushedContent)){
+        if (StringUtils.isEmpty(pushedContent)) {
             throw new HarvestException("Pushed content must not be empty!");
         }
 
@@ -76,7 +76,7 @@ public class PushHarvest extends BaseHarvest {
     /**
      * @see eionet.cr.harvest.BaseHarvest#getHarvestType()
      */
-    protected String getHarvestType(){
+    protected String getHarvestType() {
 
         return HarvestConstants.TYPE_PUSH;
     }

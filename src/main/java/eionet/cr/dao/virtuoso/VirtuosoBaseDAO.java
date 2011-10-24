@@ -110,13 +110,16 @@ public abstract class VirtuosoBaseDAO {
     /**
      * Executes SPARQL that updates data (uses old Sesame).
      *
-     * @param sparql SPARQL
-     * @param bindings Query bindings, if no bindings, null is accepted as the value
-     * @param conn Virtuoso repository connection
-     * @throws DAOException if update fails
+     * @param sparql
+     *            SPARQL
+     * @param bindings
+     *            Query bindings, if no bindings, null is accepted as the value
+     * @param conn
+     *            Virtuoso repository connection
+     * @throws DAOException
+     *             if update fails
      */
-    protected void executeUpdateSPARQL(String sparql, Bindings bindings, RepositoryConnection conn)
-    throws DAOException {
+    protected void executeUpdateSPARQL(String sparql, Bindings bindings, RepositoryConnection conn) throws DAOException {
         try {
             SesameUtil.executeUpdate(sparql, bindings, conn);
         } catch (Exception e) {
@@ -127,13 +130,16 @@ public abstract class VirtuosoBaseDAO {
     /**
      * Executes SPARQL query that updates data.
      *
-     * @param sparql SPARQL
-     * @param bindings Query bindings, if no bindings, null is accepted as the value
-     * @param conn Virtuoso repository connection
-     * @throws DAOException if update fails
+     * @param sparql
+     *            SPARQL
+     * @param bindings
+     *            Query bindings, if no bindings, null is accepted as the value
+     * @param conn
+     *            Virtuoso repository connection
+     * @throws DAOException
+     *             if update fails
      */
-    protected void executeUpdateQuerySPARQL(String sparql, Bindings bindings, RepositoryConnection conn)
-    throws DAOException {
+    protected void executeUpdateQuerySPARQL(String sparql, Bindings bindings, RepositoryConnection conn) throws DAOException {
         try {
             SesameUtil.executeUpdateQuery(sparql, bindings, conn);
         } catch (Exception e) {
@@ -187,8 +193,8 @@ public abstract class VirtuosoBaseDAO {
      * @throws DAOException
      *             Default call of getSubjectsData() - SubjectDTO are created if not existing
      */
-    protected List<SubjectDTO> getSubjectsData(Collection<String> subjectUris, String[] predicateUris,
-            SubjectDataReader reader) throws DAOException {
+    protected List<SubjectDTO> getSubjectsData(Collection<String> subjectUris, String[] predicateUris, SubjectDataReader reader)
+            throws DAOException {
 
         boolean createMissingDTOs = true;
         return getSubjectsData(subjectUris, predicateUris, reader, createMissingDTOs);
@@ -209,8 +215,8 @@ public abstract class VirtuosoBaseDAO {
      * @throws DAOException
      *             if query fails
      */
-    protected List<SubjectDTO> getSubjectsData(Collection<String> subjectUris, String[] predicateUris,
-            SubjectDataReader reader, boolean createMissingDTOs) throws DAOException {
+    protected List<SubjectDTO> getSubjectsData(Collection<String> subjectUris, String[] predicateUris, SubjectDataReader reader,
+            boolean createMissingDTOs) throws DAOException {
 
         if (subjectUris == null || subjectUris.isEmpty()) {
             throw new IllegalArgumentException("Subjects collection must not be null or empty!");
@@ -238,8 +244,7 @@ public abstract class VirtuosoBaseDAO {
     }
 
     /**
-     * Returns a SPARQL query that will retrieve the given subjects' given predicates.
-     * Predicates and graphs are optional.
+     * Returns a SPARQL query that will retrieve the given subjects' given predicates. Predicates and graphs are optional.
      *
      * @param subjectUris
      *            - collection of subjects whose data is being queried
@@ -287,7 +292,8 @@ public abstract class VirtuosoBaseDAO {
     /**
      * Count the total number of rows retrieved by the query constructed in SearchHelper.
      *
-     * @param helper SearchHelper object.
+     * @param helper
+     *            SearchHelper object.
      * @param inParams
      * @return number of rows
      * @throws DAOException

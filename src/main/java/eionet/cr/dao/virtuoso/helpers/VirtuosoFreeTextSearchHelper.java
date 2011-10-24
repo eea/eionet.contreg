@@ -69,7 +69,7 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper {
         buf.append("select distinct ?s where {?s ?p ?o");
 
         String typeFilterPart = buildTypeFilterPart();
-        if (!StringUtils.isBlank(typeFilterPart)){
+        if (!StringUtils.isBlank(typeFilterPart)) {
             buf.append(". ").append(typeFilterPart);
         }
         buf.append(". ").append(buildTextFilterPart()).append("}");
@@ -87,7 +87,7 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper {
         buf.append("select distinct ?s where {?s ?p ?o");
 
         String typeFilterPart = buildTypeFilterPart();
-        if (!StringUtils.isBlank(typeFilterPart)){
+        if (!StringUtils.isBlank(typeFilterPart)) {
             buf.append(". ").append(typeFilterPart);
         }
         buf.append(". ").append(buildTextFilterPart()).append(". optional {?s ?sortPredicate ?ord}} ORDER BY ");
@@ -122,7 +122,7 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper {
         buf.append("select count(distinct ?s) where {?s ?p ?o");
 
         String typeFilterPart = buildTypeFilterPart();
-        if (!StringUtils.isBlank(typeFilterPart)){
+        if (!StringUtils.isBlank(typeFilterPart)) {
             buf.append(". ").append(typeFilterPart);
         }
         buf.append(". ").append(buildTextFilterPart()).append("}");

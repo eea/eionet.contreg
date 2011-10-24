@@ -74,7 +74,7 @@ public final class EMailSender {
      *             if sending fails
      */
     public static void send(final String[] to, final String subject, final String body, final boolean ccSysAdmin)
-    throws MessagingException {
+            throws MessagingException {
 
         // if no mail.host specified in the properties, go no further
         String mailHost = GeneralConfig.getProperty("mail.host");
@@ -83,7 +83,7 @@ public final class EMailSender {
         }
 
         Authenticator authenticator = null;
-        if (GeneralConfig.getProperty("mail.smtp.auth")!=null && GeneralConfig.getProperty("mail.smtp.auth").equals("true")){
+        if (GeneralConfig.getProperty("mail.smtp.auth") != null && GeneralConfig.getProperty("mail.smtp.auth").equals("true")) {
             String user = GeneralConfig.getProperty("mail.user");
             String password = GeneralConfig.getProperty("mail.password");
             authenticator = new EMailAuthenticator(user, password);

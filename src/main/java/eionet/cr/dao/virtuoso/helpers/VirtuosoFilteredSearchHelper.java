@@ -41,6 +41,7 @@ public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
     /**
      *
      * Class constructor.
+     *
      * @param filters
      * @param literalRangeFilters
      * @param pagingRequest
@@ -104,12 +105,12 @@ public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
         // If sorting is done by either rdfs:label or rdf:type, and a particular subject doesn't have
         // those predicates, then the last part of subject URI must be used instead.
         if (Predicates.RDFS_LABEL.equals(sortPredicate)) {
-            strBuilder.append("(bif:either( bif:isnull(?sortObject) , (bif:lcase(bif:subseq (bif:replace (?s, '/', '#'), ").append(
-            "bif:strrchr (bif:replace (?s, '/', '#'), '#')+1))) , bif:lcase(?sortObject)))");
+            strBuilder.append("(bif:either( bif:isnull(?sortObject) , (bif:lcase(bif:subseq (bif:replace (?s, '/', '#'), ")
+                    .append("bif:strrchr (bif:replace (?s, '/', '#'), '#')+1))) , bif:lcase(?sortObject)))");
         } else if (Predicates.RDF_TYPE.equals(sortPredicate)) {
             // Replace all / with # and then get the string after last #
             strBuilder.append("(bif:lcase(bif:subseq (bif:replace (?sortObject, '/', '#'), bif:strrchr (bif:replace ").append(
-            "(?sortObject, '/', '#'), '#')+1)))");
+                    "(?sortObject, '/', '#'), '#')+1)))");
             // sort by date
         } else {
             strBuilder.append("(bif:lcase(?sortObject))");
@@ -131,8 +132,7 @@ public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
     }
 
     /**
-     * Builds the query 's "where contents",
-     * i.e. the part that goes in between the curly brackets in "where {}".
+     * Builds the query 's "where contents", i.e. the part that goes in between the curly brackets in "where {}".
      *
      * @return Query parameter string for SPARQL
      */
@@ -156,13 +156,12 @@ public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
                 String predicateValueVariable = predicateVariable + "Val";
                 String objectValueVariable = objectVariable + "Val";
 
-                if (StringUtils.equals(sortPredicate, predicateUri)){
+                if (StringUtils.equals(sortPredicate, predicateUri)) {
                     objectValueVariable = SORT_OBJECT_VALUE_VARIABLE;
                     sortPredicateInWhereConents = true;
                 }
 
-
-                if (filterIndex>1){
+                if (filterIndex > 1) {
                     result += ". ";
                 }
 
@@ -173,12 +172,10 @@ public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
                 if (Util.isSurroundedWithQuotes(objectValue)) {
                     result += ". filter(?" + objectVariable + " = ?" + objectValueVariable + ")";
                     bindings.setString(objectValueVariable, Util.removeSurroundingQuotes(objectValue));
-                }
-                else if (URIUtil.isSchemedURI(objectValue)){
+                } else if (URIUtil.isSchemedURI(objectValue)) {
                     result += ". filter(?" + objectVariable + " = ?" + objectValueVariable + ")";
                     bindings.setURI(objectValueVariable, objectValue);
-                }
-                else{
+                } else {
                     result += ". filter bif:contains(?" + objectVariable + ", ?" + objectValueVariable + ")";
                     bindings.setString(objectValueVariable, objectValue);
                     requiresFullTextSearch = Boolean.TRUE;
@@ -186,7 +183,7 @@ public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
             }
         }
 
-        if (!result.isEmpty() && sortPredicate!=null && !sortPredicateInWhereConents){
+        if (!result.isEmpty() && sortPredicate != null && !sortPredicateInWhereConents) {
             result += " . OPTIONAL {?s ?sortPred ?" + SORT_OBJECT_VALUE_VARIABLE + "}";
             bindings.setURI("sortPred", sortPredicate);
         }

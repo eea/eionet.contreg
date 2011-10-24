@@ -48,7 +48,7 @@ public class PredicateObjectsReader extends SPARQLResultSetBaseReader<ObjectDTO>
     private List<String> acceptedLanguages;
 
     /** */
-    private HashMap<String, HashSet<String>> distinctLiterals = new HashMap<String,HashSet<String>>();
+    private HashMap<String, HashSet<String>> distinctLiterals = new HashMap<String, HashSet<String>>();
     private HashSet<String> distinctResources = new HashSet<String>();
 
     /**
@@ -75,7 +75,7 @@ public class PredicateObjectsReader extends SPARQLResultSetBaseReader<ObjectDTO>
             Literal literal = isLiteral ? (Literal) objectValue : null;
             String language = isLiteral ? literal.getLanguage() : null;
 
-            if (!objectAlreadyAdded(value, isLiteral, language)){
+            if (!objectAlreadyAdded(value, isLiteral, language)) {
 
                 URI datatype = isLiteral ? literal.getDatatype() : null;
                 boolean isAnonymous = isLiteral ? false : objectValue instanceof BNode;
@@ -95,7 +95,7 @@ public class PredicateObjectsReader extends SPARQLResultSetBaseReader<ObjectDTO>
                 resultList.add(objectDTO);
                 if (isLiteral) {
                     HashSet<String> valuesByLang = distinctLiterals.get(language);
-                    if (valuesByLang==null){
+                    if (valuesByLang == null) {
                         valuesByLang = new HashSet<String>();
                         distinctLiterals.put(language, valuesByLang);
                     }
@@ -113,13 +113,12 @@ public class PredicateObjectsReader extends SPARQLResultSetBaseReader<ObjectDTO>
      * @param language
      * @return
      */
-    private boolean objectAlreadyAdded(String value, boolean isLiteral, String language){
+    private boolean objectAlreadyAdded(String value, boolean isLiteral, String language) {
 
-        if (isLiteral){
+        if (isLiteral) {
             HashSet<String> valuesByLang = distinctLiterals.get(language);
-            return valuesByLang!=null && valuesByLang.contains(value);
-        }
-        else{
+            return valuesByLang != null && valuesByLang.contains(value);
+        } else {
             return distinctResources.contains(value);
         }
     }

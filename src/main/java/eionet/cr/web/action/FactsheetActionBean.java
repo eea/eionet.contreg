@@ -132,7 +132,6 @@ public class FactsheetActionBean extends AbstractActionBean {
     @DefaultHandler
     public Resolution view() throws DAOException {
 
-
         if (isNoCriteria()) {
             addCautionMessage("No request criteria specified!");
         } else {
@@ -317,10 +316,10 @@ public class FactsheetActionBean extends AbstractActionBean {
         // since user registrations URI was used as triple source, add it to HARVEST_SOURCE too
         // (but set interval minutes to 0, to avoid it being background-harvested)
         DAOFactory
-        .get()
-        .getDao(HarvestSourceDAO.class)
-        .addSourceIgnoreDuplicate(
-                HarvestSourceDTO.create(getUser().getRegistrationsUri(), true, 0, getUser().getUserName()));
+                .get()
+                .getDao(HarvestSourceDAO.class)
+                .addSourceIgnoreDuplicate(
+                        HarvestSourceDTO.create(getUser().getRegistrationsUri(), true, 0, getUser().getUserName()));
 
         return new RedirectResolution(this.getClass(), "edit").addParameter("uri", uri);
     }
@@ -574,8 +573,8 @@ public class FactsheetActionBean extends AbstractActionBean {
      */
     public boolean isCurrentlyHarvested() {
 
-        return uri == null ? false : (CurrentHarvests.contains(uri) || UrgentHarvestQueue.isInQueue(uri)
-                || CurrentCompiledDatasets.contains(uri));
+        return uri == null ? false
+                : (CurrentHarvests.contains(uri) || UrgentHarvestQueue.isInQueue(uri) || CurrentCompiledDatasets.contains(uri));
     }
 
     /**
@@ -608,7 +607,6 @@ public class FactsheetActionBean extends AbstractActionBean {
         tabs = helper.getTabs(FactsheetTabMenuHelper.TabTitle.SHOW_ON_MAP);
         return new ForwardResolution("/pages/map.jsp");
     }
-
 
     public boolean isUriIsHarvestSource() {
         return uriIsHarvestSource;

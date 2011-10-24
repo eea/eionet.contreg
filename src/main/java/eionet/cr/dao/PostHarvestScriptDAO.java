@@ -32,7 +32,7 @@ import eionet.cr.util.Pair;
  *
  * @author Jaanus Heinlaid
  */
-public interface PostHarvestScriptDAO extends DAO{
+public interface PostHarvestScriptDAO extends DAO {
 
     /**
      *
@@ -110,18 +110,17 @@ public interface PostHarvestScriptDAO extends DAO{
      * @return
      * @throws DAOException
      */
-    List<Pair<String,Integer>> listTargets(TargetType targetType) throws DAOException;
+    List<Pair<String, Integer>> listTargets(TargetType targetType) throws DAOException;
 
     /**
-     * Move the position of the given scripts by 1 step up or down, depending on the given direction.
-     * The direction is given as an integer. Any negative integer is considered as moving up (e.g. position
-     * 3 becomes 2), any positive integer is considered moving down (e.g. position 3 becomes 4). The
-     * absolute value of the direction is ignored, as the moving is always done by one step only
-     * (i.e. direction of -3 does not mean that the moving will be done 3 steps up). A direction of 0 is illegal.
+     * Move the position of the given scripts by 1 step up or down, depending on the given direction. The direction is given as an
+     * integer. Any negative integer is considered as moving up (e.g. position 3 becomes 2), any positive integer is considered
+     * moving down (e.g. position 3 becomes 4). The absolute value of the direction is ignored, as the moving is always done by one
+     * step only (i.e. direction of -3 does not mean that the moving will be done 3 steps up). A direction of 0 is illegal.
      *
-     * Scripts are identified by the given target type, target URL and script ids. If the ids are null or empty,
-     * the method returns immediately without doing anything. Target type and target url can be null or blank,
-     * in which case the method operates on all-source scripts.
+     * Scripts are identified by the given target type, target URL and script ids. If the ids are null or empty, the method returns
+     * immediately without doing anything. Target type and target url can be null or blank, in which case the method operates on
+     * all-source scripts.
      *
      * @param targetType
      * @param targetUrl

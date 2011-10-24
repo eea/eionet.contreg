@@ -136,8 +136,6 @@ public class FactsheetTabMenuHelper {
         return uriIsHarvestSource;
     }
 
-
-
     public static class TabTitle {
         public static final String RESOURCE_PROPERTIES = "Resource properties";
         public static final String RESOURCE_REFERENCES = "Resource references";

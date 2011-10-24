@@ -336,10 +336,9 @@ public abstract class AbstractHomeActionBean extends AbstractActionBean {
             if (harvestSourceDTO != null) {
                 UploadHarvest uploadHarvest = new UploadHarvest(harvestSourceDTO, uploadedFile, dcTitle, userName);
                 CurrentHarvests.addOnDemandHarvest(harvestSourceDTO.getUrl(), userName);
-                try{
+                try {
                     uploadHarvest.execute();
-                }
-                finally{
+                } finally {
                     CurrentHarvests.removeOnDemandHarvest(harvestSourceDTO.getUrl());
                 }
             } else {

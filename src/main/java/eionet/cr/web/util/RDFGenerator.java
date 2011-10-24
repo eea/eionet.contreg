@@ -24,10 +24,12 @@ public final class RDFGenerator {
     private RDFGenerator() {
 
     }
+
     /**
      * SPARQL for exporting a graph.
      */
     private static final String EXPORT_GRAPH_SPARQL = "CONSTRUCT { ?s ?p ?o } FROM ?source WHERE { ?s ?p ?o } ";
+
     /**
      * Generates RDF of given harvest source (graph) to the output stream.
      *

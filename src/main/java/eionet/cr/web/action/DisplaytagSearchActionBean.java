@@ -37,18 +37,23 @@ public abstract class DisplaytagSearchActionBean extends AbstractActionBean {
     public int getPage() {
         return page;
     }
+
     public void setPage(int page) {
         this.page = page;
     }
+
     public String getDir() {
         return dir;
     }
+
     public void setDir(String dir) {
         this.dir = dir;
     }
+
     public String getSort() {
         return sort;
     }
+
     public void setSort(String sort) {
         this.sort = sort;
     }

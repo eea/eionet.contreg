@@ -113,8 +113,8 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
             SortingRequest sortingRequest = new SortingRequest(Predicates.RDFS_LABEL, SortOrder.ASCENDING);
             sortingRequest.setSortByPredicateObjectHash(true);
             Pair<Integer, List<SubjectDTO>> resultPair =
-                DAOFactory.get().getDao(SearchDAO.class)
-                .searchBySpatialBox(createBBOX(), source, PagingRequest.create(1, 25), sortingRequest, true);
+                    DAOFactory.get().getDao(SearchDAO.class)
+                            .searchBySpatialBox(createBBOX(), source, PagingRequest.create(1, 25), sortingRequest, true);
             resultList = resultPair.getRight();
         }
 
@@ -240,11 +240,11 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
         if (!bbox.isUndefined()) {
 
             Pair<Integer, List<SubjectDTO>> resultPair =
-                DAOFactory
-                .get()
-                .getDao(SearchDAO.class)
-                .searchBySpatialBox(createBBOX(), source, PagingRequest.create(getPageN()),
-                        new SortingRequest(getSortP(), SortOrder.parse(getSortO())), false);
+                    DAOFactory
+                            .get()
+                            .getDao(SearchDAO.class)
+                            .searchBySpatialBox(createBBOX(), source, PagingRequest.create(getPageN()),
+                                    new SortingRequest(getSortP(), SortOrder.parse(getSortO())), false);
             resultList = resultPair.getRight();
             matchCount = resultPair.getLeft();
         }

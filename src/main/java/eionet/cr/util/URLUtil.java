@@ -160,8 +160,8 @@ public class URLUtil {
         }
 
         return ioe instanceof MalformedURLException || ioe instanceof UnknownHostException
-        || (responseCode >= 400 && responseCode <= 499) || responseCode == HttpURLConnection.HTTP_NOT_IMPLEMENTED
-        || responseCode == HttpURLConnection.HTTP_VERSION;
+                || (responseCode >= 400 && responseCode <= 499) || responseCode == HttpURLConnection.HTTP_NOT_IMPLEMENTED
+                || responseCode == HttpURLConnection.HTTP_VERSION;
     }
 
     /**
@@ -231,7 +231,7 @@ public class URLUtil {
      * @param url2
      * @return
      */
-    public static boolean equalUrls(String url1, String url2){
+    public static boolean equalUrls(String url1, String url2) {
 
         return normalizeUrl(url1).equals(normalizeUrl(url2));
     }
@@ -241,7 +241,7 @@ public class URLUtil {
      * @param urlString
      * @return
      */
-    public static String normalizeUrl(String urlString){
+    public static String normalizeUrl(String urlString) {
 
         // if given URL string is null, return it as it is
         if (urlString == null) {
@@ -273,39 +273,38 @@ public class URLUtil {
 
         StringBuilder result = new StringBuilder();
 
-        try{
-            if (!StringUtils.isEmpty(protocol)){
+        try {
+            if (!StringUtils.isEmpty(protocol)) {
                 result.append(decodeEncode(protocol.toLowerCase())).append("://");
             }
 
-            if (!StringUtils.isEmpty(userInfo)){
+            if (!StringUtils.isEmpty(userInfo)) {
                 result.append(decodeEncode(userInfo, ":")).append("@");
             }
 
-            if (!StringUtils.isEmpty(host)){
+            if (!StringUtils.isEmpty(host)) {
                 result.append(decodeEncode(host.toLowerCase()));
             }
 
-            if (port!=-1 && port!=80){
+            if (port != -1 && port != 80) {
                 result.append(":").append(port);
             }
 
-            if (!StringUtils.isEmpty(path)){
+            if (!StringUtils.isEmpty(path)) {
                 result.append(normalizePath(path));
             }
 
-            if (!StringUtils.isEmpty(query)){
+            if (!StringUtils.isEmpty(query)) {
                 String normalizedQuery = normalizeQueryString(uri);
-                if (!StringUtils.isBlank(normalizedQuery)){
+                if (!StringUtils.isBlank(normalizedQuery)) {
                     result.append("?").append(normalizedQuery);
                 }
             }
 
-            if (!StringUtils.isEmpty(reference)){
+            if (!StringUtils.isEmpty(reference)) {
                 result.append("#").append(decodeEncode(reference));
             }
-        }
-        catch (UnsupportedEncodingException e){
+        } catch (UnsupportedEncodingException e) {
             throw new CRRuntimeException("Unsupported encoding: " + e.getMessage(), e);
         }
 
@@ -335,24 +334,22 @@ public class URLUtil {
      * @return
      * @throws UnsupportedEncodingException
      */
-    private static String decodeEncode(String str, String exceptions) throws UnsupportedEncodingException{
+    private static String decodeEncode(String str, String exceptions) throws UnsupportedEncodingException {
 
-        if (StringUtils.isEmpty(str)){
+        if (StringUtils.isEmpty(str)) {
             return str;
-        }
-        else if (StringUtils.isEmpty(exceptions)){
+        } else if (StringUtils.isEmpty(exceptions)) {
             return decodeEncode(str);
         }
 
         StringBuilder result = new StringBuilder();
         StringTokenizer tokenizer = new StringTokenizer(str, exceptions, true);
-        while (tokenizer.hasMoreTokens()){
+        while (tokenizer.hasMoreTokens()) {
 
             String token = tokenizer.nextToken();
-            if (!token.isEmpty() && exceptions.contains(token)){
+            if (!token.isEmpty() && exceptions.contains(token)) {
                 result.append(token);
-            }
-            else{
+            } else {
                 result.append(decodeEncode(token));
             }
         }
@@ -375,9 +372,9 @@ public class URLUtil {
             String name = paramPair.getName();
             String value = paramPair.getValue();
             String normalizedName = decodeEncode(name);
-            if (!isSessionId(normalizedName)){
+            if (!isSessionId(normalizedName)) {
 
-                if (result.length() > 0){
+                if (result.length() > 0) {
                     result.append("&");
                 }
                 result.append(normalizedName);
@@ -395,9 +392,9 @@ public class URLUtil {
      * @param str
      * @return
      */
-    private static boolean isSessionId(String str){
+    private static boolean isSessionId(String str) {
 
-        if (str==null){
+        if (str == null) {
             return false;
         }
 
@@ -410,12 +407,12 @@ public class URLUtil {
      * @return
      * @throws UnsupportedEncodingException
      */
-    private static String normalizePath(String path) throws UnsupportedEncodingException{
+    private static String normalizePath(String path) throws UnsupportedEncodingException {
 
-        for (String sessionId : sessionIdentifiers){
+        for (String sessionId : sessionIdentifiers) {
 
             int i = path.indexOf(";" + sessionId + "=");
-            if (i>=0){
+            if (i >= 0) {
                 path = path.substring(0, i);
             }
         }
@@ -430,7 +427,8 @@ public class URLUtil {
      */
     public static void main(String[] args) throws Exception {
 
-        String urlString = "http://usern%68me:password@d%69main:123/path;ASPSESSIONID=93AE727EADF5D5351219360F1952051F?jaanus=onu&phpsessid=999#fragment_%69d";
+        String urlString =
+                "http://usern%68me:password@d%69main:123/path;ASPSESSIONID=93AE727EADF5D5351219360F1952051F?jaanus=onu&phpsessid=999#fragment_%69d";
         System.out.println(urlString);
         System.out.println(normalizeUrl(urlString));
     }

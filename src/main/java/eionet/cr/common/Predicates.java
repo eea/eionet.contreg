@@ -84,7 +84,7 @@ public interface Predicates {
     public static final String CR_FEEDBACK_FOR = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#feedbackFor";
     public static final String CR_USER = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#user";
     public static final String CR_USER_REVIEW_LAST_NUMBER =
-        "http://cr.eionet.europa.eu/ontologies/contreg.rdf#userReviewLastNumber";
+            "http://cr.eionet.europa.eu/ontologies/contreg.rdf#userReviewLastNumber";
     public static final String CR_HAS_ATTACHMENT = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#hasAttachment";
     public static final String CR_HAS_FILE = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#hasFile";
     public static final String CR_FILE = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#File";

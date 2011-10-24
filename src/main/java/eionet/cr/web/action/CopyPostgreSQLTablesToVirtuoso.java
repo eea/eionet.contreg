@@ -38,7 +38,7 @@ public class CopyPostgreSQLTablesToVirtuoso {
             copyHarvestSource(virtCon, pgreCon);
             copyHarvestMessage(virtCon, pgreCon);
             copyHarvest(virtCon, pgreCon);
-            //copyDocumentation(virtCon, pgreCon);
+            // copyDocumentation(virtCon, pgreCon);
             copyUrgentHarvestQueue(virtCon, pgreCon);
             copySpoBinary(virtCon, pgreCon);
 

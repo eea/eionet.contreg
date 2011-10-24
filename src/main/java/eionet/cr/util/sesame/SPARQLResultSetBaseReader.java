@@ -63,9 +63,9 @@ public abstract class SPARQLResultSetBaseReader<T> implements SPARQLResultSetRea
      * @param bindingName
      * @return
      */
-    protected final String getStringValue(BindingSet bindingSet, String bindingName){
+    protected final String getStringValue(BindingSet bindingSet, String bindingName) {
 
         Value value = bindingSet.getValue(bindingName);
-        return value==null ? null : value.stringValue();
+        return value == null ? null : value.stringValue();
     }
 }

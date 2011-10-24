@@ -79,7 +79,7 @@ public class VirtuosoUserHomeDAO extends VirtuosoBaseDAO implements UserHomeDAO 
 
             // only these predicates will be queried for
             String[] neededPredicates =
-            {Predicates.RDFS_LABEL, Predicates.RDF_TYPE, Predicates.CR_HAS_FILE, Predicates.CR_HAS_FOLDER};
+                    {Predicates.RDFS_LABEL, Predicates.RDF_TYPE, Predicates.CR_HAS_FILE, Predicates.CR_HAS_FOLDER};
 
             if (selectedPredicates != null && selectedPredicates.size() > 0) {
                 neededPredicates = selectedPredicates.toArray(neededPredicates);
@@ -115,8 +115,8 @@ public class VirtuosoUserHomeDAO extends VirtuosoBaseDAO implements UserHomeDAO 
      * SPARQL for checking if user folder is registered.
      */
     private static final String USER_FOLDER_REGISTERED_SPARQL = SPARQLQueryUtil.getPrefixes(Namespace.CR).toString()
-        + " SELECT ?folder WHERE {?rootHomeUri <" + Predicates.CR_HAS_FOLDER + "> ?folder . "
-        + "FILTER (?folder = ?userHomeUri) . ?folder a cr:UserFolder}";
+            + " SELECT ?folder WHERE {?rootHomeUri <" + Predicates.CR_HAS_FOLDER + "> ?folder . "
+            + "FILTER (?folder = ?userHomeUri) . ?folder a cr:UserFolder}";
 
     /*
      * (non-Javadoc)

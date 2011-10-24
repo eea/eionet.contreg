@@ -67,9 +67,9 @@ public class FileProcessor {
      * @param file
      * @param contextUrl
      */
-    public FileProcessor(File file, String contextUrl){
+    public FileProcessor(File file, String contextUrl) {
 
-        if (file == null || contextUrl==null) {
+        if (file == null || contextUrl == null) {
             throw new IllegalArgumentException("File and context URL must not be null!");
         }
 
@@ -97,7 +97,7 @@ public class FileProcessor {
         // try unzipping (if the file is not zipped, reference to the same file is returned,
         // otherwise reference to the newly created unzipped file is returned)
         File unzippedFile = tryUnzip(file);
-        if (unzippedFile!=file){
+        if (unzippedFile != file) {
             LOGGER.debug(loggerMsg("File was zipped"));
         }
 
@@ -132,7 +132,7 @@ public class FileProcessor {
             // if the result that's going to be returned is not the unzipped file,
             // then delete the latter, as it won't be used outside of this method any more
             // (this includes the case where the result is null)
-            if (resultFile!=unzippedFile){
+            if (resultFile != unzippedFile) {
                 FileDeletionJob.register(unzippedFile);
             }
         }
@@ -203,7 +203,7 @@ public class FileProcessor {
      * @throws SAXException
      * @throws IOException
      */
-    private File attemptRdfConversion(File file, String conversionSchema, String contextUrl) throws IOException, SAXException{
+    private File attemptRdfConversion(File file, String conversionSchema, String contextUrl) throws IOException, SAXException {
 
         String conversionId = null;
         try {
@@ -230,126 +230,125 @@ public class FileProcessor {
 
             // return converted file
             return convertedFile;
-        }
-        else{
+        } else {
             LOGGER.debug(loggerMsg("No RDF conversion found for this schema or DTD"));
         }
 
         return null;
     }
 
-    //    /**
-    //    *
-    //    * @param file
-    //    * @param contextUrl
-    //    * @return
-    //    * @throws IOException
-    //    */
-    //   public File process(File file, String contextUrl) throws IOException {
+    // /**
+    // *
+    // * @param file
+    // * @param contextUrl
+    // * @return
+    // * @throws IOException
+    // */
+    // public File process(File file, String contextUrl) throws IOException {
     //
-    //       if (file == null) {
-    //           throw new IllegalArgumentException("File must not be null!");
-    //       }
+    // if (file == null) {
+    // throw new IllegalArgumentException("File must not be null!");
+    // }
     //
-    //       File unzippedFile = null;
-    //       File processedFile = null;
-    //       try {
-    //           // try unzipping (if not zipped, reference to the same file is returned,
-    //           // otherwise reference to the unzipped file is returned)
-    //           unzippedFile = tryUnzip(file);
+    // File unzippedFile = null;
+    // File processedFile = null;
+    // try {
+    // // try unzipping (if not zipped, reference to the same file is returned,
+    // // otherwise reference to the unzipped file is returned)
+    // unzippedFile = tryUnzip(file);
     //
-    //           // try processing as XML (if it turns out to be RDF, reference to the same file
-    //           // is returned; otherwise it is attempted to convert the file into RDF, and if
-    //           // it indeed succeeds, reference to the converted file is returned)
-    //           processedFile = processAsXml(unzippedFile, contextUrl);
-    //           return processedFile;
+    // // try processing as XML (if it turns out to be RDF, reference to the same file
+    // // is returned; otherwise it is attempted to convert the file into RDF, and if
+    // // it indeed succeeds, reference to the converted file is returned)
+    // processedFile = processAsXml(unzippedFile, contextUrl);
+    // return processedFile;
     //
-    //       } catch (ParserConfigurationException e) {
-    //           throw new CRRuntimeException("SAX parser configuration error", e);
-    //       } catch (IOException e) {
-    //           if (throwThisIOException(e)) {
-    //               throw e;
-    //           } else {
-    //               LOGGER.info("Swallowing this file processing exception: " + e.toString());
-    //               return null;
-    //           }
-    //       } catch (SAXException e) {
-    //           throw new CRRuntimeException("Expected handler to swallow this SAX parsing error", e);
-    //       } finally {
-    //           // if the processed file is not the unzipped file, then it means the processed file is
-    //           // a new file, in which case we must delete the unzipped file, which is not used any more
-    //           if (unzippedFile != null && unzippedFile != processedFile) {
-    //               FileDeletionJob.register(unzippedFile);
-    //           }
-    //       }
-    //   }
+    // } catch (ParserConfigurationException e) {
+    // throw new CRRuntimeException("SAX parser configuration error", e);
+    // } catch (IOException e) {
+    // if (throwThisIOException(e)) {
+    // throw e;
+    // } else {
+    // LOGGER.info("Swallowing this file processing exception: " + e.toString());
+    // return null;
+    // }
+    // } catch (SAXException e) {
+    // throw new CRRuntimeException("Expected handler to swallow this SAX parsing error", e);
+    // } finally {
+    // // if the processed file is not the unzipped file, then it means the processed file is
+    // // a new file, in which case we must delete the unzipped file, which is not used any more
+    // if (unzippedFile != null && unzippedFile != processedFile) {
+    // FileDeletionJob.register(unzippedFile);
+    // }
+    // }
+    // }
 
-    //    /**
-    //    *
-    //    * @param file
-    //    * @param contextUrl
-    //    * @return
-    //    * @throws ParserConfigurationException
-    //    * @throws SAXException
-    //    * @throws IOException
-    //    */
-    //   private File processAsXml(File file, String contextUrl) throws ParserConfigurationException, SAXException, IOException {
+    // /**
+    // *
+    // * @param file
+    // * @param contextUrl
+    // * @return
+    // * @throws ParserConfigurationException
+    // * @throws SAXException
+    // * @throws IOException
+    // */
+    // private File processAsXml(File file, String contextUrl) throws ParserConfigurationException, SAXException, IOException {
     //
-    //       // run XML analysis
-    //       // (will detect if the file is XML, and has a schema or DTD specified; will not throw XML validation errors)
-    //       XmlAnalysis xmlAnalysis = new XmlAnalysis();
-    //       xmlAnalysis.parse(file);
+    // // run XML analysis
+    // // (will detect if the file is XML, and has a schema or DTD specified; will not throw XML validation errors)
+    // XmlAnalysis xmlAnalysis = new XmlAnalysis();
+    // xmlAnalysis.parse(file);
     //
-    //       // get schema uri, if it's not found then fall back to dtd
-    //       String schemaOrDtd = xmlAnalysis.getSchemaLocation();
-    //       if (StringUtils.isBlank(schemaOrDtd)) {
-    //           schemaOrDtd = xmlAnalysis.getSystemDtd();
-    //           if (StringUtils.isBlank(schemaOrDtd)) {
-    //               schemaOrDtd = xmlAnalysis.getPublicDtd();
-    //           }
-    //       }
+    // // get schema uri, if it's not found then fall back to dtd
+    // String schemaOrDtd = xmlAnalysis.getSchemaLocation();
+    // if (StringUtils.isBlank(schemaOrDtd)) {
+    // schemaOrDtd = xmlAnalysis.getSystemDtd();
+    // if (StringUtils.isBlank(schemaOrDtd)) {
+    // schemaOrDtd = xmlAnalysis.getPublicDtd();
+    // }
+    // }
     //
-    //       // if no schema or DTD still found,
-    //       // assume the URI of the starting element to be the schema by which conversions should be looked for
-    //       if (StringUtils.isBlank(schemaOrDtd)) {
+    // // if no schema or DTD still found,
+    // // assume the URI of the starting element to be the schema by which conversions should be looked for
+    // if (StringUtils.isBlank(schemaOrDtd)) {
     //
-    //           schemaOrDtd = xmlAnalysis.getStartElemUri();
-    //           if (schemaOrDtd.startsWith("http://www.w3.org/1999/02/22-rdf-syntax-ns#RDF")) {
+    // schemaOrDtd = xmlAnalysis.getStartElemUri();
+    // if (schemaOrDtd.startsWith("http://www.w3.org/1999/02/22-rdf-syntax-ns#RDF")) {
     //
-    //               // file seems to be actually RDF, so return its reference back
-    //               return file;
-    //           }
-    //       }
+    // // file seems to be actually RDF, so return its reference back
+    // return file;
+    // }
+    // }
     //
-    //       // if schema or DTD found, then get its RDF conversion ID
-    //       String conversionId = null;
-    //       if (!StringUtils.isBlank(schemaOrDtd)) {
+    // // if schema or DTD found, then get its RDF conversion ID
+    // String conversionId = null;
+    // if (!StringUtils.isBlank(schemaOrDtd)) {
     //
-    //           ConversionsParser convParser = ConversionsParser.parseForSchema(schemaOrDtd);
-    //           if (convParser != null) {
-    //               conversionId = convParser.getRdfConversionId();
-    //           }
-    //       }
+    // ConversionsParser convParser = ConversionsParser.parseForSchema(schemaOrDtd);
+    // if (convParser != null) {
+    // conversionId = convParser.getRdfConversionId();
+    // }
+    // }
     //
-    //       // if conversion to RDF has been found, run it and return the converted file
-    //       if (!StringUtils.isBlank(conversionId)) {
+    // // if conversion to RDF has been found, run it and return the converted file
+    // if (!StringUtils.isBlank(conversionId)) {
     //
-    //           // prepare conversion URL
-    //           String convertUrl = GeneralConfig.getRequiredProperty(GeneralConfig.XMLCONV_CONVERT_URL);
-    //           Object[] args = new String[2];
-    //           args[0] = URLEncoder.encode(conversionId, "UTF-8");
-    //           args[1] = URLEncoder.encode(contextUrl, "UTF-8");
-    //           convertUrl = MessageFormat.format(convertUrl, args);
+    // // prepare conversion URL
+    // String convertUrl = GeneralConfig.getRequiredProperty(GeneralConfig.XMLCONV_CONVERT_URL);
+    // Object[] args = new String[2];
+    // args[0] = URLEncoder.encode(conversionId, "UTF-8");
+    // args[1] = URLEncoder.encode(contextUrl, "UTF-8");
+    // convertUrl = MessageFormat.format(convertUrl, args);
     //
-    //           // run conversion and save the response to a new file
-    //           File convertedFile = new File(file.getAbsolutePath() + ".converted");
-    //           FileUtil.downloadUrlToFile(convertUrl, convertedFile);
+    // // run conversion and save the response to a new file
+    // File convertedFile = new File(file.getAbsolutePath() + ".converted");
+    // FileUtil.downloadUrlToFile(convertUrl, convertedFile);
     //
-    //           // return converted file
-    //           return convertedFile;
-    //       } else {
-    //           return null;
-    //       }
-    //   }
+    // // return converted file
+    // return convertedFile;
+    // } else {
+    // return null;
+    // }
+    // }
 
 }

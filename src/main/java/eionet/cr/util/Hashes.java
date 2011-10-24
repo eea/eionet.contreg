@@ -132,15 +132,15 @@ public class Hashes {
         urls.add("http://cdr.eionet.europa.eu/no/ospar/Offshore%20installations/envqynzuq");
 
         for (String url : urls) {
-            System.out.println("delete from HARVEST_SOURCE where URL='" + url + "' and URL_HASH<>" + spoHash(url) +";");
+            System.out.println("delete from HARVEST_SOURCE where URL='" + url + "' and URL_HASH<>" + spoHash(url) + ";");
         }
 
-        //        if (args.length != 0) {
-        //            for (String s : args) {
-        //                System.out.println(s + " = " + Hashes.spoHash(s));
-        //            }
-        //        } else {
-        //            System.out.println(spoHash("http://www.gutenberg.org/feeds/catalog.rdf"));
-        //        }
+        // if (args.length != 0) {
+        // for (String s : args) {
+        // System.out.println(s + " = " + Hashes.spoHash(s));
+        // }
+        // } else {
+        // System.out.println(spoHash("http://www.gutenberg.org/feeds/catalog.rdf"));
+        // }
     }
 }

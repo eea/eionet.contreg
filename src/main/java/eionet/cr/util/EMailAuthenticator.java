@@ -39,7 +39,7 @@ public class EMailAuthenticator extends Authenticator {
      * @param username
      * @param password
      */
-    public EMailAuthenticator(String username, String password){
+    public EMailAuthenticator(String username, String password) {
         super();
         this.user = username;
         this.password = password;
@@ -49,7 +49,7 @@ public class EMailAuthenticator extends Authenticator {
      * @see javax.mail.Authenticator#getPasswordAuthentication()
      */
     @Override
-    public PasswordAuthentication getPasswordAuthentication(){
+    public PasswordAuthentication getPasswordAuthentication() {
 
         return new PasswordAuthentication(user, password);
     }

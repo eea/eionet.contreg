@@ -12,7 +12,6 @@ import org.openrdf.repository.sparql.SPARQLRepository;
 
 import eionet.cr.web.sparqlClient.helpers.QueryResult;
 
-
 /**
  *
  * @author <a href="mailto:jaanus.heinlaid@tieto.com">Jaanus Heinlaid</a>
@@ -105,8 +104,9 @@ public class QueryExecutor {
 
     /** */
     private static final String EXPLORE_QUERY_TEMPL = "SELECT DISTINCT ?subj ?pred ?obj WHERE {\n"
-        + " {?subj ?pred ?obj . FILTER (?subj = <@exploreSubject@>) . }\n"
-        + " UNION {?subj ?pred ?obj . FILTER (?obj = <@exploreSubject@> ) . }\n} LIMIT 50";
+            + " {?subj ?pred ?obj . FILTER (?subj = <@exploreSubject@>) . }\n"
+            + " UNION {?subj ?pred ?obj . FILTER (?obj = <@exploreSubject@> ) . }\n} LIMIT 50";
+
     /**
      *
      * @param endpoint
