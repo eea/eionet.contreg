@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 /**
  * @author Risto Alt
- *
+ * 
  */
 public class DocumentationDTO implements Serializable {
 
@@ -18,7 +18,6 @@ public class DocumentationDTO implements Serializable {
 
     private String pageId;
     private String contentType;
-    private String content;
     private String title;
 
     public String getPageId() {
@@ -35,14 +34,6 @@ public class DocumentationDTO implements Serializable {
 
     public void setContentType(String contentType) {
         this.contentType = contentType;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
     }
 
     public String getTitle() {

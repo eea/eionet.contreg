@@ -20,8 +20,10 @@
  */
 package eionet.cr.web.action;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.List;
 
 import net.sourceforge.stripes.action.DefaultHandler;
@@ -36,7 +38,6 @@ import net.sourceforge.stripes.validation.ValidationErrors;
 import net.sourceforge.stripes.validation.ValidationMethod;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.config.GeneralConfig;
@@ -114,28 +115,27 @@ public class DocumentationActionBean extends AbstractActionBean {
                 if (!StringUtils.isBlank(event) && event.equals("edit")) {
                     contentType = doc.getContentType();
                     title = doc.getTitle();
-                    if (doc.getContentType().startsWith("text/") || doc.getContentType().equals("uploaded_text/html")) {
-                        if (doc.getContentType().startsWith("text/")) {
-                            content = new String(doc.getContent());
-                        } else if (doc.getContentType().equals("uploaded_text/html")) {
-                            File f = FileStore.getInstance("documentation").get(doc.getContent());
+                    if (doc.getContentType().startsWith("text/")) {
+                        File f = FileStore.getInstance("documentation").get(pageId);
+                        if (f != null) {
                             content = FileUtils.readFileToString(f, "UTF-8");
-                            contentType = "text/html";
+                            editableContent = true;
+                        } else {
+                            addCautionMessage("File does not exist: " + pageId);
                         }
-                        editableContent = true;
                     }
                     forward = "/pages/documentationEdit.jsp";
                 } else {
-                    title = doc.getTitle();
                     if (doc.getContentType().startsWith("text/")) {
-                        content = new String(doc.getContent());
-                    } else if (doc.getContentType().equals("uploaded_text/html")) {
-                        // Initially the content of files with content-type text/html were stored in file rather than database
-                        // Now it is stored in database, but for old files we still need this hack
-                        File f = FileStore.getInstance("documentation").get(doc.getContent());
-                        content = FileUtils.readFileToString(f, "UTF-8");
+                        File f = FileStore.getInstance("documentation").get(pageId);
+                        if (f != null) {
+                            content = FileUtils.readFileToString(f, "UTF-8");
+                        } else {
+                            addCautionMessage("File does not exist: " + pageId);
+                        }
+                        title = doc.getTitle();
                     } else {
-                        File f = FileStore.getInstance("documentation").get(doc.getContent());
+                        File f = FileStore.getInstance("documentation").get(pageId);
                         return new StreamingResolution(doc.getContentType(), new FileInputStream(f));
                     }
                 }
@@ -195,23 +195,16 @@ public class DocumentationActionBean extends AbstractActionBean {
 
         if (isUserLoggedIn()) {
             if (isPostRequest()) {
-                // Extract file name and extension.
-                String fileName = "";
+                // Extract file name.
+                String fileName = pid;
                 if (file != null && file.getFileName() != null) {
                     if (StringUtils.isBlank(pid)) {
-                        pid = file.getFileName();
                         fileName = file.getFileName();
+                        pid = fileName;
                         // If title is still empty, then set it to file name
                         if (StringUtils.isBlank(title)) {
-                            title = file.getFileName();
+                            title = fileName;
                         }
-                    } else {
-                        String fileExtension = "";
-                        int idx = file.getFileName().lastIndexOf(".");
-                        if (idx != -1) {
-                            fileExtension = file.getFileName().substring(idx);
-                        }
-                        fileName = pid + fileExtension;
                     }
                 }
 
@@ -229,20 +222,17 @@ public class DocumentationActionBean extends AbstractActionBean {
                     }
                 }
 
-                // If the file is not null then store the file into filesystem, otherwise just get the content from file
+                InputStream is = null;
                 if (file != null) {
-                    if (!contentType.startsWith("text/")) {
-                        FileStore.getInstance("documentation").add(fileName, true, file.getInputStream());
-                        content = fileName;
-                    } else {
-                        content = IOUtils.toString(file.getInputStream(), "UTF-8");
-                    }
+                    is = file.getInputStream();
+                } else if (content != null) {
+                    is = new ByteArrayInputStream(content.getBytes("UTF-8"));
+                } else {
+                    is = new ByteArrayInputStream("".getBytes());
                 }
-                if (content == null) {
-                    content = "";
-                }
+                FileStore.getInstance("documentation").add(fileName, true, is);
                 DocumentationDAO dao = DAOFactory.get().getDao(DocumentationDAO.class);
-                dao.insertContent(pid, contentType, content, title);
+                dao.insertContent(pid, contentType, title);
             }
         } else {
             addWarningMessage(getBundle().getString("not.logged.in"));
@@ -260,7 +250,7 @@ public class DocumentationActionBean extends AbstractActionBean {
             }
         }
         if (file == null && StringUtils.isBlank(pid)) {
-            errors.add("pid", new SimpleError("If no file is chosen, then page id is mandatory!"));
+            errors.add("pid", new SimpleError("If no file is chosen, then Page ID is mandatory!"));
             getContext().setValidationErrors(errors);
         }
     }

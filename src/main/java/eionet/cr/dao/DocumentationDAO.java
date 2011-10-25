@@ -9,7 +9,7 @@ import eionet.cr.dto.DocumentationDTO;
 
 /**
  * @author Risto Alt
- *
+ * 
  */
 public interface DocumentationDAO extends DAO {
 
@@ -22,8 +22,9 @@ public interface DocumentationDAO extends DAO {
 
     /**
      * Return object from documentation table
+     * 
      * @param boolean whether or not to show only html objects
-     *
+     * 
      * @return List<DocumentationDTO>
      * @throws DAOException
      */
@@ -32,15 +33,14 @@ public interface DocumentationDAO extends DAO {
     /**
      * @param pageId
      * @param contentType
-     * @param fileName
      * @param title
      * @throws DAOException
      */
-    void insertContent(String pageId, String contentType, String fileName, String title) throws DAOException;
+    void insertContent(String pageId, String contentType, String title) throws DAOException;
 
     /**
      * Checks if such page_id already exists in database
-     *
+     * 
      * @param pageId
      * @return boolean
      * @throws DAOException

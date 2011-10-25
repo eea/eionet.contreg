@@ -3,7 +3,6 @@
  */
 package eionet.cr.dao.virtuoso;
 
-import java.io.Reader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,8 +10,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.commons.io.IOUtils;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DocumentationDAO;
@@ -31,7 +28,7 @@ public class VirtuosoDocumentationDAO extends VirtuosoBaseDAO implements Documen
     @Override
     public DocumentationDTO getDocObject(String pageId) throws DAOException {
 
-        String docObjectSQL = "select content_type, content, title from documentation where page_id = ?";
+        String docObjectSQL = "select content_type, title from documentation where page_id = ?";
 
         DocumentationDTO ret = null;
         Connection conn = null;
@@ -46,10 +43,6 @@ public class VirtuosoDocumentationDAO extends VirtuosoBaseDAO implements Documen
                 ret = new DocumentationDTO();
                 ret.setPageId(pageId);
                 ret.setContentType(rs.getString("content_type"));
-                Reader reader = rs.getCharacterStream("content");
-                if (reader != null) {
-                    ret.setContent(IOUtils.toString(reader));
-                }
                 ret.setTitle(rs.getString("title"));
             }
         } catch (Exception e) {
@@ -69,7 +62,7 @@ public class VirtuosoDocumentationDAO extends VirtuosoBaseDAO implements Documen
     @Override
     public List<DocumentationDTO> getDocObjects(boolean htmlOnly) throws DAOException {
 
-        String docObjectSQL = "select page_id, content_type, content, title from documentation";
+        String docObjectSQL = "select page_id, content_type, title from documentation";
         if (htmlOnly) {
             docObjectSQL = docObjectSQL + " where content_type='text/html' OR content_type='uploaded_text/html'";
         }
@@ -86,7 +79,6 @@ public class VirtuosoDocumentationDAO extends VirtuosoBaseDAO implements Documen
                 DocumentationDTO doc = new DocumentationDTO();
                 doc.setPageId(rs.getString("page_id"));
                 doc.setContentType(rs.getString("content_type"));
-                doc.setContent(rs.getString("content"));
                 doc.setTitle(rs.getString("title"));
                 ret.add(doc);
             }
@@ -105,17 +97,16 @@ public class VirtuosoDocumentationDAO extends VirtuosoBaseDAO implements Documen
      * @see eionet.cr.dao.DocumentationDAO#insertContent(java.lang.String, java.lang.String, java.lang.String)
      */
     @Override
-    public void insertContent(String pageId, String contentType, String fileName, String title) throws DAOException {
+    public void insertContent(String pageId, String contentType, String title) throws DAOException {
 
         Connection conn = null;
         PreparedStatement ps = null;
         try {
             conn = getSQLConnection();
-            ps = conn.prepareStatement("INSERT REPLACING documentation VALUES (?, ?, ?, ?)");
+            ps = conn.prepareStatement("INSERT REPLACING documentation VALUES (?, ?, ?)");
             ps.setString(1, pageId);
             ps.setString(2, contentType);
-            ps.setString(3, fileName);
-            ps.setString(4, title);
+            ps.setString(3, title);
             ps.executeUpdate();
         } catch (Exception e) {
             throw new DAOException(e.toString(), e);
