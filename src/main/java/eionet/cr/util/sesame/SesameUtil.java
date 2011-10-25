@@ -101,7 +101,7 @@ public class SesameUtil {
      * @throws ResultSetReaderException
      */
     public static <T> void executeQuery(String sparql, SPARQLResultSetReader<T> reader, RepositoryConnection conn)
-            throws OpenRDFException, ResultSetReaderException {
+    throws OpenRDFException, ResultSetReaderException {
 
         executeQuery(sparql, null, reader, conn);
     }
@@ -140,7 +140,7 @@ public class SesameUtil {
      * @throws MalformedQueryException
      */
     public static void executeUpdateQuery(String sparql, Bindings bindings, RepositoryConnection conn) throws RepositoryException,
-            QueryEvaluationException, MalformedQueryException {
+    QueryEvaluationException, MalformedQueryException {
 
         BooleanQuery query = conn.prepareBooleanQuery(QueryLanguage.SPARQL, sparql);
         if (bindings != null) {

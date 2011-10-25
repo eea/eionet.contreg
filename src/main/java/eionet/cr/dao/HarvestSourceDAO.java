@@ -254,17 +254,6 @@ public interface HarvestSourceDAO extends DAO {
     IOException;
 
     /**
-     * Derives new harvest source URLs from content in the graph represented by the given harvest source URL.
-     *
-     * @param sourceUrl
-     *            - The given harvest source URL.
-     * @return List<String> List of derived URLs.
-     * @throws DAOException
-     *             - If any kind of database access error occurs.
-     */
-    List<String> getNewSources(String sourceUrl) throws DAOException;
-
-    /**
      * Returns metadata from /harvester context.
      *
      * @param harvestSourceUri
@@ -373,4 +362,15 @@ public interface HarvestSourceDAO extends DAO {
      * @throws DAOException
      */
     int getTotalStatementsCount() throws DAOException;
+
+    /**
+     * Derives new harvest sources from the graph represented by the given source url,
+     * and inserts them into the HARVEST_SOURCE table.
+     *
+     * @param sourceUrl The given source URL.
+     * @return The number of sources found and inserted.
+     *
+     * @throws DAOException
+     */
+    int deriveNewHarvestSources(String sourceUrl) throws DAOException;
 }

@@ -57,8 +57,6 @@ import eionet.cr.dto.PostHarvestScriptDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.util.HarvestMessageType;
 import eionet.cr.util.EMailSender;
-import eionet.cr.util.Hashes;
-import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SingleObjectReader;
@@ -539,41 +537,19 @@ public abstract class BaseHarvest implements Harvest {
     /**
      * Derives new harvest sources from stored content.
      *
-     * @throws DAOException
      */
-    private void deriveNewHarvestSources() throws DAOException {
+    private void deriveNewHarvestSources(){
 
         if (storedTriplesCount <= 0) {
             return;
         }
         LOGGER.debug(loggerMsg("Deriving new harvest sources"));
 
-        // get the default harvest interval minutes
-        int defaultHarvestIntervalMinutes =
-            Integer.parseInt(GeneralConfig.getProperty(GeneralConfig.HARVESTER_REFERRALS_INTERVAL,
-                    String.valueOf(HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL)));
-
-        // derive URLs of new harvest sources from content in this context
-        List<String> newSources = getHarvestSourceDAO().getNewSources(getContextUrl());
-        LOGGER.debug((newSources == null ? 0 : newSources.size()) + " new harvest sources found");
-
-        // loop over derived URIs, create new harvest source for each one
-        if (newSources!=null){
-            for (String sourceUrl : newSources) {
-
-                // sanitize URL by removing fragment part and escaping spaces
-                sourceUrl = StringUtils.substringBefore(sourceUrl, "#");
-                sourceUrl = URLUtil.replaceURLSpaces(sourceUrl);
-
-                // create new source DTO
-                HarvestSourceDTO sourceDTO = new HarvestSourceDTO();
-                sourceDTO.setUrl(sourceUrl);
-                sourceDTO.setUrlHash(Hashes.spoHash(sourceUrl));
-                sourceDTO.setIntervalMinutes(defaultHarvestIntervalMinutes);
-
-                // persist the new harvest source DTO
-                getHarvestSourceDAO().addSource(sourceDTO);
-            }
+        try {
+            int foundSourceCount = getHarvestSourceDAO().deriveNewHarvestSources(getContextUrl());
+            LOGGER.debug(loggerMsg(foundSourceCount + " new harvest sources found and inserted"));
+        } catch (DAOException e) {
+            LOGGER.warn("Failure when extracting new harvest sources", e);
         }
     }
 
