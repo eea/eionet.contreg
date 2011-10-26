@@ -38,7 +38,6 @@ import eionet.cr.dao.readers.NewSourcesReaderWriter;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.harvest.statistics.dto.HarvestUrgencyScoreDTO;
 import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
 import eionet.cr.util.Bindings;
 import eionet.cr.util.Hashes;
@@ -439,11 +438,17 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     }
 
     /** */
-    private static final String GET_NEXT_SCHEDULED_SOURCES_SQL = "select<limParam> * from HARVEST_SOURCE where"
-        + " INTERVAL_MINUTES > 0"
-        + " and -datediff('second', now(), coalesce(LAST_HARVEST, dateadd('minute', -INTERVAL_MINUTES, TIME_CREATED)))"
-        + " / (INTERVAL_MINUTES*60)order by -datediff('second', now(), coalesce(LAST_HARVEST,"
-        + " dateadd('minute', -INTERVAL_MINUTES, TIME_CREATED))) / (INTERVAL_MINUTES*60) desc";
+    private static final String GET_NEXT_SCHEDULED_SOURCES_SQL = "select top <limit> * from HARVEST_SOURCE where"
+        + " INTERVAL_MINUTES > 0 and <seconds_since_last_harvest> >= <harvest_interval_seconds>"
+        + " order by (<seconds_since_last_harvest> / <harvest_interval_seconds>) desc";
+
+    /** */
+    private static final String SECONDS_SINCE_LAST_HARVEST_EXPR = "cast("
+        + "abs(datediff('second', now(), coalesce(LAST_HARVEST, dateadd('second', -1*INTERVAL_MINUTES, TIME_CREATED)))) "
+        + "as float)";
+
+    /** */
+    private static final String HARVEST_INTERVAL_SECONDS_EXPR = "cast(INTERVAL_MINUTES*60 as float)";
 
     /**
      * @see eionet.cr.dao.HarvestSourceDAO#getNextScheduledSources(int)
@@ -451,9 +456,14 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     @Override
     public List<HarvestSourceDTO> getNextScheduledSources(int limit) throws DAOException {
 
-        List<Object> values = new ArrayList<Object>();
-        String query = GET_NEXT_SCHEDULED_SOURCES_SQL.replace("<limParam>", " TOP " + new Integer(limit).toString());
-        return executeSQL(query, values, new HarvestSourceDTOReader());
+        if (limit < 1) {
+            throw new IllegalArgumentException("Limit must be >=1 ");
+        }
+
+        String query = GET_NEXT_SCHEDULED_SOURCES_SQL.replace("<limit>", String.valueOf(limit));
+        query = query.replace("<seconds_since_last_harvest>", SECONDS_SINCE_LAST_HARVEST_EXPR);
+        query = query.replace("<harvest_interval_seconds>", HARVEST_INTERVAL_SECONDS_EXPR);
+        return executeSQL(query, Collections.EMPTY_LIST, new HarvestSourceDTOReader());
     }
 
     /*
@@ -534,54 +544,65 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
         return new Pair<Integer, List<HarvestedUrlCountDTO>>(result.size(), result);
     }
 
-    /*
-     * (non-Javadoc)
-     *
+    /** */
+    private static final String GET_MOST_URGENT_HARVEST_SOURCES = "select top <limit> * from HARVEST_SOURCE where"
+        + " INTERVAL_MINUTES > 0 order by (<seconds_since_last_harvest> / <harvest_interval_seconds>) desc";
+
+    /**
      * @see eionet.cr.dao.HelperDAO#getUrgencyOfComingHarvests()
      */
     @Override
-    public Pair<Integer, List<HarvestUrgencyScoreDTO>> getUrgencyOfComingHarvests(int amount) throws DAOException {
+    public List<HarvestSourceDTO> getMostUrgentHarvestSources(int limit) throws DAOException {
 
-        // FIXME: Only use PERMANENT_ERROR = 'N' until ticket:2729 is done.
-        StringBuffer buf =
-            new StringBuffer()
-        .append("select top " + amount + " url, last_harvest, interval_minutes,")
-        .append(" (-datediff('second', now(), coalesce(LAST_HARVEST, dateadd('minute', -INTERVAL_MINUTES, TIME_CREATED)))")
-        .append(" / (INTERVAL_MINUTES*60)) AS urgency").append(" from CR.cr3user.HARVEST_SOURCE")
-        .append(" where PERMANENT_ERROR = 'N' and INTERVAL_MINUTES > 0 ORDER BY urgency DESC");
-
-        List<HarvestUrgencyScoreDTO> result = new ArrayList<HarvestUrgencyScoreDTO>();
-        Connection conn = null;
-        Statement stmt = null;
-        ResultSet rs = null;
-        try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-
-            conn = getSQLConnection();
-            stmt = conn.createStatement();
-            rs = stmt.executeQuery(buf.toString());
-            while (rs.next()) {
-                HarvestUrgencyScoreDTO resultRow = new HarvestUrgencyScoreDTO();
-                resultRow.setUrl(rs.getString("url"));
-                try {
-                    resultRow.setLastHarvest(sdf.parse(rs.getString("last_harvest") + ""));
-                } catch (ParseException ex) {
-                    resultRow.setLastHarvest(null);
-                    // throw new DAOException(ex.toString(), ex);
-                }
-                resultRow.setIntervalMinutes(rs.getLong("interval_minutes"));
-                resultRow.setUrgency(rs.getDouble("urgency"));
-                result.add(resultRow);
-            }
-        } catch (SQLException e) {
-            throw new DAOException(e.toString(), e);
-        } finally {
-            SQLUtil.close(rs);
-            SQLUtil.close(stmt);
-            SQLUtil.close(conn);
+        if (limit < 1) {
+            throw new IllegalArgumentException("Limit must be >=1 ");
         }
 
-        return new Pair<Integer, List<HarvestUrgencyScoreDTO>>(result.size(), result);
+        String query = GET_MOST_URGENT_HARVEST_SOURCES.replace("<limit>", String.valueOf(limit));
+        query = query.replace("<seconds_since_last_harvest>", SECONDS_SINCE_LAST_HARVEST_EXPR);
+        query = query.replace("<harvest_interval_seconds>", HARVEST_INTERVAL_SECONDS_EXPR);
+        return executeSQL(query, Collections.EMPTY_LIST, new HarvestSourceDTOReader());
+
+        //
+        // StringBuffer buf =
+        // new StringBuffer()
+        // .append("select top " + limit + " url, last_harvest, interval_minutes,")
+        // .append(" (-datediff('second', now(), coalesce(LAST_HARVEST, dateadd('minute', -INTERVAL_MINUTES, TIME_CREATED)))")
+        // .append(" / (INTERVAL_MINUTES*60)) AS urgency").append(" from CR.cr3user.HARVEST_SOURCE")
+        // .append(" where INTERVAL_MINUTES > 0 ORDER BY urgency DESC");
+        //
+        // List<HarvestUrgencyScoreDTO> result = new ArrayList<HarvestUrgencyScoreDTO>();
+        // Connection conn = null;
+        // Statement stmt = null;
+        // ResultSet rs = null;
+        // try {
+        // SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        //
+        // conn = getSQLConnection();
+        // stmt = conn.createStatement();
+        // rs = stmt.executeQuery(buf.toString());
+        // while (rs.next()) {
+        // HarvestUrgencyScoreDTO resultRow = new HarvestUrgencyScoreDTO();
+        // resultRow.setUrl(rs.getString("url"));
+        // try {
+        // resultRow.setLastHarvest(sdf.parse(rs.getString("last_harvest") + ""));
+        // } catch (ParseException ex) {
+        // resultRow.setLastHarvest(null);
+        // // throw new DAOException(ex.toString(), ex);
+        // }
+        // resultRow.setIntervalMinutes(rs.getLong("interval_minutes"));
+        // resultRow.setUrgency(rs.getDouble("urgency"));
+        // result.add(resultRow);
+        // }
+        // } catch (SQLException e) {
+        // throw new DAOException(e.toString(), e);
+        // } finally {
+        // SQLUtil.close(rs);
+        // SQLUtil.close(stmt);
+        // SQLUtil.close(conn);
+        // }
+        //
+        // return new Pair<Integer, List<HarvestUrgencyScoreDTO>>(result.size(), result);
 
     }
 
@@ -1073,6 +1094,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     private static final String NEW_SOURCES_SPARQL = "DEFINE input:inference 'CRInferenceRule' PREFIX cr: "
         + "<http://cr.eionet.europa.eu/ontologies/contreg.rdf#> SELECT ?s FROM ?sourceUrl FROM ?deploymentHost WHERE "
         + "{ ?s a cr:File . OPTIONAL { ?s cr:lastRefreshed ?refreshed } FILTER( !BOUND(?refreshed)) }";
+
     /**
      * @see eionet.cr.dao.HarvestSourceDAO#deriveNewHarvestSources(java.lang.String)
      */
@@ -1117,10 +1139,36 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             }
         } finally {
             SesameUtil.close(sparqlConn);
-            if (reader!=null){
+            if (reader != null) {
                 reader.closeResources();
             }
             SQLUtil.close(sqlConn);
         }
+    }
+
+    /** */
+    private static final String SOURCES_ABOVE_URGENCY_THRESHOLD_SQL = "select count(*) from HARVEST_SOURCE where"
+        + " INTERVAL_MINUTES > 0 and (<seconds_since_last_harvest> / <harvest_interval_seconds>) > ?";
+
+    /**
+     * @see eionet.cr.dao.HarvestSourceDAO#getNumberOfSourcesAboveUrgencyThreshold(double)
+     */
+    @Override
+    public int getNumberOfSourcesAboveUrgencyThreshold(double threshold) throws DAOException {
+
+        // Currently cannot see any reason for a negative threshold.
+        if (threshold < 0) {
+            throw new IllegalArgumentException("Urgency threshold must not be negative!");
+        }
+
+        ArrayList<Object> params = new ArrayList<Object>();
+        params.add(Double.valueOf(threshold));
+
+        String query =
+            SOURCES_ABOVE_URGENCY_THRESHOLD_SQL.replace("<seconds_since_last_harvest>", SECONDS_SINCE_LAST_HARVEST_EXPR);
+        query = query.replace("<harvest_interval_seconds>", HARVEST_INTERVAL_SECONDS_EXPR);
+
+        Object o = executeUniqueResultSQL(query, params, new SingleObjectReader<Object>());
+        return o == null ? 0 : Integer.parseInt(o.toString());
     }
 }

@@ -304,13 +304,13 @@ public class HarvestSourceDTO implements Serializable, Cloneable {
 
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(timeCreated);
-            calendar.add(Calendar.MINUTE, -1 * intervalMinutes.intValue());
+            calendar.add(Calendar.SECOND, -1 * intervalMinutes.intValue() * 60);
             lastTime = calendar.getTime();
         }
 
-        long millisecondsSinceLastTime = System.currentTimeMillis() - lastTime.getTime();
-        long intervalMilliseconds = intervalMinutes.longValue() * 60L * 1000L;
-        return ((double) millisecondsSinceLastTime) / ((double) intervalMilliseconds);
+        long secondsSinceLastTime = (System.currentTimeMillis() / 1000L) - (lastTime.getTime() / 1000L);
+        long intervalSeconds = intervalMinutes.longValue() * 60L;
+        return ((double) secondsSinceLastTime) / ((double) intervalSeconds);
     }
 
     /**

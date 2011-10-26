@@ -34,7 +34,6 @@ import org.openrdf.rio.RDFParseException;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.harvest.statistics.dto.HarvestUrgencyScoreDTO;
 import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
@@ -321,13 +320,13 @@ public interface HarvestSourceDAO extends DAO {
     /**
      * Returns urgency of coming harvests.
      *
-     * @param amount
+     * @param limit
      *            size of list
      * @return Pair <Integer, List <HarvestUrgencyScoreDTO>>
      * @throws DAOException
      *             if query fails
      */
-    Pair<Integer, List<HarvestUrgencyScoreDTO>> getUrgencyOfComingHarvests(int amount) throws DAOException;
+    List<HarvestSourceDTO> getMostUrgentHarvestSources(int limit) throws DAOException;
 
     /**
      *
@@ -373,4 +372,14 @@ public interface HarvestSourceDAO extends DAO {
      * @throws DAOException
      */
     int deriveNewHarvestSources(String sourceUrl) throws DAOException;
+
+    /**
+     * Returns the number of harvest sources whose harvest urgency score is greater
+     * than the given threshold.
+     *
+     * @param threshold The given threshold.
+     * @return The number of sources whose harvest urgency score is greater than the given threshold.
+     * @throws DAOException When an error happens during the access of data.
+     */
+    int getNumberOfSourcesAboveUrgencyThreshold(double threshold) throws DAOException;
 }
