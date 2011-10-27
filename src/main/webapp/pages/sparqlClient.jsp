@@ -67,10 +67,6 @@
         <div style="margin-top: 15px">
             <div style="float:right">
                 <a href="documentation/sparqlfunctions">SPARQL Functions</a>
-                <c:if test="${not empty actionBean.bookmarkedQueries}">
-                    <br />
-                    <a href="#" id="bookmarksLink">Bookmarked queries</a>
-                </c:if>
             </div>
             <crfn:form name="mainForm" action="/sparql" method="get">
                 <c:if test="${not empty actionBean.defaultGraphUris}">
@@ -134,6 +130,9 @@ SELECT DISTINCT * WHERE {
                             <div style="position: absolute; top: 5px; left: 590px;">
                                 <stripes:submit name="execute" value="Execute" id="executeButton" />
                                 <stripes:submit name="bookmark" value="Bookmark" id="bookmarkButton" />
+                                <c:if test="${not empty actionBean.bookmarkedQueries}">
+                                    <button id="bookmarksLink">Bookmarked queries</button>
+                                </c:if>
                                 <stripes:hidden name="bookmarkName" value="${actionBean.bookmarkName}"/>
                             </div>
                         </c:when>
@@ -249,10 +248,7 @@ PREFIX rod: &lt;http://rod.eionet.europa.eu/schema.rdf#&gt;
                                                 <stripes:checkbox value="${bookmarkedQuery.subj}" name="deleteQueries"/>
                                             </td>
                                             <td>
-                                                <ul style="list-style:none">
-                                                    <li style="font-weight:bold"><c:out value="${bookmarkedQuery.label}"/></li>
-                                                    <li style="font-size:0.8em"><c:out value="${bookmarkedQuery.queryString}"/></li>
-                                                </ul>
+                                                <span title="${bookmarkedQuery.queryString}"><c:out value="${bookmarkedQuery.label}"/></span>
                                             </td>
                                         </tr>
                                     </c:forEach>
