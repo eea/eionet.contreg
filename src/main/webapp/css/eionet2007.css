@@ -1,3 +1,12 @@
+/* Style in jQuery widgets. */
+div.ui-widget-content h1 {
+    background-color: transparent;
+    color: #315076;
+    font-size: 135%;
+    margin: 0;
+    padding: 0.2em 0;
+}
+
 div.databox {
     color: #666666;
     background-color: #F6F6F6;

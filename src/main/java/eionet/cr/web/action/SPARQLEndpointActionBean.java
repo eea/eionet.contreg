@@ -75,6 +75,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
     /** */
     private static final String FORM_PAGE = "/pages/sparqlClient.jsp";
+    // TODO: delete the jsp file
     private static final String BOOKMARKED_QUERIES_PAGE = "/pages/bookmarkedQueries.jsp";
     private static final String BOOKMARK_PAGE = "/pages/bookmarkQuery.jsp";
 
@@ -148,7 +149,6 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      */
     @DefaultHandler
     public Resolution noEvent() throws OpenRDFException, DAOException {
-        setGraphUri();
         // If fillfrom is specified then fill the bean's properties from the
         // bookmarked query and forward to form page without executing the
         // query.
@@ -157,6 +157,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         // In other cases just execute the query.
 
         if (!StringUtils.isBlank(fillfrom)) {
+            setGraphUri();
 
             fillFromBookmark(fillfrom);
             addSystemMessage("Query filled from " + fillfrom);
@@ -197,6 +198,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      * @throws DAOException
      */
     public Resolution bookmark() throws DAOException {
+
+        setGraphUri();
 
         CRUser user = getUser();
         String requestMethod = getContext().getRequest().getMethod();
@@ -323,7 +326,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         Resolution resolution = null;
         if (useInferencing && !StringUtils.isBlank(query)) {
             String infCommand =
-                "DEFINE input:inference '" + GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME) + "'";
+                    "DEFINE input:inference '" + GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME) + "'";
 
             // if inference command not yet present in the query, add it
             if (query.indexOf(infCommand) == -1) {
@@ -375,11 +378,20 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         return resolution;
     }
 
+    /**
+     * Gets the default-graph-uri and named-graph-uri parameters from request and stores them into ActionBean properties.
+     */
     private void setGraphUri() {
         defaultGraphUris = getContext().getRequest().getParameterValues(DEFAULT_GRAPH_URI);
         namedGraphUris = getContext().getRequest().getParameterValues(NAMED_GRAPH_URI);
     }
 
+    /**
+     * Returns the modified query, when defaultGraphUris and defaultGraphUris parameters are valued. The ActionBea's query parameter
+     * is kept the same.
+     *
+     * @return processed query
+     */
     private String processGraphUriParameters() {
 
         LOGGER.info("Default graph: " + ReflectionToStringBuilder.toString(defaultGraphUris));
@@ -571,13 +583,16 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      */
     public Resolution deleteBookmarked() throws DAOException {
 
+        setGraphUri();
+
         CRUser user = getUser();
         if (user == null) {
             addWarningMessage("Operation now allowed for anonymous users!");
             return new ForwardResolution(FORM_PAGE);
         }
 
-        Resolution resolution = new ForwardResolution(BOOKMARKED_QUERIES_PAGE);
+        // Resolution resolution = new ForwardResolution(BOOKMARKED_QUERIES_PAGE);
+        Resolution resolution = new ForwardResolution(FORM_PAGE);
         if (deleteQueries != null && !deleteQueries.isEmpty()) {
 
             logger.debug("Deleting these bookmarked queries: " + deleteQueries);
