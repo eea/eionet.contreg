@@ -43,8 +43,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 
 import eionet.cr.common.Predicates;
+import eionet.cr.common.Subjects;
 import eionet.cr.config.GeneralConfig;
-import eionet.cr.dao.CompiledDatasetDAO;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
@@ -316,10 +316,10 @@ public class FactsheetActionBean extends AbstractActionBean {
         // since user registrations URI was used as triple source, add it to HARVEST_SOURCE too
         // (but set interval minutes to 0, to avoid it being background-harvested)
         DAOFactory
-                .get()
-                .getDao(HarvestSourceDAO.class)
-                .addSourceIgnoreDuplicate(
-                        HarvestSourceDTO.create(getUser().getRegistrationsUri(), true, 0, getUser().getUserName()));
+        .get()
+        .getDao(HarvestSourceDAO.class)
+        .addSourceIgnoreDuplicate(
+                HarvestSourceDTO.create(getUser().getRegistrationsUri(), true, 0, getUser().getUserName()));
 
         return new RedirectResolution(this.getClass(), "edit").addParameter("uri", uri);
     }
@@ -584,13 +584,11 @@ public class FactsheetActionBean extends AbstractActionBean {
     public boolean isCompiledDataset() {
 
         boolean ret = false;
-        try {
-            if (uri != null) {
-                ret = DAOFactory.get().getDao(CompiledDatasetDAO.class).datasetExists(uri);
-            }
-        } catch (DAOException e) {
-            e.printStackTrace();
+
+        if (subject.getObject(Predicates.RDF_TYPE) != null) {
+            ret = Subjects.CR_COMPILED_DATASET.equals(subject.getObject(Predicates.RDF_TYPE).getValue());
         }
+
         return ret;
     }
 
