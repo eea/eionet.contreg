@@ -38,20 +38,20 @@
                     function(){
 
                         // Open delete bookmarked queries dialog
-                        $("#deleteBookmarksLink").click(function() {
-                            $('#deleteBookmarksDialog').dialog('open');
+                        $("#bookmarksLink").click(function() {
+                            $('#bookmarksDialog').dialog('open');
                             return false;
                         });
 
                         // Delete bookmarked queries dialog setup
-                        $('#deleteBookmarksDialog').dialog({
+                        $('#bookmarksDialog').dialog({
                             autoOpen: false,
                             width: 600
                         });
 
                         // Close dialog
                         $("#deleteBookmarked").click(function() {
-                            $('#deleteBookmarksDialog').dialog("close");
+                            $('#bookmarksDialog').dialog("close");
                             return true;
                         });
 
@@ -62,88 +62,16 @@
 
     <stripes:layout-component name="contents">
 
-        <%-- Delete bookmarked queries dialog content --%>
-        <div id="deleteBookmarksDialog" title="Bookmarked queries">
-            <h1>Delete bookmarked SPARQL queries</h1>
-
-            <c:if test="${not empty actionBean.bookmarkedQueries}">
-                <div style="margin-top: 15px">
-                    <c:url var="deleteBookmarkUrl" value="/sparql">
-                        <c:if test="${not empty actionBean.defaultGraphUris}">
-                            <c:forEach var="defaultGraphUri" items="${actionBean.defaultGraphUris}">
-                                <c:param name="default-graph-uri" value="${defaultGraphUri}" />
-                            </c:forEach>
-                        </c:if>
-                        <c:if test="${not empty actionBean.namedGraphUris}">
-                            <c:forEach var="namedGraphUri" items="${actionBean.namedGraphUris}">
-                                <c:param name="named-graph-uri" value="${namedGraphUri}" />
-                            </c:forEach>
-                        </c:if>
-                    </c:url>
-                    <crfn:form id="bookmarkedQueriesForm" action="${deleteBookmarkUrl}" method="post">
-                        <div>
-                            <stripes:submit name="deleteBookmarked" id="deleteBookmarked" value="Delete" title="Delete the bookmarked queries that you have selected below"/>
-                            <input type="button" name="selectAll" value="Select all" onclick="toggleSelectAll('bookmarkedQueriesForm');return false"/>
-                        </div>
-                        <table>
-                            <c:forEach items="${actionBean.bookmarkedQueries}" var="bookmarkedQuery">
-                                <tr>
-                                    <td>
-                                        <stripes:checkbox value="${bookmarkedQuery.subj}" name="deleteQueries"/>
-                                    </td>
-                                    <td>
-                                        <ul style="list-style:none">
-                                            <li style="font-weight:bold"><c:out value="${bookmarkedQuery.label}"/></li>
-                                            <li style="font-size:0.8em"><c:out value="${bookmarkedQuery.queryString}"/></li>
-                                        </ul>
-                                    </td>
-                                </tr>
-                            </c:forEach>
-                        </table>
-                    </crfn:form>
-                </div>
-            </c:if>
-            <c:if test="${empty actionBean.bookmarkedQueries}">
-                <div class="note-msg">No bookmarked queries currently found!</div>
-            </c:if>
-        </div>
-
         <h1>SPARQL endpoint</h1>
 
-        <div>
-            <crfn:form name="bookmarksForm" action="/sparql" method="get">
-                <c:if test="${not empty actionBean.defaultGraphUris}">
-                    <c:forEach var="defaultGraphUri" items="${actionBean.defaultGraphUris}">
-                        <input type="hidden" name="default-graph-uri" value="${defaultGraphUri}" />
-                    </c:forEach>
-                </c:if>
-                <c:if test="${not empty actionBean.namedGraphUris}">
-                    <c:forEach var="namedGraphUri" items="${actionBean.namedGraphUris}">
-                        <input type="hidden" name="named-graph-uri" value="${namedGraphUri}" />
-                    </c:forEach>
-                </c:if>
-
-                <c:if test="${empty actionBean.bookmarkedQueries}">
-                  <p>Type a SPARQL query, select output format and other options, and press Execute.</p>
-                </c:if>
-                <c:if test="${not empty actionBean.bookmarkedQueries}">
-                  <p>Type a SPARQL query, or select one from bookmarks:</p>
-                  <div>
-                    <stripes:select name="fillfrom" onchange="document.bookmarksForm.submit()" style="width:500px">
-                         <stripes:option value="" label="-- Select a bookmarked SPARQL query --" />
-                             <c:forEach items="${actionBean.bookmarkedQueries}" var="bookmarkedQuery">
-                                 <stripes:option value="${bookmarkedQuery.subj}" label="${bookmarkedQuery.label}" />
-                             </c:forEach>
-                    </stripes:select>
-                    <noscript><div><stripes:submit name="" value="Go" id="goButton" /></div></noscript>
-                    <br/><a href="#" id="deleteBookmarksLink">Delete bookmarked queries</a>
-                  </div>
-                </c:if>
-            </crfn:form>
-        </div>
-
         <div style="margin-top: 15px">
-                    <div style="float:right"><a href="documentation/sparqlfunctions">SPARQL Functions</a></div>
+            <div style="float:right">
+                <a href="documentation/sparqlfunctions">SPARQL Functions</a>
+                <c:if test="${not empty actionBean.bookmarkedQueries}">
+                    <br />
+                    <a href="#" id="bookmarksLink">Bookmarked queries</a>
+                </c:if>
+            </div>
             <crfn:form name="mainForm" action="/sparql" method="get">
                 <c:if test="${not empty actionBean.defaultGraphUris}">
                     <c:forEach var="defaultGraphUri" items="${actionBean.defaultGraphUris}">
@@ -264,6 +192,80 @@ PREFIX rod: &lt;http://rod.eionet.europa.eu/schema.rdf#&gt;
                     </c:if>
                 </div>
             </crfn:form>
+
+            <%-- Bookmarked queries dialog --%>
+            <div id="bookmarksDialog" title="Bookmarked queries">
+                <div>
+                    <h1>Select one of SPARQL queries</h1>
+                    <crfn:form name="bookmarksForm" action="/sparql" method="get">
+                        <c:if test="${not empty actionBean.defaultGraphUris}">
+                            <c:forEach var="defaultGraphUri" items="${actionBean.defaultGraphUris}">
+                                <input type="hidden" name="default-graph-uri" value="${defaultGraphUri}" />
+                            </c:forEach>
+                        </c:if>
+                        <c:if test="${not empty actionBean.namedGraphUris}">
+                            <c:forEach var="namedGraphUri" items="${actionBean.namedGraphUris}">
+                                <input type="hidden" name="named-graph-uri" value="${namedGraphUri}" />
+                            </c:forEach>
+                        </c:if>
+
+                        <stripes:select name="fillfrom" onchange="document.bookmarksForm.submit()" style="width:500px">
+                             <stripes:option value="" label="-- Select a bookmarked SPARQL query --" />
+                                 <c:forEach items="${actionBean.bookmarkedQueries}" var="bookmarkedQuery">
+                                     <stripes:option value="${bookmarkedQuery.subj}" label="${bookmarkedQuery.label}" />
+                                 </c:forEach>
+                        </stripes:select>
+                        <noscript><div><stripes:submit name="" value="Go" id="goButton" /></div></noscript>
+                    </crfn:form>
+                </div>
+                <br />
+                <br />
+                <div>
+                    <h1>Delete bookmarked SPARQL queries</h1>
+
+                    <c:if test="${not empty actionBean.bookmarkedQueries}">
+                        <div style="margin-top: 15px">
+                            <c:url var="deleteBookmarkUrl" value="/sparql">
+                                <c:if test="${not empty actionBean.defaultGraphUris}">
+                                    <c:forEach var="defaultGraphUri" items="${actionBean.defaultGraphUris}">
+                                        <c:param name="default-graph-uri" value="${defaultGraphUri}" />
+                                    </c:forEach>
+                                </c:if>
+                                <c:if test="${not empty actionBean.namedGraphUris}">
+                                    <c:forEach var="namedGraphUri" items="${actionBean.namedGraphUris}">
+                                        <c:param name="named-graph-uri" value="${namedGraphUri}" />
+                                    </c:forEach>
+                                </c:if>
+                            </c:url>
+                            <crfn:form id="bookmarkedQueriesForm" action="${deleteBookmarkUrl}" method="post">
+                                <div>
+                                    <stripes:submit name="deleteBookmarked" id="deleteBookmarked" value="Delete" title="Delete the bookmarked queries that you have selected below"/>
+                                    <input type="button" name="selectAll" value="Select all" onclick="toggleSelectAll('bookmarkedQueriesForm');return false"/>
+                                </div>
+                                <table>
+                                    <c:forEach items="${actionBean.bookmarkedQueries}" var="bookmarkedQuery">
+                                        <tr>
+                                            <td>
+                                                <stripes:checkbox value="${bookmarkedQuery.subj}" name="deleteQueries"/>
+                                            </td>
+                                            <td>
+                                                <ul style="list-style:none">
+                                                    <li style="font-weight:bold"><c:out value="${bookmarkedQuery.label}"/></li>
+                                                    <li style="font-size:0.8em"><c:out value="${bookmarkedQuery.queryString}"/></li>
+                                                </ul>
+                                            </td>
+                                        </tr>
+                                    </c:forEach>
+                                </table>
+                            </crfn:form>
+                        </div>
+                    </c:if>
+                    <c:if test="${empty actionBean.bookmarkedQueries}">
+                        <div class="note-msg">No bookmarked queries currently found!</div>
+                    </c:if>
+                </div>
+            </div>
+
         </div>
 
     </stripes:layout-component>
