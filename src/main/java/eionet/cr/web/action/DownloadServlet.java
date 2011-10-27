@@ -53,7 +53,7 @@ public class DownloadServlet extends HttpServlet {
     private static final int DEFAULT_BUFFER_SIZE = 10240; // ..bytes = 10KB.
     private static final long DEFAULT_EXPIRE_TIME = 604800000L; // ..ms = 1 week.
     private static final String MULTIPART_BOUNDARY = "MULTIPART_BYTERANGES";
-    private static final Logger logger = Logger.getLogger(DownloadServlet.class);
+    private static final Logger LOGGER = Logger.getLogger(DownloadServlet.class);
 
     // Properties ---------------------------------------------------------------------------------
 
@@ -341,7 +341,7 @@ public class DownloadServlet extends HttpServlet {
     private void handleFileNotFound(String message, HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        logger.info(message);
+        LOGGER.info(message);
         boolean isWebBrowser = false;
 
         String userAgentString = request.getHeader("User-Agent");

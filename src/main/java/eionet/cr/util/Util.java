@@ -44,7 +44,11 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.PageContext;
+
+import nl.bitwalker.useragentutils.Browser;
+import nl.bitwalker.useragentutils.BrowserType;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
@@ -257,7 +261,7 @@ public class Util {
             return null;
 
         int[] scopes =
-                {PageContext.APPLICATION_SCOPE, PageContext.PAGE_SCOPE, PageContext.REQUEST_SCOPE, PageContext.SESSION_SCOPE};
+        {PageContext.APPLICATION_SCOPE, PageContext.PAGE_SCOPE, PageContext.REQUEST_SCOPE, PageContext.SESSION_SCOPE};
         for (int i = 0; i < scopes.length; i++) {
             Enumeration attrs = pageContext.getAttributeNamesInScope(scopes[i]);
             while (attrs != null && attrs.hasMoreElements()) {
@@ -758,5 +762,33 @@ public class Util {
         }
 
         return false;
+    }
+
+    /**
+     *
+     * @param request
+     * @return
+     */
+    public static boolean isWebBrowser(HttpServletRequest request) {
+
+        // Lazy-loading.
+        boolean result = false;
+        String userAgentString = request.getHeader("User-Agent");
+        if (userAgentString != null && userAgentString.trim().length() > 0) {
+
+            Browser browser = Browser.parseUserAgentString(userAgentString);
+            if (browser != null) {
+
+                BrowserType browserType = browser.getBrowserType();
+                if (browserType != null) {
+
+                    if (browserType.equals(BrowserType.WEB_BROWSER) || browserType.equals(BrowserType.MOBILE_BROWSER)) {
+                        result = true;
+                    }
+                }
+            }
+        }
+
+        return result;
     }
 }
