@@ -8,6 +8,7 @@ import eionet.cr.dao.DAO;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.DocumentationDAO;
 import eionet.cr.dao.ExporterDAO;
+import eionet.cr.dao.FolderDAO;
 import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dao.HarvestMessageDAO;
 import eionet.cr.dao.HarvestSourceDAO;
@@ -56,6 +57,7 @@ public class VirtuosoDAOFactory extends DAOFactory {
         registeredDaos.put(SpoBinaryDAO.class, VirtuosoSpoBinaryDAO.class);
         registeredDaos.put(CompiledDatasetDAO.class, VirtuosoCompiledDatasetDAO.class);
         registeredDaos.put(PostHarvestScriptDAO.class, VirtuosoPostHarvestScriptDAO.class);
+        registeredDaos.put(FolderDAO.class, VirtuosoFolderDAO.class);
     }
 
     /**

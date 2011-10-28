@@ -57,6 +57,10 @@ public interface Subjects {
     String CR_FOLDER = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#Folder";
     String CR_USER_FOLDER = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#UserFolder";
     String CR_COMPILED_DATASET = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#CompiledDataset";
+    String CR_REVIEW_FOLDER = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#ReviewFolder";
+    String CR_BOOKMARKS_FILE = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#BookmarksFile";
+    String CR_REGISTRATIONS_FILE = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#RegistrationsFile";
+    String CR_HISTORY_FILE = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#HistoryFile";
 
     String WGS_POINT = "http://www.w3.org/2003/01/geo/wgs84_pos#Point";
     String WGS_SPATIAL_THING = "http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing";
