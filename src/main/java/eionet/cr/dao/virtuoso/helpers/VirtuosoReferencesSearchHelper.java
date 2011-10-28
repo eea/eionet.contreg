@@ -18,6 +18,9 @@ import eionet.cr.web.util.columns.ReferringPredicatesColumn;
  */
 public class VirtuosoReferencesSearchHelper extends AbstractSearchHelper {
 
+    /** subject uri is valid IRI. */
+    private boolean isValidIRI = true;
+
     /** */
     private Bindings bindings;
 
@@ -39,7 +42,8 @@ public class VirtuosoReferencesSearchHelper extends AbstractSearchHelper {
         super(pagingRequest, sortingRequest);
 
         bindings = new Bindings();
-        bindings.setURI("subjectUri", subjectUri);
+        isValidIRI = SPARQLQueryUtil.isIRI(subjectUri);
+        bindings.setIRI("subjectUri", subjectUri);
     }
 
     /*
@@ -49,7 +53,8 @@ public class VirtuosoReferencesSearchHelper extends AbstractSearchHelper {
      */
     @Override
     protected String getOrderedQuery(List<Object> inParams) {
-        String sparql = "select distinct ?s where {?s ?p ?o. filter(isURI(?o) && ?o=?subjectUri)";
+        String sparql = "select distinct ?s where {?s ?p ?o. filter(isURI(?o) && ?o=" + (isValidIRI ? "?subjectUri"
+                :  "IRI(?subjectUri)")  + ")";
 
         if (sortPredicate != null && (Predicates.RDFS_LABEL.equals(sortPredicate) || Predicates.RDF_TYPE.equals(sortPredicate))) {
             sparql += " . OPTIONAL {?s ?sortPredicate ?oorderby }";
@@ -84,7 +89,8 @@ public class VirtuosoReferencesSearchHelper extends AbstractSearchHelper {
 
     @Override
     public String getUnorderedQuery(List<Object> inParams) {
-        return REFERENCES_UNORDERED_SPARQL;
+        return (isValidIRI ?  REFERENCES_UNORDERED_SPARQL
+                : SPARQLQueryUtil.parseIRIQuery(REFERENCES_UNORDERED_SPARQL, "subjectUri"));
     }
 
     /**
@@ -114,11 +120,13 @@ public class VirtuosoReferencesSearchHelper extends AbstractSearchHelper {
             throw new IllegalArgumentException("Subjects collection must not be null or empty!");
         }
         subjectDataBindings = new Bindings();
-        subjectDataBindings.setURI("sourceUri", sourceUri);
+        subjectDataBindings.setIRI("sourceUri", sourceUri);
+
         String subjectUrisCSV = SPARQLQueryUtil.urisToCSV(subjectUris, "subjectUriValue", subjectDataBindings);
+        String sourceUriBinding = (isValidIRI ? "?sourceUri" : "IRI(?sourceUri)");
         String sparql =
                 "select * where {graph ?g {?s ?p ?o. filter (?s IN (" + subjectUrisCSV + ")) " + ". filter(?p = <"
-                        + Predicates.RDF_TYPE + "> || (isURI(?o) && ?o=?sourceUri))}} ORDER BY ?s";
+                        + Predicates.RDF_TYPE + "> || (isURI(?o) && ?o=" + sourceUriBinding + "))}} ORDER BY ?s";
 
         return sparql;
     }

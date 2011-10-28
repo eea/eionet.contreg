@@ -207,9 +207,22 @@ public class URLUtil {
      */
     public static String replaceURLSpaces(String url) {
 
-        return url == null ? null : StringUtils.replace(url.toString(), " ", "%20");
+        //return url == null ? null : StringUtils.replace(url.toString(), " ", "%20");
+        return replaceURLBadIRISymbols(url);
     }
+    /**
+    * Replaces symbols in URI that are not valid for IRI.
+    * uses URL encoding
+    * @param url given URL
+    * @return URL Valid IRI
+    */
+   public static String replaceURLBadIRISymbols(String url) {
+       String[] badList = {" ", "{", "}", "<" , ">" , "\"", "|",  "\\", "^", "`"};
+       //%7B%7D%3C%3E%22%7C%5C%5E%60
+       String[] replacementList = {"%20", "%7B", "%7D", "%3C" , "%3E" , "%22",  "%7C", "%5C", "%5E", "%60"};
 
+       return url == null ? null : StringUtils.replaceEach(url, badList, replacementList);
+   }
     /**
      *
      * @param urlConnection
@@ -425,11 +438,11 @@ public class URLUtil {
      * @param args
      * @throws Exception
      */
-    public static void main(String[] args) throws Exception {
-
-        String urlString =
-                "http://usern%68me:password@d%69main:123/path;ASPSESSIONID=93AE727EADF5D5351219360F1952051F?jaanus=onu&phpsessid=999#fragment_%69d";
-        System.out.println(urlString);
-        System.out.println(normalizeUrl(urlString));
-    }
+//    public static void main(String[] args) throws Exception {
+//
+//        String urlString =
+//                "http://usern%68me:password@d%69main:123/path;ASPSESSIONID=93AE727EADF5D5351219360F1952051F?jaanus=onu&phpsessid=999#fragment_%69d";
+//        System.out.println(urlString);
+//        System.out.println(normalizeUrl(urlString));
+//    }
 }

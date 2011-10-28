@@ -103,4 +103,12 @@ public class SPARQLQueryUtilTest extends TestCase {
                 "ORDER BY asc(bif:either( bif:isnull(?oorderby) , (bif:lcase(bif:subseq (bif:replace (?s, '/', '#'), bif:strrchr (bif:replace (?s, '/', '#'), '#')+1))) , bif:lcase(?oorderby)))",
                 orderBy);
     }
+
+    public void testPrseIRIQuery() {
+        String query = "SELECT ?s { WHERE ?s ?p ?o FILTER (?s=?subjectValue) ";
+
+        query = SPARQLQueryUtil.parseIRIQuery(query, "subjectValue");
+
+        assertEquals("SELECT ?s { WHERE ?s ?p ?o FILTER (?s=IRI(?subjectValue)) ", query);
+    }
 }

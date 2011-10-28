@@ -53,4 +53,14 @@ public class URIUtilTest extends TestCase {
         assertEquals("http://sws.geonames.org", URLUtil.extractUrlHost("http://sws.geonames.org/6255148/"));
     }
 
+    public static void main(String[] s ) {
+        String spaceUrl = "http://tes.com/a space com";
+        String badSymbolUrl = "http://test.com/a{bad}b";
+
+        System.out.println("Is url A " + URLUtil.isURL(spaceUrl));
+        System.out.println("Is URI A " + URIUtil.isURI(spaceUrl));
+
+        System.out.println("Is urL B " + URLUtil.isURL(badSymbolUrl));
+        System.out.println("Is URI B " + URIUtil.isURI(badSymbolUrl));
+    }
 }

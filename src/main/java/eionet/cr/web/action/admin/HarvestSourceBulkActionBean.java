@@ -153,6 +153,7 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
         while (urls.hasMoreElements()) {
             String url = urls.nextToken();
             if (URLUtil.isURL(url)) {
+                url = URLUtil.replaceURLBadIRISymbols(url);
                 harvestSources
                         .add(HarvestSourceDTO.create(url, false, HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL, getUserName()));
                 sourceUrls.add(url);

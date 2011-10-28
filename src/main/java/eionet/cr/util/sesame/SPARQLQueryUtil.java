@@ -22,6 +22,8 @@ package eionet.cr.util.sesame;
 
 import java.util.Collection;
 
+import org.apache.commons.lang.StringUtils;
+
 import eionet.cr.common.Namespace;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.util.Bindings;
@@ -32,6 +34,9 @@ import eionet.cr.util.Bindings;
  * @author Enriko Käsper
  */
 public class SPARQLQueryUtil {
+
+    /** Chars not allowed in IRI. */
+    private static char [] badChars = {' ', '{', '}' , '<', '>', '"', '|', '\\', '^', '`' };
 
     /**
      * Inference definition in SPARQL.
@@ -112,16 +117,14 @@ public class SPARQLQueryUtil {
                     strBuilder.append(",");
                 }
                 // if URI contains spaces - use IRI() function that makes an IRI from URI and seems to work with spaces as well
-                if (uri.indexOf(' ') == -1) {
+                if (isIRI(uri)) {
                     strBuilder.append("?" + alias);
-                    if (bindings != null) {
-                        bindings.setURI(alias, uri);
-                    }
                 } else {
                     strBuilder.append("IRI(?" + alias + ")");
-                    if (bindings != null) {
-                        bindings.setString(alias, uri);
-                    }
+                }
+
+                if (bindings != null) {
+                    bindings.setIRI(alias, uri);
                 }
                 i++;
             }
@@ -174,5 +177,33 @@ public class SPARQLQueryUtil {
         return "ORDER BY " + sortOrder + "(bif:either( bif:isnull(?" + aliasName + ") , "
                 + "(bif:lcase(bif:subseq (bif:replace (?s, '/', '#'), bif:strrchr (bif:replace (?s, '/', '#'), '#')+1))) , "
                 + "bif:lcase(?" + aliasName + ")))";
+    }
+
+
+    /**
+     * Determines if it is valid IRI (for SPARQL).
+     * @param str given URI
+     * @return true if the URI is valid IRI
+     */
+    public static boolean isIRI(String str) {
+
+        if (StringUtils.containsAny(str, badChars)) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Changes SPARQL query to use IRI function for this parameter value.
+     * ?subject -> IRI(?subject)
+     * @param query SPARQL query
+     * @param paramName parameter to be replaced
+     * @return
+     */
+    public static String parseIRIQuery(String query, String paramName) {
+        String tmpQuery = query;
+        tmpQuery = StringUtils.replace(tmpQuery, "?" + paramName, "IRI(?" + paramName + ")");
+
+        return tmpQuery;
     }
 }

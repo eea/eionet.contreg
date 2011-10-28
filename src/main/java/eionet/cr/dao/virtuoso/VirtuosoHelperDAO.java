@@ -730,12 +730,15 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     public boolean isSubjectUserBookmark(CRUser user, String subject) throws DAOException {
         Bindings bindings = new Bindings();
         bindings.setURI("userBookmark", Predicates.CR_BOOKMARK);
-        bindings.setURI("subjectValue", subject);
+        bindings.setIRI("subjectValue", subject);
+
         bindings.setURI("userBookmarksFolder", CRUser.bookmarksUri(user.getUserName()));
 
         // reader works only with Strings with Sesame/Virtuoso
         SingleObjectReader<String> reader = new SingleObjectReader<String>();
-        executeSPARQL(SUBJECT_BOOKMARK_CHECK_QUERY, bindings, reader);
+
+        executeSPARQL(SPARQLQueryUtil.isIRI(subject) ? SUBJECT_BOOKMARK_CHECK_QUERY
+                : SPARQLQueryUtil.parseIRIQuery(SUBJECT_BOOKMARK_CHECK_QUERY, "subjectValue") , bindings, reader);
 
         // resultlist contains 1 row including count of bookmark matches
         String urlCount = reader.getResultList().get(0);
@@ -1883,21 +1886,27 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     public FactsheetDTO getFactsheet(String subjectUri, List<String> acceptedLanguages, Map<String, Integer> predicatePages)
             throws DAOException {
 
+        boolean subjectUriIsValid = true; //does not contain spaces etc
         if (StringUtils.isBlank(subjectUri)) {
             throw new IllegalArgumentException("Subject uri must not be blank!");
         }
 
         Bindings bindings = new Bindings();
-        bindings.setURI("subjectUri", subjectUri);
+        // if URI contains spaces - use IRI() function that makes an IRI from URI and seems to work with spaces as well
+        subjectUriIsValid =  SPARQLQueryUtil.isIRI(subjectUri);
+        bindings.setIRI("subjectUri", subjectUri);
 
         FactsheetReader factsheetReader = new FactsheetReader(subjectUri);
 
         if (logger.isTraceEnabled()) {
             logger.trace("Executing factsheet query: "
-                    + StringUtils.replace(GET_FACTSHEET_ROWS, "?subjectUri", "<" + subjectUri + ">"));
+                    + StringUtils.replace((subjectUriIsValid ? GET_FACTSHEET_ROWS
+                                : SPARQLQueryUtil.parseIRIQuery(GET_FACTSHEET_ROWS, "subjectUri")), "?subjectUri",
+                                "<" + subjectUri + ">"));
         }
 
-        executeSPARQL(GET_FACTSHEET_ROWS, bindings, factsheetReader);
+        executeSPARQL((subjectUriIsValid ? GET_FACTSHEET_ROWS : SPARQLQueryUtil.parseIRIQuery(GET_FACTSHEET_ROWS, "subjectUri")),
+                bindings, factsheetReader);
         FactsheetDTO factsheetDTO = factsheetReader.getFactsheetDTO();
         if (factsheetDTO != null) {
 
@@ -1927,15 +1936,19 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         return factsheetDTO;
     }
 
-    @Override
+    private static final String SOURCE_COUNT_SPARQL = "SELECT COUNT(*) FROM ?sourceUri WHERE {?s ?p ?o}";
+
+//    @Override
     public int getHarvestedStatements(String sourceUri) throws DAOException {
+        Bindings bindings = new Bindings();
+        bindings.setURI("sourceUri", sourceUri);
 
-        StringBuilder sparql = new StringBuilder();
-        sparql.append("SELECT COUNT(*)");
-        sparql.append("FROM <" + sourceUri + "> ");
-        sparql.append("WHERE {?s ?p ?o}");
+//        StringBuilder sparql = new StringBuilder();
+//        sparql.append("SELECT COUNT(*)");
+//        sparql.append("FROM <" + sourceUri + "> ");
+//        sparql.append("WHERE {?s ?p ?o}");
 
-        String result = executeUniqueResultSPARQL(sparql.toString(), null, new SingleObjectReader<String>());
+        String result = executeUniqueResultSPARQL(SOURCE_COUNT_SPARQL  , bindings, new SingleObjectReader<String>());
         return Integer.parseInt(result);
     }
 

@@ -17,6 +17,7 @@ import org.openrdf.query.Query;
 
 import eionet.cr.common.CRRuntimeException;
 import eionet.cr.dao.virtuoso.VirtuosoBaseDAO;
+import eionet.cr.util.sesame.SPARQLQueryUtil;
 
 /**
  *
@@ -219,8 +220,11 @@ public class Bindings {
      * Private wrapper for blanknode binding.
      */
     private static class BlankNode {
+        /** node id. */
         String id;
-
+        /** initializes blank node.
+         * @param id Bode ID (with blank node prefix)
+         */
         BlankNode(String id) {
             this.id = id.substring(VirtuosoBaseDAO.BNODE_URI_PREFIX.length());
         }
@@ -229,4 +233,21 @@ public class Bindings {
             return id;
         }
     }
+
+    /**
+    * Common method to set IRI that is suppposed to be URI.
+    * As IRI and URI have different standards if the URI is incalid URI the query has to use IRI() function
+    * and the parameter is given as string not URI
+    * @param name Param Name
+    * @param value Param Value
+    */
+   public void setIRI(String name, String value) {
+
+       if (SPARQLQueryUtil.isIRI(value)) {
+           setURI(name, value);
+       } else {
+           setString(name, value);
+       }
+   }
+
 }
