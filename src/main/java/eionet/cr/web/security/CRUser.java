@@ -20,6 +20,9 @@
  */
 package eionet.cr.web.security;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
@@ -61,13 +64,16 @@ public class CRUser {
      */
     private boolean homeFolderRegistered;
 
+    /** List of the user's folder-or-file URIs that should be reserved, i.e. not to be created or deleted by user himself! */
+    private List<String> reservedFolderAndFileUris;
+
     /**
      * Creates CRUser.
      *
      * @param userName
      *            username
      */
-    public CRUser(final String userName) {
+    public CRUser(String userName) {
         this.userName = userName;
     }
 
@@ -247,6 +253,14 @@ public class CRUser {
     }
 
     /**
+     *
+     * @return
+     */
+    public String getReviewsUri() {
+        return CRUser.reviewsUri(userName);
+    }
+
+    /**
      * Home Item URI.
      *
      * @param uri
@@ -329,6 +343,16 @@ public class CRUser {
     }
 
     /**
+     *
+     * @param userName
+     * @return
+     */
+    public static String reviewsUri(String userName) {
+
+        return CRUser.homeUri(userName) + "/reviews";
+    }
+
+    /**
      * @return
      */
     public boolean isHomeFolderRegistered() {
@@ -387,4 +411,35 @@ public class CRUser {
         return userName;
     }
 
+    /**
+     * @return the reservedFoldersAndFiles
+     */
+    public List<String> getReservedFolderAndFileUris() {
+
+        // Lazy loading.
+        if (reservedFolderAndFileUris==null){
+
+            reservedFolderAndFileUris = new ArrayList<String>();
+            reservedFolderAndFileUris.add(getBookmarksUri());
+            reservedFolderAndFileUris.add(getRegistrationsUri());
+            reservedFolderAndFileUris.add(getHistoryUri());
+            reservedFolderAndFileUris.add(getReviewsUri());
+        }
+        return reservedFolderAndFileUris;
+    }
+
+    /**
+     *
+     * @param userName
+     * @return
+     */
+    public static List<String> getReservedFolderAndFileUris(String userName) {
+
+        ArrayList<String> result = new ArrayList<String>();
+        result.add(CRUser.bookmarksUri(userName));
+        result.add(CRUser.registrationsUri(userName));
+        result.add(CRUser.historyUri(userName));
+        result.add(CRUser.reviewsUri(userName));
+        return result;
+    }
 }
