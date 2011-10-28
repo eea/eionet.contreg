@@ -37,6 +37,7 @@ public class HarvestDTO extends HarvestBaseDTO implements java.io.Serializable {
     private Integer encodingSchemes;
     private Integer totalStatements;
     private Integer litObjStatements;
+    private String dateString;
 
     /**
      *
@@ -193,4 +194,20 @@ public class HarvestDTO extends HarvestBaseDTO implements java.io.Serializable {
     public void setEncodingSchemes(Integer encodingSchemes) {
         this.encodingSchemes = encodingSchemes;
     }
+
+    /**
+     * @return the dateString
+     */
+    public String getDateString() {
+        return dateString;
+    }
+
+    /**
+     * @param dateString
+     *            the dateString to set
+     */
+    public void setDateString(String dateString) {
+        this.dateString = dateString;
+    }
+
 }

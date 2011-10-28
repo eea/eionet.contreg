@@ -195,7 +195,7 @@ public class VirtuosoHarvestDAO extends VirtuosoBaseDAO implements HarvestDAO {
         // delete older harvests with same harvest source
         List<Object> deleteParams = new ArrayList<Object>();
         deleteParams.add(dto.getHarvestSourceId());
-        deleteParams.add(dto.getDatetimeStarted());
+        deleteParams.add(dto.getDateString());
 
         StringBuffer deleteSql = new StringBuffer();
         deleteSql.append("DELETE FROM harvest AS h ");
