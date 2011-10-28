@@ -194,35 +194,30 @@ xmlns:dct="http://purl.org/dc/terms/">
         <rdfs:label>Folder</rdfs:label>
     </rdfs:Class>
 
-    <rdf:Property rdf:ID="UserFolder">
+    <rdfs:Class rdf:ID="UserFolder">
         <rdfs:label>User folder</rdfs:label>
         <rdfs:subClassOf rdf:resource="http://cr.eionet.europa.eu/ontologies/contreg.rdf#Folder"/>
-        <rdfs:range rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Resource"/>
-    </rdf:Property>
+    </rdfs:Class>
 
-    <rdf:Property rdf:ID="ReviewFolder">
+    <rdfs:Class rdf:ID="ReviewFolder">
         <rdfs:label>Review folder</rdfs:label>
         <rdfs:subClassOf rdf:resource="http://cr.eionet.europa.eu/ontologies/contreg.rdf#UserFolder"/>
-        <rdfs:range rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Resource"/>
-    </rdf:Property>
+    </rdfs:Class>
 
-    <rdf:Property rdf:ID="BookmarkFolder">
-        <rdfs:label>Bookmark folder</rdfs:label>
-        <rdfs:subClassOf rdf:resource="http://cr.eionet.europa.eu/ontologies/contreg.rdf#UserFolder"/>
-        <rdfs:range rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Resource"/>
-    </rdf:Property>
+    <rdfs:Class rdf:ID="BookmarksFile">
+        <rdfs:label>Bookmarks file</rdfs:label>
+        <rdfs:subClassOf rdf:resource="http://cr.eionet.europa.eu/ontologies/contreg.rdf#File"/>
+    </rdfs:Class>
 
-    <rdf:Property rdf:ID="RegistrationFolder">
-        <rdfs:label>Registration folder</rdfs:label>
-        <rdfs:subClassOf rdf:resource="http://cr.eionet.europa.eu/ontologies/contreg.rdf#UserFolder"/>
-        <rdfs:range rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Resource"/>
-    </rdf:Property>
+    <rdfs:Class rdf:ID="RegistrationsFile">
+        <rdfs:label>Registrations file</rdfs:label>
+        <rdfs:subClassOf rdf:resource="http://cr.eionet.europa.eu/ontologies/contreg.rdf#File"/>
+    </rdfs:Class>
 
-    <rdf:Property rdf:ID="HistoryFolder">
-        <rdfs:label>History folder</rdfs:label>
-        <rdfs:subClassOf rdf:resource="http://cr.eionet.europa.eu/ontologies/contreg.rdf#UserFolder"/>
-        <rdfs:range rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Resource"/>
-    </rdf:Property>
+    <rdfs:Class rdf:ID="HistoryFile">
+        <rdfs:label>History file</rdfs:label>
+        <rdfs:subClassOf rdf:resource="http://cr.eionet.europa.eu/ontologies/contreg.rdf#File"/>
+    </rdfs:Class>
 
 	<rdfs:Class rdf:ID="SparqlBookmark">
 		<rdfs:label>SPARQL bookmark</rdfs:label>
