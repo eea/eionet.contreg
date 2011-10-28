@@ -24,6 +24,11 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashSet;
 
+import org.apache.commons.lang.StringUtils;
+
+import eionet.cr.config.GeneralConfig;
+import eionet.cr.web.security.CRUser;
+
 /**
  *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
@@ -209,5 +214,53 @@ public class URIUtil {
         schemes.add("xmlrpc.beep");
         schemes.add("xmlrpc.beeps");
         schemes.add("xmpp");
+    }
+
+    /**
+     *
+     * @param uri
+     * @return
+     */
+    public static boolean isUserHomeUri(String uri) {
+
+        if (StringUtils.isBlank(uri)) {
+            return false;
+        }
+
+        String appHomeUrl = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL);
+        if (!uri.startsWith(appHomeUrl) || uri.equals(appHomeUrl)) {
+            return false;
+        }
+
+        String afterAppHomeUrl = StringUtils.substringAfter(uri, appHomeUrl);
+        String homeString = "/home/";
+        return afterAppHomeUrl.startsWith(homeString) && afterAppHomeUrl.length() > homeString.length();
+    }
+
+    /**
+     *
+     * @param uri
+     * @return
+     */
+    public static boolean isUserReservedUri(String uri) {
+
+        String userName = URIUtil.extractUserName(uri);
+        return !StringUtils.isBlank(userName) && CRUser.getReservedFolderAndFileUris(userName).contains(uri);
+    }
+
+    /**
+     *
+     * @param uri
+     * @return
+     */
+    public static String extractUserName(String uri) {
+
+        if (!URIUtil.isUserHomeUri(uri)) {
+            return null;
+        }
+
+        String str =
+            StringUtils.substringAfter(uri, GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL) + "/home/");
+        return StringUtils.substringBefore(str, "/");
     }
 }

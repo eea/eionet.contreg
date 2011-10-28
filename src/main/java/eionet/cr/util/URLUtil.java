@@ -160,8 +160,8 @@ public class URLUtil {
         }
 
         return ioe instanceof MalformedURLException || ioe instanceof UnknownHostException
-                || (responseCode >= 400 && responseCode <= 499) || responseCode == HttpURLConnection.HTTP_NOT_IMPLEMENTED
-                || responseCode == HttpURLConnection.HTTP_VERSION;
+        || (responseCode >= 400 && responseCode <= 499) || responseCode == HttpURLConnection.HTTP_NOT_IMPLEMENTED
+        || responseCode == HttpURLConnection.HTTP_VERSION;
     }
 
     /**
@@ -432,17 +432,4 @@ public class URLUtil {
 
         return decodeEncode(path, "/;");
     }
-
-    /**
-     *
-     * @param args
-     * @throws Exception
-     */
-//    public static void main(String[] args) throws Exception {
-//
-//        String urlString =
-//                "http://usern%68me:password@d%69main:123/path;ASPSESSIONID=93AE727EADF5D5351219360F1952051F?jaanus=onu&phpsessid=999#fragment_%69d";
-//        System.out.println(urlString);
-//        System.out.println(normalizeUrl(urlString));
-//    }
 }

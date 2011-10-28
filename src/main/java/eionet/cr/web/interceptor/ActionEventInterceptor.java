@@ -43,10 +43,10 @@ import net.sourceforge.stripes.controller.LifecycleStage;
 
 import org.apache.log4j.Logger;
 
+import eionet.cr.util.URIUtil;
 import eionet.cr.util.Util;
 import eionet.cr.web.action.home.AbstractHomeActionBean;
 import eionet.cr.web.interceptor.annotation.DontSaveLastActionEvent;
-import eionet.cr.web.util.UserHomeUrlExtractor;
 
 /**
  * Interceptor that saves to the session last action except login action.
@@ -81,12 +81,13 @@ public class ActionEventInterceptor implements Interceptor {
             String actionEventURL = null;
 
             if (actionBean instanceof AbstractHomeActionBean) {
-                actionEventURL = "/home/" + UserHomeUrlExtractor.extractUserNameFromHomeUrl(request.getRequestURI());
+                String userName = URIUtil.extractUserName(request.getRequestURI());
+                actionEventURL = "/home/" + userName;
             } else {
                 actionEventURL =
-                        getActionName(actionBean.getClass()) + "?"
-                                + ((getEventName(eventMethod) != null) ? getEventName(eventMethod) + "=&" : "")
-                                + getRequestParameters(request);
+                    getActionName(actionBean.getClass()) + "?"
+                    + ((getEventName(eventMethod) != null) ? getEventName(eventMethod) + "=&" : "")
+                    + getRequestParameters(request);
 
                 // this will handle pretty url integration
                 actionEventURL = postProcess(actionEventURL);
@@ -98,6 +99,11 @@ public class ActionEventInterceptor implements Interceptor {
         return resolution;
     }
 
+    /**
+     *
+     * @param actionEventURL
+     * @return
+     */
     private static String postProcess(String actionEventURL) {
         StringBuilder sb = new StringBuilder(actionEventURL);
         // first, let's split the string into 2 parts
@@ -129,6 +135,11 @@ public class ActionEventInterceptor implements Interceptor {
         return sb.toString();
     }
 
+    /**
+     *
+     * @param actionBeanClass
+     * @return
+     */
     private static String getActionName(Class<?> actionBeanClass) {
         String result = "/" + actionBeanClass.getName() + ".action";
 
@@ -140,6 +151,11 @@ public class ActionEventInterceptor implements Interceptor {
         return result;
     }
 
+    /**
+     *
+     * @param eventMethod
+     * @return
+     */
     private static String getEventName(Method eventMethod) {
         if (eventMethod.isAnnotationPresent(DefaultHandler.class)) {
             return null;
@@ -154,6 +170,11 @@ public class ActionEventInterceptor implements Interceptor {
         return result;
     }
 
+    /**
+     *
+     * @param request
+     * @return
+     */
     @SuppressWarnings("unchecked")
     private static String getRequestParameters(HttpServletRequest request) {
         StringBuilder sb = new StringBuilder();
