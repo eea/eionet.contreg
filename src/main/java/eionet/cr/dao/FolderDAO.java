@@ -40,9 +40,32 @@ public interface FolderDAO extends DAO{
      * Creates a new folder in the given parent folder. Both given parameters must not be null
      * or blank.
      *
-     * @param parentFolderUri URI of the new foler's parent folder.
+     * @param parentFolderUri URI of the new folder's parent folder.
      * @param folderName The new folder's name.
      * @throws DAOException Thrown when a database-access error occurs.
      */
     void createFolder(String parentFolderUri, String folderName) throws DAOException;
+
+    /**
+     * Returns true if a folder with the given name exists in the given parent folder.
+     * If it doesn't exist, returns false. Both given parameters must not be null or blank.
+     *
+     * @param parentFolderUri The given parent folder URI.
+     * @param folderName The given folder name.
+     *
+     * @return See description above.
+     * @throws DAOException
+     */
+    boolean folderExists(String parentFolderUri, String folderName) throws DAOException;
+
+    /**
+     * Returns true if a folder with the given URI exists, otherwise returns false.
+     * The given URI must not be null.
+     *
+     * @param folderUri The given folder URI.
+     *
+     * @return See description above.
+     * @throws DAOException
+     */
+    boolean folderExists(String folderUri) throws DAOException;
 }

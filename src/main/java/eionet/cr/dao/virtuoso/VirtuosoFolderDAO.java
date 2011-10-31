@@ -38,9 +38,12 @@ import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.FolderDAO;
+import eionet.cr.util.Bindings;
 import eionet.cr.util.URIUtil;
 import eionet.cr.util.URLUtil;
+import eionet.cr.util.sesame.SPARQLQueryUtil;
 import eionet.cr.util.sesame.SesameUtil;
+import eionet.cr.util.sql.SingleObjectReader;
 import eionet.cr.web.security.CRUser;
 
 /**
@@ -59,13 +62,13 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
     @Override
     public void createUserHomeFolder(String userName) throws DAOException {
 
-        if (StringUtils.isBlank(userName)){
+        if (StringUtils.isBlank(userName)) {
             throw new IllegalArgumentException("User name must not be blank!");
         }
         CRUser user = new CRUser(userName);
 
         RepositoryConnection repoConn = null;
-        try{
+        try {
             repoConn = SesameUtil.getRepositoryConnection();
             repoConn.setAutoCommit(false);
             ValueFactory vf = repoConn.getValueFactory();
@@ -77,8 +80,7 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
         } catch (OpenRDFException e) {
             SesameUtil.rollback(repoConn);
             throw new DAOException(e.getMessage(), e);
-        }
-        finally{
+        } finally {
             SesameUtil.close(repoConn);
         }
     }
@@ -88,7 +90,7 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
      * @param user
      * @return
      */
-    private List<Statement> getHomeFolderCreationStatements(CRUser user, ValueFactory vf){
+    private List<Statement> getHomeFolderCreationStatements(CRUser user, ValueFactory vf) {
 
         URI homeUri = vf.createURI(user.getHomeUri());
         URI reviewsUri = vf.createURI(user.getReviewsUri());
@@ -156,23 +158,23 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
     public void createFolder(String parentFolderUri, String folderName) throws DAOException {
 
         // Make sure we have valid inputs.
-        if (StringUtils.isBlank(parentFolderUri) || StringUtils.isBlank(folderName)){
+        if (StringUtils.isBlank(parentFolderUri) || StringUtils.isBlank(folderName)) {
             throw new IllegalArgumentException("Parent folder URI and folder name must not be blank!");
         }
 
         // Prepend the parent folder with "/" if it's not done yet.
-        if (!parentFolderUri.endsWith("/")){
+        if (!parentFolderUri.endsWith("/")) {
             parentFolderUri = parentFolderUri + "/";
         }
 
         // If the new folder URI is reserved, exit silently.
-        if (URIUtil.isUserReservedUri(parentFolderUri + folderName)){
+        if (URIUtil.isUserReservedUri(parentFolderUri + folderName)) {
             LOGGER.debug("Cannot create reserved folder, exiting silently!");
             return;
         }
 
         RepositoryConnection repoConn = null;
-        try{
+        try {
             repoConn = SesameUtil.getRepositoryConnection();
             repoConn.setAutoCommit(false);
             ValueFactory vf = repoConn.getValueFactory();
@@ -200,9 +202,51 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
         } catch (OpenRDFException e) {
             SesameUtil.rollback(repoConn);
             throw new DAOException(e.getMessage(), e);
-        }
-        finally{
+        } finally {
             SesameUtil.close(repoConn);
         }
+    }
+
+    /*
+     * @see eionet.cr.dao.FolderDAO#folderExists(java.lang.String, java.lang.String)
+     */
+    @Override
+    public boolean folderExists(String parentFolderUri, String folderName) throws DAOException {
+
+        // Make sure we have valid inputs.
+        if (StringUtils.isBlank(parentFolderUri) || StringUtils.isBlank(folderName)) {
+            throw new IllegalArgumentException("Parent folder URI and folder name must not be blank!");
+        }
+
+        // Prepend the parent folder with "/" if it's not done yet.
+        if (!parentFolderUri.endsWith("/")) {
+            parentFolderUri = parentFolderUri + "/";
+        }
+
+        return folderExists(parentFolderUri + folderName);
+    }
+
+    /** */
+    private static final String FOLDER_EXISTS_SPARQL = SPARQLQueryUtil.getCrInferenceDefinitionStr()
+    + " select distinct ?s where {?s a <" + Subjects.CR_FOLDER + ">. ?parentFolder <" + Predicates.CR_HAS_FOLDER
+    + "> ?s. filter (?s=?folderUri)} limit 1";
+
+    /**
+     * @see eionet.cr.dao.FolderDAO#folderExists(java.lang.String)
+     */
+    @Override
+    public boolean folderExists(String folderUri) throws DAOException {
+
+        // Make sure we have valid inputs.
+        if (StringUtils.isBlank(folderUri)) {
+            throw new IllegalArgumentException("Folder URI must not be blank!");
+        }
+
+        String parentFolderUri = StringUtils.substringBeforeLast(folderUri, "/");
+        Bindings bindings = new Bindings();
+        bindings.setURI("parentFolder", parentFolderUri);
+        bindings.setURI("folderUri", folderUri);
+        Object o = executeUniqueResultSPARQL(FOLDER_EXISTS_SPARQL, bindings, new SingleObjectReader<Object>());
+        return o!=null && o.toString().equals(folderUri);
     }
 }
