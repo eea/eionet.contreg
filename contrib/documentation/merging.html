@@ -1,0 +1,33 @@
+<p>
+A core functionality of the Content Registry is to merge national Reportnet deliveries. The result is placed in your home folder as a <em>compiled dataset</em> on the website and it gives you the ability to query only the files that are merged. 
+</p>
+<h2>How to merge (compile) deliveries</h2>
+<p>Click on the "Merge deliveries" on the left side. Choose an obligation, and potentially also a coverage period. You will then get a list of deliveries. Mark the ones that potentially will contain the files you need. Click on "Save files into dataset". Then a second page will appear asking you to select the files to include in the compilation. You select some or all and then choose the name of the dataset to save to.</p>
+<p>
+  There are three options:
+</p>
+<ul>
+  <li>Save into a new dataset</li>
+  <li>Add to an existing dataset</li>
+  <li>If you check the "Overwrite if dataset already exists" then an existing dataset will be emptied before the values are copied into it.</li>
+</ul>
+<p>This means that the choice of files doesn't have to correct the first time. You can add more files at a later time.</p>
+<h2>How to recompile</h2>
+<p>Go to the dataset's special tab, select the source to remove and click "Recompile". The recompile will automatially run your <a href="documentation/gapfilling">gap-filling operations</a>, so you might want to ensure they are activated/deactivated according to your needs.</p>
+<h2>How to add a leftout source</h2>
+<p>There are two ways:</p>
+<ul>
+  <li>You can find it via "Merge deliveries"</li>
+  <li>You can find the source, then use the drop-down menu to add it to a compiled dataset.</li>
+</ul>
+<div class="tip-msg">
+  <strong>Tip</strong>
+  <p>To find out if a source is already included in a compiled dataset, click on the "Resource references" tab of the source and check if there is a "generatedFrom" link from the compiled dataset.</p>
+</div>
+<h2>How to remove a source</h2>
+<p>Go to the dataset's special tab, select the source to remove and click "Remove". This will not delete the source from the database - only remove the values from the compiled dataset that were copied from that source.</p>
+<p>When you have removed a source it is strongly recommended to recompile the dataset.</p>
+<h2>What if a delivered file isn't available as RDF?</h2>
+<p>
+In this case you will have to download the file from CDR, fix the problem and upload it to your home directory on Content Registry. The site has the same conversion tools as CDR, so if it is just an issue of using the correct template then this should fix the problem. You then add the source to the compiled dataset.
+</p>

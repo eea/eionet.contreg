@@ -1,0 +1,18 @@
+<p>Gap-filling deliveries has traditionally been considered somewhat of a black art.
+In principle it is the task of adding missing values and correcting the values to match reality. The black art lies in deciding what reality is. The Content Registry can't help in that respect, but can create a transaction log of all operations done to a source which can then be audited and replayed.
+</p>
+<p>Gap-filling can be performed on all files and compiled datasets that belong to you - i.e. the ones in your home folder.
+</p>
+<div class="important-msg">
+  <strong>Important</strong>
+  <p>The gap-filling functionality is not yet implemented!
+  </p>
+</div>
+
+<h2>Bulk gap-filling</h2>
+<p>One type of gap-filling is to change values according to a rule. Content Registry lets you create SPARQL INSERT and DELETE queries that are associated to one source. Running them modify the values. When a source is reharvested the rules are automatically rerun.</p>
+
+<h2>Gap-filling one value at a time</h2>
+<p>
+  If you change a value directly on a factsheet view the change operation is recorded as a SPARQL DELETE &amp; INSERT statement matching the triple you modified. You can modify the triple's value, datatype and language code. Direct modifications are undoable - the Content Registry will rewrite the SPARQL query to insert the old value and remove the reversed operation from the transaction log.
+</p>
