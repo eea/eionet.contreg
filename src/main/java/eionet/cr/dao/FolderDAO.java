@@ -31,8 +31,18 @@ public interface FolderDAO extends DAO{
      * Creates home folder for the given user name. The latter must not be null or blank!
      * Creates also all reserved folders under the newly created home folder.
      *
-     * @param userName
-     * @throws DAOException
+     * @param userName Given user name
+     * @throws DAOException Thrown when a database-access error occurs.
      */
     void createUserHomeFolder(String userName) throws DAOException;
+
+    /**
+     * Creates a new folder in the given parent folder. Both given parameters must not be null
+     * or blank.
+     *
+     * @param parentFolderUri URI of the new foler's parent folder.
+     * @param folderName The new folder's name.
+     * @throws DAOException Thrown when a database-access error occurs.
+     */
+    void createFolder(String parentFolderUri, String folderName) throws DAOException;
 }

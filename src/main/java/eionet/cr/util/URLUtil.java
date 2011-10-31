@@ -51,6 +51,10 @@ import eionet.cr.config.GeneralConfig;
  */
 public class URLUtil {
 
+    /**  */
+    private static final String[] BAD_IRI_CHARS = {" ", "{", "}", "<" , ">" , "\"", "|",  "\\", "^", "`"};
+    private static final String[] BAD_IRI_CHARS_ESCAPES = {"%20", "%7B", "%7D", "%3C" , "%3E" , "%22",  "%7C", "%5C", "%5E", "%60"};
+
     /** */
     private static final Logger LOGGER = Logger.getLogger(URLUtil.class);
 
@@ -210,19 +214,17 @@ public class URLUtil {
         //return url == null ? null : StringUtils.replace(url.toString(), " ", "%20");
         return replaceURLBadIRISymbols(url);
     }
-    /**
-    * Replaces symbols in URI that are not valid for IRI.
-    * uses URL encoding
-    * @param url given URL
-    * @return URL Valid IRI
-    */
-   public static String replaceURLBadIRISymbols(String url) {
-       String[] badList = {" ", "{", "}", "<" , ">" , "\"", "|",  "\\", "^", "`"};
-       //%7B%7D%3C%3E%22%7C%5C%5E%60
-       String[] replacementList = {"%20", "%7B", "%7D", "%3C" , "%3E" , "%22",  "%7C", "%5C", "%5E", "%60"};
 
-       return url == null ? null : StringUtils.replaceEach(url, badList, replacementList);
-   }
+    /**
+     * Replaces symbols in URI that are not valid for IRI.
+     * uses URL encoding
+     * @param url given URL
+     * @return URL Valid IRI
+     */
+    public static String replaceURLBadIRISymbols(String url) {
+
+        return url == null ? null : StringUtils.replaceEach(url, BAD_IRI_CHARS, BAD_IRI_CHARS_ESCAPES);
+    }
     /**
      *
      * @param urlConnection

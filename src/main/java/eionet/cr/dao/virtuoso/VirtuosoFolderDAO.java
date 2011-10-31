@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Statement;
@@ -37,6 +38,8 @@ import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.FolderDAO;
+import eionet.cr.util.URIUtil;
+import eionet.cr.util.URLUtil;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.web.security.CRUser;
 
@@ -46,6 +49,9 @@ import eionet.cr.web.security.CRUser;
  * @author Jaanus Heinlaid
  */
 public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
+
+    /** */
+    private static final Logger LOGGER = Logger.getLogger(VirtuosoFolderDAO.class);
 
     /**
      * @see eionet.cr.dao.FolderDAO#createUserHomeFolder(java.lang.String)
@@ -141,5 +147,62 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
         result.add(new ContextStatementImpl(historyUri, rdfsLabel, historyLabel, homeUri));
 
         return result;
+    }
+
+    /**
+     * @see eionet.cr.dao.FolderDAO#createFolder(java.lang.String, java.lang.String)
+     */
+    @Override
+    public void createFolder(String parentFolderUri, String folderName) throws DAOException {
+
+        // Make sure we have valid inputs.
+        if (StringUtils.isBlank(parentFolderUri) || StringUtils.isBlank(folderName)){
+            throw new IllegalArgumentException("Parent folder URI and folder name must not be blank!");
+        }
+
+        // Prepend the parent folder with "/" if it's not done yet.
+        if (!parentFolderUri.endsWith("/")){
+            parentFolderUri = parentFolderUri + "/";
+        }
+
+        // If the new folder URI is reserved, exit silently.
+        if (URIUtil.isUserReservedUri(parentFolderUri + folderName)){
+            LOGGER.debug("Cannot create reserved folder, exiting silently!");
+            return;
+        }
+
+        RepositoryConnection repoConn = null;
+        try{
+            repoConn = SesameUtil.getRepositoryConnection();
+            repoConn.setAutoCommit(false);
+            ValueFactory vf = repoConn.getValueFactory();
+
+            URI parentFolder = vf.createURI(parentFolderUri);
+            URI hasFolder = vf.createURI(Predicates.CR_HAS_FOLDER);
+            URI newFolder = vf.createURI(parentFolderUri + URLUtil.replaceURLBadIRISymbols(folderName));
+            URI rdfType = vf.createURI(Predicates.RDF_TYPE);
+            URI rdfsLabel = vf.createURI(Predicates.RDFS_LABEL);
+            URI allowSubObjectType = vf.createURI(Predicates.CR_ALLOW_SUBOBJECT_TYPE);
+            Literal folderLabel = vf.createLiteral(folderName);
+            URI folder = vf.createURI(Subjects.CR_FOLDER);
+            URI file = vf.createURI(Subjects.CR_FILE);
+
+            ArrayList<Statement> statements = new ArrayList<Statement>();
+            statements.add(new ContextStatementImpl(parentFolder, hasFolder, newFolder, parentFolder));
+            statements.add(new ContextStatementImpl(newFolder, rdfType, folder, parentFolder));
+            statements.add(new ContextStatementImpl(newFolder, rdfsLabel, folderLabel, parentFolder));
+            statements.add(new ContextStatementImpl(newFolder, allowSubObjectType, folder, parentFolder));
+            statements.add(new ContextStatementImpl(newFolder, allowSubObjectType, file, parentFolder));
+
+            repoConn.add(statements);
+            repoConn.commit();
+
+        } catch (OpenRDFException e) {
+            SesameUtil.rollback(repoConn);
+            throw new DAOException(e.getMessage(), e);
+        }
+        finally{
+            SesameUtil.close(repoConn);
+        }
     }
 }
