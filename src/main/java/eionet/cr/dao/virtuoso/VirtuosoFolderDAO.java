@@ -27,12 +27,10 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Literal;
-import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.ContextStatementImpl;
-import org.openrdf.model.impl.StatementImpl;
 import org.openrdf.repository.RepositoryConnection;
 
 import eionet.cr.common.Predicates;
@@ -66,23 +64,8 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
             repoConn.setAutoCommit(false);
             ValueFactory vf = repoConn.getValueFactory();
 
-            // Check if user home already created (i.e. exists this triple: userHomeUri rdf:type cr:UserFolder).
-            // If not created, create it.
-
-            URI homeUri = vf.createURI(user.getHomeUri());
-            URI rdfType = vf.createURI(Predicates.RDF_TYPE);
-            Statement stmt = new StatementImpl(homeUri, rdfType, vf.createURI(Subjects.CR_USER_FOLDER));
-            if (!repoConn.hasStatement(stmt, false, (Resource)null)){
-                repoConn.add(stmt, homeUri);
-            }
-
-            // Check if reserved folders already existing. If not, then create them.
-            URI hasFolder = vf.createURI(Predicates.CR_HAS_FOLDER);
-            URI hasFile = vf.createURI(Predicates.CR_HAS_FILE);
-            stmt = new StatementImpl(homeUri, hasFolder, vf.createURI(user.getReviewsUri()));
-            if (!repoConn.hasStatement(stmt, false, (Resource)null)){
-                repoConn.add(stmt, homeUri);
-            }
+            List<Statement> statements = getHomeFolderCreationStatements(user, vf);
+            repoConn.add(statements);
 
             repoConn.commit();
         } catch (OpenRDFException e) {
@@ -100,7 +83,6 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
      * @return
      */
     private List<Statement> getHomeFolderCreationStatements(CRUser user, ValueFactory vf){
-
 
         URI homeUri = vf.createURI(user.getHomeUri());
         URI reviewsUri = vf.createURI(user.getReviewsUri());
@@ -141,6 +123,22 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
         result.add(new ContextStatementImpl(homeUri, hasFile, historyUri, homeUri));
 
         // statements about reviews URI
+        result.add(new ContextStatementImpl(reviewsUri, rdfType, reviewFolder, homeUri));
+        result.add(new ContextStatementImpl(reviewsUri, rdfsLabel, reviewsLabel, homeUri));
+        result.add(new ContextStatementImpl(reviewsUri, allowSubObjectType, folder, homeUri));
+        result.add(new ContextStatementImpl(reviewsUri, allowSubObjectType, file, homeUri));
+
+        // statements about bookmarks URI
+        result.add(new ContextStatementImpl(bookmarksUri, rdfType, bookmarksFile, homeUri));
+        result.add(new ContextStatementImpl(bookmarksUri, rdfsLabel, bookmarksLabel, homeUri));
+
+        // statements about registrations URI
+        result.add(new ContextStatementImpl(registrationsUri, rdfType, registrationsFile, homeUri));
+        result.add(new ContextStatementImpl(registrationsUri, rdfsLabel, registrationsLabel, homeUri));
+
+        // statements about history URI
+        result.add(new ContextStatementImpl(historyUri, rdfType, historyFile, homeUri));
+        result.add(new ContextStatementImpl(historyUri, rdfsLabel, historyLabel, homeUri));
 
         return result;
     }
