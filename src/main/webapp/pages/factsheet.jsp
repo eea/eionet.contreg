@@ -6,6 +6,7 @@
 
     <stripes:layout-component name="contents">
         <script language="javascript">
+// <![CDATA[
             ( function($) {
                 $(document).ready(
                     function(){
@@ -28,6 +29,7 @@
                         });
                     });
             } ) ( jQuery );
+// ]]>
         </script>
         <c:choose>
             <c:when test="${!actionBean.noCriteria}">

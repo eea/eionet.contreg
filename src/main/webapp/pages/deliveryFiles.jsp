@@ -6,6 +6,7 @@
 
    	<stripes:layout-component name="head">
 		<script type="text/javascript">
+// <![CDATA[
 			( function($) {
 				$(document).ready(function(){
 					var ds_val = $('select#selDataset').val();
@@ -24,6 +25,7 @@
 					});
 				});
 			} ) ( jQuery );
+// ]]>
 		</script>
 	</stripes:layout-component>
 

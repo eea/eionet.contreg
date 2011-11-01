@@ -23,7 +23,7 @@
             <c:choose>
             <c:when test="${not empty actionBean.type}">
                 <script language="javascript">
-
+// <![CDATA[
                 function hidediv() {
                     if (document.getElementById) { // DOM3 = IE5, NS6
                         document.body.className = 'fullscreen';
@@ -63,7 +63,7 @@
                         });
                 } ) ( jQuery );
 
-
+// ]]>
                 </script>
                    <stripes:select name="type">
                    <c:forEach var="groups" items="${actionBean.availableTypes}">

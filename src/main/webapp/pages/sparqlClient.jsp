@@ -6,6 +6,7 @@
 
     <stripes:layout-component name="head">
         <script type="text/javascript">
+        // <![CDATA[
             var last_format = 1;
             function format_select(query_obg) {
                 var query = query_obg.value;
@@ -57,7 +58,83 @@
 
                     });
             } ) ( jQuery );
-            </script>
+            // ]]>
+        </script>
+        <style type="text/css" media="screen">
+/*<![CDATA[*/
+div#workarea textarea, 
+div#workarea pre {
+  margin: 0;
+  padding: 0;
+  outline: 0;
+  border: 0;
+}
+
+/* The containing element has the expandingArea
+   class, define any border or inset box-shadow
+   etc. here that you want to style your textarea.
+   I've just added a simple 1px solid mid-grey
+   border. You can also set a min-height property
+   here if you want and it works as expected.
+ */
+div#workarea .expandingArea {
+  position: relative;
+  border: 1px solid #888;
+  background: #fff;
+}
+/* Any padding should go in here; it needs to be
+   the same for both the pre and the textarea. You
+   also need to make sure both have exactly the
+   same font and line height properties, although
+   the exact values can of course be anything you
+   want.
+ */
+div#workarea .expandingArea > textarea,
+div#workarea .expandingArea > pre {
+  padding: 5px;
+  background: transparent;
+  font: 400 13px/16px helvetica, arial, sans-serif;
+  /* Make the text soft-wrap */
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+div#workarea .expandingArea > textarea {
+  /* The border-box box model is used to allow
+     padding whilst still keeping the overall width
+     at exactly that of the containing element.
+   */
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+      -ms-box-sizing: border-box;
+          box-sizing: border-box;
+  /* This height is used when JS is disabled */
+  height: 100px;
+  width: 100%;
+}
+
+div#workarea .expandingArea.active > textarea {
+  /* Hide any scrollbars */
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  /* Remove WebKit user-resize widget */
+  resize: none;
+}
+
+div#workarea .expandingArea > pre {
+  display: none;
+}
+div#workarea .expandingArea.active > pre {
+  display: block;
+  /* We don't actually want to see this text, it's just for sizing */
+  visibility: hidden;
+}
+/*]]>*/
+        </style>
+
     </stripes:layout-component>
 
     <stripes:layout-component name="contents">
@@ -95,7 +172,8 @@
                         </c:if>
                         </ul>
                     </div>
-
+                    <div class="expandingArea">
+                    <pre><span></span><br /></pre>
                     <textarea name="query" id="queryText" rows="8" cols="80" style="clear:right; display: block; width: 100%" onchange="format_select(this)" onkeyup="format_select(this)">
 <c:if test="${empty actionBean.query}">PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
 
@@ -104,6 +182,36 @@ SELECT DISTINCT * WHERE {
   OPTIONAL { ?class rdfs:label ?label }
 } LIMIT 50
 </c:if>${actionBean.query}</textarea>
+                    </div>
+                    <script type="text/javascript">
+// <![CDATA[
+function makeExpandingArea(container) {
+ var area = container.querySelector('textarea');
+ var span = container.querySelector('span');
+ if (area.addEventListener) {
+   area.addEventListener('input', function() {
+     span.textContent = area.value;
+   }, false);
+   span.textContent = area.value;
+ } else if (area.attachEvent) {
+   // IE8 compatibility
+   area.attachEvent('onpropertychange', function() {
+     span.innerText = area.value;
+   });
+   span.innerText = area.value;
+ }
+ // Enable extra CSS
+ container.className += ' active';
+}
+
+var areas = document.querySelectorAll('.expandingArea');
+var l = areas.length;
+
+while (l--) {
+ makeExpandingArea(areas[l]);
+}
+// ]]>
+                    </script>
                 </div>
                 <div style="position: relative; margin-bottom: 30px">
                     <div style="position: absolute; top: 5px; left: 0px;">

@@ -6,6 +6,7 @@
 
 	<stripes:layout-component name="head">
 		<script type="text/javascript">
+// <![CDATA[
 			( function($) {
 				$(document).ready(function(){
 					//Hide div w/id extra
@@ -17,6 +18,7 @@
 					});
 				});
 			} ) ( jQuery );
+// ]]>
 		</script>
 	</stripes:layout-component>
 
