@@ -35,9 +35,6 @@ import com.tee.uit.security.AclNotFoundException;
 import com.tee.uit.security.SignOnException;
 
 import eionet.cr.config.GeneralConfig;
-import eionet.cr.dao.DAOException;
-import eionet.cr.dao.DAOFactory;
-import eionet.cr.dao.UserHomeDAO;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Util;
 import eionet.cr.web.util.WebConstants;
@@ -59,11 +56,6 @@ public class CRUser {
     /** */
     private String userName;
 
-    /**
-     * Is user home folder registered under CR root home.
-     */
-    private boolean homeFolderRegistered;
-
     /** List of the user's folder-or-file URIs that should be reserved, i.e. not to be created or deleted by user himself! */
     private List<String> reservedFolderAndFileUris;
 
@@ -74,6 +66,10 @@ public class CRUser {
      *            username
      */
     public CRUser(String userName) {
+
+        if (StringUtils.isBlank(userName)){
+            throw new IllegalArgumentException("User name must not be blank!");
+        }
         this.userName = userName;
     }
 
@@ -350,29 +346,6 @@ public class CRUser {
     public static String reviewsUri(String userName) {
 
         return CRUser.homeUri(userName) + "/reviews";
-    }
-
-    /**
-     * @return
-     */
-    public boolean isHomeFolderRegistered() {
-        return homeFolderRegistered;
-    }
-
-    /**
-     * @param homeFolderRegistered
-     */
-    public void setHomeFolderRegistered(boolean homeFolderRegistered) {
-        this.homeFolderRegistered = homeFolderRegistered;
-    }
-
-    /**
-     * @throws DAOException
-     */
-    public void loadUserProperties() throws DAOException {
-        UserHomeDAO userHomeDAO = DAOFactory.get().getDao(UserHomeDAO.class);
-        boolean isUserHomeFolderREgistered = userHomeDAO.isUserFolderRegisteredInCrHomeContext(this);
-        setHomeFolderRegistered(isUserHomeFolderREgistered);
     }
 
     /**

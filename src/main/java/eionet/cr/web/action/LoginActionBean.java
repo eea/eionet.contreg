@@ -34,7 +34,12 @@ import net.sourceforge.stripes.action.HandlesEvent;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
+
+import org.apache.log4j.Logger;
+
 import eionet.cr.dao.DAOException;
+import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.FolderDAO;
 import eionet.cr.web.interceptor.annotation.DontSaveLastActionEvent;
 import eionet.cr.web.security.CRUser;
 
@@ -48,6 +53,9 @@ import eionet.cr.web.security.CRUser;
  */
 @UrlBinding(LOGIN_ACTION)
 public class LoginActionBean extends AbstractActionBean {
+
+    /** */
+    private static final Logger LOGGER = Logger.getLogger(LoginActionBean.class);
 
     /**
      * Action method deals with user logging in.
@@ -70,14 +78,29 @@ public class LoginActionBean extends AbstractActionBean {
     @HandlesEvent(AFTER_LOGIN_EVENT)
     @DontSaveLastActionEvent
     public Resolution afterLogin() throws DAOException {
+
         CRUser user = getContext().getCRUser();
-        if (user != null) {
-            user.loadUserProperties();
+        if (user!=null){
+
+            LOGGER.debug("Checking if there is a home folder for user " + user.getUserName());
+
+            // If this is the first time the user has logged in,
+            // create his/her home folder. First time means no
+            // home folder currently existing in the triple store.
+            FolderDAO dao = DAOFactory.get().getDao(FolderDAO.class);
+            if (!dao.folderExists(user.getHomeUri())){
+
+                LOGGER.debug("Going to create home folder for user " + user.getUserName());
+
+                dao.createUserHomeFolder(user.getUserName());
+            }
+            else{
+                LOGGER.debug("Home folder exists for user " + user.getUserName());
+            }
         }
 
         String lastActionEventUrl = getContext().getLastActionEventUrl();
         lastActionEventUrl = lastActionEventUrl == null ? MAIN_PAGE_ACTION : lastActionEventUrl;
-        // getContext().getCRUser().setLocalId(this.userService.addUserIfrequired(getUserName()));
         return new RedirectResolution(lastActionEventUrl, !lastActionEventUrl.toLowerCase().startsWith("http://"));
     }
 

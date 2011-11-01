@@ -27,7 +27,6 @@ import eionet.cr.dto.UserFolderDTO;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.pagination.PagingRequest;
-import eionet.cr.web.security.CRUser;
 
 /**
  * Interface to define methods related to users home folder.
@@ -49,14 +48,4 @@ public interface UserHomeDAO extends DAO {
      */
     Pair<Integer, List<UserFolderDTO>> getFolderContents(String parentFolder, Map<String, String> filters,
             PagingRequest pagingRequest, SortingRequest sortingRequest, List<String> selectedPredicates) throws DAOException;
-
-    /**
-     * Check if the user folder is already registered in CR home root
-     *
-     * @param user
-     *            loggedin user
-     * @return true if user folder is already registered
-     * @throws DAOException
-     */
-    boolean isUserFolderRegisteredInCrHomeContext(CRUser user) throws DAOException;
 }

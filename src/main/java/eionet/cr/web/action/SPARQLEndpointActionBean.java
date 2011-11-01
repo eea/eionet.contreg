@@ -258,11 +258,6 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             // now save the bookmark subject
             dao.addTriples(subjectDTO);
 
-            // store user folder in CR root home context
-            if (!user.isHomeFolderRegistered()) {
-                dao.registerUserFolderInCrHomeContext(user);
-            }
-
             // log and display message about successful operation
             logger.debug("Query bookmarked with URI: " + bookmarksUri);
             addSystemMessage("Successfully bookmarked query: <a href=\"factsheet.action?uri=" + URLEncoder.encode(bookmarkUri)
@@ -326,7 +321,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         Resolution resolution = null;
         if (useInferencing && !StringUtils.isBlank(query)) {
             String infCommand =
-                    "DEFINE input:inference '" + GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME) + "'";
+                "DEFINE input:inference '" + GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME) + "'";
 
             // if inference command not yet present in the query, add it
             if (query.indexOf(infCommand) == -1) {

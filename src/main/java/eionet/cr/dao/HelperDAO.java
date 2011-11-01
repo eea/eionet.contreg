@@ -431,16 +431,6 @@ public interface HelperDAO extends DAO {
     List<Map<String, String>> getSparqlBookmarks(CRUser user) throws DAOException;
 
     /**
-     * Stores the user folder in CR home context.
-     *
-     * @param user
-     *            loggedin user
-     * @return
-     * @throws DAOException
-     */
-    void registerUserFolderInCrHomeContext(CRUser user) throws DAOException;
-
-    /**
      * Returns triples of an harvest source.
      *
      * @param sourceUrl
