@@ -31,8 +31,6 @@ import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.validation.ValidationMethod;
 
 import org.apache.commons.lang.StringUtils;
-import org.openrdf.query.MalformedQueryException;
-import org.openrdf.query.parser.sparql.SPARQLParser;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
@@ -86,26 +84,32 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
      */
     public Resolution save() throws DAOException {
 
-        if (ignoreMalformedSparql == false) {
-            try {
-                new SPARQLParser().parseQuery(script, null);
-            } catch (MalformedQueryException e) {
-                ignoreMalformedSparql = true;
-                addCautionMessage("Script does not seem to be valid SPARQL: " + e.getMessage()
-                        + ".<br/><strong>Save again to ignore this message!</strong>");
-                return new ForwardResolution(SCRIPT_JSP);
-            }
-        } else {
-            ignoreMalformedSparql = false;
-        }
+        //        // If malformed script should not be ignored (i.e. first time save button is pressed),
+        //        // perform script validation, and issue a warning message to the user if the script
+        //        // was found malformed. Otherwise (i.e. save button pressed second time), lower the ignore flag.
+        //        if (ignoreMalformedSparql == false) {
+        //            try {
+        //                new SPARQLParser().parseQuery(script, null);
+        //            } catch (MalformedQueryException e) {
+        //                ignoreMalformedSparql = true;
+        //                addCautionMessage("Script does not seem to be valid SPARQL: " + e.getMessage()
+        //                        + ".<br/><strong>Save again to ignore this message!</strong>");
+        //                return new ForwardResolution(SCRIPT_JSP);
+        //            }
+        //        } else {
+        //            ignoreMalformedSparql = false;
+        //        }
 
+        // If id given, do save by the given id, otherwise do addition of brand new script.
         if (id > 0) {
             DAOFactory.get().getDao(PostHarvestScriptDAO.class).save(id, title, script, active);
         } else {
             id = DAOFactory.get().getDao(PostHarvestScriptDAO.class).insert(targetType, targetUrl, title, script, active);
         }
-
         addSystemMessage("Script successfully saved!");
+
+        // Depending on whether "Save" or "Save & close" was pressed, forward back to the same script's
+        // view or to the list of all scripts.
         if (getContext().getRequestParameter("save").equalsIgnoreCase("Save & close")) {
             if (logger.isTraceEnabled()) {
                 logger.trace("Redirecting after save & close");
@@ -177,8 +181,23 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
         if (StringUtils.isBlank(script)) {
             addGlobalValidationError("Script must not be blank!");
         }
+        else if (!isValidScript(script)){
+            addGlobalValidationError("Script must start with INSERT or DELETE (case-insensitive) followed by whitespace");
+        }
 
         getContext().setSourcePageResolution(new ForwardResolution(SCRIPT_JSP));
+    }
+
+    /**
+     *
+     * @param script
+     * @return
+     */
+    private static boolean isValidScript(String script){
+
+        String s = StringUtils.stripStart(script.toUpperCase(), null);
+        int length = s.length();
+        return (s.startsWith("INSERT") || s.startsWith("DELETE")) && length>6 && Character.isWhitespace(s.charAt(6));
     }
 
     /**

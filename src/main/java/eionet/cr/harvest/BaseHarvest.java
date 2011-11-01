@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
@@ -283,21 +284,60 @@ public abstract class BaseHarvest implements Harvest {
      * @param conn
      * @throws OpenRDFException
      */
-    private void runScripts(List<PostHarvestScriptDTO> scriptDtos, RepositoryConnection conn) throws OpenRDFException {
+    private void runScripts(List<PostHarvestScriptDTO> scriptDtos, RepositoryConnection conn) {
 
         if (scriptDtos != null && !scriptDtos.isEmpty()) {
-            for (PostHarvestScriptDTO scriptDto : scriptDtos) {
+            return;
+        }
 
-                String scriptType =
-                    scriptDto.getTargetType() == null ? "all-source" : scriptDto.getTargetType().toString().toLowerCase()
-                            + "-specific";
-                LOGGER.debug(MessageFormat.format("Executing {0} post-harvest script with title: {1}", scriptType,
-                        scriptDto.getTitle()));
+        for (PostHarvestScriptDTO scriptDto : scriptDtos) {
 
-                String updateSparql = "WITH <" + getContextUrl() + "> " + scriptDto.getScript();
-                SesameUtil.executeUpdate(updateSparql, null, conn);
+            String scriptType =
+                scriptDto.getTargetType() == null ? "all-source" : scriptDto.getTargetType().toString().toLowerCase()
+                        + "-specific";
+            LOGGER.debug(loggerMsg(MessageFormat.format("Executing {0} post-harvest script with title {1}", scriptType,
+                    scriptDto.getTitle())));
+
+            String updateSparql = fixPostHarvestScript(scriptDto.getScript(), getContextUrl());
+            try {
+                SesameUtil.executeUpdateQuery(updateSparql, null, conn);
+            } catch (OpenRDFException e) {
+                LOGGER.warn(loggerMsg("Script execution failed with exception: " + e));
             }
         }
+    }
+
+    /**
+     *
+     * @param script
+     * @return
+     */
+    private static String fixPostHarvestScript(String script, String graphUri) {
+
+        String result = script.trim();
+        StringTokenizer st = new StringTokenizer(script.trim().toUpperCase());
+        ArrayList<String> tokens = new ArrayList<String>();
+        while (st.hasMoreTokens()){
+            tokens.add(st.nextToken());
+        }
+
+        String firstToken = tokens.get(0);
+        if (firstToken.equals("WITH")){
+            result = "MODIFY" + result.substring("WITH".length());
+        }
+        else if (firstToken.equals("DELETE")){
+            if (tokens.contains("INSERT")){
+                result = "MODIFY <" + graphUri + "> " + result;
+            }
+            else{
+                result = "DELETE FROM <" + graphUri + "> " + result.substring("DELETE".length());
+            }
+        }
+        else if (firstToken.equals("INSERT")){
+            result = "INSERT INTO <" + graphUri + "> " + result.substring("INSERT".length());
+        }
+
+        return result;
     }
 
     /**
@@ -309,8 +349,8 @@ public abstract class BaseHarvest implements Harvest {
     }
 
     /**
-     * Adds source int inference rule, if source is inference rule.
-     * (It is done because rule set must be updated after the harvest is done)
+     * Adds source int inference rule, if source is inference rule. (It is done because rule set must be updated after the harvest
+     * is done)
      *
      * @throws DAOException
      */
@@ -538,7 +578,7 @@ public abstract class BaseHarvest implements Harvest {
      * Derives new harvest sources from stored content.
      *
      */
-    private void deriveNewHarvestSources(){
+    private void deriveNewHarvestSources() {
 
         if (storedTriplesCount <= 0) {
             return;
