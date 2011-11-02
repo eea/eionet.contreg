@@ -143,7 +143,7 @@ div#workarea .expandingArea.active > pre {
 
         <div style="margin-top: 15px">
             <div style="float:right">
-                <a href="documentation/sparqlfunctions">SPARQL Functions</a>
+                <a href="documentation/sparqlfunctions" title="Press Ctrl and click to open help on SPARQL Functions in a new window">SPARQL Functions</a>
             </div>
             <crfn:form name="mainForm" action="/sparql" method="get">
                 <c:if test="${not empty actionBean.defaultGraphUris}">
