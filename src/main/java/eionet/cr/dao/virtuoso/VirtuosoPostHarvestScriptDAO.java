@@ -46,41 +46,41 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
 
     /** */
     private static final String LIST_SQL = "select * from POST_HARVEST_SCRIPT where "
-            + "coalesce(TARGET_SOURCE_URL,'')=? and coalesce(TARGET_TYPE_URL,'')=? order by POSITION_NUMBER asc";
+        + "coalesce(TARGET_SOURCE_URL,'')=? and coalesce(TARGET_TYPE_URL,'')=? order by POSITION_NUMBER asc";
     private static final String LIST_ACTIVE_SQL = "select * from POST_HARVEST_SCRIPT where "
-            + "coalesce(TARGET_SOURCE_URL,'')=? and coalesce(TARGET_TYPE_URL,'')=? where ACTIVE='Y' order by POSITION_NUMBER asc";
+        + "coalesce(TARGET_SOURCE_URL,'')=? and coalesce(TARGET_TYPE_URL,'')=? and ACTIVE='Y' order by POSITION_NUMBER asc";
     private static final String LIST_ACTIVE_FOR_TYPES_SQL = "select * from POST_HARVEST_SCRIPT where "
-            + "TARGET_SOURCE_URL is null and TARGET_TYPE_URL in (@types@) and ACTIVE='Y' "
-            + "order by TARGET_TYPE_URL asc, POSITION_NUMBER asc";
+        + "TARGET_SOURCE_URL is null and TARGET_TYPE_URL in (@types@) and ACTIVE='Y' "
+        + "order by TARGET_TYPE_URL asc, POSITION_NUMBER asc";
     /** */
     private static final String SAVE_SQL = "update POST_HARVEST_SCRIPT "
-            + "set TITLE=?, SCRIPT=?, ACTIVE=? where POST_HARVEST_SCRIPT_ID=?";
+        + "set TITLE=?, SCRIPT=?, ACTIVE=? where POST_HARVEST_SCRIPT_ID=?";
     /** */
     private static final String DELETE_SQL = "delete from POST_HARVEST_SCRIPT where POST_HARVEST_SCRIPT_ID=?";
     /** */
     private static final String GET_LAST_POSITION_SQL = "select max(POSITION_NUMBER) as MAX_POS from POST_HARVEST_SCRIPT where "
-            + "coalesce(TARGET_SOURCE_URL,'')=? and coalesce(TARGET_TYPE_URL,'')=?";
+        + "coalesce(TARGET_SOURCE_URL,'')=? and coalesce(TARGET_TYPE_URL,'')=?";
     private static final String INSERT_SQL = "insert into POST_HARVEST_SCRIPT "
-            + "(TARGET_SOURCE_URL,TARGET_TYPE_URL,TITLE,SCRIPT,POSITION_NUMBER,ACTIVE) values " + "(?,?,?,?,?,?)";
+        + "(TARGET_SOURCE_URL,TARGET_TYPE_URL,TITLE,SCRIPT,POSITION_NUMBER,ACTIVE) values " + "(?,?,?,?,?,?)";
     /** */
     private static final String FETCH_SQL = "select * from POST_HARVEST_SCRIPT where POST_HARVEST_SCRIPT_ID=?";
     /** */
     private static final String LIST_TARGETS_SQL = "select coalesce(TARGET_SOURCE_URL,TARGET_TYPE_URL) as LCOL, count(*) as RCOL "
-            + "from POST_HARVEST_SCRIPT " + "where isnull(TARGET_SOURCE_URL)=? and isnull(TARGET_TYPE_URL)=? "
-            + "group by LCOL order by LCOL";
+        + "from POST_HARVEST_SCRIPT " + "where isnull(TARGET_SOURCE_URL)=? and isnull(TARGET_TYPE_URL)=? "
+        + "group by LCOL order by LCOL";
     /** */
     private static final String ACTIVATE_DEACTIVATE_SQL =
-            "update POST_HARVEST_SCRIPT set ACTIVE=either(starts_with(ACTIVE,'Y'),'N','Y') where POST_HARVEST_SCRIPT_ID=?";
+        "update POST_HARVEST_SCRIPT set ACTIVE=either(starts_with(ACTIVE,'Y'),'N','Y') where POST_HARVEST_SCRIPT_ID=?";
     /** */
     private static final String GET_POSITIONS_SQL = "select cast(POST_HARVEST_SCRIPT_ID as varchar) as LCOL, "
-            + "cast(POSITION_NUMBER as varchar) as RCOL from POST_HARVEST_SCRIPT "
-            + "where coalesce(TARGET_SOURCE_URL,'')=? and coalesce(TARGET_TYPE_URL,'')=? order by RCOL asc";
+        + "cast(POSITION_NUMBER as varchar) as RCOL from POST_HARVEST_SCRIPT "
+        + "where coalesce(TARGET_SOURCE_URL,'')=? and coalesce(TARGET_TYPE_URL,'')=? order by RCOL asc";
     /** */
     private static final String UPDATE_POSITION_SQL =
-            "update POST_HARVEST_SCRIPT set POSITION_NUMBER=? where POST_HARVEST_SCRIPT_ID=?";
+        "update POST_HARVEST_SCRIPT set POSITION_NUMBER=? where POST_HARVEST_SCRIPT_ID=?";
     /** */
     private static final String INCREASE_POSITIONS_SQL = "update POST_HARVEST_SCRIPT set POSITION_NUMBER=POSITION_NUMBER+? "
-            + "where coalesce(TARGET_SOURCE_URL,'')=? and coalesce(TARGET_TYPE_URL,'')=?";
+        + "where coalesce(TARGET_SOURCE_URL,'')=? and coalesce(TARGET_TYPE_URL,'')=?";
 
     /**
      * @see eionet.cr.dao.PostHarvestScriptDAO#list(eionet.cr.dto.PostHarvestScriptDTO.TargetType, java.lang.String)
@@ -129,7 +129,8 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
             questionMarks.append(questionMarks.length() == 0 ? "" : ",").append("?");
         }
 
-        return executeSQL(LIST_ACTIVE_FOR_TYPES_SQL, types, new PostHarvestScriptDTOReader());
+        String sql = LIST_ACTIVE_FOR_TYPES_SQL.replace("@types@", questionMarks);
+        return executeSQL(sql, types, new PostHarvestScriptDTOReader());
     }
 
     /**

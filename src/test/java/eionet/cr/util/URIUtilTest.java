@@ -60,16 +60,16 @@ public class URIUtilTest extends TestCase {
     public void testIsUserHomeUri() {
 
         String appHomeUrl = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL);
-        assertTrue(URIUtil.isUserHomeUri(appHomeUrl + "/home/heinlja"));
-        assertTrue(URIUtil.isUserHomeUri(appHomeUrl + "/home/heinlja/"));
-        assertTrue(URIUtil.isUserHomeUri(appHomeUrl + "/home/heinlja/folder"));
-        assertFalse(URIUtil.isUserHomeUri(appHomeUrl + "/home/"));
-        assertFalse(URIUtil.isUserHomeUri(appHomeUrl + "/home"));
-        assertFalse(URIUtil.isUserHomeUri(appHomeUrl));
-        assertFalse(URIUtil.isUserHomeUri(""));
-        assertFalse(URIUtil.isUserHomeUri(" "));
+        assertTrue(URIUtil.startsWithUserHome(appHomeUrl + "/home/heinlja"));
+        assertTrue(URIUtil.startsWithUserHome(appHomeUrl + "/home/heinlja/"));
+        assertTrue(URIUtil.startsWithUserHome(appHomeUrl + "/home/heinlja/folder"));
+        assertFalse(URIUtil.startsWithUserHome(appHomeUrl + "/home/"));
+        assertFalse(URIUtil.startsWithUserHome(appHomeUrl + "/home"));
+        assertFalse(URIUtil.startsWithUserHome(appHomeUrl));
+        assertFalse(URIUtil.startsWithUserHome(""));
+        assertFalse(URIUtil.startsWithUserHome(" "));
         try{
-            assertFalse(URIUtil.isUserHomeUri(null));
+            assertFalse(URIUtil.startsWithUserHome(null));
         }
         catch (NullPointerException e){
             fail("Wasn't expecting this exception: " + e.toString());

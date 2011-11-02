@@ -181,23 +181,8 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
         if (StringUtils.isBlank(script)) {
             addGlobalValidationError("Script must not be blank!");
         }
-        else if (!isValidScript(script)){
-            addGlobalValidationError("Script must start with INSERT or DELETE (case-insensitive) followed by whitespace");
-        }
 
         getContext().setSourcePageResolution(new ForwardResolution(SCRIPT_JSP));
-    }
-
-    /**
-     *
-     * @param script
-     * @return
-     */
-    private static boolean isValidScript(String script){
-
-        String s = StringUtils.stripStart(script.toUpperCase(), null);
-        int length = s.length();
-        return (s.startsWith("INSERT") || s.startsWith("DELETE")) && length>6 && Character.isWhitespace(s.charAt(6));
     }
 
     /**

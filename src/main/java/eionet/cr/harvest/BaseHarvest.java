@@ -24,6 +24,7 @@ package eionet.cr.harvest;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -188,7 +189,7 @@ public abstract class BaseHarvest implements Harvest {
 
         try {
             // run post-harvest scripts (TODO not to be run yet, as the scripts functionality is not entirely finished)
-            // runPostHarvestScripts();
+            runPostHarvestScripts();
 
             // send harvest messages
             sendHarvestMessages();
@@ -244,7 +245,7 @@ public abstract class BaseHarvest implements Harvest {
      */
     private void runPostHarvestScripts() {
 
-        LOGGER.debug("Running post-harvest scripts ...");
+        LOGGER.debug(loggerMsg("Running post-harvest scripts"));
 
         RepositoryConnection conn = null;
         try {
@@ -252,18 +253,29 @@ public abstract class BaseHarvest implements Harvest {
             conn.setAutoCommit(false);
             PostHarvestScriptDAO dao = DAOFactory.get().getDao(PostHarvestScriptDAO.class);
 
+            int totalScriptsFound = 0;
             // run scripts meant for all sources (i.e. all-source scripts)
-            runScripts(dao.listActive(null, null), conn);
+            List<PostHarvestScriptDTO> scripts = dao.listActive(null, null);
+            totalScriptsFound += scripts.size();
+            runScripts(scripts, conn);
 
             // run scripts meant for this source only
-            runScripts(dao.listActive(PostHarvestScriptDTO.TargetType.SOURCE, getContextUrl()), conn);
+            scripts = dao.listActive(PostHarvestScriptDTO.TargetType.SOURCE, getContextUrl());
+            totalScriptsFound += scripts.size();
+            runScripts(scripts, conn);
 
             // run scripts meant for the types found in the freshly harvested content of this source
             SingleObjectReader<String> reader = new SingleObjectReader<String>();
             SesameUtil.executeQuery("select distinct ?type from <" + getContextUrl() + "> where {?s a ?type}", reader, conn);
             List<String> distinctTypes = reader.getResultList();
             if (distinctTypes != null && !distinctTypes.isEmpty()) {
-                runScripts(dao.listActiveForTypes(distinctTypes), conn);
+                scripts = dao.listActiveForTypes(distinctTypes);
+                totalScriptsFound += scripts.size();
+                runScripts(scripts, conn);
+            }
+
+            if (totalScriptsFound==0){
+                LOGGER.debug(loggerMsg("No active post-harvest scripts were found relevant for this source"));
             }
 
             // commit changes
@@ -286,7 +298,7 @@ public abstract class BaseHarvest implements Harvest {
      */
     private void runScripts(List<PostHarvestScriptDTO> scriptDtos, RepositoryConnection conn) {
 
-        if (scriptDtos != null && !scriptDtos.isEmpty()) {
+        if (scriptDtos == null || scriptDtos.isEmpty()) {
             return;
         }
 
@@ -295,49 +307,114 @@ public abstract class BaseHarvest implements Harvest {
             String scriptType =
                 scriptDto.getTargetType() == null ? "all-source" : scriptDto.getTargetType().toString().toLowerCase()
                         + "-specific";
-            LOGGER.debug(loggerMsg(MessageFormat.format("Executing {0} post-harvest script with title {1}", scriptType,
-                    scriptDto.getTitle())));
+            String parsedScript = parsePostHarvestScript(scriptDto.getScript(), getContextUrl());
 
-            String updateSparql = fixPostHarvestScript(scriptDto.getScript(), getContextUrl());
+            LOGGER.debug(MessageFormat.format("Executing the following {0} post-harvest script titled \"{1}\":\n{2}",
+                    scriptType, scriptDto.getTitle(), parsedScript));
+
             try {
-                SesameUtil.executeUpdateQuery(updateSparql, null, conn);
+                SesameUtil.executeUpdateQuery(parsedScript, null, conn);
             } catch (OpenRDFException e) {
-                LOGGER.warn(loggerMsg("Script execution failed with exception: " + e));
+                String message = MessageFormat.format(
+                        "Got exception *** {0} *** when executing the following {1} post-harvest script titled \"{2}\":\n{3}", e.toString(),
+                        scriptType, scriptDto.getTitle(), parsedScript);
+                LOGGER.warn(message);
+                addHarvestMessage(message, HarvestMessageType.WARNING);
             }
         }
     }
 
+    // /**
+    // *
+    // * @param script
+    // * @return
+    // */
+    // private static String fixPostHarvestScript(String script, String graphUri) {
+    //
+    // String result = script.trim();
+    //
+    // StringTokenizer st = new StringTokenizer(script.trim().toUpperCase());
+    // ArrayList<String> tokens = new ArrayList<String>();
+    // while (st.hasMoreTokens()) {
+    // tokens.add(st.nextToken());
+    // }
+    //
+    // String firstToken = tokens.get(0);
+    // if (firstToken.equals("WITH")) {
+    // result = "MODIFY" + result.substring("WITH".length());
+    // } else if (firstToken.equals("DELETE")) {
+    // if (tokens.contains("INSERT")) {
+    // result = "MODIFY <" + graphUri + "> " + result;
+    // } else {
+    // result = "DELETE FROM <" + graphUri + "> " + result.substring("DELETE".length());
+    // }
+    // } else if (firstToken.equals("INSERT")) {
+    // result = "INSERT INTO <" + graphUri + "> " + result.substring("INSERT".length());
+    // }
+    //
+    // return result;
+    // }
+
     /**
      *
      * @param script
+     * @param graphUri
      * @return
      */
-    private static String fixPostHarvestScript(String script, String graphUri) {
+    private static String parsePostHarvestScript(String script, String graphUri) {
 
-        String result = script.trim();
-        StringTokenizer st = new StringTokenizer(script.trim().toUpperCase());
-        ArrayList<String> tokens = new ArrayList<String>();
-        while (st.hasMoreTokens()){
-            tokens.add(st.nextToken());
+        String trimmedScript = script.trim();
+        StringTokenizer st = new StringTokenizer(trimmedScript, " \t\n\r\f", true);
+        ArrayList<String> originalTokens = new ArrayList<String>();
+        ArrayList<String> upperCaseTokens = new ArrayList<String>();
+        while (st.hasMoreTokens()) {
+            String token = st.nextToken();
+            originalTokens.add(token);
+            upperCaseTokens.add(token.toUpperCase());
         }
 
-        String firstToken = tokens.get(0);
-        if (firstToken.equals("WITH")){
-            result = "MODIFY" + result.substring("WITH".length());
-        }
-        else if (firstToken.equals("DELETE")){
-            if (tokens.contains("INSERT")){
-                result = "MODIFY <" + graphUri + "> " + result;
+        String result = script;
+        int insertIndex = -1;
+        int deleteIndex = upperCaseTokens.indexOf("DELETE");
+
+        if (deleteIndex >= 0) {
+            insertIndex = upperCaseTokens.indexOf("INSERT");
+            if (insertIndex == -1) {
+                // result = "DELETE FROM <" + graphUri + "> " + result.substring("DELETE".length());
+                result = tokensToString(originalTokens.subList(0, deleteIndex + 1));
+                result = result + " FROM <" + graphUri + ">";
+                result = result + tokensToString(originalTokens.subList(deleteIndex + 1, originalTokens.size()));
+            } else if (insertIndex > deleteIndex) {
+                result = tokensToString(originalTokens.subList(0, deleteIndex));
+                result = result + "MODIFY <" + graphUri + "> ";
+                result = result + tokensToString(originalTokens.subList(deleteIndex, originalTokens.size()));
             }
-            else{
-                result = "DELETE FROM <" + graphUri + "> " + result.substring("DELETE".length());
+        } else {
+            insertIndex = upperCaseTokens.indexOf("INSERT");
+            if (insertIndex >= 0) {
+                result = tokensToString(originalTokens.subList(0, insertIndex + 1));
+                result = result + " INTO <" + graphUri + ">";
+                result = result + tokensToString(originalTokens.subList(insertIndex + 1, originalTokens.size()));
             }
-        }
-        else if (firstToken.equals("INSERT")){
-            result = "INSERT INTO <" + graphUri + "> " + result.substring("INSERT".length());
         }
 
         return result;
+    }
+
+    /**
+     *
+     * @param tokens
+     * @return
+     */
+    private static String tokensToString(Collection<String> tokens) {
+
+        StringBuilder result = new StringBuilder();
+        if (tokens != null) {
+            for (String token : tokens) {
+                result.append(token);
+            }
+        }
+        return result.toString();
     }
 
     /**
@@ -717,5 +794,16 @@ public abstract class BaseHarvest implements Harvest {
     public boolean isBeingHarvested(String url) {
 
         return url != null && StringUtils.equals(url, contextUrl);
+    }
+
+    /**
+     *
+     * @param str
+     * @param searchStr
+     * @return
+     */
+    private static int indexOfSurroundedByWhitespace(String str, String searchStr) {
+
+        return 0;
     }
 }
