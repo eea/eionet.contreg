@@ -84,21 +84,21 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
      */
     public Resolution save() throws DAOException {
 
-        //        // If malformed script should not be ignored (i.e. first time save button is pressed),
-        //        // perform script validation, and issue a warning message to the user if the script
-        //        // was found malformed. Otherwise (i.e. save button pressed second time), lower the ignore flag.
-        //        if (ignoreMalformedSparql == false) {
-        //            try {
-        //                new SPARQLParser().parseQuery(script, null);
-        //            } catch (MalformedQueryException e) {
-        //                ignoreMalformedSparql = true;
-        //                addCautionMessage("Script does not seem to be valid SPARQL: " + e.getMessage()
-        //                        + ".<br/><strong>Save again to ignore this message!</strong>");
-        //                return new ForwardResolution(SCRIPT_JSP);
-        //            }
-        //        } else {
-        //            ignoreMalformedSparql = false;
-        //        }
+        // // If malformed script should not be ignored (i.e. first time save button is pressed),
+        // // perform script validation, and issue a warning message to the user if the script
+        // // was found malformed. Otherwise (i.e. save button pressed second time), lower the ignore flag.
+        // if (ignoreMalformedSparql == false) {
+        // try {
+        // new SPARQLParser().parseQuery(script, null);
+        // } catch (MalformedQueryException e) {
+        // ignoreMalformedSparql = true;
+        // addCautionMessage("Script does not seem to be valid SPARQL: " + e.getMessage()
+        // + ".<br/><strong>Save again to ignore this message!</strong>");
+        // return new ForwardResolution(SCRIPT_JSP);
+        // }
+        // } else {
+        // ignoreMalformedSparql = false;
+        // }
 
         // If id given, do save by the given id, otherwise do addition of brand new script.
         if (id > 0) {
