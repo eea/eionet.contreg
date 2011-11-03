@@ -34,61 +34,27 @@ public class PostHarvestScriptParser {
     /**
      *
      * @param script
+     * @param graphUri
      * @return
      */
-    public static String parseForTest(String script, String graphUri) {
+    public static String parseForExecution(String script, String graphUri) {
 
-        String trimmedScript = script.trim();
-        StringTokenizer st = new StringTokenizer(trimmedScript, " \t\n\r\f", true);
-        ArrayList<String> originalTokens = new ArrayList<String>();
-        ArrayList<String> upperCaseTokens = new ArrayList<String>();
-        while (st.hasMoreTokens()) {
-            String token = st.nextToken();
-            originalTokens.add(token);
-            upperCaseTokens.add(token.toUpperCase());
-        }
+        String result = script;
+        if (containsToken(result, "DELETE")) {
 
-        String result = trimmedScript;
-        int insertIndex = -1;
-        int tokensSize = originalTokens.size();
-        int deleteIndex = upperCaseTokens.indexOf("DELETE");
-
-        if (deleteIndex >= 0) {
-
-            String beforeDelete = tokensToString(originalTokens.subList(0, deleteIndex));
-            String afterDelete = "";
-            if (deleteIndex != tokensSize - 1) {
-                afterDelete = tokensToString(originalTokens.subList(deleteIndex + 1, tokensSize));
+            if (containsToken(result, "INSERT")) {
+                result =
+                    substringBeforeToken(result, "DELETE") + "MODIFY <" + graphUri + "> DELETE"
+                    + substringAfterToken(result, "DELETE");
+            } else {
+                result =
+                    substringBeforeToken(result, "DELETE") + "DELETE FROM <" + graphUri + ">"
+                    + substringAfterToken(result, "DELETE");
             }
-
-            insertIndex = upperCaseTokens.indexOf("INSERT");
-            if (insertIndex == -1) {
-                result = beforeDelete + " SELECT " + afterDelete;
-            } else if (insertIndex > deleteIndex) {
-                String afterInsert = "";
-                if (insertIndex != tokensSize - 1) {
-                    afterInsert = tokensToString(originalTokens.subList(insertIndex + 1, tokensSize));
-                }
-                result = beforeDelete + " SELECT " + afterInsert;
-            }
-        } else {
-            insertIndex = upperCaseTokens.indexOf("INSERT");
-            if (insertIndex >= 0) {
-
-                String beforeInsert = tokensToString(originalTokens.subList(0, insertIndex));
-                String afterInsert = "";
-                if (insertIndex != tokensSize - 1) {
-                    afterInsert = tokensToString(originalTokens.subList(insertIndex + 1, tokensSize));
-                }
-                result = beforeInsert + " SELECT " + afterInsert;
-            }
-        }
-
-        int whereIndex = upperCaseTokens.indexOf("WHERE");
-        if (whereIndex >= 0) {
-            result = replaceToken(result, "WHERE", "FROM <" + graphUri + "> WHERE");
-        } else {
-            result = result + " FROM <" + graphUri + "> WHERE {?s ?p ?o}";
+        } else if (containsToken(result, "INSERT")) {
+            result =
+                substringBeforeToken(result, "INSERT") + "INSERT INTO <" + graphUri + ">"
+                + substringAfterToken(result, "INSERT");
         }
 
         return result.trim();
@@ -100,52 +66,116 @@ public class PostHarvestScriptParser {
      * @param graphUri
      * @return
      */
-    public static String parseForExecution(String script, String graphUri) {
+    public static String parseForTest(String script, String graphUri) {
 
-        String trimmedScript = script.trim();
-        StringTokenizer st = new StringTokenizer(trimmedScript, " \t\n\r\f", true);
-        ArrayList<String> originalTokens = new ArrayList<String>();
-        ArrayList<String> upperCaseTokens = new ArrayList<String>();
-        while (st.hasMoreTokens()) {
-            String token = st.nextToken();
-            originalTokens.add(token);
-            upperCaseTokens.add(token.toUpperCase());
+        String result = script;
+        if (containsToken(result, "DELETE")) {
+
+            if (containsToken(result, "INSERT")) {
+                result = substringBeforeToken(result, "DELETE") + "SELECT" + substringAfterToken(result, "INSERT");
+            } else {
+                result = substringBeforeToken(result, "DELETE") + "SELECT" + substringAfterToken(result, "DELETE");
+            }
+        } else if (containsToken(result, "INSERT")) {
+            result = substringBeforeToken(result, "INSERT") + "SELECT" + substringAfterToken(result, "INSERT");
         }
 
-        String result = trimmedScript;
-        int insertIndex = -1;
-        int tokensSize = originalTokens.size();
-        int deleteIndex = upperCaseTokens.indexOf("DELETE");
-
-        if (deleteIndex >= 0) {
-
-            String beforeDelete = tokensToString(originalTokens.subList(0, deleteIndex));
-            String afterDelete = "";
-            if (deleteIndex != tokensSize - 1) {
-                afterDelete = tokensToString(originalTokens.subList(deleteIndex + 1, tokensSize));
-            }
-
-            insertIndex = upperCaseTokens.indexOf("INSERT");
-            if (insertIndex == -1) {
-                result = beforeDelete + " DELETE FROM <" + graphUri + "> " + afterDelete;
-            } else if (insertIndex > deleteIndex) {
-                result = beforeDelete + " MODIFY <" + graphUri + "> DELETE " + afterDelete;
-            }
-        } else {
-            insertIndex = upperCaseTokens.indexOf("INSERT");
-            if (insertIndex >= 0) {
-
-                String beforeInsert = tokensToString(originalTokens.subList(0, insertIndex));
-                String afterInsert = "";
-                if (insertIndex != tokensSize - 1) {
-                    afterInsert = tokensToString(originalTokens.subList(insertIndex + 1, tokensSize));
-                }
-
-                result = beforeInsert + " INSERT INTO <" + graphUri + "> " + afterInsert;
-            }
+        if (containsToken(result, "WHERE")) {
+            result =
+                substringBeforeToken(result, "WHERE") + "FROM <" + graphUri + "> WHERE"
+                + substringAfterToken(result, "WHERE");
+        }
+        else{
+            result = result + " FROM <" + graphUri + "> WHERE {?s ?p ?o}";
         }
 
         return result.trim();
+    }
+
+    /**
+     *
+     * @param str
+     * @param token
+     * @return
+     */
+    private static boolean containsToken(String str, String token) {
+
+        if (str == null || str.trim().length() == 0 || token == null || token.trim().length() == 0) {
+            return false;
+        }
+
+        StringTokenizer st = new StringTokenizer(str, " \t\n\r\f", true);
+        ArrayList<String> upperCaseTokens = new ArrayList<String>();
+        while (st.hasMoreTokens()) {
+            String nextToken = st.nextToken();
+            upperCaseTokens.add(nextToken.toUpperCase());
+        }
+
+        return upperCaseTokens.contains(token.toUpperCase());
+    }
+
+    /**
+     *
+     * @param str
+     * @param token
+     * @return
+     */
+    private static String substringBeforeToken(String str, String token) {
+
+        if (str == null || str.trim().length() == 0 || token == null || token.trim().length() == 0) {
+            return str;
+        }
+
+        StringTokenizer st = new StringTokenizer(str, " \t\n\r\f", true);
+        ArrayList<String> originalTokens = new ArrayList<String>();
+        ArrayList<String> upperCaseTokens = new ArrayList<String>();
+        while (st.hasMoreTokens()) {
+            String nextToken = st.nextToken();
+            originalTokens.add(nextToken);
+            upperCaseTokens.add(nextToken.toUpperCase());
+        }
+
+        int tokenIndex = upperCaseTokens.indexOf(token.toUpperCase());
+        if (tokenIndex >= 0) {
+            return tokensToString(originalTokens.subList(0, tokenIndex));
+        } else {
+            return str;
+        }
+    }
+
+    /**
+     *
+     * @param str
+     * @param token
+     * @return
+     */
+    private static String substringAfterToken(String str, String token) {
+
+        if (str == null || str.trim().length() == 0 || token == null || token.trim().length() == 0) {
+            return str;
+        }
+
+        StringTokenizer st = new StringTokenizer(str, " \t\n\r\f", true);
+        ArrayList<String> originalTokens = new ArrayList<String>();
+        ArrayList<String> upperCaseTokens = new ArrayList<String>();
+        while (st.hasMoreTokens()) {
+            String nextToken = st.nextToken();
+            originalTokens.add(nextToken);
+            upperCaseTokens.add(nextToken.toUpperCase());
+        }
+
+        int tokenIndex = upperCaseTokens.indexOf(token.toUpperCase());
+        if (tokenIndex >= 0) {
+            String afterToken = "";
+            int tokensSize = originalTokens.size();
+            if (tokenIndex < tokensSize - 1) {
+                afterToken = tokensToString(originalTokens.subList(tokenIndex + 1, tokensSize));
+            }
+
+            return afterToken;
+        } else {
+            return str;
+        }
     }
 
     /**
@@ -162,57 +192,5 @@ public class PostHarvestScriptParser {
             }
         }
         return result.toString();
-    }
-
-    /**
-     *
-     * @param str
-     * @param token
-     * @param replacement
-     * @return
-     */
-    private static String replaceToken(String str, String token, String replacement) {
-
-        if (str == null || str.trim().length() == 0) {
-            return str;
-        }
-        StringTokenizer st = new StringTokenizer(str, " \t\n\r\f", true);
-        ArrayList<String> originalTokens = new ArrayList<String>();
-        ArrayList<String> upperCaseTokens = new ArrayList<String>();
-        while (st.hasMoreTokens()) {
-            String nextToken = st.nextToken();
-            originalTokens.add(nextToken);
-            upperCaseTokens.add(nextToken.toUpperCase());
-        }
-
-        int tokensSize = originalTokens.size();
-        int tokenIndex = upperCaseTokens.indexOf(token.toUpperCase());
-        if (tokenIndex >= 0) {
-
-            String beforeToken = tokensToString(originalTokens.subList(0, tokenIndex));
-            String afterToken = "";
-            if (tokenIndex < tokensSize - 1) {
-                afterToken = tokensToString(originalTokens.subList(tokenIndex + 1, tokensSize));
-            }
-
-            return beforeToken + replacement + afterToken;
-        } else {
-            return str;
-        }
-    }
-
-    public static void main(String[] args) {
-
-        String[] ss = new String[3];
-        ss[0] = "delete {1} where {2}";
-        ss[1] = "insert {1} where {2}";
-        ss[2] = "delete {1} insert {2} where {3}";
-        String graph = "http://www.neti.ee";
-
-        for (int i = 0; i < ss.length; i++) {
-            System.out.println(parseForExecution(ss[i], graph));
-            System.out.println(parseForTest(ss[i], graph));
-            System.out.println("---------------------------------");
-        }
     }
 }
