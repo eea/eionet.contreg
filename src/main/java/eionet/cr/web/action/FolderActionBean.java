@@ -378,11 +378,6 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
             logger.debug("Creating the cr:hasFile predicate");
             helperDao.addTriples(homeSubjectDTO);
 
-            // make sure that user home is now also registered in CR home context
-            if (!getUser().isHomeFolderRegistered()) {
-                helperDao.registerUserFolderInCrHomeContext(getUser());
-            }
-
             // store file subject DTO if it has been initialized
             if (fileSubjectDTO != null) {
 
