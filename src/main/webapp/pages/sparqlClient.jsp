@@ -62,8 +62,8 @@
         </script>
         <style type="text/css" media="screen">
 /*<![CDATA[*/
-div#workarea textarea, 
-div#workarea pre {
+div.documentContent textarea, 
+div.documentContent pre {
   margin: 0;
   padding: 0;
   outline: 0;
@@ -77,7 +77,7 @@ div#workarea pre {
    border. You can also set a min-height property
    here if you want and it works as expected.
  */
-div#workarea .expandingArea {
+div.documentContent .expandingArea {
   position: relative;
   border: 1px solid #888;
   background: #fff;
@@ -89,8 +89,8 @@ div#workarea .expandingArea {
    the exact values can of course be anything you
    want.
  */
-div#workarea .expandingArea > textarea,
-div#workarea .expandingArea > pre {
+div.documentContent .expandingArea > textarea,
+div.documentContent .expandingArea > pre {
   padding: 5px;
   background: transparent;
   font: 400 13px/16px helvetica, arial, sans-serif;
@@ -99,7 +99,7 @@ div#workarea .expandingArea > pre {
   word-wrap: break-word;
 }
 
-div#workarea .expandingArea > textarea {
+div.documentContent .expandingArea > textarea {
   /* The border-box box model is used to allow
      padding whilst still keeping the overall width
      at exactly that of the containing element.
@@ -113,7 +113,7 @@ div#workarea .expandingArea > textarea {
   width: 100%;
 }
 
-div#workarea .expandingArea.active > textarea {
+div.documentContent .expandingArea.active > textarea {
   /* Hide any scrollbars */
   overflow: hidden;
   position: absolute;
@@ -124,10 +124,10 @@ div#workarea .expandingArea.active > textarea {
   resize: none;
 }
 
-div#workarea .expandingArea > pre {
+div.documentContent .expandingArea > pre {
   display: none;
 }
-div#workarea .expandingArea.active > pre {
+div.documentContent .expandingArea.active > pre {
   display: block;
   /* We don't actually want to see this text, it's just for sizing */
   visibility: hidden;
