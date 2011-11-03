@@ -24,8 +24,6 @@ package eionet.cr.web.util.tabs;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.dao.DAOException;
@@ -40,8 +38,6 @@ import eionet.cr.dto.SubjectDTO;
  */
 public class FactsheetTabMenuHelper {
 
-    private static final Logger LOGGER = Logger.getLogger(FactsheetTabMenuHelper.class);
-
     /** The subject data object found by the requestd URI or URI hash. */
     private final SubjectDTO subject;
 
@@ -49,6 +45,7 @@ public class FactsheetTabMenuHelper {
     private final boolean mapDisplayable;
     private boolean sparqlBookmarkType;
     private boolean compiledDatasetType;
+    private boolean folderType;
 
     private String latitude;
     private String longitude;
@@ -76,6 +73,13 @@ public class FactsheetTabMenuHelper {
         if (subject.getObject(Predicates.RDF_TYPE) != null) {
             compiledDatasetType = Subjects.CR_COMPILED_DATASET.equals(subject.getObject(Predicates.RDF_TYPE).getValue());
         }
+
+        if (subject.getObject(Predicates.RDF_TYPE) != null) {
+            folderType =
+                    Subjects.CR_FOLDER.equals(subject.getObject(Predicates.RDF_TYPE).getValue())
+                    || Subjects.CR_USER_FOLDER.equals(subject.getObject(Predicates.RDF_TYPE).getValue());
+        }
+
     }
 
     /**
@@ -126,6 +130,12 @@ public class FactsheetTabMenuHelper {
             result.add(te6);
         }
 
+        if (folderType) {
+            TabElement te7 = new TabElement(TabTitle.FOLDER, "/folder.action", selected);
+            te7.addParam("uri", subject.getUri());
+            result.add(te7);
+        }
+
         return result;
     }
 
@@ -143,5 +153,6 @@ public class FactsheetTabMenuHelper {
         public static final String SHOW_ON_MAP = "Show on map";
         public static final String BOOKMARKED_SPARQL = "Bookmarked SPARQL";
         public static final String COMPILED_DATASET = "Compiled dataset";
+        public static final String FOLDER = "Contents";
     }
 }

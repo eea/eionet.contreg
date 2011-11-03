@@ -21,15 +21,21 @@
 
 package eionet.cr.dao;
 
+import java.util.List;
+
+import eionet.cr.dto.FolderItemDTO;
+import eionet.cr.util.Pair;
+
 /**
+ * Folder DAO.
  *
  * @author Jaanus Heinlaid
  */
-public interface FolderDAO extends DAO{
+public interface FolderDAO extends DAO {
 
     /**
-     * Creates home folder for the given user name. The latter must not be null or blank!
-     * Creates also all reserved folders under the newly created home folder.
+     * Creates home folder for the given user name. The latter must not be null or blank! Creates also all reserved folders under
+     * the newly created home folder.
      *
      * @param userName Given user name
      * @throws DAOException Thrown when a database-access error occurs.
@@ -68,4 +74,14 @@ public interface FolderDAO extends DAO{
      * @throws DAOException
      */
     boolean folderExists(String folderUri) throws DAOException;
+
+    /**
+     * Returns the contents (files and folders) of the folder with given uri. The Pair.left is the current folder and Pair.right is
+     * sorted collection of folder contents.
+     *
+     * @param uri
+     * @return
+     * @throws DAOException
+     */
+    Pair<FolderItemDTO, List<FolderItemDTO>> getFolderContents(String uri) throws DAOException;
 }

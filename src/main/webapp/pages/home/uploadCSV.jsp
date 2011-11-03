@@ -47,6 +47,7 @@
                         <c:choose>
                             <c:when test='${actionBean.fileUploaded == false}'>
                                 <crfn:form action="/uploadCSV.action" method="post">
+                                    <stripes:hidden name="uri" value="${actionBean.uri}" />
                                     <table width="360" border="0" cellpadding="3">
                                         <tr>
                                             <td><label class="question" for="type">File type</label></td>
@@ -69,6 +70,7 @@
                             </c:when>
                             <c:otherwise>
                                 <crfn:form action="/uploadCSV.action" method="post">
+                                    <stripes:hidden name="uri" value="${actionBean.uri}" />
                                     <table width="360" border="0" cellpadding="3">
                                         <tr>
                                             <td><label class="question">File type</label></td>

@@ -24,6 +24,7 @@ package eionet.cr.dao.virtuoso;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
@@ -35,17 +36,22 @@ import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.ContextStatementImpl;
+import org.openrdf.query.BindingSet;
 import org.openrdf.repository.RepositoryConnection;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.FolderDAO;
+import eionet.cr.dao.readers.ResultSetReaderException;
+import eionet.cr.dto.FolderItemDTO;
 import eionet.cr.util.Bindings;
 import eionet.cr.util.Hashes;
+import eionet.cr.util.Pair;
 import eionet.cr.util.URIUtil;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.sesame.SPARQLQueryUtil;
+import eionet.cr.util.sesame.SPARQLResultSetReader;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
@@ -63,12 +69,12 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
 
     /** */
     private static final String INSERT_NEVER_HARVESTED_SOURCE_SQL =
-        "insert soft HARVEST_SOURCE (URL,URL_HASH,TIME_CREATED,INTERVAL_MINUTES) values (?,?,now(),0)";
+            "insert soft HARVEST_SOURCE (URL,URL_HASH,TIME_CREATED,INTERVAL_MINUTES) values (?,?,now(),0)";
 
     /** */
     private static final String FOLDER_EXISTS_SPARQL = SPARQLQueryUtil.getCrInferenceDefinitionStr()
-    + " select distinct ?s where {?s a <" + Subjects.CR_FOLDER + ">. ?parentFolder <" + Predicates.CR_HAS_FOLDER
-    + "> ?s. filter (?s=?folderUri)} limit 1";
+            + " select distinct ?s where {?s a <" + Subjects.CR_FOLDER + ">. ?parentFolder <" + Predicates.CR_HAS_FOLDER
+            + "> ?s. filter (?s=?folderUri)} limit 1";
 
     /**
      * @see eionet.cr.dao.FolderDAO#createUserHomeFolder(java.lang.String)
@@ -214,6 +220,83 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
         bindings.setURI("folderUri", folderUri);
         Object o = executeUniqueResultSPARQL(FOLDER_EXISTS_SPARQL, bindings, new SingleObjectReader<Object>());
         return o != null && o.toString().equals(folderUri);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Pair<FolderItemDTO, List<FolderItemDTO>> getFolderContents(String uri) throws DAOException {
+        FolderItemDTO parentFolder = new FolderItemDTO();
+        parentFolder.setUri(uri);
+        parentFolder.setName(URIUtil.extractURILabel(parentFolder.getUri()));
+
+        // Folder contents query
+        Bindings bindings = new Bindings();
+        bindings.setURI("folderUri", uri);
+        bindings.setURI("hasFile", Predicates.CR_HAS_FILE);
+        bindings.setURI("hasFolder", Predicates.CR_HAS_FOLDER);
+        bindings.setURI("dcTitle", Predicates.DC_TITLE);
+        bindings.setURI("rdfsLabel", Predicates.RDFS_LABEL);
+        bindings.setURI("crLastModified", Predicates.CR_LAST_MODIFIED);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT ?type, ?item, ?title, ?label, ?lastModified WHERE { ");
+        sb.append("?folderUri ?type ?item . ");
+        sb.append("OPTIONAL { ?item ?rdfsLabel ?label } . ");
+        sb.append("OPTIONAL { ?item ?dcTitle ?title } . ");
+        sb.append("OPTIONAL { ?item ?crLastModified ?lastModified } . ");
+        sb.append("FILTER (?type IN (?hasFile, ?hasFolder))");
+        sb.append("}");
+
+        SPARQLResultSetReader<FolderItemDTO> reader = new SPARQLResultSetReader<FolderItemDTO>() {
+            List<FolderItemDTO> result = new ArrayList<FolderItemDTO>();
+
+            @Override
+            public List<FolderItemDTO> getResultList() {
+                return result;
+            }
+
+            @Override
+            public void endResultSet() {
+            }
+
+            @Override
+            public void startResultSet(List<String> bindingNames) {
+            }
+
+            @Override
+            public void readRow(BindingSet bindingSet) throws ResultSetReaderException {
+                FolderItemDTO item = new FolderItemDTO();
+                item.setUri(bindingSet.getValue("item").stringValue());
+                item.setName(URIUtil.extractURILabel(item.getUri()));
+                if (bindingSet.getValue("title") != null && StringUtils.isNotEmpty(bindingSet.getValue("title").stringValue())) {
+                    item.setTitle(bindingSet.getValue("item").stringValue());
+                }
+                if (bindingSet.getValue("label") != null && StringUtils.isNotEmpty(bindingSet.getValue("label").stringValue())) {
+                    item.setTitle(bindingSet.getValue("label").stringValue());
+                }
+                if (bindingSet.getValue("lastModified") != null && StringUtils.isNotEmpty(bindingSet.getValue("lastModified").stringValue())) {
+                    item.setLastModified(bindingSet.getValue("lastModified").stringValue());
+                }
+                if (Predicates.CR_HAS_FOLDER.equals(bindingSet.getValue("type").stringValue())) {
+                    if (URIUtil.isUserReservedUri(item.getUri())) {
+                        item.setType(FolderItemDTO.Type.RESERVED_FOLDER);
+                    } else {
+                        item.setType(FolderItemDTO.Type.FOLDER);
+                    }
+                }
+                if (Predicates.CR_HAS_FILE.equals(bindingSet.getValue("type").stringValue())) {
+                    item.setType(FolderItemDTO.Type.FILE);
+                }
+                result.add(item);
+            }
+        };
+
+        List<FolderItemDTO> items = executeSPARQL(sb.toString(), bindings, reader);
+        Collections.sort(items);
+
+        return new Pair<FolderItemDTO, List<FolderItemDTO>>(parentFolder, items);
     }
 
     /**
