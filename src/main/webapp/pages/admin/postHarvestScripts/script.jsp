@@ -30,6 +30,14 @@
                 });
             } ) ( jQuery );
 
+            function formSubmit(){
+
+                var targetUrlElem = document.getElementById("targetUrl");
+                if (targetUrlElem!=null && targetUrlElem.value=="Type at least 4 characters for suggestions ..."){
+                    targetUrlElem.value = "";
+                }
+            }
+
     </script>
 
 </stripes:layout-component>
@@ -62,7 +70,7 @@
 
             </div>
 
-        <crfn:form action="${actionBean.urlBinding}" focus="first" method="post" style="padding-top:0.8em">
+        <crfn:form action="${actionBean.urlBinding}" focus="first" method="post" style="padding-top:0.8em" onsubmit="formSubmit()">
 
             <table>
                 <c:if test="${not empty actionBean.targetType}">
@@ -72,7 +80,7 @@
 		                </td>
 		                <td>
 							<c:choose>
-	                            <c:when test="${not empty actionBean.targetUrl}">
+	                            <c:when test="${actionBean.id>0 && not empty actionBean.targetUrl}">
 	                                <stripes:link href="/factsheet.action">
 	                                    <c:out value="${actionBean.targetUrl}"/>
 	                                    <stripes:param name="uri" value="${actionBean.targetUrl}"/>

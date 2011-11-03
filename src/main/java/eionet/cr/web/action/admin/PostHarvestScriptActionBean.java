@@ -34,7 +34,9 @@ import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.PostHarvestScriptDAO;
+import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.PostHarvestScriptDTO;
 import eionet.cr.dto.PostHarvestScriptDTO.TargetType;
 import eionet.cr.web.action.AbstractActionBean;
@@ -84,22 +86,6 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
      */
     public Resolution save() throws DAOException {
 
-        // // If malformed script should not be ignored (i.e. first time save button is pressed),
-        // // perform script validation, and issue a warning message to the user if the script
-        // // was found malformed. Otherwise (i.e. save button pressed second time), lower the ignore flag.
-        // if (ignoreMalformedSparql == false) {
-        // try {
-        // new SPARQLParser().parseQuery(script, null);
-        // } catch (MalformedQueryException e) {
-        // ignoreMalformedSparql = true;
-        // addCautionMessage("Script does not seem to be valid SPARQL: " + e.getMessage()
-        // + ".<br/><strong>Save again to ignore this message!</strong>");
-        // return new ForwardResolution(SCRIPT_JSP);
-        // }
-        // } else {
-        // ignoreMalformedSparql = false;
-        // }
-
         // If id given, do save by the given id, otherwise do addition of brand new script.
         if (id > 0) {
             DAOFactory.get().getDao(PostHarvestScriptDAO.class).save(id, title, script, active);
@@ -135,11 +121,19 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     /**
      *
      * @return
+     * @throws DAOException
      */
-    public Resolution cancel() {
+    public Resolution cancel() throws DAOException {
 
         if (logger.isTraceEnabled()) {
             logger.trace("Handling cancel event");
+        }
+
+        if (targetType!=null && targetType.equals(TargetType.SOURCE)){
+            HarvestSourceDTO dto = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(targetUrl);
+            if (dto==null){
+                targetUrl = null;
+            }
         }
         return resolutionToScripts();
     }
@@ -170,6 +164,18 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
         if (getUser() == null || !getUser().isAdministrator()) {
             addGlobalValidationError("You are not authorized for this operation!");
             return;
+        }
+
+        if (targetType!=null) {
+            if (StringUtils.isBlank(targetUrl)){
+                addGlobalValidationError("Target " + targetType.toString().toLowerCase() + " must not be blank!");
+            }
+            else if (targetType.equals(TargetType.SOURCE)){
+                HarvestSourceDTO dto = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(targetUrl);
+                if (dto==null){
+                    addGlobalValidationError("No source by this url was found: " + targetUrl);
+                }
+            }
         }
 
         if (StringUtils.isBlank(title)) {
