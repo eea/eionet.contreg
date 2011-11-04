@@ -49,8 +49,9 @@ import eionet.cr.web.action.AbstractActionBean;
 public class PostHarvestScriptsActionBean extends AbstractActionBean {
 
     /** */
-    private static final String TARGETS_JSP = "/pages/admin/postHarvestScripts/targets.jsp";
+    //private static final String TARGETS_JSP = "/pages/admin/postHarvestScripts/targets.jsp";
     private static final String SCRIPTS_JSP = "/pages/admin/postHarvestScripts/scripts.jsp";
+    private static final String SCRIPTS_CONTAINER_JSP = "/pages/admin/postHarvestScripts/scriptsContainer.jsp";
 
     /** */
     private TargetType targetType;
@@ -72,13 +73,15 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
     @DefaultHandler
     public Resolution list() throws DAOException {
 
-        if (targetType != null && StringUtils.isBlank(targetUrl)) {
+        if (targetType != null){
             targets = DAOFactory.get().getDao(PostHarvestScriptDAO.class).listTargets(targetType);
-            return new ForwardResolution(TARGETS_JSP);
-        } else {
-            scripts = DAOFactory.get().getDao(PostHarvestScriptDAO.class).list(targetType, targetUrl);
-            return new ForwardResolution(SCRIPTS_JSP);
         }
+
+        if ((targetType==null && StringUtils.isBlank(targetUrl)) || (targetType!=null && !StringUtils.isBlank(targetUrl))){
+            scripts = DAOFactory.get().getDao(PostHarvestScriptDAO.class).list(targetType, targetUrl);
+        }
+
+        return new ForwardResolution(SCRIPTS_CONTAINER_JSP);
     }
 
     /**
@@ -118,7 +121,7 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
      */
     public Resolution moveUp() throws DAOException {
 
-        DAOFactory.get().getDao(PostHarvestScriptDAO.class).move2(targetType, targetUrl, new HashSet(selectedIds), -1);
+        DAOFactory.get().getDao(PostHarvestScriptDAO.class).move(targetType, targetUrl, new HashSet(selectedIds), -1);
         return list();
     }
 
@@ -129,7 +132,7 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
      */
     public Resolution moveDown() throws DAOException {
 
-        DAOFactory.get().getDao(PostHarvestScriptDAO.class).move2(targetType, targetUrl, new HashSet(selectedIds), 1);
+        DAOFactory.get().getDao(PostHarvestScriptDAO.class).move(targetType, targetUrl, new HashSet(selectedIds), 1);
         return list();
     }
 
@@ -222,6 +225,15 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
      */
     public void setSelectedIds(List<Integer> selectedIds) {
         this.selectedIds = selectedIds;
+    }
+    
+    /**
+     * 
+     * @return
+     */
+    public String getPageToRender(){
+    	
+    	return SCRIPTS_JSP;
     }
 
     /**

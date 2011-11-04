@@ -1,74 +1,15 @@
-<%@page contentType="text/html;charset=UTF-8"%>
-
 <%@ include file="/pages/common/taglibs.jsp"%>
+<stripes:layout-definition>
 
-<%@page import="net.sourceforge.stripes.action.ActionBean"%>
-
-<stripes:layout-render name="/pages/common/template.jsp" pageTitle="Post-harvest scripts">
-
-<stripes:layout-component name="head">
-
-    <script type="text/javascript">
-
-            ( function($) {
-                $(document).ready(function(){
-
-                    if ($("#harvestSource").length > 0){
-
-                        $('#harvestSource').click(function(){
-                            if (this.value='Type at least 4 characters for suggestions ...'){
-                                this.value='';
-                            }
-                        });
-                        $('#harvestSource').focus(function(){
-                            if (this.value='Type at least 4 characters for suggestions ...'){
-                                this.value='';
-                            }
-                        });
-                    }
-
-                });
-            } ) ( jQuery );
-
-            function formSubmit(){
-
-                var targetUrlElem = document.getElementById("targetUrl");
-                if (targetUrlElem!=null && targetUrlElem.value=="Type at least 4 characters for suggestions ..."){
-                    targetUrlElem.value = "";
-                }
-            }
-
-    </script>
-
-</stripes:layout-component>
-
-<stripes:layout-component name="contents">
-
-    <c:if test="${empty sessionScope.crUser || !sessionScope.crUser.administrator}">
-        <div class="error-msg">Access not allowed!</div>
-    </c:if>
-
-    <c:if test="${not empty sessionScope.crUser && sessionScope.crUser.administrator}">
-
+	<br/>
     <c:choose>
 	    <c:when test="${actionBean.id>0}">
-            <h1>Edit post-harvest script</h1>
+            <h4>Edit script:</h4>
 	    </c:when>
 	    <c:otherwise>
-            <h1>Add post-harvest script</h1>
+            <h4>Create script:</h4>
         </c:otherwise>
     </c:choose>
-
-
-            <div class="advice-msg" style="margin-top: 0.3em;margin-bottom: 0.3em;">
-                <c:if test="${empty actionBean.targetType}">
-                    Note: you're ${actionBean.id>0 ? 'editing' : 'adding'} an all-source script.
-                </c:if>
-                <c:if test="${not empty actionBean.targetType}">
-                    Note: you're ${actionBean.id>0 ? 'editing' : 'adding'} a ${fn:toLowerCase(actionBean.targetType)}-specific script.
-                </c:if>
-
-            </div>
 
         <crfn:form action="${actionBean.urlBinding}" focus="first" method="post" style="padding-top:0.8em" onsubmit="formSubmit()">
 
@@ -80,7 +21,7 @@
 		                </td>
 		                <td>
 							<c:choose>
-	                            <c:when test="${actionBean.id>0 && not empty actionBean.targetUrl}">
+	                            <c:when test="${not empty actionBean.targetUrl}">
 	                                <stripes:link href="/factsheet.action">
 	                                    <c:out value="${actionBean.targetUrl}"/>
 	                                    <stripes:param name="uri" value="${actionBean.targetUrl}"/>
@@ -159,12 +100,11 @@
             <c:if test="${not empty actionBean.targetUrl}">
                 <stripes:hidden name="targetUrl"/>
             </c:if>
+            <c:if test="${not empty actionBean.backToTargetUrl}">
+            	<stripes:hidden name="backToTargetUrl"/>
+            </c:if>
             <input type="hidden" name="ignoreMalformedSparql" value="${actionBean.ignoreMalformedSparql}"/>
 
         </crfn:form>
 
-    </c:if>
-
-</stripes:layout-component>
-
-</stripes:layout-render>
+</stripes:layout-definition>

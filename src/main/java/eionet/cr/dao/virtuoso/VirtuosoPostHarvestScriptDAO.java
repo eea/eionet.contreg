@@ -28,6 +28,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
+
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.PostHarvestScriptDAO;
 import eionet.cr.dao.readers.PostHarvestScriptDTOReader;
@@ -37,6 +39,7 @@ import eionet.cr.util.Pair;
 import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.sql.PairReader;
 import eionet.cr.util.sql.SQLUtil;
+import eionet.cr.util.sql.SingleObjectReader;
 
 /**
  *
@@ -81,6 +84,10 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
     /** */
     private static final String INCREASE_POSITIONS_SQL = "update POST_HARVEST_SCRIPT set POSITION_NUMBER=POSITION_NUMBER+? "
         + "where coalesce(TARGET_SOURCE_URL,'')=? and coalesce(TARGET_TYPE_URL,'')=?";
+
+    /** */
+    private static final String EXISTS_SQL = "select count(*) from POST_HARVEST_SCRIPT where "
+        + "coalesce(TARGET_SOURCE_URL,'')=? and coalesce(TARGET_TYPE_URL,'')=? and TITLE=?";
 
     /**
      * @see eionet.cr.dao.PostHarvestScriptDAO#list(eionet.cr.dto.PostHarvestScriptDTO.TargetType, java.lang.String)
@@ -279,119 +286,10 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
     }
 
     /**
-     * Move the position of the given scripts by 1 step up or down, depending on the given direction. The direction is given as an
-     * integer. Any negative integer is considered as moving up (e.g. position 3 becomes 2), any positive integer is considered
-     * moving down (e.g. position 3 becomes 4). The absolute value of the direction is ignored, as the moving is always done by one
-     * step only (i.e. direction of -3 does not mean that the moving will be done 3 steps up). A direction of 0 is illegal.
-     *
-     * Scripts are identified by the given target type, target URL and script ids. If the ids are null or empty, the method returns
-     * immediately without doing anything. Target type and target url can be null or blank, in which case the method operates on
-     * all-source scripts.
-     *
-     * @see eionet.cr.dao.PostHarvestScriptDAO#move(eionet.cr.dto.PostHarvestScriptDTO.TargetType, java.lang.String, Set, int)
+     * @see eionet.cr.dao.PostHarvestScriptDAO#move(eionet.cr.dto.PostHarvestScriptDTO.TargetType, java.lang.String, java.util.Set, int)
      */
     @Override
     public void move(TargetType targetType, String targetUrl, Set<Integer> ids, int direction) throws DAOException {
-
-        if (ids == null || ids.isEmpty()) {
-            return;
-        }
-
-        if (direction == 0) {
-            throw new IllegalArgumentException("Direction must not be 0!");
-        }
-
-        // First get the positions of all scripts matching this target type and url.
-
-        String sourceUrl = targetType != null && targetType.equals(TargetType.SOURCE) ? targetUrl : null;
-        String typeUrl = targetType != null && targetType.equals(TargetType.TYPE) ? targetUrl : null;
-
-        ArrayList<Object> values = new ArrayList<Object>();
-        values.add(sourceUrl == null ? "" : sourceUrl);
-        values.add(typeUrl == null ? "" : typeUrl);
-
-        Connection conn = null;
-        try {
-            conn = getSQLConnection();
-            conn.setAutoCommit(false);
-            PairReader<String, String> reader = new PairReader<String, String>();
-            SQLUtil.executeQuery(GET_POSITIONS_SQL, values, reader, conn);
-            List<Pair<String, String>> positionsById = reader.getResultList();
-            if (positionsById == null || positionsById.isEmpty()) {
-                return;
-            }
-
-            // If even one script is already at position 1 then moving up is not considered possible.
-            // And conversely, if even one script is already at the last position, then moving down
-            // is not considered possible either.
-            for (Pair<String, String> pair : positionsById) {
-
-                int id = Integer.parseInt(pair.getLeft());
-                int position = Integer.parseInt(pair.getRight());
-
-                // we do the check only for scripts that we have to move
-                if (ids.contains(id)) {
-                    if ((direction < 0 && position == 1) || (direction > 0 && position == positionsById.size())) {
-                        return;
-                    }
-                }
-            }
-
-            for (int i = 0; i < positionsById.size(); i++) {
-
-                Pair<String, String> pair = positionsById.get(i);
-                int id = Integer.parseInt(pair.getLeft());
-                int position = Integer.parseInt(pair.getRight());
-
-                if (ids.contains(id)) {
-
-                    Pair<String, String> neighborPair = positionsById.get(direction < 0 ? i - 1 : i + 1);
-                    int neighborId = Integer.parseInt(neighborPair.getLeft());
-                    int newPosition = direction < 0 ? position - 1 : position + 1;
-                    move(id, position, newPosition, neighborId, conn);
-                }
-            }
-
-            conn.commit();
-        } catch (Exception e) {
-            SQLUtil.rollback(conn);
-            throw new DAOException(e.getMessage(), e);
-        } finally {
-            SQLUtil.close(conn);
-        }
-    }
-
-    /**
-     * @param id
-     * @param oldPosition
-     * @param newPosition
-     * @param neighborId
-     * @throws SQLException
-     */
-    private void move(int id, int oldPosition, int newPosition, int neighborId, Connection conn) throws SQLException {
-
-        // First move the neighbor temporarily to position 0
-        // (because in DB we have set constraint that two scripts cannot be in the same position).
-
-        ArrayList<Object> values = new ArrayList<Object>();
-        values.add(Integer.valueOf(0));
-        values.add(Integer.valueOf(neighborId));
-        SQLUtil.executeUpdate(UPDATE_POSITION_SQL, values, conn);
-
-        // Secondly, move the mover-script to the new position.
-        values = new ArrayList<Object>();
-        values.add(Integer.valueOf(newPosition));
-        values.add(Integer.valueOf(id));
-        SQLUtil.executeUpdate(UPDATE_POSITION_SQL, values, conn);
-
-        // Finally, move the neighboring script the mover-script's old position.
-        values = new ArrayList<Object>();
-        values.add(Integer.valueOf(oldPosition));
-        values.add(Integer.valueOf(neighborId));
-        SQLUtil.executeUpdate(UPDATE_POSITION_SQL, values, conn);
-    }
-
-    public void move2(TargetType targetType, String targetUrl, Set<Integer> ids, int direction) throws DAOException {
 
         if (ids == null || ids.isEmpty()) {
             return;
@@ -473,5 +371,27 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
         } finally {
             SQLUtil.close(conn);
         }
+    }
+
+    /**
+     * @see eionet.cr.dao.PostHarvestScriptDAO#exists(eionet.cr.dto.PostHarvestScriptDTO.TargetType, java.lang.String, java.lang.String)
+     */
+    @Override
+    public boolean exists(TargetType targetType, String targetUrl, String title) throws DAOException {
+
+        if (StringUtils.isBlank(title)){
+            throw new IllegalArgumentException("Title must not be blank!");
+        }
+
+        String sourceUrl = targetType != null && targetType.equals(TargetType.SOURCE) ? targetUrl : null;
+        String typeUrl = targetType != null && targetType.equals(TargetType.TYPE) ? targetUrl : null;
+
+        ArrayList<Object> values = new ArrayList<Object>();
+        values.add(sourceUrl == null ? "" : sourceUrl);
+        values.add(typeUrl == null ? "" : typeUrl);
+        values.add(title);
+
+        Object o = executeUniqueResultSQL(EXISTS_SQL, values, new SingleObjectReader<Object>());
+        return o==null ? false : Integer.parseInt(o.toString())>0;
     }
 }

@@ -39,6 +39,7 @@
             </ul>
 
             <div style="float:left;width:100%;padding-top:1.2em;">
+
 	            <display:table name="${actionBean.targets}" class="datatable" id="target" sort="list" pagesize="20" requestURI="${actionBean.urlBinding}" style="width:80%">
 
 	                <display:setProperty name="basic.msg.empty_list" value="Found no ${fn:toLowerCase(actionBean.targetType)}-specific scripts. Use operations menu to add one."/>

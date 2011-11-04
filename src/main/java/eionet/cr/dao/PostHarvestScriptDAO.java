@@ -128,7 +128,15 @@ public interface PostHarvestScriptDAO extends DAO {
      * @param direction
      * @throws DAOException
      */
-    void move(TargetType targetType, String targetUrl, Set<Integer> ids, int direction) throws DAOException;
+    void move(TargetType targetType, String targetUrl, Set<Integer> selectedIds, int direction) throws DAOException;
 
-    void move2(TargetType targetType, String targetUrl, Set<Integer> selectedIds, int direction) throws DAOException;
+    /**
+     *
+     * @param targetType
+     * @param targetUrl
+     * @param title
+     * @return
+     * @throws DAOException
+     */
+    boolean exists(TargetType targetType, String targetUrl, String title) throws DAOException;
 }
