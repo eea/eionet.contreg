@@ -127,14 +127,13 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
         if (StringUtils.isBlank(parentFolderUri) || StringUtils.isBlank(folderName)) {
             throw new IllegalArgumentException("Parent folder URI and folder name must not be blank!");
         }
-
-        // Prepend the parent folder with "/" if it's not done yet.
-        if (!parentFolderUri.endsWith("/")) {
-            parentFolderUri = parentFolderUri + "/";
-        }
+        
+        // Remove trailing "/" from parent URI, if such exists
+        parentFolderUri = StringUtils.substringBeforeLast(parentFolderUri, "/");
 
         // If the new folder URI is reserved, exit silently.
-        if (URIUtil.isUserReservedUri(parentFolderUri + folderName)) {
+        String newFolderUri = parentFolderUri + "/" + URLUtil.replaceURLBadIRISymbols(folderName);
+        if (URIUtil.isUserReservedUri(newFolderUri)) {
             LOGGER.debug("Cannot create reserved folder, exiting silently!");
             return;
         }
@@ -151,7 +150,7 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
 
             URI parentFolder = vf.createURI(parentFolderUri);
             URI hasFolder = vf.createURI(Predicates.CR_HAS_FOLDER);
-            URI newFolder = vf.createURI(parentFolderUri + URLUtil.replaceURLBadIRISymbols(folderName));
+            URI newFolder = vf.createURI(newFolderUri);
             URI rdfType = vf.createURI(Predicates.RDF_TYPE);
             URI rdfsLabel = vf.createURI(Predicates.RDFS_LABEL);
             URI allowSubObjectType = vf.createURI(Predicates.CR_ALLOW_SUBOBJECT_TYPE);
