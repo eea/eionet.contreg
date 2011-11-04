@@ -25,11 +25,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.StringTokenizer;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  *
  * @author Jaanus Heinlaid
  */
 public class PostHarvestScriptParser {
+
+    /** */
+    public static final int TEST_RESULTS_LIMIT = 500;
 
     /**
      *
@@ -82,11 +87,24 @@ public class PostHarvestScriptParser {
 
         if (containsToken(result, "WHERE")) {
             result =
-                substringBeforeToken(result, "WHERE") + "FROM <" + graphUri + "> WHERE"
-                + substringAfterToken(result, "WHERE");
+                substringBeforeToken(result, "WHERE") + "FROM <" + graphUri + "> WHERE" + substringAfterToken(result, "WHERE");
+        } else {
+            result = result + " FROM <" + graphUri + "> WHERE {?s ?p ?o}";
+        }
+
+        if (containsToken(result, "LIMIT")) {
+            result = substringBeforeToken(result, "LIMIT") + "LIMIT " + TEST_RESULTS_LIMIT;
         }
         else{
-            result = result + " FROM <" + graphUri + "> WHERE {?s ?p ?o}";
+            result = result + " LIMIT " + TEST_RESULTS_LIMIT;
+        }
+
+        if (containsToken(result, "SELECT")) {
+
+            String afterSelect = substringAfterToken(result, "SELECT");
+            afterSelect = StringUtils.replaceOnce(afterSelect, "{", "");
+            afterSelect = StringUtils.replaceOnce(afterSelect, "}", "");
+            result = substringBeforeToken(result, "SELECT") + "SELECT" + afterSelect;
         }
 
         return result.trim();

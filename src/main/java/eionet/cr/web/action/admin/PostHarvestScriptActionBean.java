@@ -23,6 +23,7 @@ package eionet.cr.web.action.admin;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
@@ -38,10 +39,12 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.PostHarvestScriptDAO;
 import eionet.cr.dto.HarvestSourceDTO;
+import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.PostHarvestScriptDTO;
 import eionet.cr.dto.PostHarvestScriptDTO.TargetType;
 import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.util.ApplicationCache;
+import eionet.cr.web.util.PostHarvestScriptParser;
 
 /**
  *
@@ -65,6 +68,12 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     private boolean ignoreMalformedSparql;
     private List<Tab> tabs;
     private String backToTargetUrl;
+
+    /** */
+    private List<Map<String, ObjectDTO>> testResults;
+    private List<String> testResultColumns;
+    private String executedTestQuery;
+    private String testError;
 
     @DefaultHandler
     public Resolution defaultHandler() throws DAOException {
@@ -113,11 +122,26 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     /**
      *
      * @return
+     * @throws DAOException
      */
     public Resolution test() {
 
         if (logger.isTraceEnabled()) {
             logger.trace("Handling test event");
+        }
+
+        String graphUri = testSourceUrl;
+        if (StringUtils.isBlank(graphUri)){
+            if (targetType!=null && targetType.equals(TargetType.SOURCE)){
+                graphUri = targetUrl;
+            }
+        }
+
+        executedTestQuery = PostHarvestScriptParser.parseForTest(script, graphUri);
+        try {
+            testResults = DAOFactory.get().getDao(PostHarvestScriptDAO.class).test(executedTestQuery);
+        } catch (DAOException e) {
+            testError = e.toString();
         }
         return new ForwardResolution(SCRIPTS_CONTAINER_JSP);
     }
@@ -133,13 +157,13 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
             logger.trace("Handling cancel event");
         }
 
-        if (StringUtils.isBlank(targetUrl) && !StringUtils.isBlank(backToTargetUrl)){
+        if (StringUtils.isBlank(targetUrl) && !StringUtils.isBlank(backToTargetUrl)) {
             targetUrl = backToTargetUrl;
         }
 
-        if (targetType!=null && targetType.equals(TargetType.SOURCE) && !StringUtils.isBlank(targetUrl)){
+        if (targetType != null && targetType.equals(TargetType.SOURCE) && !StringUtils.isBlank(targetUrl)) {
             HarvestSourceDTO dto = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(targetUrl);
-            if (dto==null){
+            if (dto == null) {
                 targetUrl = null;
             }
         }
@@ -175,13 +199,12 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
             return;
         }
 
-        if (targetType!=null) {
-            if (StringUtils.isBlank(targetUrl)){
+        if (targetType != null) {
+            if (StringUtils.isBlank(targetUrl)) {
                 addGlobalValidationError("Target " + targetType.toString().toLowerCase() + " must not be blank!");
-            }
-            else if (targetType.equals(TargetType.SOURCE)){
+            } else if (targetType.equals(TargetType.SOURCE)) {
                 HarvestSourceDTO dto = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(targetUrl);
-                if (dto==null){
+                if (dto == null) {
                     addGlobalValidationError("No source by this URL was found: " + targetUrl);
                     targetUrl = null;
                 }
@@ -194,12 +217,14 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
             addGlobalValidationError("Title must be no longer than 255 characters!");
         }
 
-        if (DAOFactory.get().getDao(PostHarvestScriptDAO.class).exists(targetType, targetUrl, title)){
-            String msg = "A script with this title already exists";
-            if (targetType!=null){
-                msg = msg + " for this " + targetType.toString().toLowerCase();
+        if (id<=0){
+            if (DAOFactory.get().getDao(PostHarvestScriptDAO.class).exists(targetType, targetUrl, title)) {
+                String msg = "A script with this title already exists";
+                if (targetType != null) {
+                    msg = msg + " for this " + targetType.toString().toLowerCase();
+                }
+                addGlobalValidationError(msg + "!");
             }
-            addGlobalValidationError(msg + "!");
         }
 
         if (StringUtils.isBlank(script)) {
@@ -207,6 +232,28 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
         }
 
         getContext().setSourcePageResolution(new ForwardResolution(SCRIPTS_CONTAINER_JSP));
+    }
+
+    /**
+     *
+     * @throws DAOException
+     */
+    @ValidationMethod(on = {"test"})
+    public void validateTest() throws DAOException {
+
+        if (getUser() == null || !getUser().isAdministrator()) {
+            addGlobalValidationError("You are not authorized for this operation!");
+            return;
+        }
+
+        if (StringUtils.isBlank(script)) {
+            addGlobalValidationError("Script must not be blank!");
+        }
+
+        String targetSourceUrl = targetType!=null && targetType.equals(TargetType.SOURCE) ? targetUrl : null;
+        if (StringUtils.isBlank(testSourceUrl) && (StringUtils.isBlank(targetSourceUrl))){
+            addGlobalValidationError("Missing the source to test on!");
+        }
     }
 
     /**
@@ -360,7 +407,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
      *
      * @return
      */
-    public String getPageToRender(){
+    public String getPageToRender() {
 
         return SCRIPT_JSP;
     }
@@ -418,11 +465,61 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public String getBackToTargetUrl() {
         return backToTargetUrl;
     }
 
+    /**
+     *
+     * @param backToTargetUrl
+     */
     public void setBackToTargetUrl(String backToTargetUrl) {
         this.backToTargetUrl = backToTargetUrl;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public List<Map<String, ObjectDTO>> getTestResults() {
+        return testResults;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public List<String> getTestResultColumns() {
+
+        if (testResultColumns==null){
+
+            testResultColumns = new ArrayList<String>();
+            if (testResults!=null && !testResults.isEmpty()){
+
+                Map<String,ObjectDTO> firstRow = testResults.get(0);
+                for (String key : firstRow.keySet()){
+                    testResultColumns.add(key);
+                }
+            }
+        }
+        return testResultColumns;
+    }
+
+    /**
+     * @return the executedTestQuery
+     */
+    public String getExecutedTestQuery() {
+        return executedTestQuery;
+    }
+
+    /**
+     * @return the testError
+     */
+    public String getTestError() {
+        return testError;
     }
 }

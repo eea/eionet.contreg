@@ -70,7 +70,6 @@
                         <stripes:checkbox name="active" id="activeCheckbox"/>
                     </td>
                 </tr>
-<%--
                 <c:if test="${empty actionBean.targetType || actionBean.targetType=='TYPE'}">
                     <tr>
 	                    <td style="vertical-align:top;padding-right:0.3em;text-align:right">
@@ -81,13 +80,12 @@
 	                    </td>
                     </tr>
                 </c:if>
---%>
                 <tr>
                     <td>&nbsp;</td>
                     <td>
                         <stripes:submit name="save" value="Save"/>
                         <stripes:submit name="save" value="Save & close"/>
-<%--                        <stripes:submit name="test" value="Test"/> --%>
+                        <stripes:submit name="test" value="Test"/>
                         <stripes:submit name="cancel" value="Cancel"/>
                     </td>
                 </tr>
@@ -106,5 +104,49 @@
             <input type="hidden" name="ignoreMalformedSparql" value="${actionBean.ignoreMalformedSparql}"/>
 
         </crfn:form>
+
+        <c:if test="${not empty param.test}">
+
+        	<div>
+        		Test query executed:
+        		<pre style="font-size:0.7em"><c:out value="${actionBean.executedTestQuery}"/></pre>
+        	</div>
+        	<c:if test="${not empty actionBean.testError}">
+        		<div>
+        		Received test error:
+        		<pre style="font-size:0.7em"><c:out value="${actionBean.testError}"/></pre>
+        		</div>
+        	</c:if>
+        	<c:if test="${not empty actionBean.testResults}">
+	        	<display:table name="${actionBean.testResults}" class="datatable" id="testResultRow" sort="list" pagesize="15" requestURI="${actionBean.urlBinding}" style="width:80%">
+
+				    <display:setProperty name="paging.banner.item_name" value="row"/>
+				    <display:setProperty name="paging.banner.items_name" value="rows"/>
+				    <display:setProperty name="paging.banner.all_items_found" value='<span class="pagebanner">{0} {1} found.</span>'/>
+				    <display:setProperty name="paging.banner.onepage" value=""/>
+
+					<c:forEach items="${actionBean.testResultColumns}" var="testResultColumn">
+						<c:set var="columnValue" value="${testResultRow[testResultColumn]}"/>
+						<display:column title="${testResultColumn}">
+							<c:choose>
+								<c:when test="${not empty columnValue && columnValue.literal==false}">
+									<stripes:link href="/factsheet.action">
+	                                    <c:out value="${columnValue}"/>
+	                                    <stripes:param name="uri" value="${columnValue}"/>
+	                                </stripes:link>
+								</c:when>
+								<c:otherwise>
+									<c:out value="${columnValue}"/>
+								</c:otherwise>
+							</c:choose>
+						</display:column>
+					</c:forEach>
+
+				</display:table>
+			</c:if>
+			<c:if test="${empty actionBean.testError && empty actionBean.testResults}">
+				<div>No test results found!</div>
+			</c:if>
+        </c:if>
 
 </stripes:layout-definition>

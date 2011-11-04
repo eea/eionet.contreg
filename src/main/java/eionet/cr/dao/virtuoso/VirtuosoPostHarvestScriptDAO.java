@@ -26,17 +26,23 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.openrdf.repository.RepositoryConnection;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.PostHarvestScriptDAO;
 import eionet.cr.dao.readers.PostHarvestScriptDTOReader;
+import eionet.cr.dao.readers.PostHarvestScriptTestResultsReader;
+import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.PostHarvestScriptDTO;
 import eionet.cr.dto.PostHarvestScriptDTO.TargetType;
 import eionet.cr.util.Pair;
 import eionet.cr.util.YesNoBoolean;
+import eionet.cr.util.sesame.SesameConnectionProvider;
+import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.PairReader;
 import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
@@ -393,5 +399,29 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
 
         Object o = executeUniqueResultSQL(EXISTS_SQL, values, new SingleObjectReader<Object>());
         return o==null ? false : Integer.parseInt(o.toString())>0;
+    }
+
+    /**
+     * @throws DAOException
+     * @see eionet.cr.dao.PostHarvestScriptDAO#test(java.lang.String)
+     */
+    @Override
+    public List<Map<String, ObjectDTO>> test(String query) throws DAOException {
+
+        if (StringUtils.isBlank(query)){
+            return new ArrayList<Map<String, ObjectDTO>>();
+        }
+
+        RepositoryConnection conn = null;
+        try {
+            conn = SesameConnectionProvider.getReadOnlyRepositoryConnection();
+            PostHarvestScriptTestResultsReader reader = new PostHarvestScriptTestResultsReader();
+            SesameUtil.executeQuery(query, reader, conn);
+            return reader.getResultList();
+        } catch (Exception e) {
+            throw new DAOException(e.getMessage(), e);
+        } finally {
+            SesameUtil.close(conn);
+        }
     }
 }

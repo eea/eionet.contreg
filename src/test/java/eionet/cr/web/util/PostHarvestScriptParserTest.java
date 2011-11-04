@@ -44,15 +44,15 @@ public class PostHarvestScriptParserTest extends TestCase {
         String graph = "http://www.neti.ee";
 
         assertEquals("prefix xxx:yyy DELETE FROM <http://www.neti.ee> {1} where {2}", parseForExecution(ss[0], graph));
-        assertEquals("prefix xxx:yyy SELECT {1} FROM <http://www.neti.ee> WHERE {2}", parseForTest(ss[0], graph));
+        assertEquals("prefix xxx:yyy SELECT 1 FROM <http://www.neti.ee> WHERE {2} LIMIT 500", parseForTest(ss[0], graph));
 
         assertEquals("prefix xxx:yyy INSERT INTO <http://www.neti.ee> {1} where {2}", parseForExecution(ss[1], graph));
-        assertEquals("prefix xxx:yyy SELECT {1} FROM <http://www.neti.ee> WHERE {2}", parseForTest(ss[1], graph));
+        assertEquals("prefix xxx:yyy SELECT 1 FROM <http://www.neti.ee> WHERE {2} LIMIT 500", parseForTest(ss[1], graph));
 
         assertEquals("prefix xxx:yyy MODIFY <http://www.neti.ee> DELETE {1} insert {2} where {3}", parseForExecution(ss[2], graph));
-        assertEquals("prefix xxx:yyy SELECT {2} FROM <http://www.neti.ee> WHERE {3}", parseForTest(ss[2], graph));
+        assertEquals("prefix xxx:yyy SELECT 2 FROM <http://www.neti.ee> WHERE {3} LIMIT 500", parseForTest(ss[2], graph));
 
         assertEquals("prefix xxx:yyy INSERT INTO <http://www.neti.ee> {2}", parseForExecution(ss[3], graph));
-        assertEquals("prefix xxx:yyy SELECT {2} FROM <http://www.neti.ee> WHERE {?s ?p ?o}", parseForTest(ss[3], graph));
+        assertEquals("prefix xxx:yyy SELECT 2 FROM <http://www.neti.ee> WHERE {?s ?p ?o} LIMIT 500", parseForTest(ss[3], graph));
     }
 }

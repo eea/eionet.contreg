@@ -22,8 +22,10 @@
 package eionet.cr.dao;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.PostHarvestScriptDTO;
 import eionet.cr.dto.PostHarvestScriptDTO.TargetType;
 import eionet.cr.util.Pair;
@@ -139,4 +141,11 @@ public interface PostHarvestScriptDAO extends DAO {
      * @throws DAOException
      */
     boolean exists(TargetType targetType, String targetUrl, String title) throws DAOException;
+
+    /**
+     *
+     * @param query
+     * @return
+     */
+    List<Map<String,ObjectDTO>> test(String query) throws DAOException;
 }
