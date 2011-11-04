@@ -59,7 +59,7 @@ import eionet.cr.web.security.CRUser;
 
 /**
  * Virtuoso implementation for the {@link FolderDAO}.
- *
+ * 
  * @author Jaanus Heinlaid
  */
 public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
@@ -69,12 +69,12 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
 
     /** */
     private static final String INSERT_NEVER_HARVESTED_SOURCE_SQL =
-            "insert soft HARVEST_SOURCE (URL,URL_HASH,TIME_CREATED,INTERVAL_MINUTES) values (?,?,now(),0)";
+        "insert soft HARVEST_SOURCE (URL,URL_HASH,TIME_CREATED,INTERVAL_MINUTES) values (?,?,now(),0)";
 
     /** */
     private static final String FOLDER_EXISTS_SPARQL = SPARQLQueryUtil.getCrInferenceDefinitionStr()
-            + " select distinct ?s where {?s a <" + Subjects.CR_FOLDER + ">. ?parentFolder <" + Predicates.CR_HAS_FOLDER
-            + "> ?s. filter (?s=?folderUri)} limit 1";
+    + " select distinct ?s where {?s a <" + Subjects.CR_FOLDER + ">. ?parentFolder <" + Predicates.CR_HAS_FOLDER
+    + "> ?s. filter (?s=?folderUri)} limit 1";
 
     /**
      * @see eionet.cr.dao.FolderDAO#createUserHomeFolder(java.lang.String)
@@ -127,9 +127,11 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
         if (StringUtils.isBlank(parentFolderUri) || StringUtils.isBlank(folderName)) {
             throw new IllegalArgumentException("Parent folder URI and folder name must not be blank!");
         }
-        
+
         // Remove trailing "/" from parent URI, if such exists
-        parentFolderUri = StringUtils.substringBeforeLast(parentFolderUri, "/");
+        if (parentFolderUri.endsWith("/")){
+            parentFolderUri = StringUtils.substringBeforeLast(parentFolderUri, "/");
+        }
 
         // If the new folder URI is reserved, exit silently.
         String newFolderUri = parentFolderUri + "/" + URLUtil.replaceURLBadIRISymbols(folderName);
@@ -275,7 +277,8 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
                 if (bindingSet.getValue("label") != null && StringUtils.isNotEmpty(bindingSet.getValue("label").stringValue())) {
                     item.setTitle(bindingSet.getValue("label").stringValue());
                 }
-                if (bindingSet.getValue("lastModified") != null && StringUtils.isNotEmpty(bindingSet.getValue("lastModified").stringValue())) {
+                if (bindingSet.getValue("lastModified") != null
+                        && StringUtils.isNotEmpty(bindingSet.getValue("lastModified").stringValue())) {
                     item.setLastModified(bindingSet.getValue("lastModified").stringValue());
                 }
                 if (Predicates.CR_HAS_FOLDER.equals(bindingSet.getValue("type").stringValue())) {
@@ -299,7 +302,7 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
     }
 
     /**
-     *
+     * 
      * @param user
      * @return
      */
@@ -380,10 +383,10 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
         // given statements should never be more than a couple or so.
 
         HashSet<String> sourcesDone = new HashSet<String>();
-        for (Statement statement : statements){
+        for (Statement statement : statements) {
 
             String sourceUrl = statement.getContext().stringValue();
-            if (!sourcesDone.contains(sourceUrl)){
+            if (!sourcesDone.contains(sourceUrl)) {
                 List<Object> values = new ArrayList<Object>();
                 values.add(sourceUrl);
                 values.add(Hashes.spoHash(sourceUrl));
