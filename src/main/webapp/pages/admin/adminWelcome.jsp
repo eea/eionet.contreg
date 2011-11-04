@@ -19,9 +19,7 @@
             </ul>
         </c:when>
         <c:otherwise>
-            <div class="error-msg">
-            No Access
-            </div>
+            <div class="error-msg">Access not allowed!</div>
         </c:otherwise>
     </c:choose>
     </stripes:layout-component>
