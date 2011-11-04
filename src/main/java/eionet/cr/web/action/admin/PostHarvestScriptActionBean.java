@@ -254,6 +254,8 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
         if (StringUtils.isBlank(testSourceUrl) && (StringUtils.isBlank(targetSourceUrl))){
             addGlobalValidationError("Missing the source to test on!");
         }
+
+        getContext().setSourcePageResolution(new ForwardResolution(SCRIPTS_CONTAINER_JSP));
     }
 
     /**

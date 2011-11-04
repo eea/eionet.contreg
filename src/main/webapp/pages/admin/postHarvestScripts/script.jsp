@@ -105,7 +105,7 @@
 
         </crfn:form>
 
-        <c:if test="${not empty param.test}">
+        <c:if test="${not empty param.test && not empty actionBean.executedTestQuery}">
 
         	<div>
         		Test query executed:
