@@ -21,8 +21,8 @@
 
 package eionet.cr.web.util;
 
-import static eionet.cr.web.util.PostHarvestScriptParser.parseForExecution;
-import static eionet.cr.web.util.PostHarvestScriptParser.parseForTest;
+import static eionet.cr.web.action.admin.postHarvest.PostHarvestScriptParser.parseForExecution;
+import static eionet.cr.web.action.admin.postHarvest.PostHarvestScriptParser.parseForTest;
 import junit.framework.TestCase;
 
 /**

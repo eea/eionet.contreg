@@ -11,6 +11,10 @@
         </c:otherwise>
     </c:choose>
 
+    <div class="advice-msg" style="font-size:0.8em">
+        Hint: type at least 4 characters for suggestions in ${actionBean.targetType=='SOURCE'? 'target' : 'test'} source.
+    </div>
+
         <crfn:form action="${actionBean.urlBinding}" focus="first" method="post" style="padding-top:0.8em" onsubmit="formSubmit()">
 
             <table>
@@ -30,7 +34,7 @@
 	                            <c:otherwise>
 	                                <c:choose>
 	                                    <c:when test="${actionBean.targetType=='SOURCE'}">
-	                                        <stripes:text name="targetUrl" id="harvestSource" value="${empty actionBean.targetUrl ? 'Type at least 4 characters for suggestions ...' : actionBean.targetUrl}" size="80"/>
+	                                        <stripes:text name="targetUrl" id="harvestSource" value="${actionBean.targetUrl}" size="80"/>
 	                                    </c:when>
 	                                    <c:otherwise>
 	                                        <stripes:select name="targetUrl" id="typeSelect">
@@ -59,7 +63,7 @@
                         <label for="scriptText" class="required question">Script:</label>
                     </td>
                     <td>
-                        <stripes:textarea name="script" cols="80" rows="6"/>
+                        <stripes:textarea name="script" cols="80" rows="5"/>
                     </td>
                 </tr>
                 <tr>
@@ -76,7 +80,7 @@
 	                        <label for="harvestSource" class="question">Test source:</label>
 	                    </td>
 	                    <td>
-	                        <stripes:text name="testSourceUrl" id="harvestSource" value="${empty actionBean.testSourceUrl ? 'Type at least 4 characters for suggestions ...' : actionBean.testSourceUrl}" size="80"/>
+	                        <stripes:text name="testSourceUrl" id="harvestSource" value="${actionBean.testSourceUrl}" size="80"/>
 	                    </td>
                     </tr>
                 </c:if>

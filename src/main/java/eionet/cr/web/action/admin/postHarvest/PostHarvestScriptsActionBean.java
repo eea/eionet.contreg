@@ -19,9 +19,8 @@
  *        Jaanus Heinlaid
  */
 
-package eionet.cr.web.action.admin;
+package eionet.cr.web.action.admin.postHarvest;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
@@ -49,9 +48,8 @@ import eionet.cr.web.action.AbstractActionBean;
 public class PostHarvestScriptsActionBean extends AbstractActionBean {
 
     /** */
-    //private static final String TARGETS_JSP = "/pages/admin/postHarvestScripts/targets.jsp";
     private static final String SCRIPTS_JSP = "/pages/admin/postHarvestScripts/scripts.jsp";
-    private static final String SCRIPTS_CONTAINER_JSP = "/pages/admin/postHarvestScripts/scriptsContainer.jsp";
+    public static final String SCRIPTS_CONTAINER_JSP = "/pages/admin/postHarvestScripts/scriptsContainer.jsp";
 
     /** */
     private TargetType targetType;
@@ -191,16 +189,9 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
      */
     public List<Tab> getTabs() {
 
-        if (tabs == null) {
-
-            tabs = new ArrayList<Tab>();
-            tabs.add(new Tab("All-source scripts", getUrlBinding(), "Scripts to run for all sources", targetType == null));
-            tabs.add(new Tab("Source-specific scripts", getUrlBinding() + "?targetType=" + TargetType.SOURCE,
-                    "Scripts to run for specific sources", targetType != null && targetType.equals(TargetType.SOURCE)));
-            tabs.add(new Tab("Type-specific scripts", getUrlBinding() + "?targetType=" + TargetType.TYPE,
-                    "Scripts to run for specific types", targetType != null && targetType.equals(TargetType.TYPE)));
+        if (tabs==null){
+            tabs = Tabs.generate(targetType);
         }
-
         return tabs;
     }
 
@@ -226,66 +217,13 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
     public void setSelectedIds(List<Integer> selectedIds) {
         this.selectedIds = selectedIds;
     }
-    
+
     /**
-     * 
+     *
      * @return
      */
     public String getPageToRender(){
-    	
-    	return SCRIPTS_JSP;
-    }
 
-    /**
-     * @author Jaanus Heinlaid
-     */
-    public class Tab {
-
-        /** */
-        private String title;
-        private String href;
-        private String hint;
-        private boolean selected;
-
-        /**
-         * @param title
-         * @param href
-         * @param hint
-         * @param selected
-         */
-        public Tab(String title, String href, String hint, boolean selected) {
-            this.title = title;
-            this.href = href;
-            this.hint = hint;
-            this.selected = selected;
-        }
-
-        /**
-         * @return the title
-         */
-        public String getTitle() {
-            return title;
-        }
-
-        /**
-         * @return the href
-         */
-        public String getHref() {
-            return href;
-        }
-
-        /**
-         * @return the hint
-         */
-        public String getHint() {
-            return hint;
-        }
-
-        /**
-         * @return the selected
-         */
-        public boolean isSelected() {
-            return selected;
-        }
+        return SCRIPTS_JSP;
     }
 }

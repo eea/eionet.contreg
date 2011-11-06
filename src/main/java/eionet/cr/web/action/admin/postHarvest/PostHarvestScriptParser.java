@@ -19,7 +19,7 @@
  *        Jaanus Heinlaid
  */
 
-package eionet.cr.web.util;
+package eionet.cr.web.action.admin.postHarvest;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -86,16 +86,18 @@ public class PostHarvestScriptParser {
         }
 
         if (containsToken(result, "WHERE")) {
-            result =
-                substringBeforeToken(result, "WHERE") + "FROM <" + graphUri + "> WHERE" + substringAfterToken(result, "WHERE");
+            if (!containsToken(result, "FROM")) {
+                result =
+                    substringBeforeToken(result, "WHERE") + "FROM <" + graphUri + "> WHERE"
+                    + substringAfterToken(result, "WHERE");
+            }
         } else {
             result = result + " FROM <" + graphUri + "> WHERE {?s ?p ?o}";
         }
 
         if (containsToken(result, "LIMIT")) {
             result = substringBeforeToken(result, "LIMIT") + "LIMIT " + TEST_RESULTS_LIMIT;
-        }
-        else{
+        } else {
             result = result + " LIMIT " + TEST_RESULTS_LIMIT;
         }
 

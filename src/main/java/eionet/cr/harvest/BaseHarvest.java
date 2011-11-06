@@ -60,8 +60,8 @@ import eionet.cr.util.EMailSender;
 import eionet.cr.util.Util;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SingleObjectReader;
+import eionet.cr.web.action.admin.postHarvest.PostHarvestScriptParser;
 import eionet.cr.web.security.CRUser;
-import eionet.cr.web.util.PostHarvestScriptParser;
 
 /**
  *

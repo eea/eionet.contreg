@@ -19,7 +19,9 @@
  *        Jaanus Heinlaid
  */
 
-package eionet.cr.web.action.admin;
+package eionet.cr.web.action.admin.postHarvest;
+
+import static eionet.cr.web.action.admin.postHarvest.PostHarvestScriptsActionBean.SCRIPTS_CONTAINER_JSP;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +46,6 @@ import eionet.cr.dto.PostHarvestScriptDTO;
 import eionet.cr.dto.PostHarvestScriptDTO.TargetType;
 import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.util.ApplicationCache;
-import eionet.cr.web.util.PostHarvestScriptParser;
 
 /**
  *
@@ -55,7 +56,6 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
 
     /** */
     private static final String SCRIPT_JSP = "/pages/admin/postHarvestScripts/script.jsp";
-    private static final String SCRIPTS_CONTAINER_JSP = "/pages/admin/postHarvestScripts/scriptsContainer.jsp";
 
     /** */
     private int id;
@@ -141,7 +141,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
         try {
             testResults = DAOFactory.get().getDao(PostHarvestScriptDAO.class).test(executedTestQuery);
         } catch (DAOException e) {
-            testError = e.toString();
+            testError = e.getMessage();
         }
         return new ForwardResolution(SCRIPTS_CONTAINER_JSP);
     }
@@ -250,9 +250,9 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
             addGlobalValidationError("Script must not be blank!");
         }
 
-        String targetSourceUrl = targetType!=null && targetType.equals(TargetType.SOURCE) ? targetUrl : null;
-        if (StringUtils.isBlank(testSourceUrl) && (StringUtils.isBlank(targetSourceUrl))){
-            addGlobalValidationError("Missing the source to test on!");
+        String sourceToTestOn = targetType!=null && targetType.equals(TargetType.SOURCE) ? targetUrl : testSourceUrl;
+        if (StringUtils.isBlank(sourceToTestOn)){
+            addGlobalValidationError("Test source must not be blank!");
         }
 
         getContext().setSourcePageResolution(new ForwardResolution(SCRIPTS_CONTAINER_JSP));
@@ -391,17 +391,9 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
      */
     public List<Tab> getTabs() {
 
-        if (tabs == null) {
-
-            String urlBinding = PostHarvestScriptsActionBean.class.getAnnotation(UrlBinding.class).value();
-            tabs = new ArrayList<Tab>();
-            tabs.add(new Tab("All-source scripts", urlBinding, "Scripts to run for all sources", targetType == null));
-            tabs.add(new Tab("Source-specific scripts", urlBinding + "?targetType=" + TargetType.SOURCE,
-                    "Scripts to run for specific sources", targetType != null && targetType.equals(TargetType.SOURCE)));
-            tabs.add(new Tab("Type-specific scripts", urlBinding + "?targetType=" + TargetType.TYPE,
-                    "Scripts to run for specific types", targetType != null && targetType.equals(TargetType.TYPE)));
+        if (tabs==null){
+            tabs = Tabs.generate(targetType);
         }
-
         return tabs;
     }
 
@@ -412,59 +404,6 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     public String getPageToRender() {
 
         return SCRIPT_JSP;
-    }
-
-    /**
-     * @author Jaanus Heinlaid
-     */
-    public class Tab {
-
-        /** */
-        private String title;
-        private String href;
-        private String hint;
-        private boolean selected;
-
-        /**
-         * @param title
-         * @param href
-         * @param hint
-         * @param selected
-         */
-        public Tab(String title, String href, String hint, boolean selected) {
-            this.title = title;
-            this.href = href;
-            this.hint = hint;
-            this.selected = selected;
-        }
-
-        /**
-         * @return the title
-         */
-        public String getTitle() {
-            return title;
-        }
-
-        /**
-         * @return the href
-         */
-        public String getHref() {
-            return href;
-        }
-
-        /**
-         * @return the hint
-         */
-        public String getHint() {
-            return hint;
-        }
-
-        /**
-         * @return the selected
-         */
-        public boolean isSelected() {
-            return selected;
-        }
     }
 
     /**
