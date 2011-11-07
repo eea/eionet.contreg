@@ -114,13 +114,10 @@ public class FileProcessor {
                     LOGGER.debug(loggerMsg("Seems to be XML file with rdf:RDF start element"));
                     resultFile = unzippedFile;
                 } else {
-                    // the file's start element was not RDF, so get its conversion schema:
-                    // if it is not null or blank, the result will be an attempted RDF conversion
+                    // The file's start element was not RDF, so try to convert it to RDF.
+                    LOGGER.debug(loggerMsg("Seems to be XML file, attempting RDF conversion"));
                     String conversionSchema = xmlAnalysis.getConversionSchema();
-                    if (!StringUtils.isBlank(conversionSchema)) {
-                        LOGGER.debug(loggerMsg("Seems to be XML file, attempting RDF conversion"));
-                        resultFile = attemptRdfConversion(unzippedFile, conversionSchema, contextUrl);
-                    }
+                    resultFile = attemptRdfConversion(unzippedFile, conversionSchema, contextUrl);
                 }
             }
 
@@ -205,11 +202,27 @@ public class FileProcessor {
      */
     private File attemptRdfConversion(File file, String conversionSchema, String contextUrl) throws IOException, SAXException {
 
+        // First, attempt to convert by the file's URL. If no conversions found
+        // by that, try converting by the given conversion schema.
+
+        // So here we look for conversion by the file's URL.
         String conversionId = null;
         try {
-            conversionId = ConversionsParser.parseForSchema(conversionSchema).getRdfConversionId();
+            conversionId = ConversionsParser.parseForSchema(contextUrl).getRdfConversionId();
         } catch (ParserConfigurationException e) {
             throw new CRRuntimeException("SAX parser configuration error");
+        }
+
+        // If no conversion was found by the file's URL, look by the given conversion schema
+        if (StringUtils.isBlank(conversionId)){
+            try {
+                conversionId = ConversionsParser.parseForSchema(conversionSchema).getRdfConversionId();
+            } catch (ParserConfigurationException e) {
+                throw new CRRuntimeException("SAX parser configuration error");
+            }
+        }
+        else{
+            LOGGER.trace(loggerMsg("Found conversion by the file's URL"));
         }
 
         // if conversion to RDF has been found, run it and return the converted file
@@ -243,6 +256,7 @@ public class FileProcessor {
     // * @param contextUrl
     // * @return
     // * @throws IOException
+
     // */
     // public File process(File file, String contextUrl) throws IOException {
     //
