@@ -63,7 +63,39 @@
                         <label for="scriptText" class="required question">Script:</label>
                     </td>
                     <td>
-                        <stripes:textarea name="script" cols="80" rows="5"/>
+                        <div class="expandingArea">
+                        <pre><span></span><br /></pre>
+                           <stripes:textarea name="script" cols="80" rows="5"/>
+                        </div>
+                        <script type="text/javascript">
+// <![CDATA[
+function makeExpandingArea(container) {
+ var area = container.querySelector('textarea');
+ var span = container.querySelector('span');
+ if (area.addEventListener) {
+   area.addEventListener('input', function() {
+     span.textContent = area.value;
+   }, false);
+   span.textContent = area.value;
+ } else if (area.attachEvent) {
+   // IE8 compatibility
+   area.attachEvent('onpropertychange', function() {
+     span.innerText = area.value;
+   });
+   span.innerText = area.value;
+ }
+ // Enable extra CSS
+ container.className += ' active';
+}
+
+var areas = document.querySelectorAll('.expandingArea');
+var l = areas.length;
+
+while (l--) {
+ makeExpandingArea(areas[l]);
+}
+// ]]>
+                        </script>
                     </td>
                 </tr>
                 <tr>
