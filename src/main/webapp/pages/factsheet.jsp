@@ -78,13 +78,17 @@
                                                 <a id="wait_link" href="${oldUrl}" onclick="javascript:loadAndWait('The resource is being harvested. Please wait ...', '${url}', '${pageContext.request.contextPath}'); return false;">Harvest</a>
                                             </li>
                                         </c:if>
-
                                         <c:if test="${sourceReadActionsAllowed}">
                                             <li>
                                                 <stripes:link class="link-plain" href="/source.action?view=&harvestSource.url=${ subjectUrl }">Source details</stripes:link>
                                             </li>
                                             <li>
                                                 <stripes:link class="link-plain" href="/source.action?export=&harvestSource.url=${subjectUrl}">Export triples</stripes:link>
+                                            </li>
+                                        </c:if>
+                                        <c:if test="${actionBean.subjectIsType || (sourceReadActionsAllowed && actionBean.adminLoggedIn)}">
+                                            <li>
+                                                <stripes:link class="link-plain" href="/admin/postHarvestScripts?targetType=${actionBean.subjectIsType ? 'TYPE' : 'SOURCE'}&targetUrl=${subjectUrl}">Post-harvest scripts</stripes:link>
                                             </li>
                                         </c:if>
                                         <c:if test="${downloadAllowed}">

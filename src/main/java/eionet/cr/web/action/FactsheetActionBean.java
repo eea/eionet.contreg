@@ -64,6 +64,7 @@ import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.util.Pair;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
+import eionet.cr.web.util.ApplicationCache;
 import eionet.cr.web.util.tabs.FactsheetTabMenuHelper;
 import eionet.cr.web.util.tabs.TabElement;
 
@@ -121,7 +122,11 @@ public class FactsheetActionBean extends AbstractActionBean {
     private Map<String, Integer> predicatePageNumbers;
     private Map<String, Integer> predicatePageCounts;
 
+    /** */
     private List<TabElement> tabs;
+
+    /** */
+    private Boolean subjectIsType = null;
 
     /**
      *
@@ -685,7 +690,26 @@ public class FactsheetActionBean extends AbstractActionBean {
         return PredicateObjectsReader.PREDICATE_PAGE_SIZE;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<TabElement> getTabs() {
         return tabs;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean getSubjectIsType(){
+
+        if (subjectIsType==null){
+
+            List<String> typeUris = ApplicationCache.getTypeUris();
+            subjectIsType = Boolean.valueOf(typeUris.contains(this.uri));
+        }
+
+        return subjectIsType;
     }
 }

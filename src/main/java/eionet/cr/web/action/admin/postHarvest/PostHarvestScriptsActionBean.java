@@ -73,6 +73,9 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
 
         if (targetType != null){
             targets = DAOFactory.get().getDao(PostHarvestScriptDAO.class).listTargets(targetType);
+            if (targetUrl!=null && !targetsContain(targetUrl)){
+                targets.add(0, new Pair<String, Integer>(targetUrl, Integer.valueOf(0)));
+            }
         }
 
         if ((targetType==null && StringUtils.isBlank(targetUrl)) || (targetType!=null && !StringUtils.isBlank(targetUrl))){
@@ -225,5 +228,23 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
     public String getPageToRender(){
 
         return SCRIPTS_JSP;
+    }
+
+    /**
+     *
+     * @param url
+     * @return
+     */
+    private boolean targetsContain(String url){
+
+        if (targets!=null && !targets.isEmpty()){
+            for (Pair<String, Integer> pair : targets){
+                if (url.equals(pair.getLeft())){
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

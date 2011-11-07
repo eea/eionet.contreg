@@ -118,7 +118,7 @@
 		</div>
 	</c:if>
 
-	<c:if test="${fn:length(actionBean.scripts)==0 && (empty actionBean.targetType || not empty actionBean.targetUrl)}">
+	<c:if test="${empty actionBean.scripts && (empty actionBean.targetType || (not empty actionBean.targetUrl && not empty actionBean.targets))}">
 		<div style="margin-top:3em">No scripts found! Use operations menu to create one.</div>
 	</c:if>
 
