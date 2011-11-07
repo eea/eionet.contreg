@@ -1,3 +1,21 @@
+/* Folder items icons. */
+td.file {
+    background: url('../images/file.gif') no-repeat left top;
+    background-position: 0px 3px;
+    padding-left: 20px;
+}
+
+td.folder {
+    background: url('../images/folder2.gif') no-repeat left top;
+    background-position: 0px 3px;
+    padding-left: 20px;
+}
+
+td.reservedFolder {
+    background: url('../images/folder.gif') no-repeat left top;
+    background-position: 0px 3px;
+    padding-left: 20px;
+}
 
 
 
