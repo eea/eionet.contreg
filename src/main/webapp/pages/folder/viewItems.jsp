@@ -62,7 +62,7 @@
                             </stripes:link>
                         </li>
                         <li>
-                            <stripes:link class="link-plain" href="/factsheet.action?edit=&uri=${actionBean.user.homeUri}" title="Edit your home url properties">
+                            <stripes:link class="link-plain" href="/factsheet.action?edit=&uri=${actionBean.uri}" title="Edit folder properties">
                             Edit folder
                             </stripes:link>
                         </li>
@@ -115,7 +115,7 @@
                             </c:if>
                             <td class="${cssClass}" style="width: 100%">
                                 <c:choose>
-                                    <c:when test="${item.file}">
+                                    <c:when test="${item.file || item.reservedFile}">
                                         <stripes:link href="factsheet.action">
                                             <stripes:param name="uri" value="${item.uri}"/>
                                             ${item.name}
