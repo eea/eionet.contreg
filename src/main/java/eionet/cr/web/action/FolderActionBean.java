@@ -152,9 +152,14 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
                 return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
             }
 
-            String notEmpty = selectedItemsEmpty();
-            if (notEmpty != null) {
-                addSystemMessage("Cannot rename. Folder is not empty: " + notEmpty);
+            String check = selectedItemsEmpty();
+            if (check != null) {
+                addSystemMessage("Cannot rename. Folder is not empty: " + check);
+                return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
+            }
+            check = selectedItemsReserved();
+            if (check != null) {
+                addSystemMessage("Cannot rename. File or folder is reserved: " + check);
                 return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
             }
 
@@ -191,6 +196,10 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
         HelperDAO helperDAO = DAOFactory.get().getDao(HelperDAO.class);
         FolderDAO folderDAO = DAOFactory.get().getDao(FolderDAO.class);
         for (RenameFolderItemDTO item : renameItems) {
+            if (URIUtil.isUserReservedUri(item.getUri())) {
+                addSystemMessage("Cannot rename items. File or folder is reserved: " + item.getName());
+                return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
+            }
             if (FolderItemDTO.Type.FOLDER.equals(item.getType())) {
                 if (folderDAO.folderHasItems(item.getUri())) {
                     addSystemMessage("Cannot rename items. Folder is not empty: " + item.getName());
@@ -260,9 +269,14 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
             return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
         }
 
-        String notEmpty = selectedItemsEmpty();
-        if (notEmpty != null) {
-            addSystemMessage("Cannot delete. Folder is not empty: " + notEmpty);
+        String check = selectedItemsEmpty();
+        if (check != null) {
+            addSystemMessage("Cannot delete. Folder is not empty: " + check);
+            return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
+        }
+        check = selectedItemsReserved();
+        if (check != null) {
+            addSystemMessage("Cannot delete. File or folder is reserved: " + check);
             return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
         }
 
@@ -634,6 +648,22 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
                 if (hasItems) {
                     return item.getName();
                 }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns null, if all the selected items are not reserved. Returns file or folder name, if it is reserved.
+     *
+     * @return
+     * @throws DAOException
+     */
+    private String selectedItemsReserved() throws DAOException {
+        for (RenameFolderItemDTO item : selectedItems) {
+            if (item.isSelected() && URIUtil.isUserReservedUri(uri)) {
+                return item.getName();
             }
         }
 

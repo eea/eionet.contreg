@@ -81,22 +81,9 @@ public class LoginActionBean extends AbstractActionBean {
 
         CRUser user = getContext().getCRUser();
         if (user!=null){
-
-            LOGGER.debug("Checking if there is a home folder for user " + user.getUserName());
-
-            // If this is the first time the user has logged in,
-            // create his/her home folder. First time means no
-            // home folder currently existing in the triple store.
+            // Creating reserved files and folders for into user home
             FolderDAO dao = DAOFactory.get().getDao(FolderDAO.class);
-            if (!dao.fileOrFolderExists(user.getHomeUri())){
-
-                LOGGER.debug("Going to create home folder for user " + user.getUserName());
-
-                dao.createUserHomeFolder(user.getUserName());
-            }
-            else{
-                LOGGER.debug("Home folder exists for user " + user.getUserName());
-            }
+            dao.createUserHomeFolder(user.getUserName());
         }
 
         String lastActionEventUrl = getContext().getLastActionEventUrl();

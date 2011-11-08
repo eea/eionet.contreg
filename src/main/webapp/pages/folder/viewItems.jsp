@@ -100,11 +100,8 @@
                         <stripes:hidden name="selectedItems[${loop.index}].name" value="${item.name}" />
 
                         <c:choose>
-                            <c:when test="${item.folder}">
+                            <c:when test="${item.folder || item.reservedFolder}">
                                 <c:set var="cssClass" value="folder" />
-                            </c:when>
-                            <c:when test="${item.reservedFolder}">
-                                <c:set var="cssClass" value="reservedFolder" />
                             </c:when>
                             <c:otherwise>
                                 <c:set var="cssClass" value="file" />
@@ -113,7 +110,8 @@
 
                         <tr>
                             <c:if test="${actionBean.usersFolder}">
-                                <td><stripes:checkbox name="selectedItems[${loop.index}].selected" /></td>
+                                <c:set var="disabled" value="${item.reservedFolder || item.reservedFile}" />
+                                <td><stripes:checkbox name="selectedItems[${loop.index}].selected" disabled="${disabled}" /></td>
                             </c:if>
                             <td class="${cssClass}" style="width: 100%">
                                 <c:choose>

@@ -300,7 +300,11 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
                     }
                 }
                 if (Predicates.CR_HAS_FILE.equals(bindingSet.getValue("type").stringValue())) {
-                    item.setType(FolderItemDTO.Type.FILE);
+                    if (URIUtil.isUserReservedUri(item.getUri())) {
+                        item.setType(FolderItemDTO.Type.RESERVED_FILE);
+                    } else {
+                        item.setType(FolderItemDTO.Type.FILE);
+                    }
                 }
                 result.add(item);
             }

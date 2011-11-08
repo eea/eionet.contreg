@@ -6,12 +6,6 @@ td.file {
 }
 
 td.folder {
-    background: url('../images/folder2.gif') no-repeat left top;
-    background-position: 0px 3px;
-    padding-left: 20px;
-}
-
-td.reservedFolder {
     background: url('../images/folder.gif') no-repeat left top;
     background-position: 0px 3px;
     padding-left: 20px;
@@ -320,7 +314,7 @@ a.factsheetValueBrowse {
     font-size:0.7em;
 }
 
-div.documentContent textarea, 
+div.documentContent textarea,
 div.documentContent pre {
   margin: 0;
   padding: 0;

@@ -44,7 +44,7 @@ public class FolderItemDTO implements Comparable<FolderItemDTO> {
     private String lastModified;
 
     public enum Type {
-        RESERVED_FOLDER(1), FOLDER(2), FILE(3);
+        RESERVED_FOLDER(1), FOLDER(2), RESERVED_FILE(3), FILE(4);
         int order;
 
         Type(int order) {
@@ -81,6 +81,15 @@ public class FolderItemDTO implements Comparable<FolderItemDTO> {
      */
     public boolean isFile() {
         return Type.FILE.equals(type);
+    }
+
+    /**
+     * True, if type is reserved file.
+     *
+     * @return
+     */
+    public boolean isReservedFile() {
+        return Type.RESERVED_FILE.equals(type);
     }
 
     /**
