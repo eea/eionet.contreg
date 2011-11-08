@@ -1,5 +1,8 @@
 package eionet.cr.web.action;
 
+import java.text.NumberFormat;
+import java.util.Locale;
+
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
@@ -33,8 +36,10 @@ public class AboutActionBean extends AbstractActionBean {
      * @return
      * @throws DAOException
      */
-    public long getTriplesCount() throws DAOException {
-        return DAOFactory.get().getDao(HarvestSourceDAO.class).getTotalStatementsCount();
+    public String getTriplesCount() throws DAOException {
+        int totalStatements = DAOFactory.get().getDao(HarvestSourceDAO.class).getTotalStatementsCount();
+        NumberFormat nf = NumberFormat.getNumberInstance(Locale.UK);
+        return nf.format(totalStatements);
     }
 
 }
