@@ -9,6 +9,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -30,7 +31,7 @@ public class FileStore {
     /** */
     public static final String PATH = GeneralConfig.getRequiredProperty(GeneralConfig.FILESTORE_PATH);
 
-    private File userDir;
+    private final File userDir;
 
     /**
      *
@@ -56,24 +57,24 @@ public class FileStore {
 
     /**
      *
-     * @param fileName
+     * @param filePath file folder path with file name
      * @param overwrite
      * @param inputStream
      * @return File
      * @throws IOException
      */
-    public File add(String fileName, boolean overwrite, InputStream inputStream) throws IOException {
+    public File add(String filePath, boolean overwrite, InputStream inputStream) throws IOException {
 
-        File filePath = prepareFileWrite(fileName, overwrite);
+        File path = prepareFileWrite(filePath, overwrite);
         FileOutputStream outputStream = null;
         try {
-            outputStream = new FileOutputStream(filePath);
+            outputStream = new FileOutputStream(path);
             IOUtils.copy(inputStream, outputStream);
         } finally {
             IOUtils.closeQuietly(outputStream);
         }
 
-        return filePath;
+        return path;
     }
 
     /**
@@ -99,40 +100,75 @@ public class FileStore {
     }
 
     /**
+     * Returns file object of the uploaded file in the file system.
      *
-     * @param fileName
+     * @param filePath
+     *            file folder path with file name
      * @param overwrite
      * @throws FileAlreadyExistsException
      */
-    protected File prepareFileWrite(String fileName, boolean overwrite) throws FileAlreadyExistsException {
+    protected File prepareFileWrite(String filePath, boolean overwrite) throws FileAlreadyExistsException {
 
-        if (!userDir.exists() || !userDir.isDirectory()) {
-            // creates the directory, including any necessary but nonexistent parent directories
-            userDir.mkdirs();
+        String folderStr;
+        String fileName;
+
+        if (StringUtils.contains(filePath, "/")) {
+            String fileFolder = StringUtils.substringBeforeLast(filePath, "/");
+            folderStr = userDir.getAbsolutePath() + "/" + fileFolder;
+            fileName = StringUtils.substringAfterLast(filePath, "/");
+        } else {
+            folderStr = userDir.getAbsolutePath();
+            fileName = filePath;
         }
 
-        File filePath = new File(userDir, fileName);
-        if (filePath.exists() && filePath.isFile()) {
+        File dir = new File(folderStr);
 
-            if (overwrite == false) {
-                throw new FileAlreadyExistsException("File already exists: " + fileName);
-            } else {
-                filePath.delete();
+        if (!dir.exists() || !dir.isDirectory()) {
+            // creates the directory, including any necessary but nonexistent parent directories
+            try {
+                FileUtils.forceMkdir(dir);
+            } catch (IOException e) {
+                logger.error("Failed to create folder: " + dir.getAbsolutePath(), e);
             }
         }
 
-        return filePath;
+        File path = new File(dir, fileName);
+        if (path.exists() && path.isFile()) {
+
+            if (overwrite == false) {
+                throw new FileAlreadyExistsException("File already exists: " + path);
+            } else {
+                path.delete();
+            }
+        }
+
+        return path;
     }
 
     /**
      *
-     * @param fileName
+     * @param filePath
      */
-    public void delete(String fileName) {
+    public void delete(String filePath) {
 
-        File file = new File(userDir, fileName);
+        File file = new File(userDir, filePath);
         if (file.exists() && file.isFile()) {
             file.delete();
+        }
+    }
+
+    /**
+     * True, if folder is deleted.
+     *
+     * @param folderPath
+     * @return
+     */
+    public boolean deleteFolder(String folderPath) {
+        File file = new File(userDir, folderPath);
+        if (file.isDirectory()) {
+            return file.delete();
+        } else {
+            return true;
         }
     }
 

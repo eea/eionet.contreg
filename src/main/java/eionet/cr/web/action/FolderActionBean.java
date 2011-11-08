@@ -24,14 +24,16 @@ package eionet.cr.web.action;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.FileBean;
 import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 
@@ -78,18 +80,24 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
     /** Factsheet page tabs. */
     private List<TabElement> tabs;
 
-    /** The parent folder. */
-    private FolderItemDTO parentFolder;
+    /** The folder. */
+    private FolderItemDTO folder;
 
     /** Items that are listed in parent folder. */
     private List<FolderItemDTO> folderItems;
 
-    /** Data of folder items to be renamed. */
+    /** Objects of selected folder items data. */
+    private List<RenameFolderItemDTO> selectedItems;
+
+    /** Objects with renaming data. */
     private List<RenameFolderItemDTO> renameItems;
 
     // File upload properties
     /** Title of newly uploaded file. */
     private String title;
+
+    /** Label of newly uploaded file. */
+    private String label;
 
     /** Uploaded file. */
     private FileBean uploadedFile;
@@ -118,7 +126,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
 
         FolderDAO folderDAO = DAOFactory.get().getDao(FolderDAO.class);
         Pair<FolderItemDTO, List<FolderItemDTO>> result = folderDAO.getFolderContents(uri);
-        parentFolder = result.getLeft();
+        folder = result.getLeft();
         folderItems = result.getRight();
 
         return new ForwardResolution("/pages/folder/viewItems.jsp");
@@ -132,19 +140,31 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
      */
     public Resolution renameForm() throws DAOException {
 
-        String[] uris = getContext().getRequest().getParameterValues("subjectUris");
-        if (uris == null) {
-            addSystemMessage("Select files to rename.");
-            return view();
+        if (!isUserLoggedIn()) {
+            addSystemMessage("Only logged in users can rename files.");
+            return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
         }
 
-        renameItems = new ArrayList<RenameFolderItemDTO>();
-        for (String u : uris) {
-            logger.info("URI: " + u);
-            RenameFolderItemDTO item = new RenameFolderItemDTO();
-            item.setUri(u);
-            item.setName(URIUtil.extractURILabel(u));
-            renameItems.add(item);
+        // When returning from submit handler, renameItems are valued
+        if (renameItems == null) {
+            if (itemsNotSelected()) {
+                addSystemMessage("Select files or folders to rename.");
+                return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
+            }
+
+            String notEmpty = selectedItemsEmpty();
+            if (notEmpty != null) {
+                addSystemMessage("Cannot rename. Folder is not empty: " + notEmpty);
+                return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
+            }
+
+            renameItems = new ArrayList<RenameFolderItemDTO>();
+
+            for (RenameFolderItemDTO item : selectedItems) {
+                if (item.isSelected()) {
+                    renameItems.add(item);
+                }
+            }
         }
 
         initTabs();
@@ -160,37 +180,67 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
     public Resolution rename() throws DAOException {
         if (!isUserLoggedIn()) {
             addSystemMessage("Only logged in users can rename files.");
-            return view();
+            return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
         }
 
-        // TODO: currently only renamings of files that are in root of home folder are supported
+        // Rename files
+        Set<String> uniqueNewNames = new HashSet<String>();
         HashMap<String, String> uriRenamings = new HashMap<String, String>();
         HashMap<String, String> fileRenamings = new HashMap<String, String>();
 
+        HelperDAO helperDAO = DAOFactory.get().getDao(HelperDAO.class);
+        FolderDAO folderDAO = DAOFactory.get().getDao(FolderDAO.class);
         for (RenameFolderItemDTO item : renameItems) {
-            logger.info("renaming: " + item.getUri() + " " + item.getName() + " -> " + item.getNewName());
+            if (FolderItemDTO.Type.FOLDER.equals(item.getType())) {
+                if (folderDAO.folderHasItems(item.getUri())) {
+                    addSystemMessage("Cannot rename items. Folder is not empty: " + item.getName());
+                    return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
+                }
+            }
+
             if (StringUtils.isNotEmpty(item.getNewName())) {
                 String oldUri = item.getUri();
                 String newUri = uri + "/" + StringUtils.replace(item.getNewName(), " ", "%20");
-                String oldFileName = URIUtil.extractURILabel(item.getUri());
-                String newFileName = StringUtils.replace(item.getNewName(), " ", "%20");
+
+                if (!uniqueNewNames.add(item.getNewName())) {
+                    addSystemMessage("Cannot name multiple items with the same name: " + item.getNewName());
+                    return renameForm();
+                }
+
+                if (helperDAO.isExistingSubject(newUri)) {
+                    addSystemMessage("Object with such a name already exists in system: " + item.getNewName());
+                    return renameForm();
+                }
+
                 if (!oldUri.equals(newUri)) {
                     uriRenamings.put(oldUri, newUri);
                 }
-                if (!newFileName.equals(oldFileName)) {
-                    fileRenamings.put(oldFileName, newFileName);
+
+                if (FolderItemDTO.Type.FILE.equals(item.getType())) {
+                    String oldFileName = StringUtils.replace(URIUtil.extractURILabel(item.getUri()), "%20", " ");
+                    String newFileName = item.getNewName();
+
+                    String folderPath = URIUtil.extractPathInUserHome(uri);
+                    if (StringUtils.isNotEmpty(folderPath)) {
+                        oldFileName = folderPath + "/" + oldFileName;
+                        newFileName = folderPath + "/" + newFileName;
+                    }
+
+                    if (!newFileName.equals(oldFileName)) {
+                        fileRenamings.put(oldFileName, newFileName);
+                    }
                 }
             }
         }
 
         if (uriRenamings.size() > 0) {
-            DAOFactory.get().getDao(HelperDAO.class).renameUserUploads(uriRenamings);
+            helperDAO.renameUserUploads(uriRenamings);
         }
         if (fileRenamings.size() > 0) {
             FileStore.getInstance(getUserName()).rename(fileRenamings);
             addSystemMessage("Files renamed successfully!");
         }
-        return view();
+        return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
     }
 
     /**
@@ -202,30 +252,82 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
     public Resolution delete() throws DAOException {
         if (!isUserLoggedIn()) {
             addSystemMessage("Only logged in users can delete files.");
-            return view();
+            return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
         }
 
-        String[] uris = getContext().getRequest().getParameterValues("subjectUris");
-        if (uris == null) {
-            addSystemMessage("Select files to delete.");
-            return view();
+        if (itemsNotSelected()) {
+            addSystemMessage("Select files or folders to delete.");
+            return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
         }
 
-        DAOFactory.get().getDao(HelperDAO.class).deleteUserUploads(getUserName(), Arrays.asList(uris));
+        String notEmpty = selectedItemsEmpty();
+        if (notEmpty != null) {
+            addSystemMessage("Cannot delete. Folder is not empty: " + notEmpty);
+            return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
+        }
 
+        List<String> fileUris = new ArrayList<String>();
+
+        FolderDAO folderDAO = DAOFactory.get().getDao(FolderDAO.class);
         FileStore fileStore = FileStore.getInstance(getUserName());
-        // TODO: delete files from subfolders not supported
-        for (String u : uris) {
-            String fileName = URIUtil.extractURILabel(u);
-            fileName = StringUtils.replace(fileName, "%20", " ");
-            fileStore.delete(fileName);
+
+        // Delete folders
+        for (RenameFolderItemDTO item : selectedItems) {
+            if (item.isSelected() && FolderItemDTO.Type.FOLDER.equals(item.getType())) {
+                folderDAO.deleteFolder(item.getUri());
+
+                boolean folderDeleted = fileStore.deleteFolder(URIUtil.extractPathInUserHome(item.getUri()));
+                if (!folderDeleted) {
+                    logger.warn("Failed to delete folder from filestore for uri: " + item.getUri());
+                }
+            }
+            if (item.isSelected() && FolderItemDTO.Type.FILE.equals(item.getType())) {
+                fileUris.add(item.getUri());
+            }
         }
 
-        DAOFactory.get().getDao(HarvestSourceDAO.class).removeHarvestSources(Arrays.asList(uris));
+        // Delete files
+        for (RenameFolderItemDTO item : selectedItems) {
+            if (item.isSelected() && FolderItemDTO.Type.FILE.equals(item.getType())) {
+                String filePath = URIUtil.extractPathInUserHome(item.getUri());
+                fileStore.delete(StringUtils.replace(filePath, "%20", " "));
+            }
+        }
 
-        addSystemMessage("Files deleted successfully.");
+        if (fileUris.size() > 0) {
+            folderDAO.deleteFileUris(uri, fileUris);
+            DAOFactory.get().getDao(HarvestSourceDAO.class).removeHarvestSources(fileUris);
+        }
 
-        return view();
+        addSystemMessage("Files/folders deleted successfully.");
+        return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
+    }
+
+    /**
+     * Create new folder.
+     *
+     * @return
+     * @throws DAOException
+     */
+    public Resolution createFolder() throws DAOException {
+        if (!isUserLoggedIn()) {
+            addSystemMessage("Only logged in users can create folders.");
+            return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
+        }
+
+        if (StringUtils.isEmpty(title)) {
+            addCautionMessage("Folder name must be valued.");
+            return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
+        }
+
+        FolderDAO folderDAO = DAOFactory.get().getDao(FolderDAO.class);
+        if (folderDAO.fileOrFolderExists(uri, title)) {
+            addCautionMessage("File or folder with the same name already exists.");
+            return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
+        }
+        folderDAO.createFolder(uri, title, label);
+        addSystemMessage("Folder created successfully.");
+        return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
     }
 
     /**
@@ -241,13 +343,13 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
 
     public Resolution upload() throws DAOException, IOException {
         if (uploadedFile == null) {
-            return view();
+            return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
         }
 
         // if file content is empty (e.f. 0 KB file), no point in continuing
         if (uploadedFile.getSize() <= 0) {
             addWarningMessage("The file must not be empty!");
-            return view();
+            return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
         }
 
         String fileUri = getUploadedFileSubjectUri();
@@ -258,13 +360,12 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
         // if file exists and replace not requested, report a warning
         if (!replaceExisting && fileExists) {
             addWarningMessage("A file with such a name already exists! Use \"replace existing\" checkbox to overwrite.");
-            return view();
+            return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
         }
 
-        // TODO: ?
         if (fileUri != null && (CurrentHarvests.contains(fileUri) || UrgentHarvestQueue.isInQueue(fileUri))) {
             addWarningMessage("A file with such name is currently being harvested!");
-            return view();
+            return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
         }
 
         // save the file's content and try to harvest it
@@ -274,7 +375,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
         // String urlBinding = getUrlBinding();
         // resolution = new RedirectResolution(StringUtils.replace(urlBinding, "{username}", getUserName()));
         addSystemMessage("File successfully uploaded.");
-        return view();
+        return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
     }
 
     private void saveAndHarvest() throws IOException, DAOException {
@@ -349,8 +450,8 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
 
         // prepare cr:hasFile predicate
         ObjectDTO objectDTO = new ObjectDTO(getUploadedFileSubjectUri(), false);
-        objectDTO.setSourceUri(getUser().getHomeUri());
-        SubjectDTO homeSubjectDTO = new SubjectDTO(getUser().getHomeUri(), false);
+        objectDTO.setSourceUri(uri);
+        SubjectDTO homeSubjectDTO = new SubjectDTO(uri, false);
         homeSubjectDTO.addObject(Predicates.CR_HAS_FILE, objectDTO);
 
         // declare file subject DTO, set it to null for starters
@@ -366,7 +467,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
             }
 
             objectDTO = new ObjectDTO(titleToStore, true);
-            objectDTO.setSourceUri(getUser().getHomeUri());
+            objectDTO.setSourceUri(uri);
             fileSubjectDTO = new SubjectDTO(getUploadedFileSubjectUri(), false);
             fileSubjectDTO.addObject(Predicates.DC_TITLE, objectDTO);
         }
@@ -386,7 +487,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
 
                     List<String> subjectUris = Collections.singletonList(fileSubjectDTO.getUri());
                     List<String> predicateUris = Collections.singletonList(Predicates.DC_TITLE);
-                    List<String> sourceUris = Collections.singletonList(getUser().getHomeUri());
+                    List<String> sourceUris = Collections.singletonList(uri);
 
                     helperDao.deleteSubjectPredicates(subjectUris, predicateUris, sourceUris);
                 }
@@ -438,7 +539,13 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
         try {
             DAOFactory.get().getDao(SpoBinaryDAO.class).add(dto, uploadedFile.getSize());
             contentStream = uploadedFile.getInputStream();
-            FileStore.getInstance(getUserName()).add(uploadedFile.getFileName(), replaceExisting, contentStream);
+            String filePath = URIUtil.extractPathInUserHome(uri);
+            if (StringUtils.isNotEmpty(filePath)) {
+                filePath += "/" + uploadedFile.getFileName();
+            } else {
+                filePath = uploadedFile.getFileName();
+            }
+            FileStore.getInstance(getUserName()).add(filePath, replaceExisting, contentStream);
         } finally {
             IOUtils.closeQuietly(contentStream);
         }
@@ -513,6 +620,44 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
     }
 
     /**
+     * Returns null, if all the folders from the items are empty. Folder name, if it is not.
+     *
+     * @return
+     * @throws DAOException
+     */
+    private String selectedItemsEmpty() throws DAOException {
+        FolderDAO folderDAO = DAOFactory.get().getDao(FolderDAO.class);
+
+        for (RenameFolderItemDTO item : selectedItems) {
+            if (item.isSelected() && FolderItemDTO.Type.FOLDER.equals(item.getType())) {
+                boolean hasItems = folderDAO.folderHasItems(item.getUri());
+                if (hasItems) {
+                    return item.getName();
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns true, if none of the items are marked selected.
+     *
+     * @return
+     */
+    private boolean itemsNotSelected() {
+        if (selectedItems == null) {
+            return true;
+        }
+        for (RenameFolderItemDTO item : selectedItems) {
+            if (item.isSelected()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * True, if currently logged in user is viewing his home folder or one of sub folders.
      *
      * @return
@@ -525,6 +670,30 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
             }
         }
         return false;
+    }
+
+    /**
+     * True, if the folder uri is user's home folder.
+     *
+     * @return
+     */
+    public boolean isHomeFolder() {
+        if (StringUtils.isEmpty(URIUtil.extractPathInUserHome(uri))) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Returns parent folder uri. If it is home folder uri, current uri is returned.
+     *
+     * @return
+     */
+    public String getParentUri() {
+        if (isHomeFolder()) {
+            return uri;
+        }
+        return StringUtils.substringBeforeLast(uri, "/");
     }
 
     /**
@@ -550,10 +719,10 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
     }
 
     /**
-     * @return the parentFolder
+     * @return the folder
      */
-    public FolderItemDTO getParentFolder() {
-        return parentFolder;
+    public FolderItemDTO getFolder() {
+        return folder;
     }
 
     /**
@@ -564,18 +733,26 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
     }
 
     /**
-     * @return the renameItems
+     * @param folderItems
+     *            the folderItems to set
      */
-    public List<RenameFolderItemDTO> getRenameItems() {
-        return renameItems;
+    public void setFolderItems(List<FolderItemDTO> folderItems) {
+        this.folderItems = folderItems;
     }
 
     /**
-     * @param renameItems
-     *            the renameItems to set
+     * @return the selectedItems
      */
-    public void setRenameItems(List<RenameFolderItemDTO> renameItems) {
-        this.renameItems = renameItems;
+    public List<RenameFolderItemDTO> getSelectedItems() {
+        return selectedItems;
+    }
+
+    /**
+     * @param selectedItems
+     *            the selectedItems to set
+     */
+    public void setSelectedItems(List<RenameFolderItemDTO> selectedItems) {
+        this.selectedItems = selectedItems;
     }
 
     /**
@@ -621,6 +798,36 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
      */
     public void setReplaceExisting(boolean replaceExisting) {
         this.replaceExisting = replaceExisting;
+    }
+
+    /**
+     * @return the renameItems
+     */
+    public List<RenameFolderItemDTO> getRenameItems() {
+        return renameItems;
+    }
+
+    /**
+     * @param renameItems
+     *            the renameItems to set
+     */
+    public void setRenameItems(List<RenameFolderItemDTO> renameItems) {
+        this.renameItems = renameItems;
+    }
+
+    /**
+     * @return the label
+     */
+    public String getLabel() {
+        return label;
+    }
+
+    /**
+     * @param label
+     *            the label to set
+     */
+    public void setLabel(String label) {
+        this.label = label;
     }
 
 }

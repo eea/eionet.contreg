@@ -34,13 +34,16 @@ import org.openrdf.OpenRDFException;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
+import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.ContextStatementImpl;
 import org.openrdf.query.BindingSet;
 import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryException;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
+import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.FolderDAO;
 import eionet.cr.dao.readers.ResultSetReaderException;
@@ -59,7 +62,7 @@ import eionet.cr.web.security.CRUser;
 
 /**
  * Virtuoso implementation for the {@link FolderDAO}.
- * 
+ *
  * @author Jaanus Heinlaid
  */
 public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
@@ -69,12 +72,7 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
 
     /** */
     private static final String INSERT_NEVER_HARVESTED_SOURCE_SQL =
-        "insert soft HARVEST_SOURCE (URL,URL_HASH,TIME_CREATED,INTERVAL_MINUTES) values (?,?,now(),0)";
-
-    /** */
-    private static final String FOLDER_EXISTS_SPARQL = SPARQLQueryUtil.getCrInferenceDefinitionStr()
-    + " select distinct ?s where {?s a <" + Subjects.CR_FOLDER + ">. ?parentFolder <" + Predicates.CR_HAS_FOLDER
-    + "> ?s. filter (?s=?folderUri)} limit 1";
+            "insert soft HARVEST_SOURCE (URL,URL_HASH,TIME_CREATED,INTERVAL_MINUTES) values (?,?,now(),0)";
 
     /**
      * @see eionet.cr.dao.FolderDAO#createUserHomeFolder(java.lang.String)
@@ -121,7 +119,7 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
      * @see eionet.cr.dao.FolderDAO#createFolder(java.lang.String, java.lang.String)
      */
     @Override
-    public void createFolder(String parentFolderUri, String folderName) throws DAOException {
+    public void createFolder(String parentFolderUri, String folderName, String folderLabel) throws DAOException {
 
         // Make sure we have valid inputs.
         if (StringUtils.isBlank(parentFolderUri) || StringUtils.isBlank(folderName)) {
@@ -129,7 +127,7 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
         }
 
         // Remove trailing "/" from parent URI, if such exists
-        if (parentFolderUri.endsWith("/")){
+        if (parentFolderUri.endsWith("/")) {
             parentFolderUri = StringUtils.substringBeforeLast(parentFolderUri, "/");
         }
 
@@ -156,14 +154,16 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
             URI rdfType = vf.createURI(Predicates.RDF_TYPE);
             URI rdfsLabel = vf.createURI(Predicates.RDFS_LABEL);
             URI allowSubObjectType = vf.createURI(Predicates.CR_ALLOW_SUBOBJECT_TYPE);
-            Literal folderLabel = vf.createLiteral(folderName);
+            Literal folderLabelLiteral = vf.createLiteral(folderLabel);
             URI folder = vf.createURI(Subjects.CR_FOLDER);
             URI file = vf.createURI(Subjects.CR_FILE);
 
             ArrayList<Statement> statements = new ArrayList<Statement>();
             statements.add(new ContextStatementImpl(parentFolder, hasFolder, newFolder, parentFolder));
             statements.add(new ContextStatementImpl(newFolder, rdfType, folder, parentFolder));
-            statements.add(new ContextStatementImpl(newFolder, rdfsLabel, folderLabel, parentFolder));
+            if (StringUtils.isNotEmpty(folderLabel)) {
+                statements.add(new ContextStatementImpl(newFolder, rdfsLabel, folderLabelLiteral, parentFolder));
+            }
             statements.add(new ContextStatementImpl(newFolder, allowSubObjectType, folder, parentFolder));
             statements.add(new ContextStatementImpl(newFolder, allowSubObjectType, file, parentFolder));
             repoConn.add(statements);
@@ -189,7 +189,7 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
      * @see eionet.cr.dao.FolderDAO#folderExists(java.lang.String, java.lang.String)
      */
     @Override
-    public boolean folderExists(String parentFolderUri, String folderName) throws DAOException {
+    public boolean fileOrFolderExists(String parentFolderUri, String folderName) throws DAOException {
 
         // Make sure we have valid inputs.
         if (StringUtils.isBlank(parentFolderUri) || StringUtils.isBlank(folderName)) {
@@ -201,14 +201,14 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
             parentFolderUri = parentFolderUri + "/";
         }
 
-        return folderExists(parentFolderUri + folderName);
+        return fileOrFolderExists(parentFolderUri + folderName);
     }
 
     /**
      * @see eionet.cr.dao.FolderDAO#folderExists(java.lang.String)
      */
     @Override
-    public boolean folderExists(String folderUri) throws DAOException {
+    public boolean fileOrFolderExists(String folderUri) throws DAOException {
 
         // Make sure we have valid inputs.
         if (StringUtils.isBlank(folderUri)) {
@@ -219,8 +219,23 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
         Bindings bindings = new Bindings();
         bindings.setURI("parentFolder", parentFolderUri);
         bindings.setURI("folderUri", folderUri);
-        Object o = executeUniqueResultSPARQL(FOLDER_EXISTS_SPARQL, bindings, new SingleObjectReader<Object>());
-        return o != null && o.toString().equals(folderUri);
+        bindings.setURI("crFolder", Subjects.CR_FOLDER);
+        bindings.setURI("crHasFolder", Predicates.CR_HAS_FOLDER);
+        bindings.setURI("crHasFile", Predicates.CR_HAS_FILE);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(SPARQLQueryUtil.getCrInferenceDefinitionStr());
+        sb.append("select count(*) where { ");
+        sb.append("?parentFolder ?p ?o . ");
+        sb.append("filter (?p IN (?crHasFolder, ?crHasFile)) . ");
+        sb.append("filter (?o = ?folderUri) }  ");
+
+        String result = executeUniqueResultSPARQL(sb.toString(), bindings, new SingleObjectReader<String>());
+
+        if (Integer.parseInt(result) > 0) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -242,10 +257,9 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
         bindings.setURI("crLastModified", Predicates.CR_LAST_MODIFIED);
 
         StringBuilder sb = new StringBuilder();
-        sb.append("SELECT ?type, ?item, ?title, ?label, ?lastModified WHERE { ");
+        sb.append("SELECT ?type, ?item, ?label, ?lastModified WHERE { ");
         sb.append("?folderUri ?type ?item . ");
         sb.append("OPTIONAL { ?item ?rdfsLabel ?label } . ");
-        sb.append("OPTIONAL { ?item ?dcTitle ?title } . ");
         sb.append("OPTIONAL { ?item ?crLastModified ?lastModified } . ");
         sb.append("FILTER (?type IN (?hasFile, ?hasFolder))");
         sb.append("}");
@@ -271,9 +285,6 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
                 FolderItemDTO item = new FolderItemDTO();
                 item.setUri(bindingSet.getValue("item").stringValue());
                 item.setName(URIUtil.extractURILabel(item.getUri()));
-                if (bindingSet.getValue("title") != null && StringUtils.isNotEmpty(bindingSet.getValue("title").stringValue())) {
-                    item.setTitle(bindingSet.getValue("item").stringValue());
-                }
                 if (bindingSet.getValue("label") != null && StringUtils.isNotEmpty(bindingSet.getValue("label").stringValue())) {
                     item.setTitle(bindingSet.getValue("label").stringValue());
                 }
@@ -302,7 +313,111 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
     }
 
     /**
-     * 
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean folderHasItems(String folderUri) throws DAOException {
+        Bindings bindings = new Bindings();
+        bindings.setURI("folderUri", folderUri);
+        bindings.setURI("hasFile", Predicates.CR_HAS_FILE);
+        bindings.setURI("hasFolder", Predicates.CR_HAS_FOLDER);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT count(*) WHERE { ");
+        sb.append("?folderUri ?type ?item . ");
+        sb.append("FILTER (?type IN (?hasFile, ?hasFolder))");
+        sb.append("}");
+
+        String result = executeUniqueResultSPARQL(sb.toString(), bindings, new SingleObjectReader<String>());
+
+        if (Integer.parseInt(result) > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void deleteFolder(String folderUri) throws DAOException {
+        String parentFolderUri = StringUtils.substringBeforeLast(folderUri, "/");
+
+        Connection sqlConn = null;
+        RepositoryConnection repoConn = null;
+        try {
+            repoConn = SesameUtil.getRepositoryConnection();
+            ValueFactory valueFactory = repoConn.getValueFactory();
+
+            URI folder = valueFactory.createURI(folderUri);
+            URI hasFolder = valueFactory.createURI(Predicates.CR_HAS_FOLDER);
+            URI parentFolder = valueFactory.createURI(parentFolderUri);
+            URI harvesterContext = valueFactory.createURI(GeneralConfig.HARVESTER_URI);
+            // TODO: also add registrations graph context - http://127.0.0.1:8080/cr/home/voolajuh/registrations
+
+            repoConn.remove(folder, null, null, parentFolder, harvesterContext);
+            repoConn.remove(parentFolder, hasFolder, (Value) folder, parentFolder);
+
+        } catch (RepositoryException e) {
+            throw new DAOException(e.toString(), e);
+        } finally {
+            SesameUtil.close(repoConn);
+            SQLUtil.close(sqlConn);
+        }
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void deleteFileUris(String folderUri, List<String> subjectUris) throws DAOException {
+
+        if (subjectUris == null || subjectUris.size() == 0) {
+            return;
+        }
+
+        Connection sqlConn = null;
+        RepositoryConnection repoConn = null;
+        try {
+            repoConn = SesameUtil.getRepositoryConnection();
+            ValueFactory valueFactory = repoConn.getValueFactory();
+
+            StringBuilder strBuilder = new StringBuilder();
+            for (String subjectUri : subjectUris) {
+
+                URI subjectResource = valueFactory.createURI(subjectUri);
+                URI folderContext = valueFactory.createURI(folderUri);
+                URI harvesterContext = valueFactory.createURI(GeneralConfig.HARVESTER_URI);
+
+                // JH190511: although Sesame API claims that in RepositoryConnection.remove(...)
+                // the context is optional, Virtuoso requires the context (i.e. the graph) always
+                // to be specified in triple removal commands. Virtuoso Sesame driver seems to
+                // silently ignore the whole command, if no context specified.
+                repoConn.remove(subjectResource, null, null, folderContext, harvesterContext);
+                repoConn.remove(null, null, (Value) subjectResource, folderContext, harvesterContext);
+
+                if (strBuilder.length() > 0) {
+                    strBuilder.append(",");
+                }
+                strBuilder.append(Hashes.spoHash(subjectUri));
+            }
+
+            sqlConn = getSQLConnection();
+            SQLUtil.executeUpdate("delete from SPO_BINARY where SUBJECT in (" + strBuilder + ")", sqlConn);
+
+        } catch (RepositoryException e) {
+            throw new DAOException(e.toString(), e);
+        } catch (SQLException e) {
+            throw new DAOException(e.toString(), e);
+        } finally {
+            SesameUtil.close(repoConn);
+            SQLUtil.close(sqlConn);
+        }
+    }
+
+    /**
+     *
      * @param user
      * @return
      */
@@ -395,4 +510,5 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
             }
         }
     }
+
 }

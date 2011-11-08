@@ -50,6 +50,7 @@ import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.filestore.FileStore;
+import eionet.cr.util.URIUtil;
 import eionet.cr.web.util.CharsetToolkit;
 
 /**
@@ -93,7 +94,6 @@ public class UploadCSVActionBean extends AbstractActionBean {
      * @return ForwardResolution
      */
     public Resolution upload() {
-        // TODO: support other folders
 
         try {
             if (file != null) {
@@ -104,12 +104,13 @@ public class UploadCSVActionBean extends AbstractActionBean {
                 CSVReader reader = new CSVReader(file.getReader(), delimeter);
                 columns = reader.readNext();
 
-                // Save file under user/files folder
+                // Save file under home folder path
                 fileName = file.getFileName();
-                File storedFile = FileStore.getInstance(getUserName()).add(file.getFileName(), true, file.getInputStream());
+                String fileHomePath = URIUtil.extractPathInUserHome(uri + "/" + fileName);
+                File storedFile = FileStore.getInstance(getUserName()).add(fileHomePath, true, file.getInputStream());
                 filePath = storedFile.getAbsolutePath();
 
-                String subjectUri = appUrl + "/home/" + getUserName() + "/" + StringUtils.replace(fileName, " ", "%20");
+                String subjectUri = uri + "/" + StringUtils.replace(fileName, " ", "%20");
 
                 // Store file as new source, but don't harvest it
                 addSource(subjectUri);
@@ -146,7 +147,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
             File file = new File(filePath);
             Charset guessedCharset = CharsetToolkit.guessEncoding(file, 4096, Charset.forName("UTF-8"));
 
-            String graphName = appUrl + "/home/" + getUserName() + "/" + StringUtils.replace(fileName, " ", "%20");
+            String graphName = uri + "/" + StringUtils.replace(fileName, " ", "%20");
             String type = graphName + "/" + objectType;
 
             CSVReader reader = new CSVReader(new InputStreamReader(new FileInputStream(file), guessedCharset), delimeter);
@@ -228,8 +229,6 @@ public class UploadCSVActionBean extends AbstractActionBean {
                 }
                 DAOFactory.get().getDao(HelperDAO.class).addTriples(subject);
             }
-            // addSystemMessage("File successfully imported and stored under your <a href=\"" + getUser().getHomeUri()
-            // + "\">home folder</a>!");
 
         } catch (Exception e) {
             System.out.println("Exception while reading csv file: " + e);
@@ -237,14 +236,8 @@ public class UploadCSVActionBean extends AbstractActionBean {
             return resolution;
         }
 
-        // If everything went successfully then redirect to the uploads list
-        if (StringUtils.isNotEmpty(uri)) {
-            resolution = new RedirectResolution("/folder.action");
-            ((RedirectResolution) resolution).addParameter("uri", uri);
-        } else {
-            resolution = new RedirectResolution("/home/" + getUserName() + "/uploads");
-
-        }
+        // If everything went successfully then redirect to the folder items list
+        resolution = new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
         return resolution;
     }
 
@@ -295,8 +288,8 @@ public class UploadCSVActionBean extends AbstractActionBean {
 
         // prepare cr:hasFile predicate
         ObjectDTO objectDTO = new ObjectDTO(subjectUri, false);
-        objectDTO.setSourceUri(getUser().getHomeUri());
-        SubjectDTO homeSubjectDTO = new SubjectDTO(getUser().getHomeUri(), false);
+        objectDTO.setSourceUri(uri);
+        SubjectDTO homeSubjectDTO = new SubjectDTO(uri, false);
         homeSubjectDTO.addObject(Predicates.CR_HAS_FILE, objectDTO);
 
         logger.debug("Creating the cr:hasFile predicate");
@@ -307,7 +300,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
             // since user's home URI was used above as triple source, add it to HARVEST_SOURCE too
             // (but set interval minutes to 0, to avoid it being background-harvested)
             DAOFactory.get().getDao(HarvestSourceDAO.class)
-            .addSourceIgnoreDuplicate(HarvestSourceDTO.create(getUser().getHomeUri(), false, 0, getUserName()));
+            .addSourceIgnoreDuplicate(HarvestSourceDTO.create(uri, false, 0, getUserName()));
 
         } catch (DAOException e) {
             e.printStackTrace();

@@ -19,6 +19,8 @@
             <table>
                 <c:forEach var="item" items="${actionBean.renameItems}" varStatus="loop">
                     <stripes:hidden name="renameItems[${loop.index}].uri" value="${item.uri}"/>
+                    <stripes:hidden name="renameItems[${loop.index}].type" value="${item.type}"/>
+                    <stripes:hidden name="renameItems[${loop.index}].name" value="${item.name}"/>
                     <tr>
                         <td style="padding-right:20px">${item.name}</td>
                         <td>to:&nbsp;<stripes:text name="renameItems[${loop.index}].newName"  value="${item.newName}"/></td>

@@ -219,7 +219,8 @@ public class URIUtil {
     /**
      * Detects if the given URI starts with a CR user home.
      *
-     * @param uri The given URI.
+     * @param uri
+     *            The given URI.
      * @return See description above..
      */
     public static boolean startsWithUserHome(String uri) {
@@ -239,11 +240,11 @@ public class URIUtil {
     }
 
     /**
-     * Returns true if {@link URIUtil#startsWithUserHome(String)} true and it is a reserved URI.
-     * For resreved URIs, see {@link CRUser#getReservedFolderAndFileUris(String)}.
-     * Otherwise returns false.
+     * Returns true if {@link URIUtil#startsWithUserHome(String)} true and it is a reserved URI. For resreved URIs, see
+     * {@link CRUser#getReservedFolderAndFileUris(String)}. Otherwise returns false.
      *
-     * @param uri The given URI.
+     * @param uri
+     *            The given URI.
      * @return See method description.
      */
     public static boolean isUserReservedUri(String uri) {
@@ -253,10 +254,11 @@ public class URIUtil {
     }
 
     /**
-     * Extracts user name from the given URI. A user name is returned only if the given URI
-     * returns true for {@link URIUtil#startsWithUserHome(String)}. Otherwise null is returned.
+     * Extracts user name from the given URI. A user name is returned only if the given URI returns true for
+     * {@link URIUtil#startsWithUserHome(String)}. Otherwise null is returned.
      *
-     * @param uri The given URI.
+     * @param uri
+     *            The given URI.
      * @return See method description.
      */
     public static String extractUserName(String uri) {
@@ -266,8 +268,27 @@ public class URIUtil {
         }
 
         String str =
-            StringUtils.substringAfter(uri, GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL) + "/home/");
+                StringUtils.substringAfter(uri, GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL) + "/home/");
         return StringUtils.substringBefore(str, "/");
+    }
+
+    /**
+     * Returns the path after the user home folder. For example
+     * if uri is "http://127.0.0.1:8080/cr/home/heinlja/newFolder/newFile.txt" the result is "newFolder/newFile".
+     * @param uri
+     * @return
+     */
+    public static String extractPathInUserHome(String uri) {
+        if (!URIUtil.startsWithUserHome(uri)) {
+            return null;
+        }
+
+        String userName = extractUserName(uri);
+
+        String result =
+                StringUtils.substringAfter(uri, GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL) + "/home/"
+                        + userName + "/");
+        return result;
     }
 
     public static void main(String[] args) {

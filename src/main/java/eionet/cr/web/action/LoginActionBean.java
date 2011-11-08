@@ -88,7 +88,7 @@ public class LoginActionBean extends AbstractActionBean {
             // create his/her home folder. First time means no
             // home folder currently existing in the triple store.
             FolderDAO dao = DAOFactory.get().getDao(FolderDAO.class);
-            if (!dao.folderExists(user.getHomeUri())){
+            if (!dao.fileOrFolderExists(user.getHomeUri())){
 
                 LOGGER.debug("Going to create home folder for user " + user.getUserName());
 

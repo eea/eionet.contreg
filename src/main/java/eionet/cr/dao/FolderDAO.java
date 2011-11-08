@@ -37,43 +37,79 @@ public interface FolderDAO extends DAO {
      * Creates home folder for the given user name. The latter must not be null or blank! Creates also all reserved folders under
      * the newly created home folder.
      *
-     * @param userName Given user name
-     * @throws DAOException Thrown when a database-access error occurs.
+     * @param userName
+     *            Given user name
+     * @throws DAOException
+     *             Thrown when a database-access error occurs.
      */
     void createUserHomeFolder(String userName) throws DAOException;
 
     /**
-     * Creates a new folder in the given parent folder. Both given parameters must not be null
-     * or blank.
+     * Creates a new folder in the given parent folder. Both given parameters must not be null or blank.
      *
-     * @param parentFolderUri URI of the new folder's parent folder.
-     * @param folderName The new folder's name.
-     * @throws DAOException Thrown when a database-access error occurs.
+     * @param parentFolderUri
+     *            URI of the new folder's parent folder.
+     * @param folderName
+     *            The new folder's name.
+     * @param folderLabel
+     *            The logical folder's name.
+     * @throws DAOException
+     *             Thrown when a database-access error occurs.
      */
-    void createFolder(String parentFolderUri, String folderName) throws DAOException;
+    void createFolder(String parentFolderUri, String folderName, String folderLabel) throws DAOException;
 
     /**
-     * Returns true if a folder with the given name exists in the given parent folder.
-     * If it doesn't exist, returns false. Both given parameters must not be null or blank.
+     * Returns true if a folder or file with the given name exists in the given parent folder. If it doesn't exist, returns false.
+     * Both given parameters must not be null or blank.
      *
-     * @param parentFolderUri The given parent folder URI.
-     * @param folderName The given folder name.
+     * @param parentFolderUri
+     *            The given parent folder URI.
+     * @param folderName
+     *            The given folder name.
      *
      * @return See description above.
      * @throws DAOException
      */
-    boolean folderExists(String parentFolderUri, String folderName) throws DAOException;
+    boolean fileOrFolderExists(String parentFolderUri, String folderName) throws DAOException;
 
     /**
-     * Returns true if a folder with the given URI exists, otherwise returns false.
-     * The given URI must not be null.
+     * Returns true if a folder or file with the given URI exists, otherwise returns false. The given URI must not be null.
      *
-     * @param folderUri The given folder URI.
+     * @param folderUri
+     *            The given folder URI.
      *
      * @return See description above.
      * @throws DAOException
      */
-    boolean folderExists(String folderUri) throws DAOException;
+    boolean fileOrFolderExists(String folderUri) throws DAOException;
+
+    /**
+     * True, if folder is not empty and has files or folders.
+     *
+     * @param folderUri
+     *            The given folder URI.
+     *
+     * @return
+     * @throws DAOException
+     */
+    boolean folderHasItems(String folderUri) throws DAOException;
+
+    /**
+     * Deletes folder from triplestore and from filesystem.
+     *
+     * @param folderUri
+     * @throws DAOException
+     */
+    void deleteFolder(String folderUri) throws DAOException;
+
+    /**
+     * Deletes uploaded files data.
+     *
+     * @param folderUri
+     * @param subjectUris
+     * @throws DAOException
+     */
+    void deleteFileUris(String folderUri, List<String> subjectUris) throws DAOException;
 
     /**
      * Returns the contents (files and folders) of the folder with given uri. The Pair.left is the current folder and Pair.right is

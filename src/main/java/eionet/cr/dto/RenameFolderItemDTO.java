@@ -22,7 +22,7 @@
 package eionet.cr.dto;
 
 /**
- * Type definition ...
+ * Folder item object that is used for selecting, renaming and deleting.
  *
  * @author Juhan Voolaid
  */
@@ -33,6 +33,10 @@ public class RenameFolderItemDTO {
     private String name;
 
     private String newName;
+
+    private FolderItemDTO.Type type;
+
+    private boolean selected;
 
     /**
      * @return the uri
@@ -77,6 +81,36 @@ public class RenameFolderItemDTO {
      */
     public void setNewName(String newName) {
         this.newName = newName;
+    }
+
+    /**
+     * @return the type
+     */
+    public FolderItemDTO.Type getType() {
+        return type;
+    }
+
+    /**
+     * @param type
+     *            the type to set
+     */
+    public void setType(FolderItemDTO.Type type) {
+        this.type = type;
+    }
+
+    /**
+     * @return the selected
+     */
+    public boolean isSelected() {
+        return selected;
+    }
+
+    /**
+     * @param selected
+     *            the selected to set
+     */
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 
 }
