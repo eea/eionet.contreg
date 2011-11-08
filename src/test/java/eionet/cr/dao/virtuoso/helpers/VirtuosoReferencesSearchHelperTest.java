@@ -28,7 +28,7 @@ public class VirtuosoReferencesSearchHelperTest extends TestCase {
     public static void testOrderedQuery() {
         PagingRequest pagingRequest = PagingRequest.create(1);
         SortingRequest sortingRequest =
-                new SortingRequest("http://www.w3.org/2000/01/rdf-schema#label", SortOrder.parse(SortOrder.ASCENDING.toString()));
+            new SortingRequest("http://www.w3.org/2000/01/rdf-schema#label", SortOrder.parse(SortOrder.ASCENDING.toString()));
         String subjectUri = "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property";
         // create query helper
         VirtuosoReferencesSearchHelper helper = new VirtuosoReferencesSearchHelper(subjectUri, pagingRequest, sortingRequest);
@@ -37,16 +37,16 @@ public class VirtuosoReferencesSearchHelperTest extends TestCase {
 
         assertEquals(
                 "select distinct ?s where {?s ?p ?o. filter(isURI(?o) && ?o=?subjectUri) . OPTIONAL {?s ?sortPredicate ?oorderby }}"
-                        + " ORDER BY asc(bif:either( bif:isnull(?oorderby) , (bif:lcase(bif:subseq (bif:replace (?s, '/', '#'), "
-                        + "bif:strrchr (bif:replace (?s, '/', '#'), '#')+1))) , bif:lcase(?oorderby))) limit 15 offset 0", sparql);
+                + " ORDER BY asc(bif:either( bif:isnull(?oorderby) , (bif:lcase(bif:subseq (bif:replace (?s, '/', '#'), "
+                + "bif:strrchr (bif:replace (?s, '/', '#'), '#')+1))) , bif:lcase(?oorderby))) limit 15 offset 0", sparql);
         assertTrue(helper.getQueryBindings().toString().indexOf("sortPredicate=http://www.w3.org/2000/01/rdf-schema#label") != -1);
     }
 
     public static void testOrderedByReference() {
         PagingRequest pagingRequest = PagingRequest.create(1);
         SortingRequest sortingRequest =
-                new SortingRequest(ReferringPredicatesColumn.class.getSimpleName(), SortOrder.parse(SortOrder.DESCENDING
-                        .toString()));
+            new SortingRequest(ReferringPredicatesColumn.class.getSimpleName(), SortOrder.parse(SortOrder.DESCENDING
+                    .toString()));
         String subjectUri = "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property";
         // create query helper
         VirtuosoReferencesSearchHelper helper = new VirtuosoReferencesSearchHelper(subjectUri, pagingRequest, sortingRequest);
@@ -76,19 +76,16 @@ public class VirtuosoReferencesSearchHelperTest extends TestCase {
 
         String sourceUri = "http://goodsource.eea.europa.eu";
         String query = helper.getSubjectsDataQuery(subjectUris, sourceUri);
-        assertEquals("select * where {graph ?g {?s ?p ?o. filter "
-                + "(?s IN (?subjectUriValue1,?subjectUriValue2,?subjectUriValue3)) . "
-                + "filter(?p = <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> " + "|| (isURI(?o) && ?o=?sourceUri)). "
-                + "OPTIONAL {?g <http://cr.eionet.europa.eu/ontologies/contreg.rdf#contentLastModified> ?t} }} ORDER BY ?s", query);
-        // select * where {graph ?g {?s ?p ?o. filter (?s IN (<http://subjecturi1.nowhere.com>,
-        // <http://subjecturispecial21.somwhere.eu>, <_:blankuri>)) . filter(?p IN
-        // (<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>, <http://www.w3.org/1999/02/22-rdf-syntax-ns#type>) || (isURI(?o) &&
-        // ?o=<http://goodsource.eea.europa.eu>)). OPTIONAL {?g
-        // <http://cr.eionet.europa.eu/ontologies/contreg.rdf#contentLastModified> ?t} }} ORDER BY ?s
-        assertTrue(helper.getSubjectDataBindings().toString().indexOf("subjectUriValue2=http://subjecturispecial21.somwhere.eu") != -1);
-        assertTrue(helper.getSubjectDataBindings().toString().indexOf("sourceUri=http://goodsource.eea.europa.eu") != -1);
+        assertEquals(
+                "select * where {graph ?g {?s ?p ?o. filter (?s IN (?subjectUriValue1,?subjectUriValue2,?subjectUriValue3)) . "
+                + "filter(?p = <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> || (isURI(?o) && ?o=?sourceUri))}} "
+                + "ORDER BY ?s", query);
+        // assertTrue(helper.getSubjectDataBindings().toString().indexOf("subjectUriValue2=http://subjecturispecial21.somwhere.eu")
+        // != -1);
+        // assertTrue(helper.getSubjectDataBindings().toString().indexOf("sourceUri=http://goodsource.eea.europa.eu") != -1);
         // main bindings must not be used:
-        assertTrue(helper.getQueryBindings().toString().indexOf("subjectUriValue2=http://subjecturispecial21.somwhere.eu") == -1);
+        // assertTrue(helper.getQueryBindings().toString().indexOf("subjectUriValue2=http://subjecturispecial21.somwhere.eu") ==
+        // -1);
 
     }
 

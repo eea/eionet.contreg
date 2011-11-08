@@ -28,7 +28,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import eionet.cr.dto.TagDTO;
-import eionet.cr.test.helpers.DbHelper;
+import eionet.cr.test.helpers.RdfLoader;
 
 /**
  *
@@ -37,9 +37,11 @@ import eionet.cr.test.helpers.DbHelper;
  */
 public class TagsDAOTest {
 
+    private static final String seedFile = "tags.rdf";
+
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-        DbHelper.handleDbSetUpOperation("tags-db.xml");
+        new RdfLoader(seedFile);
     }
 
     @Test

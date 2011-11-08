@@ -39,12 +39,6 @@ public class GeneralConfig {
     public static final String PROPERTIES_FILE_NAME = "cr.properties";
 
     /** */
-    public static final String DB_URL = "db.url";
-    public static final String DB_DRV = "db.drv";
-    public static final String DB_USR = "db.usr";
-    public static final String DB_PWD = "db.pwd";
-
-    /** */
     public static final String HARVESTER_FILES_LOCATION = "harvester.tempFileDir";
     public static final String HARVESTER_BATCH_HARVESTING_HOURS = "harvester.batchHarvestingHours";
     public static final String HARVESTER_JOB_INTERVAL_SECONDS = "harvester.batchHarvestingIntervalSeconds";
@@ -90,10 +84,6 @@ public class GeneralConfig {
     /** */
     public static final String VIRTUOSO_DB_ROUSR = "virtuoso.db.rousr";
     public static final String VIRTUOSO_DB_ROPWD = "virtuoso.db.ropwd";
-
-    /** */
-    public static final String VIRTUOSO_UNITTEST_DB_USR = "virtuoso.unittest.db.usr";
-    public static final String VIRTUOSO_UNITTEST_DB_PWD = "virtuoso.unittest.db.pwd";
 
     /**
      * General ruleSet name for inferencing. Schema sources are added into that ruleset.

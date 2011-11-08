@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	 xmlns:owl="http://www.w3.org/2002/07/owl#"
+	 xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+
+	<owl:Ontology rdf:about="">
+		<rdfs:label>Test schema</rdfs:label>
+		<owl:versionInfo>$Id: schema.rdf 8218 2010-03-24 12:04:40Z roug $</owl:versionInfo>
+	</owl:Ontology>
+
+	<rdfs:Class rdf:ID="Person">
+		<rdfs:label>Person</rdfs:label>
+		<rdfs:comment>A person</rdfs:comment>
+	</rdfs:Class>
+
+	<rdf:Property rdf:ID="personName">
+		<rdfs:label>Name</rdfs:label>
+		<rdfs:domain rdf:resource="#Person"/>
+		<rdfs:subPropertyOf rdf:resource="http://www.w3.org/2000/01/rdf-schema#label"/>
+	</rdf:Property>
+
+	<owl:ObjectProperty rdf:ID="hasChild">
+		<owl:inverseOf rdf:resource="#hasParent"/>
+		<rdfs:domain rdf:resource="#Person"/>
+	</owl:ObjectProperty>
+
+	<owl:ObjectProperty rdf:ID="hasParent">
+		<owl:inverseOf rdf:resource="#hasChild"/>
+		<rdfs:domain rdf:resource="#Person"/>
+	</owl:ObjectProperty>
+
+</rdf:RDF>

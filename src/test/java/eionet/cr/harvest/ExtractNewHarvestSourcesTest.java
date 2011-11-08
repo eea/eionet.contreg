@@ -20,7 +20,6 @@
  * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.harvest;
 
-import java.net.URL;
 import java.util.List;
 
 import org.dbunit.dataset.IDataSet;
@@ -53,12 +52,22 @@ public class ExtractNewHarvestSourcesTest extends CRDatabaseTestCase {
     public void test() {
 
         try {
-            URL url = getClass().getClassLoader().getResource("extract-new-sources.xml");
-            Harvest harvest = new PullHarvest(url.toString());
+            String url =
+                "https://svn.eionet.europa.eu/repositories/Reportnet/cr3/trunk/src/test/resources/extract-new-sources.xml";
+
+            HarvestSourceDTO source = new HarvestSourceDTO();
+            source.setUrl(url);
+            source.setIntervalMinutes(5);
+            source.setPrioritySource(true);
+            source.setEmails("bob@europe.eu");
+            DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(source);
+
+            Harvest harvest = new PullHarvest(url);
             harvest.execute();
 
             Pair<Integer, List<HarvestSourceDTO>> resultPair =
-                DAOFactory.get().getDao(HarvestSourceDAO.class).getPrioritySources(null, null, null);
+                DAOFactory.get().getDao(HarvestSourceDAO.class)
+                .getHarvestSources("http://test.com/datasets#dataset2", null, null);
             assertNotNull(resultPair);
             assertNotNull(resultPair.getLeft());
             assertNotNull(resultPair.getRight());
@@ -67,8 +76,8 @@ public class ExtractNewHarvestSourcesTest extends CRDatabaseTestCase {
 
             HarvestSourceDTO harvestSource = resultPair.getRight().get(0);
             assertNotNull(harvestSource);
-            assertEquals("http://test.com/datasets", harvestSource.getUrl());
-            assertEquals(Hashes.spoHash("http://test.com/datasets"), harvestSource.getUrlHash().longValue());
+            assertEquals("http://test.com/datasets#dataset2", harvestSource.getUrl());
+            assertEquals(Hashes.spoHash("http://test.com/datasets#dataset2"), harvestSource.getUrlHash().longValue());
         } catch (Throwable e) {
             e.printStackTrace();
             fail("Was not expecting this exception: " + e.toString());

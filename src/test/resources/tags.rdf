@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <rdf:RDF xmlns="http://cr.eionet.europa.eu/ontologies/contreg.rdf#"
+ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+ xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+<rdf:Description rdf:about="http://www.google.com">
+	<tag>tag1</tag>
+	<tag>tag2</tag>
+	<tag>tag3</tag>
+	<tag>tag4</tag>
+</rdf:Description>
+<rdf:Description rdf:about="http://www.yahoo.com">
+	<tag>tag2</tag>
+	<tag>tag3</tag>
+	<tag>tag4</tag>
+</rdf:Description>
+<rdf:Description rdf:about="http://www.bing.com">
+	<tag>tag3</tag>
+	<tag>tag4</tag>
+</rdf:Description>
+<rdf:Description rdf:about="http://www.altavista.com">
+	<tag>tag4</tag>
+</rdf:Description>
+</rdf:RDF>

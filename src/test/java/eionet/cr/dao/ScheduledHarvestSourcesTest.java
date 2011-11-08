@@ -49,17 +49,15 @@ public class ScheduledHarvestSourcesTest extends CRDatabaseTestCase {
         source.setIntervalMinutes(5);
         source.setPrioritySource(false);
         source.setEmails("bob@europe.eu");
-
         dao.addSource(source);
+
+        source.setUrl("http://rod.eionet.europa.eu/testObligations2");
         source.setIntervalMinutes(10);
         dao.addSource(source);
-        source.setIntervalMinutes(15);
-        dao.addSource(source);
-        source.setIntervalMinutes(20);
-        dao.addSource(source);
 
-        List<HarvestSourceDTO> dtos = dao.getNextScheduledSources(1);
+        List<HarvestSourceDTO> dtos = dao.getNextScheduledSources(10);
         assertNotNull(dtos);
-        assertEquals(4, dtos.size());
+        // First harvest_source will be available after 5 minutes, that's why the list should be empty
+        assertEquals(0, dtos.size());
     }
 }

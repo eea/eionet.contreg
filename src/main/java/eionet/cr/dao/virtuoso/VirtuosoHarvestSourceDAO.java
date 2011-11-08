@@ -238,7 +238,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      * exists then don't insert (like MySQL INSERT IGNORE)
      */
     private static final String ADD_SOURCE_SQL = "insert soft HARVEST_SOURCE"
-        + " (URL,URL_HASH,EMAILS,TIME_CREATED,INTERVAL_MINUTES,PRIORITY_SOURCE,SOURCE_OWNER)" + " VALUES (?,?,?,NOW(),?,?,?)";
+        + " (URL,URL_HASH,EMAILS,TIME_CREATED,INTERVAL_MINUTES,PRIORITY_SOURCE,SOURCE_OWNER) VALUES (?,?,?,NOW(),?,?,?)";
 
     /*
      * (non-Javadoc)

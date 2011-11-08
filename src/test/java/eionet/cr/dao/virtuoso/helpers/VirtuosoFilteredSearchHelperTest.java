@@ -34,14 +34,8 @@ public class VirtuosoFilteredSearchHelperTest {
 
         String query = helper.getQuery(inParams);
 
-        // assertEquals(query, "DEFINE input:inference'CRInferenceRule' select distinct ?s where { ?s ?p ?o  . "
-        // + "{{?s ?p1 ?o1 . ?s <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?o1} . { ?s ?p1 ?o1 . "
-        // + "FILTER (?o1 = <http://rod.eionet.europa.eu/schema.rdf#Obligation> || "
-        // + "?o1 = \"http://rod.eionet.europa.eu/schema.rdf#Obligation\")}}} limit 15 offset 0");
-
-        assertEquals(query, "DEFINE input:inference'CRInferenceRule' select distinct ?s where { ?s ?p ?o  . "
-                + "{{?s ?p1 ?o1 . ?s ?predicateValue1 ?o1} . { ?s ?p1 ?o1 . " + "FILTER (?o1 = ?objectValue1Uri || "
-                + "?o1 = ?objectValue1Lit)}}} limit 15 offset 0");
+        assertEquals(query, "DEFINE input:inference'CRInferenceRule' select distinct ?s where {?s ?p1 ?o1. "
+                + "filter(?p1 = ?p1Val). filter(?o1 = ?o1Val)} limit 15 offset 0");
 
     }
 
@@ -59,17 +53,10 @@ public class VirtuosoFilteredSearchHelperTest {
 
         String query = helper.getOrderedQuery(inParams);
 
-        assertEquals(query, "DEFINE input:inference'CRInferenceRule' select distinct ?s where { ?s ?p ?o  . {{?s ?p1 ?o1 . "
-                + "?s ?predicateValue1 ?o1} . { ?s ?p1 ?o1 . FILTER bif:contains(?o1, ?objectValue1)}} . "
-                + "OPTIONAL {?s ?sortPredicateValue ?oorderby}} ORDER BY "
-                + "desc(bif:either( bif:isnull(?oorderby) , (bif:lcase(bif:subseq (bif:replace (?s, '/', '#'), "
-                + "bif:strrchr (bif:replace (?s, '/', '#'), '#')+1))) , bif:lcase(?oorderby)))");
-        //
-        // assertEquals(query, "DEFINE input:inference'CRInferenceRule' select distinct ?s where { ?s ?p ?o  . {{?s ?p1 ?o1 . "
-        // + "?s <http://purl.org/dc/elements/1.1/creator> ?o1} . { ?s ?p1 ?o1 . FILTER bif:contains(?o1, \"'Roug'\")}} . "
-        // + "OPTIONAL {?s <http://www.w3.org/2000/01/rdf-schema#label> ?oorderby }} ORDER BY "
-        // + "desc(bif:either( bif:isnull(?oorderby) , (bif:lcase(bif:subseq (bif:replace (?s, '/', '#'), "
-        // + "bif:strrchr (bif:replace (?s, '/', '#'), '#')+1))) , bif:lcase(?oorderby)))");
+        assertEquals(query, "DEFINE input:inference'CRInferenceRule' select distinct ?s where {?s ?p1 ?o1. "
+                + "filter(?p1 = ?p1Val). filter bif:contains(?o1, ?o1Val) . OPTIONAL {?s ?sortPred ?sortObjVal}} "
+                + "order by desc(bif:either( bif:isnull(?sortObjVal) , (bif:lcase(bif:subseq (bif:replace (?s, '/', '#'), "
+                + "bif:strrchr (bif:replace (?s, '/', '#'), '#')+1))) , bif:lcase(?sortObjVal)))");
     }
 
     @Test
@@ -88,17 +75,10 @@ public class VirtuosoFilteredSearchHelperTest {
 
         String query = helper.getUnorderedQuery(inParams);
 
-        assertEquals(query, "DEFINE input:inference'CRInferenceRule' select distinct ?s where { ?s ?p ?o  . {{?s ?p1 ?o1 . "
-                + "?s ?predicateValue1 ?o1} . { ?s ?p1 ?o1 . " + "FILTER (?o1 = ?objectValue1Uri || "
-                + "?o1 = ?objectValue1Lit)}} . " + "{{?s ?p2 ?o2 . ?s ?predicateValue2 ?o2} . { ?s ?p2 ?o2 . "
-                + "FILTER bif:contains(?o2, ?objectValue2)}}}");
-
-        // assertEquals(query, "DEFINE input:inference'CRInferenceRule' select distinct ?s where { ?s ?p ?o  . {{?s ?p1 ?o1 . "
-        // + "?s <http://rod.eionet.europa.eu/schema.rdf#obligation> ?o1} . { ?s ?p1 ?o1 . "
-        // + "FILTER (?o1 = <http://rod.eionet.europa.eu/obligations/15> || "
-        // + "?o1 = \"http://rod.eionet.europa.eu/obligations/15\")}} . "
-        // + "{{?s ?p2 ?o2 . ?s <http://www.w3.org/2000/01/rdf-schema#label> ?o2} . { ?s ?p2 ?o2 . "
-        // + "FILTER bif:contains(?o2, \"'CLRTAP'\")}}}");
+        assertEquals(
+                query,
+                "DEFINE input:inference'CRInferenceRule' select distinct ?s where {?s ?p1 ?o1. "
+                + "filter(?p1 = ?p1Val). filter(?o1 = ?o1Val). ?s ?p2 ?o2. filter(?p2 = ?p2Val). filter bif:contains(?o2, ?o2Val)}");
     }
 
     @Test
@@ -116,20 +96,8 @@ public class VirtuosoFilteredSearchHelperTest {
 
         String paramStr = helper.getWhereContents();
 
-        assertEquals(" . {{?s ?p1 ?o1 . ?s ?predicateValue1 ?o1} . { ?s ?p1 ?o1 . "
-                + "FILTER (?o1 = ?objectValue1Uri || ?o1 = ?objectValue1Lit)}} "
-                + ". {{?s ?p2 ?o2 . ?s ?predicateValue2 ?o2} . { ?s ?p2 ?o2 . "
-                + "FILTER (?o2 = ?objectValue2Uri || ?o2 = ?objectValue2Lit)}} . "
-                + "{{?s ?p3 ?o3 . ?s ?predicateValue3 ?o3} . { ?s ?p3 ?o3 . FILTER bif:contains(?o3, ?objectValue3)}}", paramStr);
-
-        //checkQuery(query, helper.getQueryBindings());
-
-        //
-        // assertEquals(paramStr, " . {{?s ?p1 ?o1 . ?s <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?o1} . { ?s ?p1 ?o1 . "
-        // +"FILTER (?o1 = <http://rod.eionet.europa.eu/schema.rdf#Delivery> || ?o1 = \"http://rod.eionet.europa.eu/schema.rdf#Delivery\")}} "
-        // +". {{?s ?p2 ?o2 . ?s <http://rod.eionet.europa.eu/schema.rdf#obligation> ?o2} . { ?s ?p2 ?o2 . "
-        // +"FILTER (?o2 = <http://rod.eionet.europa.eu/obligations/15> || ?o2 = \"http://rod.eionet.europa.eu/obligations/15\")}} . "
-        // +"{{?s ?p3 ?o3 . ?s <http://www.w3.org/2000/01/rdf-schema#label> ?o3} . { ?s ?p3 ?o3 . FILTER bif:contains(?o3, \"'CLRTAP'\")}}");
+        assertEquals("?s ?p1 ?o1. filter(?p1 = ?p1Val). filter(?o1 = ?o1Val). ?s ?p2 ?o2. filter(?p2 = ?p2Val). "
+                + "filter(?o2 = ?o2Val). ?s ?p3 ?o3. filter(?p3 = ?p3Val). filter bif:contains(?o3, ?o3Val)", paramStr);
     }
 
     private void checkQuery(String query, Bindings bindings) {
@@ -167,17 +135,11 @@ public class VirtuosoFilteredSearchHelperTest {
 
         String query = helper.getOrderedQuery(inParams);
 
-        assertEquals("DEFINE input:inference'CRInferenceRule' select distinct ?s where { ?s ?p ?o  "
-                + ". {{?s ?p1 ?oorderby . ?s ?predicateValue1 ?oorderby} . { ?s ?p1 ?oorderby . FILTER bif:contains(?oorderby, "
-                + "?objectValue1)}}} ORDER BY asc(bif:either( bif:isnull(?oorderby) , "
-                + "(bif:lcase(bif:subseq (bif:replace (?s, '/', '#'), bif:strrchr (bif:replace (?s, '/', '#'), '#')+1))) "
-                + ", bif:lcase(?oorderby)))", query);
-        //
-        // assertEquals(query, "DEFINE input:inference'CRInferenceRule' select distinct ?s where { ?s ?p ?o  . {{?s ?p1 ?o1 . "
-        // + "?s <http://purl.org/dc/elements/1.1/creator> ?o1} . { ?s ?p1 ?o1 . FILTER bif:contains(?o1, \"'Roug'\")}} . "
-        // + "OPTIONAL {?s <http://www.w3.org/2000/01/rdf-schema#label> ?oorderby }} ORDER BY "
-        // + "desc(bif:either( bif:isnull(?oorderby) , (bif:lcase(bif:subseq (bif:replace (?s, '/', '#'), "
-        // + "bif:strrchr (bif:replace (?s, '/', '#'), '#')+1))) , bif:lcase(?oorderby)))");
+        assertEquals(
+                "DEFINE input:inference'CRInferenceRule' select distinct ?s where {?s ?p1 ?o1. "
+                + "filter(?p1 = ?p1Val). filter bif:contains(?o1, ?sortObjVal)} order by asc(bif:either( bif:isnull(?sortObjVal) , "
+                + "(bif:lcase(bif:subseq (bif:replace (?s, '/', '#'), bif:strrchr (bif:replace (?s, '/', '#'), '#')+1))) , "
+                + "bif:lcase(?sortObjVal)))", query);
     }
 
     @Test
@@ -188,16 +150,15 @@ public class VirtuosoFilteredSearchHelperTest {
 
         Map<String, String> filters = new HashMap<String, String>();
         filters.put("http://www.w3.org/2000/01/rdf-schema#label", "ippc");
-        VirtuosoFilteredSearchHelper helper = new VirtuosoFilteredSearchHelper(filters, null, pagingRequest, sortingRequest, false);
+        VirtuosoFilteredSearchHelper helper =
+            new VirtuosoFilteredSearchHelper(filters, null, pagingRequest, sortingRequest, false);
         ArrayList<Object> inParams = new ArrayList<Object>();
 
         String query = helper.getOrderedQuery(inParams);
 
-        assertEquals("select distinct ?s where { ?s ?p ?o  "
-                + ". {{?s ?p1 ?oorderby . ?s ?predicateValue1 ?oorderby} . { ?s ?p1 ?oorderby . FILTER bif:contains(?oorderby, "
-                + "?objectValue1)}}} ORDER BY asc(bif:either( bif:isnull(?oorderby) , "
-                + "(bif:lcase(bif:subseq (bif:replace (?s, '/', '#'), bif:strrchr (bif:replace (?s, '/', '#'), '#')+1))) "
-                + ", bif:lcase(?oorderby)))", query);
+        assertEquals("select distinct ?s where {?s ?p1 ?o1. filter(?p1 = ?p1Val). filter bif:contains(?o1, ?sortObjVal)} "
+                + "order by asc(bif:either( bif:isnull(?sortObjVal) , (bif:lcase(bif:subseq (bif:replace (?s, '/', '#'), "
+                + "bif:strrchr (bif:replace (?s, '/', '#'), '#')+1))) , bif:lcase(?sortObjVal)))", query);
     }
 
 }

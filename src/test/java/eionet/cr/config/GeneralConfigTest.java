@@ -32,24 +32,17 @@ import junit.framework.TestCase;
 public class GeneralConfigTest extends TestCase {
 
     public static void testGetIntPropertyCorrect() {
-//        Properties props = new Properties();
         int propValue = GeneralConfig.getIntProperty("existing.intproperty", 2000);
-
         assertTrue(propValue == 1000);
     }
 
     public static void testGetIntPropertyNotExisting() {
         int propValue = GeneralConfig.getIntProperty("not.existing.intproperty", 2000);
-
         assertTrue(propValue == 2000);
-
     }
 
     public static void testGetIntPropertyWrong() {
         int propValue = GeneralConfig.getIntProperty("wrong.intproperty", 55);
-
         assertTrue(propValue == 55);
-
     }
-
 }

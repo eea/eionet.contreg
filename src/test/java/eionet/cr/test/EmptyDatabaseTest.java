@@ -45,7 +45,7 @@ public class EmptyDatabaseTest extends DatabaseTestCase {
     }
 
     /**
-     * Just a dummy test to simplet clean the database.
+     * Just a dummy test to simply clean the database.
      */
     public void testMe() {
     }

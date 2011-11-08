@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF xmlns:test="http://test.com/test/test-schema.rdf#"
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+	<test:Person rdf:about="http://test.com/test/person/1">
+		<test:personName>Chuck</test:personName>
+		<test:hasChild rdf:resource="http://test.com/test/person/2"/>
+	</test:Person>
+	<test:Person rdf:about="http://test.com/test/person/2">
+		<test:personName>Joe</test:personName>
+	</test:Person>
+</rdf:RDF>

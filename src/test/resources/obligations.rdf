@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <rdf:RDF xmlns:foaf="http://xmlns.com/foaf/0.1/"
+ xmlns:owl="http://www.w3.org/2002/07/owl#"
+ xmlns="http://rod.eionet.europa.eu/schema.rdf#"
+ xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+ xmlns:cc="http://creativecommons.org/ns#"
+ xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+ xmlns:dcterms="http://purl.org/dc/terms/"
+ xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#"
+ xml:base="http://rod.eionet.europa.eu/">
+<Obligation rdf:about="obligations/171">
+	<instrument rdf:resource="instruments/545"/>
+    <dcterms:title>3 yearly report on quality of water for human consumption</dcterms:title>
+    <guidelines>DWD reporting resources include the support files for the reporting under the next request by the Commission (DWD Questionnaire 2011). The Commission letter launching this reporting exercise sets out the reference years for reporting (2008-2010) and provides the background of the main reporting requirements.
+
+The support files consist of help (guidance) documents, schemas, Excel spreadsheets, etc.
+Drinking Water User Manual v1.0 provides support to the workflow for the DWD reporting and explains the main reporting steps for reporting information to the Commission in Reportnet. 
+A common structure to be used in the reporting was agreed in May 2007. The guidance document has been revised and divided into Guidance Document on reporting and Guidance Document on derogations. It presents a new, table-oriented way of reporting, in line with DWD and with the WISE approach for reporting.
+Schemas are developed to supply DWD reporting on the basis of the revised guidance document. Excel spreadsheets are used to import and structure MS data into the required format for the generation of the XML files. 
+
+Additional information related to DWD is available on DG ENV website    http://ec.europa.eu/environment/water/water-drink/reporting_en.html</guidelines>
+    <comment>Directive 98/83/EC has repealed Directive 80/778/EC with effect from five years after the entry into force (i.e. on 25.12.2003).
+
+Transition periods for implementation of the Directive were agreed with Estonia (2013), Latvia (2015), Malta (2005) and Romania (2015).</comment>
+    <nextdeadline rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2012-02-29</nextdeadline>
+    <nextdeadline2 rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2015-02-28</nextdeadline2>
+    <lastUpdate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2011-11-02</lastUpdate>
+    <isTerminated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</isTerminated>
+    <nextUpdate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2009-05-04</nextUpdate>
+    <verified rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2008-07-11</verified>
+    <verifiedBy>HPE</verifiedBy>
+    <lastHarvested rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2011-11-03 13:15:33.0</lastHarvested>
+    <requester rdf:resource="clients/2"/>
+    <dcterms:abstract>EC Water Reporting Obligation
+
+According to Article 13, the Member State have the obligation to publish a report every three years on the quality of water intended for human consumption with the objective of informing the consumers.</dcterms:abstract>
+    <isEEAPrimary rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</isEEAPrimary>
+    <isEEACore rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</isEEACore>
+    <isFlagged rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</isFlagged>
+    <dpsirCategory rdf:resource="http://rdfdata.eionet.europa.eu/eea/dpsir/S"/>
+    <dpsirCategory rdf:resource="http://rdfdata.eionet.europa.eu/eea/dpsir/I"/>
+    <dpsirCategory rdf:resource="http://rdfdata.eionet.europa.eu/eea/dpsir/R"/>
+    <dataUsedFor rdf:resource="http://circa.europa.eu/Public/irc/env/drinking_water_rev/library?l=/drinking_synthesis&amp;vm=detailed&amp;sb=Title"/>
+</Obligation>
+<rdf:Description rdf:about="obligations/171">    
+	<otherClient rdf:resource="clients/90"/>
+    <formalReporter rdf:resource="spatial/3"/>
+    <formalReporter rdf:resource="spatial/5"/>
+    <formalReporter rdf:resource="spatial/7"/>
+    <formalReporter rdf:resource="spatial/9"/>
+    <formalReporter rdf:resource="spatial/10"/>
+    <formalReporter rdf:resource="spatial/11"/>
+    <formalReporter rdf:resource="spatial/12"/>
+    <formalReporter rdf:resource="spatial/13"/>
+    <formalReporter rdf:resource="spatial/14"/>
+    <formalReporter rdf:resource="spatial/15"/>
+    <formalReporter rdf:resource="spatial/16"/>
+    <formalReporter rdf:resource="spatial/17"/>
+    <formalReporter rdf:resource="spatial/19"/>
+    <formalReporter rdf:resource="spatial/20"/>
+    <formalReporter rdf:resource="spatial/21"/>
+    <formalReporter rdf:resource="spatial/22"/>
+    <formalReporter rdf:resource="spatial/23"/>
+    <formalReporter rdf:resource="spatial/25"/>
+    <formalReporter rdf:resource="spatial/27"/>
+    <formalReporter rdf:resource="spatial/29"/>
+    <formalReporter rdf:resource="spatial/30"/>
+    <formalReporter rdf:resource="spatial/31"/>
+    <formalReporter rdf:resource="spatial/33"/>
+    <formalReporter rdf:resource="spatial/34"/>
+    <formalReporter rdf:resource="spatial/35"/>
+    <formalReporter rdf:resource="spatial/36"/>
+    <formalReporter rdf:resource="spatial/40"/>
+    <voluntaryReporter rdf:resource="spatial/28"/>
+    <issue rdf:resource="issues/10"/>
+    <issue rdf:resource="issues/15"/>
+</rdf:Description>
+<Obligation rdf:about="obligations/569">    
+<instrument rdf:resource="instruments/606"/>
+    <dcterms:valid rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2008-07-17</dcterms:valid>
+    <dcterms:title>4th air quality daughter directive (Art.5) assessment annual reporting exceedances</dcterms:title>
+    <guidelines>Modification of the Questionnaire under Decision 2004/461/EC and related guidance has been prepared to enable reporting of 4th Daughter Directive on a voluntary basis already for the reporting year 2007, with the deadline of submission at 30 September 2008. This reporting will become mandatory in 2009. 
+
+Guidance document available at: http://ec.europa.eu/environment/air/quality/legislation/pdf/guidelines_quest.pdf</guidelines>
+    <nextdeadline rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2012-09-30</nextdeadline>
+    <nextdeadline2 rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2013-09-30</nextdeadline2>
+    <lastUpdate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2009-05-13</lastUpdate>
+    <isTerminated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</isTerminated>
+    <validSince rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2008-07-17</validSince>
+    <nextUpdate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2009-03-30</nextUpdate>
+    <verified rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2008-07-30</verified>
+    <verifiedBy>EEA</verifiedBy>
+    <lastHarvested rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2011-11-03 13:15:33.0</lastHarvested>
+    <requester rdf:resource="clients/2"/>
+    <dcterms:abstract>Article 5 - Transmission of information and reporting:  
+1. With regard to the zones and agglomerations where any of the target values laid down in Annex I is exceeded, Member States shall forward the following information to the Commission:
+(a) the lists of the zones and agglomerations concerned, 
+(b) the areas of exceedance, 
+(c) the concentration values assessed,
+(d) the reasons for exceedance, and in particular any sources contributing to it,
+(e) the population exposed to such exceedance.
+
+Member States shall also report all data assessed in accordance with Article 4, unless already reported under Council Decision 97/101/EC of 27 January 1997 establishing a reciprocal exchange of information and data from networks and individual
+stations measuring ambient air pollution within the Member States. (See OJ L 35, 5.2.1997, p. 14. Decision as amended by Commission Decision 2001/752/EC (OJ L 282, 26.10.2001, p. 69).
+
+The information shall be transmitted for each calendar year, by no later than 30 September of the following year, and for the first time for the calendar year following 15 February 2007.
+
+2. In addition to the requirements laid down in paragraph 1, Member States shall also report any measures taken pursuant to Article 3.</dcterms:abstract>
+    <isEEAPrimary rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</isEEAPrimary>
+    <isEEACore rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</isEEACore>
+    <isFlagged rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</isFlagged>
+    <dpsirCategory rdf:resource="http://rdfdata.eionet.europa.eu/eea/dpsir/P"/>
+    <dpsirCategory rdf:resource="http://rdfdata.eionet.europa.eu/eea/dpsir/S"/>
+    <dpsirCategory rdf:resource="http://rdfdata.eionet.europa.eu/eea/dpsir/R"/>
+</Obligation>
+<rdf:Description rdf:about="obligations/569">    
+<otherClient rdf:resource="clients/3"/>
+    <otherClient rdf:resource="clients/90"/>
+    <formalReporter rdf:resource="spatial/3"/>
+    <formalReporter rdf:resource="spatial/5"/>
+    <formalReporter rdf:resource="spatial/7"/>
+    <formalReporter rdf:resource="spatial/9"/>
+    <formalReporter rdf:resource="spatial/10"/>
+    <formalReporter rdf:resource="spatial/11"/>
+    <formalReporter rdf:resource="spatial/12"/>
+    <formalReporter rdf:resource="spatial/13"/>
+    <formalReporter rdf:resource="spatial/14"/>
+    <formalReporter rdf:resource="spatial/15"/>
+    <formalReporter rdf:resource="spatial/16"/>
+    <formalReporter rdf:resource="spatial/17"/>
+    <formalReporter rdf:resource="spatial/18"/>
+    <formalReporter rdf:resource="spatial/19"/>
+    <formalReporter rdf:resource="spatial/20"/>
+    <formalReporter rdf:resource="spatial/21"/>
+    <formalReporter rdf:resource="spatial/22"/>
+    <formalReporter rdf:resource="spatial/23"/>
+    <formalReporter rdf:resource="spatial/25"/>
+    <formalReporter rdf:resource="spatial/27"/>
+    <formalReporter rdf:resource="spatial/28"/>
+    <formalReporter rdf:resource="spatial/29"/>
+    <formalReporter rdf:resource="spatial/30"/>
+    <formalReporter rdf:resource="spatial/31"/>
+    <formalReporter rdf:resource="spatial/33"/>
+    <formalReporter rdf:resource="spatial/34"/>
+    <formalReporter rdf:resource="spatial/35"/>
+    <formalReporter rdf:resource="spatial/36"/>
+    <formalReporter rdf:resource="spatial/40"/>
+    <formalReporter rdf:resource="spatial/102"/>
+    <issue rdf:resource="issues/6"/>
+</rdf:Description>
+<Obligation rdf:about="obligations/370">    
+<instrument rdf:resource="instruments/585"/>
+    <dcterms:title>Action plan summaries 1 (DF 7)</dcterms:title>
+    <nextdeadline rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2014-01-18</nextdeadline>
+    <nextdeadline2 rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2019-01-18</nextdeadline2>
+    <lastUpdate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2009-09-16</lastUpdate>
+    <isTerminated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</isTerminated>
+    <nextUpdate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2009-02-01</nextUpdate>
+    <lastHarvested rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2011-11-03 13:15:33.0</lastHarvested>
+    <requester rdf:resource="clients/2"/>
+    <dcterms:abstract>Action plans related data as listed in annex VI for major roads, railways, airports and agglomerations concerned by 1st implementation step + Any criteria used in drawing up action plans
+&#8226; Per agglomeration &#8805; 250,000 inhab.
+&#8226; Per major airport &#8805; 50,000 movts/y
+&#8226; For overall major roads &#8805; 6 millions veh/y
+&#8226; For overall major railways &#8805; 60,000 trains/y</dcterms:abstract>
+    <isEEAPrimary rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</isEEAPrimary>
+    <isEEACore rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</isEEACore>
+    <isFlagged rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</isFlagged>
+    <dpsirCategory rdf:resource="http://rdfdata.eionet.europa.eu/eea/dpsir/R"/>
+</Obligation>
+<rdf:Description rdf:about="obligations/370">    
+<formalReporter rdf:resource="spatial/3"/>
+    <formalReporter rdf:resource="spatial/5"/>
+    <formalReporter rdf:resource="spatial/7"/>
+    <formalReporter rdf:resource="spatial/9"/>
+    <formalReporter rdf:resource="spatial/10"/>
+    <formalReporter rdf:resource="spatial/11"/>
+    <formalReporter rdf:resource="spatial/12"/>
+    <formalReporter rdf:resource="spatial/13"/>
+    <formalReporter rdf:resource="spatial/14"/>
+    <formalReporter rdf:resource="spatial/15"/>
+    <formalReporter rdf:resource="spatial/16"/>
+    <formalReporter rdf:resource="spatial/17"/>
+    <formalReporter rdf:resource="spatial/18"/>
+    <formalReporter rdf:resource="spatial/19"/>
+    <formalReporter rdf:resource="spatial/20"/>
+    <formalReporter rdf:resource="spatial/21"/>
+    <formalReporter rdf:resource="spatial/22"/>
+    <formalReporter rdf:resource="spatial/23"/>
+    <formalReporter rdf:resource="spatial/25"/>
+    <formalReporter rdf:resource="spatial/27"/>
+    <formalReporter rdf:resource="spatial/28"/>
+    <formalReporter rdf:resource="spatial/29"/>
+    <formalReporter rdf:resource="spatial/30"/>
+    <formalReporter rdf:resource="spatial/31"/>
+    <formalReporter rdf:resource="spatial/33"/>
+    <formalReporter rdf:resource="spatial/34"/>
+    <formalReporter rdf:resource="spatial/35"/>
+    <formalReporter rdf:resource="spatial/36"/>
+    <formalReporter rdf:resource="spatial/40"/>
+    <formalReporter rdf:resource="spatial/102"/>
+    <issue rdf:resource="issues/7"/>
+</rdf:Description>
+</rdf:RDF>

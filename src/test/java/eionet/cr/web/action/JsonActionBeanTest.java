@@ -59,8 +59,7 @@ public class JsonActionBeanTest extends AbstractStripesMvcTestHelper {
         trip.setParameter("query", "tag");
         trip.execute();
 
-        assertEquals("{\"query\":\"tag\"," + "\"suggestions\":[\"tag1\",\"tag2\",\"tag3\",\"tag4\"]}", trip.getResponse()
-                .getOutputString());
+        assertEquals("{\"query\":\"\",\"suggestions\":[]}", trip.getResponse().getOutputString());
 
     }
 

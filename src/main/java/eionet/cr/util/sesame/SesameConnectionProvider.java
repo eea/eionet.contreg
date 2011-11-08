@@ -19,7 +19,6 @@ import virtuoso.sesame2.driver.VirtuosoRepository;
 import virtuoso.sesame2.driver.VirtuosoRepositoryConnection;
 import eionet.cr.common.CRRuntimeException;
 import eionet.cr.config.GeneralConfig;
-import eionet.cr.util.IsJUnitRuntime;
 
 /**
  *
@@ -55,12 +54,12 @@ public class SesameConnectionProvider {
         if (readWriteRepository == null) {
 
             String urlProperty = GeneralConfig.VIRTUOSO_DB_URL;
-            String usrProperty = IsJUnitRuntime.VALUE ? GeneralConfig.VIRTUOSO_UNITTEST_DB_USR : GeneralConfig.VIRTUOSO_DB_USR;
-            String pwdProperty = IsJUnitRuntime.VALUE ? GeneralConfig.VIRTUOSO_UNITTEST_DB_PWD : GeneralConfig.VIRTUOSO_DB_PWD;
+            String usrProperty = GeneralConfig.VIRTUOSO_DB_USR;
+            String pwdProperty = GeneralConfig.VIRTUOSO_DB_PWD;
 
             readWriteRepository =
-                    createRepository(GeneralConfig.getRequiredProperty(urlProperty),
-                            GeneralConfig.getRequiredProperty(usrProperty), GeneralConfig.getRequiredProperty(pwdProperty));
+                createRepository(GeneralConfig.getRequiredProperty(urlProperty),
+                        GeneralConfig.getRequiredProperty(usrProperty), GeneralConfig.getRequiredProperty(pwdProperty));
         }
         return readWriteRepository;
     }
@@ -72,9 +71,9 @@ public class SesameConnectionProvider {
 
         if (readOnlyRepository == null) {
             readOnlyRepository =
-                    createRepository(GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_URL),
-                            GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_ROUSR),
-                            GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_ROPWD));
+                createRepository(GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_URL),
+                        GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_ROUSR),
+                        GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_ROPWD));
         }
         return readOnlyRepository;
     }
@@ -212,8 +211,8 @@ public class SesameConnectionProvider {
         // no data source was found above, so create the connection through DriverManager
 
         String urlProperty = GeneralConfig.VIRTUOSO_DB_URL;
-        String usrProperty = IsJUnitRuntime.VALUE ? GeneralConfig.VIRTUOSO_UNITTEST_DB_USR : GeneralConfig.VIRTUOSO_DB_USR;
-        String pwdProperty = IsJUnitRuntime.VALUE ? GeneralConfig.VIRTUOSO_UNITTEST_DB_PWD : GeneralConfig.VIRTUOSO_DB_PWD;
+        String usrProperty = GeneralConfig.VIRTUOSO_DB_USR;
+        String pwdProperty = GeneralConfig.VIRTUOSO_DB_PWD;
 
         String drv = GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_DRV);
         String url = GeneralConfig.getRequiredProperty(urlProperty);

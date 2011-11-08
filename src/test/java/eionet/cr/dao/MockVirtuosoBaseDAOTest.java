@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Ignore;
 import org.openrdf.model.Statement;
 import org.openrdf.model.Value;
 import org.openrdf.query.BindingSet;
@@ -24,6 +25,7 @@ import eionet.cr.util.sesame.SPARQLResultSetReader;
  * Mock for testing queries. Working only for testing readers. Each implementing class must have a corresponding file in N3 format
  * that can be exported from SPARQL endpoint.
  */
+@Ignore
 public class MockVirtuosoBaseDAOTest extends VirtuosoBaseDAO {
     /** Tag name in N3. */
     private static final String RESULTVARIABLE_NAME = "http://www.w3.org/2005/sparql-results#resultVariable";
@@ -53,8 +55,7 @@ public class MockVirtuosoBaseDAOTest extends VirtuosoBaseDAO {
      * Default construtor. File name with test data is given as the parameter. Supports files in N3 format exported from SPARQL
      * endpoint.
      *
-     * @param fileName
-     *            Test data file name in test-resources.
+     * @param fileName Test data file name in test-resources.
      */
     public MockVirtuosoBaseDAOTest(String fileName) {
         bindingSet = new ArrayList<MapBindingSet>();

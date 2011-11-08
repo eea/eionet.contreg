@@ -20,44 +20,39 @@
  * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.dao;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.List;
 
-import org.dbunit.dataset.IDataSet;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import eionet.cr.dto.TripleDTO;
-import eionet.cr.test.helpers.CRDatabaseTestCase;
+import eionet.cr.test.helpers.RdfLoader;
 import eionet.cr.util.pagination.PagingRequest;
 
 /**
  *
- * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
+ * @author Risto Alt
  *
  */
-public class HelperDAOTest extends CRDatabaseTestCase {
+public class HelperDAOTest {
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.dbunit.DatabaseTestCase#getDataSet()
-     */
-    @Override
-    protected IDataSet getDataSet() throws Exception {
-        return getXmlDataSet("simple-db.xml");
+    private static RdfLoader loader;
+
+    @BeforeClass
+    public static void setUpBeforeClass() throws Exception {
+        loader = new RdfLoader("obligations.rdf");
     }
 
-    /**
-     *
-     * @throws Exception
-     */
     @Test
     public void testGetSampleTriples() throws Exception {
-
         List<TripleDTO> result =
-                DAOFactory.get().getDao(HelperDAO.class)
-                        .getSampleTriplesInSource("http://cr.eionet.europa.eu/testsource.rdf", PagingRequest.create(1, 10));
+            DAOFactory.get().getDao(HelperDAO.class)
+            .getSampleTriplesInSource(loader.getGraphUri(), PagingRequest.create(1, 10));
 
         assertNotNull(result);
-        assertEquals(10, result.size());
+        assertEquals(100, result.size());
     }
 }

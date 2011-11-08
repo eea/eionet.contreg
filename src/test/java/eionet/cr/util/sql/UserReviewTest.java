@@ -1,21 +1,16 @@
 package eionet.cr.util.sql;
 
 import org.dbunit.dataset.IDataSet;
-import org.junit.Test;
+import org.junit.Ignore;
 
-import eionet.cr.dao.DAOException;
-import eionet.cr.dao.DAOFactory;
-import eionet.cr.dao.HelperDAO;
-import eionet.cr.dto.ReviewDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
-import eionet.cr.web.security.CRUser;
 
 /**
  *
  * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
  *
  */
-
+@Ignore
 public class UserReviewTest extends CRDatabaseTestCase {
 
     /*
@@ -26,7 +21,7 @@ public class UserReviewTest extends CRDatabaseTestCase {
     protected IDataSet getDataSet() throws Exception {
         return getXmlDataSet("emptydb.xml");
     }
-
+    /*
     @Test
     public void testReadLastReviewId() throws DAOException {
 
@@ -139,5 +134,5 @@ public class UserReviewTest extends CRDatabaseTestCase {
 
         ReviewDTO result = DAOFactory.get().getDao(HelperDAO.class).getReview(user, 1);
         assertEquals(1, result.getReviewID());
-    }
+    }*/
 }

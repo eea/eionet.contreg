@@ -11,14 +11,14 @@ public class VirtuosoSearchBySourceHelperTest extends TestCase {
         String sourceUrl = "http://www.eionet.europa.eu/rdf/portal_types.rdf";
         PagingRequest pagingRequest = PagingRequest.create(1);
         SortingRequest sortingRequest =
-                new SortingRequest("http://www.w3.org/2000/01/rdf-schema#label", SortOrder.parse(SortOrder.ASCENDING.toString()));
+            new SortingRequest("http://www.w3.org/2000/01/rdf-schema#label", SortOrder.parse(SortOrder.ASCENDING.toString()));
 
         VirtuosoSearchBySourceHelper helper = new VirtuosoSearchBySourceHelper(sourceUrl, pagingRequest, sortingRequest);
 
         String sparql = helper.getQuery(null);
-        assertEquals(
-                "select distinct ?s from ?sourceUrl where {?s ?p ?o .optional {?s ?sortPredicate ?ord} } ORDER BY asc(bif:lcase(bif:either(bif:isnull(?ord), (bif:subseq "
-                        + "(bif:replace (?s, '/', '#'), bif:strrchr (bif:replace (?s, '/', '#'), '#')+1)), ?ord))) limit 15 offset 0",
+        assertEquals("select distinct ?s from ?sourceUrl where {?s ?p ?o .optional {?s ?sortPredicate ?ord} } "
+                + "ORDER BY asc(bif:lcase(bif:either(bif:isnull(?ord), (bif:subseq "
+                + "(bif:replace (?s, '/', '#'), bif:strrchr (bif:replace (?s, '/', '#'), '#')+1)), ?ord))) limit 15 offset 0",
                 sparql);
 
         assertTrue(helper.getQueryBindings().toString().indexOf("sourceUrl=http://www.eionet.europa.eu/rdf/portal_types.rdf") != -1);

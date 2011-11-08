@@ -22,6 +22,7 @@ package eionet.cr.test.helpers.dbunit;
 
 import java.util.Properties;
 
+import org.dbunit.database.DatabaseConfig;
 import org.dbunit.database.DatabaseConnection;
 import org.dbunit.database.IDatabaseConnection;
 
@@ -29,7 +30,7 @@ import eionet.cr.util.sesame.SesameUtil;
 
 /**
  *
- * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
+ * @author Risto Alt
  *
  */
 public abstract class DbUnitDatabaseConnection {
@@ -51,6 +52,8 @@ public abstract class DbUnitDatabaseConnection {
      * @return
      */
     private static Properties getConfigProperties() {
-        return new Properties();
+        Properties props = new Properties();
+        props.setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, "eionet.cr.test.helpers.dbunit.DbUnitVirtuosoDataTypeFactory");
+        return props;
     }
 }

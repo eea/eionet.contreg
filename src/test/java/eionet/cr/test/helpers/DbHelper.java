@@ -66,10 +66,10 @@ public class DbHelper {
         String url = GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_DB_URL);
         System.setProperty(PropertiesBasedJdbcDatabaseTester.DBUNIT_CONNECTION_URL, url);
 
-        String usr = GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_UNITTEST_DB_USR);
+        String usr = GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_DB_USR);
         System.setProperty(PropertiesBasedJdbcDatabaseTester.DBUNIT_USERNAME, usr);
 
-        String pwd = GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_UNITTEST_DB_PWD);
+        String pwd = GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_DB_PWD);
         System.setProperty(PropertiesBasedJdbcDatabaseTester.DBUNIT_PASSWORD, pwd);
     }
 }

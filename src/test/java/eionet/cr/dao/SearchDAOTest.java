@@ -20,49 +20,47 @@
  * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.dao;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.dbunit.dataset.IDataSet;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import eionet.cr.common.Predicates;
+import eionet.cr.dao.helpers.FreeTextSearchHelper;
+import eionet.cr.dao.util.SearchExpression;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.test.helpers.CRDatabaseTestCase;
+import eionet.cr.test.helpers.RdfLoader;
 import eionet.cr.util.Pair;
 import eionet.cr.util.pagination.PagingRequest;
 
 /**
  *
- * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
+ * @author Risto Alt
  *
  */
-public class SearchDAOTest extends CRDatabaseTestCase {
+public class SearchDAOTest {
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.test.helpers.CRDatabaseTestCase#getDataSet()
-     */
-    @Override
-    protected IDataSet getDataSet() throws Exception {
-        return getXmlDataSet("types-db.xml");
+    private static final String seedFile = "obligations.rdf";
+
+    @BeforeClass
+    public static void setUpBeforeClass() throws Exception {
+        new RdfLoader(seedFile);
     }
 
     @Test
     public void testFreeTextSearchCountResults() throws Exception {
-        //
-        // PagingRequest pagingRequest = PagingRequest.create(1);
-        //
-        //
-        // Pair<Integer, List<SubjectDTO>> result =
-        // DAOFactory.get().getDao(SearchDAO.class).searchByFreeText(
-        // new SearchExpression("KESKKONNAPOLIITIKA"), FreeTextSearchHelper.FilterType.ANY_OBJECT, false, pagingRequest,
-        // null);
-        //
-        //
-        // assertEquals(1, result.getLeft().intValue());
+
+        PagingRequest pagingRequest = PagingRequest.create(1);
+        Pair<Integer, List<SubjectDTO>> result =
+            DAOFactory.get().getDao(SearchDAO.class).searchByFreeText(
+                    new SearchExpression("Questionnaire"), FreeTextSearchHelper.FilterType.ANY_OBJECT, false, pagingRequest, null);
+
+        assertEquals(2, result.getLeft().intValue());
     }
 
     /**
@@ -73,18 +71,15 @@ public class SearchDAOTest extends CRDatabaseTestCase {
     public void testSearchByTypeAndFilters() throws Exception {
         PagingRequest pagingRequest = PagingRequest.create(1);
 
-        // type search uses cache tables and they should be up to date
-        // DAOFactory.get().getDao(HelperDAO.class).updateTypeDataCache();
-
         Map<String, String> filters = new LinkedHashMap<String, String>();
-        filters.put(Predicates.RDF_TYPE, "http://www.w3.org/2004/02/skos/core#Concept");
+        filters.put(Predicates.RDF_TYPE, "http://rod.eionet.europa.eu/schema.rdf#Obligation");
         List<String> selectedPredicates = null;
 
         Pair<Integer, List<SubjectDTO>> result =
             DAOFactory.get().getDao(SearchDAO.class)
             .searchByTypeAndFilters(filters, false, pagingRequest, null, selectedPredicates);
 
-        assertEquals(1, result.getLeft().intValue());
+        assertEquals(3, result.getLeft().intValue());
         assertTrue(result.getLeft() > 0);
     }
 }

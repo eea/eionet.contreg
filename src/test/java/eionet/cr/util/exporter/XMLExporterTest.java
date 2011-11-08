@@ -53,11 +53,11 @@ public class XMLExporterTest extends TestCase {
         exporter.setElements(elements);
 
         assertEquals(exporter.getUniqueElementNameTest("elemFour"), "elemFour");
-        assertEquals(exporter.getUniqueElementNameTest("elemOne"), "elemOne_1");
-        assertEquals(exporter.getUniqueElementNameTest("elemTwo"), "elemTwo_2");
-        assertEquals(exporter.getUniqueElementNameTest("elemThree"), "elemThree_3");
-        assertEquals(exporter.getUniqueElementNameTest("ELEMONE"), "ELEMONE_1");
-        assertEquals(exporter.getUniqueElementNameTest("ELEMTWO"), "ELEMTWO_2");
+        assertEquals(exporter.getUniqueElementNameTest("elemone"), "elemone_1");
+        assertEquals(exporter.getUniqueElementNameTest("elemtwo"), "elemtwo_2");
+        assertEquals(exporter.getUniqueElementNameTest("elemthree"), "elemthree_3");
+        assertEquals(exporter.getUniqueElementNameTest("ELEMONE"), "ELEMONE");
+        assertEquals(exporter.getUniqueElementNameTest("ELEMTWO"), "ELEMTWO");
         assertEquals(exporter.getUniqueElementNameTest(""), XmlUtil.INVALID_ELEMENT_NAME);
 
     }
