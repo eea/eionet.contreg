@@ -20,15 +20,16 @@ import net.sourceforge.stripes.action.UrlBinding;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.log4j.Logger;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.vocabulary.XMLSchema;
 import org.openrdf.query.BooleanQuery;
 import org.openrdf.query.GraphQuery;
+import org.openrdf.query.Query;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
+import org.openrdf.query.impl.DatasetImpl;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.rdfxml.RDFXMLWriter;
@@ -100,7 +101,6 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
     /** */
     private String query;
-    private String newQuery;
     private String format;
     private int nrOfHits;
     private long executionTime;
@@ -108,9 +108,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     private String[] namedGraphUris;
 
     /** */
+    private boolean isAskQuery;
     private boolean useInferencing;
-    boolean isAskQuery = false;
-    boolean isConstructQuery = false;
 
     /** */
     private QueryResult result;
@@ -294,20 +293,11 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             }
         }
 
-        // Check if ASK query
-        if (accept[0].equals("text/boolean") || isQuery("ASK")) {
-            isAskQuery = true;
-        }
 
+        boolean isConstructQuery = false;
         // Check if CONSTRUCT query
-        if (accept[0].equals("application/x-trig") || isQuery("CONSTRUCT")) {
+        if (isQuery("CONSTRUCT")) {
             isConstructQuery = true;
-        }
-
-        // If CONSTRUCT query, but output format is HTML then evaluate as simple
-        // SELECT query
-        if (isConstructQuery && format != null && format.equals("text/html")) {
-            isConstructQuery = false;
         }
 
         if (!StringUtils.isBlank(format)) {
@@ -316,23 +306,21 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
         // If user has marked CR Inferencing checkbox,
         // then add inferencing command to the query
-        newQuery = processGraphUriParameters();
-        query = StringEscapeUtils.escapeHtml(query);
         Resolution resolution = null;
         if (useInferencing && !StringUtils.isBlank(query)) {
             String infCommand =
-                "DEFINE input:inference '" + GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME) + "'";
+                    "DEFINE input:inference '" + GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME) + "'";
 
             // if inference command not yet present in the query, add it
             if (query.indexOf(infCommand) == -1) {
-                newQuery = infCommand + "\n" + newQuery;
+                query = infCommand + "\n" + query;
             }
         }
 
         if (isConstructQuery) {
             resolution = new StreamingResolution("application/rdf+xml") {
                 public void stream(HttpServletResponse response) throws Exception {
-                    runQuery(newQuery, FORMAT_XML, response.getOutputStream());
+                    runQuery(query, FORMAT_XML, response.getOutputStream());
                 }
             };
             ((StreamingResolution) resolution).setFilename("sparql-result.xml");
@@ -340,35 +328,36 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             resolution = new StreamingResolution("application/sparql-results+xml") {
                 public void stream(HttpServletResponse response) throws Exception {
                     response.setHeader("filename", "sparql-result.xml");
-                    runQuery(newQuery, FORMAT_XML, response.getOutputStream());
+                    runQuery(query, FORMAT_XML, response.getOutputStream());
                 }
             };
             ((StreamingResolution) resolution).setFilename("sparql-result.xml");
         } else if (accept[0].equals("application/x-ms-access-export+xml")) {
             resolution = new StreamingResolution("application/x-ms-access-export+xml") {
                 public void stream(HttpServletResponse response) throws Exception {
-                    runQuery(newQuery, FORMAT_XML_SCHEMA, response.getOutputStream());
+                    runQuery(query, FORMAT_XML_SCHEMA, response.getOutputStream());
                 }
             };
             ((StreamingResolution) resolution).setFilename("sparql-result.xml");
         } else if (accept[0].equals("application/sparql-results+json")) {
             resolution = new StreamingResolution("application/sparql-results+json") {
                 public void stream(HttpServletResponse response) throws Exception {
-                    runQuery(newQuery, FORMAT_JSON, response.getOutputStream());
+                    runQuery(query, FORMAT_JSON, response.getOutputStream());
                 }
             };
             ((StreamingResolution) resolution).setFilename("sparql-result.json");
         } else if (accept[0].equals("text/html+")) {
             if (!StringUtils.isBlank(query)) {
-                runQuery(newQuery, FORMAT_HTML_PLUS, null);
+                runQuery(query, FORMAT_HTML_PLUS, null);
             }
             resolution = new ForwardResolution(FORM_PAGE);
         } else {
             if (!StringUtils.isBlank(query)) {
-                runQuery(newQuery, FORMAT_HTML, null);
+                runQuery(query, FORMAT_HTML, null);
             }
             resolution = new ForwardResolution(FORM_PAGE);
         }
+        query = StringEscapeUtils.escapeHtml(query);
 
         return resolution;
     }
@@ -382,56 +371,25 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     * Returns the modified query, when defaultGraphUris and defaultGraphUris parameters are valued. The ActionBea's query parameter
-     * is kept the same.
+     * Sets dataset to query, if default-graph-uri or named-graph-uri parameters are used.
      *
-     * @return processed query
+     * @param query
+     * @param connection
      */
-    private String processGraphUriParameters() {
-
-        LOGGER.info("Default graph: " + ReflectionToStringBuilder.toString(defaultGraphUris));
-        LOGGER.info("Named graph: " + ReflectionToStringBuilder.toString(namedGraphUris));
-
+    private void setDatasetParameters(Query query, RepositoryConnection connection) {
         if (defaultGraphUris != null || namedGraphUris != null) {
-            if (StringUtils.isNotEmpty(query)) {
-                try {
-                    String q = query.toLowerCase().replaceAll("(\\r|\\n)", " ");
-                    boolean includesFrom = q.toLowerCase().matches("^.*(from)(?!(\\s)+named).*$");
-                    boolean includesFromNamed = q.toLowerCase().matches("^.*(from)(\\s)+(named).*$");
-
-                    int index = query.toLowerCase().indexOf("where");
-                    String q1 = query.substring(0, index - 1);
-                    String q2 = query.substring(index);
-
-                    StringBuilder sb = new StringBuilder();
-                    sb.append(q1);
-                    if (defaultGraphUris != null && !includesFrom) {
-                        for (String uri : defaultGraphUris) {
-                            sb.append(" FROM <" + uri + "> ");
-                        }
-                    }
-                    if (namedGraphUris != null && !includesFromNamed) {
-                        for (String uri : namedGraphUris) {
-                            sb.append(" FROM NAMED <" + uri + "> ");
-                        }
-                    }
-                    sb.append(q2);
-
-                    // LOGGER.info("Q1: " + q1);
-                    // LOGGER.info("Q2: " + q2);
-                    // LOGGER.info("Query: " + sb.toString());
-
-                    return sb.toString();
-                } catch (Exception e) {
-                    LOGGER.error("Problems with default graph uri: " + e);
-                    addCautionMessage("Problems with processing named / default graph URI parameters. Executing query without these parameters.");
-                    return query;
+            DatasetImpl dataset = new DatasetImpl();
+            if (defaultGraphUris != null) {
+                for (String uriStr : defaultGraphUris) {
+                    dataset.addDefaultGraph(connection.getValueFactory().createURI(uriStr));
                 }
-            } else {
-                return query;
             }
-        } else {
-            return query;
+            if (namedGraphUris != null) {
+                for (String uriStr : namedGraphUris) {
+                    dataset.addNamedGraph(connection.getValueFactory().createURI(uriStr));
+                }
+            }
+            query.setDataset(dataset);
         }
     }
 
@@ -465,13 +423,16 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             RepositoryConnection con = null;
             try {
                 con = SesameConnectionProvider.getReadOnlyRepositoryConnection();
+                Query queryObject = con.prepareQuery(QueryLanguage.SPARQL, query);
+                setDatasetParameters(queryObject, con);
 
                 TupleQueryResult queryResult = null;
                 try {
                     // Evaluate ASK query
-                    if (isAskQuery) {
-                        BooleanQuery resultsTableBoolean = con.prepareBooleanQuery(QueryLanguage.SPARQL, query);
-                        Boolean result = resultsTableBoolean.evaluate();
+                    //if (isAskQuery) {
+                    if (queryObject instanceof BooleanQuery) {
+                        isAskQuery = true;
+                        Boolean result = ((BooleanQuery) queryObject).evaluate();
 
                         // ASK query in XML format
                         if (format != null && format.equals(FORMAT_XML)) {
@@ -506,30 +467,28 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                             resultAsk = result.toString();
                         }
                         // Evaluate CONSTRUCT query. Returns XML format
-                    } else if (isConstructQuery && !format.equals(FORMAT_HTML)) {
-                        GraphQuery resultsTable = con.prepareGraphQuery(QueryLanguage.SPARQL, query);
+                        //} else if (isConstructQuery && !format.equals(FORMAT_HTML)) {
+                    } else if (queryObject instanceof GraphQuery) {
                         RDFXMLWriter writer = new RDFXMLWriter(out);
-                        resultsTable.evaluate(writer);
+                        ((GraphQuery) queryObject).evaluate(writer);
                         // Evaluate SELECT query
                     } else {
-                        TupleQuery resultsTable = con.prepareTupleQuery(QueryLanguage.SPARQL, query);
-
                         // Returns XML format
                         if (format != null && format.equals(FORMAT_XML)) {
                             CRXmlWriter sparqlWriter = new CRXmlWriter(out);
-                            resultsTable.evaluate(sparqlWriter);
+                            ((TupleQuery) queryObject).evaluate(sparqlWriter);
                             // Returns XML format
                         } else if (format != null && format.equals(FORMAT_XML_SCHEMA)) {
                             CRXmlSchemaWriter sparqlWriter = new CRXmlSchemaWriter(out);
-                            resultsTable.evaluate(sparqlWriter);
+                            ((TupleQuery) queryObject).evaluate(sparqlWriter);
                             // Returns JSON format
                         } else if (format != null && format.equals(FORMAT_JSON)) {
                             CRJsonWriter sparqlWriter = new CRJsonWriter(out);
-                            resultsTable.evaluate(sparqlWriter);
+                            ((TupleQuery) queryObject).evaluate(sparqlWriter);
                             // Returns HTML format
                         } else if (format != null && format.equals(FORMAT_HTML)) {
                             long startTime = System.currentTimeMillis();
-                            queryResult = resultsTable.evaluate();
+                            queryResult = ((TupleQuery) queryObject).evaluate();
 
                             executionTime = System.currentTimeMillis() - startTime;
                             if (queryResult != null) {
@@ -538,7 +497,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                             // Returns HTML+ format
                         } else if (format != null && format.equals(FORMAT_HTML_PLUS)) {
                             long startTime = System.currentTimeMillis();
-                            queryResult = resultsTable.evaluate();
+                            queryResult = ((TupleQuery) queryObject).evaluate();
 
                             executionTime = System.currentTimeMillis() - startTime;
                             if (queryResult != null) {

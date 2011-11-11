@@ -65,6 +65,18 @@
 
     <stripes:layout-component name="contents">
 
+        <c:if test="${actionBean.user != null}">
+        <ul id="dropdown-operations">
+            <li><a href="#">Operations</a>
+                <ul>
+                    <li>
+                        <a href="#" id="bookmarksLink">Bookmarked queries</a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+        </c:if>
+
         <h1>SPARQL endpoint</h1>
 
         <div style="margin-top: 15px">
@@ -164,9 +176,6 @@ while (l--) {
                             <div style="position: absolute; top: 5px; left: 590px;">
                                 <stripes:submit name="execute" value="Execute" id="executeButton" />
                                 <stripes:submit name="bookmark" value="Bookmark" id="bookmarkButton" />
-                                <c:if test="${not empty actionBean.bookmarkedQueries}">
-                                    <button id="bookmarksLink">Bookmarked queries</button>
-                                </c:if>
                                 <stripes:hidden name="bookmarkName" value="${actionBean.bookmarkName}"/>
                             </div>
                         </c:when>
@@ -228,6 +237,58 @@ PREFIX rod: &lt;http://rod.eionet.europa.eu/schema.rdf#&gt;
 
             <%-- Bookmarked queries dialog --%>
             <div id="bookmarksDialog" title="Bookmarked queries">
+            <h1>Bookmarked SPARQL queries</h1>
+            <c:choose>
+                <c:when test="${not empty actionBean.bookmarkedQueries}">
+                    <c:url var="deleteBookmarkUrl" value="/sparql">
+                        <c:if test="${not empty actionBean.defaultGraphUris}">
+                            <c:forEach var="defaultGraphUri" items="${actionBean.defaultGraphUris}">
+                                <c:param name="default-graph-uri" value="${defaultGraphUri}" />
+                            </c:forEach>
+                        </c:if>
+                        <c:if test="${not empty actionBean.namedGraphUris}">
+                            <c:forEach var="namedGraphUri" items="${actionBean.namedGraphUris}">
+                                <c:param name="named-graph-uri" value="${namedGraphUri}" />
+                            </c:forEach>
+                        </c:if>
+                    </c:url>
+                    <crfn:form id="bookmarkedQueriesForm" action="${deleteBookmarkUrl}" method="post">
+                    <table>
+                        <c:forEach items="${actionBean.bookmarkedQueries}" var="bookmarkedQuery">
+                        <tr>
+                            <td width="1%"><stripes:checkbox value="${bookmarkedQuery.subj}" name="deleteQueries"/></td>
+                            <td width="99%">
+                                <stripes:link href="/sparql" title="${bookmarkedQuery.queryString}">
+                                    <stripes:param name="fillfrom" value="${bookmarkedQuery.subj}" />
+                                    <c:if test="${not empty actionBean.defaultGraphUris}">
+                                        <c:forEach var="defaultGraphUri" items="${actionBean.defaultGraphUris}">
+                                            <stripes:param name="default-graph-uri" value="${defaultGraphUri}" />
+                                        </c:forEach>
+                                    </c:if>
+                                    <c:if test="${not empty actionBean.namedGraphUris}">
+                                        <c:forEach var="namedGraphUri" items="${actionBean.namedGraphUris}">
+                                            <stripes:param name="named-graph-uri" value="${namedGraphUri}" />
+                                        </c:forEach>
+                                    </c:if>
+                                    <c:out value="${bookmarkedQuery.label}"/>
+                                </stripes:link>
+                            </td>
+                        </tr>
+                        </c:forEach>
+                        <tr>
+                            <td colspan="2" align="right" style="padding-top: 5px">
+                                <stripes:submit name="deleteBookmarked" id="deleteBookmarked" value="Delete" title="Delete the bookmarked queries that you have selected below"/>
+                                <input type="button" name="selectAll" value="Select all" onclick="toggleSelectAll('bookmarkedQueriesForm');return false"/>
+                            </td>
+                        </tr>
+                    </table>
+                    </crfn:form>
+                </c:when>
+                <c:otherwise>
+                    No bookmarked queries found.
+                </c:otherwise>
+            </c:choose>
+            <%--
                 <div>
                     <h1>Select one of SPARQL queries</h1>
                     <crfn:form name="bookmarksForm" action="/sparql" method="get">
@@ -295,6 +356,7 @@ PREFIX rod: &lt;http://rod.eionet.europa.eu/schema.rdf#&gt;
                     </c:if>
                 </div>
             </div>
+            --%>
 
         </div>
 
