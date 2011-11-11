@@ -70,13 +70,13 @@
 				        		</c:forEach>
 				        	</c:forEach>
 			        	</table>
-						<table border="0" width="500">
+						<table border="0" width="550">
 							<tr>
-								<td width="120">
+								<td width="155">
 									<stripes:label for="selDataset" class="question">Existing datasets</stripes:label>
 								</td>
 								<td>
-									<stripes:select name="dataset" style="width: 370px;" id="selDataset">
+									<stripes:select name="dataset" style="width: 383px;" id="selDataset">
 										<stripes:option value="new_dataset" label="- new dataset -" />
 										<c:forEach items="${actionBean.existingDatasets}" var="ds" varStatus="loop">
 											<stripes:option value="${ds}" label="${ds}" />
@@ -86,13 +86,25 @@
 							</tr>
 						</table>
 						 <div id="newFile">
-							<table border="0" width="500">
+							<table border="0" width="550">
 								<tr>
-									<td width="120">
+									<td width="160">
 										<stripes:label for="fileName" class="required question">Dataset name</stripes:label>
 									</td>
 									<td>
 										<stripes:text name="fileName" id="fileName" size="58"/>
+									</td>
+								</tr>
+								<tr>
+									<td width="160">
+										<stripes:label for="folder" class="required question">Folder</stripes:label>
+									</td>
+									<td>
+										<stripes:select name="folder" id="folder">
+											<c:forEach items="${actionBean.folders}" var="f" varStatus="loop">
+												<stripes:option value="${f}" label="${crfn:removeHomeUri(f)}" />
+											</c:forEach>
+										</stripes:select>
 									</td>
 								</tr>
 								<tr>
@@ -104,7 +116,7 @@
 								</tr>
 							</table>
 						</div>
-						<table border="0" width="500">
+						<table border="0" width="550">
 							<tr>
 								<td align="right">
 									<stripes:hidden name="selectedDeliveries" value="${actionBean.selectedDeliveries}"/>

@@ -381,4 +381,16 @@
         </example>
     </function>
 
+    <function>
+        <description>
+        	Removes root home URI part from given URI
+        </description>
+        <name>removeHomeUri</name>
+        <function-class>eionet.cr.web.util.JstlFunctions</function-class>
+        <function-signature>java.lang.String removeHomeUri(java.lang.String)</function-signature>
+        <example>
+            ${removeHomeUri(folderUri)}
+        </example>
+    </function>
+
 </taglib>
