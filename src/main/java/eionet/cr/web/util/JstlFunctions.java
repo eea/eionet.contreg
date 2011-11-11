@@ -38,6 +38,7 @@ import net.sourceforge.stripes.action.UrlBinding;
 import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.common.CRRuntimeException;
+import eionet.cr.config.GeneralConfig;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Hashes;
@@ -152,8 +153,8 @@ public class JstlFunctions {
         String curValue = request.getParameter("sortP");
         if (curValue != null && buf.indexOf("sortP=") > 0) {
             buf =
-                    new StringBuffer(StringUtils.replace(buf.toString(), "sortP=" + Util.urlEncode(curValue),
-                            "sortP=" + Util.urlEncode(sortParamValue)));
+                new StringBuffer(StringUtils.replace(buf.toString(), "sortP=" + Util.urlEncode(curValue),
+                        "sortP=" + Util.urlEncode(sortParamValue)));
         } else {
             buf.append("&amp;sortP=").append(Util.urlEncode(sortParamValue));
         }
@@ -161,8 +162,8 @@ public class JstlFunctions {
         curValue = request.getParameter("sortO");
         if (curValue != null && buf.indexOf("sortO=") > 0) {
             buf =
-                    new StringBuffer(StringUtils.replace(buf.toString(), "sortO=" + curValue,
-                            "sortO=" + SortOrder.oppositeSortOrder(curValue)));
+                new StringBuffer(StringUtils.replace(buf.toString(), "sortO=" + curValue,
+                        "sortO=" + SortOrder.oppositeSortOrder(curValue)));
         } else {
             buf.append("&amp;sortO=").append(SortOrder.oppositeSortOrder(curValue));
         }
@@ -317,7 +318,7 @@ public class JstlFunctions {
         if (object != null) {
 
             buf.append("[Type: ")
-                    .append(object.isLiteral() ? "Literal" : object.isAnonymous() ? "Anonymous resource" : "Resource");
+            .append(object.isLiteral() ? "Literal" : object.isAnonymous() ? "Anonymous resource" : "Resource");
             buf.append("]   [Inferred from object: ").append(getMatchingObjectValue(object.getSourceObjectHash(), allObjects));
             buf.append("]   [Inferred from source: ").append(
                     StringUtils.isBlank(object.getDerivSourceUri()) ? object.getDerivSourceHash() : object.getDerivSourceUri());
@@ -419,7 +420,7 @@ public class JstlFunctions {
 
             try {
                 link.append("&").append(FactsheetActionBean.PAGE_PARAM_PREFIX).append(pageNumber).append("=")
-                        .append(URLEncoder.encode(predicateUri, "UTF-8"));
+                .append(URLEncoder.encode(predicateUri, "UTF-8"));
             } catch (UnsupportedEncodingException e) {
                 throw new CRRuntimeException("Unsupported encoding", e);
             }
@@ -458,7 +459,7 @@ public class JstlFunctions {
                         if (!isPageParam || !paramValue.equals(predicateUri)) {
                             try {
                                 link.append(URLEncoder.encode(paramName, "UTF-8")).append("=")
-                                        .append(URLEncoder.encode(paramValue, "UTF-8")).append("&");
+                                .append(URLEncoder.encode(paramValue, "UTF-8")).append("&");
                             } catch (UnsupportedEncodingException e) {
                                 throw new CRRuntimeException("Unsupported encoding", e);
                             }
@@ -497,6 +498,20 @@ public class JstlFunctions {
     public static Object conditional(boolean condition, Object ifTrue, Object ifFalse) {
 
         return condition == true ? ifTrue : ifFalse;
+    }
+
+    /**
+     * Removes root home URI part from given URI
+     *
+     * @param uri
+     * @return String
+     */
+    public static String removeHomeUri(String uri) {
+        if (uri == null) {
+            return "";
+        }
+        String homeUri = GeneralConfig.getProperty(GeneralConfig.APPLICATION_HOME_URL) + "/home";
+        return uri.replace(homeUri, "");
     }
 
 }

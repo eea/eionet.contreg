@@ -14,10 +14,10 @@ import org.quartz.JobListener;
  * @author Risto Alt
  *
  */
-public class ReloadDatasetJobListener implements JobListener {
+public class LoadTriplesJobListener implements JobListener {
 
     /** */
-    private static Log logger = LogFactory.getLog(ReloadDatasetJobListener.class);
+    private static Log logger = LogFactory.getLog(LoadTriplesJobListener.class);
 
     @Override
     public String getName() {
@@ -34,7 +34,7 @@ public class ReloadDatasetJobListener implements JobListener {
         JobDataMap dataMap = context.getJobDetail().getJobDataMap();
         String datasetUri = dataMap.getString("datasetUri");
 
-        logger.info("Dataset reload started: " + datasetUri);
+        logger.info("Loading triples started: " + datasetUri);
     }
 
     @Override
@@ -43,8 +43,8 @@ public class ReloadDatasetJobListener implements JobListener {
         String datasetUri = dataMap.getString("datasetUri");
 
         // Remove the flag that dataset is being reloaded
-        CurrentCompiledDatasets.removeCompiledDataset(datasetUri);
+        CurrentLoadedDatasets.removeLoadedDataset(datasetUri);
 
-        logger.info("Dataset reload finished: " + datasetUri);
+        logger.info("Loading triples finished: " + datasetUri);
     }
 }

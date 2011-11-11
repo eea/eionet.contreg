@@ -47,16 +47,13 @@ public interface FolderDAO extends DAO {
     /**
      * Creates a new folder in the given parent folder. Both given parameters must not be null or blank.
      *
-     * @param parentFolderUri
-     *            URI of the new folder's parent folder.
-     * @param folderName
-     *            The new folder's name.
-     * @param folderLabel
-     *            The logical folder's name.
-     * @throws DAOException
-     *             Thrown when a database-access error occurs.
+     * @param parentFolderUri - URI of the new folder's parent folder.
+     * @param folderName - The new folder's name.
+     * @param folderLabel - The logical folder's name.
+     * @param homeUri - User home URI.
+     * @throws DAOException - Thrown when a database-access error occurs.
      */
-    void createFolder(String parentFolderUri, String folderName, String folderLabel) throws DAOException;
+    void createFolder(String parentFolderUri, String folderName, String folderLabel, String homeUri) throws DAOException;
 
     /**
      * Returns true if a folder or file with the given name exists in the given parent folder. If it doesn't exist, returns false.
@@ -84,6 +81,15 @@ public interface FolderDAO extends DAO {
     boolean fileOrFolderExists(String folderUri) throws DAOException;
 
     /**
+     * Returns all user folders.
+     *
+     * @param homeUri - User home folder URI.
+     * @return List<String>.
+     * @throws DAOException
+     */
+    List<String> getUserFolders(String homeUri) throws DAOException;
+
+    /**
      * True, if folder is not empty and has files or folders.
      *
      * @param folderUri
@@ -98,9 +104,10 @@ public interface FolderDAO extends DAO {
      * Deletes folder from triplestore and from filesystem.
      *
      * @param folderUri
+     * @param homeUri - User home folder URI.
      * @throws DAOException
      */
-    void deleteFolder(String folderUri) throws DAOException;
+    void deleteFolder(String folderUri, String homeUri) throws DAOException;
 
     /**
      * Deletes uploaded files data.

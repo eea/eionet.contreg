@@ -288,7 +288,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
         // Delete folders
         for (RenameFolderItemDTO item : selectedItems) {
             if (item.isSelected() && FolderItemDTO.Type.FOLDER.equals(item.getType())) {
-                folderDAO.deleteFolder(item.getUri());
+                folderDAO.deleteFolder(item.getUri(), getUser().getHomeUri());
 
                 boolean folderDeleted = fileStore.deleteFolder(URIUtil.extractPathInUserHome(item.getUri()));
                 if (!folderDeleted) {
@@ -339,7 +339,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
             addCautionMessage("File or folder with the same name already exists.");
             return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
         }
-        folderDAO.createFolder(uri, title, label);
+        folderDAO.createFolder(uri, title, label, getUser().getHomeUri());
         addSystemMessage("Folder created successfully.");
         return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
     }

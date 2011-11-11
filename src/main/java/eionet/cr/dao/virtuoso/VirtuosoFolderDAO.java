@@ -47,6 +47,7 @@ import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.FolderDAO;
 import eionet.cr.dao.readers.ResultSetReaderException;
+import eionet.cr.dao.readers.UserFolderReader;
 import eionet.cr.dto.FolderItemDTO;
 import eionet.cr.util.Bindings;
 import eionet.cr.util.Hashes;
@@ -72,7 +73,7 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
 
     /** */
     private static final String INSERT_NEVER_HARVESTED_SOURCE_SQL =
-            "insert soft HARVEST_SOURCE (URL,URL_HASH,TIME_CREATED,INTERVAL_MINUTES) values (?,?,now(),0)";
+        "insert soft HARVEST_SOURCE (URL,URL_HASH,TIME_CREATED,INTERVAL_MINUTES) values (?,?,now(),0)";
 
     /**
      * @see eionet.cr.dao.FolderDAO#createUserHomeFolder(java.lang.String)
@@ -116,10 +117,10 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
     }
 
     /**
-     * @see eionet.cr.dao.FolderDAO#createFolder(java.lang.String, java.lang.String)
+     * @see eionet.cr.dao.FolderDAO#createFolder(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
      */
     @Override
-    public void createFolder(String parentFolderUri, String folderName, String folderLabel) throws DAOException {
+    public void createFolder(String parentFolderUri, String folderName, String folderLabel, String homeUri) throws DAOException {
 
         // Make sure we have valid inputs.
         if (StringUtils.isBlank(parentFolderUri) || StringUtils.isBlank(folderName)) {
@@ -148,6 +149,7 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
             repoConn.setAutoCommit(false);
             ValueFactory vf = repoConn.getValueFactory();
 
+            URI homeFolder = vf.createURI(homeUri);
             URI parentFolder = vf.createURI(parentFolderUri);
             URI hasFolder = vf.createURI(Predicates.CR_HAS_FOLDER);
             URI newFolder = vf.createURI(newFolderUri);
@@ -159,13 +161,13 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
             URI file = vf.createURI(Subjects.CR_FILE);
 
             ArrayList<Statement> statements = new ArrayList<Statement>();
-            statements.add(new ContextStatementImpl(parentFolder, hasFolder, newFolder, parentFolder));
-            statements.add(new ContextStatementImpl(newFolder, rdfType, folder, parentFolder));
+            statements.add(new ContextStatementImpl(parentFolder, hasFolder, newFolder, homeFolder));
+            statements.add(new ContextStatementImpl(newFolder, rdfType, folder, homeFolder));
             if (StringUtils.isNotEmpty(folderLabel)) {
-                statements.add(new ContextStatementImpl(newFolder, rdfsLabel, folderLabelLiteral, parentFolder));
+                statements.add(new ContextStatementImpl(newFolder, rdfsLabel, folderLabelLiteral, homeFolder));
             }
-            statements.add(new ContextStatementImpl(newFolder, allowSubObjectType, folder, parentFolder));
-            statements.add(new ContextStatementImpl(newFolder, allowSubObjectType, file, parentFolder));
+            statements.add(new ContextStatementImpl(newFolder, allowSubObjectType, folder, homeFolder));
+            statements.add(new ContextStatementImpl(newFolder, allowSubObjectType, file, homeFolder));
             repoConn.add(statements);
 
             createNeverHarvestedSources(sqlConn, statements);
@@ -320,6 +322,34 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
      * {@inheritDoc}
      */
     @Override
+    public List<String> getUserFolders(String homeUri) throws DAOException {
+
+        List<String> ret = new ArrayList<String>();
+        ret.add(homeUri);
+
+        Bindings bindings = new Bindings();
+        bindings.setURI("homeUri", homeUri);
+        bindings.setURI("hasFolder", Predicates.CR_HAS_FOLDER);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT ?o WHERE { ");
+        sb.append("graph ?g {");
+        sb.append("?s ?p ?o . ");
+        sb.append("FILTER (?g = ?homeUri) .");
+        sb.append("FILTER (?p = ?hasFolder) .");
+        sb.append("}} ORDER BY ?o");
+        List<String> folders = executeSPARQL(sb.toString(), bindings, new UserFolderReader());
+        if (folders != null) {
+            ret.addAll(folders);
+        }
+
+        return ret;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean folderHasItems(String folderUri) throws DAOException {
         Bindings bindings = new Bindings();
         bindings.setURI("folderUri", folderUri);
@@ -344,7 +374,7 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
      * {@inheritDoc}
      */
     @Override
-    public void deleteFolder(String folderUri) throws DAOException {
+    public void deleteFolder(String folderUri, String homeUri) throws DAOException {
         String parentFolderUri = StringUtils.substringBeforeLast(folderUri, "/");
 
         Connection sqlConn = null;
@@ -356,11 +386,12 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
             URI folder = valueFactory.createURI(folderUri);
             URI hasFolder = valueFactory.createURI(Predicates.CR_HAS_FOLDER);
             URI parentFolder = valueFactory.createURI(parentFolderUri);
+            URI homeFolder = valueFactory.createURI(homeUri);
             URI harvesterContext = valueFactory.createURI(GeneralConfig.HARVESTER_URI);
             // TODO: also add registrations graph context - http://127.0.0.1:8080/cr/home/voolajuh/registrations
 
             repoConn.remove(folder, null, null, parentFolder, harvesterContext);
-            repoConn.remove(parentFolder, hasFolder, (Value) folder, parentFolder);
+            repoConn.remove(parentFolder, hasFolder, (Value) folder, homeFolder);
 
         } catch (RepositoryException e) {
             throw new DAOException(e.toString(), e);

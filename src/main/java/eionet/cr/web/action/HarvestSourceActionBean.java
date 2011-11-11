@@ -22,6 +22,7 @@ package eionet.cr.web.action;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,15 +38,18 @@ import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.StreamingResolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.validation.SimpleError;
+import net.sourceforge.stripes.validation.ValidationMethod;
 
 import org.apache.commons.lang.StringUtils;
 import org.quartz.SchedulerException;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.FolderDAO;
 import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
+import eionet.cr.dataset.CreateDataset;
 import eionet.cr.dto.HarvestDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.TripleDTO;
@@ -87,7 +91,11 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     };
 
     /** */
+    private List<String> folders;
     private String exportType;
+    private String datasetName;
+    private String folder;
+    private boolean overwriteDataset;
 
     private boolean schemaSource;
 
@@ -327,7 +335,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
      *
      * @return Resolution
      */
-    public Resolution export() {
+    public Resolution export() throws DAOException {
 
         Resolution resolution = new ForwardResolution("/pages/export.jsp");
 
@@ -348,14 +356,80 @@ public class HarvestSourceActionBean extends AbstractActionBean {
                         }
                     }).setFilename("rdf.xml");
                 } else if (ExportType.HOMESPACE.toString().equals(exportType)) {
-                    // TODO handle export to home space
+                    try {
+                        // If datasetName not provided, then extract it from source url
+                        if (StringUtils.isBlank(datasetName)) {
+                            datasetName = StringUtils.substringAfterLast(harvestSource.getUrl(), "/");
+                        }
+                        // Construct dataset uri
+                        if (!StringUtils.isBlank(datasetName) && !StringUtils.isBlank(folder)) {
+                            String dataset = folder + "/" + StringUtils.replace(datasetName, " ", "%20");
+
+                            List<String> selectedFiles = new ArrayList<String>();
+                            selectedFiles.add(harvestSource.getUrl());
+
+                            CreateDataset cd = new CreateDataset(null, getUser());
+                            cd.create(dataset, folder, selectedFiles, overwriteDataset);
+
+                            return new RedirectResolution(FactsheetActionBean.class).addParameter("uri", dataset);
+                        }
+                    } catch (Exception e) {
+                        throw new DAOException(e.getMessage(), e);
+                    }
                 } else {
                     throw new IllegalArgumentException("Unknown export type: " + exportType);
                 }
             }
+        } else if (getUser() != null) {
+            folders = factory.getDao(FolderDAO.class).getUserFolders(getUser().getHomeUri());
         }
 
         return resolution;
+    }
+
+    /**
+     * @throws DAOException
+     */
+    @ValidationMethod(on = {"export"})
+    public void validateSaveEvent() throws DAOException {
+
+        // the below validation is relevant only when exported to HOMESPACE
+        if (exportType == null || ExportType.FILE.toString().equals(exportType)) {
+            return;
+        }
+
+        // for all the above POST events, user must be authorized
+        if (getUser() == null) {
+            addGlobalValidationError("User not logged in!");
+            return;
+        }
+
+        // no folder selected
+        if (StringUtils.isBlank(folder)) {
+            addGlobalValidationError("Folder not selected!");
+            return;
+        }
+
+        // Check if file already exists
+        // If datasetName not provided, then extract it from source url
+        if (StringUtils.isBlank(datasetName)) {
+            datasetName = StringUtils.substringAfterLast(harvestSource.getUrl(), "/");
+        }
+        if (!overwriteDataset && !StringUtils.isBlank(datasetName) && !StringUtils.isBlank(folder)) {
+            String datasetUri = folder + "/" + StringUtils.replace(datasetName, " ", "%20");
+            boolean exists = DAOFactory.get().getDao(FolderDAO.class).fileOrFolderExists(datasetUri);
+            if (exists) {
+                addGlobalValidationError("File named \"" + datasetName + "\" already exists in folder \""+folder+"\"!");
+            }
+        }
+
+        folders = factory.getDao(FolderDAO.class).getUserFolders(getUser().getHomeUri());
+
+        // if any validation errors were set above, make sure the right resolution is returned
+        if (hasValidationErrors()) {
+            Resolution resolution = new ForwardResolution("/pages/export.jsp");
+            getContext().setSourcePageResolution(resolution);
+        }
     }
 
     /**
@@ -542,5 +616,37 @@ public class HarvestSourceActionBean extends AbstractActionBean {
      */
     public void setUrlBefore(String urlBefore) {
         this.urlBefore = urlBefore;
+    }
+
+    public String getDatasetName() {
+        return datasetName;
+    }
+
+    public void setDatasetName(String datasetName) {
+        this.datasetName = datasetName;
+    }
+
+    public boolean getOverwriteDataset() {
+        return overwriteDataset;
+    }
+
+    public void setOverwriteDataset(boolean overwriteDataset) {
+        this.overwriteDataset = overwriteDataset;
+    }
+
+    public List<String> getFolders() {
+        return folders;
+    }
+
+    public void setFolders(List<String> folders) {
+        this.folders = folders;
+    }
+
+    public String getFolder() {
+        return folder;
+    }
+
+    public void setFolder(String folder) {
+        this.folder = folder;
     }
 }

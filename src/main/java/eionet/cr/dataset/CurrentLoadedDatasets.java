@@ -27,16 +27,16 @@ import java.util.HashMap;
  * @author altnyris
  *
  */
-public class CurrentCompiledDatasets {
+public class CurrentLoadedDatasets {
 
     /** */
-    private static HashMap<String, String> compiledDatasets;
+    private static HashMap<String, String> loadedDatasets;
 
     /**
      *
      */
     static {
-        compiledDatasets = new HashMap<String, String>();
+        loadedDatasets = new HashMap<String, String>();
     }
 
     /**
@@ -44,10 +44,10 @@ public class CurrentCompiledDatasets {
      * @param url
      * @param user
      */
-    public static synchronized void addCompiledDataset(String url, String user) {
+    public static synchronized void addLoadedDataset(String url, String user) {
 
         if (url != null && user != null) {
-            compiledDatasets.put(url, user);
+            loadedDatasets.put(url, user);
         }
     }
 
@@ -55,9 +55,9 @@ public class CurrentCompiledDatasets {
      *
      * @param url
      */
-    public static synchronized void removeCompiledDataset(String url) {
+    public static synchronized void removeLoadedDataset(String url) {
         if (url != null) {
-            compiledDatasets.remove(url);
+            loadedDatasets.remove(url);
         }
     }
 
@@ -72,7 +72,7 @@ public class CurrentCompiledDatasets {
             return false;
         }
 
-        if (compiledDatasets.containsKey(url)) {
+        if (loadedDatasets.containsKey(url)) {
             return true;
         }
 

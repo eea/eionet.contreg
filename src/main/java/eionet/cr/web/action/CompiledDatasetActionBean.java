@@ -43,9 +43,9 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
-import eionet.cr.dataset.CurrentCompiledDatasets;
-import eionet.cr.dataset.ReloadDatasetJob;
-import eionet.cr.dataset.ReloadDatasetJobListener;
+import eionet.cr.dataset.CurrentLoadedDatasets;
+import eionet.cr.dataset.LoadTriplesJob;
+import eionet.cr.dataset.LoadTriplesJobListener;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.web.util.tabs.FactsheetTabMenuHelper;
@@ -105,17 +105,20 @@ public class CompiledDatasetActionBean extends AbstractActionBean {
                 if (!StringUtils.isBlank(uri)) {
                     try {
                         // Raise the flag that dataset is being reloaded
-                        CurrentCompiledDatasets.addCompiledDataset(uri, getUserName());
+                        CurrentLoadedDatasets.addLoadedDataset(uri, getUserName());
 
                         // Start dataset reload job
                         SchedulerFactory schedFact = new org.quartz.impl.StdSchedulerFactory();
                         Scheduler sched = schedFact.getScheduler();
                         sched.start();
 
-                        JobDetail jobDetail = new JobDetail("ReloadDatasetJob", null, ReloadDatasetJob.class);
+                        JobDetail jobDetail = new JobDetail("LoadTriplesJob", null, LoadTriplesJob.class);
                         jobDetail.getJobDataMap().put("datasetUri", uri);
+                        jobDetail.getJobDataMap().put("overwrite", true);
+                        List<String> datasetFiles = DAOFactory.get().getDao(CompiledDatasetDAO.class).getDatasetFiles(uri);
+                        jobDetail.getJobDataMap().put("selectedFiles", datasetFiles);
 
-                        ReloadDatasetJobListener listener = new ReloadDatasetJobListener();
+                        LoadTriplesJobListener listener = new LoadTriplesJobListener();
                         jobDetail.addJobListener(listener.getName());
                         sched.addJobListener(listener);
 
@@ -124,10 +127,10 @@ public class CompiledDatasetActionBean extends AbstractActionBean {
 
                         // Update source last modified date
                         DAOFactory
-                                .get()
-                                .getDao(HarvestSourceDAO.class)
-                                .insertUpdateSourceMetadata(uri, Predicates.CR_LAST_MODIFIED,
-                                        ObjectDTO.createLiteral(dateFormat.format(new Date()), XMLSchema.DATETIME));
+                        .get()
+                        .getDao(HarvestSourceDAO.class)
+                        .insertUpdateSourceMetadata(uri, Predicates.CR_LAST_MODIFIED,
+                                ObjectDTO.createLiteral(dateFormat.format(new Date()), XMLSchema.DATETIME));
 
                         success = true;
                     } catch (Exception e) {
@@ -135,7 +138,7 @@ public class CompiledDatasetActionBean extends AbstractActionBean {
                         addCautionMessage("Error occured while executing compiled dataset reload process!");
 
                         // Remove the flag that dataset is being reloaded
-                        CurrentCompiledDatasets.removeCompiledDataset(uri);
+                        CurrentLoadedDatasets.removeLoadedDataset(uri);
                     }
                 }
             } else {
@@ -146,7 +149,7 @@ public class CompiledDatasetActionBean extends AbstractActionBean {
         }
 
         if (success) {
-            if (!CurrentCompiledDatasets.contains(uri)) {
+            if (!CurrentLoadedDatasets.contains(uri)) {
                 addSystemMessage("Reloaded successfully");
             } else {
                 addSystemMessage("Reload started in the background.");
@@ -178,7 +181,7 @@ public class CompiledDatasetActionBean extends AbstractActionBean {
      */
     public boolean isCurrentlyReloaded() {
 
-        return uri == null ? false : CurrentCompiledDatasets.contains(uri);
+        return uri == null ? false : CurrentLoadedDatasets.contains(uri);
     }
 
     /**

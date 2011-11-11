@@ -21,31 +21,31 @@ import eionet.cr.dao.DAOFactory;
  * @author Risto Alt
  *
  */
-public class ReloadDatasetJob implements Job {
+public class LoadTriplesJob implements Job {
 
     /** */
-    private static Log logger = LogFactory.getLog(CompileDatasetJob.class);
+    private static Log logger = LogFactory.getLog(LoadTriplesJob.class);
 
-    public ReloadDatasetJob() {
+    public LoadTriplesJob() {
     }
 
     public void execute(JobExecutionContext context) throws JobExecutionException {
         JobDataMap dataMap = context.getJobDetail().getJobDataMap();
 
+        @SuppressWarnings("unchecked")
+        List<String> selectedFiles = (List<String>) dataMap.get("selectedFiles");
         String datasetUri = dataMap.getString("datasetUri");
+        boolean overwrite = dataMap.getBoolean("overwrite");
 
         try {
-            if (!StringUtils.isBlank(datasetUri)) {
-                List<String> datasetFiles = DAOFactory.get().getDao(CompiledDatasetDAO.class).getDatasetFiles(datasetUri);
-                if (datasetFiles != null && datasetFiles.size() > 0) {
-                    DAOFactory.get().getDao(CompiledDatasetDAO.class).saveDataset(datasetFiles, datasetUri, true);
-                }
+            if (!StringUtils.isBlank(datasetUri) && selectedFiles != null && selectedFiles.size() > 0) {
+                DAOFactory.get().getDao(CompiledDatasetDAO.class).saveDataset(selectedFiles, datasetUri, overwrite);
             }
         } catch (DAOException e) {
-            logger.info("Error occured while compiling dataset: " + datasetUri);
+            logger.info("Error occured while loading triples: " + datasetUri);
             e.printStackTrace();
-            // Remove the flag that dataset is being reloaded
-            CurrentCompiledDatasets.removeCompiledDataset(datasetUri);
+            // Remove the flag that triples are being loaded
+            CurrentLoadedDatasets.removeLoadedDataset(datasetUri);
         }
     }
 
