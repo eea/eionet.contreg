@@ -59,7 +59,8 @@ public class ViewActionBean extends AbstractActionBean{
     @DefaultHandler
     public Resolution defaultHandler() throws DAOException{
 
-        RedirectResolution resolution = new RedirectResolution(FactsheetActionBean.class);
+        RedirectResolution resolution = null;
+
         SubjectDTO subject = StringUtils.isBlank(uri) ? null : DAOFactory.get().getDao(HelperDAO.class).getSubject(uri);
         if (subject!=null){
 
@@ -86,6 +87,11 @@ public class ViewActionBean extends AbstractActionBean{
                     }
                 }
             }
+        }
+
+        if (resolution==null){
+            resolution = new RedirectResolution(FactsheetActionBean.class);
+            resolution.addParameter("uri", uri==null ? "" : uri);
         }
 
         return resolution;
