@@ -187,7 +187,7 @@ public abstract class BaseHarvest implements Harvest {
     private void finishHarvest(boolean dontThrowException) throws HarvestException {
 
         try {
-            // run post-harvest scripts (TODO not to be run yet, as the scripts functionality is not entirely finished)
+            // run post-harvest scripts
             runPostHarvestScripts();
 
             // send harvest messages
