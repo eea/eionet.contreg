@@ -253,6 +253,10 @@ public class PullHarvest extends BaseHarvest {
         addHarvestMessage("Source not modified since last harvest", HarvestMessageType.INFO);
         isSourceAvailable = true;
         finishWithOK(urlConn, 0);
+
+        // FIXME we don't want to clean all previous metadata- that's true- but we still
+        // want the cr:lastRefreshed predicate updated. This is missing here.
+        setCleanAllPreviousSourceMetadata(false);
     }
 
     /**
@@ -572,7 +576,7 @@ public class PullHarvest extends BaseHarvest {
      * @throws ParserConfigurationException
      */
     private HttpURLConnection openUrlConnection(String connectUrl) throws MalformedURLException, IOException, DAOException,
-            SAXException, ParserConfigurationException {
+    SAXException, ParserConfigurationException {
 
         String sanitizedUrl = StringUtils.substringBefore(connectUrl, "#");
         sanitizedUrl = StringUtils.replace(sanitizedUrl, " ", "%20");
@@ -667,7 +671,7 @@ public class PullHarvest extends BaseHarvest {
      * @throws IOException
      */
     private String getConversionStylesheetUrl(String harvestSourceUrl) throws DAOException, IOException, SAXException,
-            ParserConfigurationException {
+    ParserConfigurationException {
 
         String result = null;
 
