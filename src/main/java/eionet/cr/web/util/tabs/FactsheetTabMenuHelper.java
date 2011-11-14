@@ -76,8 +76,8 @@ public class FactsheetTabMenuHelper {
 
         if (subject.getObject(Predicates.RDF_TYPE) != null) {
             folderType =
-                    Subjects.CR_FOLDER.equals(subject.getObject(Predicates.RDF_TYPE).getValue())
-                    || Subjects.CR_USER_FOLDER.equals(subject.getObject(Predicates.RDF_TYPE).getValue());
+                Subjects.CR_FOLDER.equals(subject.getObject(Predicates.RDF_TYPE).getValue())
+                || Subjects.CR_USER_FOLDER.equals(subject.getObject(Predicates.RDF_TYPE).getValue());
         }
 
     }
@@ -108,6 +108,26 @@ public class FactsheetTabMenuHelper {
             result.add(te3);
 
         }
+
+        result.addAll(getTypeSpecificTabs(selected));
+        return result;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public List<TabElement> getTypeSpecificTabs(){
+        return getTypeSpecificTabs(null);
+    }
+
+    /**
+     *
+     * @return
+     */
+    public List<TabElement> getTypeSpecificTabs(String selected){
+
+        List<TabElement> result = new ArrayList<TabElement>();
 
         if (mapDisplayable) {
             TabElement te4 = new TabElement(TabTitle.SHOW_ON_MAP, "/factsheet.action", selected);
@@ -146,6 +166,9 @@ public class FactsheetTabMenuHelper {
         return uriIsHarvestSource;
     }
 
+    /**
+     *
+     */
     public static class TabTitle {
         public static final String RESOURCE_PROPERTIES = "Resource properties";
         public static final String RESOURCE_REFERENCES = "Resource references";

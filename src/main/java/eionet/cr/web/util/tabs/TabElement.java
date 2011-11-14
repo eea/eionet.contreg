@@ -56,7 +56,7 @@ public class TabElement {
     public TabElement(String title, String href, String selectedTitle) {
         this.title = title;
         this.href = href;
-        selected = title.equals(selectedTitle);
+        selected = selectedTitle==null ? false : title.equals(selectedTitle);
     }
 
     /**
@@ -143,5 +143,4 @@ public class TabElement {
     public void setEvent(String event) {
         this.event = event;
     }
-
 }

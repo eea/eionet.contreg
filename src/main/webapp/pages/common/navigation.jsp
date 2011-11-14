@@ -29,7 +29,7 @@
             <li><a href="registerUrl.action">URL registration</a></li>
             <%-- We're sure that session has user, because we assume anonymous users --%>
             <%-- don't have permissions in "/registrations" ACL.                     --%>
-            <li><a href="home/${sessionScope.crUser.userName}">My home</a></li>
+            <li><a href="view.action?uri=${fn:escapeXml(sessionScope.crUser.homeUri)}">My home</a></li>
         </c:if>
     </ul>
 </div>

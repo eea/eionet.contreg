@@ -146,10 +146,10 @@ public class FactsheetActionBean extends AbstractActionBean {
 
             subject = helperDAO.getFactsheet(uri, null, getPredicatePageNumbers());
 
-            FactsheetTabMenuHelper helper = new FactsheetTabMenuHelper(uri, subject, factory.getDao(HarvestSourceDAO.class));
+            FactsheetTabMenuHelper tabsHelper = new FactsheetTabMenuHelper(uri, subject, factory.getDao(HarvestSourceDAO.class));
 
-            tabs = helper.getTabs(FactsheetTabMenuHelper.TabTitle.RESOURCE_PROPERTIES);
-            uriIsHarvestSource = helper.isUriIsHarvestSource();
+            tabs = tabsHelper.getTabs(FactsheetTabMenuHelper.TabTitle.RESOURCE_PROPERTIES);
+            uriIsHarvestSource = tabsHelper.isUriIsHarvestSource();
         }
 
         return new ForwardResolution("/pages/factsheet.jsp");
