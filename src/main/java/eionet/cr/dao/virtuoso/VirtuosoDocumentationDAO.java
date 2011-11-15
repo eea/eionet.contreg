@@ -18,7 +18,7 @@ import eionet.cr.util.sql.SQLUtil;
 
 /**
  * @author Risto Alt
- * 
+ *
  */
 public class VirtuosoDocumentationDAO extends VirtuosoBaseDAO implements DocumentationDAO {
 

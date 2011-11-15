@@ -45,9 +45,9 @@ import eionet.cr.web.util.ApplicationCache;
 import eionet.cr.web.util.CustomPaginatedList;
 
 /**
- * 
+ *
  * @author altnyris
- * 
+ *
  */
 @UrlBinding("/deliverySearch.action")
 public class DeliverySearchActionBean extends DisplaytagSearchActionBean {
@@ -70,7 +70,7 @@ public class DeliverySearchActionBean extends DisplaytagSearchActionBean {
     }
 
     /**
-     * 
+     *
      * @return
      */
     @DefaultHandler
@@ -80,7 +80,7 @@ public class DeliverySearchActionBean extends DisplaytagSearchActionBean {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.web.action.AbstractSearchActionBean#search()
      */
     public Resolution search() throws DAOException {

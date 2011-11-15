@@ -48,9 +48,9 @@ import eionet.cr.dto.DocumentationDTO;
 import eionet.cr.filestore.FileStore;
 
 /**
- * 
+ *
  * @author Risto Alt
- * 
+ *
  */
 @UrlBinding("/documentation/{pageId}/{event}")
 public class DocumentationActionBean extends AbstractActionBean {
@@ -78,7 +78,7 @@ public class DocumentationActionBean extends AbstractActionBean {
     private boolean editableContent;
 
     /**
-     * 
+     *
      * @return Resolution
      * @throws DAOException
      *             if query fails
@@ -146,7 +146,7 @@ public class DocumentationActionBean extends AbstractActionBean {
 
     /**
      * Simply forwards to add documentation page
-     * 
+     *
      * @return Resolution
      * @throws Exception
      */
@@ -156,7 +156,7 @@ public class DocumentationActionBean extends AbstractActionBean {
 
     /**
      * Edit page
-     * 
+     *
      * @return Resolution
      * @throws Exception
      */
@@ -171,7 +171,7 @@ public class DocumentationActionBean extends AbstractActionBean {
 
     /**
      * Adds content into documentation table
-     * 
+     *
      * @return Resolution
      * @throws DAOException
      */
@@ -188,7 +188,7 @@ public class DocumentationActionBean extends AbstractActionBean {
 
     /**
      * Insert content into database
-     * 
+     *
      * @throws Exception
      */
     private void insertContent() throws Exception {

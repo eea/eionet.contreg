@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 /**
  * @author Risto Alt
- * 
+ *
  */
 public class DocumentationDTO implements Serializable {
 
