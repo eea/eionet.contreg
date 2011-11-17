@@ -21,17 +21,21 @@
 
 package eionet.cr.web.action;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 
 import org.apache.commons.lang.StringUtils;
 import org.openrdf.model.vocabulary.XMLSchema;
+import org.openrdf.repository.RepositoryException;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
@@ -48,6 +52,7 @@ import eionet.cr.dataset.LoadTriplesJob;
 import eionet.cr.dataset.LoadTriplesJobListener;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
+import eionet.cr.dto.TripleDTO;
 import eionet.cr.web.util.tabs.FactsheetTabMenuHelper;
 import eionet.cr.web.util.tabs.TabElement;
 
@@ -62,12 +67,15 @@ public class CompiledDatasetActionBean extends AbstractActionBean {
     /** URI by which the factsheet has been requested. */
     private String uri;
 
+    /** Files to be selected for removal. */
+    private List<String> selectedFiles;
+
     /** Compiled dataset sources. */
     private List<SubjectDTO> sources;
 
     private List<TabElement> tabs;
 
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
     /**
      * Action event for displaying dataset sources.
@@ -127,10 +135,10 @@ public class CompiledDatasetActionBean extends AbstractActionBean {
 
                         // Update source last modified date
                         DAOFactory
-                        .get()
-                        .getDao(HarvestSourceDAO.class)
-                        .insertUpdateSourceMetadata(uri, Predicates.CR_LAST_MODIFIED,
-                                ObjectDTO.createLiteral(dateFormat.format(new Date()), XMLSchema.DATETIME));
+                                .get()
+                                .getDao(HarvestSourceDAO.class)
+                                .insertUpdateSourceMetadata(uri, Predicates.CR_LAST_MODIFIED,
+                                        ObjectDTO.createLiteral(dateFormat.format(new Date()), XMLSchema.DATETIME));
 
                         success = true;
                     } catch (Exception e) {
@@ -156,6 +164,48 @@ public class CompiledDatasetActionBean extends AbstractActionBean {
             }
         }
         return view();
+    }
+
+    /**
+     * Removes files from compiled dataset.
+     *
+     * @return
+     * @throws DAOException
+     * @throws IOException
+     * @throws RepositoryException
+     */
+    public Resolution removeFiles() throws DAOException, RepositoryException, IOException {
+        if (selectedFiles == null || selectedFiles.size() == 0) {
+            return new RedirectResolution(CompiledDatasetActionBean.class).addParameter("uri", uri);
+        }
+
+        // Remove triles
+        CompiledDatasetDAO compiledDatasetDao = DAOFactory.get().getDao(CompiledDatasetDAO.class);
+        compiledDatasetDao.removeFiles(uri, selectedFiles);
+
+        // Remove generatedFrom properties
+        HelperDAO helperDao = DAOFactory.get().getDao(HelperDAO.class);
+        List<TripleDTO> triples = new ArrayList<TripleDTO>();
+        for (String file : selectedFiles) {
+            TripleDTO t = new TripleDTO(uri, Predicates.CR_GENERATED_FROM, file);
+            t.setSourceUri(getUser().getHomeUri());
+            triples.add(t);
+        }
+        helperDao.deleteTriples(triples);
+
+        // Update source last modified date
+        DAOFactory
+                .get()
+                .getDao(HarvestSourceDAO.class)
+                .insertUpdateSourceMetadata(uri, Predicates.CR_LAST_MODIFIED,
+                        ObjectDTO.createLiteral(dateFormat.format(new Date()), XMLSchema.DATETIME));
+
+        addSystemMessage("Selected files are being removed from the dataset.");
+        if (compiledDatasetDao.isCompiledDatasetExpiredData(uri, selectedFiles)) {
+            addCautionMessage("Some of the selected files have newer content. Reloding the dataset is recommended.");
+        }
+
+        return new RedirectResolution(CompiledDatasetActionBean.class).addParameter("uri", uri);
     }
 
     /**
@@ -211,6 +261,21 @@ public class CompiledDatasetActionBean extends AbstractActionBean {
      */
     public List<SubjectDTO> getSources() {
         return sources;
+    }
+
+    /**
+     * @return the selectedFiles
+     */
+    public List<String> getSelectedFiles() {
+        return selectedFiles;
+    }
+
+    /**
+     * @param selectedFiles
+     *            the selectedFiles to set
+     */
+    public void setSelectedFiles(List<String> selectedFiles) {
+        this.selectedFiles = selectedFiles;
     }
 
 }

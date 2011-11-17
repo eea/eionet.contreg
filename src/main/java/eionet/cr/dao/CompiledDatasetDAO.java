@@ -72,14 +72,22 @@ public interface CompiledDatasetDAO extends DAO {
      * Saves compiled dataset into new graph
      *
      * @param selectedFiles
-     *            .
      * @param datasetUri
-     *            .
      * @param overwrite
-     *            .
-     * @throws DAOException.
+     * @throws DAOException
      */
     void saveDataset(List<String> selectedFiles, String datasetUri, boolean overwrite) throws DAOException;
+
+    /**
+     * Removes triples from compiled dataset that also exists in the selectedFiles.
+     *
+     * @param datasetUri
+     *            compiled dataset graph
+     * @param selectedFiles
+     *            grpahs which triples must be removed
+     * @throws DAOException
+     */
+    void removeFiles(String datasetUri, List<String> selectedFiles) throws DAOException;
 
     /**
      * User compiled datasets.
@@ -88,18 +96,18 @@ public interface CompiledDatasetDAO extends DAO {
      *            CR user
      * @see eionet.cr.dao.HelperDAO#getUserCompiledDatasets(eionet.cr.web.security.CRUser)
      * @throws DAOException
-     *             if query fails.
-     * @return List of user compiled datasets.
+     *             if query fails
+     * @return List of user compiled datasets
      */
     Collection<UploadDTO> getUserCompiledDatasets(CRUser crUser) throws DAOException;
 
     /**
-     * Check if compiled dataset exists.
+     * Check if compiled dataset exists
      *
      * @param uri
-     *            dataset URI.
-     * @throws DAOException.
-     * @return boolean.
+     *            dataset URI
+     * @throws DAOException
+     * @return boolean
      */
     boolean datasetExists(String uri) throws DAOException;
 
@@ -107,11 +115,21 @@ public interface CompiledDatasetDAO extends DAO {
      * Check if user owns the compiled dataset.
      *
      * @param dataset
-     *            .
      * @param userHome
-     *            .
-     * @throws DAOException.
-     * @return boolean.
+     * @throws DAOException
+     * @return boolean
      */
     boolean isUsersDataset(String dataset, String userHome) throws DAOException;
+
+    /**
+     * Returns true, if compiled datset's lastModified property is older than one of the selected files.
+     *
+     * @param datasetUri
+     *            compiled dataset's uri
+     * @param selectedFiles
+     *            collections of graph uris
+     * @return
+     * @throws DAOException
+     */
+    boolean isCompiledDatasetExpiredData(String datasetUri, List<String> selectedFiles) throws DAOException;
 }

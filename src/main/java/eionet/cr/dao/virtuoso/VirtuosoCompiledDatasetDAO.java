@@ -314,4 +314,71 @@ public class VirtuosoCompiledDatasetDAO extends VirtuosoBaseDAO implements Compi
         return ret;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeFiles(String datasetUri, List<String> selectedFiles) throws DAOException {
+
+        if (StringUtils.isEmpty(datasetUri)) {
+            throw new IllegalArgumentException("Dataset URI must not be null");
+        }
+
+        if (selectedFiles == null || selectedFiles.size() == 0) {
+            return;
+        }
+
+        RepositoryConnection con = null;
+        try {
+            con = SesameConnectionProvider.getRepositoryConnection();
+            for (String graph : selectedFiles) {
+                StringBuffer query = new StringBuffer();
+                query.append("DELETE FROM ?graphUri { ?s ?p ?o } ");
+                query.append("WHERE { GRAPH ?originalGraphUri { ?s ?p ?o }}");
+
+                Bindings bindings = new Bindings();
+                bindings.setURI("graphUri", datasetUri);
+                bindings.setURI("originalGraphUri", graph);
+                executeUpdateQuerySPARQL(query.toString(), bindings, con);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new DAOException(e.getMessage(), e);
+        } finally {
+            SesameUtil.close(con);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isCompiledDatasetExpiredData(String datasetUri, List<String> selectedFiles) throws DAOException {
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT ?time WHERE {?dataset ?latModified ?time} ");
+        Bindings bindings = new Bindings();
+        bindings.setURI("dataset", datasetUri);
+        bindings.setURI("latModified", Predicates.CR_LAST_MODIFIED);
+
+        String datasetLastModified = executeUniqueResultSPARQL(sb.toString(), bindings, new SingleObjectReader<String>());
+
+        sb = new StringBuilder();
+        sb.append("SELECT xsd:dateTime(?datasetLastModified) > ?time WHERE {?dataset ?lastModified ?time}");
+
+        for (String file : selectedFiles) {
+            bindings = new Bindings();
+            bindings.setURI("datasetLastModified", datasetLastModified);
+            bindings.setURI("dataset", file);
+            bindings.setURI("latModified", Predicates.CR_LAST_MODIFIED);
+
+            String result = executeUniqueResultSPARQL(sb.toString(), bindings, new SingleObjectReader<String>());
+            int resultInt = Integer.parseInt(result);
+            if (resultInt != 1) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 }
