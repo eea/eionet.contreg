@@ -226,6 +226,7 @@ public class TabularDataServlet extends HttpServlet {
      */
     public static boolean willHandle(String fileUri, String idInFile, HttpServletRequest request) throws DAOException {
 
+        boolean test = isTabularDataFile(fileUri);
         return isTabularDataFile(fileUri)
                 && (isContentTypeAccepted(request, "application/rdf+xml") || !StringUtils.isBlank(idInFile));
     }

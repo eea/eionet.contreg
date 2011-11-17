@@ -66,7 +66,7 @@ public class HomeContentTypeFilter implements Filter {
      */
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
-    throws IOException, ServletException {
+            throws IOException, ServletException {
 
         // Pass on if not a HTTP request.
         if (!(servletRequest instanceof HttpServletRequest)) {
@@ -97,7 +97,7 @@ public class HomeContentTypeFilter implements Filter {
 
                 // Extract user name and file name from the path info.
                 String userName = pathInfo.substring(1, i);
-                String fileName = pathInfo.substring(i + 1);
+                String filePath = pathInfo.substring(i + 1);
                 String fileUri = new String(requestURL);
 
                 // if is tabular data and (idInFile!=null || rdf not accepted)
@@ -108,36 +108,40 @@ public class HomeContentTypeFilter implements Filter {
                 // http://cr.eionet.europa.eu/home/userName/fileName/AT identifies code "AT"
                 // inside that file.
                 String idInFile = "";
-                if (!StringUtils.isBlank(fileName)) {
-                    int z = fileName.indexOf("/");
-                    if (z != -1 && fileName.length() > (z + 1)) {
-                        idInFile = fileName.substring(z + 1);
-                        fileName = fileName.substring(0, z);
-                        fileUri = StringUtils.substringBeforeLast(requestURL, "/" + idInFile);
+                String fileName = "";
+                String fileUriWithoutCode = fileUri;
+                if (!StringUtils.isBlank(filePath)) {
+                    if (filePath.contains("/")) {
+                        idInFile = StringUtils.substringAfterLast(filePath, "/");
+                        fileName = StringUtils.substringBeforeLast(filePath, "/");
+                        fileUriWithoutCode = StringUtils.substringBeforeLast(requestURL, "/" + idInFile);
                     }
                 }
 
                 try {
-                    if (TabularDataServlet.willHandle(fileUri, idInFile, httpRequest)) {
-
+                    if (TabularDataServlet.willHandle(fileUriWithoutCode, idInFile, httpRequest)) {
                         String redirectPath =
-                            httpRequest.getContextPath() + "/tabularData?fileUri=" + URLEncoder.encode(fileUri, "UTF-8");
+                                httpRequest.getContextPath() + "/tabularData?fileUri=" + URLEncoder.encode(fileUriWithoutCode, "UTF-8");
                         if (!StringUtils.isBlank(fileName)) {
                             redirectPath = redirectPath + "&idInFile=" + URLEncoder.encode(idInFile, "UTF-8");
                         }
                         LOGGER.debug("URL points to tabular data, so redirecting to: " + redirectPath);
                         httpResponse.sendRedirect(redirectPath);
                         return;
-                    } else if (FileStore.getInstance(userName).get(fileName) != null) {
+                    } else if (FileStore.getInstance(userName).get(filePath) != null) {
 
                         String redirectPath =
-                            httpRequest.getContextPath() + "/download?uri=" + URLEncoder.encode(requestURL, "UTF-8");
+                                httpRequest.getContextPath() + "/download?uri=" + URLEncoder.encode(requestURL, "UTF-8");
                         LOGGER.debug("URL points to stored file, so redirecting to: " + redirectPath);
                         httpResponse.sendRedirect(redirectPath);
                         return;
                     } else if (httpRequest.getHeader("Accept")!=null
                             && httpRequest.getHeader("Accept").trim().toLowerCase().startsWith("application/rdf+xml")) {
 
+                        httpResponse.sendRedirect(httpRequest.getContextPath() + "/exportTriples.action?uri=" + URLEncoder.encode(requestURL, "UTF-8"));
+                        return;
+                    } else {
+                        // If no file is found and is not "application/rdf+xml" request
                         httpResponse.sendRedirect(httpRequest.getContextPath() + "/exportTriples.action?uri=" + URLEncoder.encode(requestURL, "UTF-8"));
                         return;
                     }

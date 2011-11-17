@@ -16,6 +16,7 @@ import org.apache.log4j.Logger;
 
 import eionet.cr.common.CRRuntimeException;
 import eionet.cr.config.GeneralConfig;
+import eionet.cr.util.URIUtil;
 import eionet.cr.web.security.CRUser;
 
 /**
@@ -225,8 +226,7 @@ public class FileStore {
             String userName = CRUser.getUserNameFromUri(uriString);
             if (userName != null && userName.trim().length() > 0) {
 
-                // by now assume that URI is correct and file name is everything after last '/'
-                String fileName = StringUtils.substringAfterLast(uriString, "/");
+                String fileName = URIUtil.extractPathInUserHome(uriString);
                 try {
                     fileName = URLDecoder.decode(fileName, "UTF-8");
                 } catch (UnsupportedEncodingException e) {

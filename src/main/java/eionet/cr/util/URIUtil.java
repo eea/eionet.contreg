@@ -274,7 +274,7 @@ public class URIUtil {
 
     /**
      * Returns the path after the user home folder. For example
-     * if uri is "http://127.0.0.1:8080/cr/home/heinlja/newFolder/newFile.txt" the result is "newFolder/newFile".
+     * if uri is "http://127.0.0.1:8080/cr/home/heinlja/newFolder/newFile.txt" the result is "newFolder/newFile.txt".
      * @param uri
      * @return
      */
