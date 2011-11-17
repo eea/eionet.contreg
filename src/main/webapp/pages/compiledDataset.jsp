@@ -58,7 +58,7 @@
                 <fmt:formatDate value="${item.lastModifiedDate}" pattern="yyyy-MM-dd"/>T<fmt:formatDate value="${item.lastModifiedDate}" pattern="HH:mm:ss"/>
             </display:column>
         </display:table>
-        <c:if test="${operationsAvailable}">
+        <c:if test="${operationsAvailable && !actionBean.sourcesEmpty}">
             <br />
             <div>
                 <stripes:submit name="removeFiles" value="Delete" title="Remove files from dataset"/>

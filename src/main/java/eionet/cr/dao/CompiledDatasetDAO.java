@@ -131,5 +131,5 @@ public interface CompiledDatasetDAO extends DAO {
      * @return
      * @throws DAOException
      */
-    boolean isCompiledDatasetExpiredData(String datasetUri, List<String> selectedFiles) throws DAOException;
+    boolean hasCompiledDatasetExpiredData(String datasetUri, List<String> selectedFiles) throws DAOException;
 }

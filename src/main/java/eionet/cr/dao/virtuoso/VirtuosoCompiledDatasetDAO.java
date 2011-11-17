@@ -353,7 +353,7 @@ public class VirtuosoCompiledDatasetDAO extends VirtuosoBaseDAO implements Compi
      * {@inheritDoc}
      */
     @Override
-    public boolean isCompiledDatasetExpiredData(String datasetUri, List<String> selectedFiles) throws DAOException {
+    public boolean hasCompiledDatasetExpiredData(String datasetUri, List<String> selectedFiles) throws DAOException {
         StringBuilder sb = new StringBuilder();
         sb.append("SELECT ?time WHERE {?dataset ?latModified ?time} ");
         Bindings bindings = new Bindings();
@@ -367,9 +367,9 @@ public class VirtuosoCompiledDatasetDAO extends VirtuosoBaseDAO implements Compi
 
         for (String file : selectedFiles) {
             bindings = new Bindings();
-            bindings.setURI("datasetLastModified", datasetLastModified);
+            bindings.setString("datasetLastModified", datasetLastModified);
             bindings.setURI("dataset", file);
-            bindings.setURI("latModified", Predicates.CR_LAST_MODIFIED);
+            bindings.setURI("lastModified", Predicates.CR_LAST_MODIFIED);
 
             String result = executeUniqueResultSPARQL(sb.toString(), bindings, new SingleObjectReader<String>());
             int resultInt = Integer.parseInt(result);

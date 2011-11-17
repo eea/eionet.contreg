@@ -200,9 +200,9 @@ public class CompiledDatasetActionBean extends AbstractActionBean {
                 .insertUpdateSourceMetadata(uri, Predicates.CR_LAST_MODIFIED,
                         ObjectDTO.createLiteral(dateFormat.format(new Date()), XMLSchema.DATETIME));
 
-        addSystemMessage("Selected files are being removed from the dataset.");
-        if (compiledDatasetDao.isCompiledDatasetExpiredData(uri, selectedFiles)) {
-            addCautionMessage("Some of the selected files have newer content. Reloding the dataset is recommended.");
+        addSystemMessage("Selected files are removed from the dataset.");
+        if (compiledDatasetDao.hasCompiledDatasetExpiredData(uri, selectedFiles)) {
+            addCautionMessage("Some of the data from the deleted files may still exist. Reloding the dataset is recommended.");
         }
 
         return new RedirectResolution(CompiledDatasetActionBean.class).addParameter("uri", uri);
@@ -232,6 +232,14 @@ public class CompiledDatasetActionBean extends AbstractActionBean {
     public boolean isCurrentlyReloaded() {
 
         return uri == null ? false : CurrentLoadedDatasets.contains(uri);
+    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean isSourcesEmpty() {
+        return sources.isEmpty();
     }
 
     /**
