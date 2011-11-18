@@ -3,10 +3,9 @@
 <%@page import="eionet.cr.web.util.BaseUrl"%>
 
 <stripes:layout-definition>
-    <%@ page contentType="text/html;charset=UTF-8" language="java"%>
-	
-	<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
+<%@ page contentType="text/html;charset=UTF-8" language="java"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
     <head>
 	    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="viewport" content="initial-scale=1.0" />
@@ -134,6 +133,7 @@
                         </div>
                     </div>
                 </div>
+                </div>
                 <!-- end of main content block -->
                     
                 <!-- start of the left (by default at least) column -->
@@ -173,6 +173,5 @@
         <crfn:template file="footer.html"/>
         </div>
     </body>
-    </html>
-
+</html>
 </stripes:layout-definition>

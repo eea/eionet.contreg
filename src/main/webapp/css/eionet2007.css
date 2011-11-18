@@ -345,7 +345,7 @@ div.documentContent .expandingArea > textarea,
 div.documentContent .expandingArea > pre {
   padding: 5px;
   background: transparent;
-  font: 400 13px/16px helvetica, arial, sans-serif;
+  font: 400 13px/16px Monaco, "Courier New", Courier, monospace;
   /* Make the text soft-wrap */
   white-space: pre-wrap;
   word-wrap: break-word;
