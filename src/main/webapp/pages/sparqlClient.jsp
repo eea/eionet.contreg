@@ -355,9 +355,8 @@ PREFIX rod: &lt;http://rod.eionet.europa.eu/schema.rdf#&gt;
                         <div class="note-msg">No bookmarked queries currently found!</div>
                     </c:if>
                 </div>
-            </div>
             --%>
-
+            </div>
         </div>
 
     </stripes:layout-component>

@@ -133,7 +133,6 @@
                         </div>
                     </div>
                 </div>
-                </div>
                 <!-- end of main content block -->
                     
                 <!-- start of the left (by default at least) column -->
