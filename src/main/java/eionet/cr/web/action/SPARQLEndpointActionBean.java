@@ -20,7 +20,6 @@ import net.sourceforge.stripes.action.UrlBinding;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.vocabulary.XMLSchema;
 import org.openrdf.query.BooleanQuery;
@@ -60,9 +59,6 @@ import eionet.cr.web.sparqlClient.helpers.QueryResult;
  */
 @UrlBinding("/sparql")
 public class SPARQLEndpointActionBean extends AbstractActionBean {
-
-    /** Logger. */
-    private static final Logger LOGGER = Logger.getLogger(SPARQLEndpointActionBean.class);
 
     /** */
     private static final int DEFAULT_NUMBER_OF_HITS = 20;
@@ -309,7 +305,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         Resolution resolution = null;
         if (useInferencing && !StringUtils.isBlank(query)) {
             String infCommand =
-                    "DEFINE input:inference '" + GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME) + "'";
+                "DEFINE input:inference '" + GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME) + "'";
 
             // if inference command not yet present in the query, add it
             if (query.indexOf(infCommand) == -1) {
@@ -346,18 +342,17 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                 }
             };
             ((StreamingResolution) resolution).setFilename("sparql-result.json");
-        } else if (accept[0].equals("text/html+")) {
-            if (!StringUtils.isBlank(query)) {
-                runQuery(query, FORMAT_HTML_PLUS, null);
-            }
-            resolution = new ForwardResolution(FORM_PAGE);
         } else {
             if (!StringUtils.isBlank(query)) {
-                runQuery(query, FORMAT_HTML, null);
+                if (accept[0].equals("text/html+")) {
+                    runQuery(query, FORMAT_HTML_PLUS, null);
+                } else {
+                    runQuery(query, FORMAT_HTML, null);
+                }
             }
             resolution = new ForwardResolution(FORM_PAGE);
+            query = StringEscapeUtils.escapeHtml(query);
         }
-        query = StringEscapeUtils.escapeHtml(query);
 
         return resolution;
     }
