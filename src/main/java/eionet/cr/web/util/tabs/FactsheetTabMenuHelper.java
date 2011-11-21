@@ -46,6 +46,7 @@ public class FactsheetTabMenuHelper {
     private boolean sparqlBookmarkType;
     private boolean compiledDatasetType;
     private boolean folderType;
+    private boolean bookmarksFileType;
 
     private String latitude;
     private String longitude;
@@ -72,6 +73,10 @@ public class FactsheetTabMenuHelper {
 
         if (subject.getObject(Predicates.RDF_TYPE) != null) {
             compiledDatasetType = Subjects.CR_COMPILED_DATASET.equals(subject.getObject(Predicates.RDF_TYPE).getValue());
+        }
+
+        if (subject.getObject(Predicates.RDF_TYPE) != null) {
+            bookmarksFileType = Subjects.CR_BOOKMARKS_FILE.equals(subject.getObject(Predicates.RDF_TYPE).getValue());
         }
 
         if (subject.getObject(Predicates.RDF_TYPE) != null) {
@@ -130,30 +135,36 @@ public class FactsheetTabMenuHelper {
         List<TabElement> result = new ArrayList<TabElement>();
 
         if (mapDisplayable) {
-            TabElement te4 = new TabElement(TabTitle.SHOW_ON_MAP, "/factsheet.action", selected);
-            te4.setEvent("showOnMap");
-            te4.addParam("uri", subject.getUri());
-            te4.addParam("latitude", latitude);
-            te4.addParam("longitude", longitude);
-            result.add(te4);
+            TabElement t = new TabElement(TabTitle.SHOW_ON_MAP, "/factsheet.action", selected);
+            t.setEvent("showOnMap");
+            t.addParam("uri", subject.getUri());
+            t.addParam("latitude", latitude);
+            t.addParam("longitude", longitude);
+            result.add(t);
         }
 
         if (sparqlBookmarkType) {
-            TabElement te5 = new TabElement(TabTitle.BOOKMARKED_SPARQL, "/sparqlBookmark.action", selected);
-            te5.addParam("uri", subject.getUri());
-            result.add(te5);
+            TabElement t = new TabElement(TabTitle.BOOKMARKED_SPARQL, "/sparqlBookmark.action", selected);
+            t.addParam("uri", subject.getUri());
+            result.add(t);
         }
 
         if (compiledDatasetType) {
-            TabElement te6 = new TabElement(TabTitle.COMPILED_DATASET, "/compiledDataset.action", selected);
-            te6.addParam("uri", subject.getUri());
-            result.add(te6);
+            TabElement t = new TabElement(TabTitle.COMPILED_DATASET, "/compiledDataset.action", selected);
+            t.addParam("uri", subject.getUri());
+            result.add(t);
         }
 
         if (folderType) {
-            TabElement te7 = new TabElement(TabTitle.FOLDER, "/folder.action", selected);
-            te7.addParam("uri", subject.getUri());
-            result.add(te7);
+            TabElement t = new TabElement(TabTitle.FOLDER, "/folder.action", selected);
+            t.addParam("uri", subject.getUri());
+            result.add(t);
+        }
+
+        if (bookmarksFileType) {
+            TabElement t = new TabElement(TabTitle.BOOKMARKS, "/bookmarks.action", selected);
+            t.addParam("uri", subject.getUri());
+            result.add(t);
         }
 
         return result;
@@ -177,5 +188,6 @@ public class FactsheetTabMenuHelper {
         public static final String BOOKMARKED_SPARQL = "Bookmarked SPARQL";
         public static final String COMPILED_DATASET = "Compiled dataset";
         public static final String FOLDER = "Contents";
+        public static final String BOOKMARKS = "Bookmarks";
     }
 }

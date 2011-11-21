@@ -615,9 +615,9 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
      * @see eionet.cr.dao.HelperDAO#getUserBookmarks(eionet.cr.web.security.CRUser)
      */
     @Override
-    public List<UserBookmarkDTO> getUserBookmarks(CRUser user) throws DAOException {
+    public List<UserBookmarkDTO> getUserBookmarks(String userBookmarksUri) throws DAOException {
         Bindings bindings = new Bindings();
-        bindings.setURI("userBookmarksUri", user.getBookmarksUri());
+        bindings.setURI("userBookmarksUri", userBookmarksUri);
 
         RepositoryConnection conn = null;
         TupleQueryResult queryResult = null;

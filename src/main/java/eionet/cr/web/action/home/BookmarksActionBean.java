@@ -81,7 +81,7 @@ public class BookmarksActionBean extends AbstractHomeActionBean {
             if (StringUtils.isNotBlank(attemptedUserName)) {
                 CRUser user = new CRUser(getAttemptedUserName());
                 if (user != null) {
-                    bookmarks = DAOFactory.get().getDao(HelperDAO.class).getUserBookmarks(user);
+                    bookmarks = DAOFactory.get().getDao(HelperDAO.class).getUserBookmarks(user.getBookmarksUri());
                 }
             }
         }

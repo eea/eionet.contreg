@@ -193,12 +193,12 @@ public interface HelperDAO extends DAO {
     void deleteUserBookmark(CRUser user, String url) throws DAOException;
 
     /**
-     * @param user
+     * @param userBookmarksUri
      * @return List<UserBookmarkDTO>
      * @throws DAOException
      *             if query fails
      */
-    List<UserBookmarkDTO> getUserBookmarks(CRUser user) throws DAOException;
+    List<UserBookmarkDTO> getUserBookmarks(String userBookmarksUri) throws DAOException;
 
     /**
      * Checks if subject is listed as user bookmark.
@@ -420,8 +420,8 @@ public interface HelperDAO extends DAO {
      * @throws DAOException
      *             if query fails
      */
-    void deleteSubjectPredicates(Collection<String> subjectUris, Collection<String> predicateUris,
-            Collection<String> sourceUris) throws DAOException;
+    void deleteSubjectPredicates(Collection<String> subjectUris, Collection<String> predicateUris, Collection<String> sourceUris)
+            throws DAOException;
 
     /**
      * @param user
@@ -489,7 +489,7 @@ public interface HelperDAO extends DAO {
      * @throws DAOException
      */
     FactsheetDTO getFactsheet(String subjectUri, List<String> acceptedLanguages, Map<String, Integer> predicatePages)
-    throws DAOException;
+            throws DAOException;
 
     /**
      * Returns number of harvested triples from the harvest source.
