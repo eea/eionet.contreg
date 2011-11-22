@@ -743,9 +743,9 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
      * @see eionet.cr.dao.HelperDAO#getUserHistory(eionet.cr.web.security.CRUser)
      */
     @Override
-    public List<UserHistoryDTO> getUserHistory(CRUser user) throws DAOException {
+    public List<UserHistoryDTO> getUserHistory(String historyUri) throws DAOException {
         Bindings bindings = new Bindings();
-        bindings.setURI("userHistoryGraph", user.getHistoryUri());
+        bindings.setURI("userHistoryGraph", historyUri);
         List<UserHistoryDTO> returnHistory = new ArrayList<UserHistoryDTO>();
         MapReader reader = new MapReader();
 

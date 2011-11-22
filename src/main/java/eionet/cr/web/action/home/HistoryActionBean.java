@@ -37,9 +37,11 @@ public class HistoryActionBean extends AbstractHomeActionBean {
     public List<UserHistoryDTO> getHistory() {
         try {
             if (this.isUserAuthorized() && this.getUser() != null) {
-                history = DAOFactory.get().getDao(HelperDAO.class).getUserHistory(this.getUser());
+                history = DAOFactory.get().getDao(HelperDAO.class).getUserHistory(this.getUser().getHistoryUri());
             } else {
-                history = DAOFactory.get().getDao(HelperDAO.class).getUserHistory(new CRUser(this.getAttemptedUserName()));
+                history =
+                        DAOFactory.get().getDao(HelperDAO.class)
+                                .getUserHistory(new CRUser(this.getAttemptedUserName()).getHistoryUri());
             }
         } catch (DAOException ex) {
 

@@ -223,12 +223,12 @@ public interface HelperDAO extends DAO {
     void updateUserHistory(CRUser user, String url) throws DAOException;
 
     /**
-     * @param user
+     * @param historyUri
      * @return List<UserHistoryDTO>
      * @throws DAOException
      *             if query fails
      */
-    List<UserHistoryDTO> getUserHistory(CRUser user) throws DAOException;
+    List<UserHistoryDTO> getUserHistory(String historyUri) throws DAOException;
 
     /**
      * @param sourceUrl

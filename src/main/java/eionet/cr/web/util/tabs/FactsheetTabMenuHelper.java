@@ -48,6 +48,7 @@ public class FactsheetTabMenuHelper {
     private boolean folderType;
     private boolean bookmarksFileType;
     private boolean registrationsFileType;
+    private boolean historyFileType;
 
     private String latitude;
     private String longitude;
@@ -82,6 +83,10 @@ public class FactsheetTabMenuHelper {
 
         if (subject.getObject(Predicates.RDF_TYPE) != null) {
             registrationsFileType = Subjects.CR_REGISTRATIONS_FILE.equals(subject.getObject(Predicates.RDF_TYPE).getValue());
+        }
+
+        if (subject.getObject(Predicates.RDF_TYPE) != null) {
+            historyFileType = Subjects.CR_HISTORY_FILE.equals(subject.getObject(Predicates.RDF_TYPE).getValue());
         }
 
         if (subject.getObject(Predicates.RDF_TYPE) != null) {
@@ -182,6 +187,12 @@ public class FactsheetTabMenuHelper {
             result.add(t);
         }
 
+        if (historyFileType) {
+            TabElement t = new TabElement(TabTitle.HISTORY, "/history.action", selected);
+            t.addParam("uri", subject.getUri());
+            result.add(t);
+        }
+
         return result;
     }
 
@@ -205,5 +216,6 @@ public class FactsheetTabMenuHelper {
         public static final String FOLDER = "Contents";
         public static final String BOOKMARKS = "Bookmarks";
         public static final String REGISTRATIONS = "Registrations";
+        public static final String HISTORY = "History";
     }
 }
