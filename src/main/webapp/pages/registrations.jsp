@@ -1,21 +1,26 @@
+<%@page contentType="text/html;charset=UTF-8"%>
+
 <%@ include file="/pages/common/taglibs.jsp"%>
 
-<stripes:layout-render name="/pages/common/template.jsp" pageTitle="User History">
-<stripes:layout-component name="contents">
+<stripes:layout-render name="/pages/common/template.jsp" pageTitle="Registrations">
+    <stripes:layout-component name="contents">
 
+        <cr:tabMenu tabs="${actionBean.tabs}" />
+
+        <br style="clear:left" />
         <c:choose>
-            <c:when test="${actionBean.userAuthorized}" >
+            <c:when test="${actionBean.usersRegistrations}" >
                 <h1>My registrations</h1>
             </c:when>
             <c:otherwise>
-                <h1>${actionBean.attemptedUserName}'s registrations</h1>
+                <h1>${actionBean.ownerName}'s registrations</h1>
             </c:otherwise>
         </c:choose>
         <c:choose>
         <c:when test="${not empty actionBean.registrations}">
             <display:table name="${actionBean.registrations}" class="datatable"
                 pagesize="20" sort="list" id="registrations" htmlId="registratioinslist"
-                requestURI="${actionBean.parsedUrlBinding}" style="width:100%">
+                requestURI="${actionBean.urlBinding}" style="width:100%">
                     <display:column title="Subject" sortable="true">
                         <stripes:link href="/factsheet.action">${registrations.subjectUri}
                             <stripes:param name="uri" value="${registrations.subjectUri}" />
