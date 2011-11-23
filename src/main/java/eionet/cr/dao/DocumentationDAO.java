@@ -46,4 +46,12 @@ public interface DocumentationDAO extends DAO {
      * @throws DAOException
      */
     boolean idExists(String pageId) throws DAOException;
+
+    /**
+     * Delete content
+     *
+     * @param pageId
+     * @throws DAOException
+     */
+    void deleteContent(String pageId) throws DAOException;
 }

@@ -24,6 +24,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import net.sourceforge.stripes.action.DefaultHandler;
@@ -59,6 +60,7 @@ public class DocumentationActionBean extends AbstractActionBean {
     private String pageId;
     private String event;
     private String content;
+    private List<DocumentationDTO> docs;
 
     /** */
     public static final String PATH = GeneralConfig.getRequiredProperty(GeneralConfig.FILESTORE_PATH);
@@ -77,35 +79,23 @@ public class DocumentationActionBean extends AbstractActionBean {
 
     private boolean editableContent;
 
+    private List<String> docIds = new ArrayList<String>();
+
     /**
      *
      * @return Resolution
-     * @throws DAOException
-     *             if query fails
+     * @throws DAOException - if query fails
      */
     @DefaultHandler
     public Resolution view() throws Exception {
 
         String forward = "/pages/documentation.jsp";
         DocumentationDAO docDAO = DAOFactory.get().getDao(DocumentationDAO.class);
-        if (StringUtils.isBlank(pageId) || (pageId != null && pageId.equals("allobjects"))) {
-            List<DocumentationDTO> docs = null;
-            if (pageId != null && pageId.equals("allobjects")) {
+        if (StringUtils.isBlank(pageId) || (pageId != null && pageId.equals("contents"))) {
+            if (pageId != null && pageId.equals("contents")) {
                 docs = docDAO.getDocObjects(false);
             } else {
                 docs = docDAO.getDocObjects(true);
-            }
-            if (docs != null) {
-                StringBuffer buf = new StringBuffer();
-                buf.append("<ul>");
-                for (DocumentationDTO doc : docs) {
-                    String url = APP_URL + "/documentation/" + doc.getPageId();
-                    String title = (StringUtils.isBlank(doc.getTitle())) ? doc.getPageId() : doc.getTitle();
-                    buf.append("<li><a href=\"").append(url).append("\">").append(title).append("</a></li>");
-                }
-                buf.append("</ul>");
-                content = buf.toString();
-                title = "Documentation";
             }
         } else {
             DocumentationDTO doc = docDAO.getDocObject(pageId);
@@ -124,7 +114,6 @@ public class DocumentationActionBean extends AbstractActionBean {
                             addCautionMessage("File does not exist: " + pageId);
                         }
                     }
-                    forward = "/pages/documentationEdit.jsp";
                 } else {
                     if (doc.getContentType().startsWith("text/")) {
                         File f = FileStore.getInstance("documentation").get(pageId);
@@ -142,16 +131,6 @@ public class DocumentationActionBean extends AbstractActionBean {
             }
         }
         return new ForwardResolution(forward);
-    }
-
-    /**
-     * Simply forwards to add documentation page
-     *
-     * @return Resolution
-     * @throws Exception
-     */
-    public Resolution add() throws Exception {
-        return new ForwardResolution("/pages/documentationAdd.jsp");
     }
 
     /**
@@ -196,17 +175,7 @@ public class DocumentationActionBean extends AbstractActionBean {
         if (isUserLoggedIn()) {
             if (isPostRequest()) {
                 // Extract file name.
-                String fileName = pid;
-                if (file != null && file.getFileName() != null) {
-                    if (StringUtils.isBlank(pid)) {
-                        fileName = file.getFileName();
-                        pid = fileName;
-                        // If title is still empty, then set it to file name
-                        if (StringUtils.isBlank(title)) {
-                            title = fileName;
-                        }
-                    }
-                }
+                String fileName = extractFileName();
 
                 // If content type is not filled in, then it takes the content-type of the file.
                 // If that's not available, then it is application/octet-stream.
@@ -239,6 +208,26 @@ public class DocumentationActionBean extends AbstractActionBean {
         }
     }
 
+    /**
+     * Extract file name
+     *
+     * @return String
+     */
+    private String extractFileName() {
+        String fileName = pid;
+        if (file != null && file.getFileName() != null) {
+            if (StringUtils.isBlank(pid)) {
+                fileName = file.getFileName();
+                pid = fileName;
+                // If title is still empty, then set it to file name
+                if (StringUtils.isBlank(title)) {
+                    title = fileName;
+                }
+            }
+        }
+        return fileName;
+    }
+
     @ValidationMethod(on = {"addContent"})
     public void validatePageId(ValidationErrors errors) throws Exception {
         // If overwrite = false, then check if page id already exists
@@ -255,20 +244,40 @@ public class DocumentationActionBean extends AbstractActionBean {
         }
     }
 
+    /**
+     * Deletes content
+     *
+     * @return Resolution
+     * @throws DAOException
+     */
+    public Resolution delete() throws Exception {
+
+        if (isUserLoggedIn()) {
+            // The page title is not mandatory. If it is not filled in, then it takes the value of the page_id.
+            if (docIds != null || docIds.size() > 0) {
+                for (String id : docIds) {
+                    // Delete data from database
+                    DAOFactory.get().getDao(DocumentationDAO.class).deleteContent(id);
+
+                    // Delete file
+                    FileStore.getInstance("documentation").delete(id);
+                }
+            } else {
+                addWarningMessage("No objects selected!");
+            }
+        } else {
+            addWarningMessage(getBundle().getString("not.logged.in"));
+        }
+
+        return new RedirectResolution("/documentation/contents");
+    }
+
     public String getPageId() {
         return pageId;
     }
 
     public void setPageId(String pageId) {
         this.pageId = pageId;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
     }
 
     public String getPid() {
@@ -325,6 +334,30 @@ public class DocumentationActionBean extends AbstractActionBean {
 
     public void setEditableContent(boolean editableContent) {
         this.editableContent = editableContent;
+    }
+
+    public List<DocumentationDTO> getDocs() {
+        return docs;
+    }
+
+    public void setDocs(List<DocumentationDTO> docs) {
+        this.docs = docs;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public List<String> getDocIds() {
+        return docIds;
+    }
+
+    public void setDocIds(List<String> docIds) {
+        this.docIds = docIds;
     }
 
 }

@@ -146,4 +146,24 @@ public class VirtuosoDocumentationDAO extends VirtuosoBaseDAO implements Documen
         return ret;
     }
 
+    /**
+     * @see eionet.cr.dao.DocumentationDAO#deleteContent(java.lang.String)
+     */
+    @Override
+    public void deleteContent(String pageId) throws DAOException {
+
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = getSQLConnection();
+            ps = conn.prepareStatement("DELETE FROM documentation WHERE page_id = ?");
+            ps.setString(1, pageId);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            throw new DAOException(e.toString(), e);
+        } finally {
+            SQLUtil.close(conn);
+        }
+    }
+
 }
