@@ -21,9 +21,9 @@
 
 package eionet.cr.web.util;
 
-import static eionet.cr.web.action.admin.postHarvest.PostHarvestScriptParser.parseForExecution;
-import static eionet.cr.web.action.admin.postHarvest.PostHarvestScriptParser.parseForTest;
+import static eionet.cr.web.action.admin.postHarvest.PostHarvestScriptParser.deriveConstruct;
 import junit.framework.TestCase;
+import eionet.cr.web.action.admin.postHarvest.ScriptParseException;
 
 /**
  *
@@ -33,26 +33,126 @@ public class PostHarvestScriptParserTest extends TestCase {
 
     /**
      *
+     * @throws ScriptParseException
      */
-    public void test() {
+    public void testDeriveConstructFromModify() throws ScriptParseException {
 
-        String[] ss = new String[4];
-        ss[0] = "prefix xxx:yyy delete {1} where {2}";
-        ss[1] = "prefix xxx:yyy insert {1} where {2}";
-        ss[2] = "prefix xxx:yyy delete {1} insert {2} where {3}";
-        ss[3] = "prefix xxx:yyy insert {2}";
-        String graph = "http://www.neti.ee";
+        // test MODIFY with one target graph
+        String input = "PREFIX dc: <http://purl.org/dc/elements/1.1/> " +
+        "MODIFY <http://my.ee> DELETE {deleteTemplate} INSERT {insertTemplate} WHERE {pattern}";
+        String expected = "PREFIX dc: <http://purl.org/dc/elements/1.1/> CONSTRUCT {insertTemplate} FROM <http://my.ee> WHERE {pattern} LIMIT 500";
+        assertEquals(expected, deriveConstruct(input, null));
 
-        assertEquals("prefix xxx:yyy DELETE FROM <http://www.neti.ee> {1} where {2}", parseForExecution(ss[0], graph));
-        assertEquals("prefix xxx:yyy SELECT 1 FROM <http://www.neti.ee> WHERE {2} LIMIT 500", parseForTest(ss[0], graph));
+        // test MODIFY with multiple target graphs
+        input = "PREFIX dc: <http://purl.org/dc/elements/1.1/> " +
+        "MODIFY <http://my1.ee> <http://my2.ee> DELETE {deleteTemplate} INSERT {insertTemplate} WHERE {pattern}";
+        expected = "PREFIX dc: <http://purl.org/dc/elements/1.1/> CONSTRUCT {insertTemplate} " +
+        "FROM <http://my1.ee> FROM <http://my2.ee> WHERE {pattern} LIMIT 500";
+        assertEquals(expected, deriveConstruct(input, null));
 
-        assertEquals("prefix xxx:yyy INSERT INTO <http://www.neti.ee> {1} where {2}", parseForExecution(ss[1], graph));
-        assertEquals("prefix xxx:yyy SELECT 1 FROM <http://www.neti.ee> WHERE {2} LIMIT 500", parseForTest(ss[1], graph));
+        // test MODIFY without a specific target graph
+        input = "PREFIX dc: <http://purl.org/dc/elements/1.1/> " +
+        "MODIFY DELETE {deleteTemplate} INSERT {insertTemplate} WHERE {pattern}";
+        expected = "PREFIX dc: <http://purl.org/dc/elements/1.1/> CONSTRUCT {insertTemplate} WHERE {pattern} LIMIT 500";
+        assertEquals(expected, deriveConstruct(input, null));
 
-        assertEquals("prefix xxx:yyy MODIFY <http://www.neti.ee> DELETE {1} insert {2} where {3}", parseForExecution(ss[2], graph));
-        assertEquals("prefix xxx:yyy SELECT 2 FROM <http://www.neti.ee> WHERE {3} LIMIT 500", parseForTest(ss[2], graph));
+        // test MODIFY with one target graph and no WHERE pattern
+        input = "PREFIX dc: <http://purl.org/dc/elements/1.1/> " +
+        "MODIFY <http://my.ee> DELETE {deleteTemplate} INSERT {insertTemplate}";
+        expected = "PREFIX dc: <http://purl.org/dc/elements/1.1/> CONSTRUCT {insertTemplate} FROM <http://my.ee> WHERE {?s ?p ?o} LIMIT 500";
+        assertEquals(expected, deriveConstruct(input, null));
 
-        assertEquals("prefix xxx:yyy INSERT INTO <http://www.neti.ee> {2}", parseForExecution(ss[3], graph));
-        assertEquals("prefix xxx:yyy SELECT 2 FROM <http://www.neti.ee> WHERE {?s ?p ?o} LIMIT 500", parseForTest(ss[3], graph));
+        // test MODIFY with multiple target graphs and no WHERE pattern
+        input = "PREFIX dc: <http://purl.org/dc/elements/1.1/> " +
+        "MODIFY <http://my1.ee> <http://my2.ee> DELETE {deleteTemplate} INSERT {insertTemplate}";
+        expected = "PREFIX dc: <http://purl.org/dc/elements/1.1/> CONSTRUCT {insertTemplate} " +
+        "FROM <http://my1.ee> FROM <http://my2.ee> WHERE {?s ?p ?o} LIMIT 500";
+        assertEquals(expected, deriveConstruct(input, null));
+
+        // test MODIFY without a specific target graph and no WHERE pattern
+        input = "PREFIX dc: <http://purl.org/dc/elements/1.1/> " +
+        "MODIFY DELETE {deleteTemplate} INSERT {insertTemplate}";
+        expected = "PREFIX dc: <http://purl.org/dc/elements/1.1/> CONSTRUCT {insertTemplate} WHERE {?s ?p ?o} LIMIT 500";
+        assertEquals(expected, deriveConstruct(input, null));
+
     }
+
+    /**
+     *
+     * @throws ScriptParseException
+     */
+    public void testDeriveConstructFromInsert() throws ScriptParseException {
+
+        // test INSERT with one target graph
+        String input = "PREFIX dc: <http://purl.org/dc/elements/1.1/> " +
+        "INSERT INTO <http://my.ee> {insertTemplate} WHERE {pattern}";
+        String expected = "PREFIX dc: <http://purl.org/dc/elements/1.1/> CONSTRUCT {insertTemplate} FROM <http://my.ee> WHERE {pattern} LIMIT 500";
+        assertEquals(expected, deriveConstruct(input, null));
+
+        // test INSERT with multiple target graphs
+        input = "PREFIX dc: <http://purl.org/dc/elements/1.1/> " +
+        "INSERT INTO <http://my1.ee> INTO <http://my2.ee> {insertTemplate} WHERE {pattern}";
+        expected = "PREFIX dc: <http://purl.org/dc/elements/1.1/> CONSTRUCT {insertTemplate} FROM <http://my1.ee> FROM <http://my2.ee> WHERE {pattern} LIMIT 500";
+        assertEquals(expected, deriveConstruct(input, null));
+
+        // test INSERT without a specific target graph
+        input = "PREFIX dc: <http://purl.org/dc/elements/1.1/> INSERT {insertTemplate} WHERE {pattern}";
+        expected = "PREFIX dc: <http://purl.org/dc/elements/1.1/> CONSTRUCT {insertTemplate} WHERE {pattern} LIMIT 500";
+        assertEquals(expected, deriveConstruct(input, null));
+
+        // test INSERT with one target graph and no WHERE pattern
+        input = "PREFIX dc: <http://purl.org/dc/elements/1.1/> INSERT INTO <http://my.ee> {insertTemplate}";
+        expected = "PREFIX dc: <http://purl.org/dc/elements/1.1/> CONSTRUCT {insertTemplate} FROM <http://my.ee> WHERE {?s ?p ?o} LIMIT 500";
+        assertEquals(expected, deriveConstruct(input, null));
+
+        // test INSERT with multiple target graphs and no WHERE pattern
+        input = "PREFIX dc: <http://purl.org/dc/elements/1.1/> INSERT INTO <http://my1.ee> INTO <http://my2.ee> {insertTemplate}";
+        expected = "PREFIX dc: <http://purl.org/dc/elements/1.1/> CONSTRUCT {insertTemplate} FROM <http://my1.ee> FROM <http://my2.ee> WHERE {?s ?p ?o} LIMIT 500";
+        assertEquals(expected, deriveConstruct(input, null));
+
+        // test INSERT without a specific target graph and no WHERE pattern
+        input = "PREFIX dc: <http://purl.org/dc/elements/1.1/> INSERT {insertTemplate}";
+        expected = "PREFIX dc: <http://purl.org/dc/elements/1.1/> CONSTRUCT {insertTemplate} WHERE {?s ?p ?o} LIMIT 500";
+        assertEquals(expected, deriveConstruct(input, null));
+    }
+
+    /**
+     *
+     * @throws ScriptParseException
+     */
+    public void testDeriveConstructFromDelete() throws ScriptParseException {
+
+        // test DELETE with one target graph
+        String input = "PREFIX dc: <http://purl.org/dc/elements/1.1/> " +
+        "DELETE FROM <http://my.ee> {deleteTemplate} WHERE {pattern}";
+        String expected = "PREFIX dc: <http://purl.org/dc/elements/1.1/> CONSTRUCT {deleteTemplate} FROM <http://my.ee> WHERE {pattern} LIMIT 500";
+        assertEquals(expected, deriveConstruct(input, null));
+
+        // test DELETE with multiple target graphs
+        input = "PREFIX dc: <http://purl.org/dc/elements/1.1/> " +
+        "DELETE FROM <http://my1.ee> FROM <http://my2.ee> {deleteTemplate} WHERE {pattern}";
+        expected = "PREFIX dc: <http://purl.org/dc/elements/1.1/> CONSTRUCT {deleteTemplate} FROM <http://my1.ee> FROM <http://my2.ee> WHERE {pattern} LIMIT 500";
+        assertEquals(expected, deriveConstruct(input, null));
+
+        // test DELETE without a specific target graph
+        input = "PREFIX dc: <http://purl.org/dc/elements/1.1/> INSERT {deleteTemplate} WHERE {pattern}";
+        expected = "PREFIX dc: <http://purl.org/dc/elements/1.1/> CONSTRUCT {deleteTemplate} WHERE {pattern} LIMIT 500";
+        assertEquals(expected, deriveConstruct(input, null));
+
+        // test DELETE with one target graph and no WHERE pattern
+        input = "PREFIX dc: <http://purl.org/dc/elements/1.1/> DELETE FROM <http://my.ee> {deleteTemplate}";
+        expected = "PREFIX dc: <http://purl.org/dc/elements/1.1/> CONSTRUCT {deleteTemplate} FROM <http://my.ee> WHERE {?s ?p ?o} LIMIT 500";
+        assertEquals(expected, deriveConstruct(input, null));
+
+        // test DELETE with multiple target graphs and no WHERE pattern
+        input = "PREFIX dc: <http://purl.org/dc/elements/1.1/> DELETE FROM <http://my1.ee> FROM <http://my2.ee> {deleteTemplate}";
+        expected = "PREFIX dc: <http://purl.org/dc/elements/1.1/> CONSTRUCT {deleteTemplate} FROM <http://my1.ee> FROM <http://my2.ee> WHERE {?s ?p ?o} LIMIT 500";
+        assertEquals(expected, deriveConstruct(input, null));
+
+        // test DELETE without a specific target graph and no WHERE pattern
+        input = "PREFIX dc: <http://purl.org/dc/elements/1.1/> INSERT {deleteTemplate}";
+        expected = "PREFIX dc: <http://purl.org/dc/elements/1.1/> CONSTRUCT {deleteTemplate} WHERE {?s ?p ?o} LIMIT 500";
+        assertEquals(expected, deriveConstruct(input, null));
+    }
+
 }

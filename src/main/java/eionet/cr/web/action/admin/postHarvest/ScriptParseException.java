@@ -9,52 +9,54 @@
  * implied. See the License for the specific language governing
  * rights and limitations under the License.
  *
- * The Original Code is Content Registry 2.0.
+ * The Original Code is Content Registry 3
  *
  * The Initial Owner of the Original Code is European Environment
- * Agency.  Portions created by Tieto Eesti are Copyright
+ * Agency. Portions created by Zero Technologies are Copyright
  * (C) European Environment Agency.  All Rights Reserved.
  *
  * Contributor(s):
- * Jaanus Heinlaid, Tieto Eesti
+ *        Jaanus Heinlaid
  */
-package eionet.cr.common;
+
+package eionet.cr.web.action.admin.postHarvest;
+
+import eionet.cr.common.CRException;
 
 /**
- * @author altnyris
  *
+ * @author Jaanus Heinlaid
  */
-public class CRException extends Exception {
+public class ScriptParseException extends CRException {
 
     /**
+     *
      */
-    public CRException() {
+    public ScriptParseException() {
+        super();
     }
 
     /**
-     * @param msg
-     *            the detail message.
+     * @param s
      */
-    public CRException(String msg) {
-        super(msg);
+    public ScriptParseException(String s) {
+        super(s);
+    }
+
+    /**
+     * @param s
+     * @param throwable
+     */
+    public ScriptParseException(String s, Throwable throwable) {
+        super(s, throwable);
     }
 
     /**
      *
-     * @param message
-     * @param cause
+     * @param throwable
      */
-    public CRException(String msg, Throwable cause) {
-        super(msg, cause);
-    }
-
-    /**
-     *
-     * Class constructor.
-     * @param cause
-     */
-    public CRException(Throwable cause) {
-        super(cause);
+    public ScriptParseException(Throwable throwable) {
+        super(throwable);
     }
 
 }

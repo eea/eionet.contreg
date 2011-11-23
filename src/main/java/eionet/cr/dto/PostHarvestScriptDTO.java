@@ -39,6 +39,7 @@ public class PostHarvestScriptDTO {
     private String script;
     private int position;
     private boolean active;
+    private boolean runOnce = true;
     private int id;
 
     /**
@@ -144,5 +145,19 @@ public class PostHarvestScriptDTO {
      */
     public void setPosition(int position) {
         this.position = position;
+    }
+
+    /**
+     * @return the runOnce
+     */
+    public boolean isRunOnce() {
+        return runOnce;
+    }
+
+    /**
+     * @param runOnce the runOnce to set
+     */
+    public void setRunOnce(boolean runOnce) {
+        this.runOnce = runOnce;
     }
 }

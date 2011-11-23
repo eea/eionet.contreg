@@ -18,7 +18,6 @@ import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.StreamingResolution;
 import net.sourceforge.stripes.action.UrlBinding;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.vocabulary.XMLSchema;
@@ -30,7 +29,6 @@ import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
 import org.openrdf.query.impl.DatasetImpl;
 import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.rdfxml.RDFXMLWriter;
 
 import eionet.cr.common.Predicates;
@@ -351,7 +349,6 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                 }
             }
             resolution = new ForwardResolution(FORM_PAGE);
-            query = StringEscapeUtils.escapeHtml(query);
         }
 
         return resolution;
@@ -503,14 +500,9 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                 } finally {
                     SesameUtil.close(queryResult);
                 }
-            } catch (RepositoryException rex) {
-                rex.printStackTrace();
-                addWarningMessage("Repository exception: '" + StringEscapeUtils.escapeHtml(rex.toString()) + "'");
-                // throw new RuntimeException(rex.toString(), rex);
             } catch (Exception e) {
                 e.printStackTrace();
-                addWarningMessage("Error processing SPARQL: '" + StringEscapeUtils.escapeHtml(e.toString()) + "'");
-                // throw new RuntimeException(e.toString(), e);
+                addWarningMessage("Encountered exception: " + e.toString());
             } finally {
                 try {
                     if (out != null) {

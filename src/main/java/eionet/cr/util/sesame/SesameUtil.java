@@ -20,6 +20,7 @@ import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFHandler;
 import org.openrdf.rio.RDFHandlerException;
 
+import virtuoso.sesame2.driver.VirtuosoRepositoryConnection;
 import eionet.cr.dao.readers.ResultSetReaderException;
 import eionet.cr.util.Bindings;
 import eionet.cr.util.Util;
@@ -107,68 +108,66 @@ public class SesameUtil {
     }
 
     /**
-     * Executes a SPARQL/Update query (i.e. one that performs modifications on data).
+     * Executes a SPARQL/Update (SPARUL) query (i.e. one that performs modifications on data). Throws
+     * {@link UnsupportedOperationException} if the given connection is not a {@link VirtuosoRepositoryConnection}, because it uses
+     * {@link VirtuosoRepositoryConnection#executeSPARUL(String)} to execute the given SPARQL/Update statement. The latter supports
+     * not variable bindings, hence no bindings given in the method's input too.
      *
-     * @param sparql
-     * @param bindings
-     *            Query bindings
-     * @param conn
-     *            repository connection
-     * @throws OpenRDFException
+     * @param sparul The SPARUL statement to execute.
+     * @param conn The repository connection to operate on.
+     * @param defaultGraphUri
+     * @return The number triples inserted/updated/deleted
+     * @throws OpenRDFException When a repository access error occurs.
      */
-    public static void executeUpdate(String sparql, Bindings bindings, RepositoryConnection conn) throws OpenRDFException {
+    public static int executeSPARUL(String sparul, RepositoryConnection conn, String... defaultGraphUri) throws OpenRDFException {
 
-        throw new UnsupportedOperationException("Method not implemented!");
-        //
-        // Update preparedUpdate = conn.prepareUpdate(QueryLanguage.SPARQL, sparql);
-        // if (bindings != null) {
-        // bindings.applyTo(preparedUpdate, conn.getValueFactory());
-        // }
-        // preparedUpdate.execute();
+        if (!(conn instanceof VirtuosoRepositoryConnection)) {
+            throw new UnsupportedOperationException("Method implemented only for "
+                    + VirtuosoRepositoryConnection.class.getSimpleName());
+        }
+
+        if (defaultGraphUri!=null && defaultGraphUri.length>0){
+            for (int i = 0; i < defaultGraphUri.length; i++) {
+                sparul = "define input:default-graph-uri <" + defaultGraphUri[i] + "> " + sparul;
+            }
+        }
+
+        VirtuosoRepositoryConnection virtConn = (VirtuosoRepositoryConnection) conn;
+        return virtConn.executeSPARUL(sparul);
     }
 
     /**
-     * Executes SPARQL query that changes RDF data. Rollback is NOT made if query does not succeed
+     * Executes the given SPARQL/Update (aka SPARUL) statement.
+     * Rollback is NOT made if query does not succeed.
      *
-     * @param sparql
-     * @param conn
-     *            repository connection
-     * @param bindings
-     *            Query bindings
+     * @param sparul
+     * @param conn repository connection
+     * @param bindings Query bindings
      * @throws RepositoryException
      * @throws QueryEvaluationException
      * @throws MalformedQueryException
      */
-    public static void executeUpdateQuery(String sparql, Bindings bindings, RepositoryConnection conn) throws RepositoryException,
+    public static void executeSPARUL(String sparul, Bindings bindings, RepositoryConnection conn) throws RepositoryException,
     QueryEvaluationException, MalformedQueryException {
 
-        BooleanQuery query = conn.prepareBooleanQuery(QueryLanguage.SPARQL, sparql);
+        BooleanQuery query = conn.prepareBooleanQuery(QueryLanguage.SPARQL, sparul);
         if (bindings != null) {
             bindings.applyTo(query, conn.getValueFactory());
         }
         query.evaluate();
-
     }
 
     /**
      * Executes SPARQL Query producing RDF and exports to the passed RDF handler.
      *
-     * @param sparql
-     *            SPARQL for (CONSTRUCT) query
-     * @param rdfHandler
-     *            RDF handler for output RDF format
-     * @param conn
-     *            RepositoryConnection
-     * @param bindings
-     *            Query Bindings
-     * @throws QueryEvaluationException
-     *             if query evaluation fails
-     * @throws RDFHandlerException
-     *             if RDF handler fails
-     * @throws MalformedQueryException
-     *             if query is not formed correctly
-     * @throws RepositoryException
-     *             if Repository API call fails
+     * @param sparql SPARQL for (CONSTRUCT) query
+     * @param rdfHandler RDF handler for output RDF format
+     * @param conn RepositoryConnection
+     * @param bindings Query Bindings
+     * @throws QueryEvaluationException if query evaluation fails
+     * @throws RDFHandlerException if RDF handler fails
+     * @throws MalformedQueryException if query is not formed correctly
+     * @throws RepositoryException if Repository API call fails
      */
     public static void exportGraphQuery(final String sparql, final RDFHandler rdfHandler, final RepositoryConnection conn,
             final Bindings bindings) throws QueryEvaluationException, RDFHandlerException, MalformedQueryException,
@@ -184,8 +183,7 @@ public class SesameUtil {
 
     /**
      *
-     * @param queryResult
-     *            Query Result
+     * @param queryResult Query Result
      */
     public static void close(final TupleQueryResult queryResult) {
 

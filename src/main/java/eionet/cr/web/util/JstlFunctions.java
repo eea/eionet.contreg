@@ -35,6 +35,7 @@ import javax.servlet.jsp.PageContext;
 
 import net.sourceforge.stripes.action.UrlBinding;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.common.CRRuntimeException;
@@ -514,4 +515,13 @@ public class JstlFunctions {
         return uri.replace(homeUri, "");
     }
 
+    /**
+     *
+     * @param s
+     * @return
+     */
+    public static String escapeHtml(String s){
+
+        return StringEscapeUtils.escapeHtml(s);
+    }
 }

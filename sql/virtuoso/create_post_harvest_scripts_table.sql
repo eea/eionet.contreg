@@ -8,6 +8,7 @@ create table CR.cr3user.post_harvest_script
     script long varchar NOT NULL,
     position_number integer not null,
     active character NOT NULL DEFAULT 'N',
+    run_once character NOT NULL DEFAULT 'Y',
     PRIMARY KEY (post_harvest_script_id),
     UNIQUE (target_source_url,target_type_url,title),
     UNIQUE (target_source_url,target_type_url,position_number),

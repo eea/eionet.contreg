@@ -6,11 +6,12 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.BooleanQuery;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.repository.RepositoryConnection;
+
+import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.dao.CompiledDatasetDAO;
@@ -161,7 +162,7 @@ public class VirtuosoCompiledDatasetDAO extends VirtuosoBaseDAO implements Compi
 
             Bindings bindings = new Bindings();
             bindings.setURI("graphUri", datasetUri);
-            executeUpdateQuerySPARQL(query.toString(), bindings, con);
+            executeSPARUL(query.toString(), bindings, con);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -175,8 +176,8 @@ public class VirtuosoCompiledDatasetDAO extends VirtuosoBaseDAO implements Compi
      * SPARQL for user compiled datasets.
      */
     private static final String USER_COMPILED_DATASETS_QUERY = "select ?s ?p ?o where { ?s ?p ?o. { "
-            + "select distinct ?s where { " + "graph ?g { " + "?s a ?compDataset . " + "filter (?g = ?useFolder) "
-            + "}}}} order by ?s ?p ?o";
+        + "select distinct ?s where { " + "graph ?g { " + "?s a ?compDataset . " + "filter (?g = ?useFolder) "
+        + "}}}} order by ?s ?p ?o";
 
     /**
      * User compiled datasets.
@@ -339,7 +340,7 @@ public class VirtuosoCompiledDatasetDAO extends VirtuosoBaseDAO implements Compi
                 Bindings bindings = new Bindings();
                 bindings.setURI("graphUri", datasetUri);
                 bindings.setURI("originalGraphUri", graph);
-                executeUpdateQuerySPARQL(query.toString(), bindings, con);
+                executeSPARUL(query.toString(), bindings, con);
             }
         } catch (Exception e) {
             e.printStackTrace();

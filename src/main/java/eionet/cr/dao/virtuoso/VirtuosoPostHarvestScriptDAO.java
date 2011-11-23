@@ -21,6 +21,7 @@
 
 package eionet.cr.dao.virtuoso;
 
+import java.io.OutputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -30,7 +31,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.openrdf.model.ValueFactory;
+import org.openrdf.query.GraphQuery;
+import org.openrdf.query.QueryLanguage;
+import org.openrdf.query.impl.DatasetImpl;
 import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.rio.rdfxml.RDFXMLWriter;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.PostHarvestScriptDAO;
@@ -39,6 +45,7 @@ import eionet.cr.dao.readers.PostHarvestScriptTestResultsReader;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.PostHarvestScriptDTO;
 import eionet.cr.dto.PostHarvestScriptDTO.TargetType;
+import eionet.cr.util.Bindings;
 import eionet.cr.util.Pair;
 import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.sesame.SesameConnectionProvider;
@@ -46,6 +53,7 @@ import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.PairReader;
 import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
+import eionet.cr.web.action.admin.postHarvest.PostHarvestScriptParser;
 
 /**
  *
@@ -63,14 +71,15 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
         + "order by TARGET_TYPE_URL asc, POSITION_NUMBER asc";
     /** */
     private static final String SAVE_SQL = "update POST_HARVEST_SCRIPT "
-        + "set TITLE=?, SCRIPT=?, ACTIVE=? where POST_HARVEST_SCRIPT_ID=?";
+        + "set TITLE=?, SCRIPT=?, ACTIVE=?, RUN_ONCE=? where POST_HARVEST_SCRIPT_ID=?";
     /** */
     private static final String DELETE_SQL = "delete from POST_HARVEST_SCRIPT where POST_HARVEST_SCRIPT_ID=?";
     /** */
     private static final String GET_LAST_POSITION_SQL = "select max(POSITION_NUMBER) as MAX_POS from POST_HARVEST_SCRIPT where "
         + "coalesce(TARGET_SOURCE_URL,'')=? and coalesce(TARGET_TYPE_URL,'')=?";
+    /** */
     private static final String INSERT_SQL = "insert into POST_HARVEST_SCRIPT "
-        + "(TARGET_SOURCE_URL,TARGET_TYPE_URL,TITLE,SCRIPT,POSITION_NUMBER,ACTIVE) values " + "(?,?,?,?,?,?)";
+        + "(TARGET_SOURCE_URL,TARGET_TYPE_URL,TITLE,SCRIPT,POSITION_NUMBER,ACTIVE,RUN_ONCE) values " + "(?,?,?,?,?,?,?)";
     /** */
     private static final String FETCH_SQL = "select * from POST_HARVEST_SCRIPT where POST_HARVEST_SCRIPT_ID=?";
     /** */
@@ -159,10 +168,10 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
 
     /**
      * @see eionet.cr.dao.PostHarvestScriptDAO#insert(eionet.cr.dto.PostHarvestScriptDTO.TargetType, java.lang.String,
-     *      java.lang.String, java.lang.String, boolean)
+     *      java.lang.String, java.lang.String, boolean, boolean)
      */
     @Override
-    public int insert(TargetType targetType, String targetUrl, String title, String script, boolean active) throws DAOException {
+    public int insert(TargetType targetType, String targetUrl, String title, String script, boolean active, boolean runOnce) throws DAOException {
 
         String sourceUrl = targetType != null && targetType.equals(TargetType.SOURCE) ? targetUrl : null;
         String typeUrl = targetType != null && targetType.equals(TargetType.TYPE) ? targetUrl : null;
@@ -186,6 +195,7 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
             values.add(script);
             values.add(Integer.valueOf(position));
             values.add(YesNoBoolean.format(active));
+            values.add(YesNoBoolean.format(runOnce));
 
             int result = SQLUtil.executeUpdateReturnAutoID(INSERT_SQL, values, conn);
             conn.commit();
@@ -199,15 +209,16 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
     }
 
     /**
-     * @see eionet.cr.dao.PostHarvestScriptDAO#save(int, String, String, boolean)
+     * @see eionet.cr.dao.PostHarvestScriptDAO#save(int, String, String, boolean, boolean)
      */
     @Override
-    public void save(int id, String title, String script, boolean active) throws DAOException {
+    public void save(int id, String title, String script, boolean active, boolean runOnce) throws DAOException {
 
         ArrayList<Object> values = new ArrayList<Object>();
         values.add(title);
         values.add(script);
         values.add(YesNoBoolean.format(active));
+        values.add(YesNoBoolean.format(runOnce));
         values.add(Integer.valueOf(id));
 
         executeSQL(SAVE_SQL, values);
@@ -292,7 +303,8 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
     }
 
     /**
-     * @see eionet.cr.dao.PostHarvestScriptDAO#move(eionet.cr.dto.PostHarvestScriptDTO.TargetType, java.lang.String, java.util.Set, int)
+     * @see eionet.cr.dao.PostHarvestScriptDAO#move(eionet.cr.dto.PostHarvestScriptDTO.TargetType, java.lang.String, java.util.Set,
+     *      int)
      */
     @Override
     public void move(TargetType targetType, String targetUrl, Set<Integer> ids, int direction) throws DAOException {
@@ -380,12 +392,13 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
     }
 
     /**
-     * @see eionet.cr.dao.PostHarvestScriptDAO#exists(eionet.cr.dto.PostHarvestScriptDTO.TargetType, java.lang.String, java.lang.String)
+     * @see eionet.cr.dao.PostHarvestScriptDAO#exists(eionet.cr.dto.PostHarvestScriptDTO.TargetType, java.lang.String,
+     *      java.lang.String)
      */
     @Override
     public boolean exists(TargetType targetType, String targetUrl, String title) throws DAOException {
 
-        if (StringUtils.isBlank(title)){
+        if (StringUtils.isBlank(title)) {
             throw new IllegalArgumentException("Title must not be blank!");
         }
 
@@ -398,7 +411,7 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
         values.add(title);
 
         Object o = executeUniqueResultSQL(EXISTS_SQL, values, new SingleObjectReader<Object>());
-        return o==null ? false : Integer.parseInt(o.toString())>0;
+        return o == null ? false : Integer.parseInt(o.toString()) > 0;
     }
 
     /**
@@ -408,7 +421,7 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
     @Override
     public List<Map<String, ObjectDTO>> test(String query) throws DAOException {
 
-        if (StringUtils.isBlank(query)){
+        if (StringUtils.isBlank(query)) {
             return new ArrayList<Map<String, ObjectDTO>>();
         }
 
@@ -420,6 +433,69 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
             return reader.getResultList();
         } catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
+        } finally {
+            SesameUtil.close(conn);
+        }
+    }
+
+    /**
+     * @see eionet.cr.dao.PostHarvestScriptDAO#test(java.lang.String, eionet.cr.dto.PostHarvestScriptDTO.TargetType,
+     *      java.lang.String, java.lang.String, java.io.OutputStream)
+     */
+    @Override
+    public void test(String query, TargetType targetType, String targetUrl, String testSourceUrl, OutputStream out)
+    throws DAOException {
+
+        if (StringUtils.isBlank(query)) {
+            return;
+        }
+
+        String sourceReplacer = testSourceUrl;
+        if (StringUtils.isBlank(sourceReplacer)) {
+            if (targetType != null && targetType.equals(TargetType.SOURCE)) {
+                sourceReplacer = targetUrl;
+            }
+        }
+        String typeReplacer = targetType != null && targetType.equals(TargetType.TYPE) ? targetUrl : null;
+
+        RepositoryConnection conn = null;
+        try {
+            conn = SesameConnectionProvider.getReadOnlyRepositoryConnection();
+
+            Bindings bindings = new Bindings();
+            if (!StringUtils.isBlank(sourceReplacer)) {
+                bindings.setURI(PostHarvestScriptParser.HARVESTED_SOURCE_VARIABLE, sourceReplacer);
+            }
+            if (!StringUtils.isBlank(typeReplacer)) {
+                bindings.setURI(PostHarvestScriptParser.ASSOCIATED_TYPE_VARIABLE, typeReplacer);
+            }
+
+            GraphQuery graphQuery = conn.prepareGraphQuery(QueryLanguage.SPARQL, query);
+            ValueFactory valueFactory = conn.getValueFactory();
+            bindings.applyTo(graphQuery, valueFactory);
+
+            if (!StringUtils.isBlank(sourceReplacer)) {
+                DatasetImpl dataset = new DatasetImpl();
+                dataset.addDefaultGraph(valueFactory.createURI(sourceReplacer));
+                graphQuery.setDataset(dataset );
+            }
+            graphQuery.evaluate(new RDFXMLWriter(out));
+
+        } catch (Exception e) {
+            throw new DAOException(e.getMessage(), e);
+        } finally {
+            SesameUtil.close(conn);
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
+
+        RepositoryConnection conn = null;
+        try {
+            conn = SesameUtil.getRepositoryConnection();
+            String sparul = "INSERT {?s <http://namespace2.com/comment> ?o} WHERE {?s <http://namespace1.com/comment> ?o}";
+            int updateCount = SesameUtil.executeSPARUL(sparul , conn, "http://graaf1.ee");
+            System.out.println("Update count = " + updateCount);
         } finally {
             SesameUtil.close(conn);
         }

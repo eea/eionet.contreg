@@ -27,13 +27,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.action.StreamingResolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.validation.ValidationMethod;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.dao.DAOException;
@@ -58,13 +63,19 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     private static final String SCRIPT_JSP = "/pages/admin/postHarvestScripts/script.jsp";
 
     /** */
+    private static final String DEFAULT_SCRIPT = "PREFIX cr: <http://cr.eionet.europa.eu/ontologies/contreg.rdf#>\n" +
+    "    INSERT { ?s cr:tag `bif:lower(?o)` }\n" +
+    "    WHERE { ?s <http://www.eea.europa.eu/portal_types/Article#themes> ?o }";
+
+    /** */
     private int id;
     private String title;
-    private String script;
+    private String script = DEFAULT_SCRIPT;
     private String targetUrl;
     private TargetType targetType;
     private String testSourceUrl;
     private boolean active;
+    private boolean runOnce = true;
     private boolean ignoreMalformedSparql;
     private List<Tab> tabs;
     private String backToTargetUrl;
@@ -75,6 +86,11 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     private String executedTestQuery;
     private String testError;
 
+    /**
+     *
+     * @return
+     * @throws DAOException
+     */
     @DefaultHandler
     public Resolution defaultHandler() throws DAOException {
 
@@ -86,6 +102,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
                 targetUrl = dto.getTargetUrl();
                 targetType = dto.getTargetType();
                 active = dto.isActive();
+                runOnce = dto.isRunOnce();
             }
         }
 
@@ -101,9 +118,9 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
 
         // If id given, do save by the given id, otherwise do addition of brand new script.
         if (id > 0) {
-            DAOFactory.get().getDao(PostHarvestScriptDAO.class).save(id, title, script, active);
+            DAOFactory.get().getDao(PostHarvestScriptDAO.class).save(id, title, script, active, runOnce);
         } else {
-            id = DAOFactory.get().getDao(PostHarvestScriptDAO.class).insert(targetType, targetUrl, title, script, active);
+            id = DAOFactory.get().getDao(PostHarvestScriptDAO.class).insert(targetType, targetUrl, title, script, active, runOnce);
         }
         addSystemMessage("Script successfully saved!");
 
@@ -124,7 +141,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
      * @return
      * @throws DAOException
      */
-    public Resolution test() {
+    public Resolution test() throws Exception{
 
         if (logger.isTraceEnabled()) {
             logger.trace("Handling test event");
@@ -137,13 +154,31 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
             }
         }
 
-        executedTestQuery = PostHarvestScriptParser.parseForTest(script, graphUri);
         try {
-            testResults = DAOFactory.get().getDao(PostHarvestScriptDAO.class).test(executedTestQuery);
-        } catch (DAOException e) {
-            testError = e.getMessage();
+            executedTestQuery = PostHarvestScriptParser.deriveConstruct(script, graphUri);
+        } catch (ScriptParseException e) {
+            addWarningMessage(e.toString());
         }
-        return new ForwardResolution(SCRIPTS_CONTAINER_JSP);
+        logger.debug("Executing derived CONSTRUCT query: " + executedTestQuery);
+        logger.debug("Using " + graphUri + " as the default graph");
+
+        StreamingResolution resolution = new StreamingResolution("application/rdf+xml") {
+            public void stream(HttpServletResponse response) throws Exception {
+
+                try{
+                    DAOFactory
+                    .get()
+                    .getDao(PostHarvestScriptDAO.class)
+                    .test(executedTestQuery, targetType, targetUrl, testSourceUrl, response.getOutputStream());
+                }
+                catch (Exception e){
+                    logger.error("Failed executing test query", e);
+                }
+            }
+        };
+        resolution.setFilename("test-results.xml");
+
+        return resolution;
     }
 
     /**
@@ -217,7 +252,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
             addGlobalValidationError("Title must be no longer than 255 characters!");
         }
 
-        if (id<=0){
+        if (id <= 0) {
             if (DAOFactory.get().getDao(PostHarvestScriptDAO.class).exists(targetType, targetUrl, title)) {
                 String msg = "A script with this title already exists";
                 if (targetType != null) {
@@ -250,8 +285,8 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
             addGlobalValidationError("Script must not be blank!");
         }
 
-        String sourceToTestOn = targetType!=null && targetType.equals(TargetType.SOURCE) ? targetUrl : testSourceUrl;
-        if (StringUtils.isBlank(sourceToTestOn)){
+        String sourceToTestOn = targetType != null && targetType.equals(TargetType.SOURCE) ? targetUrl : testSourceUrl;
+        if (StringUtils.isBlank(sourceToTestOn)) {
             addGlobalValidationError("Test source must not be blank!");
         }
 
@@ -391,7 +426,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
      */
     public List<Tab> getTabs() {
 
-        if (tabs==null){
+        if (tabs == null) {
             tabs = Tabs.generate(targetType);
         }
         return tabs;
@@ -436,13 +471,13 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
      */
     public List<String> getTestResultColumns() {
 
-        if (testResultColumns==null){
+        if (testResultColumns == null) {
 
             testResultColumns = new ArrayList<String>();
-            if (testResults!=null && !testResults.isEmpty()){
+            if (testResults != null && !testResults.isEmpty()) {
 
-                Map<String,ObjectDTO> firstRow = testResults.get(0);
-                for (String key : firstRow.keySet()){
+                Map<String, ObjectDTO> firstRow = testResults.get(0);
+                for (String key : firstRow.keySet()) {
                     testResultColumns.add(key);
                 }
             }
@@ -463,4 +498,89 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     public String getTestError() {
         return testError;
     }
+
+    /**
+     *
+     * @return
+     */
+    public String getHarvestedSourceVariable() {
+        return PostHarvestScriptParser.HARVESTED_SOURCE_VARIABLE;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public String getAssociatedTypeVariable() {
+        return PostHarvestScriptParser.ASSOCIATED_TYPE_VARIABLE;
+    }
+
+    /**
+     * @author Jaanus Heinlaid
+     */
+    private class TestResultsStreamingResolution extends StreamingResolution {
+
+        /** */
+        private PostHarvestScriptActionBean actionBean;
+
+        /**
+         * @param testQuery
+         * @param contentType
+         */
+        public TestResultsStreamingResolution(PostHarvestScriptActionBean actionBean) {
+            super("application/rdf+xml");
+            this.actionBean = actionBean;
+        }
+
+        /*
+         * (non-Javadoc)
+         *
+         * @see net.sourceforge.stripes.action.StreamingResolution#stream(javax.servlet.http.HttpServletResponse)
+         */
+        @Override
+        protected void stream(HttpServletResponse response) throws Exception {
+
+            ServletOutputStream outputStream = null;
+            try {
+                outputStream = response.getOutputStream();
+                DAOFactory
+                .get()
+                .getDao(PostHarvestScriptDAO.class)
+                .test(actionBean.getExecutedTestQuery(), actionBean.getTargetType(), actionBean.getTargetUrl(),
+                        actionBean.getTestSourceUrl(), outputStream);
+            }
+            catch (Exception e){
+                actionBean.addWarningMessage(e.toString());
+            }
+            finally {
+                IOUtils.closeQuietly(outputStream);
+            }
+        }
+    }
+    //
+    //    /**
+    //     * @return the runOnce
+    //     */
+    //    public boolean isRunOnce() {
+    //        return runOnce;
+    //    }
+    //
+    //    /**
+    //     * @param runOnce the runOnce to set
+    //     */
+    //    public void setRunOnce(boolean runOnce) {
+    //        this.runOnce = runOnce;
+    //    }
+    //
+    //    /**
+    //     *
+    //     */
+    //    @Before(stages = {LifecycleStage.BindingAndValidation})
+    //    public void beforeBindingAndValidation(){
+    //
+    //        HttpServletRequest request = getContext().getRequest();
+    //        if (request.getMethod().equalsIgnoreCase("POST") && request.getParameter("runOnce")==null){
+    //            runOnce = false;
+    //        }
+    //    }
 }

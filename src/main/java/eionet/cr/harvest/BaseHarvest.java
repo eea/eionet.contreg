@@ -54,6 +54,7 @@ import eionet.cr.dto.HarvestMessageDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.PostHarvestScriptDTO;
+import eionet.cr.dto.PostHarvestScriptDTO.TargetType;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.util.HarvestMessageType;
 import eionet.cr.util.EMailSender;
@@ -268,12 +269,13 @@ public abstract class BaseHarvest implements Harvest {
             SesameUtil.executeQuery("select distinct ?type from <" + getContextUrl() + "> where {?s a ?type}", reader, conn);
             List<String> distinctTypes = reader.getResultList();
             if (distinctTypes != null && !distinctTypes.isEmpty()) {
+
                 scripts = dao.listActiveForTypes(distinctTypes);
                 totalScriptsFound += scripts.size();
                 runScripts(scripts, conn);
             }
 
-            if (totalScriptsFound==0){
+            if (totalScriptsFound == 0) {
                 LOGGER.debug(loggerMsg("No active post-harvest scripts were found relevant for this source"));
             }
 
@@ -302,24 +304,49 @@ public abstract class BaseHarvest implements Harvest {
         }
 
         for (PostHarvestScriptDTO scriptDto : scriptDtos) {
+            runScript(scriptDto, conn);
+        }
+    }
 
-            String scriptType =
-                scriptDto.getTargetType() == null ? "all-source" : scriptDto.getTargetType().toString().toLowerCase()
-                        + "-specific";
-            String parsedScript = PostHarvestScriptParser.parseForExecution(scriptDto.getScript(), getContextUrl());
+    /**
+     * @param scriptDto
+     * @param conn
+     */
+    private void runScript(PostHarvestScriptDTO scriptDto, RepositoryConnection conn) {
 
-            LOGGER.debug(MessageFormat.format("Executing the following {0} post-harvest script titled \"{1}\":\n{2}",
-                    scriptType, scriptDto.getTitle(), parsedScript));
+        TargetType targetType = scriptDto.getTargetType();
+        String targetUrl = scriptDto.getTargetUrl();
+        String query = scriptDto.getScript();
+        String title = scriptDto.getTitle();
+        String scriptType = targetType == null ? "all-source" : targetType.toString().toLowerCase() + "-specific";
+        String associatedType = targetType != null && targetType.equals(TargetType.TYPE) ? targetUrl : null;
+        String parsedQuery = PostHarvestScriptParser.parseForExecution(query, getContextUrl(), associatedType);
 
-            try {
-                SesameUtil.executeUpdateQuery(parsedScript, null, conn);
-            } catch (OpenRDFException e) {
-                String message = MessageFormat.format(
-                        "Got exception *** {0} *** when executing the following {1} post-harvest script titled \"{2}\":\n{3}", e.toString(),
-                        scriptType, scriptDto.getTitle(), parsedScript);
-                LOGGER.warn(message);
-                addHarvestMessage(message, HarvestMessageType.WARNING);
+        try {
+            LOGGER.debug(MessageFormat.format("Executing the {0} script titled \"{1}\":\n{2}", scriptType, title, parsedQuery));
+
+            int updateCount = SesameUtil.executeSPARUL(parsedQuery, conn, getContextUrl());
+            if (updateCount>0 && !scriptDto.isRunOnce()) {
+                // run maximum 100 times
+                LOGGER.debug("Update count was " + updateCount + ", running script until it becomes 0, or no more than 100 times ...");
+                int i = 0;
+                int totalUpdateCount = updateCount;
+                for (; updateCount > 0 && i < 100; i++) {
+                    updateCount = SesameUtil.executeSPARUL(parsedQuery, conn, getContextUrl());
+                    totalUpdateCount += updateCount;
+                }
+                LOGGER.debug("Script was run for a total of " + (i+1) + " times, total update count = " + totalUpdateCount);
             }
+            else{
+                LOGGER.debug("Update count was " + updateCount);
+            }
+        } catch (Exception e) {
+            String message =
+                MessageFormat
+                .format("Got exception *** {0} *** when executing the following {1} post-harvest script titled \"{2}\":\n{3}",
+                        e.toString(), scriptType, title, parsedQuery);
+            LOGGER.warn(message);
+            addHarvestMessage(message, HarvestMessageType.WARNING);
         }
     }
 
@@ -585,8 +612,7 @@ public abstract class BaseHarvest implements Harvest {
     }
 
     /**
-     * @param cleanAllPreviousSourceMetadata
-     *            the cleanAllPreviousSourceMetadata to set
+     * @param cleanAllPreviousSourceMetadata the cleanAllPreviousSourceMetadata to set
      */
     protected void setCleanAllPreviousSourceMetadata(boolean cleanAllPreviousSourceMetadata) {
         this.cleanAllPreviousSourceMetadata = cleanAllPreviousSourceMetadata;
@@ -684,8 +710,7 @@ public abstract class BaseHarvest implements Harvest {
     }
 
     /**
-     * @param storedTriplesCount
-     *            the storedTriplesCount to set
+     * @param storedTriplesCount the storedTriplesCount to set
      */
     protected void setStoredTriplesCount(int storedTriplesCount) {
         this.storedTriplesCount = storedTriplesCount;

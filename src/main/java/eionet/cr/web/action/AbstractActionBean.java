@@ -33,6 +33,7 @@ import net.sourceforge.stripes.controller.AnnotatedClassActionResolver;
 import net.sourceforge.stripes.validation.SimpleError;
 import net.sourceforge.stripes.validation.ValidationError;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -138,8 +139,8 @@ public abstract class AbstractActionBean implements ActionBean {
      * @param message
      *            Message text in HTML format.
      */
-    protected void addSystemMessage(final String message) {
-        getContext().getMessages(SYSTEM_MESSAGES).add(new SimpleMessage(message));
+    public void addSystemMessage(final String message) {
+        getContext().getMessages(SYSTEM_MESSAGES).add(new SimpleMessage(StringEscapeUtils.escapeXml(message)));
     }
 
     /**
@@ -149,8 +150,8 @@ public abstract class AbstractActionBean implements ActionBean {
      * @param message
      *            Message text in HTML format.
      */
-    protected void addCautionMessage(final String message) {
-        getContext().getMessages(CAUTION_MESSAGES).add(new SimpleMessage(message));
+    public void addCautionMessage(final String message) {
+        getContext().getMessages(CAUTION_MESSAGES).add(new SimpleMessage(StringEscapeUtils.escapeXml(message)));
     }
 
     /**
@@ -159,8 +160,8 @@ public abstract class AbstractActionBean implements ActionBean {
      * @param message
      *            Message text in HTML format.
      */
-    protected void addWarningMessage(final String message) {
-        getContext().getMessages(WARNING_MESSAGES).add(new SimpleMessage(message));
+    public void addWarningMessage(final String message) {
+        getContext().getMessages(WARNING_MESSAGES).add(new SimpleMessage(StringEscapeUtils.escapeXml(message)));
     }
 
     /**
