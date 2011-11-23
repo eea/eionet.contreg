@@ -11,6 +11,12 @@ td.folder {
     padding-left: 20px;
 }
 
+td.upFolder {
+    background: url('../images/up.gif') no-repeat left top;
+    background-position: 0px 3px;
+    padding-left: 20px;
+}
+
 /* Style in jQuery widgets. */
 div.ui-widget-content h1 {
     background-color: transparent;

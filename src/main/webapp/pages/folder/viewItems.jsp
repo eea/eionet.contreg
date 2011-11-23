@@ -81,11 +81,6 @@
                         <c:if test="${not empty actionBean.folder.title}">
                             (${actionBean.folder.title})
                         </c:if>
-                        <c:url var="upIconUrl" value="images/move_up.gif" />
-                        <stripes:link href="/folder.action" title="Move to parent folder" style="background: none">
-                            <stripes:param name="uri" value="${actionBean.parentUri}"/>
-                            <img src="${upIconUrl}" border="0" />
-                        </stripes:link>
                     </c:otherwise>
                 </c:choose>
             </h1>
@@ -94,6 +89,20 @@
                 <stripes:hidden name="uri" value="${actionBean.uri}" />
                 <table>
                     <tbody>
+                    <c:if test="${!actionBean.homeFolder}">
+                        <tr>
+                            <c:if test="${actionBean.usersFolder}">
+                                <td></td>
+                            </c:if>
+                            <td class="upFolder" style="width: 100%">
+                                [<stripes:link href="/folder.action" title="Move to parent folder" style="background: none">
+                                    <stripes:param name="uri" value="${actionBean.parentUri}"/>
+                                    Parent Directory
+                                </stripes:link>]
+                            </td>
+                            <td></td>
+                        </tr>
+                    </c:if>
                     <c:forEach var="item" items="${actionBean.folderItems}" varStatus="loop">
                         <stripes:hidden name="selectedItems[${loop.index}].uri" value="${item.uri}" />
                         <stripes:hidden name="selectedItems[${loop.index}].type" value="${item.type}" />
@@ -114,26 +123,13 @@
                                 <td><stripes:checkbox name="selectedItems[${loop.index}].selected" disabled="${disabled}" /></td>
                             </c:if>
                             <td class="${cssClass}" style="width: 100%">
-                                <c:choose>
-                                    <c:when test="${item.file || item.reservedFile}">
-                                        <stripes:link href="factsheet.action">
-                                            <stripes:param name="uri" value="${item.uri}"/>
-                                            ${item.name}
-                                        </stripes:link>
-                                        <c:if test="${not empty item.title}">
-                                            (${item.title})
-                                        </c:if>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <stripes:link href="folder.action">
-                                            <stripes:param name="uri" value="${item.uri}"/>
-                                            ${item.name}
-                                        </stripes:link>
-                                        <c:if test="${not empty item.title}">
-                                            (${item.title})
-                                        </c:if>
-                                    </c:otherwise>
-                                </c:choose>
+                                <stripes:link href="view.action">
+                                    <stripes:param name="uri" value="${item.uri}"/>
+                                    ${item.name}
+                                </stripes:link>
+                                <c:if test="${not empty item.title}">
+                                    (${item.title})
+                                </c:if>
                             </td>
                             <td>
                                 ${item.lastModified}
