@@ -95,7 +95,7 @@
                                 <td></td>
                             </c:if>
                             <td class="upFolder" style="width: 100%">
-                                [<stripes:link href="/folder.action" title="Move to parent folder" style="background: none">
+                                [<stripes:link href="/view.action" title="Move to parent folder" style="background: none">
                                     <stripes:param name="uri" value="${actionBean.parentUri}"/>
                                     Parent Directory
                                 </stripes:link>]
@@ -123,7 +123,7 @@
                                 <td><stripes:checkbox name="selectedItems[${loop.index}].selected" disabled="${disabled}" /></td>
                             </c:if>
                             <td class="${cssClass}" style="width: 100%">
-                                <stripes:link href="view.action">
+                                <stripes:link href="/view.action">
                                     <stripes:param name="uri" value="${item.uri}"/>
                                     ${item.name}
                                 </stripes:link>
