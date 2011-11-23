@@ -14,6 +14,7 @@
 
 		<title>${initParam.appDispName} - ${pageTitle}</title>
 		
+		<link rel="stylesheet" type="text/css" href="<c:url value="/css/eionet2007.css"/>" media="screen"/>
 		<link rel="stylesheet" type="text/css" href="<c:url value="/css/application.css"/>" media="screen"/>
 		<link rel="shortcut icon" href="<c:url value="/favicon.ico"/>" type="image/x-icon" />
 
