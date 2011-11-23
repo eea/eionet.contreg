@@ -31,7 +31,7 @@
 
     <stripes:layout-component name="contents">
     	<c:choose>
-			<c:when test='${crfn:userHasPermission(pageContext.session, "/registrations", "u")}'>
+			<c:when test='${not empty sessionScope.crUser && crfn:userHasPermission(pageContext.session, "/mergedeliveries", "v")}'>
 		        <h1>Save files into dataset</h1>
 				<p class="documentDescription">
 					Select multiple files and store them into one compiled dataset under your home-folder.
@@ -128,7 +128,7 @@
 		        </c:if>
         	</c:when>
 			<c:otherwise>
-				<div class="note-msg">You are not logged in!</div>
+				<div class="note-msg">You are not logged in or you do not have enough privileges!</div>
 			</c:otherwise>
 		</c:choose>
 

@@ -63,6 +63,8 @@ public class SaveFilesActionBean extends DisplaytagSearchActionBean {
     public Resolution getFiles() throws DAOException {
         if (getUser() == null) {
             addWarningMessage("You are not logged in!");
+        } else if (getUser() != null && !getUser().hasPermission("/mergedeliveries", "v")) {
+            addWarningMessage("You do not have enough privileges to view this page!");
         } else {
             init();
         }
@@ -114,6 +116,11 @@ public class SaveFilesActionBean extends DisplaytagSearchActionBean {
         // for all the above POST events, user must be authorized
         if (getUser() == null) {
             addGlobalValidationError("User not logged in!");
+            return;
+        }
+
+        if (getUser() != null && !getUser().hasPermission("/mergedeliveries", "v")) {
+            addGlobalValidationError("You do not have enough privileges to do this action!");
             return;
         }
 

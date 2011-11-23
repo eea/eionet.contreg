@@ -6,7 +6,9 @@
     <ul>
         <li><a href="documentation">Help and documentation</a></li>
         <li><a href="simpleSearch.action">Simple search</a></li>
-        <li><a href="deliverySearch.action">Search deliveries</a></li>
+        <c:if test='${not empty sessionScope.crUser && crfn:userHasPermission(pageContext.session, "/mergedeliveries", "v")}'>
+        	<li><a href="deliverySearch.action">Merge deliveries</a></li>
+        </c:if>
         <li><a href="customSearch.action">Custom search</a></li>
         <li><a href="typeSearch.action">Type search</a></li>
 <!--
