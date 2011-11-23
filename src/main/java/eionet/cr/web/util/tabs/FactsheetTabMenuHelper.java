@@ -121,7 +121,6 @@ public class FactsheetTabMenuHelper {
             te3.setEvent("search");
             te3.addParam("uri", subject.getUri());
             result.add(te3);
-
         }
 
         result.addAll(getTypeSpecificTabs(selected));
