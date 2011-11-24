@@ -140,7 +140,7 @@ public class TabularDataServlet extends HttpServlet {
      * @throws IOException
      */
     private void handleFileNotFound(String message, HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    throws ServletException, IOException {
 
         LOGGER.info(message);
 
@@ -161,7 +161,7 @@ public class TabularDataServlet extends HttpServlet {
      * @throws IOException
      */
     private void handleException(Exception exception, HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    throws ServletException, IOException {
 
         LOGGER.error(exception);
 
@@ -212,7 +212,7 @@ public class TabularDataServlet extends HttpServlet {
     public static boolean isTabularDataFile(String fileUri) throws DAOException {
 
         String mediaType =
-                DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceMetadata(fileUri, Predicates.CR_MEDIA_TYPE);
+            DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceMetadata(fileUri, Predicates.CR_MEDIA_TYPE);
         return mediaType != null && (mediaType.equals("csv") || mediaType.equals("tsv"));
     }
 
@@ -226,8 +226,7 @@ public class TabularDataServlet extends HttpServlet {
      */
     public static boolean willHandle(String fileUri, String idInFile, HttpServletRequest request) throws DAOException {
 
-        boolean test = isTabularDataFile(fileUri);
         return isTabularDataFile(fileUri)
-                && (isContentTypeAccepted(request, "application/rdf+xml") || !StringUtils.isBlank(idInFile));
+        && (isContentTypeAccepted(request, "application/rdf+xml") || !StringUtils.isBlank(idInFile));
     }
 }
