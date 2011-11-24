@@ -162,23 +162,12 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
         logger.debug("Executing derived CONSTRUCT query: " + executedTestQuery);
         logger.debug("Using " + graphUri + " as the default graph");
 
-        StreamingResolution resolution = new StreamingResolution("application/rdf+xml") {
-            public void stream(HttpServletResponse response) throws Exception {
-
-                try{
-                    DAOFactory
-                    .get()
-                    .getDao(PostHarvestScriptDAO.class)
-                    .test(executedTestQuery, targetType, targetUrl, testSourceUrl, response.getOutputStream());
-                }
-                catch (Exception e){
-                    logger.error("Failed executing test query", e);
-                }
-            }
-        };
-        resolution.setFilename("test-results.xml");
-
-        return resolution;
+        try {
+            testResults = DAOFactory.get().getDao(PostHarvestScriptDAO.class).test(executedTestQuery);
+        } catch (DAOException e) {
+            testError = e.getMessage();
+        }
+        return new ForwardResolution(SCRIPTS_CONTAINER_JSP);
     }
 
     /**
@@ -547,7 +536,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
                 .get()
                 .getDao(PostHarvestScriptDAO.class)
                 .test(actionBean.getExecutedTestQuery(), actionBean.getTargetType(), actionBean.getTargetUrl(),
-                        actionBean.getTestSourceUrl(), outputStream);
+                        actionBean.getTestSourceUrl());
             }
             catch (Exception e){
                 actionBean.addWarningMessage(e.toString());

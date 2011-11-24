@@ -21,7 +21,6 @@
 
 package eionet.cr.dao.virtuoso;
 
-import java.io.OutputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -36,7 +35,6 @@ import org.openrdf.query.GraphQuery;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.impl.DatasetImpl;
 import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.rio.rdfxml.RDFXMLWriter;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.PostHarvestScriptDAO;
@@ -440,14 +438,14 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
 
     /**
      * @see eionet.cr.dao.PostHarvestScriptDAO#test(java.lang.String, eionet.cr.dto.PostHarvestScriptDTO.TargetType,
-     *      java.lang.String, java.lang.String, java.io.OutputStream)
+     *      java.lang.String, java.lang.String)
      */
     @Override
-    public void test(String query, TargetType targetType, String targetUrl, String testSourceUrl, OutputStream out)
+    public List<Map<String, ObjectDTO>> test(String constructQuery, TargetType targetType, String targetUrl, String testSourceUrl)
     throws DAOException {
 
-        if (StringUtils.isBlank(query)) {
-            return;
+        if (StringUtils.isBlank(constructQuery)) {
+            return new ArrayList<Map<String, ObjectDTO>>();
         }
 
         String sourceReplacer = testSourceUrl;
@@ -470,7 +468,7 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
                 bindings.setURI(PostHarvestScriptParser.ASSOCIATED_TYPE_VARIABLE, typeReplacer);
             }
 
-            GraphQuery graphQuery = conn.prepareGraphQuery(QueryLanguage.SPARQL, query);
+            GraphQuery graphQuery = conn.prepareGraphQuery(QueryLanguage.SPARQL, constructQuery);
             ValueFactory valueFactory = conn.getValueFactory();
             bindings.applyTo(graphQuery, valueFactory);
 
@@ -479,23 +477,12 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
                 dataset.addDefaultGraph(valueFactory.createURI(sourceReplacer));
                 graphQuery.setDataset(dataset );
             }
-            graphQuery.evaluate(new RDFXMLWriter(out));
 
+            PostHarvestScriptTestResultsReader reader = new PostHarvestScriptTestResultsReader();
+            SesameUtil.executeQuery(constructQuery, reader, conn);
+            return reader.getResultList();
         } catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
-        } finally {
-            SesameUtil.close(conn);
-        }
-    }
-
-    public static void main(String[] args) throws Exception {
-
-        RepositoryConnection conn = null;
-        try {
-            conn = SesameUtil.getRepositoryConnection();
-            String sparul = "INSERT {?s <http://namespace2.com/comment> ?o} WHERE {?s <http://namespace1.com/comment> ?o}";
-            int updateCount = SesameUtil.executeSPARUL(sparul , conn, "http://graaf1.ee");
-            System.out.println("Update count = " + updateCount);
         } finally {
             SesameUtil.close(conn);
         }

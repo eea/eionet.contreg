@@ -21,7 +21,6 @@
 
 package eionet.cr.dao;
 
-import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -82,7 +81,8 @@ public interface PostHarvestScriptDAO extends DAO {
      * @return
      * @throws DAOException
      */
-    int insert(TargetType targetType, String targetUrl, String title, String script, boolean active, boolean runOnce) throws DAOException;
+    int insert(TargetType targetType, String targetUrl, String title, String script, boolean active, boolean runOnce)
+    throws DAOException;
 
     /**
      *
@@ -150,16 +150,17 @@ public interface PostHarvestScriptDAO extends DAO {
      * @param query
      * @return
      */
-    List<Map<String,ObjectDTO>> test(String query) throws DAOException;
+    List<Map<String, ObjectDTO>> test(String query) throws DAOException;
 
     /**
      *
-     * @param query
+     * @param constructQuery
      * @param targetType
      * @param targetUrl
      * @param testSourceUrl
-     * @param out
+     * @return TODO
      * @throws DAOException
      */
-    void test(String query, TargetType targetType, String targetUrl, String testSourceUrl, OutputStream out) throws DAOException;
+    List<Map<String, ObjectDTO>> test(String constructQuery, TargetType targetType, String targetUrl, String testSourceUrl)
+    throws DAOException;
 }
