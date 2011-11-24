@@ -280,7 +280,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
             return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
         }
 
-        List<String> fileUris = new ArrayList<String>();
+        List<String> fileOrFolderUris = new ArrayList<String>();
 
         FolderDAO folderDAO = DAOFactory.get().getDao(FolderDAO.class);
         FileStore fileStore = FileStore.getInstance(getUserName());
@@ -288,15 +288,15 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
         // Delete folders
         for (RenameFolderItemDTO item : selectedItems) {
             if (item.isSelected() && FolderItemDTO.Type.FOLDER.equals(item.getType())) {
-                folderDAO.deleteFolder(item.getUri(), getUser().getHomeUri());
 
                 boolean folderDeleted = fileStore.deleteFolder(URIUtil.extractPathInUserHome(item.getUri()));
                 if (!folderDeleted) {
                     logger.warn("Failed to delete folder from filestore for uri: " + item.getUri());
                 }
             }
-            if (item.isSelected() && FolderItemDTO.Type.FILE.equals(item.getType())) {
-                fileUris.add(item.getUri());
+            if (item.isSelected()
+                    && (FolderItemDTO.Type.FILE.equals(item.getType()) || FolderItemDTO.Type.FOLDER.equals(item.getType()))) {
+                fileOrFolderUris.add(item.getUri());
             }
         }
 
@@ -308,9 +308,9 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
             }
         }
 
-        if (fileUris.size() > 0) {
-            folderDAO.deleteFileUris(uri, fileUris);
-            DAOFactory.get().getDao(HarvestSourceDAO.class).removeHarvestSources(fileUris);
+        if (fileOrFolderUris.size() > 0) {
+            folderDAO.deleteFileOrFolderUris(uri, fileOrFolderUris);
+            DAOFactory.get().getDao(HarvestSourceDAO.class).removeHarvestSources(fileOrFolderUris);
         }
 
         addSystemMessage("Files/folders deleted successfully.");
@@ -511,7 +511,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
             // since user's home URI was used above as triple source, add it to HARVEST_SOURCE too
             // (but set interval minutes to 0, to avoid it being background-harvested)
             DAOFactory.get().getDao(HarvestSourceDAO.class)
-            .addSourceIgnoreDuplicate(HarvestSourceDTO.create(getUser().getHomeUri(), false, 0, getUserName()));
+                    .addSourceIgnoreDuplicate(HarvestSourceDTO.create(getUser().getHomeUri(), false, 0, getUserName()));
 
         } catch (DAOException e) {
             saveAndHarvestException = e;

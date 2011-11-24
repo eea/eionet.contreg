@@ -374,39 +374,7 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
      * {@inheritDoc}
      */
     @Override
-    public void deleteFolder(String folderUri, String homeUri) throws DAOException {
-        String parentFolderUri = StringUtils.substringBeforeLast(folderUri, "/");
-
-        Connection sqlConn = null;
-        RepositoryConnection repoConn = null;
-        try {
-            repoConn = SesameUtil.getRepositoryConnection();
-            ValueFactory valueFactory = repoConn.getValueFactory();
-
-            URI folder = valueFactory.createURI(folderUri);
-            URI hasFolder = valueFactory.createURI(Predicates.CR_HAS_FOLDER);
-            URI parentFolder = valueFactory.createURI(parentFolderUri);
-            URI homeFolder = valueFactory.createURI(homeUri);
-            URI harvesterContext = valueFactory.createURI(GeneralConfig.HARVESTER_URI);
-            // TODO: also add registrations graph context - http://127.0.0.1:8080/cr/home/voolajuh/registrations
-
-            repoConn.remove(folder, null, null, parentFolder, harvesterContext);
-            repoConn.remove(parentFolder, hasFolder, (Value) folder, homeFolder);
-
-        } catch (RepositoryException e) {
-            throw new DAOException(e.toString(), e);
-        } finally {
-            SesameUtil.close(repoConn);
-            SQLUtil.close(sqlConn);
-        }
-
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void deleteFileUris(String folderUri, List<String> subjectUris) throws DAOException {
+    public void deleteFileOrFolderUris(String folderUri, List<String> subjectUris) throws DAOException {
 
         if (subjectUris == null || subjectUris.size() == 0) {
             return;

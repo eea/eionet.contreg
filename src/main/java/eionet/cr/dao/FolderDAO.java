@@ -101,22 +101,13 @@ public interface FolderDAO extends DAO {
     boolean folderHasItems(String folderUri) throws DAOException;
 
     /**
-     * Deletes folder from triplestore and from filesystem.
-     *
-     * @param folderUri
-     * @param homeUri - User home folder URI.
-     * @throws DAOException
-     */
-    void deleteFolder(String folderUri, String homeUri) throws DAOException;
-
-    /**
-     * Deletes uploaded files data.
+     * Deletes uploaded files/folders data.
      *
      * @param folderUri
      * @param subjectUris
      * @throws DAOException
      */
-    void deleteFileUris(String folderUri, List<String> subjectUris) throws DAOException;
+    void deleteFileOrFolderUris(String folderUri, List<String> subjectUris) throws DAOException;
 
     /**
      * Returns the contents (files and folders) of the folder with given uri. The Pair.left is the current folder and Pair.right is
