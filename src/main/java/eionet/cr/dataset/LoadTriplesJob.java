@@ -16,6 +16,7 @@ import org.quartz.JobExecutionException;
 import eionet.cr.dao.CompiledDatasetDAO;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.HarvestSourceDAO;
 
 /**
  * @author Risto Alt
@@ -40,6 +41,7 @@ public class LoadTriplesJob implements Job {
         try {
             if (!StringUtils.isBlank(datasetUri) && selectedFiles != null && selectedFiles.size() > 0) {
                 DAOFactory.get().getDao(CompiledDatasetDAO.class).saveDataset(selectedFiles, datasetUri, overwrite);
+                DAOFactory.get().getDao(HarvestSourceDAO.class).updateHarvestedStatements(datasetUri);
             }
         } catch (DAOException e) {
             logger.info("Error occured while loading triples: " + datasetUri);

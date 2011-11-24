@@ -228,6 +228,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
                     idx++;
                 }
                 DAOFactory.get().getDao(HelperDAO.class).addTriples(subject);
+                DAOFactory.get().getDao(HarvestSourceDAO.class).updateHarvestedStatements(graphName);
             }
 
         } catch (Exception e) {

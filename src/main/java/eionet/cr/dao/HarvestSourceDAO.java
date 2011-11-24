@@ -217,8 +217,8 @@ public interface HarvestSourceDAO extends DAO {
      * @throws IOException
      * @throws OpenRDFException
      */
-    int loadIntoRepository(File file, RDFFormat rdfFormat, String graphUrl, boolean clearPreviousGraphContent)
-    throws IOException, OpenRDFException;
+    int loadIntoRepository(File file, RDFFormat rdfFormat, String graphUrl, boolean clearPreviousGraphContent) throws IOException,
+            OpenRDFException;
 
     /**
      * Loads the given input stream into the triple store (i.e. repository). The stream must be formatted by a format supported by
@@ -233,9 +233,8 @@ public interface HarvestSourceDAO extends DAO {
      * @throws IOException
      * @throws OpenRDFException
      */
-    int
-    loadIntoRepository(InputStream inputStream, RDFFormat rdfFormat, String graphUrl, boolean clearPreviousGraphContent)
-    throws IOException, OpenRDFException;
+    int loadIntoRepository(InputStream inputStream, RDFFormat rdfFormat, String graphUrl, boolean clearPreviousGraphContent)
+            throws IOException, OpenRDFException;
 
     /**
      * Adds the meta information the harvester has collected about the source. The meta data is considered part of the harvester and
@@ -249,8 +248,7 @@ public interface HarvestSourceDAO extends DAO {
      * @throws RDFParseException
      * @throws IOException
      */
-    void addSourceMetadata(SubjectDTO sourceMetadata) throws DAOException, RDFParseException, RepositoryException,
-    IOException;
+    void addSourceMetadata(SubjectDTO sourceMetadata) throws DAOException, RDFParseException, RepositoryException, IOException;
 
     /**
      * Returns metadata from /harvester context.
@@ -278,8 +276,8 @@ public interface HarvestSourceDAO extends DAO {
      *             if data repository is unavailable.
      * @throws IOException
      */
-    void insertUpdateSourceMetadata(String subject, String predicate, ObjectDTO object) throws DAOException,
-    RepositoryException, IOException;
+    void insertUpdateSourceMetadata(String subject, String predicate, ObjectDTO object) throws DAOException, RepositoryException,
+            IOException;
 
     /**
      *
@@ -363,10 +361,11 @@ public interface HarvestSourceDAO extends DAO {
     int getTotalStatementsCount() throws DAOException;
 
     /**
-     * Derives new harvest sources from the graph represented by the given source url,
-     * and inserts them into the HARVEST_SOURCE table.
+     * Derives new harvest sources from the graph represented by the given source url, and inserts them into the HARVEST_SOURCE
+     * table.
      *
-     * @param sourceUrl The given source URL.
+     * @param sourceUrl
+     *            The given source URL.
      * @return The number of sources found and inserted.
      *
      * @throws DAOException
@@ -374,12 +373,21 @@ public interface HarvestSourceDAO extends DAO {
     int deriveNewHarvestSources(String sourceUrl) throws DAOException;
 
     /**
-     * Returns the number of harvest sources whose harvest urgency score is greater
-     * than the given threshold.
+     * Returns the number of harvest sources whose harvest urgency score is greater than the given threshold.
      *
-     * @param threshold The given threshold.
+     * @param threshold
+     *            The given threshold.
      * @return The number of sources whose harvest urgency score is greater than the given threshold.
-     * @throws DAOException When an error happens during the access of data.
+     * @throws DAOException
+     *             When an error happens during the access of data.
      */
     int getNumberOfSourcesAboveUrgencyThreshold(double threshold) throws DAOException;
+
+    /**
+     * At first deletes triple with cr:harvestedStatements predicate and then adds it with updated value.
+     *
+     * @param sourceUri
+     * @throws DAOException
+     */
+    void updateHarvestedStatements(String sourceUri) throws DAOException;
 }

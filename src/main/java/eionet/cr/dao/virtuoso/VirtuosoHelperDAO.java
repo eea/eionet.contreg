@@ -1470,10 +1470,10 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     public List<UploadDTO> getAllRdfUploads() throws DAOException {
         StringBuilder sb = new StringBuilder();
         sb.append("PREFIX cr: <http://cr.eionet.europa.eu/ontologies/contreg.rdf#> ");
-        sb.append("PREFIX dc: <http://purl.org/dc/elements/1.1/> ");
-        sb.append("select ?file, ?title, ?lastModified where { ");
+        sb.append("PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> ");
+        sb.append("select ?file, ?label, ?lastModified where { ");
         sb.append("?s cr:hasFile ?file . ");
-        sb.append("?file dc:title ?title . ");
+        sb.append("OPTIONAL {?file rdfs:label ?label} . ");
         sb.append("?file cr:harvestedStatements ?statements. ");
         sb.append("?file cr:contentLastModified ?lastModified ");
         sb.append("FILTER (?statements > 0) }");
@@ -1498,11 +1498,13 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
             @Override
             public void readRow(BindingSet bindingSet) throws ResultSetReaderException {
                 Value fileValue = bindingSet.getValue("file");
-                Value titleValue = bindingSet.getValue("title");
+                Value titleValue = bindingSet.getValue("label");
                 Value lastModifiedValue = bindingSet.getValue("lastModified");
 
                 UploadDTO uploadDTO = new UploadDTO(fileValue.stringValue());
-                uploadDTO.setLabel(titleValue.stringValue());
+                if (titleValue != null) {
+                    uploadDTO.setLabel(titleValue.stringValue());
+                }
                 uploadDTO.setDateModified(lastModifiedValue.stringValue());
 
                 result.add(uploadDTO);

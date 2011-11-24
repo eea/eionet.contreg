@@ -43,7 +43,7 @@ public class SitemapXmlWriter {
     private static final String DEFAULT_NS_LOCATION = "http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd";
     private static final String SCHEMA_NS_URI = "http://sw.deri.org/2007/07/sitemapextension/scschema.xsd";
     private static final String SCHEMA_NS_PREFIX = "sc";
-    private static final String XSI_NS_URI = "http://sw.deri.org/2007/07/sitemapextension/scschema.xsd";
+    private static final String XSI_NS_URI = "http://www.w3.org/2001/XMLSchema-instance";
     private static final String XSI_NS_PREFIX = "xsi";
     private static final String ROOT_ELEMENT = "urlset";
     private static final String DATASET_ELEMENT = "dataset";
@@ -82,7 +82,7 @@ public class SitemapXmlWriter {
             writer.writeStartElement(SCHEMA_NS_PREFIX, DATA_DUMP_LOCATION_ELEMENT, SCHEMA_NS_URI);
             writer.writeCharacters(upload.getSubjectUri());
             writer.writeEndElement();
-            writer.writeStartElement(SCHEMA_NS_PREFIX, LAST_MODIFIED_ELEMENT, SCHEMA_NS_URI);
+            writer.writeStartElement(LAST_MODIFIED_ELEMENT);
             writer.writeCharacters(upload.getDateModified());
             writer.writeEndElement();
             writer.writeEndElement();
