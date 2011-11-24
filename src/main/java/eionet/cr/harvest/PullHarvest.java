@@ -252,11 +252,18 @@ public class PullHarvest extends BaseHarvest {
 
         addHarvestMessage("Source not modified since last harvest", HarvestMessageType.INFO);
         isSourceAvailable = true;
-        finishWithOK(urlConn, 0);
 
-        // FIXME we don't want to clean all previous metadata- that's true- but we still
-        // want the cr:lastRefreshed predicate updated. This is missing here.
+        // update context source DTO (since the server returned source-not-modified,
+        // the number of harvested statements stays as it already is, i.e. we're not setting it)
+        getContextSourceDTO().setLastHarvest(new Date());
+        getContextSourceDTO().setLastHarvestFailed(false);
+        getContextSourceDTO().setPermanentError(false);
+        getContextSourceDTO().setCountUnavail(0);
+
+        // since the server returned source-not-modified, we're keeping the old metadata,
+        // but still updating the cr:lastRefreshed
         setCleanAllPreviousSourceMetadata(false);
+        addSourceMetadata(Predicates.CR_LAST_REFRESHED, ObjectDTO.createLiteral(formatDate(new Date()), XMLSchema.DATETIME));
     }
 
     /**
@@ -566,8 +573,7 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     * @param connectUrl
-     *            TODO
+     * @param connectUrl TODO
      * @return
      * @throws MalformedURLException
      * @throws IOException
@@ -762,8 +768,7 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     * @param isOnDemandHarvest
-     *            the isOnDemandHarvest to set
+     * @param isOnDemandHarvest the isOnDemandHarvest to set
      */
     public void setOnDemandHarvest(boolean isOnDemandHarvest) {
         this.isOnDemandHarvest = isOnDemandHarvest;

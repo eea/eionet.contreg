@@ -326,24 +326,24 @@ public abstract class BaseHarvest implements Harvest {
             LOGGER.debug(MessageFormat.format("Executing the {0} script titled \"{1}\":\n{2}", scriptType, title, parsedQuery));
 
             int updateCount = SesameUtil.executeSPARUL(parsedQuery, conn, getContextUrl());
-            if (updateCount>0 && !scriptDto.isRunOnce()) {
+            if (updateCount > 0 && !scriptDto.isRunOnce()) {
                 // run maximum 100 times
-                LOGGER.debug("Update count was " + updateCount + ", running script until it becomes 0, or no more than 100 times ...");
+                LOGGER.debug("Script's update count was " + updateCount
+                        + ", running it until the count becomes 0, or no more than 100 times ...");
                 int i = 0;
                 int totalUpdateCount = updateCount;
                 for (; updateCount > 0 && i < 100; i++) {
                     updateCount = SesameUtil.executeSPARUL(parsedQuery, conn, getContextUrl());
                     totalUpdateCount += updateCount;
                 }
-                LOGGER.debug("Script was run for a total of " + (i+1) + " times, total update count = " + totalUpdateCount);
-            }
-            else{
-                LOGGER.debug("Update count was " + updateCount);
+                LOGGER.debug("Script was run for a total of " + (i + 1) + " times, total update count = " + totalUpdateCount);
+            } else {
+                LOGGER.debug("Script's update count was " + updateCount);
             }
         } catch (Exception e) {
             String message =
-                MessageFormat
-                .format("Got exception *** {0} *** when executing the following {1} post-harvest script titled \"{2}\":\n{3}",
+                MessageFormat.format(
+                        "Got exception *** {0} *** when executing the following {1} post-harvest script titled \"{2}\":\n{3}",
                         e.toString(), scriptType, title, parsedQuery);
             LOGGER.warn(message);
             addHarvestMessage(message, HarvestMessageType.WARNING);
@@ -379,12 +379,10 @@ public abstract class BaseHarvest implements Harvest {
             sourceMetadata = new SubjectDTO(getContextUrl(), false);
         }
 
-        // add harvest statements
-        int harvestedStatements = getHelperDAO().getHarvestedStatements(getContextUrl());
-        ObjectDTO harvestedStatementsObject =
-            new ObjectDTO(Integer.toString(harvestedStatements), null, true, false, XMLSchema.INTEGER);
-        harvestedStatementsObject.setSourceUri(GeneralConfig.HARVESTER_URI);
-        sourceMetadata.addObject(Predicates.CR_HARVESTED_STATEMENTS, harvestedStatementsObject);
+        // get number of triples in context URL, add it to the source metadata under cr:harvestedStatements
+        int tripleCount = getHelperDAO().getHarvestedStatements(getContextUrl());
+        addSourceMetadata(Predicates.CR_HARVESTED_STATEMENTS,
+                ObjectDTO.createLiteral(String.valueOf(tripleCount), XMLSchema.INTEGER));
 
         // save source metadata
         String msg = "Saving " + sourceMetadata.getTripleCount() + " triples of harvest source metadata";
