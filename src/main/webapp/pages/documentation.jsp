@@ -8,14 +8,30 @@
     			<div id="tabbedmenu">
 	                <ul>
 	                	<c:choose>
-	                        <c:when test="${actionBean.event == 'edit' || actionBean.event == 'add' || actionBean.pageId == 'contents'}">
-	                        	<li><stripes:link href="/documentation">View</stripes:link></li>
-	                            <li id="currenttab"><stripes:link href="/documentation/contents">Contents</stripes:link></li>
-	                        </c:when>
-	                        <c:otherwise>
-	                        	<li id="currenttab"><stripes:link href="/documentation">View</stripes:link></li>
-	                        	<li><stripes:link href="/documentation/contents">Contents</stripes:link></li>
-	                        </c:otherwise>
+	                        <c:when test="${not empty actionBean.pageId && actionBean.pageId != 'contents'}">
+			                	<c:choose>
+			                        <c:when test="${actionBean.event == 'edit'}">
+			                        	<li><stripes:link href="/documentation/${actionBean.pageId}">View</stripes:link></li>
+			                            <li id="currenttab"><stripes:link href="/documentation/${actionBean.pageId}/edit">Edit</stripes:link></li>
+			                        </c:when>
+			                        <c:otherwise>
+			                        	<li id="currenttab"><stripes:link href="/documentation/${actionBean.pageId}">View</stripes:link></li>
+			                        	<li><stripes:link href="/documentation/${actionBean.pageId}/edit">Edit</stripes:link></li>
+			                        </c:otherwise>
+			                    </c:choose>
+	                    	</c:when>
+	                    	<c:otherwise>
+	                    		<c:choose>
+			                        <c:when test="${actionBean.event == 'edit' || actionBean.event == 'add' || actionBean.pageId == 'contents'}">
+			                        	<li><stripes:link href="/documentation">View</stripes:link></li>
+			                            <li id="currenttab"><stripes:link href="/documentation/contents">Contents</stripes:link></li>
+			                        </c:when>
+			                        <c:otherwise>
+			                        	<li id="currenttab"><stripes:link href="/documentation">View</stripes:link></li>
+			                        	<li><stripes:link href="/documentation/contents">Contents</stripes:link></li>
+			                        </c:otherwise>
+			                    </c:choose>
+	                    	</c:otherwise>
 	                    </c:choose>
 	                </ul>
             	</div>
@@ -118,19 +134,13 @@
 	                </div>
            			<stripes:form action="/documentation" method="post">
 	           			<table>
-							<col/>
-							<col style="width: 10em"/>
 							<c:forEach var="doc" items="${actionBean.docs}">
 								<tr>
 									<td>
 										<stripes:checkbox name="docIds" value="${doc.pageId}"/>
 									</td>
 									<td>
-										<c:set var="doctitle" value="${doc.title}"/>
-										<c:if test="${empty doctitle}">
-											<c:set var="doctitle" value="${doc.pageId}"/>
-										</c:if>
-										<stripes:link href="/documentation/${doc.pageId}/edit">${doctitle}</stripes:link>
+										<stripes:link href="/documentation/${doc.pageId}/edit">${doc.title} (${doc.pageId})</stripes:link>
 									</td>
 								</tr>
 							</c:forEach>
