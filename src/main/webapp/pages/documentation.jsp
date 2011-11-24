@@ -41,7 +41,9 @@
 			<c:choose>
            		<c:when test='${actionBean.event == "edit" && crfn:userHasPermission(pageContext.session, "/documentation", "u")}'>
 		            <stripes:form action="/documentation" method="post">
-		                <table border="0" cellpadding="3">
+		                <table cellpadding="3" style="width:100%">
+				    <col style="width:10em"/>
+				    <col />
 		                    <tr>
 		                        <td><stripes:label class="question" for="page_id">Page ID</stripes:label></td>
 		                        <td>
@@ -65,7 +67,7 @@
 			                    <tr>
 			                        <td valign="top"><stripes:label class="question" for="content">Content</stripes:label></td>
 			                        <td>
-			                            <stripes:textarea id="content" name="content" cols="50" rows="10"/>
+			                            <stripes:textarea id="content" name="content" cols="70" rows="20" style="width:100%"/>
 			                        </td>
 			                    </tr>
 		                    </c:if>
@@ -83,7 +85,7 @@
            		</c:when>
            		<c:when test='${actionBean.event == "add" && crfn:userHasPermission(pageContext.session, "/documentation", "u")}'>
 		            <stripes:form action="/documentation" method="post">
-		                <table border="0" cellpadding="3">
+		                <table cellpadding="3">
 		                    <tr>
 		                        <td><stripes:label class="question" for="page_id">Page ID</stripes:label></td>
 		                        <td>
@@ -140,7 +142,7 @@
 										<stripes:checkbox name="docIds" value="${doc.pageId}"/>
 									</td>
 									<td>
-										<stripes:link href="/documentation/${doc.pageId}/edit">${doc.title} (${doc.pageId})</stripes:link>
+										<stripes:link href="/documentation/${doc.pageId}/edit">${doc.pageId} (${doc.title})</stripes:link>
 									</td>
 								</tr>
 							</c:forEach>
