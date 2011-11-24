@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -287,13 +286,6 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             }
         }
 
-
-        boolean isConstructQuery = false;
-        // Check if CONSTRUCT query
-        if (isQuery("CONSTRUCT")) {
-            isConstructQuery = true;
-        }
-
         if (!StringUtils.isBlank(format)) {
             accept[0] = format;
         }
@@ -311,14 +303,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             }
         }
 
-        if (isConstructQuery) {
-            resolution = new StreamingResolution("application/rdf+xml") {
-                public void stream(HttpServletResponse response) throws Exception {
-                    runQuery(query, FORMAT_XML, response.getOutputStream());
-                }
-            };
-            ((StreamingResolution) resolution).setFilename("sparql-result.xml");
-        } else if (xmlFormats.contains(accept[0])) {
+        if (xmlFormats.contains(accept[0])) {
             resolution = new StreamingResolution("application/sparql-results+xml") {
                 public void stream(HttpServletResponse response) throws Exception {
                     response.setHeader("filename", "sparql-result.xml");
@@ -387,24 +372,6 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
     /**
      *
-     * @param type
-     * @return
-     */
-    private boolean isQuery(String type) {
-        if (!StringUtils.isBlank(type) && !StringUtils.isBlank(query)) {
-            StringTokenizer st = new StringTokenizer(query);
-            while (st.hasMoreElements()) {
-                String token = st.nextToken();
-                if (token.toLowerCase().startsWith(type.toLowerCase())) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     *
      * @param query
      * @param format
      * @param out
@@ -461,8 +428,18 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                         // Evaluate CONSTRUCT query. Returns XML format
                         //} else if (isConstructQuery && !format.equals(FORMAT_HTML)) {
                     } else if (queryObject instanceof GraphQuery) {
-                        RDFXMLWriter writer = new RDFXMLWriter(out);
-                        ((GraphQuery) queryObject).evaluate(writer);
+                        if (!format.equals(FORMAT_HTML)) {
+                            RDFXMLWriter writer = new RDFXMLWriter(out);
+                            ((GraphQuery) queryObject).evaluate(writer);
+                        } else {
+                            long startTime = System.currentTimeMillis();
+                            TupleQuery resultsTable = con.prepareTupleQuery(QueryLanguage.SPARQL, query);
+                            TupleQueryResult bindings = resultsTable.evaluate();
+                            executionTime = System.currentTimeMillis() - startTime;
+                            if (bindings != null) {
+                                result = new QueryResult(bindings, false);
+                            }
+                        }
                         // Evaluate SELECT query
                     } else {
                         // Returns XML format
@@ -489,6 +466,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                             // Returns HTML+ format
                         } else if (format != null && format.equals(FORMAT_HTML_PLUS)) {
                             long startTime = System.currentTimeMillis();
+
                             queryResult = ((TupleQuery) queryObject).evaluate();
 
                             executionTime = System.currentTimeMillis() - startTime;
