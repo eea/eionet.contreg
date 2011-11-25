@@ -20,6 +20,8 @@
  */
 package eionet.cr.dto;
 
+import org.apache.commons.lang.time.DurationFormatUtils;
+
 /**
  *
  * @author heinljab
@@ -43,6 +45,10 @@ public class HarvestDTO extends HarvestBaseDTO implements java.io.Serializable {
      *
      */
     public HarvestDTO() {
+    }
+
+    public String getDurationString() {
+        return DurationFormatUtils.formatDuration(datetimeFinished.getTime() - datetimeStarted.getTime(), "HH:mm:ss");
     }
 
     /**
