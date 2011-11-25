@@ -323,13 +323,21 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     * @param contextSourceDTO
-     * @return
+     * Calculate last harvest date when there is a temporary error with the source.
+     * The LAST_HARVEST is not set to current time. Instead it is increased
+     * with 10% of the harvesting period but minimum two hours.
+     * If the source was never harvested before then the base date is
+     * current time minus the harvesting period (as if the source was successfully
+     * harvested one period ago).
+     *
+     * @param contextSourceDTO - object representing the source with the error.
+     * @return the last harvest date + 10 %.
      */
     private Date temporaryErrorLastHarvest(HarvestSourceDTO contextSourceDTO) {
 
         Date lastHarvest = getContextSourceDTO().getLastHarvest();
         if (lastHarvest == null) {
+            //FIXME: The base date is now - intervalMinutes (e.g. today - 6 weeks)
             return new Date();
         }
 
@@ -402,8 +410,12 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     * @param urlConn
-     * @return
+     * Download and process content. If response content type is one of RDF,
+     * then proceed straight to loading. Otherwise process the file to see if
+     * it's zipped, it's an XML with RDF conversion, or actually an RDF file.
+     *
+     * @param urlConn - connection to the remote source.
+     * @return number of triples harvested.
      * @throws IOException
      * @throws OpenRDFException
      * @throws SAXException
@@ -525,9 +537,11 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
+     * Load file into triple store.
+     *
      * @param file
      * @param rdfFormat
-     * @return
+     * @return number of triples harvested.
      * @throws OpenRDFException
      * @throws IOException
      */
@@ -540,9 +554,12 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     * @param urlConn
-     * @return
-     * @throws IOException
+     * Download file from remote source to a temporary file locally.
+     * Sideeffect: Adds the file size to the metadata to save in the harvester context.
+     *
+     * @param urlConn - connection to the remote source.
+     * @return object representing the temporary file.
+     * @throws IOException if the file is not downloadable.
      */
     private File downloadFile(HttpURLConnection urlConn) throws IOException {
 
