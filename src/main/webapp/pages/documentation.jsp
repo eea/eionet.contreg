@@ -65,9 +65,9 @@
 		                    </tr>
 		                    <c:if test='${actionBean.editableContent}'>
 			                    <tr>
-			                        <td valign="top"><stripes:label class="question" for="content">Content</stripes:label></td>
+			                        <td valign="top"><stripes:label class="question" for="page_content">Content</stripes:label></td>
 			                        <td>
-			                            <stripes:textarea id="content" name="content" cols="70" rows="20" style="width:100%"/>
+			                            <stripes:textarea id="page_content" name="content" cols="70" rows="20" style="width:100%"/>
 			                        </td>
 			                    </tr>
 		                    </c:if>
