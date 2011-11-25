@@ -42,14 +42,15 @@ public class CreateDataset {
         this.user = user;
     }
 
-    public void create(String dataset, String folder, List<String> selectedFiles, boolean overwrite) throws Exception {
+    public void create(String label, String dataset, String folder, List<String> selectedFiles, boolean overwrite)
+            throws Exception {
 
         try {
             // Store file as new source, but don't harvest it
             addSource(dataset);
 
             // Add metadata
-            addMetadata(dataset, folder, selectedFiles);
+            addMetadata(label, dataset, folder, selectedFiles);
 
             // Raise the flag that dataset is being compiled
             CurrentLoadedDatasets.addLoadedDataset(dataset, user.getUserName());
@@ -78,7 +79,7 @@ public class CreateDataset {
         }
     }
 
-    private void addMetadata(String dataset, String folder, List<String> selectedFiles) {
+    private void addMetadata(String label, String dataset, String folder, List<String> selectedFiles) {
 
         try {
             if (!StringUtils.isBlank(folder)) {
@@ -100,6 +101,15 @@ public class CreateDataset {
                     DAOFactory.get().getDao(HelperDAO.class).addTriples(typeSubjectDTO);
                 }
 
+                // Store rdfs:label predicate
+                if (StringUtils.isNotEmpty(label)) {
+                    ObjectDTO labelObjectDTO = new ObjectDTO(label, true);
+                    labelObjectDTO.setSourceUri(user.getHomeUri());
+                    SubjectDTO labelSubjectDTO = new SubjectDTO(dataset, false);
+                    labelSubjectDTO.addObject(Predicates.RDFS_LABEL, labelObjectDTO);
+                    DAOFactory.get().getDao(HelperDAO.class).addTriples(labelSubjectDTO);
+                }
+
                 // store cr:generatedFrom predicates
                 for (String file : selectedFiles) {
                     ObjectDTO genFromObjectDTO = new ObjectDTO(file, false);
@@ -119,11 +129,13 @@ public class CreateDataset {
     private void addSource(String dataset) throws Exception {
 
         DAOFactory.get().getDao(HarvestSourceDAO.class)
-        .addSourceIgnoreDuplicate(HarvestSourceDTO.create(dataset, false, 0, user.getUserName()));
+                .addSourceIgnoreDuplicate(HarvestSourceDTO.create(dataset, false, 0, user.getUserName()));
 
-        DAOFactory.get().getDao(HarvestSourceDAO.class)
-        .insertUpdateSourceMetadata(dataset, Predicates.CR_LAST_MODIFIED,
-                ObjectDTO.createLiteral(dateFormat.format(new Date()), XMLSchema.DATETIME));
+        DAOFactory
+                .get()
+                .getDao(HarvestSourceDAO.class)
+                .insertUpdateSourceMetadata(dataset, Predicates.CR_LAST_MODIFIED,
+                        ObjectDTO.createLiteral(dateFormat.format(new Date()), XMLSchema.DATETIME));
     }
 
 }

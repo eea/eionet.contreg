@@ -92,7 +92,7 @@ public class SaveFilesActionBean extends DisplaytagSearchActionBean {
                 }
 
                 CreateDataset cd = new CreateDataset(Predicates.CR_COMPILED_DATASET, getUser());
-                cd.create(dataset, folder, selectedFiles, overwrite);
+                cd.create(fileName, dataset, folder, selectedFiles, overwrite);
 
             } catch (Exception e) {
                 throw new DAOException(e.getMessage(), e);

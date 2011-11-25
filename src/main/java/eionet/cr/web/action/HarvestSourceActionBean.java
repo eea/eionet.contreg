@@ -369,7 +369,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
                             selectedFiles.add(harvestSource.getUrl());
 
                             CreateDataset cd = new CreateDataset(null, getUser());
-                            cd.create(dataset, folder, selectedFiles, overwriteDataset);
+                            cd.create(datasetName, dataset, folder, selectedFiles, overwriteDataset);
 
                             return new RedirectResolution(FactsheetActionBean.class).addParameter("uri", dataset);
                         }

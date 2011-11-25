@@ -483,7 +483,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
             objectDTO = new ObjectDTO(titleToStore, true);
             objectDTO.setSourceUri(uri);
             fileSubjectDTO = new SubjectDTO(getUploadedFileSubjectUri(), false);
-            fileSubjectDTO.addObject(Predicates.DC_TITLE, objectDTO);
+            fileSubjectDTO.addObject(Predicates.RDFS_LABEL, objectDTO);
         }
 
         try {
@@ -497,10 +497,10 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
             if (fileSubjectDTO != null) {
 
                 // delete previous value of dc:title if new one set
-                if (fileExists && fileSubjectDTO.hasPredicate(Predicates.DC_TITLE)) {
+                if (fileExists && fileSubjectDTO.hasPredicate(Predicates.RDFS_LABEL)) {
 
                     List<String> subjectUris = Collections.singletonList(fileSubjectDTO.getUri());
-                    List<String> predicateUris = Collections.singletonList(Predicates.DC_TITLE);
+                    List<String> predicateUris = Collections.singletonList(Predicates.RDFS_LABEL);
                     List<String> sourceUris = Collections.singletonList(uri);
 
                     helperDao.deleteSubjectPredicates(subjectUris, predicateUris, sourceUris);
