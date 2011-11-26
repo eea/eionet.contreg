@@ -50,6 +50,7 @@ public class DownloadServlet extends HttpServlet {
 
     // Constants ----------------------------------------------------------------------------------
 
+    public static final String URL_PATTERN = "/download";
     private static final int DEFAULT_BUFFER_SIZE = 10240; // ..bytes = 10KB.
     private static final long DEFAULT_EXPIRE_TIME = 604800000L; // ..ms = 1 week.
     private static final String MULTIPART_BOUNDARY = "MULTIPART_BYTERANGES";
@@ -95,7 +96,7 @@ public class DownloadServlet extends HttpServlet {
      * @throws ServletException
      */
     private void processRequest(HttpServletRequest request, HttpServletResponse response, boolean content) throws IOException,
-            ServletException {
+    ServletException {
 
         // Get requested file URI from request parameters, send 404 if its missing
         String requestedUri = request.getParameter("uri");
@@ -339,7 +340,7 @@ public class DownloadServlet extends HttpServlet {
      * @throws ServletException
      */
     private void handleFileNotFound(String message, HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    throws ServletException, IOException {
 
         LOGGER.info(message);
         boolean isWebBrowser = false;
@@ -383,8 +384,8 @@ public class DownloadServlet extends HttpServlet {
         String[] acceptValues = acceptHeader.split("\\s*(,|;)\\s*");
         Arrays.sort(acceptValues);
         return Arrays.binarySearch(acceptValues, toAccept) > -1
-                || Arrays.binarySearch(acceptValues, toAccept.replaceAll("/.*$", "/*")) > -1
-                || Arrays.binarySearch(acceptValues, "*/*") > -1;
+        || Arrays.binarySearch(acceptValues, toAccept.replaceAll("/.*$", "/*")) > -1
+        || Arrays.binarySearch(acceptValues, "*/*") > -1;
     }
 
     /**

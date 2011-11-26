@@ -161,16 +161,16 @@ public abstract class VirtuosoBaseDAO {
      * Executes SPARQL that is expected to have only one result and returns the unique value.
      *
      * @param <T>
-     * @param sql
+     * @param sparql
      * @param bindings Binding values for the prepared SPARQL
      * @param params
      * @param reader
      * @return
      * @throws DAOException if query fails
      */
-    protected <T> T executeUniqueResultSPARQL(String sql, Bindings bindings, SPARQLResultSetReader<T> reader) throws DAOException {
+    protected <T> T executeUniqueResultSPARQL(String sparql, Bindings bindings, SPARQLResultSetReader<T> reader) throws DAOException {
 
-        List<T> result = executeSPARQL(sql, bindings, reader);
+        List<T> result = executeSPARQL(sparql, bindings, reader);
         return (result == null || result.isEmpty()) ? null : result.get(0);
     }
 

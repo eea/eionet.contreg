@@ -32,11 +32,15 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import eionet.cr.dao.DAOException;
+import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.HelperDAO;
 import eionet.cr.filestore.FileStore;
+import eionet.cr.util.Util;
+import eionet.cr.web.action.DownloadServlet;
+import eionet.cr.web.action.ExportTriplesActionBean;
 import eionet.cr.web.action.TabularDataServlet;
 
 /**
@@ -44,14 +48,15 @@ import eionet.cr.web.action.TabularDataServlet;
  * pointing to some user home directory of CR, then this filter is relevant (and should be applied to) only URLs with pattern
  * /home/*.
  *
- * See https://svn.eionet.europa.eu/projects/Reportnet/ticket/2464 for more background.
+ * See https://svn.eionet.europa.eu/projects/Reportnet/ticket/2464 and
+ * https://svn.eionet.europa.eu/projects/Reportnet/ticket/2054 for more background.
  *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  */
-public class HomeContentTypeFilter implements Filter {
+public class HomespaceUrlFilter implements Filter {
 
     /** */
-    private static final Logger LOGGER = Logger.getLogger(HomeContentTypeFilter.class);
+    private static final Logger LOGGER = Logger.getLogger(HomespaceUrlFilter.class);
 
     /**
      * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
@@ -79,10 +84,11 @@ public class HomeContentTypeFilter implements Filter {
         HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
         String requestURL = httpRequest.getRequestURL().toString();
 
+        String contextPath = httpRequest.getContextPath();
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("httpRequest.getRequestURL() = " + requestURL);
             LOGGER.trace("httpRequest.getRequestURI() = " + httpRequest.getRequestURI());
-            LOGGER.trace("httpRequest.getContextPath() = " + httpRequest.getContextPath());
+            LOGGER.trace("httpRequest.getContextPath() = " + contextPath);
             LOGGER.trace("httpRequest.getServletPath() = " + httpRequest.getServletPath());
             LOGGER.trace("httpRequest.getPathInfo() = " + httpRequest.getPathInfo());
         }
@@ -95,58 +101,26 @@ public class HomeContentTypeFilter implements Filter {
             int i = pathInfo.indexOf('/', 1);
             if (i != -1 && pathInfo.length() > (i + 1)) {
 
-                // Extract user name and file name from the path info.
-                String userName = pathInfo.substring(1, i);
-                String filePath = pathInfo.substring(i + 1);
-                String fileUri = new String(requestURL);
-
-                // if is tabular data and (idInFile!=null || rdf not accepted)
-
-                // Extract id of a resource/object/tag/code/... inside the file.
-                // For example if http://cr.eionet.europa.eu/home/userName/fileName identifies
-                // a file that contains a code-list (e.g. country-codes), then
-                // http://cr.eionet.europa.eu/home/userName/fileName/AT identifies code "AT"
-                // inside that file.
-                String idInFile = "";
-                String fileName = "";
-                String fileUriWithoutCode = fileUri;
-                if (!StringUtils.isBlank(filePath)) {
-                    if (filePath.contains("/")) {
-                        idInFile = StringUtils.substringAfterLast(filePath, "/");
-                        fileName = StringUtils.substringBeforeLast(filePath, "/");
-                        fileUriWithoutCode = StringUtils.substringBeforeLast(requestURL, "/" + idInFile);
-                    }
-                }
-
                 try {
-                    if (TabularDataServlet.willHandle(fileUriWithoutCode, idInFile, httpRequest)) {
-                        String redirectPath =
-                            httpRequest.getContextPath() + "/tabularData?fileUri="
-                            + URLEncoder.encode(fileUriWithoutCode, "UTF-8");
-                        if (!StringUtils.isBlank(fileName)) {
-                            redirectPath = redirectPath + "&idInFile=" + URLEncoder.encode(idInFile, "UTF-8");
-                        }
-                        LOGGER.debug("URL points to tabular data, so redirecting to: " + redirectPath);
-                        httpResponse.sendRedirect(redirectPath);
-                        return;
-                    } else if (FileStore.getInstance(userName).get(filePath) != null) {
+                    // Prepare the default redirect location.
+                    String queryString = "?uri=" + URLEncoder.encode(requestURL, "UTF-8");
+                    String redirectLocation = contextPath + Util.getUrlBinding(ExportTriplesActionBean.class) + queryString;
 
-                        String redirectPath =
-                            httpRequest.getContextPath() + "/download?uri=" + URLEncoder.encode(requestURL, "UTF-8");
-                        LOGGER.debug("URL points to stored file, so redirecting to: " + redirectPath);
-                        httpResponse.sendRedirect(redirectPath);
-                        return;
-                    } else if (isRdfXmlAccepted(httpRequest)) {
-
-                        httpResponse.sendRedirect(httpRequest.getContextPath() + "/exportTriples.action?uri="
-                                + URLEncoder.encode(requestURL, "UTF-8"));
-                        return;
-                    } else {
-                        // If no file is found and is not "application/rdf+xml" request
-                        httpResponse.sendRedirect(httpRequest.getContextPath() + "/exportTriples.action?uri="
-                                + URLEncoder.encode(requestURL, "UTF-8"));
-                        return;
+                    // Override the prepared redirect location in the below special cases.
+                    if (DAOFactory.get().getDao(HelperDAO.class).isTabularDataSubject(requestURL)){
+                        // The requested URL is a subject in tabular data (i.e. CSV or TSV) file.
+                        redirectLocation = contextPath + TabularDataServlet.URL_PATTERN + queryString;
+                        LOGGER.debug("URL points to tabular data subject, redirecting to: " + redirectLocation);
                     }
+                    else if (isStoredFile(pathInfo) && !isRdfXmlPreferred(httpRequest)){
+                        // The requested URL is a stored file, and requester wants original copy (i.e. not triples)
+                        redirectLocation = contextPath + DownloadServlet.URL_PATTERN + queryString;
+                        LOGGER.debug("URL points to stored file, redirecting to: " + redirectLocation);
+                    }
+
+                    // Redirect to the location resolved above.
+                    httpResponse.sendRedirect(redirectLocation);
+                    return;
                 } catch (DAOException e) {
                     throw new ServletException(e.getMessage(), e);
                 }
@@ -157,14 +131,25 @@ public class HomeContentTypeFilter implements Filter {
     }
 
     /**
+     *
+     * @param requestPathInfo
+     * @return
+     */
+    private boolean isStoredFile(String requestPathInfo) {
+        int i = requestPathInfo.indexOf('/', 1);
+        String userName = requestPathInfo.substring(1, i);
+        String filePath = requestPathInfo.substring(i + 1);
+        return FileStore.getInstance(userName).get(filePath) != null;
+    }
+
+    /**
      * @param httpRequest
      * @return
      */
-    private boolean isRdfXmlAccepted(HttpServletRequest httpRequest) {
+    private boolean isRdfXmlPreferred(HttpServletRequest httpRequest) {
 
         String acceptHeader = httpRequest.getHeader("Accept");
-        return acceptHeader != null
-        && acceptHeader.trim().toLowerCase().startsWith("application/rdf+xml");
+        return acceptHeader != null && acceptHeader.trim().toLowerCase().startsWith("application/rdf+xml");
     }
 
     /*

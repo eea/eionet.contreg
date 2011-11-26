@@ -30,21 +30,16 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import nl.bitwalker.useragentutils.Browser;
-import nl.bitwalker.useragentutils.BrowserType;
-
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import eionet.cr.common.CRException;
-import eionet.cr.common.Predicates;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
-import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dto.SubjectDTO;
+import eionet.cr.util.Util;
 import eionet.cr.web.util.StripesExceptionHandler;
 import eionet.cr.web.util.TriplesToOutputStream;
 
@@ -55,10 +50,10 @@ import eionet.cr.web.util.TriplesToOutputStream;
 public class TabularDataServlet extends HttpServlet {
 
     /** */
-    private static final Logger LOGGER = Logger.getLogger(TabularDataServlet.class);
+    public static final String URL_PATTERN = "/tabularData";
 
     /** */
-    private Boolean isWebBrowser;
+    private static final Logger LOGGER = Logger.getLogger(TabularDataServlet.class);
 
     /**
      * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
@@ -77,39 +72,21 @@ public class TabularDataServlet extends HttpServlet {
      */
     private void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        String fileUri = request.getParameter("fileUri");
-        if (StringUtils.isBlank(fileUri)) {
-            handleFileNotFound("No file URI supplied in the request!", request, response);
+        String subjectUri = request.getParameter("uri");
+        if (StringUtils.isBlank(subjectUri)) {
+            handleFileNotFound("Request parameter \"uri\" is missing or blank!", request, response);
             return;
         }
-        String idInFile = request.getParameter("idInFile");
 
         ServletOutputStream outputStream = null;
         try {
-            if (isTabularDataFile(fileUri)) {
-
-                HelperDAO dao = DAOFactory.get().getDao(HelperDAO.class);
-                List<SubjectDTO> triplesInFile = null;
-                if (StringUtils.isBlank(idInFile)) {
-                    triplesInFile = dao.getSPOsInSource(fileUri);
-                } else {
-                    triplesInFile = dao.getSPOsInSubject(fileUri + "/" + idInFile);
-                }
-
-                outputStream = response.getOutputStream();
-                if (isContentTypeAccepted(request, "application/rdf+xml")) {
-
-                    response.setContentType("application/rdf+xml;charset=utf-8");
-                    TriplesToOutputStream.triplesToRdf(outputStream, fileUri, triplesInFile);
-                } else if (!StringUtils.isBlank(idInFile)) {
-                    TriplesToOutputStream.triplesToHtml(outputStream, fileUri + "/" + idInFile, triplesInFile);
-                } else {
-                    // TODO probably a more detailed error message needed here
-                    handleFileNotFound("Found no content!", request, response);
-                    return;
-                }
-            } else {
-                handleFileNotFound("No tabular data file by this URI found!", request, response);
+            List<SubjectDTO> subjectTriples = DAOFactory.get().getDao(HelperDAO.class).getSPOsInSubject(subjectUri);
+            outputStream = response.getOutputStream();
+            if (isRdfXmlPreferred(request)){
+                TriplesToOutputStream.triplesToRdf(outputStream, subjectUri, subjectTriples);
+            }
+            else{
+                TriplesToOutputStream.triplesToHtml(outputStream, subjectUri, subjectTriples);
             }
         } catch (DAOException e) {
             handleException(e, request, response);
@@ -117,18 +94,6 @@ public class TabularDataServlet extends HttpServlet {
         } finally {
             IOUtils.closeQuietly(outputStream);
         }
-    }
-
-    /**
-     *
-     * @param request
-     * @param contentType
-     * @return
-     */
-    private static boolean isContentTypeAccepted(HttpServletRequest request, String contentType) {
-
-        String acceptHeader = request.getHeader("Accept");
-        return ArrayUtils.contains(acceptHeader.split(","), contentType);
     }
 
     /**
@@ -144,7 +109,7 @@ public class TabularDataServlet extends HttpServlet {
 
         LOGGER.info(message);
 
-        if (isWebBrowser(request)) {
+        if (Util.isWebBrowser(request)) {
             request.setAttribute(StripesExceptionHandler.EXCEPTION_ATTR, new CRException(message));
             request.getRequestDispatcher(StripesExceptionHandler.ERROR_PAGE).forward(request, response);
         } else {
@@ -165,7 +130,7 @@ public class TabularDataServlet extends HttpServlet {
 
         LOGGER.error(exception);
 
-        if (isWebBrowser(request)) {
+        if (Util.isWebBrowser(request)) {
             request.setAttribute(StripesExceptionHandler.EXCEPTION_ATTR, exception);
             request.getRequestDispatcher(StripesExceptionHandler.ERROR_PAGE).forward(request, response);
         } else {
@@ -174,59 +139,13 @@ public class TabularDataServlet extends HttpServlet {
     }
 
     /**
-     * @param request
-     * @return
-     */
-    private boolean isWebBrowser(HttpServletRequest request) {
-
-        // Lazy-loading.
-        if (isWebBrowser == null) {
-
-            isWebBrowser = false;
-            String userAgentString = request.getHeader("User-Agent");
-            if (userAgentString != null && userAgentString.trim().length() > 0) {
-
-                Browser browser = Browser.parseUserAgentString(userAgentString);
-                if (browser != null) {
-
-                    BrowserType browserType = browser.getBrowserType();
-                    if (browserType != null) {
-
-                        if (browserType.equals(BrowserType.WEB_BROWSER) || browserType.equals(BrowserType.MOBILE_BROWSER)) {
-                            isWebBrowser = true;
-                        }
-                    }
-                }
-            }
-        }
-
-        return isWebBrowser;
-    }
-
-    /**
      *
-     * @param fileUri
+     * @param httpRequest
      * @return
-     * @throws DAOException
      */
-    public static boolean isTabularDataFile(String fileUri) throws DAOException {
+    private boolean isRdfXmlPreferred(HttpServletRequest httpRequest) {
 
-        String mediaType =
-            DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceMetadata(fileUri, Predicates.CR_MEDIA_TYPE);
-        return mediaType != null && (mediaType.equals("csv") || mediaType.equals("tsv"));
-    }
-
-    /**
-     *
-     * @param fileUri
-     * @param idInFile
-     * @param request
-     * @return
-     * @throws DAOException
-     */
-    public static boolean willHandle(String fileUri, String idInFile, HttpServletRequest request) throws DAOException {
-
-        return isTabularDataFile(fileUri)
-        && (isContentTypeAccepted(request, "application/rdf+xml") || !StringUtils.isBlank(idInFile));
+        String acceptHeader = httpRequest.getHeader("Accept");
+        return acceptHeader != null && acceptHeader.trim().toLowerCase().startsWith("application/rdf+xml");
     }
 }

@@ -31,11 +31,11 @@
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
     <filter>
-        <filter-name>HomeContentTypeFilter</filter-name>
-        <filter-class>eionet.cr.web.filters.HomeContentTypeFilter</filter-class>
+        <filter-name>HomespaceUrlFilter</filter-name>
+        <filter-class>eionet.cr.web.filters.HomespaceUrlFilter</filter-class>
     </filter>
     <filter-mapping>
-        <filter-name>HomeContentTypeFilter</filter-name>
+        <filter-name>HomespaceUrlFilter</filter-name>
         <url-pattern>/home/*</url-pattern>
     </filter-mapping>
 

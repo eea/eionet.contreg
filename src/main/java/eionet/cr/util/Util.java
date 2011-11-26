@@ -47,6 +47,8 @@ import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.PageContext;
 
+import net.sourceforge.stripes.action.ActionBean;
+import net.sourceforge.stripes.action.UrlBinding;
 import nl.bitwalker.useragentutils.Browser;
 import nl.bitwalker.useragentutils.BrowserType;
 
@@ -94,13 +96,15 @@ public class Util {
      */
     public static String arrayToString(Object[] array, String separator) {
 
-        if (array == null)
+        if (array == null) {
             return null;
+        }
 
         StringBuffer buf = new StringBuffer();
         for (int i = 0; i < array.length; i++) {
-            if (i > 0)
+            if (i > 0) {
                 buf.append(separator);
+            }
             buf.append(array[i].toString());
         }
         return buf.toString();
@@ -114,8 +118,9 @@ public class Util {
      */
     public static String dateToString(java.util.Date date, String datePattern) {
 
-        if (date == null)
+        if (date == null) {
             return null;
+        }
 
         SimpleDateFormat formatter = datePattern == null ? new SimpleDateFormat() : new SimpleDateFormat(datePattern);
         return formatter.format(date);
@@ -129,8 +134,9 @@ public class Util {
      */
     public static java.util.Date stringToDate(String str, String datePattern) {
 
-        if (str == null || str.trim().length() == 0)
+        if (str == null || str.trim().length() == 0) {
             return null;
+        }
 
         SimpleDateFormat formatter = new SimpleDateFormat(datePattern);
         try {
@@ -198,8 +204,9 @@ public class Util {
         } else {
             StringTokenizer st = new StringTokenizer(s);
             int count = 0;
-            for (; st.hasMoreTokens() && count < 2; count++)
+            for (; st.hasMoreTokens() && count < 2; count++) {
                 st.nextToken();
+            }
             return count > 1;
         }
     }
@@ -229,18 +236,20 @@ public class Util {
      */
     public static String[] pruneUrls(String[] array) {
 
-        if (array == null || array.length == 0)
+        if (array == null || array.length == 0) {
             return array;
+        }
 
         ArrayList<String> list = new ArrayList<String>();
         for (int i = 0; i < array.length; i++) {
-            if (!URLUtil.isURL(array[i]))
+            if (!URLUtil.isURL(array[i])) {
                 list.add(array[i]);
+            }
         }
 
-        if (list.isEmpty())
+        if (list.isEmpty()) {
             return array;
-        else {
+        } else {
             String[] result = new String[list.size()];
             for (int i = 0; i < list.size(); i++) {
                 result[i] = list.get(i);
@@ -257,8 +266,9 @@ public class Util {
      */
     public static Object findInAnyScope(PageContext pageContext, Class objectClass) {
 
-        if (pageContext == null || objectClass == null)
+        if (pageContext == null || objectClass == null) {
             return null;
+        }
 
         int[] scopes =
         {PageContext.APPLICATION_SCOPE, PageContext.PAGE_SCOPE, PageContext.REQUEST_SCOPE, PageContext.SESSION_SCOPE};
@@ -310,9 +320,9 @@ public class Util {
      * @return
      */
     public static Object[] toArray(Object o) {
-        if (o == null)
+        if (o == null) {
             return null;
-        else {
+        } else {
             Object[] oo = new Object[1];
             oo[0] = o;
             return oo;
@@ -325,10 +335,11 @@ public class Util {
      */
     public static boolean isValidQuartzCronExpression(String expression) {
 
-        if (Util.isNullOrEmpty(expression))
+        if (Util.isNullOrEmpty(expression)) {
             return false;
-        else
+        } else {
             return CronExpression.isValidExpression(expression);
+        }
     }
 
     /**
@@ -433,8 +444,9 @@ public class Util {
         /* ignore quality value which is separated by ';' */
 
         int j = result.indexOf(";");
-        if (j != -1)
+        if (j != -1) {
             result = result.substring(0, j);
+        }
 
         /*
          * ignore language refinement (e.g. en-US, en_UK) which is separated either by '-' or '_'
@@ -519,10 +531,11 @@ public class Util {
             buf.append(minutes).append(" min ");
         }
         buf.append(seconds).append(".");
-        if (milliseconds < 10)
+        if (milliseconds < 10) {
             buf.append("00");
-        else if (milliseconds < 100)
+        } else if (milliseconds < 100) {
             buf.append("0");
+        }
 
         return buf.append(milliseconds).append(" sec").toString();
     }
@@ -697,8 +710,9 @@ public class Util {
      */
     public static String getUniqueElementName(String element, Collection<String> elements) {
 
-        if (element == null || element.length() == 0)
+        if (element == null || element.length() == 0) {
             element = XmlUtil.INVALID_ELEMENT_NAME;
+        }
 
         if (elements != null) {
             while (elements.contains(element)) {
@@ -790,5 +804,20 @@ public class Util {
         }
 
         return result;
+    }
+
+    /**
+     *
+     * @param actionBeanClass
+     * @return
+     */
+    public static String getUrlBinding(Class<? extends ActionBean> actionBeanClass){
+
+        if (actionBeanClass==null){
+            return null;
+        }
+        else{
+            return actionBeanClass.getAnnotation(UrlBinding.class).value();
+        }
     }
 }

@@ -421,7 +421,7 @@ public interface HelperDAO extends DAO {
      *             if query fails
      */
     void deleteSubjectPredicates(Collection<String> subjectUris, Collection<String> predicateUris, Collection<String> sourceUris)
-            throws DAOException;
+    throws DAOException;
 
     /**
      * @param user
@@ -489,7 +489,7 @@ public interface HelperDAO extends DAO {
      * @throws DAOException
      */
     FactsheetDTO getFactsheet(String subjectUri, List<String> acceptedLanguages, Map<String, Integer> predicatePages)
-            throws DAOException;
+    throws DAOException;
 
     /**
      * Returns number of harvested triples from the harvest source.
@@ -499,4 +499,12 @@ public interface HelperDAO extends DAO {
      * @throws DAOException
      */
     int getHarvestedStatements(String sourceUri) throws DAOException;
+
+    /**
+     *
+     * @param subjectUri
+     * @return
+     * @throws DAOException
+     */
+    boolean isTabularDataSubject(String subjectUri) throws DAOException;
 }
