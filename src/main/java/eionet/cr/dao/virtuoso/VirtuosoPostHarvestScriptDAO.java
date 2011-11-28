@@ -30,10 +30,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.openrdf.model.ValueFactory;
-import org.openrdf.query.GraphQuery;
-import org.openrdf.query.QueryLanguage;
-import org.openrdf.query.impl.DatasetImpl;
 import org.openrdf.repository.RepositoryConnection;
 
 import eionet.cr.dao.DAOException;
@@ -441,14 +437,14 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
      *      java.lang.String, java.lang.String)
      */
     @Override
-    public List<Map<String, ObjectDTO>> test(String constructQuery, TargetType targetType, String targetUrl, String testSourceUrl)
+    public List<Map<String, ObjectDTO>> test(String constructQuery, TargetType targetType, String targetUrl, String defaultGraphUri)
     throws DAOException {
 
         if (StringUtils.isBlank(constructQuery)) {
             return new ArrayList<Map<String, ObjectDTO>>();
         }
 
-        String sourceReplacer = testSourceUrl;
+        String sourceReplacer = defaultGraphUri;
         if (StringUtils.isBlank(sourceReplacer)) {
             if (targetType != null && targetType.equals(TargetType.SOURCE)) {
                 sourceReplacer = targetUrl;
@@ -468,18 +464,8 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
                 bindings.setURI(PostHarvestScriptParser.ASSOCIATED_TYPE_VARIABLE, typeReplacer);
             }
 
-            GraphQuery graphQuery = conn.prepareGraphQuery(QueryLanguage.SPARQL, constructQuery);
-            ValueFactory valueFactory = conn.getValueFactory();
-            bindings.applyTo(graphQuery, valueFactory);
-
-            if (!StringUtils.isBlank(sourceReplacer)) {
-                DatasetImpl dataset = new DatasetImpl();
-                dataset.addDefaultGraph(valueFactory.createURI(sourceReplacer));
-                graphQuery.setDataset(dataset );
-            }
-
             PostHarvestScriptTestResultsReader reader = new PostHarvestScriptTestResultsReader();
-            SesameUtil.executeQuery(constructQuery, reader, conn);
+            SesameUtil.executeQuery(constructQuery, bindings, reader, defaultGraphUri, conn);
             return reader.getResultList();
         } catch (Exception e) {
             throw new DAOException(e.getMessage(), e);

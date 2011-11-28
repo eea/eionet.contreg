@@ -5,6 +5,7 @@ import java.sql.SQLException;
 
 import org.apache.commons.lang.StringUtils;
 import org.openrdf.OpenRDFException;
+import org.openrdf.model.ValueFactory;
 import org.openrdf.query.BooleanQuery;
 import org.openrdf.query.GraphQuery;
 import org.openrdf.query.GraphQueryResult;
@@ -13,6 +14,7 @@ import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
+import org.openrdf.query.impl.DatasetImpl;
 import org.openrdf.query.parser.sparql.SPARQLParser;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
@@ -64,13 +66,35 @@ public class SesameUtil {
      */
     public static <T> void executeQuery(String sparql, Bindings bindings, SPARQLResultSetReader<T> reader,
             RepositoryConnection conn) throws OpenRDFException, ResultSetReaderException {
+        executeQuery(sparql, bindings, reader, null, conn);
+    }
+
+    /**
+     *
+     * @param <T>
+     * @param sparql
+     * @param bindings
+     * @param reader
+     * @param conn
+     * @throws OpenRDFException
+     * @throws ResultSetReaderException
+     */
+    public static <T> void executeQuery(String sparql, Bindings bindings, SPARQLResultSetReader<T> reader, String defaultGraphUri,
+            RepositoryConnection conn) throws OpenRDFException, ResultSetReaderException {
 
         TupleQueryResult queryResult = null;
         try {
             TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, sparql);
 
+            ValueFactory valueFactory = conn.getValueFactory();
             if (bindings != null) {
-                bindings.applyTo(tupleQuery, conn.getValueFactory());
+                bindings.applyTo(tupleQuery, valueFactory);
+            }
+
+            if (!StringUtils.isBlank(defaultGraphUri)) {
+                DatasetImpl dataset = new DatasetImpl();
+                dataset.addDefaultGraph(valueFactory.createURI(defaultGraphUri));
+                tupleQuery.setDataset(dataset);
             }
 
             queryResult = tupleQuery.evaluate();
@@ -108,6 +132,22 @@ public class SesameUtil {
     }
 
     /**
+     *
+     * @param <T>
+     * @param sparql
+     * @param reader
+     * @param defaultGraphUri
+     * @param conn
+     * @throws OpenRDFException
+     * @throws ResultSetReaderException
+     */
+    public static <T> void executeQuery(String sparql, SPARQLResultSetReader<T> reader, String defaultGraphUri,
+            RepositoryConnection conn) throws OpenRDFException, ResultSetReaderException {
+
+        executeQuery(sparql, null, reader, defaultGraphUri, conn);
+    }
+
+    /**
      * Executes a SPARQL/Update (SPARUL) query (i.e. one that performs modifications on data). Throws
      * {@link UnsupportedOperationException} if the given connection is not a {@link VirtuosoRepositoryConnection}, because it uses
      * {@link VirtuosoRepositoryConnection#executeSPARUL(String)} to execute the given SPARQL/Update statement. The latter supports
@@ -126,7 +166,7 @@ public class SesameUtil {
                     + VirtuosoRepositoryConnection.class.getSimpleName());
         }
 
-        if (defaultGraphUri!=null && defaultGraphUri.length>0){
+        if (defaultGraphUri != null && defaultGraphUri.length > 0) {
             for (int i = 0; i < defaultGraphUri.length; i++) {
                 sparul = "define input:default-graph-uri <" + defaultGraphUri[i] + "> " + sparul;
             }
@@ -137,8 +177,7 @@ public class SesameUtil {
     }
 
     /**
-     * Executes the given SPARQL/Update (aka SPARUL) statement.
-     * Rollback is NOT made if query does not succeed.
+     * Executes the given SPARQL/Update (aka SPARUL) statement. Rollback is NOT made if query does not succeed.
      *
      * @param sparul
      * @param conn repository connection

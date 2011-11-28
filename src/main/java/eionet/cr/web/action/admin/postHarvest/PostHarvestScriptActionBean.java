@@ -27,18 +27,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletResponse;
-
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.action.StreamingResolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.validation.ValidationMethod;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.dao.DAOException;
@@ -63,9 +58,9 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     private static final String SCRIPT_JSP = "/pages/admin/postHarvestScripts/script.jsp";
 
     /** */
-    private static final String DEFAULT_SCRIPT = "PREFIX cr: <http://cr.eionet.europa.eu/ontologies/contreg.rdf#>\n" +
-    "    INSERT { ?s cr:tag `bif:lower(?o)` }\n" +
-    "    WHERE { ?s <http://www.eea.europa.eu/portal_types/Article#themes> ?o }";
+    private static final String DEFAULT_SCRIPT = "PREFIX cr: <http://cr.eionet.europa.eu/ontologies/contreg.rdf#>\n"
+        + "    INSERT { ?s cr:tag `bif:lower(?o)` }\n"
+        + "    WHERE { ?s <http://www.eea.europa.eu/portal_types/Article#themes> ?o }";
 
     /** */
     private int id;
@@ -141,29 +136,30 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
      * @return
      * @throws DAOException
      */
-    public Resolution test() throws Exception{
+    public Resolution test() throws Exception {
 
         if (logger.isTraceEnabled()) {
             logger.trace("Handling test event");
         }
 
-        String graphUri = testSourceUrl;
-        if (StringUtils.isBlank(graphUri)){
-            if (targetType!=null && targetType.equals(TargetType.SOURCE)){
-                graphUri = targetUrl;
+        String defaultGraphUri = testSourceUrl;
+        if (StringUtils.isBlank(defaultGraphUri)) {
+            if (targetType != null && targetType.equals(TargetType.SOURCE)) {
+                defaultGraphUri = targetUrl;
             }
         }
 
         try {
-            executedTestQuery = PostHarvestScriptParser.deriveConstruct(script, graphUri);
+            executedTestQuery = PostHarvestScriptParser.deriveConstruct(script, defaultGraphUri);
         } catch (ScriptParseException e) {
             addWarningMessage(e.toString());
         }
         logger.debug("Executing derived CONSTRUCT query: " + executedTestQuery);
-        logger.debug("Using " + graphUri + " as the default graph");
+        logger.debug("Using " + defaultGraphUri + " as the default graph");
 
         try {
-            testResults = DAOFactory.get().getDao(PostHarvestScriptDAO.class).test(executedTestQuery);
+            testResults =
+                DAOFactory.get().getDao(PostHarvestScriptDAO.class).test(executedTestQuery, targetType, targetUrl, defaultGraphUri);
         } catch (DAOException e) {
             testError = e.getMessage();
         }
@@ -290,8 +286,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param id
-     *            the id to set
+     * @param id the id to set
      */
     public void setId(int id) {
         this.id = id;
@@ -305,8 +300,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param title
-     *            the title to set
+     * @param title the title to set
      */
     public void setTitle(String title) {
         this.title = title;
@@ -320,8 +314,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param script
-     *            the script to set
+     * @param script the script to set
      */
     public void setScript(String script) {
         this.script = script;
@@ -335,8 +328,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param targetUrl
-     *            the targetUrl to set
+     * @param targetUrl the targetUrl to set
      */
     public void setTargetUrl(String targetUrl) {
         this.targetUrl = targetUrl;
@@ -350,8 +342,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param targetType
-     *            the targetType to set
+     * @param targetType the targetType to set
      */
     public void setTargetType(TargetType targetType) {
         this.targetType = targetType;
@@ -365,8 +356,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param testSourceUrl
-     *            the testSourceUrl to set
+     * @param testSourceUrl the testSourceUrl to set
      */
     public void setTestSourceUrl(String testSourceUrl) {
         this.testSourceUrl = testSourceUrl;
@@ -388,8 +378,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param active
-     *            the active to set
+     * @param active the active to set
      */
     public void setActive(boolean active) {
         this.active = active;
@@ -403,8 +392,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param ignoreMalformedSparql
-     *            the ignoreMalformedSparql to set
+     * @param ignoreMalformedSparql the ignoreMalformedSparql to set
      */
     public void setIgnoreMalformedSparql(boolean ignoreMalformedSparql) {
         this.ignoreMalformedSparql = ignoreMalformedSparql;
@@ -504,72 +492,30 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
         return PostHarvestScriptParser.ASSOCIATED_TYPE_VARIABLE;
     }
 
-    /**
-     * @author Jaanus Heinlaid
-     */
-    private class TestResultsStreamingResolution extends StreamingResolution {
-
-        /** */
-        private PostHarvestScriptActionBean actionBean;
-
-        /**
-         * @param testQuery
-         * @param contentType
-         */
-        public TestResultsStreamingResolution(PostHarvestScriptActionBean actionBean) {
-            super("application/rdf+xml");
-            this.actionBean = actionBean;
-        }
-
-        /*
-         * (non-Javadoc)
-         *
-         * @see net.sourceforge.stripes.action.StreamingResolution#stream(javax.servlet.http.HttpServletResponse)
-         */
-        @Override
-        protected void stream(HttpServletResponse response) throws Exception {
-
-            ServletOutputStream outputStream = null;
-            try {
-                outputStream = response.getOutputStream();
-                DAOFactory
-                .get()
-                .getDao(PostHarvestScriptDAO.class)
-                .test(actionBean.getExecutedTestQuery(), actionBean.getTargetType(), actionBean.getTargetUrl(),
-                        actionBean.getTestSourceUrl());
-            }
-            catch (Exception e){
-                actionBean.addWarningMessage(e.toString());
-            }
-            finally {
-                IOUtils.closeQuietly(outputStream);
-            }
-        }
-    }
     //
-    //    /**
-    //     * @return the runOnce
-    //     */
-    //    public boolean isRunOnce() {
-    //        return runOnce;
-    //    }
+    // /**
+    // * @return the runOnce
+    // */
+    // public boolean isRunOnce() {
+    // return runOnce;
+    // }
     //
-    //    /**
-    //     * @param runOnce the runOnce to set
-    //     */
-    //    public void setRunOnce(boolean runOnce) {
-    //        this.runOnce = runOnce;
-    //    }
+    // /**
+    // * @param runOnce the runOnce to set
+    // */
+    // public void setRunOnce(boolean runOnce) {
+    // this.runOnce = runOnce;
+    // }
     //
-    //    /**
-    //     *
-    //     */
-    //    @Before(stages = {LifecycleStage.BindingAndValidation})
-    //    public void beforeBindingAndValidation(){
+    // /**
+    // *
+    // */
+    // @Before(stages = {LifecycleStage.BindingAndValidation})
+    // public void beforeBindingAndValidation(){
     //
-    //        HttpServletRequest request = getContext().getRequest();
-    //        if (request.getMethod().equalsIgnoreCase("POST") && request.getParameter("runOnce")==null){
-    //            runOnce = false;
-    //        }
-    //    }
+    // HttpServletRequest request = getContext().getRequest();
+    // if (request.getMethod().equalsIgnoreCase("POST") && request.getParameter("runOnce")==null){
+    // runOnce = false;
+    // }
+    // }
 }

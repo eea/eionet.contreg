@@ -25,11 +25,11 @@ public class PostHarvestScriptTestResultsReader extends SPARQLResultSetBaseReade
     public void readRow(BindingSet bindingSet) throws ResultSetReaderException {
 
         LinkedHashMap<String, ObjectDTO> rowMap = new LinkedHashMap<String, ObjectDTO>();
-        if (bindingSet != null && bindingSet.size() > 0) {
+        if (bindingSet != null && bindingSet.size() > 0 && bindingNames!=null && !bindingNames.isEmpty()) {
 
-            for (Binding binding : bindingSet) {
+            for (String bindingName : bindingNames){
 
-                String bindingName = binding.getName();
+                Binding binding = bindingSet.getBinding(bindingName);
                 Value bindingValue = binding.getValue();
                 if (bindingValue != null) {
 
