@@ -133,7 +133,7 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
         }
 
         // If the new folder URI is reserved, exit silently.
-        String newFolderUri = parentFolderUri + "/" + URLUtil.replaceURLBadIRISymbols(folderName);
+        String newFolderUri = parentFolderUri + "/" + URLUtil.escapeIRI(folderName);
         if (URIUtil.isUserReservedUri(newFolderUri)) {
             LOGGER.debug("Cannot create reserved folder, exiting silently!");
             return;

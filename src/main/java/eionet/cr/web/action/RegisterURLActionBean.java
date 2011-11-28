@@ -67,7 +67,7 @@ public class RegisterURLActionBean extends AbstractActionBean {
     public Resolution save() throws DAOException, HarvestException {
 
         // register URL
-        url = URLUtil.replaceURLBadIRISymbols(url);
+        url = URLUtil.escapeIRI(url);
         RegisterUrl.register(url, getUser(), bookmark, label);
         // go to factsheet in edit mode
         return new RedirectResolution(FactsheetActionBean.class, "edit").addParameter("uri", url);

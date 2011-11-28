@@ -116,7 +116,7 @@ public class URLUtil {
         URLConnection urlConnection = null;
         try {
             URL url = new URL(StringUtils.substringBefore(urlString, "#"));
-            urlConnection = replaceURLSpaces(url).openConnection();
+            urlConnection = escapeIRI(url).openConnection();
             urlConnection.setRequestProperty("Connection", "close");
             urlConnection.setRequestProperty("User-Agent", userAgentHeader());
             urlConnection.setIfModifiedSince(timestamp);
@@ -154,7 +154,7 @@ public class URLUtil {
         URLConnection urlConnection = null;
         try {
             URL url = new URL(StringUtils.substringBefore(urlStr, "#"));
-            urlConnection = replaceURLSpaces(url).openConnection();
+            urlConnection = escapeIRI(url).openConnection();
             urlConnection.setRequestProperty("Connection", "close");
             responseCode = ((HttpURLConnection) urlConnection).getResponseCode();
         } catch (IOException e) {
@@ -199,29 +199,18 @@ public class URLUtil {
      * @return URL
      * @throws MalformedURLException
      */
-    public static URL replaceURLSpaces(URL url) throws MalformedURLException {
+    public static URL escapeIRI(URL url) throws MalformedURLException {
 
-        return url == null ? null : new URL(replaceURLSpaces(url.toString()));
+        return url == null ? null : new URL(escapeIRI(url.toString()));
     }
 
     /**
+     * Escapes IRI's reserved characters in the given URL string.
      *
      * @param url
-     * @return URL
+     * @return
      */
-    public static String replaceURLSpaces(String url) {
-
-        //return url == null ? null : StringUtils.replace(url.toString(), " ", "%20");
-        return replaceURLBadIRISymbols(url);
-    }
-
-    /**
-     * Replaces symbols in URI that are not valid for IRI.
-     * uses URL encoding
-     * @param url given URL
-     * @return URL Valid IRI
-     */
-    public static String replaceURLBadIRISymbols(String url) {
+    public static String escapeIRI(String url) {
 
         return url == null ? null : StringUtils.replaceEach(url, BAD_IRI_CHARS, BAD_IRI_CHARS_ESCAPES);
     }

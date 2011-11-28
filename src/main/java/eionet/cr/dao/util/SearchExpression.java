@@ -52,7 +52,7 @@ public class SearchExpression {
         }
 
         // Escape spaces
-        String escapedExpression = URLUtil.replaceURLSpaces(expression);
+        String escapedExpression = URLUtil.escapeIRI(expression);
 
         isUri = URIUtil.isSchemedURI(escapedExpression);
         if (isUri) {

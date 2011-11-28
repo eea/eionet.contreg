@@ -223,7 +223,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
                     if (hSourceDTO != null) {
                         // escape spaces in URLs
                         if (hSourceDTO.getUrl() != null) {
-                            hSourceDTO.setUrl(URLUtil.replaceURLSpaces(hSourceDTO.getUrl()));
+                            hSourceDTO.setUrl(URLUtil.escapeIRI(hSourceDTO.getUrl()));
                         }
 
                         hSourceDTO.setOwner(getUserName());

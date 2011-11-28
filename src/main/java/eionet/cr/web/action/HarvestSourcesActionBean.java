@@ -127,7 +127,7 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
         try {
             String filterString = null;
             if (!StringUtils.isEmpty(this.searchString)) {
-                this.searchString = URLUtil.replaceURLSpaces(this.searchString);
+                this.searchString = URLUtil.escapeIRI(this.searchString);
                 filterString = "%" + StringEscapeUtils.escapeSql(this.searchString) + "%";
             }
 

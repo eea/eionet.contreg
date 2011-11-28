@@ -32,15 +32,15 @@ public class URLUtilTest extends TestCase {
 
     public void testReplaceBadCharsOK() {
         String url = "http://ok";
-        assertEquals("http://ok", URLUtil.replaceURLBadIRISymbols(url));
+        assertEquals("http://ok", URLUtil.escapeIRI(url));
     }
     public void testReplaceBadCharsnotOK() {
         String url = "http://a.b.c/{aaa}";
-        assertEquals("http://a.b.c/%7Baaa%7D", URLUtil.replaceURLBadIRISymbols(url));
+        assertEquals("http://a.b.c/%7Baaa%7D", URLUtil.escapeIRI(url));
     }
     public void testReplaceSpaces() {
         String url = "http://a.b.c/ aaa b ";
-        assertEquals("http://a.b.c/%20aaa%20b%20", URLUtil.replaceURLBadIRISymbols(url));
+        assertEquals("http://a.b.c/%20aaa%20b%20", URLUtil.escapeIRI(url));
     }
 
 }
