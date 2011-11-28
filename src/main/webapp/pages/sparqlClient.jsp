@@ -37,7 +37,6 @@
             ( function($) {
                 $(document).ready(
                     function(){
-
                         // Open delete bookmarked queries dialog
                         $("#bookmarksLink").click(function() {
                             $('#bookmarksDialog').dialog('open');
@@ -60,7 +59,52 @@
             } ) ( jQuery );
             // ]]>
         </script>
+		<c:if test="${actionBean.userLoggedIn}">
+			<script type="text/javascript">
+				// <![CDATA[
+			    ( function($) {
+				$(document).ready(
+				    function(){
+						$("#executeButton").click(function() {
+							var query = document.getElementById('queryText').value;
+							var format = document.getElementById('format').value;
 
+							if (format == 'application/rdf+xml' && query.match(/\bconstruct\b/i)) {
+							    $('#constructDialog').dialog('open');
+							    document.getElementById('constructQuery').value = query;
+							    document.getElementById('constructFormat').value = format;
+							    return false;
+							} else {
+								return true;
+							}
+						});
+
+						// Construct queriy dialog setup
+						$('#constructDialog').dialog({
+						    autoOpen: false,
+						    width: 500
+						});
+
+						//Hide div w/id extra
+						if ($("input[name=exportType]:checked").val() != "HOMESPACE") {
+							$("#homespace_data").css("display","none");
+						}
+
+						// Add onclick handler to checkbox w/id checkme
+						$('input[name=exportType]').click(function(){
+							$("#homespace_data").toggle();
+						});
+
+						// Close dialog
+						$("#executeConstruct").click(function() {
+							$('#constructDialog').dialog("close");
+							return true;
+						});
+				    });
+			    } ) ( jQuery );
+			    // ]]>
+			</script>
+		</c:if>
     </stripes:layout-component>
 
     <stripes:layout-component name="contents">
@@ -152,13 +196,21 @@ while (l--) {
                 <div style="position: relative; margin-bottom: 30px">
                     <div style="position: absolute; top: 5px; left: 0px;">
                         <label for="format" class="question" style="width: 200px;">Output format:</label>
-                            <stripes:select name="format" id="format">
-                                <stripes:option value="text/html" label="HTML" />
-                                <stripes:option value="text/html+" label="HTML+" />
-                                <stripes:option value="application/sparql-results+json" label="JSON" />
-                                <stripes:option value="application/sparql-results+xml" label="XML" />
-                                <stripes:option value="application/x-ms-access-export+xml" label="XML with Schema" />
-                            </stripes:select>
+                        <stripes:select name="format" id="format">
+                        	<c:choose>
+	                            <c:when test="${actionBean.exportType == 'HOMESPACE'}">
+	                            	<stripes:option value="text/html" label="HTML" />
+	                            	<stripes:option value="application/rdf+xml" label="RDF/XML" />
+	                            </c:when>
+	                            <c:otherwise>
+	                                <stripes:option value="text/html" label="HTML" />
+		                            <stripes:option value="text/html+" label="HTML+" />
+		                            <stripes:option value="application/sparql-results+json" label="JSON" />
+		                            <stripes:option value="application/sparql-results+xml" label="XML" />
+		                            <stripes:option value="application/x-ms-access-export+xml" label="XML with Schema" />
+	                            </c:otherwise>
+	                        </c:choose>
+                        </stripes:select>
                     </div>
                     <div style="position: absolute; top: 5px; left: 250px;">
                         <stripes:label for="nrOfHits" class="question">Hits per page</stripes:label>
@@ -232,6 +284,63 @@ PREFIX rod: &lt;http://rod.eionet.europa.eu/schema.rdf#&gt;
                     </c:if>
                 </div>
             </crfn:form>
+
+            <c:if test="${actionBean.userLoggedIn}">
+	            <div id="constructDialog" title="Save result to ">
+	            	<crfn:form name="constructForm" action="/sparql" method="get">
+	            		<stripes:hidden name="query" id="constructQuery"/>
+	                	<stripes:hidden name="format" id="constructFormat"/>
+		            	<table class="formtable">
+			                <tr>
+								<td width="120"><stripes:label for="toFile">To file</stripes:label></td>
+			                    <td>
+			                        <stripes:radio name="exportType" value="FILE" checked="FILE" title="To file" id="toFile"/>
+			                    </td>
+			                </tr>
+							<tr>
+								<td><stripes:label for="toHomespace">To homespace</stripes:label></td>
+								<td>
+									<stripes:radio name="exportType" value="HOMESPACE" id="toHomespace"/>
+								</td>
+							</tr>
+						</table>
+						<div id="homespace_data">
+							<table class="formtable">
+								<tr>
+									<td width="120"><label for="datasetName">Dataset name</label></td>
+									<td>
+										<stripes:text name="datasetName" id="datasetName" style="width: 350px;"/>
+									</td>
+								</tr>
+								<tr>
+									<td><label for="folder">Folder</label></td>
+									<td>
+										<stripes:select name="folder" id="folder" style="width: 355px;">
+											<c:forEach items="${actionBean.folders}" var="f" varStatus="loop">
+												<stripes:option value="${f}" label="${crfn:removeHomeUri(f)}" />
+											</c:forEach>
+										</stripes:select>
+									</td>
+								</tr>
+								<tr>
+									<td></td>
+									<td>
+										<stripes:checkbox name="overwriteDataset" id="overwriteDataset"/>
+										<stripes:label for="overwriteDataset">Overwrite if file/dataset already exists</stripes:label>
+									</td>
+								</tr>
+							</table>
+						</div>
+						<table class="formtable">
+							<tr>
+			                    <td align="right">
+			                        <stripes:submit name="execute" value="Execute" id="executeConstruct"/>
+			                    </td>
+			                </tr>
+		            	</table>
+		            </crfn:form>
+	        	</div>
+        	</c:if>
 
             <%-- Bookmarked queries dialog --%>
             <div id="bookmarksDialog" title="Bookmarked queries">

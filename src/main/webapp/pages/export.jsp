@@ -88,7 +88,7 @@
 	                </fieldset>
 	                <stripes:submit name="export" value="Export" id="export_form_submit" style="float: right;"/>
 	            </crfn:form>
-        </div>
+        	</div>
         </c:if>
 
     </stripes:layout-component>
