@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -13,9 +15,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.StreamingResolution;
 import net.sourceforge.stripes.action.UrlBinding;
+import net.sourceforge.stripes.validation.ValidationMethod;
 
 import org.apache.commons.lang.StringUtils;
 import org.openrdf.OpenRDFException;
@@ -26,7 +30,6 @@ import org.openrdf.query.Query;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
-import org.openrdf.query.impl.DatasetImpl;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.rdfxml.RDFXMLWriter;
 
@@ -35,7 +38,10 @@ import eionet.cr.common.Subjects;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.FolderDAO;
+import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
+import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Hashes;
@@ -99,6 +105,12 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     private long executionTime;
     private String[] defaultGraphUris;
     private String[] namedGraphUris;
+
+    // CONSTRUCT query to HOMESPACE variables
+    private String exportType;
+    private String datasetName;
+    private String folder;
+    private boolean overwriteDataset;
 
     /** */
     private boolean isAskQuery;
@@ -304,13 +316,24 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         }
 
         if (xmlFormats.contains(accept[0])) {
-            resolution = new StreamingResolution("application/sparql-results+xml") {
-                public void stream(HttpServletResponse response) throws Exception {
-                    response.setHeader("filename", "sparql-result.xml");
-                    runQuery(query, FORMAT_XML, response.getOutputStream());
+            if (exportType != null && exportType.equals("HOMESPACE")) {
+                // Export result to user homespace
+                String dataset = folder + "/" + StringUtils.replace(datasetName, " ", "%20");
+                int nrOfTriples = exportToHomespace(dataset);
+                if (nrOfTriples > 0) {
+                    resolution = new RedirectResolution(FactsheetActionBean.class).addParameter("uri", dataset);
+                } else {
+                    resolution = new ForwardResolution(FORM_PAGE);
                 }
-            };
-            ((StreamingResolution) resolution).setFilename("sparql-result.xml");
+            } else {
+                resolution = new StreamingResolution("application/sparql-results+xml") {
+                    public void stream(HttpServletResponse response) throws Exception {
+                        response.setHeader("filename", "sparql-result.xml");
+                        runQuery(query, FORMAT_XML, response.getOutputStream());
+                    }
+                };
+                ((StreamingResolution) resolution).setFilename("sparql-result.xml");
+            }
         } else if (accept[0].equals("application/x-ms-access-export+xml")) {
             resolution = new StreamingResolution("application/x-ms-access-export+xml") {
                 public void stream(HttpServletResponse response) throws Exception {
@@ -348,29 +371,6 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     * Sets dataset to query, if default-graph-uri or named-graph-uri parameters are used.
-     *
-     * @param query
-     * @param connection
-     */
-    private void setDatasetParameters(Query query, RepositoryConnection connection) {
-        if (defaultGraphUris != null || namedGraphUris != null) {
-            DatasetImpl dataset = new DatasetImpl();
-            if (defaultGraphUris != null) {
-                for (String uriStr : defaultGraphUris) {
-                    dataset.addDefaultGraph(connection.getValueFactory().createURI(uriStr));
-                }
-            }
-            if (namedGraphUris != null) {
-                for (String uriStr : namedGraphUris) {
-                    dataset.addNamedGraph(connection.getValueFactory().createURI(uriStr));
-                }
-            }
-            query.setDataset(dataset);
-        }
-    }
-
-    /**
      *
      * @param query
      * @param format
@@ -383,7 +383,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             try {
                 con = SesameConnectionProvider.getReadOnlyRepositoryConnection();
                 Query queryObject = con.prepareQuery(QueryLanguage.SPARQL, query);
-                setDatasetParameters(queryObject, con);
+                SesameUtil.setDatasetParameters(queryObject, con, defaultGraphUris, namedGraphUris);
 
                 TupleQueryResult queryResult = null;
                 try {
@@ -492,6 +492,79 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                     e.printStackTrace();
                 }
             }
+        }
+    }
+
+    // Export CONSTRUCT query result to user homespace
+    public int exportToHomespace(String dataset) {
+        int nrOfTriples = 0;
+        try {
+            nrOfTriples = DAOFactory.get().getDao(HelperDAO.class).addTriples(query, dataset, defaultGraphUris, namedGraphUris);
+
+            if (nrOfTriples > 0) {
+                // prepare and insert cr:hasFile predicate
+                ObjectDTO objectDTO = new ObjectDTO(dataset, false);
+                objectDTO.setSourceUri(getUser().getHomeUri());
+                SubjectDTO homeSubjectDTO = new SubjectDTO(folder, false);
+                homeSubjectDTO.addObject(Predicates.CR_HAS_FILE, objectDTO);
+                DAOFactory.get().getDao(HelperDAO.class).addTriples(homeSubjectDTO);
+
+                // Create source
+                DAOFactory.get().getDao(HarvestSourceDAO.class)
+                .addSourceIgnoreDuplicate(HarvestSourceDTO.create(dataset, false, 0, getUserName()));
+
+                // Insert last modified predicate
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                DAOFactory.get().getDao(HarvestSourceDAO.class)
+                .insertUpdateSourceMetadata(dataset, Predicates.CR_LAST_MODIFIED,
+                        ObjectDTO.createLiteral(dateFormat.format(new Date()), XMLSchema.DATETIME));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return nrOfTriples;
+    }
+
+    /**
+     * @throws DAOException
+     */
+    @ValidationMethod(on = {"execute"})
+    public void validateSaveEvent() throws DAOException {
+
+        // the below validation is relevant only when exported to HOMESPACE
+        if (exportType == null || !exportType.equals("HOMESPACE")) {
+            return;
+        }
+
+        // user must be authorized
+        if (exportType != null && exportType.equals("HOMESPACE") && getUser() == null) {
+            addGlobalValidationError("User not logged in!");
+            return;
+        }
+
+        // no folder selected
+        if (StringUtils.isBlank(folder)) {
+            addGlobalValidationError("Folder not selected!");
+        }
+
+        // no folder selected
+        if (StringUtils.isBlank(datasetName)) {
+            addGlobalValidationError("Dataset name is mandatory!");
+        }
+
+        // Check if file already exists
+        if (!overwriteDataset && !StringUtils.isBlank(datasetName) && !StringUtils.isBlank(folder)) {
+            String datasetUri = folder + "/" + StringUtils.replace(datasetName, " ", "%20");
+            boolean exists = DAOFactory.get().getDao(FolderDAO.class).fileOrFolderExists(datasetUri);
+            if (exists) {
+                addGlobalValidationError("File named \"" + datasetName + "\" already exists in folder \""+folder+"\"!");
+            }
+        }
+
+        // if any validation errors were set above, make sure the right resolution is returned
+        if (hasValidationErrors()) {
+            Resolution resolution = new ForwardResolution(FORM_PAGE);
+            getContext().setSourcePageResolution(resolution);
         }
     }
 
@@ -716,6 +789,53 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      */
     public String[] getNamedGraphUris() {
         return namedGraphUris;
+    }
+
+    /**
+     * @return List<String> - user home folders
+     */
+    public List<String> getFolders() {
+        List<String> ret = new ArrayList<String>();
+        if (getUser() != null) {
+            try {
+                ret = factory.getDao(FolderDAO.class).getUserFolders(getUser().getHomeUri());
+            } catch (DAOException e) {
+                e.printStackTrace();
+            }
+        }
+        return ret;
+    }
+
+    public String getExportType() {
+        return exportType;
+    }
+
+    public void setExportType(String exportType) {
+        this.exportType = exportType;
+    }
+
+    public String getDatasetName() {
+        return datasetName;
+    }
+
+    public void setDatasetName(String datasetName) {
+        this.datasetName = datasetName;
+    }
+
+    public String getFolder() {
+        return folder;
+    }
+
+    public void setFolder(String folder) {
+        this.folder = folder;
+    }
+
+    public boolean isOverwriteDataset() {
+        return overwriteDataset;
+    }
+
+    public void setOverwriteDataset(boolean overwriteDataset) {
+        this.overwriteDataset = overwriteDataset;
     }
 
 }

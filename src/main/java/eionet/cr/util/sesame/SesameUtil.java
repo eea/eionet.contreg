@@ -10,6 +10,7 @@ import org.openrdf.query.BooleanQuery;
 import org.openrdf.query.GraphQuery;
 import org.openrdf.query.GraphQueryResult;
 import org.openrdf.query.MalformedQueryException;
+import org.openrdf.query.Query;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQuery;
@@ -368,5 +369,30 @@ public class SesameUtil {
     public static boolean isaSKQuery(String query) {
 
         return isWellFormedSPARQL(query) && Util.containsTokenIgnoreCase(query, "ASK");
+    }
+
+    /**
+     * Sets dataset to query, if default-graph-uri or named-graph-uri parameters are used.
+     *
+     * @param query
+     * @param connection
+     * @param defaultGraphUris
+     * @param namedGraphUris
+     */
+    public static void setDatasetParameters(Query query, RepositoryConnection connection, String[] defaultGraphUris, String[] namedGraphUris) {
+        if (defaultGraphUris != null || namedGraphUris != null) {
+            DatasetImpl dataset = new DatasetImpl();
+            if (defaultGraphUris != null) {
+                for (String uriStr : defaultGraphUris) {
+                    dataset.addDefaultGraph(connection.getValueFactory().createURI(uriStr));
+                }
+            }
+            if (namedGraphUris != null) {
+                for (String uriStr : namedGraphUris) {
+                    dataset.addNamedGraph(connection.getValueFactory().createURI(uriStr));
+                }
+            }
+            query.setDataset(dataset);
+        }
     }
 }

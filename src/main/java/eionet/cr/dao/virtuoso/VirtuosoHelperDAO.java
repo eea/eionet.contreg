@@ -23,6 +23,8 @@ import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.vocabulary.XMLSchema;
 import org.openrdf.query.BindingSet;
+import org.openrdf.query.GraphQuery;
+import org.openrdf.query.GraphQueryResult;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
@@ -98,12 +100,10 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     /**
      * Returns latest harvested files (type=cr:File) in descending order (cr:firstSeen).
      *
-     * @param limit
-     *            count of latest files
+     * @param limit count of latest files
      * @return List of Pair containing URL and date
      * @see eionet.cr.dao.HelperDAO#getLatestFiles(int)
-     * @throws DAOException
-     *             if query fails
+     * @throws DAOException if query fails
      */
     @Override
     public List<Pair<String, String>> getLatestFiles(final int limit) throws DAOException {
@@ -254,6 +254,33 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     }
 
     @Override
+    public int addTriples(String constructQuery, String context, String[] defaultGraphUris, String[] namedGraphUris)
+    throws DAOException {
+
+        int ret = 0;
+        RepositoryConnection conn = null;
+        try {
+            conn = SesameUtil.getRepositoryConnection();
+            GraphQuery queryObject = conn.prepareGraphQuery(QueryLanguage.SPARQL, constructQuery);
+            SesameUtil.setDatasetParameters(queryObject, conn, defaultGraphUris, namedGraphUris);
+
+            URI source = conn.getValueFactory().createURI(context);
+            GraphQueryResult bindings = queryObject.evaluate();
+            while (bindings.hasNext()) {
+                Statement statement = bindings.next();
+                conn.add(statement.getSubject(), statement.getPredicate(), statement.getObject(), source);
+                ret++;
+            }
+
+        } catch (Exception e) {
+            throw new DAOException(e.toString(), e);
+        } finally {
+            SesameUtil.close(conn);
+        }
+        return ret;
+    }
+
+    @Override
     public void addResource(String uri, String sourceUri) throws DAOException {
         throw new UnsupportedOperationException("Method not implemented");
 
@@ -270,11 +297,9 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     /**
      * Search for predicates that is allowed to edit on factsheet page.
      *
-     * @param subjectUri
-     *            rdf:type resources of the subject
+     * @param subjectUri rdf:type resources of the subject
      * @return the list of properties that can be added by user.
-     * @throws DAOException
-     *             if query fails
+     * @throws DAOException if query fails
      */
     @Override
     public HashMap<String, String> getAddibleProperties(String subjectUri) throws DAOException {
@@ -438,11 +463,9 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     /**
      * Finds SubProperties of given subject list.
      *
-     * @param subjects
-     *            Collection<String> subject URIs
+     * @param subjects Collection<String> subject URIs
      * @return SubProperties
-     * @throws DAOException
-     *             if query fails
+     * @throws DAOException if query fails
      */
     @Override
     public SubProperties getSubProperties(final Collection<String> subjects) throws DAOException {
@@ -469,8 +492,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
      * Returns picklist for delivery search.
      *
      * @return The picklist.
-     * @throws DAOException
-     *             if query fails.
+     * @throws DAOException if query fails.
      */
     @Override
     public HashMap<UriLabelPair, ArrayList<UriLabelPair>> getDeliverySearchPicklist() throws DAOException {
@@ -663,14 +685,11 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     /**
      * Checks if given subject is bookmarked in user bookmarks.
      *
-     * @param user
-     *            Content Registry user
-     * @param subject
-     *            Subject URI to be checked
+     * @param user Content Registry user
+     * @param subject Subject URI to be checked
      * @return boolean
      * @see eionet.cr.dao.HelperDAO#isSubjectUserBookmark(eionet.cr.web.security. CRUser, long)
-     * @throws DAOException
-     *             if query fails.
+     * @throws DAOException if query fails.
      */
     @Override
     public boolean isSubjectUserBookmark(CRUser user, String subject) throws DAOException {
@@ -695,12 +714,9 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     /**
      * Updates user history for this URI.
      *
-     * @param user
-     *            Content Registry user
-     * @param url
-     *            URI which record is updated
-     * @throws DAOException
-     *             if query fails.
+     * @param user Content Registry user
+     * @param url URI which record is updated
+     * @throws DAOException if query fails.
      */
     @Override
     public void updateUserHistory(CRUser user, String url) throws DAOException {
@@ -771,12 +787,9 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     /**
      * Returns 100 sample triples of an harvest source in random order.
      *
-     * @param sourceUrl
-     *            harvest source url
-     * @param pagingRequest
-     *            PAging request of the UI
-     * @throws DAOException
-     *             if query fails.
+     * @param sourceUrl harvest source url
+     * @param pagingRequest PAging request of the UI
+     * @throws DAOException if query fails.
      * @return list of TripleDTO objects.
      */
     @Override
@@ -798,10 +811,8 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     /**
      * Returns triples of an harvest source.
      *
-     * @param sourceUrl
-     *            harvest source url
-     * @throws DAOException
-     *             if query fails.
+     * @param sourceUrl harvest source url
+     * @throws DAOException if query fails.
      * @return list of TripleDTO objects.
      */
     @Override
@@ -818,10 +829,8 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     /**
      * Returns full SPO objects of an harvest source.
      *
-     * @param sourceUrl
-     *            harvest source url
-     * @throws DAOException
-     *             if query fails.
+     * @param sourceUrl harvest source url
+     * @throws DAOException if query fails.
      * @return list of SubjectDTO objects.
      */
     @Override
@@ -843,11 +852,9 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     /**
      * Returns full SPO objects of given subject.
      *
-     * @param subjectUri
-     *            subject URI
+     * @param subjectUri subject URI
      *
-     * @throws DAOException
-     *             if query fails.
+     * @throws DAOException if query fails.
      * @return list of SubjectDTO objects.
      */
     @Override
@@ -1181,11 +1188,9 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     /**
      * Get title and feedbackFor reference for a review.
      *
-     * @param reviewUri
-     *            - URI of review.
+     * @param reviewUri - URI of review.
      * @return ReviewDTO
-     * @throws DAOException
-     *             if query fails
+     * @throws DAOException if query fails
      */
     private ReviewDTO getReviewDTO(String reviewUri) throws DAOException {
         Bindings bindings = new Bindings();
@@ -1424,11 +1429,9 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     /**
      * User uploaded files.
      *
-     * @param crUser
-     *            CR user
+     * @param crUser CR user
      * @see eionet.cr.dao.HelperDAO#getUserUploads(eionet.cr.web.security.CRUser)
-     * @throws DAOException
-     *             if query fails.
+     * @throws DAOException if query fails.
      * @return List of user upload items.
      */
     @Override
@@ -1732,11 +1735,9 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     /**
      * Returns SPARQL bookmarks of the user.
      *
-     * @param user
-     *            CR user whose bookmarks are returned
+     * @param user CR user whose bookmarks are returned
      * @return List<Map<String, String>>
-     * @throws DAOException
-     *             if query fails.
+     * @throws DAOException if query fails.
      */
     public List<Map<String, String>> getSparqlBookmarks(CRUser user) throws DAOException {
 
@@ -1905,6 +1906,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     /** */
     private static final String IS_TABULAR_DATA_SUBJECT = "select distinct ?g " + "where {graph ?g {?subject ?p ?o}" + ". ?g <"
     + Predicates.CR_MEDIA_TYPE + "> ?mediaType" + ". filter (?mediaType in ('tsv','csv'))}";
+
     /**
      * @see eionet.cr.dao.HelperDAO#isTabularDataSubject(java.lang.String)
      */

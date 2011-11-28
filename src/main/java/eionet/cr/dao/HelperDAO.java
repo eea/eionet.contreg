@@ -89,6 +89,19 @@ public interface HelperDAO extends DAO {
     void addTriples(SubjectDTO subjectDTO) throws DAOException;
 
     /**
+     * Store CONSTRUCT query result into given context
+     *
+     * @param constructQuery
+     * @param context
+     * @param defaultGraphUris
+     * @param namedGraphUris
+     * @return int - number of triples inserted
+     * @throws DAOException - if query fails
+     */
+    int addTriples(String constructQuery, String context, String[] defaultGraphUris, String[] namedGraphUris)
+    throws DAOException;
+
+    /**
      * @param uri
      * @param sourceUri
      * @return
