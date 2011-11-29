@@ -34,7 +34,7 @@
             <script type="text/javascript" src="<c:url value="/scripts/map.js"/>"></script>
             <stripes:layout-component name="head"/>
         </head>
-        <body>
+        <body ${bodyAttribute}>
             <div id="container">
                 <div id="toolribbon">
                     <div id="lefttools">

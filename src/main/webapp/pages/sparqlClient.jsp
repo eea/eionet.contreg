@@ -2,13 +2,14 @@
 
 <%@ include file="/pages/common/taglibs.jsp"%>
 
-<stripes:layout-render name="/pages/common/template.jsp" pageTitle="SPARQL endpoint">
+<stripes:layout-render name="/pages/common/template.jsp" pageTitle="SPARQL endpoint" bodyAttribute="onLoad=\"format_select()\"">
 
     <stripes:layout-component name="head">
         <script type="text/javascript">
         // <![CDATA[
             var last_format = 1;
-            function format_select(query_obg) {
+            function format_select() {
+            	var query_obg = document.getElementById('queryText');
                 var query = query_obg.value;
                 var format = query_obg.form.format;
 
@@ -156,7 +157,7 @@
                     </div>
                     <div class="expandingArea">
                     <pre><span></span><br /></pre>
-                    <textarea name="query" id="queryText" rows="8" cols="80" style="clear:right; display: block; width: 100%" onchange="format_select(this)" onkeyup="format_select(this)"><c:if test="${empty actionBean.query}">
+                    <textarea name="query" id="queryText" rows="8" cols="80" style="clear:right; display: block; width: 100%" onchange="format_select()" onkeyup="format_select()"><c:if test="${empty actionBean.query}">
 PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
 SELECT DISTINCT * WHERE {
   _:subj a ?class .
@@ -197,19 +198,11 @@ while (l--) {
                     <div style="position: absolute; top: 5px; left: 0px;">
                         <label for="format" class="question" style="width: 200px;">Output format:</label>
                         <stripes:select name="format" id="format">
-                        	<c:choose>
-	                            <c:when test="${actionBean.exportType == 'HOMESPACE'}">
-	                            	<stripes:option value="text/html" label="HTML" />
-	                            	<stripes:option value="application/rdf+xml" label="RDF/XML" />
-	                            </c:when>
-	                            <c:otherwise>
-	                                <stripes:option value="text/html" label="HTML" />
-		                            <stripes:option value="text/html+" label="HTML+" />
-		                            <stripes:option value="application/sparql-results+json" label="JSON" />
-		                            <stripes:option value="application/sparql-results+xml" label="XML" />
-		                            <stripes:option value="application/x-ms-access-export+xml" label="XML with Schema" />
-	                            </c:otherwise>
-	                        </c:choose>
+                            <stripes:option value="text/html" label="HTML" />
+                            <stripes:option value="text/html+" label="HTML+" />
+                            <stripes:option value="application/sparql-results+json" label="JSON" />
+                            <stripes:option value="application/sparql-results+xml" label="XML" />
+                            <stripes:option value="application/x-ms-access-export+xml" label="XML with Schema" />
                         </stripes:select>
                     </div>
                     <div style="position: absolute; top: 5px; left: 250px;">

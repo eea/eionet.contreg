@@ -254,7 +254,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     }
 
     @Override
-    public int addTriples(String constructQuery, String context, String[] defaultGraphUris, String[] namedGraphUris)
+    public int addTriples(String constructQuery, String context, String[] defaultGraphUris, String[] namedGraphUris, int limit)
     throws DAOException {
 
         int ret = 0;
@@ -266,7 +266,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
             URI source = conn.getValueFactory().createURI(context);
             GraphQueryResult bindings = queryObject.evaluate();
-            while (bindings.hasNext()) {
+            while (bindings.hasNext() && ret < limit) {
                 Statement statement = bindings.next();
                 conn.add(statement.getSubject(), statement.getPredicate(), statement.getObject(), source);
                 ret++;

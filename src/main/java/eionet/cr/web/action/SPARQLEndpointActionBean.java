@@ -499,7 +499,11 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     public int exportToHomespace(String dataset) {
         int nrOfTriples = 0;
         try {
-            nrOfTriples = DAOFactory.get().getDao(HelperDAO.class).addTriples(query, dataset, defaultGraphUris, namedGraphUris);
+            //Maximum Rows count
+            int MAX_ROWS_COUNT = GeneralConfig.getIntProperty(GeneralConfig.SPARQLENDPOINT_MAX_ROWS_COUNT, 2000);
+
+            nrOfTriples = DAOFactory.get().getDao(HelperDAO.class).addTriples(
+                    query, dataset, defaultGraphUris, namedGraphUris, MAX_ROWS_COUNT);
 
             if (nrOfTriples > 0) {
                 // prepare and insert cr:hasFile predicate
@@ -518,6 +522,11 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                 DAOFactory.get().getDao(HarvestSourceDAO.class)
                 .insertUpdateSourceMetadata(dataset, Predicates.CR_LAST_MODIFIED,
                         ObjectDTO.createLiteral(dateFormat.format(new Date()), XMLSchema.DATETIME));
+
+                // Insert harvested statements predicate
+                DAOFactory.get().getDao(HarvestSourceDAO.class)
+                .insertUpdateSourceMetadata(dataset, Predicates.CR_HARVESTED_STATEMENTS,
+                        ObjectDTO.createLiteral(String.valueOf(nrOfTriples), XMLSchema.INTEGER));
             }
         } catch (Exception e) {
             e.printStackTrace();

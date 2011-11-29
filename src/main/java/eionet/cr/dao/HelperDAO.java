@@ -95,10 +95,11 @@ public interface HelperDAO extends DAO {
      * @param context
      * @param defaultGraphUris
      * @param namedGraphUris
+     * @param limit - max number of triples inserted
      * @return int - number of triples inserted
      * @throws DAOException - if query fails
      */
-    int addTriples(String constructQuery, String context, String[] defaultGraphUris, String[] namedGraphUris)
+    int addTriples(String constructQuery, String context, String[] defaultGraphUris, String[] namedGraphUris, int limit)
     throws DAOException;
 
     /**
