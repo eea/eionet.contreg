@@ -3,14 +3,14 @@ package eionet.cr.web.action.admin;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.StringTokenizer;
 
+import net.sourceforge.stripes.action.Before;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
+import net.sourceforge.stripes.controller.LifecycleStage;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.dao.DAOException;
@@ -27,28 +27,21 @@ import eionet.cr.web.action.AbstractActionBean;
  * Action bean for bulk add/delete harvest sources page.
  *
  * @author kaido
- *
  */
 @UrlBinding("/admin/bulkharvest")
 public class HarvestSourceBulkActionBean extends AbstractActionBean {
 
+    /** JSP page. */
+    private static final String BULK_HARVEST_PAGE = "/pages/admin/bulkHarvest.jsp";
+
     /** harvest sources entered by user. */
-    private String strHarvestSources;
+    private String sourceUrlsString;
 
     /** is admin logged in. */
     private boolean adminLoggedIn = false;
 
-    /** parsed sources from user input. */
-    private List<HarvestSourceDTO> harvestSources;
-
     /** harvest source URLS. */
     private List<String> sourceUrls;
-
-    /** local holder of warnings. */
-    private StringBuilder warnings = new StringBuilder();
-
-    /** JSP name . */
-    private static final String BULK_HARVEST_PAGE = "/pages/admin/bulkHarvest.jsp";
 
     /**
      * View sources bulk management page.
@@ -66,33 +59,30 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
     }
 
     /**
-     * Parse input string and adds sources to the table. Sources are entered one per line
+     * Add parsed (see {@link #parseSourceUrlsString()}) sources to the database
+     * and schedule them for harvest.
      *
      * @return Resolution
      */
     public Resolution add() {
-        logger.debug("HarvestSourceBulkActionBean.add() ");
-        strHarvestSources = StringEscapeUtils.escapeHtml(strHarvestSources);
+
         if (getUser() != null) {
 
-            parseHarvestSources(getStrHarvestSources());
             bulkAddSources();
-
             setAdminLoggedIn(true);
         }
+
         return new ForwardResolution(BULK_HARVEST_PAGE);
     }
 
     /**
-     * Deletes sources added by the user. Harvest sources are separated by carriage return in the textarea.
+     * Delete parsed (see {@link #parseSourceUrlsString()}) sources from the database.
      *
      * @return Resolution
      */
     public Resolution delete() {
 
-        strHarvestSources = StringEscapeUtils.escapeHtml(strHarvestSources);
         if (getUser() != null) {
-            parseHarvestSources(strHarvestSources);
             bulkDeleteSources();
             setAdminLoggedIn(true);
         }
@@ -101,26 +91,23 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
     }
 
     /**
-     * Sources : user entered input text.
      *
-     * @return String
+     * @return The string containing source URLs in this request.
      */
-    public String getStrHarvestSources() {
-        return strHarvestSources;
+    public String getSourceUrlsString() {
+        return sourceUrlsString;
     }
 
     /**
-     * omits value to input String.
      *
-     * @param harvestSources
-     *            String
+     * @param harvestSources The string containing source URLs in this request.
      */
-    public void setStrHarvestSources(final String harvestSources) {
-        this.strHarvestSources = harvestSources;
+    public void setSourceUrlsString(final String harvestSources) {
+        this.sourceUrlsString = harvestSources;
     }
 
     /**
-     * True if the user is authenticated.
+     * True if the user is authenticated and is an administrator.
      *
      * @return boolean
      */
@@ -129,108 +116,108 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param adminLoggedIn
-     *            boolean
+     * @param adminLoggedIn boolean
      */
     public void setAdminLoggedIn(final boolean adminLoggedIn) {
         this.adminLoggedIn = adminLoggedIn;
     }
 
     /**
-     * parses input String to harvest source DTO objects.
+     * Parses new-line-separated source URLs into a list that will be used
+     * by {@link #add()} and {@link #delete()}.
      *
      * @param strSources
-     *            user input in UI
      */
-    private void parseHarvestSources(final String strSources) {
-        harvestSources = new ArrayList<HarvestSourceDTO>();
+    @Before(stages = {LifecycleStage.EventHandling})
+    public void parseSourceUrlsString() {
+
+        if (StringUtils.isBlank(sourceUrlsString)) {
+            return;
+        }
+
         sourceUrls = new ArrayList<String>();
 
-        String trimmedStrSources = strSources.trim();
+        // split on both new line and carriage return
+        String[] urls = StringUtils.split(sourceUrlsString, "\r\n");
+        for (String url : urls) {
 
-        StringTokenizer urls = new StringTokenizer(trimmedStrSources);
-        // List<HarvestSourceDTO> sources = new ArrayList<HarvestSourceDTO>();
-        while (urls.hasMoreElements()) {
-            String url = urls.nextToken();
+            url = url.trim();
             if (URLUtil.isURL(url)) {
-                url = URLUtil.escapeIRI(url);
-                harvestSources
-                        .add(HarvestSourceDTO.create(url, false, HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL, getUserName()));
                 sourceUrls.add(url);
             } else {
-                warnings.append("Entered URL \"").append(url).append("\" is not a valid URL.<br/>");
+                addCautionMessage("Not a valid URL: " + url);
             }
-
-        }
-        if (StringUtils.isNotEmpty(warnings.toString())) {
-            addCautionMessage(warnings.toString());
         }
     }
 
     /**
-     * Adds sources to DB and urgent harvesting.
+     * Add parsed (see {@link #parseSourceUrlsString()}) sources to the database
+     * and schedule them for harvest.
      */
     private void bulkAddSources() {
-        HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
+
         int counter = 0;
-        for (HarvestSourceDTO source : harvestSources) {
+        HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
+
+        for (String sourceUrl : sourceUrls) {
+
+            boolean success = true;
             try {
-                // checking of duplicate sources is made by the unique index in the DB
-                dao.addSource(source);
-                UrgentHarvestQueue.addPullHarvest(source.getUrl());
-                counter++;
+                dao.addSource(HarvestSourceDTO.create(URLUtil.escapeIRI(sourceUrl), false,
+                        HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL, getUserName()));
             } catch (DAOException e) {
-                // if adding fails, proceed with adding the other sources and show error message
-                warnings.append("Adding source \"").append(source.getUrl()).append("\" failed, reason: ").append(e.toString())
-                        .append("<br/>");
-            } catch (HarvestException he) {
-                warnings.append("Adding source \"").append(source.getUrl()).append("\" to the harvest queue failed, reason: ")
-                        .append(he.toString()).append("<br/>");
+                success = false;
+                addSystemMessage("Adding " + sourceUrl + " failed with " + e.toString());
+            }
+
+            try {
+                UrgentHarvestQueue.addPullHarvest(sourceUrl);
+            } catch (HarvestException e) {
+                success = false;
+                addSystemMessage("Queueing " + sourceUrl + " for harvest failed with " + e.toString());
+            }
+
+            if (success) {
+                counter++;
             }
         }
-        addSystemMessage("Adding sources finished. Successfully added " + counter + " sources for urgent harvesting.");
-        if (StringUtils.isNotEmpty(warnings.toString())) {
-            addSystemMessage(warnings.toString());
+
+        if (counter > 0) {
+            addSystemMessage(0, counter + " source(s) successfully added and scheduled for harvest.");
         }
     }
 
     /**
-     * Adds sources to removal queue. Those ones that already are in the delete queue are not added.
+     * Delete parsed (see {@link #parseSourceUrlsString()}) sources from the database.
      */
     private void bulkDeleteSources() {
 
-        try {
-            HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
-            LinkedHashSet<String> sourcesToDelete = new LinkedHashSet<String>();
-            LinkedHashSet<String> currentlyHarvested = new LinkedHashSet<String>();
+        HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
+        LinkedHashSet<String> sourcesToDelete = new LinkedHashSet<String>();
+        LinkedHashSet<String> sourcesCurrentlyHarvested = new LinkedHashSet<String>();
 
-            for (String url : sourceUrls) {
+        for (String url : sourceUrls) {
 
-                if (CurrentHarvests.contains(url)) {
-                    currentlyHarvested.add(url);
-                } else {
-                    sourcesToDelete.add(url);
-                }
+            if (CurrentHarvests.contains(url)) {
+                sourcesCurrentlyHarvested.add(url);
+            } else {
+                sourcesToDelete.add(url);
             }
-
-            dao.removeHarvestSources(sourcesToDelete);
-
-            addSystemMessage(sourcesToDelete.size() + " sources were successfully removed from the system.");
-
-            if (!currentlyHarvested.isEmpty()) {
-                StringBuilder warnings = new StringBuilder();
-                warnings.append("The following sources could not be deleted, because they are curently being harvested: <ul>");
-                for (String url : currentlyHarvested) {
-                    warnings.append("<li>").append(url).append("</li>");
-                }
-                warnings.append("</ul>");
-                addWarningMessage(warnings.toString());
-            }
-        } catch (DAOException e) {
-            warnings.append("Adding sources to delete queue failed, reason: ").append(e.toString()).append("<br/>");
         }
-        if (StringUtils.isNotEmpty(warnings.toString())) {
-            addSystemMessage(warnings.toString());
+
+        try {
+            dao.removeHarvestSources(sourcesToDelete);
+            addSystemMessage(sourcesToDelete.size() + " sources were successfully removed from the system.");
+        } catch (DAOException e) {
+            addSystemMessage("Deletion failed with " + e.toString());
+        }
+
+        if (!sourcesCurrentlyHarvested.isEmpty()) {
+
+            addCautionMessage("The following sources were not deleted, because they are curently harvested:");
+            for (String url : sourcesCurrentlyHarvested) {
+                addCautionMessage(url);
+            }
         }
     }
 

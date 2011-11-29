@@ -133,14 +133,24 @@ public abstract class AbstractActionBean implements ActionBean {
     }
 
     /**
-     * Adds system message. The message will be shown in a simple rectangle and is to provide information on <i>successful</i>
-     * actions.
+     * Adds system message.
+     * The message will be shown in a simple rectangle and is to provide information on <i>successful</i> actions.
      *
      * @param message
      *            Message text in HTML format.
      */
-    public void addSystemMessage(final String message) {
+    public void addSystemMessage(String message) {
         getContext().getMessages(SYSTEM_MESSAGES).add(new SimpleMessage(StringEscapeUtils.escapeXml(message)));
+    }
+
+    /**
+     * Same as {@link #addSystemMessage(String)}, but message added at specified index.
+     *
+     * @param index
+     * @param message
+     */
+    public void addSystemMessage(int index, String message) {
+        getContext().getMessages(SYSTEM_MESSAGES).add(index, new SimpleMessage(StringEscapeUtils.escapeXml(message)));
     }
 
     /**
