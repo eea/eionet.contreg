@@ -2,7 +2,7 @@
 <acl description="ACL for merge deliveries">
     <entries>
         <entry type="object">
-            <principal id="authenticated" type="user"/>
+            <principal id="cr_admin" type="localgroup"/>
             <permissions>
                 <permission id="v"/>
             </permissions>
