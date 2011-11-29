@@ -35,7 +35,12 @@
                 </tr>
                 <tr>
                     <td>Media type:</td>
-                    <td><stripes:text name="harvestSource.mediaType" size="100" style="width:100%"/></td>
+                    <td><stripes:select name="harvestSource.mediaType" value="${actionBean.harvestSource.mediaType}">
+                        <c:forEach items="${actionBean.mediaTypes}" var="type">
+                            <stripes:option value="${type}" label="${type}"/>
+                        </c:forEach>
+                        </stripes:select>
+                    </td>
                 </tr>
                 <tr>
                     <td><label class="question" for="schema">Is "Schema" source:</label></td>

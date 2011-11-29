@@ -56,6 +56,7 @@ import eionet.cr.dto.TripleDTO;
 import eionet.cr.harvest.CurrentHarvests;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
+import eionet.cr.harvest.util.RDFMediaTypes;
 import eionet.cr.util.Pair;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.pagination.PagingRequest;
@@ -183,8 +184,8 @@ public class HarvestSourceActionBean extends AbstractActionBean {
             prepareDTO();
             // populate sample triples
             sampleTriples =
-                DAOFactory.get().getDao(HelperDAO.class)
-                .getSampleTriplesInSource(harvestSource.getUrl(), PagingRequest.create(1, 10));
+                    DAOFactory.get().getDao(HelperDAO.class)
+                            .getSampleTriplesInSource(harvestSource.getUrl(), PagingRequest.create(1, 10));
         }
 
         return new ForwardResolution("/pages/viewsource.jsp");
@@ -419,7 +420,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
             String datasetUri = folder + "/" + StringUtils.replace(datasetName, " ", "%20");
             boolean exists = DAOFactory.get().getDao(FolderDAO.class).fileOrFolderExists(datasetUri);
             if (exists) {
-                addGlobalValidationError("File named \"" + datasetName + "\" already exists in folder \""+folder+"\"!");
+                addGlobalValidationError("File named \"" + datasetName + "\" already exists in folder \"" + folder + "\"!");
             }
         }
 
@@ -554,6 +555,20 @@ public class HarvestSourceActionBean extends AbstractActionBean {
         }
 
         return buf.toString();
+    }
+
+    /**
+     * Returns all the valid media types.
+     *
+     * @return
+     */
+    public List<String> getMediaTypes() {
+        List<String> result = new ArrayList<String>();
+        result.add(null);
+        result.addAll(RDFMediaTypes.collection());
+        result.add("application/octet-stream");
+        result.add("text/plain");
+        return result;
     }
 
     /**
