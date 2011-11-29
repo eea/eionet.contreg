@@ -37,6 +37,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -337,8 +338,10 @@ public class PullHarvest extends BaseHarvest {
 
         Date lastHarvest = getContextSourceDTO().getLastHarvest();
         if (lastHarvest == null) {
-            //FIXME: The base date is now - intervalMinutes (e.g. today - 6 weeks)
-            return new Date();
+            //The last harvest date is now - intervalMinutes (e.g. today - 6 weeks)
+            Calendar c = Calendar.getInstance();
+            c.add(Calendar.MINUTE, -getContextSourceDTO().getIntervalMinutes());
+            lastHarvest = c.getTime();
         }
 
         int intervalMinutes = getContextSourceDTO().getIntervalMinutes();
