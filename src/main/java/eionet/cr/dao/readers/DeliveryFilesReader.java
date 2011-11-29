@@ -12,6 +12,7 @@ import org.openrdf.query.BindingSet;
 
 import eionet.cr.dto.DeliveryFilesDTO;
 import eionet.cr.dto.FileDTO;
+import eionet.cr.util.URIUtil;
 
 /**
  * Reads delivery files from Resultset.
@@ -47,12 +48,11 @@ public class DeliveryFilesReader extends ResultSetMixedReader<DeliveryFilesDTO> 
                 if (!StringUtils.isBlank(fileUri)) {
                     FileDTO file = new FileDTO(fileUri);
 
-                    String title = bindingSet.getValue("title") != null ? bindingSet.getValue("title").stringValue() : null;
+                    String title = URIUtil.extractURILabel(fileUri);
                     if (!StringUtils.isBlank(title)) {
                         file.setTitle(title);
                     }
-                    String triplesCnt =
-                            bindingSet.getValue("triplesCnt") != null ? bindingSet.getValue("triplesCnt").stringValue() : null;
+                    String triplesCnt = bindingSet.getValue("triplesCnt") != null ? bindingSet.getValue("triplesCnt").stringValue() : null;
                     if (!StringUtils.isBlank(triplesCnt)) {
                         file.setTriplesCnt(new Integer(triplesCnt).intValue());
                     }

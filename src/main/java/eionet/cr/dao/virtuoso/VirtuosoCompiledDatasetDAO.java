@@ -6,12 +6,11 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.BooleanQuery;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.repository.RepositoryConnection;
-
-import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.dao.CompiledDatasetDAO;
@@ -46,7 +45,17 @@ public class VirtuosoCompiledDatasetDAO extends VirtuosoBaseDAO implements Compi
     public List<DeliveryFilesDTO> getDeliveryFiles(List<String> deliveryUris) throws DAOException {
         List<DeliveryFilesDTO> ret = new ArrayList<DeliveryFilesDTO>();
         if (deliveryUris != null && deliveryUris.size() > 0) {
+
             StringBuffer query = new StringBuffer();
+            query.append("select distinct ?s ?o ?triplesCnt where {");
+            query.append("?s <").append(Predicates.ROD_HAS_FILE).append("> ?o . ");
+            query.append("filter(?s IN (").append(SPARQLQueryUtil.urisToCSV(deliveryUris)).append("))");
+            query.append("OPTIONAL {?o <").append(Predicates.CR_HARVESTED_STATEMENTS).append("> ?triplesCnt } ");
+            query.append("graph ?o {");
+            query.append("?s1 ?p1 ?o1");
+            query.append("}} ORDER BY ?s");
+
+            /*StringBuffer query = new StringBuffer();
             query.append("select ?s ?o ?title count(?s1) ?triplesCnt where {");
             query.append("?s <").append(Predicates.ROD_HAS_FILE).append("> ?o . ");
             query.append("filter(?s IN (").append(SPARQLQueryUtil.urisToCSV(deliveryUris)).append("))");
@@ -59,7 +68,7 @@ public class VirtuosoCompiledDatasetDAO extends VirtuosoBaseDAO implements Compi
             query.append("}");
             query.append("graph ?o {");
             query.append("?s1 ?p1 ?o1");
-            query.append("}} ORDER BY ?s");
+            query.append("}} ORDER BY ?s");*/
 
             ret = executeSPARQL(query.toString(), new DeliveryFilesReader());
         }
