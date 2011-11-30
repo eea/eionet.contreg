@@ -11,19 +11,24 @@
                 pagesize="20" sort="list" id="folder" htmlId="resultList"
                 requestURI="${actionBean.urlBinding}" style="width:100%">
                     <display:column title="User home folders" sortable="true">
-                        <stripes:link href="${folder.url}">
+                        <stripes:link href="/view.action">
+                            <stripes:param name="uri" value="${folder.url}" />
                            ${folder.label}
                         </stripes:link>  (${fn:length(folder.subFiles)} files, ${fn:length(folder.subFolders)} folders),
-                        <stripes:link href="${folder.url}/bookmarks">
+                        <stripes:link href="/view.action">
+                            <stripes:param name="uri" value="${folder.url}/bookmarks" />
                            Bookmarks
                         </stripes:link>,
-                        <stripes:link href="${folder.url}/registrations">
+                        <stripes:link href="/view.action">
+                            <stripes:param name="uri" value="${folder.url}/registrations" />
                            Registrations
                         </stripes:link>,
-                        <stripes:link href="${folder.url}/history">
+                        <stripes:link href="/view.action">
+                            <stripes:param name="uri" value="${folder.url}/history" />
                            History
                         </stripes:link>,
-                        <stripes:link href="${folder.url}/reviews">
+                        <stripes:link href="/view.action">
+                            <stripes:param name="uri" value="${folder.url}/reviews" />
                            Reviews
                         </stripes:link>
                     </display:column>
