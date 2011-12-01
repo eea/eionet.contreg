@@ -178,7 +178,7 @@ public class SesameUtil {
     }
 
     /**
-     * Executes the given SPARQL/Update (aka SPARUL) statement. Rollback is NOT made if query does not succeed.
+     * Executes a SPARQL/Update (SPARUL) query (i.e. one that performs modifications on data).
      *
      * @param sparul
      * @param conn repository connection

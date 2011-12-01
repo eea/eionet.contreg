@@ -47,17 +47,17 @@ public class PostHarvestScriptParser {
      * @param associatedType
      * @return
      */
-    public static String parseForExecution(String script, String harvestedSource, String associatedType){
+    public static String parseForExecution(String script, String harvestedSource, String associatedType) {
 
-        if (StringUtils.isBlank(script)){
+        if (StringUtils.isBlank(script)) {
             return script;
         }
 
-        if (!StringUtils.isBlank(harvestedSource)){
+        if (!StringUtils.isBlank(harvestedSource)) {
             script = StringUtils.replace(script, "?" + HARVESTED_SOURCE_VARIABLE, "<" + harvestedSource + ">");
         }
 
-        if (!StringUtils.isBlank(associatedType)){
+        if (!StringUtils.isBlank(associatedType)) {
             script = StringUtils.replace(script, "?" + ASSOCIATED_TYPE_VARIABLE, "<" + associatedType + ">");
         }
 
@@ -114,7 +114,7 @@ public class PostHarvestScriptParser {
     /**
      *
      * @param script
-     * @param harvestedSource TODO
+     * @param harvestedSource
      * @return
      * @throws ScriptParseException
      */
@@ -126,34 +126,36 @@ public class PostHarvestScriptParser {
 
         String result = script;
         if (containsToken(script, "MODIFY")) {
-            result = deriveConstructFromModify(script, harvestedSource);
+            result = deriveConstructFromModify(script);
         } else if (containsToken(script, "DELETE")) {
-            result = deriveConstructFromDelete(script, harvestedSource);
+            result = deriveConstructFromDelete(script);
         } else if (containsToken(script, "INSERT")) {
-            result = deriveConstructFromInsert(script, harvestedSource);
+            result = deriveConstructFromInsert(script);
         }
 
-        return result==null ? null : result.trim();
-    }
+        if (result != null && !StringUtils.isBlank(harvestedSource)) {
+            result = replaceToken(result, "?" + HARVESTED_SOURCE_VARIABLE, "<" + harvestedSource + ">");
+        }
 
+        return result == null ? null : result.trim();
+    }
 
     /**
      * @param script
-     * @param harvestedSource TODO
+     * @param harvestedSource
      * @return
      * @throws ScriptParseException
      */
-    private static String deriveConstructFromModify(String script, String harvestedSource) throws ScriptParseException {
+    private static String deriveConstructFromModifyOLD(String script, String harvestedSource) throws ScriptParseException {
 
         String datasetClause = null;
         String deleteTemplate = null;
         String insertTemplate = null;
         String wherePattern = null;
 
-        if (!containsToken(script, "DELETE")){
+        if (!containsToken(script, "DELETE")) {
             throw new ScriptParseException("Expecting MODIFY statement to contain DELETE!");
-        }
-        else if (!containsToken(substringAfterToken(script, "DELETE"), "INSERT")){
+        } else if (!containsToken(substringAfterToken(script, "DELETE"), "INSERT")) {
             throw new ScriptParseException("Expecting MODIFY statement to contain DELETE and INSERT!");
         }
 
@@ -161,35 +163,34 @@ public class PostHarvestScriptParser {
         deleteTemplate = substringBetweenTokens(script, "DELETE", "INSERT");
 
         String afterInsert = substringAfterToken(script, "INSERT");
-        if (containsToken(afterInsert, "WHERE")){
+        if (containsToken(afterInsert, "WHERE")) {
             insertTemplate = substringBetweenTokens(script, "INSERT", "WHERE");
             wherePattern = substringAfterToken(afterInsert, "WHERE");
-            if (StringUtils.isBlank(wherePattern) || !wherePattern.trim().startsWith("{")){
+            if (StringUtils.isBlank(wherePattern) || !wherePattern.trim().startsWith("{")) {
                 throw new ScriptParseException("Could not detect WHERE pattern!");
             }
-        }
-        else{
+        } else {
             insertTemplate = afterInsert;
         }
 
-        String deleteTemplTrimd = deleteTemplate==null ? null : deleteTemplate.trim();
-        if (StringUtils.isEmpty(deleteTemplTrimd) || !(deleteTemplTrimd.startsWith("{") && deleteTemplTrimd.endsWith("}"))){
+        String deleteTemplTrimd = deleteTemplate == null ? null : deleteTemplate.trim();
+        if (StringUtils.isEmpty(deleteTemplTrimd) || !(deleteTemplTrimd.startsWith("{") && deleteTemplTrimd.endsWith("}"))) {
             throw new ScriptParseException("Could not detect DELETE template!");
         }
 
-        String insertTemplTrimd = insertTemplate==null ? null : insertTemplate.trim();
-        if (StringUtils.isEmpty(insertTemplTrimd) || !(insertTemplTrimd.startsWith("{") && insertTemplTrimd.endsWith("}"))){
+        String insertTemplTrimd = insertTemplate == null ? null : insertTemplate.trim();
+        if (StringUtils.isEmpty(insertTemplTrimd) || !(insertTemplTrimd.startsWith("{") && insertTemplTrimd.endsWith("}"))) {
             throw new ScriptParseException("Could not detect INSERT template!");
         }
 
         String result = substringBeforeToken(script, "MODIFY");
         result += "CONSTRUCT";
         result += insertTemplate;
-        if (!Character.isWhitespace(result.charAt(result.length()-1))){
+        if (!Character.isWhitespace(result.charAt(result.length() - 1))) {
             result += " ";
         }
 
-        if (!StringUtils.isBlank(datasetClause)){
+        if (!StringUtils.isBlank(datasetClause)) {
             String[] graphs = StringUtils.split(datasetClause);
             for (int i = 0; i < graphs.length; i++) {
                 String graph = StringUtils.replace(graphs[i], "?" + HARVESTED_SOURCE_VARIABLE, "<" + harvestedSource + ">");
@@ -197,14 +198,13 @@ public class PostHarvestScriptParser {
             }
         }
 
-        if (!StringUtils.isBlank(wherePattern)){
+        if (!StringUtils.isBlank(wherePattern)) {
             result += "WHERE" + wherePattern;
-        }
-        else{
+        } else {
             result += "WHERE {?s ?p ?o}";
         }
         result = result.trim();
-        result += " LIMIT 500";
+        result += " LIMIT " + TEST_RESULTS_LIMIT;
 
         return result;
     }
@@ -212,11 +212,87 @@ public class PostHarvestScriptParser {
     /**
      *
      * @param script
-     * @param harvestedSource TODO
      * @return
      * @throws ScriptParseException
      */
-    private static String deriveConstructFromInsert(String script, String harvestedSource) throws ScriptParseException {
+    private static String deriveConstructFromModify(String script) throws ScriptParseException {
+
+        String datasetClause = null;
+        String constructTemplate = null;
+        String wherePattern = null;
+
+        // Ensure this is a valid MODIFY statement.
+
+        if (!containsToken(script, "DELETE")) {
+            throw new ScriptParseException("Expecting MODIFY statement to contain DELETE!");
+        } else if (!containsToken(substringAfterToken(script, "DELETE"), "INSERT")) {
+            throw new ScriptParseException("Expecting MODIFY statement to contain DELETE and INSERT!");
+        }
+
+        // Prepare some helpful variables.
+        String afterInsert = substringAfterToken(script, "INSERT");
+        boolean datasetSpecified = containsToken(afterInsert, "FROM");
+        boolean wherePatternSpecified = containsToken(afterInsert, "WHERE");
+
+        // Extract the CONSTRUCT template, and dataset part if specified.
+        if (datasetSpecified) {
+
+            constructTemplate = substringBeforeToken(afterInsert, "FROM");
+            if (wherePatternSpecified) {
+                datasetClause = substringBetweenTokens(afterInsert, "FROM", "WHERE");
+            } else {
+                datasetClause = substringAfterToken(afterInsert, "FROM");
+            }
+        } else if (wherePatternSpecified) {
+            constructTemplate = substringBeforeToken(afterInsert, "WHERE");
+        } else {
+            constructTemplate = afterInsert;
+        }
+
+        // Ensure CONSTRUCT template is not blank and starts-ends with curly braces.
+        if (constructTemplate == null || !startsEndsWith(constructTemplate.trim(), "{", "}")) {
+            throw new ScriptParseException("Could not detect CONSTRUCT template!");
+        }
+
+        // Extract WHERE pattern if present.
+        if (wherePatternSpecified) {
+            wherePattern = substringAfterToken(afterInsert, "WHERE");
+            if (StringUtils.isBlank(wherePattern) || !wherePattern.trim().startsWith("{")) {
+                throw new ScriptParseException("Could not detect WHERE pattern!");
+            }
+        }
+
+        // Build the resulting CONSTRUCT query.
+
+        String result = substringBeforeToken(script, "MODIFY");
+        result += "CONSTRUCT";
+        result += ensureWhitespaceStartEnd(constructTemplate);
+
+        if (!StringUtils.isBlank(datasetClause)) {
+            result += "FROM" + ensureWhitespaceStart(datasetClause);
+        }
+
+        result = ensureWhitespaceEnd(result);
+        if (!StringUtils.isBlank(wherePattern)) {
+            result += "WHERE" + ensureWhitespaceStart(wherePattern);
+        } else {
+            result += "WHERE {?s ?p ?o}";
+        }
+
+        result = result.trim();
+        result += " LIMIT " + TEST_RESULTS_LIMIT;
+
+        return result;
+    }
+
+    /**
+     *
+     * @param script
+     * @param harvestedSource
+     * @return
+     * @throws ScriptParseException
+     */
+    private static String deriveConstructFromInsertOLD(String script, String harvestedSource) throws ScriptParseException {
 
         String insertTemplate = null;
         String datasetClause = null;
@@ -230,7 +306,7 @@ public class PostHarvestScriptParser {
             if (wherePatternSpecified) {
                 datasetAndTemplate = substringBetweenTokens(script, "INTO", "WHERE");
                 wherePattern = substringAfterToken(script, "WHERE");
-                if (StringUtils.isBlank(wherePattern) || !wherePattern.trim().startsWith("{")){
+                if (StringUtils.isBlank(wherePattern) || !wherePattern.trim().startsWith("{")) {
                     throw new ScriptParseException("Could not detect WHERE pattern!");
                 }
             } else {
@@ -243,46 +319,44 @@ public class PostHarvestScriptParser {
                 insertTemplate = datasetAndTemplate.substring(i);
             }
         } else {
-            if (wherePatternSpecified){
-                insertTemplate =  substringBetweenTokens(script, "INSERT", "WHERE");
+            if (wherePatternSpecified) {
+                insertTemplate = substringBetweenTokens(script, "INSERT", "WHERE");
                 wherePattern = substringAfterToken(script, "WHERE");
-                if (StringUtils.isBlank(wherePattern) || !wherePattern.trim().startsWith("{")){
+                if (StringUtils.isBlank(wherePattern) || !wherePattern.trim().startsWith("{")) {
                     throw new ScriptParseException("Could not detect WHERE pattern!");
                 }
-            }
-            else{
+            } else {
                 insertTemplate = substringAfterToken(script, "INSERT");
             }
         }
 
-        String insertTemplTrimd = insertTemplate==null ? null : insertTemplate.trim();
-        if (StringUtils.isEmpty(insertTemplTrimd) || !(insertTemplTrimd.startsWith("{") && insertTemplTrimd.endsWith("}"))){
+        String insertTemplTrimd = insertTemplate == null ? null : insertTemplate.trim();
+        if (StringUtils.isEmpty(insertTemplTrimd) || !(insertTemplTrimd.startsWith("{") && insertTemplTrimd.endsWith("}"))) {
             throw new ScriptParseException("Could not detect INSERT template!");
         }
 
         String result = substringBeforeToken(script, "INSERT");
         result += "CONSTRUCT";
-        if (!Character.isWhitespace(insertTemplate.charAt(0))){
+        if (!Character.isWhitespace(insertTemplate.charAt(0))) {
             result += " ";
         }
         result += insertTemplate;
-        if (!Character.isWhitespace(result.charAt(result.length()-1))){
+        if (!Character.isWhitespace(result.charAt(result.length() - 1))) {
             result += " ";
         }
 
-        if (!StringUtils.isBlank(datasetClause)){
+        if (!StringUtils.isBlank(datasetClause)) {
             datasetClause = StringUtils.replace(datasetClause, "?" + HARVESTED_SOURCE_VARIABLE, "<" + harvestedSource + ">");
             result += "FROM" + replaceToken(datasetClause, "INTO", "FROM");
         }
 
-        if (!StringUtils.isBlank(wherePattern)){
+        if (!StringUtils.isBlank(wherePattern)) {
             result += "WHERE" + wherePattern;
-        }
-        else{
+        } else {
             result += "WHERE {?s ?p ?o}";
         }
         result = result.trim();
-        result += " LIMIT 500";
+        result += " LIMIT " + TEST_RESULTS_LIMIT;
 
         return result;
     }
@@ -290,11 +364,81 @@ public class PostHarvestScriptParser {
     /**
      *
      * @param script
-     * @param harvestedSource TODO
      * @return
      * @throws ScriptParseException
      */
-    private static String deriveConstructFromDelete(String script, String harvestedSource) throws ScriptParseException {
+    private static String deriveConstructFromInsert(String script) throws ScriptParseException {
+
+        String constructTemplate = null;
+        String datasetClause = null;
+        String wherePattern = null;
+        String graphAndTemplate = null;
+
+        boolean datasetSpecified = containsToken(script, "FROM");
+        boolean wherePatternSpecified = containsToken(script, "WHERE");
+
+        // Extract the graph-and-template section, and the dataset section if present.
+
+        if (datasetSpecified) {
+            graphAndTemplate = substringBetweenTokens(script, "INSERT", "FROM");
+            if (wherePatternSpecified) {
+                datasetClause = substringBetweenTokens(script, "FROM", "WHERE");
+            } else {
+                datasetClause = substringAfterToken(script, "FROM");
+            }
+        } else if (wherePatternSpecified) {
+            graphAndTemplate = substringBetweenTokens(script, "INSERT", "WHERE");
+        } else {
+            graphAndTemplate = substringAfterToken(script, "INSERT");
+        }
+
+        // Extract construct template, make sure it's not blank and starts-ends with curly braces.
+
+        int i = graphAndTemplate.indexOf("{");
+        if (i != -1) {
+            constructTemplate = graphAndTemplate.substring(i);
+        }
+        if (constructTemplate == null || !startsEndsWith(constructTemplate.trim(), "{", "}")) {
+            throw new ScriptParseException("Could not detect CONSTRUCT template!");
+        }
+
+        // Extract WHERE pattern if present
+        if (wherePatternSpecified) {
+            wherePattern = substringAfterToken(script, "WHERE");
+            if (StringUtils.isBlank(wherePattern) || !wherePattern.trim().startsWith("{")) {
+                throw new ScriptParseException("Could not detect WHERE pattern!");
+            }
+        }
+
+        String result = substringBeforeToken(script, "INSERT");
+        result += "CONSTRUCT";
+        result += ensureWhitespaceStartEnd(constructTemplate);
+
+        if (!StringUtils.isBlank(datasetClause)) {
+            result += "FROM" + ensureWhitespaceStart(datasetClause);
+        }
+
+        result = ensureWhitespaceEnd(result);
+        if (!StringUtils.isBlank(wherePattern)) {
+            result += "WHERE" + ensureWhitespaceStart(wherePattern);
+        } else {
+            result += "WHERE {?s ?p ?o}";
+        }
+
+        result = result.trim();
+        result += " LIMIT " + TEST_RESULTS_LIMIT;
+
+        return result;
+    }
+
+    /**
+     *
+     * @param script
+     * @param harvestedSource
+     * @return
+     * @throws ScriptParseException
+     */
+    private static String deriveConstructFromDeleteOLD(String script, String harvestedSource) throws ScriptParseException {
 
         String deleteTemplate = null;
         String datasetClause = null;
@@ -308,7 +452,7 @@ public class PostHarvestScriptParser {
             if (wherePatternSpecified) {
                 datasetAndTemplate = substringBetweenTokens(script, "FROM", "WHERE");
                 wherePattern = substringAfterToken(script, "WHERE");
-                if (StringUtils.isBlank(wherePattern) || !wherePattern.trim().startsWith("{")){
+                if (StringUtils.isBlank(wherePattern) || !wherePattern.trim().startsWith("{")) {
                     throw new ScriptParseException("Could not detect WHERE pattern!");
                 }
             } else {
@@ -321,47 +465,113 @@ public class PostHarvestScriptParser {
                 deleteTemplate = datasetAndTemplate.substring(i);
             }
         } else {
-            if (wherePatternSpecified){
-                deleteTemplate =  substringBetweenTokens(script, "DELETE", "WHERE");
+            if (wherePatternSpecified) {
+                deleteTemplate = substringBetweenTokens(script, "DELETE", "WHERE");
                 wherePattern = substringAfterToken(script, "WHERE");
-                if (StringUtils.isBlank(wherePattern) || !wherePattern.trim().startsWith("{")){
+                if (StringUtils.isBlank(wherePattern) || !wherePattern.trim().startsWith("{")) {
                     throw new ScriptParseException("Could not detect WHERE pattern!");
                 }
-            }
-            else{
+            } else {
                 deleteTemplate = substringAfterToken(script, "DELETE");
             }
         }
 
-        String deleteTemplTrimd = deleteTemplate==null ? null : deleteTemplate.trim();
-        if (StringUtils.isEmpty(deleteTemplTrimd) || !(deleteTemplTrimd.startsWith("{") && deleteTemplTrimd.endsWith("}"))){
+        String deleteTemplTrimd = deleteTemplate == null ? null : deleteTemplate.trim();
+        if (StringUtils.isEmpty(deleteTemplTrimd) || !(deleteTemplTrimd.startsWith("{") && deleteTemplTrimd.endsWith("}"))) {
             throw new ScriptParseException("Could not detect DELETE template!");
         }
 
         String result = substringBeforeToken(script, "DELETE");
         result += "CONSTRUCT";
-        if (!Character.isWhitespace(deleteTemplate.charAt(0))){
+        if (!Character.isWhitespace(deleteTemplate.charAt(0))) {
             result += " ";
         }
         result += deleteTemplate;
-        if (!Character.isWhitespace(result.charAt(result.length()-1))){
+        if (!Character.isWhitespace(result.charAt(result.length() - 1))) {
             result += " ";
         }
 
-
-        if (!StringUtils.isBlank(datasetClause)){
+        if (!StringUtils.isBlank(datasetClause)) {
             datasetClause = StringUtils.replace(datasetClause, "?" + HARVESTED_SOURCE_VARIABLE, "<" + harvestedSource + ">");
             result += "FROM" + datasetClause;
         }
 
-        if (!StringUtils.isBlank(wherePattern)){
+        if (!StringUtils.isBlank(wherePattern)) {
             result += "WHERE" + wherePattern;
-        }
-        else{
+        } else {
             result += "WHERE {?s ?p ?o}";
         }
         result = result.trim();
-        result += " LIMIT 500";
+        result += " LIMIT " + TEST_RESULTS_LIMIT;
+
+        return result;
+    }
+
+    /**
+     *
+     * @param script
+     * @return
+     * @throws ScriptParseException
+     */
+    private static String deriveConstructFromDelete(String script) throws ScriptParseException {
+
+        String constructTemplate = null;
+        String datasetClause = null;
+        String wherePattern = null;
+
+        boolean wherePatternSpecified = containsToken(script, "WHERE");
+        // Extract the CONSTRUCT template, and the dataset section if present.
+
+        String afterDelete = substringAfterToken(script, "DELETE");
+        int i = afterDelete.indexOf("{");
+        if (i != -1) {
+            String afterGraph = afterDelete.substring(i);
+            if (containsToken(afterGraph, "FROM")) {
+                constructTemplate = substringBeforeToken(afterGraph, "FROM");
+                if (wherePatternSpecified) {
+                    datasetClause = substringBetweenTokens(afterGraph, "FROM", "WHERE");
+                } else {
+                    datasetClause = substringAfterToken(afterGraph, "FROM");
+                }
+            } else if (containsToken(afterGraph, "WHERE")) {
+                constructTemplate = substringBeforeToken(afterGraph, "WHERE");
+            } else {
+                constructTemplate = afterGraph;
+            }
+        }
+
+        // Ensure CONSTRUCT template is not blank and starts-ends with curly braces
+        if (constructTemplate == null || !startsEndsWith(constructTemplate.trim(), "{", "}")) {
+            throw new ScriptParseException("Could not detect CONSTRUCT template!");
+        }
+
+        // Extract WHERE pattern if present
+        if (wherePatternSpecified) {
+            wherePattern = substringAfterToken(script, "WHERE");
+            if (StringUtils.isBlank(wherePattern) || !wherePattern.trim().startsWith("{")) {
+                throw new ScriptParseException("Could not detect WHERE pattern!");
+            }
+        }
+
+        // Build the resulting CONSTRUCT query.
+
+        String result = substringBeforeToken(script, "DELETE");
+        result += "CONSTRUCT";
+        result += ensureWhitespaceStartEnd(constructTemplate);
+
+        if (!StringUtils.isBlank(datasetClause)) {
+            result += "FROM" + ensureWhitespaceStart(datasetClause);
+        }
+
+        result = ensureWhitespaceEnd(result);
+        if (!StringUtils.isBlank(wherePattern)) {
+            result += "WHERE" + ensureWhitespaceStart(wherePattern);
+        } else {
+            result += "WHERE {?s ?p ?o}";
+        }
+
+        result = result.trim();
+        result += " LIMIT " + TEST_RESULTS_LIMIT;
 
         return result;
     }
@@ -372,7 +582,7 @@ public class PostHarvestScriptParser {
      * @param token
      * @return
      */
-    private static boolean containsToken(String str, String token) {
+    public static boolean containsToken(String str, String token) {
 
         if (str == null || str.trim().length() == 0 || token == null || token.trim().length() == 0) {
             return false;
@@ -453,11 +663,19 @@ public class PostHarvestScriptParser {
     }
 
     /**
+     * Returns the substring that is between the given tokens (tokens themselves excluded). If neither tokens are present in the
+     * string, the string itself is returned. If token1 is present in the string, but token2 is not, then the substring after token1
+     * is returned. Similarly, if token2 is present in the string, but token1 is not, then the substring before token1 is returned.
+     * If neither tokens are present in the string, the string is returned as it is.
      *
-     * @param str
-     * @param token1
-     * @param token2
-     * @return
+     * If the given string is blank (i.e. null or empty after trimmed), the given string is returned as it is. If token1 is not
+     * blank, but token2 is, the method returns substring after token1. If token2 is not blank, but token1 is, the method returns
+     * substring before token1. If both tokens are blank, the string is returned as it is.
+     *
+     * @param str The given string.
+     * @param token1 token1
+     * @param token2 token2
+     * @return See method description above.
      */
     private static String substringBetweenTokens(String str, String token1, String token2) {
 
@@ -482,7 +700,7 @@ public class PostHarvestScriptParser {
      * @param replacement
      * @return
      */
-    private static String replaceToken(String str, String tokenToReplace, String replacement){
+    private static String replaceToken(String str, String tokenToReplace, String replacement) {
 
         if (str == null || str.trim().length() == 0 || tokenToReplace == null || tokenToReplace.trim().length() == 0) {
             return str;
@@ -498,12 +716,11 @@ public class PostHarvestScriptParser {
         }
 
         StringBuilder buf = new StringBuilder();
-        for (String token : originalTokens){
+        for (String token : originalTokens) {
 
-            if (token.equalsIgnoreCase(tokenToReplace)){
+            if (token.equalsIgnoreCase(tokenToReplace)) {
                 buf.append(replacement);
-            }
-            else{
+            } else {
                 buf.append(token);
             }
         }
@@ -528,18 +745,122 @@ public class PostHarvestScriptParser {
 
     /**
      *
-     * @param args
+     * @param str
+     * @param start
+     * @param end
+     * @return
      */
-    public static void main(String[] args) {
+    private static boolean startsEndsWith(String str, String start, String end) {
 
-        String s = "    jaanus risto enriko ander marek juhan";
-        System.out.println("_" + s.replaceAll("^\\s+", "") + "_");
-        String ss = "kk jaanus risto jaanus ander marek jaanus ...";
-        System.out.println("_" + replaceToken(ss, "jaaNus", "LIINA") + "_");
+        if (str == null) {
+            return false;
+        }
 
-        //        String s = "PREFIX dc: <http://uuu.ee> insert into <http://kk.ee> {?s ?p ?o}";
-        //        System.out.println("_" + substringBetweenTokens(s, "into", "where") + "_");
-        //        System.out.println("_" + substringAfterToken(s, "where") + "_");
+        return str.startsWith(start) && str.endsWith(end);
+    }
+
+    /**
+     *
+     * @param str
+     * @return
+     */
+    private static String ensureWhitespaceStart(String str) {
+
+        if (str == null) {
+            return null;
+        } else if (str.length() == 0 || !Character.isWhitespace(str.charAt(0))) {
+            return " " + str;
+        } else {
+            return str;
+        }
+    }
+
+    /**
+     *
+     * @param str
+     * @return
+     */
+    private static String ensureWhitespaceEnd(String str) {
+
+        if (str == null) {
+            return null;
+        } else if (str.length() == 0 || !Character.isWhitespace(str.charAt(str.length() - 1))) {
+            return str + " ";
+        } else {
+            return str;
+        }
+    }
+
+    /**
+     *
+     * @param str
+     * @return
+     */
+    private static String ensureWhitespaceStartEnd(String str) {
+
+        if (str == null) {
+            return null;
+        } else if (str.length() == 0) {
+            return " ";
+        } else {
+            String result = str;
+            if (!Character.isWhitespace(result.charAt(0))) {
+                result = " " + result;
+            }
+            if (!Character.isWhitespace(result.charAt(result.length() - 1))) {
+                result = result + " ";
+            }
+            return result;
+        }
+    }
+
+    /**
+     *
+     * @param args
+     * @throws ScriptParseException
+     */
+    public static void main(String[] args) throws ScriptParseException {
+
+        // String s = "KALA RISTO ENRIKO";
+        // System.out.println("_" + substringBetweenTokens(s, "MAJA", "KATUS") + "_");
+
+        // String s = "INSERT INTO <url1> {constructTemplate} FROM <url2> FROM ?harvestedSource WHERE {whereTemplate}";
+        // System.out.println(deriveConstructFromInsert(s, "url3"));
+        //
+        // s = "INSERT INTO <url1> {constructTemplate} FROM <url2> FROM ?harvestedSource";
+        // System.out.println(deriveConstructFromInsert(s, "url3"));
+        //
+        // s = "INSERT INTO <url1> {constructTemplate} WHERE {whereTemplate}";
+        // System.out.println(deriveConstructFromInsert(s, "url1"));
+        //
+        // s = "INSERT INTO <url1> {constructTemplate}";
+        // System.out.println(deriveConstructFromInsert(s, "url1"));
+
+        // String s = "DELETE FROM <url1> {constructTemplate} FROM <url2> FROM ?harvestedSource WHERE {whereTemplate}";
+        // System.out.println(deriveConstructFromDelete(s, "url3"));
+        //
+        // s = "DELETE FROM <url1> {constructTemplate} FROM <url2> FROM ?harvestedSource";
+        // System.out.println(deriveConstructFromDelete(s, "url3"));
+        //
+        // s = "DELETE FROM <url1> {constructTemplate} WHERE {whereTemplate}";
+        // System.out.println(deriveConstructFromDelete(s, "url1"));
+        //
+        // s = "DELETE FROM <url1> {constructTemplate}";
+        // System.out.println(deriveConstructFromDelete(s, "url1"));
+
+        String s =
+            "MODIFY <url1> DELETE {deleteTemplate} INSERT {insertTemplate} FROM <url2> FROM ?harvestedSource WHERE {whereTemplate}";
+        System.out.println(deriveConstruct(s, "url1"));
+
+        s = "MODIFY <url1> DELETE {deleteTemplate} INSERT {insertTemplate} FROM <url2> FROM ?harvestedSource";
+        System.out.println(deriveConstruct(s, "url1"));
+
+        s = "MODIFY <url1> DELETE {deleteTemplate} INSERT {insertTemplate} WHERE {whereTemplate}";
+        System.out.println(deriveConstruct(s, "url1"));
+
+        s = "MODIFY <url1> DELETE {deleteTemplate} INSERT {insertTemplate}";
+        System.out.println(deriveConstruct(s, "url1"));
+
     }
 
 }

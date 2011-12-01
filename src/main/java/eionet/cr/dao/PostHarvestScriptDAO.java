@@ -157,10 +157,10 @@ public interface PostHarvestScriptDAO extends DAO {
      * @param constructQuery
      * @param targetType
      * @param targetUrl
-     * @param defaultGraphUri
-     * @return TODO
+     * @param harvestedSource
+     * @return
      * @throws DAOException
      */
-    List<Map<String, ObjectDTO>> test(String constructQuery, TargetType targetType, String targetUrl, String defaultGraphUri)
+    List<Map<String, ObjectDTO>> test(String constructQuery, TargetType targetType, String targetUrl, String harvestedSource)
     throws DAOException;
 }

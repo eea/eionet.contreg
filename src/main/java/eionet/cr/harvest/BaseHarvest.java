@@ -323,9 +323,9 @@ public abstract class BaseHarvest implements Harvest {
         String parsedQuery = PostHarvestScriptParser.parseForExecution(query, getContextUrl(), associatedType);
 
         try {
-            LOGGER.debug(MessageFormat.format("Executing the {0} script titled \"{1}\":\n{2}", scriptType, title, parsedQuery));
+            LOGGER.debug(MessageFormat.format("Executing {0} script titled \"{1}\":\n{2}", scriptType, title, parsedQuery));
 
-            int updateCount = SesameUtil.executeSPARUL(parsedQuery, conn, getContextUrl());
+            int updateCount = SesameUtil.executeSPARUL(parsedQuery, conn);
             if (updateCount > 0 && !scriptDto.isRunOnce()) {
                 // run maximum 100 times
                 LOGGER.debug("Script's update count was " + updateCount

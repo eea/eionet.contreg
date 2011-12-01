@@ -142,24 +142,25 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
             logger.trace("Handling test event");
         }
 
-        String defaultGraphUri = testSourceUrl;
-        if (StringUtils.isBlank(defaultGraphUri)) {
+        String harvestedSource = testSourceUrl;
+        if (StringUtils.isBlank(harvestedSource)) {
             if (targetType != null && targetType.equals(TargetType.SOURCE)) {
-                defaultGraphUri = targetUrl;
+                harvestedSource = targetUrl;
             }
         }
 
         try {
-            executedTestQuery = PostHarvestScriptParser.deriveConstruct(script, defaultGraphUri);
+            executedTestQuery = PostHarvestScriptParser.deriveConstruct(script, harvestedSource);
         } catch (ScriptParseException e) {
             addWarningMessage(e.toString());
         }
         logger.debug("Executing derived CONSTRUCT query: " + executedTestQuery);
-        logger.debug("Using " + defaultGraphUri + " as the default graph");
+        // logger.debug("Using " + harvestedSource + " as the default graph");
 
         try {
             testResults =
-                DAOFactory.get().getDao(PostHarvestScriptDAO.class).test(executedTestQuery, targetType, targetUrl, defaultGraphUri);
+                DAOFactory.get().getDao(PostHarvestScriptDAO.class)
+                .test(executedTestQuery, targetType, targetUrl, harvestedSource);
         } catch (DAOException e) {
             testError = e.getMessage();
         }
@@ -270,9 +271,14 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
             addGlobalValidationError("Script must not be blank!");
         }
 
-        String sourceToTestOn = targetType != null && targetType.equals(TargetType.SOURCE) ? targetUrl : testSourceUrl;
-        if (StringUtils.isBlank(sourceToTestOn)) {
-            addGlobalValidationError("Test source must not be blank!");
+        // If harvested-source variable present in the script, then test source is mandatory
+        // (because the former will be substituted by the latter).
+        String harvestedSourceVariable = "?" + PostHarvestScriptParser.HARVESTED_SOURCE_VARIABLE;
+        if (PostHarvestScriptParser.containsToken(script, harvestedSourceVariable)) {
+            String testSource = targetType != null && targetType.equals(TargetType.SOURCE) ? targetUrl : testSourceUrl;
+            if (StringUtils.isBlank(testSource)) {
+                addGlobalValidationError("Test source must not be blank when using " + harvestedSourceVariable + " in the script!");
+            }
         }
 
         getContext().setSourcePageResolution(new ForwardResolution(SCRIPTS_CONTAINER_JSP));

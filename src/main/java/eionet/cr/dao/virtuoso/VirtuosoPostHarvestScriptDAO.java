@@ -165,7 +165,8 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
      *      java.lang.String, java.lang.String, boolean, boolean)
      */
     @Override
-    public int insert(TargetType targetType, String targetUrl, String title, String script, boolean active, boolean runOnce) throws DAOException {
+    public int insert(TargetType targetType, String targetUrl, String title, String script, boolean active, boolean runOnce)
+    throws DAOException {
 
         String sourceUrl = targetType != null && targetType.equals(TargetType.SOURCE) ? targetUrl : null;
         String typeUrl = targetType != null && targetType.equals(TargetType.TYPE) ? targetUrl : null;
@@ -437,14 +438,14 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
      *      java.lang.String, java.lang.String)
      */
     @Override
-    public List<Map<String, ObjectDTO>> test(String constructQuery, TargetType targetType, String targetUrl, String defaultGraphUri)
-    throws DAOException {
+    public List<Map<String, ObjectDTO>>
+    test(String constructQuery, TargetType targetType, String targetUrl, String harvestedSource) throws DAOException {
 
         if (StringUtils.isBlank(constructQuery)) {
             return new ArrayList<Map<String, ObjectDTO>>();
         }
 
-        String sourceReplacer = defaultGraphUri;
+        String sourceReplacer = harvestedSource;
         if (StringUtils.isBlank(sourceReplacer)) {
             if (targetType != null && targetType.equals(TargetType.SOURCE)) {
                 sourceReplacer = targetUrl;
@@ -465,7 +466,7 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
             }
 
             PostHarvestScriptTestResultsReader reader = new PostHarvestScriptTestResultsReader();
-            SesameUtil.executeQuery(constructQuery, bindings, reader, defaultGraphUri, conn);
+            SesameUtil.executeQuery(constructQuery, bindings, reader, conn);
             return reader.getResultList();
         } catch (Exception e) {
             throw new DAOException(e.getMessage(), e);

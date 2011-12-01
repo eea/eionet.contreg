@@ -22,6 +22,9 @@
                 the Test button returns the result of a CONSTRUCT query derived from your script
             </li>
             <li>
+                the ${actionBean.targetType=='SOURCE'? 'Target' : 'Test'} source will be used as replacer for ?${actionBean.harvestedSourceVariable} when you run Test
+            </li>
+            <li>
                 type at least 4 characters for suggestions in the ${actionBean.targetType=='SOURCE'? 'Target' : 'Test'} source.
             </li>
         </ul>
