@@ -96,8 +96,8 @@
                                     </c:choose>
                                 </c:when>
                                 <c:otherwise>
-                                    <span title="[Datatype: ${object.dataTypeLabel}]" style="white-space:pre-wrap"><c:out value="${object.value}"/></span><c:if test="${!object.equalMD5}">&nbsp;<stripes:link id="predObjValueLink_${predLoop.index+objLoop.index}" href="${actionBean.urlBinding}" event="openPredObjValue" style="font-size:1.2em" title="Open full text of this value">
-                                            <strong>...</strong>
+                                    <span title="[Datatype: ${object.dataTypeLabel}]" style="white-space:pre-wrap"><c:out value="${object.value}"/></span><c:if test="${!object.equalMD5}">&nbsp;<stripes:link id="predObjValueLink_${predLoop.index+objLoop.index}" href="${actionBean.urlBinding}" event="openPredObjValue" title="Open full text of this value">
+                                            <strong>[...]</strong>
                                             <stripes:param name="uri" value="${actionBean.uri}"/>
                                             <stripes:param name="predicateUri" value="${predicate.key}"/>
                                             <stripes:param name="objectMD5" value="${object.objectMD5}"/>
