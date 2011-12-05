@@ -235,19 +235,20 @@ public class Bindings {
     }
 
     /**
-    * Common method to set IRI that is suppposed to be URI.
-    * As IRI and URI have different standards if the URI is incalid URI the query has to use IRI() function
-    * and the parameter is given as string not URI
-    * @param name Param Name
-    * @param value Param Value
-    */
-   public void setIRI(String name, String value) {
+     * Common method to set IRI that is suppposed to be URI.
+     * As IRI and URI have different standards if the URI is invalid URI the query has to use IRI() function
+     * and the parameter is given as string not URI.
+     *
+     * @param name Param Name
+     * @param value Param Value
+     */
+    public void setIRI(String name, String value) {
 
-       if (SPARQLQueryUtil.isIRI(value)) {
-           setURI(name, value);
-       } else {
-           setString(name, value);
-       }
-   }
+        if (SPARQLQueryUtil.isIRI(value)) {
+            setURI(name, value);
+        } else {
+            setString(name, value);
+        }
+    }
 
 }

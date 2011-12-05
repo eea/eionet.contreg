@@ -38,6 +38,9 @@ import org.apache.commons.lang.StringUtils;
 public class FactsheetDTO extends SubjectDTO {
 
     /** */
+    public static final int MAX_OBJECT_LENGTH = 2000;
+
+    /** */
     private HashMap<String, Integer> predicateObjectCounts = new HashMap<String, Integer>();
 
     /** */
@@ -109,6 +112,14 @@ public class FactsheetDTO extends SubjectDTO {
             result.put(predicateUri, getObjects(predicateUri));
         }
         return result;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public int getMaxObjectLength(){
+        return MAX_OBJECT_LENGTH;
     }
 
     /**

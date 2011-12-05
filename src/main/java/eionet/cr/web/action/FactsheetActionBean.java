@@ -32,6 +32,7 @@ import javax.servlet.http.HttpSession;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.HandlesEvent;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.StreamingResolution;
@@ -39,6 +40,7 @@ import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.validation.SimpleError;
 import net.sourceforge.stripes.validation.ValidationMethod;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 
@@ -127,6 +129,11 @@ public class FactsheetActionBean extends AbstractActionBean {
 
     /** */
     private Boolean subjectIsType = null;
+
+    /** */
+    private String predicateUri;
+    private String objectMD5;
+    private String graphUri;
 
     /**
      *
@@ -711,5 +718,48 @@ public class FactsheetActionBean extends AbstractActionBean {
         }
 
         return subjectIsType;
+    }
+
+    /**
+     *
+     * @return
+     */
+    @HandlesEvent("openPredObjValue")
+    public Resolution openPredObjValue() {
+
+
+        StringBuilder buf = new StringBuilder("Hello World!\n");
+        buf.append(predicateUri).append("\n").append(objectMD5);
+
+        logger.trace("Retrieving object value for MD5 " + objectMD5 + " of predicate " + predicateUri);
+        String value = DAOFactory.get().getDao(HelperDAO.class).getLiteralObjectValue(uri, predicateUri, objectMD5, graphUri);
+        if (StringUtils.isBlank(value)){
+            value = "Found no value!";
+        }
+        else{
+            value = StringEscapeUtils.escapeXml(value);
+        }
+        return new StreamingResolution("text/html", value);
+    }
+
+    /**
+     * @param predicateUri the predicateUri to set
+     */
+    public void setPredicateUri(String predicateUri) {
+        this.predicateUri = predicateUri;
+    }
+
+    /**
+     * @param objectMD5 the objectMD5 to set
+     */
+    public void setObjectMD5(String objectMD5) {
+        this.objectMD5 = objectMD5;
+    }
+
+    /**
+     * @param graphUri the graphUri to set
+     */
+    public void setGraphUri(String graphUri) {
+        this.graphUri = graphUri;
     }
 }

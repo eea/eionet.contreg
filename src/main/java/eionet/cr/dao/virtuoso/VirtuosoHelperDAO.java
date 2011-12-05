@@ -1804,20 +1804,11 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     private static final String GET_FACTSHEET_ROWS =
         "select ?pred min(isBlank(?s)) as ?anonSubj "
         + "min(bif:either(isLiteral(?o),"
-        + "bif:concat(str(?o),'<|>',lang(?o),'<|>',str(datatype(?o)),'<|><|>0<|>',str(?g)),"
-        + "bif:concat(bif:coalesce(str(?oLabel),str(?o)),'<|>',lang(?oLabel),'<|>',str(datatype(?oLabel)),'<|>',str(?o),'<|>',str(isBlank(?o)),'<|>',str(?g))"
+        + "bif:concat(bif:left(str(?o),LEN),'<|>',lang(?o),'<|>',str(datatype(?o)),'<|><|>0<|>',str(?g),'<|>',bif:md5(str(?o))),"
+        + "bif:concat(bif:coalesce(str(?oLabel),bif:left(str(?o),LEN)),'<|>',lang(?oLabel),'<|>',str(datatype(?oLabel)),'<|>',bif:left(str(?o),LEN),'<|>',str(isBlank(?o)),'<|>',str(?g),'<|>',bif:md5(str(?o)))"
         + ")) as ?objData " + "count(distinct ?o) as ?objCount " + "where {" + "graph ?g {"
-        + "?s ?pred ?o. filter(?s=?subjectUri)}" + ". optional {?o <" + Predicates.RDFS_LABEL + "> ?oLabel}"
+        + "?s ?pred ?o. filter(?s=iri(?subjectUri))}" + ". optional {?o <" + Predicates.RDFS_LABEL + "> ?oLabel}"
         + "} group by ?pred";
-    // "select ?pred " +
-    // "min(isBlank(?s)) as ?anonSubj " +
-    // "min(bif:either(isLiteral(?o),?o,bif:concat(?oLabel, '" + FactsheetRowReader.OBJECT_DATA_SPLITTER +
-    // "', str(?o)))) as ?objData " +
-    // "count(?o) as ?objCount " +
-    // "where {?s ?pred ?o. filter(?s=?subjectUri)" +
-    // ". optional {?pred <http://www.w3.org/2000/01/rdf-schema#label> ?pLabel}" +
-    // ". optional {?o <http://www.w3.org/2000/01/rdf-schema#label> ?oLabel}} " +
-    // "group by ?pred";
 
     /** */
     private static final String GET_PREDICATE_LABELS = "select distinct ?pred ?label where " + "{" + "?pred <"
@@ -1837,28 +1828,23 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     public FactsheetDTO getFactsheet(String subjectUri, List<String> acceptedLanguages, Map<String, Integer> predicatePages)
     throws DAOException {
 
-        boolean subjectUriIsValid = true; // does not contain spaces etc
         if (StringUtils.isBlank(subjectUri)) {
             throw new IllegalArgumentException("Subject uri must not be blank!");
         }
 
-        Bindings bindings = new Bindings();
-        // if URI contains spaces - use IRI() function that makes an IRI from URI and seems to work with spaces as well
-        subjectUriIsValid = SPARQLQueryUtil.isIRI(subjectUri);
-        bindings.setIRI("subjectUri", subjectUri);
-
-        FactsheetReader factsheetReader = new FactsheetReader(subjectUri);
-
+        String query = StringUtils.replace(GET_FACTSHEET_ROWS, "LEN", String.valueOf(FactsheetDTO.MAX_OBJECT_LENGTH));
+        query = StringUtils.replace(query, "<|>", FactsheetReader.OBJECT_DATA_SPLITTER);
         if (logger.isTraceEnabled()) {
-            logger.trace("Executing factsheet query: "
-                    + StringUtils.replace(
-                            (subjectUriIsValid ? GET_FACTSHEET_ROWS : SPARQLQueryUtil.parseIRIQuery(GET_FACTSHEET_ROWS,
-                            "subjectUri")), "?subjectUri", "<" + subjectUri + ">"));
+            logger.trace("Executing factsheet query: " + query);
         }
 
-        executeSPARQL((subjectUriIsValid ? GET_FACTSHEET_ROWS : SPARQLQueryUtil.parseIRIQuery(GET_FACTSHEET_ROWS, "subjectUri")),
-                bindings, factsheetReader);
+        Bindings bindings = new Bindings();
+        bindings.setString("subjectUri", subjectUri);
+
+        FactsheetReader factsheetReader = new FactsheetReader(subjectUri);
+        executeSPARQL(query, bindings, factsheetReader);
         FactsheetDTO factsheetDTO = factsheetReader.getFactsheetDTO();
+
         if (factsheetDTO != null) {
 
             PredicateLabelsReader predicateLabelsReader = new PredicateLabelsReader(acceptedLanguages);
@@ -1887,6 +1873,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         return factsheetDTO;
     }
 
+    /** */
     private static final String SOURCE_COUNT_SPARQL = "SELECT COUNT(*) FROM ?sourceUri WHERE {?s ?p ?o}";
 
     // @Override
@@ -1917,6 +1904,38 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         bindings.setURI("subject", subjectUri);
         String graphUri = executeUniqueResultSPARQL(IS_TABULAR_DATA_SUBJECT, bindings, new SingleObjectReader<String>());
         return !StringUtils.isBlank(graphUri);
+    }
+
+    /** */
+    private static final String GET_LIT_OBJ_VALUE =
+        "select ?o where " +
+        "{graph ?g {?s ?p ?o. filter(?g=iri(?gV) && ?s=iri(?sV) && ?p=iri(?pV) && isLiteral(?o) && bif:md5(str(?o))=?objMD5)}}";
+
+    /**
+     * @see eionet.cr.dao.HelperDAO#getLiteralObjectValue(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
+     */
+    @Override
+    public String getLiteralObjectValue(String subjectUri, String predicateUri, String objectMD5, String graphUri) {
+
+        if (StringUtils.isBlank(subjectUri) || StringUtils.isBlank(predicateUri) || StringUtils.isBlank(objectMD5)
+                || StringUtils.isBlank(graphUri)) {
+            logger.warn("Missing subject or predicate or objectMD5 or graph!");
+            return null;
+        }
+
+        Bindings bindings = new Bindings();
+        bindings.setString("gV", graphUri);
+        bindings.setString("sV", subjectUri);
+        bindings.setString("pV", predicateUri);
+        bindings.setString("objMD5", objectMD5);
+
+        try {
+            return executeUniqueResultSPARQL(GET_LIT_OBJ_VALUE, bindings, new SingleObjectReader<String>());
+        } catch (Exception e) {
+            String msg = "Error when trying to retrieve the object value: ";
+            logger.error(msg, e);
+            return "Error when trying to retrieve the object value: " + e.toString();
+        }
     }
 
 }

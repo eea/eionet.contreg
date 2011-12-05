@@ -24,6 +24,7 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.util.Date;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 import org.openrdf.model.URI;
 
@@ -70,6 +71,12 @@ public class ObjectDTO implements Serializable {
     private long sourceHash;
 
     private ObjectDTO labelObject;
+
+    /** Repository-returned MD5 hash of the object.
+     * Used to indicate {@link #value} is different than the actual value in the repository is different.
+     * For example {@link #value} might contain only a substring of what's really in the database.
+     */
+    private String objectMD5;
 
     /**
      *
@@ -458,5 +465,27 @@ public class ObjectDTO implements Serializable {
      */
     public void setLabelObject(ObjectDTO labelObject) {
         this.labelObject = labelObject;
+    }
+
+    /**
+     * @return the objectMD5
+     */
+    public String getObjectMD5() {
+        return objectMD5;
+    }
+
+    /**
+     * @param objectMD5 the objectMD5 to set
+     */
+    public void setObjectMD5(String objectMD5) {
+        this.objectMD5 = objectMD5;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean isEqualMD5(){
+        return objectMD5!=null && value!=null && DigestUtils.md5Hex(value).equalsIgnoreCase(objectMD5);
     }
 }

@@ -22,6 +22,7 @@
 package eionet.cr.dao.readers;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.URIImpl;
 import org.openrdf.query.BindingSet;
@@ -36,6 +37,9 @@ import eionet.cr.util.sesame.SPARQLResultSetBaseReader;
  * @author Jaanus Heinlaid
  */
 public class FactsheetReader extends SPARQLResultSetBaseReader<FactsheetDTO> {
+
+    /** */
+    private static final Logger LOGGER = Logger.getLogger(FactsheetReader.class);
 
     /** */
     public static final String OBJECT_DATA_SPLITTER = "<|>";
@@ -88,11 +92,11 @@ public class FactsheetReader extends SPARQLResultSetBaseReader<FactsheetDTO> {
         }
 
         String[] split = StringUtils.splitByWholeSeparatorPreserveAllTokens(objectData, OBJECT_DATA_SPLITTER);
-        if (split == null || split.length > 6) {
-            throw new CRRuntimeException("Was expecting a length >=6 for the split array");
+        if (split == null || split.length > 7) {
+            throw new CRRuntimeException("Was expecting a length >=7 for the split array");
         }
 
-        String label = StringUtils.isBlank(split[0]) ? null : split[0].trim();
+        String label = StringUtils.isBlank(split[0]) ? "" : split[0].trim();
         String language = StringUtils.isBlank(split[1]) ? null : split[1].trim();
         URI datatype = StringUtils.isBlank(split[2]) ? null : new URIImpl(split[2].trim());
         String objectUri = StringUtils.isBlank(split[3]) ? null : split[3].trim();
@@ -100,14 +104,10 @@ public class FactsheetReader extends SPARQLResultSetBaseReader<FactsheetDTO> {
         boolean isLiteral = objectUri == null;
         boolean isAnonymous = StringUtils.isBlank(split[4]) ? false : split[4].trim().equals("1");
         String graphUri = StringUtils.isBlank(split[5]) ? null : split[5].trim();
+        String objectMD5 = StringUtils.isBlank(split[6]) ? "" : split[6].trim();
 
         ObjectDTO objectDTO = null;
         if (isLiteral) {
-            // For some XML files there can be cases where label is null.
-            // Just ignoring NullPointer in this case - needs further investigation
-            if (label == null) {
-                label = "";
-            }
             objectDTO = new ObjectDTO(label, language, true, false, datatype);
         } else {
             objectDTO = new ObjectDTO(objectUri, null, false, isAnonymous);
@@ -117,6 +117,13 @@ public class FactsheetReader extends SPARQLResultSetBaseReader<FactsheetDTO> {
             }
         }
         objectDTO.setSourceUri(graphUri);
+        objectDTO.setObjectMD5(objectMD5);
+
+        if (LOGGER.isTraceEnabled()){
+            if (isLiteral && !objectDTO.isEqualMD5()){
+                LOGGER.trace("Object's MD5 is different");
+            }
+        }
 
         return objectDTO;
     }

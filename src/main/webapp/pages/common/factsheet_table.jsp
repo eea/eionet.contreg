@@ -26,12 +26,12 @@
             <th scope="col" class="scope-col">Source</th>
         </thead>
         <tbody>
-            <c:forEach var="predicate" items="${actionBean.subject.sortedPredicates}">
+            <c:forEach var="predicate" items="${actionBean.subject.sortedPredicates}" varStatus="predLoop">
 
                 <c:set var="predicateLabelDisplayed" value="${false}"/>
                 <c:set var="predicateObjectsCount" value="${actionBean.subject.predicateObjectCounts[predicate.key]}"/>
 
-                <c:forEach items="${predicate.value}" var="object" varStatus="objectsStatus">
+                <c:forEach items="${predicate.value}" var="object" varStatus="objLoop">
 
                     <tr>
                         <c:if test="${displayCheckboxes}">
@@ -62,7 +62,7 @@
                         </th>
                         <td>
                             <c:choose>
-                                <c:when test="${objectsStatus.index==0 && predicateObjectsCount>1}">
+                                <c:when test="${objLoop.index==0 && predicateObjectsCount>1}">
                                     <c:choose>
                                         <c:when test="${empty actionBean.predicatePageNumbers[predicate.key]}">
                                                <stripes:link href="${crfn:predicateExpandLink(actionBean,predicate.key,1)}">
@@ -96,11 +96,17 @@
                                     </c:choose>
                                 </c:when>
                                 <c:otherwise>
-                                    <span title="[Datatype: ${object.dataTypeLabel}]" style="white-space:pre-wrap"><c:out value="${object.value}"/></span>
+                                    <span title="[Datatype: ${object.dataTypeLabel}]" style="white-space:pre-wrap"><c:out value="${object.value}"/></span><c:if test="${!object.equalMD5}">&nbsp;<stripes:link id="predObjValueLink_${predLoop.index+objLoop.index}" href="${actionBean.urlBinding}" event="openPredObjValue" style="font-size:1.2em" title="Open full text of this value">
+                                            <strong>...</strong>
+                                            <stripes:param name="uri" value="${actionBean.uri}"/>
+                                            <stripes:param name="predicateUri" value="${predicate.key}"/>
+                                            <stripes:param name="objectMD5" value="${object.objectMD5}"/>
+                                            <stripes:param name="graphUri" value="${object.sourceSmart}"/>
+                                        </stripes:link></c:if>
                                 </c:otherwise>
                             </c:choose>
                             <c:if test="${not empty object.language}">
-                                <span class="langcode"><c:out value="${object.language}"/></span>
+                                <span class="langcode" title="Language code of this text is '${object.language}'"><c:out value="${object.language}"/></span>
                             </c:if>
                         </td>
                         <td class="center">
@@ -118,7 +124,7 @@
 
                     <c:set var="predicateNumberOfPages" value="${crfn:numberOfPages(predicateObjectsCount, actionBean.predicatePageSize)}"/>
 
-                    <c:if test="${predicateNumberOfPages>1 && fn:length(predicate.value)>1 && objectsStatus.index==fn:length(predicate.value)-1}">
+                    <c:if test="${predicateNumberOfPages>1 && fn:length(predicate.value)>1 && objLoop.index==fn:length(predicate.value)-1}">
                         <c:set var="predicatePageNumber" value="${actionBean.predicatePageNumbers[predicate.key]}"/>
                         <tr>
                             <c:if test="${displayCheckboxes}">

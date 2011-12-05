@@ -10,25 +10,52 @@
             ( function($) {
                 $(document).ready(
                     function(){
-                        // Open dialog
+                        // onClick handler for add-bookmark link (open add-bookmark dialog)
                         $("#add_bookmark").click(function() {
                             $('#bookmark_dialog').dialog('open');
                             return false;
                         });
 
-                        // Dialog setup
+                        // The add-bookmark dialog setup
                         $('#bookmark_dialog').dialog({
                             autoOpen: false,
                             width: 500
                         });
 
-                        // Close dialog
+                        // onClick handler for submit button in add-bookmark dialog that closes the dialog
                         $("#bookmark_form_submit").click(function() {
                             $('#bookmark_dialog').dialog("close");
                             return true;
                         });
+
+                        // onClick handler for links that open full values of predicate objects
+                        // in a dialog window (used when the full value is too long to display on factsheet)
+                        $("[id^=predObjValueLink]").click(function() {
+                            $('#predObjValueDialog').dialog('open');
+                            $('#predObjValueDialog').append('<img src="${pageContext.request.contextPath}/images/wait.gif" alt="Wait clock"/>');
+                            $('#predObjValueDialog').load($(this).attr("href"));
+                            return false;
+                        });
+
+                        // Setup of the modal dialog that displays full value of objects that are too long
+                        // to display on factsheet.
+                        $('#predObjValueDialog').dialog({
+                            autoOpen: false,
+                            height: 500,
+                            width: 700,
+                            maxHeight: 800,
+                            maxWidth: 800,
+                            modal: true,
+                            closeOnEscape: true
+                        });
                     });
             } ) ( jQuery );
+
+            function loadPropertyValue(predicate,objectMD5){
+            	$("#wait_container").append('<div id="propertyValueDiv" title="Property value"/>');
+            	$("#propertyValueDiv").load('${pageContext.request.contextPath}${actionBean.urlBinding}?getObjectValue=&subj=${fn:escapeXml(actionBean.uri)}&pred=' + predicate + '&objMD5=' + objectMD5);
+            }
+
 // ]]>
         </script>
         <c:choose>
@@ -186,6 +213,7 @@
                                 <stripes:submit name="addbookmark" value="Add bookmark" id="bookmark_form_submit" style="float: right;"/>
                             </crfn:form>
                         </div>
+                        <div id="predObjValueDialog" title="Property value"/>
                     </c:when>
 
                     <%-- The section that is displayed if the subject does not yet exist in the database, --%>

@@ -521,4 +521,14 @@ public interface HelperDAO extends DAO {
      * @throws DAOException
      */
     boolean isTabularDataSubject(String subjectUri) throws DAOException;
+
+    /**
+     *
+     * @param subjectUri
+     * @param predicateUri
+     * @param objectMD5
+     * @param graphUri
+     * @return
+     */
+    String getLiteralObjectValue(String subjectUri, String predicateUri, String objectMD5, String graphUri);
 }
