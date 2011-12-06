@@ -213,7 +213,7 @@
                                 <stripes:submit name="addbookmark" value="Add bookmark" id="bookmark_form_submit" style="float: right;"/>
                             </crfn:form>
                         </div>
-                        <div id="predObjValueDialog" title="Property value"/>
+                        <div id="predObjValueDialog" title="Property value"></div>
                     </c:when>
 
                     <%-- The section that is displayed if the subject does not yet exist in the database, --%>
