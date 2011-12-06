@@ -1817,7 +1817,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
     /** */
     private static final String GET_PREDICATE_OBJECTS = "select ?obj ?objLabel ?g " + "where {graph ?g {"
-    + "?subjectUri ?predicateUri ?obj}" + ". optional {?obj <" + Predicates.RDFS_LABEL + "> ?objLabel}"
+    + "?s ?p ?obj. filter(?s=iri(?subjectUri) and ?p=iri(?predicateUri))}" + ". optional {?obj <" + Predicates.RDFS_LABEL + "> ?objLabel}"
     + "} order by str(bif:either(isLiteral(?obj),?obj,bif:coalesce(?objLabel,str(?obj)))) " + "limit "
     + PredicateObjectsReader.PREDICATE_PAGE_SIZE + " offset ";
 
@@ -1859,7 +1859,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
                     if (!StringUtils.isBlank(predicateUri) && pageNum > 0) {
 
                         int offset = PagingRequest.create(pageNum, PredicateObjectsReader.PREDICATE_PAGE_SIZE).getOffset();
-                        bindings.setURI("predicateUri", predicateUri);
+                        bindings.setString("predicateUri", predicateUri);
                         PredicateObjectsReader predicateObjectsReader = new PredicateObjectsReader(acceptedLanguages);
                         List<ObjectDTO> objects = executeSPARQL(GET_PREDICATE_OBJECTS + offset, bindings, predicateObjectsReader);
                         if (objects != null && !objects.isEmpty()) {
