@@ -24,7 +24,6 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.util.Date;
 
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 import org.openrdf.model.URI;
 
@@ -479,13 +478,5 @@ public class ObjectDTO implements Serializable {
      */
     public void setObjectMD5(String objectMD5) {
         this.objectMD5 = objectMD5;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public boolean isEqualMD5(){
-        return objectMD5!=null && value!=null && DigestUtils.md5Hex(value).equalsIgnoreCase(objectMD5);
     }
 }
