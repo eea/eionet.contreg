@@ -43,7 +43,7 @@ public class CreateDataset {
     }
 
     public void create(String label, String dataset, String folder, List<String> selectedFiles, boolean overwrite)
-            throws Exception {
+    throws Exception {
 
         try {
             // Store file as new source, but don't harvest it
@@ -129,13 +129,13 @@ public class CreateDataset {
     private void addSource(String dataset) throws Exception {
 
         DAOFactory.get().getDao(HarvestSourceDAO.class)
-                .addSourceIgnoreDuplicate(HarvestSourceDTO.create(dataset, false, 0, user.getUserName()));
+        .addSourceIgnoreDuplicate(HarvestSourceDTO.create(dataset, false, 0, user.getUserName()));
 
         DAOFactory
-                .get()
-                .getDao(HarvestSourceDAO.class)
-                .insertUpdateSourceMetadata(dataset, Predicates.CR_LAST_MODIFIED,
-                        ObjectDTO.createLiteral(dateFormat.format(new Date()), XMLSchema.DATETIME));
+        .get()
+        .getDao(HarvestSourceDAO.class)
+        .insertUpdateSourceMetadata(dataset, Predicates.CR_LAST_MODIFIED,
+                ObjectDTO.createLiteral(dateFormat.format(new Date()), XMLSchema.DATETIME));
     }
 
 }

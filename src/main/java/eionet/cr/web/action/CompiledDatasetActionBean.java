@@ -134,11 +134,9 @@ public class CompiledDatasetActionBean extends AbstractActionBean {
                         sched.scheduleJob(jobDetail, trigger);
 
                         // Update source last modified date
-                        DAOFactory
-                                .get()
-                                .getDao(HarvestSourceDAO.class)
-                                .insertUpdateSourceMetadata(uri, Predicates.CR_LAST_MODIFIED,
-                                        ObjectDTO.createLiteral(dateFormat.format(new Date()), XMLSchema.DATETIME));
+                        DAOFactory.get().getDao(HarvestSourceDAO.class)
+                        .insertUpdateSourceMetadata(uri, Predicates.CR_LAST_MODIFIED,
+                                ObjectDTO.createLiteral(dateFormat.format(new Date()), XMLSchema.DATETIME));
 
                         success = true;
                     } catch (Exception e) {
@@ -194,11 +192,12 @@ public class CompiledDatasetActionBean extends AbstractActionBean {
         helperDao.deleteTriples(triples);
 
         // Update source last modified date
-        DAOFactory
-                .get()
-                .getDao(HarvestSourceDAO.class)
-                .insertUpdateSourceMetadata(uri, Predicates.CR_LAST_MODIFIED,
-                        ObjectDTO.createLiteral(dateFormat.format(new Date()), XMLSchema.DATETIME));
+        DAOFactory.get().getDao(HarvestSourceDAO.class)
+        .insertUpdateSourceMetadata(uri, Predicates.CR_LAST_MODIFIED,
+                ObjectDTO.createLiteral(dateFormat.format(new Date()), XMLSchema.DATETIME));
+
+        // Update HARVESTED STATEMENTS
+        DAOFactory.get().getDao(HarvestSourceDAO.class).updateHarvestedStatements(uri);
 
         addSystemMessage("Selected files are removed from the dataset.");
         if (compiledDatasetDao.hasCompiledDatasetExpiredData(uri, selectedFiles)) {

@@ -28,6 +28,24 @@
                             return true;
                         });
 
+                     	// onClick handler for add-to_dataset link (open add_dataset dialog)
+                        $("#add_to_dataset").click(function() {
+                            $('#dataset_dialog').dialog('open');
+                            return false;
+                        });
+
+                        // The dataset dialog setup
+                        $('#dataset_dialog').dialog({
+                            autoOpen: false,
+                            width: 400
+                        });
+
+                        // onClick handler for submit button in dataset dialog that closes the dialog
+                        $("#dataset_form_submit").click(function() {
+                            $('#dataset_dialog').dialog("close");
+                            return true;
+                        });
+
                         // onClick handler for links that open full values of predicate objects
                         // in a dialog window (used when the full value is too long to display on factsheet)
                         $("[id^=predObjValueLink]").click(function() {
@@ -50,12 +68,6 @@
                         });
                     });
             } ) ( jQuery );
-
-            function loadPropertyValue(predicate,objectMD5){
-            	$("#wait_container").append('<div id="propertyValueDiv" title="Property value"/>');
-            	$("#propertyValueDiv").load('${pageContext.request.contextPath}${actionBean.urlBinding}?getObjectValue=&subj=${fn:escapeXml(actionBean.uri)}&pred=' + predicate + '&objMD5=' + objectMD5);
-            }
-
 // ]]>
         </script>
         <c:choose>
@@ -80,6 +92,7 @@
                         <c:set var="addBookmarkAllowed" value="${registrationsAllowed && !actionBean.subjectIsUserBookmark}"/>
                         <c:set var="removeBookmarkAllowed" value="${actionBean.subjectIsUserBookmark}"/>
                         <c:set var="addReviewAllowed" value="${registrationsAllowed && subjectUrl!=null}"/>
+                        <c:set var="addToCompiledDataset" value="${sourceReadActionsAllowed && actionBean.adminLoggedIn && !actionBean.compiledDataset && not empty actionBean.userCompiledDatasets}"/>
 
                         <c:set var="displayOperations" value="${editAllowed || harvestAllowed || sourceReadActionsAllowed || downloadAllowed || addBookmarkAllowed || removeBookmarkAllowed || addReviewAllowed}"/>
 
@@ -141,6 +154,11 @@
                                                 <stripes:link class="link-plain" href="/home/${actionBean.userName}/reviews?add=Add&addUrl=${ subjectUrl }">Add review</stripes:link>
                                             </li>
                                         </c:if>
+                                        <c:if test="${addToCompiledDataset}">
+                                        	<li>
+                                        		<a href="#" id="add_to_dataset">Add to compiled dataset</a>
+                                        	</li>
+                                        </c:if>
                                     </ul>
                                 </li>
                             </ul>
@@ -154,7 +172,7 @@
                                 <c:when test="${subjectUrl!=null}">
                                     <p>Resource URL: <a class="link-external" href="${fn:escapeXml(subjectUrl)}"><c:out value="${subjectUrl}"/></a>
                                         <c:choose>
-                                            <c:when    test ="${actionBean.subjectIsUserBookmark}">(Bookmarked)</c:when>
+                                            <c:when test ="${actionBean.subjectIsUserBookmark}">(Bookmarked)</c:when>
                                         </c:choose>
                                     </p>
                                     <c:if test="${actionBean.currentlyHarvested}">
@@ -203,16 +221,32 @@
 
                             </crfn:form>
                         </div>
-                        <div id="bookmark_dialog" title="Add bookmark">
-                            <crfn:form action="/factsheet.action" method="post">
-                                <stripes:hidden name="uri" value="${subjectUrl}"/>
-                                <fieldset style="border: 0px;">
-                                    <label for="label" style="width: 200px; float: left;">Label</label>
-                                    <stripes:text name="bookmarkLabel" id="label" size="40"/>
-                                </fieldset>
-                                <stripes:submit name="addbookmark" value="Add bookmark" id="bookmark_form_submit" style="float: right;"/>
-                            </crfn:form>
-                        </div>
+                        <c:if test="${actionBean.userLoggedIn}">
+	                        <div id="bookmark_dialog" title="Add bookmark">
+	                            <crfn:form action="/factsheet.action" method="post">
+	                                <stripes:hidden name="uri" value="${subjectUrl}"/>
+	                                <fieldset style="border: 0px;">
+	                                    <label for="label" style="width: 200px; float: left;">Label</label>
+	                                    <stripes:text name="bookmarkLabel" id="label" size="40"/>
+	                                </fieldset>
+	                                <stripes:submit name="addbookmark" value="Add bookmark" id="bookmark_form_submit" style="float: right;"/>
+	                            </crfn:form>
+	                        </div>
+	                        <div id="dataset_dialog" title="Add to compiled dataset">
+	                            <crfn:form action="/saveFiles.action" method="post">
+	                                <stripes:hidden name="selectedFiles" value="${subjectUri}"/>
+	                                <fieldset style="border: 0px;">
+	                                	<label for="compiledDataset" style="width: 200px; float: left;">Select compiled dataset:</label>
+		                                <stripes:select name="dataset" id="compiledDataset" style="width: 350px;">
+											<c:forEach items="${actionBean.userCompiledDatasets}" var="ds" varStatus="loop">
+												<stripes:option value="${ds}" label="${crfn:removeHomeUri(ds)}" />
+											</c:forEach>
+										</stripes:select>
+									</fieldset>
+	                                <stripes:submit name="save" value="Add" id="dataset_form_submit" style="float: right;"/>
+	                            </crfn:form>
+	                        </div>
+                        </c:if>
                         <div id="predObjValueDialog" title="Property value"></div>
                     </c:when>
 

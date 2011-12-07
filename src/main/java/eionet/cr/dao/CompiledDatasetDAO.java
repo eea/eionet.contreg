@@ -20,13 +20,10 @@
  */
 package eionet.cr.dao;
 
-import java.util.Collection;
 import java.util.List;
 
 import eionet.cr.dto.DeliveryFilesDTO;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.dto.UploadDTO;
-import eionet.cr.web.security.CRUser;
 
 /**
  * Interface to define compiled dataset related dao methods.
@@ -46,10 +43,11 @@ public interface CompiledDatasetDAO extends DAO {
     /**
      *
      * @param homeFolder
+     * @param excludeFileUri - if provided, then compiled datasets that include this file, are not returned
      * @return List<String>
      * @throws DAOException
      */
-    List<String> getCompiledDatasets(String homeFolder) throws DAOException;
+    List<String> getCompiledDatasets(String homeFolder, String excludeFileUri) throws DAOException;
 
     /**
      *
@@ -88,18 +86,6 @@ public interface CompiledDatasetDAO extends DAO {
      * @throws DAOException
      */
     void removeFiles(String datasetUri, List<String> selectedFiles) throws DAOException;
-
-    /**
-     * User compiled datasets.
-     *
-     * @param crUser
-     *            CR user
-     * @see eionet.cr.dao.HelperDAO#getUserCompiledDatasets(eionet.cr.web.security.CRUser)
-     * @throws DAOException
-     *             if query fails
-     * @return List of user compiled datasets
-     */
-    Collection<UploadDTO> getUserCompiledDatasets(CRUser crUser) throws DAOException;
 
     /**
      * Check if compiled dataset exists

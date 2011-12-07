@@ -73,7 +73,7 @@ public class SaveFilesActionBean extends DisplaytagSearchActionBean {
 
     private void init() throws DAOException {
         deliveryFiles = DAOFactory.get().getDao(CompiledDatasetDAO.class).getDeliveryFiles(selectedDeliveries);
-        existingDatasets = DAOFactory.get().getDao(CompiledDatasetDAO.class).getCompiledDatasets(getUser().getHomeUri());
+        existingDatasets = DAOFactory.get().getDao(CompiledDatasetDAO.class).getCompiledDatasets(getUser().getHomeUri(), null);
         folders = factory.getDao(FolderDAO.class).getUserFolders(getUser().getHomeUri());
     }
 

@@ -47,6 +47,7 @@ import org.apache.commons.lang.math.NumberUtils;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.config.GeneralConfig;
+import eionet.cr.dao.CompiledDatasetDAO;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
@@ -134,6 +135,9 @@ public class FactsheetActionBean extends AbstractActionBean {
     private String predicateUri;
     private String objectMD5;
     private String graphUri;
+
+    /** */
+    private List<String> userCompiledDatasets;
 
     /**
      *
@@ -727,10 +731,6 @@ public class FactsheetActionBean extends AbstractActionBean {
     @HandlesEvent("openPredObjValue")
     public Resolution openPredObjValue() {
 
-
-        StringBuilder buf = new StringBuilder("Hello World!\n");
-        buf.append(predicateUri).append("\n").append(objectMD5);
-
         logger.trace("Retrieving object value for MD5 " + objectMD5 + " of predicate " + predicateUri);
         String value = DAOFactory.get().getDao(HelperDAO.class).getLiteralObjectValue(uri, predicateUri, objectMD5, graphUri);
         if (StringUtils.isBlank(value)){
@@ -762,4 +762,21 @@ public class FactsheetActionBean extends AbstractActionBean {
     public void setGraphUri(String graphUri) {
         this.graphUri = graphUri;
     }
+
+    public List<String> getUserCompiledDatasets() {
+        if (userCompiledDatasets == null && !StringUtils.isBlank(uri)) {
+            try {
+                CompiledDatasetDAO dao = DAOFactory.get().getDao(CompiledDatasetDAO.class);
+                userCompiledDatasets = dao.getCompiledDatasets(getUser().getHomeUri(), uri);
+            } catch (DAOException e) {
+                e.printStackTrace();
+            }
+        }
+        return userCompiledDatasets;
+    }
+
+    public void setUserCompiledDatasets(List<String> userCompiledDatasets) {
+        this.userCompiledDatasets = userCompiledDatasets;
+    }
+
 }

@@ -62,9 +62,14 @@
 				        					<c:out value="${file.title}"/>
 				        				</td>
 				        				<td>
-				        					<c:if test="${file.triplesCnt > 0}">
-				        						<c:out value="${file.triplesCnt}"/>
-				        					</c:if>
+				        					<c:choose>
+					        					<c:when test="${file.triplesCnt > 0}">
+					        						<c:out value="${file.triplesCnt}"/>
+					        					</c:when>
+					        					<c:otherwise>
+					        						<c:out value="na"/>
+					        					</c:otherwise>
+				        					</c:choose>
 				        				</td>
 				        			</tr>
 				        		</c:forEach>
@@ -79,7 +84,7 @@
 									<stripes:select name="dataset" style="width: 383px;" id="selDataset">
 										<stripes:option value="new_dataset" label="- new dataset -" />
 										<c:forEach items="${actionBean.existingDatasets}" var="ds" varStatus="loop">
-											<stripes:option value="${ds}" label="${ds}" />
+											<stripes:option value="${ds}" label="${crfn:removeHomeUri(ds)}" />
 										</c:forEach>
 									</stripes:select>
 								</td>

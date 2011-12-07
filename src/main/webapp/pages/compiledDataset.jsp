@@ -55,7 +55,9 @@
                 </stripes:link>
             </display:column>
             <display:column title="Last modified" sortable="true">
-                <fmt:formatDate value="${item.lastModifiedDate}" pattern="yyyy-MM-dd"/>T<fmt:formatDate value="${item.lastModifiedDate}" pattern="HH:mm:ss"/>
+            	<c:if test="${not empty item.lastModifiedDate}">
+                	<fmt:formatDate value="${item.lastModifiedDate}" pattern="yyyy-MM-dd"/>T<fmt:formatDate value="${item.lastModifiedDate}" pattern="HH:mm:ss"/>
+                </c:if>
             </display:column>
         </display:table>
         <c:if test="${operationsAvailable && !actionBean.sourcesEmpty}">
