@@ -35,8 +35,7 @@
 		        <h1>Save files into dataset</h1>
 				<p class="documentDescription">
 					Select multiple files and store them into one compiled dataset under your home-folder.
-					The list will only show files that contain at least one triple. If the file you are
-					looking for isn't in the list then it is probably not harvested yet or it isn't XML or RDF file.
+					The list will show only XML or RDF files.
 				</p>
 
 				<c:if test="${not empty actionBean.deliveryFiles}">
